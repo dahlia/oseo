@@ -1146,8 +1146,8 @@ assessments:
       force.
     replacementEvidence:
       tests/native/fixtures/regexp-static-evidence.ts:
-        "bfc8bfb63c609c85f6ef79d9362deef6ac8434e2e1fd37\
-        e9256f23c3c634850b"
+        "0e3c394100a05e2c5c396d53d249ec25b5ac95b9befe44\
+        ffa5bc2ba640a81943"
   ds17-static-source-roundtrips:
     disposition: exclusion
     normativeDependency: source-evaluation-only
@@ -1166,8 +1166,8 @@ assessments:
       force.
     replacementEvidence:
       tests/native/fixtures/regexp-static-evidence.ts:
-        "bfc8bfb63c609c85f6ef79d9362deef6ac8434e2e1fd37\
-        e9256f23c3c634850b"
+        "0e3c394100a05e2c5c396d53d249ec25b5ac95b9befe44\
+        ffa5bc2ba640a81943"
       tests/regexp-static-grammar.test.ts:
         "3ac4d22647648884e349f954665b17d33aa8df8ed7974e\
         66003cf3014dcc26c8"

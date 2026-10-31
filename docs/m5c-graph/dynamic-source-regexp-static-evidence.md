@@ -121,12 +121,32 @@ Root's exact-candidate CI must run the ordinary full suites, including
 AArch64 Linux cross-link, and `test:test262`. This worker does not run
 `mise run test`, publish, push, merge or set landed.
 
-Local validation: 29 grammar/structural tests passed. The fixed fixture
-passed in Node.js, Deno and Linux AMD64 native execution with specialization
-disabled and enabled. Each native policy observed 4,055 forced collections,
-236 allocations and the exact expected success output. The focused native
-log and capacity metadata are in
+Initial validation at `8b1e69ba`: 29 grammar/structural tests passed. The fixed
+fixture passed in Node.js, Deno and Linux AMD64 native execution with
+specialization disabled and enabled. Each native policy observed 4,055 forced
+collections, 236 allocations and the exact expected success output. The focused
+native log and capacity metadata are in
 */data/m5c-d17-20261031/ds17/native-focused.stdout* and the adjacent JSON
-record. These observations establish
-the local candidate; Root still owns both-host exact-candidate CI and outer
-review.
+record. These observations establish the local candidate; Root still owns
+both-host exact-candidate CI and outer review.
+
+
+Witness oracle follow-up
+------------------------
+
+Root's witness-oracle follow-up `msg_e2fd2ff4ed97` requires strict in-program
+value comparisons and mutation controls. The fixed fixture uses `Object.is`
+for the original SameValue observations. Its six negative controls reject
+number/string, undefined/string, boolean/string and positive/negative-zero
+mismatches, while a NaN positive control succeeds. The actual observations
+use the same oracle; printed output is only the final success marker. Math
+remains an unqualified identifier read, as in the original path.
+
+The updated fixture passes in Node.js, Deno and Linux AMD64 native execution
+under both specialization policies. Each native policy observes 269
+allocations and 4,386 forced collections; enabled specialization additionally
+observes 85 guard hits and 90 misses. Evidence is in
+*/data/m5c-d17-20261031/ds17/native-oracle.stdout* and its adjacent JSON
+record. All 29 grammar/structural tests pass. The audit replacement digests
+are refreshed; no subset, classification, dependency tag or observation
+changes, so no UPDATE is needed.
