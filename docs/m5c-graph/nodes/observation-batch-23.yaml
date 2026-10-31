@@ -10,5 +10,5 @@ dependencies:
   - class-static-keyword-escape-early-error
   - default-derived-constructor-spread-iterator
   - observation-batch-plan
-landed: false
+landed: true
 status: ready
