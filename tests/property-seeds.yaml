@@ -588,3 +588,7 @@ families:
     owner: tests/property/m5-with-var-loop-head.property.test.ts
     start: 0x60009200
     end: 0x600092ff
+  - family: m5-non-blocking-agent
+    owner: tests/property/m5-non-blocking-agent.property.test.ts
+    start: 0x60009300
+    end: 0x600093ff

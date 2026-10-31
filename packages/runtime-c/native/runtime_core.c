@@ -118,6 +118,7 @@ void oseo_context_init(
     context->atomics_waiter_head = oseo_undefined();
     context->atomics_waiter_tail = oseo_undefined();
     context->agent = NULL;
+    context->agent_can_block = true;
     context->agent_broadcast_callback = oseo_undefined();
     context->finalization_head = oseo_undefined();
     context->finalization_tail = oseo_undefined();

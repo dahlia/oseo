@@ -49,6 +49,8 @@ export type SpecializationMode = "disabled" | "enabled";
 
 /** Explicit compiler orchestration options, independent of process globals. */
 export interface CompilerOptions {
+  /** Main test262 agent's [[CanBlock]]; omitted means true. */
+  readonly mainAgentCanBlock?: boolean;
   readonly observeSpecialization?: boolean;
   readonly specialization?: SpecializationMode;
   /**
@@ -79,6 +81,8 @@ export interface MirHostScript {
 
 /** The test262 host a main program installs before its Script runs. */
 export interface MirTest262Host {
+  /** Agent policy shared by every realm of the main context. */
+  readonly mainAgentCanBlock?: boolean;
   readonly scripts?: readonly MirHostScript[];
   /** Agent program templates, indexed as each agent program's entry. */
   readonly agents: readonly MirAgentTemplate[];

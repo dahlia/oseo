@@ -641,6 +641,8 @@ struct OseoContext {
      * behind this public generated-code boundary.
      */
     void *agent;
+    /* Agent [[CanBlock]], shared by its realms; child contexts start true. */
+    bool agent_can_block;
     /* The callback `$262.agent.receiveBroadcast` registered, rooted. */
     OseoValue agent_broadcast_callback;
     /* Collector-owned FIFO of finalization cells ready for a later runtime

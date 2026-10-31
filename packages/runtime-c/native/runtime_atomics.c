@@ -967,6 +967,14 @@ static OseoResult atomics_wait(
                 : fmax(number, 0.0);
         }
     }
+    if (result.status == OSEO_STATUS_NORMAL &&
+        !asynchronous && !context->agent_can_block) {
+        result = oseo_internal_throw_error(
+            context,
+            OSEO_ERROR_TYPE,
+            "The executing agent cannot suspend."
+        );
+    }
     if (result.status != OSEO_STATUS_NORMAL) {
         oseo_roots_release(context, &frame);
         return result;

@@ -297,6 +297,8 @@ export class ReviewedTest262RunError extends Error {
 
 /** Inputs passed to an injected native executor. */
 export interface Test262ExecutionRequest {
+  /** Executing main agent's [[CanBlock]]; omitted means true. */
+  readonly mainAgentCanBlock?: boolean;
   readonly fragment?: Test262FragmentInput;
   readonly mode: Test262ExecutionMode;
   /**
@@ -310,8 +312,8 @@ export interface Test262ExecutionRequest {
   readonly sourcePath?: string;
   readonly specialization: SpecializationMode;
   /**
-   * The case reads `$262.agent`, so the program is built with the native
-   * test262 host and its agent programs.
+   * The case needs host bindings, AOT agent programs, or the explicit
+   * non-blocking main-agent policy, so it uses the native test262 host.
    */
   readonly test262Host?: boolean;
 }
@@ -724,26 +726,6 @@ function unsupportedRuntimeCapability(stderr: string): string | undefined {
   return diagnostic === "Number prototype methods are not admitted yet."
     ? "number-prototype"
     : undefined;
-}
-
-/**
- * A harness or agent capability that no native agent can provide, decided
- * before execution. A `CanBlockIsFalse` case needs an agent whose
- * [[CanBlock]] is false, while every native agent of this profile can
- * suspend. It stays an explicit unsupported result naming the missing
- * capability, never a pass and never a silently dropped path. A case that
- * needs `$262.agent` runs against the native test262 host instead.
- */
-function unsupportedHostCapability(
-  parsed: ParsedTest262Case,
-): { readonly capability: string; readonly detail: string } | undefined {
-  if (parsed.flags.includes("CanBlockIsFalse")) {
-    return {
-      capability: "non-blocking-agent",
-      detail: "the case needs an agent whose [[CanBlock]] is false.",
-    };
-  }
-  return undefined;
 }
 
 /**
@@ -1524,7 +1506,8 @@ async function executedResult(
   rootPath?: string,
 ): Promise<Test262Result> {
   const testCase = parsed.case;
-  const test262Host = needsTest262Host(source, parsed);
+  const nonBlocking = parsed.flags.includes("CanBlockIsFalse");
+  const test262Host = nonBlocking || needsTest262Host(source, parsed);
   /*
    * An ordinary module or asynchronous case runs under the deterministic
    * logical clock ADR 0013 records. A case built with the native test262
@@ -1677,6 +1660,10 @@ async function executedResult(
       };
     }),
     specialization: variant.specialization,
+    ...includePropertiesWhen(() => {
+      if (!nonBlocking) return undefined;
+      return { mainAgentCanBlock: false };
+    }),
     ...includePropertiesWhen(() => {
       if (!test262Host) return undefined;
       return { test262Host };
@@ -2011,19 +1998,6 @@ export async function executeTest262Case(
   )
     ? new Set([...supportedFeatures, ...observeOnlyFeatures])
     : supportedFeatures;
-  const hostCapability = unsupportedHostCapability(parsed);
-  if (hostCapability != null) {
-    return classifyTest262(
-      parsed.case,
-      {
-        detail: `Not executed: ${hostCapability.detail}`,
-        passed: false,
-        unsupportedCapability: hostCapability.capability,
-      },
-      observedFeatures,
-      evidence,
-    );
-  }
   const structuralCapability = unsupportedStructuralCapability(
     source,
     parsed,
@@ -2301,6 +2275,9 @@ async function loadNativeExecution(): Promise<NativeExecution> {
           ? []
           : ["--script", test262ModuleHarnessSourceId]),
         ...(request.test262Host === true ? ["--test262-host"] : []),
+        ...(request.mainAgentCanBlock === false
+          ? ["--test262-non-blocking"]
+          : []),
         ...(request.specialization === "disabled"
           ? ["--no-specialization"]
           : []),

@@ -7890,7 +7890,7 @@ an expected value that wraps to the stored bits matches. `isLockFree` reports
 `true` for one, two, four, and eight bytes after `ToIntegerOrInfinity`, which
 is this profile's implementation-defined agent record.
 
-The agent can suspend. `Atomics.wait` requires an `Int32Array` or
+The agent can suspend by default. `Atomics.wait` requires an `Int32Array` or
 `BigInt64Array` over a `SharedArrayBuffer` and returns `"not-equal"` or, for
 a matching element, suspends until its timeout and returns `"timed-out"`: no
 other agent exists to notify it, so an infinite timeout never returns. A
@@ -7931,9 +7931,18 @@ Every case that needs a second agent kept an explicit capability boundary
 at this node: the reviewed runner classified a case that includes
 *atomicsHelper.js* or names `$262.agent` as unsupported with the
 `test262-agent` capability without executing it, until the agent cluster
-section below admitted that capability. A `CanBlockIsFalse` case stays
-unsupported with the `non-blocking-agent` capability, because every native
-agent of this profile can suspend. The reviewed harness gains *testAtomics.js*,
+section below admitted that capability. M5c adds the main-agent blocking
+policy of ADR 0026: the reviewed runner selects `[[CanBlock]]` false for
+`CanBlockIsFalse` through `--test262-host --test262-non-blocking`.
+`Atomics.wait` then throws TypeError after view/index validation and
+value/timeout conversions, before comparing memory, even for a mismatch or
+zero timeout. `waitAsync` is unchanged. Ordinary main agents and all child
+agents default to true; realms share their owning agent's policy. The two
+owned rows keep their checked-in unsupported classification pending Root's
+UPDATE. The focused evidence is
+*tests/non-blocking-agent-native.test.ts* and
+*tests/property/m5-non-blocking-agent.property.test.ts*.
+The reviewed harness gains *testAtomics.js*,
 unchanged in behavior; its non-view value list constructs a Boolean wrapper, so
 the cases that include it keep the unadmitted `Boolean` binding boundary. The
 reviewed feature list gains `Atomics`, `Atomics.waitAsync`, and
@@ -8735,9 +8744,9 @@ complete. The remaining gaps retain their existing owners.
     boundary stands.
  -  Realms beyond the initial realm, agent clusters, cross-agent shared
     memory, and the `$262.createRealm`, `$262.global`, and `$262.agent`
-    capabilities are admitted as recorded above, except that an agent whose
-    [[CanBlock]] is false stays unsupported with the `non-blocking-agent`
-    capability, an agent source that no ahead-of-time template describes
+    capabilities are admitted as recorded above, including the main-agent
+    `[[CanBlock]]` policy of ADR 0026. An agent source that no
+    ahead-of-time template describes
     stays behind the dynamic source boundary. ADR 0029 permits a created
     realm to evaluate a member of the finite ahead-of-time host Script set.
     Ordinary `eval` and `Function` source compilation retain ADR 0016.
