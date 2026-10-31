@@ -104,8 +104,9 @@ owners:
       case-conversion and generator-instance replacement evidence; 71
       remain umbrella remediation. DS-14 callable-object evidence
       accounts for 61 paths whose complete non-source contracts are
-      observed by the 18 bound static/native groups and per-path
-      assessment; five pinned paths retain remediation for
+      observed by the 16 complete bound static/native groups and
+      per-path assessment; two additional groups are partial and close
+      no path; five pinned paths retain remediation for
       source-constructor naming or Function-subclass allocation. No path
       changes classification or becomes a pass."
     paths: 738

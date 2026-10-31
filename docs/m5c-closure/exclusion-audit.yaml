@@ -1118,16 +1118,16 @@ assessments:
     normativeDependency: source-evaluation-only
     replacementEvidence:
       tests/native/fixtures/callable-object-evidence.ts:
-        "a572704e8237c479946d078affaa8cdbe027278574207e4b3409\
-        c79005318308"
+        "e0d333bcdf6e7a86fff6aea8caed32905d2b0b35cb26cb071164\
+        3e7e74a54305"
       tests/callable-object-evidence.test.ts:
         "d2b814666e5645565ca2001f0419b931cd2949624777047f562d\
         a479c71be70d"
       tests/native.ts: "91222c3fc3b2335cfcd96ba614f2a4705a3c0935d6946fc2d998\
         9bcce7b251a7"
       docs/m5c-graph/dynamic-source-callable-object-assessment.md:
-        "1dcdd38059099dfacc63f694cc3458365cde82a8c764af44051a\
-        77805f653329"
+        "ff5881b8f97000fa6865bdc361ca14dfe1ce583b0a8d8cf089d5\
+        3403dfefd355"
     reason: DS-14 item 1 replacement group
       callable-object-intrinsic-constructability, in
       tests/native/fixtures/callable-object-evidence.ts and its focused
@@ -1150,16 +1150,16 @@ assessments:
     normativeDependency: source-evaluation-only
     replacementEvidence:
       tests/native/fixtures/callable-object-evidence.ts:
-        "a572704e8237c479946d078affaa8cdbe027278574207e4b3409\
-        c79005318308"
+        "e0d333bcdf6e7a86fff6aea8caed32905d2b0b35cb26cb071164\
+        3e7e74a54305"
       tests/callable-object-evidence.test.ts:
         "d2b814666e5645565ca2001f0419b931cd2949624777047f562d\
         a479c71be70d"
       tests/native.ts: "91222c3fc3b2335cfcd96ba614f2a4705a3c0935d6946fc2d998\
         9bcce7b251a7"
       docs/m5c-graph/dynamic-source-callable-object-assessment.md:
-        "1dcdd38059099dfacc63f694cc3458365cde82a8c764af44051a\
-        77805f653329"
+        "ff5881b8f97000fa6865bdc361ca14dfe1ce583b0a8d8cf089d5\
+        3403dfefd355"
     reason: DS-14 item 1 replacement group
       callable-object-object-truthiness, in
       tests/native/fixtures/callable-object-evidence.ts and its focused
@@ -1179,54 +1179,57 @@ assessments:
     normativeDependency: source-evaluation-only
     replacementEvidence:
       tests/native/fixtures/callable-object-evidence.ts:
-        "a572704e8237c479946d078affaa8cdbe027278574207e4b3409\
-        c79005318308"
+        "e0d333bcdf6e7a86fff6aea8caed32905d2b0b35cb26cb071164\
+        3e7e74a54305"
       tests/callable-object-evidence.test.ts:
         "d2b814666e5645565ca2001f0419b931cd2949624777047f562d\
         a479c71be70d"
       tests/native.ts: "91222c3fc3b2335cfcd96ba614f2a4705a3c0935d6946fc2d998\
         9bcce7b251a7"
       docs/m5c-graph/dynamic-source-callable-object-assessment.md:
-        "1dcdd38059099dfacc63f694cc3458365cde82a8c764af44051a\
-        77805f653329"
+        "ff5881b8f97000fa6865bdc361ca14dfe1ce583b0a8d8cf089d5\
+        3403dfefd355"
     reason: DS-14 item 1 replacement group
       callable-object-ordinary-call-and-construction, in
       tests/native/fixtures/callable-object-evidence.ts and its focused
       runner, observes every non-source assertion of these 9 paths. The
       bound per-path table names each exact input, operation, result and
       original subject. Static function retains Function constructor
-      identity and is not undefined. Static callable has the exact [object
-      Function] tag. Static plain returns OK, leaves x unbound outside and
-      writes global y=2. Static args with ("1",2) returns "12", leaves x
-      unbound outside and writes global y=2. Static Factory returns
-      primitive OK while new yields an object with its constructor and
-      y=2. Static ArgsFactory with ("1",2) yields an object with its
-      constructor and y="12". Both static function and Object(static
-      function) return [object Function]; source-created variants leave
-      only construction. Static function plus
+      identity and is not undefined. Static callable has the exact
+      [object Function] tag. Static plain returns OK, leaves x unbound
+      outside and writes global y=2. Static args with ("1",2) returns
+      "12", leaves x unbound outside and writes global y=2. Static
+      Factory returns primitive OK while new yields an object with its
+      constructor and y=2. Static ArgsFactory with ("1",2) yields an
+      object with its constructor and y="12". Both static function and
+      Object(static function) return [object Function]; source-created
+      variants leave only construction. Static function plus
       Object/String/Boolean/Number/Date/Error/RegExp all have typeof
-      function. Both native policies with forced collection, numeric guard
-      hit and false-hint miss, and Node.js/Deno Script references pass.
-      Only eval source evaluation or Function-family source construction
-      remains. All original paths and unsupported-profile-feature
-      observations remain; none counts as a pass. Reassess changed source,
-      observation or replacement evidence. ADR 0016 and ADR 0019 reopening
-      triggers remain in force.
+      function. Both native policies with forced collection, numeric
+      guard hit and false-hint miss, and Node.js/Deno Script references
+      pass. Only eval source evaluation or Function-family source
+      construction remains. All original paths and
+      unsupported-profile-feature observations remain; none counts as a
+      pass. Reassess changed source, observation or replacement
+      evidence. ADR 0016 and ADR 0019 reopening triggers remain in
+      force. Each independent call starts with deleted global y and
+      checks its absence, so an earlier write cannot mask a missing args
+      receiver write.
   ds14-strict-restricted-properties:
     disposition: exclusion
     normativeDependency: source-evaluation-only
     replacementEvidence:
       tests/native/fixtures/callable-object-evidence.ts:
-        "a572704e8237c479946d078affaa8cdbe027278574207e4b3409\
-        c79005318308"
+        "e0d333bcdf6e7a86fff6aea8caed32905d2b0b35cb26cb071164\
+        3e7e74a54305"
       tests/callable-object-evidence.test.ts:
         "d2b814666e5645565ca2001f0419b931cd2949624777047f562d\
         a479c71be70d"
       tests/native.ts: "91222c3fc3b2335cfcd96ba614f2a4705a3c0935d6946fc2d998\
         9bcce7b251a7"
       docs/m5c-graph/dynamic-source-callable-object-assessment.md:
-        "1dcdd38059099dfacc63f694cc3458365cde82a8c764af44051a\
-        77805f653329"
+        "ff5881b8f97000fa6865bdc361ca14dfe1ce583b0a8d8cf089d5\
+        3403dfefd355"
     reason: DS-14 item 1 replacement group
       callable-object-strict-restricted-properties, in
       tests/native/fixtures/callable-object-evidence.ts and its focused
@@ -1245,16 +1248,16 @@ assessments:
     normativeDependency: source-evaluation-only
     replacementEvidence:
       tests/native/fixtures/callable-object-evidence.ts:
-        "a572704e8237c479946d078affaa8cdbe027278574207e4b3409\
-        c79005318308"
+        "e0d333bcdf6e7a86fff6aea8caed32905d2b0b35cb26cb071164\
+        3e7e74a54305"
       tests/callable-object-evidence.test.ts:
         "d2b814666e5645565ca2001f0419b931cd2949624777047f562d\
         a479c71be70d"
       tests/native.ts: "91222c3fc3b2335cfcd96ba614f2a4705a3c0935d6946fc2d998\
         9bcce7b251a7"
       docs/m5c-graph/dynamic-source-callable-object-assessment.md:
-        "1dcdd38059099dfacc63f694cc3458365cde82a8c764af44051a\
-        77805f653329"
+        "ff5881b8f97000fa6865bdc361ca14dfe1ce583b0a8d8cf089d5\
+        3403dfefd355"
     reason: DS-14 item 1 replacement group
       callable-object-apply-receiver-boxing, in
       tests/native/fixtures/callable-object-evidence.ts and its focused
@@ -1277,16 +1280,16 @@ assessments:
     normativeDependency: source-evaluation-only
     replacementEvidence:
       tests/native/fixtures/callable-object-evidence.ts:
-        "a572704e8237c479946d078affaa8cdbe027278574207e4b3409\
-        c79005318308"
+        "e0d333bcdf6e7a86fff6aea8caed32905d2b0b35cb26cb071164\
+        3e7e74a54305"
       tests/callable-object-evidence.test.ts:
         "d2b814666e5645565ca2001f0419b931cd2949624777047f562d\
         a479c71be70d"
       tests/native.ts: "91222c3fc3b2335cfcd96ba614f2a4705a3c0935d6946fc2d998\
         9bcce7b251a7"
       docs/m5c-graph/dynamic-source-callable-object-assessment.md:
-        "1dcdd38059099dfacc63f694cc3458365cde82a8c764af44051a\
-        77805f653329"
+        "ff5881b8f97000fa6865bdc361ca14dfe1ce583b0a8d8cf089d5\
+        3403dfefd355"
     reason: DS-14 item 1 replacement group callable-object-apply-arrays, in
       tests/native/fixtures/callable-object-evidence.ts and its focused
       runner, observes every non-source assertion of these 3 paths. The
@@ -1307,51 +1310,55 @@ assessments:
     normativeDependency: source-evaluation-only
     replacementEvidence:
       tests/native/fixtures/callable-object-evidence.ts:
-        "a572704e8237c479946d078affaa8cdbe027278574207e4b3409\
-        c79005318308"
+        "e0d333bcdf6e7a86fff6aea8caed32905d2b0b35cb26cb071164\
+        3e7e74a54305"
       tests/callable-object-evidence.test.ts:
         "d2b814666e5645565ca2001f0419b931cd2949624777047f562d\
         a479c71be70d"
       tests/native.ts: "91222c3fc3b2335cfcd96ba614f2a4705a3c0935d6946fc2d998\
         9bcce7b251a7"
       docs/m5c-graph/dynamic-source-callable-object-assessment.md:
-        "1dcdd38059099dfacc63f694cc3458365cde82a8c764af44051a\
-        77805f653329"
-    reason: DS-14 item 1 replacement group callable-object-apply-arguments,
-      in tests/native/fixtures/callable-object-evidence.ts and its focused
+        "ff5881b8f97000fa6865bdc361ca14dfe1ce583b0a8d8cf089d5\
+        3403dfefd355"
+    reason: DS-14 item 1 replacement group
+      callable-object-apply-arguments, in
+      tests/native/fixtures/callable-object-evidence.ts and its focused
       runner, observes every non-source assertion of these 7 paths. The
       bound per-path table names each exact input, operation, result and
       original subject. Exact arguments ("",4,2) produce object
       shifted="42" without a global shifted. Exact returned arguments
-      ("a","b","c") yield shifted="c" and no global write; parameter text
-      conversion belongs to source construction. new NullFactory("",1,2)
-      writes global "12" and leaves its instance shifted undefined. new
-      ThisFactory("",4,2) writes instance "42" without a global write.
-      Expression arguments ("",1,2) write global "12". Bare sloppy
-      expression with ("",4,2) writes global "42". new
+      ("a","b","c") yield shifted="c" and no global write; parameter
+      text conversion belongs to source construction. new
+      NullFactory("",1,2) writes global "12" and leaves its instance
+      shifted undefined. new ThisFactory("",4,2) writes instance "42"
+      without a global write. Expression arguments ("",1,2) write global
+      "12". Bare sloppy expression with ("",4,2) writes global "42". new
       ObjectFactory("",1,2) returns shifted="12" object without a global
       write. Both native policies with forced collection, numeric guard
       hit and false-hint miss, and Node.js/Deno Script references pass.
       Only eval source evaluation or Function-family source construction
       remains. All original paths and unsupported-profile-feature
-      observations remain; none counts as a pass. Reassess changed source,
-      observation or replacement evidence. ADR 0016 and ADR 0019 reopening
-      triggers remain in force.
+      observations remain; none counts as a pass. Reassess changed
+      source, observation or replacement evidence. ADR 0016 and ADR 0019
+      reopening triggers remain in force. A second bare wrapper is
+      strict, observes this === undefined and passes it through apply to
+      the same sloppy sum target; its global shifted result is checked
+      after deleting the previous value.
   ds14-returned-constructor:
     disposition: exclusion
     normativeDependency: source-evaluation-only
     replacementEvidence:
       tests/native/fixtures/callable-object-evidence.ts:
-        "a572704e8237c479946d078affaa8cdbe027278574207e4b3409\
-        c79005318308"
+        "e0d333bcdf6e7a86fff6aea8caed32905d2b0b35cb26cb071164\
+        3e7e74a54305"
       tests/callable-object-evidence.test.ts:
         "d2b814666e5645565ca2001f0419b931cd2949624777047f562d\
         a479c71be70d"
       tests/native.ts: "91222c3fc3b2335cfcd96ba614f2a4705a3c0935d6946fc2d998\
         9bcce7b251a7"
       docs/m5c-graph/dynamic-source-callable-object-assessment.md:
-        "1dcdd38059099dfacc63f694cc3458365cde82a8c764af44051a\
-        77805f653329"
+        "ff5881b8f97000fa6865bdc361ca14dfe1ce583b0a8d8cf089d5\
+        3403dfefd355"
     reason: DS-14 item 1 replacement group
       callable-object-returned-constructor, in
       tests/native/fixtures/callable-object-evidence.ts and its focused
@@ -1370,16 +1377,16 @@ assessments:
     normativeDependency: source-evaluation-only
     replacementEvidence:
       tests/native/fixtures/callable-object-evidence.ts:
-        "a572704e8237c479946d078affaa8cdbe027278574207e4b3409\
-        c79005318308"
+        "e0d333bcdf6e7a86fff6aea8caed32905d2b0b35cb26cb071164\
+        3e7e74a54305"
       tests/callable-object-evidence.test.ts:
         "d2b814666e5645565ca2001f0419b931cd2949624777047f562d\
         a479c71be70d"
       tests/native.ts: "91222c3fc3b2335cfcd96ba614f2a4705a3c0935d6946fc2d998\
         9bcce7b251a7"
       docs/m5c-graph/dynamic-source-callable-object-assessment.md:
-        "1dcdd38059099dfacc63f694cc3458365cde82a8c764af44051a\
-        77805f653329"
+        "ff5881b8f97000fa6865bdc361ca14dfe1ce583b0a8d8cf089d5\
+        3403dfefd355"
     reason: DS-14 item 1 replacement group
       callable-object-call-receiver-boxing, in
       tests/native/fixtures/callable-object-evidence.ts and its focused
@@ -1402,16 +1409,16 @@ assessments:
     normativeDependency: source-evaluation-only
     replacementEvidence:
       tests/native/fixtures/callable-object-evidence.ts:
-        "a572704e8237c479946d078affaa8cdbe027278574207e4b3409\
-        c79005318308"
+        "e0d333bcdf6e7a86fff6aea8caed32905d2b0b35cb26cb071164\
+        3e7e74a54305"
       tests/callable-object-evidence.test.ts:
         "d2b814666e5645565ca2001f0419b931cd2949624777047f562d\
         a479c71be70d"
       tests/native.ts: "91222c3fc3b2335cfcd96ba614f2a4705a3c0935d6946fc2d998\
         9bcce7b251a7"
       docs/m5c-graph/dynamic-source-callable-object-assessment.md:
-        "1dcdd38059099dfacc63f694cc3458365cde82a8c764af44051a\
-        77805f653329"
+        "ff5881b8f97000fa6865bdc361ca14dfe1ce583b0a8d8cf089d5\
+        3403dfefd355"
     reason: DS-14 item 1 replacement group
       callable-object-call-array-arguments, in
       tests/native/fixtures/callable-object-evidence.ts and its focused
@@ -1433,16 +1440,16 @@ assessments:
     normativeDependency: source-evaluation-only
     replacementEvidence:
       tests/native/fixtures/callable-object-evidence.ts:
-        "a572704e8237c479946d078affaa8cdbe027278574207e4b3409\
-        c79005318308"
+        "e0d333bcdf6e7a86fff6aea8caed32905d2b0b35cb26cb071164\
+        3e7e74a54305"
       tests/callable-object-evidence.test.ts:
         "d2b814666e5645565ca2001f0419b931cd2949624777047f562d\
         a479c71be70d"
       tests/native.ts: "91222c3fc3b2335cfcd96ba614f2a4705a3c0935d6946fc2d998\
         9bcce7b251a7"
       docs/m5c-graph/dynamic-source-callable-object-assessment.md:
-        "1dcdd38059099dfacc63f694cc3458365cde82a8c764af44051a\
-        77805f653329"
+        "ff5881b8f97000fa6865bdc361ca14dfe1ce583b0a8d8cf089d5\
+        3403dfefd355"
     reason: DS-14 item 1 replacement group
       callable-object-call-arguments-objects, in
       tests/native/fixtures/callable-object-evidence.ts and its focused
@@ -1451,34 +1458,38 @@ assessments:
       original subject. Exact arguments ("",4,2,"a") passed with "" and
       "2" yield object "42" without a global write. Returned arguments
       (a,b,c,d), "" and 2 yield "24" without a global write; source
-      parameter conversion is excluded. new NullFactory("",1,2,"A") writes
-      global "42" while its instance shifted is undefined. new
-      ThisFactory("",4,2,"A") writes instance "42" without a global write.
-      Exact expression inputs ("",1,2,true) write global "42". Exact bare
-      sloppy expression inputs ("",4,2,null) write global "42". Exact
-      constructed declaration inputs ("",1,2,void 0) yield returned object
-      "42" without a global write. Both native policies with forced
-      collection, numeric guard hit and false-hint miss, and Node.js/Deno
-      Script references pass. Only eval source evaluation or
-      Function-family source construction remains. All original paths and
-      unsupported-profile-feature observations remain; none counts as a
-      pass. Reassess changed source, observation or replacement evidence.
-      ADR 0016 and ADR 0019 reopening triggers remain in force.
+      parameter conversion is excluded. new NullFactory("",1,2,"A")
+      writes global "42" while its instance shifted is undefined. new
+      ThisFactory("",4,2,"A") writes instance "42" without a global
+      write. Exact expression inputs ("",1,2,true) write global "42".
+      Exact bare sloppy expression inputs ("",4,2,null) write global
+      "42". Exact constructed declaration inputs ("",1,2,void 0) yield
+      returned object "42" without a global write. Both native policies
+      with forced collection, numeric guard hit and false-hint miss, and
+      Node.js/Deno Script references pass. Only eval source evaluation
+      or Function-family source construction remains. All original paths
+      and unsupported-profile-feature observations remain; none counts
+      as a pass. Reassess changed source, observation or replacement
+      evidence. ADR 0016 and ADR 0019 reopening triggers remain in
+      force. A second bare wrapper is strict, observes this ===
+      undefined and passes it through call to the same sloppy sum
+      target; its global shifted result is checked after deleting the
+      previous value.
   ds14-callable-descriptors:
     disposition: exclusion
     normativeDependency: source-evaluation-only
     replacementEvidence:
       tests/native/fixtures/callable-object-evidence.ts:
-        "a572704e8237c479946d078affaa8cdbe027278574207e4b3409\
-        c79005318308"
+        "e0d333bcdf6e7a86fff6aea8caed32905d2b0b35cb26cb071164\
+        3e7e74a54305"
       tests/callable-object-evidence.test.ts:
         "d2b814666e5645565ca2001f0419b931cd2949624777047f562d\
         a479c71be70d"
       tests/native.ts: "91222c3fc3b2335cfcd96ba614f2a4705a3c0935d6946fc2d998\
         9bcce7b251a7"
       docs/m5c-graph/dynamic-source-callable-object-assessment.md:
-        "1dcdd38059099dfacc63f694cc3458365cde82a8c764af44051a\
-        77805f653329"
+        "ff5881b8f97000fa6865bdc361ca14dfe1ce583b0a8d8cf089d5\
+        3403dfefd355"
     reason: DS-14 item 1 replacement group
       callable-object-callable-descriptors, in
       tests/native/fixtures/callable-object-evidence.ts and its focused
@@ -1499,16 +1510,16 @@ assessments:
     normativeDependency: source-evaluation-only
     replacementEvidence:
       tests/native/fixtures/callable-object-evidence.ts:
-        "a572704e8237c479946d078affaa8cdbe027278574207e4b3409\
-        c79005318308"
+        "e0d333bcdf6e7a86fff6aea8caed32905d2b0b35cb26cb071164\
+        3e7e74a54305"
       tests/callable-object-evidence.test.ts:
         "d2b814666e5645565ca2001f0419b931cd2949624777047f562d\
         a479c71be70d"
       tests/native.ts: "91222c3fc3b2335cfcd96ba614f2a4705a3c0935d6946fc2d998\
         9bcce7b251a7"
       docs/m5c-graph/dynamic-source-callable-object-assessment.md:
-        "1dcdd38059099dfacc63f694cc3458365cde82a8c764af44051a\
-        77805f653329"
+        "ff5881b8f97000fa6865bdc361ca14dfe1ce583b0a8d8cf089d5\
+        3403dfefd355"
     reason: DS-14 item 1 replacement group callable-object-seal-callables,
       in tests/native/fixtures/callable-object-evidence.ts and its focused
       runner, observes every non-source assertion of these 4 paths. The
@@ -1527,16 +1538,16 @@ assessments:
     normativeDependency: source-evaluation-only
     replacementEvidence:
       tests/native/fixtures/callable-object-evidence.ts:
-        "a572704e8237c479946d078affaa8cdbe027278574207e4b3409\
-        c79005318308"
+        "e0d333bcdf6e7a86fff6aea8caed32905d2b0b35cb26cb071164\
+        3e7e74a54305"
       tests/callable-object-evidence.test.ts:
         "d2b814666e5645565ca2001f0419b931cd2949624777047f562d\
         a479c71be70d"
       tests/native.ts: "91222c3fc3b2335cfcd96ba614f2a4705a3c0935d6946fc2d998\
         9bcce7b251a7"
       docs/m5c-graph/dynamic-source-callable-object-assessment.md:
-        "1dcdd38059099dfacc63f694cc3458365cde82a8c764af44051a\
-        77805f653329"
+        "ff5881b8f97000fa6865bdc361ca14dfe1ce583b0a8d8cf089d5\
+        3403dfefd355"
     reason: DS-14 item 1 replacement group
       callable-object-reflect-apply-array-like, in
       tests/native/fixtures/callable-object-evidence.ts and its focused
@@ -1556,16 +1567,16 @@ assessments:
     normativeDependency: source-evaluation-only
     replacementEvidence:
       tests/native/fixtures/callable-object-evidence.ts:
-        "a572704e8237c479946d078affaa8cdbe027278574207e4b3409\
-        c79005318308"
+        "e0d333bcdf6e7a86fff6aea8caed32905d2b0b35cb26cb071164\
+        3e7e74a54305"
       tests/callable-object-evidence.test.ts:
         "d2b814666e5645565ca2001f0419b931cd2949624777047f562d\
         a479c71be70d"
       tests/native.ts: "91222c3fc3b2335cfcd96ba614f2a4705a3c0935d6946fc2d998\
         9bcce7b251a7"
       docs/m5c-graph/dynamic-source-callable-object-assessment.md:
-        "1dcdd38059099dfacc63f694cc3458365cde82a8c764af44051a\
-        77805f653329"
+        "ff5881b8f97000fa6865bdc361ca14dfe1ce583b0a8d8cf089d5\
+        3403dfefd355"
     reason: DS-14 item 1 replacement group
       callable-object-instanceof-prototypes, in
       tests/native/fixtures/callable-object-evidence.ts and its focused
@@ -1588,16 +1599,16 @@ assessments:
     normativeDependency: source-evaluation-only
     replacementEvidence:
       tests/native/fixtures/callable-object-evidence.ts:
-        "a572704e8237c479946d078affaa8cdbe027278574207e4b3409\
-        c79005318308"
+        "e0d333bcdf6e7a86fff6aea8caed32905d2b0b35cb26cb071164\
+        3e7e74a54305"
       tests/callable-object-evidence.test.ts:
         "d2b814666e5645565ca2001f0419b931cd2949624777047f562d\
         a479c71be70d"
       tests/native.ts: "91222c3fc3b2335cfcd96ba614f2a4705a3c0935d6946fc2d998\
         9bcce7b251a7"
       docs/m5c-graph/dynamic-source-callable-object-assessment.md:
-        "1dcdd38059099dfacc63f694cc3458365cde82a8c764af44051a\
-        77805f653329"
+        "ff5881b8f97000fa6865bdc361ca14dfe1ce583b0a8d8cf089d5\
+        3403dfefd355"
     reason: DS-14 item 1 replacement group
       callable-object-object-literal-accessors, in
       tests/native/fixtures/callable-object-evidence.ts and its focused

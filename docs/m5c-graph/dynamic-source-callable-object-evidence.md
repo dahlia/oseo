@@ -114,3 +114,12 @@ The dependency-tag self-audit leaves every row's tags untouched under the
 and no new tag is inferred from the witness harness. The fixed prelude
 also exercises a truthful numeric hint and a false string hint; enabled
 native runs require both a guard hit and a miss into generic addition.
+
+Internal review pass 1 found two missing observations. The apply/call
+argument groups now include strict wrappers that explicitly observe
+`this === undefined` before passing that receiver to the same sloppy
+target. Both strict and non-strict upstream wrapper variants are covered.
+The ordinary-call group deletes and checks the global `y` before each
+independent call, so a prior write cannot mask a missing receiver write.
+The ledger note also distinguishes the 16 complete groups from the two
+partial groups. Counts and dispositions do not change.

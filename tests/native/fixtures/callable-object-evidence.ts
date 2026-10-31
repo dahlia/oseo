@@ -70,9 +70,13 @@ function plain() { var x = 1; this.y = 2; return "OK"; }
 function args(arg1, arg2) {
   var x = arg1; this.y = arg2; return arg1 + arg2;
 }
+delete globalThis.y;
+equal(typeof globalThis.y, "undefined");
 equal(plain(), "OK");
 equal(typeof x, "undefined");
 equal(globalThis.y, 2);
+delete globalThis.y;
+equal(typeof globalThis.y, "undefined");
 equal(args("1", 2), "12");
 equal(typeof x, "undefined");
 equal(globalThis.y, 2);
@@ -186,6 +190,13 @@ delete globalThis.shifted;
 (function () { sum.apply(this, arguments); })("", 4, 2);
 equal(globalThis.shifted, "42");
 delete globalThis.shifted;
+(function () {
+  "use strict";
+  equal(this, undefined);
+  sum.apply(this, arguments);
+})("", 4, 2);
+equal(globalThis.shifted, "42");
+delete globalThis.shifted;
 function ObjectFactory() {
   const object = {}; sum.apply(object, arguments); return object;
 }
@@ -254,6 +265,13 @@ equal(typeof globalThis.shifted, "undefined");
 equal(globalThis.shifted, "42");
 delete globalThis.shifted;
 (function () { sum.call(this, arguments, "", 2); })("", 4, 2, null);
+equal(globalThis.shifted, "42");
+delete globalThis.shifted;
+(function () {
+  "use strict";
+  equal(this, undefined);
+  sum.call(this, arguments, "", 2);
+})("", 4, 2, null);
 equal(globalThis.shifted, "42");
 delete globalThis.shifted;
 function ObjectFactory() {
