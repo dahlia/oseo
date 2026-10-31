@@ -17,10 +17,12 @@ evidence:
   fixed:
     status: covered
     references:
+      - tests/annex-b-mixed-core-native.test.ts
       - tests/native/fixtures/objects.ts
   forced-collection:
     status: covered
     references:
+      - tests/annex-b-mixed-core-native.test.ts
       - tests/native.ts
       - tests/native/fixtures/objects.ts
       - tests/property/m5-object-constructor.property.test.ts
@@ -37,6 +39,7 @@ evidence:
   specialization:
     status: covered
     references:
+      - tests/annex-b-mixed-core-native.test.ts
       - tests/native.ts
       - tests/native/fixtures/objects.ts
       - tests/property/m5-object-constructor.property.test.ts

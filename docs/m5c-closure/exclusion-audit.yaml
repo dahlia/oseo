@@ -201,11 +201,11 @@ assessments:
       reopening triggers.
     replacementEvidence:
       tests/native/fixtures/annex-b-mixed-core.ts:
-        "ff7aa6e18452eb39b2b775ff41ba2ee29e46d99c25415c7baa\
-        98d4a282981b1b"
+        "45e4571f2e9f7556a21c4555d86720fd37a674479b9af0c291714648\
+        071a28cd"
       tests/annex-b-mixed-core-native.test.ts:
-        "f6ea2d9c01c99525a85c5afc3883c6c4e161652c0eec10c353\
-        4e3fbe69b85b26"
+        "d3cc3f6d101465c0c6fb93467428f149adb7593495c0f2d518ea8485\
+        135151c5"
   mixed-static-functions:
     disposition: remediation
     normativeDependency: not-demonstrated
@@ -255,11 +255,11 @@ assessments:
       optional Annex B policy, or on ADR 0019's reopening triggers.
     replacementEvidence:
       tests/native/fixtures/annex-b-mixed-core.ts:
-        "ff7aa6e18452eb39b2b775ff41ba2ee29e46d99c25415c7baa\
-        98d4a282981b1b"
+        "45e4571f2e9f7556a21c4555d86720fd37a674479b9af0c291714648\
+        071a28cd"
       tests/annex-b-mixed-core-native.test.ts:
-        "f6ea2d9c01c99525a85c5afc3883c6c4e161652c0eec10c353\
-        4e3fbe69b85b26"
+        "d3cc3f6d101465c0c6fb93467428f149adb7593495c0f2d518ea8485\
+        135151c5"
   import-call-attributes:
     disposition: exclusion
     normativeDependency: source-evaluation-only
@@ -507,11 +507,11 @@ assessments:
       reopening triggers.
     replacementEvidence:
       tests/native/fixtures/annex-b-mixed-core.ts:
-        "ff7aa6e18452eb39b2b775ff41ba2ee29e46d99c25415c7baa\
-        98d4a282981b1b"
+        "45e4571f2e9f7556a21c4555d86720fd37a674479b9af0c291714648\
+        071a28cd"
       tests/annex-b-mixed-core-native.test.ts:
-        "f6ea2d9c01c99525a85c5afc3883c6c4e161652c0eec10c353\
-        4e3fbe69b85b26"
+        "d3cc3f6d101465c0c6fb93467428f149adb7593495c0f2d518ea8485\
+        135151c5"
   annex-b-resizable-typed-array-prototype:
     disposition: exclusion
     normativeDependency: annex-b-only
@@ -536,11 +536,11 @@ assessments:
       policy, or on ADR 0019's reopening triggers.
     replacementEvidence:
       tests/native/fixtures/annex-b-mixed-core.ts:
-        "ff7aa6e18452eb39b2b775ff41ba2ee29e46d99c25415c7baa\
-        98d4a282981b1b"
+        "45e4571f2e9f7556a21c4555d86720fd37a674479b9af0c291714648\
+        071a28cd"
       tests/annex-b-mixed-core-native.test.ts:
-        "f6ea2d9c01c99525a85c5afc3883c6c4e161652c0eec10c353\
-        4e3fbe69b85b26"
+        "d3cc3f6d101465c0c6fb93467428f149adb7593495c0f2d518ea8485\
+        135151c5"
   static-this-and-call-context:
     disposition: remediation
     normativeDependency: not-demonstrated
@@ -5466,18 +5466,42 @@ assessments:
       equivalent replacement or whole-path exclusion is claimed; ADR 0013,
       ADR 0016 and ADR 0019 and their reopening triggers remain unchanged.
   annex-b-ordinary-object-prototype:
-    disposition: remediation
-    normativeDependency: not-demonstrated
-    remediationOwner: node:ordinary-object-proto-coverage-remediation
-    reason: The only observed failure is the excluded Annex B
-      __proto__ write, rejected at compile time in every strictness
-      and specialization variant. The source swallows any exception
-      from that write and asserts only that Object.getPrototypeOf of a
-      non-extensible ordinary object still returns Object.prototype,
-      the OrdinarySetPrototypeOf immutability contract. That core
-      contract does not normatively require Annex B. No replacement
-      observation yet witnesses every core subject, so retain bounded
-      remediation without authorizing a whole-path exclusion.
+    disposition: exclusion
+    normativeDependency: annex-b-only
+    reason: >-
+      The 2026-10-31 maintainer decision extends item 3 of the 2026-10-28
+      decision to this path, so the rule closes it under ADR 0013. The
+      only observed failure is the excluded Annex B __proto__ write of
+      B.2.2.1.2, rejected at compile time in every strictness and
+      specialization variant. The source swallows any exception from that
+      write and asserts only that Object.getPrototypeOf of the
+      non-extensible ordinary object is still Object.prototype, the
+      OrdinarySetPrototypeOf (10.1.2.1) refusal that Object.setPrototypeOf
+      (20.1.2.20) and Reflect.setPrototypeOf (28.1.13) reach in core. The
+      annex-b-core-ordinary-object-set-prototype fixture keeps the
+      preventExtensions call, the attempted prototype change, and the
+      prototype assertion. It checks Object.isExtensible is false that
+      Object.setPrototypeOf throws TypeError and Reflect.setPrototypeOf
+      returns false, and that each refusal leaves Object.prototype. It also
+      changes an extensible object's prototype both ways, so the refusal
+      follows from the object's non-extensible state. The remaining
+      assertions are the original bindings and the catch arm that the core
+      calls observe. No core subject remains. Both specialization policies
+      run strict and non-strict Scripts natively with collection at every
+      safepoint, against Node.js and Deno references. Each check compares
+      value and type with Object.is; the program first counts six rejected
+      near-miss values without the comparator under test, and the focused
+      test fails the program when that comparator is replaced by an
+      always-true, same-type, or loose one. Reopen on changed source,
+      observation, or replacement evidence, on an amendment of ADR 0013's
+      optional Annex B policy, or on ADR 0019's reopening triggers.
+    replacementEvidence:
+      tests/native/fixtures/annex-b-mixed-core.ts:
+        "45e4571f2e9f7556a21c4555d86720fd37a674479b9af0c291714648\
+        071a28cd"
+      tests/annex-b-mixed-core-native.test.ts:
+        "d3cc3f6d101465c0c6fb93467428f149adb7593495c0f2d518ea8485\
+        135151c5"
 paths:
   - path: test/built-ins/AggregateError/newtarget-proto-fallback.js
     proposedOwner: adr:0016-dynamic-source-boundary

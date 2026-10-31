@@ -38,6 +38,10 @@ const expectedOutput = new Map([
     "typed array out-of-bounds prototype core ok",
   ],
   ["annex-b-core-string-split-regexp", "string split regexp core ok"],
+  [
+    "annex-b-core-ordinary-object-set-prototype",
+    "ordinary object prototype core ok",
+  ],
 ]);
 
 function runControl(source: string): string[] {
@@ -48,7 +52,7 @@ function runControl(source: string): string[] {
   return output;
 }
 
-test("replacement fixtures are exactly the four owned subjects", () => {
+test("replacement fixtures are exactly the five owned subjects", () => {
   assert.deepEqual(
     annexBMixedCoreFixtures.map((fixture) => fixture.name),
     [...expectedOutput.keys()],
