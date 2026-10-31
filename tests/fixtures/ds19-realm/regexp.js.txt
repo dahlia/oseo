@@ -1,0 +1,34 @@
+// Fixed DS-19 non-source witnesses, derived from pinned Test262.
+// Foreign source is collected before native emission under ADR 0029.
+// Replacement for test/built-ins/RegExp/proto-from-ctor-realm.js
+// Copyright (C) 2016 the V8 project authors. All rights reserved.
+// This code is governed by the BSD license found in the LICENSE file.
+(function () {
+var other = $262.createRealm().global;
+var C = other.$262.evalScript("(function(){})");
+C.prototype = null;
+
+var o = Reflect.construct(RegExp, [], C);
+
+assert.sameValue(Object.getPrototypeOf(o), other.RegExp.prototype);
+})();
+
+// Replacement for test/built-ins/RegExp/prototype/Symbol.split/splitter-proto-from-ctor-realm.js
+// Copyright (C) 2016 the V8 project authors. All rights reserved.
+// This code is governed by the BSD license found in the LICENSE file.
+(function () {
+var other = $262.createRealm().global;
+other.shared = null;
+var C = other.$262.evalScript("(function(){shared = this; return /./;})");
+C.prototype = null;
+
+var r = /./;
+r.constructor = function() {};
+r.constructor[Symbol.species] = C;
+
+r[Symbol.split]();
+
+assert.sameValue(Object.getPrototypeOf(other.shared), other.Object.prototype);
+})();
+
+console.log("DS19 regexp complete");

@@ -1,0 +1,24 @@
+// Fixed DS-19 non-source witnesses, derived from pinned Test262.
+// Foreign source is collected before native emission under ADR 0029.
+// Replacement for test/language/expressions/tagged-template/cache-realm.js
+// Copyright (C) 2016 the V8 project authors. All rights reserved.
+// This code is governed by the BSD license found in the LICENSE file.
+(function () {
+var other = $262.createRealm().global;
+var strings1, strings2;
+
+strings1 = (function(strings) { return strings; })`1234`;
+strings2 = other.$262.evalScript('(function(strings) { return strings; })`1234`');
+
+assert.notSameValue(strings1, strings2);
+})();
+
+// One physical linked Script/template site must cache separately by realm.
+const first = $262.createRealm();
+const second = $262.createRealm();
+const firstTemplate = first.evalScript('(strings => strings)`1234`');
+const firstAgain = first.evalScript('(strings => strings)`1234`');
+const secondTemplate = second.evalScript('(strings => strings)`1234`');
+assert.sameValue(firstTemplate, firstAgain);
+assert.notSameValue(firstTemplate, secondTemplate);
+console.log("DS19 template complete");

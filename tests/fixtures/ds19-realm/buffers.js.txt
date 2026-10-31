@@ -1,0 +1,59 @@
+// Fixed DS-19 non-source witnesses, derived from pinned Test262.
+// Foreign source is collected before native emission under ADR 0029.
+// Replacement for test/built-ins/ArrayBuffer/proto-from-ctor-realm.js
+// Copyright (C) 2016 the V8 project authors. All rights reserved.
+// This code is governed by the BSD license found in the LICENSE file.
+(function () {
+var other = $262.createRealm().global;
+var C = other.$262.evalScript("(function(){})");
+C.prototype = null;
+
+var o = Reflect.construct(ArrayBuffer, [], C);
+
+assert.sameValue(Object.getPrototypeOf(o), other.ArrayBuffer.prototype);
+})();
+
+// Replacement for test/built-ins/DataView/proto-from-ctor-realm-sab.js
+// Copyright (C) 2016 the V8 project authors. All rights reserved.
+// Copyright (C) 2017 Mozilla Corporation. All rights reserved.
+// This code is governed by the BSD license found in the LICENSE file.
+(function () {
+var other = $262.createRealm().global;
+var C = other.$262.evalScript("(function(){})");
+C.prototype = null;
+var buffer = new SharedArrayBuffer(0);
+
+var o = Reflect.construct(DataView, [buffer, 0], C);
+
+assert.sameValue(Object.getPrototypeOf(o), other.DataView.prototype);
+})();
+
+// Replacement for test/built-ins/DataView/proto-from-ctor-realm.js
+// Copyright (C) 2016 the V8 project authors. All rights reserved.
+// This code is governed by the BSD license found in the LICENSE file.
+(function () {
+var other = $262.createRealm().global;
+var C = other.$262.evalScript("(function(){})");
+C.prototype = null;
+var buffer = new ArrayBuffer(0);
+
+var o = Reflect.construct(DataView, [buffer, 0], C);
+
+assert.sameValue(Object.getPrototypeOf(o), other.DataView.prototype);
+})();
+
+// Replacement for test/built-ins/SharedArrayBuffer/proto-from-ctor-realm.js
+// Copyright (C) 2016 the V8 project authors. All rights reserved.
+// Copyright (C) 2017 Mozilla Corporation. All rights reserved.
+// This code is governed by the BSD license found in the LICENSE file.
+(function () {
+var other = $262.createRealm().global;
+var C = other.$262.evalScript("(function(){})");
+C.prototype = null;
+
+var o = Reflect.construct(SharedArrayBuffer, [], C);
+
+assert.sameValue(Object.getPrototypeOf(o), other.SharedArrayBuffer.prototype);
+})();
+
+console.log("DS19 buffers complete");

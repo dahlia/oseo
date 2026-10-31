@@ -1,0 +1,29 @@
+// Fixed DS-19 non-source witnesses, derived from pinned Test262.
+// Foreign source is collected before native emission under ADR 0029.
+// Replacement for test/built-ins/ThrowTypeError/distinct-cross-realm.js
+// Copyright (C) 2016 the V8 project authors. All rights reserved.
+// This code is governed by the BSD license found in the LICENSE file.
+(function () {
+var other = $262.createRealm().global;
+var localArgs = function() {
+  "use strict";
+  return arguments;
+}();
+var otherArgs = (other.$262.evalScript("(function(){\"use strict\"; return arguments;})"))();
+var otherArgs2 = (other.$262.evalScript("(function(){\"use strict\"; return arguments;})"))();
+var localThrowTypeError = Object.getOwnPropertyDescriptor(localArgs, "callee").get;
+var otherThrowTypeError = Object.getOwnPropertyDescriptor(otherArgs, "callee").get;
+var otherThrowTypeError2 = Object.getOwnPropertyDescriptor(otherArgs2, "callee").get;
+
+assert.throws(TypeError, function() {
+  localThrowTypeError();
+});
+assert.throws(other.TypeError, function() {
+  otherThrowTypeError();
+});
+
+assert.notSameValue(localThrowTypeError, otherThrowTypeError);
+assert.sameValue(otherThrowTypeError, otherThrowTypeError2);
+})();
+
+console.log("DS19 throw-type-error complete");

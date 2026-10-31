@@ -1,0 +1,289 @@
+// Fixed DS-19 non-source witnesses, derived from pinned Test262.
+// Foreign source is collected before native emission under ADR 0029.
+// Replacement for test/language/expressions/class/private-getter-brand-check-multiple-evaluations-of-class-realm-function-ctor.js
+// Copyright (C) 2019 Jaideep Bhoosreddy (Bloomberg LP). All rights reserved.
+// This code is governed by the BSD license found in the LICENSE file.
+(function () {
+let createAndInstantiateClass = function () {
+  let realm = $262.createRealm();
+  let classFactoryFunction = realm.global.$262.evalScript("(function(){\nreturn class {\n  get #m() { return 'test262'; }\n\n  access(o) {\n    return o.#m;\n  }\n}\n})");
+  let Class = classFactoryFunction();
+  let obj =  new Class();
+  obj.realm = realm;
+  return obj;
+};
+
+let c1 = createAndInstantiateClass();
+let c2 = createAndInstantiateClass();
+
+assert.sameValue(c1.access(c1), 'test262');
+assert.sameValue(c2.access(c2), 'test262');
+
+assert.throws(c1.realm.global.TypeError, function() {
+  c1.access(c2);
+}, 'invalid access of c1 private method');
+
+assert.throws(c2.realm.global.TypeError, function() {
+  c2.access(c1);
+}, 'invalid access of c2 private method');
+})();
+
+// Replacement for test/language/expressions/class/private-getter-brand-check-multiple-evaluations-of-class-realm.js
+// Copyright (C) 2019 Jaideep Bhoosreddy (Bloomberg LP). All rights reserved.
+// This code is governed by the BSD license found in the LICENSE file.
+(function () {
+let realm1 = $262.createRealm();
+let realm2 = $262.createRealm();
+let eval1 = realm1;
+let eval2 = realm2;
+
+let createAndInstantiateClass = function (_eval) {
+  return new (_eval.evalScript("(\nclass {\n  get #m() { return 'test262'; }\n\n  access(o) {\n    return o.#m;\n  }\n}\n)"));
+};
+
+let c1 = createAndInstantiateClass(eval1);
+let c2 = createAndInstantiateClass(eval2);
+
+assert.sameValue(c1.access(c1), 'test262');
+assert.sameValue(c2.access(c2), 'test262');
+
+assert.throws(realm1.global.TypeError, function() {
+  c1.access(c2);
+}, 'invalid access of c1 private method');
+
+assert.throws(realm2.global.TypeError, function() {
+  c2.access(c1);
+}, 'invalid access of c2 private method');
+})();
+
+// Replacement for test/language/expressions/class/private-method-brand-check-multiple-evaluations-of-class-realm-function-ctor.js
+// Copyright (C) 2019 Jaideep Bhoosreddy (Bloomberg LP). All rights reserved.
+// This code is governed by the BSD license found in the LICENSE file.
+(function () {
+let createAndInstantiateClass = function () {
+  let realm = $262.createRealm();
+  let classFactoryFunction = realm.global.$262.evalScript("(function(){\nreturn class C {\n  #m() { return 'test262'; }\n\n  access(o) {\n    return o.#m();\n  }\n}\n})");
+  let Class = classFactoryFunction();
+  let obj = new Class();
+  obj.realm = realm;
+  return obj;
+};
+
+let c1 = createAndInstantiateClass();
+let c2 = createAndInstantiateClass();
+
+assert.sameValue(c1.access(c1), 'test262');
+assert.sameValue(c2.access(c2), 'test262');
+
+assert.throws(c1.realm.global.TypeError, function() {
+  c1.access(c2);
+}, 'invalid access of c1 private method');
+
+assert.throws(c2.realm.global.TypeError, function() {
+  c2.access(c1);
+}, 'invalid access of c2 private method');
+})();
+
+// Replacement for test/language/expressions/class/private-method-brand-check-multiple-evaluations-of-class-realm.js
+// Copyright (C) 2019 Jaideep Bhoosreddy (Bloomberg LP). All rights reserved.
+// This code is governed by the BSD license found in the LICENSE file.
+(function () {
+let realm1 = $262.createRealm();
+let realm2 = $262.createRealm();
+let eval1 = realm1;
+let eval2 = realm2;
+
+let createAndInstantiateClass = function (_eval) {
+  return new (_eval.evalScript("(\nclass {\n  #m() { return 'test262'; }\n\n  access(o) {\n    return o.#m();\n  }\n}\n)"));
+};
+
+let c1 = createAndInstantiateClass(eval1);
+let c2 = createAndInstantiateClass(eval2);
+
+assert.sameValue(c1.access(c1), 'test262');
+assert.sameValue(c2.access(c2), 'test262');
+
+assert.throws(realm1.global.TypeError, function() {
+  c1.access(c2);
+}, 'invalid access of c1 private method');
+
+assert.throws(realm2.global.TypeError, function() {
+  c2.access(c1);
+}, 'invalid access of c2 private method');
+})();
+
+// Replacement for test/language/expressions/class/private-setter-brand-check-multiple-evaluations-of-class-realm-function-ctor.js
+// Copyright (C) 2019 Jaideep Bhoosreddy (Bloomberg LP). All rights reserved.
+// This code is governed by the BSD license found in the LICENSE file.
+(function () {
+let createAndInstantiateClass = function () {
+  let realm = $262.createRealm();
+  let classFactoryFunction = realm.global.$262.evalScript("(function(){\nreturn class {\n  set #m(v) { this._v = v; }\n\n  access(o, v) {\n    o.#m = v;\n  }\n}\n})");
+  let Class = classFactoryFunction();
+  let obj = new Class();
+  obj.realm = realm;
+  return obj;
+};
+
+let c1 = createAndInstantiateClass();
+let c2 = createAndInstantiateClass();
+
+c1.access(c1, 'test262');
+assert.sameValue(c1._v, 'test262');
+c2.access(c2, 'test262');
+assert.sameValue(c2._v, 'test262');
+
+assert.throws(c1.realm.global.TypeError, function() {
+  c1.access(c2, 'foo');
+}, 'invalid access of c1 private method');
+
+assert.throws(c2.realm.global.TypeError, function() {
+  c2.access(c1, 'foo');
+}, 'invalid access of c2 private method');
+})();
+
+// Replacement for test/language/expressions/class/private-setter-brand-check-multiple-evaluations-of-class-realm.js
+// Copyright (C) 2019 Jaideep Bhoosreddy (Bloomberg LP). All rights reserved.
+// This code is governed by the BSD license found in the LICENSE file.
+(function () {
+let realm1 = $262.createRealm();
+let realm2 = $262.createRealm();
+let eval1 = realm1;
+let eval2 = realm2;
+
+let createAndInstantiateClass = function (_eval) {
+  return new (_eval.evalScript("(\nclass {\n  set #m(v) { this._v = v; }\n\n  access(o, v) {\n    o.#m = v;\n  }\n}\n)"));
+};
+
+let c1 = createAndInstantiateClass(eval1);
+let c2 = createAndInstantiateClass(eval2);
+
+c1.access(c1, 'test262');
+assert.sameValue(c1._v, 'test262');
+c2.access(c2, 'test262');
+assert.sameValue(c2._v, 'test262');
+
+assert.throws(realm1.global.TypeError, function() {
+  c1.access(c2, 'foo');
+}, 'invalid access of c1 private method');
+
+assert.throws(realm2.global.TypeError, function() {
+  c2.access(c1, 'foo');
+}, 'invalid access of c2 private method');
+})();
+
+// Replacement for test/language/expressions/class/private-static-field-multiple-evaluations-of-class-realm.js
+// Copyright (C) 2019 Caio Lima (Igalia SL). All rights reserved.
+// This code is governed by the BSD license found in the LICENSE file.
+(function () {
+let global1 = $262.createRealm().global;
+let global2 = $262.createRealm().global;
+let eval1 = global1.$262;
+let eval2 = global2.$262;
+
+let evalClass = function (_eval) {
+  return _eval.evalScript("(\nclass {\n  static #m = 'test262';\n\n  static access() {\n    return this.#m;\n  }\n}\n)");
+};
+
+let C1 = evalClass(eval1);
+let C2 = evalClass(eval2);
+
+assert.sameValue(C1.access(), 'test262');
+assert.sameValue(C2.access(), 'test262');
+
+assert.throws(global1.TypeError, function() {
+  C1.access.call(C2);
+}, 'invalid access of c1 private static field');
+
+assert.throws(global2.TypeError, function() {
+  C2.access.call(C1);
+}, 'invalid access of c2 private static field');
+})();
+
+// Replacement for test/language/expressions/class/private-static-getter-multiple-evaluations-of-class-realm.js
+// Copyright (C) 2019 Caio Lima (Igalia SL). All rights reserved.
+// This code is governed by the BSD license found in the LICENSE file.
+(function () {
+let global1 = $262.createRealm().global;
+let global2 = $262.createRealm().global;
+let eval1 = global1.$262;
+let eval2 = global2.$262;
+
+let evalClass = function (_eval) {
+  return _eval.evalScript("(\nclass {\n  static get #m() {\n    return 'test262';\n  };\n\n  static access() {\n    return this.#m;\n  }\n}\n)");
+};
+
+let C1 = evalClass(eval1);
+let C2 = evalClass(eval2);
+
+assert.sameValue(C1.access(), 'test262');
+assert.sameValue(C2.access(), 'test262');
+
+assert.throws(global1.TypeError, function() {
+  C1.access.call(C2);
+}, 'invalid access of C1 private static getter');
+
+assert.throws(global2.TypeError, function() {
+  C2.access.call(C1);
+}, 'invalid access of C2 private static getter');
+})();
+
+// Replacement for test/language/expressions/class/private-static-method-brand-check-multiple-evaluations-of-class-realm.js
+// Copyright (C) 2019 Caio Lima (Igalia SL). All rights reserved.
+// This code is governed by the BSD license found in the LICENSE file.
+(function () {
+let global1 = $262.createRealm().global;
+let global2 = $262.createRealm().global;
+let eval1 = global1.$262;
+let eval2 = global2.$262;
+
+let createClass = function (_eval) {
+  return _eval.evalScript("(\nclass {\n  static #m() { return 'test262'; }\n\n  static access() {\n    return this.#m();\n  }\n}\n)");
+};
+
+let C1 = createClass(eval1);
+let C2 = createClass(eval2);
+
+assert.sameValue(C1.access(), 'test262');
+assert.sameValue(C2.access(), 'test262');
+
+assert.throws(global1.TypeError, function() {
+  C1.access.call(C2);
+}, 'invalid access of c1 private static method');
+
+assert.throws(global2.TypeError, function() {
+  C2.access.call(C1);
+}, 'invalid access of c2 private static method');
+})();
+
+// Replacement for test/language/expressions/class/private-static-setter-multiple-evaluations-of-class-realm.js
+// Copyright (C) 2019 Caio Lima (Igalia SL). All rights reserved.
+// This code is governed by the BSD license found in the LICENSE file.
+(function () {
+let global1 = $262.createRealm().global;
+let global2 = $262.createRealm().global;
+let eval1 = global1.$262;
+let eval2 = global2.$262;
+
+let evalClass = function (_eval) {
+  return _eval.evalScript("(\nclass {\n  static set #m(v) {\n    this._v = v;\n  }\n\n  static access() {\n    this.#m = 'test262';\n  }\n}\n)");
+};
+
+let C1 = evalClass(eval1);
+let C2 = evalClass(eval2);
+
+C1.access();
+assert.sameValue(C1._v, 'test262');
+C2.access();
+assert.sameValue(C2._v, 'test262');
+
+assert.throws(global1.TypeError, function() {
+  C1.access.call(C2);
+}, 'invalid access of C1 private static setter');
+
+assert.throws(global2.TypeError, function() {
+  C2.access.call(C1);
+}, 'invalid access of C2 private static setter');
+})();
+
+console.log("DS19 private-brands complete");
