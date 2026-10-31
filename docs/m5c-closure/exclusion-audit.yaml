@@ -1209,8 +1209,8 @@ assessments:
       tests/native/fixtures/bindings.ts:
         "f3e20be237b2b772c59670f481af8147bfa59312098aa503\
         e3817879ab0fb31b"
-      tests/native.ts: "6af4fb6588769c12b2f2489a27b3ce0b1d745112cfb76268\
-        5182134642ddfa1d"
+      tests/native.ts: "a15572fa62a53336b9bad50d9ffce4e49dea9b1bd1d51b28\
+        9ef6ce1f1b58345a"
     reason: Maintainer decision 2026-10-28 item 1 applies to the single path in
       dynamic-source-template-site-evidence.paths.txt. The
       template-site-identity native fixture observes both same-site equalities
@@ -2948,8 +2948,8 @@ assessments:
       tests/callable-object-evidence.test.ts:
         "d2b814666e5645565ca2001f0419b931cd2949624777047f562d\
         a479c71be70d"
-      tests/native.ts: "6af4fb6588769c12b2f2489a27b3ce0b1d745112cfb762685182\
-        134642ddfa1d"
+      tests/native.ts: "a15572fa62a53336b9bad50d9ffce4e49dea9b1bd1d51b289ef6\
+        ce1f1b58345a"
       docs/m5c-graph/dynamic-source-callable-object-assessment.md:
         "b4eb5774379e97332ac56111eb4fadf83a6e39b66f84b22bff74\
         10ffca7eaf37"
@@ -2980,8 +2980,8 @@ assessments:
       tests/callable-object-evidence.test.ts:
         "d2b814666e5645565ca2001f0419b931cd2949624777047f562d\
         a479c71be70d"
-      tests/native.ts: "6af4fb6588769c12b2f2489a27b3ce0b1d745112cfb762685182\
-        134642ddfa1d"
+      tests/native.ts: "a15572fa62a53336b9bad50d9ffce4e49dea9b1bd1d51b289ef6\
+        ce1f1b58345a"
       docs/m5c-graph/dynamic-source-callable-object-assessment.md:
         "b4eb5774379e97332ac56111eb4fadf83a6e39b66f84b22bff74\
         10ffca7eaf37"
@@ -3009,8 +3009,8 @@ assessments:
       tests/callable-object-evidence.test.ts:
         "d2b814666e5645565ca2001f0419b931cd2949624777047f562d\
         a479c71be70d"
-      tests/native.ts: "6af4fb6588769c12b2f2489a27b3ce0b1d745112cfb762685182\
-        134642ddfa1d"
+      tests/native.ts: "a15572fa62a53336b9bad50d9ffce4e49dea9b1bd1d51b289ef6\
+        ce1f1b58345a"
       docs/m5c-graph/dynamic-source-callable-object-assessment.md:
         "b4eb5774379e97332ac56111eb4fadf83a6e39b66f84b22bff74\
         10ffca7eaf37"
@@ -3053,8 +3053,8 @@ assessments:
       tests/callable-object-evidence.test.ts:
         "d2b814666e5645565ca2001f0419b931cd2949624777047f562d\
         a479c71be70d"
-      tests/native.ts: "6af4fb6588769c12b2f2489a27b3ce0b1d745112cfb762685182\
-        134642ddfa1d"
+      tests/native.ts: "a15572fa62a53336b9bad50d9ffce4e49dea9b1bd1d51b289ef6\
+        ce1f1b58345a"
       docs/m5c-graph/dynamic-source-callable-object-assessment.md:
         "b4eb5774379e97332ac56111eb4fadf83a6e39b66f84b22bff74\
         10ffca7eaf37"
@@ -3081,8 +3081,8 @@ assessments:
       tests/callable-object-evidence.test.ts:
         "d2b814666e5645565ca2001f0419b931cd2949624777047f562d\
         a479c71be70d"
-      tests/native.ts: "6af4fb6588769c12b2f2489a27b3ce0b1d745112cfb762685182\
-        134642ddfa1d"
+      tests/native.ts: "a15572fa62a53336b9bad50d9ffce4e49dea9b1bd1d51b289ef6\
+        ce1f1b58345a"
       docs/m5c-graph/dynamic-source-callable-object-assessment.md:
         "b4eb5774379e97332ac56111eb4fadf83a6e39b66f84b22bff74\
         10ffca7eaf37"
@@ -3113,8 +3113,8 @@ assessments:
       tests/callable-object-evidence.test.ts:
         "d2b814666e5645565ca2001f0419b931cd2949624777047f562d\
         a479c71be70d"
-      tests/native.ts: "6af4fb6588769c12b2f2489a27b3ce0b1d745112cfb762685182\
-        134642ddfa1d"
+      tests/native.ts: "a15572fa62a53336b9bad50d9ffce4e49dea9b1bd1d51b289ef6\
+        ce1f1b58345a"
       docs/m5c-graph/dynamic-source-callable-object-assessment.md:
         "b4eb5774379e97332ac56111eb4fadf83a6e39b66f84b22bff74\
         10ffca7eaf37"
@@ -3143,8 +3143,8 @@ assessments:
       tests/callable-object-evidence.test.ts:
         "d2b814666e5645565ca2001f0419b931cd2949624777047f562d\
         a479c71be70d"
-      tests/native.ts: "6af4fb6588769c12b2f2489a27b3ce0b1d745112cfb762685182\
-        134642ddfa1d"
+      tests/native.ts: "a15572fa62a53336b9bad50d9ffce4e49dea9b1bd1d51b289ef6\
+        ce1f1b58345a"
       docs/m5c-graph/dynamic-source-callable-object-assessment.md:
         "b4eb5774379e97332ac56111eb4fadf83a6e39b66f84b22bff74\
         10ffca7eaf37"
@@ -3182,8 +3182,8 @@ assessments:
       tests/callable-object-evidence.test.ts:
         "d2b814666e5645565ca2001f0419b931cd2949624777047f562d\
         a479c71be70d"
-      tests/native.ts: "6af4fb6588769c12b2f2489a27b3ce0b1d745112cfb762685182\
-        134642ddfa1d"
+      tests/native.ts: "a15572fa62a53336b9bad50d9ffce4e49dea9b1bd1d51b289ef6\
+        ce1f1b58345a"
       docs/m5c-graph/dynamic-source-callable-object-assessment.md:
         "b4eb5774379e97332ac56111eb4fadf83a6e39b66f84b22bff74\
         10ffca7eaf37"
@@ -3210,8 +3210,8 @@ assessments:
       tests/callable-object-evidence.test.ts:
         "d2b814666e5645565ca2001f0419b931cd2949624777047f562d\
         a479c71be70d"
-      tests/native.ts: "6af4fb6588769c12b2f2489a27b3ce0b1d745112cfb762685182\
-        134642ddfa1d"
+      tests/native.ts: "a15572fa62a53336b9bad50d9ffce4e49dea9b1bd1d51b289ef6\
+        ce1f1b58345a"
       docs/m5c-graph/dynamic-source-callable-object-assessment.md:
         "b4eb5774379e97332ac56111eb4fadf83a6e39b66f84b22bff74\
         10ffca7eaf37"
@@ -3242,8 +3242,8 @@ assessments:
       tests/callable-object-evidence.test.ts:
         "d2b814666e5645565ca2001f0419b931cd2949624777047f562d\
         a479c71be70d"
-      tests/native.ts: "6af4fb6588769c12b2f2489a27b3ce0b1d745112cfb762685182\
-        134642ddfa1d"
+      tests/native.ts: "a15572fa62a53336b9bad50d9ffce4e49dea9b1bd1d51b289ef6\
+        ce1f1b58345a"
       docs/m5c-graph/dynamic-source-callable-object-assessment.md:
         "b4eb5774379e97332ac56111eb4fadf83a6e39b66f84b22bff74\
         10ffca7eaf37"
@@ -3273,8 +3273,8 @@ assessments:
       tests/callable-object-evidence.test.ts:
         "d2b814666e5645565ca2001f0419b931cd2949624777047f562d\
         a479c71be70d"
-      tests/native.ts: "6af4fb6588769c12b2f2489a27b3ce0b1d745112cfb762685182\
-        134642ddfa1d"
+      tests/native.ts: "a15572fa62a53336b9bad50d9ffce4e49dea9b1bd1d51b289ef6\
+        ce1f1b58345a"
       docs/m5c-graph/dynamic-source-callable-object-assessment.md:
         "b4eb5774379e97332ac56111eb4fadf83a6e39b66f84b22bff74\
         10ffca7eaf37"
@@ -3313,8 +3313,8 @@ assessments:
       tests/callable-object-evidence.test.ts:
         "d2b814666e5645565ca2001f0419b931cd2949624777047f562d\
         a479c71be70d"
-      tests/native.ts: "6af4fb6588769c12b2f2489a27b3ce0b1d745112cfb762685182\
-        134642ddfa1d"
+      tests/native.ts: "a15572fa62a53336b9bad50d9ffce4e49dea9b1bd1d51b289ef6\
+        ce1f1b58345a"
       docs/m5c-graph/dynamic-source-callable-object-assessment.md:
         "b4eb5774379e97332ac56111eb4fadf83a6e39b66f84b22bff74\
         10ffca7eaf37"
@@ -3343,8 +3343,8 @@ assessments:
       tests/callable-object-evidence.test.ts:
         "d2b814666e5645565ca2001f0419b931cd2949624777047f562d\
         a479c71be70d"
-      tests/native.ts: "6af4fb6588769c12b2f2489a27b3ce0b1d745112cfb762685182\
-        134642ddfa1d"
+      tests/native.ts: "a15572fa62a53336b9bad50d9ffce4e49dea9b1bd1d51b289ef6\
+        ce1f1b58345a"
       docs/m5c-graph/dynamic-source-callable-object-assessment.md:
         "b4eb5774379e97332ac56111eb4fadf83a6e39b66f84b22bff74\
         10ffca7eaf37"
@@ -3371,8 +3371,8 @@ assessments:
       tests/callable-object-evidence.test.ts:
         "d2b814666e5645565ca2001f0419b931cd2949624777047f562d\
         a479c71be70d"
-      tests/native.ts: "6af4fb6588769c12b2f2489a27b3ce0b1d745112cfb762685182\
-        134642ddfa1d"
+      tests/native.ts: "a15572fa62a53336b9bad50d9ffce4e49dea9b1bd1d51b289ef6\
+        ce1f1b58345a"
       docs/m5c-graph/dynamic-source-callable-object-assessment.md:
         "b4eb5774379e97332ac56111eb4fadf83a6e39b66f84b22bff74\
         10ffca7eaf37"
@@ -3400,8 +3400,8 @@ assessments:
       tests/callable-object-evidence.test.ts:
         "d2b814666e5645565ca2001f0419b931cd2949624777047f562d\
         a479c71be70d"
-      tests/native.ts: "6af4fb6588769c12b2f2489a27b3ce0b1d745112cfb762685182\
-        134642ddfa1d"
+      tests/native.ts: "a15572fa62a53336b9bad50d9ffce4e49dea9b1bd1d51b289ef6\
+        ce1f1b58345a"
       docs/m5c-graph/dynamic-source-callable-object-assessment.md:
         "b4eb5774379e97332ac56111eb4fadf83a6e39b66f84b22bff74\
         10ffca7eaf37"
@@ -3432,8 +3432,8 @@ assessments:
       tests/callable-object-evidence.test.ts:
         "d2b814666e5645565ca2001f0419b931cd2949624777047f562d\
         a479c71be70d"
-      tests/native.ts: "6af4fb6588769c12b2f2489a27b3ce0b1d745112cfb762685182\
-        134642ddfa1d"
+      tests/native.ts: "a15572fa62a53336b9bad50d9ffce4e49dea9b1bd1d51b289ef6\
+        ce1f1b58345a"
       docs/m5c-graph/dynamic-source-callable-object-assessment.md:
         "b4eb5774379e97332ac56111eb4fadf83a6e39b66f84b22bff74\
         10ffca7eaf37"
@@ -3559,8 +3559,8 @@ assessments:
     replacementEvidence:
       tests/native/fixtures/binding-reference-evidence.ts: "148176601d5cac6e8f\
         b67444ac68efeadc9df8aacb596b23dbf158c2b48f1bba"
-      tests/native.ts: "6af4fb6588769c12b2f2489a27b3ce0b1d745112cfb76268518213\
-        4642ddfa1d"
+      tests/native.ts: "a15572fa62a53336b9bad50d9ffce4e49dea9b1bd1d51b289ef6ce\
+        1f1b58345a"
   ds18-static-class-fields:
     disposition: exclusion
     normativeDependency: source-evaluation-only
@@ -3581,8 +3581,8 @@ assessments:
     replacementEvidence:
       tests/native/fixtures/binding-reference-evidence.ts: "148176601d5cac6e8f\
         b67444ac68efeadc9df8aacb596b23dbf158c2b48f1bba"
-      tests/native.ts: "6af4fb6588769c12b2f2489a27b3ce0b1d745112cfb76268518213\
-        4642ddfa1d"
+      tests/native.ts: "a15572fa62a53336b9bad50d9ffce4e49dea9b1bd1d51b289ef6ce\
+        1f1b58345a"
   ds18-unresolvable-compound:
     disposition: exclusion
     normativeDependency: source-evaluation-only
@@ -3603,8 +3603,46 @@ assessments:
     replacementEvidence:
       tests/native/fixtures/binding-reference-evidence.ts: "148176601d5cac6e8f\
         b67444ac68efeadc9df8aacb596b23dbf158c2b48f1bba"
-      tests/native.ts: "6af4fb6588769c12b2f2489a27b3ce0b1d745112cfb76268518213\
-        4642ddfa1d"
+      tests/native.ts: "a15572fa62a53336b9bad50d9ffce4e49dea9b1bd1d51b289ef6ce\
+        1f1b58345a"
+  ds21-finite-completion-records:
+    disposition: exclusion
+    normativeDependency: source-evaluation-only
+    reason: >-
+      Maintainer decision 2026-10-28 item 1 applies. ADR 0029 finite
+      ahead-of-time host Script instrumentation observes every selected
+      StatementList/statement completion and every original consumer. The
+      per-path table names each fixture index and native group and records
+      the global environment, strictness and remaining-assertion checks
+      approved by Root. Both policies pass with forced collection; each
+      path/strictness mode rejects its wrong-completion mutation. All
+      original value, object identity/prototype/element, callable,
+      conversion, equality and control-flow assertions are retained. Only
+      eval source evaluation remains excluded under ADR 0016. No path counts
+      as a pass. Reopen on changed source, observation or replacement
+      evidence, or an accepted ADR 0016 amendment admitting this source
+      form; ADR 0019 non-source reopening remains in force.
+    replacementEvidence:
+      docs/m5c-graph/dynamic-source-completion-record-assessment.md:
+        "1380f0ccd6c601e58296a0898b4154661c33219e836c1e14\
+        97bf54240172dfd0"
+      tests/native/fixtures/completion-record-cases.ts:
+        "f3c04b154cf730b2ffcf1dc78c181257c83588060f18007f\
+        ade96760905840e0"
+      tests/native/fixtures/completion-records.ts:
+        "dac6fa1467ec501b5034300ae10d6ff37d9a69ef89e74552\
+        91e2b7dbeddb0d06"
+      tests/completion-records.test.ts:
+        "f053d02bcd11af6604c78d907e709ee0155fe6c33c4a551b\
+        79de0cc09474b624"
+      tests/native.ts: "a15572fa62a53336b9bad50d9ffce4e49dea9b1bd1d51b28\
+        9ef6ce1f1b58345a"
+      tests/test262/harness/base.js:
+        "50331feeca513cb2e2354e05e7c68f82d5aeccd9b766d6c8\
+        8438c5ef118075f6"
+      packages/compiler/src/host-scripts.ts:
+        "e078da63c992b7d11fe1243abb4cdc0cc28d7843fe93c723\
+        444e469285601ce3"
 paths:
   - path: test/built-ins/AggregateError/newtarget-proto-fallback.js
     proposedOwner: adr:0016-dynamic-source-boundary
@@ -3944,7 +3982,7 @@ paths:
     section: sec-toboolean
     subject: Undefined, void and others are converted to Boolean
       by explicit transformation
-    assessment: fixture-construction
+    assessment: ds21-finite-completion-records
   - path: test/built-ins/Boolean/S9.2_A6_T1.js
     proposedOwner: adr:0016-dynamic-source-boundary
     priorCohort: incidental-scaffolding
@@ -6965,7 +7003,7 @@ paths:
     section: sec-string-constructor
     subject: Undefined values is undefined, void 0 and eval("var
       x"). Use explicit transformation
-    assessment: fixture-construction
+    assessment: ds21-finite-completion-records
   - path: test/built-ins/String/proto-from-ctor-realm.js
     proposedOwner: adr:0016-dynamic-source-boundary
     priorCohort: incidental-scaffolding
@@ -7505,7 +7543,7 @@ paths:
     missingDynamicTag: false
     section: sec-undefined
     subject: Use typeof, isNaN, isFinite
-    assessment: fixture-construction
+    assessment: ds21-finite-completion-records
   - path: "test/language/arguments-object/10.5-1-s.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "incidental-scaffolding"
@@ -9320,7 +9358,7 @@ paths:
     missingDynamicTag: false
     section: "Original es5id: 15.1.2.1_A3.2_T1"
     subject: "Block statement"
-    assessment: "observation-train-b06-b08-b14"
+    assessment: ds21-finite-completion-records
   - path: "test/language/eval-code/direct/cptn-nrml-empty-do-while.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "incidental-scaffolding"
@@ -9331,7 +9369,7 @@ paths:
     missingDynamicTag: false
     section: "Original es5id: 15.1.2.1_A3.2_T6"
     subject: "do-while statement"
-    assessment: "observation-train-b06-b08-b14"
+    assessment: ds21-finite-completion-records
   - path: "test/language/eval-code/direct/cptn-nrml-empty-empty.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "incidental-scaffolding"
@@ -9342,7 +9380,7 @@ paths:
     missingDynamicTag: false
     section: "Original es5id: 15.1.2.1_A3.2_T3"
     subject: "Empty statement"
-    assessment: "observation-train-b06-b08-b14"
+    assessment: ds21-finite-completion-records
   - path: "test/language/eval-code/direct/cptn-nrml-empty-for.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "incidental-scaffolding"
@@ -9353,7 +9391,7 @@ paths:
     missingDynamicTag: false
     section: "Original es5id: 15.1.2.1_A3.2_T8"
     subject: "for statement"
-    assessment: "observation-train-b06-b08-b14"
+    assessment: ds21-finite-completion-records
   - path: "test/language/eval-code/direct/cptn-nrml-empty-if.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "incidental-scaffolding"
@@ -9364,7 +9402,7 @@ paths:
     missingDynamicTag: false
     section: "Original es5id: 15.1.2.1_A3.2_T4"
     subject: "If statement"
-    assessment: "observation-train-b06-b08-b14"
+    assessment: ds21-finite-completion-records
   - path: "test/language/eval-code/direct/cptn-nrml-empty-switch.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "incidental-scaffolding"
@@ -9375,7 +9413,7 @@ paths:
     missingDynamicTag: false
     section: "Original es5id: 15.1.2.1_A3.2_T5"
     subject: "Switch statement"
-    assessment: "observation-train-b06-b08-b14"
+    assessment: ds21-finite-completion-records
   - path: "test/language/eval-code/direct/cptn-nrml-empty-var.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "incidental-scaffolding"
@@ -9386,7 +9424,7 @@ paths:
     missingDynamicTag: false
     section: "Original es5id: 15.1.2.1_A3.2_T2"
     subject: "Var statement"
-    assessment: "observation-train-b06-b08-b14"
+    assessment: ds21-finite-completion-records
   - path: "test/language/eval-code/direct/cptn-nrml-empty-while.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "incidental-scaffolding"
@@ -9397,7 +9435,7 @@ paths:
     missingDynamicTag: false
     section: "Original es5id: 15.1.2.1_A3.2_T7"
     subject: "do-while statement"
-    assessment: "observation-train-b06-b08-b14"
+    assessment: ds21-finite-completion-records
   - path: "test/language/eval-code/direct/cptn-nrml-expr-obj.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "incidental-scaffolding"
@@ -9408,7 +9446,7 @@ paths:
     missingDynamicTag: false
     section: "Original es5id: 15.1.2.1_A3.1_T2"
     subject: "Expression statement. Eval return object value"
-    assessment: "observation-train-b06-b08-b14"
+    assessment: ds21-finite-completion-records
   - path: "test/language/eval-code/direct/cptn-nrml-expr-prim.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "incidental-scaffolding"
@@ -9419,7 +9457,7 @@ paths:
     missingDynamicTag: false
     section: "Original es5id: 15.1.2.1_A3.1_T1"
     subject: "Expression statement. Eval return primitive value"
-    assessment: "observation-train-b06-b08-b14"
+    assessment: ds21-finite-completion-records
   - path: "test/language/eval-code/direct/cptn-thrw-prim.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "incidental-scaffolding"
@@ -9430,7 +9468,7 @@ paths:
     missingDynamicTag: false
     section: "Original es5id: 15.1.2.1_A3.3_T4"
     subject: "Throw statement"
-    assessment: "observation-train-b06-b08-b14"
+    assessment: ds21-finite-completion-records
   - path: "test/language/eval-code/direct/export.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "source-subject"
@@ -11528,7 +11566,7 @@ paths:
     missingDynamicTag: false
     section: "sec-performeval"
     subject: "Block statement"
-    assessment: "observation-train-b06-b08-b14"
+    assessment: ds21-finite-completion-records
   - path: "test/language/eval-code/indirect/cptn-nrml-empty-do-while.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "incidental-scaffolding"
@@ -11539,7 +11577,7 @@ paths:
     missingDynamicTag: false
     section: "sec-performeval"
     subject: "do-while statement"
-    assessment: "observation-train-b06-b08-b14"
+    assessment: ds21-finite-completion-records
   - path: "test/language/eval-code/indirect/cptn-nrml-empty-empty.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "incidental-scaffolding"
@@ -11550,7 +11588,7 @@ paths:
     missingDynamicTag: false
     section: "sec-performeval"
     subject: "Empty statement"
-    assessment: "observation-train-b06-b08-b14"
+    assessment: ds21-finite-completion-records
   - path: "test/language/eval-code/indirect/cptn-nrml-empty-for.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "incidental-scaffolding"
@@ -11561,7 +11599,7 @@ paths:
     missingDynamicTag: false
     section: "sec-performeval"
     subject: "for statement"
-    assessment: "observation-train-b06-b08-b14"
+    assessment: ds21-finite-completion-records
   - path: "test/language/eval-code/indirect/cptn-nrml-empty-if.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "incidental-scaffolding"
@@ -11572,7 +11610,7 @@ paths:
     missingDynamicTag: false
     section: "sec-performeval"
     subject: "If statement"
-    assessment: "observation-train-b06-b08-b14"
+    assessment: ds21-finite-completion-records
   - path: "test/language/eval-code/indirect/cptn-nrml-empty-switch.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "incidental-scaffolding"
@@ -11583,7 +11621,7 @@ paths:
     missingDynamicTag: false
     section: "sec-performeval"
     subject: "Switch statement"
-    assessment: "observation-train-b06-b08-b14"
+    assessment: ds21-finite-completion-records
   - path: "test/language/eval-code/indirect/cptn-nrml-empty-var.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "incidental-scaffolding"
@@ -11594,7 +11632,7 @@ paths:
     missingDynamicTag: false
     section: "sec-performeval"
     subject: "Var statement"
-    assessment: "observation-train-b06-b08-b14"
+    assessment: ds21-finite-completion-records
   - path: "test/language/eval-code/indirect/cptn-nrml-empty-while.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "incidental-scaffolding"
@@ -11605,7 +11643,7 @@ paths:
     missingDynamicTag: false
     section: "sec-performeval"
     subject: "while statement"
-    assessment: "observation-train-b06-b08-b14"
+    assessment: ds21-finite-completion-records
   - path: "test/language/eval-code/indirect/cptn-nrml-expr-obj.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "incidental-scaffolding"
@@ -11616,7 +11654,7 @@ paths:
     missingDynamicTag: false
     section: "sec-performeval"
     subject: "Expression statement. Eval return object value"
-    assessment: "observation-train-b06-b08-b14"
+    assessment: ds21-finite-completion-records
   - path: "test/language/eval-code/indirect/cptn-nrml-expr-prim.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "incidental-scaffolding"
@@ -11627,7 +11665,7 @@ paths:
     missingDynamicTag: false
     section: "sec-performeval"
     subject: "Expression statement. Eval return primitive value"
-    assessment: "observation-train-b06-b08-b14"
+    assessment: ds21-finite-completion-records
   - path: "test/language/eval-code/indirect/export.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "source-subject"
@@ -14590,7 +14628,7 @@ paths:
     section: "sec-addition-operator-plus"
     subject: 'Undefined values is undefined, void 0 and
       eval("var x"). Use implicit transformation'
-    assessment: "fixture-construction"
+    assessment: ds21-finite-completion-records
   - path: "test/language/expressions/conditional/S11.12_A1.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "incidental-scaffolding"
@@ -14641,7 +14679,7 @@ paths:
     subject: "Division after a block statement is not a RegExp
       literal and gets no ASI; the value is read as the eval
       completion of '{[42]}.8/of/g'"
-    assessment: "completion-observation"
+    assessment: ds21-finite-completion-records
   - path: "test/language/expressions/does-not-equals/S11.9.2_A1\
       .js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -14669,7 +14707,7 @@ paths:
     section: "sec-equality-operators"
     subject: 'Undefined and Null equality with ''!=''; check #3
       obtains undefined from eval("var x")'
-    assessment: "fixture-construction"
+    assessment: ds21-finite-completion-records
   - path: "test/language/expressions/dynamic-import/always-create-new-\
       promise.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -20860,7 +20898,7 @@ paths:
     section: "sec-equality-operators"
     subject: 'Undefined and Null equality with ''==''; check #3
       obtains undefined from eval("var x")'
-    assessment: "fixture-construction"
+    assessment: ds21-finite-completion-records
   - path: "test/language/expressions/function/eval-var-scope-sy\
       ntax-err.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -21512,7 +21550,7 @@ paths:
     section: "Original es5id: 9.2_A1_T2"
     subject: "Undefined, void and others are converted to Boolean by implicit
       transformation"
-    assessment: "observation-train-b06-b08-b14"
+    assessment: ds21-finite-completion-records
   - path: test/language/expressions/logical-not/S9.2_A6_T2.js
     proposedOwner: adr:0016-dynamic-source-boundary
     priorCohort: incidental-scaffolding
@@ -21983,7 +22021,7 @@ paths:
     subject: The original first two static undefined/void checks
       and the final comparison or numeric conversion of the
       var-statement completion returned by eval.
-    assessment: completion-observation
+    assessment: ds21-finite-completion-records
   - path: test/language/expressions/strict-equals/S11.9.4_A1.js
     proposedOwner: adr:0016-dynamic-source-boundary
     priorCohort: incidental-scaffolding
@@ -22009,7 +22047,7 @@ paths:
     subject: The original first two static undefined/void checks
       and the final comparison or numeric conversion of the
       var-statement completion returned by eval.
-    assessment: completion-observation
+    assessment: ds21-finite-completion-records
   - path: test/language/expressions/subtraction/S11.6.2_A1.js
     proposedOwner: adr:0016-dynamic-source-boundary
     priorCohort: incidental-scaffolding
@@ -22293,7 +22331,7 @@ paths:
     subject: The original first two static undefined/void checks
       and the final comparison or numeric conversion of the
       var-statement completion returned by eval.
-    assessment: completion-observation
+    assessment: ds21-finite-completion-records
   - path: "test/language/expressions/unsigned-right-shift/S11.7\
       .3_A1.js"
     proposedOwner: adr:0016-dynamic-source-boundary
@@ -23386,7 +23424,7 @@ paths:
     section: "prod-StatementList"
     subject: "Array Literal with items (Eval production of StatementList
       starting with a BlockStatement)"
-    assessment: ds3-statementlist-completion
+    assessment: ds21-finite-completion-records
   - path: "test/language/statementList/eval-block-array-literal.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "incidental-scaffolding"
@@ -23398,7 +23436,7 @@ paths:
     section: "prod-StatementList"
     subject: "Array Literal (Eval production of StatementList starting with a
       BlockStatement)"
-    assessment: ds3-statementlist-completion
+    assessment: ds21-finite-completion-records
   - path: "test/language/statementList/eval-block-arrow-function-assignment-exp\
       r.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -23411,7 +23449,7 @@ paths:
     section: "prod-StatementList"
     subject: "Arrow Function with an AssignmentExpression (Eval production of
       StatementList starting with a BlockStatement)"
-    assessment: ds3-statementlist-completion
+    assessment: ds21-finite-completion-records
   - path: "test/language/statementList/eval-block-arrow-function-funct\
       ionbody.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -23424,7 +23462,7 @@ paths:
     section: "prod-StatementList"
     subject: "Arrow Function with a Function Body (Eval production of
       StatementList starting with a BlockStatement)"
-    assessment: ds3-statementlist-completion
+    assessment: ds21-finite-completion-records
   - path: "test/language/statementList/eval-block-block-with-labels.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "incidental-scaffolding"
@@ -23436,7 +23474,7 @@ paths:
     section: "prod-StatementList"
     subject: "Block with a label (Eval production of StatementList starting with
       a BlockStatement)"
-    assessment: ds3-statementlist-completion
+    assessment: ds21-finite-completion-records
   - path: "test/language/statementList/eval-block-block.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "incidental-scaffolding"
@@ -23448,7 +23486,7 @@ paths:
     section: "prod-StatementList"
     subject: "Block (Eval production of StatementList starting with a \
       BlockStatement)"
-    assessment: ds3-statementlist-completion
+    assessment: ds21-finite-completion-records
   - path: "test/language/statementList/eval-block-expr-arrow-function-boolean-l\
       iteral.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -23461,7 +23499,7 @@ paths:
     section: "prod-StatementList"
     subject: "Expression with an Arrow Function and Boolean literal (Eval
       production of StatementList starting with a BlockStatement)"
-    assessment: ds3-statementlist-completion
+    assessment: ds21-finite-completion-records
   - path: "test/language/statementList/eval-block-let-declaration.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "incidental-scaffolding"
@@ -23473,7 +23511,7 @@ paths:
     section: "prod-StatementList"
     subject: "LexicalDeclaration using Let (Eval production of StatementList
       starting with a BlockStatement)"
-    assessment: ds3-statementlist-completion
+    assessment: ds21-finite-completion-records
   - path: "test/language/statementList/eval-block-regexp-literal-flags.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "incidental-scaffolding"
@@ -23485,7 +23523,7 @@ paths:
     section: "prod-StatementList"
     subject: "Regular Expression Literal with Flags (Eval production of
       StatementList starting with a BlockStatement)"
-    assessment: ds3-statementlist-completion
+    assessment: ds21-finite-completion-records
   - path: "test/language/statementList/eval-block-regexp-literal.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "incidental-scaffolding"
@@ -23497,7 +23535,7 @@ paths:
     section: "prod-StatementList"
     subject: "Regular Expression Literal (Eval production of StatementList
       starting with a BlockStatement)"
-    assessment: ds3-statementlist-completion
+    assessment: ds21-finite-completion-records
   - path: "test/language/statementList/eval-block-with-statment-array-literal-w\
       ith-item.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -23574,7 +23612,7 @@ paths:
     section: "prod-StatementList"
     subject: "Block (Evaluate produciton of StatementList starting with a
       BlockStatement)"
-    assessment: ds3-statementlist-completion
+    assessment: ds21-finite-completion-records
   - path: "test/language/statementList/eval-block-with-statment-expr-arrow-func\
       tion-boolean-literal.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -23638,7 +23676,7 @@ paths:
     section: "prod-StatementList"
     subject: "Array Literal with items (Valid syntax of StatementList starting
       with a Class Declaration)"
-    assessment: ds3-statementlist-completion
+    assessment: ds21-finite-completion-records
   - path: "test/language/statementList/eval-class-array-literal.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "incidental-scaffolding"
@@ -23650,7 +23688,7 @@ paths:
     section: "prod-StatementList"
     subject: "Array Literal (Valid syntax of StatementList starting with a Class
       Declaration)"
-    assessment: ds3-statementlist-completion
+    assessment: ds21-finite-completion-records
   - path: "test/language/statementList/eval-class-arrow-function-assignment-exp\
       r.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -23663,7 +23701,7 @@ paths:
     section: "prod-StatementList"
     subject: "Arrow Function with an AssignmentExpression (Valid syntax of
       StatementList starting with a Class Declaration)"
-    assessment: ds3-statementlist-completion
+    assessment: ds21-finite-completion-records
   - path: "test/language/statementList/eval-class-arrow-function-funct\
       ionbody.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -23676,7 +23714,7 @@ paths:
     section: "prod-StatementList"
     subject: "Arrow Function with a Function Body (Valid syntax of StatementList
       starting with a Class Declaration)"
-    assessment: ds3-statementlist-completion
+    assessment: ds21-finite-completion-records
   - path: "test/language/statementList/eval-class-block-with-labels.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "incidental-scaffolding"
@@ -23688,7 +23726,7 @@ paths:
     section: "prod-StatementList"
     subject: "Block with a label (Valid syntax of StatementList starting with a
       Class Declaration)"
-    assessment: ds3-statementlist-completion
+    assessment: ds21-finite-completion-records
   - path: "test/language/statementList/eval-class-block.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "incidental-scaffolding"
@@ -23700,7 +23738,7 @@ paths:
     section: "prod-StatementList"
     subject: "Block (Valid syntax of StatementList starting with a Cla\
       ss Declaration)"
-    assessment: ds3-statementlist-completion
+    assessment: ds21-finite-completion-records
   - path: "test/language/statementList/eval-class-expr-arrow-function-boolean-l\
       iteral.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -23713,7 +23751,7 @@ paths:
     section: "prod-StatementList"
     subject: "Expression with an Arrow Function and Boolean literal (Valid
       syntax of StatementList starting with a Class Declaration)"
-    assessment: ds3-statementlist-completion
+    assessment: ds21-finite-completion-records
   - path: "test/language/statementList/eval-class-let-declaration.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "incidental-scaffolding"
@@ -23725,7 +23763,7 @@ paths:
     section: "prod-StatementList"
     subject: "LexicalDeclaration using Let (Valid syntax of StatementList
       starting with a Class Declaration)"
-    assessment: ds3-statementlist-completion
+    assessment: ds21-finite-completion-records
   - path: "test/language/statementList/eval-class-regexp-literal-flags.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "incidental-scaffolding"
@@ -23737,7 +23775,7 @@ paths:
     section: "prod-StatementList"
     subject: "Regular Expression Literal with Flags (Valid syntax of
       StatementList starting with a Class Declaration)"
-    assessment: ds3-statementlist-completion
+    assessment: ds21-finite-completion-records
   - path: "test/language/statementList/eval-class-regexp-literal.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "incidental-scaffolding"
@@ -23749,7 +23787,7 @@ paths:
     section: "prod-StatementList"
     subject: "Regular Expression Literal (Valid syntax of StatementList starting
       with a Class Declaration)"
-    assessment: ds3-statementlist-completion
+    assessment: ds21-finite-completion-records
   - path: "test/language/statementList/eval-fn-array-literal-with-item.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "incidental-scaffolding"
@@ -23761,7 +23799,7 @@ paths:
     section: "prod-StatementList"
     subject: "Array Literal with items (Eval production of StatementList
       starting with a Function Declaration)"
-    assessment: ds3-statementlist-completion
+    assessment: ds21-finite-completion-records
   - path: "test/language/statementList/eval-fn-array-literal.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "incidental-scaffolding"
@@ -23773,7 +23811,7 @@ paths:
     section: "prod-StatementList"
     subject: "Array Literal (Eval production of StatementList starting with a
       Function Declaration)"
-    assessment: ds3-statementlist-completion
+    assessment: ds21-finite-completion-records
   - path: "test/language/statementList/eval-fn-arrow-function-assignme\
       nt-expr.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -23786,7 +23824,7 @@ paths:
     section: "prod-StatementList"
     subject: "Arrow Function with an AssignmentExpression (Eval production of
       StatementList starting with a Function Declaration)"
-    assessment: ds3-statementlist-completion
+    assessment: ds21-finite-completion-records
   - path: "test/language/statementList/eval-fn-arrow-function-functionbody.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "incidental-scaffolding"
@@ -23798,7 +23836,7 @@ paths:
     section: "prod-StatementList"
     subject: "Arrow Function with a Function Body (Eval production of
       StatementList starting with a Function Declaration)"
-    assessment: ds3-statementlist-completion
+    assessment: ds21-finite-completion-records
   - path: "test/language/statementList/eval-fn-block-with-labels.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "incidental-scaffolding"
@@ -23810,7 +23848,7 @@ paths:
     section: "prod-StatementList"
     subject: "Block with a label (Eval production of StatementList starting with
       a Function Declaration)"
-    assessment: ds3-statementlist-completion
+    assessment: ds21-finite-completion-records
   - path: "test/language/statementList/eval-fn-block.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "incidental-scaffolding"
@@ -23822,7 +23860,7 @@ paths:
     section: "prod-StatementList"
     subject: "Block (Eval production of StatementList starting with a Function
       Declaration)"
-    assessment: ds3-statementlist-completion
+    assessment: ds21-finite-completion-records
   - path: "test/language/statementList/eval-fn-expr-arrow-function-boolean-lite\
       ral.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -23835,7 +23873,7 @@ paths:
     section: "prod-StatementList"
     subject: "Expression with an Arrow Function and Boolean literal (Eval
       production of StatementList starting with a Function Declaration)"
-    assessment: ds3-statementlist-completion
+    assessment: ds21-finite-completion-records
   - path: "test/language/statementList/eval-fn-let-declaration.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "incidental-scaffolding"
@@ -23847,7 +23885,7 @@ paths:
     section: "prod-StatementList"
     subject: "LexicalDeclaration using Let (Eval production of StatementList
       starting with a Function Declaration)"
-    assessment: ds3-statementlist-completion
+    assessment: ds21-finite-completion-records
   - path: "test/language/statementList/eval-fn-regexp-literal-flags.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "incidental-scaffolding"
@@ -23859,7 +23897,7 @@ paths:
     section: "prod-StatementList"
     subject: "Regular Expression Literal with Flags (Eval production of
       StatementList starting with a Function Declaration)"
-    assessment: ds3-statementlist-completion
+    assessment: ds21-finite-completion-records
   - path: "test/language/statementList/eval-fn-regexp-literal.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "incidental-scaffolding"
@@ -23871,7 +23909,7 @@ paths:
     section: "prod-StatementList"
     subject: "Regular Expression Literal (Eval production of StatementList
       starting with a Function Declaration)"
-    assessment: ds3-statementlist-completion
+    assessment: ds21-finite-completion-records
   - path: test/language/statements/async-function/cptn-decl.js
     proposedOwner: adr:0016-dynamic-source-boundary
     priorCohort: incidental-scaffolding
@@ -25342,7 +25380,7 @@ paths:
     section: "sec-let-and-const-declarations-runtime-semantics-eval\
       uation"
     subject: "Returns an empty completion"
-    assessment: "observation-train-dynamic-coverage"
+    assessment: ds21-finite-completion-records
   - path: test/language/statements/continue/S12.7_A7.js
     proposedOwner: adr:0016-dynamic-source-boundary
     priorCohort: incidental-scaffolding
@@ -25409,7 +25447,7 @@ paths:
     section: "13.7.2.6"
     subject: "Completion value when iteration completes due to an
       empty abrupt completion"
-    assessment: "observation-train-dynamic-coverage"
+    assessment: ds21-finite-completion-records
   - path: test/language/statements/do-while/cptn-normal.js
     proposedOwner: adr:0016-dynamic-source-boundary
     priorCohort: incidental-scaffolding
@@ -25421,7 +25459,7 @@ paths:
     section: sec-do-while-statement
     subject: Completion value when iteration completes due to
       expression value
-    assessment: completion-observation
+    assessment: ds21-finite-completion-records
   - path: "test/language/statements/empty/cptn-value.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "incidental-scaffolding"
@@ -25432,7 +25470,7 @@ paths:
     missingDynamicTag: false
     section: "sec-empty-statement-runtime-semantics-evaluation"
     subject: "Returns an empty completion"
-    assessment: "observation-train-dynamic-coverage"
+    assessment: ds21-finite-completion-records
   - path: test/language/statements/expression/S12.4_A2_T1.js
     proposedOwner: adr:0016-dynamic-source-boundary
     priorCohort: incidental-scaffolding
@@ -25466,7 +25504,7 @@ paths:
     section: sec-for-in-and-for-of-statements
     subject: Using an array as an Expression is appropriate.
       Here Expression is an array of numbers
-    assessment: completion-observation
+    assessment: ds21-finite-completion-records
   - path: test/language/statements/for-in/S12.6.4_A3.js
     proposedOwner: adr:0016-dynamic-source-boundary
     priorCohort: incidental-scaffolding
@@ -25478,7 +25516,7 @@ paths:
     section: sec-for-in-and-for-of-statements
     subject: Using an array as an Expression is appropriate.
       Here Expression is an array of numbers. Eval is used
-    assessment: completion-observation
+    assessment: ds21-finite-completion-records
   - path: test/language/statements/for-in/S12.6.4_A4.1.js
     proposedOwner: adr:0016-dynamic-source-boundary
     priorCohort: incidental-scaffolding
@@ -25490,7 +25528,7 @@ paths:
     section: sec-for-in-and-for-of-statements
     subject: Using Object as an Expression is appropriate. Eval
       is used
-    assessment: completion-observation
+    assessment: ds21-finite-completion-records
   - path: test/language/statements/for-in/S12.6.4_A4.js
     proposedOwner: adr:0016-dynamic-source-boundary
     priorCohort: incidental-scaffolding
@@ -25502,7 +25540,7 @@ paths:
     section: sec-for-in-and-for-of-statements
     subject: Using Object as an Expression is appropriate. Eval
       is used
-    assessment: completion-observation
+    assessment: ds21-finite-completion-records
   - path: test/language/statements/for-in/cptn-decl-abrupt-empty.js
     proposedOwner: adr:0016-dynamic-source-boundary
     priorCohort: incidental-scaffolding
@@ -25514,7 +25552,7 @@ paths:
     section: sec-for-in-and-for-of-statements
     subject: Completion value when head has a declaration and
       iteration is cancelled
-    assessment: completion-observation
+    assessment: ds21-finite-completion-records
   - path: test/language/statements/for-in/cptn-decl-itr.js
     proposedOwner: adr:0016-dynamic-source-boundary
     priorCohort: incidental-scaffolding
@@ -25526,7 +25564,7 @@ paths:
     section: sec-for-in-and-for-of-statements
     subject: Completion value when head has a declaration and
       iteration occurs
-    assessment: completion-observation
+    assessment: ds21-finite-completion-records
   - path: test/language/statements/for-in/cptn-decl-skip-itr.js
     proposedOwner: adr:0016-dynamic-source-boundary
     priorCohort: incidental-scaffolding
@@ -25538,7 +25576,7 @@ paths:
     section: sec-for-in-and-for-of-statements
     subject: Completion value when head has a declaration and
       iteration is skipped
-    assessment: completion-observation
+    assessment: ds21-finite-completion-records
   - path: test/language/statements/for-in/cptn-decl-zero-itr.js
     proposedOwner: adr:0016-dynamic-source-boundary
     priorCohort: incidental-scaffolding
@@ -25550,7 +25588,7 @@ paths:
     section: sec-for-in-and-for-of-statements
     subject: Completion value when head has a declaration and no
       iteration occurs
-    assessment: completion-observation
+    assessment: ds21-finite-completion-records
   - path: test/language/statements/for-in/cptn-expr-abrupt-empty.js
     proposedOwner: adr:0016-dynamic-source-boundary
     priorCohort: incidental-scaffolding
@@ -25562,7 +25600,7 @@ paths:
     section: sec-for-in-and-for-of-statements
     subject: Completion value when head has no declaration and
       iteration is cancelled
-    assessment: completion-observation
+    assessment: ds21-finite-completion-records
   - path: test/language/statements/for-in/cptn-expr-itr.js
     proposedOwner: adr:0016-dynamic-source-boundary
     priorCohort: incidental-scaffolding
@@ -25574,7 +25612,7 @@ paths:
     section: sec-for-in-and-for-of-statements
     subject: Completion value when head has no declaration and
       iteration occurs
-    assessment: completion-observation
+    assessment: ds21-finite-completion-records
   - path: test/language/statements/for-in/cptn-expr-skip-itr.js
     proposedOwner: adr:0016-dynamic-source-boundary
     priorCohort: incidental-scaffolding
@@ -25586,7 +25624,7 @@ paths:
     section: sec-for-in-and-for-of-statements
     subject: Completion value when head has no declaration and
       iteration is skipped
-    assessment: completion-observation
+    assessment: ds21-finite-completion-records
   - path: test/language/statements/for-in/cptn-expr-zero-itr.js
     proposedOwner: adr:0016-dynamic-source-boundary
     priorCohort: incidental-scaffolding
@@ -25598,7 +25636,7 @@ paths:
     section: sec-for-in-and-for-of-statements
     subject: Completion value when head has no declaration and
       no iteration occurs
-    assessment: completion-observation
+    assessment: ds21-finite-completion-records
   - path: test/language/statements/for-in/scope-head-var-none.js
     proposedOwner: adr:0016-dynamic-source-boundary
     priorCohort: source-subject
@@ -25910,7 +25948,7 @@ paths:
     section: "sec-with-statement-runtime-semantics-evaluation"
     subject: "Statement completion value when body returns an empty
       abrupt completion"
-    assessment: "observation-train-dynamic-coverage"
+    assessment: ds21-finite-completion-records
   - path: "test/language/statements/with/cptn-nrml.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "incidental-scaffolding"
@@ -25922,7 +25960,7 @@ paths:
     section: "13.11.7"
     subject: "Statement completion value when body returns a normal
       completion"
-    assessment: "observation-train-dynamic-coverage"
+    assessment: ds21-finite-completion-records
   - path: "test/language/statements/with/scope-var-open.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "incidental-scaffolding"
