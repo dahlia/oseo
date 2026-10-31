@@ -1113,6 +1113,508 @@ assessments:
       tests/native/fixtures/function-intrinsic-chains.ts:
         "c5eb018779c47f7de2959da4a1a64969475c8026fc831102\
         f06e8bef6382e1e3"
+  ds14-intrinsic-constructability:
+    disposition: exclusion
+    normativeDependency: source-evaluation-only
+    replacementEvidence:
+      tests/native/fixtures/callable-object-evidence.ts:
+        "a572704e8237c479946d078affaa8cdbe027278574207e4b3409\
+        c79005318308"
+      tests/callable-object-evidence.test.ts:
+        "d2b814666e5645565ca2001f0419b931cd2949624777047f562d\
+        a479c71be70d"
+      tests/native.ts: "91222c3fc3b2335cfcd96ba614f2a4705a3c0935d6946fc2d998\
+        9bcce7b251a7"
+      docs/m5c-graph/dynamic-source-callable-object-assessment.md:
+        "1dcdd38059099dfacc63f694cc3458365cde82a8c764af44051a\
+        77805f653329"
+    reason: DS-14 item 1 replacement group
+      callable-object-intrinsic-constructability, in
+      tests/native/fixtures/callable-object-evidence.ts and its focused
+      runner, observes every non-source assertion of these 6 paths. The
+      bound per-path table names each exact input, operation, result and
+      original subject. Static async declaration throws TypeError under
+      new; constructed instances remain source evaluation.
+      Reflect.construct uses the exact intrinsic as newTarget without
+      calling it; only its trailing source construction remains. Both
+      static forms satisfy instanceof; remaining instances require
+      excluded source construction. Both native policies with forced
+      collection, numeric guard hit and false-hint miss, and Node.js/Deno
+      Script references pass. Only eval source evaluation or
+      Function-family source construction remains. All original paths and
+      unsupported-profile-feature observations remain; none counts as a
+      pass. Reassess changed source, observation or replacement evidence.
+      ADR 0016 and ADR 0019 reopening triggers remain in force.
+  ds14-object-truthiness:
+    disposition: exclusion
+    normativeDependency: source-evaluation-only
+    replacementEvidence:
+      tests/native/fixtures/callable-object-evidence.ts:
+        "a572704e8237c479946d078affaa8cdbe027278574207e4b3409\
+        c79005318308"
+      tests/callable-object-evidence.test.ts:
+        "d2b814666e5645565ca2001f0419b931cd2949624777047f562d\
+        a479c71be70d"
+      tests/native.ts: "91222c3fc3b2335cfcd96ba614f2a4705a3c0935d6946fc2d998\
+        9bcce7b251a7"
+      docs/m5c-graph/dynamic-source-callable-object-assessment.md:
+        "1dcdd38059099dfacc63f694cc3458365cde82a8c764af44051a\
+        77805f653329"
+    reason: DS-14 item 1 replacement group
+      callable-object-object-truthiness, in
+      tests/native/fixtures/callable-object-evidence.ts and its focused
+      runner, observes every non-source assertion of these 1 paths. The
+      bound per-path table names each exact input, operation, result and
+      original subject. The complete object input list converts to true,
+      using a static callable for the source-produced function. Both
+      native policies with forced collection, numeric guard hit and
+      false-hint miss, and Node.js/Deno Script references pass. Only eval
+      source evaluation or Function-family source construction remains.
+      All original paths and unsupported-profile-feature observations
+      remain; none counts as a pass. Reassess changed source, observation
+      or replacement evidence. ADR 0016 and ADR 0019 reopening triggers
+      remain in force.
+  ds14-ordinary-call-and-construction:
+    disposition: exclusion
+    normativeDependency: source-evaluation-only
+    replacementEvidence:
+      tests/native/fixtures/callable-object-evidence.ts:
+        "a572704e8237c479946d078affaa8cdbe027278574207e4b3409\
+        c79005318308"
+      tests/callable-object-evidence.test.ts:
+        "d2b814666e5645565ca2001f0419b931cd2949624777047f562d\
+        a479c71be70d"
+      tests/native.ts: "91222c3fc3b2335cfcd96ba614f2a4705a3c0935d6946fc2d998\
+        9bcce7b251a7"
+      docs/m5c-graph/dynamic-source-callable-object-assessment.md:
+        "1dcdd38059099dfacc63f694cc3458365cde82a8c764af44051a\
+        77805f653329"
+    reason: DS-14 item 1 replacement group
+      callable-object-ordinary-call-and-construction, in
+      tests/native/fixtures/callable-object-evidence.ts and its focused
+      runner, observes every non-source assertion of these 9 paths. The
+      bound per-path table names each exact input, operation, result and
+      original subject. Static function retains Function constructor
+      identity and is not undefined. Static callable has the exact [object
+      Function] tag. Static plain returns OK, leaves x unbound outside and
+      writes global y=2. Static args with ("1",2) returns "12", leaves x
+      unbound outside and writes global y=2. Static Factory returns
+      primitive OK while new yields an object with its constructor and
+      y=2. Static ArgsFactory with ("1",2) yields an object with its
+      constructor and y="12". Both static function and Object(static
+      function) return [object Function]; source-created variants leave
+      only construction. Static function plus
+      Object/String/Boolean/Number/Date/Error/RegExp all have typeof
+      function. Both native policies with forced collection, numeric guard
+      hit and false-hint miss, and Node.js/Deno Script references pass.
+      Only eval source evaluation or Function-family source construction
+      remains. All original paths and unsupported-profile-feature
+      observations remain; none counts as a pass. Reassess changed source,
+      observation or replacement evidence. ADR 0016 and ADR 0019 reopening
+      triggers remain in force.
+  ds14-strict-restricted-properties:
+    disposition: exclusion
+    normativeDependency: source-evaluation-only
+    replacementEvidence:
+      tests/native/fixtures/callable-object-evidence.ts:
+        "a572704e8237c479946d078affaa8cdbe027278574207e4b3409\
+        c79005318308"
+      tests/callable-object-evidence.test.ts:
+        "d2b814666e5645565ca2001f0419b931cd2949624777047f562d\
+        a479c71be70d"
+      tests/native.ts: "91222c3fc3b2335cfcd96ba614f2a4705a3c0935d6946fc2d998\
+        9bcce7b251a7"
+      docs/m5c-graph/dynamic-source-callable-object-assessment.md:
+        "1dcdd38059099dfacc63f694cc3458365cde82a8c764af44051a\
+        77805f653329"
+    reason: DS-14 item 1 replacement group
+      callable-object-strict-restricted-properties, in
+      tests/native/fixtures/callable-object-evidence.ts and its focused
+      runner, observes every non-source assertion of these 1 paths. The
+      bound per-path table names each exact input, operation, result and
+      original subject. Static strict function lacks both own properties
+      and both reads/writes throw TypeError. Both native policies with
+      forced collection, numeric guard hit and false-hint miss, and
+      Node.js/Deno Script references pass. Only eval source evaluation or
+      Function-family source construction remains. All original paths and
+      unsupported-profile-feature observations remain; none counts as a
+      pass. Reassess changed source, observation or replacement evidence.
+      ADR 0016 and ADR 0019 reopening triggers remain in force.
+  ds14-apply-receiver-boxing:
+    disposition: exclusion
+    normativeDependency: source-evaluation-only
+    replacementEvidence:
+      tests/native/fixtures/callable-object-evidence.ts:
+        "a572704e8237c479946d078affaa8cdbe027278574207e4b3409\
+        c79005318308"
+      tests/callable-object-evidence.test.ts:
+        "d2b814666e5645565ca2001f0419b931cd2949624777047f562d\
+        a479c71be70d"
+      tests/native.ts: "91222c3fc3b2335cfcd96ba614f2a4705a3c0935d6946fc2d998\
+        9bcce7b251a7"
+      docs/m5c-graph/dynamic-source-callable-object-assessment.md:
+        "1dcdd38059099dfacc63f694cc3458365cde82a8c764af44051a\
+        77805f653329"
+    reason: DS-14 item 1 replacement group
+      callable-object-apply-receiver-boxing, in
+      tests/native/fixtures/callable-object-evidence.ts and its focused
+      runner, observes every non-source assertion of these 4 paths. The
+      bound per-path table names each exact input, operation, result and
+      original subject. Exact number 1 gets a touched boxed receiver while
+      the primitive has no touched property. Exact true gets a touched
+      boxed receiver while the primitive has no touched property. new
+      Number(1) is mutated through the supplied receiver. A static
+      callable receives the exact touched mutation; source creation of the
+      original receiver remains excluded. Both native policies with forced
+      collection, numeric guard hit and false-hint miss, and Node.js/Deno
+      Script references pass. Only eval source evaluation or
+      Function-family source construction remains. All original paths and
+      unsupported-profile-feature observations remain; none counts as a
+      pass. Reassess changed source, observation or replacement evidence.
+      ADR 0016 and ADR 0019 reopening triggers remain in force.
+  ds14-apply-arrays:
+    disposition: exclusion
+    normativeDependency: source-evaluation-only
+    replacementEvidence:
+      tests/native/fixtures/callable-object-evidence.ts:
+        "a572704e8237c479946d078affaa8cdbe027278574207e4b3409\
+        c79005318308"
+      tests/callable-object-evidence.test.ts:
+        "d2b814666e5645565ca2001f0419b931cd2949624777047f562d\
+        a479c71be70d"
+      tests/native.ts: "91222c3fc3b2335cfcd96ba614f2a4705a3c0935d6946fc2d998\
+        9bcce7b251a7"
+      docs/m5c-graph/dynamic-source-callable-object-assessment.md:
+        "1dcdd38059099dfacc63f694cc3458365cde82a8c764af44051a\
+        77805f653329"
+    reason: DS-14 item 1 replacement group callable-object-apply-arrays, in
+      tests/native/fixtures/callable-object-evidence.ts and its focused
+      runner, observes every non-source assertion of these 3 paths. The
+      bound per-path table names each exact input, operation, result and
+      original subject. Static first applied to null with [1] writes
+      global shifted=1. Static second applied to null with [1,2,3] writes
+      global shifted=2. Exact new Array("nine","inch","nails") yields
+      shifted="nine" and no global write; parameter text conversion
+      belongs to source construction. Both native policies with forced
+      collection, numeric guard hit and false-hint miss, and Node.js/Deno
+      Script references pass. Only eval source evaluation or
+      Function-family source construction remains. All original paths and
+      unsupported-profile-feature observations remain; none counts as a
+      pass. Reassess changed source, observation or replacement evidence.
+      ADR 0016 and ADR 0019 reopening triggers remain in force.
+  ds14-apply-arguments:
+    disposition: exclusion
+    normativeDependency: source-evaluation-only
+    replacementEvidence:
+      tests/native/fixtures/callable-object-evidence.ts:
+        "a572704e8237c479946d078affaa8cdbe027278574207e4b3409\
+        c79005318308"
+      tests/callable-object-evidence.test.ts:
+        "d2b814666e5645565ca2001f0419b931cd2949624777047f562d\
+        a479c71be70d"
+      tests/native.ts: "91222c3fc3b2335cfcd96ba614f2a4705a3c0935d6946fc2d998\
+        9bcce7b251a7"
+      docs/m5c-graph/dynamic-source-callable-object-assessment.md:
+        "1dcdd38059099dfacc63f694cc3458365cde82a8c764af44051a\
+        77805f653329"
+    reason: DS-14 item 1 replacement group callable-object-apply-arguments,
+      in tests/native/fixtures/callable-object-evidence.ts and its focused
+      runner, observes every non-source assertion of these 7 paths. The
+      bound per-path table names each exact input, operation, result and
+      original subject. Exact arguments ("",4,2) produce object
+      shifted="42" without a global shifted. Exact returned arguments
+      ("a","b","c") yield shifted="c" and no global write; parameter text
+      conversion belongs to source construction. new NullFactory("",1,2)
+      writes global "12" and leaves its instance shifted undefined. new
+      ThisFactory("",4,2) writes instance "42" without a global write.
+      Expression arguments ("",1,2) write global "12". Bare sloppy
+      expression with ("",4,2) writes global "42". new
+      ObjectFactory("",1,2) returns shifted="12" object without a global
+      write. Both native policies with forced collection, numeric guard
+      hit and false-hint miss, and Node.js/Deno Script references pass.
+      Only eval source evaluation or Function-family source construction
+      remains. All original paths and unsupported-profile-feature
+      observations remain; none counts as a pass. Reassess changed source,
+      observation or replacement evidence. ADR 0016 and ADR 0019 reopening
+      triggers remain in force.
+  ds14-returned-constructor:
+    disposition: exclusion
+    normativeDependency: source-evaluation-only
+    replacementEvidence:
+      tests/native/fixtures/callable-object-evidence.ts:
+        "a572704e8237c479946d078affaa8cdbe027278574207e4b3409\
+        c79005318308"
+      tests/callable-object-evidence.test.ts:
+        "d2b814666e5645565ca2001f0419b931cd2949624777047f562d\
+        a479c71be70d"
+      tests/native.ts: "91222c3fc3b2335cfcd96ba614f2a4705a3c0935d6946fc2d998\
+        9bcce7b251a7"
+      docs/m5c-graph/dynamic-source-callable-object-assessment.md:
+        "1dcdd38059099dfacc63f694cc3458365cde82a8c764af44051a\
+        77805f653329"
+    reason: DS-14 item 1 replacement group
+      callable-object-returned-constructor, in
+      tests/native/fixtures/callable-object-evidence.ts and its focused
+      runner, observes every non-source assertion of these 2 paths. The
+      bound per-path table names each exact input, operation, result and
+      original subject. The statically returned f is constructed by the
+      original operation and yields p1=1. Both native policies with forced
+      collection, numeric guard hit and false-hint miss, and Node.js/Deno
+      Script references pass. Only eval source evaluation or
+      Function-family source construction remains. All original paths and
+      unsupported-profile-feature observations remain; none counts as a
+      pass. Reassess changed source, observation or replacement evidence.
+      ADR 0016 and ADR 0019 reopening triggers remain in force.
+  ds14-call-receiver-boxing:
+    disposition: exclusion
+    normativeDependency: source-evaluation-only
+    replacementEvidence:
+      tests/native/fixtures/callable-object-evidence.ts:
+        "a572704e8237c479946d078affaa8cdbe027278574207e4b3409\
+        c79005318308"
+      tests/callable-object-evidence.test.ts:
+        "d2b814666e5645565ca2001f0419b931cd2949624777047f562d\
+        a479c71be70d"
+      tests/native.ts: "91222c3fc3b2335cfcd96ba614f2a4705a3c0935d6946fc2d998\
+        9bcce7b251a7"
+      docs/m5c-graph/dynamic-source-callable-object-assessment.md:
+        "1dcdd38059099dfacc63f694cc3458365cde82a8c764af44051a\
+        77805f653329"
+    reason: DS-14 item 1 replacement group
+      callable-object-call-receiver-boxing, in
+      tests/native/fixtures/callable-object-evidence.ts and its focused
+      runner, observes every non-source assertion of these 4 paths. The
+      bound per-path table names each exact input, operation, result and
+      original subject. Exact number 1 gets a touched boxed receiver while
+      the primitive has no touched property. Exact true gets a touched
+      boxed receiver while the primitive has no touched property. new
+      Number(1) is mutated through the supplied receiver. A static
+      callable receives the exact touched mutation; source creation of the
+      original receiver remains excluded. Both native policies with forced
+      collection, numeric guard hit and false-hint miss, and Node.js/Deno
+      Script references pass. Only eval source evaluation or
+      Function-family source construction remains. All original paths and
+      unsupported-profile-feature observations remain; none counts as a
+      pass. Reassess changed source, observation or replacement evidence.
+      ADR 0016 and ADR 0019 reopening triggers remain in force.
+  ds14-call-array-arguments:
+    disposition: exclusion
+    normativeDependency: source-evaluation-only
+    replacementEvidence:
+      tests/native/fixtures/callable-object-evidence.ts:
+        "a572704e8237c479946d078affaa8cdbe027278574207e4b3409\
+        c79005318308"
+      tests/callable-object-evidence.test.ts:
+        "d2b814666e5645565ca2001f0419b931cd2949624777047f562d\
+        a479c71be70d"
+      tests/native.ts: "91222c3fc3b2335cfcd96ba614f2a4705a3c0935d6946fc2d998\
+        9bcce7b251a7"
+      docs/m5c-graph/dynamic-source-callable-object-assessment.md:
+        "1dcdd38059099dfacc63f694cc3458365cde82a8c764af44051a\
+        77805f653329"
+    reason: DS-14 item 1 replacement group
+      callable-object-call-array-arguments, in
+      tests/native/fixtures/callable-object-evidence.ts and its focused
+      runner, observes every non-source assertion of these 3 paths. The
+      bound per-path table names each exact input, operation, result and
+      original subject. The global result retains Array constructor,
+      length=1 and element 1. The global result has length=3 and elements
+      3,2,1. Object result has length=3 and elements nine,inch,nails
+      without a global write; source parameter conversion is excluded.
+      Both native policies with forced collection, numeric guard hit and
+      false-hint miss, and Node.js/Deno Script references pass. Only eval
+      source evaluation or Function-family source construction remains.
+      All original paths and unsupported-profile-feature observations
+      remain; none counts as a pass. Reassess changed source, observation
+      or replacement evidence. ADR 0016 and ADR 0019 reopening triggers
+      remain in force.
+  ds14-call-arguments-objects:
+    disposition: exclusion
+    normativeDependency: source-evaluation-only
+    replacementEvidence:
+      tests/native/fixtures/callable-object-evidence.ts:
+        "a572704e8237c479946d078affaa8cdbe027278574207e4b3409\
+        c79005318308"
+      tests/callable-object-evidence.test.ts:
+        "d2b814666e5645565ca2001f0419b931cd2949624777047f562d\
+        a479c71be70d"
+      tests/native.ts: "91222c3fc3b2335cfcd96ba614f2a4705a3c0935d6946fc2d998\
+        9bcce7b251a7"
+      docs/m5c-graph/dynamic-source-callable-object-assessment.md:
+        "1dcdd38059099dfacc63f694cc3458365cde82a8c764af44051a\
+        77805f653329"
+    reason: DS-14 item 1 replacement group
+      callable-object-call-arguments-objects, in
+      tests/native/fixtures/callable-object-evidence.ts and its focused
+      runner, observes every non-source assertion of these 7 paths. The
+      bound per-path table names each exact input, operation, result and
+      original subject. Exact arguments ("",4,2,"a") passed with "" and
+      "2" yield object "42" without a global write. Returned arguments
+      (a,b,c,d), "" and 2 yield "24" without a global write; source
+      parameter conversion is excluded. new NullFactory("",1,2,"A") writes
+      global "42" while its instance shifted is undefined. new
+      ThisFactory("",4,2,"A") writes instance "42" without a global write.
+      Exact expression inputs ("",1,2,true) write global "42". Exact bare
+      sloppy expression inputs ("",4,2,null) write global "42". Exact
+      constructed declaration inputs ("",1,2,void 0) yield returned object
+      "42" without a global write. Both native policies with forced
+      collection, numeric guard hit and false-hint miss, and Node.js/Deno
+      Script references pass. Only eval source evaluation or
+      Function-family source construction remains. All original paths and
+      unsupported-profile-feature observations remain; none counts as a
+      pass. Reassess changed source, observation or replacement evidence.
+      ADR 0016 and ADR 0019 reopening triggers remain in force.
+  ds14-callable-descriptors:
+    disposition: exclusion
+    normativeDependency: source-evaluation-only
+    replacementEvidence:
+      tests/native/fixtures/callable-object-evidence.ts:
+        "a572704e8237c479946d078affaa8cdbe027278574207e4b3409\
+        c79005318308"
+      tests/callable-object-evidence.test.ts:
+        "d2b814666e5645565ca2001f0419b931cd2949624777047f562d\
+        a479c71be70d"
+      tests/native.ts: "91222c3fc3b2335cfcd96ba614f2a4705a3c0935d6946fc2d998\
+        9bcce7b251a7"
+      docs/m5c-graph/dynamic-source-callable-object-assessment.md:
+        "1dcdd38059099dfacc63f694cc3458365cde82a8c764af44051a\
+        77805f653329"
+    reason: DS-14 item 1 replacement group
+      callable-object-callable-descriptors, in
+      tests/native/fixtures/callable-object-evidence.ts and its focused
+      runner, observes every non-source assertion of these 2 paths. The
+      bound per-path table names each exact input, operation, result and
+      original subject. Static zero-arity callable length is nonwritable,
+      nonenumerable, configurable with no own get/set fields. Exact
+      nonexistent functionNameHopefullyDoesNotExist returns undefined.
+      Both native policies with forced collection, numeric guard hit and
+      false-hint miss, and Node.js/Deno Script references pass. Only eval
+      source evaluation or Function-family source construction remains.
+      All original paths and unsupported-profile-feature observations
+      remain; none counts as a pass. Reassess changed source, observation
+      or replacement evidence. ADR 0016 and ADR 0019 reopening triggers
+      remain in force.
+  ds14-seal-callables:
+    disposition: exclusion
+    normativeDependency: source-evaluation-only
+    replacementEvidence:
+      tests/native/fixtures/callable-object-evidence.ts:
+        "a572704e8237c479946d078affaa8cdbe027278574207e4b3409\
+        c79005318308"
+      tests/callable-object-evidence.test.ts:
+        "d2b814666e5645565ca2001f0419b931cd2949624777047f562d\
+        a479c71be70d"
+      tests/native.ts: "91222c3fc3b2335cfcd96ba614f2a4705a3c0935d6946fc2d998\
+        9bcce7b251a7"
+      docs/m5c-graph/dynamic-source-callable-object-assessment.md:
+        "1dcdd38059099dfacc63f694cc3458365cde82a8c764af44051a\
+        77805f653329"
+    reason: DS-14 item 1 replacement group callable-object-seal-callables,
+      in tests/native/fixtures/callable-object-evidence.ts and its focused
+      runner, observes every non-source assertion of these 4 paths. The
+      bound per-path table names each exact input, operation, result and
+      original subject. Sealing static callables succeeds; identity,
+      nonextensibility and every own-property configurable flag are
+      observed too. Both native policies with forced collection, numeric
+      guard hit and false-hint miss, and Node.js/Deno Script references
+      pass. Only eval source evaluation or Function-family source
+      construction remains. All original paths and
+      unsupported-profile-feature observations remain; none counts as a
+      pass. Reassess changed source, observation or replacement evidence.
+      ADR 0016 and ADR 0019 reopening triggers remain in force.
+  ds14-reflect-apply-array-like:
+    disposition: exclusion
+    normativeDependency: source-evaluation-only
+    replacementEvidence:
+      tests/native/fixtures/callable-object-evidence.ts:
+        "a572704e8237c479946d078affaa8cdbe027278574207e4b3409\
+        c79005318308"
+      tests/callable-object-evidence.test.ts:
+        "d2b814666e5645565ca2001f0419b931cd2949624777047f562d\
+        a479c71be70d"
+      tests/native.ts: "91222c3fc3b2335cfcd96ba614f2a4705a3c0935d6946fc2d998\
+        9bcce7b251a7"
+      docs/m5c-graph/dynamic-source-callable-object-assessment.md:
+        "1dcdd38059099dfacc63f694cc3458365cde82a8c764af44051a\
+        77805f653329"
+    reason: DS-14 item 1 replacement group
+      callable-object-reflect-apply-array-like, in
+      tests/native/fixtures/callable-object-evidence.ts and its focused
+      runner, observes every non-source assertion of these 1 paths. The
+      bound per-path table names each exact input, operation, result and
+      original subject. All four exact object kinds have a length getter
+      returning 1, deliver [undefined] and increment the call count to
+      four. Both native policies with forced collection, numeric guard hit
+      and false-hint miss, and Node.js/Deno Script references pass. Only
+      eval source evaluation or Function-family source construction
+      remains. All original paths and unsupported-profile-feature
+      observations remain; none counts as a pass. Reassess changed source,
+      observation or replacement evidence. ADR 0016 and ADR 0019 reopening
+      triggers remain in force.
+  ds14-instanceof-prototypes:
+    disposition: exclusion
+    normativeDependency: source-evaluation-only
+    replacementEvidence:
+      tests/native/fixtures/callable-object-evidence.ts:
+        "a572704e8237c479946d078affaa8cdbe027278574207e4b3409\
+        c79005318308"
+      tests/callable-object-evidence.test.ts:
+        "d2b814666e5645565ca2001f0419b931cd2949624777047f562d\
+        a479c71be70d"
+      tests/native.ts: "91222c3fc3b2335cfcd96ba614f2a4705a3c0935d6946fc2d998\
+        9bcce7b251a7"
+      docs/m5c-graph/dynamic-source-callable-object-assessment.md:
+        "1dcdd38059099dfacc63f694cc3458365cde82a8c764af44051a\
+        77805f653329"
+    reason: DS-14 item 1 replacement group
+      callable-object-instanceof-prototypes, in
+      tests/native/fixtures/callable-object-evidence.ts and its focused
+      runner, observes every non-source assertion of these 3 paths. The
+      bound per-path table names each exact input, operation, result and
+      original subject. Static function is instanceof Function and its
+      constructor is Function. After Factory.prototype=undefined,
+      instanceof throws TypeError; the old instance still has Factory
+      constructor and inherited fairy name. Ordinary object first fails
+      instanceof FakeFactory, then succeeds after its prototype becomes
+      Object.prototype. Both native policies with forced collection,
+      numeric guard hit and false-hint miss, and Node.js/Deno Script
+      references pass. Only eval source evaluation or Function-family
+      source construction remains. All original paths and
+      unsupported-profile-feature observations remain; none counts as a
+      pass. Reassess changed source, observation or replacement evidence.
+      ADR 0016 and ADR 0019 reopening triggers remain in force.
+  ds14-object-literal-accessors:
+    disposition: exclusion
+    normativeDependency: source-evaluation-only
+    replacementEvidence:
+      tests/native/fixtures/callable-object-evidence.ts:
+        "a572704e8237c479946d078affaa8cdbe027278574207e4b3409\
+        c79005318308"
+      tests/callable-object-evidence.test.ts:
+        "d2b814666e5645565ca2001f0419b931cd2949624777047f562d\
+        a479c71be70d"
+      tests/native.ts: "91222c3fc3b2335cfcd96ba614f2a4705a3c0935d6946fc2d998\
+        9bcce7b251a7"
+      docs/m5c-graph/dynamic-source-callable-object-assessment.md:
+        "1dcdd38059099dfacc63f694cc3458365cde82a8c764af44051a\
+        77805f653329"
+    reason: DS-14 item 1 replacement group
+      callable-object-object-literal-accessors, in
+      tests/native/fixtures/callable-object-evidence.ts and its focused
+      runner, observes every non-source assertion of these 4 paths. The
+      bound per-path table names each exact input, operation, result and
+      original subject. Static foo returns In getter and setter changes s2
+      to Modified by setter. Static foo/bar preserve all three original
+      initial strings, foo setter effect and bar update to Second setter.
+      Exact static {foo:0,foo:1} reads foo=1. Exact data-then-getter
+      literal compiles and evaluates; reading it returns undefined. Both
+      native policies with forced collection, numeric guard hit and
+      false-hint miss, and Node.js/Deno Script references pass. Only eval
+      source evaluation or Function-family source construction remains.
+      All original paths and unsupported-profile-feature observations
+      remain; none counts as a pass. Reassess changed source, observation
+      or replacement evidence. ADR 0016 and ADR 0019 reopening triggers
+      remain in force.
 paths:
   - path: test/built-ins/AggregateError/newtarget-proto-fallback.js
     proposedOwner: adr:0016-dynamic-source-boundary
@@ -1233,7 +1735,7 @@ paths:
     section: sec-async-function-instances
     subject: Async function instances are not constructors and
       do not have a [[Construct]] slot.
-    assessment: mixed-static-functions
+    assessment: ds14-intrinsic-constructability
   - path: test/built-ins/AsyncFunction/is-a-constructor.js
     proposedOwner: adr:0016-dynamic-source-boundary
     priorCohort: source-subject
@@ -1244,7 +1746,7 @@ paths:
     missingDynamicTag: false
     section: sec-ecmascript-standard-built-in-objects
     subject: The AsyncFunction constructor implements [[Construct]]
-    assessment: intrinsic-constructor-is-constructor
+    assessment: ds14-intrinsic-constructability
   - path: test/built-ins/AsyncFunction/proto-from-ctor-realm.js
     proposedOwner: adr:0016-dynamic-source-boundary
     priorCohort: source-subject
@@ -1269,7 +1771,7 @@ paths:
     subject: AsyncGenerator function instances are correctly
       reported as instances of the AsyncGeneratorFunction
       intrinsic.
-    assessment: mixed-static-functions
+    assessment: ds14-intrinsic-constructability
   - path: "test/built-ins/AsyncGeneratorFunction/instance-await\
       -expr-in-param.js"
     proposedOwner: adr:0016-dynamic-source-boundary
@@ -1413,7 +1915,7 @@ paths:
     section: sec-ecmascript-standard-built-in-objects
     subject: The AsyncGeneratorFunction constructor implements
       [[Construct]]
-    assessment: intrinsic-constructor-is-constructor
+    assessment: ds14-intrinsic-constructability
   - path: "test/built-ins/AsyncGeneratorFunction/proto-from-cto\
       r-realm-prototype.js"
     proposedOwner: adr:0016-dynamic-source-boundary
@@ -1464,7 +1966,7 @@ paths:
     section: sec-toboolean
     subject: Different objects convert to Boolean by explicit
       transformation
-    assessment: "ds4-callable-remediation"
+    assessment: ds14-object-truthiness
   - path: test/built-ins/Boolean/proto-from-ctor-realm.js
     proposedOwner: adr:0016-dynamic-source-boundary
     priorCohort: incidental-scaffolding
@@ -2549,7 +3051,7 @@ paths:
     section: 15.3.2_A1
     subject: Checking the constuctor of the object that is created as a new
       Function
-    assessment: observation-b01-b18-dynamic-source
+    assessment: ds14-ordinary-call-and-construction
   - path: test/built-ins/Function/S15.3.5_A1_T1.js
     proposedOwner: adr:0016-dynamic-source-boundary
     priorCohort: incidental-scaffolding
@@ -2560,7 +3062,7 @@ paths:
     missingDynamicTag: false
     section: 15.3.5_A1_T1
     subject: For testing use variable f = new Function
-    assessment: observation-b01-b18-dynamic-source
+    assessment: ds14-ordinary-call-and-construction
   - path: test/built-ins/Function/S15.3.5_A1_T2.js
     proposedOwner: adr:0016-dynamic-source-boundary
     priorCohort: incidental-scaffolding
@@ -2571,7 +3073,7 @@ paths:
     missingDynamicTag: false
     section: 15.3.5_A1_T2
     subject: For testing use variable f = Function()
-    assessment: observation-b01-b18-dynamic-source
+    assessment: ds14-ordinary-call-and-construction
   - path: test/built-ins/Function/S15.3.5_A2_T1.js
     proposedOwner: adr:0016-dynamic-source-boundary
     priorCohort: incidental-scaffolding
@@ -2582,7 +3084,7 @@ paths:
     missingDynamicTag: false
     section: 15.3.5_A2_T1
     subject: For testing call Function("var x =1; this.y=2;return \"OK\";")()
-    assessment: observation-b01-b18-dynamic-source
+    assessment: ds14-ordinary-call-and-construction
   - path: test/built-ins/Function/S15.3.5_A2_T2.js
     proposedOwner: adr:0016-dynamic-source-boundary
     priorCohort: incidental-scaffolding
@@ -2594,7 +3096,7 @@ paths:
     section: 15.3.5_A2_T2
     subject: For testing call (new Function("arg1,arg2","var x =arg1;
       this.y=arg2;return arg1+arg2;"))("1",2)
-    assessment: observation-b01-b18-dynamic-source
+    assessment: ds14-ordinary-call-and-construction
   - path: test/built-ins/Function/S15.3.5_A3_T1.js
     proposedOwner: adr:0016-dynamic-source-boundary
     priorCohort: incidental-scaffolding
@@ -2605,7 +3107,7 @@ paths:
     missingDynamicTag: false
     section: 15.3.5_A3_T1
     subject: As constructor use Function("var x =1; this.y=2;return \"OK\";")
-    assessment: observation-b01-b18-dynamic-source
+    assessment: ds14-ordinary-call-and-construction
   - path: test/built-ins/Function/S15.3.5_A3_T2.js
     proposedOwner: adr:0016-dynamic-source-boundary
     priorCohort: incidental-scaffolding
@@ -2617,7 +3119,7 @@ paths:
     section: 15.3.5_A3_T2
     subject: As constructor use new Function("arg1,arg2","var x =1;
       this.y=arg1+arg2;return \"OK\";")
-    assessment: observation-b01-b18-dynamic-source
+    assessment: ds14-ordinary-call-and-construction
   - path: test/built-ins/Function/S15.3_A2_T1.js
     proposedOwner: adr:0016-dynamic-source-boundary
     priorCohort: source-subject
@@ -2740,7 +3242,7 @@ paths:
       constructors in strict mode code do not have own properties "caller"
       or "arguments" other than those that are created by applying the
       AddRestrictedFunctionProperties abstract operation to the function.
-    assessment: observation-b01-b18-dynamic-source
+    assessment: ds14-strict-restricted-properties
   - path: "test/built-ins/Function/call-bind-this-realm-undef.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "incidental-scaffolding"
@@ -2830,7 +3332,7 @@ paths:
     missingDynamicTag: false
     section: sec-ecmascript-standard-built-in-objects
     subject: The Function constructor implements [[Construct]]
-    assessment: observation-b01-b18-dynamic-source
+    assessment: ds14-intrinsic-constructability
   - path: test/built-ins/Function/length/S15.3.5.1_A1_T1.js
     proposedOwner: adr:0016-dynamic-source-boundary
     priorCohort: source-subject
@@ -3156,7 +3658,7 @@ paths:
     missingDynamicTag: true
     section: sec-function.prototype.apply
     subject: thisArg is number
-    assessment: "ds4-callable-remediation"
+    assessment: ds14-apply-receiver-boxing
   - path: test/built-ins/Function/prototype/apply/S15.3.4.3_A5_T2.js
     proposedOwner: adr:0016-dynamic-source-boundary
     priorCohort: incidental-scaffolding
@@ -3167,7 +3669,7 @@ paths:
     missingDynamicTag: true
     section: sec-function.prototype.apply
     subject: thisArg is boolean true
-    assessment: "ds4-callable-remediation"
+    assessment: ds14-apply-receiver-boxing
   - path: test/built-ins/Function/prototype/apply/S15.3.4.3_A5_T7.js
     proposedOwner: adr:0016-dynamic-source-boundary
     priorCohort: incidental-scaffolding
@@ -3178,7 +3680,7 @@ paths:
     missingDynamicTag: true
     section: sec-function.prototype.apply
     subject: thisArg is new Number()
-    assessment: "ds4-callable-remediation"
+    assessment: ds14-apply-receiver-boxing
   - path: test/built-ins/Function/prototype/apply/S15.3.4.3_A5_T8.js
     proposedOwner: adr:0016-dynamic-source-boundary
     priorCohort: incidental-scaffolding
@@ -3189,7 +3691,7 @@ paths:
     missingDynamicTag: true
     section: sec-function.prototype.apply
     subject: thisArg is Function()
-    assessment: "ds4-callable-remediation"
+    assessment: ds14-apply-receiver-boxing
   - path: test/built-ins/Function/prototype/apply/S15.3.4.3_A7_T1.js
     proposedOwner: adr:0016-dynamic-source-boundary
     priorCohort: incidental-scaffolding
@@ -3200,7 +3702,7 @@ paths:
     missingDynamicTag: true
     section: sec-function.prototype.apply
     subject: argArray is (null,[1])
-    assessment: "ds4-callable-remediation"
+    assessment: ds14-apply-arrays
   - path: "test/built-ins/Function/prototype/apply/S15.3.4.3_A7\
       _T10.js"
     proposedOwner: adr:0016-dynamic-source-boundary
@@ -3213,7 +3715,7 @@ paths:
     section: sec-function.prototype.apply
     subject: argArray is (empty object, arguments), inside
       function call without declaration used
-    assessment: "ds4-callable-remediation"
+    assessment: ds14-apply-arguments
   - path: test/built-ins/Function/prototype/apply/S15.3.4.3_A7_T2.js
     proposedOwner: adr:0016-dynamic-source-boundary
     priorCohort: incidental-scaffolding
@@ -3224,7 +3726,7 @@ paths:
     missingDynamicTag: true
     section: sec-function.prototype.apply
     subject: argArray is (null,[1,2,3])
-    assessment: "ds4-callable-remediation"
+    assessment: ds14-apply-arrays
   - path: test/built-ins/Function/prototype/apply/S15.3.4.3_A7_T3.js
     proposedOwner: adr:0016-dynamic-source-boundary
     priorCohort: incidental-scaffolding
@@ -3236,7 +3738,7 @@ paths:
     section: sec-function.prototype.apply
     subject: argArray is (empty object, new
       Array("nine","inch","nails"))
-    assessment: "ds4-callable-remediation"
+    assessment: ds14-apply-arrays
   - path: test/built-ins/Function/prototype/apply/S15.3.4.3_A7_T4.js
     proposedOwner: adr:0016-dynamic-source-boundary
     priorCohort: incidental-scaffolding
@@ -3248,7 +3750,7 @@ paths:
     section: sec-function.prototype.apply
     subject: argArray is (empty object, ( function(){return
       arguments;}) ("a","b","c"))
-    assessment: "ds4-callable-remediation"
+    assessment: ds14-apply-arguments
   - path: test/built-ins/Function/prototype/apply/S15.3.4.3_A7_T5.js
     proposedOwner: adr:0016-dynamic-source-boundary
     priorCohort: incidental-scaffolding
@@ -3260,7 +3762,7 @@ paths:
     section: sec-function.prototype.apply
     subject: argArray is (null, arguments), inside function
       declaration used
-    assessment: "ds4-callable-remediation"
+    assessment: ds14-apply-arguments
   - path: test/built-ins/Function/prototype/apply/S15.3.4.3_A7_T6.js
     proposedOwner: adr:0016-dynamic-source-boundary
     priorCohort: incidental-scaffolding
@@ -3272,7 +3774,7 @@ paths:
     section: sec-function.prototype.apply
     subject: argArray is (this, arguments), inside function
       declaration used
-    assessment: "ds4-callable-remediation"
+    assessment: ds14-apply-arguments
   - path: test/built-ins/Function/prototype/apply/S15.3.4.3_A7_T7.js
     proposedOwner: adr:0016-dynamic-source-boundary
     priorCohort: incidental-scaffolding
@@ -3284,7 +3786,7 @@ paths:
     section: sec-function.prototype.apply
     subject: argArray is (null, arguments), inside function call
       without declaration used
-    assessment: "ds4-callable-remediation"
+    assessment: ds14-apply-arguments
   - path: test/built-ins/Function/prototype/apply/S15.3.4.3_A7_T8.js
     proposedOwner: adr:0016-dynamic-source-boundary
     priorCohort: incidental-scaffolding
@@ -3296,7 +3798,7 @@ paths:
     section: sec-function.prototype.apply
     subject: argArray is (this, arguments), inside function call
       without declaration used
-    assessment: "ds4-callable-remediation"
+    assessment: ds14-apply-arguments
   - path: test/built-ins/Function/prototype/apply/S15.3.4.3_A7_T9.js
     proposedOwner: adr:0016-dynamic-source-boundary
     priorCohort: incidental-scaffolding
@@ -3308,7 +3810,7 @@ paths:
     section: sec-function.prototype.apply
     subject: argArray is (empty object, arguments), inside
       function declaration used
-    assessment: "ds4-callable-remediation"
+    assessment: ds14-apply-arguments
   - path: test/built-ins/Function/prototype/apply/S15.3.4.3_A8_T4.js
     proposedOwner: adr:0016-dynamic-source-boundary
     priorCohort: incidental-scaffolding
@@ -3344,7 +3846,7 @@ paths:
     section: sec-function.prototype.apply
     subject: Checking if creating "new (Function("function
       f(){this.p1=1;};return f").apply())" fails
-    assessment: "ds4-callable-remediation"
+    assessment: ds14-returned-constructor
   - path: "test/built-ins/Function/prototype/apply/argarray-not\
       -object-realm.js"
     proposedOwner: adr:0016-dynamic-source-boundary
@@ -3525,7 +4027,7 @@ paths:
     missingDynamicTag: true
     section: sec-function.prototype.call
     subject: thisArg is number
-    assessment: "ds4-callable-remediation"
+    assessment: ds14-call-receiver-boxing
   - path: test/built-ins/Function/prototype/call/S15.3.4.4_A5_T2.js
     proposedOwner: adr:0016-dynamic-source-boundary
     priorCohort: incidental-scaffolding
@@ -3536,7 +4038,7 @@ paths:
     missingDynamicTag: true
     section: sec-function.prototype.call
     subject: thisArg is boolean true
-    assessment: "ds4-callable-remediation"
+    assessment: ds14-call-receiver-boxing
   - path: test/built-ins/Function/prototype/call/S15.3.4.4_A5_T7.js
     proposedOwner: adr:0016-dynamic-source-boundary
     priorCohort: incidental-scaffolding
@@ -3547,7 +4049,7 @@ paths:
     missingDynamicTag: true
     section: sec-function.prototype.call
     subject: thisArg is new Number()
-    assessment: "ds4-callable-remediation"
+    assessment: ds14-call-receiver-boxing
   - path: test/built-ins/Function/prototype/call/S15.3.4.4_A5_T8.js
     proposedOwner: adr:0016-dynamic-source-boundary
     priorCohort: incidental-scaffolding
@@ -3558,7 +4060,7 @@ paths:
     missingDynamicTag: true
     section: sec-function.prototype.call
     subject: thisArg is Function()
-    assessment: "ds4-callable-remediation"
+    assessment: ds14-call-receiver-boxing
   - path: test/built-ins/Function/prototype/call/S15.3.4.4_A6_T1.js
     proposedOwner: adr:0016-dynamic-source-boundary
     priorCohort: incidental-scaffolding
@@ -3569,7 +4071,7 @@ paths:
     missingDynamicTag: true
     section: sec-function.prototype.call
     subject: Argunemts of call function is (null,[1])
-    assessment: "ds4-callable-remediation"
+    assessment: ds14-call-array-arguments
   - path: test/built-ins/Function/prototype/call/S15.3.4.4_A6_T10.js
     proposedOwner: adr:0016-dynamic-source-boundary
     priorCohort: incidental-scaffolding
@@ -3582,7 +4084,7 @@ paths:
     subject: Argunemts of call function is (empty object, "",
       arguments,2), inside function call without declaration
       used
-    assessment: "ds4-callable-remediation"
+    assessment: ds14-call-arguments-objects
   - path: test/built-ins/Function/prototype/call/S15.3.4.4_A6_T2.js
     proposedOwner: adr:0016-dynamic-source-boundary
     priorCohort: incidental-scaffolding
@@ -3593,7 +4095,7 @@ paths:
     missingDynamicTag: true
     section: sec-function.prototype.call
     subject: Argunemts of call function is (null,[3,2,1])
-    assessment: "ds4-callable-remediation"
+    assessment: ds14-call-array-arguments
   - path: test/built-ins/Function/prototype/call/S15.3.4.4_A6_T3.js
     proposedOwner: adr:0016-dynamic-source-boundary
     priorCohort: incidental-scaffolding
@@ -3605,7 +4107,7 @@ paths:
     section: sec-function.prototype.call
     subject: Argunemts of call function is (empty object, new
       Array("nine","inch","nails"))
-    assessment: "ds4-callable-remediation"
+    assessment: ds14-call-array-arguments
   - path: test/built-ins/Function/prototype/call/S15.3.4.4_A6_T4.js
     proposedOwner: adr:0016-dynamic-source-boundary
     priorCohort: incidental-scaffolding
@@ -3617,7 +4119,7 @@ paths:
     section: sec-function.prototype.call
     subject: Argunemts of call function is (empty object, (
       function(){return arguments;})("a","b","c","d"),"",2)
-    assessment: "ds4-callable-remediation"
+    assessment: ds14-call-arguments-objects
   - path: test/built-ins/Function/prototype/call/S15.3.4.4_A6_T5.js
     proposedOwner: adr:0016-dynamic-source-boundary
     priorCohort: incidental-scaffolding
@@ -3629,7 +4131,7 @@ paths:
     section: sec-function.prototype.call
     subject: Argunemts of call function is (null,
       arguments,"",2), inside function declaration used
-    assessment: "ds4-callable-remediation"
+    assessment: ds14-call-arguments-objects
   - path: test/built-ins/Function/prototype/call/S15.3.4.4_A6_T6.js
     proposedOwner: adr:0016-dynamic-source-boundary
     priorCohort: incidental-scaffolding
@@ -3641,7 +4143,7 @@ paths:
     section: sec-function.prototype.call
     subject: Argunemts of call function is (this,
       arguments,"",2), inside function declaration used
-    assessment: "ds4-callable-remediation"
+    assessment: ds14-call-arguments-objects
   - path: test/built-ins/Function/prototype/call/S15.3.4.4_A6_T7.js
     proposedOwner: adr:0016-dynamic-source-boundary
     priorCohort: incidental-scaffolding
@@ -3654,7 +4156,7 @@ paths:
     subject: Argunemts of call function is (null,
       arguments,"",2), inside function call without
       declaration used
-    assessment: "ds4-callable-remediation"
+    assessment: ds14-call-arguments-objects
   - path: test/built-ins/Function/prototype/call/S15.3.4.4_A6_T8.js
     proposedOwner: adr:0016-dynamic-source-boundary
     priorCohort: incidental-scaffolding
@@ -3667,7 +4169,7 @@ paths:
     subject: Argunemts of call function is (this,
       arguments,"",2), inside function call without
       declaration used
-    assessment: "ds4-callable-remediation"
+    assessment: ds14-call-arguments-objects
   - path: test/built-ins/Function/prototype/call/S15.3.4.4_A6_T9.js
     proposedOwner: adr:0016-dynamic-source-boundary
     priorCohort: incidental-scaffolding
@@ -3679,7 +4181,7 @@ paths:
     section: sec-function.prototype.call
     subject: Argunemts of call function is (empty object, "",
       arguments,2), inside function declaration used
-    assessment: "ds4-callable-remediation"
+    assessment: ds14-call-arguments-objects
   - path: test/built-ins/Function/prototype/call/S15.3.4.4_A7_T4.js
     proposedOwner: adr:0016-dynamic-source-boundary
     priorCohort: incidental-scaffolding
@@ -3715,7 +4217,7 @@ paths:
     section: sec-function.prototype.call
     subject: Checking if creating "new (Function("function
       f(){this.p1=1;};return f").call())" fails
-    assessment: "ds4-callable-remediation"
+    assessment: ds14-returned-constructor
   - path: "test/built-ins/Function/prototype/toString/AsyncFunc\
       tion.js"
     proposedOwner: adr:0016-dynamic-source-boundary
@@ -3923,7 +4425,7 @@ paths:
     section: sec-ecmascript-standard-built-in-objects
     subject: The GeneratorFunction constructor implements
       [[Construct]]
-    assessment: intrinsic-constructor-is-constructor
+    assessment: ds14-intrinsic-constructability
   - path: "test/built-ins/GeneratorFunction/proto-from-ctor-rea\
       lm-prototype.js"
     proposedOwner: adr:0016-dynamic-source-boundary
@@ -4090,7 +4592,7 @@ paths:
     subject: Object.getOwnPropertyDescriptor returns data desc
       for properties on built-ins (Function
       (instance).length)
-    assessment: "ds4-callable-remediation"
+    assessment: ds14-callable-descriptors
   - path: "test/built-ins/Object/getOwnPropertyDescriptor/15.2.\
       3.3-4-188.js"
     proposedOwner: adr:0016-dynamic-source-boundary
@@ -4104,7 +4606,7 @@ paths:
     subject: Object.getOwnPropertyDescriptor returns undefined
       for non-existent properties on built-ins (Function
       (instance).name)
-    assessment: "ds4-callable-remediation"
+    assessment: ds14-callable-descriptors
   - path: test/built-ins/Object/proto-from-ctor-realm.js
     proposedOwner: adr:0016-dynamic-source-boundary
     priorCohort: incidental-scaffolding
@@ -4129,7 +4631,7 @@ paths:
     section: sec-object.prototype.tostring
     subject: has a [[Call]] internal method, let builtinTag be
       "Function".
-    assessment: "ds4-callable-remediation"
+    assessment: ds14-ordinary-call-and-construction
   - path: test/built-ins/Object/seal/seal-arrowfunction.js
     proposedOwner: adr:0016-dynamic-source-boundary
     priorCohort: incidental-scaffolding
@@ -4151,7 +4653,7 @@ paths:
     missingDynamicTag: false
     section: sec-object.seal
     subject: Object.seal AsyncArrowFunction
-    assessment: observation-b01-b18-dynamic-source
+    assessment: ds14-seal-callables
   - path: test/built-ins/Object/seal/seal-asyncfunction.js
     proposedOwner: adr:0016-dynamic-source-boundary
     priorCohort: incidental-scaffolding
@@ -4162,7 +4664,7 @@ paths:
     missingDynamicTag: false
     section: sec-object.seal
     subject: Object.seal AsyncFunction
-    assessment: observation-b01-b18-dynamic-source
+    assessment: ds14-seal-callables
   - path: test/built-ins/Object/seal/seal-asyncgeneratorfunction.js
     proposedOwner: adr:0016-dynamic-source-boundary
     priorCohort: incidental-scaffolding
@@ -4173,7 +4675,7 @@ paths:
     missingDynamicTag: true
     section: sec-object.seal
     subject: Object.seal AsyncGeneratorFunction
-    assessment: "ds4-callable-remediation"
+    assessment: ds14-seal-callables
   - path: test/built-ins/Object/seal/seal-function.js
     proposedOwner: adr:0016-dynamic-source-boundary
     priorCohort: incidental-scaffolding
@@ -4195,7 +4697,7 @@ paths:
     missingDynamicTag: true
     section: sec-object.seal
     subject: Object.seal GeneratorFunction
-    assessment: "ds4-callable-remediation"
+    assessment: ds14-seal-callables
   - path: test/built-ins/Object/values/tamper-with-global-object.js
     proposedOwner: adr:0016-dynamic-source-boundary
     priorCohort: incidental-scaffolding
@@ -4310,7 +4812,7 @@ paths:
     section: sec-reflect.apply
     subject: Return abrupt if argumentsList is not an ArrayLike
       object.
-    assessment: "ds4-callable-remediation"
+    assessment: ds14-reflect-apply-array-like
   - path: test/built-ins/RegExp/S15.10.4.1_A5_T3.js
     proposedOwner: adr:0016-dynamic-source-boundary
     priorCohort: incidental-scaffolding
@@ -18806,7 +19308,7 @@ paths:
     section: "sec-instanceofoperator"
     subject: "A Function object created by new Function is
       instanceof Function and its constructor is Function"
-    assessment: "ds4-callable-remediation"
+    assessment: ds14-instanceof-prototypes
   - path: "test/language/expressions/instanceof/S15.3.5.3_A1_T1\
       .js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -18944,7 +19446,7 @@ paths:
     section: "sec-ordinaryhasinstance"
     subject: "F.prototype is void 0 and V is new F: TypeError;
       instance.constructor and inherited name stay intact"
-    assessment: "ds4-callable-remediation"
+    assessment: ds14-instanceof-prototypes
   - path: "test/language/expressions/instanceof/S15.3.5.3_A2_T6\
       .js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -18982,7 +19484,7 @@ paths:
     section: "sec-ordinaryhasinstance"
     subject: "instanceof follows a reassigned F.prototype
       (Object.prototype) for an ordinary object"
-    assessment: "ds4-callable-remediation"
+    assessment: ds14-instanceof-prototypes
   - path: "test/language/expressions/left-shift/S11.7.1_A1.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "incidental-scaffolding"
@@ -19128,7 +19630,7 @@ paths:
     subject: "A get and set accessor pair defined in an object
       literal reads and writes through its functions; eval
       only compiles the object literal under test"
-    assessment: "ds4-callable-remediation"
+    assessment: ds14-object-literal-accessors
   - path: "test/language/expressions/object/11.1.5-0-2.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "incidental-scaffolding"
@@ -19142,7 +19644,7 @@ paths:
       object literal each read and write through their own
       functions; eval only compiles the object literal under
       test"
-    assessment: "ds4-callable-remediation"
+    assessment: ds14-object-literal-accessors
   - path: "test/language/expressions/object/11.1.5_4-4-a-3.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "incidental-scaffolding"
@@ -19156,7 +19658,7 @@ paths:
       literal is allowed and the property gets the last
       defined value; eval only compiles the object literal
       under test"
-    assessment: "ds4-callable-remediation"
+    assessment: ds14-object-literal-accessors
   - path: "test/language/expressions/object/11.1.5_4-4-b-1.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "incidental-scaffolding"
@@ -19170,7 +19672,7 @@ paths:
       same-named get accessor definition is not a
       SyntaxError; eval only compiles the object literal
       under test"
-    assessment: "ds4-callable-remediation"
+    assessment: ds14-object-literal-accessors
   - path: "test/language/expressions/object/11.1.5_6-3-1.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "incidental-scaffolding"
@@ -19782,7 +20284,7 @@ paths:
       independent checks of the existing Object, String,
       Boolean, Number, Date, Error and RegExp callable
       intrinsics.
-    assessment: "ds4-callable-remediation"
+    assessment: ds14-ordinary-call-and-construction
   - path: test/language/expressions/typeof/syntax.js
     proposedOwner: adr:0016-dynamic-source-boundary
     priorCohort: incidental-scaffolding

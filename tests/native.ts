@@ -48,6 +48,7 @@ import { expressionFixtures } from "./native/fixtures/expressions.ts";
 import { functionFixtures } from "./native/fixtures/functions.ts";
 import { generatorFixtures } from "./native/fixtures/generators.ts";
 import * as evalFixture from "./native/fixtures/direct-eval-non-string.ts";
+import { callableCases } from "./native/fixtures/callable-object-evidence.ts";
 import * as globalRecord from "./native/fixtures/global-object-record.ts";
 import * as globalThisFixture from "./native/fixtures/globalthis-binding.ts";
 import * as eagerHelpers from "./native/fixtures/iterator-helpers-eager.ts";
@@ -226,6 +227,7 @@ Object.defineProperty(globalThis, "console", {
 
 const fixtures: readonly Fixture[] = [
   ...functionFixtures,
+  ...callableCases,
   ...properTailCallFixtures,
   ...globalRecord.globalObjectRecordFixtures,
   evalFixture.directEvalNonStringFixture,
@@ -1462,6 +1464,7 @@ for (const fixture of selectedFixtures) {
     fixture.name === "global-object-record" ||
     fixture.name === "eval-intrinsic-value" ||
     fixture.name === "direct-eval-non-string" ||
+    fixture.name.startsWith("callable-object-") ||
     fixture.name === "globalthis-binding" ||
     fixture.name === "with-strict-heritage-write" ||
     fixture.name === "with-optional-call-receiver" ||
@@ -1777,6 +1780,7 @@ for (const fixture of selectedFixtures) {
             fixture.name === "global-object-record" ||
             fixture.name === "eval-intrinsic-value" ||
             fixture.name === "direct-eval-non-string" ||
+            fixture.name.startsWith("callable-object-") ||
             fixture.name === "globalthis-binding" ||
             fixture.name === "with-strict-heritage-write" ||
             fixture.name === "with-optional-call-receiver" ||
