@@ -50,9 +50,9 @@ bounded decision before closure.
 
 Remaining reason: `existing-observation-accounting-candidate`.
 
-await-expr-dyn-import.js only checks valid await ImportCall syntax and catches
-any load error; returns-promise.js observes the intrinsic ImportCall promise
-after tampering with global Promise. usage-from-eval.js additionally checks
+*await-expr-dyn-import.js* only checks valid await ImportCall syntax and catches
+any load error; *returns-promise.js* observes the intrinsic ImportCall promise
+after tampering with global Promise. *usage-from-eval.js* additionally checks
 eval and four imported values.
 
 The first two are candidates for the already authorized item 2 ImportCall

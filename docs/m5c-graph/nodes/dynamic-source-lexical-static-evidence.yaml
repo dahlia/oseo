@@ -1,0 +1,16 @@
+version: 1
+id: dynamic-source-lexical-static-evidence
+title: Lexical static evidence
+delivers: >-
+  DS-16 of the approved 2026-10-31 second split. Reviews exactly 95 pinned
+  unsupported paths, size L, listed with their SHA256 and closure obligations
+  in docs/m5c-graph/dynamic-source-lexical-static-evidence.md. Preserves every
+  original subject and observation. Ownership moves only in this child's
+  landing; unresolved subjects retain remediation. Requires per-path reviewed
+  evidence, fresh source and observation digests for any accounting, and
+  normal review/publication gates. No new exclusion, pass or boundary
+  amendment is authorized by this split.
+dependencies:
+  - authorized-exclusion-audit
+landed: false
+status: ready

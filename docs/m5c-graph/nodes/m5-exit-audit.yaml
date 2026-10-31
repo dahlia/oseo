@@ -24,15 +24,29 @@ dependencies:
   - dynamic-import
   - dynamic-import-early-error-precedence
   - dynamic-import-staged-plan
+  - dynamic-source-binding-reference-evidence
+  - dynamic-source-boundary-overlap-review
   - dynamic-source-callable-family
+  - dynamic-source-callable-object-evidence
+  - dynamic-source-completion-record-evidence
+  - dynamic-source-construction-contracts
   - dynamic-source-coverage-remediation
+  - dynamic-source-eval-arguments-accounting
+  - dynamic-source-eval-contract-accounting
   - dynamic-source-importcall-accounting
   - dynamic-source-importcall-residual-accounting
   - dynamic-source-lexical-completion-family
+  - dynamic-source-lexical-static-evidence
+  - dynamic-source-module-goal-validation
+  - dynamic-source-module-observable-contracts
   - dynamic-source-module-semantics
   - dynamic-source-private-binding-family
+  - dynamic-source-realm-host-evidence
   - dynamic-source-realm-string-family
+  - dynamic-source-regexp-static-evidence
   - dynamic-source-retagging
+  - dynamic-source-static-core-evidence
+  - dynamic-source-template-site-evidence
   - dynamic-source-unknown-eval
   - eval-intrinsic-value
   - fn-global-object-harness
