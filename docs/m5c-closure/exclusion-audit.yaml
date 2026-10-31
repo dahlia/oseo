@@ -177,18 +177,35 @@ assessments:
       environments; retain remediation until independent
       evidence or a maintainer decision bounds the gap.
   annex-b-pattern:
-    remediationOwner: node:regexp-split-coverage-remediation
-    disposition: remediation
-    normativeDependency: not-demonstrated
-    reason: The observed rejection is the Annex B-only /\k<x>/
-      pattern, which ADR 0013 excludes. The same original
-      path has many core String and RegExp split assertions
-      that are not excluded and do not require that legacy
-      pattern normatively. Rejection is authorized but
-      whole-path closure is unresolved, so retain a separate
-      RegExp split coverage remediation owner until
-      replacement evidence or a maintainer accounting
-      decision bounds the core assertions.
+    disposition: exclusion
+    normativeDependency: annex-b-only
+    reason: >-
+      Maintainer decision 2026-10-28 item 3 closes this path under ADR 0013.
+      Its 37 assertions split "x" at RegExp literals. Four patterns exist only
+      in the Annex B grammar of B.1.2: /\k<x>/ with no group name, the
+      identity escapes /\XA0/ and /\X/, and the incomplete hexadecimal escape
+      /\x/. The focused test shows the profile rejects each with OSEO1001 in
+      both strictness modes. The other 33 are core 22.2.1 patterns under
+      String.prototype.split and RegExp.prototype[%Symbol.split%]. The
+      annex-b-core-string-split-regexp fixture splits "x" with all 33
+      literals, checks each result is an ordinary Array with the upstream
+      length and string elements, and counts 33 splits. No core subject
+      remains. Both specialization policies run strict and non-strict Scripts
+      natively with collection at every safepoint, against Node.js and Deno
+      references. Each check compares value and type with Object.is; the
+      program first counts six rejected near-miss values without the
+      comparator under test, and the focused test fails the program when that
+      comparator is replaced by an always-true, same-type, or loose one.
+      Reopen on changed source, observation, or replacement evidence, on an
+      amendment of ADR 0013's optional Annex B policy, or on ADR 0019's
+      reopening triggers.
+    replacementEvidence:
+      tests/native/fixtures/annex-b-mixed-core.ts:
+        "ff7aa6e18452eb39b2b775ff41ba2ee29e46d99c25415c7baa\
+        98d4a282981b1b"
+      tests/annex-b-mixed-core-native.test.ts:
+        "f6ea2d9c01c99525a85c5afc3883c6c4e161652c0eec10c353\
+        4e3fbe69b85b26"
   mixed-static-functions:
     disposition: remediation
     normativeDependency: not-demonstrated
@@ -214,30 +231,35 @@ assessments:
       until replacement evidence or a maintainer accounting
       decision bounds it.
   annex-b-typed-array-prototype:
-    disposition: remediation
-    normativeDependency: not-demonstrated
-    remediationOwner: node:typed-array-proto-coverage-remediation
+    disposition: exclusion
+    normativeDependency: annex-b-only
+    reason: >-
+      Maintainer decision 2026-10-28 item 3 closes this path under ADR 0013.
+      Its only Annex B subject is the Object.prototype.__proto__ getter of
+      B.2.2.1.1 reading the clone's buffer prototype. That getter returns
+      ToObject(this).[[GetPrototypeOf]](), which Object.getPrototypeOf
+      observes in core. The annex-b-core-typed-array-no-species fixture keeps
+      the ArrayBuffer subclass with its throwing constructor and
+      Symbol.species getter, clones the Uint8Array view into an Int8Array, and
+      checks the fresh buffer's prototype is ArrayBuffer.prototype and its
+      constructor is ArrayBuffer. It also clones a view of every built-in
+      constructor, and counts one subclass construction and no species read.
+      No core subject of InitializeTypedArrayFromTypedArray remains. Both
+      specialization policies run strict and non-strict Scripts natively with
+      collection at every safepoint, against Node.js and Deno references. Each
+      check compares value and type with Object.is; the program first counts
+      six rejected near-miss values without the comparator under test, and the
+      focused test fails the program when that comparator is replaced by an
+      always-true, same-type, or loose one. Reopen on changed source,
+      observation, or replacement evidence, on an amendment of ADR 0013's
+      optional Annex B policy, or on ADR 0019's reopening triggers.
     replacementEvidence:
-      tests/native/fixtures/typed-array-constructors.ts:
-        "0fda23dff34deff74f9b8938bf5e2e19910343fe56ea863316\
-        236f42e342f1ec"
-      "tests/property/m5-typed-array-constructors.property.test.ts":
-        "ef8f8b1f2d88099bbbcd0ae35de4953f4a932f3242e6503a3a\
-        2b59909e3ee20d"
-    reason: The only observed failure is the excluded Annex B
-      __proto__ read. The source also requires
-      TypedArray-to-TypedArray cloning to ignore an
-      ArrayBuffer subclass constructor and species, and
-      checks the fresh buffer prototype and constructor. The
-      typed-array-buffer-without-species-core native fixture
-      retains the subclass, throwing constructor and species
-      getter, clone, and both core assertions using
-      Object.getPrototypeOf for prototype reflection.
-      Existing constructor properties supply generated clone
-      and buffer evidence. These core algorithms do not
-      normatively require Annex B; retain bounded
-      remediation until the maintainer accounting decision,
-      without authorizing a whole-path exclusion.
+      tests/native/fixtures/annex-b-mixed-core.ts:
+        "ff7aa6e18452eb39b2b775ff41ba2ee29e46d99c25415c7baa\
+        98d4a282981b1b"
+      tests/annex-b-mixed-core-native.test.ts:
+        "f6ea2d9c01c99525a85c5afc3883c6c4e161652c0eec10c353\
+        4e3fbe69b85b26"
   import-call-attributes:
     disposition: exclusion
     normativeDependency: source-evaluation-only
@@ -460,69 +482,65 @@ assessments:
       is scaffolding for the caller relationship and stays
       under ADR 0016, which owns none of these paths.
   annex-b-out-of-bounds-prototype-setup:
-    disposition: remediation
-    normativeDependency: not-demonstrated
-    remediationOwner: node:typed-array-proto-coverage-remediation
+    disposition: exclusion
+    normativeDependency: annex-b-only
+    reason: >-
+      Maintainer decision 2026-10-28 item 3 closes this path under ADR 0013.
+      Its only Annex B subject is the Object.prototype.__proto__ setter of
+      B.2.2.1.2 installing a plain prototype with index 2. That setter calls
+      O.[[SetPrototypeOf]](proto), which Object.setPrototypeOf performs in
+      core. The annex-b-core-typed-array-out-of-bounds-prototype fixture
+      installs that prototype on the length-4 Int8Array view of the 16-byte
+      resizable buffer, writes and reads index 2, and checks in. After
+      resize(0) it checks the view's length is 0, Get of indices 2 and 0 is
+      undefined, and HasProperty is false, while the prototype still has index
+      2. It also checks an in-bounds index past the view length and the view
+      after regrowing. No core TypedArray [[Get]] or [[HasProperty]] subject
+      remains. Both specialization policies run strict and non-strict Scripts
+      natively with collection at every safepoint, against Node.js and Deno
+      references. Each check compares value and type with Object.is; the
+      program first counts six rejected near-miss values without the
+      comparator under test, and the focused test fails the program when that
+      comparator is replaced by an always-true, same-type, or loose one.
+      Reopen on changed source, observation, or replacement evidence, on an
+      amendment of ADR 0013's optional Annex B policy, or on ADR 0019's
+      reopening triggers.
     replacementEvidence:
-      tests/native/fixtures/typed-array-core.ts:
-        "d56aaa14ebbd751e195d0133a1a82d4caa165909e64b85e1e7\
-        24792328062c20"
-    reason: The only observed failure is the excluded Annex B
-      __proto__ write. The program compiles and runs the
-      harness, the resizable buffer, and the length-4
-      Int8Array view, then reports OSEO1001 at 272:1, the
-      i8a.__proto__ assignment that would install a
-      prototype with index 2 through the omitted setter, so
-      no assertion of the original source ran. The source
-      requires an out-of-bounds view to answer Get and
-      HasProperty for an index as if it were detached,
-      without consulting a prototype that has that index.
-      The typed-array-core native fixture installs such a
-      prototype, inheriting from Int8Array.prototype, with
-      Object.setPrototypeOf on a fixed-length and a
-      length-tracking view, witnesses its identity and an
-      inherited label, and checks Get and in before
-      shrinking, out of bounds, and after regrowing. These
-      core algorithms do not normatively require Annex B;
-      retain bounded remediation until the maintainer
-      accounting decision, without authorizing a whole-path
-      exclusion.
+      tests/native/fixtures/annex-b-mixed-core.ts:
+        "ff7aa6e18452eb39b2b775ff41ba2ee29e46d99c25415c7baa\
+        98d4a282981b1b"
+      tests/annex-b-mixed-core-native.test.ts:
+        "f6ea2d9c01c99525a85c5afc3883c6c4e161652c0eec10c353\
+        4e3fbe69b85b26"
   annex-b-resizable-typed-array-prototype:
-    disposition: remediation
-    normativeDependency: not-demonstrated
-    remediationOwner: node:typed-array-proto-coverage-remediation
+    disposition: exclusion
+    normativeDependency: annex-b-only
+    reason: >-
+      Maintainer decision 2026-10-28 item 3 closes this path under ADR 0013.
+      Its only Annex B subject is the Object.prototype.__proto__ getter of
+      B.2.2.1.1 reading each view's prototype. Object.getPrototypeOf observes
+      the same [[GetPrototypeOf]] in core. The
+      annex-b-core-typed-array-resizable-prototype fixture builds the
+      resizable buffer harness's 15 constructors, on a host with Float16Array,
+      including its three class subclasses. For each it creates length-3 views
+      over the 40/80-byte resizable and the 80-byte fixed buffer and checks
+      both prototypes are the same and equal the constructor's prototype. No
+      core subject of AllocateTypedArray remains. Both specialization policies
+      run strict and non-strict Scripts natively with collection at every
+      safepoint, against Node.js and Deno references. Each check compares
+      value and type with Object.is; the program first counts six rejected
+      near-miss values without the comparator under test, and the focused test
+      fails the program when that comparator is replaced by an always-true,
+      same-type, or loose one. Reopen on changed source, observation, or
+      replacement evidence, on an amendment of ADR 0013's optional Annex B
+      policy, or on ADR 0019's reopening triggers.
     replacementEvidence:
-      tests/native/fixtures/typed-array-constructors.ts:
-        "0fda23dff34deff74f9b8938bf5e2e19910343fe56ea863316\
-        236f42e342f1ec"
-      "tests/property/m5-typed-array-constructors.property.test.ts":
-        "ef8f8b1f2d88099bbbcd0ae35de4953f4a932f3242e6503a3a\
-        2b59909e3ee20d"
-    reason: The only observed failure is the excluded Annex B
-      __proto__ read. The program compiles and runs the
-      harness, both buffer allocations, and the first listed
-      constructor's two views, ta_rab over the resizable
-      buffer and then ta_ab over the fixed-length buffer;
-      the runtime then reports OSEO1001 at the
-      ta_ab.__proto__ read, recorded at 275:20 as the first
-      operand of the first prototype comparison, so no
-      prototype assertion of the original source ran. The
-      source requires fixed-length views over a resizable
-      and a fixed-length buffer to share their prototype for
-      every constructor of the resizable buffer harness,
-      including its three class subclasses. The
-      typed-array-constructors native fixture builds each
-      such pair, observes both prototypes through
-      Object.getPrototypeOf instead of the accessor, and
-      compares them with each other and with the
-      constructor's prototype. The construction order
-      property's fixed case adds fixed-buffer views and
-      length-tracking resizable-buffer views of Float64Array
-      and BigInt64Array under own, bound, and Proxy new
-      targets. These core algorithms do not normatively
-      require Annex B; retain bounded remediation until the
-      maintainer accounting decision, without authorizing a
-      whole-path exclusion.
+      tests/native/fixtures/annex-b-mixed-core.ts:
+        "ff7aa6e18452eb39b2b775ff41ba2ee29e46d99c25415c7baa\
+        98d4a282981b1b"
+      tests/annex-b-mixed-core-native.test.ts:
+        "f6ea2d9c01c99525a85c5afc3883c6c4e161652c0eec10c353\
+        4e3fbe69b85b26"
   static-this-and-call-context:
     disposition: remediation
     normativeDependency: not-demonstrated

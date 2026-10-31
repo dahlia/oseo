@@ -23,8 +23,8 @@ scope:
   - "Reviewed standards coverage is all 337 upstream paths under the node's
     thirteen inventory roots, through the reviewed harness set including
     testTypedArray.js and resizableArrayBufferUtils.js. Of the 28 paths
-    using the latter, 27 pass and one remains unsupported with active owner
-    typed-array-proto-coverage-remediation."
+    using the latter, 27 pass and one remains unsupported as an ADR 0013
+    exclusion whose core subjects have strict replacement evidence."
 owners:
   - PLAN-M5.md
 evidence:
@@ -36,12 +36,14 @@ evidence:
   fixed:
     status: covered
     references:
-      - tests/native/fixtures/typed-array-core.ts
+      - tests/annex-b-mixed-core-native.test.ts
       - tests/native.ts
+      - tests/native/fixtures/typed-array-core.ts
       - tests/native/scenarios/shard-2.ts
   forced-collection:
     status: covered
     references:
+      - tests/annex-b-mixed-core-native.test.ts
       - tests/native.ts
       - tests/native/fixtures/typed-array-core.ts
       - tests/property/m5-typed-array-core.property.test.ts
@@ -59,6 +61,7 @@ evidence:
   specialization:
     status: covered
     references:
+      - tests/annex-b-mixed-core-native.test.ts
       - tests/native.ts
       - tests/native/fixtures/typed-array-core.ts
       - tests/property/m5-typed-array-core.property.test.ts
