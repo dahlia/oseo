@@ -1113,6 +1113,91 @@ assessments:
       tests/native/fixtures/function-intrinsic-chains.ts:
         "c5eb018779c47f7de2959da4a1a64969475c8026fc831102\
         f06e8bef6382e1e3"
+  ds22-strict-scope-core:
+    disposition: exclusion
+    normativeDependency: source-evaluation-only
+    replacementEvidence:
+      tests/native/fixtures/ds22-boundary-core.ts:
+        "d3238860d122c81b88979e6a11a97f86915e1ea1\
+        54e6280b0e00b039d9661bfa"
+      tests/ds22-boundary-preparation.test.ts:
+        "9cb0c4701e1d0bdd83eae59acd33b49773f5955b\
+        8245e27cddf8b7625bb1b09f"
+      tests/ds22-boundary-native.test.ts:
+        "768ebd7cf7837d8e7476132f3dc7a9ec9e03b038\
+        2a6be15fe85692b691ecf4b0"
+    reason: "Maintainer decision 2026-10-28 item 1: The block/case/default
+      function is lexical in strict code, and reading its name outside that
+      scope throws ReferenceError without creating a global property. The
+      ds22-strict-block-scope, ds22-strict-case-scope and
+      ds22-strict-default-scope fixed fixtures observe calls inside each scope
+      and the exact ReferenceError constructor outside, at Script and function
+      level. Strict eval declaration instantiation and strictness inheritance
+      remain source evaluation itself. Annex B is not used to exclude these
+      mandatory scope assertions. The six groups run under both specialization
+      policies with forced collection and fixed normative observations;
+      preparation checks both reference Script hosts and MIR/C structure. Reopen
+      on an ADR 0016 amendment admitting eval or source-compiling constructors,
+      changed source/observation/replacement evidence, or ADR 0019 non-source
+      dependence. ADR 0013 and the exact ADR 0028 selector are unchanged."
+  ds22-strict-caller-core:
+    disposition: exclusion
+    normativeDependency: source-evaluation-only
+    replacementEvidence:
+      tests/native/fixtures/ds22-boundary-core.ts:
+        "d3238860d122c81b88979e6a11a97f86915e1ea1\
+        54e6280b0e00b039d9661bfa"
+      tests/ds22-boundary-preparation.test.ts:
+        "9cb0c4701e1d0bdd83eae59acd33b49773f5955b\
+        8245e27cddf8b7625bb1b09f"
+      tests/ds22-boundary-native.test.ts:
+        "768ebd7cf7837d8e7476132f3dc7a9ec9e03b038\
+        2a6be15fe85692b691ecf4b0"
+    reason:
+      "Maintainer decision 2026-10-28 item 1: The only original assertion is
+      TypeError when reading a strict function caller, reached through direct or
+      indirect eval or a non-strict Function-created wrapper. The
+      ds22-strict-caller-read fixed fixture reads a statically declared strict
+      function directly, from a sloppy wrapper and from a strict wrapper, checks
+      the exact TypeError constructor and absence of an own caller property. The
+      ds22-caller-accessors fixture checks inherited restricted accessor
+      behavior. Only source evaluation/construction and its strictness context
+      remain. The six groups run under both specialization policies with forced
+      collection and fixed normative observations; preparation checks both
+      reference Script hosts and MIR/C structure. Reopen on an ADR 0016
+      amendment admitting eval or source-compiling constructors, changed
+      source/observation/replacement evidence, or ADR 0019 non-source
+      dependence. ADR 0013 and the exact ADR 0028 selector are unchanged."
+  ds22-sloppy-caller-core:
+    disposition: exclusion
+    normativeDependency: source-evaluation-only
+    replacementEvidence:
+      tests/native/fixtures/ds22-boundary-core.ts:
+        "d3238860d122c81b88979e6a11a97f86915e1ea1\
+        54e6280b0e00b039d9661bfa"
+      tests/ds22-boundary-preparation.test.ts:
+        "9cb0c4701e1d0bdd83eae59acd33b49773f5955b\
+        8245e27cddf8b7625bb1b09f"
+      tests/ds22-boundary-native.test.ts:
+        "768ebd7cf7837d8e7476132f3dc7a9ec9e03b038\
+        2a6be15fe85692b691ecf4b0"
+    reason:
+      "Maintainer decision 2026-10-28 item 1: The only original assertion is
+      TypeError from gNonStrict.caller || gNonStrict.caller.throwTypeError
+      beneath a strict caller. The ds22-sloppy-caller-read fixed fixture retains
+      this exact expression and the strict-to-sloppy call, directly and through
+      a sloppy wrapper. Oseo inherits the mandatory ThrowTypeError accessor
+      rather than exposing a strict caller; the expression therefore throws the
+      exact TypeError without a legacy caller extension. The
+      ds22-caller-accessors fixture observes the inherited restriction
+      separately. Only source evaluation/construction of the original wrapper or
+      reader remains; no assertion requires a normally completing legacy caller
+      read. The six groups run under both specialization policies with forced
+      collection and fixed normative observations; preparation checks both
+      reference Script hosts and MIR/C structure. Reopen on an ADR 0016
+      amendment admitting eval or source-compiling constructors, changed
+      source/observation/replacement evidence, or ADR 0019 non-source
+      dependence. ADR 0013 and the exact ADR 0028 selector are unchanged."
 paths:
   - path: test/built-ins/AggregateError/newtarget-proto-fallback.js
     proposedOwner: adr:0016-dynamic-source-boundary
@@ -1737,7 +1822,7 @@ paths:
     subject: Strict mode - checking access to strict function caller from
       non-strict function (New'ed Function constructor includes strict
       directive prologue)
-    assessment: observation-b01-b18-dynamic-source
+    assessment: ds22-sloppy-caller-core
   - path: test/built-ins/Function/15.3.5.4_2-11gs.js
     proposedOwner: adr:0016-dynamic-source-boundary
     priorCohort: incidental-scaffolding
@@ -1749,7 +1834,7 @@ paths:
     section: 15.3.5.4_2-11gs
     subject: Strict mode - checking access to strict function caller from
       strict function (eval used within strict mode)
-    assessment: observation-b01-b18-dynamic-source
+    assessment: ds22-strict-caller-core
   - path: test/built-ins/Function/15.3.5.4_2-12gs.js
     proposedOwner: adr:0028-legacy-function-caller-boundary
     priorCohort: legacy-caller
@@ -1773,7 +1858,7 @@ paths:
     section: 15.3.5.4_2-13gs
     subject: Strict mode - checking access to non-strict function caller
       from strict function (indirect eval used within strict mode)
-    assessment: observation-b01-b18-dynamic-source
+    assessment: ds22-strict-caller-core
   - path: test/built-ins/Function/15.3.5.4_2-14gs.js
     proposedOwner: adr:0028-legacy-function-caller-boundary
     priorCohort: legacy-caller
@@ -1799,7 +1884,7 @@ paths:
     subject: Strict mode - checking access to strict function caller from
       non-strict function (strict function declaration called by
       non-strict eval)
-    assessment: observation-b01-b18-dynamic-source
+    assessment: ds22-sloppy-caller-core
   - path: test/built-ins/Function/15.3.5.4_2-58gs.js
     proposedOwner: adr:0016-dynamic-source-boundary
     priorCohort: incidental-scaffolding
@@ -1812,7 +1897,7 @@ paths:
     subject: Strict mode - checking access to strict function caller from
       non-strict function (strict function declaration called by
       non-strict Function constructor)
-    assessment: observation-b01-b18-dynamic-source
+    assessment: ds22-sloppy-caller-core
   - path: test/built-ins/Function/15.3.5.4_2-59gs.js
     proposedOwner: adr:0016-dynamic-source-boundary
     priorCohort: incidental-scaffolding
@@ -1825,7 +1910,7 @@ paths:
     subject: Strict mode - checking access to strict function caller from
       non-strict function (strict function declaration called by
       non-strict new'ed Function constructor)
-    assessment: observation-b01-b18-dynamic-source
+    assessment: ds22-sloppy-caller-core
   - path: test/built-ins/Function/15.3.5.4_2-75gs.js
     proposedOwner: adr:0028-legacy-function-caller-boundary
     priorCohort: legacy-caller
@@ -1902,7 +1987,7 @@ paths:
     subject: Strict mode - checking access to non-strict function caller
       from strict function (Function constructor defined within strict
       mode)
-    assessment: observation-b01-b18-dynamic-source
+    assessment: ds22-strict-caller-core
   - path: test/built-ins/Function/15.3.5.4_2-80gs.js
     proposedOwner: adr:0028-legacy-function-caller-boundary
     priorCohort: legacy-caller
@@ -2045,7 +2130,7 @@ paths:
     subject: Strict mode - checking access to strict function caller from
       non-strict function (Function constructor includes strict directive
       prologue)
-    assessment: observation-b01-b18-dynamic-source
+    assessment: ds22-sloppy-caller-core
   - path: test/built-ins/Function/15.3.5.4_2-90gs.js
     proposedOwner: adr:0028-legacy-function-caller-boundary
     priorCohort: legacy-caller
@@ -2110,7 +2195,7 @@ paths:
     subject: Strict mode - checking access to strict function caller from
       non-strict, constructor-based function (FunctionDeclaration includes
       strict directive prologue)
-    assessment: observation-b01-b18-dynamic-source
+    assessment: ds22-sloppy-caller-core
   - path: test/built-ins/Function/15.3.5.4_2-9gs.js
     proposedOwner: adr:0016-dynamic-source-boundary
     priorCohort: incidental-scaffolding
@@ -2123,7 +2208,7 @@ paths:
     subject: Strict mode - checking access to non-strict function caller
       from strict function (New'ed Function constructor defined within
       strict mode)
-    assessment: observation-b01-b18-dynamic-source
+    assessment: ds22-strict-caller-core
   - path: test/built-ins/Function/S15.3.1_A1_T1.js
     proposedOwner: adr:0016-dynamic-source-boundary
     priorCohort: incidental-scaffolding
@@ -8588,7 +8673,7 @@ paths:
     section: "sec-web-compat-evaldeclarationinstantiation"
     subject: "AnnexB extension not honored in strict mode, Function declaration
       in the `case` clause of a `switch` statement in eval code"
-    assessment: "observation-train-b06-b08-b14"
+    assessment: ds22-strict-scope-core
   - path: "test/language/eval-code/direct/switch-case-decl-eval-source-is-stric\
       t-onlystrict.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -8601,7 +8686,7 @@ paths:
     section: "sec-web-compat-evaldeclarationinstantiation"
     subject: "AnnexB extension not honored in strict mode, Function declaration
       in the `case` clause of a `switch` statement in eval code"
-    assessment: "observation-train-b06-b08-b14"
+    assessment: ds22-strict-scope-core
   - path: "test/language/eval-code/direct/switch-case-decl-onlystrict.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "source-subject"
@@ -8613,7 +8698,7 @@ paths:
     section: "sec-web-compat-evaldeclarationinstantiation"
     subject: "AnnexB extension not honored in strict mode, Function declaration
       in the `case` clause of a `switch` statement in eval code"
-    assessment: "observation-train-b06-b08-b14"
+    assessment: ds22-strict-scope-core
   - path: "test/language/eval-code/direct/switch-dflt-decl-eval-source-is-stric\
       t-nostrict.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -8626,7 +8711,7 @@ paths:
     section: "sec-web-compat-evaldeclarationinstantiation"
     subject: "AnnexB extension not honored in strict mode, Function declaration
       in the `default` clause of a `switch` statement in eval code"
-    assessment: "observation-train-b06-b08-b14"
+    assessment: ds22-strict-scope-core
   - path: "test/language/eval-code/direct/switch-dflt-decl-eval-source-is-stric\
       t-onlystrict.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -8639,7 +8724,7 @@ paths:
     section: "sec-web-compat-evaldeclarationinstantiation"
     subject: "AnnexB extension not honored in strict mode, Function declaration
       in the `default` clause of a `switch` statement in eval code"
-    assessment: "observation-train-b06-b08-b14"
+    assessment: ds22-strict-scope-core
   - path: "test/language/eval-code/direct/switch-dflt-decl-onlystrict.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "source-subject"
@@ -8651,7 +8736,7 @@ paths:
     section: "sec-web-compat-evaldeclarationinstantiation"
     subject: "AnnexB extension not honored in strict mode: Function declaration
       in the `default` clause of a `switch` statement in eval code"
-    assessment: "observation-train-b06-b08-b14"
+    assessment: ds22-strict-scope-core
   - path: "test/language/eval-code/direct/this-value-func-non-strict.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "source-subject"
@@ -9033,7 +9118,7 @@ paths:
     missingDynamicTag: false
     section: "Original source subject; frontmatter has no section ID"
     subject: "AnnexB extension not honored in strict mode"
-    assessment: "observation-train-b06-b08-b14"
+    assessment: ds22-strict-scope-core
   - path: "test/language/eval-code/indirect/cptn-nrml-empty-block.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "incidental-scaffolding"
@@ -9492,7 +9577,7 @@ paths:
     missingDynamicTag: false
     section: "Original source subject; frontmatter has no section ID"
     subject: "AnnexB extension not honored in strict mode"
-    assessment: "observation-train-b06-b08-b14"
+    assessment: ds22-strict-scope-core
   - path: "test/language/eval-code/indirect/switch-dflt-decl-strict.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "source-subject"
@@ -9503,7 +9588,7 @@ paths:
     missingDynamicTag: false
     section: "Original source subject; frontmatter has no section ID"
     subject: "AnnexB extension not honored in strict mode"
-    assessment: "observation-train-b06-b08-b14"
+    assessment: ds22-strict-scope-core
   - path: "test/language/eval-code/indirect/this-value-func.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "source-subject"

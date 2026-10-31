@@ -45,6 +45,8 @@ const { privateNameLifetimeFixtures } =
 import { dataViewFixtures } from "./native/fixtures/data-view.ts";
 import { dateFamilyFixtures } from "./native/fixtures/date-family.ts";
 import { expressionFixtures } from "./native/fixtures/expressions.ts";
+const { ds22BoundaryCoreFixtures } =
+  await import("./native/fixtures/ds22-boundary-core.ts");
 import { functionFixtures } from "./native/fixtures/functions.ts";
 import { generatorFixtures } from "./native/fixtures/generators.ts";
 import * as evalFixture from "./native/fixtures/direct-eval-non-string.ts";
@@ -226,6 +228,7 @@ Object.defineProperty(globalThis, "console", {
 
 const fixtures: readonly Fixture[] = [
   ...functionFixtures,
+  ...ds22BoundaryCoreFixtures,
   ...properTailCallFixtures,
   ...globalRecord.globalObjectRecordFixtures,
   evalFixture.directEvalNonStringFixture,
@@ -1461,6 +1464,7 @@ for (const fixture of selectedFixtures) {
     fixture.name === "object-own-keys-virtual-read-only" ||
     fixture.name === "global-object-record" ||
     fixture.name === "eval-intrinsic-value" ||
+    fixture.name.startsWith("ds22-") ||
     fixture.name === "direct-eval-non-string" ||
     fixture.name === "globalthis-binding" ||
     fixture.name === "with-strict-heritage-write" ||
@@ -1776,6 +1780,7 @@ for (const fixture of selectedFixtures) {
             fixture.name === "object-integrity-levels" ||
             fixture.name === "global-object-record" ||
             fixture.name === "eval-intrinsic-value" ||
+            fixture.name.startsWith("ds22-") ||
             fixture.name === "direct-eval-non-string" ||
             fixture.name === "globalthis-binding" ||
             fixture.name === "with-strict-heritage-write" ||
@@ -1808,7 +1813,8 @@ for (const fixture of selectedFixtures) {
             fixture.name === "weak-collections"
           ) {
             assert.ok(native.counters.collections > 0);
-            if (mode === "enabled") {
+            // DS-22 adds finite static witnesses, no specialized path.
+            if (mode === "enabled" && !fixture.name.startsWith("ds22-")) {
               if (
                 fixture.name === "array-buffer" ||
                 fixture.name === "array-prototype-copying" ||
