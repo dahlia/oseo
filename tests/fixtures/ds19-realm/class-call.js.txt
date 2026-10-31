@@ -1,0 +1,15 @@
+// Replacement for test/built-ins/Function/internals/Call/class-ctor-realm.js
+// Copyright (C) 2016 the V8 project authors. All rights reserved.
+// This code is governed by the BSD license found in the LICENSE file.
+(function () {
+const realm = $262.createRealm();
+const C = realm.global.$262.evalScript('(class {})');
+const TE = realm.global.TypeError;
+
+assert.throws(TE, function() {
+  C();
+});
+})();
+
+
+console.log("DS19 class-call complete");

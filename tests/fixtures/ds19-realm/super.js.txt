@@ -1,0 +1,22 @@
+// Fixed DS-19 non-source witnesses, derived from pinned Test262.
+// Foreign source is collected before native emission under ADR 0029.
+// Replacement for test/language/expressions/super/realm.js
+// Copyright (C) 2016 the V8 project authors. All rights reserved.
+// This code is governed by the BSD license found in the LICENSE file.
+(function () {
+var other = $262.createRealm().global;
+var C = other.$262.evalScript("(function(){})");
+C.prototype = null;
+
+class B extends function() {} {
+  constructor() {
+    super();
+  }
+}
+
+var b = Reflect.construct(B, [], C);
+
+assert.sameValue(Object.getPrototypeOf(b), other.Object.prototype);
+})();
+
+console.log("DS19 super complete");

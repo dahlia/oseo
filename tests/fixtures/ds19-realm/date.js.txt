@@ -1,0 +1,42 @@
+// Fixed DS-19 non-source witnesses, derived from pinned Test262.
+// Foreign source is collected before native emission under ADR 0029.
+// Replacement for test/built-ins/Date/proto-from-ctor-realm-one.js
+// Copyright (C) 2016 the V8 project authors. All rights reserved.
+// This code is governed by the BSD license found in the LICENSE file.
+(function () {
+var other = $262.createRealm().global;
+var C = other.$262.evalScript("(function(){})");
+C.prototype = null;
+
+var o = Reflect.construct(Date, [0], C);
+
+assert.sameValue(Object.getPrototypeOf(o), other.Date.prototype);
+})();
+
+// Replacement for test/built-ins/Date/proto-from-ctor-realm-two.js
+// Copyright (C) 2016 the V8 project authors. All rights reserved.
+// This code is governed by the BSD license found in the LICENSE file.
+(function () {
+var other = $262.createRealm().global;
+var C = other.$262.evalScript("(function(){})");
+C.prototype = null;
+
+var o = Reflect.construct(Date, [1970, 0], C);
+
+assert.sameValue(Object.getPrototypeOf(o), other.Date.prototype);
+})();
+
+// Replacement for test/built-ins/Date/proto-from-ctor-realm-zero.js
+// Copyright (C) 2016 the V8 project authors. All rights reserved.
+// This code is governed by the BSD license found in the LICENSE file.
+(function () {
+var other = $262.createRealm().global;
+var C = other.$262.evalScript("(function(){})");
+C.prototype = null;
+
+var o = Reflect.construct(Date, [0], C);
+
+assert.sameValue(Object.getPrototypeOf(o), other.Date.prototype);
+})();
+
+console.log("DS19 date complete");

@@ -1,0 +1,100 @@
+// Fixed DS-19 non-source witnesses, derived from pinned Test262.
+// Foreign source is collected before native emission under ADR 0029.
+function testWithTypedArrayConstructors(callback) {
+  [Float64Array, Float32Array, Float16Array, Int32Array, Int16Array, Int8Array, Uint32Array, Uint16Array, Uint8Array, Uint8ClampedArray].forEach(callback);
+}
+function testWithBigIntTypedArrayConstructors(callback) {
+  [BigInt64Array, BigUint64Array].forEach(callback);
+}
+// Replacement for test/built-ins/TypedArrayConstructors/ctors-bigint/buffer-arg/proto-from-ctor-realm-sab.js
+// Copyright (C) 2016 the V8 project authors. All rights reserved.
+// Copyright (C) 2017 Mozilla Corporation. All rights reserved.
+// This code is governed by the BSD license found in the LICENSE file.
+(function () {
+var other = $262.createRealm().global;
+var C = other.$262.evalScript("(function(){})");
+C.prototype = null;
+
+testWithBigIntTypedArrayConstructors(function(TA) {
+  var ta = Reflect.construct(TA, [new SharedArrayBuffer(8)], C);
+
+  assert.sameValue(Object.getPrototypeOf(ta), other[TA.name].prototype);
+}, null, ["passthrough"]);
+})();
+
+// Replacement for test/built-ins/TypedArrayConstructors/ctors-bigint/buffer-arg/proto-from-ctor-realm.js
+// Copyright (C) 2016 the V8 project authors. All rights reserved.
+// This code is governed by the BSD license found in the LICENSE file.
+(function () {
+var other = $262.createRealm().global;
+var C = other.$262.evalScript("(function(){})");
+C.prototype = null;
+
+testWithBigIntTypedArrayConstructors(function(TA) {
+  var ta = Reflect.construct(TA, [new ArrayBuffer(8)], C);
+
+  assert.sameValue(Object.getPrototypeOf(ta), other[TA.name].prototype);
+}, null, ["passthrough"]);
+})();
+
+// Replacement for test/built-ins/TypedArrayConstructors/ctors-bigint/length-arg/proto-from-ctor-realm.js
+// Copyright (C) 2016 the V8 project authors. All rights reserved.
+// This code is governed by the BSD license found in the LICENSE file.
+(function () {
+var other = $262.createRealm().global;
+var C = other.$262.evalScript("(function(){})");
+C.prototype = null;
+
+testWithBigIntTypedArrayConstructors(function(TA) {
+  var ta = Reflect.construct(TA, [0], C);
+
+  assert.sameValue(Object.getPrototypeOf(ta), other[TA.name].prototype);
+}, null, ["passthrough"]);
+})();
+
+// Replacement for test/built-ins/TypedArrayConstructors/ctors-bigint/no-args/proto-from-ctor-realm.js
+// Copyright (C) 2016 the V8 project authors. All rights reserved.
+// This code is governed by the BSD license found in the LICENSE file.
+(function () {
+var other = $262.createRealm().global;
+var C = other.$262.evalScript("(function(){})");
+C.prototype = null;
+
+testWithBigIntTypedArrayConstructors(function(TA) {
+  var ta = Reflect.construct(TA, [], C);
+
+  assert.sameValue(Object.getPrototypeOf(ta), other[TA.name].prototype);
+}, null, ["passthrough"]);
+})();
+
+// Replacement for test/built-ins/TypedArrayConstructors/ctors-bigint/object-arg/proto-from-ctor-realm.js
+// Copyright (C) 2016 the V8 project authors. All rights reserved.
+// This code is governed by the BSD license found in the LICENSE file.
+(function () {
+var other = $262.createRealm().global;
+var C = other.$262.evalScript("(function(){})");
+C.prototype = null;
+
+testWithBigIntTypedArrayConstructors(function(TA) {
+  var ta = Reflect.construct(TA, [{}], C);
+
+  assert.sameValue(Object.getPrototypeOf(ta), other[TA.name].prototype);
+}, null, ["passthrough"]);
+})();
+
+// Replacement for test/built-ins/TypedArrayConstructors/ctors-bigint/typedarray-arg/proto-from-ctor-realm.js
+// Copyright (C) 2016 the V8 project authors. All rights reserved.
+// This code is governed by the BSD license found in the LICENSE file.
+(function () {
+var other = $262.createRealm().global;
+var C = other.$262.evalScript("(function(){})");
+C.prototype = null;
+
+testWithBigIntTypedArrayConstructors(function(TA) {
+  var ta = Reflect.construct(TA, [new TA()], C);
+
+  assert.sameValue(Object.getPrototypeOf(ta), other[TA.name].prototype);
+}, null, ["passthrough"]);
+})();
+
+console.log("DS19 typedarray-bigint complete");

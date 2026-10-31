@@ -1,0 +1,136 @@
+// Fixed DS-19 non-source witnesses, derived from pinned Test262.
+// Foreign source is collected before native emission under ADR 0029.
+// Replacement for test/built-ins/Array/from/proto-from-ctor-realm.js
+// Copyright (C) 2016 the V8 project authors. All rights reserved.
+// This code is governed by the BSD license found in the LICENSE file.
+(function () {
+var other = $262.createRealm().global;
+var C = other.$262.evalScript("(function(){})");
+C.prototype = null;
+
+var a = Array.from.call(C, []);
+
+assert.sameValue(
+  Object.getPrototypeOf(a),
+  other.Object.prototype,
+  'Object.getPrototypeOf(Array.from.call(C, [])) returns other.Object.prototype'
+);
+})();
+
+// Replacement for test/built-ins/Array/of/proto-from-ctor-realm.js
+// Copyright (C) 2016 the V8 project authors. All rights reserved.
+// This code is governed by the BSD license found in the LICENSE file.
+(function () {
+var other = $262.createRealm().global;
+var C = other.$262.evalScript("(function(){})");
+C.prototype = null;
+
+var a = Array.of.call(C, 1, 2, 3);
+
+assert.sameValue(
+  Object.getPrototypeOf(a),
+  other.Object.prototype,
+  'Object.getPrototypeOf(Array.of.call(C, 1, 2, 3)) returns other.Object.prototype'
+);
+})();
+
+// Replacement for test/built-ins/Array/proto-from-ctor-realm-one.js
+// Copyright (C) 2019 Alexey Shvayka. All rights reserved.
+// This code is governed by the BSD license found in the LICENSE file.
+(function () {
+var other = $262.createRealm().global;
+var newTarget = other.$262.evalScript("(function(){})");
+var arr;
+
+newTarget.prototype = undefined;
+arr = Reflect.construct(Array, [1], newTarget);
+assert.sameValue(Object.getPrototypeOf(arr), other.Array.prototype, 'Object.getPrototypeOf(Reflect.construct(Array, [1], newTarget)) returns other.Array.prototype');
+
+newTarget.prototype = null;
+arr = Reflect.construct(Array, [1], newTarget);
+assert.sameValue(Object.getPrototypeOf(arr), other.Array.prototype, 'Object.getPrototypeOf(Reflect.construct(Array, [1], newTarget)) returns other.Array.prototype');
+
+newTarget.prototype = true;
+arr = Reflect.construct(Array, [1], newTarget);
+assert.sameValue(Object.getPrototypeOf(arr), other.Array.prototype, 'Object.getPrototypeOf(Reflect.construct(Array, [1], newTarget)) returns other.Array.prototype');
+
+newTarget.prototype = '';
+arr = Reflect.construct(Array, [1], newTarget);
+assert.sameValue(Object.getPrototypeOf(arr), other.Array.prototype, 'Object.getPrototypeOf(Reflect.construct(Array, [1], newTarget)) returns other.Array.prototype');
+
+newTarget.prototype = Symbol();
+arr = Reflect.construct(Array, [1], newTarget);
+assert.sameValue(Object.getPrototypeOf(arr), other.Array.prototype, 'Object.getPrototypeOf(Reflect.construct(Array, [1], newTarget)) returns other.Array.prototype');
+
+newTarget.prototype = 0;
+arr = Reflect.construct(Array, [1], newTarget);
+assert.sameValue(Object.getPrototypeOf(arr), other.Array.prototype, 'Object.getPrototypeOf(Reflect.construct(Array, [1], newTarget)) returns other.Array.prototype');
+})();
+
+// Replacement for test/built-ins/Array/proto-from-ctor-realm-two.js
+// Copyright (C) 2019 Alexey Shvayka. All rights reserved.
+// This code is governed by the BSD license found in the LICENSE file.
+(function () {
+var other = $262.createRealm().global;
+var newTarget = other.$262.evalScript("(function(){})");
+var arr;
+
+newTarget.prototype = undefined;
+arr = Reflect.construct(Array, ['a', 'b'], newTarget);
+assert.sameValue(Object.getPrototypeOf(arr), other.Array.prototype, 'Object.getPrototypeOf(Reflect.construct(Array, ["a", "b"], newTarget)) returns other.Array.prototype');
+
+newTarget.prototype = null;
+arr = Reflect.construct(Array, ['a', 'b'], newTarget);
+assert.sameValue(Object.getPrototypeOf(arr), other.Array.prototype, 'Object.getPrototypeOf(Reflect.construct(Array, ["a", "b"], newTarget)) returns other.Array.prototype');
+
+newTarget.prototype = false;
+arr = Reflect.construct(Array, ['a', 'b'], newTarget);
+assert.sameValue(Object.getPrototypeOf(arr), other.Array.prototype, 'Object.getPrototypeOf(Reflect.construct(Array, ["a", "b"], newTarget)) returns other.Array.prototype');
+
+newTarget.prototype = '';
+arr = Reflect.construct(Array, ['a', 'b'], newTarget);
+assert.sameValue(Object.getPrototypeOf(arr), other.Array.prototype, 'Object.getPrototypeOf(Reflect.construct(Array, ["a", "b"], newTarget)) returns other.Array.prototype');
+
+newTarget.prototype = Symbol();
+arr = Reflect.construct(Array, ['a', 'b'], newTarget);
+assert.sameValue(Object.getPrototypeOf(arr), other.Array.prototype, 'Object.getPrototypeOf(Reflect.construct(Array, ["a", "b"], newTarget)) returns other.Array.prototype');
+
+newTarget.prototype = -1;
+arr = Reflect.construct(Array, ['a', 'b'], newTarget);
+assert.sameValue(Object.getPrototypeOf(arr), other.Array.prototype, 'Object.getPrototypeOf(Reflect.construct(Array, ["a", "b"], newTarget)) returns other.Array.prototype');
+})();
+
+// Replacement for test/built-ins/Array/proto-from-ctor-realm-zero.js
+// Copyright (C) 2016 the V8 project authors. All rights reserved.
+// This code is governed by the BSD license found in the LICENSE file.
+(function () {
+var other = $262.createRealm().global;
+var newTarget = other.$262.evalScript("(function(){})");
+var arr;
+
+newTarget.prototype = undefined;
+arr = Reflect.construct(Array, [], newTarget);
+assert.sameValue(Object.getPrototypeOf(arr), other.Array.prototype, 'Object.getPrototypeOf(Reflect.construct(Array, [], newTarget)) returns other.Array.prototype');
+
+newTarget.prototype = null;
+arr = Reflect.construct(Array, [], newTarget);
+assert.sameValue(Object.getPrototypeOf(arr), other.Array.prototype, 'Object.getPrototypeOf(Reflect.construct(Array, [], newTarget)) returns other.Array.prototype');
+
+newTarget.prototype = true;
+arr = Reflect.construct(Array, [], newTarget);
+assert.sameValue(Object.getPrototypeOf(arr), other.Array.prototype, 'Object.getPrototypeOf(Reflect.construct(Array, [], newTarget)) returns other.Array.prototype');
+
+newTarget.prototype = 'str';
+arr = Reflect.construct(Array, [], newTarget);
+assert.sameValue(Object.getPrototypeOf(arr), other.Array.prototype, 'Object.getPrototypeOf(Reflect.construct(Array, [], newTarget)) returns other.Array.prototype');
+
+newTarget.prototype = Symbol();
+arr = Reflect.construct(Array, [], newTarget);
+assert.sameValue(Object.getPrototypeOf(arr), other.Array.prototype, 'Object.getPrototypeOf(Reflect.construct(Array, [], newTarget)) returns other.Array.prototype');
+
+newTarget.prototype = 1;
+arr = Reflect.construct(Array, [], newTarget);
+assert.sameValue(Object.getPrototypeOf(arr), other.Array.prototype, 'Object.getPrototypeOf(Reflect.construct(Array, [], newTarget)) returns other.Array.prototype');
+})();
+
+console.log("DS19 array complete");

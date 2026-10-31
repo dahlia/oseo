@@ -1,0 +1,18 @@
+// Replacement for test/built-ins/Function/internals/Construct/derived-this-uninitialized-realm.js
+// Copyright (C) 2016 the V8 project authors. All rights reserved.
+// This code is governed by the BSD license found in the LICENSE file.
+(function () {
+var C = $262.createRealm().global.$262.evalScript(
+  '(class C extends Object {' +
+  '  constructor() {}' +
+  '});'
+);
+
+assert.throws(ReferenceError, function() {
+  new C();
+});
+})();
+
+
+
+console.log("DS19 derived-this complete");

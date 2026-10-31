@@ -1,0 +1,134 @@
+// Fixed DS-19 non-source witnesses, derived from pinned Test262.
+// Foreign source is collected before native emission under ADR 0029.
+// Replacement for test/built-ins/AggregateError/proto-from-ctor-realm.js
+// Copyright (C) 2020 Alexey Shvayka. All rights reserved.
+// This code is governed by the BSD license found in the LICENSE file.
+(function () {
+var other = $262.createRealm().global;
+var newTarget = other.$262.evalScript("(function(){})");
+var err;
+
+newTarget.prototype = undefined;
+err = Reflect.construct(AggregateError, [[]], newTarget);
+assert.sameValue(Object.getPrototypeOf(err), other.AggregateError.prototype, 'newTarget.prototype is undefined');
+
+newTarget.prototype = null;
+err = Reflect.construct(AggregateError, [[]], newTarget);
+assert.sameValue(Object.getPrototypeOf(err), other.AggregateError.prototype, 'newTarget.prototype is null');
+
+newTarget.prototype = true;
+err = Reflect.construct(AggregateError, [[]], newTarget);
+assert.sameValue(Object.getPrototypeOf(err), other.AggregateError.prototype, 'newTarget.prototype is a Boolean');
+
+newTarget.prototype = '';
+err = Reflect.construct(AggregateError, [[]], newTarget);
+assert.sameValue(Object.getPrototypeOf(err), other.AggregateError.prototype, 'newTarget.prototype is a String');
+
+newTarget.prototype = Symbol();
+err = Reflect.construct(AggregateError, [[]], newTarget);
+assert.sameValue(Object.getPrototypeOf(err), other.AggregateError.prototype, 'newTarget.prototype is a Symbol');
+
+newTarget.prototype = -1;
+err = Reflect.construct(AggregateError, [[]], newTarget);
+assert.sameValue(Object.getPrototypeOf(err), other.AggregateError.prototype, 'newTarget.prototype is a Number');
+})();
+
+// Replacement for test/built-ins/Error/proto-from-ctor-realm.js
+// Copyright (C) 2016 the V8 project authors. All rights reserved.
+// This code is governed by the BSD license found in the LICENSE file.
+(function () {
+var other = $262.createRealm().global;
+var C = other.$262.evalScript("(function(){})");
+C.prototype = null;
+
+var o = Reflect.construct(Error, [], C);
+
+assert.sameValue(Object.getPrototypeOf(o), other.Error.prototype);
+})();
+
+// Replacement for test/built-ins/Iterator/proto-from-ctor-realm.js
+// Copyright (C) 2020 Rick Waldron. All rights reserved.
+// This code is governed by the BSD license found in the LICENSE file.
+(function () {
+let other = $262.createRealm().global;
+let newTarget = other.$262.evalScript("(function(){})");
+let ai;
+
+newTarget.prototype = undefined;
+ai = Reflect.construct(Iterator, [1], newTarget);
+assert.sameValue(Object.getPrototypeOf(ai), other.Iterator.prototype);
+
+newTarget.prototype = null;
+ai = Reflect.construct(Iterator, [1], newTarget);
+assert.sameValue(Object.getPrototypeOf(ai), other.Iterator.prototype);
+
+newTarget.prototype = true;
+ai = Reflect.construct(Iterator, [1], newTarget);
+assert.sameValue(Object.getPrototypeOf(ai), other.Iterator.prototype);
+
+newTarget.prototype = '';
+ai = Reflect.construct(Iterator, [1], newTarget);
+assert.sameValue(Object.getPrototypeOf(ai), other.Iterator.prototype);
+
+newTarget.prototype = Symbol();
+ai = Reflect.construct(Iterator, [1], newTarget);
+assert.sameValue(Object.getPrototypeOf(ai), other.Iterator.prototype);
+
+newTarget.prototype = 0;
+ai = Reflect.construct(Iterator, [1], newTarget);
+assert.sameValue(Object.getPrototypeOf(ai), other.Iterator.prototype);
+})();
+
+// Replacement for test/built-ins/Map/proto-from-ctor-realm.js
+// Copyright (C) 2016 the V8 project authors. All rights reserved.
+// This code is governed by the BSD license found in the LICENSE file.
+(function () {
+var other = $262.createRealm().global;
+var C = other.$262.evalScript("(function(){})");
+C.prototype = null;
+
+var o = Reflect.construct(Map, [], C);
+
+assert.sameValue(Object.getPrototypeOf(o), other.Map.prototype);
+})();
+
+// Replacement for test/built-ins/Object/proto-from-ctor-realm.js
+// Copyright (C) 2016 the V8 project authors. All rights reserved.
+// This code is governed by the BSD license found in the LICENSE file.
+(function () {
+var other = $262.createRealm().global;
+var C = other.$262.evalScript("(function(){})");
+C.prototype = null;
+
+var o = Reflect.construct(Object, [], C);
+
+assert.sameValue(Object.getPrototypeOf(o), other.Object.prototype);
+})();
+
+// Replacement for test/built-ins/Promise/proto-from-ctor-realm.js
+// Copyright (C) 2016 the V8 project authors. All rights reserved.
+// This code is governed by the BSD license found in the LICENSE file.
+(function () {
+var other = $262.createRealm().global;
+var C = other.$262.evalScript("(function(){})");
+C.prototype = null;
+
+var o = Reflect.construct(Promise, [function() {}], C);
+
+assert.sameValue(Object.getPrototypeOf(o), other.Promise.prototype);
+})();
+
+// Replacement for test/built-ins/Set/proto-from-ctor-realm.js
+// Copyright (C) 2016 the V8 project authors. All rights reserved.
+// This code is governed by the BSD license found in the LICENSE file.
+(function () {
+var other = $262.createRealm().global;
+var C = other.$262.evalScript("(function(){})");
+C.prototype = null;
+
+var o = Reflect.construct(Set, [], C);
+
+assert.sameValue(Object.getPrototypeOf(o), other.Set.prototype);
+})();
+
+console.log("DS19 collections-errors complete");

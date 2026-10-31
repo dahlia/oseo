@@ -3643,6 +3643,1576 @@ assessments:
       packages/compiler/src/host-scripts.ts:
         "e078da63c992b7d11fe1243abb4cdc0cc28d7843fe93c723\
         444e469285601ce3"
+  ds19-01:
+    disposition: exclusion
+    normativeDependency: source-evaluation-only
+    reason: Literal ahead-of-time foreign code witnesses Default
+      [[Prototype]] value derived from realm of the NewTarget;
+      preserves all 6 original assertions and prototype inputs
+      undefined, null, true, '', Symbol(), -1. Only the original
+      source compilation remains. Maintainer decision 2026-10-28 item
+      1 applies only after every non-source subject has passing
+      replacement evidence. Reopen on changed original source,
+      observation or replacement evidence, an accepted ADR 0016
+      amendment admitting the source form, or the ADR 0019 non-source
+      dependence trigger.
+    replacementEvidence:
+      tests/fixtures/ds19-realm/collections-errors.js.txt:
+        "3dbfd18e6663dd1a604faa4e03b949009ce0d5ac7e11fdc6\
+        c5cd70dc99451878"
+      tests/dynamic-source-realm-host-evidence.test.ts:
+        "33fa8bc15819484524d930a99734d368c447ad95f1a7561b\
+        b553978437567194"
+  ds19-02:
+    disposition: exclusion
+    normativeDependency: source-evaluation-only
+    reason: Literal ahead-of-time foreign code witnesses Default
+      [[Prototype]] value derived from realm of the constructor;
+      preserves the original assertion and prototype inputs null.
+      Only the original source compilation remains. Maintainer
+      decision 2026-10-28 item 1 applies only after every non-source
+      subject has passing replacement evidence. Reopen on changed
+      original source, observation or replacement evidence, an
+      accepted ADR 0016 amendment admitting the source form, or the
+      ADR 0019 non-source dependence trigger.
+    replacementEvidence:
+      tests/fixtures/ds19-realm/array.js.txt:
+        "caad3f8e9b51e2f6c1e9237e91e47657571ac72288cb7720\
+        d74e205c53dc6279"
+      tests/dynamic-source-realm-host-evidence.test.ts:
+        "33fa8bc15819484524d930a99734d368c447ad95f1a7561b\
+        b553978437567194"
+  ds19-03:
+    disposition: exclusion
+    normativeDependency: source-evaluation-only
+    reason: Literal ahead-of-time foreign code witnesses Default
+      [[Prototype]] value derived from realm of the constructor;
+      preserves the original assertion and prototype inputs null.
+      Only the original source compilation remains. Maintainer
+      decision 2026-10-28 item 1 applies only after every non-source
+      subject has passing replacement evidence. Reopen on changed
+      original source, observation or replacement evidence, an
+      accepted ADR 0016 amendment admitting the source form, or the
+      ADR 0019 non-source dependence trigger.
+    replacementEvidence:
+      tests/fixtures/ds19-realm/array.js.txt:
+        "caad3f8e9b51e2f6c1e9237e91e47657571ac72288cb7720\
+        d74e205c53dc6279"
+      tests/dynamic-source-realm-host-evidence.test.ts:
+        "33fa8bc15819484524d930a99734d368c447ad95f1a7561b\
+        b553978437567194"
+  ds19-04:
+    disposition: exclusion
+    normativeDependency: source-evaluation-only
+    reason: Literal ahead-of-time foreign code witnesses Default
+      [[Prototype]] value derived from realm of the NewTarget;
+      preserves all 6 original assertions and prototype inputs
+      undefined, null, true, '', Symbol(), 0. Only the original source
+      compilation remains. Maintainer decision 2026-10-28 item 1
+      applies only after every non-source subject has passing
+      replacement evidence. Reopen on changed original source,
+      observation or replacement evidence, an accepted ADR 0016
+      amendment admitting the source form, or the ADR 0019 non-source
+      dependence trigger.
+    replacementEvidence:
+      tests/fixtures/ds19-realm/array.js.txt:
+        "caad3f8e9b51e2f6c1e9237e91e47657571ac72288cb7720\
+        d74e205c53dc6279"
+      tests/dynamic-source-realm-host-evidence.test.ts:
+        "33fa8bc15819484524d930a99734d368c447ad95f1a7561b\
+        b553978437567194"
+  ds19-05:
+    disposition: exclusion
+    normativeDependency: source-evaluation-only
+    reason: Literal ahead-of-time foreign code witnesses Default
+      [[Prototype]] value derived from realm of the NewTarget;
+      preserves all 6 original assertions and prototype inputs
+      undefined, null, false, '', Symbol(), -1. Only the original
+      source compilation remains. Maintainer decision 2026-10-28 item
+      1 applies only after every non-source subject has passing
+      replacement evidence. Reopen on changed original source,
+      observation or replacement evidence, an accepted ADR 0016
+      amendment admitting the source form, or the ADR 0019 non-source
+      dependence trigger.
+    replacementEvidence:
+      tests/fixtures/ds19-realm/array.js.txt:
+        "caad3f8e9b51e2f6c1e9237e91e47657571ac72288cb7720\
+        d74e205c53dc6279"
+      tests/dynamic-source-realm-host-evidence.test.ts:
+        "33fa8bc15819484524d930a99734d368c447ad95f1a7561b\
+        b553978437567194"
+  ds19-06:
+    disposition: exclusion
+    normativeDependency: source-evaluation-only
+    reason: Literal ahead-of-time foreign code witnesses Default
+      [[Prototype]] value derived from realm of the NewTarget;
+      preserves all 6 original assertions and prototype inputs
+      undefined, null, true, 'str', Symbol(), 1. Only the original
+      source compilation remains. Maintainer decision 2026-10-28 item
+      1 applies only after every non-source subject has passing
+      replacement evidence. Reopen on changed original source,
+      observation or replacement evidence, an accepted ADR 0016
+      amendment admitting the source form, or the ADR 0019 non-source
+      dependence trigger.
+    replacementEvidence:
+      tests/fixtures/ds19-realm/array.js.txt:
+        "caad3f8e9b51e2f6c1e9237e91e47657571ac72288cb7720\
+        d74e205c53dc6279"
+      tests/dynamic-source-realm-host-evidence.test.ts:
+        "33fa8bc15819484524d930a99734d368c447ad95f1a7561b\
+        b553978437567194"
+  ds19-07:
+    disposition: exclusion
+    normativeDependency: source-evaluation-only
+    reason: Literal ahead-of-time foreign code witnesses Default
+      [[Prototype]] value derived from realm of the newTarget;
+      preserves the original assertion and prototype inputs null.
+      Only the original source compilation remains. Maintainer
+      decision 2026-10-28 item 1 applies only after every non-source
+      subject has passing replacement evidence. Reopen on changed
+      original source, observation or replacement evidence, an
+      accepted ADR 0016 amendment admitting the source form, or the
+      ADR 0019 non-source dependence trigger.
+    replacementEvidence:
+      tests/fixtures/ds19-realm/buffers.js.txt:
+        "3412ab04c3986952bfbeb46387e46ea53e41a1b3f7385f5e\
+        1d420fe14e4082cd"
+      tests/dynamic-source-realm-host-evidence.test.ts:
+        "33fa8bc15819484524d930a99734d368c447ad95f1a7561b\
+        b553978437567194"
+  ds19-08:
+    disposition: exclusion
+    normativeDependency: source-evaluation-only
+    reason: Literal ahead-of-time foreign code witnesses Default
+      [[Prototype]] value derived from realm of the newTarget;
+      preserves the original assertion and prototype inputs null.
+      Only the original source compilation remains. Maintainer
+      decision 2026-10-28 item 1 applies only after every non-source
+      subject has passing replacement evidence. Reopen on changed
+      original source, observation or replacement evidence, an
+      accepted ADR 0016 amendment admitting the source form, or the
+      ADR 0019 non-source dependence trigger.
+    replacementEvidence:
+      tests/fixtures/ds19-realm/wrappers.js.txt:
+        "f20132eff2be2fdc1c744ddda002b18ad1c2b3f0fff30047\
+        3dbf25f68e04d11a"
+      tests/dynamic-source-realm-host-evidence.test.ts:
+        "33fa8bc15819484524d930a99734d368c447ad95f1a7561b\
+        b553978437567194"
+  ds19-09:
+    disposition: exclusion
+    normativeDependency: source-evaluation-only
+    reason: Literal ahead-of-time foreign code witnesses Default
+      [[Prototype]] value derived from realm of the newTarget;
+      preserves the original assertion and prototype inputs null.
+      Only the original source compilation remains. Maintainer
+      decision 2026-10-28 item 1 applies only after every non-source
+      subject has passing replacement evidence. Reopen on changed
+      original source, observation or replacement evidence, an
+      accepted ADR 0016 amendment admitting the source form, or the
+      ADR 0019 non-source dependence trigger.
+    replacementEvidence:
+      tests/fixtures/ds19-realm/buffers.js.txt:
+        "3412ab04c3986952bfbeb46387e46ea53e41a1b3f7385f5e\
+        1d420fe14e4082cd"
+      tests/dynamic-source-realm-host-evidence.test.ts:
+        "33fa8bc15819484524d930a99734d368c447ad95f1a7561b\
+        b553978437567194"
+  ds19-10:
+    disposition: exclusion
+    normativeDependency: source-evaluation-only
+    reason: Literal ahead-of-time foreign code witnesses Default
+      [[Prototype]] value derived from realm of the newTarget;
+      preserves the original assertion and prototype inputs null.
+      Only the original source compilation remains. Maintainer
+      decision 2026-10-28 item 1 applies only after every non-source
+      subject has passing replacement evidence. Reopen on changed
+      original source, observation or replacement evidence, an
+      accepted ADR 0016 amendment admitting the source form, or the
+      ADR 0019 non-source dependence trigger.
+    replacementEvidence:
+      tests/fixtures/ds19-realm/buffers.js.txt:
+        "3412ab04c3986952bfbeb46387e46ea53e41a1b3f7385f5e\
+        1d420fe14e4082cd"
+      tests/dynamic-source-realm-host-evidence.test.ts:
+        "33fa8bc15819484524d930a99734d368c447ad95f1a7561b\
+        b553978437567194"
+  ds19-11:
+    disposition: exclusion
+    normativeDependency: source-evaluation-only
+    reason: Literal ahead-of-time foreign code witnesses Default
+      [[Prototype]] value derived from realm of the newTarget;
+      preserves the original assertion and prototype inputs null.
+      Only the original source compilation remains. Maintainer
+      decision 2026-10-28 item 1 applies only after every non-source
+      subject has passing replacement evidence. Reopen on changed
+      original source, observation or replacement evidence, an
+      accepted ADR 0016 amendment admitting the source form, or the
+      ADR 0019 non-source dependence trigger.
+    replacementEvidence:
+      tests/fixtures/ds19-realm/date.js.txt:
+        "80145916d1152c36ba8c12526899fdc55ff735f6dc5537b5\
+        0d9429f9017a7449"
+      tests/dynamic-source-realm-host-evidence.test.ts:
+        "33fa8bc15819484524d930a99734d368c447ad95f1a7561b\
+        b553978437567194"
+  ds19-12:
+    disposition: exclusion
+    normativeDependency: source-evaluation-only
+    reason: Literal ahead-of-time foreign code witnesses Default
+      [[Prototype]] value derived from realm of the newTarget;
+      preserves the original assertion and prototype inputs null.
+      Only the original source compilation remains. Maintainer
+      decision 2026-10-28 item 1 applies only after every non-source
+      subject has passing replacement evidence. Reopen on changed
+      original source, observation or replacement evidence, an
+      accepted ADR 0016 amendment admitting the source form, or the
+      ADR 0019 non-source dependence trigger.
+    replacementEvidence:
+      tests/fixtures/ds19-realm/date.js.txt:
+        "80145916d1152c36ba8c12526899fdc55ff735f6dc5537b5\
+        0d9429f9017a7449"
+      tests/dynamic-source-realm-host-evidence.test.ts:
+        "33fa8bc15819484524d930a99734d368c447ad95f1a7561b\
+        b553978437567194"
+  ds19-13:
+    disposition: exclusion
+    normativeDependency: source-evaluation-only
+    reason: Literal ahead-of-time foreign code witnesses Default
+      [[Prototype]] value derived from realm of the newTarget;
+      preserves the original assertion and prototype inputs null.
+      Only the original source compilation remains. Maintainer
+      decision 2026-10-28 item 1 applies only after every non-source
+      subject has passing replacement evidence. Reopen on changed
+      original source, observation or replacement evidence, an
+      accepted ADR 0016 amendment admitting the source form, or the
+      ADR 0019 non-source dependence trigger.
+    replacementEvidence:
+      tests/fixtures/ds19-realm/date.js.txt:
+        "80145916d1152c36ba8c12526899fdc55ff735f6dc5537b5\
+        0d9429f9017a7449"
+      tests/dynamic-source-realm-host-evidence.test.ts:
+        "33fa8bc15819484524d930a99734d368c447ad95f1a7561b\
+        b553978437567194"
+  ds19-14:
+    disposition: exclusion
+    normativeDependency: source-evaluation-only
+    reason: Literal ahead-of-time foreign code witnesses Default
+      [[Prototype]] value derived from realm of the newTarget;
+      preserves the original assertion and prototype inputs null.
+      Only the original source compilation remains. Maintainer
+      decision 2026-10-28 item 1 applies only after every non-source
+      subject has passing replacement evidence. Reopen on changed
+      original source, observation or replacement evidence, an
+      accepted ADR 0016 amendment admitting the source form, or the
+      ADR 0019 non-source dependence trigger.
+    replacementEvidence:
+      tests/fixtures/ds19-realm/collections-errors.js.txt:
+        "3dbfd18e6663dd1a604faa4e03b949009ce0d5ac7e11fdc6\
+        c5cd70dc99451878"
+      tests/dynamic-source-realm-host-evidence.test.ts:
+        "33fa8bc15819484524d930a99734d368c447ad95f1a7561b\
+        b553978437567194"
+  ds19-15:
+    disposition: exclusion
+    normativeDependency: source-evaluation-only
+    reason: Literal ahead-of-time foreign code witnesses Default
+      [[Prototype]] value derived from realm of the newTarget;
+      preserves all 6 original assertions and prototype inputs
+      undefined, null, true, '', Symbol(), 1. Only the original source
+      compilation remains. Maintainer decision 2026-10-28 item 1
+      applies only after every non-source subject has passing
+      replacement evidence. Reopen on changed original source,
+      observation or replacement evidence, an accepted ADR 0016
+      amendment admitting the source form, or the ADR 0019 non-source
+      dependence trigger.
+    replacementEvidence:
+      tests/fixtures/ds19-realm/weak.js.txt:
+        "e8e6b82e041b3243e289978d6ac59059bd1341b15114a49b\
+        eb3567b2dcd27f9c"
+      tests/dynamic-source-realm-host-evidence.test.ts:
+        "33fa8bc15819484524d930a99734d368c447ad95f1a7561b\
+        b553978437567194"
+  ds19-16:
+    disposition: exclusion
+    normativeDependency: source-evaluation-only
+    reason: Literal ahead-of-time foreign code witnesses The "this" value
+      is set to the global This value; preserves all 3 original
+      assertions. Only the original source compilation remains.
+      Maintainer decision 2026-10-28 item 1 applies only after every
+      non-source subject has passing replacement evidence. Reopen on
+      changed original source, observation or replacement evidence, an
+      accepted ADR 0016 amendment admitting the source form, or the
+      ADR 0019 non-source dependence trigger.
+    replacementEvidence:
+      tests/fixtures/ds19-realm/call-this-apply.js.txt:
+        "08613f09d833312122887ea120715c63d3d9a53bcd2f2273\
+        2eb650690ecb998f"
+      tests/dynamic-source-realm-host-evidence.test.ts:
+        "33fa8bc15819484524d930a99734d368c447ad95f1a7561b\
+        b553978437567194"
+  ds19-17:
+    disposition: exclusion
+    normativeDependency: source-evaluation-only
+    reason: Literal ahead-of-time foreign code witnesses The "this" value
+      is wrapped in an object using the callee realm; preserves all 8
+      original assertions. Only the original source compilation
+      remains. Maintainer decision 2026-10-28 item 1 applies only
+      after every non-source subject has passing replacement evidence.
+      Reopen on changed original source, observation or replacement
+      evidence, an accepted ADR 0016 amendment admitting the source
+      form, or the ADR 0019 non-source dependence trigger.
+    replacementEvidence:
+      tests/fixtures/ds19-realm/call-this-apply.js.txt:
+        "08613f09d833312122887ea120715c63d3d9a53bcd2f2273\
+        2eb650690ecb998f"
+      tests/dynamic-source-realm-host-evidence.test.ts:
+        "33fa8bc15819484524d930a99734d368c447ad95f1a7561b\
+        b553978437567194"
+  ds19-18:
+    disposition: exclusion
+    normativeDependency: source-evaluation-only
+    reason: Literal ahead-of-time foreign code witnesses Error when
+      invoking a default class constructor, honoring the Realm that
+      the class was defined in; preserves the original assertion.
+      Only the original source compilation remains. Maintainer
+      decision 2026-10-28 item 1 applies only after every non-source
+      subject has passing replacement evidence. Reopen on changed
+      original source, observation or replacement evidence, an
+      accepted ADR 0016 amendment admitting the source form, or the
+      ADR 0019 non-source dependence trigger.
+    replacementEvidence:
+      tests/fixtures/ds19-realm/class-call.js.txt:
+        "b51e578feb1409416b6a97feeb39e9ae70f58573abee3dda\
+        87e828d8e7b168e7"
+      tests/dynamic-source-realm-host-evidence.test.ts:
+        "33fa8bc15819484524d930a99734d368c447ad95f1a7561b\
+        b553978437567194"
+  ds19-19:
+    disposition: remediation
+    normativeDependency: not-demonstrated
+    reason: The retained ahead-of-time foreign derived-class witness fails
+      the original caller-realm TypeError assertion under the disabled
+      native policy. This is an uncovered ordinary [[Construct]]
+      error-realm contract, not source evaluation; the path stays with
+      the umbrella pending a runtime repair and reviewed passing
+      native evidence. The normative assertion is retained unchanged.
+      Maintainer decision 2026-10-28 item 1 applies only after every
+      non-source subject has passing replacement evidence. Reopen on
+      changed original source, observation or replacement evidence, an
+      accepted ADR 0016 amendment admitting the source form, or the
+      ADR 0019 non-source dependence trigger.
+    replacementEvidence:
+      tests/fixtures/ds19-realm/derived-return.js.txt:
+        "ba537c1b6b27582f10a2d4f0fac920fd3a114fe4d22f8b6c\
+        db9702938af6c52a"
+      tests/dynamic-source-realm-host-evidence.test.ts:
+        "33fa8bc15819484524d930a99734d368c447ad95f1a7561b\
+        b553978437567194"
+  ds19-20:
+    disposition: remediation
+    normativeDependency: not-demonstrated
+    reason: The retained ahead-of-time foreign derived-class witness fails
+      the original caller-realm ReferenceError assertion under the
+      disabled native policy. This is an uncovered ordinary
+      [[Construct]] error-realm contract, not source evaluation; the
+      path stays with the umbrella pending a runtime repair and
+      reviewed passing native evidence. The normative assertion is
+      retained unchanged. Maintainer decision 2026-10-28 item 1
+      applies only after every non-source subject has passing
+      replacement evidence. Reopen on changed original source,
+      observation or replacement evidence, an accepted ADR 0016
+      amendment admitting the source form, or the ADR 0019 non-source
+      dependence trigger.
+    replacementEvidence:
+      tests/fixtures/ds19-realm/derived-this.js.txt:
+        "c1cb8d0db71d360241a0b7c5027f87fe8168117f8863a929\
+        bcf038aad6718b64"
+      tests/dynamic-source-realm-host-evidence.test.ts:
+        "33fa8bc15819484524d930a99734d368c447ad95f1a7561b\
+        b553978437567194"
+  ds19-21:
+    disposition: exclusion
+    normativeDependency: source-evaluation-only
+    reason: The ordinary newTarget witness covers generic realm fallback.
+      The foreign ordinary function separately checks its prototype
+      inherits from its own realm's Object.prototype, constructing it
+      produces an instance of that Object, and executing its body
+      updates calls in that realm. The combination of
+      constructor/newTarget realms in a dynamically created Function
+      remains CreateDynamicFunction itself. Maintainer decision
+      2026-10-28 item 1 applies only after every non-source subject
+      has passing replacement evidence. Reopen on changed original
+      source, observation or replacement evidence, an accepted ADR
+      0016 amendment admitting the source form, or the ADR 0019
+      non-source dependence trigger.
+    replacementEvidence:
+      tests/fixtures/ds19-realm/function-creation.js.txt:
+        "48ea091945356e6a790b357f8da9376ae2c9ab68d40a7b96\
+        460992d54220a506"
+      tests/dynamic-source-realm-host-evidence.test.ts:
+        "33fa8bc15819484524d930a99734d368c447ad95f1a7561b\
+        b553978437567194"
+  ds19-22:
+    disposition: exclusion
+    normativeDependency: source-evaluation-only
+    reason: The ordinary foreign newTarget witness observes generic
+      GetPrototypeFromConstructor/GetFunctionRealm fallback to that
+      realm's intrinsic without a bound or Proxy substitute. The
+      Function-specific returned callable and its Function prototype
+      arise only from CreateDynamicFunction, inside ADR 0016; no
+      additional ordinary-call subject occurs. Maintainer decision
+      2026-10-28 item 1 applies only after every non-source subject
+      has passing replacement evidence. Reopen on changed original
+      source, observation or replacement evidence, an accepted ADR
+      0016 amendment admitting the source form, or the ADR 0019
+      non-source dependence trigger.
+    replacementEvidence:
+      tests/fixtures/ds19-realm/function-creation.js.txt:
+        "48ea091945356e6a790b357f8da9376ae2c9ab68d40a7b96\
+        460992d54220a506"
+      tests/dynamic-source-realm-host-evidence.test.ts:
+        "33fa8bc15819484524d930a99734d368c447ad95f1a7561b\
+        b553978437567194"
+  ds19-23:
+    disposition: exclusion
+    normativeDependency: source-evaluation-only
+    reason: Literal ahead-of-time foreign code witnesses Throws a
+      TypeError exception if argArray is not an object (honoring the
+      Realm of the current execution context); preserves all 4
+      original assertions. Only the original source compilation
+      remains. Maintainer decision 2026-10-28 item 1 applies only
+      after every non-source subject has passing replacement evidence.
+      Reopen on changed original source, observation or replacement
+      evidence, an accepted ADR 0016 amendment admitting the source
+      form, or the ADR 0019 non-source dependence trigger.
+    replacementEvidence:
+      tests/fixtures/ds19-realm/call-this-apply.js.txt:
+        "08613f09d833312122887ea120715c63d3d9a53bcd2f2273\
+        2eb650690ecb998f"
+      tests/dynamic-source-realm-host-evidence.test.ts:
+        "33fa8bc15819484524d930a99734d368c447ad95f1a7561b\
+        b553978437567194"
+  ds19-24:
+    disposition: exclusion
+    normativeDependency: source-evaluation-only
+    reason: Literal ahead-of-time foreign code witnesses The realm of a
+      bound function exotic object is the realm of its target
+      function. GetFunctionRealm is called recursively; preserves all
+      2 original assertions and prototype inputs 1. Only the original
+      source compilation remains. Maintainer decision 2026-10-28 item
+      1 applies only after every non-source subject has passing
+      replacement evidence. Reopen on changed original source,
+      observation or replacement evidence, an accepted ADR 0016
+      amendment admitting the source form, or the ADR 0019 non-source
+      dependence trigger.
+    replacementEvidence:
+      tests/fixtures/ds19-realm/bound.js.txt:
+        "b62edd09264493440f9a854590a63ac6f78a7cd1eec9953a\
+        2992d293aea22fc1"
+      tests/dynamic-source-realm-host-evidence.test.ts:
+        "33fa8bc15819484524d930a99734d368c447ad95f1a7561b\
+        b553978437567194"
+  ds19-25:
+    disposition: exclusion
+    normativeDependency: source-evaluation-only
+    reason: Literal ahead-of-time foreign code witnesses The realm of a
+      bound function exotic object is the realm of its target
+      function; preserves all 2 original assertions and prototype
+      inputs "str". Only the original source compilation remains.
+      Maintainer decision 2026-10-28 item 1 applies only after every
+      non-source subject has passing replacement evidence. Reopen on
+      changed original source, observation or replacement evidence, an
+      accepted ADR 0016 amendment admitting the source form, or the
+      ADR 0019 non-source dependence trigger.
+    replacementEvidence:
+      tests/fixtures/ds19-realm/bound.js.txt:
+        "b62edd09264493440f9a854590a63ac6f78a7cd1eec9953a\
+        2992d293aea22fc1"
+      tests/dynamic-source-realm-host-evidence.test.ts:
+        "33fa8bc15819484524d930a99734d368c447ad95f1a7561b\
+        b553978437567194"
+  ds19-26:
+    disposition: exclusion
+    normativeDependency: source-evaluation-only
+    reason: Literal ahead-of-time foreign code witnesses Default
+      [[Prototype]] value derived from realm of the constructor;
+      preserves the original assertion and prototype inputs null.
+      Only the original source compilation remains. Maintainer
+      decision 2026-10-28 item 1 applies only after every non-source
+      subject has passing replacement evidence. Reopen on changed
+      original source, observation or replacement evidence, an
+      accepted ADR 0016 amendment admitting the source form, or the
+      ADR 0019 non-source dependence trigger.
+    replacementEvidence:
+      tests/fixtures/ds19-realm/bound.js.txt:
+        "b62edd09264493440f9a854590a63ac6f78a7cd1eec9953a\
+        2992d293aea22fc1"
+      tests/dynamic-source-realm-host-evidence.test.ts:
+        "33fa8bc15819484524d930a99734d368c447ad95f1a7561b\
+        b553978437567194"
+  ds19-27:
+    disposition: exclusion
+    normativeDependency: source-evaluation-only
+    reason: Literal ahead-of-time foreign code witnesses Default
+      [[Prototype]] value derived from realm of the NewTarget;
+      preserves all 6 original assertions and prototype inputs
+      undefined, null, true, '', Symbol(), 0. Only the original source
+      compilation remains. Maintainer decision 2026-10-28 item 1
+      applies only after every non-source subject has passing
+      replacement evidence. Reopen on changed original source,
+      observation or replacement evidence, an accepted ADR 0016
+      amendment admitting the source form, or the ADR 0019 non-source
+      dependence trigger.
+    replacementEvidence:
+      tests/fixtures/ds19-realm/collections-errors.js.txt:
+        "3dbfd18e6663dd1a604faa4e03b949009ce0d5ac7e11fdc6\
+        c5cd70dc99451878"
+      tests/dynamic-source-realm-host-evidence.test.ts:
+        "33fa8bc15819484524d930a99734d368c447ad95f1a7561b\
+        b553978437567194"
+  ds19-28:
+    disposition: exclusion
+    normativeDependency: source-evaluation-only
+    reason: Literal ahead-of-time foreign code witnesses Default
+      [[Prototype]] value derived from realm of the newTarget;
+      preserves the original assertion and prototype inputs null.
+      Only the original source compilation remains. Maintainer
+      decision 2026-10-28 item 1 applies only after every non-source
+      subject has passing replacement evidence. Reopen on changed
+      original source, observation or replacement evidence, an
+      accepted ADR 0016 amendment admitting the source form, or the
+      ADR 0019 non-source dependence trigger.
+    replacementEvidence:
+      tests/fixtures/ds19-realm/collections-errors.js.txt:
+        "3dbfd18e6663dd1a604faa4e03b949009ce0d5ac7e11fdc6\
+        c5cd70dc99451878"
+      tests/dynamic-source-realm-host-evidence.test.ts:
+        "33fa8bc15819484524d930a99734d368c447ad95f1a7561b\
+        b553978437567194"
+  ds19-29:
+    disposition: exclusion
+    normativeDependency: source-evaluation-only
+    reason: Literal ahead-of-time foreign code witnesses Default
+      [[Prototype]] value derived from realm of the NewTarget;
+      preserves all 6 original assertions and prototype inputs
+      undefined, null, false, 'str', Symbol(), 0. Only the original
+      source compilation remains. Maintainer decision 2026-10-28 item
+      1 applies only after every non-source subject has passing
+      replacement evidence. Reopen on changed original source,
+      observation or replacement evidence, an accepted ADR 0016
+      amendment admitting the source form, or the ADR 0019 non-source
+      dependence trigger.
+    replacementEvidence:
+      tests/fixtures/ds19-realm/native-errors.js.txt:
+        "8ef7cc5c8851671f7ad5fedae2a3a476c27845acdfe783be\
+        1ec3d8d4038a69f1"
+      tests/dynamic-source-realm-host-evidence.test.ts:
+        "33fa8bc15819484524d930a99734d368c447ad95f1a7561b\
+        b553978437567194"
+  ds19-30:
+    disposition: exclusion
+    normativeDependency: source-evaluation-only
+    reason: Literal ahead-of-time foreign code witnesses Default
+      [[Prototype]] value derived from realm of the NewTarget;
+      preserves all 6 original assertions and prototype inputs
+      undefined, null, true, '', Symbol(), -0. Only the original
+      source compilation remains. Maintainer decision 2026-10-28 item
+      1 applies only after every non-source subject has passing
+      replacement evidence. Reopen on changed original source,
+      observation or replacement evidence, an accepted ADR 0016
+      amendment admitting the source form, or the ADR 0019 non-source
+      dependence trigger.
+    replacementEvidence:
+      tests/fixtures/ds19-realm/native-errors.js.txt:
+        "8ef7cc5c8851671f7ad5fedae2a3a476c27845acdfe783be\
+        1ec3d8d4038a69f1"
+      tests/dynamic-source-realm-host-evidence.test.ts:
+        "33fa8bc15819484524d930a99734d368c447ad95f1a7561b\
+        b553978437567194"
+  ds19-31:
+    disposition: exclusion
+    normativeDependency: source-evaluation-only
+    reason: Literal ahead-of-time foreign code witnesses Default
+      [[Prototype]] value derived from realm of the NewTarget;
+      preserves all 6 original assertions and prototype inputs
+      undefined, null, false, 'str', Symbol(), NaN. Only the original
+      source compilation remains. Maintainer decision 2026-10-28 item
+      1 applies only after every non-source subject has passing
+      replacement evidence. Reopen on changed original source,
+      observation or replacement evidence, an accepted ADR 0016
+      amendment admitting the source form, or the ADR 0019 non-source
+      dependence trigger.
+    replacementEvidence:
+      tests/fixtures/ds19-realm/native-errors.js.txt:
+        "8ef7cc5c8851671f7ad5fedae2a3a476c27845acdfe783be\
+        1ec3d8d4038a69f1"
+      tests/dynamic-source-realm-host-evidence.test.ts:
+        "33fa8bc15819484524d930a99734d368c447ad95f1a7561b\
+        b553978437567194"
+  ds19-32:
+    disposition: exclusion
+    normativeDependency: source-evaluation-only
+    reason: Literal ahead-of-time foreign code witnesses Default
+      [[Prototype]] value derived from realm of the NewTarget;
+      preserves all 6 original assertions and prototype inputs
+      undefined, null, true, '', Symbol(), Infinity. Only the original
+      source compilation remains. Maintainer decision 2026-10-28 item
+      1 applies only after every non-source subject has passing
+      replacement evidence. Reopen on changed original source,
+      observation or replacement evidence, an accepted ADR 0016
+      amendment admitting the source form, or the ADR 0019 non-source
+      dependence trigger.
+    replacementEvidence:
+      tests/fixtures/ds19-realm/native-errors.js.txt:
+        "8ef7cc5c8851671f7ad5fedae2a3a476c27845acdfe783be\
+        1ec3d8d4038a69f1"
+      tests/dynamic-source-realm-host-evidence.test.ts:
+        "33fa8bc15819484524d930a99734d368c447ad95f1a7561b\
+        b553978437567194"
+  ds19-33:
+    disposition: exclusion
+    normativeDependency: source-evaluation-only
+    reason: Literal ahead-of-time foreign code witnesses Default
+      [[Prototype]] value derived from realm of the NewTarget;
+      preserves all 6 original assertions and prototype inputs
+      undefined, null, false, 'str', Symbol(), -Infinity. Only the
+      original source compilation remains. Maintainer decision
+      2026-10-28 item 1 applies only after every non-source subject
+      has passing replacement evidence. Reopen on changed original
+      source, observation or replacement evidence, an accepted ADR
+      0016 amendment admitting the source form, or the ADR 0019
+      non-source dependence trigger.
+    replacementEvidence:
+      tests/fixtures/ds19-realm/native-errors.js.txt:
+        "8ef7cc5c8851671f7ad5fedae2a3a476c27845acdfe783be\
+        1ec3d8d4038a69f1"
+      tests/dynamic-source-realm-host-evidence.test.ts:
+        "33fa8bc15819484524d930a99734d368c447ad95f1a7561b\
+        b553978437567194"
+  ds19-34:
+    disposition: exclusion
+    normativeDependency: source-evaluation-only
+    reason: Literal ahead-of-time foreign code witnesses Default
+      [[Prototype]] value derived from realm of the NewTarget;
+      preserves all 6 original assertions and prototype inputs
+      undefined, null, true, '', Symbol(), 0. Only the original source
+      compilation remains. Maintainer decision 2026-10-28 item 1
+      applies only after every non-source subject has passing
+      replacement evidence. Reopen on changed original source,
+      observation or replacement evidence, an accepted ADR 0016
+      amendment admitting the source form, or the ADR 0019 non-source
+      dependence trigger.
+    replacementEvidence:
+      tests/fixtures/ds19-realm/native-errors.js.txt:
+        "8ef7cc5c8851671f7ad5fedae2a3a476c27845acdfe783be\
+        1ec3d8d4038a69f1"
+      tests/dynamic-source-realm-host-evidence.test.ts:
+        "33fa8bc15819484524d930a99734d368c447ad95f1a7561b\
+        b553978437567194"
+  ds19-35:
+    disposition: exclusion
+    normativeDependency: source-evaluation-only
+    reason: Literal ahead-of-time foreign code witnesses Default
+      [[Prototype]] value derived from realm of the newTarget;
+      preserves the original assertion and prototype inputs null.
+      Only the original source compilation remains. Maintainer
+      decision 2026-10-28 item 1 applies only after every non-source
+      subject has passing replacement evidence. Reopen on changed
+      original source, observation or replacement evidence, an
+      accepted ADR 0016 amendment admitting the source form, or the
+      ADR 0019 non-source dependence trigger.
+    replacementEvidence:
+      tests/fixtures/ds19-realm/wrappers.js.txt:
+        "f20132eff2be2fdc1c744ddda002b18ad1c2b3f0fff30047\
+        3dbf25f68e04d11a"
+      tests/dynamic-source-realm-host-evidence.test.ts:
+        "33fa8bc15819484524d930a99734d368c447ad95f1a7561b\
+        b553978437567194"
+  ds19-36:
+    disposition: exclusion
+    normativeDependency: source-evaluation-only
+    reason: Literal ahead-of-time foreign code witnesses Default
+      [[Prototype]] value derived from realm of the newTarget;
+      preserves the original assertion and prototype inputs null.
+      Only the original source compilation remains. Maintainer
+      decision 2026-10-28 item 1 applies only after every non-source
+      subject has passing replacement evidence. Reopen on changed
+      original source, observation or replacement evidence, an
+      accepted ADR 0016 amendment admitting the source form, or the
+      ADR 0019 non-source dependence trigger.
+    replacementEvidence:
+      tests/fixtures/ds19-realm/collections-errors.js.txt:
+        "3dbfd18e6663dd1a604faa4e03b949009ce0d5ac7e11fdc6\
+        c5cd70dc99451878"
+      tests/dynamic-source-realm-host-evidence.test.ts:
+        "33fa8bc15819484524d930a99734d368c447ad95f1a7561b\
+        b553978437567194"
+  ds19-37:
+    disposition: exclusion
+    normativeDependency: source-evaluation-only
+    reason: Literal ahead-of-time foreign code witnesses Default
+      [[Prototype]] value derived from realm of the newTarget;
+      preserves the original assertion and prototype inputs null.
+      Only the original source compilation remains. Maintainer
+      decision 2026-10-28 item 1 applies only after every non-source
+      subject has passing replacement evidence. Reopen on changed
+      original source, observation or replacement evidence, an
+      accepted ADR 0016 amendment admitting the source form, or the
+      ADR 0019 non-source dependence trigger.
+    replacementEvidence:
+      tests/fixtures/ds19-realm/collections-errors.js.txt:
+        "3dbfd18e6663dd1a604faa4e03b949009ce0d5ac7e11fdc6\
+        c5cd70dc99451878"
+      tests/dynamic-source-realm-host-evidence.test.ts:
+        "33fa8bc15819484524d930a99734d368c447ad95f1a7561b\
+        b553978437567194"
+  ds19-38:
+    disposition: exclusion
+    normativeDependency: source-evaluation-only
+    reason: Literal ahead-of-time foreign code witnesses Arguments array
+      is created in the Realm of the current execution context;
+      preserves the original assertion. Only the original source
+      compilation remains. Maintainer decision 2026-10-28 item 1
+      applies only after every non-source subject has passing
+      replacement evidence. Reopen on changed original source,
+      observation or replacement evidence, an accepted ADR 0016
+      amendment admitting the source form, or the ADR 0019 non-source
+      dependence trigger.
+    replacementEvidence:
+      tests/fixtures/ds19-realm/proxy.js.txt:
+        "f5279728c927e16878f40902154f7f5c0a0d63ff13d0a7cb\
+        e334360496f5ec13"
+      tests/dynamic-source-realm-host-evidence.test.ts:
+        "33fa8bc15819484524d930a99734d368c447ad95f1a7561b\
+        b553978437567194"
+  ds19-39:
+    disposition: exclusion
+    normativeDependency: source-evaluation-only
+    reason: Literal ahead-of-time foreign code witnesses Arguments array
+      is created in the Realm of the current execution context;
+      preserves the original assertion. Only the original source
+      compilation remains. Maintainer decision 2026-10-28 item 1
+      applies only after every non-source subject has passing
+      replacement evidence. Reopen on changed original source,
+      observation or replacement evidence, an accepted ADR 0016
+      amendment admitting the source form, or the ADR 0019 non-source
+      dependence trigger.
+    replacementEvidence:
+      tests/fixtures/ds19-realm/proxy.js.txt:
+        "f5279728c927e16878f40902154f7f5c0a0d63ff13d0a7cb\
+        e334360496f5ec13"
+      tests/dynamic-source-realm-host-evidence.test.ts:
+        "33fa8bc15819484524d930a99734d368c447ad95f1a7561b\
+        b553978437567194"
+  ds19-40:
+    disposition: exclusion
+    normativeDependency: source-evaluation-only
+    reason: Literal ahead-of-time foreign code witnesses If trap is
+      undefined, propagate [[Construct]] to target, passing correct
+      newTarget parameter; preserves the original assertion. Only
+      the original source compilation remains. Maintainer decision
+      2026-10-28 item 1 applies only after every non-source subject
+      has passing replacement evidence. Reopen on changed original
+      source, observation or replacement evidence, an accepted ADR
+      0016 amendment admitting the source form, or the ADR 0019
+      non-source dependence trigger.
+    replacementEvidence:
+      tests/fixtures/ds19-realm/proxy.js.txt:
+        "f5279728c927e16878f40902154f7f5c0a0d63ff13d0a7cb\
+        e334360496f5ec13"
+      tests/dynamic-source-realm-host-evidence.test.ts:
+        "33fa8bc15819484524d930a99734d368c447ad95f1a7561b\
+        b553978437567194"
+  ds19-41:
+    disposition: exclusion
+    normativeDependency: source-evaluation-only
+    reason: Literal ahead-of-time foreign code witnesses If trap is
+      undefined, propagate [[Construct]] to target, passing correct
+      newTarget parameter; preserves the original assertion and
+      prototype inputs null. Only the original source compilation
+      remains. Maintainer decision 2026-10-28 item 1 applies only
+      after every non-source subject has passing replacement evidence.
+      Reopen on changed original source, observation or replacement
+      evidence, an accepted ADR 0016 amendment admitting the source
+      form, or the ADR 0019 non-source dependence trigger.
+    replacementEvidence:
+      tests/fixtures/ds19-realm/proxy.js.txt:
+        "f5279728c927e16878f40902154f7f5c0a0d63ff13d0a7cb\
+        e334360496f5ec13"
+      tests/dynamic-source-realm-host-evidence.test.ts:
+        "33fa8bc15819484524d930a99734d368c447ad95f1a7561b\
+        b553978437567194"
+  ds19-42:
+    disposition: exclusion
+    normativeDependency: source-evaluation-only
+    reason: Literal ahead-of-time foreign code witnesses The realm of a
+      Proxy exotic object is the realm of its target function.
+      GetFunctionRealm is called recursively; preserves all 2 original
+      assertions and prototype inputs null. Only the original source
+      compilation remains. Maintainer decision 2026-10-28 item 1
+      applies only after every non-source subject has passing
+      replacement evidence. Reopen on changed original source,
+      observation or replacement evidence, an accepted ADR 0016
+      amendment admitting the source form, or the ADR 0019 non-source
+      dependence trigger.
+    replacementEvidence:
+      tests/fixtures/ds19-realm/proxy.js.txt:
+        "f5279728c927e16878f40902154f7f5c0a0d63ff13d0a7cb\
+        e334360496f5ec13"
+      tests/dynamic-source-realm-host-evidence.test.ts:
+        "33fa8bc15819484524d930a99734d368c447ad95f1a7561b\
+        b553978437567194"
+  ds19-43:
+    disposition: exclusion
+    normativeDependency: source-evaluation-only
+    reason: Literal ahead-of-time foreign code witnesses The realm of a
+      Proxy exotic object is the realm of its target function;
+      preserves all 2 original assertions and prototype inputs false.
+      Only the original source compilation remains. Maintainer
+      decision 2026-10-28 item 1 applies only after every non-source
+      subject has passing replacement evidence. Reopen on changed
+      original source, observation or replacement evidence, an
+      accepted ADR 0016 amendment admitting the source form, or the
+      ADR 0019 non-source dependence trigger.
+    replacementEvidence:
+      tests/fixtures/ds19-realm/proxy.js.txt:
+        "f5279728c927e16878f40902154f7f5c0a0d63ff13d0a7cb\
+        e334360496f5ec13"
+      tests/dynamic-source-realm-host-evidence.test.ts:
+        "33fa8bc15819484524d930a99734d368c447ad95f1a7561b\
+        b553978437567194"
+  ds19-44:
+    disposition: exclusion
+    normativeDependency: source-evaluation-only
+    reason: Literal ahead-of-time foreign code witnesses Default
+      [[Prototype]] value derived from realm of the newTarget;
+      preserves the original assertion and prototype inputs null.
+      Only the original source compilation remains. Maintainer
+      decision 2026-10-28 item 1 applies only after every non-source
+      subject has passing replacement evidence. Reopen on changed
+      original source, observation or replacement evidence, an
+      accepted ADR 0016 amendment admitting the source form, or the
+      ADR 0019 non-source dependence trigger.
+    replacementEvidence:
+      tests/fixtures/ds19-realm/regexp.js.txt:
+        "b5fe5ff81608358de6b65f8387a983a2ac7b4f79dc00e707\
+        4570359959d6f997"
+      tests/dynamic-source-realm-host-evidence.test.ts:
+        "33fa8bc15819484524d930a99734d368c447ad95f1a7561b\
+        b553978437567194"
+  ds19-45:
+    disposition: exclusion
+    normativeDependency: source-evaluation-only
+    reason: Literal ahead-of-time foreign code witnesses Default
+      [[Prototype]] value derived from realm of the constructor;
+      preserves the original assertion and prototype inputs null.
+      Only the original source compilation remains. Maintainer
+      decision 2026-10-28 item 1 applies only after every non-source
+      subject has passing replacement evidence. Reopen on changed
+      original source, observation or replacement evidence, an
+      accepted ADR 0016 amendment admitting the source form, or the
+      ADR 0019 non-source dependence trigger.
+    replacementEvidence:
+      tests/fixtures/ds19-realm/regexp.js.txt:
+        "b5fe5ff81608358de6b65f8387a983a2ac7b4f79dc00e707\
+        4570359959d6f997"
+      tests/dynamic-source-realm-host-evidence.test.ts:
+        "33fa8bc15819484524d930a99734d368c447ad95f1a7561b\
+        b553978437567194"
+  ds19-46:
+    disposition: exclusion
+    normativeDependency: source-evaluation-only
+    reason: Literal ahead-of-time foreign code witnesses Default
+      [[Prototype]] value derived from realm of the newTarget;
+      preserves the original assertion and prototype inputs null.
+      Only the original source compilation remains. Maintainer
+      decision 2026-10-28 item 1 applies only after every non-source
+      subject has passing replacement evidence. Reopen on changed
+      original source, observation or replacement evidence, an
+      accepted ADR 0016 amendment admitting the source form, or the
+      ADR 0019 non-source dependence trigger.
+    replacementEvidence:
+      tests/fixtures/ds19-realm/collections-errors.js.txt:
+        "3dbfd18e6663dd1a604faa4e03b949009ce0d5ac7e11fdc6\
+        c5cd70dc99451878"
+      tests/dynamic-source-realm-host-evidence.test.ts:
+        "33fa8bc15819484524d930a99734d368c447ad95f1a7561b\
+        b553978437567194"
+  ds19-47:
+    disposition: exclusion
+    normativeDependency: source-evaluation-only
+    reason: Literal ahead-of-time foreign code witnesses Default
+      [[Prototype]] value derived from realm of the newTarget;
+      preserves the original assertion and prototype inputs null.
+      Only the original source compilation remains. Maintainer
+      decision 2026-10-28 item 1 applies only after every non-source
+      subject has passing replacement evidence. Reopen on changed
+      original source, observation or replacement evidence, an
+      accepted ADR 0016 amendment admitting the source form, or the
+      ADR 0019 non-source dependence trigger.
+    replacementEvidence:
+      tests/fixtures/ds19-realm/buffers.js.txt:
+        "3412ab04c3986952bfbeb46387e46ea53e41a1b3f7385f5e\
+        1d420fe14e4082cd"
+      tests/dynamic-source-realm-host-evidence.test.ts:
+        "33fa8bc15819484524d930a99734d368c447ad95f1a7561b\
+        b553978437567194"
+  ds19-48:
+    disposition: exclusion
+    normativeDependency: source-evaluation-only
+    reason: Literal ahead-of-time foreign code witnesses Default
+      [[Prototype]] value derived from realm of the newTarget;
+      preserves the original assertion and prototype inputs null.
+      Only the original source compilation remains. Maintainer
+      decision 2026-10-28 item 1 applies only after every non-source
+      subject has passing replacement evidence. Reopen on changed
+      original source, observation or replacement evidence, an
+      accepted ADR 0016 amendment admitting the source form, or the
+      ADR 0019 non-source dependence trigger.
+    replacementEvidence:
+      tests/fixtures/ds19-realm/wrappers.js.txt:
+        "f20132eff2be2fdc1c744ddda002b18ad1c2b3f0fff30047\
+        3dbf25f68e04d11a"
+      tests/dynamic-source-realm-host-evidence.test.ts:
+        "33fa8bc15819484524d930a99734d368c447ad95f1a7561b\
+        b553978437567194"
+  ds19-49:
+    disposition: exclusion
+    normativeDependency: source-evaluation-only
+    reason: Literal ahead-of-time foreign code witnesses %ThrowTypeError%
+      is defined once for each realm; preserves all 4 original
+      assertions. Only the original source compilation remains.
+      Maintainer decision 2026-10-28 item 1 applies only after every
+      non-source subject has passing replacement evidence. Reopen on
+      changed original source, observation or replacement evidence, an
+      accepted ADR 0016 amendment admitting the source form, or the
+      ADR 0019 non-source dependence trigger.
+    replacementEvidence:
+      tests/fixtures/ds19-realm/throw-type-error.js.txt:
+        "c3cd677194a0f4f934fea39b4916912fa705af775e00a6e8\
+        e7a3e262f0439d09"
+      tests/dynamic-source-realm-host-evidence.test.ts:
+        "33fa8bc15819484524d930a99734d368c447ad95f1a7561b\
+        b553978437567194"
+  ds19-50:
+    disposition: exclusion
+    normativeDependency: source-evaluation-only
+    reason: Literal ahead-of-time foreign code witnesses Default
+      [[Prototype]] value derived from realm of the newTarget;
+      preserves the original assertion and prototype inputs null.
+      Only the original source compilation remains. Maintainer
+      decision 2026-10-28 item 1 applies only after every non-source
+      subject has passing replacement evidence. Reopen on changed
+      original source, observation or replacement evidence, an
+      accepted ADR 0016 amendment admitting the source form, or the
+      ADR 0019 non-source dependence trigger.
+    replacementEvidence:
+      tests/fixtures/ds19-realm/typedarray-bigint.js.txt:
+        "073f18367a3639a4e0cd8e08876b4cf7919e0637c28680c2\
+        6a1925aea7078315"
+      tests/dynamic-source-realm-host-evidence.test.ts:
+        "33fa8bc15819484524d930a99734d368c447ad95f1a7561b\
+        b553978437567194"
+  ds19-51:
+    disposition: exclusion
+    normativeDependency: source-evaluation-only
+    reason: Literal ahead-of-time foreign code witnesses Default
+      [[Prototype]] value derived from realm of the newTarget;
+      preserves the original assertion and prototype inputs null.
+      Only the original source compilation remains. Maintainer
+      decision 2026-10-28 item 1 applies only after every non-source
+      subject has passing replacement evidence. Reopen on changed
+      original source, observation or replacement evidence, an
+      accepted ADR 0016 amendment admitting the source form, or the
+      ADR 0019 non-source dependence trigger.
+    replacementEvidence:
+      tests/fixtures/ds19-realm/typedarray-bigint.js.txt:
+        "073f18367a3639a4e0cd8e08876b4cf7919e0637c28680c2\
+        6a1925aea7078315"
+      tests/dynamic-source-realm-host-evidence.test.ts:
+        "33fa8bc15819484524d930a99734d368c447ad95f1a7561b\
+        b553978437567194"
+  ds19-52:
+    disposition: exclusion
+    normativeDependency: source-evaluation-only
+    reason: Literal ahead-of-time foreign code witnesses Default
+      [[Prototype]] value derived from realm of the newTarget;
+      preserves the original assertion and prototype inputs null.
+      Only the original source compilation remains. Maintainer
+      decision 2026-10-28 item 1 applies only after every non-source
+      subject has passing replacement evidence. Reopen on changed
+      original source, observation or replacement evidence, an
+      accepted ADR 0016 amendment admitting the source form, or the
+      ADR 0019 non-source dependence trigger.
+    replacementEvidence:
+      tests/fixtures/ds19-realm/typedarray-bigint.js.txt:
+        "073f18367a3639a4e0cd8e08876b4cf7919e0637c28680c2\
+        6a1925aea7078315"
+      tests/dynamic-source-realm-host-evidence.test.ts:
+        "33fa8bc15819484524d930a99734d368c447ad95f1a7561b\
+        b553978437567194"
+  ds19-53:
+    disposition: exclusion
+    normativeDependency: source-evaluation-only
+    reason: Literal ahead-of-time foreign code witnesses Default
+      [[Prototype]] value derived from realm of the newTarget;
+      preserves the original assertion and prototype inputs null.
+      Only the original source compilation remains. Maintainer
+      decision 2026-10-28 item 1 applies only after every non-source
+      subject has passing replacement evidence. Reopen on changed
+      original source, observation or replacement evidence, an
+      accepted ADR 0016 amendment admitting the source form, or the
+      ADR 0019 non-source dependence trigger.
+    replacementEvidence:
+      tests/fixtures/ds19-realm/typedarray-bigint.js.txt:
+        "073f18367a3639a4e0cd8e08876b4cf7919e0637c28680c2\
+        6a1925aea7078315"
+      tests/dynamic-source-realm-host-evidence.test.ts:
+        "33fa8bc15819484524d930a99734d368c447ad95f1a7561b\
+        b553978437567194"
+  ds19-54:
+    disposition: exclusion
+    normativeDependency: source-evaluation-only
+    reason: Literal ahead-of-time foreign code witnesses Default
+      [[Prototype]] value derived from realm of the newTarget;
+      preserves the original assertion and prototype inputs null.
+      Only the original source compilation remains. Maintainer
+      decision 2026-10-28 item 1 applies only after every non-source
+      subject has passing replacement evidence. Reopen on changed
+      original source, observation or replacement evidence, an
+      accepted ADR 0016 amendment admitting the source form, or the
+      ADR 0019 non-source dependence trigger.
+    replacementEvidence:
+      tests/fixtures/ds19-realm/typedarray-bigint.js.txt:
+        "073f18367a3639a4e0cd8e08876b4cf7919e0637c28680c2\
+        6a1925aea7078315"
+      tests/dynamic-source-realm-host-evidence.test.ts:
+        "33fa8bc15819484524d930a99734d368c447ad95f1a7561b\
+        b553978437567194"
+  ds19-55:
+    disposition: exclusion
+    normativeDependency: source-evaluation-only
+    reason: Literal ahead-of-time foreign code witnesses Default
+      [[Prototype]] value derived from realm of the newTarget;
+      preserves the original assertion and prototype inputs null.
+      Only the original source compilation remains. Maintainer
+      decision 2026-10-28 item 1 applies only after every non-source
+      subject has passing replacement evidence. Reopen on changed
+      original source, observation or replacement evidence, an
+      accepted ADR 0016 amendment admitting the source form, or the
+      ADR 0019 non-source dependence trigger.
+    replacementEvidence:
+      tests/fixtures/ds19-realm/typedarray-bigint.js.txt:
+        "073f18367a3639a4e0cd8e08876b4cf7919e0637c28680c2\
+        6a1925aea7078315"
+      tests/dynamic-source-realm-host-evidence.test.ts:
+        "33fa8bc15819484524d930a99734d368c447ad95f1a7561b\
+        b553978437567194"
+  ds19-56:
+    disposition: exclusion
+    normativeDependency: source-evaluation-only
+    reason: Literal ahead-of-time foreign code witnesses Default
+      [[Prototype]] value derived from realm of the newTarget;
+      preserves the original assertion and prototype inputs null.
+      Only the original source compilation remains. Maintainer
+      decision 2026-10-28 item 1 applies only after every non-source
+      subject has passing replacement evidence. Reopen on changed
+      original source, observation or replacement evidence, an
+      accepted ADR 0016 amendment admitting the source form, or the
+      ADR 0019 non-source dependence trigger.
+    replacementEvidence:
+      tests/fixtures/ds19-realm/typedarray-number.js.txt:
+        "737a9958cbef3428359f766057662e1f803920e0a20ce6d1\
+        28d8eee3942ed0a3"
+      tests/dynamic-source-realm-host-evidence.test.ts:
+        "33fa8bc15819484524d930a99734d368c447ad95f1a7561b\
+        b553978437567194"
+  ds19-57:
+    disposition: exclusion
+    normativeDependency: source-evaluation-only
+    reason: Literal ahead-of-time foreign code witnesses Default
+      [[Prototype]] value derived from realm of the newTarget;
+      preserves the original assertion and prototype inputs null.
+      Only the original source compilation remains. Maintainer
+      decision 2026-10-28 item 1 applies only after every non-source
+      subject has passing replacement evidence. Reopen on changed
+      original source, observation or replacement evidence, an
+      accepted ADR 0016 amendment admitting the source form, or the
+      ADR 0019 non-source dependence trigger.
+    replacementEvidence:
+      tests/fixtures/ds19-realm/typedarray-number.js.txt:
+        "737a9958cbef3428359f766057662e1f803920e0a20ce6d1\
+        28d8eee3942ed0a3"
+      tests/dynamic-source-realm-host-evidence.test.ts:
+        "33fa8bc15819484524d930a99734d368c447ad95f1a7561b\
+        b553978437567194"
+  ds19-58:
+    disposition: exclusion
+    normativeDependency: source-evaluation-only
+    reason: Literal ahead-of-time foreign code witnesses Default
+      [[Prototype]] value derived from realm of the newTarget;
+      preserves the original assertion and prototype inputs null.
+      Only the original source compilation remains. Maintainer
+      decision 2026-10-28 item 1 applies only after every non-source
+      subject has passing replacement evidence. Reopen on changed
+      original source, observation or replacement evidence, an
+      accepted ADR 0016 amendment admitting the source form, or the
+      ADR 0019 non-source dependence trigger.
+    replacementEvidence:
+      tests/fixtures/ds19-realm/typedarray-number.js.txt:
+        "737a9958cbef3428359f766057662e1f803920e0a20ce6d1\
+        28d8eee3942ed0a3"
+      tests/dynamic-source-realm-host-evidence.test.ts:
+        "33fa8bc15819484524d930a99734d368c447ad95f1a7561b\
+        b553978437567194"
+  ds19-59:
+    disposition: exclusion
+    normativeDependency: source-evaluation-only
+    reason: Literal ahead-of-time foreign code witnesses Default
+      [[Prototype]] value derived from realm of the newTarget;
+      preserves the original assertion and prototype inputs null.
+      Only the original source compilation remains. Maintainer
+      decision 2026-10-28 item 1 applies only after every non-source
+      subject has passing replacement evidence. Reopen on changed
+      original source, observation or replacement evidence, an
+      accepted ADR 0016 amendment admitting the source form, or the
+      ADR 0019 non-source dependence trigger.
+    replacementEvidence:
+      tests/fixtures/ds19-realm/typedarray-number.js.txt:
+        "737a9958cbef3428359f766057662e1f803920e0a20ce6d1\
+        28d8eee3942ed0a3"
+      tests/dynamic-source-realm-host-evidence.test.ts:
+        "33fa8bc15819484524d930a99734d368c447ad95f1a7561b\
+        b553978437567194"
+  ds19-60:
+    disposition: exclusion
+    normativeDependency: source-evaluation-only
+    reason: Literal ahead-of-time foreign code witnesses Default
+      [[Prototype]] value derived from realm of the newTarget;
+      preserves the original assertion and prototype inputs null.
+      Only the original source compilation remains. Maintainer
+      decision 2026-10-28 item 1 applies only after every non-source
+      subject has passing replacement evidence. Reopen on changed
+      original source, observation or replacement evidence, an
+      accepted ADR 0016 amendment admitting the source form, or the
+      ADR 0019 non-source dependence trigger.
+    replacementEvidence:
+      tests/fixtures/ds19-realm/typedarray-number.js.txt:
+        "737a9958cbef3428359f766057662e1f803920e0a20ce6d1\
+        28d8eee3942ed0a3"
+      tests/dynamic-source-realm-host-evidence.test.ts:
+        "33fa8bc15819484524d930a99734d368c447ad95f1a7561b\
+        b553978437567194"
+  ds19-61:
+    disposition: exclusion
+    normativeDependency: source-evaluation-only
+    reason: Literal ahead-of-time foreign code witnesses Default
+      [[Prototype]] value derived from realm of the newTarget;
+      preserves the original assertion and prototype inputs null.
+      Only the original source compilation remains. Maintainer
+      decision 2026-10-28 item 1 applies only after every non-source
+      subject has passing replacement evidence. Reopen on changed
+      original source, observation or replacement evidence, an
+      accepted ADR 0016 amendment admitting the source form, or the
+      ADR 0019 non-source dependence trigger.
+    replacementEvidence:
+      tests/fixtures/ds19-realm/typedarray-number.js.txt:
+        "737a9958cbef3428359f766057662e1f803920e0a20ce6d1\
+        28d8eee3942ed0a3"
+      tests/dynamic-source-realm-host-evidence.test.ts:
+        "33fa8bc15819484524d930a99734d368c447ad95f1a7561b\
+        b553978437567194"
+  ds19-62:
+    disposition: exclusion
+    normativeDependency: source-evaluation-only
+    reason: Literal ahead-of-time foreign code witnesses Default
+      [[Prototype]] value derived from realm of the newTarget;
+      preserves the original assertion and prototype inputs null.
+      Only the original source compilation remains. Maintainer
+      decision 2026-10-28 item 1 applies only after every non-source
+      subject has passing replacement evidence. Reopen on changed
+      original source, observation or replacement evidence, an
+      accepted ADR 0016 amendment admitting the source form, or the
+      ADR 0019 non-source dependence trigger.
+    replacementEvidence:
+      tests/fixtures/ds19-realm/weak.js.txt:
+        "e8e6b82e041b3243e289978d6ac59059bd1341b15114a49b\
+        eb3567b2dcd27f9c"
+      tests/dynamic-source-realm-host-evidence.test.ts:
+        "33fa8bc15819484524d930a99734d368c447ad95f1a7561b\
+        b553978437567194"
+  ds19-63:
+    disposition: exclusion
+    normativeDependency: source-evaluation-only
+    reason: Literal ahead-of-time foreign code witnesses Default
+      [[Prototype]] value derived from realm of the newTarget;
+      preserves all 6 original assertions and prototype inputs
+      undefined, null, true, '', Symbol(), 1. Only the original source
+      compilation remains. Maintainer decision 2026-10-28 item 1
+      applies only after every non-source subject has passing
+      replacement evidence. Reopen on changed original source,
+      observation or replacement evidence, an accepted ADR 0016
+      amendment admitting the source form, or the ADR 0019 non-source
+      dependence trigger.
+    replacementEvidence:
+      tests/fixtures/ds19-realm/weak.js.txt:
+        "e8e6b82e041b3243e289978d6ac59059bd1341b15114a49b\
+        eb3567b2dcd27f9c"
+      tests/dynamic-source-realm-host-evidence.test.ts:
+        "33fa8bc15819484524d930a99734d368c447ad95f1a7561b\
+        b553978437567194"
+  ds19-64:
+    disposition: exclusion
+    normativeDependency: source-evaluation-only
+    reason: Literal ahead-of-time foreign code witnesses Default
+      [[Prototype]] value derived from realm of the newTarget;
+      preserves the original assertion and prototype inputs null.
+      Only the original source compilation remains. Maintainer
+      decision 2026-10-28 item 1 applies only after every non-source
+      subject has passing replacement evidence. Reopen on changed
+      original source, observation or replacement evidence, an
+      accepted ADR 0016 amendment admitting the source form, or the
+      ADR 0019 non-source dependence trigger.
+    replacementEvidence:
+      tests/fixtures/ds19-realm/weak.js.txt:
+        "e8e6b82e041b3243e289978d6ac59059bd1341b15114a49b\
+        eb3567b2dcd27f9c"
+      tests/dynamic-source-realm-host-evidence.test.ts:
+        "33fa8bc15819484524d930a99734d368c447ad95f1a7561b\
+        b553978437567194"
+  ds19-65:
+    disposition: exclusion
+    normativeDependency: source-evaluation-only
+    reason: "Both assertions solely distinguish the variable environment
+      selected by foreign indirect PerformEval: no local x binding is
+      created and the evaluated var x appears in the eval realm. No
+      independent ordinary function, object, boxing or error-realm
+      assertion remains; host Script execution is not claimed as an
+      eval witness. Maintainer decision 2026-10-28 item 1 applies only
+      after every non-source subject has passing replacement evidence.
+      Reopen on changed original source, observation or replacement
+      evidence, an accepted ADR 0016 amendment admitting the source
+      form, or the ADR 0019 non-source dependence trigger."
+  ds19-66:
+    disposition: exclusion
+    normativeDependency: source-evaluation-only
+    reason: Literal ahead-of-time foreign code witnesses Default
+      [[Prototype]] value derived from realm of the async generator
+      function; preserves all 6 original assertions and prototype
+      inputs undefined, null, true, 'str', Symbol(), 0. Only the
+      original source compilation remains. Maintainer decision
+      2026-10-28 item 1 applies only after every non-source subject
+      has passing replacement evidence. Reopen on changed original
+      source, observation or replacement evidence, an accepted ADR
+      0016 amendment admitting the source form, or the ADR 0019
+      non-source dependence trigger.
+    replacementEvidence:
+      tests/fixtures/ds19-realm/generator-prototypes.js.txt:
+        "97cc511e183cdbf5e7938fbf7103271f9b173649b805d650\
+        c5423b1f1c63db8c"
+      tests/dynamic-source-realm-host-evidence.test.ts:
+        "33fa8bc15819484524d930a99734d368c447ad95f1a7561b\
+        b553978437567194"
+  ds19-67:
+    disposition: exclusion
+    normativeDependency: source-evaluation-only
+    reason: "The sole assertion checks that a foreign eval intrinsic is
+      selected as indirect eval even when bound to the identifier
+      eval: evaluated var x does not replace the outer local x. The
+      ordinary IIFE only supplies that caller environment; no separate
+      non-source subject is left. Maintainer decision 2026-10-28 item
+      1 applies only after every non-source subject has passing
+      replacement evidence. Reopen on changed original source,
+      observation or replacement evidence, an accepted ADR 0016
+      amendment admitting the source form, or the ADR 0019 non-source
+      dependence trigger."
+  ds19-68:
+    disposition: exclusion
+    normativeDependency: source-evaluation-only
+    reason: Literal ahead-of-time foreign code witnesses Every new
+      evaluation of a class creates a different brand (private
+      getter); preserves all 4 original assertions. Only the original
+      source compilation remains. Maintainer decision 2026-10-28 item
+      1 applies only after every non-source subject has passing
+      replacement evidence. Reopen on changed original source,
+      observation or replacement evidence, an accepted ADR 0016
+      amendment admitting the source form, or the ADR 0019 non-source
+      dependence trigger.
+    replacementEvidence:
+      tests/fixtures/ds19-realm/private-brands.js.txt:
+        "d19099f7a7c6da924becfdde101535b7d976e20aedbc63ed\
+        cbc61785d48fc5af"
+      tests/dynamic-source-realm-host-evidence.test.ts:
+        "33fa8bc15819484524d930a99734d368c447ad95f1a7561b\
+        b553978437567194"
+  ds19-69:
+    disposition: exclusion
+    normativeDependency: source-evaluation-only
+    reason: Literal ahead-of-time foreign code witnesses Every new
+      evaluation of a class creates a different brand (private
+      getter); preserves all 4 original assertions. Only the original
+      source compilation remains. Maintainer decision 2026-10-28 item
+      1 applies only after every non-source subject has passing
+      replacement evidence. Reopen on changed original source,
+      observation or replacement evidence, an accepted ADR 0016
+      amendment admitting the source form, or the ADR 0019 non-source
+      dependence trigger.
+    replacementEvidence:
+      tests/fixtures/ds19-realm/private-brands.js.txt:
+        "d19099f7a7c6da924becfdde101535b7d976e20aedbc63ed\
+        cbc61785d48fc5af"
+      tests/dynamic-source-realm-host-evidence.test.ts:
+        "33fa8bc15819484524d930a99734d368c447ad95f1a7561b\
+        b553978437567194"
+  ds19-70:
+    disposition: exclusion
+    normativeDependency: source-evaluation-only
+    reason: Literal ahead-of-time foreign code witnesses Every new
+      evaluation of a class creates a different brand (private
+      method); preserves all 4 original assertions. Only the original
+      source compilation remains. Maintainer decision 2026-10-28 item
+      1 applies only after every non-source subject has passing
+      replacement evidence. Reopen on changed original source,
+      observation or replacement evidence, an accepted ADR 0016
+      amendment admitting the source form, or the ADR 0019 non-source
+      dependence trigger.
+    replacementEvidence:
+      tests/fixtures/ds19-realm/private-brands.js.txt:
+        "d19099f7a7c6da924becfdde101535b7d976e20aedbc63ed\
+        cbc61785d48fc5af"
+      tests/dynamic-source-realm-host-evidence.test.ts:
+        "33fa8bc15819484524d930a99734d368c447ad95f1a7561b\
+        b553978437567194"
+  ds19-71:
+    disposition: exclusion
+    normativeDependency: source-evaluation-only
+    reason: Literal ahead-of-time foreign code witnesses Every new
+      evaluation of a class creates a different brand (private
+      method); preserves all 4 original assertions. Only the original
+      source compilation remains. Maintainer decision 2026-10-28 item
+      1 applies only after every non-source subject has passing
+      replacement evidence. Reopen on changed original source,
+      observation or replacement evidence, an accepted ADR 0016
+      amendment admitting the source form, or the ADR 0019 non-source
+      dependence trigger.
+    replacementEvidence:
+      tests/fixtures/ds19-realm/private-brands.js.txt:
+        "d19099f7a7c6da924becfdde101535b7d976e20aedbc63ed\
+        cbc61785d48fc5af"
+      tests/dynamic-source-realm-host-evidence.test.ts:
+        "33fa8bc15819484524d930a99734d368c447ad95f1a7561b\
+        b553978437567194"
+  ds19-72:
+    disposition: exclusion
+    normativeDependency: source-evaluation-only
+    reason: Literal ahead-of-time foreign code witnesses Every new
+      evaluation of a class creates a different brand (private
+      setter); preserves all 4 original assertions. Only the original
+      source compilation remains. Maintainer decision 2026-10-28 item
+      1 applies only after every non-source subject has passing
+      replacement evidence. Reopen on changed original source,
+      observation or replacement evidence, an accepted ADR 0016
+      amendment admitting the source form, or the ADR 0019 non-source
+      dependence trigger.
+    replacementEvidence:
+      tests/fixtures/ds19-realm/private-brands.js.txt:
+        "d19099f7a7c6da924becfdde101535b7d976e20aedbc63ed\
+        cbc61785d48fc5af"
+      tests/dynamic-source-realm-host-evidence.test.ts:
+        "33fa8bc15819484524d930a99734d368c447ad95f1a7561b\
+        b553978437567194"
+  ds19-73:
+    disposition: exclusion
+    normativeDependency: source-evaluation-only
+    reason: Literal ahead-of-time foreign code witnesses Every new
+      evaluation of a class creates a different brand (private
+      setter); preserves all 4 original assertions. Only the original
+      source compilation remains. Maintainer decision 2026-10-28 item
+      1 applies only after every non-source subject has passing
+      replacement evidence. Reopen on changed original source,
+      observation or replacement evidence, an accepted ADR 0016
+      amendment admitting the source form, or the ADR 0019 non-source
+      dependence trigger.
+    replacementEvidence:
+      tests/fixtures/ds19-realm/private-brands.js.txt:
+        "d19099f7a7c6da924becfdde101535b7d976e20aedbc63ed\
+        cbc61785d48fc5af"
+      tests/dynamic-source-realm-host-evidence.test.ts:
+        "33fa8bc15819484524d930a99734d368c447ad95f1a7561b\
+        b553978437567194"
+  ds19-74:
+    disposition: exclusion
+    normativeDependency: source-evaluation-only
+    reason: Literal ahead-of-time foreign code witnesses Every new
+      evaluation of a class creates a different Private Name (private
+      static field); preserves all 4 original assertions. Only the
+      original source compilation remains. Maintainer decision
+      2026-10-28 item 1 applies only after every non-source subject
+      has passing replacement evidence. Reopen on changed original
+      source, observation or replacement evidence, an accepted ADR
+      0016 amendment admitting the source form, or the ADR 0019
+      non-source dependence trigger.
+    replacementEvidence:
+      tests/fixtures/ds19-realm/private-brands.js.txt:
+        "d19099f7a7c6da924becfdde101535b7d976e20aedbc63ed\
+        cbc61785d48fc5af"
+      tests/dynamic-source-realm-host-evidence.test.ts:
+        "33fa8bc15819484524d930a99734d368c447ad95f1a7561b\
+        b553978437567194"
+  ds19-75:
+    disposition: exclusion
+    normativeDependency: source-evaluation-only
+    reason: Literal ahead-of-time foreign code witnesses Every new
+      evaluation of a class creates a different Private Name (private
+      static getter); preserves all 4 original assertions. Only the
+      original source compilation remains. Maintainer decision
+      2026-10-28 item 1 applies only after every non-source subject
+      has passing replacement evidence. Reopen on changed original
+      source, observation or replacement evidence, an accepted ADR
+      0016 amendment admitting the source form, or the ADR 0019
+      non-source dependence trigger.
+    replacementEvidence:
+      tests/fixtures/ds19-realm/private-brands.js.txt:
+        "d19099f7a7c6da924becfdde101535b7d976e20aedbc63ed\
+        cbc61785d48fc5af"
+      tests/dynamic-source-realm-host-evidence.test.ts:
+        "33fa8bc15819484524d930a99734d368c447ad95f1a7561b\
+        b553978437567194"
+  ds19-76:
+    disposition: exclusion
+    normativeDependency: source-evaluation-only
+    reason: Literal ahead-of-time foreign code witnesses Every new
+      evaluation of a class creates a different brand (private static
+      methods); preserves all 4 original assertions. Only the original
+      source compilation remains. Maintainer decision 2026-10-28 item
+      1 applies only after every non-source subject has passing
+      replacement evidence. Reopen on changed original source,
+      observation or replacement evidence, an accepted ADR 0016
+      amendment admitting the source form, or the ADR 0019 non-source
+      dependence trigger.
+    replacementEvidence:
+      tests/fixtures/ds19-realm/private-brands.js.txt:
+        "d19099f7a7c6da924becfdde101535b7d976e20aedbc63ed\
+        cbc61785d48fc5af"
+      tests/dynamic-source-realm-host-evidence.test.ts:
+        "33fa8bc15819484524d930a99734d368c447ad95f1a7561b\
+        b553978437567194"
+  ds19-77:
+    disposition: exclusion
+    normativeDependency: source-evaluation-only
+    reason: Literal ahead-of-time foreign code witnesses Every new
+      evaluation of a class creates a different Private Name (private
+      static setter); preserves all 4 original assertions. Only the
+      original source compilation remains. Maintainer decision
+      2026-10-28 item 1 applies only after every non-source subject
+      has passing replacement evidence. Reopen on changed original
+      source, observation or replacement evidence, an accepted ADR
+      0016 amendment admitting the source form, or the ADR 0019
+      non-source dependence trigger.
+    replacementEvidence:
+      tests/fixtures/ds19-realm/private-brands.js.txt:
+        "d19099f7a7c6da924becfdde101535b7d976e20aedbc63ed\
+        cbc61785d48fc5af"
+      tests/dynamic-source-realm-host-evidence.test.ts:
+        "33fa8bc15819484524d930a99734d368c447ad95f1a7561b\
+        b553978437567194"
+  ds19-78:
+    disposition: exclusion
+    normativeDependency: source-evaluation-only
+    reason: Literal ahead-of-time foreign code witnesses Default
+      [[Prototype]] value derived from realm of the generator
+      function; preserves the original assertion and prototype
+      inputs null. Only the original source compilation remains.
+      Maintainer decision 2026-10-28 item 1 applies only after every
+      non-source subject has passing replacement evidence. Reopen on
+      changed original source, observation or replacement evidence, an
+      accepted ADR 0016 amendment admitting the source form, or the
+      ADR 0019 non-source dependence trigger.
+    replacementEvidence:
+      tests/fixtures/ds19-realm/generator-prototypes.js.txt:
+        "97cc511e183cdbf5e7938fbf7103271f9b173649b805d650\
+        c5423b1f1c63db8c"
+      tests/dynamic-source-realm-host-evidence.test.ts:
+        "33fa8bc15819484524d930a99734d368c447ad95f1a7561b\
+        b553978437567194"
+  ds19-79:
+    disposition: exclusion
+    normativeDependency: source-evaluation-only
+    reason: Literal ahead-of-time foreign code witnesses Default
+      [[Prototype]] value derived from realm of the newTarget value;
+      preserves the original assertion and prototype inputs null.
+      Only the original source compilation remains. Maintainer
+      decision 2026-10-28 item 1 applies only after every non-source
+      subject has passing replacement evidence. Reopen on changed
+      original source, observation or replacement evidence, an
+      accepted ADR 0016 amendment admitting the source form, or the
+      ADR 0019 non-source dependence trigger.
+    replacementEvidence:
+      tests/fixtures/ds19-realm/super.js.txt:
+        "4e7fb1e1becb058393b0cbc11a5a45174247f2d8f1a6d7ba\
+        3b1e25a67301057c"
+      tests/dynamic-source-realm-host-evidence.test.ts:
+        "33fa8bc15819484524d930a99734d368c447ad95f1a7561b\
+        b553978437567194"
+  ds19-80:
+    disposition: exclusion
+    normativeDependency: source-evaluation-only
+    reason: Literal ahead-of-time foreign code witnesses Each realm has a
+      distinct template registry; preserves the original assertion.
+      Only the original source compilation remains. Maintainer
+      decision 2026-10-28 item 1 applies only after every non-source
+      subject has passing replacement evidence. Reopen on changed
+      original source, observation or replacement evidence, an
+      accepted ADR 0016 amendment admitting the source form, or the
+      ADR 0019 non-source dependence trigger.
+    replacementEvidence:
+      tests/fixtures/ds19-realm/template.js.txt:
+        "1347e426eeecb98be2a7e5a4e0ceefa93f40353cb6a58379\
+        ebe3b1bdd5dfa717"
+      tests/dynamic-source-realm-host-evidence.test.ts:
+        "33fa8bc15819484524d930a99734d368c447ad95f1a7561b\
+        b553978437567194"
+  ds19-81:
+    disposition: exclusion
+    normativeDependency: source-evaluation-only
+    reason: Literal ahead-of-time foreign code witnesses When the base of
+      a property reference is primitive, it is coerced to an object
+      during value retrieval (honoring the realm of the current
+      execution context); preserves all 4 original assertions. Only
+      the original source compilation remains. Maintainer decision
+      2026-10-28 item 1 applies only after every non-source subject
+      has passing replacement evidence. Reopen on changed original
+      source, observation or replacement evidence, an accepted ADR
+      0016 amendment admitting the source form, or the ADR 0019
+      non-source dependence trigger.
+    replacementEvidence:
+      tests/fixtures/ds19-realm/primitive-reference.js.txt:
+        "750987a370c663899c43f03660fb941031246341219141d4\
+        9f7f351d3896b21f"
+      tests/dynamic-source-realm-host-evidence.test.ts:
+        "33fa8bc15819484524d930a99734d368c447ad95f1a7561b\
+        b553978437567194"
+  ds19-82:
+    disposition: exclusion
+    normativeDependency: source-evaluation-only
+    reason: Literal ahead-of-time foreign code witnesses When the base of
+      a property reference is primitive, it is coerced to an object
+      during value assignment (honoring the realm of the current
+      execution context); preserves all 4 original assertions. Only
+      the original source compilation remains. Maintainer decision
+      2026-10-28 item 1 applies only after every non-source subject
+      has passing replacement evidence. Reopen on changed original
+      source, observation or replacement evidence, an accepted ADR
+      0016 amendment admitting the source form, or the ADR 0019
+      non-source dependence trigger.
+    replacementEvidence:
+      tests/fixtures/ds19-realm/primitive-reference.js.txt:
+        "750987a370c663899c43f03660fb941031246341219141d4\
+        9f7f351d3896b21f"
+      tests/dynamic-source-realm-host-evidence.test.ts:
+        "33fa8bc15819484524d930a99734d368c447ad95f1a7561b\
+        b553978437567194"
 paths:
   - path: test/built-ins/AggregateError/newtarget-proto-fallback.js
     proposedOwner: adr:0016-dynamic-source-boundary
@@ -3667,7 +5237,7 @@ paths:
     section: "sec-aggregate-error"
     subject: "Default [[Prototype]] value derived from realm of the
       NewTarget."
-    assessment: "observation-train-dynamic-coverage"
+    assessment: ds19-01
   - path: test/built-ins/Array/from/proto-from-ctor-realm.js
     proposedOwner: adr:0016-dynamic-source-boundary
     priorCohort: incidental-scaffolding
@@ -3679,7 +5249,7 @@ paths:
     section: sec-array.from
     subject: Default [[Prototype]] value derived from realm of
       the constructor
-    assessment: fixture-construction
+    assessment: ds19-02
   - path: test/built-ins/Array/of/proto-from-ctor-realm.js
     proposedOwner: adr:0016-dynamic-source-boundary
     priorCohort: incidental-scaffolding
@@ -3691,7 +5261,7 @@ paths:
     section: sec-array.of
     subject: Default [[Prototype]] value derived from realm of
       the constructor
-    assessment: fixture-construction
+    assessment: ds19-03
   - path: test/built-ins/Array/proto-from-ctor-realm-one.js
     proposedOwner: adr:0016-dynamic-source-boundary
     priorCohort: incidental-scaffolding
@@ -3703,7 +5273,7 @@ paths:
     section: sec-array-len
     subject: Default [[Prototype]] value derived from realm of
       the NewTarget.
-    assessment: fixture-construction
+    assessment: ds19-04
   - path: test/built-ins/Array/proto-from-ctor-realm-two.js
     proposedOwner: adr:0016-dynamic-source-boundary
     priorCohort: incidental-scaffolding
@@ -3715,7 +5285,7 @@ paths:
     section: sec-array-items
     subject: Default [[Prototype]] value derived from realm of
       the NewTarget.
-    assessment: fixture-construction
+    assessment: ds19-05
   - path: test/built-ins/Array/proto-from-ctor-realm-zero.js
     proposedOwner: adr:0016-dynamic-source-boundary
     priorCohort: incidental-scaffolding
@@ -3727,7 +5297,7 @@ paths:
     section: sec-array-constructor-array
     subject: Default [[Prototype]] value derived from realm of
       the NewTarget.
-    assessment: fixture-construction
+    assessment: ds19-06
   - path: test/built-ins/ArrayBuffer/proto-from-ctor-realm.js
     proposedOwner: adr:0016-dynamic-source-boundary
     priorCohort: incidental-scaffolding
@@ -3739,7 +5309,7 @@ paths:
     section: sec-arraybuffer-length
     subject: Default [[Prototype]] value derived from realm of
       the newTarget
-    assessment: fixture-construction
+    assessment: ds19-07
   - path: test/built-ins/AsyncFunction/AsyncFunction-construct.js
     proposedOwner: adr:0016-dynamic-source-boundary
     priorCohort: source-subject
@@ -4006,7 +5576,7 @@ paths:
     section: sec-boolean-constructor-boolean-value
     subject: Default [[Prototype]] value derived from realm of
       the newTarget
-    assessment: fixture-construction
+    assessment: ds19-08
   - path: test/built-ins/DataView/proto-from-ctor-realm-sab.js
     proposedOwner: adr:0016-dynamic-source-boundary
     priorCohort: incidental-scaffolding
@@ -4018,7 +5588,7 @@ paths:
     section: sec-dataview-buffer-byteoffset-bytelength
     subject: Default [[Prototype]] value derived from realm of
       the newTarget
-    assessment: fixture-construction
+    assessment: ds19-09
   - path: test/built-ins/DataView/proto-from-ctor-realm.js
     proposedOwner: adr:0016-dynamic-source-boundary
     priorCohort: incidental-scaffolding
@@ -4030,7 +5600,7 @@ paths:
     section: sec-dataview-buffer-byteoffset-bytelength
     subject: Default [[Prototype]] value derived from realm of
       the newTarget
-    assessment: fixture-construction
+    assessment: ds19-10
   - path: test/built-ins/Date/proto-from-ctor-realm-one.js
     proposedOwner: adr:0016-dynamic-source-boundary
     priorCohort: incidental-scaffolding
@@ -4042,7 +5612,7 @@ paths:
     section: sec-date-value
     subject: Default [[Prototype]] value derived from realm of
       the newTarget
-    assessment: fixture-construction
+    assessment: ds19-11
   - path: test/built-ins/Date/proto-from-ctor-realm-two.js
     proposedOwner: adr:0016-dynamic-source-boundary
     priorCohort: incidental-scaffolding
@@ -4054,7 +5624,7 @@ paths:
     section: sec-date-year-month-date-hours-minutes-seconds-ms
     subject: Default [[Prototype]] value derived from realm of
       the newTarget
-    assessment: fixture-construction
+    assessment: ds19-12
   - path: test/built-ins/Date/proto-from-ctor-realm-zero.js
     proposedOwner: adr:0016-dynamic-source-boundary
     priorCohort: incidental-scaffolding
@@ -4066,7 +5636,7 @@ paths:
     section: sec-date-constructor-date
     subject: Default [[Prototype]] value derived from realm of
       the newTarget
-    assessment: fixture-construction
+    assessment: ds19-13
   - path: "test/built-ins/Error/proto-from-ctor-realm.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "incidental-scaffolding"
@@ -4078,7 +5648,7 @@ paths:
     section: "sec-error-message"
     subject: "Default [[Prototype]] value derived from realm of the
       newTarget"
-    assessment: "observation-train-dynamic-coverage"
+    assessment: ds19-14
   - path: "test/built-ins/FinalizationRegistry/proto-from-ctor-\
       realm.js"
     proposedOwner: adr:0016-dynamic-source-boundary
@@ -4091,7 +5661,7 @@ paths:
     section: sec-finalization-registry-target
     subject: Default [[Prototype]] value derived from realm of
       the newTarget
-    assessment: fixture-construction
+    assessment: ds19-15
   - path: test/built-ins/Function/15.3.2.1-10-6gs.js
     proposedOwner: adr:0016-dynamic-source-boundary
     priorCohort: incidental-scaffolding
@@ -5282,7 +6852,7 @@ paths:
     section: "sec-ecmascript-function-objects-call-thisargument-arg\
       umentslist"
     subject: 'The "this" value is set to the global This value'
-    assessment: "observation-train-dynamic-coverage"
+    assessment: ds19-16
   - path: "test/built-ins/Function/call-bind-this-realm-value.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "incidental-scaffolding"
@@ -5295,7 +6865,7 @@ paths:
       umentslist"
     subject: 'The "this" value is wrapped in an object using the
       callee realm'
-    assessment: "observation-train-dynamic-coverage"
+    assessment: ds19-17
   - path: test/built-ins/Function/instance-name.js
     proposedOwner: adr:0016-dynamic-source-boundary
     priorCohort: incidental-scaffolding
@@ -5319,7 +6889,7 @@ paths:
       -argumentslist"
     subject: Error when invoking a default class constructor,
       honoring the Realm that the class was defined in.
-    assessment: fixture-construction
+    assessment: ds19-18
   - path: "test/built-ins/Function/internals/Construct/derived-\
       return-val-realm.js"
     proposedOwner: adr:0016-dynamic-source-boundary
@@ -5334,7 +6904,7 @@ paths:
     subject: Error when derived constructor returns a
       non-undefined value (honoring the Realm of the current
       execution context)
-    assessment: fixture-construction
+    assessment: ds19-19
   - path: "test/built-ins/Function/internals/Construct/derived-\
       this-uninitialized-realm.js"
     proposedOwner: adr:0016-dynamic-source-boundary
@@ -5349,7 +6919,7 @@ paths:
     subject: Error when derived constructor does not initialize
       the `this` binding (honoring the Realm of the current
       execution context)
-    assessment: fixture-construction
+    assessment: ds19-20
   - path: test/built-ins/Function/is-a-constructor.js
     proposedOwner: adr:0016-dynamic-source-boundary
     priorCohort: incidental-scaffolding
@@ -5533,7 +7103,7 @@ paths:
     subject: 'While default [[Prototype]] value derives from realm
       of the newTarget, "prototype" object inherits from
       %Object.prototype% of constructor''s realm.'
-    assessment: "observation-train-dynamic-coverage"
+    assessment: ds19-21
   - path: "test/built-ins/Function/proto-from-ctor-realm.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "incidental-scaffolding"
@@ -5545,7 +7115,7 @@ paths:
     section: "sec-function-p1-p2-pn-body"
     subject: "Default [[Prototype]] value derived from realm of the
       newTarget"
-    assessment: "observation-train-dynamic-coverage"
+    assessment: ds19-22
   - path: test/built-ins/Function/prototype/S15.3.5.2_A1_T1.js
     proposedOwner: adr:0016-dynamic-source-boundary
     priorCohort: source-subject
@@ -5888,7 +7458,7 @@ paths:
     subject: Throws a TypeError exception if argArray is not an
       object (honoring the Realm of the current execution
       context)
-    assessment: fixture-construction
+    assessment: ds19-23
   - path: "test/built-ins/Function/prototype/bind/get-fn-realm-\
       recursive.js"
     proposedOwner: adr:0016-dynamic-source-boundary
@@ -5902,7 +7472,7 @@ paths:
     subject: The realm of a bound function exotic object is the
       realm of its target function. GetFunctionRealm is
       called recursively.
-    assessment: fixture-construction
+    assessment: ds19-24
   - path: test/built-ins/Function/prototype/bind/get-fn-realm.js
     proposedOwner: adr:0016-dynamic-source-boundary
     priorCohort: incidental-scaffolding
@@ -5914,7 +7484,7 @@ paths:
     section: sec-getfunctionrealm
     subject: The realm of a bound function exotic object is the
       realm of its target function.
-    assessment: fixture-construction
+    assessment: ds19-25
   - path: "test/built-ins/Function/prototype/bind/proto-from-ct\
       or-realm.js"
     proposedOwner: adr:0016-dynamic-source-boundary
@@ -5928,7 +7498,7 @@ paths:
       entslist-newtarget"
     subject: Default [[Prototype]] value derived from realm of
       the constructor
-    assessment: fixture-construction
+    assessment: ds19-26
   - path: test/built-ins/Function/prototype/call/S15.3.4.4_A1_T1.js
     proposedOwner: adr:0016-dynamic-source-boundary
     priorCohort: incidental-scaffolding
@@ -6491,7 +8061,7 @@ paths:
     section: sec-iterator
     subject: Default [[Prototype]] value derived from realm of
       the newTarget
-    assessment: fixture-construction
+    assessment: ds19-27
   - path: test/built-ins/Map/proto-from-ctor-realm.js
     proposedOwner: adr:0016-dynamic-source-boundary
     priorCohort: incidental-scaffolding
@@ -6503,7 +8073,7 @@ paths:
     section: sec-map-iterable
     subject: Default [[Prototype]] value derived from realm of
       the newTarget
-    assessment: fixture-construction
+    assessment: ds19-28
   - path: "test/built-ins/NativeErrors/EvalError/proto-from-ctor-re\
       alm.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -6516,7 +8086,7 @@ paths:
     section: "sec-nativeerror"
     subject: "Default [[Prototype]] value derived from realm of the
       NewTarget."
-    assessment: "observation-train-dynamic-coverage"
+    assessment: ds19-29
   - path: "test/built-ins/NativeErrors/RangeError/proto-from-ctor-r\
       ealm.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -6529,7 +8099,7 @@ paths:
     section: "sec-nativeerror"
     subject: "Default [[Prototype]] value derived from realm of the
       NewTarget."
-    assessment: "observation-train-dynamic-coverage"
+    assessment: ds19-30
   - path: "test/built-ins/NativeErrors/ReferenceError/proto-from-ct\
       or-realm.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -6542,7 +8112,7 @@ paths:
     section: "sec-nativeerror"
     subject: "Default [[Prototype]] value derived from realm of the
       NewTarget."
-    assessment: "observation-train-dynamic-coverage"
+    assessment: ds19-31
   - path: "test/built-ins/NativeErrors/SyntaxError/proto-from-ctor-\
       realm.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -6555,7 +8125,7 @@ paths:
     section: "sec-nativeerror"
     subject: "Default [[Prototype]] value derived from realm of the
       NewTarget."
-    assessment: "observation-train-dynamic-coverage"
+    assessment: ds19-32
   - path: "test/built-ins/NativeErrors/TypeError/proto-from-ctor-re\
       alm.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -6568,7 +8138,7 @@ paths:
     section: "sec-nativeerror"
     subject: "Default [[Prototype]] value derived from realm of the
       NewTarget."
-    assessment: "observation-train-dynamic-coverage"
+    assessment: ds19-33
   - path: "test/built-ins/NativeErrors/URIError/proto-from-ctor-rea\
       lm.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -6581,7 +8151,7 @@ paths:
     section: "sec-nativeerror"
     subject: "Default [[Prototype]] value derived from realm of the
       NewTarget."
-    assessment: "observation-train-dynamic-coverage"
+    assessment: ds19-34
   - path: test/built-ins/Number/proto-from-ctor-realm.js
     proposedOwner: adr:0016-dynamic-source-boundary
     priorCohort: incidental-scaffolding
@@ -6593,7 +8163,7 @@ paths:
     section: sec-number-constructor-number-value
     subject: Default [[Prototype]] value derived from realm of
       the newTarget
-    assessment: fixture-construction
+    assessment: ds19-35
   - path: test/built-ins/Object/entries/tamper-with-global-object.js
     proposedOwner: adr:0016-dynamic-source-boundary
     priorCohort: incidental-scaffolding
@@ -6645,7 +8215,7 @@ paths:
     section: sec-object-value
     subject: Default [[Prototype]] value derived from realm of
       the newTarget
-    assessment: fixture-construction
+    assessment: ds19-36
   - path: "test/built-ins/Object/prototype/toString/Object.prot\
       otype.toString.call-function.js"
     proposedOwner: adr:0016-dynamic-source-boundary
@@ -6748,7 +8318,7 @@ paths:
     section: sec-promise-executor
     subject: Default [[Prototype]] value derived from realm of
       the newTarget
-    assessment: fixture-construction
+    assessment: ds19-37
   - path: "test/built-ins/Proxy/apply/arguments-realm.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "incidental-scaffolding"
@@ -6761,7 +8331,7 @@ paths:
       call-thisargument-argumentslist"
     subject: "Arguments array is created in the Realm of the current
       execution context"
-    assessment: "observation-train-dynamic-coverage"
+    assessment: ds19-38
   - path: "test/built-ins/Proxy/construct/arguments-realm.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "incidental-scaffolding"
@@ -6774,7 +8344,7 @@ paths:
       construct-argumentslist-newtarget"
     subject: "Arguments array is created in the Realm of the current
       execution context"
-    assessment: "observation-train-dynamic-coverage"
+    assessment: ds19-39
   - path: "test/built-ins/Proxy/construct/trap-is-undefined-proto-f\
       rom-cross-realm-newtarget.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -6788,7 +8358,7 @@ paths:
       construct-argumentslist-newtarget"
     subject: "If trap is undefined, propagate [[Construct]] to
       target, passing correct newTarget parameter"
-    assessment: "observation-train-dynamic-coverage"
+    assessment: ds19-40
   - path: "test/built-ins/Proxy/construct/trap-is-undefined-proto-f\
       rom-newtarget-realm.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -6802,7 +8372,7 @@ paths:
       construct-argumentslist-newtarget"
     subject: "If trap is undefined, propagate [[Construct]] to
       target, passing correct newTarget parameter"
-    assessment: "observation-train-dynamic-coverage"
+    assessment: ds19-41
   - path: "test/built-ins/Proxy/get-fn-realm-recursive.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "incidental-scaffolding"
@@ -6814,7 +8384,7 @@ paths:
     section: "sec-getfunctionrealm"
     subject: "The realm of a Proxy exotic object is the realm of its
       target function. GetFunctionRealm is called recursively."
-    assessment: "observation-train-dynamic-coverage"
+    assessment: ds19-42
   - path: "test/built-ins/Proxy/get-fn-realm.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "incidental-scaffolding"
@@ -6826,7 +8396,7 @@ paths:
     section: "sec-getfunctionrealm"
     subject: "The realm of a Proxy exotic object is the realm of its
       target function."
-    assessment: "observation-train-dynamic-coverage"
+    assessment: ds19-43
   - path: "test/built-ins/Reflect/apply/arguments-list-is-not-a\
       rray-like-but-still-valid.js"
     proposedOwner: adr:0016-dynamic-source-boundary
@@ -6875,7 +8445,7 @@ paths:
     section: sec-boolean-constructor-boolean-value
     subject: Default [[Prototype]] value derived from realm of
       the newTarget
-    assessment: fixture-construction
+    assessment: ds19-44
   - path: "test/built-ins/RegExp/prototype/Symbol.split/splitte\
       r-proto-from-ctor-realm.js"
     proposedOwner: adr:0016-dynamic-source-boundary
@@ -6888,7 +8458,7 @@ paths:
     section: sec-regexp.prototype-@@split
     subject: Default [[Prototype]] value derived from realm of
       the constructor
-    assessment: fixture-construction
+    assessment: ds19-45
   - path: test/built-ins/RegExp/prototype/source/value-empty.js
     proposedOwner: adr:0016-dynamic-source-boundary
     priorCohort: incidental-scaffolding
@@ -6968,7 +8538,7 @@ paths:
     section: sec-set-iterable
     subject: Default [[Prototype]] value derived from realm of
       the newTarget
-    assessment: fixture-construction
+    assessment: ds19-46
   - path: test/built-ins/SharedArrayBuffer/proto-from-ctor-realm.js
     proposedOwner: adr:0016-dynamic-source-boundary
     priorCohort: incidental-scaffolding
@@ -6980,7 +8550,7 @@ paths:
     section: sec-sharedarraybuffer-length
     subject: Default [[Prototype]] value derived from realm of
       the newTarget
-    assessment: fixture-construction
+    assessment: ds19-47
   - path: test/built-ins/String/S15.5.1.1_A1_T6.js
     proposedOwner: adr:0016-dynamic-source-boundary
     priorCohort: incidental-scaffolding
@@ -7015,7 +8585,7 @@ paths:
     section: sec-string-constructor-string-value
     subject: Default [[Prototype]] value derived from realm of
       the newTarget
-    assessment: fixture-construction
+    assessment: ds19-48
   - path: test/built-ins/String/prototype/charAt/S15.5.4.4_A1.1.js
     proposedOwner: adr:0016-dynamic-source-boundary
     priorCohort: incidental-scaffolding
@@ -7202,7 +8772,7 @@ paths:
     missingDynamicTag: false
     section: sec-%throwtypeerror%
     subject: "%ThrowTypeError% is defined once for each realm."
-    assessment: fixture-construction
+    assessment: ds19-49
   - path: "test/built-ins/TypedArray/out-of-bounds-behaves-like\
       -detached.js"
     proposedOwner: adr:0013-m5-edition-and-manifest
@@ -7242,7 +8812,7 @@ paths:
     section: "sec-typedarray-buffer-byteoffset-length"
     subject: "Default [[Prototype]] value derived from realm of the
       newTarget"
-    assessment: "observation-train-dynamic-coverage"
+    assessment: ds19-50
   - path: "test/built-ins/TypedArrayConstructors/ctors-bigint/buffe\
       r-arg/proto-from-ctor-realm.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -7255,7 +8825,7 @@ paths:
     section: "sec-typedarray-buffer-byteoffset-length"
     subject: "Default [[Prototype]] value derived from realm of the
       newTarget"
-    assessment: "observation-train-dynamic-coverage"
+    assessment: ds19-51
   - path: "test/built-ins/TypedArrayConstructors/ctors-bigint/lengt\
       h-arg/proto-from-ctor-realm.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -7268,7 +8838,7 @@ paths:
     section: "sec-typedarray-length"
     subject: "Default [[Prototype]] value derived from realm of the
       newTarget"
-    assessment: "observation-train-dynamic-coverage"
+    assessment: ds19-52
   - path: "test/built-ins/TypedArrayConstructors/ctors-bigint/no-ar\
       gs/proto-from-ctor-realm.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -7281,7 +8851,7 @@ paths:
     section: "sec-typedarray"
     subject: "Default [[Prototype]] value derived from realm of the
       newTarget"
-    assessment: "observation-train-dynamic-coverage"
+    assessment: ds19-53
   - path: "test/built-ins/TypedArrayConstructors/ctors-bigint/objec\
       t-arg/proto-from-ctor-realm.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -7294,7 +8864,7 @@ paths:
     section: "sec-typedarray-object"
     subject: "Default [[Prototype]] value derived from realm of the
       newTarget"
-    assessment: "observation-train-dynamic-coverage"
+    assessment: ds19-54
   - path: "test/built-ins/TypedArrayConstructors/ctors-bigint/typed\
       array-arg/proto-from-ctor-realm.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -7307,7 +8877,7 @@ paths:
     section: "sec-typedarray-typedarray"
     subject: "Default [[Prototype]] value derived from realm of the
       newTarget"
-    assessment: "observation-train-dynamic-coverage"
+    assessment: ds19-55
   - path: "test/built-ins/TypedArrayConstructors/ctors/buffer-arg/p\
       roto-from-ctor-realm-sab.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -7320,7 +8890,7 @@ paths:
     section: "sec-typedarray-buffer-byteoffset-length"
     subject: "Default [[Prototype]] value derived from realm of the
       newTarget"
-    assessment: "observation-train-dynamic-coverage"
+    assessment: ds19-56
   - path: "test/built-ins/TypedArrayConstructors/ctors/buffer-arg/p\
       roto-from-ctor-realm.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -7333,7 +8903,7 @@ paths:
     section: "sec-typedarray-buffer-byteoffset-length"
     subject: "Default [[Prototype]] value derived from realm of the
       newTarget"
-    assessment: "observation-train-dynamic-coverage"
+    assessment: ds19-57
   - path: "test/built-ins/TypedArrayConstructors/ctors/length-arg/p\
       roto-from-ctor-realm.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -7346,7 +8916,7 @@ paths:
     section: "sec-typedarray-length"
     subject: "Default [[Prototype]] value derived from realm of the
       newTarget"
-    assessment: "observation-train-dynamic-coverage"
+    assessment: ds19-58
   - path: "test/built-ins/TypedArrayConstructors/ctors/no-args/prot\
       o-from-ctor-realm.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -7359,7 +8929,7 @@ paths:
     section: "sec-typedarray"
     subject: "Default [[Prototype]] value derived from realm of the
       newTarget"
-    assessment: "observation-train-dynamic-coverage"
+    assessment: ds19-59
   - path: test/built-ins/TypedArrayConstructors/ctors/no-species.js
     proposedOwner: adr:0013-m5-edition-and-manifest
     priorCohort: annex-b
@@ -7384,7 +8954,7 @@ paths:
     section: "sec-typedarray-object"
     subject: "Default [[Prototype]] value derived from realm of the
       newTarget"
-    assessment: "observation-train-dynamic-coverage"
+    assessment: ds19-60
   - path: "test/built-ins/TypedArrayConstructors/ctors/typedarray-a\
       rg/proto-from-ctor-realm.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -7397,7 +8967,7 @@ paths:
     section: "sec-typedarray-typedarray"
     subject: "Default [[Prototype]] value derived from realm of the
       newTarget"
-    assessment: "observation-train-dynamic-coverage"
+    assessment: ds19-61
   - path: test/built-ins/WeakMap/proto-from-ctor-realm.js
     proposedOwner: adr:0016-dynamic-source-boundary
     priorCohort: incidental-scaffolding
@@ -7409,7 +8979,7 @@ paths:
     section: sec-weakmap-iterable
     subject: Default [[Prototype]] value derived from realm of
       the newTarget
-    assessment: fixture-construction
+    assessment: ds19-62
   - path: test/built-ins/WeakRef/proto-from-ctor-realm.js
     proposedOwner: adr:0016-dynamic-source-boundary
     priorCohort: incidental-scaffolding
@@ -7421,7 +8991,7 @@ paths:
     section: sec-weak-ref-target
     subject: Default [[Prototype]] value derived from realm of
       the newTarget
-    assessment: fixture-construction
+    assessment: ds19-63
   - path: test/built-ins/WeakSet/proto-from-ctor-realm.js
     proposedOwner: adr:0016-dynamic-source-boundary
     priorCohort: incidental-scaffolding
@@ -7433,7 +9003,7 @@ paths:
     section: sec-weakset-iterable
     subject: Default [[Prototype]] value derived from realm of
       the newTarget
-    assessment: fixture-construction
+    assessment: ds19-64
   - path: test/built-ins/eval/private-identifiers-not-empty.js
     proposedOwner: adr:0016-dynamic-source-boundary
     priorCohort: source-subject
@@ -11981,7 +13551,7 @@ paths:
     section: "sec-performeval"
     subject: "Uses the global variable envrionment of the running
       execution context"
-    assessment: "observation-train-dynamic-coverage"
+    assessment: ds19-65
   - path: "test/language/eval-code/indirect/super-call.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "source-subject"
@@ -12452,7 +14022,7 @@ paths:
     section: sec-asyncgenerator-definitions-evaluatebody
     subject: Default [[Prototype]] value derived from realm of
       the async generator function.
-    assessment: fixture-construction
+    assessment: ds19-66
   - path: "test/language/expressions/async-generator/eval-var-s\
       cope-syntax-err.js"
     proposedOwner: adr:0016-dynamic-source-boundary
@@ -12619,7 +14189,7 @@ paths:
     section: "sec-function-calls-runtime-semantics-evaluation"
     subject: "An eval function from another realm is not a candidate
       for direct eval"
-    assessment: "observation-train-dynamic-coverage"
+    assessment: ds19-67
   - path: "test/language/expressions/call/eval-spread-empty-lea\
       ding.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -13936,7 +15506,7 @@ paths:
     section: "sec-privatefieldget"
     subject: "Every new evaluation of a class creates a different
       brand (private getter)"
-    assessment: "observation-train-dynamic-coverage"
+    assessment: ds19-68
   - path: "test/language/expressions/class/private-getter-brand-che\
       ck-multiple-evaluations-of-class-realm.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -13949,7 +15519,7 @@ paths:
     section: "sec-privatefieldget"
     subject: "Every new evaluation of a class creates a different
       brand (private getter)"
-    assessment: "observation-train-dynamic-coverage"
+    assessment: ds19-69
   - path: "test/language/expressions/class/private-method-brand\
       -check-multiple-evaluations-of-class-eval-indirect.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -14001,7 +15571,7 @@ paths:
     section: "sec-privatefieldget"
     subject: "Every new evaluation of a class creates a different
       brand (private method)"
-    assessment: "observation-train-dynamic-coverage"
+    assessment: ds19-70
   - path: "test/language/expressions/class/private-method-brand-che\
       ck-multiple-evaluations-of-class-realm.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -14014,7 +15584,7 @@ paths:
     section: "sec-privatefieldget"
     subject: "Every new evaluation of a class creates a different
       brand (private method)"
-    assessment: "observation-train-dynamic-coverage"
+    assessment: ds19-71
   - path: "test/language/expressions/class/private-setter-brand\
       -check-multiple-evaluations-of-class-eval-indirect.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -14066,7 +15636,7 @@ paths:
     section: "sec-privatefieldget"
     subject: "Every new evaluation of a class creates a different
       brand (private setter)"
-    assessment: "observation-train-dynamic-coverage"
+    assessment: ds19-72
   - path: "test/language/expressions/class/private-setter-brand-che\
       ck-multiple-evaluations-of-class-realm.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -14079,7 +15649,7 @@ paths:
     section: "sec-privatefieldget"
     subject: "Every new evaluation of a class creates a different
       brand (private setter)"
-    assessment: "observation-train-dynamic-coverage"
+    assessment: ds19-73
   - path: "test/language/expressions/class/private-static-field\
       -multiple-evaluations-of-class-direct-eval.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -14131,7 +15701,7 @@ paths:
     section: "sec-runtime-semantics-evaluate-name"
     subject: "Every new evaluation of a class creates a different
       Private Name (private static field)"
-    assessment: "observation-train-dynamic-coverage"
+    assessment: ds19-74
   - path: "test/language/expressions/class/private-static-gette\
       r-multiple-evaluations-of-class-direct-eval.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -14183,7 +15753,7 @@ paths:
     section: "sec-runtime-semantics-evaluate-name"
     subject: "Every new evaluation of a class creates a different
       Private Name (private static getter)"
-    assessment: "observation-train-dynamic-coverage"
+    assessment: ds19-75
   - path: "test/language/expressions/class/private-static-metho\
       d-brand-check-multiple-evaluations-of-class-direct-ev\
       al.js"
@@ -14238,7 +15808,7 @@ paths:
     section: "sec-privatefieldget"
     subject: "Every new evaluation of a class creates a different
       brand (private static methods)"
-    assessment: "observation-train-dynamic-coverage"
+    assessment: ds19-76
   - path: "test/language/expressions/class/private-static-sette\
       r-multiple-evaluations-of-class-direct-eval.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -14290,7 +15860,7 @@ paths:
     section: "sec-runtime-semantics-evaluate-name"
     subject: "Every new evaluation of a class creates a different
       Private Name (private static setter)"
-    assessment: "observation-train-dynamic-coverage"
+    assessment: ds19-77
   - path: "test/language/expressions/class/subclass-builtins/su\
       bclass-Function.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -21049,7 +22619,7 @@ paths:
       evaluatebody"
     subject: "Default [[Prototype]] value derived from realm of the
       generator function"
-    assessment: "observation-train-dynamic-coverage"
+    assessment: ds19-78
   - path: "test/language/expressions/generators/eval-var-scope-\
       syntax-err.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -22124,7 +23694,7 @@ paths:
     section: "sec-super-keyword"
     subject: "Default [[Prototype]] value derived from realm of the
       newTarget value"
-    assessment: "observation-train-dynamic-coverage"
+    assessment: ds19-79
   - path: "test/language/expressions/tagged-template/cache-diff\
       ering-expressions-eval.js"
     proposedOwner: adr:0016-dynamic-source-boundary
@@ -22200,7 +23770,7 @@ paths:
     missingDynamicTag: false
     section: sec-template-literals
     subject: Each realm has a distinct template registry
-    assessment: template-sites
+    assessment: ds19-80
   - path: "test/language/expressions/template-literal/mongolian\
       -vowel-separator-eval.js"
     proposedOwner: adr:0016-dynamic-source-boundary
@@ -25997,7 +27567,7 @@ paths:
     subject: "When the base of a property reference is primitive, it
       is coerced to an object during value retrieval (honoring
       the realm of the current execution context)"
-    assessment: "observation-train-dynamic-coverage"
+    assessment: ds19-81
   - path: "test/language/types/reference/put-value-prop-base-primit\
       ive-realm.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -26011,7 +27581,7 @@ paths:
     subject: "When the base of a property reference is primitive, it
       is coerced to an object during value assignment (honoring
       the realm of the current execution context)"
-    assessment: "observation-train-dynamic-coverage"
+    assessment: ds19-82
   - path: "test/language/types/string/S8.4_A7.1.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "incidental-scaffolding"

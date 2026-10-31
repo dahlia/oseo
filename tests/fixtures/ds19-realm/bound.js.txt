@@ -1,0 +1,56 @@
+// Fixed DS-19 non-source witnesses, derived from pinned Test262.
+// Foreign source is collected before native emission under ADR 0029.
+// Replacement for test/built-ins/Function/prototype/bind/get-fn-realm-recursive.js
+// Copyright (C) 2019 Aleksey Shvayka. All rights reserved.
+// This code is governed by the BSD license found in the LICENSE file.
+(function () {
+var realm1 = $262.createRealm().global;
+var realm2 = $262.createRealm().global;
+var realm3 = $262.createRealm().global;
+var realm4 = $262.createRealm().global;
+
+var newTarget = realm1.$262.evalScript("(function(){})");
+newTarget.prototype = 1;
+
+var boundNewTarget = realm2.Function.prototype.bind.call(newTarget);
+var boundBoundNewTarget = realm3.Function.prototype.bind.call(boundNewTarget);
+var object = Reflect.construct(realm4.Object, [], boundBoundNewTarget);
+
+assert(object instanceof realm1.Object);
+assert.sameValue(Object.getPrototypeOf(object), realm1.Object.prototype);
+})();
+
+// Replacement for test/built-ins/Function/prototype/bind/get-fn-realm.js
+// Copyright (C) 2016 the V8 project authors. All rights reserved.
+// This code is governed by the BSD license found in the LICENSE file.
+(function () {
+var realm1 = $262.createRealm().global;
+var realm2 = $262.createRealm().global;
+var realm3 = $262.createRealm().global;
+
+var newTarget = realm1.$262.evalScript("(function(){})");
+newTarget.prototype = "str";
+
+var boundNewTarget = realm2.Function.prototype.bind.call(newTarget);
+var date = Reflect.construct(realm3.Date, [], boundNewTarget);
+
+assert(date instanceof realm1.Date);
+assert.sameValue(Object.getPrototypeOf(date), realm1.Date.prototype);
+})();
+
+// Replacement for test/built-ins/Function/prototype/bind/proto-from-ctor-realm.js
+// Copyright (C) 2016 the V8 project authors. All rights reserved.
+// This code is governed by the BSD license found in the LICENSE file.
+(function () {
+var other = $262.createRealm().global;
+var C = other.$262.evalScript("(function(){})");
+C.prototype = null;
+
+var D = function() {}.bind();
+
+var d = Reflect.construct(D, [], C);
+
+assert.sameValue(Object.getPrototypeOf(d), other.Object.prototype);
+})();
+
+console.log("DS19 bound complete");

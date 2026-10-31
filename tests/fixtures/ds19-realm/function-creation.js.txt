@@ -1,0 +1,34 @@
+// Fixed generic steps used by the two CreateDynamicFunction realm subjects.
+// Source compilation and the dynamically constructed result stay excluded.
+const realmA = $262.createRealm();
+const realmB = $262.createRealm();
+realmA.global.calls = 0;
+const ordinary = realmA.evalScript('(function () { calls += 1; })');
+const newTarget = realmB.evalScript('(function () {})');
+newTarget.prototype = null;
+// The ordinary GetFunctionRealm branch, not a bound or Proxy substitute.
+const fallback = Reflect.construct(Object, [], newTarget);
+assert.sameValue(Object.getPrototypeOf(fallback), realmB.global.Object.prototype);
+// MakeConstructor creates the ordinary function's prototype in its own realm.
+assert.sameValue(Object.getPrototypeOf(ordinary), realmA.global.Function.prototype);
+assert.sameValue(Object.getPrototypeOf(ordinary.prototype), realmA.global.Object.prototype);
+assert(new ordinary() instanceof realmA.global.Object);
+assert.sameValue(realmA.global.calls, 1);
+// Mutate expected values, preserving the strict in-program upstream oracle.
+// Printed text would conflate each pair; every mismatch must throw instead.
+function rejectsWrongType(actual, mutatedExpected) {
+  let rejected = false;
+  try {
+    assert.sameValue(actual, mutatedExpected);
+  } catch (error) {
+    rejected = error instanceof Test262Error;
+  }
+  assert.sameValue(rejected, true);
+}
+for (const pair of [[1, "1"], [undefined, "undefined"], [42, "42"]]) {
+  rejectsWrongType(pair[0], pair[1]);
+  rejectsWrongType(pair[1], pair[0]);
+}
+// This mutation targets an actual value assertion in the witness above.
+rejectsWrongType(realmA.global.calls, "1");
+console.log('DS19 function-creation complete');
