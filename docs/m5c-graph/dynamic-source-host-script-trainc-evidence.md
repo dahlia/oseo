@@ -80,3 +80,32 @@ focused tests and fast non-native tests; no full or extended gate or
 UPDATE. Review uses scope `host-script-trainc`: the D25 pre gate with
 `opencode-kimi`, then the internal gate with `codex-astra`. Reviewers are
 read-only.
+
+
+Evidence candidate
+------------------
+
+The per-path assessment is
+[*dynamic-source-host-script-trainc-evidence.assessment.md*](./dynamic-source-host-script-trainc-evidence.assessment.md).
+It proposes 98 bounded ADR 0016 closures under the exclusion audit assessment
+`host-script-trainc-completion`: 62 completion paths, 34 eval syntax error
+paths, *variable/S12.2\_A5.js* and *function/S13\_A14\_T1.js*. No path of this
+selector stays with the umbrella. All 98 source and normalized observation
+digests match fresh inputs. No subset row, tag, observed classification or pass
+count changes.
+
+The fixtures read each pinned original and replace only its literal eval
+call expressions, at offsets that the source test re-derives with Babel.
+Each original therefore keeps every assertion. Mutations select a wrong
+completion or remove an early error at run time, so each original variant
+compiles to one finite literal program. Groups of six originals bound
+persistent realm roots under forced collection.
+
+The candidate changes no product package, runtime ABI, ADR or harness file.
+It adds tests and fixtures only, and *tests/native.ts* now registers the
+`residual-trainc-*` fixtures. Raw checks and review packets are retained
+under */data/m5c-d17-20261101/host-script-trainc/run/*. These focused
+witnesses do not regenerate the original unsupported observations.
+
+Tag self-audit: no dependency tag changes; every original rejected source
+keeps its `dynamic-source` prerequisite. No outside-scope observation moves.

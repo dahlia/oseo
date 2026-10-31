@@ -624,3 +624,7 @@ and one eval binding row. Its pinned selector and obligations are in that
 child's work note. Ownership moves only with reviewed closure; the umbrella
 retains every remaining path and requires child landing plus zero directly
 owned paths before its own landing.
+
+The child's evidence candidate accounts for all 98 under ADR 0016, so the
+umbrella would directly own 236 paths: the 192 earlier residual paths and
+the 44 remaining train C paths.
