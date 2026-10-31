@@ -1,7 +1,7 @@
 B19/B20/B30 dynamic-source coverage remediation
 ===============================================
 
-The current umbrella owns 950 paths: DS1 accounts for 218, DS-3 for 11,
+The current umbrella owns 943 paths: DS1 accounts for 218, DS-3 for 11,
 DS2 for 76, DS4 for 40, DS-5 for 2, DS-6 for 42 and DS-7 for 9 of the
 paths it has held; later
 observation trains added the rest, and five promoted to pass when direct
@@ -29,6 +29,12 @@ DS-7's [per-path assessment](./dynamic-source-realm-string-assessment.md)
 reviews its exact 80-path reservation, accounts for 9 using existing static
 replacement evidence, and retains 71 with their uncovered contracts. It adds
 no evidence or native tests.
+DS-10's [*per-path assessment*](./dynamic-source-eval-contract-assessment.md)
+reviews 105 eval-contract paths: seven acceptance-only eval environment
+construction cases move to ADR 0016 under existing `eval-semantics`, and
+98 stay here with their ordinary subjects and evidence gaps. Root's
+2026-10-31 ruling requires no replacement for the seven because no
+non-source subject remains. No tests or replacement evidence were added.
 All original paths and observations remain; no UPDATE is needed.
 
 
@@ -40,8 +46,8 @@ The maintainer approved DS-8 through DS-22 on 2026-10-31 in
 answering *20261031T0935-umbrella-second-split.md* in that directory. The
 proposal is */data/m5c-d17-20261031/umbrella-split/REPORT.md*, pinned to
 semantic bundle commit `9529210a24be72e2b273f43f014c03a98a29069e`. The children
-below partition the current 950 paths. Each linked work note preserves its
-exact selector, SHA256, closure route and evidence obligations.
+below partition the 950 paths owned at the split. Each linked work note
+preserves its exact selector, SHA256, closure route and evidence obligations.
 
 | Child | Paths | Size | Work note                                                                                                |
 | ----- | ----: | ---- | -------------------------------------------------------------------------------------------------------- |
@@ -62,7 +68,8 @@ exact selector, SHA256, closure route and evidence obligations.
 | DS-22 |    19 | M    | [*dynamic-source-boundary-overlap-review.md*](./dynamic-source-boundary-overlap-review.md)               |
 
 Ownership moves to each child only as that child lands. All 950 paths
-remain owned here in the derived closure ledger during this metadata split.
+remained owned here during the metadata split. DS-10 now accounts for seven
+under ADR 0016 and retains 98 here, leaving 943 umbrella-owned paths.
 The umbrella depends on DS-1 through DS-22, stays blocked until all
 children land, and lands when it owns zero paths. Zero direct ownership
 alone does not establish that a child's evidence and publication gates
@@ -71,8 +78,9 @@ subsets; unresolved subjects retain active remediation.
 
 The split establishes no exclusions, passes or new replacement evidence.
 The first three children have at most 299 audit-only candidates; all 950
-remain unresolved today. No estimate permits weakening ordinary core
-assertions or broadening ADR 0013/0016/0019 or an ADR 0028 selector.
+were unresolved at the split. DS-10 subsequently accounts for seven. No
+estimate permits weakening ordinary core assertions or broadening ADR
+0013/0016/0019 or an ADR 0028 selector.
 
 Root authorized exactly 459 additions on 2026-10-27: 66 observed
 `OSEO1001` unknown-eval binding paths and 393 observed ImportExpression

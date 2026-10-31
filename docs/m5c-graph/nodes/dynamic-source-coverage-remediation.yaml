@@ -195,7 +195,9 @@ delivers: "Resolves the 950 reviewed unsupported paths assigned to
   string case-conversion and generator-instance paths through reviewed
   static replacements and keeps 71, as recorded in
   docs/m5c-graph/dynamic-source-realm-string-assessment.md. The current
-  scope is 950; no native
+  scope is 943 after DS-10 accounts for seven acceptance-only eval
+  environment-construction cases under existing eval-semantics. Its
+  per-path assessment retains 98 ordinary-subject paths here; no native
   or fixture evidence was added, and all original unsupported results
   remain unchanged. The approved 2026-10-31 second split adds DS-8
   through DS-22 as bounded children for these exact 950 paths. Their
