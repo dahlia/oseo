@@ -1132,8 +1132,8 @@ assessments:
       non-source reopening remains in force.
     replacementEvidence:
       tests/regexp-static-grammar.test.ts:
-        "3ac4d22647648884e349f954665b17d33aa8df8ed7974e\
-        66003cf3014dcc26c8"
+        "6582ae85e7bca86210008bfb7640b9942d58786b2bb32b\
+        97d0a9a824c8d960f1"
   ds17-static-constructor-inputs:
     disposition: exclusion
     normativeDependency: source-evaluation-only
@@ -1149,8 +1149,8 @@ assessments:
       force.
     replacementEvidence:
       tests/native/fixtures/regexp-static-evidence.ts:
-        "0e3c394100a05e2c5c396d53d249ec25b5ac95b9befe44\
-        ffa5bc2ba640a81943"
+        "218de3dad4661c298278d612c8b1e032218857c4903904\
+        0d14480f3574d6000f"
   ds17-static-source-roundtrips:
     disposition: exclusion
     normativeDependency: source-evaluation-only
@@ -1169,11 +1169,11 @@ assessments:
       force.
     replacementEvidence:
       tests/native/fixtures/regexp-static-evidence.ts:
-        "0e3c394100a05e2c5c396d53d249ec25b5ac95b9befe44\
-        ffa5bc2ba640a81943"
+        "218de3dad4661c298278d612c8b1e032218857c4903904\
+        0d14480f3574d6000f"
       tests/regexp-static-grammar.test.ts:
-        "3ac4d22647648884e349f954665b17d33aa8df8ed7974e\
-        66003cf3014dcc26c8"
+        "6582ae85e7bca86210008bfb7640b9942d58786b2bb32b\
+        97d0a9a824c8d960f1"
 paths:
   - path: test/built-ins/AggregateError/newtarget-proto-fallback.js
     proposedOwner: adr:0016-dynamic-source-boundary

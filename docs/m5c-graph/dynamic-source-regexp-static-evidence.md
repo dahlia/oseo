@@ -151,6 +151,20 @@ record. All 29 grammar/structural tests pass. The audit replacement digests
 are refreshed; no subset, classification, dependency tag or observation
 changes, so no UPDATE is needed.
 
+Internal pass 2 found that the mutation rejection count reused the comparator
+under test. The corrected verdict uses strict equality and a fixed expected
+count of six. Focused tests run the actual fixture and replace its comparator
+with always-true and same-type-number expressions; both mutants throw before
+printing success. A search of all DS-17 fixture changes found no other
+mutation-control loops of this kind.
+
+The corrected fixture passes Node.js, Deno and both forced-GC Linux AMD64
+native policies. Each native policy observes 269 allocations and 4,383
+collections; enabled specialization observes 84 guard hits and 90 misses.
+Evidence is in */data/m5c-d17-20261031/ds17/fix2-native.stdout* and its
+adjacent JSON record. The focused grammar/control suite has 32 passing tests.
+Replacement witness digests are refreshed in the exclusion audit.
+
 
 Internal review reconciliation
 ------------------------------

@@ -20,6 +20,11 @@ safepoint. Exact source output is also parsed into static literal artifacts.
 The source pairs use no Annex B extension; the four exhaustive BMP domains
 retain their separate Annex B/UnicodeIDContinue assessment.
 
+The fixture's six comparator controls require six rejections through an
+independent strict check. Focused tests replace the comparator with an
+always-true expression and with one that equates all numbers; both mutants
+fail before the fixture can print its success marker.
+
 | Path                                                                             | Normative subject                                                                               | Disposition                   | Replacement evidence                                                                     | Reason                                                                                                                                                                                         |
 | -------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------- | ----------------------------- | ---------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | *test/built-ins/RegExp/S15.10.4.1\_A5\_T3.js*                                    | RegExp constructor rejects the invalid flags migr with SyntaxError                              | ADR 0016 accounting candidate | *tests/native/fixtures/regexp-static-evidence.ts*                                        | Native fixture substitutes the evaluated string with migr and checks the original SyntaxError contract.                                                                                        |

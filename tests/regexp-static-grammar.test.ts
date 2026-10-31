@@ -1,11 +1,47 @@
 import assert from "node:assert/strict";
 import test from "node:test";
+import { runInNewContext } from "node:vm";
 
 import { cBackend } from "../packages/backend-c/src/index.ts";
 const { regexpStaticEvidenceFixtures } =
   await import("./native/fixtures/regexp-static-evidence.ts");
 import { defaultComponents } from "../packages/cli/src/index.ts";
 import { compileSource } from "../packages/compiler/src/index.ts";
+
+test("replacement fixture passes its oracle controls", () => {
+  const fixture = regexpStaticEvidenceFixtures[0];
+  assert.ok(fixture);
+  const output: string[] = [];
+  runInNewContext(fixture.source, {
+    console: { log: (value: string) => output.push(value) },
+  });
+  assert.deepEqual(output, ["regexp static evidence passed"]);
+});
+
+for (const comparator of [
+  "true",
+  '(typeof actual === "number" && typeof expected === "number") || ' +
+    "Object.is(actual, expected)",
+]) {
+  test(`oracle controls reject comparator: ${comparator}`, () => {
+    const fixture = regexpStaticEvidenceFixtures[0];
+    assert.ok(fixture);
+    const source = fixture.source.replace(
+      "check(Object.is(actual, expected));",
+      `check(${comparator});`,
+    );
+    assert.notEqual(source, fixture.source);
+    const output: string[] = [];
+    assert.throws(
+      () =>
+        runInNewContext(source, {
+          console: { log: (value: string) => output.push(value) },
+        }),
+      /static regexp evidence failed/u,
+    );
+    assert.deepEqual(output, []);
+  });
+}
 
 // These are build inputs, never strings evaluated by the produced program.
 // A constructor cannot witness the lexical grammar of a regexp literal.

@@ -22,7 +22,8 @@ for (let i = 0; i < mutations.length; i++) {
   try { same(mutations[i][0], mutations[i][1]); }
   catch (error) { mutationsRejected = mutationsRejected + 1; }
 }
-same(mutationsRejected, mutations.length);
+// Keep this verdict independent of the comparator under test.
+check(mutations.length === 6 && mutationsRejected === 6);
 same(NaN, NaN);
 let rejected = false;
 try { new RegExp("", "migr"); }
