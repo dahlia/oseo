@@ -77,8 +77,35 @@ The Linux job is one extra ubuntu job with a 45-minute timeout. The macOS
 job chains on the property sanitizer lane, under the same rule that chains
 the two native sanitizer shards, so it takes no hosted slot. Its 1,812-second
 lane entry is a planning allowance, twice the local clang wall plus setup,
-until a hosted run measures it. With the two configured Mac lanes the modeled
-makespan stays at 111.9 minutes before and after, and the property lane ends
-at 71.1 minutes. With six Mac lanes that lane becomes the hosted floor at
-4,264 seconds. Without Mac lanes the all-hosted fallback rises from 216.4
-minutes after the native split to 223.9.
+until a hosted run measures it.
+
+At `a0cd901d`, which also carries the weighted Node shards and the native
+sanitizer split, the property sanitizer lane ends at 4,264 seconds and the
+chained native sanitizer lane at 3,607. The generator models these maxima:
+
+| Mac lanes      | Modeled maximum, minutes | Set by                  |
+| -------------- | -----------------------: | ----------------------- |
+| 0              |                    236.4 | property sanitizer lane |
+| 2              |                    119.4 | a Mac lane              |
+| 6              |                     71.1 | property sanitizer lane |
+| 8 (configured) |                     71.1 | property sanitizer lane |
+
+From six Mac lanes up, the property sanitizer lane is the hosted floor. This
+command, run from the repository root, prints the maxima;
+`node tools/macos-lane-report.ts` prints every lane end for the configured
+count:
+
+~~~~ sh
+node -e '
+import("./tools/generate-macos-lanes.ts").then((lanes) => {
+  for (const n of [0, 2, 6, 8]) {
+    const ends = lanes.macosLaneEnds(lanes.macosLanes(n));
+    console.log(n, Math.max(...ends) / 60);
+  }
+});'
+~~~~
+
+The job's own cost was modeled on the lane's branch before the Node shards
+merged. From the native split at `5bfef8748` to the dedicated job at
+`51ff5b61b`, the two-lane maximum stayed at 111.9 minutes and the all-hosted
+maximum rose from 216.4 to 223.9.

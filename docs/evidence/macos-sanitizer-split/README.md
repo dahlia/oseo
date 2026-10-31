@@ -61,20 +61,28 @@ Placement
 ---------
 
 A hosted lane that holds a sanitizer job reserves itself for that job, because
-a lane that follows one inherits its spread (U41, U42). With two Mac lanes, a
-reserved lane per native shard raises the modeled makespan from 111.9 to 125.9
-minutes: the third reservation leaves only two hosted lanes for the hosted-only
-Node.js shards and the Mac-eligible overflow. The generator therefore reserves
-one hosted lane per sanitizer suite. Both native shards chain on that lane, the
-property suite keeps its own, and no other job joins either. The modeled
-makespan stays at 111.9 minutes, and the account's five hosted slots carry the
-same two sanitizer reservations as before.
+a lane that follows one inherits its spread (U41, U42). At this change's
+commit `5bfef8748`, with two Mac lanes, a reserved lane per native shard
+would have raised the modeled makespan from 111.9 to 125.9 minutes: the third
+reservation leaves only two hosted lanes for the hosted-only Node.js shards
+and the Mac-eligible overflow. The generator therefore reserves one hosted
+lane per sanitizer suite. Both native shards chain on that lane, the property
+suite keeps its own, and no other job joins either. The modeled makespan
+stayed at 111.9 minutes, and the account's five hosted slots carry the same
+two sanitizer reservations as before.
 
 The chained lane ends at 3,607 seconds, about one extra setup and preflight
-above the unsplit job's measured median. With six Mac lanes, and with the
-rented pair, that lane is now the hosted floor of the model. Without Mac lanes
-the reservation does not apply and the LPT partition places each shard like
-any other job.
+above the unsplit job's measured median. At `5bfef8748`, with six Mac lanes
+and with the rented pair, it was the hosted floor of the model. Without Mac
+lanes the reservation does not apply and the LPT partition places each shard
+like any other job.
+
+At `a0cd901d` the native lane no longer sets the hosted floor. The dedicated
+RegExp literal sanitizer job chains on the property lane, which ends at 4,264
+seconds and sets the modeled maximum at 71.1 minutes with six or the eight
+configured Mac lanes. The native lane still ends at 3,607 seconds.
+[*Exhaustive RegExp literal evidence*](../regexp-literal-exhaustive/README.md)
+gives the maxima for other lane counts and the command that computes them.
 
 The `native` aggregate requires both native shards. The property suite keeps
 its existing standing; this decision covers the native suite only.

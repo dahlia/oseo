@@ -84,7 +84,8 @@ The new 240-second cost is a scheduling allowance, the 180-second interrupt
 plus 60 seconds of setup, not a measured standalone latency or a new timeout.
 The four shared shard weights are retained estimates: excluding a file also
 changes Node's positional assignments, so they need a later CI refresh.
-With these inputs the generator's modeled maximum changes as follows:
+At `bc6aab055`, with these inputs, the generator's modeled maximum changes
+as follows:
 
 | Self-hosted lanes | Before, seconds | After, seconds | Difference, seconds |
 | ----------------: | --------------: | -------------: | ------------------: |
