@@ -1,9 +1,10 @@
 Eval arguments accounting
 =========================
 
-DS-9 bounds 192 unsupported paths at semantic bundle commit
-`9529210a24be72e2b273f43f014c03a98a29069e`. Size: M. The initial scope has
-zero newly established closures.
+DS-9 reviews 192 unsupported paths at split commit
+`362ddb13d933600f6a0543ac332eb8479be9053f`, based on semantic bundle
+`9529210a24be72e2b273f43f014c03a98a29069e`. Size: M. This accounting
+closes 186 under ADR 0016 and retains six mixed arrow cells in remediation.
 
 The exact selector is
 [*dynamic-source-eval-arguments-accounting.paths.txt*](./dynamic-source-eval-arguments-accounting.paths.txt),
@@ -57,11 +58,33 @@ These appear to test eval declaration semantics themselves, rather than use
 eval merely to build an input.
 
 Accounting audit using the pinned source and existing reviewed rejection
-observations; no complete replacement witness is currently named by the broad
-train assessment. Review each matrix cell for an independent
-arguments/parameter contract before changing any owner. No new evidence should
-be needed if the remainder is exclusively eval-specific; otherwise retain that
-cell and write targeted parameter/arguments evidence.
+observations. The
+[per-path assessment](./dynamic-source-eval-arguments-assessment.md) records
+each cell's normative subject, disposition and reason. All 192 selector paths
+match unsupported umbrella entries in the base ledger, and all 192 source and
+normalized observation digests were recomputed and match the existing audit
+snapshots.
+
+Of these, 184 cells observe eval declaration collisions and global
+non-leakage only; two arrow cells read an eval-created arguments binding.
+These 186 have no independent non-source subject requiring replacement
+evidence. Six arrow cells also assert ordinary function-valued, lexical or
+var body bindings named arguments. Three of those invoke a parameter
+closure and compare its binding with the body binding. No complete static
+replacement is established for those contracts, so all six stay with the
+umbrella. A default closure that is never called is not a binding-lookup
+witness. No new native or fixture evidence is added.
+
+The umbrella goes from 950 to 764 directly owned paths; ADR 0016 goes from
+677 to 863. All 41,091 inventory paths, 29,038 passes, 3,627 expected
+negatives and 1,684 unsupported observations remain. No subset, result or
+dependency tag changes; no UPDATE is needed. The graph remains unlanded,
+and Root owns outer review, publication, integration and landing.
+
+The dependency-tag self-audit changes no rows: the unsupported observations
+retain their asserted-contract tags under the 2026-10-29 shared rules.
+Unused closures, unreachable body bindings and harness counters supply no
+new semantic evidence in this accounting.
 
 For every eventual exclusion, name the exact replacement paths and reviewed
 observations, refresh source and normalized observation digests, and show
