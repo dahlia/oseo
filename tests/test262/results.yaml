@@ -22895,14 +22895,14 @@ summary:
       semanticFailures: 0
       unsupportedProfileFeatures: 4
     - dependency: async-functions
-      expectedNegatives: 434
+      expectedNegatives: 436
       harnessFailures: 0
       infrastructureFailures: 0
       passes: 1562
       semanticFailures: 0
       unsupportedProfileFeatures: 281
     - dependency: async-iteration
-      expectedNegatives: 499
+      expectedNegatives: 500
       harnessFailures: 0
       infrastructureFailures: 0
       passes: 3279
@@ -22930,7 +22930,7 @@ summary:
       semanticFailures: 0
       unsupportedProfileFeatures: 0
     - dependency: classes
-      expectedNegatives: 1136
+      expectedNegatives: 1138
       harnessFailures: 0
       infrastructureFailures: 0
       passes: 5718
@@ -22993,7 +22993,7 @@ summary:
       semanticFailures: 0
       unsupportedProfileFeatures: 570
     - dependency: functions
-      expectedNegatives: 1010
+      expectedNegatives: 1012
       harnessFailures: 0
       infrastructureFailures: 0
       passes: 13170

@@ -160186,7 +160186,8 @@ tests:
       ]
   - path: test/language/statements/class/async-gen-meth-escaped-async.js
     expectedClassification: expected-negative
-    dependencies: [lexical-grammar]
+    dependencies:
+      [async-functions, async-iteration, classes, functions, lexical-grammar]
   - path: test/language/statements/class/async-gen-method-static/array-destructuring-param-strict-body.js
     expectedClassification: expected-negative
     dependencies:
@@ -163065,7 +163066,7 @@ tests:
       ]
   - path: test/language/statements/class/async-meth-escaped-async.js
     expectedClassification: expected-negative
-    dependencies: [lexical-grammar]
+    dependencies: [async-functions, classes, functions, lexical-grammar]
   - path: test/language/statements/class/async-method-static/array-destructuring-param-strict-body.js
     expectedClassification: expected-negative
     dependencies: [async-functions, classes, destructuring-bindings, functions]

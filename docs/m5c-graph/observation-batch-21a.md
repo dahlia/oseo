@@ -101,3 +101,20 @@ The audit covers all 1,768 train rows. Its records are
 *zero-asserted-operator-ast-audit.json* beside the focused evidence.
 Executed counters, logical-assignment subjects with zero results, and
 helpers that change asserted protocol results remain tagged.
+
+
+Outer review grammar audit
+--------------------------
+
+The outer finding 21a-rows-001 restores the grammar families of two
+parse-only negatives: *class/async-gen-meth-escaped-async.js* and
+*class/async-meth-escaped-async.js*. Both retain lexical-grammar and add
+classes, functions, and async-functions; the generator method also adds
+async-iteration. Rule 6 preserves these rejected subject grammar families.
+
+The follow-up scans all 1,768 admitted rows, verifies their pinned source
+hashes, and checks parse-only negatives for lexical-grammar-only tags.
+Exactly these two rows match; the other escaped-keyword negatives retain
+their subject grammar families. The complete audit is
+*outer-fix/full-row-audit.json* beside the focused evidence. No other tag
+family, classification, observation, owner, or landed flag changes.
