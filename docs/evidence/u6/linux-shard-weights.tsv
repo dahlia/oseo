@@ -76,6 +76,7 @@ tests/property/m5-math-namespace.property.test.ts	1140	1052832.616239	990735.847
 tests/property/m5-module-continuation.property.test.ts	153	191083.505904	193223.279306	266752.149296	194
 tests/property/m5-module-namespace-uninitialized.property.test.ts	128	-	-	-	128
 tests/property/m5-module-prelude-script.property.test.ts	486	-	-	-	486
+tests/property/m5-non-blocking-agent.property.test.ts	130	-	-	-	130
 tests/property/m5-number-intrinsic.property.test.ts	1050	965477.688123	911786.974075	1329458.200932	966
 tests/property/m5-number-prototype.property.test.ts	415	1294526.603444	734638.828844	1291499.585016	1292
 tests/property/m5-object-binding.property.test.ts	235	543537.900247	545378.340831	307446.600920	544

@@ -205,6 +205,7 @@ export const nativeShardCosts = {
     "tests/property/m5-module-continuation.property.test.ts": 194,
     "tests/property/m5-module-namespace-uninitialized.property.test.ts": 128,
     "tests/property/m5-module-prelude-script.property.test.ts": 486,
+    "tests/property/m5-non-blocking-agent.property.test.ts": 130,
     "tests/property/m5-number-intrinsic.property.test.ts": 966,
     "tests/property/m5-number-prototype.property.test.ts": 1292,
     "tests/property/m5-object-binding.property.test.ts": 544,

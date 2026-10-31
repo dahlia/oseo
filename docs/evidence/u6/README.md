@@ -1952,3 +1952,25 @@ are retained as *weight-extended-zig.json*, *weight-extended-zig.stdout*,
 packet binds the changed compiler, backend, runtime and test inputs to
 base `1f3ade138ea7cbee80b2d62940e8f497db2bc1a2`; later changes in this
 preparation are scheduling metadata, digest expectations and documentation.
+
+
+Non-blocking agent local cost
+-----------------------------
+
+*tests/property/m5-non-blocking-agent.property.test.ts* also postdates the
+three Linux source runs. Root measured its initial shard weight the same
+way as the primitive with binding object file: one local Linux AMD64
+extended run on the Zig lane with `OSEO_PROPERTY_RUN_SCALE=10`, under the
+heavy lock and a fresh capacity prefix, at bundle 3 commit `0aac392a`. Its
+seed `0x60009400`, size and base limit were unchanged; no seed, size or
+time-scale override was set.
+
+The single complete passing registration took 129932.762582 milliseconds,
+so its per-test case sum is 129932.762582 milliseconds and its rounded-up
+Linux weight is 130 seconds. This is one local observation, not a CI
+file-shard sum, a run-to-run bound or a macOS measurement. Root may replace
+it with exact-candidate CI case sums. macOS gains no entry and keeps its
+unknown-file median fallback.
+
+The TSV retains this later file with `-` for all three historical source
+samples, and the extraction script and its unit test retain it explicitly.
