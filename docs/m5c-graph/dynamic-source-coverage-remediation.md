@@ -636,3 +636,18 @@ moves only with reviewed closure; the umbrella keeps every remaining path
 and now waits for this child. The child accounts for 44 paths under ADR 0016
 with finite literal host Script witnesses and keeps 55 with exact per-path
 reasons, so the umbrella owns 290.
+
+
+Train C ordinary evidence child
+-------------------------------
+
+Items 3 and 4 of the 2026-11-01 umbrella residual answer add
+`dynamic-source-trainc-ordinary-evidence` for exactly 44 train C paths:
+26 Function-constructor paths expected to close with ordinary evidence and
+ADR 0016 accounting, and 18 caller-local direct eval environment paths that
+try evidence first. Its pinned selector and obligations are in that child's
+work note. Ownership moves only with reviewed closure; paths that evidence
+cannot close stay here for the named-deferral route.
+The child accounts for 26 paths under ADR 0016 and keeps the 18
+caller-local paths with exact per-path reasons, so with both children the
+umbrella owns 264.

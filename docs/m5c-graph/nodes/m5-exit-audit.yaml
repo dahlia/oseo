@@ -54,6 +54,7 @@ dependencies:
   - dynamic-source-retagging
   - dynamic-source-static-core-evidence
   - dynamic-source-template-site-evidence
+  - dynamic-source-trainc-ordinary-evidence
   - dynamic-source-unknown-eval
   - eval-intrinsic-value
   - fn-global-object-harness

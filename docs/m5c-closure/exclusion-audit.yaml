@@ -80,6 +80,113 @@ records:
         tests a mandatory contract this boundary would leave
         uncovered reopens it for that path.
 assessments:
+  trainc-strict-restricted-static:
+    disposition: exclusion
+    normativeDependency: source-evaluation-only
+    reason: >-
+      Train C item 3 evidence for the 16 strict function restricted-property
+      paths. A static strict function expression replaces Function and new
+      Function with a strict directive and retains the caller and arguments read
+      and write TypeErrors and both for-in loops, including the loop over this
+      inside the function, in sloppy and strict callers. Exact empty key lists
+      and strict value/type checks precede six mutations, each rejected by an
+      independent Test262Error verdict. Both native policies with forced GC and
+      Node/Deno references observe the same output. Only the construction of the
+      strict function remains. Only the original source evaluation remains
+      excluded under ADR 0016; accounting counts no path as pass. Reopen on
+      changed source, observed rejection or replacement evidence, an accepted
+      source admission, or any uncovered non-source assertion under ADR 0019.
+    replacementEvidence:
+      docs/m5c-graph/dynamic-source-trainc-ordinary-assessment.md:
+        "9e9cb874d7e3449a29cdfa6da9b075a1a27bcf073f7a5bb4\
+        de1e233d002e654e"
+      tests/native/fixtures/trainc-ordinary-evidence.ts:
+        "09f2ff5f03ec78f88848b42878a50464caf94ff346db0e92\
+        07ad008ec300bd49"
+      tests/trainc-ordinary-evidence.test.ts:
+        "42a2b5adcea97e0a3644dd128901d0e9d3e962422b38445a\
+        b75594a265f9eba6"
+      tests/trainc-ordinary-source.test.ts:
+        "b39847456bec796078ece3c22939494371f3006467bbb90a\
+        e27f25abf8eaa76b"
+      tests/native/host-script-reference.ts:
+        "d01339d26b85c0c7e315f453a831bd12a725261ce11635ba\
+        a6ea62c1b8cab262"
+      tests/test262/harness/base.js:
+        "50331feeca513cb2e2354e05e7c68f82d5aeccd9b766d6c8\
+        8438c5ef118075f6"
+  trainc-sloppy-body-static:
+    disposition: exclusion
+    normativeDependency: source-evaluation-only
+    reason: >-
+      Train C item 3 evidence for five executed sloppy constructed bodies.
+      Static sloppy callables replace bodies that assign the global eval or the
+      local arguments binding, and the S13.2.2_A8_T3 function returned from a
+      constructor keeps all four values. Strict and sloppy callers, the eval
+      descriptor before assignment, the value after it, and a literal strict ADR
+      0029 wrapper for the 13.0-17-s eval site under the DS-21 conditions are
+      covered. Seven mutations are rejected by independent Test262Error
+      verdicts; both native policies with forced GC and Node/Deno references
+      agree. Only the rule that a constructed body is sloppy whatever the
+      caller's mode remains. Only the original source evaluation remains
+      excluded under ADR 0016; accounting counts no path as pass. Reopen on
+      changed source, observed rejection or replacement evidence, an accepted
+      source admission, or any uncovered non-source assertion under ADR 0019.
+    replacementEvidence:
+      docs/m5c-graph/dynamic-source-trainc-ordinary-assessment.md:
+        "9e9cb874d7e3449a29cdfa6da9b075a1a27bcf073f7a5bb4\
+        de1e233d002e654e"
+      tests/native/fixtures/trainc-ordinary-evidence.ts:
+        "09f2ff5f03ec78f88848b42878a50464caf94ff346db0e92\
+        07ad008ec300bd49"
+      tests/trainc-ordinary-evidence.test.ts:
+        "42a2b5adcea97e0a3644dd128901d0e9d3e962422b38445a\
+        b75594a265f9eba6"
+      tests/trainc-ordinary-source.test.ts:
+        "b39847456bec796078ece3c22939494371f3006467bbb90a\
+        e27f25abf8eaa76b"
+      tests/native/host-script-reference.ts:
+        "d01339d26b85c0c7e315f453a831bd12a725261ce11635ba\
+        a6ea62c1b8cab262"
+      tests/test262/harness/base.js:
+        "50331feeca513cb2e2354e05e7c68f82d5aeccd9b766d6c8\
+        8438c5ef118075f6"
+  trainc-constructor-phase:
+    disposition: exclusion
+    normativeDependency: source-evaluation-only
+    reason: >-
+      Train C item 3 evidence for five construction-phase paths whose
+      constructed functions never run. Static grammar checks accept sloppy var
+      eval, var arguments, eval and arguments assignment bodies and reject each
+      with a strict directive. A nested literal host Script raises the
+      caller-realm SyntaxError at run time, matching the CreateDynamicFunction
+      phase, directly for 13.0-14-s and through a literal wrapper at the
+      13.0-13-s eval site under the DS-21 conditions. The witnesses show that
+      unexecuted bodies stay uncalled, and three mutations are rejected by
+      independent verdicts. Only CreateDynamicFunction parsing remains. Only the
+      original source evaluation remains excluded under ADR 0016; accounting
+      counts no path as pass. Reopen on changed source, observed rejection or
+      replacement evidence, an accepted source admission, or any uncovered
+      non-source assertion under ADR 0019.
+    replacementEvidence:
+      docs/m5c-graph/dynamic-source-trainc-ordinary-assessment.md:
+        "9e9cb874d7e3449a29cdfa6da9b075a1a27bcf073f7a5bb4\
+        de1e233d002e654e"
+      tests/native/fixtures/trainc-ordinary-evidence.ts:
+        "09f2ff5f03ec78f88848b42878a50464caf94ff346db0e92\
+        07ad008ec300bd49"
+      tests/trainc-ordinary-evidence.test.ts:
+        "42a2b5adcea97e0a3644dd128901d0e9d3e962422b38445a\
+        b75594a265f9eba6"
+      tests/trainc-ordinary-source.test.ts:
+        "b39847456bec796078ece3c22939494371f3006467bbb90a\
+        e27f25abf8eaa76b"
+      tests/native/host-script-reference.ts:
+        "d01339d26b85c0c7e315f453a831bd12a725261ce11635ba\
+        a6ea62c1b8cab262"
+      tests/test262/harness/base.js:
+        "50331feeca513cb2e2354e05e7c68f82d5aeccd9b766d6c8\
+        8438c5ef118075f6"
   ds9-eval-arguments-only:
     disposition: exclusion
     normativeDependency: source-evaluation-only
@@ -5464,7 +5571,9 @@ assessments:
       rejections as active coverage remediation. Source hashes and normalized
       observation digests bind every assessment to its original subject. No
       equivalent replacement or whole-path exclusion is claimed; ADR 0013,
-      ADR 0016 and ADR 0019 and their reopening triggers remain unchanged.
+      ADR 0016 and ADR 0019 and their reopening triggers remain unchanged. The
+      bundle 4 UPDATE promoted S13.2.2_A13.js, and the train C ordinary
+      evidence node moved 26 Function-constructor paths to trainc assessments.
   annex-b-ordinary-object-prototype:
     disposition: exclusion
     normativeDependency: annex-b-only
@@ -27754,7 +27863,7 @@ paths:
     subject: "Strict Mode - SourceElements is not evaluated as strict mode code
       when a Function constructor is contained in strict mode code and the
       function constructor body is not strict"
-    assessment: "observation-train-b26a-b26b-b27"
+    assessment: "trainc-sloppy-body-static"
   - path: "test/language/statements/function/13.0-13-s.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "source-subject"
@@ -27767,7 +27876,7 @@ paths:
     subject: "Strict Mode - SourceElements is evaluated as strict mode code when
       the function body of a Function constructor begins with a Strict
       Directive"
-    assessment: "observation-train-b26a-b26b-b27"
+    assessment: "trainc-constructor-phase"
   - path: "test/language/statements/function/13.0-14-s.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "source-subject"
@@ -27779,7 +27888,7 @@ paths:
     section: "Original es5id: 13.0-14-s"
     subject: "Strict Mode - SourceElements is evaluated as strict mode code when
       the function body of a Function constructor contains a Strict Directive"
-    assessment: "observation-train-b26a-b26b-b27"
+    assessment: "trainc-constructor-phase"
   - path: "test/language/statements/function/13.0-15-s.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "source-subject"
@@ -27816,7 +27925,7 @@ paths:
     subject: "Strict Mode - SourceElements is not evaluated as strict mode code
       when a Function constructor is contained in strict mode code within eval
       code"
-    assessment: "observation-train-b26a-b26b-b27"
+    assessment: "trainc-sloppy-body-static"
   - path: "test/language/statements/function/13.0-7-s.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "source-subject"
@@ -27854,7 +27963,7 @@ paths:
     section: "Original es5id: 13.0_4-17gs"
     subject: "Strict Mode - SourceElements is not evaluated as strict mode code
       when a Function constructor is contained in strict mode code"
-    assessment: "observation-train-b26a-b26b-b27"
+    assessment: "trainc-constructor-phase"
   - path: "test/language/statements/function/13.1-19-s.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "source-subject"
@@ -28035,7 +28144,7 @@ paths:
     section: "Original es5id: 13.2-10-s"
     subject: "StrictMode - writing a property named 'caller' of function objects
       is not allowed outside the function"
-    assessment: "observation-train-b26a-b26b-b27"
+    assessment: "trainc-strict-restricted-static"
   - path: "test/language/statements/function/13.2-11-s.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "incidental-scaffolding"
@@ -28047,7 +28156,7 @@ paths:
     section: "Original es5id: 13.2-11-s"
     subject: "StrictMode - enumerating over a function object looking for
       'caller' fails outside of the function"
-    assessment: "observation-train-b26a-b26b-b27"
+    assessment: "trainc-strict-restricted-static"
   - path: "test/language/statements/function/13.2-12-s.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "incidental-scaffolding"
@@ -28059,7 +28168,7 @@ paths:
     section: "Original es5id: 13.2-12-s"
     subject: "StrictMode - enumerating over a function object looking for
       'caller' fails inside the function"
-    assessment: "observation-train-b26a-b26b-b27"
+    assessment: "trainc-strict-restricted-static"
   - path: "test/language/statements/function/13.2-13-s.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "incidental-scaffolding"
@@ -28071,7 +28180,7 @@ paths:
     section: "Original es5id: 13.2-13-s"
     subject: "StrictMode - reading a property named 'arguments' of function
       objects is not allowed outside the function"
-    assessment: "observation-train-b26a-b26b-b27"
+    assessment: "trainc-strict-restricted-static"
   - path: "test/language/statements/function/13.2-14-s.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "incidental-scaffolding"
@@ -28083,7 +28192,7 @@ paths:
     section: "Original es5id: 13.2-14-s"
     subject: "StrictMode - writing a property named 'arguments' of function
       objects is not allowed outside the function"
-    assessment: "observation-train-b26a-b26b-b27"
+    assessment: "trainc-strict-restricted-static"
   - path: "test/language/statements/function/13.2-15-s.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "incidental-scaffolding"
@@ -28095,7 +28204,7 @@ paths:
     section: "Original es5id: 13.2-15-s"
     subject: "StrictMode - enumerating over a function object looking for
       'arguments' fails outside of the function"
-    assessment: "observation-train-b26a-b26b-b27"
+    assessment: "trainc-strict-restricted-static"
   - path: "test/language/statements/function/13.2-16-s.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "incidental-scaffolding"
@@ -28107,7 +28216,7 @@ paths:
     section: "Original es5id: 13.2-16-s"
     subject: "StrictMode - enumerating over a function object looking for
       'arguments' fails inside the function"
-    assessment: "observation-train-b26a-b26b-b27"
+    assessment: "trainc-strict-restricted-static"
   - path: "test/language/statements/function/13.2-17-s.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "incidental-scaffolding"
@@ -28119,7 +28228,7 @@ paths:
     section: "Original es5id: 13.2-17-s"
     subject: "StrictMode - reading a property named 'arguments' of function
       objects is not allowed outside the function"
-    assessment: "observation-train-b26a-b26b-b27"
+    assessment: "trainc-strict-restricted-static"
   - path: "test/language/statements/function/13.2-18-s.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "incidental-scaffolding"
@@ -28131,7 +28240,7 @@ paths:
     section: "Original es5id: 13.2-18-s"
     subject: "StrictMode - writing a property named 'arguments' of function
       objects is not allowed outside the function"
-    assessment: "observation-train-b26a-b26b-b27"
+    assessment: "trainc-strict-restricted-static"
   - path: "test/language/statements/function/13.2-19-s.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "incidental-scaffolding"
@@ -28143,7 +28252,7 @@ paths:
     section: "Original es5id: 13.2-19-s"
     subject: "StrictMode - enumerating over a function object looking for
       'arguments' fails outside of the function"
-    assessment: "observation-train-b26a-b26b-b27"
+    assessment: "trainc-strict-restricted-static"
   - path: "test/language/statements/function/13.2-20-s.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "incidental-scaffolding"
@@ -28155,7 +28264,7 @@ paths:
     section: "Original es5id: 13.2-20-s"
     subject: "StrictMode - enumerating over a function object looking for
       'arguments' fails inside the function"
-    assessment: "observation-train-b26a-b26b-b27"
+    assessment: "trainc-strict-restricted-static"
   - path: "test/language/statements/function/13.2-5-s.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "incidental-scaffolding"
@@ -28167,7 +28276,7 @@ paths:
     section: "Original es5id: 13.2-5-s"
     subject: "StrictMode - reading a property named 'caller' of function objects
       is not allowed outside the function"
-    assessment: "observation-train-b26a-b26b-b27"
+    assessment: "trainc-strict-restricted-static"
   - path: "test/language/statements/function/13.2-6-s.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "incidental-scaffolding"
@@ -28179,7 +28288,7 @@ paths:
     section: "Original es5id: 13.2-6-s"
     subject: "StrictMode - writing a property named 'caller' of function objects
       is not allowed outside the function"
-    assessment: "observation-train-b26a-b26b-b27"
+    assessment: "trainc-strict-restricted-static"
   - path: "test/language/statements/function/13.2-7-s.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "incidental-scaffolding"
@@ -28191,7 +28300,7 @@ paths:
     section: "Original es5id: 13.2-7-s"
     subject: "StrictMode - enumerating over a function object looking for
       'caller' fails outside of the function"
-    assessment: "observation-train-b26a-b26b-b27"
+    assessment: "trainc-strict-restricted-static"
   - path: "test/language/statements/function/13.2-8-s.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "incidental-scaffolding"
@@ -28203,7 +28312,7 @@ paths:
     section: "Original es5id: 13.2-8-s"
     subject: "StrictMode - enumerating over a function object looking for
       'caller' fails inside the function"
-    assessment: "observation-train-b26a-b26b-b27"
+    assessment: "trainc-strict-restricted-static"
   - path: "test/language/statements/function/13.2-9-s.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "incidental-scaffolding"
@@ -28215,7 +28324,7 @@ paths:
     section: "Original es5id: 13.2-9-s"
     subject: "StrictMode - reading a property named 'caller' of function objects
       is not allowed outside the function"
-    assessment: "observation-train-b26a-b26b-b27"
+    assessment: "trainc-strict-restricted-static"
   - path: "test/language/statements/function/S13.2.2_A13.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "incidental-scaffolding"
@@ -28251,7 +28360,7 @@ paths:
     section: "Original es5id: 13.2.2_A8_T3"
     subject: "Creating a function whose prototype contains declaration of
       another function defined by using Function.call method"
-    assessment: "observation-train-b26a-b26b-b27"
+    assessment: "trainc-sloppy-body-static"
   - path: "test/language/statements/function/S13_A14_T1.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "incidental-scaffolding"
@@ -29079,7 +29188,7 @@ paths:
     section: "Original es5id: 12.2.1-16-s"
     subject: "A Function constructor (called as a function) declaring a var
       named 'arguments' does not throw a SyntaxError"
-    assessment: "observation-train-b26a-b26b-b27"
+    assessment: "trainc-constructor-phase"
   - path: "test/language/statements/variable/12.2.1-17-s.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "source-subject"
@@ -29092,7 +29201,7 @@ paths:
     subject: "A Function constructor (called as a function) assigning into
       'arguments' will not throw any error if contained within strict mode and
       its body does not start with strict mode"
-    assessment: "observation-train-b26a-b26b-b27"
+    assessment: "trainc-sloppy-body-static"
   - path: "test/language/statements/variable/12.2.1-18-s.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "source-subject"
@@ -29199,7 +29308,7 @@ paths:
     missingDynamicTag: false
     section: "Original es5id: 12.2.1-5-s"
     subject: "a Function declaring var named 'eval' does not throw SyntaxError"
-    assessment: "observation-train-b26a-b26b-b27"
+    assessment: "trainc-constructor-phase"
   - path: "test/language/statements/variable/12.2.1-6-s.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "source-subject"
@@ -29212,7 +29321,7 @@ paths:
     subject: "eval - a Function assigning into 'eval' will not throw any error
       if contained within strict mode and its body does not start with strict
       mode"
-    assessment: "observation-train-b26a-b26b-b27"
+    assessment: "trainc-sloppy-body-static"
   - path: "test/language/statements/variable/12.2.1-7-s.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "source-subject"

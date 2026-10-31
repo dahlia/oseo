@@ -20,8 +20,8 @@ baseline:
   unreviewedPaths: 0
   unsupportedProfileFeatures: 1939
 summary:
-  nodes: 144
-  ready: 142
+  nodes: 145
+  ready: 143
   blocked: 2
   parked: 0
   landed: 137
@@ -11449,4 +11449,24 @@ collisions:
     nodes:
       - dynamic-source-host-script-evidence
       - unhandled-rejection-observation
+    note: "Independent publishers serialize canonical manifest updates."
+  - path: tests/test262/results.yaml
+    nodes:
+      - class-private-accessor-lookup-coverage-remediation
+      - dynamic-source-trainc-ordinary-evidence
+    note: "Independent publishers serialize canonical manifest updates."
+  - path: tests/test262/results.yaml
+    nodes:
+      - dynamic-source-trainc-ordinary-evidence
+      - ordinary-object-proto-coverage-remediation
+    note: "Independent publishers serialize canonical manifest updates."
+  - path: tests/test262/results.yaml
+    nodes:
+      - dynamic-source-trainc-ordinary-evidence
+      - unhandled-rejection-observation
+    note: "Independent publishers serialize canonical manifest updates."
+  - path: tests/test262/results.yaml
+    nodes:
+      - dynamic-source-host-script-evidence
+      - dynamic-source-trainc-ordinary-evidence
     note: "Independent publishers serialize canonical manifest updates."

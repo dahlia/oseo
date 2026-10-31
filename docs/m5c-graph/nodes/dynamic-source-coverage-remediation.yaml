@@ -296,7 +296,12 @@ delivers: "Resolves the 334 reviewed unsupported paths assigned to
   leaving 334. dynamic-source-host-script-evidence then accounts for 44 of
   its 99 DS-10 and completion paths under ADR 0016 with finite literal host
   Script witnesses and keeps 55, leaving 290; see
-  docs/m5c-graph/dynamic-source-host-script-evidence.md."
+  docs/m5c-graph/dynamic-source-host-script-evidence.md.
+  dynamic-source-trainc-ordinary-evidence accounts for 26 of its 44 train C
+  paths under ADR 0016 with static, grammar and literal host Script
+  witnesses compared strictly and keeps 18 caller-local direct eval
+  environment paths, leaving 264; see
+  docs/m5c-graph/dynamic-source-trainc-ordinary-assessment.md."
 dependencies:
   - authorized-exclusion-audit
   - dynamic-source-binding-reference-evidence
@@ -322,6 +327,7 @@ dependencies:
   - dynamic-source-residual-evidence
   - dynamic-source-static-core-evidence
   - dynamic-source-template-site-evidence
+  - dynamic-source-trainc-ordinary-evidence
   - dynamic-source-unknown-eval
   - static-specifier-import-design
 landed: false
