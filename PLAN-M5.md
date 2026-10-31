@@ -19,8 +19,8 @@ the deterministic native scheduler through the explicit CLI module goal, and
 the dependency-indexed baseline manifest covers module linking and early
 errors, top-level await, asynchronous functions, and the Promise family with
 honest unsupported classifications. The current reviewed manifest records
-39,421 reviewed cases: 33,530 passes, 4,095
-expected negatives, and 1,796 unsupported profile features with no semantic,
+41,090 reviewed cases: 34,750 passes, 4,401
+expected negatives, and 1,939 unsupported profile features with no semantic,
 harness, or infrastructure failures.
 [ADR 0020](./docs/adr/0020-m5-applicable-test-inventory.md) now fixes the M5a
 denominator at 41,091 paths from 47,381 candidates: 22,998 language tests and
