@@ -87,6 +87,14 @@ Reflect, proxy fallback, TypedArray, and cross-realm reads. The runtime ABI at
 that checkpoint was `oseo-runtime-m5-129`; Annex B and the ADR 0013 vocabulary
 stay unchanged.
 
+Observation-batch-28 admits *test/language/types/object/S8.6.2\_A8.js*, whose
+`__proto__` write on a non-extensible ordinary object is rejected at compile
+time with this `OSEO1001` accessor diagnostic in every variant. Its unsupported
+observation is owned by `node:ordinary-object-proto-coverage-remediation`. The
+asserted core contract, that the object keeps `Object.prototype` as its
+`[[Prototype]]`, does not require Annex B; no replacement evidence is bound
+yet, so the path is not an exclusion.
+
 Runtime ABI `oseo-runtime-m5-134` added the write half of that historical
 boundary. A `[[Set]]` of `"__proto__"` whose walk reached an intrinsic
 `Object.prototype` without finding an own property there or earlier reported
@@ -255,8 +263,8 @@ with the executed variants and target, reviewed dependency tags, and summaries
 with raw, path-group, and dependency totals. Unsupported, harness, and
 infrastructure results never increase the pass count.
 
-The current manifest contains 39,421 reviewed cases: 33,530 passes, 4,095
-expected negatives, and 1,796 unsupported profile features. It records no
+The current manifest contains 39,422 reviewed cases: 33,530 passes, 4,095
+expected negatives, and 1,797 unsupported profile features. It records no
 semantic, harness, or infrastructure failures.
 
 The batch 16/17 dependency audit corrects 21 tag claims on 20 of their
