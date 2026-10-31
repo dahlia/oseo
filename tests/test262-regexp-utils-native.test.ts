@@ -96,6 +96,12 @@ test(
 
 /** Complete pinned subjects, including their original assertions and data. */
 const representatives = [
+  "CharacterClassEscapes/" +
+    "character-class-non-digit-class-escape-positive-cases.js",
+  "CharacterClassEscapes/" +
+    "character-class-non-whitespace-class-escape-positive-cases.js",
+  "CharacterClassEscapes/" +
+    "character-class-non-word-class-escape-positive-cases.js",
   "CharacterClassEscapes/character-class-word-class-escape-positive-cases.js",
   "property-escapes/generated/ASCII.js",
   "property-escapes/generated/General_Category_-_Surrogate.js",

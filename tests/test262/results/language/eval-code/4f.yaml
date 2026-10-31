@@ -29,13 +29,21 @@ results:
       - promise-settlement
       - symbols
       - var-bindings
+    execution:
+      harnessIncludes:
+        - base.js
+        - doneprintHandle.js
+      scheduler: deterministic-logical-clock
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
     observation:
-      detail: "test/language/eval-code/direct/async-func-decl-a-following-par\
-        ameter-is-named-arguments-declare-arguments-and-assign.js
-        non-strict disabled failed (1): stdout=\"\"
-        stderr=\"test/language/eval-code/direct/async-func-decl-a-follo\
-        wing-parameter-is-named-arguments-declare-arguments-and-assign.\
-        js:115:22: error[OSEO1001]: Unknown binding 'eval'.\\n\""
+      detail: 'test/language/eval-code/direct/async-func-decl-a-following-parameter-is-named-arguments-declare-arguments-and-assign.js
+        non-strict disabled failed (1): stdout=""
+        stderr="test/language/eval-code/direct/async-func-decl-a-following-parameter-is-named-arguments-declare-arguments-and-assign.js:115:22:
+        error[OSEO1001]: eval compiles source text at run time, which is
+        outside the admitted profile.\n"'
       passed: false
       unsupportedCapability: profile-syntax
     unsupportedFeatures: []
@@ -57,11 +65,19 @@ results:
       - error-intrinsics
       - expression-operators
       - functions
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
     observation:
-      detail: "test/language/eval-code/direct/strictness-override.js
-        non-strict disabled failed (1): stdout=\"\"
-        stderr=\"test/language/eval-code/direct/strictness-override.js:\
-        89:3: error[OSEO1001]: Unknown binding 'eval'.\\n\""
+      detail: 'test/language/eval-code/direct/strictness-override.js
+        non-strict disabled failed (1): stdout=""
+        stderr="test/language/eval-code/direct/strictness-override.js:89:3:
+        error[OSEO1001]: eval compiles source text at run time, which is
+        outside the admitted profile.\n"'
       passed: false
       unsupportedCapability: profile-syntax
     unsupportedFeatures: []
@@ -85,11 +101,19 @@ results:
       - functions
       - object-properties
       - var-bindings
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: strict
     observation:
-      detail: "test/language/eval-code/direct/switch-dflt-decl-onlystrict.js
-        strict disabled failed (1): stdout=\"\"
-        stderr=\"test/language/eval-code/direct/switch-dflt-decl-onlyst\
-        rict.js:95:1: error[OSEO1001]: Unknown binding 'eval'.\\n\""
+      detail: 'test/language/eval-code/direct/switch-dflt-decl-onlystrict.js
+        strict disabled failed (1): stdout=""
+        stderr="test/language/eval-code/direct/switch-dflt-decl-onlystrict.js:95:1:
+        error[OSEO1001]: eval compiles source text at run time, which is
+        outside the admitted profile.\n"'
       passed: false
       unsupportedCapability: profile-syntax
     unsupportedFeatures: []

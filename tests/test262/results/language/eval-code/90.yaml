@@ -27,13 +27,19 @@ results:
       - object-literals
       - object-properties
       - var-bindings
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
     observation:
-      detail: "test/language/eval-code/direct/async-gen-meth-a-following-para\
-        meter-is-named-arguments-declare-arguments-and-assign.js
-        non-strict disabled failed (1): stdout=\"\"
-        stderr=\"test/language/eval-code/direct/async-gen-meth-a-follow\
-        ing-parameter-is-named-arguments-declare-arguments-and-assign.j\
-        s:87:24: error[OSEO1001]: Unknown binding 'eval'.\\n\""
+      detail: 'test/language/eval-code/direct/async-gen-meth-a-following-parameter-is-named-arguments-declare-arguments-and-assign.js
+        non-strict disabled failed (1): stdout=""
+        stderr="test/language/eval-code/direct/async-gen-meth-a-following-parameter-is-named-arguments-declare-arguments-and-assign.js:87:24:
+        error[OSEO1001]: eval compiles source text at run time, which is
+        outside the admitted profile.\n"'
       passed: false
       unsupportedCapability: profile-syntax
     unsupportedFeatures: []
@@ -61,13 +67,19 @@ results:
       - lexical-bindings
       - object-properties
       - var-bindings
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
     observation:
-      detail: "test/language/eval-code/direct/gen-func-expr-nameless-fn-body-\
-        cntns-arguments-lex-bind-declare-arguments.js non-strict
-        disabled failed (1): stdout=\"\"
-        stderr=\"test/language/eval-code/direct/gen-func-expr-nameless-\
-        fn-body-cntns-arguments-lex-bind-declare-arguments.js:89:25:
-        error[OSEO1001]: Unknown binding 'eval'.\\n\""
+      detail: 'test/language/eval-code/direct/gen-func-expr-nameless-fn-body-cntns-arguments-lex-bind-declare-arguments.js
+        non-strict disabled failed (1): stdout=""
+        stderr="test/language/eval-code/direct/gen-func-expr-nameless-fn-body-cntns-arguments-lex-bind-declare-arguments.js:89:25:
+        error[OSEO1001]: eval compiles source text at run time, which is
+        outside the admitted profile.\n"'
       passed: false
       unsupportedCapability: profile-syntax
     unsupportedFeatures: []
@@ -93,11 +105,19 @@ results:
       - functions
       - lexical-bindings
       - var-bindings
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
     observation:
-      detail: "test/language/eval-code/direct/var-env-global-lex-non-strict.js
-        non-strict disabled failed (1): stdout=\"\"
-        stderr=\"test/language/eval-code/direct/var-env-global-lex-non-\
-        strict.js:105:1: error[OSEO1001]: Unknown binding 'eval'.\\n\""
+      detail: 'test/language/eval-code/direct/var-env-global-lex-non-strict.js
+        non-strict disabled failed (1): stdout=""
+        stderr="test/language/eval-code/direct/var-env-global-lex-non-strict.js:105:1:
+        error[OSEO1001]: eval compiles source text at run time, which is
+        outside the admitted profile.\n"'
       passed: false
       unsupportedCapability: profile-syntax
     unsupportedFeatures: []
@@ -117,11 +137,19 @@ results:
       - dynamic-source
       - functions
       - var-bindings
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: strict
     observation:
-      detail: "test/language/eval-code/direct/var-env-var-strict-caller.js
-        strict disabled failed (1): stdout=\"\"
-        stderr=\"test/language/eval-code/direct/var-env-var-strict-call\
-        er.js:91:6: error[OSEO1001]: Unknown binding 'eval'.\\n\""
+      detail: 'test/language/eval-code/direct/var-env-var-strict-caller.js
+        strict disabled failed (1): stdout=""
+        stderr="test/language/eval-code/direct/var-env-var-strict-caller.js:91:6:
+        error[OSEO1001]: eval compiles source text at run time, which is
+        outside the admitted profile.\n"'
       passed: false
       unsupportedCapability: profile-syntax
     unsupportedFeatures: []

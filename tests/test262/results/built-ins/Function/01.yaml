@@ -39,11 +39,19 @@ results:
     classification: unsupported-profile-feature
     dependencies:
       - functions
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
     observation:
-      detail: "test/built-ins/Function/prototype/apply/S15.3.4.3_A3_T9.js
-        non-strict disabled failed (1): stdout=\"\"
-        stderr=\"test/built-ins/Function/prototype/apply/S15.3.4.3_A3_T\
-        9.js:87:1: error[OSEO1001]: Unknown binding 'eval'.\\n\""
+      detail: 'test/built-ins/Function/prototype/apply/S15.3.4.3_A3_T9.js
+        non-strict disabled failed (1): stdout=""
+        stderr="test/built-ins/Function/prototype/apply/S15.3.4.3_A3_T9.js:87:1:
+        error[OSEO1001]: eval compiles source text at run time, which is
+        outside the admitted profile.\n"'
       passed: false
       unsupportedCapability: profile-syntax
     unsupportedFeatures: []
@@ -94,11 +102,19 @@ results:
     classification: unsupported-profile-feature
     dependencies:
       - functions
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
     observation:
-      detail: "test/built-ins/Function/prototype/call/S15.3.4.4_A3_T9.js
-        non-strict disabled failed (1): stdout=\"\"
-        stderr=\"test/built-ins/Function/prototype/call/S15.3.4.4_A3_T9\
-        .js:87:1: error[OSEO1001]: Unknown binding 'eval'.\\n\""
+      detail: 'test/built-ins/Function/prototype/call/S15.3.4.4_A3_T9.js
+        non-strict disabled failed (1): stdout=""
+        stderr="test/built-ins/Function/prototype/call/S15.3.4.4_A3_T9.js:87:1:
+        error[OSEO1001]: eval compiles source text at run time, which is
+        outside the admitted profile.\n"'
       passed: false
       unsupportedCapability: profile-syntax
     unsupportedFeatures: []

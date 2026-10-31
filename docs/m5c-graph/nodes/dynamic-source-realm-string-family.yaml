@@ -20,5 +20,5 @@ delivers: "DS-7 of the dynamic-source-coverage-remediation split approved by
   and ADR 0019 remain unchanged."
 dependencies:
   - authorized-exclusion-audit
-landed: false
+landed: true
 status: ready

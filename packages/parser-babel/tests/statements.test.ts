@@ -954,13 +954,12 @@ test("reads and writes the eval global property as a value", () => {
   );
 });
 
-test("keeps the ADR 0016 rejection of an unshadowed eval call", () => {
-  // ECMA-262 2025 13.3.6.1 makes a call a direct eval when its callee is
-  // an identifier Reference named eval, IsPropertyReference is false, and
-  // the value is %eval%. An unshadowed eval(...) is such a call, and ADR
-  // 0016 keeps it outside the profile with the diagnostic it always had.
+test("dispatches direct eval calls through the current global value", () => {
+  // Non-String arguments need no source compilation. The same generic
+  // dispatch rejects Strings at run time and honors replaced globals.
   for (const source of [
     'eval("1");',
+    "eval();",
     "eval(1);",
     "(eval)(1);",
     "eval(...[1]);",
@@ -973,16 +972,10 @@ test("keeps the ADR 0016 rejection of an unshadowed eval call", () => {
       source,
       sourceId: "eval-call.ts",
     });
-    assert.equal(result.mir, undefined, source);
-    assert.deepEqual(
-      result.diagnostics.map((diagnostic) => [
-        diagnostic.code,
-        diagnostic.message,
-        diagnostic.byteRange,
-      ]),
-      [["OSEO1001", "Unknown binding 'eval'.", { end: 0, start: 0 }]],
-      source,
-    );
+    assert.deepEqual(result.diagnostics, [], source);
+    assert.ok(result.hir != null, source);
+    assert.ok(result.mir != null, source);
+    assert.match(printHir(result.hir), /intrinsic global object/u);
   }
   // A parameter, var, or `with` object may hold any value. A call whose
   // Reference name is eval and whose Environment Record base yields %eval%

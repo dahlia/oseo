@@ -211,3 +211,134 @@ test(
     );
   },
 );
+
+interface PatternCase {
+  readonly provided: boolean;
+  readonly value: boolean | number | string | null | { readonly item: number };
+}
+
+const patternArbitrary: fc.Arbitrary<PatternCase> = fc.record({
+  provided: fc.boolean(),
+  value: fc.oneof(
+    fc.integer({ min: -9, max: 9 }),
+    fc.boolean(),
+    fc.constant(null),
+    fc.constantFrom("", "text"),
+    fc.record({ item: fc.integer({ min: -9, max: 9 }) }),
+  ),
+});
+
+/** Each draw exercises every binding context with a lazy or reached default. */
+function patternSource(value: PatternCase): string {
+  const input = value.provided ? JSON.stringify(value.value) : "undefined";
+  return [
+    `const input = ${input};`,
+    `const fallback = ${JSON.stringify(value.value)};`,
+    "let calls = 0;",
+    "const resolve = () => { calls++; return Promise.resolve(fallback); };",
+    "export var { item: exported = await resolve() } = { item: input };",
+    'console.log("export", JSON.stringify(exported));',
+    "try { throw [input]; } catch ([caught = await resolve()]) {",
+    '  console.log("catch", JSON.stringify(caught));',
+    "}",
+    "for (let [bound = await resolve()] = [input], once = true; once;",
+    "    once = false) console.log('for', JSON.stringify(bound));",
+    "for (const { item: bound = await resolve() } of [{ item: input }])",
+    "  console.log('of', JSON.stringify(bound));",
+    "const target = {};",
+    "[target[await 'item'] = await resolve()] = [input];",
+    "console.log('assignment', JSON.stringify(target.item));",
+    "const { [await 'item']: keyed = await resolve(), ...rest } =",
+    "  { item: input, extra: 1 };",
+    "console.log('key', JSON.stringify(keyed), rest.extra);",
+    "for (const { [await 'length']: size } in { ab: 1 })",
+    "  console.log('in', size);",
+    "/** @param {number} value */",
+    "function add(value) { return value + 1; }",
+    "console.log('fallback', add('s'));",
+    "console.log('calls', calls);",
+    "",
+  ].join("\n");
+}
+
+async function assertNativePattern(value: PatternCase): Promise<void> {
+  const directory = await host.makeTemporaryDirectory("oseo-pattern-property-");
+  let succeeded = false;
+  try {
+    const entry = `${directory}/entry.mjs`;
+    await host.writeTextFile(entry, patternSource(value));
+    const item = JSON.stringify(value.value);
+    const expected = [
+      `export ${item}`,
+      `catch ${item}`,
+      `for ${item}`,
+      `of ${item}`,
+      `assignment ${item}`,
+      `key ${item} 1`,
+      "in 2",
+      "fallback s1",
+      `calls ${value.provided ? 0 : 6}`,
+      "",
+    ].join("\n");
+    for (const [command, args] of [
+      ["node", [entry]],
+      ["deno", ["run", "--quiet", entry]],
+    ] as const) {
+      const result = await host.run({ command, args, cwd: directory });
+      assert.equal(result.exitStatus, 0, result.stderr);
+      assert.equal(result.stderr, "");
+      assert.equal(result.stdout, expected, command);
+    }
+    const previous = process.env.OSEO_GC_EVERY_SAFEPOINT;
+    process.env.OSEO_GC_EVERY_SAFEPOINT = "1";
+    try {
+      for (const specialization of ["disabled", "enabled"] as const) {
+        const result = await runNativeCli(
+          {
+            args: [
+              ...(specialization === "disabled" ? ["--no-specialization"] : []),
+              entry,
+            ],
+            version: "0.1.0",
+          },
+          host,
+        );
+        assert.equal(result.exitStatus, 0, result.stderr);
+        assert.equal(result.stderr, "");
+        assert.equal(result.stdout, expected, specialization);
+      }
+    } finally {
+      if (previous == null) delete process.env.OSEO_GC_EVERY_SAFEPOINT;
+      else process.env.OSEO_GC_EVERY_SAFEPOINT = previous;
+    }
+    succeeded = true;
+  } catch (error) {
+    throw new Error(`Module pattern artifacts retained at ${directory}`, {
+      cause: error,
+    });
+  } finally {
+    if (succeeded) await host.remove(directory);
+  }
+}
+
+test(
+  "generated module pattern defaults preserve values and lazy evaluation",
+  { skip: nativeTarget == null ? "requires a supported native host" : false },
+  async () => {
+    await assertAsyncProperty(
+      "module patterns preserve defaults across traced suspension",
+      fc.asyncProperty(patternArbitrary, assertNativePattern),
+      {
+        domain:
+          "export, catch, for, for-of, assignment and computed-key patterns; " +
+          "provided or absent values; primitive and object defaults",
+        numRuns: 6,
+        profile: "M5c module top-level await patterns",
+        seed: 0x6000_1f01,
+        sizeLimit:
+          "six pattern contexts, bounded primitive or one-field object",
+        timeLimitMilliseconds: 180_000,
+      },
+    );
+  },
+);

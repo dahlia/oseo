@@ -47,7 +47,7 @@ results:
       strictness:
         - strict
       suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
-    classification: unsupported-profile-feature
+    classification: pass
     dependencies:
       - destructuring-bindings
       - module-linking
@@ -56,11 +56,21 @@ results:
       - promise-settlement
       - top-level-await
       - var-bindings
+    execution:
+      harnessIncludes:
+        - base.js
+      moduleGraph:
+        - dependencies: []
+          id: test/language/module-code/top-level-await/syntax/export-var-await-expr-this.js
+          sourceHash: fnv1a64:ccff519f26e863c9
+      scheduler: deterministic-logical-clock
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
     observation:
-      detail: "test/language/module-code/top-level-await/syntax/export-var-aw\
-        ait-expr-this.js:64:12: error[OSEO1001]: Await inside a module
-        top-level binding or assignment pattern is unsupported."
-      passed: false
-      unsupportedCapability: profile-syntax
+      passed: true
     unsupportedFeatures: []
 suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2

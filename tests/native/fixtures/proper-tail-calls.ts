@@ -9,6 +9,32 @@ import type { Fixture } from "../fixture.ts";
  */
 export const properTailCallFixtures: readonly Fixture[] = [
   {
+    name: "global-eval-tail-calls",
+    globalScriptReference: true,
+    nonStrictScript: true,
+    source: `
+const intrinsic = eval;
+const marker = { value: "alive" };
+function step(n, value) {
+  "use strict";
+  if (n === 0) return [this === undefined, value];
+  return eval(n - 1, value);
+}
+eval = step;
+const result = step(1500, marker);
+console.log("tail", result[0], result[1] === marker, result[1].value);
+function tail(value) { "use strict"; return eval(value); }
+eval = function (value) { "use strict"; return [this === undefined, value]; };
+const text = "throw new Error('not source')";
+const ordinary = tail(text);
+console.log("ordinary", ordinary[0], ordinary[1] === text);
+eval = 0;
+try { tail(marker); }
+catch (error) { console.log("noncallable", error.name); }
+eval = intrinsic;
+`,
+  },
+  {
     name: "proper-tail-calls",
     source: `"use strict";
 const depth = 1500;

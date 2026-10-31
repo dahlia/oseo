@@ -29,14 +29,21 @@ results:
       - promise-settlement
       - symbols
       - var-bindings
+    execution:
+      harnessIncludes:
+        - base.js
+        - doneprintHandle.js
+      scheduler: deterministic-logical-clock
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
     observation:
-      detail: "test/language/eval-code/direct/async-func-expr-nameless-no-pre\
-        -existing-arguments-bindings-are-present-declare-arguments-and-\
-        assign.js non-strict disabled failed (1): stdout=\"\"
-        stderr=\"test/language/eval-code/direct/async-func-expr-nameles\
-        s-no-pre-existing-arguments-bindings-are-present-declare-argume\
-        nts-and-assign.js:115:28: error[OSEO1001]: Unknown binding
-        'eval'.\\n\""
+      detail: 'test/language/eval-code/direct/async-func-expr-nameless-no-pre-existing-arguments-bindings-are-present-declare-arguments-and-assign.js
+        non-strict disabled failed (1): stdout=""
+        stderr="test/language/eval-code/direct/async-func-expr-nameless-no-pre-existing-arguments-bindings-are-present-declare-arguments-and-assign.js:115:28:
+        error[OSEO1001]: eval compiles source text at run time, which is
+        outside the admitted profile.\n"'
       passed: false
       unsupportedCapability: profile-syntax
     unsupportedFeatures: []

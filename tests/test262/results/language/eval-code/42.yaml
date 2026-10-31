@@ -20,11 +20,19 @@ results:
       - expression-operators
       - functions
       - var-bindings
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
     observation:
-      detail: "test/language/eval-code/direct/var-env-func-init-local-update.\
-        js non-strict disabled failed (1): stdout=\"\"
-        stderr=\"test/language/eval-code/direct/var-env-func-init-local\
-        -update.js:103:3: error[OSEO1001]: Unknown binding 'eval'.\\n\""
+      detail: 'test/language/eval-code/direct/var-env-func-init-local-update.js
+        non-strict disabled failed (1): stdout=""
+        stderr="test/language/eval-code/direct/var-env-func-init-local-update.js:103:3:
+        error[OSEO1001]: eval compiles source text at run time, which is
+        outside the admitted profile.\n"'
       passed: false
       unsupportedCapability: profile-syntax
     unsupportedFeatures: []

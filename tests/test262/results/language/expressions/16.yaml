@@ -605,13 +605,19 @@ results:
     dependencies:
       - classes
       - dynamic-source
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
     observation:
-      detail: "test/language/expressions/class/elements/private-direct-eval-e\
-        rr-contains-arguments.js non-strict disabled failed (1):
-        stdout=\"\"
-        stderr=\"test/language/expressions/class/elements/private-direc\
-        t-eval-err-contains-arguments.js:104:8: error[OSEO1001]: Unknown
-        binding 'eval'.\\n\""
+      detail: 'test/language/expressions/class/elements/private-direct-eval-err-contains-arguments.js
+        non-strict disabled failed (1): stdout=""
+        stderr="test/language/expressions/class/elements/private-direct-eval-err-contains-arguments.js:104:8:
+        error[OSEO1001]: eval compiles source text at run time, which is
+        outside the admitted profile.\n"'
       passed: false
       unsupportedCapability: profile-syntax
     unsupportedFeatures: []
@@ -1069,12 +1075,19 @@ results:
       - generators
       - object-properties
       - var-bindings
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
     observation:
-      detail: "test/language/expressions/generators/scope-param-elem-var-clos\
-        e.js non-strict disabled failed (1): stdout=\"\"
-        stderr=\"test/language/expressions/generators/scope-param-elem-\
-        var-close.js:98:10: error[OSEO1001]: Unknown binding
-        'eval'.\\n\""
+      detail: 'test/language/expressions/generators/scope-param-elem-var-close.js
+        non-strict disabled failed (1): stdout=""
+        stderr="test/language/expressions/generators/scope-param-elem-var-close.js:98:10:
+        error[OSEO1001]: eval compiles source text at run time, which is
+        outside the admitted profile.\n"'
       passed: false
       unsupportedCapability: profile-syntax
     unsupportedFeatures: []

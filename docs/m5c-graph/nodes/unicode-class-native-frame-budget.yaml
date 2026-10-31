@@ -16,5 +16,5 @@ delivers: Repairs the native active-frame exhaustion observed on exactly the
   exclusion, reclassification, or budget override.
 dependencies:
   - unsupported-ownership-audit
-landed: false
+landed: true
 status: ready

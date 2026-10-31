@@ -237,8 +237,8 @@ with the executed variants and target, reviewed dependency tags, and summaries
 with raw, path-group, and dependency totals. Unsupported, harness, and
 infrastructure results never increase the pass count.
 
-The current manifest contains 34,337 reviewed cases: 29,004 passes, 3,627
-expected negatives, and 1,706 unsupported profile features. It records no
+The current manifest contains 34,349 reviewed cases: 29,038 passes, 3,627
+expected negatives, and 1,684 unsupported profile features. It records no
 semantic, harness, or infrastructure failures.
 
 The batch 16/17 dependency audit corrects 21 tag claims on 20 of their
@@ -538,8 +538,8 @@ current evidence assessment. Those live only in the indexed records above.
     the strict and non-strict fallback-write boundaries behave exactly as
     they do for a direct head target, and a pattern subexpression may
     `await` wherever the M5a Unit 8.3 pattern positions may, which is a
-    body that owns a traced suspension frame; a module top level keeps
-    that unit's rejection for the same position. Deliberate boundary,
+    body that owns a traced suspension frame, including module top level
+    under M5c's module pattern-await admission. Deliberate boundary,
     rejected with
     a source-located diagnostic: every array pattern position, both the
     head's own form and one nested below an admitted object head. The key
@@ -645,8 +645,8 @@ current evidence assessment. Those live only in the indexed records above.
     centralized promise reaction construction and dispatch paths required by
     [ADR 0022](./adr/0022-async-context-boundary.md). M5a Unit 8.3 admits the
     binding-pattern subexpressions recorded below. Top-level module await uses
-    its own private traced frame, with the pattern-position boundary recorded
-    below. Fixed native evidence
+    its own private traced frame, including the pattern positions admitted by
+    M5c. Fixed native evidence
     covers evaluation order, nested and loop positions, abrupt completion,
     awaited cleanup, heap locals across suspension, both specialization
     policies, false hints, a deliberate guard miss, and forced collection. A
@@ -902,8 +902,7 @@ current evidence assessment. Those live only in the indexed records above.
     `0x60000c03` cover member reference order. An ordinary
     asynchronous function retains the reference and current value in its traced
     frame when the right operand awaits. Module top level uses its private
-    traced frame for the same position; only the pattern-position module await
-    gap recorded below remains.
+    traced frame for the same position, including pattern subexpressions.
  -  Prefix and postfix `++` and `--` for identifiers and static or computed
     member references. Each form reads once, coerces through the admitted
     Number path, adds or subtracts one, and performs a checked write. Prefix
@@ -3756,25 +3755,26 @@ deletes, and applies `typeof` to the global object's `eval` property, which
 the realm installs with %eval% (ADR 0027). An object environment that lacks
 `eval` falls back to that property rather than to an uninitialized hidden
 binding. Declarations, parameters, and `with` objects named `eval` shadow it
-as ordinary bindings. ADR 0016 still excludes the unshadowed call position,
-`eval(...)`, which ECMA-262 treats as a direct eval whenever the value is
-%eval%. The resolver rejects that call before evaluating any argument and
-keeps its original `Unknown binding 'eval'.` diagnostic text and range,
-because the exclusion audit binds each accepted direct-eval observation to
-that text. `(0, eval)(...)`, `eval?.(...)`, a call through a parameter of
-another name, and a tagged template such as ``eval`x` `` are ordinary calls
-that 13.3.6.1 never routes to PerformEval. A call written `eval(...)` inside
-a `with` body is a direct eval under 13.3.6.1 whenever the value is %eval%,
-whether the `with` object supplies the name or the lookup falls back to the
-global property, because its Reference Record has an Environment Record
-base either way. A different callable makes it an ordinary call of that
-callable, whether supplied by the `with` object, the global fallback, or
-an enclosing binding. Oseo performs no direct eval. It dispatches the
-resolved callable through the generic call path. A nonintrinsic replacement
-is invoked ordinarily with its own behavior and may itself invoke %eval%.
-If execution reaches %eval%, its String argument meets its run-time
-`OSEO1001` boundary and its non-String argument is returned unchanged.
-The intrinsic evaluates no source.
+as ordinary bindings. The `direct-eval-non-string-dispatch` node admits
+unshadowed `eval(...)` calls, including parenthesized callees and spread
+arguments. The compiled call captures the current callee before evaluating all
+arguments, including unused extras. When that value is %eval%, it returns
+a non-String first argument unchanged, or undefined when none is supplied,
+without conversion. A String reaches the located ADR 0016 run-time
+`OSEO1001` boundary after argument evaluation and before any source effect.
+`(0, eval)(...)`, `eval?.(...)`, a call through a parameter of another name,
+and a tagged template such as ``eval`x` `` are ordinary calls that 13.3.6.1
+never routes to PerformEval. A call written `eval(...)` inside a `with` body is
+a direct eval under 13.3.6.1 whenever the value is %eval%, whether the `with`
+object supplies the name or the lookup falls back to the global property,
+because its Reference Record has an Environment Record base either way. A
+different callable makes it an ordinary call of that callable, whether supplied
+by the `with` object, the global fallback, or an enclosing binding. Oseo
+evaluates no source text. It dispatches the resolved callable through the
+generic call path. A nonintrinsic replacement is invoked ordinarily with its
+own behavior and may itself invoke %eval%. If execution reaches %eval%, its
+String argument meets its run-time `OSEO1001` boundary and its non-String
+argument is returned unchanged. The intrinsic evaluates no source.
 
 The fixed `eval-intrinsic-value` native fixture and the generated domain at
 property seed `0x60003d01` cover descriptor identity, `length`, `name`,
@@ -3786,6 +3786,14 @@ shadowing, both specialization policies, forced collection, and a cached
 global-object shape read that misses after the property is recreated and
 reaches the compiled generic read. Native-only checks pin the run-time
 boundary of indirect, optional, parameter, and `with`-fallback String calls.
+The later *direct-eval-non-string* fixture and focused suite add direct,
+parenthesized, zero-argument and spread calls, strict and non-strict bodies,
+primitive and object identity, boxed Strings, a revoked Proxy and coercion
+traps, argument order and abrupt completion, callee capture and replacement,
+and the direct String boundary. The generated state model adds direct,
+parenthesized and spread forms and non-String identity values while keeping
+its seed and case budget. Both policies, false hints and forced collection
+remain covered; the node's work note records the source-bound results.
 The complete update on historical four-source composition
 `edccfd292b245c80c3503a93bf1a268fc99506c7` observed 26 passes among the
 node's original 33 paths and seven indirect-eval private-class cases at the
@@ -8422,8 +8430,9 @@ writable, non-enumerable, configurable `eval` property with `length` 1 and
 does without parsing, and reports `OSEO1001` “eval compiles source text at run
 time, which is outside the admitted profile.” for a String, the boundary of
 [ADR 0016](./adr/0016-dynamic-source-boundary.md); it never evaluates source.
-The `eval-intrinsic-value` node later admits the bare `eval` identifier as a
-value, while the unshadowed call position stays the ADR 0016 rejection.
+The `eval-intrinsic-value` node admits the bare `eval` identifier as a value.
+The `direct-eval-non-string-dispatch` node admits direct non-String calls;
+String arguments retain the located ADR 0016 run-time rejection.
 `%Function%`'s [[Call]] and [[Construct]] report the same boundary as
 `OSEO1001`, as the generator and async function constructors do.
 
@@ -8637,10 +8646,11 @@ complete. The remaining gaps retain their existing owners.
     and M5b `globalthis-binding` exposes it as `globalThis` and resolves every
     other unresolved global reference through it at run time. Three
     boundaries remain. First, M5c node `eval-intrinsic-value` admits a bare
-    `eval` identifier read as the global object's `eval` property, but an
-    unshadowed `eval(...)` call stays the source-located ADR 0016
-    rejection, and any other call that passes a String to `%eval%` reaches
-    its run-time `OSEO1001` boundary. Every realm's global
+    `eval` identifier read as the global object's `eval` property.
+    The direct-eval-non-string-dispatch node also admits direct calls
+    with non-String arguments, preserving identity without coercion.
+    Every call that passes a String to `%eval%` reaches its located
+    run-time `OSEO1001` boundary under ADR 0016. Every realm's global
     object holds the `%eval%` value of
     [ADR 0027](./adr/0027-realms-beyond-the-initial-realm.md), so a Script
     top-level `var eval` keeps it. M5c node `typed-array-feature-admission`
@@ -8675,19 +8685,6 @@ complete. The remaining gaps retain their existing owners.
     capability, as the `globalthis-binding` section records. Owner: the
     intrinsics and built-in objects stream and the dynamic-source boundary;
     the surface audit in [*PLAN-M6.md*](../PLAN-M6.md) depends on this unit.
- -  Await inside a computed member of an assignment target, a computed binding
-    property name, or an array or object binding default is admitted by M5a
-    Unit 8.3 in ordinary asynchronous and asynchronous generator bodies, as
-    recorded above. The same positions stay rejected with a source-located
-    diagnostic at module top level. Its private traced frame can suspend an
-    ordinary expression, but module construction still rejects a pattern that
-    contains `await` before that frame is built. The reviewed test262 case
-    *top-level-await/syntax/catch-parameter.js* reaches this diagnostic and
-    records `unsupported-profile-feature` with `profile-syntax`, rather than
-    a frontmatter feature rejection. Package tests in
-    *packages/parser-babel/tests/bindings.test.ts* and
-    *packages/compiler/tests/modules.test.ts* also prove the diagnostic and
-    its location. Owner: `module-top-level-await-patterns`.
  -  `%AsyncFromSyncIteratorPrototype%` is not materialized. ECMA-262 never
     exposes an AsyncFromSyncIterator object to a program, so no
     `Object.getPrototypeOf` route reaches it and the unreachable internal
@@ -10002,3 +9999,23 @@ reference order with mutations. Seeds `0x60009200` and `0x60009201` use
 8 ordinary cases each, both specialization policies and forced collection.
 These sources add no test262 path or classification. D3, full observation,
 review and publication remain separate gates owned by Root.
+
+
+Module top-level await patterns
+-------------------------------
+
+Module binding and assignment patterns admit await in computed keys, defaults,
+and member targets. Catch parameters, classic for initializers, and for-of
+and object-pattern for-in heads use the same traced evaluator frame. Defaults
+run only for undefined; rejection resumes the pending throw at the await,
+retaining iterator cleanup, finally precedence and live binding cells. The
+module scheduler recognizes a pattern await even when it occurs only in a
+classic for declaration. No new runtime operation or ABI is introduced.
+
+The fixed module fixture and the generated pattern domain with seed
+`0x60001f01` cover both specialization policies and forced collection, with
+Node.js, Deno and independent expected output. Parameter
+early errors and the ADR 0016 boundary remain.
+The thirteen owned test262 records retain their prior unsupported results
+until Root's actual full UPDATE; compilation alone supplies no promotion.
+See [the work note](./m5c-graph/module-top-level-await-patterns.md).

@@ -10,6 +10,11 @@ scope:
   - "Bound function and Proxy [[Call]] forwarding through the same
     trampoline, derived constructor result rules after a tail call, and
     the realm of errors a tail call raises."
+  - "A global eval binding replaced by an ordinary function uses the
+    dynamic tail-call ABI in strict function code. Its name does not
+    require source evaluation; the current callable value determines
+    behavior. The original noStrict Script keeps its strict recursive
+    body and 100,000-step helper. ADR 0016 remains unchanged."
   - "Historical integration ported complete TCO 9945b7b8 to b1eaeff0 onto
     Array Ucccb7195, preserving all thirteen Array paths, three runtime
     guard hunks, six coverage files and its source-qualified worknote.
@@ -65,6 +70,7 @@ evidence:
       - tests/native/fixtures/proper-tail-calls.ts
       - tests/proper-tail-calls.test.ts
       - tests/allocation-paths.test.ts
+      - tests/global-eval-tail-calls.test.ts
   fixed:
     status: covered
     references:
@@ -72,6 +78,7 @@ evidence:
       - tests/runtime-tail-calls.test.ts
       - tests/fixtures/runtime-tail-calls.c
       - tests/tco-generator-interop.test.ts
+      - tests/global-eval-tail-calls.test.ts
   forced-collection:
     status: covered
     references:
@@ -101,6 +108,7 @@ evidence:
     references:
       - tests/test262/results/language/expressions/03.yaml
       - tests/test262/results/language/expressions/b7.yaml
+      - tests/test262/results/language/expressions/64.yaml
       - tests/test262/subset.yaml
       - docs/evidence/proper-tail-calls-u68-20261027.md
   structural:

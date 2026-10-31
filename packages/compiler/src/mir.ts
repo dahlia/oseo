@@ -145,6 +145,10 @@ export interface MirOperation {
   /** The hole an `agent-hole` operation reads. */
   readonly agentHole?: number;
   readonly arrayLength?: number;
+  /**
+   * Binding accessed by the operation. A private-name-create replaces this
+   * binding with a fresh cell initialized to its new private identity.
+   */
   readonly bindingId?: number;
   readonly cacheId?: number;
   readonly constant?: MirConstant;

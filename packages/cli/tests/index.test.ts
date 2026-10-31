@@ -261,9 +261,9 @@ test("separates the source path from its diagnostic identifier", async () => {
     },
     readTextFile(path) {
       readPath = path;
-      // ADR 0016 keeps an unshadowed `eval` call outside the profile, so
+      // ADR 0016 keeps the Function constructor outside the profile, so
       // the source still ends in a source-located compile diagnostic.
-      return Promise.resolve("eval(1);");
+      return Promise.resolve("Function(1);");
     },
     remove() {
       return Promise.reject(new Error("unexpected cleanup"));

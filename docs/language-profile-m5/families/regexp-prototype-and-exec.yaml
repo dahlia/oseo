@@ -40,9 +40,20 @@ scope:
     capture visibility, assertion and lookaround behavior, backreference
     resolution, quantifier priority, empty-progress failure, UTF-16 and
     code-point traversal, and canonicalization that `@oseo/compiler` owns.
-    Execution uses an explicit backtrack stack and undo trail rather than
-    native recursion, allocates no managed memory, calls no user code, and
+    Ordered execution uses an explicit backtrack stack and undo trail
+    rather than native recursion, allocates no managed memory, calls no
+    user code, and
     reaches no safepoint."
+  - "For exactly the empty flag string, `u`, or `v`, both executors may
+    select a constant-state scan after proving the entire artifact is a
+    start edge, one capture-free greedy unbounded single-consuming-set
+    repetition with minimum one, and a non-multiline end edge, with exact
+    save, register and branch links. The scan charges one entry step,
+    one per tested input character, and one terminal decision at input
+    exhaustion. It uses no backtrack or trail entries and retains the
+    reviewed step ceiling. Every guard miss selects ordered execution
+    before match state is exposed. Non-multiline `$` requires InputLength;
+    only multiline mode permits a line-terminator boundary."
   - "Building or executing a program reports a source-located `OSEO2001`
     boundary when it reaches a reviewed instruction, register, step,
     backtrack-entry, or trail-entry limit. An ignore-case pattern whose
@@ -71,6 +82,7 @@ evidence:
     status: covered
     references:
       - tests/native/fixtures/regexp-prototype-and-exec.ts
+      - tests/native/fixtures/regexp-anchored-repeat.ts
       - tests/property/m5-regexp-prototype-and-exec.property.test.ts
       - tests/regexp-matcher-data.ts
   fixed:
@@ -78,12 +90,14 @@ evidence:
     references:
       - tests/native.ts
       - tests/native/fixtures/regexp-prototype-and-exec.ts
+      - tests/native/fixtures/regexp-anchored-repeat.ts
   forced-collection:
     status: covered
     references:
       - tests/fixtures/runtime-heap.c
       - tests/native.ts
       - tests/native/fixtures/regexp-prototype-and-exec.ts
+      - tests/native/fixtures/regexp-anchored-repeat.ts
       - tests/property/m5-regexp-prototype-and-exec.property.test.ts
   generated:
     status: covered
@@ -95,21 +109,26 @@ evidence:
     references:
       - tests/native.ts
       - tests/native/fixtures/regexp-prototype-and-exec.ts
+      - tests/native/fixtures/regexp-anchored-repeat.ts
       - tests/property/m5-regexp-prototype-and-exec.property.test.ts
   specialization:
     status: covered
     references:
       - tests/native.ts
       - tests/native/fixtures/regexp-prototype-and-exec.ts
+      - tests/native/fixtures/regexp-anchored-repeat.ts
       - tests/property/m5-regexp-prototype-and-exec.property.test.ts
   standards:
     status: covered
     references:
       - tests/test262/subset.yaml
       - tests/test262/results.yaml
+      - tests/test262-regexp-utils-native.test.ts
   structural:
     status: covered
     references:
+      - tests/regexp-matcher.test.ts
+      - tests/property/m5-regexp-matcher.property.test.ts
       - packages/runtime-c/native/runtime_regexp.c
       - packages/runtime-c/native/runtime_regexp_matcher.c
       - packages/runtime-c/native/runtime_internal.h

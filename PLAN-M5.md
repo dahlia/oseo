@@ -19,8 +19,8 @@ the deterministic native scheduler through the explicit CLI module goal, and
 the dependency-indexed baseline manifest covers module linking and early
 errors, top-level await, asynchronous functions, and the Promise family with
 honest unsupported classifications. The current reviewed manifest records
-34,337 reviewed cases: 29,004 passes, 3,627
-expected negatives, and 1,706 unsupported profile features with no semantic,
+34,349 reviewed cases: 29,038 passes, 3,627
+expected negatives, and 1,684 unsupported profile features with no semantic,
 harness, or infrastructure failures.
 [ADR 0020](./docs/adr/0020-m5-applicable-test-inventory.md) now fixes the M5a
 denominator at 41,091 paths from 47,381 candidates: 22,998 language tests and
@@ -1556,8 +1556,7 @@ function-name inference, and immutable failure. Forty-two reviewed test262
 `for-of` binding cases now pass because their `+=` loop bodies use the same
 lowering. An ordinary asynchronous function now retains the reference and
 already-read target value across suspension. Module top level uses its private
-traced frame for the same position; only the pattern-position module await gap
-recorded below remains.
+traced frame for the same position, including the later M5c pattern admission.
 
 Prefix and postfix update expressions now accept `++` and `--` on existing
 identifier and static or computed member targets. Each form reads the target
@@ -1937,13 +1936,10 @@ the `await` position, an unfinished array-pattern iterator closes exactly once
 before that completion leaves the pattern, and a done iterator is not closed
 again.
 
-Module top level keeps a source-located rejection for the same positions. Its
-private traced frame can suspend an ordinary expression or control-flow
-position, but module graph compilation rejects these pattern positions before
-constructing that frame. That residue stays with the modules and asynchronous
-execution stream. The module-owned follow-up must also replace the adjacent
-stale compiler comment, which attributes this rejection to the continuation
-transform, with this traced-frame rationale.
+At this unit's original checkpoint, module top level kept a source-located
+rejection for these positions before constructing its private traced frame.
+M5c's module-top-level-await-patterns follow-up removes that guard and admits
+the patterns through the existing frame, as its work note records.
 
 The generated property suite uses seed `0x60002800` across four pattern
 positions, three body forms, supplied and missing selections, fulfilled and
@@ -1957,21 +1953,26 @@ that is not closed, rejected keys and targets, `finally` precedence, a catch
 parameter, an asynchronous generator that mixes `await` and `yield` in the same
 positions, and a deliberate guard miss reaching the generic fallback.
 
-An AST scan of all 47,381 candidate paths finds `await` inside a pattern in
-seventeen upstream cases, and every one is module code or a parse negative for
-function parameters, so no reviewed case can promote to pass here. Three of
-those parse negatives enter the reviewed subset as executable boundary
-evidence: they pin that the admission reaches neither an asynchronous arrow's
-nor an asynchronous generator's formal parameters, and that the module Await
-capability does not propagate into a nested function's parameters. The one
-module positive, *top-level-await/syntax/catch-parameter.js*, enters as
-inventory evidence only; its declared `dynamic-import` feature stops it before
-compilation, so it never reaches the module pattern-await diagnostic. The
-compiler tests in *packages/parser-babel/tests/bindings.test.ts* and
-*packages/compiler/tests/modules.test.ts* are what prove that diagnostic and
-its location. The manifest grows to 4,219 cases and stays at 2,482 passes,
-with 1,182 expected negatives and 555 unsupported profile features and no
-semantic or harness failures.
+At the original Unit 8.3 checkpoint, an AST scan of all 47,381 candidate
+paths found `await` inside a pattern in seventeen upstream cases. Every one
+was module code or a parse negative for function parameters, so that unit
+promoted no reviewed case. Three parse negatives entered the reviewed subset
+as executable boundary evidence: they pin that the admission reaches neither
+an asynchronous arrow's nor an asynchronous generator's formal parameters,
+and that the module Await capability does not propagate into a nested
+function's parameters. The newly reviewed module positive,
+*top-level-await/syntax/catch-parameter.js*, entered as inventory evidence only:
+its declared `dynamic-import` feature stopped it before compilation. The
+compiler tests then proved the module pattern-await diagnostic and its
+location. That historical manifest had 4,219 cases: 2,482 passes, 1,182 expected
+negatives, 555 unsupported profile features and no semantic or harness failures.
+
+M5c's later dynamic-import observation reached the pattern-await diagnostic.
+The module-top-level-await-patterns follow-up now removes that diagnostic and
+changes *packages/parser-babel/tests/bindings.test.ts* and
+*packages/compiler/tests/modules.test.ts* to assert admission through a traced
+asynchronous evaluator. Its work note records the thirteen currently owned
+unsupported paths; their actual promotions still require Root's full UPDATE.
 
 M5a Unit 8.4 closes the reviewed
 *AsyncFromSyncIteratorPrototype/throw/iterator-result.js* gap with targeted
@@ -3310,8 +3311,8 @@ exactly as a direct head target does, and a strict fallback write keeps
 the M5a Unit 8.5i rejection while a non-strict one records its name so
 that unit's `typeof` fold stays rejected for it. A pattern subexpression
 may `await` wherever the M5a Unit 8.3 positions may, which is a body that
-owns a traced suspension frame; a module top level keeps that unit's
-rejection, now located at the for-in statement that carries the head.
+owns a traced suspension frame. M5c later admits module top level through
+its existing private frame, as the module pattern-await work note records.
 
 Because ToObject of the key is modeled rather than materialized, the
 values a head pattern can read are exactly a String exotic object's: one
@@ -3371,8 +3372,8 @@ reserved-word binding name in the head reports its early error first.
 Compiler-core tests build a nested array pattern head directly in owned
 syntax, bypassing the frontend, and pin the HIR rejection for the
 lexical, `var`, and assignment forms. A module
-test pins that an `await` inside the head pattern keeps the M5a Unit 8.3
-module top-level rejection at the statement that carries it. A fixed
+test originally pinned the module top-level pattern-await rejection; M5c
+replaces it with admission through the private traced evaluator frame. A fixed
 *for-in-object-patterns* native differential fixture covers the four head
 forms, computed names and their evaluation order, defaults applied only
 to `undefined`, a rest property and the keys it excludes, a nested object
@@ -3446,8 +3447,9 @@ execution stream. M5c later admits the first three: node `import-meta` admits
 `import.meta` in Module code, and node `module-export-forms` admits
 `export var` and `export * as` namespace re-exports, as the import.meta
 section below and the Module export forms section of
-[*PLAN-M5C.md*](./PLAN-M5C.md) record. Pattern-position `await` is still
-rejected and is owned by node `module-top-level-await-patterns`.
+[*PLAN-M5C.md*](./PLAN-M5C.md) record.
+Node `module-top-level-await-patterns` later admits pattern-position
+`await` through the existing module frame; its work note records the evidence.
 TypeScript-only syntax is outside the ECMA-262 claim, and dynamic source
 remains owned by ADR 0016.
 
@@ -8721,11 +8723,22 @@ binding, which repairs the `OSEO2001` “Binding is read before
 initialization” failure of a `with` fallback read. Parameters, `var`,
 function, and lexical declarations named `eval` stay ordinary bindings.
 
-ADR 0016's call-position exclusion is unchanged. ECMA-262 2025 13.3.6.1
+The later `direct-eval-non-string-dispatch` node routes every direct call
+through the existing resolved-callee runtime dispatch. Non-String values
+return unchanged after argument evaluation; String arguments report the
+source-located ADR 0016 runtime boundary before source evaluation. This
+supersedes the syntactic rejection described in the historical value-only
+preparation below. The fixed native fixture and the existing global-object
+record property cover direct, parenthesized and spread forms, both policies,
+false hints and forced collection; the node's work note records validation.
+No source compiler, interpreter or new exclusion is admitted.
+
+At the earlier value-only preparation, ADR 0016's call-position exclusion
+was retained by the resolver. ECMA-262 2025 13.3.6.1
 performs a direct eval for a call whose callee is an identifier reference
 named `eval` holding %eval%, and only the global property can hold it where
-no declaration or `with` object supplies the name. The resolver therefore
-rejects an unshadowed `eval(...)`, including a parenthesized callee and
+no declaration or `with` object supplies the name. The resolver then
+rejected an unshadowed `eval(...)`, including a parenthesized callee and
 spread arguments, at the same point and with the same
 `Unknown binding 'eval'.` text and range as before. A compile-only
 comparison of base `c249cad8` with this change over every reviewed Script
@@ -8764,8 +8777,8 @@ or ``(eval)`x` ``, is also an ordinary call. ECMA-262 2025 13.3.11.1
 evaluates it through EvaluateCall rather than the direct eval steps of
 13.3.6.1, and it passes the site's template object, which PerformEval
 (19.2.1.1, step 2) returns unchanged because it is not a String. The
-resolver recognizes the tagged form by its synthesized template object
-argument, so an `eval(...)` call keeps its rejection even when its
+resolver then recognized the tagged form by its synthesized template object
+argument, so an `eval(...)` call kept its rejection even when its
 argument is an untagged template literal. No reviewed path uses a tagged
 `eval`: rerunning the compile-only comparison after this distinction left
 every MIR digest of the 388 compiled Script paths and every diagnostic
@@ -9679,3 +9692,15 @@ debt under `dynamic-source-coverage-remediation`. Earlier focused and
 source-qualified observations remain historical. The
 [IH-A work note](./docs/m5c-graph/iterator-helpers-tag-activation.md)
 binds the raw Full packet; candidate/Main gates and landing remain pending.
+
+
+Module pattern-await follow-up
+------------------------------
+
+M5c removes the pre-frame pattern-await rejection and detects await inside a
+classic for declaration pattern when choosing the module evaluator's async
+frame. The existing pattern lowering retains evaluation order, roots, abrupt
+completion and cleanup. The
+[work note](./docs/m5c-graph/module-top-level-await-patterns.md) names the
+thirteen owned paths and the fixed and generated evidence. Prior manifest
+observations remain unchanged pending Root's full UPDATE.

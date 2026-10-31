@@ -7,11 +7,11 @@ This record backs the M5c graph node `dynamic-source-lexical-completion-family`
 `dynamic-source-coverage-remediation` into DS-1 through DS-7 and keeps it as an
 umbrella that lands when it owns zero paths.
 
-This node owns exactly the 73 paths below at test262 revision
-`f2d1435644797268dca1f7988cad5a4e89ccd8d2`. Every one is currently owned by
-`node:dynamic-source-coverage-remediation` in the derived closure ledger,
-and it stays there until this node lands; the landing moves each path to
-its reviewed owner. This change moves no ledger ownership. The path set,
+This node selects exactly the 73 original umbrella paths below at test262
+revision `f2d1435644797268dca1f7988cad5a4e89ccd8d2`. The per-path assessment
+closes two under `adr:0016-dynamic-source-boundary` and keeps 71 with
+`node:dynamic-source-coverage-remediation` in the derived closure ledger. All
+73 retain `unsupported-profile-feature`; none counts as a pass. The path set,
 sorted with one final newline, has SHA256
 `1f540200bd7b2e1a109da611f0762bf5383c14ae38d4eb11c50fb1ae83f617ee`.
 
@@ -19,6 +19,35 @@ Selection rule: the audit families of
 */data/m5c-dynamic-source-265-audit-20261024/group-counts.json* named below,
 plus the later umbrella additions that audit did not group, placed by the
 missing contracts their batch notes record.
+
+
+Assessment outcome
+------------------
+
+The [*per-path assessment*](./dynamic-source-lexical-completion-assessment.yaml)
+records all 73 normative subjects, replacement candidates, dispositions and
+reasons. Two U+180E probes close under item 1 of the maintainer decision:
+the single-line comment and template-literal probes have paired reviewed
+static passes in all four strictness/specialization variants on
+linux-x86\_64-gnu. The assessment binds their pinned source digests and result
+partitions, and `ds5-static-u180e` binds those partitions in the exclusion
+audit. All 73 original source and normalized observation digests were
+recomputed and match the audit.
+
+71 paths stay with the umbrella. These include full whitespace and BMP
+comment matrices, declaration and statement completion values, binding
+introduction and retained References, and the global declaration collision.
+Three strict early-error probes have related static expected-negatives;
+this task requires an existing reviewed passing path or fixture/native
+replacement, so this assessment does not treat those negatives as complete
+replacement evidence for the caught-error assertions.
+
+No native or fixture evidence was added. The subset, result partitions,
+dependency tags and all 41,091 inventory paths remain unchanged; no UPDATE
+is needed. The dependency-tag self-audit found no changed rows to retag.
+ADR 0016 and ADR 0019 remain unchanged, including their reopening triggers.
+This is partial accounting; Root retains outer review, publication and the
+landed-state decision.
 
 
 Evidence obligations

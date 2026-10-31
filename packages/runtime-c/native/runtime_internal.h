@@ -4457,7 +4457,8 @@ bool oseo_internal_unicode_id_continue(uint32_t code_point);
  * `2 * (capture_count + 1)` entries and uses -1 for a capture that did
  * not participate. A sticky search attempts only the given position.
  * The search allocates only an unmanaged work area, so it reaches no
- * safepoint and observes no managed state.
+ * safepoint and observes no managed state. `scan_eligible` is true only
+ * for the exact flag sets empty, u or v; the program proof still must pass.
  */
 OseoRegExpExecution oseo_internal_regexp_program_search(
     OseoContext *context,
@@ -4465,6 +4466,7 @@ OseoRegExpExecution oseo_internal_regexp_program_search(
     const OseoString *subject,
     size_t start_index,
     bool sticky,
+    bool scan_eligible,
     int64_t *captures
 );
 /* The lazily created, permanently rooted %AsyncGeneratorPrototype%

@@ -4,13 +4,15 @@ Observation batch 06 admission preparation
 Scope and observations
 ----------------------
 
-This train admits 332 of the 334 originals selected by
+The original train admitted 332 of the 334 originals selected by
 `observation-batch-06`, covering *test/language/eval-code/* and
-_test/language/export/escaped-\*_. The observation used the original planning
-basis and prerequisites: 242 review units. All source hashes and 100
-generator-file hashes match the preserved preparation and the pinned suite
-`f2d1435644797268dca1f7988cad5a4e89ccd8d2`. No existing subset row,
-classification, owner or dependency tag changes.
+_test/language/export/escaped-\*_. The diagnostic portability preparation
+below admits the final two originals under Root's D3 instruction. The
+observation used the original planning basis and prerequisites: 242 review
+units. All source hashes and 100 generator-file hashes match the preserved
+preparation and the pinned suite `f2d1435644797268dca1f7988cad5a4e89ccd8d2`. No
+previously reviewed subset row, classification, owner or dependency tag
+changes. The table records the original train's 332 admissions:
 
 | Classification              | Paths |
 | --------------------------- | ----: |
@@ -43,24 +45,27 @@ and raw request, result, stdout and stderr files.
 Held diagnostic portability prerequisite
 ----------------------------------------
 
-Root holds *test/language/eval-code/indirect/export.js* and
+Before the diagnostic portability preparation, Root held
+*test/language/eval-code/indirect/export.js* and
 *test/language/eval-code/indirect/import.js* unreviewed under this batch.
 Their actual focused runtime rejections embed an absolute file URL under
-this host's aube cache. Both raw results remain preserved, but neither is
-admitted to the subset, manifest or exclusion audit. The focused batch
-therefore observed 329 unsupported results; 327 are admitted here.
+this host's aube cache. Both raw results remain preserved, but neither was
+admitted to the original train's subset, manifest or exclusion audit. The
+focused batch observed 329 unsupported results; 327 were admitted in that train.
 
 The new `test262-diagnostic-host-path-normalization` node depends on
-`unsupported-ownership-audit` and is listed in `m5-exit-audit`. This batch
-waits for that unlanded prerequisite and keeps its two-path selector.
-It requires portable suite-relative diagnostic identifiers and a fresh
-observation of both originals without altering rejection content or the
-ADR boundaries. The entire train's result fields were scanned for
-`file://`, `/home/`, `/tmp/` and `.cache`; these were the only two affected
-records, and the remaining 1,153 records had zero hits.
+`unsupported-ownership-audit` and is listed in `m5-exit-audit`. At that stage
+this batch waited for the unlanded prerequisite and kept its two-path selector;
+the U2 admission below now consumes that selector. It requires portable
+suite-relative diagnostic identifiers and a fresh observation of both originals
+without altering rejection content or the ADR boundaries. The entire train's
+result fields were scanned for `file://`, `/home/`, `/tmp/` and `.cache`; these
+were the only two affected records, and the remaining 1,153 records had zero
+hits.
 [*absolute-host-path-audit.json*](/data/m5c-train-b06-b08-b14-20261029/task_816c5a04798f/ctx_6f53d3a87142/absolute-host-path-audit.json)
-retains both exact diagnostics and the scan scope. This is a partial B06
-admission, not completion or landed status for the batch.
+retains both exact diagnostics and the scan scope of the original partial B06
+admission. U2 below completes admission of the cohort; the Full gate and
+publication remain with Root.
 
 
 Unsupported ownership
@@ -68,18 +73,20 @@ Unsupported ownership
 
 Root approved the train's exact 339-path extension of the existing source
 coverage umbrella, preserving its previous 547 owners for a combined 886.
-For this batch, 325 paths remain under
-`node:dynamic-source-coverage-remediation`. The two direct non-String identity
+The original admission kept 325 paths under
+`node:dynamic-source-coverage-remediation`; the two portable observations
+below bring that count to 327. The two direct non-String identity
 paths use `node:direct-eval-non-string-dispatch`. Fresh
 source/observation-bound audit rows retain the umbrella paths as active
 remediation. ADR 0013, ADR 0016 and ADR 0019, including their authorization and
 reopening text, remain unchanged.
 
-The 54 admitted runtime String-eval rejections and 271 unknown-eval binding
-rejections remain active source-contract remediation. The original source
-subjects, including completion values and ordinary scope/property
-assertions, remain in-claim pending the owning node's per-path review.
-No new whole-path exclusion is authorized.
+The original 54 admitted runtime String-eval rejections and 271 unknown-eval
+binding rejections remain active source-contract remediation. The final two
+String-eval admissions below bring that runtime rejection count to 56. The
+original source subjects, including completion values and ordinary
+scope/property assertions, remain in-claim pending the owning node's per-path
+review. No new whole-path exclusion is authorized.
 
 The exact two non-String paths are
 *test/language/eval-code/direct/non-string-object.js* and
@@ -263,7 +270,7 @@ hashes match the preceding audit. The audit traced eval and Function
 source arguments, including nested source strings, and distinguished
 constructed subject prerequisites from assertion messages, non-String
 identity probes and rejected grammar. Both held B06 sources were also
-inspected and remain unreviewed.
+inspected and remained unreviewed at that gate.
 
 Only B06-ROWS-001 changes a row: indirect *always-non-strict.js* gains
 `object-literals` because its evaluated `with ({}) {}` constructs the
@@ -277,3 +284,41 @@ text now states partial observation: 332 admitted and two held from the
 The full audit and candidate dispositions are recorded in
 [the outer-fix audit](/data/m5c-train-b06-b08-b14-20261029/task_327a4df2e5ee/ctx_3d3c7fa767fb/full-row-audit.json).
 Root owns the scoped UPDATE and the second outer review pass.
+
+
+Portable diagnostic implementation
+----------------------------------
+
+The bounded prerequisite has an implementation work note at
+[*test262-diagnostic-host-path-normalization.md*](./test262-diagnostic-host-path-normalization.md).
+It maps runtime diagnostic locations through the prepared module graph's
+portable identities while preserving rejection and execution evidence.
+
+Root's D3 reply to `msg_56c6e517dbc9` selected Full because the changed
+file is a runner module. Root authorized preparation of both previously
+held subset rows and canonical records before U2, with their fresh
+`unsupported-profile-feature` observations. Each has the six tags
+`abrupt-completion`, `dynamic-source`, `error-intrinsics`,
+`expression-operators`, `functions` and `module-linking`, reconciled with
+the shared rules and the original indirect-eval row audit. The comma
+expression supplies indirect invocation; the asserted SyntaxError supplies
+the abrupt/error contract, and import/export Script-goal rejection supplies
+the module syntax subject. Assertion plumbing contributes no extra tags;
+there are no imported fixtures or fixture-derived rows.
+
+The two ledger owners move from B06 to
+`node:dynamic-source-coverage-remediation`, preserving its prior 881 paths
+for 883 total. Fresh source/observation-bound audit rows retain the original
+Script grammar subjects as unresolved coverage. No exclusion or equivalent
+replacement is claimed. This completes the cohort's admission at 334 paths:
+2 passes, 3 expected negatives and 329 unsupported results, including 327
+under the dynamic-source umbrella and the two non-String direct-eval paths
+under their existing bounded owner. Original raw observations remain
+historical evidence.
+
+The canonical records are bootstrapped from the completed focused native
+observations, with reviewed dependency metadata attached. This is neither
+an UPDATE nor a claim that the Full gate ran. Root batches the required
+Full UPDATE with other ready semantic nodes, owns R, and explicitly told
+this worker to report U2 after its checks and internal reviews without
+waiting for that UPDATE. No node is marked landed.

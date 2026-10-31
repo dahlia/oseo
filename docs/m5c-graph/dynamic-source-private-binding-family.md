@@ -7,13 +7,75 @@ This record backs the M5c graph node `dynamic-source-private-binding-family`
 `dynamic-source-coverage-remediation` into DS-1 through DS-7 and keeps it as an
 umbrella that lands when it owns zero paths.
 
-This node owns exactly the 66 paths below at test262 revision
-`f2d1435644797268dca1f7988cad5a4e89ccd8d2`. Every one is currently owned by
-`node:dynamic-source-coverage-remediation` in the derived closure ledger,
-and it stays there until this node lands; the landing moves each path to
-its reviewed owner. This change moves no ledger ownership. The path set,
-sorted with one final newline, has SHA256
+This node assesses exactly the 66 paths below at test262 revision
+`f2d1435644797268dca1f7988cad5a4e89ccd8d2`. At base `1f3ade13`, all
+66 were `unsupported-profile-feature` paths owned by
+`node:dynamic-source-coverage-remediation` in the derived closure ledger.
+The sorted path set, with one final newline, has SHA256
 `d698889cd5c0a48322a434125b9986ae6ca1cfd383f48736be2abf0e93dd5352`.
+
+DS-6 accounts for 42 paths under `adr:0016-dynamic-source-boundary`
+using item 1 of the maintainer decision. The other 24 stay with the
+umbrella as active remediation. Classification remains
+`unsupported-profile-feature` for all 66; no path counts as a pass.
+No native tests or fixtures are added, and all 41,091 inventory paths
+remain. The subset and observations are unchanged; no UPDATE is needed.
+
+The [*per-path assessment*](./dynamic-source-private-binding-assessment.yaml)
+records each original's normative subject, source digest, disposition,
+replacement path and one-line coverage reason. Its 20 distinct static
+replacement paths already pass on linux-x86\_64-gnu in every listed
+strictness/specialization variant. It binds their pinned source and result
+partition digests. The exclusion audit independently binds all originals'
+fresh source and observation digests and the replacement table/partitions.
+For a remediation row, “no complete replacement is established” records a
+remaining evidence gap; it does not assert that no related test exists.
+
+| Family                                                          | Assessed | Closed under ADR 0016 | Staying | Evidence added |
+| --------------------------------------------------------------- | -------: | --------------------: | ------: | -------------: |
+| Private class identity, public lookup, static initializer this  |       24 |                    21 |       3 |              0 |
+| Named self bindings, arrows, compound assignment, call ordering |       22 |                     9 |      13 |              0 |
+| Direct-eval arguments and spread                                |        6 |                     0 |       6 |              0 |
+| Batch 16 and 17 static this and call context                    |       14 |                    12 |       2 |              0 |
+| Total                                                           |       66 |                    42 |      24 |              0 |
+
+The 21 private identity closures use factory expressions that evaluate the
+same static class twice, observe own getter/method/field access or setter
+side effects, and reject both cross-brand accesses with TypeError. The eight
+named-binding replacements keep the original strictness, self identity or
+TypeError, invocation count, and async/generator observation. The static
+call-order replacement observes the argument side effect and TypeError.
+The 12 caller/callee replacements observe callee strictness independently
+of caller strictness. Their original eval/Function caller supplies only
+source evaluation to that receiver contract.
+
+The remaining subjects are private initialization/public lookup (2), static
+initializer this (1), arrow capture (4), unresolvable compound assignment
+ReferenceErrors (9), direct-eval argument/spread dispatch (6), and mixed
+ordinary/eval global this or construction (2). A compiler rejection cannot
+replace a catchable ReferenceError, and no-argument eval dispatch does not
+have a source-evaluation-only remainder. Their original assertions remain
+in-claim; ADR 0016 and ADR 0019 are unchanged.
+
+Root approved supplying changed owners in memory through
+`parseM5cClosureLedger`, `deriveM5cClosureLedger`, and
+`serializeM5cClosureLedger`. The script is
+*/data/m5c-ds6-20261031/update-accounting.mjs*. It verifies all 66 original
+audit digests, changes only the 42 closure owners and the two affected owner
+notes, and serializes the derived ledger. Then
+`mise run m5c:closure-ledger:update` verifies regeneration is a no-op.
+The umbrella owns 1,004 paths after this change, down from 1,046 at the base;
+ADR 0016 owns 626, up from 584. Root owns outer review and publication.
+
+Validation: `mise run check` and the dedicated
+`mise run check:m5c-closure-ledger` pass. `node --test tests/m5c-*.test.ts`
+passes all 105 tests both before and after the change. The consistency script
+*/data/m5c-ds6-20261031/verify.mjs* verifies the selector, all original source
+and replacement source/result digests, every listed variant, and exactly 42
+owner changes with all inventory states and dependency tags unchanged.
+Regenerating the ledger preserves its SHA256 exactly. No UPDATE or additional
+native suite is required for this accounting-only change; Root retains the
+normal exact-candidate publication gates.
 
 Selection rule: the audit families of
 */data/m5c-dynamic-source-265-audit-20261024/group-counts.json* named below,
@@ -40,8 +102,8 @@ Evidence obligations
  -  Split review scopes by subdirectory where a diff is large.
 
 
-Owned paths
------------
+Assessed paths
+--------------
 
 ### Private class identity, public lookup and static initializer this (24)
 

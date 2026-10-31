@@ -571,13 +571,19 @@ results:
     dependencies:
       - classes
       - dynamic-source
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
     observation:
-      detail: "test/language/expressions/class/private-static-setter-multiple\
-        -evaluations-of-class-direct-eval.js non-strict disabled failed
-        (1): stdout=\"\"
-        stderr=\"test/language/expressions/class/private-static-setter-\
-        multiple-evaluations-of-class-direct-eval.js:114:10:
-        error[OSEO1001]: Unknown binding 'eval'.\\n\""
+      detail: 'test/language/expressions/class/private-static-setter-multiple-evaluations-of-class-direct-eval.js
+        non-strict disabled failed (1): stdout=""
+        stderr="test/language/expressions/class/private-static-setter-multiple-evaluations-of-class-direct-eval.js:114:10:
+        error[OSEO1001]: eval compiles source text at run time, which is
+        outside the admitted profile.\n"'
       passed: false
       unsupportedCapability: profile-syntax
     unsupportedFeatures: []
@@ -1135,12 +1141,19 @@ results:
       - expression-operators
       - functions
       - lexical-grammar
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
     observation:
-      detail: "test/language/expressions/template-literal/mongolian-vowel-sep\
-        arator-eval.js non-strict disabled failed (1): stdout=\"\"
-        stderr=\"test/language/expressions/template-literal/mongolian-v\
-        owel-separator-eval.js:97:18: error[OSEO1001]: Unknown binding
-        'eval'.\\n\""
+      detail: 'test/language/expressions/template-literal/mongolian-vowel-separator-eval.js
+        non-strict disabled failed (1): stdout=""
+        stderr="test/language/expressions/template-literal/mongolian-vowel-separator-eval.js:97:18:
+        error[OSEO1001]: eval compiles source text at run time, which is
+        outside the admitted profile.\n"'
       passed: false
       unsupportedCapability: profile-syntax
     unsupportedFeatures: []

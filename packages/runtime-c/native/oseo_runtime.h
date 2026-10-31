@@ -1418,6 +1418,16 @@ OseoResult oseo_class_field_define(
  */
 OseoResult oseo_private_name_create(OseoContext *context);
 /*
+ * Replace one lexical cell and initialize it to a fresh private identity.
+ * All intermediate roots live only until this bounded operation returns;
+ * closures from earlier evaluations retain their original cells.
+ */
+OseoResult oseo_private_name_bind(
+    OseoContext *context,
+    OseoValue environment,
+    size_t binding_id
+);
+/*
  * Appends one private field to a class constructor's element list: the
  * private name and the closure that produces the value, or `undefined`
  * for a field declared without an initializer.

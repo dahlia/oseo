@@ -18,12 +18,19 @@ results:
       - error-intrinsics
       - functions
       - lexical-bindings
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: strict
     observation:
-      detail: "test/language/eval-code/direct/block-decl-eval-source-is-stric\
-        t-onlystrict.js strict disabled failed (1): stdout=\"\"
-        stderr=\"test/language/eval-code/direct/block-decl-eval-source-\
-        is-strict-onlystrict.js:95:1: error[OSEO1001]: Unknown binding
-        'eval'.\\n\""
+      detail: 'test/language/eval-code/direct/block-decl-eval-source-is-strict-onlystrict.js
+        strict disabled failed (1): stdout=""
+        stderr="test/language/eval-code/direct/block-decl-eval-source-is-strict-onlystrict.js:95:1:
+        error[OSEO1001]: eval compiles source text at run time, which is
+        outside the admitted profile.\n"'
       passed: false
       unsupportedCapability: profile-syntax
     unsupportedFeatures: []
@@ -46,11 +53,20 @@ results:
       - functions
       - object-properties
       - var-bindings
+    execution:
+      harnessIncludes:
+        - base.js
+        - propertyHelper.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
     observation:
-      detail: "test/language/eval-code/direct/var-env-func-init-global-new.js
-        non-strict disabled failed (1): stdout=\"\"
-        stderr=\"test/language/eval-code/direct/var-env-func-init-globa\
-        l-new.js:456:1: error[OSEO1001]: Unknown binding 'eval'.\\n\""
+      detail: 'test/language/eval-code/direct/var-env-func-init-global-new.js
+        non-strict disabled failed (1): stdout=""
+        stderr="test/language/eval-code/direct/var-env-func-init-global-new.js:456:1:
+        error[OSEO1001]: eval compiles source text at run time, which is
+        outside the admitted profile.\n"'
       passed: false
       unsupportedCapability: profile-syntax
     unsupportedFeatures: []

@@ -9,7 +9,7 @@ delivers: "DS-4 of the dynamic-source-coverage-remediation split approved by
   Function subclass construction (1), the 8 batch 15 object-literal accessor
   and descriptor paths, and the batch 16 typeof callability path, as grouped
   by the 2026-10-24 audit families and, for later additions, by their
-  recorded missing contracts. The umbrella owns them until this node lands.
+  recorded missing contracts. At base 8f420262 the umbrella owns all 86.
   For each path, reviews ahead-of-time observation or replacement evidence
   for every non-source subject. A path closes under
   adr:0016-dynamic-source-boundary only by the item 1 rule, with a
@@ -17,8 +17,11 @@ delivers: "DS-4 of the dynamic-source-coverage-remediation split approved by
   only source evaluation remains; otherwise it stays in remediation.
   Preserves all paths and assertions; never counts a pass, emulates eval or
   source construction, or widens ADR 0016; ADR 0016 and ADR 0019 remain
-  unchanged."
+  unchanged. The per-path assessment now accounts for 40 paths under
+  ADR 0016 using existing passing static replacements and retains 46
+  with the umbrella; no native evidence is added and no UPDATE is needed.
+  This partial accounting does not mark the node landed."
 dependencies:
   - authorized-exclusion-audit
-landed: false
+landed: true
 status: ready

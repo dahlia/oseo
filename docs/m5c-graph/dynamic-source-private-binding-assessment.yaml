@@ -1,0 +1,994 @@
+base: 1f3ade138ea7cbee80b2d62940e8f497db2bc1a2
+suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+pathSetDigest: d698889cd5c0a48322a434125b9986ae6ca1cfd383f48736be2abf0e93dd5352
+assessed: 66
+closed: 42
+staying: 24
+evidenceAdded: 0
+replacements:
+  - path: "test/language/expressions/class/private-getter-brand-check-multipl\
+      e-evaluations-of-class-factory.js"
+    sourceDigest: "ded77b7650dd299d5dbd0677882ea5168899ee142ed1caf910c3267c29\
+      659a71"
+    resultPartition: tests/test262/results/language/expressions/11.yaml
+    resultDigest: "f6339dea2e410c9b1ccc72280d1473dca7dfad36f0314ee54e77c00119\
+      c15ca1"
+    target: linux-x86_64-gnu
+    variants:
+      - specialization: disabled
+        strictness: non-strict
+      - specialization: enabled
+        strictness: non-strict
+      - specialization: disabled
+        strictness: strict
+      - specialization: enabled
+        strictness: strict
+  - path: "test/language/expressions/class/private-method-brand-check-multipl\
+      e-evaluations-of-class-factory.js"
+    sourceDigest: "cd59723266af048d8547bb15d2b46a824245f446155136c9c04dc6642c\
+      e6de57"
+    resultPartition: tests/test262/results/language/expressions/66.yaml
+    resultDigest: "03c18f614ac7e6303c6b13ce46c4b5bd57b6c059fa7b91ae6a51d0d8c8\
+      0537eb"
+    target: linux-x86_64-gnu
+    variants:
+      - specialization: disabled
+        strictness: non-strict
+      - specialization: enabled
+        strictness: non-strict
+      - specialization: disabled
+        strictness: strict
+      - specialization: enabled
+        strictness: strict
+  - path: "test/language/expressions/class/private-setter-brand-check-multipl\
+      e-evaluations-of-class-factory.js"
+    sourceDigest: "9f022835f1df9ae87256371011c252cedb64fdfab5e6a6462fd1ea745b\
+      a7d2cc"
+    resultPartition: tests/test262/results/language/expressions/84.yaml
+    resultDigest: "bc9838bb3b7cc7e0fa971818b4a2f76406bb2cdfed7c7225249a81a1c1\
+      36b5d2"
+    target: linux-x86_64-gnu
+    variants:
+      - specialization: disabled
+        strictness: non-strict
+      - specialization: enabled
+        strictness: non-strict
+      - specialization: disabled
+        strictness: strict
+      - specialization: enabled
+        strictness: strict
+  - path: "test/language/expressions/class/private-static-field-multiple-eval\
+      uations-of-class-factory.js"
+    sourceDigest: "dca4a318a992af07040845588edc3a7e0aeb63c8400a3c72f5b22a6c87\
+      e255da"
+    resultPartition: tests/test262/results/language/expressions/26.yaml
+    resultDigest: "fd0c30827e9f5d71c6500eafc5bf4841fa95367ab16b374ad9e305ccbb\
+      db19d7"
+    target: linux-x86_64-gnu
+    variants:
+      - specialization: disabled
+        strictness: non-strict
+      - specialization: enabled
+        strictness: non-strict
+      - specialization: disabled
+        strictness: strict
+      - specialization: enabled
+        strictness: strict
+  - path: "test/language/expressions/class/private-static-getter-multiple-eva\
+      luations-of-class-factory.js"
+    sourceDigest: "a75b94786239e2d9f0eab460234ed75c135ce82fb717a61988c418be3c\
+      c59160"
+    resultPartition: tests/test262/results/language/expressions/1d.yaml
+    resultDigest: "d34ab11dcead983a3e753c85146d456bb637338e7e6cb5acc80c877367\
+      22d07e"
+    target: linux-x86_64-gnu
+    variants:
+      - specialization: disabled
+        strictness: non-strict
+      - specialization: enabled
+        strictness: non-strict
+      - specialization: disabled
+        strictness: strict
+      - specialization: enabled
+        strictness: strict
+  - path: "test/language/expressions/class/private-static-method-brand-check-\
+      multiple-evaluations-of-class-factory.js"
+    sourceDigest: "6edf8bd9bae95167e0bc9aa315169492dbeebbcfe486a013bafbf71d2b\
+      90fb0a"
+    resultPartition: tests/test262/results/language/expressions/2c.yaml
+    resultDigest: "58b93c3e6377e81f026350a9e65e733ae541aebaf30e454ae6243cdf45\
+      b08db1"
+    target: linux-x86_64-gnu
+    variants:
+      - specialization: disabled
+        strictness: non-strict
+      - specialization: enabled
+        strictness: non-strict
+      - specialization: disabled
+        strictness: strict
+      - specialization: enabled
+        strictness: strict
+  - path: "test/language/expressions/class/private-static-setter-multiple-eva\
+      luations-of-class-factory.js"
+    sourceDigest: "71c789233ce62b5511d017d9e70e4a88cb1c5b24a549bc8f0d6fb21c13\
+      fe6060"
+    resultPartition: tests/test262/results/language/expressions/3a.yaml
+    resultDigest: "73885edb2c48f2a280d0a1ecf778d82f6b84d1e3a68620ca4aeb7df5cc\
+      0426f5"
+    target: linux-x86_64-gnu
+    variants:
+      - specialization: disabled
+        strictness: non-strict
+      - specialization: enabled
+        strictness: non-strict
+      - specialization: disabled
+        strictness: strict
+      - specialization: enabled
+        strictness: strict
+  - path: "test/language/expressions/async-function/named-reassign-fn-name-in\
+      -body.js"
+    sourceDigest: "a18fad459b284dee2c11e6a3e17b9f6eaa3b03c2531b3b6e0837e926dd\
+      3217df"
+    resultPartition: tests/test262/results/language/expressions/d4.yaml
+    resultDigest: "bef81096136f2a9d7ff5734b353bf6fd98f273f323b4d1178cadd013e3\
+      c0df36"
+    target: linux-x86_64-gnu
+    variants:
+      - specialization: disabled
+        strictness: non-strict
+      - specialization: enabled
+        strictness: non-strict
+  - path: "test/language/expressions/async-function/named-strict-error-reassi\
+      gn-fn-name-in-body.js"
+    sourceDigest: "d49292e5a5e2e588f483033a91adbf7c98c3cbbbe913d4fc77bf75c1f0\
+      be162f"
+    resultPartition: tests/test262/results/language/expressions/4c.yaml
+    resultDigest: "123def8f3c6ef6c07fe56ab78c2610ac85d04865cb312f11fef4494818\
+      252587"
+    target: linux-x86_64-gnu
+    variants:
+      - specialization: disabled
+        strictness: strict
+      - specialization: enabled
+        strictness: strict
+  - path: "test/language/expressions/async-generator/named-no-strict-reassign\
+      -fn-name-in-body.js"
+    sourceDigest: "4aed08dab4902ac8a6efc0bbe988679b9f99d4f8531feea6cf2320f57e\
+      2d29da"
+    resultPartition: tests/test262/results/language/expressions/08.yaml
+    resultDigest: "d8806ac3f3171b45f7080ecb3b9299e31cf60353a4e32fc066cd3351b9\
+      0b8a5d"
+    target: linux-x86_64-gnu
+    variants:
+      - specialization: disabled
+        strictness: non-strict
+      - specialization: enabled
+        strictness: non-strict
+  - path: "test/language/expressions/async-generator/named-strict-error-reass\
+      ign-fn-name-in-body.js"
+    sourceDigest: "c74e4f27e364e64863be205642f9d0af187d77df9982e9813e032fc1df\
+      3db3d6"
+    resultPartition: tests/test262/results/language/expressions/49.yaml
+    resultDigest: "e142f21c16b52c3cf52f0d3850b78558375295bd51caba666a75b8398f\
+      1ad205"
+    target: linux-x86_64-gnu
+    variants:
+      - specialization: disabled
+        strictness: strict
+      - specialization: enabled
+        strictness: strict
+  - path: test/language/expressions/call/11.2.3-3_1.js
+    sourceDigest: "7a3f537ecdb7144b75db03e4b800807c2f4e2c96747d37ec83a3f0dd29\
+      5ad5a5"
+    resultPartition: tests/test262/results/language/expressions/83.yaml
+    resultDigest: "0a738fa7f62d1997dc46abfee7ff418f84e65147c8b2a6de9970baba9a\
+      26af7c"
+    target: linux-x86_64-gnu
+    variants:
+      - specialization: disabled
+        strictness: non-strict
+      - specialization: enabled
+        strictness: non-strict
+      - specialization: disabled
+        strictness: strict
+      - specialization: enabled
+        strictness: strict
+  - path: "test/language/expressions/function/named-no-strict-reassign-fn-nam\
+      e-in-body.js"
+    sourceDigest: "a08a4e0c537456596753477bc4bfd29bf53e9162bdd098eeccf77e8396\
+      8eaec5"
+    resultPartition: tests/test262/results/language/expressions/fb.yaml
+    resultDigest: "43939432170cbb892ee7e9e642df8d15fbf6dcb2e6088db7c383dd935c\
+      6ca64a"
+    target: linux-x86_64-gnu
+    variants:
+      - specialization: disabled
+        strictness: non-strict
+      - specialization: enabled
+        strictness: non-strict
+  - path: "test/language/expressions/function/named-strict-error-reassign-fn-\
+      name-in-body.js"
+    sourceDigest: "e23daa1b4885ed6ccf76ee629fbc848abf98bafddaa5620a524a81728f\
+      8681a1"
+    resultPartition: tests/test262/results/language/expressions/ba.yaml
+    resultDigest: "b1e9a6150b0231146a839b78f1c096160a3413c9d952265edc9346eea1\
+      e93b6b"
+    target: linux-x86_64-gnu
+    variants:
+      - specialization: disabled
+        strictness: strict
+      - specialization: enabled
+        strictness: strict
+  - path: "test/language/expressions/generators/named-no-strict-reassign-fn-n\
+      ame-in-body.js"
+    sourceDigest: "b63b8d0f9c95f8b17f4e5abeb2954b56d34d62aad845eeaa2279ff372f\
+      0a2d52"
+    resultPartition: tests/test262/results/language/expressions/c8.yaml
+    resultDigest: "e196a58f6a660d8886a51a9bfc635194897281af0137a1a2edb6762b51\
+      7b7d59"
+    target: linux-x86_64-gnu
+    variants:
+      - specialization: disabled
+        strictness: non-strict
+      - specialization: enabled
+        strictness: non-strict
+  - path: "test/language/expressions/generators/named-strict-error-reassign-f\
+      n-name-in-body.js"
+    sourceDigest: "5be11d8c6733ab075a0a29ce870ede9f8a09705b0b7d23c55f66b64897\
+      679923"
+    resultPartition: tests/test262/results/language/expressions/86.yaml
+    resultDigest: "7a2c7e243a2ab9d6ead98f2c20dfc6bdec8cac8827bf31241fb3a6a746\
+      ab9be6"
+    target: linux-x86_64-gnu
+    variants:
+      - specialization: disabled
+        strictness: strict
+      - specialization: enabled
+        strictness: strict
+  - path: test/language/function-code/10.4.3-1-62-s.js
+    sourceDigest: "667153e5e32acb7e4067c4d751e258ca18cfc16dc72c790d9532635078\
+      90ff98"
+    resultPartition: tests/test262/results/language/function-code/58.yaml
+    resultDigest: "01d9f92a14b036c802c86ca406b2f6f5d41178d42be7bd42ccf4c87261\
+      cc95de"
+    target: linux-x86_64-gnu
+    variants:
+      - specialization: disabled
+        strictness: non-strict
+      - specialization: enabled
+        strictness: non-strict
+      - specialization: disabled
+        strictness: strict
+      - specialization: enabled
+        strictness: strict
+  - path: test/language/function-code/10.4.3-1-62gs.js
+    sourceDigest: "5efebd7d1b620393f993048bf3e6f2791ea0b32e6cefc330e389699814\
+      94b4a6"
+    resultPartition: tests/test262/results/language/function-code/46.yaml
+    resultDigest: "83c822137db169cc8095329426341cdabff64181ef7e635ad7fdfd0a26\
+      1c55a6"
+    target: linux-x86_64-gnu
+    variants:
+      - specialization: disabled
+        strictness: non-strict
+      - specialization: enabled
+        strictness: non-strict
+      - specialization: disabled
+        strictness: strict
+      - specialization: enabled
+        strictness: strict
+  - path: test/language/function-code/10.4.3-1-81-s.js
+    sourceDigest: "b7c83bb17ea4da0193d2c53ca52c0bfb7ed6d7c0e6e427f19bfe8198fb\
+      73c10d"
+    resultPartition: tests/test262/results/language/function-code/41.yaml
+    resultDigest: "ab457852390a47d09607aed06b011443b15c8e47e20be2b52125a8f243\
+      1ba920"
+    target: linux-x86_64-gnu
+    variants:
+      - specialization: disabled
+        strictness: non-strict
+      - specialization: enabled
+        strictness: non-strict
+  - path: test/language/function-code/10.4.3-1-81gs.js
+    sourceDigest: "5f6fd154c9a14608c4bf4dd8cf99fd962f1212946411dc6f8a897321d0\
+      3cc023"
+    resultPartition: tests/test262/results/language/function-code/81.yaml
+    resultDigest: "ea654d7b203c1b269904341236bad2f16967182ac8261496218559e04a\
+      a4e492"
+    target: linux-x86_64-gnu
+    variants:
+      - specialization: disabled
+        strictness: non-strict
+      - specialization: enabled
+        strictness: non-strict
+paths:
+  - path: "test/language/expressions/class/elements/nested-private-direct-eva\
+      l-err-contains-newtarget.js"
+    subject: Class private field initialization, new.target in direct eval, and
+      public c.x lookup
+    disposition: remediation
+    sourceDigest: "953355769378162a45854247463d10bc16fd1dde93e5776bdfbac0cb9b\
+      19c91a"
+    replacement: null
+    reason: No complete reviewed replacement establishes initializer side effect
+      executed=true together with c.x===undefined; the eval/new.target subject
+      alone does not cover the public lookup.
+  - path: "test/language/expressions/class/elements/private-direct-eval-err-c\
+      ontains-newtarget.js"
+    subject: Class private field initialization, new.target in direct eval, and
+      public c.x lookup
+    disposition: remediation
+    sourceDigest: "1ab6e04331242b80ac3660702320d5b58a49e52279471066bddeb763cf\
+      fea185"
+    replacement: null
+    reason: No complete reviewed replacement establishes initializer side effect
+      executed=true together with c.x===undefined; the eval/new.target subject
+      alone does not cover the public lookup.
+  - path: "test/language/expressions/class/elements/static-field-init-with-th\
+      is.js"
+    subject: Static initializer this, ordered f/g/h reads, and string
+      concatenation
+    disposition: remediation
+    sourceDigest: "644cac2a5bf43a356eac968fa4130002d4d47118bc5909f8ec29996562\
+      550108"
+    replacement: null
+    reason: All C.f, C.g and C.h assertions follow class initialization and
+      remain unobserved after the compile-stage eval rejection; no complete
+      replacement is established for ordered initialization, constructor this
+      and concatenation.
+  - path: "test/language/expressions/class/private-getter-brand-check-multipl\
+      e-evaluations-of-class-eval-indirect.js"
+    subject: Fresh private instance getter identity on repeated class evaluation
+    disposition: exclusion
+    sourceDigest: "5d156b2e7c0d1e717fe115d38633799cc8f32c2f2c4539562423e35a51\
+      627641"
+    replacement: "test/language/expressions/class/private-getter-brand-check-\
+      multiple-evaluations-of-class-factory.js"
+    reason: The static factory evaluates one class expression twice, checks both
+      own instance getter accesses and both cross-brand TypeErrors; only
+      source evaluation remains.
+  - path: "test/language/expressions/class/private-getter-brand-check-multipl\
+      e-evaluations-of-class-eval.js"
+    subject: Fresh private instance getter identity on repeated class evaluation
+    disposition: exclusion
+    sourceDigest: "c93b1d57e2b7166d88bf542c8a0ab32db916e7aa128cf37b0ca2f8b976\
+      942100"
+    replacement: "test/language/expressions/class/private-getter-brand-check-\
+      multiple-evaluations-of-class-factory.js"
+    reason: The static factory evaluates one class expression twice, checks both
+      own instance getter accesses and both cross-brand TypeErrors; only
+      source evaluation remains.
+  - path: "test/language/expressions/class/private-getter-brand-check-multipl\
+      e-evaluations-of-class-function-ctor.js"
+    subject: Fresh private instance getter identity on repeated class evaluation
+    disposition: exclusion
+    sourceDigest: "ff2a48f2985dd1bc257eba2057562c625a5722a46bb75d463952e05d41\
+      455cf2"
+    replacement: "test/language/expressions/class/private-getter-brand-check-\
+      multiple-evaluations-of-class-factory.js"
+    reason: The static factory evaluates one class expression twice, checks both
+      own instance getter accesses and both cross-brand TypeErrors; only
+      source evaluation remains.
+  - path: "test/language/expressions/class/private-method-brand-check-multipl\
+      e-evaluations-of-class-eval-indirect.js"
+    subject: Fresh private instance method identity on repeated class evaluation
+    disposition: exclusion
+    sourceDigest: "5c15a6c372559f03ceae5c18510f81c2fb5f7eaefd23b9deaa46de5c97\
+      b4dde2"
+    replacement: "test/language/expressions/class/private-method-brand-check-\
+      multiple-evaluations-of-class-factory.js"
+    reason: The static factory evaluates one class expression twice, checks both
+      own instance method accesses and both cross-brand TypeErrors; only
+      source evaluation remains.
+  - path: "test/language/expressions/class/private-method-brand-check-multipl\
+      e-evaluations-of-class-eval.js"
+    subject: Fresh private instance method identity on repeated class evaluation
+    disposition: exclusion
+    sourceDigest: "4752f29f0e6fe908e1e29d7abb5facd609a1f2b9c6de47fe54c2d871c4\
+      c85e36"
+    replacement: "test/language/expressions/class/private-method-brand-check-\
+      multiple-evaluations-of-class-factory.js"
+    reason: The static factory evaluates one class expression twice, checks both
+      own instance method accesses and both cross-brand TypeErrors; only
+      source evaluation remains.
+  - path: "test/language/expressions/class/private-method-brand-check-multipl\
+      e-evaluations-of-class-function-ctor.js"
+    subject: Fresh private instance method identity on repeated class evaluation
+    disposition: exclusion
+    sourceDigest: "a742bb24bb8ec1a9630542cc9f8d1326674f45648a44d0cf9e1ca6c08a\
+      a79022"
+    replacement: "test/language/expressions/class/private-method-brand-check-\
+      multiple-evaluations-of-class-factory.js"
+    reason: The static factory evaluates one class expression twice, checks both
+      own instance method accesses and both cross-brand TypeErrors; only
+      source evaluation remains.
+  - path: "test/language/expressions/class/private-setter-brand-check-multipl\
+      e-evaluations-of-class-eval-indirect.js"
+    subject: Fresh private instance setter identity on repeated class evaluation
+    disposition: exclusion
+    sourceDigest: "d781dc86ca0c015b54a5896b3cd8954b7ae42810014dd06d5ded681b56\
+      40f90d"
+    replacement: "test/language/expressions/class/private-setter-brand-check-\
+      multiple-evaluations-of-class-factory.js"
+    reason: The static factory evaluates one class expression twice, checks both
+      own instance setter accesses and both cross-brand TypeErrors; only
+      source evaluation remains.
+  - path: "test/language/expressions/class/private-setter-brand-check-multipl\
+      e-evaluations-of-class-eval.js"
+    subject: Fresh private instance setter identity on repeated class evaluation
+    disposition: exclusion
+    sourceDigest: "9f136b2b89552b223a0ebb2f309d862d66f40e591d4f12713f0cc9963a\
+      909837"
+    replacement: "test/language/expressions/class/private-setter-brand-check-\
+      multiple-evaluations-of-class-factory.js"
+    reason: The static factory evaluates one class expression twice, checks both
+      own instance setter accesses and both cross-brand TypeErrors; only
+      source evaluation remains.
+  - path: "test/language/expressions/class/private-setter-brand-check-multipl\
+      e-evaluations-of-class-function-ctor.js"
+    subject: Fresh private instance setter identity on repeated class evaluation
+    disposition: exclusion
+    sourceDigest: "61bd2214cd458f7dde8c79a399c3c783c75f713833b3493909f553b5a3\
+      62b6de"
+    replacement: "test/language/expressions/class/private-setter-brand-check-\
+      multiple-evaluations-of-class-factory.js"
+    reason: The static factory evaluates one class expression twice, checks both
+      own instance setter accesses and both cross-brand TypeErrors; only
+      source evaluation remains.
+  - path: "test/language/expressions/class/private-static-field-multiple-eval\
+      uations-of-class-direct-eval.js"
+    subject: Fresh private static field identity on repeated class evaluation
+    disposition: exclusion
+    sourceDigest: "0317317878f54107a2882410910e6906bd01a32dd584511c96deba8327\
+      8fa921"
+    replacement: "test/language/expressions/class/private-static-field-multip\
+      le-evaluations-of-class-factory.js"
+    reason: The static factory evaluates one class expression twice, checks both
+      own static field accesses and both cross-brand TypeErrors; only source
+      evaluation remains.
+  - path: "test/language/expressions/class/private-static-field-multiple-eval\
+      uations-of-class-eval-indirect.js"
+    subject: Fresh private static field identity on repeated class evaluation
+    disposition: exclusion
+    sourceDigest: "df8d71afe00cbd480d2688a78517146ba44b374a3de6fc402b0eb0723b\
+      63a18e"
+    replacement: "test/language/expressions/class/private-static-field-multip\
+      le-evaluations-of-class-factory.js"
+    reason: The static factory evaluates one class expression twice, checks both
+      own static field accesses and both cross-brand TypeErrors; only source
+      evaluation remains.
+  - path: "test/language/expressions/class/private-static-field-multiple-eval\
+      uations-of-class-function-ctor.js"
+    subject: Fresh private static field identity on repeated class evaluation
+    disposition: exclusion
+    sourceDigest: "bcb60765fcd725a95185867c8f70370062e2778fa685a418713355ad1e\
+      6fb990"
+    replacement: "test/language/expressions/class/private-static-field-multip\
+      le-evaluations-of-class-factory.js"
+    reason: The static factory evaluates one class expression twice, checks both
+      own static field accesses and both cross-brand TypeErrors; only source
+      evaluation remains.
+  - path: "test/language/expressions/class/private-static-getter-multiple-eva\
+      luations-of-class-direct-eval.js"
+    subject: Fresh private static getter identity on repeated class evaluation
+    disposition: exclusion
+    sourceDigest: "d598a5cdfbc2be9e0d353276b5b7bbf47c5d671747486ca9335d08772e\
+      71591a"
+    replacement: "test/language/expressions/class/private-static-getter-multi\
+      ple-evaluations-of-class-factory.js"
+    reason: The static factory evaluates one class expression twice, checks both
+      own static getter accesses and both cross-brand TypeErrors; only source
+      evaluation remains. Its Test262 sentinel differs only in capitalization,
+      which does not change the asserted getter contract.
+  - path: "test/language/expressions/class/private-static-getter-multiple-eva\
+      luations-of-class-eval-indirect.js"
+    subject: Fresh private static getter identity on repeated class evaluation
+    disposition: exclusion
+    sourceDigest: "275916b2efa6f3cc8040131190621b92aff52edf1e7b0d5d5f4a181dce\
+      721daa"
+    replacement: "test/language/expressions/class/private-static-getter-multi\
+      ple-evaluations-of-class-factory.js"
+    reason: The static factory evaluates one class expression twice, checks both
+      own static getter accesses and both cross-brand TypeErrors; only source
+      evaluation remains.
+  - path: "test/language/expressions/class/private-static-getter-multiple-eva\
+      luations-of-class-function-ctor.js"
+    subject: Fresh private static getter identity on repeated class evaluation
+    disposition: exclusion
+    sourceDigest: "82f33e27a248dbbaf79a55e235c20beccdb143013ff5689ca3c9567124\
+      2b47d7"
+    replacement: "test/language/expressions/class/private-static-getter-multi\
+      ple-evaluations-of-class-factory.js"
+    reason: The static factory evaluates one class expression twice, checks both
+      own static getter accesses and both cross-brand TypeErrors; only source
+      evaluation remains.
+  - path: "test/language/expressions/class/private-static-method-brand-check-\
+      multiple-evaluations-of-class-direct-eval.js"
+    subject: Fresh private static method identity on repeated class evaluation
+    disposition: exclusion
+    sourceDigest: "0e741b10350c1dbd6ba218ea9468d8f2e14c693dba537ca7803bb876b4\
+      8496d5"
+    replacement: "test/language/expressions/class/private-static-method-brand\
+      -check-multiple-evaluations-of-class-factory.js"
+    reason: The static factory evaluates one class expression twice, checks both
+      own static method accesses and both cross-brand TypeErrors; only source
+      evaluation remains.
+  - path: "test/language/expressions/class/private-static-method-brand-check-\
+      multiple-evaluations-of-class-eval-indirect.js"
+    subject: Fresh private static method identity on repeated class evaluation
+    disposition: exclusion
+    sourceDigest: "c209abc7ef57ddb61e1b9be97e1db6e46a930647d70135f8cefdf93ef8\
+      4937d6"
+    replacement: "test/language/expressions/class/private-static-method-brand\
+      -check-multiple-evaluations-of-class-factory.js"
+    reason: The static factory evaluates one class expression twice, checks both
+      own static method accesses and both cross-brand TypeErrors; only source
+      evaluation remains.
+  - path: "test/language/expressions/class/private-static-method-brand-check-\
+      multiple-evaluations-of-class-function-ctor.js"
+    subject: Fresh private static method identity on repeated class evaluation
+    disposition: exclusion
+    sourceDigest: "4c263ed6d36d3b7539cb7c81aa50a8ed700aeedd8beb620a1b62f57287\
+      e3dd00"
+    replacement: "test/language/expressions/class/private-static-method-brand\
+      -check-multiple-evaluations-of-class-factory.js"
+    reason: The static factory evaluates one class expression twice, checks both
+      own static method accesses and both cross-brand TypeErrors; only source
+      evaluation remains.
+  - path: "test/language/expressions/class/private-static-setter-multiple-eva\
+      luations-of-class-direct-eval.js"
+    subject: Fresh private static setter identity on repeated class evaluation
+    disposition: exclusion
+    sourceDigest: "76361d7562781e118cbaa113f80d20efccfb389c46775cdde62d1f767d\
+      f7a1f9"
+    replacement: "test/language/expressions/class/private-static-setter-multi\
+      ple-evaluations-of-class-factory.js"
+    reason: The static factory evaluates one class expression twice, checks both
+      own static setter accesses and both cross-brand TypeErrors; only source
+      evaluation remains.
+  - path: "test/language/expressions/class/private-static-setter-multiple-eva\
+      luations-of-class-eval-indirect.js"
+    subject: Fresh private static setter identity on repeated class evaluation
+    disposition: exclusion
+    sourceDigest: "cbf974dbc06462842f57318e5dbccc31dddbe3ee1e35c490967e659fbf\
+      e9a55e"
+    replacement: "test/language/expressions/class/private-static-setter-multi\
+      ple-evaluations-of-class-factory.js"
+    reason: The static factory evaluates one class expression twice, checks both
+      own static setter accesses and both cross-brand TypeErrors; only source
+      evaluation remains.
+  - path: "test/language/expressions/class/private-static-setter-multiple-eva\
+      luations-of-class-function-ctor.js"
+    subject: Fresh private static setter identity on repeated class evaluation
+    disposition: exclusion
+    sourceDigest: "9e49cde6331bf54bab75f38189f32f1237f4099f55e018344e89b4258f\
+      f39402"
+    replacement: "test/language/expressions/class/private-static-setter-multi\
+      ple-evaluations-of-class-factory.js"
+    reason: The static factory evaluates one class expression twice, checks both
+      own static setter accesses and both cross-brand TypeErrors; only source
+      evaluation remains.
+  - path: test/language/expressions/arrow-function/arrow/binding-tests-1.js
+    subject: Arrow lexical this capture from a bare non-strict function call
+    disposition: remediation
+    sourceDigest: "8fdaab321dd3fb9281ee3a0cea11a0935f10b10d5b699ee7a6f6459c75\
+      c659db"
+    replacement: null
+    reason:
+      lexical-this.js observes a constructed object receiver, not this exact
+      global bare-call capture; no complete replacement is established.
+  - path: test/language/expressions/arrow-function/arrow/binding-tests-2.js
+    subject: Arrow lexical this capture from a bare non-strict function call
+    disposition: remediation
+    sourceDigest: "8fdaab321dd3fb9281ee3a0cea11a0935f10b10d5b699ee7a6f6459c75\
+      c659db"
+    replacement: null
+    reason:
+      lexical-this.js observes a constructed object receiver, not this exact
+      global bare-call capture; no complete replacement is established.
+  - path: test/language/expressions/arrow-function/arrow/binding-tests-3.js
+    subject: Arrow lexical this capture from a bare non-strict function call
+    disposition: remediation
+    sourceDigest: "f863b06da48490f5769bb5e18f0e4e4e592da108ed511ecf8f6460e8c8\
+      d7602d"
+    replacement: null
+    reason:
+      lexical-this.js observes a constructed object receiver, not this exact
+      global bare-call capture; no complete replacement is established.
+  - path: "test/language/expressions/arrow-function/arrow/capturing-closure-v\
+      ariables-1.js"
+    subject: Arrow closure observes the outer var after assignment
+    disposition: remediation
+    sourceDigest: "ab105605b61012ae8ba88cc2d0e69d2c6227f1ce4835a883056646032b\
+      89d551"
+    replacement: null
+    reason:
+      capturing-closure-variables-2.js uses with and a different binding; no
+      complete replacement is established for the outer var update and
+      returned arrow read.
+  - path: "test/language/expressions/async-function/named-reassign-fn-name-in\
+      -body-in-eval.js"
+    subject: Named async-function expression immutable self binding in
+      non-strict code
+    disposition: exclusion
+    sourceDigest: "8c172e3d95288d69374ccd94e2290ef2df70d6e321ce443a8b72710dbb\
+      54e5b3"
+    replacement: "test/language/expressions/async-function/named-reassign-fn-\
+      name-in-body.js"
+    reason: The paired static body assigns the same self binding and checks the
+      unchanged function identity and exactly one invocation, with the same
+      async/generator observation where applicable; only eval source
+      evaluation remains.
+  - path: "test/language/expressions/async-function/named-strict-error-reassi\
+      gn-fn-name-in-body-in-eval.js"
+    subject: Named async-function expression immutable self binding in strict
+      code
+    disposition: exclusion
+    sourceDigest: "870d8f132c3cb4419fa47e26464f9457d8fb8b5b210a557c8704862d93\
+      fbeff5"
+    replacement: "test/language/expressions/async-function/named-strict-error\
+      -reassign-fn-name-in-body.js"
+    reason: The paired static body assigns the same self binding and checks the
+      TypeError and exactly one invocation, with the same async/generator
+      observation where applicable; only eval source evaluation remains.
+  - path: "test/language/expressions/async-generator/named-no-strict-reassign\
+      -fn-name-in-body-in-eval.js"
+    subject:
+      Named async-generator expression immutable self binding in non-strict
+      code
+    disposition: exclusion
+    sourceDigest: "3f8458140c36e6c8157a562350eb0228fe25cb94e7887d8468d05fce95\
+      fcfc73"
+    replacement: "test/language/expressions/async-generator/named-no-strict-r\
+      eassign-fn-name-in-body.js"
+    reason: The paired static body assigns the same self binding and checks the
+      unchanged function identity and exactly one invocation, with the same
+      async/generator observation where applicable; only eval source
+      evaluation remains.
+  - path: "test/language/expressions/async-generator/named-strict-error-reass\
+      ign-fn-name-in-body-in-eval.js"
+    subject: Named async-generator expression immutable self binding in strict
+      code
+    disposition: exclusion
+    sourceDigest: "536039fab1840579e26f9e9f362ebd4b57489d7afccf21492922ca7e1e\
+      67e43c"
+    replacement: "test/language/expressions/async-generator/named-strict-erro\
+      r-reassign-fn-name-in-body.js"
+    reason: The paired static body assigns the same self binding and checks the
+      TypeError and exactly one invocation, with the same async/generator
+      observation where applicable; only eval source evaluation remains.
+  - path: test/language/expressions/call/11.2.3-3_5.js
+    subject: Call arguments run before the callability check
+    disposition: exclusion
+    sourceDigest: "4fd4a8c69a5b5074740ee5f60a0f29c679a583fc56a78834c7819fa6de\
+      653508"
+    replacement: test/language/expressions/call/11.2.3-3_1.js
+    reason: The static call uses the same o.bar(foo()) expression, observes
+      fooCalled=true and TypeError, and removes only eval source evaluation.
+  - path: test/language/expressions/compound-assignment/11.13.2-1-s.js
+    subject: Unresolvable identifier *= throws ReferenceError
+    disposition: remediation
+    sourceDigest: "bb850bf59179ff94b166b42c3003497e9c50c143fc4f9a69e2d95dcfc6\
+      0bf15d"
+    replacement: null
+    reason:
+      No reviewed runtime ReferenceError replacement is established for *=;
+      a compile-time unknown-binding diagnostic cannot witness the asserted
+      catchable error.
+  - path: test/language/expressions/compound-assignment/11.13.2-10-s.js
+    subject: Unresolvable identifier ^= throws ReferenceError
+    disposition: remediation
+    sourceDigest: "c6001a29cf1a80c2106d4520aacc5738db77ce5eb10f31f0559dbb8f99\
+      9514cc"
+    replacement: null
+    reason:
+      No reviewed runtime ReferenceError replacement is established for ^=;
+      a compile-time unknown-binding diagnostic cannot witness the asserted
+      catchable error.
+  - path: test/language/expressions/compound-assignment/11.13.2-11-s.js
+    subject: Unresolvable identifier |= throws ReferenceError
+    disposition: remediation
+    sourceDigest: "d8268662741a95bc2a6c6f021354477ed4874dbda384eec99b89bc40af\
+      bb90d4"
+    replacement: null
+    reason:
+      No reviewed runtime ReferenceError replacement is established for |=;
+      a compile-time unknown-binding diagnostic cannot witness the asserted
+      catchable error.
+  - path: test/language/expressions/compound-assignment/11.13.2-2-s.js
+    subject: Unresolvable identifier /= throws ReferenceError
+    disposition: remediation
+    sourceDigest: "e1f51ddbdc3f1d9b4a0e0e09fe9b4112656c7a28c346a457224e29d249\
+      77aa10"
+    replacement: null
+    reason:
+      No reviewed runtime ReferenceError replacement is established for /=;
+      a compile-time unknown-binding diagnostic cannot witness the asserted
+      catchable error.
+  - path: test/language/expressions/compound-assignment/11.13.2-4-s.js
+    subject: Unresolvable identifier += throws ReferenceError
+    disposition: remediation
+    sourceDigest: "0fa130b05397cbc4f6ed3cdba9d0d9c57bef70e874d1b3ecfacfe0a0f3\
+      3cac49"
+    replacement: null
+    reason:
+      No reviewed runtime ReferenceError replacement is established for +=;
+      a compile-time unknown-binding diagnostic cannot witness the asserted
+      catchable error.
+  - path: test/language/expressions/compound-assignment/11.13.2-5-s.js
+    subject: Unresolvable identifier -= throws ReferenceError
+    disposition: remediation
+    sourceDigest: "1fb79d0b9135bce17553f1854bcfb32deaa77aa029bff4ae1193c93de6\
+      f8ea85"
+    replacement: null
+    reason:
+      No reviewed runtime ReferenceError replacement is established for -=;
+      a compile-time unknown-binding diagnostic cannot witness the asserted
+      catchable error.
+  - path: test/language/expressions/compound-assignment/11.13.2-6-s.js
+    subject: Unresolvable identifier <<= throws ReferenceError
+    disposition: remediation
+    sourceDigest: "5512efeb298132c68f78139094b10ec0ae0f11c5f1755b079b986236f3\
+      045b7c"
+    replacement: null
+    reason:
+      No reviewed runtime ReferenceError replacement is established for <<=;
+      a compile-time unknown-binding diagnostic cannot witness the asserted
+      catchable error.
+  - path: test/language/expressions/compound-assignment/11.13.2-8-s.js
+    subject: Unresolvable identifier >>>= throws ReferenceError
+    disposition: remediation
+    sourceDigest: "bd090dc38d7ed2e2dff444dfd49375c71baba9b96d09768f30d14b1bd9\
+      72c248"
+    replacement: null
+    reason: No reviewed runtime ReferenceError replacement is established for
+      >>>=; a compile-time unknown-binding diagnostic cannot witness the
+      asserted catchable error.
+  - path: test/language/expressions/compound-assignment/11.13.2-9-s.js
+    subject: Unresolvable identifier &= throws ReferenceError
+    disposition: remediation
+    sourceDigest: "d5eb4bea930d47fba0e931aa3b33522788a725634863b0bc74c2dfaf4a\
+      d3ef8c"
+    replacement: null
+    reason:
+      No reviewed runtime ReferenceError replacement is established for &=;
+      a compile-time unknown-binding diagnostic cannot witness the asserted
+      catchable error.
+  - path: "test/language/expressions/function/named-no-strict-reassign-fn-nam\
+      e-in-body-in-eval.js"
+    subject: Named function expression immutable self binding in non-strict code
+    disposition: exclusion
+    sourceDigest: "aa9d803f66607367a69ec05fa58c1818692b07e551f741a5303ca2e84a\
+      a0324e"
+    replacement: "test/language/expressions/function/named-no-strict-reassign\
+      -fn-name-in-body.js"
+    reason: The paired static body assigns the same self binding and checks the
+      unchanged function identity and exactly one invocation, with the same
+      async/generator observation where applicable; only eval source
+      evaluation remains.
+  - path: "test/language/expressions/function/named-strict-error-reassign-fn-\
+      name-in-body-in-eval.js"
+    subject: Named function expression immutable self binding in strict code
+    disposition: exclusion
+    sourceDigest: "fc8a889f9c513f1759b18665c017a348107819b2b8ec45536cb46cd466\
+      37ffa1"
+    replacement: "test/language/expressions/function/named-strict-error-reass\
+      ign-fn-name-in-body.js"
+    reason: The paired static body assigns the same self binding and checks the
+      TypeError and exactly one invocation, with the same async/generator
+      observation where applicable; only eval source evaluation remains.
+  - path: "test/language/expressions/generators/named-no-strict-reassign-fn-n\
+      ame-in-body-in-eval.js"
+    subject: Named generators expression immutable self binding in non-strict
+      code
+    disposition: exclusion
+    sourceDigest: "422e7e2107a62b29a237b68f23254d08da3162f9cb82e6d525e806c9fd\
+      dfde5b"
+    replacement: "test/language/expressions/generators/named-no-strict-reassi\
+      gn-fn-name-in-body.js"
+    reason: The paired static body assigns the same self binding and checks the
+      unchanged function identity and exactly one invocation, with the same
+      async/generator observation where applicable; only eval source
+      evaluation remains.
+  - path: "test/language/expressions/generators/named-strict-error-reassign-f\
+      n-name-in-body-in-eval.js"
+    subject: Named generators expression immutable self binding in strict code
+    disposition: exclusion
+    sourceDigest: "dd3a0f967bfe7dfe03fec345eb665334a8f20a6a21197e031827311391\
+      1762ea"
+    replacement: "test/language/expressions/generators/named-strict-error-rea\
+      ssign-fn-name-in-body.js"
+    reason: The paired static body assigns the same self binding and checks the
+      TypeError and exactly one invocation, with the same async/generator
+      observation where applicable; only eval source evaluation remains.
+  - path: test/language/expressions/call/eval-err-args.js
+    subject:
+      Direct eval ArgumentListEvaluation propagates an unresolved argument
+      ReferenceError
+    disposition: remediation
+    sourceDigest: "18b6654d706e02ecd0f680010e3323c2158894c769165411e8855289d6\
+      983634"
+    replacement: null
+    reason: No replacement observes argument GetValue failure before eval
+      dispatch; compile-time unknown-binding rejection does not witness the
+      catchable ReferenceError.
+  - path: test/language/expressions/call/eval-no-args.js
+    subject: Direct eval with no arguments returns undefined
+    disposition: remediation
+    sourceDigest: "125fce4f6333708484486d6718827dde9352fdb46b428d88d6d7a57732\
+      28e976"
+    replacement: null
+    reason: The no-argument intrinsic dispatch contract requires no source
+      evaluation, so source-evaluation-only accounting cannot close it; no
+      replacement is established.
+  - path: test/language/expressions/call/eval-spread-empty-leading.js
+    subject: Direct eval leading empty spread argument iteration and local
+      assignment
+    disposition: remediation
+    sourceDigest: "cf5223e3010a7abea82fe7f0b24c8b2746fce1bcabdd27b1777382fd5a\
+      fd8b38"
+    replacement: null
+    reason: No complete replacement observes nextCount=1 and the local x change
+      while global x stays unchanged; generic spread evidence is insufficient.
+  - path: test/language/expressions/call/eval-spread-empty-trailing.js
+    subject: Direct eval trailing empty spread argument iteration and local
+      assignment
+    disposition: remediation
+    sourceDigest: "2b450001e579ddec3ce1a038c0616895b08946a48a515bde58ac1e4208\
+      ebc4d0"
+    replacement: null
+    reason: No complete replacement observes nextCount=1 and the local x change
+      while global x stays unchanged; generic spread evidence is insufficient.
+  - path: test/language/expressions/call/eval-spread-empty.js
+    subject: Empty iterator spread is exhausted once and direct eval returns
+      undefined
+    disposition: remediation
+    sourceDigest: "9579caf22073a998b319be2aca4398330e6b13cfd807f89318f84c0690\
+      5a9294"
+    replacement: null
+    reason:
+      No complete replacement observes both nextCount=1 and the no-argument
+      eval dispatch result; this intrinsic call has no source text to exclude.
+  - path: test/language/expressions/call/eval-spread.js
+    subject: Direct eval nonempty spread argument iteration and local assignment
+    disposition: remediation
+    sourceDigest: "00323d72969c804b8093dbe36a8772af23c57d881ca9621f639edf1584\
+      9af028"
+    replacement: null
+    reason: No complete replacement observes nextCount=3, only the first string
+      taking effect, and the local x change while global x stays unchanged;
+      generic spread evidence is insufficient.
+  - path: test/language/expressions/this/S11.1.1_A3.1.js
+    subject: Bare non-strict call returns global this, both directly and
+      through eval
+    disposition: remediation
+    sourceDigest: "be99004f8e76e7d01c3dfa23584281888a89bd70a096d1604014bb01fb\
+      35c06e"
+    replacement: null
+    reason: No complete reviewed replacement is established for both ordinary
+      bare-call global identity and the eval-side this observation.
+  - path: test/language/expressions/this/S11.1.1_A3.2.js
+    subject:
+      Constructed this stored as a public property and converted to [object
+      Object]
+    disposition: remediation
+    sourceDigest: "ee5c2a722df3a8dd729666593ea36dfa1ad3f02bfff84b17d4c1f0085b\
+      a2d7c6"
+    replacement: null
+    reason: No complete replacement is established for the stored receiver and
+      toString result of both constructions; generic construction coverage is
+      insufficient.
+  - path: test/language/function-code/10.4.3-1-63-s.js
+    subject: Strict callee this is independent of non-strict caller
+    disposition: exclusion
+    sourceDigest: "490be3867882612c5119a6874042e08bc3faccc3763ec691b25e064458\
+      e6a47d"
+    replacement: test/language/function-code/10.4.3-1-62-s.js
+    reason:
+      The static 62 caller pair observes undefined this for the same callee
+      strictness; the original's eval caller adds only source
+      creation/evaluation to that receiver contract.
+  - path: test/language/function-code/10.4.3-1-63gs.js
+    subject: Strict callee this is independent of non-strict caller
+    disposition: exclusion
+    sourceDigest: "e214d79f23bc0efd57aea04194d05983f5df5ef9f102892cae0ca552a3\
+      564a08"
+    replacement: test/language/function-code/10.4.3-1-62gs.js
+    reason:
+      The static 62 caller pair observes undefined this for the same callee
+      strictness; the original's eval caller adds only source
+      creation/evaluation to that receiver contract.
+  - path: test/language/function-code/10.4.3-1-64-s.js
+    subject: Strict callee this is independent of non-strict caller
+    disposition: exclusion
+    sourceDigest: "392f9a3ff13efea61d8dc33aaf125b0346705bda096fb8959ab3f0679f\
+      83bef4"
+    replacement: test/language/function-code/10.4.3-1-62-s.js
+    reason:
+      The static 62 caller pair observes undefined this for the same callee
+      strictness; the original's Function-created global caller adds only
+      source creation/evaluation to that receiver contract.
+  - path: test/language/function-code/10.4.3-1-64gs.js
+    subject: Strict callee this is independent of non-strict caller
+    disposition: exclusion
+    sourceDigest: "f0fcaed274a52a871f0231de36d08c2db9d19a46594dc359a6ae40811f\
+      724d96"
+    replacement: test/language/function-code/10.4.3-1-62gs.js
+    reason:
+      The static 62 caller pair observes undefined this for the same callee
+      strictness; the original's Function-created global caller adds only
+      source creation/evaluation to that receiver contract.
+  - path: test/language/function-code/10.4.3-1-65-s.js
+    subject: Strict callee this is independent of non-strict caller
+    disposition: exclusion
+    sourceDigest: "6d700708e9d44aa70133a7db6a4fa5035f1e0a078ccd335a21ae49a264\
+      4c2325"
+    replacement: test/language/function-code/10.4.3-1-62-s.js
+    reason:
+      The static 62 caller pair observes undefined this for the same callee
+      strictness; the original's Function-created global caller adds only
+      source creation/evaluation to that receiver contract.
+  - path: test/language/function-code/10.4.3-1-65gs.js
+    subject: Strict callee this is independent of non-strict caller
+    disposition: exclusion
+    sourceDigest: "9158ba0d289c5c1a3f881288383c73905e1c6d10f1084d4401eb0d829c\
+      8e3249"
+    replacement: test/language/function-code/10.4.3-1-62gs.js
+    reason:
+      The static 62 caller pair observes undefined this for the same callee
+      strictness; the original's Function-created global caller adds only
+      source creation/evaluation to that receiver contract.
+  - path: test/language/function-code/10.4.3-1-82-s.js
+    subject: Non-strict callee this is independent of strict caller
+    disposition: exclusion
+    sourceDigest: "f501dcefb4129650e3125fcfc2047d7fa40a4b99ee0aed12145a175e77\
+      bccbd1"
+    replacement: test/language/function-code/10.4.3-1-81-s.js
+    reason: The static 81 caller pair observes non-undefined this for the same
+      callee strictness; the original's eval caller adds only source
+      creation/evaluation to that receiver contract.
+  - path: test/language/function-code/10.4.3-1-82gs.js
+    subject: Non-strict callee this is independent of strict caller
+    disposition: exclusion
+    sourceDigest: "acbe6aef0fc06f5f0fd1e3742148c330cff7907f14678459b0b8291047\
+      37ecb3"
+    replacement: test/language/function-code/10.4.3-1-81gs.js
+    reason: The static 81 caller pair observes non-undefined this for the same
+      callee strictness; the original's eval caller adds only source
+      creation/evaluation to that receiver contract.
+  - path: test/language/function-code/10.4.3-1-83-s.js
+    subject: Non-strict callee this is independent of strict caller
+    disposition: exclusion
+    sourceDigest: "315316076697db1a0c3520d09bd2f99476fd6e2bf99019072b659ede6f\
+      c5de59"
+    replacement: test/language/function-code/10.4.3-1-81-s.js
+    reason: The static 81 caller pair observes non-undefined this for the same
+      callee strictness; the original's Function-created global caller adds
+      only source creation/evaluation to that receiver contract.
+  - path: test/language/function-code/10.4.3-1-83gs.js
+    subject: Non-strict callee this is independent of strict caller
+    disposition: exclusion
+    sourceDigest: "0cf89fe2d284f65e3810d0a66dade3bd5baa9f3b91c542756cc42adce7\
+      5e876f"
+    replacement: test/language/function-code/10.4.3-1-81gs.js
+    reason: The static 81 caller pair observes non-undefined this for the same
+      callee strictness; the original's Function-created global caller adds
+      only source creation/evaluation to that receiver contract.
+  - path: test/language/function-code/10.4.3-1-84-s.js
+    subject: Non-strict callee this is independent of strict caller
+    disposition: exclusion
+    sourceDigest: "dcae7d406fde05c4ebafc6ce544c5fa984de1ff4dd9450433d8cbd0097\
+      a70d0e"
+    replacement: test/language/function-code/10.4.3-1-81-s.js
+    reason: The static 81 caller pair observes non-undefined this for the same
+      callee strictness; the original's Function-created global caller adds
+      only source creation/evaluation to that receiver contract.
+  - path: test/language/function-code/10.4.3-1-84gs.js
+    subject: Non-strict callee this is independent of strict caller
+    disposition: exclusion
+    sourceDigest: "2b7d1bb5800f34cd18ee8d401823f8c97f3e108b2fec05d804923517ab\
+      682441"
+    replacement: test/language/function-code/10.4.3-1-81gs.js
+    reason: The static 81 caller pair observes non-undefined this for the same
+      callee strictness; the original's Function-created global caller adds
+      only source creation/evaluation to that receiver contract.

@@ -4,12 +4,15 @@ Observation batch 18: reviewed admission
 Focused observations on base `68b026bb` selected 336 paths
 from the pinned batch selector. Admit 326 paths: 150 pass,
 167 expected-negative, and 9 unsupported-profile-feature.
-Ten Unicode class tests remain unreviewed after runtime OSEO2001
+Ten Unicode class tests remained unreviewed after runtime OSEO2001
 reported “Maximum active native frame budget exceeded” in the first
 non-strict variant with specialization disabled. Root approved admitting
 the other 944 train paths and retaining these ten under batch 18;
 *unicode-class-native-frame-budget.md* records the bounded prerequisite.
 No frame budget, source, or test assertion changes in this train.
+The later Unicode frame-budget prerequisite repairs their implementation;
+its work note records Root's separate ten-path pass admission and the
+required Full UPDATE. That admission changes no original train observation.
 The nine eval-rejected line-terminator subjects belong to
 `node:dynamic-source-coverage-remediation`. These ownership assignments
 add no exclusion or change to ADR 0016.

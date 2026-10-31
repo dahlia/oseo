@@ -878,11 +878,19 @@ results:
       - expression-operators
       - functions
       - var-bindings
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
     observation:
-      detail: "test/language/expressions/function/scope-param-elem-var-close.\
-        js non-strict disabled failed (1): stdout=\"\"
-        stderr=\"test/language/expressions/function/scope-param-elem-va\
-        r-close.js:97:10: error[OSEO1001]: Unknown binding 'eval'.\\n\""
+      detail: 'test/language/expressions/function/scope-param-elem-var-close.js
+        non-strict disabled failed (1): stdout=""
+        stderr="test/language/expressions/function/scope-param-elem-var-close.js:97:10:
+        error[OSEO1001]: eval compiles source text at run time, which is
+        outside the admitted profile.\n"'
       passed: false
       unsupportedCapability: profile-syntax
     unsupportedFeatures: []

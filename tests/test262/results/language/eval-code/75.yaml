@@ -21,11 +21,19 @@ results:
       - expression-operators
       - functions
       - lexical-bindings
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
     observation:
-      detail: "test/language/eval-code/direct/lex-env-distinct-const.js
-        non-strict disabled failed (1): stdout=\"\"
-        stderr=\"test/language/eval-code/direct/lex-env-distinct-const.\
-        js:93:1: error[OSEO1001]: Unknown binding 'eval'.\\n\""
+      detail: 'test/language/eval-code/direct/lex-env-distinct-const.js
+        non-strict disabled failed (1): stdout=""
+        stderr="test/language/eval-code/direct/lex-env-distinct-const.js:93:1:
+        error[OSEO1001]: eval compiles source text at run time, which is
+        outside the admitted profile.\n"'
       passed: false
       unsupportedCapability: profile-syntax
     unsupportedFeatures: []
@@ -49,12 +57,20 @@ results:
       - object-literals
       - object-properties
       - var-bindings
+    execution:
+      harnessIncludes:
+        - base.js
+        - propertyHelper.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
     observation:
-      detail: "test/language/eval-code/direct/var-env-func-init-global-update\
-        -non-configurable.js non-strict disabled failed (1): stdout=\"\"
-        stderr=\"test/language/eval-code/direct/var-env-func-init-globa\
-        l-update-non-configurable.js:462:1: error[OSEO1001]: Unknown
-        binding 'eval'.\\n\""
+      detail: 'test/language/eval-code/direct/var-env-func-init-global-update-non-configurable.js
+        non-strict disabled failed (1): stdout=""
+        stderr="test/language/eval-code/direct/var-env-func-init-global-update-non-configurable.js:462:1:
+        error[OSEO1001]: eval compiles source text at run time, which is
+        outside the admitted profile.\n"'
       passed: false
       unsupportedCapability: profile-syntax
     unsupportedFeatures: []

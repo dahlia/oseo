@@ -3180,12 +3180,98 @@ static OseoRegExpExecution match_at(
     }
 }
 
+/*
+ * Mirror anchoredRepeatSet in the compiler executor. Compare the complete
+ * program, including all branch/register links, before exposing any match
+ * state. Unknown shapes keep the ordered matcher and all of its counters.
+ */
+static bool anchored_repeat_set(
+    const OseoRegExpProgram *program,
+    uint32_t *set
+) {
+    if (program->capture_count != 0u || program->registers != 4u ||
+        program->instruction_count != 11u || program->repeat_count != 1u) {
+        return false;
+    }
+    const OseoRegExpRepeat *repeat = &program->repeats[0];
+    if (repeat->minimum != 1u || repeat->maximum != UINT64_MAX ||
+        repeat->clear_from != 0u || repeat->clear_to != 0u) return false;
+    const OseoRegExpInstruction expected[] = {
+        {OSEO_REGEXP_OP_SAVE, 0u, {0u, 0u, 0u, 0u}},
+        {OSEO_REGEXP_OP_EDGE, 0u, {0u, 0u, 0u, 0u}},
+        {OSEO_REGEXP_OP_REPEAT_INIT, 0u, {2u, 0u, 0u, 0u}},
+        {OSEO_REGEXP_OP_REPEAT, OSEO_REGEXP_INSTRUCTION_GREEDY,
+            {2u, 4u, 7u, 0u}},
+        {OSEO_REGEXP_OP_REPEAT_ENTER, 0u, {2u, 3u, 5u, 0u}},
+        {OSEO_REGEXP_OP_CONSUME, 0u, {0u, 0u, 0u, 0u}},
+        {OSEO_REGEXP_OP_REPEAT_END, 0u, {2u, 3u, 3u, 0u}},
+        {OSEO_REGEXP_OP_EDGE, OSEO_REGEXP_INSTRUCTION_END_EDGE,
+            {0u, 0u, 0u, 0u}},
+        {OSEO_REGEXP_OP_SAVE, 0u, {1u, 0u, 0u, 0u}},
+        {OSEO_REGEXP_OP_ACCEPT, 0u, {0u, 0u, 0u, 0u}},
+        {OSEO_REGEXP_OP_FAIL, 0u, {0u, 0u, 0u, 0u}},
+    };
+    for (size_t index = 0u; index < 11u; index += 1u) {
+        const OseoRegExpInstruction *actual = &program->instructions[index];
+        if (actual->opcode != expected[index].opcode ||
+            actual->modifiers != expected[index].modifiers) return false;
+        for (size_t operand = 0u; operand < 4u; operand += 1u) {
+            if (index == 5u && operand == 0u) continue;
+            if (actual->operands[operand] !=
+                expected[index].operands[operand]) return false;
+        }
+    }
+    *set = program->instructions[5].operands[0];
+    return *set < program->set_count;
+}
+
+/*
+ * Constant-state ^set+$ scan: one entry step, one per tested character,
+ * and one terminal decision. No stack/trail entries or work allocations
+ * are needed. Non-multiline $ succeeds only at InputLength.
+ */
+static OseoRegExpExecution scan_anchored_repeat(
+    const OseoRegExpProgram *program,
+    const OseoString *subject,
+    size_t start_index,
+    uint32_t set,
+    int64_t *captures
+) {
+    uint64_t steps = 0u;
+    if (steps >= OSEO_REGEXP_STEP_LIMIT) return OSEO_REGEXP_EXECUTION_LIMIT;
+    steps += 1u;
+    if (aligned_start(subject, start_index, program->unicode_mode) != 0u) {
+        return OSEO_REGEXP_EXECUTION_UNMATCHED;
+    }
+    size_t index = 0u;
+    while (index < subject->length) {
+        if (steps >= OSEO_REGEXP_STEP_LIMIT) {
+            return OSEO_REGEXP_EXECUTION_LIMIT;
+        }
+        steps += 1u;
+        uint32_t character = character_at(
+            subject, index, program->unicode_mode
+        );
+        if (!program_set_has(program, set, character)) {
+            return OSEO_REGEXP_EXECUTION_UNMATCHED;
+        }
+        index += character > 0xffffu ? 2u : 1u;
+    }
+    if (steps >= OSEO_REGEXP_STEP_LIMIT) return OSEO_REGEXP_EXECUTION_LIMIT;
+    steps += 1u;
+    if (index == 0u) return OSEO_REGEXP_EXECUTION_UNMATCHED;
+    captures[0] = 0;
+    captures[1] = (int64_t)index;
+    return OSEO_REGEXP_EXECUTION_MATCHED;
+}
+
 OseoRegExpExecution oseo_internal_regexp_program_search(
     OseoContext *context,
     const OseoRegExpProgram *program,
     const OseoString *subject,
     size_t start_index,
     bool sticky,
+    bool scan_eligible,
     int64_t *captures
 ) {
     size_t total = 2u * (program->capture_count + 1u);
@@ -3194,6 +3280,12 @@ OseoRegExpExecution oseo_internal_regexp_program_search(
     }
     if (start_index > subject->length) {
         return OSEO_REGEXP_EXECUTION_UNMATCHED;
+    }
+    uint32_t scan_set = 0u;
+    if (scan_eligible && anchored_repeat_set(program, &scan_set)) {
+        return scan_anchored_repeat(
+            program, subject, start_index, scan_set, captures
+        );
     }
     OseoRegExpMachine machine;
     memset(&machine, 0, sizeof(machine));

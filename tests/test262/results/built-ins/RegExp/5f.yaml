@@ -15,11 +15,19 @@ results:
     classification: unsupported-profile-feature
     dependencies:
       - object-properties
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
     observation:
-      detail: "test/built-ins/RegExp/S15.10.4.1_A5_T3.js non-strict disabled
-        failed (1): stdout=\"\"
-        stderr=\"test/built-ins/RegExp/S15.10.4.1_A5_T3.js:88:115:
-        error[OSEO1001]: Unknown binding 'eval'.\\n\""
+      detail: 'test/built-ins/RegExp/S15.10.4.1_A5_T3.js non-strict disabled
+        failed (1): stdout=""
+        stderr="test/built-ins/RegExp/S15.10.4.1_A5_T3.js:88:115:
+        error[OSEO1001]: eval compiles source text at run time, which is
+        outside the admitted profile.\n"'
       passed: false
       unsupportedCapability: profile-syntax
     unsupportedFeatures: []

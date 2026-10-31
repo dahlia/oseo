@@ -395,11 +395,19 @@ results:
     dependencies:
       - control-flow
       - property-enumeration
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
     observation:
-      detail: "test/language/statements/for-in/S12.6.4_A3.js non-strict
-        disabled failed (1): stdout=\"\"
-        stderr=\"test/language/statements/for-in/S12.6.4_A3.js:92:15:
-        error[OSEO1001]: Unknown binding 'eval'.\\n\""
+      detail: 'test/language/statements/for-in/S12.6.4_A3.js non-strict
+        disabled failed (1): stdout=""
+        stderr="test/language/statements/for-in/S12.6.4_A3.js:92:15:
+        error[OSEO1001]: eval compiles source text at run time, which is
+        outside the admitted profile.\n"'
       passed: false
       unsupportedCapability: profile-syntax
     unsupportedFeatures: []
@@ -526,11 +534,19 @@ results:
       - object-properties
       - symbols
       - var-bindings
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
     observation:
-      detail: "test/language/statements/with/S12.10_A4_T5.js non-strict
-        disabled failed (1): stdout=\"\"
-        stderr=\"test/language/statements/with/S12.10_A4_T5.js:90:1:
-        error[OSEO1001]: Unknown binding 'eval'.\\n\""
+      detail: 'test/language/statements/with/S12.10_A4_T5.js non-strict
+        disabled failed (1): stdout=""
+        stderr="test/language/statements/with/S12.10_A4_T5.js:90:1:
+        error[OSEO1001]: eval compiles source text at run time, which is
+        outside the admitted profile.\n"'
       passed: false
       unsupportedCapability: profile-syntax
     unsupportedFeatures: []

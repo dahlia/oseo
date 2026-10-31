@@ -9,5 +9,5 @@ delivers: "Observes the 336 unreviewed paths that
 dependencies:
   - observation-batch-plan
   - unicode-class-native-frame-budget
-landed: false
-status: blocked
+landed: true
+status: ready

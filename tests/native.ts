@@ -40,11 +40,14 @@ import { bigintFixtures } from "./native/fixtures/bigint.ts";
 import { bigintIntrinsicFixtures } from "./native/fixtures/bigint-intrinsic.ts";
 import * as booleanFixture from "./native/fixtures/boolean-intrinsic.ts";
 import { classFixtures } from "./native/fixtures/classes.ts";
+const { privateNameLifetimeFixtures } =
+  await import("./native/fixtures/class-private-name-lifetimes.ts");
 import { dataViewFixtures } from "./native/fixtures/data-view.ts";
 import { dateFamilyFixtures } from "./native/fixtures/date-family.ts";
 import { expressionFixtures } from "./native/fixtures/expressions.ts";
 import { functionFixtures } from "./native/fixtures/functions.ts";
 import { generatorFixtures } from "./native/fixtures/generators.ts";
+import * as evalFixture from "./native/fixtures/direct-eval-non-string.ts";
 import * as globalRecord from "./native/fixtures/global-object-record.ts";
 import * as globalThisFixture from "./native/fixtures/globalthis-binding.ts";
 import * as eagerHelpers from "./native/fixtures/iterator-helpers-eager.ts";
@@ -93,6 +96,8 @@ const { typedArrayStaticsFixtures } =
 
 const { regexpLiteralAotFixtures } =
   await import("./native/fixtures/regexp-literal-aot.ts");
+const { regexpAnchoredRepeatFixtures } =
+  await import("./native/fixtures/regexp-anchored-repeat.ts");
 const { regexpPrototypeAndExecFixtures } =
   await import("./native/fixtures/regexp-prototype-and-exec.ts");
 const { regexpPatternExtensionFixtures } =
@@ -223,6 +228,7 @@ const fixtures: readonly Fixture[] = [
   ...functionFixtures,
   ...properTailCallFixtures,
   ...globalRecord.globalObjectRecordFixtures,
+  evalFixture.directEvalNonStringFixture,
   ...globalThisFixture.globalThisBindingFixtures,
   ...objectFixtures,
   ...objectOwnKeysFixtures,
@@ -250,6 +256,7 @@ const fixtures: readonly Fixture[] = [
   ...typedArraySortFixtures,
   ...typedArrayStaticsFixtures,
   ...classFixtures,
+  ...privateNameLifetimeFixtures,
   ...bindingFixtures,
   ...bigintFixtures,
   ...bigintIntrinsicFixtures,
@@ -264,6 +271,7 @@ const fixtures: readonly Fixture[] = [
   ...regexpLiteralAotFixtures,
   ...regexpPatternExtensionFixtures,
   ...regexpPrototypeAndExecFixtures,
+  ...regexpAnchoredRepeatFixtures,
   ...regexpSymbolMethodsFixtures,
   ...generatorFixtures,
   ...functionIntrinsicChainFixtures,
@@ -1272,6 +1280,7 @@ for (const fixture of selectedFixtures) {
     fixture.name === "regexp-literal-aot" ||
     fixture.name === "regexp-pattern-extensions" ||
     fixture.name === "regexp-prototype-and-exec" ||
+    fixture.name === "regexp-anchored-repeat" ||
     fixture.name === "regexp-symbol-methods" ||
     fixture.name === "typed-array-constructors" ||
     fixture.name === "typed-array-float16" ||
@@ -1297,6 +1306,7 @@ for (const fixture of selectedFixtures) {
     fixture.name === "object-own-keys" ||
     fixture.name === "global-object-record" ||
     fixture.name === "eval-intrinsic-value" ||
+    fixture.name === "direct-eval-non-string" ||
     fixture.name === "globalthis-binding" ||
     fixture.name === "set-intrinsic" ||
     fixture.name === "set-composition-methods" ||
@@ -1451,6 +1461,7 @@ for (const fixture of selectedFixtures) {
     fixture.name === "object-own-keys-virtual-read-only" ||
     fixture.name === "global-object-record" ||
     fixture.name === "eval-intrinsic-value" ||
+    fixture.name === "direct-eval-non-string" ||
     fixture.name === "globalthis-binding" ||
     fixture.name === "with-strict-heritage-write" ||
     fixture.name === "with-optional-call-receiver" ||
@@ -1503,6 +1514,7 @@ for (const fixture of selectedFixtures) {
     fixture.name === "class-field-scope" ||
     fixture.name === "class-field-super" ||
     fixture.name === "class-private-fields" ||
+    fixture.name === "class-private-name-lifetimes" ||
     fixture.name === "class-private-methods" ||
     fixture.name === "class-private-accessors" ||
     fixture.name === "class-private-brand-checks" ||
@@ -1601,6 +1613,7 @@ for (const fixture of selectedFixtures) {
     fixture.name === "regexp-literal-aot" ||
     fixture.name === "regexp-pattern-extensions" ||
     fixture.name === "regexp-prototype-and-exec" ||
+    fixture.name === "regexp-anchored-repeat" ||
     fixture.name === "bigint-primitive" ||
     fixture.name === "bigint-false-number-hint" ||
     fixture.name === "reflect-namespace" ||
@@ -1610,6 +1623,7 @@ for (const fixture of selectedFixtures) {
     fixture.name === "tagged-templates" ||
     fixture.name === "template-literals" ||
     fixture.name === "proper-tail-calls" ||
+    fixture.name === "global-eval-tail-calls" ||
     fixture.name.startsWith("cross-realm-")
   ) {
     process.env.OSEO_GC_EVERY_SAFEPOINT = "1";
@@ -1666,7 +1680,8 @@ for (const fixture of selectedFixtures) {
           assert(native.emittedC.includes("OseoResult"), "generic call ABI");
           if (
             fixture.name === "iterator-next-callability" ||
-            fixture.name === "proper-tail-calls"
+            fixture.name === "proper-tail-calls" ||
+            fixture.name === "global-eval-tail-calls"
           ) {
             // Forced collection runs while tail call records and the
             // trampoline's steps hold the only references to arguments.
@@ -1720,6 +1735,7 @@ for (const fixture of selectedFixtures) {
           }
           if (
             fixture.name === "array-buffer" ||
+            fixture.name === "class-private-name-lifetimes" ||
             fixture.name === "array-prototype-copying" ||
             fixture.name === "array-prototype-change-by-copy" ||
             fixture.name === "array-prototype-iterative" ||
@@ -1741,6 +1757,7 @@ for (const fixture of selectedFixtures) {
             fixture.name === "regexp-literal-aot" ||
             fixture.name === "regexp-pattern-extensions" ||
             fixture.name === "regexp-prototype-and-exec" ||
+            fixture.name === "regexp-anchored-repeat" ||
             fixture.name === "typed-array-constructors" ||
             fixture.name === "typed-array-float16" ||
             fixture.name === "typed-array-core" ||
@@ -1759,6 +1776,7 @@ for (const fixture of selectedFixtures) {
             fixture.name === "object-integrity-levels" ||
             fixture.name === "global-object-record" ||
             fixture.name === "eval-intrinsic-value" ||
+            fixture.name === "direct-eval-non-string" ||
             fixture.name === "globalthis-binding" ||
             fixture.name === "with-strict-heritage-write" ||
             fixture.name === "with-optional-call-receiver" ||

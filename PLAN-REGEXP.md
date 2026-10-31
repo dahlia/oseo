@@ -340,7 +340,7 @@ positions, and lookaround frames. It carries no mutable field and no
 reference to a regular expression object, so equal artifacts may be shared
 while every evaluation still owns its object identity and `lastIndex`.
 
-The executor holds an explicit backtrack stack and an undo trail rather
+The ordered executor holds an explicit backtrack stack and an undo trail rather
 than a native call stack, so backtracking depth is data and a later C
 lowering needs no recursion. Every register write is trailed, so one
 backtrack entry restores the whole state by truncating the trail. A
@@ -348,6 +348,18 @@ lookaround runs as an atomic submatch: its body's remaining choices are
 discarded when it finishes, a positive assertion keeps the captures its
 body set and restores the entry position, and a negative one restores
 both and fails.
+
+The M5c anchored-repeat remediation adds a constant-state scan in both
+executors for a proved complete `^set+$` instruction shape, with exactly
+no flags, `u`, or `v`. It checks capture absence, the single forward
+consuming set, greedy unbounded minimum-one repetition, non-multiline
+edges and every register/branch link before selecting the scan. All other
+shapes and flags use ordered execution. The scan charges one entry step,
+one per tested character, and one terminal decision at input exhaustion;
+it uses no trail or backtrack entries. Numeric limits and ordered counters
+stay unchanged. It preserves UTF-16 spans and requires InputLength at `$`.
+The artifact remains the existing serialized ordered program; this adds
+neither an automaton artifact nor direct generated matcher control flow.
 
 Choice order, capture reset and visibility, assertion and lookaround
 behavior, backreference resolution, quantifier priority, empty-progress

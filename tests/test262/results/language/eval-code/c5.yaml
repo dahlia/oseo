@@ -26,13 +26,19 @@ results:
       - object-literals
       - object-properties
       - var-bindings
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
     observation:
-      detail: "test/language/eval-code/direct/gen-meth-a-preceding-parameter-\
-        is-named-arguments-declare-arguments-and-assign.js non-strict
-        disabled failed (1): stdout=\"\"
-        stderr=\"test/language/eval-code/direct/gen-meth-a-preceding-pa\
-        rameter-is-named-arguments-declare-arguments-and-assign.js:89:3\
-        0: error[OSEO1001]: Unknown binding 'eval'.\\n\""
+      detail: 'test/language/eval-code/direct/gen-meth-a-preceding-parameter-is-named-arguments-declare-arguments-and-assign.js
+        non-strict disabled failed (1): stdout=""
+        stderr="test/language/eval-code/direct/gen-meth-a-preceding-parameter-is-named-arguments-declare-arguments-and-assign.js:89:30:
+        error[OSEO1001]: eval compiles source text at run time, which is
+        outside the admitted profile.\n"'
       passed: false
       unsupportedCapability: profile-syntax
     unsupportedFeatures: []

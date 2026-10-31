@@ -6,8 +6,10 @@ delivers: "Removes host-specific source identifiers from test262 module
   test/language/eval-code/indirect/export.js and
   test/language/eval-code/indirect/import.js embed a file URL under the
   local aube cache in the OSEO1001 runtime String-eval rejection. Root
-  holds both originals unreviewed under observation-batch-06; the raw
-  observations remain evidence, not portable manifest records. Normalize
+  initially held both originals unreviewed under observation-batch-06.
+  After repair, Root authorizes their focused-observation admission as
+  unsupported profile features under active dynamic-source remediation;
+  Root owns the required Full UPDATE. Normalize
   diagnostic source identifiers to the pinned suite-relative path,
   preserving diagnostic code, message, phase, capability, stdout, exit
   status and variant evidence. Do not truncate diagnostic content or
@@ -20,5 +22,5 @@ delivers: "Removes host-specific source identifiers from test262 module
   recorded in docs/m5c-graph/observation-batch-06.md."
 dependencies:
   - unsupported-ownership-audit
-landed: false
+landed: true
 status: ready

@@ -10,9 +10,13 @@ delivers: "DS-6 of the dynamic-source-coverage-remediation split approved by
   (22), and direct-eval arguments and spread (6), plus the 14 batch 16 and
   batch 17 static this and call context paths, as grouped by the 2026-10-24
   audit families and, for later additions, by their recorded missing
-  contracts. The umbrella owns them until this node lands. For each path,
+  contracts. DS-6 accounts for 42 paths under ADR 0016 using 20 existing
+  reviewed static replacement paths; 24 stay with the umbrella, and no tests are
+  added. The per-path assessment is
+  docs/m5c-graph/dynamic-source-private-binding-assessment.yaml. It
   reviews ahead-of-time observation or replacement evidence for every
-  non-source subject. A path closes under adr:0016-dynamic-source-boundary
+  non-source subject of each path. A path closes under
+  adr:0016-dynamic-source-boundary
   only by the item 1 rule, with a fresh-digest exclusion-audit record naming
   that evidence and showing that only source evaluation remains; otherwise
   it stays in remediation. Preserves all paths and assertions; never counts
@@ -20,5 +24,5 @@ delivers: "DS-6 of the dynamic-source-coverage-remediation split approved by
   and ADR 0019 remain unchanged."
 dependencies:
   - authorized-exclusion-audit
-landed: false
+landed: true
 status: ready

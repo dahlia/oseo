@@ -12,7 +12,7 @@ results:
         - non-strict
         - strict
       suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
-    classification: unsupported-profile-feature
+    classification: pass
     dependencies:
       - abrupt-completion
       - dynamic-source
@@ -20,14 +20,20 @@ results:
       - functions
       - lexical-bindings
       - var-bindings
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
     observation:
-      detail: "test/language/block-scope/leave/outermost-binding-updated-in-c\
-        atch-block-nested-block-let-declaration-unseen-outside-of-block\
-        .js non-strict disabled failed (1): stdout=\"\"
-        stderr=\"test/language/block-scope/leave/outermost-binding-upda\
-        ted-in-catch-block-nested-block-let-declaration-unseen-outside-\
-        of-block.js:97:7: error[OSEO1001]: Unknown binding 'eval'.\\n\""
-      passed: false
-      unsupportedCapability: profile-syntax
+      passed: true
     unsupportedFeatures: []
 suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2

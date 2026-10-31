@@ -2198,6 +2198,8 @@ static OseoResult regexp_builtin_exec(
             string_object(frame.slots[1]),
             (size_t)last_index,
             sticky,
+            mask == 0u || mask == OSEO_REGEXP_FLAG_U ||
+                mask == OSEO_REGEXP_FLAG_V,
             captures
         );
     }

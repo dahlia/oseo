@@ -956,7 +956,7 @@ test("keeps a synchronous for-of module cycle admitted", () => {
   assert.ok(result.mir != null);
 });
 
-test("rejects await in object-rest assignment member targets", () => {
+test("suspends await in object-rest assignment member targets", () => {
   const canonicalId = "file:///object-rest-await.js";
   const module = {
     canonicalId,
@@ -998,11 +998,9 @@ test("rejects await in object-rest assignment member targets", () => {
     kind: "module-graph",
     modules: [module],
   });
-  assert.equal(result.mir, undefined);
-  assert.match(
-    result.diagnostics[0]?.message ?? "",
-    /await inside a module top-level binding or assignment pattern/iu,
-  );
+  assert.deepEqual(result.diagnostics, []);
+  assert.ok(result.mir != null);
+  assert.ok(result.mir.functions.some((value) => value.asyncFunction));
 });
 
 test("rejects duplicate top-level function declarations in a module", () => {
@@ -1047,7 +1045,7 @@ test("rejects duplicate top-level function declarations in a module", () => {
   );
 });
 
-test("rejects pattern await nested in expression containers", () => {
+test("suspends pattern await nested in expression containers", () => {
   const patternAwait = {
     kind: "destructuring-set" as const,
     pattern: {
@@ -1110,15 +1108,13 @@ test("rejects pattern await nested in expression containers", () => {
       kind: "module-graph",
       modules: [module],
     });
-    assert.equal(result.mir, undefined);
-    assert.match(
-      result.diagnostics[0]?.message ?? "",
-      /await inside a module top-level binding or assignment pattern/iu,
-    );
+    assert.deepEqual(result.diagnostics, []);
+    assert.ok(result.mir != null);
+    assert.ok(result.mir.functions.some((value) => value.asyncFunction));
   }
 });
 
-test("rejects await in a top-level catch binding pattern", () => {
+test("suspends await in a top-level catch binding pattern", () => {
   const canonicalId = "file:///catch-pattern-await.js";
   const module = {
     canonicalId,
@@ -1170,14 +1166,12 @@ test("rejects await in a top-level catch binding pattern", () => {
     kind: "module-graph",
     modules: [module],
   });
-  assert.equal(result.mir, undefined);
-  assert.match(
-    result.diagnostics[0]?.message ?? "",
-    /await inside a module top-level binding or assignment pattern/iu,
-  );
+  assert.deepEqual(result.diagnostics, []);
+  assert.ok(result.mir != null);
+  assert.ok(result.mir.functions.some((value) => value.asyncFunction));
 });
 
-test("rejects await in top-level binding-pattern keys", () => {
+test("suspends await in top-level binding-pattern keys", () => {
   const canonicalId = "file:///binding-pattern-await.js";
   const module = {
     canonicalId,
@@ -1222,9 +1216,7 @@ test("rejects await in top-level binding-pattern keys", () => {
     kind: "module-graph",
     modules: [module],
   });
-  assert.equal(result.mir, undefined);
-  assert.match(
-    result.diagnostics[0]?.message ?? "",
-    /await inside a module top-level binding or assignment pattern/iu,
-  );
+  assert.deepEqual(result.diagnostics, []);
+  assert.ok(result.mir != null);
+  assert.ok(result.mir.functions.some((value) => value.asyncFunction));
 });

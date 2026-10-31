@@ -920,15 +920,12 @@ test("supports awaited destructuring assignment in modules", () => {
   assert.match(printMir(compiled.mir), /GetIterator sync for array binding/u);
 });
 
-/* Module top level suspends through the module continuation transform,
- * which splits statements around whole `await` expressions rather than
- * around the steps of a pattern. Each pattern position therefore keeps a
- * source-located rejection there, while an asynchronous function written
- * in the same module admits every one of them. */
-test("rejects module top-level pattern await at its statement", () => {
-  const rejected: readonly string[] = [
+test("suspends module top-level pattern await in its traced frame", () => {
+  const sources: readonly string[] = [
     "const { value = await 1 } = {};\n",
     "const [value = await 1] = [];\n",
+    "for (let [value = await 1] = []; false;) value;\n",
+    "export var { value = await 1 } = {};\n",
     "const { [await 'k']: value } = {};\n",
     "const target = {};\n[target[await 'k']] = [1];\n",
     "try { throw {}; } catch ({ value = await 1 }) { value; }\n",
@@ -936,7 +933,7 @@ test("rejects module top-level pattern await at its statement", () => {
     "for (const { [await 'k']: value } in {}) value;\n",
     "let value;\nfor ({ [await 'k']: value } in {}) value;\n",
   ];
-  for (const source of rejected) {
+  for (const source of sources) {
     const sourceId = "file:///app/module-pattern-await.js";
     const parsed = babelModuleFrontend.parseModule({ source, sourceId });
     assert.deepEqual(parsed.diagnostics, [], source);
@@ -954,16 +951,18 @@ test("rejects module top-level pattern await at its statement", () => {
         },
       ],
     });
-    assert.equal(compiled.mir, undefined, source);
-    const diagnostic = compiled.diagnostics[0];
-    assert.equal(diagnostic?.code, "OSEO1001", source);
-    assert.match(
-      diagnostic?.message ?? "",
-      /await inside a module top-level binding or assignment pattern/iu,
+    assert.deepEqual(compiled.diagnostics, [], source);
+    assert.ok(compiled.mir != null, source);
+    const evaluator = compiled.mir.functions.find(
+      (candidate) => candidate.name === `*module:${sourceId}*`,
+    );
+    assert.equal(evaluator?.asyncFunction, true, source);
+    assert.ok(
+      evaluator?.blocks.some(
+        (block) => block.terminator.kind === "generator-yield",
+      ),
       source,
     );
-    assert.equal(diagnostic?.sourceId, sourceId, source);
-    assert.ok((diagnostic?.range.start.line ?? 0) >= 1, source);
   }
 });
 

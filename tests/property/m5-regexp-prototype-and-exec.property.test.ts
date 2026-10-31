@@ -8,6 +8,7 @@ import fc from "fast-check";
 
 import { cBackend } from "../../packages/backend-c/src/index.ts";
 import { runNativeCli } from "../native-cli.ts";
+import { defaultComponents } from "../../packages/cli/src/index.ts";
 import {
   buildRegExpMatcher,
   compileSource,
@@ -29,6 +30,8 @@ import {
   withNativeFixture,
 } from "../../packages/testkit/src/index.ts";
 import { nativeToolchain } from "../native-toolchain.ts";
+const { regexpAnchoredRepeatFixtures } =
+  await import("../native/fixtures/regexp-anchored-repeat.ts");
 import { unicodeMatcherData } from "../regexp-matcher-data.ts";
 
 const { assertAsyncProperty } = await import(
@@ -716,11 +719,12 @@ async function assertNative(
   source: string,
   expected: Observation,
   sourceId: string,
+  frontend = babelFrontend,
 ): Promise<void> {
   assertMatchingObservations([expected, ...(await references(source))]);
   for (const specialization of ["disabled", "enabled"] as const) {
     const compiled = compileSource(
-      babelFrontend,
+      frontend,
       { source, sourceId },
       { observeSpecialization: true, specialization },
     );
@@ -972,6 +976,100 @@ test(
         profile: "M5 RegExp ignore-case boundaries",
         seed: 0x6000_5002,
         sizeLimit: "one pattern of at most twelve units and two flags",
+        timeLimitMilliseconds: 180_000,
+      },
+    );
+  },
+);
+
+// This extends the existing execution seed family; no new property file.
+test(
+  "anchored repeat regression fixture agrees with both reference hosts",
+  { skip: nativeTarget == null ? "requires a supported native host" : false },
+  async () => {
+    const fixture = regexpAnchoredRepeatFixtures[0];
+    assert.ok(fixture != null);
+    const expected = (await references(fixture.source))[0];
+    assert.ok(expected != null);
+    await assertNative(
+      fixture.source,
+      expected,
+      "anchored-repeat.ts",
+      defaultComponents.frontend,
+    );
+  },
+);
+
+test(
+  "generated anchored single-set repetitions match independent hosts",
+  { skip: nativeTarget == null ? "requires a supported native host" : false },
+  async () => {
+    await assertAsyncProperty(
+      "anchored repetitions preserve boundaries and surrogate traversal",
+      fc.asyncProperty(
+        fc.constantFrom("", "u", "v").chain((flags) =>
+          fc.record({
+            // The dynamic compiler retains its class-set boundary under v.
+            atom:
+              flags === "v"
+                ? fc.constantFrom("a", "\\D", "\\S", "\\W", ".")
+                : fc.constantFrom("[a-c]", "[^a]", "\\D", "\\S", "\\W", "."),
+            flags: fc.constant(flags),
+            units: fc.array(
+              fc.constantFrom(
+                "a",
+                "b",
+                "d",
+                "0",
+                " ",
+                "\n",
+                "\r",
+                "\u2028",
+                "\u2029",
+                "\ud800",
+                "\udc00",
+                "\u{1f600}",
+              ),
+              { maxLength: 12 },
+            ),
+          }),
+        ),
+        async ({ atom, flags, units }) => {
+          const pattern = `^${atom}+$`;
+          const text = JSON.stringify(units.join(""));
+          const source = `
+const literal = /${pattern}/${flags};
+const dynamic = new RegExp(${JSON.stringify(pattern)}, "${flags}");
+for (const expression of [literal, dynamic]) {
+  expression.lastIndex = 1;
+  const match = expression.exec(${text});
+  console.log(match === null ? -1 : match.index,
+    match === null ? -1 : match[0].length, expression.lastIndex);
+}
+/** @param {number} value */
+function hinted(value) { return value + 1; }
+console.log("hint", hinted(2), hinted("miss"));
+`;
+          const expected = (await references(source))[0];
+          assert.ok(expected != null);
+          await assertNative(
+            source,
+            expected,
+            "generated-anchored-repeat.ts",
+            defaultComponents.frontend,
+          );
+        },
+      ),
+      {
+        context: propertyContext(),
+        domain:
+          "capture-free ^set+$, literal and dynamic; v uses atoms the " +
+          "dynamic compiler admits; ASCII set edges, " +
+          "line terminators, paired and lone surrogates; false number hint",
+        numRuns: 6,
+        profile: "M5 anchored single-set repetition",
+        seed: 0x6000_5004,
+        sizeLimit: "one set, flags empty/u/v, at most twelve input parts",
         timeLimitMilliseconds: 180_000,
       },
     );

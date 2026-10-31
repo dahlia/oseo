@@ -7,11 +7,11 @@ The maintainer decision of 2026-10-28 on the big-node split review
 `dynamic-source-coverage-remediation` into DS-1 through DS-7 and keeps it as an
 umbrella that lands when it owns zero paths.
 
-This node owns exactly the 86 paths below at test262 revision
-`f2d1435644797268dca1f7988cad5a4e89ccd8d2`. Every one is currently owned by
-`node:dynamic-source-coverage-remediation` in the derived closure ledger,
-and it stays there until this node lands; the landing moves each path to
-its reviewed owner. This change moves no ledger ownership. The path set,
+This node audits exactly the 86 paths below at test262 revision
+`f2d1435644797268dca1f7988cad5a4e89ccd8d2`. At base `8f420262` every path
+belongs to `node:dynamic-source-coverage-remediation` in the derived closure
+ledger. This audit assigns 40 to `adr:0016-dynamic-source-boundary` and
+keeps 46 with that umbrella. The path set,
 sorted with one final newline, has SHA256
 `bd0fdcc24e468e5b193a54ccaab408b58a93af1cf042ba2cdd77539d4ea108a4`.
 
@@ -19,6 +19,36 @@ Selection rule: the audit families of
 */data/m5c-dynamic-source-265-audit-20261024/group-counts.json* named below,
 plus the later umbrella additions that audit did not group, placed by the
 missing contracts their batch notes record.
+
+
+Audit result
+------------
+
+The [*per-path assessment*](./dynamic-source-callable-family-assessment.md)
+names the normative subject, disposition, replacement witnesses, and reason
+for each of the 86 paths. Existing reviewed static passes cover every
+non-source assertion for 40 paths: inherited call/apply on non-callable
+objects (2), sloppy global-this substitution (16), call/apply
+non-constructibility (4), call length (1), ordinary callable sealing (2),
+primitive OrdinaryHasInstance operands (8), invalid callable prototypes (2),
+positive prototype-chain lookup (1), and accessor descriptors (4).
+
+The other 46 paths retain their unsupported classification and umbrella
+owner because complete replacement evidence was not established. This
+includes the successful returned-function constructions whose descriptions
+incorrectly suggest call/apply non-constructibility. No native evidence was
+added. The exclusion audit recomputes all 86 original source and observation
+digests, which match the recorded values, and binds the replacement table
+and passing result partitions. Only source evaluation remains for the 40
+exclusion rows under decision item 1. Changed evidence or an accepted
+ADR 0016 amendment admitting the excluded source form reopens them;
+ADR 0019's non-source dependence trigger remains in force.
+
+The umbrella decreases from 881 to 841 paths; ADR 0016 increases from 584
+to 624. All 41,091 inventory paths remain. No subset, result, dependency
+tag, ADR, or product behavior changes, so no UPDATE is needed. This
+partial accounting does not land this node or the umbrella; Root owns
+publication and the remaining remediation schedule.
 
 
 Evidence obligations

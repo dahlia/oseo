@@ -2306,6 +2306,32 @@ OseoResult oseo_private_name_create(OseoContext *context) {
     );
 }
 
+OseoResult oseo_private_name_bind(
+    OseoContext *context,
+    OseoValue environment,
+    size_t binding_id
+) {
+    OseoValue slots[] = {environment, oseo_undefined()};
+    OseoRootFrame frame = {NULL, slots, 2u};
+    oseo_roots_push(context, &frame);
+    OseoResult result = oseo_cell_create(context, oseo_uninitialized());
+    if (result.status == OSEO_STATUS_NORMAL) {
+        slots[1] = result.value;
+        result = oseo_environment_set(
+            context, slots[0], binding_id, slots[1]
+        );
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = oseo_private_name_create(context);
+        if (result.status == OSEO_STATUS_NORMAL) {
+            /* Cell initialization cannot allocate or invoke user code. */
+            result = oseo_cell_initialize(context, slots[1], result.value);
+        }
+    }
+    oseo_roots_pop(context, &frame);
+    return result;
+}
+
 OseoResult oseo_private_get(
     OseoContext *context,
     OseoValue object,

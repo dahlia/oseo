@@ -256,8 +256,11 @@ function hirStatementAwaits(
   }
   if (statement.kind === "for") {
     return (
-      (statement.declarations ?? []).some((declaration) =>
-        hirExpressionHasAwait(declaration.initializer),
+      (statement.declarations ?? []).some(
+        (declaration) =>
+          hirExpressionHasAwait(declaration.initializer) ||
+          (declaration.kind === "pattern" &&
+            hirBindingPatternHasAwait(declaration.pattern)),
       ) ||
       (statement.init != null && hirExpressionHasAwait(statement.init)) ||
       (statement.test != null && hirExpressionHasAwait(statement.test)) ||
@@ -330,202 +333,6 @@ function moduleComponentRoot(
     throw new Error(`Module component '${component.id}' has no root.`);
   }
   return root;
-}
-
-function hirExpressionHasPatternAwait(expression: HirExpression): boolean {
-  if (expression.kind === "delete-value") {
-    return hirExpressionHasPatternAwait(expression.argument);
-  }
-  if (
-    expression.kind === "destructuring-set" &&
-    hirBindingPatternHasAwait(expression.pattern)
-  ) {
-    return true;
-  }
-  if (expression.kind === "logical" || expression.kind === "binary") {
-    return (
-      hirExpressionHasPatternAwait(expression.left) ||
-      hirExpressionHasPatternAwait(expression.right)
-    );
-  }
-  if (expression.kind === "conditional") {
-    return (
-      hirExpressionHasPatternAwait(expression.test) ||
-      hirExpressionHasPatternAwait(expression.consequent) ||
-      hirExpressionHasPatternAwait(expression.alternate)
-    );
-  }
-  if (expression.kind === "sequence") {
-    return expression.expressions.some(hirExpressionHasPatternAwait);
-  }
-  if (expression.kind === "optional-chain") {
-    return (
-      hirExpressionHasPatternAwait(expression.base) ||
-      expression.links.some((link) =>
-        link.kind === "member"
-          ? hirExpressionHasPatternAwait(link.key)
-          : link.kind === "private-member"
-            ? false
-            : link.arguments.some((argument) =>
-                hirExpressionHasPatternAwait(
-                  argument.kind === "spread" ? argument.argument : argument,
-                ),
-              ),
-      )
-    );
-  }
-  if (expression.kind === "class") {
-    return (
-      (expression.heritage != null &&
-        hirExpressionHasPatternAwait(expression.heritage)) ||
-      expression.elements.some(
-        (element) =>
-          element.kind !== "static-block" &&
-          element.key.kind !== "private-name" &&
-          hirExpressionHasPatternAwait(element.key),
-      )
-    );
-  }
-  if (expression.kind === "with-set" || expression.kind === "with-update") {
-    return hirExpressionHasPatternAwait(expression.value);
-  }
-  if (
-    expression.kind === "private-get" ||
-    expression.kind === "private-in" ||
-    expression.kind === "private-step"
-  ) {
-    return hirExpressionHasPatternAwait(expression.object);
-  }
-  if (
-    expression.kind === "private-set" ||
-    expression.kind === "private-update"
-  ) {
-    return (
-      hirExpressionHasPatternAwait(expression.object) ||
-      hirExpressionHasPatternAwait(expression.value)
-    );
-  }
-  if (expression.kind === "super-base") {
-    return hirExpressionHasPatternAwait(expression.receiver);
-  }
-  if (expression.kind === "yield" && expression.argument != null) {
-    return hirExpressionHasPatternAwait(expression.argument);
-  }
-  if (
-    expression.kind === "call" &&
-    expression.target.kind === "private-method" &&
-    hirExpressionHasPatternAwait(expression.target.object)
-  ) {
-    return true;
-  }
-  const parts = moduleExpressionParts(expression);
-  return parts?.children.some(hirExpressionHasPatternAwait) ?? false;
-}
-
-function hirStatementHasPatternAwait(statement: HirStatement): boolean {
-  const recurse = (child: HirStatement): boolean =>
-    hirStatementHasPatternAwait(child);
-  if (
-    statement.kind === "binding-pattern" &&
-    hirBindingPatternHasAwait(statement.pattern)
-  ) {
-    return true;
-  }
-  if (statement.kind === "block") return statement.body.some(recurse);
-  if (statement.kind === "if") {
-    return (
-      hirExpressionHasPatternAwait(statement.test) ||
-      recurse(statement.consequent) ||
-      (statement.alternate != null && recurse(statement.alternate))
-    );
-  }
-  if (statement.kind === "try") {
-    return (
-      recurse(statement.block) ||
-      (statement.handler != null &&
-        ((statement.handler.pattern != null &&
-          hirBindingPatternHasAwait(statement.handler.pattern)) ||
-          recurse(statement.handler.body))) ||
-      (statement.finalizer != null && recurse(statement.finalizer))
-    );
-  }
-  if (statement.kind === "labeled") return recurse(statement.body);
-  if (statement.kind === "switch") {
-    return (
-      hirExpressionHasPatternAwait(statement.discriminant) ||
-      statement.cases.some(
-        (switchCase) =>
-          (switchCase.test != null &&
-            hirExpressionHasPatternAwait(switchCase.test)) ||
-          switchCase.body.some(recurse),
-      )
-    );
-  }
-  if (statement.kind === "for") {
-    return (
-      (statement.declarations ?? []).some((declaration) =>
-        declaration.kind === "pattern"
-          ? hirBindingPatternHasAwait(declaration.pattern) ||
-            hirExpressionHasPatternAwait(declaration.initializer)
-          : hirExpressionHasPatternAwait(declaration.initializer),
-      ) ||
-      (statement.init != null &&
-        hirExpressionHasPatternAwait(statement.init)) ||
-      (statement.test != null &&
-        hirExpressionHasPatternAwait(statement.test)) ||
-      (statement.update != null &&
-        hirExpressionHasPatternAwait(statement.update)) ||
-      recurse(statement.body)
-    );
-  }
-  if (statement.kind === "for-of") {
-    return (
-      ((statement.target.kind === "pattern-declaration" ||
-        statement.target.kind === "assignment-pattern") &&
-        hirBindingPatternHasAwait(statement.target.pattern)) ||
-      (statement.target.kind === "property" &&
-        (hirExpressionHasPatternAwait(statement.target.object) ||
-          hirExpressionHasPatternAwait(statement.target.key))) ||
-      hirExpressionHasPatternAwait(statement.iterable) ||
-      recurse(statement.body)
-    );
-  }
-  if (statement.kind === "for-in") {
-    return (
-      ((statement.target.kind === "pattern-declaration" ||
-        statement.target.kind === "assignment-pattern") &&
-        hirBindingPatternHasAwait(statement.target.pattern)) ||
-      (statement.target.kind === "property" &&
-        (hirExpressionHasPatternAwait(statement.target.object) ||
-          hirExpressionHasPatternAwait(statement.target.key))) ||
-      (statement.target.kind === "private" &&
-        hirExpressionHasPatternAwait(statement.target.object)) ||
-      hirExpressionHasPatternAwait(statement.subject) ||
-      recurse(statement.body)
-    );
-  }
-  if (statement.kind === "while" || statement.kind === "do-while") {
-    return (
-      hirExpressionHasPatternAwait(statement.test) || recurse(statement.body)
-    );
-  }
-  if (statement.kind === "with") {
-    return (
-      hirExpressionHasPatternAwait(statement.object) || recurse(statement.body)
-    );
-  }
-  const expression =
-    statement.kind === "expression" || statement.kind === "throw"
-      ? statement.expression
-      : statement.kind === "binding-init" ||
-          statement.kind === "const" ||
-          statement.kind === "let" ||
-          statement.kind === "binding-pattern"
-        ? statement.initializer
-        : statement.kind === "return"
-          ? statement.expression
-          : undefined;
-  return expression != null && hirExpressionHasPatternAwait(expression);
 }
 
 function collectHirBindings(
@@ -1512,27 +1319,8 @@ export function compileModuleGraph(
         evaluationBody.push(statement);
       }
     }
-    /* A module top level suspends through the continuation transform
-     * below, which splits statements around whole `await` expressions
-     * rather than around the steps of a pattern. An ordinary
-     * asynchronous or asynchronous generator body suspends through its
-     * traced frame instead and admits these positions, so this
-     * rejection is located at the module statement that carries the
-     * pattern rather than shared with those bodies. */
-    const patternAwait = evaluationBody.find(hirStatementHasPatternAwait);
-    if (patternAwait != null) {
-      return {
-        diagnostics: [
-          sourceDiagnostic(
-            moduleId,
-            patternAwait,
-            "Await inside a module top-level binding or assignment " +
-              "pattern is unsupported.",
-          ),
-        ],
-        graph: linked.graph,
-      };
-    }
+    // Asynchronous module evaluators use the same traced frames as async
+    // functions, including suspension inside binding and assignment steps.
     if (node.moduleKind === "json") {
       const declaration = evaluationBody[0];
       if (evaluationBody.length !== 1 || declaration?.kind !== "const") {

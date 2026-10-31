@@ -3428,16 +3428,18 @@ function lowerClassExpression(
   // class resets the cells and creates fresh names, which is why an
   // instance of one evaluation fails the brand check of the other.
   for (const privateName of expression.privateNames ?? []) {
-    resetBinding(
-      privateName.bindingId,
-      privateName.name,
-      expression.range,
+    appendMirMetadata(
       builder,
+      "safepoint",
+      `fresh private name and cell for ${privateName.name}`,
+      [],
+      expression.range,
     );
     const created = builder.nextValue;
     builder.nextValue += 1;
     builder.current.operations.push({
       arguments: [],
+      bindingId: privateName.bindingId,
       detail: `private name ${privateName.name}`,
       id: created,
       kind: "private-name-create",
@@ -3451,17 +3453,6 @@ function lowerClassExpression(
       expression.range,
     );
     recordRoot(builder, created, expression.range);
-    const initialized = builder.nextValue;
-    builder.nextValue += 1;
-    builder.current.operations.push({
-      arguments: [created],
-      bindingId: privateName.bindingId,
-      detail: `%b${privateName.bindingId} ${privateName.name}`,
-      id: initialized,
-      kind: "initialize",
-      range: expression.range,
-    });
-    recordRoot(builder, initialized, expression.range);
   }
   const constructorValue = lowerExpression(
     expression.constructorFunction,

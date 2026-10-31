@@ -435,6 +435,66 @@ static void test_leaf_graph(
     oseo_context_destroy(&context);
 }
 
+/* Fresh cells preserve captured old identities through GC and failures. */
+static void test_private_name_binding(bool forced) {
+    OseoContext context;
+    OseoRootFrame frame = {NULL, NULL, 0u};
+    oseo_context_init(&context, "private-bind", 12u);
+    context.collect_every_safepoint = forced;
+    context.observe_specialization = true;
+    require_normal(oseo_roots_allocate(&context, &frame, 4u));
+    frame.slots[0] = require_normal(oseo_environment_create(&context, 1u));
+    frame.slots[1] = require_normal(oseo_private_name_bind(
+        &context, frame.slots[0], 0u
+    ));
+    assert(is_private_name(frame.slots[1]));
+    frame.slots[2] = require_normal(oseo_environment_clone(
+        &context, frame.slots[0]
+    ));
+    frame.slots[3] = require_normal(oseo_private_name_bind(
+        &context, frame.slots[0], 0u
+    ));
+    assert(frame.slots[1] != frame.slots[3]);
+    oseo_collect(&context);
+    OseoValue old_cell = require_normal(oseo_environment_get(
+        &context, frame.slots[2], 0u
+    ));
+    assert(require_normal(oseo_cell_get(&context, old_cell)) ==
+        frame.slots[1]);
+    assert_bitmap_exact(frame.slots[0]);
+    assert_bitmap_exact(frame.slots[2]);
+    for (size_t attempt = 1u; attempt <= 2u; attempt += 1u) {
+        oseo_context_source_location(&context, "private-bind", 12u, 7u, 3u);
+        oseo_context_fail_allocation_at(&context, attempt);
+        OseoResult failed = oseo_private_name_bind(
+            &context, frame.slots[0], 0u
+        );
+        assert(failed.status == OSEO_STATUS_THROW);
+        assert(strcmp(context.error_code, "OSEO2001") == 0);
+        assert(context.line == 7u && context.column == 3u);
+        assert(context.roots == &frame);
+        assert(context.active_frame_slots == 0u && context.call_depth == 0u);
+        oseo_context_fail_allocation_at(&context, 0u);
+        frame.slots[3] = require_normal(oseo_private_name_bind(
+            &context, frame.slots[0], 0u
+        ));
+        assert(require_normal(oseo_cell_get(&context, old_cell)) ==
+            frame.slots[1]);
+    }
+    assert(oseo_private_name_bind(
+        &context, oseo_number(1.0), 0u
+    ).status == OSEO_STATUS_THROW);
+    assert(oseo_private_name_bind(
+        &context, frame.slots[0], 1u
+    ).status == OSEO_STATUS_THROW);
+    assert(context.roots == &frame);
+    assert(context.collections > 0u);
+    oseo_roots_release(&context, &frame);
+    assert(context.roots == NULL);
+    oseo_context_destroy(&context);
+    assert(context.objects == NULL);
+}
+
 int main(void) {
     const OseoHeapKind kinds[] = {
         OSEO_HEAP_STRING,
@@ -450,6 +510,7 @@ int main(void) {
             test_bitmap_slots(counts[index], mode != 0u);
         }
         test_bitmap_allocation_failures(mode != 0u);
+        test_private_name_binding(mode != 0u);
         test_distinct_slot_edges(mode != 0u);
         for (size_t index = 0u; index < 4u; index += 1u) {
             test_leaf_graph(kinds[index], true, mode != 0u);
