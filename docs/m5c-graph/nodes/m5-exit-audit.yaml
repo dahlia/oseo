@@ -127,6 +127,7 @@ dependencies:
   - runtime-dynamic-source-classification
   - script-module-declaration-early-error
   - shift-operator-c-size
+  - static-specifier-import-design
   - temporal-helpers-harness
   - test262-diagnostic-host-path-normalization
   - test262-host-script-bindings
