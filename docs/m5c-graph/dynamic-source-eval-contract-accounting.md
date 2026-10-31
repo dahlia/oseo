@@ -69,3 +69,49 @@ unavailable. Preserve ADR 0016/0019 reopening triggers; an accepted ADR 0016
 amendment admitting dynamic import reopens ImportCall accounting. Each child
 requires normal D1/D11 review and D3/D4 publication. This metadata change
 performs none of those closure or landing steps.
+
+
+Per-path review result
+----------------------
+
+The [*per-path assessment*](./dynamic-source-eval-contract-assessment.md)
+reviews all 105 pinned paths at base
+`362ddb13d933600f6a0543ac332eb8479be9053f`: seven close under ADR 0016,
+98 stay with the umbrella, and zero replacement tests were added. Every
+selected path matched the ledger and its current source and normalized
+observation digests. The selector and its SHA256 remain unchanged.
+
+Root's 2026-10-31 ruling under decision item 1 permits the exact seven
+acceptance-only environment-construction cases to use existing
+`eval-semantics`. Their complete asserted subject is eval source evaluation;
+there is no non-source subject requiring replacement evidence. Each audit
+record has fresh digests. The other 98 preserve independent binding,
+strictness, property, error or completion subjects for which this audit
+establishes no complete qualifying source-free replacement. They remain
+active remediation rather than excluded ordinary semantics.
+
+The derived ledger moves only the seven existing unsupported rows to
+`adr:0016-dynamic-source-boundary`. The umbrella goes from 950 to 943 owned
+paths; its retained DS-10 subset is 98. All 41,091 inventory paths remain,
+and classifications, dependency tags, subset and results are unchanged.
+Accounting adds no passes. No UPDATE is needed and no new native suite is
+required. Root owns outer review, publication, integration and landing.
+
+
+Self-audit and validation
+-------------------------
+
+The dependency-tag rules of 2026-10-29 were checked against this change:
+no dependency tag or observation changed. Every original eval rejection
+retains its dynamic-source prerequisite. Assertions about errors, ordinary
+bindings, properties, strictness, skipped side effects and returned values
+remain explicit in the 98 retained rows; assertion messages and failure
+markers were not substituted for semantic evidence. The seven closed rows
+assert only environment-construction acceptance and have no later ordinary
+assertion. The existing audit digests were recomputed and match byte for
+byte, so their fresh values remain unchanged.
+
+The baseline fast M5c repository tests passed 105/105. The final required
+checks are `mise run check` and `node --test tests/m5c-*.test.ts`; their
+results and internal review artifacts accompany the worker report. No
+native test was added and `mise run test` is outside this accounting run.

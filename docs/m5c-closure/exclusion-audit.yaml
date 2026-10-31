@@ -8863,7 +8863,7 @@ paths:
     missingDynamicTag: false
     section: "sec-evaldeclarationinstantiation"
     subject: "No variable collision with global lexical binding"
-    assessment: "observation-train-b06-b08-b14"
+    assessment: "eval-semantics"
   - path: "test/language/eval-code/direct/var-env-global-lex-non-strict.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "source-subject"
@@ -8885,7 +8885,7 @@ paths:
     missingDynamicTag: false
     section: "sec-evaldeclarationinstantiation"
     subject: "No variable collision with global lexical binding"
-    assessment: "observation-train-b06-b08-b14"
+    assessment: "eval-semantics"
   - path: "test/language/eval-code/direct/var-env-lower-lex-non-strict.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "source-subject"
@@ -8907,7 +8907,7 @@ paths:
     missingDynamicTag: false
     section: "sec-evaldeclarationinstantiation"
     subject: "No variable collision with lexical binding in lower scope"
-    assessment: "observation-train-b06-b08-b14"
+    assessment: "eval-semantics"
   - path: "test/language/eval-code/direct/var-env-lower-lex-strict-source.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "source-subject"
@@ -8918,7 +8918,7 @@ paths:
     missingDynamicTag: false
     section: "sec-evaldeclarationinstantiation"
     subject: "No variable collision with lexical binding in lower scope"
-    assessment: "observation-train-b06-b08-b14"
+    assessment: "eval-semantics"
   - path: "test/language/eval-code/direct/var-env-var-init-global-exstng.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "source-subject"
@@ -9645,7 +9645,7 @@ paths:
     missingDynamicTag: false
     section: "sec-evaldeclarationinstantiation"
     subject: "No variable collision with global lexical binding"
-    assessment: "observation-train-b06-b08-b14"
+    assessment: "eval-semantics"
   - path: "test/language/eval-code/indirect/var-env-lower-lex-non-strict.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "source-subject"
@@ -9656,7 +9656,7 @@ paths:
     missingDynamicTag: false
     section: "sec-evaldeclarationinstantiation"
     subject: "No variable collision with lexical binding in lower scope"
-    assessment: "observation-train-b06-b08-b14"
+    assessment: "eval-semantics"
   - path: "test/language/eval-code/indirect/var-env-lower-lex-strict.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "source-subject"
@@ -9667,7 +9667,7 @@ paths:
     missingDynamicTag: false
     section: "sec-evaldeclarationinstantiation"
     subject: "No variable collision with lexical binding in lower scope"
-    assessment: "observation-train-b06-b08-b14"
+    assessment: "eval-semantics"
   - path: "test/language/eval-code/indirect/var-env-var-init-global-exstng.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "source-subject"

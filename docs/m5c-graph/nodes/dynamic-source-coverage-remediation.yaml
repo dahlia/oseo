@@ -1,7 +1,7 @@
 version: 1
 id: dynamic-source-coverage-remediation
 title: Resolve dynamic source coverage gaps
-delivers: "Resolves the 950 reviewed unsupported paths assigned to
+delivers: "Resolves the 757 reviewed unsupported paths assigned to
   node:dynamic-source-coverage-remediation in the derived closure
   ledger. Select exactly those owners and their exclusion-audit path
   assessments: the original 121 paths, 35 from cross-realm-host, 1 from
@@ -194,8 +194,11 @@ delivers: "Resolves the 950 reviewed unsupported paths assigned to
   static replacements and keeps 24. DS-7 moves 9 of its 80 template-site,
   string case-conversion and generator-instance paths through reviewed
   static replacements and keeps 71, as recorded in
-  docs/m5c-graph/dynamic-source-realm-string-assessment.md. The current
-  scope is 950; no native
+  docs/m5c-graph/dynamic-source-realm-string-assessment.md. DS-9 accounts
+  for 186 eval-specific arguments cells and keeps six mixed arrow cells,
+  and DS-10 accounts for seven acceptance-only eval environment-construction
+  cases under existing eval-semantics and retains 98 ordinary-subject paths,
+  so the current scope is 757; no native
   or fixture evidence was added, and all original unsupported results
   remain unchanged. The approved 2026-10-31 second split adds DS-8
   through DS-22 as bounded children for these exact 950 paths. Their
