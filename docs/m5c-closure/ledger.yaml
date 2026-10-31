@@ -5,15 +5,15 @@
 version: 1
 suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
 inventoryPaths: 41091
-closedPaths: 32665
-openPaths: 8426
+closedPaths: 32668
+openPaths: 8423
 states:
   expected-negative: 3627
   harness-failure: 0
   infrastructure-failure: 0
-  pass: 29038
+  pass: 29041
   semantic-failure: 0
-  unreviewed: 6742
+  unreviewed: 6739
   unsupported-profile-feature: 1684
 owners:
   adr:0016-dynamic-source-boundary:
@@ -310,7 +310,7 @@ owners:
     note: Unreviewed paths that docs/m5c-closure/observation-batches.yaml
       selects for observation-batch-28. The batch observes them; no
       classification is assumed before it does.
-    paths: 4
+    paths: 1
   node:regexp-split-coverage-remediation:
     note: The observed Annex B-only named backreference rejection in
       separator-regexp.js is authorized by ADR 0013, but the same path
@@ -335,7 +335,7 @@ owners:
     note: Closed by a reviewed pass or expected negative in the manifest.
       The owner changes only when a regenerated manifest changes the
       state.
-    paths: 32665
+    paths: 32668
 paths:
   test/built-ins/AggregateError/cause-property.js: [pass, observation]
   test/built-ins/AggregateError/errors-iterabletolist-failures.js: [pass, observation]
@@ -41075,9 +41075,9 @@ paths:
   test/language/statements/with/12.10-0-7.js: [pass, observation]
   test/language/statements/with/12.10-0-8.js: [pass, observation]
   test/language/statements/with/12.10-0-9.js: [pass, observation]
-  test/language/statements/with/12.10-2-1.js: [unreviewed, node:observation-batch-28]
-  test/language/statements/with/12.10-2-2.js: [unreviewed, node:observation-batch-28]
-  test/language/statements/with/12.10-2-3.js: [unreviewed, node:observation-batch-28]
+  test/language/statements/with/12.10-2-1.js: [pass, observation]
+  test/language/statements/with/12.10-2-2.js: [pass, observation]
+  test/language/statements/with/12.10-2-3.js: [pass, observation]
   test/language/statements/with/12.10-2-4.js: [pass, observation]
   test/language/statements/with/12.10-2-5.js: [pass, observation]
   test/language/statements/with/12.10-7-1.js: [pass, observation]

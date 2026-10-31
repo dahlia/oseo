@@ -1467,6 +1467,7 @@ for (const fixture of selectedFixtures) {
     fixture.name === "with-optional-call-receiver" ||
     fixture.name === "with-optional-call-receiver-tail" ||
     fixture.name === "with-var-loop-head-resolution" ||
+    fixture.name === "with-primitive-boxing" ||
     fixture.name === "object-prototype" ||
     fixture.name === "catchable-type-errors" ||
     fixture.name === "aggregate-error-and-options" ||
@@ -1786,6 +1787,7 @@ for (const fixture of selectedFixtures) {
             fixture.name === "with-optional-call-receiver" ||
             fixture.name === "with-optional-call-receiver-tail" ||
             fixture.name === "with-var-loop-head-resolution" ||
+            fixture.name === "with-primitive-boxing" ||
             fixture.name === "object-prototype" ||
             fixture.name === "function-prototype" ||
             fixture.name === "iterator-helpers-eager" ||

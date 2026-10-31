@@ -1736,6 +1736,8 @@ OseoResult oseo_mapped_arguments_create(
     const size_t *mapped_binding_ids,
     size_t mapped_count
 );
+/* ToObject: retain objects; box primitives; reject null and undefined. */
+OseoResult oseo_to_object(OseoContext *context, OseoValue value);
 OseoResult oseo_require_object_coercible(
     OseoContext *context,
     OseoValue value

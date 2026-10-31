@@ -4,8 +4,9 @@ Observation batch 28: reviewed admission
 Focused executeTest262Case observations on base
 `68b026bb8275b9b7ddd15b9bdd02ef90ef3b123f` cover all 348 selected paths
 exactly once. Results: 271 pass, 32 expected-negative, 42
-unsupported-profile-feature, and 3 semantic failures. Admit 344 paths;
-retain 4 unreviewed originals below.
+unsupported-profile-feature, and 3 semantic failures. The original train
+admitted 344 paths and retained 4 unreviewed originals; the later primitive
+with admission below closes three of those follow-ups.
 
 The pinned native executor uses target linux-x86\_64-gnu with the stock
 fragment emitter and whole-CLI fallback. Cases ran serially, with one case
@@ -78,12 +79,6 @@ ADR 0019 remain unchanged.
 Unreviewed follow-ups
 ---------------------
 
- -  `test/language/statements/with/12.10-2-1.js`:
-    `with-primitive-binding-object-boxing` remediation; retain batch ownership.
- -  `test/language/statements/with/12.10-2-2.js`:
-    `with-primitive-binding-object-boxing` remediation; retain batch ownership.
- -  `test/language/statements/with/12.10-2-3.js`:
-    `with-primitive-binding-object-boxing` remediation; retain batch ownership.
  -  `test/language/types/object/S8.6.2_A8.js`: Reaches OSEO1001 on the Annex B
     Object.prototype.__proto__ accessor while asserting ordinary
     preventExtensions/GetPrototypeOf immutability; no existing bounded Annex B
@@ -228,3 +223,21 @@ redeclaration candidate contains no with statement. The nested Function
 inside 12.10.1-5-s.js is in an uninvoked constructed body, so it gains no
 subject tag. The correction changes nine rows, all in this batch; the
 source-bound decisions are in round5-strict-with-pattern-audit.json.
+
+
+Primitive with follow-up admission
+----------------------------------
+
+Root authorized the bounded with-primitive-binding-object-boxing U2 to
+admit *test/language/statements/with/12.10-2-1.js*, *12.10-2-2.js* and
+*12.10-2-3.js*. Fresh stock-runner observations on semantic U
+`d7808583c66ad45ef870ea4a28b394d9420fa7dd` pass all six non-strict native
+variants across both policies. Their tags are `expression-operators`,
+`object-properties` and `var-bindings`, audited in the
+[*with work note*](./with-primitive-binding-object-boxing.md). Canonical
+records move only these three ledger rows from unreviewed batch ownership
+to pass under observation. This batch retains one unreviewed original,
+*test/language/types/object/S8.6.2\_A8.js*, with its unchanged follow-up.
+The original train's observations retain their historical source binding.
+Root owns the combined Full, R, outer gate and publication; none is claimed
+by this admission.

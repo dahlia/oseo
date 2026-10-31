@@ -3,13 +3,13 @@
     "family": "bindings",
     "name": "with-statements",
     "specialization": "enabled",
-    "sha256": "a8fde3f2c7bbc24ce92c488df8cdb2586977a37bc2d4ea76fb23158943d0a9dd"
+    "sha256": "0da4ea693f77df773094b27cb7856d8ef2f348440702fb33da345f9ecf395ba3"
   },
   {
     "family": "bindings",
     "name": "with-statements",
     "specialization": "disabled",
-    "sha256": "459a422692aa03b1246e4414f790e6059fe7269b386c38f6b054aeb04989094e"
+    "sha256": "bfb970c4c3de2e2eca9a207ed02e9dd8d2a5ceca6dd02664faec093eef502952"
   },
   {
     "family": "bindings",
@@ -255,12 +255,12 @@
     "family": "global-object-record",
     "name": "global-object-record",
     "specialization": "enabled",
-    "sha256": "a1699a16ec4f884a25e8422ab10be437218d7a14d4d6d2f8488a72e78425809f"
+    "sha256": "95be2220d80663e67cc3ec8b2f3e7f8b2b8e7fef9ffb2f7f74b58ebcb97b179b"
   },
   {
     "family": "global-object-record",
     "name": "global-object-record",
     "specialization": "disabled",
-    "sha256": "a308ed9208aa6e6675ea387099d0ea6ebef46c23a74a24e14d5fe821f9d11cef"
+    "sha256": "e28d072d7cda685d0a5e42b2e9135210c9caad3e85e17befc77ab16eb5bbd62d"
   }
 ]

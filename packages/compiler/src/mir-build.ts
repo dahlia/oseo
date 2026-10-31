@@ -738,6 +738,32 @@ function lowerObjectCoercible(
   return recordRoot(builder, id, range);
 }
 
+/** Materialize one binding object, retained for the entire with scope. */
+function lowerWithObject(
+  input: number,
+  range: SourceRange,
+  builder: MirBuilder,
+): number {
+  appendMirMetadata(builder, "safepoint", "box with input", [input], range);
+  const id = builder.nextValue;
+  builder.nextValue += 1;
+  builder.current.operations.push({
+    arguments: [input],
+    detail: "ToObject for with binding object",
+    id,
+    kind: "to-object",
+    range,
+  });
+  appendMirMetadata(
+    builder,
+    "check-status",
+    "normal -> enter with, abrupt -> return",
+    [id],
+    range,
+  );
+  return recordRoot(builder, id, range);
+}
+
 /**
  * A key expression whose value is a primitive fixed by the source, so
  * ToPropertyKey of it can run no user code and cannot throw.
@@ -7493,7 +7519,7 @@ function lowerStatements(
       if (lowerTryStatement(statement, builder)) return true;
     } else if (statement.kind === "with") {
       const input = lowerExpression(statement.object, builder);
-      const object = lowerObjectCoercible(input, statement.range, builder);
+      const object = lowerWithObject(input, statement.range, builder);
       resetBinding(
         statement.objectBindingId,
         "<with object>",

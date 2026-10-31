@@ -579,6 +579,10 @@ static OseoResult to_object(
     return result;
 }
 
+OseoResult oseo_to_object(OseoContext *context, OseoValue value) {
+    return to_object(context, value, true);
+}
+
 OseoResult oseo_internal_to_object(OseoContext *context, OseoValue value) {
     return to_object(context, value, true);
 }

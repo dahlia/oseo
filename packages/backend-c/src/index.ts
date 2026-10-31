@@ -1847,6 +1847,7 @@ function emitObjectOperation(state: EmitState, operation: MirOperation): void {
       ),
     );
   } else if (
+    operation.kind === "to-object" ||
     operation.kind === "object-coercible" ||
     operation.kind === "delete-object-coercible"
   ) {
@@ -1854,10 +1855,12 @@ function emitObjectOperation(state: EmitState, operation: MirOperation): void {
     line(
       state,
       renderC(
-        operation.kind === "delete-object-coercible"
-          ? emittedC.objectOperation
-              .resultAssignOseoRequireDeleteObjectCoercible
-          : emittedC.objectOperation.resultAssignOseoRequireObjectCoercible,
+        operation.kind === "to-object"
+          ? emittedC.objectOperation.resultAssignOseoToObject
+          : operation.kind === "delete-object-coercible"
+            ? emittedC.objectOperation
+                .resultAssignOseoRequireDeleteObjectCoercible
+            : emittedC.objectOperation.resultAssignOseoRequireObjectCoercible,
         input,
       ),
     );
@@ -3206,6 +3209,7 @@ function emitOperation(state: EmitState, operation: MirOperation): void {
     operation.kind === "array-append-hole" ||
     operation.kind === "array-create" ||
     operation.kind === "delete-object-coercible" ||
+    operation.kind === "to-object" ||
     operation.kind === "object-coercible" ||
     operation.kind === "object-create" ||
     operation.kind === "object-rest" ||
