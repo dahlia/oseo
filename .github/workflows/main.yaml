@@ -245,14 +245,45 @@ jobs:
           toolchain: host-cc
       # Each shard retains its own instrumentation preflight.
       - run: mise run test:sanitizer:self
+      # Node's positional shards, without the dedicated sanitizer files.
       - run: >-
-          mise run test:sanitizer:property:shard
-          --test-shard=${{ matrix.shard }}/3
-          tests/property/*.property.test.ts
+          mise run test:sanitizer:property:shared
+          --shard ${{ matrix.shard }}/3
       - if: failure() || cancelled()
         uses: actions/upload-artifact@v7
         with:
           name: host-cc-sanitizer-property-failures-${{ matrix.shard }}-of-3
+          path: /tmp/oseo-native-*
+          if-no-files-found: warn
+
+  # The dedicated sanitizer property files, left out of the shards above;
+  # see docs/evidence/regexp-literal-exhaustive/README.md. Every case keeps
+  # its ordinary budget and the lane's interrupt scale.
+  test_sanitizer_property_dedicated:
+    name: host C sanitizers (Linux, property, regexp literals)
+    if: ${{ !cancelled() }}
+    needs:
+      - mac_ready
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: jdx/mise-action@v4
+        with:
+          install: true
+      - uses: ./.github/actions/runtime-archive-cache
+        with:
+          toolchain: host-cc
+      - run: mise run test:sanitizer:self
+      - run: >-
+          mise run test:sanitizer:property:shard
+          tests/property/m5-regexp-literal-exhaustive.property.test.ts
+      - if: failure() || cancelled()
+        uses: actions/upload-artifact@v7
+        with:
+          name: host-cc-sanitizer-property-regexp-literals-failures
           path: /tmp/oseo-native-*
           if-no-files-found: warn
 
@@ -567,6 +598,7 @@ jobs:
     needs:
       - test_native
       - test_sanitizer_property
+      - test_sanitizer_property_dedicated
       - test_native_support
       - test_property_case
       - test_reflect_case
@@ -576,6 +608,9 @@ jobs:
       - test_native_macos_1
       - test_native_macos_2
       - test_native_macos_3
+      - test_sanitizer_macos_macos_native_1
+      - test_sanitizer_macos_macos_native_2
+      - test_sanitizer_macos_macos_property_regexp_literals
       - test_test262_macos_1
       - test_test262_macos_2
       - test_test262_macos_3
@@ -677,10 +712,14 @@ jobs:
     runs-on: macos-15
     if: ${{ !cancelled() }}
     needs: mac_ready
-    # Each suite retains its own instrumentation preflight. About 36–44
-    # minutes for runtime/native and 29–35 for properties. Run 41191483370
-    # cancelled native at 75.5 minutes on commit 216503f8 and passed its
-    # rerun at 58.9, so native gets 90 and property keeps 75; see
+    # Each job retains its own instrumentation preflight. The native suite
+    # runs as two file shards, with the unsharded runtime fixtures on the
+    # first; see docs/evidence/macos-sanitizer-split/README.md. The listed
+    # dedicated property files run in their own job; see
+    # docs/evidence/regexp-literal-exhaustive/README.md. Run 41191483370
+    # cancelled the unsplit native suite at 75.5 minutes on commit 216503f8
+    # and passed its rerun at 58.9, so each native shard keeps the 90
+    # minutes that suite had and the property jobs keep 75; see
     # docs/sanitizer-activity.md. Each leaves room for setup, cold caches,
     # and slower runner images.
     timeout-minutes: 75
@@ -704,7 +743,7 @@ jobs:
         env:
           TMPDIR: ${{ runner.temp }}
       # No GCC verification: macOS gcc is an Apple Clang alias.
-      - run: mise run test:sanitizer:property
+      - run: mise run test:sanitizer:property:shared
         env:
           # Four workers share three CPUs. Double Linux's interrupt allowance,
           # retaining every ordinary case and seed; interruptions still fail.
@@ -717,16 +756,70 @@ jobs:
           path: ${{ runner.temp }}/oseo-native-*
           if-no-files-found: warn
 
+  test_sanitizer_macos_macos_property_regexp_literals:
+    name: host C sanitizers (macOS, property, regexp literals)
+    runs-on: macos-15
+    if: ${{ !cancelled() }}
+    needs: test_sanitizer_macos_macos_property
+    # Each job retains its own instrumentation preflight. The native suite
+    # runs as two file shards, with the unsharded runtime fixtures on the
+    # first; see docs/evidence/macos-sanitizer-split/README.md. The listed
+    # dedicated property files run in their own job; see
+    # docs/evidence/regexp-literal-exhaustive/README.md. Run 41191483370
+    # cancelled the unsplit native suite at 75.5 minutes on commit 216503f8
+    # and passed its rerun at 58.9, so each native shard keeps the 90
+    # minutes that suite had and the property jobs keep 75; see
+    # docs/sanitizer-activity.md. Each leaves room for setup, cold caches,
+    # and slower runner images.
+    timeout-minutes: 75
+    env:
+      OSEO_HOST_CC: clang
+    steps:
+      - name: Record macOS host version
+        run: sw_vers -productVersion
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: jdx/mise-action@v4
+        with:
+          install: true
+      - uses: ./.github/actions/runtime-archive-cache
+        with:
+          toolchain: host-cc
+        env:
+          TMPDIR: ${{ runner.temp }}
+      - run: mise run test:sanitizer:self
+        env:
+          TMPDIR: ${{ runner.temp }}
+      # No GCC verification: macOS gcc is an Apple Clang alias.
+      - run: >-
+          mise run test:sanitizer:property:shard
+          tests/property/m5-regexp-literal-exhaustive.property.test.ts
+        env:
+          # The same allowance as the shared property job on this runner.
+          OSEO_PROPERTY_TIME_SCALE: "6"
+          TMPDIR: ${{ runner.temp }}
+      - if: failure() || cancelled()
+        uses: actions/upload-artifact@v7
+        with:
+          name: host-cc-sanitizer-macos-property-regexp-literals-failures
+          path: ${{ runner.temp }}/oseo-native-*
+          if-no-files-found: warn
+
   # macOS lane 2, longest jobs first.
-  test_sanitizer_macos_macos_native:
-    name: host C sanitizers (macOS, native)
+  test_sanitizer_macos_macos_native_1:
+    name: host C sanitizers (macOS, native, 1/2)
     runs-on: macos-15
     if: ${{ !cancelled() }}
     needs: mac_ready
-    # Each suite retains its own instrumentation preflight. About 36–44
-    # minutes for runtime/native and 29–35 for properties. Run 41191483370
-    # cancelled native at 75.5 minutes on commit 216503f8 and passed its
-    # rerun at 58.9, so native gets 90 and property keeps 75; see
+    # Each job retains its own instrumentation preflight. The native suite
+    # runs as two file shards, with the unsharded runtime fixtures on the
+    # first; see docs/evidence/macos-sanitizer-split/README.md. The listed
+    # dedicated property files run in their own job; see
+    # docs/evidence/regexp-literal-exhaustive/README.md. Run 41191483370
+    # cancelled the unsplit native suite at 75.5 minutes on commit 216503f8
+    # and passed its rerun at 58.9, so each native shard keeps the 90
+    # minutes that suite had and the property jobs keep 75; see
     # docs/sanitizer-activity.md. Each leaves room for setup, cold caches,
     # and slower runner images.
     timeout-minutes: 90
@@ -753,13 +846,63 @@ jobs:
       - run: mise run test:sanitizer:runtime
         env:
           TMPDIR: ${{ runner.temp }}
-      - run: mise run test:sanitizer:native
+      - run: >-
+          mise run test:sanitizer:native
+          --shard 1/2
         env:
           TMPDIR: ${{ runner.temp }}
       - if: failure() || cancelled()
         uses: actions/upload-artifact@v7
         with:
-          name: host-cc-sanitizer-macos-native-failures
+          name: host-cc-sanitizer-macos-native-1-of-2-failures
+          path: ${{ runner.temp }}/oseo-native-*
+          if-no-files-found: warn
+
+  test_sanitizer_macos_macos_native_2:
+    name: host C sanitizers (macOS, native, 2/2)
+    runs-on: macos-15
+    if: ${{ !cancelled() }}
+    needs: test_sanitizer_macos_macos_native_1
+    # Each job retains its own instrumentation preflight. The native suite
+    # runs as two file shards, with the unsharded runtime fixtures on the
+    # first; see docs/evidence/macos-sanitizer-split/README.md. The listed
+    # dedicated property files run in their own job; see
+    # docs/evidence/regexp-literal-exhaustive/README.md. Run 41191483370
+    # cancelled the unsplit native suite at 75.5 minutes on commit 216503f8
+    # and passed its rerun at 58.9, so each native shard keeps the 90
+    # minutes that suite had and the property jobs keep 75; see
+    # docs/sanitizer-activity.md. Each leaves room for setup, cold caches,
+    # and slower runner images.
+    timeout-minutes: 90
+    env:
+      OSEO_HOST_CC: clang
+    steps:
+      - name: Record macOS host version
+        run: sw_vers -productVersion
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: jdx/mise-action@v4
+        with:
+          install: true
+      - uses: ./.github/actions/runtime-archive-cache
+        with:
+          toolchain: host-cc
+        env:
+          TMPDIR: ${{ runner.temp }}
+      - run: mise run test:sanitizer:self
+        env:
+          TMPDIR: ${{ runner.temp }}
+      # No GCC verification: macOS gcc is an Apple Clang alias.
+      - run: >-
+          mise run test:sanitizer:native
+          --shard 2/2
+        env:
+          TMPDIR: ${{ runner.temp }}
+      - if: failure() || cancelled()
+        uses: actions/upload-artifact@v7
+        with:
+          name: host-cc-sanitizer-macos-native-2-of-2-failures
           path: ${{ runner.temp }}/oseo-native-*
           if-no-files-found: warn
 
@@ -831,8 +974,8 @@ jobs:
   # Hosted macos-latest, like the ordinary Node shards. No time scaling.
   # The generator places this on one of the same five hosted capacity lanes.
 
-  test_node_shard_macos_2:
-    name: test (macos-latest, node, 2/6)
+  test_node_shard_macos_4:
+    name: test (macos-latest, node, 4/6)
     runs-on: macos-latest
     if: ${{ !cancelled() }}
     needs: test_node_shard_macos_5
@@ -848,7 +991,7 @@ jobs:
       - uses: ./.github/actions/runtime-archive-cache
       - run: >-
           mise run test:node:shard
-          --shard=2/6
+          --shard=4/6
 
   # Hosted macos-latest, like the ordinary Node shards. No time scaling.
   # The generator places this on one of the same five hosted capacity lanes.
@@ -857,7 +1000,7 @@ jobs:
     name: test (macos-latest, deno)
     runs-on: macos-latest
     if: ${{ !cancelled() }}
-    needs: test_node_shard_macos_2
+    needs: test_node_shard_macos_4
     steps:
       - name: Record macOS host version
         run: sw_vers -productVersion
@@ -876,11 +1019,33 @@ jobs:
   # file weights; see docs/evidence/node-shards/README.md.
 
   # macOS lane 5, longest jobs first.
+  test_node_shard_macos_2:
+    name: test (macos-latest, node, 2/6)
+    runs-on: macos-latest
+    if: ${{ !cancelled() }}
+    needs: mac_ready
+    steps:
+      - name: Record macOS host version
+        run: sw_vers -productVersion
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: jdx/mise-action@v4
+        with:
+          install: true
+      - uses: ./.github/actions/runtime-archive-cache
+      - run: >-
+          mise run test:node:shard
+          --shard=2/6
+
+  # Hosted macos-latest, like the ordinary Node shards. No time scaling.
+  # The generator places this on one of the same five hosted capacity lanes.
+
   test_node_shard_macos_3:
     name: test (macos-latest, node, 3/6)
     runs-on: macos-latest
     if: ${{ !cancelled() }}
-    needs: mac_ready
+    needs: test_node_shard_macos_2
     steps:
       - name: Record macOS host version
         run: sw_vers -productVersion
@@ -898,33 +1063,11 @@ jobs:
   # Hosted macos-latest, like the ordinary Node shards. No time scaling.
   # The generator places this on one of the same five hosted capacity lanes.
 
-  test_node_shard_macos_4:
-    name: test (macos-latest, node, 4/6)
-    runs-on: macos-latest
-    if: ${{ !cancelled() }}
-    needs: test_node_shard_macos_3
-    steps:
-      - name: Record macOS host version
-        run: sw_vers -productVersion
-      - uses: actions/checkout@v7
-        with:
-          persist-credentials: false
-      - uses: jdx/mise-action@v4
-        with:
-          install: true
-      - uses: ./.github/actions/runtime-archive-cache
-      - run: >-
-          mise run test:node:shard
-          --shard=4/6
-
-  # Hosted macos-latest, like the ordinary Node shards. No time scaling.
-  # The generator places this on one of the same five hosted capacity lanes.
-
   test_array_constructor_macos_macos_node:
     name: Array constructor (macos-latest, node)
     runs-on: macos-latest
     if: ${{ !cancelled() }}
-    needs: test_node_shard_macos_4
+    needs: test_node_shard_macos_3
     steps:
       - name: Record macOS host version
         run: sw_vers -productVersion

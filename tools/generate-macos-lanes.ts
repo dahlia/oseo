@@ -34,6 +34,15 @@ export interface MacosLaneJob {
 const templatePath = "tools/main-workflow.template.yaml";
 const workflowPath = ".github/workflows/main.yaml";
 
+/**
+ * File shards of the macOS native sanitizer suite. Two keep each job
+ * within about 46 minutes even at the slowest measured runner. They chain
+ * on the suite's one reserved hosted lane, so the split takes no more of
+ * the account's hosted slots; see
+ * *docs/evidence/macos-sanitizer-split/README.md*.
+ */
+export const macosSanitizerNativeShards = 2;
+
 /** Enumerate every macOS matrix entry without changing its workload. */
 export function macosJobs(): readonly MacosLaneJob[] {
   const jobs: MacosLaneJob[] = [];
@@ -100,18 +109,55 @@ export function macosJobs(): readonly MacosLaneJob[] {
       shard,
     });
   }
-  // Run 41191483370 cancelled the native suite at 75.5 minutes on commit
-  // 216503f8 and passed its rerun at 58.9, so it needs a wider timeout than
-  // the property suite. See docs/sanitizer-activity.md.
-  for (const [suite, timeout] of [
-    ["native", 90],
-    ["property", 75],
-  ] as const) {
-    add("test_sanitizer_macos", suite, `host C sanitizers (macOS, ${suite})`, {
-      suite,
-      timeout,
-    });
+  // `tests/native.ts` partitions its fixtures and scenarios round-robin, so
+  // each native shard carries about half of the suite; the runtime fixtures
+  // do not shard and stay with the first. See
+  // docs/evidence/macos-sanitizer-split/README.md. Run 41191483370 cancelled
+  // the unsplit native suite at 75.5 minutes on commit 216503f8 and passed
+  // its rerun at 58.9, so each native shard keeps its 90-minute timeout and
+  // the property jobs keep 75. See docs/sanitizer-activity.md.
+  for (let shard = 1; shard <= macosSanitizerNativeShards; shard++) {
+    add(
+      "test_sanitizer_macos",
+      `native_${shard}`,
+      `host C sanitizers (macOS, native, ${shard}/` +
+        `${macosSanitizerNativeShards})`,
+      {
+        suite: "native",
+        label: `native, ${shard}/${macosSanitizerNativeShards}`,
+        part: `native-${shard}-of-${macosSanitizerNativeShards}`,
+        runtime: shard === 1 ? 1 : 0,
+        shard,
+        timeout: 90,
+      },
+    );
   }
+  add(
+    "test_sanitizer_macos",
+    "property",
+    "host C sanitizers (macOS, property)",
+    {
+      suite: "property",
+      label: "property",
+      part: "property",
+      runtime: 0,
+      timeout: 75,
+    },
+  );
+  // The dedicated sanitizer property files chain on the property lane; see
+  // docs/evidence/regexp-literal-exhaustive/README.md.
+  add(
+    "test_sanitizer_macos",
+    "property_regexp_literals",
+    "host C sanitizers (macOS, property, regexp literals)",
+    {
+      suite: "property",
+      label: "property, regexp literals",
+      part: "property-regexp-literals",
+      runtime: 0,
+      timeout: 75,
+    },
+  );
   for (const [sourceId, family] of [
     ["test_test262", "test262"],
     ["test_native_support", "native support"],
@@ -184,6 +230,17 @@ function selfHostedEligible(job: MacosLaneJob): boolean {
 const hostedLaneCount = 5;
 
 /**
+ * The hosted lane a sanitizer job reserves: one per suite. The native
+ * suite's file shards chain on one lane, so splitting it shortens each job
+ * without taking another of the account's hosted slots.
+ */
+function sanitizerSuite(job: MacosLaneJob): string | undefined {
+  return job.family === "host C sanitizers"
+    ? String(job.matrix.suite)
+    : undefined;
+}
+
+/**
  * The lane order the placement's invariants require: own-key case shards
  * lead their Mac lane under one measured deadline, then the jobs no Mac
  * lane can run, then the rest, each of the two groups by descending hosted
@@ -215,11 +272,12 @@ function feasibleLanes(
 ): boolean {
   for (const [index, lane] of lanes.entries()) {
     if (index < hostedLaneCount) {
-      // A hosted lane that holds a sanitizer job holds nothing else, and
-      // the own-key deadline is measured on a Mac lane.
+      // A hosted lane that holds a sanitizer job holds only that suite's
+      // jobs, and the own-key deadline is measured on a Mac lane.
       if (lane.some((job) => job.family === "own-key cases")) return false;
+      const suites = new Set(lane.map(sanitizerSuite));
       if (lane.some((job) => job.family === "host C sanitizers")) {
-        if (lane.length !== 1) return false;
+        if (suites.size !== 1) return false;
       }
       for (const job of lane) {
         if (selfHostedEligible(job) && !measuredHostedJobs.includes(job.name)) {
@@ -610,14 +668,21 @@ export function macosLanes(
       // of raising it to 56.17; see PLAN-GATE.md (U41, U42). With no Mac
       // lane the hosted lanes must hold every job and cannot reserve
       // two, so the pure-hosted partition is unchanged.
-      if (
-        selfHostedCount > 0 &&
-        candidate < hostedLaneCount &&
-        lanes[candidate]!.some(
-          (placed) => placed.family === "host C sanitizers",
-        )
-      ) {
-        continue;
+      if (selfHostedCount > 0 && candidate < hostedLaneCount) {
+        const suite = sanitizerSuite(job);
+        const reserved = lanes.findIndex((lane) =>
+          lane.some((placed) => sanitizerSuite(placed) === suite),
+        );
+        if (suite != null && reserved !== -1) {
+          if (candidate !== reserved) continue;
+        } else if (
+          lanes[candidate]!.some(
+            (placed) => placed.family === "host C sanitizers",
+          ) ||
+          (suite != null && lanes[candidate]!.length > 0)
+        ) {
+          continue;
+        }
       }
       let projected: number;
       let candidateMacEnds = macEnds;
@@ -752,10 +817,22 @@ export function generateMacosWorkflow(
   if (!Array.isArray(nativeIds) || !nativeIds.every(isString)) {
     throw new Error("Native aggregate needs must be job IDs");
   }
+  // The macOS-only template jobs exist only as their generated lane jobs.
+  // Of the sanitizer jobs, the aggregate requires the native shards, which
+  // together cover the whole native suite, and the dedicated property files'
+  // job, as on Linux; the shared property suite keeps its own standing.
   const required = [
-    ...nativeIds.filter((id) => id !== "test_array_constructor_macos"),
+    ...nativeIds.filter(
+      (id) =>
+        id !== "test_array_constructor_macos" && id !== "test_sanitizer_macos",
+    ),
     ...macosJobs()
-      .filter((job) => nativeIds.includes(job.sourceId))
+      .filter(
+        (job) =>
+          nativeIds.includes(job.sourceId) &&
+          (job.sourceId !== "test_sanitizer_macos" ||
+            job.matrix.part !== "property"),
+      )
       .map((job) => job.id),
   ];
   const aggregateSteps = [

@@ -1,16 +1,16 @@
 Derived seconds; concurrent case sums, no fixed job overhead.
 Statistic: ceil(median(per-run sum(case_ms)) / 1000).
 Measured files: 136
-No file-shard observation; retained: tests/property/m5-array-constructor.property.test.ts, tests/property/m5-host-script-bindings.property.test.ts, tests/property/m5-module-namespace-uninitialized.property.test.ts, tests/property/m5-module-prelude-script.property.test.ts, tests/property/m5-non-blocking-agent.property.test.ts, tests/property/m5-object-own-keys.property.test.ts, tests/property/m5-proper-tail-calls.property.test.ts, tests/property/m5-reflect-namespace.property.test.ts, tests/property/m5-with-primitive-boxing.property.test.ts, tests/property/m5-with-var-loop-head.property.test.ts
+No file-shard observation; retained: tests/property/m5-array-constructor.property.test.ts, tests/property/m5-host-script-bindings.property.test.ts, tests/property/m5-module-namespace-uninitialized.property.test.ts, tests/property/m5-module-prelude-script.property.test.ts, tests/property/m5-non-blocking-agent.property.test.ts, tests/property/m5-object-own-keys.property.test.ts, tests/property/m5-proper-tail-calls.property.test.ts, tests/property/m5-reflect-namespace.property.test.ts, tests/property/m5-regexp-literal-exhaustive.property.test.ts, tests/property/m5-with-primitive-boxing.property.test.ts, tests/property/m5-with-var-loop-head.property.test.ts
 Rebucketed: tests/property/m5-compound-assignment.property.test.ts -> 3 files
 d4d81be9 shard:run/job/cases 1:40401101765/121847031054/15 2:40401101765/121847031208/62 3:40401101765/121847031011/28 4:40401101765/121847031261/38 5:40401101765/121847031100/62 6:40401101765/121847030959/42 7:40401101765/121847030943/39
 98460f7c shard:run/job/cases 1:40442491966/121985959542/15 2:40442491966/121985959637/62 3:40442491966/121985959527/28 4:40442491966/121985959575/38 5:40442491966/121985959675/62 6:40442491966/121985959612/42 7:40442491966/121985959670/39
 6aab0fc8 shard:run/job/cases 1:40454201429/122023722631/15 2:40454201429/122023722692/62 3:40454201429/122023722851/28 4:40454201429/122023722807/38 5:40454201429/122023722742/62 6:40454201429/122023722630/42 7:40454201429/122023722816/39
-old entries/fallback: 141 409
-old 7 loads: 2647,2452,2530,2468,2517,2524,2533 mean: 2524.429 max/mean: 1.048554 scored with refreshed: 2673,3059,3799,3263,3361,2987,2598
-old 8 loads: 2647,2159,2137,2151,2145,2157,2156,2147 mean: 2212.375 max/mean: 1.196452 scored with refreshed: 2673,2630,2697,2084,3477,3427,2665,2325
-old 9 loads: 2647,1876,1926,1894,1886,1874,1928,1841,1877 mean: 1972.111 max/mean: 1.342216 scored with refreshed: 2673,2379,2185,2190,2159,2608,2068,2766,3270
-refreshed entries/fallback: 146 443
-refreshed 7 loads: 2980,3036,2947,2958,3003,2985,2940 mean: 2978.429 max/mean: 1.019329 scored with refreshed: 2980,3036,2947,2958,3003,2985,2940
-refreshed 8 loads: 2673,2614,2637,2641,2619,2640,2659,2649 mean: 2641.500 max/mean: 1.011925 scored with refreshed: 2673,2614,2637,2641,2619,2640,2659,2649
-refreshed 9 loads: 2673,2337,2305,2301,2290,2312,2261,2337,2333 mean: 2349.889 max/mean: 1.137501 scored with refreshed: 2673,2337,2305,2301,2290,2312,2261,2337,2333
+old entries/fallback: 142 415
+old 7 loads: 2647,2533,2571,2552,2588,2568,2559 mean: 2574.000 max/mean: 1.028361 scored with refreshed: 2673,3213,3713,3306,3064,2793,3395
+old 8 loads: 2647,2166,2173,2256,2229,2169,2186,2166 mean: 2249.000 max/mean: 1.176968 scored with refreshed: 2673,2602,3032,2858,3040,3133,3041,2497
+old 9 loads: 2647,1877,1951,1959,1909,1962,1885,1979,1946 mean: 2012.778 max/mean: 1.315098 scored with refreshed: 2673,2674,2521,2088,2176,2649,2997,2487,3040
+refreshed entries/fallback: 147 443
+refreshed 7 loads: 2978,3048,2979,3038,2989,3027,3080 mean: 3019.857 max/mean: 1.019916 scored with refreshed: 2978,3048,2979,3038,2989,3027,3080
+refreshed 8 loads: 2673,2681,2714,2692,2696,2735,2679,2666 mean: 2692.000 max/mean: 1.015973 scored with refreshed: 2673,2681,2714,2692,2696,2735,2679,2666
+refreshed 9 loads: 2673,2340,2307,2363,2349,2379,2395,2390,2389 mean: 2398.333 max/mean: 1.114524 scored with refreshed: 2673,2340,2307,2363,2349,2379,2395,2390,2389

@@ -1,5 +1,6 @@
 /**
- * Except for the explicitly unmeasured Array scheduling allowance, each
+ * Except for the explicitly unmeasured Array scheduling allowance and the
+ * entries marked `derived` below, each
  * entry is the median, rounded to whole seconds, of the job's measured
  * hosted `macos-15` or `macos-latest` walls (`started_at` to
  * `completed_at`). The lane generator sorts hosted jobs by these weights
@@ -40,6 +41,17 @@
  *     37121778924 and 37167895777, branch run 37194069657 attempts 1 and
  *     2, main run 37206614757, and branch run 37215661294 attempts 1
  *     and 2.
+ *
+ *  -  Two `derived` entries are the macOS native sanitizer shards. No
+ *     hosted run has executed either shard yet; each sums the setup, the
+ *     preflight, the runtime fixtures on the first shard, and that shard's
+ *     share of three hosted native logs. See
+ *     *docs/evidence/macos-sanitizer-split/README.md*.
+ *
+ *  -  One `derived` entry is the dedicated sanitizer property files' job,
+ *     which no hosted run has executed. It is a planning allowance of
+ *     twice the local Linux clang wall plus setup; see
+ *     *docs/evidence/regexp-literal-exhaustive/README.md*.
  *
  *  -  Three entries are marked `derived`, the `reflect cases` shards that
  *     U38 introduced. CI has never run them, so they have no hosted
@@ -89,7 +101,13 @@ interface MacosJobCosts {
 /** Measured hosted medians used only for lane assignment. */
 export const macosJobCosts: MacosJobCosts = {
   "host C sanitizers (macOS, property)": 2452, // 18
-  "host C sanitizers (macOS, native)": 2337, // 18
+  // Planning allowance, not a hosted wall: twice the 873-second local Linux
+  // clang run plus setup; see docs/evidence/regexp-literal-exhaustive.
+  "host C sanitizers (macOS, property, regexp literals)": 1812, // derived
+  // Derived from the native progress logs of three hosted runs, not
+  // measured job walls; see docs/evidence/macos-sanitizer-split/README.md.
+  "host C sanitizers (macOS, native, 1/2)": 2014, // derived
+  "host C sanitizers (macOS, native, 2/2)": 1593, // derived
   "test262 (macos-aarch64, 12/12)": 2212, // 1
   "native support (macos-aarch64, 5/12)": 2063, // 1 hosted since b59ac914
   "test262 (macos-aarch64, 2/12)": 2054, // 4

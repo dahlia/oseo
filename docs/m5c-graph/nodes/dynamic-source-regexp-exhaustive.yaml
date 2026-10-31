@@ -1,0 +1,15 @@
+version: 1
+id: dynamic-source-regexp-exhaustive
+title: Exhaustive regexp literal domains
+delivers: >-
+  Reviews exactly the 4 DS-17 BMP literal paths the maintainer's 2026-11-01
+  answer approved for exhaustive coverage. Witnesses every code unit each
+  original loop selects, its exclusions and UnicodeIDContinue fallback,
+  through build-time literal grammar and native source checks, with a seed
+  block and measured shard weights. Also splits the macOS native sanitizer
+  job into required file shards. Scope and obligations are recorded in
+  docs/m5c-graph/dynamic-source-regexp-exhaustive.md.
+dependencies:
+  - unsupported-ownership-audit
+landed: false
+status: ready

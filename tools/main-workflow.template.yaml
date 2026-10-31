@@ -285,10 +285,10 @@ jobs:
           toolchain: host-cc
       # Each shard retains its own instrumentation preflight.
       - run: mise run test:sanitizer:self
+      # Node's positional shards, without the dedicated sanitizer files.
       - run: >-
-          mise run test:sanitizer:property:shard
-          --test-shard=${{ matrix.shard }}/3
-          tests/property/*.property.test.ts
+          mise run test:sanitizer:property:shared
+          --shard ${{ matrix.shard }}/3
       - if: failure() || cancelled()
         uses: actions/upload-artifact@v7
         with:
@@ -296,13 +296,45 @@ jobs:
           path: /tmp/oseo-native-*
           if-no-files-found: warn
 
+  # The dedicated sanitizer property files, left out of the shards above;
+  # see docs/evidence/regexp-literal-exhaustive/README.md. Every case keeps
+  # its ordinary budget and the lane's interrupt scale.
+  test_sanitizer_property_dedicated:
+    name: host C sanitizers (Linux, property, regexp literals)
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: jdx/mise-action@v4
+        with:
+          install: true
+      - uses: ./.github/actions/runtime-archive-cache
+        with:
+          toolchain: host-cc
+      - run: mise run test:sanitizer:self
+      - run: >-
+          mise run test:sanitizer:property:shard
+          tests/property/m5-regexp-literal-exhaustive.property.test.ts
+      - if: failure() || cancelled()
+        uses: actions/upload-artifact@v7
+        with:
+          name: host-cc-sanitizer-property-regexp-literals-failures
+          path: /tmp/oseo-native-*
+          if-no-files-found: warn
+
   test_sanitizer_macos:
-    name: host C sanitizers (macOS, ${{ matrix.suite }})
+    name: host C sanitizers (macOS, ${{ matrix.label }})
     runs-on: macos-15
-    # Each suite retains its own instrumentation preflight. About 36–44
-    # minutes for runtime/native and 29–35 for properties. Run 41191483370
-    # cancelled native at 75.5 minutes on commit 216503f8 and passed its
-    # rerun at 58.9, so native gets 90 and property keeps 75; see
+    # Each job retains its own instrumentation preflight. The native suite
+    # runs as two file shards, with the unsharded runtime fixtures on the
+    # first; see docs/evidence/macos-sanitizer-split/README.md. The listed
+    # dedicated property files run in their own job; see
+    # docs/evidence/regexp-literal-exhaustive/README.md. Run 41191483370
+    # cancelled the unsplit native suite at 75.5 minutes on commit 216503f8
+    # and passed its rerun at 58.9, so each native shard keeps the 90
+    # minutes that suite had and the property jobs keep 75; see
     # docs/sanitizer-activity.md. Each leaves room for setup, cold caches,
     # and slower runner images.
     timeout-minutes: ${{ matrix.timeout }}
@@ -311,8 +343,26 @@ jobs:
       matrix:
         include:
           - suite: native
+            label: native, 1/2
+            part: native-1-of-2
+            runtime: 1
+            shard: 1
+            timeout: 90
+          - suite: native
+            label: native, 2/2
+            part: native-2-of-2
+            runtime: 0
+            shard: 2
             timeout: 90
           - suite: property
+            label: property
+            part: property
+            runtime: 0
+            timeout: 75
+          - suite: property
+            label: property, regexp literals
+            part: property-regexp-literals
+            runtime: 0
             timeout: 75
     env:
       OSEO_HOST_CC: clang
@@ -332,25 +382,35 @@ jobs:
         env:
           TMPDIR: ${{ runner.temp }}
       # No GCC verification: macOS gcc is an Apple Clang alias.
-      - if: matrix.suite == 'native'
+      - if: matrix.runtime == 1
         run: mise run test:sanitizer:runtime
         env:
           TMPDIR: ${{ runner.temp }}
       - if: matrix.suite == 'native'
-        run: mise run test:sanitizer:native
+        run: >-
+          mise run test:sanitizer:native
+          --shard ${{ matrix.shard }}/2
         env:
           TMPDIR: ${{ runner.temp }}
-      - if: matrix.suite == 'property'
-        run: mise run test:sanitizer:property
+      - if: matrix.part == 'property'
+        run: mise run test:sanitizer:property:shared
         env:
           # Four workers share three CPUs. Double Linux's interrupt allowance,
           # retaining every ordinary case and seed; interruptions still fail.
           OSEO_PROPERTY_TIME_SCALE: "6"
           TMPDIR: ${{ runner.temp }}
+      - if: matrix.part == 'property-regexp-literals'
+        run: >-
+          mise run test:sanitizer:property:shard
+          tests/property/m5-regexp-literal-exhaustive.property.test.ts
+        env:
+          # The same allowance as the shared property job on this runner.
+          OSEO_PROPERTY_TIME_SCALE: "6"
+          TMPDIR: ${{ runner.temp }}
       - if: failure() || cancelled()
         uses: actions/upload-artifact@v7
         with:
-          name: host-cc-sanitizer-macos-${{ matrix.suite }}-failures
+          name: host-cc-sanitizer-macos-${{ matrix.part }}-failures
           path: ${{ runner.temp }}/oseo-native-*
           if-no-files-found: warn
 
@@ -764,6 +824,8 @@ jobs:
     needs:
       - test_native
       - test_sanitizer_property
+      - test_sanitizer_property_dedicated
+      - test_sanitizer_macos
       - test_native_support
       - test_property_case
       - test_reflect_case

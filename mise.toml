@@ -391,6 +391,15 @@ env.OSEO_NATIVE_TOOLCHAIN = "host-cc"
 env.OSEO_PROPERTY_TIME_SCALE = """
 {{ get_env(name='OSEO_PROPERTY_TIME_SCALE', default='3') }}"""
 
+[tasks."test:sanitizer:property:shared"]
+description = "Run sanitizer property files without dedicated files"
+depends = ["build"]
+raw_args = true
+run = "node tools/run-sanitizer-property-shard.ts"
+env.OSEO_NATIVE_TOOLCHAIN = "host-cc"
+env.OSEO_PROPERTY_TIME_SCALE = """
+{{ get_env(name='OSEO_PROPERTY_TIME_SCALE', default='3') }}"""
+
 [tasks."test:sanitizer:test262"]
 description = "Measure a bounded test262 shard under host ASan and UBSan"
 depends = ["build"]
@@ -417,7 +426,8 @@ run = "node tools/generate-macos-lanes.ts"
 description = "Check generated macOS CI lanes and preserved jobs"
 run = """
 node tools/generate-macos-lanes.ts --check
-node --test tests/macos-lanes.test.ts tests/node-shard.test.ts
+node --test tests/macos-lanes.test.ts tests/node-shard.test.ts \
+  tests/sanitizer-property-shard.test.ts
 """
 
 [tasks."check:selfhosted-mac-shell"]

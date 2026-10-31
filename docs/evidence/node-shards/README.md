@@ -142,10 +142,16 @@ about 47 minutes is the hosted Node, Deno, and Array work divided by three.
 *tools/macos-job-costs.ts* records the six walls as derived entries until
 CI measures them.
 
-The same runs observed the two macOS sanitizer jobs at medians of 2,823
-seconds for `property` and 3,377 for `native`, against checked-in entries
-of 2,452 and 2,337. This change leaves those entries alone because the
-`dynamic-source-regexp-exhaustive` lane splits that family.
+These maxima predate the merge of the `dynamic-source-regexp-exhaustive`
+lane, which splits the macOS native sanitizer job in two and chains a
+dedicated RegExp literal sanitizer job on the property sanitizer lane. With
+both changes the property sanitizer lane, at 4,264 seconds, sets the run
+maximum, and the three Node lanes model at 45.8 to 47.5 minutes.
+
+The same runs observed the macOS `property` sanitizer job at a median of
+2,823 seconds, against a checked-in entry of 2,452, and the unsplit
+`native` job at 3,377. Those entries belong to the sanitizer split and are
+not refreshed here.
 
 
 Coming files

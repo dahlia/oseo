@@ -37,8 +37,12 @@ owners:
       original source and observation digests and the annex-b-mixed-core
       native evidence. Their unsupported results are not counted as
       passes. Other Annex B observers, including the legacy accessor
-      lookups, keep their remediation owners."
-    paths: 5
+      lookups, keep their remediation owners. The maintainer decision of
+      2026-11-01 applies the same rule to S7.8.5_A1.4_T2 and
+      S7.8.5_A2.4_T2, which observe the eval rejection: the exhaustive
+      literal property witnesses every core subject, and only the U+200C
+      and U+200D identity escapes need Annex B; 7 paths."
+    paths: 7
   adr:0016-dynamic-source-boundary:
     note: "ADR 0016 excludes \"`eval` in call position, the `Function`
       constructor, `new Function`, and every constructor that compiles
@@ -187,8 +191,12 @@ owners:
       umbrella-residual decision, item 1, with finite literal host
       Scripts that replace only each original's eval calls;
       dynamic-source-host-script-evidence.md lists each mapping and the
-      55 kept paths with exact reasons."
-    paths: 1616
+      55 kept paths with exact reasons. Dynamic-source-regexp-exhaustive
+      accounts for S7.8.5_A1.1_T2 and S7.8.5_A2.1_T2 under the
+      2026-10-28 item 1 rule: its exhaustive literal property witnesses
+      every selected code unit at build time and natively, and only eval
+      of the literal text remains."
+    paths: 1618
   adr:0028-legacy-function-caller-boundary:
     note: ADR 0028 authorizes "an M5 exclusion of the expectation that
       reading the `caller` property of a non-strict ordinary function
@@ -346,8 +354,11 @@ owners:
       all original subjects as active remediation under the source-bound
       audit rows. No exclusion or change to ADR 0016 or ADR 0019 is
       claimed; see docs/m5c-graph/observation-batch-26a.md,
-      observation-batch-26b.md and observation-batch-27.md."
-    paths: 264
+      observation-batch-26b.md and observation-batch-27.md.
+      Dynamic-source-regexp-exhaustive moves the four DS-17 exhaustive
+      BMP literal paths out: two to ADR 0016 and two escaped ones, whose
+      ZWNJ and ZWJ assertions only Annex B meets, to ADR 0013."
+    paths: 260
   observation:
     note: Closed by a reviewed pass or expected negative in the manifest.
       The owner changes only when a regenerated manifest changes the
@@ -31096,7 +31107,7 @@ paths:
   test/language/literals/regexp/7.8.5-1gs.js: [pass, observation]
   test/language/literals/regexp/7.8.5-2gs.js: [pass, observation]
   test/language/literals/regexp/S7.8.5_A1.1_T1.js: [pass, observation]
-  test/language/literals/regexp/S7.8.5_A1.1_T2.js: [unsupported-profile-feature, node:dynamic-source-coverage-remediation, [control-flow, dynamic-source, expression-operators, functions, object-properties, regular-expressions, var-bindings]]
+  test/language/literals/regexp/S7.8.5_A1.1_T2.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [control-flow, dynamic-source, expression-operators, functions, object-properties, regular-expressions, var-bindings]]
   test/language/literals/regexp/S7.8.5_A1.2_T1.js: [expected-negative, observation]
   test/language/literals/regexp/S7.8.5_A1.2_T2.js: [expected-negative, observation]
   test/language/literals/regexp/S7.8.5_A1.2_T3.js: [expected-negative, observation]
@@ -31108,7 +31119,7 @@ paths:
   test/language/literals/regexp/S7.8.5_A1.3_T5.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [abrupt-completion, control-flow, dynamic-source, error-intrinsics, expression-operators, functions, lexical-grammar, object-properties, regular-expressions, symbols]]
   test/language/literals/regexp/S7.8.5_A1.3_T6.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [abrupt-completion, control-flow, dynamic-source, error-intrinsics, expression-operators, functions, lexical-grammar, object-properties, regular-expressions, symbols]]
   test/language/literals/regexp/S7.8.5_A1.4_T1.js: [pass, observation]
-  test/language/literals/regexp/S7.8.5_A1.4_T2.js: [unsupported-profile-feature, node:dynamic-source-coverage-remediation, [abrupt-completion, control-flow, dynamic-source, error-intrinsics, expression-operators, functions, object-properties, regular-expressions, symbols, var-bindings]]
+  test/language/literals/regexp/S7.8.5_A1.4_T2.js: [unsupported-profile-feature, adr:0013-m5-edition-and-manifest, [abrupt-completion, control-flow, dynamic-source, error-intrinsics, expression-operators, functions, object-properties, regular-expressions, symbols, var-bindings]]
   test/language/literals/regexp/S7.8.5_A1.5_T1.js: [expected-negative, observation]
   test/language/literals/regexp/S7.8.5_A1.5_T2.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [abrupt-completion, control-flow, dynamic-source, error-intrinsics, expression-operators, functions, lexical-grammar, object-properties, regular-expressions, symbols]]
   test/language/literals/regexp/S7.8.5_A1.5_T3.js: [expected-negative, observation]
@@ -31116,7 +31127,7 @@ paths:
   test/language/literals/regexp/S7.8.5_A1.5_T5.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [abrupt-completion, control-flow, dynamic-source, error-intrinsics, expression-operators, functions, lexical-grammar, object-properties, regular-expressions, symbols]]
   test/language/literals/regexp/S7.8.5_A1.5_T6.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [abrupt-completion, control-flow, dynamic-source, error-intrinsics, expression-operators, functions, lexical-grammar, object-properties, regular-expressions, symbols]]
   test/language/literals/regexp/S7.8.5_A2.1_T1.js: [pass, observation]
-  test/language/literals/regexp/S7.8.5_A2.1_T2.js: [unsupported-profile-feature, node:dynamic-source-coverage-remediation, [control-flow, dynamic-source, expression-operators, functions, object-properties, regular-expressions, var-bindings]]
+  test/language/literals/regexp/S7.8.5_A2.1_T2.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [control-flow, dynamic-source, expression-operators, functions, object-properties, regular-expressions, var-bindings]]
   test/language/literals/regexp/S7.8.5_A2.2_T1.js: [expected-negative, observation]
   test/language/literals/regexp/S7.8.5_A2.2_T2.js: [expected-negative, observation]
   test/language/literals/regexp/S7.8.5_A2.3_T1.js: [expected-negative, observation]
@@ -31126,7 +31137,7 @@ paths:
   test/language/literals/regexp/S7.8.5_A2.3_T5.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [abrupt-completion, control-flow, dynamic-source, error-intrinsics, expression-operators, functions, lexical-grammar, object-properties, regular-expressions, symbols]]
   test/language/literals/regexp/S7.8.5_A2.3_T6.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [abrupt-completion, control-flow, dynamic-source, error-intrinsics, expression-operators, functions, lexical-grammar, object-properties, regular-expressions, symbols]]
   test/language/literals/regexp/S7.8.5_A2.4_T1.js: [pass, observation]
-  test/language/literals/regexp/S7.8.5_A2.4_T2.js: [unsupported-profile-feature, node:dynamic-source-coverage-remediation, [abrupt-completion, control-flow, dynamic-source, error-intrinsics, expression-operators, functions, object-properties, regular-expressions, symbols, var-bindings]]
+  test/language/literals/regexp/S7.8.5_A2.4_T2.js: [unsupported-profile-feature, adr:0013-m5-edition-and-manifest, [abrupt-completion, control-flow, dynamic-source, error-intrinsics, expression-operators, functions, object-properties, regular-expressions, symbols, var-bindings]]
   test/language/literals/regexp/S7.8.5_A2.5_T1.js: [expected-negative, observation]
   test/language/literals/regexp/S7.8.5_A2.5_T2.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [abrupt-completion, control-flow, dynamic-source, error-intrinsics, expression-operators, functions, lexical-grammar, object-properties, regular-expressions, symbols]]
   test/language/literals/regexp/S7.8.5_A2.5_T3.js: [expected-negative, observation]

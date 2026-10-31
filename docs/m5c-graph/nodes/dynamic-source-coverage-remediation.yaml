@@ -323,6 +323,7 @@ dependencies:
   - dynamic-source-private-binding-family
   - dynamic-source-realm-host-evidence
   - dynamic-source-realm-string-family
+  - dynamic-source-regexp-exhaustive
   - dynamic-source-regexp-static-evidence
   - dynamic-source-residual-evidence
   - dynamic-source-static-core-evidence
