@@ -68,3 +68,65 @@ unavailable. Preserve ADR 0016/0019 reopening triggers; an accepted ADR 0016
 amendment admitting dynamic import reopens ImportCall accounting. Each child
 requires normal D1/D11 review and D3/D4 publication. This metadata change
 performs none of those closure or landing steps.
+
+
+DS-14 evidence delta
+--------------------
+
+At base `362ddb13d933600f6a0543ac332eb8479be9053f`, the pinned selector
+matches 66 unsupported umbrella paths exactly. The
+[*per-path assessment*](./dynamic-source-callable-object-assessment.md)
+names every subject, static witness and residual. This node adds 18 fixed
+static/native groups: 16 supply complete non-source observations and two
+supply partial evidence. Their focused integration runner checks Node.js,
+Deno, both native specialization policies, positive forced-collection
+counts and static MIR structure. All 36 focused registrations passed on
+Linux AMD64; all 18 strengthened structural checks passed afterwards.
+
+The proposed delta is 61 paths accounted under
+`adr:0016-dynamic-source-boundary` and five retained with the umbrella.
+The five are *Function/instance-name.js* and the four selected
+*class/subclass/builtin-objects/Function/* paths. Static name descriptors
+and a missing-super ReferenceError are observed, but they do not prove
+CreateDynamicFunction naming or successful Function-subclass allocation.
+These gaps need faithful evidence or a bounded maintainer decision. No
+unrelated built-in subclass stands in for them.
+
+The audit names the replacement groups and binds their fixture, focused
+runner, native registration and assessment by SHA256. Every selected source
+and normalized observation digest was recomputed. The 61 exclusions keep
+all original assertions and the unsupported-profile-feature classification;
+no result becomes a pass. All 41,091 inventory paths remain. ADR 0013/0016/
+0019, dependency tags, subset and results are unchanged, so no UPDATE is
+needed. Changed source, observation or replacement evidence requires a fresh
+assessment. ADR 0016's reopening triggers and ADR 0019's non-source
+normative-dependence trigger remain in force.
+
+This note records only DS-14's delta. Root owns shared umbrella totals,
+outer review, full exact-candidate CI, UPDATE scheduling, publication,
+landing, merge and push. The full ordinary and extended property suites on
+both supported native hosts remain required by PLAN-M5C.md before landing;
+this worker ran no full suite. Internal review artifacts and exact commit
+IDs are supplied in the worker report.
+
+The dependency-tag self-audit leaves every row's tags untouched under the
+2026-10-29 rules: the source-construction prerequisite remains present,
+and no new tag is inferred from the witness harness. The fixed prelude
+also exercises a truthful numeric hint and a false string hint; enabled
+native runs require both a guard hit and a miss into generic addition.
+
+Internal review pass 1 found two missing observations. The apply/call
+argument groups now include strict wrappers that explicitly observe
+`this === undefined` before passing that receiver to the same sloppy
+target. Both strict and non-strict upstream wrapper variants are covered.
+The ordinary-call group deletes and checks the global `y` before each
+independent call, so a prior write cannot mask a missing receiver write.
+The ledger note also distinguishes the 16 complete groups from the two
+partial groups. Counts and dispositions do not change.
+
+Outer pass 1 identified two missing global identifier observations. After
+each independent ordinary call, the witness now checks `y` strictly against
+2 before checking `globalThis.y`. This exercises identifier resolution as
+well as the receiver property write. Auditing all 66 pinned tests found no
+other identifier/property substitution; the per-path table records the
+distinction. Replacement digests were refreshed for the revised evidence.
