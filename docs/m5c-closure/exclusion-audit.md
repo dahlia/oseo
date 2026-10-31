@@ -100,27 +100,34 @@ A different diagnostic code, accessor name, or message is outside this
 bounded addition. Ordinary properties named `__proto__`, null prototype
 objects, and proxy traps are not Annex B accessors.
 
-The mixed TypedArray assessment originally named
-`remediationOwner: node:typed-array-proto-coverage-remediation` with
-`disposition: remediation` and `normativeDependency: not-demonstrated`, because
-ADR 0013 authorized the accessor rejection without excluding the whole path.
-The RegExp split and ordinary-object assessments named their remediation owners
-the same way. The checker accepted only those three bounded Annex B owners and
-required each ledger owner to have a reviewed assessment. The mixed-coverage
-section below records the later closure of all five assessments.
+The mixed assessment names
+`remediationOwner: node:typed-array-proto-coverage-remediation` and keeps
+`disposition: remediation` with `normativeDependency: not-demonstrated`.
+ADR 0013 authorizes the accessor rejection, not exclusion of the whole path.
+The RegExp split assessment separately names its existing remediation owner.
+The `annex-b-ordinary-object-prototype` assessment names
+`node:ordinary-object-proto-coverage-remediation` for
+*test/language/types/object/S8.6.2\_A8.js* with the same disposition and
+normative dependency. The checker accepts only these three bounded Annex B
+owners and requires each ledger owner to have a reviewed assessment.
 
-The `typed-array-buffer-without-species-core` fixture in
-*../../tests/native/fixtures/typed-array-constructors.ts* preserves the
+The new assessment binds the replacement source digest in
+`replacementEvidence`. The `typed-array-buffer-without-species-core` fixture
+in *../../tests/native/fixtures/typed-array-constructors.ts* preserves the
 original subclass, throwing constructor and species getter, TypedArray clone,
 and fresh-buffer prototype and constructor assertions. It observes the
 prototype through `Object.getPrototypeOf` instead of the excluded accessor
 and retains the original upstream path unchanged. Existing constructor
 properties supply generated constructor, clone, and buffer coverage.
+Replacement evidence supports the core contract; assigning an exclusion still
+requires the remediation node's maintainer accounting decision.
 
-The checker requires reviewed replacement evidence for every assessment that
-binds `replacementEvidence`. The ordinary-object assessment now binds the
-`annex-b-core-ordinary-object-set-prototype` fixture below, which covers every
-core subject of *S8.6.2\_A8.js*.
+The ordinary-object assessment now binds the
+`annex-b-core-ordinary-object-set-prototype` fixture, which witnesses every
+core subject of *S8.6.2\_A8.js*. Replacement coverage is not an accounting
+decision: item 3 of the 2026-10-28 maintainer decision names three other mixed
+Annex B nodes, so this path keeps its remediation owner until an applicable
+decision extends that rule.
 
 
 Dynamic import attributes and JSON identity
@@ -285,7 +292,7 @@ Annex B mixed-coverage closures
 
 Item 3 of the 2026-10-28 maintainer decision closes a mixed Annex B path
 under ADR 0013 only when reviewed replacement observations cover every core
-subject and a fresh-digest record names them. Five paths now meet that
+subject and a fresh-digest record names them. Four paths now meet that
 condition, and their assessments change to `disposition: exclusion` with
 `normativeDependency: annex-b-only`:
 
@@ -295,27 +302,30 @@ condition, and their assessments change to `disposition: exclusion` with
     *TypedArray/prototype/resizable-and-fixed-have-same-prototype.js*;
  -  `annex-b-out-of-bounds-prototype-setup`:
     *TypedArray/out-of-bounds-behaves-like-detached.js*;
- -  `annex-b-pattern`: *String/prototype/split/separator-regexp.js*;
- -  `annex-b-ordinary-object-prototype`:
-    *language/types/object/S8.6.2\_A8.js*.
+ -  `annex-b-pattern`: *String/prototype/split/separator-regexp.js*.
 
 The first three keep the `Object.prototype.__proto__` rejection above; the
-fourth keeps the named backreference rejection, and the fifth keeps the
-`__proto__` write on a non-extensible ordinary object. Each assessment binds
+fourth keeps the named backreference rejection. Each assessment binds
 *../../tests/native/fixtures/annex-b-mixed-core.ts* and
 *../../tests/annex-b-mixed-core-native.test.ts*. Those files check each core
 subject's value and type in the program, prove the comparator rejects
 near-miss values through an independent count, and run natively under both
-specialization policies with forced collection. The fifth replaces the
-accessor write with `Object.setPrototypeOf` and `Reflect.setPrototypeOf`,
-which reach the same OrdinarySetPrototypeOf refusal in core. The ledger moves
-the five paths to `adr:0013-m5-edition-and-manifest`. The earlier print-based
-replacement fixtures above stay but no longer close these paths. The three
+specialization policies with forced collection. The ledger moves the four
+paths to `adr:0013-m5-edition-and-manifest`. The earlier print-based
+replacement fixtures above stay but no longer close these paths. The two
 remediation nodes then own no path, and the paragraphs above that keep
 remediation for these paths describe the earlier state. The legacy accessor
 lookups and every other Annex B observer keep their owners. The per-path
 assertion tables are in
-[typed-array-proto-coverage-remediation.md](../m5c-graph/typed-array-proto-coverage-remediation.md),
-[regexp-split-coverage-remediation.md](../m5c-graph/regexp-split-coverage-remediation.md)
+[typed-array-proto-coverage-remediation.md](../m5c-graph/typed-array-proto-coverage-remediation.md)
 and
+[regexp-split-coverage-remediation.md](../m5c-graph/regexp-split-coverage-remediation.md).
+
+The fifth fixture in those files,
+`annex-b-core-ordinary-object-set-prototype`, covers every core subject of
+*S8.6.2\_A8.js*. It does not close that path, because item 3 of the decision
+names only the three earlier nodes. The `annex-b-ordinary-object-prototype`
+assessment keeps `disposition: remediation` and its
+`node:ordinary-object-proto-coverage-remediation` owner until an applicable
+maintainer accounting decision extends the rule. Its per-assertion table is in
 [ordinary-object-proto-coverage-remediation.md](../m5c-graph/ordinary-object-proto-coverage-remediation.md).

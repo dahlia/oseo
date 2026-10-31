@@ -92,16 +92,14 @@ stay unchanged.
 Observation-batch-28 admits *test/language/types/object/S8.6.2\_A8.js*, whose
 `__proto__` write on a non-extensible ordinary object is rejected at compile
 time with this `OSEO1001` accessor diagnostic in every variant. Its unsupported
-observation became an ADR 0013 exclusion under the 2026-10-28 maintainer
-decision, item 3, once the strict
-`annex-b-core-ordinary-object-set-prototype` evidence covered every core
-subject; the
-[closure note](./m5c-graph/ordinary-object-proto-coverage-remediation.md)
-records it. It is not counted as a pass. The fixture keeps
-`Object.preventExtensions`, the attempted prototype change, and the assertion
-that `Object.getPrototypeOf` still returns `Object.prototype`, reaching the
-same OrdinarySetPrototypeOf refusal through `Object.setPrototypeOf` and
-`Reflect.setPrototypeOf` instead of the excluded accessor.
+observation is owned by `node:ordinary-object-proto-coverage-remediation`. The
+asserted core contract, that the object keeps `Object.prototype` as its
+`[[Prototype]]`, does not require Annex B. The
+`annex-b-core-ordinary-object-set-prototype` fixture now witnesses every core
+subject through `Object.setPrototypeOf` and `Reflect.setPrototypeOf`, but
+closing the path still needs an applicable maintainer accounting decision; the
+[work note](./m5c-graph/ordinary-object-proto-coverage-remediation.md) records
+the per-assertion table and evidence.
 
 Runtime ABI `oseo-runtime-m5-134` added the write half of that historical
 boundary. A `[[Set]]` of `"__proto__"` whose walk reached an intrinsic
