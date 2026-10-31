@@ -18,6 +18,7 @@ import {
   type ConvertOptions,
   type ParserError,
 } from "./babel.ts";
+import { classStaticKeywordDiagnostics } from "./class-static-keyword.ts";
 import {
   classExpression,
   expression,
@@ -483,6 +484,18 @@ export function convertModule(
       diagnostics: parserErrors.map((error) =>
         diagnosticAt(input, locations, errorOffset(error)),
       ),
+      parsed: false,
+      sourceId: input.sourceId,
+    };
+  }
+  const staticKeywordErrors = classStaticKeywordDiagnostics(
+    input,
+    locations,
+    file,
+  );
+  if (staticKeywordErrors.length > 0) {
+    return {
+      diagnostics: staticKeywordErrors,
       parsed: false,
       sourceId: input.sourceId,
     };

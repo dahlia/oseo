@@ -5,7 +5,7 @@
 # or a split of one batch that PLAN-M5C.md records.
 version: 1
 suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
-unreviewedPaths: 6738
+unreviewedPaths: 6737
 basis:
   supportedFeatures:
     - AggregateError
@@ -170,14 +170,14 @@ regeneration:
   finalExecutedVariants: 137314
   finalSeconds: 7544
   plan:
-    batches: 13
+    batches: 12
     largestPaths: 794
     largestReviewUnits: 500
     limits:
       paths: 3000
       reviewUnits: 500
-    scheduleHours: 25.69
-    fullUpdateScheduleHours: 50.66
+    scheduleHours: 23.75
+    fullUpdateScheduleHours: 46.79
   alternatives:
     - batches: 12
       largestPaths: 1920
@@ -196,7 +196,7 @@ regeneration:
       scheduleHours: 12.33
       fullUpdateScheduleHours: 23.95
     - batches: 3
-      largestPaths: 3628
+      largestPaths: 3627
       largestReviewUnits: 1144
       limits:
         paths: 8000
@@ -508,33 +508,6 @@ batches:
     regeneration:
       executableVariants: 2150
       scopedUpdateSeconds: 118
-      fullCorpusSeconds: 6965
-  - id: observation-batch-23
-    selector:
-      prerequisiteSets:
-        - ""
-      prefixes:
-        - test/language/statements/class/syntax/
-    dependsOn:
-      - observation-batch-plan
-    paths: 1
-    reviewUnits: 1
-    generatedPaths: 0
-    prerequisites: {}
-    dynamicSource: {}
-    flags: {}
-    includes: {}
-    features: {}
-    negatives:
-      parse: 1
-    partitions:
-      groups:
-        - language/statements
-      files: 1
-      newFiles: 0
-    regeneration:
-      executableVariants: 0
-      scopedUpdateSeconds: 0
       fullCorpusSeconds: 6965
   - id: observation-batch-24
     selector:

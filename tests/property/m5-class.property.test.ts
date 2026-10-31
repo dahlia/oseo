@@ -22,6 +22,7 @@ import {
 import { nativeToolchain } from "../native-toolchain.ts";
 const { privateNameLifetimeSource } =
   await import("../native/fixtures/class-private-name-lifetimes.ts");
+import { isString } from "../../tools/value-kinds.ts";
 
 const { assertAsyncProperty } = await import(
   ["../../packages/testkit/tests/", "property-support.ts"].join("")
@@ -723,7 +724,14 @@ function expected(testCase: ClassCase): string {
   return `${lines.join("\n")}\n`;
 }
 
-async function references(source: string): Promise<
+interface ClassReferenceOptions {
+  readonly globalScriptReference?: true;
+}
+
+async function references(
+  source: string,
+  options: ClassReferenceOptions = {},
+): Promise<
   readonly [
     {
       readonly exitStatus: number;
@@ -741,7 +749,14 @@ async function references(source: string): Promise<
   const sourcePath = `${directory}/case.ts`;
   let succeeded = false;
   try {
-    await host.writeTextFile(sourcePath, source);
+    // Loader parsers reject some valid escaped static ASI fields. Only
+    // this opt-in JavaScript domain uses the engines' Script parser;
+    // the existing typed domains keep their original TypeScript input.
+    const referenceSource =
+      options.globalScriptReference === true
+        ? `(0, eval)(${JSON.stringify(source)});\n`
+        : source;
+    await host.writeTextFile(sourcePath, referenceSource);
     const observations = [
       await host.run({
         args: [sourcePath],
@@ -2048,6 +2063,119 @@ Object.defineProperty(Array.prototype, Symbol.iterator, descriptor);
         seed: 0x6000_0b04,
         sizeLimit: "five arguments, integers from -20 to 20, two subclasses",
         timeLimitMilliseconds: 120_000,
+      },
+    );
+  },
+);
+
+test(
+  "generated escaped static ASI fields keep instance placement",
+  { skip: nativeTarget == null ? "requires a supported native host" : false },
+  async () => {
+    await assertAsyncProperty(
+      "escaped static fields split from the following member at ASI",
+      fc.asyncProperty(
+        fc.record({
+          braced: fc.boolean(),
+          expression: fc.boolean(),
+          hinted: fc.boolean(),
+          letter: fc.integer({ min: 0, max: 5 }),
+          staticMethod: fc.boolean(),
+          trivia: fc.constantFrom(
+            "\n",
+            "\r\n",
+            "/*\n*/",
+            "//static\n",
+            "\u2028",
+            "\u2029",
+          ),
+          value: fc.oneof(
+            fc.integer({ min: -10, max: 10 }),
+            fc.constantFrom("text", "", 0.5),
+          ),
+        }),
+        async (testCase) => {
+          const hex = "static".charCodeAt(testCase.letter).toString(16);
+          const escape = testCase.braced ? `\\u{${hex}}` : `\\u00${hex}`;
+          const spelling =
+            "static".slice(0, testCase.letter) +
+            escape +
+            "static".slice(testCase.letter + 1);
+          const form = testCase.expression ? "const C = class" : "class C";
+          const modifier = testCase.staticMethod ? "static " : "";
+          const hint = testCase.hinted ? "/** @param {number} value */\n" : "";
+          const receiver = testCase.staticMethod ? "C" : "instance";
+          const source = `${form} {
+  ${spelling}${testCase.trivia}${hint}${modifier}read(value) {
+    return value + 1;
+  }
+};
+const instance = new C();
+console.log(Object.hasOwn(instance, "static"), instance.static,
+  Object.hasOwn(C, "static"), typeof C.read, typeof instance.read,
+  ${receiver}.read(${JSON.stringify(testCase.value)}));
+`;
+          const output = isString(testCase.value)
+            ? testCase.value + "1"
+            : testCase.value + 1;
+          const roles = testCase.staticMethod
+            ? "function undefined"
+            : "undefined function";
+          const expectedObservation = {
+            exitStatus: 0,
+            stderr: "",
+            stdout: `true undefined false ${roles} ${output}\n`,
+          };
+          assertMatchingObservations([
+            expectedObservation,
+            ...(await references(source, { globalScriptReference: true })),
+          ]);
+          for (const specialization of ["disabled", "enabled"] as const) {
+            const compiled = compileSource(
+              babelFrontend,
+              { source, sourceId: "generated-static-asi.ts" },
+              { specialization, observeSpecialization: true },
+            );
+            assert.deepEqual(compiled.diagnostics, [], source);
+            assert.ok(compiled.mir);
+            process.env.OSEO_GC_EVERY_SAFEPOINT = "1";
+            try {
+              await withNativeFixture(
+                {
+                  backend: cBackend,
+                  host,
+                  input: compiled.mir,
+                  operation: "execute",
+                  runtime: cRuntimeProvider,
+                  target: nativeTarget ?? describeTarget("linux-x86_64-gnu"),
+                  toolchain: nativeToolchain,
+                },
+                (native) => {
+                  assertMatchingObservations([expectedObservation, native]);
+                  assert.ok((native.counters?.collections ?? 0) > 0);
+                },
+              );
+            } finally {
+              delete process.env.OSEO_GC_EVERY_SAFEPOINT;
+            }
+          }
+        },
+      ),
+      {
+        context: [`target=${nativeTarget?.name ?? "unsupported"}`],
+        domain:
+          "escaped letters in static field names followed by each " +
+          "line terminator or a comment containing one, declarations and " +
+          "expressions, instance and static methods, with optional numeric " +
+          "hints and number/string operands compared with an independent " +
+          "placement/addition model, Node.js and Deno",
+        numRuns: 8,
+        profile: "M5 classes with escaped static ASI fields",
+        seed: 0x6000_0b05,
+        sizeLimit:
+          "one field, one method, six escape positions, and bounded " +
+          "numbers/strings; shrinking preserves the field/member split",
+        timeLimitMilliseconds: 180_000,
       },
     );
   },

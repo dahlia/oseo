@@ -40,4 +40,5 @@ evidence:
   structural:
     status: covered
     references:
+      - packages/parser-babel/tests/class-static-keyword.test.ts
       - packages/parser-babel/tests/basics.test.ts

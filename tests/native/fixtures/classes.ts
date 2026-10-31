@@ -4768,4 +4768,39 @@ console.log(Hinted.bump(140737488355327, 1), Plain.bump(140737488355327, 1));
       overflowMisses: 1,
     },
   },
+  {
+    name: "class-static-keyword-asi",
+    globalScriptReference: true,
+    source: String.raw`
+// An escaped name followed by a line terminator is an instance field,
+// even when the next member is a method or another literal static member.
+class EscapedAsi {
+  st\u0061tic
+  /** @param {number} value */
+  read(value) { return value + 1; }
+}
+class PlainAsi {
+  static;
+  read(value) { return value + 1; }
+}
+const escapedAsi = new EscapedAsi();
+const plainAsi = new PlainAsi();
+console.log(
+  "escaped ASI", Object.hasOwn(escapedAsi, "static"),
+  escapedAsi.static, Object.hasOwn(EscapedAsi, "static"),
+  typeof EscapedAsi.read, escapedAsi.read(2), plainAsi.read(2),
+  escapedAsi.read("two"), plainAsi.read("two"),
+  escapedAsi.read(0.5), plainAsi.read(0.5),
+);
+const CommentAsi = class {
+  st\u{000061}tic/*
+*/static read() { return "constructor"; }
+};
+const commentAsi = new CommentAsi();
+console.log(
+  "comment ASI", Object.hasOwn(commentAsi, "static"),
+  commentAsi.static, CommentAsi.read(), typeof commentAsi.read,
+);
+`,
+  },
 ];

@@ -1527,6 +1527,7 @@ for (const fixture of selectedFixtures) {
     fixture.name === "class-optional-private-methods" ||
     fixture.name === "class-static-private-methods" ||
     fixture.name === "class-private-updates" ||
+    fixture.name === "class-static-keyword-asi" ||
     fixture.name === "class-static-fields" ||
     fixture.name === "class-static-field-order" ||
     fixture.name === "class-static-private-fields" ||
@@ -1683,6 +1684,7 @@ for (const fixture of selectedFixtures) {
           assert(native.counters != null, `${fixture.name}: counters`);
           assert(native.emittedC.includes("OseoResult"), "generic call ABI");
           if (
+            fixture.name === "class-static-keyword-asi" ||
             fixture.name === "iterator-next-callability" ||
             fixture.name === "proper-tail-calls" ||
             fixture.name === "global-eval-tail-calls"

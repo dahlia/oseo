@@ -23464,7 +23464,7 @@ partitions:
     path: results/language/white-space/f9.yaml
 suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
 summary:
-  expectedNegatives: 3627
+  expectedNegatives: 3628
   harnessFailures: 0
   infrastructureFailures: 0
   passes: 29042
@@ -23521,7 +23521,7 @@ summary:
       semanticFailures: 0
       unsupportedProfileFeatures: 0
     - dependency: classes
-      expectedNegatives: 969
+      expectedNegatives: 970
       harnessFailures: 0
       infrastructureFailures: 0
       passes: 4347
@@ -23626,7 +23626,7 @@ summary:
       semanticFailures: 0
       unsupportedProfileFeatures: 418
     - dependency: lexical-grammar
-      expectedNegatives: 432
+      expectedNegatives: 433
       harnessFailures: 0
       infrastructureFailures: 0
       passes: 509
@@ -24369,7 +24369,7 @@ summary:
       semanticFailures: 0
       unsupportedProfileFeatures: 40
     - group: language/statements
-      expectedNegatives: 681
+      expectedNegatives: 682
       harnessFailures: 0
       infrastructureFailures: 0
       passes: 1660
