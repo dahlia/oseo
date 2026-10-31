@@ -110,7 +110,7 @@ The
 [independent-assertion audit](/data/m5c-d17-20261031/train-b/round2-investigation/independent-assertion-audit.json)
 reviews all 100 eval rejections and preserves the mixed static-setter case as
 remediation. Its final C.getWithEval.call(D) reads an absent method and throws
-TypeError before any eval. The existing dynamic-source node owns 885 paths,
+TypeError before any eval. The existing dynamic-source node owns 886 paths,
 including four additions from these batches. The original source, all
 assertions and the unsupported observation stay.
 
@@ -122,3 +122,16 @@ their grammar family. The full 1,859-source audit retained the computed boolean
 field-value update and numeric counters, and recorded its per-source
 dispositions in
 [marker and grammar audit](/data/m5c-d17-20261031/train-b/round3-investigation/marker-and-superproperty-audit.json).
+
+Internal review round 4 audited all 1,859 sources for asserted values
+from ordinary methods that discard an eval-created value. The
+[implicit-return audit](/data/m5c-d17-20261031/train-b/round4-investigation/implicit-return-audit.json)
+identifies one B22a mixed assertion: the public x method drops its private
+arrow call result, so the final undefined value is independent of that arrow
+new.target value. The
+[controlled source probes](/data/m5c-d17-20261031/train-b/round4-investigation/implicit-return-probe.json)
+confirm this distinction without changing the pinned source or native
+observation. That path remains in claim under active remediation; B21d and B22b
+ownership is unchanged. The node now owns 886 paths, including five from this
+train; 95 train paths retain the existing eval-semantics exclusion. No
+replacement evidence or ADR boundary change is claimed.

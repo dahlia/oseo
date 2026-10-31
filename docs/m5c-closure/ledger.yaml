@@ -83,11 +83,11 @@ owners:
       dynamic-source-module-semantics-assessment.yaml cover all
       non-source subjects; 584 paths. Only the import()
       source-evaluation site remains; an accepted ADR 0016 amendment
-      admitting any dynamic import reopens them. B22a adds 64 and B22b
+      admitting any dynamic import reopens them. B22a adds 63 and B22b
       adds 32 reviewed eval-source subjects under the existing
       eval-semantics assessment; the batch notes bind their source and
       assertion audit."
-    paths: 680
+    paths: 679
   adr:0028-legacy-function-caller-boundary:
     note: ADR 0028 authorizes "an M5 exclusion of the expectation that
       reading the `caller` property of a non-strict ordinary function
@@ -206,10 +206,12 @@ owners:
       B06/B08/B14 source-rejection paths (325/2/12); fresh source-bound
       audit rows retain active remediation; no whole-path exclusion or
       ADR boundary change is authorized. B22a adds one
-      fixture-construction rejection; B22b adds two fixture-construction
-      rejections and one mixed eval/ordinary-TypeError assertion. All
-      four retain active remediation."
-    paths: 885
+      fixture-construction rejection and one mixed
+      eval/ordinary-implicit-return assertion; B22b adds two
+      fixture-construction rejections and one mixed
+      eval/ordinary-TypeError assertion. All five retain active
+      remediation."
+    paths: 886
   node:module-top-level-await-patterns:
     note: "Observed OSEO1001: Await inside a module top-level binding or
       assignment pattern is unsupported. The dynamic-import observe-only
@@ -35211,7 +35213,7 @@ paths:
   test/language/statements/class/elements/arrow-body-private-derived-cls-indirect-eval-err-contains-supercall-2.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [abrupt-completion, classes, dynamic-source, error-intrinsics, expression-operators, functions]]
   test/language/statements/class/elements/arrow-body-private-derived-cls-indirect-eval-err-contains-supercall.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [abrupt-completion, classes, dynamic-source, error-intrinsics, expression-operators, functions]]
   test/language/statements/class/elements/arrow-body-private-direct-eval-err-contains-arguments.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [abrupt-completion, classes, dynamic-source, error-intrinsics, functions]]
-  test/language/statements/class/elements/arrow-body-private-direct-eval-err-contains-newtarget.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [classes, dynamic-source, functions, object-properties, var-bindings]]
+  test/language/statements/class/elements/arrow-body-private-direct-eval-err-contains-newtarget.js: [unsupported-profile-feature, node:dynamic-source-coverage-remediation, [classes, dynamic-source, functions, object-properties, var-bindings]]
   test/language/statements/class/elements/arrow-body-private-indirect-eval-err-contains-newtarget.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [abrupt-completion, classes, dynamic-source, error-intrinsics, expression-operators, functions]]
   test/language/statements/class/elements/arrow-fnc-init-err-contains-arguments.js: [expected-negative, observation]
   test/language/statements/class/elements/arrow-fnc-init-err-contains-super.js: [expected-negative, observation]

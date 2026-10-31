@@ -22,9 +22,11 @@ the base tree and shows byte preservation of every existing subset row.
 Classifications come from execution with empty tag inputs; materialization adds
 only the reviewed dependency tags through the canonical manifest serializer.
 
-Of the 65 unsupported paths, 64 eval-source subjects use the existing
-ADR 0016 eval-semantics exclusion assessment. Another 1 use eval as
-fixture construction and retain dynamic-source coverage remediation.
+Of the 65 unsupported paths, 63 eval-source subjects use the existing
+ADR 0016 eval-semantics exclusion assessment. One uses eval as fixture
+construction; another asserts an ordinary method implicit return
+independently of the evaluated arrow value. Both retain dynamic-source
+coverage remediation.
 The [owner assignments](/data/m5c-d17-20261031/train-b/owner-assignments.json)
 list every path. The
 [source audit](/data/m5c-d17-20261031/train-b/round2-investigation/independent-assertion-audit.json)
@@ -100,3 +102,16 @@ SuperProperty subjects gained `object-properties` as a grammar family, without
 claiming a runtime lookup. All 1,859 train sources were checked for these
 patterns; the source hashes and dispositions are in
 [marker and grammar audit](/data/m5c-d17-20261031/train-b/round3-investigation/marker-and-superproperty-audit.json).
+
+Internal review round 4 audited all 1,859 sources for asserted values
+from ordinary methods that discard an eval-created value. The
+[implicit-return audit](/data/m5c-d17-20261031/train-b/round4-investigation/implicit-return-audit.json)
+identifies one B22a mixed assertion: the public x method drops its private
+arrow call result, so the final undefined value is independent of that arrow
+new.target value. The
+[controlled source probes](/data/m5c-d17-20261031/train-b/round4-investigation/implicit-return-probe.json)
+confirm this distinction without changing the pinned source or native
+observation. That path remains in claim under active remediation; B21d and B22b
+ownership is unchanged. The node now owns 886 paths, including five from this
+train; 95 train paths retain the existing eval-semantics exclusion. No
+replacement evidence or ADR boundary change is claimed.

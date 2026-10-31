@@ -782,6 +782,17 @@ assessments:
       non-source assertion remains in claim, without replacement evidence
       or a maintainer accounting decision. Preserve the original source
       and unsupported observation under active coverage remediation.
+  class-declaration-arrow-return-mixed-assertion:
+    disposition: remediation
+    normativeDependency: not-demonstrated
+    reason: The eval-created arrow and its new.target value are source
+      subjects, but the final assertion checks the ordinary x method
+      implicit return. That method calls this.#x() without returning its
+      result, so c.x() is undefined independently of the evaluated arrow
+      value. Keep this independent non-source assertion in claim under
+      active coverage remediation without replacement evidence or a
+      maintainer accounting decision. Preserve the original source and
+      its unsupported observation without widening ADR 0016.
 paths:
   - path: test/built-ins/AggregateError/newtarget-proto-fallback.js
     proposedOwner: adr:0016-dynamic-source-boundary
@@ -20049,7 +20060,7 @@ paths:
     missingDynamicTag: false
     section: "sec-performeval-rules-in-initializer"
     subject: "error if `new.target` in StatementList of eval (direct eval)"
-    assessment: eval-semantics
+    assessment: class-declaration-arrow-return-mixed-assertion
   - path: "test/language/statements/class/elements/arrow-body-private-indirect-\
       eval-err-contains-newtarget.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
