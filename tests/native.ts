@@ -29,6 +29,8 @@ import {
 } from "../tools/shard.ts";
 
 import type { Fixture } from "./native/fixture.ts";
+import { hostScriptReferences } from "./native/host-script-reference.ts";
+import * as records from "./native/fixtures/completion-records.ts";
 import { agentReferencePrelude } from "./native/agent-reference.ts";
 import { realmReferencePrelude } from "./native/realm-reference.ts";
 import { arrayBufferFixtures } from "./native/fixtures/array-buffer.ts";
@@ -225,6 +227,8 @@ Object.defineProperty(globalThis, "console", {
 `;
 
 const fixtures: readonly Fixture[] = [
+  ...records.completionRecordFixtures,
+  records.completionRecordOracleFixture,
   ...functionFixtures,
   ...properTailCallFixtures,
   ...globalRecord.globalObjectRecordFixtures,
@@ -729,6 +733,11 @@ async function references(fixture: Fixture): Promise<
     },
   ]
 > {
+  if (fixture.name.startsWith("completion-records-")) {
+    const [node, deno] = await hostScriptReferences(host, fixture.source);
+    assert(node != null && deno != null);
+    return [node, deno];
+  }
   nativeProgress(`fixture ${fixture.name} reference preparation begin`);
   const directory = await host.makeTemporaryDirectory("oseo-reference-");
   const path = `${directory}/${fixture.name}.ts`;
@@ -1421,6 +1430,7 @@ for (const fixture of selectedFixtures) {
   }
 
   if (
+    fixture.name.startsWith("completion-records-") ||
     fixture.name === "array-buffer" ||
     fixture.name === "typed-array-constructors" ||
     fixture.name === "typed-array-float16" ||
@@ -1734,6 +1744,7 @@ for (const fixture of selectedFixtures) {
             }
           }
           if (
+            fixture.name.startsWith("completion-records-") ||
             fixture.name === "array-buffer" ||
             fixture.name === "class-private-name-lifetimes" ||
             fixture.name === "array-prototype-copying" ||
@@ -1808,7 +1819,10 @@ for (const fixture of selectedFixtures) {
             fixture.name === "weak-collections"
           ) {
             assert.ok(native.counters.collections > 0);
-            if (mode === "enabled") {
+            if (
+              mode === "enabled" &&
+              !fixture.name.startsWith("completion-records-")
+            ) {
               if (
                 fixture.name === "array-buffer" ||
                 fixture.name === "array-prototype-copying" ||
