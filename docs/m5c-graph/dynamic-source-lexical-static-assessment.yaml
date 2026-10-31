@@ -1,0 +1,1651 @@
+version: 1
+suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+pathSetDigest: b3871569ba60ce967d3a0ad6b46a27b313c148ba26743e4dfceb78394d95d498
+selected: 95
+closed: 91
+staying: 4
+evidenceAdded:
+  nativeGroups: 25
+  staticNegativePaths: 22
+paths:
+  - path: test/language/arguments-object/10.5-1-s.js
+    section: sec-identifiers-static-semantics-early-errors
+    subject: Assignment to arguments in strict function code is an early
+      SyntaxError; eval only carries the assignment as source so the error
+      surfaces at run time
+    sourceDigest: "0f76c3b17d80ce0eda9e03d85ff72a51d4e6969a5485ecbc096decab\
+      288263f7"
+    observationDigest:
+      "b0c53cf74e3c0b046b575d6ff1d82bcefe2966a96d5d911815fa4e79\
+      cf0054ec"
+    disposition: exclusion
+    evidence:
+      - tests/lexical-static-evidence.test.ts
+      - tests/fixtures/lexical-static-negatives.json
+    observation: ds16-static-syntax
+    reason: The static Script/function source rejects at parse with OSEO0001 and
+      independent reference SyntaxError; source instantiation, strictness
+      inheritance and conversion of that error into a runtime
+      eval/constructor exception remain inside ADR 0016.
+  - path: test/language/comments/S7.4_A5.js
+    section: sec-comments
+    subject: A single-line comment ends only at a LineTerminator code point;
+      eval only compiles each probe source that places one BMP code unit in
+      the comment
+    sourceDigest: "750e81132560c5ab7915bfca83e7afea4d458455ea476fc20873e37d\
+      ebfa8ec1"
+    observationDigest:
+      "536fe259555cedcfa4113f206d213460fbceed2b4bc1b977c37bf399\
+      b8f63704"
+    disposition: exclusion
+    evidence:
+      - tests/lexical-static-native.test.ts
+      - tests/native/fixtures/lexical-bmp-comments.ts
+      - tests/lexical-static-evidence.test.ts
+    observation: ds16-lexical-bmp-single
+    reason: All 65,536 code units retain the //var CODEyy = -1 position; 65,532
+      preserve zero and LF/CR/LS/PS each execute the assignment. A leaked
+      assignment cannot be masked by a reset.
+  - path: test/language/comments/S7.4_A6.js
+    section: sec-comments
+    subject: A multi-line comment can contain any code unit; eval only compiles
+      each probe source that places one code unit in the comment
+    sourceDigest: "8d89c2b5ebb2410a9f0d06b30b31f72b727a8e079080ee4457c5bdf3\
+      3e4966a6"
+    observationDigest:
+      "84b8927cccd64f45079200dbdb79b3552fc16024bccd01dbf72a4bb1\
+      fda37a89"
+    disposition: exclusion
+    evidence:
+      - tests/lexical-static-native.test.ts
+      - tests/native/fixtures/lexical-bmp-comments.ts
+      - tests/lexical-static-evidence.test.ts
+    observation: ds16-lexical-bmp-multi
+    reason: All 65,536 code units retain the /*var CODExx = 1*/ position; the
+      shared zero binding must survive every comment without a masked
+      assignment.
+  - path: test/language/comments/hashbang/eval-indirect.js
+    section: ECMA-262 Hashbang Comments; PerformEval (Script goal)
+    subject: Hashbang comments should be available in Script evaluator contexts.
+      (indirect eval)
+    sourceDigest: "5722becf202d160b3dc744566af9a4eedce84789100a3706876397c3\
+      20869705"
+    observationDigest:
+      "dba8e4fddc4f7ec08b6bc1a0e6d80fab710d9a1e462ae8769ecc72f5\
+      467639a9"
+    disposition: remediation
+    evidence:
+      - tests/lexical-static-evidence.test.ts
+    observation: partial-or-none
+    reason: Static syntax acceptance is covered, but no static witness observes
+      all original Script Completion Record values (undefined and, where
+      asserted, 1). Parsing or returning a function value does not establish
+      those values.
+  - path: test/language/comments/hashbang/eval.js
+    section: ECMA-262 Hashbang Comments; PerformEval (Script goal)
+    subject: Hashbang comments should be available in Script evaluator contexts.
+      (direct eval)
+    sourceDigest: "f836abecfb7637b0fe01133d79f527964ea6e1f1ebce2883da1463e9\
+      87d959f2"
+    observationDigest:
+      "508b2f21ff083efebb9d2c2da8438be935ece194102e43ee371262e0\
+      97bf6ad3"
+    disposition: remediation
+    evidence:
+      - tests/lexical-static-evidence.test.ts
+    observation: partial-or-none
+    reason: Static syntax acceptance is covered, but no static witness observes
+      all original Script Completion Record values (undefined and, where
+      asserted, 1). Parsing or returning a function value does not establish
+      those values.
+  - path: test/language/comments/hashbang/function-constructor.js
+    section: ECMA-262 Hashbang Comments; CreateDynamicFunction
+    subject: "Hashbang comments should not be allowed in function eval\
+      uator contexts."
+    sourceDigest: "7ae57d1047e3fab441abb44cbb8cdad830ee2dff5a048db126f64d88\
+      68305197"
+    observationDigest:
+      "fb45583f23549ef4721e7940301c4cd2eebea627867c09b7d5d51885\
+      e9873455"
+    disposition: exclusion
+    evidence:
+      - tests/lexical-static-evidence.test.ts
+      - tests/fixtures/lexical-static-negatives.json
+    observation: ds16-static-syntax
+    reason: The static Script/function source rejects at parse with OSEO0001 and
+      independent reference SyntaxError; source instantiation, strictness
+      inheritance and conversion of that error into a runtime
+      eval/constructor exception remain inside ADR 0016.
+  - path: test/language/comments/hashbang/no-line-separator.js
+    section: ECMA-262 Hashbang Comments; PerformEval (Script goal)
+    subject: Hashbang comments should not require a newline afterwards
+    sourceDigest: "3fe34c780c8b8a7587c59e77961a320be0f1293a119278370cbfe119\
+      b9dc438b"
+    observationDigest:
+      "14fbf96b58e57f9b759c2b914a1a4a7b22bcdec0ccaea595b8d44304\
+      5a318571"
+    disposition: remediation
+    evidence:
+      - tests/lexical-static-evidence.test.ts
+    observation: partial-or-none
+    reason: Static syntax acceptance is covered, but no static witness observes
+      all original Script Completion Record values (undefined and, where
+      asserted, 1). Parsing or returning a function value does not establish
+      those values.
+  - path: test/language/eval-code/direct/parse-failure-1.js
+    section: "Original es5id: 15.1.2.1_A2_T1"
+    subject: Checking if execution of "eval("x = 1; x\u000A++"), catch
+      SyntaxError" passes
+    sourceDigest: "b5d746c26b7b37a6229d0898d2a9c8be82e9e9546132e80ca446f6e6\
+      332dcce3"
+    observationDigest:
+      "0b3d6e56a005b0ed71103d215a0c82d7d843602b3882308ae96644b1\
+      2ae0a2be"
+    disposition: exclusion
+    evidence:
+      - tests/lexical-static-evidence.test.ts
+      - tests/fixtures/lexical-static-negatives.json
+    observation: ds16-static-syntax
+    reason: The static Script/function source rejects at parse with OSEO0001 and
+      independent reference SyntaxError; source instantiation, strictness
+      inheritance and conversion of that error into a runtime
+      eval/constructor exception remain inside ADR 0016.
+  - path: test/language/eval-code/direct/parse-failure-2.js
+    section: "Original es5id: 15.1.2.1_A2_T2"
+    subject: Checking if execution of "eval("x = 1; x\u000A++")" fails
+    sourceDigest: "4d257f0ccfc3dff5fcd79abd991e67104778b1720bd078572cfb68f9\
+      6b0506b1"
+    observationDigest:
+      "ead544018dcdc22bcfbe6bedf5a5ca4445a2b58addb6240f3a8773c7\
+      9c309c7b"
+    disposition: exclusion
+    evidence:
+      - tests/lexical-static-evidence.test.ts
+      - tests/fixtures/lexical-static-negatives.json
+    observation: ds16-static-syntax
+    reason: The static Script/function source rejects at parse with OSEO0001 and
+      independent reference SyntaxError; source instantiation, strictness
+      inheritance and conversion of that error into a runtime
+      eval/constructor exception remain inside ADR 0016.
+  - path: test/language/eval-code/direct/parse-failure-3.js
+    section: "Original es5id: 15.1.2.1_A3.3_T1"
+    subject: Continue statement
+    sourceDigest: "491de7009a0ec92b36f736cba2764b650cb770074f880a0447720049\
+      ea6f0ce3"
+    observationDigest:
+      "3344eda1a171f113043e8caab65a2ab004e8b1b8d3e73d337fe026ca\
+      ed830d40"
+    disposition: exclusion
+    evidence:
+      - tests/lexical-static-evidence.test.ts
+      - tests/fixtures/lexical-static-negatives.json
+    observation: ds16-static-syntax
+    reason: The static Script/function source rejects at parse with OSEO0001 and
+      independent reference SyntaxError; source instantiation, strictness
+      inheritance and conversion of that error into a runtime
+      eval/constructor exception remain inside ADR 0016.
+  - path: test/language/eval-code/direct/parse-failure-4.js
+    section: "Original es5id: 15.1.2.1_A3.3_T2"
+    subject: Break statement
+    sourceDigest: "af1c6afad3d08d10b0a1e1649adea4344497b24ace77782a43833f78\
+      a5a4921c"
+    observationDigest:
+      "9d1b84290b1d7a87bc9dd24eb21ea682550860b96d7aa217117127bb\
+      d5f35afe"
+    disposition: exclusion
+    evidence:
+      - tests/lexical-static-evidence.test.ts
+      - tests/fixtures/lexical-static-negatives.json
+    observation: ds16-static-syntax
+    reason: The static Script/function source rejects at parse with OSEO0001 and
+      independent reference SyntaxError; source instantiation, strictness
+      inheritance and conversion of that error into a runtime
+      eval/constructor exception remain inside ADR 0016.
+  - path: test/language/eval-code/direct/parse-failure-5.js
+    section: "Original es5id: 15.1.2.1_A3.3_T3"
+    subject: Return statement
+    sourceDigest: "a8ef71718ed401504767400ebec34e0928f251887d64156f29492319\
+      09e5cafc"
+    observationDigest:
+      "23f6579a2ed2732a722a2d814ec107c22f56e6a37c4787b0cbe82369\
+      1fbe1974"
+    disposition: exclusion
+    evidence:
+      - tests/lexical-static-evidence.test.ts
+      - tests/fixtures/lexical-static-negatives.json
+    observation: ds16-static-syntax
+    reason: The static Script/function source rejects at parse with OSEO0001 and
+      independent reference SyntaxError; source instantiation, strictness
+      inheritance and conversion of that error into a runtime
+      eval/constructor exception remain inside ADR 0016.
+  - path: test/language/eval-code/direct/parse-failure-6.js
+    section: sec-performeval
+    subject: For statement
+    sourceDigest: "eb2bf3f3e4165698eb6af791acccec9863e3ecdc12b200d3abe5e35e\
+      4bbf1f91"
+    observationDigest:
+      "df0da0970c663420eab479541df4c3f93468f35aad1bf11113012f39\
+      b920f0b9"
+    disposition: exclusion
+    evidence:
+      - tests/lexical-static-evidence.test.ts
+      - tests/fixtures/lexical-static-negatives.json
+    observation: ds16-static-syntax
+    reason: The static Script/function source rejects at parse with OSEO0001 and
+      independent reference SyntaxError; source instantiation, strictness
+      inheritance and conversion of that error into a runtime
+      eval/constructor exception remain inside ADR 0016.
+  - path: test/language/eval-code/indirect/parse-failure-1.js
+    section: sec-performeval
+    subject: Checking if execution of "(0,eval)("x = 1; x\u000A++"), catch
+      SyntaxError" passes
+    sourceDigest: "47e9b42a13d66ac2794b135f5bab6ef3f18161c492ad5b779a2002ef\
+      4a1d2e01"
+    observationDigest:
+      "a60769504f49113d91c252e1859da4588d168c5b8bbe44f49d77a2e7\
+      d484cdd7"
+    disposition: exclusion
+    evidence:
+      - tests/lexical-static-evidence.test.ts
+      - tests/fixtures/lexical-static-negatives.json
+    observation: ds16-static-syntax
+    reason: The static Script/function source rejects at parse with OSEO0001 and
+      independent reference SyntaxError; source instantiation, strictness
+      inheritance and conversion of that error into a runtime
+      eval/constructor exception remain inside ADR 0016.
+  - path: test/language/eval-code/indirect/parse-failure-2.js
+    section: sec-performeval
+    subject: Checking if execution of "(0,eval)("x = 1; x\u000A++")" fails
+    sourceDigest: "d2f753a16d03089f6472e4505c4ab57d0b03b9450ad4f832f662bb11\
+      a725c6d8"
+    observationDigest:
+      "d8cdabb82441ffbe0e4be39f2579a19967c52310a4ac9c774bd3e08c\
+      7baaa8e5"
+    disposition: exclusion
+    evidence:
+      - tests/lexical-static-evidence.test.ts
+      - tests/fixtures/lexical-static-negatives.json
+    observation: ds16-static-syntax
+    reason: The static Script/function source rejects at parse with OSEO0001 and
+      independent reference SyntaxError; source instantiation, strictness
+      inheritance and conversion of that error into a runtime
+      eval/constructor exception remain inside ADR 0016.
+  - path: test/language/eval-code/indirect/parse-failure-3.js
+    section: sec-performeval
+    subject: Continue statement
+    sourceDigest: "a71ed0c58a9a1a3c551eb7434032c367d4145d4fee840083b66b90d9\
+      c9bf377e"
+    observationDigest:
+      "7ff33f8db21a1912366af5ed131b4648d4674451c88a8759a9be8629\
+      70777710"
+    disposition: exclusion
+    evidence:
+      - tests/lexical-static-evidence.test.ts
+      - tests/fixtures/lexical-static-negatives.json
+    observation: ds16-static-syntax
+    reason: The static Script/function source rejects at parse with OSEO0001 and
+      independent reference SyntaxError; source instantiation, strictness
+      inheritance and conversion of that error into a runtime
+      eval/constructor exception remain inside ADR 0016.
+  - path: test/language/eval-code/indirect/parse-failure-4.js
+    section: sec-performeval
+    subject: Break statement
+    sourceDigest: "d24feb17ced8c8f3488e95da02c2205c3a4fe3be9629f3e91ca80022\
+      901a3517"
+    observationDigest:
+      "6318dffa0b46ce33de6b42ebbe691679804c4e4dfa98611beaccb286\
+      d3ee2beb"
+    disposition: exclusion
+    evidence:
+      - tests/lexical-static-evidence.test.ts
+      - tests/fixtures/lexical-static-negatives.json
+    observation: ds16-static-syntax
+    reason: The static Script/function source rejects at parse with OSEO0001 and
+      independent reference SyntaxError; source instantiation, strictness
+      inheritance and conversion of that error into a runtime
+      eval/constructor exception remain inside ADR 0016.
+  - path: test/language/eval-code/indirect/parse-failure-5.js
+    section: sec-performeval
+    subject: Return statement
+    sourceDigest: "d04598b91a696035362b65dbe4d9a8d2051cba497d6b4c1fab24ee2e\
+      882a8938"
+    observationDigest:
+      "751116f018cad9b943b983782cc0333bf1ba7dcc1d85bca0ecf56776\
+      54657a5a"
+    disposition: exclusion
+    evidence:
+      - tests/lexical-static-evidence.test.ts
+      - tests/fixtures/lexical-static-negatives.json
+    observation: ds16-static-syntax
+    reason: The static Script/function source rejects at parse with OSEO0001 and
+      independent reference SyntaxError; source instantiation, strictness
+      inheritance and conversion of that error into a runtime
+      eval/constructor exception remain inside ADR 0016.
+  - path: test/language/eval-code/indirect/parse-failure-6.js
+    section: sec-performeval
+    subject: For statement
+    sourceDigest: "cd71e95c846f283799800466fdae4a61b4bb4393399661b43ae2a6f3\
+      b42699c5"
+    observationDigest:
+      "4bbef97fe3a3e3c5353c11586843990c1e200f488005cfaafd831462\
+      14574dba"
+    disposition: exclusion
+    evidence:
+      - tests/lexical-static-evidence.test.ts
+      - tests/fixtures/lexical-static-negatives.json
+    observation: ds16-static-syntax
+    reason: The static Script/function source rejects at parse with OSEO0001 and
+      independent reference SyntaxError; source instantiation, strictness
+      inheritance and conversion of that error into a runtime
+      eval/constructor exception remain inside ADR 0016.
+  - path: test/language/expressions/addition/S11.6.1_A1.js
+    section: sec-addition-operator-plus
+    subject: Whitespace and line terminators around the addition operator
+    sourceDigest: "e19b6800a638faf54237a41ab7b772d65176ed29b5d9284fcb6f0bfc\
+      38b1dd92"
+    observationDigest:
+      "a0380198e016df6dbfbd95605563e13a95caadd2278adfb1b5b425c0\
+      c51960ae"
+    disposition: exclusion
+    evidence:
+      - tests/lexical-static-native.test.ts
+      - tests/native/fixtures/lexical-static-evidence.ts
+      - tests/lexical-static-evidence.test.ts
+    observation: ds16-lexical-0
+    reason: The fixed witness preserves every original separator, token
+      position, combined separator sequence and value assertion, including
+      original greater/less comparison variants and typeof grouping.
+  - path: test/language/expressions/bitwise-and/S11.10.1_A1.js
+    section: sec-binary-bitwise-operators
+    subject: Checking uses eval
+    sourceDigest: "c664c561c6de4def3595d0d266ee006176e5a9764ca4a2ada1dc7498\
+      a1a48f54"
+    observationDigest:
+      "f424092aaa1f152279448efa0577ca4880cfb756e6981d6a36dde9f8\
+      8351daed"
+    disposition: exclusion
+    evidence:
+      - tests/lexical-static-native.test.ts
+      - tests/native/fixtures/lexical-static-evidence.ts
+      - tests/lexical-static-evidence.test.ts
+    observation: ds16-lexical-0
+    reason: The fixed witness preserves every original separator, token
+      position, combined separator sequence and value assertion, including
+      original greater/less comparison variants and typeof grouping.
+  - path: test/language/expressions/bitwise-not/S11.4.8_A1.js
+    section: sec-bitwise-not-operator
+    subject: Checking by using eval
+    sourceDigest: "a1558bb750ce64ea94717ab5543c93ccfa4af0d5028683289920a7d5\
+      b01b0127"
+    observationDigest:
+      "ecbb233f9f4aba5d7c9049a3b105757a988d15040e51a92d051e71f2\
+      10988580"
+    disposition: exclusion
+    evidence:
+      - tests/lexical-static-native.test.ts
+      - tests/native/fixtures/lexical-static-evidence.ts
+      - tests/lexical-static-evidence.test.ts
+    observation: ds16-lexical-0
+    reason: The fixed witness preserves every original separator, token
+      position, combined separator sequence and value assertion, including
+      original greater/less comparison variants and typeof grouping.
+  - path: test/language/expressions/bitwise-or/S11.10.3_A1.js
+    section: sec-binary-bitwise-operators
+    subject: Checking by using eval
+    sourceDigest: "435457f39546913413cc3ec06c6256ce4cdedea1981038a687a319c6\
+      a2d3a2d2"
+    observationDigest:
+      "04f4ca830b7a74299da8b6962e04861cb48edb0901fe172f9b5440c2\
+      cec99d71"
+    disposition: exclusion
+    evidence:
+      - tests/lexical-static-native.test.ts
+      - tests/native/fixtures/lexical-static-evidence.ts
+      - tests/lexical-static-evidence.test.ts
+    observation: ds16-lexical-1
+    reason: The fixed witness preserves every original separator, token
+      position, combined separator sequence and value assertion, including
+      original greater/less comparison variants and typeof grouping.
+  - path: test/language/expressions/bitwise-xor/S11.10.2_A1.js
+    section: sec-binary-bitwise-operators
+    subject: The check uses eval
+    sourceDigest: "960ceeb656d8ec05815c94f2ec38efee280d4966d6438cade1ca2ec5\
+      e4be06f4"
+    observationDigest:
+      "da83ec2bf9dea6419232adb4dc421d8466ec564b081511dad72a612e\
+      0d9a3228"
+    disposition: exclusion
+    evidence:
+      - tests/lexical-static-native.test.ts
+      - tests/native/fixtures/lexical-static-evidence.ts
+      - tests/lexical-static-evidence.test.ts
+    observation: ds16-lexical-1
+    reason: The fixed witness preserves every original separator, token
+      position, combined separator sequence and value assertion, including
+      original greater/less comparison variants and typeof grouping.
+  - path: test/language/expressions/call/S11.2.3_A1.js
+    section: sec-function-calls-runtime-semantics-evaluation
+    subject: Checking by using eval
+    sourceDigest: "dcd7260633f6a9fcaf95553b077ff15455dbc1d29df5f79753720314\
+      4c691f16"
+    observationDigest:
+      "bd1dbf53a2ad0fb08094e7e13f705002eb5d610faf6e3c6b89c09122\
+      a9a51158"
+    disposition: exclusion
+    evidence:
+      - tests/lexical-static-native.test.ts
+      - tests/native/fixtures/lexical-static-evidence.ts
+      - tests/lexical-static-evidence.test.ts
+    observation: ds16-lexical-1
+    reason: The fixed witness preserves every original separator, token
+      position, combined separator sequence and value assertion, including
+      original greater/less comparison variants and typeof grouping.
+  - path: test/language/expressions/comma/S11.14_A1.js
+    section: sec-comma-operator
+    subject: Whitespace and line terminators around the comma operator
+    sourceDigest: "e83bcdaaaa0b25b4b08380d1896ffbbe22b6d2b393d203ca580fe2d3\
+      72449d95"
+    observationDigest:
+      "85c3d1f4f905730d2e765303c8216c489da0839aeaa0beea23926c0b\
+      2df0a342"
+    disposition: exclusion
+    evidence:
+      - tests/lexical-static-native.test.ts
+      - tests/native/fixtures/lexical-static-evidence.ts
+      - tests/lexical-static-evidence.test.ts
+    observation: ds16-lexical-2
+    reason: The fixed witness preserves every original separator, token
+      position, combined separator sequence and value assertion, including
+      original greater/less comparison variants and typeof grouping.
+  - path: test/language/expressions/conditional/S11.12_A1.js
+    section: sec-conditional-operator
+    subject: Checking by using eval
+    sourceDigest: "39f1061c03578012e0acb3c5aed3886a83cc5c3bdd2ebddcd020bcea\
+      aa4f328e"
+    observationDigest:
+      "7de355e1a84f743e4d28de8b871c090361c837f8795417249d622224\
+      d76e2e7b"
+    disposition: exclusion
+    evidence:
+      - tests/lexical-static-native.test.ts
+      - tests/native/fixtures/lexical-static-evidence.ts
+      - tests/lexical-static-evidence.test.ts
+    observation: ds16-lexical-2
+    reason: The fixed witness preserves every original separator, token
+      position, combined separator sequence and value assertion, including
+      original greater/less comparison variants and typeof grouping.
+  - path: test/language/expressions/division/S11.5.2_A1.js
+    section: sec-multiplicative-operators
+    subject: Whitespace and line terminators around the division operator; every
+      check compiles a source string with eval to place the WhiteSpace or
+      LineTerminator code points
+    sourceDigest: "609f9978297934e0973361203ade223e851dda163dbdf52ee8ee8000\
+      07561ac4"
+    observationDigest:
+      "27a71f822470886ebc34f1fc755e6020e7bb5781881f42497594d846\
+      922f809a"
+    disposition: exclusion
+    evidence:
+      - tests/lexical-static-native.test.ts
+      - tests/native/fixtures/lexical-static-evidence.ts
+      - tests/lexical-static-evidence.test.ts
+    observation: ds16-lexical-2
+    reason: The fixed witness preserves every original separator, token
+      position, combined separator sequence and value assertion, including
+      original greater/less comparison variants and typeof grouping.
+  - path: test/language/expressions/does-not-equals/S11.9.2_A1.js
+    section: sec-equality-operators
+    subject: Whitespace and line terminators around the does-not-equals
+      operator; every check compiles a source string with eval to place the
+      WhiteSpace or LineTerminator code points
+    sourceDigest: "0ef371e484fd71f2fd517a4642a2258a7afea71894b19f0844df6c6c\
+      3db606e9"
+    observationDigest:
+      "9dc874f5487737a31be2a9b6e5b54006a5bfda492080ccd6ff040747\
+      7513cdce"
+    disposition: exclusion
+    evidence:
+      - tests/lexical-static-native.test.ts
+      - tests/native/fixtures/lexical-static-evidence.ts
+      - tests/lexical-static-evidence.test.ts
+    observation: ds16-lexical-3
+    reason: The fixed witness preserves every original separator, token
+      position, combined separator sequence and value assertion, including
+      original greater/less comparison variants and typeof grouping.
+  - path: test/language/expressions/equals/S11.9.1_A1.js
+    section: sec-equality-operators
+    subject: Checking by using eval
+    sourceDigest: "21983615ef843115362113720d092b6a3ce80597635b706bb8d4f5dd\
+      01e2b505"
+    observationDigest:
+      "4ef30cd284281f2f5bdf7ade52d456c6de5cd0b14f648cbbf01b6879\
+      19500957"
+    disposition: exclusion
+    evidence:
+      - tests/lexical-static-native.test.ts
+      - tests/native/fixtures/lexical-static-evidence.ts
+      - tests/lexical-static-evidence.test.ts
+    observation: ds16-lexical-3
+    reason: The fixed witness preserves every original separator, token
+      position, combined separator sequence and value assertion, including
+      original greater/less comparison variants and typeof grouping.
+  - path: test/language/expressions/function/name-eval-stricteval.js
+    section: sec-function-definitions-static-semantics-early-errors
+    subject: SyntaxError when 'eval' is the Identifier of a FunctionExpression
+      in strict mode code; eval only carries the invalid source, whose
+      literal 'use strict' directive makes it strict
+    sourceDigest: "885250a51c27e1f192eb01a2342ad2973d919130f30dadde134eb119\
+      0a288ce1"
+    observationDigest:
+      "e44d5e0d35993d528c62fbb2cd5dcf8e8c66dc35718bed3a0b380e82\
+      d1387632"
+    disposition: exclusion
+    evidence:
+      - tests/lexical-static-evidence.test.ts
+      - tests/fixtures/lexical-static-negatives.json
+    observation: ds16-static-syntax
+    reason: The static Script/function source rejects at parse with OSEO0001 and
+      independent reference SyntaxError; source instantiation, strictness
+      inheritance and conversion of that error into a runtime
+      eval/constructor exception remain inside ADR 0016.
+  - path: test/language/expressions/function/param-eval-stricteval.js
+    section: sec-function-definitions-static-semantics-early-errors
+    subject: SyntaxError when 'eval' is a FormalParameterList element in strict
+      mode code; eval only carries the invalid source, whose literal 'use
+      strict' directive makes it strict
+    sourceDigest: "dc8bf3f7b6ab30152954760b14d88f2e25ae851f0e4913e30cca1be4\
+      19c8dcb0"
+    observationDigest:
+      "a0a8daef20e3e88d037ac8869c6c174d281725fea6e177cef3d48828\
+      912eb5b4"
+    disposition: exclusion
+    evidence:
+      - tests/lexical-static-evidence.test.ts
+      - tests/fixtures/lexical-static-negatives.json
+    observation: ds16-static-syntax
+    reason: The static Script/function source rejects at parse with OSEO0001 and
+      independent reference SyntaxError; source instantiation, strictness
+      inheritance and conversion of that error into a runtime
+      eval/constructor exception remain inside ADR 0016.
+  - path: test/language/expressions/greater-than-or-equal/S11.8.4_A1.js
+    section: sec-relational-operators
+    subject: Whitespace and line terminators around the greater-than-or-equal
+      operator; every check compiles a source string with eval to place the
+      WhiteSpace or LineTerminator code points
+    sourceDigest: "18e242eedf235c00e6528f340948ca0f6c24cb40037886fef8f5e7f4\
+      dbb4bb49"
+    observationDigest:
+      "f83be741ba16d4ed2ee49f67fe45905515f46937519c6d6446a55d91\
+      5ad1859d"
+    disposition: exclusion
+    evidence:
+      - tests/lexical-static-native.test.ts
+      - tests/native/fixtures/lexical-static-evidence.ts
+      - tests/lexical-static-evidence.test.ts
+    observation: ds16-lexical-3
+    reason: The fixed witness preserves every original separator, token
+      position, combined separator sequence and value assertion, including
+      original greater/less comparison variants and typeof grouping.
+  - path: test/language/expressions/greater-than/S11.8.2_A1.js
+    section: sec-relational-operators
+    subject: Whitespace and line terminators around the greater-than operator;
+      every check compiles a source string with eval to place the WhiteSpace
+      or LineTerminator code points
+    sourceDigest: "cc7c07782db7868bd7b12f5089bb22a03e3d3239ef550d6f06d98349\
+      b5770001"
+    observationDigest:
+      "6ce51e6b313a29e701401db387d3fe39a918bdb95e49ef859680a5af\
+      500354a7"
+    disposition: exclusion
+    evidence:
+      - tests/lexical-static-native.test.ts
+      - tests/native/fixtures/lexical-static-evidence.ts
+      - tests/lexical-static-evidence.test.ts
+    observation: ds16-lexical-4
+    reason: The fixed witness preserves every original separator, token
+      position, combined separator sequence and value assertion, including
+      original greater/less comparison variants and typeof grouping.
+  - path: test/language/expressions/grouping/S11.1.6_A1.js
+    section: sec-grouping-operator
+    subject: Whitespace and line terminators inside the grouping operator; every
+      check compiles a source string with eval
+    sourceDigest: "36fc75130f1e90f1f0aadc0544714f68d650635e245a688c5f89912b\
+      be3b16de"
+    observationDigest:
+      "ab3501535a234d5e24153e57cd868841d663157894ad478345caac3d\
+      fa67faca"
+    disposition: exclusion
+    evidence:
+      - tests/lexical-static-native.test.ts
+      - tests/native/fixtures/lexical-static-evidence.ts
+      - tests/lexical-static-evidence.test.ts
+    observation: ds16-lexical-4
+    reason: The fixed witness preserves every original separator, token
+      position, combined separator sequence and value assertion, including
+      original greater/less comparison variants and typeof grouping.
+  - path: test/language/expressions/in/S11.8.7_A1.js
+    section: sec-relational-operators
+    subject: Whitespace and line terminators around the in operator; every check
+      compiles a source string with eval to place the WhiteSpace or
+      LineTerminator code points
+    sourceDigest: "78530cc817deb2fa76c90c8c22a7263f4213215dc4c1cd245806c5f2\
+      6230f072"
+    observationDigest:
+      "797ac14767d0bf5fc1ffdd8f74b421998924bb8714d5da0567ceacea\
+      e351b097"
+    disposition: exclusion
+    evidence:
+      - tests/lexical-static-native.test.ts
+      - tests/native/fixtures/lexical-static-evidence.ts
+      - tests/lexical-static-evidence.test.ts
+    observation: ds16-lexical-4
+    reason: The fixed witness preserves every original separator, token
+      position, combined separator sequence and value assertion, including
+      original greater/less comparison variants and typeof grouping.
+  - path: test/language/expressions/instanceof/S11.8.6_A1.js
+    section: sec-relational-operators
+    subject: Whitespace and line terminators around the instanceof operator;
+      every check compiles a source string with eval to place the WhiteSpace
+      or LineTerminator code points
+    sourceDigest: "45914c02cbd727cda3b5376e50a426cfc5b763237fc3bf04d454049f\
+      3a5a23e2"
+    observationDigest:
+      "08dcece85da17365877e1f5aae042050fc7c3fc0181c8db0e4dee40e\
+      b88cbb85"
+    disposition: exclusion
+    evidence:
+      - tests/lexical-static-native.test.ts
+      - tests/native/fixtures/lexical-static-evidence.ts
+      - tests/lexical-static-evidence.test.ts
+    observation: ds16-lexical-5
+    reason: The fixed witness preserves every original separator, token
+      position, combined separator sequence and value assertion, including
+      original greater/less comparison variants and typeof grouping.
+  - path: test/language/expressions/left-shift/S11.7.1_A1.js
+    section: "Original es5id: 11.7.1_A1"
+    subject: Checking by using eval
+    sourceDigest: "8a3a72746c5779f3c83a50db91df6da09fa0aeae66af7618cef8f104\
+      a235b41c"
+    observationDigest:
+      "dbb35b39604a754b11a90c37368edd147e147cee1a880b95d73e2b98\
+      dac1c065"
+    disposition: exclusion
+    evidence:
+      - tests/lexical-static-native.test.ts
+      - tests/native/fixtures/lexical-static-evidence.ts
+      - tests/lexical-static-evidence.test.ts
+    observation: ds16-lexical-5
+    reason: The fixed witness preserves every original separator, token
+      position, combined separator sequence and value assertion, including
+      original greater/less comparison variants and typeof grouping.
+  - path: test/language/expressions/less-than-or-equal/S11.8.3_A1.js
+    section: "Original es5id: 11.8.3_A1"
+    subject: Checking by using eval
+    sourceDigest: "bb77f4b638260e09a8dfe4ad94f566279edf1736334fbfa13d847413\
+      8a917446"
+    observationDigest:
+      "9df7800a143426f54fbd3499046c87d7e6e6eb0bc16f09354e3eb85a\
+      b34f7adf"
+    disposition: exclusion
+    evidence:
+      - tests/lexical-static-native.test.ts
+      - tests/native/fixtures/lexical-static-evidence.ts
+      - tests/lexical-static-evidence.test.ts
+    observation: ds16-lexical-5
+    reason: The fixed witness preserves every original separator, token
+      position, combined separator sequence and value assertion, including
+      original greater/less comparison variants and typeof grouping.
+  - path: test/language/expressions/less-than/S11.8.1_A1.js
+    section: "Original es5id: 11.8.1_A1"
+    subject: Checking by using eval
+    sourceDigest: "6e1a6f927400dc3d3d304d6aaba11d266081597ed6eaf04380dd7219\
+      063ca353"
+    observationDigest:
+      "d896d5bb722a5a14bd49c282b91b692209ee168b8d824a9ee1a3f76f\
+      2e822ec2"
+    disposition: exclusion
+    evidence:
+      - tests/lexical-static-native.test.ts
+      - tests/native/fixtures/lexical-static-evidence.ts
+      - tests/lexical-static-evidence.test.ts
+    observation: ds16-lexical-6
+    reason: The fixed witness preserves every original separator, token
+      position, combined separator sequence and value assertion, including
+      original greater/less comparison variants and typeof grouping.
+  - path: test/language/expressions/logical-and/S11.11.1_A1.js
+    section: "Original es5id: 11.11.1_A1"
+    subject: Checking by using eval
+    sourceDigest: "8e7b943542b5c7ec0c0d88e473d3675f1b2dec631f93ffdab1844382\
+      c1d36e9d"
+    observationDigest:
+      "24c423dac87bc0ad993df6af1bd6325f7c25699bc621883e7100f21f\
+      9d7cadd4"
+    disposition: exclusion
+    evidence:
+      - tests/lexical-static-native.test.ts
+      - tests/native/fixtures/lexical-static-evidence.ts
+      - tests/lexical-static-evidence.test.ts
+    observation: ds16-lexical-6
+    reason: The fixed witness preserves every original separator, token
+      position, combined separator sequence and value assertion, including
+      original greater/less comparison variants and typeof grouping.
+  - path: test/language/expressions/logical-not/S11.4.9_A1.js
+    section: "Original es5id: 11.4.9_A1"
+    subject: Checking by using eval
+    sourceDigest: "a4e1211948eeb8f0891f4debcb73000a5413a9ebb6ef3d855a2a2828\
+      d972c74a"
+    observationDigest:
+      "19c90ed987e52f27814fa009f02d5efe2abfac9b2320a01a6fda74a1\
+      75ddc569"
+    disposition: exclusion
+    evidence:
+      - tests/lexical-static-native.test.ts
+      - tests/native/fixtures/lexical-static-evidence.ts
+      - tests/lexical-static-evidence.test.ts
+    observation: ds16-lexical-6
+    reason: The fixed witness preserves every original separator, token
+      position, combined separator sequence and value assertion, including
+      original greater/less comparison variants and typeof grouping.
+  - path: test/language/expressions/logical-or/S11.11.2_A1.js
+    section: "Original es5id: 11.11.2_A1"
+    subject: Checking by using eval
+    sourceDigest: "4a903dc0970d2fbb6a00da57af219e53dfe1e5de510584b777178442\
+      a0ec7c06"
+    observationDigest:
+      "28553fbddd70d2dac432e993b1a7aed54887b77650f3078d32dfe68f\
+      b8f4920b"
+    disposition: exclusion
+    evidence:
+      - tests/lexical-static-native.test.ts
+      - tests/native/fixtures/lexical-static-evidence.ts
+      - tests/lexical-static-evidence.test.ts
+    observation: ds16-lexical-7
+    reason: The fixed witness preserves every original separator, token
+      position, combined separator sequence and value assertion, including
+      original greater/less comparison variants and typeof grouping.
+  - path: test/language/expressions/modulus/S11.5.3_A1.js
+    section: "Original es5id: 11.5.3_A1"
+    subject: Checking by using eval
+    sourceDigest: "0380f022a7f29ca5f9cd494e8ac271865294c2ec3091ec8b1260c037\
+      752f0097"
+    observationDigest:
+      "69557bfc8a13469775079e02c3b16796510ffb4e9b05c8d41df53089\
+      7d68a1a1"
+    disposition: exclusion
+    evidence:
+      - tests/lexical-static-native.test.ts
+      - tests/native/fixtures/lexical-static-evidence.ts
+      - tests/lexical-static-evidence.test.ts
+    observation: ds16-lexical-7
+    reason: The fixed witness preserves every original separator, token
+      position, combined separator sequence and value assertion, including
+      original greater/less comparison variants and typeof grouping.
+  - path: test/language/expressions/multiplication/S11.5.1_A1.js
+    section: "Original es5id: 11.5.1_A1"
+    subject: Checking by using eval
+    sourceDigest: "15c4c0b92fd2bf4b803fc068d87c08014836588206caee23dd7db684\
+      b66f7a38"
+    observationDigest:
+      "108666c1fa32a213ccb7fd1e4428b4d1c7d1fd09d9e3988ea90eca20\
+      d152c093"
+    disposition: exclusion
+    evidence:
+      - tests/lexical-static-native.test.ts
+      - tests/native/fixtures/lexical-static-evidence.ts
+      - tests/lexical-static-evidence.test.ts
+    observation: ds16-lexical-7
+    reason: The fixed witness preserves every original separator, token
+      position, combined separator sequence and value assertion, including
+      original greater/less comparison variants and typeof grouping.
+  - path: test/language/expressions/new/S11.2.2_A1.1.js
+    section: "Original es5id: 11.2.2_A1.1"
+    subject: Checking by using eval
+    sourceDigest: "76ffc2fbfd30d7b6ff1d2b01d9194e9e0b90f5d145dcc10e81f0abee\
+      e66ff1aa"
+    observationDigest:
+      "9c261e3aa110c005530dfe436ceaaf500a7ca62e7af9307846ca990c\
+      0f71a4ef"
+    disposition: exclusion
+    evidence:
+      - tests/lexical-static-native.test.ts
+      - tests/native/fixtures/lexical-static-evidence.ts
+      - tests/lexical-static-evidence.test.ts
+    observation: ds16-lexical-8
+    reason: The fixed witness preserves every original separator, token
+      position, combined separator sequence and value assertion, including
+      original greater/less comparison variants and typeof grouping.
+  - path: test/language/expressions/new/S11.2.2_A1.2.js
+    section: "Original es5id: 11.2.2_A1.2"
+    subject: Checking by using eval
+    sourceDigest: "015fc451b71d014c1e4ac3121afed58cf4c9f167347ea83dccadb9c8\
+      5bd59537"
+    observationDigest:
+      "c71ee63464b2bfbbccbc02845466b4f4efd4ae443af5b6e13e54122f\
+      69a2689b"
+    disposition: exclusion
+    evidence:
+      - tests/lexical-static-native.test.ts
+      - tests/native/fixtures/lexical-static-evidence.ts
+      - tests/lexical-static-evidence.test.ts
+    observation: ds16-lexical-8
+    reason: The fixed witness preserves every original separator, token
+      position, combined separator sequence and value assertion, including
+      original greater/less comparison variants and typeof grouping.
+  - path: test/language/expressions/property-accessors/S11.2.1_A1.1.js
+    section: ES5 11.2.1 (original upstream clause)
+    subject: The exact whitespace and line-terminator placements in the supplied
+      source strings, with the property/operator result asserted by this
+      original.
+    sourceDigest: "f64ab519c9d2e0cbd969296ad150f0b00c953e0b7e4761be1f59c588\
+      aec016de"
+    observationDigest:
+      "45eeab59e52443d921425df077501c6e75509d33b1fa7ed6cccc8b70\
+      58db6f56"
+    disposition: exclusion
+    evidence:
+      - tests/lexical-static-native.test.ts
+      - tests/native/fixtures/lexical-static-evidence.ts
+      - tests/lexical-static-evidence.test.ts
+    observation: ds16-lexical-8
+    reason: The fixed witness preserves every original separator, token
+      position, combined separator sequence and value assertion, including
+      original greater/less comparison variants and typeof grouping.
+  - path: test/language/expressions/property-accessors/S11.2.1_A1.2.js
+    section: ES5 11.2.1 (original upstream clause)
+    subject: The exact whitespace and line-terminator placements in the supplied
+      source strings, with the property/operator result asserted by this
+      original.
+    sourceDigest: "a555d1e595b1ab353d4fc267bd5c3a65a84b7de8e76e8363771a9b5b\
+      4dccf2ad"
+    observationDigest:
+      "75abad463f720c84f0041aee8f88d7929f9409ee7897ad7b35babb16\
+      97a00c4e"
+    disposition: exclusion
+    evidence:
+      - tests/lexical-static-native.test.ts
+      - tests/native/fixtures/lexical-static-evidence.ts
+      - tests/lexical-static-evidence.test.ts
+    observation: ds16-lexical-9
+    reason: The fixed witness preserves every original separator, token
+      position, combined separator sequence and value assertion, including
+      original greater/less comparison variants and typeof grouping.
+  - path: test/language/expressions/right-shift/S11.7.2_A1.js
+    section: ES5 11.7.2 (original upstream clause)
+    subject: The exact whitespace and line-terminator placements in the supplied
+      source strings, with the property/operator result asserted by this
+      original.
+    sourceDigest: "b78ab6bdab5a49acbf81852844ed66ee6f398ce02c8d6d5932d56a69\
+      142d7cd6"
+    observationDigest:
+      "e62463c415c8dc1cea1655f74b94891409631fbd11c733e133522f3e\
+      34611269"
+    disposition: exclusion
+    evidence:
+      - tests/lexical-static-native.test.ts
+      - tests/native/fixtures/lexical-static-evidence.ts
+      - tests/lexical-static-evidence.test.ts
+    observation: ds16-lexical-9
+    reason: The fixed witness preserves every original separator, token
+      position, combined separator sequence and value assertion, including
+      original greater/less comparison variants and typeof grouping.
+  - path: test/language/expressions/strict-does-not-equals/S11.9.5_A1.js
+    section: ES5 11.9.5 (original upstream clause)
+    subject: The exact whitespace and line-terminator placements in the supplied
+      source strings, with the property/operator result asserted by this
+      original.
+    sourceDigest: "f7d235e2045e198b61752f611247e346b60b632dbf22fd0f4d49dd53\
+      1a56d63a"
+    observationDigest:
+      "44742cc42b0ea7514b9ef9310d27d1c80f15449ab91502fe78e546d0\
+      233db7c6"
+    disposition: exclusion
+    evidence:
+      - tests/lexical-static-native.test.ts
+      - tests/native/fixtures/lexical-static-evidence.ts
+      - tests/lexical-static-evidence.test.ts
+    observation: ds16-lexical-9
+    reason: The fixed witness preserves every original separator, token
+      position, combined separator sequence and value assertion, including
+      original greater/less comparison variants and typeof grouping.
+  - path: test/language/expressions/strict-equals/S11.9.4_A1.js
+    section: ES5 11.9.4 (original upstream clause)
+    subject: The exact whitespace and line-terminator placements in the supplied
+      source strings, with the property/operator result asserted by this
+      original.
+    sourceDigest: "5865e6b0e875459e0c1f9545ad164e77b835b03e3093e9235a0fed3c\
+      6cf4a93b"
+    observationDigest:
+      "e0ebbb7e8684837d0e241ea26becf70e8023be56a0291564d4291d12\
+      5105fd89"
+    disposition: exclusion
+    evidence:
+      - tests/lexical-static-native.test.ts
+      - tests/native/fixtures/lexical-static-evidence.ts
+      - tests/lexical-static-evidence.test.ts
+    observation: ds16-lexical-10
+    reason: The fixed witness preserves every original separator, token
+      position, combined separator sequence and value assertion, including
+      original greater/less comparison variants and typeof grouping.
+  - path: test/language/expressions/subtraction/S11.6.2_A1.js
+    section: ES5 11.6.2 (original upstream clause)
+    subject: The exact whitespace and line-terminator placements in the supplied
+      source strings, with the property/operator result asserted by this
+      original.
+    sourceDigest: "1f2ff24242a602f2bd7adf047cc7da9134384dc99e0b6b0d02620285\
+      92f15b74"
+    observationDigest:
+      "89abd0cecd6c6e722d6ef06b30e39ea3384f85d1b3fe562f209778f2\
+      65df37ae"
+    disposition: exclusion
+    evidence:
+      - tests/lexical-static-native.test.ts
+      - tests/native/fixtures/lexical-static-evidence.ts
+      - tests/lexical-static-evidence.test.ts
+    observation: ds16-lexical-10
+    reason: The fixed witness preserves every original separator, token
+      position, combined separator sequence and value assertion, including
+      original greater/less comparison variants and typeof grouping.
+  - path: test/language/expressions/typeof/syntax.js
+    section: sec-typeof-operator
+    subject: Checking by using eval
+    sourceDigest: "9ff2b4cec522780ce92e0a6ed2f67b1b0ed5fa76b3414a582a5fad1e\
+      231751e4"
+    observationDigest:
+      "2678d220bff6c0b1766ddc05b14e2670eca61e026c49d0bde666915b\
+      b25a9675"
+    disposition: exclusion
+    evidence:
+      - tests/lexical-static-native.test.ts
+      - tests/native/fixtures/lexical-static-evidence.ts
+      - tests/lexical-static-evidence.test.ts
+    observation: ds16-lexical-10
+    reason: The fixed witness preserves every original separator, token
+      position, combined separator sequence and value assertion, including
+      original greater/less comparison variants and typeof grouping.
+  - path: test/language/expressions/unary-minus/S11.4.7_A1.js
+    section: ES5 11.4.7 (original upstream clause)
+    subject: The exact whitespace and line-terminator placements in the supplied
+      source strings, with the property/operator result asserted by this
+      original.
+    sourceDigest: "a099408400452144b84f99e1df489d63344a15fd4d504d1ebbbff54b\
+      f35a27b8"
+    observationDigest:
+      "8f25616ceae74debd15d0882e83b6dcab7d5bbc32b55752ed2e2f052\
+      45cdb580"
+    disposition: exclusion
+    evidence:
+      - tests/lexical-static-native.test.ts
+      - tests/native/fixtures/lexical-static-evidence.ts
+      - tests/lexical-static-evidence.test.ts
+    observation: ds16-lexical-11
+    reason: The fixed witness preserves every original separator, token
+      position, combined separator sequence and value assertion, including
+      original greater/less comparison variants and typeof grouping.
+  - path: test/language/expressions/unary-plus/S11.4.6_A1.js
+    section: ES5 11.4.6 (original upstream clause)
+    subject: The exact whitespace and line-terminator placements in the supplied
+      source strings, with the property/operator result asserted by this
+      original.
+    sourceDigest: "b6b590e9ec59333fc4b088267e79ea5a5cf255a4bef5dba38d864d3c\
+      f3d2ea49"
+    observationDigest:
+      "137f6f6f54bf25c1e7283b18155344bed4204dd71c4389cbfc06fb6f\
+      9387b280"
+    disposition: exclusion
+    evidence:
+      - tests/lexical-static-native.test.ts
+      - tests/native/fixtures/lexical-static-evidence.ts
+      - tests/lexical-static-evidence.test.ts
+    observation: ds16-lexical-11
+    reason: The fixed witness preserves every original separator, token
+      position, combined separator sequence and value assertion, including
+      original greater/less comparison variants and typeof grouping.
+  - path: test/language/expressions/unsigned-right-shift/S11.7.3_A1.js
+    section: ES5 11.7.3 (original upstream clause)
+    subject: The exact whitespace and line-terminator placements in the supplied
+      source strings, with the property/operator result asserted by this
+      original.
+    sourceDigest: "45f3f06546360e7f158f6060f5665ee92beee6bc92d03d2a6a19571d\
+      ab307a65"
+    observationDigest:
+      "17b6046ed74735fc0024920fbdeb59d955faec425eb798fd70b785b3\
+      defccace"
+    disposition: exclusion
+    evidence:
+      - tests/lexical-static-native.test.ts
+      - tests/native/fixtures/lexical-static-evidence.ts
+      - tests/lexical-static-evidence.test.ts
+    observation: ds16-lexical-11
+    reason: The fixed witness preserves every original separator, token
+      position, combined separator sequence and value assertion, including
+      original greater/less comparison variants and typeof grouping.
+  - path: test/language/expressions/void/S11.4.2_A1.js
+    section: ES5 11.4.2 (original upstream clause)
+    subject: The exact whitespace and line-terminator placements in the supplied
+      source strings, with the property/operator result asserted by this
+      original.
+    sourceDigest: "6df0eb4081c89a8b368eb18d9611b85882e32901bbe828ef8ecb3a4b\
+      9aa0a0e5"
+    observationDigest:
+      "fdb61497ef4a11f9e425ead9edc6365dd928b16ba1119eb492a2cf65\
+      0767eac1"
+    disposition: exclusion
+    evidence:
+      - tests/lexical-static-native.test.ts
+      - tests/native/fixtures/lexical-static-evidence.ts
+      - tests/lexical-static-evidence.test.ts
+    observation: ds16-lexical-12
+    reason: The fixed witness preserves every original separator, token
+      position, combined separator sequence and value assertion, including
+      original greater/less comparison variants and typeof grouping.
+  - path: test/language/line-terminators/S7.3_A5.4.js
+    section: 7.3_A5.4
+    subject: Insert PARAGRAPH SEPARATOR (U+2029) into multi line comment
+    sourceDigest: "1cabb856757465a17d72950b0b6a0f23ceb69180e41917f8a7658e16\
+      c975f1e6"
+    observationDigest:
+      "b6fa60e477365ff72169ab831d4cb3cab77a37bd5723b00037f9710a\
+      609f0265"
+    disposition: exclusion
+    evidence:
+      - tests/lexical-static-native.test.ts
+      - tests/native/fixtures/lexical-static-evidence.ts
+      - tests/lexical-static-evidence.test.ts
+    observation: ds16-lexical-12
+    reason: Both U+2029 block-comment bodies parse; the second encloses
+      x = 1 and the native witness observes that x remains zero.
+  - path: test/language/line-terminators/S7.3_A7_T1.js
+    section: 7.3_A7_T1
+    subject: Insert Line Terminator in var x=y+z
+    sourceDigest: "b167e636eaecba5a5983499e94c364d8b33389a3933f29a6747e54b0\
+      c8d078a9"
+    observationDigest:
+      "7dcb1fda654a77239cb253323ccda0aaf7fdb99f05d0441171c49b17\
+      aa722c5e"
+    disposition: exclusion
+    evidence:
+      - tests/lexical-static-native.test.ts
+      - tests/native/fixtures/lexical-static-evidence.ts
+      - tests/lexical-static-evidence.test.ts
+    observation: ds16-lexical-12
+    reason: The fixed witness preserves both original static checks, both LS/PS
+      statement sources, resets, assignments and asserted values.
+  - path: test/language/line-terminators/S7.3_A7_T2.js
+    section: 7.3_A7_T2
+    subject: Insert Line Terminator in var x=y-z
+    sourceDigest: "2b003345ddc348d45a199bd71e812950e7352ea2f21402e7465bb0f2\
+      97103d3f"
+    observationDigest:
+      "74bb4b213692ce822fdf199f6474c7999d565b488720e98fd4534a07\
+      eeb4e6a9"
+    disposition: exclusion
+    evidence:
+      - tests/lexical-static-native.test.ts
+      - tests/native/fixtures/lexical-static-evidence.ts
+      - tests/lexical-static-evidence.test.ts
+    observation: ds16-lexical-13
+    reason: The fixed witness preserves both original static checks, both LS/PS
+      statement sources, resets, assignments and asserted values.
+  - path: test/language/line-terminators/S7.3_A7_T3.js
+    section: 7.3_A7_T3
+    subject: Insert Line Terminator in var x=y*z
+    sourceDigest: "10a968294c665df76278d3887f43b73ce32fe7feabcb0a7ce1465403\
+      47be11c3"
+    observationDigest:
+      "3529ee04876cb5adfe08219458144731e41ecaac94620b9944d4ceeb\
+      6491fecb"
+    disposition: exclusion
+    evidence:
+      - tests/lexical-static-native.test.ts
+      - tests/native/fixtures/lexical-static-evidence.ts
+      - tests/lexical-static-evidence.test.ts
+    observation: ds16-lexical-13
+    reason: The fixed witness preserves both original static checks, both LS/PS
+      statement sources, resets, assignments and asserted values.
+  - path: test/language/line-terminators/S7.3_A7_T4.js
+    section: 7.3_A7_T4
+    subject: Insert Line Terminator in var x=y/z
+    sourceDigest: "7fcb42dfef9fd47306396fa41a331b86e22d75c48b83744cf4711d89\
+      a81e5173"
+    observationDigest:
+      "1b2de06feacc0310af0f9c9e0f7ecb8fab7231f2d7a4ac0556784692\
+      9d69f732"
+    disposition: exclusion
+    evidence:
+      - tests/lexical-static-native.test.ts
+      - tests/native/fixtures/lexical-static-evidence.ts
+      - tests/lexical-static-evidence.test.ts
+    observation: ds16-lexical-13
+    reason: The fixed witness preserves both original static checks, both LS/PS
+      statement sources, resets, assignments and asserted values.
+  - path: test/language/line-terminators/S7.3_A7_T5.js
+    section: 7.3_A7_T5
+    subject: Insert Line Terminator in var x=y%z
+    sourceDigest: "314ed963ae148aed4a68405487270c21c5da3156f6f071a1b82bea81\
+      f80c6598"
+    observationDigest:
+      "1161fcb23b0ce4792914db435c1084a17288a028566bd27ef3a1b023\
+      44de36cc"
+    disposition: exclusion
+    evidence:
+      - tests/lexical-static-native.test.ts
+      - tests/native/fixtures/lexical-static-evidence.ts
+      - tests/lexical-static-evidence.test.ts
+    observation: ds16-lexical-14
+    reason: The fixed witness preserves both original static checks, both LS/PS
+      statement sources, resets, assignments and asserted values.
+  - path: test/language/line-terminators/S7.3_A7_T6.js
+    section: 7.3_A7_T6
+    subject: Insert Line Terminator in var x=y>>z
+    sourceDigest: "208af09a6cb341c652cf29e322037d697ee52b98a5e26f3a3e36d371\
+      a1430a6a"
+    observationDigest:
+      "e8f34cc1c10fa9a8e61b0042bb95afb62b3b75e37887b5c4d92a54e5\
+      22496089"
+    disposition: exclusion
+    evidence:
+      - tests/lexical-static-native.test.ts
+      - tests/native/fixtures/lexical-static-evidence.ts
+      - tests/lexical-static-evidence.test.ts
+    observation: ds16-lexical-14
+    reason: The fixed witness preserves both original static checks, both LS/PS
+      statement sources, resets, assignments and asserted values.
+  - path: test/language/line-terminators/S7.3_A7_T7.js
+    section: 7.3_A7_T7
+    subject: Insert Line Terminator in var x=y<<z
+    sourceDigest: "79b2bd240573054ec1729a8ab8f8c93a6a96b2610be76df211216d7f\
+      070024e4"
+    observationDigest:
+      "7cf263082d0950ae1ef3bc7d07c818a9184a3e47d5cfec83fe38f1f8\
+      cc12e975"
+    disposition: exclusion
+    evidence:
+      - tests/lexical-static-native.test.ts
+      - tests/native/fixtures/lexical-static-evidence.ts
+      - tests/lexical-static-evidence.test.ts
+    observation: ds16-lexical-14
+    reason: The fixed witness preserves both original static checks, both LS/PS
+      statement sources, resets, assignments and asserted values.
+  - path: test/language/line-terminators/S7.3_A7_T8.js
+    section: 7.3_A7_T8
+    subject: Insert Line Terminator in var x=y<z
+    sourceDigest: "fe64d66db9132ffe240d3ea1f8281d01d07cc1f9d5abd212fc82a312\
+      7a0f6128"
+    observationDigest:
+      "d12c8cdeca1b7b9eb4cb78e5523d550f3b1854b0f84d2ce59f92c54d\
+      2085cff7"
+    disposition: exclusion
+    evidence:
+      - tests/lexical-static-native.test.ts
+      - tests/native/fixtures/lexical-static-evidence.ts
+      - tests/lexical-static-evidence.test.ts
+    observation: ds16-lexical-15
+    reason: The fixed witness preserves both original static checks, both LS/PS
+      statement sources, resets, assignments and asserted values.
+  - path: test/language/literals/numeric/7.8.3-3gs.js
+    section: "Original es5id: 7.8.3-3gs"
+    subject: Strict Mode - octal extension is forbidden in strict mode (after a
+      hex number is assigned to a variable from an eval)
+    sourceDigest: "228d3bb4d12ad6e0c00ebae60417f32c924e9cf94416f34e649e59ca\
+      4d963c50"
+    observationDigest:
+      "40fd9fe3a92413b229d0356f25fe50fabd90e4a46f8a101db622c6c1\
+      5281ac92"
+    disposition: exclusion
+    evidence:
+      - tests/lexical-static-evidence.test.ts
+      - tests/fixtures/lexical-static-negatives.json
+    observation: ds16-static-syntax
+    reason: The static Script/function source rejects at parse with OSEO0001 and
+      independent reference SyntaxError; source instantiation, strictness
+      inheritance and conversion of that error into a runtime
+      eval/constructor exception remain inside ADR 0016.
+  - path: test/language/literals/string/line-separator-eval.js
+    section: sec-literals-string-literals
+    subject: U+2028 LINE SEPARATOR can appear in string literals (eval code).
+    sourceDigest: "a2494eca0cbcd90cf8c17581e03ebec75e41dcaa5fceaa8266c8f1fa\
+      e32c7f0f"
+    observationDigest:
+      "5e57b650355fbec915a777574154ccd9422b7778434949d485cb90e1\
+      a08c7fa3"
+    disposition: exclusion
+    evidence:
+      - tests/lexical-static-native.test.ts
+      - tests/native/fixtures/lexical-static-evidence.ts
+      - tests/lexical-static-evidence.test.ts
+    observation: ds16-lexical-15
+    reason: The fixed witness embeds the exact literal characters and checks the
+      original string value.
+  - path: test/language/literals/string/paragraph-separator-eval.js
+    section: sec-literals-string-literals
+    subject: "U+2029 PARAGRAPH SEPARATOR can appear in string literals\
+      (eval code)."
+    sourceDigest: "afe313499d8604099e935405bd41b616fdc0e1824075fc0aa0f09afa\
+      2d5b0633"
+    observationDigest:
+      "59c1faf162c306c217421ba766c3909945c0d561587f3dd13c54b11a\
+      dcfda21d"
+    disposition: exclusion
+    evidence:
+      - tests/lexical-static-native.test.ts
+      - tests/native/fixtures/lexical-static-evidence.ts
+      - tests/lexical-static-evidence.test.ts
+    observation: ds16-lexical-15
+    reason: The fixed witness embeds the exact literal characters and checks the
+      original string value.
+  - path: test/language/statements/with/12.10.1-10-s.js
+    section: 12.10.1-10-s
+    subject: with statement in strict mode throws SyntaxError (eval, where the
+      container function is strict)
+    sourceDigest: "dd423d69db2feb4f75d26f5184444afe028dfac97e16b0a279f7081a\
+      01b85916"
+    observationDigest:
+      "9f8e970588acdd1f7530405b03845b47f36d10ff3b5a0be3abc5ab80\
+      f6b84480"
+    disposition: exclusion
+    evidence:
+      - tests/lexical-static-evidence.test.ts
+      - tests/fixtures/lexical-static-negatives.json
+    observation: ds16-static-syntax
+    reason: The static Script/function source rejects at parse with OSEO0001 and
+      independent reference SyntaxError; source instantiation, strictness
+      inheritance and conversion of that error into a runtime
+      eval/constructor exception remain inside ADR 0016.
+  - path: test/language/statements/with/12.10.1-12-s.js
+    section: 12.10.1-12-s
+    subject: with statement in strict mode throws SyntaxError (strict eval)
+    sourceDigest: "bd6e41a05fc5e8f7e209710e292b5c7ab0dec48f8f3c0a64869e5973\
+      97706744"
+    observationDigest:
+      "a98a55e7dfa95072ccf254850b49c53fc121266ece58e6aa296fd255\
+      55034d89"
+    disposition: exclusion
+    evidence:
+      - tests/lexical-static-evidence.test.ts
+      - tests/fixtures/lexical-static-negatives.json
+    observation: ds16-static-syntax
+    reason: The static Script/function source rejects at parse with OSEO0001 and
+      independent reference SyntaxError; source instantiation, strictness
+      inheritance and conversion of that error into a runtime
+      eval/constructor exception remain inside ADR 0016.
+  - path: test/language/statements/with/12.10.1-4-s.js
+    section: 12.10.1-4-s
+    subject: with statement in strict mode throws SyntaxError (strict Function)
+    sourceDigest: "9bf81a852697a3871dfda0ea56af407694b4bede3148e32530473acd\
+      b664674d"
+    observationDigest:
+      "6ddbef0972994ea5a45aa1f26f036c82906680fd31ac0a0389b554fd\
+      1d43eb5a"
+    disposition: exclusion
+    evidence:
+      - tests/lexical-static-evidence.test.ts
+      - tests/fixtures/lexical-static-negatives.json
+    observation: ds16-static-syntax
+    reason: The static Script/function source rejects at parse with OSEO0001 and
+      independent reference SyntaxError; source instantiation, strictness
+      inheritance and conversion of that error into a runtime
+      eval/constructor exception remain inside ADR 0016.
+  - path: test/language/statements/with/12.10.1-5-s.js
+    section: 12.10.1-5-s
+    subject: Construction of a strict dynamic function containing an
+      unexecuted nested Function call with a string containing with syntax.
+    sourceDigest: "8f1deffa657d1f507ae25f2e9fb7e361339abdfef901763c34e4a196\
+      d8ce2f26"
+    observationDigest:
+      "e8e1b2edd6d30278e723b3bc8770ad4c46c7402bdac6a5727843c026\
+      23ae7b23"
+    disposition: remediation
+    evidence: []
+    observation: partial-or-none
+    reason: The outer constructor is called but its function is never
+      invoked, so the inner constructor and with statement never execute.
+      Retain this path conservatively for review of its source-construction
+      accounting; no replacement or inner strictness observation is claimed.
+  - path: test/language/statements/with/12.10.1-8-s.js
+    section: 12.10.1-8-s
+    subject: with statement in strict mode throws SyntaxError (function
+      expression, where the container Function is strict)
+    sourceDigest: "a07b0fcff0dcc7b70bec0dd16e71e6a00b089bfab44dccab2a47169c\
+      a581302e"
+    observationDigest:
+      "7ff5e0663ed8028386ab25a3ca4a47256cd63d7c2c0f44d04347b201\
+      862d59d7"
+    disposition: exclusion
+    evidence:
+      - tests/lexical-static-evidence.test.ts
+      - tests/fixtures/lexical-static-negatives.json
+    observation: ds16-static-syntax
+    reason: The static Script/function source rejects at parse with OSEO0001 and
+      independent reference SyntaxError; source instantiation, strictness
+      inheritance and conversion of that error into a runtime
+      eval/constructor exception remain inside ADR 0016.
+  - path: test/language/types/string/S8.4_A7.1.js
+    section: sec-line-terminators
+    subject: Line terminator <LF> may appear as an escape sequence within a
+      StringLiteral
+    sourceDigest: "228dd9e2129e52f8108cb55eead776c44d61170777d113b54ed2c010\
+      50fdfc63"
+    observationDigest:
+      "51fa804f55ed542949f686ab82b1cd5089101d7dc94eaa8d9917a64c\
+      cc7c0539"
+    disposition: exclusion
+    evidence:
+      - tests/lexical-static-native.test.ts
+      - tests/native/fixtures/lexical-static-evidence.ts
+      - tests/lexical-static-evidence.test.ts
+    observation: ds16-lexical-16
+    reason: The exact unbound-identifier source separated by its line terminator
+      throws ReferenceError before the following identifier; the fixed
+      native witness catches only ReferenceError.
+  - path: test/language/types/string/S8.4_A7.2.js
+    section: sec-line-terminators
+    subject: Line terminator <CR> may appear as an escape sequence within a
+      StringLiteral
+    sourceDigest: "399b5687918d6a12ea7ec742618aaf2f48c1086e1866eb456d67f63b\
+      a0ca5558"
+    observationDigest:
+      "e44af3bda6012878f942524a87fd168e2b9333b03c3d4d231b240320\
+      31227e79"
+    disposition: exclusion
+    evidence:
+      - tests/lexical-static-native.test.ts
+      - tests/native/fixtures/lexical-static-evidence.ts
+      - tests/lexical-static-evidence.test.ts
+    observation: ds16-lexical-16
+    reason: The exact unbound-identifier source separated by its line terminator
+      throws ReferenceError before the following identifier; the fixed
+      native witness catches only ReferenceError.
+  - path: test/language/types/string/S8.4_A7.3.js
+    section: sec-line-terminators
+    subject: Line terminator <PS> may appear as an escape sequence within a
+      StringLiteral
+    sourceDigest: "3a02ff865aa86e284f730b4c2881e0a7202133768955d6b26fd0dc81\
+      8398fc78"
+    observationDigest:
+      "054d4d4bd285fb2479e3ce1ce64cab9e8839220ee1ee2f2e9bbc651c\
+      6b5f8839"
+    disposition: exclusion
+    evidence:
+      - tests/lexical-static-native.test.ts
+      - tests/native/fixtures/lexical-static-evidence.ts
+      - tests/lexical-static-evidence.test.ts
+    observation: ds16-lexical-16
+    reason: The exact unbound-identifier source separated by its line terminator
+      throws ReferenceError before the following identifier; the fixed
+      native witness catches only ReferenceError.
+  - path: test/language/types/string/S8.4_A7.4.js
+    section: sec-line-terminators
+    subject: Line terminator <LS> may appear as an escape sequence within a
+      StringLiteral
+    sourceDigest: "d02a352fca50b66152b6d05e70d2c8b8d41461d5ed72edb21dd0053e\
+      deb9f408"
+    observationDigest:
+      "68e550001d67e3aeab2748779bc921389f341ea7ddcbccba0d02ac61\
+      75b8cea2"
+    disposition: exclusion
+    evidence:
+      - tests/lexical-static-native.test.ts
+      - tests/native/fixtures/lexical-static-evidence.ts
+      - tests/lexical-static-evidence.test.ts
+    observation: ds16-lexical-17
+    reason: The exact unbound-identifier source separated by its line terminator
+      throws ReferenceError before the following identifier; the fixed
+      native witness catches only ReferenceError.
+  - path: test/language/white-space/comment-multi-form-feed.js
+    section: 7.2_A4.3_T1
+    subject: Use FORM FEED(\u000C)
+    sourceDigest: "420e368f4de8d2a078bfab75f9a116c75ea7619217de87d175c498b2\
+      e5a31574"
+    observationDigest:
+      "91a38956d938504871cfc5f2e047b2d59ab6f1649e1fe897251b4876\
+      df5a0fb1"
+    disposition: exclusion
+    evidence:
+      - tests/lexical-static-native.test.ts
+      - tests/native/fixtures/lexical-static-evidence.ts
+      - tests/lexical-static-evidence.test.ts
+    observation: ds16-lexical-17
+    reason: The fixed witness parses both original comment bodies and observes
+      that the enclosed assignment leaves the binding zero.
+  - path: test/language/white-space/comment-multi-horizontal-tab.js
+    section: 7.2_A4.1_T1
+    subject: Use HORIZONTAL TAB(\u0009)
+    sourceDigest: "8417e76ae3eb0309f81c083cef9e8b7571a6adc631200ef5084e0ae1\
+      e397e8de"
+    observationDigest:
+      "cdc767038ede64a47a3461a67d8c79bb18a2c44a2eb6c76e723e2eb4\
+      59e00ff8"
+    disposition: exclusion
+    evidence:
+      - tests/lexical-static-native.test.ts
+      - tests/native/fixtures/lexical-static-evidence.ts
+      - tests/lexical-static-evidence.test.ts
+    observation: ds16-lexical-17
+    reason: The fixed witness parses both original comment bodies and observes
+      that the enclosed assignment leaves the binding zero.
+  - path: test/language/white-space/comment-multi-nbsp.js
+    section: 7.2_A4.5_T1
+    subject: Use NO-BREAK SPACE(\u00A0)
+    sourceDigest: "fbc163402c77510e4e93059dee45612c8a63fe23000c93f70a4ff631\
+      e49c2ca9"
+    observationDigest:
+      "59cad5d5784dfc770f98b0a34192cba1f4a557131de48065052db3d6\
+      6fd206cc"
+    disposition: exclusion
+    evidence:
+      - tests/lexical-static-native.test.ts
+      - tests/native/fixtures/lexical-static-evidence.ts
+      - tests/lexical-static-evidence.test.ts
+    observation: ds16-lexical-18
+    reason: The fixed witness parses both original comment bodies and observes
+      that the enclosed assignment leaves the binding zero.
+  - path: test/language/white-space/comment-multi-space.js
+    section: 7.2_A4.4_T1
+    subject: Use SPACE(\u0020)
+    sourceDigest: "cbe251e575e9ec40dd676d90563bb5931f97790bad8317f4136ec190\
+      c71de8c9"
+    observationDigest:
+      "f741127190c8ca6689fc415cb046b223ad99d393c99f64e8bfee7bba\
+      23cddf6f"
+    disposition: exclusion
+    evidence:
+      - tests/lexical-static-native.test.ts
+      - tests/native/fixtures/lexical-static-evidence.ts
+      - tests/lexical-static-evidence.test.ts
+    observation: ds16-lexical-18
+    reason: The fixed witness parses both original comment bodies and observes
+      that the enclosed assignment leaves the binding zero.
+  - path: test/language/white-space/comment-multi-vertical-tab.js
+    section: 7.2_A4.2_T1
+    subject: Use VERTICAL TAB(\u000B)
+    sourceDigest: "5ff4ad7875170827da5bf0b036a57e3ac734a727b98a4821b3cca737\
+      d4456afa"
+    observationDigest:
+      "726bd63f94b207eb7961612bd26aaaf245fabfef32fe45056233ca5f\
+      6db1c452"
+    disposition: exclusion
+    evidence:
+      - tests/lexical-static-native.test.ts
+      - tests/native/fixtures/lexical-static-evidence.ts
+      - tests/lexical-static-evidence.test.ts
+    observation: ds16-lexical-18
+    reason: The fixed witness parses both original comment bodies and observes
+      that the enclosed assignment leaves the binding zero.
+  - path: test/language/white-space/comment-single-form-feed.js
+    section: 7.2_A3.3_T1
+    subject: Use FORM FEED(\u000C)
+    sourceDigest: "fc1c31b680e9d4ce541529889df793f73bb0b9565c2c41f2284dba1e\
+      12aa6352"
+    observationDigest:
+      "62c4a215d6b996cd9f971fa9b87570458be46f157b2f738ea2ffdb50\
+      43d6c1cf"
+    disposition: exclusion
+    evidence:
+      - tests/lexical-static-native.test.ts
+      - tests/native/fixtures/lexical-static-evidence.ts
+      - tests/lexical-static-evidence.test.ts
+    observation: ds16-lexical-19
+    reason: The fixed witness parses both original comment bodies and observes
+      that the enclosed assignment leaves the binding zero.
+  - path: test/language/white-space/comment-single-horizontal-tab.js
+    section: 7.2_A3.1_T1
+    subject: Use HORIZONTAL TAB(\u0009)
+    sourceDigest: "0b13a46486136d8b62efaeb5682c60cfedd98f4fe4d2c43a29b8477e\
+      efc63d5d"
+    observationDigest:
+      "d42acdad9a7a1e3f8d3832a4a139339f31367b560ce0260ebaf1b08d\
+      3bf8eb5c"
+    disposition: exclusion
+    evidence:
+      - tests/lexical-static-native.test.ts
+      - tests/native/fixtures/lexical-static-evidence.ts
+      - tests/lexical-static-evidence.test.ts
+    observation: ds16-lexical-19
+    reason: The fixed witness parses both original comment bodies and observes
+      that the enclosed assignment leaves the binding zero.
+  - path: test/language/white-space/comment-single-nbsp.js
+    section: 7.2_A3.5_T1
+    subject: Use NO-BREAK SPACE(\u00A0)
+    sourceDigest: "655ff14f674bcd61d01eb83e761c721151c88162d07466125c458428\
+      32fa22d6"
+    observationDigest:
+      "431567af5ef7f8661b655b4f4b5b09f5d08945f838f0776e3a8cab68\
+      85d2fe01"
+    disposition: exclusion
+    evidence:
+      - tests/lexical-static-native.test.ts
+      - tests/native/fixtures/lexical-static-evidence.ts
+      - tests/lexical-static-evidence.test.ts
+    observation: ds16-lexical-19
+    reason: The fixed witness parses both original comment bodies and observes
+      that the enclosed assignment leaves the binding zero.
+  - path: test/language/white-space/comment-single-space.js
+    section: 7.2_A3.4_T1
+    subject: Use SPACE(\u0020)
+    sourceDigest: "1223c178c4408b329e0782103dff0eb66b46fe67d548546c4d86131d\
+      0621af0a"
+    observationDigest:
+      "8a94181236bc68de5ae8d090cba95dfbfe7a526094fa38d7a80063ae\
+      a42f8ffb"
+    disposition: exclusion
+    evidence:
+      - tests/lexical-static-native.test.ts
+      - tests/native/fixtures/lexical-static-evidence.ts
+      - tests/lexical-static-evidence.test.ts
+    observation: ds16-lexical-20
+    reason: The fixed witness parses both original comment bodies and observes
+      that the enclosed assignment leaves the binding zero.
+  - path: test/language/white-space/comment-single-vertical-tab.js
+    section: 7.2_A3.2_T1
+    subject: Use VERTICAL TAB(\u000B)
+    sourceDigest: "fb59b9ca2642c20924308661b7b22953da55fe51deffe31fd7a24a13\
+      7159a3c7"
+    observationDigest:
+      "b405eb271cdbfab67b92c6aa41b9772fa901037e9359f9c3ae87b537\
+      6fcd249c"
+    disposition: exclusion
+    evidence:
+      - tests/lexical-static-native.test.ts
+      - tests/native/fixtures/lexical-static-evidence.ts
+      - tests/lexical-static-evidence.test.ts
+    observation: ds16-lexical-20
+    reason: The fixed witness parses both original comment bodies and observes
+      that the enclosed assignment leaves the binding zero.
+  - path: test/language/white-space/mongolian-vowel-separator-eval.js
+    section: sec-white-space
+    subject: "Mongolian Vowel Separator is not recognized as white spa\
+      ce (eval code)."
+    sourceDigest: "6b2139d618919e96d0b9fdee14b451136fef101cfe967a3e31c99a33\
+      85d14ac6"
+    observationDigest:
+      "f063c3307c566c113d04ef3b0edd6eb82149be124aa6e94df6c6b820\
+      0cfaffa2"
+    disposition: exclusion
+    evidence:
+      - tests/lexical-static-evidence.test.ts
+      - tests/fixtures/lexical-static-negatives.json
+    observation: ds16-static-syntax
+    reason: The static Script/function source rejects at parse with OSEO0001 and
+      independent reference SyntaxError; source instantiation, strictness
+      inheritance and conversion of that error into a runtime
+      eval/constructor exception remain inside ADR 0016.
+  - path: test/language/white-space/string-form-feed.js
+    section: 7.2_A2.3_T1
+    subject: Use FORM FEED(\u000C and \f)
+    sourceDigest: "2f044164e0ce7d1cd720a42cb67253838966c69021b2681389750fcc\
+      3fb34cb4"
+    observationDigest:
+      "41c6d15c7d8c28213ee8d9488ee47b818fa8d6d07e51cf55ae57f3a3\
+      19819325"
+    disposition: exclusion
+    evidence:
+      - tests/lexical-static-native.test.ts
+      - tests/native/fixtures/lexical-static-evidence.ts
+      - tests/lexical-static-evidence.test.ts
+    observation: ds16-lexical-20
+    reason: The fixed witness embeds the exact literal characters and checks the
+      original string value.
+  - path: test/language/white-space/string-horizontal-tab.js
+    section: 7.2_A2.1_T1
+    subject: Use HORIZONTAL TAB(\u0009 and \t)
+    sourceDigest: "882e36d5bd5b3478fb8a46c73a717e0eeaaf5683c86e09f3958adf99\
+      dd8515dc"
+    observationDigest:
+      "9aa8a542029d40b4d03b3dcedbcb34847f380396cf125e6b6c1c8801\
+      164c6c85"
+    disposition: exclusion
+    evidence:
+      - tests/lexical-static-native.test.ts
+      - tests/native/fixtures/lexical-static-evidence.ts
+      - tests/lexical-static-evidence.test.ts
+    observation: ds16-lexical-21
+    reason: The fixed witness embeds the exact literal characters and checks the
+      original string value.
+  - path: test/language/white-space/string-nbsp.js
+    section: 7.2_A2.5_T1
+    subject: Use NO-BREAK SPACE(\u00A0)
+    sourceDigest: "491a77b96bb9c008a36310efbafe96a279113d4a2a22bd1995a0662c\
+      fe43559d"
+    observationDigest:
+      "5eb4d72c3be4345606f28d3c134ae7d4b300ca0d9db2d3db7e1773b9\
+      1100a5e4"
+    disposition: exclusion
+    evidence:
+      - tests/lexical-static-native.test.ts
+      - tests/native/fixtures/lexical-static-evidence.ts
+      - tests/lexical-static-evidence.test.ts
+    observation: ds16-lexical-21
+    reason: The fixed witness embeds the exact literal characters and checks the
+      original string value.
+  - path: test/language/white-space/string-space.js
+    section: 7.2_A2.4_T1
+    subject: Use SPACE(\u0020)
+    sourceDigest: "8c577e14d668318ee44223c902fe661db0dcd1e4866b288b9250c21f\
+      adcbc6db"
+    observationDigest:
+      "edc5a0c062aca331024db5890f917a4566481544a0066d5b17213e72\
+      f72a53a3"
+    disposition: exclusion
+    evidence:
+      - tests/lexical-static-native.test.ts
+      - tests/native/fixtures/lexical-static-evidence.ts
+      - tests/lexical-static-evidence.test.ts
+    observation: ds16-lexical-21
+    reason: The fixed witness embeds the exact literal characters and checks the
+      original string value.
+  - path: test/language/white-space/string-vertical-tab.js
+    section: 7.2_A2.2_T1
+    subject: Use VERTICAL TAB(\u000B and \v)
+    sourceDigest: "3eca3990e938a55ceb8fde6a2ca0e74e037b7d761206b370a7387ad5\
+      2e9aee5b"
+    observationDigest:
+      "5262e7fbc6be4e824fb133730dcc9b422b5ec6eb9a6357f2a95f53de\
+      bd701217"
+    disposition: exclusion
+    evidence:
+      - tests/lexical-static-native.test.ts
+      - tests/native/fixtures/lexical-static-evidence.ts
+      - tests/lexical-static-evidence.test.ts
+    observation: ds16-lexical-22
+    reason: The fixed witness embeds the exact literal characters and checks the
+      original string value.

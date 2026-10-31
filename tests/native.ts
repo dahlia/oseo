@@ -96,6 +96,10 @@ const { typedArraySortFixtures } =
 const { typedArrayStaticsFixtures } =
   await import("./native/fixtures/typed-array-statics.ts");
 
+const { lexicalStaticFixtures } =
+  await import("./native/fixtures/lexical-static-evidence.ts");
+import { lexicalBmpFixtures } from "./native/fixtures/lexical-bmp-comments.ts";
+
 const { regexpLiteralAotFixtures } =
   await import("./native/fixtures/regexp-literal-aot.ts");
 const { regexpAnchoredRepeatFixtures } =
@@ -272,6 +276,8 @@ const fixtures: readonly Fixture[] = [
   ...primitiveReceiverSetFixtures,
   ...regexpIntrinsicFixtures,
   ...regexpLiteralAotFixtures,
+  ...lexicalStaticFixtures,
+  ...lexicalBmpFixtures,
   ...regexpPatternExtensionFixtures,
   ...regexpPrototypeAndExecFixtures,
   ...regexpAnchoredRepeatFixtures,
@@ -1649,6 +1655,7 @@ for (const fixture of selectedFixtures) {
     fixture.name === "date-real-time-clock" ||
     fixture.name === "regexp-intrinsic" ||
     fixture.name === "regexp-literal-aot" ||
+    fixture.name.startsWith("ds16-lexical-") ||
     fixture.name === "regexp-pattern-extensions" ||
     fixture.name === "regexp-prototype-and-exec" ||
     fixture.name === "regexp-anchored-repeat" ||
@@ -1895,6 +1902,9 @@ for (const fixture of selectedFixtures) {
                 assert.ok(native.counters.guardMisses > 0);
               }
             }
+          }
+          if (fixture.name.startsWith("ds16-lexical-")) {
+            assert.ok(native.counters.collections > 0);
           }
           if (fixture.test262Host === true) {
             // Collection forced at every safepoint reaches the main

@@ -1209,8 +1209,8 @@ assessments:
       tests/native/fixtures/bindings.ts:
         "f3e20be237b2b772c59670f481af8147bfa59312098aa503\
         e3817879ab0fb31b"
-      tests/native.ts: "3364536158b7563fc496e24097e08d7b0d96bee8d84f4ca1\
-        0f68d1d64cf37f84"
+      tests/native.ts: "1796805a1fcd585f33704acb002d7b221bfc51bf77d1b000\
+        7374e77e75389d21"
     reason: Maintainer decision 2026-10-28 item 1 applies to the single path in
       dynamic-source-template-site-evidence.paths.txt. The
       template-site-identity native fixture observes both same-site equalities
@@ -2213,6 +2213,639 @@ assessments:
       ownership pending faithful observations or a bounded maintainer
       decision. ADR 0016 and ADR 0019 remain unchanged."
 
+  ds16-static-syntax:
+    disposition: exclusion
+    normativeDependency: source-evaluation-only
+    replacementEvidence:
+      tests/lexical-static-evidence.test.ts:
+        "f0517b358fe59f4083924d6307f277041168d548cde19a1b\
+        5be2d11c2f8c7cc5"
+      tests/fixtures/lexical-static-negatives.json:
+        "24d86babb6f1f2fcc7b091fbd581ebeac75520c2f06588b8\
+        f5403ef7fcbb01fb"
+    reason: Maintainer decision 2026-10-28 item 1 applies path by path as
+      mapped in
+      docs/m5c-graph/dynamic-source-lexical-static-assessment.yaml. The
+      static Script/function source rejects at parse with OSEO0001 and
+      independent reference SyntaxError; source instantiation, strictness
+      inheritance and conversion of that error into a runtime
+      eval/constructor exception remain inside ADR 0016. Only source
+      evaluation remains after the named static observations. Original
+      unsupported-profile-feature classifications and all assertions
+      remain unchanged; none counts as a pass. Reopen if original or
+      replacement evidence changes or ADR 0016 admits the corresponding
+      source operation; all ADR 0016/0019 reopening triggers remain in
+      force.
+  ds16-lexical-bmp-single:
+    disposition: exclusion
+    normativeDependency: source-evaluation-only
+    replacementEvidence:
+      tests/lexical-static-native.test.ts:
+        "92b2bd59258f0ffc79ccb7bcb0be40d3f97239f15f7e3c6e\
+        de2d03dd2cd35b78"
+      tests/native/fixtures/lexical-bmp-comments.ts:
+        "66eeee10d6b139f746d882ed87eecdff3fc699c87db14a29\
+        820222c85f17b4cd"
+      tests/lexical-static-evidence.test.ts:
+        "f0517b358fe59f4083924d6307f277041168d548cde19a1b\
+        5be2d11c2f8c7cc5"
+    reason: Maintainer decision 2026-10-28 item 1 applies path by path as
+      mapped in
+      docs/m5c-graph/dynamic-source-lexical-static-assessment.yaml. All
+      65,536 code units retain the //var CODEyy = -1 position; 65,532
+      preserve zero and LF/CR/LS/PS each execute the assignment. A leaked
+      assignment cannot be masked by a reset. Only source evaluation
+      remains after the named static observations. Original
+      unsupported-profile-feature classifications and all assertions
+      remain unchanged; none counts as a pass. Reopen if original or
+      replacement evidence changes or ADR 0016 admits the corresponding
+      source operation; all ADR 0016/0019 reopening triggers remain in
+      force.
+  ds16-lexical-bmp-multi:
+    disposition: exclusion
+    normativeDependency: source-evaluation-only
+    replacementEvidence:
+      tests/lexical-static-native.test.ts:
+        "92b2bd59258f0ffc79ccb7bcb0be40d3f97239f15f7e3c6e\
+        de2d03dd2cd35b78"
+      tests/native/fixtures/lexical-bmp-comments.ts:
+        "66eeee10d6b139f746d882ed87eecdff3fc699c87db14a29\
+        820222c85f17b4cd"
+      tests/lexical-static-evidence.test.ts:
+        "f0517b358fe59f4083924d6307f277041168d548cde19a1b\
+        5be2d11c2f8c7cc5"
+    reason: Maintainer decision 2026-10-28 item 1 applies path by path as
+      mapped in
+      docs/m5c-graph/dynamic-source-lexical-static-assessment.yaml. All
+      65,536 code units retain the /*var CODExx = 1*/ position; the shared
+      zero binding must survive every comment without a masked assignment.
+      Only source evaluation remains after the named static observations.
+      Original unsupported-profile-feature classifications and all
+      assertions remain unchanged; none counts as a pass. Reopen if
+      original or replacement evidence changes or ADR 0016 admits the
+      corresponding source operation; all ADR 0016/0019 reopening triggers
+      remain in force.
+  ds16-lexical-0:
+    disposition: exclusion
+    normativeDependency: source-evaluation-only
+    replacementEvidence:
+      tests/lexical-static-native.test.ts:
+        "92b2bd59258f0ffc79ccb7bcb0be40d3f97239f15f7e3c6e\
+        de2d03dd2cd35b78"
+      tests/native/fixtures/lexical-static-evidence.ts:
+        "e2007c4535bd5f97698fc47139109b5b437e5663fdff7e96\
+        150180c391024282"
+      tests/lexical-static-evidence.test.ts:
+        "f0517b358fe59f4083924d6307f277041168d548cde19a1b\
+        5be2d11c2f8c7cc5"
+    reason: Maintainer decision 2026-10-28 item 1 applies path by path as
+      mapped in
+      docs/m5c-graph/dynamic-source-lexical-static-assessment.yaml. The
+      fixed witness preserves every original separator, token position,
+      combined separator sequence and value assertion, including original
+      greater/less comparison variants and typeof grouping. Only source
+      evaluation remains after the named static observations. Original
+      unsupported-profile-feature classifications and all assertions
+      remain unchanged; none counts as a pass. Reopen if original or
+      replacement evidence changes or ADR 0016 admits the corresponding
+      source operation; all ADR 0016/0019 reopening triggers remain in
+      force.
+  ds16-lexical-1:
+    disposition: exclusion
+    normativeDependency: source-evaluation-only
+    replacementEvidence:
+      tests/lexical-static-native.test.ts:
+        "92b2bd59258f0ffc79ccb7bcb0be40d3f97239f15f7e3c6e\
+        de2d03dd2cd35b78"
+      tests/native/fixtures/lexical-static-evidence.ts:
+        "e2007c4535bd5f97698fc47139109b5b437e5663fdff7e96\
+        150180c391024282"
+      tests/lexical-static-evidence.test.ts:
+        "f0517b358fe59f4083924d6307f277041168d548cde19a1b\
+        5be2d11c2f8c7cc5"
+    reason: Maintainer decision 2026-10-28 item 1 applies path by path as
+      mapped in
+      docs/m5c-graph/dynamic-source-lexical-static-assessment.yaml. The
+      fixed witness preserves every original separator, token position,
+      combined separator sequence and value assertion, including original
+      greater/less comparison variants and typeof grouping. Only source
+      evaluation remains after the named static observations. Original
+      unsupported-profile-feature classifications and all assertions
+      remain unchanged; none counts as a pass. Reopen if original or
+      replacement evidence changes or ADR 0016 admits the corresponding
+      source operation; all ADR 0016/0019 reopening triggers remain in
+      force.
+  ds16-lexical-2:
+    disposition: exclusion
+    normativeDependency: source-evaluation-only
+    replacementEvidence:
+      tests/lexical-static-native.test.ts:
+        "92b2bd59258f0ffc79ccb7bcb0be40d3f97239f15f7e3c6e\
+        de2d03dd2cd35b78"
+      tests/native/fixtures/lexical-static-evidence.ts:
+        "e2007c4535bd5f97698fc47139109b5b437e5663fdff7e96\
+        150180c391024282"
+      tests/lexical-static-evidence.test.ts:
+        "f0517b358fe59f4083924d6307f277041168d548cde19a1b\
+        5be2d11c2f8c7cc5"
+    reason: Maintainer decision 2026-10-28 item 1 applies path by path as
+      mapped in
+      docs/m5c-graph/dynamic-source-lexical-static-assessment.yaml. The
+      fixed witness preserves every original separator, token position,
+      combined separator sequence and value assertion, including original
+      greater/less comparison variants and typeof grouping. Only source
+      evaluation remains after the named static observations. Original
+      unsupported-profile-feature classifications and all assertions
+      remain unchanged; none counts as a pass. Reopen if original or
+      replacement evidence changes or ADR 0016 admits the corresponding
+      source operation; all ADR 0016/0019 reopening triggers remain in
+      force.
+  ds16-lexical-3:
+    disposition: exclusion
+    normativeDependency: source-evaluation-only
+    replacementEvidence:
+      tests/lexical-static-native.test.ts:
+        "92b2bd59258f0ffc79ccb7bcb0be40d3f97239f15f7e3c6e\
+        de2d03dd2cd35b78"
+      tests/native/fixtures/lexical-static-evidence.ts:
+        "e2007c4535bd5f97698fc47139109b5b437e5663fdff7e96\
+        150180c391024282"
+      tests/lexical-static-evidence.test.ts:
+        "f0517b358fe59f4083924d6307f277041168d548cde19a1b\
+        5be2d11c2f8c7cc5"
+    reason: Maintainer decision 2026-10-28 item 1 applies path by path as
+      mapped in
+      docs/m5c-graph/dynamic-source-lexical-static-assessment.yaml. The
+      fixed witness preserves every original separator, token position,
+      combined separator sequence and value assertion, including original
+      greater/less comparison variants and typeof grouping. Only source
+      evaluation remains after the named static observations. Original
+      unsupported-profile-feature classifications and all assertions
+      remain unchanged; none counts as a pass. Reopen if original or
+      replacement evidence changes or ADR 0016 admits the corresponding
+      source operation; all ADR 0016/0019 reopening triggers remain in
+      force.
+  ds16-lexical-4:
+    disposition: exclusion
+    normativeDependency: source-evaluation-only
+    replacementEvidence:
+      tests/lexical-static-native.test.ts:
+        "92b2bd59258f0ffc79ccb7bcb0be40d3f97239f15f7e3c6e\
+        de2d03dd2cd35b78"
+      tests/native/fixtures/lexical-static-evidence.ts:
+        "e2007c4535bd5f97698fc47139109b5b437e5663fdff7e96\
+        150180c391024282"
+      tests/lexical-static-evidence.test.ts:
+        "f0517b358fe59f4083924d6307f277041168d548cde19a1b\
+        5be2d11c2f8c7cc5"
+    reason: Maintainer decision 2026-10-28 item 1 applies path by path as
+      mapped in
+      docs/m5c-graph/dynamic-source-lexical-static-assessment.yaml. The
+      fixed witness preserves every original separator, token position,
+      combined separator sequence and value assertion, including original
+      greater/less comparison variants and typeof grouping. Only source
+      evaluation remains after the named static observations. Original
+      unsupported-profile-feature classifications and all assertions
+      remain unchanged; none counts as a pass. Reopen if original or
+      replacement evidence changes or ADR 0016 admits the corresponding
+      source operation; all ADR 0016/0019 reopening triggers remain in
+      force.
+  ds16-lexical-5:
+    disposition: exclusion
+    normativeDependency: source-evaluation-only
+    replacementEvidence:
+      tests/lexical-static-native.test.ts:
+        "92b2bd59258f0ffc79ccb7bcb0be40d3f97239f15f7e3c6e\
+        de2d03dd2cd35b78"
+      tests/native/fixtures/lexical-static-evidence.ts:
+        "e2007c4535bd5f97698fc47139109b5b437e5663fdff7e96\
+        150180c391024282"
+      tests/lexical-static-evidence.test.ts:
+        "f0517b358fe59f4083924d6307f277041168d548cde19a1b\
+        5be2d11c2f8c7cc5"
+    reason: Maintainer decision 2026-10-28 item 1 applies path by path as
+      mapped in
+      docs/m5c-graph/dynamic-source-lexical-static-assessment.yaml. The
+      fixed witness preserves every original separator, token position,
+      combined separator sequence and value assertion, including original
+      greater/less comparison variants and typeof grouping. Only source
+      evaluation remains after the named static observations. Original
+      unsupported-profile-feature classifications and all assertions
+      remain unchanged; none counts as a pass. Reopen if original or
+      replacement evidence changes or ADR 0016 admits the corresponding
+      source operation; all ADR 0016/0019 reopening triggers remain in
+      force.
+  ds16-lexical-6:
+    disposition: exclusion
+    normativeDependency: source-evaluation-only
+    replacementEvidence:
+      tests/lexical-static-native.test.ts:
+        "92b2bd59258f0ffc79ccb7bcb0be40d3f97239f15f7e3c6e\
+        de2d03dd2cd35b78"
+      tests/native/fixtures/lexical-static-evidence.ts:
+        "e2007c4535bd5f97698fc47139109b5b437e5663fdff7e96\
+        150180c391024282"
+      tests/lexical-static-evidence.test.ts:
+        "f0517b358fe59f4083924d6307f277041168d548cde19a1b\
+        5be2d11c2f8c7cc5"
+    reason: Maintainer decision 2026-10-28 item 1 applies path by path as
+      mapped in
+      docs/m5c-graph/dynamic-source-lexical-static-assessment.yaml. The
+      fixed witness preserves every original separator, token position,
+      combined separator sequence and value assertion, including original
+      greater/less comparison variants and typeof grouping. Only source
+      evaluation remains after the named static observations. Original
+      unsupported-profile-feature classifications and all assertions
+      remain unchanged; none counts as a pass. Reopen if original or
+      replacement evidence changes or ADR 0016 admits the corresponding
+      source operation; all ADR 0016/0019 reopening triggers remain in
+      force.
+  ds16-lexical-7:
+    disposition: exclusion
+    normativeDependency: source-evaluation-only
+    replacementEvidence:
+      tests/lexical-static-native.test.ts:
+        "92b2bd59258f0ffc79ccb7bcb0be40d3f97239f15f7e3c6e\
+        de2d03dd2cd35b78"
+      tests/native/fixtures/lexical-static-evidence.ts:
+        "e2007c4535bd5f97698fc47139109b5b437e5663fdff7e96\
+        150180c391024282"
+      tests/lexical-static-evidence.test.ts:
+        "f0517b358fe59f4083924d6307f277041168d548cde19a1b\
+        5be2d11c2f8c7cc5"
+    reason: Maintainer decision 2026-10-28 item 1 applies path by path as
+      mapped in
+      docs/m5c-graph/dynamic-source-lexical-static-assessment.yaml. The
+      fixed witness preserves every original separator, token position,
+      combined separator sequence and value assertion, including original
+      greater/less comparison variants and typeof grouping. Only source
+      evaluation remains after the named static observations. Original
+      unsupported-profile-feature classifications and all assertions
+      remain unchanged; none counts as a pass. Reopen if original or
+      replacement evidence changes or ADR 0016 admits the corresponding
+      source operation; all ADR 0016/0019 reopening triggers remain in
+      force.
+  ds16-lexical-8:
+    disposition: exclusion
+    normativeDependency: source-evaluation-only
+    replacementEvidence:
+      tests/lexical-static-native.test.ts:
+        "92b2bd59258f0ffc79ccb7bcb0be40d3f97239f15f7e3c6e\
+        de2d03dd2cd35b78"
+      tests/native/fixtures/lexical-static-evidence.ts:
+        "e2007c4535bd5f97698fc47139109b5b437e5663fdff7e96\
+        150180c391024282"
+      tests/lexical-static-evidence.test.ts:
+        "f0517b358fe59f4083924d6307f277041168d548cde19a1b\
+        5be2d11c2f8c7cc5"
+    reason: Maintainer decision 2026-10-28 item 1 applies path by path as
+      mapped in
+      docs/m5c-graph/dynamic-source-lexical-static-assessment.yaml. The
+      fixed witness preserves every original separator, token position,
+      combined separator sequence and value assertion, including original
+      greater/less comparison variants and typeof grouping. Only source
+      evaluation remains after the named static observations. Original
+      unsupported-profile-feature classifications and all assertions
+      remain unchanged; none counts as a pass. Reopen if original or
+      replacement evidence changes or ADR 0016 admits the corresponding
+      source operation; all ADR 0016/0019 reopening triggers remain in
+      force.
+  ds16-lexical-9:
+    disposition: exclusion
+    normativeDependency: source-evaluation-only
+    replacementEvidence:
+      tests/lexical-static-native.test.ts:
+        "92b2bd59258f0ffc79ccb7bcb0be40d3f97239f15f7e3c6e\
+        de2d03dd2cd35b78"
+      tests/native/fixtures/lexical-static-evidence.ts:
+        "e2007c4535bd5f97698fc47139109b5b437e5663fdff7e96\
+        150180c391024282"
+      tests/lexical-static-evidence.test.ts:
+        "f0517b358fe59f4083924d6307f277041168d548cde19a1b\
+        5be2d11c2f8c7cc5"
+    reason: Maintainer decision 2026-10-28 item 1 applies path by path as
+      mapped in
+      docs/m5c-graph/dynamic-source-lexical-static-assessment.yaml. The
+      fixed witness preserves every original separator, token position,
+      combined separator sequence and value assertion, including original
+      greater/less comparison variants and typeof grouping. Only source
+      evaluation remains after the named static observations. Original
+      unsupported-profile-feature classifications and all assertions
+      remain unchanged; none counts as a pass. Reopen if original or
+      replacement evidence changes or ADR 0016 admits the corresponding
+      source operation; all ADR 0016/0019 reopening triggers remain in
+      force.
+  ds16-lexical-10:
+    disposition: exclusion
+    normativeDependency: source-evaluation-only
+    replacementEvidence:
+      tests/lexical-static-native.test.ts:
+        "92b2bd59258f0ffc79ccb7bcb0be40d3f97239f15f7e3c6e\
+        de2d03dd2cd35b78"
+      tests/native/fixtures/lexical-static-evidence.ts:
+        "e2007c4535bd5f97698fc47139109b5b437e5663fdff7e96\
+        150180c391024282"
+      tests/lexical-static-evidence.test.ts:
+        "f0517b358fe59f4083924d6307f277041168d548cde19a1b\
+        5be2d11c2f8c7cc5"
+    reason: Maintainer decision 2026-10-28 item 1 applies path by path as
+      mapped in
+      docs/m5c-graph/dynamic-source-lexical-static-assessment.yaml. The
+      fixed witness preserves every original separator, token position,
+      combined separator sequence and value assertion, including original
+      greater/less comparison variants and typeof grouping. Only source
+      evaluation remains after the named static observations. Original
+      unsupported-profile-feature classifications and all assertions
+      remain unchanged; none counts as a pass. Reopen if original or
+      replacement evidence changes or ADR 0016 admits the corresponding
+      source operation; all ADR 0016/0019 reopening triggers remain in
+      force.
+  ds16-lexical-11:
+    disposition: exclusion
+    normativeDependency: source-evaluation-only
+    replacementEvidence:
+      tests/lexical-static-native.test.ts:
+        "92b2bd59258f0ffc79ccb7bcb0be40d3f97239f15f7e3c6e\
+        de2d03dd2cd35b78"
+      tests/native/fixtures/lexical-static-evidence.ts:
+        "e2007c4535bd5f97698fc47139109b5b437e5663fdff7e96\
+        150180c391024282"
+      tests/lexical-static-evidence.test.ts:
+        "f0517b358fe59f4083924d6307f277041168d548cde19a1b\
+        5be2d11c2f8c7cc5"
+    reason: Maintainer decision 2026-10-28 item 1 applies path by path as
+      mapped in
+      docs/m5c-graph/dynamic-source-lexical-static-assessment.yaml. The
+      fixed witness preserves every original separator, token position,
+      combined separator sequence and value assertion, including original
+      greater/less comparison variants and typeof grouping. Only source
+      evaluation remains after the named static observations. Original
+      unsupported-profile-feature classifications and all assertions
+      remain unchanged; none counts as a pass. Reopen if original or
+      replacement evidence changes or ADR 0016 admits the corresponding
+      source operation; all ADR 0016/0019 reopening triggers remain in
+      force.
+  ds16-lexical-12:
+    disposition: exclusion
+    normativeDependency: source-evaluation-only
+    replacementEvidence:
+      tests/lexical-static-native.test.ts:
+        "92b2bd59258f0ffc79ccb7bcb0be40d3f97239f15f7e3c6e\
+        de2d03dd2cd35b78"
+      tests/native/fixtures/lexical-static-evidence.ts:
+        "e2007c4535bd5f97698fc47139109b5b437e5663fdff7e96\
+        150180c391024282"
+      tests/lexical-static-evidence.test.ts:
+        "f0517b358fe59f4083924d6307f277041168d548cde19a1b\
+        5be2d11c2f8c7cc5"
+    reason: Maintainer decision 2026-10-28 item 1 applies path by path as
+      mapped in
+      docs/m5c-graph/dynamic-source-lexical-static-assessment.yaml. The
+      fixed witness preserves both original static checks, both LS/PS
+      statement sources, resets, assignments and asserted values. Only
+      source evaluation remains after the named static observations.
+      Original unsupported-profile-feature classifications and all
+      assertions remain unchanged; none counts as a pass. Reopen if
+      original or replacement evidence changes or ADR 0016 admits the
+      corresponding source operation; all ADR 0016/0019 reopening triggers
+      remain in force.
+  ds16-lexical-13:
+    disposition: exclusion
+    normativeDependency: source-evaluation-only
+    replacementEvidence:
+      tests/lexical-static-native.test.ts:
+        "92b2bd59258f0ffc79ccb7bcb0be40d3f97239f15f7e3c6e\
+        de2d03dd2cd35b78"
+      tests/native/fixtures/lexical-static-evidence.ts:
+        "e2007c4535bd5f97698fc47139109b5b437e5663fdff7e96\
+        150180c391024282"
+      tests/lexical-static-evidence.test.ts:
+        "f0517b358fe59f4083924d6307f277041168d548cde19a1b\
+        5be2d11c2f8c7cc5"
+    reason: Maintainer decision 2026-10-28 item 1 applies path by path as
+      mapped in
+      docs/m5c-graph/dynamic-source-lexical-static-assessment.yaml. The
+      fixed witness preserves both original static checks, both LS/PS
+      statement sources, resets, assignments and asserted values. Only
+      source evaluation remains after the named static observations.
+      Original unsupported-profile-feature classifications and all
+      assertions remain unchanged; none counts as a pass. Reopen if
+      original or replacement evidence changes or ADR 0016 admits the
+      corresponding source operation; all ADR 0016/0019 reopening triggers
+      remain in force.
+  ds16-lexical-14:
+    disposition: exclusion
+    normativeDependency: source-evaluation-only
+    replacementEvidence:
+      tests/lexical-static-native.test.ts:
+        "92b2bd59258f0ffc79ccb7bcb0be40d3f97239f15f7e3c6e\
+        de2d03dd2cd35b78"
+      tests/native/fixtures/lexical-static-evidence.ts:
+        "e2007c4535bd5f97698fc47139109b5b437e5663fdff7e96\
+        150180c391024282"
+      tests/lexical-static-evidence.test.ts:
+        "f0517b358fe59f4083924d6307f277041168d548cde19a1b\
+        5be2d11c2f8c7cc5"
+    reason: Maintainer decision 2026-10-28 item 1 applies path by path as
+      mapped in
+      docs/m5c-graph/dynamic-source-lexical-static-assessment.yaml. The
+      fixed witness preserves both original static checks, both LS/PS
+      statement sources, resets, assignments and asserted values. Only
+      source evaluation remains after the named static observations.
+      Original unsupported-profile-feature classifications and all
+      assertions remain unchanged; none counts as a pass. Reopen if
+      original or replacement evidence changes or ADR 0016 admits the
+      corresponding source operation; all ADR 0016/0019 reopening triggers
+      remain in force.
+  ds16-lexical-15:
+    disposition: exclusion
+    normativeDependency: source-evaluation-only
+    replacementEvidence:
+      tests/lexical-static-native.test.ts:
+        "92b2bd59258f0ffc79ccb7bcb0be40d3f97239f15f7e3c6e\
+        de2d03dd2cd35b78"
+      tests/native/fixtures/lexical-static-evidence.ts:
+        "e2007c4535bd5f97698fc47139109b5b437e5663fdff7e96\
+        150180c391024282"
+      tests/lexical-static-evidence.test.ts:
+        "f0517b358fe59f4083924d6307f277041168d548cde19a1b\
+        5be2d11c2f8c7cc5"
+    reason: Maintainer decision 2026-10-28 item 1 applies path by path as
+      mapped in
+      docs/m5c-graph/dynamic-source-lexical-static-assessment.yaml. The
+      fixed witness embeds the exact literal characters and checks the
+      original string value. Only source evaluation remains after the
+      named static observations. Original unsupported-profile-feature
+      classifications and all assertions remain unchanged; none counts as
+      a pass. Reopen if original or replacement evidence changes or ADR
+      0016 admits the corresponding source operation; all ADR 0016/0019
+      reopening triggers remain in force.
+  ds16-lexical-16:
+    disposition: exclusion
+    normativeDependency: source-evaluation-only
+    replacementEvidence:
+      tests/lexical-static-native.test.ts:
+        "92b2bd59258f0ffc79ccb7bcb0be40d3f97239f15f7e3c6e\
+        de2d03dd2cd35b78"
+      tests/native/fixtures/lexical-static-evidence.ts:
+        "e2007c4535bd5f97698fc47139109b5b437e5663fdff7e96\
+        150180c391024282"
+      tests/lexical-static-evidence.test.ts:
+        "f0517b358fe59f4083924d6307f277041168d548cde19a1b\
+        5be2d11c2f8c7cc5"
+    reason: Maintainer decision 2026-10-28 item 1 applies path by path as
+      mapped in
+      docs/m5c-graph/dynamic-source-lexical-static-assessment.yaml. The
+      exact unbound-identifier source separated by its line terminator
+      throws ReferenceError before the following identifier; the fixed
+      native witness catches only ReferenceError. Only source evaluation
+      remains after the named static observations. Original
+      unsupported-profile-feature classifications and all assertions
+      remain unchanged; none counts as a pass. Reopen if original or
+      replacement evidence changes or ADR 0016 admits the corresponding
+      source operation; all ADR 0016/0019 reopening triggers remain in
+      force.
+  ds16-lexical-17:
+    disposition: exclusion
+    normativeDependency: source-evaluation-only
+    replacementEvidence:
+      tests/lexical-static-native.test.ts:
+        "92b2bd59258f0ffc79ccb7bcb0be40d3f97239f15f7e3c6e\
+        de2d03dd2cd35b78"
+      tests/native/fixtures/lexical-static-evidence.ts:
+        "e2007c4535bd5f97698fc47139109b5b437e5663fdff7e96\
+        150180c391024282"
+      tests/lexical-static-evidence.test.ts:
+        "f0517b358fe59f4083924d6307f277041168d548cde19a1b\
+        5be2d11c2f8c7cc5"
+    reason: Maintainer decision 2026-10-28 item 1 applies path by path as
+      mapped in
+      docs/m5c-graph/dynamic-source-lexical-static-assessment.yaml. The
+      fixed witness parses both original comment bodies and observes that
+      the enclosed assignment leaves the binding zero. Only source
+      evaluation remains after the named static observations. Original
+      unsupported-profile-feature classifications and all assertions
+      remain unchanged; none counts as a pass. Reopen if original or
+      replacement evidence changes or ADR 0016 admits the corresponding
+      source operation; all ADR 0016/0019 reopening triggers remain in
+      force.
+  ds16-lexical-18:
+    disposition: exclusion
+    normativeDependency: source-evaluation-only
+    replacementEvidence:
+      tests/lexical-static-native.test.ts:
+        "92b2bd59258f0ffc79ccb7bcb0be40d3f97239f15f7e3c6e\
+        de2d03dd2cd35b78"
+      tests/native/fixtures/lexical-static-evidence.ts:
+        "e2007c4535bd5f97698fc47139109b5b437e5663fdff7e96\
+        150180c391024282"
+      tests/lexical-static-evidence.test.ts:
+        "f0517b358fe59f4083924d6307f277041168d548cde19a1b\
+        5be2d11c2f8c7cc5"
+    reason: Maintainer decision 2026-10-28 item 1 applies path by path as
+      mapped in
+      docs/m5c-graph/dynamic-source-lexical-static-assessment.yaml. The
+      fixed witness parses both original comment bodies and observes that
+      the enclosed assignment leaves the binding zero. Only source
+      evaluation remains after the named static observations. Original
+      unsupported-profile-feature classifications and all assertions
+      remain unchanged; none counts as a pass. Reopen if original or
+      replacement evidence changes or ADR 0016 admits the corresponding
+      source operation; all ADR 0016/0019 reopening triggers remain in
+      force.
+  ds16-lexical-19:
+    disposition: exclusion
+    normativeDependency: source-evaluation-only
+    replacementEvidence:
+      tests/lexical-static-native.test.ts:
+        "92b2bd59258f0ffc79ccb7bcb0be40d3f97239f15f7e3c6e\
+        de2d03dd2cd35b78"
+      tests/native/fixtures/lexical-static-evidence.ts:
+        "e2007c4535bd5f97698fc47139109b5b437e5663fdff7e96\
+        150180c391024282"
+      tests/lexical-static-evidence.test.ts:
+        "f0517b358fe59f4083924d6307f277041168d548cde19a1b\
+        5be2d11c2f8c7cc5"
+    reason: Maintainer decision 2026-10-28 item 1 applies path by path as
+      mapped in
+      docs/m5c-graph/dynamic-source-lexical-static-assessment.yaml. The
+      fixed witness parses both original comment bodies and observes that
+      the enclosed assignment leaves the binding zero. Only source
+      evaluation remains after the named static observations. Original
+      unsupported-profile-feature classifications and all assertions
+      remain unchanged; none counts as a pass. Reopen if original or
+      replacement evidence changes or ADR 0016 admits the corresponding
+      source operation; all ADR 0016/0019 reopening triggers remain in
+      force.
+  ds16-lexical-20:
+    disposition: exclusion
+    normativeDependency: source-evaluation-only
+    replacementEvidence:
+      tests/lexical-static-native.test.ts:
+        "92b2bd59258f0ffc79ccb7bcb0be40d3f97239f15f7e3c6e\
+        de2d03dd2cd35b78"
+      tests/native/fixtures/lexical-static-evidence.ts:
+        "e2007c4535bd5f97698fc47139109b5b437e5663fdff7e96\
+        150180c391024282"
+      tests/lexical-static-evidence.test.ts:
+        "f0517b358fe59f4083924d6307f277041168d548cde19a1b\
+        5be2d11c2f8c7cc5"
+    reason: Maintainer decision 2026-10-28 item 1 applies path by path as
+      mapped in
+      docs/m5c-graph/dynamic-source-lexical-static-assessment.yaml. The
+      fixed witness embeds the exact literal characters and checks the
+      original string value. Only source evaluation remains after the
+      named static observations. Original unsupported-profile-feature
+      classifications and all assertions remain unchanged; none counts as
+      a pass. Reopen if original or replacement evidence changes or ADR
+      0016 admits the corresponding source operation; all ADR 0016/0019
+      reopening triggers remain in force.
+  ds16-lexical-21:
+    disposition: exclusion
+    normativeDependency: source-evaluation-only
+    replacementEvidence:
+      tests/lexical-static-native.test.ts:
+        "92b2bd59258f0ffc79ccb7bcb0be40d3f97239f15f7e3c6e\
+        de2d03dd2cd35b78"
+      tests/native/fixtures/lexical-static-evidence.ts:
+        "e2007c4535bd5f97698fc47139109b5b437e5663fdff7e96\
+        150180c391024282"
+      tests/lexical-static-evidence.test.ts:
+        "f0517b358fe59f4083924d6307f277041168d548cde19a1b\
+        5be2d11c2f8c7cc5"
+    reason: Maintainer decision 2026-10-28 item 1 applies path by path as
+      mapped in
+      docs/m5c-graph/dynamic-source-lexical-static-assessment.yaml. The
+      fixed witness embeds the exact literal characters and checks the
+      original string value. Only source evaluation remains after the
+      named static observations. Original unsupported-profile-feature
+      classifications and all assertions remain unchanged; none counts as
+      a pass. Reopen if original or replacement evidence changes or ADR
+      0016 admits the corresponding source operation; all ADR 0016/0019
+      reopening triggers remain in force.
+  ds16-lexical-22:
+    disposition: exclusion
+    normativeDependency: source-evaluation-only
+    replacementEvidence:
+      tests/lexical-static-native.test.ts:
+        "92b2bd59258f0ffc79ccb7bcb0be40d3f97239f15f7e3c6e\
+        de2d03dd2cd35b78"
+      tests/native/fixtures/lexical-static-evidence.ts:
+        "e2007c4535bd5f97698fc47139109b5b437e5663fdff7e96\
+        150180c391024282"
+      tests/lexical-static-evidence.test.ts:
+        "f0517b358fe59f4083924d6307f277041168d548cde19a1b\
+        5be2d11c2f8c7cc5"
+    reason: Maintainer decision 2026-10-28 item 1 applies path by path as
+      mapped in
+      docs/m5c-graph/dynamic-source-lexical-static-assessment.yaml. The
+      fixed witness embeds the exact literal characters and checks the
+      original string value. Only source evaluation remains after the
+      named static observations. Original unsupported-profile-feature
+      classifications and all assertions remain unchanged; none counts as
+      a pass. Reopen if original or replacement evidence changes or ADR
+      0016 admits the corresponding source operation; all ADR 0016/0019
+      reopening triggers remain in force.
 paths:
   - path: test/built-ins/AggregateError/newtarget-proto-fallback.js
     proposedOwner: adr:0016-dynamic-source-boundary
@@ -6126,7 +6759,7 @@ paths:
     subject: "Assignment to arguments in strict function code is
       an early SyntaxError; eval only carries the assignment
       as source so the error surfaces at run time"
-    assessment: "fixture-construction"
+    assessment: ds16-static-syntax
   - path: "test/language/arguments-object/10.5-7-b-1-s.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "source-subject"
@@ -6193,7 +6826,7 @@ paths:
       LineTerminator code point; eval only compiles each
       probe source that places one BMP code unit in the
       comment"
-    assessment: "fixture-construction"
+    assessment: ds16-lexical-bmp-single
   - path: "test/language/comments/S7.4_A6.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "incidental-scaffolding"
@@ -6206,7 +6839,7 @@ paths:
     subject: "A multi-line comment can contain any code unit;
       eval only compiles each probe source that places one
       code unit in the comment"
-    assessment: "fixture-construction"
+    assessment: ds16-lexical-bmp-multi
   - path: "test/language/comments/hashbang/eval-indirect.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "incidental-scaffolding"
@@ -6242,7 +6875,7 @@ paths:
     section: "ECMA-262 Hashbang Comments; CreateDynamicFunction"
     subject: "Hashbang comments should not be allowed in function
       evaluator contexts."
-    assessment: "observation-train-dynamic-coverage"
+    assessment: ds16-static-syntax
   - path: "test/language/comments/hashbang/no-line-separator.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "incidental-scaffolding"
@@ -9457,7 +10090,7 @@ paths:
     section: "Original es5id: 15.1.2.1_A2_T1"
     subject: "Checking if execution of \"eval(\"x = 1; x\\u000A++\"), catch
       SyntaxError\" passes"
-    assessment: "observation-train-b06-b08-b14"
+    assessment: ds16-static-syntax
   - path: "test/language/eval-code/direct/parse-failure-2.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "source-subject"
@@ -9468,7 +10101,7 @@ paths:
     missingDynamicTag: false
     section: "Original es5id: 15.1.2.1_A2_T2"
     subject: "Checking if execution of \"eval(\"x = 1; x\\u000A++\")\" fails"
-    assessment: "observation-train-b06-b08-b14"
+    assessment: ds16-static-syntax
   - path: "test/language/eval-code/direct/parse-failure-3.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "source-subject"
@@ -9479,7 +10112,7 @@ paths:
     missingDynamicTag: false
     section: "Original es5id: 15.1.2.1_A3.3_T1"
     subject: "Continue statement"
-    assessment: "observation-train-b06-b08-b14"
+    assessment: ds16-static-syntax
   - path: "test/language/eval-code/direct/parse-failure-4.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "source-subject"
@@ -9490,7 +10123,7 @@ paths:
     missingDynamicTag: false
     section: "Original es5id: 15.1.2.1_A3.3_T2"
     subject: "Break statement"
-    assessment: "observation-train-b06-b08-b14"
+    assessment: ds16-static-syntax
   - path: "test/language/eval-code/direct/parse-failure-5.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "source-subject"
@@ -9501,7 +10134,7 @@ paths:
     missingDynamicTag: false
     section: "Original es5id: 15.1.2.1_A3.3_T3"
     subject: "Return statement"
-    assessment: "observation-train-b06-b08-b14"
+    assessment: ds16-static-syntax
   - path: "test/language/eval-code/direct/parse-failure-6.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "source-subject"
@@ -9512,7 +10145,7 @@ paths:
     missingDynamicTag: false
     section: "sec-performeval"
     subject: "For statement"
-    assessment: "observation-train-b06-b08-b14"
+    assessment: ds16-static-syntax
   - path: "test/language/eval-code/direct/strict-caller-function-context.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "source-subject"
@@ -10483,7 +11116,7 @@ paths:
     section: "sec-performeval"
     subject: "Checking if execution of \"(0,eval)(\"x = 1; x\\u000A++\"), catch
       SyntaxError\" passes"
-    assessment: "observation-train-b06-b08-b14"
+    assessment: ds16-static-syntax
   - path: "test/language/eval-code/indirect/parse-failure-2.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "source-subject"
@@ -10495,7 +11128,7 @@ paths:
     section: "sec-performeval"
     subject: "Checking if execution of \"(0,eval)(\"x = 1; x\\u000A++\")\" f\
       ails"
-    assessment: "observation-train-b06-b08-b14"
+    assessment: ds16-static-syntax
   - path: "test/language/eval-code/indirect/parse-failure-3.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "source-subject"
@@ -10506,7 +11139,7 @@ paths:
     missingDynamicTag: false
     section: "sec-performeval"
     subject: "Continue statement"
-    assessment: "observation-train-b06-b08-b14"
+    assessment: ds16-static-syntax
   - path: "test/language/eval-code/indirect/parse-failure-4.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "source-subject"
@@ -10517,7 +11150,7 @@ paths:
     missingDynamicTag: false
     section: "sec-performeval"
     subject: "Break statement"
-    assessment: "observation-train-b06-b08-b14"
+    assessment: ds16-static-syntax
   - path: "test/language/eval-code/indirect/parse-failure-5.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "source-subject"
@@ -10528,7 +11161,7 @@ paths:
     missingDynamicTag: false
     section: "sec-performeval"
     subject: "Return statement"
-    assessment: "observation-train-b06-b08-b14"
+    assessment: ds16-static-syntax
   - path: "test/language/eval-code/indirect/parse-failure-6.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "source-subject"
@@ -10539,7 +11172,7 @@ paths:
     missingDynamicTag: false
     section: "sec-performeval"
     subject: "For statement"
-    assessment: "observation-train-b06-b08-b14"
+    assessment: ds16-static-syntax
   - path: "test/language/eval-code/indirect/realm.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "source-subject"
@@ -10791,7 +11424,7 @@ paths:
     section: sec-addition-operator-plus
     subject: Whitespace and line terminators around the addition
       operator
-    assessment: fixture-construction
+    assessment: ds16-lexical-0
   - path: "test/language/expressions/arrow-function/arrow/bindi\
       ng-tests-1.js"
     proposedOwner: adr:0016-dynamic-source-boundary
@@ -11094,7 +11727,7 @@ paths:
     missingDynamicTag: false
     section: "sec-binary-bitwise-operators"
     subject: "Checking uses eval"
-    assessment: "fixture-construction"
+    assessment: ds16-lexical-0
   - path: "test/language/expressions/bitwise-not/S11.4.8_A1.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "incidental-scaffolding"
@@ -11105,7 +11738,7 @@ paths:
     missingDynamicTag: false
     section: "sec-bitwise-not-operator"
     subject: "Checking by using eval"
-    assessment: "fixture-construction"
+    assessment: ds16-lexical-0
   - path: "test/language/expressions/bitwise-or/S11.10.3_A1.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "incidental-scaffolding"
@@ -11116,7 +11749,7 @@ paths:
     missingDynamicTag: false
     section: "sec-binary-bitwise-operators"
     subject: "Checking by using eval"
-    assessment: "fixture-construction"
+    assessment: ds16-lexical-1
   - path: "test/language/expressions/bitwise-xor/S11.10.2_A1.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "incidental-scaffolding"
@@ -11127,7 +11760,7 @@ paths:
     missingDynamicTag: false
     section: "sec-binary-bitwise-operators"
     subject: "The check uses eval"
-    assessment: "fixture-construction"
+    assessment: ds16-lexical-1
   - path: "test/language/expressions/call/11.2.3-3_5.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "incidental-scaffolding"
@@ -11151,7 +11784,7 @@ paths:
     missingDynamicTag: false
     section: "sec-function-calls-runtime-semantics-evaluation"
     subject: "Checking by using eval"
-    assessment: "fixture-construction"
+    assessment: ds16-lexical-1
   - path: "test/language/expressions/call/eval-err-args.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "incidental-scaffolding"
@@ -12894,7 +13527,7 @@ paths:
     section: "sec-comma-operator"
     subject: "Whitespace and line terminators around the comma
       operator"
-    assessment: "fixture-construction"
+    assessment: ds16-lexical-2
   - path: "test/language/expressions/compound-assignment/11.13.\
       2-1-s.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -13230,7 +13863,7 @@ paths:
     missingDynamicTag: false
     section: "sec-conditional-operator"
     subject: "Checking by using eval"
-    assessment: "fixture-construction"
+    assessment: ds16-lexical-2
   - path: test/language/expressions/delete/11.4.1-4.a-7.js
     proposedOwner: adr:0016-dynamic-source-boundary
     priorCohort: incidental-scaffolding
@@ -13255,7 +13888,7 @@ paths:
       division operator; every check compiles a source
       string with eval to place the WhiteSpace or
       LineTerminator code points"
-    assessment: "fixture-construction"
+    assessment: ds16-lexical-2
   - path: "test/language/expressions/division/no-magic-asi-from\
       -block-eval.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -13285,7 +13918,7 @@ paths:
       does-not-equals operator; every check compiles a
       source string with eval to place the WhiteSpace or
       LineTerminator code points"
-    assessment: "fixture-construction"
+    assessment: ds16-lexical-3
   - path: "test/language/expressions/does-not-equals/S11.9.2_A6\
       .1.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -19477,7 +20110,7 @@ paths:
     missingDynamicTag: false
     section: sec-equality-operators
     subject: Checking by using eval
-    assessment: fixture-construction
+    assessment: ds16-lexical-3
   - path: "test/language/expressions/equals/S11.9.1_A6.1.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "incidental-scaffolding"
@@ -19519,7 +20152,7 @@ paths:
       FunctionExpression in strict mode code; eval only
       carries the invalid source, whose literal 'use strict'
       directive makes it strict"
-    assessment: "fixture-construction"
+    assessment: ds16-static-syntax
   - path: "test/language/expressions/function/named-no-strict-r\
       eassign-fn-name-in-body-in-eval.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -19561,7 +20194,7 @@ paths:
       element in strict mode code; eval only carries the
       invalid source, whose literal 'use strict' directive
       makes it strict"
-    assessment: "fixture-construction"
+    assessment: ds16-static-syntax
   - path: "test/language/expressions/function/scope-body-lex-di\
       stinct.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -19762,7 +20395,7 @@ paths:
       greater-than-or-equal operator; every check compiles a
       source string with eval to place the WhiteSpace or
       LineTerminator code points"
-    assessment: "fixture-construction"
+    assessment: ds16-lexical-3
   - path: "test/language/expressions/greater-than/S11.8.2_A1.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "incidental-scaffolding"
@@ -19776,7 +20409,7 @@ paths:
       greater-than operator; every check compiles a source
       string with eval to place the WhiteSpace or
       LineTerminator code points"
-    assessment: "fixture-construction"
+    assessment: ds16-lexical-4
   - path: "test/language/expressions/grouping/S11.1.6_A1.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "incidental-scaffolding"
@@ -19789,7 +20422,7 @@ paths:
     subject: "Whitespace and line terminators inside the
       grouping operator; every check compiles a source
       string with eval"
-    assessment: "fixture-construction"
+    assessment: ds16-lexical-4
   - path: "test/language/expressions/import.meta/not-accessible-fro\
       m-direct-eval.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -19872,7 +20505,7 @@ paths:
       operator; every check compiles a source string with
       eval to place the WhiteSpace or LineTerminator code
       points"
-    assessment: "fixture-construction"
+    assessment: ds16-lexical-4
   - path: "test/language/expressions/instanceof/S11.8.6_A1.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "incidental-scaffolding"
@@ -19886,7 +20519,7 @@ paths:
       instanceof operator; every check compiles a source
       string with eval to place the WhiteSpace or
       LineTerminator code points"
-    assessment: "fixture-construction"
+    assessment: ds16-lexical-5
   - path: "test/language/expressions/instanceof/S11.8.6_A7_T3.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "incidental-scaffolding"
@@ -20085,7 +20718,7 @@ paths:
     missingDynamicTag: false
     section: "Original es5id: 11.7.1_A1"
     subject: "Checking by using eval"
-    assessment: "observation-train-b06-b08-b14"
+    assessment: ds16-lexical-5
   - path: "test/language/expressions/less-than-or-equal/S11.8.3_A1.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "incidental-scaffolding"
@@ -20096,7 +20729,7 @@ paths:
     missingDynamicTag: false
     section: "Original es5id: 11.8.3_A1"
     subject: "Checking by using eval"
-    assessment: "observation-train-b06-b08-b14"
+    assessment: ds16-lexical-5
   - path: "test/language/expressions/less-than/S11.8.1_A1.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "incidental-scaffolding"
@@ -20107,7 +20740,7 @@ paths:
     missingDynamicTag: false
     section: "Original es5id: 11.8.1_A1"
     subject: "Checking by using eval"
-    assessment: "observation-train-b06-b08-b14"
+    assessment: ds16-lexical-6
   - path: "test/language/expressions/logical-and/S11.11.1_A1.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "incidental-scaffolding"
@@ -20118,7 +20751,7 @@ paths:
     missingDynamicTag: false
     section: "Original es5id: 11.11.1_A1"
     subject: "Checking by using eval"
-    assessment: "observation-train-b06-b08-b14"
+    assessment: ds16-lexical-6
   - path: "test/language/expressions/logical-not/S11.4.9_A1.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "incidental-scaffolding"
@@ -20129,7 +20762,7 @@ paths:
     missingDynamicTag: false
     section: "Original es5id: 11.4.9_A1"
     subject: "Checking by using eval"
-    assessment: "observation-train-b06-b08-b14"
+    assessment: ds16-lexical-6
   - path: "test/language/expressions/logical-not/S9.2_A1_T2.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "incidental-scaffolding"
@@ -20163,7 +20796,7 @@ paths:
     missingDynamicTag: false
     section: "Original es5id: 11.11.2_A1"
     subject: "Checking by using eval"
-    assessment: "observation-train-b06-b08-b14"
+    assessment: ds16-lexical-7
   - path: "test/language/expressions/modulus/S11.5.3_A1.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "incidental-scaffolding"
@@ -20174,7 +20807,7 @@ paths:
     missingDynamicTag: false
     section: "Original es5id: 11.5.3_A1"
     subject: "Checking by using eval"
-    assessment: "observation-train-b06-b08-b14"
+    assessment: ds16-lexical-7
   - path: "test/language/expressions/multiplication/S11.5.1_A1.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "incidental-scaffolding"
@@ -20185,7 +20818,7 @@ paths:
     missingDynamicTag: false
     section: "Original es5id: 11.5.1_A1"
     subject: "Checking by using eval"
-    assessment: "observation-train-b06-b08-b14"
+    assessment: ds16-lexical-7
   - path: "test/language/expressions/new/S11.2.2_A1.1.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "incidental-scaffolding"
@@ -20196,7 +20829,7 @@ paths:
     missingDynamicTag: false
     section: "Original es5id: 11.2.2_A1.1"
     subject: "Checking by using eval"
-    assessment: "observation-train-b06-b08-b14"
+    assessment: ds16-lexical-8
   - path: "test/language/expressions/new/S11.2.2_A1.2.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "incidental-scaffolding"
@@ -20207,7 +20840,7 @@ paths:
     missingDynamicTag: false
     section: "Original es5id: 11.2.2_A1.2"
     subject: "Checking by using eval"
-    assessment: "observation-train-b06-b08-b14"
+    assessment: ds16-lexical-8
   - path: "test/language/expressions/object/11.1.5-0-1.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "incidental-scaffolding"
@@ -20557,7 +21190,7 @@ paths:
     subject: The exact whitespace and line-terminator placements
       in the supplied source strings, with the
       property/operator result asserted by this original.
-    assessment: fixture-construction
+    assessment: ds16-lexical-8
   - path: "test/language/expressions/property-accessors/S11.2.1\
       _A1.2.js"
     proposedOwner: adr:0016-dynamic-source-boundary
@@ -20571,7 +21204,7 @@ paths:
     subject: The exact whitespace and line-terminator placements
       in the supplied source strings, with the
       property/operator result asserted by this original.
-    assessment: fixture-construction
+    assessment: ds16-lexical-9
   - path: test/language/expressions/right-shift/S11.7.2_A1.js
     proposedOwner: adr:0016-dynamic-source-boundary
     priorCohort: incidental-scaffolding
@@ -20584,7 +21217,7 @@ paths:
     subject: The exact whitespace and line-terminator placements
       in the supplied source strings, with the
       property/operator result asserted by this original.
-    assessment: fixture-construction
+    assessment: ds16-lexical-9
   - path: "test/language/expressions/strict-does-not-equals/S11\
       .9.5_A1.js"
     proposedOwner: adr:0016-dynamic-source-boundary
@@ -20598,7 +21231,7 @@ paths:
     subject: The exact whitespace and line-terminator placements
       in the supplied source strings, with the
       property/operator result asserted by this original.
-    assessment: fixture-construction
+    assessment: ds16-lexical-9
   - path: "test/language/expressions/strict-does-not-equals/S11\
       .9.5_A6.1.js"
     proposedOwner: adr:0016-dynamic-source-boundary
@@ -20625,7 +21258,7 @@ paths:
     subject: The exact whitespace and line-terminator placements
       in the supplied source strings, with the
       property/operator result asserted by this original.
-    assessment: fixture-construction
+    assessment: ds16-lexical-10
   - path: test/language/expressions/strict-equals/S11.9.4_A6.1.js
     proposedOwner: adr:0016-dynamic-source-boundary
     priorCohort: incidental-scaffolding
@@ -20651,7 +21284,7 @@ paths:
     subject: The exact whitespace and line-terminator placements
       in the supplied source strings, with the
       property/operator result asserted by this original.
-    assessment: fixture-construction
+    assessment: ds16-lexical-10
   - path: "test/language/expressions/super/prop-dot-cls-val-fro\
       m-eval.js"
     proposedOwner: adr:0016-dynamic-source-boundary
@@ -20885,7 +21518,7 @@ paths:
     missingDynamicTag: false
     section: sec-typeof-operator
     subject: Checking by using eval
-    assessment: fixture-construction
+    assessment: ds16-lexical-10
   - path: test/language/expressions/unary-minus/S11.4.7_A1.js
     proposedOwner: adr:0016-dynamic-source-boundary
     priorCohort: incidental-scaffolding
@@ -20898,7 +21531,7 @@ paths:
     subject: The exact whitespace and line-terminator placements
       in the supplied source strings, with the
       property/operator result asserted by this original.
-    assessment: fixture-construction
+    assessment: ds16-lexical-11
   - path: test/language/expressions/unary-plus/S11.4.6_A1.js
     proposedOwner: adr:0016-dynamic-source-boundary
     priorCohort: incidental-scaffolding
@@ -20911,7 +21544,7 @@ paths:
     subject: The exact whitespace and line-terminator placements
       in the supplied source strings, with the
       property/operator result asserted by this original.
-    assessment: fixture-construction
+    assessment: ds16-lexical-11
   - path: test/language/expressions/unary-plus/S9.3_A1_T2.js
     proposedOwner: adr:0016-dynamic-source-boundary
     priorCohort: incidental-scaffolding
@@ -20938,7 +21571,7 @@ paths:
     subject: The exact whitespace and line-terminator placements
       in the supplied source strings, with the
       property/operator result asserted by this original.
-    assessment: fixture-construction
+    assessment: ds16-lexical-11
   - path: test/language/expressions/void/S11.4.2_A1.js
     proposedOwner: adr:0016-dynamic-source-boundary
     priorCohort: incidental-scaffolding
@@ -20951,7 +21584,7 @@ paths:
     subject: The exact whitespace and line-terminator placements
       in the supplied source strings, with the
       property/operator result asserted by this original.
-    assessment: fixture-construction
+    assessment: ds16-lexical-12
   - path: test/language/function-code/10.4.3-1-13-s.js
     proposedOwner: adr:0016-dynamic-source-boundary
     priorCohort: source-subject
@@ -21402,7 +22035,7 @@ paths:
     missingDynamicTag: false
     section: 7.3_A5.4
     subject: Insert PARAGRAPH SEPARATOR (U+2029) into multi line comment
-    assessment: observation-b01-b18-dynamic-source
+    assessment: ds16-lexical-12
   - path: test/language/line-terminators/S7.3_A7_T1.js
     proposedOwner: adr:0016-dynamic-source-boundary
     priorCohort: incidental-scaffolding
@@ -21413,7 +22046,7 @@ paths:
     missingDynamicTag: false
     section: 7.3_A7_T1
     subject: Insert Line Terminator in var x=y+z
-    assessment: observation-b01-b18-dynamic-source
+    assessment: ds16-lexical-12
   - path: test/language/line-terminators/S7.3_A7_T2.js
     proposedOwner: adr:0016-dynamic-source-boundary
     priorCohort: incidental-scaffolding
@@ -21424,7 +22057,7 @@ paths:
     missingDynamicTag: false
     section: 7.3_A7_T2
     subject: Insert Line Terminator in var x=y-z
-    assessment: observation-b01-b18-dynamic-source
+    assessment: ds16-lexical-13
   - path: test/language/line-terminators/S7.3_A7_T3.js
     proposedOwner: adr:0016-dynamic-source-boundary
     priorCohort: incidental-scaffolding
@@ -21435,7 +22068,7 @@ paths:
     missingDynamicTag: false
     section: 7.3_A7_T3
     subject: Insert Line Terminator in var x=y*z
-    assessment: observation-b01-b18-dynamic-source
+    assessment: ds16-lexical-13
   - path: test/language/line-terminators/S7.3_A7_T4.js
     proposedOwner: adr:0016-dynamic-source-boundary
     priorCohort: incidental-scaffolding
@@ -21446,7 +22079,7 @@ paths:
     missingDynamicTag: false
     section: 7.3_A7_T4
     subject: Insert Line Terminator in var x=y/z
-    assessment: observation-b01-b18-dynamic-source
+    assessment: ds16-lexical-13
   - path: test/language/line-terminators/S7.3_A7_T5.js
     proposedOwner: adr:0016-dynamic-source-boundary
     priorCohort: incidental-scaffolding
@@ -21457,7 +22090,7 @@ paths:
     missingDynamicTag: false
     section: 7.3_A7_T5
     subject: Insert Line Terminator in var x=y%z
-    assessment: observation-b01-b18-dynamic-source
+    assessment: ds16-lexical-14
   - path: test/language/line-terminators/S7.3_A7_T6.js
     proposedOwner: adr:0016-dynamic-source-boundary
     priorCohort: incidental-scaffolding
@@ -21468,7 +22101,7 @@ paths:
     missingDynamicTag: false
     section: 7.3_A7_T6
     subject: Insert Line Terminator in var x=y>>z
-    assessment: observation-b01-b18-dynamic-source
+    assessment: ds16-lexical-14
   - path: test/language/line-terminators/S7.3_A7_T7.js
     proposedOwner: adr:0016-dynamic-source-boundary
     priorCohort: incidental-scaffolding
@@ -21479,7 +22112,7 @@ paths:
     missingDynamicTag: false
     section: 7.3_A7_T7
     subject: Insert Line Terminator in var x=y<<z
-    assessment: observation-b01-b18-dynamic-source
+    assessment: ds16-lexical-14
   - path: test/language/line-terminators/S7.3_A7_T8.js
     proposedOwner: adr:0016-dynamic-source-boundary
     priorCohort: incidental-scaffolding
@@ -21490,7 +22123,7 @@ paths:
     missingDynamicTag: false
     section: 7.3_A7_T8
     subject: Insert Line Terminator in var x=y<z
-    assessment: observation-b01-b18-dynamic-source
+    assessment: ds16-lexical-15
   - path: "test/language/literals/numeric/7.8.3-3gs.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "incidental-scaffolding"
@@ -21502,7 +22135,7 @@ paths:
     section: "Original es5id: 7.8.3-3gs"
     subject: "Strict Mode - octal extension is forbidden in strict mode (after a
       hex number is assigned to a variable from an eval)"
-    assessment: ds3-literal-coverage
+    assessment: ds16-static-syntax
   - path: "test/language/literals/regexp/7.8.5-1.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "incidental-scaffolding"
@@ -21786,7 +22419,7 @@ paths:
     section: "sec-literals-string-literals"
     subject: "U+2028 LINE SEPARATOR can appear in string literals
       (eval code)."
-    assessment: "observation-train-dynamic-coverage"
+    assessment: ds16-lexical-15
   - path: "test/language/literals/string/mongolian-vowel-separator-eval.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "incidental-scaffolding"
@@ -21810,7 +22443,7 @@ paths:
     section: "sec-literals-string-literals"
     subject: "U+2029 PARAGRAPH SEPARATOR can appear in string
       literals (eval code)."
-    assessment: "observation-train-dynamic-coverage"
+    assessment: ds16-lexical-15
   - path: "test/language/module-code/eval-gtbndng-indirect-update-a\
       s.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -24348,7 +24981,7 @@ paths:
     section: "12.10.1-10-s"
     subject: "with statement in strict mode throws SyntaxError
       (eval, where the container function is strict)"
-    assessment: "observation-train-dynamic-coverage"
+    assessment: ds16-static-syntax
   - path: "test/language/statements/with/12.10.1-12-s.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "incidental-scaffolding"
@@ -24360,7 +24993,7 @@ paths:
     section: "12.10.1-12-s"
     subject: "with statement in strict mode throws SyntaxError
       (strict eval)"
-    assessment: "observation-train-dynamic-coverage"
+    assessment: ds16-static-syntax
   - path: "test/language/statements/with/12.10.1-4-s.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "incidental-scaffolding"
@@ -24372,7 +25005,7 @@ paths:
     section: "12.10.1-4-s"
     subject: "with statement in strict mode throws SyntaxError
       (strict Function)"
-    assessment: "observation-train-dynamic-coverage"
+    assessment: ds16-static-syntax
   - path: "test/language/statements/with/12.10.1-5-s.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "incidental-scaffolding"
@@ -24397,7 +25030,7 @@ paths:
     subject: "with statement in strict mode throws SyntaxError
       (function expression, where the container Function is
       strict)"
-    assessment: "observation-train-dynamic-coverage"
+    assessment: ds16-static-syntax
   - path: test/language/statements/with/S12.10_A4_T1.js
     proposedOwner: adr:0016-dynamic-source-boundary
     priorCohort: incidental-scaffolding
@@ -24616,7 +25249,7 @@ paths:
     section: "sec-line-terminators"
     subject: "Line terminator <LF> may appear as an escape sequence
       within a StringLiteral"
-    assessment: "observation-train-dynamic-coverage"
+    assessment: ds16-lexical-16
   - path: "test/language/types/string/S8.4_A7.2.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "incidental-scaffolding"
@@ -24628,7 +25261,7 @@ paths:
     section: "sec-line-terminators"
     subject: "Line terminator <CR> may appear as an escape sequence
       within a StringLiteral"
-    assessment: "observation-train-dynamic-coverage"
+    assessment: ds16-lexical-16
   - path: "test/language/types/string/S8.4_A7.3.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "incidental-scaffolding"
@@ -24640,7 +25273,7 @@ paths:
     section: "sec-line-terminators"
     subject: "Line terminator <PS> may appear as an escape sequence
       within a StringLiteral"
-    assessment: "observation-train-dynamic-coverage"
+    assessment: ds16-lexical-16
   - path: "test/language/types/string/S8.4_A7.4.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "incidental-scaffolding"
@@ -24652,7 +25285,7 @@ paths:
     section: "sec-line-terminators"
     subject: "Line terminator <LS> may appear as an escape sequence
       within a StringLiteral"
-    assessment: "observation-train-dynamic-coverage"
+    assessment: ds16-lexical-17
   - path: "test/language/white-space/comment-multi-form-feed.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "incidental-scaffolding"
@@ -24663,7 +25296,7 @@ paths:
     missingDynamicTag: false
     section: "7.2_A4.3_T1"
     subject: "Use FORM FEED(\\u000C)"
-    assessment: "observation-train-dynamic-coverage"
+    assessment: ds16-lexical-17
   - path: "test/language/white-space/comment-multi-horizontal-tab.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "incidental-scaffolding"
@@ -24674,7 +25307,7 @@ paths:
     missingDynamicTag: false
     section: "7.2_A4.1_T1"
     subject: "Use HORIZONTAL TAB(\\u0009)"
-    assessment: "observation-train-dynamic-coverage"
+    assessment: ds16-lexical-17
   - path: "test/language/white-space/comment-multi-nbsp.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "incidental-scaffolding"
@@ -24685,7 +25318,7 @@ paths:
     missingDynamicTag: false
     section: "7.2_A4.5_T1"
     subject: "Use NO-BREAK SPACE(\\u00A0)"
-    assessment: "observation-train-dynamic-coverage"
+    assessment: ds16-lexical-18
   - path: "test/language/white-space/comment-multi-space.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "incidental-scaffolding"
@@ -24696,7 +25329,7 @@ paths:
     missingDynamicTag: false
     section: "7.2_A4.4_T1"
     subject: "Use SPACE(\\u0020)"
-    assessment: "observation-train-dynamic-coverage"
+    assessment: ds16-lexical-18
   - path: "test/language/white-space/comment-multi-vertical-tab.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "incidental-scaffolding"
@@ -24707,7 +25340,7 @@ paths:
     missingDynamicTag: false
     section: "7.2_A4.2_T1"
     subject: "Use VERTICAL TAB(\\u000B)"
-    assessment: "observation-train-dynamic-coverage"
+    assessment: ds16-lexical-18
   - path: "test/language/white-space/comment-single-form-feed.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "incidental-scaffolding"
@@ -24718,7 +25351,7 @@ paths:
     missingDynamicTag: false
     section: "7.2_A3.3_T1"
     subject: "Use FORM FEED(\\u000C)"
-    assessment: "observation-train-dynamic-coverage"
+    assessment: ds16-lexical-19
   - path: "test/language/white-space/comment-single-horizontal-tab.\
       js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -24730,7 +25363,7 @@ paths:
     missingDynamicTag: false
     section: "7.2_A3.1_T1"
     subject: "Use HORIZONTAL TAB(\\u0009)"
-    assessment: "observation-train-dynamic-coverage"
+    assessment: ds16-lexical-19
   - path: "test/language/white-space/comment-single-nbsp.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "incidental-scaffolding"
@@ -24741,7 +25374,7 @@ paths:
     missingDynamicTag: false
     section: "7.2_A3.5_T1"
     subject: "Use NO-BREAK SPACE(\\u00A0)"
-    assessment: "observation-train-dynamic-coverage"
+    assessment: ds16-lexical-19
   - path: "test/language/white-space/comment-single-space.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "incidental-scaffolding"
@@ -24752,7 +25385,7 @@ paths:
     missingDynamicTag: false
     section: "7.2_A3.4_T1"
     subject: "Use SPACE(\\u0020)"
-    assessment: "observation-train-dynamic-coverage"
+    assessment: ds16-lexical-20
   - path: "test/language/white-space/comment-single-vertical-tab.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "incidental-scaffolding"
@@ -24763,7 +25396,7 @@ paths:
     missingDynamicTag: false
     section: "7.2_A3.2_T1"
     subject: "Use VERTICAL TAB(\\u000B)"
-    assessment: "observation-train-dynamic-coverage"
+    assessment: ds16-lexical-20
   - path: "test/language/white-space/mongolian-vowel-separator-eval\
       .js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -24776,7 +25409,7 @@ paths:
     section: "sec-white-space"
     subject: "Mongolian Vowel Separator is not recognized as white
       space (eval code)."
-    assessment: "observation-train-dynamic-coverage"
+    assessment: ds16-static-syntax
   - path: "test/language/white-space/string-form-feed.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "incidental-scaffolding"
@@ -24787,7 +25420,7 @@ paths:
     missingDynamicTag: false
     section: "7.2_A2.3_T1"
     subject: "Use FORM FEED(\\u000C and \\f)"
-    assessment: "observation-train-dynamic-coverage"
+    assessment: ds16-lexical-20
   - path: "test/language/white-space/string-horizontal-tab.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "incidental-scaffolding"
@@ -24798,7 +25431,7 @@ paths:
     missingDynamicTag: false
     section: "7.2_A2.1_T1"
     subject: "Use HORIZONTAL TAB(\\u0009 and \\t)"
-    assessment: "observation-train-dynamic-coverage"
+    assessment: ds16-lexical-21
   - path: "test/language/white-space/string-nbsp.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "incidental-scaffolding"
@@ -24809,7 +25442,7 @@ paths:
     missingDynamicTag: false
     section: "7.2_A2.5_T1"
     subject: "Use NO-BREAK SPACE(\\u00A0)"
-    assessment: "observation-train-dynamic-coverage"
+    assessment: ds16-lexical-21
   - path: "test/language/white-space/string-space.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "incidental-scaffolding"
@@ -24820,7 +25453,7 @@ paths:
     missingDynamicTag: false
     section: "7.2_A2.4_T1"
     subject: "Use SPACE(\\u0020)"
-    assessment: "observation-train-dynamic-coverage"
+    assessment: ds16-lexical-21
   - path: "test/language/white-space/string-vertical-tab.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "incidental-scaffolding"
@@ -24831,4 +25464,4 @@ paths:
     missingDynamicTag: false
     section: "7.2_A2.2_T1"
     subject: "Use VERTICAL TAB(\\u000B and \\v)"
-    assessment: "observation-train-dynamic-coverage"
+    assessment: ds16-lexical-22
