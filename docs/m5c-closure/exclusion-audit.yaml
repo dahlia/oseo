@@ -5332,21 +5332,22 @@ assessments:
         "0231397301b0298580bbe87634690f4f279ce3676410d5\
         50bb3ab68649f669fc"
   ds17-exhaustive-escaped-annex-b:
-    disposition: remediation
-    normativeDependency: not-demonstrated
-    remediationOwner: node:dynamic-source-regexp-exhaustive
+    disposition: exclusion
+    normativeDependency: annex-b-only
     reason: >-
-      S7.8.5_A1.4_T2 and S7.8.5_A2.4_T2 select 65,521 escaped code units each.
-      The exhaustive literal property witnesses 14,737 accepted with exact
-      source at build time and natively, and 50,782 rejected with the Annex B
+      The maintainer decision of 2026-11-01 applies item 3 of the 2026-10-28
+      decision to S7.8.5_A1.4_T2 and S7.8.5_A2.4_T2 and closes both under ADR
+      0013, which is unchanged. Each selects 65,521 escaped code units. The
+      exhaustive literal property witnesses 14,737 accepted with exact source
+      at build time and natively, and 50,782 rejected with the Annex B
       OSEO1001 diagnostic whose code unit is ID_Continue and passes the
-      original's var _X check, the original's SyntaxError fallback. U+200C and
-      U+200D remain: Unicode 15.1 made them ID_Continue, so the core grammar
-      rejects their identity escapes, but the originals exempt them from the
-      fallback. Only Annex B's identity escape meets those two assertions, the
-      shape of the 2026-10-28 maintainer decision item 3, which is authorized
-      per path. Root asked the maintainer whether to extend it; until then
-      this node owns both paths as remediation.
+      original's var _X check, which is the original's SyntaxError fallback.
+      Only U+200C and U+200D need Annex B: Unicode 15.1 made them
+      ID_Continue, so the core grammar rejects their identity escapes, while
+      the originals exempt them from the fallback. No core subject remains;
+      the eval rejection the paths observe stays recorded. Reopen on changed
+      source, observation, or replacement evidence, on an amendment of ADR
+      0013's optional Annex B policy, or on ADR 0019's reopening triggers.
     replacementEvidence:
       tests/property/m5-regexp-literal-exhaustive.property.test.ts:
         "0231397301b0298580bbe87634690f4f279ce3676410d5\
@@ -24844,7 +24845,7 @@ paths:
       tested through evaluated source"
     assessment: ds17-static-literal-grammar
   - path: "test/language/literals/regexp/S7.8.5_A1.4_T2.js"
-    proposedOwner: "adr:0016-dynamic-source-boundary"
+    proposedOwner: "adr:0013-m5-edition-and-manifest"
     priorCohort: "incidental-scaffolding"
     sourceDigest: "0de2b7c36d7aeacf749dc1942f2a60301095339842cb3d924d6\
       7d0a55fe96b59"
@@ -24962,7 +24963,7 @@ paths:
       evaluated"
     assessment: ds17-static-literal-grammar
   - path: "test/language/literals/regexp/S7.8.5_A2.4_T2.js"
-    proposedOwner: "adr:0016-dynamic-source-boundary"
+    proposedOwner: "adr:0013-m5-edition-and-manifest"
     priorCohort: "incidental-scaffolding"
     sourceDigest: "a81734f3c0609fa8fb61345a8f917fc6aa6f9ab9dacd82430aa\
       d254a6a23ee4d"

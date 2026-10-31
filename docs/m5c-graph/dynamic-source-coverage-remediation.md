@@ -621,6 +621,6 @@ The maintainer's 2026-11-01 answer adds `dynamic-source-regexp-exhaustive`
 for the four DS-17 BMP literal paths that need exhaustive witnesses. Its
 pinned selector and obligations are in that child's work note. Its
 exhaustive witness moves the two plain paths to ADR 0016 and the two escaped
-paths, whose ZWNJ and ZWJ assertions only Annex B meets, to the child's own
-remediation, so the umbrella owns 330 paths. The umbrella is blocked until
-the child lands.
+paths, whose ZWNJ and ZWJ assertions only Annex B meets, to ADR 0013 under
+the maintainer decision of 2026-11-01, so the umbrella owns 330 paths. The
+umbrella is blocked until the child lands.

@@ -12,6 +12,7 @@ import {
   hasEvalCall,
   hasLookupCall,
   legacyCallerSelector,
+  m5cAnnexDynamicResiduePaths,
   validateCurrentM5cExclusionAudit,
   validateM5cExclusionAudit,
 } from "../tools/m5c-exclusion-audit.ts";
@@ -540,14 +541,11 @@ test("unresolved non-source coverage requires remediation ownership", () => {
   );
 });
 
-test("an umbrella child owns the dynamic remediation it assesses", () => {
-  const child = "node:dynamic-source-regexp-exhaustive";
-  const { audit, inputs } = fixture(true);
-  audit.assessments.reviewed.remediationOwner = child;
-  assert.throws(
-    () => validateM5cExclusionAudit(stringifyYaml(audit), inputs),
-    /requires owner node:dynamic-source-regexp-exhaustive/u,
-  );
+test("the Annex B residue selector bounds ADR 0013 over eval", () => {
+  const { audit, inputs } = fixture();
+  audit.assessments.reviewed.normativeDependency = "annex-b-only";
+  audit.paths[0]!.proposedOwner = annexOwner;
+  audit.paths[0]!.missingDynamicTag = false;
   const owned = {
     ...inputs,
     ledger: {
@@ -555,43 +553,60 @@ test("an umbrella child owns the dynamic remediation it assesses", () => {
       entries: [
         {
           path,
-          owner: child,
+          owner: annexOwner,
           prerequisites: result.dependencies,
           state: result.classification,
         },
       ],
     },
   };
+  const selected = { ...owned, annexDynamicResiduePaths: new Set([path]) };
   assert.equal(
-    validateM5cExclusionAudit(stringifyYaml(audit), owned).remediation,
+    validateM5cExclusionAudit(stringifyYaml(audit), selected).exclusions,
     1,
   );
-  // An exclusion keeps its record owner whatever the assessment names.
-  audit.assessments.reviewed.disposition = "exclusion";
+  // Outside the selector, an eval rejection cannot authorize ADR 0013.
   assert.throws(
     () => validateM5cExclusionAudit(stringifyYaml(audit), owned),
-    /Unresolved subject coverage cannot keep an ADR|requires owner adr:/u,
+    /exact Annex B residue selector/u,
   );
-  // The child owner still needs an audit row for every path it owns.
-  const unaudited = {
-    ...owned,
-    ledger: {
-      ...owned.ledger,
-      entries: [
-        ...owned.ledger.entries,
-        {
-          path: "test/language/eval-code/unaudited.js",
-          owner: child,
-          prerequisites: [],
-          state: "unsupported-profile-feature" as const,
-        },
-      ],
-    },
-  };
-  audit.assessments.reviewed.disposition = "remediation";
+  // Inside it, the row must stay a bound exclusion.
+  const { replacementEvidence, ...unbound } = audit.assessments.reviewed;
+  assert.ok(replacementEvidence);
   assert.throws(
-    () => validateM5cExclusionAudit(stringifyYaml(audit), unaudited),
-    /Ledger owner has no reviewed exclusion audit/u,
+    () =>
+      validateM5cExclusionAudit(
+        stringifyYaml({ ...audit, assessments: { reviewed: unbound } }),
+        selected,
+      ),
+    /exact Annex B residue selector/u,
+  );
+  audit.assessments.reviewed.disposition = "remediation";
+  audit.assessments.reviewed.normativeDependency = "not-demonstrated";
+  assert.throws(
+    () => validateM5cExclusionAudit(stringifyYaml(audit), selected),
+    /exact Annex B residue selector/u,
+  );
+  // A selector path cannot leave the audit.
+  assert.throws(
+    () =>
+      validateM5cExclusionAudit(stringifyYaml(fixture().audit), {
+        ...fixture().inputs,
+        annexDynamicResiduePaths: new Set([
+          "test/language/literals/regexp/absent.js",
+        ]),
+      }),
+    /Annex B residue selector lacks its audit row/u,
+  );
+});
+
+test("the checked-in Annex B residue selector names the two escapes", () => {
+  assert.deepEqual(
+    [...m5cAnnexDynamicResiduePaths],
+    [
+      "test/language/literals/regexp/S7.8.5_A1.4_T2.js",
+      "test/language/literals/regexp/S7.8.5_A2.4_T2.js",
+    ],
   );
 });
 
@@ -843,7 +858,6 @@ function expectedAuditCounts(ledger: M5cClosureLedger) {
   const remediation = ledger.entries.filter(
     (entry) =>
       entry.owner === remediationOwner ||
-      entry.owner === "node:dynamic-source-regexp-exhaustive" ||
       entry.owner === annexRemediationOwner ||
       entry.owner === protoRemediationOwner ||
       entry.owner === ordinaryProtoRemediationOwner ||

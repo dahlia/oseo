@@ -116,13 +116,14 @@ every other code unit of the four originals is witnessed.
 
 Root's ruling of 2026-11-01 closes S7.8.5\_A1.1\_T2 and S7.8.5\_A2.1\_T2 under
 ADR 0016 through the new `ds17-exhaustive-plain-literals` assessment. The
-two escaped paths stay unsupported remediation under
-`ds17-exhaustive-escaped-annex-b`, owned by this node rather than the
-umbrella. Their shape matches item 3 of the 2026-10-28 maintainer decision,
-which is authorized per path, and Root asked the maintainer whether to
-extend it. This node does not land until that answer. The exclusion audit
-lets an umbrella child own the dynamic-source remediation its assessment
-names; the checker lists this node as the only such owner.
+maintainer decision of 2026-11-01 applies item 3 of the 2026-10-28 decision
+to S7.8.5\_A1.4\_T2 and S7.8.5\_A2.4\_T2 and to no other path: every core
+subject has the replacement evidence above, so both close under ADR 0013 as
+`annex-b-only` exclusions through `ds17-exhaustive-escaped-annex-b`. ADR 0013
+is unchanged. Their observation is still the eval rejection, so the exclusion
+audit admits an ADR 0013 row over that rejection only for these two exact
+paths, only as a bound `annex-b-only` exclusion, and requires both rows. The
+umbrella now owns 330 paths and this node owns none.
 
 Cost, shard weights and CI placement are recorded in
 [*exhaustive RegExp literal evidence*](../evidence/regexp-literal-exhaustive/README.md).
