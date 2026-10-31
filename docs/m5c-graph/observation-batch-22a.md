@@ -89,3 +89,14 @@ subjects keep the family for their rejected property syntax. Their corrected
 per-row evidence claims no runtime property lookup; the
 [full-train audit](/data/m5c-d17-20261031/train-b/round2-investigation/constructor-property-audit.json)
 records every disposition.
+
+Internal review round 3 corrected reach-marker scaffolding missed by the
+earlier audit: 43 rows lost `var-bindings` supported only by
+`var executed = false`, and 15 lost `expression-operators` supported only by
+`executed = true`. Other bindings and operators remain only where a separate
+asserted or prerequisite witness exists; marker evidence was also removed from
+eight retained binding records across B22a/B22b. Five rejected indirect-eval
+SuperProperty subjects gained `object-properties` as a grammar family, without
+claiming a runtime lookup. All 1,859 train sources were checked for these
+patterns; the source hashes and dispositions are in
+[marker and grammar audit](/data/m5c-d17-20261031/train-b/round3-investigation/marker-and-superproperty-audit.json).

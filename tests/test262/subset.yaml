@@ -171039,59 +171039,22 @@ tests:
       ]
   - path: test/language/statements/class/elements/arrow-body-derived-cls-direct-eval-contains-superproperty-1.js
     expectedClassification: unsupported-profile-feature
-    dependencies:
-      [
-        classes,
-        dynamic-source,
-        expression-operators,
-        functions,
-        object-properties,
-        var-bindings,
-      ]
+    dependencies: [classes, dynamic-source, functions, object-properties]
   - path: test/language/statements/class/elements/arrow-body-derived-cls-direct-eval-contains-superproperty-2.js
     expectedClassification: unsupported-profile-feature
-    dependencies:
-      [
-        classes,
-        dynamic-source,
-        expression-operators,
-        functions,
-        object-properties,
-        var-bindings,
-      ]
+    dependencies: [classes, dynamic-source, functions, object-properties]
   - path: test/language/statements/class/elements/arrow-body-derived-cls-direct-eval-err-contains-supercall-1.js
     expectedClassification: unsupported-profile-feature
     dependencies:
-      [
-        abrupt-completion,
-        classes,
-        dynamic-source,
-        error-intrinsics,
-        functions,
-        var-bindings,
-      ]
+      [abrupt-completion, classes, dynamic-source, error-intrinsics, functions]
   - path: test/language/statements/class/elements/arrow-body-derived-cls-direct-eval-err-contains-supercall-2.js
     expectedClassification: unsupported-profile-feature
     dependencies:
-      [
-        abrupt-completion,
-        classes,
-        dynamic-source,
-        error-intrinsics,
-        functions,
-        var-bindings,
-      ]
+      [abrupt-completion, classes, dynamic-source, error-intrinsics, functions]
   - path: test/language/statements/class/elements/arrow-body-derived-cls-direct-eval-err-contains-supercall.js
     expectedClassification: unsupported-profile-feature
     dependencies:
-      [
-        abrupt-completion,
-        classes,
-        dynamic-source,
-        error-intrinsics,
-        functions,
-        var-bindings,
-      ]
+      [abrupt-completion, classes, dynamic-source, error-intrinsics, functions]
   - path: test/language/statements/class/elements/arrow-body-derived-cls-indirect-eval-contains-superproperty-1.js
     expectedClassification: unsupported-profile-feature
     dependencies:
@@ -171152,25 +171115,11 @@ tests:
   - path: test/language/statements/class/elements/arrow-body-direct-eval-err-contains-arguments.js
     expectedClassification: unsupported-profile-feature
     dependencies:
-      [
-        abrupt-completion,
-        classes,
-        dynamic-source,
-        error-intrinsics,
-        functions,
-        var-bindings,
-      ]
+      [abrupt-completion, classes, dynamic-source, error-intrinsics, functions]
   - path: test/language/statements/class/elements/arrow-body-direct-eval-err-contains-newtarget.js
     expectedClassification: unsupported-profile-feature
     dependencies:
-      [
-        classes,
-        dynamic-source,
-        expression-operators,
-        functions,
-        object-properties,
-        var-bindings,
-      ]
+      [classes, dynamic-source, functions, object-properties, var-bindings]
   - path: test/language/statements/class/elements/arrow-body-indirect-eval-err-contains-newtarget.js
     expectedClassification: unsupported-profile-feature
     dependencies:
@@ -171184,59 +171133,22 @@ tests:
       ]
   - path: test/language/statements/class/elements/arrow-body-private-derived-cls-direct-eval-contains-superproperty-1.js
     expectedClassification: unsupported-profile-feature
-    dependencies:
-      [
-        classes,
-        dynamic-source,
-        expression-operators,
-        functions,
-        object-properties,
-        var-bindings,
-      ]
+    dependencies: [classes, dynamic-source, functions, object-properties]
   - path: test/language/statements/class/elements/arrow-body-private-derived-cls-direct-eval-contains-superproperty-2.js
     expectedClassification: unsupported-profile-feature
-    dependencies:
-      [
-        classes,
-        dynamic-source,
-        expression-operators,
-        functions,
-        object-properties,
-        var-bindings,
-      ]
+    dependencies: [classes, dynamic-source, functions, object-properties]
   - path: test/language/statements/class/elements/arrow-body-private-derived-cls-direct-eval-err-contains-supercall-1.js
     expectedClassification: unsupported-profile-feature
     dependencies:
-      [
-        abrupt-completion,
-        classes,
-        dynamic-source,
-        error-intrinsics,
-        functions,
-        var-bindings,
-      ]
+      [abrupt-completion, classes, dynamic-source, error-intrinsics, functions]
   - path: test/language/statements/class/elements/arrow-body-private-derived-cls-direct-eval-err-contains-supercall-2.js
     expectedClassification: unsupported-profile-feature
     dependencies:
-      [
-        abrupt-completion,
-        classes,
-        dynamic-source,
-        error-intrinsics,
-        functions,
-        var-bindings,
-      ]
+      [abrupt-completion, classes, dynamic-source, error-intrinsics, functions]
   - path: test/language/statements/class/elements/arrow-body-private-derived-cls-direct-eval-err-contains-supercall.js
     expectedClassification: unsupported-profile-feature
     dependencies:
-      [
-        abrupt-completion,
-        classes,
-        dynamic-source,
-        error-intrinsics,
-        functions,
-        var-bindings,
-      ]
+      [abrupt-completion, classes, dynamic-source, error-intrinsics, functions]
   - path: test/language/statements/class/elements/arrow-body-private-derived-cls-indirect-eval-contains-superproperty-1.js
     expectedClassification: unsupported-profile-feature
     dependencies:
@@ -171297,25 +171209,11 @@ tests:
   - path: test/language/statements/class/elements/arrow-body-private-direct-eval-err-contains-arguments.js
     expectedClassification: unsupported-profile-feature
     dependencies:
-      [
-        abrupt-completion,
-        classes,
-        dynamic-source,
-        error-intrinsics,
-        functions,
-        var-bindings,
-      ]
+      [abrupt-completion, classes, dynamic-source, error-intrinsics, functions]
   - path: test/language/statements/class/elements/arrow-body-private-direct-eval-err-contains-newtarget.js
     expectedClassification: unsupported-profile-feature
     dependencies:
-      [
-        classes,
-        dynamic-source,
-        expression-operators,
-        functions,
-        object-properties,
-        var-bindings,
-      ]
+      [classes, dynamic-source, functions, object-properties, var-bindings]
   - path: test/language/statements/class/elements/arrow-body-private-indirect-eval-err-contains-newtarget.js
     expectedClassification: unsupported-profile-feature
     dependencies:
@@ -173928,48 +173826,18 @@ tests:
     dependencies: [classes, object-properties]
   - path: test/language/statements/class/elements/derived-cls-direct-eval-contains-superproperty-1.js
     expectedClassification: unsupported-profile-feature
-    dependencies:
-      [
-        classes,
-        dynamic-source,
-        expression-operators,
-        functions,
-        object-properties,
-        var-bindings,
-      ]
+    dependencies: [classes, dynamic-source, functions, object-properties]
   - path: test/language/statements/class/elements/derived-cls-direct-eval-contains-superproperty-2.js
     expectedClassification: unsupported-profile-feature
-    dependencies:
-      [
-        classes,
-        dynamic-source,
-        expression-operators,
-        functions,
-        object-properties,
-        var-bindings,
-      ]
+    dependencies: [classes, dynamic-source, functions, object-properties]
   - path: test/language/statements/class/elements/derived-cls-direct-eval-err-contains-supercall-1.js
     expectedClassification: unsupported-profile-feature
     dependencies:
-      [
-        abrupt-completion,
-        classes,
-        dynamic-source,
-        error-intrinsics,
-        functions,
-        var-bindings,
-      ]
+      [abrupt-completion, classes, dynamic-source, error-intrinsics, functions]
   - path: test/language/statements/class/elements/derived-cls-direct-eval-err-contains-supercall-2.js
     expectedClassification: unsupported-profile-feature
     dependencies:
-      [
-        abrupt-completion,
-        classes,
-        dynamic-source,
-        error-intrinsics,
-        functions,
-        var-bindings,
-      ]
+      [abrupt-completion, classes, dynamic-source, error-intrinsics, functions]
   - path: test/language/statements/class/elements/derived-cls-direct-eval-err-contains-supercall.js
     expectedClassification: unsupported-profile-feature
     dependencies: [classes, object-properties]
@@ -173986,7 +173854,7 @@ tests:
         error-intrinsics,
         expression-operators,
         functions,
-        var-bindings,
+        object-properties,
       ]
   - path: test/language/statements/class/elements/derived-cls-indirect-eval-err-contains-supercall-1.js
     expectedClassification: unsupported-profile-feature
@@ -173998,7 +173866,6 @@ tests:
         error-intrinsics,
         expression-operators,
         functions,
-        var-bindings,
       ]
   - path: test/language/statements/class/elements/derived-cls-indirect-eval-err-contains-supercall-2.js
     expectedClassification: unsupported-profile-feature
@@ -174010,7 +173877,6 @@ tests:
         error-intrinsics,
         expression-operators,
         functions,
-        var-bindings,
       ]
   - path: test/language/statements/class/elements/derived-cls-indirect-eval-err-contains-supercall.js
     expectedClassification: unsupported-profile-feature
@@ -174022,7 +173888,6 @@ tests:
         error-intrinsics,
         expression-operators,
         functions,
-        var-bindings,
       ]
   - path: test/language/statements/class/elements/direct-eval-err-contains-arguments.js
     expectedClassification: unsupported-profile-feature
@@ -174030,14 +173895,7 @@ tests:
   - path: test/language/statements/class/elements/direct-eval-err-contains-newtarget.js
     expectedClassification: unsupported-profile-feature
     dependencies:
-      [
-        classes,
-        dynamic-source,
-        expression-operators,
-        functions,
-        object-properties,
-        var-bindings,
-      ]
+      [classes, dynamic-source, functions, object-properties, var-bindings]
   - path: test/language/statements/class/elements/equality-init-err-contains-arguments.js
     expectedClassification: expected-negative
     dependencies: [classes, object-properties]
@@ -174301,7 +174159,6 @@ tests:
         error-intrinsics,
         expression-operators,
         functions,
-        var-bindings,
       ]
   - path: test/language/statements/class/elements/init-err-evaluation.js
     expectedClassification: pass
@@ -175218,59 +175075,22 @@ tests:
     dependencies: [classes, object-properties]
   - path: test/language/statements/class/elements/nested-derived-cls-direct-eval-contains-superproperty-1.js
     expectedClassification: unsupported-profile-feature
-    dependencies:
-      [
-        classes,
-        dynamic-source,
-        expression-operators,
-        functions,
-        object-properties,
-        var-bindings,
-      ]
+    dependencies: [classes, dynamic-source, functions, object-properties]
   - path: test/language/statements/class/elements/nested-derived-cls-direct-eval-contains-superproperty-2.js
     expectedClassification: unsupported-profile-feature
-    dependencies:
-      [
-        classes,
-        dynamic-source,
-        expression-operators,
-        functions,
-        object-properties,
-        var-bindings,
-      ]
+    dependencies: [classes, dynamic-source, functions, object-properties]
   - path: test/language/statements/class/elements/nested-derived-cls-direct-eval-err-contains-supercall-1.js
     expectedClassification: unsupported-profile-feature
     dependencies:
-      [
-        abrupt-completion,
-        classes,
-        dynamic-source,
-        error-intrinsics,
-        functions,
-        var-bindings,
-      ]
+      [abrupt-completion, classes, dynamic-source, error-intrinsics, functions]
   - path: test/language/statements/class/elements/nested-derived-cls-direct-eval-err-contains-supercall-2.js
     expectedClassification: unsupported-profile-feature
     dependencies:
-      [
-        abrupt-completion,
-        classes,
-        dynamic-source,
-        error-intrinsics,
-        functions,
-        var-bindings,
-      ]
+      [abrupt-completion, classes, dynamic-source, error-intrinsics, functions]
   - path: test/language/statements/class/elements/nested-derived-cls-direct-eval-err-contains-supercall.js
     expectedClassification: unsupported-profile-feature
     dependencies:
-      [
-        abrupt-completion,
-        classes,
-        dynamic-source,
-        error-intrinsics,
-        functions,
-        var-bindings,
-      ]
+      [abrupt-completion, classes, dynamic-source, error-intrinsics, functions]
   - path: test/language/statements/class/elements/nested-derived-cls-indirect-eval-contains-superproperty-1.js
     expectedClassification: unsupported-profile-feature
     dependencies:
@@ -175281,7 +175101,7 @@ tests:
         error-intrinsics,
         expression-operators,
         functions,
-        var-bindings,
+        object-properties,
       ]
   - path: test/language/statements/class/elements/nested-derived-cls-indirect-eval-contains-superproperty-2.js
     expectedClassification: unsupported-profile-feature
@@ -175293,7 +175113,7 @@ tests:
         error-intrinsics,
         expression-operators,
         functions,
-        var-bindings,
+        object-properties,
       ]
   - path: test/language/statements/class/elements/nested-derived-cls-indirect-eval-err-contains-supercall-1.js
     expectedClassification: unsupported-profile-feature
@@ -175305,7 +175125,6 @@ tests:
         error-intrinsics,
         expression-operators,
         functions,
-        var-bindings,
       ]
   - path: test/language/statements/class/elements/nested-derived-cls-indirect-eval-err-contains-supercall-2.js
     expectedClassification: unsupported-profile-feature
@@ -175317,7 +175136,6 @@ tests:
         error-intrinsics,
         expression-operators,
         functions,
-        var-bindings,
       ]
   - path: test/language/statements/class/elements/nested-derived-cls-indirect-eval-err-contains-supercall.js
     expectedClassification: unsupported-profile-feature
@@ -175329,7 +175147,6 @@ tests:
         error-intrinsics,
         expression-operators,
         functions,
-        var-bindings,
       ]
   - path: test/language/statements/class/elements/nested-direct-eval-err-contains-arguments.js
     expectedClassification: unsupported-profile-feature
@@ -175346,14 +175163,7 @@ tests:
   - path: test/language/statements/class/elements/nested-direct-eval-err-contains-newtarget.js
     expectedClassification: unsupported-profile-feature
     dependencies:
-      [
-        classes,
-        dynamic-source,
-        expression-operators,
-        functions,
-        object-properties,
-        var-bindings,
-      ]
+      [classes, dynamic-source, functions, object-properties, var-bindings]
   - path: test/language/statements/class/elements/nested-equality-init-err-contains-arguments.js
     expectedClassification: expected-negative
     dependencies: [classes, object-properties]
@@ -175381,7 +175191,6 @@ tests:
         error-intrinsics,
         expression-operators,
         functions,
-        var-bindings,
       ]
   - path: test/language/statements/class/elements/nested-literal-name-init-err-contains-arguments.js
     expectedClassification: expected-negative
@@ -175397,59 +175206,22 @@ tests:
     dependencies: [classes, object-properties]
   - path: test/language/statements/class/elements/nested-private-derived-cls-direct-eval-contains-superproperty-1.js
     expectedClassification: unsupported-profile-feature
-    dependencies:
-      [
-        classes,
-        dynamic-source,
-        expression-operators,
-        functions,
-        object-properties,
-        var-bindings,
-      ]
+    dependencies: [classes, dynamic-source, functions, object-properties]
   - path: test/language/statements/class/elements/nested-private-derived-cls-direct-eval-contains-superproperty-2.js
     expectedClassification: unsupported-profile-feature
-    dependencies:
-      [
-        classes,
-        dynamic-source,
-        expression-operators,
-        functions,
-        object-properties,
-        var-bindings,
-      ]
+    dependencies: [classes, dynamic-source, functions, object-properties]
   - path: test/language/statements/class/elements/nested-private-derived-cls-direct-eval-err-contains-supercall-1.js
     expectedClassification: unsupported-profile-feature
     dependencies:
-      [
-        abrupt-completion,
-        classes,
-        dynamic-source,
-        error-intrinsics,
-        functions,
-        var-bindings,
-      ]
+      [abrupt-completion, classes, dynamic-source, error-intrinsics, functions]
   - path: test/language/statements/class/elements/nested-private-derived-cls-direct-eval-err-contains-supercall-2.js
     expectedClassification: unsupported-profile-feature
     dependencies:
-      [
-        abrupt-completion,
-        classes,
-        dynamic-source,
-        error-intrinsics,
-        functions,
-        var-bindings,
-      ]
+      [abrupt-completion, classes, dynamic-source, error-intrinsics, functions]
   - path: test/language/statements/class/elements/nested-private-derived-cls-direct-eval-err-contains-supercall.js
     expectedClassification: unsupported-profile-feature
     dependencies:
-      [
-        abrupt-completion,
-        classes,
-        dynamic-source,
-        error-intrinsics,
-        functions,
-        var-bindings,
-      ]
+      [abrupt-completion, classes, dynamic-source, error-intrinsics, functions]
   - path: test/language/statements/class/elements/nested-private-derived-cls-indirect-eval-contains-superproperty-1.js
     expectedClassification: unsupported-profile-feature
     dependencies:
@@ -175460,7 +175232,7 @@ tests:
         error-intrinsics,
         expression-operators,
         functions,
-        var-bindings,
+        object-properties,
       ]
   - path: test/language/statements/class/elements/nested-private-derived-cls-indirect-eval-contains-superproperty-2.js
     expectedClassification: unsupported-profile-feature
@@ -175472,7 +175244,7 @@ tests:
         error-intrinsics,
         expression-operators,
         functions,
-        var-bindings,
+        object-properties,
       ]
   - path: test/language/statements/class/elements/nested-private-derived-cls-indirect-eval-err-contains-supercall-1.js
     expectedClassification: unsupported-profile-feature
@@ -175484,7 +175256,6 @@ tests:
         error-intrinsics,
         expression-operators,
         functions,
-        var-bindings,
       ]
   - path: test/language/statements/class/elements/nested-private-derived-cls-indirect-eval-err-contains-supercall-2.js
     expectedClassification: unsupported-profile-feature
@@ -175496,7 +175267,6 @@ tests:
         error-intrinsics,
         expression-operators,
         functions,
-        var-bindings,
       ]
   - path: test/language/statements/class/elements/nested-private-derived-cls-indirect-eval-err-contains-supercall.js
     expectedClassification: unsupported-profile-feature
@@ -175508,7 +175278,6 @@ tests:
         error-intrinsics,
         expression-operators,
         functions,
-        var-bindings,
       ]
   - path: test/language/statements/class/elements/nested-private-direct-eval-err-contains-arguments.js
     expectedClassification: unsupported-profile-feature
@@ -175525,14 +175294,7 @@ tests:
   - path: test/language/statements/class/elements/nested-private-direct-eval-err-contains-newtarget.js
     expectedClassification: unsupported-profile-feature
     dependencies:
-      [
-        classes,
-        dynamic-source,
-        expression-operators,
-        functions,
-        object-properties,
-        var-bindings,
-      ]
+      [classes, dynamic-source, functions, object-properties, var-bindings]
   - path: test/language/statements/class/elements/nested-private-indirect-eval-contains-arguments.js
     expectedClassification: unsupported-profile-feature
     dependencies:
@@ -175554,7 +175316,6 @@ tests:
         error-intrinsics,
         expression-operators,
         functions,
-        var-bindings,
       ]
   - path: test/language/statements/class/elements/nested-private-literal-name-init-err-contains-arguments.js
     expectedClassification: expected-negative
@@ -177131,59 +176892,22 @@ tests:
       [async-functions, classes, functions, lexical-bindings, object-properties]
   - path: test/language/statements/class/elements/private-derived-cls-direct-eval-contains-superproperty-1.js
     expectedClassification: unsupported-profile-feature
-    dependencies:
-      [
-        classes,
-        dynamic-source,
-        expression-operators,
-        functions,
-        object-properties,
-        var-bindings,
-      ]
+    dependencies: [classes, dynamic-source, functions, object-properties]
   - path: test/language/statements/class/elements/private-derived-cls-direct-eval-contains-superproperty-2.js
     expectedClassification: unsupported-profile-feature
-    dependencies:
-      [
-        classes,
-        dynamic-source,
-        expression-operators,
-        functions,
-        object-properties,
-        var-bindings,
-      ]
+    dependencies: [classes, dynamic-source, functions, object-properties]
   - path: test/language/statements/class/elements/private-derived-cls-direct-eval-err-contains-supercall-1.js
     expectedClassification: unsupported-profile-feature
     dependencies:
-      [
-        abrupt-completion,
-        classes,
-        dynamic-source,
-        error-intrinsics,
-        functions,
-        var-bindings,
-      ]
+      [abrupt-completion, classes, dynamic-source, error-intrinsics, functions]
   - path: test/language/statements/class/elements/private-derived-cls-direct-eval-err-contains-supercall-2.js
     expectedClassification: unsupported-profile-feature
     dependencies:
-      [
-        abrupt-completion,
-        classes,
-        dynamic-source,
-        error-intrinsics,
-        functions,
-        var-bindings,
-      ]
+      [abrupt-completion, classes, dynamic-source, error-intrinsics, functions]
   - path: test/language/statements/class/elements/private-derived-cls-direct-eval-err-contains-supercall.js
     expectedClassification: unsupported-profile-feature
     dependencies:
-      [
-        abrupt-completion,
-        classes,
-        dynamic-source,
-        error-intrinsics,
-        functions,
-        var-bindings,
-      ]
+      [abrupt-completion, classes, dynamic-source, error-intrinsics, functions]
   - path: test/language/statements/class/elements/private-derived-cls-indirect-eval-contains-superproperty-1.js
     expectedClassification: unsupported-profile-feature
     dependencies:
@@ -177194,7 +176918,7 @@ tests:
         error-intrinsics,
         expression-operators,
         functions,
-        var-bindings,
+        object-properties,
       ]
   - path: test/language/statements/class/elements/private-derived-cls-indirect-eval-contains-superproperty-2.js
     expectedClassification: unsupported-profile-feature
@@ -177206,7 +176930,7 @@ tests:
         error-intrinsics,
         expression-operators,
         functions,
-        var-bindings,
+        object-properties,
       ]
   - path: test/language/statements/class/elements/private-derived-cls-indirect-eval-err-contains-supercall-1.js
     expectedClassification: unsupported-profile-feature
@@ -177218,7 +176942,6 @@ tests:
         error-intrinsics,
         expression-operators,
         functions,
-        var-bindings,
       ]
   - path: test/language/statements/class/elements/private-derived-cls-indirect-eval-err-contains-supercall-2.js
     expectedClassification: unsupported-profile-feature
@@ -177230,7 +176953,6 @@ tests:
         error-intrinsics,
         expression-operators,
         functions,
-        var-bindings,
       ]
   - path: test/language/statements/class/elements/private-derived-cls-indirect-eval-err-contains-supercall.js
     expectedClassification: unsupported-profile-feature
@@ -177242,30 +176964,15 @@ tests:
         error-intrinsics,
         expression-operators,
         functions,
-        var-bindings,
       ]
   - path: test/language/statements/class/elements/private-direct-eval-err-contains-arguments.js
     expectedClassification: unsupported-profile-feature
     dependencies:
-      [
-        abrupt-completion,
-        classes,
-        dynamic-source,
-        error-intrinsics,
-        functions,
-        var-bindings,
-      ]
+      [abrupt-completion, classes, dynamic-source, error-intrinsics, functions]
   - path: test/language/statements/class/elements/private-direct-eval-err-contains-newtarget.js
     expectedClassification: unsupported-profile-feature
     dependencies:
-      [
-        classes,
-        dynamic-source,
-        expression-operators,
-        functions,
-        object-properties,
-        var-bindings,
-      ]
+      [classes, dynamic-source, functions, object-properties, var-bindings]
   - path: test/language/statements/class/elements/private-field-access-on-inner-arrow-function.js
     expectedClassification: pass
     dependencies: [classes, object-properties]
@@ -177436,7 +177143,6 @@ tests:
         error-intrinsics,
         expression-operators,
         functions,
-        var-bindings,
       ]
   - path: test/language/statements/class/elements/private-literal-name-init-err-contains-arguments.js
     expectedClassification: expected-negative
@@ -178004,14 +177710,7 @@ tests:
   - path: test/language/statements/class/elements/privatename-not-valid-eval-earlyerr-1.js
     expectedClassification: unsupported-profile-feature
     dependencies:
-      [
-        abrupt-completion,
-        classes,
-        dynamic-source,
-        error-intrinsics,
-        functions,
-        var-bindings,
-      ]
+      [abrupt-completion, classes, dynamic-source, error-intrinsics, functions]
   - path: test/language/statements/class/elements/privatename-not-valid-eval-earlyerr-2.js
     expectedClassification: unsupported-profile-feature
     dependencies:
@@ -178022,19 +177721,11 @@ tests:
         error-intrinsics,
         functions,
         object-properties,
-        var-bindings,
       ]
   - path: test/language/statements/class/elements/privatename-not-valid-eval-earlyerr-3.js
     expectedClassification: unsupported-profile-feature
     dependencies:
-      [
-        abrupt-completion,
-        classes,
-        dynamic-source,
-        error-intrinsics,
-        functions,
-        var-bindings,
-      ]
+      [abrupt-completion, classes, dynamic-source, error-intrinsics, functions]
   - path: test/language/statements/class/elements/privatename-not-valid-eval-earlyerr-4.js
     expectedClassification: unsupported-profile-feature
     dependencies:
@@ -178045,52 +177736,23 @@ tests:
         error-intrinsics,
         functions,
         object-properties,
-        var-bindings,
       ]
   - path: test/language/statements/class/elements/privatename-not-valid-eval-earlyerr-5.js
     expectedClassification: unsupported-profile-feature
     dependencies:
-      [
-        abrupt-completion,
-        classes,
-        dynamic-source,
-        error-intrinsics,
-        functions,
-        var-bindings,
-      ]
+      [abrupt-completion, classes, dynamic-source, error-intrinsics, functions]
   - path: test/language/statements/class/elements/privatename-not-valid-eval-earlyerr-6.js
     expectedClassification: unsupported-profile-feature
     dependencies:
-      [
-        abrupt-completion,
-        classes,
-        dynamic-source,
-        error-intrinsics,
-        functions,
-        var-bindings,
-      ]
+      [abrupt-completion, classes, dynamic-source, error-intrinsics, functions]
   - path: test/language/statements/class/elements/privatename-not-valid-eval-earlyerr-7.js
     expectedClassification: unsupported-profile-feature
     dependencies:
-      [
-        abrupt-completion,
-        classes,
-        dynamic-source,
-        error-intrinsics,
-        functions,
-        var-bindings,
-      ]
+      [abrupt-completion, classes, dynamic-source, error-intrinsics, functions]
   - path: test/language/statements/class/elements/privatename-not-valid-eval-earlyerr-8.js
     expectedClassification: unsupported-profile-feature
     dependencies:
-      [
-        abrupt-completion,
-        classes,
-        dynamic-source,
-        error-intrinsics,
-        functions,
-        var-bindings,
-      ]
+      [abrupt-completion, classes, dynamic-source, error-intrinsics, functions]
   - path: test/language/statements/class/elements/privatename-valid-no-earlyerr.js
     expectedClassification: pass
     dependencies: [classes, object-properties]

@@ -226,7 +226,6 @@ results:
       - dynamic-source
       - error-intrinsics
       - functions
-      - var-bindings
     observation:
       detail: "test/language/statements/class/elements/nested-private-derived\
         -cls-direct-eval-err-contains-supercall-1.js non-strict disabled

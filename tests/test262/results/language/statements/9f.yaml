@@ -241,7 +241,6 @@ results:
       - dynamic-source
       - error-intrinsics
       - functions
-      - var-bindings
     observation:
       detail: "test/language/statements/class/elements/derived-cls-direct-eva\
         l-err-contains-supercall-2.js non-strict disabled failed (1):

@@ -344,10 +344,8 @@ results:
     dependencies:
       - classes
       - dynamic-source
-      - expression-operators
       - functions
       - object-properties
-      - var-bindings
     observation:
       detail: "test/language/statements/class/elements/arrow-body-derived-cls\
         -direct-eval-contains-superproperty-1.js non-strict disabled

@@ -320,7 +320,6 @@ results:
       - error-intrinsics
       - expression-operators
       - functions
-      - var-bindings
     execution:
       harnessIncludes:
         - base.js
@@ -359,7 +358,6 @@ results:
       - dynamic-source
       - error-intrinsics
       - functions
-      - var-bindings
     observation:
       detail: "test/language/statements/class/elements/private-direct-eval-er\
         r-contains-arguments.js non-strict disabled failed (1):

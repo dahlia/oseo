@@ -192,7 +192,6 @@ results:
       - dynamic-source
       - error-intrinsics
       - functions
-      - var-bindings
     observation:
       detail: "test/language/statements/class/elements/arrow-body-private-der\
         ived-cls-direct-eval-err-contains-supercall.js non-strict
@@ -222,7 +221,6 @@ results:
     dependencies:
       - classes
       - dynamic-source
-      - expression-operators
       - functions
       - object-properties
       - var-bindings
@@ -309,7 +307,6 @@ results:
       - error-intrinsics
       - expression-operators
       - functions
-      - var-bindings
     execution:
       harnessIncludes:
         - base.js

@@ -216,10 +216,8 @@ results:
     dependencies:
       - classes
       - dynamic-source
-      - expression-operators
       - functions
       - object-properties
-      - var-bindings
     observation:
       detail: "test/language/statements/class/elements/derived-cls-direct-eva\
         l-contains-superproperty-1.js non-strict disabled failed (1):
@@ -252,7 +250,6 @@ results:
       - dynamic-source
       - error-intrinsics
       - functions
-      - var-bindings
     observation:
       detail: "test/language/statements/class/elements/nested-private-derived\
         -cls-direct-eval-err-contains-supercall-2.js non-strict disabled

@@ -284,7 +284,7 @@ results:
       - error-intrinsics
       - expression-operators
       - functions
-      - var-bindings
+      - object-properties
     execution:
       harnessIncludes:
         - base.js

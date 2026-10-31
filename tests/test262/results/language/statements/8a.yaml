@@ -280,7 +280,6 @@ results:
       - dynamic-source
       - error-intrinsics
       - functions
-      - var-bindings
     observation:
       detail: "test/language/statements/class/elements/private-derived-cls-di\
         rect-eval-err-contains-supercall.js non-strict disabled failed

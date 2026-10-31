@@ -223,7 +223,6 @@ results:
       - dynamic-source
       - error-intrinsics
       - functions
-      - var-bindings
     observation:
       detail: "test/language/statements/class/elements/arrow-body-derived-cls\
         -direct-eval-err-contains-supercall.js non-strict disabled

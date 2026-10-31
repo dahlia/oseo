@@ -113,3 +113,12 @@ remediation. Its final C.getWithEval.call(D) reads an absent method and throws
 TypeError before any eval. The existing dynamic-source node owns 885 paths,
 including four additions from these batches. The original source, all
 assertions and the unsupported observation stay.
+
+Internal review round 3 corrected 20 `var-bindings` rows supported only by
+reach markers or the unused rejected-eval assignment-target fixture, and three
+`expression-operators` rows supported only by the marker assignment. Two
+rejected indirect-eval SuperProperty subjects gained `object-properties` as
+their grammar family. The full 1,859-source audit retained the computed boolean
+field-value update and numeric counters, and recorded its per-source
+dispositions in
+[marker and grammar audit](/data/m5c-d17-20261031/train-b/round3-investigation/marker-and-superproperty-audit.json).

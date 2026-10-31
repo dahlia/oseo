@@ -184,7 +184,6 @@ results:
       - error-intrinsics
       - expression-operators
       - functions
-      - var-bindings
     execution:
       harnessIncludes:
         - base.js

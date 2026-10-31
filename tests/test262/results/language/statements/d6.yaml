@@ -184,7 +184,6 @@ results:
       - error-intrinsics
       - functions
       - object-properties
-      - var-bindings
     observation:
       detail: "test/language/statements/class/elements/privatename-not-valid-\
         eval-earlyerr-4.js non-strict disabled failed (1): stdout=\"\"

@@ -124,7 +124,6 @@ results:
       - dynamic-source
       - error-intrinsics
       - functions
-      - var-bindings
     observation:
       detail: "test/language/statements/class/elements/arrow-body-private-dir\
         ect-eval-err-contains-arguments.js non-strict disabled failed

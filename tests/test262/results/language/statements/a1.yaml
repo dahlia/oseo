@@ -242,7 +242,6 @@ results:
     dependencies:
       - classes
       - dynamic-source
-      - expression-operators
       - functions
       - object-properties
       - var-bindings

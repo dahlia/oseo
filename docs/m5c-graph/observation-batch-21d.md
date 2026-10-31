@@ -75,3 +75,9 @@ skipped. The generator declaration is an unused fixture, not asserted
 generator behavior. The
 [generator-fixture audit](/data/m5c-d17-20261031/train-b/round2-investigation/unused-generator-audit.json)
 removes only that family and keeps the reached method-body operators.
+
+Internal review round 3 rechecked all 1,859 admitted sources for the October 30
+reach-marker and rejected-SuperProperty rules. No B21d correction matched those
+patterns; numeric counter updates remain witnesses because they compute
+asserted values. The per-source dispositions are recorded in
+[marker and grammar audit](/data/m5c-d17-20261031/train-b/round3-investigation/marker-and-superproperty-audit.json).

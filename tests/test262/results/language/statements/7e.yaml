@@ -435,7 +435,6 @@ results:
       - dynamic-source
       - error-intrinsics
       - functions
-      - var-bindings
     observation:
       detail: "test/language/statements/class/elements/privatename-not-valid-\
         eval-earlyerr-6.js non-strict disabled failed (1): stdout=\"\"

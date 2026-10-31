@@ -22991,7 +22991,7 @@ summary:
       infrastructureFailures: 0
       passes: 7147
       semanticFailures: 0
-      unsupportedProfileFeatures: 631
+      unsupportedProfileFeatures: 613
     - dependency: functions
       expectedNegatives: 1043
       harnessFailures: 0
@@ -23068,7 +23068,7 @@ summary:
       infrastructureFailures: 0
       passes: 18577
       semanticFailures: 0
-      unsupportedProfileFeatures: 847
+      unsupportedProfileFeatures: 854
     - dependency: promise-settlement
       expectedNegatives: 93
       harnessFailures: 0
@@ -23194,7 +23194,7 @@ summary:
       infrastructureFailures: 0
       passes: 7299
       semanticFailures: 0
-      unsupportedProfileFeatures: 676
+      unsupportedProfileFeatures: 613
     - dependency: weak-collections
       expectedNegatives: 0
       harnessFailures: 0
