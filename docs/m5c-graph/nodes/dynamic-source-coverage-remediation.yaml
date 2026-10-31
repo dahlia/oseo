@@ -293,7 +293,10 @@ delivers: "Resolves the 334 reviewed unsupported paths assigned to
   observation-batch-27.md. No replacement, exclusion or ADR change is
   claimed. Root's bundle 4 scoped UPDATE then observed
   statements/function/S13.2.2_A13.js as pass on the bundle 3 runtime,
-  leaving 334."
+  leaving 334. dynamic-source-host-script-evidence then accounts for 44 of
+  its 99 DS-10 and completion paths under ADR 0016 with finite literal host
+  Script witnesses and keeps 55, leaving 290; see
+  docs/m5c-graph/dynamic-source-host-script-evidence.md."
 dependencies:
   - authorized-exclusion-audit
   - dynamic-source-binding-reference-evidence

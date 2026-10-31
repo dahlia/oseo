@@ -5478,6 +5478,48 @@ assessments:
       contract does not normatively require Annex B. No replacement
       observation yet witnesses every core subject, so retain bounded
       remediation without authorizing a whole-path exclusion.
+  ds-host-script-finite-evidence:
+    disposition: exclusion
+    normativeDependency: source-evaluation-only
+    reason: >-
+      The 2026-11-01 umbrella-residual decision, item 1, extends the DS-21
+      condition to 44 DS-10 eval originals. Finite literal ADR 0029 Scripts
+      replace only the eval call expressions of each pinned original and retain
+      every other byte, including all assertions. Indirect rows keep their
+      caller-local bindings and match eval's global environment, strictness and
+      error phase. Direct rows are at global Script top level or evaluate source
+      that reads nothing of the caller, with inherited strictness reproduced by
+      a directive and void 0 as DS-21 and Root's 2026-11-01 ruling allow.
+      Consumed values are compared by strict value and type; each call site in
+      each mode rejects its own mutation through an independent error-type
+      verdict, and runtime-negative originals must throw their realm's
+      SyntaxError. Both native policies with forced collection observe the same
+      operation. Only the original source evaluation remains excluded under ADR
+      0016; accounting counts no path as pass. Reopen on changed source,
+      observed rejection or replacement evidence, an accepted source
+      admission, or any uncovered non-source assertion under ADR 0019.
+    replacementEvidence:
+      docs/m5c-graph/dynamic-source-host-script-evidence.md:
+        "3c6488e68c119517181847d50c44a27465d3f7ffca2c6fa0\
+        e25ed5833cdda710"
+      tests/native/fixtures/host-script-evidence-cases.ts:
+        "a556e07fbda41c6594120bd16c6f6a01deb7f897ec82acfe\
+        3c23b8c6b85ea196"
+      tests/native/fixtures/host-script-evidence.ts:
+        "d804fcda15e50a5b2f9ecbaaa16796710150e5cefb8d98fc\
+        213693f3ca618a0c"
+      tests/native/host-script-main-reference.ts:
+        "8521eb0676f0f27268615f6bb45cad536fe612894f1b3c84\
+        2a6e6fa74eba8b6a"
+      tests/host-script-evidence.test.ts:
+        "023fbf22f8af246f867da9eb6ec2776bab46cd926ca822a8\
+        d70e6a52dc89974f"
+      tests/test262/harness/base.js:
+        "50331feeca513cb2e2354e05e7c68f82d5aeccd9b766d6c8\
+        8438c5ef118075f6"
+      tests/test262/harness/propertyHelper.js:
+        "bf9ce5ce4509a5b848cac4c3902e054dec385f1ed86284c0\
+        543f5da4949e7c35"
 paths:
   - path: test/built-ins/AggregateError/newtarget-proto-fallback.js
     proposedOwner: adr:0016-dynamic-source-boundary
@@ -12427,7 +12469,7 @@ paths:
     section: "sec-performeval"
     subject: "Direct eval code creates `class` bindings prior to evaluation, but
       does not initialize them."
-    assessment: "observation-train-b06-b08-b14"
+    assessment: ds-host-script-finite-evidence
   - path: "test/language/eval-code/direct/lex-env-no-init-const.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "source-subject"
@@ -12439,7 +12481,7 @@ paths:
     section: "sec-performeval"
     subject: "Direct eval code creates `const` bindings prior to evaluation but
       does not initialize them."
-    assessment: "observation-train-b06-b08-b14"
+    assessment: ds-host-script-finite-evidence
   - path: "test/language/eval-code/direct/lex-env-no-init-let.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "source-subject"
@@ -12451,7 +12493,7 @@ paths:
     section: "sec-performeval"
     subject: "Direct eval code creates `let` bindings prior to evaluation but
       does not initialize them."
-    assessment: "observation-train-b06-b08-b14"
+    assessment: ds-host-script-finite-evidence
   - path: "test/language/eval-code/direct/meth-a-following-parameter-is-named-a\
       rguments-declare-arguments-and-assign.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -12650,7 +12692,7 @@ paths:
     missingDynamicTag: false
     section: "sec-scripts-static-semantics-early-errors"
     subject: "A direct eval in global code may not contain `new.target`"
-    assessment: "observation-train-b06-b08-b14"
+    assessment: ds-host-script-finite-evidence
   - path: "test/language/eval-code/direct/non-definable-function-with-functi\
       on.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -12663,7 +12705,7 @@ paths:
     section: "Original source subject; frontmatter has no section ID"
     subject: "Global functions are not created if conflicting function
       declarations were detected."
-    assessment: "observation-train-b06-b08-b14"
+    assessment: ds-host-script-finite-evidence
   - path: "test/language/eval-code/direct/non-definable-function-with-variab\
       le.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -12676,7 +12718,7 @@ paths:
     section: "Original source subject; frontmatter has no section ID"
     subject: "Global variables are not created if conflicting function
       declarations were detected."
-    assessment: "observation-train-b06-b08-b14"
+    assessment: ds-host-script-finite-evidence
   - path: "test/language/eval-code/direct/non-definable-global-function.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "source-subject"
@@ -12687,7 +12729,7 @@ paths:
     missingDynamicTag: false
     section: "Original source subject; frontmatter has no section ID"
     subject: "Throws a TypeError if a global function cannot be defined."
-    assessment: "observation-train-b06-b08-b14"
+    assessment: ds-host-script-finite-evidence
   - path: "test/language/eval-code/direct/non-definable-global-generator.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "source-subject"
@@ -12699,7 +12741,7 @@ paths:
     section: "Original source subject; frontmatter has no section ID"
     subject: "Throws a TypeError if a global generator function cannot be de\
       fined."
-    assessment: "observation-train-b06-b08-b14"
+    assessment: ds-host-script-finite-evidence
   - path: "test/language/eval-code/direct/non-definable-global-var.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "source-subject"
@@ -12710,7 +12752,7 @@ paths:
     missingDynamicTag: false
     section: "Original source subject; frontmatter has no section ID"
     subject: "Throws a TypeError if a global variable cannot be defined."
-    assessment: "observation-train-b06-b08-b14"
+    assessment: ds-host-script-finite-evidence
   - path: "test/language/eval-code/direct/parse-failure-1.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "source-subject"
@@ -12789,7 +12831,7 @@ paths:
     section: "sec-performeval"
     subject: "Script will be script if strictCaller is true, inside a function
       context"
-    assessment: "observation-train-b06-b08-b14"
+    assessment: ds-host-script-finite-evidence
   - path: "test/language/eval-code/direct/strict-caller-global.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "source-subject"
@@ -12800,7 +12842,7 @@ paths:
     missingDynamicTag: false
     section: "sec-performeval"
     subject: "Script will be script if strictCaller is true"
-    assessment: "observation-train-b06-b08-b14"
+    assessment: ds-host-script-finite-evidence
   - path: "test/language/eval-code/direct/strictness-override.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "source-subject"
@@ -12812,7 +12854,7 @@ paths:
     section: "sec-strict-mode-code"
     subject: "Evaluated code honors a Use Strict Directive in the Directive \
       Prologue"
-    assessment: "observation-train-b06-b08-b14"
+    assessment: ds-host-script-finite-evidence
   - path: "test/language/eval-code/direct/super-call-arrow.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "source-subject"
@@ -12859,7 +12901,7 @@ paths:
     missingDynamicTag: false
     section: "sec-scripts-static-semantics-early-errors"
     subject: "A direct eval in global code may not contain SuperCall"
-    assessment: "observation-train-dynamic-coverage"
+    assessment: ds-host-script-finite-evidence
   - path: "test/language/eval-code/direct/super-prop-arrow.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "source-subject"
@@ -12932,7 +12974,7 @@ paths:
     section: "sec-scripts-static-semantics-early-errors"
     subject: "A direct eval in global code may not contain
       SuperProperty"
-    assessment: "observation-train-dynamic-coverage"
+    assessment: ds-host-script-finite-evidence
   - path: "test/language/eval-code/direct/switch-case-decl-eval-source-is-stric\
       t-nostrict.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -13056,7 +13098,7 @@ paths:
     section: "sec-performeval"
     subject: "Direct eval code has the same `this` binding as the calling
       context (global scope)"
-    assessment: "observation-train-b06-b08-b14"
+    assessment: ds-host-script-finite-evidence
   - path: "test/language/eval-code/direct/var-env-func-init-global-new.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "source-subject"
@@ -13092,7 +13134,7 @@ paths:
     section: "sec-evaldeclarationinstantiation"
     subject: "Modification of previously-existing non-configurable global pr\
       operty"
-    assessment: "observation-train-b06-b08-b14"
+    assessment: ds-host-script-finite-evidence
   - path: "test/language/eval-code/direct/var-env-func-init-local-new-delete.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "source-subject"
@@ -13136,7 +13178,7 @@ paths:
     missingDynamicTag: false
     section: "sec-evaldeclarationinstantiation"
     subject: "Precedence of final declaration when bindings are duplicated"
-    assessment: "observation-train-b06-b08-b14"
+    assessment: ds-host-script-finite-evidence
   - path: "test/language/eval-code/direct/var-env-func-non-strict.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "source-subject"
@@ -13206,7 +13248,7 @@ paths:
     missingDynamicTag: false
     section: "sec-evaldeclarationinstantiation"
     subject: "Variable collision with global lexical binding"
-    assessment: "observation-train-b06-b08-b14"
+    assessment: ds-host-script-finite-evidence
   - path: "test/language/eval-code/direct/var-env-global-lex-strict-source.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "source-subject"
@@ -13261,7 +13303,7 @@ paths:
     missingDynamicTag: false
     section: "sec-evaldeclarationinstantiation"
     subject: "Declaration does not modify existing global property"
-    assessment: "observation-train-b06-b08-b14"
+    assessment: ds-host-script-finite-evidence
   - path: "test/language/eval-code/direct/var-env-var-init-global-new.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "source-subject"
@@ -13379,7 +13421,7 @@ paths:
     section: "sec-strict-mode-code"
     subject: "Strictness of direct eval is not dependent on strictness of ca\
       ller"
-    assessment: "observation-train-b06-b08-b14"
+    assessment: ds-host-script-finite-evidence
   - path: "test/language/eval-code/indirect/block-decl-strict.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "source-subject"
@@ -13523,7 +13565,7 @@ paths:
     section: "Original es5id: 10.4.2-1-3"
     subject: "Indirect call to eval has context set to global context (catch \
       block)"
-    assessment: "observation-train-b06-b08-b14"
+    assessment: ds-host-script-finite-evidence
   - path: "test/language/eval-code/indirect/global-env-rec-eval.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "source-subject"
@@ -13547,7 +13589,7 @@ paths:
     section: "Original es5id: 10.4.2-1-2"
     subject: "Indirect call to eval has context set to global context (nested
       function)"
-    assessment: "observation-train-b06-b08-b14"
+    assessment: ds-host-script-finite-evidence
   - path: "test/language/eval-code/indirect/global-env-rec-with.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "source-subject"
@@ -13559,7 +13601,7 @@ paths:
     section: "Original es5id: 10.4.2-1-4"
     subject: "Indirect call to eval has context set to global context (with \
       block)"
-    assessment: "observation-train-b06-b08-b14"
+    assessment: ds-host-script-finite-evidence
   - path: "test/language/eval-code/indirect/global-env-rec.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "source-subject"
@@ -13570,7 +13612,7 @@ paths:
     missingDynamicTag: false
     section: "Original es5id: 10.4.2-1-1"
     subject: "Indirect call to eval has context set to global context"
-    assessment: "observation-train-b06-b08-b14"
+    assessment: ds-host-script-finite-evidence
   - path: "test/language/eval-code/indirect/import.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "source-subject"
@@ -13629,7 +13671,7 @@ paths:
     section: "sec-performeval"
     subject: "Indirect eval code sets the new declarative environment's outer
       environment to the global environment."
-    assessment: "observation-train-b06-b08-b14"
+    assessment: ds-host-script-finite-evidence
   - path: "test/language/eval-code/indirect/lex-env-no-init-cls.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "source-subject"
@@ -13641,7 +13683,7 @@ paths:
     section: "sec-performeval"
     subject: "Indirect eval code creates `class` bindings prior to evaluation,
       but does not initialize them."
-    assessment: "observation-train-b06-b08-b14"
+    assessment: ds-host-script-finite-evidence
   - path: "test/language/eval-code/indirect/lex-env-no-init-const.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "source-subject"
@@ -13653,7 +13695,7 @@ paths:
     section: "sec-performeval"
     subject: "Indirect eval code creates `const` bindings prior to evaluation
       but does not initialize them."
-    assessment: "observation-train-b06-b08-b14"
+    assessment: ds-host-script-finite-evidence
   - path: "test/language/eval-code/indirect/lex-env-no-init-let.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "source-subject"
@@ -13665,7 +13707,7 @@ paths:
     section: "sec-performeval"
     subject: "Indirect eval code creates `let` bindings prior to evaluation but
       does not initialize them."
-    assessment: "observation-train-b06-b08-b14"
+    assessment: ds-host-script-finite-evidence
   - path: "test/language/eval-code/indirect/new.target.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "source-subject"
@@ -13676,7 +13718,7 @@ paths:
     missingDynamicTag: false
     section: "sec-scripts-static-semantics-early-errors"
     subject: "An indirect eval may not contain `new.target`"
-    assessment: "observation-train-b06-b08-b14"
+    assessment: ds-host-script-finite-evidence
   - path: "test/language/eval-code/indirect/non-definable-function-with-functio\
       n.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -13689,7 +13731,7 @@ paths:
     section: "sec-evaldeclarationinstantiation"
     subject: "Global functions are not created if conflicting function
       declarations were detected."
-    assessment: "observation-train-b06-b08-b14"
+    assessment: ds-host-script-finite-evidence
   - path: "test/language/eval-code/indirect/non-definable-function-with-variabl\
       e.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -13702,7 +13744,7 @@ paths:
     section: "sec-evaldeclarationinstantiation"
     subject: "Global variables are not created if conflicting function
       declarations were detected."
-    assessment: "observation-train-b06-b08-b14"
+    assessment: ds-host-script-finite-evidence
   - path: "test/language/eval-code/indirect/non-definable-global-function.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "source-subject"
@@ -13713,7 +13755,7 @@ paths:
     missingDynamicTag: false
     section: "sec-evaldeclarationinstantiation"
     subject: "Throws a TypeError if a global function cannot be defined."
-    assessment: "observation-train-b06-b08-b14"
+    assessment: ds-host-script-finite-evidence
   - path: "test/language/eval-code/indirect/non-definable-global-generator.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "source-subject"
@@ -13725,7 +13767,7 @@ paths:
     section: "sec-evaldeclarationinstantiation"
     subject: "Throws a TypeError if a global generator function cannot be de\
       fined."
-    assessment: "observation-train-b06-b08-b14"
+    assessment: ds-host-script-finite-evidence
   - path: "test/language/eval-code/indirect/non-definable-global-var.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "source-subject"
@@ -13736,7 +13778,7 @@ paths:
     missingDynamicTag: false
     section: "sec-evaldeclarationinstantiation"
     subject: "Throws a TypeError if a global variable cannot be defined."
-    assessment: "observation-train-b06-b08-b14"
+    assessment: ds-host-script-finite-evidence
   - path: "test/language/eval-code/indirect/parse-failure-1.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "source-subject"
@@ -13827,7 +13869,7 @@ paths:
     missingDynamicTag: false
     section: "sec-scripts-static-semantics-early-errors"
     subject: "An indirect eval may not contain SuperCall"
-    assessment: "observation-train-dynamic-coverage"
+    assessment: ds-host-script-finite-evidence
   - path: "test/language/eval-code/indirect/super-prop.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "source-subject"
@@ -13838,7 +13880,7 @@ paths:
     missingDynamicTag: false
     section: "sec-scripts-static-semantics-early-errors"
     subject: "An indirect eval may not contain SuperProperty"
-    assessment: "observation-train-dynamic-coverage"
+    assessment: ds-host-script-finite-evidence
   - path: "test/language/eval-code/indirect/switch-case-decl-strict.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "source-subject"
@@ -13872,7 +13914,7 @@ paths:
     section: "sec-performeval"
     subject: "Direct eval code has the same `this` binding as the calling
       context (non-strict function scope)"
-    assessment: "observation-train-b06-b08-b14"
+    assessment: ds-host-script-finite-evidence
   - path: "test/language/eval-code/indirect/this-value-global.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "source-subject"
@@ -13884,7 +13926,7 @@ paths:
     section: "sec-performeval"
     subject: "Direct eval code has the same `this` binding as the calling
       context (global scope)"
-    assessment: "observation-train-b06-b08-b14"
+    assessment: ds-host-script-finite-evidence
   - path: "test/language/eval-code/indirect/var-env-func-init-global-new.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "source-subject"
@@ -13920,7 +13962,7 @@ paths:
     section: "sec-evaldeclarationinstantiation"
     subject: "Modification of previously-existing non-configurable global pr\
       operty"
-    assessment: "observation-train-b06-b08-b14"
+    assessment: ds-host-script-finite-evidence
   - path: "test/language/eval-code/indirect/var-env-func-init-multi.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "source-subject"
@@ -13931,7 +13973,7 @@ paths:
     missingDynamicTag: false
     section: "sec-evaldeclarationinstantiation"
     subject: "Precedence of final declaration when bindings are duplicated"
-    assessment: "observation-train-b06-b08-b14"
+    assessment: ds-host-script-finite-evidence
   - path: "test/language/eval-code/indirect/var-env-func-non-strict.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "source-subject"
@@ -13943,7 +13985,7 @@ paths:
     section: "sec-performeval"
     subject: "Non-stict mode indirect eval code cannot instantiate functions in
       the variable environment of the caller"
-    assessment: "observation-train-b06-b08-b14"
+    assessment: ds-host-script-finite-evidence
   - path: "test/language/eval-code/indirect/var-env-func-strict.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "source-subject"
@@ -13966,7 +14008,7 @@ paths:
     missingDynamicTag: false
     section: "sec-evaldeclarationinstantiation"
     subject: "Variable collision with global lexical binding"
-    assessment: "observation-train-b06-b08-b14"
+    assessment: ds-host-script-finite-evidence
   - path: "test/language/eval-code/indirect/var-env-global-lex-strict.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "source-subject"
@@ -14010,7 +14052,7 @@ paths:
     missingDynamicTag: false
     section: "sec-evaldeclarationinstantiation"
     subject: "Declaration does not modify existing global property"
-    assessment: "observation-train-b06-b08-b14"
+    assessment: ds-host-script-finite-evidence
   - path: "test/language/eval-code/indirect/var-env-var-init-global-new.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "source-subject"
@@ -14032,7 +14074,7 @@ paths:
     missingDynamicTag: false
     section: "sec-performeval"
     subject: "Indirect eval code cannot instantiate variable in calling context"
-    assessment: "observation-train-b06-b08-b14"
+    assessment: ds-host-script-finite-evidence
   - path: "test/language/eval-code/indirect/var-env-var-strict.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "source-subject"
