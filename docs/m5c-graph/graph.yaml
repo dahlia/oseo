@@ -20,8 +20,8 @@ baseline:
   unreviewedPaths: 6742
   unsupportedProfileFeatures: 1684
 summary:
-  nodes: 124
-  ready: 121
+  nodes: 125
+  ready: 122
   blocked: 3
   parked: 0
   landed: 97
@@ -8761,3 +8761,133 @@ collisions:
       - with-primitive-binding-object-boxing
     note: "These independent remediation and observation publishers share
       the canonical manifest index; serialize their publication."
+  - path: tests/test262/results.yaml
+    nodes:
+      - array-generated-property-cost-remediation
+      - dynamic-source-importcall-residual-accounting
+    note: "Independent publishers serialize canonical manifest updates."
+  - path: tests/test262/results.yaml
+    nodes:
+      - class-private-accessor-lookup-coverage-remediation
+      - dynamic-source-importcall-residual-accounting
+    note: "Independent publishers serialize canonical manifest updates."
+  - path: tests/test262/results.yaml
+    nodes:
+      - class-static-keyword-escape-early-error
+      - dynamic-source-importcall-residual-accounting
+    note: "Independent publishers serialize canonical manifest updates."
+  - path: tests/test262/results.yaml
+    nodes:
+      - default-derived-constructor-spread-iterator
+      - dynamic-source-importcall-residual-accounting
+    note: "Independent publishers serialize canonical manifest updates."
+  - path: tests/test262/results.yaml
+    nodes:
+      - dynamic-source-coverage-remediation
+      - dynamic-source-importcall-residual-accounting
+    note: "Independent publishers serialize canonical manifest updates."
+  - path: tests/test262/results.yaml
+    nodes:
+      - dynamic-source-importcall-residual-accounting
+      - dynamic-source-retagging
+    note: "Independent publishers serialize canonical manifest updates."
+  - path: tests/test262/results.yaml
+    nodes:
+      - dynamic-source-importcall-residual-accounting
+      - non-blocking-agent
+    note: "Independent publishers serialize canonical manifest updates."
+  - path: tests/test262/results.yaml
+    nodes:
+      - dynamic-source-importcall-residual-accounting
+      - observation-batch-21a
+    note: "Independent publishers serialize canonical manifest updates."
+  - path: tests/test262/results.yaml
+    nodes:
+      - dynamic-source-importcall-residual-accounting
+      - observation-batch-21b
+    note: "Independent publishers serialize canonical manifest updates."
+  - path: tests/test262/results.yaml
+    nodes:
+      - dynamic-source-importcall-residual-accounting
+      - observation-batch-21c
+    note: "Independent publishers serialize canonical manifest updates."
+  - path: tests/test262/results.yaml
+    nodes:
+      - dynamic-source-importcall-residual-accounting
+      - observation-batch-21d
+    note: "Independent publishers serialize canonical manifest updates."
+  - path: tests/test262/results.yaml
+    nodes:
+      - dynamic-source-importcall-residual-accounting
+      - observation-batch-22a
+    note: "Independent publishers serialize canonical manifest updates."
+  - path: tests/test262/results.yaml
+    nodes:
+      - dynamic-source-importcall-residual-accounting
+      - observation-batch-22b
+    note: "Independent publishers serialize canonical manifest updates."
+  - path: tests/test262/results.yaml
+    nodes:
+      - dynamic-source-importcall-residual-accounting
+      - observation-batch-23
+    note: "Independent publishers serialize canonical manifest updates."
+  - path: tests/test262/results.yaml
+    nodes:
+      - dynamic-source-importcall-residual-accounting
+      - observation-batch-24
+    note: "Independent publishers serialize canonical manifest updates."
+  - path: tests/test262/results.yaml
+    nodes:
+      - dynamic-source-importcall-residual-accounting
+      - observation-batch-25
+    note: "Independent publishers serialize canonical manifest updates."
+  - path: tests/test262/results.yaml
+    nodes:
+      - dynamic-source-importcall-residual-accounting
+      - observation-batch-26a
+    note: "Independent publishers serialize canonical manifest updates."
+  - path: tests/test262/results.yaml
+    nodes:
+      - dynamic-source-importcall-residual-accounting
+      - observation-batch-26b
+    note: "Independent publishers serialize canonical manifest updates."
+  - path: tests/test262/results.yaml
+    nodes:
+      - dynamic-source-importcall-residual-accounting
+      - observation-batch-27
+    note: "Independent publishers serialize canonical manifest updates."
+  - path: tests/test262/results.yaml
+    nodes:
+      - dynamic-source-importcall-residual-accounting
+      - observation-batch-28
+    note: "Independent publishers serialize canonical manifest updates."
+  - path: tests/test262/results.yaml
+    nodes:
+      - dynamic-source-importcall-residual-accounting
+      - observation-batch-31
+    note: "Independent publishers serialize canonical manifest updates."
+  - path: tests/test262/results.yaml
+    nodes:
+      - dynamic-source-importcall-residual-accounting
+      - regexp-split-coverage-remediation
+    note: "Independent publishers serialize canonical manifest updates."
+  - path: tests/test262/results.yaml
+    nodes:
+      - dynamic-source-importcall-residual-accounting
+      - typed-array-proto-coverage-remediation
+    note: "Independent publishers serialize canonical manifest updates."
+  - path: tests/test262/results.yaml
+    nodes:
+      - dynamic-source-importcall-residual-accounting
+      - unhandled-rejection-observation
+    note: "Independent publishers serialize canonical manifest updates."
+  - path: tests/test262/results.yaml
+    nodes:
+      - dynamic-source-importcall-residual-accounting
+      - with-optional-call-receiver
+    note: "Independent publishers serialize canonical manifest updates."
+  - path: tests/test262/results.yaml
+    nodes:
+      - dynamic-source-importcall-residual-accounting
+      - with-primitive-binding-object-boxing
+    note: "Independent publishers serialize canonical manifest updates."
