@@ -2253,9 +2253,11 @@ test(
                 (native) => {
                   assertMatchingObservations([expectedObservation, native]);
                   assert.ok(native.counters!.collections > 0);
+                  // A tail-position result checks through the derived tail
+                  // call helper instead of the direct result helper.
                   assert.match(
                     native.emittedC,
-                    /oseo_derived_constructor_result/u,
+                    /oseo_derived_constructor_result|oseo_tail_call_derived/u,
                   );
                 },
               );

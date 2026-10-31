@@ -453,9 +453,17 @@ function ordinaryInert() {
 console.log("host contract", inert() === undefined,
   ordinaryInert() === undefined);
 `;
+    // Reflect.construct from the foreign realm is the caller here, so the
+    // uninitialized-this ReferenceError comes from that caller's realm, as
+    // [[Construct]] restores the caller context before GetThisBinding.
+    // Node.js and Deno create it in the constructor's realm instead; that
+    // qualified reference divergence stays in the shared expectation, and
+    // the native oracle asserts the specified realm.
     const nativeExpected = {
       ...expected,
-      stdout: commonOutput + "host contract true true\ncallbacks kept\n",
+      stdout:
+        commonOutput.replace("realm true false", "realm false true") +
+        "host contract true true\ncallbacks kept\n",
     };
     // Both reference hosts supply a realm through node:vm; only the test
     // harness owns it, and compiled code uses the existing $262 surface.
