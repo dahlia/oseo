@@ -10,13 +10,17 @@ evidence:
     status: covered
     references:
       - tests/native/fixtures/bindings.ts
+      - tests/native/fixtures/template-site-identity.ts
   fixed:
     status: covered
     references:
       - tests/native/fixtures/bindings.ts
+      - tests/native/fixtures/template-site-identity.ts
   forced-collection:
     status: covered
     references:
+      - tests/native.ts
+      - tests/native/fixtures/template-site-identity.ts
       - tests/property/m5-tagged-template.property.test.ts
   generated:
     status: covered
@@ -32,6 +36,7 @@ evidence:
     references:
       - tests/native.ts
       - tests/native/fixtures/bindings.ts
+      - tests/native/fixtures/template-site-identity.ts
   standards:
     status: covered
     references:
@@ -40,4 +45,5 @@ evidence:
   structural:
     status: covered
     references:
+      - tests/native.ts
       - packages/parser-babel/tests/statements.test.ts
