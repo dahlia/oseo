@@ -1234,12 +1234,19 @@ results:
       - rest-parameters
       - symbols
       - var-bindings
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
     observation:
-      detail: "test/language/statements/function/scope-param-rest-elem-var-op\
-        en.js non-strict disabled failed (1): stdout=\"\"
-        stderr=\"test/language/statements/function/scope-param-rest-ele\
-        m-var-open.js:98:15: error[OSEO1001]: Unknown binding
-        'eval'.\\n\""
+      detail: 'test/language/statements/function/scope-param-rest-elem-var-open.js
+        non-strict disabled failed (1): stdout=""
+        stderr="test/language/statements/function/scope-param-rest-elem-var-open.js:98:15:
+        error[OSEO1001]: eval compiles source text at run time, which is
+        outside the admitted profile.\n"'
       passed: false
       unsupportedCapability: profile-syntax
     unsupportedFeatures: []
@@ -1286,11 +1293,19 @@ results:
       - error-intrinsics
       - functions
       - var-bindings
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: strict
     observation:
-      detail: "test/language/statements/variable/12.2.1-18-s.js strict
-        disabled failed (1): stdout=\"\"
-        stderr=\"test/language/statements/variable/12.2.1-18-s.js:90:5:
-        error[OSEO1001]: Unknown binding 'eval'.\\n\""
+      detail: 'test/language/statements/variable/12.2.1-18-s.js strict
+        disabled failed (1): stdout=""
+        stderr="test/language/statements/variable/12.2.1-18-s.js:90:5:
+        error[OSEO1001]: eval compiles source text at run time, which is
+        outside the admitted profile.\n"'
       passed: false
       unsupportedCapability: profile-syntax
     unsupportedFeatures: []

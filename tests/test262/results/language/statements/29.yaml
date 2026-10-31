@@ -1028,11 +1028,19 @@ results:
       - control-flow
       - dynamic-source
       - functions
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
     observation:
-      detail: "test/language/statements/if/cptn-else-true-abrupt-empty.js
-        non-strict disabled failed (1): stdout=\"\"
-        stderr=\"test/language/statements/if/cptn-else-true-abrupt-empt\
-        y.js:94:3: error[OSEO1001]: Unknown binding 'eval'.\\n\""
+      detail: 'test/language/statements/if/cptn-else-true-abrupt-empty.js
+        non-strict disabled failed (1): stdout=""
+        stderr="test/language/statements/if/cptn-else-true-abrupt-empty.js:94:3:
+        error[OSEO1001]: eval compiles source text at run time, which is
+        outside the admitted profile.\n"'
       passed: false
       unsupportedCapability: profile-syntax
     unsupportedFeatures: []
@@ -1052,11 +1060,19 @@ results:
       - control-flow
       - dynamic-source
       - functions
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
     observation:
-      detail: "test/language/statements/labeled/cptn-nrml.js non-strict
-        disabled failed (1): stdout=\"\"
-        stderr=\"test/language/statements/labeled/cptn-nrml.js:95:18:
-        error[OSEO1001]: Unknown binding 'eval'.\\n\""
+      detail: 'test/language/statements/labeled/cptn-nrml.js non-strict
+        disabled failed (1): stdout=""
+        stderr="test/language/statements/labeled/cptn-nrml.js:95:18:
+        error[OSEO1001]: eval compiles source text at run time, which is
+        outside the admitted profile.\n"'
       passed: false
       unsupportedCapability: profile-syntax
     unsupportedFeatures: []
@@ -1076,11 +1092,19 @@ results:
       - control-flow
       - dynamic-source
       - functions
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
     observation:
-      detail: "test/language/statements/switch/cptn-a-fall-thru-nrml.js
-        non-strict disabled failed (1): stdout=\"\"
-        stderr=\"test/language/statements/switch/cptn-a-fall-thru-nrml.\
-        js:128:3: error[OSEO1001]: Unknown binding 'eval'.\\n\""
+      detail: 'test/language/statements/switch/cptn-a-fall-thru-nrml.js
+        non-strict disabled failed (1): stdout=""
+        stderr="test/language/statements/switch/cptn-a-fall-thru-nrml.js:128:3:
+        error[OSEO1001]: eval compiles source text at run time, which is
+        outside the admitted profile.\n"'
       passed: false
       unsupportedCapability: profile-syntax
     unsupportedFeatures: []

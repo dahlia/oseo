@@ -965,11 +965,19 @@ results:
       - lexical-bindings
       - object-properties
       - var-bindings
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
     observation:
-      detail: "test/language/statements/generators/scope-body-lex-distinct.js
-        non-strict disabled failed (1): stdout=\"\"
-        stderr=\"test/language/statements/generators/scope-body-lex-dis\
-        tinct.js:123:3: error[OSEO1001]: Unknown binding 'eval'.\\n\""
+      detail: 'test/language/statements/generators/scope-body-lex-distinct.js
+        non-strict disabled failed (1): stdout=""
+        stderr="test/language/statements/generators/scope-body-lex-distinct.js:123:3:
+        error[OSEO1001]: eval compiles source text at run time, which is
+        outside the admitted profile.\n"'
       passed: false
       unsupportedCapability: profile-syntax
     unsupportedFeatures: []

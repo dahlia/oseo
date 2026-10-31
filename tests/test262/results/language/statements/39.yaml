@@ -1285,13 +1285,19 @@ results:
       - dynamic-source
       - error-intrinsics
       - functions
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: strict
     observation:
-      detail: "test/language/statements/try/catch-parameter-boundnames-restri\
-        ction-eval-eval-throws.js strict disabled failed (1):
-        stdout=\"\"
-        stderr=\"test/language/statements/try/catch-parameter-boundname\
-        s-restriction-eval-eval-throws.js:88:3: error[OSEO1001]: Unknown
-        binding 'eval'.\\n\""
+      detail: 'test/language/statements/try/catch-parameter-boundnames-restriction-eval-eval-throws.js
+        strict disabled failed (1): stdout=""
+        stderr="test/language/statements/try/catch-parameter-boundnames-restriction-eval-eval-throws.js:88:3:
+        error[OSEO1001]: eval compiles source text at run time, which is
+        outside the admitted profile.\n"'
       passed: false
       unsupportedCapability: profile-syntax
     unsupportedFeatures: []

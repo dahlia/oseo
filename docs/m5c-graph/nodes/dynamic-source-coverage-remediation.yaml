@@ -1,7 +1,7 @@
 version: 1
 id: dynamic-source-coverage-remediation
 title: Resolve dynamic source coverage gaps
-delivers: "Resolves the 335 reviewed unsupported paths assigned to
+delivers: "Resolves the 334 reviewed unsupported paths assigned to
   node:dynamic-source-coverage-remediation in the derived closure
   ledger.   Select exactly those owners and their exclusion-audit path
   assessments: the original 121 paths, 35 from cross-realm-host, 1 from
@@ -291,7 +291,9 @@ delivers: "Resolves the 335 reviewed unsupported paths assigned to
   remediation; selectors and source-bound observations are linked from
   docs/m5c-graph/observation-batch-26a.md, observation-batch-26b.md and
   observation-batch-27.md. No replacement, exclusion or ADR change is
-  claimed."
+  claimed. Root's bundle 4 scoped UPDATE then observed
+  statements/function/S13.2.2_A13.js as pass on the bundle 3 runtime,
+  leaving 334."
 dependencies:
   - authorized-exclusion-audit
   - dynamic-source-binding-reference-evidence

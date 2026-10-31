@@ -165,10 +165,10 @@ regeneration:
     wallSeconds: 3997
     workers: 8
   secondsPerVariant: 0.0549
-  currentExecutedVariants: 136544
-  currentSeconds: 7502
-  finalExecutedVariants: 136548
-  finalSeconds: 7502
+  currentExecutedVariants: 136661
+  currentSeconds: 7508
+  finalExecutedVariants: 136665
+  finalSeconds: 7509
   plan:
     batches: 1
     largestPaths: 1
@@ -176,7 +176,7 @@ regeneration:
     limits:
       paths: 3000
       reviewUnits: 500
-    scheduleHours: 2.08
+    scheduleHours: 2.09
     fullUpdateScheduleHours: 4.17
   alternatives:
     - batches: 1
@@ -185,7 +185,7 @@ regeneration:
       limits:
         paths: 2000
         reviewUnits: 300
-      scheduleHours: 2.08
+      scheduleHours: 2.09
       fullUpdateScheduleHours: 4.17
     - batches: 1
       largestPaths: 1
@@ -193,7 +193,7 @@ regeneration:
       limits:
         paths: 4000
         reviewUnits: 600
-      scheduleHours: 2.08
+      scheduleHours: 2.09
       fullUpdateScheduleHours: 4.17
     - batches: 1
       largestPaths: 1
@@ -201,7 +201,7 @@ regeneration:
       limits:
         paths: 8000
         reviewUnits: 1200
-      scheduleHours: 2.08
+      scheduleHours: 2.09
       fullUpdateScheduleHours: 4.17
 batches:
   - id: observation-batch-28
@@ -229,4 +229,4 @@ batches:
     regeneration:
       executableVariants: 4
       scopedUpdateSeconds: 0
-      fullCorpusSeconds: 7502
+      fullCorpusSeconds: 7509

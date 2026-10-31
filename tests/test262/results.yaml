@@ -23467,17 +23467,17 @@ summary:
   expectedNegatives: 4401
   harnessFailures: 0
   infrastructureFailures: 0
-  passes: 34750
+  passes: 34751
   semanticFailures: 0
-  unsupportedProfileFeatures: 1939
+  unsupportedProfileFeatures: 1938
   dependencies:
     - dependency: abrupt-completion
       expectedNegatives: 27
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 4132
+      passes: 4133
       semanticFailures: 0
-      unsupportedProfileFeatures: 679
+      unsupportedProfileFeatures: 678
     - dependency: array-buffer
       expectedNegatives: 0
       harnessFailures: 0
@@ -23566,30 +23566,30 @@ summary:
       expectedNegatives: 147
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 35
+      passes: 36
       semanticFailures: 0
-      unsupportedProfileFeatures: 1886
+      unsupportedProfileFeatures: 1885
     - dependency: error-intrinsics
       expectedNegatives: 17
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 2998
+      passes: 2999
       semanticFailures: 0
-      unsupportedProfileFeatures: 607
+      unsupportedProfileFeatures: 606
     - dependency: expression-operators
       expectedNegatives: 642
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 10850
+      passes: 10851
       semanticFailures: 0
-      unsupportedProfileFeatures: 773
+      unsupportedProfileFeatures: 772
     - dependency: functions
       expectedNegatives: 1387
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 17323
+      passes: 17324
       semanticFailures: 0
-      unsupportedProfileFeatures: 1599
+      unsupportedProfileFeatures: 1598
     - dependency: generators
       expectedNegatives: 436
       harnessFailures: 0
@@ -23657,9 +23657,9 @@ summary:
       expectedNegatives: 610
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 22722
+      passes: 22723
       semanticFailures: 0
-      unsupportedProfileFeatures: 1001
+      unsupportedProfileFeatures: 1000
     - dependency: promise-settlement
       expectedNegatives: 93
       harnessFailures: 0
@@ -24372,9 +24372,9 @@ summary:
       expectedNegatives: 1455
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 7366
+      passes: 7367
       semanticFailures: 0
-      unsupportedProfileFeatures: 316
+      unsupportedProfileFeatures: 315
     - group: language/types
       expectedNegatives: 11
       harnessFailures: 0

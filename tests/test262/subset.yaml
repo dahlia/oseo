@@ -246524,7 +246524,7 @@ tests:
     dependencies:
       [expression-operators, functions, object-properties, var-bindings]
   - path: test/language/statements/function/S13.2.2_A13.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies:
       [
         abrupt-completion,
