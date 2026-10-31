@@ -83,3 +83,57 @@ unavailable. Preserve ADR 0016/0019 reopening triggers; an accepted ADR 0016
 amendment admitting dynamic import reopens ImportCall accounting. Each child
 requires normal D1/D11 review and D3/D4 publication. This metadata change
 performs none of those closure or landing steps.
+
+
+DS-18 evidence delta
+--------------------
+
+At base `362ddb13`, all 41 selector paths match the ledger and remain
+`unsupported-profile-feature`. The selector's SHA256 above is unchanged.
+The [per-path assessment](./dynamic-source-binding-reference-assessment.md)
+names every normative subject, replacement witness and remaining gap.
+
+This candidate accounts for 18 paths under ADR 0016: four arrow capture
+paths, three private/static field paths, nine unresolvable compound-assignment
+paths and two ordinary this/call/construction paths. Three new fixed native
+fixture groups live in
+[*binding-reference-evidence.ts*](../../tests/native/fixtures/binding-reference-evidence.ts).
+They observe exact original non-source results under both specialization
+policies with forced collection, compare Node.js/Deno/native output, inspect
+MIR/C, and cross-link for Linux AArch64. Fresh source and observation digests
+and replacement-source digests bind the 18 audit records. This accounting adds
+zero passes and removes zero inventory paths.
+
+The remaining 23 paths keep umbrella remediation ownership: 20 binding
+introduction/environment paths and three intrinsic direct eval string-spread
+paths. Hoisted declarations, assignments, property References and an ordinary
+callable named eval do not establish those contracts. Root confirmed this
+bounded retention and owns any ADR 0019/observation decision in response to
+Orca question `msg_ccc47fba1fff` on 2026-10-31. Every remaining path has its
+own reason in the assessment. No boundary amendment is inferred.
+
+Only this node's delta is recorded here; shared umbrella totals and node
+metadata are unchanged for Root's serialized publication. The child remains
+unlanded and does not claim to discharge its 23 residual contracts.
+
+The reviewed subset and result manifest are unchanged, so no UPDATE is
+needed. Focused native validation covers the three new groups; Root must run
+full `test:native` on Linux AMD64 and macOS AArch64 before publication. Root
+also retains full gate scheduling, outer review, integration and landing.
+
+
+Internal review corrections
+---------------------------
+
+The original audit subjects are preserved verbatim, beside the table's
+separate non-source observations. A pass-1 DeepSeek finding identified that
+replacing those subjects obscured the excluded eval-context contracts.
+Astra's pass-1 review was clean; both stages review the correction batch.
+
+Every replacement assertion compares actual values with `Object.is` inside
+the compiled program before printing. The same oracle rejects five type
+mutations, including `1`/`"1"`, `42`/`"42"`, `10`/`"10"`,
+`undefined`/`"undefined"` and `true`/`"true"`, in each fixture. Printed
+output remains a differential trace, while typed assertions prove the
+original values and identities. All original identifier reads remain
+identifier reads; property reads remain property reads.

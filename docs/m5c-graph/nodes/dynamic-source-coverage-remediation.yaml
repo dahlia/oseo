@@ -1,7 +1,7 @@
 version: 1
 id: dynamic-source-coverage-remediation
 title: Resolve dynamic source coverage gaps
-delivers: "Resolves the 437 reviewed unsupported paths assigned to
+delivers: "Resolves the 419 reviewed unsupported paths assigned to
   node:dynamic-source-coverage-remediation in the derived closure
   ledger.   Select exactly those owners and their exclusion-audit path
   assessments: the original 121 paths, 35 from cross-realm-host, 1 from
@@ -262,7 +262,12 @@ delivers: "Resolves the 437 reviewed unsupported paths assigned to
   DS-22 then accounts for all 19 boundary-overlap paths under ADR 0016
   with static and native evidence groups and strict mutation controls,
   leaving 437; see docs/m5c-graph/dynamic-source-boundary-overlap-
-  review.md."
+  review.md.
+  DS-18 then accounts for 18 of its 41 binding-reference paths under ADR
+  0016 with typed native witnesses and keeps 23 that need binding
+  introduction during eval or direct dispatch into the caller
+  environment, leaving 419; see docs/m5c-graph/dynamic-source-binding-
+  reference-assessment.md."
 dependencies:
   - authorized-exclusion-audit
   - dynamic-source-binding-reference-evidence
