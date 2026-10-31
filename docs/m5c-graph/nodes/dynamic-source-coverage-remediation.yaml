@@ -1,7 +1,7 @@
 version: 1
 id: dynamic-source-coverage-remediation
 title: Resolve dynamic source coverage gaps
-delivers: "Resolves the 771 reviewed unsupported paths assigned to
+delivers: "Resolves the 769 reviewed unsupported paths assigned to
   node:dynamic-source-coverage-remediation in the derived closure
   ledger.   Select exactly those owners and their exclusion-audit path
   assessments: the original 121 paths, 35 from cross-realm-host, 1 from
@@ -234,7 +234,10 @@ delivers: "Resolves the 771 reviewed unsupported paths assigned to
   source-compilation rejection. The other 95 class-declaration eval
   subjects use the existing eval-semantics exclusion assessment under
   ADR 0016. The B22a and B22b batch notes link the original sources and
-  full-row assertion audits."
+  full-row assertion audits. DS-8 then accounts for two ImportCall-only
+  subjects under decision item 2 and retains usage-from-eval with its two
+  promise and four exported-value assertions, leaving 769; its assessment
+  is docs/m5c-graph/dynamic-source-importcall-residual-accounting.md."
 dependencies:
   - authorized-exclusion-audit
   - dynamic-source-binding-reference-evidence
