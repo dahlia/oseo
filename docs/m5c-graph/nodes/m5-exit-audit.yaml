@@ -62,6 +62,7 @@ dependencies:
   - iterator-helpers
   - iterator-helpers-tag-activation
   - iterator-next-callability
+  - m5c-named-deferral-policy
   - minor-feature-tag-admission
   - module-export-forms
   - module-namespace-uninitialized-bindings

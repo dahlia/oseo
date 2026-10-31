@@ -1,0 +1,14 @@
+version: 1
+id: m5c-named-deferral-policy
+title: Named deferral policy for measured M5 residue
+delivers: >-
+  Drafts ADR 0031 and the PLAN-M5C.md exit criteria that let m5-exit-audit
+  account for measured residue that neither evidence nor an approved track
+  closes as a per-path named deferral with a reason, remaining contract and
+  target milestone. Moves no ledger owner, adds no deferral entry and changes
+  no checker. Scope and the follow-up checker change are recorded in
+  docs/m5c-graph/m5c-named-deferral-policy.md.
+dependencies:
+  - unsupported-ownership-audit
+landed: false
+status: ready
