@@ -69,8 +69,10 @@ async function compileAndRun(
 }
 
 test("the reference host prints the tolerated program's output", async () => {
+  // Node.js names this policy and Deno has no equivalent flag. The file
+  // may run under Deno too, so name Node rather than the test host.
   const result = await host.run({
-    command: process.execPath,
+    command: "node",
     args: ["--unhandled-rejections=none", "-e", toleratedSource],
     cwd: ".",
   });
