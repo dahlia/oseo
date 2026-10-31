@@ -880,9 +880,9 @@ The terminal audit additionally proves:
  -  every accepted exclusion retains a stated reopening trigger, and every
     deferral names its remaining contract and a target milestone after M5;
  -  before the audit uses the deferral list, Root has mailed the maintainer
-    its total path count, per-family counts, distinct reasons, and target
-    milestones, and no objection arrived within the coordination wait
-    period;
+    its total path count, per-family counts, each distinct reason with its
+    count, and target milestones, and no objection arrived within the
+    coordination wait period;
  -  the coverage report can be reproduced from checked-in inputs; and
  -  `mise run check`, `mise run test`, and the extended property task pass from
     a clean checkout.

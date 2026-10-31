@@ -20,6 +20,8 @@ manner of the bounded exclusions under ADR 0019. It is never a silent
 exclusion or a scope cut. Before `m5-exit-audit` uses the list, Root mails
 the maintainer a summary of path count, per-family counts, and reasons, and
 proceeds when no objection arrives within the coordination wait period.
+ADR 0031 makes that summary give each distinct reason with its count and
+the target milestones as well.
 Public wording is “measured residue was deferred by name and M5 closed.”
 
 Items 1 to 3 of the same answer bound what counts as an approved track:
