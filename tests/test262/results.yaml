@@ -22989,7 +22989,7 @@ summary:
       expectedNegatives: 615
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 6592
+      passes: 6588
       semanticFailures: 0
       unsupportedProfileFeatures: 624
     - dependency: functions
@@ -23028,7 +23028,7 @@ summary:
       semanticFailures: 0
       unsupportedProfileFeatures: 0
     - dependency: lexical-bindings
-      expectedNegatives: 327
+      expectedNegatives: 352
       harnessFailures: 0
       infrastructureFailures: 0
       passes: 1297
@@ -23063,12 +23063,12 @@ summary:
       semanticFailures: 0
       unsupportedProfileFeatures: 4
     - dependency: object-properties
-      expectedNegatives: 602
+      expectedNegatives: 604
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 17978
+      passes: 17797
       semanticFailures: 0
-      unsupportedProfileFeatures: 827
+      unsupportedProfileFeatures: 825
     - dependency: promise-settlement
       expectedNegatives: 93
       harnessFailures: 0
@@ -23192,7 +23192,7 @@ summary:
       expectedNegatives: 220
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 6777
+      passes: 6752
       semanticFailures: 0
       unsupportedProfileFeatures: 670
     - dependency: weak-collections

@@ -309,7 +309,6 @@ results:
       - expression-operators
       - iterator-protocol
       - lexical-bindings
-      - object-properties
       - symbols
       - var-bindings
     execution:
@@ -423,6 +422,7 @@ results:
     classification: expected-negative
     dependencies:
       - functions
+      - object-properties
     observation:
       errorType: SyntaxError
       failedPhase: parse

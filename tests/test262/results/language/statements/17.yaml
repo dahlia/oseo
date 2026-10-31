@@ -316,7 +316,6 @@ results:
       - error-intrinsics
       - functions
       - iterator-protocol
-      - object-properties
       - symbols
     execution:
       harnessIncludes:
@@ -476,7 +475,6 @@ results:
       - lexical-bindings
       - object-literals
       - object-properties
-      - var-bindings
     execution:
       harnessIncludes:
         - base.js
@@ -515,6 +513,7 @@ results:
       - control-flow
       - functions
       - generators
+      - lexical-bindings
     observation:
       errorType: SyntaxError
       failedPhase: parse

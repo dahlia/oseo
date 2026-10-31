@@ -274,7 +274,6 @@ results:
       - error-intrinsics
       - iterator-protocol
       - lexical-bindings
-      - object-properties
       - symbols
     execution:
       harnessIncludes:
@@ -345,7 +344,6 @@ results:
       - expression-operators
       - functions
       - iterator-protocol
-      - object-properties
       - symbols
       - var-bindings
     execution:

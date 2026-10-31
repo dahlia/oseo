@@ -511,6 +511,7 @@ results:
       - control-flow
       - functions
       - generators
+      - lexical-bindings
     observation:
       errorType: SyntaxError
       failedPhase: parse
@@ -572,7 +573,6 @@ results:
       - functions
       - object-literals
       - object-properties
-      - var-bindings
     execution:
       harnessIncludes:
         - base.js

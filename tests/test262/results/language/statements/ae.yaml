@@ -352,7 +352,6 @@ results:
       - functions
       - generators
       - iterator-protocol
-      - object-properties
       - symbols
     execution:
       harnessIncludes:

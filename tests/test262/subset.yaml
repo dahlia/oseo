@@ -168188,7 +168188,6 @@ tests:
         expression-operators,
         functions,
         iterator-protocol,
-        object-properties,
         symbols,
         typed-array-constructors,
         typed-array-core,
@@ -168216,7 +168215,6 @@ tests:
         expression-operators,
         functions,
         iterator-protocol,
-        object-properties,
         symbols,
         typed-array-constructors,
         typed-array-core,
@@ -168244,7 +168242,6 @@ tests:
         expression-operators,
         functions,
         iterator-protocol,
-        object-properties,
         symbols,
         typed-array-constructors,
         typed-array-core,
@@ -168366,28 +168363,28 @@ tests:
     dependencies: [control-flow, functions, var-bindings]
   - path: test/language/statements/for/12.6.3_2-3-a-ii-11.js
     expectedClassification: pass
-    dependencies: [control-flow, var-bindings]
+    dependencies: [control-flow]
   - path: test/language/statements/for/12.6.3_2-3-a-ii-12.js
     expectedClassification: pass
-    dependencies: [control-flow, var-bindings]
+    dependencies: [control-flow]
   - path: test/language/statements/for/12.6.3_2-3-a-ii-13.js
     expectedClassification: pass
-    dependencies: [control-flow, var-bindings]
+    dependencies: [control-flow]
   - path: test/language/statements/for/12.6.3_2-3-a-ii-14.js
     expectedClassification: pass
-    dependencies: [control-flow, var-bindings]
+    dependencies: [control-flow]
   - path: test/language/statements/for/12.6.3_2-3-a-ii-15.js
     expectedClassification: pass
-    dependencies: [control-flow, expression-operators, var-bindings]
+    dependencies: [control-flow, expression-operators]
   - path: test/language/statements/for/12.6.3_2-3-a-ii-16.js
     expectedClassification: pass
-    dependencies: [control-flow, expression-operators, var-bindings]
+    dependencies: [control-flow, expression-operators]
   - path: test/language/statements/for/12.6.3_2-3-a-ii-17.js
     expectedClassification: pass
     dependencies: [control-flow]
   - path: test/language/statements/for/12.6.3_2-3-a-ii-18.js
     expectedClassification: pass
-    dependencies: [control-flow, var-bindings]
+    dependencies: [control-flow]
   - path: test/language/statements/for/12.6.3_2-3-a-ii-19.js
     expectedClassification: pass
     dependencies: [control-flow]
@@ -168671,7 +168668,6 @@ tests:
         expression-operators,
         iterator-protocol,
         lexical-bindings,
-        object-properties,
         symbols,
         var-bindings,
       ]
@@ -168684,7 +168680,6 @@ tests:
         expression-operators,
         iterator-protocol,
         lexical-bindings,
-        object-properties,
         symbols,
         var-bindings,
       ]
@@ -168697,7 +168692,6 @@ tests:
         expression-operators,
         iterator-protocol,
         lexical-bindings,
-        object-properties,
         symbols,
         var-bindings,
       ]
@@ -168712,7 +168706,6 @@ tests:
         generators,
         iterator-protocol,
         lexical-bindings,
-        object-properties,
         symbols,
         var-bindings,
       ]
@@ -168725,7 +168718,6 @@ tests:
         expression-operators,
         iterator-protocol,
         lexical-bindings,
-        object-properties,
         symbols,
         var-bindings,
       ]
@@ -168740,7 +168732,6 @@ tests:
         generators,
         iterator-protocol,
         lexical-bindings,
-        object-properties,
         symbols,
         var-bindings,
       ]
@@ -168753,7 +168744,6 @@ tests:
         expression-operators,
         iterator-protocol,
         lexical-bindings,
-        object-properties,
         symbols,
         var-bindings,
       ]
@@ -168793,7 +168783,6 @@ tests:
         error-intrinsics,
         iterator-protocol,
         lexical-bindings,
-        object-properties,
         symbols,
       ]
   - path: test/language/statements/for/dstr/const-ary-ptrn-elem-id-init-exhausted.js
@@ -168805,7 +168794,6 @@ tests:
         expression-operators,
         iterator-protocol,
         lexical-bindings,
-        object-properties,
         symbols,
         var-bindings,
       ]
@@ -168900,7 +168888,6 @@ tests:
         expression-operators,
         iterator-protocol,
         lexical-bindings,
-        object-properties,
         symbols,
         var-bindings,
       ]
@@ -168914,7 +168901,6 @@ tests:
         functions,
         iterator-protocol,
         lexical-bindings,
-        object-properties,
         symbols,
       ]
   - path: test/language/statements/for/dstr/const-ary-ptrn-elem-id-init-undef.js
@@ -168926,7 +168912,6 @@ tests:
         expression-operators,
         iterator-protocol,
         lexical-bindings,
-        object-properties,
         symbols,
         var-bindings,
       ]
@@ -168940,7 +168925,6 @@ tests:
         error-intrinsics,
         iterator-protocol,
         lexical-bindings,
-        object-properties,
         symbols,
       ]
   - path: test/language/statements/for/dstr/const-ary-ptrn-elem-id-iter-complete.js
@@ -168952,7 +168936,6 @@ tests:
         expression-operators,
         iterator-protocol,
         lexical-bindings,
-        object-properties,
         symbols,
         var-bindings,
       ]
@@ -168965,7 +168948,6 @@ tests:
         expression-operators,
         iterator-protocol,
         lexical-bindings,
-        object-properties,
         symbols,
         var-bindings,
       ]
@@ -169025,7 +169007,6 @@ tests:
         expression-operators,
         iterator-protocol,
         lexical-bindings,
-        object-properties,
         symbols,
         var-bindings,
       ]
@@ -169099,7 +169080,6 @@ tests:
         error-intrinsics,
         iterator-protocol,
         lexical-bindings,
-        object-properties,
         symbols,
       ]
   - path: test/language/statements/for/dstr/const-ary-ptrn-elem-obj-val-undef.js
@@ -169112,7 +169092,6 @@ tests:
         error-intrinsics,
         iterator-protocol,
         lexical-bindings,
-        object-properties,
         symbols,
       ]
   - path: test/language/statements/for/dstr/const-ary-ptrn-elision-exhausted.js
@@ -169169,7 +169148,6 @@ tests:
         generators,
         iterator-protocol,
         lexical-bindings,
-        object-properties,
         symbols,
         var-bindings,
       ]
@@ -169184,7 +169162,6 @@ tests:
         generators,
         iterator-protocol,
         lexical-bindings,
-        object-properties,
         symbols,
         var-bindings,
       ]
@@ -169197,7 +169174,6 @@ tests:
         expression-operators,
         iterator-protocol,
         lexical-bindings,
-        object-properties,
         symbols,
         var-bindings,
       ]
@@ -169212,7 +169188,6 @@ tests:
         generators,
         iterator-protocol,
         lexical-bindings,
-        object-properties,
         symbols,
         var-bindings,
       ]
@@ -169227,7 +169202,6 @@ tests:
         generators,
         iterator-protocol,
         lexical-bindings,
-        object-properties,
         symbols,
         var-bindings,
       ]
@@ -169253,7 +169227,6 @@ tests:
         expression-operators,
         iterator-protocol,
         lexical-bindings,
-        object-properties,
         symbols,
         var-bindings,
       ]
@@ -169268,7 +169241,6 @@ tests:
         generators,
         iterator-protocol,
         lexical-bindings,
-        object-properties,
         symbols,
         var-bindings,
       ]
@@ -169572,7 +169544,6 @@ tests:
         lexical-bindings,
         object-literals,
         object-properties,
-        var-bindings,
       ]
   - path: test/language/statements/for/dstr/const-obj-ptrn-prop-ary-init.js
     expectedClassification: pass
@@ -169894,7 +169865,6 @@ tests:
         expression-operators,
         iterator-protocol,
         lexical-bindings,
-        object-properties,
         symbols,
         var-bindings,
       ]
@@ -169907,7 +169877,6 @@ tests:
         expression-operators,
         iterator-protocol,
         lexical-bindings,
-        object-properties,
         symbols,
         var-bindings,
       ]
@@ -169920,7 +169889,6 @@ tests:
         expression-operators,
         iterator-protocol,
         lexical-bindings,
-        object-properties,
         symbols,
         var-bindings,
       ]
@@ -169935,7 +169903,6 @@ tests:
         generators,
         iterator-protocol,
         lexical-bindings,
-        object-properties,
         symbols,
         var-bindings,
       ]
@@ -169948,7 +169915,6 @@ tests:
         expression-operators,
         iterator-protocol,
         lexical-bindings,
-        object-properties,
         symbols,
         var-bindings,
       ]
@@ -169963,7 +169929,6 @@ tests:
         generators,
         iterator-protocol,
         lexical-bindings,
-        object-properties,
         symbols,
         var-bindings,
       ]
@@ -169976,7 +169941,6 @@ tests:
         expression-operators,
         iterator-protocol,
         lexical-bindings,
-        object-properties,
         symbols,
         var-bindings,
       ]
@@ -170016,7 +169980,6 @@ tests:
         error-intrinsics,
         iterator-protocol,
         lexical-bindings,
-        object-properties,
         symbols,
       ]
   - path: test/language/statements/for/dstr/let-ary-ptrn-elem-id-init-exhausted.js
@@ -170028,7 +169991,6 @@ tests:
         expression-operators,
         iterator-protocol,
         lexical-bindings,
-        object-properties,
         symbols,
         var-bindings,
       ]
@@ -170123,7 +170085,6 @@ tests:
         expression-operators,
         iterator-protocol,
         lexical-bindings,
-        object-properties,
         symbols,
         var-bindings,
       ]
@@ -170137,7 +170098,6 @@ tests:
         functions,
         iterator-protocol,
         lexical-bindings,
-        object-properties,
         symbols,
       ]
   - path: test/language/statements/for/dstr/let-ary-ptrn-elem-id-init-undef.js
@@ -170149,7 +170109,6 @@ tests:
         expression-operators,
         iterator-protocol,
         lexical-bindings,
-        object-properties,
         symbols,
         var-bindings,
       ]
@@ -170163,7 +170122,6 @@ tests:
         error-intrinsics,
         iterator-protocol,
         lexical-bindings,
-        object-properties,
         symbols,
       ]
   - path: test/language/statements/for/dstr/let-ary-ptrn-elem-id-iter-complete.js
@@ -170175,7 +170133,6 @@ tests:
         expression-operators,
         iterator-protocol,
         lexical-bindings,
-        object-properties,
         symbols,
         var-bindings,
       ]
@@ -170188,7 +170145,6 @@ tests:
         expression-operators,
         iterator-protocol,
         lexical-bindings,
-        object-properties,
         symbols,
         var-bindings,
       ]
@@ -170248,7 +170204,6 @@ tests:
         expression-operators,
         iterator-protocol,
         lexical-bindings,
-        object-properties,
         symbols,
         var-bindings,
       ]
@@ -170322,7 +170277,6 @@ tests:
         error-intrinsics,
         iterator-protocol,
         lexical-bindings,
-        object-properties,
         symbols,
       ]
   - path: test/language/statements/for/dstr/let-ary-ptrn-elem-obj-val-undef.js
@@ -170335,7 +170289,6 @@ tests:
         error-intrinsics,
         iterator-protocol,
         lexical-bindings,
-        object-properties,
         symbols,
       ]
   - path: test/language/statements/for/dstr/let-ary-ptrn-elision-exhausted.js
@@ -170392,7 +170345,6 @@ tests:
         generators,
         iterator-protocol,
         lexical-bindings,
-        object-properties,
         symbols,
         var-bindings,
       ]
@@ -170407,7 +170359,6 @@ tests:
         generators,
         iterator-protocol,
         lexical-bindings,
-        object-properties,
         symbols,
         var-bindings,
       ]
@@ -170420,7 +170371,6 @@ tests:
         expression-operators,
         iterator-protocol,
         lexical-bindings,
-        object-properties,
         symbols,
         var-bindings,
       ]
@@ -170435,7 +170385,6 @@ tests:
         generators,
         iterator-protocol,
         lexical-bindings,
-        object-properties,
         symbols,
         var-bindings,
       ]
@@ -170450,7 +170399,6 @@ tests:
         generators,
         iterator-protocol,
         lexical-bindings,
-        object-properties,
         symbols,
         var-bindings,
       ]
@@ -170476,7 +170424,6 @@ tests:
         expression-operators,
         iterator-protocol,
         lexical-bindings,
-        object-properties,
         symbols,
         var-bindings,
       ]
@@ -170491,7 +170438,6 @@ tests:
         generators,
         iterator-protocol,
         lexical-bindings,
-        object-properties,
         symbols,
         var-bindings,
       ]
@@ -170793,7 +170739,6 @@ tests:
         lexical-bindings,
         object-literals,
         object-properties,
-        var-bindings,
       ]
   - path: test/language/statements/for/dstr/let-obj-ptrn-prop-ary-init.js
     expectedClassification: pass
@@ -171113,7 +171058,6 @@ tests:
         destructuring-bindings,
         expression-operators,
         iterator-protocol,
-        object-properties,
         symbols,
         var-bindings,
       ]
@@ -171125,7 +171069,6 @@ tests:
         destructuring-bindings,
         expression-operators,
         iterator-protocol,
-        object-properties,
         symbols,
         var-bindings,
       ]
@@ -171137,7 +171080,6 @@ tests:
         destructuring-bindings,
         expression-operators,
         iterator-protocol,
-        object-properties,
         symbols,
         var-bindings,
       ]
@@ -171151,7 +171093,6 @@ tests:
         functions,
         generators,
         iterator-protocol,
-        object-properties,
         symbols,
         var-bindings,
       ]
@@ -171163,7 +171104,6 @@ tests:
         destructuring-bindings,
         expression-operators,
         iterator-protocol,
-        object-properties,
         symbols,
         var-bindings,
       ]
@@ -171177,7 +171117,6 @@ tests:
         functions,
         generators,
         iterator-protocol,
-        object-properties,
         symbols,
         var-bindings,
       ]
@@ -171189,7 +171128,6 @@ tests:
         destructuring-bindings,
         expression-operators,
         iterator-protocol,
-        object-properties,
         symbols,
         var-bindings,
       ]
@@ -171226,7 +171164,6 @@ tests:
         destructuring-bindings,
         error-intrinsics,
         iterator-protocol,
-        object-properties,
         symbols,
         var-bindings,
       ]
@@ -171238,7 +171175,6 @@ tests:
         destructuring-bindings,
         expression-operators,
         iterator-protocol,
-        object-properties,
         symbols,
         var-bindings,
       ]
@@ -171327,7 +171263,6 @@ tests:
         destructuring-bindings,
         expression-operators,
         iterator-protocol,
-        object-properties,
         symbols,
         var-bindings,
       ]
@@ -171340,7 +171275,6 @@ tests:
         destructuring-bindings,
         functions,
         iterator-protocol,
-        object-properties,
         symbols,
         var-bindings,
       ]
@@ -171352,7 +171286,6 @@ tests:
         destructuring-bindings,
         expression-operators,
         iterator-protocol,
-        object-properties,
         symbols,
         var-bindings,
       ]
@@ -171365,7 +171298,6 @@ tests:
         destructuring-bindings,
         error-intrinsics,
         iterator-protocol,
-        object-properties,
         symbols,
         var-bindings,
       ]
@@ -171377,7 +171309,6 @@ tests:
         destructuring-bindings,
         expression-operators,
         iterator-protocol,
-        object-properties,
         symbols,
         var-bindings,
       ]
@@ -171389,7 +171320,6 @@ tests:
         destructuring-bindings,
         expression-operators,
         iterator-protocol,
-        object-properties,
         symbols,
         var-bindings,
       ]
@@ -171445,7 +171375,6 @@ tests:
         destructuring-bindings,
         expression-operators,
         iterator-protocol,
-        object-properties,
         symbols,
         var-bindings,
       ]
@@ -171514,7 +171443,6 @@ tests:
         destructuring-bindings,
         error-intrinsics,
         iterator-protocol,
-        object-properties,
         symbols,
         var-bindings,
       ]
@@ -171527,7 +171455,6 @@ tests:
         destructuring-bindings,
         error-intrinsics,
         iterator-protocol,
-        object-properties,
         symbols,
         var-bindings,
       ]
@@ -171583,7 +171510,6 @@ tests:
         functions,
         generators,
         iterator-protocol,
-        object-properties,
         symbols,
         var-bindings,
       ]
@@ -171597,7 +171523,6 @@ tests:
         functions,
         generators,
         iterator-protocol,
-        object-properties,
         symbols,
         var-bindings,
       ]
@@ -171609,7 +171534,6 @@ tests:
         destructuring-bindings,
         expression-operators,
         iterator-protocol,
-        object-properties,
         symbols,
         var-bindings,
       ]
@@ -171623,7 +171547,6 @@ tests:
         functions,
         generators,
         iterator-protocol,
-        object-properties,
         symbols,
         var-bindings,
       ]
@@ -171637,7 +171560,6 @@ tests:
         functions,
         generators,
         iterator-protocol,
-        object-properties,
         symbols,
         var-bindings,
       ]
@@ -171661,7 +171583,6 @@ tests:
         destructuring-bindings,
         expression-operators,
         iterator-protocol,
-        object-properties,
         symbols,
         var-bindings,
       ]
@@ -171675,7 +171596,6 @@ tests:
         functions,
         generators,
         iterator-protocol,
-        object-properties,
         symbols,
         var-bindings,
       ]
@@ -172261,7 +172181,6 @@ tests:
         iterator-protocol,
         lexical-bindings,
         lexical-grammar,
-        object-properties,
         symbols,
         var-bindings,
       ]
@@ -173599,7 +173518,6 @@ tests:
         expression-operators,
         functions,
         iterator-protocol,
-        object-properties,
         symbols,
         var-bindings,
       ]
@@ -173611,7 +173529,6 @@ tests:
         expression-operators,
         functions,
         iterator-protocol,
-        object-properties,
         symbols,
         var-bindings,
       ]
@@ -173628,7 +173545,6 @@ tests:
         functions,
         generators,
         iterator-protocol,
-        object-properties,
         symbols,
         var-bindings,
       ]
@@ -173640,7 +173556,6 @@ tests:
         expression-operators,
         functions,
         iterator-protocol,
-        object-properties,
         symbols,
         var-bindings,
       ]
@@ -173653,7 +173568,6 @@ tests:
         functions,
         generators,
         iterator-protocol,
-        object-properties,
         symbols,
         var-bindings,
       ]
@@ -173665,7 +173579,6 @@ tests:
         expression-operators,
         functions,
         iterator-protocol,
-        object-properties,
         symbols,
         var-bindings,
       ]
@@ -173702,7 +173615,6 @@ tests:
         error-intrinsics,
         functions,
         iterator-protocol,
-        object-properties,
         symbols,
       ]
   - path: test/language/statements/function/dstr/ary-ptrn-elem-id-init-exhausted.js
@@ -173713,7 +173625,6 @@ tests:
         expression-operators,
         functions,
         iterator-protocol,
-        object-properties,
         symbols,
         var-bindings,
       ]
@@ -173787,7 +173698,6 @@ tests:
         expression-operators,
         functions,
         iterator-protocol,
-        object-properties,
         symbols,
         var-bindings,
       ]
@@ -173799,7 +173709,6 @@ tests:
         expression-operators,
         functions,
         iterator-protocol,
-        object-properties,
         symbols,
         var-bindings,
       ]
@@ -173815,7 +173724,6 @@ tests:
         expression-operators,
         functions,
         iterator-protocol,
-        object-properties,
         symbols,
         var-bindings,
       ]
@@ -173828,7 +173736,6 @@ tests:
         error-intrinsics,
         functions,
         iterator-protocol,
-        object-properties,
         symbols,
       ]
   - path: test/language/statements/function/dstr/ary-ptrn-elem-id-iter-complete.js
@@ -173839,7 +173746,6 @@ tests:
         expression-operators,
         functions,
         iterator-protocol,
-        object-properties,
         symbols,
         var-bindings,
       ]
@@ -173851,7 +173757,6 @@ tests:
         expression-operators,
         functions,
         iterator-protocol,
-        object-properties,
         symbols,
         var-bindings,
       ]
@@ -173966,7 +173871,6 @@ tests:
         error-intrinsics,
         functions,
         iterator-protocol,
-        object-properties,
         symbols,
       ]
   - path: test/language/statements/function/dstr/ary-ptrn-elem-obj-val-undef.js
@@ -173978,7 +173882,6 @@ tests:
         error-intrinsics,
         functions,
         iterator-protocol,
-        object-properties,
         symbols,
       ]
   - path: test/language/statements/function/dstr/ary-ptrn-elision-exhausted.js
@@ -174016,7 +173919,6 @@ tests:
         functions,
         generators,
         iterator-protocol,
-        object-properties,
         symbols,
         var-bindings,
       ]
@@ -174029,7 +173931,6 @@ tests:
         functions,
         generators,
         iterator-protocol,
-        object-properties,
         symbols,
         var-bindings,
       ]
@@ -174046,7 +173947,6 @@ tests:
         functions,
         generators,
         iterator-protocol,
-        object-properties,
         symbols,
         var-bindings,
       ]
@@ -174059,7 +173959,6 @@ tests:
         functions,
         generators,
         iterator-protocol,
-        object-properties,
         symbols,
         var-bindings,
       ]
@@ -174083,7 +173982,6 @@ tests:
         expression-operators,
         functions,
         iterator-protocol,
-        object-properties,
         symbols,
         var-bindings,
       ]
@@ -174096,7 +173994,6 @@ tests:
         functions,
         generators,
         iterator-protocol,
-        object-properties,
         symbols,
         var-bindings,
       ]
@@ -174273,7 +174170,6 @@ tests:
         expression-operators,
         functions,
         iterator-protocol,
-        object-properties,
         symbols,
         var-bindings,
       ]
@@ -174286,7 +174182,6 @@ tests:
         expression-operators,
         functions,
         iterator-protocol,
-        object-properties,
         symbols,
         var-bindings,
       ]
@@ -174299,7 +174194,6 @@ tests:
         expression-operators,
         functions,
         iterator-protocol,
-        object-properties,
         symbols,
         var-bindings,
       ]
@@ -174313,7 +174207,6 @@ tests:
         functions,
         generators,
         iterator-protocol,
-        object-properties,
         symbols,
         var-bindings,
       ]
@@ -174326,7 +174219,6 @@ tests:
         expression-operators,
         functions,
         iterator-protocol,
-        object-properties,
         symbols,
         var-bindings,
       ]
@@ -174340,7 +174232,6 @@ tests:
         functions,
         generators,
         iterator-protocol,
-        object-properties,
         symbols,
         var-bindings,
       ]
@@ -174353,7 +174244,6 @@ tests:
         expression-operators,
         functions,
         iterator-protocol,
-        object-properties,
         symbols,
         var-bindings,
       ]
@@ -174393,7 +174283,6 @@ tests:
         error-intrinsics,
         functions,
         iterator-protocol,
-        object-properties,
         symbols,
       ]
   - path: test/language/statements/function/dstr/dflt-ary-ptrn-elem-id-init-exhausted.js
@@ -174405,7 +174294,6 @@ tests:
         expression-operators,
         functions,
         iterator-protocol,
-        object-properties,
         symbols,
         var-bindings,
       ]
@@ -174485,7 +174373,6 @@ tests:
         expression-operators,
         functions,
         iterator-protocol,
-        object-properties,
         symbols,
         var-bindings,
       ]
@@ -174498,7 +174385,6 @@ tests:
         expression-operators,
         functions,
         iterator-protocol,
-        object-properties,
         symbols,
         var-bindings,
       ]
@@ -174511,7 +174397,6 @@ tests:
         destructuring-bindings,
         functions,
         iterator-protocol,
-        object-properties,
         symbols,
       ]
   - path: test/language/statements/function/dstr/dflt-ary-ptrn-elem-id-init-undef.js
@@ -174523,7 +174408,6 @@ tests:
         expression-operators,
         functions,
         iterator-protocol,
-        object-properties,
         symbols,
         var-bindings,
       ]
@@ -174537,7 +174421,6 @@ tests:
         error-intrinsics,
         functions,
         iterator-protocol,
-        object-properties,
         symbols,
       ]
   - path: test/language/statements/function/dstr/dflt-ary-ptrn-elem-id-iter-complete.js
@@ -174549,7 +174432,6 @@ tests:
         expression-operators,
         functions,
         iterator-protocol,
-        object-properties,
         symbols,
         var-bindings,
       ]
@@ -174562,7 +174444,6 @@ tests:
         expression-operators,
         functions,
         iterator-protocol,
-        object-properties,
         symbols,
         var-bindings,
       ]
@@ -174620,7 +174501,6 @@ tests:
         expression-operators,
         functions,
         iterator-protocol,
-        object-properties,
         symbols,
         var-bindings,
       ]
@@ -174694,7 +174574,6 @@ tests:
         error-intrinsics,
         functions,
         iterator-protocol,
-        object-properties,
         symbols,
       ]
   - path: test/language/statements/function/dstr/dflt-ary-ptrn-elem-obj-val-undef.js
@@ -174707,7 +174586,6 @@ tests:
         error-intrinsics,
         functions,
         iterator-protocol,
-        object-properties,
         symbols,
       ]
   - path: test/language/statements/function/dstr/dflt-ary-ptrn-elision-exhausted.js
@@ -174748,7 +174626,6 @@ tests:
         functions,
         generators,
         iterator-protocol,
-        object-properties,
         symbols,
         var-bindings,
       ]
@@ -174762,7 +174639,6 @@ tests:
         functions,
         generators,
         iterator-protocol,
-        object-properties,
         symbols,
         var-bindings,
       ]
@@ -174775,7 +174651,6 @@ tests:
         expression-operators,
         functions,
         iterator-protocol,
-        object-properties,
         symbols,
         var-bindings,
       ]
@@ -174789,7 +174664,6 @@ tests:
         functions,
         generators,
         iterator-protocol,
-        object-properties,
         symbols,
         var-bindings,
       ]
@@ -174803,7 +174677,6 @@ tests:
         functions,
         generators,
         iterator-protocol,
-        object-properties,
         symbols,
         var-bindings,
       ]
@@ -174829,7 +174702,6 @@ tests:
         expression-operators,
         functions,
         iterator-protocol,
-        object-properties,
         symbols,
         var-bindings,
       ]
@@ -174843,7 +174715,6 @@ tests:
         functions,
         generators,
         iterator-protocol,
-        object-properties,
         symbols,
         var-bindings,
       ]
@@ -175124,7 +174995,6 @@ tests:
         functions,
         object-literals,
         object-properties,
-        var-bindings,
       ]
   - path: test/language/statements/function/dstr/dflt-obj-ptrn-prop-ary-init.js
     expectedClassification: pass
@@ -175513,7 +175383,6 @@ tests:
         functions,
         object-literals,
         object-properties,
-        var-bindings,
       ]
   - path: test/language/statements/function/dstr/obj-ptrn-prop-ary-init.js
     expectedClassification: pass
@@ -175744,7 +175613,7 @@ tests:
     dependencies: [functions]
   - path: test/language/statements/function/early-body-super-prop.js
     expectedClassification: expected-negative
-    dependencies: [functions]
+    dependencies: [functions, object-properties]
   - path: test/language/statements/function/early-errors/invalid-names-call-expression-bad-reference.js
     expectedClassification: expected-negative
     dependencies: [classes, functions]
@@ -175762,7 +175631,7 @@ tests:
     dependencies: [default-parameters, functions]
   - path: test/language/statements/function/early-params-super-prop.js
     expectedClassification: expected-negative
-    dependencies: [default-parameters, functions]
+    dependencies: [default-parameters, functions, object-properties]
   - path: test/language/statements/function/enable-strict-via-body.js
     expectedClassification: expected-negative
     dependencies: [functions]
@@ -176013,7 +175882,6 @@ tests:
         expression-operators,
         functions,
         iterator-protocol,
-        object-properties,
         rest-parameters,
         symbols,
         var-bindings,
@@ -176028,7 +175896,6 @@ tests:
         expression-operators,
         functions,
         iterator-protocol,
-        object-properties,
         rest-parameters,
         symbols,
         var-bindings,
@@ -176364,7 +176231,6 @@ tests:
         functions,
         generators,
         iterator-protocol,
-        object-properties,
         symbols,
       ]
   - path: test/language/statements/generators/dstr/ary-ptrn-elem-id-init-exhausted.js
@@ -176481,7 +176347,6 @@ tests:
         functions,
         generators,
         iterator-protocol,
-        object-properties,
         symbols,
       ]
   - path: test/language/statements/generators/dstr/ary-ptrn-elem-id-init-undef.js
@@ -176507,7 +176372,6 @@ tests:
         functions,
         generators,
         iterator-protocol,
-        object-properties,
         symbols,
       ]
   - path: test/language/statements/generators/dstr/ary-ptrn-elem-id-iter-complete.js
@@ -176663,7 +176527,6 @@ tests:
         functions,
         generators,
         iterator-protocol,
-        object-properties,
         symbols,
       ]
   - path: test/language/statements/generators/dstr/ary-ptrn-elem-obj-val-undef.js
@@ -176676,7 +176539,6 @@ tests:
         functions,
         generators,
         iterator-protocol,
-        object-properties,
         symbols,
       ]
   - path: test/language/statements/generators/dstr/ary-ptrn-elision-exhausted.js
@@ -176805,7 +176667,6 @@ tests:
         functions,
         generators,
         iterator-protocol,
-        object-properties,
         symbols,
         var-bindings,
       ]
@@ -177120,7 +176981,6 @@ tests:
         functions,
         generators,
         iterator-protocol,
-        object-properties,
         symbols,
       ]
   - path: test/language/statements/generators/dstr/dflt-ary-ptrn-elem-id-init-exhausted.js
@@ -177246,7 +177106,6 @@ tests:
         functions,
         generators,
         iterator-protocol,
-        object-properties,
         symbols,
       ]
   - path: test/language/statements/generators/dstr/dflt-ary-ptrn-elem-id-init-undef.js
@@ -177274,7 +177133,6 @@ tests:
         functions,
         generators,
         iterator-protocol,
-        object-properties,
         symbols,
       ]
   - path: test/language/statements/generators/dstr/dflt-ary-ptrn-elem-id-iter-complete.js
@@ -177441,7 +177299,6 @@ tests:
         functions,
         generators,
         iterator-protocol,
-        object-properties,
         symbols,
       ]
   - path: test/language/statements/generators/dstr/dflt-ary-ptrn-elem-obj-val-undef.js
@@ -177455,7 +177312,6 @@ tests:
         functions,
         generators,
         iterator-protocol,
-        object-properties,
         symbols,
       ]
   - path: test/language/statements/generators/dstr/dflt-ary-ptrn-elision-exhausted.js
@@ -177594,7 +177450,6 @@ tests:
         functions,
         generators,
         iterator-protocol,
-        object-properties,
         symbols,
         var-bindings,
       ]
@@ -177900,7 +177755,6 @@ tests:
         generators,
         object-literals,
         object-properties,
-        var-bindings,
       ]
   - path: test/language/statements/generators/dstr/dflt-obj-ptrn-prop-ary-init.js
     expectedClassification: pass
@@ -178331,7 +178185,6 @@ tests:
         generators,
         object-literals,
         object-properties,
-        var-bindings,
       ]
   - path: test/language/statements/generators/dstr/obj-ptrn-prop-ary-init.js
     expectedClassification: pass
@@ -179237,7 +179090,7 @@ tests:
     dependencies: [control-flow, lexical-grammar]
   - path: test/language/statements/labeled/let-identifier-with-newline.js
     expectedClassification: pass
-    dependencies: [control-flow, expression-operators, lexical-grammar]
+    dependencies: [control-flow, lexical-grammar]
   - path: test/language/statements/labeled/static-init-invalid-await.js
     expectedClassification: expected-negative
     dependencies: [classes, control-flow]
@@ -179268,13 +179121,7 @@ tests:
   - path: test/language/statements/let/block-local-closure-get-before-initialization.js
     expectedClassification: pass
     dependencies:
-      [
-        abrupt-completion,
-        error-intrinsics,
-        expression-operators,
-        functions,
-        lexical-bindings,
-      ]
+      [abrupt-completion, error-intrinsics, functions, lexical-bindings]
   - path: test/language/statements/let/block-local-closure-set-before-initialization.js
     expectedClassification: pass
     dependencies:
@@ -179359,13 +179206,7 @@ tests:
   - path: test/language/statements/let/dstr/ary-ptrn-elem-ary-elem-iter.js
     expectedClassification: pass
     dependencies:
-      [
-        destructuring-bindings,
-        iterator-protocol,
-        lexical-bindings,
-        object-properties,
-        symbols,
-      ]
+      [destructuring-bindings, iterator-protocol, lexical-bindings, symbols]
   - path: test/language/statements/let/dstr/ary-ptrn-elem-ary-elision-init.js
     expectedClassification: pass
     dependencies:
@@ -179376,21 +179217,13 @@ tests:
         generators,
         iterator-protocol,
         lexical-bindings,
-        object-properties,
         symbols,
         var-bindings,
       ]
   - path: test/language/statements/let/dstr/ary-ptrn-elem-ary-elision-iter.js
     expectedClassification: pass
     dependencies:
-      [
-        destructuring-bindings,
-        iterator-protocol,
-        lexical-bindings,
-        object-properties,
-        symbols,
-        var-bindings,
-      ]
+      [destructuring-bindings, iterator-protocol, lexical-bindings, symbols]
   - path: test/language/statements/let/dstr/ary-ptrn-elem-ary-empty-init.js
     expectedClassification: pass
     dependencies:
@@ -179401,21 +179234,13 @@ tests:
         generators,
         iterator-protocol,
         lexical-bindings,
-        object-properties,
         symbols,
         var-bindings,
       ]
   - path: test/language/statements/let/dstr/ary-ptrn-elem-ary-empty-iter.js
     expectedClassification: pass
     dependencies:
-      [
-        destructuring-bindings,
-        iterator-protocol,
-        lexical-bindings,
-        object-properties,
-        symbols,
-        var-bindings,
-      ]
+      [destructuring-bindings, iterator-protocol, lexical-bindings, symbols]
   - path: test/language/statements/let/dstr/ary-ptrn-elem-ary-rest-init.js
     expectedClassification: pass
     dependencies:
@@ -179447,7 +179272,6 @@ tests:
         error-intrinsics,
         iterator-protocol,
         lexical-bindings,
-        object-properties,
         symbols,
       ]
   - path: test/language/statements/let/dstr/ary-ptrn-elem-id-init-exhausted.js
@@ -179510,14 +179334,7 @@ tests:
   - path: test/language/statements/let/dstr/ary-ptrn-elem-id-init-skipped.js
     expectedClassification: pass
     dependencies:
-      [
-        destructuring-bindings,
-        iterator-protocol,
-        lexical-bindings,
-        object-properties,
-        symbols,
-        var-bindings,
-      ]
+      [destructuring-bindings, iterator-protocol, lexical-bindings, symbols]
   - path: test/language/statements/let/dstr/ary-ptrn-elem-id-init-throws.js
     expectedClassification: pass
     dependencies:
@@ -179527,7 +179344,6 @@ tests:
         functions,
         iterator-protocol,
         lexical-bindings,
-        object-properties,
         symbols,
       ]
   - path: test/language/statements/let/dstr/ary-ptrn-elem-id-init-undef.js
@@ -179542,19 +179358,12 @@ tests:
         error-intrinsics,
         iterator-protocol,
         lexical-bindings,
-        object-properties,
         symbols,
       ]
   - path: test/language/statements/let/dstr/ary-ptrn-elem-id-iter-complete.js
     expectedClassification: pass
     dependencies:
-      [
-        destructuring-bindings,
-        iterator-protocol,
-        lexical-bindings,
-        object-properties,
-        symbols,
-      ]
+      [destructuring-bindings, iterator-protocol, lexical-bindings, symbols]
   - path: test/language/statements/let/dstr/ary-ptrn-elem-id-iter-done.js
     expectedClassification: pass
     dependencies: [destructuring-bindings, iterator-protocol, lexical-bindings]
@@ -179605,13 +179414,7 @@ tests:
   - path: test/language/statements/let/dstr/ary-ptrn-elem-id-iter-val.js
     expectedClassification: pass
     dependencies:
-      [
-        destructuring-bindings,
-        iterator-protocol,
-        lexical-bindings,
-        object-properties,
-        symbols,
-      ]
+      [destructuring-bindings, iterator-protocol, lexical-bindings, symbols]
   - path: test/language/statements/let/dstr/ary-ptrn-elem-obj-id-init.js
     expectedClassification: pass
     dependencies:
@@ -179669,7 +179472,6 @@ tests:
         error-intrinsics,
         iterator-protocol,
         lexical-bindings,
-        object-properties,
         symbols,
       ]
   - path: test/language/statements/let/dstr/ary-ptrn-elem-obj-val-undef.js
@@ -179681,7 +179483,6 @@ tests:
         error-intrinsics,
         iterator-protocol,
         lexical-bindings,
-        object-properties,
         symbols,
       ]
   - path: test/language/statements/let/dstr/ary-ptrn-elision-exhausted.js
@@ -179721,7 +179522,6 @@ tests:
         generators,
         iterator-protocol,
         lexical-bindings,
-        object-properties,
         symbols,
         var-bindings,
       ]
@@ -179734,7 +179534,6 @@ tests:
         generators,
         iterator-protocol,
         lexical-bindings,
-        object-properties,
         symbols,
         var-bindings,
       ]
@@ -179751,7 +179550,6 @@ tests:
         generators,
         iterator-protocol,
         lexical-bindings,
-        object-properties,
         symbols,
         var-bindings,
       ]
@@ -179765,7 +179563,6 @@ tests:
         generators,
         iterator-protocol,
         lexical-bindings,
-        object-properties,
         symbols,
         var-bindings,
       ]
@@ -179783,13 +179580,7 @@ tests:
   - path: test/language/statements/let/dstr/ary-ptrn-rest-id-direct.js
     expectedClassification: pass
     dependencies:
-      [
-        destructuring-bindings,
-        iterator-protocol,
-        lexical-bindings,
-        object-properties,
-        symbols,
-      ]
+      [destructuring-bindings, iterator-protocol, lexical-bindings, symbols]
   - path: test/language/statements/let/dstr/ary-ptrn-rest-id-elision-next-err.js
     expectedClassification: pass
     dependencies:
@@ -179800,7 +179591,6 @@ tests:
         generators,
         iterator-protocol,
         lexical-bindings,
-        object-properties,
         symbols,
         var-bindings,
       ]
@@ -179987,7 +179777,6 @@ tests:
         lexical-bindings,
         object-literals,
         object-properties,
-        var-bindings,
       ]
   - path: test/language/statements/let/dstr/obj-ptrn-id-init-throws.js
     expectedClassification: pass
@@ -180024,7 +179813,6 @@ tests:
         lexical-bindings,
         object-literals,
         object-properties,
-        var-bindings,
       ]
   - path: test/language/statements/let/dstr/obj-ptrn-prop-ary-init.js
     expectedClassification: pass
@@ -180107,7 +179895,6 @@ tests:
         lexical-bindings,
         object-literals,
         object-properties,
-        var-bindings,
       ]
   - path: test/language/statements/let/dstr/obj-ptrn-prop-id-init-throws.js
     expectedClassification: pass
@@ -180244,13 +180031,7 @@ tests:
   - path: test/language/statements/let/function-local-closure-get-before-initialization.js
     expectedClassification: pass
     dependencies:
-      [
-        abrupt-completion,
-        error-intrinsics,
-        expression-operators,
-        functions,
-        lexical-bindings,
-      ]
+      [abrupt-completion, error-intrinsics, functions, lexical-bindings]
   - path: test/language/statements/let/function-local-closure-set-before-initialization.js
     expectedClassification: pass
     dependencies:
@@ -180272,13 +180053,7 @@ tests:
   - path: test/language/statements/let/global-closure-get-before-initialization.js
     expectedClassification: pass
     dependencies:
-      [
-        abrupt-completion,
-        error-intrinsics,
-        expression-operators,
-        functions,
-        lexical-bindings,
-      ]
+      [abrupt-completion, error-intrinsics, functions, lexical-bindings]
   - path: test/language/statements/let/global-closure-set-before-initialization.js
     expectedClassification: pass
     dependencies:
@@ -180700,13 +180475,15 @@ tests:
       ]
   - path: test/language/statements/switch/syntax/redeclaration/async-function-name-redeclaration-attempt-with-async-function.js
     expectedClassification: expected-negative
-    dependencies: [async-functions, control-flow, functions]
+    dependencies: [async-functions, control-flow, functions, lexical-bindings]
   - path: test/language/statements/switch/syntax/redeclaration/async-function-name-redeclaration-attempt-with-async-generator.js
     expectedClassification: expected-negative
-    dependencies: [async-functions, control-flow, functions, generators]
+    dependencies:
+      [async-functions, control-flow, functions, generators, lexical-bindings]
   - path: test/language/statements/switch/syntax/redeclaration/async-function-name-redeclaration-attempt-with-class.js
     expectedClassification: expected-negative
-    dependencies: [async-functions, classes, control-flow, functions]
+    dependencies:
+      [async-functions, classes, control-flow, functions, lexical-bindings]
   - path: test/language/statements/switch/syntax/redeclaration/async-function-name-redeclaration-attempt-with-const.js
     expectedClassification: expected-negative
     dependencies: [async-functions, control-flow, functions, lexical-bindings]
@@ -180715,23 +180492,34 @@ tests:
     dependencies: [async-functions, control-flow, functions, lexical-bindings]
   - path: test/language/statements/switch/syntax/redeclaration/async-function-name-redeclaration-attempt-with-generator.js
     expectedClassification: expected-negative
-    dependencies: [async-functions, control-flow, functions, generators]
+    dependencies:
+      [async-functions, control-flow, functions, generators, lexical-bindings]
   - path: test/language/statements/switch/syntax/redeclaration/async-function-name-redeclaration-attempt-with-let.js
     expectedClassification: expected-negative
     dependencies: [async-functions, control-flow, functions, lexical-bindings]
   - path: test/language/statements/switch/syntax/redeclaration/async-function-name-redeclaration-attempt-with-var.js
     expectedClassification: expected-negative
-    dependencies: [async-functions, control-flow, functions, var-bindings]
+    dependencies:
+      [async-functions, control-flow, functions, lexical-bindings, var-bindings]
   - path: test/language/statements/switch/syntax/redeclaration/async-generator-name-redeclaration-attempt-with-async-function.js
     expectedClassification: expected-negative
-    dependencies: [async-functions, control-flow, functions, generators]
+    dependencies:
+      [async-functions, control-flow, functions, generators, lexical-bindings]
   - path: test/language/statements/switch/syntax/redeclaration/async-generator-name-redeclaration-attempt-with-async-generator.js
     expectedClassification: expected-negative
-    dependencies: [async-functions, control-flow, functions, generators]
+    dependencies:
+      [async-functions, control-flow, functions, generators, lexical-bindings]
   - path: test/language/statements/switch/syntax/redeclaration/async-generator-name-redeclaration-attempt-with-class.js
     expectedClassification: expected-negative
     dependencies:
-      [async-functions, classes, control-flow, functions, generators]
+      [
+        async-functions,
+        classes,
+        control-flow,
+        functions,
+        generators,
+        lexical-bindings,
+      ]
   - path: test/language/statements/switch/syntax/redeclaration/async-generator-name-redeclaration-attempt-with-const.js
     expectedClassification: expected-negative
     dependencies:
@@ -180741,7 +180529,8 @@ tests:
     dependencies: [async-iteration, control-flow, functions, lexical-bindings]
   - path: test/language/statements/switch/syntax/redeclaration/async-generator-name-redeclaration-attempt-with-generator.js
     expectedClassification: expected-negative
-    dependencies: [async-functions, control-flow, functions, generators]
+    dependencies:
+      [async-functions, control-flow, functions, generators, lexical-bindings]
   - path: test/language/statements/switch/syntax/redeclaration/async-generator-name-redeclaration-attempt-with-let.js
     expectedClassification: expected-negative
     dependencies:
@@ -180749,17 +180538,32 @@ tests:
   - path: test/language/statements/switch/syntax/redeclaration/async-generator-name-redeclaration-attempt-with-var.js
     expectedClassification: expected-negative
     dependencies:
-      [async-functions, control-flow, functions, generators, var-bindings]
+      [
+        async-functions,
+        control-flow,
+        functions,
+        generators,
+        lexical-bindings,
+        var-bindings,
+      ]
   - path: test/language/statements/switch/syntax/redeclaration/class-name-redeclaration-attempt-with-async-function.js
     expectedClassification: expected-negative
-    dependencies: [async-functions, classes, control-flow, functions]
+    dependencies:
+      [async-functions, classes, control-flow, functions, lexical-bindings]
   - path: test/language/statements/switch/syntax/redeclaration/class-name-redeclaration-attempt-with-async-generator.js
     expectedClassification: expected-negative
     dependencies:
-      [async-functions, classes, control-flow, functions, generators]
+      [
+        async-functions,
+        classes,
+        control-flow,
+        functions,
+        generators,
+        lexical-bindings,
+      ]
   - path: test/language/statements/switch/syntax/redeclaration/class-name-redeclaration-attempt-with-class.js
     expectedClassification: expected-negative
-    dependencies: [classes, control-flow]
+    dependencies: [classes, control-flow, lexical-bindings]
   - path: test/language/statements/switch/syntax/redeclaration/class-name-redeclaration-attempt-with-const.js
     expectedClassification: expected-negative
     dependencies: [classes, control-flow, lexical-bindings]
@@ -180768,13 +180572,14 @@ tests:
     dependencies: [classes, control-flow, functions, lexical-bindings]
   - path: test/language/statements/switch/syntax/redeclaration/class-name-redeclaration-attempt-with-generator.js
     expectedClassification: expected-negative
-    dependencies: [classes, control-flow, functions, generators]
+    dependencies:
+      [classes, control-flow, functions, generators, lexical-bindings]
   - path: test/language/statements/switch/syntax/redeclaration/class-name-redeclaration-attempt-with-let.js
     expectedClassification: expected-negative
     dependencies: [classes, control-flow, lexical-bindings]
   - path: test/language/statements/switch/syntax/redeclaration/class-name-redeclaration-attempt-with-var.js
     expectedClassification: expected-negative
-    dependencies: [classes, control-flow, var-bindings]
+    dependencies: [classes, control-flow, lexical-bindings, var-bindings]
   - path: test/language/statements/switch/syntax/redeclaration/const-name-redeclaration-attempt-with-async-function.js
     expectedClassification: expected-negative
     dependencies: [async-functions, control-flow, functions, lexical-bindings]
@@ -180826,13 +180631,16 @@ tests:
     dependencies: [control-flow, functions, lexical-bindings, var-bindings]
   - path: test/language/statements/switch/syntax/redeclaration/generator-name-redeclaration-attempt-with-async-function.js
     expectedClassification: expected-negative
-    dependencies: [async-functions, control-flow, functions, generators]
+    dependencies:
+      [async-functions, control-flow, functions, generators, lexical-bindings]
   - path: test/language/statements/switch/syntax/redeclaration/generator-name-redeclaration-attempt-with-async-generator.js
     expectedClassification: expected-negative
-    dependencies: [async-functions, control-flow, functions, generators]
+    dependencies:
+      [async-functions, control-flow, functions, generators, lexical-bindings]
   - path: test/language/statements/switch/syntax/redeclaration/generator-name-redeclaration-attempt-with-class.js
     expectedClassification: expected-negative
-    dependencies: [classes, control-flow, functions, generators]
+    dependencies:
+      [classes, control-flow, functions, generators, lexical-bindings]
   - path: test/language/statements/switch/syntax/redeclaration/generator-name-redeclaration-attempt-with-const.js
     expectedClassification: expected-negative
     dependencies: [control-flow, functions, generators, lexical-bindings]
@@ -180841,13 +180649,14 @@ tests:
     dependencies: [control-flow, functions, generators, lexical-bindings]
   - path: test/language/statements/switch/syntax/redeclaration/generator-name-redeclaration-attempt-with-generator.js
     expectedClassification: expected-negative
-    dependencies: [control-flow, functions, generators]
+    dependencies: [control-flow, functions, generators, lexical-bindings]
   - path: test/language/statements/switch/syntax/redeclaration/generator-name-redeclaration-attempt-with-let.js
     expectedClassification: expected-negative
     dependencies: [control-flow, functions, generators, lexical-bindings]
   - path: test/language/statements/switch/syntax/redeclaration/generator-name-redeclaration-attempt-with-var.js
     expectedClassification: expected-negative
-    dependencies: [control-flow, functions, generators, var-bindings]
+    dependencies:
+      [control-flow, functions, generators, lexical-bindings, var-bindings]
   - path: test/language/statements/switch/syntax/redeclaration/let-name-redeclaration-attempt-with-async-function.js
     expectedClassification: expected-negative
     dependencies: [async-functions, control-flow, functions, lexical-bindings]
@@ -180875,14 +180684,22 @@ tests:
     dependencies: [control-flow, lexical-bindings, var-bindings]
   - path: test/language/statements/switch/syntax/redeclaration/var-name-redeclaration-attempt-with-async-function.js
     expectedClassification: expected-negative
-    dependencies: [async-functions, control-flow, functions, var-bindings]
+    dependencies:
+      [async-functions, control-flow, functions, lexical-bindings, var-bindings]
   - path: test/language/statements/switch/syntax/redeclaration/var-name-redeclaration-attempt-with-async-generator.js
     expectedClassification: expected-negative
     dependencies:
-      [async-functions, control-flow, functions, generators, var-bindings]
+      [
+        async-functions,
+        control-flow,
+        functions,
+        generators,
+        lexical-bindings,
+        var-bindings,
+      ]
   - path: test/language/statements/switch/syntax/redeclaration/var-name-redeclaration-attempt-with-class.js
     expectedClassification: expected-negative
-    dependencies: [classes, control-flow, var-bindings]
+    dependencies: [classes, control-flow, lexical-bindings, var-bindings]
   - path: test/language/statements/switch/syntax/redeclaration/var-name-redeclaration-attempt-with-const.js
     expectedClassification: expected-negative
     dependencies: [control-flow, lexical-bindings, var-bindings]
@@ -180891,7 +180708,8 @@ tests:
     dependencies: [control-flow, functions, lexical-bindings, var-bindings]
   - path: test/language/statements/switch/syntax/redeclaration/var-name-redeclaration-attempt-with-generator.js
     expectedClassification: expected-negative
-    dependencies: [control-flow, functions, generators, var-bindings]
+    dependencies:
+      [control-flow, functions, generators, lexical-bindings, var-bindings]
   - path: test/language/statements/switch/syntax/redeclaration/var-name-redeclaration-attempt-with-let.js
     expectedClassification: expected-negative
     dependencies: [control-flow, lexical-bindings, var-bindings]
@@ -181662,7 +181480,6 @@ tests:
         destructuring-bindings,
         iterator-protocol,
         symbols,
-        var-bindings,
       ]
   - path: test/language/statements/try/dstr/ary-ptrn-elem-ary-empty-init.js
     expectedClassification: pass
@@ -181687,7 +181504,6 @@ tests:
         destructuring-bindings,
         iterator-protocol,
         symbols,
-        var-bindings,
       ]
   - path: test/language/statements/try/dstr/ary-ptrn-elem-ary-rest-init.js
     expectedClassification: pass
@@ -181794,7 +181610,6 @@ tests:
         destructuring-bindings,
         iterator-protocol,
         symbols,
-        var-bindings,
       ]
   - path: test/language/statements/try/dstr/ary-ptrn-elem-id-init-throws.js
     expectedClassification: pass
@@ -181947,7 +181762,6 @@ tests:
         destructuring-bindings,
         error-intrinsics,
         iterator-protocol,
-        object-properties,
         symbols,
       ]
   - path: test/language/statements/try/dstr/ary-ptrn-elem-obj-val-undef.js
@@ -181959,7 +181773,6 @@ tests:
         destructuring-bindings,
         error-intrinsics,
         iterator-protocol,
-        object-properties,
         symbols,
       ]
   - path: test/language/statements/try/dstr/ary-ptrn-elision-exhausted.js
@@ -182031,7 +181844,6 @@ tests:
         functions,
         generators,
         iterator-protocol,
-        object-properties,
         symbols,
         var-bindings,
       ]
@@ -182046,7 +181858,6 @@ tests:
         functions,
         generators,
         iterator-protocol,
-        object-properties,
         symbols,
         var-bindings,
       ]
@@ -182278,7 +182089,6 @@ tests:
         destructuring-bindings,
         object-literals,
         object-properties,
-        var-bindings,
       ]
   - path: test/language/statements/try/dstr/obj-ptrn-id-init-throws.js
     expectedClassification: pass
@@ -182315,7 +182125,6 @@ tests:
         functions,
         object-literals,
         object-properties,
-        var-bindings,
       ]
   - path: test/language/statements/try/dstr/obj-ptrn-prop-ary-init.js
     expectedClassification: pass
@@ -182399,7 +182208,6 @@ tests:
         error-intrinsics,
         object-literals,
         object-properties,
-        var-bindings,
       ]
   - path: test/language/statements/try/dstr/obj-ptrn-prop-id-init-throws.js
     expectedClassification: pass
@@ -182524,7 +182332,7 @@ tests:
     dependencies: [control-flow, destructuring-bindings]
   - path: test/language/statements/try/early-catch-function.js
     expectedClassification: expected-negative
-    dependencies: [control-flow, functions]
+    dependencies: [control-flow, functions, lexical-bindings]
   - path: test/language/statements/try/early-catch-lex.js
     expectedClassification: expected-negative
     dependencies: [control-flow, lexical-bindings]
@@ -182943,13 +182751,7 @@ tests:
   - path: test/language/statements/variable/dstr/ary-ptrn-elem-ary-elem-iter.js
     expectedClassification: pass
     dependencies:
-      [
-        destructuring-bindings,
-        iterator-protocol,
-        object-properties,
-        symbols,
-        var-bindings,
-      ]
+      [destructuring-bindings, iterator-protocol, symbols, var-bindings]
   - path: test/language/statements/variable/dstr/ary-ptrn-elem-ary-elision-init.js
     expectedClassification: pass
     dependencies:
@@ -182959,20 +182761,13 @@ tests:
         functions,
         generators,
         iterator-protocol,
-        object-properties,
         symbols,
         var-bindings,
       ]
   - path: test/language/statements/variable/dstr/ary-ptrn-elem-ary-elision-iter.js
     expectedClassification: pass
     dependencies:
-      [
-        destructuring-bindings,
-        iterator-protocol,
-        object-properties,
-        symbols,
-        var-bindings,
-      ]
+      [destructuring-bindings, iterator-protocol, symbols, var-bindings]
   - path: test/language/statements/variable/dstr/ary-ptrn-elem-ary-empty-init.js
     expectedClassification: pass
     dependencies:
@@ -182982,20 +182777,13 @@ tests:
         functions,
         generators,
         iterator-protocol,
-        object-properties,
         symbols,
         var-bindings,
       ]
   - path: test/language/statements/variable/dstr/ary-ptrn-elem-ary-empty-iter.js
     expectedClassification: pass
     dependencies:
-      [
-        destructuring-bindings,
-        iterator-protocol,
-        object-properties,
-        symbols,
-        var-bindings,
-      ]
+      [destructuring-bindings, iterator-protocol, symbols, var-bindings]
   - path: test/language/statements/variable/dstr/ary-ptrn-elem-ary-rest-init.js
     expectedClassification: pass
     dependencies:
@@ -183024,7 +182812,6 @@ tests:
         destructuring-bindings,
         error-intrinsics,
         iterator-protocol,
-        object-properties,
         symbols,
         var-bindings,
       ]
@@ -183088,13 +182875,7 @@ tests:
   - path: test/language/statements/variable/dstr/ary-ptrn-elem-id-init-skipped.js
     expectedClassification: pass
     dependencies:
-      [
-        destructuring-bindings,
-        iterator-protocol,
-        object-properties,
-        symbols,
-        var-bindings,
-      ]
+      [destructuring-bindings, iterator-protocol, symbols, var-bindings]
   - path: test/language/statements/variable/dstr/ary-ptrn-elem-id-init-throws.js
     expectedClassification: pass
     dependencies:
@@ -183103,7 +182884,6 @@ tests:
         destructuring-bindings,
         functions,
         iterator-protocol,
-        object-properties,
         symbols,
         var-bindings,
       ]
@@ -183118,20 +182898,13 @@ tests:
         destructuring-bindings,
         error-intrinsics,
         iterator-protocol,
-        object-properties,
         symbols,
         var-bindings,
       ]
   - path: test/language/statements/variable/dstr/ary-ptrn-elem-id-iter-complete.js
     expectedClassification: pass
     dependencies:
-      [
-        destructuring-bindings,
-        iterator-protocol,
-        object-properties,
-        symbols,
-        var-bindings,
-      ]
+      [destructuring-bindings, iterator-protocol, symbols, var-bindings]
   - path: test/language/statements/variable/dstr/ary-ptrn-elem-id-iter-done.js
     expectedClassification: pass
     dependencies: [destructuring-bindings, iterator-protocol, var-bindings]
@@ -183180,13 +182953,7 @@ tests:
   - path: test/language/statements/variable/dstr/ary-ptrn-elem-id-iter-val.js
     expectedClassification: pass
     dependencies:
-      [
-        destructuring-bindings,
-        iterator-protocol,
-        object-properties,
-        symbols,
-        var-bindings,
-      ]
+      [destructuring-bindings, iterator-protocol, symbols, var-bindings]
   - path: test/language/statements/variable/dstr/ary-ptrn-elem-id-static-init-await-invalid.js
     expectedClassification: expected-negative
     dependencies: [classes, destructuring-bindings, var-bindings]
@@ -183249,7 +183016,6 @@ tests:
         destructuring-bindings,
         error-intrinsics,
         iterator-protocol,
-        object-properties,
         symbols,
         var-bindings,
       ]
@@ -183261,7 +183027,6 @@ tests:
         destructuring-bindings,
         error-intrinsics,
         iterator-protocol,
-        object-properties,
         symbols,
         var-bindings,
       ]
@@ -183299,7 +183064,6 @@ tests:
         functions,
         generators,
         iterator-protocol,
-        object-properties,
         symbols,
         var-bindings,
       ]
@@ -183311,7 +183075,6 @@ tests:
         functions,
         generators,
         iterator-protocol,
-        object-properties,
         symbols,
         var-bindings,
       ]
@@ -183327,7 +183090,6 @@ tests:
         functions,
         generators,
         iterator-protocol,
-        object-properties,
         symbols,
         var-bindings,
       ]
@@ -183340,7 +183102,6 @@ tests:
         functions,
         generators,
         iterator-protocol,
-        object-properties,
         symbols,
         var-bindings,
       ]
@@ -183357,13 +183118,7 @@ tests:
   - path: test/language/statements/variable/dstr/ary-ptrn-rest-id-direct.js
     expectedClassification: pass
     dependencies:
-      [
-        destructuring-bindings,
-        iterator-protocol,
-        object-properties,
-        symbols,
-        var-bindings,
-      ]
+      [destructuring-bindings, iterator-protocol, symbols, var-bindings]
   - path: test/language/statements/variable/dstr/ary-ptrn-rest-id-elision-next-err.js
     expectedClassification: pass
     dependencies:
@@ -183373,7 +183128,6 @@ tests:
         functions,
         generators,
         iterator-protocol,
-        object-properties,
         symbols,
         var-bindings,
       ]

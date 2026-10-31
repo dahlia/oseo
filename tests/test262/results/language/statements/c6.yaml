@@ -200,7 +200,6 @@ results:
       - generators
       - iterator-protocol
       - lexical-bindings
-      - object-properties
       - symbols
       - var-bindings
     execution:
@@ -414,7 +413,6 @@ results:
     dependencies:
       - abrupt-completion
       - error-intrinsics
-      - expression-operators
       - functions
       - lexical-bindings
     execution:

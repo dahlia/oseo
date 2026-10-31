@@ -390,7 +390,6 @@ results:
       - expression-operators
       - functions
       - iterator-protocol
-      - object-properties
       - symbols
       - var-bindings
     execution:
@@ -431,7 +430,6 @@ results:
       - functions
       - object-literals
       - object-properties
-      - var-bindings
     execution:
       harnessIncludes:
         - base.js
@@ -647,6 +645,7 @@ results:
       - control-flow
       - functions
       - generators
+      - lexical-bindings
     observation:
       errorType: SyntaxError
       failedPhase: parse

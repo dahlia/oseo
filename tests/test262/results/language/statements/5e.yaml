@@ -187,7 +187,6 @@ results:
       - generators
       - iterator-protocol
       - lexical-bindings
-      - object-properties
       - symbols
       - var-bindings
     execution:
@@ -252,7 +251,6 @@ results:
       - expression-operators
       - functions
       - iterator-protocol
-      - object-properties
       - symbols
       - var-bindings
     execution:

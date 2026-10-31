@@ -267,6 +267,7 @@ results:
     dependencies:
       - classes
       - control-flow
+      - lexical-bindings
     observation:
       errorType: SyntaxError
       failedPhase: parse

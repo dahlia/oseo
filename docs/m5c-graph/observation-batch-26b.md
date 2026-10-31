@@ -215,3 +215,33 @@ and exact changes in `round3-fix-plan.json`, `round3-fix-applied.json` and
 the `round3-*-audit.json` and `round3-*-candidates.json` artifacts. The fixed
 third-pass verdicts are in `review-round-3/attempts.json`. Classifications,
 counts, unsupported ownership and the original admitted rows are preserved.
+
+
+Internal pass 4 corrections
+---------------------------
+
+All 1,669 train rows were checked for every fourth-pass finding pattern
+against the latest consolidated rules and original sources. This batch has
+68 dependency rows corrected in that audit.
+
+Function and generator carriers retain their subject families. The two rejected
+ordinary-function SuperProperty cases retain object-properties as a grammar
+family, with runtime families excluded. Array binding and rest-parameter
+iterator lookups add no independent property coverage. RequireObjectCoercible
+rejects null or undefined before the named property read starts; an actual
+outer object-pattern read remains an independent witness.
+
+Declarations used only to observe that a counter update never executes
+add no var-bindings coverage. The audit distinguishes skipped defaults,
+falsy loop bodies and later initializers blocked by an earlier throw
+from real input holders, evaluated counter computations and binding
+scope subjects.
+
+Source hashes, the whole-train pattern scans and exact corrections are
+recorded in `round4-fix-plan.json`, `round4-fix-applied.json`, the
+`round4-*-conclusions.json` artifacts and
+`zero-counter-holder-Root-decision.json` in the dispatch packet. AST
+reachability remains candidate analysis; literal inputs and original source
+contracts establish the boundaries. Classifications, counts, unsupported
+ownership and prior admitted rows are preserved. All fixed fourth-pass verdicts
+are retained in `review-round-4/attempts.json`.

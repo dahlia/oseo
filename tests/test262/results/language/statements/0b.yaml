@@ -349,7 +349,6 @@ results:
       - expression-operators
       - functions
       - iterator-protocol
-      - object-properties
       - symbols
       - typed-array-constructors
       - typed-array-core
@@ -481,7 +480,6 @@ results:
       - functions
       - generators
       - iterator-protocol
-      - object-properties
       - symbols
       - var-bindings
     execution:
@@ -637,7 +635,6 @@ results:
       - destructuring-bindings
       - object-literals
       - object-properties
-      - var-bindings
     execution:
       harnessIncludes:
         - base.js

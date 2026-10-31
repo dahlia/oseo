@@ -594,6 +594,7 @@ results:
       - async-functions
       - control-flow
       - functions
+      - lexical-bindings
       - var-bindings
     observation:
       errorType: SyntaxError

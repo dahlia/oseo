@@ -313,7 +313,6 @@ results:
       - destructuring-bindings
       - error-intrinsics
       - iterator-protocol
-      - object-properties
       - symbols
       - var-bindings
     execution:

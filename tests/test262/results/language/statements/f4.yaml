@@ -241,7 +241,6 @@ results:
       - destructuring-bindings
       - expression-operators
       - iterator-protocol
-      - object-properties
       - symbols
       - var-bindings
     execution:
@@ -357,7 +356,6 @@ results:
       - lexical-bindings
       - object-literals
       - object-properties
-      - var-bindings
     execution:
       harnessIncludes:
         - base.js

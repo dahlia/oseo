@@ -605,7 +605,6 @@ results:
     dependencies:
       - destructuring-bindings
       - iterator-protocol
-      - object-properties
       - symbols
       - var-bindings
     execution:

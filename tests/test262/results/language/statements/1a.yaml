@@ -634,6 +634,7 @@ results:
       - control-flow
       - functions
       - generators
+      - lexical-bindings
       - var-bindings
     observation:
       errorType: SyntaxError

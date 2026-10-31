@@ -434,7 +434,6 @@ results:
       - error-intrinsics
       - iterator-protocol
       - lexical-bindings
-      - object-properties
       - symbols
     execution:
       harnessIncludes:

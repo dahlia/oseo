@@ -141,7 +141,6 @@ results:
       - functions
       - generators
       - iterator-protocol
-      - object-properties
       - symbols
       - var-bindings
     execution:
@@ -255,7 +254,6 @@ results:
       - destructuring-bindings
       - iterator-protocol
       - lexical-bindings
-      - object-properties
       - symbols
     execution:
       harnessIncludes:
@@ -350,7 +348,6 @@ results:
       - functions
       - generators
       - iterator-protocol
-      - object-properties
       - symbols
       - var-bindings
     execution:

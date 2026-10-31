@@ -360,7 +360,6 @@ results:
       - expression-operators
       - functions
       - iterator-protocol
-      - object-properties
       - symbols
       - var-bindings
     execution:

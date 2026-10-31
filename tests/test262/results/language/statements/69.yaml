@@ -121,7 +121,6 @@ results:
       - error-intrinsics
       - iterator-protocol
       - lexical-bindings
-      - object-properties
       - symbols
     execution:
       harnessIncludes:
@@ -216,6 +215,7 @@ results:
       - async-functions
       - control-flow
       - functions
+      - lexical-bindings
       - var-bindings
     observation:
       errorType: SyntaxError

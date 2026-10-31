@@ -326,7 +326,6 @@ results:
       - expression-operators
       - functions
       - iterator-protocol
-      - object-properties
       - symbols
       - var-bindings
     execution:
@@ -367,7 +366,6 @@ results:
       - error-intrinsics
       - functions
       - iterator-protocol
-      - object-properties
       - symbols
     execution:
       harnessIncludes:
@@ -509,7 +507,6 @@ results:
       - functions
       - generators
       - iterator-protocol
-      - object-properties
       - symbols
       - var-bindings
     execution:

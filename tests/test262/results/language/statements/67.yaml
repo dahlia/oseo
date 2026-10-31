@@ -314,7 +314,6 @@ results:
     dependencies:
       - control-flow
       - expression-operators
-      - var-bindings
     execution:
       harnessIncludes:
         - base.js

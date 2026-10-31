@@ -306,7 +306,6 @@ results:
       - expression-operators
       - iterator-protocol
       - lexical-bindings
-      - object-properties
       - symbols
       - var-bindings
     execution:
@@ -384,7 +383,6 @@ results:
       - expression-operators
       - iterator-protocol
       - lexical-bindings
-      - object-properties
       - symbols
       - var-bindings
     execution:
@@ -423,7 +421,6 @@ results:
       - destructuring-bindings
       - expression-operators
       - iterator-protocol
-      - object-properties
       - symbols
       - var-bindings
     execution:
@@ -703,7 +700,6 @@ results:
       - error-intrinsics
       - iterator-protocol
       - lexical-bindings
-      - object-properties
       - symbols
     execution:
       harnessIncludes:
@@ -828,7 +824,6 @@ results:
       - functions
       - generators
       - iterator-protocol
-      - object-properties
       - symbols
       - var-bindings
     execution:

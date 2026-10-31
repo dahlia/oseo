@@ -264,7 +264,6 @@ results:
       - generators
       - iterator-protocol
       - lexical-bindings
-      - object-properties
       - symbols
       - var-bindings
     execution:
@@ -360,7 +359,6 @@ results:
     classification: pass
     dependencies:
       - control-flow
-      - expression-operators
       - lexical-grammar
     execution:
       harnessIncludes:

@@ -526,7 +526,6 @@ results:
       - destructuring-bindings
       - iterator-protocol
       - lexical-bindings
-      - object-properties
       - symbols
     execution:
       harnessIncludes:

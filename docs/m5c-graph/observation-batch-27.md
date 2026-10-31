@@ -231,3 +231,38 @@ and exact changes in `round3-fix-plan.json`, `round3-fix-applied.json` and
 the `round3-*-audit.json` and `round3-*-candidates.json` artifacts. The fixed
 third-pass verdicts are in `review-round-3/attempts.json`. Classifications,
 counts, unsupported ownership and the original admitted rows are preserved.
+
+
+Internal pass 4 corrections
+---------------------------
+
+All 1,669 train rows were checked for every fourth-pass finding pattern
+against the latest consolidated rules and original sources. This batch has
+80 dependency rows corrected in that audit.
+
+The property audit preserves actual object-pattern reads, indexed element
+assertions and property setup. Implicit iterator lookups and Array.isArray
+oracle checks add no independent property family. Nullish inputs that abort
+before named-property reads retain their actual TypeError, binding and iterator
+contracts. The three closure getters lose their addition because a TDZ read
+throws first; direct closure assignments remain actual write subjects. Static
+lexical-name conflicts retain lexical-bindings for async functions, generators,
+classes and the early catch/block-function conflict. The false-gated labeled
+let/ASI case loses its unreachable assignment while the if/while contrasts
+retain their executed assignments. Actual var, catch and captured-scope
+subjects remain.
+
+Declarations used only to observe that a counter update never executes
+add no var-bindings coverage. The audit distinguishes skipped defaults,
+falsy loop bodies and later initializers blocked by an earlier throw
+from real input holders, evaluated counter computations and binding
+scope subjects.
+
+Source hashes, the whole-train pattern scans and exact corrections are
+recorded in `round4-fix-plan.json`, `round4-fix-applied.json`, the
+`round4-*-conclusions.json` artifacts and
+`zero-counter-holder-Root-decision.json` in the dispatch packet. AST
+reachability remains candidate analysis; literal inputs and original source
+contracts establish the boundaries. Classifications, counts, unsupported
+ownership and prior admitted rows are preserved. All fixed fourth-pass verdicts
+are retained in `review-round-4/attempts.json`.

@@ -267,7 +267,6 @@ results:
       - functions
       - iterator-protocol
       - lexical-bindings
-      - object-properties
       - symbols
     execution:
       harnessIncludes:
@@ -377,7 +376,6 @@ results:
       - expression-operators
       - functions
       - iterator-protocol
-      - object-properties
       - symbols
       - var-bindings
     execution:
@@ -458,7 +456,6 @@ results:
       - expression-operators
       - functions
       - iterator-protocol
-      - object-properties
       - rest-parameters
       - symbols
       - var-bindings
@@ -489,6 +486,7 @@ results:
     dependencies:
       - classes
       - control-flow
+      - lexical-bindings
       - var-bindings
     observation:
       errorType: SyntaxError

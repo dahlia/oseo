@@ -233,7 +233,6 @@ results:
     dependencies:
       - control-flow
       - expression-operators
-      - var-bindings
     execution:
       harnessIncludes:
         - base.js
@@ -367,7 +366,6 @@ results:
       - destructuring-bindings
       - expression-operators
       - iterator-protocol
-      - object-properties
       - symbols
       - var-bindings
     execution:
@@ -564,7 +562,6 @@ results:
       - destructuring-bindings
       - error-intrinsics
       - iterator-protocol
-      - object-properties
       - symbols
       - var-bindings
     execution:

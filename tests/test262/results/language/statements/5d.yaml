@@ -393,6 +393,7 @@ results:
       - control-flow
       - functions
       - generators
+      - lexical-bindings
     observation:
       errorType: SyntaxError
       failedPhase: parse

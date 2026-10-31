@@ -188,7 +188,6 @@ results:
       - error-intrinsics
       - functions
       - iterator-protocol
-      - object-properties
       - symbols
     execution:
       harnessIncludes:
@@ -292,7 +291,6 @@ results:
       - functions
       - generators
       - iterator-protocol
-      - object-properties
       - symbols
     execution:
       harnessIncludes:
@@ -393,7 +391,6 @@ results:
       - error-intrinsics
       - iterator-protocol
       - lexical-bindings
-      - object-properties
       - symbols
     execution:
       harnessIncludes:

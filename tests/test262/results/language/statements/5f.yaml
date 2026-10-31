@@ -247,7 +247,6 @@ results:
     classification: pass
     dependencies:
       - control-flow
-      - var-bindings
     execution:
       harnessIncludes:
         - base.js
@@ -286,7 +285,6 @@ results:
       - lexical-bindings
       - object-literals
       - object-properties
-      - var-bindings
     execution:
       harnessIncludes:
         - base.js
@@ -324,7 +322,6 @@ results:
       - expression-operators
       - functions
       - iterator-protocol
-      - object-properties
       - symbols
       - var-bindings
     execution:
@@ -364,6 +361,7 @@ results:
       - classes
       - control-flow
       - functions
+      - lexical-bindings
     observation:
       errorType: SyntaxError
       failedPhase: parse

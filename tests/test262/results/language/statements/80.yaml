@@ -364,6 +364,7 @@ results:
       - classes
       - control-flow
       - functions
+      - lexical-bindings
     observation:
       errorType: SyntaxError
       failedPhase: parse

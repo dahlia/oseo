@@ -290,7 +290,6 @@ results:
       - functions
       - generators
       - iterator-protocol
-      - object-properties
       - symbols
       - var-bindings
     execution:
@@ -443,6 +442,7 @@ results:
     dependencies:
       - default-parameters
       - functions
+      - object-properties
     observation:
       errorType: SyntaxError
       failedPhase: parse

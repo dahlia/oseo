@@ -527,6 +527,7 @@ results:
     dependencies:
       - classes
       - control-flow
+      - lexical-bindings
       - var-bindings
     observation:
       errorType: SyntaxError

@@ -351,7 +351,6 @@ results:
       - destructuring-bindings
       - error-intrinsics
       - iterator-protocol
-      - object-properties
       - symbols
     execution:
       harnessIncludes:

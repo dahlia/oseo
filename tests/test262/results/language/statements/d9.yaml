@@ -506,9 +506,7 @@ results:
       - destructuring-bindings
       - iterator-protocol
       - lexical-bindings
-      - object-properties
       - symbols
-      - var-bindings
     execution:
       harnessIncludes:
         - base.js

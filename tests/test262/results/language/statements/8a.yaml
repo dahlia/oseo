@@ -467,7 +467,6 @@ results:
       - functions
       - object-literals
       - object-properties
-      - var-bindings
     execution:
       harnessIncludes:
         - base.js

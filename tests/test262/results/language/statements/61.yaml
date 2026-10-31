@@ -317,7 +317,6 @@ results:
       - functions
       - iterator-protocol
       - lexical-bindings
-      - object-properties
       - symbols
     execution:
       harnessIncludes:
@@ -508,7 +507,6 @@ results:
     dependencies:
       - destructuring-bindings
       - iterator-protocol
-      - object-properties
       - symbols
       - var-bindings
     execution:

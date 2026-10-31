@@ -250,7 +250,6 @@ results:
       - functions
       - generators
       - iterator-protocol
-      - object-properties
       - symbols
       - var-bindings
     execution:
@@ -331,7 +330,6 @@ results:
       - expression-operators
       - functions
       - iterator-protocol
-      - object-properties
       - symbols
       - var-bindings
     execution:
@@ -477,7 +475,6 @@ results:
     dependencies:
       - destructuring-bindings
       - iterator-protocol
-      - object-properties
       - symbols
       - var-bindings
     execution:

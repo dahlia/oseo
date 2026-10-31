@@ -262,7 +262,6 @@ results:
       - expression-operators
       - functions
       - iterator-protocol
-      - object-properties
       - symbols
       - typed-array-constructors
       - typed-array-core

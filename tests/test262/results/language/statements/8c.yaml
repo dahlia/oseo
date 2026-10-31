@@ -452,7 +452,6 @@ results:
       - error-intrinsics
       - object-literals
       - object-properties
-      - var-bindings
     execution:
       harnessIncludes:
         - base.js

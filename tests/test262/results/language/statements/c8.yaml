@@ -458,7 +458,6 @@ results:
       - error-intrinsics
       - functions
       - iterator-protocol
-      - object-properties
       - symbols
     execution:
       harnessIncludes:
