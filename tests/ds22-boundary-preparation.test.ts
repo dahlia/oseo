@@ -33,7 +33,9 @@ for (const fixture of ds22BoundaryCoreFixtures) {
         assert.doesNotMatch(mir, /guard-object|guard-shape|load-fixed-slot/u);
       }
       assert.match(mir, /catch/u);
-      assert.match(emitted, /oseo_object_get/u);
+      // Ordinary gets reach the runtime directly or through the generated
+      // archive composition that the Array cost remedy introduced.
+      assert.match(emitted, /oseo_object_get|oseo_generated_property_get/u);
       assert.doesNotMatch(
         fixture.source,
         /\beval\s*\(|\b(?:new\s+)?Function\s*\(/u,
