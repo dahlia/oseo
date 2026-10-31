@@ -1,4 +1,5 @@
 import type { Fixture } from "../fixture.ts";
+import { templateSiteIdentityFixture } from "./template-site-identity.ts";
 import { withVarLoopHeadFixtures } from "./with-var-loop-head-resolution.ts";
 
 import { boxingFixtures } from "./with-primitive-boxing.ts";
@@ -2749,4 +2750,5 @@ console.log("mixed", add(truthful, 1), add(falsified, 1));
       overflowMisses: 0,
     },
   },
+  templateSiteIdentityFixture,
 ];

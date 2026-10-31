@@ -1199,6 +1199,34 @@ assessments:
       active coverage remediation without replacement evidence or a
       maintainer accounting decision. Preserve the original source and
       its unsupported observation without widening ADR 0016.
+  ds20-template-site-identity:
+    disposition: exclusion
+    normativeDependency: source-evaluation-only
+    replacementEvidence:
+      tests/native/fixtures/template-site-identity.ts:
+        "2a343025a834e1a3608e708ce218ec0b16610c85228aa35c\
+        e771008f46d9d5de"
+      tests/native/fixtures/bindings.ts:
+        "f3e20be237b2b772c59670f481af8147bfa59312098aa503\
+        e3817879ab0fb31b"
+      tests/native.ts: "9d973f85f2d4f643ab94f9940d7d698bfed49181c77ec267\
+        86f3f6438e23efc0"
+    reason: Maintainer decision 2026-10-28 item 1 applies to the single path in
+      dynamic-source-template-site-evidence.paths.txt. The
+      template-site-identity native fixture observes both same-site equalities
+      and the intervening distinct-Parse-Node inequality with identical inner
+      function bodies and changing outer/inner substitutions. A fresh closure of
+      the first static function additionally reuses its site. Node.js, Deno and
+      both native specialization policies must match the explicit identity/value
+      log; both native policies force collection and assert a positive
+      collection count. MIR and emitted C preserve two separate static sites.
+      These observations cover all non-source assertions. Only creation of fresh
+      Parse Nodes by eval remains excluded; no dynamic parsing is emulated. Keep
+      the original unsupported result, inventory entry and assertions and count
+      no pass. Reopen on changed original or replacement source or observations,
+      an accepted ADR 0016 amendment admitting eval, or ADR 0019 evidence of
+      unresolved non-source normative dependence. The node note records the
+      exact focused execution and review artifacts.
 paths:
   - path: test/built-ins/AggregateError/newtarget-proto-fallback.js
     proposedOwner: adr:0016-dynamic-source-boundary
@@ -19748,7 +19776,7 @@ paths:
     section: sec-gettemplateobject
     subject: Templates are cached by source location inside a
       function
-    assessment: template-sites
+    assessment: ds20-template-site-identity
   - path: "test/language/expressions/tagged-template/cache-iden\
       tical-source-eval.js"
     proposedOwner: adr:0016-dynamic-source-boundary

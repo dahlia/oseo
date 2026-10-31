@@ -1241,6 +1241,31 @@ for (const fixture of selectedFixtures) {
   assert(disabledMir != null, `${fixture.name}: disabled MIR`);
   assert(enabledMir != null, `${fixture.name}: enabled MIR`);
 
+  if (fixture.name === "template-site-identity") {
+    const expected =
+      "identities true true true\n" +
+      "values 0:0,0:1,1:0,1:1\n" +
+      "recreated true true\n" +
+      "all-values 0:0,0:1,1:0,1:1,2:0,2:1\n";
+    assert.equal(nodeReference.stdout, expected);
+    assert.equal(denoReference.stdout, expected);
+    for (const mir of [disabledMir, enabledMir]) {
+      const sites = mir.functions.flatMap((fn) =>
+        fn.blocks.flatMap((block) =>
+          block.operations
+            .filter((operation) => operation.kind === "template-object")
+            .map((operation) => ({ fn, operation })),
+        ),
+      );
+      assert.equal(sites.length, 2);
+      assert.notEqual(sites[0]!.fn.id, sites[1]!.fn.id);
+      for (const { operation } of sites) {
+        assert.deepEqual(operation.templateCooked, ["", "", ""]);
+        assert.deepEqual(operation.templateRaw, ["", "", ""]);
+      }
+    }
+  }
+
   if (fixture.name === "property-specialization") {
     const enabledText = printMir(enabledMir);
     assert.match(enabledText, /guard-object/u);
@@ -1627,6 +1652,7 @@ for (const fixture of selectedFixtures) {
     fixture.name === "proxy-object-rest-collection" ||
     fixture.name === "json-stringify" ||
     fixture.name === "tagged-templates" ||
+    fixture.name === "template-site-identity" ||
     fixture.name === "template-literals" ||
     fixture.name === "proper-tail-calls" ||
     fixture.name === "global-eval-tail-calls" ||
@@ -1693,6 +1719,17 @@ for (const fixture of selectedFixtures) {
             // Forced collection runs while tail call records and the
             // trampoline's steps hold the only references to arguments.
             assert.ok(native.counters.collections > 0);
+          }
+          if (fixture.name === "template-site-identity") {
+            assert.ok(native.counters.collections > 0);
+            assert.equal(
+              [
+                ...native.emittedC.matchAll(
+                  /static const char template_site_\d+ = 0;/gu,
+                ),
+              ].length,
+              2,
+            );
           }
           if (mode === "disabled") {
             assert.equal(native.counters.guardHits, 0);

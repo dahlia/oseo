@@ -123,7 +123,7 @@ owners:
       subjects; no evidence is added. The per-path assessment is in
       docs/m5c-graph/dynamic-source-importcall-residual-accounting.md.
       Root reconciles shared totals at publication."
-    paths: 969
+    paths: 970
   adr:0028-legacy-function-caller-boundary:
     note: ADR 0028 authorizes "an M5 exclusion of the expectation that
       reading the `caller` property of a non-strict ordinary function
@@ -274,7 +274,7 @@ owners:
       assessment is in
       docs/m5c-graph/dynamic-source-importcall-residual-accounting.md.
       Root reconciles shared totals at publication."
-    paths: 769
+    paths: 768
   node:non-blocking-agent:
     note: Needs an agent whose [[CanBlock]] is false; 2 paths.
     paths: 2
@@ -29914,7 +29914,7 @@ paths:
   test/language/expressions/tagged-template/cache-differing-expressions.js: [pass, observation]
   test/language/expressions/tagged-template/cache-differing-raw-strings.js: [pass, observation]
   test/language/expressions/tagged-template/cache-differing-string-count.js: [pass, observation]
-  test/language/expressions/tagged-template/cache-eval-inner-function.js: [unsupported-profile-feature, node:dynamic-source-coverage-remediation, [dynamic-source, expression-operators]]
+  test/language/expressions/tagged-template/cache-eval-inner-function.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [dynamic-source, expression-operators]]
   test/language/expressions/tagged-template/cache-identical-source-eval.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [dynamic-source, expression-operators]]
   test/language/expressions/tagged-template/cache-identical-source-new-function.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [dynamic-source, expression-operators]]
   test/language/expressions/tagged-template/cache-identical-source.js: [pass, observation]
