@@ -1118,8 +1118,8 @@ assessments:
     normativeDependency: "source-evaluation-only"
     replacementEvidence:
       docs/m5c-graph/dynamic-source-module-goal-validation-assessment.md:
-        "8f72876415ead85f5d560926ac63ad69\
-        8c32dd3d10ae0e7847f7080fa781cac9"
+        "69e2e931d230d886502afc050c221e05\
+        612738388edf1b254cb7be1e4b191fcb"
       tests/module-goal-validation-source.test.ts:
         "8339a1e8ab6dd61e2d07440cc7c74e2e\
         1ddbc2b79bd9aad35c61a28989c21261"
@@ -1136,8 +1136,8 @@ assessments:
     normativeDependency: "source-evaluation-only"
     replacementEvidence:
       docs/m5c-graph/dynamic-source-module-goal-validation-assessment.md:
-        "8f72876415ead85f5d560926ac63ad69\
-        8c32dd3d10ae0e7847f7080fa781cac9"
+        "69e2e931d230d886502afc050c221e05\
+        612738388edf1b254cb7be1e4b191fcb"
       tests/module-goal-validation-source.test.ts:
         "8339a1e8ab6dd61e2d07440cc7c74e2e\
         1ddbc2b79bd9aad35c61a28989c21261"
@@ -1154,8 +1154,8 @@ assessments:
     normativeDependency: "source-evaluation-only"
     replacementEvidence:
       docs/m5c-graph/dynamic-source-module-goal-validation-assessment.md:
-        "8f72876415ead85f5d560926ac63ad69\
-        8c32dd3d10ae0e7847f7080fa781cac9"
+        "69e2e931d230d886502afc050c221e05\
+        612738388edf1b254cb7be1e4b191fcb"
       tests/module-goal-validation-source.test.ts:
         "8339a1e8ab6dd61e2d07440cc7c74e2e\
         1ddbc2b79bd9aad35c61a28989c21261"
@@ -1171,8 +1171,8 @@ assessments:
     normativeDependency: "source-evaluation-only"
     replacementEvidence:
       docs/m5c-graph/dynamic-source-module-goal-validation-assessment.md:
-        "8f72876415ead85f5d560926ac63ad69\
-        8c32dd3d10ae0e7847f7080fa781cac9"
+        "69e2e931d230d886502afc050c221e05\
+        612738388edf1b254cb7be1e4b191fcb"
       tests/module-goal-validation-source.test.ts:
         "8339a1e8ab6dd61e2d07440cc7c74e2e\
         1ddbc2b79bd9aad35c61a28989c21261"
@@ -1180,8 +1180,8 @@ assessments:
         "9d358469af96127f4b97e0457ddd22f0\
         98cb561dd262e47a7883507e5c027152"
       tests/fixtures/module-goal-validation/entry.mjs:
-        "ec5ea246e6cf3a5dcf190040c369391d\
-        543a826c172bb0cac188c7fe90d33994"
+        "0d39af443c52b3ed7e0e19b7af807b28\
+        15c7e8f838c4f2915daeb099fbb921c1"
       tests/fixtures/module-goal-validation/target.mjs:
         "a40085f1129e91c1699b4765f78e99bf\
         f399ef8f127173fcb32ba88b4c56a159"

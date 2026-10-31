@@ -11,7 +11,8 @@ function observe(label, imported) {
   console.log(label, imported.default, imported.x, imported.z);
 }
 
-// nested-arrow-assignment-expression-eval-script-code-host-resolves-module-code.js
+// nested-arrow-assignment-expression-eval-script-code-host-resolves-module-
+// code.js
 {
   let f = () =>
     Promise.resolve(namespace).then((imported) => {
@@ -35,7 +36,8 @@ function observe(label, imported) {
   f();
 }
 
-// nested-async-arrow-function-await-eval-script-code-host-resolves-module-code.js
+// nested-async-arrow-function-await-eval-script-code-host-resolves-module-
+// code.js
 {
   const f = async () => {
     await Promise.resolve(namespace).then((imported) => {
@@ -46,7 +48,8 @@ function observe(label, imported) {
   f().then(done, done).catch(done);
 }
 
-// nested-async-arrow-function-return-await-eval-script-code-host-resolves-module-code.js
+// nested-async-arrow-function-return-await-eval-script-code-host-resolves-
+// module-code.js
 {
   const f = async () => await Promise.resolve(namespace);
 
@@ -83,7 +86,8 @@ function observe(label, imported) {
   f();
 }
 
-// nested-async-function-return-await-eval-script-code-host-resolves-module-code.js
+// nested-async-function-return-await-eval-script-code-host-resolves-module-
+// code.js
 {
   async function f() {
     return await Promise.resolve(namespace);

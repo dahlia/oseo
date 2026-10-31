@@ -106,10 +106,16 @@ body checked the fixed positive output in Node.js and Deno and in both
 native specialization policies with forced collection. Raw stdout, stderr
 and capacity/timing metadata are in
 */data/m5c-ds11-20261031/checks/native-focused.{stdout,stderr,json}*.
-The run lasted 43.351 seconds, from 01:07:22 to 01:08:05 UTC. The fixture
-and native-test digests bound in the exclusion audit name the inputs that
-ran; no compiler or runtime product input changed. This is Linux author
-evidence, without macOS or full-candidate execution.
+The run lasted 43.351 seconds, from 01:07:22 to 01:08:05 UTC. The native test,
+target and Script prelude are unchanged since that run. Four filename comments
+in *entry.mjs* were subsequently wrapped; removing line comments gives
+byte-identical executable source before and after the edit. The original
+fixture bytes are retained in author commit
+`e8c51bab2aaff2742b8d88b172eaf926fd4b036c`. The audit binds the current
+reviewed fixture sources. A separately logged *native-final* run checks the
+wrapped source under the same raw-evidence directory. No compiler or runtime
+product input changed. This is Linux author evidence, without macOS or
+full-candidate execution.
 
 The source suite checks the three static negative reference groups under
 Node.js and Deno and the independent Oseo parser/linker assertions. Its
