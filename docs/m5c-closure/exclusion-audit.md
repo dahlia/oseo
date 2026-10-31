@@ -105,8 +105,11 @@ The mixed assessment names
 `disposition: remediation` with `normativeDependency: not-demonstrated`.
 ADR 0013 authorizes the accessor rejection, not exclusion of the whole path.
 The RegExp split assessment separately names its existing remediation owner.
-The checker accepts only these bounded Annex B owners and requires each
-ledger owner to have a reviewed assessment.
+The `annex-b-ordinary-object-prototype` assessment names
+`node:ordinary-object-proto-coverage-remediation` for
+*test/language/types/object/S8.6.2\_A8.js* with the same disposition and
+normative dependency. The checker accepts only these three bounded Annex B
+owners and requires each ledger owner to have a reviewed assessment.
 
 The new assessment binds the replacement source digest in
 `replacementEvidence`. The `typed-array-buffer-without-species-core` fixture
@@ -118,6 +121,11 @@ and retains the original upstream path unchanged. Existing constructor
 properties supply generated constructor, clone, and buffer coverage.
 Replacement evidence supports the core contract; assigning an exclusion still
 requires the remediation node's maintainer accounting decision.
+
+The checker requires replacement evidence only for the TypedArray owner. The
+ordinary-object assessment binds none: no reviewed replacement observation yet
+witnesses every core subject of *S8.6.2\_A8.js*, so its node must supply one,
+or obtain a maintainer accounting decision, before any exclusion.
 
 
 Dynamic import attributes and JSON identity

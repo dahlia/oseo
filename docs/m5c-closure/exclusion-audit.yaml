@@ -5465,6 +5465,19 @@ assessments:
       observation digests bind every assessment to its original subject. No
       equivalent replacement or whole-path exclusion is claimed; ADR 0013,
       ADR 0016 and ADR 0019 and their reopening triggers remain unchanged.
+  annex-b-ordinary-object-prototype:
+    disposition: remediation
+    normativeDependency: not-demonstrated
+    remediationOwner: node:ordinary-object-proto-coverage-remediation
+    reason: The only observed failure is the excluded Annex B
+      __proto__ write, rejected at compile time in every strictness
+      and specialization variant. The source swallows any exception
+      from that write and asserts only that Object.getPrototypeOf of a
+      non-extensible ordinary object still returns Object.prototype,
+      the OrdinarySetPrototypeOf immutability contract. That core
+      contract does not normatively require Annex B. No replacement
+      observation yet witnesses every core subject, so retain bounded
+      remediation without authorizing a whole-path exclusion.
 paths:
   - path: test/built-ins/AggregateError/newtarget-proto-fallback.js
     proposedOwner: adr:0016-dynamic-source-boundary
@@ -29494,6 +29507,17 @@ paths:
     section: "sec-with-statement-runtime-semantics-evaluation"
     subject: "Creation of new variable environment"
     assessment: "observation-train-dynamic-coverage"
+  - path: test/language/types/object/S8.6.2_A8.js
+    proposedOwner: adr:0013-m5-edition-and-manifest
+    priorCohort: annex-b
+    sourceDigest: "0c92e702f4e4cdd08b5058e206af0532161c6ace2e3319ad45\
+      065a29ceb4e967"
+    observationDigest: "092010049ab09a3d2abbe5c4c5b3226b41f59d2bc104\
+      14d134a1a4e45f065ec3"
+    missingDynamicTag: false
+    section: sec-ordinarysetprototypeof
+    subject: Non-extensible ordinary object [[Prototype]] immutability
+    assessment: annex-b-ordinary-object-prototype
   - path: test/language/types/reference/8.7.2-1-s.js
     proposedOwner: adr:0016-dynamic-source-boundary
     priorCohort: incidental-scaffolding

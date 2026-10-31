@@ -26,6 +26,8 @@ const remediationOwner = "node:dynamic-source-coverage-remediation";
 const annexOwner = "adr:0013-m5-edition-and-manifest";
 const annexRemediationOwner = "node:regexp-split-coverage-remediation";
 const protoRemediationOwner = "node:typed-array-proto-coverage-remediation";
+const ordinaryProtoRemediationOwner =
+  "node:ordinary-object-proto-coverage-remediation";
 const lookupRemediationOwner =
   "node:class-private-accessor-lookup-coverage-remediation";
 const callerOwner = "adr:0028-legacy-function-caller-boundary";
@@ -788,6 +790,7 @@ function expectedAuditCounts(ledger: M5cClosureLedger) {
       entry.owner === remediationOwner ||
       entry.owner === annexRemediationOwner ||
       entry.owner === protoRemediationOwner ||
+      entry.owner === ordinaryProtoRemediationOwner ||
       entry.owner === lookupRemediationOwner,
   );
   return {
@@ -799,6 +802,7 @@ function expectedAuditCounts(ledger: M5cClosureLedger) {
         entry.owner !== callerOwner &&
         entry.owner !== annexRemediationOwner &&
         entry.owner !== protoRemediationOwner &&
+        entry.owner !== ordinaryProtoRemediationOwner &&
         entry.owner !== lookupRemediationOwner &&
         !entry.prerequisites.includes("dynamic-source"),
     ).length,
@@ -992,6 +996,65 @@ test("the exact Annex B accessor rejection uses its assessed owner", () => {
       /no reviewed exclusion audit/u,
     );
   }
+});
+
+test("the ordinary-object accessor owner accepts only the rejection", () => {
+  const detail =
+    "error[OSEO1001]: The Object.prototype.__proto__ accessor " +
+    "is excluded by Annex B.";
+  const { audit, inputs } = fixture(true);
+  audit.paths[0]!.proposedOwner = annexOwner;
+  audit.paths[0]!.missingDynamicTag = false;
+  audit.assessments.reviewed.remediationOwner = ordinaryProtoRemediationOwner;
+  Reflect.deleteProperty(audit.assessments.reviewed, "replacementEvidence");
+  const observed = {
+    ...observation,
+    detail: `failed (1): stdout="" stderr="test/case.js:1:1: ${detail}\\n"`,
+  };
+  audit.paths[0]!.observationDigest = exclusionObservationDigest(observed);
+  const annexInputs: M5cExclusionAuditInputs = {
+    ...inputs,
+    results: [{ ...result, observation: observed }],
+    ledger: {
+      ...inputs.ledger,
+      entries: inputs.ledger.entries.map((entry) =>
+        Object.assign({}, entry, { owner: ordinaryProtoRemediationOwner }),
+      ),
+    },
+  };
+  // Unlike the TypedArray owner, this owner binds no replacement evidence:
+  // its node still has to supply a witness for every core subject.
+  assert.equal(
+    validateM5cExclusionAudit(stringifyYaml(audit), {
+      ...annexInputs,
+      replacementEvidence: new Map(),
+    }).remediation,
+    1,
+  );
+  audit.assessments.reviewed.disposition = "exclusion";
+  assert.throws(
+    () => validateM5cExclusionAudit(stringifyYaml(audit), annexInputs),
+    /Unresolved subject coverage cannot keep an ADR/u,
+  );
+  audit.assessments.reviewed.disposition = "remediation";
+  const unrelated = {
+    ...observation,
+    detail: "error[OSEO1001]: Unknown binding 'eval'.",
+  };
+  audit.paths[0]!.observationDigest = exclusionObservationDigest(unrelated);
+  assert.throws(
+    () =>
+      validateM5cExclusionAudit(stringifyYaml(audit), {
+        ...annexInputs,
+        results: [{ ...result, observation: unrelated }],
+      }),
+    /outside the record surface/u,
+  );
+  audit.paths = [];
+  assert.throws(
+    () => validateM5cExclusionAudit(stringifyYaml(audit), annexInputs),
+    /no reviewed exclusion audit/u,
+  );
 });
 
 test("near-miss accessor diagnostics preserve unrelated failures", () => {

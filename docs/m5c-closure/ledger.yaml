@@ -13,8 +13,8 @@ states:
   infrastructure-failure: 0
   pass: 34751
   semantic-failure: 0
-  unreviewed: 1
-  unsupported-profile-feature: 1938
+  unreviewed: 0
+  unsupported-profile-feature: 1939
 owners:
   adr:0013-m5-edition-and-manifest:
     note: "ADR 0013 excludes Annex B legacy web semantics and reports Annex
@@ -338,10 +338,11 @@ owners:
       claimed; see docs/m5c-graph/observation-batch-26a.md,
       observation-batch-26b.md and observation-batch-27.md."
     paths: 334
-  node:observation-batch-28:
-    note: Unreviewed paths that docs/m5c-closure/observation-batches.yaml
-      selects for observation-batch-28. The batch observes them; no
-      classification is assumed before it does.
+  node:ordinary-object-proto-coverage-remediation:
+    note: Observation-batch-28 admits S8.6.2_A8.js as unsupported because
+      its __proto__ write reaches the Annex B OSEO1001 rejection. Its
+      core non-extensible [[Prototype]] subject remains remediation, not
+      an exclusion.
     paths: 1
   node:unhandled-rejection-observation:
     note: "Runtime capability unhandled-rejection-policy; 20 paths.
@@ -41314,7 +41315,7 @@ paths:
   test/language/types/object/S8.6.2_A5_T4.js: [pass, observation]
   test/language/types/object/S8.6.2_A6.js: [pass, observation]
   test/language/types/object/S8.6.2_A7.js: [pass, observation]
-  test/language/types/object/S8.6.2_A8.js: [unreviewed, node:observation-batch-28]
+  test/language/types/object/S8.6.2_A8.js: [unsupported-profile-feature, node:ordinary-object-proto-coverage-remediation, [object-literals, object-properties, var-bindings]]
   test/language/types/object/S8.6_A2_T1.js: [pass, observation]
   test/language/types/object/S8.6_A2_T2.js: [pass, observation]
   test/language/types/object/S8.6_A3_T1.js: [pass, observation]
