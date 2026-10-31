@@ -293,7 +293,11 @@ delivers: "Resolves the 334 reviewed unsupported paths assigned to
   observation-batch-27.md. No replacement, exclusion or ADR change is
   claimed. Root's bundle 4 scoped UPDATE then observed
   statements/function/S13.2.2_A13.js as pass on the bundle 3 runtime,
-  leaving 334."
+  leaving 334. dynamic-source-trainc-ordinary-evidence then accounts for
+  26 of its 44 train C paths under ADR 0016 with static, grammar and
+  literal host Script witnesses compared strictly and keeps 18
+  caller-local direct eval environment paths, leaving 308; see
+  docs/m5c-graph/dynamic-source-trainc-ordinary-assessment.md."
 dependencies:
   - authorized-exclusion-audit
   - dynamic-source-binding-reference-evidence

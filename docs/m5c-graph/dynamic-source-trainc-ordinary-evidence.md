@@ -67,3 +67,14 @@ commit. Evidence requires focused native runs through
 `run-gate.py --wait-lock`, focused tests and fast non-native tests; no full or
 extended gate or UPDATE. Review uses scope `trainc-ordinary-evidence` with the
 pre-gate and internal reviewers; reviewers are read-only.
+
+
+Evidence candidate
+------------------
+
+The per-path assessment is
+[*dynamic-source-trainc-ordinary-assessment.md*](./dynamic-source-trainc-ordinary-assessment.md).
+All 26 Function-constructor paths close under ADR 0016 through the
+`trainc-strict-restricted-static`, `trainc-sloppy-body-static` and
+`trainc-constructor-phase` assessments. The 18 caller-local paths keep umbrella
+ownership with an exact per-path reason, so the umbrella owns 308 paths.
