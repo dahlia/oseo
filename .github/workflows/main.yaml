@@ -240,14 +240,45 @@ jobs:
           toolchain: host-cc
       # Each shard retains its own instrumentation preflight.
       - run: mise run test:sanitizer:self
+      # Node's positional shards, without the dedicated sanitizer files.
       - run: >-
-          mise run test:sanitizer:property:shard
-          --test-shard=${{ matrix.shard }}/3
-          tests/property/*.property.test.ts
+          mise run test:sanitizer:property:shared
+          --shard ${{ matrix.shard }}/3
       - if: failure() || cancelled()
         uses: actions/upload-artifact@v7
         with:
           name: host-cc-sanitizer-property-failures-${{ matrix.shard }}-of-3
+          path: /tmp/oseo-native-*
+          if-no-files-found: warn
+
+  # The dedicated sanitizer property files, left out of the shards above;
+  # see docs/evidence/regexp-literal-exhaustive/README.md. Every case keeps
+  # its ordinary budget and the lane's interrupt scale.
+  test_sanitizer_property_dedicated:
+    name: host C sanitizers (Linux, property, regexp literals)
+    if: ${{ !cancelled() }}
+    needs:
+      - mac_ready
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: jdx/mise-action@v4
+        with:
+          install: true
+      - uses: ./.github/actions/runtime-archive-cache
+        with:
+          toolchain: host-cc
+      - run: mise run test:sanitizer:self
+      - run: >-
+          mise run test:sanitizer:property:shard
+          tests/property/m5-regexp-literal-exhaustive.property.test.ts
+      - if: failure() || cancelled()
+        uses: actions/upload-artifact@v7
+        with:
+          name: host-cc-sanitizer-property-regexp-literals-failures
           path: /tmp/oseo-native-*
           if-no-files-found: warn
 
@@ -562,6 +593,7 @@ jobs:
     needs:
       - test_native
       - test_sanitizer_property
+      - test_sanitizer_property_dedicated
       - test_native_support
       - test_property_case
       - test_reflect_case
@@ -573,6 +605,7 @@ jobs:
       - test_native_macos_3
       - test_sanitizer_macos_macos_native_1
       - test_sanitizer_macos_macos_native_2
+      - test_sanitizer_macos_macos_property_regexp_literals
       - test_test262_macos_1
       - test_test262_macos_2
       - test_test262_macos_3
@@ -676,8 +709,10 @@ jobs:
     needs: mac_ready
     # Each job retains its own instrumentation preflight. The native suite
     # runs as two file shards, with the unsharded runtime fixtures on the
-    # first; see docs/evidence/macos-sanitizer-split/README.md. 75 minutes
-    # leaves room for setup, cold caches, and slower runner images.
+    # first; see docs/evidence/macos-sanitizer-split/README.md. The listed
+    # dedicated property files run in their own job; see
+    # docs/evidence/regexp-literal-exhaustive/README.md. 75 minutes leaves
+    # room for setup, cold caches, and slower runner images.
     timeout-minutes: 75
     env:
       OSEO_HOST_CC: clang
@@ -699,7 +734,7 @@ jobs:
         env:
           TMPDIR: ${{ runner.temp }}
       # No GCC verification: macOS gcc is an Apple Clang alias.
-      - run: mise run test:sanitizer:property
+      - run: mise run test:sanitizer:property:shared
         env:
           # Four workers share three CPUs. Double Linux's interrupt allowance,
           # retaining every ordinary case and seed; interruptions still fail.
@@ -712,6 +747,52 @@ jobs:
           path: ${{ runner.temp }}/oseo-native-*
           if-no-files-found: warn
 
+  test_sanitizer_macos_macos_property_regexp_literals:
+    name: host C sanitizers (macOS, property, regexp literals)
+    runs-on: macos-15
+    if: ${{ !cancelled() }}
+    needs: test_sanitizer_macos_macos_property
+    # Each job retains its own instrumentation preflight. The native suite
+    # runs as two file shards, with the unsharded runtime fixtures on the
+    # first; see docs/evidence/macos-sanitizer-split/README.md. The listed
+    # dedicated property files run in their own job; see
+    # docs/evidence/regexp-literal-exhaustive/README.md. 75 minutes leaves
+    # room for setup, cold caches, and slower runner images.
+    timeout-minutes: 75
+    env:
+      OSEO_HOST_CC: clang
+    steps:
+      - name: Record macOS host version
+        run: sw_vers -productVersion
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: jdx/mise-action@v4
+        with:
+          install: true
+      - uses: ./.github/actions/runtime-archive-cache
+        with:
+          toolchain: host-cc
+        env:
+          TMPDIR: ${{ runner.temp }}
+      - run: mise run test:sanitizer:self
+        env:
+          TMPDIR: ${{ runner.temp }}
+      # No GCC verification: macOS gcc is an Apple Clang alias.
+      - run: >-
+          mise run test:sanitizer:property:shard
+          tests/property/m5-regexp-literal-exhaustive.property.test.ts
+        env:
+          # The same allowance as the shared property job on this runner.
+          OSEO_PROPERTY_TIME_SCALE: "6"
+          TMPDIR: ${{ runner.temp }}
+      - if: failure() || cancelled()
+        uses: actions/upload-artifact@v7
+        with:
+          name: host-cc-sanitizer-macos-property-regexp-literals-failures
+          path: ${{ runner.temp }}/oseo-native-*
+          if-no-files-found: warn
+
   # macOS lane 2, longest jobs first.
   test_sanitizer_macos_macos_native_1:
     name: host C sanitizers (macOS, native, 1/2)
@@ -720,8 +801,10 @@ jobs:
     needs: mac_ready
     # Each job retains its own instrumentation preflight. The native suite
     # runs as two file shards, with the unsharded runtime fixtures on the
-    # first; see docs/evidence/macos-sanitizer-split/README.md. 75 minutes
-    # leaves room for setup, cold caches, and slower runner images.
+    # first; see docs/evidence/macos-sanitizer-split/README.md. The listed
+    # dedicated property files run in their own job; see
+    # docs/evidence/regexp-literal-exhaustive/README.md. 75 minutes leaves
+    # room for setup, cold caches, and slower runner images.
     timeout-minutes: 75
     env:
       OSEO_HOST_CC: clang
@@ -765,8 +848,10 @@ jobs:
     needs: test_sanitizer_macos_macos_native_1
     # Each job retains its own instrumentation preflight. The native suite
     # runs as two file shards, with the unsharded runtime fixtures on the
-    # first; see docs/evidence/macos-sanitizer-split/README.md. 75 minutes
-    # leaves room for setup, cold caches, and slower runner images.
+    # first; see docs/evidence/macos-sanitizer-split/README.md. The listed
+    # dedicated property files run in their own job; see
+    # docs/evidence/regexp-literal-exhaustive/README.md. 75 minutes leaves
+    # room for setup, cold caches, and slower runner images.
     timeout-minutes: 75
     env:
       OSEO_HOST_CC: clang

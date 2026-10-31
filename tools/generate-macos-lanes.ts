@@ -134,6 +134,19 @@ export function macosJobs(): readonly MacosLaneJob[] {
     "host C sanitizers (macOS, property)",
     { suite: "property", label: "property", part: "property", runtime: 0 },
   );
+  // The dedicated sanitizer property files chain on the property lane; see
+  // docs/evidence/regexp-literal-exhaustive/README.md.
+  add(
+    "test_sanitizer_macos",
+    "property_regexp_literals",
+    "host C sanitizers (macOS, property, regexp literals)",
+    {
+      suite: "property",
+      label: "property, regexp literals",
+      part: "property-regexp-literals",
+      runtime: 0,
+    },
+  );
   for (const [sourceId, family] of [
     ["test_test262", "test262"],
     ["test_native_support", "native support"],
@@ -795,8 +808,8 @@ export function generateMacosWorkflow(
   }
   // The macOS-only template jobs exist only as their generated lane jobs.
   // Of the sanitizer jobs, the aggregate requires the native shards, which
-  // together cover the whole native suite; the property suite keeps its
-  // own standing.
+  // together cover the whole native suite, and the dedicated property files'
+  // job, as on Linux; the shared property suite keeps its own standing.
   const required = [
     ...nativeIds.filter(
       (id) =>
@@ -807,7 +820,7 @@ export function generateMacosWorkflow(
         (job) =>
           nativeIds.includes(job.sourceId) &&
           (job.sourceId !== "test_sanitizer_macos" ||
-            job.matrix.suite === "native"),
+            job.matrix.part !== "property"),
       )
       .map((job) => job.id),
   ];

@@ -593,6 +593,21 @@ puts the additional job on one of the existing five hosted macOS lanes;
 `native` requires its result even if an earlier lane job fails. See
 [*macOS Array placement evidence*](docs/evidence/array-macos/README.md).
 
+The host C sanitizer property jobs exclude the files in
+`dedicatedSanitizerPropertyFiles`, now only
+*tests/property/m5-regexp-literal-exhaustive.property.test.ts*. Each host
+runs them in one dedicated sanitizer job with every ordinary case, seed and
+interrupt limit, and `native` requires both. The shared jobs use
+`test:sanitizer:property:shared`: *tools/sanitizer-property-shard.ts* keeps
+the files Node's `--test-shard` would select from the complete property list
+and only then drops the dedicated ones, so no other file changes shard. The
+shared shards and the dedicated jobs execute the inventory exactly once. On
+macOS the dedicated job chains on the property sanitizer lane and takes no
+extra hosted slot, as the two native sanitizer shards chain on theirs. See
+[*exhaustive RegExp literal evidence*](docs/evidence/regexp-literal-exhaustive/README.md)
+and
+[*macOS native sanitizer split*](docs/evidence/macos-sanitizer-split/README.md).
+
 The local unsharded extended
 task still runs every file with all cases. The Linux singleton rule still
 applies to wrapper invocations that include

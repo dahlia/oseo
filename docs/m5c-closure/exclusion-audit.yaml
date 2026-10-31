@@ -674,18 +674,6 @@ assessments:
       observe the StatementList value, returned object, or returned function;
       substituting a return statement would not prove Completion Record
       equivalence. No complete replacement is established.
-  ds3-literal-coverage:
-    disposition: remediation
-    normativeDependency: not-demonstrated
-    reason: >-
-      The five remaining DS-3 literal probes retain the strict octal error and
-      the four selected BMP character/source domains, including
-      UnicodeIDContinue fallback, listed in
-      docs/m5c-graph/dynamic-source-unknown-eval-assessment.md. No complete
-      replacement is established for those five contracts; an unknown eval
-      binding diagnostic is not such evidence. The other 18 original literal
-      grammar probes now use ds17-static-literal-grammar and its reviewed
-      static rejection witnesses.
   ds3-import-from-eval:
     disposition: remediation
     normativeDependency: not-demonstrated
@@ -5324,6 +5312,45 @@ assessments:
       tests/regexp-static-grammar.test.ts:
         "6582ae85e7bca86210008bfb7640b9942d58786b2bb32b\
         97d0a9a824c8d960f1"
+  ds17-exhaustive-plain-literals:
+    disposition: exclusion
+    normativeDependency: source-evaluation-only
+    reason: >-
+      Maintainer decision 2026-10-28 item 1, with the 2026-11-01 answer item 2
+      approving exhaustive coverage, applies to S7.8.5_A1.1_T2 and
+      S7.8.5_A2.1_T2. The exhaustive literal property compiles every one of
+      the 65,521 code units each original loop selects as a build-time literal
+      in both strictness modes, and each is accepted with its exact source.
+      Every one then executes natively as a literal whose source the program
+      compares with the original's spelling, on the reference host too. No
+      sample or RegExp constructor substitutes for a literal. Only eval of the
+      literal text remains. Reopen on changed source, observations or
+      replacement evidence, or an ADR 0016 amendment admitting eval; ADR 0019
+      non-source reopening remains in force.
+    replacementEvidence:
+      tests/property/m5-regexp-literal-exhaustive.property.test.ts:
+        "0231397301b0298580bbe87634690f4f279ce3676410d5\
+        50bb3ab68649f669fc"
+  ds17-exhaustive-escaped-annex-b:
+    disposition: remediation
+    normativeDependency: not-demonstrated
+    remediationOwner: node:dynamic-source-regexp-exhaustive
+    reason: >-
+      S7.8.5_A1.4_T2 and S7.8.5_A2.4_T2 select 65,521 escaped code units each.
+      The exhaustive literal property witnesses 14,737 accepted with exact
+      source at build time and natively, and 50,782 rejected with the Annex B
+      OSEO1001 diagnostic whose code unit is ID_Continue and passes the
+      original's var _X check, the original's SyntaxError fallback. U+200C and
+      U+200D remain: Unicode 15.1 made them ID_Continue, so the core grammar
+      rejects their identity escapes, but the originals exempt them from the
+      fallback. Only Annex B's identity escape meets those two assertions, the
+      shape of the 2026-10-28 maintainer decision item 3, which is authorized
+      per path. Root asked the maintainer whether to extend it; until then
+      this node owns both paths as remediation.
+    replacementEvidence:
+      tests/property/m5-regexp-literal-exhaustive.property.test.ts:
+        "0231397301b0298580bbe87634690f4f279ce3676410d5\
+        50bb3ab68649f669fc"
   residual-exact-completion:
     disposition: exclusion
     normativeDependency: source-evaluation-only
@@ -24767,7 +24794,7 @@ paths:
     missingDynamicTag: false
     section: "Original es5id: 7.8.5_A1.1_T2"
     subject: "Complex test with eval, using syntax pattern"
-    assessment: ds3-literal-coverage
+    assessment: ds17-exhaustive-plain-literals
   - path: "test/language/literals/regexp/S7.8.5_A1.3_T2.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "incidental-scaffolding"
@@ -24826,7 +24853,7 @@ paths:
     missingDynamicTag: false
     section: "Original es5id: 7.8.5_A1.4_T2"
     subject: "Complex test with eval, using syntax pattern"
-    assessment: ds3-literal-coverage
+    assessment: ds17-exhaustive-escaped-annex-b
   - path: "test/language/literals/regexp/S7.8.5_A1.5_T2.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "incidental-scaffolding"
@@ -24885,7 +24912,7 @@ paths:
     missingDynamicTag: false
     section: "Original es5id: 7.8.5_A2.1_T2"
     subject: "Complex test with eval, using syntax pattern"
-    assessment: ds3-literal-coverage
+    assessment: ds17-exhaustive-plain-literals
   - path: "test/language/literals/regexp/S7.8.5_A2.3_T2.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "incidental-scaffolding"
@@ -24944,7 +24971,7 @@ paths:
     missingDynamicTag: false
     section: "Original es5id: 7.8.5_A2.4_T2"
     subject: "Complex test with eval, using syntax pattern"
-    assessment: ds3-literal-coverage
+    assessment: ds17-exhaustive-escaped-annex-b
   - path: "test/language/literals/regexp/S7.8.5_A2.5_T2.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "incidental-scaffolding"

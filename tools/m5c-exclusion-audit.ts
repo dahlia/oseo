@@ -29,6 +29,14 @@ const auditPath = "docs/m5c-closure/exclusion-audit.yaml";
 const dynamicOwner = "adr:0016-dynamic-source-boundary";
 const annexOwner = "adr:0013-m5-edition-and-manifest";
 const remediationOwner = "node:dynamic-source-coverage-remediation";
+/**
+ * Umbrella children that own the dynamic-source remediation rows their own
+ * assessment names. Any other dynamic-source remediation row stays with the
+ * umbrella.
+ */
+const dynamicRemediationOwners: ReadonlySet<string> = new Set([
+  "node:dynamic-source-regexp-exhaustive",
+]);
 const importAttributesOwner =
   "node:import-attributes-dynamic-coverage-remediation";
 const importAttributesReservationPath =
@@ -640,7 +648,10 @@ export function validateM5cExclusionAudit(
       ? proposedOwner
       : proposedOwner === annexOwner
         ? annexRemediationOwner
-        : remediationOwner;
+        : isString(assessment.remediationOwner) &&
+            dynamicRemediationOwners.has(assessment.remediationOwner)
+          ? assessment.remediationOwner
+          : remediationOwner;
     if (entry.owner !== owner) {
       throw new Error(`Audit requires owner ${owner} for ${path}.`);
     }
@@ -651,6 +662,7 @@ export function validateM5cExclusionAudit(
     if (
       (entry.owner.startsWith("adr:") ||
         entry.owner === remediationOwner ||
+        dynamicRemediationOwners.has(entry.owner) ||
         entry.owner === importAttributesOwner ||
         entry.owner === lookupRemediationOwner ||
         annexRemediationOwners.has(entry.owner)) &&

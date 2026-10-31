@@ -76,3 +76,59 @@ shards. Audit-only candidates: zero.
 
 Each closure needs normal D1/D11 review and D3/D4 publication. Root owns
 integration and publication.
+
+
+Implementation delta
+--------------------
+
+*tests/property/m5-regexp-literal-exhaustive.property.test.ts* reproduces
+each original loop, its exclusions and its fallback condition. Build-time
+tests compile every selected code unit as the literal the original evaluates,
+`/` + text + `/` with no flags, in sloppy and strict scripts:
+
+ -  An accepted literal must compile with no diagnostic to exactly one
+    ahead-of-time literal whose recorded source is the original's spelling
+    and whose flags are empty.
+ -  A rejected literal is allowed only in the escaped domains. Every
+    diagnostic must be `OSEO1001` with the Annex B message, the code unit
+    must not be one the original exempts, and `var _X` must compile, which is
+    the original's own UnicodeIDContinue check.
+ -  Both strictness modes must agree. Independently of the parser, the
+    accepted set must equal the selected code units outside `ID_Continue` of
+    the pinned Unicode tables plus the core escapes
+    `f n r t v d D s S w W b B 0`.
+
+Four native properties execute all 160,516 accepted literals, each once per
+run, comparing `source` in the program with the spelling the original builds
+from the same code unit through `String.fromCharCode`. The reference host
+runs every program from memory, the build must emit one literal descriptor
+per selected code unit, and mutation controls show that a wrong prefix or a
+wrong code unit fails before the success line.
+
+No parser, escape or source defect was found, so `packages/` is unchanged.
+
+The witness found one residue. Unicode 15.1 made ZWNJ and ZWJ
+`ID_Continue`, and the pinned tables are Unicode 17. The core grammar
+therefore rejects `‌` and `‍` as identity escapes, while both
+escaped originals exempt exactly these two code units from their fallback
+and rethrow. Only Annex B's identity escape satisfies those two assertions;
+every other code unit of the four originals is witnessed.
+
+Root's ruling of 2026-11-01 closes S7.8.5\_A1.1\_T2 and S7.8.5\_A2.1\_T2 under
+ADR 0016 through the new `ds17-exhaustive-plain-literals` assessment. The
+two escaped paths stay unsupported remediation under
+`ds17-exhaustive-escaped-annex-b`, owned by this node rather than the
+umbrella. Their shape matches item 3 of the 2026-10-28 maintainer decision,
+which is authorized per path, and Root asked the maintainer whether to
+extend it. This node does not land until that answer. The exclusion audit
+lets an umbrella child own the dynamic-source remediation its assessment
+names; the checker lists this node as the only such owner.
+
+Cost, shard weights and CI placement are recorded in
+[*exhaustive RegExp literal evidence*](../evidence/regexp-literal-exhaustive/README.md).
+The macOS native sanitizer split is recorded in
+[*macOS native sanitizer split*](../evidence/macos-sanitizer-split/README.md).
+
+The subset, classifications, dependency tags and observations are unchanged,
+so no test262 UPDATE is needed. The test262 runner reads none of the changed
+*tools/* files.

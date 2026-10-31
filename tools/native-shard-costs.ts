@@ -120,6 +120,11 @@
  * at the unchanged source seed and size. This is a local case duration,
  * not a CI file-shard sum or a matching-host macOS measurement. macOS
  * keeps the unknown-file median fallback. See U6 provenance.
+ *
+ * Exhaustive RegExp literals use one local Linux AMD64 extended case sum
+ * of eleven registrations. Its macOS entry is a provisional estimate, the
+ * Linux weight scaled by the AOT literal file's 353/608 host ratio, not a
+ * measurement. See U6 provenance.
  */
 export const nativeShardCosts = {
   "linux-x86_64-gnu": {
@@ -236,6 +241,7 @@ export const nativeShardCosts = {
     "tests/property/m5-reflect-namespace.property.test.ts": 2299,
     "tests/property/m5-regexp-intrinsic.property.test.ts": 344,
     "tests/property/m5-regexp-literal-aot.property.test.ts": 608,
+    "tests/property/m5-regexp-literal-exhaustive.property.test.ts": 1585,
     "tests/property/m5-regexp-matcher.property.test.ts": 7,
     "tests/property/m5-regexp-pattern-extensions.property.test.ts": 53,
     "tests/property/m5-regexp-pattern.property.test.ts": 2,
@@ -394,6 +400,7 @@ export const nativeShardCosts = {
     "tests/property/m5-reflect-namespace.property.test.ts": 2283,
     "tests/property/m5-regexp-intrinsic.property.test.ts": 185,
     "tests/property/m5-regexp-literal-aot.property.test.ts": 353,
+    "tests/property/m5-regexp-literal-exhaustive.property.test.ts": 921,
     "tests/property/m5-regexp-matcher.property.test.ts": 4,
     "tests/property/m5-regexp-pattern-extensions.property.test.ts": 44,
     "tests/property/m5-regexp-pattern.property.test.ts": 2,

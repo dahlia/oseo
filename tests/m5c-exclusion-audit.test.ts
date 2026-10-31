@@ -540,6 +540,61 @@ test("unresolved non-source coverage requires remediation ownership", () => {
   );
 });
 
+test("an umbrella child owns the dynamic remediation it assesses", () => {
+  const child = "node:dynamic-source-regexp-exhaustive";
+  const { audit, inputs } = fixture(true);
+  audit.assessments.reviewed.remediationOwner = child;
+  assert.throws(
+    () => validateM5cExclusionAudit(stringifyYaml(audit), inputs),
+    /requires owner node:dynamic-source-regexp-exhaustive/u,
+  );
+  const owned = {
+    ...inputs,
+    ledger: {
+      ...inputs.ledger,
+      entries: [
+        {
+          path,
+          owner: child,
+          prerequisites: result.dependencies,
+          state: result.classification,
+        },
+      ],
+    },
+  };
+  assert.equal(
+    validateM5cExclusionAudit(stringifyYaml(audit), owned).remediation,
+    1,
+  );
+  // An exclusion keeps its record owner whatever the assessment names.
+  audit.assessments.reviewed.disposition = "exclusion";
+  assert.throws(
+    () => validateM5cExclusionAudit(stringifyYaml(audit), owned),
+    /Unresolved subject coverage cannot keep an ADR|requires owner adr:/u,
+  );
+  // The child owner still needs an audit row for every path it owns.
+  const unaudited = {
+    ...owned,
+    ledger: {
+      ...owned.ledger,
+      entries: [
+        ...owned.ledger.entries,
+        {
+          path: "test/language/eval-code/unaudited.js",
+          owner: child,
+          prerequisites: [],
+          state: "unsupported-profile-feature" as const,
+        },
+      ],
+    },
+  };
+  audit.assessments.reviewed.disposition = "remediation";
+  assert.throws(
+    () => validateM5cExclusionAudit(stringifyYaml(audit), unaudited),
+    /Ledger owner has no reviewed exclusion audit/u,
+  );
+});
+
 test("withdrawn records and stale source, observation, or tags fail", () => {
   const { audit, inputs } = fixture();
   const text = stringifyYaml(audit);
@@ -788,6 +843,7 @@ function expectedAuditCounts(ledger: M5cClosureLedger) {
   const remediation = ledger.entries.filter(
     (entry) =>
       entry.owner === remediationOwner ||
+      entry.owner === "node:dynamic-source-regexp-exhaustive" ||
       entry.owner === annexRemediationOwner ||
       entry.owner === protoRemediationOwner ||
       entry.owner === ordinaryProtoRemediationOwner ||

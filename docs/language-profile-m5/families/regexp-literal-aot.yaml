@@ -85,6 +85,7 @@ evidence:
     references:
       - tests/native/fixtures/regexp-literal-aot.ts
       - tests/property/m5-regexp-literal-aot.property.test.ts
+      - tests/property/m5-regexp-literal-exhaustive.property.test.ts
       - packages/cli/src/regexp-unicode.ts
   fixed:
     status: covered
@@ -104,6 +105,7 @@ evidence:
     references:
       - tests/property-seeds.yaml
       - tests/property/m5-regexp-literal-aot.property.test.ts
+      - tests/property/m5-regexp-literal-exhaustive.property.test.ts
   guard-fallback:
     status: covered
     references:
