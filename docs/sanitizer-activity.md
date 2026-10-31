@@ -353,12 +353,20 @@ the maintainer's five macOS slots. A single late-starting job could add almost
 the entire lane's duration. Earlier splitting of the longest macOS job family
 reduced a repository run from 260.8 to 181.4 minutes; that observation
 motivates the split but does not predict this lane's wall time. Two jobs also
-limit repeated setup costs. Each has a 75-minute timeout: about 31 minutes
-above the larger central estimate, and roughly 16 minutes above its
-proportional share of the 105-minute upper planning bound. That margin covers
-tool installation, cold archives, runner variation, and corpus growth. Queue
-time is separate; the split does not reduce total compiler work or guarantee
-earlier scheduling.
+limit repeated setup costs. The property job keeps a 75-minute timeout: about
+31 minutes above the larger central estimate, and roughly 16 minutes above
+its proportional share of the 105-minute upper planning bound. On commit
+`216503f8`, run `41191483370` attempt 1 cancelled
+`test_sanitizer_macos_macos_native` at 75.48 minutes on runner instance
+`1000093502`; attempt 2 of the same run passed the same commit at 58.92
+minutes on instance `1000093512`, so that job now gets 90 minutes. Main runs
+`41201259627` at `999f3416` and `41212096408` at `4e4d8a4a` measured 54.05
+and 61.72 minutes with the same image and toolchain. The per-fixture progress
+lines show attempt 1 running 20 to 40 percent slower across every large
+fixture, which reads as runner variance rather than a workload regression.
+Those margins cover tool installation, cold archives, runner variation, and
+corpus growth. Queue time is separate; the split does not reduce total
+compiler work or guarantee earlier scheduling.
 
 The property job retains four Node workers and sets
 `OSEO_PROPERTY_TIME_SCALE=6`, twice Linux's value of 3, because four compiling

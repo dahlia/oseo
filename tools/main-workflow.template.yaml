@@ -292,16 +292,21 @@ jobs:
   test_sanitizer_macos:
     name: host C sanitizers (macOS, ${{ matrix.suite }})
     runs-on: macos-15
-    # Each suite retains its own instrumentation preflight.
-    # About 36–44 minutes for runtime/native and 29–35 for properties;
-    # 75 minutes leaves room for setup, cold caches, and slower runner images.
-    timeout-minutes: 75
+    # Each suite retains its own instrumentation preflight. About 36–44
+    # minutes for runtime/native and 29–35 for properties. Run 41191483370
+    # cancelled native at 75.5 minutes on commit 216503f8 and passed its
+    # rerun at 58.9, so native gets 90 and property keeps 75; see
+    # docs/sanitizer-activity.md. Each leaves room for setup, cold caches,
+    # and slower runner images.
+    timeout-minutes: ${{ matrix.timeout }}
     strategy:
       fail-fast: false
       matrix:
-        suite:
-          - native
-          - property
+        include:
+          - suite: native
+            timeout: 90
+          - suite: property
+            timeout: 75
     env:
       OSEO_HOST_CC: clang
     steps:

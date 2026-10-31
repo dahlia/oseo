@@ -131,7 +131,7 @@ An initial experiment forcing collection at every safepoint in every
 large generated case hit the 180-second interrupt. The coordinator approved
 normal collection for generated cases. Final Fable review found that the
 pinned runner has no individual execution timeout: the actual constraint
-is the sanitizer native CI job's 75-minute limit. The coordinator superseded
+is the sanitizer native CI job's 90-minute limit. The coordinator superseded
 the earlier scheduling approval: force collection at every safepoint in
 the 2,048-element fixture under both policies, and use normal collection
 in the 4,096-element fixture. All semantic checks and property case and
