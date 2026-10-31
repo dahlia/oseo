@@ -129,10 +129,13 @@ including the newly registered fixtures, for the exact integration candidate;
 this worker's focused Linux run does not establish macOS execution or CI.
 ADR 0016 and ADR 0019, including every reopening trigger, remain unchanged.
 
-Focused validation passed: 49 static/structural tests and all 25 native
+Focused validation passed: 50 static/structural tests and all 25 native
 groups on Linux AMD64, with Node.js/Deno reference agreement, both native
 specialization policies, forced collection and positive collection counters.
-The native source strings remained byte-identical through fixture formatting.
+The 23 unchanged native groups retain their original execution inputs.
+Groups 19 and 20 were rerun after restoring their single-line comment
+probes; the static contract test now requires both original comment
+bodies for each of the five characters.
 The execution record is */data/m5c-d17-20261031/ds16/native1.json*.
 
 Dependency-tag self-audit: all 95 original tag sets are unchanged. The

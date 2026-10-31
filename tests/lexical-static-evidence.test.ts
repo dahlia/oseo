@@ -88,3 +88,25 @@ test("remaining hashbang completion probes have partial static syntax", () => {
   // Parsing acceptance does not observe a Script Completion Record value.
   // These originals therefore stay remediation-owned.
 });
+
+test("fixed single-line witnesses retain both comment bodies", () => {
+  const characters = [
+    ["form-feed", 0x0c],
+    ["horizontal-tab", 0x09],
+    ["nbsp", 0xa0],
+    ["space", 0x20],
+    ["vertical-tab", 0x0b],
+  ] as const;
+  for (const [name, code] of characters) {
+    const path = `test/language/white-space/comment-single-${name}.js`;
+    const fixture = lexicalStaticFixtures.find((f) => f.paths.includes(path));
+    assert.ok(fixture, path);
+    const c = String.fromCharCode(code);
+    const body = `//${c} single line ${c} comment ${c}`;
+    assert.ok(fixture.source.includes(`${body}\n`), `${name} empty probe`);
+    assert.ok(
+      fixture.source.includes(`${body} x = 1;\n`),
+      `${name} assignment probe`,
+    );
+  }
+});

@@ -1052,8 +1052,8 @@ paths:
       - tests/native/fixtures/lexical-static-evidence.ts
       - tests/lexical-static-evidence.test.ts
     observation: ds16-lexical-12
-    reason: The fixed witness preserves both original static checks, both LS/PS
-      statement sources, resets, assignments and asserted values.
+    reason: Both U+2029 block-comment bodies parse; the second encloses
+      x = 1 and the native witness observes that x remains zero.
   - path: test/language/line-terminators/S7.3_A7_T1.js
     section: 7.3_A7_T1
     subject: Insert Line Terminator in var x=y+z

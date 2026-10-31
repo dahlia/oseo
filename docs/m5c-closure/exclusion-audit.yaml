@@ -1118,8 +1118,8 @@ assessments:
     normativeDependency: source-evaluation-only
     replacementEvidence:
       tests/lexical-static-evidence.test.ts:
-        "83cc74d71cb09643570039737c26af7ab76638fee721aeef\
-        f033f5aca28e7b8d"
+        "f0517b358fe59f4083924d6307f277041168d548cde19a1b\
+        5be2d11c2f8c7cc5"
       tests/fixtures/lexical-static-negatives.json:
         "24d86babb6f1f2fcc7b091fbd581ebeac75520c2f06588b8\
         f5403ef7fcbb01fb"
@@ -1147,8 +1147,8 @@ assessments:
         "66eeee10d6b139f746d882ed87eecdff3fc699c87db14a29\
         820222c85f17b4cd"
       tests/lexical-static-evidence.test.ts:
-        "83cc74d71cb09643570039737c26af7ab76638fee721aeef\
-        f033f5aca28e7b8d"
+        "f0517b358fe59f4083924d6307f277041168d548cde19a1b\
+        5be2d11c2f8c7cc5"
     reason: Maintainer decision 2026-10-28 item 1 applies path by path as
       mapped in
       docs/m5c-graph/dynamic-source-lexical-static-assessment.yaml. All
@@ -1172,8 +1172,8 @@ assessments:
         "66eeee10d6b139f746d882ed87eecdff3fc699c87db14a29\
         820222c85f17b4cd"
       tests/lexical-static-evidence.test.ts:
-        "83cc74d71cb09643570039737c26af7ab76638fee721aeef\
-        f033f5aca28e7b8d"
+        "f0517b358fe59f4083924d6307f277041168d548cde19a1b\
+        5be2d11c2f8c7cc5"
     reason: Maintainer decision 2026-10-28 item 1 applies path by path as
       mapped in
       docs/m5c-graph/dynamic-source-lexical-static-assessment.yaml. All
@@ -1193,11 +1193,11 @@ assessments:
         "92b2bd59258f0ffc79ccb7bcb0be40d3f97239f15f7e3c6e\
         de2d03dd2cd35b78"
       tests/native/fixtures/lexical-static-evidence.ts:
-        "c1465a5b408f14c0cde48d408b8e41bcf124c83deaee0ae4\
-        4871138e587314c0"
+        "e2007c4535bd5f97698fc47139109b5b437e5663fdff7e96\
+        150180c391024282"
       tests/lexical-static-evidence.test.ts:
-        "83cc74d71cb09643570039737c26af7ab76638fee721aeef\
-        f033f5aca28e7b8d"
+        "f0517b358fe59f4083924d6307f277041168d548cde19a1b\
+        5be2d11c2f8c7cc5"
     reason: Maintainer decision 2026-10-28 item 1 applies path by path as
       mapped in
       docs/m5c-graph/dynamic-source-lexical-static-assessment.yaml. The
@@ -1218,11 +1218,11 @@ assessments:
         "92b2bd59258f0ffc79ccb7bcb0be40d3f97239f15f7e3c6e\
         de2d03dd2cd35b78"
       tests/native/fixtures/lexical-static-evidence.ts:
-        "c1465a5b408f14c0cde48d408b8e41bcf124c83deaee0ae4\
-        4871138e587314c0"
+        "e2007c4535bd5f97698fc47139109b5b437e5663fdff7e96\
+        150180c391024282"
       tests/lexical-static-evidence.test.ts:
-        "83cc74d71cb09643570039737c26af7ab76638fee721aeef\
-        f033f5aca28e7b8d"
+        "f0517b358fe59f4083924d6307f277041168d548cde19a1b\
+        5be2d11c2f8c7cc5"
     reason: Maintainer decision 2026-10-28 item 1 applies path by path as
       mapped in
       docs/m5c-graph/dynamic-source-lexical-static-assessment.yaml. The
@@ -1243,11 +1243,11 @@ assessments:
         "92b2bd59258f0ffc79ccb7bcb0be40d3f97239f15f7e3c6e\
         de2d03dd2cd35b78"
       tests/native/fixtures/lexical-static-evidence.ts:
-        "c1465a5b408f14c0cde48d408b8e41bcf124c83deaee0ae4\
-        4871138e587314c0"
+        "e2007c4535bd5f97698fc47139109b5b437e5663fdff7e96\
+        150180c391024282"
       tests/lexical-static-evidence.test.ts:
-        "83cc74d71cb09643570039737c26af7ab76638fee721aeef\
-        f033f5aca28e7b8d"
+        "f0517b358fe59f4083924d6307f277041168d548cde19a1b\
+        5be2d11c2f8c7cc5"
     reason: Maintainer decision 2026-10-28 item 1 applies path by path as
       mapped in
       docs/m5c-graph/dynamic-source-lexical-static-assessment.yaml. The
@@ -1268,11 +1268,11 @@ assessments:
         "92b2bd59258f0ffc79ccb7bcb0be40d3f97239f15f7e3c6e\
         de2d03dd2cd35b78"
       tests/native/fixtures/lexical-static-evidence.ts:
-        "c1465a5b408f14c0cde48d408b8e41bcf124c83deaee0ae4\
-        4871138e587314c0"
+        "e2007c4535bd5f97698fc47139109b5b437e5663fdff7e96\
+        150180c391024282"
       tests/lexical-static-evidence.test.ts:
-        "83cc74d71cb09643570039737c26af7ab76638fee721aeef\
-        f033f5aca28e7b8d"
+        "f0517b358fe59f4083924d6307f277041168d548cde19a1b\
+        5be2d11c2f8c7cc5"
     reason: Maintainer decision 2026-10-28 item 1 applies path by path as
       mapped in
       docs/m5c-graph/dynamic-source-lexical-static-assessment.yaml. The
@@ -1293,11 +1293,11 @@ assessments:
         "92b2bd59258f0ffc79ccb7bcb0be40d3f97239f15f7e3c6e\
         de2d03dd2cd35b78"
       tests/native/fixtures/lexical-static-evidence.ts:
-        "c1465a5b408f14c0cde48d408b8e41bcf124c83deaee0ae4\
-        4871138e587314c0"
+        "e2007c4535bd5f97698fc47139109b5b437e5663fdff7e96\
+        150180c391024282"
       tests/lexical-static-evidence.test.ts:
-        "83cc74d71cb09643570039737c26af7ab76638fee721aeef\
-        f033f5aca28e7b8d"
+        "f0517b358fe59f4083924d6307f277041168d548cde19a1b\
+        5be2d11c2f8c7cc5"
     reason: Maintainer decision 2026-10-28 item 1 applies path by path as
       mapped in
       docs/m5c-graph/dynamic-source-lexical-static-assessment.yaml. The
@@ -1318,11 +1318,11 @@ assessments:
         "92b2bd59258f0ffc79ccb7bcb0be40d3f97239f15f7e3c6e\
         de2d03dd2cd35b78"
       tests/native/fixtures/lexical-static-evidence.ts:
-        "c1465a5b408f14c0cde48d408b8e41bcf124c83deaee0ae4\
-        4871138e587314c0"
+        "e2007c4535bd5f97698fc47139109b5b437e5663fdff7e96\
+        150180c391024282"
       tests/lexical-static-evidence.test.ts:
-        "83cc74d71cb09643570039737c26af7ab76638fee721aeef\
-        f033f5aca28e7b8d"
+        "f0517b358fe59f4083924d6307f277041168d548cde19a1b\
+        5be2d11c2f8c7cc5"
     reason: Maintainer decision 2026-10-28 item 1 applies path by path as
       mapped in
       docs/m5c-graph/dynamic-source-lexical-static-assessment.yaml. The
@@ -1343,11 +1343,11 @@ assessments:
         "92b2bd59258f0ffc79ccb7bcb0be40d3f97239f15f7e3c6e\
         de2d03dd2cd35b78"
       tests/native/fixtures/lexical-static-evidence.ts:
-        "c1465a5b408f14c0cde48d408b8e41bcf124c83deaee0ae4\
-        4871138e587314c0"
+        "e2007c4535bd5f97698fc47139109b5b437e5663fdff7e96\
+        150180c391024282"
       tests/lexical-static-evidence.test.ts:
-        "83cc74d71cb09643570039737c26af7ab76638fee721aeef\
-        f033f5aca28e7b8d"
+        "f0517b358fe59f4083924d6307f277041168d548cde19a1b\
+        5be2d11c2f8c7cc5"
     reason: Maintainer decision 2026-10-28 item 1 applies path by path as
       mapped in
       docs/m5c-graph/dynamic-source-lexical-static-assessment.yaml. The
@@ -1368,11 +1368,11 @@ assessments:
         "92b2bd59258f0ffc79ccb7bcb0be40d3f97239f15f7e3c6e\
         de2d03dd2cd35b78"
       tests/native/fixtures/lexical-static-evidence.ts:
-        "c1465a5b408f14c0cde48d408b8e41bcf124c83deaee0ae4\
-        4871138e587314c0"
+        "e2007c4535bd5f97698fc47139109b5b437e5663fdff7e96\
+        150180c391024282"
       tests/lexical-static-evidence.test.ts:
-        "83cc74d71cb09643570039737c26af7ab76638fee721aeef\
-        f033f5aca28e7b8d"
+        "f0517b358fe59f4083924d6307f277041168d548cde19a1b\
+        5be2d11c2f8c7cc5"
     reason: Maintainer decision 2026-10-28 item 1 applies path by path as
       mapped in
       docs/m5c-graph/dynamic-source-lexical-static-assessment.yaml. The
@@ -1393,11 +1393,11 @@ assessments:
         "92b2bd59258f0ffc79ccb7bcb0be40d3f97239f15f7e3c6e\
         de2d03dd2cd35b78"
       tests/native/fixtures/lexical-static-evidence.ts:
-        "c1465a5b408f14c0cde48d408b8e41bcf124c83deaee0ae4\
-        4871138e587314c0"
+        "e2007c4535bd5f97698fc47139109b5b437e5663fdff7e96\
+        150180c391024282"
       tests/lexical-static-evidence.test.ts:
-        "83cc74d71cb09643570039737c26af7ab76638fee721aeef\
-        f033f5aca28e7b8d"
+        "f0517b358fe59f4083924d6307f277041168d548cde19a1b\
+        5be2d11c2f8c7cc5"
     reason: Maintainer decision 2026-10-28 item 1 applies path by path as
       mapped in
       docs/m5c-graph/dynamic-source-lexical-static-assessment.yaml. The
@@ -1418,11 +1418,11 @@ assessments:
         "92b2bd59258f0ffc79ccb7bcb0be40d3f97239f15f7e3c6e\
         de2d03dd2cd35b78"
       tests/native/fixtures/lexical-static-evidence.ts:
-        "c1465a5b408f14c0cde48d408b8e41bcf124c83deaee0ae4\
-        4871138e587314c0"
+        "e2007c4535bd5f97698fc47139109b5b437e5663fdff7e96\
+        150180c391024282"
       tests/lexical-static-evidence.test.ts:
-        "83cc74d71cb09643570039737c26af7ab76638fee721aeef\
-        f033f5aca28e7b8d"
+        "f0517b358fe59f4083924d6307f277041168d548cde19a1b\
+        5be2d11c2f8c7cc5"
     reason: Maintainer decision 2026-10-28 item 1 applies path by path as
       mapped in
       docs/m5c-graph/dynamic-source-lexical-static-assessment.yaml. The
@@ -1443,11 +1443,11 @@ assessments:
         "92b2bd59258f0ffc79ccb7bcb0be40d3f97239f15f7e3c6e\
         de2d03dd2cd35b78"
       tests/native/fixtures/lexical-static-evidence.ts:
-        "c1465a5b408f14c0cde48d408b8e41bcf124c83deaee0ae4\
-        4871138e587314c0"
+        "e2007c4535bd5f97698fc47139109b5b437e5663fdff7e96\
+        150180c391024282"
       tests/lexical-static-evidence.test.ts:
-        "83cc74d71cb09643570039737c26af7ab76638fee721aeef\
-        f033f5aca28e7b8d"
+        "f0517b358fe59f4083924d6307f277041168d548cde19a1b\
+        5be2d11c2f8c7cc5"
     reason: Maintainer decision 2026-10-28 item 1 applies path by path as
       mapped in
       docs/m5c-graph/dynamic-source-lexical-static-assessment.yaml. The
@@ -1468,11 +1468,11 @@ assessments:
         "92b2bd59258f0ffc79ccb7bcb0be40d3f97239f15f7e3c6e\
         de2d03dd2cd35b78"
       tests/native/fixtures/lexical-static-evidence.ts:
-        "c1465a5b408f14c0cde48d408b8e41bcf124c83deaee0ae4\
-        4871138e587314c0"
+        "e2007c4535bd5f97698fc47139109b5b437e5663fdff7e96\
+        150180c391024282"
       tests/lexical-static-evidence.test.ts:
-        "83cc74d71cb09643570039737c26af7ab76638fee721aeef\
-        f033f5aca28e7b8d"
+        "f0517b358fe59f4083924d6307f277041168d548cde19a1b\
+        5be2d11c2f8c7cc5"
     reason: Maintainer decision 2026-10-28 item 1 applies path by path as
       mapped in
       docs/m5c-graph/dynamic-source-lexical-static-assessment.yaml. The
@@ -1493,11 +1493,11 @@ assessments:
         "92b2bd59258f0ffc79ccb7bcb0be40d3f97239f15f7e3c6e\
         de2d03dd2cd35b78"
       tests/native/fixtures/lexical-static-evidence.ts:
-        "c1465a5b408f14c0cde48d408b8e41bcf124c83deaee0ae4\
-        4871138e587314c0"
+        "e2007c4535bd5f97698fc47139109b5b437e5663fdff7e96\
+        150180c391024282"
       tests/lexical-static-evidence.test.ts:
-        "83cc74d71cb09643570039737c26af7ab76638fee721aeef\
-        f033f5aca28e7b8d"
+        "f0517b358fe59f4083924d6307f277041168d548cde19a1b\
+        5be2d11c2f8c7cc5"
     reason: Maintainer decision 2026-10-28 item 1 applies path by path as
       mapped in
       docs/m5c-graph/dynamic-source-lexical-static-assessment.yaml. The
@@ -1517,11 +1517,11 @@ assessments:
         "92b2bd59258f0ffc79ccb7bcb0be40d3f97239f15f7e3c6e\
         de2d03dd2cd35b78"
       tests/native/fixtures/lexical-static-evidence.ts:
-        "c1465a5b408f14c0cde48d408b8e41bcf124c83deaee0ae4\
-        4871138e587314c0"
+        "e2007c4535bd5f97698fc47139109b5b437e5663fdff7e96\
+        150180c391024282"
       tests/lexical-static-evidence.test.ts:
-        "83cc74d71cb09643570039737c26af7ab76638fee721aeef\
-        f033f5aca28e7b8d"
+        "f0517b358fe59f4083924d6307f277041168d548cde19a1b\
+        5be2d11c2f8c7cc5"
     reason: Maintainer decision 2026-10-28 item 1 applies path by path as
       mapped in
       docs/m5c-graph/dynamic-source-lexical-static-assessment.yaml. The
@@ -1541,11 +1541,11 @@ assessments:
         "92b2bd59258f0ffc79ccb7bcb0be40d3f97239f15f7e3c6e\
         de2d03dd2cd35b78"
       tests/native/fixtures/lexical-static-evidence.ts:
-        "c1465a5b408f14c0cde48d408b8e41bcf124c83deaee0ae4\
-        4871138e587314c0"
+        "e2007c4535bd5f97698fc47139109b5b437e5663fdff7e96\
+        150180c391024282"
       tests/lexical-static-evidence.test.ts:
-        "83cc74d71cb09643570039737c26af7ab76638fee721aeef\
-        f033f5aca28e7b8d"
+        "f0517b358fe59f4083924d6307f277041168d548cde19a1b\
+        5be2d11c2f8c7cc5"
     reason: Maintainer decision 2026-10-28 item 1 applies path by path as
       mapped in
       docs/m5c-graph/dynamic-source-lexical-static-assessment.yaml. The
@@ -1565,11 +1565,11 @@ assessments:
         "92b2bd59258f0ffc79ccb7bcb0be40d3f97239f15f7e3c6e\
         de2d03dd2cd35b78"
       tests/native/fixtures/lexical-static-evidence.ts:
-        "c1465a5b408f14c0cde48d408b8e41bcf124c83deaee0ae4\
-        4871138e587314c0"
+        "e2007c4535bd5f97698fc47139109b5b437e5663fdff7e96\
+        150180c391024282"
       tests/lexical-static-evidence.test.ts:
-        "83cc74d71cb09643570039737c26af7ab76638fee721aeef\
-        f033f5aca28e7b8d"
+        "f0517b358fe59f4083924d6307f277041168d548cde19a1b\
+        5be2d11c2f8c7cc5"
     reason: Maintainer decision 2026-10-28 item 1 applies path by path as
       mapped in
       docs/m5c-graph/dynamic-source-lexical-static-assessment.yaml. The
@@ -1588,11 +1588,11 @@ assessments:
         "92b2bd59258f0ffc79ccb7bcb0be40d3f97239f15f7e3c6e\
         de2d03dd2cd35b78"
       tests/native/fixtures/lexical-static-evidence.ts:
-        "c1465a5b408f14c0cde48d408b8e41bcf124c83deaee0ae4\
-        4871138e587314c0"
+        "e2007c4535bd5f97698fc47139109b5b437e5663fdff7e96\
+        150180c391024282"
       tests/lexical-static-evidence.test.ts:
-        "83cc74d71cb09643570039737c26af7ab76638fee721aeef\
-        f033f5aca28e7b8d"
+        "f0517b358fe59f4083924d6307f277041168d548cde19a1b\
+        5be2d11c2f8c7cc5"
     reason: Maintainer decision 2026-10-28 item 1 applies path by path as
       mapped in
       docs/m5c-graph/dynamic-source-lexical-static-assessment.yaml. The
@@ -1613,11 +1613,11 @@ assessments:
         "92b2bd59258f0ffc79ccb7bcb0be40d3f97239f15f7e3c6e\
         de2d03dd2cd35b78"
       tests/native/fixtures/lexical-static-evidence.ts:
-        "c1465a5b408f14c0cde48d408b8e41bcf124c83deaee0ae4\
-        4871138e587314c0"
+        "e2007c4535bd5f97698fc47139109b5b437e5663fdff7e96\
+        150180c391024282"
       tests/lexical-static-evidence.test.ts:
-        "83cc74d71cb09643570039737c26af7ab76638fee721aeef\
-        f033f5aca28e7b8d"
+        "f0517b358fe59f4083924d6307f277041168d548cde19a1b\
+        5be2d11c2f8c7cc5"
     reason: Maintainer decision 2026-10-28 item 1 applies path by path as
       mapped in
       docs/m5c-graph/dynamic-source-lexical-static-assessment.yaml. The
@@ -1637,11 +1637,11 @@ assessments:
         "92b2bd59258f0ffc79ccb7bcb0be40d3f97239f15f7e3c6e\
         de2d03dd2cd35b78"
       tests/native/fixtures/lexical-static-evidence.ts:
-        "c1465a5b408f14c0cde48d408b8e41bcf124c83deaee0ae4\
-        4871138e587314c0"
+        "e2007c4535bd5f97698fc47139109b5b437e5663fdff7e96\
+        150180c391024282"
       tests/lexical-static-evidence.test.ts:
-        "83cc74d71cb09643570039737c26af7ab76638fee721aeef\
-        f033f5aca28e7b8d"
+        "f0517b358fe59f4083924d6307f277041168d548cde19a1b\
+        5be2d11c2f8c7cc5"
     reason: Maintainer decision 2026-10-28 item 1 applies path by path as
       mapped in
       docs/m5c-graph/dynamic-source-lexical-static-assessment.yaml. The
@@ -1661,11 +1661,11 @@ assessments:
         "92b2bd59258f0ffc79ccb7bcb0be40d3f97239f15f7e3c6e\
         de2d03dd2cd35b78"
       tests/native/fixtures/lexical-static-evidence.ts:
-        "c1465a5b408f14c0cde48d408b8e41bcf124c83deaee0ae4\
-        4871138e587314c0"
+        "e2007c4535bd5f97698fc47139109b5b437e5663fdff7e96\
+        150180c391024282"
       tests/lexical-static-evidence.test.ts:
-        "83cc74d71cb09643570039737c26af7ab76638fee721aeef\
-        f033f5aca28e7b8d"
+        "f0517b358fe59f4083924d6307f277041168d548cde19a1b\
+        5be2d11c2f8c7cc5"
     reason: Maintainer decision 2026-10-28 item 1 applies path by path as
       mapped in
       docs/m5c-graph/dynamic-source-lexical-static-assessment.yaml. The
@@ -1685,11 +1685,11 @@ assessments:
         "92b2bd59258f0ffc79ccb7bcb0be40d3f97239f15f7e3c6e\
         de2d03dd2cd35b78"
       tests/native/fixtures/lexical-static-evidence.ts:
-        "c1465a5b408f14c0cde48d408b8e41bcf124c83deaee0ae4\
-        4871138e587314c0"
+        "e2007c4535bd5f97698fc47139109b5b437e5663fdff7e96\
+        150180c391024282"
       tests/lexical-static-evidence.test.ts:
-        "83cc74d71cb09643570039737c26af7ab76638fee721aeef\
-        f033f5aca28e7b8d"
+        "f0517b358fe59f4083924d6307f277041168d548cde19a1b\
+        5be2d11c2f8c7cc5"
     reason: Maintainer decision 2026-10-28 item 1 applies path by path as
       mapped in
       docs/m5c-graph/dynamic-source-lexical-static-assessment.yaml. The
@@ -1708,11 +1708,11 @@ assessments:
         "92b2bd59258f0ffc79ccb7bcb0be40d3f97239f15f7e3c6e\
         de2d03dd2cd35b78"
       tests/native/fixtures/lexical-static-evidence.ts:
-        "c1465a5b408f14c0cde48d408b8e41bcf124c83deaee0ae4\
-        4871138e587314c0"
+        "e2007c4535bd5f97698fc47139109b5b437e5663fdff7e96\
+        150180c391024282"
       tests/lexical-static-evidence.test.ts:
-        "83cc74d71cb09643570039737c26af7ab76638fee721aeef\
-        f033f5aca28e7b8d"
+        "f0517b358fe59f4083924d6307f277041168d548cde19a1b\
+        5be2d11c2f8c7cc5"
     reason: Maintainer decision 2026-10-28 item 1 applies path by path as
       mapped in
       docs/m5c-graph/dynamic-source-lexical-static-assessment.yaml. The
@@ -1731,11 +1731,11 @@ assessments:
         "92b2bd59258f0ffc79ccb7bcb0be40d3f97239f15f7e3c6e\
         de2d03dd2cd35b78"
       tests/native/fixtures/lexical-static-evidence.ts:
-        "c1465a5b408f14c0cde48d408b8e41bcf124c83deaee0ae4\
-        4871138e587314c0"
+        "e2007c4535bd5f97698fc47139109b5b437e5663fdff7e96\
+        150180c391024282"
       tests/lexical-static-evidence.test.ts:
-        "83cc74d71cb09643570039737c26af7ab76638fee721aeef\
-        f033f5aca28e7b8d"
+        "f0517b358fe59f4083924d6307f277041168d548cde19a1b\
+        5be2d11c2f8c7cc5"
     reason: Maintainer decision 2026-10-28 item 1 applies path by path as
       mapped in
       docs/m5c-graph/dynamic-source-lexical-static-assessment.yaml. The
