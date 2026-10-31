@@ -123,3 +123,10 @@ The ordinary-call group deletes and checks the global `y` before each
 independent call, so a prior write cannot mask a missing receiver write.
 The ledger note also distinguishes the 16 complete groups from the two
 partial groups. Counts and dispositions do not change.
+
+Outer pass 1 identified two missing global identifier observations. After
+each independent ordinary call, the witness now checks `y` strictly against
+2 before checking `globalThis.y`. This exercises identifier resolution as
+well as the receiver property write. Auditing all 66 pinned tests found no
+other identifier/property substitution; the per-path table records the
+distinction. Replacement digests were refreshed for the revised evidence.

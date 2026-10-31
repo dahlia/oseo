@@ -74,11 +74,13 @@ delete globalThis.y;
 equal(typeof globalThis.y, "undefined");
 equal(plain(), "OK");
 equal(typeof x, "undefined");
+equal(y, 2);
 equal(globalThis.y, 2);
 delete globalThis.y;
 equal(typeof globalThis.y, "undefined");
 equal(args("1", 2), "12");
 equal(typeof x, "undefined");
+equal(y, 2);
 equal(globalThis.y, 2);
 function Factory() { var x = 1; this.y = 2; return "OK"; }
 function ArgsFactory(arg1, arg2) {

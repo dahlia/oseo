@@ -1118,16 +1118,16 @@ assessments:
     normativeDependency: source-evaluation-only
     replacementEvidence:
       tests/native/fixtures/callable-object-evidence.ts:
-        "e0d333bcdf6e7a86fff6aea8caed32905d2b0b35cb26cb071164\
-        3e7e74a54305"
+        "e4c41001c23905e90aef35fa2fa94c5207f77e0d7ca6aef8faaa\
+        b6435b7a9b06"
       tests/callable-object-evidence.test.ts:
         "d2b814666e5645565ca2001f0419b931cd2949624777047f562d\
         a479c71be70d"
       tests/native.ts: "91222c3fc3b2335cfcd96ba614f2a4705a3c0935d6946fc2d998\
         9bcce7b251a7"
       docs/m5c-graph/dynamic-source-callable-object-assessment.md:
-        "ff5881b8f97000fa6865bdc361ca14dfe1ce583b0a8d8cf089d5\
-        3403dfefd355"
+        "b4eb5774379e97332ac56111eb4fadf83a6e39b66f84b22bff74\
+        10ffca7eaf37"
     reason: DS-14 item 1 replacement group
       callable-object-intrinsic-constructability, in
       tests/native/fixtures/callable-object-evidence.ts and its focused
@@ -1150,16 +1150,16 @@ assessments:
     normativeDependency: source-evaluation-only
     replacementEvidence:
       tests/native/fixtures/callable-object-evidence.ts:
-        "e0d333bcdf6e7a86fff6aea8caed32905d2b0b35cb26cb071164\
-        3e7e74a54305"
+        "e4c41001c23905e90aef35fa2fa94c5207f77e0d7ca6aef8faaa\
+        b6435b7a9b06"
       tests/callable-object-evidence.test.ts:
         "d2b814666e5645565ca2001f0419b931cd2949624777047f562d\
         a479c71be70d"
       tests/native.ts: "91222c3fc3b2335cfcd96ba614f2a4705a3c0935d6946fc2d998\
         9bcce7b251a7"
       docs/m5c-graph/dynamic-source-callable-object-assessment.md:
-        "ff5881b8f97000fa6865bdc361ca14dfe1ce583b0a8d8cf089d5\
-        3403dfefd355"
+        "b4eb5774379e97332ac56111eb4fadf83a6e39b66f84b22bff74\
+        10ffca7eaf37"
     reason: DS-14 item 1 replacement group
       callable-object-object-truthiness, in
       tests/native/fixtures/callable-object-evidence.ts and its focused
@@ -1179,16 +1179,16 @@ assessments:
     normativeDependency: source-evaluation-only
     replacementEvidence:
       tests/native/fixtures/callable-object-evidence.ts:
-        "e0d333bcdf6e7a86fff6aea8caed32905d2b0b35cb26cb071164\
-        3e7e74a54305"
+        "e4c41001c23905e90aef35fa2fa94c5207f77e0d7ca6aef8faaa\
+        b6435b7a9b06"
       tests/callable-object-evidence.test.ts:
         "d2b814666e5645565ca2001f0419b931cd2949624777047f562d\
         a479c71be70d"
       tests/native.ts: "91222c3fc3b2335cfcd96ba614f2a4705a3c0935d6946fc2d998\
         9bcce7b251a7"
       docs/m5c-graph/dynamic-source-callable-object-assessment.md:
-        "ff5881b8f97000fa6865bdc361ca14dfe1ce583b0a8d8cf089d5\
-        3403dfefd355"
+        "b4eb5774379e97332ac56111eb4fadf83a6e39b66f84b22bff74\
+        10ffca7eaf37"
     reason: DS-14 item 1 replacement group
       callable-object-ordinary-call-and-construction, in
       tests/native/fixtures/callable-object-evidence.ts and its focused
@@ -1214,22 +1214,25 @@ assessments:
       evidence. ADR 0016 and ADR 0019 reopening triggers remain in
       force. Each independent call starts with deleted global y and
       checks its absence, so an earlier write cannot mask a missing args
-      receiver write.
+      receiver write. Both independent calls also read the unqualified
+      identifier y strictly against 2, preserving the upstream
+      ResolveBinding/GetBindingValue observation separately from
+      globalThis.y.
   ds14-strict-restricted-properties:
     disposition: exclusion
     normativeDependency: source-evaluation-only
     replacementEvidence:
       tests/native/fixtures/callable-object-evidence.ts:
-        "e0d333bcdf6e7a86fff6aea8caed32905d2b0b35cb26cb071164\
-        3e7e74a54305"
+        "e4c41001c23905e90aef35fa2fa94c5207f77e0d7ca6aef8faaa\
+        b6435b7a9b06"
       tests/callable-object-evidence.test.ts:
         "d2b814666e5645565ca2001f0419b931cd2949624777047f562d\
         a479c71be70d"
       tests/native.ts: "91222c3fc3b2335cfcd96ba614f2a4705a3c0935d6946fc2d998\
         9bcce7b251a7"
       docs/m5c-graph/dynamic-source-callable-object-assessment.md:
-        "ff5881b8f97000fa6865bdc361ca14dfe1ce583b0a8d8cf089d5\
-        3403dfefd355"
+        "b4eb5774379e97332ac56111eb4fadf83a6e39b66f84b22bff74\
+        10ffca7eaf37"
     reason: DS-14 item 1 replacement group
       callable-object-strict-restricted-properties, in
       tests/native/fixtures/callable-object-evidence.ts and its focused
@@ -1248,16 +1251,16 @@ assessments:
     normativeDependency: source-evaluation-only
     replacementEvidence:
       tests/native/fixtures/callable-object-evidence.ts:
-        "e0d333bcdf6e7a86fff6aea8caed32905d2b0b35cb26cb071164\
-        3e7e74a54305"
+        "e4c41001c23905e90aef35fa2fa94c5207f77e0d7ca6aef8faaa\
+        b6435b7a9b06"
       tests/callable-object-evidence.test.ts:
         "d2b814666e5645565ca2001f0419b931cd2949624777047f562d\
         a479c71be70d"
       tests/native.ts: "91222c3fc3b2335cfcd96ba614f2a4705a3c0935d6946fc2d998\
         9bcce7b251a7"
       docs/m5c-graph/dynamic-source-callable-object-assessment.md:
-        "ff5881b8f97000fa6865bdc361ca14dfe1ce583b0a8d8cf089d5\
-        3403dfefd355"
+        "b4eb5774379e97332ac56111eb4fadf83a6e39b66f84b22bff74\
+        10ffca7eaf37"
     reason: DS-14 item 1 replacement group
       callable-object-apply-receiver-boxing, in
       tests/native/fixtures/callable-object-evidence.ts and its focused
@@ -1280,16 +1283,16 @@ assessments:
     normativeDependency: source-evaluation-only
     replacementEvidence:
       tests/native/fixtures/callable-object-evidence.ts:
-        "e0d333bcdf6e7a86fff6aea8caed32905d2b0b35cb26cb071164\
-        3e7e74a54305"
+        "e4c41001c23905e90aef35fa2fa94c5207f77e0d7ca6aef8faaa\
+        b6435b7a9b06"
       tests/callable-object-evidence.test.ts:
         "d2b814666e5645565ca2001f0419b931cd2949624777047f562d\
         a479c71be70d"
       tests/native.ts: "91222c3fc3b2335cfcd96ba614f2a4705a3c0935d6946fc2d998\
         9bcce7b251a7"
       docs/m5c-graph/dynamic-source-callable-object-assessment.md:
-        "ff5881b8f97000fa6865bdc361ca14dfe1ce583b0a8d8cf089d5\
-        3403dfefd355"
+        "b4eb5774379e97332ac56111eb4fadf83a6e39b66f84b22bff74\
+        10ffca7eaf37"
     reason: DS-14 item 1 replacement group callable-object-apply-arrays, in
       tests/native/fixtures/callable-object-evidence.ts and its focused
       runner, observes every non-source assertion of these 3 paths. The
@@ -1310,16 +1313,16 @@ assessments:
     normativeDependency: source-evaluation-only
     replacementEvidence:
       tests/native/fixtures/callable-object-evidence.ts:
-        "e0d333bcdf6e7a86fff6aea8caed32905d2b0b35cb26cb071164\
-        3e7e74a54305"
+        "e4c41001c23905e90aef35fa2fa94c5207f77e0d7ca6aef8faaa\
+        b6435b7a9b06"
       tests/callable-object-evidence.test.ts:
         "d2b814666e5645565ca2001f0419b931cd2949624777047f562d\
         a479c71be70d"
       tests/native.ts: "91222c3fc3b2335cfcd96ba614f2a4705a3c0935d6946fc2d998\
         9bcce7b251a7"
       docs/m5c-graph/dynamic-source-callable-object-assessment.md:
-        "ff5881b8f97000fa6865bdc361ca14dfe1ce583b0a8d8cf089d5\
-        3403dfefd355"
+        "b4eb5774379e97332ac56111eb4fadf83a6e39b66f84b22bff74\
+        10ffca7eaf37"
     reason: DS-14 item 1 replacement group
       callable-object-apply-arguments, in
       tests/native/fixtures/callable-object-evidence.ts and its focused
@@ -1349,16 +1352,16 @@ assessments:
     normativeDependency: source-evaluation-only
     replacementEvidence:
       tests/native/fixtures/callable-object-evidence.ts:
-        "e0d333bcdf6e7a86fff6aea8caed32905d2b0b35cb26cb071164\
-        3e7e74a54305"
+        "e4c41001c23905e90aef35fa2fa94c5207f77e0d7ca6aef8faaa\
+        b6435b7a9b06"
       tests/callable-object-evidence.test.ts:
         "d2b814666e5645565ca2001f0419b931cd2949624777047f562d\
         a479c71be70d"
       tests/native.ts: "91222c3fc3b2335cfcd96ba614f2a4705a3c0935d6946fc2d998\
         9bcce7b251a7"
       docs/m5c-graph/dynamic-source-callable-object-assessment.md:
-        "ff5881b8f97000fa6865bdc361ca14dfe1ce583b0a8d8cf089d5\
-        3403dfefd355"
+        "b4eb5774379e97332ac56111eb4fadf83a6e39b66f84b22bff74\
+        10ffca7eaf37"
     reason: DS-14 item 1 replacement group
       callable-object-returned-constructor, in
       tests/native/fixtures/callable-object-evidence.ts and its focused
@@ -1377,16 +1380,16 @@ assessments:
     normativeDependency: source-evaluation-only
     replacementEvidence:
       tests/native/fixtures/callable-object-evidence.ts:
-        "e0d333bcdf6e7a86fff6aea8caed32905d2b0b35cb26cb071164\
-        3e7e74a54305"
+        "e4c41001c23905e90aef35fa2fa94c5207f77e0d7ca6aef8faaa\
+        b6435b7a9b06"
       tests/callable-object-evidence.test.ts:
         "d2b814666e5645565ca2001f0419b931cd2949624777047f562d\
         a479c71be70d"
       tests/native.ts: "91222c3fc3b2335cfcd96ba614f2a4705a3c0935d6946fc2d998\
         9bcce7b251a7"
       docs/m5c-graph/dynamic-source-callable-object-assessment.md:
-        "ff5881b8f97000fa6865bdc361ca14dfe1ce583b0a8d8cf089d5\
-        3403dfefd355"
+        "b4eb5774379e97332ac56111eb4fadf83a6e39b66f84b22bff74\
+        10ffca7eaf37"
     reason: DS-14 item 1 replacement group
       callable-object-call-receiver-boxing, in
       tests/native/fixtures/callable-object-evidence.ts and its focused
@@ -1409,16 +1412,16 @@ assessments:
     normativeDependency: source-evaluation-only
     replacementEvidence:
       tests/native/fixtures/callable-object-evidence.ts:
-        "e0d333bcdf6e7a86fff6aea8caed32905d2b0b35cb26cb071164\
-        3e7e74a54305"
+        "e4c41001c23905e90aef35fa2fa94c5207f77e0d7ca6aef8faaa\
+        b6435b7a9b06"
       tests/callable-object-evidence.test.ts:
         "d2b814666e5645565ca2001f0419b931cd2949624777047f562d\
         a479c71be70d"
       tests/native.ts: "91222c3fc3b2335cfcd96ba614f2a4705a3c0935d6946fc2d998\
         9bcce7b251a7"
       docs/m5c-graph/dynamic-source-callable-object-assessment.md:
-        "ff5881b8f97000fa6865bdc361ca14dfe1ce583b0a8d8cf089d5\
-        3403dfefd355"
+        "b4eb5774379e97332ac56111eb4fadf83a6e39b66f84b22bff74\
+        10ffca7eaf37"
     reason: DS-14 item 1 replacement group
       callable-object-call-array-arguments, in
       tests/native/fixtures/callable-object-evidence.ts and its focused
@@ -1440,16 +1443,16 @@ assessments:
     normativeDependency: source-evaluation-only
     replacementEvidence:
       tests/native/fixtures/callable-object-evidence.ts:
-        "e0d333bcdf6e7a86fff6aea8caed32905d2b0b35cb26cb071164\
-        3e7e74a54305"
+        "e4c41001c23905e90aef35fa2fa94c5207f77e0d7ca6aef8faaa\
+        b6435b7a9b06"
       tests/callable-object-evidence.test.ts:
         "d2b814666e5645565ca2001f0419b931cd2949624777047f562d\
         a479c71be70d"
       tests/native.ts: "91222c3fc3b2335cfcd96ba614f2a4705a3c0935d6946fc2d998\
         9bcce7b251a7"
       docs/m5c-graph/dynamic-source-callable-object-assessment.md:
-        "ff5881b8f97000fa6865bdc361ca14dfe1ce583b0a8d8cf089d5\
-        3403dfefd355"
+        "b4eb5774379e97332ac56111eb4fadf83a6e39b66f84b22bff74\
+        10ffca7eaf37"
     reason: DS-14 item 1 replacement group
       callable-object-call-arguments-objects, in
       tests/native/fixtures/callable-object-evidence.ts and its focused
@@ -1480,16 +1483,16 @@ assessments:
     normativeDependency: source-evaluation-only
     replacementEvidence:
       tests/native/fixtures/callable-object-evidence.ts:
-        "e0d333bcdf6e7a86fff6aea8caed32905d2b0b35cb26cb071164\
-        3e7e74a54305"
+        "e4c41001c23905e90aef35fa2fa94c5207f77e0d7ca6aef8faaa\
+        b6435b7a9b06"
       tests/callable-object-evidence.test.ts:
         "d2b814666e5645565ca2001f0419b931cd2949624777047f562d\
         a479c71be70d"
       tests/native.ts: "91222c3fc3b2335cfcd96ba614f2a4705a3c0935d6946fc2d998\
         9bcce7b251a7"
       docs/m5c-graph/dynamic-source-callable-object-assessment.md:
-        "ff5881b8f97000fa6865bdc361ca14dfe1ce583b0a8d8cf089d5\
-        3403dfefd355"
+        "b4eb5774379e97332ac56111eb4fadf83a6e39b66f84b22bff74\
+        10ffca7eaf37"
     reason: DS-14 item 1 replacement group
       callable-object-callable-descriptors, in
       tests/native/fixtures/callable-object-evidence.ts and its focused
@@ -1510,16 +1513,16 @@ assessments:
     normativeDependency: source-evaluation-only
     replacementEvidence:
       tests/native/fixtures/callable-object-evidence.ts:
-        "e0d333bcdf6e7a86fff6aea8caed32905d2b0b35cb26cb071164\
-        3e7e74a54305"
+        "e4c41001c23905e90aef35fa2fa94c5207f77e0d7ca6aef8faaa\
+        b6435b7a9b06"
       tests/callable-object-evidence.test.ts:
         "d2b814666e5645565ca2001f0419b931cd2949624777047f562d\
         a479c71be70d"
       tests/native.ts: "91222c3fc3b2335cfcd96ba614f2a4705a3c0935d6946fc2d998\
         9bcce7b251a7"
       docs/m5c-graph/dynamic-source-callable-object-assessment.md:
-        "ff5881b8f97000fa6865bdc361ca14dfe1ce583b0a8d8cf089d5\
-        3403dfefd355"
+        "b4eb5774379e97332ac56111eb4fadf83a6e39b66f84b22bff74\
+        10ffca7eaf37"
     reason: DS-14 item 1 replacement group callable-object-seal-callables,
       in tests/native/fixtures/callable-object-evidence.ts and its focused
       runner, observes every non-source assertion of these 4 paths. The
@@ -1538,16 +1541,16 @@ assessments:
     normativeDependency: source-evaluation-only
     replacementEvidence:
       tests/native/fixtures/callable-object-evidence.ts:
-        "e0d333bcdf6e7a86fff6aea8caed32905d2b0b35cb26cb071164\
-        3e7e74a54305"
+        "e4c41001c23905e90aef35fa2fa94c5207f77e0d7ca6aef8faaa\
+        b6435b7a9b06"
       tests/callable-object-evidence.test.ts:
         "d2b814666e5645565ca2001f0419b931cd2949624777047f562d\
         a479c71be70d"
       tests/native.ts: "91222c3fc3b2335cfcd96ba614f2a4705a3c0935d6946fc2d998\
         9bcce7b251a7"
       docs/m5c-graph/dynamic-source-callable-object-assessment.md:
-        "ff5881b8f97000fa6865bdc361ca14dfe1ce583b0a8d8cf089d5\
-        3403dfefd355"
+        "b4eb5774379e97332ac56111eb4fadf83a6e39b66f84b22bff74\
+        10ffca7eaf37"
     reason: DS-14 item 1 replacement group
       callable-object-reflect-apply-array-like, in
       tests/native/fixtures/callable-object-evidence.ts and its focused
@@ -1567,16 +1570,16 @@ assessments:
     normativeDependency: source-evaluation-only
     replacementEvidence:
       tests/native/fixtures/callable-object-evidence.ts:
-        "e0d333bcdf6e7a86fff6aea8caed32905d2b0b35cb26cb071164\
-        3e7e74a54305"
+        "e4c41001c23905e90aef35fa2fa94c5207f77e0d7ca6aef8faaa\
+        b6435b7a9b06"
       tests/callable-object-evidence.test.ts:
         "d2b814666e5645565ca2001f0419b931cd2949624777047f562d\
         a479c71be70d"
       tests/native.ts: "91222c3fc3b2335cfcd96ba614f2a4705a3c0935d6946fc2d998\
         9bcce7b251a7"
       docs/m5c-graph/dynamic-source-callable-object-assessment.md:
-        "ff5881b8f97000fa6865bdc361ca14dfe1ce583b0a8d8cf089d5\
-        3403dfefd355"
+        "b4eb5774379e97332ac56111eb4fadf83a6e39b66f84b22bff74\
+        10ffca7eaf37"
     reason: DS-14 item 1 replacement group
       callable-object-instanceof-prototypes, in
       tests/native/fixtures/callable-object-evidence.ts and its focused
@@ -1599,16 +1602,16 @@ assessments:
     normativeDependency: source-evaluation-only
     replacementEvidence:
       tests/native/fixtures/callable-object-evidence.ts:
-        "e0d333bcdf6e7a86fff6aea8caed32905d2b0b35cb26cb071164\
-        3e7e74a54305"
+        "e4c41001c23905e90aef35fa2fa94c5207f77e0d7ca6aef8faaa\
+        b6435b7a9b06"
       tests/callable-object-evidence.test.ts:
         "d2b814666e5645565ca2001f0419b931cd2949624777047f562d\
         a479c71be70d"
       tests/native.ts: "91222c3fc3b2335cfcd96ba614f2a4705a3c0935d6946fc2d998\
         9bcce7b251a7"
       docs/m5c-graph/dynamic-source-callable-object-assessment.md:
-        "ff5881b8f97000fa6865bdc361ca14dfe1ce583b0a8d8cf089d5\
-        3403dfefd355"
+        "b4eb5774379e97332ac56111eb4fadf83a6e39b66f84b22bff74\
+        10ffca7eaf37"
     reason: DS-14 item 1 replacement group
       callable-object-object-literal-accessors, in
       tests/native/fixtures/callable-object-evidence.ts and its focused
