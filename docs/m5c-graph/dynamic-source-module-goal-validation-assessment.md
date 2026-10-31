@@ -27,7 +27,7 @@ error into a rejected import promise is the excluded ImportCall contract.
 This does not authorize treating a compiler rejection as an observed promise
 rejection. Error identity, repeated imports, ordering and namespace state
 would need separate evidence if asserted; none of these 48 catch bodies
-asserts them. Their only error observation is `error.name === SyntaxError`.
+asserts them. Their only error observation is `error.name === "SyntaxError"`.
 The original awaited and async-generator contexts only route that rejection.
 
 G, A and C below distinguish target-validation stages from that ImportCall

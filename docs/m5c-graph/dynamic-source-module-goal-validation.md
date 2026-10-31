@@ -12,8 +12,9 @@ in remediation: 16 Module-goal early errors, 16 ambiguous indirect-export
 errors, 16 circular unresolved-export errors and 18 static namespace usage
 contexts. All classifications stay unsupported; no pass is added.
 
-New evidence consists of 12 source registrations and one native registration
-with 18 context units, three positive fixture files, fixed Node.js/Deno
+New evidence consists of 12 source registrations and two native registrations
+with 18 context units each (positive and string-mutation checks), three
+positive fixture files, fixed Node.js/Deno
 oracles, structural graph/MIR assertions and both native policies with
 collection forced at every safepoint. Root's 2026-10-31 ruling separates
 the statically witnessed target errors from ImportCall's excluded promise

@@ -37,9 +37,10 @@ accounts for all 66 selected Module-goal, indirect-export validation and
 Script-to-Module usage paths through new static and native witnesses under
 decision items 1 and 2. Zero selected paths remain in remediation, and
 884 of the base 950 umbrella paths remain. It adds 12 source registrations
-and one native registration covering 18 usage contexts under both policies
-with forced collection. These are exclusions, never passes; full candidate
-suites, outer review, publication and landing remain Root-owned.
+and two native registrations covering 18 usage contexts each (positive and
+string-mutation checks) under both policies with forced collection. These are
+exclusions, never passes; full candidate suites, outer review, publication and
+landing remain Root-owned.
 
 
 Approved second split

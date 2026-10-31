@@ -209,8 +209,9 @@ delivers: "Resolves the 884 reviewed unsupported paths assigned to
   under ADR 0016 and maintainer decision items 1 and 2. Its per-path
   assessment is
   docs/m5c-graph/dynamic-source-module-goal-validation-assessment.md.
-  New evidence adds 12 source registrations and one native registration
-  covering 18 usage contexts, with three fixture files, structural graph
+  New evidence adds 12 source registrations and two native registrations
+  covering 18 usage contexts each (positive and string-mutation checks),
+  with three fixture files, structural graph
   and MIR assertions, both native policies and forced collection.
   The current owned scope is 884; zero selected DS-11 paths remain in
   remediation. Every original classification and inventory path stays

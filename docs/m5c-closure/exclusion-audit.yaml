@@ -1118,8 +1118,8 @@ assessments:
     normativeDependency: "source-evaluation-only"
     replacementEvidence:
       docs/m5c-graph/dynamic-source-module-goal-validation-assessment.md:
-        "7cc9227aae85d1657aa32d5cba7c02da\
-        b2880474d8c90725d183b41db72d59ae"
+        "fa1e7018641f8550f5a381b6a36c23a0\
+        4176f0ebc0c93ff3478b820ee8ec5111"
       tests/module-goal-validation-source.test.ts:
         "8339a1e8ab6dd61e2d07440cc7c74e2e\
         1ddbc2b79bd9aad35c61a28989c21261"
@@ -1136,8 +1136,8 @@ assessments:
     normativeDependency: "source-evaluation-only"
     replacementEvidence:
       docs/m5c-graph/dynamic-source-module-goal-validation-assessment.md:
-        "7cc9227aae85d1657aa32d5cba7c02da\
-        b2880474d8c90725d183b41db72d59ae"
+        "fa1e7018641f8550f5a381b6a36c23a0\
+        4176f0ebc0c93ff3478b820ee8ec5111"
       tests/module-goal-validation-source.test.ts:
         "8339a1e8ab6dd61e2d07440cc7c74e2e\
         1ddbc2b79bd9aad35c61a28989c21261"
@@ -1154,8 +1154,8 @@ assessments:
     normativeDependency: "source-evaluation-only"
     replacementEvidence:
       docs/m5c-graph/dynamic-source-module-goal-validation-assessment.md:
-        "7cc9227aae85d1657aa32d5cba7c02da\
-        b2880474d8c90725d183b41db72d59ae"
+        "fa1e7018641f8550f5a381b6a36c23a0\
+        4176f0ebc0c93ff3478b820ee8ec5111"
       tests/module-goal-validation-source.test.ts:
         "8339a1e8ab6dd61e2d07440cc7c74e2e\
         1ddbc2b79bd9aad35c61a28989c21261"
@@ -1171,8 +1171,8 @@ assessments:
     normativeDependency: "source-evaluation-only"
     replacementEvidence:
       docs/m5c-graph/dynamic-source-module-goal-validation-assessment.md:
-        "7cc9227aae85d1657aa32d5cba7c02da\
-        b2880474d8c90725d183b41db72d59ae"
+        "fa1e7018641f8550f5a381b6a36c23a0\
+        4176f0ebc0c93ff3478b820ee8ec5111"
       tests/module-goal-validation-source.test.ts:
         "8339a1e8ab6dd61e2d07440cc7c74e2e\
         1ddbc2b79bd9aad35c61a28989c21261"
