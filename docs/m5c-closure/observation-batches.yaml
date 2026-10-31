@@ -165,10 +165,10 @@ regeneration:
     wallSeconds: 3997
     workers: 8
   secondsPerVariant: 0.0549
-  currentExecutedVariants: 131730
-  currentSeconds: 7238
-  finalExecutedVariants: 136912
-  finalSeconds: 7522
+  currentExecutedVariants: 131810
+  currentSeconds: 7242
+  finalExecutedVariants: 136992
+  finalSeconds: 7527
   plan:
     batches: 4
     largestPaths: 645
@@ -176,8 +176,8 @@ regeneration:
     limits:
       paths: 3000
       reviewUnits: 500
-    scheduleHours: 8.35
-    fullUpdateScheduleHours: 16.55
+    scheduleHours: 8.36
+    fullUpdateScheduleHours: 16.56
   alternatives:
     - batches: 5
       largestPaths: 453
@@ -185,15 +185,15 @@ regeneration:
       limits:
         paths: 2000
         reviewUnits: 300
-      scheduleHours: 10.4
-      fullUpdateScheduleHours: 20.65
+      scheduleHours: 10.41
+      fullUpdateScheduleHours: 20.66
     - batches: 2
       largestPaths: 1115
       largestReviewUnits: 581
       limits:
         paths: 4000
         reviewUnits: 600
-      scheduleHours: 4.23
+      scheduleHours: 4.24
       fullUpdateScheduleHours: 8.31
     - batches: 1
       largestPaths: 1670
@@ -251,7 +251,7 @@ batches:
     regeneration:
       executableVariants: 1328
       scopedUpdateSeconds: 73
-      fullCorpusSeconds: 7311
+      fullCorpusSeconds: 7315
   - id: observation-batch-26b
     selector:
       prerequisiteSets:
@@ -298,7 +298,7 @@ batches:
     regeneration:
       executableVariants: 2116
       scopedUpdateSeconds: 116
-      fullCorpusSeconds: 7427
+      fullCorpusSeconds: 7431
   - id: observation-batch-27
     selector:
       prerequisiteSets:
@@ -350,7 +350,7 @@ batches:
     regeneration:
       executableVariants: 1734
       scopedUpdateSeconds: 95
-      fullCorpusSeconds: 7522
+      fullCorpusSeconds: 7526
   - id: observation-batch-28
     selector:
       prerequisiteSets:
@@ -376,4 +376,4 @@ batches:
     regeneration:
       executableVariants: 4
       scopedUpdateSeconds: 0
-      fullCorpusSeconds: 7522
+      fullCorpusSeconds: 7527

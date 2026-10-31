@@ -468,13 +468,19 @@ results:
       - dynamic-source
       - functions
       - object-properties
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
     observation:
-      detail: "test/language/statements/class/elements/derived-cls-direct-eva\
-        l-contains-superproperty-2.js non-strict disabled failed (1):
-        stdout=\"\"
-        stderr=\"test/language/statements/class/elements/derived-cls-di\
-        rect-eval-contains-superproperty-2.js:101:7: error[OSEO1001]:
-        Unknown binding 'eval'.\\n\""
+      detail: 'test/language/statements/class/elements/derived-cls-direct-eval-contains-superproperty-2.js
+        non-strict disabled failed (1): stdout=""
+        stderr="test/language/statements/class/elements/derived-cls-direct-eval-contains-superproperty-2.js:101:7:
+        error[OSEO1001]: eval compiles source text at run time, which is
+        outside the admitted profile.\n"'
       passed: false
       unsupportedCapability: profile-syntax
     unsupportedFeatures: []
@@ -499,13 +505,19 @@ results:
       - dynamic-source
       - error-intrinsics
       - functions
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
     observation:
-      detail: "test/language/statements/class/elements/nested-derived-cls-dir\
-        ect-eval-err-contains-supercall.js non-strict disabled failed
-        (1): stdout=\"\"
-        stderr=\"test/language/statements/class/elements/nested-derived\
-        -cls-direct-eval-err-contains-supercall.js:104:7:
-        error[OSEO1001]: Unknown binding 'eval'.\\n\""
+      detail: 'test/language/statements/class/elements/nested-derived-cls-direct-eval-err-contains-supercall.js
+        non-strict disabled failed (1): stdout=""
+        stderr="test/language/statements/class/elements/nested-derived-cls-direct-eval-err-contains-supercall.js:104:7:
+        error[OSEO1001]: eval compiles source text at run time, which is
+        outside the admitted profile.\n"'
       passed: false
       unsupportedCapability: profile-syntax
     unsupportedFeatures: []

@@ -11125,7 +11125,7 @@ tests:
     expectedClassification: pass
     dependencies: [atomics-single-agent]
   - path: test/built-ins/Atomics/wait/bigint/cannot-suspend-throws.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [atomics-single-agent]
   - path: test/built-ins/Atomics/wait/bigint/false-for-timeout-agent.js
     expectedClassification: pass
@@ -11197,7 +11197,7 @@ tests:
     expectedClassification: pass
     dependencies: [atomics-single-agent, atomics-and-shared-memory]
   - path: test/built-ins/Atomics/wait/cannot-suspend-throws.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [atomics-single-agent]
   - path: test/built-ins/Atomics/wait/descriptor.js
     expectedClassification: pass

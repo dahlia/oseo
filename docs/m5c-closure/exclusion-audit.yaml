@@ -25711,8 +25711,8 @@ paths:
     priorCohort: incidental-scaffolding
     sourceDigest: "24fcdf381cea49595a8d161954d303718607e7160bf6\
       4deb78b546067a0c23d9"
-    observationDigest: "52c8604ad5eef5fee7fccad5cb7bceca393690c189bc\
-      b9557212e95d72fc4b4d"
+    observationDigest: "1559c5182a81b49d379734731e0a07e9df59a1574ac2\
+      0f89c277639387ce6e59"
     missingDynamicTag: false
     section: sec-async-function-definitions-runtime-semantics-evaluation
     subject: Async function declaration completion value is empty.
@@ -25722,8 +25722,8 @@ paths:
     priorCohort: source-subject
     sourceDigest: "29865a812061e66fa971002d06c78ac4500fa0e2b275\
       1533813f4e19de81900b"
-    observationDigest: "e266bba3adea1ef5540999bacf70053305aa6d9501c1\
-      6a8b6cdf75dbd771485b"
+    observationDigest: "a222c55cdddfb86df5da2f5344ce414cb9c70ada8b3f\
+      8fb2aa27bfa72ee2a312"
     missingDynamicTag: false
     section: sec-async-function-definitions
     subject: sloppy direct eval in params introduces var (async function
@@ -25747,8 +25747,8 @@ paths:
     priorCohort: source-subject
     sourceDigest: "af80f24ff90a804646692fc94abcac6e0d2617221c50\
       436a8e63d85bc4a4e6dc"
-    observationDigest: "14024bfc631b27a2f97a3c0467175e52c7345b9bd495\
-      949ce50f995e5303c4f0"
+    observationDigest: "0a5d39919c206e81f73bb38f072178b9347abce8f02f\
+      d389dcf30f5dbc1ea982"
     missingDynamicTag: false
     section: "Original es5id: 12.8_A7"
     subject: Using eval "eval("break LABEL1")"
@@ -25758,8 +25758,8 @@ paths:
     priorCohort: incidental-scaffolding
     sourceDigest: "7015f8441010b5feb72c5a6bf369500783a04a0dc1a6\
       585edb82e3a419f9d7e0"
-    observationDigest: "b75e014a71cd3bf7b15759e9df6fe0666029717cddc8\
-      8c438fc17ea35c605750"
+    observationDigest: "c10f3942266bf95c7d01d3e6fd71738186125ed64685\
+      0fb583b8b3b1108388a0"
     missingDynamicTag: false
     section: sec-class-definitions-runtime-semantics-evaluation
     subject: Class declaration completion value is empty.
@@ -25770,8 +25770,8 @@ paths:
     priorCohort: source-subject
     sourceDigest: "e771494969af15e2cfc0a3e9ad6e6da4542e75780e0052c74e7f71172e9\
       a613b"
-    observationDigest: "6cd2953733e1058630f123d71e2178413cedf24210d3f3e16847f2\
-      1d30c16393"
+    observationDigest: "4b03bf19ad13a70f370c86a906de003bf7f518f7e5fd55f9cd8b96\
+      d07d28b47d"
     missingDynamicTag: false
     section: "sec-performeval-rules-in-initializer"
     subject: "super.x in StatementList of eval (direct eval)"
@@ -25782,8 +25782,8 @@ paths:
     priorCohort: source-subject
     sourceDigest: "a1d9bdd2e4d54cf4a1d21907e74126d115b5f8020c4293e9928e888aa56\
       3aafc"
-    observationDigest: "817e9243200619b013b479e957dc31cf1096fc88e30fad9585b403\
-      604d84635f"
+    observationDigest: "4d4d63fc4e864b3ba0827d08b18e6596636a678a9da59f84f84c91\
+      1a5816c037"
     missingDynamicTag: false
     section: "sec-performeval-rules-in-initializer"
     subject: "super['x'] in StatementList of eval (direct eval)"
@@ -25794,8 +25794,8 @@ paths:
     priorCohort: source-subject
     sourceDigest: "d3293d70770e48cbb9f837f0015cf465f5b59306a2ba2dcbe8c30b97d02\
       0419a"
-    observationDigest: "2952d7deebd18b6c3c24aa39b8ee7713aee8e5b8b5c24c7dde4ba2\
-      31681965c9"
+    observationDigest: "4f3c6221d1d3f7b3380217894069b33168275916f3cd3cd78edc10\
+      a87f983e52"
     missingDynamicTag: false
     section: "sec-performeval-rules-in-initializer"
     subject: "error if `super()['x']` in StatementList of eval (direct eval)"
@@ -25806,8 +25806,8 @@ paths:
     priorCohort: source-subject
     sourceDigest: "5a31c92d042ffe85f1a076d0e88d2850fc4a7410b91e46bc6c04dc98275\
       fcb8f"
-    observationDigest: "6f470879b0f252032b803090dbec1fdd14ba28b2ad179d01721476\
-      e235bffb1c"
+    observationDigest: "822d4ced01b7bfe513c8c9822da6c642b69e05fd62cceb652ff972\
+      893d1c073e"
     missingDynamicTag: false
     section: "sec-performeval-rules-in-initializer"
     subject: "error if `super().x` in StatementList of eval (direct eval)"
@@ -25818,8 +25818,8 @@ paths:
     priorCohort: source-subject
     sourceDigest: "717ca05d20a0cf735fa801d26d50532c3111db07b3b8cc20db4a1c34aa1\
       3b253"
-    observationDigest: "9fccb078f4f2f3d99d6edce4b61d701669386554496941d97f5996\
-      31b74a165a"
+    observationDigest: "d3fa0767de014f6711948232dd4721b0012a45d8889f5706a14348\
+      77b85defd8"
     missingDynamicTag: false
     section: "sec-performeval-rules-in-initializer"
     subject: "error if `super()` in StatementList of eval (direct eval)"
@@ -25890,8 +25890,8 @@ paths:
     priorCohort: source-subject
     sourceDigest: "661bdf04cc5a66bdd0ddf0d41a3450f0bc675f1b2d30ef2d526aed3e212\
       1cabe"
-    observationDigest: "84d9e3a40eb936a22d634e9714827587f3a5acb106fb80d044653f\
-      44640e9fdd"
+    observationDigest: "fc83e21c9920b91551f6ec5e7734a0784904a146486f7bbc03ded6\
+      785f7105c5"
     missingDynamicTag: false
     section: "sec-performeval-rules-in-initializer"
     subject: "error if `arguments` in StatementList of eval (direct eval)"
@@ -25902,8 +25902,8 @@ paths:
     priorCohort: source-subject
     sourceDigest: "557a8991b9592ad8ca0003c13740e83df3ed169adee55d5c3dbbcc97b7a\
       1ebbf"
-    observationDigest: "87ac2c9cb301b17a1e5707095f04f6ab1895be8217c93942a5c7ce\
-      34b82cd2c5"
+    observationDigest: "e3b63d9408e97b5712e4db452a48a5d9a2897bac5f28f3e4a681f0\
+      2be8fd9aef"
     missingDynamicTag: false
     section: "sec-performeval-rules-in-initializer"
     subject: "error if `new.target` in StatementList of eval (direct eval)"
@@ -25926,8 +25926,8 @@ paths:
     priorCohort: source-subject
     sourceDigest: "b86798b1776fedc1f7fd46ea56000ff9d4dd67cfe87c0288a9e260025da\
       7d775"
-    observationDigest: "a547b0bab79e1ecdca9f1d3db04f49af304bb7dcdaf00a65b56cb6\
-      05d66def58"
+    observationDigest: "64f7493c507fb76abcadc176f43744d28a91d45afaa4ae0adcfe98\
+      762a872f59"
     missingDynamicTag: false
     section: "sec-performeval-rules-in-initializer"
     subject: "super.x in StatementList of eval (direct eval)"
@@ -25938,8 +25938,8 @@ paths:
     priorCohort: source-subject
     sourceDigest: "76b87038a46af4783fb2e7fec80f89609ac2d93abdd05e5c4c442651565\
       de668"
-    observationDigest: "bbcf3215b4ba59b564a1b215f0f74b40dd147fa6e5badf8a9de740\
-      37ed241727"
+    observationDigest: "0ac2460dace8b91e7129786ef03db437be33278df7fd19e42705bb\
+      f021381950"
     missingDynamicTag: false
     section: "sec-performeval-rules-in-initializer"
     subject: "super['x'] in StatementList of eval (direct eval)"
@@ -25950,8 +25950,8 @@ paths:
     priorCohort: source-subject
     sourceDigest: "4036ee7d12238a2e2459955d6a43c8e8bb08e2f6935bbc1ad8ec11002ee\
       fa003"
-    observationDigest: "ba17949f8078eba0e347890b8e16f20a27cfe1b3aa2b10d8d0f2b3\
-      eecbbc7e0f"
+    observationDigest: "e79e6c66f4d66b6fd014586945b3f71655d071ad5bd9907b3dabf0\
+      b39bcebb4c"
     missingDynamicTag: false
     section: "sec-performeval-rules-in-initializer"
     subject: "error if `super()['x']` in StatementList of eval (direct eval)"
@@ -25962,8 +25962,8 @@ paths:
     priorCohort: source-subject
     sourceDigest: "cc03630e346928a21f155cc1b2453c43efe96ad8af42654b1edc50c2ca5\
       c436f"
-    observationDigest: "56a2764e0e54fc5c4c99a5314671e8566ffb9a15eab414282f65d5\
-      3a9a49c1ac"
+    observationDigest: "8ea69772f0d3c554713db10d00e3ddb2a711fb2fa5d546f159ecea\
+      261e8aec3d"
     missingDynamicTag: false
     section: "sec-performeval-rules-in-initializer"
     subject: "error if `super().x` in StatementList of eval (direct eval)"
@@ -25974,8 +25974,8 @@ paths:
     priorCohort: source-subject
     sourceDigest: "78564a6728bd60b9774111b71442a525b96aa682eddf66db3886a7a5ef4\
       67b46"
-    observationDigest: "cb24073242561fcbc5e47d6e360d41f9c6c7e79204b91983e24651\
-      a1e914474e"
+    observationDigest: "e5cbbffbc3b01fdb0ce1ae3523b45fcc45ed7bc8a4ed7da69898a3\
+      ba88d3b5f8"
     missingDynamicTag: false
     section: "sec-performeval-rules-in-initializer"
     subject: "error if `super()` in StatementList of eval (direct eval)"
@@ -26046,8 +26046,8 @@ paths:
     priorCohort: source-subject
     sourceDigest: "8b1ba97c7aae963819839ba29df8f6828830f9b7e64028547b109f1f381\
       3ac94"
-    observationDigest: "0216d59f956b0677b06bd2ca3c3126dc1f1b613c4fd13b9fdab384\
-      ad602c63d1"
+    observationDigest: "461fd0d1821815ed77c29c6d43bebcb5c42c46796725d4713ceb4c\
+      cc4f16ad3f"
     missingDynamicTag: false
     section: "sec-performeval-rules-in-initializer"
     subject: "error if `arguments` in StatementList of eval (direct eval)"
@@ -26058,8 +26058,8 @@ paths:
     priorCohort: source-subject
     sourceDigest: "1fe0d552e9acf56125bc333f03bf3a4d62d836bf6f1adb3fcbff15f42a2\
       00d75"
-    observationDigest: "506d9568b9729265437f598760e51c7e10867ea0b3957c8a9a44f3\
-      976e6a3503"
+    observationDigest: "e3e673d930cd205f8fb6869612191850e1d657be255d7e67c8124d\
+      62c5822e18"
     missingDynamicTag: false
     section: "sec-performeval-rules-in-initializer"
     subject: "error if `new.target` in StatementList of eval (direct eval)"
@@ -26082,8 +26082,8 @@ paths:
     priorCohort: source-subject
     sourceDigest: "9cd509121ef66e0bab66f63728272206fb468364b02982fb3a9c68cf0f3\
       8afc7"
-    observationDigest: "5fe4420af3fcb9ad20d2a98b6737a5366a56e487990ac2e1c8b922\
-      7bf38c891c"
+    observationDigest: "750ecdb4a09246906be1019e12fc1d1e82016f46c0462b617ea3a9\
+      2faca5ad73"
     missingDynamicTag: false
     section: "sec-performeval-rules-in-initializer"
     subject: "super.x in StatementList of eval (direct eval)"
@@ -26094,8 +26094,8 @@ paths:
     priorCohort: source-subject
     sourceDigest: "c78d80be301bdca26d3e5a206c54d7316d085ffa5a93deeffb2623987d3\
       73967"
-    observationDigest: "8fc81e5002834935d4b4737d01399f0427a0f66547d166cc8003a1\
-      a52bbca4e9"
+    observationDigest: "aab34009bf99cd4fa04de9153a85340729031d1c76e15e3d1fd453\
+      1751541cb3"
     missingDynamicTag: false
     section: "sec-performeval-rules-in-initializer"
     subject: "super['x'] in StatementList of eval (direct eval)"
@@ -26106,8 +26106,8 @@ paths:
     priorCohort: source-subject
     sourceDigest: "e81dd44994568e8fe521cbab376938e36ce5386b8513b88be42c239f17c\
       0bc2c"
-    observationDigest: "b8d9880a5f291f73883c0715bcd6e19f15e44a727076e647df9bc6\
-      9ebde6683a"
+    observationDigest: "812bd62171e161acc4a68938ed96a6f3f9cec711da6bcc0e3b0a45\
+      70b3e3d0e1"
     missingDynamicTag: false
     section: "sec-performeval-rules-in-initializer"
     subject: "error if `super()['x']` in StatementList of eval (direct eval)"
@@ -26118,8 +26118,8 @@ paths:
     priorCohort: source-subject
     sourceDigest: "afb48760f80e188fd5ef5bd9a87509d61bbb2f55cbbd5b1a1f8a4afdeae\
       7d101"
-    observationDigest: "6a5af043aa84989e688f2839861be34de1f715b270c4a6c68c6554\
-      574808a513"
+    observationDigest: "703aa5ce267ccfa6502f6857aa48b246733456134b09f17caae0aa\
+      fb90597d51"
     missingDynamicTag: false
     section: "sec-performeval-rules-in-initializer"
     subject: "error if `super().x` in StatementList of eval (direct eval)"
@@ -26219,8 +26219,8 @@ paths:
     priorCohort: source-subject
     sourceDigest: "a68a88f199b8579f418c819d46a133e54ad8cef461be506125c8a423b03\
       68c8f"
-    observationDigest: "ef2139287cee5ea45cb1f6838609d3063fad76c2101f052ef5243c\
-      66c0904892"
+    observationDigest: "979b830220881d97f12acf282c046ad274a9a03295b66224970f63\
+      6749526a52"
     missingDynamicTag: false
     section: "sec-performeval-rules-in-initializer"
     subject: "error if `new.target` in StatementList of eval (direct eval)"
@@ -26255,8 +26255,8 @@ paths:
     priorCohort: source-subject
     sourceDigest: "f06b3e30620c1fe403ea3b931a9bfeae663873b5c997f4ff9120763ff60\
       ad6ed"
-    observationDigest: "6a38c2d20d49c1fc6f950fe197f57911058b2a22a3df25fa950f7b\
-      85b5a9659d"
+    observationDigest: "cfbd1b3dc6a682c2a778321e29cfefec5a4849002928b2661ab921\
+      91b4dcd403"
     missingDynamicTag: false
     section: "sec-performeval-rules-in-initializer"
     subject: "super.x in StatementList of eval (direct eval)"
@@ -26267,8 +26267,8 @@ paths:
     priorCohort: source-subject
     sourceDigest: "89a7dd00dc466907eac8fe01c0f0416fd3436396c2055dc00fad1578a13\
       7030d"
-    observationDigest: "abb0dd3b765052edb596a82d2a9e9329499cc0e68209c23cd328e5\
-      3fa2117962"
+    observationDigest: "0f08a1d121a57f7f81fe4ba923095adad6688458578550eaacdde9\
+      ef24f087db"
     missingDynamicTag: false
     section: "sec-performeval-rules-in-initializer"
     subject: "super['x'] in StatementList of eval (direct eval)"
@@ -26279,8 +26279,8 @@ paths:
     priorCohort: source-subject
     sourceDigest: "e0dded17657f41e74cb28ae678e9f3db4848f291990ea74d4f5fd06dd34\
       ca96f"
-    observationDigest: "99018faf9e16b87e891ff958b32813bd8a9f720aa573da872a10c0\
-      e9525677ff"
+    observationDigest: "cd40b4c6f793d4e14ba5ed27510c1a5036025c84ed18b9e756fbf1\
+      dd4879183e"
     missingDynamicTag: false
     section: "sec-performeval-rules-in-initializer"
     subject: "error if `super()['x']` in StatementList of eval (direct eval)"
@@ -26291,8 +26291,8 @@ paths:
     priorCohort: source-subject
     sourceDigest: "16f7d12deda67cd9821d29e68cad68764cecbdfce000c92c9accbdacfed\
       ca535"
-    observationDigest: "1795fda02bc5bbc0523d90b1c76049ded5867fa783a083cc9c724a\
-      fbf52380cb"
+    observationDigest: "b14ca283244878341916de1a78695e2240d4b025b9b4b0790ca04e\
+      2482cef12f"
     missingDynamicTag: false
     section: "sec-performeval-rules-in-initializer"
     subject: "error if `super().x` in StatementList of eval (direct eval)"
@@ -26303,8 +26303,8 @@ paths:
     priorCohort: source-subject
     sourceDigest: "58b1b761172a63b6ce756554af9ef8bb5257c51b06cdaf60f3c8569060e\
       670b3"
-    observationDigest: "e8aeeabe3b7f305a9fcba8e7856881d421bd2bbbf36fca27c67834\
-      e61e4b829a"
+    observationDigest: "f4208951aaf1c4061ceea5a6faac7a4c8f94b0ab83bd0cf18085ba\
+      e9fe2833f1"
     missingDynamicTag: false
     section: "sec-performeval-rules-in-initializer"
     subject: "error if `super()` in StatementList of eval (direct eval)"
@@ -26375,8 +26375,8 @@ paths:
     priorCohort: source-subject
     sourceDigest: "e51031787ff0b1af187907a8f7def1779105725e8d88705676dd30b824d\
       b51c7"
-    observationDigest: "e5a4d1c68ff832e0c00d0beeda2df48293add469a7afeb2efda867\
-      fe39e39e3b"
+    observationDigest: "b9a3cf5639fb10a406f6132ab895d3a2b9bfd3569ba72d79b3f2c2\
+      8852591e97"
     missingDynamicTag: false
     section: "sec-performeval-rules-in-initializer"
     subject: "error if `arguments` in StatementList of eval (direct eval)"
@@ -26387,8 +26387,8 @@ paths:
     priorCohort: source-subject
     sourceDigest: "5f40954ea813e91ba782f9f2a25467febf17718a5558d114093da1b0eff\
       b9de6"
-    observationDigest: "88c359ee03501f498244973c8ab14b97a70928b8907765f853dacb\
-      591dd650e3"
+    observationDigest: "4443631214b2ca120b96c7dd8103fe53e319b09026ec1cfe50ba85\
+      87cca64577"
     missingDynamicTag: false
     section: "sec-performeval-rules-in-initializer"
     subject: "error if `new.target` in StatementList of eval (direct eval)"
@@ -26423,8 +26423,8 @@ paths:
     priorCohort: source-subject
     sourceDigest: "5f6382dc9835ce58a312d6da064f488f4b2152dc947a933dae9201d913f\
       7306d"
-    observationDigest: "d718bedee7392443ba7c2421ebec6e0ffd60c1b24d6ebc4b950a05\
-      a11ae09b3b"
+    observationDigest: "41f736385ceca0f5e16cac44db19b90843656b4b371f10b069769a\
+      0909d2dcbd"
     missingDynamicTag: false
     section: "sec-performeval-rules-in-initializer"
     subject: "super.x in StatementList of eval (direct eval)"
@@ -26435,8 +26435,8 @@ paths:
     priorCohort: source-subject
     sourceDigest: "229cd7880c1e36985f9374bbacae248fed9da2b0fa9ee3d91636a742741\
       0f2a0"
-    observationDigest: "aadad4ab28b4409084cb9af504bbe5ca5d9b4967e6fabf5b2a5afe\
-      fbad0c2315"
+    observationDigest: "049d7f508b5a9861b38b36a467521ab4ceccdfa62fd0413cb76996\
+      5d1e7582b6"
     missingDynamicTag: false
     section: "sec-performeval-rules-in-initializer"
     subject: "super['x'] in StatementList of eval (direct eval)"
@@ -26447,8 +26447,8 @@ paths:
     priorCohort: source-subject
     sourceDigest: "675e8c5fd1beb0a5ef7973b494543b4f9e3cdfc6d5585d46e77f797dbf9\
       4d09b"
-    observationDigest: "14fd752083436282a800488413859041eb7a8fd62669403561a70c\
-      311893a7c3"
+    observationDigest: "fd7fda17dd7506730cdf8a87a1cf0176385ad45c0fb406f9b0fa6a\
+      62d9542a95"
     missingDynamicTag: false
     section: "sec-performeval-rules-in-initializer"
     subject: "error if `super()['x']` in StatementList of eval (direct eval)"
@@ -26459,8 +26459,8 @@ paths:
     priorCohort: source-subject
     sourceDigest: "16c4be87e83aa99fb36b914138714e53c202a0ecd84b47283a254dfce15\
       13ee6"
-    observationDigest: "ff0f579cb6ef7aaacd43b236a3bf63251c33651d7d658e791f603d\
-      d52f9bd699"
+    observationDigest: "3cb5d8029cc2d62f6cc35b8b6493c54e2c67109db88ba4479bafa3\
+      0652a4f1b7"
     missingDynamicTag: false
     section: "sec-performeval-rules-in-initializer"
     subject: "error if `super().x` in StatementList of eval (direct eval)"
@@ -26471,8 +26471,8 @@ paths:
     priorCohort: source-subject
     sourceDigest: "636f05f7e89ef742b1f566c6941bb169cc1c5439b711934dc8e42138e4a\
       b8bcd"
-    observationDigest: "da324d21b5ba943fc13da22195843000407b00d5354a416d4a0a2c\
-      bb743b6404"
+    observationDigest: "79e4e8483b11684aa227c09325bfdda1ab00615dc8d58f3a205784\
+      7ff7d721d8"
     missingDynamicTag: false
     section: "sec-performeval-rules-in-initializer"
     subject: "error if `super()` in StatementList of eval (direct eval)"
@@ -26543,8 +26543,8 @@ paths:
     priorCohort: source-subject
     sourceDigest: "219ec00312e65f2ecc8f088f03320b7e254a625eda74266eb433a8f5128\
       01883"
-    observationDigest: "cbff3b1dd5bdc1578c090bd93214c4921658a82f22f5c43453d675\
-      61c9d30df5"
+    observationDigest: "8145dbb4d702cf9a95de63ab09408adc8c025f45d64b8a5eac044d\
+      45d4d0b8fa"
     missingDynamicTag: false
     section: "sec-performeval-rules-in-initializer"
     subject: "error if `arguments` in StatementList of eval (direct eval)"
@@ -26555,8 +26555,8 @@ paths:
     priorCohort: incidental-scaffolding
     sourceDigest: "610a0e497f972cfcce8da14a738ddf1759133a83fa95d21f86533e0090d\
       acb1a"
-    observationDigest: "3a0cfb86bf94cbc30dcd9a78ef97b95c561f77214fdab84b57504a\
-      3b61d0afa5"
+    observationDigest: "bc90962d7e4f7937cd9175982ac8b2e164bd4b9f6173bb8660cbe4\
+      2e7ae0a265"
     missingDynamicTag: false
     section: "sec-performeval-rules-in-initializer"
     subject: "error if `new.target` in StatementList of eval (direct eval)"
@@ -26591,8 +26591,8 @@ paths:
     priorCohort: source-subject
     sourceDigest: "6b64f37446dc6e6904c1ca34ce0e32149994773abd3db2bba5f78a056da\
       52431"
-    observationDigest: "7da8bd98674488a29799017bba1b04c69625065de03985b567440d\
-      edd863ad10"
+    observationDigest: "546edb96227eda418c1c508ca78af5d096e96d1394f546378401eb\
+      d10b8e81ee"
     missingDynamicTag: false
     section: "sec-performeval-rules-in-initializer"
     subject: "super.x in StatementList of eval (direct eval)"
@@ -26603,8 +26603,8 @@ paths:
     priorCohort: source-subject
     sourceDigest: "caeb58f331ffc3c5b99a09814da5fc36494711b6b18962b098fde6fc43c\
       7e0ad"
-    observationDigest: "3f1e50c272d3d64e5b2654374f375a3b7a90509c784cd1ad8562b3\
-      4d8312d8e6"
+    observationDigest: "f45b50b4d79974a41704539e4640c7fa1a3e903912fba84c14149b\
+      748c96eb38"
     missingDynamicTag: false
     section: "sec-performeval-rules-in-initializer"
     subject: "super['x'] in StatementList of eval (direct eval)"
@@ -26615,8 +26615,8 @@ paths:
     priorCohort: source-subject
     sourceDigest: "a23cf8ded5cdd892f03ec2d2b45b5a4595a890205347cf8bc1241605b97\
       eb3a3"
-    observationDigest: "ad67abfbf3f223f41810a52ced27b49e1985f87e480510416bd8e8\
-      1c62702662"
+    observationDigest: "afcbfd7266cba0e41abdf785c673fc3c7aecaa1903928c51c5266b\
+      7e0c38202b"
     missingDynamicTag: false
     section: "sec-performeval-rules-in-initializer"
     subject: "error if `super()['x']` in StatementList of eval (direct eval)"
@@ -26627,8 +26627,8 @@ paths:
     priorCohort: source-subject
     sourceDigest: "0a6fc0edabc74314913f1319915866385a25c0985d83258af425034a57a\
       7e739"
-    observationDigest: "17e8c68b23de82257f888ec2a71d8d2b20bfed5c54c2f4fe792658\
-      87fbc235b6"
+    observationDigest: "64c0400ba2eec78b52b6df2adb797c74730ecbf0f7162312518496\
+      f0ceb35569"
     missingDynamicTag: false
     section: "sec-performeval-rules-in-initializer"
     subject: "error if `super().x` in StatementList of eval (direct eval)"
@@ -26639,8 +26639,8 @@ paths:
     priorCohort: source-subject
     sourceDigest: "90abb2f21af69d06f7a31d43e36767cacfa0026a8a38dd7db354fb81674\
       0054d"
-    observationDigest: "0880de25572851eaa835743b18577f93696dc1537b821e295ab75e\
-      d80b6ff455"
+    observationDigest: "de3ff75ffa875dbee926a82035320a5fb8e478038dc8b3fced265e\
+      1ed879ad0f"
     missingDynamicTag: false
     section: "sec-performeval-rules-in-initializer"
     subject: "error if `super()` in StatementList of eval (direct eval)"
@@ -26711,8 +26711,8 @@ paths:
     priorCohort: source-subject
     sourceDigest: "06f5f492acfa4ffea0cdd67faba09a75efe33bb66e8b35c143359166cc9\
       351f6"
-    observationDigest: "77febccd1da45b2ed34e91c6506786ef7d3757b628c5df428948c6\
-      9fa7c648f9"
+    observationDigest: "330a1b003efe8cf243a409fa450f5f34d2573f2c40fe9cec70b204\
+      d2924c5af1"
     missingDynamicTag: false
     section: "sec-performeval-rules-in-initializer"
     subject: "error if `arguments` in StatementList of eval (direct eval)"
@@ -26723,8 +26723,8 @@ paths:
     priorCohort: incidental-scaffolding
     sourceDigest: "c5a1acbf6a69b20a631e1c74b8c00093fe19a2e605270030b4bf599861a\
       55125"
-    observationDigest: "64e2e838f1c83b3b653c064d875dfeb405999ca4572f68bc840166\
-      34cf7c1b3c"
+    observationDigest: "a574624ef0ca9c90ddd57a10915fd37c4520f780ac83c0b9c29514\
+      bc77f6203e"
     missingDynamicTag: false
     section: "sec-performeval-rules-in-initializer"
     subject: "error if `new.target` in StatementList of eval (direct eval)"
@@ -26735,8 +26735,8 @@ paths:
     priorCohort: source-subject
     sourceDigest: "f525d41bfbb9748d05188aacc6fb9e1e57244bc26c7967aec5956221d8f\
       18c6e"
-    observationDigest: "aea2c1273f288ff80934c05490514bf13176f974404c28a286caa1\
-      ca54f4d8bb"
+    observationDigest: "4de50bfafd665a4a03b1ef46d1b3ce74443f71bc915bc5c79316d7\
+      1eedc6eef5"
     missingDynamicTag: false
     section: "sec-privatefieldget"
     subject: "Private field is visible on initializer with direct eval"
@@ -26747,8 +26747,8 @@ paths:
     priorCohort: source-subject
     sourceDigest: "a40c8fcc07a68cc0b9ea8faa0ff9c0d851087d8bde3ef2533aac3a69c65\
       06d01"
-    observationDigest: "b57a48220564b623892dc81584c06561a55aa57127d1323b5d6032\
-      008d8c4314"
+    observationDigest: "2ae317bee61dad18b3c0a477638114c04c35fae24d6a3b27e86e8a\
+      d2d99222bc"
     missingDynamicTag: false
     section: "sec-privatefieldget"
     subject: "Private field is visible to direct eval code"
@@ -26772,8 +26772,8 @@ paths:
     priorCohort: source-subject
     sourceDigest: "4a776b97759aa74d505adba8a8dc1bfaf1c0ff5a3f39242af6bc19f5f60\
       a370e"
-    observationDigest: "629e82bac865eaf234d1baddc0dd761a7f13cfd3cee790600475b1\
-      97c8c84ac1"
+    observationDigest: "66ced1f30bd975dc7e84f0242d61646c8891b1e9b450039b15c8a5\
+      c73453cb7e"
     missingDynamicTag: false
     section: "sec-privatefieldget"
     subject: "Private getter is visible on initializer with direct eval"
@@ -26784,8 +26784,8 @@ paths:
     priorCohort: source-subject
     sourceDigest: "fb10b5f6c14f5e232baaef6afdcecfd8a26b4de9771f67320885331d90b\
       4ee81"
-    observationDigest: "842fe3897b0f348eb5eb487b355aff98e9b1b2ea7851a0cf2c7829\
-      7ea28f2fdf"
+    observationDigest: "35ac25fe7ced85ba4dfda9edb5d68d11fe9684356f13f16a437fc9\
+      cf86b23e0a"
     missingDynamicTag: false
     section: "sec-privatefieldget"
     subject: "Private getter is visible to direct eval code"
@@ -26820,8 +26820,8 @@ paths:
     priorCohort: source-subject
     sourceDigest: "181df38e4c1e642660d9deccc31548fa73d46e59de82f019748cf58dc06\
       496f7"
-    observationDigest: "1ef41be602d9821febcba2cc528baeebd4e1c3440ab81bb643f247\
-      7d0ed434b9"
+    observationDigest: "26539b4ae63b4fd1314fec76e817ecddbf823cfa220c0ca48c7e9c\
+      5497f42ecf"
     missingDynamicTag: false
     section: "sec-privatefieldget"
     subject: "Private method is visible on initializer with direct eval"
@@ -26832,8 +26832,8 @@ paths:
     priorCohort: source-subject
     sourceDigest: "d61f9e28bc6252785ac2492d00d97d1fe43503814dae7b77f3d1a65ccd3\
       6987a"
-    observationDigest: "b617136cfe845d75118310960aef1beb2155b8d7143f5e5cd94a9f\
-      02bf65257e"
+    observationDigest: "6ca4872e14f2173f231b64029e82ed04ed2d3f415db41ed9ed31b3\
+      4156f5a0ae"
     missingDynamicTag: false
     section: "sec-privatefieldget"
     subject: "Private method is visible to direct eval code"
@@ -26857,8 +26857,8 @@ paths:
     priorCohort: source-subject
     sourceDigest: "cd150c66f47aa95f0e3bd946a9d5620585a1fa2f8c5ac3ad148ba0eccaa\
       1bc9f"
-    observationDigest: "b86a312a3fa45fe72e8c8b3d3c014eb8259cd9b7a9f6a9f8d75b9b\
-      2108b421e4"
+    observationDigest: "3152e4505c52799e97cd6d6202e0cd9a391a13cc9c18226329e2ea\
+      69a0e093a1"
     missingDynamicTag: false
     section: "sec-privatefieldset"
     subject: "Private setter is visible on initializer with direct eval"
@@ -26869,8 +26869,8 @@ paths:
     priorCohort: source-subject
     sourceDigest: "3a7b21a0a1e294482e4f1b6d9f5793b1b55939f765e03723c64086a9e5a\
       7a3df"
-    observationDigest: "1b7435eaa16c65020d1481a13efd1b50517dc87988bb8d5a5cbaf5\
-      ddaf931251"
+    observationDigest: "5f612ad1f401ea47521a09ec9ec62856d6e34bd4eada336414fada\
+      6ba98dd593"
     missingDynamicTag: false
     section: "sec-privatefieldset"
     subject: "Private setter is visible to direct eval code"
@@ -26881,8 +26881,8 @@ paths:
     priorCohort: source-subject
     sourceDigest: "ed017705198028283a01e8b128d723a9f33a86475f2dd082c24f1af8a57\
       166e4"
-    observationDigest: "8fdac69a13449d2acd7123c79f95a5bc0d47bf51b13b8f1326a9f9\
-      80de10019f"
+    observationDigest: "525337987efc4c9e60554fe6d4445e95b9503eb71d6caf8634371f\
+      447d7040bf"
     missingDynamicTag: false
     section: "sec-privatefieldget"
     subject: "Private static field is visible to direct eval code"
@@ -26893,8 +26893,8 @@ paths:
     priorCohort: source-subject
     sourceDigest: "8c3195ac05a1ab719aa3811eb24fde038c0dd4541ac8c06faf42abf8be3\
       b75e5"
-    observationDigest: "0ba3db19a137903842f4b49634a8d163f2d130face9e7548902e79\
-      c96106713f"
+    observationDigest: "0a19acb49678de207fb9e1dc91b2172b8dc75ba03059cf3d2f6b5c\
+      a35298afbc"
     missingDynamicTag: false
     section: "sec-privatefieldget"
     subject: "Private static getter is visible to direct eval code"
@@ -26905,8 +26905,8 @@ paths:
     priorCohort: source-subject
     sourceDigest: "d227631a51ba8b12581a3057f99a1d1c0212a88ac10dbc56f308017be8e\
       9cec1"
-    observationDigest: "bc999477ffda9b9fc6e64fd91a68df0af50c69684eb376a8426a65\
-      a40238ab3d"
+    observationDigest: "d81730dcdd884638a4ec1a157a417efebaa938879fbbbf7112d418\
+      9431866523"
     missingDynamicTag: false
     section: "sec-privatefieldget"
     subject: "Private static method is visible to direct eval code"
@@ -26917,8 +26917,8 @@ paths:
     priorCohort: source-subject
     sourceDigest: "8221349fd36b13914d8235487939ea430004d9453403969f859cb0d37d0\
       ea213"
-    observationDigest: "eac6b8e02e6749ea16ea9bae49ee001c23ef082c6eeb0a8c22f8bb\
-      989b526c5f"
+    observationDigest: "078240fedb3347f85c6a3408a50b2ca77da406c40acdfb9a0b0a09\
+      c2fdd47ec7"
     missingDynamicTag: false
     section: "sec-privatefieldget"
     subject: "Private static setter is visible to direct eval code"
@@ -26929,8 +26929,8 @@ paths:
     priorCohort: source-subject
     sourceDigest: "585c03e4aaf60c3458f7db58a77607c6a6d25a1ff940df0b69343f49129\
       45b20"
-    observationDigest: "ffd92f0401773818b3c1f153c3d45b60801fcc92e33d8c1004650a\
-      164a1067a1"
+    observationDigest: "ec69c391e468792bf5e98331b672919314844f7ca213ac89770977\
+      7efa312659"
     missingDynamicTag: false
     section: "sec-scripts-static-semantics-early-errors"
     subject: "Early error when referencing privatename in constructor without
@@ -26942,8 +26942,8 @@ paths:
     priorCohort: source-subject
     sourceDigest: "75a05e4955fc8edc83a003b98b84a72d12d6c0b2d1cfd2336263a892373\
       f632b"
-    observationDigest: "e539266e342c8f6c07f357e487945f71038b8bde93ef0af8599f1c\
-      f4a7c20fa3"
+    observationDigest: "34aecee1a6bb7595767d3d9d392ea25eb2ceb6be3990f18053acb8\
+      35174d5f6e"
     missingDynamicTag: false
     section: "sec-scripts-static-semantics-early-errors"
     subject: "Early error when referencing privatename in function in class
@@ -26955,8 +26955,8 @@ paths:
     priorCohort: source-subject
     sourceDigest: "c591fb14fbab113b551918eca312746e2935143ad8d9b4499068128e097\
       b8870"
-    observationDigest: "576ef38a9955089fb7bdc86fc54c47293c90baea2a64c8a9bfd1d0\
-      4749c53cae"
+    observationDigest: "f6fe8bc7843100ecf1695519811bf9b93d576285871c5f46ed8e4c\
+      099a6568e2"
     missingDynamicTag: false
     section: "sec-scripts-static-semantics-early-errors"
     subject: "Early error when referencing privatename that has not been
@@ -26968,8 +26968,8 @@ paths:
     priorCohort: source-subject
     sourceDigest: "bf43665aafd3263f4d38d64d305c7ba7f056bdd4016c768b2dea7461fb9\
       b73a1"
-    observationDigest: "8f97488605f4ea683eb0cbbd14191e62db3629437a658a99ea93d5\
-      bd2d476bc9"
+    observationDigest: "f960b4be66dfc69bb05d648bfa088d2bcb49f33af3a528ecb26913\
+      608897603e"
     missingDynamicTag: false
     section: "sec-scripts-static-semantics-early-errors"
     subject: "Early error when referencing privatename that has not been
@@ -26981,8 +26981,8 @@ paths:
     priorCohort: source-subject
     sourceDigest: "abb2a5f4ec4876b9b885f43da5b990adfa9783d3a736c21bb0629290e67\
       e8065"
-    observationDigest: "cccff95a002627d662dcc4cd0a0b16e43a57243a09c71883c94cb2\
-      7f2d40506a"
+    observationDigest: "145bc903eb01f66898042e3771e297c3fa10b3787f99b1da8e08d6\
+      768a2e553d"
     missingDynamicTag: false
     section: "sec-scripts-static-semantics-early-errors"
     subject: "Early error when referencing privatename outside of class"
@@ -26993,8 +26993,8 @@ paths:
     priorCohort: source-subject
     sourceDigest: "9dc5f36a9e917c3298e29eb70d3dac44bb9097e2224c7eafad77849dcfd\
       a365f"
-    observationDigest: "3eb1553c21779a090a017bb8d1966ecebf722dc4f4f295a0ff0f31\
-      ba3a38187b"
+    observationDigest: "98929b8d9103b6a3f2da7584c073acd7e328ba59f6c3e3ba60ecaa\
+      e115ac0b9b"
     missingDynamicTag: false
     section: "sec-scripts-static-semantics-early-errors"
     subject: "Early error when referencing privatename outside of class."
@@ -27005,8 +27005,8 @@ paths:
     priorCohort: source-subject
     sourceDigest: "4e983212864d5fd457f93546bdd64c36ab5811056775e796a8fe59a2633\
       1a29f"
-    observationDigest: "fafb2a1413ff36dfa1538d426df94cbd27eef82dc1104bd0fd9ddc\
-      51d05b9321"
+    observationDigest: "d7b540e950a6d5f55f984039572d22df2dd664cbd6e4a069edd95d\
+      e30992b070"
     missingDynamicTag: false
     section: "sec-scripts-static-semantics-early-errors"
     subject: "Early error when referencing privatename on object, outside of c\
@@ -27018,8 +27018,8 @@ paths:
     priorCohort: source-subject
     sourceDigest: "826ed6198e8425ace91fc72b321cd75de93d38df51af977ad9151c3190b\
       f2f02"
-    observationDigest: "2c17569bc8a86c594ed024665ddb489b364e653753e718cbb15e48\
-      53b62e38ae"
+    observationDigest: "51e7d01c74055b6f14ed6916faa20ae58013fdf1a326d33df6443e\
+      f8eb01799e"
     missingDynamicTag: false
     section: "sec-scripts-static-semantics-early-errors"
     subject: "Early error when referencing privatename on object, outside of c\
@@ -27031,8 +27031,8 @@ paths:
     priorCohort: incidental-scaffolding
     sourceDigest: "e9c8ccea4fb11ae4c42474f812aa106a9252633871dfde7efd56d6b95b0\
       4e4ff"
-    observationDigest: "2dd61ce067c6398bf242ed4903607cffc69e5fe6c93597014b73d9\
-      65d78b7910"
+    observationDigest: "aa987b274b7a8300ce7cf1bd5774c609dd233c125b774c11010f23\
+      8c95367c73"
     missingDynamicTag: false
     section: "prod-FieldDefinition"
     subject: "Static fields initializer has `this` biding (field definitions in
@@ -27451,8 +27451,8 @@ paths:
     priorCohort: incidental-scaffolding
     sourceDigest: "9a0f69a525bf64409ca6829281bae2e7e3694aaeb1508717\
       ce5399a3da700a07"
-    observationDigest: "3650c51f2c73d5231ce0a48c72abe29b0990563345b6f625\
-      8078489aa3820b6e"
+    observationDigest: "b1a268943bd946772d625fef0057aecc5dcf166c0b4cd8fb\
+      5ce920b8b8e98678"
     missingDynamicTag: false
     section: 13.7.5.11
     subject: Completion value when head has a declaration and iteration is
@@ -27463,8 +27463,8 @@ paths:
     priorCohort: incidental-scaffolding
     sourceDigest: "43cf1ed785382075a5a798cc226fd1839a44118b70e329bd\
       1df2a2f2334b4a4c"
-    observationDigest: "f7bcb7183ab535ebd7e356c8cb22cd0805e5b5e0406f6d33\
-      f37e38f656e50456"
+    observationDigest: "821d660f7bd15a25a595aa9478b6fd520c2c743e07bdc56c\
+      7f894510cb5c615d"
     missingDynamicTag: false
     section: 13.7.5.11
     subject: Completion value when head has a declaration and iteration occurs
@@ -27474,8 +27474,8 @@ paths:
     priorCohort: incidental-scaffolding
     sourceDigest: "7071609ec5809b4ad2c8f84d2337aa58857b97280fb35539\
       5966444ad76fe750"
-    observationDigest: "b03279704deb0226ea4080bc8f9043cd3b88bede4763dd9e\
-      1e3bab5d35982b00"
+    observationDigest: "43127d4caca96a590b444f6064a17fa42cdfef39a915aa62\
+      7f46461ef57e5cc3"
     missingDynamicTag: false
     section: 13.7.5.11
     subject: Completion value when head has a declaration and no iteration
@@ -27486,8 +27486,8 @@ paths:
     priorCohort: incidental-scaffolding
     sourceDigest: "a80d8457ae444669eb5f845e49d2ed6760a03c654da2aa97\
       d2a6d852decccd54"
-    observationDigest: "98038099f48fb58f6f224c173bd64e85912ec4949a833caf\
-      1755c52174d9b0bd"
+    observationDigest: "bfd79484e2b96aebe96266ede552b478d15fb1199cbacaab\
+      ec3d77585fa13a51"
     missingDynamicTag: false
     section: 13.7.5.11
     subject: Completion value when head has no declaration and iteration is
@@ -27498,8 +27498,8 @@ paths:
     priorCohort: incidental-scaffolding
     sourceDigest: "b8e10d5b313c9edf7b9a5d3931be8a0823985a31c6170f6d\
       84bb7d621933e3ee"
-    observationDigest: "9695f96840249a3b0372bf60886be0336f4b55757fcadca0\
-      44d7c293b5dfc150"
+    observationDigest: "73b47a337f21eb9181222bb9351488b963714d158369776b\
+      6d10893c5eb4fcac"
     missingDynamicTag: false
     section: 13.7.5.11
     subject: Completion value when head has no declaration and iteration occurs
@@ -27509,8 +27509,8 @@ paths:
     priorCohort: incidental-scaffolding
     sourceDigest: "30ffa0ed8f4a2728d2e488151e179782d46cff30f3fe3704\
       2f7843160d072d12"
-    observationDigest: "46d52b5551e78fe378c1c176d8c2cc8021895a2ec8f5f1c2\
-      b47f34dcc6d51fec"
+    observationDigest: "fa2558b6ce41d1d250008dfa0be596f23e163abddb8d094c\
+      3973a6512507df3d"
     missingDynamicTag: false
     section: 13.7.5.11
     subject: Completion value when head has no declaration and no iteration
@@ -27521,8 +27521,8 @@ paths:
     priorCohort: incidental-scaffolding
     sourceDigest: "ad40cbb12ec8ef496589b172141ae16e13e756d7444e9b12\
       e2daf725c0954bcf"
-    observationDigest: "647840a7fe471d16387a17bdacbac35782df9ac76f56fa03\
-      50d747ffa579d14c"
+    observationDigest: "80ee04216addd9583ed9ff826a4fe87e2e40499025edb517\
+      8b8484d5489ba38e"
     missingDynamicTag: false
     section: "sec-for-in-and-for-of-statements-runtime-semanti\
       cs-labelledevaluation"

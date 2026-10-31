@@ -643,13 +643,19 @@ results:
       - dynamic-source
       - error-intrinsics
       - functions
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
     observation:
-      detail: "test/language/statements/class/elements/arrow-body-private-der\
-        ived-cls-direct-eval-err-contains-supercall.js non-strict
-        disabled failed (1): stdout=\"\"
-        stderr=\"test/language/statements/class/elements/arrow-body-pri\
-        vate-derived-cls-direct-eval-err-contains-supercall.js:104:8:
-        error[OSEO1001]: Unknown binding 'eval'.\\n\""
+      detail: 'test/language/statements/class/elements/arrow-body-private-derived-cls-direct-eval-err-contains-supercall.js
+        non-strict disabled failed (1): stdout=""
+        stderr="test/language/statements/class/elements/arrow-body-private-derived-cls-direct-eval-err-contains-supercall.js:104:8:
+        error[OSEO1001]: eval compiles source text at run time, which is
+        outside the admitted profile.\n"'
       passed: false
       unsupportedCapability: profile-syntax
     unsupportedFeatures: []
@@ -675,13 +681,19 @@ results:
       - functions
       - object-properties
       - var-bindings
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
     observation:
-      detail: "test/language/statements/class/elements/arrow-body-private-dir\
-        ect-eval-err-contains-newtarget.js non-strict disabled failed
-        (1): stdout=\"\"
-        stderr=\"test/language/statements/class/elements/arrow-body-pri\
-        vate-direct-eval-err-contains-newtarget.js:103:8:
-        error[OSEO1001]: Unknown binding 'eval'.\\n\""
+      detail: 'test/language/statements/class/elements/arrow-body-private-direct-eval-err-contains-newtarget.js
+        non-strict disabled failed (1): stdout=""
+        stderr="test/language/statements/class/elements/arrow-body-private-direct-eval-err-contains-newtarget.js:103:8:
+        error[OSEO1001]: eval compiles source text at run time, which is
+        outside the admitted profile.\n"'
       passed: false
       unsupportedCapability: profile-syntax
     unsupportedFeatures: []

@@ -218,8 +218,8 @@ The focused contract evidence is
 *packages/cli/tests/non-blocking-agent.test.ts*,
 *tests/non-blocking-agent-native.test.ts*,
 *tests/native/fixtures/non-blocking-agent.ts*, and
-*tests/property/m5-non-blocking-agent.property.test.ts*. The two owned
-reviewed rows retain their previous classifications until Root's UPDATE.
+*tests/property/m5-non-blocking-agent.property.test.ts*. Root's bundle 3 Full
+UPDATE observed both owned reviewed rows as pass.
 
 
 Consequences
