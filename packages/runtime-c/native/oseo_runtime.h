@@ -1026,6 +1026,50 @@ OseoResult oseo_unresolvable_cell_create(
     OseoContext *context,
     const char *message
 );
+/* A statically selected native operation's operands and source position.
+ * first/second are environment slot/binding ID for a read, object/key slots
+ * for a property get, and input slot/unused for key conversion. output is
+ * the destination root slot. All slots belong to the caller's rooted frame.
+ * A null source_id preserves the current source identity, like
+ * oseo_context_location. This record does not select an operation. */
+typedef struct {
+    size_t output, first, second;
+    const char *source_id;
+    size_t source_id_length, line, column;
+} OseoGeneratedOperation;
+
+bool oseo_generated_binding_read_at(
+    OseoContext *context, OseoValue *roots,
+    const OseoGeneratedOperation *operation, OseoResult *result
+);
+void oseo_generated_property_key_at(
+    OseoContext *context, OseoValue *roots,
+    const OseoGeneratedOperation *operation, OseoResult *result
+);
+void oseo_generated_property_get_at(
+    OseoContext *context, OseoValue *roots,
+    const OseoGeneratedOperation *operation, OseoResult *result
+);
+void oseo_generated_operation_location(
+    OseoContext *context, const OseoGeneratedOperation *operation
+);
+
+/* Generated operation compositions keep result and root stores in the archive.
+ * A false binding-read result means environment lookup failed, before the
+ * cell read and output store; a cell's throw still reaches the MIR handler. */
+bool oseo_generated_binding_read(
+    OseoContext *context, OseoValue environment, size_t index,
+    OseoResult *result, OseoValue *output
+);
+void oseo_generated_property_key(
+    OseoContext *context, OseoValue input,
+    OseoResult *result, OseoValue *output
+);
+void oseo_generated_property_get(
+    OseoContext *context, OseoValue object, OseoValue key,
+    OseoResult *result, OseoValue *output
+);
+
 OseoResult oseo_cell_get(OseoContext *context, OseoValue cell);
 OseoResult oseo_cell_initialize(
     OseoContext *context,

@@ -1266,4 +1266,16 @@ Both source branches used `m5-140` independently, so this composition uses
 the next unused identity after Main and both branches. Their ABI history
 notes retain their original source identities.
 
+The `m5-142` ABI adds archive compositions for generated binding reads,
+property-key conversion, and ordinary property gets. Each native call selects
+its operation statically. A call-site record supplies root indices and its
+source position; it has no opcode or dispatch loop. The caller keeps the same
+registered frame and live operands. Each composition performs the existing
+runtime calls and stores the result in the same output root, including a
+language throw. A failed environment lookup returns before the binding read
+and output store, retaining the generated direct-abrupt route. Fragment code
+uses the same compositions after its existing relocated location call.
+These helpers introduce no collection point, language call, or specialization
+policy. The existing runtime calls retain their generic behavior.
+
 [activity audit]: https://github.com/dahlia/oseo/blob/main/docs/sanitizer-activity.md

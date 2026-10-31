@@ -435,3 +435,15 @@ The post-revert sanitizer repair guards function bodies with the shared
 runtime frame ceiling and applies the explicit host C callable-frame charge
 in both direct and dispatched calls. All 44 whole-Script digest records are
 regenerated for these C-only changes; HIR and MIR are unchanged.
+
+M5c node `array-generated-property-cost-remediation` regenerates all 44
+whole-Script records because binding reads, property-key conversion, and
+ordinary property gets now use runtime archive compositions and static
+call-site records. Replaying the base backend reproduces all 44 old hashes
+against the current fixture HIR and MIR; only emitted C changes. The script
+and per-record comparisons are retained at
+*/data/m5c-arraycost3-20261031/refresh-baseline.ts* and
+*/data/m5c-arraycost3-20261031/baseline-refresh.json*. Whole/fragment native
+equivalence passes both toolchains before this code-generation baseline
+refresh. This is derived C-output evidence, separate from compatibility
+classifications and performance measurements.

@@ -22,8 +22,8 @@ measure the remedy on the same lane. No observation or product repair is
 claimed by this graph addition.
 
 
-Linux compiler profile, 2026-10-31
-----------------------------------
+Attempt 2 compiler profile, 2026-10-31
+--------------------------------------
 
 This attempt produced no accepted cost remedy. Root requested a diagnostic-only
 commit and a failed worker outcome after the best bounded prototype reduced
@@ -138,3 +138,104 @@ compile time. It also changes what the native and sanitizer lanes test,
 including stack/frame behavior and diagnostic coverage. This attempt changes
 no compiler flag; any proposal needs separate lane evidence and maintainer
 approval before adoption.
+
+
+Attempt 3 archive compositions, 2026-10-31
+------------------------------------------
+
+The third attempt carries forward the diagnostic note from `e4334397`
+and retains the same base, fixed seed, generator, independent output model,
+case budget, interrupt, specialization policies, and toolchain flags. This
+node still owns no test262 path, and no result classification changes.
+
+A fresh baseline profile again puts native compilation ahead of source
+compilation, C emission, and execution. The first disabled Zig request had a
+cold cache and is excluded from comparisons. The retained prototype moves
+binding-read, property-key, and ordinary property-get compositions into the
+runtime archive. It preserves the existing environment and cell calls,
+source locations, output root stores, guards, and fallback operations.
+Static call-site records supply operands and locations to a function selected
+by generated native code. They contain no opcode and introduce no interpreter
+or dispatch loop. Fragments keep their dynamically relocated location call.
+Runtime ABI `m5-142` names the added entry points.
+
+The first prototype moved just operation result and output-root stores into
+archive helpers. Its three warm alternating pairs reduced median compile-link
+time by 5.3%/5.5% under Zig and 18.0%/11.6% under host-cc for disabled/enabled
+policies. It reduced C text by 56,286 bytes per policy. The final prototype
+also shares operand loading and location setup through static call-site
+records. Each lane has one excluded warm-up pair and three measured
+baseline/candidate pairs:
+
+| Lane    | Policy   | Baseline median ms | Candidate median ms | Reduction |
+| ------- | -------- | -----------------: | ------------------: | --------: |
+| Zig     | Disabled |             1140.4 |               902.6 |     20.9% |
+| Zig     | Enabled  |             1145.4 |               939.5 |     18.0% |
+| host-cc | Disabled |             2511.2 |              1985.4 |     20.9% |
+| host-cc | Enabled  |             3485.3 |              2414.8 |     30.7% |
+
+These are Linux AMD64 specimen measurements. Runtime archives are warm,
+commands alternate baseline then candidate, and desktop load and cache history
+are not controlled. Individual paired reductions vary; ratios of medians do
+not establish a hosted macOS improvement. Every completed specimen matches
+the full output model and the original allocation, collection, guard and
+addition counters. The static records increase total standalone C text from
+1,047,906 to 1,326,149 bytes with specialization disabled and from 1,403,899
+to 1,683,706 bytes with it enabled. The benefit is less executable call-site
+code to generate, despite additional static declarations.
+
+A representative paired specimen's executable `.text` section shrinks by
+about 1.09 MB under Zig and 1.30 MB under host-cc in both policies. Its
+`.rodata` grows by about 66 KB and 172 KB respectively. These ELF section
+measurements include the linked runtime and sanitizer code; the packet
+retains the exact binary paths and byte counts.
+
+The paired prototype's reusable runtime archive grows from 12,323,202 to
+12,343,976 bytes under Zig and from 10,412,448 to 10,426,200 bytes under
+host-cc. These are increases of 20,774 and 13,752 bytes respectively, below
+0.2%. Archive construction is separate from the per-program compile-link
+samples; the new ABI identity requires a fresh archive, then reuses it.
+
+Root confirmed that the 18–31% specimen reduction meets this attempt's
+material-reduction threshold. The earlier roughly 30% target was a planning
+figure. This does not close the node: closure requires candidate CI to measure
+the ordinary macOS Array job against its unchanged 180-second interrupt.
+The optimization-level measurement remains a separate measurement-only task.
+
+The packet at </data/m5c-arraycost3-20261031/> retains the baseline backend
+and runtime copied from the exact base, both prototype patches, command logs,
+all paired samples, and machine-readable summaries. The backend adapter
+changes only import paths. Both toolchains retain their default sanitizer
+settings and optimization levels. All heavy commands use the shared lock and
+capacity wrapper; no UPDATE runs in this worker.
+
+The unchanged ordinary property passes all 12 cases, both policies, and forced
+collection on each lane. A single fresh baseline run follows the candidate
+run; these whole-file observations are not alternating specimen pairs:
+
+| Lane    | Baseline property seconds | Candidate property seconds |
+| ------- | ------------------------: | -------------------------: |
+| Zig     |                    46.788 |                     43.402 |
+| host-cc |                   110.487 |                     86.943 |
+
+The retained implementation emits byte-identical specimen C to the measured
+prototype under both policies. The new native fixture covers TDZ reads,
+coercion order, getter and proxy throws, and roots across collection. Its
+registration includes both forced-GC lists. It and the with-var loop-head and
+optional-call tail fixtures pass both policies on Zig and host-cc. The
+harness-fragment equivalence, location, reuse, and deterministic-object suite
+also passes on both toolchains. All 38 focused backend/runtime registrations
+pass. The corrected assertion layout passes the focused backend test, and the
+capacity-wrapped repository check passes.
+
+The code-generation baseline refresh reproduces all 44 old whole-Script
+hashes with the base backend before replacing them. Printed HIR and MIR are
+unchanged; emitted C uses the archive compositions. The array indexed-lookup
+source check now names the generated property-get entry point. All 16 tests
+in the two affected suites pass after those expectation updates.
+
+The fast non-native repository batch passes all 833 tests across 59 files,
+with native suites excluded by the repository's host-guard analyzer. The
+internal pair precedes the exact-U D3 request. Root's D3 decision follows
+those gates. Hosted macOS evidence, candidate gates, publication, and landed
+state remain Root-owned.

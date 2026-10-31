@@ -1978,3 +1978,78 @@ test("leaves a tail call through the frame's abrupt exit", () => {
     /MIR tail call %3 has a target with no tail call ABI\./u,
   );
 });
+
+test("archive operations retain source bytes and root operands", () => {
+  const program = globalObjectProgram(false);
+  const range = {
+    start: { line: 7, column: 9 },
+    end: { line: 7, column: 15 },
+    sourceId: "café.js",
+  };
+  const input: MirProgram = {
+    ...program,
+    script: {
+      ...program.script,
+      blocks: [
+        {
+          id: 0,
+          operations: [
+            {
+              arguments: [],
+              bindingId: 0,
+              detail: "answer",
+              id: 0,
+              kind: "read",
+              range,
+            },
+            {
+              arguments: [0],
+              detail: "key",
+              id: 1,
+              kind: "property-key",
+              range,
+            },
+            {
+              arguments: [0, 1],
+              detail: "get",
+              id: 2,
+              kind: "property-get",
+              range,
+            },
+          ],
+          terminator: { kind: "return", value: 2 },
+        },
+      ],
+    },
+  };
+  const source = cBackend.emit(input).source;
+  const location = String.raw`"caf\303\251.js", 8u, 7u, 9u`;
+  const read = source.match(/generated_operation_0 = \{(.+)\};/u)?.[1];
+  assert.ok(read);
+  assert.match(read, /^0u, \d+u, 0u,/u);
+  assert.ok(read.endsWith(location));
+  assert.ok(
+    source.includes(`generated_operation_1 = {1u, 0u, 0u, ${location}};`),
+  );
+  assert.ok(
+    source.includes(`generated_operation_2 = {2u, 0u, 1u, ${location}};`),
+  );
+  assert.ok(
+    source.includes(
+      "if (!oseo_generated_binding_read_at(context, roots, " +
+        "&generated_operation_0, &result)) goto abrupt;",
+    ),
+  );
+  assert.ok(
+    source.includes(
+      "oseo_generated_property_key_at(context, roots, " +
+        "&generated_operation_1, &result);",
+    ),
+  );
+  assert.ok(
+    source.includes(
+      "oseo_generated_property_get_at(context, roots, " +
+        "&generated_operation_2, &result);",
+    ),
+  );
+});

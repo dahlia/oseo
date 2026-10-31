@@ -33,6 +33,6 @@ test("array indexed lookup regressions lower under both policies", () => {
     assert.deepEqual(compiled.diagnostics, []);
     assert.ok(compiled.mir != null);
     const emitted = cBackend.emit(compiled.mir);
-    assert.match(emitted.source, /oseo_object_get/u);
+    assert.match(emitted.source, /oseo_generated_property_get_at/u);
   }
 });

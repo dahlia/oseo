@@ -8,6 +8,13 @@ not execute a compiler or choose runtime sources. MIR blocks and terminators are
 its only semantic input; it never replays HIR.
 Lexical bindings use traced environments and shared cells while their values
 remain rooted across calls and collection.
+
+Binding reads, property-key conversion, and ordinary property gets use
+statically selected native helpers from the runtime archive. Their call-site
+records carry root indices and source positions, so each generated program
+compiles fewer operand loads and result stores. The helpers perform the same
+runtime calls and root stores; MIR still owns guards and abrupt routing.
+Fragment emission retains its dynamically relocated source-location call.
 Only functions reachable from the script and blocks reachable from function
 entry are emitted. Self-recursive calls use a standard C volatile function
 pointer so strict warning settings do not reject valid recursion.

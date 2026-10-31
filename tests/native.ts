@@ -1411,6 +1411,7 @@ for (const fixture of selectedFixtures) {
   }
 
   if (
+    fixture.name === "generated-native-operations" ||
     fixture.name === "array-buffer" ||
     fixture.name === "typed-array-constructors" ||
     fixture.name === "typed-array-float16" ||
@@ -1719,6 +1720,7 @@ for (const fixture of selectedFixtures) {
             }
           }
           if (
+            fixture.name === "generated-native-operations" ||
             fixture.name === "array-buffer" ||
             fixture.name === "array-prototype-copying" ||
             fixture.name === "array-prototype-change-by-copy" ||
