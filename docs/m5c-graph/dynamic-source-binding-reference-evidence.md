@@ -120,3 +120,20 @@ The reviewed subset and result manifest are unchanged, so no UPDATE is
 needed. Focused native validation covers the three new groups; Root must run
 full `test:native` on Linux AMD64 and macOS AArch64 before publication. Root
 also retains full gate scheduling, outer review, integration and landing.
+
+
+Internal review corrections
+---------------------------
+
+The original audit subjects are preserved verbatim, beside the table's
+separate non-source observations. A pass-1 DeepSeek finding identified that
+replacing those subjects obscured the excluded eval-context contracts.
+Astra's pass-1 review was clean; both stages review the correction batch.
+
+Every replacement assertion compares actual values with `Object.is` inside
+the compiled program before printing. The same oracle rejects five type
+mutations, including `1`/`"1"`, `42`/`"42"`, `10`/`"10"`,
+`undefined`/`"undefined"` and `true`/`"true"`, in each fixture. Printed
+output remains a differential trace, while typed assertions prove the
+original values and identities. All original identifier reads remain
+identifier reads; property reads remain property reads.

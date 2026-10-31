@@ -1131,8 +1131,8 @@ assessments:
       ADR 0016 admits eval, or ADR 0019 non-source normative dependence is
       established.
     replacementEvidence:
-      tests/native/fixtures/binding-reference-evidence.ts: "47e009865211b11966\
-        fcca931b39fbaf19a478b115839a1bcda767fe621bc4d8"
+      tests/native/fixtures/binding-reference-evidence.ts: "148176601d5cac6e8f\
+        b67444ac68efeadc9df8aacb596b23dbf158c2b48f1bba"
       tests/native.ts: "c3e997ca7fd4732d3e16605577a668f3846aa5ad3288c2ee22f59a\
         ca17f787e0"
   ds18-static-class-fields:
@@ -1153,8 +1153,8 @@ assessments:
       on changed source, observation or replacement evidence, an ADR 0016
       amendment admitting eval, or ADR 0019 non-source normative dependence.
     replacementEvidence:
-      tests/native/fixtures/binding-reference-evidence.ts: "47e009865211b11966\
-        fcca931b39fbaf19a478b115839a1bcda767fe621bc4d8"
+      tests/native/fixtures/binding-reference-evidence.ts: "148176601d5cac6e8f\
+        b67444ac68efeadc9df8aacb596b23dbf158c2b48f1bba"
       tests/native.ts: "c3e997ca7fd4732d3e16605577a668f3846aa5ad3288c2ee22f59a\
         ca17f787e0"
   ds18-unresolvable-compound:
@@ -1175,8 +1175,8 @@ assessments:
       evidence, an ADR 0016 amendment admitting eval, or ADR 0019 non-source
       normative dependence.
     replacementEvidence:
-      tests/native/fixtures/binding-reference-evidence.ts: "47e009865211b11966\
-        fcca931b39fbaf19a478b115839a1bcda767fe621bc4d8"
+      tests/native/fixtures/binding-reference-evidence.ts: "148176601d5cac6e8f\
+        b67444ac68efeadc9df8aacb596b23dbf158c2b48f1bba"
       tests/native.ts: "c3e997ca7fd4732d3e16605577a668f3846aa5ad3288c2ee22f59a\
         ca17f787e0"
 paths:
@@ -9775,7 +9775,7 @@ paths:
       53aaea7157"
     missingDynamicTag: false
     section: sec-arrow-function-definitions-runtime-semantics-evaluation
-    subject: Arrow lexical this captured from a bare-called sloppy function
+    subject: Arrow lexical this capture
     assessment: ds18-static-arrow-and-this
   - path: test/language/expressions/arrow-function/arrow/binding-tests-2.js
     proposedOwner: adr:0016-dynamic-source-boundary
@@ -9786,7 +9786,7 @@ paths:
       7f7036a768"
     missingDynamicTag: false
     section: sec-arrow-function-definitions-runtime-semantics-evaluation
-    subject: Arrow lexical this captured from a bare-called sloppy function
+    subject: Arrow lexical this capture
     assessment: ds18-static-arrow-and-this
   - path: test/language/expressions/arrow-function/arrow/binding-tests-3.js
     proposedOwner: adr:0016-dynamic-source-boundary
@@ -9797,7 +9797,7 @@ paths:
       26abcf965b"
     missingDynamicTag: false
     section: sec-arrow-function-definitions-runtime-semantics-evaluation
-    subject: Arrow lexical this captured from a bare-called sloppy function
+    subject: Arrow lexical this capture
     assessment: ds18-static-arrow-and-this
   - path: "test/language/expressions/arrow-function/arrow/capturing-closure-va\
       riables-1.js"
@@ -9809,7 +9809,7 @@ paths:
       0ed65d5165"
     missingDynamicTag: false
     section: sec-arrow-function-definitions-runtime-semantics-evaluation
-    subject: Arrow reads a shared outer var cell after a write
+    subject: Arrow closure capture of an outer variable
     assessment: ds18-static-arrow-and-this
   - path: "test/language/expressions/arrow-function/eval-var-sc\
       ope-syntax-err.js"
@@ -11169,7 +11169,7 @@ paths:
     missingDynamicTag: false
     section: sec-performeval
     upstreamSection: sec-performeval-rules-in-initializer
-    subject: Private initializer executes and public c.x remains undefined
+    subject: error if `new.target` in StatementList of eval (direct eval)
     assessment: ds18-static-class-fields
   - path: "test/language/expressions/class/elements/nested-priv\
       ate-indirect-eval-contains-arguments.js"
@@ -11360,7 +11360,7 @@ paths:
     missingDynamicTag: false
     section: sec-performeval
     upstreamSection: sec-performeval-rules-in-initializer
-    subject: Private initializer executes and public c.x remains undefined
+    subject: error if `new.target` in StatementList of eval (direct eval)
     assessment: ds18-static-class-fields
   - path: "test/language/expressions/class/elements/private-get\
       ter-is-not-a-own-property.js"
@@ -11426,7 +11426,8 @@ paths:
       766d85c7ef"
     missingDynamicTag: false
     section: prod-FieldDefinition
-    subject: Static initializers receive the constructor and run in source order
+    subject: Static fields initializer has `this` biding (field definitions in a
+      class expression)
     assessment: ds18-static-class-fields
   - path: "test/language/expressions/class/private-getter-brand\
       -check-multiple-evaluations-of-class-eval-indirect.js"
@@ -11868,7 +11869,8 @@ paths:
       28e2053b06"
     missingDynamicTag: false
     section: sec-assignment-operators-runtime-semantics-evaluation
-    subject: Unresolvable *= LHS throws runtime ReferenceError
+    subject: ReferenceError is thrown if the LeftHandSideExpression of a
+      Compound Assignment operator(*=) evaluates to an unresolvable reference
     assessment: ds18-unresolvable-compound
   - path: test/language/expressions/compound-assignment/11.13.2-10-s.js
     proposedOwner: adr:0016-dynamic-source-boundary
@@ -11879,7 +11881,8 @@ paths:
       c0b3c3c684"
     missingDynamicTag: false
     section: sec-assignment-operators-runtime-semantics-evaluation
-    subject: Unresolvable ^= LHS throws runtime ReferenceError
+    subject: ReferenceError is thrown if the LeftHandSideExpression of a
+      Compound Assignment operator(^=) evaluates to an unresolvable reference
     assessment: ds18-unresolvable-compound
   - path: test/language/expressions/compound-assignment/11.13.2-11-s.js
     proposedOwner: adr:0016-dynamic-source-boundary
@@ -11890,7 +11893,8 @@ paths:
       f11a0ad5b5"
     missingDynamicTag: false
     section: sec-assignment-operators-runtime-semantics-evaluation
-    subject: Unresolvable |= LHS throws runtime ReferenceError
+    subject: ReferenceError is thrown if the LeftHandSideExpression of a
+      Compound Assignment operator(|=) evaluates to an unresolvable reference
     assessment: ds18-unresolvable-compound
   - path: test/language/expressions/compound-assignment/11.13.2-2-s.js
     proposedOwner: adr:0016-dynamic-source-boundary
@@ -11901,7 +11905,9 @@ paths:
       46093c16fb"
     missingDynamicTag: false
     section: sec-assignment-operators-runtime-semantics-evaluation
-    subject: Unresolvable /= LHS throws runtime ReferenceError
+    subject: Strict Mode - ReferenceError is thrown if the
+      LeftHandSideExpression of a Compound Assignment operator(/=) evaluates
+      to an unresolvable reference
     assessment: ds18-unresolvable-compound
   - path: test/language/expressions/compound-assignment/11.13.2-4-s.js
     proposedOwner: adr:0016-dynamic-source-boundary
@@ -11912,7 +11918,9 @@ paths:
       95b2b0a102"
     missingDynamicTag: false
     section: sec-assignment-operators-runtime-semantics-evaluation
-    subject: Unresolvable += LHS throws runtime ReferenceError
+    subject: Strict Mode - ReferenceError is thrown if the
+      LeftHandSideExpression of a Compound Assignment operator(+=) evaluates
+      to an unresolvable reference
     assessment: ds18-unresolvable-compound
   - path: test/language/expressions/compound-assignment/11.13.2-5-s.js
     proposedOwner: adr:0016-dynamic-source-boundary
@@ -11923,7 +11931,9 @@ paths:
       2e71f4d796"
     missingDynamicTag: false
     section: sec-assignment-operators-runtime-semantics-evaluation
-    subject: Unresolvable -= LHS throws runtime ReferenceError
+    subject: Strict Mode - ReferenceError is thrown if the
+      LeftHandSideExpression of a Compound Assignment operator(-=) evaluates
+      to an unresolvable reference
     assessment: ds18-unresolvable-compound
   - path: test/language/expressions/compound-assignment/11.13.2-6-s.js
     proposedOwner: adr:0016-dynamic-source-boundary
@@ -11934,7 +11944,9 @@ paths:
       992dc8b579"
     missingDynamicTag: false
     section: sec-assignment-operators-runtime-semantics-evaluation
-    subject: Unresolvable <<= LHS throws runtime ReferenceError
+    subject: Strict Mode - ReferenceError is thrown if the
+      LeftHandSideExpression of a Compound Assignment operator(<<=) evaluates
+      to an unresolvable reference
     assessment: ds18-unresolvable-compound
   - path: test/language/expressions/compound-assignment/11.13.2-8-s.js
     proposedOwner: adr:0016-dynamic-source-boundary
@@ -11945,7 +11957,9 @@ paths:
       61bb282b70"
     missingDynamicTag: false
     section: sec-assignment-operators-runtime-semantics-evaluation
-    subject: Unresolvable >>>= LHS throws runtime ReferenceError
+    subject: Strict Mode - ReferenceError is thrown if the
+      LeftHandSideExpression of a Compound Assignment operator(>>>=) evaluates
+      to an unresolvable reference
     assessment: ds18-unresolvable-compound
   - path: test/language/expressions/compound-assignment/11.13.2-9-s.js
     proposedOwner: adr:0016-dynamic-source-boundary
@@ -11956,7 +11970,9 @@ paths:
       27935d292b"
     missingDynamicTag: false
     section: sec-assignment-operators-runtime-semantics-evaluation
-    subject: Unresolvable &= LHS throws runtime ReferenceError
+    subject: Strict Mode - ReferenceError is thrown if the
+      LeftHandSideExpression of a Compound Assignment operator(&=) evaluates
+      to an unresolvable reference
     assessment: ds18-unresolvable-compound
   - path: "test/language/expressions/compound-assignment/S11.13\
       .2_A6.10_T1.js"
@@ -19751,7 +19767,9 @@ paths:
       745f512faa"
     missingDynamicTag: false
     section: ES5 11.1.1 (original upstream clause)
-    subject: Bare sloppy call returns the global this value
+    subject: The statically declared ReturnThis or SetThis call/construct
+      assertions coexist with eval-dependent counterparts; the frontend
+      rejection prevents native execution of even those static controls.
     assessment: ds18-static-arrow-and-this
   - path: test/language/expressions/this/S11.1.1_A3.2.js
     proposedOwner: adr:0016-dynamic-source-boundary
@@ -19762,7 +19780,9 @@ paths:
       7a579922f4"
     missingDynamicTag: false
     section: ES5 11.1.1 (original upstream clause)
-    subject: Constructed receiver stored on THIS and ordinary object toString
+    subject: The statically declared ReturnThis or SetThis call/construct
+      assertions coexist with eval-dependent counterparts; the frontend
+      rejection prevents native execution of even those static controls.
     assessment: ds18-static-arrow-and-this
   - path: test/language/expressions/this/S11.1.1_A4.1.js
     proposedOwner: adr:0016-dynamic-source-boundary
