@@ -1113,6 +1113,93 @@ assessments:
       tests/native/fixtures/function-intrinsic-chains.ts:
         "c5eb018779c47f7de2959da4a1a64969475c8026fc831102\
         f06e8bef6382e1e3"
+  ds11-static-module-goal:
+    disposition: "exclusion"
+    normativeDependency: "source-evaluation-only"
+    replacementEvidence:
+      docs/m5c-graph/dynamic-source-module-goal-validation-assessment.md:
+        "8f72876415ead85f5d560926ac63ad69\
+        8c32dd3d10ae0e7847f7080fa781cac9"
+      tests/module-goal-validation-source.test.ts:
+        "8339a1e8ab6dd61e2d07440cc7c74e2e\
+        1ddbc2b79bd9aad35c61a28989c21261"
+    reason: "The same var/function collision is accepted as sloppy and
+      strict Script and rejected by Module parsing, both directly and
+      through a static dependency. Node.js and Deno observe static
+      SyntaxError before evaluation. Oseo preserves a located OSEO0001
+      target diagnostic. Only ImportCall source loading and conversion of
+      that target error into a rejected promise remain; these are bounded
+      by decision items 1 and 2, as Root confirmed on 2026-10-31. No
+      rejected promise is inferred from a compiler diagnostic."
+  ds11-static-module-ambiguous:
+    disposition: "exclusion"
+    normativeDependency: "source-evaluation-only"
+    replacementEvidence:
+      docs/m5c-graph/dynamic-source-module-goal-validation-assessment.md:
+        "8f72876415ead85f5d560926ac63ad69\
+        8c32dd3d10ae0e7847f7080fa781cac9"
+      tests/module-goal-validation-source.test.ts:
+        "8339a1e8ab6dd61e2d07440cc7c74e2e\
+        1ddbc2b79bd9aad35c61a28989c21261"
+    reason: "The same indirect re-export requests x from two distinct
+      star-export sources. All modules parse; Oseo linking rejects the
+      ambiguous resolution under both policies before MIR, and Node.js and
+      Deno observe static SyntaxError before evaluation. The
+      namespace-only control remains valid. Only ImportCall source loading
+      and rejection routing remain under decision items 1 and 2; no
+      runtime promise rejection is claimed for the static linker
+      diagnostic."
+  ds11-static-module-circular:
+    disposition: "exclusion"
+    normativeDependency: "source-evaluation-only"
+    replacementEvidence:
+      docs/m5c-graph/dynamic-source-module-goal-validation-assessment.md:
+        "8f72876415ead85f5d560926ac63ad69\
+        8c32dd3d10ae0e7847f7080fa781cac9"
+      tests/module-goal-validation-source.test.ts:
+        "8339a1e8ab6dd61e2d07440cc7c74e2e\
+        1ddbc2b79bd9aad35c61a28989c21261"
+    reason: "The same two-module indirect re-export cycle has no concrete x
+      binding. All modules parse; Oseo linking rejects that unresolved
+      resolution under both policies before MIR, and Node.js and Deno
+      observe static SyntaxError before evaluation. A productive cycle
+      links to one concrete cell. Only ImportCall source loading and
+      rejection routing remain under decision items 1 and 2; no runtime
+      promise rejection is claimed for the static linker diagnostic."
+  ds11-static-module-usage:
+    disposition: "exclusion"
+    normativeDependency: "source-evaluation-only"
+    replacementEvidence:
+      docs/m5c-graph/dynamic-source-module-goal-validation-assessment.md:
+        "8f72876415ead85f5d560926ac63ad69\
+        8c32dd3d10ae0e7847f7080fa781cac9"
+      tests/module-goal-validation-source.test.ts:
+        "8339a1e8ab6dd61e2d07440cc7c74e2e\
+        1ddbc2b79bd9aad35c61a28989c21261"
+      tests/module-goal-validation-native.test.ts:
+        "9d358469af96127f4b97e0457ddd22f0\
+        98cb561dd262e47a7883507e5c027152"
+      tests/fixtures/module-goal-validation/entry.mjs:
+        "ec5ea246e6cf3a5dcf190040c369391d\
+        543a826c172bb0cac188c7fe90d33994"
+      tests/fixtures/module-goal-validation/target.mjs:
+        "a40085f1129e91c1699b4765f78e99bf\
+        f399ef8f127173fcb32ba88b4c56a159"
+      tests/fixtures/module-goal-validation/prelude.js:
+        "85383879a2786c478abf619fe3e7dfee\
+        c8638dc13b0426e2726d55c2049a84d8"
+    reason: "The static target retains default 42, named x Test262 and alias
+      z 42; the fixture observes all three namespace reads in each of the
+      18 original usage contexts, including the async-generator call
+      count. Structural checks bind one target and its three export cells.
+      The native test runs that graph after the Script-valid var/function
+      prelude under both policies with forced collection, and compares
+      positive module observations with Node.js and Deno. Separate
+      Script/Module parsing checks retain the caller grammar distinction.
+      Promise.resolve supplies already-known static namespace data and
+      implements no import operation. Only ImportCall source loading from
+      Script and its promise fulfillment remain under decision items 1 and
+      2."
 paths:
   - path: test/built-ins/AggregateError/newtarget-proto-fallback.js
     proposedOwner: adr:0016-dynamic-source-boundary
@@ -12636,7 +12723,7 @@ paths:
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "import() from a module code can load a file with script code, but
       the target is resolved into a Module Record (nested arrow)"
-    assessment: "observation-train-dynamic-source"
+    assessment: ds11-static-module-goal
   - path: "test/language/expressions/dynamic-import/catch/nested-arrow-import-c\
       atch-file-does-not-exist.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -12662,7 +12749,7 @@ paths:
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "IndirectExportEntries validation - ambiguous imported bindings
       (nested arrow)"
-    assessment: "observation-train-dynamic-source"
+    assessment: ds11-static-module-ambiguous
   - path: "test/language/expressions/dynamic-import/catch/nested-arrow-import-c\
       atch-instn-iee-err-circular.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -12675,7 +12762,7 @@ paths:
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "IndirectExportEntries validation - circular imported bindings
       (nested arrow)"
-    assessment: "observation-train-dynamic-source"
+    assessment: ds11-static-module-circular
   - path: "test/language/expressions/dynamic-import/catch/nested-arrow-import-c\
       atch-specifier-tostring-abrupt-rejects.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -12728,7 +12815,7 @@ paths:
     subject: "import() from a module code can load a file with script code, but
       the target is resolved into a Module Record (nested in async arrow
       function, awaited)"
-    assessment: "observation-train-dynamic-source"
+    assessment: ds11-static-module-goal
   - path: "test/language/expressions/dynamic-import/catch/nested-async-arrow-fu\
       nction-await-file-does-not-exist.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -12754,7 +12841,7 @@ paths:
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "IndirectExportEntries validation - ambiguous imported bindings
       (nested in async arrow function, awaited)"
-    assessment: "observation-train-dynamic-source"
+    assessment: ds11-static-module-ambiguous
   - path: "test/language/expressions/dynamic-import/catch/nested-async-arrow-fu\
       nction-await-instn-iee-err-circular.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -12767,7 +12854,7 @@ paths:
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "IndirectExportEntries validation - circular imported bindings
       (nested in async arrow function, awaited)"
-    assessment: "observation-train-dynamic-source"
+    assessment: ds11-static-module-circular
   - path: "test/language/expressions/dynamic-import/catch/nested-async-arrow-fu\
       nction-await-specifier-tostring-abrupt-rejects.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -12820,7 +12907,7 @@ paths:
     subject: "import() from a module code can load a file with script code, but
       the target is resolved into a Module Record (nested in async arrow
       function, returned)"
-    assessment: "observation-train-dynamic-source"
+    assessment: ds11-static-module-goal
   - path: "test/language/expressions/dynamic-import/catch/nested-async-arrow-fu\
       nction-return-await-file-does-not-exist.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -12846,7 +12933,7 @@ paths:
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "IndirectExportEntries validation - ambiguous imported bindings
       (nested in async arrow function, returned)"
-    assessment: "observation-train-dynamic-source"
+    assessment: ds11-static-module-ambiguous
   - path: "test/language/expressions/dynamic-import/catch/nested-async-arrow-fu\
       nction-return-await-instn-iee-err-circular.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -12859,7 +12946,7 @@ paths:
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "IndirectExportEntries validation - circular imported bindings
       (nested in async arrow function, returned)"
-    assessment: "observation-train-dynamic-source"
+    assessment: ds11-static-module-circular
   - path: "test/language/expressions/dynamic-import/catch/nested-async-arrow-fu\
       nction-return-await-specifier-tostring-abrupt-rejects.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -12912,7 +12999,7 @@ paths:
     subject: "import() from a module code can load a file with script code, but
       the target is resolved into a Module Record (nested in async function,
       awaited)"
-    assessment: "observation-train-dynamic-source"
+    assessment: ds11-static-module-goal
   - path: "test/language/expressions/dynamic-import/catch/nested-async-function\
       -await-file-does-not-exist.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -12938,7 +13025,7 @@ paths:
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "IndirectExportEntries validation - ambiguous imported bindings
       (nested in async function, awaited)"
-    assessment: "observation-train-dynamic-source"
+    assessment: ds11-static-module-ambiguous
   - path: "test/language/expressions/dynamic-import/catch/nested-async-function\
       -await-instn-iee-err-circular.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -12951,7 +13038,7 @@ paths:
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "IndirectExportEntries validation - circular imported bindings
       (nested in async function, awaited)"
-    assessment: "observation-train-dynamic-source"
+    assessment: ds11-static-module-circular
   - path: "test/language/expressions/dynamic-import/catch/nested-async-function\
       -await-specifier-tostring-abrupt-rejects.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -13003,7 +13090,7 @@ paths:
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "import() from a module code can load a file with script code, but
       the target is resolved into a Module Record (nested in async function)"
-    assessment: "observation-train-dynamic-source"
+    assessment: ds11-static-module-goal
   - path: "test/language/expressions/dynamic-import/catch/nested-async-function\
       -file-does-not-exist.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -13029,7 +13116,7 @@ paths:
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "IndirectExportEntries validation - ambiguous imported bindings
       (nested in async function)"
-    assessment: "observation-train-dynamic-source"
+    assessment: ds11-static-module-ambiguous
   - path: "test/language/expressions/dynamic-import/catch/nested-async-function\
       -instn-iee-err-circular.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -13042,7 +13129,7 @@ paths:
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "IndirectExportEntries validation - circular imported bindings
       (nested in async function)"
-    assessment: "observation-train-dynamic-source"
+    assessment: ds11-static-module-circular
   - path: "test/language/expressions/dynamic-import/catch/nested-async-function\
       -return-await-eval-rqstd-abrupt-typeerror.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -13082,7 +13169,7 @@ paths:
     subject: "import() from a module code can load a file with script code, but
       the target is resolved into a Module Record (nested in async function,
       returns awaited)"
-    assessment: "observation-train-dynamic-source"
+    assessment: ds11-static-module-goal
   - path: "test/language/expressions/dynamic-import/catch/nested-async-function\
       -return-await-file-does-not-exist.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -13108,7 +13195,7 @@ paths:
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "IndirectExportEntries validation - ambiguous imported bindings
       (nested in async function, returns awaited)"
-    assessment: "observation-train-dynamic-source"
+    assessment: ds11-static-module-ambiguous
   - path: "test/language/expressions/dynamic-import/catch/nested-async-function\
       -return-await-instn-iee-err-circular.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -13121,7 +13208,7 @@ paths:
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "IndirectExportEntries validation - circular imported bindings
       (nested in async function, returns awaited)"
-    assessment: "observation-train-dynamic-source"
+    assessment: ds11-static-module-circular
   - path: "test/language/expressions/dynamic-import/catch/nested-async-function\
       -return-await-specifier-tostring-abrupt-rejects.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -13187,7 +13274,7 @@ paths:
     subject: "import() from a module code can load a file with script code, but
       the target is resolved into a Module Record (nested in async generator,
       awaited)"
-    assessment: "observation-train-dynamic-source"
+    assessment: ds11-static-module-goal
   - path: "test/language/expressions/dynamic-import/catch/nested-async-gen-awai\
       t-file-does-not-exist.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -13213,7 +13300,7 @@ paths:
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "IndirectExportEntries validation - ambiguous imported bindings
       (nested in async generator, awaited)"
-    assessment: "observation-train-dynamic-source"
+    assessment: ds11-static-module-ambiguous
   - path: "test/language/expressions/dynamic-import/catch/nested-async-gen-awai\
       t-instn-iee-err-circular.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -13226,7 +13313,7 @@ paths:
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "IndirectExportEntries validation - circular imported bindings
       (nested in async generator, awaited)"
-    assessment: "observation-train-dynamic-source"
+    assessment: ds11-static-module-circular
   - path: "test/language/expressions/dynamic-import/catch/nested-async-gen-awai\
       t-specifier-tostring-abrupt-rejects.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -13279,7 +13366,7 @@ paths:
     subject: "import() from a module code can load a file with script code, but
       the target is resolved into a Module Record (nested in async generator,
       returns awaited)"
-    assessment: "observation-train-dynamic-source"
+    assessment: ds11-static-module-goal
   - path: "test/language/expressions/dynamic-import/catch/nested-async-gen-retu\
       rn-await-file-does-not-exist.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -13305,7 +13392,7 @@ paths:
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "IndirectExportEntries validation - ambiguous imported bindings
       (nested in async generator, returns awaited)"
-    assessment: "observation-train-dynamic-source"
+    assessment: ds11-static-module-ambiguous
   - path: "test/language/expressions/dynamic-import/catch/nested-async-gen-retu\
       rn-await-instn-iee-err-circular.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -13318,7 +13405,7 @@ paths:
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "IndirectExportEntries validation - circular imported bindings
       (nested in async generator, returns awaited)"
-    assessment: "observation-train-dynamic-source"
+    assessment: ds11-static-module-circular
   - path: "test/language/expressions/dynamic-import/catch/nested-async-gen-retu\
       rn-await-specifier-tostring-abrupt-rejects.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -13370,7 +13457,7 @@ paths:
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "import() from a module code can load a file with script code, but
       the target is resolved into a Module Record (nested block)"
-    assessment: "observation-train-dynamic-source"
+    assessment: ds11-static-module-goal
   - path: "test/language/expressions/dynamic-import/catch/nested-block-import-c\
       atch-file-does-not-exist.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -13396,7 +13483,7 @@ paths:
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "IndirectExportEntries validation - ambiguous imported bindings
       (nested block)"
-    assessment: "observation-train-dynamic-source"
+    assessment: ds11-static-module-ambiguous
   - path: "test/language/expressions/dynamic-import/catch/nested-block-import-c\
       atch-instn-iee-err-circular.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -13409,7 +13496,7 @@ paths:
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "IndirectExportEntries validation - circular imported bindings
       (nested block)"
-    assessment: "observation-train-dynamic-source"
+    assessment: ds11-static-module-circular
   - path: "test/language/expressions/dynamic-import/catch/nested-block-import-c\
       atch-specifier-tostring-abrupt-rejects.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -13461,7 +13548,7 @@ paths:
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "import() from a module code can load a file with script code, but
       the target is resolved into a Module Record (nested block syntax)"
-    assessment: "observation-train-dynamic-source"
+    assessment: ds11-static-module-goal
   - path: "test/language/expressions/dynamic-import/catch/nested-block-labeled-\
       file-does-not-exist.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -13487,7 +13574,7 @@ paths:
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "IndirectExportEntries validation - ambiguous imported bindings
       (nested block syntax)"
-    assessment: "observation-train-dynamic-source"
+    assessment: ds11-static-module-ambiguous
   - path: "test/language/expressions/dynamic-import/catch/nested-block-labeled-\
       instn-iee-err-circular.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -13500,7 +13587,7 @@ paths:
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "IndirectExportEntries validation - circular imported bindings
       (nested block syntax)"
-    assessment: "observation-train-dynamic-source"
+    assessment: ds11-static-module-circular
   - path: "test/language/expressions/dynamic-import/catch/nested-block-labeled-\
       specifier-tostring-abrupt-rejects.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -13552,7 +13639,7 @@ paths:
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "import() from a module code can load a file with script code, but
       the target is resolved into a Module Record (nested do while syntax)"
-    assessment: "observation-train-dynamic-source"
+    assessment: ds11-static-module-goal
   - path: "test/language/expressions/dynamic-import/catch/nested-do-while-file-\
       does-not-exist.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -13578,7 +13665,7 @@ paths:
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "IndirectExportEntries validation - ambiguous imported bindings
       (nested do while syntax)"
-    assessment: "observation-train-dynamic-source"
+    assessment: ds11-static-module-ambiguous
   - path: "test/language/expressions/dynamic-import/catch/nested-do-while-instn\
       -iee-err-circular.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -13591,7 +13678,7 @@ paths:
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "IndirectExportEntries validation - circular imported bindings
       (nested do while syntax)"
-    assessment: "observation-train-dynamic-source"
+    assessment: ds11-static-module-circular
   - path: "test/language/expressions/dynamic-import/catch/nested-do-while-speci\
       fier-tostring-abrupt-rejects.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -13643,7 +13730,7 @@ paths:
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "import() from a module code can load a file with script code, but
       the target is resolved into a Module Record (nested else)"
-    assessment: "observation-train-dynamic-source"
+    assessment: ds11-static-module-goal
   - path: "test/language/expressions/dynamic-import/catch/nested-else-import-ca\
       tch-file-does-not-exist.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -13669,7 +13756,7 @@ paths:
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "IndirectExportEntries validation - ambiguous imported bindings
       (nested else)"
-    assessment: "observation-train-dynamic-source"
+    assessment: ds11-static-module-ambiguous
   - path: "test/language/expressions/dynamic-import/catch/nested-else-import-ca\
       tch-instn-iee-err-circular.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -13682,7 +13769,7 @@ paths:
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "IndirectExportEntries validation - circular imported bindings
       (nested else)"
-    assessment: "observation-train-dynamic-source"
+    assessment: ds11-static-module-circular
   - path: "test/language/expressions/dynamic-import/catch/nested-else-import-ca\
       tch-specifier-tostring-abrupt-rejects.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -13733,7 +13820,7 @@ paths:
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "import() from a module code can load a file with script code, but
       the target is resolved into a Module Record (nested function)"
-    assessment: "observation-train-dynamic-source"
+    assessment: ds11-static-module-goal
   - path: "test/language/expressions/dynamic-import/catch/nested-function-impor\
       t-catch-file-does-not-exist.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -13759,7 +13846,7 @@ paths:
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "IndirectExportEntries validation - ambiguous imported bindings
       (nested function)"
-    assessment: "observation-train-dynamic-source"
+    assessment: ds11-static-module-ambiguous
   - path: "test/language/expressions/dynamic-import/catch/nested-function-impor\
       t-catch-instn-iee-err-circular.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -13772,7 +13859,7 @@ paths:
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "IndirectExportEntries validation - circular imported bindings
       (nested function)"
-    assessment: "observation-train-dynamic-source"
+    assessment: ds11-static-module-circular
   - path: "test/language/expressions/dynamic-import/catch/nested-function-impor\
       t-catch-specifier-tostring-abrupt-rejects.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -13824,7 +13911,7 @@ paths:
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "import() from a module code can load a file with script code, but
       the target is resolved into a Module Record (nested if)"
-    assessment: "observation-train-dynamic-source"
+    assessment: ds11-static-module-goal
   - path: "test/language/expressions/dynamic-import/catch/nested-if-import-catc\
       h-file-does-not-exist.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -13850,7 +13937,7 @@ paths:
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "IndirectExportEntries validation - ambiguous imported bindings
       (nested if)"
-    assessment: "observation-train-dynamic-source"
+    assessment: ds11-static-module-ambiguous
   - path: "test/language/expressions/dynamic-import/catch/nested-if-import-catc\
       h-instn-iee-err-circular.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -13863,7 +13950,7 @@ paths:
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "IndirectExportEntries validation - circular imported bindings
       (nested if)"
-    assessment: "observation-train-dynamic-source"
+    assessment: ds11-static-module-circular
   - path: "test/language/expressions/dynamic-import/catch/nested-if-import-catc\
       h-specifier-tostring-abrupt-rejects.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -13914,7 +14001,7 @@ paths:
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "import() from a module code can load a file with script code, but
       the target is resolved into a Module Record (nested while)"
-    assessment: "observation-train-dynamic-source"
+    assessment: ds11-static-module-goal
   - path: "test/language/expressions/dynamic-import/catch/nested-while-import-c\
       atch-file-does-not-exist.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -13940,7 +14027,7 @@ paths:
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "IndirectExportEntries validation - ambiguous imported bindings
       (nested while)"
-    assessment: "observation-train-dynamic-source"
+    assessment: ds11-static-module-ambiguous
   - path: "test/language/expressions/dynamic-import/catch/nested-while-import-c\
       atch-instn-iee-err-circular.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -13953,7 +14040,7 @@ paths:
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "IndirectExportEntries validation - circular imported bindings
       (nested while)"
-    assessment: "observation-train-dynamic-source"
+    assessment: ds11-static-module-circular
   - path: "test/language/expressions/dynamic-import/catch/nested-while-import-c\
       atch-specifier-tostring-abrupt-rejects.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -14005,7 +14092,7 @@ paths:
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "import() from a module code can load a file with script code, but
       the target is resolved into a Module Record (top level)"
-    assessment: "observation-train-dynamic-source"
+    assessment: ds11-static-module-goal
   - path: "test/language/expressions/dynamic-import/catch/top-level-import-catc\
       h-file-does-not-exist.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -14031,7 +14118,7 @@ paths:
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "IndirectExportEntries validation - ambiguous imported bindings
       (top level)"
-    assessment: "observation-train-dynamic-source"
+    assessment: ds11-static-module-ambiguous
   - path: "test/language/expressions/dynamic-import/catch/top-level-import-catc\
       h-instn-iee-err-circular.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -14044,7 +14131,7 @@ paths:
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "IndirectExportEntries validation - circular imported bindings (top
       level)"
-    assessment: "observation-train-dynamic-source"
+    assessment: ds11-static-module-circular
   - path: "test/language/expressions/dynamic-import/catch/top-level-import-catc\
       h-specifier-tostring-abrupt-rejects.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -17008,7 +17095,7 @@ paths:
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "import() from a script code can load a file with module code
       (nested arrow)"
-    assessment: "observation-train-dynamic-source"
+    assessment: ds11-static-module-usage
   - path: "test/language/expressions/dynamic-import/usage/nested-arrow-assignme\
       nt-expression-is-call-expression-square-brackets.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -17085,7 +17172,7 @@ paths:
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "import() from a script code can load a file with module code
       (nested arrow)"
-    assessment: "observation-train-dynamic-source"
+    assessment: ds11-static-module-usage
   - path: "test/language/expressions/dynamic-import/usage/nested-arrow-import-t\
       hen-is-call-expression-square-brackets.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -17163,7 +17250,7 @@ paths:
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "import() from a script code can load a file with module code
       (nested in async arrow function, awaited)"
-    assessment: "observation-train-dynamic-source"
+    assessment: ds11-static-module-usage
   - path: "test/language/expressions/dynamic-import/usage/nested-async-arrow-fu\
       nction-await-is-call-expression-square-brackets.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -17244,7 +17331,7 @@ paths:
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "import() from a script code can load a file with module code
       (nested in async arrow function, returned)"
-    assessment: "observation-train-dynamic-source"
+    assessment: ds11-static-module-usage
   - path: "test/language/expressions/dynamic-import/usage/nested-async-arrow-fu\
       nction-return-await-is-call-expression-square-brackets.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -17324,7 +17411,7 @@ paths:
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "import() from a script code can load a file with module code
       (nested in async function, awaited)"
-    assessment: "observation-train-dynamic-source"
+    assessment: ds11-static-module-usage
   - path: "test/language/expressions/dynamic-import/usage/nested-async-function\
       -await-is-call-expression-square-brackets.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -17403,7 +17490,7 @@ paths:
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "import() from a script code can load a file with module code
       (nested in async function)"
-    assessment: "observation-train-dynamic-source"
+    assessment: ds11-static-module-usage
   - path: "test/language/expressions/dynamic-import/usage/nested-async-function\
       -is-call-expression-square-brackets.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -17457,7 +17544,7 @@ paths:
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "import() from a script code can load a file with module code
       (nested in async function, returns awaited)"
-    assessment: "observation-train-dynamic-source"
+    assessment: ds11-static-module-usage
   - path: "test/language/expressions/dynamic-import/usage/nested-async-function\
       -return-await-is-call-expression-square-brackets.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -17562,7 +17649,7 @@ paths:
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "import() from a script code can load a file with module code
       (nested in async generator, awaited)"
-    assessment: "observation-train-dynamic-source"
+    assessment: ds11-static-module-usage
   - path: "test/language/expressions/dynamic-import/usage/nested-async-gen-awai\
       t-is-call-expression-square-brackets.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -17641,7 +17728,7 @@ paths:
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "import() from a script code can load a file with module code
       (nested in async generator, returns awaited)"
-    assessment: "observation-train-dynamic-source"
+    assessment: ds11-static-module-usage
   - path: "test/language/expressions/dynamic-import/usage/nested-async-gen-retu\
       rn-await-is-call-expression-square-brackets.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -17720,7 +17807,7 @@ paths:
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "import() from a script code can load a file with module code
       (nested block)"
-    assessment: "observation-train-dynamic-source"
+    assessment: ds11-static-module-usage
   - path: "test/language/expressions/dynamic-import/usage/nested-block-import-t\
       hen-is-call-expression-square-brackets.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -17797,7 +17884,7 @@ paths:
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "import() from a script code can load a file with module code
       (nested do while syntax)"
-    assessment: "observation-train-dynamic-source"
+    assessment: ds11-static-module-usage
   - path: "test/language/expressions/dynamic-import/usage/nested-do-while-is-ca\
       ll-expression-square-brackets.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -17875,7 +17962,7 @@ paths:
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "import() from a script code can load a file with module code
       (nested else)"
-    assessment: "observation-train-dynamic-source"
+    assessment: ds11-static-module-usage
   - path: "test/language/expressions/dynamic-import/usage/nested-else-import-th\
       en-is-call-expression-square-brackets.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -17952,7 +18039,7 @@ paths:
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "import() from a script code can load a file with module code
       (nested function)"
-    assessment: "observation-train-dynamic-source"
+    assessment: ds11-static-module-usage
   - path: "test/language/expressions/dynamic-import/usage/nested-function-impor\
       t-then-is-call-expression-square-brackets.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -18029,7 +18116,7 @@ paths:
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "import() from a script code can load a file with module code
       (nested if syntax)"
-    assessment: "observation-train-dynamic-source"
+    assessment: ds11-static-module-usage
   - path: "test/language/expressions/dynamic-import/usage/nested-if-braceless-i\
       s-call-expression-square-brackets.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -18106,7 +18193,7 @@ paths:
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "import() from a script code can load a file with module code
       (nested if)"
-    assessment: "observation-train-dynamic-source"
+    assessment: ds11-static-module-usage
   - path: "test/language/expressions/dynamic-import/usage/nested-if-import-then\
       -is-call-expression-square-brackets.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -18183,7 +18270,7 @@ paths:
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "import() from a script code can load a file with module code
       (nested while)"
-    assessment: "observation-train-dynamic-source"
+    assessment: ds11-static-module-usage
   - path: "test/language/expressions/dynamic-import/usage/nested-while-import-t\
       hen-is-call-expression-square-brackets.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -18260,7 +18347,7 @@ paths:
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "import() from a script code can load a file with module code
       (nested block syntax)"
-    assessment: "observation-train-dynamic-source"
+    assessment: ds11-static-module-usage
   - path: "test/language/expressions/dynamic-import/usage/syntax-nested-block-l\
       abeled-is-call-expression-square-brackets.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -18337,7 +18424,7 @@ paths:
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "import() from a script code can load a file with module code (top
       level)"
-    assessment: "observation-train-dynamic-source"
+    assessment: ds11-static-module-usage
   - path: "test/language/expressions/dynamic-import/usage/top-level-import-then\
       -is-call-expression-square-brackets.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"

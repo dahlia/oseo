@@ -5,6 +5,23 @@ DS-11 bounds 66 unsupported paths at semantic bundle commit
 `9529210a24be72e2b273f43f014c03a98a29069e`. Size: M. The initial scope has
 zero newly established closures.
 
+DS-11 implementation assesses all 66 selected paths in the
+[*per-path table*](./dynamic-source-module-goal-validation-assessment.md).
+It prepares 66 ADR 0016 accounting closures and keeps zero selected paths
+in remediation: 16 Module-goal early errors, 16 ambiguous indirect-export
+errors, 16 circular unresolved-export errors and 18 static namespace usage
+contexts. All classifications stay unsupported; no pass is added.
+
+New evidence consists of 12 source registrations and one native registration
+with 18 context units, three positive fixture files, fixed Node.js/Deno
+oracles, structural graph/MIR assertions and both native policies with
+collection forced at every safepoint. Root's 2026-10-31 ruling separates
+the statically witnessed target errors from ImportCall's excluded promise
+rejection routing. The table records the exact scope and observation limits.
+The umbrella retains 884 of the base 950 paths. Subset and results are
+unchanged; no UPDATE is needed. Root retains outer review, full candidate
+suites, publication and landing.
+
 The exact selector is
 [*dynamic-source-module-goal-validation.paths.txt*](./dynamic-source-module-goal-validation.paths.txt),
 copied byte for byte from the approved proposal.
