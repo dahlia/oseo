@@ -1813,8 +1813,7 @@ for (const fixture of selectedFixtures) {
             fixture.name === "weak-collections"
           ) {
             assert.ok(native.counters.collections > 0);
-            // DS-22 adds finite static witnesses, no specialized path.
-            if (mode === "enabled" && !fixture.name.startsWith("ds22-")) {
+            if (mode === "enabled") {
               if (
                 fixture.name === "array-buffer" ||
                 fixture.name === "array-prototype-copying" ||

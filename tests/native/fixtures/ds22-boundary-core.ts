@@ -84,7 +84,16 @@ for (var operation of [
 ];
 
 /** Fixed observations from lexical scope and restricted-property rules. */
-export function ds22BoundaryCoreExpected(name: string): string {
+export function ds22BoundaryCoreExpected(
+  name: string,
+  constructorText = false,
+): string {
+  if (constructorText) {
+    return ds22BoundaryCoreExpected(name).replace(
+      /^(outside|function outside|strict read|sloppy read|restricted) true$/gmu,
+      "$1 false",
+    );
+  }
   if (name.startsWith("ds22-strict-") && name.endsWith("-scope")) {
     return (
       "inside 17\noutside true\nglobal false\n" +
@@ -104,4 +113,14 @@ export function ds22BoundaryCoreExpected(name: string): string {
     );
   }
   throw new Error(`Unknown DS-22 fixture: ${name}`);
+}
+
+/** Preserve printed constructor text while breaking its type and identity. */
+export function ds22ConstructorTextMutation(source: string): string {
+  const mutated = source.replaceAll(
+    "error.constructor ===",
+    "String(error.constructor) ===",
+  );
+  if (mutated === source) throw new Error("Missing constructor identity check");
+  return mutated;
 }

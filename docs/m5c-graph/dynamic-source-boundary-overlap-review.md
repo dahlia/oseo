@@ -147,11 +147,23 @@ oracle.
 *tests/ds22-boundary-native.test.ts* runs each group with both native policies
 and forced collection, checks fixed normative stdout, zero exit status, empty
 stderr, positive allocations/collections, and zero disabled-policy guards.
+Every enabled group requires guard misses, and the caller groups also require
+guard hits. The structural checks require the existing object/shape guards and
+fixed-slot loads only under the enabled policy.
 *tests/native.ts* registers the six groups in the ordinary native corpus and
-both forced-collection lists. These groups introduce no specialized path or
-new generated domain; their complete finite matrix and both-policy execution
-supply replacement evidence for those omissions. Existing property families
-and their seeds, budgets and guard-fallback assertions are unchanged.
+both forced-collection lists, including its enabled-policy guard-miss
+assertion. These groups add no new specialization feature or generated domain;
+they exercise existing specialization paths and generic fallbacks. Existing
+property families and their seeds and budgets are unchanged.
+
+The original error constructors are compared by identity with `===` inside
+each program. Six additional mutation variants replace the actual constructor
+by `String(error.constructor)`, preserving its textual representation while
+changing its type and identity. Both reference hosts and both native policies
+must observe false for every mutated comparison. This catches a coercing or
+text-only oracle. Unqualified-name reads remain unqualified-name reads;
+the extra global-own-property check supplements them. The native matrix has
+12 program variants and 24 executions under forced collection.
 
 ### Gates and remaining ownership
 

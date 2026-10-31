@@ -1118,14 +1118,14 @@ assessments:
     normativeDependency: source-evaluation-only
     replacementEvidence:
       tests/native/fixtures/ds22-boundary-core.ts:
-        "d3238860d122c81b88979e6a11a97f86915e1ea1\
-        54e6280b0e00b039d9661bfa"
+        "f755663992dab8573044d1750c30450c08ad6836\
+        fcf4d00777851ff53b90c744"
       tests/ds22-boundary-preparation.test.ts:
-        "9cb0c4701e1d0bdd83eae59acd33b49773f5955b\
-        8245e27cddf8b7625bb1b09f"
+        "e6b2b1c38d8047097eadea6a8bd7e90d4ea863f1\
+        629f0cc3f871df15a157cc70"
       tests/ds22-boundary-native.test.ts:
-        "768ebd7cf7837d8e7476132f3dc7a9ec9e03b038\
-        2a6be15fe85692b691ecf4b0"
+        "6b723d9d542b188bbe683b0597335d270c08e875\
+        d0272a616ee823a5129cad58"
     reason: "Maintainer decision 2026-10-28 item 1: The block/case/default
       function is lexical in strict code, and reading its name outside that
       scope throws ReferenceError without creating a global property. The
@@ -1145,14 +1145,14 @@ assessments:
     normativeDependency: source-evaluation-only
     replacementEvidence:
       tests/native/fixtures/ds22-boundary-core.ts:
-        "d3238860d122c81b88979e6a11a97f86915e1ea1\
-        54e6280b0e00b039d9661bfa"
+        "f755663992dab8573044d1750c30450c08ad6836\
+        fcf4d00777851ff53b90c744"
       tests/ds22-boundary-preparation.test.ts:
-        "9cb0c4701e1d0bdd83eae59acd33b49773f5955b\
-        8245e27cddf8b7625bb1b09f"
+        "e6b2b1c38d8047097eadea6a8bd7e90d4ea863f1\
+        629f0cc3f871df15a157cc70"
       tests/ds22-boundary-native.test.ts:
-        "768ebd7cf7837d8e7476132f3dc7a9ec9e03b038\
-        2a6be15fe85692b691ecf4b0"
+        "6b723d9d542b188bbe683b0597335d270c08e875\
+        d0272a616ee823a5129cad58"
     reason:
       "Maintainer decision 2026-10-28 item 1: The only original assertion is
       TypeError when reading a strict function caller, reached through direct or
@@ -1173,14 +1173,14 @@ assessments:
     normativeDependency: source-evaluation-only
     replacementEvidence:
       tests/native/fixtures/ds22-boundary-core.ts:
-        "d3238860d122c81b88979e6a11a97f86915e1ea1\
-        54e6280b0e00b039d9661bfa"
+        "f755663992dab8573044d1750c30450c08ad6836\
+        fcf4d00777851ff53b90c744"
       tests/ds22-boundary-preparation.test.ts:
-        "9cb0c4701e1d0bdd83eae59acd33b49773f5955b\
-        8245e27cddf8b7625bb1b09f"
+        "e6b2b1c38d8047097eadea6a8bd7e90d4ea863f1\
+        629f0cc3f871df15a157cc70"
       tests/ds22-boundary-native.test.ts:
-        "768ebd7cf7837d8e7476132f3dc7a9ec9e03b038\
-        2a6be15fe85692b691ecf4b0"
+        "6b723d9d542b188bbe683b0597335d270c08e875\
+        d0272a616ee823a5129cad58"
     reason:
       "Maintainer decision 2026-10-28 item 1: The only original assertion is
       TypeError from gNonStrict.caller || gNonStrict.caller.throwTypeError
