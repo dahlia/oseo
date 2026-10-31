@@ -80,3 +80,75 @@ unavailable. Preserve ADR 0016/0019 reopening triggers; an accepted ADR 0016
 amendment admitting dynamic import reopens ImportCall accounting. Each child
 requires normal D1/D11 review and D3/D4 publication. This metadata change
 performs none of those closure or landing steps.
+
+
+Candidate evidence and accounting
+---------------------------------
+
+The selector matches exactly 43 existing umbrella-owned unsupported paths
+at base `362ddb13d933600f6a0543ac332eb8479be9053f`, with the SHA256 above.
+The [per-path table](./dynamic-source-static-core-evidence-table.md) names
+each normative subject, its fixed static fixture, every non-source
+observation and the source operation that remains. There were no reviewed
+complete replacement witnesses at entry.
+
+This node adds 43 fixed native fixture groups. Thirty-six use ordinary
+static Script code. Seven use ADR 0029's explicit `test262Host` compiler
+path for finite literal host Scripts: six retain the exact original
+statement completion values and one observes an invalid continue across a
+Script boundary. Root approved the six completion witnesses through Orca
+on 2026-10-31; the ruling requires the same statement forms,
+exact completion values, both native policies and forced collection. No
+runtime-created source is accepted. Ordinary eval and Function construction
+remain excluded, including the inner eval around the do-loop postfix
+update. Each per-path assessment names the replacement and distinguishes
+the remaining eval operation.
+
+The candidate delta is 43 newly covered non-source subjects and 43 proposed
+ADR 0016 exclusions, with zero paths staying in remediation and 43 evidence
+groups added. Classification remains `unsupported-profile-feature` for all
+43 paths. No pass, inventory, subset, result, ADR or graph landing changes.
+The complete inventory retains 41,091 paths. The ledger in this worktree
+prepares only this node's candidate owner assignments; it does not publish
+the child or change its unlanded status. Authoritative merged ownership
+and aggregate documentation follow Root's serialized publication/landing.
+
+Root's final dispatch addition expressly requires: “Do not write a new
+running total into the shared umbrella prose or its node YAML; record only
+this node's delta in its own note. Root merges the counts at publication.”
+Accordingly, the shared umbrella prose and node YAML retain their base
+snapshot here. This note records the 43-path delta for Root to integrate
+with the other lanes; their unpublished totals are not a claim about this
+candidate ledger. Ownership is generated through the ledger API with only
+these assignments, then regenerated with
+`mise run m5c:closure-ledger:update`; audit edits touch only these 43
+records and their new assessments. Root owns merged totals, outer review,
+publication and landing.
+
+The fixed fixture module is
+*tests/native/fixtures/dynamic-source-static-core.ts*.
+*tests/dynamic-source-static-core-source.test.ts* checks both compilation
+policies without ordinary eval or Function calls.
+*tests/dynamic-source-static-core.test.ts* observes each fixture against
+independent Node.js and Deno Script references, with an explicit `ok` output
+oracle, both native policies, positive allocation/collection counters and
+C call/host-installation structure. All 43 also register in *tests/native.ts*
+and both of its forced-collection lists. No shared property domain changes;
+existing generated suites continue to own the admitted semantic domains.
+
+
+Validation and review
+---------------------
+
+Validation results and source identities are recorded in the dispatch report
+under */data/m5c-ds15-20261031/*. The baseline fast repository suite passed
+105 tests, and the final fast suite passed the same 105 tests. The source
+suite passed 43 tests under both policies. The final focused native suite
+passed all 43 fixtures with both references, policies and forced collection.
+The derived ledger retains all 41,091 paths. Check and internal review
+results are bound to the final commit in the dispatch report.
+
+The reviewed subset and observations are unchanged, so no UPDATE is needed.
+Root's full exact-candidate gates must include `test:node`, `test:deno`, and
+`test:native` for the added native fixtures, followed by normal publication
+requirements. No full suite or UPDATE runs in this worker.
