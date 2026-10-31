@@ -52,6 +52,7 @@ import { dateFamilyFixtures } from "./native/fixtures/date-family.ts";
 import { expressionFixtures } from "./native/fixtures/expressions.ts";
 const { ds22BoundaryCoreFixtures } =
   await import("./native/fixtures/ds22-boundary-core.ts");
+import * as cs from "./native/fixtures/construction-static-contracts.ts";
 import { functionFixtures } from "./native/fixtures/functions.ts";
 import { generatorFixtures } from "./native/fixtures/generators.ts";
 import * as evalFixture from "./native/fixtures/direct-eval-non-string.ts";
@@ -243,6 +244,7 @@ const fixtures: readonly Fixture[] = [
   ...functionFixtures,
   ...callableCases,
   ...ds22BoundaryCoreFixtures,
+  cs.constructionStaticFixture,
   ...properTailCallFixtures,
   ...globalRecord.globalObjectRecordFixtures,
   evalFixture.directEvalNonStringFixture,
@@ -1396,6 +1398,7 @@ for (const fixture of selectedFixtures) {
     fixture.name === "object-integrity-levels" ||
     fixture.name === "object-own-keys" ||
     fixture.name === "global-object-record" ||
+    fixture.name === "construction-static-contracts" ||
     fixture.name === "eval-intrinsic-value" ||
     fixture.name === "direct-eval-non-string" ||
     fixture.name.startsWith("binding-reference-") ||
@@ -1554,6 +1557,7 @@ for (const fixture of selectedFixtures) {
     fixture.name === "object-own-keys-virtual-assignment" ||
     fixture.name === "object-own-keys-virtual-read-only" ||
     fixture.name === "global-object-record" ||
+    fixture.name === "construction-static-contracts" ||
     fixture.name === "eval-intrinsic-value" ||
     fixture.name.startsWith("ds22-") ||
     fixture.name === "direct-eval-non-string" ||
@@ -1665,6 +1669,7 @@ for (const fixture of selectedFixtures) {
     fixture.name === "object-descriptor-queries" ||
     fixture.name === "object-integrity-levels" ||
     fixture.name === "global-object-record" ||
+    fixture.name === "construction-static-contracts" ||
     fixture.name === "eval-intrinsic-value" ||
     fixture.name === "globalthis-binding" ||
     fixture.name === "symbols" ||
@@ -1780,6 +1785,10 @@ for (const fixture of selectedFixtures) {
             ]);
           } else {
             assertMatchingObservations([nodeReference, denoReference, native]);
+          }
+          if (fixture.name === "construction-static-contracts") {
+            assert.equal(native.stdout, cs.constructionStaticExpected);
+            assert.ok(native.counters!.collections > 0);
           }
           assert(native.counters != null, `${fixture.name}: counters`);
           assert(native.emittedC.includes("OseoResult"), "generic call ABI");
@@ -1897,6 +1906,7 @@ for (const fixture of selectedFixtures) {
             fixture.name === "object-descriptor-queries" ||
             fixture.name === "object-integrity-levels" ||
             fixture.name === "global-object-record" ||
+            fixture.name === "construction-static-contracts" ||
             fixture.name === "eval-intrinsic-value" ||
             fixture.name.startsWith("ds22-") ||
             fixture.name === "direct-eval-non-string" ||

@@ -1209,8 +1209,8 @@ assessments:
       tests/native/fixtures/bindings.ts:
         "f3e20be237b2b772c59670f481af8147bfa59312098aa503\
         e3817879ab0fb31b"
-      tests/native.ts: "a15572fa62a53336b9bad50d9ffce4e49dea9b1bd1d51b28\
-        9ef6ce1f1b58345a"
+      tests/native.ts: "2602184d72bcb04a20b39b0894648778b18bf15bed665bed\
+        fe542a824fbcf563"
     reason: Maintainer decision 2026-10-28 item 1 applies to the single path in
       dynamic-source-template-site-evidence.paths.txt. The
       template-site-identity native fixture observes both same-site equalities
@@ -2948,8 +2948,8 @@ assessments:
       tests/callable-object-evidence.test.ts:
         "d2b814666e5645565ca2001f0419b931cd2949624777047f562d\
         a479c71be70d"
-      tests/native.ts: "a15572fa62a53336b9bad50d9ffce4e49dea9b1bd1d51b289ef6\
-        ce1f1b58345a"
+      tests/native.ts: "2602184d72bcb04a20b39b0894648778b18bf15bed665bedfe54\
+        2a824fbcf563"
       docs/m5c-graph/dynamic-source-callable-object-assessment.md:
         "b4eb5774379e97332ac56111eb4fadf83a6e39b66f84b22bff74\
         10ffca7eaf37"
@@ -2980,8 +2980,8 @@ assessments:
       tests/callable-object-evidence.test.ts:
         "d2b814666e5645565ca2001f0419b931cd2949624777047f562d\
         a479c71be70d"
-      tests/native.ts: "a15572fa62a53336b9bad50d9ffce4e49dea9b1bd1d51b289ef6\
-        ce1f1b58345a"
+      tests/native.ts: "2602184d72bcb04a20b39b0894648778b18bf15bed665bedfe54\
+        2a824fbcf563"
       docs/m5c-graph/dynamic-source-callable-object-assessment.md:
         "b4eb5774379e97332ac56111eb4fadf83a6e39b66f84b22bff74\
         10ffca7eaf37"
@@ -3009,8 +3009,8 @@ assessments:
       tests/callable-object-evidence.test.ts:
         "d2b814666e5645565ca2001f0419b931cd2949624777047f562d\
         a479c71be70d"
-      tests/native.ts: "a15572fa62a53336b9bad50d9ffce4e49dea9b1bd1d51b289ef6\
-        ce1f1b58345a"
+      tests/native.ts: "2602184d72bcb04a20b39b0894648778b18bf15bed665bedfe54\
+        2a824fbcf563"
       docs/m5c-graph/dynamic-source-callable-object-assessment.md:
         "b4eb5774379e97332ac56111eb4fadf83a6e39b66f84b22bff74\
         10ffca7eaf37"
@@ -3053,8 +3053,8 @@ assessments:
       tests/callable-object-evidence.test.ts:
         "d2b814666e5645565ca2001f0419b931cd2949624777047f562d\
         a479c71be70d"
-      tests/native.ts: "a15572fa62a53336b9bad50d9ffce4e49dea9b1bd1d51b289ef6\
-        ce1f1b58345a"
+      tests/native.ts: "2602184d72bcb04a20b39b0894648778b18bf15bed665bedfe54\
+        2a824fbcf563"
       docs/m5c-graph/dynamic-source-callable-object-assessment.md:
         "b4eb5774379e97332ac56111eb4fadf83a6e39b66f84b22bff74\
         10ffca7eaf37"
@@ -3081,8 +3081,8 @@ assessments:
       tests/callable-object-evidence.test.ts:
         "d2b814666e5645565ca2001f0419b931cd2949624777047f562d\
         a479c71be70d"
-      tests/native.ts: "a15572fa62a53336b9bad50d9ffce4e49dea9b1bd1d51b289ef6\
-        ce1f1b58345a"
+      tests/native.ts: "2602184d72bcb04a20b39b0894648778b18bf15bed665bedfe54\
+        2a824fbcf563"
       docs/m5c-graph/dynamic-source-callable-object-assessment.md:
         "b4eb5774379e97332ac56111eb4fadf83a6e39b66f84b22bff74\
         10ffca7eaf37"
@@ -3113,8 +3113,8 @@ assessments:
       tests/callable-object-evidence.test.ts:
         "d2b814666e5645565ca2001f0419b931cd2949624777047f562d\
         a479c71be70d"
-      tests/native.ts: "a15572fa62a53336b9bad50d9ffce4e49dea9b1bd1d51b289ef6\
-        ce1f1b58345a"
+      tests/native.ts: "2602184d72bcb04a20b39b0894648778b18bf15bed665bedfe54\
+        2a824fbcf563"
       docs/m5c-graph/dynamic-source-callable-object-assessment.md:
         "b4eb5774379e97332ac56111eb4fadf83a6e39b66f84b22bff74\
         10ffca7eaf37"
@@ -3143,8 +3143,8 @@ assessments:
       tests/callable-object-evidence.test.ts:
         "d2b814666e5645565ca2001f0419b931cd2949624777047f562d\
         a479c71be70d"
-      tests/native.ts: "a15572fa62a53336b9bad50d9ffce4e49dea9b1bd1d51b289ef6\
-        ce1f1b58345a"
+      tests/native.ts: "2602184d72bcb04a20b39b0894648778b18bf15bed665bedfe54\
+        2a824fbcf563"
       docs/m5c-graph/dynamic-source-callable-object-assessment.md:
         "b4eb5774379e97332ac56111eb4fadf83a6e39b66f84b22bff74\
         10ffca7eaf37"
@@ -3182,8 +3182,8 @@ assessments:
       tests/callable-object-evidence.test.ts:
         "d2b814666e5645565ca2001f0419b931cd2949624777047f562d\
         a479c71be70d"
-      tests/native.ts: "a15572fa62a53336b9bad50d9ffce4e49dea9b1bd1d51b289ef6\
-        ce1f1b58345a"
+      tests/native.ts: "2602184d72bcb04a20b39b0894648778b18bf15bed665bedfe54\
+        2a824fbcf563"
       docs/m5c-graph/dynamic-source-callable-object-assessment.md:
         "b4eb5774379e97332ac56111eb4fadf83a6e39b66f84b22bff74\
         10ffca7eaf37"
@@ -3210,8 +3210,8 @@ assessments:
       tests/callable-object-evidence.test.ts:
         "d2b814666e5645565ca2001f0419b931cd2949624777047f562d\
         a479c71be70d"
-      tests/native.ts: "a15572fa62a53336b9bad50d9ffce4e49dea9b1bd1d51b289ef6\
-        ce1f1b58345a"
+      tests/native.ts: "2602184d72bcb04a20b39b0894648778b18bf15bed665bedfe54\
+        2a824fbcf563"
       docs/m5c-graph/dynamic-source-callable-object-assessment.md:
         "b4eb5774379e97332ac56111eb4fadf83a6e39b66f84b22bff74\
         10ffca7eaf37"
@@ -3242,8 +3242,8 @@ assessments:
       tests/callable-object-evidence.test.ts:
         "d2b814666e5645565ca2001f0419b931cd2949624777047f562d\
         a479c71be70d"
-      tests/native.ts: "a15572fa62a53336b9bad50d9ffce4e49dea9b1bd1d51b289ef6\
-        ce1f1b58345a"
+      tests/native.ts: "2602184d72bcb04a20b39b0894648778b18bf15bed665bedfe54\
+        2a824fbcf563"
       docs/m5c-graph/dynamic-source-callable-object-assessment.md:
         "b4eb5774379e97332ac56111eb4fadf83a6e39b66f84b22bff74\
         10ffca7eaf37"
@@ -3273,8 +3273,8 @@ assessments:
       tests/callable-object-evidence.test.ts:
         "d2b814666e5645565ca2001f0419b931cd2949624777047f562d\
         a479c71be70d"
-      tests/native.ts: "a15572fa62a53336b9bad50d9ffce4e49dea9b1bd1d51b289ef6\
-        ce1f1b58345a"
+      tests/native.ts: "2602184d72bcb04a20b39b0894648778b18bf15bed665bedfe54\
+        2a824fbcf563"
       docs/m5c-graph/dynamic-source-callable-object-assessment.md:
         "b4eb5774379e97332ac56111eb4fadf83a6e39b66f84b22bff74\
         10ffca7eaf37"
@@ -3313,8 +3313,8 @@ assessments:
       tests/callable-object-evidence.test.ts:
         "d2b814666e5645565ca2001f0419b931cd2949624777047f562d\
         a479c71be70d"
-      tests/native.ts: "a15572fa62a53336b9bad50d9ffce4e49dea9b1bd1d51b289ef6\
-        ce1f1b58345a"
+      tests/native.ts: "2602184d72bcb04a20b39b0894648778b18bf15bed665bedfe54\
+        2a824fbcf563"
       docs/m5c-graph/dynamic-source-callable-object-assessment.md:
         "b4eb5774379e97332ac56111eb4fadf83a6e39b66f84b22bff74\
         10ffca7eaf37"
@@ -3343,8 +3343,8 @@ assessments:
       tests/callable-object-evidence.test.ts:
         "d2b814666e5645565ca2001f0419b931cd2949624777047f562d\
         a479c71be70d"
-      tests/native.ts: "a15572fa62a53336b9bad50d9ffce4e49dea9b1bd1d51b289ef6\
-        ce1f1b58345a"
+      tests/native.ts: "2602184d72bcb04a20b39b0894648778b18bf15bed665bedfe54\
+        2a824fbcf563"
       docs/m5c-graph/dynamic-source-callable-object-assessment.md:
         "b4eb5774379e97332ac56111eb4fadf83a6e39b66f84b22bff74\
         10ffca7eaf37"
@@ -3371,8 +3371,8 @@ assessments:
       tests/callable-object-evidence.test.ts:
         "d2b814666e5645565ca2001f0419b931cd2949624777047f562d\
         a479c71be70d"
-      tests/native.ts: "a15572fa62a53336b9bad50d9ffce4e49dea9b1bd1d51b289ef6\
-        ce1f1b58345a"
+      tests/native.ts: "2602184d72bcb04a20b39b0894648778b18bf15bed665bedfe54\
+        2a824fbcf563"
       docs/m5c-graph/dynamic-source-callable-object-assessment.md:
         "b4eb5774379e97332ac56111eb4fadf83a6e39b66f84b22bff74\
         10ffca7eaf37"
@@ -3400,8 +3400,8 @@ assessments:
       tests/callable-object-evidence.test.ts:
         "d2b814666e5645565ca2001f0419b931cd2949624777047f562d\
         a479c71be70d"
-      tests/native.ts: "a15572fa62a53336b9bad50d9ffce4e49dea9b1bd1d51b289ef6\
-        ce1f1b58345a"
+      tests/native.ts: "2602184d72bcb04a20b39b0894648778b18bf15bed665bedfe54\
+        2a824fbcf563"
       docs/m5c-graph/dynamic-source-callable-object-assessment.md:
         "b4eb5774379e97332ac56111eb4fadf83a6e39b66f84b22bff74\
         10ffca7eaf37"
@@ -3432,8 +3432,8 @@ assessments:
       tests/callable-object-evidence.test.ts:
         "d2b814666e5645565ca2001f0419b931cd2949624777047f562d\
         a479c71be70d"
-      tests/native.ts: "a15572fa62a53336b9bad50d9ffce4e49dea9b1bd1d51b289ef6\
-        ce1f1b58345a"
+      tests/native.ts: "2602184d72bcb04a20b39b0894648778b18bf15bed665bedfe54\
+        2a824fbcf563"
       docs/m5c-graph/dynamic-source-callable-object-assessment.md:
         "b4eb5774379e97332ac56111eb4fadf83a6e39b66f84b22bff74\
         10ffca7eaf37"
@@ -3559,8 +3559,8 @@ assessments:
     replacementEvidence:
       tests/native/fixtures/binding-reference-evidence.ts: "148176601d5cac6e8f\
         b67444ac68efeadc9df8aacb596b23dbf158c2b48f1bba"
-      tests/native.ts: "a15572fa62a53336b9bad50d9ffce4e49dea9b1bd1d51b289ef6ce\
-        1f1b58345a"
+      tests/native.ts: "2602184d72bcb04a20b39b0894648778b18bf15bed665bedfe542a\
+        824fbcf563"
   ds18-static-class-fields:
     disposition: exclusion
     normativeDependency: source-evaluation-only
@@ -3581,8 +3581,8 @@ assessments:
     replacementEvidence:
       tests/native/fixtures/binding-reference-evidence.ts: "148176601d5cac6e8f\
         b67444ac68efeadc9df8aacb596b23dbf158c2b48f1bba"
-      tests/native.ts: "a15572fa62a53336b9bad50d9ffce4e49dea9b1bd1d51b289ef6ce\
-        1f1b58345a"
+      tests/native.ts: "2602184d72bcb04a20b39b0894648778b18bf15bed665bedfe542a\
+        824fbcf563"
   ds18-unresolvable-compound:
     disposition: exclusion
     normativeDependency: source-evaluation-only
@@ -3603,8 +3603,8 @@ assessments:
     replacementEvidence:
       tests/native/fixtures/binding-reference-evidence.ts: "148176601d5cac6e8f\
         b67444ac68efeadc9df8aacb596b23dbf158c2b48f1bba"
-      tests/native.ts: "a15572fa62a53336b9bad50d9ffce4e49dea9b1bd1d51b289ef6ce\
-        1f1b58345a"
+      tests/native.ts: "2602184d72bcb04a20b39b0894648778b18bf15bed665bedfe542a\
+        824fbcf563"
   ds21-finite-completion-records:
     disposition: exclusion
     normativeDependency: source-evaluation-only
@@ -3635,8 +3635,8 @@ assessments:
       tests/completion-records.test.ts:
         "f053d02bcd11af6604c78d907e709ee0155fe6c33c4a551b\
         79de0cc09474b624"
-      tests/native.ts: "a15572fa62a53336b9bad50d9ffce4e49dea9b1bd1d51b28\
-        9ef6ce1f1b58345a"
+      tests/native.ts: "2602184d72bcb04a20b39b0894648778b18bf15bed665bed\
+        fe542a824fbcf563"
       tests/test262/harness/base.js:
         "50331feeca513cb2e2354e05e7c68f82d5aeccd9b766d6c8\
         8438c5ef118075f6"
@@ -5213,6 +5213,38 @@ assessments:
       tests/dynamic-source-realm-host-evidence.test.ts:
         "33fa8bc15819484524d930a99734d368c447ad95f1a7561b\
         b553978437567194"
+  ds13-static-construction-contracts:
+    disposition: "exclusion"
+    normativeDependency: "source-evaluation-only"
+    replacementEvidence:
+      tests/construction-static-contracts.test.ts: "428628247b099d6e74148a55\
+        90f24966b2f41a0ebe9cabe4a5454e61063d6b54"
+      tests/native/fixtures/construction-static-contracts.ts: "784b3e71396e5\
+        f40e33a5b3cbe52a3ec28b59cdba905431d1e8e0c1d929ae6b6"
+      tests/native.ts: "2602184d72bcb04a20b39b0894648778b18bf15bed665bedfe54\
+        2a824fbcf563"
+    reason: >-
+      Maintainer decision 2026-10-28 item 1 applies only to the 24 exclusion
+      rows in docs/m5c-graph/dynamic-source-construction-assessment.yaml.
+      Complete ordinary function definitions witness the same strict/sloppy
+      formal parameter and body grammar; syntax negatives report OSEO0001
+      with no MIR and the reference compiler reports SyntaxError. The fixed
+      construction-static-contracts native fixture observes duplicate
+      binding acceptance, eval/arguments parameter acceptance, arguments[0]
+      identity, Function instance/constructor identity, true/undefined
+      results and the exact sums 6, ABBA1 and 2ABBA under both policies with
+      forced GC. All 17 printed primitive values pass Object.is before
+      formatting; seven string-result mutations must throw. String argument
+      grouping, strict-caller independence of separately compiled source and
+      call/new construction are the remaining CreateDynamicFunction
+      source-construction residue. No object/primitive non-String conversion
+      or Function-family subclass row is excluded. The exact per-path
+      subject, witness observation, reason and fresh original digests are in
+      the assessment. All original unsupported observations remain unchanged
+      and never count as passes. Reopen on original or replacement
+      source/observation changes, accepted ADR 0016 admission of
+      Function-family construction, or ADR 0019 non-source dependence; all
+      ADR 0016 laboratory, staged-compilation and WinterTC triggers remain.
 paths:
   - path: test/built-ins/AggregateError/newtarget-proto-fallback.js
     proposedOwner: adr:0016-dynamic-source-boundary
@@ -5674,7 +5706,7 @@ paths:
     subject: Strict Mode - SyntaxError is thrown if a function using the
       Function constructor has two identical parameters in (local) strict
       mode
-    assessment: observation-b01-b18-dynamic-source
+    assessment: ds13-static-construction-contracts
   - path: test/built-ins/Function/15.3.2.1-11-1-s.js
     proposedOwner: adr:0016-dynamic-source-boundary
     priorCohort: incidental-scaffolding
@@ -5686,7 +5718,7 @@ paths:
     section: 15.3.2.1-11-1-s
     subject: Duplicate seperate parameter name in Function constructor
       throws SyntaxError in strict mode
-    assessment: observation-b01-b18-dynamic-source
+    assessment: ds13-static-construction-contracts
   - path: test/built-ins/Function/15.3.2.1-11-1.js
     proposedOwner: adr:0016-dynamic-source-boundary
     priorCohort: incidental-scaffolding
@@ -5698,7 +5730,7 @@ paths:
     section: 15.3.2.1-11-1
     subject: Duplicate separate parameter name in Function constructor
       allowed if body not strict
-    assessment: observation-b01-b18-dynamic-source
+    assessment: ds13-static-construction-contracts
   - path: test/built-ins/Function/15.3.2.1-11-2-s.js
     proposedOwner: adr:0016-dynamic-source-boundary
     priorCohort: incidental-scaffolding
@@ -5710,7 +5742,7 @@ paths:
     section: 15.3.2.1-11-2-s
     subject: Duplicate seperate parameter name in Function constructor
       called from strict mode allowed if body not strict
-    assessment: observation-b01-b18-dynamic-source
+    assessment: ds13-static-construction-contracts
   - path: test/built-ins/Function/15.3.2.1-11-3-s.js
     proposedOwner: adr:0016-dynamic-source-boundary
     priorCohort: incidental-scaffolding
@@ -5722,7 +5754,7 @@ paths:
     section: 15.3.2.1-11-3-s
     subject: Function constructor having a formal parameter named 'eval'
       throws SyntaxError if function body is strict mode
-    assessment: observation-b01-b18-dynamic-source
+    assessment: ds13-static-construction-contracts
   - path: test/built-ins/Function/15.3.2.1-11-3.js
     proposedOwner: adr:0016-dynamic-source-boundary
     priorCohort: incidental-scaffolding
@@ -5734,7 +5766,7 @@ paths:
     section: 15.3.2.1-11-3
     subject: Function constructor may have a formal parameter named 'eval'
       if body is not strict mode
-    assessment: observation-b01-b18-dynamic-source
+    assessment: ds13-static-construction-contracts
   - path: test/built-ins/Function/15.3.2.1-11-4-s.js
     proposedOwner: adr:0016-dynamic-source-boundary
     priorCohort: incidental-scaffolding
@@ -5747,7 +5779,7 @@ paths:
     subject: Function constructor call from strict code with formal
       parameter named 'eval' does not throws SyntaxError if function body
       is not strict mode
-    assessment: observation-b01-b18-dynamic-source
+    assessment: ds13-static-construction-contracts
   - path: test/built-ins/Function/15.3.2.1-11-5-s.js
     proposedOwner: adr:0016-dynamic-source-boundary
     priorCohort: incidental-scaffolding
@@ -5759,7 +5791,7 @@ paths:
     section: 15.3.2.1-11-5-s
     subject: Duplicate combined parameter name in Function constructor
       throws SyntaxError in strict mode
-    assessment: observation-b01-b18-dynamic-source
+    assessment: ds13-static-construction-contracts
   - path: test/built-ins/Function/15.3.2.1-11-5.js
     proposedOwner: adr:0016-dynamic-source-boundary
     priorCohort: incidental-scaffolding
@@ -5771,7 +5803,7 @@ paths:
     section: 15.3.2.1-11-5
     subject: Duplicate combined parameter name in Function constructor
       allowed if body is not strict
-    assessment: observation-b01-b18-dynamic-source
+    assessment: ds13-static-construction-contracts
   - path: test/built-ins/Function/15.3.2.1-11-6-s.js
     proposedOwner: adr:0016-dynamic-source-boundary
     priorCohort: incidental-scaffolding
@@ -5783,7 +5815,7 @@ paths:
     section: 15.3.2.1-11-6-s
     subject: Duplicate combined parameter name allowed in Function
       constructor called in strict mode if body not strict
-    assessment: observation-b01-b18-dynamic-source
+    assessment: ds13-static-construction-contracts
   - path: test/built-ins/Function/15.3.2.1-11-7-s.js
     proposedOwner: adr:0016-dynamic-source-boundary
     priorCohort: incidental-scaffolding
@@ -5796,7 +5828,7 @@ paths:
     subject: Function constructor call from strict code with formal
       parameter named arguments does not throws SyntaxError if function
       body is not strict mode
-    assessment: observation-b01-b18-dynamic-source
+    assessment: ds13-static-construction-contracts
   - path: test/built-ins/Function/15.3.2.1-11-8-s.js
     proposedOwner: adr:0016-dynamic-source-boundary
     priorCohort: incidental-scaffolding
@@ -5810,7 +5842,7 @@ paths:
       created using a Function constructor that has two identical
       parameters, which are separated by a unique parameter name and there
       is no explicit 'use strict' in the function constructor's body
-    assessment: observation-b01-b18-dynamic-source
+    assessment: ds13-static-construction-contracts
   - path: test/built-ins/Function/15.3.2.1-11-9-s.js
     proposedOwner: adr:0016-dynamic-source-boundary
     priorCohort: incidental-scaffolding
@@ -5824,7 +5856,7 @@ paths:
       using the Function constructor that has three identical parameters
       and there is no explicit 'use strict' in the function constructor's
       body
-    assessment: observation-b01-b18-dynamic-source
+    assessment: ds13-static-construction-contracts
   - path: test/built-ins/Function/15.3.5.4_2-10gs.js
     proposedOwner: adr:0016-dynamic-source-boundary
     priorCohort: incidental-scaffolding
@@ -6234,7 +6266,7 @@ paths:
     missingDynamicTag: false
     section: 15.3.1_A1_T1
     subject: Create simple functions and check returned values
-    assessment: observation-b01-b18-dynamic-source
+    assessment: ds13-static-construction-contracts
   - path: test/built-ins/Function/S15.3.2.1_A1_T1.js
     proposedOwner: adr:0016-dynamic-source-boundary
     priorCohort: incidental-scaffolding
@@ -6348,7 +6380,7 @@ paths:
     section: 15.3.2.1_A1_T6
     subject: Value of the function constructor argument is the string
       "return true;"
-    assessment: observation-b01-b18-dynamic-source
+    assessment: ds13-static-construction-contracts
   - path: test/built-ins/Function/S15.3.2.1_A1_T7.js
     proposedOwner: adr:0016-dynamic-source-boundary
     priorCohort: incidental-scaffolding
@@ -6370,7 +6402,7 @@ paths:
     missingDynamicTag: false
     section: 15.3.2.1_A1_T8
     subject: Value of the function constructor argument is "var 1=1;"
-    assessment: observation-b01-b18-dynamic-source
+    assessment: ds13-static-construction-contracts
   - path: test/built-ins/Function/S15.3.2.1_A1_T9.js
     proposedOwner: adr:0016-dynamic-source-boundary
     priorCohort: incidental-scaffolding
@@ -6383,7 +6415,7 @@ paths:
     subject: >-
       Value of the function constructor argument is
       "return arguments[0];"
-    assessment: observation-b01-b18-dynamic-source
+    assessment: ds13-static-construction-contracts
   - path: test/built-ins/Function/S15.3.2.1_A2_T1.js
     proposedOwner: adr:0016-dynamic-source-boundary
     priorCohort: incidental-scaffolding
@@ -6395,7 +6427,7 @@ paths:
     section: 15.3.2.1_A2_T1
     subject: Values of the function constructor arguments are "arg1",
       "arg2", "arg3", "return arg1+arg2+arg3;"
-    assessment: observation-b01-b18-dynamic-source
+    assessment: ds13-static-construction-contracts
   - path: test/built-ins/Function/S15.3.2.1_A2_T2.js
     proposedOwner: adr:0016-dynamic-source-boundary
     priorCohort: incidental-scaffolding
@@ -6407,7 +6439,7 @@ paths:
     section: 15.3.2.1_A2_T2
     subject: Values of the function constructor arguments are "arg1, arg2",
       "arg3", "return arg1+arg2+arg3;"
-    assessment: observation-b01-b18-dynamic-source
+    assessment: ds13-static-construction-contracts
   - path: test/built-ins/Function/S15.3.2.1_A2_T3.js
     proposedOwner: adr:0016-dynamic-source-boundary
     priorCohort: incidental-scaffolding
@@ -6419,7 +6451,7 @@ paths:
     section: 15.3.2.1_A2_T3
     subject: Values of the function constructor arguments are "arg1, arg2,
       arg3", "return arg1+arg2+arg3;"
-    assessment: observation-b01-b18-dynamic-source
+    assessment: ds13-static-construction-contracts
   - path: test/built-ins/Function/S15.3.2.1_A2_T4.js
     proposedOwner: adr:0016-dynamic-source-boundary
     priorCohort: incidental-scaffolding
@@ -6540,7 +6572,7 @@ paths:
     section: 15.3.2.1_A3_T15
     subject: Values of the function constructor arguments are are two empty
       strings
-    assessment: observation-b01-b18-dynamic-source
+    assessment: ds13-static-construction-contracts
   - path: test/built-ins/Function/S15.3.2.1_A3_T2.js
     proposedOwner: adr:0016-dynamic-source-boundary
     priorCohort: incidental-scaffolding
@@ -6637,7 +6669,7 @@ paths:
     section: 15.3.2.1_A3_T9
     subject: Values of the function constructor arguments are "1,1" and
       "return this;"
-    assessment: observation-b01-b18-dynamic-source
+    assessment: ds13-static-construction-contracts
   - path: test/built-ins/Function/S15.3.2_A1.js
     proposedOwner: adr:0016-dynamic-source-boundary
     priorCohort: incidental-scaffolding
@@ -6826,7 +6858,7 @@ paths:
     missingDynamicTag: false
     section: sec-createdynamicfunction
     subject: Strictfunction shouldn't have the reserved word "with"
-    assessment: observation-b01-b18-dynamic-source
+    assessment: ds13-static-construction-contracts
   - path: test/built-ins/Function/StrictFunction_restricted-properties.js
     proposedOwner: adr:0016-dynamic-source-boundary
     priorCohort: incidental-scaffolding
@@ -7089,7 +7121,7 @@ paths:
     section: sec-createdynamicfunction
     subject: CreateDynamicFunction throws SyntaxError if there is some
       invalid private identifier on its body
-    assessment: observation-b01-b18-dynamic-source
+    assessment: ds13-static-construction-contracts
   - path: "test/built-ins/Function/proto-from-ctor-realm-prototype.\
       js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
