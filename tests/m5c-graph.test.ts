@@ -551,8 +551,8 @@ test("the checked-in M5c work graph is valid", () => {
   assert.ok(summary.landed >= 129);
   assert.equal(summary.parked, 0);
   assert.equal(summary.nodes, 140);
-  assert.equal(summary.ready, 136);
-  assert.equal(summary.blocked, 4);
+  assert.equal(summary.ready, 139);
+  assert.equal(summary.blocked, 1);
   const array = readImportAttributesNode(
     "ordinary-array-indexed-lookup-performance",
   );
@@ -592,7 +592,7 @@ test("import attribute accounting retains its bounded graph contract", () => {
   assert.match(owner.delivers, /counts none as a pass/u);
   assert.match(owner.delivers, /does not widen the existing/u);
   const reservation = readImportAttributesNode("observation-batch-31");
-  assert.equal(reservation.landed, false);
+  assert.equal(reservation.landed, true);
   assert.equal(reservation.status, "ready");
   assert.deepEqual(reservation.dependencies, [
     "dynamic-import",
@@ -837,6 +837,7 @@ test("observation train retains bounded remediation dependencies", () => {
   // their batches could admit the paths these nodes owned;
   // with-var-loop-head-resolution landed in the 2026-10-30 bundle.
   const landedRemediations = new Set([
+    "array-generated-property-cost-remediation",
     "dynamic-import-early-error-precedence",
     "module-namespace-uninitialized-bindings",
     "test262-module-harness-globals",
