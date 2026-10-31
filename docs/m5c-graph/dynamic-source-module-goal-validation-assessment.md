@@ -118,10 +118,11 @@ product input changed. This is Linux author evidence, without macOS or
 full-candidate execution.
 
 The source suite checks the three static negative reference groups under
-Node.js and Deno and the independent Oseo parser/linker assertions. Its
-focused output is in
-*/data/m5c-ds11-20261031/source-tests-structural.log*; the final complete
-non-native run is recorded in *fast-tests-final.log* in that directory.
+Node.js and Deno and the independent Oseo parser/linker assertions. The
+current 12 source registrations passed in the final complete non-native
+run, recorded in */data/m5c-ds11-20261031/fast-tests-final.log*, together
+with the repository tooling and existing parser tests: 127 passed, with
+zero failures, skips or cancellations. Earlier focused logs are historical.
 The first broad non-native command ran before package build and failed
 only to import the unbuilt compiler package for the existing parser suite;
 its 123 other registrations passed. Building the workspace and rerunning

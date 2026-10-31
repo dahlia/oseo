@@ -1,7 +1,7 @@
 version: 1
 id: dynamic-source-coverage-remediation
 title: Resolve dynamic source coverage gaps
-delivers: "Resolves the 950 reviewed unsupported paths assigned to
+delivers: "Resolves the 884 reviewed unsupported paths assigned to
   node:dynamic-source-coverage-remediation in the derived closure
   ledger. Select exactly those owners and their exclusion-audit path
   assessments: the original 121 paths, 35 from cross-realm-host, 1 from
@@ -133,8 +133,8 @@ delivers: "Resolves the 950 reviewed unsupported paths assigned to
   this-binding paths under maintainer decision 2026-10-28 item 1, using
   the reviewed static replacements in
   dynamic-source-private-binding-assessment.yaml.
-  Its other 24 paths stay here; no new tests or UPDATE are needed. The current
-  total is 1004, down from 1046, including later observation additions.
+  Its other 24 paths stay here; no new tests or UPDATE are needed. At that
+  checkpoint the total was 1004, down from 1046, including later additions.
   B19/B20/B30 add exactly 459 paths: 66 observed OSEO1001 Unknown binding
   eval rejections and 393 observed OSEO1001 ImportExpression outside M1
   rejections. Preserve the existing 306 paths and dependencies; the combined
@@ -194,16 +194,28 @@ delivers: "Resolves the 950 reviewed unsupported paths assigned to
   static replacements and keeps 24. DS-7 moves 9 of its 80 template-site,
   string case-conversion and generator-instance paths through reviewed
   static replacements and keeps 71, as recorded in
-  docs/m5c-graph/dynamic-source-realm-string-assessment.md. The current
-  scope is 950; no native
-  or fixture evidence was added, and all original unsupported results
-  remain unchanged. The approved 2026-10-31 second split adds DS-8
+  docs/m5c-graph/dynamic-source-realm-string-assessment.md. The scope
+  before DS-11 was 950; those accounting nodes added no native or fixture
+  evidence, and all original unsupported results remain unchanged.
+  The approved 2026-10-31 second split adds DS-8
   through DS-22 as bounded children for these exact 950 paths. Their
   work notes pin disjoint path lists and evidence obligations. Ownership
   moves to each child only as that child lands; no ledger owner changes
   in this metadata split. This umbrella remains blocked until every
   child lands and itself lands when it owns zero paths. The split
-  establishes no new exclusion or completed replacement evidence."
+  establishes no new exclusion or completed replacement evidence. DS-11
+  subsequently accounts for all 66 selected Module-goal, ambiguous and
+  circular indirect-export validation and Script-to-Module usage paths
+  under ADR 0016 and maintainer decision items 1 and 2. Its per-path
+  assessment is
+  docs/m5c-graph/dynamic-source-module-goal-validation-assessment.md.
+  New evidence adds 12 source registrations and one native registration
+  covering 18 usage contexts, with three fixture files, structural graph
+  and MIR assertions, both native policies and forced collection.
+  The current owned scope is 884; zero selected DS-11 paths remain in
+  remediation. Every original classification and inventory path stays
+  unchanged, and no UPDATE is needed. Outer review, full candidate suites,
+  publication and landing remain Root-owned."
 dependencies:
   - authorized-exclusion-audit
   - dynamic-source-binding-reference-evidence
