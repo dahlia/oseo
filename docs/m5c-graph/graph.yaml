@@ -20,8 +20,8 @@ baseline:
   unreviewedPaths: 1670
   unsupportedProfileFeatures: 1798
 summary:
-  nodes: 139
-  ready: 135
+  nodes: 140
+  ready: 136
   blocked: 4
   parked: 0
   landed: 97
@@ -11159,5 +11159,205 @@ collisions:
   - path: tests/test262/results.yaml
     nodes:
       - dynamic-source-boundary-overlap-review
+      - with-primitive-binding-object-boxing
+    note: "Independent publishers serialize canonical manifest updates."
+  - path: tests/test262/results.yaml
+    nodes:
+      - array-generated-property-cost-remediation
+      - dynamic-source-residual-evidence
+    note: "Independent publishers serialize canonical manifest updates."
+  - path: tests/test262/results.yaml
+    nodes:
+      - class-private-accessor-lookup-coverage-remediation
+      - dynamic-source-residual-evidence
+    note: "Independent publishers serialize canonical manifest updates."
+  - path: tests/test262/results.yaml
+    nodes:
+      - class-static-keyword-escape-early-error
+      - dynamic-source-residual-evidence
+    note: "Independent publishers serialize canonical manifest updates."
+  - path: tests/test262/results.yaml
+    nodes:
+      - default-derived-constructor-spread-iterator
+      - dynamic-source-residual-evidence
+    note: "Independent publishers serialize canonical manifest updates."
+  - path: tests/test262/results.yaml
+    nodes:
+      - dynamic-source-binding-reference-evidence
+      - dynamic-source-residual-evidence
+    note: "Independent publishers serialize canonical manifest updates."
+  - path: tests/test262/results.yaml
+    nodes:
+      - dynamic-source-boundary-overlap-review
+      - dynamic-source-residual-evidence
+    note: "Independent publishers serialize canonical manifest updates."
+  - path: tests/test262/results.yaml
+    nodes:
+      - dynamic-source-callable-object-evidence
+      - dynamic-source-residual-evidence
+    note: "Independent publishers serialize canonical manifest updates."
+  - path: tests/test262/results.yaml
+    nodes:
+      - dynamic-source-completion-record-evidence
+      - dynamic-source-residual-evidence
+    note: "Independent publishers serialize canonical manifest updates."
+  - path: tests/test262/results.yaml
+    nodes:
+      - dynamic-source-construction-contracts
+      - dynamic-source-residual-evidence
+    note: "Independent publishers serialize canonical manifest updates."
+  - path: tests/test262/results.yaml
+    nodes:
+      - dynamic-source-eval-arguments-accounting
+      - dynamic-source-residual-evidence
+    note: "Independent publishers serialize canonical manifest updates."
+  - path: tests/test262/results.yaml
+    nodes:
+      - dynamic-source-eval-contract-accounting
+      - dynamic-source-residual-evidence
+    note: "Independent publishers serialize canonical manifest updates."
+  - path: tests/test262/results.yaml
+    nodes:
+      - dynamic-source-importcall-residual-accounting
+      - dynamic-source-residual-evidence
+    note: "Independent publishers serialize canonical manifest updates."
+  - path: tests/test262/results.yaml
+    nodes:
+      - dynamic-source-lexical-static-evidence
+      - dynamic-source-residual-evidence
+    note: "Independent publishers serialize canonical manifest updates."
+  - path: tests/test262/results.yaml
+    nodes:
+      - dynamic-source-module-goal-validation
+      - dynamic-source-residual-evidence
+    note: "Independent publishers serialize canonical manifest updates."
+  - path: tests/test262/results.yaml
+    nodes:
+      - dynamic-source-module-observable-contracts
+      - dynamic-source-residual-evidence
+    note: "Independent publishers serialize canonical manifest updates."
+  - path: tests/test262/results.yaml
+    nodes:
+      - dynamic-source-realm-host-evidence
+      - dynamic-source-residual-evidence
+    note: "Independent publishers serialize canonical manifest updates."
+  - path: tests/test262/results.yaml
+    nodes:
+      - dynamic-source-regexp-static-evidence
+      - dynamic-source-residual-evidence
+    note: "Independent publishers serialize canonical manifest updates."
+  - path: tests/test262/results.yaml
+    nodes:
+      - dynamic-source-residual-evidence
+      - dynamic-source-retagging
+    note: "Independent publishers serialize canonical manifest updates."
+  - path: tests/test262/results.yaml
+    nodes:
+      - dynamic-source-residual-evidence
+      - dynamic-source-static-core-evidence
+    note: "Independent publishers serialize canonical manifest updates."
+  - path: tests/test262/results.yaml
+    nodes:
+      - dynamic-source-residual-evidence
+      - dynamic-source-template-site-evidence
+    note: "Independent publishers serialize canonical manifest updates."
+  - path: tests/test262/results.yaml
+    nodes:
+      - dynamic-source-residual-evidence
+      - non-blocking-agent
+    note: "Independent publishers serialize canonical manifest updates."
+  - path: tests/test262/results.yaml
+    nodes:
+      - dynamic-source-residual-evidence
+      - observation-batch-21a
+    note: "Independent publishers serialize canonical manifest updates."
+  - path: tests/test262/results.yaml
+    nodes:
+      - dynamic-source-residual-evidence
+      - observation-batch-21b
+    note: "Independent publishers serialize canonical manifest updates."
+  - path: tests/test262/results.yaml
+    nodes:
+      - dynamic-source-residual-evidence
+      - observation-batch-21c
+    note: "Independent publishers serialize canonical manifest updates."
+  - path: tests/test262/results.yaml
+    nodes:
+      - dynamic-source-residual-evidence
+      - observation-batch-21d
+    note: "Independent publishers serialize canonical manifest updates."
+  - path: tests/test262/results.yaml
+    nodes:
+      - dynamic-source-residual-evidence
+      - observation-batch-22a
+    note: "Independent publishers serialize canonical manifest updates."
+  - path: tests/test262/results.yaml
+    nodes:
+      - dynamic-source-residual-evidence
+      - observation-batch-22b
+    note: "Independent publishers serialize canonical manifest updates."
+  - path: tests/test262/results.yaml
+    nodes:
+      - dynamic-source-residual-evidence
+      - observation-batch-23
+    note: "Independent publishers serialize canonical manifest updates."
+  - path: tests/test262/results.yaml
+    nodes:
+      - dynamic-source-residual-evidence
+      - observation-batch-24
+    note: "Independent publishers serialize canonical manifest updates."
+  - path: tests/test262/results.yaml
+    nodes:
+      - dynamic-source-residual-evidence
+      - observation-batch-25
+    note: "Independent publishers serialize canonical manifest updates."
+  - path: tests/test262/results.yaml
+    nodes:
+      - dynamic-source-residual-evidence
+      - observation-batch-26a
+    note: "Independent publishers serialize canonical manifest updates."
+  - path: tests/test262/results.yaml
+    nodes:
+      - dynamic-source-residual-evidence
+      - observation-batch-26b
+    note: "Independent publishers serialize canonical manifest updates."
+  - path: tests/test262/results.yaml
+    nodes:
+      - dynamic-source-residual-evidence
+      - observation-batch-27
+    note: "Independent publishers serialize canonical manifest updates."
+  - path: tests/test262/results.yaml
+    nodes:
+      - dynamic-source-residual-evidence
+      - observation-batch-28
+    note: "Independent publishers serialize canonical manifest updates."
+  - path: tests/test262/results.yaml
+    nodes:
+      - dynamic-source-residual-evidence
+      - observation-batch-31
+    note: "Independent publishers serialize canonical manifest updates."
+  - path: tests/test262/results.yaml
+    nodes:
+      - dynamic-source-residual-evidence
+      - regexp-split-coverage-remediation
+    note: "Independent publishers serialize canonical manifest updates."
+  - path: tests/test262/results.yaml
+    nodes:
+      - dynamic-source-residual-evidence
+      - typed-array-proto-coverage-remediation
+    note: "Independent publishers serialize canonical manifest updates."
+  - path: tests/test262/results.yaml
+    nodes:
+      - dynamic-source-residual-evidence
+      - unhandled-rejection-observation
+    note: "Independent publishers serialize canonical manifest updates."
+  - path: tests/test262/results.yaml
+    nodes:
+      - dynamic-source-residual-evidence
+      - with-optional-call-receiver
+    note: "Independent publishers serialize canonical manifest updates."
+  - path: tests/test262/results.yaml
+    nodes:
+      - dynamic-source-residual-evidence
       - with-primitive-binding-object-boxing
     note: "Independent publishers serialize canonical manifest updates."

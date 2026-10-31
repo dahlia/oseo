@@ -598,3 +598,14 @@ Root assigned `tco-non-eval-global.js` to the bounded
 rebinds the global eval name to a statically declared function and performs
 no source evaluation. Its unsupported classification and observation remain
 unchanged, but it contributes no dynamic-source tag or exclusion assessment.
+
+
+Bounded residual evidence child
+-------------------------------
+
+The D19 decision adds `dynamic-source-residual-evidence` for exactly 19
+paths: completion 11, class/private/static 5, derived error realms 2 and
+unexecuted constructor accounting 1. Its pinned selector and obligations
+are in that child's work note. Ownership moves only with reviewed closure;
+the umbrella retains every remaining path and requires child landing plus
+zero directly owned paths before its own landing.

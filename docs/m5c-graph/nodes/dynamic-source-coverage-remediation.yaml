@@ -305,6 +305,7 @@ dependencies:
   - dynamic-source-realm-host-evidence
   - dynamic-source-realm-string-family
   - dynamic-source-regexp-static-evidence
+  - dynamic-source-residual-evidence
   - dynamic-source-static-core-evidence
   - dynamic-source-template-site-evidence
   - dynamic-source-unknown-eval
