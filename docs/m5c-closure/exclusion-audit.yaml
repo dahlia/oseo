@@ -1113,6 +1113,313 @@ assessments:
       tests/native/fixtures/function-intrinsic-chains.ts:
         "c5eb018779c47f7de2959da4a1a64969475c8026fc831102\
         f06e8bef6382e1e3"
+  "ds12-static-module-observables":
+    "disposition": "exclusion"
+    "normativeDependency": "source-evaluation-only"
+    "replacementEvidence":
+      ? "docs/m5c-graph/dynamic-source-module-observable-contracts-assessmen\
+        t.yaml"
+      : "b4850c00865aa9de62fa58f2f6ba7ee8\
+        99571878860287462d76dbddfbb2ac6b"
+      "tests/ds12-import-meta-goals.test.ts": "ac709afe92b7fc5b688936e6826a6332\
+        b63b99cc0974b309e92da3cecf00ae9b"
+      "tests/ds12-module-observables-native.test.ts":
+        "c6aa9e6f450a421a83cb268fb74ed7d6\
+        80b8f0e9c81e986c21aed64e586b4e8f"
+      "tests/fixtures/ds12-module-observables/LICENSE":
+        "2c921a1fe5e04c956db32cbc3e68ad2c\
+        ec59078611ddb147449c498d6955e548"
+      "tests/fixtures/ds12-module-observables/custom-primitive.mjs":
+        "dc9f452a8d8df81558dedc111afd3f3c\
+        90bc34754b641087e700fa486ac58b25"
+      "tests/fixtures/ds12-module-observables/custom-tostring_FIXTURE.mjs":
+        "fa0187f84d47999698379ec47b0595c6\
+        2593a52cfa5d08c0b7f2477a215f8cf0"
+      "tests/fixtures/ds12-module-observables/custom-valueof_FIXTURE.mjs":
+        "6bf21deef98434feb89c9c2dd1506a42\
+        5ebb122617a731e4278da25dca48d7ab"
+      ? "tests/fixtures/ds12-module-observables/delete-exported-init-no-stri\
+        ct.mjs"
+      : "260021b92c7c663e6ecefa60bda3a233\
+        218b96fb83b94cb6dbb6dbbe343adde2"
+      ? "tests/fixtures/ds12-module-observables/delete-exported-init-no-stri\
+        ct.prelude.js"
+      : "802734aae40350fff7b60c34c6f95350\
+        3622e95e14c776d67a54bdf53ae98c20"
+      ? "tests/fixtures/ds12-module-observables/delete-exported-init-strict.\
+        mjs"
+      : "260021b92c7c663e6ecefa60bda3a233\
+        218b96fb83b94cb6dbb6dbbe343adde2"
+      ? "tests/fixtures/ds12-module-observables/delete-exported-init-strict.\
+        prelude.js"
+      : "9f7992cf887f37a90cf0df99d0122c9b\
+        a2dc345d03ad2db4c7ab3666d76f8785"
+      ? "tests/fixtures/ds12-module-observables/delete-non-exported-no-stric\
+        t.mjs"
+      : "2d940b92bbcc0ab9889073677ed034a7\
+        6fa34c0d7ee5d2fe629dc1cc47e96673"
+      ? "tests/fixtures/ds12-module-observables/delete-non-exported-no-stric\
+        t.prelude.js"
+      : "18cb901adcb726ad65b51d2132e67e02\
+        27a4c4db8bba4ab723fa6603e3064fa5"
+      "tests/fixtures/ds12-module-observables/empty_FIXTURE.mjs":
+        "0ab7d92aae402cec319b314aea522348\
+        290e14d5fa64dc3baecb8bd21723c675"
+      ? "tests/fixtures/ds12-module-observables/eval-gtbndng-indirect-update\
+        -as.mjs"
+      : "97645cad553ce5e417addb858a41d119\
+        488e8d8125e9e65210a097742ce42fc7"
+      ? "tests/fixtures/ds12-module-observables/eval-gtbndng-indirect-update\
+        -as_FIXTURE.mjs"
+      : "eddadfff17d51b77cbbb9d08bc018ffd\
+        10e7e1792f3304f7b4c916dbcaa2c27d"
+      ? "tests/fixtures/ds12-module-observables/eval-gtbndng-indirect-update\
+        .mjs"
+      : "13a225f468cacc383f600da3852e94ae\
+        ac0ba34209b4bafc20c007516b69aef1"
+      ? "tests/fixtures/ds12-module-observables/eval-gtbndng-indirect-update\
+        _FIXTURE.mjs"
+      : "eddadfff17d51b77cbbb9d08bc018ffd\
+        10e7e1792f3304f7b4c916dbcaa2c27d"
+      "tests/fixtures/ds12-module-observables/eval-rqstd-once.mjs":
+        "4946554f7d6e05fdef285c7cd7df7784\
+        7e2c834f72a6de07857248f072ac1382"
+      "tests/fixtures/ds12-module-observables/eval-rqstd-once_FIXTURE.mjs":
+        "4503d1c01ad706edda8d832f145bf64e\
+        d32e9be6f93493b598dc2af1cfc72194"
+      ? "tests/fixtures/ds12-module-observables/eval-rqstd-order-1_FIXTURE.m\
+        js"
+      : "cd3d827dbeb3d1bbf77db82a2fff9b2d\
+        b738934ddc2610573fc72593cacca39d"
+      ? "tests/fixtures/ds12-module-observables/eval-rqstd-order-2_FIXTURE.m\
+        js"
+      : "70932dca8a0b531cf02942362bddbc7d\
+        a5c592d77252f2c669d0abc625bd57fd"
+      ? "tests/fixtures/ds12-module-observables/eval-rqstd-order-3_FIXTURE.m\
+        js"
+      : "eaf2a6b91b7575e7e760be4d9828638b\
+        b0929c6f91de5d30a945eb4b9e55e7da"
+      ? "tests/fixtures/ds12-module-observables/eval-rqstd-order-4_FIXTURE.m\
+        js"
+      : "43ea0992b7110e46db64f88b2114d4fc\
+        eaad8381c8088839755dae30f12e6cc0"
+      ? "tests/fixtures/ds12-module-observables/eval-rqstd-order-5_FIXTURE.m\
+        js"
+      : "e65e33847f4120b1fbd4d12af2d7216c\
+        d6fcbfc53ce89867e4f6e426e8bc4184"
+      ? "tests/fixtures/ds12-module-observables/eval-rqstd-order-6_FIXTURE.m\
+        js"
+      : "97b7a6c8c56fc0e0a99b3e21d65a673f\
+        f7c239a5c2e246733f590de67621a028"
+      ? "tests/fixtures/ds12-module-observables/eval-rqstd-order-7_FIXTURE.m\
+        js"
+      : "9c97af386ca70b06a4fca4989d5bade9\
+        9af10a6d9ba04769fbf1fb76bcc7b723"
+      ? "tests/fixtures/ds12-module-observables/eval-rqstd-order-8_FIXTURE.m\
+        js"
+      : "0f0986a6bc82ee0ba0a577b01769197e\
+        b5c4c1b423f651dec0cdc6f80001953d"
+      ? "tests/fixtures/ds12-module-observables/eval-rqstd-order-9_FIXTURE.m\
+        js"
+      : "37c3d673513f64cf4324693b25734692\
+        7a0c61138039bd862b4a3cecd14dda30"
+      "tests/fixtures/ds12-module-observables/eval-rqstd-order.mjs":
+        "977c14ecb812ae53c80d5289a98f6664\
+        8b6352b89ffc46112b2e26557f9e52cb"
+      ? "tests/fixtures/ds12-module-observables/get-nested-namespace-dflt-di\
+        rect.mjs"
+      : "8545d08dc4efb95a73c2ad0d394b0c29\
+        c44574f8c698bc510c0a3a24faff4fa5"
+      ? "tests/fixtures/ds12-module-observables/get-nested-namespace-dflt-di\
+        rect.prelude.js"
+      : "a3440216df0e2eaccb258109e2a7441a\
+        d13c278db1a3aec032c6561fdc53e167"
+      ? "tests/fixtures/ds12-module-observables/get-nested-namespace-dflt-in\
+        direct.mjs"
+      : "e8fcc80c9bc075fb4bcd86f1db7eda56\
+        414dfdfcfbd1c4cdcbef91bcb3249460"
+      ? "tests/fixtures/ds12-module-observables/get-nested-namespace-dflt-in\
+        direct.prelude.js"
+      : "ad571a71f3c0ac248c45b5f4030efc92\
+        e52e689c15513b8ffe33bb8386ce86df"
+      ? "tests/fixtures/ds12-module-observables/get-nested-namespace-dflt-sk\
+        ip-named_FIXTURE.mjs"
+      : "3bf5372e942f029f81298418521339cc\
+        61451d3f5e1ca63da5db41edd5d12666"
+      ? "tests/fixtures/ds12-module-observables/get-nested-namespace-dflt-sk\
+        ip-prod_FIXTURE.mjs"
+      : "839375ec1448e5b97019702850a19125\
+        3b1b303333a770efe45db14e5ec5ede7"
+      ? "tests/fixtures/ds12-module-observables/get-nested-namespace-props-n\
+        rml-1_FIXTURE.mjs"
+      : "abf3cccfac398bba1cff4a2d08c1cff4\
+        e9483e58831d4d398be66f74308f06b9"
+      ? "tests/fixtures/ds12-module-observables/get-nested-namespace-props-n\
+        rml-2_FIXTURE.mjs"
+      : "89d344d21cf0e6c2456df9a6916104e5\
+        ffc44e84f9795196b64415c2f589337f"
+      ? "tests/fixtures/ds12-module-observables/get-nested-namespace-props-n\
+        rml.mjs"
+      : "2413c55efb51b09960010a41d2df952b\
+        c9d0758e6c002a828ae770cd3c17e9c9"
+      ? "tests/fixtures/ds12-module-observables/get-nested-namespace-props-n\
+        rml.prelude.js"
+      : "5bb76db3108c450c8c4bcc99a0f393d0\
+        4af83427f62018c2bf623ebe40dafeac"
+      "tests/fixtures/ds12-module-observables/import-meta-specifier.mjs":
+        "073f154bede3a470ee5b1315249eb79e\
+        40e448c102fab1dd53e2c87b0f2fd427"
+      "tests/fixtures/ds12-module-observables/imported-self-update.mjs":
+        "bb3be99ce94c4facbe950494faf97477\
+        968e3bbf6f789f015318f16624de504c"
+      ? "tests/fixtures/ds12-module-observables/instn-same-global-set_FIXTUR\
+        E.mjs"
+      : "c37fc7559683c68a8d05162973cb9301\
+        5164615801ca52a4c20bf9f810e2b63e"
+      "tests/fixtures/ds12-module-observables/instn-same-global.mjs":
+        "bf2da6e18037b4e39d6a22beae6bbb58\
+        5cb28bcc6d8e80b9fa111c370e7cf1a4"
+      "tests/fixtures/ds12-module-observables/module-code_FIXTURE.mjs":
+        "82055af18938e4da75eaca5bf31e1315\
+        e24d2d77b86f75857c757e895dee2f37"
+      ? "tests/fixtures/ds12-module-observables/nested-arrow-assignment-expr\
+        ession-eval-gtbndng-indirect-update.mjs"
+      : "7257c74eb7b853be86d3b7416255665a\
+        6f935b547378b03c4d44baa9bf49552e"
+      ? "tests/fixtures/ds12-module-observables/nested-arrow-import-then-eva\
+        l-gtbndng-indirect-update.mjs"
+      : "b27358b62cfdd5bafa8f1e86781ede64\
+        3e9c61f82463ddf61fd9e4d07422956b"
+      ? "tests/fixtures/ds12-module-observables/nested-async-arrow-function-\
+        await-eval-gtbndng-indirect-update.mjs"
+      : "f6916107b65512a5c46e59d35bced963\
+        92b26105176ba4b9444f999e503fc135"
+      ? "tests/fixtures/ds12-module-observables/nested-async-arrow-function-\
+        return-await-eval-gtbndng-indirect-update.mjs"
+      : "97448d86af49abfd7111841f9f954e2a\
+        db2b3bd12e912ff14acac12c7ef2a827"
+      ? "tests/fixtures/ds12-module-observables/nested-async-function-await-\
+        eval-gtbndng-indirect-update.mjs"
+      : "c60752b91c641098964b88820860473f\
+        5865d9b50196b083e268c8ec1679e827"
+      ? "tests/fixtures/ds12-module-observables/nested-async-function-eval-g\
+        tbndng-indirect-update.mjs"
+      : "6c0f477faa3b45005d5c8ead3ee57505\
+        df1cf6d17f0ee8a3f56b311ec9be7e53"
+      ? "tests/fixtures/ds12-module-observables/nested-async-function-return\
+        -await-eval-gtbndng-indirect-update.mjs"
+      : "4ee45b618239c5171a1d9673a5139f5a\
+        069ef45e68b526794e45c82f9510a033"
+      ? "tests/fixtures/ds12-module-observables/nested-async-gen-await-eval-\
+        gtbndng-indirect-update.mjs"
+      : "3e7dc72c117d970f25486326c5c57963\
+        5a18f19945f232da404266d049f0461e"
+      ? "tests/fixtures/ds12-module-observables/nested-async-gen-return-awai\
+        t-eval-gtbndng-indirect-update.mjs"
+      : "84ec5e50b9f59cd52e0ac8decdf4c618\
+        ee487896c22eaed04d82073d9a9b74e4"
+      ? "tests/fixtures/ds12-module-observables/nested-block-import-then-eva\
+        l-gtbndng-indirect-update.mjs"
+      : "6f416aec4a97fce8da75bd35bab93102\
+        767899a8ee6304b6d630a209f58ebab8"
+      ? "tests/fixtures/ds12-module-observables/nested-do-while-eval-gtbndng\
+        -indirect-update.mjs"
+      : "f5b6941600a5a1a3185f3297135f8126\
+        137630fd7fdc1ef0ef36910d22441009"
+      ? "tests/fixtures/ds12-module-observables/nested-else-import-then-eval\
+        -gtbndng-indirect-update.mjs"
+      : "6ad03915a52ff4f54d8443cf67a00f27\
+        c5257a58fae99790057e41cb9cd0647d"
+      ? "tests/fixtures/ds12-module-observables/nested-function-import-then-\
+        eval-gtbndng-indirect-update.mjs"
+      : "5d2ac9b24c26ad5578bd92b0babe150e\
+        26485f340a1909fc715532566a3c8bd4"
+      ? "tests/fixtures/ds12-module-observables/nested-if-braceless-eval-gtb\
+        ndng-indirect-update.mjs"
+      : "04e635311e862eab5aaa4c4c18658d45\
+        53037f7854f39b79f0cb7a6b1c63dd84"
+      ? "tests/fixtures/ds12-module-observables/nested-if-import-then-eval-g\
+        tbndng-indirect-update.mjs"
+      : "91b8b1c61bd047f75a25e979ad4b8c00\
+        a9e87fb76973b62453590403f848c1d6"
+      ? "tests/fixtures/ds12-module-observables/nested-while-import-then-eva\
+        l-gtbndng-indirect-update.mjs"
+      : "885bd28843bf67f1656242feda0173e8\
+        ea0d778f7d978fe1e713ed9178d36482"
+      "tests/fixtures/ds12-module-observables/ns-direct-value.mjs":
+        "70e1c0955e79e99629bbfb2396b4b136\
+        d98b039b0dd781f621075eeb6416c17f"
+      "tests/fixtures/ds12-module-observables/ns-indirect-value.mjs":
+        "46e7dcfa414d51d0070530f134c2122b\
+        94d594ae61ecf89e3a6bf519da73c631"
+      "tests/fixtures/ds12-module-observables/ns.mjs":
+        "fc4a16120836dbd4685742b12fff11a5\
+        066d8ad431bebb4a5ac6830f2979b52f"
+      "tests/fixtures/ds12-module-observables/set-no-strict.mjs":
+        "260021b92c7c663e6ecefa60bda3a233\
+        218b96fb83b94cb6dbb6dbbe343adde2"
+      "tests/fixtures/ds12-module-observables/set-no-strict.prelude.js":
+        "82a22569b853d2cc96b5b5bc7b802f51\
+        fc2ed20798c47b8595554a9abcfb0d13"
+      "tests/fixtures/ds12-module-observables/set-same-values-no-strict.mjs":
+        "260021b92c7c663e6ecefa60bda3a233\
+        218b96fb83b94cb6dbb6dbbe343adde2"
+      ? "tests/fixtures/ds12-module-observables/set-same-values-no-strict.pr\
+        elude.js"
+      : "b0072d397a236b03de0212ffca4c80ea\
+        eac8ce48a8ab28d3a24759e33cb3c023"
+      "tests/fixtures/ds12-module-observables/set-same-values-strict.mjs":
+        "260021b92c7c663e6ecefa60bda3a233\
+        218b96fb83b94cb6dbb6dbbe343adde2"
+      ? "tests/fixtures/ds12-module-observables/set-same-values-strict.prelu\
+        de.js"
+      : "4091e6cdf7cd9f88aed1ad16597ad884\
+        014e9ca569972ea1cf54bfb1d9bf6690"
+      "tests/fixtures/ds12-module-observables/set-strict.mjs":
+        "260021b92c7c663e6ecefa60bda3a233\
+        218b96fb83b94cb6dbb6dbbe343adde2"
+      "tests/fixtures/ds12-module-observables/set-strict.prelude.js":
+        "143ebc48485e7046583cbe274d0b5e5b\
+        76e014848068f30fc8ec247f3ba72f85"
+      ? "tests/fixtures/ds12-module-observables/syntax-nested-block-labeled-\
+        eval-gtbndng-indirect-update.mjs"
+      : "7ce58732ec79956d1094e7704dfefc4b\
+        36a3ea201600aa9afd443917297cc534"
+      ? "tests/fixtures/ds12-module-observables/top-level-import-then-eval-g\
+        tbndng-indirect-update.mjs"
+      : "a1e15cd9b7077541d15fe54649c4829f\
+        9320169179bb16ecfcfa52c8e605b6bf"
+    "reason": "The 2026-10-28 maintainer decision item 1 applies to
+      exactly the 51 exclusions in
+      dynamic-source-module-observable-contracts-assessment.yaml. Its
+      per-path rows retain every non-source assertion and name static
+      witnesses. Namespace operations use Script observers with the
+      original strictness; live binding updates retain the global
+      updater, aliases and enclosing syntax; graph witnesses preserve
+      all original static edges; primitive conversion retains both
+      fallback directions. ImportMeta source-goal probes separately
+      reject Script and admit Module; the specifier witness retains the
+      conditional null-prototype conversion error and item 2 covers only
+      ImportCall promise identity and rejection conversion. The fixed
+      native groups require Node.js, Deno and both native policies with
+      forced collection and structural C evidence. Only dynamic source
+      evaluation or construction remains. All original paths,
+      unsupported observations and assertions remain visible; none
+      becomes a pass. Reopen for an ADR 0016 amendment admitting any
+      dynamic import or the relevant source construction, changed
+      replacement evidence, source or observation, or ADR 0019
+      non-source normative dependence."
+  "ds12-module-observable-residual":
+    "disposition": "remediation"
+    "normativeDependency": "not-demonstrated"
+    "reason": "Exactly 19 DS-12 paths retain uncovered repeated-load
+      identity, cached error, deferred evaluation, staggered graph-start
+      or exact TLA result/error/ordering observations. The per-path
+      table names each residual; nearby static namespace or continuation
+      evidence is not asserted to prove it. Keep umbrella remediation
+      ownership pending faithful observations or a bounded maintainer
+      decision. ADR 0016 and ADR 0019 remain unchanged."
+
 paths:
   - path: test/built-ins/AggregateError/newtarget-proto-fallback.js
     proposedOwner: adr:0016-dynamic-source-boundary
@@ -12383,7 +12690,7 @@ paths:
     section: "prod-ImportCall"
     subject: "Dynamic Import receives an AssignmentExpression
       (ImportMeta)"
-    assessment: "observation-train-dynamic-coverage"
+    assessment: "ds12-static-module-observables"
   - path: "test/language/expressions/dynamic-import/assignment-expression/lhs-a\
       ssign-operator-assign-expr.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -14067,7 +14374,7 @@ paths:
     missingDynamicTag: false
     section: "sec-finishdynamicimport"
     subject: "Import a custom toString and valueOf bindings"
-    assessment: "observation-train-dynamic-source"
+    assessment: "ds12-static-module-observables"
   - path: "test/language/expressions/dynamic-import/eval-export-dflt-c\
       ls-anon.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -14227,7 +14534,7 @@ paths:
     missingDynamicTag: false
     section: "sec-moduleevaluation"
     subject: "Requested modules are evaluated exactly once"
-    assessment: "observation-train-dynamic-coverage"
+    assessment: "ds12-module-observable-residual"
   - path: "test/language/expressions/dynamic-import/eval-self-once-\
       module.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -14239,7 +14546,7 @@ paths:
     missingDynamicTag: false
     section: "sec-moduleevaluation"
     subject: "Module is evaluated exactly once"
-    assessment: "observation-train-dynamic-coverage"
+    assessment: "ds12-module-observable-residual"
   - path: "test/language/expressions/dynamic-import/eval-self-once-\
       script.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -14251,7 +14558,7 @@ paths:
     missingDynamicTag: false
     section: "sec-hostimportmoduledynamically"
     subject: "Script is evaluated exactly once after loaded by import"
-    assessment: "observation-train-dynamic-coverage"
+    assessment: "ds12-module-observable-residual"
   - path: "test/language/expressions/dynamic-import/for-await-resolution-and-er\
       ror-agen-yield.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -14574,7 +14881,7 @@ paths:
     missingDynamicTag: false
     section: "sec-ContinueDynamicImport"
     subject: "Dynamic import of an already errored module should fail"
-    assessment: "observation-train-dynamic-source"
+    assessment: "ds12-module-observable-residual"
   - path: "test/language/expressions/dynamic-import/import-fulfilled-member-of-\
       errored-cycle.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -14587,7 +14894,7 @@ paths:
     section: "sec-moduleevaluation"
     subject: "Dynamic import of a fulfilled member of an errored async cycle
       rejects with the recorded evaluation error"
-    assessment: "observation-train-dynamic-source"
+    assessment: "ds12-module-observable-residual"
   - path: "test/language/expressions/dynamic-import/imported-self-update.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "source-subject"
@@ -14598,7 +14905,7 @@ paths:
     missingDynamicTag: false
     section: "sec-finishdynamicimport"
     subject: "Imported self bindings should update the references"
-    assessment: "observation-train-dynamic-source"
+    assessment: "ds12-static-module-observables"
   - path: "test/language/expressions/dynamic-import/indirect-resolution.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "source-subject"
@@ -14649,7 +14956,7 @@ paths:
     section: "sec-finishdynamicimport"
     subject: "The [[Delete]] behavior for a key that describes an initialized
       exported binding on non strict mode (value from await resolving)"
-    assessment: "observation-train-dynamic-source"
+    assessment: "ds12-static-module-observables"
   - path: "test/language/expressions/dynamic-import/namespace/await-ns-delete-e\
       xported-init-strict.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -14662,7 +14969,7 @@ paths:
     section: "sec-finishdynamicimport"
     subject: "The [[Delete]] behavior for a key that describes an initialized
       exported binding on strict mode (value from await resolving)"
-    assessment: "observation-train-dynamic-source"
+    assessment: "ds12-static-module-observables"
   - path: "test/language/expressions/dynamic-import/namespace/await-ns-delete-n\
       on-exported-no-strict.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -14675,7 +14982,7 @@ paths:
     section: "sec-finishdynamicimport"
     subject: "The [[Delete]] behavior for a key that does not describe an
       exported binding (value from await resolving)"
-    assessment: "observation-train-dynamic-source"
+    assessment: "ds12-static-module-observables"
   - path: "test/language/expressions/dynamic-import/namespace/await-ns-delete-n\
       on-exported-strict.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -14715,7 +15022,7 @@ paths:
     subject: "Direct Default exports are included in an imported
       module namespace object when a namespace object is
       created. (value from await resolving)"
-    assessment: "observation-train-dynamic-coverage"
+    assessment: "ds12-static-module-observables"
   - path: "test/language/expressions/dynamic-import/namespace/await\
       -ns-get-nested-namespace-dflt-indirect.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -14729,7 +15036,7 @@ paths:
     subject: "Inirect Default exports are included in an imported
       module namespace object when a namespace object is
       created. (value from await resolving)"
-    assessment: "observation-train-dynamic-coverage"
+    assessment: "ds12-static-module-observables"
   - path: "test/language/expressions/dynamic-import/namespace/await\
       -ns-get-nested-namespace-props-nrml.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -14743,7 +15050,7 @@ paths:
     subject: "Module namespace object reports properties for all
       ExportEntries of all dependencies. (value from await
       resolving)"
-    assessment: "observation-train-dynamic-coverage"
+    assessment: "ds12-static-module-observables"
   - path: "test/language/expressions/dynamic-import/namespace/await-ns-get-own-\
       property-str-found-init.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -14979,7 +15286,7 @@ paths:
     section: "sec-finishdynamicimport"
     subject: "The [[Set]] internal method consistently returns `false`, No
       Strict Mode (value from await resolving)"
-    assessment: "observation-train-dynamic-source"
+    assessment: "ds12-static-module-observables"
   - path: "test/language/expressions/dynamic-import/namespace/await-ns-set-prot\
       otype-of-null.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -15018,7 +15325,7 @@ paths:
     section: "sec-finishdynamicimport"
     subject: "The [[Set]] internal method consistently returns `false` even
       setting the same value - No Strict Mode (value from await resolving)"
-    assessment: "observation-train-dynamic-source"
+    assessment: "ds12-static-module-observables"
   - path: "test/language/expressions/dynamic-import/namespace/await-ns-set-same\
       -values-strict.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -15031,7 +15338,7 @@ paths:
     section: "sec-finishdynamicimport"
     subject: "The [[Set]] internal method consistently returns `false` even
       setting the same value - Strict Mode (value from await resolving)"
-    assessment: "observation-train-dynamic-source"
+    assessment: "ds12-static-module-observables"
   - path: "test/language/expressions/dynamic-import/namespace/await-ns-set-stri\
       ct.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -15044,7 +15351,7 @@ paths:
     section: "sec-finishdynamicimport"
     subject: "The [[Set]] internal method consistently returns `false`, Strict
       Mode (value from await resolving)"
-    assessment: "observation-train-dynamic-source"
+    assessment: "ds12-static-module-observables"
   - path: "test/language/expressions/dynamic-import/namespace/default-property-\
       not-set-own.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -15096,7 +15403,7 @@ paths:
     section: "sec-finishdynamicimport"
     subject: "The [[Delete]] behavior for a key that describes an initialized
       exported binding on non strict mode (value from promise then)"
-    assessment: "observation-train-dynamic-source"
+    assessment: "ds12-static-module-observables"
   - path: "test/language/expressions/dynamic-import/namespace/promise-then-ns-d\
       elete-exported-init-strict.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -15109,7 +15416,7 @@ paths:
     section: "sec-finishdynamicimport"
     subject: "The [[Delete]] behavior for a key that describes an initialized
       exported binding on strict mode (value from promise then)"
-    assessment: "observation-train-dynamic-source"
+    assessment: "ds12-static-module-observables"
   - path: "test/language/expressions/dynamic-import/namespace/promise-then-ns-d\
       elete-non-exported-no-strict.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -15122,7 +15429,7 @@ paths:
     section: "sec-finishdynamicimport"
     subject: "The [[Delete]] behavior for a key that does not describe an
       exported binding (value from promise then)"
-    assessment: "observation-train-dynamic-source"
+    assessment: "ds12-static-module-observables"
   - path: "test/language/expressions/dynamic-import/namespace/promise-then-ns-d\
       elete-non-exported-strict.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -15162,7 +15469,7 @@ paths:
     subject: "Direct Default exports are included in an imported
       module namespace object when a namespace object is
       created. (value from promise then)"
-    assessment: "observation-train-dynamic-coverage"
+    assessment: "ds12-static-module-observables"
   - path: "test/language/expressions/dynamic-import/namespace/promi\
       se-then-ns-get-nested-namespace-dflt-indirect.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -15176,7 +15483,7 @@ paths:
     subject: "Inirect Default exports are included in an imported
       module namespace object when a namespace object is
       created. (value from promise then)"
-    assessment: "observation-train-dynamic-coverage"
+    assessment: "ds12-static-module-observables"
   - path: "test/language/expressions/dynamic-import/namespace/promi\
       se-then-ns-get-nested-namespace-props-nrml.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -15190,7 +15497,7 @@ paths:
     subject: "Module namespace object reports properties for all
       ExportEntries of all dependencies. (value from promise
       then)"
-    assessment: "observation-train-dynamic-coverage"
+    assessment: "ds12-static-module-observables"
   - path: "test/language/expressions/dynamic-import/namespace/promise-then-ns-g\
       et-own-property-str-found-init.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -15424,7 +15731,7 @@ paths:
     section: "sec-finishdynamicimport"
     subject: "The [[Set]] internal method consistently returns `false`, No
       Strict Mode (value from promise then)"
-    assessment: "observation-train-dynamic-source"
+    assessment: "ds12-static-module-observables"
   - path: "test/language/expressions/dynamic-import/namespace/promise-then-ns-s\
       et-prototype-of-null.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -15463,7 +15770,7 @@ paths:
     section: "sec-finishdynamicimport"
     subject: "The [[Set]] internal method consistently returns `false` even
       setting the same value - No Strict Mode (value from promise then)"
-    assessment: "observation-train-dynamic-source"
+    assessment: "ds12-static-module-observables"
   - path: "test/language/expressions/dynamic-import/namespace/promise-then-ns-s\
       et-same-values-strict.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -15476,7 +15783,7 @@ paths:
     section: "sec-finishdynamicimport"
     subject: "The [[Set]] internal method consistently returns `false` even
       setting the same value - Strict Mode (value from promise then)"
-    assessment: "observation-train-dynamic-source"
+    assessment: "ds12-static-module-observables"
   - path: "test/language/expressions/dynamic-import/namespace/promise-then-ns-s\
       et-strict.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -15489,7 +15796,7 @@ paths:
     section: "sec-finishdynamicimport"
     subject: "The [[Set]] internal method consistently returns `false`, Strict
       Mode (value from promise then)"
-    assessment: "observation-train-dynamic-source"
+    assessment: "ds12-static-module-observables"
   - path: "test/language/expressions/dynamic-import/returns-promise\
       .js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -15514,7 +15821,7 @@ paths:
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "Reuse the resolved namespace object already imported from a static
       import"
-    assessment: "observation-train-dynamic-source"
+    assessment: "ds12-module-observable-residual"
   - path: "test/language/expressions/dynamic-import/reuse-namespace-object-from\
       -script.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -15526,7 +15833,7 @@ paths:
     missingDynamicTag: false
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "Reuse the resolved namespace object from a script code."
-    assessment: "observation-train-dynamic-source"
+    assessment: "ds12-module-observable-residual"
   - path: "test/language/expressions/dynamic-import/reuse-namespace-object.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "source-subject"
@@ -15537,7 +15844,7 @@ paths:
     missingDynamicTag: false
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "Reuse the resolved namespace object instead of creating a new one"
-    assessment: "observation-train-dynamic-source"
+    assessment: "ds12-module-observable-residual"
   - path: "test/language/expressions/dynamic-import/syntax/valid/callexpression\
       -arguments.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -16957,7 +17264,7 @@ paths:
     missingDynamicTag: false
     section: "sec-finishdynamicimport"
     subject: "Resolve imports after a binding update"
-    assessment: "observation-train-dynamic-source"
+    assessment: "ds12-module-observable-residual"
   - path: "test/language/expressions/dynamic-import/usage-from-eval.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "source-subject"
@@ -16995,7 +17302,7 @@ paths:
     subject: "Modifications to named bindings that occur after
       dependency has been evaluated are reflected in local
       binding (nested arrow)"
-    assessment: "observation-train-dynamic-coverage"
+    assessment: "ds12-static-module-observables"
   - path: "test/language/expressions/dynamic-import/usage/nested-arrow-assignme\
       nt-expression-eval-script-code-host-resolves-module-code.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -17072,7 +17379,7 @@ paths:
     subject: "Modifications to named bindings that occur after
       dependency has been evaluated are reflected in local
       binding (nested arrow)"
-    assessment: "observation-train-dynamic-coverage"
+    assessment: "ds12-static-module-observables"
   - path: "test/language/expressions/dynamic-import/usage/nested-arrow-import-t\
       hen-eval-script-code-host-resolves-module-code.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -17150,7 +17457,7 @@ paths:
     subject: "Modifications to named bindings that occur after
       dependency has been evaluated are reflected in local
       binding (nested in async arrow function, awaited)"
-    assessment: "observation-train-dynamic-coverage"
+    assessment: "ds12-static-module-observables"
   - path: "test/language/expressions/dynamic-import/usage/nested-async-arrow-fu\
       nction-await-eval-script-code-host-resolves-module-code.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -17231,7 +17538,7 @@ paths:
     subject: "Modifications to named bindings that occur after
       dependency has been evaluated are reflected in local
       binding (nested in async arrow function, returned)"
-    assessment: "observation-train-dynamic-coverage"
+    assessment: "ds12-static-module-observables"
   - path: "test/language/expressions/dynamic-import/usage/nested-async-arrow-fu\
       nction-return-await-eval-script-code-host-resolves-module-code.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -17311,7 +17618,7 @@ paths:
     subject: "Modifications to named bindings that occur after
       dependency has been evaluated are reflected in local
       binding (nested in async function, awaited)"
-    assessment: "observation-train-dynamic-coverage"
+    assessment: "ds12-static-module-observables"
   - path: "test/language/expressions/dynamic-import/usage/nested-async-function\
       -await-eval-script-code-host-resolves-module-code.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -17390,7 +17697,7 @@ paths:
     subject: "Modifications to named bindings that occur after
       dependency has been evaluated are reflected in local
       binding (nested in async function)"
-    assessment: "observation-train-dynamic-coverage"
+    assessment: "ds12-static-module-observables"
   - path: "test/language/expressions/dynamic-import/usage/nested-async-function\
       -eval-script-code-host-resolves-module-code.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -17444,7 +17751,7 @@ paths:
     subject: "Modifications to named bindings that occur after
       dependency has been evaluated are reflected in local
       binding (nested in async function, returns awaited)"
-    assessment: "observation-train-dynamic-coverage"
+    assessment: "ds12-static-module-observables"
   - path: "test/language/expressions/dynamic-import/usage/nested-async-function\
       -return-await-eval-script-code-host-resolves-module-code.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -17549,7 +17856,7 @@ paths:
     subject: "Modifications to named bindings that occur after
       dependency has been evaluated are reflected in local
       binding (nested in async generator, awaited)"
-    assessment: "observation-train-dynamic-coverage"
+    assessment: "ds12-static-module-observables"
   - path: "test/language/expressions/dynamic-import/usage/nested-async-gen-awai\
       t-eval-script-code-host-resolves-module-code.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -17628,7 +17935,7 @@ paths:
     subject: "Modifications to named bindings that occur after
       dependency has been evaluated are reflected in local
       binding (nested in async generator, returns awaited)"
-    assessment: "observation-train-dynamic-coverage"
+    assessment: "ds12-static-module-observables"
   - path: "test/language/expressions/dynamic-import/usage/nested-async-gen-retu\
       rn-await-eval-script-code-host-resolves-module-code.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -17707,7 +18014,7 @@ paths:
     subject: "Modifications to named bindings that occur after
       dependency has been evaluated are reflected in local
       binding (nested block)"
-    assessment: "observation-train-dynamic-coverage"
+    assessment: "ds12-static-module-observables"
   - path: "test/language/expressions/dynamic-import/usage/nested-block-import-t\
       hen-eval-script-code-host-resolves-module-code.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -17784,7 +18091,7 @@ paths:
     subject: "Modifications to named bindings that occur after
       dependency has been evaluated are reflected in local
       binding (nested do while syntax)"
-    assessment: "observation-train-dynamic-coverage"
+    assessment: "ds12-static-module-observables"
   - path: "test/language/expressions/dynamic-import/usage/nested-do-while-eval-\
       script-code-host-resolves-module-code.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -17862,7 +18169,7 @@ paths:
     subject: "Modifications to named bindings that occur after
       dependency has been evaluated are reflected in local
       binding (nested else)"
-    assessment: "observation-train-dynamic-coverage"
+    assessment: "ds12-static-module-observables"
   - path: "test/language/expressions/dynamic-import/usage/nested-else-import-th\
       en-eval-script-code-host-resolves-module-code.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -17939,7 +18246,7 @@ paths:
     subject: "Modifications to named bindings that occur after
       dependency has been evaluated are reflected in local
       binding (nested function)"
-    assessment: "observation-train-dynamic-coverage"
+    assessment: "ds12-static-module-observables"
   - path: "test/language/expressions/dynamic-import/usage/nested-function-impor\
       t-then-eval-script-code-host-resolves-module-code.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -18016,7 +18323,7 @@ paths:
     subject: "Modifications to named bindings that occur after
       dependency has been evaluated are reflected in local
       binding (nested if syntax)"
-    assessment: "observation-train-dynamic-coverage"
+    assessment: "ds12-static-module-observables"
   - path: "test/language/expressions/dynamic-import/usage/nested-if-braceless-e\
       val-script-code-host-resolves-module-code.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -18093,7 +18400,7 @@ paths:
     subject: "Modifications to named bindings that occur after
       dependency has been evaluated are reflected in local
       binding (nested if)"
-    assessment: "observation-train-dynamic-coverage"
+    assessment: "ds12-static-module-observables"
   - path: "test/language/expressions/dynamic-import/usage/nested-if-import-then\
       -eval-script-code-host-resolves-module-code.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -18170,7 +18477,7 @@ paths:
     subject: "Modifications to named bindings that occur after
       dependency has been evaluated are reflected in local
       binding (nested while)"
-    assessment: "observation-train-dynamic-coverage"
+    assessment: "ds12-static-module-observables"
   - path: "test/language/expressions/dynamic-import/usage/nested-while-import-t\
       hen-eval-script-code-host-resolves-module-code.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -18247,7 +18554,7 @@ paths:
     subject: "Modifications to named bindings that occur after
       dependency has been evaluated are reflected in local
       binding (nested block syntax)"
-    assessment: "observation-train-dynamic-coverage"
+    assessment: "ds12-static-module-observables"
   - path: "test/language/expressions/dynamic-import/usage/syntax-nested-block-l\
       abeled-eval-script-code-host-resolves-module-code.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -18324,7 +18631,7 @@ paths:
     subject: "Modifications to named bindings that occur after
       dependency has been evaluated are reflected in local
       binding (top level)"
-    assessment: "observation-train-dynamic-coverage"
+    assessment: "ds12-static-module-observables"
   - path: "test/language/expressions/dynamic-import/usage/top-level-import-then\
       -eval-script-code-host-resolves-module-code.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -18710,7 +19017,7 @@ paths:
     section: "sec-left-hand-side-expressions-static-semantics-early\
       -errors"
     subject: "import.meta is not allowed in direct eval in module code."
-    assessment: "observation-train-dynamic-coverage"
+    assessment: "ds12-static-module-observables"
   - path: "test/language/expressions/import.meta/syntax/goal-async-\
       function-params-or-body.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -18724,7 +19031,7 @@ paths:
       -errors"
     subject: "An Syntax Error is thrown when the syntactic goal
       symbol is AsyncFunctionBody or FormalParameters."
-    assessment: "observation-train-dynamic-coverage"
+    assessment: "ds12-static-module-observables"
   - path: "test/language/expressions/import.meta/syntax/goal-async-\
       generator-params-or-body.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -18738,7 +19045,7 @@ paths:
       -errors"
     subject: "An Syntax Error is thrown when the syntactic goal
       symbol is AsyncGeneratorBody or FormalParameters."
-    assessment: "observation-train-dynamic-coverage"
+    assessment: "ds12-static-module-observables"
   - path: "test/language/expressions/import.meta/syntax/goal-functi\
       on-params-or-body.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -18752,7 +19059,7 @@ paths:
       -errors"
     subject: "An Syntax Error is thrown when the syntactic goal
       symbol is FunctionBody or FormalParameters."
-    assessment: "observation-train-dynamic-coverage"
+    assessment: "ds12-static-module-observables"
   - path: "test/language/expressions/import.meta/syntax/goal-genera\
       tor-params-or-body.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -18766,7 +19073,7 @@ paths:
       -errors"
     subject: "An Syntax Error is thrown when the syntactic goal
       symbol is GeneratorBody or FormalParameters."
-    assessment: "observation-train-dynamic-coverage"
+    assessment: "ds12-static-module-observables"
   - path: "test/language/expressions/in/S11.8.7_A1.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "incidental-scaffolding"
@@ -20732,7 +21039,7 @@ paths:
     subject: "Modifications to named bindings that occur after
       dependency has been evaluated are reflected in local
       binding"
-    assessment: "observation-train-dynamic-coverage"
+    assessment: "ds12-static-module-observables"
   - path: "test/language/module-code/eval-gtbndng-indirect-update.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "incidental-scaffolding"
@@ -20745,7 +21052,7 @@ paths:
     subject: "Modifications to named bindings that occur after
       dependency has been evaluated are reflected in local
       binding"
-    assessment: "observation-train-dynamic-coverage"
+    assessment: "ds12-static-module-observables"
   - path: "test/language/module-code/eval-rqstd-once.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "incidental-scaffolding"
@@ -20756,7 +21063,7 @@ paths:
     missingDynamicTag: false
     section: "sec-moduleevaluation"
     subject: "Requested modules are evaluated exactly once"
-    assessment: "observation-train-dynamic-coverage"
+    assessment: "ds12-static-module-observables"
   - path: "test/language/module-code/eval-rqstd-order.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "incidental-scaffolding"
@@ -20768,7 +21075,7 @@ paths:
     section: "sec-moduleevaluation"
     subject: "Requested modules are evaluated prior to the
       requesting module in source code order"
-    assessment: "observation-train-dynamic-coverage"
+    assessment: "ds12-static-module-observables"
   - path: "test/language/module-code/instn-same-global.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "incidental-scaffolding"
@@ -20779,7 +21086,7 @@ paths:
     missingDynamicTag: false
     section: "sec-moduledeclarationinstantiation"
     subject: "Modules share the same global `this` value"
-    assessment: "observation-train-dynamic-coverage"
+    assessment: "ds12-static-module-observables"
   - path: "test/language/module-code/top-level-await/await-dynamic-import-rejec\
       tion.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -20791,7 +21098,7 @@ paths:
     missingDynamicTag: false
     section: "sec-moduleevaluation"
     subject: "Top Level Await on a Dynamic import"
-    assessment: "observation-train-dynamic-source"
+    assessment: "ds12-module-observable-residual"
   - path: "test/language/module-code/top-level-await/await-dynamic-import-resol\
       ution.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -20803,7 +21110,7 @@ paths:
     missingDynamicTag: false
     section: "sec-moduleevaluation"
     subject: "Top Level Await on a Dynamic import"
-    assessment: "observation-train-dynamic-source"
+    assessment: "ds12-module-observable-residual"
   - path: "test/language/module-code/top-level-await/dynamic-import-of-waiting-\
       module.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -20816,7 +21123,7 @@ paths:
     section: "sec-ContinueDynamicImport"
     subject: "Dynamic import of an ~evaluating-async~ module waits for the
       module to finish its evaluation"
-    assessment: "observation-train-dynamic-source"
+    assessment: "ds12-module-observable-residual"
   - path: "test/language/module-code/top-level-await/dynamic-import-re\
       jection.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -20828,7 +21135,7 @@ paths:
     missingDynamicTag: false
     section: "sec-moduleevaluation"
     subject: "Dynamic imported module with async exports"
-    assessment: "observation-train-dynamic-source"
+    assessment: "ds12-module-observable-residual"
   - path: "test/language/module-code/top-level-await/dynamic-import-re\
       solution.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -20840,7 +21147,7 @@ paths:
     missingDynamicTag: false
     section: "sec-moduleevaluation"
     subject: "Dynamic imported module with async exports"
-    assessment: "observation-train-dynamic-source"
+    assessment: "ds12-module-observable-residual"
   - path: "test/language/module-code/top-level-await/fulfillment-order.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "incidental-scaffolding"
@@ -20852,7 +21159,7 @@ paths:
     section: "sec-async-module-execution-fulfilled"
     subject: "When an async module fulfills, the promises relative to itself and
       its ancestors are resolved in leaf-to-root order"
-    assessment: "observation-train-dynamic-source"
+    assessment: "ds12-module-observable-residual"
   - path: "test/language/module-code/top-level-await/module-graphs-does-not-han\
       g.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -20864,7 +21171,7 @@ paths:
     missingDynamicTag: false
     section: "Module evaluation (original frontmatter has no esid)"
     subject: "Module graphs with Top-Level Await shouldn't hang."
-    assessment: "observation-train-dynamic-source"
+    assessment: "ds12-module-observable-residual"
   - path: "test/language/module-code/top-level-await/rejection-order.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "incidental-scaffolding"
@@ -20876,7 +21183,7 @@ paths:
     section: "sec-async-module-execution-rejected"
     subject: "When an async module rejects, the promises relative to itself and
       its ancestors are resolved in leaf-to-root order"
-    assessment: "observation-train-dynamic-source"
+    assessment: "ds12-module-observable-residual"
   - path: "test/language/module-code/top-level-await/syntax/await-expr-dyn-impo\
       rt.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -20902,7 +21209,7 @@ paths:
     subject: "An implementation may unobservably reset
       [[ModuleAsyncEvaluationCount]] to 0 whenever there are no pending
       modules."
-    assessment: "observation-train-dynamic-source"
+    assessment: "ds12-module-observable-residual"
   - path: "test/language/module-code/verify-dfs.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "incidental-scaffolding"
@@ -20913,7 +21220,7 @@ paths:
     missingDynamicTag: false
     section: "sec-moduleevaluation"
     subject: "Dynamic import can't preempt DFS evaluation order"
-    assessment: "observation-train-dynamic-source"
+    assessment: "ds12-module-observable-residual"
   - path: "test/language/statementList/eval-block-array-literal-with-item.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "incidental-scaffolding"

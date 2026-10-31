@@ -1,0 +1,1046 @@
+"base": "362ddb13d933600f6a0543ac332eb8479be9053f"
+"suiteRevision": "f2d1435644797268dca1f7988cad5a4e89ccd8d2"
+"assessed": 70
+"closed": 51
+"staying": 19
+"nativeGroups": 36
+"parserProbes": 9
+"observations": "Native groups require Node.js and Deno stdout ok, then
+  both native policies with forced collection, positive
+  allocation/collection counts and emitted static-module C; parser
+  probes require rejection under Script and admission under Module."
+"rows":
+  - "path": "test/language/expressions/dynamic-import/assignment-expression\
+      /import-meta.js"
+    "sourceDigest": "25a06877484a087cc87a61dd39d71e76791210ede96642b02b9\
+      9dab6da9283b3"
+    "section": "prod-ImportCall"
+    "subject": "Dynamic Import receives an AssignmentExpression (ImportMeta)"
+    "disposition": "exclusion"
+    "reason": "The static ImportMeta witness checks its null prototype and
+      the exact conditional missing-conversion-method TypeError;
+      ImportCall promise identity and abrupt-to-rejection conversion are
+      separately within decision item 2."
+    "evidence":
+      - "tests/fixtures/ds12-module-observables/import-meta-specifier.m\
+        js"
+  - "path": "test/language/expressions/dynamic-import/custom-primitive.js"
+    "sourceDigest": "c5f7cd07f7082b700236c6708568112f6dd5048d8dcb0f97113\
+      6418669f6dac6"
+    "section": "sec-finishdynamicimport"
+    "subject": "Import a custom toString and valueOf bindings"
+    "disposition": "exclusion"
+    "reason": "Static imports retain all four String/Number results,
+      including both fallback conversion directions on null-prototype
+      namespaces."
+    "evidence":
+      - "tests/fixtures/ds12-module-observables/custom-primitive.mjs"
+  - "path": "test/language/expressions/dynamic-import/eval-rqstd-once.js"
+    "sourceDigest": "b0ddc2e3390304f469e8e6348c28ee7407a00a62356c9889fdf\
+      9439c8152f881"
+    "section": "sec-moduleevaluation"
+    "subject": "Requested modules are evaluated exactly once"
+    "disposition": "remediation"
+    "reason": "Concurrent and subsequent dynamic loads must share
+      evaluation; duplicate static edges do not exercise re-entry after
+      completion."
+    "evidence": []
+  - "path": "test/language/expressions/dynamic-import/eval-self-once-module.js"
+    "sourceDigest": "c2499ec1969ed861b17f2a58bcb5f60db281d82da6580ca184f\
+      412f7fb65697b"
+    "section": "sec-moduleevaluation"
+    "subject": "Module is evaluated exactly once"
+    "disposition": "remediation"
+    "reason": "Concurrent and subsequent dynamic self-loads must observe one
+      evaluation; a closed self-import graph does not re-enter
+      Evaluate."
+    "evidence": []
+  - "path": "test/language/expressions/dynamic-import/eval-self-once-script.js"
+    "sourceDigest": "1ade26b3249019856801749bdb12f555eb7244b2cf82a789a79\
+      ebbbcbd09e2dd"
+    "section": "sec-hostimportmoduledynamically"
+    "subject": "Script is evaluated exactly once after loaded by import"
+    "disposition": "remediation"
+    "reason": "The same file first executes as Script and then once as
+      Module; a single static Module goal cannot witness both
+      identities."
+    "evidence": []
+  - "path": "test/language/expressions/dynamic-import/import-errored-module.js"
+    "sourceDigest": "355af91b34d16c41d3f10b2fa85dba1cd280fd9ffeeeefb3183\
+      0fccdb563c67c"
+    "section": "sec-ContinueDynamicImport"
+    "subject": "Dynamic import of an already errored module should fail"
+    "disposition": "remediation"
+    "reason": "The second load must reject from cached evaluation state; a
+      static target-error witness alone cannot prove failure caching."
+    "evidence": []
+  - "path": "test/language/expressions/dynamic-import/import-fulfilled-memb\
+      er-of-errored-cycle.js"
+    "sourceDigest": "f88cc90a6755753ff88bcff5312d4322eed5cf23b4407fcdbf7\
+      e80b591c51d33"
+    "section": "sec-moduleevaluation"
+    "subject": "Dynamic import of a fulfilled member of an errored async
+      cycle rejects with the recorded evaluation error"
+    "disposition": "remediation"
+    "reason": "A later load of fulfilled C must reuse the exact earlier
+      cycle-root error object and message; static failure alone loses
+      that identity observation."
+    "evidence": []
+  - "path": "test/language/expressions/dynamic-import/imported-self-update.js"
+    "sourceDigest": "9ca60094efe70061cc61df6f2c6c81e1b8e640639c74babbf1b\
+      c7bf4ee456417"
+    "section": "sec-finishdynamicimport"
+    "subject": "Imported self bindings should update the references"
+    "disposition": "exclusion"
+    "reason": "Static self-import retains the original x and y export-alias
+      reads before and after the local binding changes from 0 to 1."
+    "evidence":
+      - "tests/fixtures/ds12-module-observables/imported-self-update.mjs"
+  - "path": "test/language/expressions/dynamic-import/namespace/await-ns-de\
+      lete-exported-init-no-strict.js"
+    "sourceDigest": "ae180ec8786b12e0883b137b10feac5adbfc89dcca57ccf6994\
+      ec05d582574cf"
+    "section": "sec-finishdynamicimport"
+    "subject": "The [[Delete]] behavior for a key that describes an
+      initialized exported binding on non strict mode (value from await
+      resolving)"
+    "disposition": "exclusion"
+    "reason": "The static namespace is passed to the original assertion body
+      in a Script observer with the original strictness, then observed
+      again after a promise continuation; all export categories, keys,
+      values and descriptors remain."
+    "evidence":
+      - "tests/fixtures/ds12-module-observables/delete-exported-init-no\
+        -strict.mjs"
+      - "tests/fixtures/ds12-module-observables/delete-exported-init-no\
+        -strict.prelude.js"
+  - "path": "test/language/expressions/dynamic-import/namespace/await-ns-de\
+      lete-exported-init-strict.js"
+    "sourceDigest": "d41de330e09eb62bc37a3109431dfe44906f176125f7f55bbca\
+      f7dc05c0500af"
+    "section": "sec-finishdynamicimport"
+    "subject": "The [[Delete]] behavior for a key that describes an
+      initialized exported binding on strict mode (value from await
+      resolving)"
+    "disposition": "exclusion"
+    "reason": "The static namespace is passed to the original assertion body
+      in a Script observer with the original strictness, then observed
+      again after a promise continuation; all export categories, keys,
+      values and descriptors remain."
+    "evidence":
+      - "tests/fixtures/ds12-module-observables/delete-exported-init-st\
+        rict.mjs"
+      - "tests/fixtures/ds12-module-observables/delete-exported-init-st\
+        rict.prelude.js"
+  - "path": "test/language/expressions/dynamic-import/namespace/await-ns-de\
+      lete-non-exported-no-strict.js"
+    "sourceDigest": "4c5e2e0ed0c9cea1cb6f6e1aefc9c7455945bdb58b2b950e91e\
+      51c7153f84095"
+    "section": "sec-finishdynamicimport"
+    "subject": "The [[Delete]] behavior for a key that does not describe an
+      exported binding (value from await resolving)"
+    "disposition": "exclusion"
+    "reason": "The static namespace is passed to the original assertion body
+      in a Script observer with the original strictness, then observed
+      again after a promise continuation; all export categories, keys,
+      values and descriptors remain."
+    "evidence":
+      - "tests/fixtures/ds12-module-observables/delete-non-exported-no-\
+        strict.mjs"
+      - "tests/fixtures/ds12-module-observables/delete-non-exported-no-\
+        strict.prelude.js"
+  - "path": "test/language/expressions/dynamic-import/namespace/await-ns-ge\
+      t-nested-namespace-dflt-direct.js"
+    "sourceDigest": "b85ff1673dc5b1406bc322ac752be64cef0898979571382ee90\
+      58f7592b46b90"
+    "section": "sec-finishdynamicimport"
+    "subject": "Direct Default exports are included in an imported module
+      namespace object when a namespace object is created. (value from
+      await resolving)"
+    "disposition": "exclusion"
+    "reason": "The static namespace is passed to the original assertion body
+      in a Script observer with the original strictness, then observed
+      again after a promise continuation; all export categories, keys,
+      values and descriptors remain."
+    "evidence":
+      - "tests/fixtures/ds12-module-observables/get-nested-namespace-df\
+        lt-direct.mjs"
+      - "tests/fixtures/ds12-module-observables/get-nested-namespace-df\
+        lt-direct.prelude.js"
+  - "path": "test/language/expressions/dynamic-import/namespace/await-ns-ge\
+      t-nested-namespace-dflt-indirect.js"
+    "sourceDigest": "ffb5a3791ebc0acfff888ce97285af83a2ebaa64f1e013165b8\
+      e8abb9fcf5892"
+    "section": "sec-finishdynamicimport"
+    "subject": "Inirect Default exports are included in an imported module
+      namespace object when a namespace object is created. (value from
+      await resolving)"
+    "disposition": "exclusion"
+    "reason": "The static namespace is passed to the original assertion body
+      in a Script observer with the original strictness, then observed
+      again after a promise continuation; all export categories, keys,
+      values and descriptors remain."
+    "evidence":
+      - "tests/fixtures/ds12-module-observables/get-nested-namespace-df\
+        lt-indirect.mjs"
+      - "tests/fixtures/ds12-module-observables/get-nested-namespace-df\
+        lt-indirect.prelude.js"
+  - "path": "test/language/expressions/dynamic-import/namespace/await-ns-ge\
+      t-nested-namespace-props-nrml.js"
+    "sourceDigest": "2298702b6f05f54df262f687103eb1c72fc7dfd75e878b7c8f5\
+      7cda45e32e070"
+    "section": "sec-finishdynamicimport"
+    "subject": "Module namespace object reports properties for all
+      ExportEntries of all dependencies. (value from await resolving)"
+    "disposition": "exclusion"
+    "reason": "The static namespace is passed to the original assertion body
+      in a Script observer with the original strictness, then observed
+      again after a promise continuation; all export categories, keys,
+      values and descriptors remain."
+    "evidence":
+      - "tests/fixtures/ds12-module-observables/get-nested-namespace-pr\
+        ops-nrml.mjs"
+      - "tests/fixtures/ds12-module-observables/get-nested-namespace-pr\
+        ops-nrml.prelude.js"
+  - "path": "test/language/expressions/dynamic-import/namespace/await-ns-se\
+      t-no-strict.js"
+    "sourceDigest": "5aee94bb6f3e786d8cd81caddd3dd0c97e7d97b772930ac0df0\
+      8db6ae45a14a5"
+    "section": "sec-finishdynamicimport"
+    "subject": "The [[Set]] internal method consistently returns `false`, No
+      Strict Mode (value from await resolving)"
+    "disposition": "exclusion"
+    "reason": "The static namespace is passed to the original assertion body
+      in a Script observer with the original strictness, then observed
+      again after a promise continuation; all export categories, keys,
+      values and descriptors remain."
+    "evidence":
+      - "tests/fixtures/ds12-module-observables/set-no-strict.mjs"
+      - "tests/fixtures/ds12-module-observables/set-no-strict.prelude.js"
+  - "path": "test/language/expressions/dynamic-import/namespace/await-ns-se\
+      t-same-values-no-strict.js"
+    "sourceDigest": "6e3f81fabe94cb63b7ceec4446ecb344b949153584849abbb19\
+      7b9a9f6cae340"
+    "section": "sec-finishdynamicimport"
+    "subject": "The [[Set]] internal method consistently returns `false`
+      even setting the same value - No Strict Mode (value from await
+      resolving)"
+    "disposition": "exclusion"
+    "reason": "The static namespace is passed to the original assertion body
+      in a Script observer with the original strictness, then observed
+      again after a promise continuation; all export categories, keys,
+      values and descriptors remain."
+    "evidence":
+      - "tests/fixtures/ds12-module-observables/set-same-values-no-stri\
+        ct.mjs"
+      - "tests/fixtures/ds12-module-observables/set-same-values-no-stri\
+        ct.prelude.js"
+  - "path": "test/language/expressions/dynamic-import/namespace/await-ns-se\
+      t-same-values-strict.js"
+    "sourceDigest": "d8391e1a3484382de512cf556cc528e720c3a950a05477454a0\
+      81a7881e953aa"
+    "section": "sec-finishdynamicimport"
+    "subject": "The [[Set]] internal method consistently returns `false`
+      even setting the same value - Strict Mode (value from await
+      resolving)"
+    "disposition": "exclusion"
+    "reason": "The static namespace is passed to the original assertion body
+      in a Script observer with the original strictness, then observed
+      again after a promise continuation; all export categories, keys,
+      values and descriptors remain."
+    "evidence":
+      - "tests/fixtures/ds12-module-observables/set-same-values-strict.\
+        mjs"
+      - "tests/fixtures/ds12-module-observables/set-same-values-strict.\
+        prelude.js"
+  - "path": "test/language/expressions/dynamic-import/namespace/await-ns-se\
+      t-strict.js"
+    "sourceDigest": "1e3209e4c855fcff7d4f19c657747191ab6c42e2842c3cfc44e\
+      632fd6fd53a18"
+    "section": "sec-finishdynamicimport"
+    "subject": "The [[Set]] internal method consistently returns `false`,
+      Strict Mode (value from await resolving)"
+    "disposition": "exclusion"
+    "reason": "The static namespace is passed to the original assertion body
+      in a Script observer with the original strictness, then observed
+      again after a promise continuation; all export categories, keys,
+      values and descriptors remain."
+    "evidence":
+      - "tests/fixtures/ds12-module-observables/set-strict.mjs"
+      - "tests/fixtures/ds12-module-observables/set-strict.prelude.js"
+  - "path": "test/language/expressions/dynamic-import/namespace/promise-the\
+      n-ns-delete-exported-init-no-strict.js"
+    "sourceDigest": "0f4fb67575abd316596fcff8efd5dbe5bfeefbe3209955c9b8e\
+      b51ff9730bdcd"
+    "section": "sec-finishdynamicimport"
+    "subject": "The [[Delete]] behavior for a key that describes an
+      initialized exported binding on non strict mode (value from
+      promise then)"
+    "disposition": "exclusion"
+    "reason": "The static namespace is passed to the original assertion body
+      in a Script observer with the original strictness, then observed
+      again after a promise continuation; all export categories, keys,
+      values and descriptors remain."
+    "evidence":
+      - "tests/fixtures/ds12-module-observables/delete-exported-init-no\
+        -strict.mjs"
+      - "tests/fixtures/ds12-module-observables/delete-exported-init-no\
+        -strict.prelude.js"
+  - "path": "test/language/expressions/dynamic-import/namespace/promise-the\
+      n-ns-delete-exported-init-strict.js"
+    "sourceDigest": "603386ea13eb31cb9124f9cffcb612cfdc81d5cba1536767bba\
+      3bc2372403468"
+    "section": "sec-finishdynamicimport"
+    "subject": "The [[Delete]] behavior for a key that describes an
+      initialized exported binding on strict mode (value from promise
+      then)"
+    "disposition": "exclusion"
+    "reason": "The static namespace is passed to the original assertion body
+      in a Script observer with the original strictness, then observed
+      again after a promise continuation; all export categories, keys,
+      values and descriptors remain."
+    "evidence":
+      - "tests/fixtures/ds12-module-observables/delete-exported-init-st\
+        rict.mjs"
+      - "tests/fixtures/ds12-module-observables/delete-exported-init-st\
+        rict.prelude.js"
+  - "path": "test/language/expressions/dynamic-import/namespace/promise-the\
+      n-ns-delete-non-exported-no-strict.js"
+    "sourceDigest": "58377aeb2b105087ac612bbf7010fa8cce5a4c44c6aec8fd52a\
+      fea7319f2e66a"
+    "section": "sec-finishdynamicimport"
+    "subject": "The [[Delete]] behavior for a key that does not describe an
+      exported binding (value from promise then)"
+    "disposition": "exclusion"
+    "reason": "The static namespace is passed to the original assertion body
+      in a Script observer with the original strictness, then observed
+      again after a promise continuation; all export categories, keys,
+      values and descriptors remain."
+    "evidence":
+      - "tests/fixtures/ds12-module-observables/delete-non-exported-no-\
+        strict.mjs"
+      - "tests/fixtures/ds12-module-observables/delete-non-exported-no-\
+        strict.prelude.js"
+  - "path": "test/language/expressions/dynamic-import/namespace/promise-the\
+      n-ns-get-nested-namespace-dflt-direct.js"
+    "sourceDigest": "a6a76d21199a00172ddd1f0f145993bc85c72f1e94e1a7a7223\
+      de83655ef62b2"
+    "section": "sec-finishdynamicimport"
+    "subject": "Direct Default exports are included in an imported module
+      namespace object when a namespace object is created. (value from
+      promise then)"
+    "disposition": "exclusion"
+    "reason": "The static namespace is passed to the original assertion body
+      in a Script observer with the original strictness, then observed
+      again after a promise continuation; all export categories, keys,
+      values and descriptors remain."
+    "evidence":
+      - "tests/fixtures/ds12-module-observables/get-nested-namespace-df\
+        lt-direct.mjs"
+      - "tests/fixtures/ds12-module-observables/get-nested-namespace-df\
+        lt-direct.prelude.js"
+  - "path": "test/language/expressions/dynamic-import/namespace/promise-the\
+      n-ns-get-nested-namespace-dflt-indirect.js"
+    "sourceDigest": "ec7b9753525bd1fe142c61e78999730aa0e548f90d4b68f230a\
+      fa926b0d6a071"
+    "section": "sec-finishdynamicimport"
+    "subject": "Inirect Default exports are included in an imported module
+      namespace object when a namespace object is created. (value from
+      promise then)"
+    "disposition": "exclusion"
+    "reason": "The static namespace is passed to the original assertion body
+      in a Script observer with the original strictness, then observed
+      again after a promise continuation; all export categories, keys,
+      values and descriptors remain."
+    "evidence":
+      - "tests/fixtures/ds12-module-observables/get-nested-namespace-df\
+        lt-indirect.mjs"
+      - "tests/fixtures/ds12-module-observables/get-nested-namespace-df\
+        lt-indirect.prelude.js"
+  - "path": "test/language/expressions/dynamic-import/namespace/promise-the\
+      n-ns-get-nested-namespace-props-nrml.js"
+    "sourceDigest": "13468f713992c39346cc6ee887e092e1e93b8e4c355869851a1\
+      60b32fb236465"
+    "section": "sec-finishdynamicimport"
+    "subject": "Module namespace object reports properties for all
+      ExportEntries of all dependencies. (value from promise then)"
+    "disposition": "exclusion"
+    "reason": "The static namespace is passed to the original assertion body
+      in a Script observer with the original strictness, then observed
+      again after a promise continuation; all export categories, keys,
+      values and descriptors remain."
+    "evidence":
+      - "tests/fixtures/ds12-module-observables/get-nested-namespace-pr\
+        ops-nrml.mjs"
+      - "tests/fixtures/ds12-module-observables/get-nested-namespace-pr\
+        ops-nrml.prelude.js"
+  - "path": "test/language/expressions/dynamic-import/namespace/promise-the\
+      n-ns-set-no-strict.js"
+    "sourceDigest": "74460e1dc4226d028cebf36d97f6b41ef80b9583f7bb57f4027\
+      2cba8fdf11329"
+    "section": "sec-finishdynamicimport"
+    "subject": "The [[Set]] internal method consistently returns `false`, No
+      Strict Mode (value from promise then)"
+    "disposition": "exclusion"
+    "reason": "The static namespace is passed to the original assertion body
+      in a Script observer with the original strictness, then observed
+      again after a promise continuation; all export categories, keys,
+      values and descriptors remain."
+    "evidence":
+      - "tests/fixtures/ds12-module-observables/set-no-strict.mjs"
+      - "tests/fixtures/ds12-module-observables/set-no-strict.prelude.js"
+  - "path": "test/language/expressions/dynamic-import/namespace/promise-the\
+      n-ns-set-same-values-no-strict.js"
+    "sourceDigest": "eb0643a52e4cbfd4be6404e80c55120657c8c0e51fa4cc4c9c0\
+      04969712d8f2c"
+    "section": "sec-finishdynamicimport"
+    "subject": "The [[Set]] internal method consistently returns `false`
+      even setting the same value - No Strict Mode (value from promise
+      then)"
+    "disposition": "exclusion"
+    "reason": "The static namespace is passed to the original assertion body
+      in a Script observer with the original strictness, then observed
+      again after a promise continuation; all export categories, keys,
+      values and descriptors remain."
+    "evidence":
+      - "tests/fixtures/ds12-module-observables/set-same-values-no-stri\
+        ct.mjs"
+      - "tests/fixtures/ds12-module-observables/set-same-values-no-stri\
+        ct.prelude.js"
+  - "path": "test/language/expressions/dynamic-import/namespace/promise-the\
+      n-ns-set-same-values-strict.js"
+    "sourceDigest": "678654b458ede2b408576763998b240bad641e5d8793ed72825\
+      b69bb0200458d"
+    "section": "sec-finishdynamicimport"
+    "subject": "The [[Set]] internal method consistently returns `false`
+      even setting the same value - Strict Mode (value from promise
+      then)"
+    "disposition": "exclusion"
+    "reason": "The static namespace is passed to the original assertion body
+      in a Script observer with the original strictness, then observed
+      again after a promise continuation; all export categories, keys,
+      values and descriptors remain."
+    "evidence":
+      - "tests/fixtures/ds12-module-observables/set-same-values-strict.\
+        mjs"
+      - "tests/fixtures/ds12-module-observables/set-same-values-strict.\
+        prelude.js"
+  - "path": "test/language/expressions/dynamic-import/namespace/promise-the\
+      n-ns-set-strict.js"
+    "sourceDigest": "4e8520706c492163d60eb691c9e0dba2fbd96eb79fd9368c849\
+      660e033e88940"
+    "section": "sec-finishdynamicimport"
+    "subject": "The [[Set]] internal method consistently returns `false`,
+      Strict Mode (value from promise then)"
+    "disposition": "exclusion"
+    "reason": "The static namespace is passed to the original assertion body
+      in a Script observer with the original strictness, then observed
+      again after a promise continuation; all export categories, keys,
+      values and descriptors remain."
+    "evidence":
+      - "tests/fixtures/ds12-module-observables/set-strict.mjs"
+      - "tests/fixtures/ds12-module-observables/set-strict.prelude.js"
+  - "path": "test/language/expressions/dynamic-import/reuse-namespace-objec\
+      t-from-import.js"
+    "sourceDigest": "b8013653226c4d64eb51e88b3fdd7329b56f91b132be0055b0d\
+      10a8b6e5b4895"
+    "section": "sec-import-call-runtime-semantics-evaluation"
+    "subject": "Reuse the resolved namespace object already imported from a
+      static import"
+    "disposition": "remediation"
+    "reason": "Equality between two dynamic loads and a prior static
+      namespace needs explicit repeated-load identity evidence."
+    "evidence": []
+  - "path": "test/language/expressions/dynamic-import/reuse-namespace-objec\
+      t-from-script.js"
+    "sourceDigest": "833b2a04d3fa699dbeba639f4e9a512a0488166ea68e381c2e9\
+      d3abdfb59cf4e"
+    "section": "sec-import-call-runtime-semantics-evaluation"
+    "subject": "Reuse the resolved namespace object from a script code."
+    "disposition": "remediation"
+    "reason": "Repeated dynamic loads of an export-free file must return the
+      same namespace; a static alias does not witness repeated host
+      loading."
+    "evidence": []
+  - "path": "test/language/expressions/dynamic-import/reuse-namespace-objec\
+      t.js"
+    "sourceDigest": "aa09ffc882f21eabd879596e11e83655c2146b20f5a9031d520\
+      2a2960cdfa68b"
+    "section": "sec-import-call-runtime-semantics-evaluation"
+    "subject": "Reuse the resolved namespace object instead of creating
+      a new one"
+    "disposition": "remediation"
+    "reason": "Two dynamic acquisitions must share one namespace object;
+      this change does not assert static aliases prove that temporal
+      contract."
+    "evidence": []
+  - "path": "test/language/expressions/dynamic-import/update-to-dynamic-imp\
+      ort.js"
+    "sourceDigest": "e5f73c261c7bb18b9167a694c7fa6402217420cca1ddc609ef2\
+      cef4cf7daeef0"
+    "section": "sec-finishdynamicimport"
+    "subject": "Resolve imports after a binding update"
+    "disposition": "remediation"
+    "reason": "Calling the exported loader must defer evaluation of the
+      other module and then update first.x; eager static loading changes
+      the before-call value."
+    "evidence": []
+  - "path": "test/language/expressions/dynamic-import/usage/nested-arrow-as\
+      signment-expression-eval-gtbndng-indirect-update.js"
+    "sourceDigest": "a5306473292a9e64aca98b3ea0c7dd0c02390114711c1acd6c7\
+      e791041918f9f"
+    "section": "sec-import-call-runtime-semantics-evaluation"
+    "subject": "Modifications to named bindings that occur after dependency
+      has been evaluated are reflected in local binding (nested arrow)"
+    "disposition": "exclusion"
+    "reason": "The original enclosing function, generator or statement
+      retains x=1 then x=2 through the global updater and a static
+      namespace; Promise.resolve replaces only namespace acquisition and
+      globalThis replaces only Function-based global discovery."
+    "evidence":
+      - "tests/fixtures/ds12-module-observables/nested-arrow-assignment\
+        -expression-eval-gtbndng-indirect-update.mjs"
+      - "tests/fixtures/ds12-module-observables/eval-gtbndng-indirect-u\
+        pdate_FIXTURE.mjs"
+  - "path": "test/language/expressions/dynamic-import/usage/nested-arrow-im\
+      port-then-eval-gtbndng-indirect-update.js"
+    "sourceDigest": "b5b616a9ae3f1062bf7cb43dad89632db468b772867cac683ad\
+      4faf41d38fa90"
+    "section": "sec-import-call-runtime-semantics-evaluation"
+    "subject": "Modifications to named bindings that occur after dependency
+      has been evaluated are reflected in local binding (nested arrow)"
+    "disposition": "exclusion"
+    "reason": "The original enclosing function, generator or statement
+      retains x=1 then x=2 through the global updater and a static
+      namespace; Promise.resolve replaces only namespace acquisition and
+      globalThis replaces only Function-based global discovery."
+    "evidence":
+      - "tests/fixtures/ds12-module-observables/nested-arrow-import-the\
+        n-eval-gtbndng-indirect-update.mjs"
+      - "tests/fixtures/ds12-module-observables/eval-gtbndng-indirect-u\
+        pdate_FIXTURE.mjs"
+  - "path": "test/language/expressions/dynamic-import/usage/nested-async-ar\
+      row-function-await-eval-gtbndng-indirect-update.js"
+    "sourceDigest": "391beff946bdebdbfcf818a1990a0325b175fd2cb814ee85926\
+      26344c9a5058e"
+    "section": "sec-import-call-runtime-semantics-evaluation"
+    "subject": "Modifications to named bindings that occur after dependency
+      has been evaluated are reflected in local binding (nested in async
+      arrow function, awaited)"
+    "disposition": "exclusion"
+    "reason": "The original enclosing function, generator or statement
+      retains x=1 then x=2 through the global updater and a static
+      namespace; Promise.resolve replaces only namespace acquisition and
+      globalThis replaces only Function-based global discovery."
+    "evidence":
+      - "tests/fixtures/ds12-module-observables/nested-async-arrow-func\
+        tion-await-eval-gtbndng-indirect-update.mjs"
+      - "tests/fixtures/ds12-module-observables/eval-gtbndng-indirect-u\
+        pdate_FIXTURE.mjs"
+  - "path": "test/language/expressions/dynamic-import/usage/nested-async-ar\
+      row-function-return-await-eval-gtbndng-indirect-update.js"
+    "sourceDigest": "fcaeba2d4fa0a77c229cc34a2b9d5672f80e2bb9d3d0edb7100\
+      3f0aaac571435"
+    "section": "sec-import-call-runtime-semantics-evaluation"
+    "subject": "Modifications to named bindings that occur after dependency
+      has been evaluated are reflected in local binding (nested in async
+      arrow function, returned)"
+    "disposition": "exclusion"
+    "reason": "The original enclosing function, generator or statement
+      retains x=1 then x=2 through the global updater and a static
+      namespace; Promise.resolve replaces only namespace acquisition and
+      globalThis replaces only Function-based global discovery."
+    "evidence":
+      - "tests/fixtures/ds12-module-observables/nested-async-arrow-func\
+        tion-return-await-eval-gtbndng-indirect-update.mjs"
+      - "tests/fixtures/ds12-module-observables/eval-gtbndng-indirect-u\
+        pdate_FIXTURE.mjs"
+  - "path": "test/language/expressions/dynamic-import/usage/nested-async-fu\
+      nction-await-eval-gtbndng-indirect-update.js"
+    "sourceDigest": "65a9370ac498901dee8e1c47b55c754bdc372bc148e9e8ff3cb\
+      84a32a64a48e1"
+    "section": "sec-import-call-runtime-semantics-evaluation"
+    "subject": "Modifications to named bindings that occur after dependency
+      has been evaluated are reflected in local binding (nested in async
+      function, awaited)"
+    "disposition": "exclusion"
+    "reason": "The original enclosing function, generator or statement
+      retains x=1 then x=2 through the global updater and a static
+      namespace; Promise.resolve replaces only namespace acquisition and
+      globalThis replaces only Function-based global discovery."
+    "evidence":
+      - "tests/fixtures/ds12-module-observables/nested-async-function-a\
+        wait-eval-gtbndng-indirect-update.mjs"
+      - "tests/fixtures/ds12-module-observables/eval-gtbndng-indirect-u\
+        pdate_FIXTURE.mjs"
+  - "path": "test/language/expressions/dynamic-import/usage/nested-async-fu\
+      nction-eval-gtbndng-indirect-update.js"
+    "sourceDigest": "fae80388d419927da213c75b0112609febcb3fb033e9b42a977\
+      b82339c53c2f2"
+    "section": "sec-import-call-runtime-semantics-evaluation"
+    "subject": "Modifications to named bindings that occur after dependency
+      has been evaluated are reflected in local binding (nested in async
+      function)"
+    "disposition": "exclusion"
+    "reason": "The original enclosing function, generator or statement
+      retains x=1 then x=2 through the global updater and a static
+      namespace; Promise.resolve replaces only namespace acquisition and
+      globalThis replaces only Function-based global discovery."
+    "evidence":
+      - "tests/fixtures/ds12-module-observables/nested-async-function-e\
+        val-gtbndng-indirect-update.mjs"
+      - "tests/fixtures/ds12-module-observables/eval-gtbndng-indirect-u\
+        pdate_FIXTURE.mjs"
+  - "path": "test/language/expressions/dynamic-import/usage/nested-async-fu\
+      nction-return-await-eval-gtbndng-indirect-update.js"
+    "sourceDigest": "c597f91d86f6ba0fd8e77ef2ba72fb1154bf3bcc9b8b7e82963\
+      b1f0ef85cf470"
+    "section": "sec-import-call-runtime-semantics-evaluation"
+    "subject": "Modifications to named bindings that occur after dependency
+      has been evaluated are reflected in local binding (nested in async
+      function, returns awaited)"
+    "disposition": "exclusion"
+    "reason": "The original enclosing function, generator or statement
+      retains x=1 then x=2 through the global updater and a static
+      namespace; Promise.resolve replaces only namespace acquisition and
+      globalThis replaces only Function-based global discovery."
+    "evidence":
+      - "tests/fixtures/ds12-module-observables/nested-async-function-r\
+        eturn-await-eval-gtbndng-indirect-update.mjs"
+      - "tests/fixtures/ds12-module-observables/eval-gtbndng-indirect-u\
+        pdate_FIXTURE.mjs"
+  - "path": "test/language/expressions/dynamic-import/usage/nested-async-ge\
+      n-await-eval-gtbndng-indirect-update.js"
+    "sourceDigest": "68e4fd6fc6f93ef4417c498d95addc5555ee44d2bd858a897a7\
+      128b663792e46"
+    "section": "sec-import-call-runtime-semantics-evaluation"
+    "subject": "Modifications to named bindings that occur after dependency
+      has been evaluated are reflected in local binding (nested in async
+      generator, awaited)"
+    "disposition": "exclusion"
+    "reason": "The original enclosing function, generator or statement
+      retains x=1 then x=2 through the global updater and a static
+      namespace; Promise.resolve replaces only namespace acquisition and
+      globalThis replaces only Function-based global discovery."
+    "evidence":
+      - "tests/fixtures/ds12-module-observables/nested-async-gen-await-\
+        eval-gtbndng-indirect-update.mjs"
+      - "tests/fixtures/ds12-module-observables/eval-gtbndng-indirect-u\
+        pdate_FIXTURE.mjs"
+  - "path": "test/language/expressions/dynamic-import/usage/nested-async-ge\
+      n-return-await-eval-gtbndng-indirect-update.js"
+    "sourceDigest": "44c0d4998986fcb66ddbef6ea457b2ed205cd74609b941d6da1\
+      1c762ee8ac00b"
+    "section": "sec-import-call-runtime-semantics-evaluation"
+    "subject": "Modifications to named bindings that occur after dependency
+      has been evaluated are reflected in local binding (nested in async
+      generator, returns awaited)"
+    "disposition": "exclusion"
+    "reason": "The original enclosing function, generator or statement
+      retains x=1 then x=2 through the global updater and a static
+      namespace; Promise.resolve replaces only namespace acquisition and
+      globalThis replaces only Function-based global discovery."
+    "evidence":
+      - "tests/fixtures/ds12-module-observables/nested-async-gen-return\
+        -await-eval-gtbndng-indirect-update.mjs"
+      - "tests/fixtures/ds12-module-observables/eval-gtbndng-indirect-u\
+        pdate_FIXTURE.mjs"
+  - "path": "test/language/expressions/dynamic-import/usage/nested-block-im\
+      port-then-eval-gtbndng-indirect-update.js"
+    "sourceDigest": "6101c6392ae9f0db51643449d289706704c0a40c7027b256f6c\
+      6068489ffe5fb"
+    "section": "sec-import-call-runtime-semantics-evaluation"
+    "subject": "Modifications to named bindings that occur after dependency
+      has been evaluated are reflected in local binding (nested block)"
+    "disposition": "exclusion"
+    "reason": "The original enclosing function, generator or statement
+      retains x=1 then x=2 through the global updater and a static
+      namespace; Promise.resolve replaces only namespace acquisition and
+      globalThis replaces only Function-based global discovery."
+    "evidence":
+      - "tests/fixtures/ds12-module-observables/nested-block-import-the\
+        n-eval-gtbndng-indirect-update.mjs"
+      - "tests/fixtures/ds12-module-observables/eval-gtbndng-indirect-u\
+        pdate_FIXTURE.mjs"
+  - "path": "test/language/expressions/dynamic-import/usage/nested-do-while\
+      -eval-gtbndng-indirect-update.js"
+    "sourceDigest": "bdd16ed959c226e62149f45449e175e8254c5ed3bb8eefee8cf\
+      3bf581352efe9"
+    "section": "sec-import-call-runtime-semantics-evaluation"
+    "subject": "Modifications to named bindings that occur after dependency
+      has been evaluated are reflected in local binding (nested do while
+      syntax)"
+    "disposition": "exclusion"
+    "reason": "The original enclosing function, generator or statement
+      retains x=1 then x=2 through the global updater and a static
+      namespace; Promise.resolve replaces only namespace acquisition and
+      globalThis replaces only Function-based global discovery."
+    "evidence":
+      - "tests/fixtures/ds12-module-observables/nested-do-while-eval-gt\
+        bndng-indirect-update.mjs"
+      - "tests/fixtures/ds12-module-observables/eval-gtbndng-indirect-u\
+        pdate_FIXTURE.mjs"
+  - "path": "test/language/expressions/dynamic-import/usage/nested-else-imp\
+      ort-then-eval-gtbndng-indirect-update.js"
+    "sourceDigest": "241406f84ef566474546360fb6a05af8c16e4e0a7f419209bda\
+      10f0f6e1b0f02"
+    "section": "sec-import-call-runtime-semantics-evaluation"
+    "subject": "Modifications to named bindings that occur after dependency
+      has been evaluated are reflected in local binding (nested else)"
+    "disposition": "exclusion"
+    "reason": "The original enclosing function, generator or statement
+      retains x=1 then x=2 through the global updater and a static
+      namespace; Promise.resolve replaces only namespace acquisition and
+      globalThis replaces only Function-based global discovery."
+    "evidence":
+      - "tests/fixtures/ds12-module-observables/nested-else-import-then\
+        -eval-gtbndng-indirect-update.mjs"
+      - "tests/fixtures/ds12-module-observables/eval-gtbndng-indirect-u\
+        pdate_FIXTURE.mjs"
+  - "path": "test/language/expressions/dynamic-import/usage/nested-function\
+      -import-then-eval-gtbndng-indirect-update.js"
+    "sourceDigest": "18a5b4d3b20cd2600f62f888813d9bff85f49ef855db8fd2ebc\
+      d7f69896d483e"
+    "section": "sec-import-call-runtime-semantics-evaluation"
+    "subject": "Modifications to named bindings that occur after dependency
+      has been evaluated are reflected in local binding (nested
+      function)"
+    "disposition": "exclusion"
+    "reason": "The original enclosing function, generator or statement
+      retains x=1 then x=2 through the global updater and a static
+      namespace; Promise.resolve replaces only namespace acquisition and
+      globalThis replaces only Function-based global discovery."
+    "evidence":
+      - "tests/fixtures/ds12-module-observables/nested-function-import-\
+        then-eval-gtbndng-indirect-update.mjs"
+      - "tests/fixtures/ds12-module-observables/eval-gtbndng-indirect-u\
+        pdate_FIXTURE.mjs"
+  - "path": "test/language/expressions/dynamic-import/usage/nested-if-brace\
+      less-eval-gtbndng-indirect-update.js"
+    "sourceDigest": "510397d103996e346146e97e7b5358dc39f72d77dc612737d68\
+      6a5d82cbde495"
+    "section": "sec-import-call-runtime-semantics-evaluation"
+    "subject": "Modifications to named bindings that occur after dependency
+      has been evaluated are reflected in local binding (nested if
+      syntax)"
+    "disposition": "exclusion"
+    "reason": "The original enclosing function, generator or statement
+      retains x=1 then x=2 through the global updater and a static
+      namespace; Promise.resolve replaces only namespace acquisition and
+      globalThis replaces only Function-based global discovery."
+    "evidence":
+      - "tests/fixtures/ds12-module-observables/nested-if-braceless-eva\
+        l-gtbndng-indirect-update.mjs"
+      - "tests/fixtures/ds12-module-observables/eval-gtbndng-indirect-u\
+        pdate_FIXTURE.mjs"
+  - "path": "test/language/expressions/dynamic-import/usage/nested-if-impor\
+      t-then-eval-gtbndng-indirect-update.js"
+    "sourceDigest": "0049f0646309d418b6e903e915ca5e50c12d9ffbd96fbff0c47\
+      36221fa1e4a7e"
+    "section": "sec-import-call-runtime-semantics-evaluation"
+    "subject": "Modifications to named bindings that occur after dependency
+      has been evaluated are reflected in local binding (nested if)"
+    "disposition": "exclusion"
+    "reason": "The original enclosing function, generator or statement
+      retains x=1 then x=2 through the global updater and a static
+      namespace; Promise.resolve replaces only namespace acquisition and
+      globalThis replaces only Function-based global discovery."
+    "evidence":
+      - "tests/fixtures/ds12-module-observables/nested-if-import-then-e\
+        val-gtbndng-indirect-update.mjs"
+      - "tests/fixtures/ds12-module-observables/eval-gtbndng-indirect-u\
+        pdate_FIXTURE.mjs"
+  - "path": "test/language/expressions/dynamic-import/usage/nested-while-im\
+      port-then-eval-gtbndng-indirect-update.js"
+    "sourceDigest": "4fb0e60deb925e95d863e2e56b87bd18a1e005a21003af0df4c\
+      300b164246ac3"
+    "section": "sec-import-call-runtime-semantics-evaluation"
+    "subject": "Modifications to named bindings that occur after dependency
+      has been evaluated are reflected in local binding (nested while)"
+    "disposition": "exclusion"
+    "reason": "The original enclosing function, generator or statement
+      retains x=1 then x=2 through the global updater and a static
+      namespace; Promise.resolve replaces only namespace acquisition and
+      globalThis replaces only Function-based global discovery."
+    "evidence":
+      - "tests/fixtures/ds12-module-observables/nested-while-import-the\
+        n-eval-gtbndng-indirect-update.mjs"
+      - "tests/fixtures/ds12-module-observables/eval-gtbndng-indirect-u\
+        pdate_FIXTURE.mjs"
+  - "path": "test/language/expressions/dynamic-import/usage/syntax-nested-b\
+      lock-labeled-eval-gtbndng-indirect-update.js"
+    "sourceDigest": "3b3af03c9335e712c76409e351dd58382fa5424d2512d5d6afd\
+      cc0f31de1999a"
+    "section": "sec-import-call-runtime-semantics-evaluation"
+    "subject": "Modifications to named bindings that occur after dependency
+      has been evaluated are reflected in local binding (nested block
+      syntax)"
+    "disposition": "exclusion"
+    "reason": "The original enclosing function, generator or statement
+      retains x=1 then x=2 through the global updater and a static
+      namespace; Promise.resolve replaces only namespace acquisition and
+      globalThis replaces only Function-based global discovery."
+    "evidence":
+      - "tests/fixtures/ds12-module-observables/syntax-nested-block-lab\
+        eled-eval-gtbndng-indirect-update.mjs"
+      - "tests/fixtures/ds12-module-observables/eval-gtbndng-indirect-u\
+        pdate_FIXTURE.mjs"
+  - "path": "test/language/expressions/dynamic-import/usage/top-level-impor\
+      t-then-eval-gtbndng-indirect-update.js"
+    "sourceDigest": "97daf29ac044e23578dfeae882c2d9e8b3adabdaebe63bfb0c7\
+      23da7253b482f"
+    "section": "sec-import-call-runtime-semantics-evaluation"
+    "subject": "Modifications to named bindings that occur after dependency
+      has been evaluated are reflected in local binding (top level)"
+    "disposition": "exclusion"
+    "reason": "The original enclosing function, generator or statement
+      retains x=1 then x=2 through the global updater and a static
+      namespace; Promise.resolve replaces only namespace acquisition and
+      globalThis replaces only Function-based global discovery."
+    "evidence":
+      - "tests/fixtures/ds12-module-observables/top-level-import-then-e\
+        val-gtbndng-indirect-update.mjs"
+      - "tests/fixtures/ds12-module-observables/eval-gtbndng-indirect-u\
+        pdate_FIXTURE.mjs"
+  - "path": "test/language/expressions/import.meta/not-accessible-from-dire\
+      ct-eval.js"
+    "sourceDigest": "211f92e37e1c87e80e68a289b00efa9f4e8369e5bd8ecb6df79\
+      9d744009b0a43"
+    "section": "sec-left-hand-side-expressions-static-semantics-early-errors"
+    "subject": "import.meta is not allowed in direct eval in module code."
+    "disposition": "exclusion"
+    "reason": "All original assertions concern import.meta rejection in
+      constructor or eval source goals; fixed Script/Module parser
+      probes separately reject and admit the same expression in body and
+      parameter positions, leaving only dynamic source-goal
+      construction."
+    "evidence":
+      - "tests/ds12-import-meta-goals.test.ts"
+  - "path": "test/language/expressions/import.meta/syntax/goal-async-functi\
+      on-params-or-body.js"
+    "sourceDigest": "cbe2b1c3d4517a3990bd56a420cb7125195adda746591a544e8\
+      b4a82a71e27a0"
+    "section": "sec-left-hand-side-expressions-static-semantics-early-errors"
+    "subject": "An Syntax Error is thrown when the syntactic goal symbol is
+      AsyncFunctionBody or FormalParameters."
+    "disposition": "exclusion"
+    "reason": "All original assertions concern import.meta rejection in
+      constructor or eval source goals; fixed Script/Module parser
+      probes separately reject and admit the same expression in body and
+      parameter positions, leaving only dynamic source-goal
+      construction."
+    "evidence":
+      - "tests/ds12-import-meta-goals.test.ts"
+  - "path": "test/language/expressions/import.meta/syntax/goal-async-genera\
+      tor-params-or-body.js"
+    "sourceDigest": "c89ed59d66c4c85396d1da2fa9c0f3d34f6392dd296226c28f5\
+      8ce32521ddea6"
+    "section": "sec-left-hand-side-expressions-static-semantics-early-errors"
+    "subject": "An Syntax Error is thrown when the syntactic goal symbol is
+      AsyncGeneratorBody or FormalParameters."
+    "disposition": "exclusion"
+    "reason": "All original assertions concern import.meta rejection in
+      constructor or eval source goals; fixed Script/Module parser
+      probes separately reject and admit the same expression in body and
+      parameter positions, leaving only dynamic source-goal
+      construction."
+    "evidence":
+      - "tests/ds12-import-meta-goals.test.ts"
+  - "path": "test/language/expressions/import.meta/syntax/goal-function-par\
+      ams-or-body.js"
+    "sourceDigest": "0f0f10d06669f27d6fa67c55415952d892e82cf7037c79f0b74\
+      a755289f17bbb"
+    "section": "sec-left-hand-side-expressions-static-semantics-early-errors"
+    "subject": "An Syntax Error is thrown when the syntactic goal symbol is
+      FunctionBody or FormalParameters."
+    "disposition": "exclusion"
+    "reason": "All original assertions concern import.meta rejection in
+      constructor or eval source goals; fixed Script/Module parser
+      probes separately reject and admit the same expression in body and
+      parameter positions, leaving only dynamic source-goal
+      construction."
+    "evidence":
+      - "tests/ds12-import-meta-goals.test.ts"
+  - "path": "test/language/expressions/import.meta/syntax/goal-generator-pa\
+      rams-or-body.js"
+    "sourceDigest": "0a24c4839d48c07a64e6c8cb0dfc9d7747d4cc5542c691bd559\
+      abc227de07f53"
+    "section": "sec-left-hand-side-expressions-static-semantics-early-errors"
+    "subject": "An Syntax Error is thrown when the syntactic goal symbol is
+      GeneratorBody or FormalParameters."
+    "disposition": "exclusion"
+    "reason": "All original assertions concern import.meta rejection in
+      constructor or eval source goals; fixed Script/Module parser
+      probes separately reject and admit the same expression in body and
+      parameter positions, leaving only dynamic source-goal
+      construction."
+    "evidence":
+      - "tests/ds12-import-meta-goals.test.ts"
+  - "path": "test/language/module-code/eval-gtbndng-indirect-update-as.js"
+    "sourceDigest": "531a6d88591198d2c6d8ca9151a675b17b1259c150bfd0b24a9\
+      b5208799fcb52"
+    "section": "sec-moduleevaluation"
+    "subject": "Modifications to named bindings that occur after dependency
+      has been evaluated are reflected in local binding"
+    "disposition": "exclusion"
+    "reason": "The static import retains the original direct or aliased
+      local reads at 1 and 2 through an independently global updater."
+    "evidence":
+      - "tests/fixtures/ds12-module-observables/eval-gtbndng-indirect-u\
+        pdate-as.mjs"
+  - "path": "test/language/module-code/eval-gtbndng-indirect-update.js"
+    "sourceDigest": "2e382b6cef4a65f3c1b58ed7a21f9311b2627e7980b410805d1\
+      018b714d4b5b6"
+    "section": "sec-moduleevaluation"
+    "subject": "Modifications to named bindings that occur after dependency
+      has been evaluated are reflected in local binding"
+    "disposition": "exclusion"
+    "reason": "The static import retains the original direct or aliased
+      local reads at 1 and 2 through an independently global updater."
+    "evidence":
+      - "tests/fixtures/ds12-module-observables/eval-gtbndng-indirect-u\
+        pdate.mjs"
+  - "path": "test/language/module-code/eval-rqstd-once.js"
+    "sourceDigest": "882ed0917cb6f3e51819d3df04b339fa3bedc5066f82e096a5c\
+      accee46b02ae6"
+    "section": "sec-moduleevaluation"
+    "subject": "Requested modules are evaluated exactly once"
+    "disposition": "exclusion"
+    "reason": "All ten original import/export forms remain and the fixture
+      rejects a second evaluation; globalThis replaces only
+      Function-based global discovery."
+    "evidence":
+      - "tests/fixtures/ds12-module-observables/eval-rqstd-once.mjs"
+  - "path": "test/language/module-code/eval-rqstd-order.js"
+    "sourceDigest": "6bc5fcbee5e8c6c9315ac71d6b88b47ff0b0c826a0f44305371\
+      30d64fd70f5e6"
+    "section": "sec-moduleevaluation"
+    "subject": "Requested modules are evaluated prior to the requesting
+      module in source code order"
+    "disposition": "exclusion"
+    "reason": "All nine original import/export edges and the exact global
+      trace 123456789 remain; only global-object discovery is replaced."
+    "evidence":
+      - "tests/fixtures/ds12-module-observables/eval-rqstd-order.mjs"
+  - "path": "test/language/module-code/instn-same-global.js"
+    "sourceDigest": "564f38753491b84941656868c73ce342c2111fc9b29ed7b681e\
+      e9732f4e5cbce"
+    "section": "sec-moduledeclarationinstantiation"
+    "subject": "Modules share the same global `this` value"
+    "disposition": "exclusion"
+    "reason": "The static dependency writes the same global object that the
+      importer reads, preserving the exact 262 sentinel without
+      constructing a function."
+    "evidence":
+      - "tests/fixtures/ds12-module-observables/instn-same-global.mjs"
+  - "path": "test/language/module-code/top-level-await/await-dynamic-import\
+      -rejection.js"
+    "sourceDigest": "ee609192b201b8194b4a6986aba7d3c1d1a237b037f4e7a505c\
+      af2e17614a1ef"
+    "section": "sec-moduleevaluation"
+    "subject": "Top Level Await on a Dynamic import"
+    "disposition": "remediation"
+    "reason": "Await must propagate the loaded module-body error and
+      suppress the following statement; no exact static-error-plus-await
+      observation is established here."
+    "evidence": []
+  - "path": "test/language/module-code/top-level-await/await-dynamic-import\
+      -resolution.js"
+    "sourceDigest": "487cec895aff7a3fd8051e08fd2c46cf8b3227d4bade937d239\
+      fb3f6563e9c47"
+    "section": "sec-moduleevaluation"
+    "subject": "Top Level Await on a Dynamic import"
+    "disposition": "remediation"
+    "reason": "Awaiting an asynchronously evaluated module must expose
+      default 42, x named and y 39; the new namespace witnesses do not
+      observe this TLA graph."
+    "evidence": []
+  - "path": "test/language/module-code/top-level-await/dynamic-import-of-wa\
+      iting-module.js"
+    "sourceDigest": "339720673a134559d91844bc177731cc494adf1a221087fa8de\
+      1089f8ef1811f"
+    "section": "sec-ContinueDynamicImport"
+    "subject": "Dynamic import of an ~evaluating-async~ module waits for the
+      module to finish its evaluation"
+    "disposition": "remediation"
+    "reason": "Two loads of a still-waiting module must settle in
+      first-request order across an independent empty-module load;
+      static edges do not expose those promises."
+    "evidence": []
+  - "path": "test/language/module-code/top-level-await/dynamic-import-rejec\
+      tion.js"
+    "sourceDigest": "6af1a75b3de0c7caeb5affd07d2ba598e04476b2e71cd4c3879\
+      b3e1b0cf254cf"
+    "section": "sec-moduleevaluation"
+    "subject": "Dynamic imported module with async exports"
+    "disposition": "remediation"
+    "reason": "Rejection must preserve TypeError constructor and exact
+      message error in the default export line; a generic rejection
+      witness is insufficient."
+    "evidence": []
+  - "path": "test/language/module-code/top-level-await/dynamic-import-resol\
+      ution.js"
+    "sourceDigest": "76db157ba2be71d323f6f5e753737f9c0e51fc6a10028230f98\
+      532c76bae8bad"
+    "section": "sec-moduleevaluation"
+    "subject": "Dynamic imported module with async exports"
+    "disposition": "remediation"
+    "reason": "Promise fulfillment must occur after the TLA graph
+      initializes default 42, x named and y 39; no witness of that graph
+      is added."
+    "evidence": []
+  - "path": "test/language/module-code/top-level-await/fulfillment-order.js"
+    "sourceDigest": "45c63f22d4028a425852a11e2592a48b82e51d0a959490ef9c9\
+      9da34b48b6686"
+    "section": "sec-async-module-execution-fulfilled"
+    "subject": "When an async module fulfills, the promises relative to
+      itself and its ancestors are resolved in leaf-to-root order"
+    "disposition": "remediation"
+    "reason": "Independently started overlapping graph evaluations must
+      fulfill in B,A order after both start barriers; one static entry
+      loses independent capabilities."
+    "evidence": []
+  - "path": "test/language/module-code/top-level-await/module-graphs-does-n\
+      ot-hang.js"
+    "sourceDigest": "5a715a19933abd179c881584fd6682f03ae6f1f941d00582823\
+      bc0af5f977d92"
+    "subject": "Module graphs with Top-Level Await shouldn't hang."
+    "disposition": "remediation"
+    "reason": "A graph already evaluated through its parent must complete a
+      later grandparent load; static construction does not witness later
+      evaluation re-entry."
+    "evidence": []
+  - "path": "test/language/module-code/top-level-await/rejection-order.js"
+    "sourceDigest": "a9d6eec9f4cae9d833c95f230c86a89ae1c3d2393b190d40e14\
+      909ad2d91b5a3"
+    "section": "sec-async-module-execution-rejected"
+    "subject": "When an async module rejects, the promises relative to
+      itself and its ancestors are resolved in leaf-to-root order"
+    "disposition": "remediation"
+    "reason": "Independently started overlapping evaluations must reject in
+      B,A order with both start barriers; a static target error does not
+      retain these capabilities."
+    "evidence": []
+  - "path": "test/language/module-code/top-level-await/unobservable-global-\
+      async-evaluation-count-reset.js"
+    "sourceDigest": "52efae1bed45325169a95cc6c7c40ec01802b76bae247c113e5\
+      234f575b1eefd"
+    "section": "sec-IncrementModuleAsyncEvaluationCount"
+    "subject": "An implementation may unobservably reset
+      [[ModuleAsyncEvaluationCount]] to 0 whenever there are no pending
+      modules."
+    "disposition": "remediation"
+    "reason": "Starting D after C completes must not reset relative async
+      evaluation ordering of pending A; one static graph cannot
+      reproduce the staggered starts."
+    "evidence": []
+  - "path": "test/language/module-code/verify-dfs.js"
+    "sourceDigest": "f848091e31905679d740fd845820fa60c4356b2f58d93ab15f5\
+      1a18c1d8969df"
+    "section": "sec-moduleevaluation"
+    "subject": "Dynamic import can't preempt DFS evaluation order"
+    "disposition": "remediation"
+    "reason": "The check is registered during A evaluation through a dynamic
+      B load and must observe A,B order after fulfillment; eager static
+      replacement changes registration timing."
+    "evidence": []
