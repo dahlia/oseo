@@ -342,7 +342,6 @@ results:
       - expression-operators
       - functions
       - object-properties
-      - var-bindings
     observation:
       detail: "test/language/statements/function/S13.2.2_A14.js non-strict
         disabled failed (1): stdout=\"\"
@@ -535,7 +534,6 @@ results:
       - abrupt-completion
       - destructuring-bindings
       - error-intrinsics
-      - functions
       - object-literals
       - object-properties
       - var-bindings

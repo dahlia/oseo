@@ -376,7 +376,6 @@ results:
       - expression-operators
       - functions
       - object-properties
-      - var-bindings
     observation:
       detail: "test/language/statements/function/S13.2.2_A13.js non-strict
         disabled failed (1): stdout=\"\"
@@ -505,8 +504,6 @@ results:
     classification: pass
     dependencies:
       - destructuring-bindings
-      - functions
-      - generators
       - iterator-protocol
       - lexical-bindings
       - object-properties

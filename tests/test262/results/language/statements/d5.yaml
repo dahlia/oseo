@@ -239,7 +239,6 @@ results:
       - control-flow
       - destructuring-bindings
       - expression-operators
-      - functions
       - object-literals
       - object-properties
       - var-bindings
@@ -550,7 +549,6 @@ results:
     classification: pass
     dependencies:
       - destructuring-bindings
-      - functions
       - iterator-protocol
       - lexical-bindings
       - object-properties
@@ -652,8 +650,6 @@ results:
     classification: pass
     dependencies:
       - control-flow
-      - expression-operators
-      - var-bindings
     execution:
       harnessIncludes:
         - base.js

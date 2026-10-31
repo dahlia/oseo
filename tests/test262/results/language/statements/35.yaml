@@ -315,7 +315,6 @@ results:
       - expression-operators
       - functions
       - object-properties
-      - var-bindings
     execution:
       harnessIncludes:
         - base.js

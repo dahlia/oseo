@@ -144,7 +144,6 @@ results:
       - control-flow
       - destructuring-bindings
       - error-intrinsics
-      - functions
       - lexical-bindings
       - object-literals
       - object-properties
@@ -336,7 +335,6 @@ results:
       - abrupt-completion
       - destructuring-bindings
       - error-intrinsics
-      - functions
       - object-literals
       - object-properties
       - var-bindings

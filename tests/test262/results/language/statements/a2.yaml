@@ -405,7 +405,6 @@ results:
       - abrupt-completion
       - control-flow
       - destructuring-bindings
-      - functions
       - iterator-protocol
       - symbols
       - var-bindings

@@ -377,7 +377,6 @@ results:
       - abrupt-completion
       - destructuring-bindings
       - error-intrinsics
-      - functions
       - iterator-protocol
       - lexical-bindings
       - object-literals

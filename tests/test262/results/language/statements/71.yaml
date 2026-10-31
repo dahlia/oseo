@@ -305,7 +305,6 @@ results:
       - destructuring-bindings
       - error-intrinsics
       - expression-operators
-      - functions
       - lexical-bindings
       - object-literals
       - object-properties
@@ -342,7 +341,6 @@ results:
       - dynamic-source
       - expression-operators
       - functions
-      - var-bindings
     observation:
       detail: 'test/language/statements/function/13.0_4-17gs.js strict
         disabled failed (1): stdout=""

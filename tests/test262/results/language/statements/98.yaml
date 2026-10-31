@@ -259,7 +259,6 @@ results:
       - destructuring-bindings
       - error-intrinsics
       - expression-operators
-      - functions
       - iterator-protocol
       - object-literals
       - object-properties
@@ -294,7 +293,6 @@ results:
       suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
     classification: pass
     dependencies:
-      - expression-operators
       - functions
       - var-bindings
     execution:
@@ -534,7 +532,6 @@ results:
       - abrupt-completion
       - destructuring-bindings
       - error-intrinsics
-      - functions
       - object-literals
       - object-properties
       - var-bindings

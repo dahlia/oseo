@@ -357,9 +357,7 @@ results:
     classification: pass
     dependencies:
       - control-flow
-      - expression-operators
       - object-literals
-      - var-bindings
     execution:
       harnessIncludes:
         - base.js

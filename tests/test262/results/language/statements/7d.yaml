@@ -204,7 +204,6 @@ results:
       - control-flow
       - destructuring-bindings
       - expression-operators
-      - functions
       - iterator-protocol
       - lexical-bindings
       - object-properties
@@ -342,7 +341,6 @@ results:
       - abrupt-completion
       - control-flow
       - destructuring-bindings
-      - functions
       - iterator-protocol
       - object-properties
       - symbols

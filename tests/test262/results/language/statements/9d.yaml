@@ -172,9 +172,7 @@ results:
     dependencies:
       - abrupt-completion
       - control-flow
-      - expression-operators
       - functions
-      - var-bindings
     execution:
       harnessIncludes:
         - base.js
@@ -211,7 +209,6 @@ results:
       - destructuring-bindings
       - error-intrinsics
       - expression-operators
-      - functions
       - lexical-bindings
       - object-literals
       - object-properties
@@ -252,7 +249,6 @@ results:
       - destructuring-bindings
       - error-intrinsics
       - expression-operators
-      - functions
       - lexical-bindings
       - object-literals
       - object-properties

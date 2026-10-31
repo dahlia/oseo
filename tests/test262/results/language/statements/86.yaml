@@ -258,7 +258,6 @@ results:
       - control-flow
       - destructuring-bindings
       - error-intrinsics
-      - functions
       - lexical-bindings
     execution:
       harnessIncludes:

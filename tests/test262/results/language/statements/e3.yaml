@@ -471,7 +471,6 @@ results:
       - destructuring-bindings
       - error-intrinsics
       - expression-operators
-      - functions
       - iterator-protocol
       - object-properties
       - symbols

@@ -553,7 +553,6 @@ results:
       - abrupt-completion
       - control-flow
       - destructuring-bindings
-      - functions
       - iterator-protocol
       - object-properties
       - symbols
@@ -592,7 +591,6 @@ results:
       - abrupt-completion
       - control-flow
       - destructuring-bindings
-      - functions
       - iterator-protocol
       - object-properties
       - symbols

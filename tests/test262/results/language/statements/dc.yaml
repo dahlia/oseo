@@ -287,7 +287,6 @@ results:
       - control-flow
       - destructuring-bindings
       - expression-operators
-      - functions
       - iterator-protocol
       - object-properties
       - symbols

@@ -558,7 +558,6 @@ results:
       - control-flow
       - destructuring-bindings
       - error-intrinsics
-      - functions
       - object-literals
       - object-properties
     execution:
@@ -593,7 +592,6 @@ results:
       - abrupt-completion
       - control-flow
       - expression-operators
-      - var-bindings
     execution:
       harnessIncludes:
         - base.js

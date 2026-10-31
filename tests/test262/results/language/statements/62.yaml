@@ -200,7 +200,6 @@ results:
       - control-flow
       - destructuring-bindings
       - error-intrinsics
-      - functions
       - iterator-protocol
       - object-properties
       - symbols
@@ -264,7 +263,6 @@ results:
       - error-intrinsics
       - functions
       - object-properties
-      - var-bindings
     execution:
       harnessIncludes:
         - base.js

@@ -200,3 +200,34 @@ and exact changes in `round2-fix-plan.json`, `round2-fix-applied.json` and
 the `round2-*-audit.json` and `round2-*-candidates.json` artifacts. The fixed
 second-pass verdicts are in `review-round-2/attempts.json`. Classifications,
 counts, unsupported ownership and the original admitted rows are preserved.
+
+
+Internal pass 3 corrections
+---------------------------
+
+All 1,669 train rows were checked for every third-pass finding pattern
+against the latest consolidated tag rules. This batch has
+118 dependency rows corrected in that audit.
+
+Executed unresolved-binding probes retain error-intrinsics, and numeric
+conversion of function-object switch inputs retains symbols for
+Symbol.toPrimitive. A TDZ read that throws before addition excludes that
+unexecuted operator. The function-local TDZ case retains its invoked inner
+function; ordinary assert.throws wrappers alone add no function family. Skipped
+default observers, shape-check predicates, unused holders and constant markers
+add no dependency coverage. The implicit iterator lookup stays in
+iterator-protocol rather than object-properties, and actual catch-scope
+subjects, Error formatting calls and loop inputs retain their families.
+
+Root confirmed the skipped-default helper, Array.isArray oracle, implicit
+iterator-property, TDZ and expected-value comparison boundaries. All train rows
+were scanned for the function-observer, holder, marker, evaluated-operator and
+implicit Symbol patterns. Source hashes and independent retained witnesses are
+recorded per candidate; AST reachability is candidate evidence, not an
+execution trace.
+
+The dispatch packet records source hashes, the full-train pattern audits,
+and exact changes in `round3-fix-plan.json`, `round3-fix-applied.json` and
+the `round3-*-audit.json` and `round3-*-candidates.json` artifacts. The fixed
+third-pass verdicts are in `review-round-3/attempts.json`. Classifications,
+counts, unsupported ownership and the original admitted rows are preserved.

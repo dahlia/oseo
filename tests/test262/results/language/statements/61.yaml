@@ -507,7 +507,6 @@ results:
     classification: pass
     dependencies:
       - destructuring-bindings
-      - functions
       - iterator-protocol
       - object-properties
       - symbols

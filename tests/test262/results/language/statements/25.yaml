@@ -181,7 +181,6 @@ results:
       - functions
       - object-properties
       - property-enumeration
-      - var-bindings
     execution:
       harnessIncludes:
         - base.js
@@ -477,8 +476,6 @@ results:
     classification: pass
     dependencies:
       - destructuring-bindings
-      - functions
-      - generators
       - iterator-protocol
       - object-properties
       - symbols

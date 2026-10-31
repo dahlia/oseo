@@ -240,7 +240,6 @@ results:
     classification: pass
     dependencies:
       - destructuring-bindings
-      - functions
       - iterator-protocol
       - lexical-bindings
       - object-properties

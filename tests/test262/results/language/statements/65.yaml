@@ -348,7 +348,6 @@ results:
       - abrupt-completion
       - destructuring-bindings
       - error-intrinsics
-      - functions
       - lexical-bindings
       - object-literals
       - object-properties

@@ -315,7 +315,6 @@ results:
       - destructuring-bindings
       - error-intrinsics
       - expression-operators
-      - functions
       - object-literals
       - object-properties
       - var-bindings
@@ -572,7 +571,6 @@ results:
       - control-flow
       - destructuring-bindings
       - error-intrinsics
-      - functions
       - object-literals
       - object-properties
     execution:

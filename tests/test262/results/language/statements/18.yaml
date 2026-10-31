@@ -366,7 +366,6 @@ results:
       - control-flow
       - destructuring-bindings
       - error-intrinsics
-      - functions
       - iterator-protocol
       - lexical-bindings
       - object-properties

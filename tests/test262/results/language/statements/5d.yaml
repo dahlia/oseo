@@ -315,7 +315,6 @@ results:
       - destructuring-bindings
       - error-intrinsics
       - expression-operators
-      - functions
       - object-literals
       - object-properties
       - var-bindings
@@ -353,7 +352,6 @@ results:
       - abrupt-completion
       - destructuring-bindings
       - error-intrinsics
-      - functions
       - lexical-bindings
       - object-literals
       - object-properties

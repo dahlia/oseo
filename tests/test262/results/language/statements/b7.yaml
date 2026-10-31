@@ -493,7 +493,6 @@ results:
       - control-flow
       - destructuring-bindings
       - expression-operators
-      - functions
       - lexical-bindings
       - object-literals
       - object-properties

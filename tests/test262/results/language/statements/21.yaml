@@ -427,7 +427,6 @@ results:
       - destructuring-bindings
       - error-intrinsics
       - expression-operators
-      - functions
       - iterator-protocol
       - lexical-bindings
       - object-literals
@@ -545,7 +544,6 @@ results:
       - abrupt-completion
       - destructuring-bindings
       - error-intrinsics
-      - functions
       - iterator-protocol
       - lexical-bindings
       - object-literals
@@ -585,7 +583,6 @@ results:
       - abrupt-completion
       - control-flow
       - destructuring-bindings
-      - functions
       - iterator-protocol
       - object-properties
       - symbols

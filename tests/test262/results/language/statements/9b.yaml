@@ -254,7 +254,6 @@ results:
       - control-flow
       - destructuring-bindings
       - expression-operators
-      - functions
       - iterator-protocol
       - lexical-bindings
       - object-properties
@@ -296,7 +295,6 @@ results:
       - destructuring-bindings
       - error-intrinsics
       - expression-operators
-      - functions
       - lexical-bindings
       - object-literals
       - object-properties
@@ -460,6 +458,7 @@ results:
       - control-flow
       - expression-operators
       - functions
+      - symbols
       - var-bindings
     execution:
       harnessIncludes:

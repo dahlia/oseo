@@ -559,10 +559,8 @@ results:
       - abrupt-completion
       - control-flow
       - error-intrinsics
-      - expression-operators
       - functions
       - object-properties
-      - var-bindings
     execution:
       harnessIncludes:
         - base.js
@@ -595,7 +593,6 @@ results:
     classification: pass
     dependencies:
       - destructuring-bindings
-      - functions
       - iterator-protocol
       - object-properties
       - symbols

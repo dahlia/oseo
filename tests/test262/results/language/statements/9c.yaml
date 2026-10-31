@@ -350,7 +350,6 @@ results:
       - control-flow
       - destructuring-bindings
       - error-intrinsics
-      - functions
       - iterator-protocol
       - object-properties
       - symbols

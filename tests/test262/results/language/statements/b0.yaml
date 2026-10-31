@@ -485,7 +485,6 @@ results:
       - abrupt-completion
       - control-flow
       - destructuring-bindings
-      - functions
       - iterator-protocol
       - symbols
       - var-bindings
@@ -522,7 +521,6 @@ results:
     classification: pass
     dependencies:
       - destructuring-bindings
-      - functions
       - iterator-protocol
       - object-properties
       - symbols

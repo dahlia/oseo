@@ -168384,22 +168384,22 @@ tests:
     dependencies: [control-flow, expression-operators, var-bindings]
   - path: test/language/statements/for/12.6.3_2-3-a-ii-17.js
     expectedClassification: pass
-    dependencies: [control-flow, var-bindings]
+    dependencies: [control-flow]
   - path: test/language/statements/for/12.6.3_2-3-a-ii-18.js
     expectedClassification: pass
     dependencies: [control-flow, var-bindings]
   - path: test/language/statements/for/12.6.3_2-3-a-ii-19.js
     expectedClassification: pass
-    dependencies: [control-flow, var-bindings]
+    dependencies: [control-flow]
   - path: test/language/statements/for/12.6.3_2-3-a-ii-2.js
     expectedClassification: pass
     dependencies: [control-flow, functions, var-bindings]
   - path: test/language/statements/for/12.6.3_2-3-a-ii-20.js
     expectedClassification: pass
-    dependencies: [control-flow, var-bindings]
+    dependencies: [control-flow]
   - path: test/language/statements/for/12.6.3_2-3-a-ii-21.js
     expectedClassification: pass
-    dependencies: [control-flow, var-bindings]
+    dependencies: [control-flow]
   - path: test/language/statements/for/12.6.3_2-3-a-ii-3.js
     expectedClassification: pass
     dependencies: [control-flow, functions, var-bindings]
@@ -168499,24 +168499,10 @@ tests:
     dependencies: [abrupt-completion, control-flow, functions]
   - path: test/language/statements/for/S12.6.3_A2.js
     expectedClassification: pass
-    dependencies:
-      [
-        abrupt-completion,
-        control-flow,
-        expression-operators,
-        functions,
-        var-bindings,
-      ]
+    dependencies: [abrupt-completion, control-flow, functions]
   - path: test/language/statements/for/S12.6.3_A3.js
     expectedClassification: pass
-    dependencies:
-      [
-        abrupt-completion,
-        control-flow,
-        expression-operators,
-        functions,
-        var-bindings,
-      ]
+    dependencies: [abrupt-completion, control-flow, functions]
   - path: test/language/statements/for/S12.6.3_A4.1.js
     expectedClassification: expected-negative
     dependencies: [control-flow, expression-operators, var-bindings]
@@ -168538,14 +168524,7 @@ tests:
       ]
   - path: test/language/statements/for/S12.6.3_A6.js
     expectedClassification: pass
-    dependencies:
-      [
-        abrupt-completion,
-        control-flow,
-        expression-operators,
-        functions,
-        var-bindings,
-      ]
+    dependencies: [abrupt-completion, control-flow, functions]
   - path: test/language/statements/for/S12.6.3_A7.1_T1.js
     expectedClassification: expected-negative
     dependencies: [control-flow, expression-operators, var-bindings]
@@ -168647,7 +168626,6 @@ tests:
         destructuring-bindings,
         error-intrinsics,
         expression-operators,
-        functions,
         iterator-protocol,
         lexical-bindings,
         object-properties,
@@ -168745,8 +168723,6 @@ tests:
         control-flow,
         destructuring-bindings,
         expression-operators,
-        functions,
-        generators,
         iterator-protocol,
         lexical-bindings,
         object-properties,
@@ -168775,7 +168751,6 @@ tests:
         control-flow,
         destructuring-bindings,
         expression-operators,
-        functions,
         iterator-protocol,
         lexical-bindings,
         object-properties,
@@ -168789,7 +168764,6 @@ tests:
         control-flow,
         destructuring-bindings,
         expression-operators,
-        functions,
         iterator-protocol,
         lexical-bindings,
         object-properties,
@@ -168803,7 +168777,6 @@ tests:
         control-flow,
         destructuring-bindings,
         expression-operators,
-        functions,
         iterator-protocol,
         lexical-bindings,
         object-properties,
@@ -168818,7 +168791,6 @@ tests:
         control-flow,
         destructuring-bindings,
         error-intrinsics,
-        functions,
         iterator-protocol,
         lexical-bindings,
         object-properties,
@@ -168926,7 +168898,6 @@ tests:
         control-flow,
         destructuring-bindings,
         expression-operators,
-        functions,
         iterator-protocol,
         lexical-bindings,
         object-properties,
@@ -168967,7 +168938,6 @@ tests:
         control-flow,
         destructuring-bindings,
         error-intrinsics,
-        functions,
         iterator-protocol,
         lexical-bindings,
         object-properties,
@@ -169096,7 +169066,6 @@ tests:
         destructuring-bindings,
         error-intrinsics,
         expression-operators,
-        functions,
         iterator-protocol,
         lexical-bindings,
         object-literals,
@@ -169113,7 +169082,6 @@ tests:
         destructuring-bindings,
         error-intrinsics,
         expression-operators,
-        functions,
         iterator-protocol,
         lexical-bindings,
         object-literals,
@@ -169129,7 +169097,6 @@ tests:
         control-flow,
         destructuring-bindings,
         error-intrinsics,
-        functions,
         iterator-protocol,
         lexical-bindings,
         object-properties,
@@ -169143,7 +169110,6 @@ tests:
         control-flow,
         destructuring-bindings,
         error-intrinsics,
-        functions,
         iterator-protocol,
         lexical-bindings,
         object-properties,
@@ -169272,7 +169238,6 @@ tests:
         control-flow,
         destructuring-bindings,
         expression-operators,
-        functions,
         iterator-protocol,
         lexical-bindings,
         object-properties,
@@ -169286,7 +169251,6 @@ tests:
         control-flow,
         destructuring-bindings,
         expression-operators,
-        functions,
         iterator-protocol,
         lexical-bindings,
         object-properties,
@@ -169315,7 +169279,6 @@ tests:
         control-flow,
         destructuring-bindings,
         expression-operators,
-        functions,
         iterator-protocol,
         lexical-bindings,
         object-properties,
@@ -169329,7 +169292,6 @@ tests:
         control-flow,
         destructuring-bindings,
         expression-operators,
-        functions,
         iterator-protocol,
         lexical-bindings,
         object-properties,
@@ -169388,7 +169350,6 @@ tests:
         control-flow,
         destructuring-bindings,
         expression-operators,
-        functions,
         iterator-protocol,
         lexical-bindings,
         object-properties,
@@ -169447,7 +169408,6 @@ tests:
         control-flow,
         destructuring-bindings,
         error-intrinsics,
-        functions,
         lexical-bindings,
       ]
   - path: test/language/statements/for/dstr/const-obj-init-undefined.js
@@ -169458,7 +169418,6 @@ tests:
         control-flow,
         destructuring-bindings,
         error-intrinsics,
-        functions,
         lexical-bindings,
       ]
   - path: test/language/statements/for/dstr/const-obj-ptrn-empty.js
@@ -169561,7 +169520,6 @@ tests:
         control-flow,
         destructuring-bindings,
         expression-operators,
-        functions,
         lexical-bindings,
         object-literals,
         object-properties,
@@ -169587,7 +169545,6 @@ tests:
         control-flow,
         destructuring-bindings,
         error-intrinsics,
-        functions,
         lexical-bindings,
         object-literals,
         object-properties,
@@ -169626,7 +169583,6 @@ tests:
         destructuring-bindings,
         error-intrinsics,
         expression-operators,
-        functions,
         iterator-protocol,
         lexical-bindings,
         object-literals,
@@ -169656,7 +169612,6 @@ tests:
         control-flow,
         destructuring-bindings,
         error-intrinsics,
-        functions,
         iterator-protocol,
         lexical-bindings,
         object-literals,
@@ -169671,7 +169626,6 @@ tests:
         destructuring-bindings,
         error-intrinsics,
         expression-operators,
-        functions,
         iterator-protocol,
         lexical-bindings,
         object-literals,
@@ -169712,7 +169666,6 @@ tests:
         destructuring-bindings,
         error-intrinsics,
         expression-operators,
-        functions,
         lexical-bindings,
         object-literals,
         object-properties,
@@ -169738,7 +169691,6 @@ tests:
         control-flow,
         destructuring-bindings,
         error-intrinsics,
-        functions,
         lexical-bindings,
         object-literals,
         object-properties,
@@ -169752,7 +169704,6 @@ tests:
         destructuring-bindings,
         error-intrinsics,
         expression-operators,
-        functions,
         lexical-bindings,
         object-literals,
         object-properties,
@@ -169767,7 +169718,6 @@ tests:
         destructuring-bindings,
         error-intrinsics,
         expression-operators,
-        functions,
         lexical-bindings,
         object-literals,
         object-properties,
@@ -169782,7 +169732,6 @@ tests:
         destructuring-bindings,
         error-intrinsics,
         expression-operators,
-        functions,
         lexical-bindings,
         object-literals,
         object-properties,
@@ -169797,7 +169746,6 @@ tests:
         destructuring-bindings,
         error-intrinsics,
         expression-operators,
-        functions,
         lexical-bindings,
         object-literals,
         object-properties,
@@ -169811,7 +169759,6 @@ tests:
         control-flow,
         destructuring-bindings,
         error-intrinsics,
-        functions,
         lexical-bindings,
         object-literals,
         object-properties,
@@ -169824,7 +169771,6 @@ tests:
         control-flow,
         destructuring-bindings,
         error-intrinsics,
-        functions,
         lexical-bindings,
         object-literals,
         object-properties,
@@ -169838,7 +169784,6 @@ tests:
         destructuring-bindings,
         error-intrinsics,
         expression-operators,
-        functions,
         lexical-bindings,
         object-literals,
         object-properties,
@@ -169904,7 +169849,6 @@ tests:
         destructuring-bindings,
         error-intrinsics,
         expression-operators,
-        functions,
         iterator-protocol,
         lexical-bindings,
         object-properties,
@@ -170002,8 +169946,6 @@ tests:
         control-flow,
         destructuring-bindings,
         expression-operators,
-        functions,
-        generators,
         iterator-protocol,
         lexical-bindings,
         object-properties,
@@ -170032,7 +169974,6 @@ tests:
         control-flow,
         destructuring-bindings,
         expression-operators,
-        functions,
         iterator-protocol,
         lexical-bindings,
         object-properties,
@@ -170046,7 +169987,6 @@ tests:
         control-flow,
         destructuring-bindings,
         expression-operators,
-        functions,
         iterator-protocol,
         lexical-bindings,
         object-properties,
@@ -170060,7 +170000,6 @@ tests:
         control-flow,
         destructuring-bindings,
         expression-operators,
-        functions,
         iterator-protocol,
         lexical-bindings,
         object-properties,
@@ -170075,7 +170014,6 @@ tests:
         control-flow,
         destructuring-bindings,
         error-intrinsics,
-        functions,
         iterator-protocol,
         lexical-bindings,
         object-properties,
@@ -170183,7 +170121,6 @@ tests:
         control-flow,
         destructuring-bindings,
         expression-operators,
-        functions,
         iterator-protocol,
         lexical-bindings,
         object-properties,
@@ -170224,7 +170161,6 @@ tests:
         control-flow,
         destructuring-bindings,
         error-intrinsics,
-        functions,
         iterator-protocol,
         lexical-bindings,
         object-properties,
@@ -170353,7 +170289,6 @@ tests:
         destructuring-bindings,
         error-intrinsics,
         expression-operators,
-        functions,
         iterator-protocol,
         lexical-bindings,
         object-literals,
@@ -170370,7 +170305,6 @@ tests:
         destructuring-bindings,
         error-intrinsics,
         expression-operators,
-        functions,
         iterator-protocol,
         lexical-bindings,
         object-literals,
@@ -170386,7 +170320,6 @@ tests:
         control-flow,
         destructuring-bindings,
         error-intrinsics,
-        functions,
         iterator-protocol,
         lexical-bindings,
         object-properties,
@@ -170400,7 +170333,6 @@ tests:
         control-flow,
         destructuring-bindings,
         error-intrinsics,
-        functions,
         iterator-protocol,
         lexical-bindings,
         object-properties,
@@ -170529,7 +170461,6 @@ tests:
         control-flow,
         destructuring-bindings,
         expression-operators,
-        functions,
         iterator-protocol,
         lexical-bindings,
         object-properties,
@@ -170543,7 +170474,6 @@ tests:
         control-flow,
         destructuring-bindings,
         expression-operators,
-        functions,
         iterator-protocol,
         lexical-bindings,
         object-properties,
@@ -170572,7 +170502,6 @@ tests:
         control-flow,
         destructuring-bindings,
         expression-operators,
-        functions,
         iterator-protocol,
         lexical-bindings,
         object-properties,
@@ -170586,7 +170515,6 @@ tests:
         control-flow,
         destructuring-bindings,
         expression-operators,
-        functions,
         iterator-protocol,
         lexical-bindings,
         object-properties,
@@ -170645,7 +170573,6 @@ tests:
         control-flow,
         destructuring-bindings,
         expression-operators,
-        functions,
         iterator-protocol,
         lexical-bindings,
         object-properties,
@@ -170704,7 +170631,6 @@ tests:
         control-flow,
         destructuring-bindings,
         error-intrinsics,
-        functions,
         lexical-bindings,
       ]
   - path: test/language/statements/for/dstr/let-obj-init-undefined.js
@@ -170715,7 +170641,6 @@ tests:
         control-flow,
         destructuring-bindings,
         error-intrinsics,
-        functions,
         lexical-bindings,
       ]
   - path: test/language/statements/for/dstr/let-obj-ptrn-empty.js
@@ -170818,7 +170743,6 @@ tests:
         control-flow,
         destructuring-bindings,
         expression-operators,
-        functions,
         lexical-bindings,
         object-literals,
         object-properties,
@@ -170844,7 +170768,6 @@ tests:
         control-flow,
         destructuring-bindings,
         error-intrinsics,
-        functions,
         lexical-bindings,
         object-literals,
         object-properties,
@@ -170881,7 +170804,6 @@ tests:
         destructuring-bindings,
         error-intrinsics,
         expression-operators,
-        functions,
         iterator-protocol,
         lexical-bindings,
         object-literals,
@@ -170911,7 +170833,6 @@ tests:
         control-flow,
         destructuring-bindings,
         error-intrinsics,
-        functions,
         iterator-protocol,
         lexical-bindings,
         object-literals,
@@ -170926,7 +170847,6 @@ tests:
         destructuring-bindings,
         error-intrinsics,
         expression-operators,
-        functions,
         iterator-protocol,
         lexical-bindings,
         object-literals,
@@ -170967,7 +170887,6 @@ tests:
         destructuring-bindings,
         error-intrinsics,
         expression-operators,
-        functions,
         lexical-bindings,
         object-literals,
         object-properties,
@@ -170993,7 +170912,6 @@ tests:
         control-flow,
         destructuring-bindings,
         error-intrinsics,
-        functions,
         lexical-bindings,
         object-literals,
         object-properties,
@@ -171007,7 +170925,6 @@ tests:
         destructuring-bindings,
         error-intrinsics,
         expression-operators,
-        functions,
         lexical-bindings,
         object-literals,
         object-properties,
@@ -171022,7 +170939,6 @@ tests:
         destructuring-bindings,
         error-intrinsics,
         expression-operators,
-        functions,
         lexical-bindings,
         object-literals,
         object-properties,
@@ -171037,7 +170953,6 @@ tests:
         destructuring-bindings,
         error-intrinsics,
         expression-operators,
-        functions,
         lexical-bindings,
         object-literals,
         object-properties,
@@ -171052,7 +170967,6 @@ tests:
         destructuring-bindings,
         error-intrinsics,
         expression-operators,
-        functions,
         lexical-bindings,
         object-literals,
         object-properties,
@@ -171066,7 +170980,6 @@ tests:
         control-flow,
         destructuring-bindings,
         error-intrinsics,
-        functions,
         lexical-bindings,
         object-literals,
         object-properties,
@@ -171079,7 +170992,6 @@ tests:
         control-flow,
         destructuring-bindings,
         error-intrinsics,
-        functions,
         lexical-bindings,
         object-literals,
         object-properties,
@@ -171093,7 +171005,6 @@ tests:
         destructuring-bindings,
         error-intrinsics,
         expression-operators,
-        functions,
         lexical-bindings,
         object-literals,
         object-properties,
@@ -171160,7 +171071,6 @@ tests:
         destructuring-bindings,
         error-intrinsics,
         expression-operators,
-        functions,
         iterator-protocol,
         object-properties,
         symbols,
@@ -171252,8 +171162,6 @@ tests:
         control-flow,
         destructuring-bindings,
         expression-operators,
-        functions,
-        generators,
         iterator-protocol,
         object-properties,
         symbols,
@@ -171280,7 +171188,6 @@ tests:
         control-flow,
         destructuring-bindings,
         expression-operators,
-        functions,
         iterator-protocol,
         object-properties,
         symbols,
@@ -171293,7 +171200,6 @@ tests:
         control-flow,
         destructuring-bindings,
         expression-operators,
-        functions,
         iterator-protocol,
         object-properties,
         symbols,
@@ -171306,7 +171212,6 @@ tests:
         control-flow,
         destructuring-bindings,
         expression-operators,
-        functions,
         iterator-protocol,
         object-properties,
         symbols,
@@ -171320,7 +171225,6 @@ tests:
         control-flow,
         destructuring-bindings,
         error-intrinsics,
-        functions,
         iterator-protocol,
         object-properties,
         symbols,
@@ -171422,7 +171326,6 @@ tests:
         control-flow,
         destructuring-bindings,
         expression-operators,
-        functions,
         iterator-protocol,
         object-properties,
         symbols,
@@ -171461,7 +171364,6 @@ tests:
         control-flow,
         destructuring-bindings,
         error-intrinsics,
-        functions,
         iterator-protocol,
         object-properties,
         symbols,
@@ -171582,7 +171484,6 @@ tests:
         destructuring-bindings,
         error-intrinsics,
         expression-operators,
-        functions,
         iterator-protocol,
         object-literals,
         object-properties,
@@ -171598,7 +171499,6 @@ tests:
         destructuring-bindings,
         error-intrinsics,
         expression-operators,
-        functions,
         iterator-protocol,
         object-literals,
         object-properties,
@@ -171613,7 +171513,6 @@ tests:
         control-flow,
         destructuring-bindings,
         error-intrinsics,
-        functions,
         iterator-protocol,
         object-properties,
         symbols,
@@ -171627,7 +171526,6 @@ tests:
         control-flow,
         destructuring-bindings,
         error-intrinsics,
-        functions,
         iterator-protocol,
         object-properties,
         symbols,
@@ -171750,7 +171648,6 @@ tests:
         control-flow,
         destructuring-bindings,
         expression-operators,
-        functions,
         iterator-protocol,
         object-properties,
         symbols,
@@ -171763,7 +171660,6 @@ tests:
         control-flow,
         destructuring-bindings,
         expression-operators,
-        functions,
         iterator-protocol,
         object-properties,
         symbols,
@@ -171790,7 +171686,6 @@ tests:
         control-flow,
         destructuring-bindings,
         expression-operators,
-        functions,
         iterator-protocol,
         object-properties,
         symbols,
@@ -171803,7 +171698,6 @@ tests:
         control-flow,
         destructuring-bindings,
         expression-operators,
-        functions,
         iterator-protocol,
         object-properties,
         symbols,
@@ -171860,7 +171754,6 @@ tests:
         control-flow,
         destructuring-bindings,
         expression-operators,
-        functions,
         iterator-protocol,
         object-properties,
         symbols,
@@ -171917,7 +171810,6 @@ tests:
         control-flow,
         destructuring-bindings,
         error-intrinsics,
-        functions,
         var-bindings,
       ]
   - path: test/language/statements/for/dstr/var-obj-init-undefined.js
@@ -171928,7 +171820,6 @@ tests:
         control-flow,
         destructuring-bindings,
         error-intrinsics,
-        functions,
         var-bindings,
       ]
   - path: test/language/statements/for/dstr/var-obj-ptrn-empty.js
@@ -172024,7 +171915,6 @@ tests:
         control-flow,
         destructuring-bindings,
         expression-operators,
-        functions,
         object-literals,
         object-properties,
         var-bindings,
@@ -172049,7 +171939,6 @@ tests:
         control-flow,
         destructuring-bindings,
         error-intrinsics,
-        functions,
         object-literals,
         object-properties,
         var-bindings,
@@ -172085,7 +171974,6 @@ tests:
         destructuring-bindings,
         error-intrinsics,
         expression-operators,
-        functions,
         iterator-protocol,
         object-literals,
         object-properties,
@@ -172113,7 +172001,6 @@ tests:
         control-flow,
         destructuring-bindings,
         error-intrinsics,
-        functions,
         iterator-protocol,
         object-literals,
         object-properties,
@@ -172128,7 +172015,6 @@ tests:
         destructuring-bindings,
         error-intrinsics,
         expression-operators,
-        functions,
         iterator-protocol,
         object-literals,
         object-properties,
@@ -172167,7 +172053,6 @@ tests:
         destructuring-bindings,
         error-intrinsics,
         expression-operators,
-        functions,
         object-literals,
         object-properties,
         var-bindings,
@@ -172192,7 +172077,6 @@ tests:
         control-flow,
         destructuring-bindings,
         error-intrinsics,
-        functions,
         object-literals,
         object-properties,
         var-bindings,
@@ -172206,7 +172090,6 @@ tests:
         destructuring-bindings,
         error-intrinsics,
         expression-operators,
-        functions,
         object-literals,
         object-properties,
         var-bindings,
@@ -172220,7 +172103,6 @@ tests:
         destructuring-bindings,
         error-intrinsics,
         expression-operators,
-        functions,
         object-literals,
         object-properties,
         var-bindings,
@@ -172234,7 +172116,6 @@ tests:
         destructuring-bindings,
         error-intrinsics,
         expression-operators,
-        functions,
         object-literals,
         object-properties,
         var-bindings,
@@ -172248,7 +172129,6 @@ tests:
         destructuring-bindings,
         error-intrinsics,
         expression-operators,
-        functions,
         object-literals,
         object-properties,
         var-bindings,
@@ -172261,7 +172141,6 @@ tests:
         control-flow,
         destructuring-bindings,
         error-intrinsics,
-        functions,
         object-literals,
         object-properties,
         var-bindings,
@@ -172274,7 +172153,6 @@ tests:
         control-flow,
         destructuring-bindings,
         error-intrinsics,
-        functions,
         object-literals,
         object-properties,
         var-bindings,
@@ -172288,7 +172166,6 @@ tests:
         destructuring-bindings,
         error-intrinsics,
         expression-operators,
-        functions,
         object-literals,
         object-properties,
         var-bindings,
@@ -172535,8 +172412,7 @@ tests:
       ]
   - path: test/language/statements/function/13.0_4-17gs.js
     expectedClassification: unsupported-profile-feature
-    dependencies:
-      [dynamic-source, expression-operators, functions, var-bindings]
+    dependencies: [dynamic-source, expression-operators, functions]
   - path: test/language/statements/function/13.0_4-5gs.js
     expectedClassification: expected-negative
     dependencies: [functions]
@@ -172720,6 +172596,7 @@ tests:
         functions,
         object-literals,
         object-properties,
+        symbols,
         var-bindings,
       ]
   - path: test/language/statements/function/13.2-18-s.js
@@ -172779,13 +172656,7 @@ tests:
   - path: test/language/statements/function/13.2-21-s.js
     expectedClassification: pass
     dependencies:
-      [
-        abrupt-completion,
-        error-intrinsics,
-        functions,
-        object-properties,
-        var-bindings,
-      ]
+      [abrupt-completion, error-intrinsics, functions, object-properties]
   - path: test/language/statements/function/13.2-22-s.js
     expectedClassification: pass
     dependencies:
@@ -172812,13 +172683,7 @@ tests:
   - path: test/language/statements/function/13.2-25-s.js
     expectedClassification: pass
     dependencies:
-      [
-        abrupt-completion,
-        error-intrinsics,
-        functions,
-        object-properties,
-        var-bindings,
-      ]
+      [abrupt-completion, error-intrinsics, functions, object-properties]
   - path: test/language/statements/function/13.2-26-s.js
     expectedClassification: pass
     dependencies:
@@ -173029,16 +172894,16 @@ tests:
     dependencies: [abrupt-completion, functions, var-bindings]
   - path: test/language/statements/function/S13.2.1_A9.1_T1.js
     expectedClassification: pass
-    dependencies: [expression-operators, functions, var-bindings]
+    dependencies: [functions]
   - path: test/language/statements/function/S13.2.1_A9.1_T2.js
     expectedClassification: pass
-    dependencies: [expression-operators, functions, var-bindings]
+    dependencies: [functions, var-bindings]
   - path: test/language/statements/function/S13.2.1_A9_T1.js
     expectedClassification: pass
-    dependencies: [expression-operators, functions, var-bindings]
+    dependencies: [functions]
   - path: test/language/statements/function/S13.2.1_A9_T2.js
     expectedClassification: pass
-    dependencies: [expression-operators, functions, var-bindings]
+    dependencies: [functions, var-bindings]
   - path: test/language/statements/function/S13.2.2_A10.js
     expectedClassification: pass
     dependencies:
@@ -173052,7 +172917,6 @@ tests:
         expression-operators,
         functions,
         object-properties,
-        var-bindings,
       ]
   - path: test/language/statements/function/S13.2.2_A12.js
     expectedClassification: pass
@@ -173068,18 +172932,11 @@ tests:
         expression-operators,
         functions,
         object-properties,
-        var-bindings,
       ]
   - path: test/language/statements/function/S13.2.2_A14.js
     expectedClassification: unsupported-profile-feature
     dependencies:
-      [
-        dynamic-source,
-        expression-operators,
-        functions,
-        object-properties,
-        var-bindings,
-      ]
+      [dynamic-source, expression-operators, functions, object-properties]
   - path: test/language/statements/function/S13.2.2_A15_T1.js
     expectedClassification: pass
     dependencies:
@@ -173385,26 +173242,22 @@ tests:
         expression-operators,
         functions,
         object-properties,
-        var-bindings,
       ]
   - path: test/language/statements/function/S13.2_A1_T1.js
     expectedClassification: pass
-    dependencies: [expression-operators, functions, object-properties]
+    dependencies: [functions, object-properties]
   - path: test/language/statements/function/S13.2_A1_T2.js
     expectedClassification: pass
-    dependencies:
-      [expression-operators, functions, object-properties, var-bindings]
+    dependencies: [functions, object-properties, var-bindings]
   - path: test/language/statements/function/S13.2_A2_T1.js
     expectedClassification: pass
-    dependencies:
-      [expression-operators, functions, object-properties, var-bindings]
+    dependencies: [functions, object-properties, var-bindings]
   - path: test/language/statements/function/S13.2_A2_T2.js
     expectedClassification: pass
-    dependencies:
-      [expression-operators, functions, object-properties, var-bindings]
+    dependencies: [functions, object-properties, var-bindings]
   - path: test/language/statements/function/S13.2_A3.js
     expectedClassification: pass
-    dependencies: [expression-operators, functions, object-properties]
+    dependencies: [functions, object-properties]
   - path: test/language/statements/function/S13.2_A4_T1.js
     expectedClassification: pass
     dependencies:
@@ -173414,7 +173267,6 @@ tests:
         functions,
         object-properties,
         property-enumeration,
-        var-bindings,
       ]
   - path: test/language/statements/function/S13.2_A4_T2.js
     expectedClassification: pass
@@ -173429,8 +173281,7 @@ tests:
       ]
   - path: test/language/statements/function/S13.2_A5.js
     expectedClassification: pass
-    dependencies:
-      [expression-operators, functions, object-properties, var-bindings]
+    dependencies: [functions, object-properties, var-bindings]
   - path: test/language/statements/function/S13.2_A6_T1.js
     expectedClassification: pass
     dependencies: [functions]
@@ -173509,7 +173360,7 @@ tests:
       [dynamic-source, expression-operators, functions, lexical-grammar]
   - path: test/language/statements/function/S13_A15_T1.js
     expectedClassification: pass
-    dependencies: [expression-operators, functions]
+    dependencies: [functions]
   - path: test/language/statements/function/S13_A15_T2.js
     expectedClassification: pass
     dependencies: [expression-operators, functions, var-bindings]
@@ -173544,8 +173395,7 @@ tests:
       ]
   - path: test/language/statements/function/S13_A18.js
     expectedClassification: pass
-    dependencies:
-      [expression-operators, functions, object-properties, var-bindings]
+    dependencies: [expression-operators, functions, object-properties]
   - path: test/language/statements/function/S13_A19_T1.js
     expectedClassification: pass
     dependencies: [expression-operators, functions, var-bindings]
@@ -173587,7 +173437,7 @@ tests:
       [expression-operators, functions, object-literals, object-properties]
   - path: test/language/statements/function/S13_A6_T1.js
     expectedClassification: pass
-    dependencies: [expression-operators, functions, var-bindings]
+    dependencies: [functions, var-bindings]
   - path: test/language/statements/function/S13_A6_T2.js
     expectedClassification: pass
     dependencies: [expression-operators, functions, var-bindings]
@@ -173599,10 +173449,10 @@ tests:
     dependencies: [functions]
   - path: test/language/statements/function/S13_A8_T1.js
     expectedClassification: pass
-    dependencies: [expression-operators, functions, object-properties]
+    dependencies: [functions, object-properties]
   - path: test/language/statements/function/S13_A8_T2.js
     expectedClassification: pass
-    dependencies: [expression-operators, functions, object-properties]
+    dependencies: [functions, object-properties]
   - path: test/language/statements/function/S13_A9.js
     expectedClassification: pass
     dependencies: [expression-operators, functions]
@@ -173614,10 +173464,10 @@ tests:
     dependencies: [expression-operators, functions]
   - path: test/language/statements/function/S14_A5_T1.js
     expectedClassification: pass
-    dependencies: [expression-operators, functions, lexical-grammar]
+    dependencies: [functions, lexical-grammar]
   - path: test/language/statements/function/S14_A5_T2.js
     expectedClassification: pass
-    dependencies: [expression-operators, functions, lexical-grammar]
+    dependencies: [functions, lexical-grammar]
   - path: test/language/statements/function/arguments-with-arguments-fn.js
     expectedClassification: pass
     dependencies: [functions, object-properties]
@@ -173789,7 +173639,6 @@ tests:
         destructuring-bindings,
         expression-operators,
         functions,
-        generators,
         iterator-protocol,
         object-properties,
         symbols,
@@ -174476,7 +174325,6 @@ tests:
         destructuring-bindings,
         expression-operators,
         functions,
-        generators,
         iterator-protocol,
         object-properties,
         symbols,
@@ -179182,7 +179030,13 @@ tests:
   - path: test/language/statements/if/S12.5_A5.js
     expectedClassification: pass
     dependencies:
-      [abrupt-completion, control-flow, expression-operators, functions]
+      [
+        abrupt-completion,
+        control-flow,
+        error-intrinsics,
+        expression-operators,
+        functions,
+      ]
   - path: test/language/statements/if/S12.5_A6_T1.js
     expectedClassification: expected-negative
     dependencies: [control-flow]
@@ -179433,18 +179287,10 @@ tests:
       ]
   - path: test/language/statements/let/block-local-use-before-initialization-in-declaration-statement.js
     expectedClassification: pass
-    dependencies:
-      [
-        abrupt-completion,
-        error-intrinsics,
-        expression-operators,
-        functions,
-        lexical-bindings,
-      ]
+    dependencies: [abrupt-completion, error-intrinsics, lexical-bindings]
   - path: test/language/statements/let/block-local-use-before-initialization-in-prior-statement.js
     expectedClassification: pass
-    dependencies:
-      [abrupt-completion, error-intrinsics, functions, lexical-bindings]
+    dependencies: [abrupt-completion, error-intrinsics, lexical-bindings]
   - path: test/language/statements/let/cptn-value.js
     expectedClassification: unsupported-profile-feature
     dependencies: [dynamic-source, functions, lexical-bindings]
@@ -179470,7 +179316,6 @@ tests:
         destructuring-bindings,
         error-intrinsics,
         expression-operators,
-        functions,
         iterator-protocol,
         lexical-bindings,
         object-properties,
@@ -179540,8 +179385,6 @@ tests:
     dependencies:
       [
         destructuring-bindings,
-        functions,
-        generators,
         iterator-protocol,
         lexical-bindings,
         object-properties,
@@ -179567,7 +179410,6 @@ tests:
     dependencies:
       [
         destructuring-bindings,
-        functions,
         iterator-protocol,
         lexical-bindings,
         object-properties,
@@ -179579,7 +179421,6 @@ tests:
     dependencies:
       [
         destructuring-bindings,
-        functions,
         iterator-protocol,
         lexical-bindings,
         object-properties,
@@ -179591,7 +179432,6 @@ tests:
     dependencies:
       [
         destructuring-bindings,
-        functions,
         iterator-protocol,
         lexical-bindings,
         object-properties,
@@ -179605,7 +179445,6 @@ tests:
         abrupt-completion,
         destructuring-bindings,
         error-intrinsics,
-        functions,
         iterator-protocol,
         lexical-bindings,
         object-properties,
@@ -179673,7 +179512,6 @@ tests:
     dependencies:
       [
         destructuring-bindings,
-        functions,
         iterator-protocol,
         lexical-bindings,
         object-properties,
@@ -179702,7 +179540,6 @@ tests:
         abrupt-completion,
         destructuring-bindings,
         error-intrinsics,
-        functions,
         iterator-protocol,
         lexical-bindings,
         object-properties,
@@ -179804,7 +179641,6 @@ tests:
         abrupt-completion,
         destructuring-bindings,
         error-intrinsics,
-        functions,
         iterator-protocol,
         lexical-bindings,
         object-literals,
@@ -179818,7 +179654,6 @@ tests:
         abrupt-completion,
         destructuring-bindings,
         error-intrinsics,
-        functions,
         iterator-protocol,
         lexical-bindings,
         object-literals,
@@ -179832,7 +179667,6 @@ tests:
         abrupt-completion,
         destructuring-bindings,
         error-intrinsics,
-        functions,
         iterator-protocol,
         lexical-bindings,
         object-properties,
@@ -179845,7 +179679,6 @@ tests:
         abrupt-completion,
         destructuring-bindings,
         error-intrinsics,
-        functions,
         iterator-protocol,
         lexical-bindings,
         object-properties,
@@ -179941,7 +179774,6 @@ tests:
     dependencies:
       [
         destructuring-bindings,
-        functions,
         iterator-protocol,
         lexical-bindings,
         object-properties,
@@ -179953,7 +179785,6 @@ tests:
     dependencies:
       [
         destructuring-bindings,
-        functions,
         iterator-protocol,
         lexical-bindings,
         object-properties,
@@ -179978,7 +179809,6 @@ tests:
     dependencies:
       [
         destructuring-bindings,
-        functions,
         iterator-protocol,
         lexical-bindings,
         object-properties,
@@ -179990,7 +179820,6 @@ tests:
     dependencies:
       [
         destructuring-bindings,
-        functions,
         iterator-protocol,
         lexical-bindings,
         object-properties,
@@ -180031,7 +179860,6 @@ tests:
     dependencies:
       [
         destructuring-bindings,
-        functions,
         iterator-protocol,
         lexical-bindings,
         object-properties,
@@ -180156,7 +179984,6 @@ tests:
     dependencies:
       [
         destructuring-bindings,
-        functions,
         lexical-bindings,
         object-literals,
         object-properties,
@@ -180180,7 +180007,6 @@ tests:
         abrupt-completion,
         destructuring-bindings,
         error-intrinsics,
-        functions,
         lexical-bindings,
         object-literals,
         object-properties,
@@ -180207,7 +180033,6 @@ tests:
         abrupt-completion,
         destructuring-bindings,
         error-intrinsics,
-        functions,
         iterator-protocol,
         lexical-bindings,
         object-literals,
@@ -180232,7 +180057,6 @@ tests:
         abrupt-completion,
         destructuring-bindings,
         error-intrinsics,
-        functions,
         iterator-protocol,
         lexical-bindings,
         object-literals,
@@ -180245,7 +180069,6 @@ tests:
         abrupt-completion,
         destructuring-bindings,
         error-intrinsics,
-        functions,
         iterator-protocol,
         lexical-bindings,
         object-literals,
@@ -180281,7 +180104,6 @@ tests:
         abrupt-completion,
         destructuring-bindings,
         error-intrinsics,
-        functions,
         lexical-bindings,
         object-literals,
         object-properties,
@@ -180305,7 +180127,6 @@ tests:
         abrupt-completion,
         destructuring-bindings,
         error-intrinsics,
-        functions,
         lexical-bindings,
         object-literals,
         object-properties,
@@ -180317,7 +180138,6 @@ tests:
         abrupt-completion,
         destructuring-bindings,
         error-intrinsics,
-        functions,
         lexical-bindings,
         object-literals,
         object-properties,
@@ -180329,7 +180149,6 @@ tests:
         abrupt-completion,
         destructuring-bindings,
         error-intrinsics,
-        functions,
         lexical-bindings,
         object-literals,
         object-properties,
@@ -180341,7 +180160,6 @@ tests:
         abrupt-completion,
         destructuring-bindings,
         error-intrinsics,
-        functions,
         lexical-bindings,
         object-literals,
         object-properties,
@@ -180353,7 +180171,6 @@ tests:
         abrupt-completion,
         destructuring-bindings,
         error-intrinsics,
-        functions,
         lexical-bindings,
         object-literals,
         object-properties,
@@ -180365,7 +180182,6 @@ tests:
         abrupt-completion,
         destructuring-bindings,
         error-intrinsics,
-        functions,
         lexical-bindings,
         object-literals,
         object-properties,
@@ -180377,7 +180193,6 @@ tests:
         abrupt-completion,
         destructuring-bindings,
         error-intrinsics,
-        functions,
         lexical-bindings,
         object-literals,
         object-properties,
@@ -180389,7 +180204,6 @@ tests:
         abrupt-completion,
         destructuring-bindings,
         error-intrinsics,
-        functions,
         lexical-bindings,
         object-literals,
         object-properties,
@@ -180426,14 +180240,7 @@ tests:
     dependencies: [functions, lexical-bindings]
   - path: test/language/statements/let/fn-name-gen.js
     expectedClassification: pass
-    dependencies:
-      [
-        expression-operators,
-        functions,
-        generators,
-        lexical-bindings,
-        object-properties,
-      ]
+    dependencies: [functions, generators, lexical-bindings, object-properties]
   - path: test/language/statements/let/function-local-closure-get-before-initialization.js
     expectedClassification: pass
     dependencies:
@@ -180457,13 +180264,7 @@ tests:
   - path: test/language/statements/let/function-local-use-before-initialization-in-declaration-statement.js
     expectedClassification: pass
     dependencies:
-      [
-        abrupt-completion,
-        error-intrinsics,
-        expression-operators,
-        functions,
-        lexical-bindings,
-      ]
+      [abrupt-completion, error-intrinsics, functions, lexical-bindings]
   - path: test/language/statements/let/function-local-use-before-initialization-in-prior-statement.js
     expectedClassification: pass
     dependencies:
@@ -180731,6 +180532,7 @@ tests:
         control-flow,
         expression-operators,
         functions,
+        symbols,
         var-bindings,
       ]
   - path: test/language/statements/switch/S12.11_A2_T1.js
@@ -181281,7 +181083,7 @@ tests:
       ]
   - path: test/language/statements/try/S12.14_A1.js
     expectedClassification: pass
-    dependencies: [control-flow, expression-operators, var-bindings]
+    dependencies: [control-flow]
   - path: test/language/statements/try/S12.14_A10_T1.js
     expectedClassification: pass
     dependencies:
@@ -181373,7 +181175,6 @@ tests:
         abrupt-completion,
         control-flow,
         error-intrinsics,
-        expression-operators,
         functions,
         var-bindings,
       ]
@@ -181384,7 +181185,6 @@ tests:
         abrupt-completion,
         control-flow,
         error-intrinsics,
-        expression-operators,
         functions,
         var-bindings,
       ]
@@ -181395,7 +181195,6 @@ tests:
         abrupt-completion,
         control-flow,
         error-intrinsics,
-        expression-operators,
         functions,
         var-bindings,
       ]
@@ -181527,7 +181326,6 @@ tests:
         error-intrinsics,
         functions,
         object-properties,
-        var-bindings,
       ]
   - path: test/language/statements/try/S12.14_A19_T2.js
     expectedClassification: pass
@@ -181536,15 +181334,12 @@ tests:
         abrupt-completion,
         control-flow,
         error-intrinsics,
-        expression-operators,
         functions,
         object-properties,
-        var-bindings,
       ]
   - path: test/language/statements/try/S12.14_A2.js
     expectedClassification: pass
-    dependencies:
-      [abrupt-completion, control-flow, expression-operators, var-bindings]
+    dependencies: [abrupt-completion, control-flow]
   - path: test/language/statements/try/S12.14_A3.js
     expectedClassification: pass
     dependencies:
@@ -181557,7 +181352,8 @@ tests:
       ]
   - path: test/language/statements/try/S12.14_A4.js
     expectedClassification: pass
-    dependencies: [abrupt-completion, control-flow, expression-operators]
+    dependencies:
+      [abrupt-completion, control-flow, error-intrinsics, expression-operators]
   - path: test/language/statements/try/S12.14_A5.js
     expectedClassification: pass
     dependencies:
@@ -181793,7 +181589,6 @@ tests:
         destructuring-bindings,
         error-intrinsics,
         expression-operators,
-        functions,
         iterator-protocol,
         object-properties,
         symbols,
@@ -181865,8 +181660,6 @@ tests:
         abrupt-completion,
         control-flow,
         destructuring-bindings,
-        functions,
-        generators,
         iterator-protocol,
         symbols,
         var-bindings,
@@ -181892,7 +181685,6 @@ tests:
         abrupt-completion,
         control-flow,
         destructuring-bindings,
-        functions,
         iterator-protocol,
         symbols,
         var-bindings,
@@ -181904,7 +181696,6 @@ tests:
         abrupt-completion,
         control-flow,
         destructuring-bindings,
-        functions,
         iterator-protocol,
         object-properties,
         symbols,
@@ -181917,7 +181708,6 @@ tests:
         abrupt-completion,
         control-flow,
         destructuring-bindings,
-        functions,
         iterator-protocol,
         object-properties,
         symbols,
@@ -181931,7 +181721,6 @@ tests:
         control-flow,
         destructuring-bindings,
         error-intrinsics,
-        functions,
         iterator-protocol,
         symbols,
       ]
@@ -182003,7 +181792,6 @@ tests:
         abrupt-completion,
         control-flow,
         destructuring-bindings,
-        functions,
         iterator-protocol,
         symbols,
         var-bindings,
@@ -182030,7 +181818,6 @@ tests:
         control-flow,
         destructuring-bindings,
         error-intrinsics,
-        functions,
         iterator-protocol,
         symbols,
       ]
@@ -182133,7 +181920,6 @@ tests:
         control-flow,
         destructuring-bindings,
         error-intrinsics,
-        functions,
         iterator-protocol,
         object-literals,
         object-properties,
@@ -182147,7 +181933,6 @@ tests:
         control-flow,
         destructuring-bindings,
         error-intrinsics,
-        functions,
         iterator-protocol,
         object-literals,
         object-properties,
@@ -182161,7 +181946,6 @@ tests:
         control-flow,
         destructuring-bindings,
         error-intrinsics,
-        functions,
         iterator-protocol,
         object-properties,
         symbols,
@@ -182174,7 +181958,6 @@ tests:
         control-flow,
         destructuring-bindings,
         error-intrinsics,
-        functions,
         iterator-protocol,
         object-properties,
         symbols,
@@ -182274,7 +182057,6 @@ tests:
         abrupt-completion,
         control-flow,
         destructuring-bindings,
-        functions,
         iterator-protocol,
         object-properties,
         symbols,
@@ -182287,9 +182069,7 @@ tests:
         abrupt-completion,
         control-flow,
         destructuring-bindings,
-        functions,
         iterator-protocol,
-        object-properties,
         symbols,
       ]
   - path: test/language/statements/try/dstr/ary-ptrn-rest-id-elision-next-err.js
@@ -182312,7 +182092,6 @@ tests:
         abrupt-completion,
         control-flow,
         destructuring-bindings,
-        functions,
         iterator-protocol,
         object-properties,
         symbols,
@@ -182325,7 +182104,6 @@ tests:
         abrupt-completion,
         control-flow,
         destructuring-bindings,
-        functions,
         iterator-protocol,
         object-properties,
         symbols,
@@ -182367,7 +182145,6 @@ tests:
         abrupt-completion,
         control-flow,
         destructuring-bindings,
-        functions,
         iterator-protocol,
         object-properties,
         symbols,
@@ -182499,7 +182276,6 @@ tests:
         abrupt-completion,
         control-flow,
         destructuring-bindings,
-        functions,
         object-literals,
         object-properties,
         var-bindings,
@@ -182523,7 +182299,6 @@ tests:
         control-flow,
         destructuring-bindings,
         error-intrinsics,
-        functions,
         object-literals,
         object-properties,
       ]
@@ -182550,7 +182325,6 @@ tests:
         control-flow,
         destructuring-bindings,
         error-intrinsics,
-        functions,
         iterator-protocol,
         object-literals,
         object-properties,
@@ -182576,7 +182350,6 @@ tests:
         control-flow,
         destructuring-bindings,
         error-intrinsics,
-        functions,
         iterator-protocol,
         object-literals,
         object-properties,
@@ -182589,7 +182362,6 @@ tests:
         control-flow,
         destructuring-bindings,
         error-intrinsics,
-        functions,
         iterator-protocol,
         object-literals,
         object-properties,
@@ -182625,7 +182397,6 @@ tests:
         control-flow,
         destructuring-bindings,
         error-intrinsics,
-        functions,
         object-literals,
         object-properties,
         var-bindings,
@@ -182649,7 +182420,6 @@ tests:
         control-flow,
         destructuring-bindings,
         error-intrinsics,
-        functions,
         object-literals,
         object-properties,
       ]
@@ -182661,7 +182431,6 @@ tests:
         control-flow,
         destructuring-bindings,
         error-intrinsics,
-        functions,
         object-literals,
         object-properties,
       ]
@@ -182673,7 +182442,6 @@ tests:
         control-flow,
         destructuring-bindings,
         error-intrinsics,
-        functions,
         object-literals,
         object-properties,
       ]
@@ -182685,7 +182453,6 @@ tests:
         control-flow,
         destructuring-bindings,
         error-intrinsics,
-        functions,
         object-literals,
         object-properties,
       ]
@@ -182697,7 +182464,6 @@ tests:
         control-flow,
         destructuring-bindings,
         error-intrinsics,
-        functions,
         object-literals,
         object-properties,
       ]
@@ -182709,7 +182475,6 @@ tests:
         control-flow,
         destructuring-bindings,
         error-intrinsics,
-        functions,
         object-literals,
         object-properties,
       ]
@@ -182721,7 +182486,6 @@ tests:
         control-flow,
         destructuring-bindings,
         error-intrinsics,
-        functions,
         object-literals,
         object-properties,
       ]
@@ -182733,7 +182497,6 @@ tests:
         control-flow,
         destructuring-bindings,
         error-intrinsics,
-        functions,
         object-literals,
         object-properties,
       ]
@@ -182975,13 +182738,7 @@ tests:
   - path: test/language/statements/variable/S12.2_A1.js
     expectedClassification: pass
     dependencies:
-      [
-        abrupt-completion,
-        error-intrinsics,
-        expression-operators,
-        functions,
-        var-bindings,
-      ]
+      [abrupt-completion, error-intrinsics, expression-operators, var-bindings]
   - path: test/language/statements/variable/S12.2_A10.js
     expectedClassification: pass
     dependencies: [control-flow, expression-operators, var-bindings]
@@ -183050,7 +182807,7 @@ tests:
       [control-flow, expression-operators, property-enumeration, var-bindings]
   - path: test/language/statements/variable/S14_A1.js
     expectedClassification: pass
-    dependencies: [control-flow, expression-operators, functions, var-bindings]
+    dependencies: [control-flow, functions, var-bindings]
   - path: test/language/statements/variable/arguments-fn-non-strict.js
     expectedClassification: pass
     dependencies: [functions, object-properties, var-bindings]
@@ -183145,7 +182902,6 @@ tests:
         destructuring-bindings,
         error-intrinsics,
         expression-operators,
-        functions,
         iterator-protocol,
         object-properties,
         symbols,
@@ -183212,8 +182968,6 @@ tests:
     dependencies:
       [
         destructuring-bindings,
-        functions,
-        generators,
         iterator-protocol,
         object-properties,
         symbols,
@@ -183237,7 +182991,6 @@ tests:
     dependencies:
       [
         destructuring-bindings,
-        functions,
         iterator-protocol,
         object-properties,
         symbols,
@@ -183248,7 +183001,6 @@ tests:
     dependencies:
       [
         destructuring-bindings,
-        functions,
         iterator-protocol,
         object-properties,
         symbols,
@@ -183259,7 +183011,6 @@ tests:
     dependencies:
       [
         destructuring-bindings,
-        functions,
         iterator-protocol,
         object-properties,
         symbols,
@@ -183272,7 +183023,6 @@ tests:
         abrupt-completion,
         destructuring-bindings,
         error-intrinsics,
-        functions,
         iterator-protocol,
         object-properties,
         symbols,
@@ -183340,7 +183090,6 @@ tests:
     dependencies:
       [
         destructuring-bindings,
-        functions,
         iterator-protocol,
         object-properties,
         symbols,
@@ -183368,7 +183117,6 @@ tests:
         abrupt-completion,
         destructuring-bindings,
         error-intrinsics,
-        functions,
         iterator-protocol,
         object-properties,
         symbols,
@@ -183474,7 +183222,6 @@ tests:
         abrupt-completion,
         destructuring-bindings,
         error-intrinsics,
-        functions,
         iterator-protocol,
         object-literals,
         object-properties,
@@ -183488,7 +183235,6 @@ tests:
         abrupt-completion,
         destructuring-bindings,
         error-intrinsics,
-        functions,
         iterator-protocol,
         object-literals,
         object-properties,
@@ -183502,7 +183248,6 @@ tests:
         abrupt-completion,
         destructuring-bindings,
         error-intrinsics,
-        functions,
         iterator-protocol,
         object-properties,
         symbols,
@@ -183515,7 +183260,6 @@ tests:
         abrupt-completion,
         destructuring-bindings,
         error-intrinsics,
-        functions,
         iterator-protocol,
         object-properties,
         symbols,
@@ -183605,7 +183349,6 @@ tests:
     dependencies:
       [
         destructuring-bindings,
-        functions,
         iterator-protocol,
         object-properties,
         symbols,
@@ -183616,7 +183359,6 @@ tests:
     dependencies:
       [
         destructuring-bindings,
-        functions,
         iterator-protocol,
         object-properties,
         symbols,
@@ -183640,7 +183382,6 @@ tests:
     dependencies:
       [
         destructuring-bindings,
-        functions,
         iterator-protocol,
         object-properties,
         symbols,
@@ -183651,7 +183392,6 @@ tests:
     dependencies:
       [
         destructuring-bindings,
-        functions,
         iterator-protocol,
         object-properties,
         symbols,
@@ -183690,7 +183430,6 @@ tests:
     dependencies:
       [
         destructuring-bindings,
-        functions,
         iterator-protocol,
         object-properties,
         symbols,
@@ -183817,13 +183556,7 @@ tests:
   - path: test/language/statements/variable/dstr/obj-ptrn-id-init-skipped.js
     expectedClassification: pass
     dependencies:
-      [
-        destructuring-bindings,
-        functions,
-        object-literals,
-        object-properties,
-        var-bindings,
-      ]
+      [destructuring-bindings, object-literals, object-properties, var-bindings]
   - path: test/language/statements/variable/dstr/obj-ptrn-id-init-throws.js
     expectedClassification: pass
     dependencies:
@@ -183842,7 +183575,6 @@ tests:
         abrupt-completion,
         destructuring-bindings,
         error-intrinsics,
-        functions,
         object-literals,
         object-properties,
         var-bindings,
@@ -183868,7 +183600,6 @@ tests:
         abrupt-completion,
         destructuring-bindings,
         error-intrinsics,
-        functions,
         iterator-protocol,
         object-literals,
         object-properties,
@@ -183893,7 +183624,6 @@ tests:
         abrupt-completion,
         destructuring-bindings,
         error-intrinsics,
-        functions,
         iterator-protocol,
         object-literals,
         object-properties,
@@ -183906,7 +183636,6 @@ tests:
         abrupt-completion,
         destructuring-bindings,
         error-intrinsics,
-        functions,
         iterator-protocol,
         object-literals,
         object-properties,
@@ -183941,7 +183670,6 @@ tests:
         abrupt-completion,
         destructuring-bindings,
         error-intrinsics,
-        functions,
         object-literals,
         object-properties,
         var-bindings,
@@ -183964,7 +183692,6 @@ tests:
         abrupt-completion,
         destructuring-bindings,
         error-intrinsics,
-        functions,
         object-literals,
         object-properties,
         var-bindings,
@@ -183976,7 +183703,6 @@ tests:
         abrupt-completion,
         destructuring-bindings,
         error-intrinsics,
-        functions,
         object-literals,
         object-properties,
         var-bindings,
@@ -183988,7 +183714,6 @@ tests:
         abrupt-completion,
         destructuring-bindings,
         error-intrinsics,
-        functions,
         object-literals,
         object-properties,
         var-bindings,
@@ -184000,7 +183725,6 @@ tests:
         abrupt-completion,
         destructuring-bindings,
         error-intrinsics,
-        functions,
         object-literals,
         object-properties,
         var-bindings,
@@ -184012,7 +183736,6 @@ tests:
         abrupt-completion,
         destructuring-bindings,
         error-intrinsics,
-        functions,
         object-literals,
         object-properties,
         var-bindings,
@@ -184024,7 +183747,6 @@ tests:
         abrupt-completion,
         destructuring-bindings,
         error-intrinsics,
-        functions,
         object-literals,
         object-properties,
         var-bindings,
@@ -184036,7 +183758,6 @@ tests:
         abrupt-completion,
         destructuring-bindings,
         error-intrinsics,
-        functions,
         object-literals,
         object-properties,
         var-bindings,
@@ -184048,7 +183769,6 @@ tests:
         abrupt-completion,
         destructuring-bindings,
         error-intrinsics,
-        functions,
         object-literals,
         object-properties,
         var-bindings,
@@ -184112,18 +183832,10 @@ tests:
       [expression-operators, functions, object-properties, var-bindings]
   - path: test/language/statements/variable/fn-name-fn.js
     expectedClassification: pass
-    dependencies:
-      [expression-operators, functions, object-properties, var-bindings]
+    dependencies: [functions, object-properties, var-bindings]
   - path: test/language/statements/variable/fn-name-gen.js
     expectedClassification: pass
-    dependencies:
-      [
-        expression-operators,
-        functions,
-        generators,
-        object-properties,
-        var-bindings,
-      ]
+    dependencies: [functions, generators, object-properties, var-bindings]
   - path: test/language/statements/variable/id-arguments-strict.js
     expectedClassification: expected-negative
     dependencies: [functions, object-properties, var-bindings]
@@ -184138,14 +183850,13 @@ tests:
     dependencies: [classes, var-bindings]
   - path: test/language/statements/while/S12.6.2_A1.js
     expectedClassification: pass
-    dependencies: [control-flow, expression-operators, var-bindings]
+    dependencies: [control-flow]
   - path: test/language/statements/while/S12.6.2_A10.js
     expectedClassification: pass
-    dependencies: [control-flow, expression-operators, functions, var-bindings]
+    dependencies: [control-flow, expression-operators, functions]
   - path: test/language/statements/while/S12.6.2_A11.js
     expectedClassification: pass
-    dependencies:
-      [control-flow, expression-operators, object-literals, var-bindings]
+    dependencies: [control-flow, object-literals]
   - path: test/language/statements/while/S12.6.2_A14_T1.js
     expectedClassification: pass
     dependencies: [control-flow, functions]
@@ -184171,20 +183882,16 @@ tests:
       ]
   - path: test/language/statements/while/S12.6.2_A4_T1.js
     expectedClassification: pass
-    dependencies:
-      [abrupt-completion, control-flow, expression-operators, var-bindings]
+    dependencies: [abrupt-completion, control-flow, expression-operators]
   - path: test/language/statements/while/S12.6.2_A4_T2.js
     expectedClassification: pass
-    dependencies:
-      [abrupt-completion, control-flow, expression-operators, var-bindings]
+    dependencies: [abrupt-completion, control-flow, expression-operators]
   - path: test/language/statements/while/S12.6.2_A4_T3.js
     expectedClassification: pass
-    dependencies:
-      [abrupt-completion, control-flow, expression-operators, var-bindings]
+    dependencies: [abrupt-completion, control-flow, expression-operators]
   - path: test/language/statements/while/S12.6.2_A4_T4.js
     expectedClassification: pass
-    dependencies:
-      [abrupt-completion, control-flow, expression-operators, var-bindings]
+    dependencies: [abrupt-completion, control-flow, expression-operators]
   - path: test/language/statements/while/S12.6.2_A4_T5.js
     expectedClassification: pass
     dependencies:

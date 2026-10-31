@@ -366,7 +366,6 @@ results:
       - control-flow
       - destructuring-bindings
       - expression-operators
-      - functions
       - iterator-protocol
       - object-properties
       - symbols
@@ -564,7 +563,6 @@ results:
       - abrupt-completion
       - destructuring-bindings
       - error-intrinsics
-      - functions
       - iterator-protocol
       - object-properties
       - symbols

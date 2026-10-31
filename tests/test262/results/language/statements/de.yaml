@@ -364,8 +364,6 @@ results:
     dependencies:
       - abrupt-completion
       - error-intrinsics
-      - expression-operators
-      - functions
       - lexical-bindings
     execution:
       harnessIncludes:
@@ -401,7 +399,6 @@ results:
       - abrupt-completion
       - destructuring-bindings
       - error-intrinsics
-      - functions
       - iterator-protocol
       - lexical-bindings
       - object-properties
@@ -533,7 +530,6 @@ results:
       - control-flow
       - destructuring-bindings
       - error-intrinsics
-      - functions
       - iterator-protocol
       - symbols
     execution:

@@ -265,7 +265,6 @@ results:
       - control-flow
       - destructuring-bindings
       - expression-operators
-      - functions
       - lexical-bindings
       - object-literals
       - object-properties
@@ -433,7 +432,6 @@ results:
     classification: pass
     dependencies:
       - destructuring-bindings
-      - functions
       - iterator-protocol
       - lexical-bindings
       - object-properties

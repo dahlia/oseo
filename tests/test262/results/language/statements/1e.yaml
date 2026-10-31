@@ -265,7 +265,6 @@ results:
       - control-flow
       - destructuring-bindings
       - expression-operators
-      - functions
       - iterator-protocol
       - lexical-bindings
       - object-properties
@@ -306,7 +305,6 @@ results:
       - control-flow
       - destructuring-bindings
       - error-intrinsics
-      - functions
       - lexical-bindings
       - object-literals
       - object-properties

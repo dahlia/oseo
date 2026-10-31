@@ -220,7 +220,6 @@ results:
     classification: pass
     dependencies:
       - control-flow
-      - var-bindings
     execution:
       harnessIncludes:
         - base.js
@@ -312,7 +311,6 @@ results:
     dependencies:
       - abrupt-completion
       - error-intrinsics
-      - expression-operators
       - functions
       - lexical-bindings
     execution:

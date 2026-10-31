@@ -178,7 +178,6 @@ results:
       - abrupt-completion
       - error-intrinsics
       - expression-operators
-      - functions
       - var-bindings
     execution:
       harnessIncludes:

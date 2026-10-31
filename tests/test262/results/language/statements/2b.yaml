@@ -210,9 +210,7 @@ results:
     dependencies:
       - abrupt-completion
       - control-flow
-      - expression-operators
       - functions
-      - var-bindings
     execution:
       harnessIncludes:
         - base.js
@@ -338,7 +336,6 @@ results:
       suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
     classification: pass
     dependencies:
-      - expression-operators
       - functions
       - lexical-grammar
     execution:

@@ -22982,28 +22982,28 @@ summary:
       expectedNegatives: 17
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 1959
+      passes: 1961
       semanticFailures: 0
       unsupportedProfileFeatures: 484
     - dependency: expression-operators
       expectedNegatives: 615
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 6625
+      passes: 6592
       semanticFailures: 0
       unsupportedProfileFeatures: 624
     - dependency: functions
       expectedNegatives: 989
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 12642
+      passes: 12447
       semanticFailures: 0
       unsupportedProfileFeatures: 1330
     - dependency: generators
       expectedNegatives: 325
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 2340
+      passes: 2332
       semanticFailures: 0
       unsupportedProfileFeatures: 169
     - dependency: iterator-protocol
@@ -23066,7 +23066,7 @@ summary:
       expectedNegatives: 602
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 17979
+      passes: 17978
       semanticFailures: 0
       unsupportedProfileFeatures: 827
     - dependency: promise-settlement
@@ -23129,7 +23129,7 @@ summary:
       expectedNegatives: 0
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 3159
+      passes: 3161
       semanticFailures: 0
       unsupportedProfileFeatures: 240
     - dependency: top-level-await
@@ -23192,9 +23192,9 @@ summary:
       expectedNegatives: 220
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 6803
+      passes: 6777
       semanticFailures: 0
-      unsupportedProfileFeatures: 673
+      unsupportedProfileFeatures: 670
     - dependency: weak-collections
       expectedNegatives: 0
       harnessFailures: 0

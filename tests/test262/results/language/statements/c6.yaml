@@ -239,7 +239,6 @@ results:
       - destructuring-bindings
       - error-intrinsics
       - expression-operators
-      - functions
       - lexical-bindings
       - object-literals
       - object-properties
@@ -280,7 +279,6 @@ results:
       - destructuring-bindings
       - error-intrinsics
       - expression-operators
-      - functions
       - lexical-bindings
       - object-literals
       - object-properties

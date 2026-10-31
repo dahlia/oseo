@@ -306,7 +306,6 @@ results:
     classification: pass
     dependencies:
       - destructuring-bindings
-      - functions
       - object-literals
       - object-properties
       - var-bindings
