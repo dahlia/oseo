@@ -164857,6 +164857,9 @@ tests:
   - path: test/language/statements/class/subclass/default-constructor-2.js
     expectedClassification: pass
     dependencies: [classes, functions]
+  - path: test/language/statements/class/subclass/default-constructor-spread-override.js
+    expectedClassification: pass
+    dependencies: [classes, functions, object-properties, symbols]
   - path: test/language/statements/class/subclass/default-constructor.js
     expectedClassification: pass
     dependencies: [classes, functions]

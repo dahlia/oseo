@@ -23467,7 +23467,7 @@ summary:
   expectedNegatives: 3627
   harnessFailures: 0
   infrastructureFailures: 0
-  passes: 29041
+  passes: 29042
   semanticFailures: 0
   unsupportedProfileFeatures: 1684
   dependencies:
@@ -23524,7 +23524,7 @@ summary:
       expectedNegatives: 969
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 4346
+      passes: 4347
       semanticFailures: 0
       unsupportedProfileFeatures: 157
     - dependency: control-flow
@@ -23587,7 +23587,7 @@ summary:
       expectedNegatives: 866
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 12112
+      passes: 12113
       semanticFailures: 0
       unsupportedProfileFeatures: 1342
     - dependency: generators
@@ -23657,7 +23657,7 @@ summary:
       expectedNegatives: 608
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 17489
+      passes: 17490
       semanticFailures: 0
       unsupportedProfileFeatures: 917
     - dependency: promise-settlement
@@ -23720,7 +23720,7 @@ summary:
       expectedNegatives: 0
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 2809
+      passes: 2810
       semanticFailures: 0
       unsupportedProfileFeatures: 272
     - dependency: top-level-await
@@ -24372,7 +24372,7 @@ summary:
       expectedNegatives: 681
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 1659
+      passes: 1660
       semanticFailures: 0
       unsupportedProfileFeatures: 59
     - group: language/types

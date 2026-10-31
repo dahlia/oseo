@@ -541,6 +541,8 @@ export type HirCallTarget =
        * without re-resolving the class.
        */
       readonly kind: "super";
+      /** Forward the incoming list without evaluating a source spread. */
+      readonly forwardArguments?: true;
       readonly thisBinding: HirClassThisBinding;
     }
   | {

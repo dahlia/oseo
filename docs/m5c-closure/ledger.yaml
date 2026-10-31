@@ -5,15 +5,15 @@
 version: 1
 suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
 inventoryPaths: 41091
-closedPaths: 32668
-openPaths: 8423
+closedPaths: 32669
+openPaths: 8422
 states:
   expected-negative: 3627
   harness-failure: 0
   infrastructure-failure: 0
-  pass: 29041
+  pass: 29042
   semantic-failure: 0
-  unreviewed: 6739
+  unreviewed: 6738
   unsupported-profile-feature: 1684
 owners:
   adr:0016-dynamic-source-boundary:
@@ -280,7 +280,7 @@ owners:
     note: Unreviewed paths that docs/m5c-closure/observation-batches.yaml
       selects for observation-batch-23. The batch observes them; no
       classification is assumed before it does.
-    paths: 2
+    paths: 1
   node:observation-batch-24:
     note: Unreviewed paths that docs/m5c-closure/observation-batches.yaml
       selects for observation-batch-24. The batch observes them; no
@@ -335,7 +335,7 @@ owners:
     note: Closed by a reviewed pass or expected negative in the manifest.
       The owner changes only when a regenerated manifest changes the
       state.
-    paths: 32668
+    paths: 32669
 paths:
   test/built-ins/AggregateError/cause-property.js: [pass, observation]
   test/built-ins/AggregateError/errors-iterabletolist-failures.js: [pass, observation]
@@ -36829,7 +36829,7 @@ paths:
   test/language/statements/class/subclass/class-definition-null-proto.js: [pass, observation]
   test/language/statements/class/subclass/class-definition-parent-proto-null.js: [pass, observation]
   test/language/statements/class/subclass/default-constructor-2.js: [pass, observation]
-  test/language/statements/class/subclass/default-constructor-spread-override.js: [unreviewed, node:observation-batch-23]
+  test/language/statements/class/subclass/default-constructor-spread-override.js: [pass, observation]
   test/language/statements/class/subclass/default-constructor.js: [pass, observation]
   test/language/statements/class/subclass/derived-class-return-override-catch-finally-arrow.js: [pass, observation]
   test/language/statements/class/subclass/derived-class-return-override-catch-finally.js: [pass, observation]

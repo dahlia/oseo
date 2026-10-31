@@ -140,6 +140,11 @@ export interface MirOperation {
    * prefix for the accessor closure created by `function-create`.
    */
   readonly accessorKind?: "get" | "set";
+  /**
+   * A default derived super construction forwards the running function's
+   * incoming argument list directly, without reading an iterator.
+   */
+  readonly forwardArguments?: true;
   readonly argumentListId?: number;
   readonly arguments: readonly number[];
   /** The hole an `agent-hole` operation reads. */

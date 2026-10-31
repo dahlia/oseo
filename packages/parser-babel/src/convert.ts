@@ -3779,10 +3779,9 @@ function classElementKey(
 }
 
 /**
- * The implicit derived constructor `constructor(...args) { super(...args); }`.
- * Its rest parameter carries a synthetic name so that no class-body or
- * enclosing binding can capture it, and its `length` is zero, matching a
- * default constructor's own `length`.
+ * The implicit derived constructor forwards its incoming argument list.
+ * Unlike source `super(...args)`, it never consults an Array iterator.
+ * Its `length` is zero and no observable rest Array is created.
  */
 function implicitDerivedConstructor(
   context: ConvertContext,
@@ -3790,21 +3789,14 @@ function implicitDerivedConstructor(
   name: string | undefined,
 ): SyntaxFunction {
   const range = located.range;
-  const restName = syntheticName(context, "implicit-super-arguments");
   return {
     body: [
       {
         expression: {
-          arguments: [
-            {
-              argument: identifierExpression(restName, range),
-              kind: "spread",
-              range,
-            },
-          ],
+          arguments: [],
           kind: "call",
           range,
-          target: { kind: "super", range },
+          target: { forwardArguments: true, kind: "super", range },
         },
         kind: "expression",
         range,
@@ -3814,7 +3806,7 @@ function implicitDerivedConstructor(
     functionLength: 0,
     kind: "function",
     name,
-    parameters: [{ ...syntheticParameter(restName, range), rest: true }],
+    parameters: [],
     range,
     returnHints: [],
     strict: true,

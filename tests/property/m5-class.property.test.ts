@@ -33,7 +33,7 @@ type ClassForm = "anonymous" | "declaration" | "named-expression";
 /**
  * Whether one generated class extends a base class, and whether it
  * declares the derived constructor or takes the implicit
- * `constructor(...args) { super(...args); }`.
+ * constructor's direct argument forwarding.
  */
 type ClassHeritage = "derived" | "derived-implicit" | "none";
 
@@ -1942,6 +1942,111 @@ test(
         profile: "M5 private-name cell lifetime",
         seed: 0x6000_0b03,
         sizeLimit: "two to five class groups and integer values from -20 to 20",
+        timeLimitMilliseconds: 120_000,
+      },
+    );
+  },
+);
+
+/**
+ * Shrinking retains the implicit constructor and poisoned iterator while
+ * reducing the directly generated argument list. No source is filtered.
+ */
+test(
+  "generated default constructors bypass Array iteration",
+  { skip: nativeTarget == null ? "requires a supported native host" : false },
+  async () => {
+    await assertAsyncProperty(
+      "default derived argument forwarding",
+      fc.asyncProperty(
+        fc.array(fc.integer({ min: -20, max: 20 }), { maxLength: 5 }),
+        fc.boolean(),
+        async (values, getter) => {
+          const source = `
+let reads = 0;
+const descriptor = Object.getOwnPropertyDescriptor(
+  Array.prototype, Symbol.iterator,
+);
+Object.defineProperty(Array.prototype, Symbol.iterator, {
+  configurable: true,
+  ${
+    getter
+      ? "get() { reads++; throw 42; }"
+      : "value: function() { reads++; throw 42; }"
+  },
+});
+class Base {
+  constructor() {
+    this.count = arguments.length;
+    this.sum = 0;
+    for (let i = 0; i < arguments.length; i++) {
+      this.sum = this.sum + arguments[i];
+    }
+    this.target = new.target;
+  }
+}
+class Middle extends Base {}
+class Derived extends Middle { field = this.sum; }
+const result = new Derived(${values.join(", ")});
+console.log(result.count, result.sum, result.field);
+console.log(reads, result.target === Derived, Derived.length);
+Object.defineProperty(Array.prototype, Symbol.iterator, descriptor);
+`;
+          const sum = values.reduce((total, value) => total + value, 0);
+          const expectedObservation = {
+            exitStatus: 0,
+            stderr: "",
+            stdout: `${values.length} ${sum} ${sum}\n0 true 0\n`,
+          };
+          assertMatchingObservations([
+            expectedObservation,
+            ...(await references(source)),
+          ]);
+          for (const specialization of ["disabled", "enabled"] as const) {
+            const compiled = compileSource(
+              babelFrontend,
+              {
+                source,
+                sourceId: "generated-default-forwarding.ts",
+              },
+              { observeSpecialization: true, specialization },
+            );
+            assert.deepEqual(compiled.diagnostics, []);
+            assert.ok(compiled.mir != null);
+            process.env.OSEO_GC_EVERY_SAFEPOINT = "1";
+            try {
+              await withNativeFixture(
+                {
+                  backend: cBackend,
+                  host,
+                  input: compiled.mir,
+                  operation: "execute",
+                  runtime: cRuntimeProvider,
+                  target: nativeTarget ?? describeTarget("linux-x86_64-gnu"),
+                  toolchain: nativeToolchain,
+                },
+                (native) => {
+                  assertMatchingObservations([expectedObservation, native]);
+                  assert.ok(native.counters != null);
+                  assert.ok(native.counters.collections > 0);
+                },
+              );
+            } finally {
+              delete process.env.OSEO_GC_EVERY_SAFEPOINT;
+            }
+          }
+        },
+      ),
+      {
+        domain:
+          "zero to five integers forwarded through two implicit derived " +
+          "constructors with a throwing Array iterator getter or method; " +
+          "independent argument-count, sum, field, and new.target model " +
+          "compared with Node, Deno, and both native policies under GC",
+        numRuns: 10,
+        profile: "M5 default derived constructor argument forwarding",
+        seed: 0x6000_0b04,
+        sizeLimit: "five arguments, integers from -20 to 20, two subclasses",
         timeLimitMilliseconds: 120_000,
       },
     );

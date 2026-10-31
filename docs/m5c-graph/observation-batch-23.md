@@ -4,8 +4,8 @@ Observation batch 23: reviewed admission
 Focused executeTest262Case observations on base
 `68b026bb8275b9b7ddd15b9bdd02ef90ef3b123f` cover all 273 selected paths
 exactly once. Results: 218 pass, 33 expected-negative, 20
-unsupported-profile-feature, and 2 semantic failures. Admit 271 paths;
-retain 2 unreviewed originals below.
+unsupported-profile-feature, and 2 semantic failures. That admission
+covered 271 paths and retained two unreviewed originals, tracked below.
 
 The pinned native executor uses target linux-x86\_64-gnu with the stock
 fragment emitter and whole-CLI fallback. Cases ran serially, with one case
@@ -72,17 +72,16 @@ exclusion or equivalent replacement is claimed. ADR 0013, ADR 0016 and
 ADR 0019 remain unchanged.
 
 
-Unreviewed follow-ups
----------------------
+Original follow-ups
+-------------------
 
- -  [*default-constructor-spread-override.js*]:
-    `default-derived-constructor-spread-iterator` remediation; retain batch
-    ownership.
+ -  `default-derived-constructor-spread-iterator` U2 admission now records
+    a fresh pass under Root's D3 direction. The ledger owner is
+    `observation`; Root's bundled Full UPDATE and publication remain.
+    The node work note binds the unchanged source and four variants.
  -  `test/language/statements/class/syntax/escaped-static.js`:
     `class-static-keyword-escape-early-error` remediation; retain batch
     ownership.
-
-[*default-constructor-spread-override.js*]: https://github.com/tc39/test262/blob/f2d1435644797268dca1f7988cad5a4e89ccd8d2/test/language/statements/class/subclass/default-constructor-spread-override.js
 
 
 Scoped UPDATE agreement

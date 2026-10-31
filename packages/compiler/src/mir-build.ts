@@ -5436,7 +5436,12 @@ function lowerExpression(
     };
     detail = expression.target.method;
   } else if (expression.target.kind === "super") {
-    return lowerSuperCall(expression, expression.target.thisBinding, builder);
+    return lowerSuperCall(
+      expression,
+      expression.target.thisBinding,
+      builder,
+      expression.target.forwardArguments === true,
+    );
   } else {
     let callee: number;
     let receiver: number;
@@ -5773,6 +5778,7 @@ function lowerSuperCall(
   expression: HirExpression & { readonly kind: "call" },
   thisBinding: { readonly bindingId: number },
   builder: MirBuilder,
+  forwardArguments: boolean,
 ): number {
   // SuperCall, 13.3.7.1: GetSuperConstructor reads the running
   // constructor's [[Prototype]] at step 3 and cannot fail, Arguments are
@@ -5831,6 +5837,10 @@ function lowerSuperCall(
     id: constructed,
     kind: "construct",
     range: expression.range,
+    ...includePropertiesWhen(() => {
+      if (!forwardArguments) return undefined;
+      return { forwardArguments: true as const };
+    }),
     target: { kind: "super" },
   });
   appendMirMetadata(
