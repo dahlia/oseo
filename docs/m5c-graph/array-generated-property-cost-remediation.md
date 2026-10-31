@@ -239,3 +239,60 @@ with native suites excluded by the repository's host-guard analyzer. The
 internal pair precedes the exact-U D3 request. Root's D3 decision follows
 those gates. Hosted macOS evidence, candidate gates, publication, and landed
 state remain Root-owned.
+
+
+Optimization-level measurement, 2026-10-31
+------------------------------------------
+
+This separate, measurement-only experiment uses product U
+`fdc6e284a3ceff0e6f2dec01c6aff1f04eaeb3dd`. The maintainer permitted
+measurement and proposal; adoption still requires a separate decision.
+The current generated-program command has no `-O` option. The experiment
+adds only `-O1` or `-O2` to its generated-program compilation request;
+runtime archives retain `-O2`, their existing cache identity, and their
+existing sanitizer flags. No toolchain flag or policy changes in this commit.
+
+Each candidate level and toolchain has an excluded warm-up pair followed
+by three alternating current/candidate pairs, with both specialization
+policies. All 64 specimen executions, including warm-ups, match the same
+independent output model and every allocation, collection, guard and addition
+counter for their policy. The source, seed, forced-collection setting and
+emitted C remain fixed. Median compile-link time is:
+
+| Level | Lane    | Policy   | Current ms | Candidate ms |
+| ----- | ------- | -------- | ---------: | -----------: |
+| `-O1` | zig     | disabled |     1188.9 |       6220.6 |
+| `-O1` | zig     | enabled  |     1185.1 |       6309.6 |
+| `-O1` | host-cc | disabled |     2432.8 |       5900.1 |
+| `-O1` | host-cc | enabled  |     2955.1 |       7721.4 |
+| `-O2` | zig     | disabled |     1394.5 |       7165.9 |
+| `-O2` | zig     | enabled  |     1404.4 |       7515.5 |
+| `-O2` | host-cc | disabled |     2597.2 |       6186.2 |
+| `-O2` | host-cc | enabled  |     3213.5 |       8159.3 |
+
+Both candidates also increase median compile-plus-execute wall time in
+every comparison. Native execution alone is 9–29 ms faster on host-cc but
+slightly slower on Zig; the additional seconds spent compiling dominate
+those differences. This bounded Array specimen supports retaining the current
+generated-code level for this cost node. It establishes no result for the
+whole ordinary suite, hosted macOS, or other optimization levels.
+
+The sanitizer check uses the repository's plain-C heap-overflow and signed
+integer-overflow vectors in generated code and runtime archive code. These
+fault vectors are independent of specialization policy. Host-cc detects both
+faults in both locations at all three levels, 12 of 12 checks. Zig detects
+signed overflow in both locations at every level, 6 of 6 checks. Its six
+address probes exit zero with no ASan symbol, retaining the existing coverage
+gap documented in <../sanitizer-activity.md>.
+The Zig executables have 34 UBSan symbol lines at the current level and one
+at the candidate levels; symbol-line counts are not counts of checks. These
+fault observations do not establish general sanitizer-coverage equivalence.
+
+The packet at </data/m5c-arraycost3-20261031/optimization-levels/> retains
+all paired commands, complete output, fault reports, symbols, compiler
+identities and the measurement scripts. *measurements.json* records the warm
+samples and medians; *sanitizers-zig.json* and *sanitizers-host-cc.json*
+record all 24 fault observations. The capacity-scoped heavy command exits
+zero. Runtime archives are warm; host contention and cache history remain
+uncontrolled. Root's Full UPDATE, R, outer gate and candidate macOS
+measurement remain pending under Root's ownership.
