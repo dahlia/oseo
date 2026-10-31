@@ -410,6 +410,47 @@ an exclusion. The batches follow
 for the record procedure. The separate `dynamic-import-staged-plan` node plans
 ADR 0016 alternative 3; it does not alter this interim ownership rule.
 
+### Static-specifier import track
+
+Item 3 of the 2026-11-01 maintainer answer approves only a design review of
+the build-time-resolvable `import()` track. Accepting the track needs a
+reviewed plan and an ADR 0016 amendment first; bounded general `eval` and
+`Function` construction are not approved. The `static-specifier-import-design`
+node owns that review. Its design is
+[*docs/static-specifier-import-design.md*](./docs/static-specifier-import-design.md),
+and its pinned 20-path selector is in its work note under *docs/m5c-graph/*.
+Until the maintainer accepts the amendment, the interim ownership rule above
+applies unchanged: every `import()` is rejected, and every pinned path keeps
+`node:dynamic-source-coverage-remediation`.
+
+The admitted surface is an ImportCall whose only argument is a string
+literal, at a site in a module or in a Script with a build-side referrer.
+Every other form keeps the exact `ImportExpression` rejection that the audit
+accepts. A runtime module evaluation driver replaces the compiled evaluation
+schedule for every graph, so static and dynamic requests share one record,
+namespace, and evaluation state per canonical identity.
+
+After acceptance, Root may create the design's five implementation units as
+graph nodes, in this order:
+
+1.  the runtime evaluation driver for static graphs, with a full test262
+    UPDATE whose changed static observations are explained;
+2.  owned requests, Script referrers, discovery edges, and build refusals;
+3.  the import operation and its asynchronous settlement paths;
+4.  runner support and admission, with the `dynamic-import` feature moved
+    to the supported list, a full UPDATE, review of every changed
+    `dynamic-import` observation, and fresh assessments of the reopened
+    ADR 0016 dynamic-import exclusions; and
+5.  accounting for the pinned rows.
+
+Each unit meets the Gates section and needs Root's authorization. Unit 4
+must leave zero semantic failures. Seventeen pinned rows should close by
+observation after unit 4. *usage-from-eval.js* needs separate eval-context
+evidence, and *eval-rqstd-once.js* and *update-to-dynamic-import.js* reach
+the `Function` constructor in fixtures. Those three stay with the umbrella
+until reviewed evidence closes them or the named-deferral list of item 4
+records them.
+
 
 Static import attributes and JSON modules
 -----------------------------------------

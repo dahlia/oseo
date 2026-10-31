@@ -41,10 +41,11 @@ Deliverables
 ------------
 
  -  The design and per-path mapping in
-    *docs/static-specifier-import-design.md*, added by this node's design
-    commit.
- -  A proposed ADR 0016 amendment, with status Proposed, that leaves the
-    accepted decision in force until the maintainer accepts it.
+    [*docs/static-specifier-import-design.md*](../static-specifier-import-design.md).
+ -  A proposed ADR 0016 amendment, with status Proposed, inside that design.
+    ADR 0016 itself is unchanged: the exclusion audit binds its text by
+    digest, so Root applies the amendment with the audit update only after
+    the maintainer accepts it.
  -  A *PLAN-M5C.md* section that schedules the track's implementation and
     admission nodes only after acceptance.
 
