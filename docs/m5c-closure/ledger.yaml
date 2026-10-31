@@ -22,18 +22,21 @@ owners:
       on it; ADR 0019 accepts unsupported results that such a record
       authorizes and bounds. Maintainer decision 2026-10-28 item 3
       closes a mixed Annex B path only when reviewed replacement
-      observations cover every core subject. Four paths qualify: three
+      observations cover every core subject. Five paths qualify: three
       TypedArray paths whose only Annex B subject is an
       Object.prototype.__proto__ read or write, replaced by
-      Object.getPrototypeOf or Object.setPrototypeOf, and
+      Object.getPrototypeOf or Object.setPrototypeOf,
       String/prototype/split/separator-regexp.js, whose four Annex B
       patterns stay rejected while its 33 core split patterns are
-      observed. exclusion-audit.yaml binds their original source and
-      observation digests and the annex-b-mixed-core native evidence.
-      Their unsupported results are not counted as passes. Other Annex B
-      observers, including the legacy accessor lookups, keep their
-      remediation owners."
-    paths: 4
+      observed, and test/language/types/object/S8.6.2_A8.js, whose
+      __proto__ write on a non-extensible ordinary object is replaced by
+      Object.setPrototypeOf and Reflect.setPrototypeOf observing the
+      same OrdinarySetPrototypeOf refusal. exclusion-audit.yaml binds
+      their original source and observation digests and the
+      annex-b-mixed-core native evidence. Their unsupported results are
+      not counted as passes. Other Annex B observers, including the
+      legacy accessor lookups, keep their remediation owners."
+    paths: 5
   adr:0016-dynamic-source-boundary:
     note: "ADR 0016 excludes \"`eval` in call position, the `Function`
       constructor, `new Function`, and every constructor that compiles
@@ -338,12 +341,6 @@ owners:
       claimed; see docs/m5c-graph/observation-batch-26a.md,
       observation-batch-26b.md and observation-batch-27.md."
     paths: 334
-  node:ordinary-object-proto-coverage-remediation:
-    note: Observation-batch-28 admits S8.6.2_A8.js as unsupported because
-      its __proto__ write reaches the Annex B OSEO1001 rejection. Its
-      core non-extensible [[Prototype]] subject remains remediation, not
-      an exclusion.
-    paths: 1
   node:unhandled-rejection-observation:
     note: "Runtime capability unhandled-rejection-policy; 20 paths.
       Observation batch 01 adds six unhandled-rejection-policy
@@ -41315,7 +41312,7 @@ paths:
   test/language/types/object/S8.6.2_A5_T4.js: [pass, observation]
   test/language/types/object/S8.6.2_A6.js: [pass, observation]
   test/language/types/object/S8.6.2_A7.js: [pass, observation]
-  test/language/types/object/S8.6.2_A8.js: [unsupported-profile-feature, node:ordinary-object-proto-coverage-remediation, [object-literals, object-properties, var-bindings]]
+  test/language/types/object/S8.6.2_A8.js: [unsupported-profile-feature, adr:0013-m5-edition-and-manifest, [object-literals, object-properties, var-bindings]]
   test/language/types/object/S8.6_A2_T1.js: [pass, observation]
   test/language/types/object/S8.6_A2_T2.js: [pass, observation]
   test/language/types/object/S8.6_A3_T1.js: [pass, observation]

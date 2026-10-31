@@ -18,11 +18,13 @@ evidence:
   fixed:
     status: covered
     references:
+      - tests/annex-b-mixed-core-native.test.ts
       - tests/native/fixtures/objects.ts
       - tests/native.ts
   forced-collection:
     status: covered
     references:
+      - tests/annex-b-mixed-core-native.test.ts
       - tests/native.ts
       - tests/property/m5-object-integrity-levels.property.test.ts
   generated:
@@ -39,6 +41,7 @@ evidence:
   specialization:
     status: covered
     references:
+      - tests/annex-b-mixed-core-native.test.ts
       - tests/native.ts
       - tests/native/fixtures/objects.ts
       - tests/property/m5-object-integrity-levels.property.test.ts
