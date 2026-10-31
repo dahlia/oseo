@@ -612,3 +612,15 @@ unexecuted constructor accounting 1. Its pinned selector and obligations
 are in that child's work note. Ownership moves only with reviewed closure;
 the umbrella retains every remaining path and requires child landing plus
 zero directly owned paths before its own landing.
+
+
+Train C ordinary evidence child
+-------------------------------
+
+Items 3 and 4 of the 2026-11-01 umbrella residual answer add
+`dynamic-source-trainc-ordinary-evidence` for exactly 44 train C paths:
+26 Function-constructor paths expected to close with ordinary evidence and
+ADR 0016 accounting, and 18 caller-local direct eval environment paths that
+try evidence first. Its pinned selector and obligations are in that child's
+work note. Ownership moves only with reviewed closure; paths that evidence
+cannot close stay here for the named-deferral route.

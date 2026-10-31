@@ -1,0 +1,16 @@
+version: 1
+id: dynamic-source-trainc-ordinary-evidence
+title: Dynamic source train C ordinary evidence
+delivers: >-
+  Reviews exactly 44 pinned train C paths under items 3 and 4 of the
+  2026-11-01 umbrella residual answer. Witnesses the non-source subjects
+  of 26 Function-constructor paths with ordinary static and native
+  evidence before ADR 0016 accounting, and tries evidence first for 18
+  caller-local direct eval environment paths. Uncovered paths retain
+  umbrella ownership for the named-deferral route. Scope, SHA256, family
+  obligations and authority are recorded in
+  docs/m5c-graph/dynamic-source-trainc-ordinary-evidence.md.
+dependencies:
+  - unsupported-ownership-audit
+landed: false
+status: ready
