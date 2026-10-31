@@ -7429,8 +7429,11 @@ implemented; ADR 0013's exclusion remains unchanged.
 
 The exact reviewed admission is
 *test/built-ins/TypedArrayConstructors/ctors/no-species.js*. Its unsupported
-observation remains owned by `node:typed-array-proto-coverage-remediation`;
-ADR 0013 excludes the accessor but does not close mixed core coverage. The
+observation became an ADR 0013 exclusion under the 2026-10-28
+maintainer decision, item 3, once the strict
+`annex-b-core-typed-array-no-species` evidence covered every core subject;
+the [closure note](./docs/m5c-graph/typed-array-proto-coverage-remediation.md)
+records it. It is not counted as a pass. The
 fixed `typed-array-buffer-without-species-core` fixture preserves the original
 ArrayBuffer subclass, throwing constructor and species getter, TypedArray
 clone, and fresh buffer's intrinsic prototype and constructor. Core reflection

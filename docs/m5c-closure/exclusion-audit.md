@@ -275,3 +275,38 @@ subjects remain in-claim under dynamic-source-coverage-remediation. The
 derived owner total is 273; no tag creates an exclusion. Source and
 observation digests bind every assessment to the pinned source and fresh
 canonical record. Integrated formal review remains pending.
+
+
+Annex B mixed-coverage closures
+-------------------------------
+
+Item 3 of the 2026-10-28 maintainer decision closes a mixed Annex B path
+under ADR 0013 only when reviewed replacement observations cover every core
+subject and a fresh-digest record names them. Four paths now meet that
+condition, and their assessments change to `disposition: exclusion` with
+`normativeDependency: annex-b-only`:
+
+ -  `annex-b-typed-array-prototype`:
+    *TypedArrayConstructors/ctors/no-species.js*;
+ -  `annex-b-resizable-typed-array-prototype`:
+    *TypedArray/prototype/resizable-and-fixed-have-same-prototype.js*;
+ -  `annex-b-out-of-bounds-prototype-setup`:
+    *TypedArray/out-of-bounds-behaves-like-detached.js*;
+ -  `annex-b-pattern`: *String/prototype/split/separator-regexp.js*.
+
+The first three keep the `Object.prototype.__proto__` rejection above; the
+fourth keeps the named backreference rejection. Each assessment binds
+*../../tests/native/fixtures/annex-b-mixed-core.ts* and
+*../../tests/annex-b-mixed-core-native.test.ts*. Those files check each core
+subject's value and type in the program, prove the comparator rejects
+near-miss values through an independent count, and run natively under both
+specialization policies with forced collection. The ledger moves the four
+paths to `adr:0013-m5-edition-and-manifest`. The earlier print-based
+replacement fixtures above stay but no longer close these paths. The two
+remediation nodes then own no path, and the paragraphs above that keep
+remediation for these paths describe the earlier state. The legacy accessor
+lookups and every other Annex B observer keep their owners. The per-path
+assertion tables are in
+[typed-array-proto-coverage-remediation.md](../m5c-graph/typed-array-proto-coverage-remediation.md)
+and
+[regexp-split-coverage-remediation.md](../m5c-graph/regexp-split-coverage-remediation.md).

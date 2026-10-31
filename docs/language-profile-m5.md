@@ -73,9 +73,11 @@ ordinary-property evidence.
 
 The exact reviewed admission is
 *test/built-ins/TypedArrayConstructors/ctors/no-species.js*. Its unsupported
-observation remains owned by `node:typed-array-proto-coverage-remediation`;
-ADR 0013 excludes the accessor behavior but does not close mixed core
-coverage. The
+observation became an ADR 0013 exclusion under the 2026-10-28
+maintainer decision, item 3, once the strict
+`annex-b-core-typed-array-no-species` evidence covered every core subject;
+the [closure note](./m5c-graph/typed-array-proto-coverage-remediation.md)
+records it. It is not counted as a pass. The
 fixed `typed-array-buffer-without-species-core` fixture preserves the original
 ArrayBuffer subclass, throwing constructor and species getter, TypedArray
 clone, and fresh buffer's intrinsic prototype and constructor. Core reflection
@@ -7374,8 +7376,9 @@ the current harness.
 The current complete RAB harness update, recorded in `fbdb0824` from clean
 source `2e3d973f`, observes 27 passes among the 28 paths in these roots that
 include *resizableArrayBufferUtils.js*. The remaining
-*resizable-and-fixed-have-same-prototype.js* case is unsupported, with active
-owner `typed-array-proto-coverage-remediation`; it is not an exclusion.
+*resizable-and-fixed-have-same-prototype.js* case is unsupported. Since the
+2026-10-28 maintainer decision, item 3, it is an ADR 0013 exclusion backed by
+strict core replacement evidence, not a pass.
 The seven SharedArrayBuffer paths above now pass under the already-admitted
 shared-buffer support. The original admission counts above are historical.
 
@@ -7785,8 +7788,9 @@ inventory reaches 140 families, and the runtime ABI moves to `m5-124`.
 The current complete RAB harness update, recorded in `fbdb0824` from clean
 source `2e3d973f`, observes four passes among the five paths in these roots
 that include *resizableArrayBufferUtils.js*. The remaining
-*out-of-bounds-behaves-like-detached.js* case is unsupported, with active owner
-`typed-array-proto-coverage-remediation`; it is not an exclusion. The original
+*out-of-bounds-behaves-like-detached.js* case is unsupported. Since the
+2026-10-28 maintainer decision, item 3, it is an ADR 0013 exclusion backed by
+strict core replacement evidence, not a pass. The original
 admission counts above are historical.
 
 

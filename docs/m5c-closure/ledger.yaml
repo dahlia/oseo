@@ -16,6 +16,24 @@ states:
   unreviewed: 1
   unsupported-profile-feature: 1938
 owners:
+  adr:0013-m5-edition-and-manifest:
+    note: "ADR 0013 excludes Annex B legacy web semantics and reports Annex
+      B behavior as unsupported when a test inside the boundary depends
+      on it; ADR 0019 accepts unsupported results that such a record
+      authorizes and bounds. Maintainer decision 2026-10-28 item 3
+      closes a mixed Annex B path only when reviewed replacement
+      observations cover every core subject. Four paths qualify: three
+      TypedArray paths whose only Annex B subject is an
+      Object.prototype.__proto__ read or write, replaced by
+      Object.getPrototypeOf or Object.setPrototypeOf, and
+      String/prototype/split/separator-regexp.js, whose four Annex B
+      patterns stay rejected while its 33 core split patterns are
+      observed. exclusion-audit.yaml binds their original source and
+      observation digests and the annex-b-mixed-core native evidence.
+      Their unsupported results are not counted as passes. Other Annex B
+      observers, including the legacy accessor lookups, keep their
+      remediation owners."
+    paths: 4
   adr:0016-dynamic-source-boundary:
     note: "ADR 0016 excludes \"`eval` in call position, the `Function`
       constructor, `new Function`, and every constructor that compiles
@@ -325,20 +343,6 @@ owners:
       selects for observation-batch-28. The batch observes them; no
       classification is assumed before it does.
     paths: 1
-  node:regexp-split-coverage-remediation:
-    note: The observed Annex B-only named backreference rejection in
-      separator-regexp.js is authorized by ADR 0013, but the same path
-      contains unobserved core split assertions. Retain remediation
-      ownership until the maintainer accounting decision and reviewed
-      replacement evidence bound core coverage; Annex B remains
-      excluded.
-    paths: 1
-  node:typed-array-proto-coverage-remediation:
-    note: The full update on 2e3d973f adds 2 RAB cases whose prototype read
-      or setup write reaches the Annex B __proto__ boundary. Their core
-      prototype and out-of-bounds subjects retain native replacement
-      evidence and remain remediation, not exclusions.
-    paths: 3
   node:unhandled-rejection-observation:
     note: "Runtime capability unhandled-rejection-policy; 20 paths.
       Observation batch 01 adds six unhandled-rejection-policy
@@ -15168,7 +15172,7 @@ paths:
   test/built-ins/String/prototype/split/separator-override-valueof.js: [pass, observation]
   test/built-ins/String/prototype/split/separator-regexp-comma-instance-is-string-one-1-two-2-four-4.js: [pass, observation]
   test/built-ins/String/prototype/split/separator-regexp-limit-string-via-eval.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [dynamic-source, functions, object-properties, symbols]]
-  test/built-ins/String/prototype/split/separator-regexp.js: [unsupported-profile-feature, node:regexp-split-coverage-remediation, [functions, object-properties, symbols]]
+  test/built-ins/String/prototype/split/separator-regexp.js: [unsupported-profile-feature, adr:0013-m5-edition-and-manifest, [functions, object-properties, symbols]]
   test/built-ins/String/prototype/split/separator-string-instance-is-empty-string-object.js: [pass, observation]
   test/built-ins/String/prototype/split/separator-tostring-error.js: [pass, observation]
   test/built-ins/String/prototype/split/separator-undef-limit-custom.js: [pass, observation]
@@ -15734,7 +15738,7 @@ paths:
   test/built-ins/TypedArray/of/prop-desc.js: [pass, observation]
   test/built-ins/TypedArray/of/resized-with-out-of-bounds-and-in-bounds-indices.js: [pass, observation]
   test/built-ins/TypedArray/of/this-is-not-constructor.js: [pass, observation]
-  test/built-ins/TypedArray/out-of-bounds-behaves-like-detached.js: [unsupported-profile-feature, node:typed-array-proto-coverage-remediation, [typed-array-statics]]
+  test/built-ins/TypedArray/out-of-bounds-behaves-like-detached.js: [unsupported-profile-feature, adr:0013-m5-edition-and-manifest, [typed-array-statics]]
   test/built-ins/TypedArray/out-of-bounds-get-and-set.js: [pass, observation]
   test/built-ins/TypedArray/out-of-bounds-has.js: [pass, observation]
   test/built-ins/TypedArray/prototype.js: [pass, observation]
@@ -16659,7 +16663,7 @@ paths:
   test/built-ins/TypedArray/prototype/reduceRight/this-is-not-object.js: [pass, observation]
   test/built-ins/TypedArray/prototype/reduceRight/this-is-not-typedarray-instance.js: [pass, observation]
   test/built-ins/TypedArray/prototype/reduceRight/values-are-not-cached.js: [pass, observation]
-  test/built-ins/TypedArray/prototype/resizable-and-fixed-have-same-prototype.js: [unsupported-profile-feature, node:typed-array-proto-coverage-remediation, [typed-array-core]]
+  test/built-ins/TypedArray/prototype/resizable-and-fixed-have-same-prototype.js: [unsupported-profile-feature, adr:0013-m5-edition-and-manifest, [typed-array-core]]
   test/built-ins/TypedArray/prototype/reverse/BigInt/detached-buffer.js: [pass, observation]
   test/built-ins/TypedArray/prototype/reverse/BigInt/get-length-uses-internal-arraylength.js: [pass, observation]
   test/built-ins/TypedArray/prototype/reverse/BigInt/preserves-non-numeric-properties.js: [pass, observation]
@@ -17445,7 +17449,7 @@ paths:
   test/built-ins/TypedArrayConstructors/ctors/no-args/undefined-newtarget-throws.js: [pass, observation]
   test/built-ins/TypedArrayConstructors/ctors/no-args/use-custom-proto-if-object.js: [pass, observation]
   test/built-ins/TypedArrayConstructors/ctors/no-args/use-default-proto-if-custom-proto-is-not-object.js: [pass, observation]
-  test/built-ins/TypedArrayConstructors/ctors/no-species.js: [unsupported-profile-feature, node:typed-array-proto-coverage-remediation, [array-buffer, object-properties, typed-array-constructors]]
+  test/built-ins/TypedArrayConstructors/ctors/no-species.js: [unsupported-profile-feature, adr:0013-m5-edition-and-manifest, [array-buffer, object-properties, typed-array-constructors]]
   test/built-ins/TypedArrayConstructors/ctors/object-arg/as-array-returns.js: [pass, observation]
   test/built-ins/TypedArrayConstructors/ctors/object-arg/as-generator-iterable-returns.js: [pass, observation]
   test/built-ins/TypedArrayConstructors/ctors/object-arg/conversion-operation-consistent-nan.js: [pass, observation]

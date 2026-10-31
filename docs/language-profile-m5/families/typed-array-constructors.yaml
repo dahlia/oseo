@@ -37,13 +37,15 @@ evidence:
   fixed:
     status: covered
     references:
-      - tests/native/fixtures/typed-array-constructors.ts
+      - tests/annex-b-mixed-core-native.test.ts
       - tests/native.ts
+      - tests/native/fixtures/typed-array-constructors.ts
       - tests/native/scenarios/shard-2.ts
       - tests/property/m5-typed-array-constructors.property.test.ts
   forced-collection:
     status: covered
     references:
+      - tests/annex-b-mixed-core-native.test.ts
       - tests/native.ts
       - tests/native/fixtures/typed-array-constructors.ts
       - tests/property/m5-typed-array-constructors.property.test.ts
@@ -61,6 +63,7 @@ evidence:
   specialization:
     status: covered
     references:
+      - tests/annex-b-mixed-core-native.test.ts
       - tests/native.ts
       - tests/native/fixtures/typed-array-constructors.ts
       - tests/property/m5-typed-array-constructors.property.test.ts

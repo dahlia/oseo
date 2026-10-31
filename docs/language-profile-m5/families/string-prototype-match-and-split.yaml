@@ -27,10 +27,12 @@ evidence:
   fixed:
     status: covered
     references:
+      - tests/annex-b-mixed-core-native.test.ts
       - tests/native/fixtures/string-prototype-match-and-split.ts
   forced-collection:
     status: covered
     references:
+      - tests/annex-b-mixed-core-native.test.ts
       - tests/native.ts
       - tests/native/fixtures/string-prototype-match-and-split.ts
       - tests/property/m5-string-prototype-match-and-split.property.test.ts
@@ -48,6 +50,7 @@ evidence:
   specialization:
     status: covered
     references:
+      - tests/annex-b-mixed-core-native.test.ts
       - tests/native.ts
       - tests/native/fixtures/string-prototype-match-and-split.ts
       - tests/property/m5-string-prototype-match-and-split.property.test.ts
