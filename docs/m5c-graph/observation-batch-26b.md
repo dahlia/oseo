@@ -265,3 +265,29 @@ subjects. The catch-scope subject in `try/12.14-3.js` also keeps its tag.
 Per-row changes, retained witnesses and the reused audit tools are in
 */data/m5c-d17-20261031/train-c-outer-fix/audit.json*.
 Observations, classifications and unsupported owners are unchanged.
+
+
+Outer pass 2 correction
+-----------------------
+
+The audit checked all 1,019 var-bindings rows across the three train batches,
+including all 162 contrasts retained by the previous marker sweep. In this
+batch, nine rows drop the tag: both ordinary and generator
+`dflt-params-ref-later.js` and `dflt-params-ref-self.js`, the four ordinary
+function enumeration rows `13.2-23-s.js`, `13.2-24-s.js`, `13.2-27-s.js` and
+`13.2-28-s.js`, and `S13_A7_T1.js`.
+
+Parameter initialization shadows the outer x and throws before callCount
+updates in the four default cases. The enumeration cases never enter their
+loops, so their sole var target tempIndex is never read or written. The
+SourceElements case checks a function's type without calling its body;
+its var B is never reached.
+
+Root clarified that declarations which are themselves the tested construct
+keep the tag, including var destructuring with elisions, skipped defaults
+or throwing initializers. These subjects are distinct from unused helper
+vars. Exact-symbol references, original source hashes, per-row retained
+witnesses and the Root ruling are recorded in
+*/data/m5c-d17-20261031/train-c-outer-fix2/audit.json*.
+Diagnostic Node read traces support source inspection; they are not new
+Oseo observations. Classifications, owners and admitted paths are unchanged.

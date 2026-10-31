@@ -172588,17 +172588,11 @@ tests:
       ]
   - path: test/language/statements/function/13.2-23-s.js
     expectedClassification: pass
-    dependencies: [control-flow, functions, property-enumeration, var-bindings]
+    dependencies: [control-flow, functions, property-enumeration]
   - path: test/language/statements/function/13.2-24-s.js
     expectedClassification: pass
     dependencies:
-      [
-        control-flow,
-        functions,
-        object-properties,
-        property-enumeration,
-        var-bindings,
-      ]
+      [control-flow, functions, object-properties, property-enumeration]
   - path: test/language/statements/function/13.2-25-s.js
     expectedClassification: pass
     dependencies:
@@ -172615,17 +172609,11 @@ tests:
       ]
   - path: test/language/statements/function/13.2-27-s.js
     expectedClassification: pass
-    dependencies: [control-flow, functions, property-enumeration, var-bindings]
+    dependencies: [control-flow, functions, property-enumeration]
   - path: test/language/statements/function/13.2-28-s.js
     expectedClassification: pass
     dependencies:
-      [
-        control-flow,
-        functions,
-        object-properties,
-        property-enumeration,
-        var-bindings,
-      ]
+      [control-flow, functions, object-properties, property-enumeration]
   - path: test/language/statements/function/13.2-3-s.js
     expectedClassification: pass
     dependencies:
@@ -173362,7 +173350,7 @@ tests:
     dependencies: [expression-operators, functions, var-bindings]
   - path: test/language/statements/function/S13_A7_T1.js
     expectedClassification: pass
-    dependencies: [expression-operators, functions, var-bindings]
+    dependencies: [expression-operators, functions]
   - path: test/language/statements/function/S13_A7_T3.js
     expectedClassification: expected-negative
     dependencies: [functions]
@@ -173422,13 +173410,7 @@ tests:
   - path: test/language/statements/function/dflt-params-ref-later.js
     expectedClassification: pass
     dependencies:
-      [
-        abrupt-completion,
-        default-parameters,
-        error-intrinsics,
-        functions,
-        var-bindings,
-      ]
+      [abrupt-completion, default-parameters, error-intrinsics, functions]
   - path: test/language/statements/function/dflt-params-ref-prior.js
     expectedClassification: pass
     dependencies:
@@ -173436,13 +173418,7 @@ tests:
   - path: test/language/statements/function/dflt-params-ref-self.js
     expectedClassification: pass
     dependencies:
-      [
-        abrupt-completion,
-        default-parameters,
-        error-intrinsics,
-        functions,
-        var-bindings,
-      ]
+      [abrupt-completion, default-parameters, error-intrinsics, functions]
   - path: test/language/statements/function/dflt-params-rest.js
     expectedClassification: expected-negative
     dependencies: [default-parameters, functions, rest-parameters]
@@ -176001,7 +175977,6 @@ tests:
         error-intrinsics,
         functions,
         generators,
-        var-bindings,
       ]
   - path: test/language/statements/generators/dflt-params-ref-prior.js
     expectedClassification: pass
@@ -176023,7 +175998,6 @@ tests:
         error-intrinsics,
         functions,
         generators,
-        var-bindings,
       ]
   - path: test/language/statements/generators/dflt-params-rest.js
     expectedClassification: expected-negative
@@ -181083,7 +181057,6 @@ tests:
         expression-operators,
         functions,
         object-properties,
-        var-bindings,
       ]
   - path: test/language/statements/try/S12.14_A18_T1.js
     expectedClassification: pass

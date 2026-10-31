@@ -410,7 +410,6 @@ results:
       - error-intrinsics
       - functions
       - generators
-      - var-bindings
     execution:
       harnessIncludes:
         - base.js

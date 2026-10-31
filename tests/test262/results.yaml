@@ -23192,7 +23192,7 @@ summary:
       expectedNegatives: 220
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 6750
+      passes: 6740
       semanticFailures: 0
       unsupportedProfileFeatures: 670
     - dependency: weak-collections

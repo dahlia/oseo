@@ -347,7 +347,6 @@ results:
       - functions
       - object-properties
       - property-enumeration
-      - var-bindings
     execution:
       harnessIncludes:
         - base.js

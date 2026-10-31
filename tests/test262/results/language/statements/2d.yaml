@@ -375,7 +375,6 @@ results:
       - default-parameters
       - error-intrinsics
       - functions
-      - var-bindings
     execution:
       harnessIncludes:
         - base.js

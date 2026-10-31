@@ -266,3 +266,20 @@ reachability remains candidate analysis; literal inputs and original source
 contracts establish the boundaries. Classifications, counts, unsupported
 ownership and prior admitted rows are preserved. All fixed fourth-pass verdicts
 are retained in `review-round-4/attempts.json`.
+
+
+Outer pass 2 var-binding audit
+------------------------------
+
+The full-train audit checked every remaining var-bindings row against the
+executed-use rule, including all previously retained marker contrasts.
+In this batch, `try/S12.14_A17.js` drops var-bindings. Its sole var i only
+numbers failure messages; the constructor increments it without observing
+its value on a successful path. That diagnostic counter is scaffolding.
+
+Var declarations which are themselves the subject retain their tags under
+Root's clarified rule, including destructuring initialization and grammar
+or scope subjects. Every changed and retained row has source-bound evidence
+in */data/m5c-d17-20261031/train-c-outer-fix2/audit.json*.
+Observations, classifications, unsupported owners and admitted paths are
+unchanged.

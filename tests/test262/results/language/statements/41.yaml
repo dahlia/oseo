@@ -231,7 +231,6 @@ results:
       - control-flow
       - functions
       - property-enumeration
-      - var-bindings
     execution:
       harnessIncludes:
         - base.js
