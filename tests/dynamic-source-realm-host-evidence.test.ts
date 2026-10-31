@@ -46,10 +46,6 @@ const groups = [
   "weak",
   "wrappers",
 ] as const;
-// These two retained normative sources failed native observation in DS-19.
-// Structural/reference diagnostics stay registered, but neither is offered
-// as passing native evidence. Their original paths stay in remediation.
-const diagnosticGroups = new Set<string>(["derived-return", "derived-this"]);
 const base = await readFile(
   new URL("./test262/harness/base.js", import.meta.url),
   "utf8",
@@ -119,8 +115,6 @@ for (const fixture of fixtures) {
       assertMatchingObservations([expected, reference]);
     }
   });
-
-  if (diagnosticGroups.has(fixture.name)) continue;
 
   test(
     `DS19 native: ${fixture.name}`,

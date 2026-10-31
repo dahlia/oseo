@@ -160,7 +160,7 @@ owners:
       static/native witnesses. Its 33 conversion/subclass paths remain
       umbrella remediation and original unsupported observations are
       unchanged."
-    paths: 1529
+    paths: 1546
   adr:0028-legacy-function-caller-boundary:
     note: ADR 0028 authorizes "an M5 exclusion of the expectation that
       reading the `caller` property of a non-strict ordinary function
@@ -314,7 +314,7 @@ owners:
       validation supplies reviewed static witnesses for all 66 selected
       target-validation and Script-to-Module usage paths and moves them
       to ADR 0016; 884 of the base 950 remain."
-    paths: 209
+    paths: 192
   node:non-blocking-agent:
     note: Needs an agent whose [[CanBlock]] is false; 2 paths.
     paths: 2
@@ -5636,9 +5636,9 @@ paths:
   test/built-ins/Function/internals/Call/class-ctor.js: [pass, observation]
   test/built-ins/Function/internals/Construct/base-ctor-revoked-proxy-realm.js: [pass, observation]
   test/built-ins/Function/internals/Construct/base-ctor-revoked-proxy.js: [pass, observation]
-  test/built-ins/Function/internals/Construct/derived-return-val-realm.js: [unsupported-profile-feature, node:dynamic-source-coverage-remediation, [dynamic-source, functions]]
+  test/built-ins/Function/internals/Construct/derived-return-val-realm.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [dynamic-source, functions]]
   test/built-ins/Function/internals/Construct/derived-return-val.js: [pass, observation]
-  test/built-ins/Function/internals/Construct/derived-this-uninitialized-realm.js: [unsupported-profile-feature, node:dynamic-source-coverage-remediation, [dynamic-source, functions]]
+  test/built-ins/Function/internals/Construct/derived-this-uninitialized-realm.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [dynamic-source, functions]]
   test/built-ins/Function/internals/Construct/derived-this-uninitialized.js: [pass, observation]
   test/built-ins/Function/is-a-constructor.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [dynamic-source, functions]]
   test/built-ins/Function/length/15.3.3.2-1.js: [pass, observation]
@@ -18992,8 +18992,8 @@ paths:
   test/language/comments/hashbang/escaped-hash-u23.js: [expected-negative, observation]
   test/language/comments/hashbang/escaped-hash-x23.js: [expected-negative, observation]
   test/language/comments/hashbang/escaped-hashbang.js: [expected-negative, observation]
-  test/language/comments/hashbang/eval-indirect.js: [unsupported-profile-feature, node:dynamic-source-coverage-remediation, [dynamic-source, expression-operators, functions, lexical-grammar]]
-  test/language/comments/hashbang/eval.js: [unsupported-profile-feature, node:dynamic-source-coverage-remediation, [dynamic-source, functions, lexical-grammar]]
+  test/language/comments/hashbang/eval-indirect.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [dynamic-source, expression-operators, functions, lexical-grammar]]
+  test/language/comments/hashbang/eval.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [dynamic-source, functions, lexical-grammar]]
   test/language/comments/hashbang/function-body.js: [expected-negative, observation]
   test/language/comments/hashbang/function-constructor.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [abrupt-completion, async-functions, dynamic-source, error-intrinsics, functions, generators, iterator-protocol, lexical-bindings, lexical-grammar, object-properties, symbols]]
   test/language/comments/hashbang/line-terminator-carriage-return.js: [pass, observation]
@@ -32147,7 +32147,7 @@ paths:
   test/language/statements/async-function/await-as-identifier-reference.js: [expected-negative, observation]
   test/language/statements/async-function/await-as-label-identifier-escaped.js: [expected-negative, observation]
   test/language/statements/async-function/await-as-label-identifier.js: [expected-negative, observation]
-  test/language/statements/async-function/cptn-decl.js: [unsupported-profile-feature, node:dynamic-source-coverage-remediation, [async-functions, dynamic-source, functions]]
+  test/language/statements/async-function/cptn-decl.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [async-functions, dynamic-source, functions]]
   test/language/statements/async-function/declaration-returns-promise.js: [pass, observation]
   test/language/statements/async-function/dflt-params-abrupt.js: [pass, observation]
   test/language/statements/async-function/dflt-params-arg-val-not-undefined.js: [pass, observation]
@@ -33001,7 +33001,7 @@ paths:
   test/language/statements/class/cpn-class-decl-fields-methods-computed-property-name-from-numeric-literal.js: [pass, observation]
   test/language/statements/class/cpn-class-decl-fields-methods-computed-property-name-from-string-literal.js: [pass, observation]
   test/language/statements/class/cpn-class-decl-fields-methods-computed-property-name-from-yield-expression.js: [pass, observation]
-  test/language/statements/class/cptn-decl.js: [unsupported-profile-feature, node:dynamic-source-coverage-remediation, [classes, dynamic-source, functions]]
+  test/language/statements/class/cptn-decl.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [classes, dynamic-source, functions]]
   test/language/statements/class/definition/accessors.js: [pass, observation]
   test/language/statements/class/definition/basics.js: [pass, observation]
   test/language/statements/class/definition/class-method-returns-promise.js: [pass, observation]
@@ -35252,7 +35252,7 @@ paths:
   test/language/statements/class/elements/arrow-body-private-derived-cls-indirect-eval-err-contains-supercall-2.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [abrupt-completion, classes, dynamic-source, error-intrinsics, expression-operators, functions]]
   test/language/statements/class/elements/arrow-body-private-derived-cls-indirect-eval-err-contains-supercall.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [abrupt-completion, classes, dynamic-source, error-intrinsics, expression-operators, functions]]
   test/language/statements/class/elements/arrow-body-private-direct-eval-err-contains-arguments.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [abrupt-completion, classes, dynamic-source, error-intrinsics, functions]]
-  test/language/statements/class/elements/arrow-body-private-direct-eval-err-contains-newtarget.js: [unsupported-profile-feature, node:dynamic-source-coverage-remediation, [classes, dynamic-source, functions, object-properties, var-bindings]]
+  test/language/statements/class/elements/arrow-body-private-direct-eval-err-contains-newtarget.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [classes, dynamic-source, functions, object-properties, var-bindings]]
   test/language/statements/class/elements/arrow-body-private-indirect-eval-err-contains-newtarget.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [abrupt-completion, classes, dynamic-source, error-intrinsics, expression-operators, functions]]
   test/language/statements/class/elements/arrow-fnc-init-err-contains-arguments.js: [expected-negative, observation]
   test/language/statements/class/elements/arrow-fnc-init-err-contains-super.js: [expected-negative, observation]
@@ -35638,7 +35638,7 @@ paths:
   test/language/statements/class/elements/nested-private-derived-cls-indirect-eval-err-contains-supercall-2.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [abrupt-completion, classes, dynamic-source, error-intrinsics, expression-operators, functions]]
   test/language/statements/class/elements/nested-private-derived-cls-indirect-eval-err-contains-supercall.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [abrupt-completion, classes, dynamic-source, error-intrinsics, expression-operators, functions]]
   test/language/statements/class/elements/nested-private-direct-eval-err-contains-arguments.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [abrupt-completion, classes, dynamic-source, error-intrinsics, functions, object-properties, var-bindings]]
-  test/language/statements/class/elements/nested-private-direct-eval-err-contains-newtarget.js: [unsupported-profile-feature, node:dynamic-source-coverage-remediation, [classes, dynamic-source, functions, object-properties, var-bindings]]
+  test/language/statements/class/elements/nested-private-direct-eval-err-contains-newtarget.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [classes, dynamic-source, functions, object-properties, var-bindings]]
   test/language/statements/class/elements/nested-private-indirect-eval-contains-arguments.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [classes, dynamic-source, expression-operators, functions, object-properties, var-bindings]]
   test/language/statements/class/elements/nested-private-indirect-eval-err-contains-newtarget.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [abrupt-completion, classes, dynamic-source, error-intrinsics, expression-operators, functions]]
   test/language/statements/class/elements/nested-private-literal-name-init-err-contains-arguments.js: [expected-negative, observation]
@@ -35817,7 +35817,7 @@ paths:
   test/language/statements/class/elements/private-derived-cls-indirect-eval-err-contains-supercall-2.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [abrupt-completion, classes, dynamic-source, error-intrinsics, expression-operators, functions]]
   test/language/statements/class/elements/private-derived-cls-indirect-eval-err-contains-supercall.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [abrupt-completion, classes, dynamic-source, error-intrinsics, expression-operators, functions]]
   test/language/statements/class/elements/private-direct-eval-err-contains-arguments.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [abrupt-completion, classes, dynamic-source, error-intrinsics, functions]]
-  test/language/statements/class/elements/private-direct-eval-err-contains-newtarget.js: [unsupported-profile-feature, node:dynamic-source-coverage-remediation, [classes, dynamic-source, functions, object-properties, var-bindings]]
+  test/language/statements/class/elements/private-direct-eval-err-contains-newtarget.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [classes, dynamic-source, functions, object-properties, var-bindings]]
   test/language/statements/class/elements/private-field-access-on-inner-arrow-function.js: [pass, observation]
   test/language/statements/class/elements/private-field-access-on-inner-function.js: [pass, observation]
   test/language/statements/class/elements/private-field-after-optional-chain.js: [pass, observation]
@@ -35915,7 +35915,7 @@ paths:
   test/language/statements/class/elements/private-static-method-usage-inside-nested-class.js: [pass, observation]
   test/language/statements/class/elements/private-static-method-visible-to-direct-eval.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [abrupt-completion, classes, dynamic-source, error-intrinsics, functions, object-properties]]
   test/language/statements/class/elements/private-static-setter-abrupt-completition.js: [pass, observation]
-  test/language/statements/class/elements/private-static-setter-visible-to-direct-eval.js: [unsupported-profile-feature, node:dynamic-source-coverage-remediation, [abrupt-completion, classes, dynamic-source, error-intrinsics, expression-operators, functions, object-properties]]
+  test/language/statements/class/elements/private-static-setter-visible-to-direct-eval.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [abrupt-completion, classes, dynamic-source, error-intrinsics, expression-operators, functions, object-properties]]
   test/language/statements/class/elements/private-ternary-init-err-contains-arguments.js: [expected-negative, observation]
   test/language/statements/class/elements/private-ternary-init-err-contains-super.js: [expected-negative, observation]
   test/language/statements/class/elements/private-typeof-init-err-contains-arguments.js: [expected-negative, observation]
@@ -36192,7 +36192,7 @@ paths:
   test/language/statements/class/elements/static-field-anonymous-function-name.js: [pass, observation]
   test/language/statements/class/elements/static-field-declaration.js: [pass, observation]
   test/language/statements/class/elements/static-field-init-this-inside-arrow-function.js: [pass, observation]
-  test/language/statements/class/elements/static-field-init-with-this.js: [unsupported-profile-feature, node:dynamic-source-coverage-remediation, [classes, dynamic-source, expression-operators, functions, object-properties]]
+  test/language/statements/class/elements/static-field-init-with-this.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [classes, dynamic-source, expression-operators, functions, object-properties]]
   test/language/statements/class/elements/static-field-initializer-error.js: [pass, observation]
   test/language/statements/class/elements/static-field-redeclaration.js: [pass, observation]
   test/language/statements/class/elements/static-fielddefinition-initializer-abrupt-completion.js: [pass, observation]
@@ -38491,12 +38491,12 @@ paths:
   test/language/statements/for-of/continue-label-from-try.js: [pass, observation]
   test/language/statements/for-of/continue-label.js: [pass, observation]
   test/language/statements/for-of/continue.js: [pass, observation]
-  test/language/statements/for-of/cptn-decl-abrupt-empty.js: [unsupported-profile-feature, node:dynamic-source-coverage-remediation, [abrupt-completion, control-flow, dynamic-source, functions, iterator-protocol, object-properties, symbols, var-bindings]]
-  test/language/statements/for-of/cptn-decl-itr.js: [unsupported-profile-feature, node:dynamic-source-coverage-remediation, [control-flow, dynamic-source, functions, iterator-protocol, object-properties, symbols, var-bindings]]
-  test/language/statements/for-of/cptn-decl-no-itr.js: [unsupported-profile-feature, node:dynamic-source-coverage-remediation, [control-flow, dynamic-source, functions, iterator-protocol, object-properties, symbols, var-bindings]]
-  test/language/statements/for-of/cptn-expr-abrupt-empty.js: [unsupported-profile-feature, node:dynamic-source-coverage-remediation, [abrupt-completion, control-flow, dynamic-source, functions, iterator-protocol, object-properties, symbols, var-bindings]]
-  test/language/statements/for-of/cptn-expr-itr.js: [unsupported-profile-feature, node:dynamic-source-coverage-remediation, [control-flow, dynamic-source, functions, iterator-protocol, object-properties, symbols, var-bindings]]
-  test/language/statements/for-of/cptn-expr-no-itr.js: [unsupported-profile-feature, node:dynamic-source-coverage-remediation, [control-flow, dynamic-source, functions, iterator-protocol, object-properties, symbols, var-bindings]]
+  test/language/statements/for-of/cptn-decl-abrupt-empty.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [abrupt-completion, control-flow, dynamic-source, functions, iterator-protocol, object-properties, symbols, var-bindings]]
+  test/language/statements/for-of/cptn-decl-itr.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [control-flow, dynamic-source, functions, iterator-protocol, object-properties, symbols, var-bindings]]
+  test/language/statements/for-of/cptn-decl-no-itr.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [control-flow, dynamic-source, functions, iterator-protocol, object-properties, symbols, var-bindings]]
+  test/language/statements/for-of/cptn-expr-abrupt-empty.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [abrupt-completion, control-flow, dynamic-source, functions, iterator-protocol, object-properties, symbols, var-bindings]]
+  test/language/statements/for-of/cptn-expr-itr.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [control-flow, dynamic-source, functions, iterator-protocol, object-properties, symbols, var-bindings]]
+  test/language/statements/for-of/cptn-expr-no-itr.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [control-flow, dynamic-source, functions, iterator-protocol, object-properties, symbols, var-bindings]]
   test/language/statements/for-of/decl-async-fun.js: [expected-negative, observation]
   test/language/statements/for-of/decl-async-gen.js: [expected-negative, observation]
   test/language/statements/for-of/decl-cls.js: [expected-negative, observation]

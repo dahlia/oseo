@@ -2722,20 +2722,40 @@ OseoResult oseo_bind_this(
     return normal(value);
 }
 
+static OseoResult derived_result_in_realm(
+    OseoContext *context,
+    OseoValue returned,
+    OseoValue cell,
+    OseoValue realm
+) {
+    if (is_object(returned) || is_promise(returned)) return normal(returned);
+    /* Construct resumes the caller before interpreting the body's normal
+     * completion. Body throws and this reads still use the callee realm. */
+    OseoRealmScope scope;
+    oseo_internal_realm_enter(context, &scope, realm);
+    OseoResult result;
+    if (tag_of(returned) != OSEO_TAG_UNDEFINED) {
+        result = oseo_internal_throw_error(
+            context,
+            OSEO_ERROR_TYPE,
+            "Derived constructor returned a non-object value."
+        );
+    } else {
+        result = oseo_cell_get(context, cell);
+    }
+    oseo_internal_realm_leave(context, &scope);
+    return result;
+}
+
 OseoResult oseo_derived_constructor_result(
     OseoContext *context,
     OseoValue returned,
     OseoValue cell
 ) {
-    if (is_object(returned) || is_promise(returned)) return normal(returned);
-    if (tag_of(returned) != OSEO_TAG_UNDEFINED) {
-        return oseo_internal_throw_error(
-            context,
-            OSEO_ERROR_TYPE,
-            "Derived constructor returned a non-object value."
-        );
-    }
-    return oseo_cell_get(context, cell);
+    OseoValue realm = context->constructor_scope == NULL
+        ? context->realm_record
+        : context->constructor_scope->realm_record;
+    return derived_result_in_realm(context, returned, cell, realm);
 }
 
 static OseoResult call_bound_function(
@@ -2973,6 +2993,10 @@ static OseoResult call_once(
      * the callee's [[Realm]] the running realm, and the caller's realm is
      * restored when the callee returns or throws. A bound function or a
      * Proxy has no realm of its own and never switches. */
+    OseoConstructorScope constructor_scope = {
+        context->realm_record, context->constructor_scope
+    };
+    context->constructor_scope = &constructor_scope;
     OseoRealmScope scope;
     oseo_internal_realm_enter(context, &scope, function_object(callee)->realm);
     OseoResult result = call_in_running_realm(
@@ -2984,6 +3008,7 @@ static OseoResult call_once(
         new_target
     );
     oseo_internal_realm_leave(context, &scope);
+    context->constructor_scope = constructor_scope.previous;
     return result;
 }
 
@@ -2995,6 +3020,7 @@ static OseoTailCall *tail_call_record(OseoContext *context) {
         record->receiver = oseo_undefined();
         record->realm_record = oseo_undefined();
         record->this_cell = oseo_undefined();
+        record->constructor_realm = oseo_undefined();
         record->arguments = NULL;
         record->argument_count = 0u;
         record->argument_capacity = 0u;
@@ -3071,6 +3097,9 @@ static OseoResult record_tail_call(
     record->receiver = receiver;
     record->realm_record = context->realm_record;
     record->this_cell = this_cell;
+    record->constructor_realm = derived && context->constructor_scope != NULL
+        ? context->constructor_scope->realm_record
+        : context->realm_record;
     record->argument_count = argument_count;
     record->derived = derived;
     record->pending = true;
@@ -3083,6 +3112,7 @@ static void clear_tail_call(OseoTailCall *record) {
     record->receiver = oseo_undefined();
     record->realm_record = oseo_undefined();
     record->this_cell = oseo_undefined();
+    record->constructor_realm = oseo_undefined();
     record->argument_count = 0u;
     record->pending = false;
     record->derived = false;
@@ -3267,7 +3297,7 @@ static OseoResult run_tail_calls(OseoContext *context) {
     bool derived = record->derived;
     if (derived) {
         continuation[0] = record->this_cell;
-        continuation[1] = record->realm_record;
+        continuation[1] = record->constructor_realm;
     }
     OseoResult result;
     for (;;) {
@@ -3314,14 +3344,12 @@ static OseoResult run_tail_calls(OseoContext *context) {
         }
     }
     if (derived && result.status == OSEO_STATUS_NORMAL) {
-        OseoRealmScope scope;
-        oseo_internal_realm_enter(context, &scope, continuation[1]);
-        result = oseo_derived_constructor_result(
+        result = derived_result_in_realm(
             context,
             result.value,
-            continuation[0]
+            continuation[0],
+            continuation[1]
         );
-        oseo_internal_realm_leave(context, &scope);
     }
     oseo_roots_pop(context, &continuation_frame);
     return result;

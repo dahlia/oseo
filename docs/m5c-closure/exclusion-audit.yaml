@@ -1212,8 +1212,8 @@ assessments:
       tests/native/fixtures/bindings.ts:
         "f3e20be237b2b772c59670f481af8147bfa59312098aa503\
         e3817879ab0fb31b"
-      tests/native.ts: "88325e5fa326ae82704a3f8996ac8860b42f6f4cc15a69fe\
-        4d891942dca59425"
+      tests/native.ts: "a28b51a7e399b7a128011aa70d758a2ce26229e4ab78c539\
+        f5e27a33ddea023f"
     reason: Maintainer decision 2026-10-28 item 1 applies to the single path in
       dynamic-source-template-site-evidence.paths.txt. The
       template-site-identity native fixture observes both same-site equalities
@@ -2951,8 +2951,8 @@ assessments:
       tests/callable-object-evidence.test.ts:
         "d2b814666e5645565ca2001f0419b931cd2949624777047f562d\
         a479c71be70d"
-      tests/native.ts: "88325e5fa326ae82704a3f8996ac8860b42f6f4cc15a69fe4d89\
-        1942dca59425"
+      tests/native.ts: "a28b51a7e399b7a128011aa70d758a2ce26229e4ab78c539f5e2\
+        7a33ddea023f"
       docs/m5c-graph/dynamic-source-callable-object-assessment.md:
         "b4eb5774379e97332ac56111eb4fadf83a6e39b66f84b22bff74\
         10ffca7eaf37"
@@ -2983,8 +2983,8 @@ assessments:
       tests/callable-object-evidence.test.ts:
         "d2b814666e5645565ca2001f0419b931cd2949624777047f562d\
         a479c71be70d"
-      tests/native.ts: "88325e5fa326ae82704a3f8996ac8860b42f6f4cc15a69fe4d89\
-        1942dca59425"
+      tests/native.ts: "a28b51a7e399b7a128011aa70d758a2ce26229e4ab78c539f5e2\
+        7a33ddea023f"
       docs/m5c-graph/dynamic-source-callable-object-assessment.md:
         "b4eb5774379e97332ac56111eb4fadf83a6e39b66f84b22bff74\
         10ffca7eaf37"
@@ -3012,8 +3012,8 @@ assessments:
       tests/callable-object-evidence.test.ts:
         "d2b814666e5645565ca2001f0419b931cd2949624777047f562d\
         a479c71be70d"
-      tests/native.ts: "88325e5fa326ae82704a3f8996ac8860b42f6f4cc15a69fe4d89\
-        1942dca59425"
+      tests/native.ts: "a28b51a7e399b7a128011aa70d758a2ce26229e4ab78c539f5e2\
+        7a33ddea023f"
       docs/m5c-graph/dynamic-source-callable-object-assessment.md:
         "b4eb5774379e97332ac56111eb4fadf83a6e39b66f84b22bff74\
         10ffca7eaf37"
@@ -3056,8 +3056,8 @@ assessments:
       tests/callable-object-evidence.test.ts:
         "d2b814666e5645565ca2001f0419b931cd2949624777047f562d\
         a479c71be70d"
-      tests/native.ts: "88325e5fa326ae82704a3f8996ac8860b42f6f4cc15a69fe4d89\
-        1942dca59425"
+      tests/native.ts: "a28b51a7e399b7a128011aa70d758a2ce26229e4ab78c539f5e2\
+        7a33ddea023f"
       docs/m5c-graph/dynamic-source-callable-object-assessment.md:
         "b4eb5774379e97332ac56111eb4fadf83a6e39b66f84b22bff74\
         10ffca7eaf37"
@@ -3084,8 +3084,8 @@ assessments:
       tests/callable-object-evidence.test.ts:
         "d2b814666e5645565ca2001f0419b931cd2949624777047f562d\
         a479c71be70d"
-      tests/native.ts: "88325e5fa326ae82704a3f8996ac8860b42f6f4cc15a69fe4d89\
-        1942dca59425"
+      tests/native.ts: "a28b51a7e399b7a128011aa70d758a2ce26229e4ab78c539f5e2\
+        7a33ddea023f"
       docs/m5c-graph/dynamic-source-callable-object-assessment.md:
         "b4eb5774379e97332ac56111eb4fadf83a6e39b66f84b22bff74\
         10ffca7eaf37"
@@ -3116,8 +3116,8 @@ assessments:
       tests/callable-object-evidence.test.ts:
         "d2b814666e5645565ca2001f0419b931cd2949624777047f562d\
         a479c71be70d"
-      tests/native.ts: "88325e5fa326ae82704a3f8996ac8860b42f6f4cc15a69fe4d89\
-        1942dca59425"
+      tests/native.ts: "a28b51a7e399b7a128011aa70d758a2ce26229e4ab78c539f5e2\
+        7a33ddea023f"
       docs/m5c-graph/dynamic-source-callable-object-assessment.md:
         "b4eb5774379e97332ac56111eb4fadf83a6e39b66f84b22bff74\
         10ffca7eaf37"
@@ -3146,8 +3146,8 @@ assessments:
       tests/callable-object-evidence.test.ts:
         "d2b814666e5645565ca2001f0419b931cd2949624777047f562d\
         a479c71be70d"
-      tests/native.ts: "88325e5fa326ae82704a3f8996ac8860b42f6f4cc15a69fe4d89\
-        1942dca59425"
+      tests/native.ts: "a28b51a7e399b7a128011aa70d758a2ce26229e4ab78c539f5e2\
+        7a33ddea023f"
       docs/m5c-graph/dynamic-source-callable-object-assessment.md:
         "b4eb5774379e97332ac56111eb4fadf83a6e39b66f84b22bff74\
         10ffca7eaf37"
@@ -3185,8 +3185,8 @@ assessments:
       tests/callable-object-evidence.test.ts:
         "d2b814666e5645565ca2001f0419b931cd2949624777047f562d\
         a479c71be70d"
-      tests/native.ts: "88325e5fa326ae82704a3f8996ac8860b42f6f4cc15a69fe4d89\
-        1942dca59425"
+      tests/native.ts: "a28b51a7e399b7a128011aa70d758a2ce26229e4ab78c539f5e2\
+        7a33ddea023f"
       docs/m5c-graph/dynamic-source-callable-object-assessment.md:
         "b4eb5774379e97332ac56111eb4fadf83a6e39b66f84b22bff74\
         10ffca7eaf37"
@@ -3213,8 +3213,8 @@ assessments:
       tests/callable-object-evidence.test.ts:
         "d2b814666e5645565ca2001f0419b931cd2949624777047f562d\
         a479c71be70d"
-      tests/native.ts: "88325e5fa326ae82704a3f8996ac8860b42f6f4cc15a69fe4d89\
-        1942dca59425"
+      tests/native.ts: "a28b51a7e399b7a128011aa70d758a2ce26229e4ab78c539f5e2\
+        7a33ddea023f"
       docs/m5c-graph/dynamic-source-callable-object-assessment.md:
         "b4eb5774379e97332ac56111eb4fadf83a6e39b66f84b22bff74\
         10ffca7eaf37"
@@ -3245,8 +3245,8 @@ assessments:
       tests/callable-object-evidence.test.ts:
         "d2b814666e5645565ca2001f0419b931cd2949624777047f562d\
         a479c71be70d"
-      tests/native.ts: "88325e5fa326ae82704a3f8996ac8860b42f6f4cc15a69fe4d89\
-        1942dca59425"
+      tests/native.ts: "a28b51a7e399b7a128011aa70d758a2ce26229e4ab78c539f5e2\
+        7a33ddea023f"
       docs/m5c-graph/dynamic-source-callable-object-assessment.md:
         "b4eb5774379e97332ac56111eb4fadf83a6e39b66f84b22bff74\
         10ffca7eaf37"
@@ -3276,8 +3276,8 @@ assessments:
       tests/callable-object-evidence.test.ts:
         "d2b814666e5645565ca2001f0419b931cd2949624777047f562d\
         a479c71be70d"
-      tests/native.ts: "88325e5fa326ae82704a3f8996ac8860b42f6f4cc15a69fe4d89\
-        1942dca59425"
+      tests/native.ts: "a28b51a7e399b7a128011aa70d758a2ce26229e4ab78c539f5e2\
+        7a33ddea023f"
       docs/m5c-graph/dynamic-source-callable-object-assessment.md:
         "b4eb5774379e97332ac56111eb4fadf83a6e39b66f84b22bff74\
         10ffca7eaf37"
@@ -3316,8 +3316,8 @@ assessments:
       tests/callable-object-evidence.test.ts:
         "d2b814666e5645565ca2001f0419b931cd2949624777047f562d\
         a479c71be70d"
-      tests/native.ts: "88325e5fa326ae82704a3f8996ac8860b42f6f4cc15a69fe4d89\
-        1942dca59425"
+      tests/native.ts: "a28b51a7e399b7a128011aa70d758a2ce26229e4ab78c539f5e2\
+        7a33ddea023f"
       docs/m5c-graph/dynamic-source-callable-object-assessment.md:
         "b4eb5774379e97332ac56111eb4fadf83a6e39b66f84b22bff74\
         10ffca7eaf37"
@@ -3346,8 +3346,8 @@ assessments:
       tests/callable-object-evidence.test.ts:
         "d2b814666e5645565ca2001f0419b931cd2949624777047f562d\
         a479c71be70d"
-      tests/native.ts: "88325e5fa326ae82704a3f8996ac8860b42f6f4cc15a69fe4d89\
-        1942dca59425"
+      tests/native.ts: "a28b51a7e399b7a128011aa70d758a2ce26229e4ab78c539f5e2\
+        7a33ddea023f"
       docs/m5c-graph/dynamic-source-callable-object-assessment.md:
         "b4eb5774379e97332ac56111eb4fadf83a6e39b66f84b22bff74\
         10ffca7eaf37"
@@ -3374,8 +3374,8 @@ assessments:
       tests/callable-object-evidence.test.ts:
         "d2b814666e5645565ca2001f0419b931cd2949624777047f562d\
         a479c71be70d"
-      tests/native.ts: "88325e5fa326ae82704a3f8996ac8860b42f6f4cc15a69fe4d89\
-        1942dca59425"
+      tests/native.ts: "a28b51a7e399b7a128011aa70d758a2ce26229e4ab78c539f5e2\
+        7a33ddea023f"
       docs/m5c-graph/dynamic-source-callable-object-assessment.md:
         "b4eb5774379e97332ac56111eb4fadf83a6e39b66f84b22bff74\
         10ffca7eaf37"
@@ -3403,8 +3403,8 @@ assessments:
       tests/callable-object-evidence.test.ts:
         "d2b814666e5645565ca2001f0419b931cd2949624777047f562d\
         a479c71be70d"
-      tests/native.ts: "88325e5fa326ae82704a3f8996ac8860b42f6f4cc15a69fe4d89\
-        1942dca59425"
+      tests/native.ts: "a28b51a7e399b7a128011aa70d758a2ce26229e4ab78c539f5e2\
+        7a33ddea023f"
       docs/m5c-graph/dynamic-source-callable-object-assessment.md:
         "b4eb5774379e97332ac56111eb4fadf83a6e39b66f84b22bff74\
         10ffca7eaf37"
@@ -3435,8 +3435,8 @@ assessments:
       tests/callable-object-evidence.test.ts:
         "d2b814666e5645565ca2001f0419b931cd2949624777047f562d\
         a479c71be70d"
-      tests/native.ts: "88325e5fa326ae82704a3f8996ac8860b42f6f4cc15a69fe4d89\
-        1942dca59425"
+      tests/native.ts: "a28b51a7e399b7a128011aa70d758a2ce26229e4ab78c539f5e2\
+        7a33ddea023f"
       docs/m5c-graph/dynamic-source-callable-object-assessment.md:
         "b4eb5774379e97332ac56111eb4fadf83a6e39b66f84b22bff74\
         10ffca7eaf37"
@@ -3562,8 +3562,8 @@ assessments:
     replacementEvidence:
       tests/native/fixtures/binding-reference-evidence.ts: "148176601d5cac6e8f\
         b67444ac68efeadc9df8aacb596b23dbf158c2b48f1bba"
-      tests/native.ts: "88325e5fa326ae82704a3f8996ac8860b42f6f4cc15a69fe4d8919\
-        42dca59425"
+      tests/native.ts: "a28b51a7e399b7a128011aa70d758a2ce26229e4ab78c539f5e27a\
+        33ddea023f"
   ds18-static-class-fields:
     disposition: exclusion
     normativeDependency: source-evaluation-only
@@ -3584,8 +3584,8 @@ assessments:
     replacementEvidence:
       tests/native/fixtures/binding-reference-evidence.ts: "148176601d5cac6e8f\
         b67444ac68efeadc9df8aacb596b23dbf158c2b48f1bba"
-      tests/native.ts: "88325e5fa326ae82704a3f8996ac8860b42f6f4cc15a69fe4d8919\
-        42dca59425"
+      tests/native.ts: "a28b51a7e399b7a128011aa70d758a2ce26229e4ab78c539f5e27a\
+        33ddea023f"
   ds18-unresolvable-compound:
     disposition: exclusion
     normativeDependency: source-evaluation-only
@@ -3606,8 +3606,8 @@ assessments:
     replacementEvidence:
       tests/native/fixtures/binding-reference-evidence.ts: "148176601d5cac6e8f\
         b67444ac68efeadc9df8aacb596b23dbf158c2b48f1bba"
-      tests/native.ts: "88325e5fa326ae82704a3f8996ac8860b42f6f4cc15a69fe4d8919\
-        42dca59425"
+      tests/native.ts: "a28b51a7e399b7a128011aa70d758a2ce26229e4ab78c539f5e27a\
+        33ddea023f"
   ds21-finite-completion-records:
     disposition: exclusion
     normativeDependency: source-evaluation-only
@@ -3638,8 +3638,8 @@ assessments:
       tests/completion-records.test.ts:
         "f053d02bcd11af6604c78d907e709ee0155fe6c33c4a551b\
         79de0cc09474b624"
-      tests/native.ts: "88325e5fa326ae82704a3f8996ac8860b42f6f4cc15a69fe\
-        4d891942dca59425"
+      tests/native.ts: "a28b51a7e399b7a128011aa70d758a2ce26229e4ab78c539\
+        f5e27a33ddea023f"
       tests/test262/harness/base.js:
         "50331feeca513cb2e2354e05e7c68f82d5aeccd9b766d6c8\
         8438c5ef118075f6"
@@ -3664,8 +3664,8 @@ assessments:
         "3dbfd18e6663dd1a604faa4e03b949009ce0d5ac7e11fdc6\
         c5cd70dc99451878"
       tests/dynamic-source-realm-host-evidence.test.ts:
-        "33fa8bc15819484524d930a99734d368c447ad95f1a7561b\
-        b553978437567194"
+        "86c650b94794f06feb2712820e1722977377dbd1b162a968\
+        010cb47a76028ce9"
   ds19-02:
     disposition: exclusion
     normativeDependency: source-evaluation-only
@@ -3683,8 +3683,8 @@ assessments:
         "caad3f8e9b51e2f6c1e9237e91e47657571ac72288cb7720\
         d74e205c53dc6279"
       tests/dynamic-source-realm-host-evidence.test.ts:
-        "33fa8bc15819484524d930a99734d368c447ad95f1a7561b\
-        b553978437567194"
+        "86c650b94794f06feb2712820e1722977377dbd1b162a968\
+        010cb47a76028ce9"
   ds19-03:
     disposition: exclusion
     normativeDependency: source-evaluation-only
@@ -3702,8 +3702,8 @@ assessments:
         "caad3f8e9b51e2f6c1e9237e91e47657571ac72288cb7720\
         d74e205c53dc6279"
       tests/dynamic-source-realm-host-evidence.test.ts:
-        "33fa8bc15819484524d930a99734d368c447ad95f1a7561b\
-        b553978437567194"
+        "86c650b94794f06feb2712820e1722977377dbd1b162a968\
+        010cb47a76028ce9"
   ds19-04:
     disposition: exclusion
     normativeDependency: source-evaluation-only
@@ -3722,8 +3722,8 @@ assessments:
         "caad3f8e9b51e2f6c1e9237e91e47657571ac72288cb7720\
         d74e205c53dc6279"
       tests/dynamic-source-realm-host-evidence.test.ts:
-        "33fa8bc15819484524d930a99734d368c447ad95f1a7561b\
-        b553978437567194"
+        "86c650b94794f06feb2712820e1722977377dbd1b162a968\
+        010cb47a76028ce9"
   ds19-05:
     disposition: exclusion
     normativeDependency: source-evaluation-only
@@ -3742,8 +3742,8 @@ assessments:
         "caad3f8e9b51e2f6c1e9237e91e47657571ac72288cb7720\
         d74e205c53dc6279"
       tests/dynamic-source-realm-host-evidence.test.ts:
-        "33fa8bc15819484524d930a99734d368c447ad95f1a7561b\
-        b553978437567194"
+        "86c650b94794f06feb2712820e1722977377dbd1b162a968\
+        010cb47a76028ce9"
   ds19-06:
     disposition: exclusion
     normativeDependency: source-evaluation-only
@@ -3762,8 +3762,8 @@ assessments:
         "caad3f8e9b51e2f6c1e9237e91e47657571ac72288cb7720\
         d74e205c53dc6279"
       tests/dynamic-source-realm-host-evidence.test.ts:
-        "33fa8bc15819484524d930a99734d368c447ad95f1a7561b\
-        b553978437567194"
+        "86c650b94794f06feb2712820e1722977377dbd1b162a968\
+        010cb47a76028ce9"
   ds19-07:
     disposition: exclusion
     normativeDependency: source-evaluation-only
@@ -3781,8 +3781,8 @@ assessments:
         "3412ab04c3986952bfbeb46387e46ea53e41a1b3f7385f5e\
         1d420fe14e4082cd"
       tests/dynamic-source-realm-host-evidence.test.ts:
-        "33fa8bc15819484524d930a99734d368c447ad95f1a7561b\
-        b553978437567194"
+        "86c650b94794f06feb2712820e1722977377dbd1b162a968\
+        010cb47a76028ce9"
   ds19-08:
     disposition: exclusion
     normativeDependency: source-evaluation-only
@@ -3800,8 +3800,8 @@ assessments:
         "f20132eff2be2fdc1c744ddda002b18ad1c2b3f0fff30047\
         3dbf25f68e04d11a"
       tests/dynamic-source-realm-host-evidence.test.ts:
-        "33fa8bc15819484524d930a99734d368c447ad95f1a7561b\
-        b553978437567194"
+        "86c650b94794f06feb2712820e1722977377dbd1b162a968\
+        010cb47a76028ce9"
   ds19-09:
     disposition: exclusion
     normativeDependency: source-evaluation-only
@@ -3819,8 +3819,8 @@ assessments:
         "3412ab04c3986952bfbeb46387e46ea53e41a1b3f7385f5e\
         1d420fe14e4082cd"
       tests/dynamic-source-realm-host-evidence.test.ts:
-        "33fa8bc15819484524d930a99734d368c447ad95f1a7561b\
-        b553978437567194"
+        "86c650b94794f06feb2712820e1722977377dbd1b162a968\
+        010cb47a76028ce9"
   ds19-10:
     disposition: exclusion
     normativeDependency: source-evaluation-only
@@ -3838,8 +3838,8 @@ assessments:
         "3412ab04c3986952bfbeb46387e46ea53e41a1b3f7385f5e\
         1d420fe14e4082cd"
       tests/dynamic-source-realm-host-evidence.test.ts:
-        "33fa8bc15819484524d930a99734d368c447ad95f1a7561b\
-        b553978437567194"
+        "86c650b94794f06feb2712820e1722977377dbd1b162a968\
+        010cb47a76028ce9"
   ds19-11:
     disposition: exclusion
     normativeDependency: source-evaluation-only
@@ -3857,8 +3857,8 @@ assessments:
         "80145916d1152c36ba8c12526899fdc55ff735f6dc5537b5\
         0d9429f9017a7449"
       tests/dynamic-source-realm-host-evidence.test.ts:
-        "33fa8bc15819484524d930a99734d368c447ad95f1a7561b\
-        b553978437567194"
+        "86c650b94794f06feb2712820e1722977377dbd1b162a968\
+        010cb47a76028ce9"
   ds19-12:
     disposition: exclusion
     normativeDependency: source-evaluation-only
@@ -3876,8 +3876,8 @@ assessments:
         "80145916d1152c36ba8c12526899fdc55ff735f6dc5537b5\
         0d9429f9017a7449"
       tests/dynamic-source-realm-host-evidence.test.ts:
-        "33fa8bc15819484524d930a99734d368c447ad95f1a7561b\
-        b553978437567194"
+        "86c650b94794f06feb2712820e1722977377dbd1b162a968\
+        010cb47a76028ce9"
   ds19-13:
     disposition: exclusion
     normativeDependency: source-evaluation-only
@@ -3895,8 +3895,8 @@ assessments:
         "80145916d1152c36ba8c12526899fdc55ff735f6dc5537b5\
         0d9429f9017a7449"
       tests/dynamic-source-realm-host-evidence.test.ts:
-        "33fa8bc15819484524d930a99734d368c447ad95f1a7561b\
-        b553978437567194"
+        "86c650b94794f06feb2712820e1722977377dbd1b162a968\
+        010cb47a76028ce9"
   ds19-14:
     disposition: exclusion
     normativeDependency: source-evaluation-only
@@ -3914,8 +3914,8 @@ assessments:
         "3dbfd18e6663dd1a604faa4e03b949009ce0d5ac7e11fdc6\
         c5cd70dc99451878"
       tests/dynamic-source-realm-host-evidence.test.ts:
-        "33fa8bc15819484524d930a99734d368c447ad95f1a7561b\
-        b553978437567194"
+        "86c650b94794f06feb2712820e1722977377dbd1b162a968\
+        010cb47a76028ce9"
   ds19-15:
     disposition: exclusion
     normativeDependency: source-evaluation-only
@@ -3934,8 +3934,8 @@ assessments:
         "e8e6b82e041b3243e289978d6ac59059bd1341b15114a49b\
         eb3567b2dcd27f9c"
       tests/dynamic-source-realm-host-evidence.test.ts:
-        "33fa8bc15819484524d930a99734d368c447ad95f1a7561b\
-        b553978437567194"
+        "86c650b94794f06feb2712820e1722977377dbd1b162a968\
+        010cb47a76028ce9"
   ds19-16:
     disposition: exclusion
     normativeDependency: source-evaluation-only
@@ -3952,8 +3952,8 @@ assessments:
         "08613f09d833312122887ea120715c63d3d9a53bcd2f2273\
         2eb650690ecb998f"
       tests/dynamic-source-realm-host-evidence.test.ts:
-        "33fa8bc15819484524d930a99734d368c447ad95f1a7561b\
-        b553978437567194"
+        "86c650b94794f06feb2712820e1722977377dbd1b162a968\
+        010cb47a76028ce9"
   ds19-17:
     disposition: exclusion
     normativeDependency: source-evaluation-only
@@ -3970,8 +3970,8 @@ assessments:
         "08613f09d833312122887ea120715c63d3d9a53bcd2f2273\
         2eb650690ecb998f"
       tests/dynamic-source-realm-host-evidence.test.ts:
-        "33fa8bc15819484524d930a99734d368c447ad95f1a7561b\
-        b553978437567194"
+        "86c650b94794f06feb2712820e1722977377dbd1b162a968\
+        010cb47a76028ce9"
   ds19-18:
     disposition: exclusion
     normativeDependency: source-evaluation-only
@@ -3989,8 +3989,8 @@ assessments:
         "b51e578feb1409416b6a97feeb39e9ae70f58573abee3dda\
         87e828d8e7b168e7"
       tests/dynamic-source-realm-host-evidence.test.ts:
-        "33fa8bc15819484524d930a99734d368c447ad95f1a7561b\
-        b553978437567194"
+        "86c650b94794f06feb2712820e1722977377dbd1b162a968\
+        010cb47a76028ce9"
   ds19-19:
     disposition: remediation
     normativeDependency: not-demonstrated
@@ -4010,8 +4010,8 @@ assessments:
         "ba537c1b6b27582f10a2d4f0fac920fd3a114fe4d22f8b6c\
         db9702938af6c52a"
       tests/dynamic-source-realm-host-evidence.test.ts:
-        "33fa8bc15819484524d930a99734d368c447ad95f1a7561b\
-        b553978437567194"
+        "86c650b94794f06feb2712820e1722977377dbd1b162a968\
+        010cb47a76028ce9"
   ds19-20:
     disposition: remediation
     normativeDependency: not-demonstrated
@@ -4032,8 +4032,8 @@ assessments:
         "c1cb8d0db71d360241a0b7c5027f87fe8168117f8863a929\
         bcf038aad6718b64"
       tests/dynamic-source-realm-host-evidence.test.ts:
-        "33fa8bc15819484524d930a99734d368c447ad95f1a7561b\
-        b553978437567194"
+        "86c650b94794f06feb2712820e1722977377dbd1b162a968\
+        010cb47a76028ce9"
   ds19-21:
     disposition: exclusion
     normativeDependency: source-evaluation-only
@@ -4054,8 +4054,8 @@ assessments:
         "48ea091945356e6a790b357f8da9376ae2c9ab68d40a7b96\
         460992d54220a506"
       tests/dynamic-source-realm-host-evidence.test.ts:
-        "33fa8bc15819484524d930a99734d368c447ad95f1a7561b\
-        b553978437567194"
+        "86c650b94794f06feb2712820e1722977377dbd1b162a968\
+        010cb47a76028ce9"
   ds19-22:
     disposition: exclusion
     normativeDependency: source-evaluation-only
@@ -4075,8 +4075,8 @@ assessments:
         "48ea091945356e6a790b357f8da9376ae2c9ab68d40a7b96\
         460992d54220a506"
       tests/dynamic-source-realm-host-evidence.test.ts:
-        "33fa8bc15819484524d930a99734d368c447ad95f1a7561b\
-        b553978437567194"
+        "86c650b94794f06feb2712820e1722977377dbd1b162a968\
+        010cb47a76028ce9"
   ds19-23:
     disposition: exclusion
     normativeDependency: source-evaluation-only
@@ -4094,8 +4094,8 @@ assessments:
         "08613f09d833312122887ea120715c63d3d9a53bcd2f2273\
         2eb650690ecb998f"
       tests/dynamic-source-realm-host-evidence.test.ts:
-        "33fa8bc15819484524d930a99734d368c447ad95f1a7561b\
-        b553978437567194"
+        "86c650b94794f06feb2712820e1722977377dbd1b162a968\
+        010cb47a76028ce9"
   ds19-24:
     disposition: exclusion
     normativeDependency: source-evaluation-only
@@ -4114,8 +4114,8 @@ assessments:
         "b62edd09264493440f9a854590a63ac6f78a7cd1eec9953a\
         2992d293aea22fc1"
       tests/dynamic-source-realm-host-evidence.test.ts:
-        "33fa8bc15819484524d930a99734d368c447ad95f1a7561b\
-        b553978437567194"
+        "86c650b94794f06feb2712820e1722977377dbd1b162a968\
+        010cb47a76028ce9"
   ds19-25:
     disposition: exclusion
     normativeDependency: source-evaluation-only
@@ -4133,8 +4133,8 @@ assessments:
         "b62edd09264493440f9a854590a63ac6f78a7cd1eec9953a\
         2992d293aea22fc1"
       tests/dynamic-source-realm-host-evidence.test.ts:
-        "33fa8bc15819484524d930a99734d368c447ad95f1a7561b\
-        b553978437567194"
+        "86c650b94794f06feb2712820e1722977377dbd1b162a968\
+        010cb47a76028ce9"
   ds19-26:
     disposition: exclusion
     normativeDependency: source-evaluation-only
@@ -4152,8 +4152,8 @@ assessments:
         "b62edd09264493440f9a854590a63ac6f78a7cd1eec9953a\
         2992d293aea22fc1"
       tests/dynamic-source-realm-host-evidence.test.ts:
-        "33fa8bc15819484524d930a99734d368c447ad95f1a7561b\
-        b553978437567194"
+        "86c650b94794f06feb2712820e1722977377dbd1b162a968\
+        010cb47a76028ce9"
   ds19-27:
     disposition: exclusion
     normativeDependency: source-evaluation-only
@@ -4172,8 +4172,8 @@ assessments:
         "3dbfd18e6663dd1a604faa4e03b949009ce0d5ac7e11fdc6\
         c5cd70dc99451878"
       tests/dynamic-source-realm-host-evidence.test.ts:
-        "33fa8bc15819484524d930a99734d368c447ad95f1a7561b\
-        b553978437567194"
+        "86c650b94794f06feb2712820e1722977377dbd1b162a968\
+        010cb47a76028ce9"
   ds19-28:
     disposition: exclusion
     normativeDependency: source-evaluation-only
@@ -4191,8 +4191,8 @@ assessments:
         "3dbfd18e6663dd1a604faa4e03b949009ce0d5ac7e11fdc6\
         c5cd70dc99451878"
       tests/dynamic-source-realm-host-evidence.test.ts:
-        "33fa8bc15819484524d930a99734d368c447ad95f1a7561b\
-        b553978437567194"
+        "86c650b94794f06feb2712820e1722977377dbd1b162a968\
+        010cb47a76028ce9"
   ds19-29:
     disposition: exclusion
     normativeDependency: source-evaluation-only
@@ -4211,8 +4211,8 @@ assessments:
         "8ef7cc5c8851671f7ad5fedae2a3a476c27845acdfe783be\
         1ec3d8d4038a69f1"
       tests/dynamic-source-realm-host-evidence.test.ts:
-        "33fa8bc15819484524d930a99734d368c447ad95f1a7561b\
-        b553978437567194"
+        "86c650b94794f06feb2712820e1722977377dbd1b162a968\
+        010cb47a76028ce9"
   ds19-30:
     disposition: exclusion
     normativeDependency: source-evaluation-only
@@ -4231,8 +4231,8 @@ assessments:
         "8ef7cc5c8851671f7ad5fedae2a3a476c27845acdfe783be\
         1ec3d8d4038a69f1"
       tests/dynamic-source-realm-host-evidence.test.ts:
-        "33fa8bc15819484524d930a99734d368c447ad95f1a7561b\
-        b553978437567194"
+        "86c650b94794f06feb2712820e1722977377dbd1b162a968\
+        010cb47a76028ce9"
   ds19-31:
     disposition: exclusion
     normativeDependency: source-evaluation-only
@@ -4251,8 +4251,8 @@ assessments:
         "8ef7cc5c8851671f7ad5fedae2a3a476c27845acdfe783be\
         1ec3d8d4038a69f1"
       tests/dynamic-source-realm-host-evidence.test.ts:
-        "33fa8bc15819484524d930a99734d368c447ad95f1a7561b\
-        b553978437567194"
+        "86c650b94794f06feb2712820e1722977377dbd1b162a968\
+        010cb47a76028ce9"
   ds19-32:
     disposition: exclusion
     normativeDependency: source-evaluation-only
@@ -4271,8 +4271,8 @@ assessments:
         "8ef7cc5c8851671f7ad5fedae2a3a476c27845acdfe783be\
         1ec3d8d4038a69f1"
       tests/dynamic-source-realm-host-evidence.test.ts:
-        "33fa8bc15819484524d930a99734d368c447ad95f1a7561b\
-        b553978437567194"
+        "86c650b94794f06feb2712820e1722977377dbd1b162a968\
+        010cb47a76028ce9"
   ds19-33:
     disposition: exclusion
     normativeDependency: source-evaluation-only
@@ -4291,8 +4291,8 @@ assessments:
         "8ef7cc5c8851671f7ad5fedae2a3a476c27845acdfe783be\
         1ec3d8d4038a69f1"
       tests/dynamic-source-realm-host-evidence.test.ts:
-        "33fa8bc15819484524d930a99734d368c447ad95f1a7561b\
-        b553978437567194"
+        "86c650b94794f06feb2712820e1722977377dbd1b162a968\
+        010cb47a76028ce9"
   ds19-34:
     disposition: exclusion
     normativeDependency: source-evaluation-only
@@ -4311,8 +4311,8 @@ assessments:
         "8ef7cc5c8851671f7ad5fedae2a3a476c27845acdfe783be\
         1ec3d8d4038a69f1"
       tests/dynamic-source-realm-host-evidence.test.ts:
-        "33fa8bc15819484524d930a99734d368c447ad95f1a7561b\
-        b553978437567194"
+        "86c650b94794f06feb2712820e1722977377dbd1b162a968\
+        010cb47a76028ce9"
   ds19-35:
     disposition: exclusion
     normativeDependency: source-evaluation-only
@@ -4330,8 +4330,8 @@ assessments:
         "f20132eff2be2fdc1c744ddda002b18ad1c2b3f0fff30047\
         3dbf25f68e04d11a"
       tests/dynamic-source-realm-host-evidence.test.ts:
-        "33fa8bc15819484524d930a99734d368c447ad95f1a7561b\
-        b553978437567194"
+        "86c650b94794f06feb2712820e1722977377dbd1b162a968\
+        010cb47a76028ce9"
   ds19-36:
     disposition: exclusion
     normativeDependency: source-evaluation-only
@@ -4349,8 +4349,8 @@ assessments:
         "3dbfd18e6663dd1a604faa4e03b949009ce0d5ac7e11fdc6\
         c5cd70dc99451878"
       tests/dynamic-source-realm-host-evidence.test.ts:
-        "33fa8bc15819484524d930a99734d368c447ad95f1a7561b\
-        b553978437567194"
+        "86c650b94794f06feb2712820e1722977377dbd1b162a968\
+        010cb47a76028ce9"
   ds19-37:
     disposition: exclusion
     normativeDependency: source-evaluation-only
@@ -4368,8 +4368,8 @@ assessments:
         "3dbfd18e6663dd1a604faa4e03b949009ce0d5ac7e11fdc6\
         c5cd70dc99451878"
       tests/dynamic-source-realm-host-evidence.test.ts:
-        "33fa8bc15819484524d930a99734d368c447ad95f1a7561b\
-        b553978437567194"
+        "86c650b94794f06feb2712820e1722977377dbd1b162a968\
+        010cb47a76028ce9"
   ds19-38:
     disposition: exclusion
     normativeDependency: source-evaluation-only
@@ -4387,8 +4387,8 @@ assessments:
         "f5279728c927e16878f40902154f7f5c0a0d63ff13d0a7cb\
         e334360496f5ec13"
       tests/dynamic-source-realm-host-evidence.test.ts:
-        "33fa8bc15819484524d930a99734d368c447ad95f1a7561b\
-        b553978437567194"
+        "86c650b94794f06feb2712820e1722977377dbd1b162a968\
+        010cb47a76028ce9"
   ds19-39:
     disposition: exclusion
     normativeDependency: source-evaluation-only
@@ -4406,8 +4406,8 @@ assessments:
         "f5279728c927e16878f40902154f7f5c0a0d63ff13d0a7cb\
         e334360496f5ec13"
       tests/dynamic-source-realm-host-evidence.test.ts:
-        "33fa8bc15819484524d930a99734d368c447ad95f1a7561b\
-        b553978437567194"
+        "86c650b94794f06feb2712820e1722977377dbd1b162a968\
+        010cb47a76028ce9"
   ds19-40:
     disposition: exclusion
     normativeDependency: source-evaluation-only
@@ -4425,8 +4425,8 @@ assessments:
         "f5279728c927e16878f40902154f7f5c0a0d63ff13d0a7cb\
         e334360496f5ec13"
       tests/dynamic-source-realm-host-evidence.test.ts:
-        "33fa8bc15819484524d930a99734d368c447ad95f1a7561b\
-        b553978437567194"
+        "86c650b94794f06feb2712820e1722977377dbd1b162a968\
+        010cb47a76028ce9"
   ds19-41:
     disposition: exclusion
     normativeDependency: source-evaluation-only
@@ -4444,8 +4444,8 @@ assessments:
         "f5279728c927e16878f40902154f7f5c0a0d63ff13d0a7cb\
         e334360496f5ec13"
       tests/dynamic-source-realm-host-evidence.test.ts:
-        "33fa8bc15819484524d930a99734d368c447ad95f1a7561b\
-        b553978437567194"
+        "86c650b94794f06feb2712820e1722977377dbd1b162a968\
+        010cb47a76028ce9"
   ds19-42:
     disposition: exclusion
     normativeDependency: source-evaluation-only
@@ -4464,8 +4464,8 @@ assessments:
         "f5279728c927e16878f40902154f7f5c0a0d63ff13d0a7cb\
         e334360496f5ec13"
       tests/dynamic-source-realm-host-evidence.test.ts:
-        "33fa8bc15819484524d930a99734d368c447ad95f1a7561b\
-        b553978437567194"
+        "86c650b94794f06feb2712820e1722977377dbd1b162a968\
+        010cb47a76028ce9"
   ds19-43:
     disposition: exclusion
     normativeDependency: source-evaluation-only
@@ -4483,8 +4483,8 @@ assessments:
         "f5279728c927e16878f40902154f7f5c0a0d63ff13d0a7cb\
         e334360496f5ec13"
       tests/dynamic-source-realm-host-evidence.test.ts:
-        "33fa8bc15819484524d930a99734d368c447ad95f1a7561b\
-        b553978437567194"
+        "86c650b94794f06feb2712820e1722977377dbd1b162a968\
+        010cb47a76028ce9"
   ds19-44:
     disposition: exclusion
     normativeDependency: source-evaluation-only
@@ -4502,8 +4502,8 @@ assessments:
         "b5fe5ff81608358de6b65f8387a983a2ac7b4f79dc00e707\
         4570359959d6f997"
       tests/dynamic-source-realm-host-evidence.test.ts:
-        "33fa8bc15819484524d930a99734d368c447ad95f1a7561b\
-        b553978437567194"
+        "86c650b94794f06feb2712820e1722977377dbd1b162a968\
+        010cb47a76028ce9"
   ds19-45:
     disposition: exclusion
     normativeDependency: source-evaluation-only
@@ -4521,8 +4521,8 @@ assessments:
         "b5fe5ff81608358de6b65f8387a983a2ac7b4f79dc00e707\
         4570359959d6f997"
       tests/dynamic-source-realm-host-evidence.test.ts:
-        "33fa8bc15819484524d930a99734d368c447ad95f1a7561b\
-        b553978437567194"
+        "86c650b94794f06feb2712820e1722977377dbd1b162a968\
+        010cb47a76028ce9"
   ds19-46:
     disposition: exclusion
     normativeDependency: source-evaluation-only
@@ -4540,8 +4540,8 @@ assessments:
         "3dbfd18e6663dd1a604faa4e03b949009ce0d5ac7e11fdc6\
         c5cd70dc99451878"
       tests/dynamic-source-realm-host-evidence.test.ts:
-        "33fa8bc15819484524d930a99734d368c447ad95f1a7561b\
-        b553978437567194"
+        "86c650b94794f06feb2712820e1722977377dbd1b162a968\
+        010cb47a76028ce9"
   ds19-47:
     disposition: exclusion
     normativeDependency: source-evaluation-only
@@ -4559,8 +4559,8 @@ assessments:
         "3412ab04c3986952bfbeb46387e46ea53e41a1b3f7385f5e\
         1d420fe14e4082cd"
       tests/dynamic-source-realm-host-evidence.test.ts:
-        "33fa8bc15819484524d930a99734d368c447ad95f1a7561b\
-        b553978437567194"
+        "86c650b94794f06feb2712820e1722977377dbd1b162a968\
+        010cb47a76028ce9"
   ds19-48:
     disposition: exclusion
     normativeDependency: source-evaluation-only
@@ -4578,8 +4578,8 @@ assessments:
         "f20132eff2be2fdc1c744ddda002b18ad1c2b3f0fff30047\
         3dbf25f68e04d11a"
       tests/dynamic-source-realm-host-evidence.test.ts:
-        "33fa8bc15819484524d930a99734d368c447ad95f1a7561b\
-        b553978437567194"
+        "86c650b94794f06feb2712820e1722977377dbd1b162a968\
+        010cb47a76028ce9"
   ds19-49:
     disposition: exclusion
     normativeDependency: source-evaluation-only
@@ -4596,8 +4596,8 @@ assessments:
         "c3cd677194a0f4f934fea39b4916912fa705af775e00a6e8\
         e7a3e262f0439d09"
       tests/dynamic-source-realm-host-evidence.test.ts:
-        "33fa8bc15819484524d930a99734d368c447ad95f1a7561b\
-        b553978437567194"
+        "86c650b94794f06feb2712820e1722977377dbd1b162a968\
+        010cb47a76028ce9"
   ds19-50:
     disposition: exclusion
     normativeDependency: source-evaluation-only
@@ -4615,8 +4615,8 @@ assessments:
         "073f18367a3639a4e0cd8e08876b4cf7919e0637c28680c2\
         6a1925aea7078315"
       tests/dynamic-source-realm-host-evidence.test.ts:
-        "33fa8bc15819484524d930a99734d368c447ad95f1a7561b\
-        b553978437567194"
+        "86c650b94794f06feb2712820e1722977377dbd1b162a968\
+        010cb47a76028ce9"
   ds19-51:
     disposition: exclusion
     normativeDependency: source-evaluation-only
@@ -4634,8 +4634,8 @@ assessments:
         "073f18367a3639a4e0cd8e08876b4cf7919e0637c28680c2\
         6a1925aea7078315"
       tests/dynamic-source-realm-host-evidence.test.ts:
-        "33fa8bc15819484524d930a99734d368c447ad95f1a7561b\
-        b553978437567194"
+        "86c650b94794f06feb2712820e1722977377dbd1b162a968\
+        010cb47a76028ce9"
   ds19-52:
     disposition: exclusion
     normativeDependency: source-evaluation-only
@@ -4653,8 +4653,8 @@ assessments:
         "073f18367a3639a4e0cd8e08876b4cf7919e0637c28680c2\
         6a1925aea7078315"
       tests/dynamic-source-realm-host-evidence.test.ts:
-        "33fa8bc15819484524d930a99734d368c447ad95f1a7561b\
-        b553978437567194"
+        "86c650b94794f06feb2712820e1722977377dbd1b162a968\
+        010cb47a76028ce9"
   ds19-53:
     disposition: exclusion
     normativeDependency: source-evaluation-only
@@ -4672,8 +4672,8 @@ assessments:
         "073f18367a3639a4e0cd8e08876b4cf7919e0637c28680c2\
         6a1925aea7078315"
       tests/dynamic-source-realm-host-evidence.test.ts:
-        "33fa8bc15819484524d930a99734d368c447ad95f1a7561b\
-        b553978437567194"
+        "86c650b94794f06feb2712820e1722977377dbd1b162a968\
+        010cb47a76028ce9"
   ds19-54:
     disposition: exclusion
     normativeDependency: source-evaluation-only
@@ -4691,8 +4691,8 @@ assessments:
         "073f18367a3639a4e0cd8e08876b4cf7919e0637c28680c2\
         6a1925aea7078315"
       tests/dynamic-source-realm-host-evidence.test.ts:
-        "33fa8bc15819484524d930a99734d368c447ad95f1a7561b\
-        b553978437567194"
+        "86c650b94794f06feb2712820e1722977377dbd1b162a968\
+        010cb47a76028ce9"
   ds19-55:
     disposition: exclusion
     normativeDependency: source-evaluation-only
@@ -4710,8 +4710,8 @@ assessments:
         "073f18367a3639a4e0cd8e08876b4cf7919e0637c28680c2\
         6a1925aea7078315"
       tests/dynamic-source-realm-host-evidence.test.ts:
-        "33fa8bc15819484524d930a99734d368c447ad95f1a7561b\
-        b553978437567194"
+        "86c650b94794f06feb2712820e1722977377dbd1b162a968\
+        010cb47a76028ce9"
   ds19-56:
     disposition: exclusion
     normativeDependency: source-evaluation-only
@@ -4729,8 +4729,8 @@ assessments:
         "737a9958cbef3428359f766057662e1f803920e0a20ce6d1\
         28d8eee3942ed0a3"
       tests/dynamic-source-realm-host-evidence.test.ts:
-        "33fa8bc15819484524d930a99734d368c447ad95f1a7561b\
-        b553978437567194"
+        "86c650b94794f06feb2712820e1722977377dbd1b162a968\
+        010cb47a76028ce9"
   ds19-57:
     disposition: exclusion
     normativeDependency: source-evaluation-only
@@ -4748,8 +4748,8 @@ assessments:
         "737a9958cbef3428359f766057662e1f803920e0a20ce6d1\
         28d8eee3942ed0a3"
       tests/dynamic-source-realm-host-evidence.test.ts:
-        "33fa8bc15819484524d930a99734d368c447ad95f1a7561b\
-        b553978437567194"
+        "86c650b94794f06feb2712820e1722977377dbd1b162a968\
+        010cb47a76028ce9"
   ds19-58:
     disposition: exclusion
     normativeDependency: source-evaluation-only
@@ -4767,8 +4767,8 @@ assessments:
         "737a9958cbef3428359f766057662e1f803920e0a20ce6d1\
         28d8eee3942ed0a3"
       tests/dynamic-source-realm-host-evidence.test.ts:
-        "33fa8bc15819484524d930a99734d368c447ad95f1a7561b\
-        b553978437567194"
+        "86c650b94794f06feb2712820e1722977377dbd1b162a968\
+        010cb47a76028ce9"
   ds19-59:
     disposition: exclusion
     normativeDependency: source-evaluation-only
@@ -4786,8 +4786,8 @@ assessments:
         "737a9958cbef3428359f766057662e1f803920e0a20ce6d1\
         28d8eee3942ed0a3"
       tests/dynamic-source-realm-host-evidence.test.ts:
-        "33fa8bc15819484524d930a99734d368c447ad95f1a7561b\
-        b553978437567194"
+        "86c650b94794f06feb2712820e1722977377dbd1b162a968\
+        010cb47a76028ce9"
   ds19-60:
     disposition: exclusion
     normativeDependency: source-evaluation-only
@@ -4805,8 +4805,8 @@ assessments:
         "737a9958cbef3428359f766057662e1f803920e0a20ce6d1\
         28d8eee3942ed0a3"
       tests/dynamic-source-realm-host-evidence.test.ts:
-        "33fa8bc15819484524d930a99734d368c447ad95f1a7561b\
-        b553978437567194"
+        "86c650b94794f06feb2712820e1722977377dbd1b162a968\
+        010cb47a76028ce9"
   ds19-61:
     disposition: exclusion
     normativeDependency: source-evaluation-only
@@ -4824,8 +4824,8 @@ assessments:
         "737a9958cbef3428359f766057662e1f803920e0a20ce6d1\
         28d8eee3942ed0a3"
       tests/dynamic-source-realm-host-evidence.test.ts:
-        "33fa8bc15819484524d930a99734d368c447ad95f1a7561b\
-        b553978437567194"
+        "86c650b94794f06feb2712820e1722977377dbd1b162a968\
+        010cb47a76028ce9"
   ds19-62:
     disposition: exclusion
     normativeDependency: source-evaluation-only
@@ -4843,8 +4843,8 @@ assessments:
         "e8e6b82e041b3243e289978d6ac59059bd1341b15114a49b\
         eb3567b2dcd27f9c"
       tests/dynamic-source-realm-host-evidence.test.ts:
-        "33fa8bc15819484524d930a99734d368c447ad95f1a7561b\
-        b553978437567194"
+        "86c650b94794f06feb2712820e1722977377dbd1b162a968\
+        010cb47a76028ce9"
   ds19-63:
     disposition: exclusion
     normativeDependency: source-evaluation-only
@@ -4863,8 +4863,8 @@ assessments:
         "e8e6b82e041b3243e289978d6ac59059bd1341b15114a49b\
         eb3567b2dcd27f9c"
       tests/dynamic-source-realm-host-evidence.test.ts:
-        "33fa8bc15819484524d930a99734d368c447ad95f1a7561b\
-        b553978437567194"
+        "86c650b94794f06feb2712820e1722977377dbd1b162a968\
+        010cb47a76028ce9"
   ds19-64:
     disposition: exclusion
     normativeDependency: source-evaluation-only
@@ -4882,8 +4882,8 @@ assessments:
         "e8e6b82e041b3243e289978d6ac59059bd1341b15114a49b\
         eb3567b2dcd27f9c"
       tests/dynamic-source-realm-host-evidence.test.ts:
-        "33fa8bc15819484524d930a99734d368c447ad95f1a7561b\
-        b553978437567194"
+        "86c650b94794f06feb2712820e1722977377dbd1b162a968\
+        010cb47a76028ce9"
   ds19-65:
     disposition: exclusion
     normativeDependency: source-evaluation-only
@@ -4915,8 +4915,8 @@ assessments:
         "97cc511e183cdbf5e7938fbf7103271f9b173649b805d650\
         c5423b1f1c63db8c"
       tests/dynamic-source-realm-host-evidence.test.ts:
-        "33fa8bc15819484524d930a99734d368c447ad95f1a7561b\
-        b553978437567194"
+        "86c650b94794f06feb2712820e1722977377dbd1b162a968\
+        010cb47a76028ce9"
   ds19-67:
     disposition: exclusion
     normativeDependency: source-evaluation-only
@@ -4947,8 +4947,8 @@ assessments:
         "d19099f7a7c6da924becfdde101535b7d976e20aedbc63ed\
         cbc61785d48fc5af"
       tests/dynamic-source-realm-host-evidence.test.ts:
-        "33fa8bc15819484524d930a99734d368c447ad95f1a7561b\
-        b553978437567194"
+        "86c650b94794f06feb2712820e1722977377dbd1b162a968\
+        010cb47a76028ce9"
   ds19-69:
     disposition: exclusion
     normativeDependency: source-evaluation-only
@@ -4966,8 +4966,8 @@ assessments:
         "d19099f7a7c6da924becfdde101535b7d976e20aedbc63ed\
         cbc61785d48fc5af"
       tests/dynamic-source-realm-host-evidence.test.ts:
-        "33fa8bc15819484524d930a99734d368c447ad95f1a7561b\
-        b553978437567194"
+        "86c650b94794f06feb2712820e1722977377dbd1b162a968\
+        010cb47a76028ce9"
   ds19-70:
     disposition: exclusion
     normativeDependency: source-evaluation-only
@@ -4985,8 +4985,8 @@ assessments:
         "d19099f7a7c6da924becfdde101535b7d976e20aedbc63ed\
         cbc61785d48fc5af"
       tests/dynamic-source-realm-host-evidence.test.ts:
-        "33fa8bc15819484524d930a99734d368c447ad95f1a7561b\
-        b553978437567194"
+        "86c650b94794f06feb2712820e1722977377dbd1b162a968\
+        010cb47a76028ce9"
   ds19-71:
     disposition: exclusion
     normativeDependency: source-evaluation-only
@@ -5004,8 +5004,8 @@ assessments:
         "d19099f7a7c6da924becfdde101535b7d976e20aedbc63ed\
         cbc61785d48fc5af"
       tests/dynamic-source-realm-host-evidence.test.ts:
-        "33fa8bc15819484524d930a99734d368c447ad95f1a7561b\
-        b553978437567194"
+        "86c650b94794f06feb2712820e1722977377dbd1b162a968\
+        010cb47a76028ce9"
   ds19-72:
     disposition: exclusion
     normativeDependency: source-evaluation-only
@@ -5023,8 +5023,8 @@ assessments:
         "d19099f7a7c6da924becfdde101535b7d976e20aedbc63ed\
         cbc61785d48fc5af"
       tests/dynamic-source-realm-host-evidence.test.ts:
-        "33fa8bc15819484524d930a99734d368c447ad95f1a7561b\
-        b553978437567194"
+        "86c650b94794f06feb2712820e1722977377dbd1b162a968\
+        010cb47a76028ce9"
   ds19-73:
     disposition: exclusion
     normativeDependency: source-evaluation-only
@@ -5042,8 +5042,8 @@ assessments:
         "d19099f7a7c6da924becfdde101535b7d976e20aedbc63ed\
         cbc61785d48fc5af"
       tests/dynamic-source-realm-host-evidence.test.ts:
-        "33fa8bc15819484524d930a99734d368c447ad95f1a7561b\
-        b553978437567194"
+        "86c650b94794f06feb2712820e1722977377dbd1b162a968\
+        010cb47a76028ce9"
   ds19-74:
     disposition: exclusion
     normativeDependency: source-evaluation-only
@@ -5061,8 +5061,8 @@ assessments:
         "d19099f7a7c6da924becfdde101535b7d976e20aedbc63ed\
         cbc61785d48fc5af"
       tests/dynamic-source-realm-host-evidence.test.ts:
-        "33fa8bc15819484524d930a99734d368c447ad95f1a7561b\
-        b553978437567194"
+        "86c650b94794f06feb2712820e1722977377dbd1b162a968\
+        010cb47a76028ce9"
   ds19-75:
     disposition: exclusion
     normativeDependency: source-evaluation-only
@@ -5080,8 +5080,8 @@ assessments:
         "d19099f7a7c6da924becfdde101535b7d976e20aedbc63ed\
         cbc61785d48fc5af"
       tests/dynamic-source-realm-host-evidence.test.ts:
-        "33fa8bc15819484524d930a99734d368c447ad95f1a7561b\
-        b553978437567194"
+        "86c650b94794f06feb2712820e1722977377dbd1b162a968\
+        010cb47a76028ce9"
   ds19-76:
     disposition: exclusion
     normativeDependency: source-evaluation-only
@@ -5099,8 +5099,8 @@ assessments:
         "d19099f7a7c6da924becfdde101535b7d976e20aedbc63ed\
         cbc61785d48fc5af"
       tests/dynamic-source-realm-host-evidence.test.ts:
-        "33fa8bc15819484524d930a99734d368c447ad95f1a7561b\
-        b553978437567194"
+        "86c650b94794f06feb2712820e1722977377dbd1b162a968\
+        010cb47a76028ce9"
   ds19-77:
     disposition: exclusion
     normativeDependency: source-evaluation-only
@@ -5118,8 +5118,8 @@ assessments:
         "d19099f7a7c6da924becfdde101535b7d976e20aedbc63ed\
         cbc61785d48fc5af"
       tests/dynamic-source-realm-host-evidence.test.ts:
-        "33fa8bc15819484524d930a99734d368c447ad95f1a7561b\
-        b553978437567194"
+        "86c650b94794f06feb2712820e1722977377dbd1b162a968\
+        010cb47a76028ce9"
   ds19-78:
     disposition: exclusion
     normativeDependency: source-evaluation-only
@@ -5137,8 +5137,8 @@ assessments:
         "97cc511e183cdbf5e7938fbf7103271f9b173649b805d650\
         c5423b1f1c63db8c"
       tests/dynamic-source-realm-host-evidence.test.ts:
-        "33fa8bc15819484524d930a99734d368c447ad95f1a7561b\
-        b553978437567194"
+        "86c650b94794f06feb2712820e1722977377dbd1b162a968\
+        010cb47a76028ce9"
   ds19-79:
     disposition: exclusion
     normativeDependency: source-evaluation-only
@@ -5156,8 +5156,8 @@ assessments:
         "4e7fb1e1becb058393b0cbc11a5a45174247f2d8f1a6d7ba\
         3b1e25a67301057c"
       tests/dynamic-source-realm-host-evidence.test.ts:
-        "33fa8bc15819484524d930a99734d368c447ad95f1a7561b\
-        b553978437567194"
+        "86c650b94794f06feb2712820e1722977377dbd1b162a968\
+        010cb47a76028ce9"
   ds19-80:
     disposition: exclusion
     normativeDependency: source-evaluation-only
@@ -5174,8 +5174,8 @@ assessments:
         "1347e426eeecb98be2a7e5a4e0ceefa93f40353cb6a58379\
         ebe3b1bdd5dfa717"
       tests/dynamic-source-realm-host-evidence.test.ts:
-        "33fa8bc15819484524d930a99734d368c447ad95f1a7561b\
-        b553978437567194"
+        "86c650b94794f06feb2712820e1722977377dbd1b162a968\
+        010cb47a76028ce9"
   ds19-81:
     disposition: exclusion
     normativeDependency: source-evaluation-only
@@ -5194,8 +5194,8 @@ assessments:
         "750987a370c663899c43f03660fb941031246341219141d4\
         9f7f351d3896b21f"
       tests/dynamic-source-realm-host-evidence.test.ts:
-        "33fa8bc15819484524d930a99734d368c447ad95f1a7561b\
-        b553978437567194"
+        "86c650b94794f06feb2712820e1722977377dbd1b162a968\
+        010cb47a76028ce9"
   ds19-82:
     disposition: exclusion
     normativeDependency: source-evaluation-only
@@ -5214,8 +5214,8 @@ assessments:
         "750987a370c663899c43f03660fb941031246341219141d4\
         9f7f351d3896b21f"
       tests/dynamic-source-realm-host-evidence.test.ts:
-        "33fa8bc15819484524d930a99734d368c447ad95f1a7561b\
-        b553978437567194"
+        "86c650b94794f06feb2712820e1722977377dbd1b162a968\
+        010cb47a76028ce9"
   ds13-static-construction-contracts:
     disposition: "exclusion"
     normativeDependency: "source-evaluation-only"
@@ -5224,8 +5224,8 @@ assessments:
         90f24966b2f41a0ebe9cabe4a5454e61063d6b54"
       tests/native/fixtures/construction-static-contracts.ts: "784b3e71396e5\
         f40e33a5b3cbe52a3ec28b59cdba905431d1e8e0c1d929ae6b6"
-      tests/native.ts: "88325e5fa326ae82704a3f8996ac8860b42f6f4cc15a69fe4d89\
-        1942dca59425"
+      tests/native.ts: "a28b51a7e399b7a128011aa70d758a2ce26229e4ab78c539f5e2\
+        7a33ddea023f"
     reason: >-
       Maintainer decision 2026-10-28 item 1 applies only to the 24 exclusion
       rows in docs/m5c-graph/dynamic-source-construction-assessment.yaml.
@@ -5306,6 +5306,139 @@ assessments:
       tests/regexp-static-grammar.test.ts:
         "6582ae85e7bca86210008bfb7640b9942d58786b2bb32b\
         97d0a9a824c8d960f1"
+  residual-exact-completion:
+    disposition: exclusion
+    normativeDependency: source-evaluation-only
+    reason: >-
+      D19 applies the existing DS-21 condition to ten exact completion paths.
+      Finite literal ADR 0029 Scripts retain every original assertion and
+      independently compare each result's strict value and type. Each site
+      in both strictness modes rejects its own wrong-type mutation through
+      an independent error-type/reachability verdict. Direct strict source
+      receives a directive and void 0, after a hashbang when present;
+      indirect source remains sloppy. No caller-local input, this,
+      new.target, arguments or function var environment affects completion.
+      Class declaration sites use fresh realms for eval lexical isolation.
+      Both native policies and forced GC observe the same operation.
+      Only the original source evaluation remains excluded under ADR 0016;
+      accounting counts no path as pass. Reopen on changed source, observed
+      rejection or replacement evidence, an accepted source admission, or
+      any uncovered non-source assertion under ADR 0019.
+    replacementEvidence:
+      docs/m5c-graph/dynamic-source-residual-evidence.assessment.md:
+        "8a0cddcd21f7223bc65f7d3b1314774849021810aebba9d9\
+        ed4b8cade760e0ab"
+      tests/native/fixtures/residual-completion-cases.ts:
+        "5a0888fa54174d4a86f31763436c445456a49548177ec6f9\
+        43c91575ed994c35"
+      tests/native/fixtures/dynamic-source-residual.ts:
+        "20e630cc639ca491192be7ea0193d333bb2723f5b3fc3d24\
+        81c22ffcee11b683"
+      tests/dynamic-source-residual-evidence.test.ts:
+        "578d18d9124d3817c4358f92ec4c99d815b9d5189594a095\
+        87ece93ee612e3bb"
+      tests/dynamic-source-residual-source.test.ts:
+        "f124147bde0d8023f6be413421e40d6cf3d09ec2a2e5abf9\
+        119442a0bb1d515c"
+      tests/native.ts: "a28b51a7e399b7a128011aa70d758a2ce26229e4ab78c539\
+        f5e27a33ddea023f"
+      tests/test262/harness/base.js:
+        "50331feeca513cb2e2354e05e7c68f82d5aeccd9b766d6c8\
+        8438c5ef118075f6"
+  residual-exact-class:
+    disposition: exclusion
+    normativeDependency: source-evaluation-only
+    reason: >-
+      D19 permits exact static witnesses of all five original class contracts.
+      Static initializers, public property reads and calls, ordered static
+      fields and the original absent-method TypeError are retained. Private
+      names and arrow return values absent from the original assertions are
+      not invented. Strict value/type checks and per-value mutations have
+      independent rejection verdicts. Both native policies pass with forced
+      GC and Node/Deno references observe the same ordinary operations.
+      Only the original source evaluation remains excluded under ADR 0016;
+      accounting counts no path as pass. Reopen on changed source, observed
+      rejection or replacement evidence, an accepted source admission, or
+      any uncovered non-source assertion under ADR 0019.
+    replacementEvidence:
+      docs/m5c-graph/dynamic-source-residual-evidence.assessment.md:
+        "8a0cddcd21f7223bc65f7d3b1314774849021810aebba9d9\
+        ed4b8cade760e0ab"
+      tests/native/fixtures/residual-class-cases.ts:
+        "75b92b68c15d721bfacd72ef94394d68b3d8828f6ade7dbf\
+        70fb3f75f5b1adf0"
+      tests/native/fixtures/dynamic-source-residual.ts:
+        "20e630cc639ca491192be7ea0193d333bb2723f5b3fc3d24\
+        81c22ffcee11b683"
+      tests/dynamic-source-residual-evidence.test.ts:
+        "578d18d9124d3817c4358f92ec4c99d815b9d5189594a095\
+        87ece93ee612e3bb"
+      tests/dynamic-source-residual-source.test.ts:
+        "f124147bde0d8023f6be413421e40d6cf3d09ec2a2e5abf9\
+        119442a0bb1d515c"
+      tests/native.ts: "a28b51a7e399b7a128011aa70d758a2ce26229e4ab78c539\
+        f5e27a33ddea023f"
+      tests/test262/harness/base.js:
+        "50331feeca513cb2e2354e05e7c68f82d5aeccd9b766d6c8\
+        8438c5ef118075f6"
+  residual-derived-error-realm:
+    disposition: exclusion
+    normativeDependency: source-evaluation-only
+    reason: >-
+      D19 authorizes repair of the two ordinary Construct error-realm defects.
+      The original DS19 caller-realm TypeError/ReferenceError assertions
+      remain unchanged and pass under both policies with forced GC. ABI
+      m5-146 retains the caller realm through nested calls and derived tail
+      continuations; body errors retain the callee realm. Fixed matrices
+      and class property seed 0x60000b06 cover return strategies, body and
+      result errors, wrappers, caller realms and primitive result types.
+      Node/Deno's empty-body ReferenceError realm difference is explicitly
+      qualified only in reference programs, never in the native oracle.
+      Root still owes the next bundle UPDATE.
+      Only the original source evaluation remains excluded under ADR 0016;
+      accounting counts no path as pass. Reopen on changed source, observed
+      rejection or replacement evidence, an accepted source admission, or
+      any uncovered non-source assertion under ADR 0019.
+    replacementEvidence:
+      docs/m5c-graph/dynamic-source-residual-evidence.assessment.md:
+        "8a0cddcd21f7223bc65f7d3b1314774849021810aebba9d9\
+        ed4b8cade760e0ab"
+      tests/fixtures/ds19-realm/derived-return.js.txt:
+        "ba537c1b6b27582f10a2d4f0fac920fd3a114fe4d22f8b6c\
+        db9702938af6c52a"
+      tests/fixtures/ds19-realm/derived-this.js.txt:
+        "c1cb8d0db71d360241a0b7c5027f87fe8168117f8863a929\
+        bcf038aad6718b64"
+      tests/dynamic-source-realm-host-evidence.test.ts:
+        "86c650b94794f06feb2712820e1722977377dbd1b162a968\
+        010cb47a76028ce9"
+      tests/native/fixtures/derived-constructor-realms.ts:
+        "f3c077755f14d3282c2d598ff3665550bd770a62fcb64c42\
+        eb4a29e5763f6e89"
+      tests/dynamic-source-residual-evidence.test.ts:
+        "578d18d9124d3817c4358f92ec4c99d815b9d5189594a095\
+        87ece93ee612e3bb"
+      tests/property/m5-class.property.test.ts:
+        "a28a1ee343951fadda7533ab3a960b185c949e027db1d64a\
+        8b6db3794ca10873"
+      packages/runtime-c/native/runtime_function.c:
+        "0aba436f4c6143d47c771a311c152109b85cd3530344df28\
+        112eeb7a05970851"
+      packages/runtime-c/native/runtime_memory.c:
+        "9c07b723ea610bb8e6e1322c7ee9cfaa3666efc92a85921a\
+        44b1b6bb6a944a69"
+      packages/runtime-c/native/runtime_internal.h:
+        "ae951eecf05b132893a2bfc93a0186b6bc106e4bba413f0a\
+        a9e584d352b5ecca"
+      packages/runtime-c/native/oseo_runtime.h:
+        "b8d6083f7cd65b5e02678dcb65650762ba952eb899973459\
+        1e25f37f399ee669"
+      packages/runtime-c/native/runtime_core.c:
+        "d6bc44175f5525359409c3294eb13926aaf33b60f99b4d7b\
+        65c2a5998f9d50b4"
+      packages/runtime-c/src/index.ts:
+        "5e3a197e90743104a0224f7a73a0bebcdf4e99cbf181d651\
+        7e0a37e5e00735e7"
 paths:
   - path: test/built-ins/AggregateError/newtarget-proto-fallback.js
     proposedOwner: adr:0016-dynamic-source-boundary
@@ -6997,7 +7130,7 @@ paths:
     subject: Error when derived constructor returns a
       non-undefined value (honoring the Realm of the current
       execution context)
-    assessment: ds19-19
+    assessment: residual-derived-error-realm
   - path: "test/built-ins/Function/internals/Construct/derived-\
       this-uninitialized-realm.js"
     proposedOwner: adr:0016-dynamic-source-boundary
@@ -7012,7 +7145,7 @@ paths:
     subject: Error when derived constructor does not initialize
       the `this` binding (honoring the Realm of the current
       execution context)
-    assessment: ds19-20
+    assessment: residual-derived-error-realm
   - path: test/built-ins/Function/is-a-constructor.js
     proposedOwner: adr:0016-dynamic-source-boundary
     priorCohort: incidental-scaffolding
@@ -9311,7 +9444,7 @@ paths:
     section: "ECMA-262 Hashbang Comments; PerformEval (Script goal)"
     subject: "Hashbang comments should be available in Script
       evaluator contexts. (indirect eval)"
-    assessment: "observation-train-dynamic-coverage"
+    assessment: residual-exact-completion
   - path: "test/language/comments/hashbang/eval.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "incidental-scaffolding"
@@ -9323,7 +9456,7 @@ paths:
     section: "ECMA-262 Hashbang Comments; PerformEval (Script goal)"
     subject: "Hashbang comments should be available in Script
       evaluator contexts. (direct eval)"
-    assessment: "observation-train-dynamic-coverage"
+    assessment: residual-exact-completion
   - path: "test/language/comments/hashbang/function-constructor.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "incidental-scaffolding"
@@ -25583,7 +25716,7 @@ paths:
     missingDynamicTag: false
     section: sec-async-function-definitions-runtime-semantics-evaluation
     subject: Async function declaration completion value is empty.
-    assessment: completion-observation
+    assessment: residual-exact-completion
   - path: test/language/statements/async-function/eval-var-scope-syntax-err.js
     proposedOwner: adr:0016-dynamic-source-boundary
     priorCohort: source-subject
@@ -25630,7 +25763,7 @@ paths:
     missingDynamicTag: false
     section: sec-class-definitions-runtime-semantics-evaluation
     subject: Class declaration completion value is empty.
-    assessment: completion-observation
+    assessment: residual-exact-completion
   - path: "test/language/statements/class/elements/arrow-body-derived-cls-direc\
       t-eval-contains-superproperty-1.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -25930,7 +26063,7 @@ paths:
     missingDynamicTag: false
     section: "sec-performeval-rules-in-initializer"
     subject: "error if `new.target` in StatementList of eval (direct eval)"
-    assessment: class-declaration-arrow-return-mixed-assertion
+    assessment: residual-exact-class
   - path: "test/language/statements/class/elements/arrow-body-private-indirect-\
       eval-err-contains-newtarget.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -26427,7 +26560,7 @@ paths:
     missingDynamicTag: false
     section: "sec-performeval-rules-in-initializer"
     subject: "error if `new.target` in StatementList of eval (direct eval)"
-    assessment: fixture-construction
+    assessment: residual-exact-class
   - path: "test/language/statements/class/elements/nested-private-indirect-eval\
       -contains-arguments.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -26595,7 +26728,7 @@ paths:
     missingDynamicTag: false
     section: "sec-performeval-rules-in-initializer"
     subject: "error if `new.target` in StatementList of eval (direct eval)"
-    assessment: fixture-construction
+    assessment: residual-exact-class
   - path: "test/language/statements/class/elements/private-field-visible-to-dir\
       ect-eval-on-initializer.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -26789,7 +26922,7 @@ paths:
     missingDynamicTag: false
     section: "sec-privatefieldget"
     subject: "Private static setter is visible to direct eval code"
-    assessment: class-declaration-setter-mixed-assertion
+    assessment: residual-exact-class
   - path: "test/language/statements/class/elements/privatename-not-valid-eval-e\
       arlyerr-1.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -26904,7 +27037,7 @@ paths:
     section: "prod-FieldDefinition"
     subject: "Static fields initializer has `this` biding (field definitions in
       a class declaration)"
-    assessment: fixture-construction
+    assessment: residual-exact-class
   - path: "test/language/statements/class/subclass-builtins/subclas\
       s-Function.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -27324,7 +27457,7 @@ paths:
     section: 13.7.5.11
     subject: Completion value when head has a declaration and iteration is
       cancelled
-    assessment: observation-train-b24-b25
+    assessment: residual-exact-completion
   - path: test/language/statements/for-of/cptn-decl-itr.js
     proposedOwner: adr:0016-dynamic-source-boundary
     priorCohort: incidental-scaffolding
@@ -27335,7 +27468,7 @@ paths:
     missingDynamicTag: false
     section: 13.7.5.11
     subject: Completion value when head has a declaration and iteration occurs
-    assessment: observation-train-b24-b25
+    assessment: residual-exact-completion
   - path: test/language/statements/for-of/cptn-decl-no-itr.js
     proposedOwner: adr:0016-dynamic-source-boundary
     priorCohort: incidental-scaffolding
@@ -27347,7 +27480,7 @@ paths:
     section: 13.7.5.11
     subject: Completion value when head has a declaration and no iteration
       occurs
-    assessment: observation-train-b24-b25
+    assessment: residual-exact-completion
   - path: test/language/statements/for-of/cptn-expr-abrupt-empty.js
     proposedOwner: adr:0016-dynamic-source-boundary
     priorCohort: incidental-scaffolding
@@ -27359,7 +27492,7 @@ paths:
     section: 13.7.5.11
     subject: Completion value when head has no declaration and iteration is
       cancelled
-    assessment: observation-train-b24-b25
+    assessment: residual-exact-completion
   - path: test/language/statements/for-of/cptn-expr-itr.js
     proposedOwner: adr:0016-dynamic-source-boundary
     priorCohort: incidental-scaffolding
@@ -27370,7 +27503,7 @@ paths:
     missingDynamicTag: false
     section: 13.7.5.11
     subject: Completion value when head has no declaration and iteration occurs
-    assessment: observation-train-b24-b25
+    assessment: residual-exact-completion
   - path: test/language/statements/for-of/cptn-expr-no-itr.js
     proposedOwner: adr:0016-dynamic-source-boundary
     priorCohort: incidental-scaffolding
@@ -27382,7 +27515,7 @@ paths:
     section: 13.7.5.11
     subject: Completion value when head has no declaration and no iteration
       occurs
-    assessment: observation-train-b24-b25
+    assessment: residual-exact-completion
   - path: test/language/statements/for-of/scope-head-var-none.js
     proposedOwner: adr:0016-dynamic-source-boundary
     priorCohort: incidental-scaffolding

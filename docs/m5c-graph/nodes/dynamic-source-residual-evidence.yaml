@@ -1,0 +1,14 @@
+version: 1
+id: dynamic-source-residual-evidence
+title: Dynamic source residual evidence
+delivers: >-
+  Reviews exactly 19 pinned residual paths under the D19 bounded decision.
+  Establishes faithful completion and class witnesses and repairs ordinary
+  derived-constructor error realms. Every non-source assertion requires
+  reviewed evidence before closure. Uncovered paths retain umbrella ownership.
+  Scope, SHA256, family obligations and authority are recorded in
+  docs/m5c-graph/dynamic-source-residual-evidence.md.
+dependencies:
+  - authorized-exclusion-audit
+landed: false
+status: ready
