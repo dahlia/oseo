@@ -1146,6 +1146,142 @@ results:
     unsupportedFeatures: []
   - case:
       async: false
+      features: []
+      flags: []
+      includes: []
+      mode: script
+      path: test/language/statements/for/12.6.3_2-3-a-ii-1.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - control-flow
+      - object-literals
+      - var-bindings
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - destructuring-binding
+      flags:
+        - generated
+      includes: []
+      mode: script
+      path: test/language/statements/for/dstr/let-ary-ptrn-elem-ary-elem-init.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - control-flow
+      - destructuring-bindings
+      - expression-operators
+      - iterator-protocol
+      - lexical-bindings
+      - symbols
+      - var-bindings
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features: []
+      flags: []
+      includes: []
+      mode: script
+      path: test/language/statements/for/head-let-fresh-binding-per-iteration.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - control-flow
+      - expression-operators
+      - lexical-bindings
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features: []
+      flags: []
+      includes: []
+      mode: script
+      path: test/language/statements/function/S13.2.1_A4_T1.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - expression-operators
+      - functions
+      - object-literals
+      - object-properties
+      - var-bindings
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
       features:
         - generators
       flags:
@@ -1169,6 +1305,111 @@ results:
           strictness: non-strict
         - specialization: enabled
           strictness: non-strict
+    observation:
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features: []
+      flags: []
+      includes: []
+      mode: script
+      path: test/language/statements/let/block-local-closure-get-before-initialization.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - abrupt-completion
+      - error-intrinsics
+      - functions
+      - lexical-bindings
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features: []
+      flags: []
+      includes: []
+      mode: script
+      path: test/language/statements/switch/S12.11_A4_T1.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - abrupt-completion
+      - control-flow
+      - expression-operators
+      - functions
+      - var-bindings
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - destructuring-binding
+      flags:
+        - generated
+      includes: []
+      mode: script
+      path: test/language/statements/try/dstr/ary-ptrn-elem-ary-rest-iter.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - abrupt-completion
+      - control-flow
+      - destructuring-bindings
+      - iterator-protocol
+      - object-properties
+      - symbols
+      - var-bindings
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
     observation:
       passed: true
     unsupportedFeatures: []
@@ -1241,5 +1482,39 @@ results:
           strictness: strict
     observation:
       passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features: []
+      flags:
+        - onlyStrict
+      includes: []
+      mode: script
+      path: test/language/statements/variable/12.2.1-2-s.js
+      strictness:
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - abrupt-completion
+      - dynamic-source
+      - error-intrinsics
+      - expression-operators
+      - functions
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: strict
+    observation:
+      detail: 'test/language/statements/variable/12.2.1-2-s.js strict disabled
+        failed (1): stdout=""
+        stderr="test/language/statements/variable/12.2.1-2-s.js:90:5:
+        error[OSEO1001]: eval compiles source text at run time, which is
+        outside the admitted profile.\n"'
+      passed: false
+      unsupportedCapability: profile-syntax
     unsupportedFeatures: []
 suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2

@@ -1085,6 +1085,208 @@ results:
   - case:
       async: false
       features:
+        - destructuring-binding
+      flags:
+        - generated
+      includes: []
+      mode: script
+      path: test/language/statements/for/dstr/var-obj-ptrn-prop-obj.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - abrupt-completion
+      - control-flow
+      - destructuring-bindings
+      - error-intrinsics
+      - expression-operators
+      - object-literals
+      - object-properties
+      - var-bindings
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features: []
+      flags:
+        - noStrict
+      includes: []
+      mode: script
+      path: test/language/statements/function/S13_A15_T4.js
+      strictness:
+        - non-strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - expression-operators
+      - functions
+      - var-bindings
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+    observation:
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
+      expectedErrorType: SyntaxError
+      expectedFailurePhase: parse
+      features:
+        - class-fields-private
+      flags:
+        - generated
+      includes: []
+      mode: script
+      path: test/language/statements/function/early-errors/invalid-names-call-expression-this.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: expected-negative
+    dependencies:
+      - classes
+      - functions
+    observation:
+      errorType: SyntaxError
+      failedPhase: parse
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      expectedErrorType: SyntaxError
+      expectedFailurePhase: parse
+      features:
+        - generators
+        - destructuring-binding
+      flags:
+        - generated
+      includes: []
+      mode: script
+      path: test/language/statements/generators/dstr/ary-ptrn-rest-not-final-obj.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: expected-negative
+    dependencies:
+      - destructuring-bindings
+      - functions
+      - generators
+    observation:
+      errorType: SyntaxError
+      failedPhase: parse
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - generators
+        - destructuring-binding
+        - default-parameters
+      flags:
+        - generated
+      includes: []
+      mode: script
+      path: test/language/statements/generators/dstr/dflt-ary-ptrn-elem-ary-elision-init.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - default-parameters
+      - destructuring-bindings
+      - expression-operators
+      - functions
+      - generators
+      - iterator-protocol
+      - object-properties
+      - symbols
+      - var-bindings
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - generators
+        - destructuring-binding
+        - default-parameters
+      flags:
+        - generated
+      includes: []
+      mode: script
+      path: test/language/statements/generators/dstr/dflt-obj-ptrn-prop-id-trailing-comma.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - abrupt-completion
+      - default-parameters
+      - destructuring-bindings
+      - error-intrinsics
+      - expression-operators
+      - functions
+      - generators
+      - object-literals
+      - object-properties
+      - var-bindings
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
         - generators
       flags: []
       includes: []
@@ -1097,6 +1299,75 @@ results:
     classification: pass
     dependencies:
       - generators
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features: []
+      flags: []
+      includes: []
+      mode: script
+      path: test/language/statements/switch/cptn-no-dflt-match-final.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - control-flow
+      - dynamic-source
+      - functions
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+    observation:
+      detail: 'test/language/statements/switch/cptn-no-dflt-match-final.js
+        non-strict disabled failed (1): stdout=""
+        stderr="test/language/statements/switch/cptn-no-dflt-match-final.js:117:3:
+        error[OSEO1001]: eval compiles source text at run time, which is
+        outside the admitted profile.\n"'
+      passed: false
+      unsupportedCapability: profile-syntax
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - destructuring-binding
+      flags:
+        - generated
+      includes: []
+      mode: script
+      path: test/language/statements/try/dstr/obj-ptrn-prop-obj-value-null.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - abrupt-completion
+      - control-flow
+      - destructuring-bindings
+      - error-intrinsics
+      - object-literals
+      - object-properties
     execution:
       harnessIncludes:
         - base.js

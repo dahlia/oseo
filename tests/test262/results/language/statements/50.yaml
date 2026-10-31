@@ -1332,6 +1332,204 @@ results:
   - case:
       async: false
       features: []
+      flags: []
+      includes: []
+      mode: script
+      path: test/language/statements/for/cptn-expr-expr-no-iter.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - control-flow
+      - dynamic-source
+      - functions
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+    observation:
+      detail: 'test/language/statements/for/cptn-expr-expr-no-iter.js
+        non-strict disabled failed (1): stdout=""
+        stderr="test/language/statements/for/cptn-expr-expr-no-iter.js:104:18:
+        error[OSEO1001]: eval compiles source text at run time, which is
+        outside the admitted profile.\n"'
+      passed: false
+      unsupportedCapability: profile-syntax
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - generators
+        - destructuring-binding
+      flags:
+        - generated
+      includes: []
+      mode: script
+      path: test/language/statements/generators/dstr/ary-ptrn-elem-id-init-fn-name-arrow.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - destructuring-bindings
+      - expression-operators
+      - functions
+      - generators
+      - iterator-protocol
+      - object-properties
+      - symbols
+      - var-bindings
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - generators
+        - destructuring-binding
+      flags:
+        - generated
+      includes: []
+      mode: script
+      path: test/language/statements/generators/dstr/obj-ptrn-id-init-fn-name-cover.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - destructuring-bindings
+      - expression-operators
+      - functions
+      - generators
+      - object-literals
+      - object-properties
+      - var-bindings
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
+      expectedErrorType: SyntaxError
+      expectedFailurePhase: parse
+      features:
+        - async-functions
+      flags: []
+      includes: []
+      mode: script
+      path: test/language/statements/if/if-async-fun-else-stmt.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: expected-negative
+    dependencies:
+      - async-functions
+      - control-flow
+      - functions
+    observation:
+      errorType: SyntaxError
+      failedPhase: parse
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      expectedErrorType: SyntaxError
+      expectedFailurePhase: parse
+      features: []
+      flags:
+        - generated
+      includes: []
+      mode: script
+      path: test/language/statements/switch/syntax/redeclaration/const-name-redeclaration-attempt-with-class.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: expected-negative
+    dependencies:
+      - classes
+      - control-flow
+      - lexical-bindings
+    observation:
+      errorType: SyntaxError
+      failedPhase: parse
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - destructuring-binding
+      flags:
+        - generated
+      includes: []
+      mode: script
+      path: test/language/statements/try/dstr/ary-ptrn-elem-id-init-fn-name-class.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - abrupt-completion
+      - classes
+      - control-flow
+      - destructuring-bindings
+      - functions
+      - iterator-protocol
+      - object-properties
+      - symbols
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features: []
       flags:
         - noStrict
       includes: []

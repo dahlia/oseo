@@ -980,6 +980,299 @@ results:
     unsupportedFeatures: []
   - case:
       async: false
+      expectedErrorType: SyntaxError
+      expectedFailurePhase: parse
+      features:
+        - async-iteration
+      flags: []
+      includes: []
+      mode: script
+      path: test/language/statements/for/decl-async-gen.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: expected-negative
+    dependencies:
+      - async-functions
+      - control-flow
+      - functions
+      - generators
+    observation:
+      errorType: SyntaxError
+      failedPhase: parse
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      expectedErrorType: SyntaxError
+      expectedFailurePhase: parse
+      features:
+        - destructuring-binding
+      flags:
+        - generated
+      includes: []
+      mode: script
+      path: test/language/statements/for/dstr/let-ary-ptrn-rest-init-id.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: expected-negative
+    dependencies:
+      - control-flow
+      - destructuring-bindings
+      - lexical-bindings
+    observation:
+      errorType: SyntaxError
+      failedPhase: parse
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      expectedErrorType: SyntaxError
+      expectedFailurePhase: parse
+      features:
+        - destructuring-binding
+      flags:
+        - generated
+      includes: []
+      mode: script
+      path: test/language/statements/for/dstr/var-ary-ptrn-rest-not-final-obj.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: expected-negative
+    dependencies:
+      - control-flow
+      - destructuring-bindings
+      - var-bindings
+    observation:
+      errorType: SyntaxError
+      failedPhase: parse
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features: []
+      flags: []
+      includes: []
+      mode: script
+      path: test/language/statements/for/head-let-destructuring.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - control-flow
+      - destructuring-bindings
+      - expression-operators
+      - iterator-protocol
+      - lexical-bindings
+      - lexical-grammar
+      - symbols
+      - var-bindings
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features: []
+      flags: []
+      includes: []
+      mode: script
+      path: test/language/statements/function/S13.2_A1_T1.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - functions
+      - object-properties
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
+      expectedErrorType: SyntaxError
+      expectedFailurePhase: parse
+      features: []
+      flags:
+        - noStrict
+      includes: []
+      mode: script
+      path: test/language/statements/function/param-eval-strict-body.js
+      strictness:
+        - non-strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: expected-negative
+    dependencies:
+      - functions
+    observation:
+      errorType: SyntaxError
+      failedPhase: parse
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      expectedErrorType: SyntaxError
+      expectedFailurePhase: parse
+      features: []
+      flags:
+        - onlyStrict
+      includes: []
+      mode: script
+      path: test/language/statements/if/if-decl-else-stmt-strict.js
+      strictness:
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: expected-negative
+    dependencies:
+      - control-flow
+      - functions
+    observation:
+      errorType: SyntaxError
+      failedPhase: parse
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features: []
+      flags: []
+      includes: []
+      mode: script
+      path: test/language/statements/switch/cptn-dflt-b-final.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - control-flow
+      - dynamic-source
+      - functions
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+    observation:
+      detail: 'test/language/statements/switch/cptn-dflt-b-final.js non-strict
+        disabled failed (1): stdout=""
+        stderr="test/language/statements/switch/cptn-dflt-b-final.js:127:3:
+        error[OSEO1001]: eval compiles source text at run time, which is
+        outside the admitted profile.\n"'
+      passed: false
+      unsupportedCapability: profile-syntax
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - destructuring-binding
+      flags:
+        - generated
+      includes: []
+      mode: script
+      path: test/language/statements/try/dstr/ary-ptrn-rest-obj-id.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - abrupt-completion
+      - control-flow
+      - destructuring-bindings
+      - iterator-protocol
+      - object-properties
+      - symbols
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - destructuring-binding
+      flags:
+        - generated
+      includes: []
+      mode: script
+      path: test/language/statements/try/dstr/obj-ptrn-empty.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - abrupt-completion
+      - control-flow
+      - destructuring-bindings
+      - functions
+      - object-literals
+      - object-properties
+      - var-bindings
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
       features: []
       flags:
         - noStrict

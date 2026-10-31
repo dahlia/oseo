@@ -1,0 +1,293 @@
+Observation batch 26b: preparation
+==================================
+
+On source `8f420262`, focused `executeTest262Case` observations cover
+all 645 originals selected for this batch: 521 pass,
+65 expected-negative and 59 unsupported-profile-feature.
+There are no semantic, harness or infrastructure failures and no held paths.
+These are branch preparation results; Root owns scoped UPDATE, integration,
+landing, publication and the outer gate.
+
+The 59 unsupported originals remain active in-claim coverage
+remediation under `node:dynamic-source-coverage-remediation`. Their
+observations report the existing eval or Function source-compilation
+boundary, including unknown-eval binding diagnostics. They gain source-bound
+assessments under
+`observation-train-b26a-b26b-b27` in the exclusion audit, with original source
+hashes, normalized observation digests, normative sections and subjects.
+No replacement or whole-path exclusion is claimed. ADR 0013, ADR 0016 and
+ADR 0019, including their reopening triggers, remain unchanged.
+
+
+Evidence
+--------
+
+The
+[dispatch packet](/data/m5c-d17-20261031/train-c/task_e9fd521bf8ca/ctx_f6f615dc9f66/)
+retains the raw evidence. Its *intake.json* binds the pinned source hashes and
+exact batch selectors. *observations.json* contains the runner classifications
+and specialization variants, while *raw/* retains every native execution
+request and result. *self-audit.json* and *reviewed-tags.json* record per-path
+dependency evidence and audit corrections; *observation-batch-26b.paths* and
+*observation-batch-26b.review-units* name the 645 paths and 378 review units.
+The canonical serializer materializes the saved observations into the manifest
+before U; Root's scoped UPDATE must strictly agree before R is accepted.
+
+
+Dependency self-audit
+---------------------
+
+Every row was checked against the consolidated tag rules of October 29
+and every October 30 clarification. Tags name an asserted source contract
+or its prerequisites. Assertion messages, failure-only Test262Error
+branches, normally completing try statements and expected-error checking
+plumbing supply no independent coverage. Catch environments and statement
+completion forms retain control-flow only when they are subjects; helper
+branches that change an asserted operation retain the prerequisite.
+
+Expected-descriptor objects passed only to verifyProperty are excluded
+from object-literals; Object.defineProperty descriptors remain prerequisites.
+Literal eval and Function source strings are parsed for their actual subject
+syntax, including evaluated object literals. Implicit iterable consumers
+retain iterator-protocol and symbols where their Symbol-keyed lookup is
+reached. Parse-only negatives retain subject grammar families without
+runtime promise, abrupt-completion or protocol claims. Original declaration
+conflicts include both declarations in the rejected early-error contract.
+No fixture module contributes a tag in this train; the fixture-derived
+row count is zero. Existing subset rows, classifications, tags and owners
+are preserved.
+
+
+Unsupported selector
+--------------------
+
+| Original path                                                          | Owner                               |
+| ---------------------------------------------------------------------- | ----------------------------------- |
+| test/language/statements/function/13.0-12-s.js                         | dynamic-source-coverage-remediation |
+| test/language/statements/function/13.0-13-s.js                         | dynamic-source-coverage-remediation |
+| test/language/statements/function/13.0-14-s.js                         | dynamic-source-coverage-remediation |
+| test/language/statements/function/13.0-15-s.js                         | dynamic-source-coverage-remediation |
+| test/language/statements/function/13.0-16-s.js                         | dynamic-source-coverage-remediation |
+| test/language/statements/function/13.0-17-s.js                         | dynamic-source-coverage-remediation |
+| test/language/statements/function/13.0-7-s.js                          | dynamic-source-coverage-remediation |
+| test/language/statements/function/13.0-8-s.js                          | dynamic-source-coverage-remediation |
+| test/language/statements/function/13.0\_4-17gs.js                      | dynamic-source-coverage-remediation |
+| test/language/statements/function/13.1-19-s.js                         | dynamic-source-coverage-remediation |
+| test/language/statements/function/13.1-2-s.js                          | dynamic-source-coverage-remediation |
+| test/language/statements/function/13.1-21-s.js                         | dynamic-source-coverage-remediation |
+| test/language/statements/function/13.1-22-s.js                         | dynamic-source-coverage-remediation |
+| test/language/statements/function/13.1-23-s.js                         | dynamic-source-coverage-remediation |
+| test/language/statements/function/13.1-25-s.js                         | dynamic-source-coverage-remediation |
+| test/language/statements/function/13.1-27-s.js                         | dynamic-source-coverage-remediation |
+| test/language/statements/function/13.1-29-s.js                         | dynamic-source-coverage-remediation |
+| test/language/statements/function/13.1-31-s.js                         | dynamic-source-coverage-remediation |
+| test/language/statements/function/13.1-33-s.js                         | dynamic-source-coverage-remediation |
+| test/language/statements/function/13.1-39-s.js                         | dynamic-source-coverage-remediation |
+| test/language/statements/function/13.1-4-s.js                          | dynamic-source-coverage-remediation |
+| test/language/statements/function/13.1-41-s.js                         | dynamic-source-coverage-remediation |
+| test/language/statements/function/13.2-10-s.js                         | dynamic-source-coverage-remediation |
+| test/language/statements/function/13.2-11-s.js                         | dynamic-source-coverage-remediation |
+| test/language/statements/function/13.2-12-s.js                         | dynamic-source-coverage-remediation |
+| test/language/statements/function/13.2-13-s.js                         | dynamic-source-coverage-remediation |
+| test/language/statements/function/13.2-14-s.js                         | dynamic-source-coverage-remediation |
+| test/language/statements/function/13.2-15-s.js                         | dynamic-source-coverage-remediation |
+| test/language/statements/function/13.2-16-s.js                         | dynamic-source-coverage-remediation |
+| test/language/statements/function/13.2-17-s.js                         | dynamic-source-coverage-remediation |
+| test/language/statements/function/13.2-18-s.js                         | dynamic-source-coverage-remediation |
+| test/language/statements/function/13.2-19-s.js                         | dynamic-source-coverage-remediation |
+| test/language/statements/function/13.2-20-s.js                         | dynamic-source-coverage-remediation |
+| test/language/statements/function/13.2-5-s.js                          | dynamic-source-coverage-remediation |
+| test/language/statements/function/13.2-6-s.js                          | dynamic-source-coverage-remediation |
+| test/language/statements/function/13.2-7-s.js                          | dynamic-source-coverage-remediation |
+| test/language/statements/function/13.2-8-s.js                          | dynamic-source-coverage-remediation |
+| test/language/statements/function/13.2-9-s.js                          | dynamic-source-coverage-remediation |
+| test/language/statements/function/`S13.2.2_A13.js`                     | dynamic-source-coverage-remediation |
+| test/language/statements/function/S13.2.2\_A14.js                      | dynamic-source-coverage-remediation |
+| test/language/statements/function/S13.2.2\_A8\_T3.js                   | dynamic-source-coverage-remediation |
+| test/language/statements/function/S13\_A14\_T1.js                      | dynamic-source-coverage-remediation |
+| test/language/statements/function/cptn-decl.js                         | dynamic-source-coverage-remediation |
+| test/language/statements/function/eval-var-scope-syntax-err.js         | dynamic-source-coverage-remediation |
+| test/language/statements/function/name-eval-stricteval.js              | dynamic-source-coverage-remediation |
+| test/language/statements/function/name-unicode.js                      | dynamic-source-coverage-remediation |
+| test/language/statements/function/param-eval-stricteval.js             | dynamic-source-coverage-remediation |
+| test/language/statements/function/scope-body-lex-distinct.js           | dynamic-source-coverage-remediation |
+| test/language/statements/function/scope-param-elem-var-close.js        | dynamic-source-coverage-remediation |
+| test/language/statements/function/scope-param-elem-var-open.js         | dynamic-source-coverage-remediation |
+| test/language/statements/function/scope-param-rest-elem-var-close.js   | dynamic-source-coverage-remediation |
+| test/language/statements/function/scope-param-rest-elem-var-open.js    | dynamic-source-coverage-remediation |
+| test/language/statements/generators/cptn-decl.js                       | dynamic-source-coverage-remediation |
+| test/language/statements/generators/eval-var-scope-syntax-err.js       | dynamic-source-coverage-remediation |
+| test/language/statements/generators/scope-body-lex-distinct.js         | dynamic-source-coverage-remediation |
+| test/language/statements/generators/scope-param-elem-var-close.js      | dynamic-source-coverage-remediation |
+| test/language/statements/generators/scope-param-elem-var-open.js       | dynamic-source-coverage-remediation |
+| test/language/statements/generators/scope-param-rest-elem-var-close.js | dynamic-source-coverage-remediation |
+| test/language/statements/generators/scope-param-rest-elem-var-open.js  | dynamic-source-coverage-remediation |
+
+
+Internal pass 1 corrections
+---------------------------
+
+All 1,669 train rows were rechecked against each finding pattern and the
+latest consolidated tag rules, including Root's October 30 clarifications.
+This batch has 38 dependency rows corrected in that audit.
+
+Root retained dynamic-source on `S13.2.2_A13.js` even though eval is unreachable
+at run time: handling that construct is a prerequisite of the observed
+compile-time dynamic-source rejection under ADR 0013. The audit corrected
+nested evaluated Function assignments, unused holders around rejected source,
+implicit with-environment Symbol.unscopables reads, required runtime errors,
+and setup branches that deliberately define the observed caller property. Root
+confirmed that constant-false counterparts and assertion-only selection
+branches add no control-flow.
+
+Root confirmed that a declaration used only as an unread assignment
+target for source that must fail to parse adds no holder syntax coverage.
+Identifier-only let tests retain lexical-grammar rather than a directory-only
+lexical-bindings claim. Rejected for-in heads keep control-flow as their
+grammar carrier and drop runtime property-enumeration.
+
+The source-section audit checked all 143 unsupported assessments and
+recovered 37 es6id references omitted by the original fallback. Every
+unsupported path keeps its source hash and normalized observation digest.
+The full cohort audit distinguishes 61 source subjects from 82 incidental
+uses; this cohort records the asserted subject, not an exclusion or proof
+of normative dependence. Counts, classifications and active remediation
+owners remain as above.
+
+The dispatch packet's *round1-fix-plan.json* and
+*round1-fix-applied.json* record the exact changes and source-bound reasons.
+Its `round1-*-candidates.json` and `round1-*-conclusions.json` retain the
+full-train pattern audits, while *review-round-1/attempts.json* retains every
+first-pass verdict. The final packet includes every later review verdict
+and Codex rollout path for Root's audit.
+
+
+Internal pass 2 corrections
+---------------------------
+
+All 1,669 train rows were checked for every second-pass finding pattern
+against the latest consolidated tag rules. This batch has
+14 dependency rows corrected in that audit.
+
+Inherited strictness makes three direct-eval result holders unreachable before
+initialization. The throwing-function holder audit also excludes an unused
+local and a result target that cannot initialize. Constant-false
+caller-property setup adds no object-literals or lexical-bindings coverage, and
+an oracle-only absent-property Symbol sentinel adds no symbols coverage. True
+branches that deliberately define the observed caller property retain their
+setup families. Expected-error instanceof checks add no symbols or property
+coverage.
+
+Root confirmed that expected-error comparisons and their implicit
+instanceof protocol are assertion plumbing, as are constant reach markers
+and declarations whose sole purpose is to hold those markers. Actual
+catch binding and destructuring subjects retain their own families.
+
+The dispatch packet records source hashes, the full-train pattern audits,
+and exact changes in `round2-fix-plan.json`, `round2-fix-applied.json` and
+the `round2-*-audit.json` and `round2-*-candidates.json` artifacts. The fixed
+second-pass verdicts are in `review-round-2/attempts.json`. Classifications,
+counts, unsupported ownership and the original admitted rows are preserved.
+
+
+Internal pass 3 corrections
+---------------------------
+
+All 1,669 train rows were checked for every third-pass finding pattern
+against the latest consolidated tag rules. This batch has
+28 dependency rows corrected in that audit.
+
+Unread construction and property-read result holders and constant
+enumeration/return reach markers add no var-binding coverage. The asserted
+Object.prototype.toString result retains symbols for its implicit
+Symbol.toStringTag lookup. Ordinary and generator function carriers remain real
+subject definitions even when an auxiliary default observer is never called.
+
+Root confirmed the skipped-default helper, Array.isArray oracle, implicit
+iterator-property, TDZ and expected-value comparison boundaries. All train rows
+were scanned for the function-observer, holder, marker, evaluated-operator and
+implicit Symbol patterns. Source hashes and independent retained witnesses are
+recorded per candidate; AST reachability is candidate evidence, not an
+execution trace.
+
+The dispatch packet records source hashes, the full-train pattern audits,
+and exact changes in `round3-fix-plan.json`, `round3-fix-applied.json` and
+the `round3-*-audit.json` and `round3-*-candidates.json` artifacts. The fixed
+third-pass verdicts are in `review-round-3/attempts.json`. Classifications,
+counts, unsupported ownership and the original admitted rows are preserved.
+
+
+Internal pass 4 corrections
+---------------------------
+
+All 1,669 train rows were checked for every fourth-pass finding pattern
+against the latest consolidated rules and original sources. This batch has
+68 dependency rows corrected in that audit.
+
+Function and generator carriers retain their subject families. The two rejected
+ordinary-function SuperProperty cases retain object-properties as a grammar
+family, with runtime families excluded. Array binding and rest-parameter
+iterator lookups add no independent property coverage. RequireObjectCoercible
+rejects null or undefined before the named property read starts; an actual
+outer object-pattern read remains an independent witness.
+
+Declarations used only to observe that a counter update never executes
+add no var-bindings coverage. The audit distinguishes skipped defaults,
+falsy loop bodies and later initializers blocked by an earlier throw
+from real input holders, evaluated counter computations and binding
+scope subjects.
+
+Source hashes, the whole-train pattern scans and exact corrections are
+recorded in `round4-fix-plan.json`, `round4-fix-applied.json`, the
+`round4-*-conclusions.json` artifacts and
+`zero-counter-holder-Root-decision.json` in the dispatch packet. AST
+reachability remains candidate analysis; literal inputs and original source
+contracts establish the boundaries. Classifications, counts, unsupported
+ownership and prior admitted rows are preserved. All fixed fourth-pass verdicts
+are retained in `review-round-4/attempts.json`.
+
+
+Outer pass 1 correction
+-----------------------
+
+The throwing defaults in `function/dflt-params-abrupt.js` and
+`generators/dflt-params-abrupt.js` prevent their bodies from running.
+Their sole var, `callCount = 0`, only records that the body was skipped;
+both rows therefore drop var-bindings. A read on the right side of an
+unexecuted counter assignment is part of that update and supplies no
+independent input witness.
+
+The same-pattern audit scanned all 1,669 train originals and verified their
+pinned hashes. It retained 162 zero-counter or marker contrasts with
+independent binding evidence, including real input holders, executed
+counter computations, var patterns and the eval-var-scope-syntax-err
+subjects. The catch-scope subject in `try/12.14-3.js` also keeps its tag.
+Per-row changes, retained witnesses and the reused audit tools are in
+*/data/m5c-d17-20261031/train-c-outer-fix/audit.json*.
+Observations, classifications and unsupported owners are unchanged.
+
+
+Outer pass 2 correction
+-----------------------
+
+The audit checked all 1,019 var-bindings rows across the three train batches,
+including all 162 contrasts retained by the previous marker sweep. In this
+batch, nine rows drop the tag: both ordinary and generator
+`dflt-params-ref-later.js` and `dflt-params-ref-self.js`, the four ordinary
+function enumeration rows `13.2-23-s.js`, `13.2-24-s.js`, `13.2-27-s.js` and
+`13.2-28-s.js`, and `S13_A7_T1.js`.
+
+Parameter initialization shadows the outer x and throws before callCount
+updates in the four default cases. The enumeration cases never enter their
+loops, so their sole var target tempIndex is never read or written. The
+SourceElements case checks a function's type without calling its body;
+its var B is never reached.
+
+Root clarified that declarations which are themselves the tested construct
+keep the tag, including var destructuring with elisions, skipped defaults
+or throwing initializers. These subjects are distinct from unused helper
+vars. Exact-symbol references, original source hashes, per-row retained
+witnesses and the Root ruling are recorded in
+*/data/m5c-d17-20261031/train-c-outer-fix2/audit.json*.
+Diagnostic Node read traces support source inspection; they are not new
+Oseo observations. Classifications, owners and admitted paths are unchanged.

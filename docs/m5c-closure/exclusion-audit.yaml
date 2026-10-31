@@ -5439,6 +5439,14 @@ assessments:
       packages/runtime-c/src/index.ts:
         "5e3a197e90743104a0224f7a73a0bebcdf4e99cbf181d651\
         7e0a37e5e00735e7"
+  observation-train-b26a-b26b-b27:
+    disposition: remediation
+    normativeDependency: not-demonstrated
+    reason: Retain the 143 original B26a/B26b/B27 dynamic-source
+      rejections as active coverage remediation. Source hashes and normalized
+      observation digests bind every assessment to its original subject. No
+      equivalent replacement or whole-path exclusion is claimed; ADR 0013,
+      ADR 0016 and ADR 0019 and their reopening triggers remain unchanged.
 paths:
   - path: test/built-ins/AggregateError/newtarget-proto-fallback.js
     proposedOwner: adr:0016-dynamic-source-boundary
@@ -27528,6 +27536,1403 @@ paths:
       cs-labelledevaluation"
     subject: No variable environment is created for the statement "head"
     assessment: observation-train-b24-b25
+  - path: "test/language/statements/for/S12.6.3_A5.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "faa76aeb8f0c2a10f7d95f52527fc5be18e18e306d8dd9f2905019c8\
+      828ca146"
+    observationDigest: "ee2f691a720993b90246a5c493f9d807b149881d68ec67fe0fc\
+      3285d463c3831"
+    missingDynamicTag: false
+    section: "Original es5id: 12.6.3_A5"
+    subject: 'Using eval "for(eval("i in arr");1;)"'
+    assessment: "observation-train-b26a-b26b-b27"
+  - path: "test/language/statements/for/cptn-decl-expr-iter.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "77db8e690209fb72a87b3515799dd1becec7d0e8764c54b1ce45e95e\
+      9601baf9"
+    observationDigest: "9e350c0a520f93d0f0bad4ea413e5cc1496a2cab8fbaef8efcd\
+      a5027a838f179"
+    missingDynamicTag: false
+    section: "Original es6id: 13.7.4.7"
+    subject: 'Completion value when head has a declaration and a "test"
+      expression and iteration occurs'
+    assessment: "observation-train-b26a-b26b-b27"
+  - path: "test/language/statements/for/cptn-decl-expr-no-iter.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "7b321b02480ab43368ed909d85558855f2537086303a1ab935e67ef2\
+      f6189f2d"
+    observationDigest: "16dbece8bd06dc2f3b22e945db29486421b4d99dbbabed8406a\
+      00e32cf9d29e2"
+    missingDynamicTag: false
+    section: "Original es6id: 13.7.4.7"
+    subject: 'Completion value when head has a declaration and a "test"
+      expression and no iteration occurs'
+    assessment: "observation-train-b26a-b26b-b27"
+  - path: "test/language/statements/for/cptn-expr-expr-iter.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "c6e07e6143f6c3dfcc6bce436e065b33e80b6cf0d4e5006aeb441064\
+      cd557f75"
+    observationDigest: "9d883df19a091e2d5c054b25e8fdc1600d3cdb41561568bd89c\
+      ad4329b8584bb"
+    missingDynamicTag: false
+    section: "Original es6id: 13.7.4.7"
+    subject: 'Completion value when head has no declaration and a "test"
+      expression and iteration occurs'
+    assessment: "observation-train-b26a-b26b-b27"
+  - path: "test/language/statements/for/cptn-expr-expr-no-iter.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "f08275b2d80ee46a834f406206052c240fff437b2cd692a2a24b8ed6\
+      bdeab273"
+    observationDigest: "2f6238be3c2860d648cf27f028e26189cf7cfc2609d5b8628fb\
+      beeac649307ec"
+    missingDynamicTag: false
+    section: "Original es6id: 13.7.4.7"
+    subject: 'Completion value when head has no declaration and a "test"
+      expression and no iteration occurs'
+    assessment: "observation-train-b26a-b26b-b27"
+  - path: "test/language/statements/for/head-init-expr-check-empty-inc-empty-co\
+      mpletion.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "a02585fe16e2717fb6c72261a4ba04d5255239470e6923b0b6dc2ee5\
+      5acbaef0"
+    observationDigest: "1dc59fa3321fb21d42f5d8304f5c7d2bd373f2bea908a6ef541\
+      f81e035fe7525"
+    missingDynamicTag: false
+    section: "Original es5id: 12.6.3_A9.1"
+    subject: "Using eval"
+    assessment: "observation-train-b26a-b26b-b27"
+  - path: "test/language/statements/for/head-init-var-check-empty-inc-empty-com\
+      pletion.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "f00675d5b4e46d9b3207d044f5d891ba8e4648c6de5f87d9c644da51\
+      509a2a7d"
+    observationDigest: "1f573f9fad8eb1c3eddebe6444dce29ea6b12120e447b1659f8\
+      f9340dcf53177"
+    missingDynamicTag: false
+    section: "Original es5id: 12.6.3_A9"
+    subject: "Using eval"
+    assessment: "observation-train-b26a-b26b-b27"
+  - path: "test/language/statements/for/scope-body-var-none.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "source-subject"
+    sourceDigest: "f1e1b5089561ac4bad90677bee5735b1302ca93c0ebfb1e81eebc8db\
+      fcd70297"
+    observationDigest: "6b5dabaaf02b833e33f3c7121b8b82278c4080f831104002496\
+      9f2499f83bc96"
+    missingDynamicTag: false
+    section: "sec-for-statement-runtime-semantics-labelledevaluation"
+    subject: "No variable environment is created for each evaluation of the
+      statement body"
+    assessment: "observation-train-b26a-b26b-b27"
+  - path: "test/language/statements/for/scope-head-var-none.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "source-subject"
+    sourceDigest: "f980cdb9d3bc1ebdfc8cfa9c5dc8dd89e0534e8601377290c20b59ee\
+      4dc89fb1"
+    observationDigest: "0548e5f243f6c9091e1990cf941d1debd8148a2e52b69a3edda\
+      4450c86d33666"
+    missingDynamicTag: false
+    section: "sec-for-statement-runtime-semantics-labelledevaluation"
+    subject: 'No variable environment is created for the statement "head"'
+    assessment: "observation-train-b26a-b26b-b27"
+  - path: "test/language/statements/function/13.0-12-s.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "source-subject"
+    sourceDigest: "78dc248a3bc06895d0b17022d1c0e25d5e5e13106280862761b4e59d\
+      d17ff4ca"
+    observationDigest: "aea581ca9698ff4cd15abbae41a7fbe3dbf8086dfa996016c92\
+      a35abe2495758"
+    missingDynamicTag: false
+    section: "Original es5id: 13.0-12-s"
+    subject: "Strict Mode - SourceElements is not evaluated as strict mode code
+      when a Function constructor is contained in strict mode code and the
+      function constructor body is not strict"
+    assessment: "observation-train-b26a-b26b-b27"
+  - path: "test/language/statements/function/13.0-13-s.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "source-subject"
+    sourceDigest: "fcba1b5681d484392dc6a0034bd70ca893de4e752d10ab7e1a4596ed\
+      258cc691"
+    observationDigest: "9d9ca007ec69ddbb601c16c50f13482f7617741ec224261a39a\
+      16a541948406d"
+    missingDynamicTag: false
+    section: "Original es5id: 13.0-13-s"
+    subject: "Strict Mode - SourceElements is evaluated as strict mode code when
+      the function body of a Function constructor begins with a Strict
+      Directive"
+    assessment: "observation-train-b26a-b26b-b27"
+  - path: "test/language/statements/function/13.0-14-s.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "source-subject"
+    sourceDigest: "bbcf0d397d47e6d5cb44bbb7a2120df03d4ff02d13c576b93d539613\
+      bb085831"
+    observationDigest: "7440a613b268210a3ad4e4564ae761ac88ad6dd84fa4a499008\
+      4bd12f04883e7"
+    missingDynamicTag: false
+    section: "Original es5id: 13.0-14-s"
+    subject: "Strict Mode - SourceElements is evaluated as strict mode code when
+      the function body of a Function constructor contains a Strict Directive"
+    assessment: "observation-train-b26a-b26b-b27"
+  - path: "test/language/statements/function/13.0-15-s.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "source-subject"
+    sourceDigest: "3ea1298dc124cefaa4a87f0af9accf235898c65b50c977756232fe69\
+      be2b99f7"
+    observationDigest: "08487659299ebd2544051536b53603e76ad57b69fa174cef22c\
+      29b2ee9b5b3dc"
+    missingDynamicTag: false
+    section: "Original es5id: 13.0-15-s"
+    subject: "Strict Mode - SourceElements is evaluated as strict mode code when
+      a FunctionDeclaration is contained in strict mode code within eval code"
+    assessment: "observation-train-b26a-b26b-b27"
+  - path: "test/language/statements/function/13.0-16-s.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "source-subject"
+    sourceDigest: "15cfbe4e5787a88ffa718272750131bd4bbd376de08a4e8ac70bcc05\
+      d63ca351"
+    observationDigest: "f159eea191740032bc7b9176da151423afdf0ad4e323fced378\
+      3dcadd2f9f02e"
+    missingDynamicTag: false
+    section: "Original es5id: 13.0-16-s"
+    subject: "Strict Mode - SourceElements is evaluated as strict mode code when
+      a FunctionExpression is contained in strict mode code within eval code"
+    assessment: "observation-train-b26a-b26b-b27"
+  - path: "test/language/statements/function/13.0-17-s.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "source-subject"
+    sourceDigest: "0918eeb5ce504c7e7d53e35437f190d682d5175f9f05d4b899e66132\
+      a6bd561b"
+    observationDigest: "098fa060a751f1e17b58314ef2cf75e6216ff6c0018eca58ec2\
+      f14a2924ae632"
+    missingDynamicTag: false
+    section: "Original es5id: 13.0-17-s"
+    subject: "Strict Mode - SourceElements is not evaluated as strict mode code
+      when a Function constructor is contained in strict mode code within eval
+      code"
+    assessment: "observation-train-b26a-b26b-b27"
+  - path: "test/language/statements/function/13.0-7-s.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "source-subject"
+    sourceDigest: "ac40f0eb96bee3db447f1339efaa8ef49676273497a5945322e4cf56\
+      ec0fa887"
+    observationDigest: "a1fdc69e9531e0e51ebd21b199ed7ae68e349a2e3d258953761\
+      3bec745e7a72d"
+    missingDynamicTag: false
+    section: "Original es5id: 13.0-7-s"
+    subject: "Strict Mode - SourceElements is evaluated as strict mode code when
+      the code of this FunctionDeclaration is contained in non-strict mode but
+      the call to eval is a direct call in strict mode code"
+    assessment: "observation-train-b26a-b26b-b27"
+  - path: "test/language/statements/function/13.0-8-s.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "source-subject"
+    sourceDigest: "9b0353ac114da451af1020c8dc2215192b1b6c7ae5125aa0a4e18eef\
+      e0cdf78d"
+    observationDigest: "40bc34a364fd8cfeaf8f696ade7673a3d2561264bb8711f703f\
+      c3a07716f5aa6"
+    missingDynamicTag: false
+    section: "Original es5id: 13.0-8-s"
+    subject: "Strict Mode - SourceElements is evaluated as strict mode code when
+      the code of this FunctionExpression is contained in non-strict mode but
+      the call to eval is a direct call in strict mode code"
+    assessment: "observation-train-b26a-b26b-b27"
+  - path: "test/language/statements/function/13.0_4-17gs.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "source-subject"
+    sourceDigest: "947eddddc0bdcd38d137d6f3157e849925dcbb012872ba796fb06ebf\
+      5f730d0d"
+    observationDigest: "fc17a5f94550f1979e2bcacdbb71f46028bc9ac8b48a2d5c934\
+      8a1864b019db8"
+    missingDynamicTag: false
+    section: "Original es5id: 13.0_4-17gs"
+    subject: "Strict Mode - SourceElements is not evaluated as strict mode code
+      when a Function constructor is contained in strict mode code"
+    assessment: "observation-train-b26a-b26b-b27"
+  - path: "test/language/statements/function/13.1-19-s.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "source-subject"
+    sourceDigest: "4a27224d4137c61c73d0dd8bcfe753e5ce7bba3df2288218ec36b883\
+      16ab8934"
+    observationDigest: "fed9c7d853db13006b18353cf06c05479c493c58649892629b0\
+      fe9d8e7600c28"
+    missingDynamicTag: false
+    section: "Original es5id: 13.1-19-s"
+    subject: "Strict Mode - SyntaxError is thrown if the identifier 'arguments'
+      appears within a FormalParameterList of a strict mode
+      FunctionDeclaration in strict eval code"
+    assessment: "observation-train-b26a-b26b-b27"
+  - path: "test/language/statements/function/13.1-2-s.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "source-subject"
+    sourceDigest: "6d32b4a302b179f86c409af95e2ce0adb8cc723fb974643d5ff30414\
+      845db38e"
+    observationDigest: "2707a93050a0288344cb9b2629ad4cc3d3da99519f91ce1c4c9\
+      057201f83620f"
+    missingDynamicTag: false
+    section: "Original es5id: 13.1-2-s"
+    subject: "Strict Mode - SyntaxError is thrown if the identifier 'eval'
+      appears within a FormalParameterList of a strict mode
+      FunctionExpression"
+    assessment: "observation-train-b26a-b26b-b27"
+  - path: "test/language/statements/function/13.1-21-s.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "source-subject"
+    sourceDigest: "c0eb9b2b448814a29c49651e1842c929b0e04ba7a9c26da9e0772f1d\
+      a714a8eb"
+    observationDigest: "ce49ce3a3683e2d4b02e5e29aac0cbbc44dabf03fca9720430c\
+      e834440816dca"
+    missingDynamicTag: false
+    section: "Original es5id: 13.1-21-s"
+    subject: "StrictMode - SyntaxError is thrown if the identifier 'arguments'
+      appears within a FormalParameterList of a strict mode FunctionExpression
+      in strict eval code"
+    assessment: "observation-train-b26a-b26b-b27"
+  - path: "test/language/statements/function/13.1-22-s.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "source-subject"
+    sourceDigest: "73511f19185e09c99170decf5b25bfd501bc6af359f23891fafefe6a\
+      d9c6ed0a"
+    observationDigest: "2c87a33b9ebd602ef0256b53f5ade614bf98043f983810e53cb\
+      285b87fb31d37"
+    missingDynamicTag: false
+    section: "Original es5id: 13.1-22-s"
+    subject: "StrictMode - SyntaxError is thrown if the identifier 'arguments'
+      appears within a FormalParameterList of a strict mode FunctionExpression
+      when FuctionBody is strict code"
+    assessment: "observation-train-b26a-b26b-b27"
+  - path: "test/language/statements/function/13.1-23-s.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "source-subject"
+    sourceDigest: "b329a040b6783fd598ab3f351f8fa4cdac2c8fc996d01a7440cdbfd7\
+      03078951"
+    observationDigest: "4eed35274feca248badeca2dee05bfa898ee704e4103a8e68bf\
+      8dd6d43dd0e98"
+    missingDynamicTag: false
+    section: "Original es5id: 13.1-23-s"
+    subject: "Strict Mode - SyntaxError is thrown if a function is created using
+      a FunctionDeclaration that is contained in eval strict code and the
+      function has two identical parameters"
+    assessment: "observation-train-b26a-b26b-b27"
+  - path: "test/language/statements/function/13.1-25-s.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "source-subject"
+    sourceDigest: "0abe93fdcc1251a68dd245339cc020b0db32e129d6435e33223ff641\
+      461912a9"
+    observationDigest: "f2d960ceaf502faeaeeb8bc5e4bc81ea99db8f0898faa37ee2f\
+      98ffdb0825cec"
+    missingDynamicTag: false
+    section: "Original es5id: 13.1-25-s"
+    subject: "Strict Mode - SyntaxError is thrown if a function is created using
+      a FunctionDeclaration that is contained in eval strict code and the
+      function has two identical parameters which are separated by a unique
+      parameter name"
+    assessment: "observation-train-b26a-b26b-b27"
+  - path: "test/language/statements/function/13.1-27-s.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "source-subject"
+    sourceDigest: "b39074d5f56f0b632d640dec19f4b44909283087d7ec48ad734e5410\
+      3a268c3c"
+    observationDigest: "56b786eaef99127425a1f75a2fb1eb4614dd8844d4c2b201582\
+      1a38e1e6b0a94"
+    missingDynamicTag: false
+    section: "Original es5id: 13.1-27-s"
+    subject: "Strict Mode - SyntaxError is thrown if a function is created using
+      a FunctionDeclaration that is contained in eval strict code and the
+      function has three identical parameters"
+    assessment: "observation-train-b26a-b26b-b27"
+  - path: "test/language/statements/function/13.1-29-s.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "source-subject"
+    sourceDigest: "0f638ad173b59188687d8aeabbb1b626d10b0d8f24ca7b1d70c3ae6a\
+      2b690708"
+    observationDigest: "248c3d856071d020ef83ba891a64d315c58d87e22fa036fba61\
+      adca833feea32"
+    missingDynamicTag: false
+    section: "Original es5id: 13.1-29-s"
+    subject: "Strict Mode - SyntaxError is thrown if a function is created using
+      a FunctionExpression that is contained in eval strict code and the
+      function has two identical parameters"
+    assessment: "observation-train-b26a-b26b-b27"
+  - path: "test/language/statements/function/13.1-31-s.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "source-subject"
+    sourceDigest: "8764c588ae11b34188d0b1b73f64a24c34468d5d445b7ff107fdbc95\
+      d876957b"
+    observationDigest: "bacbb7fe8fd86b2cffad5e4925d891780bacf846996c9b1314d\
+      3f36a5edc9786"
+    missingDynamicTag: false
+    section: "Original es5id: 13.1-31-s"
+    subject: "Strict Mode - SyntaxError is thrown if a function is created using
+      a FunctionExpression that is contained in eval strict code and the
+      function has two identical parameters, which are separated by a unique
+      parameter name"
+    assessment: "observation-train-b26a-b26b-b27"
+  - path: "test/language/statements/function/13.1-33-s.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "source-subject"
+    sourceDigest: "3a69353d6cf5d732a5d4ad6b4ce511be4a2e822ea96cf1b8bc51ee55\
+      cb7288a8"
+    observationDigest: "12b5c7eeee1a375eff8fc37de1f605f6116eeea6819448266f1\
+      33b9f6a9383e0"
+    missingDynamicTag: false
+    section: "Original es5id: 13.1-33-s"
+    subject: "Strict Mode - SyntaxError is thrown if function is created using a
+      FunctionExpression that is contained in eval strict code and the
+      function has three identical parameters"
+    assessment: "observation-train-b26a-b26b-b27"
+  - path: "test/language/statements/function/13.1-39-s.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "source-subject"
+    sourceDigest: "b10fcf6a44cee627b3e372642d35b1091d080a9673c47623a4869d92\
+      00960aa5"
+    observationDigest: "14df2134ebc72b001e59deecc37e3abb3c58be34f02459b81a6\
+      6cd607091d9fc"
+    missingDynamicTag: false
+    section: "Original es5id: 13.1-39-s"
+    subject: "StrictMode - SyntaxError is thrown if 'arguments' occurs as the
+      function name of a FunctionDeclaration in strict eval code"
+    assessment: "observation-train-b26a-b26b-b27"
+  - path: "test/language/statements/function/13.1-4-s.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "source-subject"
+    sourceDigest: "176f27bacdd9c0a0f1345103017729c31e4f74bb54f08184bebb84bc\
+      71fbb82b"
+    observationDigest: "05cf63cd4f172902c1072428787c1278db59f6c32e246296dab\
+      b4506de563f2c"
+    missingDynamicTag: false
+    section: "Original es5id: 13.1-4-s"
+    subject: "Strict Mode - SyntaxError is thrown if the identifier 'arguments'
+      appears within a FormalParameterList of a strict mode
+      FunctionExpression"
+    assessment: "observation-train-b26a-b26b-b27"
+  - path: "test/language/statements/function/13.1-41-s.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "source-subject"
+    sourceDigest: "541858e41aafcfcfd030b1edc88bd7111bb04b165adb2e66a7efc893\
+      775a54ad"
+    observationDigest: "787b5cc1a18b8376c785e559b9ccf15bc7e6be10ba8f6c4bce3\
+      8de9494f2cf67"
+    missingDynamicTag: false
+    section: "Original es5id: 13.1-41-s"
+    subject: "StrictMode - SyntaxError is thrown if 'arguments' occurs as the
+      Identifier of a FunctionExpression in strict eval code"
+    assessment: "observation-train-b26a-b26b-b27"
+  - path: "test/language/statements/function/13.2-10-s.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "95af5565cae50f04d9e210f34a2ab6b6ac43910eafbdb74e5fde6f10\
+      1a3f9879"
+    observationDigest: "1eeba40c18053b2f0cdc2af829b4e4f79f3343939222456b5ca\
+      7b7ba1f9ff9e7"
+    missingDynamicTag: false
+    section: "Original es5id: 13.2-10-s"
+    subject: "StrictMode - writing a property named 'caller' of function objects
+      is not allowed outside the function"
+    assessment: "observation-train-b26a-b26b-b27"
+  - path: "test/language/statements/function/13.2-11-s.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "de698aefb220557ed979d6e828e8b48553c3a4b5fb34e3d59b49886d\
+      dd4aa881"
+    observationDigest: "495dece99c6a598311620bab10a245116b9bb66ea87c209a78e\
+      7209a6f78b49a"
+    missingDynamicTag: false
+    section: "Original es5id: 13.2-11-s"
+    subject: "StrictMode - enumerating over a function object looking for
+      'caller' fails outside of the function"
+    assessment: "observation-train-b26a-b26b-b27"
+  - path: "test/language/statements/function/13.2-12-s.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "5fed50a5f38137bd060b2b770c26270dc173e627733f59a454170983\
+      973b5f26"
+    observationDigest: "7e6a3f4366cad489dfca70544bf3b53e22dbd715d9fc6a84f1a\
+      4e8cb0294bcfa"
+    missingDynamicTag: false
+    section: "Original es5id: 13.2-12-s"
+    subject: "StrictMode - enumerating over a function object looking for
+      'caller' fails inside the function"
+    assessment: "observation-train-b26a-b26b-b27"
+  - path: "test/language/statements/function/13.2-13-s.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "a59ecd66b6b32421b711b049dcc5212c9fafedf7a04deb35364add11\
+      4ac1fde1"
+    observationDigest: "9def7a3667ff325fbb9ee7a2e3cc412865dfc2b1ac60d6de53c\
+      193617247a697"
+    missingDynamicTag: false
+    section: "Original es5id: 13.2-13-s"
+    subject: "StrictMode - reading a property named 'arguments' of function
+      objects is not allowed outside the function"
+    assessment: "observation-train-b26a-b26b-b27"
+  - path: "test/language/statements/function/13.2-14-s.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "39af7d08f248e3c289025161e95f1648dd86be95f771371f8b1cf0fe\
+      3d714133"
+    observationDigest: "c888d541e55d5d25e3743c6aa4805bd8c096f113b270d157b17\
+      d24f57a1dd9eb"
+    missingDynamicTag: false
+    section: "Original es5id: 13.2-14-s"
+    subject: "StrictMode - writing a property named 'arguments' of function
+      objects is not allowed outside the function"
+    assessment: "observation-train-b26a-b26b-b27"
+  - path: "test/language/statements/function/13.2-15-s.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "d6f0781c7bb5feab822a535ca448df5715c6f3f1acde202b2052dadb\
+      13f51789"
+    observationDigest: "4d178c35102174fe900a47ca7203d32e26dbe05389c61e4cc90\
+      9b4f860313f2a"
+    missingDynamicTag: false
+    section: "Original es5id: 13.2-15-s"
+    subject: "StrictMode - enumerating over a function object looking for
+      'arguments' fails outside of the function"
+    assessment: "observation-train-b26a-b26b-b27"
+  - path: "test/language/statements/function/13.2-16-s.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "6ae0940fad5ba55dabf52a17b521ba00590134b37b4b2dfdfbab0540\
+      e76ec285"
+    observationDigest: "f0f797104c36f3ce1bdae4ed65d4f9d173378a44c0d0bcd5e63\
+      054d65697118b"
+    missingDynamicTag: false
+    section: "Original es5id: 13.2-16-s"
+    subject: "StrictMode - enumerating over a function object looking for
+      'arguments' fails inside the function"
+    assessment: "observation-train-b26a-b26b-b27"
+  - path: "test/language/statements/function/13.2-17-s.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "ac03412add9cd51d40814cc3e9ff05700abe594d01c1998eddabe051\
+      fe844f95"
+    observationDigest: "9506438ea0a7f250ccc7fa8a6b92866b723c5efc3e2cc89abcb\
+      7f51d23d1df1a"
+    missingDynamicTag: false
+    section: "Original es5id: 13.2-17-s"
+    subject: "StrictMode - reading a property named 'arguments' of function
+      objects is not allowed outside the function"
+    assessment: "observation-train-b26a-b26b-b27"
+  - path: "test/language/statements/function/13.2-18-s.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "b4374236412ac14b2b54230af43e3dda6d300b98dc9779ed7d690d4e\
+      205f565c"
+    observationDigest: "8f9390c1ab50e2fdabeadf9ba314a27b6578e80dea311d7aa7c\
+      56982c2c9b933"
+    missingDynamicTag: false
+    section: "Original es5id: 13.2-18-s"
+    subject: "StrictMode - writing a property named 'arguments' of function
+      objects is not allowed outside the function"
+    assessment: "observation-train-b26a-b26b-b27"
+  - path: "test/language/statements/function/13.2-19-s.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "5a999d246e5ddb140ed86963ec72c36a328acb391f291400bd83e65b\
+      b9c2ae38"
+    observationDigest: "1c0c1396b00d079bb379e669a5087c1223c39a982a6750e820e\
+      eae049d0859a1"
+    missingDynamicTag: false
+    section: "Original es5id: 13.2-19-s"
+    subject: "StrictMode - enumerating over a function object looking for
+      'arguments' fails outside of the function"
+    assessment: "observation-train-b26a-b26b-b27"
+  - path: "test/language/statements/function/13.2-20-s.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "f88e43a8c136b8943075ddd3495140632ea4f014411fe5711dc9cf2f\
+      5f497a5f"
+    observationDigest: "d5a19586b2e98d06887b8c6b515141cdf5f0297a14da3af6663\
+      5643e95260e3f"
+    missingDynamicTag: false
+    section: "Original es5id: 13.2-20-s"
+    subject: "StrictMode - enumerating over a function object looking for
+      'arguments' fails inside the function"
+    assessment: "observation-train-b26a-b26b-b27"
+  - path: "test/language/statements/function/13.2-5-s.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "83cd1bb7d3570e9d5ce52beda0a82e20b6cdf0b73cb4cc8157105c52\
+      4db6bdc2"
+    observationDigest: "dc067caf7b1c95710eb05755538fa62bb3d799d0f2f108d7776\
+      3472fbd3b0a6a"
+    missingDynamicTag: false
+    section: "Original es5id: 13.2-5-s"
+    subject: "StrictMode - reading a property named 'caller' of function objects
+      is not allowed outside the function"
+    assessment: "observation-train-b26a-b26b-b27"
+  - path: "test/language/statements/function/13.2-6-s.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "e84a311507fec654c8cb879e584331641993ede3cfdf9c287f8cb564\
+      e4a3813d"
+    observationDigest: "1527a247ce4692be62eb8074e183af0c7cdddcdb98dccf3eda2\
+      0b26db2984c6d"
+    missingDynamicTag: false
+    section: "Original es5id: 13.2-6-s"
+    subject: "StrictMode - writing a property named 'caller' of function objects
+      is not allowed outside the function"
+    assessment: "observation-train-b26a-b26b-b27"
+  - path: "test/language/statements/function/13.2-7-s.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "1550bfc8b9ef54b1e7b2e9a7a4b99f80ac7edea1bab06cc53b9f2688\
+      ffbdae36"
+    observationDigest: "e894c47f24e5b4f89629efe4257b37e88db46be60bd555f3ff0\
+      bac9fea64b3ed"
+    missingDynamicTag: false
+    section: "Original es5id: 13.2-7-s"
+    subject: "StrictMode - enumerating over a function object looking for
+      'caller' fails outside of the function"
+    assessment: "observation-train-b26a-b26b-b27"
+  - path: "test/language/statements/function/13.2-8-s.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "cd80afcd1aa9103d942406b0b9b2b0d65b26a10c9e04f5a35b7cf52a\
+      04fbf076"
+    observationDigest: "a8ff12bf65e57928a83918363ef7d31ba2eb8d75ef5fa1cb47b\
+      d15662db07539"
+    missingDynamicTag: false
+    section: "Original es5id: 13.2-8-s"
+    subject: "StrictMode - enumerating over a function object looking for
+      'caller' fails inside the function"
+    assessment: "observation-train-b26a-b26b-b27"
+  - path: "test/language/statements/function/13.2-9-s.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "6c1a90499013305791025b1dec200407881553832fd14b0d708de5ba\
+      cf85fb39"
+    observationDigest: "04d93855a71c51297d422b72d8fc75a0eea15670361cd047918\
+      22d58991b5006"
+    missingDynamicTag: false
+    section: "Original es5id: 13.2-9-s"
+    subject: "StrictMode - reading a property named 'caller' of function objects
+      is not allowed outside the function"
+    assessment: "observation-train-b26a-b26b-b27"
+  - path: "test/language/statements/function/S13.2.2_A13.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "2483c29d6fc8d0c4ebba5a0ba19578c7018a6ca4bb0723a377d0e588\
+      5398f790"
+    observationDigest: "a0168842faf320e6b54eb9a923c491baf213701f0a074ab8d6c\
+      9d2e4c64de017"
+    missingDynamicTag: false
+    section: "Original es5id: 13.2.2_A13"
+    subject: "Calling a function as a constructor after it has been declare\
+      d by eval"
+    assessment: "observation-train-b26a-b26b-b27"
+  - path: "test/language/statements/function/S13.2.2_A14.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "source-subject"
+    sourceDigest: "430f5fa5fdcbc69f280bdd32846e7160ee62543357c5ac9482a665e9\
+      7ef8e88d"
+    observationDigest: "303060dad9dbb6e255b943200610d33ab48e667c16b4ecc4f72\
+      994e5465f6af6"
+    missingDynamicTag: false
+    section: "Original es5id: 13.2.2_A14"
+    subject: "Calling a function as a constructor after it has been declare\
+      d by eval"
+    assessment: "observation-train-b26a-b26b-b27"
+  - path: "test/language/statements/function/S13.2.2_A8_T3.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "b03c69a8cf22f03f4e3f7a92c6b17716f71f026ad7a67e31c2a34a95\
+      51bc4656"
+    observationDigest: "950573356aededa87ae631309d0156062c3477af5fa817affd6\
+      b950a94374e14"
+    missingDynamicTag: false
+    section: "Original es5id: 13.2.2_A8_T3"
+    subject: "Creating a function whose prototype contains declaration of
+      another function defined by using Function.call method"
+    assessment: "observation-train-b26a-b26b-b27"
+  - path: "test/language/statements/function/S13_A14_T1.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "93ae7163dd61235ebfb0b4a2d5a81c1fe6016287d529b54617f7fe5e\
+      af93ef88"
+    observationDigest: "3b95a17ac3599ea0a8e6f5542db2d58f28f05c47e8c7e7eacb0\
+      d04ec02078db2"
+    missingDynamicTag: false
+    section: "Original es5id: 13_A14"
+    subject: "Defining function name with unicode symbols"
+    assessment: "observation-train-b26a-b26b-b27"
+  - path: "test/language/statements/function/cptn-decl.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "ff0d259f3f660195c10959162e89a3f6b645b6d417fae63c53ddae32\
+      014cb7d5"
+    observationDigest: "25e0b8eed8568ee9a951638b29f394c9b6ed1cef848d3444539\
+      1e4fcc6525f02"
+    missingDynamicTag: false
+    section: "sec-function-definitions-runtime-semantics-evaluation"
+    subject: "Function declaration completion value is empty."
+    assessment: "observation-train-b26a-b26b-b27"
+  - path: "test/language/statements/function/eval-var-scope-syntax-err.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "source-subject"
+    sourceDigest: "794cb526b9757815d020a52fa99e711b9e62aae573caaf40dcbf8d84\
+      f3ce3581"
+    observationDigest: "582819c5c5426febd823df97cea93c5a2af69d6d75be91b9629\
+      b0436eae5c29f"
+    missingDynamicTag: false
+    section: "sec-function-definitions-runtime-semantics-instantiatefunctio\
+      nobject"
+    subject: "sloppy direct eval in params introduces var (function declaration
+      in sloppy code)"
+    assessment: "observation-train-b26a-b26b-b27"
+  - path: "test/language/statements/function/name-eval-stricteval.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "source-subject"
+    sourceDigest: "0902f26c7a861f5d38479c76ba25a90a0fc3496bf876469e49f25610\
+      cfcc85df"
+    observationDigest: "98c5be4eae2b91d084de68172fed399eb27cf6d75b9dfce4551\
+      f0cb3bbe18c1c"
+    missingDynamicTag: false
+    section: "Original es5id: 13.1-35-s"
+    subject: "StrictMode - SyntaxError is thrown if 'eval' occurs as the
+      function name of a FunctionDeclaration in strict eval code"
+    assessment: "observation-train-b26a-b26b-b27"
+  - path: "test/language/statements/function/name-unicode.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "bdec3ae69b749abfa534cb3ed74bebb506070b79faaf256780101e1e\
+      41d26fd1"
+    observationDigest: "75fa90d578f566590da9b7ae6d7f67a08d1c144faed0ff32206\
+      971ecf267c7ed"
+    missingDynamicTag: false
+    section: "Original es5id: 13_A14"
+    subject: "Defining function name with unicode symbols"
+    assessment: "observation-train-b26a-b26b-b27"
+  - path: "test/language/statements/function/param-eval-stricteval.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "source-subject"
+    sourceDigest: "0e95a8be5c37bea521ddc5f4b3eb64574e9459bd9ad0214926fd0968\
+      589b4163"
+    observationDigest: "7d78b44df68387b1f1596f093e7b0bb4b505c7fe680ee1067f9\
+      8c00e4559d5c3"
+    missingDynamicTag: false
+    section: "Original es5id: 13.1-15-s"
+    subject: "Strict Mode - SyntaxError is thrown if the identifier 'eval'
+      appears within a FormalParameterList of a strict mode
+      FunctionDeclaration in strict eval code"
+    assessment: "observation-train-b26a-b26b-b27"
+  - path: "test/language/statements/function/scope-body-lex-distinct.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "source-subject"
+    sourceDigest: "6281b61286a9b75e8c9a505752dbe5b9f22dd41b1e36b859497c470f\
+      dfdb8290"
+    observationDigest: "7052e37f3c10736f48f62887cc2f3b3002016f278d1e424a2c9\
+      ec516502d4d7e"
+    missingDynamicTag: false
+    section: "sec-functiondeclarationinstantiation"
+    subject: "Creation of new lexical environment (distinct from the variable
+      environment) for the function body outside of strict mode"
+    assessment: "observation-train-b26a-b26b-b27"
+  - path: "test/language/statements/function/scope-param-elem-var-close.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "source-subject"
+    sourceDigest: "0330fd8c9e3256a87ccde36f778ed856fb18488fbdbab2042fde8983\
+      903304f2"
+    observationDigest: "d898433b80356cae99a3fd519fc65b7ddc41375fd0bed77a60f\
+      ba881a34ec3cc"
+    missingDynamicTag: false
+    section: "sec-functiondeclarationinstantiation"
+    subject: "sloppy direct evals in params introduce vars"
+    assessment: "observation-train-b26a-b26b-b27"
+  - path: "test/language/statements/function/scope-param-elem-var-open.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "source-subject"
+    sourceDigest: "315cd3fb3e2bbebe069f3a456e02b26201afd1be3ee06c0e77e87243\
+      265da3fe"
+    observationDigest: "92d6fb229ef3316af2d3d051af1d15312fd21067a529d0288ba\
+      bd9df8ff5c852"
+    missingDynamicTag: false
+    section: "sec-functiondeclarationinstantiation"
+    subject: "sloppy direct evals in params introduce vars"
+    assessment: "observation-train-b26a-b26b-b27"
+  - path: "test/language/statements/function/scope-param-rest-elem-var-close.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "source-subject"
+    sourceDigest: "0d44e13829f555a5bf08327cbe639dbec1ec628144188e3de4ef2ea4\
+      965a2ef1"
+    observationDigest: "d3d48114e117e3dd11180a160e40bd23a042c4827786fcf6feb\
+      b7c192f79ebec"
+    missingDynamicTag: false
+    section: "sec-functiondeclarationinstantiation"
+    subject: "sloppy direct evals in params introduce vars"
+    assessment: "observation-train-b26a-b26b-b27"
+  - path: "test/language/statements/function/scope-param-rest-elem-var-open.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "source-subject"
+    sourceDigest: "0c957877eea8f8791a82bb3f11c3ad218640382e27d751e8c4bc9146\
+      e6ee8373"
+    observationDigest: "98b361eaecba0041657e443857fb950e0856e3d1831386684d1\
+      d49be47e93c99"
+    missingDynamicTag: false
+    section: "sec-functiondeclarationinstantiation"
+    subject: "sloppy direct evals in params introduce vars"
+    assessment: "observation-train-b26a-b26b-b27"
+  - path: "test/language/statements/generators/cptn-decl.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "6c839dd2d3636db554aa95971aee0fcd8893ccd1aa53e11a92b6b1f8\
+      e3f059f5"
+    observationDigest: "2209a75821084db74e8ab4ef08542cf4a3c58689a442573fdea\
+      65c347e3d1b7f"
+    missingDynamicTag: false
+    section: "sec-statement-semantics-runtime-semantics-evaluation"
+    subject: "Generator declaration completion value is empty."
+    assessment: "observation-train-b26a-b26b-b27"
+  - path: "test/language/statements/generators/eval-var-scope-syntax-err.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "source-subject"
+    sourceDigest: "68635098aab3060cec3a28b0409542a0360393a2b0aba6aedd7478f3\
+      a3897a07"
+    observationDigest: "c05ac54750e470cefa1ce3a108f1c744b05da9797e8344eab26\
+      ddc9b5e73f578"
+    missingDynamicTag: false
+    section: "sec-generator-function-definitions-runtime-semantics-instantiatef\
+      unctionobject"
+    subject: "sloppy direct eval in params introduces var (generator function
+      declaration in sloppy code)"
+    assessment: "observation-train-b26a-b26b-b27"
+  - path: "test/language/statements/generators/scope-body-lex-distinct.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "source-subject"
+    sourceDigest: "a9d63b3d409b49fbad33999f9bd3d20ceeac4fddc7f83105e19c243d\
+      ed937bbb"
+    observationDigest: "1c4fc11048a5b0e5e625fd264b3a10a7ea5f37feb450713af21\
+      fd1df04f25b66"
+    missingDynamicTag: false
+    section: "sec-functiondeclarationinstantiation"
+    subject: "Creation of new lexical environment (distinct from the variable
+      environment) for the function body outside of strict mode"
+    assessment: "observation-train-b26a-b26b-b27"
+  - path: "test/language/statements/generators/scope-param-elem-var-close.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "source-subject"
+    sourceDigest: "667c02e7a916f41de5cd149df92400643b6df22971e9670e322b265e\
+      c36e6e68"
+    observationDigest: "eb71b9774849615e1f50a93e27fa88eddb83f89d51507f3fe0b\
+      a9bf8a7c0e6a6"
+    missingDynamicTag: false
+    section: "sec-functiondeclarationinstantiation"
+    subject: "sloppy direct evals in params introduce vars"
+    assessment: "observation-train-b26a-b26b-b27"
+  - path: "test/language/statements/generators/scope-param-elem-var-open.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "source-subject"
+    sourceDigest: "c80658a401237ef617e42c8224afa1a0ca94079611b0e00c32d2e102\
+      32ca90c4"
+    observationDigest: "53cbeb1b1e493a35938a21ca1236e0011e4878c04045c899405\
+      8dab2680de78a"
+    missingDynamicTag: false
+    section: "sec-functiondeclarationinstantiation"
+    subject: "sloppy direct evals in params introduce vars"
+    assessment: "observation-train-b26a-b26b-b27"
+  - path: "test/language/statements/generators/scope-param-rest-elem-var-cl\
+      ose.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "source-subject"
+    sourceDigest: "929be78f0fd82de3f3d6346c21a6702387a3be8938892735d337e0c4\
+      11717a12"
+    observationDigest: "4c6b708aee2b0017229461b3378eab5053f2765afd1339c6c8e\
+      5687d02b3f4d8"
+    missingDynamicTag: false
+    section: "sec-functiondeclarationinstantiation"
+    subject: "sloppy direct evals in params introduce vars"
+    assessment: "observation-train-b26a-b26b-b27"
+  - path: "test/language/statements/generators/scope-param-rest-elem-var-op\
+      en.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "source-subject"
+    sourceDigest: "a59a8959d711701c4daf4d7433b8e54f0d9ceb43dd1a7e395a24c6d2\
+      c71117d6"
+    observationDigest: "d50341a20763a0b0f41cc1ee947193dafe36f2ec37b7e6821d5\
+      dbf3b4fb91847"
+    missingDynamicTag: false
+    section: "sec-functiondeclarationinstantiation"
+    subject: "sloppy direct evals in params introduce vars"
+    assessment: "observation-train-b26a-b26b-b27"
+  - path: "test/language/statements/if/S12.5_A2.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "e6de405072a409c00b7cf1e50ce69b84b219272c28897eef5d6b7abd\
+      66d0d9ec"
+    observationDigest: "2f65106a0dfa0f3df504947dff5e3b079e129cb536425a0d134\
+      481a772a08f98"
+    missingDynamicTag: false
+    section: "Original es5id: 12.5_A2"
+    subject: 'Checking by using eval "eval("true")"'
+    assessment: "observation-train-b26a-b26b-b27"
+  - path: "test/language/statements/if/cptn-else-false-abrupt-empty.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "0e743c571551a14c432f8c2f5eb972c412aee8a037b148a4d890854c\
+      6a1f37dc"
+    observationDigest: "4392954186d2f587fffadac03884d206db980156fb3c85068fb\
+      301be53c21bca"
+    missingDynamicTag: false
+    section: "sec-if-statement-runtime-semantics-evaluation"
+    subject: "Completion value when expression is false with an `else` clause
+      and body returns an empty abrupt completion"
+    assessment: "observation-train-b26a-b26b-b27"
+  - path: "test/language/statements/if/cptn-else-false-nrml.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "ec6e1d20257f662a0674d576ee440e7ea761986945010084bac97faf\
+      fcc2a7a4"
+    observationDigest: "34cf07f3ef1eebc40ea598b1bb4c679b5602e68917d242ff211\
+      f875ee3052061"
+    missingDynamicTag: false
+    section: "Original es6id: 13.6.7"
+    subject: "Completion value when expression is false with an `else` clause
+      and body returns a normal completion"
+    assessment: "observation-train-b26a-b26b-b27"
+  - path: "test/language/statements/if/cptn-else-true-abrupt-empty.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "9b3ee87b1b06e94333e2e6251d595e3534e1bc9728bdb83579bb08f3\
+      90cf513d"
+    observationDigest: "1bc274ee87aded32ee266eb1be52991880ee5105d232e6ae1ba\
+      030c492d4b3a0"
+    missingDynamicTag: false
+    section: "sec-if-statement-runtime-semantics-evaluation"
+    subject: "Completion value when expression is true with an `else` clause and
+      body returns an abrupt completion"
+    assessment: "observation-train-b26a-b26b-b27"
+  - path: "test/language/statements/if/cptn-else-true-nrml.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "240a23b9a9fde3972e093d1aeb21b07d4128da031efbaa6c2408749b\
+      e7913edc"
+    observationDigest: "8c547e12258a0bf7879235ddd0c5ce982209dcaf9c66bcf6068\
+      4c16249bb4beb"
+    missingDynamicTag: false
+    section: "Original es6id: 13.6.7"
+    subject: "Completion value when expression is true with an `else` clause and
+      body returns a normal completion"
+    assessment: "observation-train-b26a-b26b-b27"
+  - path: "test/language/statements/if/cptn-empty-statement.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "db78241edb665bef78107ba1e46bbd4513d1cbaa10ff05a6baf6b0ee\
+      4007b1f2"
+    observationDigest: "15529e1267e0cd4547e604ac9870b57d77d6a3a4b6f7e097fe8\
+      08715b3653c94"
+    missingDynamicTag: false
+    section: "Original es5id: 12.5_A7"
+    subject: 'Checking by using eval "eval("if(1);"))"'
+    assessment: "observation-train-b26a-b26b-b27"
+  - path: "test/language/statements/if/cptn-no-else-false.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "c3c89d3d4c4b580dfed50a6d2ab201cf320730fdedc88329c88988f4\
+      d8e6a085"
+    observationDigest: "e6291e5784cd5d0eb06ef47e0276e91ff33b28fcb82898b89e0\
+      6cf53abae358a"
+    missingDynamicTag: false
+    section: "Original es6id: 13.6.7"
+    subject: "Completion value when expression is false without an `else` c\
+      lause"
+    assessment: "observation-train-b26a-b26b-b27"
+  - path: "test/language/statements/if/cptn-no-else-true-abrupt-empty.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "94b2a18de6f1eb40756f612a6e2940fc4d4981c5a4ca261f5ac034e8\
+      e3714c44"
+    observationDigest: "a1bd010e0fb49df3870b9bbe6fce4d0be786692a9c06ccc8f6f\
+      26bcd0dc20241"
+    missingDynamicTag: false
+    section: "sec-if-statement-runtime-semantics-evaluation"
+    subject: "Completion value when expression is true without an `else` clause
+      and body returns an empty abrupt completion"
+    assessment: "observation-train-b26a-b26b-b27"
+  - path: "test/language/statements/if/cptn-no-else-true-nrml.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "2dd098d9167f12a535293c7deb5ee208e6289ea1b054228e1bdf23f1\
+      f5b0fd14"
+    observationDigest: "0bdb1b734cce5b26a38c5db85f05c5b4e47b5658ea3b798bde8\
+      8796d14aab306"
+    missingDynamicTag: false
+    section: "Original es6id: 13.6.7"
+    subject: "Completion value when expression is true without an `else` clause
+      and body returns a normal completion."
+    assessment: "observation-train-b26a-b26b-b27"
+  - path: "test/language/statements/labeled/cptn-break.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "cb08236a1a8f862802cb2dac13895705d35a72b6705fa83530d8f862\
+      6c01076f"
+    observationDigest: "254db6187de6a36b9c59f8d097c6de03af3c7cb5feb3a21afd9\
+      d94849df2b254"
+    missingDynamicTag: false
+    section: "sec-labelled-statements-runtime-semantics-labelledevaluation"
+    subject: 'Completion value when LabelledItem returns a "break" completion'
+    assessment: "observation-train-b26a-b26b-b27"
+  - path: "test/language/statements/labeled/cptn-nrml.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "ea13f4c384ab874d7808ada7fc88d967afe3a726092b2dc8cc05cc1a\
+      210bc3d7"
+    observationDigest: "7454065021ac59132517f2e778e43c7f88db6c6a01137cfd099\
+      00ee7ac304598"
+    missingDynamicTag: false
+    section: "sec-labelled-statements-runtime-semantics-labelledevaluation"
+    subject: "Completion value when LabelledItem returns normally"
+    assessment: "observation-train-b26a-b26b-b27"
+  - path: "test/language/statements/let/cptn-value.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "3fc487e463d52bae33bc089ceb8395d656cec56f443aa55904155a4b\
+      390d3c7d"
+    observationDigest: "14b448a842c4b0e4ea5324d5832d0211cf71e36b3f791eb4a1f\
+      c42dabdaff8d9"
+    missingDynamicTag: false
+    section: "sec-let-and-const-declarations-runtime-semantics-evaluation"
+    subject: "Returns an empty completion"
+    assessment: "observation-train-b26a-b26b-b27"
+  - path: "test/language/statements/switch/cptn-a-abrupt-empty.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "78c1f80d342d532028124bb1b6003d5871ef968d814ea63628c205fc\
+      a2bafd63"
+    observationDigest: "fb8874c4a92cc8b59ede589bbb86c02ac923f583b577d1a6f62\
+      892d3c5ed6643"
+    missingDynamicTag: false
+    section: "Original es6id: 13.12.11"
+    subject: "Completion value when the matching case is exited via an empty
+      abrupt completion"
+    assessment: "observation-train-b26a-b26b-b27"
+  - path: "test/language/statements/switch/cptn-a-fall-thru-abrupt-empty.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "8a6602a78eafa7708586ec2f17ae821866b2d438118191a8e8e00ccf\
+      a1091884"
+    observationDigest: "5c22c0dcf5e3c8b1ab618dc7d34c863a14a6a81e3a6578f809a\
+      d93c7c8708417"
+    missingDynamicTag: false
+    section: "Original es6id: 13.12.11"
+    subject: "Completion value when execution continues through multiple cases
+      and ends with an empty abrupt completion"
+    assessment: "observation-train-b26a-b26b-b27"
+  - path: "test/language/statements/switch/cptn-a-fall-thru-nrml.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "9cfa3975cdfcc75341ecf7dfd9f63ea5ac6256e726a5d1927063b0e0\
+      a494c7de"
+    observationDigest: "3361fb8d5b59bf293c7980e6588ae6a1dd10155685ceed00220\
+      d6bd53301560a"
+    missingDynamicTag: false
+    section: "Original es6id: 13.12.11"
+    subject: "Completion value when execution continues through multiple cases
+      and ends with a normal completion"
+    assessment: "observation-train-b26a-b26b-b27"
+  - path: "test/language/statements/switch/cptn-abrupt-empty.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "c54a1c8216c82b443fa55ffc25bdac7728fac1e5ebae5bba9b00d39c\
+      e68ff30c"
+    observationDigest: "e6f97eb95d57e2195b98fe95e61263fcfe282518734d5ae47ec\
+      b2d07f2887555"
+    missingDynamicTag: false
+    section: "Original es6id: 13.12.11"
+    subject: "Completion value when case block is empty"
+    assessment: "observation-train-b26a-b26b-b27"
+  - path: "test/language/statements/switch/cptn-b-abrupt-empty.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "3922983d17b5ff1165d711440796cfc93873e6c2f495a03b1791c71c\
+      21aafbbf"
+    observationDigest: "6a4f92b37d4dd17584c8dc1296727f55ed01abb2d946148cc9e\
+      05337de3b3b4a"
+    missingDynamicTag: false
+    section: "Original es6id: 13.12.11"
+    subject: "Completion value when the matching case is exited via an empty
+      abrupt completion"
+    assessment: "observation-train-b26a-b26b-b27"
+  - path: "test/language/statements/switch/cptn-b-fall-thru-abrupt-empty.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "a8b30b7ce9016ed2613ef7ab374d1a97cf059c8280dc4e130cf95bad\
+      669c7225"
+    observationDigest: "d768250b3ce3253a52184dbfac6de655b7635cbde323ae3b4a3\
+      813a203da6a14"
+    missingDynamicTag: false
+    section: "Original es6id: 13.12.11"
+    subject: "Completion value when execution continues through multiple cases
+      and ends with an empty abrupt completion"
+    assessment: "observation-train-b26a-b26b-b27"
+  - path: "test/language/statements/switch/cptn-b-fall-thru-nrml.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "b2cef9314506e72e1c3c4282d08eabc5937adb060b84e0feca4a194f\
+      9dc1a114"
+    observationDigest: "77d8a570a7e2028dbd2368946ea83b47b0e4099a230361ffa27\
+      6a6cee3270453"
+    missingDynamicTag: false
+    section: "Original es6id: 13.12.11"
+    subject: "Completion value when execution continues through multiple cases
+      and ends with a normal completion"
+    assessment: "observation-train-b26a-b26b-b27"
+  - path: "test/language/statements/switch/cptn-b-final.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "c031281770ad695b4d466cad98816d49a7a99ed22a45c5e2aa4a25b8\
+      53730f65"
+    observationDigest: "17381e6e3db4647d14ea8ab6fa095b3c70831f5242f5d6fed6d\
+      df475b66a8254"
+    missingDynamicTag: false
+    section: "Original es6id: 13.12.11"
+    subject: "Completion value when the final case matches"
+    assessment: "observation-train-b26a-b26b-b27"
+  - path: "test/language/statements/switch/cptn-dflt-abrupt-empty.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "5b59bc29c8a63bc2222cf5522ea3f5db34018777aff70b4270f45945\
+      fe64f82f"
+    observationDigest: "6d2c644b41c92a81f7c52f9178326066ebf048e32b476433d99\
+      a4b64032e66a7"
+    missingDynamicTag: false
+    section: "Original es6id: 13.12.11"
+    subject: "Completion value when the default case is exited via an empty
+      abrupt completion"
+    assessment: "observation-train-b26a-b26b-b27"
+  - path: "test/language/statements/switch/cptn-dflt-b-abrupt-empty.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "7f9af37e1e6e5c4c36780c17a133fe208057a7e2c5fe681bd2424f12\
+      39e34a1a"
+    observationDigest: "2a2ee55e3f249ccb9a5c7f46922f9952f0f4c24e780306b9047\
+      719cb59c3fd6f"
+    missingDynamicTag: false
+    section: "Original es6id: 13.12.11"
+    subject: "Completion value when the matching case is exited via an empty
+      abrupt completion"
+    assessment: "observation-train-b26a-b26b-b27"
+  - path: "test/language/statements/switch/cptn-dflt-b-fall-thru-abrupt-emp\
+      ty.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "2e580abe7f21779c0f15ecdad133a517347704136f25611156496775\
+      30522f32"
+    observationDigest: "79812e1e8c8e92558da7b38952c4f6c88f78ded19a4195716e2\
+      1c125d55007fa"
+    missingDynamicTag: false
+    section: "Original es6id: 13.12.11"
+    subject: "Completion value when execution continues through multiple cases
+      and ends with an empty abrupt completion"
+    assessment: "observation-train-b26a-b26b-b27"
+  - path: "test/language/statements/switch/cptn-dflt-b-fall-thru-nrml.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "fa2d05b9cfbd2dcf101fcdc07da9a6f8b62e3ee97d9ead18b95da42b\
+      16ad9cbb"
+    observationDigest: "02b49fe489fc5b222611c76a037b0f8d12c5036a49be6ebe88c\
+      91a9b1ad0b110"
+    missingDynamicTag: false
+    section: "Original es6id: 13.12.11"
+    subject: "Completion value when execution continues through multiple cases
+      and ends with a normal completion"
+    assessment: "observation-train-b26a-b26b-b27"
+  - path: "test/language/statements/switch/cptn-dflt-b-final.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "ec6b6e27ed2e877e5c891e9ce4a4ffe1602f6e9112df61536fc9b373\
+      9290fc50"
+    observationDigest: "b389d73bd645130e50deb3dfb0cb1e36f8eeba6739a55031e4e\
+      e757b912121df"
+    missingDynamicTag: false
+    section: "Original es6id: 13.12.11"
+    subject: "Completion value when the final case matches"
+    assessment: "observation-train-b26a-b26b-b27"
+  - path: "test/language/statements/switch/cptn-dflt-fall-thru-abrupt-empty.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "2140489f5ea665bdd9402eaa4edd1550188b22dea585ed1cfb2a0a54\
+      05f22815"
+    observationDigest: "0d27366d351ba674a95d1744cb8267c611492cddfc02a91cc49\
+      6f1860b5e3511"
+    missingDynamicTag: false
+    section: "Original es6id: 13.12.11"
+    subject: "Completion value when execution continues through multiple cases
+      and ends with an empty abrupt completion in the default case"
+    assessment: "observation-train-b26a-b26b-b27"
+  - path: "test/language/statements/switch/cptn-dflt-fall-thru-nrml.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "022c7b42e7262e41c380a87da460de9083611da9853a9caa9272d730\
+      c665a375"
+    observationDigest: "995a3e588c1f8d3a9f8a22b615c3f0526cf757fd04104c58fbc\
+      88e79d5b5166b"
+    missingDynamicTag: false
+    section: "Original es6id: 13.12.11"
+    subject: "Completion value when execution continues through multiple cases
+      and ends with a normal completion in the default case"
+    assessment: "observation-train-b26a-b26b-b27"
+  - path: "test/language/statements/switch/cptn-dflt-final.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "58b6c4c407d2e78efb9127998a3dc8e815857f0e370ba496d06cb8c1\
+      27158d8a"
+    observationDigest: "8da438401204f89c176a3d5dbc91b3eb887235f89df06a8fd3d\
+      cdeba27cd7e21"
+    missingDynamicTag: false
+    section: "Original es6id: 13.12.11"
+    subject: "Completion value when the default case matches and is final"
+    assessment: "observation-train-b26a-b26b-b27"
+  - path: "test/language/statements/switch/cptn-no-dflt-match-abrupt-empty.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "0e9f332613b10bad29174f12cd2787017c8fcff70a75946e5704d781\
+      78c3302d"
+    observationDigest: "aaac2dd5840650201e6c1aef87450f81be4296dec26a23f0cef\
+      82e2d35e24491"
+    missingDynamicTag: false
+    section: "Original es6id: 13.12.11"
+    subject: "Completion value when the matching case is exited via an empty
+      abrupt completion"
+    assessment: "observation-train-b26a-b26b-b27"
+  - path: "test/language/statements/switch/cptn-no-dflt-match-fall-thru-abrupt-\
+      empty.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "de552d163ff437124534488da95ac75abcd2ffccf2bbd58557ab7f7a\
+      af858af0"
+    observationDigest: "783c69c2de19fdde78c6324bb5c36f7d10b758ab0800b15f993\
+      afecf696c79b7"
+    missingDynamicTag: false
+    section: "Original es6id: 13.12.11"
+    subject: "Completion value when execution continues through multiple cases
+      and ends with an empty abrupt completion"
+    assessment: "observation-train-b26a-b26b-b27"
+  - path: "test/language/statements/switch/cptn-no-dflt-match-fall-thru-nrml.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "b69edb93c199a4b2e4b8dc56f735395d6b0fb99ddcd677c3e5384d82\
+      d648cf86"
+    observationDigest: "091bab4a9880104c0c37dc3519612d943791def0733f822c24d\
+      7942e4dfdbfeb"
+    missingDynamicTag: false
+    section: "Original es6id: 13.12.11"
+    subject: "Completion value when execution continues through multiple cases
+      and ends with a normal completion"
+    assessment: "observation-train-b26a-b26b-b27"
+  - path: "test/language/statements/switch/cptn-no-dflt-match-final.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "54a41bc9e986b74324fdc6b250e94d2c0039460fb8e78bb1e8c2666d\
+      c0891365"
+    observationDigest: "7ff201d2c5fc956fb0fee8ef535bc804e90bae0b0f4a7de2e1e\
+      ae63aabb714b2"
+    missingDynamicTag: false
+    section: "Original es6id: 13.12.11"
+    subject: "Completion value when only the final case matches"
+    assessment: "observation-train-b26a-b26b-b27"
+  - path: "test/language/statements/switch/cptn-no-dflt-no-match.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "e5fe4345003b20ad5a9ed928782d66cc559d356d768a0079f15955e1\
+      6888b781"
+    observationDigest: "662d153a6fb3ca5369597c619dd30d968e2494826cce58b6c1f\
+      69586d3e7bf61"
+    missingDynamicTag: false
+    section: "Original es6id: 13.12.11"
+    subject: "Completion value when no cases match"
+    assessment: "observation-train-b26a-b26b-b27"
+  - path: "test/language/statements/switch/scope-var-none-case.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "source-subject"
+    sourceDigest: "9c78d35d1aafb6b3e55800661a4ad178eace890c43582dc8cddbb376\
+      b85c4c49"
+    observationDigest: "b509ae81c9b1c532c13e80ee407a6bc12a257e29d550dae9c7c\
+      013c315896147"
+    missingDynamicTag: false
+    section: "sec-switch-statement-runtime-semantics-evaluation"
+    subject: "Retainment of existing variable environment (`case` clause)"
+    assessment: "observation-train-b26a-b26b-b27"
+  - path: "test/language/statements/switch/scope-var-none-dflt.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "source-subject"
+    sourceDigest: "020a47060232672db3fe6de79c49e75a875b5749964f616f63f25a9f\
+      4aab92cb"
+    observationDigest: "4bad89ba5f9f72428159d262c9e652118f14ec427b9efec51bf\
+      08efcc6cbffb2"
+    missingDynamicTag: false
+    section: "sec-switch-statement-runtime-semantics-evaluation"
+    subject: "Retainment of existing variable environment (`default` clause)"
+    assessment: "observation-train-b26a-b26b-b27"
+  - path: "test/language/statements/try/catch-parameter-boundnames-restriction-\
+      arguments-eval-throws.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "source-subject"
+    sourceDigest: "d7881acae209ab8163a5a501ea2bbef9ea851c7212e6a6ffd0ba8876\
+      f587b15d"
+    observationDigest: "4f438772533e97a5107de52a8e0ad587d386b7ded54b86d13fe\
+      ed86b43f99f11"
+    missingDynamicTag: false
+    section: "sec-strict-mode-of-ecmascript"
+    subject: "It is a SyntaxError if a CatchParameter occurs within strict mode
+      code and BoundNames of CatchParameter contains either eval or arguments
+      (13.15.1)."
+    assessment: "observation-train-b26a-b26b-b27"
+  - path: "test/language/statements/try/catch-parameter-boundnames-restriction-\
+      eval-eval-throws.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "source-subject"
+    sourceDigest: "48a74b549d8a4308595ef3bb88084c64ae93b397b5967f17464e6c0d\
+      66469417"
+    observationDigest: "d8c7871eff09b41225a4e26f006715c8b1322fd4f584ab816bc\
+      50c3a95b4ba73"
+    missingDynamicTag: false
+    section: "sec-strict-mode-of-ecmascript"
+    subject: "It is a SyntaxError if a CatchParameter occurs within strict mode
+      code and BoundNames of CatchParameter contains either eval or arguments
+      (13.15.1)."
+    assessment: "observation-train-b26a-b26b-b27"
+  - path: "test/language/statements/try/completion-values.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "9ca9d0d7af85e5a300682c22ab258cf6339df9a2b0e537ea336dccdd\
+      1a64ae2a"
+    observationDigest: "e1fd508bec979e6e683a4d387d4f98516e875756d90fee8826d\
+      0225088d03c39"
+    missingDynamicTag: false
+    section: "sec-try-statement-runtime-semantics-evaluation"
+    subject: "Direct eval try/catch/finally for completion value"
+    assessment: "observation-train-b26a-b26b-b27"
+  - path: "test/language/statements/try/cptn-catch-empty-break.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "5aec6c9dc360bac3ce2627b51829aee82896edbe610c36009f068f8c\
+      7d21260a"
+    observationDigest: "04194689237609380d84002b230748cb36f4b6ddaf59bd95411\
+      02c29a91ddd2b"
+    missingDynamicTag: false
+    section: "sec-try-statement-runtime-semantics-evaluation"
+    subject: "Abrupt completion from catch block calls UpdatEmpty()"
+    assessment: "observation-train-b26a-b26b-b27"
+  - path: "test/language/statements/try/cptn-catch-empty-continue.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "f03442980b9d65eca747697632ea7aa6516544a9c063cf5a5ff57a6f\
+      19c4c9b2"
+    observationDigest: "7460134b1e754146a632a976c08b617c4c4f6cac2d1ce341f68\
+      623000714a228"
+    missingDynamicTag: false
+    section: "sec-try-statement-runtime-semantics-evaluation"
+    subject: "Abrupt completion from catch block calls UpdatEmpty()"
+    assessment: "observation-train-b26a-b26b-b27"
+  - path: "test/language/statements/try/cptn-catch-finally-empty-break.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "17ce745690a5a4b4201699454cc8051395ae0420a40571d668aae004\
+      dffcf59b"
+    observationDigest: "24b381e874318ea08509fbb6765cd8eadbc6363b6b6f236e143\
+      cce344149cc0f"
+    missingDynamicTag: false
+    section: "sec-try-statement-runtime-semantics-evaluation"
+    subject: "Abrupt completion from finally block calls UpdatEmpty()"
+    assessment: "observation-train-b26a-b26b-b27"
+  - path: "test/language/statements/try/cptn-catch-finally-empty-continue.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "1abc8d3032dc81e60f86d239fc99018da0f03fb382fd110b871d22a6\
+      f526f287"
+    observationDigest: "beb30b38e9482498c06eaaf0fe15808b162d8c9b56c7f7e7412\
+      60cd9f59bb16d"
+    missingDynamicTag: false
+    section: "sec-try-statement-runtime-semantics-evaluation"
+    subject: "Abrupt completion from finally block calls UpdatEmpty()"
+    assessment: "observation-train-b26a-b26b-b27"
+  - path: "test/language/statements/try/cptn-catch.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "f7de3b6dc00c3891ad10fbf4ca88a14a4be01a2b0e684c1b92e10742\
+      1449c432"
+    observationDigest: "e33a08e5eec312a3c7a354264897b28187ae22e476157f4dd32\
+      754ecf8850126"
+    missingDynamicTag: false
+    section: "Original es6id: 13.15.8"
+    subject: "Completion value from `catch` clause of a try..catch statement"
+    assessment: "observation-train-b26a-b26b-b27"
+  - path: "test/language/statements/try/cptn-finally-empty-break.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "5304dbfc339c7c922922797b8da7499206be3804400fd4a8e1f73f8d\
+      a67ecc20"
+    observationDigest: "44bcbcd72488a31443afa22c4e8eef3428539b06fbdbef91184\
+      55ab96c07b0c1"
+    missingDynamicTag: false
+    section: "sec-try-statement-runtime-semantics-evaluation"
+    subject: "Abrupt completion from finally block calls UpdatEmpty()"
+    assessment: "observation-train-b26a-b26b-b27"
+  - path: "test/language/statements/try/cptn-finally-empty-continue.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "ae5c7e07f2d0d3a598d633c90d4c1993c1c895747309938743183b0a\
+      e3e7c3bd"
+    observationDigest: "a2de1f3648d1da69810ba87393f593527bb328b42cd46e411f9\
+      30e40928cfee4"
+    missingDynamicTag: false
+    section: "sec-try-statement-runtime-semantics-evaluation"
+    subject: "Abrupt completion from finally block calls UpdatEmpty()"
+    assessment: "observation-train-b26a-b26b-b27"
+  - path: "test/language/statements/try/cptn-finally-from-catch.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "1c9053ba0c444224b5f65a65f2746b920eb9d63cae14dc9c7c7e5dcd\
+      493644e2"
+    observationDigest: "79b3701da91d710a0e42aad665420fa0a7bf42120426f6a2bca\
+      ddd9f243dfc4c"
+    missingDynamicTag: false
+    section: "Original es6id: 13.15.8"
+    subject: "Completion value from `finally` clause of a try..catch..finally
+      statement (following execution of `catch` block)"
+    assessment: "observation-train-b26a-b26b-b27"
+  - path: "test/language/statements/try/cptn-finally-skip-catch.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "0bb64a4a5a88dd339275edd2e62b35b881f6162603b970917f55aaf2\
+      bdbbfb54"
+    observationDigest: "115b01f3661c927abdcbcddfc3ac8a2356820e2511f39ce1955\
+      d76e893a96d6f"
+    missingDynamicTag: false
+    section: "Original es6id: 13.15.8"
+    subject: "Completion value from `finally` clause of a try..catch..finally
+      statement (when `catch` block is not executed)"
+    assessment: "observation-train-b26a-b26b-b27"
+  - path: "test/language/statements/try/cptn-finally-wo-catch.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "3844e060a9048b34e23104a57b378844bf32e5da68928201ec4db35b\
+      d9894fb9"
+    observationDigest: "9881d9722e99cb53c48343da9dde30520ea65d745f6164a424e\
+      7030965e7c506"
+    missingDynamicTag: false
+    section: "Original es6id: 13.15.8"
+    subject: "Completion value from `finally` clause of a try..finally stat\
+      ement"
+    assessment: "observation-train-b26a-b26b-b27"
+  - path: "test/language/statements/try/cptn-try.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "840c745028e71d1cf845971b7c7f231df014d3de32bd036805e88174\
+      976da155"
+    observationDigest: "30b8d7a4f86463522b854481a784a4e6f239ad032cf7fca99ce\
+      208d8d2189979"
+    missingDynamicTag: false
+    section: "Original es6id: 13.15.8"
+    subject: "Completion value from `try` clause of a try..catch statement"
+    assessment: "observation-train-b26a-b26b-b27"
   - path: test/language/statements/try/scope-catch-param-var-none.js
     proposedOwner: adr:0016-dynamic-source-boundary
     priorCohort: source-subject
@@ -27540,6 +28945,309 @@ paths:
     subject: Retainment of existing variable environment for
       `catch` parameter
     assessment: variable-environment
+  - path: "test/language/statements/variable/12.2.1-10-s.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "source-subject"
+    sourceDigest: "4062cb95c2ebaf42ca9fbe5e0788d98e4e9b4b90092143119ed439de\
+      74aa39d7"
+    observationDigest: "026ae913890a90749ff0890b5de294314decb5bbc70dd66a55c\
+      a0558a448e63d"
+    missingDynamicTag: false
+    section: "Original es5id: 12.2.1-10-s"
+    subject: "Strict Mode: an indirect eval assigning into 'eval' does not \
+      throw"
+    assessment: "observation-train-b26a-b26b-b27"
+  - path: "test/language/statements/variable/12.2.1-11.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "source-subject"
+    sourceDigest: "9b979d078208a2bc7748ad775857e235c6418178e3c205e469af4804\
+      6170f574"
+    observationDigest: "ed6e933c6c82b232e4347c7adaedddbc58a7d347bc875c2f809\
+      5c90f34b3e2ea"
+    missingDynamicTag: false
+    section: "Original es5id: 12.2.1-11"
+    subject: "arguments as var identifier in eval code is allowed"
+    assessment: "observation-train-b26a-b26b-b27"
+  - path: "test/language/statements/variable/12.2.1-16-s.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "source-subject"
+    sourceDigest: "7280df67664ad4eeb42f9392d1ef1b21deff6487e8fb92fb9e4b1106\
+      38315fbb"
+    observationDigest: "8c9a7dc3d6e451504a1506966245e04b8e4c9a663a7f4dd7d6d\
+      34bc071817a7e"
+    missingDynamicTag: false
+    section: "Original es5id: 12.2.1-16-s"
+    subject: "A Function constructor (called as a function) declaring a var
+      named 'arguments' does not throw a SyntaxError"
+    assessment: "observation-train-b26a-b26b-b27"
+  - path: "test/language/statements/variable/12.2.1-17-s.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "source-subject"
+    sourceDigest: "36500112417971399138cf8addc39eb696d6c2fc9abcf074d2ba79ce\
+      68007dc4"
+    observationDigest: "a95967f6d1c1ecd70870b2aa03a9296d7d7e65949ad01ceff18\
+      26aab20dc27fa"
+    missingDynamicTag: false
+    section: "Original es5id: 12.2.1-17-s"
+    subject: "A Function constructor (called as a function) assigning into
+      'arguments' will not throw any error if contained within strict mode and
+      its body does not start with strict mode"
+    assessment: "observation-train-b26a-b26b-b27"
+  - path: "test/language/statements/variable/12.2.1-18-s.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "source-subject"
+    sourceDigest: "44f503bb4ea1995988e7709e9368b1604c668d6b049a3cd3a2c641e5\
+      93d90f32"
+    observationDigest: "13cd274336b6175c66fd95ccb2e12750905b8a82417b3aa1187\
+      4299146245ec9"
+    missingDynamicTag: false
+    section: "Original es5id: 12.2.1-18-s"
+    subject: "A direct eval declaring a var named 'arguments' throws SyntaxError
+      in strict mode"
+    assessment: "observation-train-b26a-b26b-b27"
+  - path: "test/language/statements/variable/12.2.1-19-s.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "source-subject"
+    sourceDigest: "9e5a53064cd5bc6e884e3d1345028e169949e18f64963e4b517d2e22\
+      1b7d8215"
+    observationDigest: "7d6ecffef73798d006405b42699d8cf6ab4ebb5475bd961fa17\
+      48c983088099e"
+    missingDynamicTag: false
+    section: "Original es5id: 12.2.1-19-s"
+    subject: "A direct eval assigning into 'arguments' throws SyntaxError in
+      strict mode"
+    assessment: "observation-train-b26a-b26b-b27"
+  - path: "test/language/statements/variable/12.2.1-2-s.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "source-subject"
+    sourceDigest: "945a19ed925932fe469129a7f90a675c5c78c1763cab1f6e12431eed\
+      64c192b2"
+    observationDigest: "2f0d8b2da87023028dfe719615190e28e2d7980271a9edf954b\
+      cf4e1ecbffe3e"
+    missingDynamicTag: false
+    section: "Original es5id: 12.2.1-2-s"
+    subject: "eval - a function assigning into 'eval' throws SyntaxError in
+      strict mode"
+    assessment: "observation-train-b26a-b26b-b27"
+  - path: "test/language/statements/variable/12.2.1-20-s.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "source-subject"
+    sourceDigest: "e10339a4f5d5d65330494b5a4b10cbf678a7a6ad71947beb701737e8\
+      f5a65025"
+    observationDigest: "ec37156d23a11b804bb0f8fe1dd57ab8bbf5fdfbfb335a462a3\
+      fe123c6bb6c97"
+    missingDynamicTag: false
+    section: "Original es5id: 12.2.1-20-s"
+    subject: "Strict Mode: an indirect eval declaring a var named 'arguments'
+      does not throw"
+    assessment: "observation-train-b26a-b26b-b27"
+  - path: "test/language/statements/variable/12.2.1-21-s.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "source-subject"
+    sourceDigest: "efba0167efcc36dd0104c6d209edfba162806e0e6fc4e53ce0ba8eee\
+      2cca35d2"
+    observationDigest: "3a5add94602d5920381933f6e2f344894ffaad4cb12e2c9074a\
+      e9896f8ffb72a"
+    missingDynamicTag: false
+    section: "Original es5id: 12.2.1-21-s"
+    subject: "Strict Mode: an indirect eval assigning into 'arguments' doe\
+      s not throw"
+    assessment: "observation-train-b26a-b26b-b27"
+  - path: "test/language/statements/variable/12.2.1-22-s.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "source-subject"
+    sourceDigest: "3a45b4cc4c00d7447948b9a4765548dd61fa4af198518010e07d9967\
+      c761cd8c"
+    observationDigest: "b805809f9fecbfa11f646f7910ae37ddaf8044d41520cb1904a\
+      c339182cebf28"
+    missingDynamicTag: false
+    section: "Original es5id: 12.2.1-22-s"
+    subject: "arguments as global var identifier throws SyntaxError in stri\
+      ct mode"
+    assessment: "observation-train-b26a-b26b-b27"
+  - path: "test/language/statements/variable/12.2.1-3-s.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "source-subject"
+    sourceDigest: "b37acd9d4a9bf28a5a537cccf22a1ec9ed3a7f62f175d08dd4bf0d90\
+      20cc7dea"
+    observationDigest: "dca3d47fd40d3a200b706c7cfc6f866465ce53fdc4d4adc8d70\
+      8f52d908bc49f"
+    missingDynamicTag: false
+    section: "Original es5id: 12.2.1-3-s"
+    subject: "eval - a function expr declaring a var named 'eval' throws
+      SyntaxError in strict mode"
+    assessment: "observation-train-b26a-b26b-b27"
+  - path: "test/language/statements/variable/12.2.1-4-s.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "source-subject"
+    sourceDigest: "96f3cad555ce39ad565d627a5f76b5608e947025f1832054cd5705d9\
+      91ac521f"
+    observationDigest: "ac2809e8ac7602662c118c3cefdb8dae93886a2a11790442863\
+      f9384a0ad8252"
+    missingDynamicTag: false
+    section: "Original es5id: 12.2.1-4-s"
+    subject: "eval - a function expr assigning into 'eval' throws a SyntaxError
+      in strict mode"
+    assessment: "observation-train-b26a-b26b-b27"
+  - path: "test/language/statements/variable/12.2.1-5-s.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "source-subject"
+    sourceDigest: "5e6e37a3af179c10d4b3abfa71acee662fbe444039870923bbb4f8cd\
+      74cacc34"
+    observationDigest: "f9a45b4657fb0069658764582ee04510b32f6a54fcedb73c0ed\
+      f4002e15a470f"
+    missingDynamicTag: false
+    section: "Original es5id: 12.2.1-5-s"
+    subject: "a Function declaring var named 'eval' does not throw SyntaxError"
+    assessment: "observation-train-b26a-b26b-b27"
+  - path: "test/language/statements/variable/12.2.1-6-s.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "source-subject"
+    sourceDigest: "9b88f813a13eea62b014674511801f1ae14afda77d5b3f025aa5192b\
+      aaf88deb"
+    observationDigest: "7e3127dffe88301f14ffeca653feabb7e2d8c4b5b6d72dc93ea\
+      67d21fe65cd97"
+    missingDynamicTag: false
+    section: "Original es5id: 12.2.1-6-s"
+    subject: "eval - a Function assigning into 'eval' will not throw any error
+      if contained within strict mode and its body does not start with strict
+      mode"
+    assessment: "observation-train-b26a-b26b-b27"
+  - path: "test/language/statements/variable/12.2.1-7-s.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "source-subject"
+    sourceDigest: "d89f2221618f18d4d2a3bd3cbd6a7ae419deeb043a7a9a05af083202\
+      91b44058"
+    observationDigest: "4a35331ec179e18bd6b7dea94d576647e0eec6594a0e474cd72\
+      4208c4e8691e1"
+    missingDynamicTag: false
+    section: "Original es5id: 12.2.1-7-s"
+    subject: "eval - a direct eval declaring a var named 'eval' throws
+      SyntaxError in strict mode"
+    assessment: "observation-train-b26a-b26b-b27"
+  - path: "test/language/statements/variable/12.2.1-8-s.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "source-subject"
+    sourceDigest: "b56fbba2aa23987e10f53c4f1678d44e2d506e8f4570fad0ebed7715\
+      e34118b6"
+    observationDigest: "1358d57633c210df1a82b40af1d90798d9fb0181650220ef963\
+      1f855853f67e3"
+    missingDynamicTag: false
+    section: "Original es5id: 12.2.1-8-s"
+    subject: "eval - a direct eval assigning into 'eval' throws SyntaxError in
+      strict mode"
+    assessment: "observation-train-b26a-b26b-b27"
+  - path: "test/language/statements/variable/12.2.1-9-s.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "source-subject"
+    sourceDigest: "984badc49fad1459d7321ae279457d5fdeb91b2dce6355e0a3d0d44a\
+      ef733ce9"
+    observationDigest: "baf13a528ff0e0b44c1d6b31df6dea0b12639fe3e98208bdbea\
+      d1133690458da"
+    missingDynamicTag: false
+    section: "Original es5id: 12.2.1-9-s"
+    subject: "an indirect eval declaring a var named 'eval' does not throw"
+    assessment: "observation-train-b26a-b26b-b27"
+  - path: "test/language/statements/variable/S12.2_A5.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "source-subject"
+    sourceDigest: "5f7761d8ad6c3078462540b714920aa7b1d97de8e31e0dc090d52e54\
+      bf813c56"
+    observationDigest: "08c2af824562fdaab033d0c67805e33ec2dc4698130c8f5349a\
+      b1d52e60f03b7"
+    missingDynamicTag: false
+    section: "Original es5id: 12.2_A5"
+    subject: 'Executing eval("var x")'
+    assessment: "observation-train-b26a-b26b-b27"
+  - path: "test/language/statements/variable/cptn-value.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "746f5fed7e3485833ffa3e17dd341c2f673c9e05e5518f7f3e0ee405\
+      88814496"
+    observationDigest: "55a40c35f94f341a0a9b2df3dacee0c4bf41d91f5c385797523\
+      a5ca867f72ae8"
+    missingDynamicTag: false
+    section: "sec-variable-statement-runtime-semantics-evaluation"
+    subject: "Returns an empty completion"
+    assessment: "observation-train-b26a-b26b-b27"
+  - path: "test/language/statements/while/S12.6.2_A3.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "abcce5471fbea4f44bc00cfe8f1680fd8a104144b1c2b6b80e36c1cd\
+      b2855b6d"
+    observationDigest: "2437c3d0902774ae7c2709f75d464320ac478e660f61ef9b94f\
+      61680c110e2fb"
+    missingDynamicTag: false
+    section: "Original es5id: 12.6.2_A3"
+    subject: "Using eval"
+    assessment: "observation-train-b26a-b26b-b27"
+  - path: "test/language/statements/while/S12.6.2_A5.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "f0f657b9a9a8eca76aa58e71f92cbb680b00a94b5c0a1aca073ced84\
+      59cc966c"
+    observationDigest: "4bb3711fe6bf6e4c330b9cbba1182de32286ea9f757248a65d9\
+      c0f8841be4bd7"
+    missingDynamicTag: false
+    section: "Original es5id: 12.6.2_A5"
+    subject: "Using eval"
+    assessment: "observation-train-b26a-b26b-b27"
+  - path: "test/language/statements/while/S12.6.2_A7.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "ee938b98371cacd4e07a6606e5ff8118fd6d3e419d162cc4a6792aa2\
+      be90ac2b"
+    observationDigest: "366d82ac08bf08f1c736fdc9ca37d8bfc64b585fcf8feb96e08\
+      6dc12a1a5c433"
+    missingDynamicTag: false
+    section: "Original es5id: 12.6.2_A7"
+    subject: "using eval"
+    assessment: "observation-train-b26a-b26b-b27"
+  - path: "test/language/statements/while/S12.6.2_A8.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "b2cc631dd15362a4cb70376c7cb5fdd9748e2973e5859158a78010fd\
+      cd48a409"
+    observationDigest: "bc65aac6cbc7164a81dd7be56525eb6180722c4d541bbdb05d7\
+      566fde9aff4a8"
+    missingDynamicTag: false
+    section: "Original es5id: 12.6.2_A8"
+    subject: "using eval"
+    assessment: "observation-train-b26a-b26b-b27"
+  - path: "test/language/statements/while/cptn-abrupt-empty.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "e676d38fd1a72d464080175d65a68400b623953b7366f407047e8fad\
+      20c775a0"
+    observationDigest: "082ed5b4622f3f9ba6036c78e32562130b7521760506c8ed4d0\
+      94c3caa7d34e8"
+    missingDynamicTag: false
+    section: "Original es6id: 13.7.3.6"
+    subject: "Completion value when iteration completes due to an empty abrupt
+      completion"
+    assessment: "observation-train-b26a-b26b-b27"
+  - path: "test/language/statements/while/cptn-iter.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "3aeeb7e108aeed31d73496319c62d537d8de0525f7bbf3259c77ed34\
+      bfce8a32"
+    observationDigest: "5e1b6354434a2ea0e99cfb5c5badb0525969a60b57418f3bbef\
+      658c08da7df25"
+    missingDynamicTag: false
+    section: "Original es6id: 13.7.3.6"
+    subject: "Completion value when iteration completes due to expression value"
+    assessment: "observation-train-b26a-b26b-b27"
+  - path: "test/language/statements/while/cptn-no-iter.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "52c3ac99999652e3272aee32c479396bc8f12970df930a58752cd743\
+      d447baed"
+    observationDigest: "35c0e735f16c9abf93f941cb809c934a5079bf35e06da5ebc16\
+      f31e26ce41c27"
+    missingDynamicTag: false
+    section: "Original es6id: 13.7.3.6"
+    subject: "Completion value when no iteration occurs"
+    assessment: "observation-train-b26a-b26b-b27"
   - path: "test/language/statements/with/12.10.1-10-s.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "incidental-scaffolding"
