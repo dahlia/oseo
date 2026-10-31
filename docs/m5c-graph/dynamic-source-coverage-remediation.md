@@ -623,3 +623,16 @@ module-loading-and-promises rows and DS-8's *usage-from-eval.js*. Its pinned
 selector and authority are in that child's work note. The node designs the
 build-time-resolvable literal `import()` track and drafts a Proposed ADR 0016
 amendment; it moves no owner. The umbrella retains all 20 paths.
+
+
+Host Script evidence child
+--------------------------
+
+The 2026-11-01 umbrella-residual decision, item 1, adds
+`dynamic-source-host-script-evidence` for exactly 99 paths: 98 DS-10 eval
+rows and the DS-16 no-newline hashbang completion row. Its pinned selector,
+conditions and closure routes are in that child's work note. Ownership
+moves only with reviewed closure; the umbrella keeps every remaining path
+and now waits for this child. The child accounts for 44 paths under ADR 0016
+with finite literal host Script witnesses and keeps 55 with exact per-path
+reasons, so the umbrella owns 290.
