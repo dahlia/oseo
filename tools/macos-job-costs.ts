@@ -78,7 +78,10 @@ interface MacosJobCosts {
 /** Measured hosted medians used only for lane assignment. */
 export const macosJobCosts: MacosJobCosts = {
   "host C sanitizers (macOS, property)": 2452, // 18
-  "host C sanitizers (macOS, native)": 2337, // 18
+  // Derived from four hosted native logs, not measured job walls; see
+  // docs/evidence/macos-sanitizer-split/README.md.
+  "host C sanitizers (macOS, native, 1/2)": 2014, // derived
+  "host C sanitizers (macOS, native, 2/2)": 1593, // derived
   "test262 (macos-aarch64, 12/12)": 2212, // 1
   "native support (macos-aarch64, 5/12)": 2063, // 1 hosted since b59ac914
   "test262 (macos-aarch64, 2/12)": 2054, // 4

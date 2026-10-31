@@ -147,6 +147,11 @@ mise run test:sanitizer:property:shard \
   --test-shard=1/12 tests/property/*.property.test.ts
 ~~~~
 
+The macOS CI lane runs the native task as two file shards with
+`--shard N/2`; the first also carries the runtime fixtures, and the `native`
+aggregate requires both. See
+[*macOS native sanitizer split*](evidence/macos-sanitizer-split/README.md).
+
 The full property task remains unsharded. The Linux CI lane runs all three
 shards with `--test-shard=N/3` over _tests/property/\*.property.test.ts_,
 and the `native` aggregate requires the whole matrix. The shard task uses
