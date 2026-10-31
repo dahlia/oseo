@@ -23562,7 +23562,7 @@ summary:
       infrastructureFailures: 0
       passes: 30
       semanticFailures: 0
-      unsupportedProfileFeatures: 1480
+      unsupportedProfileFeatures: 1635
     - dependency: error-intrinsics
       expectedNegatives: 15
       harnessFailures: 0

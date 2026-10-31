@@ -1031,6 +1031,7 @@ results:
     classification: unsupported-profile-feature
     dependencies:
       - classes
+      - dynamic-source
       - object-properties
     observation:
       detail: "test/language/expressions/class/elements/derived-cls-direct-ev\

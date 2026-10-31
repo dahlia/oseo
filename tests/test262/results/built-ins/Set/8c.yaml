@@ -16,6 +16,7 @@ results:
       suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
     classification: unsupported-profile-feature
     dependencies:
+      - dynamic-source
       - set-intrinsic
     execution:
       harnessIncludes:

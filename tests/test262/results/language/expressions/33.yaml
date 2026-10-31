@@ -1658,6 +1658,7 @@ results:
     classification: unsupported-profile-feature
     dependencies:
       - classes
+      - dynamic-source
     observation:
       detail: "test/language/expressions/super/prop-expr-cls-val-from-eval.js
         non-strict disabled failed (1): stdout=\"\"

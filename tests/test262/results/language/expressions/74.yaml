@@ -1250,6 +1250,7 @@ results:
     classification: unsupported-profile-feature
     dependencies:
       - classes
+      - dynamic-source
       - object-literals
     observation:
       detail: "test/language/expressions/super/prop-dot-obj-val-from-eval.js

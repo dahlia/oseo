@@ -241,6 +241,7 @@ results:
     classification: unsupported-profile-feature
     dependencies:
       - async-iteration
+      - dynamic-source
     observation:
       detail: "test/language/expressions/async-generator/named-eval-var-scope\
         -syntax-err.js non-strict disabled failed (1): stdout=\"\"

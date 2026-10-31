@@ -188,6 +188,7 @@ results:
     classification: unsupported-profile-feature
     dependencies:
       - control-flow
+      - dynamic-source
       - property-enumeration
     observation:
       detail: "test/language/statements/for-in/S12.6.4_A4.js non-strict

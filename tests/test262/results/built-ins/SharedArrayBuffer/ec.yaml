@@ -50,6 +50,7 @@ results:
     classification: unsupported-profile-feature
     dependencies:
       - atomics-single-agent
+      - dynamic-source
     execution:
       harnessIncludes:
         - base.js
