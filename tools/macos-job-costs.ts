@@ -59,6 +59,17 @@
  *     not either, because it overstates the two files by a derived 1.31
  *     against 2.50. The first run that places one of these hosted
  *     replaces the estimate.
+ *  -  Six entries marked `derived` are the weighted ordinary Node shards
+ *     that replaced the four positional ones, four of the seven U40
+ *     entries above. CI has not run them yet. Each is the modeled wall of
+ *     its shard: the per-file sums of *docs/evidence/node-shards/*, the
+ *     median of three runs, replayed in Node's sorted order on two
+ *     workers, plus one minute of setup. The four positional entries they
+ *     replace summed to 4,055 seconds, against 5,717 to 7,788 for the
+ *     same four jobs in those runs. The same model reproduced every
+ *     positional macOS shard of those runs within 0.9 minutes but one, a
+ *     runner that finished 7.2 minutes early. The first run that places
+ *     them replaces the estimates.
  *
  * The refreshed entries rose against their retained neighbours, so the
  * table is likely to understate the retained ones and to place them on a
@@ -105,15 +116,19 @@ export const macosJobCosts: MacosJobCosts = {
   // Scheduling allowance only: unchanged 180-second interrupt plus setup.
   // Dedicated hosted macOS execution has not yet been measured.
   "Array constructor (macos-latest, node)": 240,
-  "test (macos-latest, node, 3/4)": 1311, // 18
+  // Derived, not observed: modeled walls of the six weighted shards; see
+  // docs/evidence/node-shards/README.md.
+  "test (macos-latest, node, 1/6)": 1622, // derived
+  "test (macos-latest, node, 5/6)": 1373, // derived
+  "test (macos-latest, node, 2/6)": 1335, // derived
   "native support (macos-aarch64, 3/12)": 1293, // 5 hosted since b59ac914
+  "test (macos-latest, node, 3/6)": 1270, // derived
+  "test (macos-latest, node, 6/6)": 1250, // derived
+  "test (macos-latest, node, 4/6)": 1241, // derived
   "native (macos-aarch64, 1/3)": 1236, // 6 hosted since b59ac914
   "native (macos-aarch64, 2/3)": 1162, // 3 hosted since b59ac914
   "native (macos-aarch64, 3/3)": 1160, // 2 hosted since b59ac914
-  "test (macos-latest, node, 2/4)": 996, // 18
   "own-key cases (macos-aarch64, 2/3)": 995, // retained
-  "test (macos-latest, node, 1/4)": 884, // 18
-  "test (macos-latest, node, 4/4)": 864, // 18
   "own-key cases (macos-aarch64, 3/3)": 854, // retained
   "own-key cases (macos-aarch64, 1/3)": 810, // retained
   "reflect cases (macos-aarch64, 1/3)": 690, // 2 hosted since b59ac914

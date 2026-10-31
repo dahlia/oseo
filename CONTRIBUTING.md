@@ -584,14 +584,33 @@ The ordinary macOS Node.js gate uses a separate dedicated hosted
 `macos-latest` job for that same file. It runs all 12 cases with the original
 seed and 180-second interrupt, with one file worker and no time scaling.
 `dedicatedMacosNodeFiles` lists this ordinary exclusion independently of the
-Linux extended one. The four ordinary shards use `test:node:macos:shard`:
-*tools/node-shard.ts* reproduces Node 24's default discovery, removes the
-dedicated file, and passes the remaining files to Node's `--test-shard`.
-The four shards and dedicated job together execute the original inventory
-exactly once. Linux ordinary Node discovery is unchanged. The lane generator
-puts the additional job on one of the existing five hosted macOS lanes;
-`native` requires its result even if an earlier lane job fails. See
+Linux extended one. The lane generator puts the additional job on one of the
+existing five hosted macOS lanes; `native` requires its result even if an
+earlier lane job fails. See
 [*macOS Array placement evidence*](docs/evidence/array-macos/README.md).
+
+The ordinary Node.js gate runs in four Linux and six macOS shards through
+`mise run test:node:shard --shard INDEX/TOTAL`; Windows still runs it
+unsharded through `mise run test:node`. *tools/node-shard.ts* reproduces
+Node 24's default discovery, removes `dedicatedMacosNodeFiles` on macOS
+only, and passes each shard's files to Node without `--test-shard`. The
+shards on each host, with the dedicated macOS job, execute the inventory
+exactly once.
+
+Files are assigned by the weights in *tools/node-shard-costs.ts*: heaviest
+first, ties in path order, each to the shard whose modeled run ends
+earliest with it, ties to the lowest index. The model follows Node's own
+scheduling. Node sorts the files it is given and starts each on the first
+free worker, three on Linux and two on macOS, so a heavy file sorted late
+ends its shard late. A file without a weight weighs the host fallback, the
+median of the measured weights. *tests/node-shard.test.ts* requires every
+modeled shard to finish within 40 minutes including setup.
+
+A new test file that runs for minutes on CI must add its weight on both
+hosts in the same change, or the placement treats it as light. Weights are
+the largest of three CI observations of a file's summed top-level test
+durations. Refresh them when the file set or relative costs change, as
+[*Node shard evidence*](docs/evidence/node-shards/README.md) describes.
 
 The local unsharded extended
 task still runs every file with all cases. The Linux singleton rule still

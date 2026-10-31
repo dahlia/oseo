@@ -78,12 +78,12 @@ export function macosJobs(): readonly MacosLaneJob[] {
     { os: "macos-latest", runtime: "deno" },
     "macos-latest",
   );
-  for (let shard = 1; shard <= 4; shard++) {
+  for (let shard = 1; shard <= 6; shard++) {
     add(
       "test_node_shard",
       String(shard),
-      `test (macos-latest, node, ${shard}/4)`,
-      { shard, total: 4 },
+      `test (macos-latest, node, ${shard}/6)`,
+      { shard, total: 6 },
       "macos-latest",
     );
   }

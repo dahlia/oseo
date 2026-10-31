@@ -270,17 +270,17 @@ test("every check name and concurrency policy is preserved", () => {
         { length: 3 },
         (_, index) => `host C sanitizers (Linux, ${index + 1}/3)`,
       ),
-      // The hosted macOS Node.js suite is partitioned by Node's own
-      // --test-shard after excluding the dedicated Array file; Linux
-      // keeps default discovery. See PLAN-GATE.md (U32, U46).
+      // The ordinary Node.js suite is partitioned by measured file
+      // weights, after excluding the dedicated Array file on macOS. See
+      // PLAN-GATE.md (U32, U46) and docs/evidence/node-shards/README.md.
       "Array constructor (macos-latest, node)",
       ...Array.from(
-        { length: 4 },
-        (_, index) => `test (macos-latest, node, ${index + 1}/4)`,
+        { length: 6 },
+        (_, index) => `test (macos-latest, node, ${index + 1}/6)`,
       ),
       ...Array.from(
-        { length: 2 },
-        (_, index) => `test (ubuntu-latest, node, ${index + 1}/2)`,
+        { length: 4 },
+        (_, index) => `test (ubuntu-latest, node, ${index + 1}/4)`,
       ),
       // The Linux test262 total fell from twelve to eight so that the
       // run's Ubuntu jobs fit the slots it receives; see PLAN-GATE.md
@@ -309,7 +309,7 @@ test("every check name and concurrency policy is preserved", () => {
       ),
     ].toSorted(),
   );
-  assert.equal(names(after).length, 79);
+  assert.equal(names(after).length, 83);
   const { jobs: _beforeJobs, ...beforeHeader } = before;
   const { jobs: _afterJobs, ...afterHeader } = after;
   assert.deepEqual(afterHeader, beforeHeader);
@@ -361,8 +361,8 @@ test("every macOS job occurs exactly once in five LPT chains", () => {
   const lanes = macosLanes();
   assert.equal(lanes.length, 5);
   const jobs = lanes.flat();
-  assert.equal(jobs.length, 41);
-  assert.equal(new Set(jobs.map((job) => job.id)).size, 41);
+  assert.equal(jobs.length, 43);
+  assert.equal(new Set(jobs.map((job) => job.id)).size, 43);
   assert.deepEqual(
     jobs.map((job) => job.name).toSorted(),
     macosJobs()
@@ -398,11 +398,14 @@ test("every macOS job occurs exactly once in five LPT chains", () => {
   // median had moved by at least five percent. See PLAN-GATE.md
   // (U33, U40, U41, U42, U43, U44, U49). The Array ordinary job adds
   // an unmeasured 240-second allowance; see docs/evidence/array-macos.
+  // The six weighted Node shards replaced four stale positional entries
+  // with modeled walls, which raised this from 12334; see
+  // docs/evidence/node-shards/README.md.
   assert.equal(
     Math.max(
       ...lanes.map((lane) => lane.reduce((sum, job) => sum + job.seconds, 0)),
     ),
-    12334,
+    14574,
   );
 });
 
@@ -772,8 +775,8 @@ test("lane-count preview leaves the committed workflow alone", () => {
 test("one extra lane retains every job and aggregate dependency", () => {
   const lanes = macosLanes(1);
   assert.equal(lanes.length, 6);
-  assert.equal(lanes.flat().length, 41);
-  assert.equal(new Set(lanes.flat().map((job) => job.id)).size, 41);
+  assert.equal(lanes.flat().length, 43);
+  assert.equal(new Set(lanes.flat().map((job) => job.id)).size, 43);
   assert.ok(lanes[5]!.length > 0);
   assert.deepEqual(
     lanes[5]!
@@ -1176,7 +1179,9 @@ test("own-key cases lead the Mac lane with measured Mac seconds", () => {
     selfHostedProbeSeconds,
   );
   // The dedicated ordinary Array allowance also loads a hosted lane.
-  assert.equal(Math.round(modeled), 8909);
+  // The six weighted Node shards' modeled walls raised this from 8909,
+  // because the heavier hosted lanes leave more work to the Mac lane.
+  assert.equal(Math.round(modeled), 9513);
 });
 
 test("hosted lanes take the jobs no Mac lane can run first", () => {
@@ -1193,7 +1198,7 @@ test("hosted lanes take the jobs no Mac lane can run first", () => {
     );
   }
   const ineligible = macosJobs().filter((job) => !macLaneEligible(job));
-  assert.equal(ineligible.length, 8);
+  assert.equal(ineligible.length, 10);
   for (const job of ineligible) {
     const lane = hosted.find((candidate) =>
       candidate.some((placed) => placed.id === job.id),
@@ -1213,20 +1218,31 @@ test("hosted lanes take the jobs no Mac lane can run first", () => {
   // single jobs after the greedy pass; see PLAN-GATE.md (U45). U49's
   // refreshed hosted entries raised it from 2820 by charging the hosted
   // lanes what they measured, which moved a `native support` shard off a
-  // hosted lane; see PLAN-GATE.md (U49).
-  assert.equal(Math.round(Math.max(...macosLaneEnds(macosLanes(6)))), 2839);
+  // hosted lane; see PLAN-GATE.md (U49). The six weighted Node shards'
+  // modeled walls raised it from 2839 by charging the hosted lanes for
+  // the ordinary Node work that the stale positional entries understated;
+  // see docs/evidence/node-shards/README.md.
+  assert.equal(Math.round(Math.max(...macosLaneEnds(macosLanes(6)))), 3111);
   // The rented pair lowers the maximum to the hosted floor; it has no
-  // measured walls of its own yet.
-  assert.equal(Math.round(Math.max(...macosLaneEnds(lanes))), 2452);
+  // measured walls of its own yet. That floor is now the three hosted
+  // lanes that carry the Node shards, not the property sanitizer's 2452.
+  assert.equal(Math.round(Math.max(...macosLaneEnds(lanes))), 2863);
 });
 
 test("only a tested hosted entry reaches a hosted lane", () => {
-  const lanes = macosLanes(configuredSelfHostedLanes);
-  const eligible = lanes
-    .slice(0, 5)
-    .flatMap((lane) =>
-      lane.filter((job) => selfHostedJobSeconds[job.name] != null),
-    );
+  // The weighted Node shards fill the hosted lanes at the configured
+  // count, so the placements with three or more Mac lanes are checked
+  // together to keep at least one hosted Mac-eligible job in view.
+  const eligible = Array.from(
+    { length: Math.max(configuredSelfHostedLanes - 2, 0) },
+    (_, index) => macosLanes(index + 3),
+  ).flatMap((lanes) =>
+    lanes
+      .slice(0, 5)
+      .flatMap((lane) =>
+        lane.filter((job) => selfHostedJobSeconds[job.name] != null),
+      ),
+  );
   assert.ok(eligible.length > 0, "the placement hosts no Mac-eligible job");
   for (const job of eligible) {
     // The placement minimizes a projected finish, so it may select the
@@ -1342,8 +1358,8 @@ test("availability decides the second machine's lanes too", async () => {
 test("three Mac lanes keep every job and the own-key lane", () => {
   const lanes = macosLanes(3);
   assert.equal(lanes.length, 8);
-  assert.equal(lanes.flat().length, 41);
-  assert.equal(new Set(lanes.flat().map((job) => job.id)).size, 41);
+  assert.equal(lanes.flat().length, 43);
+  assert.equal(new Set(lanes.flat().map((job) => job.id)).size, 43);
   for (const lane of lanes.slice(5)) assert.ok(lane.length > 0);
   assert.deepEqual(
     lanes
@@ -1426,8 +1442,8 @@ test("eight Mac lanes route each label with its own hosted fallback", () => {
   ]);
   const lanes = macosLanes(8);
   assert.equal(lanes.length, 13);
-  assert.equal(lanes.flat().length, 41);
-  assert.equal(new Set(lanes.flat().map((job) => job.id)).size, 41);
+  assert.equal(lanes.flat().length, 43);
+  assert.equal(new Set(lanes.flat().map((job) => job.id)).size, 43);
   for (const lane of lanes.slice(5)) assert.ok(lane.length > 0);
   // One readiness output, so one runner class, for the shared deadline.
   assert.deepEqual(
@@ -2835,8 +2851,35 @@ test("ordinary macOS Array keeps one hosted lane and deadline", () => {
     const commands = after.jobs[shard.id]!.steps.map((step) => step.run);
     assert.ok(
       commands.includes(
-        `mise run test:node:macos:shard --shard=${shard.matrix.shard}/4`,
+        `mise run test:node:shard --shard=${shard.matrix.shard}/6`,
       ),
     );
   }
+});
+
+test("ordinary Node shards cover four Linux and six macOS indices", () => {
+  const linux = after.jobs.test_node_shard_linux!;
+  assert.equal(linux["runs-on"], "ubuntu-latest");
+  assert.deepEqual(
+    entries(linux),
+    Array.from({ length: 4 }, (_, index) => ({ shard: index + 1, total: 4 })),
+  );
+  assert.ok(
+    linux.steps.some(
+      (step) =>
+        step.run ===
+        "mise run test:node:shard " +
+          "--shard=${{ matrix.shard }}/${{ matrix.total }}",
+    ),
+  );
+  assert.deepEqual(
+    entries(before.jobs.test_node_shard!),
+    Array.from({ length: 6 }, (_, index) => ({ shard: index + 1, total: 6 })),
+  );
+  assert.deepEqual(
+    macosJobs()
+      .filter((job) => job.sourceId === "test_node_shard")
+      .map((job) => job.matrix),
+    Array.from({ length: 6 }, (_, index) => ({ shard: index + 1, total: 6 })),
+  );
 });

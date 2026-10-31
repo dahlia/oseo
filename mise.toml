@@ -252,13 +252,11 @@ run = "node tests/native.ts"
 [tasks."test:node"]
 description = "Run source, version, and built ESM tests under Node.js"
 depends = ["build"]
-# CI passes Node's own --test-shard so that the partition uses Node's file
-# discovery and no file can be missed.
 raw_args = true
 run = "node --test"
 
-[tasks."test:node:macos:shard"]
-description = "Run ordinary Node shards without dedicated macOS files"
+[tasks."test:node:shard"]
+description = "Run one ordinary Node shard selected by measured file weights"
 depends = ["build"]
 raw_args = true
 run = "node tools/run-node-shard.ts"

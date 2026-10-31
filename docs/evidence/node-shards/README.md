@@ -1,0 +1,184 @@
+Ordinary Node shard placement
+=============================
+
+The ordinary Node.js gate kept every file, case, seed, budget, and interrupt
+limit. What changed is which shard runs each file: Linux moved from Node's
+positional `--test-shard=INDEX/2` to four weighted shards, and macOS from
+four positional shards to six weighted ones. *tools/node-shard.ts* now
+assigns files on both hosts by the weights in *tools/node-shard-costs.ts*.
+The dedicated macOS Array job and the unsharded Windows job are unchanged.
+
+
+Problem
+-------
+
+Run [41228695658] at `9f21b607`, run [41233967056] at `636157ef`, and run
+[41238903460] at `8770b2e4` took 41.2, 53.3, and 56.0 minutes for
+`test (ubuntu-latest, node, 2/2)`, while shard 1/2 took 30.6 to 37.7. The
+macOS shards took 9.3 to 42.7 minutes. Node's positional partition sends
+every second file in sorted path order to a shard, so the heavy native
+evidence files fall where their names put them. Node also sorts the files
+it is given and starts each on the first free worker, so a heavy file late
+in path order starts only after the files before it. The shard ends when
+that file does.
+
+[41228695658]: https://github.com/dahlia/oseo/actions/runs/41228695658
+[41233967056]: https://github.com/dahlia/oseo/actions/runs/41233967056
+[41238903460]: https://github.com/dahlia/oseo/actions/runs/41238903460
+
+
+Measurement
+-----------
+
+*extract.py* reads the 18 ordinary Node job logs of those three runs, which
+were fetched with `gh api repos/dahlia/oseo/actions/jobs/JOB/logs`. The
+logs are not checked in. The spec reporter prints top-level results without
+file names, so the script recomputes each job's file list from the run's
+commit and partition. It then credits each top-level duration to the file
+whose longest string-literal fragment occurs in the test name. Every
+top-level result was attributed. *node-file-costs.tsv* holds the resulting
+sums in seconds, one column per host and run. They are concurrent test
+durations, not file walls or CPU time.
+
+The same file's sum varies with the runner. The residual evidence file,
+*tests/dynamic-source-residual-evidence.test.ts*, summed to 1,512.3,
+2,054.9, and 2,045.5 seconds on Linux, a factor of 1.36, and to 1,098.5,
+1,562.0, and 1,575.7 on macOS. A weight is therefore the largest of the
+three sums, rounded up, so the margin below is a slow runner's. Files under 30
+seconds have no entry and weigh the host fallback, 18 seconds on both hosts,
+which is the median of every measured weight.
+
+Three files postdate those runs. One serial local run on 2026-11-01 of the
+residual evidence and those three files gives the calibration:
+
+| File                                              | Local, s | Linux weight | macOS weight |
+| ------------------------------------------------- | -------: | -----------: | -----------: |
+| *tests/dynamic-source-residual-evidence.test.ts*  |    798.3 |   2,055 (CI) |   1,576 (CI) |
+| *tests/host-script-evidence.test.ts*              |    290.8 |          749 |          575 |
+| *tests/trainc-ordinary-evidence.test.ts*          |    155.2 |          400 |          307 |
+| *tests/unhandled-rejection-policy-native.test.ts* |      9.5 |     fallback |     fallback |
+
+The ratios are 2.574 for Linux and 1.974 for macOS, the residual file's
+largest CI sum over its local sum. The fastest Linux observation gives
+1.894, so the ratio spans the runner variation as well.
+
+
+Model
+-----
+
+*model.py* replays Node's runner. A shard's files start in sorted path
+order, each on the first free of three Linux or two macOS workers, which is
+Node's default file concurrency on the hosted runners: available
+parallelism minus one. One minute of setup is added. With each job's own
+sums, it reproduces the positional jobs of the three runs:
+
+| Job                    | Actual, minutes        | Model, minutes         |
+| ---------------------- | ---------------------- | ---------------------- |
+| Linux, run 41228695658 | 37.7, 41.2             | 37.8, 41.4             |
+| Linux, run 41233967056 | 30.6, 53.3             | 30.7, 53.4             |
+| Linux, run 41238903460 | 37.4, 56.0             | 37.4, 56.1             |
+| macOS, run 41228695658 | 16.6, 9.3, 38.8, 30.7  | 16.6, 16.5, 38.1, 30.7 |
+| macOS, run 41233967056 | 21.3, 26.2, 42.7, 39.5 | 21.1, 26.0, 41.8, 39.2 |
+| macOS, run 41238903460 | 17.1, 20.6, 41.1, 40.1 | 17.1, 20.5, 40.4, 40.1 |
+
+The one miss is shard 2/4 of run 41228695658. It summed 1,902.7 seconds of
+tests in a 521-second test step, which two workers cannot do. That runner
+evidently ran more files at once than the others, so the model is
+conservative there.
+
+The placement uses the same model. Files are taken heaviest first, ties in
+path order, and each goes to the shard whose modeled run ends earliest with
+it, ties to the lowest index. Passing files in a different order cannot
+change Node's sorted start order, so the placement models it instead.
+
+
+Modeled maxima
+--------------
+
+On the bundle 8 tree, in minutes including setup. The weights column uses
+the checked-in weights and fallback. The sums column uses each file's
+largest observed sum, with the fallback only for files never observed:
+
+| Host and total    | Weights                            | Largest sums                       |
+| ----------------- | ---------------------------------- | ---------------------------------- |
+| Linux, 3          | 38.5, 38.4, 38.4                   | 35.7, 35.8, 35.7                   |
+| Linux, 4 (chosen) | 35.2, 34.7, 34.8, 34.8             | 35.2, 30.7, 31.4, 30.7             |
+| macOS, 5          | 31.6, 31.6, 31.4, 31.5, 31.4       | 27.3, 29.2, 28.8, 29.8, 28.7       |
+| macOS, 6 (chosen) | 27.3, 27.2, 27.1, 27.2, 27.2, 27.1 | 27.3, 24.3, 24.2, 24.9, 24.5, 25.1 |
+
+The Linux floor is the residual evidence file, which takes shard 1 alone at
+35.2 minutes. The same files and sums under the old positional partition
+model at 67.7 and 36.9 minutes for Linux and 45.0, 19.7, 26.8, and 50.5 for
+macOS.
+
+The macOS total follows from the hosted lanes. The lane generator keeps the
+`test` family off Mac lanes, and two of the five hosted lanes each hold one
+sanitizer job, so the ordinary Node shards share three lanes with the Deno
+and Array jobs. With each shard's modeled wall from per-file medians and
+eight configured Mac lanes, the generator models these maxima:
+
+| Placement                            | Shard walls, s                           | Run maximum, minutes |
+| ------------------------------------ | ---------------------------------------- | -------------------: |
+| Positional 4, checked-in U40 entries | 884, 996, 1,311, 864                     |                40.87 |
+| Positional 4, modeled on this tree   | 2,485, 1,055, 1,369, 2,640               |                44.40 |
+| Weighted 4                           | 1,873, 1,896, 1,831, 1,828               |                60.98 |
+| Weighted 5                           | 1,623, 1,544, 1,564, 1,507, 1,515        |                51.18 |
+| Weighted 6 (chosen)                  | 1,622, 1,335, 1,270, 1,241, 1,373, 1,250 |                47.72 |
+
+The checked-in positional entries summed to 4,055 seconds, against 5,717
+to 7,788 for the same four jobs in the three runs, so the 40.87 figure was
+optimistic. The positional shards fit three lanes only because they were
+uneven. Equal weighted shards pack two per lane at most, which makes six
+the smallest total that leaves no lane with a third shard. The floor of
+about 47 minutes is the hosted Node, Deno, and Array work divided by three.
+*tools/macos-job-costs.ts* records the six walls as derived entries until
+CI measures them.
+
+The same runs observed the two macOS sanitizer jobs at medians of 2,823
+seconds for `property` and 3,377 for `native`, against checked-in entries
+of 2,452 and 2,337. This change leaves those entries alone because the
+`dynamic-source-regexp-exhaustive` lane splits that family.
+
+
+Coming files
+------------
+
+Two lanes will add heavy files. Their handoffs give local estimates of
+1,140 seconds for *tests/host-script-trainc-evidence.test.ts* and 248 for
+*tests/property/m5-regexp-literal-exhaustive.property.test.ts*. Scaled by
+the ratios above, the train C file alone is 48.9 minutes on a slow Linux
+runner and 37.5 on macOS. It runs its 18 fixtures serially in one file, so
+no placement brings its job under 40 minutes. The modeled maxima with both
+files, in minutes:
+
+| Scenario                           | Linux, 4               | macOS, 6                           |
+| ---------------------------------- | ---------------------- | ---------------------------------- |
+| Train C as one file, no weight     | 35.2, 53.6, 31.3, 32.5 | 27.3, 24.5, 24.8, 24.9, 44.8, 24.6 |
+| Train C in three files, no weights | 35.2, 36.3, 45.0, 31.1 | 27.3, 24.1, 30.6, 24.5, 37.1, 24.9 |
+| Train C in three files, weighted   | 35.6, 34.0, 33.8, 34.0 | 27.8, 28.2, 28.1, 27.7, 28.5, 28.1 |
+
+The split pieces must therefore add their weights in the change that adds
+them. The weighted row assumes local times scaled by the two ratios and
+also weights the RegExp property.
+
+Capacity remains a concern. The weighted train C pieces add about 2,250
+seconds to the three hosted macOS lanes that carry Node shards, which would
+put the run maximum near 60 minutes whatever the Node total is. That needs
+a separate decision about hosted macOS capacity.
+
+
+Reproduction
+------------
+
+~~~~ sh
+python3 docs/evidence/node-shards/extract.py LOG_DIR \
+  > docs/evidence/node-shards/node-file-costs.tsv
+python3 docs/evidence/node-shards/model.py
+python3 docs/evidence/node-shards/model.py --emit
+~~~~
+
+`--emit` prints the weight tables in *tools/node-shard-costs.ts*.
+*model.py* discovers files from the checked-out tree, so its maxima follow
+the tree it runs in. The lane maxima above come from the lane generator
+with the shard walls listed. The checked-in workflow reflects the six
+derived entries.
