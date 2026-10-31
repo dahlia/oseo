@@ -1,35 +1,37 @@
 B19/B20/B30 dynamic-source coverage remediation
 ===============================================
 
-The current umbrella owns 950 paths: DS1 accounts for 218, DS-3 for 11,
-DS2 for 76, DS4 for 40, DS-5 for 2, DS-6 for 42 and DS-7 for 9 of the
-paths it has held; later
-observation trains added the rest, and five promoted to pass when direct
-eval stopped parsing absent or non-String arguments. DS-5's
+The current umbrella owns 948 paths: DS1 accounts for 218, DS-3 for 11,
+DS2 for 76, DS4 for 40, DS-5 for 2, DS-6 for 42, DS-7 for 9 and DS-8 for 2
+of the paths it has held; later observation trains added the rest, and five
+promoted to pass when direct eval stopped parsing absent or non-String
+arguments. DS-5's
 [*per-path assessment*](./dynamic-source-lexical-completion-assessment.yaml)
-closes two U+180E lexical probes through paired static passes and keeps
-71 in remediation. DS-6's
+closes two U+180E lexical probes through paired static passes and keeps 71 in
+remediation. DS-6's
 [*per-path assessment*](./dynamic-source-private-binding-assessment.yaml)
-closes 42 of its 66 private identity, binding, call-order and
-this-binding paths through 20 reviewed static replacement paths and keeps
-24 in remediation. DS4's
-[*per-path assessment*](./dynamic-source-callable-family-assessment.md)
+closes 42 of its 66 private identity, binding, call-order and this-binding
+paths through 20 reviewed static replacement paths and keeps 24 in remediation.
+DS4's [*per-path assessment*](./dynamic-source-callable-family-assessment.md)
 reviews all 86 reserved callable-family paths, closes 40 through existing
-passing static replacements under decision item 1, and keeps 46 in
-remediation. It adds no native evidence. DS2's
-[*per-path assessment*](./dynamic-source-module-semantics-assessment.yaml)
-uses reviewed static-import observations and one new native test of a live
-default namespace property, keeping 32 selected module subjects and 67
-candidates outside DS2 in remediation.
-DS-5 closes two U+180E lexical probes using paired static passes, with
-71 of its 73 selected paths remaining here; its
+passing static replacements under decision item 1, and keeps 46 in remediation.
+It adds no native evidence. DS2's
+[*per-path assessment*](./dynamic-source-module-semantics-assessment.yaml) uses
+reviewed static-import observations and one new native test of a live default
+namespace property, keeping 32 selected module subjects and 67 candidates
+outside DS2 in remediation. DS-5 closes two U+180E lexical probes using paired
+static passes, with 71 of its 73 selected paths remaining here; its
 [*per-path assessment*](./dynamic-source-lexical-completion-assessment.yaml)
-records every disposition. No DS-5 native or fixture evidence was added.
-DS-7's [per-path assessment](./dynamic-source-realm-string-assessment.md)
-reviews its exact 80-path reservation, accounts for 9 using existing static
-replacement evidence, and retains 71 with their uncovered contracts. It adds
-no evidence or native tests.
-All original paths and observations remain; no UPDATE is needed.
+records every disposition. No DS-5 native or fixture evidence was added. DS-7's
+[per-path assessment](./dynamic-source-realm-string-assessment.md) reviews its
+exact 80-path reservation, accounts for 9 using existing static replacement
+evidence, and retains 71 with their uncovered contracts. It adds no evidence or
+native tests. DS-8's
+[per-path assessment](./dynamic-source-importcall-residual-accounting.md)
+reviews its exact three-path reservation: two ImportCall-only subjects move to
+ADR 0016 under decision item 2 and one mixed eval/Promise/export subject stays
+here. It adds no evidence or native tests. All original paths and observations
+remain; no UPDATE is needed.
 
 
 Approved second split
@@ -40,8 +42,8 @@ The maintainer approved DS-8 through DS-22 on 2026-10-31 in
 answering *20261031T0935-umbrella-second-split.md* in that directory. The
 proposal is */data/m5c-d17-20261031/umbrella-split/REPORT.md*, pinned to
 semantic bundle commit `9529210a24be72e2b273f43f014c03a98a29069e`. The children
-below partition the current 950 paths. Each linked work note preserves its
-exact selector, SHA256, closure route and evidence obligations.
+below partition the 950 paths held at the split. Each linked work note
+preserves its exact selector, SHA256, closure route and evidence obligations.
 
 | Child | Paths | Size | Work note                                                                                                |
 | ----- | ----: | ---- | -------------------------------------------------------------------------------------------------------- |
@@ -61,12 +63,13 @@ exact selector, SHA256, closure route and evidence obligations.
 | DS-21 |    81 | L    | [*dynamic-source-completion-record-evidence.md*](./dynamic-source-completion-record-evidence.md)         |
 | DS-22 |    19 | M    | [*dynamic-source-boundary-overlap-review.md*](./dynamic-source-boundary-overlap-review.md)               |
 
-Ownership moves to each child only as that child lands. All 950 paths
-remain owned here in the derived closure ledger during this metadata split.
-The umbrella depends on DS-1 through DS-22, stays blocked until all
-children land, and lands when it owns zero paths. Zero direct ownership
-alone does not establish that a child's evidence and publication gates
-have landed. Every child reports exact newly covered and still-uncovered
+Ownership moves to each child only as that child lands. At the metadata split,
+all 950 paths remained owned here in the derived closure ledger. DS-8
+subsequently accounts for two under ADR 0016, leaving 948 here; its retained
+path stays here. The umbrella depends on DS-1 through DS-22, stays blocked
+until all children land, and lands when it owns zero paths. Zero direct
+ownership alone does not establish that a child's evidence and publication
+gates have landed. Every child reports exact newly covered and still-uncovered
 subsets; unresolved subjects retain active remediation.
 
 The split establishes no exclusions, passes or new replacement evidence.

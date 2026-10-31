@@ -103,7 +103,7 @@ owners:
       reserved paths using reviewed static template-site,
       case-conversion and generator-instance replacement evidence; 71
       remain umbrella remediation."
-    paths: 677
+    paths: 679
   adr:0028-legacy-function-caller-boundary:
     note: ADR 0028 authorizes "an M5 exclusion of the expectation that
       reading the `caller` property of a non-strict ordinary function
@@ -234,7 +234,7 @@ owners:
       template-site, case-conversion and generator-instance paths to ADR
       0016 and keeps 71, with remaining contracts in
       docs/m5c-graph/dynamic-source-realm-string-assessment.md."
-    paths: 950
+    paths: 948
   node:non-blocking-agent:
     note: Needs an agent whose [[CanBlock]] is false; 2 paths.
     paths: 2
@@ -26674,7 +26674,7 @@ paths:
   test/language/expressions/dynamic-import/namespace/promise-then-ns-set-same-values-no-strict.js: [unsupported-profile-feature, node:dynamic-source-coverage-remediation, [dynamic-source, expression-operators, functions, module-linking, object-properties, promise-settlement, reflect-namespace, symbols]]
   test/language/expressions/dynamic-import/namespace/promise-then-ns-set-same-values-strict.js: [unsupported-profile-feature, node:dynamic-source-coverage-remediation, [abrupt-completion, dynamic-source, error-intrinsics, expression-operators, functions, module-linking, object-properties, promise-settlement, reflect-namespace, symbols]]
   test/language/expressions/dynamic-import/namespace/promise-then-ns-set-strict.js: [unsupported-profile-feature, node:dynamic-source-coverage-remediation, [abrupt-completion, dynamic-source, error-intrinsics, expression-operators, functions, module-linking, object-properties, promise-settlement, reflect-namespace, symbols, var-bindings]]
-  test/language/expressions/dynamic-import/returns-promise.js: [unsupported-profile-feature, node:dynamic-source-coverage-remediation, [dynamic-source, expression-operators, functions, lexical-bindings, module-linking, object-properties, promise-settlement]]
+  test/language/expressions/dynamic-import/returns-promise.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [dynamic-source, expression-operators, functions, lexical-bindings, module-linking, object-properties, promise-settlement]]
   test/language/expressions/dynamic-import/reuse-namespace-object-from-import.js: [unsupported-profile-feature, node:dynamic-source-coverage-remediation, [destructuring-bindings, dynamic-source, functions, iterator-protocol, module-linking, object-properties, promise-settlement, symbols]]
   test/language/expressions/dynamic-import/reuse-namespace-object-from-script.js: [unsupported-profile-feature, node:dynamic-source-coverage-remediation, [destructuring-bindings, dynamic-source, functions, iterator-protocol, module-linking, object-properties, promise-settlement, symbols]]
   test/language/expressions/dynamic-import/reuse-namespace-object.js: [unsupported-profile-feature, node:dynamic-source-coverage-remediation, [destructuring-bindings, dynamic-source, functions, iterator-protocol, module-linking, object-properties, promise-settlement, symbols]]
@@ -31756,7 +31756,7 @@ paths:
   test/language/module-code/top-level-await/no-operand.js: [expected-negative, observation]
   test/language/module-code/top-level-await/pending-async-dep-from-cycle.js: [pass, observation]
   test/language/module-code/top-level-await/rejection-order.js: [unsupported-profile-feature, node:dynamic-source-coverage-remediation, [abrupt-completion, dynamic-source, functions, iterator-protocol, lexical-bindings, module-linking, object-properties, promise-settlement, symbols, top-level-await]]
-  test/language/module-code/top-level-await/syntax/await-expr-dyn-import.js: [unsupported-profile-feature, node:dynamic-source-coverage-remediation, [dynamic-source, module-linking, promise-settlement, top-level-await]]
+  test/language/module-code/top-level-await/syntax/await-expr-dyn-import.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [dynamic-source, module-linking, promise-settlement, top-level-await]]
   test/language/module-code/top-level-await/syntax/block-await-expr-array-literal.js: [pass, observation]
   test/language/module-code/top-level-await/syntax/block-await-expr-func-expression.js: [pass, observation]
   test/language/module-code/top-level-await/syntax/block-await-expr-identifier.js: [pass, observation]

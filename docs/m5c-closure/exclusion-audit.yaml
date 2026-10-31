@@ -340,6 +340,38 @@ assessments:
       No path counts as a pass. An accepted ADR 0016
       amendment that admits any form of dynamic import
       reopens it for reassessment.
+  ds8-await-import-call-syntax:
+    disposition: exclusion
+    normativeDependency: source-evaluation-only
+    reason: await-expr-dyn-import.js checks only the grammar composition
+      await ImportCall at module top level (prod-AwaitExpression). Its
+      try/catch ignores every import load error; no value, module order,
+      scheduling or settlement result is asserted. Only the ImportCall
+      grammar site remains, with the exact ImportExpression OSEO1001
+      rejection. Root confirmed on 2026-10-31 that decision item 2 follows
+      the ImportCall subject rather than a directory, and the approved DS-8
+      selector explicitly includes this grammar-only composition. The
+      per-path assessment is in
+      docs/m5c-graph/dynamic-source-importcall-residual-accounting.md.
+      No independent non-source subject needs replacement and no pass is
+      counted. An accepted ADR 0016 amendment admitting any dynamic import
+      reopens it; ADR 0019 reopening remains in force.
+  ds8-import-call-intrinsic-promise:
+    disposition: exclusion
+    normativeDependency: source-evaluation-only
+    reason: returns-promise.js asserts EvaluateImportCall creates its result
+      with intrinsic %Promise% even after the global Promise binding is
+      replaced by a throwing function. It checks the original constructor,
+      prototype and inherited then/catch/finally methods, including absence
+      of own method properties. All eight assertions concern the ImportCall
+      result; no export, binding update or module evaluation order is read.
+      The 2026-10-28 maintainer decision item 2 authorizes this ImportCall
+      subject, assessed separately in
+      docs/m5c-graph/dynamic-source-importcall-residual-accounting.md.
+      There is no independent non-source subject needing replacement.
+      The existing exact ImportExpression OSEO1001 rejection is retained,
+      never counted as a pass. An accepted ADR 0016 amendment admitting any
+      dynamic import reopens it; ADR 0019 reopening remains in force.
   import-call-promise:
     disposition: exclusion
     normativeDependency: source-evaluation-only
@@ -15501,7 +15533,7 @@ paths:
     missingDynamicTag: false
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "ImportCall returns a promise"
-    assessment: "observation-train-dynamic-coverage"
+    assessment: ds8-import-call-intrinsic-promise
   - path: "test/language/expressions/dynamic-import/reuse-namespace-object-from\
       -import.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -20888,7 +20920,7 @@ paths:
     missingDynamicTag: false
     section: "prod-AwaitExpression"
     subject: "Valid syntax for top level await. AwaitExpression ImportCall"
-    assessment: "observation-train-dynamic-source"
+    assessment: ds8-await-import-call-syntax
   - path: "test/language/module-code/top-level-await/unobservable-global-async-\
       evaluation-count-reset.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
