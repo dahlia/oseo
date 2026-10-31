@@ -1,5 +1,6 @@
 /**
- * Except for the explicitly unmeasured Array scheduling allowance, each
+ * Except for the explicitly unmeasured Array scheduling allowance and the
+ * entries marked `derived` below, each
  * entry is the median, rounded to whole seconds, of the job's measured
  * hosted `macos-15` or `macos-latest` walls (`started_at` to
  * `completed_at`). The lane generator sorts hosted jobs by these weights
@@ -41,6 +42,12 @@
  *     2, main run 37206614757, and branch run 37215661294 attempts 1
  *     and 2.
  *
+ *  -  Two `derived` entries are the macOS native sanitizer shards. No
+ *     hosted run has executed either shard yet; each sums the setup, the
+ *     preflight, the runtime fixtures on the first shard, and that shard's
+ *     share of three hosted native logs. See
+ *     *docs/evidence/macos-sanitizer-split/README.md*.
+ *
  *  -  Three entries are marked `derived`, the `reflect cases` shards that
  *     U38 introduced. CI has never run them, so they have no hosted
  *     observation at all, and these are estimates rather than medians.
@@ -78,8 +85,8 @@ interface MacosJobCosts {
 /** Measured hosted medians used only for lane assignment. */
 export const macosJobCosts: MacosJobCosts = {
   "host C sanitizers (macOS, property)": 2452, // 18
-  // Derived from four hosted native logs, not measured job walls; see
-  // docs/evidence/macos-sanitizer-split/README.md.
+  // Derived from the native progress logs of three hosted runs, not
+  // measured job walls; see docs/evidence/macos-sanitizer-split/README.md.
   "host C sanitizers (macOS, native, 1/2)": 2014, // derived
   "host C sanitizers (macOS, native, 2/2)": 1593, // derived
   "test262 (macos-aarch64, 12/12)": 2212, // 1

@@ -35,9 +35,10 @@ const templatePath = "tools/main-workflow.template.yaml";
 const workflowPath = ".github/workflows/main.yaml";
 
 /**
- * File shards of the macOS native sanitizer suite. Two keep each job near
- * half the former 75-minute limit even at the slowest measured runner while
- * taking one more hosted slot; see
+ * File shards of the macOS native sanitizer suite. Two keep each job
+ * within about 46 minutes even at the slowest measured runner. They chain
+ * on the suite's one reserved hosted lane, so the split takes no more of
+ * the account's hosted slots; see
  * *docs/evidence/macos-sanitizer-split/README.md*.
  */
 export const macosSanitizerNativeShards = 2;
