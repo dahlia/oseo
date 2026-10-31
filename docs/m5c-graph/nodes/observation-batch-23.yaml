@@ -11,4 +11,4 @@ dependencies:
   - default-derived-constructor-spread-iterator
   - observation-batch-plan
 landed: false
-status: blocked
+status: ready

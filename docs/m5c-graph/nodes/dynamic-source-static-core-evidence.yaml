@@ -14,5 +14,5 @@ delivers: >-
   amendment is authorized by this split.
 dependencies:
   - authorized-exclusion-audit
-landed: false
+landed: true
 status: ready

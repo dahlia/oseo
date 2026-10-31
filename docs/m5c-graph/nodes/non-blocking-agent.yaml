@@ -6,5 +6,5 @@ delivers: "Observes the 2 reviewed Atomics.wait cannot-suspend-throws.js
   main-agent blocking policy of ADR 0026."
 dependencies:
   - unsupported-ownership-audit
-landed: false
+landed: true
 status: ready

@@ -19,5 +19,5 @@ dependencies:
   - dynamic-import
   - import-attributes
   - observation-batch-plan
-landed: false
+landed: true
 status: ready

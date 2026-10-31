@@ -10,5 +10,5 @@ delivers: >-
   docs/m5c-graph/dynamic-source-residual-evidence.md.
 dependencies:
   - authorized-exclusion-audit
-landed: false
+landed: true
 status: ready

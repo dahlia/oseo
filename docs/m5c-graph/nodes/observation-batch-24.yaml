@@ -12,5 +12,5 @@ delivers: "Prepares all 794 original observation-batch-24 paths with
   integration, landing, publication and the outer gate."
 dependencies:
   - observation-batch-plan
-landed: false
+landed: true
 status: ready

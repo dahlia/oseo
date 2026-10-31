@@ -11,5 +11,5 @@ delivers: >-
   path and raw observation.
 dependencies:
   - unsupported-ownership-audit
-landed: false
+landed: true
 status: ready

@@ -17,5 +17,5 @@ delivers: "Adds the ADR 0013 dynamic-source dependency tag, alongside each
 dependencies:
   - authorized-exclusion-audit
   - cross-realm-host
-landed: false
+landed: true
 status: ready
