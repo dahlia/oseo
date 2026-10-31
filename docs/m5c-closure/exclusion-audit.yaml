@@ -659,12 +659,15 @@ assessments:
   ds3-literal-coverage:
     disposition: remediation
     normativeDependency: not-demonstrated
-    reason: The 23 literal probes retain the separately assessed strict octal
-      error, RegExp syntax errors, selected BMP character/source domains,
-      UnicodeIDContinue fallback, and lone surrogate group-name subjects in
-      docs/m5c-graph/dynamic-source-unknown-eval-assessment.md. No reviewed
-      complete replacement is established for these contracts; the unknown
-      eval binding diagnostic is not such evidence.
+    reason: >-
+      The five remaining DS-3 literal probes retain the strict octal error and
+      the four selected BMP character/source domains, including
+      UnicodeIDContinue fallback, listed in
+      docs/m5c-graph/dynamic-source-unknown-eval-assessment.md. No complete
+      replacement is established for those five contracts; an unknown eval
+      binding diagnostic is not such evidence. The other 18 original literal
+      grammar probes now use ds17-static-literal-grammar and its reviewed
+      static rejection witnesses.
   ds3-import-from-eval:
     disposition: remediation
     normativeDependency: not-demonstrated
@@ -1209,8 +1212,8 @@ assessments:
       tests/native/fixtures/bindings.ts:
         "f3e20be237b2b772c59670f481af8147bfa59312098aa503\
         e3817879ab0fb31b"
-      tests/native.ts: "2602184d72bcb04a20b39b0894648778b18bf15bed665bed\
-        fe542a824fbcf563"
+      tests/native.ts: "39da60bd61e3d161472e0fd16a316a3a15e4f670179d9311\
+        91fc9a9ebe9d6c8b"
     reason: Maintainer decision 2026-10-28 item 1 applies to the single path in
       dynamic-source-template-site-evidence.paths.txt. The
       template-site-identity native fixture observes both same-site equalities
@@ -2948,8 +2951,8 @@ assessments:
       tests/callable-object-evidence.test.ts:
         "d2b814666e5645565ca2001f0419b931cd2949624777047f562d\
         a479c71be70d"
-      tests/native.ts: "2602184d72bcb04a20b39b0894648778b18bf15bed665bedfe54\
-        2a824fbcf563"
+      tests/native.ts: "39da60bd61e3d161472e0fd16a316a3a15e4f670179d931191fc\
+        9a9ebe9d6c8b"
       docs/m5c-graph/dynamic-source-callable-object-assessment.md:
         "b4eb5774379e97332ac56111eb4fadf83a6e39b66f84b22bff74\
         10ffca7eaf37"
@@ -2980,8 +2983,8 @@ assessments:
       tests/callable-object-evidence.test.ts:
         "d2b814666e5645565ca2001f0419b931cd2949624777047f562d\
         a479c71be70d"
-      tests/native.ts: "2602184d72bcb04a20b39b0894648778b18bf15bed665bedfe54\
-        2a824fbcf563"
+      tests/native.ts: "39da60bd61e3d161472e0fd16a316a3a15e4f670179d931191fc\
+        9a9ebe9d6c8b"
       docs/m5c-graph/dynamic-source-callable-object-assessment.md:
         "b4eb5774379e97332ac56111eb4fadf83a6e39b66f84b22bff74\
         10ffca7eaf37"
@@ -3009,8 +3012,8 @@ assessments:
       tests/callable-object-evidence.test.ts:
         "d2b814666e5645565ca2001f0419b931cd2949624777047f562d\
         a479c71be70d"
-      tests/native.ts: "2602184d72bcb04a20b39b0894648778b18bf15bed665bedfe54\
-        2a824fbcf563"
+      tests/native.ts: "39da60bd61e3d161472e0fd16a316a3a15e4f670179d931191fc\
+        9a9ebe9d6c8b"
       docs/m5c-graph/dynamic-source-callable-object-assessment.md:
         "b4eb5774379e97332ac56111eb4fadf83a6e39b66f84b22bff74\
         10ffca7eaf37"
@@ -3053,8 +3056,8 @@ assessments:
       tests/callable-object-evidence.test.ts:
         "d2b814666e5645565ca2001f0419b931cd2949624777047f562d\
         a479c71be70d"
-      tests/native.ts: "2602184d72bcb04a20b39b0894648778b18bf15bed665bedfe54\
-        2a824fbcf563"
+      tests/native.ts: "39da60bd61e3d161472e0fd16a316a3a15e4f670179d931191fc\
+        9a9ebe9d6c8b"
       docs/m5c-graph/dynamic-source-callable-object-assessment.md:
         "b4eb5774379e97332ac56111eb4fadf83a6e39b66f84b22bff74\
         10ffca7eaf37"
@@ -3081,8 +3084,8 @@ assessments:
       tests/callable-object-evidence.test.ts:
         "d2b814666e5645565ca2001f0419b931cd2949624777047f562d\
         a479c71be70d"
-      tests/native.ts: "2602184d72bcb04a20b39b0894648778b18bf15bed665bedfe54\
-        2a824fbcf563"
+      tests/native.ts: "39da60bd61e3d161472e0fd16a316a3a15e4f670179d931191fc\
+        9a9ebe9d6c8b"
       docs/m5c-graph/dynamic-source-callable-object-assessment.md:
         "b4eb5774379e97332ac56111eb4fadf83a6e39b66f84b22bff74\
         10ffca7eaf37"
@@ -3113,8 +3116,8 @@ assessments:
       tests/callable-object-evidence.test.ts:
         "d2b814666e5645565ca2001f0419b931cd2949624777047f562d\
         a479c71be70d"
-      tests/native.ts: "2602184d72bcb04a20b39b0894648778b18bf15bed665bedfe54\
-        2a824fbcf563"
+      tests/native.ts: "39da60bd61e3d161472e0fd16a316a3a15e4f670179d931191fc\
+        9a9ebe9d6c8b"
       docs/m5c-graph/dynamic-source-callable-object-assessment.md:
         "b4eb5774379e97332ac56111eb4fadf83a6e39b66f84b22bff74\
         10ffca7eaf37"
@@ -3143,8 +3146,8 @@ assessments:
       tests/callable-object-evidence.test.ts:
         "d2b814666e5645565ca2001f0419b931cd2949624777047f562d\
         a479c71be70d"
-      tests/native.ts: "2602184d72bcb04a20b39b0894648778b18bf15bed665bedfe54\
-        2a824fbcf563"
+      tests/native.ts: "39da60bd61e3d161472e0fd16a316a3a15e4f670179d931191fc\
+        9a9ebe9d6c8b"
       docs/m5c-graph/dynamic-source-callable-object-assessment.md:
         "b4eb5774379e97332ac56111eb4fadf83a6e39b66f84b22bff74\
         10ffca7eaf37"
@@ -3182,8 +3185,8 @@ assessments:
       tests/callable-object-evidence.test.ts:
         "d2b814666e5645565ca2001f0419b931cd2949624777047f562d\
         a479c71be70d"
-      tests/native.ts: "2602184d72bcb04a20b39b0894648778b18bf15bed665bedfe54\
-        2a824fbcf563"
+      tests/native.ts: "39da60bd61e3d161472e0fd16a316a3a15e4f670179d931191fc\
+        9a9ebe9d6c8b"
       docs/m5c-graph/dynamic-source-callable-object-assessment.md:
         "b4eb5774379e97332ac56111eb4fadf83a6e39b66f84b22bff74\
         10ffca7eaf37"
@@ -3210,8 +3213,8 @@ assessments:
       tests/callable-object-evidence.test.ts:
         "d2b814666e5645565ca2001f0419b931cd2949624777047f562d\
         a479c71be70d"
-      tests/native.ts: "2602184d72bcb04a20b39b0894648778b18bf15bed665bedfe54\
-        2a824fbcf563"
+      tests/native.ts: "39da60bd61e3d161472e0fd16a316a3a15e4f670179d931191fc\
+        9a9ebe9d6c8b"
       docs/m5c-graph/dynamic-source-callable-object-assessment.md:
         "b4eb5774379e97332ac56111eb4fadf83a6e39b66f84b22bff74\
         10ffca7eaf37"
@@ -3242,8 +3245,8 @@ assessments:
       tests/callable-object-evidence.test.ts:
         "d2b814666e5645565ca2001f0419b931cd2949624777047f562d\
         a479c71be70d"
-      tests/native.ts: "2602184d72bcb04a20b39b0894648778b18bf15bed665bedfe54\
-        2a824fbcf563"
+      tests/native.ts: "39da60bd61e3d161472e0fd16a316a3a15e4f670179d931191fc\
+        9a9ebe9d6c8b"
       docs/m5c-graph/dynamic-source-callable-object-assessment.md:
         "b4eb5774379e97332ac56111eb4fadf83a6e39b66f84b22bff74\
         10ffca7eaf37"
@@ -3273,8 +3276,8 @@ assessments:
       tests/callable-object-evidence.test.ts:
         "d2b814666e5645565ca2001f0419b931cd2949624777047f562d\
         a479c71be70d"
-      tests/native.ts: "2602184d72bcb04a20b39b0894648778b18bf15bed665bedfe54\
-        2a824fbcf563"
+      tests/native.ts: "39da60bd61e3d161472e0fd16a316a3a15e4f670179d931191fc\
+        9a9ebe9d6c8b"
       docs/m5c-graph/dynamic-source-callable-object-assessment.md:
         "b4eb5774379e97332ac56111eb4fadf83a6e39b66f84b22bff74\
         10ffca7eaf37"
@@ -3313,8 +3316,8 @@ assessments:
       tests/callable-object-evidence.test.ts:
         "d2b814666e5645565ca2001f0419b931cd2949624777047f562d\
         a479c71be70d"
-      tests/native.ts: "2602184d72bcb04a20b39b0894648778b18bf15bed665bedfe54\
-        2a824fbcf563"
+      tests/native.ts: "39da60bd61e3d161472e0fd16a316a3a15e4f670179d931191fc\
+        9a9ebe9d6c8b"
       docs/m5c-graph/dynamic-source-callable-object-assessment.md:
         "b4eb5774379e97332ac56111eb4fadf83a6e39b66f84b22bff74\
         10ffca7eaf37"
@@ -3343,8 +3346,8 @@ assessments:
       tests/callable-object-evidence.test.ts:
         "d2b814666e5645565ca2001f0419b931cd2949624777047f562d\
         a479c71be70d"
-      tests/native.ts: "2602184d72bcb04a20b39b0894648778b18bf15bed665bedfe54\
-        2a824fbcf563"
+      tests/native.ts: "39da60bd61e3d161472e0fd16a316a3a15e4f670179d931191fc\
+        9a9ebe9d6c8b"
       docs/m5c-graph/dynamic-source-callable-object-assessment.md:
         "b4eb5774379e97332ac56111eb4fadf83a6e39b66f84b22bff74\
         10ffca7eaf37"
@@ -3371,8 +3374,8 @@ assessments:
       tests/callable-object-evidence.test.ts:
         "d2b814666e5645565ca2001f0419b931cd2949624777047f562d\
         a479c71be70d"
-      tests/native.ts: "2602184d72bcb04a20b39b0894648778b18bf15bed665bedfe54\
-        2a824fbcf563"
+      tests/native.ts: "39da60bd61e3d161472e0fd16a316a3a15e4f670179d931191fc\
+        9a9ebe9d6c8b"
       docs/m5c-graph/dynamic-source-callable-object-assessment.md:
         "b4eb5774379e97332ac56111eb4fadf83a6e39b66f84b22bff74\
         10ffca7eaf37"
@@ -3400,8 +3403,8 @@ assessments:
       tests/callable-object-evidence.test.ts:
         "d2b814666e5645565ca2001f0419b931cd2949624777047f562d\
         a479c71be70d"
-      tests/native.ts: "2602184d72bcb04a20b39b0894648778b18bf15bed665bedfe54\
-        2a824fbcf563"
+      tests/native.ts: "39da60bd61e3d161472e0fd16a316a3a15e4f670179d931191fc\
+        9a9ebe9d6c8b"
       docs/m5c-graph/dynamic-source-callable-object-assessment.md:
         "b4eb5774379e97332ac56111eb4fadf83a6e39b66f84b22bff74\
         10ffca7eaf37"
@@ -3432,8 +3435,8 @@ assessments:
       tests/callable-object-evidence.test.ts:
         "d2b814666e5645565ca2001f0419b931cd2949624777047f562d\
         a479c71be70d"
-      tests/native.ts: "2602184d72bcb04a20b39b0894648778b18bf15bed665bedfe54\
-        2a824fbcf563"
+      tests/native.ts: "39da60bd61e3d161472e0fd16a316a3a15e4f670179d931191fc\
+        9a9ebe9d6c8b"
       docs/m5c-graph/dynamic-source-callable-object-assessment.md:
         "b4eb5774379e97332ac56111eb4fadf83a6e39b66f84b22bff74\
         10ffca7eaf37"
@@ -3559,8 +3562,8 @@ assessments:
     replacementEvidence:
       tests/native/fixtures/binding-reference-evidence.ts: "148176601d5cac6e8f\
         b67444ac68efeadc9df8aacb596b23dbf158c2b48f1bba"
-      tests/native.ts: "2602184d72bcb04a20b39b0894648778b18bf15bed665bedfe542a\
-        824fbcf563"
+      tests/native.ts: "39da60bd61e3d161472e0fd16a316a3a15e4f670179d931191fc9a\
+        9ebe9d6c8b"
   ds18-static-class-fields:
     disposition: exclusion
     normativeDependency: source-evaluation-only
@@ -3581,8 +3584,8 @@ assessments:
     replacementEvidence:
       tests/native/fixtures/binding-reference-evidence.ts: "148176601d5cac6e8f\
         b67444ac68efeadc9df8aacb596b23dbf158c2b48f1bba"
-      tests/native.ts: "2602184d72bcb04a20b39b0894648778b18bf15bed665bedfe542a\
-        824fbcf563"
+      tests/native.ts: "39da60bd61e3d161472e0fd16a316a3a15e4f670179d931191fc9a\
+        9ebe9d6c8b"
   ds18-unresolvable-compound:
     disposition: exclusion
     normativeDependency: source-evaluation-only
@@ -3603,8 +3606,8 @@ assessments:
     replacementEvidence:
       tests/native/fixtures/binding-reference-evidence.ts: "148176601d5cac6e8f\
         b67444ac68efeadc9df8aacb596b23dbf158c2b48f1bba"
-      tests/native.ts: "2602184d72bcb04a20b39b0894648778b18bf15bed665bedfe542a\
-        824fbcf563"
+      tests/native.ts: "39da60bd61e3d161472e0fd16a316a3a15e4f670179d931191fc9a\
+        9ebe9d6c8b"
   ds21-finite-completion-records:
     disposition: exclusion
     normativeDependency: source-evaluation-only
@@ -3635,8 +3638,8 @@ assessments:
       tests/completion-records.test.ts:
         "f053d02bcd11af6604c78d907e709ee0155fe6c33c4a551b\
         79de0cc09474b624"
-      tests/native.ts: "2602184d72bcb04a20b39b0894648778b18bf15bed665bed\
-        fe542a824fbcf563"
+      tests/native.ts: "39da60bd61e3d161472e0fd16a316a3a15e4f670179d9311\
+        91fc9a9ebe9d6c8b"
       tests/test262/harness/base.js:
         "50331feeca513cb2e2354e05e7c68f82d5aeccd9b766d6c8\
         8438c5ef118075f6"
@@ -5221,8 +5224,8 @@ assessments:
         90f24966b2f41a0ebe9cabe4a5454e61063d6b54"
       tests/native/fixtures/construction-static-contracts.ts: "784b3e71396e5\
         f40e33a5b3cbe52a3ec28b59cdba905431d1e8e0c1d929ae6b6"
-      tests/native.ts: "2602184d72bcb04a20b39b0894648778b18bf15bed665bedfe54\
-        2a824fbcf563"
+      tests/native.ts: "39da60bd61e3d161472e0fd16a316a3a15e4f670179d931191fc\
+        9a9ebe9d6c8b"
     reason: >-
       Maintainer decision 2026-10-28 item 1 applies only to the 24 exclusion
       rows in docs/m5c-graph/dynamic-source-construction-assessment.yaml.
@@ -5245,6 +5248,64 @@ assessments:
       source/observation changes, accepted ADR 0016 admission of
       Function-family construction, or ADR 0019 non-source dependence; all
       ADR 0016 laboratory, staged-compilation and WinterTC triggers remain.
+  ds17-static-literal-grammar:
+    disposition: exclusion
+    normativeDependency: source-evaluation-only
+    reason: >-
+      Maintainer decision 2026-10-28 item 1 applies to the 18 exact grammar
+      paths in the DS-17 assessment table. Build-time compilation rejects
+      every original invalid literal with OSEO0001 and no MIR: all four line
+      terminators in first/subsequent and escaped positions, CR followed by n,
+      and both lone-surrogate group names with and without u. These are
+      lexical/early errors, so no native runtime or RegExp constructor
+      substitutes for literal parsing. Only evaluation of the rejected source
+      through eval remains. Reopen on changed source, observations or
+      replacement evidence, or an ADR 0016 amendment admitting eval; ADR 0019
+      non-source reopening remains in force.
+    replacementEvidence:
+      tests/regexp-static-grammar.test.ts:
+        "6582ae85e7bca86210008bfb7640b9942d58786b2bb32b\
+        97d0a9a824c8d960f1"
+  ds17-static-constructor-inputs:
+    disposition: exclusion
+    normativeDependency: source-evaluation-only
+    reason: >-
+      Maintainer decision 2026-10-28 item 1 applies to the two DS-17
+      constructor paths. The regexp-static-evidence native fixture replaces
+      only eval of the constant flag strings: migr still throws SyntaxError,
+      while Math with g observes ignoreCase=false, multiline=false,
+      global=true, lastIndex=0 and defined source. Both specialization
+      policies force collection. Only eval of the flag strings remains. Reopen
+      on changed source, observations or replacement evidence, or an ADR 0016
+      amendment admitting eval; ADR 0019 non-source reopening remains in
+      force.
+    replacementEvidence:
+      tests/native/fixtures/regexp-static-evidence.ts:
+        "218de3dad4661c298278d612c8b1e032218857c4903904\
+        0d14480f3574d6000f"
+  ds17-static-source-roundtrips:
+    disposition: exclusion
+    normativeDependency: source-evaluation-only
+    reason: >-
+      Maintainer decision 2026-10-28 item 1 applies to the five DS-17 RegExp
+      source paths. The regexp-static-evidence native fixture pins exact
+      source spelling and flags, builds the corresponding literal without
+      dynamic source, and tests every original positive and negative input for
+      both constructor/original and static literal. This includes empty, LF,
+      slash, both Unicode escape spellings and all twelve anchored-quantifier
+      inputs. Structural tests compile the exact source output to artifact-
+      carrying literal operations. Both native specialization policies force
+      collection. Only eval of the reconstructed literal remains. Reopen on
+      changed source, observations or replacement evidence, or an ADR 0016
+      amendment admitting eval; ADR 0019 non-source reopening remains in
+      force.
+    replacementEvidence:
+      tests/native/fixtures/regexp-static-evidence.ts:
+        "218de3dad4661c298278d612c8b1e032218857c4903904\
+        0d14480f3574d6000f"
+      tests/regexp-static-grammar.test.ts:
+        "6582ae85e7bca86210008bfb7640b9942d58786b2bb32b\
+        97d0a9a824c8d960f1"
 paths:
   - path: test/built-ins/AggregateError/newtarget-proto-fallback.js
     proposedOwner: adr:0016-dynamic-source-boundary
@@ -8453,7 +8514,7 @@ paths:
     section: sec-regexp-pattern-flags
     subject: Checking by using eval, try to use eval("\"migr\"")
       as F
-    assessment: fixture-construction
+    assessment: ds17-static-constructor-inputs
   - path: test/built-ins/RegExp/S15.10.4.1_A8_T11.js
     proposedOwner: adr:0016-dynamic-source-boundary
     priorCohort: incidental-scaffolding
@@ -8465,7 +8526,7 @@ paths:
     section: sec-regexp-pattern-flags
     subject: Checking by using eval, pattern is Math and flags
       is eval("\"g\"")
-    assessment: fixture-construction
+    assessment: ds17-static-constructor-inputs
   - path: test/built-ins/RegExp/proto-from-ctor-realm.js
     proposedOwner: adr:0016-dynamic-source-boundary
     priorCohort: incidental-scaffolding
@@ -8509,7 +8570,7 @@ paths:
       identically to the internal procedure given by the
       constructed object''s [[RegExpMatcher]] internal
       slot.'
-    assessment: regexp-roundtrip
+    assessment: ds17-static-source-roundtrips
   - path: "test/built-ins/RegExp/prototype/source/value-line-te\
       rminator.js"
     proposedOwner: adr:0016-dynamic-source-boundary
@@ -8523,7 +8584,7 @@ paths:
     subject: Return value can be used to create an equivalent
       RegExp when the [[OriginalSource]] internal slot
       contains a LineTerminator
-    assessment: regexp-roundtrip
+    assessment: ds17-static-source-roundtrips
   - path: test/built-ins/RegExp/prototype/source/value-slash.js
     proposedOwner: adr:0016-dynamic-source-boundary
     priorCohort: incidental-scaffolding
@@ -8534,7 +8595,7 @@ paths:
     missingDynamicTag: false
     section: sec-get-regexp.prototype.source
     subject: Return value can be used to create an equivalent RegExp
-    assessment: regexp-roundtrip
+    assessment: ds17-static-source-roundtrips
   - path: test/built-ins/RegExp/prototype/source/value-u.js
     proposedOwner: adr:0016-dynamic-source-boundary
     priorCohort: incidental-scaffolding
@@ -8547,7 +8608,7 @@ paths:
     subject: Return value can be used to create an equivalent
       RegExp when the [[OriginalFlags]] internal slot
       contains the `u` flag
-    assessment: regexp-roundtrip
+    assessment: ds17-static-source-roundtrips
   - path: test/built-ins/RegExp/prototype/source/value.js
     proposedOwner: adr:0016-dynamic-source-boundary
     priorCohort: incidental-scaffolding
@@ -8558,7 +8619,7 @@ paths:
     missingDynamicTag: false
     section: sec-get-regexp.prototype.source
     subject: Return value can be used to create an equivalent RegExp
-    assessment: regexp-roundtrip
+    assessment: ds17-static-source-roundtrips
   - path: test/built-ins/Set/proto-from-ctor-realm.js
     proposedOwner: adr:0016-dynamic-source-boundary
     priorCohort: incidental-scaffolding
@@ -24523,7 +24584,7 @@ paths:
     section: "prod-RegularExpressionBackslashSequence"
     subject: "A RegularExpressionBackslashSequence may not contain a L\
       ineTerminator."
-    assessment: ds3-literal-coverage
+    assessment: ds17-static-literal-grammar
   - path: "test/language/literals/regexp/S7.8.5_A1.1_T2.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "incidental-scaffolding"
@@ -24546,7 +24607,7 @@ paths:
     section: "prod-RegularExpressionNonTerminator"
     subject: "The first character of a regular expression may not be a <LF>
       (\\u000A), evaluated"
-    assessment: ds3-literal-coverage
+    assessment: ds17-static-literal-grammar
   - path: "test/language/literals/regexp/S7.8.5_A1.3_T4.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "incidental-scaffolding"
@@ -24558,7 +24619,7 @@ paths:
     section: "prod-RegularExpressionNonTerminator"
     subject: "The first character of a regular expression may not be a <CR>,
       (\\u000D), evaluated"
-    assessment: ds3-literal-coverage
+    assessment: ds17-static-literal-grammar
   - path: "test/language/literals/regexp/S7.8.5_A1.3_T5.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "incidental-scaffolding"
@@ -24570,7 +24631,7 @@ paths:
     section: "prod-RegularExpressionNonTerminator"
     subject: "The first character of a regular expression may not be a <LS>,
       (\\u2028), evaluated"
-    assessment: ds3-literal-coverage
+    assessment: ds17-static-literal-grammar
   - path: "test/language/literals/regexp/S7.8.5_A1.3_T6.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "incidental-scaffolding"
@@ -24582,7 +24643,7 @@ paths:
     section: "prod-RegularExpressionNonTerminator"
     subject: "The first character of a regexp literal cannot be PS (U+2029),
       tested through evaluated source"
-    assessment: ds3-literal-coverage
+    assessment: ds17-static-literal-grammar
   - path: "test/language/literals/regexp/S7.8.5_A1.4_T2.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "incidental-scaffolding"
@@ -24605,7 +24666,7 @@ paths:
     section: "prod-RegularExpressionBackslashSequence"
     subject: "A RegularExpressionBackslashSequence may not contain a <\
       LF>, evaluated"
-    assessment: ds3-literal-coverage
+    assessment: ds17-static-literal-grammar
   - path: "test/language/literals/regexp/S7.8.5_A1.5_T4.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "incidental-scaffolding"
@@ -24617,7 +24678,7 @@ paths:
     section: "prod-RegularExpressionBackslashSequence"
     subject: "A RegularExpressionBackslashSequence may not contain a <\
       CR>, evaluated"
-    assessment: ds3-literal-coverage
+    assessment: ds17-static-literal-grammar
   - path: "test/language/literals/regexp/S7.8.5_A1.5_T5.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "incidental-scaffolding"
@@ -24629,7 +24690,7 @@ paths:
     section: "prod-RegularExpressionNonTerminator"
     subject: "The first character of a regular expression may not be a <LS>,
       (\\u2028), evaluated"
-    assessment: ds3-literal-coverage
+    assessment: ds17-static-literal-grammar
   - path: "test/language/literals/regexp/S7.8.5_A1.5_T6.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "incidental-scaffolding"
@@ -24641,7 +24702,7 @@ paths:
     section: "prod-RegularExpressionNonTerminator"
     subject: "The first character of a regular expression may not be a <PS>,
       (\\u2029), evaluated"
-    assessment: ds3-literal-coverage
+    assessment: ds17-static-literal-grammar
   - path: "test/language/literals/regexp/S7.8.5_A2.1_T2.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "incidental-scaffolding"
@@ -24664,7 +24725,7 @@ paths:
     section: "sec-literals-regular-expression-literals"
     subject: "A regular expression may not contain a <LF> as a SourceCharacter,
       evaluated"
-    assessment: ds3-literal-coverage
+    assessment: ds17-static-literal-grammar
   - path: "test/language/literals/regexp/S7.8.5_A2.3_T4.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "incidental-scaffolding"
@@ -24676,7 +24737,7 @@ paths:
     section: "sec-literals-regular-expression-literals"
     subject: "A regular expression may not contain a <CR> as a SourceCharacter,
       evaluated"
-    assessment: ds3-literal-coverage
+    assessment: ds17-static-literal-grammar
   - path: "test/language/literals/regexp/S7.8.5_A2.3_T5.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "incidental-scaffolding"
@@ -24688,7 +24749,7 @@ paths:
     section: "prod-RegularExpressionNonTerminator"
     subject: "A regular expression may not contain a <LS> as a SourceCharacter,
       evaluated"
-    assessment: ds3-literal-coverage
+    assessment: ds17-static-literal-grammar
   - path: "test/language/literals/regexp/S7.8.5_A2.3_T6.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "incidental-scaffolding"
@@ -24700,7 +24761,7 @@ paths:
     section: "prod-RegularExpressionNonTerminator"
     subject: "A regular expression may not contain a <PS> as a SourceCharacter,
       evaluated"
-    assessment: ds3-literal-coverage
+    assessment: ds17-static-literal-grammar
   - path: "test/language/literals/regexp/S7.8.5_A2.4_T2.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "incidental-scaffolding"
@@ -24723,7 +24784,7 @@ paths:
     section: "prod-RegularExpressionBackslashSequence"
     subject: "A regular expression may not contain a <LF> as a SourceCharacter,
       evaluated"
-    assessment: ds3-literal-coverage
+    assessment: ds17-static-literal-grammar
   - path: "test/language/literals/regexp/S7.8.5_A2.5_T4.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "incidental-scaffolding"
@@ -24735,7 +24796,7 @@ paths:
     section: "prod-RegularExpressionBackslashSequence"
     subject: "A regexp literal cannot contain backslash followed by CR (U+000D),
       tested through evaluated source"
-    assessment: ds3-literal-coverage
+    assessment: ds17-static-literal-grammar
   - path: "test/language/literals/regexp/S7.8.5_A2.5_T5.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "incidental-scaffolding"
@@ -24747,7 +24808,7 @@ paths:
     section: "prod-RegularExpressionBackslashSequence"
     subject: "A regular expression may not contain a <LS> as a SourceCharacter,
       evaluated"
-    assessment: ds3-literal-coverage
+    assessment: ds17-static-literal-grammar
   - path: "test/language/literals/regexp/S7.8.5_A2.5_T6.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "incidental-scaffolding"
@@ -24759,7 +24820,7 @@ paths:
     section: "prod-RegularExpressionBackslashSequence"
     subject: "A regular expression may not contain a <PS> as a SourceCharacter,
       evaluated"
-    assessment: ds3-literal-coverage
+    assessment: ds17-static-literal-grammar
   - path: "test/language/literals/regexp/mongolian-vowel-separator-eval.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "incidental-scaffolding"
@@ -24783,7 +24844,7 @@ paths:
     missingDynamicTag: false
     section: "prod-GroupSpecifier"
     subject: "Lone surrogates in RegExp group names"
-    assessment: ds3-literal-coverage
+    assessment: ds17-static-literal-grammar
   - path: "test/language/literals/string/line-separator-eval.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "incidental-scaffolding"

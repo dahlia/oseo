@@ -68,3 +68,112 @@ unavailable. Preserve ADR 0016/0019 reopening triggers; an accepted ADR 0016
 amendment admitting dynamic import reopens ImportCall accounting. Each child
 requires normal D1/D11 review and D3/D4 publication. This metadata change
 performs none of those closure or landing steps.
+
+
+Implementation delta
+--------------------
+
+The per-path assessment is in
+[*dynamic-source-regexp-static-evidence.assessment.md*](./dynamic-source-regexp-static-evidence.assessment.md).
+The selector and its SHA256 are unchanged, and all 29 paths match the base
+ledger's unsupported umbrella rows. This change supplies replacement coverage
+for 25 paths: 18 literal grammar paths, two constructor-input paths and five
+source round-trip paths. Four exhaustive BMP paths remain in remediation, as
+Root approved in Orca reply `msg_39d48b1bac6b` on 2026-10-31. No aggregate
+umbrella total is changed here; Root reconciles this node's 25-path delta at
+publication.
+
+The new fixed *tests/native/fixtures/regexp-static-evidence.ts* fixture
+covers eight semantic groups: invalid flags, Math pattern conversion,
+empty source, LF escaping, slash escaping, surrogate-pair Unicode spelling,
+code-point Unicode spelling and anchored bounded quantification. It retains
+every original input and result, pins source and flags, and compares the
+original/constructor matcher with a build-time literal. Both forced-GC
+lists in *tests/native.ts* include it, so both specialization policies must
+observe actual collection. The new
+*tests/regexp-static-grammar.test.ts* covers the complete fixed grammar
+matrix and checks artifact-carrying literal operations for every source
+output spelling. Rejected literals produce `OSEO0001` without MIR; source
+parsing is witnessed before native code generation, rather than replaced
+with constructor parsing.
+
+The exclusion audit names these replacement files and binds their digests.
+Each selected source digest and normalized observation digest was freshly
+checked against the pinned source and checked-in observation. Ownership is
+regenerated through the ledger APIs and
+`mise run m5c:closure-ledger:update`, retaining
+`unsupported-profile-feature` for all 29 paths. No pass, subset, result,
+inventory, ADR, dependency tag or ratchet override changes. The four BMP
+paths retain their existing audit assessment and umbrella owner, with the
+exact missing domains recorded in the per-path table. ADR 0016's
+replacement triggers and ADR 0019's non-source reopening trigger remain in
+force.
+
+The pre-commit tag self-audit found no dependency changes: all existing
+asserted/prerequisite tags and missing-tag audit facts stay intact. Negative
+syntax evidence covers only grammar, not an executed exception or later
+property read. Constructor and matching observations remain runtime
+subjects. No shared property domain or seed was added.
+
+The subset and recorded observations are unchanged, so no UPDATE is needed.
+Root's exact-candidate CI must run the ordinary full suites, including
+`test:node`, `test:deno`, `test:native` on Linux AMD64/macOS AArch64 with the
+AArch64 Linux cross-link, and `test:test262`. This worker does not run
+`mise run test`, publish, push, merge or set landed.
+
+Initial validation at `8b1e69ba`: 29 grammar/structural tests passed. The fixed
+fixture passed in Node.js, Deno and Linux AMD64 native execution with
+specialization disabled and enabled. Each native policy observed 4,055 forced
+collections, 236 allocations and the exact expected success output. The focused
+native log and capacity metadata are in
+*/data/m5c-d17-20261031/ds17/native-focused.stdout* and the adjacent JSON
+record. These observations establish the local candidate; Root still owns
+both-host exact-candidate CI and outer review.
+
+
+Witness oracle follow-up
+------------------------
+
+Root's witness-oracle follow-up `msg_e2fd2ff4ed97` requires strict in-program
+value comparisons and mutation controls. The fixed fixture uses `Object.is`
+for the original SameValue observations. Its six negative controls reject
+number/string, undefined/string, boolean/string and positive/negative-zero
+mismatches, while a NaN positive control succeeds. The actual observations
+use the same oracle; printed output is only the final success marker. Math
+remains an unqualified identifier read, as in the original path.
+
+The updated fixture passes in Node.js, Deno and Linux AMD64 native execution
+under both specialization policies. Each native policy observes 269
+allocations and 4,386 forced collections; enabled specialization additionally
+observes 85 guard hits and 90 misses. Evidence is in
+*/data/m5c-d17-20261031/ds17/native-oracle.stdout* and its adjacent JSON
+record. All 29 grammar/structural tests pass. The audit replacement digests
+are refreshed; no subset, classification, dependency tag or observation
+changes, so no UPDATE is needed.
+
+Internal pass 2 found that the mutation rejection count reused the comparator
+under test. The corrected verdict uses strict equality and a fixed expected
+count of six. Focused tests run the actual fixture and replace its comparator
+with always-true and same-type-number expressions; both mutants throw before
+printing success. A search of all DS-17 fixture changes found no other
+mutation-control loops of this kind.
+
+The corrected fixture passes Node.js, Deno and both forced-GC Linux AMD64
+native policies. Each native policy observes 269 allocations and 4,383
+collections; enabled specialization observes 84 guard hits and 90 misses.
+Evidence is in */data/m5c-d17-20261031/ds17/fix2-native.stdout* and its
+adjacent JSON record. The focused grammar/control suite has 32 passing tests.
+Replacement witness digests are refreshed in the exclusion audit.
+
+
+Internal review reconciliation
+------------------------------
+
+Pass 1 accepted the functional replacement evidence. Its two documentation
+findings, `ds3-reason-stale` and `ds3-assessment-stale-rows`, identified old
+DS-3 text that still described the 18 covered grammar paths as uncovered.
+The fix updates only those table rows and the shared literal assessment,
+and labels the original DS-3 publication counts as historical. No umbrella
+running total is added. The fix-round tag self-audit confirms unchanged
+subjects, prerequisites, dependency tags, subset and observations; no UPDATE
+is needed.

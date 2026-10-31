@@ -16,8 +16,10 @@ delivers: "DS-3 of the dynamic-source-coverage-remediation split approved
   remediation. Never counts a pass, emulates eval, or widens ADR 0016; ADR
   0016 and ADR 0019 remain unchanged. The per-path assessment in
   docs/m5c-graph/dynamic-source-unknown-eval-assessment.md accounts for
-  11 paths with reviewed static replacements and retains 55 under the
-  umbrella; no evidence test is added."
+  the original DS-3 publication result: 11 paths accounted with reviewed
+  static replacements and 55 retained under the umbrella; DS-3 added no
+  evidence test. DS-17 later supplies static grammar witnesses for 18 of
+  those original remediation paths, as its per-path assessment records."
 after:
   - observation-batch-19
   - observation-batch-20
