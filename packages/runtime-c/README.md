@@ -1273,6 +1273,23 @@ then releases its intermediate roots before returning. Earlier class
 closures retain their original cells. The native frame ceiling, callable
 cost multiplier and general declaration charges stay unchanged.
 
+The `m5-143` ABI exports `oseo_to_object` for generated `with` entry, and
+`m5-144` adds the Array-cost archive compositions below. Both source
+branches used `m5-142` or `m5-143` independently of the landed `m5-142`
+private-name helper, so this composition carries all three as `m5-144`.
+
+The `m5-144` ABI adds archive compositions for generated binding reads,
+property-key conversion, and ordinary property gets. Each native call selects
+its operation statically. A call-site record supplies root indices and its
+source position; it has no opcode or dispatch loop. The caller keeps the same
+registered frame and live operands. Each composition performs the existing
+runtime calls and stores the result in the same output root, including a
+language throw. A failed environment lookup returns before the binding read
+and output store, retaining the generated direct-abrupt route. Fragment code
+uses the same compositions after its existing relocated location call.
+These helpers introduce no collection point, language call, or specialization
+policy. The existing runtime calls retain their generic behavior.
+
 [activity audit]: https://github.com/dahlia/oseo/blob/main/docs/sanitizer-activity.md
 
 

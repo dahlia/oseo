@@ -1421,6 +1421,7 @@ for (const fixture of selectedFixtures) {
   }
 
   if (
+    fixture.name === "generated-native-operations" ||
     fixture.name === "array-buffer" ||
     fixture.name === "typed-array-constructors" ||
     fixture.name === "typed-array-float16" ||
@@ -1743,6 +1744,7 @@ for (const fixture of selectedFixtures) {
             fixture.name === "class-private-getter-public-absence" ||
             fixture.name === "class-private-setter-public-absence" ||
             fixture.name === "class-default-forwarding" ||
+            fixture.name === "generated-native-operations" ||
             fixture.name === "array-buffer" ||
             fixture.name === "class-private-name-lifetimes" ||
             fixture.name === "array-prototype-copying" ||

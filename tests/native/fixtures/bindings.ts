@@ -7,6 +7,53 @@ export const bindingFixtures: readonly Fixture[] = [
   ...withVarLoopHeadFixtures,
   ...boxingFixtures,
   {
+    name: "generated-native-operations",
+    source: `
+const trace = [];
+const sentinel = { name: "sentinel" };
+const object = { value: { nested: ["alive"] } };
+function named() { return object.value; }
+function computed(key) { return object[key]; }
+function key() {
+  return { toString() { trace.push("key"); return "value"; } };
+}
+const retained = computed(key());
+object.extra = { collected: false };
+console.log("root", retained.nested[0], named().nested[0]);
+Object.defineProperty(object, "value", {
+  configurable: true,
+  get() { trace.push("get"); throw sentinel; },
+});
+try { computed(key()); } catch (error) {
+  console.log("getter throw", error === sentinel);
+}
+try { named(); } catch (error) {
+  console.log("named throw", error === sentinel);
+}
+try {
+  computed({ toString() { trace.push("key throw"); throw sentinel; } });
+} catch (error) { console.log("key throw", error === sentinel); }
+try { null.value; } catch (error) {
+  console.log("null", error instanceof TypeError);
+}
+{
+  function readLater() { return later; }
+  try { readLater(); } catch (error) {
+    console.log("tdz", error instanceof ReferenceError);
+  }
+  let later = { nested: ["cell"] };
+  console.log("cell", readLater().nested[0]);
+}
+const proxy = new Proxy({}, {
+  get(target, property) { trace.push(String(property)); throw sentinel; },
+});
+try { proxy.value; } catch (error) {
+  console.log("proxy", error === sentinel);
+}
+console.log("trace", trace.join(","));
+`,
+  },
+  {
     name: "with-optional-call-receiver-tail",
     nonStrictScript: true,
     source: `
