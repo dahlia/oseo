@@ -2813,10 +2813,8 @@ test("shares Shared Data Blocks and waiters across an agent cluster", () => {
   // context roots the broadcast callback the agent registered.
   assert.match(header, /OseoResult oseo_test262_host_install\(/u);
   assert.match(header, /OseoResult oseo_agent_hole\(/u);
-  assert.match(
-    header,
-    /void \*agent;\s*\/\*[^*]*\*\/\s*OseoValue agent_broadcast_callback;/u,
-  );
+  assert.match(header, /void \*agent;/u);
+  assert.match(header, /OseoValue agent_broadcast_callback;/u);
   assert.match(
     memorySource,
     /mark_value\(context->agent_broadcast_callback, &worklist\)/u,

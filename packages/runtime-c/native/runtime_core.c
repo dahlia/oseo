@@ -105,6 +105,7 @@ void oseo_context_init(
     oseo_internal_realm_init(&context->initial_realm);
     context->realm = &context->initial_realm;
     context->realm_record = oseo_undefined();
+    context->constructor_scope = NULL;
     for (size_t index = 0u;
          index < OSEO_WELL_KNOWN_SYMBOL_COUNT;
          index += 1u) {
@@ -118,6 +119,7 @@ void oseo_context_init(
     context->atomics_waiter_head = oseo_undefined();
     context->atomics_waiter_tail = oseo_undefined();
     context->agent = NULL;
+    context->agent_can_block = true;
     context->agent_broadcast_callback = oseo_undefined();
     context->finalization_head = oseo_undefined();
     context->finalization_tail = oseo_undefined();
@@ -202,6 +204,7 @@ void oseo_context_destroy(OseoContext *context) {
      */
     context->realm = &context->initial_realm;
     context->realm_record = oseo_undefined();
+    context->constructor_scope = NULL;
     oseo_internal_realm_release(&context->initial_realm);
     for (size_t index = 0u;
          index < OSEO_WELL_KNOWN_SYMBOL_COUNT;

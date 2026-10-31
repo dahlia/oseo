@@ -1,0 +1,90 @@
+// Fixed DS-19 non-source witnesses, derived from pinned Test262.
+// Foreign source is collected before native emission under ADR 0029.
+// Replacement for test/built-ins/Proxy/apply/arguments-realm.js
+// Copyright (C) 2016 the V8 project authors. All rights reserved.
+// This code is governed by the BSD license found in the LICENSE file.
+(function () {
+var f = $262.createRealm().global.$262.evalScript(
+  'new Proxy(function() {}, { apply: function(_, __, args) { return args; } })'
+);
+
+assert.sameValue(f().constructor, Array);
+})();
+
+// Replacement for test/built-ins/Proxy/construct/arguments-realm.js
+// Copyright (C) 2016 the V8 project authors. All rights reserved.
+// This code is governed by the BSD license found in the LICENSE file.
+(function () {
+var C = $262.createRealm().global.$262.evalScript(
+  'new Proxy(function() {}, { construct: function(_, args) { return args; } })'
+);
+
+assert.sameValue(new C().constructor, Array);
+})();
+
+// Replacement for test/built-ins/Proxy/construct/trap-is-undefined-proto-from-cross-realm-newtarget.js
+// Copyright (C) 2016 the V8 project authors. All rights reserved.
+// This code is governed by the BSD license found in the LICENSE file.
+(function () {
+var other = $262.createRealm().global;
+var C = other.$262.evalScript("(function(){})");
+
+var P = new Proxy(function() {}, {});
+var p = Reflect.construct(P, [], C);
+
+assert.sameValue(Object.getPrototypeOf(p), C.prototype);
+})();
+
+// Replacement for test/built-ins/Proxy/construct/trap-is-undefined-proto-from-newtarget-realm.js
+// Copyright (C) 2016 the V8 project authors. All rights reserved.
+// This code is governed by the BSD license found in the LICENSE file.
+(function () {
+var other = $262.createRealm().global;
+var C = other.$262.evalScript("(function(){})");
+C.prototype = null;
+
+var P = new Proxy(function() {}, {});
+var p = Reflect.construct(P, [], C);
+
+assert.sameValue(Object.getPrototypeOf(p), other.Object.prototype);
+})();
+
+// Replacement for test/built-ins/Proxy/get-fn-realm-recursive.js
+// Copyright (C) 2019 Aleksey Shvayka. All rights reserved.
+// This code is governed by the BSD license found in the LICENSE file.
+(function () {
+var realm1 = $262.createRealm().global;
+var realm2 = $262.createRealm().global;
+var realm3 = $262.createRealm().global;
+var realm4 = $262.createRealm().global;
+
+var newTarget = realm1.$262.evalScript("(function(){})");
+newTarget.prototype = null;
+
+var newTargetProxy = new realm2.Proxy(newTarget, {});
+var newTargetProxyProxy = new realm3.Proxy(newTargetProxy, {});
+var boolean = Reflect.construct(realm4.Boolean, [], newTargetProxyProxy);
+
+assert(boolean instanceof realm1.Boolean);
+assert.sameValue(Object.getPrototypeOf(boolean), realm1.Boolean.prototype);
+})();
+
+// Replacement for test/built-ins/Proxy/get-fn-realm.js
+// Copyright (C) 2016 the V8 project authors. All rights reserved.
+// This code is governed by the BSD license found in the LICENSE file.
+(function () {
+var realm1 = $262.createRealm().global;
+var realm2 = $262.createRealm().global;
+var realm3 = $262.createRealm().global;
+
+var newTarget = realm1.$262.evalScript("(function(){})");
+newTarget.prototype = false;
+
+var newTargetProxy = new realm2.Proxy(newTarget, {});
+var array = Reflect.construct(realm3.Array, [], newTargetProxy);
+
+assert(array instanceof realm1.Array);
+assert.sameValue(Object.getPrototypeOf(array), realm1.Array.prototype);
+})();
+
+console.log("DS19 proxy complete");

@@ -49,6 +49,8 @@ export type SpecializationMode = "disabled" | "enabled";
 
 /** Explicit compiler orchestration options, independent of process globals. */
 export interface CompilerOptions {
+  /** Main test262 agent's [[CanBlock]]; omitted means true. */
+  readonly mainAgentCanBlock?: boolean;
   readonly observeSpecialization?: boolean;
   readonly specialization?: SpecializationMode;
   /**
@@ -79,6 +81,8 @@ export interface MirHostScript {
 
 /** The test262 host a main program installs before its Script runs. */
 export interface MirTest262Host {
+  /** Agent policy shared by every realm of the main context. */
+  readonly mainAgentCanBlock?: boolean;
   readonly scripts?: readonly MirHostScript[];
   /** Agent program templates, indexed as each agent program's entry. */
   readonly agents: readonly MirAgentTemplate[];
@@ -140,6 +144,11 @@ export interface MirOperation {
    * prefix for the accessor closure created by `function-create`.
    */
   readonly accessorKind?: "get" | "set";
+  /**
+   * A default derived super construction forwards the running function's
+   * incoming argument list directly, without reading an iterator.
+   */
+  readonly forwardArguments?: true;
   readonly argumentListId?: number;
   readonly arguments: readonly number[];
   /** The hole an `agent-hole` operation reads. */
@@ -224,6 +233,7 @@ export interface MirOperation {
     | "load-fixed-slot"
     | "module-namespace-create"
     | "new-target"
+    | "to-object"
     | "object-coercible"
     | "object-create"
     | "object-rest"

@@ -1,0 +1,45 @@
+// Fixed DS-19 non-source witnesses, derived from pinned Test262.
+// Foreign source is collected before native emission under ADR 0029.
+// Replacement for test/language/expressions/async-generator/eval-body-proto-realm.js
+// Copyright (C) 2019 Alexey Shvayka. All rights reserved.
+// This code is governed by the BSD license found in the LICENSE file.
+(function () {
+var other = $262.createRealm().global;
+var fn = other.$262.evalScript('(0, async function* () {})');
+var AsyncGeneratorPrototype = Object.getPrototypeOf(fn.prototype);
+
+fn.prototype = undefined;
+assert.sameValue(Object.getPrototypeOf(fn()), AsyncGeneratorPrototype, 'fn.prototype is undefined');
+
+fn.prototype = null;
+assert.sameValue(Object.getPrototypeOf(fn()), AsyncGeneratorPrototype, 'fn.prototype is null');
+
+fn.prototype = true;
+assert.sameValue(Object.getPrototypeOf(fn()), AsyncGeneratorPrototype, 'fn.prototype is a Boolean');
+
+fn.prototype = 'str';
+assert.sameValue(Object.getPrototypeOf(fn()), AsyncGeneratorPrototype, 'fn.prototype is a String');
+
+fn.prototype = Symbol();
+assert.sameValue(Object.getPrototypeOf(fn()), AsyncGeneratorPrototype, 'fn.prototype is a Symbol');
+
+fn.prototype = 0;
+assert.sameValue(Object.getPrototypeOf(fn()), AsyncGeneratorPrototype, 'fn.prototype is a Number');
+})();
+
+// Replacement for test/language/expressions/generators/eval-body-proto-realm.js
+// Copyright (C) 2016 the V8 project authors. All rights reserved.
+// This code is governed by the BSD license found in the LICENSE file.
+(function () {
+var other = $262.createRealm().global;
+var g = other.$262.evalScript('(0, function*() {})');
+var GeneratorPrototype = Object.getPrototypeOf(g.prototype);
+g.prototype = null;
+var instance;
+
+instance = g();
+
+assert.sameValue(Object.getPrototypeOf(instance), GeneratorPrototype);
+})();
+
+console.log("DS19 generator-prototypes complete");

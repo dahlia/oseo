@@ -47,6 +47,7 @@ results:
     classification: unsupported-profile-feature
     dependencies:
       - array-buffer
+      - dynamic-source
     execution:
       harnessIncludes:
         - base.js

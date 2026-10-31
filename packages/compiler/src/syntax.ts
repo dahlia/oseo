@@ -87,6 +87,8 @@ export type SyntaxCallTarget =
        * [[Prototype]], so the target carries no callee expression.
        */
       readonly kind: "super";
+      /** Only synthesized default constructors forward the incoming list. */
+      readonly forwardArguments?: true;
     })
   | (LocatedSyntax & {
       readonly key: SyntaxExpression;

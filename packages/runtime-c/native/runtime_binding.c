@@ -939,3 +939,35 @@ OseoResult oseo_script_lexicals_install(
     oseo_roots_pop(context, &frame);
     return result;
 }
+
+/* Keep the caller's existing roots and error routing across the composition. */
+bool oseo_generated_binding_read(
+    OseoContext *context, OseoValue environment, size_t index,
+    OseoResult *result, OseoValue *output
+) {
+    *result = oseo_environment_get(context, environment, index);
+    if (result->status != OSEO_STATUS_NORMAL) return false;
+    *result = oseo_cell_get(context, result->value);
+    *output = result->value;
+    return true;
+}
+
+void oseo_generated_operation_location(
+    OseoContext *context, const OseoGeneratedOperation *operation
+) {
+    if (operation->source_id != NULL) {
+        oseo_context_source_location(context, operation->source_id,
+            operation->source_id_length, operation->line, operation->column);
+    } else {
+        oseo_context_location(context, operation->line, operation->column);
+    }
+}
+
+bool oseo_generated_binding_read_at(
+    OseoContext *context, OseoValue *roots,
+    const OseoGeneratedOperation *operation, OseoResult *result
+) {
+    oseo_generated_operation_location(context, operation);
+    return oseo_generated_binding_read(context, roots[operation->first],
+        operation->second, result, &roots[operation->output]);
+}

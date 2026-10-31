@@ -1478,6 +1478,7 @@ results:
     classification: unsupported-profile-feature
     dependencies:
       - classes
+      - dynamic-source
     execution:
       harnessIncludes:
         - base.js

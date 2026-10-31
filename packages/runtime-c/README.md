@@ -1273,4 +1273,49 @@ then releases its intermediate roots before returning. Earlier class
 closures retain their original cells. The native frame ceiling, callable
 cost multiplier and general declaration charges stay unchanged.
 
+The `m5-143` ABI exports `oseo_to_object` for generated `with` entry, and
+`m5-144` adds the Array-cost archive compositions below. Both source
+branches used `m5-142` or `m5-143` independently of the landed `m5-142`
+private-name helper, so this composition carries all three as `m5-144`.
+
+The `m5-144` ABI adds archive compositions for generated binding reads,
+property-key conversion, and ordinary property gets. Each native call selects
+its operation statically. A call-site record supplies root indices and its
+source position; it has no opcode or dispatch loop. The caller keeps the same
+registered frame and live operands. Each composition performs the existing
+runtime calls and stores the result in the same output root, including a
+language throw. A failed environment lookup returns before the binding read
+and output store, retaining the generated direct-abrupt route. Fragment code
+uses the same compositions after its existing relocated location call.
+These helpers introduce no collection point, language call, or specialization
+policy. The existing runtime calls retain their generic behavior.
+
+ABI `m5-145` adds `agent_can_block` to `OseoContext`. The main test262
+agent's generated setup selects false for `CanBlockIsFalse`; ordinary
+contexts and child agents initialize true, and realms retain their owning
+context's policy. `Atomics.wait` checks it after argument validation and
+conversion, before comparing memory. `Atomics.waitAsync` is unchanged.
+
 [activity audit]: https://github.com/dahlia/oseo/blob/main/docs/sanitizer-activity.md
+
+
+With binding object boxing
+--------------------------
+
+The `m5-143` ABI exports `oseo_to_object` for generated with entry.
+It uses the same ToObject implementation as the intrinsic built-ins:
+objects retain identity, primitives receive wrappers with their intrinsic
+prototype, and null or undefined throws TypeError. String wrappers carry
+their own indexed properties and length. The compiler roots the result
+before initializing the with environment, so repeated lookups and escaped
+closures retain one binding object. The helper does not read a mutable
+JavaScript `Object` binding or invoke primitive conversion hooks.
+
+ABI `m5-146` adds a context pointer to the active ordinary call's saved
+caller realm. The matching realm scope roots that realm until return.
+Derived constructor completion errors use the saved caller realm, while
+errors raised by the body retain the callee realm. A pending derived tail
+call retains and traces its constructor caller realm separately from the
+tail call's running realm, then checks its final result in that caller.
+Nested calls restore the previous scope. It follows `m5-145`, the
+non-blocking-agent policy above.

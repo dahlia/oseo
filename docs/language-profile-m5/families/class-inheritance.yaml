@@ -3,6 +3,7 @@ id: class-inheritance
 title: "Class inheritance"
 scope:
   - "Extends, super construction, new.target, and derived returns."
+  - "Default derived constructors forward arguments without Array iteration."
 owners:
   - PLAN-M5.md
 evidence:

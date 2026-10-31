@@ -1,0 +1,18 @@
+version: 1
+id: dynamic-source-static-core-evidence
+title: Static core evidence
+delivers: >-
+  DS-15 of the approved 2026-10-31 second split. Reviews exactly 43 pinned
+  unsupported paths, size M, listed with their SHA256 and closure obligations
+  in docs/m5c-graph/dynamic-source-static-core-evidence.md. Preserves every
+  original subject and observation. Candidate ledger assignments prepare
+  this node's delta; authoritative merged ownership follows Root's serialized
+  publication/landing. Shared umbrella totals remain Root-owned; unresolved
+  subjects retain remediation. Requires per-path reviewed
+  evidence, fresh source and observation digests for any accounting, and
+  normal review/publication gates. No new exclusion, pass or boundary
+  amendment is authorized by this split.
+dependencies:
+  - authorized-exclusion-audit
+landed: true
+status: ready

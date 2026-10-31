@@ -666,6 +666,12 @@ function emitTemplateObject(state: EmitState, operation: MirOperation): void {
 }
 
 function emitArguments(state: EmitState, operation: MirOperation) {
+  if (operation.forwardArguments === true) {
+    return {
+      count: renderC(emittedC.arguments.incomingCount),
+      name: renderC(emittedC.arguments.incomingValues),
+    };
+  }
   if (operation.argumentListId != null) {
     const count = renderC(emittedC.arguments.argumentCount, operation.id);
     const name = renderC(emittedC.arguments.argumentValues, operation.id);
@@ -733,25 +739,58 @@ function emittedArgument(
     : renderC(emittedC.common.root, value);
 }
 
+/** Pass one static call-site record to the reusable native composition. */
+function generatedOperation(
+  state: EmitState,
+  operation: MirOperation,
+  first: number,
+  second: number,
+): string {
+  const name = `generated_operation_${operation.id}`;
+  const range = operation.range;
+  const source =
+    range.sourceId == null ? "NULL" : `"${escapeCString(range.sourceId)}"`;
+  const length =
+    range.sourceId == null
+      ? 0
+      : new TextEncoder().encode(range.sourceId).length;
+  line(
+    state,
+    `static const OseoGeneratedOperation ${name} = {` +
+      `${operation.id}u, ${first}u, ${second}u, ${source}, ${length}u, ` +
+      `${range.start.line}u, ${range.start.column}u};`,
+  );
+  return name;
+}
+
 function emitRead(state: EmitState, operation: MirOperation): void {
   const bindingId = operation.bindingId;
   if (bindingId == null) {
     throw new Error(`MIR read %${operation.id} has no bound value.`);
   }
+  if (state.fragmentUnit == null) {
+    state.usesAbrupt = true;
+    const name = generatedOperation(
+      state,
+      operation,
+      state.environmentSlot,
+      bindingId,
+    );
+    line(
+      state,
+      `if (!oseo_generated_binding_read_at(context, roots, ` +
+        `&${name}, &result)) goto abrupt;`,
+    );
+    return;
+  }
   location(state, operation.range);
   state.usesAbrupt = true;
   line(
     state,
-    renderC(emittedC.common.resultAssignOseoEnvironmentGetContext) +
-      renderC(
-        emittedC.common.rootsUStatement,
-        state.environmentSlot,
-        bindingId,
-      ),
+    `if (!oseo_generated_binding_read(context, ` +
+      `roots[${state.environmentSlot}], ${bindingId}u, ` +
+      `&result, &roots[${operation.id}])) goto abrupt;`,
   );
-  line(state, renderC(emittedC.common.gotoAbruptUnlessNormal));
-  line(state, renderC(emittedC.read.resultAssignOseoCellGetContextResultValue));
-  line(state, renderC(emittedC.common.rootAssignResultValue, operation.id));
 }
 
 function emitWrite(state: EmitState, operation: MirOperation): void {
@@ -1807,6 +1846,26 @@ function emitTailCall(
 }
 
 function emitObjectOperation(state: EmitState, operation: MirOperation): void {
+  if (
+    state.fragmentUnit == null &&
+    (operation.kind === "property-key" ||
+      (operation.kind === "property-get" && operation.superReference !== true))
+  ) {
+    state.usesAbrupt = true;
+    const name = generatedOperation(
+      state,
+      operation,
+      operationArgument(operation, 0),
+      operation.kind === "property-get" ? operationArgument(operation, 1) : 0,
+    );
+    const helper = operation.kind === "property-key" ? "key" : "get";
+    line(
+      state,
+      `oseo_generated_property_${helper}_at(context, roots, ` +
+        `&${name}, &result);`,
+    );
+    return;
+  }
   location(state, operation.range);
   state.usesAbrupt = true;
   if (operation.kind === "array-create") {
@@ -1847,6 +1906,7 @@ function emitObjectOperation(state: EmitState, operation: MirOperation): void {
       ),
     );
   } else if (
+    operation.kind === "to-object" ||
     operation.kind === "object-coercible" ||
     operation.kind === "delete-object-coercible"
   ) {
@@ -1854,10 +1914,12 @@ function emitObjectOperation(state: EmitState, operation: MirOperation): void {
     line(
       state,
       renderC(
-        operation.kind === "delete-object-coercible"
-          ? emittedC.objectOperation
-              .resultAssignOseoRequireDeleteObjectCoercible
-          : emittedC.objectOperation.resultAssignOseoRequireObjectCoercible,
+        operation.kind === "to-object"
+          ? emittedC.objectOperation.resultAssignOseoToObject
+          : operation.kind === "delete-object-coercible"
+            ? emittedC.objectOperation
+                .resultAssignOseoRequireDeleteObjectCoercible
+            : emittedC.objectOperation.resultAssignOseoRequireObjectCoercible,
         input,
       ),
     );
@@ -1920,11 +1982,10 @@ function emitObjectOperation(state: EmitState, operation: MirOperation): void {
     const input = operationArgument(operation, 0);
     line(
       state,
-      renderC(
-        emittedC.objectOperation.resultAssignOseoPropertyKeyContextRoots,
-        input,
-      ),
+      `oseo_generated_property_key(context, roots[${input}], ` +
+        `&result, &roots[${operation.id}]);`,
     );
+    return;
   } else if (operation.kind === "property-define-data") {
     const object = operationArgument(operation, 0);
     const key = operationArgument(operation, 1);
@@ -2021,11 +2082,11 @@ function emitObjectOperation(state: EmitState, operation: MirOperation): void {
       } else {
         line(
           state,
-          renderC(
-            emittedC.objectOperation.resultAssignOseoObjectGetContextRoots,
-            object,
-          ) + renderC(emittedC.common.rootCallSuffix, key),
+          `oseo_generated_property_get(context, ` +
+            `roots[${object}], roots[${key}], ` +
+            `&result, &roots[${operation.id}]);`,
         );
+        return;
       }
     } else if (operation.kind === "property-delete") {
       line(
@@ -3206,6 +3267,7 @@ function emitOperation(state: EmitState, operation: MirOperation): void {
     operation.kind === "array-append-hole" ||
     operation.kind === "array-create" ||
     operation.kind === "delete-object-coercible" ||
+    operation.kind === "to-object" ||
     operation.kind === "object-coercible" ||
     operation.kind === "object-create" ||
     operation.kind === "object-rest" ||
@@ -5085,7 +5147,10 @@ export const cBackend: NativeBackend = {
     const hostInstall =
       host == null
         ? empty
-        : renderC(
+        : `    context.agent_can_block = ${
+            host.mainAgentCanBlock !== false
+          };\n` +
+          renderC(
             emittedC.agent.installLine,
             host.agents.length === 0
               ? renderC(emittedC.agent.noProgramsValue)

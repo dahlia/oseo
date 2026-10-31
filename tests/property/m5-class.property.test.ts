@@ -22,6 +22,7 @@ import {
 import { nativeToolchain } from "../native-toolchain.ts";
 const { privateNameLifetimeSource } =
   await import("../native/fixtures/class-private-name-lifetimes.ts");
+import { isString } from "../../tools/value-kinds.ts";
 
 const { assertAsyncProperty } = await import(
   ["../../packages/testkit/tests/", "property-support.ts"].join("")
@@ -33,7 +34,7 @@ type ClassForm = "anonymous" | "declaration" | "named-expression";
 /**
  * Whether one generated class extends a base class, and whether it
  * declares the derived constructor or takes the implicit
- * `constructor(...args) { super(...args); }`.
+ * constructor's direct argument forwarding.
  */
 type ClassHeritage = "derived" | "derived-implicit" | "none";
 
@@ -723,7 +724,14 @@ function expected(testCase: ClassCase): string {
   return `${lines.join("\n")}\n`;
 }
 
-async function references(source: string): Promise<
+interface ClassReferenceOptions {
+  readonly globalScriptReference?: true;
+}
+
+async function references(
+  source: string,
+  options: ClassReferenceOptions = {},
+): Promise<
   readonly [
     {
       readonly exitStatus: number;
@@ -741,7 +749,14 @@ async function references(source: string): Promise<
   const sourcePath = `${directory}/case.ts`;
   let succeeded = false;
   try {
-    await host.writeTextFile(sourcePath, source);
+    // Loader parsers reject some valid escaped static ASI fields. Only
+    // this opt-in JavaScript domain uses the engines' Script parser;
+    // the existing typed domains keep their original TypeScript input.
+    const referenceSource =
+      options.globalScriptReference === true
+        ? `(0, eval)(${JSON.stringify(source)});\n`
+        : source;
+    await host.writeTextFile(sourcePath, referenceSource);
     const observations = [
       await host.run({
         args: [sourcePath],
@@ -1943,6 +1958,327 @@ test(
         seed: 0x6000_0b03,
         sizeLimit: "two to five class groups and integer values from -20 to 20",
         timeLimitMilliseconds: 120_000,
+      },
+    );
+  },
+);
+
+/**
+ * Shrinking retains the implicit constructor and poisoned iterator while
+ * reducing the directly generated argument list. No source is filtered.
+ */
+test(
+  "generated default constructors bypass Array iteration",
+  { skip: nativeTarget == null ? "requires a supported native host" : false },
+  async () => {
+    await assertAsyncProperty(
+      "default derived argument forwarding",
+      fc.asyncProperty(
+        fc.array(fc.integer({ min: -20, max: 20 }), { maxLength: 5 }),
+        fc.boolean(),
+        async (values, getter) => {
+          const source = `
+let reads = 0;
+const descriptor = Object.getOwnPropertyDescriptor(
+  Array.prototype, Symbol.iterator,
+);
+Object.defineProperty(Array.prototype, Symbol.iterator, {
+  configurable: true,
+  ${
+    getter
+      ? "get() { reads++; throw 42; }"
+      : "value: function() { reads++; throw 42; }"
+  },
+});
+class Base {
+  constructor() {
+    this.count = arguments.length;
+    this.sum = 0;
+    for (let i = 0; i < arguments.length; i++) {
+      this.sum = this.sum + arguments[i];
+    }
+    this.target = new.target;
+  }
+}
+class Middle extends Base {}
+class Derived extends Middle { field = this.sum; }
+const result = new Derived(${values.join(", ")});
+console.log(result.count, result.sum, result.field);
+console.log(reads, result.target === Derived, Derived.length);
+Object.defineProperty(Array.prototype, Symbol.iterator, descriptor);
+`;
+          const sum = values.reduce((total, value) => total + value, 0);
+          const expectedObservation = {
+            exitStatus: 0,
+            stderr: "",
+            stdout: `${values.length} ${sum} ${sum}\n0 true 0\n`,
+          };
+          assertMatchingObservations([
+            expectedObservation,
+            ...(await references(source)),
+          ]);
+          for (const specialization of ["disabled", "enabled"] as const) {
+            const compiled = compileSource(
+              babelFrontend,
+              {
+                source,
+                sourceId: "generated-default-forwarding.ts",
+              },
+              { observeSpecialization: true, specialization },
+            );
+            assert.deepEqual(compiled.diagnostics, []);
+            assert.ok(compiled.mir != null);
+            process.env.OSEO_GC_EVERY_SAFEPOINT = "1";
+            try {
+              await withNativeFixture(
+                {
+                  backend: cBackend,
+                  host,
+                  input: compiled.mir,
+                  operation: "execute",
+                  runtime: cRuntimeProvider,
+                  target: nativeTarget ?? describeTarget("linux-x86_64-gnu"),
+                  toolchain: nativeToolchain,
+                },
+                (native) => {
+                  assertMatchingObservations([expectedObservation, native]);
+                  assert.ok(native.counters != null);
+                  assert.ok(native.counters.collections > 0);
+                },
+              );
+            } finally {
+              delete process.env.OSEO_GC_EVERY_SAFEPOINT;
+            }
+          }
+        },
+      ),
+      {
+        domain:
+          "zero to five integers forwarded through two implicit derived " +
+          "constructors with a throwing Array iterator getter or method; " +
+          "independent argument-count, sum, field, and new.target model " +
+          "compared with Node, Deno, and both native policies under GC",
+        numRuns: 10,
+        profile: "M5 default derived constructor argument forwarding",
+        seed: 0x6000_0b04,
+        sizeLimit: "five arguments, integers from -20 to 20, two subclasses",
+        timeLimitMilliseconds: 120_000,
+      },
+    );
+  },
+);
+
+test(
+  "generated escaped static ASI fields keep instance placement",
+  { skip: nativeTarget == null ? "requires a supported native host" : false },
+  async () => {
+    await assertAsyncProperty(
+      "escaped static fields split from the following member at ASI",
+      fc.asyncProperty(
+        fc.record({
+          braced: fc.boolean(),
+          expression: fc.boolean(),
+          hinted: fc.boolean(),
+          letter: fc.integer({ min: 0, max: 5 }),
+          staticMethod: fc.boolean(),
+          trivia: fc.constantFrom(
+            "\n",
+            "\r\n",
+            "/*\n*/",
+            "//static\n",
+            "\u2028",
+            "\u2029",
+          ),
+          value: fc.oneof(
+            fc.integer({ min: -10, max: 10 }),
+            fc.constantFrom("text", "", 0.5),
+          ),
+        }),
+        async (testCase) => {
+          const hex = "static".charCodeAt(testCase.letter).toString(16);
+          const escape = testCase.braced ? `\\u{${hex}}` : `\\u00${hex}`;
+          const spelling =
+            "static".slice(0, testCase.letter) +
+            escape +
+            "static".slice(testCase.letter + 1);
+          const form = testCase.expression ? "const C = class" : "class C";
+          const modifier = testCase.staticMethod ? "static " : "";
+          const hint = testCase.hinted ? "/** @param {number} value */\n" : "";
+          const receiver = testCase.staticMethod ? "C" : "instance";
+          const source = `${form} {
+  ${spelling}${testCase.trivia}${hint}${modifier}read(value) {
+    return value + 1;
+  }
+};
+const instance = new C();
+console.log(Object.hasOwn(instance, "static"), instance.static,
+  Object.hasOwn(C, "static"), typeof C.read, typeof instance.read,
+  ${receiver}.read(${JSON.stringify(testCase.value)}));
+`;
+          const output = isString(testCase.value)
+            ? testCase.value + "1"
+            : testCase.value + 1;
+          const roles = testCase.staticMethod
+            ? "function undefined"
+            : "undefined function";
+          const expectedObservation = {
+            exitStatus: 0,
+            stderr: "",
+            stdout: `true undefined false ${roles} ${output}\n`,
+          };
+          assertMatchingObservations([
+            expectedObservation,
+            ...(await references(source, { globalScriptReference: true })),
+          ]);
+          for (const specialization of ["disabled", "enabled"] as const) {
+            const compiled = compileSource(
+              babelFrontend,
+              { source, sourceId: "generated-static-asi.ts" },
+              { specialization, observeSpecialization: true },
+            );
+            assert.deepEqual(compiled.diagnostics, [], source);
+            assert.ok(compiled.mir);
+            process.env.OSEO_GC_EVERY_SAFEPOINT = "1";
+            try {
+              await withNativeFixture(
+                {
+                  backend: cBackend,
+                  host,
+                  input: compiled.mir,
+                  operation: "execute",
+                  runtime: cRuntimeProvider,
+                  target: nativeTarget ?? describeTarget("linux-x86_64-gnu"),
+                  toolchain: nativeToolchain,
+                },
+                (native) => {
+                  assertMatchingObservations([expectedObservation, native]);
+                  assert.ok((native.counters?.collections ?? 0) > 0);
+                },
+              );
+            } finally {
+              delete process.env.OSEO_GC_EVERY_SAFEPOINT;
+            }
+          }
+        },
+      ),
+      {
+        context: [`target=${nativeTarget?.name ?? "unsupported"}`],
+        domain:
+          "escaped letters in static field names followed by each " +
+          "line terminator or a comment containing one, declarations and " +
+          "expressions, instance and static methods, with optional numeric " +
+          "hints and number/string operands compared with an independent " +
+          "placement/addition model, Node.js and Deno",
+        numRuns: 8,
+        profile: "M5 classes with escaped static ASI fields",
+        seed: 0x6000_0b05,
+        sizeLimit:
+          "one field, one method, six escape positions, and bounded " +
+          "numbers/strings; shrinking preserves the field/member split",
+        timeLimitMilliseconds: 180_000,
+      },
+    );
+  },
+);
+
+test(
+  "generated derived results preserve caller and body error realms",
+  { skip: nativeTarget == null ? "requires a supported native host" : false },
+  async () => {
+    const { derivedConstructorRealmSource } =
+      await import("../native/fixtures/derived-constructor-realms.ts");
+    await assertAsyncProperty(
+      "derived constructor result realm",
+      fc.asyncProperty(
+        fc.record({
+          body: fc.constantFrom(
+            "primitive" as const,
+            "empty" as const,
+            "object" as const,
+            "super" as const,
+            "throw" as const,
+            "this" as const,
+          ),
+          primitive: fc.constantFrom(
+            "null",
+            "0",
+            "true",
+            '""',
+            "1n",
+            "Symbol()",
+          ),
+          strategy: fc.constantFrom(
+            "direct" as const,
+            "tail" as const,
+            "finally" as const,
+          ),
+          wrapper: fc.constantFrom(
+            "direct" as const,
+            "bound" as const,
+            "proxy" as const,
+          ),
+          foreignCaller: fc.boolean(),
+        }),
+        async (input) => {
+          const source = derivedConstructorRealmSource(input);
+          const expectedObservation = {
+            exitStatus: 0,
+            stderr: "",
+            stdout: "derived-realm ok\n",
+          };
+          const saved = process.env.OSEO_GC_EVERY_SAFEPOINT;
+          process.env.OSEO_GC_EVERY_SAFEPOINT = "1";
+          try {
+            for (const specialization of ["disabled", "enabled"] as const) {
+              const compiled = compileSource(
+                babelFrontend,
+                { source, sourceId: "generated-derived-realm.js" },
+                {
+                  specialization,
+                  test262Host: true,
+                  observeSpecialization: true,
+                },
+              );
+              assert.deepEqual(compiled.diagnostics, [], source);
+              await withNativeFixture(
+                {
+                  backend: cBackend,
+                  host,
+                  input: compiled.mir!,
+                  operation: "execute",
+                  runtime: cRuntimeProvider,
+                  target: nativeTarget!,
+                  toolchain: nativeToolchain,
+                },
+                (native) => {
+                  assertMatchingObservations([expectedObservation, native]);
+                  assert.ok(native.counters!.collections > 0);
+                  // A tail-position result checks through the derived tail
+                  // call helper instead of the direct result helper.
+                  assert.match(
+                    native.emittedC,
+                    /oseo_derived_constructor_result|oseo_tail_call_derived/u,
+                  );
+                },
+              );
+            }
+          } finally {
+            if (saved == null) delete process.env.OSEO_GC_EVERY_SAFEPOINT;
+            else process.env.OSEO_GC_EVERY_SAFEPOINT = saved;
+          }
+        },
+      ),
+      {
+        domain:
+          "six completion/body contracts, six primitive values, direct/" +
+          "tail/finally returns, ordinary/bound/proxy constructors, " +
+          "same/foreign " +
+          "callers; independent caller versus callee error-constructor model",
+        numRuns: 10,
+        profile: "M5 derived constructor error realms",
+        seed: 0x6000_0b06,
+        sizeLimit: "two or three realms, one nested call, one constructor",
+        timeLimitMilliseconds: 180_000,
       },
     );
   },

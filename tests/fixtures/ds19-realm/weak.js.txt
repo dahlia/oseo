@@ -1,0 +1,96 @@
+// Fixed DS-19 non-source witnesses, derived from pinned Test262.
+// Foreign source is collected before native emission under ADR 0029.
+// Replacement for test/built-ins/FinalizationRegistry/proto-from-ctor-realm.js
+// Copyright (C) 2019 Leo Balter. All rights reserved.
+// This code is governed by the BSD license found in the LICENSE file.
+(function () {
+var other = $262.createRealm().global;
+var newTarget = other.$262.evalScript("(function(){})");
+function fn() {}
+var finalizationRegistry;
+
+newTarget.prototype = undefined;
+finalizationRegistry = Reflect.construct(FinalizationRegistry, [fn], newTarget);
+assert.sameValue(Object.getPrototypeOf(finalizationRegistry), other.FinalizationRegistry.prototype, 'newTarget.prototype is undefined');
+
+newTarget.prototype = null;
+finalizationRegistry = Reflect.construct(FinalizationRegistry, [fn], newTarget);
+assert.sameValue(Object.getPrototypeOf(finalizationRegistry), other.FinalizationRegistry.prototype, 'newTarget.prototype is null');
+
+newTarget.prototype = true;
+finalizationRegistry = Reflect.construct(FinalizationRegistry, [fn], newTarget);
+assert.sameValue(Object.getPrototypeOf(finalizationRegistry), other.FinalizationRegistry.prototype, 'newTarget.prototype is a Boolean');
+
+newTarget.prototype = '';
+finalizationRegistry = Reflect.construct(FinalizationRegistry, [fn], newTarget);
+assert.sameValue(Object.getPrototypeOf(finalizationRegistry), other.FinalizationRegistry.prototype, 'newTarget.prototype is a String');
+
+newTarget.prototype = Symbol();
+finalizationRegistry = Reflect.construct(FinalizationRegistry, [fn], newTarget);
+assert.sameValue(Object.getPrototypeOf(finalizationRegistry), other.FinalizationRegistry.prototype, 'newTarget.prototype is a Symbol');
+
+newTarget.prototype = 1;
+finalizationRegistry = Reflect.construct(FinalizationRegistry, [fn], newTarget);
+assert.sameValue(Object.getPrototypeOf(finalizationRegistry), other.FinalizationRegistry.prototype, 'newTarget.prototype is a Number');
+})();
+
+// Replacement for test/built-ins/WeakMap/proto-from-ctor-realm.js
+// Copyright (C) 2016 the V8 project authors. All rights reserved.
+// This code is governed by the BSD license found in the LICENSE file.
+(function () {
+var other = $262.createRealm().global;
+var C = other.$262.evalScript("(function(){})");
+C.prototype = null;
+
+var o = Reflect.construct(WeakMap, [], C);
+
+assert.sameValue(Object.getPrototypeOf(o), other.WeakMap.prototype);
+})();
+
+// Replacement for test/built-ins/WeakRef/proto-from-ctor-realm.js
+// Copyright (C) 2019 Leo Balter. All rights reserved.
+// This code is governed by the BSD license found in the LICENSE file.
+(function () {
+var other = $262.createRealm().global;
+var newTarget = other.$262.evalScript("(function(){})");
+var wr;
+
+newTarget.prototype = undefined;
+wr = Reflect.construct(WeakRef, [{}], newTarget);
+assert.sameValue(Object.getPrototypeOf(wr), other.WeakRef.prototype, 'newTarget.prototype is undefined');
+
+newTarget.prototype = null;
+wr = Reflect.construct(WeakRef, [{}], newTarget);
+assert.sameValue(Object.getPrototypeOf(wr), other.WeakRef.prototype, 'newTarget.prototype is null');
+
+newTarget.prototype = true;
+wr = Reflect.construct(WeakRef, [{}], newTarget);
+assert.sameValue(Object.getPrototypeOf(wr), other.WeakRef.prototype, 'newTarget.prototype is a Boolean');
+
+newTarget.prototype = '';
+wr = Reflect.construct(WeakRef, [{}], newTarget);
+assert.sameValue(Object.getPrototypeOf(wr), other.WeakRef.prototype, 'newTarget.prototype is a String');
+
+newTarget.prototype = Symbol();
+wr = Reflect.construct(WeakRef, [{}], newTarget);
+assert.sameValue(Object.getPrototypeOf(wr), other.WeakRef.prototype, 'newTarget.prototype is a Symbol');
+
+newTarget.prototype = 1;
+wr = Reflect.construct(WeakRef, [{}], newTarget);
+assert.sameValue(Object.getPrototypeOf(wr), other.WeakRef.prototype, 'newTarget.prototype is a Number');
+})();
+
+// Replacement for test/built-ins/WeakSet/proto-from-ctor-realm.js
+// Copyright (C) 2016 the V8 project authors. All rights reserved.
+// This code is governed by the BSD license found in the LICENSE file.
+(function () {
+var other = $262.createRealm().global;
+var C = other.$262.evalScript("(function(){})");
+C.prototype = null;
+
+var o = Reflect.construct(WeakSet, [], C);
+
+assert.sameValue(Object.getPrototypeOf(o), other.WeakSet.prototype);
+})();
+
+console.log("DS19 weak complete");

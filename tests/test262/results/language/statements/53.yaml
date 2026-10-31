@@ -71,6 +71,529 @@ results:
     unsupportedFeatures: []
   - case:
       async: false
+      features:
+        - generators
+      flags: []
+      includes: []
+      mode: script
+      path: test/language/statements/class/definition/methods-gen-yield-newline.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - classes
+      - expression-operators
+      - functions
+      - generators
+      - lexical-grammar
+      - object-properties
+      - var-bindings
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: true
+      features:
+        - class
+        - class-methods-private
+        - async-iteration
+      flags:
+        - generated
+        - async
+      includes: []
+      mode: script
+      path: test/language/statements/class/dstr/async-private-gen-meth-ary-ptrn-rest-id.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - async-functions
+      - async-iteration
+      - classes
+      - destructuring-bindings
+      - expression-operators
+      - functions
+      - iterator-protocol
+      - object-properties
+      - promise-settlement
+      - symbols
+      - var-bindings
+    execution:
+      harnessIncludes:
+        - base.js
+        - doneprintHandle.js
+      scheduler: deterministic-logical-clock
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: true
+      features:
+        - object-rest
+        - class
+        - class-static-methods-private
+        - async-iteration
+      flags:
+        - generated
+        - async
+      includes:
+        - propertyHelper.js
+      mode: script
+      path: test/language/statements/class/dstr/async-private-gen-meth-static-dflt-obj-ptrn-rest-getter.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - async-functions
+      - async-iteration
+      - classes
+      - default-parameters
+      - destructuring-bindings
+      - expression-operators
+      - functions
+      - object-literals
+      - object-own-keys
+      - object-properties
+      - promise-settlement
+      - var-bindings
+    execution:
+      harnessIncludes:
+        - base.js
+        - doneprintHandle.js
+        - propertyHelper.js
+      scheduler: deterministic-logical-clock
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - Symbol.iterator
+        - generators
+        - destructuring-binding
+        - default-parameters
+      flags:
+        - generated
+      includes: []
+      mode: script
+      path: test/language/statements/class/dstr/gen-meth-static-dflt-ary-init-iter-no-close.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - classes
+      - default-parameters
+      - destructuring-bindings
+      - expression-operators
+      - functions
+      - generators
+      - iterator-protocol
+      - object-literals
+      - object-properties
+      - symbols
+      - var-bindings
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - generators
+        - destructuring-binding
+        - default-parameters
+      flags:
+        - generated
+      includes: []
+      mode: script
+      path: test/language/statements/class/dstr/gen-meth-static-dflt-obj-ptrn-prop-obj-value-undef.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - abrupt-completion
+      - classes
+      - default-parameters
+      - destructuring-bindings
+      - error-intrinsics
+      - functions
+      - generators
+      - object-literals
+      - object-properties
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - destructuring-binding
+      flags:
+        - generated
+      includes: []
+      mode: script
+      path: test/language/statements/class/dstr/meth-static-ary-ptrn-elem-ary-val-null.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - abrupt-completion
+      - classes
+      - destructuring-bindings
+      - error-intrinsics
+      - functions
+      - iterator-protocol
+      - object-properties
+      - symbols
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - class
+        - class-fields-public
+        - class-fields-private
+      flags:
+        - generated
+      includes: []
+      mode: script
+      path: test/language/statements/class/elements/arrow-body-private-derived-cls-direct-eval-contains-superproperty-2.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - classes
+      - dynamic-source
+      - functions
+      - object-properties
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+    observation:
+      detail: 'test/language/statements/class/elements/arrow-body-private-derived-cls-direct-eval-contains-superproperty-2.js
+        non-strict disabled failed (1): stdout=""
+        stderr="test/language/statements/class/elements/arrow-body-private-derived-cls-direct-eval-contains-superproperty-2.js:101:8:
+        error[OSEO1001]: eval compiles source text at run time, which is
+        outside the admitted profile.\n"'
+      passed: false
+      unsupportedCapability: profile-syntax
+    unsupportedFeatures: []
+  - case:
+      async: true
+      features:
+        - async-iteration
+        - class-static-methods-private
+      flags:
+        - generated
+        - async
+      includes: []
+      mode: script
+      path: test/language/statements/class/elements/async-gen-private-method-static/yield-star-expr-abrupt.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - abrupt-completion
+      - async-iteration
+      - classes
+      - destructuring-bindings
+      - expression-operators
+      - functions
+      - object-literals
+      - object-properties
+      - promise-settlement
+      - var-bindings
+    execution:
+      harnessIncludes:
+        - base.js
+        - doneprintHandle.js
+      scheduler: deterministic-logical-clock
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: true
+      features:
+        - Symbol.iterator
+        - Symbol.asyncIterator
+        - async-iteration
+        - class-static-methods-private
+      flags:
+        - generated
+        - async
+      includes: []
+      mode: script
+      path: test/language/statements/class/elements/async-gen-private-method-static/yield-star-next-not-callable-string-throw.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - abrupt-completion
+      - async-iteration
+      - classes
+      - destructuring-bindings
+      - error-intrinsics
+      - expression-operators
+      - functions
+      - iterator-protocol
+      - object-literals
+      - object-properties
+      - promise-settlement
+      - symbols
+      - var-bindings
+    execution:
+      harnessIncludes:
+        - base.js
+        - doneprintHandle.js
+      scheduler: deterministic-logical-clock
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: true
+      features:
+        - Symbol.iterator
+        - Symbol.asyncIterator
+        - async-iteration
+        - class-methods-private
+      flags:
+        - generated
+        - async
+      includes: []
+      mode: script
+      path: test/language/statements/class/elements/async-gen-private-method/yield-star-getiter-async-not-callable-symbol-throw.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - abrupt-completion
+      - async-iteration
+      - classes
+      - destructuring-bindings
+      - error-intrinsics
+      - expression-operators
+      - functions
+      - iterator-protocol
+      - lexical-bindings
+      - object-literals
+      - object-properties
+      - promise-settlement
+      - symbols
+      - var-bindings
+    execution:
+      harnessIncludes:
+        - base.js
+        - doneprintHandle.js
+      scheduler: deterministic-logical-clock
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - class-fields-private
+        - class
+        - class-fields-public
+      flags:
+        - generated
+      includes:
+        - propertyHelper.js
+      mode: script
+      path: test/language/statements/class/elements/multiple-definitions-rs-privatename-identifier-initializer-alt.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - classes
+      - expression-operators
+      - functions
+      - lexical-grammar
+      - object-properties
+      - var-bindings
+    execution:
+      harnessIncludes:
+        - base.js
+        - propertyHelper.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - class
+        - class-static-methods-private
+      flags:
+        - generated
+      includes: []
+      mode: script
+      path: test/language/statements/class/elements/private-accessor-name/static-private-name-u2118.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - classes
+      - expression-operators
+      - functions
+      - lexical-grammar
+      - object-properties
+      - var-bindings
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
       expectedErrorType: SyntaxError
       expectedFailurePhase: parse
       features:
@@ -200,6 +723,55 @@ results:
   - case:
       async: true
       features:
+        - generators
+        - destructuring-binding
+        - async-iteration
+      flags:
+        - generated
+        - async
+      includes: []
+      mode: script
+      path: test/language/statements/for-await-of/async-func-dstr-const-async-ary-ptrn-elem-ary-empty-init.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - async-functions
+      - async-iteration
+      - control-flow
+      - destructuring-bindings
+      - expression-operators
+      - functions
+      - generators
+      - iterator-protocol
+      - lexical-bindings
+      - object-properties
+      - promise-settlement
+      - symbols
+      - var-bindings
+    execution:
+      harnessIncludes:
+        - base.js
+        - doneprintHandle.js
+      scheduler: deterministic-logical-clock
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: true
+      features:
         - Symbol.iterator
         - destructuring-binding
         - async-iteration
@@ -228,6 +800,327 @@ results:
         - base.js
         - doneprintHandle.js
       scheduler: deterministic-logical-clock
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: true
+      features:
+        - generators
+        - destructuring-binding
+        - async-iteration
+      flags:
+        - generated
+        - async
+      includes: []
+      mode: script
+      path: test/language/statements/for-await-of/async-func-dstr-var-async-ary-ptrn-elem-ary-elision-iter.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - async-functions
+      - async-iteration
+      - control-flow
+      - destructuring-bindings
+      - expression-operators
+      - functions
+      - generators
+      - iterator-protocol
+      - object-properties
+      - promise-settlement
+      - symbols
+      - var-bindings
+    execution:
+      harnessIncludes:
+        - base.js
+        - doneprintHandle.js
+      scheduler: deterministic-logical-clock
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: true
+      features:
+        - object-rest
+        - destructuring-binding
+        - async-iteration
+      flags:
+        - generated
+        - async
+      includes:
+        - propertyHelper.js
+      mode: script
+      path: test/language/statements/for-await-of/async-gen-dstr-const-obj-ptrn-rest-skip-non-enumerable.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - async-functions
+      - async-iteration
+      - control-flow
+      - destructuring-bindings
+      - expression-operators
+      - functions
+      - generators
+      - iterator-protocol
+      - lexical-bindings
+      - object-literals
+      - object-own-keys
+      - object-properties
+      - promise-settlement
+      - symbols
+      - var-bindings
+    execution:
+      harnessIncludes:
+        - base.js
+        - doneprintHandle.js
+        - propertyHelper.js
+      scheduler: deterministic-logical-clock
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: true
+      features:
+        - generators
+        - destructuring-binding
+        - async-iteration
+      flags:
+        - generated
+        - async
+      includes: []
+      mode: script
+      path: test/language/statements/for-await-of/async-gen-dstr-let-ary-ptrn-elision.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - async-functions
+      - async-iteration
+      - control-flow
+      - destructuring-bindings
+      - expression-operators
+      - functions
+      - generators
+      - iterator-protocol
+      - lexical-bindings
+      - object-properties
+      - promise-settlement
+      - symbols
+      - var-bindings
+    execution:
+      harnessIncludes:
+        - base.js
+        - doneprintHandle.js
+      scheduler: deterministic-logical-clock
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: true
+      features:
+        - destructuring-binding
+        - async-iteration
+      flags:
+        - generated
+        - async
+      includes: []
+      mode: script
+      path: test/language/statements/for-await-of/async-gen-dstr-var-ary-ptrn-elem-obj-prop-id.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - abrupt-completion
+      - async-functions
+      - async-iteration
+      - control-flow
+      - destructuring-bindings
+      - error-intrinsics
+      - expression-operators
+      - functions
+      - generators
+      - iterator-protocol
+      - object-literals
+      - object-properties
+      - promise-settlement
+      - symbols
+      - var-bindings
+    execution:
+      harnessIncludes:
+        - base.js
+        - doneprintHandle.js
+      scheduler: deterministic-logical-clock
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - generators
+      flags: []
+      includes: []
+      mode: script
+      path: test/language/statements/for-of/break-from-try.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - abrupt-completion
+      - control-flow
+      - expression-operators
+      - functions
+      - generators
+      - iterator-protocol
+      - object-properties
+      - symbols
+      - var-bindings
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - let
+        - destructuring-binding
+      flags:
+        - generated
+      includes: []
+      mode: script
+      path: test/language/statements/for-of/dstr/array-elem-put-let.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - abrupt-completion
+      - control-flow
+      - destructuring-bindings
+      - error-intrinsics
+      - functions
+      - iterator-protocol
+      - lexical-bindings
+      - object-properties
+      - symbols
+      - var-bindings
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - destructuring-binding
+      flags:
+        - generated
+      includes: []
+      mode: script
+      path: test/language/statements/for-of/dstr/array-empty-val-null.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - abrupt-completion
+      - control-flow
+      - destructuring-bindings
+      - error-intrinsics
+      - functions
+      - iterator-protocol
+      - object-properties
+      - symbols
+      - var-bindings
+    execution:
+      harnessIncludes:
+        - base.js
       target: linux-x86_64-gnu
       variants:
         - specialization: disabled

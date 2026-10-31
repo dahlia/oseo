@@ -4,8 +4,8 @@ Observation batch 23: reviewed admission
 Focused executeTest262Case observations on base
 `68b026bb8275b9b7ddd15b9bdd02ef90ef3b123f` cover all 273 selected paths
 exactly once. Results: 218 pass, 33 expected-negative, 20
-unsupported-profile-feature, and 2 semantic failures. Admit 271 paths;
-retain 2 unreviewed originals below.
+unsupported-profile-feature, and 2 semantic failures. That admission
+covered 271 paths and retained two unreviewed originals, tracked below.
 
 The pinned native executor uses target linux-x86\_64-gnu with the stock
 fragment emitter and whole-CLI fallback. Cases ran serially, with one case
@@ -72,17 +72,17 @@ exclusion or equivalent replacement is claimed. ADR 0013, ADR 0016 and
 ADR 0019 remain unchanged.
 
 
-Unreviewed follow-ups
----------------------
+Original follow-ups
+-------------------
 
- -  [*default-constructor-spread-override.js*]:
-    `default-derived-constructor-spread-iterator` remediation; retain batch
-    ownership.
+ -  `default-derived-constructor-spread-iterator` U2 admission now records
+    a fresh pass under Root's D3 direction. The ledger owner is
+    `observation`; Root's bundled Full UPDATE and publication remain.
+    The node work note binds the unchanged source and four variants.
  -  `test/language/statements/class/syntax/escaped-static.js`:
-    `class-static-keyword-escape-early-error` remediation; retain batch
-    ownership.
-
-[*default-constructor-spread-override.js*]: https://github.com/tc39/test262/blob/f2d1435644797268dca1f7988cad5a4e89ccd8d2/test/language/statements/class/subclass/default-constructor-spread-override.js
+    `class-static-keyword-escape-early-error` U2 admission now records a
+    fresh expected-negative. The ledger owner is `observation`; Root's
+    bundled Full UPDATE and publication remain.
 
 
 Scoped UPDATE agreement
@@ -204,3 +204,22 @@ CreateDynamicFunction contract. The earlier paragraph records the audit
 that was performed; later rounds found and corrected further omissions,
 so it does not establish complete or clean tag coverage. This batch has
 0 dependency rows changed by this correction.
+
+
+Class keyword follow-up admission
+---------------------------------
+
+The original holding list above describes the earlier train. Fresh
+parse-only observations on semantic U
+`6c24a75ac6980acae62ff90f8ea01514d924f0eb` close
+*test/language/statements/class/syntax/escaped-static.js* as an expected
+negative under both strictness modes. The authorized U2 adds its canonical
+record with `classes` and `lexical-grammar`, and moves its ledger owner to
+`observation`. No earlier batch row, tag or observation changes.
+
+The default-derived-constructor original remains unreviewed under this
+batch in this branch. The
+[*class keyword work note*](./class-static-keyword-escape-early-error.md)
+records the tag self-audit and focused packet. Root's D3 decision requires a
+combined Full after the semantic bundle lands; neither this bootstrap
+admission nor the historical scoped UPDATE substitutes for that run.

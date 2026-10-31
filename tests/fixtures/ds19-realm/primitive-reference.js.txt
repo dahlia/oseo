@@ -1,0 +1,58 @@
+// Fixed DS-19 non-source witnesses, derived from pinned Test262.
+// Foreign source is collected before native emission under ADR 0029.
+// Replacement for test/language/types/reference/get-value-prop-base-primitive-realm.js
+// Copyright (C) 2016 the V8 project authors. All rights reserved.
+// This code is governed by the BSD license found in the LICENSE file.
+(function () {
+var other = $262.createRealm().global;
+
+other.Number.prototype.test262 = 'number prototype';
+other.value = 1;
+assert.sameValue(other.$262.evalScript('value.test262'), 'number prototype');
+
+other.String.prototype.test262 = 'string prototype';
+other.value = '';
+assert.sameValue(other.$262.evalScript('value.test262'), 'string prototype');
+
+other.Boolean.prototype.test262 = 'Boolean prototype';
+other.value = true;
+assert.sameValue(other.$262.evalScript('value.test262'), 'Boolean prototype');
+
+other.Symbol.prototype.test262 = 'Symbol prototype';
+other.value = Symbol();
+assert.sameValue(other.$262.evalScript('value.test262'), 'Symbol prototype');
+})();
+
+// Replacement for test/language/types/reference/put-value-prop-base-primitive-realm.js
+// Copyright (C) 2016 the V8 project authors. All rights reserved.
+// This code is governed by the BSD license found in the LICENSE file.
+(function () {
+var other = $262.createRealm().global;
+var numberCount = 0;
+var stringCount = 0;
+var booleanCount = 0;
+var symbolCount = 0;
+var spy;
+
+spy = new Proxy({}, { set: function() { numberCount += 1; return true; } });
+Object.setPrototypeOf(other.Number.prototype, spy);
+other.$262.evalScript('0..test262 = null;');
+assert.sameValue(numberCount, 1, 'number');
+
+spy = new Proxy({}, { set: function() { stringCount += 1; return true; } });
+Object.setPrototypeOf(other.String.prototype, spy);
+other.$262.evalScript('"".test262 = null;');
+assert.sameValue(stringCount, 1, 'string');
+
+spy = new Proxy({}, { set: function() { booleanCount += 1; return true; } });
+Object.setPrototypeOf(other.Boolean.prototype, spy);
+other.$262.evalScript('true.test262 = null;');
+assert.sameValue(booleanCount, 1, 'string');
+
+spy = new Proxy({}, { set: function() { symbolCount += 1; return true; } });
+Object.setPrototypeOf(other.Symbol.prototype, spy);
+other.$262.evalScript('Symbol().test262 = null;');
+assert.sameValue(symbolCount, 1, 'string');
+})();
+
+console.log("DS19 primitive-reference complete");

@@ -835,3 +835,38 @@ OseoResult oseo_super_set(
     if (result.status != OSEO_STATUS_NORMAL || refusal == NULL) return result;
     return strict ? type_error(context, refusal) : normal(value);
 }
+
+/* Inputs remain in the generated frame until the operation completes. */
+void oseo_generated_property_key(
+    OseoContext *context, OseoValue input,
+    OseoResult *result, OseoValue *output
+) {
+    *result = oseo_property_key(context, input);
+    *output = result->value;
+}
+
+void oseo_generated_property_get(
+    OseoContext *context, OseoValue object, OseoValue key,
+    OseoResult *result, OseoValue *output
+) {
+    *result = oseo_object_get(context, object, key);
+    *output = result->value;
+}
+
+void oseo_generated_property_key_at(
+    OseoContext *context, OseoValue *roots,
+    const OseoGeneratedOperation *operation, OseoResult *result
+) {
+    oseo_generated_operation_location(context, operation);
+    oseo_generated_property_key(context, roots[operation->first],
+        result, &roots[operation->output]);
+}
+
+void oseo_generated_property_get_at(
+    OseoContext *context, OseoValue *roots,
+    const OseoGeneratedOperation *operation, OseoResult *result
+) {
+    oseo_generated_operation_location(context, operation);
+    oseo_generated_property_get(context, roots[operation->first],
+        roots[operation->second], result, &roots[operation->output]);
+}

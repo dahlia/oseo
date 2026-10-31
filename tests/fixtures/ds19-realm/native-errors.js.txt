@@ -1,0 +1,201 @@
+// Fixed DS-19 non-source witnesses, derived from pinned Test262.
+// Foreign source is collected before native emission under ADR 0029.
+// Replacement for test/built-ins/NativeErrors/EvalError/proto-from-ctor-realm.js
+// Copyright (C) 2019 Alexey Shvayka. All rights reserved.
+// This code is governed by the BSD license found in the LICENSE file.
+(function () {
+var other = $262.createRealm().global;
+var newTarget = other.$262.evalScript("(function(){})");
+var err;
+
+newTarget.prototype = undefined;
+err = Reflect.construct(EvalError, [], newTarget);
+assert.sameValue(Object.getPrototypeOf(err), other.EvalError.prototype, 'newTarget.prototype is undefined');
+
+newTarget.prototype = null;
+err = Reflect.construct(EvalError, [], newTarget);
+assert.sameValue(Object.getPrototypeOf(err), other.EvalError.prototype, 'newTarget.prototype is null');
+
+newTarget.prototype = false;
+err = Reflect.construct(EvalError, [], newTarget);
+assert.sameValue(Object.getPrototypeOf(err), other.EvalError.prototype, 'newTarget.prototype is a Boolean');
+
+newTarget.prototype = 'str';
+err = Reflect.construct(EvalError, [], newTarget);
+assert.sameValue(Object.getPrototypeOf(err), other.EvalError.prototype, 'newTarget.prototype is a String');
+
+newTarget.prototype = Symbol();
+err = Reflect.construct(EvalError, [], newTarget);
+assert.sameValue(Object.getPrototypeOf(err), other.EvalError.prototype, 'newTarget.prototype is a Symbol');
+
+newTarget.prototype = 0;
+err = Reflect.construct(EvalError, [], newTarget);
+assert.sameValue(Object.getPrototypeOf(err), other.EvalError.prototype, 'newTarget.prototype is a Number');
+})();
+
+// Replacement for test/built-ins/NativeErrors/RangeError/proto-from-ctor-realm.js
+// Copyright (C) 2019 Alexey Shvayka. All rights reserved.
+// This code is governed by the BSD license found in the LICENSE file.
+(function () {
+var other = $262.createRealm().global;
+var newTarget = other.$262.evalScript("(function(){})");
+var err;
+
+newTarget.prototype = undefined;
+err = Reflect.construct(RangeError, [], newTarget);
+assert.sameValue(Object.getPrototypeOf(err), other.RangeError.prototype, 'newTarget.prototype is undefined');
+
+newTarget.prototype = null;
+err = Reflect.construct(RangeError, [], newTarget);
+assert.sameValue(Object.getPrototypeOf(err), other.RangeError.prototype, 'newTarget.prototype is null');
+
+newTarget.prototype = true;
+err = Reflect.construct(RangeError, [], newTarget);
+assert.sameValue(Object.getPrototypeOf(err), other.RangeError.prototype, 'newTarget.prototype is a Boolean');
+
+newTarget.prototype = '';
+err = Reflect.construct(RangeError, [], newTarget);
+assert.sameValue(Object.getPrototypeOf(err), other.RangeError.prototype, 'newTarget.prototype is a String');
+
+newTarget.prototype = Symbol();
+err = Reflect.construct(RangeError, [], newTarget);
+assert.sameValue(Object.getPrototypeOf(err), other.RangeError.prototype, 'newTarget.prototype is a Symbol');
+
+newTarget.prototype = -0;
+err = Reflect.construct(RangeError, [], newTarget);
+assert.sameValue(Object.getPrototypeOf(err), other.RangeError.prototype, 'newTarget.prototype is a Number');
+})();
+
+// Replacement for test/built-ins/NativeErrors/ReferenceError/proto-from-ctor-realm.js
+// Copyright (C) 2019 Alexey Shvayka. All rights reserved.
+// This code is governed by the BSD license found in the LICENSE file.
+(function () {
+var other = $262.createRealm().global;
+var newTarget = other.$262.evalScript("(function(){})");
+var err;
+
+newTarget.prototype = undefined;
+err = Reflect.construct(ReferenceError, [], newTarget);
+assert.sameValue(Object.getPrototypeOf(err), other.ReferenceError.prototype, 'newTarget.prototype is undefined');
+
+newTarget.prototype = null;
+err = Reflect.construct(ReferenceError, [], newTarget);
+assert.sameValue(Object.getPrototypeOf(err), other.ReferenceError.prototype, 'newTarget.prototype is null');
+
+newTarget.prototype = false;
+err = Reflect.construct(ReferenceError, [], newTarget);
+assert.sameValue(Object.getPrototypeOf(err), other.ReferenceError.prototype, 'newTarget.prototype is a Boolean');
+
+newTarget.prototype = 'str';
+err = Reflect.construct(ReferenceError, [], newTarget);
+assert.sameValue(Object.getPrototypeOf(err), other.ReferenceError.prototype, 'newTarget.prototype is a String');
+
+newTarget.prototype = Symbol();
+err = Reflect.construct(ReferenceError, [], newTarget);
+assert.sameValue(Object.getPrototypeOf(err), other.ReferenceError.prototype, 'newTarget.prototype is a Symbol');
+
+newTarget.prototype = NaN;
+err = Reflect.construct(ReferenceError, [], newTarget);
+assert.sameValue(Object.getPrototypeOf(err), other.ReferenceError.prototype, 'newTarget.prototype is a Number');
+})();
+
+// Replacement for test/built-ins/NativeErrors/SyntaxError/proto-from-ctor-realm.js
+// Copyright (C) 2019 Alexey Shvayka. All rights reserved.
+// This code is governed by the BSD license found in the LICENSE file.
+(function () {
+var other = $262.createRealm().global;
+var newTarget = other.$262.evalScript("(function(){})");
+var err;
+
+newTarget.prototype = undefined;
+err = Reflect.construct(SyntaxError, [], newTarget);
+assert.sameValue(Object.getPrototypeOf(err), other.SyntaxError.prototype, 'newTarget.prototype is undefined');
+
+newTarget.prototype = null;
+err = Reflect.construct(SyntaxError, [], newTarget);
+assert.sameValue(Object.getPrototypeOf(err), other.SyntaxError.prototype, 'newTarget.prototype is null');
+
+newTarget.prototype = true;
+err = Reflect.construct(SyntaxError, [], newTarget);
+assert.sameValue(Object.getPrototypeOf(err), other.SyntaxError.prototype, 'newTarget.prototype is a Boolean');
+
+newTarget.prototype = '';
+err = Reflect.construct(SyntaxError, [], newTarget);
+assert.sameValue(Object.getPrototypeOf(err), other.SyntaxError.prototype, 'newTarget.prototype is a String');
+
+newTarget.prototype = Symbol();
+err = Reflect.construct(SyntaxError, [], newTarget);
+assert.sameValue(Object.getPrototypeOf(err), other.SyntaxError.prototype, 'newTarget.prototype is a Symbol');
+
+newTarget.prototype = Infinity;
+err = Reflect.construct(SyntaxError, [], newTarget);
+assert.sameValue(Object.getPrototypeOf(err), other.SyntaxError.prototype, 'newTarget.prototype is a Number');
+})();
+
+// Replacement for test/built-ins/NativeErrors/TypeError/proto-from-ctor-realm.js
+// Copyright (C) 2019 Alexey Shvayka. All rights reserved.
+// This code is governed by the BSD license found in the LICENSE file.
+(function () {
+var other = $262.createRealm().global;
+var newTarget = other.$262.evalScript("(function(){})");
+var err;
+
+newTarget.prototype = undefined;
+err = Reflect.construct(TypeError, [], newTarget);
+assert.sameValue(Object.getPrototypeOf(err), other.TypeError.prototype, 'newTarget.prototype is undefined');
+
+newTarget.prototype = null;
+err = Reflect.construct(TypeError, [], newTarget);
+assert.sameValue(Object.getPrototypeOf(err), other.TypeError.prototype, 'newTarget.prototype is null');
+
+newTarget.prototype = false;
+err = Reflect.construct(TypeError, [], newTarget);
+assert.sameValue(Object.getPrototypeOf(err), other.TypeError.prototype, 'newTarget.prototype is a Boolean');
+
+newTarget.prototype = 'str';
+err = Reflect.construct(TypeError, [], newTarget);
+assert.sameValue(Object.getPrototypeOf(err), other.TypeError.prototype, 'newTarget.prototype is a String');
+
+newTarget.prototype = Symbol();
+err = Reflect.construct(TypeError, [], newTarget);
+assert.sameValue(Object.getPrototypeOf(err), other.TypeError.prototype, 'newTarget.prototype is a Symbol');
+
+newTarget.prototype = -Infinity;
+err = Reflect.construct(TypeError, [], newTarget);
+assert.sameValue(Object.getPrototypeOf(err), other.TypeError.prototype, 'newTarget.prototype is a Number');
+})();
+
+// Replacement for test/built-ins/NativeErrors/URIError/proto-from-ctor-realm.js
+// Copyright (C) 2019 Alexey Shvayka. All rights reserved.
+// This code is governed by the BSD license found in the LICENSE file.
+(function () {
+var other = $262.createRealm().global;
+var newTarget = other.$262.evalScript("(function(){})");
+var err;
+
+newTarget.prototype = undefined;
+err = Reflect.construct(URIError, [], newTarget);
+assert.sameValue(Object.getPrototypeOf(err), other.URIError.prototype, 'newTarget.prototype is undefined');
+
+newTarget.prototype = null;
+err = Reflect.construct(URIError, [], newTarget);
+assert.sameValue(Object.getPrototypeOf(err), other.URIError.prototype, 'newTarget.prototype is null');
+
+newTarget.prototype = true;
+err = Reflect.construct(URIError, [], newTarget);
+assert.sameValue(Object.getPrototypeOf(err), other.URIError.prototype, 'newTarget.prototype is a Boolean');
+
+newTarget.prototype = '';
+err = Reflect.construct(URIError, [], newTarget);
+assert.sameValue(Object.getPrototypeOf(err), other.URIError.prototype, 'newTarget.prototype is a String');
+
+newTarget.prototype = Symbol();
+err = Reflect.construct(URIError, [], newTarget);
+assert.sameValue(Object.getPrototypeOf(err), other.URIError.prototype, 'newTarget.prototype is a Symbol');
+
+newTarget.prototype = 0;
+err = Reflect.construct(URIError, [], newTarget);
+assert.sameValue(Object.getPrototypeOf(err), other.URIError.prototype, 'newTarget.prototype is a Number');
+})();
+
+console.log("DS19 native-errors complete");

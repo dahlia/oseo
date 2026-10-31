@@ -47,6 +47,7 @@ results:
     classification: unsupported-profile-feature
     dependencies:
       - date
+      - dynamic-source
       - functions
       - reflect-namespace
     execution:

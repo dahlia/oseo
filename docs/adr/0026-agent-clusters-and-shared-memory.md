@@ -193,8 +193,33 @@ because it runs under this real-clock cluster rather than the
 `deterministic-logical-clock` scheduler of ADR 0013. The manifest schema and
 classification vocabulary are unchanged. The reviewed *atomicsHelper.js* is
 the upstream helper except that `$262.agent.setTimeout` forwards to the host
-timer, which this profile reaches only as a call target. A `CanBlockIsFalse`
-case keeps the `non-blocking-agent` capability.
+timer, which this profile reaches only as a call target.
+
+**Main-agent blocking policy (M5c).** The main agent defaults to
+`[[CanBlock]]` true. The reviewed runner selects false for a
+`CanBlockIsFalse` case through `--test262-host --test262-non-blocking`.
+The latter option requires the Script host; it does not admit a new module
+host or a JavaScript override. The compiler carries `mainAgentCanBlock`
+through the host MIR record to generated setup of the runtime context's
+`agent_can_block` field before the main Script executes. Every child agent
+initializes its own context with true. All realms of an agent share the
+policy of that context, including calls to another realm's Atomics object.
+
+`Atomics.wait` validates the shared waitable view and index, converts its
+expected value and timeout, then throws a TypeError when the executing
+agent cannot block. This check precedes the memory comparison, including
+mismatching values and zero timeouts. Abrupt argument conversions keep
+their original precedence. `Atomics.waitAsync`, child-agent waits, and
+ordinary blocking execution retain their existing behavior. Runtime ABI
+`m5-145` records the context layout change. This amendment changes no
+manifest vocabulary or ADR 0013/0016/0019 boundary.
+
+The focused contract evidence is
+*packages/cli/tests/non-blocking-agent.test.ts*,
+*tests/non-blocking-agent-native.test.ts*,
+*tests/native/fixtures/non-blocking-agent.ts*, and
+*tests/property/m5-non-blocking-agent.property.test.ts*. Root's bundle 3 Full
+UPDATE observed both owned reviewed rows as pass.
 
 
 Consequences

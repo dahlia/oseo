@@ -1,0 +1,847 @@
+version: 1
+suiteRevision: "f2d1435644797268dca1f7988cad5a4e89ccd8d2"
+base: "362ddb13d933600f6a0543ac332eb8479be9053f"
+selectorSha256: "dbd8987dc7547f584c51d4e5ab50e0f74fb3c865e0e79cad3468ea62d2a\
+  1716c"
+selected: 57
+closed: 24
+staying: 33
+evidenceAdded:
+  staticNegativeGroups: 8
+  structuralGroups: 1
+  nativeFixtureGroups: 1
+  nativeObservationLines: 6
+  stringResultMutations: 7
+qualification: >-
+  Each row was read separately. Evidence is new unless named; no existing
+  reviewed passing path was established as a complete witness for these
+  contracts. New witnesses close only the ordinary static subjects named per
+  row; conversion/subclass interactions remain open. No subset, result,
+  dependency tag, inventory or ADR edit. All 17 printed primitive
+  observations pass Object.is before formatting; seven string-result
+  mutations must throw.
+replacementEvidence:
+  tests/construction-static-contracts.test.ts: "428628247b099d6e74148a5590f2\
+    4966b2f41a0ebe9cabe4a5454e61063d6b54"
+  tests/native/fixtures/construction-static-contracts.ts: "784b3e71396e5f40e\
+    33a5b3cbe52a3ec28b59cdba905431d1e8e0c1d929ae6b6"
+  tests/native.ts: "73f887cf52020a7eff851c130c0df6477ba06267629abcc324f9be78\
+    e266cae0"
+paths:
+  - path: "test/built-ins/Function/15.3.2.1-10-6gs.js"
+    sourceDigest: "65f19e5b986f34401d1185edfc8ed2d18f0ee4606a7c709c4fb1ec7e6\
+      0d781a9"
+    subject: >-
+      Local strict body rejects non-adjacent duplicate parameter names.
+    replacementObservation: "separated duplicate strict"
+    disposition: "exclusion"
+    reason: >-
+      Ordinary static function grammar is witnessed; caller independence,
+      parameter-string concatenation and source compilation are
+      CreateDynamicFunction-only residue.
+    normativeSection: "15.3.2.1-10-6gs"
+    observationDigest: "84241e8d07af78679c66d2fcc8f1cafd3540c3603bfea3340059\
+      701d13a2c568"
+  - path: "test/built-ins/Function/15.3.2.1-11-1-s.js"
+    sourceDigest: "0f04348d109c895c067024df960b868bcdbd0cc61c8c12651dc4843fa\
+      648eedf"
+    subject: "Local strict body rejects separate duplicate parameter names."
+    replacementObservation: "adjacent duplicate strict"
+    disposition: "exclusion"
+    reason: >-
+      Ordinary static function grammar is witnessed; caller independence,
+      parameter-string concatenation and source compilation are
+      CreateDynamicFunction-only residue.
+    normativeSection: "15.3.2.1-11-1-s"
+    observationDigest: "9bfdde1b70beeb93b6dc06fa70107c0ac62f9b30088831f7c775\
+      dc35b893d805"
+  - path: "test/built-ins/Function/15.3.2.1-11-1.js"
+    sourceDigest: "adf6d2ae368b5c49e3c5e08c334383af60cc90bbb5ebe4b6eb770cac7\
+      6f2db8a"
+    subject: "Sloppy body accepts separate duplicate parameter names."
+    replacementObservation: "Object.is before print: duplicates 3 2 3"
+    disposition: "exclusion"
+    reason: >-
+      Ordinary static function grammar is witnessed; caller independence,
+      parameter-string concatenation and source compilation are
+      CreateDynamicFunction-only residue.
+    normativeSection: "15.3.2.1-11-1"
+    observationDigest: "02e2581672cd19695e9a5547d3688fdb49ff94e8ae5de8ad8fc0\
+      7ae750716ac0"
+  - path: "test/built-ins/Function/15.3.2.1-11-2-s.js"
+    sourceDigest: "094bb020ce154bc34192855342136badec91594b7c22f5541ad7cafa7\
+      65b1eea"
+    subject: >-
+      A strict caller does not make constructed duplicate-parameter source
+      strict.
+    replacementObservation: "Object.is before print: duplicates 3 2 3"
+    disposition: "exclusion"
+    reason: >-
+      Ordinary static function grammar is witnessed; caller independence,
+      parameter-string concatenation and source compilation are
+      CreateDynamicFunction-only residue.
+    normativeSection: "15.3.2.1-11-2-s"
+    observationDigest: "a6eabf8c335ba7094f51d110e7fece6fa1574da38d1bb7314823\
+      4460a3955056"
+  - path: "test/built-ins/Function/15.3.2.1-11-3-s.js"
+    sourceDigest: "06c10eb321c764889d607c326b824f6fd2f818942ce57c1ba05ed9832\
+      2d105ea"
+    subject: "Local strict body rejects the parameter name eval."
+    replacementObservation: "eval strict"
+    disposition: "exclusion"
+    reason: >-
+      Ordinary static function grammar is witnessed; caller independence,
+      parameter-string concatenation and source compilation are
+      CreateDynamicFunction-only residue.
+    normativeSection: "15.3.2.1-11-3-s"
+    observationDigest: "b06e799eaa4efd761d343817af09814404b6a3e86679494dd5b7\
+      c221f45c13b2"
+  - path: "test/built-ins/Function/15.3.2.1-11-3.js"
+    sourceDigest: "8cfe951f639203f37b25fc42617562e7cb496ec4db910fbcc9f3ff005\
+      4a5eca9"
+    subject: "Sloppy body accepts the parameter name eval."
+    replacementObservation: "Object.is before print: names 4 5"
+    disposition: "exclusion"
+    reason: >-
+      Ordinary static function grammar is witnessed; caller independence,
+      parameter-string concatenation and source compilation are
+      CreateDynamicFunction-only residue.
+    normativeSection: "15.3.2.1-11-3"
+    observationDigest: "80bf6c1a88458514f4bb5f7fe7fb0d353cc7ec01140a06369129\
+      4dc210852eb3"
+  - path: "test/built-ins/Function/15.3.2.1-11-4-s.js"
+    sourceDigest: "680fb83202d7ff828cc08b96b673b65cf9d6ec9d0063733d6ca7b34c9\
+      f2cf82b"
+    subject: >-
+      A strict caller does not make constructed eval-parameter source
+      strict.
+    replacementObservation: "Object.is before print: names 4 5"
+    disposition: "exclusion"
+    reason: >-
+      Ordinary static function grammar is witnessed; caller independence,
+      parameter-string concatenation and source compilation are
+      CreateDynamicFunction-only residue.
+    normativeSection: "15.3.2.1-11-4-s"
+    observationDigest: "23e1677166d67c50edadcd1411c319065e41ed705226782c4a52\
+      c36a20d89b1c"
+  - path: "test/built-ins/Function/15.3.2.1-11-5-s.js"
+    sourceDigest: "07ff29e0033c729dd043c7602432515d3af2a4317d7a543ed4d8901e0\
+      8169e18"
+    subject: >-
+      Local strict body rejects duplicates in one combined parameter string.
+    replacementObservation: "adjacent duplicate strict"
+    disposition: "exclusion"
+    reason: >-
+      Ordinary static function grammar is witnessed; caller independence,
+      parameter-string concatenation and source compilation are
+      CreateDynamicFunction-only residue.
+    normativeSection: "15.3.2.1-11-5-s"
+    observationDigest: "1e9c1aa00fbdc0dda909fd4620a1f596baea757128af84de5404\
+      5ae3bf9fe808"
+  - path: "test/built-ins/Function/15.3.2.1-11-5.js"
+    sourceDigest: "cf1233fcaecb69c13b5f6bc927ec9730084061fe4723d4cea60525372\
+      1737793"
+    subject: >-
+      Sloppy body accepts duplicates in one combined parameter string.
+    replacementObservation: "Object.is before print: duplicates 3 2 3"
+    disposition: "exclusion"
+    reason: >-
+      Ordinary static function grammar is witnessed; caller independence,
+      parameter-string concatenation and source compilation are
+      CreateDynamicFunction-only residue.
+    normativeSection: "15.3.2.1-11-5"
+    observationDigest: "9cc420529a497c12058579404877ad7f947c19bd2c05635a5629\
+      5e690350a416"
+  - path: "test/built-ins/Function/15.3.2.1-11-6-s.js"
+    sourceDigest: "c569c95a0299d73a5d3c43d0da011b7de7c7375a16a66778e0f78f02e\
+      0174527"
+    subject: >-
+      A strict caller does not make combined duplicate-parameter source
+      strict.
+    replacementObservation: "Object.is before print: duplicates 3 2 3"
+    disposition: "exclusion"
+    reason: >-
+      Ordinary static function grammar is witnessed; caller independence,
+      parameter-string concatenation and source compilation are
+      CreateDynamicFunction-only residue.
+    normativeSection: "15.3.2.1-11-6-s"
+    observationDigest: "c2745c77a3d4eaffc3b6695520350c3cab9c8a37a972b052c35c\
+      0e58d3437b5f"
+  - path: "test/built-ins/Function/15.3.2.1-11-7-s.js"
+    sourceDigest: "bc484ea9fdd4c8cd31bf085a417d86338a0acf37894dad7b2d158f416\
+      04afc88"
+    subject: >-
+      A strict caller does not make constructed arguments-parameter source
+      strict.
+    replacementObservation: "Object.is before print: names 4 5"
+    disposition: "exclusion"
+    reason: >-
+      Ordinary static function grammar is witnessed; caller independence,
+      parameter-string concatenation and source compilation are
+      CreateDynamicFunction-only residue.
+    normativeSection: "15.3.2.1-11-7-s"
+    observationDigest: "53eaae739dfafe7ac44370dea6358eb61c7ae1722f5da5d77098\
+      12b7ab506150"
+  - path: "test/built-ins/Function/15.3.2.1-11-8-s.js"
+    sourceDigest: "21d656be99252ac2a0dcced823e2bf78e8e3746405073614f66c9f0e7\
+      67fc03f"
+    subject: >-
+      A strict caller does not make non-adjacent duplicate-parameter source
+      strict.
+    replacementObservation: "Object.is before print: duplicates 3 2 3"
+    disposition: "exclusion"
+    reason: >-
+      Ordinary static function grammar is witnessed; caller independence,
+      parameter-string concatenation and source compilation are
+      CreateDynamicFunction-only residue.
+    normativeSection: "15.3.2.1-11-8-s"
+    observationDigest: "365ffff72ca5b0688236ee33d201b174664357a6cc557cbe04f0\
+      3cf235d8d33d"
+  - path: "test/built-ins/Function/15.3.2.1-11-9-s.js"
+    sourceDigest: "f795f13df7423eb03b5e95a43aa611f3be00dc66c76a9efde81a31053\
+      f5cdb4e"
+    subject: "Constructed sloppy body accepts three identical parameters."
+    replacementObservation: "Object.is before print: duplicates 3 2 3"
+    disposition: "exclusion"
+    reason: >-
+      Ordinary static function grammar is witnessed; caller independence,
+      parameter-string concatenation and source compilation are
+      CreateDynamicFunction-only residue.
+    normativeSection: "15.3.2.1-11-9-s"
+    observationDigest: "96c379a4cb84d791ce4b68ddd4953bfa4d43046e42ac342793dd\
+      0fdcc20404c6"
+  - path: "test/built-ins/Function/S15.3.1_A1_T1.js"
+    sourceDigest: "16aa0faa2a0ab569444109d8cf2e768cef4de1ae6467070b7f3428cad\
+      826768a"
+    subject: >-
+      Call/new forms produce Function instances returning arguments[0] for 1
+      and A.
+    replacementObservation: >-
+      Object.is before print: identity 1 A; function true true true true
+      true
+    disposition: "exclusion"
+    reason: >-
+      The exact ordinary grammar/result and Function identity are witnessed;
+      assembling only primitive String inputs into compiled source is the
+      remaining excluded step.
+    normativeSection: "15.3.1_A1_T1"
+    observationDigest: "2acffe26b0a62aa78c24589505d8a0d3d986043b13fb2a1852be\
+      b8b918aae9a5"
+  - path: "test/built-ins/Function/S15.3.2.1_A1_T1.js"
+    sourceDigest: "3f785032fa741e02ceea3d3dedeed25b718592807ae12967c432ca3d0\
+      c74d161"
+    subject: >-
+      Body object ToString throws the exact number 7 before construction.
+    replacementObservation: null
+    disposition: "remediation"
+    reason: >-
+      The throw must originate during Function body conversion; an explicit
+      String call would not witness this constructor boundary.
+    normativeSection: "15.3.2.1_A1_T1"
+    observationDigest: "e600b4ed46edd5c14f80ae862a6f73f995489647bc2d0c639890\
+      1cba14838ac9"
+  - path: "test/built-ins/Function/S15.3.2.1_A1_T10.js"
+    sourceDigest: "070c4b4a8d716be6c4876b00bb061a84b92dabfbc6ce7e6cd487d488a\
+      686231a"
+    subject: >-
+      Null body converts to an expression statement; constructor is Function
+      and call returns undefined.
+    replacementObservation: null
+    disposition: "remediation"
+    reason: >-
+      Null conversion into a parsed body is not witnessed by an empty
+      function.
+    normativeSection: "15.3.2.1_A1_T10"
+    observationDigest: "bf824758caedafd0e2f2ea36e5626f095f6a77b4f8d22b2907bc\
+      920df4e0f29d"
+  - path: "test/built-ins/Function/S15.3.2.1_A1_T11.js"
+    sourceDigest: "9ec34a42e5b28fec0b7c0914f6d066687503a6f3c54ac901c29468ac5\
+      f3ad6ee"
+    subject: >-
+      Undefined body converts to an expression statement; constructor is
+      Function and call returns undefined.
+    replacementObservation: null
+    disposition: "remediation"
+    reason: "Undefined conversion into a parsed body is not witnessed."
+    normativeSection: "15.3.2.1_A1_T11"
+    observationDigest: "820a07dcbbc2ffe8b8676838a064fb1f155cfd466af003dde0d9\
+      26e278309c66"
+  - path: "test/built-ins/Function/S15.3.2.1_A1_T12.js"
+    sourceDigest: "294743747899a4a8600b08ab9b1e0e7004e17946bc514ba59f50113e2\
+      959db52"
+    subject: >-
+      Void-zero body converts to an expression statement; constructor is
+      Function and call returns undefined.
+    replacementObservation: null
+    disposition: "remediation"
+    reason: >-
+      Void-zero evaluation and conversion into the body are not jointly
+      witnessed.
+    normativeSection: "15.3.2.1_A1_T12"
+    observationDigest: "8b3eb7aee402e553b711d07851a53103c0154de15a6094797185\
+      c907dce3b470"
+  - path: "test/built-ins/Function/S15.3.2.1_A1_T13.js"
+    sourceDigest: "dd994f362f70afa08fa593ed3d67ab4c2c960105fe904cce301d84a77\
+      12d9ab9"
+    subject: >-
+      Plain object body converts to invalid function-body text and throws
+      SyntaxError.
+    replacementObservation: null
+    disposition: "remediation"
+    reason: >-
+      The conversion-to-invalid-body interaction is not witnessed by
+      ordinary grammar rejection alone.
+    normativeSection: "15.3.2.1_A1_T13"
+    observationDigest: "b3b15759141f6b14162b7b92bf6a146f87607c830bd4c30cd5ec\
+      a1f2365d1772"
+  - path: "test/built-ins/Function/S15.3.2.1_A1_T2.js"
+    sourceDigest: "131cdeb46d75d0caf988995845ed3a44ddcda5a58eca579f2544c13ac\
+      eea5781"
+    subject: >-
+      Body object converts to return 1 source; resulting constructor is
+      Function and call returns 1.
+    replacementObservation: null
+    disposition: "remediation"
+    reason: >-
+      Object conversion must feed construction; an ordinary return-1
+      function does not witness that connection.
+    normativeSection: "15.3.2.1_A1_T2"
+    observationDigest: "36e6c1928932971c11cc92b975f646ca3bc5fae199aa7b335791\
+      6ba481714764"
+  - path: "test/built-ins/Function/S15.3.2.1_A1_T3.js"
+    sourceDigest: "279996e2be7441733d9a072f15e251871d602fd71f27408953097d38e\
+      03668da"
+    subject: >-
+      Numeric body 1 converts to an expression statement; constructor is
+      Function and call returns undefined.
+    replacementObservation: null
+    disposition: "remediation"
+    reason: >-
+      Primitive body conversion into source is not witnessed by the empty
+      ordinary function.
+    normativeSection: "15.3.2.1_A1_T3"
+    observationDigest: "2019ca4b90ad9a27318da0c92982f7a2bf5c4d2d245035a0c0e9\
+      27aeda9c4f0e"
+  - path: "test/built-ins/Function/S15.3.2.1_A1_T4.js"
+    sourceDigest: "da969a9898f54b39e5851d615306056d502d9e40a31dd4f32b04d41d0\
+      1a2001b"
+    subject: >-
+      Hoisted uninitialized x is converted as the body; constructor is
+      Function and call returns undefined.
+    replacementObservation: null
+    disposition: "remediation"
+    reason: >-
+      Hoisted value evaluation and constructor body conversion are not
+      jointly witnessed.
+    normativeSection: "15.3.2.1_A1_T4"
+    observationDigest: "9e18aceb1ac79bdfd50f7af898b36d2ad0505586723bb79e0bee\
+      3324f677f973"
+  - path: "test/built-ins/Function/S15.3.2.1_A1_T5.js"
+    sourceDigest: "56f9534abddc5d42f3f020f9bb2179ae3d83847afc547ff97f7fb419c\
+      5941a21"
+    subject: >-
+      Boxed String body converts to return A; constructor is Function and
+      call returns A.
+    replacementObservation: null
+    disposition: "remediation"
+    reason: "Boxed-string conversion into compiled body is not witnessed."
+    normativeSection: "15.3.2.1_A1_T5"
+    observationDigest: "2588e821a387daaca6554d2ef0c8e78e6bba18c347725b7ce85b\
+      0e29e36dc995"
+  - path: "test/built-ins/Function/S15.3.2.1_A1_T6.js"
+    sourceDigest: "88322748e4b26a0213e2a3435b54d0639a6472ed4e7a080d45f6840cd\
+      60ae191"
+    subject: "The created function has constructor Function and returns true."
+    replacementObservation: >-
+      Object.is before print: results true undefined; function true true
+      true true true
+    disposition: "exclusion"
+    reason: >-
+      The exact ordinary grammar/result and Function identity are witnessed;
+      assembling only primitive String inputs into compiled source is the
+      remaining excluded step.
+    normativeSection: "15.3.2.1_A1_T6"
+    observationDigest: "11391b5d1cffd138e31d3a46475a2b1b0d1b5a91d6c42da17f97\
+      23ad2e4b5ec1"
+  - path: "test/built-ins/Function/S15.3.2.1_A1_T7.js"
+    sourceDigest: "e419c4e87a1c6bc73c4935b4c4db4a181b47850360410c7d7052ce9e2\
+      e19634c"
+    subject: >-
+      Boxed Number body converts to an expression statement; constructor is
+      Function and call returns undefined.
+    replacementObservation: null
+    disposition: "remediation"
+    reason: "Boxed-number conversion into compiled body is not witnessed."
+    normativeSection: "15.3.2.1_A1_T7"
+    observationDigest: "66368ae4fa28f24db31681c814a5b000f35319e20413fe02d966\
+      6d9210a9e6a9"
+  - path: "test/built-ins/Function/S15.3.2.1_A1_T8.js"
+    sourceDigest: "828c274e293a86ce39de2675c2f3dbc1603a2e15b23075d94f2e1b3b6\
+      bf7d7e0"
+    subject: "Invalid var 1 binding in a function body throws SyntaxError."
+    replacementObservation: "invalid variable binding"
+    disposition: "exclusion"
+    reason: >-
+      The exact ordinary grammar/result and Function identity are witnessed;
+      assembling only primitive String inputs into compiled source is the
+      remaining excluded step.
+    normativeSection: "15.3.2.1_A1_T8"
+    observationDigest: "bd8b6d41d1d183df927a6599f29f49082becd9e0af28f07d4448\
+      e4dd4a16f484"
+  - path: "test/built-ins/Function/S15.3.2.1_A1_T9.js"
+    sourceDigest: "a2ff596d95d1068695cafa1f052a454525c944f3896eaf5b7dcc87b23\
+      81c6ec3"
+    subject: >-
+      The created function is a Function instance and returns its A
+      argument.
+    replacementObservation: >-
+      Object.is before print: identity 1 A; function true true true true
+      true
+    disposition: "exclusion"
+    reason: >-
+      The exact ordinary grammar/result and Function identity are witnessed;
+      assembling only primitive String inputs into compiled source is the
+      remaining excluded step.
+    normativeSection: "15.3.2.1_A1_T9"
+    observationDigest: "da78166d0b7fd8b59e24d6807a67b19eb23a16919a0cddb012ed\
+      2466b2c5641f"
+  - path: "test/built-ins/Function/S15.3.2.1_A2_T1.js"
+    sourceDigest: "235804d210aa57bcd51df4deb9bdc8495fe12fafcc663ed6f305c2c47\
+      544eedd"
+    subject: >-
+      Three separate parameter strings produce a Function instance whose sum
+      is 6.
+    replacementObservation: >-
+      Object.is before print: sums 6 ABBA1 2ABBA; function true true true
+      true true
+    disposition: "exclusion"
+    reason: >-
+      The exact ordinary grammar/result and Function identity are witnessed;
+      assembling only primitive String inputs into compiled source is the
+      remaining excluded step.
+    normativeSection: "15.3.2.1_A2_T1"
+    observationDigest: "7d0681b7f285110ef3b9ac49f8412598dd2b011701148ea86714\
+      d1e9ad3aa748"
+  - path: "test/built-ins/Function/S15.3.2.1_A2_T2.js"
+    sourceDigest: "565ee5867dfae567d67105278708ed674606d6c88db70bbb94b2e5492\
+      6c59842"
+    subject: >-
+      Combined/separate parameter strings produce left-associative string
+      sum ABBA1.
+    replacementObservation: >-
+      Object.is before print: sums 6 ABBA1 2ABBA; function true true true
+      true true
+    disposition: "exclusion"
+    reason: >-
+      The exact ordinary grammar/result and Function identity are witnessed;
+      assembling only primitive String inputs into compiled source is the
+      remaining excluded step.
+    normativeSection: "15.3.2.1_A2_T2"
+    observationDigest: "d525934e10d6e714e74a1990f6646a48d659ae0c5a0d245192b2\
+      0aa94f938f06"
+  - path: "test/built-ins/Function/S15.3.2.1_A2_T3.js"
+    sourceDigest: "c9de62fda4ee34ce0810f379fb8185d5df4df7d3c1551e88876c5b5dc\
+      cce770f"
+    subject: >-
+      One combined parameter string produces numeric-then-string sum 2ABBA.
+    replacementObservation: >-
+      Object.is before print: sums 6 ABBA1 2ABBA; function true true true
+      true true
+    disposition: "exclusion"
+    reason: >-
+      The exact ordinary grammar/result and Function identity are witnessed;
+      assembling only primitive String inputs into compiled source is the
+      remaining excluded step.
+    normativeSection: "15.3.2.1_A2_T3"
+    observationDigest: "3c867190d3f4a28cdad06edca20779053e08132a8fd9dfd9c592\
+      633bc995430f"
+  - path: "test/built-ins/Function/S15.3.2.1_A2_T4.js"
+    sourceDigest: "7d918aea3e1abe6035745e59a9f07211a11dfa97530084c24c68c7f01\
+      9c017fd"
+    subject: >-
+      Three successive conversions of the same parameter object create
+      arg1/arg2/arg3; instance call returns 42QUESTION.
+    replacementObservation: null
+    disposition: "remediation"
+    reason: >-
+      Constructor-specific three-conversion order and the resulting
+      parameter names cannot be replaced by a generic ToString test.
+    normativeSection: "15.3.2.1_A2_T4"
+    observationDigest: "67d099914a12eb1901314e9e3d45b2090b1ad8d8a10a35bfdcc2\
+      10b3f9010915"
+  - path: "test/built-ins/Function/S15.3.2.1_A2_T5.js"
+    sourceDigest: "bf4aa6e9a541feac830d71a000ceab374b838551e49c09bc92b7fed6a\
+      36b3ad6"
+    subject: >-
+      Two concatenation conversions precede the constructor conversion of
+      the third parameter; instance call returns 12.
+    replacementObservation: null
+    disposition: "remediation"
+    reason: >-
+      Argument-expression versus constructor conversion ordering and binding
+      results remain unwitnessed.
+    normativeSection: "15.3.2.1_A2_T5"
+    observationDigest: "285e2afbb205c6757e7b544210facf086d181a59f49a89001a9e\
+      6b05a2ffb4c3"
+  - path: "test/built-ins/Function/S15.3.2.1_A2_T6.js"
+    sourceDigest: "c40f7e8b897d378bd60b35ded52bb10111830b19778b15ef80b3a3d54\
+      2856e11"
+    subject: >-
+      Three argument-expression conversions create parameter names and a
+      later sum converts p a fourth time, yielding 1arg4.
+    replacementObservation: null
+    disposition: "remediation"
+    reason: >-
+      The cross-boundary counter state and later coercion are not covered by
+      the fixed sum witnesses.
+    normativeSection: "15.3.2.1_A2_T6"
+    observationDigest: "f895a516ea1c6509cee8b31c262877b8c430230d4467cf1a6895\
+      0c81b7663c35"
+  - path: "test/built-ins/Function/S15.3.2.1_A3_T1.js"
+    sourceDigest: "ff82eeef8bf7ec8b3c0e6e690bb098e816e1feb0b5856949e85cefb5b\
+      8e86829"
+    subject: >-
+      Parameter ToString throws exact number 1 before the body conversion
+      that would throw body.
+    replacementObservation: null
+    disposition: "remediation"
+    reason: >-
+      A faithful witness needs the constructor parameter-before-body
+      conversion boundary.
+    normativeSection: "15.3.2.1_A3_T1"
+    observationDigest: "5af247a31640d4f24cc650cf3bdbc46aa9264f890bb5d696665a\
+      f80680a3795b"
+  - path: "test/built-ins/Function/S15.3.2.1_A3_T10.js"
+    sourceDigest: "25c02fb8333813c800e7baa8a2652c69eef89c0c0cc5638a8e5826b45\
+      844d9f0"
+    subject: >-
+      Parameter object converts to invalid z;x source and throws
+      SyntaxError.
+    replacementObservation: null
+    disposition: "remediation"
+    reason: >-
+      Object conversion into rejected parameter grammar is not witnessed.
+    normativeSection: "15.3.2.1_A3_T10"
+    observationDigest: "36ac61b39846badf5b7bba48b64d451d3470498f71af3e7eef8e\
+      26d5684cbe29"
+  - path: "test/built-ins/Function/S15.3.2.1_A3_T11.js"
+    sourceDigest: "c9d3cfd3f1c4278055846e56150b1109d6437f024c148561b7eb7a5fe\
+      968bc87"
+    subject: >-
+      Undefined body with a,b,c parameter source yields constructor Function
+      and undefined result.
+    replacementObservation: null
+    disposition: "remediation"
+    reason: >-
+      Undefined body conversion is not witnessed by an ordinary empty
+      function.
+    normativeSection: "15.3.2.1_A3_T11"
+    observationDigest: "df0606ff04079888416044a581b810aed2f5de4201aaebf4ca26\
+      58786b6e2af7"
+  - path: "test/built-ins/Function/S15.3.2.1_A3_T12.js"
+    sourceDigest: "af253ffa7a2f79d0cba80412bab5200829c56ce793dae358fb3584671\
+      0b6625e"
+    subject: >-
+      Explicit undefined body with a,b,c parameters yields constructor
+      Function and undefined result.
+    replacementObservation: null
+    disposition: "remediation"
+    reason: >-
+      Undefined body conversion is not witnessed by an ordinary empty
+      function.
+    normativeSection: "15.3.2.1_A3_T12"
+    observationDigest: "023c0968ee0f6413166f9ed41f5a4f84cc1fe8b19f20ccd8a38b\
+      1e4fdb313581"
+  - path: "test/built-ins/Function/S15.3.2.1_A3_T13.js"
+    sourceDigest: "89ff4316fdd115925bae4c827258dd55bd93bc4e0889640071ff6f839\
+      236adcb"
+    subject: >-
+      Null body with a,b,c parameters yields constructor Function and
+      undefined result.
+    replacementObservation: null
+    disposition: "remediation"
+    reason: >-
+      Null body conversion is not witnessed by an ordinary empty function.
+    normativeSection: "15.3.2.1_A3_T13"
+    observationDigest: "085a6fb2b20c97af331778d2fe3fa1af18a77416fa3438be0ebf\
+      dae3cd2f2d32"
+  - path: "test/built-ins/Function/S15.3.2.1_A3_T14.js"
+    sourceDigest: "be70fc577253e8d8c78dd528960624d1c8992623b5d3980432e50c340\
+      9cedf32"
+    subject: >-
+      Hoisted uninitialized body with a,b,c parameters yields constructor
+      Function and undefined result.
+    replacementObservation: null
+    disposition: "remediation"
+    reason: >-
+      Hoisted body evaluation and conversion into parsed source remain
+      unwitnessed.
+    normativeSection: "15.3.2.1_A3_T14"
+    observationDigest: "f75b69cefb85cf04e0a7d707560bd771a45782da04db5854d99c\
+      295e54774705"
+  - path: "test/built-ins/Function/S15.3.2.1_A3_T15.js"
+    sourceDigest: "cb5c592f124137f04ff7e15e28d2604d823b8b2266c85330d5ab26910\
+      238d675"
+    subject: >-
+      Empty parameter/body text produces a function with constructor
+      Function returning undefined.
+    replacementObservation: >-
+      Object.is before print: results true undefined; function true true
+      true true true
+    disposition: "exclusion"
+    reason: >-
+      The exact ordinary grammar/result and Function identity are witnessed;
+      assembling only primitive String inputs into compiled source is the
+      remaining excluded step.
+    normativeSection: "15.3.2.1_A3_T15"
+    observationDigest: "7e456860cccaf6d6601c3bb6ca1d29c468d01181b9789294257e\
+      a305e8dff78c"
+  - path: "test/built-ins/Function/S15.3.2.1_A3_T2.js"
+    sourceDigest: "782a17f0e0434e095231b08931ef702b96b0fc0bfaf19ba429a223400\
+      3a2f74c"
+    subject: >-
+      Parameter object converts to a and resulting constructor Function
+      returns 42.
+    replacementObservation: null
+    disposition: "remediation"
+    reason: >-
+      The object-to-parameter-binding connection is not witnessed by a
+      static identity function.
+    normativeSection: "15.3.2.1_A3_T2"
+    observationDigest: "43007dbb320d58d01e53df5c8731d52ad851493231d66832d3af\
+      fb751761edda"
+  - path: "test/built-ins/Function/S15.3.2.1_A3_T3.js"
+    sourceDigest: "beda9e8b7b13030f38ad141d9ad8ec1efade4e01ef1b92a95acf88d3d\
+      3b1d26e"
+    subject: >-
+      Parameter conversion sets p to 1 before body conversion throws the
+      exact string body.
+    replacementObservation: null
+    disposition: "remediation"
+    reason: >-
+      A faithful witness needs constructor conversion order, observable
+      mutation and abrupt completion together.
+    normativeSection: "15.3.2.1_A3_T3"
+    observationDigest: "fe914f20487e4f4f5c5f84e6fde21b9e5bf63d43803c70c491d2\
+      f246299cf77e"
+  - path: "test/built-ins/Function/S15.3.2.1_A3_T4.js"
+    sourceDigest: "ae62ee8bb3ce631665beae828527b091530682fca11622e8b1d19830b\
+      924e1a3"
+    subject: >-
+      Hoisted undefined parameter value converts to an identifier;
+      constructor Function call returns 1.1.
+    replacementObservation: null
+    disposition: "remediation"
+    reason: >-
+      Hoisted evaluation and parameter conversion into parsed source remain
+      unwitnessed.
+    normativeSection: "15.3.2.1_A3_T4"
+    observationDigest: "71e95f8b6c073ce7c6112328b79cd27ad8198e563ae0ed206ab2\
+      cff3f7152ee0"
+  - path: "test/built-ins/Function/S15.3.2.1_A3_T5.js"
+    sourceDigest: "2bd4f222fe88cf0a4f6cde87c7bc3ff450c4239ab1a647282195003fb\
+      182cefd"
+    subject: >-
+      Void-zero parameter converts to an identifier; constructor Function
+      call returns A.
+    replacementObservation: null
+    disposition: "remediation"
+    reason: >-
+      Void-zero parameter conversion into parsed source remains unwitnessed.
+    normativeSection: "15.3.2.1_A3_T5"
+    observationDigest: "1c3fb268e1a41a684b27a7566f9d95367b88e37fae1dda1ae912\
+      5e5a3fb39b40"
+  - path: "test/built-ins/Function/S15.3.2.1_A3_T6.js"
+    sourceDigest: "1255aeba510eadebe5bd2090b54f99f8fe06b039b74abff0319673b8c\
+      e63fbcd"
+    subject: >-
+      Null parameter converts to reserved token null and throws SyntaxError.
+    replacementObservation: null
+    disposition: "remediation"
+    reason: >-
+      Parameter conversion followed by grammar rejection is not established
+      by a different static negative.
+    normativeSection: "15.3.2.1_A3_T6"
+    observationDigest: "566176a820c2a1d7c6178bf850d7ba6c52f7a662014d82970973\
+      7da75383e554"
+  - path: "test/built-ins/Function/S15.3.2.1_A3_T7.js"
+    sourceDigest: "13bef7cac00010da6c634185303a440975c6a9bf325fb1d8cd4b90f86\
+      cb6bf95"
+    subject: >-
+      Boxed String parameter converts to a; constructor Function call
+      returns 1.
+    replacementObservation: null
+    disposition: "remediation"
+    reason: >-
+      Boxed-string conversion into the bound parameter is not witnessed.
+    normativeSection: "15.3.2.1_A3_T7"
+    observationDigest: "b44d4a9267e3c87c8ae78b702b80fdf6433b0db85d7287f5eed5\
+      5a367bf21d72"
+  - path: "test/built-ins/Function/S15.3.2.1_A3_T8.js"
+    sourceDigest: "eb011c62eccf88e50c31d5b4e781f2a42adc159a8f15114049d5f709e\
+      af99463"
+    subject: >-
+      Undefined parameter converts to an identifier; constructor Function
+      call returns the global this.
+    replacementObservation: null
+    disposition: "remediation"
+    reason: >-
+      Parameter conversion and global-environment receiver behavior are not
+      jointly witnessed.
+    normativeSection: "15.3.2.1_A3_T8"
+    observationDigest: "f33ff604457845c74d7a7b43de7e0141dc0c619b667391acb6e2\
+      baa77c81b615"
+  - path: "test/built-ins/Function/S15.3.2.1_A3_T9.js"
+    sourceDigest: "4f2dbb2d79d1a6b8a9f0eefaf45f9b1738bf933575c0c5a5b2e910c3a\
+      893c36b"
+    subject: "Parameter text 1,1 is rejected with SyntaxError."
+    replacementObservation: "invalid parameter list"
+    disposition: "exclusion"
+    reason: >-
+      The exact ordinary grammar/result and Function identity are witnessed;
+      assembling only primitive String inputs into compiled source is the
+      remaining excluded step.
+    normativeSection: "15.3.2.1_A3_T9"
+    observationDigest: "572297e354f7b07fb8300901dd0f76db72244e41e9f131e3ae04\
+      9add93060c51"
+  - path: "test/built-ins/Function/StrictFunction_reservedwords_with.js"
+    sourceDigest: "32c00ed5c8601ada64f71f65e592b0e886ff1f81b29db949c5d27ce2e\
+      c9c2333"
+    subject: "Strict function body rejects a with statement."
+    replacementObservation: "strict with"
+    disposition: "exclusion"
+    reason: >-
+      Ordinary static function grammar is witnessed; caller independence,
+      parameter-string concatenation and source compilation are
+      CreateDynamicFunction-only residue.
+    normativeSection: "sec-createdynamicfunction"
+    observationDigest: "b13828931d6fbbb72b43077b2a96ef3338b819158008511d2c9e\
+      3ea248dc32f1"
+  - path: "test/built-ins/Function/private-identifiers-not-empty.js"
+    sourceDigest: "9b6600f6323352f7958ab7da0d611d00182947892bbeda77eef4ef6c7\
+      29bccc2"
+    subject: >-
+      Function body rejects a private name with no enclosing private
+      declaration.
+    replacementObservation: "unbound private"
+    disposition: "exclusion"
+    reason: >-
+      Ordinary static function grammar is witnessed; caller independence,
+      parameter-string concatenation and source compilation are
+      CreateDynamicFunction-only residue.
+    normativeSection: "sec-createdynamicfunction"
+    observationDigest: "52a33205a9eff9478b7f74f5bfffa58265e7dd8b80cb4eb8cd2a\
+      4982188889d2"
+  - path: "test/language/expressions/class/subclass-builtins/subclass-Functi\
+      on.js"
+    sourceDigest: "3c41d5e40784cdf9e2e41e5854b4b0f98b358c65e00eb20a529640e8c\
+      d00d4d8"
+    subject: >-
+      Function subclass allocated by default super is instanceof the
+      subclass and Function.
+    replacementObservation: null
+    disposition: "remediation"
+    reason: >-
+      The Function-family allocation/internal-slot step is unreachable
+      without excluded source construction; static generator metadata or
+      unrelated built-in subclasses do not witness this subclass contract.
+    normativeSection: "CreateDynamicFunction; default derived constructor"
+    observationDigest: "97896ab35a3a63ed1fd6a0d0a0f884c6c8fffe04fc798e1126e4\
+      b1f50d2be607"
+  - path: "test/language/statements/class/subclass-builtins/subclass-Functio\
+      n.js"
+    sourceDigest: "e1388907a63526c117b728443656348ee9326ddb3fccea5451bc08319\
+      1ce3ddf"
+    subject: >-
+      Function subclass allocated by default super is instanceof the
+      subclass and Function.
+    replacementObservation: null
+    disposition: "remediation"
+    reason: >-
+      The Function-family allocation/internal-slot step is unreachable
+      without excluded source construction; static generator metadata or
+      unrelated built-in subclasses do not witness this subclass contract.
+    normativeSection: "CreateDynamicFunction; default derived constructor"
+    observationDigest: "bdf29ea2103435c6059294976874a562416a5bdb14728a528e19\
+      83de527f7e84"
+  - path: "test/language/statements/class/subclass/builtin-objects/Generator\
+      Function/instance-length.js"
+    sourceDigest: "ea432b0c4d335318c5b97422a819f9e79f9ed72debf43238b6df40f39\
+      3db395c"
+    subject: >-
+      Subclassed GeneratorFunction instance has own length 2,
+      nonwritable/nonenumerable/configurable.
+    replacementObservation: null
+    disposition: "remediation"
+    reason: >-
+      The Function-family allocation/internal-slot step is unreachable
+      without excluded source construction; static generator metadata or
+      unrelated built-in subclasses do not witness this subclass contract.
+    normativeSection: "25.2.4.1"
+    observationDigest: "f66a27c54caa2be659c202f8f2489f0c69c16c3e9fcea04a4a93\
+      7b2cad40117f"
+  - path: "test/language/statements/class/subclass/builtin-objects/Generator\
+      Function/instance-name.js"
+    sourceDigest: "9b3c1ac19e3296873f91917a8a1d4a4cb670aff374ed340214768ccb0\
+      6e0bbf7"
+    subject: >-
+      Subclassed GeneratorFunction instance has own name anonymous,
+      nonwritable/nonenumerable/configurable.
+    replacementObservation: null
+    disposition: "remediation"
+    reason: >-
+      The Function-family allocation/internal-slot step is unreachable
+      without excluded source construction; static generator metadata or
+      unrelated built-in subclasses do not witness this subclass contract.
+    normativeSection: "25.2.4.2"
+    observationDigest: "f9aac1f02736a7b84be7258c37fc3f5c88d2572a0d4b3ca62115\
+      8a510504e3a5"
+  - path: "test/language/statements/class/subclass/builtin-objects/Generator\
+      Function/instance-prototype.js"
+    sourceDigest: "a14c27fdc0e712b4f7cd28b6e59d142c96195c524d278fb788b70cc6f\
+      421cf46"
+    subject: >-
+      Subclassed GeneratorFunction prototype object has no enumerable keys
+      or own constructor; prototype property is
+      writable/nonenumerable/nonconfigurable.
+    replacementObservation: null
+    disposition: "remediation"
+    reason: >-
+      The Function-family allocation/internal-slot step is unreachable
+      without excluded source construction; static generator metadata or
+      unrelated built-in subclasses do not witness this subclass contract.
+    normativeSection: "25.2.4.3"
+    observationDigest: "326fad4b1d5674803d07b21918d9fe3a41b103eb6cd71e22b351\
+      aa5239757282"
+  - path: "test/language/statements/class/subclass/builtin-objects/Generator\
+      Function/regular-subclassing.js"
+    sourceDigest: "20396554e49ca18f053ab2e1a4ecedf45f329bd0d073c19143e68197a\
+      22f9b74"
+    subject: >-
+      Subclassed GeneratorFunction call produces a generator yielding 42
+      then 84.
+    replacementObservation: null
+    disposition: "remediation"
+    reason: >-
+      The Function-family allocation/internal-slot step is unreachable
+      without excluded source construction; static generator metadata or
+      unrelated built-in subclasses do not witness this subclass contract.
+    normativeSection: "25.2.1"
+    observationDigest: "b3709dfb558c51358112389d1971a6ad726e4d01a1fe4e3c8146\
+      5bc55a1b5567"
+  - path: "test/language/statements/class/subclass/builtin-objects/Generator\
+      Function/super-must-be-called.js"
+    sourceDigest: "757446c1931cb4a2c6d76a57a79b9e4646e42815ba08de05a0e3b3104\
+      b92dba0"
+    subject: >-
+      GeneratorFunction subclass without super throws ReferenceError; with
+      super creates a GeneratorFunction instance.
+    replacementObservation: null
+    disposition: "remediation"
+    reason: >-
+      The Function-family allocation/internal-slot step is unreachable
+      without excluded source construction; static generator metadata or
+      unrelated built-in subclasses do not witness this subclass contract.
+    normativeSection: "25.2.1"
+    observationDigest: "e7f5862e882c0ba837c7786da061fd5ed67bbb7a3b743e6196b9\
+      bde933813361"

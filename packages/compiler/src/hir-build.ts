@@ -2024,7 +2024,7 @@ function resolveExpression(
       );
       return undefined;
     }
-    target = { kind: "super", thisBinding };
+    target = { ...expression.target, kind: "super", thisBinding };
   } else if (expression.target.kind === "private-method") {
     const object = resolveExpression(expression.target.object, scopes, state);
     const privateName = resolvePrivateName(

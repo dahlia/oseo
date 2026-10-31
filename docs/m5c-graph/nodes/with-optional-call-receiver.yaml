@@ -39,5 +39,5 @@ dependencies:
   - proper-tail-calls
   - with-optional-call-receiver-non-tail
   - with-optional-call-receiver-tail
-landed: false
+landed: true
 status: ready

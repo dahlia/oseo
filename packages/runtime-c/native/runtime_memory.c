@@ -732,6 +732,7 @@ void oseo_collect(OseoContext *context) {
         mark_value(tail_call->receiver, &worklist);
         mark_value(tail_call->realm_record, &worklist);
         mark_value(tail_call->this_cell, &worklist);
+        mark_value(tail_call->constructor_realm, &worklist);
         for (size_t index = 0u;
              index < tail_call->argument_count;
              index += 1u) {

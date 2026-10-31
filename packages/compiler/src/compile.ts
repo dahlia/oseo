@@ -82,7 +82,11 @@ export function compileSource(
       functions: [...mir.functions, ...scripts.functions],
       globalBindings: [...mir.globalBindings, ...scripts.globals],
       hostObjectBindings: scripts.objects,
-      test262Host: { agents: templates, scripts: scripts.scripts },
+      test262Host: {
+        agents: templates,
+        mainAgentCanBlock: options.mainAgentCanBlock ?? true,
+        scripts: scripts.scripts,
+      },
     },
     syntax: frontendResult.program,
   };

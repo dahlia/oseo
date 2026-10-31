@@ -2,6 +2,70 @@ import type { Fixture } from "../fixture.ts";
 
 export const classFixtures: readonly Fixture[] = [
   {
+    name: "class-default-forwarding",
+    source: `
+let reads = 0;
+const marker = { value: 17 };
+class Base {
+  constructor(first, second) {
+    this.count = arguments.length;
+    this.first = first;
+    this.second = second;
+    this.target = new.target;
+  }
+}
+class Middle extends Base {}
+class Derived extends Middle {
+  field = this.first;
+  #private = this.second;
+  read() { return this.#private; }
+}
+const original = Object.getOwnPropertyDescriptor(
+  Array.prototype, Symbol.iterator,
+);
+Object.defineProperty(Array.prototype, Symbol.iterator, {
+  configurable: true,
+  get() { reads++; throw marker; },
+});
+const empty = new Derived();
+const pair = new Derived(marker, "second", 3);
+console.log(empty.count, empty.first, empty.read(), empty.target === Derived);
+console.log(pair.count, pair.first === marker, pair.field === marker);
+console.log(pair.read(), pair.target === Derived, reads, Derived.length);
+class Explicit extends Base {
+  constructor(...args) { super(...args); }
+}
+try { new Explicit(marker); }
+catch (error) { console.log("explicit", error === marker, reads); }
+Object.defineProperty(Array.prototype, Symbol.iterator, {
+  configurable: true, value: null,
+});
+console.log("null iterator", new Derived(marker).first === marker);
+class Alternate {
+  constructor(value) { this.value = value; this.target = new.target; }
+}
+Object.setPrototypeOf(Middle, Alternate);
+const changed = new Derived(marker);
+console.log("changed", changed.value === marker, changed.target === Derived);
+class Replacement {
+  constructor(value) { return value; }
+}
+class Replacing extends Replacement { field = 21; }
+const replaced = new Replacing(marker);
+console.log("replacement", replaced === marker, marker.field);
+class Throwing {
+  constructor(value) { throw value; }
+}
+class Abrupt extends Throwing {}
+try { new Abrupt(marker); }
+catch (error) { console.log("abrupt", error === marker); }
+class Invalid extends null {}
+try { new Invalid(marker); }
+catch (error) { console.log("invalid", error instanceof TypeError); }
+Object.defineProperty(Array.prototype, Symbol.iterator, original);
+`,
+  },
+  {
     name: "class-definitions",
     source: `
 class Empty {}
@@ -3058,6 +3122,69 @@ console.log(new Child().read());
 `,
   },
   {
+    name: "class-private-getter-public-absence",
+    source: `
+// Preserve the upstream core assertions without its optional legacy observer.
+function same(actual, expected) {
+  if (!Object.is(actual, expected)) throw new Error("private getter coverage");
+}
+var C = class {
+  get #m() { return "Test262"; }
+  check() {
+    same(this.hasOwnProperty("#m"), false);
+    same("#m" in this, false);
+    same(Object.getOwnPropertyDescriptor(this, "#m"), undefined);
+    same(this.#m, "Test262");
+    same(this.hasOwnProperty("#m"), false);
+    same("#m" in this, false);
+    return 0;
+  }
+};
+let c = new C();
+same(c.check(), 0);
+// A public string with the same spelling is a separate property.
+c["#m"] = "public";
+same(c.hasOwnProperty("#m"), true);
+same("#m" in c, true);
+same(c["#m"], "public");
+delete c["#m"];
+same(c.check(), 0);
+console.log("private getter core ok");
+`,
+  },
+  {
+    name: "class-private-setter-public-absence",
+    source: `
+// Preserve the upstream core assertions without its optional legacy observer.
+function same(actual, expected) {
+  if (!Object.is(actual, expected)) throw new Error("private setter coverage");
+}
+var C = class {
+  set #m(v) { this._v = v; }
+  check() {
+    same(this.hasOwnProperty("#m"), false);
+    same("#m" in this, false);
+    same(Object.getOwnPropertyDescriptor(this, "#m"), undefined);
+    this.#m = "Test262";
+    same(this._v, "Test262");
+    same(this.hasOwnProperty("#m"), false);
+    same("#m" in this, false);
+    return 0;
+  }
+};
+let c = new C();
+same(c.check(), 0);
+// A public string with the same spelling is a separate property.
+c["#m"] = "public";
+same(c.hasOwnProperty("#m"), true);
+same("#m" in c, true);
+same(c["#m"], "public");
+delete c["#m"];
+same(c.check(), 0);
+console.log("private setter core ok");
+`,
+  },
+  {
     name: "class-private-accessors",
     source: `
 // A getter and a setter under one private name describe one element,
@@ -4640,5 +4767,40 @@ console.log(Hinted.bump(140737488355327, 1), Plain.bump(140737488355327, 1));
       misses: 14,
       overflowMisses: 1,
     },
+  },
+  {
+    name: "class-static-keyword-asi",
+    globalScriptReference: true,
+    source: String.raw`
+// An escaped name followed by a line terminator is an instance field,
+// even when the next member is a method or another literal static member.
+class EscapedAsi {
+  st\u0061tic
+  /** @param {number} value */
+  read(value) { return value + 1; }
+}
+class PlainAsi {
+  static;
+  read(value) { return value + 1; }
+}
+const escapedAsi = new EscapedAsi();
+const plainAsi = new PlainAsi();
+console.log(
+  "escaped ASI", Object.hasOwn(escapedAsi, "static"),
+  escapedAsi.static, Object.hasOwn(EscapedAsi, "static"),
+  typeof EscapedAsi.read, escapedAsi.read(2), plainAsi.read(2),
+  escapedAsi.read("two"), plainAsi.read("two"),
+  escapedAsi.read(0.5), plainAsi.read(0.5),
+);
+const CommentAsi = class {
+  st\u{000061}tic/*
+*/static read() { return "constructor"; }
+};
+const commentAsi = new CommentAsi();
+console.log(
+  "comment ASI", Object.hasOwn(commentAsi, "static"),
+  commentAsi.static, CommentAsi.read(), typeof commentAsi.read,
+);
+`,
   },
 ];

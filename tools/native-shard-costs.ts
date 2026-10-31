@@ -17,7 +17,7 @@
  * Compound assignment's logged registrations are rebucketed into its
  * three split files. Host script bindings and proper tail calls postdate
  * these runs and retain their weights. The Linux upper-median fallback is
- * 452 seconds across 144 entries.
+ * 443 seconds across 145 entries.
  * docs/evidence/u6/linux-shard-weights.tsv retains each sum and old weight;
  * linux-shards.py reproduces them and the model. See the U6 README.
  *
@@ -115,6 +115,11 @@
  * one-run case sums from candidate CI 41059687055 at `20ac1098`:
  * Linux job 124076306332 and macOS job 124076306487. The rounded
  * weights are 465 and 564 seconds; one run estimates no variation. See U6.
+ *
+ * Primitive with boxing uses one local Linux AMD64 extended registration
+ * at the unchanged source seed and size. This is a local case duration,
+ * not a CI file-shard sum or a matching-host macOS measurement. macOS
+ * keeps the unknown-file median fallback. See U6 provenance.
  */
 export const nativeShardCosts = {
   "linux-x86_64-gnu": {
@@ -200,6 +205,7 @@ export const nativeShardCosts = {
     "tests/property/m5-module-continuation.property.test.ts": 194,
     "tests/property/m5-module-namespace-uninitialized.property.test.ts": 128,
     "tests/property/m5-module-prelude-script.property.test.ts": 486,
+    "tests/property/m5-non-blocking-agent.property.test.ts": 130,
     "tests/property/m5-number-intrinsic.property.test.ts": 966,
     "tests/property/m5-number-prototype.property.test.ts": 1292,
     "tests/property/m5-object-binding.property.test.ts": 544,
@@ -266,6 +272,7 @@ export const nativeShardCosts = {
     "tests/property/m5-uri-handling-functions.property.test.ts": 700,
     "tests/property/m5-weak-collections.property.test.ts": 429,
     "tests/property/m5-well-known-symbols.property.test.ts": 442,
+    "tests/property/m5-with-primitive-boxing.property.test.ts": 179,
     "tests/property/m5-with-var-loop-head.property.test.ts": 465,
     "tests/property/nio-clock-wakeup.property.test.ts": 137,
     "tests/property/unicode-tables.property.test.ts": 1,

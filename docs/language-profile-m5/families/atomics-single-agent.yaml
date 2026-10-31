@@ -22,9 +22,10 @@ scope:
     that time out a still-waiting promise."
   - "Reviewed standards coverage is all 479 upstream paths under the node's
     two inventory roots through the reviewed testAtomics.js harness. Cases
-    that need $262.agent or a non-blocking agent are never executed and name
-    the test262-agent or non-blocking-agent capability; agent clusters and
-    cross-agent execution belong to the atomics-and-shared-memory node."
+    that need $262.agent use the host admitted by ADR 0026. Its M5c
+    main-agent policy makes wait throw TypeError after argument validation
+    and conversion when CanBlock is false; waitAsync is unchanged. The two
+    owned rows retain their classifications pending Root's UPDATE."
 owners:
   - PLAN-M5.md
 evidence:
@@ -36,18 +37,24 @@ evidence:
   fixed:
     status: covered
     references:
+      - packages/cli/tests/non-blocking-agent.test.ts
+      - tests/non-blocking-agent-native.test.ts
+      - tests/native/fixtures/non-blocking-agent.ts
       - tests/native/fixtures/atomics-single-agent.ts
       - tests/native.ts
       - tests/native/scenarios/shard-0.ts
   forced-collection:
     status: covered
     references:
+      - tests/non-blocking-agent-native.test.ts
+      - tests/property/m5-non-blocking-agent.property.test.ts
       - tests/native.ts
       - tests/native/fixtures/atomics-single-agent.ts
       - tests/property/m5-atomics-single-agent.property.test.ts
   generated:
     status: covered
     references:
+      - tests/property/m5-non-blocking-agent.property.test.ts
       - tests/property-seeds.yaml
       - tests/property/m5-atomics-single-agent.property.test.ts
   guard-fallback:
@@ -59,6 +66,8 @@ evidence:
   specialization:
     status: covered
     references:
+      - tests/non-blocking-agent-native.test.ts
+      - tests/property/m5-non-blocking-agent.property.test.ts
       - tests/native.ts
       - tests/native/fixtures/atomics-single-agent.ts
       - tests/property/m5-atomics-single-agent.property.test.ts

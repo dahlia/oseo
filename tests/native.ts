@@ -29,6 +29,14 @@ import {
 } from "../tools/shard.ts";
 
 import type { Fixture } from "./native/fixture.ts";
+import { hostScriptReferences } from "./native/host-script-reference.ts";
+import { staticCore } from "./native/fixtures/dynamic-source-static-core.ts";
+import {
+  residualCompletionFixtures,
+  residualClassFixtures,
+  residualValueOracleFixture,
+} from "./native/fixtures/dynamic-source-residual.ts";
+import * as records from "./native/fixtures/completion-records.ts";
 import { agentReferencePrelude } from "./native/agent-reference.ts";
 import { realmReferencePrelude } from "./native/realm-reference.ts";
 import { arrayBufferFixtures } from "./native/fixtures/array-buffer.ts";
@@ -36,6 +44,8 @@ import { asyncFixtures } from "./native/fixtures/async.ts";
 import { asyncGeneratorFixtures } from "./native/fixtures/async-generators.ts";
 import { asyncIterationFixtures } from "./native/fixtures/async-iteration.ts";
 import { bindingFixtures } from "./native/fixtures/bindings.ts";
+const { bindingReferenceEvidenceFixtures } =
+  await import("./native/fixtures/binding-reference-evidence.ts");
 import { bigintFixtures } from "./native/fixtures/bigint.ts";
 import { bigintIntrinsicFixtures } from "./native/fixtures/bigint-intrinsic.ts";
 import * as booleanFixture from "./native/fixtures/boolean-intrinsic.ts";
@@ -45,9 +55,13 @@ const { privateNameLifetimeFixtures } =
 import { dataViewFixtures } from "./native/fixtures/data-view.ts";
 import { dateFamilyFixtures } from "./native/fixtures/date-family.ts";
 import { expressionFixtures } from "./native/fixtures/expressions.ts";
+const { ds22BoundaryCoreFixtures } =
+  await import("./native/fixtures/ds22-boundary-core.ts");
+import * as cs from "./native/fixtures/construction-static-contracts.ts";
 import { functionFixtures } from "./native/fixtures/functions.ts";
 import { generatorFixtures } from "./native/fixtures/generators.ts";
 import * as evalFixture from "./native/fixtures/direct-eval-non-string.ts";
+import { callableCases } from "./native/fixtures/callable-object-evidence.ts";
 import * as globalRecord from "./native/fixtures/global-object-record.ts";
 import * as globalThisFixture from "./native/fixtures/globalthis-binding.ts";
 import * as eagerHelpers from "./native/fixtures/iterator-helpers-eager.ts";
@@ -70,6 +84,7 @@ import * as typedArrayFloat16 from "./native/fixtures/typed-array-float16.ts";
 import * as typedArrayCore from "./native/fixtures/typed-array-core.ts";
 import * as atomics from "./native/fixtures/atomics-single-agent.ts";
 import * as agentFixtures from "./native/fixtures/atomics-and-shared-memory.ts";
+import { blockingAgentFixture } from "./native/fixtures/non-blocking-agent.ts";
 import { crossRealmFixtures } from "./native/fixtures/cross-realm.ts";
 import { weakCollectionFixtures } from "./native/fixtures/weak-collections.ts";
 import {
@@ -94,6 +109,12 @@ const { typedArraySortFixtures } =
 const { typedArrayStaticsFixtures } =
   await import("./native/fixtures/typed-array-statics.ts");
 
+const { lexicalStaticFixtures } =
+  await import("./native/fixtures/lexical-static-evidence.ts");
+import { lexicalBmpFixtures } from "./native/fixtures/lexical-bmp-comments.ts";
+
+const { regexpStaticEvidenceFixtures } =
+  await import("./native/fixtures/regexp-static-evidence.ts");
 const { regexpLiteralAotFixtures } =
   await import("./native/fixtures/regexp-literal-aot.ts");
 const { regexpAnchoredRepeatFixtures } =
@@ -225,10 +246,20 @@ Object.defineProperty(globalThis, "console", {
 `;
 
 const fixtures: readonly Fixture[] = [
+  ...staticCore,
+  ...records.completionRecordFixtures,
+  ...residualCompletionFixtures,
+  ...residualClassFixtures,
+  residualValueOracleFixture,
+  records.completionRecordOracleFixture,
   ...functionFixtures,
+  ...callableCases,
+  ...ds22BoundaryCoreFixtures,
+  cs.constructionStaticFixture,
   ...properTailCallFixtures,
   ...globalRecord.globalObjectRecordFixtures,
   evalFixture.directEvalNonStringFixture,
+  ...bindingReferenceEvidenceFixtures,
   ...globalThisFixture.globalThisBindingFixtures,
   ...objectFixtures,
   ...objectOwnKeysFixtures,
@@ -249,6 +280,7 @@ const fixtures: readonly Fixture[] = [
   ...typedArrayCore.typedArrayCoreFixtures,
   ...atomics.atomicsSingleAgentFixtures,
   ...agentFixtures.atomicsAndSharedMemoryFixtures,
+  blockingAgentFixture,
   ...crossRealmFixtures,
   ...typedArrayIterativeFixtures,
   ...typedArraySearchAndJoinFixtures,
@@ -269,6 +301,9 @@ const fixtures: readonly Fixture[] = [
   ...primitiveReceiverSetFixtures,
   ...regexpIntrinsicFixtures,
   ...regexpLiteralAotFixtures,
+  ...lexicalStaticFixtures,
+  ...lexicalBmpFixtures,
+  ...regexpStaticEvidenceFixtures,
   ...regexpPatternExtensionFixtures,
   ...regexpPrototypeAndExecFixtures,
   ...regexpAnchoredRepeatFixtures,
@@ -729,7 +764,19 @@ async function references(fixture: Fixture): Promise<
     },
   ]
 > {
+  if (
+    fixture.name.startsWith("completion-records-") ||
+    fixture.name.startsWith("residual-")
+  ) {
+    const [node, deno] = await hostScriptReferences(host, fixture.source);
+    assert(node != null && deno != null);
+    return [node, deno];
+  }
   nativeProgress(`fixture ${fixture.name} reference preparation begin`);
+  if (fixture.name.startsWith("ds15-")) {
+    const observations = await hostScriptReferences(host, fixture.source);
+    return [observations[0]!, observations[1]!];
+  }
   const directory = await host.makeTemporaryDirectory("oseo-reference-");
   const path = `${directory}/${fixture.name}.ts`;
   try {
@@ -1213,6 +1260,33 @@ for (const fixture of selectedFixtures) {
   }
   const [nodeReference, denoReference] = await references(fixture);
   assertMatchingObservations([nodeReference, denoReference]);
+  if (fixture.name === "binding-reference-arrows-and-this") {
+    assert.equal(
+      nodeReference.stdout,
+      "bare true true\nmember true true\ncapture 10\nupdate 12\n" +
+        "strict capture 10\nstrict update 12\n" +
+        "call true\nconstruct true [object Object]\n" +
+        "strict construct true [object Object]\n",
+    );
+  }
+  if (fixture.name === "binding-reference-class-fields") {
+    assert.equal(
+      nodeReference.stdout,
+      "private true true true false\n" +
+        "static test test262 test262test f,g,h\n",
+    );
+  }
+  if (fixture.name === "binding-reference-unresolvable-compound") {
+    const operators = ["*=", "/=", "+=", "-=", "<<=", ">>>=", "&=", "^=", "|="];
+    assert.equal(
+      nodeReference.stdout,
+      ["", "strict "]
+        .flatMap((prefix) =>
+          operators.map((operator) => `${prefix}${operator} true 0\n`),
+        )
+        .join("") + "absent false\n",
+    );
+  }
   const test262Host = fixture.test262Host === true;
   nativeProgress(`fixture ${fixture.name} source compile disabled begin`);
   const disabledCompilation = compileSource(
@@ -1240,6 +1314,41 @@ for (const fixture of selectedFixtures) {
   const enabledMir = enabledCompilation.mir;
   assert(disabledMir != null, `${fixture.name}: disabled MIR`);
   assert(enabledMir != null, `${fixture.name}: enabled MIR`);
+
+  if (fixture.name === "template-site-identity") {
+    const expected =
+      "identities true true true\n" +
+      "values 0:0,0:1,1:0,1:1\n" +
+      "recreated true true\n" +
+      "all-values 0:0,0:1,1:0,1:1,2:0,2:1\n";
+    assert.equal(nodeReference.stdout, expected);
+    assert.equal(denoReference.stdout, expected);
+    for (const mir of [disabledMir, enabledMir]) {
+      const sites = mir.functions.flatMap((fn) =>
+        fn.blocks.flatMap((block) =>
+          block.operations
+            .filter((operation) => operation.kind === "template-object")
+            .map((operation) => ({ fn, operation })),
+        ),
+      );
+      assert.equal(sites.length, 2);
+      assert.notEqual(sites[0]!.fn.id, sites[1]!.fn.id);
+      for (const { operation } of sites) {
+        assert.deepEqual(operation.templateCooked, ["", "", ""]);
+        assert.deepEqual(operation.templateRaw, ["", "", ""]);
+      }
+    }
+  }
+
+  if (fixture.name === "binding-reference-unresolvable-compound") {
+    assert.match(printMir(disabledMir), /global/u);
+    assert.match(printMir(enabledMir), /global/u);
+  }
+  if (fixture.name === "binding-reference-class-fields") {
+    for (const mir of [disabledMir, enabledMir]) {
+      assert.match(printMir(mir), /private-get private-get/u);
+    }
+  }
 
   if (fixture.name === "property-specialization") {
     const enabledText = printMir(enabledMir);
@@ -1287,6 +1396,7 @@ for (const fixture of selectedFixtures) {
     fixture.name === "typed-array-core" ||
     fixture.name === "shared-array-buffer" ||
     fixture.name === "atomics-single-agent" ||
+    fixture.name === "agent-default-blocking-policy" ||
     fixture.name === "agent-cluster-broadcast" ||
     fixture.name === "agent-wait-notify" ||
     fixture.name === "agent-wait-async" ||
@@ -1305,8 +1415,10 @@ for (const fixture of selectedFixtures) {
     fixture.name === "object-integrity-levels" ||
     fixture.name === "object-own-keys" ||
     fixture.name === "global-object-record" ||
+    fixture.name === "construction-static-contracts" ||
     fixture.name === "eval-intrinsic-value" ||
     fixture.name === "direct-eval-non-string" ||
+    fixture.name.startsWith("binding-reference-") ||
     fixture.name === "globalthis-binding" ||
     fixture.name === "set-intrinsic" ||
     fixture.name === "set-composition-methods" ||
@@ -1421,12 +1533,16 @@ for (const fixture of selectedFixtures) {
   }
 
   if (
+    fixture.name === "generated-native-operations" ||
+    fixture.name.startsWith("completion-records-") ||
+    fixture.name.startsWith("residual-") ||
     fixture.name === "array-buffer" ||
     fixture.name === "typed-array-constructors" ||
     fixture.name === "typed-array-float16" ||
     fixture.name === "typed-array-core" ||
     fixture.name === "shared-array-buffer" ||
     fixture.name === "atomics-single-agent" ||
+    fixture.name === "agent-default-blocking-policy" ||
     fixture.name === "agent-cluster-broadcast" ||
     fixture.name === "agent-wait-notify" ||
     fixture.name === "agent-wait-async" ||
@@ -1460,13 +1576,18 @@ for (const fixture of selectedFixtures) {
     fixture.name === "object-own-keys-virtual-assignment" ||
     fixture.name === "object-own-keys-virtual-read-only" ||
     fixture.name === "global-object-record" ||
+    fixture.name === "construction-static-contracts" ||
     fixture.name === "eval-intrinsic-value" ||
+    fixture.name.startsWith("ds22-") ||
     fixture.name === "direct-eval-non-string" ||
+    fixture.name.startsWith("callable-object-") ||
+    fixture.name.startsWith("binding-reference-") ||
     fixture.name === "globalthis-binding" ||
     fixture.name === "with-strict-heritage-write" ||
     fixture.name === "with-optional-call-receiver" ||
     fixture.name === "with-optional-call-receiver-tail" ||
     fixture.name === "with-var-loop-head-resolution" ||
+    fixture.name === "with-primitive-boxing" ||
     fixture.name === "object-prototype" ||
     fixture.name === "catchable-type-errors" ||
     fixture.name === "aggregate-error-and-options" ||
@@ -1493,6 +1614,7 @@ for (const fixture of selectedFixtures) {
     fixture.name === "class-evaluation-order" ||
     fixture.name === "class-strict-body" ||
     fixture.name === "class-inheritance" ||
+    fixture.name === "class-default-forwarding" ||
     fixture.name === "class-super-binding" ||
     fixture.name === "class-super-property" ||
     fixture.name === "super-without-extends" ||
@@ -1517,12 +1639,15 @@ for (const fixture of selectedFixtures) {
     fixture.name === "class-private-name-lifetimes" ||
     fixture.name === "class-private-methods" ||
     fixture.name === "class-private-accessors" ||
+    fixture.name === "class-private-getter-public-absence" ||
+    fixture.name === "class-private-setter-public-absence" ||
     fixture.name === "class-private-brand-checks" ||
     fixture.name === "class-cross-private-access" ||
     fixture.name === "class-optional-private-reads" ||
     fixture.name === "class-optional-private-methods" ||
     fixture.name === "class-static-private-methods" ||
     fixture.name === "class-private-updates" ||
+    fixture.name === "class-static-keyword-asi" ||
     fixture.name === "class-static-fields" ||
     fixture.name === "class-static-field-order" ||
     fixture.name === "class-static-private-fields" ||
@@ -1563,6 +1688,7 @@ for (const fixture of selectedFixtures) {
     fixture.name === "object-descriptor-queries" ||
     fixture.name === "object-integrity-levels" ||
     fixture.name === "global-object-record" ||
+    fixture.name === "construction-static-contracts" ||
     fixture.name === "eval-intrinsic-value" ||
     fixture.name === "globalthis-binding" ||
     fixture.name === "symbols" ||
@@ -1611,6 +1737,8 @@ for (const fixture of selectedFixtures) {
     fixture.name === "date-real-time-clock" ||
     fixture.name === "regexp-intrinsic" ||
     fixture.name === "regexp-literal-aot" ||
+    fixture.name.startsWith("ds16-lexical-") ||
+    fixture.name === "regexp-static-evidence" ||
     fixture.name === "regexp-pattern-extensions" ||
     fixture.name === "regexp-prototype-and-exec" ||
     fixture.name === "regexp-anchored-repeat" ||
@@ -1621,10 +1749,12 @@ for (const fixture of selectedFixtures) {
     fixture.name === "proxy-object-rest-collection" ||
     fixture.name === "json-stringify" ||
     fixture.name === "tagged-templates" ||
+    fixture.name === "template-site-identity" ||
     fixture.name === "template-literals" ||
     fixture.name === "proper-tail-calls" ||
     fixture.name === "global-eval-tail-calls" ||
-    fixture.name.startsWith("cross-realm-")
+    fixture.name.startsWith("cross-realm-") ||
+    fixture.name.startsWith("ds15-")
   ) {
     process.env.OSEO_GC_EVERY_SAFEPOINT = "1";
   }
@@ -1676,9 +1806,14 @@ for (const fixture of selectedFixtures) {
           } else {
             assertMatchingObservations([nodeReference, denoReference, native]);
           }
+          if (fixture.name === "construction-static-contracts") {
+            assert.equal(native.stdout, cs.constructionStaticExpected);
+            assert.ok(native.counters!.collections > 0);
+          }
           assert(native.counters != null, `${fixture.name}: counters`);
           assert(native.emittedC.includes("OseoResult"), "generic call ABI");
           if (
+            fixture.name === "class-static-keyword-asi" ||
             fixture.name === "iterator-next-callability" ||
             fixture.name === "proper-tail-calls" ||
             fixture.name === "global-eval-tail-calls"
@@ -1686,6 +1821,17 @@ for (const fixture of selectedFixtures) {
             // Forced collection runs while tail call records and the
             // trampoline's steps hold the only references to arguments.
             assert.ok(native.counters.collections > 0);
+          }
+          if (fixture.name === "template-site-identity") {
+            assert.ok(native.counters.collections > 0);
+            assert.equal(
+              [
+                ...native.emittedC.matchAll(
+                  /static const char template_site_\d+ = 0;/gu,
+                ),
+              ].length,
+              2,
+            );
           }
           if (mode === "disabled") {
             assert.equal(native.counters.guardHits, 0);
@@ -1734,6 +1880,12 @@ for (const fixture of selectedFixtures) {
             }
           }
           if (
+            fixture.name === "class-private-getter-public-absence" ||
+            fixture.name === "class-private-setter-public-absence" ||
+            fixture.name === "class-default-forwarding" ||
+            fixture.name === "generated-native-operations" ||
+            fixture.name.startsWith("completion-records-") ||
+            fixture.name.startsWith("residual-") ||
             fixture.name === "array-buffer" ||
             fixture.name === "class-private-name-lifetimes" ||
             fixture.name === "array-prototype-copying" ||
@@ -1755,6 +1907,7 @@ for (const fixture of selectedFixtures) {
             fixture.name === "monotonic-timer-wakeups" ||
             fixture.name === "regexp-intrinsic" ||
             fixture.name === "regexp-literal-aot" ||
+            fixture.name === "regexp-static-evidence" ||
             fixture.name === "regexp-pattern-extensions" ||
             fixture.name === "regexp-prototype-and-exec" ||
             fixture.name === "regexp-anchored-repeat" ||
@@ -1775,13 +1928,18 @@ for (const fixture of selectedFixtures) {
             fixture.name === "object-descriptor-queries" ||
             fixture.name === "object-integrity-levels" ||
             fixture.name === "global-object-record" ||
+            fixture.name === "construction-static-contracts" ||
             fixture.name === "eval-intrinsic-value" ||
+            fixture.name.startsWith("ds22-") ||
             fixture.name === "direct-eval-non-string" ||
+            fixture.name.startsWith("callable-object-") ||
+            fixture.name.startsWith("binding-reference-") ||
             fixture.name === "globalthis-binding" ||
             fixture.name === "with-strict-heritage-write" ||
             fixture.name === "with-optional-call-receiver" ||
             fixture.name === "with-optional-call-receiver-tail" ||
             fixture.name === "with-var-loop-head-resolution" ||
+            fixture.name === "with-primitive-boxing" ||
             fixture.name === "object-prototype" ||
             fixture.name === "function-prototype" ||
             fixture.name === "iterator-helpers-eager" ||
@@ -1805,10 +1963,17 @@ for (const fixture of selectedFixtures) {
             fixture.name === "number-prototype" ||
             fixture.name === "set-intrinsic" ||
             fixture.name === "set-composition-methods" ||
-            fixture.name === "weak-collections"
+            fixture.name === "weak-collections" ||
+            fixture.name.startsWith("ds15-")
           ) {
             assert.ok(native.counters.collections > 0);
-            if (mode === "enabled") {
+            if (
+              mode === "enabled" &&
+              !(
+                fixture.name.startsWith("completion-records-") ||
+                fixture.name.startsWith("residual-")
+              )
+            ) {
               if (
                 fixture.name === "array-buffer" ||
                 fixture.name === "array-prototype-copying" ||
@@ -1833,8 +1998,13 @@ for (const fixture of selectedFixtures) {
               ) {
                 assert.ok(native.counters.guardHits > 0);
               }
-              assert.ok(native.counters.guardMisses > 0);
+              if (!fixture.name.startsWith("ds15-")) {
+                assert.ok(native.counters.guardMisses > 0);
+              }
             }
+          }
+          if (fixture.name.startsWith("ds16-lexical-")) {
+            assert.ok(native.counters.collections > 0);
           }
           if (fixture.test262Host === true) {
             // Collection forced at every safepoint reaches the main

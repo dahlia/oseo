@@ -123,6 +123,16 @@ const test262HostParser = withDefault(
   false,
 );
 
+const test262NonBlockingParser = withDefault(
+  map(
+    flag("--test262-non-blocking", {
+      description: message`Run the test262 main agent with [[CanBlock]] false.`,
+    }),
+    () => true,
+  ),
+  false,
+);
+
 const moduleParser = withDefault(
   map(
     flag("--module", {
@@ -164,6 +174,7 @@ const cliParser = object({
   specialization: specializationParser,
   target: targetParser,
   test262Host: test262HostParser,
+  test262NonBlocking: test262NonBlockingParser,
 });
 
 const cliProgram = defineProgram({
@@ -331,6 +342,7 @@ function compileCliSource(
   sourceId: string,
   specialization: CliInvocation["specialization"],
   test262Host: boolean,
+  mainAgentCanBlock: boolean,
 ): CliResult {
   const compiled = compileSource(
     defaultComponents.frontend,
@@ -338,7 +350,7 @@ function compileCliSource(
       source,
       sourceId,
     },
-    { specialization, test262Host },
+    { mainAgentCanBlock, specialization, test262Host },
   );
   const diagnostic = compiled.diagnostics[0];
   if (diagnostic != null) return diagnosticResult(diagnostic);
@@ -559,12 +571,21 @@ export function runCli(request: CliRequest): CliResult {
       ),
     );
   }
+  if (parsed.value.test262NonBlocking && !parsed.value.test262Host) {
+    return diagnosticResult(
+      hostDiagnostic(
+        request.sourceId ?? parsed.value.sourceId,
+        "The --test262-non-blocking option requires --test262-host.",
+      ),
+    );
+  }
   return compileCliSource(
     parsed.value.mode,
     request.source ?? "",
     request.sourceId ?? parsed.value.sourceId,
     parsed.value.specialization,
     parsed.value.test262Host,
+    !parsed.value.test262NonBlocking,
   );
 }
 
@@ -1564,6 +1585,14 @@ export async function runNativeCli(
       ),
     );
   }
+  if (parsed.value.test262NonBlocking && !parsed.value.test262Host) {
+    return diagnosticResult(
+      hostDiagnostic(
+        sourceId,
+        "The --test262-non-blocking option requires --test262-host.",
+      ),
+    );
+  }
   if (!moduleGoal && parsed.value.script != null) {
     return diagnosticResult(hostDiagnostic(sourceId, scriptModuleOnly));
   }
@@ -1605,6 +1634,7 @@ export async function runNativeCli(
       sourceId,
       parsed.value.specialization,
       parsed.value.test262Host,
+      !parsed.value.test262NonBlocking,
     );
   } else {
     const compiled = compileSource(
@@ -1614,6 +1644,7 @@ export async function runNativeCli(
         sourceId,
       },
       {
+        mainAgentCanBlock: !parsed.value.test262NonBlocking,
         specialization: parsed.value.specialization,
         test262Host: parsed.value.test262Host,
       },

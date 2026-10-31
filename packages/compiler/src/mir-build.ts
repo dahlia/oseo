@@ -738,6 +738,32 @@ function lowerObjectCoercible(
   return recordRoot(builder, id, range);
 }
 
+/** Materialize one binding object, retained for the entire with scope. */
+function lowerWithObject(
+  input: number,
+  range: SourceRange,
+  builder: MirBuilder,
+): number {
+  appendMirMetadata(builder, "safepoint", "box with input", [input], range);
+  const id = builder.nextValue;
+  builder.nextValue += 1;
+  builder.current.operations.push({
+    arguments: [input],
+    detail: "ToObject for with binding object",
+    id,
+    kind: "to-object",
+    range,
+  });
+  appendMirMetadata(
+    builder,
+    "check-status",
+    "normal -> enter with, abrupt -> return",
+    [id],
+    range,
+  );
+  return recordRoot(builder, id, range);
+}
+
 /**
  * A key expression whose value is a primitive fixed by the source, so
  * ToPropertyKey of it can run no user code and cannot throw.
@@ -5410,7 +5436,12 @@ function lowerExpression(
     };
     detail = expression.target.method;
   } else if (expression.target.kind === "super") {
-    return lowerSuperCall(expression, expression.target.thisBinding, builder);
+    return lowerSuperCall(
+      expression,
+      expression.target.thisBinding,
+      builder,
+      expression.target.forwardArguments === true,
+    );
   } else {
     let callee: number;
     let receiver: number;
@@ -5747,6 +5778,7 @@ function lowerSuperCall(
   expression: HirExpression & { readonly kind: "call" },
   thisBinding: { readonly bindingId: number },
   builder: MirBuilder,
+  forwardArguments: boolean,
 ): number {
   // SuperCall, 13.3.7.1: GetSuperConstructor reads the running
   // constructor's [[Prototype]] at step 3 and cannot fail, Arguments are
@@ -5805,6 +5837,10 @@ function lowerSuperCall(
     id: constructed,
     kind: "construct",
     range: expression.range,
+    ...includePropertiesWhen(() => {
+      if (!forwardArguments) return undefined;
+      return { forwardArguments: true as const };
+    }),
     target: { kind: "super" },
   });
   appendMirMetadata(
@@ -7493,7 +7529,7 @@ function lowerStatements(
       if (lowerTryStatement(statement, builder)) return true;
     } else if (statement.kind === "with") {
       const input = lowerExpression(statement.object, builder);
-      const object = lowerObjectCoercible(input, statement.range, builder);
+      const object = lowerWithObject(input, statement.range, builder);
       resetBinding(
         statement.objectBindingId,
         "<with object>",

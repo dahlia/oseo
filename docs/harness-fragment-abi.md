@@ -435,3 +435,44 @@ The post-revert sanitizer repair guards function bodies with the shared
 runtime frame ceiling and applies the explicit host C callable-frame charge
 in both direct and dispatched calls. All 44 whole-Script digest records are
 regenerated for these C-only changes; HIR and MIR are unchanged.
+
+
+Default derived constructor forwarding
+--------------------------------------
+
+M5c node `default-derived-constructor-spread-iterator` regenerates four
+of the 44 whole-Script records: *functions/function-prototype* and
+*objects/object-constructor*, each under both specialization policies.
+These fixtures contain implicit derived constructors. Removing their
+synthetic rest binding and iterator evaluation changes printed HIR, MIR
+and emitted C, including subsequent binding and root numbering.
+A clean source archive of base
+`1f3ade138ea7cbee80b2d62940e8f497db2bc1a2` reproduced all 44 old hashes;
+the other 40 outputs remain unchanged. This changes no runtime ABI.
+The comparison script and its output live in
+*/data/m5c-derived-spread-20261031/compare-baseline.ts* and
+*baseline-compare.out*. These hashes measure code generation; the node's
+work note records its separate native execution evidence.
+
+M5c node `array-generated-property-cost-remediation` regenerates all 44
+whole-Script records because binding reads, property-key conversion, and
+ordinary property gets now use runtime archive compositions and static
+call-site records. Replaying the base backend reproduces all 44 old hashes
+against the current fixture HIR and MIR; only emitted C changes. The script
+and per-record comparisons are retained at
+*/data/m5c-arraycost3-20261031/refresh-baseline.ts* and
+*/data/m5c-arraycost3-20261031/baseline-refresh.json*. Whole/fragment native
+equivalence passes both toolchains before this code-generation baseline
+refresh. This is derived C-output evidence, separate from compatibility
+classifications and performance measurements.
+
+
+Combined bundle regeneration
+----------------------------
+
+The 2026-11-01 bundle composes the Array-cost archive compositions with
+the default derived constructor forwarding and the primitive `with`
+boxing lowering, which each regenerated records on their own base. Root
+recomputed all 44 records from the composed tree with the same hash shape
+as the test; eight differ from the last single-node values because more
+than one of those changes reaches the same fixture.

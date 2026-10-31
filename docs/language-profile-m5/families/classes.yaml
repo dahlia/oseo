@@ -29,6 +29,7 @@ evidence:
     references:
       - tests/native/fixtures/classes.ts
       - packages/parser-babel/tests/class-early-errors.test.ts
+      - tests/dynamic-source-residual-evidence.test.ts
   forced-collection:
     status: covered
     references:
@@ -56,5 +57,6 @@ evidence:
   structural:
     status: covered
     references:
+      - tests/dynamic-source-residual-source.test.ts
       - packages/parser-babel/tests/basics.test.ts
       - packages/parser-babel/tests/class-early-errors.test.ts

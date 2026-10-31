@@ -1,0 +1,101 @@
+[
+  {
+    "path": "test/language/arguments-object/10.5-1-s.js",
+    "sources": ["\"use strict\";\narguments = 10"]
+  },
+  {
+    "path": "test/language/comments/hashbang/function-constructor.js",
+    "sources": [
+      "function f(#!\n_) {}",
+      "function f(){#!\n_}",
+      "async function f(#!\n_) {}",
+      "async function f(){#!\n_}",
+      "function* f(#!\n_) {}",
+      "function* f(){#!\n_}",
+      "async function* f(#!\n_) {}",
+      "async function* f(){#!\n_}"
+    ]
+  },
+  {
+    "path": "test/language/eval-code/direct/parse-failure-1.js",
+    "sources": ["x = 1; x\n++"]
+  },
+  {
+    "path": "test/language/eval-code/direct/parse-failure-2.js",
+    "sources": ["x = 1; x\n++"]
+  },
+  {
+    "path": "test/language/eval-code/direct/parse-failure-3.js",
+    "sources": ["continue;"]
+  },
+  {
+    "path": "test/language/eval-code/direct/parse-failure-4.js",
+    "sources": ["break;"]
+  },
+  {
+    "path": "test/language/eval-code/direct/parse-failure-5.js",
+    "sources": ["return;"]
+  },
+  {
+    "path": "test/language/eval-code/direct/parse-failure-6.js",
+    "sources": ["for(;false;)"]
+  },
+  {
+    "path": "test/language/eval-code/indirect/parse-failure-1.js",
+    "sources": ["x = 1; x\n++"]
+  },
+  {
+    "path": "test/language/eval-code/indirect/parse-failure-2.js",
+    "sources": ["x = 1; x\n++"]
+  },
+  {
+    "path": "test/language/eval-code/indirect/parse-failure-3.js",
+    "sources": ["continue;"]
+  },
+  {
+    "path": "test/language/eval-code/indirect/parse-failure-4.js",
+    "sources": ["break;"]
+  },
+  {
+    "path": "test/language/eval-code/indirect/parse-failure-5.js",
+    "sources": ["return;"]
+  },
+  {
+    "path": "test/language/eval-code/indirect/parse-failure-6.js",
+    "sources": ["for(;false;)"]
+  },
+  {
+    "path": "test/language/expressions/function/name-eval-stricteval.js",
+    "sources": ["'use strict'; _13_1_37_s.x = function eval() {};"]
+  },
+  {
+    "path": "test/language/expressions/function/param-eval-stricteval.js",
+    "sources": ["'use strict'; var _13_1_17_fun = function (eval) { }"]
+  },
+  {
+    "path": "test/language/literals/numeric/7.8.3-3gs.js",
+    "sources": ["\"use strict\";\na = 0x1;a = 01;"]
+  },
+  {
+    "path": "test/language/statements/with/12.10.1-10-s.js",
+    "sources": ["\"use strict\";\n var o = {}; with (o) {} "]
+  },
+  {
+    "path": "test/language/statements/with/12.10.1-12-s.js",
+    "sources": [" 'use strict'; var o = {}; with (o) {} "]
+  },
+  {
+    "path": "test/language/statements/with/12.10.1-4-s.js",
+    "sources": [" 'use strict'; var o = {}; with (o) {}; "]
+  },
+  {
+    "path": "test/language/statements/with/12.10.1-8-s.js",
+    "sources": [
+      " 'use strict'; var f1 = function () { var o = {}; with (o) {}; } "
+    ]
+  },
+  {
+    "path": "test/language/white-space/mongolian-vowel-separator-eval.js",
+    "sources": ["var᠎foo;"]
+  }
+]

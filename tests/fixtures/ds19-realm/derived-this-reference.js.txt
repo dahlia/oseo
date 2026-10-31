@@ -1,0 +1,20 @@
+// Qualified Node.js/Deno error realm; native keeps local ReferenceError.
+// Replacement for test/built-ins/Function/internals/Construct/derived-this-uninitialized-realm.js
+// Copyright (C) 2016 the V8 project authors. All rights reserved.
+// This code is governed by the BSD license found in the LICENSE file.
+(function () {
+var referenceRealm = $262.createRealm();
+var C = referenceRealm.evalScript(
+  '(class C extends Object {' +
+  '  constructor() {}' +
+  '});'
+);
+
+assert.throws(referenceRealm.global.ReferenceError, function() {
+  new C();
+});
+})();
+
+
+
+console.log("DS19 derived-this complete");

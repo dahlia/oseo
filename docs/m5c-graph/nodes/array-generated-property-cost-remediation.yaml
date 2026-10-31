@@ -8,5 +8,5 @@ delivers: >-
   exact Root decision and raw pointer.
 dependencies:
   - unsupported-ownership-audit
-landed: false
+landed: true
 status: ready

@@ -1,0 +1,42 @@
+// Fixed DS-19 non-source witnesses, derived from pinned Test262.
+// Foreign source is collected before native emission under ADR 0029.
+// Replacement for test/built-ins/Boolean/proto-from-ctor-realm.js
+// Copyright (C) 2016 the V8 project authors. All rights reserved.
+// This code is governed by the BSD license found in the LICENSE file.
+(function () {
+var other = $262.createRealm().global;
+var C = other.$262.evalScript("(function(){})");
+C.prototype = null;
+
+var o = Reflect.construct(Boolean, [], C);
+
+assert.sameValue(Object.getPrototypeOf(o), other.Boolean.prototype);
+})();
+
+// Replacement for test/built-ins/Number/proto-from-ctor-realm.js
+// Copyright (C) 2016 the V8 project authors. All rights reserved.
+// This code is governed by the BSD license found in the LICENSE file.
+(function () {
+var other = $262.createRealm().global;
+var C = other.$262.evalScript("(function(){})");
+C.prototype = null;
+
+var o = Reflect.construct(Number, [], C);
+
+assert.sameValue(Object.getPrototypeOf(o), other.Number.prototype);
+})();
+
+// Replacement for test/built-ins/String/proto-from-ctor-realm.js
+// Copyright (C) 2016 the V8 project authors. All rights reserved.
+// This code is governed by the BSD license found in the LICENSE file.
+(function () {
+var other = $262.createRealm().global;
+var C = other.$262.evalScript("(function(){})");
+C.prototype = null;
+
+var o = Reflect.construct(String, [], C);
+
+assert.sameValue(Object.getPrototypeOf(o), other.String.prototype);
+})();
+
+console.log("DS19 wrappers complete");

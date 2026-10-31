@@ -24,13 +24,17 @@ EXCLUDED = {
 # Added to main after these runs, so the logs never observed them; their
 # table weights are retained unchanged. The two module files carry one-run
 # case sums from candidate CI 40869736577; with-var loop heads use
-# candidate CI 41059687055. See the U6 README.
+# candidate CI 41059687055. Primitive with boxing and the non-blocking
+# agent each use a later local Linux extended measurement, not a CI
+# file-shard sum. See the U6 README.
 RETAINED = {
     'tests/property/m5-host-script-bindings.property.test.ts',
     'tests/property/m5-module-namespace-uninitialized.property.test.ts',
     'tests/property/m5-module-prelude-script.property.test.ts',
     'tests/property/m5-proper-tail-calls.property.test.ts',
     'tests/property/m5-with-var-loop-head.property.test.ts',
+    'tests/property/m5-with-primitive-boxing.property.test.ts',
+    'tests/property/m5-non-blocking-agent.property.test.ts',
 }
 # Logged files later split by test registration. Each logged title is
 # rebucketed to the current source that defines it.

@@ -10,4 +10,4 @@ dependencies:
   - observation-batch-plan
   - with-primitive-binding-object-boxing
 landed: false
-status: blocked
+status: ready

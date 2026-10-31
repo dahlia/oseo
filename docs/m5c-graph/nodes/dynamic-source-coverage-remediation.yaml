@@ -1,9 +1,9 @@
 version: 1
 id: dynamic-source-coverage-remediation
 title: Resolve dynamic source coverage gaps
-delivers: "Resolves the 950 reviewed unsupported paths assigned to
+delivers: "Resolves the 192 reviewed unsupported paths assigned to
   node:dynamic-source-coverage-remediation in the derived closure
-  ledger. Select exactly those owners and their exclusion-audit path
+  ledger.   Select exactly those owners and their exclusion-audit path
   assessments: the original 121 paths, 35 from cross-realm-host, 1 from
   runtime dynamic source classification, 5 from observation-batch-07, 16
   from batch 09, 19 from batch 11: 14 class tests that evaluate a class
@@ -194,18 +194,120 @@ delivers: "Resolves the 950 reviewed unsupported paths assigned to
   static replacements and keeps 24. DS-7 moves 9 of its 80 template-site,
   string case-conversion and generator-instance paths through reviewed
   static replacements and keeps 71, as recorded in
-  docs/m5c-graph/dynamic-source-realm-string-assessment.md. The current
-  scope is 950; no native
+  docs/m5c-graph/dynamic-source-realm-string-assessment.md. DS-9 accounts
+  for 186 eval-specific arguments cells and keeps six mixed arrow cells,
+  and DS-10 accounts for seven acceptance-only eval environment-construction
+  cases under existing eval-semantics and retains 98 ordinary-subject paths,
+  so the current scope is 757; no native
   or fixture evidence was added, and all original unsupported results
-  remain unchanged."
+  remain unchanged. The approved 2026-10-31 second split adds DS-8
+  through DS-22 as bounded children for these exact 950 paths. Their
+  work notes pin disjoint path lists and evidence obligations. Ownership
+  moves to each child only as that child lands; no ledger owner changes
+  in this metadata split. This umbrella remains blocked until every
+  child lands and itself lands when it owns zero paths. The split
+  establishes no new exclusion or completed replacement evidence.
+  B24/B25 preparation then adds exactly 7 original source-rejection
+  paths, distributed 0 and 7 by batch, bringing the scope to 764. They
+  fall outside the 950 split paths, so the umbrella owns them directly
+  until a further child is assigned. Their original statement and
+  completion subjects remain active coverage remediation; selectors and
+  source-bound observations are linked from
+  docs/m5c-graph/observation-batch-24.md and
+  docs/m5c-graph/observation-batch-25.md. Observation-batch-21a adds two
+  declaration completion-value probes under test/language/statements/:
+  async-function/cptn-decl.js and class/cptn-decl.js, bringing the scope
+  to 766. They also lie outside the split and stay with the umbrella;
+  their ordinary Completion Records remain in-claim. B22a adds one
+  fixture-construction subject,
+  nested-private-direct-eval-err-contains-newtarget.js, and the mixed
+  implicit-return subject
+  arrow-body-private-direct-eval-err-contains-newtarget.js. The latter
+  asserts c.x() is undefined although x() discards this.#x() result.
+  B22b adds two fixture-construction subjects,
+  private-direct-eval-err-contains-newtarget.js and
+  static-field-init-with-this.js, and the mixed-assertion path
+  private-static-setter-visible-to-direct-eval.js. Its final callback
+  reads the absent C.getWithEval target and throws TypeError before eval.
+  These five also lie outside the split, stay with the umbrella and
+  remain active remediation, bringing the scope to 771. B21d adds no
+  source-compilation rejection. The other 95 class-declaration eval
+  subjects use the existing eval-semantics exclusion assessment under
+  ADR 0016. The B22a and B22b batch notes link the original sources and
+  full-row assertion audits. DS-8 then accounts for two ImportCall-only
+  subjects under decision item 2 and retains usage-from-eval with its two
+  promise and four exported-value assertions, leaving 769; its assessment
+  is docs/m5c-graph/dynamic-source-importcall-residual-accounting.md.
+  DS-20 then accounts for its one template-site path under ADR 0016 with
+  one static and native identity evidence group, leaving 768; see
+  docs/m5c-graph/dynamic-source-template-site-evidence.md.
+  DS-15 then accounts for all 43 of its static-core paths under ADR 0016
+  item 1 with new static and native witnesses, leaving 725; see
+  docs/m5c-graph/dynamic-source-static-core-evidence-table.md.
+  DS-12 then accounts for 51 of its 70 module observable-contract paths
+  under ADR 0016 with native module-graph, Node tooling and Deno
+  witnesses and keeps 19, leaving 674; see docs/m5c-graph/dynamic-
+  source-module-observable-contracts-assessment.yaml.
+  DS-16 then accounts for 91 of its 95 lexical paths under ADR 0016 with
+  static checks and native evidence groups and keeps four, leaving 583;
+  see docs/m5c-graph/dynamic-source-lexical-static-assessment.yaml.
+  DS-11 then accounts for all 66 of its module-goal validation paths
+  under ADR 0016 with static parsed-graph witnesses and a native module-
+  graph fixture whose usage values are compared strictly, leaving 517;
+  see docs/m5c-graph/dynamic-source-module-goal-validation-
+  assessment.md.
+  DS-14 then accounts for 61 of its 66 callable-object paths under ADR
+  0016 with fixed native evidence groups and keeps five, leaving 456;
+  see docs/m5c-graph/dynamic-source-callable-object-assessment.md.
+  DS-22 then accounts for all 19 boundary-overlap paths under ADR 0016
+  with static and native evidence groups and strict mutation controls,
+  leaving 437; see docs/m5c-graph/dynamic-source-boundary-overlap-
+  review.md.
+  DS-18 then accounts for 18 of its 41 binding-reference paths under ADR
+  0016 with typed native witnesses and keeps 23 that need binding
+  introduction during eval or direct dispatch into the caller
+  environment, leaving 419; see docs/m5c-graph/dynamic-source-binding-
+  reference-assessment.md.
+  DS-21 then accounts for all 81 of its completion-record paths under
+  ADR 0016 with finite ahead-of-time literal $262.evalScript completion
+  witnesses, leaving 338; see docs/m5c-graph/dynamic-source-completion-
+  record-assessment.md.
+  DS-19 then accounts for 80 of its 82 realm and host paths under ADR
+  0016 with literal ahead-of-time host Script witnesses and keeps two
+  derived-constructor error-realm paths, leaving 258; see
+  docs/m5c-graph/dynamic-source-realm-host-evidence.assessment.md.
+  DS-13 then accounts for 24 of its 57 construction-contract paths under
+  ADR 0016 with static and native witnesses compared strictly and keeps
+  33 whose contracts need source-compiling construction, leaving 234;
+  see docs/m5c-graph/dynamic-source-construction-assessment.yaml.
+  DS-17 then accounts for 25 of its 29 RegExp literal paths under ADR
+  0016 with static grammar rejection evidence and native source and
+  matcher pairs, and keeps four exhaustive BMP paths, leaving 209; see
+  docs/m5c-graph/dynamic-source-regexp-static-evidence.assessment.md."
 dependencies:
   - authorized-exclusion-audit
+  - dynamic-source-binding-reference-evidence
+  - dynamic-source-boundary-overlap-review
   - dynamic-source-callable-family
+  - dynamic-source-callable-object-evidence
+  - dynamic-source-completion-record-evidence
+  - dynamic-source-construction-contracts
+  - dynamic-source-eval-arguments-accounting
+  - dynamic-source-eval-contract-accounting
   - dynamic-source-importcall-accounting
+  - dynamic-source-importcall-residual-accounting
   - dynamic-source-lexical-completion-family
+  - dynamic-source-lexical-static-evidence
+  - dynamic-source-module-goal-validation
+  - dynamic-source-module-observable-contracts
   - dynamic-source-module-semantics
   - dynamic-source-private-binding-family
+  - dynamic-source-realm-host-evidence
   - dynamic-source-realm-string-family
+  - dynamic-source-regexp-static-evidence
+  - dynamic-source-residual-evidence
+  - dynamic-source-static-core-evidence
+  - dynamic-source-template-site-evidence
   - dynamic-source-unknown-eval
 landed: false
 status: ready

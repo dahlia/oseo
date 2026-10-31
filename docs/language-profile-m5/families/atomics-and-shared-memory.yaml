@@ -23,6 +23,11 @@ scope:
     with numeric and BigInt holes, the compile-time rejection of a hole that
     is not one literal token position, and the dynamic source boundary for
     any other start source."
+  - "The main test262 agent's explicit CanBlock policy, true by default and
+    false for CanBlockIsFalse; child agents start true, while realms retain
+    their owning context's policy. A synchronous wait checks the policy
+    after argument validation/conversion and before memory comparison;
+    waitAsync is unchanged."
   - "Reviewed standards coverage is the 112 upstream paths that name
     $262.agent, built with the test262 host and executed without a
     deterministic scheduler record through the reviewed atomicsHelper.js
@@ -40,6 +45,8 @@ evidence:
   fixed:
     status: covered
     references:
+      - tests/non-blocking-agent-native.test.ts
+      - packages/cli/tests/non-blocking-agent.test.ts
       - tests/native/fixtures/atomics-and-shared-memory.ts
       - tests/native.ts
       - tests/native/scenarios/agents.ts
@@ -47,12 +54,15 @@ evidence:
   forced-collection:
     status: covered
     references:
+      - tests/non-blocking-agent-native.test.ts
+      - tests/property/m5-non-blocking-agent.property.test.ts
       - tests/native.ts
       - tests/native/fixtures/atomics-and-shared-memory.ts
       - tests/property/m5-atomics-and-shared-memory.property.test.ts
   generated:
     status: covered
     references:
+      - tests/property/m5-non-blocking-agent.property.test.ts
       - tests/property-seeds.yaml
       - tests/property/m5-atomics-and-shared-memory.property.test.ts
   guard-fallback:
@@ -64,6 +74,8 @@ evidence:
   specialization:
     status: covered
     references:
+      - tests/non-blocking-agent-native.test.ts
+      - tests/property/m5-non-blocking-agent.property.test.ts
       - tests/native.ts
       - tests/native/fixtures/atomics-and-shared-memory.ts
       - tests/property/m5-atomics-and-shared-memory.property.test.ts

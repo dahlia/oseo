@@ -5,7 +5,7 @@
 # or a split of one batch that PLAN-M5C.md records.
 version: 1
 suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
-unreviewedPaths: 6742
+unreviewedPaths: 1670
 basis:
   supportedFeatures:
     - AggregateError
@@ -165,509 +165,45 @@ regeneration:
     wallSeconds: 3997
     workers: 8
   secondsPerVariant: 0.0549
-  currentExecutedVariants: 113928
-  currentSeconds: 6259
-  finalExecutedVariants: 137314
-  finalSeconds: 7544
+  currentExecutedVariants: 131810
+  currentSeconds: 7242
+  finalExecutedVariants: 136992
+  finalSeconds: 7527
   plan:
-    batches: 13
-    largestPaths: 794
-    largestReviewUnits: 500
+    batches: 4
+    largestPaths: 645
+    largestReviewUnits: 464
     limits:
       paths: 3000
       reviewUnits: 500
-    scheduleHours: 25.69
-    fullUpdateScheduleHours: 50.66
+    scheduleHours: 8.36
+    fullUpdateScheduleHours: 16.56
   alternatives:
-    - batches: 12
-      largestPaths: 1920
+    - batches: 5
+      largestPaths: 453
       largestReviewUnits: 300
       limits:
         paths: 2000
         reviewUnits: 300
-      scheduleHours: 24.19
-      fullUpdateScheduleHours: 47.67
-    - batches: 6
-      largestPaths: 2408
-      largestReviewUnits: 595
+      scheduleHours: 10.41
+      fullUpdateScheduleHours: 20.66
+    - batches: 2
+      largestPaths: 1115
+      largestReviewUnits: 581
       limits:
         paths: 4000
         reviewUnits: 600
-      scheduleHours: 12.33
-      fullUpdateScheduleHours: 23.95
-    - batches: 3
-      largestPaths: 3629
-      largestReviewUnits: 1144
+      scheduleHours: 4.24
+      fullUpdateScheduleHours: 8.31
+    - batches: 1
+      largestPaths: 1670
+      largestReviewUnits: 883
       limits:
         paths: 8000
         reviewUnits: 1200
-      scheduleHours: 6.46
-      fullUpdateScheduleHours: 12.2
+      scheduleHours: 2.17
+      fullUpdateScheduleHours: 4.18
 batches:
-  - id: observation-batch-21a
-    selector:
-      prerequisiteSets:
-        - ""
-      prefixes:
-        - test/language/statements/async-
-        - test/language/statements/block/
-        - test/language/statements/break/
-        - test/language/statements/class/arguments/
-        - test/language/statements/class/async-
-        - test/language/statements/class/class-name-ident-
-        - test/language/statements/class/cpn-class-decl-
-        - test/language/statements/class/cptn-
-        - test/language/statements/class/definition/
-    dependsOn:
-      - observation-batch-plan
-    paths: 488
-    reviewUnits: 267
-    generatedPaths: 411
-    prerequisites: {}
-    dynamicSource:
-      Function: 1
-      eval: 4
-    flags:
-      async: 220
-      generated: 411
-      module: 6
-      noStrict: 33
-      onlyStrict: 4
-    includes:
-      compareArray.js: 4
-      propertyHelper.js: 2
-    features:
-      Symbol: 2
-      Symbol.asyncIterator: 88
-      Symbol.iterator: 106
-      Symbol.unscopables: 2
-      arrow-function: 30
-      async-functions: 85
-      async-iteration: 208
-      class: 20
-      class-fields-private: 4
-      class-fields-public: 62
-      class-static-fields-public: 62
-      computed-property-names: 124
-      default-parameters: 36
-      exponentiation: 8
-      generators: 13
-      globalThis: 2
-      let: 2
-      logical-assignment-operators: 12
-      object-spread: 4
-      rest-parameters: 12
-      top-level-await: 4
-    negatives:
-      parse: 95
-    partitions:
-      groups:
-        - language/statements
-      files: 223
-      newFiles: 0
-    regeneration:
-      executableVariants: 1498
-      scopedUpdateSeconds: 82
-      fullCorpusSeconds: 6342
-  - id: observation-batch-21b
-    selector:
-      prerequisiteSets:
-        - ""
-      prefixes:
-        - test/language/statements/class/dstr/async-
-    dependsOn:
-      - observation-batch-plan
-    paths: 640
-    reviewUnits: 105
-    generatedPaths: 640
-    prerequisites: {}
-    dynamicSource: {}
-    flags:
-      async: 488
-      generated: 640
-    includes:
-      compareArray.js: 8
-      propertyHelper.js: 24
-    features:
-      Symbol.iterator: 52
-      async-iteration: 640
-      class: 268
-      class-methods-private: 134
-      class-static-methods-private: 134
-      generators: 100
-      object-rest: 24
-    negatives:
-      parse: 48
-    partitions:
-      groups:
-        - language/statements
-      files: 236
-      newFiles: 0
-    regeneration:
-      executableVariants: 2368
-      scopedUpdateSeconds: 130
-      fullCorpusSeconds: 6472
-  - id: observation-batch-21c
-    selector:
-      prerequisiteSets:
-        - ""
-      prefixes:
-        - test/language/statements/class/dstr/gen-
-        - test/language/statements/class/dstr/private-gen-
-    dependsOn:
-      - observation-batch-plan
-    paths: 640
-    reviewUnits: 105
-    generatedPaths: 640
-    prerequisites: {}
-    dynamicSource: {}
-    flags:
-      generated: 640
-    includes:
-      compareArray.js: 8
-      propertyHelper.js: 24
-    features:
-      Symbol.iterator: 52
-      class: 268
-      class-methods-private: 134
-      class-static-methods-private: 134
-      default-parameters: 320
-      destructuring-binding: 640
-      generators: 640
-      object-rest: 24
-    negatives:
-      parse: 48
-    partitions:
-      groups:
-        - language/statements
-      files: 236
-      newFiles: 0
-    regeneration:
-      executableVariants: 2368
-      scopedUpdateSeconds: 130
-      fullCorpusSeconds: 6602
-  - id: observation-batch-21d
-    selector:
-      prerequisiteSets:
-        - ""
-      prefixes:
-        - test/language/statements/class/dstr/meth-
-        - test/language/statements/class/dstr/private-meth-
-    dependsOn:
-      - observation-batch-plan
-    paths: 640
-    reviewUnits: 105
-    generatedPaths: 640
-    prerequisites: {}
-    dynamicSource: {}
-    flags:
-      generated: 640
-    includes:
-      compareArray.js: 8
-      propertyHelper.js: 24
-    features:
-      Symbol.iterator: 52
-      class: 268
-      class-methods-private: 134
-      class-static-methods-private: 134
-      default-parameters: 320
-      destructuring-binding: 640
-      generators: 100
-      object-rest: 24
-    negatives:
-      parse: 48
-    partitions:
-      groups:
-        - language/statements
-      files: 240
-      newFiles: 0
-    regeneration:
-      executableVariants: 2368
-      scopedUpdateSeconds: 130
-      fullCorpusSeconds: 6732
-  - id: observation-batch-22a
-    selector:
-      prerequisiteSets:
-        - ""
-      prefixes:
-        - test/language/statements/class/elements/after-
-        - test/language/statements/class/elements/arrow-
-        - test/language/statements/class/elements/async-
-        - test/language/statements/class/elements/class-
-        - test/language/statements/class/elements/derived-
-        - test/language/statements/class/elements/direct-
-        - test/language/statements/class/elements/fields-
-        - test/language/statements/class/elements/gen-
-        - test/language/statements/class/elements/get-
-        - test/language/statements/class/elements/indirect-
-        - test/language/statements/class/elements/multiple-
-        - test/language/statements/class/elements/nested-
-    dependsOn:
-      - observation-batch-plan
-    paths: 579
-    reviewUnits: 212
-    generatedPaths: 574
-    prerequisites: {}
-    dynamicSource:
-      eval: 65
-    flags:
-      async: 243
-      generated: 574
-      noStrict: 3
-      onlyStrict: 8
-    includes:
-      compareArray.js: 5
-      propertyHelper.js: 306
-    features:
-      Proxy: 1
-      Symbol: 8
-      Symbol.asyncIterator: 88
-      Symbol.iterator: 106
-      async-functions: 61
-      async-iteration: 198
-      class: 375
-      class-fields-private: 131
-      class-fields-public: 370
-      class-methods-private: 166
-      class-static-fields-private: 57
-      class-static-methods-private: 183
-      computed-property-names: 16
-      generators: 103
-      new.target: 10
-      object-spread: 8
-    negatives:
-      parse: 57
-    partitions:
-      groups:
-        - language/statements
-      files: 235
-      newFiles: 0
-    regeneration:
-      executableVariants: 2082
-      scopedUpdateSeconds: 114
-      fullCorpusSeconds: 6846
-  - id: observation-batch-22b
-    selector:
-      prerequisiteSets:
-        - ""
-      prefixes:
-        - test/language/statements/class/elements/
-        - test/language/statements/class/gen-
-        - test/language/statements/class/ident-name-method-def-
-        - test/language/statements/class/method-
-        - test/language/statements/class/method/forbidden-ext/
-        - test/language/statements/class/name-binding/
-        - test/language/statements/class/name.
-        - test/language/statements/class/params-dflt-
-        - test/language/statements/class/poisoned-
-        - test/language/statements/class/private-
-        - test/language/statements/class/restricted-
-    dependsOn:
-      - observation-batch-plan
-    paths: 640
-    reviewUnits: 341
-    generatedPaths: 575
-    prerequisites: {}
-    dynamicSource:
-      eval: 35
-    flags:
-      async: 108
-      generated: 575
-      noStrict: 21
-      onlyStrict: 4
-    includes:
-      compareArray.js: 5
-      propertyHelper.js: 289
-    features:
-      BigInt: 2
-      Proxy: 3
-      Symbol: 9
-      arrow-function: 1
-      async-functions: 48
-      async-iteration: 67
-      class: 567
-      class-fields-private: 164
-      class-fields-public: 364
-      class-methods-private: 125
-      class-static-fields-private: 57
-      class-static-fields-public: 7
-      class-static-methods-private: 144
-      computed-property-names: 19
-      default-parameters: 24
-      generators: 158
-      new.target: 2
-      object-spread: 4
-      rest-parameters: 6
-    negatives:
-      parse: 92
-    partitions:
-      groups:
-        - language/statements
-      files: 237
-      newFiles: 0
-    regeneration:
-      executableVariants: 2150
-      scopedUpdateSeconds: 118
-      fullCorpusSeconds: 6965
-  - id: observation-batch-23
-    selector:
-      prerequisiteSets:
-        - ""
-      prefixes:
-        - test/language/statements/class/subclass/
-        - test/language/statements/class/syntax/
-    dependsOn:
-      - observation-batch-plan
-    paths: 2
-    reviewUnits: 2
-    generatedPaths: 0
-    prerequisites: {}
-    dynamicSource: {}
-    flags: {}
-    includes: {}
-    features:
-      Symbol.iterator: 1
-    negatives:
-      parse: 1
-    partitions:
-      groups:
-        - language/statements
-      files: 2
-      newFiles: 0
-    regeneration:
-      executableVariants: 4
-      scopedUpdateSeconds: 0
-      fullCorpusSeconds: 6965
-  - id: observation-batch-24
-    selector:
-      prerequisiteSets:
-        - ""
-      prefixes:
-        - test/language/statements/for-await-of/
-        - test/language/statements/for-in/
-    dependsOn:
-      - observation-batch-plan
-    paths: 794
-    reviewUnits: 228
-    generatedPaths: 781
-    prerequisites: {}
-    dynamicSource: {}
-    flags:
-      async: 785
-      generated: 781
-      noStrict: 11
-      onlyStrict: 2
-    includes:
-      compareArray.js: 4
-      propertyHelper.js: 33
-    features:
-      Symbol: 3
-      Symbol.iterator: 63
-      async-iteration: 787
-      const: 1
-      destructuring-binding: 781
-      generators: 117
-      object-rest: 38
-    negatives: {}
-    partitions:
-      groups:
-        - language/statements
-      files: 246
-      newFiles: 0
-    regeneration:
-      executableVariants: 3150
-      scopedUpdateSeconds: 173
-      fullCorpusSeconds: 7138
-  - id: observation-batch-25
-    selector:
-      prerequisiteSets:
-        - ""
-      prefixes:
-        - test/language/statements/for-of/Array.prototype.
-        - test/language/statements/for-of/array-
-        - test/language/statements/for-of/array.
-        - test/language/statements/for-of/body-
-        - test/language/statements/for-of/break-
-        - test/language/statements/for-of/break.
-        - test/language/statements/for-of/continue-
-        - test/language/statements/for-of/continue.
-        - test/language/statements/for-of/cptn-
-        - test/language/statements/for-of/decl-
-        - test/language/statements/for-of/dstr/
-        - test/language/statements/for-of/escaped-
-        - test/language/statements/for-of/float32array-
-        - test/language/statements/for-of/float32array.
-        - test/language/statements/for-of/float64array-
-        - test/language/statements/for-of/float64array.
-        - test/language/statements/for-of/generator-
-        - test/language/statements/for-of/generator.
-        - test/language/statements/for-of/generic-
-        - test/language/statements/for-of/head-
-        - test/language/statements/for-of/int16array-
-        - test/language/statements/for-of/int16array.
-        - test/language/statements/for-of/int32array-
-        - test/language/statements/for-of/int32array.
-        - test/language/statements/for-of/int8array-
-        - test/language/statements/for-of/int8array.
-        - test/language/statements/for-of/iterator-
-        - test/language/statements/for-of/labelled-fn-stmt-
-        - test/language/statements/for-of/let-
-        - test/language/statements/for-of/map-
-        - test/language/statements/for-of/map.
-        - test/language/statements/for-of/nested.
-        - test/language/statements/for-of/return-from-
-        - test/language/statements/for-of/return.
-        - test/language/statements/for-of/scope-
-        - test/language/statements/for-of/set-
-        - test/language/statements/for-of/set.
-        - test/language/statements/for-of/string-
-        - test/language/statements/for-of/throw-from-
-        - test/language/statements/for-of/throw.
-        - test/language/statements/for-of/uint16array-
-        - test/language/statements/for-of/uint16array.
-    dependsOn:
-      - observation-batch-plan
-    paths: 646
-    reviewUnits: 500
-    generatedPaths: 509
-    prerequisites: {}
-    dynamicSource:
-      eval: 9
-    flags:
-      generated: 509
-      noStrict: 29
-      onlyStrict: 20
-    includes:
-      compareArray.js: 7
-      propertyHelper.js: 32
-    features:
-      Map: 5
-      Proxy: 1
-      Set: 5
-      Symbol: 5
-      Symbol.iterator: 104
-      TypedArray: 12
-      async-functions: 1
-      async-iteration: 1
-      class: 4
-      const: 4
-      destructuring-binding: 509
-      for-of: 2
-      generators: 109
-      let: 13
-      object-rest: 29
-      optional-chaining: 4
-    negatives:
-      parse: 79
-    partitions:
-      groups:
-        - language/statements
-      files: 241
-      newFiles: 0
-    regeneration:
-      executableVariants: 2210
-      scopedUpdateSeconds: 121
-      fullCorpusSeconds: 7259
   - id: observation-batch-26a
     selector:
       prerequisiteSets:
@@ -715,7 +251,7 @@ batches:
     regeneration:
       executableVariants: 1328
       scopedUpdateSeconds: 73
-      fullCorpusSeconds: 7332
+      fullCorpusSeconds: 7315
   - id: observation-batch-26b
     selector:
       prerequisiteSets:
@@ -762,7 +298,7 @@ batches:
     regeneration:
       executableVariants: 2116
       scopedUpdateSeconds: 116
-      fullCorpusSeconds: 7449
+      fullCorpusSeconds: 7431
   - id: observation-batch-27
     selector:
       prerequisiteSets:
@@ -814,33 +350,30 @@ batches:
     regeneration:
       executableVariants: 1734
       scopedUpdateSeconds: 95
-      fullCorpusSeconds: 7544
+      fullCorpusSeconds: 7526
   - id: observation-batch-28
     selector:
       prerequisiteSets:
         - ""
       prefixes:
-        - test/language/statements/with/
         - test/language/types/
     dependsOn:
       - observation-batch-plan
-    paths: 4
-    reviewUnits: 4
+    paths: 1
+    reviewUnits: 1
     generatedPaths: 0
     prerequisites: {}
     dynamicSource: {}
-    flags:
-      noStrict: 3
+    flags: {}
     includes: {}
     features: {}
     negatives: {}
     partitions:
       groups:
-        - language/statements
         - language/types
-      files: 4
+      files: 1
       newFiles: 1
     regeneration:
-      executableVariants: 10
-      scopedUpdateSeconds: 1
-      fullCorpusSeconds: 7544
+      executableVariants: 4
+      scopedUpdateSeconds: 0
+      fullCorpusSeconds: 7527

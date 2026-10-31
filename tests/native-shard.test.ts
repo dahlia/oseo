@@ -181,12 +181,16 @@ test("Linux weights match the three-run median case sums", async () => {
   const { costs } = nativeShardModel("linux");
   // Added after the three source runs; they keep their earlier weights.
   // The module and with-var files use one candidate run each (see U6).
+  // Primitive with boxing and the non-blocking agent use later local
+  // Linux extended runs.
   const retained = [
     "tests/property/m5-host-script-bindings.property.test.ts",
     "tests/property/m5-module-namespace-uninitialized.property.test.ts",
     "tests/property/m5-module-prelude-script.property.test.ts",
     "tests/property/m5-proper-tail-calls.property.test.ts",
     "tests/property/m5-with-var-loop-head.property.test.ts",
+    "tests/property/m5-with-primitive-boxing.property.test.ts",
+    "tests/property/m5-non-blocking-agent.property.test.ts",
   ];
   assert.deepEqual(
     rows.map((row) => row.split("\t")[0]).toSorted(),

@@ -10,10 +10,14 @@ delivers: "Audits the exact original 65 path/source identities retained in
   2026-10-22, which an accepted ADR 0016 amendment admitting any form of
   dynamic import reopens. The reservation has zero remaining unreviewed paths;
   this node performs no duplicate first admission, claims no new pass or
-  automatic closure, and authorizes no exclusion itself."
+  automatic closure, and authorizes no exclusion itself. Source and
+  accounting checks on
+  8f420262 verify all 65 hashes and canonical subset/manifest/ledger
+  agreement without changing any record; see
+  docs/m5c-graph/observation-batch-31.md."
 dependencies:
   - dynamic-import
   - import-attributes
   - observation-batch-plan
-landed: false
+landed: true
 status: ready

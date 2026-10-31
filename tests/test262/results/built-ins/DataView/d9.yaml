@@ -19,6 +19,7 @@ results:
     dependencies:
       - array-buffer
       - data-view
+      - dynamic-source
     execution:
       harnessIncludes:
         - base.js

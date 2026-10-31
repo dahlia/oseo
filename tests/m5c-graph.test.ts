@@ -548,11 +548,11 @@ test("the checked-in M5c work graph is valid", () => {
   );
   assert.equal(summary.ready + summary.blocked + summary.parked, summary.nodes);
   // Landing marks change this count without changing the graph's shape.
-  assert.ok(summary.landed >= 97);
+  assert.ok(summary.landed >= 129);
   assert.equal(summary.parked, 0);
-  assert.equal(summary.nodes, 124);
-  assert.equal(summary.ready, 121);
-  assert.equal(summary.blocked, 3);
+  assert.equal(summary.nodes, 140);
+  assert.equal(summary.ready, 139);
+  assert.equal(summary.blocked, 1);
   const array = readImportAttributesNode(
     "ordinary-array-indexed-lookup-performance",
   );
@@ -592,7 +592,7 @@ test("import attribute accounting retains its bounded graph contract", () => {
   assert.match(owner.delivers, /counts none as a pass/u);
   assert.match(owner.delivers, /does not widen the existing/u);
   const reservation = readImportAttributesNode("observation-batch-31");
-  assert.equal(reservation.landed, false);
+  assert.equal(reservation.landed, true);
   assert.equal(reservation.status, "ready");
   assert.deepEqual(reservation.dependencies, [
     "dynamic-import",
@@ -698,7 +698,7 @@ function deliveredPaths(node: Batch11PrerequisiteNode): readonly string[] {
   return [...new Set(node.delivers.match(/test\/[^\s,]+\.js/gu))].toSorted();
 }
 
-test("batch11 prerequisites retain their three-path contracts", () => {
+test("class accessor prerequisites retain their bounded paths", () => {
   validateCurrentM5cWorkGraph();
   const readNode = (id: string): Batch11PrerequisiteNode =>
     // SAFETY: graph validation checked each parsed node's shape.
@@ -721,7 +721,12 @@ test("batch11 prerequisites retain their three-path contracts", () => {
       "private-setter-is-not-a-own-property.js",
   ];
   assert.deepEqual(deliveredPaths(classifier), accessorPaths);
-  assert.deepEqual(deliveredPaths(coverage), accessorPaths);
+  assert.deepEqual(deliveredPaths(coverage), [
+    ...accessorPaths,
+    ...accessorPaths.map((path) =>
+      path.replace("/expressions/", "/statements/"),
+    ),
+  ]);
   assert.deepEqual(deliveredPaths(earlyError), [
     "test/language/expressions/class/elements/syntax/early-errors/" +
       "grammar-class-body-ctor-duplicate.js",
@@ -832,6 +837,7 @@ test("observation train retains bounded remediation dependencies", () => {
   // their batches could admit the paths these nodes owned;
   // with-var-loop-head-resolution landed in the 2026-10-30 bundle.
   const landedRemediations = new Set([
+    "array-generated-property-cost-remediation",
     "dynamic-import-early-error-precedence",
     "module-namespace-uninitialized-bindings",
     "test262-module-harness-globals",
