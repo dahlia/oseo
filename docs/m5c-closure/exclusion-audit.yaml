@@ -1114,35 +1114,37 @@ assessments:
         "c5eb018779c47f7de2959da4a1a64969475c8026fc831102\
         f06e8bef6382e1e3"
   ds13-static-construction-contracts:
-    disposition: exclusion
-    normativeDependency: source-evaluation-only
+    disposition: "exclusion"
+    normativeDependency: "source-evaluation-only"
     replacementEvidence:
-      tests/construction-static-contracts.test.ts: "57c692b940a15cb9fcf843b64\
-        6514c3a581ea3812e40dc769e67d026cb6b8d8d"
-      tests/native/fixtures/construction-static-contracts.ts: "ba88cc3a02a0f4\
-        eedb45740ac0de8c695150d0e229264ba8d34f504dc66942da"
-      tests/native.ts: "73f887cf52020a7eff851c130c0df6477ba06267629abcc324f9b\
-        e78e266cae0"
-    reason:
+      tests/construction-static-contracts.test.ts: "428628247b099d6e74148a55\
+        90f24966b2f41a0ebe9cabe4a5454e61063d6b54"
+      tests/native/fixtures/construction-static-contracts.ts: "784b3e71396e5\
+        f40e33a5b3cbe52a3ec28b59cdba905431d1e8e0c1d929ae6b6"
+      tests/native.ts: "73f887cf52020a7eff851c130c0df6477ba06267629abcc324f9\
+        be78e266cae0"
+    reason: >-
       Maintainer decision 2026-10-28 item 1 applies only to the 24 exclusion
       rows in docs/m5c-graph/dynamic-source-construction-assessment.yaml.
       Complete ordinary function definitions witness the same strict/sloppy
-      formal parameter and body grammar; syntax negatives report OSEO0001 with
-      no MIR and the reference compiler reports SyntaxError. The fixed
-      construction-static-contracts native fixture observes duplicate binding
-      acceptance, eval/arguments parameter acceptance, arguments[0] identity,
-      Function instance/constructor identity, true/undefined results and the
-      exact sums 6, ABBA1 and 2ABBA under both policies with forced GC. String
-      argument grouping, strict-caller independence of separately compiled
-      source and call/new construction are the remaining CreateDynamicFunction
-      source-construction residue. No object/primitive non-String conversion or
-      Function-family subclass row is excluded. The exact per-path subject,
-      witness observation, reason and fresh original digests are in the
-      assessment. All original unsupported observations remain unchanged and
-      never count as passes. Reopen on original or replacement
-      source/observation changes, accepted ADR 0016 admission of Function-family
-      construction, or ADR 0019 non-source dependence; all ADR 0016 laboratory,
-      staged-compilation and WinterTC triggers remain.
+      formal parameter and body grammar; syntax negatives report OSEO0001
+      with no MIR and the reference compiler reports SyntaxError. The fixed
+      construction-static-contracts native fixture observes duplicate
+      binding acceptance, eval/arguments parameter acceptance, arguments[0]
+      identity, Function instance/constructor identity, true/undefined
+      results and the exact sums 6, ABBA1 and 2ABBA under both policies with
+      forced GC. All 17 printed primitive values pass Object.is before
+      formatting; seven string-result mutations must throw. String argument
+      grouping, strict-caller independence of separately compiled source and
+      call/new construction are the remaining CreateDynamicFunction
+      source-construction residue. No object/primitive non-String conversion
+      or Function-family subclass row is excluded. The exact per-path
+      subject, witness observation, reason and fresh original digests are in
+      the assessment. All original unsupported observations remain unchanged
+      and never count as passes. Reopen on original or replacement
+      source/observation changes, accepted ADR 0016 admission of
+      Function-family construction, or ADR 0019 non-source dependence; all
+      ADR 0016 laboratory, staged-compilation and WinterTC triggers remain.
 paths:
   - path: test/built-ins/AggregateError/newtarget-proto-fallback.js
     proposedOwner: adr:0016-dynamic-source-boundary

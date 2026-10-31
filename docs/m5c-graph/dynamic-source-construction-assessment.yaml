@@ -11,17 +11,20 @@ evidenceAdded:
   structuralGroups: 1
   nativeFixtureGroups: 1
   nativeObservationLines: 6
+  stringResultMutations: 7
 qualification: >-
   Each row was read separately. Evidence is new unless named; no existing
   reviewed passing path was established as a complete witness for these
   contracts. New witnesses close only the ordinary static subjects named per
   row; conversion/subclass interactions remain open. No subset, result,
-  dependency tag, inventory or ADR edit.
+  dependency tag, inventory or ADR edit. All 17 printed primitive
+  observations pass Object.is before formatting; seven string-result
+  mutations must throw.
 replacementEvidence:
-  tests/construction-static-contracts.test.ts: "57c692b940a15cb9fcf843b64651\
-    4c3a581ea3812e40dc769e67d026cb6b8d8d"
-  tests/native/fixtures/construction-static-contracts.ts: "ba88cc3a02a0f4eed\
-    b45740ac0de8c695150d0e229264ba8d34f504dc66942da"
+  tests/construction-static-contracts.test.ts: "428628247b099d6e74148a5590f2\
+    4966b2f41a0ebe9cabe4a5454e61063d6b54"
+  tests/native/fixtures/construction-static-contracts.ts: "784b3e71396e5f40e\
+    33a5b3cbe52a3ec28b59cdba905431d1e8e0c1d929ae6b6"
   tests/native.ts: "73f887cf52020a7eff851c130c0df6477ba06267629abcc324f9be78\
     e266cae0"
 paths:
@@ -56,7 +59,7 @@ paths:
     sourceDigest: "adf6d2ae368b5c49e3c5e08c334383af60cc90bbb5ebe4b6eb770cac7\
       6f2db8a"
     subject: "Sloppy body accepts separate duplicate parameter names."
-    replacementObservation: "duplicates 3 2 3"
+    replacementObservation: "Object.is before print: duplicates 3 2 3"
     disposition: "exclusion"
     reason: >-
       Ordinary static function grammar is witnessed; caller independence,
@@ -71,7 +74,7 @@ paths:
     subject: >-
       A strict caller does not make constructed duplicate-parameter source
       strict.
-    replacementObservation: "duplicates 3 2 3"
+    replacementObservation: "Object.is before print: duplicates 3 2 3"
     disposition: "exclusion"
     reason: >-
       Ordinary static function grammar is witnessed; caller independence,
@@ -97,7 +100,7 @@ paths:
     sourceDigest: "8cfe951f639203f37b25fc42617562e7cb496ec4db910fbcc9f3ff005\
       4a5eca9"
     subject: "Sloppy body accepts the parameter name eval."
-    replacementObservation: "names 4 5"
+    replacementObservation: "Object.is before print: names 4 5"
     disposition: "exclusion"
     reason: >-
       Ordinary static function grammar is witnessed; caller independence,
@@ -112,7 +115,7 @@ paths:
     subject: >-
       A strict caller does not make constructed eval-parameter source
       strict.
-    replacementObservation: "names 4 5"
+    replacementObservation: "Object.is before print: names 4 5"
     disposition: "exclusion"
     reason: >-
       Ordinary static function grammar is witnessed; caller independence,
@@ -140,7 +143,7 @@ paths:
       1737793"
     subject: >-
       Sloppy body accepts duplicates in one combined parameter string.
-    replacementObservation: "duplicates 3 2 3"
+    replacementObservation: "Object.is before print: duplicates 3 2 3"
     disposition: "exclusion"
     reason: >-
       Ordinary static function grammar is witnessed; caller independence,
@@ -155,7 +158,7 @@ paths:
     subject: >-
       A strict caller does not make combined duplicate-parameter source
       strict.
-    replacementObservation: "duplicates 3 2 3"
+    replacementObservation: "Object.is before print: duplicates 3 2 3"
     disposition: "exclusion"
     reason: >-
       Ordinary static function grammar is witnessed; caller independence,
@@ -170,7 +173,7 @@ paths:
     subject: >-
       A strict caller does not make constructed arguments-parameter source
       strict.
-    replacementObservation: "names 4 5"
+    replacementObservation: "Object.is before print: names 4 5"
     disposition: "exclusion"
     reason: >-
       Ordinary static function grammar is witnessed; caller independence,
@@ -185,7 +188,7 @@ paths:
     subject: >-
       A strict caller does not make non-adjacent duplicate-parameter source
       strict.
-    replacementObservation: "duplicates 3 2 3"
+    replacementObservation: "Object.is before print: duplicates 3 2 3"
     disposition: "exclusion"
     reason: >-
       Ordinary static function grammar is witnessed; caller independence,
@@ -198,7 +201,7 @@ paths:
     sourceDigest: "f795f13df7423eb03b5e95a43aa611f3be00dc66c76a9efde81a31053\
       f5cdb4e"
     subject: "Constructed sloppy body accepts three identical parameters."
-    replacementObservation: "duplicates 3 2 3"
+    replacementObservation: "Object.is before print: duplicates 3 2 3"
     disposition: "exclusion"
     reason: >-
       Ordinary static function grammar is witnessed; caller independence,
@@ -213,7 +216,9 @@ paths:
     subject: >-
       Call/new forms produce Function instances returning arguments[0] for 1
       and A.
-    replacementObservation: "identity 1 A; function true true true true true"
+    replacementObservation: >-
+      Object.is before print: identity 1 A; function true true true true
+      true
     disposition: "exclusion"
     reason: >-
       The exact ordinary grammar/result and Function identity are witnessed;
@@ -348,7 +353,8 @@ paths:
       60ae191"
     subject: "The created function has constructor Function and returns true."
     replacementObservation: >-
-      results true undefined; function true true true true true
+      Object.is before print: results true undefined; function true true
+      true true true
     disposition: "exclusion"
     reason: >-
       The exact ordinary grammar/result and Function identity are witnessed;
@@ -388,7 +394,9 @@ paths:
     subject: >-
       The created function is a Function instance and returns its A
       argument.
-    replacementObservation: "identity 1 A; function true true true true true"
+    replacementObservation: >-
+      Object.is before print: identity 1 A; function true true true true
+      true
     disposition: "exclusion"
     reason: >-
       The exact ordinary grammar/result and Function identity are witnessed;
@@ -404,7 +412,8 @@ paths:
       Three separate parameter strings produce a Function instance whose sum
       is 6.
     replacementObservation: >-
-      sums 6 ABBA1 2ABBA; function true true true true true
+      Object.is before print: sums 6 ABBA1 2ABBA; function true true true
+      true true
     disposition: "exclusion"
     reason: >-
       The exact ordinary grammar/result and Function identity are witnessed;
@@ -420,7 +429,8 @@ paths:
       Combined/separate parameter strings produce left-associative string
       sum ABBA1.
     replacementObservation: >-
-      sums 6 ABBA1 2ABBA; function true true true true true
+      Object.is before print: sums 6 ABBA1 2ABBA; function true true true
+      true true
     disposition: "exclusion"
     reason: >-
       The exact ordinary grammar/result and Function identity are witnessed;
@@ -435,7 +445,8 @@ paths:
     subject: >-
       One combined parameter string produces numeric-then-string sum 2ABBA.
     replacementObservation: >-
-      sums 6 ABBA1 2ABBA; function true true true true true
+      Object.is before print: sums 6 ABBA1 2ABBA; function true true true
+      true true
     disposition: "exclusion"
     reason: >-
       The exact ordinary grammar/result and Function identity are witnessed;
@@ -575,7 +586,8 @@ paths:
       Empty parameter/body text produces a function with constructor
       Function returning undefined.
     replacementObservation: >-
-      results true undefined; function true true true true true
+      Object.is before print: results true undefined; function true true
+      true true true
     disposition: "exclusion"
     reason: >-
       The exact ordinary grammar/result and Function identity are witnessed;

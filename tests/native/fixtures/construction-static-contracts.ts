@@ -14,15 +14,29 @@ function ordinary() { return arguments[0]; }
 function truth() { return true; }
 function empty() {}
 function sum(arg1, arg2, arg3) { return arg1 + arg2 + arg3; }
-console.log("duplicates", separated(1, 2, 3), adjacent(1, 2),
-  triple(1, 2, 3));
-console.log("names", namedEval(4), namedArguments(5));
-console.log("identity", ordinary(1), ordinary("A"));
-console.log("function", ordinary instanceof Function,
-  ordinary.constructor === Function, truth.constructor === Function,
-  empty.constructor === Function, sum instanceof Function);
-console.log("results", truth(), empty());
-console.log("sums", sum(1, 2, 3), sum("AB", "BA", 1), sum(1, 1, "ABBA"));
+// Object.is checks primitive type/value before console formatting loses it.
+function sameValue(actual, expected) {
+  if (!Object.is(actual, expected)) {
+    throw new Error("construction result mismatch");
+  }
+  return actual;
+}
+console.log("duplicates", sameValue(separated(1, 2, 3), 3),
+  sameValue(adjacent(1, 2), 2), sameValue(triple(1, 2, 3), 3));
+console.log("names", sameValue(namedEval(4), 4),
+  sameValue(namedArguments(5), 5));
+console.log("identity", sameValue(ordinary(1), 1),
+  sameValue(ordinary("A"), "A"));
+console.log("function", sameValue(ordinary instanceof Function, true),
+  sameValue(ordinary.constructor === Function, true),
+  sameValue(truth.constructor === Function, true),
+  sameValue(empty.constructor === Function, true),
+  sameValue(sum instanceof Function, true));
+console.log("results", sameValue(truth(), true),
+  sameValue(empty(), undefined));
+console.log("sums", sameValue(sum(1, 2, 3), 6),
+  sameValue(sum("AB", "BA", 1), "ABBA1"),
+  sameValue(sum(1, 1, "ABBA"), "2ABBA"));
 `,
 };
 

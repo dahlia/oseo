@@ -53,3 +53,34 @@ test("construction ordinary functions emit without source compilation", () => {
     assert.match(emitted, /OseoResult/u);
   }
 });
+
+// Each mutation would print the same text without the fixture's strict checks.
+const resultMutations = [
+  ["duplicates", "return a;", 'return "3";'],
+  ["names", "return eval;", 'return "4";'],
+  ["identity", "return arguments[0];", "return String(arguments[0]);"],
+  [
+    "function",
+    "sameValue(ordinary instanceof Function, true)",
+    "sameValue(String(ordinary instanceof Function), true)",
+  ],
+  ["true result", "return true;", 'return "true";'],
+  [
+    "undefined result",
+    "function empty() {}",
+    'function empty() { return "undefined"; }',
+  ],
+  ["sum", "return arg1 + arg2 + arg3;", "return String(arg1 + arg2 + arg3);"],
+] as const;
+
+for (const [name, original, replacement] of resultMutations) {
+  test(`construction rejects string result: ${name}`, () => {
+    const source = fixture.constructionStaticFixture.source;
+    assert.ok(source.includes(original));
+    const mutated = source.replace(original, replacement);
+    assert.throws(
+      () => new Script(mutated).runInNewContext({ console: { log() {} } }),
+      /construction result mismatch/u,
+    );
+  });
+}

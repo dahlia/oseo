@@ -127,22 +127,29 @@ reconcile at publication.
 ### Ordinary grammar and results
 
 *tests/construction-static-contracts.test.ts* adds eight static negative
-groups and one structural group. Complete ordinary function definitions
-reject strict duplicate parameters, strict `eval`/`arguments` parameters,
-strict `with`, an unbound private name, an invalid `var` binding and an
-invalid numeric parameter list. Both specialization policies report owned
-`OSEO0001` syntax diagnostics without MIR; Node.js and Deno's reference
-compiler reports `SyntaxError`. These observations cover the same ordinary
-FormalParameters and FunctionBody early errors. Catching a SyntaxError object
-in the original is the observer for that parse failure, rather than a
-separate error-object mutation or descriptor contract.
+groups, one structural group and seven string-result mutation checks.
+Complete ordinary function definitions reject strict duplicate parameters,
+strict `eval`/`arguments` parameters, strict `with`, an unbound private
+name, an invalid `var` binding and an invalid numeric parameter list. Both
+specialization policies report owned `OSEO0001` syntax diagnostics without
+MIR; the Node.js and Deno reference compilers report `SyntaxError`. These
+observations cover the same ordinary FormalParameters and FunctionBody
+early errors. Catching a SyntaxError object in the original is the
+observer for that parse failure, rather than a separate error-object
+mutation or descriptor contract.
 
 The fixed *tests/native/fixtures/construction-static-contracts.ts* fixture
 adds six observation groups: duplicate parameter bindings; sloppy `eval` and
 `arguments` parameter acceptance; `arguments[0]` identity for numeric and
 String inputs; `instanceof Function` and `.constructor` identity; true and
 undefined return values; and the exact left-associative sums `6`, `ABBA1` and
-`2ABBA`. Its native registration in *tests/native.ts* runs both policies,
+`2ABBA`. Each of its 17 primitive observations is checked with `Object.is`
+before printing, so a difference in type or value throws and fails execution.
+Seven mutations substitute strings with identical printed text: one each for
+duplicate bindings, named parameters, argument identity, Function predicates
+and numeric sums, plus separate true and undefined return cases. Each
+mutated test must throw in the reference hosts. Its native registration in
+*tests/native.ts* runs both policies,
 enters both forced-GC lists, checks the fixed expected output and positive
 collection count, and retains the structural property guards/generic fallback
 checks. No property-generator domain or compiler/runtime support is added.
@@ -182,12 +189,14 @@ unreachable mixed contracts; no broader exclusion is assumed.
 
 ### Validation and publication
 
-The focused static tests pass on Node.js and Deno (9 each). The locked focused
+The focused static tests pass on Node.js and Deno (16 each). The locked focused
 native run, `node tests/native.ts --shard 23/1000`, passes the new fixture on
 Linux x86-64 under both policies with forced collection, matches both
 references and the fixed expectation, and cross-links Linux AArch64. Its
 common runner prelude also passes. Logs are under
-*/data/m5c-d17-20261031/ds13/*.
+*/data/m5c-d17-20261031/ds13-fix/*. A native mutation converts the numeric
+argument result to a string and must fail under both policies with forced
+collection.
 
 No UPDATE is needed: the subset and result observations are unchanged, and
 the test262 runner cannot reach the new test-only fixture or registration.
