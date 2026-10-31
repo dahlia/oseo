@@ -82,8 +82,7 @@ Unreviewed follow-ups
  -  `test/language/types/object/S8.6.2_A8.js`: Reaches OSEO1001 on the Annex B
     Object.prototype.__proto__ accessor while asserting ordinary
     preventExtensions/GetPrototypeOf immutability; no existing bounded Annex B
-    owner fits. Root owns the follow-up
-    ordinary-object-proto-coverage-remediation node and audit-owner extension.
+    owner fits. The final admission below closes this follow-up.
 
 
 Scoped UPDATE agreement
@@ -241,3 +240,38 @@ to pass under observation. This batch retains one unreviewed original,
 The original train's observations retain their historical source binding.
 Root owns the combined Full, R, outer gate and publication; none is claimed
 by this admission.
+
+
+Final Annex B prototype admission
+---------------------------------
+
+Root authorized the final batch admission of
+*test/language/types/object/S8.6.2\_A8.js* on base
+`999f3416fdc62e2c28c2d067f22797306a781af2`. The reviewed executor classifies
+it `unsupported-profile-feature` with capability `profile-syntax`. Direct
+native runs on `linux-x86_64-gnu` reject all four variants, non-strict and
+strict with specialization enabled and disabled, at compile time with the
+same OSEO1001 Annex B `Object.prototype.__proto__` accessor diagnostic. Raw
+records, source hashes and natural exits are in
+[the observation packet](/data/m5c-d17-20261031/ob28/).
+
+Its tags are `object-literals`, `object-properties` and `var-bindings`. The
+two empty object literals construct the subject and its intended prototype,
+the `__proto__` assignment and the asserted `Object.getPrototypeOf` result
+are the property subjects, and both `var` bindings are read on the executed
+path. The try statement only swallows the rejected write's error, so it adds
+no `control-flow` or `abrupt-completion` (rules 1 and 4). The `!==`
+comparison guards a failure-only `Test262Error`, so it adds no
+`expression-operators` or `control-flow`. The test uses no fixture, Symbol
+dispatch or iterator protocol, and diagnostic text supplies no tag.
+
+Root ruled that the mixed path needs its own bounded owner. This change adds
+node `ordinary-object-proto-coverage-remediation`, lets the exclusion audit
+accept it as an Annex B remediation owner, and records assessment
+`annex-b-ordinary-object-prototype` with disposition `remediation` and
+normative dependency `not-demonstrated`. No exclusion or replacement
+evidence is claimed; the [*node work
+note*](./ordinary-object-proto-coverage-remediation.md) lists related
+passing core rows. The batch now owns no unreviewed path and leaves the
+observation batch plan. Root owns the scoped UPDATE, outer review and
+publication.

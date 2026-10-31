@@ -244585,6 +244585,9 @@ tests:
       - error-intrinsics
       - functions
       - var-bindings
+  - path: test/language/types/object/S8.6.2_A8.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [object-literals, object-properties, var-bindings]
   - path: test/language/types/object/S8.6_A2_T1.js
     expectedClassification: pass
     dependencies:

@@ -13,8 +13,8 @@ states:
   infrastructure-failure: 0
   pass: 33530
   semantic-failure: 0
-  unreviewed: 1670
-  unsupported-profile-feature: 1796
+  unreviewed: 1669
+  unsupported-profile-feature: 1797
 owners:
   adr:0016-dynamic-source-boundary:
     note: "ADR 0016 excludes \"`eval` in call position, the `Function`
@@ -330,10 +330,11 @@ owners:
       selects for observation-batch-27. The batch observes them; no
       classification is assumed before it does.
     paths: 640
-  node:observation-batch-28:
-    note: Unreviewed paths that docs/m5c-closure/observation-batches.yaml
-      selects for observation-batch-28. The batch observes them; no
-      classification is assumed before it does.
+  node:ordinary-object-proto-coverage-remediation:
+    note: Observation-batch-28 admits S8.6.2_A8.js as unsupported because
+      its __proto__ write reaches the Annex B OSEO1001 rejection. Its
+      core non-extensible [[Prototype]] subject remains remediation, not
+      an exclusion.
     paths: 1
   node:regexp-split-coverage-remediation:
     note: The observed Annex B-only named backreference rejection in
@@ -41320,7 +41321,7 @@ paths:
   test/language/types/object/S8.6.2_A5_T4.js: [pass, observation]
   test/language/types/object/S8.6.2_A6.js: [pass, observation]
   test/language/types/object/S8.6.2_A7.js: [pass, observation]
-  test/language/types/object/S8.6.2_A8.js: [unreviewed, node:observation-batch-28]
+  test/language/types/object/S8.6.2_A8.js: [unsupported-profile-feature, node:ordinary-object-proto-coverage-remediation, [object-literals, object-properties, var-bindings]]
   test/language/types/object/S8.6_A2_T1.js: [pass, observation]
   test/language/types/object/S8.6_A2_T2.js: [pass, observation]
   test/language/types/object/S8.6_A3_T1.js: [pass, observation]

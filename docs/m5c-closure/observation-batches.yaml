@@ -5,7 +5,7 @@
 # or a split of one batch that PLAN-M5C.md records.
 version: 1
 suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
-unreviewedPaths: 1670
+unreviewedPaths: 1669
 basis:
   supportedFeatures:
     - AggregateError
@@ -165,19 +165,19 @@ regeneration:
     wallSeconds: 3997
     workers: 8
   secondsPerVariant: 0.0549
-  currentExecutedVariants: 131810
+  currentExecutedVariants: 131811
   currentSeconds: 7242
-  finalExecutedVariants: 136992
-  finalSeconds: 7527
+  finalExecutedVariants: 136989
+  finalSeconds: 7526
   plan:
-    batches: 4
+    batches: 3
     largestPaths: 645
     largestReviewUnits: 464
     limits:
       paths: 3000
       reviewUnits: 500
-    scheduleHours: 8.36
-    fullUpdateScheduleHours: 16.56
+    scheduleHours: 6.27
+    fullUpdateScheduleHours: 12.37
   alternatives:
     - batches: 5
       largestPaths: 453
@@ -196,8 +196,8 @@ regeneration:
       scheduleHours: 4.24
       fullUpdateScheduleHours: 8.31
     - batches: 1
-      largestPaths: 1670
-      largestReviewUnits: 883
+      largestPaths: 1669
+      largestReviewUnits: 882
       limits:
         paths: 8000
         reviewUnits: 1200
@@ -351,29 +351,3 @@ batches:
       executableVariants: 1734
       scopedUpdateSeconds: 95
       fullCorpusSeconds: 7526
-  - id: observation-batch-28
-    selector:
-      prerequisiteSets:
-        - ""
-      prefixes:
-        - test/language/types/
-    dependsOn:
-      - observation-batch-plan
-    paths: 1
-    reviewUnits: 1
-    generatedPaths: 0
-    prerequisites: {}
-    dynamicSource: {}
-    flags: {}
-    includes: {}
-    features: {}
-    negatives: {}
-    partitions:
-      groups:
-        - language/types
-      files: 1
-      newFiles: 1
-    regeneration:
-      executableVariants: 4
-      scopedUpdateSeconds: 0
-      fullCorpusSeconds: 7527

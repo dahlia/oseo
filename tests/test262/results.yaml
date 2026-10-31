@@ -23223,6 +23223,9 @@ partitions:
     key: aa
     path: results/language/types/aa.yaml
   - group: language/types
+    key: ad
+    path: results/language/types/ad.yaml
+  - group: language/types
     key: ae
     path: results/language/types/ae.yaml
   - group: language/types
@@ -23469,7 +23472,7 @@ summary:
   infrastructureFailures: 0
   passes: 33530
   semanticFailures: 0
-  unsupportedProfileFeatures: 1796
+  unsupportedProfileFeatures: 1797
   dependencies:
     - dependency: abrupt-completion
       expectedNegatives: 25
@@ -23645,7 +23648,7 @@ summary:
       infrastructureFailures: 0
       passes: 5310
       semanticFailures: 0
-      unsupportedProfileFeatures: 178
+      unsupportedProfileFeatures: 179
     - dependency: object-own-keys
       expectedNegatives: 6
       harnessFailures: 0
@@ -23659,7 +23662,7 @@ summary:
       infrastructureFailures: 0
       passes: 21950
       semanticFailures: 0
-      unsupportedProfileFeatures: 978
+      unsupportedProfileFeatures: 979
     - dependency: promise-settlement
       expectedNegatives: 93
       harnessFailures: 0
@@ -23785,7 +23788,7 @@ summary:
       infrastructureFailures: 0
       passes: 10302
       semanticFailures: 0
-      unsupportedProfileFeatures: 711
+      unsupportedProfileFeatures: 712
     - dependency: weak-collections
       expectedNegatives: 0
       harnessFailures: 0
@@ -24381,7 +24384,7 @@ summary:
       infrastructureFailures: 0
       passes: 94
       semanticFailures: 0
-      unsupportedProfileFeatures: 7
+      unsupportedProfileFeatures: 8
     - group: language/white-space
       expectedNegatives: 6
       harnessFailures: 0
