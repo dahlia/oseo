@@ -612,3 +612,13 @@ unexecuted constructor accounting 1. Its pinned selector and obligations
 are in that child's work note. Ownership moves only with reviewed closure;
 the umbrella retains every remaining path and requires child landing plus
 zero directly owned paths before its own landing.
+
+
+Exhaustive regexp literal child
+-------------------------------
+
+The maintainer's 2026-11-01 answer adds `dynamic-source-regexp-exhaustive`
+for the four DS-17 BMP literal paths that need exhaustive witnesses. Its
+pinned selector and obligations are in that child's work note. The umbrella
+keeps those paths until reviewed closure moves them, and is blocked until
+the child lands.

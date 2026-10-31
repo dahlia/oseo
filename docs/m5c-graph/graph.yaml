@@ -20,9 +20,9 @@ baseline:
   unreviewedPaths: 0
   unsupportedProfileFeatures: 1939
 summary:
-  nodes: 141
+  nodes: 142
   ready: 140
-  blocked: 1
+  blocked: 2
   parked: 0
   landed: 136
 serializationPoints:
@@ -11435,3 +11435,18 @@ collisions:
       - typed-array-proto-coverage-remediation
     note: "Independent remediation owners update the exclusion audit and
       ledger; serialize these edits."
+  - path: tests/test262/results.yaml
+    nodes:
+      - class-private-accessor-lookup-coverage-remediation
+      - dynamic-source-regexp-exhaustive
+    note: "Independent publishers serialize canonical manifest updates."
+  - path: tests/test262/results.yaml
+    nodes:
+      - dynamic-source-regexp-exhaustive
+      - ordinary-object-proto-coverage-remediation
+    note: "Independent publishers serialize canonical manifest updates."
+  - path: tests/test262/results.yaml
+    nodes:
+      - dynamic-source-regexp-exhaustive
+      - unhandled-rejection-observation
+    note: "Independent publishers serialize canonical manifest updates."
