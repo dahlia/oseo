@@ -1113,6 +1113,64 @@ assessments:
       tests/native/fixtures/function-intrinsic-chains.ts:
         "c5eb018779c47f7de2959da4a1a64969475c8026fc831102\
         f06e8bef6382e1e3"
+  ds17-static-literal-grammar:
+    disposition: exclusion
+    normativeDependency: source-evaluation-only
+    reason: >-
+      Maintainer decision 2026-10-28 item 1 applies to the 18 exact grammar
+      paths in the DS-17 assessment table. Build-time compilation rejects
+      every original invalid literal with OSEO0001 and no MIR: all four line
+      terminators in first/subsequent and escaped positions, CR followed by n,
+      and both lone-surrogate group names with and without u. These are
+      lexical/early errors, so no native runtime or RegExp constructor
+      substitutes for literal parsing. Only evaluation of the rejected source
+      through eval remains. Reopen on changed source, observations or
+      replacement evidence, or an ADR 0016 amendment admitting eval; ADR 0019
+      non-source reopening remains in force.
+    replacementEvidence:
+      tests/regexp-static-grammar.test.ts:
+        "3ac4d22647648884e349f954665b17d33aa8df8ed7974e\
+        66003cf3014dcc26c8"
+  ds17-static-constructor-inputs:
+    disposition: exclusion
+    normativeDependency: source-evaluation-only
+    reason: >-
+      Maintainer decision 2026-10-28 item 1 applies to the two DS-17
+      constructor paths. The regexp-static-evidence native fixture replaces
+      only eval of the constant flag strings: migr still throws SyntaxError,
+      while Math with g observes ignoreCase=false, multiline=false,
+      global=true, lastIndex=0 and defined source. Both specialization
+      policies force collection. Only eval of the flag strings remains. Reopen
+      on changed source, observations or replacement evidence, or an ADR 0016
+      amendment admitting eval; ADR 0019 non-source reopening remains in
+      force.
+    replacementEvidence:
+      tests/native/fixtures/regexp-static-evidence.ts:
+        "bfc8bfb63c609c85f6ef79d9362deef6ac8434e2e1fd37\
+        e9256f23c3c634850b"
+  ds17-static-source-roundtrips:
+    disposition: exclusion
+    normativeDependency: source-evaluation-only
+    reason: >-
+      Maintainer decision 2026-10-28 item 1 applies to the five DS-17 RegExp
+      source paths. The regexp-static-evidence native fixture pins exact
+      source spelling and flags, builds the corresponding literal without
+      dynamic source, and tests every original positive and negative input for
+      both constructor/original and static literal. This includes empty, LF,
+      slash, both Unicode escape spellings and all twelve anchored-quantifier
+      inputs. Structural tests compile the exact source output to artifact-
+      carrying literal operations. Both native specialization policies force
+      collection. Only eval of the reconstructed literal remains. Reopen on
+      changed source, observations or replacement evidence, or an ADR 0016
+      amendment admitting eval; ADR 0019 non-source reopening remains in
+      force.
+    replacementEvidence:
+      tests/native/fixtures/regexp-static-evidence.ts:
+        "bfc8bfb63c609c85f6ef79d9362deef6ac8434e2e1fd37\
+        e9256f23c3c634850b"
+      tests/regexp-static-grammar.test.ts:
+        "3ac4d22647648884e349f954665b17d33aa8df8ed7974e\
+        66003cf3014dcc26c8"
 paths:
   - path: test/built-ins/AggregateError/newtarget-proto-fallback.js
     proposedOwner: adr:0016-dynamic-source-boundary
@@ -4322,7 +4380,7 @@ paths:
     section: sec-regexp-pattern-flags
     subject: Checking by using eval, try to use eval("\"migr\"")
       as F
-    assessment: fixture-construction
+    assessment: ds17-static-constructor-inputs
   - path: test/built-ins/RegExp/S15.10.4.1_A8_T11.js
     proposedOwner: adr:0016-dynamic-source-boundary
     priorCohort: incidental-scaffolding
@@ -4334,7 +4392,7 @@ paths:
     section: sec-regexp-pattern-flags
     subject: Checking by using eval, pattern is Math and flags
       is eval("\"g\"")
-    assessment: fixture-construction
+    assessment: ds17-static-constructor-inputs
   - path: test/built-ins/RegExp/proto-from-ctor-realm.js
     proposedOwner: adr:0016-dynamic-source-boundary
     priorCohort: incidental-scaffolding
@@ -4378,7 +4436,7 @@ paths:
       identically to the internal procedure given by the
       constructed object''s [[RegExpMatcher]] internal
       slot.'
-    assessment: regexp-roundtrip
+    assessment: ds17-static-source-roundtrips
   - path: "test/built-ins/RegExp/prototype/source/value-line-te\
       rminator.js"
     proposedOwner: adr:0016-dynamic-source-boundary
@@ -4392,7 +4450,7 @@ paths:
     subject: Return value can be used to create an equivalent
       RegExp when the [[OriginalSource]] internal slot
       contains a LineTerminator
-    assessment: regexp-roundtrip
+    assessment: ds17-static-source-roundtrips
   - path: test/built-ins/RegExp/prototype/source/value-slash.js
     proposedOwner: adr:0016-dynamic-source-boundary
     priorCohort: incidental-scaffolding
@@ -4403,7 +4461,7 @@ paths:
     missingDynamicTag: true
     section: sec-get-regexp.prototype.source
     subject: Return value can be used to create an equivalent RegExp
-    assessment: regexp-roundtrip
+    assessment: ds17-static-source-roundtrips
   - path: test/built-ins/RegExp/prototype/source/value-u.js
     proposedOwner: adr:0016-dynamic-source-boundary
     priorCohort: incidental-scaffolding
@@ -4416,7 +4474,7 @@ paths:
     subject: Return value can be used to create an equivalent
       RegExp when the [[OriginalFlags]] internal slot
       contains the `u` flag
-    assessment: regexp-roundtrip
+    assessment: ds17-static-source-roundtrips
   - path: test/built-ins/RegExp/prototype/source/value.js
     proposedOwner: adr:0016-dynamic-source-boundary
     priorCohort: incidental-scaffolding
@@ -4427,7 +4485,7 @@ paths:
     missingDynamicTag: true
     section: sec-get-regexp.prototype.source
     subject: Return value can be used to create an equivalent RegExp
-    assessment: regexp-roundtrip
+    assessment: ds17-static-source-roundtrips
   - path: test/built-ins/Set/proto-from-ctor-realm.js
     proposedOwner: adr:0016-dynamic-source-boundary
     priorCohort: incidental-scaffolding
@@ -20422,7 +20480,7 @@ paths:
     section: "prod-RegularExpressionBackslashSequence"
     subject: "A RegularExpressionBackslashSequence may not contain a L\
       ineTerminator."
-    assessment: ds3-literal-coverage
+    assessment: ds17-static-literal-grammar
   - path: "test/language/literals/regexp/S7.8.5_A1.1_T2.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "incidental-scaffolding"
@@ -20445,7 +20503,7 @@ paths:
     section: "prod-RegularExpressionNonTerminator"
     subject: "The first character of a regular expression may not be a <LF>
       (\\u000A), evaluated"
-    assessment: ds3-literal-coverage
+    assessment: ds17-static-literal-grammar
   - path: "test/language/literals/regexp/S7.8.5_A1.3_T4.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "incidental-scaffolding"
@@ -20457,7 +20515,7 @@ paths:
     section: "prod-RegularExpressionNonTerminator"
     subject: "The first character of a regular expression may not be a <CR>,
       (\\u000D), evaluated"
-    assessment: ds3-literal-coverage
+    assessment: ds17-static-literal-grammar
   - path: "test/language/literals/regexp/S7.8.5_A1.3_T5.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "incidental-scaffolding"
@@ -20469,7 +20527,7 @@ paths:
     section: "prod-RegularExpressionNonTerminator"
     subject: "The first character of a regular expression may not be a <LS>,
       (\\u2028), evaluated"
-    assessment: ds3-literal-coverage
+    assessment: ds17-static-literal-grammar
   - path: "test/language/literals/regexp/S7.8.5_A1.3_T6.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "incidental-scaffolding"
@@ -20481,7 +20539,7 @@ paths:
     section: "prod-RegularExpressionNonTerminator"
     subject: "The first character of a regexp literal cannot be PS (U+2029),
       tested through evaluated source"
-    assessment: ds3-literal-coverage
+    assessment: ds17-static-literal-grammar
   - path: "test/language/literals/regexp/S7.8.5_A1.4_T2.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "incidental-scaffolding"
@@ -20504,7 +20562,7 @@ paths:
     section: "prod-RegularExpressionBackslashSequence"
     subject: "A RegularExpressionBackslashSequence may not contain a <\
       LF>, evaluated"
-    assessment: ds3-literal-coverage
+    assessment: ds17-static-literal-grammar
   - path: "test/language/literals/regexp/S7.8.5_A1.5_T4.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "incidental-scaffolding"
@@ -20516,7 +20574,7 @@ paths:
     section: "prod-RegularExpressionBackslashSequence"
     subject: "A RegularExpressionBackslashSequence may not contain a <\
       CR>, evaluated"
-    assessment: ds3-literal-coverage
+    assessment: ds17-static-literal-grammar
   - path: "test/language/literals/regexp/S7.8.5_A1.5_T5.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "incidental-scaffolding"
@@ -20528,7 +20586,7 @@ paths:
     section: "prod-RegularExpressionNonTerminator"
     subject: "The first character of a regular expression may not be a <LS>,
       (\\u2028), evaluated"
-    assessment: ds3-literal-coverage
+    assessment: ds17-static-literal-grammar
   - path: "test/language/literals/regexp/S7.8.5_A1.5_T6.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "incidental-scaffolding"
@@ -20540,7 +20598,7 @@ paths:
     section: "prod-RegularExpressionNonTerminator"
     subject: "The first character of a regular expression may not be a <PS>,
       (\\u2029), evaluated"
-    assessment: ds3-literal-coverage
+    assessment: ds17-static-literal-grammar
   - path: "test/language/literals/regexp/S7.8.5_A2.1_T2.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "incidental-scaffolding"
@@ -20563,7 +20621,7 @@ paths:
     section: "sec-literals-regular-expression-literals"
     subject: "A regular expression may not contain a <LF> as a SourceCharacter,
       evaluated"
-    assessment: ds3-literal-coverage
+    assessment: ds17-static-literal-grammar
   - path: "test/language/literals/regexp/S7.8.5_A2.3_T4.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "incidental-scaffolding"
@@ -20575,7 +20633,7 @@ paths:
     section: "sec-literals-regular-expression-literals"
     subject: "A regular expression may not contain a <CR> as a SourceCharacter,
       evaluated"
-    assessment: ds3-literal-coverage
+    assessment: ds17-static-literal-grammar
   - path: "test/language/literals/regexp/S7.8.5_A2.3_T5.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "incidental-scaffolding"
@@ -20587,7 +20645,7 @@ paths:
     section: "prod-RegularExpressionNonTerminator"
     subject: "A regular expression may not contain a <LS> as a SourceCharacter,
       evaluated"
-    assessment: ds3-literal-coverage
+    assessment: ds17-static-literal-grammar
   - path: "test/language/literals/regexp/S7.8.5_A2.3_T6.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "incidental-scaffolding"
@@ -20599,7 +20657,7 @@ paths:
     section: "prod-RegularExpressionNonTerminator"
     subject: "A regular expression may not contain a <PS> as a SourceCharacter,
       evaluated"
-    assessment: ds3-literal-coverage
+    assessment: ds17-static-literal-grammar
   - path: "test/language/literals/regexp/S7.8.5_A2.4_T2.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "incidental-scaffolding"
@@ -20622,7 +20680,7 @@ paths:
     section: "prod-RegularExpressionBackslashSequence"
     subject: "A regular expression may not contain a <LF> as a SourceCharacter,
       evaluated"
-    assessment: ds3-literal-coverage
+    assessment: ds17-static-literal-grammar
   - path: "test/language/literals/regexp/S7.8.5_A2.5_T4.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "incidental-scaffolding"
@@ -20634,7 +20692,7 @@ paths:
     section: "prod-RegularExpressionBackslashSequence"
     subject: "A regexp literal cannot contain backslash followed by CR (U+000D),
       tested through evaluated source"
-    assessment: ds3-literal-coverage
+    assessment: ds17-static-literal-grammar
   - path: "test/language/literals/regexp/S7.8.5_A2.5_T5.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "incidental-scaffolding"
@@ -20646,7 +20704,7 @@ paths:
     section: "prod-RegularExpressionBackslashSequence"
     subject: "A regular expression may not contain a <LS> as a SourceCharacter,
       evaluated"
-    assessment: ds3-literal-coverage
+    assessment: ds17-static-literal-grammar
   - path: "test/language/literals/regexp/S7.8.5_A2.5_T6.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "incidental-scaffolding"
@@ -20658,7 +20716,7 @@ paths:
     section: "prod-RegularExpressionBackslashSequence"
     subject: "A regular expression may not contain a <PS> as a SourceCharacter,
       evaluated"
-    assessment: ds3-literal-coverage
+    assessment: ds17-static-literal-grammar
   - path: "test/language/literals/regexp/mongolian-vowel-separator-eval.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "incidental-scaffolding"
@@ -20682,7 +20740,7 @@ paths:
     missingDynamicTag: false
     section: "prod-GroupSpecifier"
     subject: "Lone surrogates in RegExp group names"
-    assessment: ds3-literal-coverage
+    assessment: ds17-static-literal-grammar
   - path: "test/language/literals/string/line-separator-eval.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "incidental-scaffolding"

@@ -94,6 +94,8 @@ const { typedArraySortFixtures } =
 const { typedArrayStaticsFixtures } =
   await import("./native/fixtures/typed-array-statics.ts");
 
+const { regexpStaticEvidenceFixtures } =
+  await import("./native/fixtures/regexp-static-evidence.ts");
 const { regexpLiteralAotFixtures } =
   await import("./native/fixtures/regexp-literal-aot.ts");
 const { regexpAnchoredRepeatFixtures } =
@@ -269,6 +271,7 @@ const fixtures: readonly Fixture[] = [
   ...primitiveReceiverSetFixtures,
   ...regexpIntrinsicFixtures,
   ...regexpLiteralAotFixtures,
+  ...regexpStaticEvidenceFixtures,
   ...regexpPatternExtensionFixtures,
   ...regexpPrototypeAndExecFixtures,
   ...regexpAnchoredRepeatFixtures,
@@ -1611,6 +1614,7 @@ for (const fixture of selectedFixtures) {
     fixture.name === "date-real-time-clock" ||
     fixture.name === "regexp-intrinsic" ||
     fixture.name === "regexp-literal-aot" ||
+    fixture.name === "regexp-static-evidence" ||
     fixture.name === "regexp-pattern-extensions" ||
     fixture.name === "regexp-prototype-and-exec" ||
     fixture.name === "regexp-anchored-repeat" ||
@@ -1755,6 +1759,7 @@ for (const fixture of selectedFixtures) {
             fixture.name === "monotonic-timer-wakeups" ||
             fixture.name === "regexp-intrinsic" ||
             fixture.name === "regexp-literal-aot" ||
+            fixture.name === "regexp-static-evidence" ||
             fixture.name === "regexp-pattern-extensions" ||
             fixture.name === "regexp-prototype-and-exec" ||
             fixture.name === "regexp-anchored-repeat" ||
