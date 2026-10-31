@@ -159,6 +159,8 @@ typedef struct AgentCluster {
     size_t program_count;
     /* The adapter reading `$262.agent.monotonicNow` counts from. */
     uint64_t origin;
+    /* The main context's policy, fixed before any agent starts. */
+    OseoUnhandledRejectionPolicy unhandled_rejection_policy;
 } AgentCluster;
 
 /* The stack each agent thread gets, which the main thread usually has. */
@@ -984,6 +986,7 @@ static void *agent_thread(void *argument) {
         self->program->source_id_length
     );
     context.agent = self;
+    context.unhandled_rejection_policy = cluster->unhandled_rejection_policy;
     if (!oseo_clock_open(&context)) {
         (void)fflush(stdout);
         (void)fwrite(
@@ -1598,6 +1601,7 @@ OseoResult oseo_test262_host_install(
         return result;
     }
     cluster->origin = origin;
+    cluster->unhandled_rejection_policy = context->unhandled_rejection_policy;
     cluster->programs = programs;
     cluster->program_count = program_count;
     cluster->main = main;

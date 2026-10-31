@@ -47,12 +47,27 @@ export interface MirHint {
 /** Compiler-owned policy for removable guarded specialization. */
 export type SpecializationMode = "disabled" | "enabled";
 
+/**
+ * The host decision at a rejection checkpoint that finds an unhandled
+ * rejection. `"fatal"` ends the program with the first reason, the M4
+ * event-loop profile every ordinary executable keeps. `"observe"` records
+ * the report and continues, the tolerant test262 host contract that only
+ * a test262 harness run selects (ADR 0030).
+ */
+export type UnhandledRejectionPolicy = "fatal" | "observe";
+
 /** Explicit compiler orchestration options, independent of process globals. */
 export interface CompilerOptions {
   /** Main test262 agent's [[CanBlock]]; omitted means true. */
   readonly mainAgentCanBlock?: boolean;
   readonly observeSpecialization?: boolean;
   readonly specialization?: SpecializationMode;
+  /**
+   * Rejection checkpoint policy of the generated program; omitted means
+   * `"fatal"`. It is independent of `test262Host`, so a Script, a module
+   * graph, and a split fragment build can select it without host bindings.
+   */
+  readonly unhandledRejectionPolicy?: UnhandledRejectionPolicy;
   /**
    * Compile the Script for the test262 host: `$262` reads the host object
    * the runtime installs, and every `$262.agent.start` source template the
@@ -564,6 +579,11 @@ export interface MirProgram {
   readonly observeSpecialization: boolean;
   /** Present on a main program compiled for the test262 host. */
   readonly test262Host?: MirTest262Host;
+  /**
+   * Present only when the program observes unhandled rejections; absent
+   * means the fatal policy, so ordinary programs emit no policy setup.
+   */
+  readonly unhandledRejectionPolicy?: "observe";
   /**
    * Present on an agent program: its index in the main program's agent
    * table, which names its generated entry.

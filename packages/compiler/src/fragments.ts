@@ -277,6 +277,7 @@ export function lowerFragmentPhases(
       {
         specialization: unit.mir.specialization,
         observeSpecialization: unit.mir.observeSpecialization,
+        unhandledRejectionPolicy: unit.mir.unhandledRejectionPolicy ?? "fatal",
       },
     );
   return [lower(true), lower(false)];

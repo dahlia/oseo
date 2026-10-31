@@ -1,27 +1,38 @@
 Unhandled rejection observation: proposed host policy
 =====================================================
 
-This node is held for a maintainer decision. Root directed a design-only
-commit on 2026-10-31 after the worker identified the reserved host-profile
-decision in the M5 language profile. No runtime behavior, host capability,
-ADR, subset entry, result record, or classification changes here.
+The maintainer decided on 2026-11-01 to allow unhandled rejections only for
+test262 harness runs, through a named, explicit host policy independent of
+`--test262-host`.
+[ADR 0030](../adr/0030-test262-unhandled-rejection-policy.md) records the
+decision, the default, why it cannot reach ordinary executables, and the
+tests. The implementation adds the `--test262-observe-rejections` CLI flag,
+the `unhandledRejectionPolicy` compiler option and runner request field, and
+runtime ABI `m5-147`. The design sections below are kept as the proposal the
+decision accepted; where they leave an option name or ABI field open, ADR 0030
+fixes it.
 
-The pending
+This change edits no subset entry, result record, or ledger classification.
+Root owns D3, the full UPDATE, outer review, candidate gates, and
+publication. The pending-decision
 [maintainer question](/home/dahlia/.local/state/oseo-m5c/decisions/questions/20261031T0850-unhandled-rejection-host-policy.md)
-records the requested choice. Root owns the decision response, implementation
-restart, D3, UPDATE, outer review, candidate gates, and publication.
+is answered.
 
 
 Current evidence
 ----------------
 
 At base `1f3ade138ea7cbee80b2d62940e8f497db2bc1a2`, the closure ledger
-assigns exactly 26 reviewed paths to this node. Every corresponding
-checked-in result is `unsupported-profile-feature` with capability
-`unhandled-rejection-policy`. The path-by-path partition audit is saved at
+assigned exactly 26 reviewed paths to this node. At base
+`9f21b607aef9399cc2a1f61d382f535af5161a2e` it assigns 27: observation
+batch 21a added
+`test/language/statements/async-function/evaluation-body.js`. Every
+corresponding checked-in result is `unsupported-profile-feature` with
+capability `unhandled-rejection-policy`. The path-by-path partition audit is
+saved at
 */data/m5c-d17-20261031/unhandled-rejection-observation/ownership-audit.json*.
-These are checked-in observations; no fresh native execution or test262
-UPDATE has been run for this design-only change.
+These are checked-in observations; no fresh native execution or test262 UPDATE
+has been run for this design-only change.
 
 Source inspection confirms the boundary. In
 *packages/runtime-c/native/runtime\_promise.c*,
@@ -134,6 +145,37 @@ Root's full UPDATE determines every resulting record.
 | `test/built-ins/Promise/reject/ctx-ctor.js`                                             | `pass`, conditional on fresh execution |
 | `test/built-ins/Promise/resolve/arg-uniq-ctor.js`                                       | `pass`, conditional on fresh execution |
 | `test/language/expressions/optional-chaining/member-expression-async-identifier.js`     | `pass`, conditional on fresh execution |
+
+
+Focused observations after the decision
+---------------------------------------
+
+On 2026-11-01 a focused observer called the runner's exported
+`executeTest262Case` once for each of the 27 owned paths, with the
+checked-in `supportedFeatures` and dependencies, the reviewed harnesses,
+and an executor that mirrors `loadNativeExecution` on the Zig lane. Under
+the observe policy, all 27 paths classified `pass` in all four variants.
+A control run with the fatal policy reproduced every checked-in record,
+`unsupported-profile-feature` with `unhandled-rejection-policy`. These
+are focused observations, not an UPDATE: the subset, result records, and
+ledger are unchanged, and Root's full UPDATE determines each record. The
+script and results are in
+*/data/m5c-d17-20261101/unhandled-rejection-policy/focused/*.
+
+
+Exclusion audit digests
+-----------------------
+
+The change to *docs/m5c-closure/exclusion-audit.yaml* is digest-only. The
+assessment `residual-derived-error-realm` pins
+*packages/runtime-c/native/oseo\_runtime.h*,
+*packages/runtime-c/native/runtime\_core.c*, and
+*packages/runtime-c/src/index.ts* as replacement evidence. This node adds
+the policy enum and context field, its initialization, and the ABI
+version string to those files, and changes none of the derived-constructor
+caller-realm code that the assessment relies on. Root approved refreshing
+those three digests to the checker's values; the reason, disposition, and
+every other record are unchanged.
 
 
 Acceptance after a decision

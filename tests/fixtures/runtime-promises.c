@@ -129,6 +129,9 @@ int main(void) {
     OseoRootFrame frame = {NULL, NULL, 0u};
     OseoResult result;
     oseo_context_init(&context, "promise", 7u);
+    assert(
+        context.unhandled_rejection_policy == OSEO_UNHANDLED_REJECTION_FATAL
+    );
     oseo_context_set_function_dispatcher(&context, dispatch);
     result = oseo_roots_allocate(&context, &frame, 24u);
     assert(result.status == OSEO_STATUS_NORMAL);
@@ -265,6 +268,96 @@ int main(void) {
     result = oseo_promise_result(&context, frame.slots[17]);
     assert(result.status == OSEO_STATUS_NORMAL);
     expect_number(result.value, 23);
+
+    /*
+     * ADR 0030: the observe policy marks and counts every unhandled
+     * report exactly once, but the checkpoint completes normally. A
+     * rejection handled before the checkpoint is never reported, and a
+     * late handler still counts as handling a reported rejection.
+     */
+    size_t handled_before = context.rejection_handled_count;
+    size_t observed_before = observation_count;
+    context.unhandled_rejection_policy = OSEO_UNHANDLED_REJECTION_OBSERVE;
+    frame.slots[18] = construct_promise(&context, frame.slots[10]);
+    result = oseo_promise_reject_into(
+        &context,
+        frame.slots[18],
+        oseo_number(8.0)
+    );
+    assert(result.status == OSEO_STATUS_NORMAL);
+    result = oseo_object_create(&context, oseo_null());
+    assert(result.status == OSEO_STATUS_NORMAL);
+    frame.slots[20] = result.value;
+    frame.slots[19] = construct_promise(&context, frame.slots[10]);
+    result = oseo_promise_reject_into(
+        &context,
+        frame.slots[19],
+        frame.slots[20]
+    );
+    assert(result.status == OSEO_STATUS_NORMAL);
+    frame.slots[21] = construct_promise(&context, frame.slots[10]);
+    result = oseo_promise_reject_into(
+        &context,
+        frame.slots[21],
+        oseo_number(9.0)
+    );
+    assert(result.status == OSEO_STATUS_NORMAL);
+    result = oseo_promise_then(
+        &context,
+        frame.slots[21],
+        oseo_undefined(),
+        frame.slots[1]
+    );
+    assert(result.status == OSEO_STATUS_NORMAL);
+    frame.slots[22] = result.value;
+    result = oseo_rejection_checkpoint(&context);
+    assert(result.status == OSEO_STATUS_NORMAL);
+    assert(result.value == oseo_undefined());
+    assert(context.unhandled_rejection_count == 3u);
+    assert(context.rejection_handled_count == handled_before);
+    result = oseo_rejection_checkpoint(&context);
+    assert(result.status == OSEO_STATUS_NORMAL);
+    assert(context.unhandled_rejection_count == 3u);
+    result = oseo_jobs_drain(&context);
+    assert(result.status == OSEO_STATUS_NORMAL);
+    assert(observation_count == observed_before + 1u);
+    assert(oseo_promise_state(frame.slots[22]) == OSEO_PROMISE_FULFILLED);
+    assert(oseo_promise_state(frame.slots[19]) == OSEO_PROMISE_REJECTED);
+    result = oseo_promise_result(&context, frame.slots[19]);
+    assert(result.status == OSEO_STATUS_NORMAL);
+    assert(result.value == frame.slots[20]);
+    result = oseo_promise_then(
+        &context,
+        frame.slots[18],
+        oseo_undefined(),
+        frame.slots[1]
+    );
+    assert(result.status == OSEO_STATUS_NORMAL);
+    frame.slots[23] = result.value;
+    assert(context.rejection_handled_count == handled_before + 1u);
+    result = oseo_jobs_drain(&context);
+    assert(result.status == OSEO_STATUS_NORMAL);
+    assert(observation_count == observed_before + 2u);
+    result = oseo_rejection_checkpoint(&context);
+    assert(result.status == OSEO_STATUS_NORMAL);
+    assert(context.unhandled_rejection_count == 3u);
+    result = oseo_promise_result(&context, frame.slots[23]);
+    expect_number(result.value, 10);
+
+    /* The fatal policy, every context's default, ends at the next report. */
+    context.unhandled_rejection_policy = OSEO_UNHANDLED_REJECTION_FATAL;
+    frame.slots[22] = construct_promise(&context, frame.slots[10]);
+    result = oseo_promise_reject_into(
+        &context,
+        frame.slots[22],
+        oseo_number(11.0)
+    );
+    assert(result.status == OSEO_STATUS_NORMAL);
+    result = oseo_rejection_checkpoint(&context);
+    assert(result.status == OSEO_STATUS_THROW);
+    expect_number(result.value, 11);
+    assert(context.unhandled_rejection_count == 4u);
+    oseo_context_clear_language_error(&context);
 
     oseo_roots_release(&context, &frame);
     oseo_context_destroy(&context);

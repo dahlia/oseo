@@ -131,6 +131,19 @@ typedef enum {
 } OseoPromiseState;
 
 /*
+ * The host's decision at a rejection checkpoint that finds an unhandled
+ * rejection (ADR 0030). Both policies mark the promise reported and count
+ * it. Fatal, the zero value every context starts with, then returns the
+ * first reason as a throw so the program fails. Observe continues. Only
+ * generated setup for a test262 harness run selects it, through an
+ * explicit compiler option that ordinary executables never set.
+ */
+typedef enum {
+    OSEO_UNHANDLED_REJECTION_FATAL = 0,
+    OSEO_UNHANDLED_REJECTION_OBSERVE = 1,
+} OseoUnhandledRejectionPolicy;
+
+/*
  * The named error intrinsics owned by the runtime. The enumerators
  * index the per-context constructor and prototype tables, so they
  * must stay contiguous from zero.
@@ -706,6 +719,8 @@ struct OseoContext {
     size_t collections;
     size_t rejection_handled_count;
     size_t unhandled_rejection_count;
+    /* Shared by this context's realms; child agents copy the main's. */
+    OseoUnhandledRejectionPolicy unhandled_rejection_policy;
     /*
      * The realm's clock adapter and its state, NULL until the first
      * clock use opens the platform adapter or an embedder installs one.

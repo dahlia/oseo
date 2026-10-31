@@ -5449,14 +5449,14 @@ assessments:
         "ae951eecf05b132893a2bfc93a0186b6bc106e4bba413f0a\
         a9e584d352b5ecca"
       packages/runtime-c/native/oseo_runtime.h:
-        "b8d6083f7cd65b5e02678dcb65650762ba952eb899973459\
-        1e25f37f399ee669"
+        "c7bb02a8832f50228830ead14bfe2cd90b1e671314f1e63f\
+        70555d9489533578"
       packages/runtime-c/native/runtime_core.c:
-        "d6bc44175f5525359409c3294eb13926aaf33b60f99b4d7b\
-        65c2a5998f9d50b4"
+        "cdca053e549463f459bdc7aaa25eaf7920df05b9ea90631a\
+        a4497c7208239f66"
       packages/runtime-c/src/index.ts:
-        "5e3a197e90743104a0224f7a73a0bebcdf4e99cbf181d651\
-        7e0a37e5e00735e7"
+        "3de085960212e3ddc5acc83e41ccf933ce09031ba9ed3cc3\
+        b35ac9a8dce594b5"
   observation-train-b26a-b26b-b27:
     disposition: remediation
     normativeDependency: not-demonstrated

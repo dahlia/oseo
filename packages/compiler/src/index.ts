@@ -127,6 +127,7 @@ export type { MirConstant } from "./mir.ts";
 export type { MirCallTarget } from "./mir.ts";
 export type { MirHint } from "./mir.ts";
 export type { SpecializationMode } from "./mir.ts";
+export type { UnhandledRejectionPolicy } from "./mir.ts";
 export type { CompilerOptions } from "./mir.ts";
 export type { MirParameter } from "./mir.ts";
 export type { MirGlobalBinding } from "./mir.ts";
