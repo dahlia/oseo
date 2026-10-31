@@ -1181,7 +1181,7 @@ test("own-key cases lead the Mac lane with measured Mac seconds", () => {
   // The dedicated ordinary Array allowance also loads a hosted lane.
   // The six weighted Node shards' modeled walls raised this from 8909,
   // because the heavier hosted lanes leave more work to the Mac lane.
-  assert.equal(Math.round(modeled), 9513);
+  assert.equal(Math.round(modeled), 9485);
 });
 
 test("hosted lanes take the jobs no Mac lane can run first", () => {
@@ -1226,7 +1226,7 @@ test("hosted lanes take the jobs no Mac lane can run first", () => {
   // The rented pair lowers the maximum to the hosted floor; it has no
   // measured walls of its own yet. That floor is now the three hosted
   // lanes that carry the Node shards, not the property sanitizer's 2452.
-  assert.equal(Math.round(Math.max(...macosLaneEnds(lanes))), 2863);
+  assert.equal(Math.round(Math.max(...macosLaneEnds(lanes))), 2846);
 });
 
 test("only a tested hosted entry reaches a hosted lane", () => {

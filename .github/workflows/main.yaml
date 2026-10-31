@@ -786,8 +786,8 @@ jobs:
   # Hosted macos-latest, like the ordinary Node shards. No time scaling.
   # The generator places this on one of the same five hosted capacity lanes.
 
-  test_node_shard_macos_4:
-    name: test (macos-latest, node, 4/6)
+  test_node_shard_macos_6:
+    name: test (macos-latest, node, 6/6)
     runs-on: macos-latest
     if: ${{ !cancelled() }}
     needs: test_node_shard_macos_1
@@ -803,7 +803,7 @@ jobs:
       - uses: ./.github/actions/runtime-archive-cache
       - run: >-
           mise run test:node:shard
-          --shard=4/6
+          --shard=6/6
 
   # Hosted macos-latest, like the ordinary Node shards. No time scaling.
   # The generator places this on one of the same five hosted capacity lanes.
@@ -831,8 +831,8 @@ jobs:
   # Hosted macos-latest, like the ordinary Node shards. No time scaling.
   # The generator places this on one of the same five hosted capacity lanes.
 
-  test_node_shard_macos_6:
-    name: test (macos-latest, node, 6/6)
+  test_node_shard_macos_2:
+    name: test (macos-latest, node, 2/6)
     runs-on: macos-latest
     if: ${{ !cancelled() }}
     needs: test_node_shard_macos_5
@@ -848,7 +848,7 @@ jobs:
       - uses: ./.github/actions/runtime-archive-cache
       - run: >-
           mise run test:node:shard
-          --shard=6/6
+          --shard=2/6
 
   # Hosted macos-latest, like the ordinary Node shards. No time scaling.
   # The generator places this on one of the same five hosted capacity lanes.
@@ -857,7 +857,7 @@ jobs:
     name: test (macos-latest, deno)
     runs-on: macos-latest
     if: ${{ !cancelled() }}
-    needs: test_node_shard_macos_6
+    needs: test_node_shard_macos_2
     steps:
       - name: Record macOS host version
         run: sw_vers -productVersion
@@ -876,33 +876,11 @@ jobs:
   # file weights; see docs/evidence/node-shards/README.md.
 
   # macOS lane 5, longest jobs first.
-  test_node_shard_macos_2:
-    name: test (macos-latest, node, 2/6)
-    runs-on: macos-latest
-    if: ${{ !cancelled() }}
-    needs: mac_ready
-    steps:
-      - name: Record macOS host version
-        run: sw_vers -productVersion
-      - uses: actions/checkout@v7
-        with:
-          persist-credentials: false
-      - uses: jdx/mise-action@v4
-        with:
-          install: true
-      - uses: ./.github/actions/runtime-archive-cache
-      - run: >-
-          mise run test:node:shard
-          --shard=2/6
-
-  # Hosted macos-latest, like the ordinary Node shards. No time scaling.
-  # The generator places this on one of the same five hosted capacity lanes.
-
   test_node_shard_macos_3:
     name: test (macos-latest, node, 3/6)
     runs-on: macos-latest
     if: ${{ !cancelled() }}
-    needs: test_node_shard_macos_2
+    needs: mac_ready
     steps:
       - name: Record macOS host version
         run: sw_vers -productVersion
@@ -920,11 +898,33 @@ jobs:
   # Hosted macos-latest, like the ordinary Node shards. No time scaling.
   # The generator places this on one of the same five hosted capacity lanes.
 
+  test_node_shard_macos_4:
+    name: test (macos-latest, node, 4/6)
+    runs-on: macos-latest
+    if: ${{ !cancelled() }}
+    needs: test_node_shard_macos_3
+    steps:
+      - name: Record macOS host version
+        run: sw_vers -productVersion
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: jdx/mise-action@v4
+        with:
+          install: true
+      - uses: ./.github/actions/runtime-archive-cache
+      - run: >-
+          mise run test:node:shard
+          --shard=4/6
+
+  # Hosted macos-latest, like the ordinary Node shards. No time scaling.
+  # The generator places this on one of the same five hosted capacity lanes.
+
   test_array_constructor_macos_macos_node:
     name: Array constructor (macos-latest, node)
     runs-on: macos-latest
     if: ${{ !cancelled() }}
-    needs: test_node_shard_macos_3
+    needs: test_node_shard_macos_4
     steps:
       - name: Record macOS host version
         run: sw_vers -productVersion

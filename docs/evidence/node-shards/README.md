@@ -34,11 +34,19 @@ Measurement
 were fetched with `gh api repos/dahlia/oseo/actions/jobs/JOB/logs`. The
 logs are not checked in. The spec reporter prints top-level results without
 file names, so the script recomputes each job's file list from the run's
-commit and partition. It then credits each top-level duration to the file
-whose longest string-literal fragment occurs in the test name. Every
-top-level result was attributed. *node-file-costs.tsv* holds the resulting
-sums in seconds, one column per host and run. They are concurrent test
-durations, not file walls or CPU time.
+commit and partition. A result goes to the file whose literal `test` name,
+with template substitutions as wildcards, matches it completely and most
+specifically. Results that only a computed name can explain fall back to
+the longest string-literal fragment among files that compute names.
+
+Node prints each file's results as one block in sorted path order, which
+checks the attribution. Where two files register the same name, the result
+goes to the one candidate that sorts between its attributed neighbors. The
+script stops on any unmatched or still ambiguous result, and on any job
+whose attributed files leave sorted order, so a result credited to the
+wrong file fails the extraction. All 18 jobs pass. *node-file-costs.tsv*
+holds the resulting sums in seconds, one column per host and run. They are
+concurrent test durations, not file walls or CPU time.
 
 The same file's sum varies with the runner. The residual evidence file,
 *tests/dynamic-source-residual-evidence.test.ts*, summed to 1,512.3,
@@ -76,10 +84,10 @@ sums, it reproduces the positional jobs of the three runs:
 | ---------------------- | ---------------------- | ---------------------- |
 | Linux, run 41228695658 | 37.7, 41.2             | 37.8, 41.4             |
 | Linux, run 41233967056 | 30.6, 53.3             | 30.7, 53.4             |
-| Linux, run 41238903460 | 37.4, 56.0             | 37.4, 56.1             |
-| macOS, run 41228695658 | 16.6, 9.3, 38.8, 30.7  | 16.6, 16.5, 38.1, 30.7 |
-| macOS, run 41233967056 | 21.3, 26.2, 42.7, 39.5 | 21.1, 26.0, 41.8, 39.2 |
-| macOS, run 41238903460 | 17.1, 20.6, 41.1, 40.1 | 17.1, 20.5, 40.4, 40.1 |
+| Linux, run 41238903460 | 37.4, 56.0             | 37.5, 56.1             |
+| macOS, run 41228695658 | 16.6, 9.3, 38.8, 30.7  | 16.6, 16.5, 38.1, 30.6 |
+| macOS, run 41233967056 | 21.3, 26.2, 42.7, 39.5 | 21.1, 26.0, 41.8, 39.1 |
+| macOS, run 41238903460 | 17.1, 20.6, 41.1, 40.1 | 17.1, 20.5, 40.4, 40.0 |
 
 The one miss is shard 2/4 of run 41228695658. It summed 1,902.7 seconds of
 tests in a 521-second test step, which two workers cannot do. That runner
@@ -101,14 +109,14 @@ largest observed sum, with the fallback only for files never observed:
 
 | Host and total    | Weights                            | Largest sums                       |
 | ----------------- | ---------------------------------- | ---------------------------------- |
-| Linux, 3          | 38.5, 38.4, 38.4                   | 35.7, 35.8, 35.7                   |
-| Linux, 4 (chosen) | 35.2, 34.7, 34.8, 34.8             | 35.2, 30.7, 31.4, 30.7             |
-| macOS, 5          | 31.6, 31.6, 31.4, 31.5, 31.4       | 27.3, 29.2, 28.8, 29.8, 28.7       |
-| macOS, 6 (chosen) | 27.3, 27.2, 27.1, 27.2, 27.2, 27.1 | 27.3, 24.3, 24.2, 24.9, 24.5, 25.1 |
+| Linux, 3          | 38.8, 38.6, 38.7                   | 36.1, 35.6, 36.1                   |
+| Linux, 4 (chosen) | 35.2, 35.0, 35.1, 35.0             | 35.2, 31.5, 30.9, 31.3             |
+| macOS, 5          | 31.3, 31.3, 31.4, 31.4, 31.2       | 27.8, 28.2, 28.9, 29.1, 28.5       |
+| macOS, 6 (chosen) | 27.3, 27.2, 27.2, 27.1, 27.2, 27.1 | 27.3, 24.4, 24.2, 25.1, 24.8, 24.3 |
 
 The Linux floor is the residual evidence file, which takes shard 1 alone at
 35.2 minutes. The same files and sums under the old positional partition
-model at 67.7 and 36.9 minutes for Linux and 45.0, 19.7, 26.8, and 50.5 for
+model at 67.9 and 36.7 minutes for Linux and 45.0, 19.6, 26.8, and 50.5 for
 macOS.
 
 The macOS total follows from the hosted lanes. The lane generator keeps the
@@ -120,10 +128,10 @@ eight configured Mac lanes, the generator models these maxima:
 | Placement                            | Shard walls, s                           | Run maximum, minutes |
 | ------------------------------------ | ---------------------------------------- | -------------------: |
 | Positional 4, checked-in U40 entries | 884, 996, 1,311, 864                     |                40.87 |
-| Positional 4, modeled on this tree   | 2,485, 1,055, 1,369, 2,640               |                44.40 |
-| Weighted 4                           | 1,873, 1,896, 1,831, 1,828               |                60.98 |
-| Weighted 5                           | 1,623, 1,544, 1,564, 1,507, 1,515        |                51.18 |
-| Weighted 6 (chosen)                  | 1,622, 1,335, 1,270, 1,241, 1,373, 1,250 |                47.72 |
+| Positional 4, modeled on this tree   | 2,485, 1,052, 1,369, 2,641               |                44.35 |
+| Weighted 4                           | 1,872, 1,915, 1,833, 1,879               |                61.75 |
+| Weighted 5                           | 1,646, 1,522, 1,543, 1,475, 1,501        |                50.38 |
+| Weighted 6 (chosen)                  | 1,622, 1,339, 1,273, 1,254, 1,387, 1,224 |                47.43 |
 
 The checked-in positional entries summed to 4,055 seconds, against 5,717
 to 7,788 for the same four jobs in the three runs, so the 40.87 figure was
@@ -153,9 +161,9 @@ files, in minutes:
 
 | Scenario                           | Linux, 4               | macOS, 6                           |
 | ---------------------------------- | ---------------------- | ---------------------------------- |
-| Train C as one file, no weight     | 35.2, 53.6, 31.3, 32.5 | 27.3, 24.5, 24.8, 24.9, 44.8, 24.6 |
-| Train C in three files, no weights | 35.2, 36.3, 45.0, 31.1 | 27.3, 24.1, 30.6, 24.5, 37.1, 24.9 |
-| Train C in three files, weighted   | 35.6, 34.0, 33.8, 34.0 | 27.8, 28.2, 28.1, 27.7, 28.5, 28.1 |
+| Train C as one file, no weight     | 35.2, 51.2, 30.8, 33.4 | 27.3, 24.5, 24.4, 24.6, 45.7, 24.3 |
+| Train C in three files, no weights | 35.2, 36.8, 41.9, 33.5 | 27.3, 30.8, 30.5, 25.0, 30.8, 24.4 |
+| Train C in three files, weighted   | 35.2, 33.6, 33.9, 33.9 | 27.7, 28.3, 28.3, 28.4, 28.1, 27.6 |
 
 The split pieces must therefore add their weights in the change that adds
 them. The weighted row assumes local times scaled by the two ratios and

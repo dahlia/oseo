@@ -4,12 +4,22 @@ Usage: python3 extract.py LOG_DIR > node-file-costs.tsv
 
 LOG_DIR holds `RUN-JOB.log` files fetched with
 `gh api repos/dahlia/oseo/actions/jobs/JOB/logs`. The spec reporter prints
-no file names, so each top-level result line is attributed to the file in
-the job's shard whose longest string-literal fragment (six characters or
-more, split at template substitutions) occurs in the test name. The shard's
-files are recomputed from the run's commit with Node's discovery and the
-partition the job used, so a name is only matched against files that job
-executed. Sums are seconds of concurrent test time, not file wall times.
+no file names, so each top-level result line is attributed among the files
+that job executed, recomputed from the run's commit with Node's discovery
+and the job's partition. A file's test names are the literal first
+arguments of its `test`, `it`, `describe` and `suite` calls, with template
+substitutions as wildcards. A result goes to the file with a name that
+matches it completely, preferring the most literal characters. A result
+that no literal name matches goes to a file that registers tests under a
+computed name, by the longest string-literal fragment of six or more
+characters found in the result. Node's spec reporter prints each file's
+results as one block, in sorted path order. A result that two files name
+equally well therefore goes to the one candidate that sorts between the
+files of the nearest attributed results before and after it. The script
+stops if that leaves a choice, if any result matches nothing, or if the
+attributed files are not in sorted order, which also catches a result
+credited to the wrong file. Sums are seconds of concurrent test time, not
+file wall times.
 """
 
 import collections
@@ -61,14 +71,73 @@ def discover(commit):
     )
 
 
-def fragments(commit, path):
+CALL = re.compile(
+    r"\b(?:test|it|describe|suite)\(\s*(?:"
+    r'"((?:[^"\\\n]|\\.)*)"|\'((?:[^\'\\\n]|\\.)*)\'|`((?:[^`\\]|\\.)*)`'
+    r")(\s*\+)?"
+)
+COMPUTED = re.compile(r"\b(?:test|it)\(\s*[A-Za-z_$]")
+
+
+def unescape(text):
+    return re.sub(r"\\(.)", lambda m: {"n": "\n", "t": "\t"}.get(m[1], m[1]), text)
+
+
+def names(source):
+    """Full-match patterns for literal test names, with literal lengths."""
+    found = []
+    for match in CALL.finditer(source):
+        text = next(g for g in match.groups()[:3] if g is not None)
+        pieces = [unescape(p) for p in re.split(r"\$\{[^}]*\}", text)]
+        pattern = ".*".join(re.escape(p) for p in pieces)
+        # A literal continued by `+` names only a prefix.
+        if match.group(4) is not None:
+            pattern += ".*"
+        found.append((re.compile(pattern, re.S), sum(map(len, pieces))))
+    return found
+
+
+def fragments(source):
     found = set()
-    for match in LITERAL.finditer(git("show", f"{commit}:{path}")):
+    for match in LITERAL.finditer(source):
         text = next(group for group in match.groups() if group is not None)
         for piece in re.split(r"\$\{[^}]*\}", text):
             if len(piece.strip()) >= 6:
                 found.add(piece.strip())
     return found
+
+
+def attribute(name, mine, cache):
+    """The file that registered this result, or the tied candidates."""
+    best, length, tied = None, -1, False
+    for path in mine:
+        for pattern, size in cache[path]["names"]:
+            if size > length and pattern.fullmatch(name):
+                best, length, tied = path, size, False
+            elif size == length and best != path and pattern.fullmatch(name):
+                tied = True
+    if best is not None and length > 0:
+        if tied:
+            return sorted(
+                path
+                for path in mine
+                for pattern, size in cache[path]["names"]
+                if size == length and pattern.fullmatch(name)
+            )
+        return best
+    computed = [path for path in mine if cache[path]["computed"]]
+    best, length, tied = None, 0, False
+    for path in computed:
+        for piece in cache[path]["fragments"]:
+            if piece in name and len(piece) > length:
+                best, length, tied = path, len(piece), False
+            elif piece in name and len(piece) == length and best != path:
+                tied = True
+    if best is None:
+        raise SystemExit(f"unattributed result: {name}")
+    if tied:
+        raise SystemExit(f"ambiguous result: {name}")
+    return best
 
 
 def main(log_dir):
@@ -80,22 +149,41 @@ def main(log_dir):
             pool = [path for path in files if host == "linux" or path != ARRAY]
             mine = [p for k, p in enumerate(pool) if k % total == index - 1]
             for path in mine:
-                cache.setdefault(path, fragments(commit, path))
+                if path not in cache:
+                    source = git("show", f"{commit}:{path}")
+                    cache[path] = {
+                        "names": names(source),
+                        "computed": COMPUTED.search(source) is not None,
+                        "fragments": fragments(source),
+                    }
                 sums[path].setdefault(f"{host}-{run}", 0.0)
             log = open(f"{log_dir}/{run}-{job}.log", errors="replace").read()
+            results = []
             for line in re.sub(r"\x1b\[[0-9;]*m", "", log).splitlines():
                 result = RESULT.match(line)
                 # Prefixed mise task output from the build is not a test.
                 if result is None or result.group(1).startswith("["):
                     continue
-                name, best, length = result.group(1), None, 0
-                for path in mine:
-                    for piece in cache[path]:
-                        if len(piece) > length and piece in name:
-                            best, length = path, len(piece)
-                if best is None:
-                    raise SystemExit(f"unattributed result in {job}: {name}")
-                sums[best][f"{host}-{run}"] += float(result.group(2)) / 1000
+                owner = attribute(result.group(1), mine, cache)
+                results.append([owner, float(result.group(2)) / 1000])
+            rank = {path: k for k, path in enumerate(sorted(mine))}
+            known = [k for k, entry in enumerate(results) if isinstance(entry[0], str)]
+            for index, entry in enumerate(results):
+                if isinstance(entry[0], str):
+                    continue
+                before = [k for k in known if k < index]
+                after = [k for k in known if k > index]
+                low = rank[results[before[-1]][0]] if before else -1
+                high = rank[results[after[0]][0]] if after else len(mine)
+                fits = [p for p in entry[0] if low <= rank[p] <= high]
+                if len(fits) != 1:
+                    raise SystemExit(f"ambiguous result in job {job}: {fits}")
+                entry[0] = fits[0]
+            order = [rank[owner] for owner, _ in results]
+            if order != sorted(order):
+                raise SystemExit(f"results out of file order in job {job}")
+            for owner, seconds in results:
+                sums[owner][f"{host}-{run}"] += seconds
     columns = [f"{h}-{r}" for h in ("linux", "macos") for r in RUNS]
     print("\t".join(["path", *columns]))
     for path in sorted(sums):

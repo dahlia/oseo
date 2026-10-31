@@ -119,13 +119,13 @@ export const macosJobCosts: MacosJobCosts = {
   // Derived, not observed: modeled walls of the six weighted shards; see
   // docs/evidence/node-shards/README.md.
   "test (macos-latest, node, 1/6)": 1622, // derived
-  "test (macos-latest, node, 5/6)": 1373, // derived
-  "test (macos-latest, node, 2/6)": 1335, // derived
+  "test (macos-latest, node, 5/6)": 1387, // derived
+  "test (macos-latest, node, 2/6)": 1339, // derived
   "native support (macos-aarch64, 3/12)": 1293, // 5 hosted since b59ac914
-  "test (macos-latest, node, 3/6)": 1270, // derived
-  "test (macos-latest, node, 6/6)": 1250, // derived
-  "test (macos-latest, node, 4/6)": 1241, // derived
+  "test (macos-latest, node, 3/6)": 1273, // derived
+  "test (macos-latest, node, 4/6)": 1254, // derived
   "native (macos-aarch64, 1/3)": 1236, // 6 hosted since b59ac914
+  "test (macos-latest, node, 6/6)": 1224, // derived
   "native (macos-aarch64, 2/3)": 1162, // 3 hosted since b59ac914
   "native (macos-aarch64, 3/3)": 1160, // 2 hosted since b59ac914
   "own-key cases (macos-aarch64, 2/3)": 995, // retained
