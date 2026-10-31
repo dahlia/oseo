@@ -1,6 +1,6 @@
 import type { Fixture } from "../fixture.ts";
 
-// Core replacement evidence for four upstream paths whose only rejected
+// Core replacement evidence for five upstream paths whose only rejected
 // operation is optional Annex B: a __proto__ accessor read or write, or a
 // legacy regular expression escape. Each program keeps the upstream core
 // assertions and checks value and type with Object.is before printing one
@@ -189,6 +189,43 @@ for (let i = 0; i < cases.length; i++) {
 }
 same(splits, 33);
 console.log("string split regexp core ok");
+`,
+  },
+  {
+    name: "annex-b-core-ordinary-object-set-prototype",
+    source: `${comparator}
+// test/language/types/object/S8.6.2_A8.js makes an object non-extensible,
+// writes its __proto__, and swallows any exception from that write. The
+// write reaches the Annex B setter of B.2.2.1.2, which throws when
+// OrdinarySetPrototypeOf (10.1.2.1) refuses a non-extensible object.
+// Object.setPrototypeOf (20.1.2.20) and Reflect.setPrototypeOf (28.1.13)
+// reach the same [[SetPrototypeOf]] in core, without the accessor.
+var x = Object.preventExtensions({});
+var y = {};
+same(Object.isExtensible(x), false);
+same(Object.getPrototypeOf(x), Object.prototype);
+let refused = 0;
+try {
+  Object.setPrototypeOf(x, y);
+  refused = refused + 1;
+} catch (error) {
+  same(error.name, "TypeError");
+  same(error.constructor, TypeError);
+}
+same(refused, 0);
+same(Object.getPrototypeOf(x), Object.prototype);
+same(Reflect.setPrototypeOf(x, y), false);
+same(Object.getPrototypeOf(x), Object.prototype);
+// The same [[SetPrototypeOf]] admits an extensible ordinary object, so the
+// refusal above follows from the object's non-extensible state.
+var z = {};
+same(Object.setPrototypeOf(z, y), z);
+same(Object.getPrototypeOf(z), y);
+same(Reflect.setPrototypeOf(z, null), true);
+same(Object.getPrototypeOf(z), null);
+same(Object.getPrototypeOf(y), Object.prototype);
+same(Object.isExtensible(x), false);
+console.log("ordinary object prototype core ok");
 `,
   },
 ];

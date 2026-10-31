@@ -30,10 +30,12 @@ evidence:
   fixed:
     status: covered
     references:
+      - tests/annex-b-mixed-core-native.test.ts
       - tests/native/fixtures/reflect-namespace.ts
   forced-collection:
     status: covered
     references:
+      - tests/annex-b-mixed-core-native.test.ts
       - tests/native.ts
       - tests/native/fixtures/reflect-namespace.ts
       - tests/property/m5-reflect-namespace.property.test.ts
@@ -51,6 +53,7 @@ evidence:
   specialization:
     status: covered
     references:
+      - tests/annex-b-mixed-core-native.test.ts
       - tests/native.ts
       - tests/native/fixtures/reflect-namespace.ts
       - tests/property/m5-reflect-namespace.property.test.ts
