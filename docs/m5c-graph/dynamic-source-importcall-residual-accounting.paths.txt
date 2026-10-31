@@ -1,0 +1,3 @@
+test/language/expressions/dynamic-import/returns-promise.js
+test/language/expressions/dynamic-import/usage-from-eval.js
+test/language/module-code/top-level-await/syntax/await-expr-dyn-import.js

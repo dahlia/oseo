@@ -31,6 +31,49 @@ replacement evidence, and retains 71 with their uncovered contracts. It adds
 no evidence or native tests.
 All original paths and observations remain; no UPDATE is needed.
 
+
+Approved second split
+---------------------
+
+The maintainer approved DS-8 through DS-22 on 2026-10-31 in
+[*20261031T0935-umbrella-second-split.answer.md*](~/.local/state/oseo-m5c/decisions/done/20261031T0935-umbrella-second-split.answer.md),
+answering *20261031T0935-umbrella-second-split.md* in that directory. The
+proposal is */data/m5c-d17-20261031/umbrella-split/REPORT.md*, pinned to
+semantic bundle commit `9529210a24be72e2b273f43f014c03a98a29069e`. The children
+below partition the current 950 paths. Each linked work note preserves its
+exact selector, SHA256, closure route and evidence obligations.
+
+| Child | Paths | Size | Work note                                                                                                |
+| ----- | ----: | ---- | -------------------------------------------------------------------------------------------------------- |
+| DS-8  |     3 | S    | [*dynamic-source-importcall-residual-accounting.md*](./dynamic-source-importcall-residual-accounting.md) |
+| DS-9  |   192 | M    | [*dynamic-source-eval-arguments-accounting.md*](./dynamic-source-eval-arguments-accounting.md)           |
+| DS-10 |   105 | M    | [*dynamic-source-eval-contract-accounting.md*](./dynamic-source-eval-contract-accounting.md)             |
+| DS-11 |    66 | M    | [*dynamic-source-module-goal-validation.md*](./dynamic-source-module-goal-validation.md)                 |
+| DS-12 |    70 | L    | [*dynamic-source-module-observable-contracts.md*](./dynamic-source-module-observable-contracts.md)       |
+| DS-13 |    57 | L    | [*dynamic-source-construction-contracts.md*](./dynamic-source-construction-contracts.md)                 |
+| DS-14 |    66 | M    | [*dynamic-source-callable-object-evidence.md*](./dynamic-source-callable-object-evidence.md)             |
+| DS-15 |    43 | M    | [*dynamic-source-static-core-evidence.md*](./dynamic-source-static-core-evidence.md)                     |
+| DS-16 |    95 | L    | [*dynamic-source-lexical-static-evidence.md*](./dynamic-source-lexical-static-evidence.md)               |
+| DS-17 |    29 | L    | [*dynamic-source-regexp-static-evidence.md*](./dynamic-source-regexp-static-evidence.md)                 |
+| DS-18 |    41 | L    | [*dynamic-source-binding-reference-evidence.md*](./dynamic-source-binding-reference-evidence.md)         |
+| DS-19 |    82 | L    | [*dynamic-source-realm-host-evidence.md*](./dynamic-source-realm-host-evidence.md)                       |
+| DS-20 |     1 | M    | [*dynamic-source-template-site-evidence.md*](./dynamic-source-template-site-evidence.md)                 |
+| DS-21 |    81 | L    | [*dynamic-source-completion-record-evidence.md*](./dynamic-source-completion-record-evidence.md)         |
+| DS-22 |    19 | M    | [*dynamic-source-boundary-overlap-review.md*](./dynamic-source-boundary-overlap-review.md)               |
+
+Ownership moves to each child only as that child lands. All 950 paths
+remain owned here in the derived closure ledger during this metadata split.
+The umbrella depends on DS-1 through DS-22, stays blocked until all
+children land, and lands when it owns zero paths. Zero direct ownership
+alone does not establish that a child's evidence and publication gates
+have landed. Every child reports exact newly covered and still-uncovered
+subsets; unresolved subjects retain active remediation.
+
+The split establishes no exclusions, passes or new replacement evidence.
+The first three children have at most 299 audit-only candidates; all 950
+remain unresolved today. No estimate permits weakening ordinary core
+assertions or broadening ADR 0013/0016/0019 or an ADR 0028 selector.
+
 Root authorized exactly 459 additions on 2026-10-27: 66 observed
 `OSEO1001` unknown-eval binding paths and 393 observed ImportExpression
 rejections. Preserve the existing 306 owned paths and dependencies. The

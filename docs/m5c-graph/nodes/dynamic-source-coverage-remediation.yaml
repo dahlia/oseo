@@ -197,15 +197,36 @@ delivers: "Resolves the 950 reviewed unsupported paths assigned to
   docs/m5c-graph/dynamic-source-realm-string-assessment.md. The current
   scope is 950; no native
   or fixture evidence was added, and all original unsupported results
-  remain unchanged."
+  remain unchanged. The approved 2026-10-31 second split adds DS-8
+  through DS-22 as bounded children for these exact 950 paths. Their
+  work notes pin disjoint path lists and evidence obligations. Ownership
+  moves to each child only as that child lands; no ledger owner changes
+  in this metadata split. This umbrella remains blocked until every
+  child lands and itself lands when it owns zero paths. The split
+  establishes no new exclusion or completed replacement evidence."
 dependencies:
   - authorized-exclusion-audit
+  - dynamic-source-binding-reference-evidence
+  - dynamic-source-boundary-overlap-review
   - dynamic-source-callable-family
+  - dynamic-source-callable-object-evidence
+  - dynamic-source-completion-record-evidence
+  - dynamic-source-construction-contracts
+  - dynamic-source-eval-arguments-accounting
+  - dynamic-source-eval-contract-accounting
   - dynamic-source-importcall-accounting
+  - dynamic-source-importcall-residual-accounting
   - dynamic-source-lexical-completion-family
+  - dynamic-source-lexical-static-evidence
+  - dynamic-source-module-goal-validation
+  - dynamic-source-module-observable-contracts
   - dynamic-source-module-semantics
   - dynamic-source-private-binding-family
+  - dynamic-source-realm-host-evidence
   - dynamic-source-realm-string-family
+  - dynamic-source-regexp-static-evidence
+  - dynamic-source-static-core-evidence
+  - dynamic-source-template-site-evidence
   - dynamic-source-unknown-eval
 landed: false
-status: ready
+status: blocked
