@@ -319,5 +319,6 @@ dependencies:
   - dynamic-source-static-core-evidence
   - dynamic-source-template-site-evidence
   - dynamic-source-unknown-eval
+  - static-specifier-import-design
 landed: false
-status: ready
+status: blocked

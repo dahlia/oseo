@@ -1,0 +1,16 @@
+version: 1
+id: static-specifier-import-design
+title: Design the static-specifier import track
+delivers: >-
+  Design only, under item 3 (choice B) of the maintainer decision of
+  2026-11-01. Specifies the build-time-resolvable string-literal import()
+  track anticipated by ADR 0016 alternative 3 and PLAN-DYN.md for review,
+  maps the 20 pinned module-loading paths to planned test groups, and drafts
+  a Proposed ADR 0016 amendment and a PLAN-M5C.md section. Implements no
+  compiler, runtime, runner or manifest change, admits no path and moves no
+  ledger owner. Scope, SHA256 and authority are recorded in
+  docs/m5c-graph/static-specifier-import-design.md.
+dependencies:
+  - unsupported-ownership-audit
+landed: false
+status: ready

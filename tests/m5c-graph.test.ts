@@ -550,9 +550,9 @@ test("the checked-in M5c work graph is valid", () => {
   // Landing marks change this count without changing the graph's shape.
   assert.ok(summary.landed >= 136);
   assert.equal(summary.parked, 0);
-  assert.equal(summary.nodes, 141);
+  assert.equal(summary.nodes, 142);
   assert.equal(summary.ready, 140);
-  assert.equal(summary.blocked, 1);
+  assert.equal(summary.blocked, 2);
   const array = readImportAttributesNode(
     "ordinary-array-indexed-lookup-performance",
   );
@@ -652,6 +652,7 @@ test("independent M5c manifest publishers declare their collisions", () => {
     "dynamic-import-staged-plan",
     "m5-exit-audit",
     "remediation-work-graph",
+    "static-specifier-import-design",
   ]);
   const publishers = nodes.filter(
     (node) => !node.landed && !sourceOnly.has(node.id),
