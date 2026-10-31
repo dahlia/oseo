@@ -98,13 +98,14 @@ The fixtures read each pinned original and replace only its literal eval
 call expressions, at offsets that the source test re-derives with Babel.
 Each original therefore keeps every assertion. Mutations select a wrong
 completion or remove an early error at run time, so each original variant
-compiles to one finite literal program. Groups of six originals bound
+compiles to one finite literal program. Groups of three originals bound
 persistent realm roots under forced collection.
 
 The candidate changes no product package, runtime ABI, ADR or harness file.
-It adds tests and fixtures only, and *tests/native.ts* now registers the
-`residual-trainc-*` fixtures. Raw checks and review packets are retained
-under */data/m5c-d17-20261101/host-script-trainc/run/*. These focused
+It adds tests and fixtures only; *tests/native.ts* is unchanged, because
+*tests/host-script-trainc-evidence.test.ts* already runs every fixture
+under both policies with forced collection. Raw checks and review packets are
+retained under */data/m5c-d17-20261101/host-script-trainc/run/*. These focused
 witnesses do not regenerate the original unsupported observations.
 
 Tag self-audit: no dependency tag changes; every original rejected source

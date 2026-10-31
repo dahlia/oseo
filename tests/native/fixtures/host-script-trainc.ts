@@ -28,16 +28,26 @@ export const hostScriptChecks = `function __hsCompletion(actual, expected) {
     throw new Test262Error("completion value/type");
   return actual;
 }
+function __hsGlobals() {
+  var keys = Reflect.ownKeys(globalThis), state = [];
+  for (var i = 0; i < keys.length; i++) {
+    var property = Object.getOwnPropertyDescriptor(globalThis, keys[i]);
+    state.push(keys[i], property.value, property.get, property.set,
+      property.writable, property.enumerable, property.configurable);
+  }
+  return state;
+}
 function __hsEarlyError(evaluate, after) {
-  var keys = Reflect.ownKeys(globalThis).length;
-  var evalFunction = globalThis.eval;
+  var before = __hsGlobals();
   try { evaluate(); }
   catch (error) {
     if (Object.getPrototypeOf(error) !== SyntaxError.prototype)
       throw new Test262Error("early error identity");
-    if (Reflect.ownKeys(globalThis).length !== keys ||
-        globalThis.eval !== evalFunction || !after())
-      throw new Test262Error("early error effects");
+    var now = __hsGlobals();
+    var same = now.length === before.length;
+    for (var i = 0; same && i < now.length; i++)
+      same = Object.is(now[i], before[i]);
+    if (!same || !after()) throw new Test262Error("early error effects");
     throw error;
   }
   throw new Test262Error("early error missing");
@@ -174,7 +184,7 @@ export function hostScriptTraincFixture(
 }
 
 /** Selector-order groups keep persistent realm roots bounded per process. */
-export const hostScriptTraincGroupSize = 6;
+export const hostScriptTraincGroupSize = 3;
 
 /** Native fixtures covering all 98 train C subjects. */
 export const hostScriptTraincFixtures: readonly Fixture[] = Array.from(
@@ -254,6 +264,27 @@ rejected(function () {
 rejected(function () {
   __hsEarlyError(function () {
     globalThis.eval = 42;
+    throw new SyntaxError("x");
+  }, function () { return true; });
+});
+globalThis.__hsSwapOut = 1;
+rejected(function () {
+  __hsEarlyError(function () {
+    delete globalThis.__hsSwapOut;
+    globalThis.__hsSwapIn = 1;
+    throw new SyntaxError("x");
+  }, function () { return true; });
+});
+globalThis.__hsValue = 1;
+rejected(function () {
+  __hsEarlyError(function () {
+    globalThis.__hsValue = 2;
+    throw new SyntaxError("x");
+  }, function () { return true; });
+});
+rejected(function () {
+  __hsEarlyError(function () {
+    Object.defineProperty(globalThis, "__hsValue", { enumerable: false });
     throw new SyntaxError("x");
   }, function () { return true; });
 });

@@ -36,10 +36,6 @@ import {
   residualClassFixtures,
   residualValueOracleFixture,
 } from "./native/fixtures/dynamic-source-residual.ts";
-import {
-  hostScriptTraincFixtures,
-  hostScriptTraincOracleFixture,
-} from "./native/fixtures/host-script-trainc.ts";
 import * as records from "./native/fixtures/completion-records.ts";
 import { agentReferencePrelude } from "./native/agent-reference.ts";
 import { realmReferencePrelude } from "./native/realm-reference.ts";
@@ -255,8 +251,6 @@ const fixtures: readonly Fixture[] = [
   ...residualCompletionFixtures,
   ...residualClassFixtures,
   residualValueOracleFixture,
-  ...hostScriptTraincFixtures,
-  hostScriptTraincOracleFixture,
   records.completionRecordOracleFixture,
   ...functionFixtures,
   ...callableCases,
