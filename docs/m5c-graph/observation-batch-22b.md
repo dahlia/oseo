@@ -111,7 +111,7 @@ The
 reviews all 100 eval rejections and preserves the mixed static-setter case as
 remediation. Its final C.getWithEval.call(D) reads an absent method and throws
 TypeError before any eval. The existing dynamic-source node owns 886 paths,
-including four additions from these batches. The original source, all
+including five additions from these batches. The original source, all
 assertions and the unsupported observation stay.
 
 Internal review round 3 corrected 20 `var-bindings` rows supported only by
