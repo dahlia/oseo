@@ -3058,6 +3058,69 @@ console.log(new Child().read());
 `,
   },
   {
+    name: "class-private-getter-public-absence",
+    source: `
+// Preserve the upstream core assertions without its optional legacy observer.
+function same(actual, expected) {
+  if (!Object.is(actual, expected)) throw new Error("private getter coverage");
+}
+var C = class {
+  get #m() { return "Test262"; }
+  check() {
+    same(this.hasOwnProperty("#m"), false);
+    same("#m" in this, false);
+    same(Object.getOwnPropertyDescriptor(this, "#m"), undefined);
+    same(this.#m, "Test262");
+    same(this.hasOwnProperty("#m"), false);
+    same("#m" in this, false);
+    return 0;
+  }
+};
+let c = new C();
+same(c.check(), 0);
+// A public string with the same spelling is a separate property.
+c["#m"] = "public";
+same(c.hasOwnProperty("#m"), true);
+same("#m" in c, true);
+same(c["#m"], "public");
+delete c["#m"];
+same(c.check(), 0);
+console.log("private getter core ok");
+`,
+  },
+  {
+    name: "class-private-setter-public-absence",
+    source: `
+// Preserve the upstream core assertions without its optional legacy observer.
+function same(actual, expected) {
+  if (!Object.is(actual, expected)) throw new Error("private setter coverage");
+}
+var C = class {
+  set #m(v) { this._v = v; }
+  check() {
+    same(this.hasOwnProperty("#m"), false);
+    same("#m" in this, false);
+    same(Object.getOwnPropertyDescriptor(this, "#m"), undefined);
+    this.#m = "Test262";
+    same(this._v, "Test262");
+    same(this.hasOwnProperty("#m"), false);
+    same("#m" in this, false);
+    return 0;
+  }
+};
+let c = new C();
+same(c.check(), 0);
+// A public string with the same spelling is a separate property.
+c["#m"] = "public";
+same(c.hasOwnProperty("#m"), true);
+same("#m" in c, true);
+same(c["#m"], "public");
+delete c["#m"];
+same(c.check(), 0);
+console.log("private setter core ok");
+`,
+  },
+  {
     name: "class-private-accessors",
     source: `
 // A getter and a setter under one private name describe one element,
