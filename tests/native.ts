@@ -47,6 +47,8 @@ const { privateNameLifetimeFixtures } =
 import { dataViewFixtures } from "./native/fixtures/data-view.ts";
 import { dateFamilyFixtures } from "./native/fixtures/date-family.ts";
 import { expressionFixtures } from "./native/fixtures/expressions.ts";
+const { ds22BoundaryCoreFixtures } =
+  await import("./native/fixtures/ds22-boundary-core.ts");
 import { functionFixtures } from "./native/fixtures/functions.ts";
 import { generatorFixtures } from "./native/fixtures/generators.ts";
 import * as evalFixture from "./native/fixtures/direct-eval-non-string.ts";
@@ -235,6 +237,7 @@ const fixtures: readonly Fixture[] = [
   ...staticCore,
   ...functionFixtures,
   ...callableCases,
+  ...ds22BoundaryCoreFixtures,
   ...properTailCallFixtures,
   ...globalRecord.globalObjectRecordFixtures,
   evalFixture.directEvalNonStringFixture,
@@ -1502,6 +1505,7 @@ for (const fixture of selectedFixtures) {
     fixture.name === "object-own-keys-virtual-read-only" ||
     fixture.name === "global-object-record" ||
     fixture.name === "eval-intrinsic-value" ||
+    fixture.name.startsWith("ds22-") ||
     fixture.name === "direct-eval-non-string" ||
     fixture.name.startsWith("callable-object-") ||
     fixture.name === "globalthis-binding" ||
@@ -1842,6 +1846,7 @@ for (const fixture of selectedFixtures) {
             fixture.name === "object-integrity-levels" ||
             fixture.name === "global-object-record" ||
             fixture.name === "eval-intrinsic-value" ||
+            fixture.name.startsWith("ds22-") ||
             fixture.name === "direct-eval-non-string" ||
             fixture.name.startsWith("callable-object-") ||
             fixture.name === "globalthis-binding" ||
