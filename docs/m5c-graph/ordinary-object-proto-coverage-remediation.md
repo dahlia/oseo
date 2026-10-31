@@ -7,10 +7,9 @@ Scope and accounting
 Item 3 of the 2026-10-28 *m5c-scope-big-node-split* maintainer decision
 closes a mixed Annex B path under ADR 0013's optional Annex B boundary only
 when reviewed replacement observations cover every core subject and a
-fresh-digest audit record names them. Otherwise the path stays here. Item 3
-names three other mixed Annex B nodes and six paths, so it authorizes no
-closure here, and the class-private-accessor-lookup-coverage-remediation
-precedent kept its two paths because not every core subject could be covered.
+fresh-digest audit record names them. The 2026-10-31 maintainer decision
+applies that rule to this node's single path as well, and extends it to no
+other path. ADR 0013 itself is unchanged.
 
 This node owned exactly one reviewed unsupported path,
 *test/language/types/object/S8.6.2\_A8.js*. Observation-batch-28 admitted it
@@ -27,13 +26,11 @@ error[OSEO1001]: The Object.prototype.__proto__ accessor is excluded by Annex B.
 The reviewed executor stopped at its first variant and recorded the
 `profile-syntax` capability, so no assertion of the original source ran. Raw
 records, source hashes and natural exits are in
-[the observation packet](/data/m5c-d17-20261031/ob28/). The path keeps
-remediation ownership: its only Annex B subject is the accessor write, and
-every core subject now has fixed native evidence, but replacement coverage
-alone does not authorize an exclusion. ADR 0013, ADR 0016, ADR 0019, the
-subset, the original source and assertions, and the recorded unsupported
-result are unchanged. The path is not counted as a pass, and closing it needs
-an applicable maintainer accounting decision; Root has asked the user.
+[the observation packet](/data/m5c-d17-20261031/ob28/). The path now closes:
+its only Annex B subject is the accessor write, and every core subject has
+fixed native evidence. ADR 0013, ADR 0016, ADR 0019, the subset, the original
+source and assertions, and the recorded unsupported result are unchanged. The
+path is not counted as a pass.
 
 
 Per-path assertions
@@ -97,21 +94,19 @@ Audit record
 ------------
 
 *docs/m5c-closure/exclusion-audit.yaml* keeps the path row, with current
-source and observation digests, and keeps
-`annex-b-ordinary-object-prototype` at `disposition: remediation` and
-`normativeDependency: not-demonstrated` with
-`remediationOwner: node:ordinary-object-proto-coverage-remediation`. It binds
-the digests of both evidence files as related replacement evidence. The
-ledger keeps the path with the same node owner through the ledger API and
-`mise run m5c:closure-ledger:update`.
+source and observation digests, and changes the
+`annex-b-ordinary-object-prototype` assessment to `disposition: exclusion`
+and `normativeDependency: annex-b-only`. It binds the digests of both
+evidence files. The ledger moves the path to
+`adr:0013-m5-edition-and-manifest` through the ledger API and
+`mise run m5c:closure-ledger:update`. This node then owns no path.
 
-| Path                                  | Outcome | Assessment                          |
-| ------------------------------------- | ------- | ----------------------------------- |
-| *language/types/object/S8.6.2\_A8.js* | kept    | `annex-b-ordinary-object-prototype` |
+| Path                                  | Outcome  | Assessment                          |
+| ------------------------------------- | -------- | ----------------------------------- |
+| *language/types/object/S8.6.2\_A8.js* | excluded | `annex-b-ordinary-object-prototype` |
 
-The evidence reopens on changed source, observation, or replacement evidence.
-Closing the path needs an applicable maintainer accounting decision that
-extends item 3 to this node, or another decision that authorizes the
-exclusion.
+The exclusion reopens on changed source, observation, or replacement
+evidence, on an amendment of ADR 0013's optional Annex B policy, or on an
+ADR 0019 reopening trigger.
 
 Root owns D3, any UPDATE, outer review, publication, merge, and landed state.

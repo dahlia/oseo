@@ -91,13 +91,15 @@ stay unchanged.
 
 Observation-batch-28 admits *test/language/types/object/S8.6.2\_A8.js*, whose
 `__proto__` write on a non-extensible ordinary object is rejected at compile
-time with this `OSEO1001` accessor diagnostic in every variant. Its unsupported
-observation is owned by `node:ordinary-object-proto-coverage-remediation`. The
-asserted core contract, that the object keeps `Object.prototype` as its
-`[[Prototype]]`, does not require Annex B. The
-`annex-b-core-ordinary-object-set-prototype` fixture now witnesses every core
-subject through `Object.setPrototypeOf` and `Reflect.setPrototypeOf`, but
-closing the path still needs an applicable maintainer accounting decision; the
+time with this `OSEO1001` accessor diagnostic in every variant. The asserted
+core contract, that the object keeps `Object.prototype` as its `[[Prototype]]`,
+does not require Annex B. The
+`annex-b-core-ordinary-object-set-prototype` fixture witnesses every core
+subject through `Object.setPrototypeOf` and `Reflect.setPrototypeOf`. The
+2026-10-31 maintainer decision extends item 3 of the 2026-10-28 decision to
+this path and no other, so its unsupported observation is an ADR 0013
+exclusion owned by `adr:0013-m5-edition-and-manifest`; it is not counted as a
+pass. The
 [work note](./m5c-graph/ordinary-object-proto-coverage-remediation.md) records
 the per-assertion table and evidence.
 
