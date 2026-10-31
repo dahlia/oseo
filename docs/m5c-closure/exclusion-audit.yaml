@@ -5486,10 +5486,13 @@ assessments:
       condition to 44 DS-10 eval originals. Finite literal ADR 0029 Scripts
       replace only the eval call expressions of each pinned original and retain
       every other byte, including all assertions. Indirect rows keep their
-      caller-local bindings and match eval's global environment, strictness and
-      error phase. Direct rows are at global Script top level or evaluate source
-      that reads nothing of the caller, with inherited strictness reproduced by
-      a directive and void 0 as DS-21 and Root's 2026-11-01 ruling allow.
+      caller-local bindings and match every binding, value, descriptor and
+      error the original observes, with eval's strictness and error phase; a
+      Script's non-configurable new globals and persistent lexicals are
+      admitted only where the original never observes them. Direct rows are
+      at global Script top level or evaluate source that reads nothing of
+      the caller, with inherited strictness reproduced by a directive and
+      void 0 as DS-21 and Root's 2026-11-01 ruling allow.
       Consumed values are compared by strict value and type; each call site in
       each mode rejects its own mutation through an independent error-type
       verdict, and runtime-negative originals must throw their realm's
@@ -5500,8 +5503,8 @@ assessments:
       admission, or any uncovered non-source assertion under ADR 0019.
     replacementEvidence:
       docs/m5c-graph/dynamic-source-host-script-evidence.md:
-        "3c6488e68c119517181847d50c44a27465d3f7ffca2c6fa0\
-        e25ed5833cdda710"
+        "2105e30144bad4783ce3847dbfc8edfa0992a135ecf33c42\
+        f5eb1107084726a5"
       tests/native/fixtures/host-script-evidence-cases.ts:
         "a556e07fbda41c6594120bd16c6f6a01deb7f897ec82acfe\
         3c23b8c6b85ea196"
