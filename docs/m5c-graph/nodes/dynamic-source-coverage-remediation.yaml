@@ -1,7 +1,7 @@
 version: 1
 id: dynamic-source-coverage-remediation
 title: Resolve dynamic source coverage gaps
-delivers: "Resolves the 950 reviewed unsupported paths assigned to
+delivers: "Resolves the reviewed unsupported paths assigned to
   node:dynamic-source-coverage-remediation in the derived closure
   ledger. Select exactly those owners and their exclusion-audit path
   assessments: the original 121 paths, 35 from cross-realm-host, 1 from
@@ -194,16 +194,23 @@ delivers: "Resolves the 950 reviewed unsupported paths assigned to
   static replacements and keeps 24. DS-7 moves 9 of its 80 template-site,
   string case-conversion and generator-instance paths through reviewed
   static replacements and keeps 71, as recorded in
-  docs/m5c-graph/dynamic-source-realm-string-assessment.md. The current
-  scope is 950; no native
-  or fixture evidence was added, and all original unsupported results
-  remain unchanged. The approved 2026-10-31 second split adds DS-8
+  docs/m5c-graph/dynamic-source-realm-string-assessment.md. At the DS-8
+  base, the scope is 950; no native or fixture evidence was added, and
+  all original unsupported results remain unchanged. The approved
+  2026-10-31 second split adds DS-8
   through DS-22 as bounded children for these exact 950 paths. Their
   work notes pin disjoint path lists and evidence obligations. Ownership
   moves to each child only as that child lands; no ledger owner changes
   in this metadata split. This umbrella remains blocked until every
   child lands and itself lands when it owns zero paths. The split
-  establishes no new exclusion or completed replacement evidence."
+  establishes no new exclusion or completed replacement evidence.
+  DS-8 subsequently accounts for two ImportCall-only subjects under
+  decision item 2 and retains usage-from-eval with its two promise and
+  four exported-value assertions. No native or replacement evidence is
+  added. Its exact delta and assessment are in
+  docs/m5c-graph/dynamic-source-importcall-residual-accounting.md.
+  Root reconciles the shared running total at publication across the
+  parallel DS-8 through DS-22 lanes."
 dependencies:
   - authorized-exclusion-audit
   - dynamic-source-binding-reference-evidence

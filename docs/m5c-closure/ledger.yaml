@@ -102,7 +102,12 @@ owners:
       selected paths remain remediation. DS-7 accounts for 9 of its 80
       reserved paths using reviewed static template-site,
       case-conversion and generator-instance replacement evidence; 71
-      remain umbrella remediation."
+      remain umbrella remediation. DS-8 accounts for two ImportCall-only
+      subjects under decision item 2 and retains usage-from-eval with
+      its mixed promise/export subjects; no evidence is added. The
+      per-path assessment is in
+      docs/m5c-graph/dynamic-source-importcall-residual-accounting.md.
+      Root reconciles shared totals at publication."
     paths: 679
   adr:0028-legacy-function-caller-boundary:
     note: ADR 0028 authorizes "an M5 exclusion of the expectation that
@@ -233,7 +238,12 @@ owners:
       this-binding paths to ADR 0016 and keeps 24 here. DS-7 moves 9
       template-site, case-conversion and generator-instance paths to ADR
       0016 and keeps 71, with remaining contracts in
-      docs/m5c-graph/dynamic-source-realm-string-assessment.md."
+      docs/m5c-graph/dynamic-source-realm-string-assessment.md. DS-8
+      accounts for two ImportCall-only subjects under decision item 2
+      and retains usage-from-eval with its mixed promise/export
+      subjects; no evidence is added. The per-path assessment is in
+      docs/m5c-graph/dynamic-source-importcall-residual-accounting.md.
+      Root reconciles shared totals at publication."
     paths: 948
   node:non-blocking-agent:
     note: Needs an agent whose [[CanBlock]] is false; 2 paths.

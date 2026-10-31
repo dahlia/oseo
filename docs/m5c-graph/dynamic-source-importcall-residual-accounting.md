@@ -116,3 +116,16 @@ stays with `node:dynamic-source-coverage-remediation`. Umbrella ownership
 changes from 950 to 948 and ADR 0016 ownership from 677 to 679. The ledger's
 `closedPaths` stays 32,665 because exclusions never count as passes or
 expected negatives.
+
+
+Publication coordination
+------------------------
+
+Root directed the parallel DS-8 through DS-22 lanes on 2026-10-31 to keep
+shared umbrella counts anchored to the 950-path split baseline and report
+only each child's delta. DS-8 accounts for 2 paths and retains 1; Root
+reconciles the shared running total at publication. The local derived
+ledger's 948 umbrella paths and 679 ADR 0016 paths describe this candidate
+alone, not a running total across the other lanes. Shared prose and node
+metadata therefore name the historical baseline and DS-8 delta rather than
+asserting a new combined total.

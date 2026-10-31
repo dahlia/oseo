@@ -1,11 +1,10 @@
 B19/B20/B30 dynamic-source coverage remediation
 ===============================================
 
-The current umbrella owns 948 paths: DS1 accounts for 218, DS-3 for 11,
-DS2 for 76, DS4 for 40, DS-5 for 2, DS-6 for 42, DS-7 for 9 and DS-8 for 2
-of the paths it has held; later observation trains added the rest, and five
-promoted to pass when direct eval stopped parsing absent or non-String
-arguments. DS-5's
+At the DS-8 base, the umbrella owns 950 paths: DS1 accounts for 218, DS-3 for
+11, DS2 for 76, DS4 for 40, DS-5 for 2, DS-6 for 42 and DS-7 for 9 of the paths
+it has held; later observation trains added the rest, and five promoted to pass
+when direct eval stopped parsing absent or non-String arguments. DS-5's
 [*per-path assessment*](./dynamic-source-lexical-completion-assessment.yaml)
 closes two U+180E lexical probes through paired static passes and keeps 71 in
 remediation. DS-6's
@@ -65,17 +64,20 @@ preserves its exact selector, SHA256, closure route and evidence obligations.
 
 Ownership moves to each child only as that child lands. At the metadata split,
 all 950 paths remained owned here in the derived closure ledger. DS-8
-subsequently accounts for two under ADR 0016, leaving 948 here; its retained
-path stays here. The umbrella depends on DS-1 through DS-22, stays blocked
-until all children land, and lands when it owns zero paths. Zero direct
+subsequently accounts for two under ADR 0016; its retained path stays here.
+Root reconciles the shared running total at publication across the parallel
+DS-8 through DS-22 lanes. The umbrella depends on DS-1 through DS-22, stays
+blocked until all children land, and lands when it owns zero paths. Zero direct
 ownership alone does not establish that a child's evidence and publication
 gates have landed. Every child reports exact newly covered and still-uncovered
 subsets; unresolved subjects retain active remediation.
 
 The split establishes no exclusions, passes or new replacement evidence.
-The first three children have at most 299 audit-only candidates; all 950
-remain unresolved today. No estimate permits weakening ordinary core
-assertions or broadening ADR 0013/0016/0019 or an ADR 0028 selector.
+At the split, the first three children had at most 299 audit-only candidates
+and all 950 paths remained unresolved. DS-8 accounts for two of its three
+selected paths; the third remains remediation. No estimate permits weakening
+ordinary core assertions or broadening ADR 0013/0016/0019 or an ADR 0028
+selector.
 
 Root authorized exactly 459 additions on 2026-10-27: 66 observed
 `OSEO1001` unknown-eval binding paths and 393 observed ImportExpression
@@ -101,7 +103,7 @@ from clean source `6aab0fc8`, tree
 every original path and exact diagnostic. No path was re-observed here.
 
 The table below preserves the original observation-train evidence. Later
-DS-1 through DS-7 audit assessments account for the paths described above; all
+DS-1 through DS-8 audit assessments account for the paths described above; all
 other paths remain active remediation. A dependency tag alone authorizes
 no exclusion. Every original subject and normative section is preserved.
 
