@@ -7,5 +7,5 @@ delivers: "Defines the host rejection-tracking policy test262 cases need, so
   rejection checkpoint."
 dependencies:
   - unsupported-ownership-audit
-landed: false
+landed: true
 status: ready
