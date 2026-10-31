@@ -8,7 +8,8 @@
  * store, compareExchange, isLockFree, wait, waitAsync, and notify, over
  * integer TypedArray views of ArrayBuffer and SharedArrayBuffer storage.
  *
- * Every agent can suspend. Agents of one cluster take turns on one
+ * Agents can suspend when their [[CanBlock]] policy permits it.
+ * Agents of one cluster take turns on one
  * executing thread (runtime_agent.c), so every atomic step runs without
  * interference and a critical section is never contended; each operation
  * offers the turn to another ready agent once its step is complete.
@@ -966,6 +967,14 @@ static OseoResult atomics_wait(
                 : number == -INFINITY ? 0.0
                 : fmax(number, 0.0);
         }
+    }
+    if (result.status == OSEO_STATUS_NORMAL &&
+        !asynchronous && !context->agent_can_block) {
+        result = oseo_internal_throw_error(
+            context,
+            OSEO_ERROR_TYPE,
+            "The executing agent cannot suspend."
+        );
     }
     if (result.status != OSEO_STATUS_NORMAL) {
         oseo_roots_release(context, &frame);

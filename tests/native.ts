@@ -79,6 +79,7 @@ import * as typedArrayFloat16 from "./native/fixtures/typed-array-float16.ts";
 import * as typedArrayCore from "./native/fixtures/typed-array-core.ts";
 import * as atomics from "./native/fixtures/atomics-single-agent.ts";
 import * as agentFixtures from "./native/fixtures/atomics-and-shared-memory.ts";
+import { blockingAgentFixture } from "./native/fixtures/non-blocking-agent.ts";
 import { crossRealmFixtures } from "./native/fixtures/cross-realm.ts";
 import { weakCollectionFixtures } from "./native/fixtures/weak-collections.ts";
 import {
@@ -271,6 +272,7 @@ const fixtures: readonly Fixture[] = [
   ...typedArrayCore.typedArrayCoreFixtures,
   ...atomics.atomicsSingleAgentFixtures,
   ...agentFixtures.atomicsAndSharedMemoryFixtures,
+  blockingAgentFixture,
   ...crossRealmFixtures,
   ...typedArrayIterativeFixtures,
   ...typedArraySearchAndJoinFixtures,
@@ -1383,6 +1385,7 @@ for (const fixture of selectedFixtures) {
     fixture.name === "typed-array-core" ||
     fixture.name === "shared-array-buffer" ||
     fixture.name === "atomics-single-agent" ||
+    fixture.name === "agent-default-blocking-policy" ||
     fixture.name === "agent-cluster-broadcast" ||
     fixture.name === "agent-wait-notify" ||
     fixture.name === "agent-wait-async" ||
@@ -1527,6 +1530,7 @@ for (const fixture of selectedFixtures) {
     fixture.name === "typed-array-core" ||
     fixture.name === "shared-array-buffer" ||
     fixture.name === "atomics-single-agent" ||
+    fixture.name === "agent-default-blocking-policy" ||
     fixture.name === "agent-cluster-broadcast" ||
     fixture.name === "agent-wait-notify" ||
     fixture.name === "agent-wait-async" ||

@@ -5147,7 +5147,10 @@ export const cBackend: NativeBackend = {
     const hostInstall =
       host == null
         ? empty
-        : renderC(
+        : `    context.agent_can_block = ${
+            host.mainAgentCanBlock !== false
+          };\n` +
+          renderC(
             emittedC.agent.installLine,
             host.agents.length === 0
               ? renderC(emittedC.agent.noProgramsValue)

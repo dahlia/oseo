@@ -1290,6 +1290,12 @@ uses the same compositions after its existing relocated location call.
 These helpers introduce no collection point, language call, or specialization
 policy. The existing runtime calls retain their generic behavior.
 
+ABI `m5-145` adds `agent_can_block` to `OseoContext`. The main test262
+agent's generated setup selects false for `CanBlockIsFalse`; ordinary
+contexts and child agents initialize true, and realms retain their owning
+context's policy. `Atomics.wait` checks it after argument validation and
+conversion, before comparing memory. `Atomics.waitAsync` is unchanged.
+
 [activity audit]: https://github.com/dahlia/oseo/blob/main/docs/sanitizer-activity.md
 
 

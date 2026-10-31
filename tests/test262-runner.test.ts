@@ -2357,24 +2357,45 @@ test("records a deterministic scheduler outside the agent host", async () => {
   }
 });
 
-test("names the agent capability no native agent can provide", async () => {
-  const source = "/*---\nflags: [CanBlockIsFalse]\n---*/\nAtomics.wait;\n";
-  const parsed = parseTest262Case(source, "test/agent-gap.js", revision);
-  const result = await executeTest262Case(
-    source,
-    parsed,
-    new Set(["Atomics"]),
-    harnesses,
-    {
-      async execute() {
-        return assert.fail("an agent capability case must not execute");
-      },
-    },
-    ["atomics-single-agent"],
+test("selects the agent policy for every reviewed variant", async () => {
+  await Promise.all(
+    ["CanBlockIsFalse", "CanBlockIsTrue", ""].map(async (flag) => {
+      const source = `/*---\nflags: [${flag}]\n---*/\nAtomics.wait;\n`;
+      const parsed = parseTest262Case(source, "test/agent-policy.js", revision);
+      const requests: Test262ExecutionRequest[] = [];
+      const result = await executeTest262Case(
+        source,
+        parsed,
+        new Set(["Atomics"]),
+        harnesses,
+        {
+          async execute(request) {
+            requests.push(request);
+            assert.equal(
+              request.mainAgentCanBlock,
+              flag === "CanBlockIsFalse" ? false : undefined,
+            );
+            assert.equal(
+              request.test262Host,
+              flag === "CanBlockIsFalse" ? true : undefined,
+            );
+            return successfulResult();
+          },
+        },
+        ["atomics-single-agent"],
+      );
+      assert.equal(result.classification, "pass");
+      assert.equal(requests.length, 4);
+      assert.deepEqual(
+        new Set(requests.map((r) => r.specialization)),
+        new Set(["disabled", "enabled"]),
+      );
+      assert.equal(
+        requests.filter((r) => r.fragment?.strict === true).length,
+        2,
+      );
+    }),
   );
-  assert.equal(result.classification, "unsupported-profile-feature");
-  assert.equal(result.observation.unsupportedCapability, "non-blocking-agent");
-  assert.equal(result.observation.passed, false);
 });
 
 test("builds a case that only names $262.agent in text plainly", async () => {
