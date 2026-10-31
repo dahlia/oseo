@@ -46,7 +46,7 @@ results:
         - non-strict
         - strict
       suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
-    classification: unsupported-profile-feature
+    classification: pass
     dependencies:
       - abrupt-completion
       - error-intrinsics
@@ -65,15 +65,14 @@ results:
       variants:
         - specialization: disabled
           strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
     observation:
-      detail: 'test/built-ins/Promise/prototype/then/rxn-handler-fulfilled-next-abrupt.js
-        non-strict disabled failed (1):
-        stdout="Test262:AsyncTestComplete\n"
-        stderr="test/built-ins/Promise/prototype/then/rxn-handler-fulfilled-next-abrupt.js:129:3:
-        error[OSEO2001]: Unhandled promise rejection.\nOSEO_THROWN
-        Error\n"'
-      passed: false
-      unsupportedCapability: unhandled-rejection-policy
+      passed: true
     unsupportedFeatures: []
   - case:
       async: true
