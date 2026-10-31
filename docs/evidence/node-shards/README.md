@@ -54,7 +54,7 @@ residual evidence and those three files gives the calibration:
 | File                                              | Local, s | Linux weight | macOS weight |
 | ------------------------------------------------- | -------: | -----------: | -----------: |
 | *tests/dynamic-source-residual-evidence.test.ts*  |    798.3 |   2,055 (CI) |   1,576 (CI) |
-| *tests/host-script-evidence.test.ts*              |    290.8 |          749 |          575 |
+| *tests/host-script-evidence.test.ts*              |    290.8 |          749 |          574 |
 | *tests/trainc-ordinary-evidence.test.ts*          |    155.2 |          400 |          307 |
 | *tests/unhandled-rejection-policy-native.test.ts* |      9.5 |     fallback |     fallback |
 
