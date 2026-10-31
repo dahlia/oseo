@@ -612,3 +612,14 @@ unexecuted constructor accounting 1. Its pinned selector and obligations
 are in that child's work note. Ownership moves only with reviewed closure;
 the umbrella retains every remaining path and requires child landing plus
 zero directly owned paths before its own landing.
+
+
+Host Script evidence child
+--------------------------
+
+The 2026-11-01 umbrella-residual decision, item 1, adds
+`dynamic-source-host-script-evidence` for exactly 99 paths: 98 DS-10 eval
+rows and the DS-16 no-newline hashbang completion row. Its pinned selector,
+conditions and closure routes are in that child's work note. Ownership
+moves only with reviewed closure; the umbrella keeps every remaining path
+and now waits for this child.
