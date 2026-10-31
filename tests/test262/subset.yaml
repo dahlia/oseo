@@ -17265,13 +17265,13 @@ tests:
     dependencies: [dynamic-source, functions]
   - path: test/built-ins/Function/length/S15.3.5.1_A3_T1.js
     expectedClassification: unsupported-profile-feature
-    dependencies: [dynamic-source, functions]
+    dependencies: [dynamic-source, functions, object-properties]
   - path: test/built-ins/Function/length/S15.3.5.1_A3_T2.js
     expectedClassification: unsupported-profile-feature
-    dependencies: [dynamic-source, functions]
+    dependencies: [dynamic-source, functions, object-properties]
   - path: test/built-ins/Function/length/S15.3.5.1_A3_T3.js
     expectedClassification: unsupported-profile-feature
-    dependencies: [dynamic-source, functions]
+    dependencies: [dynamic-source, functions, object-properties]
   - path: test/built-ins/Function/length/S15.3.5.1_A4_T1.js
     expectedClassification: unsupported-profile-feature
     dependencies: [dynamic-source, functions]
@@ -17359,10 +17359,10 @@ tests:
     dependencies: [functions]
   - path: test/built-ins/Function/prototype/S15.3.5.2_A1_T1.js
     expectedClassification: unsupported-profile-feature
-    dependencies: [dynamic-source, functions]
+    dependencies: [dynamic-source, functions, object-properties]
   - path: test/built-ins/Function/prototype/S15.3.5.2_A1_T2.js
     expectedClassification: unsupported-profile-feature
-    dependencies: [dynamic-source, functions]
+    dependencies: [dynamic-source, functions, object-properties]
   - path: test/built-ins/Function/prototype/Symbol.hasInstance/length.js
     expectedClassification: pass
     dependencies: [functions]

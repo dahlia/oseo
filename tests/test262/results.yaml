@@ -23653,7 +23653,7 @@ summary:
       infrastructureFailures: 0
       passes: 17472
       semanticFailures: 0
-      unsupportedProfileFeatures: 926
+      unsupportedProfileFeatures: 931
     - dependency: promise-settlement
       expectedNegatives: 93
       harnessFailures: 0

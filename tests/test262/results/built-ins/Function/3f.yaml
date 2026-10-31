@@ -47,6 +47,7 @@ results:
     dependencies:
       - dynamic-source
       - functions
+      - object-properties
     observation:
       detail: 'test/built-ins/Function/prototype/S15.3.5.2_A1_T2.js non-strict
         disabled failed (1): stdout=""

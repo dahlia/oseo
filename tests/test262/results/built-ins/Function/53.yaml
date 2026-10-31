@@ -17,6 +17,7 @@ results:
     dependencies:
       - dynamic-source
       - functions
+      - object-properties
     observation:
       detail: 'test/built-ins/Function/length/S15.3.5.1_A3_T1.js non-strict
         disabled failed (1): stdout=""

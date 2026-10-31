@@ -28,7 +28,7 @@ evaluation boundary, and ADR 0019's closure requirements remain unchanged.
 Prepared metadata
 -----------------
 
-Each selected subset entry gains only `dynamic-source`, retaining every
+Each selected subset entry gains `dynamic-source`, retaining every
 existing dependency and its expected classification. The canonical
 manifest serializer materializes those dependencies into stored records,
 derives the dependency summary, and computes the target-parity digest.
@@ -36,6 +36,17 @@ It preserves all observations, executions, source hashes, classifications,
 unsupported features, paths, suite revision, and supported features.
 This preparation is not a new standards observation or a completed UPDATE.
 Root explicitly authorized it to prepare a canonical scoped-update U.
+
+Precheck on the first U, `e69e62ea`, exposed five pre-existing omissions
+among the selected rows. Root approved also adding `object-properties`
+to *test/built-ins/Function/length/S15.3.5.1\_A3\_T1.js*,
+*S15.3.5.1\_A3\_T2.js*, and *S15.3.5.1\_A3\_T3.js*, plus
+*test/built-ins/Function/prototype/S15.3.5.2\_A1\_T1.js* and
+*S15.3.5.2\_A1\_T2.js*. They include *propertyHelper.js* and assert
+`verifyNotWritable` or `verifyNotConfigurable`, which read own property
+descriptors. Exactly these five gain the additional descriptor dependency;
+all other selected rows gain only `dynamic-source`. The preservation
+proof records their exact paths and retains every baseline dependency.
 
 The ledger serializer derives the matching prerequisites while retaining
 all owners and states. Each selected audit record changes only

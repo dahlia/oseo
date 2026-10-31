@@ -11,7 +11,9 @@ delivers: "Adds the ADR 0013 dynamic-source dependency tag, alongside each
   Root approved including that record on 2026-10-31. Regenerates the
   manifest with the scoped update, regenerates the ledger, sets every
   affected missingDynamicTag to false, and changes no classification,
-  owner, or observation."
+  owner, or observation. Also repairs five pre-existing object-properties
+  tag omissions in selected Function length/prototype subjects, approved
+  by Root after precheck identified their propertyHelper.js assertions."
 dependencies:
   - authorized-exclusion-audit
   - cross-realm-host
