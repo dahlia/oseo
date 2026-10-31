@@ -1,9 +1,9 @@
 version: 1
 id: dynamic-source-coverage-remediation
 title: Resolve dynamic source coverage gaps
-delivers: "Resolves the 764 reviewed unsupported paths assigned to
+delivers: "Resolves the 766 reviewed unsupported paths assigned to
   node:dynamic-source-coverage-remediation in the derived closure
-  ledger. Select exactly those owners and their exclusion-audit path
+  ledger.   Select exactly those owners and their exclusion-audit path
   assessments: the original 121 paths, 35 from cross-realm-host, 1 from
   runtime dynamic source classification, 5 from observation-batch-07, 16
   from batch 09, 19 from batch 11: 14 class tests that evaluate a class
@@ -214,7 +214,11 @@ delivers: "Resolves the 764 reviewed unsupported paths assigned to
   completion subjects remain active coverage remediation; selectors and
   source-bound observations are linked from
   docs/m5c-graph/observation-batch-24.md and
-  docs/m5c-graph/observation-batch-25.md."
+  docs/m5c-graph/observation-batch-25.md. Observation-batch-21a adds two
+  declaration completion-value probes under test/language/statements/:
+  async-function/cptn-decl.js and class/cptn-decl.js, bringing the scope
+  to 766. They also lie outside the split and stay with the umbrella;
+  their ordinary Completion Records remain in-claim."
 dependencies:
   - authorized-exclusion-audit
   - dynamic-source-binding-reference-evidence

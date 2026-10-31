@@ -5,7 +5,7 @@
 # or a split of one batch that PLAN-M5C.md records.
 version: 1
 suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
-unreviewedPaths: 5297
+unreviewedPaths: 3529
 basis:
   supportedFeatures:
     - AggregateError
@@ -165,187 +165,45 @@ regeneration:
     wallSeconds: 3997
     workers: 8
   secondsPerVariant: 0.0549
-  currentExecutedVariants: 119272
-  currentSeconds: 6553
-  finalExecutedVariants: 137288
-  finalSeconds: 7543
+  currentExecutedVariants: 125489
+  currentSeconds: 6895
+  finalExecutedVariants: 137271
+  finalSeconds: 7542
   plan:
-    batches: 10
+    batches: 7
     largestPaths: 645
     largestReviewUnits: 464
     limits:
       paths: 3000
       reviewUnits: 500
-    scheduleHours: 20.16
-    fullUpdateScheduleHours: 39.77
+    scheduleHours: 14.42
+    fullUpdateScheduleHours: 28.49
   alternatives:
-    - batches: 9
-      largestPaths: 1920
+    - batches: 8
+      largestPaths: 781
       largestReviewUnits: 300
       limits:
         paths: 2000
         reviewUnits: 300
-      scheduleHours: 18.43
-      fullUpdateScheduleHours: 36.32
-    - batches: 4
-      largestPaths: 2408
-      largestReviewUnits: 595
+      scheduleHours: 16.49
+      fullUpdateScheduleHours: 32.63
+    - batches: 3
+      largestPaths: 1859
+      largestReviewUnits: 599
       limits:
         paths: 4000
         reviewUnits: 600
-      scheduleHours: 8.42
-      fullUpdateScheduleHours: 16.28
+      scheduleHours: 6.36
+      fullUpdateScheduleHours: 12.36
     - batches: 2
-      largestPaths: 4656
-      largestReviewUnits: 1153
+      largestPaths: 3191
+      largestReviewUnits: 1180
       limits:
         paths: 8000
         reviewUnits: 1200
-      scheduleHours: 4.44
-      fullUpdateScheduleHours: 8.33
+      scheduleHours: 4.35
+      fullUpdateScheduleHours: 8.35
 batches:
-  - id: observation-batch-21a
-    selector:
-      prerequisiteSets:
-        - ""
-      prefixes:
-        - test/language/statements/async-
-        - test/language/statements/block/
-        - test/language/statements/break/
-        - test/language/statements/class/arguments/
-        - test/language/statements/class/async-
-        - test/language/statements/class/class-name-ident-
-        - test/language/statements/class/cpn-class-decl-
-        - test/language/statements/class/cptn-
-        - test/language/statements/class/definition/
-    dependsOn:
-      - observation-batch-plan
-    paths: 488
-    reviewUnits: 267
-    generatedPaths: 411
-    prerequisites: {}
-    dynamicSource:
-      Function: 1
-      eval: 4
-    flags:
-      async: 220
-      generated: 411
-      module: 6
-      noStrict: 33
-      onlyStrict: 4
-    includes:
-      compareArray.js: 4
-      propertyHelper.js: 2
-    features:
-      Symbol: 2
-      Symbol.asyncIterator: 88
-      Symbol.iterator: 106
-      Symbol.unscopables: 2
-      arrow-function: 30
-      async-functions: 85
-      async-iteration: 208
-      class: 20
-      class-fields-private: 4
-      class-fields-public: 62
-      class-static-fields-public: 62
-      computed-property-names: 124
-      default-parameters: 36
-      exponentiation: 8
-      generators: 13
-      globalThis: 2
-      let: 2
-      logical-assignment-operators: 12
-      object-spread: 4
-      rest-parameters: 12
-      top-level-await: 4
-    negatives:
-      parse: 95
-    partitions:
-      groups:
-        - language/statements
-      files: 223
-      newFiles: 0
-    regeneration:
-      executableVariants: 1498
-      scopedUpdateSeconds: 82
-      fullCorpusSeconds: 6635
-  - id: observation-batch-21b
-    selector:
-      prerequisiteSets:
-        - ""
-      prefixes:
-        - test/language/statements/class/dstr/async-
-    dependsOn:
-      - observation-batch-plan
-    paths: 640
-    reviewUnits: 105
-    generatedPaths: 640
-    prerequisites: {}
-    dynamicSource: {}
-    flags:
-      async: 488
-      generated: 640
-    includes:
-      compareArray.js: 8
-      propertyHelper.js: 24
-    features:
-      Symbol.iterator: 52
-      async-iteration: 640
-      class: 268
-      class-methods-private: 134
-      class-static-methods-private: 134
-      generators: 100
-      object-rest: 24
-    negatives:
-      parse: 48
-    partitions:
-      groups:
-        - language/statements
-      files: 236
-      newFiles: 0
-    regeneration:
-      executableVariants: 2368
-      scopedUpdateSeconds: 130
-      fullCorpusSeconds: 6765
-  - id: observation-batch-21c
-    selector:
-      prerequisiteSets:
-        - ""
-      prefixes:
-        - test/language/statements/class/dstr/gen-
-        - test/language/statements/class/dstr/private-gen-
-    dependsOn:
-      - observation-batch-plan
-    paths: 640
-    reviewUnits: 105
-    generatedPaths: 640
-    prerequisites: {}
-    dynamicSource: {}
-    flags:
-      generated: 640
-    includes:
-      compareArray.js: 8
-      propertyHelper.js: 24
-    features:
-      Symbol.iterator: 52
-      class: 268
-      class-methods-private: 134
-      class-static-methods-private: 134
-      default-parameters: 320
-      destructuring-binding: 640
-      generators: 640
-      object-rest: 24
-    negatives:
-      parse: 48
-    partitions:
-      groups:
-        - language/statements
-      files: 236
-      newFiles: 0
-    regeneration:
-      executableVariants: 2368
-      scopedUpdateSeconds: 130
-      fullCorpusSeconds: 6896
   - id: observation-batch-21d
     selector:
       prerequisiteSets:
@@ -384,7 +242,7 @@ batches:
     regeneration:
       executableVariants: 2368
       scopedUpdateSeconds: 130
-      fullCorpusSeconds: 7026
+      fullCorpusSeconds: 7025
   - id: observation-batch-22a
     selector:
       prerequisiteSets:
@@ -445,7 +303,7 @@ batches:
     regeneration:
       executableVariants: 2082
       scopedUpdateSeconds: 114
-      fullCorpusSeconds: 7140
+      fullCorpusSeconds: 7139
   - id: observation-batch-22b
     selector:
       prerequisiteSets:
@@ -508,7 +366,7 @@ batches:
     regeneration:
       executableVariants: 2150
       scopedUpdateSeconds: 118
-      fullCorpusSeconds: 7258
+      fullCorpusSeconds: 7257
   - id: observation-batch-26a
     selector:
       prerequisiteSets:
@@ -556,7 +414,7 @@ batches:
     regeneration:
       executableVariants: 1328
       scopedUpdateSeconds: 73
-      fullCorpusSeconds: 7331
+      fullCorpusSeconds: 7330
   - id: observation-batch-26b
     selector:
       prerequisiteSets:
@@ -603,7 +461,7 @@ batches:
     regeneration:
       executableVariants: 2116
       scopedUpdateSeconds: 116
-      fullCorpusSeconds: 7447
+      fullCorpusSeconds: 7446
   - id: observation-batch-27
     selector:
       prerequisiteSets:
@@ -655,7 +513,7 @@ batches:
     regeneration:
       executableVariants: 1734
       scopedUpdateSeconds: 95
-      fullCorpusSeconds: 7543
+      fullCorpusSeconds: 7542
   - id: observation-batch-28
     selector:
       prerequisiteSets:
@@ -681,4 +539,4 @@ batches:
     regeneration:
       executableVariants: 4
       scopedUpdateSeconds: 0
-      fullCorpusSeconds: 7543
+      fullCorpusSeconds: 7542

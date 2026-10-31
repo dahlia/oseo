@@ -9,16 +9,16 @@ usage: "Take a node whose status is ready and whose landed field is
   m5-exit-audit path. Update baseline whenever the checked-in reviewed
   manifest changes; check:m5c-graph rejects stale counts."
 baseline:
-  expectedNegatives: 3707
+  expectedNegatives: 3898
   harnessFailures: 0
   infrastructureFailures: 0
   inventoryPaths: 41091
-  passes: 30396
-  reviewedPaths: 35794
+  passes: 31968
+  reviewedPaths: 37562
   semanticFailures: 0
   suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
-  unreviewedPaths: 5297
-  unsupportedProfileFeatures: 1691
+  unreviewedPaths: 3529
+  unsupportedProfileFeatures: 1696
 summary:
   nodes: 139
   ready: 135
