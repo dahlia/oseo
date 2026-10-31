@@ -268,18 +268,22 @@ export function createTest262FragmentExecutor(
       const input = request.fragment;
       if (input == null) return await fallback("metadata");
       if (input.raw) return await fallback("raw");
+      const unhandledRejectionPolicy =
+        request.unhandledRejectionPolicy ?? "fatal";
       const key = JSON.stringify([
         input.sources,
         input.strict,
         request.specialization,
+        unhandledRejectionPolicy,
       ]);
       let prepared = bundles.get(key);
       if (prepared == null) {
+        // The harness MIR carries the policy to the launcher it emits.
         prepared = compileHarnessFragment(
           defaultComponents.frontend,
           input.sources,
           input.strict,
-          { specialization: request.specialization },
+          { specialization: request.specialization, unhandledRejectionPolicy },
         );
         bundles.set(key, prepared);
       }

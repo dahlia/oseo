@@ -34,6 +34,7 @@ import type {
   Diagnostic,
   SpecializationMode,
   SyntaxProgram,
+  UnhandledRejectionPolicy,
 } from "../packages/compiler/src/index.ts";
 import {
   parsedObject as record,
@@ -316,6 +317,12 @@ export interface Test262ExecutionRequest {
    * non-blocking main-agent policy, so it uses the native test262 host.
    */
   readonly test262Host?: boolean;
+  /**
+   * The rejection checkpoint policy. The reviewed runner selects
+   * `"observe"` for every case, as the upstream test262 host contract
+   * tolerates an unhandled rejection; omitted means `"fatal"` (ADR 0030).
+   */
+  readonly unhandledRejectionPolicy?: UnhandledRejectionPolicy;
 }
 
 /** Native execution boundary used by the repository runner and unit tests. */
@@ -1669,6 +1676,7 @@ async function executedResult(
       if (!test262Host) return undefined;
       return { test262Host };
     }),
+    unhandledRejectionPolicy: "observe" as const,
   });
   /*
    * ADR 0013 requires every executed combination to be listed and
@@ -2278,6 +2286,9 @@ async function loadNativeExecution(): Promise<NativeExecution> {
         ...(request.test262Host === true ? ["--test262-host"] : []),
         ...(request.mainAgentCanBlock === false
           ? ["--test262-non-blocking"]
+          : []),
+        ...(request.unhandledRejectionPolicy === "observe"
+          ? ["--test262-observe-rejections"]
           : []),
         ...(request.specialization === "disabled"
           ? ["--no-specialization"]

@@ -49,6 +49,28 @@ test("an empty unit still exports dispatch and both phase entries", () => {
   assert.match(result.launcher.source, /oseo_environment_create/u);
 });
 
+test("only an observing harness launcher selects the rejection policy", () => {
+  const mapping = {
+    sourceId: "case.js",
+    harnessLineOffset: 0,
+    bodyLineOffset: 0,
+  };
+  const fatal = emitScriptFragments(harness, fragment, mapping);
+  assert.doesNotMatch(fatal.launcher.source, /unhandled_rejection_policy/u);
+  const observing: HarnessFragment = {
+    ...harness,
+    mir: buildMir(hir, { unhandledRejectionPolicy: "observe" }),
+    options: { unhandledRejectionPolicy: "observe" },
+  };
+  const observed = emitScriptFragments(observing, fragment, mapping);
+  assert.match(
+    observed.launcher.source,
+    /unhandled_rejection_policy =\s+OSEO_UNHANDLED_REJECTION_OBSERVE;/u,
+  );
+  assert.equal(observed.harness.source, fatal.harness.source);
+  assert.equal(observed.body.source, fatal.body.source);
+});
+
 test("both fragment phases charge binding access apart from heap roots", () => {
   const declarations: HirProgram = {
     ...hir,

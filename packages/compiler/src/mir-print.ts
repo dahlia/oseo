@@ -150,6 +150,9 @@ export function printMir(program: MirProgram): string {
     `mir ${JSON.stringify(program.sourceId)} ` +
       `specialization ${program.specialization}`,
   ];
+  if (program.unhandledRejectionPolicy != null) {
+    lines.push(`unhandled-rejections ${program.unhandledRejectionPolicy}`);
+  }
   for (const binding of program.globalBindings) {
     lines.push(`global %b${binding.id} ${binding.name}`);
   }

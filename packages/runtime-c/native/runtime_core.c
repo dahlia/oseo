@@ -151,6 +151,7 @@ void oseo_context_init(
     context->collections = 0u;
     context->rejection_handled_count = 0u;
     context->unhandled_rejection_count = 0u;
+    context->unhandled_rejection_policy = OSEO_UNHANDLED_REJECTION_FATAL;
     context->clock_adapter = NULL;
     context->clock_state = NULL;
     context->clock_origin = 0u;

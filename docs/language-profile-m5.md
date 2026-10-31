@@ -8849,10 +8849,14 @@ complete. The remaining gaps retain their existing owners.
     `unhandled-rejection-policy` capability; node
     `unhandled-rejection-observation` owns them, and none is a pass or an
     exclusion. The five unreviewed cases recorded above belong to node
-    `observation-batch-01`, not to this boundary's owner. Reconciling the
-    native policy with the test262 host contract, which would change how
-    such cases classify, is a separate host-profile decision. Owner of that
-    decision: the modules and asynchronous execution stream.
+    `observation-batch-01`, not to this boundary's owner. The host-profile
+    decision that reconciles the native policy with the test262 host
+    contract is
+    [ADR 0030](./adr/0030-test262-unhandled-rejection-policy.md): the
+    reviewed runner selects the explicit observe policy for test262 harness
+    runs, while ordinary executables keep the fatal policy. Until Root's
+    full UPDATE observes these paths under it, their checked-in records
+    keep the classification above.
  -  Large intrinsic tables and built-in families land in the owned
     runtime components recorded in
     [*runtime-components.md*](./runtime-components.md).

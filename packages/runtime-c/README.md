@@ -1319,3 +1319,15 @@ call retains and traces its constructor caller realm separately from the
 tail call's running realm, then checks its final result in that caller.
 Nested calls restore the previous scope. It follows `m5-145`, the
 non-blocking-agent policy above.
+
+ABI `m5-147` adds `unhandled_rejection_policy` to `OseoContext`, as
+[ADR 0030] records. Every context initializes it to the fatal policy. Under the
+observe policy, `oseo_rejection_checkpoint` still marks each unhandled
+rejected promise reported and counts it, then returns a normal
+completion instead of the first reason. Only generated setup compiled
+with the test262 observation option selects observe. The agent cluster
+records the main context's policy at installation, and each child agent
+copies it before running its program. Timer and cleanup callback throws,
+host diagnostics, and a rejected entry completion are unchanged.
+
+[ADR 0030]: https://github.com/dahlia/oseo/blob/main/docs/adr/0030-test262-unhandled-rejection-policy.md

@@ -20,6 +20,7 @@ import type {
   SyntaxProgram,
   TargetDescription,
   TargetName,
+  UnhandledRejectionPolicy,
 } from "@oseo/compiler";
 import {
   buildModuleGraph,
@@ -133,6 +134,18 @@ const test262NonBlockingParser = withDefault(
   false,
 );
 
+// ADR 0030: the tolerant test262 rejection policy is its own explicit
+// option, independent of --test262-host, and every other run stays fatal.
+const unhandledRejectionPolicyParser = withDefault(
+  map(
+    flag("--test262-observe-rejections", {
+      description: message`Continue after unhandled rejections for test262.`,
+    }),
+    () => "observe" as const,
+  ),
+  "fatal" as const,
+);
+
 const moduleParser = withDefault(
   map(
     flag("--module", {
@@ -175,6 +188,7 @@ const cliParser = object({
   target: targetParser,
   test262Host: test262HostParser,
   test262NonBlocking: test262NonBlockingParser,
+  unhandledRejectionPolicy: unhandledRejectionPolicyParser,
 });
 
 const cliProgram = defineProgram({
@@ -343,6 +357,7 @@ function compileCliSource(
   specialization: CliInvocation["specialization"],
   test262Host: boolean,
   mainAgentCanBlock: boolean,
+  unhandledRejectionPolicy: UnhandledRejectionPolicy,
 ): CliResult {
   const compiled = compileSource(
     defaultComponents.frontend,
@@ -350,7 +365,12 @@ function compileCliSource(
       source,
       sourceId,
     },
-    { mainAgentCanBlock, specialization, test262Host },
+    {
+      mainAgentCanBlock,
+      specialization,
+      test262Host,
+      unhandledRejectionPolicy,
+    },
   );
   const diagnostic = compiled.diagnostics[0];
   if (diagnostic != null) return diagnosticResult(diagnostic);
@@ -410,6 +430,7 @@ async function compileCliModuleGraph(
   sourcePath: string,
   source: string,
   specialization: CliInvocation["specialization"],
+  unhandledRejectionPolicy: UnhandledRejectionPolicy,
   script?: CliPreludeScript,
 ): Promise<{ readonly diagnostic: Diagnostic } | { readonly mir: MirProgram }> {
   let entryId: string;
@@ -470,7 +491,7 @@ async function compileCliModuleGraph(
   }
   const compiled = compileModuleGraph(
     result.graph,
-    { specialization },
+    { specialization, unhandledRejectionPolicy },
     prelude,
   );
   const diagnostic = compiled.diagnostics[0];
@@ -586,6 +607,7 @@ export function runCli(request: CliRequest): CliResult {
     parsed.value.specialization,
     parsed.value.test262Host,
     !parsed.value.test262NonBlocking,
+    parsed.value.unhandledRejectionPolicy,
   );
 }
 
@@ -1618,6 +1640,7 @@ export async function runNativeCli(
       parsed.value.sourceId,
       source,
       parsed.value.specialization,
+      parsed.value.unhandledRejectionPolicy,
       script,
     );
     if ("diagnostic" in compiled) {
@@ -1635,6 +1658,7 @@ export async function runNativeCli(
       parsed.value.specialization,
       parsed.value.test262Host,
       !parsed.value.test262NonBlocking,
+      parsed.value.unhandledRejectionPolicy,
     );
   } else {
     const compiled = compileSource(
@@ -1647,6 +1671,7 @@ export async function runNativeCli(
         mainAgentCanBlock: !parsed.value.test262NonBlocking,
         specialization: parsed.value.specialization,
         test262Host: parsed.value.test262Host,
+        unhandledRejectionPolicy: parsed.value.unhandledRejectionPolicy,
       },
     );
     const diagnostic = compiled.diagnostics[0];

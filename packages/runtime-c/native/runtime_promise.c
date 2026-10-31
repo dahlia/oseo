@@ -3211,7 +3211,15 @@ OseoResult oseo_rejection_checkpoint(OseoContext *context) {
         }
         current = next;
     }
-    if (!found) {
+    /*
+     * The observe policy has already recorded every report above; it
+     * only declines to end the program. A thrown timer or cleanup
+     * callback is a separate completion its caller keeps, and an internal
+     * await reads its own promise, so neither depends on this decision.
+     */
+    if (!found ||
+        context->unhandled_rejection_policy ==
+            OSEO_UNHANDLED_REJECTION_OBSERVE) {
         return normal(oseo_undefined());
     }
     context->error_code = "OSEO2001";
