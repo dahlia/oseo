@@ -14,4 +14,21 @@ assert.sameValue(Object.getPrototypeOf(ordinary), realmA.global.Function.prototy
 assert.sameValue(Object.getPrototypeOf(ordinary.prototype), realmA.global.Object.prototype);
 assert(new ordinary() instanceof realmA.global.Object);
 assert.sameValue(realmA.global.calls, 1);
+// Mutate expected values, preserving the strict in-program upstream oracle.
+// Printed text would conflate each pair; every mismatch must throw instead.
+function rejectsWrongType(actual, mutatedExpected) {
+  let rejected = false;
+  try {
+    assert.sameValue(actual, mutatedExpected);
+  } catch (error) {
+    rejected = error instanceof Test262Error;
+  }
+  assert.sameValue(rejected, true);
+}
+for (const pair of [[1, "1"], [undefined, "undefined"], [42, "42"]]) {
+  rejectsWrongType(pair[0], pair[1]);
+  rejectsWrongType(pair[1], pair[0]);
+}
+// This mutation targets an actual value assertion in the witness above.
+rejectsWrongType(realmA.global.calls, "1");
 console.log('DS19 function-creation complete');

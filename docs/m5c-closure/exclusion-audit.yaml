@@ -1518,8 +1518,8 @@ assessments:
       non-source dependence trigger.
     replacementEvidence:
       tests/fixtures/ds19-realm/function-creation.js.txt:
-        "ad08a035e9ec86eec54a2afdcbad62fb1032f08fd0ba5eeb\
-        395a650b471570cf"
+        "48ea091945356e6a790b357f8da9376ae2c9ab68d40a7b96\
+        460992d54220a506"
       tests/dynamic-source-realm-host-evidence.test.ts:
         "33fa8bc15819484524d930a99734d368c447ad95f1a7561b\
         b553978437567194"
@@ -1539,8 +1539,8 @@ assessments:
       non-source dependence trigger.
     replacementEvidence:
       tests/fixtures/ds19-realm/function-creation.js.txt:
-        "ad08a035e9ec86eec54a2afdcbad62fb1032f08fd0ba5eeb\
-        395a650b471570cf"
+        "48ea091945356e6a790b357f8da9376ae2c9ab68d40a7b96\
+        460992d54220a506"
       tests/dynamic-source-realm-host-evidence.test.ts:
         "33fa8bc15819484524d930a99734d368c447ad95f1a7561b\
         b553978437567194"

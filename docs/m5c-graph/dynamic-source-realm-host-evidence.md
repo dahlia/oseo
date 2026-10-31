@@ -168,3 +168,12 @@ must run the complete Node.js and Deno suites, the native and standards
 suites, and the selected host-cc sanitizer coverage. No local full suite,
 macOS native execution, full UPDATE, outer review, push, merge or publication
 is claimed by this worker.
+
+Root's oracle-rule follow-up (`msg_bfad61481e63`) is checked inside the
+`function-creation` program. The original fixtures retain their strict
+in-program `assert.sameValue` calls and preserve identifier/property access
+operations. Six type mutations compare 1/“1”, undefined/“undefined” and
+42/“42” in both directions; a seventh mutates the actual realm call counter's
+expected value from 1 to “1”. Every mutation must throw Test262Error before
+the program's completion marker. These checks reject printed-text equality
+as an oracle while retaining the original successful assertions.
