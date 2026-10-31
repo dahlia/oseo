@@ -274,8 +274,9 @@ Both candidates also increase median compile-plus-execute wall time in
 every comparison. Native execution alone is 9–29 ms faster on host-cc but
 slightly slower on Zig; the additional seconds spent compiling dominate
 those differences. This bounded Array specimen supports retaining the current
-generated-code level for this cost node. It establishes no result for the
-whole ordinary suite, hosted macOS, or other optimization levels.
+generated-code level for this cost node. The specimen pairs establish no hosted
+macOS result or result for other optimization levels. Whole-property
+observations follow below.
 
 The sanitizer check uses the repository's plain-C heap-overflow and signed
 integer-overflow vectors in generated code and runtime archive code. These
@@ -296,3 +297,49 @@ record all 24 fault observations. The capacity-scoped heavy command exits
 zero. Runtime archives are warm; host contention and cache history remain
 uncontrolled. Root's Full UPDATE, R, outer gate and candidate macOS
 measurement remain pending under Root's ownership.
+
+
+Whole-property and resource checks for candidate levels
+-------------------------------------------------------
+
+The detailed measurement follow-up runs the unchanged ordinary Array property
+once at each candidate level on each toolchain. Its seed, generated domain,
+12-case budget, both policies, forced collection, and 180-second interrupt
+remain unchanged. Every candidate run exits one because fast-check reports an
+interrupt, with no semantic counterexample recorded. The current-level U
+runs passed all 12 cases in 43.402 seconds on Zig and 86.943 seconds on host-cc.
+The candidate-level observations are:
+
+| Level | Lane    | Property s | Command s | Reported tests |
+| ----- | ------- | ---------: | --------: | -------------: |
+| `-O1` | zig     |    180.004 |   183.403 |              9 |
+| `-O2` | zig     |    180.005 |   180.931 |              9 |
+| `-O1` | host-cc |    180.002 |   191.944 |             10 |
+| `-O2` | host-cc |    180.004 |   188.748 |              9 |
+
+The last column is fast-check's reported count at interruption, not a claim
+that all configured cases finished. Command wall time includes startup and
+in-flight compiler cleanup, which can extend beyond the property timer. These
+single whole-file observations are separate from the three alternating
+specimen pairs for each level/lane/policy. They are failed ordinary gates,
+not completed 12-case timing results.
+
+The resource checks reuse the call-depth, compact-frame recursion, and proper
+tail-call contracts. All 36 observations pass: three levels, two toolchains,
+two policies and three source cases. A 1,500-step proper-tail chain completes;
+a non-tail chain reaches its owned call-depth diagnostic; and the
+1,000-binding compact-frame case admits its depth-zero call before reaching
+the owned native-frame budget diagnostic during recursion. Each candidate's
+status, stdout and diagnostic exactly match its current-level control. The
+checks force collection and retain the generated-program compile arguments.
+
+The initial resource wrapper used a fixture helper that rejects nonzero exits
+before inspection. Its corrected runner uses the repository CLI path for
+intentional resource failures. Original runner errors and all corrected
+observations remain in the packet. *ordinary-results.json* retains property
+walls, command walls and reported counts; *stack-summary.json* and the
+_stack2-\*.json_ records retain the 36 resource observations. The original
+measurement driver records its initial wrapper failure; the corrected
+resource-check command exits zero. All four ordinary interrupts remain
+reported as failures. These observations support retaining the current
+optimization level; no flag or sanitizer-policy change is adopted.
