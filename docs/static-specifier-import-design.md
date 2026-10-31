@@ -43,8 +43,15 @@ The pinned selector is
 [*m5c-graph/static-specifier-import-design.paths.txt*](./m5c-graph/static-specifier-import-design.paths.txt):
 19 DS-12 module-loading-and-promises rows and DS-8's
 *test/language/expressions/dynamic-import/usage-from-eval.js*. All 20 are owned
-by `node:dynamic-source-coverage-remediation` and observe the parse-time
-`OSEO1001` rejection of `import()`.
+by `node:dynamic-source-coverage-remediation` and record an unsupported
+`profile-syntax` observation under `OSEO1001`, but not the same one. The 19
+DS-12 rows observe the parse-time rejection
+`ImportExpression is outside the M1 profile.` of a direct ImportCall.
+*usage-from-eval.js* has no ImportCall the build sees: its `import()` is inside
+an eval string. It observes the run-time rejection of the direct eval call at
+line 129,
+`eval compiles source text at run time, which is outside the admitted profile.`,
+so admitting literal `import()` does not change its observation.
 
 Admitting the track changes more than these rows. The fixed inventory has
 630 paths whose frontmatter lists `dynamic-import`. A heuristic scan of the
@@ -455,7 +462,7 @@ and the module that throws or awaits.
 | *expressions/dynamic-import/reuse-namespace-object-from-script.js*                | G4      | Observation on admission                               |
 | *expressions/dynamic-import/reuse-namespace-object.js*                            | G4      | Observation on admission                               |
 | *expressions/dynamic-import/update-to-dynamic-import.js*                          | G5      | Conditional: fixtures call the `Function` constructor  |
-| *expressions/dynamic-import/usage-from-eval.js*                                   | G4, G10 | Not closed by this track: direct eval context          |
+| *expressions/dynamic-import/usage-from-eval.js*                                   | G4, G10 | Not closed by this track: run-time eval rejection      |
 | *module-code/top-level-await/await-dynamic-import-rejection.js*                   | G6      | Observation on admission                               |
 | *module-code/top-level-await/await-dynamic-import-resolution.js*                  | G6      | Observation on admission                               |
 | *module-code/top-level-await/dynamic-import-of-waiting-module.js*                 | G7      | Observation on admission                               |
@@ -467,7 +474,10 @@ and the module that throws or awaits.
 | *module-code/top-level-await/unobservable-global-async-evaluation-count-reset.js* | G8      | Observation on admission                               |
 | *module-code/verify-dfs.js*                                                       | G9      | Observation on admission                               |
 
-Paths are relative to *test/language/*. “Observation on admission” means
+Paths are relative to *test/language/*. Every row except
+*usage-from-eval.js* currently observes the parse-time `ImportExpression`
+rejection; *usage-from-eval.js* observes the run-time eval rejection
+described in [Scope](#scope). “Observation on admission” means
 that, once the track is accepted, implemented, and admitted, the original
 source should run unchanged and its fresh observation decides the result.
 A pass then takes the observation owner. A failure is a semantic failure for
@@ -479,13 +489,15 @@ Three rows stay with `node:dynamic-source-coverage-remediation` even after
 admission:
 
  -  *usage-from-eval.js* (DS-8) calls `import()` inside direct eval code.
-    Direct eval stays rejected at run time, so none of its promise or
-    namespace assertions execute. G10 and G4 can witness those assertions
-    for an import outside eval, but the referrer and the eval-to-ImportCall
-    interaction belong to eval semantics. Closing it needs separate
-    eval-context evidence under the ADR 0016 accounting rule of the
-    2026-10-28 decision. Otherwise it is a candidate for a named deferral
-    under item 4 of the 2026-11-01 answer.
+    Its recorded observation is already the run-time `OSEO1001` rejection
+    of that eval call, not an `ImportExpression` rejection. Direct eval
+    stays rejected at run time, so the observation is unchanged by
+    admission and none of its promise or namespace assertions execute. G10 and
+    G4 can witness those assertions for an import outside eval, but the
+    referrer and the eval-to-ImportCall interaction belong to eval semantics.
+    Closing it needs separate eval-context evidence under the ADR 0016
+    accounting rule of the 2026-10-28 decision. Otherwise it is a candidate for
+    a named deferral under item 4 of the 2026-11-01 answer.
  -  *eval-rqstd-once.js* and *update-to-dynamic-import.js* reach
     `Function('return this;')()` in their fixtures. The runtime rejects that
     call with `OSEO1001` under ADR 0016, so the original observations stay
@@ -514,8 +526,10 @@ feature moves from the runner's observe-only set to the supported features
 in the same change.
 
 Every `dynamic-import` path is re-observed. Non-literal and attribute forms
-keep their exact rejection and their records. Literal paths change
-observation, and each change needs review:
+keep their exact rejection and their records. So does a path whose only
+ImportCall is inside eval or `Function` source, such as *usage-from-eval.js*,
+because the build never sees that call. Literal paths change observation, and
+each change needs review:
 
  -  a path that now passes or becomes an expected negative takes the
     observation owner;

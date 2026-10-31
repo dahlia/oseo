@@ -28,6 +28,13 @@ Nineteen paths are DS-12 module-loading-and-promises rows. The twentieth,
 whose `import()` runs inside direct eval code. It must not be swept into the
 import decision without its own eval-context evidence.
 
+The baselines differ. The 19 DS-12 rows record the parse-time `OSEO1001`
+rejection `ImportExpression is outside the M1 profile.` The DS-8 row records
+the run-time `OSEO1001` rejection of its direct eval call,
+`eval compiles source text at run time, which is outside the admitted profile.`,
+in *tests/test262/results/language/expressions/67.yaml*. The build never sees
+its ImportCall.
+
 The node starts ready and unlanded, depending on landed
 `unsupported-ownership-audit`. The umbrella
 `dynamic-source-coverage-remediation` and `m5-exit-audit` depend on it.

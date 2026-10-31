@@ -421,7 +421,10 @@ node owns that review. Its design is
 and its pinned 20-path selector is in its work note under *docs/m5c-graph/*.
 Until the maintainer accepts the amendment, the interim ownership rule above
 applies unchanged: every `import()` is rejected, and every pinned path keeps
-`node:dynamic-source-coverage-remediation`.
+`node:dynamic-source-coverage-remediation`. Nineteen pinned rows observe the
+parse-time `ImportExpression` rejection. *usage-from-eval.js* instead observes
+the run-time `OSEO1001` rejection of the direct eval call whose source contains
+its `import()`.
 
 The admitted surface is an ImportCall whose only argument is a string
 literal, at a site in a module or in a Script with a build-side referrer.
