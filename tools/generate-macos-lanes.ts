@@ -100,9 +100,16 @@ export function macosJobs(): readonly MacosLaneJob[] {
       shard,
     });
   }
-  for (const suite of ["native", "property"]) {
+  // Run 41191483370 cancelled the native suite at 75.5 minutes on commit
+  // 216503f8 and passed its rerun at 58.9, so it needs a wider timeout than
+  // the property suite. See docs/sanitizer-activity.md.
+  for (const [suite, timeout] of [
+    ["native", 90],
+    ["property", 75],
+  ] as const) {
     add("test_sanitizer_macos", suite, `host C sanitizers (macOS, ${suite})`, {
       suite,
+      timeout,
     });
   }
   for (const [sourceId, family] of [

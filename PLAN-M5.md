@@ -4782,7 +4782,7 @@ The unchanged upstream path is admitted, and fixed 2,048- and
 both policies and deliberate shape-guard fallback. The pinned 2,048-element
 fixture forces collection at every safepoint throughout construction and
 sorting under both policies; the 4,096-element fixture uses normal
-collection. The sanitizer native CI job has a 75-minute limit, and these
+collection. The sanitizer native CI job has a 90-minute limit, and these
 fixtures have no individual execution timeout. Generated large literals
 use normal collection inside the unchanged two-case, 180-second property
 budget. The normative sorting family now includes all 75 upstream paths.

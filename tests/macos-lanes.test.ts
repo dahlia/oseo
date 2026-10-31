@@ -406,7 +406,7 @@ test("every macOS job occurs exactly once in five LPT chains", () => {
   );
 });
 
-test("commands, timeouts, environments and artifacts are unchanged", () => {
+test("generated macOS jobs preserve their template contract", () => {
   for (const planned of macosJobs()) {
     const original = before.jobs[planned.sourceId]!;
     const actual = after.jobs[planned.id]!;
@@ -469,6 +469,24 @@ test("commands, timeouts, environments and artifacts are unchanged", () => {
         (row) => !expand(original["runs-on"], row).startsWith("macos-"),
       ),
     );
+  }
+});
+
+test("macOS native sanitizer timeout covers the slow run", () => {
+  // Run 41191483370 cancelled the native suite at 75.5 minutes on commit
+  // 216503f8 and passed its rerun at 58.9, so only that suite gets 90
+  // minutes. The property suite keeps 75. Cases, seeds, and budgets are
+  // unchanged. See docs/sanitizer-activity.md.
+  for (const [suite, timeout] of [
+    ["native", 90],
+    ["property", 75],
+  ] as const) {
+    const planned = macosJobs().find(
+      (job) => job.id === `test_sanitizer_macos_macos_${suite}`,
+    );
+    assert.ok(planned);
+    assert.deepEqual(planned.matrix, { suite, timeout });
+    assert.equal(after.jobs[planned.id]!["timeout-minutes"], timeout);
   }
 });
 
