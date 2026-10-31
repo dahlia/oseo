@@ -107,12 +107,23 @@ the remaining eval operation.
 The candidate delta is 43 newly covered non-source subjects and 43 proposed
 ADR 0016 exclusions, with zero paths staying in remediation and 43 evidence
 groups added. Classification remains `unsupported-profile-feature` for all
-43 paths. No pass, inventory, subset, result, ADR, graph landing or shared
-umbrella total changes. The complete inventory retains 41,091 paths.
-Ownership is generated through the ledger API with only these assignments,
-then regenerated with `mise run m5c:closure-ledger:update`; audit edits touch
-only these 43 records and their new assessments. Root owns merged totals,
-outer review, publication and landing.
+43 paths. No pass, inventory, subset, result, ADR or graph landing changes.
+The complete inventory retains 41,091 paths. The ledger in this worktree
+prepares only this node's candidate owner assignments; it does not publish
+the child or change its unlanded status. Authoritative merged ownership
+and aggregate documentation follow Root's serialized publication/landing.
+
+Root's final dispatch addition expressly requires: “Do not write a new
+running total into the shared umbrella prose or its node YAML; record only
+this node's delta in its own note. Root merges the counts at publication.”
+Accordingly, the shared umbrella prose and node YAML retain their base
+snapshot here. This note records the 43-path delta for Root to integrate
+with the other lanes; their unpublished totals are not a claim about this
+candidate ledger. Ownership is generated through the ledger API with only
+these assignments, then regenerated with
+`mise run m5c:closure-ledger:update`; audit edits touch only these 43
+records and their new assessments. Root owns merged totals, outer review,
+publication and landing.
 
 The fixed fixture module is
 *tests/native/fixtures/dynamic-source-static-core.ts*.
