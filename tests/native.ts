@@ -1505,6 +1505,8 @@ for (const fixture of selectedFixtures) {
     fixture.name === "class-private-fields" ||
     fixture.name === "class-private-methods" ||
     fixture.name === "class-private-accessors" ||
+    fixture.name === "class-private-getter-public-absence" ||
+    fixture.name === "class-private-setter-public-absence" ||
     fixture.name === "class-private-brand-checks" ||
     fixture.name === "class-cross-private-access" ||
     fixture.name === "class-optional-private-reads" ||
@@ -1719,6 +1721,8 @@ for (const fixture of selectedFixtures) {
             }
           }
           if (
+            fixture.name === "class-private-getter-public-absence" ||
+            fixture.name === "class-private-setter-public-absence" ||
             fixture.name === "array-buffer" ||
             fixture.name === "array-prototype-copying" ||
             fixture.name === "array-prototype-change-by-copy" ||

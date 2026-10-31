@@ -3,20 +3,28 @@ id: class-private-elements
 title: "Private instance elements"
 scope:
   - "Private fields, methods, accessors, brands, and optional reads."
+  - "Installing a private getter or setter creates no public own property
+    or public-name membership. Ordinary private reads and setter effects
+    remain observable without legacy accessor lookup. The replacement
+    fixtures do not count the two unsupported upstream paths as passes
+    or authorize whole-path exclusion."
 owners:
   - PLAN-M5.md
 evidence:
   differential:
     status: covered
     references:
+      - tests/class-private-accessor-coverage-native.test.ts
       - tests/native/fixtures/classes.ts
   fixed:
     status: covered
     references:
+      - tests/class-private-accessor-coverage-native.test.ts
       - tests/native/fixtures/classes.ts
   forced-collection:
     status: covered
     references:
+      - tests/class-private-accessor-coverage-native.test.ts
       - tests/property/m5-optional-private.property.test.ts
   generated:
     status: covered
@@ -29,6 +37,7 @@ evidence:
   specialization:
     status: covered
     references:
+      - tests/class-private-accessor-coverage-native.test.ts
       - tests/native.ts
       - tests/native/fixtures/classes.ts
   standards:

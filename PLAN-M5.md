@@ -7466,6 +7466,24 @@ results, reviewed exclusion-audit rows, and ledger owner
 batch; ADR 0013 accepts no new exclusion, and the private accessor subjects
 remain mixed coverage debt.
 
+The private accessor coverage follow-up adds fixed
+`class-private-getter-public-absence` and
+`class-private-setter-public-absence` native fixtures in
+*tests/native/fixtures/classes.ts*. They retain the two expression tests'
+core `hasOwnProperty("#m")`, public-name membership, private getter value,
+private setter effect, and zero-return checks while omitting only the
+optional legacy lookup call. Descriptor absence, repeated observation after
+access, and a separate public `"#m"` property supply controls.
+*tests/class-private-accessor-coverage-native.test.ts* compares explicit
+expected output with Node.js and Deno references, then executes each fixture
+in strict and non-strict Scripts under both specialization policies with
+collection at every safepoint. This is replacement evidence for core
+private elements, not upstream pass evidence. Both original expression paths
+remain unsupported with their remediation owner until a separate maintainer
+coverage-accounting decision. The
+[work note](./docs/m5c-graph/class-private-accessor-lookup-coverage-remediation.md)
+records the evidence and pending statement-family paths.
+
 
 Ahead-of-time challenge boundary
 --------------------------------
