@@ -602,12 +602,15 @@ assessments:
   ds3-literal-coverage:
     disposition: remediation
     normativeDependency: not-demonstrated
-    reason: The 23 literal probes retain the separately assessed strict octal
-      error, RegExp syntax errors, selected BMP character/source domains,
-      UnicodeIDContinue fallback, and lone surrogate group-name subjects in
-      docs/m5c-graph/dynamic-source-unknown-eval-assessment.md. No reviewed
-      complete replacement is established for these contracts; the unknown
-      eval binding diagnostic is not such evidence.
+    reason: >-
+      The five remaining DS-3 literal probes retain the strict octal error and
+      the four selected BMP character/source domains, including
+      UnicodeIDContinue fallback, listed in
+      docs/m5c-graph/dynamic-source-unknown-eval-assessment.md. No complete
+      replacement is established for those five contracts; an unknown eval
+      binding diagnostic is not such evidence. The other 18 original literal
+      grammar probes now use ds17-static-literal-grammar and its reviewed
+      static rejection witnesses.
   ds3-import-from-eval:
     disposition: remediation
     normativeDependency: not-demonstrated

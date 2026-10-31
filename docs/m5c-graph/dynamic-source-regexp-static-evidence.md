@@ -150,3 +150,16 @@ observes 85 guard hits and 90 misses. Evidence is in
 record. All 29 grammar/structural tests pass. The audit replacement digests
 are refreshed; no subset, classification, dependency tag or observation
 changes, so no UPDATE is needed.
+
+
+Internal review reconciliation
+------------------------------
+
+Pass 1 accepted the functional replacement evidence. Its two documentation
+findings, `ds3-reason-stale` and `ds3-assessment-stale-rows`, identified old
+DS-3 text that still described the 18 covered grammar paths as uncovered.
+The fix updates only those table rows and the shared literal assessment,
+and labels the original DS-3 publication counts as historical. No umbrella
+running total is added. The fix-round tag self-audit confirms unchanged
+subjects, prerequisites, dependency tags, subset and observations; no UPDATE
+is needed.
