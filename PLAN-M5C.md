@@ -36,7 +36,8 @@ inventory. Every included path ends in exactly one of these states:
  -  a reviewed unsupported profile feature covered by an accepted record that
     explicitly authorizes an M5 exclusion and bounds its surface;
  -  a reviewed unsupported profile feature named in the ADR 0031 deferral
-    list with its reason, remaining contract, and target milestone; or
+    list with its reason, remaining contract, and the milestone or deferred
+    track that inherits it; or
  -  unreviewed, which is allowed only while M5c remains active.
 
 M5 completes only when the last state is empty, all semantic, harness, and

@@ -237,7 +237,8 @@ ledger owner kind, the exclusion audit disposition, and their tests. Until
 that node lands, no path can be deferred, because the ledger checker rejects
 the owner.
 
-Each target milestone inherits its deferred paths as entry work. Its plan
+Each target milestone or deferred track inherits its deferred paths as entry
+work. Its plan
 names the list rather than rediscovering the residue.
 
 The cost is a second open category at M5 completion. M5 no longer means
@@ -259,8 +260,9 @@ Failure modes and replacement triggers
  -  If staged compilation or a successor to ADR 0016 makes the deferred
     dynamic source paths reachable before the exit audit, their entries are
     withdrawn and the paths return to remediation.
- -  A target milestone plan that drops an inherited path without evidence or
-    an accepted exclusion reverses the deferral and needs a successor record.
+ -  A target milestone or track plan that drops an inherited path without
+    evidence or an accepted exclusion reverses the deferral and needs a
+    successor record.
 
 
 Links

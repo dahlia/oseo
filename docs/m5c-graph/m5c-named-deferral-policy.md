@@ -18,9 +18,9 @@ item 4, and item 1 of *20261101-remaining-node-decisions.answer.md* in
 
 M5 may close with an explicit named deferral beside authorized exclusions.
 A deferral is a per-path entry giving the reason, the remaining contract,
-and the target milestone, in the manner of the bounded exclusions under ADR
-0019. It is never a silent exclusion or a scope cut. Public wording is
-“measured residue was deferred by name and M5 closed.”
+and the target milestone or deferred track, in the manner of the bounded
+exclusions under ADR 0019. It is never a silent exclusion or a scope cut.
+Public wording is “measured residue was deferred by name and M5 closed.”
 
 A path may be deferred only when work the maintainer did not approve for M5
 or declined is its one remaining closure route: general `eval` and
