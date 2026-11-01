@@ -705,3 +705,15 @@ variable-environment probes, and *subclass-Function.js*.
 [*docs/m5c-closure/deferrals.yaml*](../m5c-closure/deferrals.yaml) gives each
 path's remaining contract and reason. With this move the umbrella owns 136
 paths.
+
+
+Function constructor assessment child
+-------------------------------------
+
+`dynamic-source-function-constructor-assessment` gives exactly 49 umbrella
+paths one reviewed outcome each: 27 Function constructor rows of
+observation batches 01 and 18 and 22 dynamic coverage train rows. Its pinned
+selector and outcome rules are in that child's work note. Ownership moves
+only with its reviewed assessment; the umbrella retains every remaining path
+and requires child landing plus zero directly owned paths before its own
+landing.
