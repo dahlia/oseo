@@ -1,0 +1,639 @@
+version: 1
+suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+base: bc8e3a93ed3b6aa8daac70d08fd146f202755f99
+selectorSha256: "e405ad5a032f4727d404aa5ec09b54d5878148b088f0f303f4c5bbe2864335\
+  23"
+assessed: 49
+closed: 13
+deferred: 36
+qualification: Each pinned original was read separately. A closed row either has
+  a faithful witness for every non-source assertion or asserts only eval or
+  Function source handling inside an existing ADR 0016 audit surface, named with
+  a sibling precedent; the surface is not widened. A deferred row is observable
+  only through run-time source compilation, and its remaining contract, reason
+  and attempts are in docs/m5c-closure/deferrals.yaml. No subset row, dependency
+  tag, observation or pass count changes.
+evidence:
+  tests/native/fixtures/function-constructor-evidence.ts:
+    "1c1091c3741ae0a5e0a9e91186106423afd5f5c7\
+    99576dc0d7274f7b9f2f1ca8"
+  tests/function-constructor-evidence.test.ts:
+    "a906752672a9c759ccb84f3d62290b706744b01a\
+    707e9fe36c5d8cdf86dfcd00"
+  tests/test262/harness/base.js: "50331feeca513cb2e2354e05e7c68f82d5aeccd9\
+    b766d6c88438c5ef118075f6"
+replacements:
+  - original: test/language/expressions/call/tco-non-eval-function-dynamic.js
+    path: test/language/expressions/call/tco-non-eval-function.js
+    sourceDigest: "d87d82ebfe86486a7b96a1fec941feb15f6a106ee21014576d1c8e5829c6\
+      6e4c"
+    resultPartition: tests/test262/results/language/expressions/8f.yaml
+    resultDigest: "cc77e765a6b00488f0f6e9c70bba5fae7ba463542d3c9733415fd46d9c8f\
+      34e2"
+    classification: pass
+    observation: "passed: true; linux-x86_64-gnu; non-strict x disabled/enabled"
+    contract: The same strict tail call through a function-scope binding named
+      eval that holds f, with a static var eval = f in place of the direct eval
+      var declaration; callCount is 1 after $MAX_ITERATIONS calls.
+  - original: test/built-ins/Function/instance-name.js
+    path: test/language/statements/function/name.js
+    sourceDigest: "74095f2f4929c37912312b9691ec93d063be43d119beb826f21175c2c61d\
+      3bb2"
+    resultPartition: tests/test262/results/language/statements/db.yaml
+    resultDigest: "5f2f4336fdbc7a0150887086415f06b8e1a041356c2afc4994a1274864ab\
+      7cdd"
+    classification: pass
+    observation: "passed: true; linux-x86_64-gnu; non-strict/strict x
+      disabled/enabled"
+    contract: SetFunctionName defines name as non-writable, non-enumerable and
+      configurable; only the 'anonymous' value comes from CreateDynamicFunction.
+  - original: "test/language/statements/class/subclass/builtin-objects/Function\
+      /super-must-be-called.js"
+    path: "test/language/statements/class/subclass/builtin-objects/Array/super-\
+      must-be-called.js"
+    sourceDigest: "4a71106f1ed77180f549de1c3a15b4ae15d415c3cb049f367f108958d659\
+      eebc"
+    resultPartition: tests/test262/results/language/statements/fd.yaml
+    resultDigest: "b510986bb5afe987d2d0bb868636f389c594d79b512fe3bcbbcf70fa239b\
+      9324"
+    classification: pass
+    observation: "passed: true; linux-x86_64-gnu; non-strict/strict x
+      disabled/enabled"
+    contract: A derived constructor that never calls super() makes new throw a
+      ReferenceError. This covers one assertion of the Function and
+      GeneratorFunction rows, which stay deferred.
+paths:
+  - path: test/built-ins/Function/S15.3.2.1_A1_T1.js
+    sourceDigest: "3f785032fa741e02ceea3d3dedeed25b718592807ae12967c432ca3d0c74\
+      d161"
+    observationDigest: "e600b4ed46edd5c14f80ae862a6f73f995489647bc2d0c6398901cb\
+      a14838ac9"
+    assessment: ds-fc-argument-conversion
+    outcome: deferred
+    subject: new Function(body) calls ToString on a body object whose toString
+      throws 7, and the constructor propagates that 7 instead of returning a
+      function.
+    witness: "None: see the deferral entry's reason."
+  - path: test/built-ins/Function/S15.3.2.1_A1_T10.js
+    sourceDigest: "070c4b4a8d716be6c4876b00bb061a84b92dabfbc6ce7e6cd487d488a686\
+      231a"
+    observationDigest: "bf824758caedafd0e2f2ea36e5626f095f6a77b4f8d22b2907bc920\
+      df4e0f29d"
+    assessment: ds-fc-argument-conversion
+    outcome: deferred
+    subject: new Function(null) converts the body to "null"; the result's
+      constructor is Function and calling it returns undefined.
+    witness: "None: see the deferral entry's reason."
+  - path: test/built-ins/Function/S15.3.2.1_A1_T11.js
+    sourceDigest: "9ec34a42e5b28fec0b7c0914f6d066687503a6f3c54ac901c29468ac5f3a\
+      d6ee"
+    observationDigest: "820a07dcbbc2ffe8b8676838a064fb1f155cfd466af003dde0d926e\
+      278309c66"
+    assessment: ds-fc-argument-conversion
+    outcome: deferred
+    subject: new Function(undefined) converts the body to "undefined"; the
+      result's constructor is Function and calling it returns undefined.
+    witness: "None: see the deferral entry's reason."
+  - path: test/built-ins/Function/S15.3.2.1_A1_T12.js
+    sourceDigest: "294743747899a4a8600b08ab9b1e0e7004e17946bc514ba59f50113e2959\
+      db52"
+    observationDigest: "8b3eb7aee402e553b711d07851a53103c0154de15a6094797185c90\
+      7dce3b470"
+    assessment: ds-fc-argument-conversion
+    outcome: deferred
+    subject: new Function(void 0) converts the body to "undefined"; the result's
+      constructor is Function and calling it returns undefined.
+    witness: "None: see the deferral entry's reason."
+  - path: test/built-ins/Function/S15.3.2.1_A1_T13.js
+    sourceDigest: "dd994f362f70afa08fa593ed3d67ab4c2c960105fe904cce301d84a7712d\
+      9ab9"
+    observationDigest: "b3b15759141f6b14162b7b92bf6a146f87607c830bd4c30cd5eca1f\
+      2365d1772"
+    assessment: ds-fc-argument-conversion
+    outcome: deferred
+    subject: new Function({}) converts the body to "[object Object]", which does
+      not parse as a FunctionBody, so the constructor throws a SyntaxError.
+    witness: "None: see the deferral entry's reason."
+  - path: test/built-ins/Function/S15.3.2.1_A1_T2.js
+    sourceDigest: "131cdeb46d75d0caf988995845ed3a44ddcda5a58eca579f2544c13aceea\
+      5781"
+    observationDigest: "36e6c1928932971c11cc92b975f646ca3bc5fae199aa7b3357916ba\
+      481714764"
+    assessment: ds-fc-argument-conversion
+    outcome: deferred
+    subject: new Function(body) calls a body object's toString, which returns
+      "return 1;"; the result's constructor is Function and calling it returns
+      1.
+    witness: "None: see the deferral entry's reason."
+  - path: test/built-ins/Function/S15.3.2.1_A1_T3.js
+    sourceDigest: "279996e2be7441733d9a072f15e251871d602fd71f27408953097d38e036\
+      68da"
+    observationDigest: "2019ca4b90ad9a27318da0c92982f7a2bf5c4d2d245035a0c0e927a\
+      eda9c4f0e"
+    assessment: ds-fc-argument-conversion
+    outcome: deferred
+    subject: new Function(1) converts the body to "1"; the result's constructor
+      is Function and calling it returns undefined.
+    witness: "None: see the deferral entry's reason."
+  - path: test/built-ins/Function/S15.3.2.1_A1_T4.js
+    sourceDigest: "da969a9898f54b39e5851d615306056d502d9e40a31dd4f32b04d41d01a2\
+      001b"
+    observationDigest: "9e18aceb1ac79bdfd50f7af898b36d2ad0505586723bb79e0bee332\
+      4f677f973"
+    assessment: ds-fc-argument-conversion
+    outcome: deferred
+    subject: new Function(x), with x a hoisted var still undefined, converts the
+      body to "undefined"; the result's constructor is Function and calling it
+      returns undefined.
+    witness: "None: see the deferral entry's reason."
+  - path: test/built-ins/Function/S15.3.2.1_A1_T5.js
+    sourceDigest: "56f9534abddc5d42f3f020f9bb2179ae3d83847afc547ff97f7fb419c594\
+      1a21"
+    observationDigest: "2588e821a387daaca6554d2ef0c8e78e6bba18c347725b7ce85b0e2\
+      9e36dc995"
+    assessment: ds-fc-argument-conversion
+    outcome: deferred
+    subject: new Function(Object("return 'A'")) converts the String object body
+      to its string; the result's constructor is Function and calling it returns
+      "A".
+    witness: "None: see the deferral entry's reason."
+  - path: test/built-ins/Function/S15.3.2.1_A1_T7.js
+    sourceDigest: "e419c4e87a1c6bc73c4935b4c4db4a181b47850360410c7d7052ce9e2e19\
+      634c"
+    observationDigest: "66368ae4fa28f24db31681c814a5b000f35319e20413fe02d9666d9\
+      210a9e6a9"
+    assessment: ds-fc-argument-conversion
+    outcome: deferred
+    subject: new Function(new Object(1)) converts the Number object body to "1";
+      the result's constructor is Function and calling it returns undefined.
+    witness: "None: see the deferral entry's reason."
+  - path: test/built-ins/Function/S15.3.2.1_A2_T4.js
+    sourceDigest: "7d918aea3e1abe6035745e59a9f07211a11dfa97530084c24c68c7f019c0\
+      17fd"
+    observationDigest: "67d099914a12eb1901314e9e3d45b2090b1ad8d8a10a35bfdcc210b\
+      3f9010915"
+    assessment: ds-fc-argument-conversion
+    outcome: deferred
+    subject: Function(p, p, p, "return arg1+arg2+arg3;") calls p.toString once
+      per parameter in argument order, naming the parameters arg1, arg2 and
+      arg3; the result is a Function instance and f(4, "2", "QUESTION") returns
+      "42QUESTION".
+    witness: "None: see the deferral entry's reason."
+  - path: test/built-ins/Function/S15.3.2.1_A2_T5.js
+    sourceDigest: "bf4aa6e9a541feac830d71a000ceab374b838551e49c09bc92b7fed6a36b\
+      3ad6"
+    observationDigest: "285e2afbb205c6757e7b544210facf086d181a59f49a89001a9e6b0\
+      5a2ffb4c3"
+    assessment: ds-fc-argument-conversion
+    outcome: deferred
+    subject: Function(p + "," + p, p, "return arg1+arg2+arg3;") receives the
+      String "arg1,arg2" and the object p, whose toString the constructor calls
+      to name arg3; the result is a Function instance and f("", 1, 2) returns
+      "12".
+    witness: "None: see the deferral entry's reason."
+  - path: test/built-ins/Function/S15.3.2.1_A2_T6.js
+    sourceDigest: "c40f7e8b897d378bd60b35ded52bb10111830b19778b15ef80b3a3d54285\
+      6e11"
+    observationDigest: "f895a516ea1c6509cee8b31c262877b8c430230d4467cf1a68950c8\
+      1b7663c35"
+    assessment: ds-fc-source-subjects
+    outcome: closed
+    surface: dynamic-construction
+    precedent: test/built-ins/Function/S15.3.2.1_A2_T1.js
+    subject: Function receives only the String values "arg1,arg2,arg3" and
+      "return arg1+arg2+arg3;"; the result is a Function instance and f("", 1,
+      p) returns "1arg4".
+    witness: 'fc-string-parameters: the original with its Function call replaced
+      by a strict check that the parameter string is "arg1,arg2,arg3" and a
+      static function with those parameters and that body; every original
+      assertion is kept.'
+  - path: test/built-ins/Function/S15.3.2.1_A3_T1.js
+    sourceDigest: "ff82eeef8bf7ec8b3c0e6e690bb098e816e1feb0b5856949e85cefb5b8e8\
+      6829"
+    observationDigest: "5af247a31640d4f24cc650cf3bdbc46aa9264f890bb5d696665af80\
+      680a3795b"
+    assessment: ds-fc-argument-conversion
+    outcome: deferred
+    subject: new Function(p, body) converts the parameter before the body, so
+      the 1 thrown by p.toString propagates and body.toString, which would throw
+      "body", is not reached.
+    witness: "None: see the deferral entry's reason."
+  - path: test/built-ins/Function/S15.3.2.1_A3_T10.js
+    sourceDigest: "25c02fb8333813c800e7baa8a2652c69eef89c0c0cc5638a8e5826b45844\
+      d9f0"
+    observationDigest: "36ac61b39846badf5b7bba48b64d451d3470498f71af3e7eef8e26d\
+      5684cbe29"
+    assessment: ds-fc-argument-conversion
+    outcome: deferred
+    subject: new Function(p, "return this;"), with p.toString returning "z;x",
+      throws a SyntaxError because the converted parameter list does not parse.
+    witness: "None: see the deferral entry's reason."
+  - path: test/built-ins/Function/S15.3.2.1_A3_T11.js
+    sourceDigest: "c9d3cfd3f1c4278055846e56150b1109d6437f024c148561b7eb7a5fe968\
+      bc87"
+    observationDigest: "df0606ff04079888416044a581b810aed2f5de4201aaebf4ca26587\
+      86b6e2af7"
+    assessment: ds-fc-argument-conversion
+    outcome: deferred
+    subject: new Function("a,b,c", void 0) converts the body to "undefined"; the
+      result's constructor is Function and calling it returns undefined.
+    witness: "None: see the deferral entry's reason."
+  - path: test/built-ins/Function/S15.3.2.1_A3_T12.js
+    sourceDigest: "af253ffa7a2f79d0cba80412bab5200829c56ce793dae358fb35846710b6\
+      625e"
+    observationDigest: "023c0968ee0f6413166f9ed41f5a4f84cc1fe8b19f20ccd8a38b1e4\
+      fdb313581"
+    assessment: ds-fc-argument-conversion
+    outcome: deferred
+    subject: new Function("a,b,c", undefined) converts the body to "undefined";
+      the result's constructor is Function and calling it returns undefined.
+    witness: "None: see the deferral entry's reason."
+  - path: test/built-ins/Function/S15.3.2.1_A3_T13.js
+    sourceDigest: "89ff4316fdd115925bae4c827258dd55bd93bc4e0889640071ff6f839236\
+      adcb"
+    observationDigest: "085a6fb2b20c97af331778d2fe3fa1af18a77416fa3438be0ebfdae\
+      3cd2f2d32"
+    assessment: ds-fc-argument-conversion
+    outcome: deferred
+    subject: new Function("a,b,c", null) converts the body to "null"; the
+      result's constructor is Function and calling it returns undefined.
+    witness: "None: see the deferral entry's reason."
+  - path: test/built-ins/Function/S15.3.2.1_A3_T14.js
+    sourceDigest: "be70fc577253e8d8c78dd528960624d1c8992623b5d3980432e50c3409ce\
+      df32"
+    observationDigest: "f75b69cefb85cf04e0a7d707560bd771a45782da04db5854d99c295\
+      e54774705"
+    assessment: ds-fc-argument-conversion
+    outcome: deferred
+    subject: new Function("a,b,c", body), with body a hoisted var still
+      undefined, converts the body to "undefined"; the result's constructor is
+      Function and calling it returns undefined.
+    witness: "None: see the deferral entry's reason."
+  - path: test/built-ins/Function/S15.3.2.1_A3_T2.js
+    sourceDigest: "782a17f0e0434e095231b08931ef702b96b0fc0bfaf19ba429a2234003a2\
+      f74c"
+    observationDigest: "43007dbb320d58d01e53df5c8731d52ad851493231d66832d3affb7\
+      51761edda"
+    assessment: ds-fc-argument-conversion
+    outcome: deferred
+    subject: new Function(p, "return a;") calls p.toString, which returns "a";
+      the result's constructor is Function and f(42) returns 42.
+    witness: "None: see the deferral entry's reason."
+  - path: test/built-ins/Function/S15.3.2.1_A3_T3.js
+    sourceDigest: "beda9e8b7b13030f38ad141d9ad8ec1efade4e01ef1b92a95acf88d3d3b1\
+      d26e"
+    observationDigest: "fe914f20487e4f4f5c5f84e6fde21b9e5bf63d43803c70c491d2f24\
+      6299cf77e"
+    assessment: ds-fc-argument-conversion
+    outcome: deferred
+    subject: new Function(p, body) calls p.toString, which sets p to 1, before
+      body.toString throws "body"; the constructor propagates "body" and p is 1
+      afterward.
+    witness: "None: see the deferral entry's reason."
+  - path: test/built-ins/Function/S15.3.2.1_A3_T4.js
+    sourceDigest: "ae62ee8bb3ce631665beae828527b091530682fca11622e8b1d19830b924\
+      e1a3"
+    observationDigest: "71e95f8b6c073ce7c6112328b79cd27ad8198e563ae0ed206ab2cff\
+      3f7152ee0"
+    assessment: ds-fc-argument-conversion
+    outcome: deferred
+    subject: new Function(p, "return 1.1;"), with p a hoisted var still
+      undefined, converts the parameter to "undefined"; the result's constructor
+      is Function and f() returns 1.1.
+    witness: "None: see the deferral entry's reason."
+  - path: test/built-ins/Function/S15.3.2.1_A3_T5.js
+    sourceDigest: "2bd4f222fe88cf0a4f6cde87c7bc3ff450c4239ab1a647282195003fb182\
+      cefd"
+    observationDigest: "1c3fb268e1a41a684b27a7566f9d95367b88e37fae1dda1ae9125e5\
+      a3fb39b40"
+    assessment: ds-fc-argument-conversion
+    outcome: deferred
+    subject: new Function(void 0, 'return "A";') converts the parameter to
+      "undefined"; the result's constructor is Function and f() returns "A".
+    witness: "None: see the deferral entry's reason."
+  - path: test/built-ins/Function/S15.3.2.1_A3_T6.js
+    sourceDigest: "1255aeba510eadebe5bd2090b54f99f8fe06b039b74abff0319673b8ce63\
+      fbcd"
+    observationDigest: "566176a820c2a1d7c6178bf850d7ba6c52f7a662014d829709737da\
+      75383e554"
+    assessment: ds-fc-argument-conversion
+    outcome: deferred
+    subject: new Function(null, "return true;") converts the parameter to
+      "null", which is not a valid parameter name, so the constructor throws a
+      SyntaxError.
+    witness: "None: see the deferral entry's reason."
+  - path: test/built-ins/Function/S15.3.2.1_A3_T7.js
+    sourceDigest: "13bef7cac00010da6c634185303a440975c6a9bf325fb1d8cd4b90f86cb6\
+      bf95"
+    observationDigest: "b44d4a9267e3c87c8ae78b702b80fdf6433b0db85d7287f5eed55a3\
+      67bf21d72"
+    assessment: ds-fc-argument-conversion
+    outcome: deferred
+    subject: new Function(Object("a"), "return a;") converts the String object
+      parameter to "a"; the result's constructor is Function and f(1) returns 1.
+    witness: "None: see the deferral entry's reason."
+  - path: test/built-ins/Function/S15.3.2.1_A3_T8.js
+    sourceDigest: "eb011c62eccf88e50c31d5b4e781f2a42adc159a8f15114049d5f709eaf9\
+      9463"
+    observationDigest: "f33ff604457845c74d7a7b43de7e0141dc0c619b667391acb6e2baa\
+      77c81b615"
+    assessment: ds-fc-argument-conversion
+    outcome: deferred
+    subject: new Function(undefined, "return this;") converts the parameter to
+      "undefined"; the result's constructor is Function and f() returns the
+      global this value.
+    witness: "None: see the deferral entry's reason."
+  - path: test/built-ins/Function/instance-name.js
+    sourceDigest: "c1dab727bcc6c8c62e176cc7ab9afcadb0a23b2109dcbeecb5906a59e9f9\
+      df07"
+    observationDigest: "9c673d2b6e939931a97cfaa24bee5dcff2681e6212e9f17cec2e1e5\
+      6678795b5"
+    assessment: ds-fc-source-subjects
+    outcome: closed
+    surface: dynamic-construction
+    precedent: test/built-ins/GeneratorFunction/instance-name.js
+    subject: Function() has name 'anonymous', non-enumerable, non-writable and
+      configurable.
+    witness: test/language/statements/function/name.js observes the same
+      SetFunctionName descriptor flags; the 'anonymous' value is the
+      CreateDynamicFunction result.
+  - path: test/language/comments/hashbang/no-line-separator.js
+    sourceDigest: "3fe34c780c8b8a7587c59e77961a320be0f1293a119278370cbfe119b9dc\
+      438b"
+    observationDigest: "14fbf96b58e57f9b759c2b914a1a4a7b22bcdec0ccaea595b8d4430\
+      45a318571"
+    assessment: ds-fc-strict-hashbang
+    outcome: deferred
+    subject: Direct eval of '#!', a hashbang with no line terminator after it,
+      returns undefined in the strict variant, whose eval code inherits the
+      caller's strictness.
+    witness: "None: see the deferral entry's reason."
+  - path: test/language/eval-code/direct/super-call-arrow.js
+    sourceDigest: "f8aab2032512c1e22f6ed141a07754a7b0f3d5cd568ca2275f701a79ce18\
+      16b4"
+    observationDigest: "38c21f20d3bee2afa1890510c28ed5ac6ba061d79ddb73feb95ca80\
+      9ca2e2981"
+    assessment: ds-fc-source-subjects
+    outcome: closed
+    surface: eval-semantics
+    precedent: "test/language/expressions/class/elements/arrow-body-direct-eval\
+      -err-contains-supercall.js"
+    subject: Direct eval of 'super();' in a top-level arrow throws a SyntaxError
+      from PerformEval's caller-dependent early error.
+    witness: "None needed: the early error belongs to PerformEval."
+  - path: test/language/eval-code/direct/super-call-fn.js
+    sourceDigest: "514d375663b874b5a685899a039409ac755663af22ce6f9964c5f13ffb2a\
+      7cad"
+    observationDigest: "3810615af203526e58f38e031e212210681c4b79165de691262a274\
+      196ffb3d3"
+    assessment: ds-fc-source-subjects
+    outcome: closed
+    surface: eval-semantics
+    precedent: "test/language/expressions/class/elements/arrow-body-direct-eval\
+      -err-contains-supercall.js"
+    subject: Direct eval in an ordinary function rejects SuperCall as an early
+      error, so the preceding assignment in the same eval source never runs.
+    witness: "None needed: the early error and its parse-before-run order belong
+      to PerformEval."
+  - path: test/language/eval-code/direct/super-call-method.js
+    sourceDigest: "0c44c2c17aeeb1c41639c5841b252752451d77eec35c444e3142efaf79b1\
+      4218"
+    observationDigest: "be6da12d5122423a2a34e10f272a299b8465302a6c9dbfef828c4ce\
+      6d048296b"
+    assessment: ds-fc-source-subjects
+    outcome: closed
+    surface: eval-semantics
+    precedent: "test/language/expressions/class/elements/arrow-body-direct-eval\
+      -err-contains-supercall.js"
+    subject: Direct eval in a non-constructor method rejects SuperCall as an
+      early error, so its argument assignment never runs.
+    witness: "None needed: the early error and its parse-before-run order belong
+      to PerformEval."
+  - path: test/language/eval-code/direct/super-prop-arrow.js
+    sourceDigest: "29c39bac7a39dbaa195b122b94915499c9507423ac17dd3f1d25976b8d97\
+      ae10"
+    observationDigest: "eb3514f6c0cf3924e70a05934144d31315f0c86206fc9120dded221\
+      17a6953e1"
+    assessment: ds-fc-source-subjects
+    outcome: closed
+    surface: eval-semantics
+    precedent: "test/language/expressions/class/elements/arrow-body-derived-cls\
+      -direct-eval-contains-superproperty-1.js"
+    subject: Direct eval of 'super.property;' in a top-level arrow throws a
+      SyntaxError from PerformEval's caller-dependent early error.
+    witness: "None needed: the early error belongs to PerformEval."
+  - path: test/language/eval-code/direct/super-prop-dot-no-home.js
+    sourceDigest: "7e33cd7fd21c1417421835cd07b4c833b20f7422243ee0e3c9048b82eab1\
+      71f7"
+    observationDigest: "953325bade5119db82ba7a1251a79e882c26c2ba4c7d4048c3b1c99\
+      6926197e8"
+    assessment: ds-fc-source-subjects
+    outcome: closed
+    surface: eval-semantics
+    precedent: "test/language/expressions/class/elements/arrow-body-derived-cls\
+      -direct-eval-contains-superproperty-1.js"
+    subject: Direct eval of 'super.x;' in a function without a home object
+      throws a SyntaxError from PerformEval's caller-dependent early error.
+    witness: "None needed: the early error belongs to PerformEval."
+  - path: test/language/eval-code/direct/super-prop-expr-no-home-no-eval.js
+    sourceDigest: "50fc0222144738bb36ab8c107441efb77560bbabdd4eb290654e23eadcdb\
+      a247"
+    observationDigest: "101915aa18ac9662ad3a34f80882a3e46141c12ec8a83c38d7b6970\
+      4807b8cc4"
+    assessment: ds-fc-source-subjects
+    outcome: closed
+    surface: eval-semantics
+    precedent: "test/language/expressions/class/elements/arrow-body-derived-cls\
+      -direct-eval-contains-superproperty-2.js"
+    subject: Direct eval of 'super[evaluated = true];' in a function without a
+      home object is rejected before the computed key runs, so evaluated stays
+      false.
+    witness: "None needed: the early error and its parse-before-run order belong
+      to PerformEval."
+  - path: test/language/eval-code/direct/super-prop-expr-no-home.js
+    sourceDigest: "6d150e6296657a86d53d5cff1b8da78429c856885f03c4d29121fb10317e\
+      733b"
+    observationDigest: "d9404112b83510677e59fa5d4814ba466b14bcd31ac0b469d660b3b\
+      cea878ada"
+    assessment: ds-fc-source-subjects
+    outcome: closed
+    surface: eval-semantics
+    precedent: "test/language/expressions/class/elements/arrow-body-derived-cls\
+      -direct-eval-contains-superproperty-2.js"
+    subject: Direct eval of 'super["x"];' in a function without a home object
+      throws a SyntaxError from PerformEval's caller-dependent early error.
+    witness: "None needed: the early error belongs to PerformEval."
+  - path: test/language/eval-code/direct/super-prop-method.js
+    sourceDigest: "681dc9a1a2d545b77eea0d557c7c646535633a62b1da19794eeccbd3b9df\
+      a8cf"
+    observationDigest: "e76273dcc47f9d189f78454323fb7e97c2033128ba322002b3c00f9\
+      beb5bc3d8"
+    assessment: ds-fc-source-subjects
+    outcome: closed
+    surface: eval-semantics
+    precedent: test/language/expressions/super/prop-dot-obj-val-from-eval.js
+    subject: Direct eval in a method reads super.test262 as undefined, then 262
+      after the home object's prototype changes.
+    witness: "fc-super-property-method: the original with eval('super.test262;')
+      replaced by super.test262 in the same method; both reads and the
+      intervening setPrototypeOf are kept."
+  - path: test/language/expressions/call/tco-non-eval-function-dynamic.js
+    sourceDigest: "8d381595908fa414b6aaa027f3386bf922220738e1902b16037f08f836b1\
+      c803"
+    observationDigest: "353dc37e69478f4d06eefa7bae43a558f9e2f3ee0a61014c5c27a1a\
+      654c755d3"
+    assessment: ds-fc-source-subjects
+    outcome: closed
+    surface: eval-semantics
+    precedent: test/language/expressions/call/tco-non-eval-function.js
+    subject: A strict tail call through a function-scope binding named eval that
+      holds f, not %eval%, runs $MAX_ITERATIONS deep and callCount is 1; direct
+      eval creates the binding.
+    witness: test/language/expressions/call/tco-non-eval-function.js passes with
+      the same body and a static var eval = f in the same function var
+      environment; only the eval var instantiation remains.
+  - path: test/language/statements/class/subclass-builtins/subclass-Function.js
+    sourceDigest: "e1388907a63526c117b728443656348ee9326ddb3fccea5451bc083191ce\
+      3ddf"
+    observationDigest: "bdf29ea2103435c6059294976874a562416a5bdb14728a528e1983d\
+      e527f7e84"
+    assessment: ds-fc-function-subclass
+    outcome: deferred
+    subject: new Subclass() of class extends Function returns an instance of
+      both Subclass and Function.
+    witness: "None: see the deferral entry's reason."
+  - path: "test/language/statements/class/subclass/builtin-objects/Function/ins\
+      tance-length.js"
+    sourceDigest: "86a518c72cbbec7393ef4ce5e66c2b37076aa41d2a0061ab33701c7ec032\
+      f484"
+    observationDigest: "1fead4a39e58204918a8fb129c077878f420860f708daf80973bf61\
+      55c7875ef"
+    assessment: ds-fc-function-subclass
+    outcome: deferred
+    subject: new Fn('a', 'b', 'return a + b') of class Fn extends Function
+      returns a function whose length is 2, non-writable, non-enumerable and
+      configurable.
+    witness: "None: see the deferral entry's reason."
+  - path: "test/language/statements/class/subclass/builtin-objects/Function/ins\
+      tance-name.js"
+    sourceDigest: "95b5db396dd732ef83676a57ac33953bd15ddb6f504f80c460ffb3eea765\
+      c9a9"
+    observationDigest: "963be16e1a519adcb89eae8a81d42ce8d0cca0773e034dc7fac739c\
+      10857a331"
+    assessment: ds-fc-function-subclass
+    outcome: deferred
+    subject: new Fn('a', 'b', 'return a + b') of class Fn extends Function
+      returns a function whose name is 'anonymous', non-writable, non-enumerable
+      and configurable.
+    witness: "None: see the deferral entry's reason."
+  - path: "test/language/statements/class/subclass/builtin-objects/Function/reg\
+      ular-subclassing.js"
+    sourceDigest: "0a2ba98fc9d78c1e8a7ddbe1725828403275ef5844ecc7801d7513fc9a2e\
+      966f"
+    observationDigest: "628235e3152722d373cfce9a2052f6a6c4de7f18e3c23e0cf13baea\
+      9e80503bd"
+    assessment: ds-fc-function-subclass
+    outcome: deferred
+    subject: new Fn('a', 'return a * 2') of class Fn extends Function returns a
+      function for which fn(42) is 84.
+    witness: "None: see the deferral entry's reason."
+  - path: "test/language/statements/class/subclass/builtin-objects/Function/sup\
+      er-must-be-called.js"
+    sourceDigest: "ae099a1bc300ad9c6c70ebd15aa633d2b16ae6dc176cbf4ce17e75cc99bf\
+      be53"
+    observationDigest: "a6ccac319aa01f1d27fa786ca9b53586e3f499107acc1cdc4e1008b\
+      4dd51227a"
+    assessment: ds-fc-function-subclass
+    outcome: deferred
+    subject: new Fn2() of class Fn2 extends Function, whose constructor calls
+      super(), returns an instance of Function.
+    witness: "None: see the deferral entry's reason."
+  - path: "test/language/statements/class/subclass/builtin-objects/GeneratorFun\
+      ction/instance-length.js"
+    sourceDigest: "ea432b0c4d335318c5b97422a819f9e79f9ed72debf43238b6df40f393db\
+      395c"
+    observationDigest: "f66a27c54caa2be659c202f8f2489f0c69c16c3e9fcea04a4a937b2\
+      cad40117f"
+    assessment: ds-fc-function-subclass
+    outcome: deferred
+    subject: new GFn('a', 'b', 'return a + b') of class GFn extends
+      GeneratorFunction returns a generator function whose length is 2,
+      non-writable, non-enumerable and configurable.
+    witness: "None: see the deferral entry's reason."
+  - path: "test/language/statements/class/subclass/builtin-objects/GeneratorFun\
+      ction/instance-name.js"
+    sourceDigest: "9b3c1ac19e3296873f91917a8a1d4a4cb670aff374ed340214768ccb06e0\
+      bbf7"
+    observationDigest: "f9aac1f02736a7b84be7258c37fc3f5c88d2572a0d4b3ca621158a5\
+      10504e3a5"
+    assessment: ds-fc-function-subclass
+    outcome: deferred
+    subject: new GFn('a', 'b', 'return a + b') of class GFn extends
+      GeneratorFunction returns a generator function whose name is 'anonymous',
+      non-writable, non-enumerable and configurable.
+    witness: "None: see the deferral entry's reason."
+  - path: "test/language/statements/class/subclass/builtin-objects/GeneratorFun\
+      ction/instance-prototype.js"
+    sourceDigest: "a14c27fdc0e712b4f7cd28b6e59d142c96195c524d278fb788b70cc6f421\
+      cf46"
+    observationDigest: "326fad4b1d5674803d07b21918d9fe3a41b103eb6cd71e22b351aa5\
+      239757282"
+    assessment: ds-fc-function-subclass
+    outcome: deferred
+    subject: new GFn(';') of class GFn extends GeneratorFunction returns a
+      generator function whose prototype is a new object with no own keys and no
+      own constructor, held in a writable, non-enumerable, non-configurable
+      property.
+    witness: "None: see the deferral entry's reason."
+  - path: "test/language/statements/class/subclass/builtin-objects/GeneratorFun\
+      ction/regular-subclassing.js"
+    sourceDigest: "20396554e49ca18f053ab2e1a4ecedf45f329bd0d073c19143e68197a22f\
+      9b74"
+    observationDigest: "b3709dfb558c51358112389d1971a6ad726e4d01a1fe4e3c81465bc\
+      55a1b5567"
+    assessment: ds-fc-function-subclass
+    outcome: deferred
+    subject: new Gfn('a', 'yield a; yield a * 2;') of class Gfn extends
+      GeneratorFunction returns a generator function whose gfn(42) iterator
+      yields 42 and then 84.
+    witness: "None: see the deferral entry's reason."
+  - path: "test/language/statements/class/subclass/builtin-objects/GeneratorFun\
+      ction/super-must-be-called.js"
+    sourceDigest: "757446c1931cb4a2c6d76a57a79b9e4646e42815ba08de05a0e3b3104b92\
+      dba0"
+    observationDigest: "e7f5862e882c0ba837c7786da061fd5ed67bbb7a3b743e6196b9bde\
+      933813361"
+    assessment: ds-fc-function-subclass
+    outcome: deferred
+    subject: new GFn2() of class GFn2 extends GeneratorFunction, whose
+      constructor calls super(), returns an instance of GeneratorFunction.
+    witness: "None: see the deferral entry's reason."
+  - path: test/language/statements/with/12.10.1-5-s.js
+    sourceDigest: "8f1deffa657d1f507ae25f2e9fb7e361339abdfef901763c34e4a196d8ce\
+      2f26"
+    observationDigest: "e8e1b2edd6d30278e723b3bc8770ad4c46c7402bdac6a5727843c02\
+      623ae7b23"
+    assessment: ds-fc-source-subjects
+    outcome: closed
+    surface: dynamic-construction
+    precedent: test/built-ins/Function/S15.3_A2_T1.js
+    subject: Function accepts a strict body that contains an uncalled nested
+      Function call; neither created function is invoked.
+    witness: "None needed: the only observation is that Function construction
+      completes."
+  - path: test/language/statements/with/scope-var-open.js
+    sourceDigest: "59ed9f1509259ae4296f32a82dfaef31d1d05b9db449bec9253b19ca16f8\
+      0e2c"
+    observationDigest: "ce57deb7638b5540cdd4bfa9f3c7e589294d07ef5767770f2ca7bb0\
+      60cc8e7c6"
+    assessment: ds-fc-source-subjects
+    outcome: closed
+    surface: eval-semantics
+    precedent: test/language/eval-code/direct/super-call.js
+    subject: "The with object environment is opened for the statement body only:
+      the global x set to 1 during the expression is read by closures made
+      before and in the expression, and the body's x is the object's 3."
+    witness: "fc-with-scope-var-open: the original with its global-code direct
+      eval replaced by the literal host Script $262.evalScript('var x = 1;'),
+      which declares nothing new and sets the existing global x; every original
+      assertion is kept."

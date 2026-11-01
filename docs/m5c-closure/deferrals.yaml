@@ -23,6 +23,752 @@ families:
       import track, which the maintainer moved past M5; its reviewed
       design is the post-M5 plan that PLAN-DYN.md links.
 paths:
+  test/built-ins/Function/S15.3.2.1_A1_T1.js:
+    family: run-time-source
+    section: sec-createdynamicfunction
+    remainingContract: new Function(body) calls ToString on a body object whose
+      toString throws 7, and the constructor propagates that 7 instead of
+      returning a function.
+    reason: The constructor's ToString of its non-String arguments, including
+      any user toString call, their order and their abrupt completions, happens
+      only inside CreateDynamicFunction, which the runtime rejects before
+      converting any argument. The 2026-11-01 umbrella-residual answer names
+      Function argument conversion as a contract to evidence or defer, so the
+      dynamic-construction exclusion, which covers construction from parameter
+      and body strings and the resulting instance, does not cover it; ordinary
+      ToString or a static function observes neither the call site nor its
+      order.
+    attempts:
+      nodes:
+        - dynamic-source-construction-contracts
+        - dynamic-source-function-constructor-assessment
+      decisions:
+        - "2026-11-01 umbrella-residual answer, item 3: Function argument
+          conversion tries evidence first and is otherwise deferred"
+        - "2026-11-01 umbrella-residual answer: bounded general eval and
+          Function construction are not approved for M5"
+    targetMilestone: PLAN-DYN.md
+    sourceDigest: "3f785032fa741e02ceea3d3dedeed25b718592807ae12967c432ca3d0c74\
+      d161"
+    observationDigest: "e600b4ed46edd5c14f80ae862a6f73f995489647bc2d0c6398901cb\
+      a14838ac9"
+  test/built-ins/Function/S15.3.2.1_A1_T10.js:
+    family: run-time-source
+    section: sec-createdynamicfunction
+    remainingContract: new Function(null) converts the body to "null"; the
+      result's constructor is Function and calling it returns undefined.
+    reason: The constructor's ToString of its non-String arguments, including
+      any user toString call, their order and their abrupt completions, happens
+      only inside CreateDynamicFunction, which the runtime rejects before
+      converting any argument. The 2026-11-01 umbrella-residual answer names
+      Function argument conversion as a contract to evidence or defer, so the
+      dynamic-construction exclusion, which covers construction from parameter
+      and body strings and the resulting instance, does not cover it; ordinary
+      ToString or a static function observes neither the call site nor its
+      order.
+    attempts:
+      nodes:
+        - dynamic-source-construction-contracts
+        - dynamic-source-function-constructor-assessment
+      decisions:
+        - "2026-11-01 umbrella-residual answer, item 3: Function argument
+          conversion tries evidence first and is otherwise deferred"
+        - "2026-11-01 umbrella-residual answer: bounded general eval and
+          Function construction are not approved for M5"
+    targetMilestone: PLAN-DYN.md
+    sourceDigest: "070c4b4a8d716be6c4876b00bb061a84b92dabfbc6ce7e6cd487d488a686\
+      231a"
+    observationDigest: "bf824758caedafd0e2f2ea36e5626f095f6a77b4f8d22b2907bc920\
+      df4e0f29d"
+  test/built-ins/Function/S15.3.2.1_A1_T11.js:
+    family: run-time-source
+    section: sec-createdynamicfunction
+    remainingContract: new Function(undefined) converts the body to "undefined";
+      the result's constructor is Function and calling it returns undefined.
+    reason: The constructor's ToString of its non-String arguments, including
+      any user toString call, their order and their abrupt completions, happens
+      only inside CreateDynamicFunction, which the runtime rejects before
+      converting any argument. The 2026-11-01 umbrella-residual answer names
+      Function argument conversion as a contract to evidence or defer, so the
+      dynamic-construction exclusion, which covers construction from parameter
+      and body strings and the resulting instance, does not cover it; ordinary
+      ToString or a static function observes neither the call site nor its
+      order.
+    attempts:
+      nodes:
+        - dynamic-source-construction-contracts
+        - dynamic-source-function-constructor-assessment
+      decisions:
+        - "2026-11-01 umbrella-residual answer, item 3: Function argument
+          conversion tries evidence first and is otherwise deferred"
+        - "2026-11-01 umbrella-residual answer: bounded general eval and
+          Function construction are not approved for M5"
+    targetMilestone: PLAN-DYN.md
+    sourceDigest: "9ec34a42e5b28fec0b7c0914f6d066687503a6f3c54ac901c29468ac5f3a\
+      d6ee"
+    observationDigest: "820a07dcbbc2ffe8b8676838a064fb1f155cfd466af003dde0d926e\
+      278309c66"
+  test/built-ins/Function/S15.3.2.1_A1_T12.js:
+    family: run-time-source
+    section: sec-createdynamicfunction
+    remainingContract: new Function(void 0) converts the body to "undefined";
+      the result's constructor is Function and calling it returns undefined.
+    reason: The constructor's ToString of its non-String arguments, including
+      any user toString call, their order and their abrupt completions, happens
+      only inside CreateDynamicFunction, which the runtime rejects before
+      converting any argument. The 2026-11-01 umbrella-residual answer names
+      Function argument conversion as a contract to evidence or defer, so the
+      dynamic-construction exclusion, which covers construction from parameter
+      and body strings and the resulting instance, does not cover it; ordinary
+      ToString or a static function observes neither the call site nor its
+      order.
+    attempts:
+      nodes:
+        - dynamic-source-construction-contracts
+        - dynamic-source-function-constructor-assessment
+      decisions:
+        - "2026-11-01 umbrella-residual answer, item 3: Function argument
+          conversion tries evidence first and is otherwise deferred"
+        - "2026-11-01 umbrella-residual answer: bounded general eval and
+          Function construction are not approved for M5"
+    targetMilestone: PLAN-DYN.md
+    sourceDigest: "294743747899a4a8600b08ab9b1e0e7004e17946bc514ba59f50113e2959\
+      db52"
+    observationDigest: "8b3eb7aee402e553b711d07851a53103c0154de15a6094797185c90\
+      7dce3b470"
+  test/built-ins/Function/S15.3.2.1_A1_T13.js:
+    family: run-time-source
+    section: sec-createdynamicfunction
+    remainingContract: new Function({}) converts the body to "[object Object]",
+      which does not parse as a FunctionBody, so the constructor throws a
+      SyntaxError.
+    reason: The constructor's ToString of its non-String arguments, including
+      any user toString call, their order and their abrupt completions, happens
+      only inside CreateDynamicFunction, which the runtime rejects before
+      converting any argument. The 2026-11-01 umbrella-residual answer names
+      Function argument conversion as a contract to evidence or defer, so the
+      dynamic-construction exclusion, which covers construction from parameter
+      and body strings and the resulting instance, does not cover it; ordinary
+      ToString or a static function observes neither the call site nor its
+      order.
+    attempts:
+      nodes:
+        - dynamic-source-construction-contracts
+        - dynamic-source-function-constructor-assessment
+      decisions:
+        - "2026-11-01 umbrella-residual answer, item 3: Function argument
+          conversion tries evidence first and is otherwise deferred"
+        - "2026-11-01 umbrella-residual answer: bounded general eval and
+          Function construction are not approved for M5"
+    targetMilestone: PLAN-DYN.md
+    sourceDigest: "dd994f362f70afa08fa593ed3d67ab4c2c960105fe904cce301d84a7712d\
+      9ab9"
+    observationDigest: "b3b15759141f6b14162b7b92bf6a146f87607c830bd4c30cd5eca1f\
+      2365d1772"
+  test/built-ins/Function/S15.3.2.1_A1_T2.js:
+    family: run-time-source
+    section: sec-createdynamicfunction
+    remainingContract: new Function(body) calls a body object's toString, which
+      returns "return 1;"; the result's constructor is Function and calling it
+      returns 1.
+    reason: The constructor's ToString of its non-String arguments, including
+      any user toString call, their order and their abrupt completions, happens
+      only inside CreateDynamicFunction, which the runtime rejects before
+      converting any argument. The 2026-11-01 umbrella-residual answer names
+      Function argument conversion as a contract to evidence or defer, so the
+      dynamic-construction exclusion, which covers construction from parameter
+      and body strings and the resulting instance, does not cover it; ordinary
+      ToString or a static function observes neither the call site nor its
+      order.
+    attempts:
+      nodes:
+        - dynamic-source-construction-contracts
+        - dynamic-source-function-constructor-assessment
+      decisions:
+        - "2026-11-01 umbrella-residual answer, item 3: Function argument
+          conversion tries evidence first and is otherwise deferred"
+        - "2026-11-01 umbrella-residual answer: bounded general eval and
+          Function construction are not approved for M5"
+    targetMilestone: PLAN-DYN.md
+    sourceDigest: "131cdeb46d75d0caf988995845ed3a44ddcda5a58eca579f2544c13aceea\
+      5781"
+    observationDigest: "36e6c1928932971c11cc92b975f646ca3bc5fae199aa7b3357916ba\
+      481714764"
+  test/built-ins/Function/S15.3.2.1_A1_T3.js:
+    family: run-time-source
+    section: sec-createdynamicfunction
+    remainingContract: new Function(1) converts the body to "1"; the result's
+      constructor is Function and calling it returns undefined.
+    reason: The constructor's ToString of its non-String arguments, including
+      any user toString call, their order and their abrupt completions, happens
+      only inside CreateDynamicFunction, which the runtime rejects before
+      converting any argument. The 2026-11-01 umbrella-residual answer names
+      Function argument conversion as a contract to evidence or defer, so the
+      dynamic-construction exclusion, which covers construction from parameter
+      and body strings and the resulting instance, does not cover it; ordinary
+      ToString or a static function observes neither the call site nor its
+      order.
+    attempts:
+      nodes:
+        - dynamic-source-construction-contracts
+        - dynamic-source-function-constructor-assessment
+      decisions:
+        - "2026-11-01 umbrella-residual answer, item 3: Function argument
+          conversion tries evidence first and is otherwise deferred"
+        - "2026-11-01 umbrella-residual answer: bounded general eval and
+          Function construction are not approved for M5"
+    targetMilestone: PLAN-DYN.md
+    sourceDigest: "279996e2be7441733d9a072f15e251871d602fd71f27408953097d38e036\
+      68da"
+    observationDigest: "2019ca4b90ad9a27318da0c92982f7a2bf5c4d2d245035a0c0e927a\
+      eda9c4f0e"
+  test/built-ins/Function/S15.3.2.1_A1_T4.js:
+    family: run-time-source
+    section: sec-createdynamicfunction
+    remainingContract: new Function(x), with x a hoisted var still undefined,
+      converts the body to "undefined"; the result's constructor is Function and
+      calling it returns undefined.
+    reason: The constructor's ToString of its non-String arguments, including
+      any user toString call, their order and their abrupt completions, happens
+      only inside CreateDynamicFunction, which the runtime rejects before
+      converting any argument. The 2026-11-01 umbrella-residual answer names
+      Function argument conversion as a contract to evidence or defer, so the
+      dynamic-construction exclusion, which covers construction from parameter
+      and body strings and the resulting instance, does not cover it; ordinary
+      ToString or a static function observes neither the call site nor its
+      order.
+    attempts:
+      nodes:
+        - dynamic-source-construction-contracts
+        - dynamic-source-function-constructor-assessment
+      decisions:
+        - "2026-11-01 umbrella-residual answer, item 3: Function argument
+          conversion tries evidence first and is otherwise deferred"
+        - "2026-11-01 umbrella-residual answer: bounded general eval and
+          Function construction are not approved for M5"
+    targetMilestone: PLAN-DYN.md
+    sourceDigest: "da969a9898f54b39e5851d615306056d502d9e40a31dd4f32b04d41d01a2\
+      001b"
+    observationDigest: "9e18aceb1ac79bdfd50f7af898b36d2ad0505586723bb79e0bee332\
+      4f677f973"
+  test/built-ins/Function/S15.3.2.1_A1_T5.js:
+    family: run-time-source
+    section: sec-createdynamicfunction
+    remainingContract: new Function(Object("return 'A'")) converts the String
+      object body to its string; the result's constructor is Function and
+      calling it returns "A".
+    reason: The constructor's ToString of its non-String arguments, including
+      any user toString call, their order and their abrupt completions, happens
+      only inside CreateDynamicFunction, which the runtime rejects before
+      converting any argument. The 2026-11-01 umbrella-residual answer names
+      Function argument conversion as a contract to evidence or defer, so the
+      dynamic-construction exclusion, which covers construction from parameter
+      and body strings and the resulting instance, does not cover it; ordinary
+      ToString or a static function observes neither the call site nor its
+      order.
+    attempts:
+      nodes:
+        - dynamic-source-construction-contracts
+        - dynamic-source-function-constructor-assessment
+      decisions:
+        - "2026-11-01 umbrella-residual answer, item 3: Function argument
+          conversion tries evidence first and is otherwise deferred"
+        - "2026-11-01 umbrella-residual answer: bounded general eval and
+          Function construction are not approved for M5"
+    targetMilestone: PLAN-DYN.md
+    sourceDigest: "56f9534abddc5d42f3f020f9bb2179ae3d83847afc547ff97f7fb419c594\
+      1a21"
+    observationDigest: "2588e821a387daaca6554d2ef0c8e78e6bba18c347725b7ce85b0e2\
+      9e36dc995"
+  test/built-ins/Function/S15.3.2.1_A1_T7.js:
+    family: run-time-source
+    section: sec-createdynamicfunction
+    remainingContract: new Function(new Object(1)) converts the Number object
+      body to "1"; the result's constructor is Function and calling it returns
+      undefined.
+    reason: The constructor's ToString of its non-String arguments, including
+      any user toString call, their order and their abrupt completions, happens
+      only inside CreateDynamicFunction, which the runtime rejects before
+      converting any argument. The 2026-11-01 umbrella-residual answer names
+      Function argument conversion as a contract to evidence or defer, so the
+      dynamic-construction exclusion, which covers construction from parameter
+      and body strings and the resulting instance, does not cover it; ordinary
+      ToString or a static function observes neither the call site nor its
+      order.
+    attempts:
+      nodes:
+        - dynamic-source-construction-contracts
+        - dynamic-source-function-constructor-assessment
+      decisions:
+        - "2026-11-01 umbrella-residual answer, item 3: Function argument
+          conversion tries evidence first and is otherwise deferred"
+        - "2026-11-01 umbrella-residual answer: bounded general eval and
+          Function construction are not approved for M5"
+    targetMilestone: PLAN-DYN.md
+    sourceDigest: "e419c4e87a1c6bc73c4935b4c4db4a181b47850360410c7d7052ce9e2e19\
+      634c"
+    observationDigest: "66368ae4fa28f24db31681c814a5b000f35319e20413fe02d9666d9\
+      210a9e6a9"
+  test/built-ins/Function/S15.3.2.1_A2_T4.js:
+    family: run-time-source
+    section: sec-createdynamicfunction
+    remainingContract: Function(p, p, p, "return arg1+arg2+arg3;") calls
+      p.toString once per parameter in argument order, naming the parameters
+      arg1, arg2 and arg3; the result is a Function instance and f(4, "2",
+      "QUESTION") returns "42QUESTION".
+    reason: The constructor's ToString of its non-String arguments, including
+      any user toString call, their order and their abrupt completions, happens
+      only inside CreateDynamicFunction, which the runtime rejects before
+      converting any argument. The 2026-11-01 umbrella-residual answer names
+      Function argument conversion as a contract to evidence or defer, so the
+      dynamic-construction exclusion, which covers construction from parameter
+      and body strings and the resulting instance, does not cover it; ordinary
+      ToString or a static function observes neither the call site nor its
+      order.
+    attempts:
+      nodes:
+        - dynamic-source-construction-contracts
+        - dynamic-source-function-constructor-assessment
+      decisions:
+        - "2026-11-01 umbrella-residual answer, item 3: Function argument
+          conversion tries evidence first and is otherwise deferred"
+        - "2026-11-01 umbrella-residual answer: bounded general eval and
+          Function construction are not approved for M5"
+    targetMilestone: PLAN-DYN.md
+    sourceDigest: "7d918aea3e1abe6035745e59a9f07211a11dfa97530084c24c68c7f019c0\
+      17fd"
+    observationDigest: "67d099914a12eb1901314e9e3d45b2090b1ad8d8a10a35bfdcc210b\
+      3f9010915"
+  test/built-ins/Function/S15.3.2.1_A2_T5.js:
+    family: run-time-source
+    section: sec-createdynamicfunction
+    remainingContract: Function(p + "," + p, p, "return arg1+arg2+arg3;")
+      receives the String "arg1,arg2" and the object p, whose toString the
+      constructor calls to name arg3; the result is a Function instance and
+      f("", 1, 2) returns "12".
+    reason: The constructor's ToString of its non-String arguments, including
+      any user toString call, their order and their abrupt completions, happens
+      only inside CreateDynamicFunction, which the runtime rejects before
+      converting any argument. The 2026-11-01 umbrella-residual answer names
+      Function argument conversion as a contract to evidence or defer, so the
+      dynamic-construction exclusion, which covers construction from parameter
+      and body strings and the resulting instance, does not cover it; ordinary
+      ToString or a static function observes neither the call site nor its
+      order.
+    attempts:
+      nodes:
+        - dynamic-source-construction-contracts
+        - dynamic-source-function-constructor-assessment
+      decisions:
+        - "2026-11-01 umbrella-residual answer, item 3: Function argument
+          conversion tries evidence first and is otherwise deferred"
+        - "2026-11-01 umbrella-residual answer: bounded general eval and
+          Function construction are not approved for M5"
+    targetMilestone: PLAN-DYN.md
+    sourceDigest: "bf4aa6e9a541feac830d71a000ceab374b838551e49c09bc92b7fed6a36b\
+      3ad6"
+    observationDigest: "285e2afbb205c6757e7b544210facf086d181a59f49a89001a9e6b0\
+      5a2ffb4c3"
+  test/built-ins/Function/S15.3.2.1_A3_T1.js:
+    family: run-time-source
+    section: sec-createdynamicfunction
+    remainingContract: new Function(p, body) converts the parameter before the
+      body, so the 1 thrown by p.toString propagates and body.toString, which
+      would throw "body", is not reached.
+    reason: The constructor's ToString of its non-String arguments, including
+      any user toString call, their order and their abrupt completions, happens
+      only inside CreateDynamicFunction, which the runtime rejects before
+      converting any argument. The 2026-11-01 umbrella-residual answer names
+      Function argument conversion as a contract to evidence or defer, so the
+      dynamic-construction exclusion, which covers construction from parameter
+      and body strings and the resulting instance, does not cover it; ordinary
+      ToString or a static function observes neither the call site nor its
+      order.
+    attempts:
+      nodes:
+        - dynamic-source-construction-contracts
+        - dynamic-source-function-constructor-assessment
+      decisions:
+        - "2026-11-01 umbrella-residual answer, item 3: Function argument
+          conversion tries evidence first and is otherwise deferred"
+        - "2026-11-01 umbrella-residual answer: bounded general eval and
+          Function construction are not approved for M5"
+    targetMilestone: PLAN-DYN.md
+    sourceDigest: "ff82eeef8bf7ec8b3c0e6e690bb098e816e1feb0b5856949e85cefb5b8e8\
+      6829"
+    observationDigest: "5af247a31640d4f24cc650cf3bdbc46aa9264f890bb5d696665af80\
+      680a3795b"
+  test/built-ins/Function/S15.3.2.1_A3_T10.js:
+    family: run-time-source
+    section: sec-createdynamicfunction
+    remainingContract: new Function(p, "return this;"), with p.toString
+      returning "z;x", throws a SyntaxError because the converted parameter list
+      does not parse.
+    reason: The constructor's ToString of its non-String arguments, including
+      any user toString call, their order and their abrupt completions, happens
+      only inside CreateDynamicFunction, which the runtime rejects before
+      converting any argument. The 2026-11-01 umbrella-residual answer names
+      Function argument conversion as a contract to evidence or defer, so the
+      dynamic-construction exclusion, which covers construction from parameter
+      and body strings and the resulting instance, does not cover it; ordinary
+      ToString or a static function observes neither the call site nor its
+      order.
+    attempts:
+      nodes:
+        - dynamic-source-construction-contracts
+        - dynamic-source-function-constructor-assessment
+      decisions:
+        - "2026-11-01 umbrella-residual answer, item 3: Function argument
+          conversion tries evidence first and is otherwise deferred"
+        - "2026-11-01 umbrella-residual answer: bounded general eval and
+          Function construction are not approved for M5"
+    targetMilestone: PLAN-DYN.md
+    sourceDigest: "25c02fb8333813c800e7baa8a2652c69eef89c0c0cc5638a8e5826b45844\
+      d9f0"
+    observationDigest: "36ac61b39846badf5b7bba48b64d451d3470498f71af3e7eef8e26d\
+      5684cbe29"
+  test/built-ins/Function/S15.3.2.1_A3_T11.js:
+    family: run-time-source
+    section: sec-createdynamicfunction
+    remainingContract: new Function("a,b,c", void 0) converts the body to
+      "undefined"; the result's constructor is Function and calling it returns
+      undefined.
+    reason: The constructor's ToString of its non-String arguments, including
+      any user toString call, their order and their abrupt completions, happens
+      only inside CreateDynamicFunction, which the runtime rejects before
+      converting any argument. The 2026-11-01 umbrella-residual answer names
+      Function argument conversion as a contract to evidence or defer, so the
+      dynamic-construction exclusion, which covers construction from parameter
+      and body strings and the resulting instance, does not cover it; ordinary
+      ToString or a static function observes neither the call site nor its
+      order.
+    attempts:
+      nodes:
+        - dynamic-source-construction-contracts
+        - dynamic-source-function-constructor-assessment
+      decisions:
+        - "2026-11-01 umbrella-residual answer, item 3: Function argument
+          conversion tries evidence first and is otherwise deferred"
+        - "2026-11-01 umbrella-residual answer: bounded general eval and
+          Function construction are not approved for M5"
+    targetMilestone: PLAN-DYN.md
+    sourceDigest: "c9d3cfd3f1c4278055846e56150b1109d6437f024c148561b7eb7a5fe968\
+      bc87"
+    observationDigest: "df0606ff04079888416044a581b810aed2f5de4201aaebf4ca26587\
+      86b6e2af7"
+  test/built-ins/Function/S15.3.2.1_A3_T12.js:
+    family: run-time-source
+    section: sec-createdynamicfunction
+    remainingContract: new Function("a,b,c", undefined) converts the body to
+      "undefined"; the result's constructor is Function and calling it returns
+      undefined.
+    reason: The constructor's ToString of its non-String arguments, including
+      any user toString call, their order and their abrupt completions, happens
+      only inside CreateDynamicFunction, which the runtime rejects before
+      converting any argument. The 2026-11-01 umbrella-residual answer names
+      Function argument conversion as a contract to evidence or defer, so the
+      dynamic-construction exclusion, which covers construction from parameter
+      and body strings and the resulting instance, does not cover it; ordinary
+      ToString or a static function observes neither the call site nor its
+      order.
+    attempts:
+      nodes:
+        - dynamic-source-construction-contracts
+        - dynamic-source-function-constructor-assessment
+      decisions:
+        - "2026-11-01 umbrella-residual answer, item 3: Function argument
+          conversion tries evidence first and is otherwise deferred"
+        - "2026-11-01 umbrella-residual answer: bounded general eval and
+          Function construction are not approved for M5"
+    targetMilestone: PLAN-DYN.md
+    sourceDigest: "af253ffa7a2f79d0cba80412bab5200829c56ce793dae358fb35846710b6\
+      625e"
+    observationDigest: "023c0968ee0f6413166f9ed41f5a4f84cc1fe8b19f20ccd8a38b1e4\
+      fdb313581"
+  test/built-ins/Function/S15.3.2.1_A3_T13.js:
+    family: run-time-source
+    section: sec-createdynamicfunction
+    remainingContract: new Function("a,b,c", null) converts the body to "null";
+      the result's constructor is Function and calling it returns undefined.
+    reason: The constructor's ToString of its non-String arguments, including
+      any user toString call, their order and their abrupt completions, happens
+      only inside CreateDynamicFunction, which the runtime rejects before
+      converting any argument. The 2026-11-01 umbrella-residual answer names
+      Function argument conversion as a contract to evidence or defer, so the
+      dynamic-construction exclusion, which covers construction from parameter
+      and body strings and the resulting instance, does not cover it; ordinary
+      ToString or a static function observes neither the call site nor its
+      order.
+    attempts:
+      nodes:
+        - dynamic-source-construction-contracts
+        - dynamic-source-function-constructor-assessment
+      decisions:
+        - "2026-11-01 umbrella-residual answer, item 3: Function argument
+          conversion tries evidence first and is otherwise deferred"
+        - "2026-11-01 umbrella-residual answer: bounded general eval and
+          Function construction are not approved for M5"
+    targetMilestone: PLAN-DYN.md
+    sourceDigest: "89ff4316fdd115925bae4c827258dd55bd93bc4e0889640071ff6f839236\
+      adcb"
+    observationDigest: "085a6fb2b20c97af331778d2fe3fa1af18a77416fa3438be0ebfdae\
+      3cd2f2d32"
+  test/built-ins/Function/S15.3.2.1_A3_T14.js:
+    family: run-time-source
+    section: sec-createdynamicfunction
+    remainingContract: new Function("a,b,c", body), with body a hoisted var
+      still undefined, converts the body to "undefined"; the result's
+      constructor is Function and calling it returns undefined.
+    reason: The constructor's ToString of its non-String arguments, including
+      any user toString call, their order and their abrupt completions, happens
+      only inside CreateDynamicFunction, which the runtime rejects before
+      converting any argument. The 2026-11-01 umbrella-residual answer names
+      Function argument conversion as a contract to evidence or defer, so the
+      dynamic-construction exclusion, which covers construction from parameter
+      and body strings and the resulting instance, does not cover it; ordinary
+      ToString or a static function observes neither the call site nor its
+      order.
+    attempts:
+      nodes:
+        - dynamic-source-construction-contracts
+        - dynamic-source-function-constructor-assessment
+      decisions:
+        - "2026-11-01 umbrella-residual answer, item 3: Function argument
+          conversion tries evidence first and is otherwise deferred"
+        - "2026-11-01 umbrella-residual answer: bounded general eval and
+          Function construction are not approved for M5"
+    targetMilestone: PLAN-DYN.md
+    sourceDigest: "be70fc577253e8d8c78dd528960624d1c8992623b5d3980432e50c3409ce\
+      df32"
+    observationDigest: "f75b69cefb85cf04e0a7d707560bd771a45782da04db5854d99c295\
+      e54774705"
+  test/built-ins/Function/S15.3.2.1_A3_T2.js:
+    family: run-time-source
+    section: sec-createdynamicfunction
+    remainingContract: new Function(p, "return a;") calls p.toString, which
+      returns "a"; the result's constructor is Function and f(42) returns 42.
+    reason: The constructor's ToString of its non-String arguments, including
+      any user toString call, their order and their abrupt completions, happens
+      only inside CreateDynamicFunction, which the runtime rejects before
+      converting any argument. The 2026-11-01 umbrella-residual answer names
+      Function argument conversion as a contract to evidence or defer, so the
+      dynamic-construction exclusion, which covers construction from parameter
+      and body strings and the resulting instance, does not cover it; ordinary
+      ToString or a static function observes neither the call site nor its
+      order.
+    attempts:
+      nodes:
+        - dynamic-source-construction-contracts
+        - dynamic-source-function-constructor-assessment
+      decisions:
+        - "2026-11-01 umbrella-residual answer, item 3: Function argument
+          conversion tries evidence first and is otherwise deferred"
+        - "2026-11-01 umbrella-residual answer: bounded general eval and
+          Function construction are not approved for M5"
+    targetMilestone: PLAN-DYN.md
+    sourceDigest: "782a17f0e0434e095231b08931ef702b96b0fc0bfaf19ba429a2234003a2\
+      f74c"
+    observationDigest: "43007dbb320d58d01e53df5c8731d52ad851493231d66832d3affb7\
+      51761edda"
+  test/built-ins/Function/S15.3.2.1_A3_T3.js:
+    family: run-time-source
+    section: sec-createdynamicfunction
+    remainingContract: new Function(p, body) calls p.toString, which sets p to
+      1, before body.toString throws "body"; the constructor propagates "body"
+      and p is 1 afterward.
+    reason: The constructor's ToString of its non-String arguments, including
+      any user toString call, their order and their abrupt completions, happens
+      only inside CreateDynamicFunction, which the runtime rejects before
+      converting any argument. The 2026-11-01 umbrella-residual answer names
+      Function argument conversion as a contract to evidence or defer, so the
+      dynamic-construction exclusion, which covers construction from parameter
+      and body strings and the resulting instance, does not cover it; ordinary
+      ToString or a static function observes neither the call site nor its
+      order.
+    attempts:
+      nodes:
+        - dynamic-source-construction-contracts
+        - dynamic-source-function-constructor-assessment
+      decisions:
+        - "2026-11-01 umbrella-residual answer, item 3: Function argument
+          conversion tries evidence first and is otherwise deferred"
+        - "2026-11-01 umbrella-residual answer: bounded general eval and
+          Function construction are not approved for M5"
+    targetMilestone: PLAN-DYN.md
+    sourceDigest: "beda9e8b7b13030f38ad141d9ad8ec1efade4e01ef1b92a95acf88d3d3b1\
+      d26e"
+    observationDigest: "fe914f20487e4f4f5c5f84e6fde21b9e5bf63d43803c70c491d2f24\
+      6299cf77e"
+  test/built-ins/Function/S15.3.2.1_A3_T4.js:
+    family: run-time-source
+    section: sec-createdynamicfunction
+    remainingContract: new Function(p, "return 1.1;"), with p a hoisted var
+      still undefined, converts the parameter to "undefined"; the result's
+      constructor is Function and f() returns 1.1.
+    reason: The constructor's ToString of its non-String arguments, including
+      any user toString call, their order and their abrupt completions, happens
+      only inside CreateDynamicFunction, which the runtime rejects before
+      converting any argument. The 2026-11-01 umbrella-residual answer names
+      Function argument conversion as a contract to evidence or defer, so the
+      dynamic-construction exclusion, which covers construction from parameter
+      and body strings and the resulting instance, does not cover it; ordinary
+      ToString or a static function observes neither the call site nor its
+      order.
+    attempts:
+      nodes:
+        - dynamic-source-construction-contracts
+        - dynamic-source-function-constructor-assessment
+      decisions:
+        - "2026-11-01 umbrella-residual answer, item 3: Function argument
+          conversion tries evidence first and is otherwise deferred"
+        - "2026-11-01 umbrella-residual answer: bounded general eval and
+          Function construction are not approved for M5"
+    targetMilestone: PLAN-DYN.md
+    sourceDigest: "ae62ee8bb3ce631665beae828527b091530682fca11622e8b1d19830b924\
+      e1a3"
+    observationDigest: "71e95f8b6c073ce7c6112328b79cd27ad8198e563ae0ed206ab2cff\
+      3f7152ee0"
+  test/built-ins/Function/S15.3.2.1_A3_T5.js:
+    family: run-time-source
+    section: sec-createdynamicfunction
+    remainingContract: new Function(void 0, 'return "A";') converts the
+      parameter to "undefined"; the result's constructor is Function and f()
+      returns "A".
+    reason: The constructor's ToString of its non-String arguments, including
+      any user toString call, their order and their abrupt completions, happens
+      only inside CreateDynamicFunction, which the runtime rejects before
+      converting any argument. The 2026-11-01 umbrella-residual answer names
+      Function argument conversion as a contract to evidence or defer, so the
+      dynamic-construction exclusion, which covers construction from parameter
+      and body strings and the resulting instance, does not cover it; ordinary
+      ToString or a static function observes neither the call site nor its
+      order.
+    attempts:
+      nodes:
+        - dynamic-source-construction-contracts
+        - dynamic-source-function-constructor-assessment
+      decisions:
+        - "2026-11-01 umbrella-residual answer, item 3: Function argument
+          conversion tries evidence first and is otherwise deferred"
+        - "2026-11-01 umbrella-residual answer: bounded general eval and
+          Function construction are not approved for M5"
+    targetMilestone: PLAN-DYN.md
+    sourceDigest: "2bd4f222fe88cf0a4f6cde87c7bc3ff450c4239ab1a647282195003fb182\
+      cefd"
+    observationDigest: "1c3fb268e1a41a684b27a7566f9d95367b88e37fae1dda1ae9125e5\
+      a3fb39b40"
+  test/built-ins/Function/S15.3.2.1_A3_T6.js:
+    family: run-time-source
+    section: sec-createdynamicfunction
+    remainingContract: new Function(null, "return true;") converts the parameter
+      to "null", which is not a valid parameter name, so the constructor throws
+      a SyntaxError.
+    reason: The constructor's ToString of its non-String arguments, including
+      any user toString call, their order and their abrupt completions, happens
+      only inside CreateDynamicFunction, which the runtime rejects before
+      converting any argument. The 2026-11-01 umbrella-residual answer names
+      Function argument conversion as a contract to evidence or defer, so the
+      dynamic-construction exclusion, which covers construction from parameter
+      and body strings and the resulting instance, does not cover it; ordinary
+      ToString or a static function observes neither the call site nor its
+      order.
+    attempts:
+      nodes:
+        - dynamic-source-construction-contracts
+        - dynamic-source-function-constructor-assessment
+      decisions:
+        - "2026-11-01 umbrella-residual answer, item 3: Function argument
+          conversion tries evidence first and is otherwise deferred"
+        - "2026-11-01 umbrella-residual answer: bounded general eval and
+          Function construction are not approved for M5"
+    targetMilestone: PLAN-DYN.md
+    sourceDigest: "1255aeba510eadebe5bd2090b54f99f8fe06b039b74abff0319673b8ce63\
+      fbcd"
+    observationDigest: "566176a820c2a1d7c6178bf850d7ba6c52f7a662014d829709737da\
+      75383e554"
+  test/built-ins/Function/S15.3.2.1_A3_T7.js:
+    family: run-time-source
+    section: sec-createdynamicfunction
+    remainingContract: new Function(Object("a"), "return a;") converts the
+      String object parameter to "a"; the result's constructor is Function and
+      f(1) returns 1.
+    reason: The constructor's ToString of its non-String arguments, including
+      any user toString call, their order and their abrupt completions, happens
+      only inside CreateDynamicFunction, which the runtime rejects before
+      converting any argument. The 2026-11-01 umbrella-residual answer names
+      Function argument conversion as a contract to evidence or defer, so the
+      dynamic-construction exclusion, which covers construction from parameter
+      and body strings and the resulting instance, does not cover it; ordinary
+      ToString or a static function observes neither the call site nor its
+      order.
+    attempts:
+      nodes:
+        - dynamic-source-construction-contracts
+        - dynamic-source-function-constructor-assessment
+      decisions:
+        - "2026-11-01 umbrella-residual answer, item 3: Function argument
+          conversion tries evidence first and is otherwise deferred"
+        - "2026-11-01 umbrella-residual answer: bounded general eval and
+          Function construction are not approved for M5"
+    targetMilestone: PLAN-DYN.md
+    sourceDigest: "13bef7cac00010da6c634185303a440975c6a9bf325fb1d8cd4b90f86cb6\
+      bf95"
+    observationDigest: "b44d4a9267e3c87c8ae78b702b80fdf6433b0db85d7287f5eed55a3\
+      67bf21d72"
+  test/built-ins/Function/S15.3.2.1_A3_T8.js:
+    family: run-time-source
+    section: sec-createdynamicfunction
+    remainingContract: new Function(undefined, "return this;") converts the
+      parameter to "undefined"; the result's constructor is Function and f()
+      returns the global this value.
+    reason: The constructor's ToString of its non-String arguments, including
+      any user toString call, their order and their abrupt completions, happens
+      only inside CreateDynamicFunction, which the runtime rejects before
+      converting any argument. The 2026-11-01 umbrella-residual answer names
+      Function argument conversion as a contract to evidence or defer, so the
+      dynamic-construction exclusion, which covers construction from parameter
+      and body strings and the resulting instance, does not cover it; ordinary
+      ToString or a static function observes neither the call site nor its
+      order.
+    attempts:
+      nodes:
+        - dynamic-source-construction-contracts
+        - dynamic-source-function-constructor-assessment
+      decisions:
+        - "2026-11-01 umbrella-residual answer, item 3: Function argument
+          conversion tries evidence first and is otherwise deferred"
+        - "2026-11-01 umbrella-residual answer: bounded general eval and
+          Function construction are not approved for M5"
+    targetMilestone: PLAN-DYN.md
+    sourceDigest: "eb011c62eccf88e50c31d5b4e781f2a42adc159a8f15114049d5f709eaf9\
+      9463"
+    observationDigest: "f33ff604457845c74d7a7b43de7e0141dc0c619b667391acb6e2baa\
+      77c81b615"
+  test/language/comments/hashbang/no-line-separator.js:
+    family: run-time-source
+    section: sec-hashbang
+    remainingContract: Direct eval of '#!', a hashbang with no line terminator
+      after it, returns undefined in the strict variant, whose eval code
+      inherits the caller's strictness.
+    reason: A literal host Script reproduces the non-strict variant
+      (residual-completion-2), but a strict Script needs a directive before the
+      code and nothing may precede '#!', so neither static nor host Script code
+      observes the strict evaluation. Only direct eval in strict code does.
+    attempts:
+      nodes:
+        - dynamic-source-host-script-evidence
+        - dynamic-source-residual-evidence
+        - dynamic-source-function-constructor-assessment
+      decisions:
+        - "2026-11-01 umbrella-residual answer, item 1: the literal host Script
+          track was assessed; its strict variant cannot match strictness"
+        - "2026-11-01 umbrella-residual answer: bounded general eval and
+          Function construction are not approved for M5"
+    targetMilestone: PLAN-DYN.md
+    sourceDigest: "3fe34c780c8b8a7587c59e77961a320be0f1293a119278370cbfe119b9dc\
+      438b"
+    observationDigest: "14fbf96b58e57f9b759c2b914a1a4a7b22bcdec0ccaea595b8d4430\
+      45a318571"
   test/language/expressions/class/subclass-builtins/subclass-Function.js:
     family: run-time-source
     section: sec-function-constructor
@@ -461,6 +1207,239 @@ paths:
       69df"
     observationDigest: "35201d6ddcff4f84bbfeae05516fcdd6bdf539ab7a6286bb7eb3b0f\
       17fb7472b"
+  test/language/statements/class/subclass-builtins/subclass-Function.js:
+    family: run-time-source
+    section: sec-function-p1-p2-pn-body
+    remainingContract: new Subclass() of class extends Function returns an
+      instance of both Subclass and Function.
+    reason: Construction reaches the source-compiling Function constructor
+      through super(), which the runtime rejects under ADR 0016. Static subclass
+      heritage does not replace that invocation, and no static allocation yields
+      the created function, so the subclass construction contract stays
+      unobserved.
+    attempts:
+      nodes:
+        - dynamic-source-callable-family
+        - dynamic-source-function-constructor-assessment
+      decisions:
+        - "2026-11-01 umbrella-residual answer: bounded general eval and
+          Function construction are not approved for M5"
+    targetMilestone: PLAN-DYN.md
+    sourceDigest: "e1388907a63526c117b728443656348ee9326ddb3fccea5451bc083191ce\
+      3ddf"
+    observationDigest: "bdf29ea2103435c6059294976874a562416a5bdb14728a528e1983d\
+      e527f7e84"
+  test/language/statements/class/subclass/builtin-objects/Function/instance-length.js:
+    family: run-time-source
+    section: sec-function-p1-p2-pn-body
+    remainingContract: new Fn('a', 'b', 'return a + b') of class Fn extends
+      Function returns a function whose length is 2, non-writable,
+      non-enumerable and configurable.
+    reason: Construction reaches the source-compiling Function constructor
+      through super(), which the runtime rejects under ADR 0016. Static subclass
+      heritage does not replace that invocation, and no static allocation yields
+      the created function, so the subclass construction contract stays
+      unobserved.
+    attempts:
+      nodes:
+        - dynamic-source-callable-object-evidence
+        - dynamic-source-function-constructor-assessment
+      decisions:
+        - "2026-11-01 umbrella-residual answer: bounded general eval and
+          Function construction are not approved for M5"
+    targetMilestone: PLAN-DYN.md
+    sourceDigest: "86a518c72cbbec7393ef4ce5e66c2b37076aa41d2a0061ab33701c7ec032\
+      f484"
+    observationDigest: "1fead4a39e58204918a8fb129c077878f420860f708daf80973bf61\
+      55c7875ef"
+  test/language/statements/class/subclass/builtin-objects/Function/instance-name.js:
+    family: run-time-source
+    section: sec-function-p1-p2-pn-body
+    remainingContract: new Fn('a', 'b', 'return a + b') of class Fn extends
+      Function returns a function whose name is 'anonymous', non-writable,
+      non-enumerable and configurable.
+    reason: Construction reaches the source-compiling Function constructor
+      through super(), which the runtime rejects under ADR 0016. Static subclass
+      heritage does not replace that invocation, and no static allocation yields
+      the created function, so the subclass construction contract stays
+      unobserved.
+    attempts:
+      nodes:
+        - dynamic-source-callable-object-evidence
+        - dynamic-source-function-constructor-assessment
+      decisions:
+        - "2026-11-01 umbrella-residual answer: bounded general eval and
+          Function construction are not approved for M5"
+    targetMilestone: PLAN-DYN.md
+    sourceDigest: "95b5db396dd732ef83676a57ac33953bd15ddb6f504f80c460ffb3eea765\
+      c9a9"
+    observationDigest: "963be16e1a519adcb89eae8a81d42ce8d0cca0773e034dc7fac739c\
+      10857a331"
+  test/language/statements/class/subclass/builtin-objects/Function/regular-subclassing.js:
+    family: run-time-source
+    section: sec-function-p1-p2-pn-body
+    remainingContract: new Fn('a', 'return a * 2') of class Fn extends Function
+      returns a function for which fn(42) is 84.
+    reason: Construction reaches the source-compiling Function constructor
+      through super(), which the runtime rejects under ADR 0016. Static subclass
+      heritage does not replace that invocation, and no static allocation yields
+      the created function, so the subclass construction contract stays
+      unobserved.
+    attempts:
+      nodes:
+        - dynamic-source-callable-object-evidence
+        - dynamic-source-function-constructor-assessment
+      decisions:
+        - "2026-11-01 umbrella-residual answer: bounded general eval and
+          Function construction are not approved for M5"
+    targetMilestone: PLAN-DYN.md
+    sourceDigest: "0a2ba98fc9d78c1e8a7ddbe1725828403275ef5844ecc7801d7513fc9a2e\
+      966f"
+    observationDigest: "628235e3152722d373cfce9a2052f6a6c4de7f18e3c23e0cf13baea\
+      9e80503bd"
+  test/language/statements/class/subclass/builtin-objects/Function/super-must-be-called.js:
+    family: run-time-source
+    section: sec-function-p1-p2-pn-body
+    remainingContract: new Fn2() of class Fn2 extends Function, whose
+      constructor calls super(), returns an instance of Function.
+    reason: Construction reaches the source-compiling Function constructor
+      through super(), which the runtime rejects under ADR 0016. Static subclass
+      heritage does not replace that invocation, and no static allocation yields
+      the created function, so the subclass construction contract stays
+      unobserved. The other assertion, that a derived constructor which never
+      calls super() makes new throw a ReferenceError, is ordinary and is
+      observed by the passing Array/super-must-be-called.js in the same
+      builtin-objects directory.
+    attempts:
+      nodes:
+        - dynamic-source-callable-object-evidence
+        - dynamic-source-function-constructor-assessment
+      decisions:
+        - "2026-11-01 umbrella-residual answer: bounded general eval and
+          Function construction are not approved for M5"
+    targetMilestone: PLAN-DYN.md
+    sourceDigest: "ae099a1bc300ad9c6c70ebd15aa633d2b16ae6dc176cbf4ce17e75cc99bf\
+      be53"
+    observationDigest: "a6ccac319aa01f1d27fa786ca9b53586e3f499107acc1cdc4e1008b\
+      4dd51227a"
+  test/language/statements/class/subclass/builtin-objects/GeneratorFunction/instance-length.js:
+    family: run-time-source
+    section: sec-generatorfunction
+    remainingContract: new GFn('a', 'b', 'return a + b') of class GFn extends
+      GeneratorFunction returns a generator function whose length is 2,
+      non-writable, non-enumerable and configurable.
+    reason: Construction reaches the source-compiling GeneratorFunction
+      constructor through super(), which the runtime rejects under ADR 0016.
+      Static subclass heritage does not replace that invocation, and no static
+      allocation yields the created function, so the subclass construction
+      contract stays unobserved.
+    attempts:
+      nodes:
+        - dynamic-source-callable-object-evidence
+        - dynamic-source-function-constructor-assessment
+      decisions:
+        - "2026-11-01 umbrella-residual answer: bounded general eval and
+          Function construction are not approved for M5"
+    targetMilestone: PLAN-DYN.md
+    sourceDigest: "ea432b0c4d335318c5b97422a819f9e79f9ed72debf43238b6df40f393db\
+      395c"
+    observationDigest: "f66a27c54caa2be659c202f8f2489f0c69c16c3e9fcea04a4a937b2\
+      cad40117f"
+  test/language/statements/class/subclass/builtin-objects/GeneratorFunction/instance-name.js:
+    family: run-time-source
+    section: sec-generatorfunction
+    remainingContract: new GFn('a', 'b', 'return a + b') of class GFn extends
+      GeneratorFunction returns a generator function whose name is 'anonymous',
+      non-writable, non-enumerable and configurable.
+    reason: Construction reaches the source-compiling GeneratorFunction
+      constructor through super(), which the runtime rejects under ADR 0016.
+      Static subclass heritage does not replace that invocation, and no static
+      allocation yields the created function, so the subclass construction
+      contract stays unobserved.
+    attempts:
+      nodes:
+        - dynamic-source-callable-object-evidence
+        - dynamic-source-function-constructor-assessment
+      decisions:
+        - "2026-11-01 umbrella-residual answer: bounded general eval and
+          Function construction are not approved for M5"
+    targetMilestone: PLAN-DYN.md
+    sourceDigest: "9b3c1ac19e3296873f91917a8a1d4a4cb670aff374ed340214768ccb06e0\
+      bbf7"
+    observationDigest: "f9aac1f02736a7b84be7258c37fc3f5c88d2572a0d4b3ca621158a5\
+      10504e3a5"
+  test/language/statements/class/subclass/builtin-objects/GeneratorFunction/instance-prototype.js:
+    family: run-time-source
+    section: sec-generatorfunction
+    remainingContract: new GFn(';') of class GFn extends GeneratorFunction
+      returns a generator function whose prototype is a new object with no own
+      keys and no own constructor, held in a writable, non-enumerable,
+      non-configurable property.
+    reason: Construction reaches the source-compiling GeneratorFunction
+      constructor through super(), which the runtime rejects under ADR 0016.
+      Static subclass heritage does not replace that invocation, and no static
+      allocation yields the created function, so the subclass construction
+      contract stays unobserved.
+    attempts:
+      nodes:
+        - dynamic-source-callable-object-evidence
+        - dynamic-source-function-constructor-assessment
+      decisions:
+        - "2026-11-01 umbrella-residual answer: bounded general eval and
+          Function construction are not approved for M5"
+    targetMilestone: PLAN-DYN.md
+    sourceDigest: "a14c27fdc0e712b4f7cd28b6e59d142c96195c524d278fb788b70cc6f421\
+      cf46"
+    observationDigest: "326fad4b1d5674803d07b21918d9fe3a41b103eb6cd71e22b351aa5\
+      239757282"
+  test/language/statements/class/subclass/builtin-objects/GeneratorFunction/regular-subclassing.js:
+    family: run-time-source
+    section: sec-generatorfunction
+    remainingContract: new Gfn('a', 'yield a; yield a * 2;') of class Gfn
+      extends GeneratorFunction returns a generator function whose gfn(42)
+      iterator yields 42 and then 84.
+    reason: Construction reaches the source-compiling GeneratorFunction
+      constructor through super(), which the runtime rejects under ADR 0016.
+      Static subclass heritage does not replace that invocation, and no static
+      allocation yields the created function, so the subclass construction
+      contract stays unobserved.
+    attempts:
+      nodes:
+        - dynamic-source-callable-object-evidence
+        - dynamic-source-function-constructor-assessment
+      decisions:
+        - "2026-11-01 umbrella-residual answer: bounded general eval and
+          Function construction are not approved for M5"
+    targetMilestone: PLAN-DYN.md
+    sourceDigest: "20396554e49ca18f053ab2e1a4ecedf45f329bd0d073c19143e68197a22f\
+      9b74"
+    observationDigest: "b3709dfb558c51358112389d1971a6ad726e4d01a1fe4e3c81465bc\
+      55a1b5567"
+  test/language/statements/class/subclass/builtin-objects/GeneratorFunction/super-must-be-called.js:
+    family: run-time-source
+    section: sec-generatorfunction
+    remainingContract: new GFn2() of class GFn2 extends GeneratorFunction, whose
+      constructor calls super(), returns an instance of GeneratorFunction.
+    reason: Construction reaches the source-compiling GeneratorFunction
+      constructor through super(), which the runtime rejects under ADR 0016.
+      Static subclass heritage does not replace that invocation, and no static
+      allocation yields the created function, so the subclass construction
+      contract stays unobserved. The other assertion, that a derived constructor
+      which never calls super() makes new throw a ReferenceError, is ordinary
+      and is observed by the passing Array/super-must-be-called.js in the same
+      builtin-objects directory.
+    attempts:
+      nodes:
+        - dynamic-source-callable-object-evidence
+        - dynamic-source-function-constructor-assessment
+      decisions:
+        - "2026-11-01 umbrella-residual answer: bounded general eval and
+          Function construction are not approved for M5"
+    targetMilestone: PLAN-DYN.md
+    sourceDigest: "757446c1931cb4a2c6d76a57a79b9e4646e42815ba08de05a0e3b3104b92\
+      dba0"
+    observationDigest: "e7f5862e882c0ba837c7786da061fd5ed67bbb7a3b743e6196b9bde\
+      933813361"
   test/language/statements/for-in/scope-head-var-none.js:
     family: run-time-source
     section: "sec-for-in-and-for-of-statements-runtime-semantics-labelled\

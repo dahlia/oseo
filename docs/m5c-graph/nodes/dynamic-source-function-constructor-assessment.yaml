@@ -1,0 +1,15 @@
+version: 1
+id: dynamic-source-function-constructor-assessment
+title: Assess the Function constructor and train coverage paths
+delivers: >-
+  Gives each of exactly 49 pinned umbrella paths one reviewed outcome: 27
+  Function constructor rows of observation batches 01 and 18 and 22
+  dynamic coverage train rows. A path closes under ADR 0016 only with
+  faithful evidence for every non-source subject, and is deferred under
+  ADR 0031 only when run-time source compilation alone observes its
+  contract. Scope, SHA256 and authority are recorded in
+  docs/m5c-graph/dynamic-source-function-constructor-assessment.md.
+dependencies:
+  - unsupported-ownership-audit
+landed: false
+status: ready
