@@ -33,11 +33,14 @@ LOCAL = {
     "tests/host-script-evidence.test.ts": 290.8,
     "tests/trainc-ordinary-evidence.test.ts": 155.2,
     "tests/unhandled-rejection-policy-native.test.ts": 9.5,
+    # Train C evidence pieces, one serial run each on the same host.
+    "tests/host-script-trainc-evidence-1.test.ts": 335.4,
+    "tests/host-script-trainc-evidence-2.test.ts": 291.9,
+    "tests/host-script-trainc-evidence-3.test.ts": 284.2,
+    "tests/host-script-trainc-evidence-4.test.ts": 261.2,
 }
-# Coming files with local estimates from their lanes' handoffs: train C
-# evidence (one file, or the three pieces the split would produce) and the
-# exhaustive RegExp literal property.
-TRAINC = 1140.0
+# The exhaustive RegExp literal property has no measured weight yet; its
+# lane's handoff estimates it locally.
 REGEXP = ("tests/property/m5-regexp-literal-exhaustive.property.test.ts", 248.0)
 # Job walls in seconds (started_at to completed_at) for model validation.
 WALLS = {
@@ -151,35 +154,23 @@ def main(emit):
                   + " ".join(f"{wall(s, truth, WIDTH[host]) / 60:5.1f}"
                              for s in shards))
 
-    print("\nComing files on HEAD (minutes of largest sums)")
-    pieces = [f"tests/host-script-trainc-evidence-{i}.test.ts" for i in (1, 2, 3)]
-    scenarios = [
-        ("whole, unweighted", {"tests/host-script-trainc-evidence.test.ts":
-                               TRAINC}, False),
-        ("split, unweighted", {p: TRAINC / 3 for p in pieces}, False),
-        ("split, weighted", {p: TRAINC / 3 for p in pieces}, True),
-    ]
+    print("\nRegExp property at its estimate (minutes of largest sums)")
     for host in ("linux", "macos"):
         largest = {p: max(v.values()) for p, v in sums[host].items() if v}
         for path, seconds in LOCAL.items():
             largest[path] = seconds * ratio[host]
-        for label, extra, weighted in scenarios:
-            coming = {**extra, REGEXP[0]: REGEXP[1]}
+        largest[REGEXP[0]] = REGEXP[1] * ratio[host]
+        fallback = fallbacks[host]
+        pool = [p for p in files if host == "linux" or p != ARRAY]
+        for label, weighted in (("unweighted", False), ("weighted", True)):
             table = dict(tables[host])
             if weighted:
-                table.update({p: math.ceil(v * ratio[host])
-                              for p, v in coming.items()})
-            truth = dict(largest)
-            truth.update({p: v * ratio[host] for p, v in coming.items()})
-            fallback = fallbacks[host]
-            pool = [p for p in sorted(set(files) | set(coming))
-                    if host == "linux" or p != ARRAY]
+                table[REGEXP[0]] = math.ceil(REGEXP[1] * ratio[host])
             shards = select(pool, TOTAL[host],
                             lambda p: table.get(p, fallback), WIDTH[host])
-            print(f"  {host} {TOTAL[host]} train C {label}: "
-                  + " ".join(f"{wall(s, lambda p: truth.get(p, fallback), WIDTH[host]) / 60:5.1f}"
+            print(f"  {host} {TOTAL[host]} RegExp {label}: "
+                  + " ".join(f"{wall(s, lambda p: largest.get(p, fallback), WIDTH[host]) / 60:5.1f}"
                              for s in shards))
-
 
 if __name__ == "__main__":
     main("--emit" in sys.argv[1:])

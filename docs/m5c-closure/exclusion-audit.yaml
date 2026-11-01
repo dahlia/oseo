@@ -5706,20 +5706,32 @@ assessments:
       assertion under ADR 0019.
     replacementEvidence:
       docs/m5c-graph/dynamic-source-host-script-trainc-evidence.assessment.md:
-        "a8f1f75c436f1b8e4d7e969996f9a863910267879e718057\
-        fee5f8660ace079f"
+        "a191e21285ea733d00f91d2d717430356a92f748e9530f9b\
+        0d0a18d193151df1"
       tests/native/fixtures/host-script-trainc-cases.ts:
         "27ef80d272a4d9ed39a8e1091d83e6ff340ffcc8045b7aa0\
         90b0cda2399de5b0"
       tests/native/fixtures/host-script-trainc.ts:
         "80cacb1a95fd173f8b5d5fbcaff2cdfb8a3734136c42d462\
         baefa28b9f2ac388"
-      tests/host-script-trainc-evidence.test.ts:
-        "7aef02836069ac8023dcfbe55a609bfd236c4a8e2de8ec80\
-        99def58e8d48c01c"
+      tests/host-script-trainc-evidence.ts:
+        "47ffdb769b37f2ac888d517bc8523b9a22a35df11327b400\
+        26de49abe987520f"
+      tests/host-script-trainc-evidence-1.test.ts:
+        "c4c3e794b71efb89ca6d635e4be2656f302f2893afd57aeb\
+        1f14989e72ca8b63"
+      tests/host-script-trainc-evidence-2.test.ts:
+        "5bb296c521ac0cd82fcaf3f8c532284e483990028c5045a8\
+        71f28aee7cedc4c4"
+      tests/host-script-trainc-evidence-3.test.ts:
+        "292eabe309cd3d7c2f60eb1bf39680ff57311989f1fcf4a9\
+        c81463ea44e26dba"
+      tests/host-script-trainc-evidence-4.test.ts:
+        "81f5c192b1d54c35414ec5d72d5f18e16a0cf1ca23fea152\
+        1e7a118fc9aa1dda"
       tests/host-script-trainc-source.test.ts:
-        "538734b38daad86b65201690e7b1b80cf40a51a2c77f798d\
-        8c90bd27510a23a5"
+        "ce9202b76651d3e4d0b3eb1de117322f9de76ddea1c2c05d\
+        556f23993545153d"
       tests/test262/harness/base.js:
         "50331feeca513cb2e2354e05e7c68f82d5aeccd9b766d6c8\
         8438c5ef118075f6"

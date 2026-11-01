@@ -20,14 +20,33 @@ import {
   hostScriptTraincFixtures,
   hostScriptTraincOracleFixture,
 } from "./native/fixtures/host-script-trainc.ts";
+import type { Fixture } from "./native/fixture.ts";
 
 const host = createNodeHost();
 const nativeTarget = targetForExecutionHost(host.executionHost!);
 
-for (const fixture of [
-  ...hostScriptTraincFixtures,
-  hostScriptTraincOracleFixture,
-]) {
+/**
+ * The native evidence pieces, in fixture order. Each
+ * *host-script-trainc-evidence-N.test.ts* file runs piece N - 1, so the
+ * ordinary Node shards can place the pieces apart instead of running all 34
+ * fixtures serially in one file. The pieces run every fixture exactly once,
+ * which the source test checks.
+ */
+export const traincEvidencePieces: readonly (readonly Fixture[])[] = [
+  hostScriptTraincFixtures.slice(0, 13),
+  hostScriptTraincFixtures.slice(13, 18),
+  hostScriptTraincFixtures.slice(18, 24),
+  [...hostScriptTraincFixtures.slice(24), hostScriptTraincOracleFixture],
+];
+
+/** Registers the native tests for one piece of the train C evidence. */
+export function registerTraincEvidence(piece: number): void {
+  for (const fixture of traincEvidencePieces[piece]!) {
+    registerFixture(fixture);
+  }
+}
+
+function registerFixture(fixture: Fixture): void {
   test(
     `${fixture.name} observes its host Script witness with forced GC`,
     { skip: nativeTarget == null ? "requires a supported native host" : false },

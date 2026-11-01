@@ -103,10 +103,11 @@ persistent realm roots under forced collection.
 
 The candidate changes no product package, runtime ABI, ADR or harness file.
 It adds tests and fixtures only; *tests/native.ts* is unchanged, because
-*tests/host-script-trainc-evidence.test.ts* already runs every fixture
-under both policies with forced collection. Raw checks and review packets are
-retained under */data/m5c-d17-20261101/host-script-trainc/run/*. These focused
-witnesses do not regenerate the original unsupported observations.
+the four *tests/host-script-trainc-evidence-N.test.ts* pieces already run
+every fixture once under both policies with forced collection. Raw checks and
+review packets are retained under
+*/data/m5c-d17-20261101/host-script-trainc/run/*. These focused witnesses do
+not regenerate the original unsupported observations.
 
 Tag self-audit: no dependency tag changes; every original rejected source
 keeps its `dynamic-source` prerequisite. No outside-scope observation moves.

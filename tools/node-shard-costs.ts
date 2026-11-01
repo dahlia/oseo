@@ -6,10 +6,10 @@
  * `9f21b607`, candidate run 41233967056 at `636157ef`, and main run
  * 41238903460 at `8770b2e4`. The largest is kept on purpose: the residual
  * evidence file took 1.36 times longer on one of those Linux runners than
- * on another, and the margin the shards keep is a slow runner's. Three
- * files postdate those runs and scale one serial local measurement by the
- * residual-evidence ratio of the same two measurements: 2.574 on Linux and
- * 1.974 on macOS.
+ * on another, and the margin the shards keep is a slow runner's. Seven
+ * files postdate those runs and scale a serial local measurement on the
+ * same host by the residual-evidence ratio: 2.574 on Linux and 1.974 on
+ * macOS.
  * Files below 30 seconds have no entry and weigh the host fallback, the
  * median of every measured weight. These are concurrent test durations,
  * not file wall times. *docs/evidence/node-shards/README.md* records the
@@ -32,6 +32,10 @@ export const nodeShardCosts = {
     "tests/host-script-bindings.test.ts": 131,
     "tests/host-script-evidence.test.ts": 749,
     "tests/host-script-runtime-owned.test.ts": 39,
+    "tests/host-script-trainc-evidence-1.test.ts": 864,
+    "tests/host-script-trainc-evidence-2.test.ts": 752,
+    "tests/host-script-trainc-evidence-3.test.ts": 732,
+    "tests/host-script-trainc-evidence-4.test.ts": 673,
     "tests/lexical-static-native.test.ts": 77,
     "tests/m5c-closure-ledger.test.ts": 58,
     "tests/m5c-exclusion-audit.test.ts": 31,
@@ -140,6 +144,10 @@ export const nodeShardCosts = {
     "tests/host-script-bindings.test.ts": 117,
     "tests/host-script-evidence.test.ts": 574,
     "tests/host-script-runtime-owned.test.ts": 34,
+    "tests/host-script-trainc-evidence-1.test.ts": 663,
+    "tests/host-script-trainc-evidence-2.test.ts": 577,
+    "tests/host-script-trainc-evidence-3.test.ts": 561,
+    "tests/host-script-trainc-evidence-4.test.ts": 516,
     "tests/lexical-static-native.test.ts": 61,
     "tests/m5c-closure-ledger.test.ts": 50,
     "tests/m5c-graph.test.ts": 166,

@@ -56,8 +56,8 @@ three sums, rounded up, so the margin below is a slow runner's. Files under 30
 seconds have no entry and weigh the host fallback, 18 seconds on both hosts,
 which is the median of every measured weight.
 
-Three files postdate those runs. One serial local run on 2026-11-01 of the
-residual evidence and those three files gives the calibration:
+Seven files postdate those runs. Serial local runs on 2026-11-01 of the
+residual evidence and those files, on one host, give the calibration:
 
 | File                                              | Local, s | Linux weight | macOS weight |
 | ------------------------------------------------- | -------: | -----------: | -----------: |
@@ -65,6 +65,10 @@ residual evidence and those three files gives the calibration:
 | *tests/host-script-evidence.test.ts*              |    290.8 |          749 |          574 |
 | *tests/trainc-ordinary-evidence.test.ts*          |    155.2 |          400 |          307 |
 | *tests/unhandled-rejection-policy-native.test.ts* |      9.5 |     fallback |     fallback |
+| *tests/host-script-trainc-evidence-1.test.ts*     |    335.4 |          864 |          663 |
+| *tests/host-script-trainc-evidence-2.test.ts*     |    291.9 |          752 |          577 |
+| *tests/host-script-trainc-evidence-3.test.ts*     |    284.2 |          732 |          561 |
+| *tests/host-script-trainc-evidence-4.test.ts*     |    261.2 |          673 |          516 |
 
 The ratios are 2.574 for Linux and 1.974 for macOS, the residual file's
 largest CI sum over its local sum. The fastest Linux observation gives
@@ -103,20 +107,21 @@ change Node's sorted start order, so the placement models it instead.
 Modeled maxima
 --------------
 
-On the bundle 8 tree, in minutes including setup. The weights column uses
+On the bundle 8 tree with the train C evidence pieces, in minutes including
+setup. The weights column uses
 the checked-in weights and fallback. The sums column uses each file's
 largest observed sum, with the fallback only for files never observed:
 
 | Host and total    | Weights                            | Largest sums                       |
 | ----------------- | ---------------------------------- | ---------------------------------- |
-| Linux, 3          | 38.8, 38.6, 38.7                   | 36.1, 35.6, 36.1                   |
-| Linux, 4 (chosen) | 35.2, 35.0, 35.1, 35.0             | 35.2, 31.5, 30.9, 31.3             |
-| macOS, 5          | 31.3, 31.3, 31.4, 31.4, 31.2       | 27.8, 28.2, 28.9, 29.1, 28.5       |
-| macOS, 6 (chosen) | 27.3, 27.2, 27.2, 27.1, 27.2, 27.1 | 27.3, 24.4, 24.2, 25.1, 24.8, 24.3 |
+| Linux, 3          | 44.5, 44.5, 44.4                   | 40.5, 40.2, 40.4                   |
+| Linux, 4 (chosen) | 35.2, 35.2, 35.1, 35.3             | 35.2, 33.0, 33.4, 33.0             |
+| macOS, 5          | 35.5, 35.5, 35.6, 35.6, 35.4       | 32.1, 32.1, 32.1, 32.4, 33.0       |
+| macOS, 6 (chosen) | 29.7, 29.6, 29.7, 29.7, 29.6, 29.7 | 28.0, 27.4, 27.3, 26.9, 27.7, 27.4 |
 
 The Linux floor is the residual evidence file, which takes shard 1 alone at
 35.2 minutes. The same files and sums under the old positional partition
-model at 67.9 and 36.7 minutes for Linux and 45.0, 19.6, 26.8, and 50.5 for
+model at 63.1 and 58.0 minutes for Linux and 52.6, 21.9, 47.7, and 39.3 for
 macOS.
 
 The macOS total follows from the hosted lanes. The lane generator keeps the
@@ -157,28 +162,23 @@ not refreshed here.
 Coming files
 ------------
 
-Two lanes will add heavy files. Their handoffs give local estimates of
-1,140 seconds for *tests/host-script-trainc-evidence.test.ts* and 248 for
-*tests/property/m5-regexp-literal-exhaustive.property.test.ts*. Scaled by
-the ratios above, the train C file alone is 48.9 minutes on a slow Linux
-runner and 37.5 on macOS. It runs its 18 fixtures serially in one file, so
-no placement brings its job under 40 minutes. The modeled maxima with both
-files, in minutes:
+The train C host Script evidence runs its 34 fixtures in four files of 13,
+5, 6, and 10 fixtures, contiguous in fixture order, which
+*tests/host-script-trainc-evidence.ts* registers. As one file it took
+1,160.6 seconds locally, 49.8 minutes on a slow Linux runner by the ratio
+above, so no placement could bring its job under 40 minutes. Each piece
+carries its scaled weight from the table above.
 
-| Scenario                           | Linux, 4               | macOS, 6                           |
-| ---------------------------------- | ---------------------- | ---------------------------------- |
-| Train C as one file, no weight     | 35.2, 51.2, 30.8, 33.4 | 27.3, 24.5, 24.4, 24.6, 45.7, 24.3 |
-| Train C in three files, no weights | 35.2, 36.8, 41.9, 33.5 | 27.3, 30.8, 30.5, 25.0, 30.8, 24.4 |
-| Train C in three files, weighted   | 35.2, 33.6, 33.9, 33.9 | 27.7, 28.3, 28.3, 28.4, 28.1, 27.6 |
+*tests/property/m5-regexp-literal-exhaustive.property.test.ts* is on the
+tree without a weight and weighs the fallback. Its lane's handoff estimates
+248 seconds locally. At that estimate the chosen totals model at most 35.2
+minutes on Linux and 29.3 on macOS unweighted, and 35.3 and 28.9 with a
+scaled weight, so the fallback does not push a shard past the limit.
 
-The split pieces must therefore add their weights in the change that adds
-them. The weighted row assumes local times scaled by the two ratios and
-also weights the RegExp property.
-
-Capacity remains a concern. The weighted train C pieces add about 2,250
-seconds to the three hosted macOS lanes that carry Node shards, which would
-put the run maximum near 60 minutes whatever the Node total is. That needs
-a separate decision about hosted macOS capacity.
+Capacity remains a concern. The train C pieces add 2,317 weighted seconds
+to the three hosted macOS lanes that carry Node shards, which would put the
+run maximum near 60 minutes whatever the Node total is. That needs a
+separate decision about hosted macOS capacity.
 
 
 Reproduction

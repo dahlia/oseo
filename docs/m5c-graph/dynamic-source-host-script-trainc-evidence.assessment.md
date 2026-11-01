@@ -52,9 +52,10 @@ attribute, a replaced `eval` and a failed caller-side condition.
 
 The structural test compiles each group under both policies and requires
 the matched malformed host Scripts to be exactly the expected early-error
-literals. *tests/host-script-trainc-evidence.test.ts* compares Node.js and
-Deno references with native execution under both specialization policies
-with forced collection.
+literals. The four *tests/host-script-trainc-evidence-N.test.ts* pieces,
+registered through *tests/host-script-trainc-evidence.ts*, together run
+every fixture once and compare Node.js and Deno references with native
+execution under both specialization policies with forced collection.
 
 
 Conditions

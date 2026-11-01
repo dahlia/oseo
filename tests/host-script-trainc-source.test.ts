@@ -17,6 +17,7 @@ import {
   hostScriptTraincOracleFixture,
   hostScriptTraincOriginal,
 } from "./native/fixtures/host-script-trainc.ts";
+import { traincEvidencePieces } from "./host-script-trainc-evidence.ts";
 
 const strictPrefix = '"use strict"; void 0;\n';
 
@@ -207,6 +208,13 @@ function errorScripts(subjects: readonly HostScriptTraincCase[]): Set<string> {
   }
   return sources;
 }
+
+test("train C evidence pieces run every fixture exactly once", () => {
+  assert.deepEqual(traincEvidencePieces.flat(), [
+    ...hostScriptTraincFixtures,
+    hostScriptTraincOracleFixture,
+  ]);
+});
 
 for (const [group, fixture] of [
   ...hostScriptTraincFixtures,
