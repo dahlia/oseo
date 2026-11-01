@@ -7,16 +7,16 @@ Status
 This baseline records the target evidence immediately before the native support
 work accepted by [ADR 0014](./adr/0014-native-target-support.md). The baseline
 commit is `35d90ba57cd503f82685509a0991de0449636f8c`.
-Its target names preserve the Zig-shaped identifiers in that commit. ADR 0015
-later introduced stable OS-first Oseo target IDs.
+
+The baseline target names preserve the Zig-shaped identifiers in that commit.
+ADR 0015 later introduced stable OS-first Oseo target IDs.
 
 
 Linux on AMD64
 --------------
 
-The latest `main` workflow for the baseline commit completed successfully in
-[GitHub Actions].
-The Ubuntu native job recorded these task durations:
+The [GitHub Actions] run for the `main` workflow at the baseline commit recorded
+these Ubuntu native job durations:
 
 | Task                       | Duration | Evidence                                 |
 | -------------------------- | -------- | ---------------------------------------- |
@@ -26,10 +26,13 @@ The Ubuntu native job recorded these task durations:
 | Complete `test-native` job | 264 s    | Setup and all native task steps          |
 
 The native fixture corpus executed `x86_64-linux-gnu` and cross-linked
-`aarch64-linux-musl`. The checked test262 manifest recorded 50 passes, 178
-expected negatives, 150 unsupported profile features, and no semantic or
-harness failures. The M0 architecture probes were later retired after direct
-package, native, and property tests subsumed their contracts.
+`aarch64-linux-musl`.
+
+The checked test262 manifest recorded 50 passes, 178 expected negatives, 150
+unsupported profile features, and no semantic or harness failures.
+
+The M0 architecture probes were later retired after direct package, native, and
+property tests subsumed their contracts.
 
 [GitHub Actions]: https://github.com/dahlia/oseo/actions/runs/29649255718
 
@@ -38,14 +41,13 @@ macOS on AArch64
 ----------------
 
 The local baseline host was Darwin on AArch64 with an Apple M4 processor and
-the pinned Zig 0.16.0 toolchain. `mise run check` passed in 1.86 seconds.
-`mise run test` failed after 0.36 seconds when the ABI-root probe built an
-`x86_64-linux-gnu` ELF executable and the shell attempted to start it. The
-reported failure was `cannot execute binary file`.
+the pinned Zig 0.16.0 toolchain. On that host, `mise run test` failed when the
+ABI-root probe built an `x86_64-linux-gnu` ELF executable and the shell
+attempted to start it. The reported failure was `cannot execute binary file`.
 
-Before the implementation, Node.js and Deno package tests ran on macOS, but
-the native fixture, native property, test262, heap, promise, and architecture
-probe execution paths did not provide macOS native semantic evidence.
+Before the implementation, Node.js and Deno package tests ran on macOS. The
+native fixture, native property, test262, heap, promise, and architecture probe
+execution paths did not provide macOS native semantic evidence.
 
 
 Preserved comparison points

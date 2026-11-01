@@ -1,8 +1,8 @@
 M5 language profile and measurement boundary
 ============================================
 
-Sanitizer evidence (2026-09-17): historical Zig 0.16.0 runs did not
-provide ASan coverage. The separate Linux host C sanitizer lane now verifies
+Sanitizer evidence (2026-09-17): historical Zig 0.16.0 runs did not provide
+ASan coverage. The separate Linux host C sanitizer lane now verifies
 instrumentation; its measured scope is recorded in the
 [activity audit](sanitizer-activity.md). This does not retroactively validate
 earlier gates or establish macOS ASan coverage. Zig address self-checks remain
@@ -14,90 +14,101 @@ Status
 
 Implementation status: active. This is the living M5 profile required by
 [*PLAN-M5.md*](../PLAN-M5.md). It starts from the frozen
-[M3](./language-profile-m3.md) and [M4](./language-profile-m4.md) profiles
-and records how each dependency-indexed capability group stands against the
-claim boundary frozen in
-[ADR 0013](./adr/0013-m5-edition-and-manifest.md). Every M5 checkpoint that
-admits or measures behavior updates this document in the same change.
+[M3](./language-profile-m3.md) and [M4](./language-profile-m4.md) profiles and
+records how each dependency-indexed capability group stands against the claim
+boundary frozen in [ADR 0013](./adr/0013-m5-edition-and-manifest.md). Every M5
+checkpoint that admits or measures behavior updates this document in the same
+change.
 
-Unlike the frozen M3 and M4 profiles, this document changes throughout M5.
-A group's status describes tested current behavior, never intended behavior.
+Unlike the frozen M3 and M4 profiles, this document changes throughout M5. A
+group's status describes tested current behavior, never intended behavior.
 
 M5a is complete. The normative family records described below inventory 149
 admitted M5 families and assess every evidence class. M5 remains active through
 its M5b and M5c checkpoints.
 
-M5c node `import-attributes` admits static import and re-export attributes
-and default-only JSON modules. The file host accepts `type: "json"` for
-JSON dependencies and validates each request before canonical URL
-deduplication. JSON syntax errors occur during discovery; named exports
-are rejected during linking. Aliases and cycles share one traced, extensible
-data value constructed before source evaluators run. Construction retains
-duplicate-key, UTF-16, negative-zero, and `__proto__` data semantics without
-reading the mutable realm `JSON.parse` binding. Synthetic linking initializes
-the default cell to `undefined`; scheduled evaluation publishes the prepared
-value. A cyclic source observer reads `undefined` before publication and can
-read the shared value after resuming from `await`.
+M5c node `import-attributes` admits static import and re-export attributes and
+default-only JSON modules. The file host accepts `type: "json"` for JSON
+dependencies and validates each request before canonical URL deduplication.
+JSON syntax errors occur during discovery, and named exports are rejected
+during linking.
 
-The JSON file loader removes leading U+FEFF characters before validation
-and hashes the original content. Interior U+FEFF data and JavaScript file
-text are preserved; custom loaders retain their own text policy. JSON entry
-modules remain unsupported and receive an entry-specific diagnostic.
+Aliases and cycles share one traced, extensible data value constructed before
+source evaluators run. Construction retains duplicate-key, UTF-16,
+negative-zero, and `__proto__` data semantics without reading the mutable realm
+`JSON.parse` binding.
 
-The pinned prerequisite selector contains 89 paths: 24 static subjects and
-65 dynamic-boundary subjects. Dynamic import and runtime options remain
-outside admission under ADR 0016. The separately bounded
-`import-attributes-dynamic-coverage-remediation` node accounts for the 64
-actual `ImportExpression` rejections as bounded ADR 0016 exclusions under the
-maintainer accounting decision of 2026-10-22. Their subjects are ImportCall
-syntax and evaluation and the dynamic import site of JSON module identity;
-static JSON identity stays inside the profile. The indexed import-attributes
-family records fixed, generated, structural, differential, specialization,
-guard-fallback, collection, and standards evidence in
-*tests/property/m5-import-attributes.property.test.ts* and
+Synthetic linking initializes the default cell to `undefined`; scheduled
+evaluation publishes the prepared value. A cyclic source observer reads
+`undefined` before publication and can read the shared value after resuming
+from `await`.
+
+The JSON file loader removes leading U+FEFF characters before validation and
+hashes the original content. Interior U+FEFF data and JavaScript file text are
+preserved; custom loaders retain their own text policy. JSON entry modules
+remain unsupported and receive an entry-specific diagnostic.
+
+The pinned prerequisite selector contains 89 paths: 24 static subjects and 65
+dynamic-boundary subjects. Dynamic import and runtime options remain outside
+admission under ADR 0016.
+
+The separately bounded `import-attributes-dynamic-coverage-remediation` node
+accounts for the 64 actual `ImportExpression` rejections as bounded ADR 0016
+exclusions under the maintainer accounting decision of 2026-10-22. Their
+subjects are ImportCall syntax and evaluation, and the dynamic import site of
+JSON module identity; static JSON identity stays inside the profile.
+
+The indexed import-attributes family records fixed, generated, structural,
+differential, specialization, guard-fallback, collection, and standards
+evidence in *tests/property/m5-import-attributes.property.test.ts* and
 *tests/fixtures/import-attributes/*.
 
-M5c node `annexb-proto-dependency-classification` originally made a missing
+The M5c node `annexb-proto-dependency-classification` originally made a missing
 `__proto__` lookup reaching an intrinsic `Object.prototype` observable as
-`OSEO1001`, without installing an accessor. The immutable-prototype brand
-identified that intrinsic across realms. That historical lookup boundary
-is superseded by the current
+`OSEO1001`, without installing an accessor; the immutable-prototype brand
+identified that intrinsic across realms. That historical lookup boundary is
+superseded by the current
 [omitted legacy accessor metadata contract](#omitted-legacy-accessor-metadata-boundary).
+
 Core reflection exposes stable, distinct native getter/setter identities that
-can be obtained, compared, copied and redefined without invoking their excluded
-bodies. Invoking either excluded body reports source-located `OSEO1001`; no
-Annex B getter/setter behavior is admitted. User properties named `__proto__`,
-null prototypes, proxy traps and unrelated abrupt completions retain their core
-behavior. The existing indexed Object prototype family records the boundary and
-ordinary-property evidence.
+can be obtained, compared, copied, and redefined without invoking their
+excluded bodies. Invoking either excluded body reports source-located
+`OSEO1001`; no Annex B getter/setter behavior is admitted.
+
+User properties named `__proto__`, null prototypes, proxy traps, and unrelated
+abrupt completions retain their core behavior. The existing indexed Object
+prototype family records the boundary and ordinary-property evidence.
 
 The exact reviewed admission is
 *test/built-ins/TypedArrayConstructors/ctors/no-species.js*. Its unsupported
-observation became an ADR 0013 exclusion under the 2026-10-28
-maintainer decision, item 3, once the strict
-`annex-b-core-typed-array-no-species` evidence covered every core subject;
-the [closure note](./m5c-graph/typed-array-proto-coverage-remediation.md)
-records it. It is not counted as a pass. The
-fixed `typed-array-buffer-without-species-core` fixture preserves the original
-ArrayBuffer subclass, throwing constructor and species getter, TypedArray
-clone, and fresh buffer's intrinsic prototype and constructor. Core reflection
-replaces only the incidental accessor observation. Bounded ordinary-property
-generation uses seed `0x60008500`, absent, truthful, and false hints, both
-specialization policies, deliberate shape-guard misses, generic fallback, and
-collection at every safepoint. Native diagnostic tests pin direct, computed,
-Reflect, proxy fallback, TypedArray, and cross-realm reads. The runtime ABI at
-that checkpoint was `oseo-runtime-m5-129`; Annex B and the ADR 0013 vocabulary
-stay unchanged.
+observation became an ADR 0013 exclusion under the 2026-10-28 maintainer
+decision, item 3, once the strict `annex-b-core-typed-array-no-species`
+evidence covered every core subject. The
+[closure note](./m5c-graph/typed-array-proto-coverage-remediation.md) records
+it; the admission is not counted as a pass.
 
-Observation-batch-28 admits *test/language/types/object/S8.6.2\_A8.js*, whose
+The fixed `typed-array-buffer-without-species-core` fixture preserves the
+original ArrayBuffer subclass, throwing constructor and species getter,
+TypedArray clone, and fresh buffer's intrinsic prototype and constructor. Core
+reflection replaces only the incidental accessor observation.
+
+Bounded ordinary-property generation uses seed `0x60008500`, absent, truthful,
+and false hints, both specialization policies, deliberate shape-guard misses,
+generic fallback, and collection at every safepoint. Native diagnostic tests
+pin direct, computed, Reflect, proxy fallback, TypedArray, and cross-realm
+reads. The runtime ABI at that checkpoint was `oseo-runtime-m5-129`; Annex B
+and the ADR 0013 vocabulary stay unchanged.
+
+The M5c profile admits *test/language/types/object/S8.6.2\_A8.js*, whose
 `__proto__` write on a non-extensible ordinary object is rejected at compile
-time with this `OSEO1001` accessor diagnostic in every variant. The asserted
+time with the `OSEO1001` accessor diagnostic in every variant. The asserted
 core contract, that the object keeps `Object.prototype` as its `[[Prototype]]`,
-does not require Annex B. The
-`annex-b-core-ordinary-object-set-prototype` fixture witnesses every core
-subject through `Object.setPrototypeOf` and `Reflect.setPrototypeOf`. The
-2026-10-31 maintainer decision extends item 3 of the 2026-10-28 decision to
-this path and no other, so its unsupported observation is an ADR 0013
+does not require Annex B. The `annex-b-core-ordinary-object-set-prototype`
+fixture witnesses every core subject through `Object.setPrototypeOf` and
+`Reflect.setPrototypeOf`.
+
+The 2026-10-31 maintainer decision extends item 3 of the 2026-10-28 decision to
+this path and no other. Its unsupported observation is therefore an ADR 0013
 exclusion owned by `adr:0013-m5-edition-and-manifest`; it is not counted as a
 pass. The
 [work note](./m5c-graph/ordinary-object-proto-coverage-remediation.md) records
@@ -247,44 +258,44 @@ the ADR 0016 boundary and gain neither a pass nor an exclusion here.
 Claim boundary
 --------------
 
-The conformance candidate is the ECMA-262 16th edition, ECMAScript 2025,
-with the optional-section policy of ADR 0013: Annex B and ECMA-402 are
-outside the claim; host hooks, realms, agents, shared memory, `eval`, the
-`Function` constructor, and dynamic import are inside it and remain explicit
-gaps until owned decisions land. No release uses the conformance label while
-a known language gap remains inside this boundary.
+The conformance candidate is the ECMA-262 16th edition, ECMAScript 2025, with
+the optional-section policy of ADR 0013: Annex B and ECMA-402 are outside the
+claim. Host hooks, realms, agents, shared memory, `eval`, the `Function`
+constructor, and dynamic import are inside it and remain explicit gaps until
+owned decisions land. No release uses the conformance label while a known
+language gap remains inside this boundary.
 
 This profile measures ECMAScript source modules. Loading a binary *.wasm*
 module through static module syntax is a future host integration owned by
-[*PLAN-WASM.md*](../PLAN-WASM.md); it neither adds an M5 pass nor classifies a
+[*PLAN-WASM.md*](../PLAN-WASM.md). It neither adds an M5 pass nor classifies a
 test262 path as unsupported. The WebAssembly JavaScript and web APIs remain M6
 work under the same plan.
 
-The checked-in compatibility manifest under *tests/test262/* is the source
-of truth for progress against this boundary. *subset.yaml* pins the suite
-revision, supported features, and expected classifications; *results.yaml*
-indexes the reviewed observation partitions. The checked-in manifest
-implements the schema frozen by ADR 0013: six classifications with
-`expected-negative` covering matched negatives in every phase and
-`infrastructure-failure` separated from harness defects, execution evidence
-with the executed variants and target, reviewed dependency tags, and summaries
-with raw, path-group, and dependency totals. Unsupported, harness, and
-infrastructure results never increase the pass count.
+The checked-in compatibility manifest under *tests/test262/* is the source of
+truth for progress against this boundary. *subset.yaml* pins the suite
+revision, supported features, and expected classifications. *results.yaml*
+indexes the reviewed observation partitions.
+
+The manifest implements the schema frozen by ADR 0013. That schema defines six
+classifications, with `expected-negative` covering matched negatives in every
+phase and `infrastructure-failure` separated from harness defects. Execution
+evidence includes the executed variants and target, dependency tags are
+reviewed, and summaries include raw, path-group, and dependency totals.
+Unsupported, harness, and infrastructure results never increase the pass count.
 
 The current manifest contains 41,091 reviewed cases: 34,778 passes, 4,401
 expected negatives, and 1,912 unsupported profile features. It records no
 semantic, harness, or infrastructure failures.
 
-The batch 16/17 dependency audit corrects 21 tag claims on 20 of their
-754 new paths. Their dependency totals become 48 abrupt-completion,
-559 functions, 404 var-bindings and 98 lexical-grammar; every other new
-path/tag remains unchanged. The
-[batch 16 repair account](./m5c-graph/observation-batch-16.md)
-links the complete per-path body audit. This metadata repair preserves
-all classifications and actual native observations from U44d2c4f/R2609fcd5,
-including their 636 passes, 70 expected negatives and 48 unsupported results.
-The latter retain 31 active remediation owners and 17 bounded existing ADR
-bindings. Affected independent review and Root's D3 decision remain pending.
+The batch 16/17 dependency audit corrects 21 tag claims on 20 of the 754 new
+paths. Dependency totals are now 48 abrupt-completion, 559 functions, 404
+var-bindings, and 98 lexical-grammar; every other new path and tag remains
+unchanged. The [batch 16 repair account](./m5c-graph/observation-batch-16.md)
+links the complete per-path body audit. The metadata repair preserves all
+classifications and actual native observations, including 636 passes, 70
+expected negatives, and 48 unsupported results. The 48 unsupported results
+retain 31 active remediation owners and 17 bounded existing ADR bindings. The
+affected independent review and Root's D3 decision remain pending.
 
 
 Normative family records
@@ -293,7 +304,7 @@ Normative family records
 The complete language profile is the union of the frozen
 [M3](./language-profile-m3.md) and [M4](./language-profile-m4.md) profiles and
 every indexed M5 family record. M3 and M4 remain the normative owners of their
-admitted behavior; M5 does not duplicate those families or claim new ownership
+admitted behavior. M5 does not duplicate those families or claim new ownership
 of them.
 
 The M4 event-loop profile's timer conversion, ordering, microtask checkpoint,
@@ -302,7 +313,7 @@ deterministic test adapter of
 [ADR 0025](./adr/0025-native-clock-and-wakeup.md): production executables wait
 monotonic elapsed time for a timer deadline through the native clock adapter.
 That checkpoint is host scheduling infrastructure rather than a language
-family, so it adds no record below; its fixed, generated, and differential
+family, so it adds no record below. Its fixed, generated, and differential
 evidence is named in the decision.
 
 The files under *language-profile-m5/index/* are the normative index. Each
@@ -333,13 +344,14 @@ admitted family is a monotonicity violation without an override path.
 Capability groups
 -----------------
 
-Groups derive deterministically from the upstream test262 path: a group is
-the first two directory segments under *test/*, such as
-`language/module-code` or `built-ins/Promise`. The table names the groups
-the M5 measurement work tracks first and the contract that owns each; it
-is not exhaustive, because admitted syntax spans further groups such as
-`language/literals`. Measured coverage per group lives in the
-*results.yaml* summary; a group may have an admitted subset before its
+Groups derive deterministically from the upstream test262 path: a group is the
+first two directory segments under *test/*, such as `language/module-code` or
+`built-ins/Promise`.
+
+The table names the groups the M5 measurement work tracks first and the
+contract that owns each. It is not exhaustive, because admitted syntax spans
+further groups such as `language/literals`. Measured coverage per group lives
+in the *results.yaml* summary. A group may have an admitted subset before its
 first reviewed test262 cases land.
 
 | Group                | Status  | Owning contract      |
@@ -350,8 +362,8 @@ first reviewed test262 cases land.
 | built-ins/Object     | partial | M3 profile, ADR 0008 |
 | built-ins/Promise    | partial | M4 profile, ADR 0010 |
 
-“Partial” means the admitted subset in the owning profile document, with
-every other form rejected by a source-located diagnostic.
+“Partial” means the admitted subset in the owning profile document, with every
+other form rejected by a source-located diagnostic.
 
 
 M5a implementation history
@@ -2862,20 +2874,22 @@ M5a Unit 8.1b admits the remaining core `delete` operands without changing the
 ordinary property-reference runtime operation. Owned syntax retains a general
 operand until HIR resolution distinguishes declarative, unresolvable, dynamic
 `with`, non-reference, and optional-chain cases. MIR uses constants for static
-identifier results, evaluates and discards non-reference values only after
+identifier results. It evaluates and discards non-reference values only after
 their abrupt checks, and branches optional deletion to `true` without entering
 the skipped reference spine. A live optional path reuses the ordinary property
 delete operation for its final member.
 
 Fixed differential fixtures compare Node.js, Deno, specialization disabled and
 enabled, forced collection, Linux AMD64 execution, and the AArch64 Linux
-cross-link. They retain strict and non-strict behavior, resolved and unresolved
+cross-link. They cover strict and non-strict behavior, resolved and unresolved
 names, temporal-dead-zone independence, `with` selection, operand, key,
 conversion, and call order, abrupt completion, nullish short-circuiting, later
 chain suppression, live static and computed deletion, non-configurable
 properties, a false number hint, and a deliberate intermediate property-guard
-miss. The directly generated property uses seed `0x60000f00`, a 16-case
-ordinary budget, a directly generated structured domain, and an independent
+miss.
+
+The directly generated property uses seed `0x60000f00`, a 16-case ordinary
+budget, a directly generated structured domain, and an independent
 reference-and-effect oracle. The extended gate uses seed `0x5eed0003` and
 scales it to 160 cases. Initial and intermediate nullish bases prove key
 expression evaluation before coercibility and key conversion after it. Both
@@ -2885,29 +2899,31 @@ This unit advances the runtime ABI to `m5-36` with a delete-specific
 object-coercibility entry point. It preserves the existing delete nullish error
 while keeping object-binding diagnostics separate.
 
-The reviewed test262 subset adds 28 applicable pinned cases without changing
+The reviewed test262 subset adds 28 applicable pinned cases. It does not change
 the suite revision, inventory policy, manifest schema, or classification
 vocabulary. Twenty-six pass and two are expected strict identifier parse
-negatives. The manifest moves from 4,174 to 4,202 cases, from 2,448 to 2,474
-passes, and from 1,167 to 1,169 expected negatives; its 559 unsupported profile
-features do not move, and it records no semantic or harness failures.
+negatives. The manifest records 4,202 cases, 2,474 passes, 1,169 expected
+negatives, and 559 unsupported profile features, with no semantic or harness
+failures.
 
-Private-name deletion remains an early error. `delete super.property` was a
-source-located invalid boundary for this unit rather than being lowered as an
-ordinary property delete, because admitting it requires the runtime
-`ReferenceError` and the specified receiver, key-expression, and
+Private-name deletion remains an early error. For this unit,
+`delete super.property` was a source-located invalid boundary rather than being
+lowered as an ordinary property delete, because admitting it requires the
+runtime `ReferenceError` and the specified receiver, key-expression, and
 `ToPropertyKey` suppression order. M5a Unit 8.5j supplies all four and closes
 that boundary.
+
 Deleting `Symbol` or a named error intrinsic as an identifier remains invalid
 until the global-object model can remove the property and change subsequent
 name resolution consistently. At non-strict Script top level,
 `delete arguments` is an unresolvable-reference delete and returns `true` when
-no global binding exists, and M5a Unit 8.5h gives an arrow function with no
+no global binding exists. M5a Unit 8.5h gives an arrow function with no
 enclosing function form the same answer through the same unresolvable path.
-Every other function form instead resolves its own implicit `arguments`
-object and returns `false`, so the unit retired the separate source-located
-diagnostic that reported a deliberately unavailable implicit object. Strict
-identifier deletion remains an early error.
+Every other function form instead resolves its own implicit `arguments` object
+and returns `false`, so the unit retired the separate source-located diagnostic
+that reported a deliberately unavailable implicit object. Strict identifier
+deletion remains an early error.
+
 Deleting a hidden `with` fallback that a prior unresolved assignment allocated
 is likewise invalid until the global-object model can remove that cell
 consistently.
@@ -2923,12 +2939,11 @@ remain rooted across the runtime operation. An anonymous function used as the
 prototype value does not receive `"__proto__"` as its inferred name.
 
 Computed, shorthand, method, getter, setter, and spread `__proto__` definitions
-remain ordinary properties. They preserve their existing descriptors,
-function names, replacement order, and own-key observations while coexisting
-with one prototype setter. Two prototype setters in one literal are a
-parse-time `SyntaxError`, including an identifier spelling paired with a
-quoted spelling. Permitted ordinary forms do not participate in that early
-error.
+remain ordinary properties. They preserve their existing descriptors, function
+names, replacement order, and own-key observations while coexisting with one
+prototype setter. Two prototype setters in one literal are a parse-time
+`SyntaxError`, including an identifier spelling paired with a quoted spelling.
+Permitted ordinary forms do not participate in that early error.
 
 The generated property uses fixed seed `0x60002101` and a 16-case ordinary
 budget. Its independent oracle directly generates null, object, and primitive
@@ -2948,150 +2963,160 @@ authority.
 The reviewed test262 subset adds the directly applicable duplicate-setter parse
 negative. Positive upstream cases that also require `Object` reflection,
 `Object.prototype`, or object-method `super` remain outside this unit instead
-of borrowing partial results. The manifest moves from 4,202 to 4,203 cases and
-from 1,169 to 1,170 expected negatives. Its 2,474 passes and 559 unsupported
-profile features do not move. The suite revision, inventory policy, schema,
-and classification vocabulary do not change, and there are no semantic or
-harness failures.
+of borrowing partial results. The suite revision, inventory policy, schema, and
+classification vocabulary do not change. The manifest records 4,203 cases,
+1,170 expected negatives, 2,474 passes, and 559 unsupported profile features,
+with no semantic or harness failures.
 
 ### Script and module top-level `this`
 
 M5a Unit 8.1d admits `this` at the top level of both source kinds and gives
-every `this` expression the environment record that actually binds it.
-ECMA-262 resolves `this` through the nearest environment with a this binding,
-so an arrow carries the mode of the position it is written in rather than a
-mode of its own. Owned syntax now records that mode on the expression, and HIR
-and MIR keep the three cases apart.
+every `this` expression the environment record that actually binds it. ECMA-262
+resolves `this` through the nearest environment with a this binding, so an
+arrow carries the mode of the position it is written in rather than a mode of
+its own. Owned syntax now records that mode on the expression, and HIR and MIR
+keep the three cases apart.
 
 A Script's this binding lives in its Global Environment Record, so a top-level
 `this` is the realm's global this value whatever the source's strictness. A
 function whose `[[ThisMode]]` is global, which is any non-strict function,
-resolves a nullish call-site receiver to the same value; a function whose
+resolves a nullish call-site receiver to the same value. A function whose
 `[[ThisMode]]` is strict keeps the receiver unchanged, including when it is
 `undefined`. Class bodies, class field initializers, and static blocks are
-strict code and keep the strict behavior. A module's this binding is a Module
-Environment Record's, which ECMA-262 defines as `undefined`, so module
-top-level `this` and an arrow written beside it lower to the `undefined`
-constant while an ordinary function in the same module still reads its own
-receiver.
+strict code and keep the strict behavior.
+
+A module's this binding lives in a Module Environment Record. ECMA-262 defines
+that binding as `undefined`, so module top-level `this` and an arrow written
+beside it lower to the `undefined` constant, while an ordinary function in the
+same module still reads its own receiver.
 
 The realm's global this value is deliberately the smallest object that makes
 these positions correct. The runtime creates one ordinary extensible object
 with a null `[[Prototype]]` on first use, the same way it creates an object
-literal, and roots it permanently, so every read observes one identity across
-collection and an ordinary property write on it is visible to the next read.
+literal, and roots it permanently. Every read therefore observes one identity
+across collection, and an ordinary property write on it is visible to the next
+read.
 
 Its own properties are the Script bindings GlobalDeclarationInstantiation
 creates on the global object, and nothing else. Those are exactly the
 var-scoped top-level names: every top-level function declaration in source
-order, then every hoisted `var` name that no function declaration already
-owns. A Script's `let`, `const`, and `class` declarations live in the global
-declarative record and are never properties, a name declared inside a function
-is never one either, and module code adds nothing to the global object at all.
-The property and the binding are one storage location rather than two copies:
-the property stores the binding cell, so a binding write is visible through
-the property, a property write reaches the binding, and a closure that
-captured the binding reads the same value. Each property is writable,
-enumerable, and non-configurable, so `delete this.name` reports failure
-outside strict code and throws a `TypeError` inside it, while an ordinary
-property the Script adds to the same object stays configurable and deletable.
+order, then every hoisted `var` name that no function declaration already owns.
+A Script's `let`, `const`, and `class` declarations live in the global
+declarative record and are never properties. A name declared inside a function
+is never a property either, and module code adds nothing to the global object
+at all.
+
+The property and the binding are one storage location, not two copies. The
+property stores the binding cell, so a binding write is visible through the
+property, a property write reaches the binding, and a closure that captured the
+binding reads the same value. Each such property is writable, enumerable, and
+non-configurable. `delete this.name` therefore reports failure outside strict
+code and throws a `TypeError` inside it. An ordinary property the Script adds
+to the same object stays configurable and deletable.
+
 `Object.defineProperty` owns the `[[Writable]]` attribute of that shared
-storage: once a var-scoped property is made non-writable, an assignment
-through the binding fails exactly where a property assignment fails, silently
-outside strict code and with a `TypeError` inside it.
+storage. Once a var-scoped property is made non-writable, an assignment through
+the binding fails exactly where a property assignment fails, silently outside
+strict code and with a `TypeError` inside it.
 
 The later M5b `global-object-record` node completes this static declaration
 boundary. The realm installs `Infinity`, `NaN`, `undefined`, and every admitted
-constructor global before declaration instantiation. Script lexical names
-reach HasRestrictedGlobalProperty before any mutation, and var-scoped names
-reach CanDeclareGlobalFunction or CanDeclareGlobalVar against the existing
-descriptor and the global object's extensibility. A `var` redeclaration
-preserves the existing property and value, a restricted function or lexical
-declaration throws before the statement list runs, and a missing property on a
-non-extensible global is rejected before any earlier declaration can mutate
-the object. Function-local and Module declarations remain ordinary
-declarative bindings and do not enter this record.
+constructor global before declaration instantiation. Script lexical names reach
+HasRestrictedGlobalProperty before any mutation. Var-scoped names reach
+CanDeclareGlobalFunction or CanDeclareGlobalVar against the existing descriptor
+and the global object's extensibility.
 
-ADR 0029 extends this record for the explicit test262 host with a finite
-set of ahead-of-time Scripts. Each invocation validates its declarations
-against persistent realm lexical cells and the existing global object before
-executing its body. Lexical names never become global-object properties;
-retained closures keep their cells and realm. The implementation and focused
-evidence sources are described in the host Script section below.
+A `var` redeclaration preserves the existing property and value. A restricted
+function or lexical declaration throws before the statement list runs, and a
+missing property on a non-extensible global is rejected before any earlier
+declaration can mutate the object. Function-local and Module declarations
+remain ordinary declarative bindings and do not enter this record.
+
+ADR 0029 extends this record for the explicit test262 host with a finite set of
+ahead-of-time Scripts. Each invocation validates its declarations against
+persistent realm lexical cells and the existing global object before executing
+its body. Lexical names never become global-object properties; retained
+closures keep their cells and realm. The implementation and focused evidence
+sources are described in the host Script section below.
 
 M5b node `globalthis-binding` exposes this object as `globalThis` and gives a
 dynamically created global property the runtime lookup path recorded in that
-node's section below; known names keep their compiled property-backed cells.
+node's section below. Known names keep their compiled property-backed cells.
 Indirect `eval`, dynamic `Function` construction, and the standard global
 values owned by later intrinsic nodes remain outside this static record.
 
-Two further boundaries are worth naming. Annex B's block-level function
-hoisting is not implemented, so a function declared in a block at Script top
-level has no var-scoped binding and is therefore absent from the global
-object; a reference to that name outside its block is already rejected with a
-source-located diagnostic, but a global-object observation such as
-`"name" in this` reports absence instead of diagnosing it. This holds in
-strict and non-strict Script code alike, since Annex B applies only to
-non-strict code and the profile never applies it: M5a Unit 8.5d admits a var
-declaration that shares a block-level function's name only when the two
-coexist as the ordinary disjoint bindings ECMA-262 already describes without
-Annex B, never as the copied-out alias Annex B would create. Property creation
-order also follows ECMA-262 rather than the reference hosts: both Node.js and
-Deno share V8, which creates global declarations in source order, while
-GlobalDeclarationInstantiation creates every function binding before every
-`var` binding. A fixed native scenario pins the ECMA-262 order because no host
-observation can.
+Annex B's block-level function hoisting is not implemented. A function declared
+in a block at Script top level therefore has no var-scoped binding and is
+absent from the global object. A reference to that name outside its block is
+already rejected with a source-located diagnostic, but a global-object
+observation such as `"name" in this` reports absence instead of diagnosing it.
+This holds in strict and non-strict Script code alike, since Annex B applies
+only to non-strict code and the profile never applies it.
+
+M5a Unit 8.5d admits a var declaration that shares a block-level function's
+name only when the two coexist as the ordinary disjoint bindings ECMA-262
+already describes without Annex B, never as the copied-out alias Annex B would
+create.
+
+Property creation order also follows ECMA-262 rather than the reference hosts.
+Both Node.js and Deno share V8, which creates global declarations in source
+order, while GlobalDeclarationInstantiation creates every function binding
+before every `var` binding. A fixed native scenario pins the ECMA-262 order
+because no host observation can.
 
 `this` remains an invalid assignment and update target, so `this = 1`,
 `(this) = 1`, `this++`, `++this`, `var this`, and `({this})` stay parse-time
 `SyntaxError`s. Because the bootstrap parser accepts TypeScript's `this`
 parameter spelling wherever a binding identifier is written, every binding
-position names the reserved word itself. Only a plain first parameter named
-`this` is TypeScript's receiver annotation and keeps the unsupported
-classification that boundary already had; a later, rest, or defaulted
-parameter named `this` is a binding position and takes the early error. A
-binding pattern is checked for the reserved word before any of it is
-converted, because a source that names `this` is invalid in every engine
-while an unadmitted construct beside it is only outside this profile, and
-the reader has to be told the answer that holds. A property key spelled
-`this` names an ordinary property and is unaffected.
+position names the reserved word itself.
 
-The generated property uses fixed seed `0x60002c0c` and a 32-case ordinary
-budget. Its independent oracle names the binding each position observes rather
-than the value the compiler produces, and it directly generates fifteen
-positions across both source kinds: Script top level with and without a
-`"use strict"` directive, module top level, arrows at both, ordinary,
-own-strict, generator, asynchronous, and parameter-default functions, object
-methods and detached methods, class instance methods, static methods, and
-fields, a detached class method, and a module continuation resumed after
-top-level await. Each case also carries an absent, `var`, function, or lexical
-top-level declaration and reports what the captured receiver observes of it:
+Only a plain first parameter named `this` is TypeScript's receiver annotation
+and keeps the unsupported classification that boundary already had. A later,
+rest, or defaulted parameter named `this` is a binding position and takes the
+early error. A binding pattern is checked for the reserved word before any of
+it is converted. This is because a source that names `this` is invalid in every
+engine, while an unadmitted construct beside it is only outside this profile.
+The reader has to be told the answer that holds. A property key spelled `this`
+names an ordinary property and is unaffected. The generated property uses the
+fixed seed `0x60002c0c` and a 32-case ordinary budget. Its independent oracle
+names the binding each position observes rather than the value the compiler
+produces. It directly generates fifteen positions across both source kinds:
+Script top level with and without a `"use strict"` directive; module top level;
+arrows at both; ordinary, own-strict, generator, asynchronous, and
+parameter-default functions; object methods and detached methods; class
+instance methods, static methods, and fields; a detached class method; and a
+module continuation resumed after top-level await.
+
+Each case also carries an absent, `var`, function, or lexical top-level
+declaration and reports what the captured receiver observes of it. It records
 the property's type before the declaration statement runs, then a binding read
 after a property write, then a property read after a binding write. Half the
 generated cases add a false number hint whose guarded addition reads through a
-receiver and misses into the compiled generic fallback. Every case runs under
-both specialization policies with forced collection and is compared with
-Node.js and Deno, where indirect `eval` supplies the only host position whose
-this binding is a Global Environment Record's. A strict indirect `eval` gets
-its own variable environment instead of adding to the global object, so the
-generated Script directive appears only beside a declaration the global object
-never binds; a strict Script's own global bindings are pinned by the fixed
-scenario below. Sampling is not treated as coverage: the ordinary budget
-reaches thirteen of the fifteen positions and all four declaration kinds at
-this seed, and the extended budget reaches all fifteen positions, so the object
-method and the parameter default that the ordinary budget misses are pinned by
-fixed Script, strict Script, and module fixtures instead. Those fixed Node.js,
-Deno, and native fixtures retain the same Script and module boundaries,
-including the AArch64 Linux cross-link.
+receiver and misses into the compiled generic fallback.
+
+Every case runs under both specialization policies with forced collection and
+is compared with Node.js and Deno. In Node.js and Deno, indirect `eval`
+supplies the only host position whose this binding is a Global Environment
+Record's. A strict indirect `eval` gets its own variable environment instead of
+adding to the global object, so the generated Script directive appears only
+beside a declaration the global object never binds. A strict Script's own
+global bindings are pinned by the fixed scenario below.
+
+Sampling is not treated as coverage. At this seed, the ordinary budget reaches
+thirteen of the fifteen positions and all four declaration kinds. The extended
+budget reaches all fifteen. The object method and the parameter default that
+the ordinary budget misses are pinned by fixed Script, strict Script, and
+module fixtures instead. Those fixed Node.js, Deno, and native fixtures retain
+the same Script and module boundaries, including the AArch64 Linux cross-link.
 
 Two fixed observations cover what no host position can. A native scenario runs
 a Script and a strict Script against fixed ECMA-262 expectations for the
 declaration order, the descriptors, the deletion results, and the
-`[[Writable]]` interaction that indirect `eval` cannot reproduce, under both
-specialization policies with a collection forced at every safepoint. A
-reviewed C heap fixture retains the global this value's identity,
-reachability, and non-nullish pass-through across a forced collection, keeps a
-binding, its cell, and its property alive together, and pins the property
+`[[Writable]]` interaction that indirect `eval` cannot reproduce. The scenario
+runs under both specialization policies with a collection forced at every
+safepoint. A reviewed C heap fixture retains the global this value's identity,
+reachability, and non-nullish pass-through across a forced collection. It keeps
+a binding, its cell, and its property alive together, and pins the property
 cache's cell-backed exclusion.
 
 This unit advances the runtime ABI to `m5-38` with three entry points.
@@ -3102,35 +3127,33 @@ receiver a Script top level or a non-strict function observes.
 the binding cells that already exist, once, before the script body runs.
 `oseo_global_binding_set` is SetMutableBinding for a binding the global object
 also exposes, so the runtime rather than generated C owns the `[[Writable]]`
-check that a shared storage location carries. Because a fixed-slot property
-load would hand generated code the binding cell instead of the value it holds,
-the property cache excludes cell-backed slots individually; the global object's
-ordinary properties keep the cache.
+check that a shared storage location carries.
+
+A fixed-slot property load would hand generated code the binding cell instead
+of the value it holds, so the property cache excludes cell-backed slots
+individually. The global object's ordinary properties keep the cache.
 
 ToObject boxing of a primitive receiver in a non-strict function remains
-unsupported and produces a source-located diagnostic. A borrowed object
-method can reach this boundary through `Function.prototype.call`; its
-nullish receiver instead resolves to the global this value. Strict methods
-retain primitive and nullish receivers unchanged.
+unsupported and produces a source-located diagnostic. A borrowed object method
+can reach this boundary through `Function.prototype.call`. Its nullish receiver
+instead resolves to the global this value. Strict methods retain primitive and
+nullish receivers unchanged.
 
-The reviewed test262 subset adds twelve directly applicable cases: the three
-positive top-level `this` cases this unit admits and the nine parse negatives
-that keep `this` an invalid assignment, update, and binding target. Four
-already reviewed cases move from unsupported to pass because their only
-missing prerequisite was a top-level `this`: the tagged-template
+The reviewed test262 subset includes twelve additional directly applicable
+cases. Three are positive top-level `this` cases this unit admits; the other
+nine are parse negatives that keep `this` an invalid assignment, update, and
+binding target. Four already reviewed cases now pass because their only missing
+prerequisite was a top-level `this`. They are the tagged-template
 call-expression context, *test/language/module-code/eval-this.js*, and the two
 class private-field computed-property cases whose bodies begin
-`const self = this`. The manifest moves from 4,203 to 4,215 cases, from 2,474
-to 2,481 passes, and from 1,170 to 1,179 expected negatives, and unsupported
-profile features fall from 559 to 555. The suite revision, inventory policy,
-manifest schema, and classification vocabulary do not change, and there are no
-semantic or harness failures.
+`const self = this`. The suite revision, inventory policy, manifest schema, and
+classification vocabulary do not change.
 
 ### Lexical and constructed `super`
 
 M5a Unit 8.2 reconciles the profile with the semantics completed in Units 6.6
-and 6.7 and admits the remaining optional-call form. An arrow captures the
-enclosing function's `super()` constructor context, home object, and
+and 6.7. The unit admits the remaining optional-call form. An arrow captures
+the enclosing function's `super()` constructor context, home object, and
 `new.target` alongside its lexical receiver. The same captured home object
 reaches `super` property references in nested arrows and in asynchronous class
 elements. An intervening ordinary function still starts its own execution
@@ -3139,7 +3162,7 @@ context.
 `super.m?.()` and `super[key]?.()` first perform the ordinary `super` property
 lookup with the class element's home object and derived receiver kept separate.
 They then guard the resulting value. A nullish value skips argument evaluation
-and produces `undefined`; a present value is called with the derived receiver.
+and produces `undefined`. A present value is called with the derived receiver.
 The form composes with lexical arrows and asynchronous class elements.
 
 Every `super()` call performs a fresh construction from `new.target`'s
@@ -3149,39 +3172,39 @@ it attempts to rebind the derived constructor's `this`. A private element on
 the parent is installed on that fresh receiver and does not cause an earlier
 duplicate-brand `TypeError`.
 
-The existing lexical-super property uses seed `0x60001e00`. A separate
-optional-call property uses seed `0x60001e01` across one to three nested arrows,
-literal and side-effecting computed keys, and present and absent methods. Both
-run under both
-specialization policies with forced collection and compare independent
-bounded-integer models with Node.js, Deno, and native execution. Fixed native
-fixtures cover synchronous and asynchronous optional calls and distinguish
-fresh construction from receiver reuse with a parent that publishes each
-receiver and installs a private element. The reviewed
-*super-property-optional-call.js* test262 case moves from unsupported to pass.
-The manifest stays at 4,215 cases and moves to 2,482 passes, 1,179 expected
-negatives, and 554 unsupported profile features with no semantic or harness
-failures.
+The existing lexical-super property uses the seed `0x60001e00`. A separate
+optional-call property uses the seed `0x60001e01` across one to three nested
+arrows, literal and side-effecting computed keys, and present and absent
+methods.
+
+Both run under both specialization policies with forced collection and compare
+independent bounded-integer models with Node.js, Deno, and native execution.
+Fixed native fixtures cover synchronous and asynchronous optional calls and
+distinguish fresh construction from receiver reuse with a parent that publishes
+each receiver and installs a private element. The reviewed
+*super-property-optional-call.js* test262 case now passes. The manifest has
+4,215 cases, 2,482 passes, 1,179 expected negatives, and 554 unsupported
+profile features. The suite has no semantic or harness failures.
 
 ### Pattern-position `await` suspension
 
-M5a Unit 8.3 admits `await` inside the three pattern subexpressions that the
+M5a Unit 8.3 admits `await` in the three pattern subexpressions that the
 frontend previously rejected everywhere: the object and computed key of an
 assignment target member, a computed binding property name, and an array or
-object binding default. They are admitted in every body that owns a traced
-suspension frame, which is an ordinary asynchronous function, an asynchronous
-arrow, and an asynchronous generator, and in every pattern that reaches such a
+object binding default. The admission applies in every body that owns a traced
+suspension frame: an ordinary asynchronous function, an asynchronous arrow, and
+an asynchronous generator. It also applies in every pattern that reaches such a
 body: standalone declarations, destructuring assignment, catch parameters,
 classic `for` declaration heads, and `for-of`, `for-await-of`, `for-in`, and
 assignment heads.
 
 The admission adds no new lowering. A pattern already lowers into the enclosing
-body, and every MIR value in that body occupies a root slot of the frame, so
-the acquired iterator, its captured `next` method, its done state, the prepared
+body, and every MIR value in that body occupies a root slot of the frame. The
+acquired iterator, its captured `next` method, its done state, the prepared
 assignment reference, an object binding's coercible input, and the excluded
 keys of a rest property all survive a suspension and are reachable by the
-collector while the frame is suspended. Removing the frontend rejection is what
-lets those positions reach the machinery.
+collector while the frame is suspended. Removing the frontend rejection lets
+those positions reach the machinery.
 
 Evaluation order is unchanged by suspension. An assignment target's object and
 computed key evaluate before the iterator step or source read that selects the
@@ -3189,152 +3212,148 @@ value it stores, and the raw key converts after that selection. A computed
 binding property name evaluates before the `GetV` it names, and after
 `RequireObjectCoercible` for an object pattern. A default evaluates only when
 the selected value is `undefined`, so a supplied value never reaches the
-operand and a rejected operand behind a supplied value never rejects anything.
+operand, and a rejected operand behind a supplied value never rejects anything.
 An object rest keeps every excluded key computed before the suspensions that
 separate them.
 
 Abrupt completion keeps the ordinary precedence. A rejected operand raises a
 throw completion at the `await` position, so an enclosing `catch` and `finally`
-still run, and an array pattern whose iterator is not yet done closes that
-iterator exactly once before the throw leaves the pattern. An iterator that has
-already reported `done` is not closed again. Assignment and binding cell
-identity is unchanged: a closure captured before the suspension observes the
-write the pattern performs after it.
+still run. An array pattern whose iterator is not yet done closes that iterator
+exactly once before the throw leaves the pattern. An iterator that has already
+reported `done` is not closed again. Assignment and binding cell identity is
+unchanged: a closure captured before the suspension observes the write the
+pattern performs after it.
 
 Module top level is not part of this admission and keeps a source-located
 diagnostic for the same three positions, as recorded below.
 
 The generated property suite uses seed `0x60002800` across the four pattern
-positions, asynchronous functions, arrows, and asynchronous generators,
+positions, asynchronous functions, arrows, and asynchronous generators, with
 supplied and missing selections, fulfilled and rejected operands, and truthful
 or false hints. Its independent oracle predicts the printed order and
-completion from the case record alone, and every case runs under both
+completion from the case record alone. Every case runs under both
 specialization policies with forced collection against Node.js, Deno, and
-native execution. Fixed native fixtures cover member-target and source-key
-order, defaults that are and are not taken, nested patterns, rest exclusions,
-assignment cell identity, per-iteration lexical and hoisted `var` loop cells
-captured by closures, `for-of` and `for-await-of` heads, a single close of an
-unfinished iterator, a done iterator that is not closed, a rejected key and a
-rejected target, `finally` precedence, a catch parameter, an asynchronous
+native execution.
+
+Fixed native fixtures cover member-target and source-key order, defaults that
+are and are not taken, nested patterns, rest exclusions, assignment cell
+identity, and per-iteration lexical and hoisted `var` loop cells captured by
+closures. They also cover `for-of` and `for-await-of` heads, a single close of
+an unfinished iterator, a done iterator that is not closed, a rejected key and
+a rejected target, `finally` precedence, a catch parameter, an asynchronous
 generator that mixes `await` and `yield` in the same positions, and a false
 number hint with a deliberate guard miss that reaches the compiled generic
 fallback.
 
-No reviewed test262 case exercises these positions: an AST scan of all 47,381
+No reviewed test262 case exercises these positions. An AST scan of all 47,381
 candidate paths finds `await` inside a pattern in seventeen cases, and every
 one of them is either module code or a parse negative for function parameters.
-Three of those parse negatives enter the reviewed subset here, pinning that the
-admission does not reach an asynchronous arrow's or asynchronous generator's
-formal parameters and does not propagate the module Await capability into a
-nested function's parameters. The one module positive enters as inventory
-evidence only: its declared `dynamic-import` feature stops it before
-compilation, so it classifies `unsupported-profile-feature` without reaching
-the module diagnostic recorded below, which package tests prove instead. The
-manifest therefore
-grows to 4,219 cases and stays at 2,482 passes, with 1,182 expected negatives
-and 555 unsupported profile features and no semantic or harness failures.
+Three of those parse negatives enter the reviewed subset here. They pin that
+the admission does not reach an asynchronous arrow's or asynchronous
+generator's formal parameters and does not propagate the module Await
+capability into a nested function's parameters.
+
+The one module positive enters as inventory evidence only: its declared
+`dynamic-import` feature stops it before compilation, so it classifies
+`unsupported-profile-feature` without reaching the module diagnostic recorded
+below, which package tests prove instead.
+
+The manifest therefore grows to 4,219 cases and stays at 2,482 passes, with
+1,182 expected negatives, 555 unsupported profile features, and no semantic or
+harness failures.
 
 ### Async-from-sync delegated throw
 
 M5a Unit 8.4 closes the reviewed
 *AsyncFromSyncIteratorPrototype/throw/iterator-result.js* gap. The case
 delivers a throw to an asynchronous generator suspended in `yield*` over a
-wrapped synchronous generator, expects the step promise to reject with the
+wrapped synchronous generator. It expects the step promise to reject with the
 forwarded reason after the wrapper calls the synchronous
-`%GeneratorPrototype%.throw`, and then observes the completed iterator.
-Tracing that forwarding against Node.js and Deno found two real defects.
+`%GeneratorPrototype%.throw`, then observes the completed iterator. Tracing
+that forwarding against Node.js and Deno found two defects.
 
 The runtime's virtualized `%GeneratorPrototype%.throw` had no context cache
-slot of its own, so its lookup fell through to the `[Symbol.iterator]` self
-function's slot and whichever method a program resolved first answered both
+slot of its own. Its lookup fell through to the `[Symbol.iterator]` self
+function's slot, so whichever method a program resolved first answered both
 keys afterward. Any program that acquired a generator's iterator before
 delivering a throw therefore called the self function instead of resuming the
-generator: the delegating step fulfilled with the generator object where a
-reference host rejects with the forwarded reason. The `m5-39` runtime ABI
-gives the throw method its own permanently rooted cache field, so `next`,
-`return`, `throw`, and `[Symbol.iterator]` now keep four distinct cached
-identities in every resolution order.
+generator. The delegating step fulfilled with the generator object where a
+reference host rejects with the forwarded reason. The `m5-39` runtime ABI gives
+the throw method its own permanently rooted cache field, so `next`, `return`,
+`throw`, and `[Symbol.iterator]` now keep four distinct cached identities in
+every resolution order.
 
 The synchronous `yield*` lowering also reported the wrong delegation result
-when a forwarded throw ended the delegation: the shared exit read the `next`
+when a forwarded throw ended the delegation. The shared exit read the `next`
 step's result slot, so a `throw` result carrying `done` reported the last
-stepped object instead of its own `IteratorValue`. The exit now joins through
-a block parameter each ending step supplies, matching the asynchronous
+stepped object instead of its own `IteratorValue`. The exit now joins through a
+block parameter that each ending step supplies, matching the asynchronous
 delegation's join.
 
 Two fixed fixtures cover the repaired paths against Node.js, Deno, and native
 execution under both specialization policies and forced collection. The
 synchronous *generator-delegated-throw* fixture resolves the throw method
-before the program's first `[Symbol.iterator]` read, forwards uncaught and
+before the program's first `[Symbol.iterator]` read. It forwards uncaught and
 caught throws through `yield*` to an inner generator, observes the inner
 `finally`, the rethrown reason's identity, and both completed states, and
 completes a delegation through a hand-written iterator's done `throw` result.
 The asynchronous *async-from-sync-delegated-throw* fixture forwards a throw
-through the wrapper to a synchronous generator in the reviewed case's shape,
+through the wrapper to a synchronous generator in the reviewed case's shape. It
 observes the rejection reason's identity and the completed state of both
-iterators, and keeps a caught forwarded throw delegating. The defect domain
-is a fixed method-identity and join-value fault, so no new property suite is
-added; the existing generator throw-resumption and delegation suites keep
-their seeds and domains. The reviewed case enters as a pass, and the manifest
-grows to 4,220 cases: 2,483 passes, 1,182 expected negatives, and 555
-unsupported profile features with no semantic or harness failures.
+iterators, and keeps a caught forwarded throw delegating.
+
+The defect domain is a fixed method-identity and join-value fault, so no new
+property suite is added. The existing generator throw-resumption and delegation
+suites keep their seeds and domains. The reviewed case enters as a pass.
 
 M5a Unit 8.5a admits the multi-declarator `const` and `let` declaration list
-recorded above. The reviewed subset grows by 112 cases and the manifest
-reaches 4,332 cases: 2,563 passes, 1,211 expected negatives, and 558
-unsupported profile features with no semantic or harness failures. Eighty of
-the new passes are the two reviewed cases the old rejection blocked plus
+recorded above. The reviewed subset grows by 112 cases. Eighty of the new
+passes consist of the two reviewed cases the old rejection blocked and
 seventy-eight promotions from *language/statementList/*,
 *statements/let/syntax/*, *statements/const/syntax/*, *statements/for/*, and
-the *for-await-of* destructuring family whose generated preludes declare
-several names in one `let`.
+the *for-await-of* destructuring family. That family's generated preludes
+declare several names in one `let`.
 
 M5a Unit 8.5b admits the optional catch binding recorded above. The reviewed
-subset grows by the seven cases a textual scan of the included inventory
-finds using or naming the form: three passes, three expected parse negatives,
-and one unresolved-global read that stays `unsupported-profile-feature` under
-the global binding model gap. The manifest reaches 4,339 cases: 2,566 passes,
-1,214 expected negatives, and 559 unsupported profile features with no
-semantic or harness failures.
+subset grows by the seven cases a textual scan of the included inventory finds
+using or naming the form: three passes, three expected parse negatives, and one
+unresolved-global read that stays `unsupported-profile-feature` under the
+global binding model gap.
 
-M5a Unit 8.5c admits the simple catch parameter and same-name `var`
-coexistence recorded above. The reviewed subset adds
+M5a Unit 8.5c admits the simple catch parameter and same-name `var` coexistence
+recorded above. The reviewed subset adds
 *test/language/statements/try/scope-catch-param-var-none.js* as inventory
 evidence for retaining the existing variable environment across a catch
 parameter. Its direct `eval` dependency remains outside the profile under ADR
-0016, so it is recorded as `unsupported-profile-feature`; the fixed
-differential fixture provides the same-name positive evidence the upstream
-case does not isolate. The manifest reaches 4,340 cases: 2,566 passes, 1,214
-expected negatives, and 560 unsupported profile features with no semantic or
-harness failures.
+0016, so it is recorded as `unsupported-profile-feature`. The fixed
+differential fixture provides the same-name positive evidence the upstream case
+does not isolate.
 
 M5a Unit 8.5d admits the block-level function and outer var coexistence
-recorded above. The reviewed subset adds thirteen cases naming a
-block-level function declaration: two passes from
-*test/language/block-scope/shadowing/* for a bare block function that was
-already admitted before this unit, six expected negatives from
-*test/language/block-scope/syntax/redeclaration/* for the same-block and
-ancestor-block conflicts the lexical-frame check keeps rejecting, and five
-`unsupported-profile-feature` results, *global-code/block-decl-strict.js*,
-*function-code/block-decl-onlystrict.js*, and three *eval-code/direct/*
-forms, each of which expects a runtime `ReferenceError` for a reference
-outside the declaring block that the frontend instead reports as a
-compile-time diagnostic. The manifest reaches 4,353 cases: 2,568 passes,
-1,220 expected negatives, and 565 unsupported profile features with no
-semantic or harness failures.
+recorded above. The reviewed subset adds thirteen cases naming a block-level
+function declaration. Two passes from *test/language/block-scope/shadowing/*
+are for a bare block function that was already admitted before this unit. Six
+expected negatives from *test/language/block-scope/syntax/redeclaration/* are
+for the same-block and ancestor-block conflicts the lexical-frame check keeps
+rejecting. Five results are `unsupported-profile-feature`:
+*global-code/block-decl-strict.js*, *function-code/block-decl-onlystrict.js*,
+and three *eval-code/direct/* forms. Each expects a runtime `ReferenceError`
+for a reference outside the declaring block that the frontend instead reports
+as a compile-time diagnostic.
 
-M5a Unit 8.5e admits the switch-clause function declaration recorded above.
-The reviewed subset adds nineteen cases: fifteen expected negatives from
-*test/language/statements/switch/syntax/redeclaration/* for the CaseBlock
-duplicate and var-overlap conflicts the shared scope keeps rejecting, and
-four `unsupported-profile-feature` results, *scope-lex-async-function.js*,
+M5a Unit 8.5e admits the switch-clause function declaration recorded above. The
+reviewed subset adds nineteen cases. Fifteen expected negatives from
+*test/language/statements/switch/syntax/redeclaration/* are for the CaseBlock
+duplicate and var-overlap conflicts the shared scope keeps rejecting. Four
+results are `unsupported-profile-feature`: *scope-lex-async-function.js*,
 *scope-lex-async-generator.js*, *scope-lex-class.js*, and
-*scope-lex-generator.js*, each of which expects a runtime `ReferenceError`
-for a reference outside the switch that the frontend instead reports as a
-compile-time diagnostic, the same documented boundary Unit 8.5d records for
-a block. The manifest reaches 4,372 cases: 2,568 passes, 1,235 expected
-negatives, and 569 unsupported profile features with no semantic or harness
-failures.
+*scope-lex-generator.js*. Each expects a runtime `ReferenceError` for a
+reference outside the switch that the frontend instead reports as a
+compile-time diagnostic, the same documented boundary Unit 8.5d records for a
+block.
+
+The manifest reaches 4,372 cases: 2,568 passes, 1,235 expected negatives, and
+569 unsupported profile features, with no semantic or harness failures.
 
 M5a Unit 8.5f admits the `debugger` statement recorded above. The frontend
 converts it to the same `{ kind: "block", body: [] }` owned syntax the
@@ -3432,84 +3451,85 @@ infrastructure failures. The suite revision, 41,091-path inventory, manifest
 schema and vocabulary, and zero-override policy are unchanged. The public
 function-kind and intrinsic tables move the runtime ABI to
 `oseo-runtime-m5-48` without changing the graph's orchestration state.
+M5b node `iterator-intrinsic` materializes `%Iterator%`, `%IteratorPrototype%`,
+`Iterator.from`, and the wrap-for-valid-iterator object that later helper
+methods extend. `Iterator.from` captures `next` once, preserves an iterator
+that already inherits from `%IteratorPrototype%`, and otherwise returns a
+collector-traced wrapper. The wrapper's `next` forwards through the captured
+method, and its `return` performs a fresh lookup. The prototype's `constructor`
+and `Symbol.toStringTag` accessors retain their standard
+setter-that-ignores-prototype behavior.
 
-M5b node `iterator-intrinsic` materializes `%Iterator%`,
-`%IteratorPrototype%`, `Iterator.from`, and the wrap-for-valid-iterator object
-that later helper methods extend. `Iterator.from` captures `next` once,
-preserves an iterator that already inherits from `%IteratorPrototype%`, and
-otherwise returns a collector-traced wrapper whose `next` forwards through the
-captured method and whose `return` performs a fresh lookup. The prototype's
-`constructor` and `Symbol.toStringTag` accessors retain their standard
-setter-that-ignores-prototype behavior. Fixed native and generated
-differential evidence at seed `0x60003400` covers both specialization
-policies, forced collection, direct and iterable inputs, late `return` lookup,
-and deliberate shape-guard misses. All 37 paths under the node's six inventory
-roots are reviewed. Their common upstream `iterator-helpers` feature tag
-remains unsupported, so the manifest reaches 5,459 cases: 3,141 passes, 1,355
-expected negatives, and 963 unsupported profile features with no semantic,
-harness, or infrastructure failures. This section originally expected the
-later helper method nodes to complete that feature; the eager helper section
-below records the String iteration and *temporalHelpers.js* prerequisites that
-disproved it. The suite revision, 41,091-path inventory, manifest
-schema and vocabulary, and zero-override policy are unchanged. The expanded
-intrinsic table and traced wrapper state move the runtime ABI to
-`oseo-runtime-m5-49` without changing the graph's orchestration state.
+Fixed native and generated differential evidence at seed `0x60003400` covers
+both specialization policies, forced collection, direct and iterable inputs,
+late `return` lookup, and deliberate shape-guard misses. All 37 paths under the
+node's six inventory roots are reviewed. The common upstream `iterator-helpers`
+feature tag remains unsupported, so the manifest reaches 5,459 cases: 3,141
+passes, 1,355 expected negatives, and 963 unsupported profile features with no
+semantic, harness, or infrastructure failures. The eager helper section below
+records the String iteration and *temporalHelpers.js* prerequisites that leave
+the feature unsupported. The expanded intrinsic table and traced wrapper state
+move the runtime ABI to `oseo-runtime-m5-49` without changing the graph's
+orchestration state.
 
-M5b node `number-intrinsic` materializes the `Number` constructor, its
-branded wrapper objects, standard numeric constants, predicate statics, and
-parser statics. `Number` is also the standard writable, non-enumerable,
-configurable property of the realm's global object. Fixed native and generated
-differential evidence at seed `0x60003500` covers both specialization policies,
-forced collection, string and BigInt conversion, wrapper construction, parser
-prefixes, false numeric hints, and deliberate shape-guard misses. All 172 paths
-under the node's eleven inventory roots are reviewed: 135 pass and 37 retain
-explicit prerequisite boundaries for Number prototype formatting, other
-primitive wrappers and constructors, global numeric aliases, and unavailable
-harness capabilities. Twenty-four previously reviewed cross-family cases also
-become passes because their Number prerequisites are now present. The manifest
-reaches 5,631 cases: 3,300 passes, 1,355 expected negatives, and 976 unsupported
-profile features with no semantic, harness, or infrastructure failures. The
-suite revision, 41,091-path inventory, manifest schema and vocabulary, and
-zero-override policy are unchanged. The expanded intrinsic table, branded
-wrapper state, and Number component move the runtime ABI to
-`oseo-runtime-m5-50` without changing the graph's orchestration state.
+M5b node `number-intrinsic` materializes the `Number` constructor, its branded
+wrapper objects, standard numeric constants, predicate statics, and parser
+statics. `Number` is also the standard writable, non-enumerable, configurable
+property of the realm's global object.
+
+Fixed native and generated differential evidence at seed `0x60003500` covers
+both specialization policies, forced collection, string and BigInt conversion,
+wrapper construction, parser prefixes, false numeric hints, and deliberate
+shape-guard misses. All 172 paths under the node's eleven inventory roots are
+reviewed: 135 pass and 37 retain explicit prerequisite boundaries for Number
+prototype formatting, other primitive wrappers and constructors, global numeric
+aliases, and unavailable harness capabilities. Twenty-four previously reviewed
+cross-family cases also become passes because their Number prerequisites are
+now present. The manifest reaches 5,631 cases: 3,300 passes, 1,355 expected
+negatives, and 976 unsupported profile features with no semantic, harness, or
+infrastructure failures. The expanded intrinsic table, branded wrapper state,
+and Number component move the runtime ABI to `oseo-runtime-m5-50` without
+changing the graph's orchestration state.
 
 M5b node `object-constructor` makes `Object` a callable and constructible
 global intrinsic, adds collector-traced primitive wrappers and String wrapper
 properties, and implements `Object.is`, `Object.getPrototypeOf`, and
-`Object.setPrototypeOf`. Fixed native and generated differential evidence at
-seed `0x60003600` covers both specialization policies, collection forced at
-every safepoint, false hints, guard hits and misses, generic fallback, derived
-construction, primitive wrapping, prototype mutation, and global `Object`
-replacement. All 139 paths under the node's five inventory roots are reviewed:
-76 pass and 63 retain explicit prerequisite boundaries. A further 195
-previously reviewed cases move from unsupported to pass because the real
-`Object` value and its prototype operations satisfy their prerequisites. The
-manifest reaches 5,770 cases: 3,571 passes, 1,355 expected negatives, and 844
-unsupported profile features with no semantic, harness, or infrastructure
-failures. The suite revision, 41,091-path inventory, manifest schema and
-vocabulary, and zero-override policy are unchanged. The public intrinsic table
-and collector-traced wrapper state move the runtime ABI to
-`oseo-runtime-m5-51` without changing the graph's orchestration state.
+`Object.setPrototypeOf`.
+
+Fixed native and generated differential evidence at seed `0x60003600` covers
+both specialization policies, collection forced at every safepoint, false
+hints, guard hits and misses, generic fallback, derived construction, primitive
+wrapping, prototype mutation, and global `Object` replacement. All 139 paths
+under the node's five inventory roots are reviewed: 76 pass and 63 retain
+explicit prerequisite boundaries. A further 195 previously reviewed cases move
+from unsupported to pass because the real `Object` value and its prototype
+operations satisfy their prerequisites. The manifest reaches 5,770 cases: 3,571
+passes, 1,355 expected negatives, and 844 unsupported profile features with no
+semantic, harness, or infrastructure failures. The public intrinsic table and
+collector-traced wrapper state move the runtime ABI to `oseo-runtime-m5-51`
+without changing the graph's orchestration state.
 
 M5b node `object-define-property` admits `Object.defineProperty` over the
 existing property-key and descriptor components. It preserves the specified
-target check, property-key coercion, and descriptor conversion order;
-attribute defaults; data/accessor exclusivity; incompatible-change checks;
-abrupt completion; and ordinary and exotic mutation. Fixed native and
-generated differential evidence at seed `0x60003700` covers both
-specialization policies, collection forced at every safepoint, false hints,
-generic fallback, primitive targets, arrays, functions, arguments aliases,
-String wrappers, symbols, and module namespace descriptor compatibility. The
-reviewed property helper provides the admitted legacy descriptor verifiers, so
-missing harness bindings do not count as profile gaps. All 1,131 paths under
-the node's inventory root are reviewed: 965 pass and 166 retain explicit
-prerequisite boundaries. The manifest reaches 6,901 cases: 4,556 passes, 1,355
-expected negatives, and 990 unsupported profile features with no semantic,
-harness, or infrastructure failures. The suite revision, 41,091-path
-inventory, manifest schema and vocabulary, and zero-override policy are
-unchanged. The completed descriptor checkpoint moves the runtime ABI to
-`oseo-runtime-m5-52` without changing the graph's orchestration state.
+target check, property-key coercion, and descriptor conversion order; attribute
+defaults; data/accessor exclusivity; incompatible-change checks; abrupt
+completion; and ordinary and exotic mutation.
+
+Fixed native and generated differential evidence at seed `0x60003700` covers
+both specialization policies, collection forced at every safepoint, false
+hints, generic fallback, primitive targets, arrays, functions, arguments
+aliases, String wrappers, symbols, and module namespace descriptor
+compatibility. The reviewed property helper provides the admitted legacy
+descriptor verifiers, so missing harness bindings do not count as profile gaps.
+All 1,131 paths under the node's inventory root are reviewed: 965 pass and 166
+retain explicit prerequisite boundaries. The manifest reaches 6,901 cases:
+4,556 passes, 1,355 expected negatives, and 990 unsupported profile features
+with no semantic, harness, or infrastructure failures. The completed descriptor
+checkpoint moves the runtime ABI to `oseo-runtime-m5-52` without changing the
+graph's orchestration state.
+
+Across these nodes, the suite revision, 41,091-path inventory, manifest schema
+and vocabulary, and zero-override policy are unchanged.
 
 M5b node `promise-intrinsic` makes `Promise` a materialized realm value.
 The constructor is an ordinary constructible function bound as the standard
@@ -3614,92 +3634,101 @@ infrastructure failures. The suite revision, 41,091-path inventory, manifest
 schema and vocabulary, and zero-override policy are unchanged. Completing the
 descriptor checkpoint's reporting half moves the runtime ABI to
 `oseo-runtime-m5-54` without changing the graph's orchestration state.
-
 M5b node `array-buffer` materializes `%ArrayBuffer%`. The constructor is an
-ordinary constructible function the global object binds as a writable,
-non-enumerable, configurable property, so calling it without `new` throws a
-`TypeError` and `new ArrayBuffer(length, options)` is ordinary construction.
-The length runs through ToIndex, so a fractional, string, boolean, nullish,
-or `valueOf`-bearing argument becomes its truncated integer and a negative,
-infinite, or beyond-`2^53-1` request throws a `RangeError`. The options bag
-is read only when it is an object, and only its `maxByteLength` property is
-consulted, so a non-object and an absent or `undefined` maximum both produce
-a fixed-length buffer. A present maximum runs through ToIndex as well, its
-getter and its conversion propagate abruptly, and a length above it throws a
-`RangeError` before the new target's `prototype` is read. An instance takes
-its `[[Prototype]]` from that read, so a subclass instance inherits from the
-subclass prototype and a non-object result falls back to
+ordinary constructible function that the global object binds as a writable,
+non-enumerable, configurable property. Calling it without `new` throws a
+`TypeError`, and `new ArrayBuffer(length, options)` is ordinary construction.
+
+The length runs through ToIndex. A fractional, string, boolean, nullish, or
+`valueOf`-bearing argument becomes its truncated integer. A negative, infinite,
+or beyond-`2^53-1` request throws a `RangeError`.
+
+The options bag is read only when it is an object, and only its `maxByteLength`
+property is consulted, so a non-object and an absent or `undefined` maximum
+both produce a fixed-length buffer. A present maximum runs through ToIndex as
+well; its getter and its conversion propagate abruptly, and a length above it
+throws a `RangeError` before the new target's `prototype` is read. An instance
+takes its `[[Prototype]]` from that read, so a subclass instance inherits from
+the subclass prototype and a non-object result falls back to
 `%ArrayBuffer.prototype%`.
 
 `[[ArrayBufferData]]` is one zero-initialized Data Block that exactly one
 buffer owns. A resizable buffer reserves its whole maximum up front, as
-AllocateArrayBuffer specifies, so `resize` moves `[[ArrayBufferByteLength]]`
-inside a block that never moves and clears every byte outside the new length
-in both directions; a later grow therefore exposes zeroes rather than what a
-shrink discarded. `resize` requires the resizability brand before it converts
-its argument and the attached state after it, so an argument whose conversion
-detaches the buffer still observes the specified `TypeError`, and a length
-above the maximum throws a `RangeError`. `transfer` and
-`transferToFixedLength` allocate a second block, copy the overlapping bytes,
-and only then detach the source, so no block is ever reachable from two
-buffers and an allocation failure leaves the source intact. `transfer`
-preserves resizability and its maximum while `transferToFixedLength` reports
-the new length as the maximum; both leave the source detached with a zero
-`byteLength` and a retained resizability brand. `byteLength` and
-`maxByteLength` report `0` once detached, `resizable` keeps reporting the
-brand, and `detached` reports the state itself. All four are getter-only
-accessors that reject a receiver without the brand.
+AllocateArrayBuffer specifies. `resize` moves `[[ArrayBufferByteLength]]`
+inside a block that never moves and clears every byte outside the new length in
+both directions; a later grow exposes zeroes rather than what a shrink
+discarded.
+
+`resize` requires the resizability brand before it converts its argument and
+the attached state after it. An argument whose conversion detaches the buffer
+still observes the specified `TypeError`, and a length above the maximum throws
+a `RangeError`.
+
+`transfer` and `transferToFixedLength` allocate a second block, copy the
+overlapping bytes, and only then detach the source. No block is ever reachable
+from two buffers, and an allocation failure leaves the source intact.
+`transfer` preserves resizability and its maximum, while
+`transferToFixedLength` reports the new length as the maximum. Both leave the
+source detached with a zero `byteLength` and a retained resizability brand.
+
+`byteLength` and `maxByteLength` report `0` once detached, `resizable` keeps
+reporting the brand, and `detached` reports the state itself. All four are
+getter-only accessors that reject a receiver without the brand.
 
 `slice` rejects a detached source, clamps both bounds through
-ToIntegerOrInfinity, and allocates through SpeciesConstructor, so an absent
-`constructor`, a nullish species, a non-object `constructor`, a
-non-constructor species, a species that returns a value that is not an
-ArrayBuffer, one that returns the source, one that returns a detached or
-too-small buffer, and one that detaches the source while it runs each reach
-their specified outcome. At the `array-buffer` checkpoint,
-`ArrayBuffer.isView` was `false` for every admitted value because no value yet
-carried `[[ViewedArrayBuffer]]`; the TypedArray constructor node below extends
-it with that brand. `%ArrayBuffer%` carries the
-`Symbol.species` accessor that reports its receiver, and the prototype
-carries `Symbol.toStringTag`, so `Object.prototype.toString` reports
+ToIntegerOrInfinity, and allocates through SpeciesConstructor. An absent
+`constructor`, a nullish species, a non-object `constructor`, a non-constructor
+species, a species that returns a value that is not an ArrayBuffer, one that
+returns the source, one that returns a detached or too-small buffer, and one
+that detaches the source while it runs each reach their specified outcome.
+
+At the `array-buffer` checkpoint, `ArrayBuffer.isView` was `false` for every
+admitted value because no value yet carried `[[ViewedArrayBuffer]]`; the
+TypedArray constructor node below extends it with that brand. `%ArrayBuffer%`
+carries the `Symbol.species` accessor that reports its receiver, and the
+prototype carries `Symbol.toStringTag`, so `Object.prototype.toString` reports
 `[object ArrayBuffer]`.
 
-Fixed native and generated differential evidence at property seed
-`0x60003a00` covers both specialization policies, collection forced at every
-safepoint, false hints, deliberate shape-guard misses, generic fallback,
-fixed and resizable allocation, every ToIndex conversion class, the option
-bag's abrupt orders, brand rejection over five receiver kinds, resize in both
-directions, both transfers over eight source and target shapes, fifteen slice
-ranges, ten species outcomes, and a collection-pressure loop that discards
-sixty-four buffers around a survivor and a transferred store. Both native
-execution targets compile the runtime under the address and undefined-behavior
-sanitizers, so the ownership rules above execute under them. Byte contents
-were unobservable from ECMAScript at that checkpoint, so its zeroing and
-copying evidence was structural and sanitizer-based. The TypedArray evidence
-below subsequently observes those bytes through a view.
+Fixed native and generated differential evidence at property seed `0x60003a00`
+covers both specialization policies, collection forced at every safepoint,
+false hints, deliberate shape-guard misses, generic fallback, fixed and
+resizable allocation, every ToIndex conversion class, and the option bag's
+abrupt orders. It also covers brand rejection over five receiver kinds, resize
+in both directions, both transfers over eight source and target shapes, fifteen
+slice ranges, ten species outcomes, and a collection-pressure loop that
+discards sixty-four buffers around a survivor and a transferred store.
+
+Both native execution targets compile the runtime under the address and
+undefined-behavior sanitizers, so the ownership rules above execute under them.
+Byte contents were unobservable from ECMAScript at that checkpoint, so its
+zeroing and copying evidence was structural and sanitizer-based. The TypedArray
+evidence below observes those bytes through a view.
 
 At the original M5b admission, all 192 paths under the node's inventory root
-were reviewed: 128 pass and
-64 record explicit prerequisites. Twenty-four reach an unadmitted standard
-global at compile time, twelve need `Reflect.construct`, nine need
-`SharedArrayBuffer`, ten need `DataView`, four need a TypedArray constructor,
-four need `Object.isExtensible`, and one needs `Reflect` with a second realm.
-The reviewed feature list gains `ArrayBuffer`,
-`align-detached-buffer-semantics-with-web-reality`, `arraybuffer-transfer`,
-and `resizable-arraybuffer`, and the reviewed dependency vocabulary gains
-`array-buffer`. The reviewed harness gains `detachArrayBuffer.js`, which
-performs the detach its `$262` hook would through the admitted
-`transferToFixedLength`, and records `resizableArrayBufferUtils.js` as
-unavailable because it builds every TypedArray constructor at load time; the
-five reviewed cases that include it keep their existing
-`unsupported-profile-feature` classification and record that harness reason
-instead of the feature they now share with this node. The manifest reaches
-7,613 cases: 5,038 passes, 1,355 expected negatives, and 1,220 unsupported
-profile features with no semantic, harness, or infrastructure failures. The
-suite revision, 41,091-path inventory, manifest schema and vocabulary, and
-zero-override policy are otherwise unchanged. The new component and its heap
-kind move the runtime ABI to `oseo-runtime-m5-55` without a public layout
-change and without changing the graph's orchestration state.
+were reviewed: 128 pass and 64 record explicit prerequisites. Of those 64,
+twenty-four reach an unadmitted standard global at compile time, twelve need
+`Reflect.construct`, nine need `SharedArrayBuffer`, ten need `DataView`, four
+need a TypedArray constructor, four need `Object.isExtensible`, and one needs
+`Reflect` with a second realm.
+
+The reviewed feature list includes `ArrayBuffer`,
+`align-detached-buffer-semantics-with-web-reality`, `arraybuffer-transfer`, and
+`resizable-arraybuffer`; the reviewed dependency vocabulary includes
+`array-buffer`.
+
+The reviewed harness includes `detachArrayBuffer.js`, which performs the detach
+its `$262` hook would through the admitted `transferToFixedLength`. It records
+`resizableArrayBufferUtils.js` as unavailable because it builds every
+TypedArray constructor at load time. The five reviewed cases that include it
+keep their existing `unsupported-profile-feature` classification and record
+that harness reason instead of the feature they now share with this node.
+
+The manifest contains 7,613 cases: 5,038 passes, 1,355 expected negatives, and
+1,220 unsupported profile features. The suite revision, 41,091-path inventory,
+manifest schema and vocabulary, and zero-override policy are otherwise
+unchanged. The new component and its heap kind move the runtime ABI to
+`oseo-runtime-m5-55` without a public layout change and without changing the
+graph's orchestration state.
 
 M5b node `object-integrity-levels` gives every object an extensibility state
 that the six admitted Object integrity statics expose. `preventExtensions`
@@ -3718,25 +3747,27 @@ properties remain writable, while freezing it severs that alias when the
 descriptor becomes non-writable. Prototype mutation and new own-property
 definition fail once extensibility has been cleared.
 
-Fixed native and generated differential evidence at property seed
-`0x60003c00` covers both specialization policies, collection forced at every
-safepoint, false hints, deliberate shape-guard hits and misses, generic
-fallback, all three transitions and queries, data and accessor descriptors,
-ordinary objects, arrays, functions, arguments aliases, String wrappers,
-primitive inputs, and collection pressure. All 317 paths under the node's six
-inventory roots were reviewed. Of those paths, 314 enter the manifest: 206
-pass and 108 retain explicit prerequisites for unadmitted standard globals,
-`Proxy`, `Reflect`, TypedArrays, SharedArrayBuffer, DataView, host objects,
-private fields, and dynamic source. The remaining three seal function kinds
-by constructing new source through the `Function` constructor and stay
-outside the reviewed subset under ADR 0016. Nineteen previously reviewed
-cross-family cases also become passes because the admitted extensibility state
-satisfies their prerequisite. The manifest reaches 7,927 cases: 5,263 passes,
-1,355 expected negatives, and 1,309 unsupported profile features with no
-semantic, harness, or infrastructure failures. The suite revision,
-41,091-path inventory, manifest schema and vocabulary, and zero-override
-policy are unchanged. The runtime ABI moves to `oseo-runtime-m5-56` without
-changing the graph's orchestration state.
+Fixed native and generated differential evidence at property seed `0x60003c00`
+covers both specialization policies, collection forced at every safepoint,
+false hints, deliberate shape-guard hits and misses, generic fallback, all
+three transitions and queries, data and accessor descriptors, ordinary objects,
+arrays, functions, arguments aliases, String wrappers, primitive inputs, and
+collection pressure.
+
+All 317 paths under the node's six inventory roots were reviewed. Of those
+paths, 314 enter the manifest: 206 pass and 108 retain explicit prerequisites
+for unadmitted standard globals, `Proxy`, `Reflect`, TypedArrays,
+SharedArrayBuffer, DataView, host objects, private fields, and dynamic source.
+The remaining three seal function kinds by constructing new source through the
+`Function` constructor and stay outside the reviewed subset under ADR 0016.
+Nineteen previously reviewed cross-family cases also pass because the admitted
+extensibility state satisfies their prerequisite.
+
+The manifest contains 7,927 cases: 5,263 passes, 1,355 expected negatives, and
+1,309 unsupported profile features. The suite revision, 41,091-path inventory,
+manifest schema and vocabulary, and zero-override policy are unchanged. The
+runtime ABI moves to `oseo-runtime-m5-56` without changing the graph's
+orchestration state.
 
 ### Standard global value properties and declarations
 
@@ -3852,227 +3883,216 @@ extended candidate CI; affected post-observation review remains pending.
 
 ### Object.defineProperties descriptor collection
 
-M5b node `object-define-properties` admits `Object.defineProperties` over
-the property-key, descriptor, and own-key components the descriptor
-checkpoint already landed. The target check precedes every read of the
-properties argument, so a primitive target throws before a poisoned
-properties getter can run. ToObject then precedes the own-key walk, so a
-nullish properties argument throws and a primitive is read through the
-wrapper it converts to, including a String wrapper's index properties. The
-walk keeps the own enumerable keys in ordinary own-key order: integer
-indices lead in ascending numeric order, string keys follow in creation
-order, and symbol keys trail. Each kept key's descriptor is read with Get,
-so an accessor on the properties object runs and a deleted or
-no-longer-enumerable key is skipped, and each read descriptor converts
-through the one ToPropertyDescriptor body `Object.defineProperty` shares,
-observing `enumerable`, `configurable`, `value`, `writable`, `get`, and
-`set` in that order with the specified callable and exclusivity checks.
+M5b node `object-define-properties` admits `Object.defineProperties` over the
+property-key, descriptor, and own-key components the descriptor checkpoint
+already landed. Before any read of the properties argument, it checks the
+target, so a primitive target throws before a poisoned properties getter can
+run. ToObject precedes the own-key walk, so a nullish properties argument
+throws, and a primitive is read through the wrapper it converts to, including a
+String wrapper's index properties.
+
+The walk keeps own enumerable keys in ordinary own-key order: integer indices
+in ascending numeric order, then string keys in creation order, then symbol
+keys. It reads each kept key's descriptor with Get, so an accessor on the
+properties object runs, and a deleted or no-longer-enumerable key is skipped.
+Each descriptor converts through the same ToPropertyDescriptor body that
+`Object.defineProperty` uses, observing `enumerable`, `configurable`, `value`,
+`writable`, `get`, and `set` in that order with the specified callable and
+exclusivity checks.
 
 The whole collection pass completes before the first definition mutates the
-target. An abrupt completion while collecting, including a non-object
-descriptor value, an abrupt field read, an accessor field that is neither
-undefined nor callable, and a descriptor mixing accessor and data fields,
-therefore leaves the target untouched. The collected descriptors then apply
-in own-key order through the shared DefinePropertyOrThrow body, so an
-incompatible redefinition throws a `TypeError` that keeps every earlier
-definition and stops every later one. Ordinary objects, arrays and their
-`length`, functions and their `prototype`, mapped arguments aliases, String
-wrappers, symbol keys, and module namespace compatibility all behave as the
-descriptor component already specifies, and a module namespace works as the
-properties argument with its exports read through their binding cells.
+target. An abrupt completion while collecting leaves the target untouched. This
+covers a non-object descriptor value, an abrupt field read, an accessor field
+that is neither undefined nor callable, and a descriptor that mixes accessor
+and data fields.
 
-Fixed native and generated differential evidence at property seed
-`0x60003e00` covers both specialization policies, collection forced at every
-safepoint, false hints, deliberate shape-guard misses, generic fallback,
-one to three colliding integer and string keys in every literal order,
+The collected descriptors then apply in own-key order through the shared
+DefinePropertyOrThrow body. An incompatible redefinition throws a `TypeError`
+that keeps every earlier definition and stops every later one. Ordinary
+objects, arrays and their `length`, functions and their `prototype`, mapped
+arguments aliases, String wrappers, symbol keys, and module namespace
+compatibility all behave as the descriptor component already specifies. A
+module namespace also works as the properties argument, with its exports read
+through their binding cells.
+
+Fixed native and generated differential evidence at property seed `0x60003e00`
+covers both specialization policies, collection forced at every safepoint,
+false hints, deliberate shape-guard misses, and generic fallback. It also
+covers one to three colliding integer and string keys in every literal order,
 every independently optional descriptor field, abrupt getters, mixed and
 non-object descriptors at each collection position, namespace sources and
-targets, and a collection-pressure loop over twenty-four definitions. All
-632 paths under the node's inventory root are reviewed: 540 pass and 92
-retain explicit prerequisite boundaries for the unadmitted `Array`,
-`Boolean`, `Date`, `JSON`, `Math`, `RegExp`, and `String` globals, `Proxy`,
-and the `Reflect.construct` the constructor-check harness needs. The
-manifest reaches 8,617 cases: 5,828 passes, 1,364 expected negatives, and
-1,425 unsupported profile features with no semantic, harness, or
-infrastructure failures. The suite revision, 41,091-path inventory,
-manifest schema and vocabulary, and zero-override policy are unchanged. The
-completed collection checkpoint moves the runtime ABI to `oseo-runtime-m5-60`
-without changing the graph's orchestration state.
+targets, and a collection-pressure loop over twenty-four definitions.
+
+All 632 paths under the node's inventory root are reviewed; 92 retain explicit
+prerequisite boundaries for the unadmitted `Array`, `Boolean`, `Date`, `JSON`,
+`Math`, `RegExp`, and `String` globals, `Proxy`, and the `Reflect.construct`
+the constructor-check harness needs.
 
 M5b node `array-constructor` makes `Array` a replaceable intrinsic value and
 completes its realm cluster with length-argument construction,
 `Symbol.species`, `from`, `of`, and `isArray`. Fixed native and generated
 differential evidence at seed `0x60003f00` covers generic constructor
-receivers, iterator closing, descriptors, both specialization policies,
-forced collection, false hints, and a deliberate shape-guard miss. Of the 176
-paths in the node inventory, 174 are reviewed: 145 pass and 29 retain explicit
-prerequisite boundaries. The two omitted paths require later `map` and
+receivers, iterator closing, descriptors, both specialization policies, forced
+collection, false hints, and a deliberate shape-guard miss.
+
+Of the 176 paths in the node inventory, 174 are reviewed; 29 of those retain
+explicit prerequisite boundaries. The two omitted paths require later `map` and
 `splice` semantics; the fixed and generated `Array.from` suites replace their
 construction and mutation observations. One hundred forty existing dependency
-cases also move from unsupported to pass. The manifest reaches 8,791 cases:
-6,113 passes, 1,364 expected negatives, and 1,314 unsupported profile features
-with
-no semantic, harness, or infrastructure failures. The suite revision,
-41,091-path inventory, manifest schema and vocabulary, and zero-override policy
-are unchanged. The public intrinsic table moves the runtime ABI to
-`oseo-runtime-m5-61` without changing the graph's orchestration state.
+cases now pass instead of being unsupported.
 
 M5b node `string-intrinsic` makes `String` a materialized realm value. The
 constructor is an ordinary constructible function bound as the standard
 writable, non-enumerable, configurable property of the global object, so
 `new String` is ordinary construction and every static is an ordinary method
 call. Calling `String` converts through the shared `ToString`, except that a
-Symbol argument renders SymbolDescriptiveString instead of throwing;
-constructing it brands the receiver the new target produced with
-`[[StringData]]`, so a subclass keeps its own prototype. A String exotic
-object carries one non-writable, non-configurable, enumerable own property
-per UTF-16 code unit and a non-writable, non-enumerable, non-configurable
-`length`, and %String.prototype% is itself such an object over the empty
-String, so `Object.prototype.toString` reports `[object String]` for either.
-Sixteen selected ES5-era methods are materialized as ordinary boundary
-functions with their specified descriptors. Calling one still reports the
-owned unadmitted-method boundary until its String prototype node lands.
-`String.fromCharCode` truncates each converted argument with `ToUint16` in
-argument order; `String.fromCodePoint` rejects a non-integral, negative, or
-above-`0x10FFFF` code point with a `RangeError` at the argument that produced
-it and encodes an astral code point as a surrogate pair, while a lone
-surrogate stays exactly the code unit it names; and `String.raw` follows the
-specified order of `ToObject`, the `raw` read, LengthOfArrayLike, and the
-alternating literal and substitution conversions. Fixed native
-and generated differential evidence at seed `0x60004000` covers both
-specialization policies, collection forced at every safepoint, false hints,
-deliberate shape-guard misses, generic fallback, lone surrogates, astral code
-points, coercion order, and global `String` replacement and deletion. The
-reviewed subset admits the `String.fromCodePoint` feature tag so that static
-executes its upstream cases instead of reporting an unadmitted feature. Of
-the 150 paths under the node's four inventory roots, 145 are reviewed: 114
-pass and 31 retain explicit prerequisite boundaries. The remaining five call
-the materialized `String.prototype.charCodeAt` boundary, whose behavior no
-admitted prototype-method node implements yet.
-Ninety-four previously reviewed cases also move from unsupported to pass
-because a real `String` value and the descriptor-complete boundary for those
-methods satisfy their prerequisites. The manifest reaches 8,936 cases: 6,321
-passes, 1,364 expected negatives, and 1,251 unsupported profile features with
-no semantic, harness, or infrastructure failures. The suite revision,
-41,091-path inventory, manifest schema and vocabulary, and zero-override policy
-are unchanged. The materialized constructor adds no generated-code entry point
-and moves the runtime ABI to `oseo-runtime-m5-62` without changing the graph's
-orchestration state.
+Symbol argument renders SymbolDescriptiveString instead of throwing.
+Constructing it brands the receiver the new target produced with
+`[[StringData]]`, so a subclass keeps its own prototype.
 
-M5b node `string-prototype-access` implements the materialized prototype's
-`at`, `charAt`, `charCodeAt`, `codePointAt`, `toString`, and `valueOf`
-functions while preserving its existing `constructor` link. The four access
-methods first reject a nullish receiver, convert every other receiver with
-the shared `ToString`, and then apply `ToIntegerOrInfinity` to the position.
-`at` permits a negative position relative to the UTF-16 code-unit length;
-`charAt` and `charCodeAt` return the specified empty String and `NaN`
-out-of-range results; and `codePointAt` combines only a leading and trailing
-surrogate at the selected position. `toString` and `valueOf` accept only a
-String primitive or an object carrying `[[StringData]]`, including
-`%String.prototype%` itself, and reject every other receiver with a
-`TypeError`. The other fourteen materialized String prototype methods retain
-their source-located M5b boundary.
+A String exotic object carries one non-writable, non-configurable, enumerable
+own property per UTF-16 code unit and a non-writable, non-enumerable,
+non-configurable `length`. %String.prototype% is itself such an object over the
+empty String, so `Object.prototype.toString` reports `[object String]` for
+either.
+
+Sixteen selected ES5-era methods are materialized as ordinary boundary
+functions with their specified descriptors. Calling one still reports the owned
+unadmitted-method boundary until its String prototype node lands.
+`String.fromCharCode` truncates each converted argument with `ToUint16` in
+argument order. `String.fromCodePoint` rejects a non-integral, negative, or
+above-`0x10FFFF` code point with a `RangeError` at the argument that produced
+it, and encodes an astral code point as a surrogate pair; a lone surrogate
+stays exactly the code unit it names. `String.raw` follows the specified order
+of `ToObject`, the `raw` read, LengthOfArrayLike, and the alternating literal
+and substitution conversions.
+
+Fixed native and generated differential evidence at seed `0x60004000` covers
+both specialization policies, collection forced at every safepoint, false
+hints, deliberate shape-guard misses, generic fallback, lone surrogates, astral
+code points, coercion order, and global `String` replacement and deletion. The
+reviewed subset admits the `String.fromCodePoint` feature tag so that static
+executes its upstream cases instead of reporting an unadmitted feature.
+
+Of the 150 paths under the node's four inventory roots, 145 are reviewed; 31 of
+those retain explicit prerequisite boundaries. The five remaining paths call
+the materialized `String.prototype.charCodeAt` boundary, whose behavior no
+admitted prototype-method node implements yet. Ninety-four previously reviewed
+cases now pass because a real `String` value and the descriptor-complete
+boundary for those methods satisfy their prerequisites.
+
+The manifest now reaches 8,936 cases: 6,321 passes, 1,364 expected negatives,
+and 1,251 unsupported profile features, with no semantic, harness, or
+infrastructure failures. The suite revision, 41,091-path inventory, manifest
+schema and vocabulary, and zero-override policy are unchanged. The materialized
+constructor adds no generated-code entry point. The runtime ABI is now
+`oseo-runtime-m5-62`, and the graph's orchestration state is unchanged. M5b
+node `string-prototype-access` implements the materialized prototype's `at`,
+`charAt`, `charCodeAt`, `codePointAt`, `toString`, and `valueOf` functions
+while preserving its existing `constructor` link.
+
+The four access methods first reject a nullish receiver, convert every other
+receiver with the shared `ToString`, and then apply `ToIntegerOrInfinity` to
+the position. `at` permits a negative position relative to the UTF-16
+code-unit length. `charAt` and `charCodeAt` return the specified empty String
+and `NaN` out-of-range results, and `codePointAt` combines only a leading and
+trailing surrogate at the selected position.
+
+`toString` and `valueOf` accept only a String primitive or an object carrying
+`[[StringData]]`, including `%String.prototype%` itself, and reject every
+other receiver with a `TypeError`. The other fourteen materialized String
+prototype methods retain their source-located M5b boundary.
 
 Fixed native and generated differential evidence at seed `0x60004100` covers
 primitive and generic receivers, branded wrappers, UTF-16 edge cases,
-conversion order, abrupt conversions, both specialization policies, forced
-collection at every safepoint, false hints, deliberate shape-guard misses,
-and generic fallback. All 105 paths under the node's inventory roots are
-reviewed: 89 pass and 16 retain explicit prerequisite boundaries for dynamic
-source, realms, unadmitted built-in constructors, constructor detection, or
-later String methods. Thirty-two previously reviewed dependency cases also
-move from unsupported to pass. The manifest reaches 9,041 cases: 6,442 passes,
-1,364 expected negatives, and 1,235 unsupported profile features with no
-semantic, harness, or infrastructure failures. The suite revision,
-41,091-path inventory, manifest schema and vocabulary, and zero-override
-policy are unchanged. The admitted runtime checkpoint moves the runtime ABI
-to `oseo-runtime-m5-63` without adding a generated-code entry point or changing
-the graph's orchestration state.
+conversion order, and abrupt conversions. It also covers both specialization
+policies, forced collection at every safepoint, false hints, deliberate
+shape-guard misses, and generic fallback. All 105 paths under the node's
+inventory roots are reviewed: 89 pass and 16 retain explicit prerequisite
+boundaries for dynamic source, realms, unadmitted built-in constructors,
+constructor detection, or later String methods.
 
 M5b node `array-prototype-iterative` implements ordinary `every`, `forEach`,
-and `some` functions on the realm-owned `%Array.prototype%`. Each method first
-converts its receiver and snapshots LengthOfArrayLike, then validates the
-callback before visiting the initial index range. A visit performs HasProperty
-and Get at that moment, so holes are skipped, inherited and newly created
-properties are observed, deleted properties are omitted, and appended indices
-outside the snapshot remain unvisited. The callback receives the value, index,
-and converted receiver with the supplied `thisArg`. `every` and `some` stop at
-the first decisive callback result; `forEach` ignores that result and returns
-`undefined`.
+and `some` functions on the realm-owned `%Array.prototype%`.
+
+Each method first converts its receiver and snapshots LengthOfArrayLike, then
+validates the callback before visiting the initial index range. A visit
+performs HasProperty and Get at that moment, so holes are skipped, inherited
+and newly created properties are observed, deleted properties are omitted,
+and appended indices outside the snapshot remain unvisited. The callback
+receives the value, index, and converted receiver with the supplied `thisArg`.
+`every` and `some` stop at the first decisive callback result; `forEach`
+ignores that result and returns `undefined`.
 
 Fixed native and generated differential evidence at seed `0x60004200` covers
 sparse arrays, inherited entries, ordinary array-like and primitive receivers,
-callback order, early and abrupt completion, mutation during iteration, both
-specialization policies, forced collection at every safepoint, false hints,
-deliberate shape-guard misses, and generic fallback. Of the 627 paths under the
-node's inventory roots, 615 are reviewed: 541 pass and 74 retain explicit
-prerequisite boundaries. Twelve resizable-buffer cases remain outside the
-subset for unreviewed TypedArray or harness support. Static array elements now
-use CreateDataProperty, so an own element overrides an inherited accessor
-before an iterative method retrieves it. The manifest reaches 9,656 cases:
-6,983 passes, 1,364 expected negatives, and 1,309 unsupported profile features
-with no semantic, harness, or infrastructure failures. The suite revision,
-41,091-path inventory, manifest schema and vocabulary, and zero-override policy
-are unchanged. The admitted runtime checkpoint moves the runtime ABI to
-`oseo-runtime-m5-64` without adding a generated-code entry point or changing
-the graph's orchestration state.
+callback order, early and abrupt completion, and mutation during iteration.
+It also covers both specialization policies, forced collection at every
+safepoint, false hints, deliberate shape-guard misses, and generic fallback.
+Of the 627 paths under the node's inventory roots, 615 are reviewed: 541 pass
+and 74 retain explicit prerequisite boundaries. Twelve resizable-buffer cases
+remain outside the subset for unreviewed TypedArray or harness support. Static
+array elements now use CreateDataProperty, so an own element overrides an
+inherited accessor before an iterative method retrieves it.
 
 M5b node `string-prototype-search-and-slice` implements the materialized
 prototype's `concat`, `indexOf`, `lastIndexOf`, `includes`, `startsWith`,
-`endsWith`, `slice`, and `substring` functions. All eight first reject a
-nullish receiver and then convert every other receiver through the shared
-`ToString`. `concat` converts each argument in order. The search methods
-convert the search value before the position, while `includes`, `startsWith`,
-and `endsWith` first apply `IsRegExp` and reject a true `@@match` result.
-Matching uses UTF-16 code units. `indexOf`, `includes`, and `startsWith`
-default their position to zero; `lastIndexOf` treats an omitted or `NaN`
-position as positive infinity; and `endsWith` defaults its end position to
-the subject length. Each position is converted and clamped before matching.
-`slice` applies relative negative indices and an empty result for reversed
-bounds, while `substring` clamps negative bounds to zero and swaps reversed
-endpoints. The other ten materialized String prototype methods retain their
-source-located M5b boundary.
+`endsWith`, `slice`, and `substring` functions.
+
+All eight first reject a nullish receiver and then convert every other
+receiver through the shared `ToString`. `concat` converts each argument in
+order. The search methods convert the search value before the position, while
+`includes`, `startsWith`, and `endsWith` first apply `IsRegExp` and reject a
+true `@@match` result. Matching uses UTF-16 code units.
+
+`indexOf`, `includes`, and `startsWith` default their position to zero;
+`lastIndexOf` treats an omitted or `NaN` position as positive infinity; and
+`endsWith` defaults its end position to the subject length. Each position is
+converted and clamped before matching. `slice` applies relative negative
+indices and an empty result for reversed bounds, while `substring` clamps
+negative bounds to zero and swaps reversed endpoints. The other ten
+materialized String prototype methods retain their source-located M5b
+boundary.
 
 Fixed native and generated differential evidence at seed `0x60004300` covers
 primitive and generic receivers, `@@match`, conversion order, abrupt
-conversions, empty searches, UTF-16 edge cases, both specialization policies,
-forced collection at every safepoint, false hints, deliberate shape-guard
-misses, and generic fallback. All 253 paths under the node's inventory roots
-are reviewed: 217 pass and 36 retain explicit prerequisite boundaries for
-dynamic source, realms, unadmitted built-in constructors, constructor
-detection, or RegExp objects. Six previously reviewed dependency cases also
-move from unsupported to pass. The manifest reaches 9,909 cases: 7,206 passes,
-1,364 expected negatives, and 1,339 unsupported profile features with no
-semantic, harness, or infrastructure failures. The suite revision,
-41,091-path inventory, manifest schema and vocabulary, and zero-override
-policy are unchanged. The admitted runtime checkpoint moves the runtime ABI
-to `oseo-runtime-m5-65` without adding a generated-code entry point or changing
-the graph's orchestration state.
+conversions, empty searches, and UTF-16 edge cases. It also covers both
+specialization policies, forced collection at every safepoint, false hints,
+deliberate shape-guard misses, and generic fallback. All 253 paths under the
+node's inventory roots are reviewed: 217 pass and 36 retain explicit
+prerequisite boundaries for dynamic source, realms, unadmitted built-in
+constructors, constructor detection, or RegExp objects.
+
+The manifest records 9,909 cases: 7,206 passes, 1,364 expected negatives, and
+1,339 unsupported profile features, with no semantic, harness, or
+infrastructure failures. The suite revision, 41,091-path inventory, manifest
+schema and vocabulary, and zero-override policy remain unchanged across the
+three checkpoints. The admitted runtime checkpoints set the ABI to
+`oseo-runtime-m5-63` for `string-prototype-access`, `oseo-runtime-m5-64` for
+`array-prototype-iterative`, and `oseo-runtime-m5-65` for
+`string-prototype-search-and-slice`. None adds a generated-code entry point,
+and the graph's orchestration state is unchanged.
 
 M5b node `array-prototype-species-mapping` implements ordinary `map` and
-`filter` functions on the realm-owned `%Array.prototype%`. Each method first
-converts its receiver, snapshots LengthOfArrayLike, and validates the callback
-before calling ArraySpeciesCreate. For an Array receiver, that operation reads
-`constructor` and, when the result is an object, reads `Symbol.species`.
-Missing, `undefined`, and `null` species use the realm Array; a custom
-constructor receives the requested result length; and a non-constructor or
-abrupt read throws. A non-Array receiver uses the realm Array without either
-observable read. Both methods retain the shared HasProperty and Get visit
-semantics. `map` creates at the snapshot length and preserves holes, while
-`filter` creates at length zero and compacts accepted values in visit order.
+`filter` functions on the realm-owned `%Array.prototype%`.
 
+Each method first converts its receiver, snapshots LengthOfArrayLike, and
+validates the callback before calling ArraySpeciesCreate. For an Array
+receiver, that operation reads `constructor` and, when the result is an
+object, reads `Symbol.species`. Missing, `undefined`, and `null` species use
+the realm Array; a custom constructor receives the requested result length;
+and a non-constructor or abrupt read throws. A non-Array receiver uses the
+realm Array without either observable read.
+
+Both methods retain the shared HasProperty and Get visit semantics. `map`
+creates at the snapshot length and preserves holes, while `filter` creates at
+length zero and compacts accepted values in visit order.
 Fixed native and generated differential evidence at seed `0x60004400` covers
-sparse and generic receivers, default and custom species, observable and
-abrupt reads, mutation during iteration, both specialization policies, forced
+sparse and generic receivers, default and custom species, observable and abrupt
+reads, mutation during iteration, both specialization policies, forced
 collection at every safepoint, false hints, deliberate shape-guard misses, and
 generic fallback. All 458 paths under the node's inventory roots are reviewed:
-390 pass and 68 retain explicit prerequisite boundaries. The manifest reaches
-10,367 cases: 7,596 passes, 1,364 expected negatives, and 1,407 unsupported
-profile features with no semantic, harness, or infrastructure failures. The
-suite revision, 41,091-path inventory, manifest schema and vocabulary, and
-zero-override policy are unchanged. The admitted runtime checkpoint moves the
-runtime ABI to `oseo-runtime-m5-66` without adding a generated-code entry point
-or changing the graph's orchestration state.
+390 pass and 68 retain explicit prerequisite boundaries.
 
 M5b node `promise-all-and-race` completes both combinators over the
 materialized constructor. Each static builds NewPromiseCapability from its
@@ -4081,50 +4101,45 @@ iterator, and calls the captured method with the constructor as receiver for
 every iterated value. `Promise.all` gives every index one guarded fulfillment
 closure, shares the capability rejection function, and resolves its result in
 input order. `Promise.race` shares both capability settlement functions and
-leaves an empty input pending. Its outer abrupt paths use the same
-first-settlement guard, so a thenable assimilation job queued by the first
-resolution wins over a later `then` getter or iterator-step throw. An abrupt
-resolve call, `then` getter, or `then` call closes an unfinished iterator before
-rejection and preserves the original throw over an abrupt `return`; an abrupt
-iterator step or value read marks the iterator done and does not close it.
-`Promise.all` creates own result data properties without invoking inherited
-indexed setters. A subclass owns the aggregate promise independently of the
-species constructor that a later `then` selects.
+leaves an empty input pending.
+
+Its outer abrupt paths use the same first-settlement guard, so a thenable
+assimilation job queued by the first resolution wins over a later `then` getter
+or iterator-step throw. An abrupt resolve call, `then` getter, or `then` call
+closes an unfinished iterator before rejection and preserves the original throw
+over an abrupt `return`; an abrupt iterator step or value read marks the
+iterator done and does not close it. `Promise.all` creates own result data
+properties without invoking inherited indexed setters. A subclass owns the
+aggregate promise independently of the species constructor that a later `then`
+selects.
 
 Fixed native and generated differential evidence at seeds `0x60004500` and
-`0x60004501` covers
-empty, sparse, array, and custom iterable inputs, bounded thenable schedules,
-both specialization policies, collection forced at every safepoint, false
-hints, deliberate guard misses, generic fallback, and observable constructor,
-resolve, iterator, and species operations, including first settlement before
-later abrupt completion and inherited indexed setters. The reviewed
-*promiseHelper.js*
-harness executes all 16 scheduling cases that use it. Of the 192 paths under
-the node's two inventory roots, 190 are reviewed: 173 pass and 17 retain
-explicit prerequisite boundaries for the unhandled-rejection host policy,
-`eval`, other profile syntax, `Object.getOwnPropertyNames`, or
-`Reflect.construct`. The two remaining paths require string iteration and stay
-with the separate `string-iterator` node; fixed and generated evidence covers
-the combinators' empty-input contracts. The manifest reaches 10,548 cases:
-7,760 passes, 1,364 expected negatives, and 1,424 unsupported profile features
-with no semantic, harness, or infrastructure failures. The suite revision,
-41,091-path inventory, manifest schema and vocabulary, and zero-override policy
-are unchanged. The admitted runtime checkpoint moves the runtime ABI to
-`oseo-runtime-m5-67` without adding a generated-code entry point or changing
-the graph's orchestration state.
+`0x60004501` covers empty, sparse, array, and custom iterable inputs, bounded
+thenable schedules, both specialization policies, collection forced at every
+safepoint, false hints, deliberate guard misses, generic fallback, and
+observable constructor, resolve, iterator, and species operations, including
+first settlement before later abrupt completion and inherited indexed setters.
+The reviewed *promiseHelper.js* harness executes all 16 scheduling cases that
+use it. Of the 192 paths under the node's two inventory roots, 190 are
+reviewed: 173 pass and 17 retain explicit prerequisite boundaries for the
+unhandled-rejection host policy, `eval`, other profile syntax,
+`Object.getOwnPropertyNames`, or `Reflect.construct`. The two remaining paths
+require string iteration and stay with the separate `string-iterator` node;
+fixed and generated evidence covers the combinators' empty-input contracts.
 
 M5b node `string-prototype-match-and-split` implements the materialized
 prototype's `match`, `matchAll`, `search`, and `split` functions. An object
 operand first receives the applicable `Symbol.match`, `Symbol.matchAll`,
 `Symbol.search`, or `Symbol.split` lookup. A callable method receives the
 original receiver and, for `split`, the original limit. A nullish method,
-primitive operand, or missing operand takes the fallback. `matchAll` first
-applies `IsRegExp` through `@@match`, requires a global `flags` value for a
-true result, and returns an iterator over nonoverlapping admitted matches.
-`match` and `search` report the first admitted match, including match index,
-input, and groups metadata. `split` preserves receiver, limit, and separator
-conversion order, `ToUint32` limits, empty separators, empty subjects, and
-the specified zero-limit behavior.
+primitive operand, or missing operand takes the fallback.
+
+`matchAll` first applies `IsRegExp` through `@@match`, requires a global
+`flags` value for a true result, and returns an iterator over nonoverlapping
+admitted matches. `match` and `search` report the first admitted match,
+including match index, input, and groups metadata. `split` preserves receiver,
+limit, and separator conversion order, `ToUint32` limits, empty separators,
+empty subjects, and the specified zero-limit behavior.
 
 The RegExp fallback admits fixed-width literal, dot, escaped syntax, control,
 hexadecimal, Unicode, digit, word, and whitespace atoms. Quantifiers,
@@ -4139,50 +4154,53 @@ empty-match advancement. Mutating the Array iterator prototype cannot change
 its steps.
 
 Fixed native and generated differential evidence at seeds `0x60004600` and
-`0x60004601` covers
-primitive, wrapper, and generic receivers, all four symbol dispatches, null
-protocol methods, match metadata and iteration, empty matches and separators,
-both specialization policies, forced collection at every safepoint, false
-hints, deliberate shape-guard misses, and generic fallback. All 239 paths under
-the node's inventory roots are reviewed: 130 pass and 109 retain
-explicit prerequisite boundaries for RegExp syntax and objects, dynamic
+`0x60004601` covers primitive, wrapper, and generic receivers, all four symbol
+dispatches, null protocol methods, match metadata and iteration, empty matches
+and separators, both specialization policies, forced collection at every
+safepoint, false hints, deliberate shape-guard misses, and generic fallback.
+All 239 paths under the node's inventory roots are reviewed: 130 pass and 109
+retain explicit prerequisite boundaries for RegExp syntax and objects, dynamic
 source, realms, or unadmitted built-ins. The two null-method cases that
-dynamically produce the RegExp pattern `\d` were outside the subset in the
-previous checkpoint. Both now pass with fixed and generated replacement
-evidence. The combined manifest reaches 10,787 cases: 7,890 passes, 1,364
-expected negatives, and 1,533 unsupported profile features with no semantic,
-harness, or infrastructure failures. The suite
-revision, 41,091-path inventory, manifest schema and vocabulary, and
-zero-override policy are unchanged. The admitted runtime checkpoint moves the
-runtime ABI to `oseo-runtime-m5-68` without adding a generated-code entry
-point or changing the graph's orchestration state.
+dynamically produce the RegExp pattern `\d` pass with fixed and generated
+replacement evidence.
 
-M5b node `array-prototype-copying` implements ordinary `concat`, `flat`,
-`flatMap`, `join`, `slice`, `toLocaleString`, and `toString` functions on the
-realm-owned `%Array.prototype%`. Each method converts its receiver before its
-later method-specific work, and each copying or stringification loop obtains
-LengthOfArrayLike at its specified point. Sparse copying uses HasProperty
-before Get, while `join` and `toLocaleString` retrieve every index and render
-nullish values as empty fields for admitted lengths. Matching Node.js and Deno,
-these methods and ordinary string conversion that reaches intrinsic Array
-`toString` reject a length above `2**32 - 1` with a catchable `TypeError`, and
-every runtime string producer rejects a result above 536,870,888 UTF-16 code
-units with a catchable `RangeError`. `concat` reads
-`Symbol.isConcatSpreadable` before its Array fallback. `concat`, `flat`,
-`flatMap`, and `slice` create Array results through ArraySpeciesCreate,
-preserving observable constructor and `Symbol.species` reads, custom result
-constructors, and generic-receiver realm allocation.
+The combined manifest contains 10,787 cases: 7,890 passes, 1,364 expected
+negatives, and 1,533 unsupported profile features with no semantic, harness, or
+infrastructure failures. The suite revision, 41,091-path inventory, manifest
+schema and vocabulary, and zero-override policy remain unchanged. The runtime
+ABI is `oseo-runtime-m5-68`; the admitted checkpoints added no generated-code
+entry point and made no change to the graph's orchestration state. M5b node
+`array-prototype-copying` implements ordinary `concat`, `flat`, `flatMap`,
+`join`, `slice`, `toLocaleString`, and `toString` functions on the realm-owned
+`%Array.prototype%`. Each method converts its receiver before its later
+method-specific work, and each copying or stringification loop obtains
+LengthOfArrayLike at its specified point.
+
+Sparse copying uses HasProperty before Get, while `join` and `toLocaleString`
+retrieve every index and render nullish values as empty fields for admitted
+lengths. `concat` reads `Symbol.isConcatSpreadable` before its Array fallback.
+`concat`, `flat`, `flatMap`, and `slice` create Array results through
+ArraySpeciesCreate, preserving observable constructor and `Symbol.species`
+reads, custom result constructors, and generic-receiver realm allocation.
+
+Matching Node.js and Deno, these methods and ordinary string conversion that
+reaches intrinsic Array `toString` reject a length above `2**32 - 1` with a
+catchable `TypeError`, and every runtime string producer rejects a result above
+536,870,888 UTF-16 code units with a catchable `RangeError`.
 
 FlattenIntoArray skips holes, calls a `flatMap` mapper before deciding whether
 the mapped value is an Array, and recursively flattens only Array values. Zero
 and finite depth retain their ordinary results. Cyclic or positive-infinity
 paths that exceed the admitted nesting limit reach the runtime's deterministic
-depth boundary without native stack overflow. `join` converts its separator
-after reading length and uses recursion-safe nested Array stringification.
-Until M5c, `toLocaleString` invoked each non-nullish element's method with the
-same receiver and exactly the outer locales and options, forwarding two
-`undefined` values when they were omitted; it converts the method's result. A
-recursive locale conversion of the same receiver renders an empty element.
+depth boundary without native stack overflow.
+
+`join` converts its separator after reading length and uses recursion-safe
+nested Array stringification. Until M5c, `toLocaleString` invoked each
+non-nullish element's method with the same receiver and exactly the outer
+locales and options, forwarding two `undefined` values when they were omitted;
+it converts the method's result. A recursive locale conversion of the same
+receiver renders an empty element.
+
 During element conversion, re-entry through `join`, `toString`, or
 `toLocaleString` on the same active receiver likewise renders an empty string
 instead of exceeding the call-depth boundary. `toString` calls a callable
@@ -4192,202 +4210,223 @@ Fixed native and generated differential evidence at seed `0x60004700` covers
 sparse Arrays, ordinary and primitive generic receivers, observable property
 order, `Symbol.isConcatSpreadable`, every ArraySpeciesCreate default and guard
 fallback, custom species, recursive and cyclic input, locale result coercion,
-locale element calls, locale cycles, oversized-length rejection,
-large-length index access ordering, callback behavior, and abrupt completion.
-Both specialization policies, forced collection at every safepoint, false
-hints, deliberate guard hits and misses, and generic fallback are exercised. Of
-the 229 paths under the node's seven inventory roots, 228 are reviewed: 181
-pass and 47 retain explicit prerequisite boundaries. The pinned
+locale element calls, locale cycles, oversized-length rejection, large-length
+index access ordering, callback behavior, and abrupt completion. It exercises
+both specialization policies, forced collection at every safepoint, false
+hints, deliberate guard hits and misses, and generic fallback.
+
+Of the 229 paths under the node's seven inventory roots, 228 are reviewed: 181
+pass and 47 retain explicit prerequisite boundaries.
+
+No new path outside those roots is added. Two already-reviewed cases outside
+the roots move from unsupported to pass because they exercise the newly
+admitted `toString` and generic `slice` behavior. The pinned
 *invoke-element-tolocalestring.js* case asserts the non-ECMA-402 fallback's
 zero-argument call and was omitted because this method then followed the
 ECMA-402 superseding call contract; the fixed differential fixture replaced its
-element-call evidence. No new path outside those roots is added. Two
-already-reviewed cases outside the roots move from unsupported to pass because
-they exercise the newly admitted `toString` and generic `slice` behavior. The
-manifest reaches 11,015 cases: 8,073 passes, 1,364 expected negatives, and
+element-call evidence.
+
+The manifest reaches 11,015 cases: 8,073 passes, 1,364 expected negatives, and
 1,578 unsupported profile features with no semantic, harness, or infrastructure
 failures. The suite revision, 41,091-path inventory, manifest schema and
-vocabulary, and zero-override policy are unchanged. The admitted runtime
-checkpoint moves the runtime ABI to `oseo-runtime-m5-69` without adding a
-generated-code entry point or changing the graph's orchestration state.
+vocabulary, and zero-override policy are unchanged.
 
-M5c node `array-tolocalestring-arguments` supersedes that forwarding
-account. ECMA-262 2025 `Array.prototype.toLocaleString` invokes each element's
+The admitted runtime checkpoint moves the runtime ABI to `oseo-runtime-m5-69`
+without adding a generated-code entry point or changing the graph's
+orchestration state.
+
+M5c node `array-tolocalestring-arguments` supersedes that forwarding account.
+ECMA-262 2025 `Array.prototype.toLocaleString` invokes each element's
 `toLocaleString` with no arguments, and ADR 0013 excludes the ECMA-402
 replacement that forwards the outer locales and options. `toLocaleString`
 therefore calls each non-nullish element's current method with the element as
 its receiver and no arguments, whatever the outer call received. Holes,
-`undefined`, and `null` still render empty fields without a call, and receiver
+`undefined`, and `null` still render empty fields without a call. Receiver
 conversion, length, callability, result coercion, abrupt completion, and
-re-entry are unchanged. The implementation-defined list separator that
-ECMA-262 lets this method choose is the one-code-unit String `","`, U+002C
-COMMA. `%TypedArray.prototype%.toLocaleString` is separate
-code, which M5c node `typed-array-tolocalestring-arguments` already made pass no
-arguments. Node.js 24.21.0 and Deno 2.9.7 implement ECMA-402, so their element
-methods always receive the outer call's first two arguments, `undefined` when
-absent. Both also read a hole of an Array receiver as an empty string and
-invoke `String.prototype.toLocaleString` on it. The differential fixture
-therefore no longer prints element arguments. Fixed and generated cases in the
-copying property suite instead require both references to equal a labeled V8
-model that differs only in those two respects, and native output to equal the
-ECMA-262 model, under both specialization policies with collection at every
-safepoint. The fixed program covers every argument shape of the pinned upstream
-case plus a `null` locale with numeric options, through a method call, `call`,
-and `apply`, on Array and ordinary array-like receivers. Its elements are
-holes, `undefined`, `null`, own, inherited, accessor, coercing, throwing, and
+re-entry are unchanged.
+
+The implementation-defined list separator that ECMA-262 lets this method choose
+is the one-code-unit String `","`, U+002C COMMA.
+`%TypedArray.prototype%.toLocaleString` is separate code, which M5c node
+`typed-array-tolocalestring-arguments` already made pass no arguments.
+
+Node.js 24.21.0 and Deno 2.9.7 implement ECMA-402, so their element methods
+always receive the outer call's first two arguments, `undefined` when absent.
+Both also read a hole of an Array receiver as an empty string and invoke
+`String.prototype.toLocaleString` on it. The differential fixture therefore no
+longer prints element arguments.
+
+Fixed and generated cases in the copying property suite instead require both
+references to equal a labeled V8 model that differs only in those two respects.
+They also require native output to equal the ECMA-262 model, under both
+specialization policies with collection at every safepoint.
+
+The fixed program covers every argument shape of the pinned upstream case plus
+a `null` locale with numeric options, through a method call, `call`, and
+`apply`, on Array and ordinary array-like receivers. Its elements are holes,
+`undefined`, `null`, own, inherited, accessor, coercing, throwing, and
 non-callable methods, number and string primitives reaching strict prototype
 methods, and nested Arrays. The generated domain at seed `0x60004701` draws one
-to three such calls in ten ordinary cases. The repair adds no specialized path
-or guard, so the guard-fallback evidence is unchanged. The unchanged upstream
-*invoke-element-tolocalestring.js* path passes in all four variants of the
-focused observation at source `28d30410` and is admitted. The full manifest
-update that the coordinator's log records as reading the clean source
-`05ba44c9` also observed it passing in all four variants, with the root's
-other eleven reviewed paths keeping their classifications; its own run record
-names no commit. The later full update at source `4c18c04b`, whose pre-start
-record binds that clean commit and its tree, observed every record again,
-these twelve included, and changed none. No layout, intrinsic, helper, or
-entry point changes, so the runtime ABI is unchanged.
+to three such calls in ten ordinary cases.
 
-M5b node `map-intrinsic` completes the realm-owned `%Map%` constructor
-together with SameValueZero-keyed `[[MapData]]` storage, insertion order,
-and `%MapIteratorPrototype%`. The constructor reads the target's `set`
-method once through AddEntriesFromIterable and calls it for every iterated
-two-element entry, closing an unfinished iterable on a non-object entry, an
-abrupt element read, or an abrupt `set` call while preserving the original
-throw completion. `set` normalizes a `-0` key to `+0`; `delete` and `clear`
-mark a record dead in place instead of removing it, so a live
-`%MapIteratorPrototype%.next` walking the same array by index never skips
-or misaligns past a concurrent mutation, and a key deleted and re-added
-reappears at the end of insertion order. `forEach` re-reads the entry array
-on every step, so a `set` call from inside the callback that grows the
-backing storage is still observed, and it always returns `undefined`
-regardless of the callback's return value. `Map.groupBy` builds its result
-directly into a fresh map's records instead of through an observable `set`
-lookup, and the `Symbol.species` accessor returns its receiver unchanged.
+The change adds no specialized path or guard, so the guard-fallback evidence is
+unchanged. The unchanged upstream *invoke-element-tolocalestring.js* path is
+admitted. The manifest retains the classifications of the twelve reviewed
+paths. No layout, intrinsic, helper, or entry point changes, so the runtime ABI
+is unchanged.
 
-Fixed native and generated differential evidence at seed `0x60004800` covers
-SameValueZero identity across canonical zero, NaN, a string, and two
-distinct object identities, insertion order, in-place tombstone deletion,
-both specialization policies, forced collection at every safepoint, false
-hints, deliberate guard misses, generic fallback, and observable
-constructor, iterator, and `forEach` re-entrancy operations. Of the 182
-paths under the node's two inventory roots, 181 are reviewed: 147 pass and
-34 retain explicit prerequisite boundaries for constructor detection, the
-unimplemented `Set`, `WeakMap`, `WeakSet`, and `WeakRef` collection
+M5b node `map-intrinsic` completes the realm-owned `%Map%` constructor together
+with SameValueZero-keyed `[[MapData]]` storage, insertion order, and
+`%MapIteratorPrototype%`. The constructor reads the target's `set` method once
+through AddEntriesFromIterable and calls it for every iterated two-element
+entry. It closes an unfinished iterable on a non-object entry, an abrupt
+element read, or an abrupt `set` call while preserving the original throw
+completion.
+
+`set` normalizes a `-0` key to `+0`. `delete` and `clear` mark a record dead in
+place instead of removing it, so a live `%MapIteratorPrototype%.next` walking
+the same array by index never skips or misaligns past a concurrent mutation. A
+key deleted and re-added reappears at the end of insertion order.
+
+`forEach` re-reads the entry array on every step, so a `set` call from inside
+the callback that grows the backing storage is still observed. It always
+returns `undefined` regardless of the callback's return value. `Map.groupBy`
+builds its result directly into a fresh map's records instead of through an
+observable `set` lookup, and the `Symbol.species` accessor returns its receiver
+unchanged. Fixed native and generated differential evidence at seed
+`0x60004800` covers SameValueZero identity across canonical zero, NaN, a
+string, and two distinct object identities, insertion order, in-place tombstone
+deletion, both specialization policies, forced collection at every safepoint,
+false hints, deliberate guard misses, generic fallback, and observable
+constructor, iterator, and `forEach` re-entrancy operations.
+
+Of the 182 paths under the node's two inventory roots, 181 are reviewed: 147
+pass and 34 retain explicit prerequisite boundaries for constructor detection,
+the unimplemented `Set`, `WeakMap`, `WeakSet`, and `WeakRef` collection
 intrinsics, `Array.prototype.pop`, or realm creation. The remaining path
-requires string iteration and stays with the separate `string-iterator`
-node. One previously reviewed case, *test/built-ins/Object/seal/seal-map.js*,
-also moves from unsupported to pass because `Object.seal` now observes a
-real `Map` instance instead of an unresolved global. The combined manifest
-reaches 11,196 cases: 8,221 passes, 1,364 expected negatives, and 1,611
-unsupported profile features with no semantic, harness, or infrastructure
-failures. The
-suite revision, 41,091-path inventory, manifest schema and vocabulary, and
-zero-override policy are unchanged. The admitted runtime checkpoint moves
-the runtime ABI to `oseo-runtime-m5-70` without adding a generated-code
-entry point or changing the graph's orchestration state.
+requires string iteration and stays with the separate `string-iterator` node.
 
-Implemented M5b node `number-prototype` gives the materialized
+One previously reviewed case, *test/built-ins/Object/seal/seal-map.js*, also
+moves from unsupported to pass because `Object.seal` now observes a real `Map`
+instance instead of an unresolved global. The combined manifest reaches 11,196
+cases: 8,221 passes, 1,364 expected negatives, and 1,611 unsupported profile
+features with no semantic, harness, or infrastructure failures.
+
+The suite revision, 41,091-path inventory, manifest schema and vocabulary, and
+zero-override policy are unchanged. The admitted runtime checkpoint moves the
+runtime ABI to `oseo-runtime-m5-70` without adding a generated-code entry point
+or changing the graph's orchestration state.
+
+The M5b node `number-prototype` is implemented. It gives the materialized
 `%Number.prototype%` real `toString` and `valueOf` bodies in place of the
 placeholder that named this node, and adds `toFixed`, `toExponential`,
-`toPrecision`, and `toLocaleString`. `toString` accepts an optional radix:
-radix 10 reuses the existing shortest round-trip decimal algorithm, and
-radix 2 through 36 convert the receiver's exact mantissa and binary exponent
-through a bignum built for this node, rendering the integer part exactly and
-advancing the remaining fraction against the distance to the rounding
-boundary, stopping once the tail no longer exceeds it and raising the final
-digit when ordinary rounding selects it and the raised value still names the
-same double. This keeps a non-terminating radix from emitting digits the
-receiver's precision does not carry. It is the round-trip stopping rule
-rather than a shortest-string search, and its tie test inspects the final
-digit rather than the whole coefficient; ECMA-262 leaves both to the
-implementation for a non-decimal radix.
+`toPrecision`, and `toLocaleString`. `toString` accepts an optional radix.
+Radix 10 reuses the existing shortest round-trip decimal algorithm. Radix 2
+through 36 convert the receiver's exact mantissa and binary exponent through a
+bignum built for this node, rendering the integer part exactly and advancing
+the remaining fraction against the distance to the rounding boundary. The
+conversion stops once the tail no longer exceeds that distance and raises the
+final digit when ordinary rounding selects it and the raised value still names
+the same double. This keeps a non-terminating radix from emitting digits the
+receiver's precision does not carry.
+
+The radix conversion uses the round-trip stopping rule rather than a
+shortest-string search, and its tie test inspects the final digit rather than
+the whole coefficient. ECMA-262 leaves both to the implementation for a
+non-decimal radix.
 
 The budget is two-sided. A power of two lies twice as far from its upper
-neighbor as from its lower one, so truncating spends the distance to the
-lower rounding boundary and rounding up spends the distance to the upper
-one. One shared budget would let a truncated expansion of a value such as
-`0.5` in radix 5 cross the lower boundary and name a different double.
+neighbor as from its lower one, so truncating spends the distance to the lower
+rounding boundary and rounding up spends the distance to the upper one. One
+shared budget would let a truncated expansion of a value such as `0.5` in radix
+5 cross the lower boundary and name a different double.
 
-Because ECMA-262 leaves a non-decimal radix implementation-approximated,
-that exactness is a recorded divergence rather than a match. V8 advances its
+Because ECMA-262 leaves a non-decimal radix implementation-approximated, that
+exactness is a recorded divergence rather than a match. V8 advances its
 remaining fraction in floating point, so for a fraction whose expansion does
-not terminate its last digits can differ from the exact result. Over a
-767-case sweep of values and radices, including binade boundaries, the
-smallest denormal, and randomly drawn bit patterns, 280 outputs differed.
-Every Oseo result read back as the original double; 229 of V8's did not, and
-no case had the reverse relationship. Oseo keeps the exact result, so an
-admitted program can differ from V8 in the trailing digits of a
-non-terminating fractional expansion, always in the direction of
-round-tripping. Terminating radices, which include every power of two, agree
-exactly and are pinned digit for digit.
-Differential evidence for the non-terminating cases asserts the reparsed
-magnitude on all three engines instead of the spelling, because the
-reference engines do not agree with each other's exact digits either.
+not terminate, its last digits can differ from the exact result. Over a
+767-case sweep of values and radices, including binade boundaries, the smallest
+denormal, and randomly drawn bit patterns, 280 outputs differed. Every Oseo
+result read back as the original double; 229 of V8's did not, and no case had
+the reverse relationship.
 
-Radix 10, `ToString`, free-precision `toExponential`, `toPrecision`
-without a precision, and the canonical numeric index test a TypedArray
-applies to string keys share one decimal digit selection: the fewest
-significant digits that read back as the double, and among those the
-decimal closest to it, the even one on a tie, as ECMA-262 2025
-Number::toString step 5 requires. At each digit count the runtime takes
-the correctly rounded decimal and, for a normal power of two above the
-smallest normal, also the next decimal up, because the interval of decimals
-that read back as a power of two reaches twice as far above it as below.
-Until M5c node `typed-array-feature-admission` the runtime tried only the
-closest decimal, so 46 of the 2,098 positive powers of two printed 17
-digits where 16 suffice, such as `5.9604644775390625e-8` for 2^-24 instead
-of `5.960464477539063e-8`, and the canonical numeric index test treated the
-wrong spelling as canonical. The `number-prototype` native fixture pins
-2^-24 through each consumer and additionally checks `String` for 2^-1017,
-2^-140, 2^89, and 2^976, and generated evidence at seed `0x60004901`
-checks powers of two and their neighbors across the binary16, binary32, and
-binary64 exponent ranges against an exact BigInt Number::toString oracle.
+Oseo keeps the exact result, so an admitted program can differ from V8 in the
+trailing digits of a non-terminating fractional expansion, always in the
+direction of round-tripping. Terminating radices, which include every power of
+two, agree exactly and are pinned digit for digit. Differential evidence for
+the non-terminating cases asserts the reparsed magnitude on all three engines
+instead of the spelling, because the reference engines do not agree with each
+other's exact digits either.
 
-`toFixed`, `toExponential`,
+Radix 10, `ToString`, free-precision `toExponential`, `toPrecision` without a
+precision, and the canonical numeric index test that a TypedArray applies to
+string keys share one decimal digit selection. It selects the fewest
+significant digits that read back as the double, and among those the decimal
+closest to it, the even one on a tie, as ECMA-262 2025 Number::toString step 5
+requires. At each digit count the runtime takes the correctly rounded decimal.
+For a normal power of two above the smallest normal, it also takes the next
+decimal up, because the interval of decimals that read back as a power of two
+reaches twice as far above it as below.
+
+Until M5c node `typed-array-feature-admission`, the runtime tried only the
+closest decimal, so 46 of the 2,098 positive powers of two printed 17 digits
+where 16 suffice, such as `5.9604644775390625e-8` for 2^-24 instead of
+`5.960464477539063e-8`, and the canonical numeric index test treated the wrong
+spelling as canonical. The `number-prototype` native fixture pins 2^-24 through
+each consumer. It additionally checks `String` for 2^-1017, 2^-140, 2^89, and
+2^976, and generated evidence at seed `0x60004901` checks powers of two and
+their neighbors across the binary16, binary32, and binary64 exponent ranges
+against an exact BigInt Number::toString oracle. `toFixed`, `toExponential`,
 and `toPrecision` round through the same bignum numerator-over-denominator
-representation rather than repeated floating-point arithmetic, so every
-fraction-digit and significant-digit count rounds to the nearest value with
-ties away from zero, exactly as ECMA-262 specifies. The decimal exponent a
-significant-digit request needs is found by exact bignum comparison against
-powers of ten instead of a `log10` estimate, because a value adjacent to a
-power-of-ten boundary can round to a self-consistent but wrong digit count
-on either side of that boundary if the exponent is only a floating-point
-guess. `toLocaleString` returns the base specification's own fallback,
+representation rather than repeated floating-point arithmetic. Every
+fraction-digit and significant-digit count therefore rounds to the nearest
+value with ties away from zero, exactly as ECMA-262 specifies.
+
+The decimal exponent a significant-digit request needs is found by exact bignum
+comparison against powers of ten instead of a `log10` estimate. If the exponent
+is only a floating-point guess, a value adjacent to a power-of-ten boundary can
+round to a self-consistent but wrong digit count on either side of that
+boundary.
+
+`toLocaleString` returns the base specification's own fallback,
 `thisNumberValue` followed by `ToString`, since no ECMA-402
-Internationalization API is admitted. Every method shares one
-`thisNumberValue` brand check, admitting a Number primitive or a Number
-wrapper object and rejecting every other receiver, including a generic
-object with a `valueOf` method: unlike String.prototype's coercing
-receiver, Number.prototype's brand check has no looser fallback. The generic
-`ToPrimitive` conversion path's narrow placeholder for the deferred
+Internationalization API is admitted.
+
+Every method shares one `thisNumberValue` brand check. It admits a Number
+primitive or a Number wrapper object and rejects every other receiver,
+including a generic object with a `valueOf` method. Unlike String.prototype's
+coercing receiver, Number.prototype's brand check has no looser fallback.
+
+The generic `ToPrimitive` conversion path's narrow placeholder for the deferred
 `Number.prototype.toString`, which read the receiver's `[[NumberData]]`
-directly by prototype-chain position, is removed; the generic property
-lookup and call it already used for every other constructor now reaches
-this node's real methods instead. Fixed native and generated differential
-evidence at seed `0x60004900` covers both specialization policies, forced
-collection at every safepoint, a false hint, and a deliberate shape-guard
-miss. Of the 168 paths under the node's inventory root, 155 pass and 13
-retain explicit prerequisite boundaries for `Reflect.construct`, `Date`,
-`Boolean`, and the mutable global object implicit-assignment binding this
-checkpoint does not admit. Completing `valueOf` and `toString` also lets 21
-already-reviewed paths outside this node's own root, in `Number`, `Object`,
-`Array`, `Array.prototype.join`, `Function.prototype.bind`, and
-`String.fromCharCode`/`split`, pass where they previously retained an
-unsupported-profile-feature boundary citing the same placeholder; their
-entries move with this change since the manifest requires every reviewed
-path's classification to match observed evidence. Two of the twenty-one are
-the `Array.prototype.join` cases that take a Number wrapper as `length`,
-which the separately landed array-prototype-copying node reviewed while
-that placeholder still stood. The combined manifest reaches 11,364 cases:
-8,397 passes, 1,364
-expected negatives, and 1,603 unsupported profile features with no semantic,
-harness, or infrastructure failures. The suite revision, 41,091-path
-inventory, manifest schema and vocabulary, and zero-override policy are
-unchanged. The admitted runtime checkpoint moves the runtime ABI to
-`oseo-runtime-m5-71` without adding a generated-code entry point or changing
-the graph's orchestration state.
+directly by prototype-chain position, is removed. The generic property lookup
+and call that the path already used for every other constructor now reaches
+this node's real methods instead.
+
+Fixed native and generated differential evidence at seed `0x60004900` covers
+both specialization policies, forced collection at every safepoint, a false
+hint, and a deliberate shape-guard miss. Of the 168 paths under the node's
+inventory root, 155 pass and 13 retain explicit prerequisite boundaries for
+`Reflect.construct`, `Date`, `Boolean`, and the mutable global object
+implicit-assignment binding this checkpoint does not admit.
+
+Completing `valueOf` and `toString` also lets 21 already-reviewed paths outside
+this node's own root pass. They are in `Number`, `Object`, `Array`,
+`Array.prototype.join`, `Function.prototype.bind`, and
+`String.fromCharCode`/`split`, and previously retained an
+unsupported-profile-feature boundary citing the same placeholder. Their entries
+move with this change because the manifest requires every reviewed path's
+classification to match observed evidence. Two of the twenty-one are the
+`Array.prototype.join` cases that take a Number wrapper as `length`; the
+separately landed array-prototype-copying node reviewed them while that
+placeholder still stood.
+
+The combined manifest reaches 11,364 cases: 8,397 passes, 1,364 expected
+negatives, and 1,603 unsupported profile features.
+
+The admitted runtime checkpoint moves the runtime ABI to `oseo-runtime-m5-71`
+without adding a generated-code entry point or changing the graph's
+orchestration state.
 
 M5b node `bigint-intrinsic` materializes the callable `BigInt` intrinsic,
 `%BigInt.prototype%`, branded wrapper objects, `asIntN`, `asUintN`, `toString`,
@@ -4412,48 +4451,53 @@ fallback because ECMA-402 remains outside the profile. `Object.prototype`
 string tagging obtains `"BigInt"` through `Symbol.toStringTag`; overriding that
 property with a non-string correctly falls back to `"Object"`.
 
-The object model lives in *runtime\_bigint\_object.c* and reads no limb. The
-private *runtime\_bigint.c* operations retain exact integral-Number conversion,
-radix text, and fixed-width truncation behind `OseoValue`. Fixed and generated
-differential evidence covers both reference hosts, both specialization
-policies, forced collection, false hints, guard misses, mutable global binding
-behavior, the reviewed 65,536-bit resource ceiling, and deterministic
-allocation-attempt sweeps over result publication, Number conversion, radix
-staging buffers, wrappers, and partial intrinsic initialization. Each failed
-attempt is collected and retried to prove cleanup, stable identity, roots, and
-complete publication. The generated family uses seed `0x60004b00` in the
-reserved block through `0x60004bff` with an independent base-2^15 Number model.
-The runtime ABI moves to `oseo-runtime-m5-72`, and built-in code range index 14
-is
-allocated without a gap. No compiler IR or generated-code entry point changes.
+The object model is implemented in *runtime\_bigint\_object.c* and reads no
+limb. The private *runtime\_bigint.c* operations retain exact integral-Number
+conversion, radix text, and fixed-width truncation behind `OseoValue`.
+
+Fixed and generated differential evidence covers both reference hosts, both
+specialization policies, forced collection, false hints, guard misses, mutable
+global binding behavior, and the reviewed 65,536-bit resource ceiling. The same
+evidence includes deterministic allocation-attempt sweeps over result
+publication, Number conversion, radix staging buffers, wrappers, and partial
+intrinsic initialization. Each failed attempt is collected and retried to prove
+cleanup, stable identity, roots, and complete publication.
+
+The generated family uses seed `0x60004b00` in the reserved block through
+`0x60004bff` with an independent base-2^15 Number model. The runtime ABI moves
+to `oseo-runtime-m5-72`, and built-in code range index 14 is allocated without
+a gap. No compiler IR or generated-code entry point changes.
 
 All 77 paths under *test/built-ins/BigInt/* are reviewed: 61 pass and 16 retain
 explicit boundaries. Eight need deferred non-BigInt primitive-wrapper methods,
-six need `Reflect.construct`, one needs realm creation, and one also reaches the
-unadmitted `Date` intrinsic. Four already-reviewed Object paths and six String
-paths outside that root also move from unsupported to pass. The complete
-manifest moves from 11,364 to 11,441 cases, from 8,397 to 8,468 passes, keeps
-1,364 expected negatives, and moves from 1,603 to 1,609 unsupported profile
-features, with no semantic, harness, or infrastructure failures. The suite
-revision, 41,091-path inventory, manifest schema and vocabulary, and
-zero-override policy are unchanged.
+six need `Reflect.construct`, one needs realm creation, and one also reaches
+the unadmitted `Date` intrinsic. Four already-reviewed Object paths and six
+String paths outside that root also move from unsupported to pass.
+
+With the BigInt paths included, the complete manifest reaches 11,441 cases and
+8,468 passes, keeps 1,364 expected negatives, and moves unsupported profile
+features from 1,603 to 1,609. The manifest has no semantic, harness, or
+infrastructure failures. The suite revision, 41,091-path inventory, manifest
+schema and vocabulary, and zero-override policy are unchanged.
 
 M5b node `data-view` materializes `%DataView%` and `%DataView.prototype%` over
-the Data Block the `array-buffer` node already owns, so a program can read and
-write those bytes for the first time. The constructor requires `new`, requires
-an `ArrayBuffer`, runs `ToIndex` over `byteOffset` and then over `byteLength`,
-and validates the detached state and both bounds once before and once after
-`OrdinaryCreateFromConstructor` reads the new target's `prototype`. No
-admitted source construct reaches that read with an accessor, so the second
-validation is observed natively rather than from a reviewed program. An absent
-`byteLength` fixes the view's length over a fixed-length buffer and makes it
-length-tracking over a resizable one, which is the candidate edition's `auto`.
+the Data Block the `array-buffer` node already owns. A program can then read
+and write those bytes for the first time.
 
-A view owns no Data Block. It holds only its buffer's value, so the collector
-keeps the block alive by tracing the buffer, and nothing in the component
-allocates, resizes, or releases a block. Every accessor and every element
-access recomputes the buffer's detached state and byte length, so a detached or
-shrunk buffer produces the specified `TypeError` from `byteLength`,
+The constructor requires `new` and an `ArrayBuffer`. It runs `ToIndex` over
+`byteOffset` and then over `byteLength`. It validates the detached state and
+both bounds once before and once after `OrdinaryCreateFromConstructor` reads
+the new target's `prototype`. No admitted source construct reaches that read
+with an accessor, so the second validation is observed natively rather than
+from a reviewed program.
+
+An absent `byteLength` fixes the view's length over a fixed-length buffer and
+makes it length-tracking over a resizable one, which is the candidate edition's
+`auto`. A view owns no Data Block. It holds only its buffer's value, so the
+collector keeps the block alive by tracing the buffer, and nothing in the
+component allocates, resizes, or releases a block. Every accessor and element
+access recomputes the buffer's detached state and byte length. A detached or
+shrunk buffer therefore produces the specified `TypeError` from `byteLength`,
 `byteOffset`, and every `get` and `set`, while `buffer` still reports the
 detached buffer. A zero-length view exactly at the end of its buffer stays in
 bounds.
@@ -4461,68 +4505,76 @@ bounds.
 The eleven `get` and eleven `set` accessors cover `Int8`, `Uint8`, `Int16`,
 `Uint16`, `Int32`, `Uint32`, `Float16`, `Float32`, `Float64`, `BigInt64`, and
 `BigUint64`. Each `get` accessor runs `ToIndex` over the byte offset, then
-`ToBoolean` over the byte-order flag; each `set` accessor runs `ToIndex`, then
+`ToBoolean` over the byte-order flag. Each `set` accessor runs `ToIndex`, then
 `ToNumber` or `ToBigInt` over the stored value, then `ToBoolean`. Both then run
 the out-of-bounds `TypeError` and the range `RangeError`, so a conversion that
 detaches or shrinks the buffer still reaches the specified rejection. A
 one-byte accessor takes no byte-order parameter: it passes little-endian
-directly and runs no `ToBoolean`. The integer element types truncate and wrap
-modulo the element width in two's complement. The float element types round to
-nearest with ties to even in exact integer arithmetic over the operand's own
-binary64 encoding, so no narrowing floating conversion happens and no operand
-can reach an out-of-range one; `Float64` is bit-preserving, a signed zero keeps
-its sign, and a NaN keeps its class. Each element moves through a local byte
-buffer rather than a cast, so an unaligned access is ordinary, and every index
-and size comparison is written so that no host addition can wrap.
-`ArrayBuffer.isView` now reports the one admitted view kind.
+directly and runs no `ToBoolean`.
 
-The object model lives in *runtime\_data\_view.c* and reads no BigInt limb: the
+The integer element types truncate and wrap modulo the element width in two's
+complement. The float element types round to nearest with ties to even in exact
+integer arithmetic over the operand's own binary64 encoding, so no narrowing
+floating conversion happens and no operand can reach an out-of-range one.
+`Float64` is bit-preserving; a signed zero keeps its sign and a NaN keeps its
+class. Each element moves through a local byte buffer rather than a cast, so an
+unaligned access is ordinary. Every index and size comparison is written so
+that no host addition can wrap. `ArrayBuffer.isView` reports the one admitted
+view kind.
+
+The object model lives in *runtime\_data\_view.c* and reads no BigInt limb. The
 two 64-bit element types reach the representation only through the raw-integer
 operations *runtime\_bigint.c* exports. `ToIndex` becomes one shared conversion
 in *runtime\_primitive.c* that both this node and `ArrayBuffer` call with their
-own diagnostics. Fixed and generated differential evidence covers both
-reference hosts, both specialization policies, forced collection at every
-safepoint, false hints, guard misses, mutable global binding behavior, every
-conversion and failure order, subclass construction, unaligned access at every
-offset of an eight-byte element, length-tracking and fixed-length views across
-grow and shrink, and a deterministic allocation-attempt sweep over the view
-record, the intrinsic cluster, and the BigInt a 64-bit load produces. Each
+own diagnostics.
+
+Fixed and generated differential evidence covers both reference hosts, both
+specialization policies, forced collection at every safepoint, false hints,
+guard misses, mutable global binding behavior, every conversion and failure
+order, and subclass construction. It also covers unaligned access at every
+offset of an eight-byte element, and length-tracking and fixed-length views
+across grow and shrink. A deterministic allocation-attempt sweep covers the
+view record, the intrinsic cluster, and the BigInt a 64-bit load produces. Each
 failed attempt is collected and retried to prove cleanup, roots, stable
-identity, and complete publication. The generated family uses seed `0x60004c00`
-in the reserved block through `0x60004cff` with an independent byte-level model
-that reads no host `DataView` and no host BigInt. The runtime ABI moves to
-`oseo-runtime-m5-73`, and built-in code range index 15 is allocated without a
-gap. No compiler IR or generated-code entry point changes.
+identity, and complete publication.
+
+The generated family uses seed `0x60004c00` in the reserved block through
+`0x60004cff` with an independent byte-level model that reads no host `DataView`
+and no host BigInt. The runtime ABI is `oseo-runtime-m5-73`, and built-in code
+range index 15 is allocated without a gap. No compiler IR or generated-code
+entry point changes.
 
 All 550 paths under *test/built-ins/DataView/* are reviewed: 443 pass and 107
-retain explicit boundaries. Thirty-nine need `SharedArrayBuffer`, thirty-two
-need `Reflect.construct` or the `Reflect` namespace, thirty need a TypedArray
-constructor, four need the deferred non-BigInt primitive-wrapper prototype
-methods, one reaches an unresolvable identifier this profile rejects at compile
-time, and two of those also need a second realm. Five already-reviewed
+retain explicit boundaries. Thirty-nine need `SharedArrayBuffer`. Thirty-two
+need `Reflect.construct` or the `Reflect` namespace. Thirty need a TypedArray
+constructor. Four need the deferred non-BigInt primitive-wrapper prototype
+methods. One reaches an unresolvable identifier this profile rejects at compile
+time. Two of those also need a second realm. Five already-reviewed
 `ArrayBuffer` paths, one `Array.prototype` path, and one `Object.seal` path
-outside that root move from unsupported to pass. The reviewed feature list
-gains `DataView`, `Float16Array`, and the eight `DataView.prototype.*` accessor
-features this node implements; the reviewed dependency vocabulary gains
-`data-view`; and the reviewed harness gains upstream's
-`byteConversionValues.js` data table and a `verifyPrimordialProperty` alias.
-That historical helper restored its probes unconditionally; the host Script
-source correction below distinguishes default deletion from explicit restore.
-The complete manifest moves from 11,441 to 11,991 cases, from 8,468 to 8,918
-passes, keeps
-1,364 expected negatives, and moves from 1,609 to 1,709 unsupported profile
-features, with no semantic, harness, or infrastructure failures. The suite
-revision, 41,091-path inventory, manifest schema, and zero-override policy are
-unchanged.
+outside that root move from unsupported to pass.
 
-M5b node `regexp-unicode-property-escapes` admits the six regular expression
-character class escapes and exact Unicode property escapes over the Unicode
-17.0.0 tables pinned by `@oseo/unicode`. The resolver admits canonical binary
-property names, lone General\_Category values, and General\_Category, Script, or
-Script\_Extensions name-value pairs. Loose matching and a lone Script value are
-early errors. The frontend supplies this resolver at the owned parser boundary,
-while the compiler core remains independent of the tables. The generic matcher
-continues to own complement, Unicode traversal, and ignore-case closure.
+The reviewed feature list gains `DataView`, `Float16Array`, and the eight
+`DataView.prototype.*` accessor features this node implements. The reviewed
+dependency vocabulary gains `data-view`. The reviewed harness gains upstream's
+`byteConversionValues.js` data table and a `verifyPrimordialProperty` alias.
+The historical helper restored its probes unconditionally; the host Script
+source correction below distinguishes default deletion from explicit restore.
+
+The complete manifest has 11,991 cases and 8,918 passes, up from 11,441 and
+8,468. It keeps 1,364 expected negatives and has 1,709 unsupported profile
+features, up from 1,609. There are no semantic, harness, or infrastructure
+failures. The suite revision, 41,091-path inventory, manifest schema, and
+zero-override policy are unchanged.
+
+The M5b node `regexp-unicode-property-escapes` admits the six regular
+expression character class escapes and exact Unicode property escapes over the
+Unicode 17.0.0 tables pinned by `@oseo/unicode`. The resolver admits canonical
+binary property names, lone General\_Category values, and General\_Category,
+Script, or Script\_Extensions name-value pairs. Loose matching and a lone
+Script value are early errors. The frontend supplies this resolver at the owned
+parser boundary, while the compiler core remains independent of the tables. The
+generic matcher continues to own complement, Unicode traversal, and ignore-case
+closure.
 
 The checkpoint adds no specialized matcher, runtime allocation, generated-code
 entry point, or built-in code range. Existing fixed native String fallback
@@ -4530,69 +4582,76 @@ evidence covers all six class escapes under both specialization policies,
 deliberate guard misses, and forced collection. Generated differential evidence
 at seeds `0x60004e00`, `0x60004e01`, and `0x60004e02` compares the generic
 matcher with the host engine for class escapes and every canonical property
-family. The retained empty `Hrkt` Script value uses its absence from the pinned
-Script and Script\_Extensions assignments because the host rejects that alias.
-The diagnostic domain asserts the exact kind, section, message, and source
-span for invalid forms. The property ratchet moves from 94 domains, 94 seeds,
-and 4,594 ordinary cases to 97 domains, 97 seeds, and 5,074 cases. The runtime
-ABI moves to `oseo-runtime-m5-74` without changing a C layout or runtime
-component.
+family.
+
+The retained empty `Hrkt` Script value uses its absence from the pinned Script
+and Script\_Extensions assignments because the host rejects that alias. The
+diagnostic domain asserts the exact kind, section, message, and source span for
+invalid forms.
+
+The property ratchet has 97 domains, 97 seeds, and 5,074 cases, up from 94
+domains, 94 seeds, and 4,594 ordinary cases. The runtime ABI is
+`oseo-runtime-m5-74` without changing a C layout or runtime component.
 
 All 625 paths under *test/built-ins/RegExp/CharacterClassEscapes/* and
 *test/built-ins/RegExp/property-escapes/* are reviewed. The 142 parse-negative
 paths are expected negatives, and 483 retain explicit later-node boundaries.
-The complete manifest reaches 12,616 cases: 8,918 passes, 1,506 expected
-negatives, and 2,192 unsupported profile features, with no semantic, harness,
-or infrastructure failures. The suite revision, inventory policy, ADR 0013
+The complete manifest has 12,616 cases: 8,918 passes, 1,506 expected negatives,
+and 2,192 unsupported profile features. There are no semantic, harness, or
+infrastructure failures. The suite revision, inventory policy, ADR 0013
 vocabulary, and zero-override policy do not change.
 
-M5b node `regexp-intrinsic` materializes `%RegExp%` and
+The M5b node `regexp-intrinsic` materializes `%RegExp%` and
 `%RegExp.prototype%`, defines the constructor link and `Symbol.species`
 accessor, and installs the writable global binding. Calling `RegExp` uses the
 intrinsic as `newTarget` and preserves the specified same-constructor identity
 case. Construction keeps the actual `newTarget`, reads its `prototype` before
 operand conversion, and therefore gives a derived constructor's instances the
-derived prototype.
+derived prototype. `IsRegExp` reads `Symbol.match` before falling back to the
+runtime brand. A branded RegExp copies its internal source and, when flags are
+absent, its internal flags. Another regexp-like object supplies those values
+through ordered `source` and `flags` property reads. Allocation precedes
+pattern and flags string conversion. Every instance has an ordinary `lastIndex`
+data property initialized to zero, writable, non-enumerable, and
+non-configurable, and points to a separately allocated immutable matcher
+artifact. The collector traces the instance, artifact, source, and flags as one
+ownership chain.
 
-`IsRegExp` reads `Symbol.match` before falling back to the runtime brand. A
-branded RegExp copies its internal source and, when flags are absent, its
-internal flags. Another regexp-like object supplies those values through
-ordered `source` and `flags` property reads. Allocation precedes pattern and
-flags string conversion. Every instance owns an ordinary `lastIndex` data
-property initialized to zero, writable, non-enumerable, and non-configurable,
-and points to a separately allocated immutable matcher artifact. The collector
-traces the instance, artifact, source, and flags as one ownership chain.
+Dynamic initialization validates the admitted generic-matcher grammar. Invalid
+patterns and flags throw a catchable `SyntaxError`; Unicode property escapes,
+Unicode set and string syntax, modifier groups, and reviewed resource limits
+retain source-located `OSEO2001` boundaries.
 
-Dynamic initialization validates the admitted generic-matcher grammar.
-Invalid patterns and flags throw a catchable `SyntaxError`; Unicode property
-escapes, Unicode set and string syntax, modifier groups, and reviewed resource
-limits retain source-located `OSEO2001` boundaries. Pattern execution, result
-construction, prototype accessors, symbol methods, String replacement,
-literal lowering, and those pattern extensions remain outside this node. The
-`exec`, `test`, and `toString` properties exist with their built-in metadata
-but report the explicit execution boundary when called.
+Pattern execution, result construction, prototype accessors, symbol methods,
+String replacement, literal lowering, and those pattern extensions remain
+outside this node. The `exec`, `test`, and `toString` properties exist with
+their built-in metadata but report the explicit execution boundary when called.
 
 Fixed and generated differential evidence covers both reference hosts, both
-specialization policies, forced collection at every safepoint, call and
-construction behavior, regexp-like conversion order, false hints, guard hits
-and misses, subclass allocation, catchable dynamic errors, and mutable
-`lastIndex` state. A deterministic allocation-attempt sweep covers complete
-cluster construction, successful wrapper and artifact initialization, and the
-catchable-SyntaxError path. Each failed attempt is collected and retried to
-prove cleanup, roots, stable intrinsic identity, and complete publication. The
-generated family uses seeds `0x60004f00` and `0x60004f01` in the reserved block
-through `0x60004fff`, with an independent constructor-state and error oracle.
-The runtime ABI moves to `oseo-runtime-m5-75`, and built-in code range index 16
-is allocated without a gap. No generated-code entry point changes.
+specialization policies, and forced collection at every safepoint. It also
+covers call and construction behavior, regexp-like conversion order, false
+hints, guard hits and misses, subclass allocation, catchable dynamic errors,
+and mutable `lastIndex` state. A deterministic allocation-attempt sweep covers
+complete cluster construction, successful wrapper and artifact initialization,
+and the catchable-SyntaxError path.
+
+Each failed attempt is collected and retried to prove cleanup, roots, stable
+intrinsic identity, and complete publication. The generated family uses seeds
+`0x60004f00` and `0x60004f01` in the reserved block through `0x60004fff`, with
+an independent constructor-state and error oracle. The runtime ABI moves to
+`oseo-runtime-m5-75`, and built-in code range index 16 is allocated without a
+gap. No generated-code entry point changes.
 
 All 492 paths in the node's reviewed RegExp roots are included: 111 pass and
 381 retain explicit downstream boundaries. Sixty-nine already-reviewed Array,
-Object, and Symbol paths outside those roots also move from unsupported to
-pass because they observe the real RegExp object. The combined manifest moves
-from 12,616 to 13,108 paths, keeps 9,098 passes and 1,506 expected negatives,
-and moves from 2,192 to 2,504 unsupported profile features, with no semantic,
-harness, or infrastructure failures. The suite revision,
-41,091-path inventory, manifest schema, and zero-override policy are unchanged.
+Object, and Symbol paths outside those roots also move from unsupported to pass
+because they observe the real RegExp object.
+
+The combined manifest moves from 12,616 to 13,108 paths and keeps 9,098 passes
+and 1,506 expected negatives. It moves from 2,192 to 2,504 unsupported profile
+features, with no semantic, harness, or infrastructure failures. The suite
+revision, 41,091-path inventory, manifest schema, and zero-override policy are
+unchanged.
 
 M5b node `array-prototype-sort` implements ordinary `sort` and `toSorted`
 functions on the realm-owned `%Array.prototype%` and removes `sort` from the
@@ -4604,82 +4663,90 @@ catchable `RangeError` there.
 
 SortIndexedProperties reads every index into one collected list before the
 first comparison. `sort` uses HasProperty before Get, so holes are skipped and
-collapse behind the sorted elements, while `toSorted` reads through holes, so
-a hole becomes an undefined element of the copy. CompareArrayElements orders
-an undefined element after every defined one without calling the comparator,
-converts a supplied comparator's result with `ToNumber` and reads `NaN` as
-`+0`, and otherwise compares the `ToString` results in code-unit order. The
-sort is stable, and the first abrupt comparison stops it before any further
-one. `sort` then writes the sorted elements back with Set and deletes the
-trailing indices with DeletePropertyOrThrow, leaving `length` unchanged, while
-`toSorted` fills the Array it already allocated. Neither method reads
-`constructor` or `Symbol.species`, so a species-bearing receiver still yields
-an ordinary Array. Every element read, comparison, write-back, and deletion
-observes the receiver at its specified step, so an accessor that appends,
-truncates, deletes, or assigns during the sort produces the specified result.
+collapse behind the sorted elements. `toSorted` reads through holes, so a hole
+becomes an undefined element of the copy.
+
+CompareArrayElements orders an undefined element after every defined one
+without calling the comparator, converts a supplied comparator's result with
+`ToNumber` and reads `NaN` as `+0`, and otherwise compares the `ToString`
+results in code-unit order. The sort is stable, and the first abrupt comparison
+stops it before any further one.
+
+`sort` then writes the sorted elements back with Set and deletes the trailing
+indices with DeletePropertyOrThrow, leaving `length` unchanged. `toSorted`
+fills the Array it already allocated. Neither method reads `constructor` or
+`Symbol.species`, so a species-bearing receiver still yields an ordinary Array.
+
+Every element read, comparison, write-back, and deletion observes the receiver
+at its specified step, so an accessor that appends, truncates, deletes, or
+assigns during the sort produces the specified result.
 
 Fixed native and generated differential evidence at seed `0x60005100` covers
-sparse, generic, inherited, primitive, and frozen receivers, undefined and
-hole ordering, comparator validation and coercion, abrupt completion at each
-observable step, stability across both merge shapes, accessor-driven mutation,
-copy isolation, and length coercion and limits. Both specialization policies,
-forced collection at every safepoint, false hints, deliberate guard hits and
-misses, and generic fallback are exercised. Of the 75 paths in the node's two
-inventory roots, 74 are reviewed: 55 pass and 19 retain explicit prerequisite
-boundaries for the unadmitted `Boolean` and `isNaN` globals, regular
-expression evaluation, `Reflect.construct`, resizable-buffer TypedArray views,
-and the `Array.prototype` `pop` and `reduce` methods later nodes own. The one
-omitted path builds a 2,048-element array literal, which exceeds the
-documented 32,768 root-slot native frame budget before any sorting runs; the
-fixed suite replaces its stability observation with an eleven-element ordering
-over duplicated keys. No path outside the roots changes classification.
+sparse, generic, inherited, primitive, and frozen receivers, undefined and hole
+ordering, comparator validation and coercion, and abrupt completion at each
+observable step. It also covers stability across both merge shapes,
+accessor-driven mutation, copy isolation, and length coercion and limits. Both
+specialization policies, forced collection at every safepoint, false hints,
+deliberate guard hits and misses, and generic fallback are exercised.
 
-M5c node `array-sort-stability` supersedes the omitted-path boundary.
-The minimized 2,048-object literal requests 94,237 MIR identities without
-calling `sort`; 69,652 identities belong to non-value safepoint, status,
-and root annotations. The C backend now assigns dense storage identities
-to actual values, block parameters, and auxiliary iterator or suspension
-state, preserving separately reserved capacity. Every value keeps its own
-slot throughout the frame, so no lifetime reuse or comparison ordering
-changes. The active 65,536-slot ceiling remains unchanged. Literal
-construction still has a finite boundary proportional to actual values,
-and recursive calls still consume the shared active frame budget.
-Callable entries retain conservative logical frame charges
-separately from compact heap-root allocation. Unoptimized sanitizer code
-keeps C expression temporaries on the stack, so compacting heap roots must
-not admit deeper wide recursion. A 3,000-binding frame uses 6,017 heap-root
-slots but Zig's unoptimized UBSan object reserves 1,033,856 C stack bytes;
-charging only compact roots allowed a segmentation fault before OSEO2001.
-The unchanged wide-recursion scenario now retains its budget diagnostic,
-and a 1,000-binding regression checks both specialization policies. Script
-entries charge compact roots and two extra units per binding access.
-The host C sanitizer toolchain applies an explicit eight-unit multiplier
-to callable logical slots above the fixed 32-slot overhead, covering
-expression temporaries and ASan redzones without changing the 65,536-unit
-ceiling. Generated function
-bodies that cannot enter that ceiling are preprocessed into rejection
-stubs, so clang does not build sanitizer IR for an unenterable wide script.
-The runtime ABI is `oseo-runtime-m5-128`.
-The unchanged upstream path is admitted, and fixed 2,048- and
-4,096-element literals plus generated independent bucket orderings at seed
-`0x60008400` check every element's order and identity, copy preservation,
-both policies and deliberate shape-guard fallback. The pinned 2,048-element
-fixture forces collection at every safepoint throughout construction and
-sorting under both policies; the 4,096-element fixture uses normal
-collection. The sanitizer native CI job has a 90-minute limit, and these
-fixtures have no individual execution timeout. Generated large literals
-use normal collection inside the unchanged two-case, 180-second property
-budget. The normative sorting family now includes all 75 upstream paths.
+Of the 75 paths in the node's two inventory roots, 74 are reviewed: 55 pass and
+19 retain explicit prerequisite boundaries. Those boundaries cover the
+unadmitted `Boolean` and `isNaN` globals, regular expression evaluation,
+`Reflect.construct`, resizable-buffer TypedArray views, and the
+`Array.prototype` `pop` and `reduce` methods later nodes own. The one omitted
+path builds a 2,048-element array literal, which exceeds the documented 32,768
+root-slot native frame budget before any sorting runs. The fixed suite replaces
+its stability observation with an eleven-element ordering over duplicated keys.
+No path outside the roots changes classification. M5c node
+`array-sort-stability` supersedes the omitted-path boundary. The minimized
+2,048-object literal requests 94,237 MIR identities without calling `sort`;
+69,652 identities belong to non-value safepoint, status, and root annotations.
+
+The C backend assigns dense storage identities to actual values, block
+parameters, and auxiliary iterator or suspension state, preserving separately
+reserved capacity. Every value keeps its own slot throughout the frame, so no
+lifetime reuse or comparison ordering changes. The active 65,536-slot ceiling
+remains unchanged. Literal construction still has a finite boundary
+proportional to actual values, and recursive calls still consume the shared
+active frame budget.
+
+Callable entries retain conservative logical frame charges separately from
+compact heap-root allocation. Unoptimized sanitizer code keeps C expression
+temporaries on the stack, so compacting heap roots must not admit deeper wide
+recursion. A 3,000-binding frame uses 6,017 heap-root slots, but Zig's
+unoptimized UBSan object reserves 1,033,856 C stack bytes; charging only
+compact roots allowed a segmentation fault before OSEO2001. The unchanged
+wide-recursion scenario retains its budget diagnostic, and a 1,000-binding
+regression checks both specialization policies.
+
+Script entries charge compact roots and two extra units per binding access. The
+host C sanitizer toolchain applies an explicit eight-unit multiplier to
+callable logical slots above the fixed 32-slot overhead, covering expression
+temporaries and ASan redzones without changing the 65,536-unit ceiling.
+Generated function bodies that cannot enter that ceiling are preprocessed into
+rejection stubs, so clang does not build sanitizer IR for an unenterable wide
+script. The runtime ABI is `oseo-runtime-m5-128`.
+
+The unchanged upstream path is admitted, and fixed 2,048- and 4,096-element
+literals plus generated independent bucket orderings at seed `0x60008400` check
+every element's order and identity, copy preservation, both policies and
+deliberate shape-guard fallback. The pinned 2,048-element fixture forces
+collection at every safepoint throughout construction and sorting under both
+policies; the 4,096-element fixture uses normal collection. The sanitizer
+native CI job has a 90-minute limit, and these fixtures have no individual
+execution timeout. Generated large literals use normal collection inside the
+unchanged two-case, 180-second property budget. The normative sorting family
+includes all 75 upstream paths.
 
 `stable-array-sort` and `change-array-by-copy` join the reviewed
 supported-feature list because this node admits both, and no already-reviewed
 path carries either flag. The manifest reaches 13,182 cases: 9,153 passes,
 1,506 expected negatives, and 2,523 unsupported profile features with no
-semantic, harness, or infrastructure failures. The suite revision,
-41,091-path inventory, manifest schema and vocabulary, and zero-override
-policy are unchanged. The admitted runtime checkpoint moves the runtime ABI to
-`oseo-runtime-m5-76` and allocates two code IDs inside the existing Array
-range without adding a generated-code entry point or changing the graph's
+semantic, harness, or infrastructure failures. The suite revision, 41,091-path
+inventory, manifest schema and vocabulary, and zero-override policy are
+unchanged. The admitted runtime checkpoint moves the runtime ABI to
+`oseo-runtime-m5-76` and allocates two code IDs inside the existing Array range
+without adding a generated-code entry point or changing the graph's
 orchestration state.
 
 M5b node `regexp-prototype-and-exec` admits built-in regular expression
@@ -4688,44 +4755,46 @@ reads `lastIndex` through ordinary property semantics, converts it with
 `ToLength`, ignores it unless the pattern is global or sticky, and writes the
 end of the match, or zero on failure, back through an ordinary `Set` that a
 read-only slot rejects. A sticky pattern attempts one position; every other
-pattern advances one character at a time, which is one code point under `u`
-or `v`.
+pattern advances one character at a time, which is one code point under `u` or
+`v`.
 
-A successful execution returns an ordinary Array holding the matched
-substring, each capture or `undefined`, `index`, `input`, a null-prototype
-`groups` object when the pattern declares a group name, and, under `d`, the
-`MakeMatchIndicesIndexPairArray` result with its own `groups` object.
-`test` dispatches through `RegExpExec`, so an overridden `exec` is called and
-a non-object, non-null result is a `TypeError`. `toString` reads `source` and
-`flags` generically. The `source` accessor returns `EscapeRegExpPattern`, so
-an empty pattern is `(?:)`, an unescaped solidus outside a class is escaped,
-and a line terminator becomes its escape sequence, reusing a backslash that
-already precedes it. The `flags` accessor
-composes the eight individual accessors through ordinary property lookup in
-the order `d`, `g`, `i`, `m`, `s`, `u`, `v`, `y`, and each individual accessor
-answers from the artifact, returns `undefined` for `%RegExp.prototype%`
-itself, and is a `TypeError` for any other receiver without the slot.
+A successful execution returns an ordinary Array holding the matched substring,
+each capture or `undefined`, `index`, `input`, a null-prototype `groups` object
+when the pattern declares a group name, and, under `d`, the
+`MakeMatchIndicesIndexPairArray` result with its own `groups` object. `test`
+dispatches through `RegExpExec`, so an overridden `exec` is called and a
+non-object, non-null result is a `TypeError`. `toString` reads `source` and
+`flags` generically.
 
-The new *runtime\_regexp\_matcher.c* component compiles one validated
-pattern into an owned instruction program over a register file and executes
-it with an explicit backtrack stack and undo trail, so backtracking depth is
-data rather than native recursion. It reproduces the choice order, capture
+The `source` accessor returns `EscapeRegExpPattern`, so an empty pattern is
+`(?:)`, an unescaped solidus outside a class is escaped, and a line terminator
+becomes its escape sequence, reusing a backslash that already precedes it. The
+`flags` accessor composes the eight individual accessors through ordinary
+property lookup in the order `d`, `g`, `i`, `m`, `s`, `u`, `v`, `y`. Each
+individual accessor answers from the artifact, returns `undefined` for
+`%RegExp.prototype%` itself, and is a `TypeError` for any other receiver
+without the slot.
+
+The new *runtime\_regexp\_matcher.c* component compiles one validated pattern
+into an owned instruction program over a register file. It executes the program
+with an explicit backtrack stack and undo trail, so backtracking depth is data
+rather than native recursion. It reproduces the choice order, capture
 visibility, assertion and lookaround behavior, backreference resolution,
 quantifier priority, empty-progress failure, UTF-16 and code-point traversal,
-and canonicalization the `@oseo/compiler` matcher already owns, which is what
-makes the generic artifact one semantic authority across both. Execution
-allocates no managed memory, calls no user code, and reaches no safepoint,
-and the collector releases the program with the artifact that owns it.
+and canonicalization that the `@oseo/compiler` matcher already owns, so the
+generic artifact has one semantic authority across both. Execution allocates no
+managed memory, calls no user code, and reaches no safepoint; the collector
+releases the program with the artifact that owns it.
 
 Ignore-case closure folds every equivalence decision into a set while the
 program is built. Simple case folding and the code-unit uppercase rule map
 nothing outside ASCII into ASCII except U+017F and U+212A, so every remaining
-class lies entirely inside or entirely outside ASCII; the runtime therefore
-resolves an ASCII closure exactly and keeps a source-located `OSEO2001`
-boundary for a set that meets a non-ASCII class it has no folding data for,
-and for a backreference under `i` in a pattern whose sets can match such a
-code point. Reaching a reviewed instruction, register, step, backtrack-entry,
-or trail-entry limit keeps the same boundary. Regular expression literals,
+class lies entirely inside or entirely outside ASCII. The runtime resolves an
+ASCII closure exactly. It keeps a source-located `OSEO2001` boundary for a set
+that meets a non-ASCII class it has no folding data for, and for a
+backreference under `i` in a pattern whose sets can match such a code point.
+Reaching a reviewed instruction, register, step, backtrack-entry, or
+trail-entry limit keeps the same boundary. Regular expression literals,
 well-known symbol methods, `String.prototype` dispatch, `RegExp.escape`, and
 the regular expression string iterator remain outside this node.
 
@@ -4837,31 +4906,29 @@ adding a generated-code entry point or changing the graph's orchestration
 state. The String built-in code range gains two IDs for the two methods, and
 the RegExp range gains a twentieth for the deferred `[Symbol.replace]`
 placeholder.
-
 M5b node `generic-string-coercion` routes `ToString` for an arbitrary object
 through the materialized `%Object.prototype.toString%`, `@@toPrimitive`, and
 `@@toStringTag`. OrdinaryToPrimitive reads `valueOf` and `toString` with the
 ordinary property lookup and calls whichever function it finds, so the
-conversion no longer selects a private text substitute by intrinsic
-prototype identity. The two retired substitutes were a virtual
-receiver-sensitive tag text and a function-and-promise unsupported
-diagnostic with a purely numeric shortcut to `NaN`.
+conversion no longer selects a private text substitute by intrinsic prototype
+identity. The two retired substitutes were a virtual receiver-sensitive tag
+text and a function-and-promise unsupported diagnostic with a purely numeric
+shortcut to `NaN`.
 
 A promise therefore renders as `[object Promise]` through its prototype's
-`@@toStringTag`, and its numeric conversion materializes that text before
+`@@toStringTag`. Its numeric conversion materializes that text before
 `ToNumber`, so a `@@toStringTag` getter is observed. An object inheriting
 `%Function.prototype.toString%` without being callable reaches that method's
 own `TypeError`. A replaced `%Object.prototype.toString%` was already called
-through the ordinary lookup; deleting it is newly observable, because an
-object left with neither convertible method throws the specified catchable
-`TypeError`.
+through the ordinary lookup; deleting it is newly observable, because an object
+left with neither convertible method throws the specified catchable `TypeError`.
 
-Array text keeps the deferred conversion selected by intrinsic identity,
-which the Array prototype nodes own; measuring it against the reference
-hosts while retiring the substitutes above found one unchanged divergence
-they still own, a cyclic array-like whose `length` accessor is observed once
-rather than twice because the deferred path detects the cycle before reading
-it. Two receivers still report an owned prerequisite boundary from inside
+Array text keeps the deferred conversion selected by intrinsic identity, which
+the Array prototype nodes own. Measuring it against the reference hosts while
+retiring the substitutes above found one unchanged divergence they still own: a
+cyclic array-like whose `length` accessor is observed once rather than twice
+because the deferred path detects the cycle before reading it. Two receivers
+still report an owned prerequisite boundary from inside
 `%Object.prototype.toString%` rather than from the conversion: generator
 functions and generator objects, whose intrinsic reflection
 `function-intrinsic-chains` owns, and `Boolean` and `Symbol` wrappers, whose
@@ -4869,329 +4936,346 @@ prototype methods `boolean-intrinsic` and `symbol-intrinsic` own.
 
 Fixed native and generated differential evidence at seed `0x60005300` covers
 `@@toPrimitive` dispatch with each hint string and its non-callable,
-object-result, and abrupt rejections, an explicit null method, hint order
-and fallthrough, an object with neither convertible method, a null-prototype
-receiver, `@@toStringTag` in own, inherited, non-string, getter, abrupt, and
-builtin-shadowing forms, every admitted builtinTag receiver, deleted and
-replaced default methods, `Object.prototype.toLocaleString` over the same
-receivers, both specialization policies, false hints, deliberate shape-guard
-misses, generic fallback, and collection forced at every safepoint.
+object-result, and abrupt rejections, an explicit null method, hint order and
+fallthrough, an object with neither convertible method, a null-prototype
+receiver, and `@@toStringTag` in own, inherited, non-string, getter, abrupt,
+and builtin-shadowing forms. The same evidence covers every admitted builtinTag
+receiver, deleted and replaced default methods,
+`Object.prototype.toLocaleString` over the same receivers, both specialization
+policies, false hints, deliberate shape-guard misses, generic fallback, and
+collection forced at every safepoint.
 
-The node declares no test262 inventory root, because every applicable
-upstream path its behavior reaches is already reviewed: the 41 paths under
-*test/built-ins/Object/prototype/toString/* and the two each under
-*test/built-ins/Symbol/toPrimitive/* and
-*test/built-ins/Symbol/toStringTag/*. No previously reviewed path changes
-classification, and the manifest keeps 13,553 cases with 9,365 passes, 1,506
-expected negatives, and 2,682 unsupported profile features, with no
-semantic, harness, or infrastructure failures. The suite revision,
-41,091-path inventory, manifest schema and vocabulary, and zero-override
-policy are unchanged. The admitted runtime checkpoint moves the runtime ABI
-to `oseo-runtime-m5-79` without adding a generated-code entry point, a
-built-in code ID, or a translation unit, and without changing the graph's
-orchestration state.
+The node declares no test262 inventory root because every applicable upstream
+path its behavior reaches is already reviewed. The reviewed paths are the 41
+under *test/built-ins/Object/prototype/toString/* and the two each under
+*test/built-ins/Symbol/toPrimitive/* and *test/built-ins/Symbol/toStringTag/*.
+No previously reviewed path changes classification, and the manifest keeps
+13,553 cases with 9,365 passes, 1,506 expected negatives, and 2,682 unsupported
+profile features, with no semantic, harness, or infrastructure failures. The
+suite revision, 41,091-path inventory, manifest schema and vocabulary, and
+zero-override policy are unchanged.
+
+The admitted runtime checkpoint changes the runtime ABI to
+`oseo-runtime-m5-79`. It adds no generated-code entry point, built-in code ID,
+or translation unit. It does not change the graph's orchestration state.
 
 M5b node `object-create` completes `Object.create` over the
 ObjectDefineProperties body the collection checkpoint already landed. The
-prototype check precedes every read of the properties argument, so a
-prototype that is neither an object nor null throws a `TypeError` before a
-poisoned properties getter can run, and the fresh object is created with
-exactly the requested null or object prototype, including array, function,
-and module namespace prototypes. An undefined or absent properties
-argument returns the fresh object directly. Any other properties value
-flows through the one ObjectDefineProperties body `Object.defineProperties`
-owns: ToObject precedes the own enumerable key walk, so a nullish
-properties argument throws and a primitive is read through the wrapper it
-converts to, each kept descriptor is read with Get and converts through
-the shared ToPropertyDescriptor body in ordinary own-key order, and the
-whole collection pass completes before the first definition. Definitions
-on the fresh extensible target cannot fail, so an abrupt collection is the
-only abrupt completion, and it discards the created object with the thrown
-error. Object, array, mapped arguments, and module namespace properties
-arguments keep the compatibility rules the collection checkpoint recorded,
-a namespace reading each descriptor through its binding cells. The M3
-descriptor-map rejection and its `object-create-descriptor-map` dependency
-observation retire, so call and constructor spread now reach the same
-admitted contract with dynamic arity.
+prototype check precedes every read of the properties argument, so a prototype
+that is neither an object nor null throws a `TypeError` before a poisoned
+properties getter can run. The fresh object is created with exactly the
+requested null or object prototype, including array, function, and module
+namespace prototypes. An undefined or absent properties argument returns the
+fresh object directly.
 
-Fixed native and generated differential evidence at property seed
-`0x60005400` covers null, object, and invalid prototypes ahead of entries,
-undefined, and null properties arguments, every independently optional
-descriptor field, seven admitted value families, abrupt getters, mixed and
-non-object descriptors at each collection position, module namespace
-properties and prototype arguments, both specialization policies, false
-hints, deliberate shape-guard misses, generic fallback, forced collection
-at every safepoint, and a collection-pressure loop over twenty-four
-chained creations. All 320 paths under the node's inventory root are
-reviewed: 267 pass and 53 retain explicit prerequisite boundaries.
-Forty-eight need the unadmitted `Boolean`, `Date`, `JSON`, and `Math`
-globals, four need the deferred `Object.getOwnPropertyNames` static, and
-one needs `Reflect.construct`. The previously reviewed
+Any other properties value flows through the one ObjectDefineProperties body
+`Object.defineProperties` owns. ToObject precedes the own enumerable key walk,
+so a nullish properties argument throws and a primitive is read through the
+wrapper it converts to. Each kept descriptor is read with Get and converts
+through the shared ToPropertyDescriptor body in ordinary own-key order. The
+whole collection pass completes before the first definition.
+
+Definitions on the fresh extensible target cannot fail, so an abrupt collection
+is the only abrupt completion. An abrupt collection discards the created object
+with the thrown error. Object, array, mapped arguments, and module namespace
+properties arguments keep the compatibility rules the collection checkpoint
+recorded. For a namespace, each descriptor is read through its binding cells.
+
+The M3 descriptor-map rejection and its `object-create-descriptor-map`
+dependency observation retire, so call and constructor spread now reach the
+same admitted contract with dynamic arity.
+
+Fixed native and generated differential evidence at property seed `0x60005400`
+covers null, object, and invalid prototypes ahead of entries, undefined, and
+null properties arguments. The same evidence covers every independently
+optional descriptor field, seven admitted value families, abrupt getters, mixed
+and non-object descriptors at each collection position, module namespace
+properties and prototype arguments, both specialization policies, false hints,
+deliberate shape-guard misses, generic fallback, forced collection at every
+safepoint, and a collection-pressure loop over twenty-four chained creations.
+
+All 320 paths under the node's inventory root are reviewed: 267 pass and 53
+retain explicit prerequisite boundaries. Forty-eight need the unadmitted
+`Boolean`, `Date`, `JSON`, and `Math` globals, four need the deferred
+`Object.getOwnPropertyNames` static, and one needs `Reflect.construct`. The
+previously reviewed
 `test/language/statements/for-in/order-enumerable-shadowed.js` moves from
-unsupported to pass because its only blocker was the retired
-descriptor-map rejection. The manifest moves from 13,553 to 13,872 cases
-and from 9,365 to 9,632 passes, keeps 1,506 expected negatives, and moves
-from 2,682 to 2,734 unsupported profile features, with no semantic,
-harness, or infrastructure failures. The suite revision, 41,091-path
-inventory, manifest schema and vocabulary, and zero-override policy are
-unchanged. The admitted runtime checkpoint moves the runtime ABI to
-`oseo-runtime-m5-80` without adding a generated-code entry point or
-changing the graph's orchestration state.
+unsupported to pass because its only blocker was the retired descriptor-map
+rejection.
 
-M5b node `regexp-literal-aot` admits regular expression literals. A literal
-is an expression wherever the grammar admits one, and its pattern is parsed
-and compiled during the build to the immutable `@oseo/compiler` matcher
-artifact that `regexp-generic-matcher` already established as the family's
-semantic authority. Nothing about the pattern is read at run time: no
-pattern tree, bootstrap-parser node, or pattern text survives as something
-to be parsed. An invalid pattern or flag set stays an ECMA-262 early error
-at the offending text, and a pattern whose artifact the build cannot
-produce, because it reaches an owned instruction or register limit or needs
-a Unicode fact the composition root did not supply, reports the profile
-boundary at the same text.
+The manifest moves from 13,553 to 13,872 cases and from 9,365 to 9,632 passes,
+keeps 1,506 expected negatives, and moves from 2,682 to 2,734 unsupported
+profile features, with no semantic, harness, or infrastructure failures.
 
-Evaluating a literal allocates a fresh RegExp object whose prototype is
-`%RegExp.prototype%`, which is what GetPrototypeFromConstructor reaches for
-`%RegExp%` because its `prototype` property is neither writable nor
-configurable, and whose own `lastIndex` is a writable, non-enumerable,
-non-configurable data property starting at zero. Repeated evaluation of one
-occurrence and evaluation of two equal occurrences never share object
-identity or mutable state. The realm keeps one immutable matcher artifact
-per descriptor, so equal evaluations share compiled instructions, sets,
-repetition records, group names, and pattern text without sharing anything
-observable. Two source occurrences of one pattern still emit two
-descriptors: object allocation and identity are never deduplicated.
+The admitted runtime checkpoint changes the runtime ABI to
+`oseo-runtime-m5-80`. It adds no generated-code entry point and does not change
+the graph's orchestration state. M5b node `regexp-literal-aot` admits regular
+expression literals. A literal is an expression wherever the grammar admits
+one. The build parses and compiles its pattern to the immutable
+`@oseo/compiler` matcher artifact that `regexp-generic-matcher` already
+established as the family's semantic authority.
 
-The C backend writes the compiled artifact as generated data, and its
-layout is generated-code ABI declared in *oseo\_runtime.h*: the instruction
-array, the concatenated inversion lists and their offsets, the repetition
-table, the capture and group-name tables, the written pattern and flag
-text, and the normalized flag mask. One entry point, `oseo_regexp_literal`,
-takes that descriptor and returns the fresh object, and the runtime's
-matcher executes the descriptor with the same executor a dynamic pattern
-reaches. Both compilation paths therefore run one choice order, capture
-visibility, assertion and lookaround behavior, backreference resolution,
-quantifier priority, empty-progress failure, and UTF-16 and code-point
-traversal. A backreference to a duplicated group name expands to one
-instruction per candidate capture, which is the shape the runtime's own
-pattern compiler emits.
+Nothing about the pattern is read at run time. No pattern tree,
+bootstrap-parser node, or pattern text survives as something to be parsed. An
+invalid pattern or flag set stays an ECMA-262 early error at the offending
+text. A pattern whose artifact the build cannot produce reports the profile
+boundary at the same text. That happens when it reaches an owned instruction or
+register limit, or needs a Unicode fact the composition root did not supply.
+
+Evaluating a literal allocates a fresh RegExp object. Its prototype is
+`%RegExp.prototype%`, which GetPrototypeFromConstructor reaches for `%RegExp%`
+because its `prototype` property is neither writable nor configurable. Its own
+`lastIndex` is a writable, non-enumerable, non-configurable data property
+starting at zero. Repeated evaluation of one occurrence and evaluation of two
+equal occurrences never share object identity or mutable state.
+
+The realm keeps one immutable matcher artifact per descriptor. Equal
+evaluations therefore share compiled instructions, sets, repetition records,
+group names, and pattern text without sharing anything observable. Two source
+occurrences of one pattern still emit two descriptors. Object allocation and
+identity are never deduplicated.
+
+The C backend writes the compiled artifact as generated data. Its layout is
+generated-code ABI declared in *oseo\_runtime.h*: the instruction array, the
+concatenated inversion lists and their offsets, the repetition table, the
+capture and group-name tables, the written pattern and flag text, and the
+normalized flag mask. One entry point, `oseo_regexp_literal`, takes that
+descriptor and returns the fresh object. The runtime's matcher executes the
+descriptor with the same executor a dynamic pattern reaches.
+
+Both compilation paths therefore run one choice order, capture visibility,
+assertion and lookaround behavior, backreference resolution, quantifier
+priority, empty-progress failure, and UTF-16 and code-point traversal. A
+backreference to a duplicated group name expands to one instruction per
+candidate capture, which is the shape the runtime's own pattern compiler emits.
 
 A descriptor may carry the complete `Canonicalize` table its build computed
-from the pinned Unicode tables, and does so exactly when the pattern
-compares two input characters under `i`, which is only a backreference;
-every other ignore-case decision is folded into a set while the artifact is
-built. A literal therefore admits an ignore-case pattern whose closure
-reaches a non-ASCII equivalence class, and it resolves Unicode property
-escapes, both of which the runtime's own pattern compiler still refuses
-with the documented `OSEO2001` boundary because it links no folding or
-property data. Those are differences in profile reach, not in matching:
-where both paths admit a pattern they produce the same match state, and the
-generated evidence compares them case by case.
+from the pinned Unicode tables. It does so exactly when the pattern compares
+two input characters under `i`, which is only a backreference. Every other
+ignore-case decision is folded into a set while the artifact is built.
+
+A literal therefore admits an ignore-case pattern whose closure reaches a
+non-ASCII equivalence class. It also resolves Unicode property escapes. The
+runtime's own pattern compiler still refuses both with the documented
+`OSEO2001` boundary because it links no folding or property data. These are
+differences in profile reach, not in matching. Where both paths admit a
+pattern, they produce the same match state, and the generated evidence compares
+them case by case.
 
 `@oseo/compiler` still links no Unicode data. The command line is the
 composition root that supplies the two `Canonicalize` rules, the
-`Space_Separator` set, and the property-escape lookup to the frontend, so a
-literal compiled by a build and one compiled by a test describe the same
-pinned release. A composition that supplies none cannot compile an
+`Space_Separator` set, and the property-escape lookup to the frontend. A
+literal compiled by a build and one compiled by a test therefore describe the
+same pinned release. A composition that supplies none cannot compile an
 ignore-case pattern, a `\s` escape, or a property escape, and reports the
 profile boundary rather than matching against a guess.
 
-Fixed native and generated differential evidence at seeds `0x60005500`
-through `0x60005502` covers literal and constructor compilation of one
-generated pattern side by side, repeated evaluation with per-object
-`lastIndex`, the written text the `source`, `flags`, and `toString`
-behavior reports, match indices, global and sticky iteration, controlled
-early errors, both specialization policies, forced collection at every
-safepoint, false hints, deliberate shape-guard misses, and generic
-fallback. The allocation-attempt sweep gains the literal path, so every
-allocation it takes, including the realm cache's own table, fails once,
-collects, and retries in the same context without publishing a partial
-artifact or object. The cache reserves its slot before the artifact
-exists, and it is addressed by descriptor rather than scanned, so one
-evaluation's lookup does not grow with the number of literal sites. Structural
-evidence in *tests/regexp-literal-aot.test.ts* proves that the artifact reaches
-MIR, that the descriptor and its arrays are generated data, that no run-time
-pattern construction is emitted, and that the canonicalization table appears
-exactly where a comparison needs it.
+Fixed native and generated differential evidence at seeds `0x60005500` through
+`0x60005502` covers literal and constructor compilation of one generated
+pattern side by side. It also covers repeated evaluation with per-object
+`lastIndex`, the written text that the `source`, `flags`, and `toString`
+behavior reports, match indices, global and sticky iteration, controlled early
+errors, both specialization policies, forced collection at every safepoint,
+false hints, deliberate shape-guard misses, and generic fallback.
 
-The node declares no inventory root, so it promotes reviewed paths rather
-than adding any. Three hundred eighty-one already-reviewed paths move from
-unsupported to pass because a literal was the only thing they were waiting
-for: 346 under *test/built-ins/RegExp/*, 27 String cases spread over
-`endsWith`, `includes`, `match`, `matchAll`, `replace`, `replaceAll`,
-`search`, `split`, and `startsWith`, which reach the owned boundary,
-observe `IsRegExp`, or merely evaluate a literal argument before a
-receiver error, three `Function.prototype` and three `Array.prototype`
-cases that pass a regular expression as a non-callable argument, one
-`Object.prototype.toString` case, and one module case that writes a
-literal in a `for await` head.
+The allocation-attempt sweep gains the literal path, so every allocation it
+takes, including the realm cache's own table, fails once, collects, and retries
+in the same context without publishing a partial artifact or object.
 
-Admitting literals also settled which diagnostic an Annex B rejection
-reports, because a rejected literal is now the difference between a
-program that builds and one that does not.
-[ADR 0013](./adr/0013-m5-edition-and-manifest.md) places Annex B outside
-the claim and requires a case inside the boundary that depends on it to be
-reported as unsupported with the section named, never as a failure and
-never dropped. The owned pattern parser now reports a construct only Annex
-B admits as the profile boundary rather than as invalid text, and only
-without `u` or `v`, because those flag sets never admitted the construct
-and their rejection is the early error the edition itself requires. The
-rule covers an identity escape over an `ID_Continue` character, a legacy
+The cache reserves its slot before the artifact exists and is addressed by
+descriptor rather than scanned, so one evaluation's lookup does not grow with
+the number of literal sites.
+
+Structural evidence in *tests/regexp-literal-aot.test.ts* proves that the
+artifact reaches MIR, that the descriptor and its arrays are generated data,
+that no run-time pattern construction is emitted, and that the canonicalization
+table appears exactly where a comparison needs it.
+
+The node declares no inventory root, so it promotes reviewed paths rather than
+adding any. Three hundred eighty-one already-reviewed paths move from
+unsupported to pass because a literal was the only thing they were waiting for.
+Of these, 346 are under *test/built-ins/RegExp/*. 27 String cases are spread
+over `endsWith`, `includes`, `match`, `matchAll`, `replace`, `replaceAll`,
+`search`, `split`, and `startsWith`; they reach the owned boundary, observe
+`IsRegExp`, or merely evaluate a literal argument before a receiver error.
+Three `Function.prototype` and three `Array.prototype` cases pass a regular
+expression as a non-callable argument. One `Object.prototype.toString` case and
+one module case that writes a literal in a `for await` head are also included.
+
+Admitting literals also settled which diagnostic an Annex B rejection reports,
+because a rejected literal is now the difference between a program that builds
+and one that does not. [ADR 0013](./adr/0013-m5-edition-and-manifest.md) places
+Annex B outside the claim and requires a case inside the boundary that depends
+on it to be reported as unsupported with the section named, never as a failure
+and never dropped. The owned pattern parser now reports a construct only Annex
+B admits as the profile boundary rather than as invalid text. It does so only
+without `u` or `v`, because those flag sets never admitted the construct and
+their rejection is the early error the edition itself requires.
+
+The rule covers an identity escape over an `ID_Continue` character, a legacy
 octal escape, a control escape without an ASCII letter, an incomplete
-hexadecimal or Unicode escape, a quantified lookahead, an unescaped `]`,
-`}`, or `{`, a class-escape bound class range, a backreference that names
-no group, and a named backreference in a pattern that declares no group
-name. A rejection Annex B shares, such as a quantified lookbehind, an
-out-of-order class range, a named backreference in a pattern that does
-declare a group name, or `\k` inside a class when that pattern declares a
-group name, stays an early error in both modes.
-
-That split makes the reported kind the record of whether a host engine
-agrees, so the generated invalid pattern domain now uses it to decide when
-the reference hosts are a sound oracle instead of asking whether a
-unicode-mode flag is set. It also keeps
+hexadecimal or Unicode escape, a quantified lookahead, and an unescaped `]`,
+`}`, or `{`. It also covers a class-escape bound class range, a backreference
+that names no group, and a named backreference in a pattern that declares no
+group name. A rejection that Annex B shares, such as a quantified lookbehind,
+an out-of-order class range, a named backreference in a pattern that does
+declare a group name, or `\k` inside a class when that pattern declares a group
+name, stays an early error in both modes. That split makes the reported kind
+the record of whether a host engine agrees. The generated invalid pattern
+domain uses that record to decide when the reference hosts are a sound oracle,
+instead of asking whether a unicode-mode flag is set. It also keeps
 *test/built-ins/String/prototype/split/separator-regexp.js* classified as
-unsupported: four of its thirty-seven literals, `/\XA0/`, `/\X/`,
-`/\x/`, and `/\k<x>/`, parse only under Annex B, and the case now
-reports that boundary instead of turning into a parse rejection.
+unsupported: four of its thirty-seven literals, `/\XA0/`, `/\X/`, `/\x/`, and
+`/\k<x>/`, parse only under Annex B, and the case now reports that boundary
+instead of turning into a parse rejection.
 
-The manifest keeps 13,872 paths, moves from 9,632 to 10,013 passes, keeps
-1,506 expected negatives, and moves from 2,734 to 2,353 unsupported
-profile features, with no semantic, harness, or infrastructure failures.
-The runtime ABI moves to `oseo-runtime-m5-81`. The node adds one
-generated-code ABI entry point, `oseo_regexp_literal`, and no built-in code
-ID. The suite revision, 41,091-path inventory, manifest schema and
-vocabulary, and the manifest's zero-override policy are unchanged.
+The manifest holds 13,872 paths, 10,013 passes, 1,506 expected negatives, and
+2,353 unsupported profile features, with no semantic, harness, or
+infrastructure failures. The runtime ABI is `oseo-runtime-m5-81`. The node adds
+one generated-code ABI entry point, `oseo_regexp_literal`, and no built-in code
+ID. The suite revision, 41,091-path inventory, manifest schema and vocabulary,
+and the manifest's zero-override policy are unchanged.
 
 M5b node `math-namespace` materializes the `Math` namespace object. It is an
-ordinary object whose `[[Prototype]]` is the realm's `%Object.prototype%`,
-and the global object binds it as a writable, non-enumerable, configurable
-property, so a program may replace or delete `Math` exactly as it may
-replace `Number` or `String`. It is not a function: it has neither
-`[[Call]]` nor `[[Construct]]`, calling it throws a `TypeError`, and its
-`Symbol.toStringTag` is the non-writable, non-enumerable, configurable
-string `"Math"`, so `Object.prototype.toString` reports `[object Math]`.
-None of its function properties is a constructor either, so `new Math.abs(1)`
-throws a `TypeError` before any argument is converted.
+ordinary object whose `[[Prototype]]` is the realm's `%Object.prototype%`. The
+global object binds it as a writable, non-enumerable, configurable property, so
+a program may replace or delete `Math` exactly as it may replace `Number` or
+`String`.
+
+It is not a function. It has neither `[[Call]]` nor `[[Construct]]`, and
+calling it throws a `TypeError`. Its `Symbol.toStringTag` is the non-writable,
+non-enumerable, configurable string `"Math"`, so `Object.prototype.toString`
+reports `[object Math]`. None of its function properties is a constructor
+either, so `new Math.abs(1)` throws a `TypeError` before any argument is
+converted.
 
 The eight value properties `E`, `LN10`, `LN2`, `LOG10E`, `LOG2E`, `PI`,
-`SQRT1_2`, and `SQRT2` are non-writable, non-enumerable, and
-non-configurable, and each holds the Number value closest to the constant it
-names. The thirty-six function properties of 21.3.2 are writable,
-non-enumerable, and configurable ordinary built-in functions with their
-specified names and lengths: `abs`, `acos`, `acosh`, `asin`, `asinh`,
-`atan`, `atanh`, `atan2`, `cbrt`, `ceil`, `clz32`, `cos`, `cosh`, `exp`,
-`expm1`, `f16round`, `floor`, `fround`, `hypot`, `imul`, `log`, `log1p`,
-`log10`, `log2`, `max`, `min`, `pow`, `random`, `round`, `sign`, `sin`,
-`sinh`, `sqrt`, `tan`, `tanh`, and `trunc`. `Math.sumPrecise` belongs to a
-later edition than the one [ADR 0013](./adr/0013-m5-edition-and-manifest.md)
-pins and is not added.
+`SQRT1_2`, and `SQRT2` are non-writable, non-enumerable, and non-configurable.
+Each holds the Number value closest to the constant it names.
 
-Every function converts its arguments with `ToNumber` in argument order and
-propagates the first abrupt conversion without converting the arguments
-after it, so a `Symbol` operand throws a `TypeError` and a throwing
-`valueOf` is observed exactly once. A missing argument converts `undefined`,
-which is `NaN` for the unary operations, and `Math.max`, `Math.min`, and
-`Math.hypot` convert every argument they receive before comparing any of
-them.
+The thirty-six function properties of 21.3.2 are writable, non-enumerable, and
+configurable ordinary built-in functions with their specified names and
+lengths: `abs`, `acos`, `acosh`, `asin`, `asinh`, `atan`, `atanh`, `atan2`,
+`cbrt`, `ceil`, `clz32`, `cos`, `cosh`, `exp`, `expm1`, `f16round`, `floor`,
+`fround`, `hypot`, `imul`, `log`, `log1p`, `log10`, `log2`, `max`, `min`,
+`pow`, `random`, `round`, `sign`, `sin`, `sinh`, `sqrt`, `tan`, `tanh`, and
+`trunc`. `Math.sumPrecise` belongs to a later edition than the one
+[ADR 0013](./adr/0013-m5-edition-and-manifest.md) pins and is not added.
+
+Every function converts its arguments with `ToNumber` in argument order. It
+propagates the first abrupt conversion without converting the arguments after
+it, so a `Symbol` operand throws a `TypeError` and a throwing `valueOf` is
+observed exactly once. A missing argument converts `undefined`, which is `NaN`
+for the unary operations. `Math.max`, `Math.min`, and `Math.hypot` convert
+every argument they receive before comparing any of them.
 
 The exactly determined operations produce exactly the specified Number.
 `Math.round` returns the closest integral Number and breaks a tie toward
-positive infinity, so `Math.round(-2.5)` is `-2`, `Math.round(-0.2)` is
-`-0`, and `Math.round(0.49999999999999994)` is `+0`. `Math.ceil`,
-`Math.floor`, `Math.trunc`, `Math.abs`, `Math.sign`, `Math.sqrt`,
+positive infinity, so `Math.round(-2.5)` is `-2`, `Math.round(-0.2)` is `-0`,
+and `Math.round(0.49999999999999994)` is `+0`.
+
+`Math.ceil`, `Math.floor`, `Math.trunc`, `Math.abs`, `Math.sign`, `Math.sqrt`,
 `Math.cbrt`, `Math.min`, `Math.max`, `Math.fround`, and `Math.f16round`
-preserve the specified signed zero, and `Math.max` treats `+0` as larger
-than `-0` while `Math.min` treats it as smaller. `Math.max` and `Math.min`
-report `NaN` whenever any converted argument is `NaN`, while `Math.hypot`
-reports `+∞` for an infinite argument even when another is `NaN`.
-`Math.pow` follows Number::exponentiate rather than the host C library, so a
-`NaN` exponent is `NaN` even for a base of one and a base of exactly one or
-minus one with an infinite exponent is `NaN`. `Math.fround` and
-`Math.f16round` round to binary32 and binary16 with ties to even over exact
-binary64 scaling of the operand, so no narrowing floating conversion happens
-and an operand that rounds past the format's largest finite value becomes an
-infinity. `Math.clz32` and `Math.imul` read their
-operands through `ToUint32` and report the exact counted and wrapped
-results.
+preserve the specified signed zero. `Math.max` treats `+0` as larger than `-0`
+while `Math.min` treats it as smaller. `Math.max` and `Math.min` report `NaN`
+whenever any converted argument is `NaN`, while `Math.hypot` reports `+∞` for
+an infinite argument even when another is `NaN`.
+
+`Math.pow` follows Number::exponentiate rather than the host C library. A `NaN`
+exponent is `NaN` even for a base of one, and a base of exactly one or minus
+one with an infinite exponent is `NaN`.
+
+`Math.fround` and `Math.f16round` round to binary32 and binary16 with ties to
+even over exact binary64 scaling of the operand, so no narrowing floating
+conversion happens and an operand that rounds past the format's largest finite
+value becomes an infinity.
+
+`Math.clz32` and `Math.imul` read their operands through `ToUint32` and report
+the exact counted and wrapped results.
 
 The remaining operations are the ones ECMA-262 marks
-implementation-approximated, so this profile commits to their specified
-special values, their argument conversion, and their sign behavior rather
-than to a digit-exact result. On the supported native targets they are the
-host C library's correspondingly named operations, which agree with the
-reference hosts to within one unit in the last place; the differential
-fixtures assert the specified exact cases directly and the approximated ones
-through bounded identities so a permitted last-place difference is not
-recorded as a semantic requirement.
+implementation-approximated. This profile commits to their specified special
+values, their argument conversion, and their sign behavior rather than to a
+digit-exact result. On the supported native targets they are the host C
+library's correspondingly named operations, which agree with the reference
+hosts to within one unit in the last place. The differential fixtures assert
+the specified exact cases directly and the approximated ones through bounded
+identities, so a permitted last-place difference is not recorded as a semantic
+requirement.
 
 `Math.random` returns a Number in `[0, 1)` drawn from a realm-owned
-xorshift128+ generator whose two state words the realm mixes from its own
-initialization ordinal, meaning the number of realms the process had
-already initialized. ECMA-262 leaves the strategy to the implementation but
-requires the `Math.random` of one realm to produce a sequence distinct from
-every other realm's, and this runtime keeps every other observable schedule
-reproducible, including its timer order for known deadlines, so realm N of a
-run seeds
-from ordinal N: a host that initializes its realms in one order draws the
-same pairwise distinct sequences on every run and every supported target
-rather than seeding from host entropy. The ordinal counter is atomic, so a
-host that initialized two realms on separate threads would still give each
-its own ordinal without a data race, but atomicity does not order the two,
-so that host would keep distinctness and give up the fixed assignment of
-ordinal to realm. No current host initializes realms concurrently. A later
-host-capability decision owns introducing an entropy source; nothing in the
-pinned suite observes the difference.
+xorshift128+ generator. The realm mixes the generator's two state words from
+its own initialization ordinal, meaning the number of realms the process had
+already initialized.
 
-Fixed native and generated differential evidence at property seed
-`0x60005600` covers the namespace identity, prototype, and tag, every
-descriptor class, every function's name and length, the specified signed
-zeroes, infinities, and `NaN` results, exact square roots, powers,
-logarithms of powers of two, Pythagorean `hypot` scales, binary32 and
-binary16 rounding at and past the format boundaries, `ToUint32` wrapping,
-argument conversion order, abrupt conversion, `Symbol` operands, bounded
-approximated identities, the pseudorandom range, both specialization
-policies, collection forced at every safepoint, false hints, deliberate
-shape-guard misses, generic fallback, and the global-object write, delete,
-restore, assignment-target, and strict missing-property sequences the
-replaceable binding admits. One native C fixture initializes three realms
-in a single process and observes that their `Math.random` sequences differ
-pairwise while every draw stays inside `[0, 1)`; the fixture prints those
-draws and its driver runs the executable twice on the matching native
-target to observe the two runs agreeing.
+ECMA-262 leaves the strategy to the implementation but requires the
+`Math.random` of one realm to produce a sequence distinct from every other
+realm's. This runtime keeps every other observable schedule reproducible,
+including its timer order for known deadlines, so realm N of a run seeds from
+ordinal N. A host that initializes its realms in one order draws the same
+pairwise distinct sequences on every run and every supported target rather than
+seeding from host entropy.
 
-All 317 paths under the node's inventory root are accounted for and 316 are
-reviewed: 280 pass and 36 retain the explicit `Reflect.construct`
-prerequisite their *isConstructor.js* include needs.
-*test/built-ins/Math/sqrt/results.js* stays outside the reviewed subset
-because its thousand-entry nested array literal exceeds the runtime's
-reviewed active frame-slot budget, an existing resource boundary this node
-does not own. The reviewed *nans.js* harness include also becomes available,
-because `Math.pow` was its only unadmitted dependency. One hundred and
-five previously reviewed paths outside the root move from
-`unsupported-profile-feature` to `pass`: one hundred and three read `Math`
+The ordinal counter is atomic, so a host that initialized two realms on
+separate threads would still give each its own ordinal without a data race.
+Atomicity does not order the two, so that host would keep distinctness and give
+up the fixed assignment of ordinal to realm. No current host initializes realms
+concurrently. A later host-capability decision owns introducing an entropy
+source. Nothing in the pinned suite observes the difference. Fixed native and
+generated differential evidence at property seed `0x60005600` covers the
+namespace identity, prototype, and tag, every descriptor class, and every
+function's name and length. It also covers the specified signed zeroes,
+infinities, and `NaN` results, exact square roots, powers, logarithms of powers
+of two, Pythagorean `hypot` scales, binary32 and binary16 rounding at and past
+the format boundaries, and `ToUint32` wrapping.
+
+The evidence also covers argument conversion order, abrupt conversion, `Symbol`
+operands, bounded approximated identities, and the pseudorandom range. It
+covers both specialization policies, collection forced at every safepoint,
+false hints, deliberate shape-guard misses, and generic fallback. It covers the
+global-object write, delete, restore, assignment-target, and strict
+missing-property sequences the replaceable binding admits.
+
+One native C fixture initializes three realms in a single process. It observes
+that their `Math.random` sequences differ pairwise while every draw stays
+inside `[0, 1)`. The fixture prints those draws, and its driver runs the
+executable twice on the matching native target to observe the two runs agreeing.
+
+All 317 paths under the node's inventory root are accounted for. Of the 316
+reviewed, 280 pass and 36 retain the explicit `Reflect.construct` prerequisite
+their *isConstructor.js* include needs. *test/built-ins/Math/sqrt/results.js*
+stays outside the reviewed subset because its thousand-entry nested array
+literal exceeds the runtime's reviewed active frame-slot budget, an existing
+resource boundary this node does not own. The reviewed *nans.js* harness
+include also becomes available, because `Math.pow` was its only unadmitted
+dependency.
+
+One hundred and five previously reviewed paths outside the root move from
+`unsupported-profile-feature` to `pass`. One hundred and three read `Math`
 while probing an unrelated contract, and two are the
 _Object/internals/DefineOwnProperty/nan-equivalence-\*.js_ cases the new
 include unblocks. Eleven of the hundred and three are the
-_Object/create/15.2.3.5-4-\*.js_ cases that pass the `Math` object itself as
-a `Properties` argument, which `object-create` reviewed as unsupported
-while `Math` was absent, and five are _RegExp.prototype.exec_ and
-_RegExp.prototype.test_ cases that read `Math` for a match subject or a
-`lastIndex` value, which `regexp-literal-aot` reviewed as unsupported for
-the same reason. No previously reviewed path loses a pass. The manifest
-moves from 13,872 to 14,188 cases and from 10,013 to 10,398 passes, keeps
-1,506 expected negatives, and moves from 2,353 to 2,284 unsupported
-profile features, with no semantic, harness, or infrastructure failures. The
-suite revision, 41,091-path inventory, manifest schema and vocabulary, and
-zero-override policy are unchanged. The admitted runtime checkpoint moves
-the runtime ABI to `oseo-runtime-m5-82` without adding a generated-code
-entry point or changing the graph's orchestration state.
+_Object/create/15.2.3.5-4-\*.js_ cases that pass the `Math` object itself as a
+`Properties` argument, which `object-create` reviewed as unsupported while
+`Math` was absent. Five are _RegExp.prototype.exec_ and _RegExp.prototype.test_
+cases that read `Math` for a match subject or a `lastIndex` value, which
+`regexp-literal-aot` reviewed as unsupported for the same reason. No previously
+reviewed path loses a pass.
+
+The manifest has 14,188 cases and 10,398 passes, keeps 1,506 expected
+negatives, and has 2,284 unsupported profile features. It reports no semantic,
+harness, or infrastructure failures. The suite revision, 41,091-path inventory,
+manifest schema and vocabulary, and zero-override policy are unchanged.
+
+The admitted runtime checkpoint sets the runtime ABI to `oseo-runtime-m5-82`.
+It adds no generated-code entry point and does not change the graph's
+orchestration state.
 
 M5b node `array-prototype-reduction` implements ordinary `reduce` and
-`reduceRight` functions on the realm-owned `%Array.prototype%` and removes
-both from the unadmitted boundary table. Each method converts its receiver
-with `ToObject` and reads LengthOfArrayLike before validating the callback,
-so a `length` read on the receiver is observable even when the callback is
+`reduceRight` functions on the realm-owned `%Array.prototype%` and removes both
+from the unadmitted boundary table. Each method converts its receiver with
+`ToObject` and reads LengthOfArrayLike before validating the callback. A
+`length` read on the receiver is therefore observable even when the callback is
 not callable, and a non-callable callback then throws a `TypeError`. When the
 traversal is empty and no initial value is supplied, the same check ordering
 ends in a `TypeError` after the callable check.
@@ -5199,55 +5283,55 @@ ends in a `TypeError` after the callable check.
 One accumulator loop serves both methods. `reduce` visits ascending indices
 from zero and `reduceRight` descending indices from the snapshot length minus
 one. Every index passes HasProperty before Get, so holes are skipped and
-inherited entries participate, and both reads observe the receiver live, so
-an element deleted, assigned, or added below the snapshot length during
-traversal produces the specified result while indices at or above the
-snapshot stay unvisited. Initial-value presence follows the argument count,
-so an explicit `undefined` initial value seeds the accumulator. Without an
-initial value, the first present element in traversal order seeds the
-accumulator without a callback invocation, and a traversal that ends without
-one throws a `TypeError`. The callback receives the accumulator, element,
-index, and converted receiver with an undefined `this` value, its result
-becomes the next accumulator, and its abrupt completion or an abrupt
-`length`, element, or coercion read stops the loop at that step. Neither
-method allocates a result array, so no `constructor` or `Symbol.species`
-read is reachable.
+inherited entries participate. Both reads observe the receiver live, so an
+element deleted, assigned, or added below the snapshot length during traversal
+produces the specified result while indices at or above the snapshot stay
+unvisited.
+
+Initial-value presence follows the argument count, so an explicit `undefined`
+initial value seeds the accumulator. Without an initial value, the first
+present element in traversal order seeds the accumulator without a callback
+invocation, and a traversal that ends without one throws a `TypeError`. The
+callback receives the accumulator, element, index, and converted receiver with
+an undefined `this` value. Its result becomes the next accumulator, and its
+abrupt completion or an abrupt `length`, element, or coercion read stops the
+loop at that step. Neither method allocates a result array, so no `constructor`
+or `Symbol.species` read is reachable.
 
 Fixed native and generated differential evidence at seed `0x60005700` covers
 sparse, generic, inherited, primitive, and frozen receivers, both traversal
 orders, accumulator seeding, initial-value presence by argument count, the
 empty-traversal `TypeError`, callback argument order and receiver identity,
-length coercion and clamping, mutation during the snapshot-length loop,
-abrupt completion at each observable step, both specialization policies,
-forced collection at every safepoint, false hints, deliberate shape-guard
-misses, and generic fallback. All 520 paths under the node's two inventory
-roots are reviewed: 494 pass and 26 retain explicit prerequisite boundaries.
-Fourteen need the unadmitted `Boolean`, `Date`, or `JSON` globals,
-two need `Reflect.construct`, two need TypedArray receivers, six need
-resizable-buffer harness support, and two expect the dynamic
-`ReferenceError` an unreferenced callback binding requires, which the
-profile reports as a source-located diagnostic instead. Three sort
-stability paths outside the roots change classification from
-`unsupported-profile-feature` to `pass` because their final observation
-reduces the sorted result, which this node admits. The manifest moves from
-14,188 to 14,708 cases and from 10,398 to 10,895 passes, keeps 1,506 expected
-negatives, and moves from 2,284 to 2,307 unsupported profile features, with
-no semantic, harness, or infrastructure failures. The suite revision,
-41,091-path inventory, manifest schema and vocabulary, and zero-override
-policy are unchanged. The admitted runtime checkpoint moves the runtime ABI
-to `oseo-runtime-m5-83` and allocates two code IDs inside the existing Array
-range without adding a generated-code entry point or changing the graph's
-orchestration state.
+length coercion and clamping, and mutation during the snapshot-length loop. It
+also covers abrupt completion at each observable step, both specialization
+policies, forced collection at every safepoint, false hints, deliberate
+shape-guard misses, and generic fallback.
+
+All 520 paths under the node's two inventory roots are reviewed. Of those, 494
+pass and 26 retain explicit prerequisite boundaries. Fourteen need the
+unadmitted `Boolean`, `Date`, or `JSON` globals. Two need `Reflect.construct`,
+two need TypedArray receivers, and six need resizable-buffer harness support.
+Two expect the dynamic `ReferenceError` an unreferenced callback binding
+requires, which the profile reports as a source-located diagnostic instead.
+
+Three sort stability paths outside the roots change classification from
+`unsupported-profile-feature` to `pass` because their final observation reduces
+the sorted result, which this node admits. The manifest has 14,708 cases and
+10,895 passes, keeps 1,506 expected negatives, and has 2,307 unsupported
+profile features. It reports no semantic, harness, or infrastructure failures.
+
+The admitted runtime checkpoint sets the runtime ABI to `oseo-runtime-m5-83`
+and allocates two code IDs inside the existing Array range. It adds no
+generated-code entry point and does not change the graph's orchestration state.
 
 M5b node `array-prototype-index-search` implements ordinary `at`, `includes`,
-`indexOf`, and `lastIndexOf` functions on the realm-owned
-`%Array.prototype%` and retires the two deferred search entries from the
-unadmitted boundary table. Each method converts its receiver and snapshots
-LengthOfArrayLike before converting its relative index. The three search
-methods skip that conversion when the length is zero; `at` still performs it.
-Positive relative indices count from zero, negative indices add the snapshot
-length, and omitted `lastIndexOf` starts at the last index while an explicit
-`undefined` starts at zero.
+`indexOf`, and `lastIndexOf` functions on the realm-owned `%Array.prototype%`
+and retires the two deferred search entries from the unadmitted boundary table.
+Each method converts its receiver and snapshots LengthOfArrayLike before
+converting its relative index. The three search methods skip that conversion
+when the length is zero; `at` still performs it. Positive relative indices
+count from zero, and negative indices add the snapshot length. An omitted
+`lastIndexOf` starts at the last index; an explicit `undefined` starts at zero.
 
 `indexOf` and `lastIndexOf` visit present properties through HasProperty then
 Get and use strict equality, so they skip holes and do not find `NaN`.
@@ -5388,30 +5472,30 @@ String prototype case conversion and normalization
 
 M5b node `string-prototype-case` adds `toLowerCase`, `toUpperCase`,
 `toLocaleLowerCase`, `toLocaleUpperCase`, `trim`, `trimStart`, `trimEnd`,
-`normalize`, and `localeCompare` to the realm-owned `%String.prototype%`.
-Every method first rejects a nullish receiver and then applies the shared
-`ToString`, so String primitives, String wrappers, and generic receivers use
-one conversion path and preserve the first abrupt completion. `normalize`
-converts its optional form after the receiver, and `localeCompare` converts
-its comparison operand after the receiver.
+`normalize`, and `localeCompare` to the realm-owned `%String.prototype%`. Every
+method first rejects a nullish receiver, then applies the shared `ToString`, so
+String primitives, String wrappers, and generic receivers use one conversion
+path and preserve the first abrupt completion. `normalize` converts its
+optional form after the receiver. `localeCompare` converts its comparison
+operand after the receiver.
 
-Case conversion decodes UTF-16 into code points, preserves unpaired
-surrogates, and applies the full locale-insensitive mappings from the pinned
-Unicode 17.0.0 data. It includes expanding mappings and the contextual
-`Final_Sigma` rule over the pinned `Cased` and `Case_Ignorable` properties.
-The two locale methods deliberately use that same pinned default mapping.
-They do not consult a process locale, C library classification routine, or
-host Unicode implementation, so every supported target observes the same
-answer.
+Case conversion decodes UTF-16 into code points, preserves unpaired surrogates,
+and applies the full locale-insensitive mappings from the pinned Unicode 17.0.0
+data. It includes expanding mappings and the contextual `Final_Sigma` rule over
+the pinned `Cased` and `Case_Ignorable` properties. The two locale methods
+deliberately use that same pinned default mapping. They do not consult a
+process locale, C library classification routine, or host Unicode
+implementation, so every supported target observes the same answer.
 
-Trimming uses exactly the ECMAScript union of WhiteSpace and LineTerminator.
-It includes the byte-order mark and excludes U+180E and U+200B. `trim`
-removes both ends, while `trimStart` and `trimEnd` leave the opposite end
-unchanged. Normalization recursively applies canonical or compatibility
-decomposition, canonical combining-class order, composition exclusions, and
-algorithmic Hangul decomposition and composition from the pinned tables.
-The default is `NFC`; the admitted forms are `NFC`, `NFD`, `NFKC`, and
-`NFKD`, and every other converted form throws `RangeError`.
+Trimming uses exactly the ECMAScript union of WhiteSpace and LineTerminator. It
+includes the byte-order mark and excludes U+180E and U+200B. `trim` removes
+both ends, while `trimStart` and `trimEnd` leave the opposite end unchanged.
+
+Normalization recursively applies canonical or compatibility decomposition,
+canonical combining-class order, composition exclusions, and algorithmic Hangul
+decomposition and composition from the pinned tables. The default is `NFC`; the
+admitted forms are `NFC`, `NFD`, `NFKC`, and `NFKD`, and every other converted
+form throws `RangeError`.
 
 `localeCompare` first normalizes both converted operands to `NFD`, then
 compares their UTF-16 code units and returns `-1`, `0`, or `1`. This profile
@@ -5420,75 +5504,77 @@ antisymmetry while keeping ordering independent of host locale state. A later
 internationalization unit can replace that deterministic base comparison
 without making this node depend on an unreviewed host collator.
 
-The Unicode generator now emits
+The Unicode generator emits
 *packages/runtime-c/native/runtime\_unicode\_tables.h* together with the
 existing TypeScript table module. Both outputs are pure functions of the same
 reviewed inputs, and the ordinary Unicode-table check rejects drift in either
 one. The C header carries compact case maps, decomposition and composition
 maps, combining classes, and contextual case-property sets. It is a reviewed
-runtime asset rather than a generated-code entry point, and the runtime
-package ships the Unicode permission notice beside it. Seven IDs in the
-existing String built-in range dispatch the nine methods because each locale
-case form has its own function object but shares the corresponding pinned
-lowercase or uppercase body.
+runtime asset rather than a generated-code entry point, and the runtime package
+ships the Unicode permission notice beside it.
 
-Fixed native and generated differential evidence at property seed
-`0x60005800` covers ASCII, expanding, contextual, Unicode 17,
-supplementary-plane, and unpaired-surrogate case mappings; the complete
-ECMAScript trim set and its exclusions; every normalization form, combining
-mark ordering, compatibility mappings, and Hangul; canonical comparison;
-receiver and operand conversion order; abrupt conversion; method descriptors
-and constructor rejection; both specialization policies; false hints;
-deliberate shape-guard misses; generic fallback; and collection forced at
-every safepoint. The generated oracle decodes case answers through
-`@oseo/unicode` independently of the C header, and the same source executes
-unchanged under Node.js, Deno, and the native runtime. The fixed native lane
-also retains the AArch64 Linux cross-link.
+Seven IDs in the existing String built-in range dispatch the nine methods
+because each locale case form has its own function object but shares the
+corresponding pinned lowercase or uppercase body.
 
-All 312 paths under the node's nine inventory roots are reviewed: 290 pass
-and 22 retain explicit prerequisite boundaries. Nine need
-`Reflect.construct` for their *isConstructor.js* include, nine need the
-unadmitted Boolean wrapper intrinsic, and four need dynamic `eval`. No
-previously reviewed path loses a pass. Three Number conversion paths outside
-the roots move from `unsupported-profile-feature` to `pass` because admitting
-the `u180e` feature exposes their already-correct conversion result. The
-manifest moves from 14,708 to 15,020 cases and from 10,895 to 11,188 passes,
-keeps 1,506 expected negatives, and moves from 2,307 to 2,326 unsupported
-profile features, with no semantic, harness, or infrastructure failures. The
-suite revision, 41,091-path inventory, manifest schema and vocabulary,
-target-parity policy, and zero-override policy are unchanged. The admitted
-runtime checkpoint moves the runtime ABI to `oseo-runtime-m5-84` without
-adding a generated-code entry point or changing the graph's orchestration
-state.
+Fixed native and generated differential evidence at property seed `0x60005800`
+covers ASCII, expanding, contextual, Unicode 17, supplementary-plane, and
+unpaired-surrogate case mappings. The same evidence covers the complete
+ECMAScript trim set and its exclusions, plus every normalization form,
+combining mark ordering, compatibility mappings, and Hangul. It also covers
+canonical comparison, receiver and operand conversion order, abrupt conversion,
+method descriptors, and constructor rejection. Both specialization policies,
+false hints, deliberate shape-guard misses, generic fallback, and collection
+forced at every safepoint are also covered.
 
-M5b node `regexp-symbol-methods` admits the five `RegExp.prototype`
-well-known symbol methods, the `RegExp.escape` static, and the
-`String.prototype` dispatch that reaches them. Each method requires an
-Object receiver, reads `flags`, `lastIndex`, `constructor`,
-`Symbol.species`, `index`, `groups`, `length`, and the numbered capture
-properties through ordinary property access, and executes through
-`RegExpExec`, so an overridden `exec` is called and its non-object,
+The generated oracle decodes case answers through `@oseo/unicode` independently
+of the C header, and the same source executes unchanged under Node.js, Deno,
+and the native runtime. The fixed native lane also retains the AArch64 Linux
+cross-link.
+
+All 312 paths under the node's nine inventory roots are reviewed: 290 pass and
+22 retain explicit prerequisite boundaries. Nine need `Reflect.construct` for
+their *isConstructor.js* include, nine need the unadmitted Boolean wrapper
+intrinsic, and four need dynamic `eval`. No previously reviewed path loses a
+pass.
+
+Three Number conversion paths outside the roots pass because admitting the
+`u180e` feature exposes their already-correct conversion result. The manifest
+has 15,020 cases, 11,188 passes, 1,506 expected negatives, and 2,326
+unsupported profile features, with no semantic, harness, or infrastructure
+failures. The suite revision, 41,091-path inventory, manifest schema and
+vocabulary, target-parity policy, and zero-override policy are unchanged. The
+runtime ABI is `oseo-runtime-m5-84`. The admitted runtime checkpoint adds no
+generated-code entry point and does not change the graph's orchestration state.
+
+M5b node `regexp-symbol-methods` admits the five `RegExp.prototype` well-known
+symbol methods, the `RegExp.escape` static, and the `String.prototype` dispatch
+that reaches them. Each method requires an Object receiver and reads `flags`,
+`lastIndex`, `constructor`, `Symbol.species`, `index`, `groups`, `length`, and
+the numbered capture properties through ordinary property access. Each executes
+through `RegExpExec`, so an overridden `exec` is called and its non-object,
 non-null result is a `TypeError`.
 
-`@@match` returns one execution for a pattern that is not global, and
-otherwise resets `lastIndex`, collects every matched substring, advances by
+`@@match` returns one execution for a pattern that is not global. Otherwise it
+resets `lastIndex`, collects every matched substring, advances by
 `AdvanceStringIndex` after an empty match, and answers null when nothing
-matched. `@@search` saves `lastIndex`, executes from zero, restores the
-saved value through `SameValue`, and reports `index` or -1. `@@matchAll`
-and `@@split` take `SpeciesConstructor(rx, %RegExp%)` and construct a copy
-with the receiver's `flags`, which `@@split` extends with `y` when it is
-absent; `@@matchAll` also copies `lastIndex` and freezes the `global` and
-`unicode` decisions into the iterator it returns. `@@replace` collects
-every execution before it builds, clamps each `index`, converts every
-capture that participated, passes the captures, the position, the subject,
-and the named-capture object to a callable replacer, and otherwise runs
-GetSubstitution, which now resolves `$1` through `$99` and `$<name>`. Its
-next source position is the unclamped sum of that position and the matched
-length, so a match object built by user code that reports a `0` longer than
-the remaining subject makes every later match, including one at the
-subject's end, contribute nothing. A
-two-digit reference past the capture count is one digit followed by a
-literal digit, and an unterminated `$<` copies its own text.
+matched. `@@search` saves `lastIndex`, executes from zero, restores the saved
+value through `SameValue`, and reports `index` or -1.
+
+`@@matchAll` and `@@split` take `SpeciesConstructor(rx, %RegExp%)` and
+construct a copy with the receiver's `flags`, which `@@split` extends with `y`
+when it is absent. `@@matchAll` also copies `lastIndex` and freezes the
+`global` and `unicode` decisions into the iterator it returns.
+
+`@@replace` collects every execution before it builds, clamps each `index`, and
+converts every capture that participated. It passes the captures, the position,
+the subject, and the named-capture object to a callable replacer. Otherwise it
+runs GetSubstitution, which resolves `$1` through `$99` and `$<name>`. Its next
+source position is the unclamped sum of that position and the matched length. A
+match object built by user code that reports a `0` longer than the remaining
+subject therefore makes every later match, including one at the subject's end,
+contribute nothing. A two-digit reference past the capture count is one digit
+followed by a literal digit, and an unterminated `$<` copies its own text.
 
 `RegExp.escape` requires a String argument, hex-escapes a leading decimal
 digit or ASCII letter, escapes every SyntaxCharacter and the solidus,
@@ -5579,13 +5665,14 @@ Generator and asynchronous function intrinsic chains
 M5b node `function-intrinsic-chains` materializes `%GeneratorFunction%`,
 `%AsyncFunction%`, and `%AsyncGeneratorFunction%` as realm-owned intrinsic
 values together with `%GeneratorFunction.prototype%` and
-`%AsyncFunction.prototype%`. Each constructor is an ordinary built-in
-function whose `[[Prototype]]` is `%Function%`, whose `name` is its own
-intrinsic name, whose `length` is 1, and whose `prototype` is the matching
-prototype object with the specified non-writable, non-enumerable,
-non-configurable attributes. Each prototype object is an ordinary
-non-callable object whose `[[Prototype]]` is `%Function.prototype%` and
-which carries no own `length` or `name`.
+`%AsyncFunction.prototype%`.
+
+Each constructor is an ordinary built-in function whose `[[Prototype]]` is
+`%Function%`, whose `name` is its own intrinsic name, whose `length` is 1, and
+whose `prototype` is the matching prototype object with the specified
+non-writable, non-enumerable, non-configurable attributes. Each prototype
+object is an ordinary non-callable object whose `[[Prototype]]` is
+`%Function.prototype%` and which carries no own `length` or `name`.
 
 Every link between these objects is an ordinary own property with the
 specified non-writable, non-enumerable, configurable attributes, defined on
@@ -5594,39 +5681,43 @@ the object ECMA-262 places it on rather than synthesized by a property read.
 `Symbol.toStringTag` of `"GeneratorFunction"`; `%AsyncFunction.prototype%`
 carries `constructor` and a `Symbol.toStringTag` of `"AsyncFunction"` and
 deliberately no `prototype`, because an asynchronous function is not a
-constructor. `%GeneratorPrototype%` now carries `constructor` and a
-`Symbol.toStringTag` of `"Generator"` beside its existing `next`, `return`,
-and `throw`. The three synchronous generator intrinsics are created as one
-cluster, the way the asynchronous generator cluster already was, because
-their links are circular and a program must never observe a
-`%GeneratorPrototype%` whose `constructor` is still missing.
+constructor. `%GeneratorPrototype%` carries `constructor` and a
+`Symbol.toStringTag` of `"Generator"` alongside its `next`, `return`, and
+`throw`.
+
+The three synchronous generator intrinsics are created as one cluster, as the
+asynchronous generator cluster is, because their links are circular and a
+program must never observe a `%GeneratorPrototype%` whose `constructor` is
+still missing.
 
 OrdinaryOwnPropertyKeys reports a non-index string key in the order the
 property was created, so the order the realm creates these links in is
 observable. A program reaches it through the own descriptor record, and,
 without `Object.getOwnPropertyNames`, by redefining a configurable link as
-enumerable and then reading `Object.keys` or walking `for`-`in`. Each object
-therefore creates its properties in the order the reference hosts expose:
-`%GeneratorFunction.prototype%` and `%AsyncGeneratorFunction.prototype%` take
-`prototype` before `constructor`, `%GeneratorPrototype%` and
-`%AsyncGeneratorPrototype%` take `constructor` before `next`, `return`, and
-`throw`, `%AsyncFunction.prototype%` carries `constructor` alone, and each
-constructor takes `length`, `name`, and `prototype` in that order. ECMA-262
-fixes no creation order for a built-in object, so the reference hosts own this
-one; the allocation order stays free, because only a definition creates a key.
+enumerable and then reading `Object.keys` or walking `for`-`in`.
+
+Each object therefore creates its properties in the order the reference
+hosts expose: `%GeneratorFunction.prototype%` and
+`%AsyncGeneratorFunction.prototype%` take `prototype` before `constructor`,
+`%GeneratorPrototype%` and `%AsyncGeneratorPrototype%` take `constructor`
+before `next`, `return`, and `throw`, `%AsyncFunction.prototype%` carries
+`constructor` alone, and each constructor takes `length`, `name`, and
+`prototype` in that order. ECMA-262 fixes no creation order for a built-in
+object, so the reference hosts define it; the allocation order stays free,
+because only a definition creates a key.
 
 A generator function, an asynchronous function, an asynchronous arrow
 function, and an asynchronous generator function each inherit from the
-prototype object of its own kind, in every syntactic form: declaration,
-expression, arrow, object method, class method, and static class method.
-`Object.getPrototypeOf` and `Object.prototype.toString` therefore reach these
-chains through ordinary reads, and the owned `generator-intrinsics`
-reflection boundary those two operations carried is removed. A program that
-replaces a link observes the replacement: detaching a generator function's
-`[[Prototype]]` makes it report `[object Function]`, replacing a generator
-function's `prototype` gives its generators that object's chain, and
-redefining a kind prototype's `Symbol.toStringTag` retags every function of
-that kind.
+prototype object of its own kind. This holds in every syntactic form:
+declaration, expression, arrow, object method, class method, and static class
+method. `Object.getPrototypeOf` and `Object.prototype.toString` therefore
+reach these chains through ordinary reads, without the owned
+`generator-intrinsics` reflection boundary those two operations carried. A
+program that replaces a link observes the replacement: detaching a generator
+function's `[[Prototype]]` makes it report `[object Function]`, replacing a
+generator function's `prototype` gives its generators that object's chain,
+and redefining a kind prototype's `Symbol.toStringTag` retags every function
+of that kind.
 
 Calling or constructing any of the three constructors stays outside the
 profile under [ADR 0016](./adr/0016-dynamic-source-boundary.md), because it
@@ -5636,44 +5727,49 @@ the same boundary `%Function%` already carries. The three constructors exist
 as intrinsic values so that the chains above them are complete; nothing
 approximates their behavior.
 
-A generator object takes its `[[Prototype]]` from the function's
-`prototype` at the point EvaluateBody reads it, which is after
-FunctionDeclarationInstantiation. The prologue has to allocate the
-generator record before it instantiates parameters, because a parameter is
-initialized into the record's collector-traced slots, so the read is
-completed when the call returns instead. That is the first moment the
-object reaches the program, so the relink is unobservable, and a parameter
-initializer that replaces its own function's `prototype` now selects the
-object the specification selects. A `prototype` replaced before the call is
-honored, and one replaced after the call does not reach an object already
-created. This makes the two reviewed
-_async-generator/generator-created-after-decl-inst.js_ cases pass. The
-reflection boundary this node removes had masked them, and the reference
-hosts still report the earlier read, so the differential fixtures do not
-cover this ordering and the reviewed test262 cases own it instead.
+A generator object takes its `[[Prototype]]` from the function's `prototype`
+at the point EvaluateBody reads it, which is after
+FunctionDeclarationInstantiation. The prologue has to allocate the generator
+record before it instantiates parameters, because a parameter is initialized
+into the record's collector-traced slots, so the read is completed when the
+call returns instead.
+
+That is the first moment the object reaches the program, so the relink is
+unobservable, and a parameter initializer that replaces its own function's
+`prototype` selects the object the specification selects. A `prototype`
+replaced before the call is honored, and one replaced after the call does not
+reach an object already created. This makes the two reviewed
+_async-generator/generator-created-after-decl-inst.js_ cases pass.
+
+The removed reflection boundary had masked them, and the reference hosts
+still report the earlier read, so differential fixtures do not cover this
+ordering; the reviewed test262 cases own it instead.
 
 `%AsyncFromSyncIteratorPrototype%` is not materialized, and this is a
 deliberate representation choice rather than a gap in observable behavior.
-ECMA-262 never hands an AsyncFromSyncIterator object to a program: the
-wrapper exists only inside a `for await` head and a delegating `yield*`, so
-no `Object.getPrototypeOf` route reaches it. Oseo keeps it as an unreachable
-internal record with no prototype and no own properties, and the reviewed
+ECMA-262 never exposes an AsyncFromSyncIterator object to a program: the
+wrapper exists only inside a `for await` head and a delegating `yield*`, so no
+`Object.getPrototypeOf` route reaches it. Oseo keeps it as an unreachable
+internal record with no prototype and no own properties. The reviewed
 _test/built-ins/AsyncFromSyncIteratorPrototype/_ paths exercise the
 operational contract that record implements.
 
 Fixed native and generated differential evidence at property seed
-`0x60005a00` covers every function kind in every admitted syntactic form,
-the complete descriptor set of each constructor and prototype object, the
-chain depth and identity a walk through `Object.getPrototypeOf` observes,
-the `Symbol.toStringTag` each object reports, the instance chain a generator
-object exposes, `instanceof` through each constructor, link replacement, the
-complete own string-key order of every constructor and prototype object read
-both through the descriptor record and after each configurable link becomes
-enumerable, both specialization policies, false hints, deliberate shape-guard
-misses, generic fallback, and collection forced at every safepoint. The three
-dynamic-source diagnostics are proved as fixed native observations, because
-a rejected program produces a host diagnostic rather than a catchable throw.
-The fixed native lane also retains the AArch64 Linux cross-link.
+`0x60005a00` covers every function kind in every admitted syntactic form.
+This includes the complete descriptor set of each constructor and prototype
+object, the chain depth and identity a walk through `Object.getPrototypeOf`
+observes, and the `Symbol.toStringTag` each object reports. The evidence also
+covers the instance chain a generator object exposes, `instanceof` through
+each constructor, link replacement, and the complete own string-key order of
+every constructor and prototype object, read both through the descriptor
+record and after each configurable link becomes enumerable.
+
+The evidence covers both specialization policies, false hints, deliberate
+shape-guard misses, generic fallback, and collection forced at every
+safepoint. The three dynamic-source diagnostics are proved as fixed native
+observations, because a rejected program produces a host diagnostic rather
+than a catchable throw. The fixed native lane also retains the AArch64 Linux
+cross-link.
 
 All 215 paths under the node's seven inventory roots are accounted for and
 209 are reviewed: 173 pass and 36 retain explicit prerequisite boundaries.
@@ -5878,15 +5974,16 @@ non-ASCII identity escape without `u` keep their located boundary.
 Promise settled combinators
 ---------------------------
 
-M5b node `promise-allsettled-and-any` completes the four iterable Promise
-combinators by replacing the deferred `Promise.allSettled` and `Promise.any`
-entry points with their ECMA-262 algorithms. `allSettled` creates one
-ordinary result record per input in input order. A fulfilled record creates
-`status` with value `"fulfilled"` before `value`; a rejected record creates
-`status` with value `"rejected"` before `reason`. Every property is writable,
-enumerable, and configurable. Each element's fulfill and reject closure
-shares one first-call guard, so only the first call contributes its record
-and decrements the remaining count.
+The M5b node `promise-allsettled-and-any` completes the four iterable Promise
+combinators. It replaces the deferred `Promise.allSettled` and `Promise.any`
+entry points with their ECMA-262 algorithms.
+
+`allSettled` creates one ordinary result record per input in input order. A
+fulfilled record creates `status` with value `"fulfilled"` before `value`; a
+rejected record creates `status` with value `"rejected"` before `reason`. Every
+property is writable, enumerable, and configurable. Each element's fulfill and
+reject closure shares one first-call guard, so only the first call contributes
+its record and decrements the remaining count.
 
 `any` fulfills with the first fulfilled input. When every input rejects, it
 creates an `AggregateError` with the realm's standard prototype, the
@@ -5899,52 +5996,52 @@ constructor, so an overridden Array iterator is not observed a second time.
 Both methods share the capability, iterator, and abrupt-completion machinery
 with `Promise.all` and `Promise.race`. They apply NewPromiseCapability to the
 receiver, read `resolve` once, call it with the receiver for every element,
-close an active iterator after the applicable abrupt completions, and
-preserve subclass-created promise capabilities. A native capability records
-aggregate settlement so a later closure cannot settle it again, while a
-foreign constructor continues to receive the exact resolve and reject
-functions it created.
+close an active iterator after the applicable abrupt completions, and preserve
+subclass-created promise capabilities. A native capability records aggregate
+settlement so a later closure cannot settle it again. A foreign constructor
+continues to receive the exact resolve and reject functions it created.
 
-Fixed native and generated differential evidence at property seed
-`0x60004502` covers zero through four directly generated thenables, each of
-which fulfills, rejects, fulfills then rejects, or rejects then fulfills with
-one bounded integer. The independent schedule oracle checks first-call
-behavior, input-ordered result records and rejection reasons, empty input,
-subclass capabilities, metadata, abrupt iterator completion, both
-specialization policies, false hints, deliberate shape-guard misses, generic
-fallback, and collection forced at every safepoint. The property has a
-12-case ordinary budget, direct Array and record shrinking, and reports its
-seed, replay path, profile, domain, size limit, and host target. The fixed
-native lane retains the AArch64 Linux cross-link.
+Fixed native and generated differential evidence at property seed `0x60004502`
+covers zero through four directly generated thenables. Each thenable fulfills,
+rejects, fulfills then rejects, or rejects then fulfills with one bounded
+integer. The independent schedule oracle checks first-call behavior,
+input-ordered result records and rejection reasons, empty input, subclass
+capabilities, metadata, abrupt iterator completion, both specialization
+policies, false hints, deliberate shape-guard misses, generic fallback, and
+collection forced at every safepoint. The property has a 12-case ordinary
+budget, direct Array and record shrinking, and reports its seed, replay path,
+profile, domain, size limit, and host target. The fixed native lane retains the
+AArch64 Linux cross-link.
 
-The reviewed *promiseHelper.js* implementation supplies
-`checkSettledPromises` for the `allSettled` result-record assertions. All 198
-paths under the node's two inventory roots are accounted for and 192 are
-reviewed: 180 pass and 12 retain explicit prerequisite boundaries. Five keep
-the unhandled-rejection policy, three need `Object.getOwnPropertyNames`, two
-need `Reflect.construct`, and two call dynamic `eval`. Three String-iteration
-cases stay outside this node for the separate `string-iterator` owner. Three
-cases whose result promise rejects with an intrinsic error but installs no
-reaction stayed outside the reviewed subset because the unhandled-rejection
+The reviewed *promiseHelper.js* implementation supplies `checkSettledPromises`
+for the `allSettled` result-record assertions. All 198 paths under the node's
+two inventory roots are accounted for, and 192 are reviewed: 180 pass and 12
+retain explicit prerequisite boundaries. Five keep the unhandled-rejection
+policy, three need `Object.getOwnPropertyNames`, two need `Reflect.construct`,
+and two call dynamic `eval`. Three String-iteration cases stay outside this
+node for the separate `string-iterator` owner.
+
+Three cases whose result promise rejects with an intrinsic error but installs
+no reaction remain outside the reviewed subset because the unhandled-rejection
 policy at this node could not distinguish that rejection from an unhandled
-throw: *Promise/allSettled/invoke-resolve-error-close.js*, which rejects with an
-`Error`, and *Promise/any/ctx-ctor.js* and *Promise/any/returns-promise.js*,
-whose empty input rejects with an `AggregateError`. The M5b
-`globalthis-binding` node later gave a rejected recognized intrinsic error the
-rejection boundary text, as recorded under globalThis binding. The closure
-ledger still assigns the three, unreviewed, to node `observation-batch-01`, and
-no observation of them is recorded since. No previously reviewed path loses a
-pass.
-The manifest moves from 16,269 to 16,461 paths and from 12,599 to 12,779
-passes, keeps 1,556 expected negatives, and moves from 2,114 to 2,126
-unsupported profile features, with no semantic, harness, or infrastructure
-failures. The property inventory moves from 121 to 122 domains and seeds and
-from 5,344 to 5,356 ordinary cases. The suite revision, 41,091-path applicable
-inventory, manifest schema and vocabulary, target-parity policy, and
-zero-override policy are unchanged. The admitted runtime checkpoint moves the
-runtime ABI to `oseo-runtime-m5-90` and allocates two code IDs inside the
-existing Promise range without adding a generated-code entry point or
-changing the graph's orchestration state.
+throw. They are *Promise/allSettled/invoke-resolve-error-close.js*, which
+rejects with an `Error`, and *Promise/any/ctx-ctor.js* and
+*Promise/any/returns-promise.js*, whose empty input rejects with an
+`AggregateError`. The M5b `globalthis-binding` node gives the rejection
+boundary text to a rejected recognized intrinsic error, as recorded under
+globalThis binding. The closure ledger still assigns the three unreviewed cases
+to node `observation-batch-01`, and no observation of them is recorded since.
+No previously reviewed path loses a pass.
+
+The manifest has 16,461 paths and 12,779 passes, with 1,556 expected negatives
+and 2,126 unsupported profile features. It has no semantic, harness, or
+infrastructure failures. The property inventory has 122 domains and seeds and
+5,356 ordinary cases. The suite revision, 41,091-path applicable inventory,
+manifest schema and vocabulary, target-parity policy, and zero-override policy
+are unchanged. The admitted runtime checkpoint sets the runtime ABI to
+`oseo-runtime-m5-90` and allocates two code IDs inside the existing Promise
+range. It adds no generated-code entry point and leaves the graph's
+orchestration state unchanged.
 
 
 Lazy iterator helpers
@@ -5952,103 +6049,114 @@ Lazy iterator helpers
 
 M5b node `iterator-helpers-lazy` adds `map`, `filter`, `take`, `drop`, and
 `flatMap` to the realm-owned `%IteratorPrototype%`. Each is a writable,
-non-enumerable, configurable data property whose function has `length` 1, its
-own name, `%Function.prototype%` as its `[[Prototype]]`, and no
-`[[Construct]]`. Each returns an Iterator Helper object whose
-`[[Prototype]]` is the realm's single `%IteratorHelperPrototype%`, which
-inherits from `%IteratorPrototype%`, carries `next` and `return`, and reports
-a non-writable, non-enumerable, configurable `Symbol.toStringTag` of
-`"Iterator Helper"`. A helper is therefore `instanceof Iterator` and its
-`Symbol.iterator` returns itself.
+non-enumerable, configurable data property. Its function has `length` 1, its
+own name, `%Function.prototype%` as its `[[Prototype]]`, and no `[[Construct]]`.
+
+Each returns an Iterator Helper object whose `[[Prototype]]` is the realm's
+single `%IteratorHelperPrototype%`. That prototype inherits from
+`%IteratorPrototype%` and carries `next` and `return`. It has a non-writable,
+non-enumerable, configurable `Symbol.toStringTag` of `"Iterator Helper"`. A
+helper is `instanceof Iterator`, and its `Symbol.iterator` returns itself.
 
 Every method validates its receiver first, so a primitive receiver throws a
-`TypeError` before any argument is read. It then validates its argument
-against the iterator record it would capture, and an argument failure closes
-that record: a non-callable mapper or predicate throws a `TypeError`, and a
-`take` or `drop` limit that is `NaN` after `ToNumber`, or negative after
-`ToIntegerOrInfinity`, throws a `RangeError`, each after calling the
-underlying iterator's `return`. An abrupt `ToNumber` closes it the same way.
-The `next` method is read exactly once, after that validation, so a failing
-argument never reaches the receiver's `next` getter, and every later step
-reuses the captured method.
+`TypeError` before any argument is read. It then validates its argument against
+the iterator record it would capture, and an argument failure closes that
+record.
+
+A non-callable mapper or predicate throws a `TypeError`, and a `take` or `drop`
+limit that is `NaN` after `ToNumber`, or negative after `ToIntegerOrInfinity`,
+throws a `RangeError`, each after calling the underlying iterator's `return`.
+An abrupt `ToNumber` closes it the same way. The `next` method is read exactly
+once, after that validation, so a failing argument never reaches the receiver's
+`next` getter, and every later step reuses the captured method.
 
 The helpers are lazy. ECMA-262 writes each as a generator over an abstract
-closure with a single `yield`, and this profile stores that closure's captured
+closure with a single `yield`. This profile stores that closure's captured
 state on the helper instead: the underlying record, the callback, the counter
 the callback receives as its second argument, the count `take` and `drop`
-decrement, and the inner record `flatMap` is flattening. One resumption
-re-enters the loop where the yield left it, so the underlying iterator
-advances only as far as the consumer pulls, and a program that steps the
+decrement, and the inner record `flatMap` is flattening.
+
+One resumption re-enters the loop where the yield left it, so the underlying
+iterator advances only as far as the consumer pulls. A program that steps the
 underlying iterator in parallel observes the interleaving that produces.
 
-The `[[GeneratorState]]` each helper carries is observable. Resuming or
-closing a helper from inside its own callback throws a `TypeError`. A helper
-that has not run yet completes before it closes its underlying iterator
-directly, which is what `%IteratorHelperPrototype%.return` performs without
-resuming. A suspended helper instead resumes with a return completion through
-GeneratorResumeAbrupt, so its state is `executing` for the whole cleanup and a
+`[[GeneratorState]]` each helper carries is observable. Resuming or closing a
+helper from inside its own callback throws a `TypeError`. A helper that has not
+run yet completes before it closes its underlying iterator directly, which is
+what `%IteratorHelperPrototype%.return` performs without resuming.
+
+A suspended helper instead resumes with a return completion through
+GeneratorResumeAbrupt. Its state is `executing` for the whole cleanup, and a
 `return` method that re-enters that helper reaches the running-generator
 `TypeError` rather than a `done` result. The cleanup closes the underlying
-iterator, and `flatMap` closes its live inner iterator first and the
-underlying iterator second, propagating the inner close failure through the
-outer close. A completed helper closes nothing and answers `done`.
+iterator, and `flatMap` closes its live inner iterator first and the underlying
+iterator second, propagating the inner close failure through the outer close. A
+completed helper closes nothing and answers `done`.
 
-A step that throws, including a `next` result that is not an object,
-completes the helper without closing it, matching the `[[Done]]` the specified
-operation sets before propagating. A callback that throws closes the underlying
-iterator and keeps the original completion, so a `return` method that also
-throws does not replace it. `take` closes its underlying iterator when its
-limit is reached, and `drop` skips its prefix with `IteratorStep`, so a skipped
-result's `value` getter never runs. `flatMap` flattens through
-GetIteratorFlattenable with primitives rejected, so a String and a Number are
-`TypeError`s while their wrapper objects flatten, and a nullish
-`Symbol.iterator` leaves the mapped object itself as the inner iterator.
+A step that throws, including a `next` result that is not an object, completes
+the helper without closing it, matching the `[[Done]]` the specified operation
+sets before propagating. A callback that throws closes the underlying iterator
+and keeps the original completion, so a `return` method that also throws does
+not replace it.
 
-The two reference hosts disagree on that one re-entry: Node.js reports a
-`done` result for a suspended helper, while Deno reports the specified
-`TypeError`. This profile follows ECMA-262 and Deno. The observation is
-therefore recorded as a fixed native evidence assertion in *tests/native.ts*
-rather than as a differential fixture, because a differential fixture requires
-both reference hosts to agree.
+`take` closes its underlying iterator when its limit is reached, and `drop`
+skips its prefix with `IteratorStep`, so a skipped result's `value` getter
+never runs. `flatMap` flattens through GetIteratorFlattenable with primitives
+rejected, so a String and a Number are `TypeError`s while their wrapper objects
+flatten, and a nullish `Symbol.iterator` leaves the mapped object itself as the
+inner iterator.
+
+The two reference hosts disagree on that one re-entry: Node.js reports a `done`
+result for a suspended helper, while Deno reports the specified `TypeError`.
+This profile follows ECMA-262 and Deno. The observation is therefore recorded
+as a fixed native evidence assertion in *tests/native.ts* rather than as a
+differential fixture, because a differential fixture requires both reference
+hosts to agree.
 
 A helper is one collector-traced heap kind rather than extra state on every
 ordinary object. Its underlying record, callback, and in-flight inner record
 are reachable only through the helper, so a collection at any safepoint inside
 a resumption keeps all of them alive.
 
-Fixed native and generated differential evidence at property seed
-`0x60005e00` covers all five helpers, chained pipelines, metadata and
-descriptors, non-construction, argument validation with its close, limit
+Fixed native and generated differential evidence at property seed `0x60005e00`
+covers all five helpers, chained pipelines, metadata and descriptors, and
+non-construction. It also covers argument validation with its close, limit
 conversion through `valueOf` and `toString`, the single captured `next`,
-counter sequences, close forwarding before the first step, while suspended,
-and after completion, the re-entrancy `TypeError`, `flatMap` inner-then-outer
-close order and its primitive rejection, parallel and already-closed
-underlying iterators, both specialization policies, deliberate shape-guard
-hits and misses, generic fallback, and collection forced at every safepoint.
-The generated suite measures a demand-driven pipeline against an independent
-pull model that predicts the emitted values, the callback counter sequence,
-and whether a close reaches the source.
+counter sequences, close forwarding before the first step, while suspended, and
+after completion.
 
-All 184 paths under the node's five inventory roots are reviewed. Every one of
-them declares the upstream `iterator-helpers` feature, which stays
-unsupported, so each reviewed path records an explicit prerequisite boundary
-rather than a pass and the fixed and generated evidence above owns the
-admitted behavior in the meantime. This paragraph originally named the
-separately owned `iterator-helpers-eager` node as the one that completes that
-feature. The eager helper landing measured the remaining blockers and
-disproved that: the tag also needs String iteration and the
-`temporalHelpers.js` harness include the reviewed harness set does not supply.
-The `string-iterator` node now supplies the former prerequisite. The eager
-section below names the six paths that measurement identified. No previously
-reviewed path moves. The manifest reaches 16,645 cases: 12,779 passes, 1,556
-expected negatives, and 2,310 unsupported profile features with no semantic,
-harness, or infrastructure failures. The property inventory moves from 122 to
-123 domains and seeds and from 5,356 to 5,366 ordinary cases. The suite
-revision, 41,091-path inventory, manifest schema and vocabulary, target-parity
-policy, and zero-override policy are unchanged. The new heap kind and the
-expanded intrinsic table move the runtime ABI to `oseo-runtime-m5-91` and
-allocate seven code IDs inside the existing iterator range without adding a
-generated-code entry point or changing the graph's orchestration state.
+The evidence covers the re-entrancy `TypeError`, `flatMap` inner-then-outer
+close order and its primitive rejection, parallel and already-closed underlying
+iterators, both specialization policies, deliberate shape-guard hits and
+misses, generic fallback, and collection forced at every safepoint. The
+generated suite measures a demand-driven pipeline against an independent pull
+model that predicts the emitted values, the callback counter sequence, and
+whether a close reaches the source.
+
+All 184 paths under the node's five inventory roots are reviewed. Each declares
+the upstream `iterator-helpers` feature, which stays unsupported. Each reviewed
+path therefore records an explicit prerequisite boundary rather than a pass,
+and the fixed and generated evidence above owns the admitted behavior in the
+meantime.
+
+The separately owned `iterator-helpers-eager` node does not complete that
+feature: the tag also needs String iteration and the `temporalHelpers.js`
+harness include, which the reviewed harness set does not supply. The
+`string-iterator` node now supplies the former prerequisite. The eager section
+below names the six paths that measurement identified. No previously reviewed
+path moves.
+
+The manifest has 16,645 cases: 12,779 passes, 1,556 expected negatives, and
+2,310 unsupported profile features. It has no semantic, harness, or
+infrastructure failures. The property inventory moves from 122 to 123 domains
+and seeds, and its ordinary cases move from 5,356 to 5,366. The suite revision,
+41,091-path inventory, manifest schema and vocabulary, target-parity policy,
+and zero-override policy are unchanged.
+
+The new heap kind and the expanded intrinsic table move the runtime ABI to
+`oseo-runtime-m5-91`. They allocate seven code IDs inside the existing iterator
+range, without adding a generated-code entry point or changing the graph's
+orchestration state.
 
 
 URI handling functions
@@ -6325,14 +6433,15 @@ Reflect namespace
 
 M5b node `reflect-namespace` materializes the `Reflect` namespace object of
 28.1. `Reflect` is an ordinary object whose `[[Prototype]]` is the realm's
-`%Object.prototype%`; it has neither `[[Call]]` nor `[[Construct]]`, so
+`%Object.prototype%`. It has neither `[[Call]]` nor `[[Construct]]`, so
 calling or constructing it throws a `TypeError`. The global object binds it as
 a writable, non-enumerable, configurable property, so the compiler treats it
 as a property-owned replaceable intrinsic exactly as it treats `Math`, and a
-program may replace, delete, or shadow it. Its `@@toStringTag` value property
-is the String `"Reflect"` with the specified non-writable, non-enumerable,
-configurable attributes, so `Object.prototype.toString` reports
-`"[object Reflect]"`.
+program may replace, delete, or shadow it.
+
+Its `@@toStringTag` value property is the String `"Reflect"` with the
+specified non-writable, non-enumerable, configurable attributes, so
+`Object.prototype.toString` reports `"[object Reflect]"`.
 
 Its thirteen function properties expose one essential internal method each:
 `apply`, `construct`, `defineProperty`, `deleteProperty`, `get`,
@@ -6340,8 +6449,8 @@ Its thirteen function properties expose one essential internal method each:
 `ownKeys`, `preventExtensions`, `set`, and `setPrototypeOf`. Each is an
 ordinary built-in function whose `[[Prototype]]` is `%Function.prototype%`,
 with its specified name and `length`, no `prototype` property, and no
-`[[Construct]]`, and each is a writable, non-enumerable, configurable
-property created in that order.
+`[[Construct]]`. Each is a writable, non-enumerable, configurable property
+created in that order.
 
 Every function but `apply` and `construct` requires an object target and
 throws a `TypeError` for every primitive, including a `Symbol`, rather than
@@ -6349,105 +6458,116 @@ coercing it the way the matching `Object` static does. Each then reports the
 internal method's own result. `defineProperty`, `deleteProperty`, `set`,
 `setPrototypeOf`, and `preventExtensions` report the specification's boolean
 where `Object.defineProperty`, strict `delete`, a strict assignment, and
-`Object.setPrototypeOf` raise a `TypeError`, and the two agree on exactly
-which cases refuse. To keep one set of refusal rules rather than two, the
-descriptor, property, and object components now report a refusal as a message
-the throwing forms turn back into that `TypeError` while the `Reflect`
-function turns it into `false`. An abrupt completion that no boolean can
-carry, such as a `ToPropertyKey` conversion, a descriptor accessor, a setter,
-or the `RangeError` an invalid array length raises, still propagates.
+`Object.setPrototypeOf` raise a `TypeError`. The two agree on exactly which
+cases refuse.
+
+To keep one set of refusal rules rather than two, the descriptor, property,
+and object components report a refusal as a message. The throwing forms turn
+that message back into that `TypeError`, while the `Reflect` function turns it
+into `false`. An abrupt completion that no boolean can carry, such as a
+`ToPropertyKey` conversion, a descriptor accessor, a setter, or the `RangeError`
+an invalid array length raises, still propagates.
 
 `get` and `set` take an explicit receiver, which defaults to the target, so a
 getter or setter found on the target or its prototype chain runs against the
-receiver and a created or updated own property lands on it. `ownKeys` returns
+receiver, and a created or updated own property lands on it. `ownKeys` returns
 one fresh array in OrdinaryOwnPropertyKeys order, integer indices in ascending
 numeric order, then the remaining String keys in creation order, then the
-Symbol keys in creation order, sharing the ordering
-`Object.getOwnPropertyNames` and `Object.getOwnPropertySymbols` already use.
-`getOwnPropertyDescriptor` shares FromPropertyDescriptor with
+Symbol keys in creation order. It shares that ordering with
+`Object.getOwnPropertyNames` and `Object.getOwnPropertySymbols`, which already
+use it. `getOwnPropertyDescriptor` shares FromPropertyDescriptor with
 `Object.getOwnPropertyDescriptor` and reports `undefined` for a missing key.
 
 `apply` requires a callable target and converts its argument list through
 CreateListFromArrayLike, so a non-object list is a `TypeError` and an
-array-like object contributes its `length` and index reads;
-`Function.prototype.apply` now shares that operation, keeping only its own
-nullish shortcut. `construct` requires a constructor target, defaults the new
-target to the target, requires that to be a constructor too, and only then
-converts the argument list. It then performs the target's own
-OrdinaryCreateFromConstructor on the target's behalf, and which receiver
-that produces follows from the constructor the innermost bound target
+array-like object contributes its `length` and index reads.
+`Function.prototype.apply` shares that operation, keeping only its own nullish
+shortcut. `construct` requires a constructor target, defaults the new target
+to the target, requires that to be a constructor too, and only then converts
+the argument list. It then performs the target's own
+OrdinaryCreateFromConstructor on the target's behalf. The receiver that
+operation produces follows from the constructor the innermost bound target
 names: a bound target replaces the new target with its own target at every
 layer at which the two are the same function.
 
-A derived class constructor, one whose class definition had a
-ClassHeritage including `extends null`, creates no receiver at all. 10.2.2
-skips OrdinaryCreateFromConstructor for `[[ConstructorKind]]` derived and
-leaves both the read and the allocation to the `super()` inside the body,
-so nothing is read before the body runs and an observable `prototype`
-accessor on the new target runs at the position `super()` gives it. Each
-`super()` performs the same operation against the super constructor it read
-and the running constructor's new target, so a chain of derived
-constructors reads the new target exactly once, at its innermost base.
+A derived class constructor, one whose class definition had a ClassHeritage
+including `extends null`, creates no receiver at all. 10.2.2 skips
+OrdinaryCreateFromConstructor for `[[ConstructorKind]]` derived and leaves
+both the read and the allocation to the `super()` inside the body, so nothing
+is read before the body runs. An observable `prototype` accessor on the new
+target runs at the position `super()` gives it. Each `super()` performs the
+same operation against the super constructor it read and the running
+constructor's new target. A chain of derived constructors therefore reads the
+new target exactly once, at its innermost base.
 
 For an ordinary or base class constructor the read is a real
 `Get(newTarget, "prototype")` before the body, because a bound function has
 no own `prototype` and a program may define an accessor one on it. For a
 built-in target the position of OrdinaryCreateFromConstructor belongs to the
-clause that defines the constructor, so the built-in performs that read
-itself and `Reflect.construct` creates no receiver for it, exactly as it
-creates none for a derived class constructor. Every constructible built-in
-in the profile now performs it: `Object` before any other step, `Number` and
-`String` after the argument conversion their clause runs first, the eight
-`Error` constructors before ToString of the message, `Map` before it reads
-the `set` adder, `Iterator` after it rejects the abstract constructor
-itself, and `Promise` after its executor callability check, joining `Array`,
-`ArrayBuffer`, `DataView`, and `RegExp`. A non-object result falls back to
-the intrinsic prototype the clause names, and an abrupt one reports at that
-position. `Symbol`, `BigInt`, and `Function` create nothing, because each
-rejects the construction before reaching that step.
+clause that defines the constructor. The built-in therefore performs that read
+itself, and `Reflect.construct` creates no receiver for it, exactly as it
+creates none for a derived class constructor.
 
-Three adjacent corrections land with the node because admitting these
-functions makes already reviewed behavior observable. `%Object.prototype%`
-becomes an immutable prototype exotic object under 10.4.7, so its
-`[[SetPrototypeOf]]` accepts only the null prototype it already has and
-reports `false` for any other, joining the module namespace objects that
-already had that behavior. OrdinarySetWithOwnDescriptor now finishes with the
-receiver's `[[DefineOwnProperty]]` for a value-only descriptor rather than a
-second ordinary assignment, so an array `length` write whose value coercion
+Every constructible built-in in the profile performs it: `Object` before any
+other step, `Number` and `String` after the argument conversion their clause
+runs first, the eight `Error` constructors before ToString of the message,
+`Map` before it reads the `set` adder, `Iterator` after it rejects the
+abstract constructor itself, and `Promise` after its executor callability
+check, joining `Array`, `ArrayBuffer`, `DataView`, and `RegExp`. A non-object
+result falls back to the intrinsic prototype the clause names, and an abrupt
+one reports at that position. `Symbol`, `BigInt`, and `Function` create
+nothing, because each rejects the construction before reaching that step.
+
+Three adjacent corrections are part of the `reflect-namespace` node because
+admitting these functions makes already reviewed behavior observable.
+
+`%Object.prototype%` becomes an immutable prototype exotic object under
+10.4.7. Its `[[SetPrototypeOf]]` accepts only the null prototype it already
+has and reports `false` for any other. It joins the module namespace objects
+that already had that behavior.
+
+OrdinarySetWithOwnDescriptor finishes with the receiver's
+`[[DefineOwnProperty]]` for a value-only descriptor rather than a second
+ordinary assignment. As a result, an array `length` write whose value coercion
 makes `length` non-writable reports `false` after both of its specified hint
-reads. And OrdinarySetWithOwnDescriptor hands an absent own property to the
-parent's own `[[Set]]` rather than continuing one flattened walk, so a module
-namespace reached anywhere on an ordinary object's prototype chain answers
+reads.
+
+OrdinarySetWithOwnDescriptor hands an absent own property to the parent's own
+`[[Set]]` rather than continuing one flattened walk. A module namespace
+reached anywhere on an ordinary object's prototype chain therefore answers
 with its exotic `[[Set]]` of 10.4.6.9 and refuses every key and every
-receiver, exactly as one reached as the target itself already did. Both
-reference hosts refuse a write whose receiver is the namespace, and they
-disagree about every shape whose walk reaches a namespace some other way: the
+receiver, exactly as one reached as the target itself already did.
+
+Both reference hosts refuse a write whose receiver is the namespace. They
+disagree about every shape whose walk reaches a namespace some other way. The
 V8 that Node.js 24 bundles applies the exotic clause only to that one case,
 while Deno's newer V8 and this profile apply 10.4.6.9 wherever the walk
 reaches the namespace.
-
 The runtime gains one component, *runtime\_reflect.c*, and one built-in code
 range whose thirteen IDs count down from the range last in the order the
-namespace creates its properties, so the dispatch reads an index rather than a
-table. The namespace is one lazily created intrinsic. The node adds one
-generated-code entry point, `oseo_super_constructor_receiver`, because
-`Reflect.construct` and `super()` now share one OrdinaryCreateFromConstructor
-in *runtime\_function.c* instead of each reading the new target its own way,
-and one shared internal helper, `oseo_internal_constructor_prototype`,
-performs the `Get(newTarget, "prototype")` that every built-in clause needs
-at its own position.
-It owns no property, descriptor, or call semantics
-of its own: OrdinaryOwnPropertyKeys and ToPropertyDescriptor stay with the
-`Object` component, ValidateAndApplyPropertyDescriptor and `[[Delete]]` with
-the descriptor component, `[[Get]]` and `[[Set]]` with the property component,
+namespace creates its properties. Dispatch therefore reads an index rather than
+a table. The namespace is one lazily created intrinsic.
+
+The node adds one generated-code entry point,
+`oseo_super_constructor_receiver`, because `Reflect.construct` and `super()`
+now share one OrdinaryCreateFromConstructor in *runtime\_function.c* instead of
+each reading the new target its own way. It also adds one shared internal
+helper, `oseo_internal_constructor_prototype`, which performs the
+`Get(newTarget, "prototype")` that every built-in clause needs at its own
+position.
+
+The new component owns no property, descriptor, or call semantics of its own.
+OrdinaryOwnPropertyKeys and ToPropertyDescriptor stay with the `Object`
+component. ValidateAndApplyPropertyDescriptor and `[[Delete]]` stay with the
+descriptor component. `[[Get]]` and `[[Set]]` stay with the property component,
 `[[SetPrototypeOf]]` with the object component, and CreateListFromArrayLike
 with the function component.
 
 The reviewed *isConstructor.js* harness include becomes available with this
 node. Its one operation is a `Reflect.construct` call whose abrupt completion
-it catches, so the include had no reviewed implementation before and every
-case that named it stayed outside the reviewed subset or recorded an explicit
-`Reflect.construct` prerequisite.
+it catches. Before this node, the include had no reviewed implementation, so
+every case that named it stayed outside the reviewed subset or recorded an
+explicit `Reflect.construct` prerequisite.
 
 The later `proxy-exotic-object` node admits `Proxy`, so reflective operations
 now observe its traps and validate their answers against the target invariants
@@ -6455,60 +6575,74 @@ described in the following section.
 
 Fixed native and generated differential evidence at property seeds
 `0x60006300`, `0x60006301`, and `0x60006302` covers the namespace identity,
-descriptor, and
-`@@toStringTag`,
-the thirteen function identities, names, lengths, descriptors, and `new`
-rejections, the object-target `TypeError` for six primitive kinds across every
-function that requires one, integer-index, String, and Symbol own-key
-ordering, data and accessor descriptors across every writable, enumerable,
-configurable, and setter combination, own and missing probe keys, extensible
-and non-extensible targets, the boolean-versus-`TypeError` agreement with the
-matching `Object` static for definition, assignment, deletion, and prototype
-writes, the explicit receiver of `get` and `set`, array-like and array
+descriptor, and `@@toStringTag`. It also covers the thirteen function
+identities, names, lengths, descriptors, and `new` rejections, and the
+object-target `TypeError` for six primitive kinds across every function that
+requires one. It covers integer-index, String, and Symbol own-key ordering.
+
+The same evidence covers data and accessor descriptors across every writable,
+enumerable, configurable, and setter combination, own and missing probe keys,
+and extensible and non-extensible targets. It also covers the
+boolean-versus-`TypeError` agreement with the matching `Object` static for
+definition, assignment, deletion, and prototype writes.
+
+It covers the explicit receiver of `get` and `set`, array-like and array
 argument lists, `construct` with and without a distinct new target, a bound
-target and a bound new target, an abrupt `prototype` accessor, the observed
-order of a derived, base, built-in-parent, and derived-parent construction
-against a bound new target whose `prototype` is an accessor, the
-`Array`, `Iterator`, `Map`, `Number`, `Object`, `String`, and `TypeError`
-constructions against a bound new target whose `prototype` is an accessor
-answering with an object, with a primitive, or abruptly, against a bound new
-target that owns no `prototype` at all, and against a defaulted one, each
-with and without an observable argument conversion to order against the
-read, a bound `TypeError` whose inherited `prototype` the specified Get
-reaches through its target's own chain, a bound and a twice-bound built-in
-target, an `AggregateError` new target read before both the message
-conversion and the errors iterable, a `Symbol` and a `BigInt` construction
-that rejects before reading the new target at all, the
-array `length` coercion order, the immutable `%Object.prototype%`, a module
-namespace reached as the write target, as a prototype, and as a grandparent
-under both `Reflect.set` and the strict assignment form, both
-specialization policies, collection forced at every safepoint, a false number
-hint, a deliberate global-object shape guard miss with generic fallback, and
-the global write, delete, restore, assignment-target, and strict
-missing-property sequences the replaceable binding admits. The generated
-oracle models own-key order, descriptor validation, and OrdinarySet directly
-rather than calling the host's own `Reflect`.
+target and a bound new target, and an abrupt `prototype` accessor.
+
+The evidence covers the observed order of a derived, base, built-in-parent, and
+derived-parent construction against a bound new target whose `prototype` is an
+accessor. It also covers the `Array`, `Iterator`, `Map`, `Number`, `Object`,
+`String`, and `TypeError` constructions against a bound new target whose
+`prototype` is an accessor. The accessor answers with an object, with a
+primitive, or abruptly. The same constructions are covered against a bound new
+target that owns no `prototype` at all and against a defaulted one. Each case
+runs with and without an observable argument conversion to order against the
+read.
+
+The evidence covers a bound `TypeError` whose inherited `prototype` the
+specified Get reaches through its target's own chain, and a bound and a
+twice-bound built-in target. It also covers an `AggregateError` new target read
+before both the message conversion and the errors iterable, and a `Symbol` and
+a `BigInt` construction that rejects before reading the new target at all.
+
+It covers the array `length` coercion order, the immutable
+`%Object.prototype%`, and a module namespace reached as the write target, as a
+prototype, and as a grandparent under both `Reflect.set` and the strict
+assignment form. It also covers both specialization policies, collection forced
+at every safepoint, a false number hint, and a deliberate global-object shape
+guard miss with generic fallback. The global write, delete, restore,
+assignment-target, and strict missing-property sequences the replaceable
+binding admits are also covered.
+
+The generated oracle models own-key order, descriptor validation, and
+OrdinarySet directly rather than calling the host's own `Reflect`.
 
 Of the 153 paths under the node's inventory root, 152 are reviewed: 139 pass
 and 13 retain explicit prerequisite boundaries, ten for `Proxy` and three for
 the `Function` constructor and the `Date` intrinsic their bodies reach.
 *ownKeys/return-on-corresponding-order-large-index.js* stays outside the
-subset: its frontmatter names only admitted features, but its body needs the
-`Symbol` registry the separately owned `symbol-intrinsic` node holds, and the
+subset. Its frontmatter names only admitted features, but its body needs the
+`Symbol` registry the separately owned `symbol-intrinsic` node holds. The
 own-key order it measures already agrees with the reference hosts.
+
 Two hundred and eighty-five reviewed cases outside that root also move from
 unsupported profile feature to pass, and no reviewed row moves away from pass.
 Most of them detect a non-constructor through the *isConstructor.js* include
-this node makes available, and the rest read a `Reflect` function directly.
-The manifest reaches 17,495 cases: 13,873 passes, 1,556 expected negatives,
-and 2,066 unsupported profile features with no semantic, harness, or
-infrastructure failures, up from 17,343 cases with 13,449 passes and 2,338
-unsupported profile features. The suite revision, 41,091-path inventory,
-manifest schema, and zero-override policy are unchanged; the dependency
-vocabulary adds the `reflect-namespace` evidence tag. The admitted runtime
-checkpoint moves the runtime ABI to `oseo-runtime-m5-96`, adds the
-`oseo_super_constructor_receiver` generated-code entry point, and does not
-change the graph's orchestration state.
+this node makes available; the rest read a `Reflect` function directly.
+
+The manifest reaches 17,495 cases: 13,873 passes, 1,556 expected negatives, and
+2,066 unsupported profile features, with no semantic, harness, or
+infrastructure failures. That is up from 17,343 cases with 13,449 passes and
+2,338 unsupported profile features.
+
+The suite revision, 41,091-path inventory, manifest schema, and zero-override
+policy are unchanged. The dependency vocabulary adds the `reflect-namespace`
+evidence tag.
+
+The admitted runtime checkpoint moves the runtime ABI to `oseo-runtime-m5-96`,
+adds the `oseo_super_constructor_receiver` generated-code entry point, and does
+not change the graph's orchestration state.
 
 
 Array prototype iterators
@@ -6618,72 +6752,74 @@ an independent arithmetic oracle and corroborates it with Node.js and Deno.
 The collector traces the backing-buffer reference, while the view never owns
 or caches the buffer's native Data Block; a store reacquires the buffer after
 conversion before touching bytes.
-
 M5c node `typed-array-feature-admission` adds `Float16Array`, the twelfth
-concrete constructor of ECMA-262 2025 Table 73, with element size 2 and
-element type Float16. A store rounds the converted Number once, directly
-from binary64, to binary16 with ties to even; magnitudes of 65520 and above
-become signed infinity, and a NaN stores the canonical quiet NaN. Reads
-return the exact Number a binary16 encoding denotes, so a Float16Array and a
-DataView over one buffer agree bit for bit. Float16 is a Number content type
-for every conversion and content-type check, and every `Atomics` operation
-rejects a Float16Array with `TypeError`. The global property is writable,
-non-enumerable, and configurable like the other constructors, and `typeof`
-reads it. The node also admits the frontmatter tags of the nine other
-concrete constructors that the reviewed feature list lacked. The generated
-domains at seeds `0x60006e00` and `0x60006e01` draw `Float16Array` from
-their shared Number constructor pool, so construction, prototype, iterator,
-out-of-bounds, global, primitive length, and construction-order cases cover
-it like the other eleven kinds. Generated evidence at seed `0x60006e02`
-checks rounding at binary16 midpoints and their binary64 neighbors against an
-exact BigInt oracle through construction, element assignment, and DataView,
-and the fixed `typed-array-float16` native fixture covers the constructor
-surface. Preparation ran no native build or execution and no manifest update.
-A later local Linux run of the Float16 conversion domain drew binary16
-bits 1, which is 2^-24, and its stored bits were exact, but the runtime
-printed the Number with 17 digits instead of 16; the node fixes that shared
-decimal digit selection, described with the `number-prototype` node above,
-rather than the binary16 conversion. After that fix, local Linux whole-file
-extended runs of the constructor and Number prototype property files passed.
-The complete reviewed test262 update then observed all 42 paths the node owns
-as passes and changed no other classification. Two TypedArray
-`toLocaleString` paths keep their `primitive-wrapper` boundary at the same
-`calls.push(this)` site, now reported six harness lines later. A later
-local Linux run of the fixed native fixture passed on the same source.
-Rebased onto the TypedArray `toLocaleString` argument change, which edits
-the `join` helper the fixture calls, the node's manifest first carried
-those records forward. A complete manifest update on that integrated source
-then reproduced all 28,287 records without a change. A native fixture run
-on that source, macOS execution, and CI remain pending. These 42 paths do
-not show complete Float16 conformance.
+concrete constructor of ECMA-262 2025 Table 73, with element size 2 and element
+type Float16. A store rounds the converted Number once, directly from binary64,
+to binary16 with ties to even. Magnitudes of 65520 and above become signed
+infinity, and a NaN stores the canonical quiet NaN. Reads return the exact
+Number a binary16 encoding denotes, so a Float16Array and a DataView over one
+buffer agree bit for bit.
+
+Float16 is a Number content type for every conversion and content-type check,
+and every `Atomics` operation rejects a Float16Array with `TypeError`. The
+global property is writable, non-enumerable, and configurable like the other
+constructors, and `typeof` reads it. The node also admits the frontmatter tags
+of the nine other concrete constructors that the reviewed feature list lacked.
+
+The generated domains at seeds `0x60006e00` and `0x60006e01` draw
+`Float16Array` from their shared Number constructor pool, so construction,
+prototype, iterator, out-of-bounds, global, primitive length, and
+construction-order cases cover it like the other eleven kinds. Generated
+evidence at seed `0x60006e02` checks rounding at binary16 midpoints and their
+binary64 neighbors against an exact BigInt oracle through construction, element
+assignment, and DataView. The fixed `typed-array-float16` native fixture covers
+the constructor surface.
+
+On local Linux, a Float16 conversion of binary16 bits 1, which is 2^-24, stored
+the exact bits, but the runtime printed the Number with 17 digits instead of
+16. The node fixes that shared decimal digit selection, described with the
+`number-prototype` node above, rather than the binary16 conversion. In the
+complete reviewed test262 update, all 42 paths the node owns pass, and no other
+classification changed. Two TypedArray `toLocaleString` paths keep their
+`primitive-wrapper` boundary at the same `calls.push(this)` site, now reported
+six harness lines later. These 42 paths do not show complete Float16
+conformance.
+
+The TypedArray `toLocaleString` argument change edits the `join` helper the
+fixture calls; the node's manifest on that integrated source holds 28,287
+records. A native fixture run on that source, macOS execution, and CI remain
+pending.
 
 The reviewed test262 subset adds 81 directly applicable paths from the node's
 736-path inventory. Fourteen BigInt constructor and prototype metadata cases
-pass. The other 67 retain an explicit `unsupported-profile-feature` boundary:
-63 otherwise applicable Number constructor metadata cases, two BigInt
+pass. The other 67 retain an explicit `unsupported-profile-feature` boundary.
+Of those, 63 otherwise applicable Number constructor metadata cases, two BigInt
 metadata cases, and two BigInt conversion cases carry test262's broad
 `TypedArray` feature tag, which also claims the prototype surface owned by the
 later core node. The remaining 655 paths stay outside the reviewed subset.
-Cases for prototype accessors and methods, static `from` and `of`, species,
-and the complete integer-indexed exotic object have explicit later graph
-owners and runtime lookup boundaries. Constructor cases that include the
-upstream
+
+Cases for prototype accessors and methods, static `from` and `of`, species, and
+the complete integer-indexed exotic object have explicit later graph owners and
+runtime lookup boundaries. Constructor cases that include the upstream
 *testTypedArray.js* harness also require Array statics and TypedArray prototype
-accessors that this node does not admit; the fixed fixture and the independent
+accessors that this node does not admit. The fixed fixture and the independent
 generated oracle replace that harness for every construction path and element
-conversion this node owns. Twenty-four already reviewed ArrayBuffer transfer
-cases also promote because their typed-view inspection dependency is now
-available. One DataView receiver case and eleven `Object.seal` cases also
-promote after their concrete TypedArray inputs become available. The manifest
-reaches 18,768 cases: 15,226 passes, 1,556 expected negatives, and 1,986
-unsupported profile features with no semantic, harness, or infrastructure
-failures. The reviewed feature list retained the broader `TypedArray` gate for
-the later core node, which has since admitted it and moved those 67 cases to
-`pass`, and the dependency vocabulary gains `typed-array-constructors`. The
-component and heap kind move the runtime ABI to `oseo-runtime-m5-106`, and the
-public intrinsic table grows by 24 slots for the new constructor and prototype
-pairs. The value representation and the generated-code entry points are
-unchanged, and no graph state moves.
+conversion this node owns.
+
+Twenty-four already reviewed ArrayBuffer transfer cases also promote because
+their typed-view inspection dependency is now available. One DataView receiver
+case and eleven `Object.seal` cases also promote after their concrete
+TypedArray inputs become available. The manifest reaches 18,768 cases: 15,226
+passes, 1,556 expected negatives, and 1,986 unsupported profile features with
+no semantic, harness, or infrastructure failures.
+
+The reviewed feature list retained the broader `TypedArray` gate for the later
+core node, which has since admitted it and moved those 67 cases to `pass`. The
+dependency vocabulary gains `typed-array-constructors`. The component and heap
+kind move the runtime ABI to `oseo-runtime-m5-106`, and the public intrinsic
+table grows by 24 slots for the new constructor and prototype pairs. The value
+representation and the generated-code entry points are unchanged, and no graph
+state moves.
 
 
 Proxy exotic objects
@@ -6692,11 +6828,13 @@ Proxy exotic objects
 M5b node `proxy-exotic-object` admits the `Proxy` constructor and
 `Proxy.revocable`. `Proxy` is a constructible built-in with no own
 `prototype` property and throws when called without `new`. Both its target and
-handler must be objects. `Proxy.revocable` returns an ordinary object whose
-`proxy` and `revoke` properties are writable, enumerable, and configurable;
-the idempotent revoke function marks the proxy revoked, after which every
-essential internal method throws a `TypeError` while the proxy retains its
-original callable and constructible identity.
+handler must be objects.
+
+`Proxy.revocable` returns an ordinary object whose `proxy` and `revoke`
+properties are writable, enumerable, and configurable. The idempotent revoke
+function marks the proxy revoked. After that, every essential internal method
+throws a `TypeError` while the proxy retains its original callable and
+constructible identity.
 
 The proxy exotic supplies all thirteen essential internal methods:
 `[[GetPrototypeOf]]`, `[[SetPrototypeOf]]`, `[[IsExtensible]]`,
@@ -6704,22 +6842,26 @@ The proxy exotic supplies all thirteen essential internal methods:
 `[[HasProperty]]`, `[[Get]]`, `[[Set]]`, `[[Delete]]`, `[[OwnPropertyKeys]]`,
 `[[Call]]`, and `[[Construct]]`. Each first reads the corresponding handler
 trap. An absent trap delegates to the target's same internal method, including
-another proxy target. A present trap receives the target plus the operation's
-key, receiver, descriptor, argument list, or new target in specification
-order. Boolean traps apply `ToBoolean`; `construct` requires an object result;
-`getPrototypeOf` requires an object or null; descriptor and own-key traps
-validate their result shape before it is used.
+another proxy target.
+
+A present trap receives the target plus the operation's key, receiver,
+descriptor, argument list, or new target in specification order. Boolean traps
+apply `ToBoolean`; `construct` requires an object result; `getPrototypeOf`
+requires an object or null. Descriptor and own-key traps validate their result
+shape before it is used.
 
 Every successful trap answer is checked against the target. A
 non-configurable property cannot disappear, change enumerable or accessor
 identity, contradict a frozen data value, or be deleted. A non-extensible
 target cannot acquire a reported property, lose an existing property, accept
-an extra own key, or report a different prototype. `ownKeys` requires only
-String and Symbol values, rejects duplicates, preserves the trap's order, and
-requires all non-configurable keys plus every key of a non-extensible target.
-When `getOwnPropertyDescriptor` reports `undefined`, the target descriptor
-settles absence and non-configurability before a present configurable property
-requires the target's `[[IsExtensible]]` result.
+an extra own key, or report a different prototype.
+
+`ownKeys` requires only String and Symbol values, rejects duplicates, preserves
+the trap's order, and requires all non-configurable keys plus every key of a
+non-extensible target. When `getOwnPropertyDescriptor` reports `undefined`, the
+target descriptor settles absence and non-configurability before a present
+configurable property requires the target's `[[IsExtensible]]` result.
+
 The `get` and `set` traps preserve non-configurable, non-writable data values
 and undefined accessor halves. The `isExtensible` and `preventExtensions`
 answers must agree with the target's actual extensibility.
@@ -6727,9 +6869,11 @@ answers must agree with the target's actual extensibility.
 The runtime represents a proxy as a collector-traced heap object retaining
 its target, handler, and the callable and constructible decisions made at
 creation. *runtime\_proxy.c* owns construction, revocation, trap dispatch, and
-invariant checks; the property, descriptor, object, enumeration, function,
+invariant checks. The property, descriptor, object, enumeration, function,
 and `Object` built-in components route their generic internal methods through
-it. The component has its own fixed built-in code range for `Proxy`,
+it.
+
+The component has its own fixed built-in code range for `Proxy`,
 `Proxy.revocable`, and the revoke closure. The runtime ABI advances to
 `oseo-runtime-m5-98`; no dynamic-source entry point or generated-code ABI is
 added. Object binding rest roots its fresh copy target before Proxy own-key,
@@ -6740,20 +6884,24 @@ Fixed native and generated differential evidence at property seed
 revocation, callable and constructible targets, writable, configurable,
 extensible, and prototype combinations, specialization enabled and disabled,
 collection forced at every safepoint, a false numeric hint, and an intentional
-shape-guard miss that reaches the generic fallback. It also covers callable
-proxies in callback and protocol-method positions and the bound and nested
-Proxy walk that makes built-in constructor fallback throw when its new target
-reaches a revoked Proxy. Constructor regressions pin the construct-trap and
-prototype-read order for ordinary `new` and Array species construction, while
-coercion regressions pin Proxy `[[Get]]` followed by a callable
-`Symbol.toPrimitive`. The inventory contains 311 included paths under
+shape-guard miss that reaches the generic fallback.
+
+It also covers callable proxies in callback and protocol-method positions and
+the bound and nested Proxy walk that makes built-in constructor fallback throw
+when its new target reaches a revoked Proxy. Constructor regressions pin the
+construct-trap and prototype-read order for ordinary `new` and Array species
+construction, while coercion regressions pin Proxy `[[Get]]` followed by a
+callable `Symbol.toPrimitive`.
+
+The inventory contains 311 included paths under
 *test/built-ins/Proxy/*. The reviewed Test262 manifest advances 90 dependent
 paths to `pass`, moving from 13,929 to 14,019 passes and from 2,085 to 1,995
 unsupported profile features while keeping 1,556 expected negatives and zero
 semantic, harness, or infrastructure failures. The property ratchet moves
-from 131 to 132 domains and seeds and from 5,478 to 5,490 ordinary cases. The
-suite revision, manifest schema, classification vocabulary, and zero-override
-policy remain unchanged.
+from 131 to 132 domains and seeds and from 5,478 to 5,490 ordinary cases.
+
+The suite revision, manifest schema, classification vocabulary, and
+zero-override policy remain unchanged.
 
 
 Eager iterator helpers
@@ -6768,93 +6916,90 @@ configurable data property whose function has its own name,
 
 These six are eager: each drains the iterator it captures rather than
 returning a helper object, so none of them adds an observable object kind.
-`reduce` answers the accumulator, `toArray` a fresh ordinary array whose
+`reduce` returns the accumulator, `toArray` a fresh ordinary array whose
 `[[Prototype]]` is `%Array.prototype%`, `forEach` `undefined`, `some` and
 `every` booleans, and `find` the first value its predicate accepts or
 `undefined`.
 
-Every method validates its receiver first, so a primitive receiver throws a
-`TypeError` before any argument is read. The five that take a callback then
-validate it against the iterator record they would capture, and a
-non-callable callback throws a `TypeError` after calling the receiver's
-`return`, which is `IteratorClose` over a record whose `next` method is still
-`undefined`. `next` is read exactly once, after that validation, so a failing
-callback never reaches the receiver's `next` getter, and every later step
-reuses the captured method. `toArray` takes no callback and reads `next`
-immediately.
+Every method validates its receiver first. A primitive receiver throws a
+`TypeError` before any argument is read. The five methods that take a callback
+then validate it against the iterator record they would capture. A non-callable
+callback throws a `TypeError` after calling the receiver's `return`, which is
+`IteratorClose` over a record whose `next` method is still `undefined`.
 
-The counter each callback receives as its last argument counts callback
-invocations, not steps. `reduce` passes the accumulator, the value, and that
-counter. Without an initial value it takes the first value as the accumulator
-and starts its counter at one, and an iterator that is already exhausted
-there throws a `TypeError` with no close, because the step that reported done
-already ended the record. With an initial value, including an explicit
-`undefined`, the counter starts at zero.
+`next` is read exactly once, after that validation, so a failing callback never
+reaches the receiver's `next` getter. Every later step reuses the captured
+method. `toArray` takes no callback and reads `next` immediately.
 
-A step that throws, including a `next` result that is not an object, and a
-`done` or `value` getter that throws, propagates without a close, matching the
-`[[Done]]` the specified operation sets before propagating. A callback that
-throws closes the record and keeps its own completion, so a `return` method
-that also throws there does not replace it. `some`, `every`, and `find` stop
-early and close the record with a normal completion instead, so a `return`
-that throws at that point replaces the answer the method would have produced
-with its own thrown value, whatever that value is, and a `return` that answers
-a non-object replaces it with a `TypeError`. `forEach` and `toArray` never
-stop early, so a source they exhaust is never closed.
+Each callback receives a counter as its last argument. That counter counts
+callback invocations, not steps. `reduce` passes the accumulator, the value,
+and that counter. Without an initial value, `reduce` takes the first value as
+the accumulator and starts its counter at one. An iterator that is already
+exhausted there throws a `TypeError` with no close, because the step that
+reported done already ended the record. With an initial value, including an
+explicit `undefined`, the counter starts at zero.
+
+A step that throws propagates without a close, matching the `[[Done]]` the
+specified operation sets before propagating. This includes a `next` result that
+is not an object and a `done` or `value` getter that throws.
+
+A callback that throws closes the record and keeps its own completion, so a
+`return` method that also throws there does not replace it. `some`, `every`,
+and `find` stop early and close the record with a normal completion instead. At
+that point, a `return` that throws replaces the result the method would have
+produced with its own thrown value, whatever that value is. A `return` method
+that returns a non-object replaces it with a `TypeError`. `forEach` and
+`toArray` never stop early, so a source they exhaust is never closed.
 
 The eager helpers need no heap kind, because none of them suspends. One root
 frame holds the receiver, the callback, the captured `next` method, the
 `toArray` result, and the contiguous callback argument list for the length of
-the drain, so a collection at any safepoint inside a callback, a `next`, or a
-`return` keeps the accumulator and every in-flight value alive.
+the drain. A collection at any safepoint inside a callback, a `next`, or a
+`return` therefore keeps the accumulator and every in-flight value alive.
 
-Fixed native and generated differential evidence at property seed
-`0x60006700` covers all six methods, metadata and descriptors,
-non-construction, receiver and callback validation with its close, the
-counter sequences, the reduce accumulator with and without an initial value,
-the empty-iterator `TypeError`, early stop and exhaustion for all three
-predicates, close failures in both the abrupt and the normal-completion
-position, a close that answers a non-object, throwing `next`, `done`, and
-`value`, chained lazy-to-eager pipelines, both specialization policies,
-deliberate shape-guard hits and misses, generic fallback, and collection
-forced at every safepoint. The generated suite measures one drain against an
-independent model that predicts the outcome, the callback trace, and the
-number of closes.
+Fixed native and generated differential evidence at property seed `0x60006700`
+covers all six methods, metadata and descriptors, non-construction, receiver
+and callback validation with its close, and the counter sequences. It also
+covers the `reduce` accumulator with and without an initial value, the
+empty-iterator `TypeError`, early stop and exhaustion for all three predicates,
+and close failures in both the abrupt and the normal-completion position. It
+covers a close that returns a non-object, throwing `next`, `done`, and `value`,
+chained lazy-to-eager pipelines, both specialization policies, deliberate
+shape-guard hits and misses, generic fallback, and collection forced at every
+safepoint. The generated suite measures one drain against an independent model
+that predicts the outcome, the callback trace, and the number of closes.
 
-All 173 paths under the node's six inventory roots are reviewed. Every one of
-them declares the upstream `iterator-helpers` feature, which stays
-unsupported, so each reviewed path records an explicit prerequisite boundary
-rather than a pass and the fixed and generated evidence above owns the
-admitted behavior. The lazy helper section above originally expected this node
-to complete that feature tag. A scoped classification run over all 394
-reviewed and inventoried `test/built-ins/Iterator/` paths with the tag enabled
-measured otherwise. Six paths outside this node's roots do not pass, and a
-reviewed manifest admits no semantic or harness failure, so the tag stays
-unsupported. *test/built-ins/Iterator/from/primitives.js*,
+All 173 paths under the node's six inventory roots are reviewed. Each declares
+the upstream `iterator-helpers` feature and records an explicit prerequisite
+boundary rather than a pass. The fixed and generated evidence above owns the
+admitted behavior.
+
+When the `iterator-helpers` tag is enabled, six of the 394 reviewed and
+inventoried `test/built-ins/Iterator/` paths do not pass, all outside this
+node's roots. The reviewed manifest allows no semantic or harness failure, so
+the tag stays unsupported. *test/built-ins/Iterator/from/primitives.js*,
 *test/built-ins/Iterator/from/supports-iterable.js*, and
 *test/built-ins/Iterator/prototype/flatMap/strings-are-not-flattened.js* fail
 semantically because each iterates a String or a String wrapper. The
-`string-iterator` node now supplies that prerequisite, and each still declares
-the unsupported `iterator-helpers` feature, so its reviewed classification
-is unchanged.
-*test/built-ins/Iterator/from/get-return-method-when-call-return.js*,
+`string-iterator` node now supplies that prerequisite. Each path still declares
+the unsupported `iterator-helpers` feature, so its reviewed classification is
+unchanged. *test/built-ins/Iterator/from/get-return-method-when-call-return.js*,
 *test/built-ins/Iterator/from/return-method-calls-base-return-method.js*, and
-*test/built-ins/Iterator/from/return-method-throws-for-invalid-this.js* fail
-in the harness because each includes *temporalHelpers.js*, which the reviewed
+*test/built-ins/Iterator/from/return-method-throws-for-invalid-this.js* fail in
+the harness because each includes *temporalHelpers.js*, which the reviewed
 harness set does not supply. Thirteen further paths keep an honest boundary
 for the separate `globalThis` feature, and one for `cross-realm`.
 
-No previously reviewed path moves. The manifest reaches 17,743 cases: 14,019
-passes, 1,556 expected negatives, and 2,168 unsupported profile features with
-no semantic, harness, or infrastructure failures, up from 17,570 cases with
-1,995 unsupported profile features. The property inventory moves from 134 to
-135 domains and seeds and from 5,508 to 5,518 ordinary cases. The normative
-family index moves from 115 to 116 records. The suite revision, 41,091-path
-inventory, manifest schema and vocabulary, target-parity policy, and
-zero-override policy are unchanged. The expanded intrinsic table moves the
-runtime ABI to `oseo-runtime-m5-100` and allocates six code IDs inside the
-existing iterator range without adding a heap kind, a generated-code entry
-point, or a change to the graph's orchestration state.
+No previously reviewed path moves. The manifest has 17,743 cases: 14,019
+passes, 1,556 expected negatives, and 2,168 unsupported profile features, with
+no semantic, harness, or infrastructure failures. The property inventory has
+135 domains and seeds and 5,518 ordinary cases. The normative family index has
+116 records. The suite revision, 41,091-path inventory, manifest schema and
+vocabulary, target-parity policy, and zero-override policy are unchanged. The
+expanded intrinsic table sets the runtime ABI to `oseo-runtime-m5-100` and
+allocates six code IDs inside the existing iterator range without adding a heap
+kind, a generated-code entry point, or a change to the graph's orchestration
+state.
 
 
 Date family
@@ -7189,25 +7334,26 @@ M5b node `json-stringify` admits the ordinary, non-constructible
 `JSON.stringify` function and completes SerializeJSONProperty. For each value,
 an object or BigInt first reads and, when callable, invokes `toJSON` with the
 value as receiver and the property key as its sole argument. A callable
-replacer runs next with the holder as receiver and the key and transformed
+replacer then runs with the holder as receiver and the key and transformed
 value as arguments. Number and String wrapper results use their observable
-numeric and string conversions, while Boolean and BigInt wrappers expose their
+numeric and string conversions. Boolean and BigInt wrappers expose their
 internal primitive values. An unhandled BigInt throws `TypeError`; undefined,
 Symbols, and callable values have no object-member representation and become
 `null` in Arrays.
 
 Strings are quoted from their UTF-16 code units. JSON control characters,
 quotes, and reverse solidus use escapes, lone surrogates use lowercase
-four-digit Unicode escapes, and valid surrogate pairs remain unchanged.
-Finite numbers use the runtime's shortest decimal conversion, including `0`
-for negative zero, while non-finite numbers become `null`.
+four-digit Unicode escapes, and valid surrogate pairs remain unchanged. Finite
+numbers use the runtime's shortest decimal conversion, including `0` for
+negative zero, while non-finite numbers become `null`.
 
 A replacer Array is recognized through `IsArray`, including Proxy Arrays. Its
-array-like length and indexed values are read once in ascending order; String
+array-like length and indexed values are read once in ascending order. String
 and Number primitives or wrappers are converted to strings and deduplicated
-without reordering. The resulting property list filters every serialized
-object and performs ordinary Get even for inherited names. Without that list,
-an object snapshots its enumerable own string keys in
+without reordering. The resulting property list filters every serialized object
+and performs ordinary Get even for inherited names.
+
+Without that list, an object snapshots its enumerable own string keys in
 `OrdinaryOwnPropertyKeys` order before reading the first value. Arrays snapshot
 their array-like length and then read each index in order. All Proxy length,
 own-key, descriptor, and Get operations remain observable and propagate abrupt
@@ -7217,79 +7363,82 @@ A numeric space value is converted, truncated, and clamped to zero through ten
 spaces. A string space value contributes at most its first ten UTF-16 code
 units. Number and String wrapper space values perform the corresponding
 observable conversion. Nonempty gaps produce the specified line breaks,
-indentation, and colon spacing. The active ancestor chain, rather than a global
-visited set, rejects circular Arrays and objects with `TypeError` while
-allowing the same identity in sibling positions. The shared runtime depth
-bound completes excessively nested serialization with deterministic
-`RangeError`.
+indentation, and colon spacing.
+
+The active ancestor chain, rather than a global visited set, rejects circular
+Arrays and objects with `TypeError` while allowing the same identity in sibling
+positions. The shared runtime depth bound completes excessively nested
+serialization with deterministic `RangeError`.
 
 Fixed Node.js, Deno, and native differential evidence covers descriptors,
 non-construction, primitive and wrapper values, escaping, sparse Arrays,
 ordinary and inherited key order, `toJSON`, both replacer forms, gaps, Proxies,
-BigInt, abrupt completion, cycles, and repeated identities. Generated evidence
-at seed `0x60006c00` supplies a 12-case ordinary budget over bounded integers,
-Booleans, two zero-through-twelve-code-unit UTF-16 strings, one nested Array,
-both gap forms, and function and Array replacers. It executes specialization
-enabled and disabled, collection forced at every safepoint, a false number
-hint, and a deliberate JSON namespace shape-guard miss that reaches compiled
-generic fallback. The node reuses the existing JSON component, code-ID range,
-intrinsics, and fixed allocation count, adds no generated-code entry point,
-and moves the runtime ABI to `oseo-runtime-m5-105`.
-The property ratchet moves from 139 to 140 domains and seeds and from 5,566 to
-5,578 ordinary cases. The normative family index moves from 120 to 121
-records.
+BigInt, abrupt completion, cycles, and repeated identities.
 
-The node reviews all 72 edition paths under its inventory roots. Sixty-seven
+Generated evidence at seed `0x60006c00` supplies a 12-case ordinary budget over
+bounded integers, Booleans, two zero-through-twelve-code-unit UTF-16 strings,
+one nested Array, both gap forms, and function and Array replacers. It executes
+with specialization enabled and disabled, collection forced at every safepoint,
+a false number hint, and a deliberate JSON namespace shape-guard miss that
+reaches compiled generic fallback.
+
+The node reuses the existing JSON component, code-ID range, intrinsics, and
+fixed allocation count. It adds no generated-code entry point. The runtime ABI
+is `oseo-runtime-m5-105`. The property ratchet has 140 domains and seeds and
+5,578 ordinary cases. The normative family index has 121 records.
+
+All 72 edition paths under the node's inventory roots are reviewed. Sixty-seven
 pass under both specialization policies, including the well-formed
 JSON-stringification case whose frontmatter feature enters the supported set.
 Five remain `unsupported-profile-feature`: the two cross-realm cases need the
 deferred realm harness, the two Boolean-wrapper cases name the deferred
 `Boolean` binding, and the BigInt `toJSON` case depends on general primitive
-wrapper method access. The manifest moves from 18,615 to 18,687 paths, from
-15,109 to 15,176 passes, and from 1,950 to 1,955 unsupported profile features
-while keeping 1,556 expected negatives and zero semantic, harness, or
-infrastructure failures. No reviewed path outside the node roots changes
-classification.
+wrapper method access. The manifest has 18,687 paths, 15,176 passes, 1,955
+unsupported profile features, and 1,556 expected negatives, with zero semantic,
+harness, or infrastructure failures. No reviewed path outside the node roots
+changes classification.
 
 
 Promise harness helper
 ----------------------
 
-M5b node `harness-promise-helper` completes the reviewed
-*promiseHelper.js* include as ordinary JavaScript assembled before each
-upstream test body. `checkSequence` accepts an empty or one-based numeric
-sequence and reports the first mismatch with the upstream truthy-message
-fallback and joined-array text. `checkSettledPromises` requires an Array of
-the expected length, checks each result record's own `status` and matching own
-`value` or `reason` property, rejects the opposite payload property, compares
-the expected payload, and preserves the upstream optional message prefix and
-failure text. The include adds no native shortcut, intrinsic, or runtime
-surface.
+M5b node `harness-promise-helper` completes the reviewed *promiseHelper.js*
+include as ordinary JavaScript assembled before each upstream test body. The
+include adds no native shortcut, intrinsic, or runtime surface.
 
-Fixed native and generated differential evidence at property seed
-`0x60006d00` covers zero through six valid or mismatching sequence entries,
-one through four fulfilled or rejected settlement records, valid settlement
-Arrays, and one Array, length, status, property-presence, or payload fault.
-Omitted, empty, and custom messages reach both message branches. Node.js,
-Deno, and both native specialization policies agree with collection forced at
-every safepoint; a false numeric hint deliberately misses its guard and
-reaches the compiled generic fallback. The generated domain has a 12-case
+`checkSequence` accepts an empty or one-based numeric sequence and reports the
+first mismatch with the upstream truthy-message fallback and joined-array text.
+
+`checkSettledPromises` requires an Array of the expected length, checks each
+result record's own `status` and matching own `value` or `reason` property,
+rejects the opposite payload property, compares the expected payload, and
+preserves the upstream optional message prefix and failure text.
+
+Fixed native and generated differential evidence at property seed `0x60006d00`
+covers zero through six valid or mismatching sequence entries, one through four
+fulfilled or rejected settlement records, valid settlement Arrays, and one
+Array, length, status, property-presence, or payload fault. Omitted, empty, and
+custom messages reach both message branches.
+
+Node.js, Deno, and both native specialization policies agree with collection
+forced at every safepoint; a false numeric hint deliberately misses its guard
+and reaches the compiled generic fallback. The generated domain has a 12-case
 ordinary budget and direct record and Array shrinking.
 
-Focused execution also observes ten passing upstream users of the include:
-one AggregateError argument-order case, seven Promise reaction-order cases,
-and two Promise.resolve thenable-order cases. They remain outside the reviewed
-subset because this node has no inventory root and their paths belong to other
-graph nodes. The 44 reviewed include users keep their classifications: 39
-pass, and five Promise.prototype.finally cases retain that separate feature
-boundary. No reviewed row moves. The manifest keeps 18,687 cases: 15,176
-passes, 1,556 expected negatives, and 1,955 unsupported profile features,
-with no semantic, harness, or infrastructure failures. The property inventory
-reaches 141 domains and seeds with a 5,590-case ordinary budget, and the
-evidence inventory reaches 122 families. The runtime ABI remains
-`oseo-runtime-m5-105`, and the suite revision, applicable inventory,
-classification vocabulary, target-parity policy, forced-collection policy,
-and zero-override policy are unchanged.
+Ten upstream users of the include pass under focused execution: one
+AggregateError argument-order case, seven Promise reaction-order cases, and two
+Promise.resolve thenable-order cases. They remain outside the reviewed subset
+because this node has no inventory root and their paths belong to other graph
+nodes.
+
+The 44 reviewed include users keep their classifications: 39 pass, and five
+Promise.prototype.finally cases retain that separate feature boundary. No
+reviewed row moves.
+
+The property inventory has 141 domains and seeds with a 5,590-case ordinary
+budget, and the evidence inventory has 122 families. The suite revision,
+applicable inventory, classification vocabulary, target-parity policy,
+forced-collection policy, and zero-override policy are unchanged.
 
 
 TypedArray core prototype
@@ -7403,64 +7552,66 @@ TypedArray iteration methods
 M5b node `typed-array-iterative` adds `every`, `some`, `forEach`, `map`,
 `filter`, `reduce`, and `reduceRight` to `%TypedArray.prototype%`. Each is an
 ordinary non-constructible method of length one with the standard writable,
-non-enumerable, configurable descriptor. Each begins with ValidateTypedArray,
-so a receiver without a `[[TypedArrayName]]` slot, or one whose buffer is
-detached or too short for its view, throws a `TypeError` before the callback
-is inspected. The callable check follows the length snapshot, and the element
-length itself is read once at the start and never re-read, so a resize during
-a callback does not extend the traversal.
+non-enumerable, configurable descriptor.
+
+Each method begins with ValidateTypedArray, so a receiver without a
+`[[TypedArrayName]]` slot, or one whose buffer is detached or too short for its
+view, throws a `TypeError` before the callback is inspected. The callable check
+follows the length snapshot. The element length is read once at the start and
+never re-read, so a resize during a callback does not extend the traversal.
 
 A typed array has no holes, so the seven methods read every index below the
-snapshot through TypedArrayGetElement instead of testing HasProperty. A
-detach or shrink that a callback performs makes a later index invalid, and
-TypedArrayGetElement then reports `undefined` for that step rather than
-reading outside the Data Block; the callback still runs once per snapshot
-index. `every` stops at its first false result, `some` at its first true one,
-and `forEach` returns `undefined`.
+snapshot through TypedArrayGetElement instead of testing HasProperty. A detach
+or shrink that a callback performs makes a later index invalid.
+TypedArrayGetElement then reports `undefined` for that step rather than reading
+outside the Data Block, and the callback still runs once per snapshot index.
+`every` stops at its first false result, `some` at its first true one, and
+`forEach` returns `undefined`.
 
 `map` performs TypedArraySpeciesCreate before the first callback and stores
 each mapped value with TypedArraySetElement, so the observable `constructor`
 and `Symbol.species` lookups and the species construction all precede user
-code, and a species result that is shorter than the snapshot throws the
-specified `TypeError`. `filter` instead collects the selected values first and
-only then performs TypedArraySpeciesCreate with the captured count, so its
-species constructor observes the final number of matches. Both check that the
-species result is a TypedArray of the same content type. `reduce` and
-`reduceRight` traverse the same snapshot in opposite directions without hole
-skipping; with no initial value the first element in that direction seeds the
-accumulator and no callback runs for it, an empty view with no initial value
-throws a `TypeError`, and each callback receives the accumulator, element,
-index, and receiver.
+code. A species result that is shorter than the snapshot throws the specified
+`TypeError`. `filter` instead collects the selected values first and only then
+performs TypedArraySpeciesCreate with the captured count, so its species
+constructor observes the final number of matches. Both check that the species
+result is a TypedArray of the same content type.
 
-Fixed native and generated differential evidence at property seed
-`0x60007400` covers the seven methods over Number and BigInt element kinds,
-default, null, and subclass species, present and absent reduction initial
-values, and no mutation, detach, and shrink during the first callback.
-Node.js, Deno, and both native specialization policies agree with collection
-forced at every safepoint, a false numeric hint deliberately misses its guard
-and reaches the compiled generic fallback, and an independent model computes
-every callback, element, accumulator, and result observation. The fixed
-fixture also pins method metadata, argument and receiver identity, the
-callback's `this`, species construction order, content-type and result-shape
-errors, non-typed-array and detached receivers, non-callable callbacks, empty
-reductions, and species reads that throw.
+`reduce` and `reduceRight` traverse the same snapshot in opposite directions
+without hole skipping. With no initial value, the first element in that
+direction seeds the accumulator and no callback runs for it. An empty view with
+no initial value throws a `TypeError`, and each callback receives the
+accumulator, element, index, and receiver.
 
-At the original M5b admission, the reviewed feature list already carries
-`TypedArray`, so no new feature tag is needed. All 398 paths under the node's
-seven inventory roots enter the reviewed subset: 375 pass and twenty-three keep
-the unreviewed *resizableArrayBufferUtils.js* include as an explicit
-prerequisite. No path outside the roots changes classification. The manifest
-moves from 19,770 to 20,168 cases and from 16,144 to 16,519 passes while
-keeping 1,556 expected negatives and moving from 2,070 to 2,093 unsupported
-profile features with no semantic, harness, or infrastructure failures. The
-property inventory reaches 149 domains and seeds with a 5,707-case ordinary
-budget, the evidence inventory reaches 127 families, and the runtime ABI moves
-to `m5-112`.
+Fixed native and generated differential evidence at property seed `0x60007400`
+covers the seven methods over Number and BigInt element kinds, default, null,
+and subclass species, present and absent reduction initial values, and no
+mutation, detach, and shrink during the first callback. Node.js, Deno, and both
+native specialization policies agree with collection forced at every safepoint.
+A false numeric hint deliberately misses its guard and reaches the compiled
+generic fallback, and an independent model computes every callback, element,
+accumulator, and result observation.
 
-The current complete RAB harness update, recorded in `fbdb0824` from clean
-source `2e3d973f`, observes all 23 paths in these roots that include
-*resizableArrayBufferUtils.js* as passes, with ledger owner `observation`.
-None remains unsupported. The original admission counts above are historical.
+The fixed fixture pins method metadata, argument and receiver identity, the
+callback's `this`, and species construction order. It also pins content-type
+and result-shape errors, non-typed-array and detached receivers, non-callable
+callbacks, empty reductions, and species reads that throw.
+
+At the original M5b admission, the reviewed feature list already carried
+`TypedArray`, so no new feature tag was needed. All 398 paths under the node's
+seven inventory roots entered the reviewed subset: 375 passed, and twenty-three
+kept the unreviewed *resizableArrayBufferUtils.js* include as an explicit
+prerequisite. No path outside the roots changed classification.
+
+The admission manifest had 20,168 cases, 16,519 passes, 1,556 expected
+negatives, and 2,093 unsupported profile features, with no semantic, harness,
+or infrastructure failures. The property inventory reached 149 domains and
+seeds with a 5,707-case ordinary budget, the evidence inventory reached 127
+families, and the runtime ABI moved to `m5-112`.
+
+The RAB harness update is complete. All 23 paths in the node's seven inventory
+roots that include *resizableArrayBufferUtils.js* are passes with ledger owner
+`observation`, and none remains unsupported.
 
 
 TypedArray search and joining
@@ -7473,46 +7624,49 @@ non-constructible method with the standard writable, non-enumerable,
 configurable descriptor; `toLocaleString` has length zero and the others
 length one. `%TypedArray.prototype%.toString` remains the shared
 `Array.prototype.toString` function object the core node installs, which
-reaches this node's `join` for a typed-array receiver. Each method begins with
-ValidateTypedArray, so a receiver without a `[[TypedArrayName]]` slot, or one
-whose buffer is detached or too short for its view, throws a `TypeError`
-before any argument is inspected or converted, and the element length is read
-once at that point.
+reaches this node's `join` for a typed-array receiver.
 
-`find` and `findIndex` visit the snapshot in ascending order and `findLast`
-and `findLastIndex` in descending order. After the callable check each reads
-every visited index through TypedArrayGetElement with no presence test, so a
-detach or shrink the predicate performs makes a later element `undefined` and
-the predicate still runs for it; the predicate receives the element, index,
-and receiver with the supplied `this` value, and the first truthy result
-stops the walk.
+Each method begins with ValidateTypedArray. A receiver without a
+`[[TypedArrayName]]` slot, or one whose buffer is detached or too short for
+its view, throws a `TypeError` before any argument is inspected or converted.
+The element length is read once at that point.
+
+`find` and `findIndex` visit the snapshot in ascending order; `findLast` and
+`findLastIndex` visit it in descending order. After the callable check each
+reads every visited index through TypedArrayGetElement with no presence test.
+A detach or shrink the predicate performs makes a later element `undefined`,
+and the predicate still runs for it. The predicate receives the element,
+index, and receiver with the supplied `this` value, and the first truthy
+result stops the walk.
 
 `includes`, `indexOf`, and `lastIndexOf` return `false` or `-1` for an empty
 view before converting fromIndex. Otherwise fromIndex goes through
 ToIntegerOrInfinity: a positive infinity ends `includes` and `indexOf`, a
 negative infinity ends `lastIndexOf`, negative values count from the snapshot
 length, and an omitted `lastIndexOf` fromIndex starts at the last snapshot
-index. The conversion may run user code. `includes` then reads every remaining
-snapshot index and compares with SameValueZero, so `NaN` matches `NaN` and an
-index the conversion invalidated matches `undefined`. `indexOf` and
-`lastIndexOf` skip any index HasProperty no longer reports and compare with
-strict equality, so `NaN` never matches and a Number never matches a BigInt
-element.
+index. The conversion may run user code.
+
+`includes` then reads every remaining snapshot index and compares with
+SameValueZero, so `NaN` matches `NaN` and an index the conversion invalidated
+matches `undefined`. `indexOf` and `lastIndexOf` skip any index HasProperty
+no longer reports and compare with strict equality, so `NaN` never matches
+and a Number never matches a BigInt element.
 
 `join` converts a defined separator with ToString after the length snapshot,
 defaulting to a comma, and renders an index a detach or shrink during that
-conversion invalidated as an empty field; a growth never extends the
-snapshot. `toLocaleString` uses a comma separator and follows the ECMA-262
-2025 Array algorithm that section 23.2.3.31 applies: it reads each defined
-element's current `toLocaleString` through the element's primitive prototype,
-throws a `TypeError` when that value is not callable, calls it with the
-element as its receiver and no arguments, and converts the result with
-ToString. An abrupt completion from any of these steps propagates at once.
-The outer locales and options are evaluated by the caller but never passed
-to an element method or converted, because forwarding them is the ECMA-402
-call contract that ADR 0013 excludes; M5c node
-`typed-array-tolocalestring-arguments` removed the earlier forwarding of
-exactly two arguments.
+conversion invalidated as an empty field. A growth never extends the snapshot.
+
+`toLocaleString` uses a comma separator and follows the ECMA-262 2025 Array
+algorithm that section 23.2.3.31 applies: it reads each defined element's
+current `toLocaleString` through the element's primitive prototype, throws a
+`TypeError` when that value is not callable, calls it with the element as its
+receiver and no arguments, and converts the result with ToString. An abrupt
+completion from any of these steps propagates at once. The outer locales and
+options are evaluated by the caller but never passed to an element method or
+converted, because forwarding them is the ECMA-402 call contract that ADR
+0013 excludes. M5c node `typed-array-tolocalestring-arguments` removed the
+earlier forwarding of exactly two arguments.
+
 Both methods share Array stringification's active-receiver stack, so a
 re-entrant `join` or `toLocaleString` of a view that is already being
 stringified renders an empty string, as V8 does, instead of exhausting the
@@ -7671,141 +7825,156 @@ TypedArray sorting
 ------------------
 
 M5b node `typed-array-sort` adds `sort` and `toSorted` to
-`%TypedArray.prototype%`. They are distinct ordinary non-constructible methods
-of length one with writable, non-enumerable, configurable descriptors, and
-neither is the `Array.prototype` method of the same name. Each first checks a
-supplied comparator for callability, so an invalid comparator throws a
-`TypeError` before an invalid, detached, or out-of-bounds receiver is examined.
-ValidateTypedArray then fixes the element length and the methods capture every
+`%TypedArray.prototype%`. Both are distinct ordinary non-constructible methods
+of length one with writable, non-enumerable, configurable descriptors. Neither
+is the `Array.prototype` method of the same name. Each first checks a supplied
+comparator for callability, so an invalid comparator throws a `TypeError`
+before an invalid, detached, or out-of-bounds receiver is examined.
+ValidateTypedArray then fixes the element length, and the methods capture every
 element before the first comparison.
 
-The default CompareTypedArrayElements ordering is numeric, not the string
-ordering used by `Array.prototype.sort`. Number element kinds place `NaN`
-after every non-`NaN`, keep `NaN` values stable with respect to each other, and
-place negative zero before positive zero. BigInt element kinds compare their
-integer values directly. A supplied comparator is called with `undefined` as
-its `this` value and two captured elements. Its result passes through ToNumber,
-with `NaN` treated as zero, and an abrupt call or conversion stops sorting
-before any element is written. The stable bottom-up merge keeps the left
-element whenever a comparison is equal.
+Default CompareTypedArrayElements ordering is numeric, not the string ordering
+used by `Array.prototype.sort`. Number element kinds place `NaN` after every
+non-`NaN`, keep `NaN` values stable with respect to each other, and place
+negative zero before positive zero. BigInt element kinds compare their integer
+values directly.
+
+A supplied comparator is called with `undefined` as its `this` value and two
+captured elements. Its result passes through ToNumber, with `NaN` treated as
+zero, and an abrupt call or conversion stops sorting before any element is
+written. The stable bottom-up merge keeps the left element whenever a
+comparison is equal.
 
 `sort` writes the completed captured order back to the receiver and returns
 that same view. If a comparator detaches or shrinks the buffer, invalid
-integer-index writes are ignored; a grow adds elements that were never part of
-the captured list, so they remain after the sorted prefix. `toSorted` instead
-allocates a same-element-kind view of the snapshot length before collecting
-the source elements, never reads `constructor` or `Symbol.species`, writes only
-the new view, and returns it. Comparator-driven detach, shrink, and grow can
-therefore change the later source observation without changing the copied
-result.
+integer-index writes are ignored. If the buffer grows, elements added during
+sorting were never part of the captured list, so they remain after the sorted
+prefix.
 
-Fixed native and generated differential evidence at property seed
-`0x60007d00` covers `Float64Array`, `Int16Array`, and `BigInt64Array`; `NaN`,
-signed-zero, infinite, bounded integer, and BigInt elements; default,
-ascending, descending, equal, `NaN`, and observably coerced comparator results;
-stable ordering; abrupt comparator and result conversion; detach, shrink, and
-grow during the first comparison; and the in-place and copied results. Node.js,
-Deno, and both native specialization policies agree with collection forced at
-every safepoint, a false numeric hint deliberately misses its guard and reaches
-the generic fallback, and an insertion-sort model independent of the host sort
-computes the expected order and surviving source view. The fixed fixture also
-pins metadata and identities, invalid comparator and receiver ordering,
+`toSorted` instead allocates a same-element-kind view of the snapshot length
+before collecting the source elements. It never reads `constructor` or
+`Symbol.species`, writes only the new view, and returns it. Comparator-driven
+detach, shrink, and grow can therefore change the later source observation
+without changing the copied result.
+
+Fixed native and generated differential evidence at property seed `0x60007d00`
+covers `Float64Array`, `Int16Array`, and `BigInt64Array`. The element coverage
+includes `NaN`, signed-zero, infinite, bounded integer, and BigInt elements.
+The comparator cases include default, ascending, descending, equal, `NaN`, and
+observably coerced comparator results. The evidence also covers stable
+ordering, abrupt comparator and result conversion, detach, shrink, and grow
+during the first comparison, and the in-place and copied results.
+
+Node.js, Deno, and both native specialization policies agree with collection
+forced at every safepoint. A false numeric hint is made to miss its guard and
+reach the generic fallback. An insertion-sort model independent of the host
+sort computes the expected order and surviving source view. The fixed fixture
+also pins metadata and identities, invalid comparator and receiver ordering,
 constructor and species avoidance, and initial detached and out-of-bounds
 receivers.
 
-At the original M5b admission, the dependency vocabulary gains
-`typed-array-sort`, and all 47 paths under the node's `sort` and `toSorted`
-inventory roots enter the reviewed subset: 43 pass, while four retain the
-unreviewed *resizableArrayBufferUtils.js* harness prerequisite. The manifest
-moves from 21,265 to 21,312 paths and from 17,958 to 18,001 passes, keeps 1,556
-expected negatives, and moves from 1,751 to 1,755 unsupported profile features
-with no semantic, harness, or infrastructure failures. No reviewed path moves
-away from pass. The property inventory reaches 160 domains and seeds with a
-5,839-case ordinary budget, the evidence inventory reaches 137 families, and
-the runtime ABI moves to `m5-121`.
+At M5b admission, `typed-array-sort` entered the dependency vocabulary. All 47
+paths under the node's `sort` and `toSorted` inventory roots entered the
+reviewed subset: 43 passed, and four retained the unreviewed
+*resizableArrayBufferUtils.js* harness prerequisite. The manifest had 21,312
+paths and 18,001 passes, with 1,556 expected negatives and 1,755 unsupported
+profile features. No reviewed path moved away from pass. The property inventory
+reached 160 domains and seeds with a 5,839-case ordinary budget, the evidence
+inventory reached 137 families, and the runtime ABI moved to `m5-121`.
 
-The current complete RAB harness update, recorded in `fbdb0824` from clean
-source `2e3d973f`, observes all four paths in these roots that include
-*resizableArrayBufferUtils.js* as passes, with ledger owner `observation`.
-None remains unsupported. The original admission counts above are historical.
+The completed RAB harness update at `fbdb0824` passes all four paths in these
+roots that include *resizableArrayBufferUtils.js*, with ledger owner
+`observation`. None remains unsupported.
 
 
 TypedArray statics
 ------------------
 
 M5b node `typed-array-statics` adds `from` and `of` to `%TypedArray%`, so every
-concrete constructor inherits them rather than owning copies. They are
-distinct ordinary non-constructible functions of lengths one and zero with
-writable, non-enumerable, configurable descriptors. Each first requires its
-`this` value to be a constructor and throws a `TypeError` otherwise; `from`
-then requires a supplied mapper to be callable, and only after both checks does
-it read the source's `Symbol.iterator` method. A nullish method selects the
-array-like path and any other non-callable value throws a `TypeError`.
+concrete constructor inherits them rather than owning copies. They are distinct
+ordinary non-constructible functions of lengths one and zero with writable,
+non-enumerable, configurable descriptors.
 
-An iterable source is drained completely by IteratorToList before the result
-exists: the list's length is the argument to the constructor, and the mapper
-runs afterward, once per collected value, with the supplied `this` argument,
-the value, and its index. An array-like source is converted with ToObject, its
-`length` passes through ToLength, and the constructor receives that length
-before each index is read, mapped, and stored in turn, so a mapper observes
-later source elements as they are when they are read. `of` constructs a result
-of its argument count and stores the arguments in order.
+Each first requires its `this` value to be a constructor and throws a
+`TypeError` otherwise. `from` then requires a supplied mapper to be callable,
+and only after both checks does it read the source's `Symbol.iterator` method.
+A nullish method selects the array-like path and any other non-callable value
+throws a `TypeError`.
+
+For an iterable source, IteratorToList drains the source completely before the
+result exists. The list's length is the argument to the constructor. The mapper
+then runs once per collected value, with the supplied `this` argument, the
+value, and its index.
+
+An array-like source is converted with ToObject, and its `length` passes
+through ToLength. The constructor receives that length before each index is
+read, mapped, and stored in turn, so a mapper observes later source elements as
+they are when they are read.
+
+`of` constructs a result of its argument count and stores the arguments in
+order.
 
 Both statics and TypedArraySpeciesCreate share one
-TypedArrayCreateFromConstructor: Construct through the receiver, which may be
-an intrinsic, derived, bound, Proxy, or ordinary function constructor, then
-ValidateTypedArray on the result, and, for the one Number argument both
-statics pass, a `TypeError` when the result holds fewer elements. Unlike a
+TypedArrayCreateFromConstructor. It calls Construct through the receiver, which
+may be an intrinsic, derived, bound, Proxy, or ordinary function constructor,
+then ValidateTypedArray on the result. For the one Number argument both statics
+pass, it throws a `TypeError` when the result holds fewer elements. Unlike a
 species result, a statics result never has its content type checked, so a
 constructor may answer with a BigInt view whose later Number stores throw.
+
 Each value is stored through TypedArraySetElement, which converts it before
-testing the index, so a mapper or conversion that detaches or shrinks the
-result still converts every later value but drops its write, and a grown
+testing the index. So a mapper or conversion that detaches or shrinks the
+result still converts every later value but drops its write. A grown
 length-tracking result keeps its new trailing elements.
 
 With `from` and `of` present, the shared component has no deferred surface
 left. Property lookup, `in`, `hasOwnProperty`, descriptor queries, deletion,
 and own-key reflection on `%TypedArray%` and `%TypedArray.prototype%` are now
-ordinary, and the reviewed classifier's two TypedArray boundary diagnostics
-are retired. The `%TypedArray%[Symbol.species]` getter that the core node
+ordinary. The reviewed classifier's two TypedArray boundary diagnostics are
+retired. The `%TypedArray%[Symbol.species]` getter that the core node
 materialized is unchanged; this node reviews its metadata and result.
 
-Fixed native and generated differential evidence at property seed
-`0x60008000` covers `from` over array, array-like, iterable, and TypedArray
-sources and `of` over plain and converting arguments; `Int16Array`,
+Fixed native and generated differential evidence at property seed `0x60008000`
+covers `from` over array, array-like, iterable, and TypedArray sources and `of`
+over plain and converting arguments. It covers `Int16Array`,
 `Uint8ClampedArray`, `Float64Array`, and `BigInt64Array` with bounded integer,
-`NaN`, signed-zero, fractional, infinite, and BigInt elements; no, scaling,
-and converting mappers with a `this` argument; intrinsic, derived, longer,
-shorter, and resizable receivers; and detach, shrink, and grow of the result
-during the first mapper call or conversion. Node.js, Deno, and both native
-specialization policies agree with collection forced at every safepoint, a
-false numeric hint deliberately misses its guard and reaches the compiled
-generic fallback, and an independent model predicts every stored value and
-the order of source reads, iterator steps, constructor calls, mapper calls,
-and conversions. The fixed fixture also pins metadata and identities through
-the concrete constructors, own-key reflection, the species getter, receiver
-and mapper validation order, every abrupt iterator step, non-TypedArray,
-detached, too-short, bound, and Proxy constructor results, content-type
-mismatches, and deletion and restoration of `from`.
+`NaN`, signed-zero, fractional, infinite, and BigInt elements. It also covers
+no, scaling, and converting mappers with a `this` argument; intrinsic, derived,
+longer, shorter, and resizable receivers; and detach, shrink, and grow of the
+result during the first mapper call or conversion.
+
+Node.js, Deno, and both native specialization policies agree with collection
+forced at every safepoint. A false numeric hint deliberately misses its guard
+and reaches the compiled generic fallback. An independent model predicts every
+stored value and the order of source reads, iterator steps, constructor calls,
+mapper calls, and conversions.
+
+The fixed fixture also pins metadata and identities through the concrete
+constructors, own-key reflection, the species getter, and receiver and mapper
+validation order. It pins every abrupt iterator step, non-TypedArray, detached,
+too-short, bound, and Proxy constructor results, content-type mismatches, and
+deletion and restoration of `from`.
 
 At the original M5b admission, the dependency vocabulary gains
-`typed-array-statics`, and all 42 paths under the node's four inventory roots
-enter the reviewed subset: 37 pass, while five retain the unreviewed
+`typed-array-statics`. All 42 paths under the node's four inventory roots enter
+the reviewed subset: 37 pass, while five retain the unreviewed
 *resizableArrayBufferUtils.js* harness prerequisite. No reviewed path outside
-the roots changes classification, and none moves away from pass. The manifest
-moves from 21,341 to 21,383 paths and from 18,273 to 18,310 passes, keeps 1,560
-expected negatives, and moves from 1,508 to 1,513 unsupported profile features
-with no semantic, harness, or infrastructure failures. The property inventory
-reaches 163 domains and seeds with a 5,873-case ordinary budget, the evidence
-inventory reaches 140 families, and the runtime ABI moves to `m5-124`.
+the roots changes classification, and none moves away from pass.
 
-The current complete RAB harness update, recorded in `fbdb0824` from clean
-source `2e3d973f`, observes four passes among the five paths in these roots
+At that admission, the manifest moves from 21,341 to 21,383 paths and from
+18,273 to 18,310 passes. It keeps 1,560 expected negatives and moves from 1,508
+to 1,513 unsupported profile features, with no semantic, harness, or
+infrastructure failures. The property inventory reaches 163 domains and seeds
+with a 5,873-case ordinary budget. The evidence inventory reaches 140 families,
+and the runtime ABI moves to `m5-124`.
+
+The current complete RAB harness update is recorded in `fbdb0824` from clean
+source `2e3d973f`. It observes four passes among the five paths in these roots
 that include *resizableArrayBufferUtils.js*. The remaining
 *out-of-bounds-behaves-like-detached.js* case is unsupported. Since the
 2026-10-28 maintainer decision, item 3, it is an ADR 0013 exclusion backed by
-strict core replacement evidence, not a pass. The original
-admission counts above are historical.
+strict core replacement evidence, not a pass. The original admission counts
+above are historical.
 
 
 Set composition methods
@@ -7895,29 +8064,30 @@ Single-agent shared memory and Atomics
 
 M5b node `atomics-single-agent` admits `SharedArrayBuffer` and the `Atomics`
 namespace for a realm that is the only agent of its agent cluster. A
-`SharedArrayBuffer` is the ArrayBuffer record with the shared brand: its
+`SharedArrayBuffer` is the ArrayBuffer record with the shared brand. Its
 constructor orders the length conversion, the `maxByteLength` option, the
-length comparison, the new target's `prototype` read, and the Shared Data
-Block allocation exactly as AllocateSharedArrayBuffer does, and a growable
-buffer reserves its maximum length at creation. The `byteLength`,
-`growable`, and `maxByteLength` getters, `grow`, and `slice` require the
-shared brand, while every `ArrayBuffer.prototype` member now rejects it, and
-`ArrayBuffer.prototype.slice` rejects a species result that is shared. `grow`
-checks both brands before its length converts, returns `undefined` for the
-current length, and throws a `RangeError` for a smaller or over-maximum
-length; the grown bytes read zero. A shared buffer never detaches. TypedArray
-and DataView construction, element access, and length-tracking views accept
-either buffer kind unchanged, so a length-tracking view over a growable
-buffer observes each grow. A growable shared buffer is still fixed length
-for IsTypedArrayFixedLength, because it never shrinks, so
-`Object.preventExtensions` accepts an explicitly sized view over one while
-it keeps rejecting a length-tracking view and a sized view over a resizable
-`ArrayBuffer`.
+length comparison, the new target's `prototype` read, and the Shared Data Block
+allocation exactly as AllocateSharedArrayBuffer does, and a growable buffer
+reserves its maximum length at creation.
+
+The `byteLength`, `growable`, and `maxByteLength` getters, `grow`, and `slice`
+require the shared brand, while every `ArrayBuffer.prototype` member now
+rejects it. `ArrayBuffer.prototype.slice` rejects a species result that is
+shared. `grow` checks both brands before its length converts, returns
+`undefined` for the current length, and throws a `RangeError` for a smaller or
+over-maximum length; the grown bytes read zero. A shared buffer never detaches.
+
+TypedArray and DataView construction, element access, and length-tracking views
+accept either buffer kind unchanged, so a length-tracking view over a growable
+buffer observes each grow. A growable shared buffer is still fixed length for
+IsTypedArrayFixedLength, because it never shrinks. `Object.preventExtensions`
+therefore accepts an explicitly sized view over one while it keeps rejecting a
+length-tracking view and a sized view over a resizable `ArrayBuffer`.
 
 The thirteen `Atomics` functions validate an integer TypedArray first, then
-convert the index against the length read before that conversion, then
-convert their values, and then revalidate the view, so a conversion that
-detaches or shrinks an `ArrayBuffer` throws before any byte is read. The
+convert the index against the length read before that conversion, then convert
+their values, and then revalidate the view. A conversion that detaches or
+shrinks an `ArrayBuffer` therefore throws before any byte is read. The
 read-modify-write functions, `store`, and `compareExchange` operate on
 `ArrayBuffer` and `SharedArrayBuffer` views alike, compute over the element's
 two's-complement bits, and return the previous element, except that `store`
@@ -7927,76 +8097,85 @@ an expected value that wraps to the stored bits matches. `isLockFree` reports
 is this profile's implementation-defined agent record.
 
 The agent can suspend by default. `Atomics.wait` requires an `Int32Array` or
-`BigInt64Array` over a `SharedArrayBuffer` and returns `"not-equal"` or, for
-a matching element, suspends until its timeout and returns `"timed-out"`: no
+`BigInt64Array` over a `SharedArrayBuffer` and returns `"not-equal"` or, for a
+matching element, suspends until its timeout and returns `"timed-out"`. No
 other agent exists to notify it, so an infinite timeout never returns. A
 fractional timeout rounds up to whole milliseconds, which is a permitted
-additional timeout. `Atomics.waitAsync` returns `{ async, value }` with
-`"not-equal"` or an immediate `"timed-out"` synchronously, and otherwise adds
-a waiter to the realm's FIFO WaiterList store and returns its pending
-`%Promise%`. `Atomics.notify` removes up to `count` waiters on the same buffer
-and byte index in FIFO order and resolves each promise to `"ok"`
-synchronously, as NotifyWaiter specifies for a waiter of the surrounding
-agent; a non-shared buffer reports zero after the same validation and
-conversions. A finite waitAsync timeout is a host timeout job whose deadline
-counts from the monotonic time of the call rather than from the start of the
-current task, and which keeps the event loop running until it resolves a
-still-waiting promise to `"timed-out"`. A notification cancels that job.
-Waiters, their promises, their buffers, and their timeout jobs stay collector
-roots while listed.
+additional timeout.
 
-Fixed native and generated differential evidence at property seed
-`0x60007300` covers the constructor, prototype, brand, grow, slice, species,
-DataView, and TypedArray surface over fixed and growable shared buffers, all
-eight integer and both BigInt element kinds over shared and unshared buffers,
-wrapping, fractional, non-finite, and mismatched operands, validation and
-conversion order, revalidation after resize and detachment, immediate and
-blocking waits, and waitAsync waiters settled by count-limited notification
-or by timeout. Node.js, Deno, and both native specialization policies agree
-with collection forced at every safepoint, a false numeric hint deliberately
-misses its guard and reaches the compiled generic fallback, and an
-independent element-level model computes every generated observation.
-Native-only checks record where both reference engines diverge from
-ECMA-262: V8 resolves a same-agent notification through a later host task
-rather than synchronously, lets a process exit with a waitAsync timeout still
-pending, answers `isLockFree` for an unconverted fractional size, and throws
-a `TypeError` instead of the specified `RangeError` when revalidation finds a
+`Atomics.waitAsync` returns `{ async, value }` with `"not-equal"` or an
+immediate `"timed-out"` synchronously, and otherwise adds a waiter to the
+realm's FIFO WaiterList store and returns its pending `%Promise%`.
+`Atomics.notify` removes up to `count` waiters on the same buffer and byte
+index in FIFO order and resolves each promise to `"ok"` synchronously, as
+NotifyWaiter specifies for a waiter of the surrounding agent. A non-shared
+buffer reports zero after the same validation and conversions.
+
+A finite waitAsync timeout is a host timeout job whose deadline counts from the
+monotonic time of the call rather than from the start of the current task. It
+keeps the event loop running until it resolves a still-waiting promise to
+`"timed-out"`. A notification cancels that job. Waiters, their promises, their
+buffers, and their timeout jobs stay collector roots while listed.
+
+Fixed native and generated differential evidence at property seed `0x60007300`
+covers the constructor, prototype, brand, grow, slice, species, DataView, and
+TypedArray surface over fixed and growable shared buffers, and all eight
+integer and both BigInt element kinds over shared and unshared buffers. It
+covers wrapping, fractional, non-finite, and mismatched operands, validation
+and conversion order, revalidation after resize and detachment, immediate and
+blocking waits, and waitAsync waiters settled by count-limited notification or
+by timeout. Node.js, Deno, and both native specialization policies agree with
+collection forced at every safepoint. A false numeric hint deliberately misses
+its guard and reaches the compiled generic fallback. An independent
+element-level model computes every generated observation.
+
+Native-only checks record where both reference engines diverge from ECMA-262.
+V8 resolves a same-agent notification through a later host task rather than
+synchronously, lets a process exit with a waitAsync timeout still pending,
+answers `isLockFree` for an unconverted fractional size, and throws a
+`TypeError` instead of the specified `RangeError` when revalidation finds a
 byte index past a shrunk buffer under an in-bounds length-tracking view.
 
-Every case that needs a second agent kept an explicit capability boundary
-at this node: the reviewed runner classified a case that includes
+Every case that needs a second agent kept an explicit capability boundary at
+this node. The reviewed runner classified a case that includes
 *atomicsHelper.js* or names `$262.agent` as unsupported with the
 `test262-agent` capability without executing it, until the agent cluster
-section below admitted that capability. M5c adds the main-agent blocking
-policy of ADR 0026: the reviewed runner selects `[[CanBlock]]` false for
-`CanBlockIsFalse` through `--test262-host --test262-non-blocking`.
-`Atomics.wait` then throws TypeError after view/index validation and
-value/timeout conversions, before comparing memory, even for a mismatch or
-zero timeout. `waitAsync` is unchanged. Ordinary main agents and all child
-agents default to true; realms share their owning agent's policy. The two
-owned rows keep their checked-in unsupported classification pending Root's
-UPDATE. The focused evidence is
-*tests/non-blocking-agent-native.test.ts* and
+section below admitted that capability.
+
+M5c adds the main-agent blocking policy of ADR 0026: the reviewed runner
+selects `[[CanBlock]]` false for `CanBlockIsFalse` through
+`--test262-host --test262-non-blocking`. `Atomics.wait` then throws TypeError
+after view/index validation and value/timeout conversions, before comparing
+memory, even for a mismatch or zero timeout. `waitAsync` is unchanged. Ordinary
+main agents and all child agents default to true; realms share their owning
+agent's policy. The two owned rows keep their checked-in unsupported
+classification pending Root's UPDATE.
+
+The focused evidence is *tests/non-blocking-agent-native.test.ts* and
 *tests/property/m5-non-blocking-agent.property.test.ts*.
-The reviewed harness gains *testAtomics.js*,
-unchanged in behavior; its non-view value list constructs a Boolean wrapper, so
-the cases that include it keep the unadmitted `Boolean` binding boundary. The
-reviewed feature list gains `Atomics`, `Atomics.waitAsync`, and
-`SharedArrayBuffer`, and the dependency vocabulary gains
-`atomics-single-agent`. All 479 paths under the node's two inventory roots are
-reviewed: 304 pass, 112 need `$262.agent`, 52 need the `Boolean` binding
-through *testAtomics.js*, two need an agent that cannot block, three reference
-an unresolvable upstream identifier this profile rejects at compile time, five
-need concrete TypedArray feature gates, and one needs a second realm.
-Forty-eight already reviewed paths outside the roots move to pass: 38 DataView
-cases, nine ArrayBuffer brand-check cases, and one `Object.seal` case; the
-remaining eight shared-buffer paths keep their TypedArray method,
-`Float16Array`, or realm boundaries. No reviewed path moves away from `pass`.
-The manifest moves from 19,291 to 19,770 cases and from 15,792 to 16,144
-passes, keeps 1,556 expected negatives, and moves from 1,943 to 2,070
-unsupported profile features with no semantic, harness, or infrastructure
-failures. The property inventory reaches 148 domains and seeds with a
-5,695-case ordinary budget, and the evidence inventory reaches 126 families.
+
+The reviewed harness gains *testAtomics.js*, unchanged in behavior. Its
+non-view value list constructs a Boolean wrapper, so the cases that include it
+keep the unadmitted `Boolean` binding boundary. The reviewed feature list gains
+`Atomics`, `Atomics.waitAsync`, and `SharedArrayBuffer`, and the dependency
+vocabulary gains `atomics-single-agent`.
+
+All 479 paths under the node's two inventory roots are reviewed: 304 pass, 112
+need `$262.agent`, 52 need the `Boolean` binding through *testAtomics.js*, two
+need an agent that cannot block, three reference an unresolvable upstream
+identifier this profile rejects at compile time, five need concrete TypedArray
+feature gates, and one needs a second realm. Forty-eight already reviewed paths
+outside the roots move to pass: 38 DataView cases, nine ArrayBuffer brand-check
+cases, and one `Object.seal` case. The remaining eight shared-buffer paths keep
+their TypedArray method, `Float16Array`, or realm boundaries. No reviewed path
+moves away from `pass`.
+
+The manifest holds 19,770 cases and 16,144 passes, keeps 1,556 expected
+negatives, and holds 2,070 unsupported profile features, with no semantic,
+harness, or infrastructure failures. The property inventory reaches 148 domains
+and seeds with a 5,695-case ordinary budget, and the evidence inventory reaches
+126 families.
+
 The runtime ABI moves to `oseo-runtime-m5-111`: the ArrayBuffer range gains
 seven SharedArrayBuffer code IDs, code range index 25 holds the thirteen
 Atomics functions, the public intrinsic table gains four slots, the heap gains
@@ -8009,92 +8188,96 @@ Agent clusters and cross-agent shared memory
 M5b node `atomics-and-shared-memory` admits agent clusters and the
 `$262.agent` harness capability under
 [ADR 0026](./adr/0026-agent-clusters-and-shared-memory.md). A Script built
-with the CLI's `--test262-host` option has a `$262` global whose `agent`
-object provides `start`, `broadcast`, `getReport`, `sleep`, and
-`monotonicNow` in the main agent and `receiveBroadcast`, `report`,
-`leaving`, `sleep`, and `monotonicNow` in every agent it starts; in an
-ordinary program the name is unresolvable and a read of it throws a
-`ReferenceError`. Each agent has its own
-realm, heap, collector, clock adapter, and event loop on a POSIX thread of its
-own, and heap values never cross agents.
+with the CLI's `--test262-host` option has a `$262` global. In the main
+agent, its `agent` object provides `start`, `broadcast`, `getReport`,
+`sleep`, and `monotonicNow`. In every agent it starts, the object provides
+`receiveBroadcast`, `report`, `leaving`, `sleep`, and `monotonicNow`. In an
+ordinary program the name is unresolvable, and a read of it throws a
+`ReferenceError`. Each agent has its own realm, heap, collector, clock
+adapter, and event loop on a POSIX thread of its own. Heap values never cross
+agents.
 
 Agents share memory through Shared Data Blocks. `broadcast` gives every agent
 still evaluating a SharedArrayBuffer of its own realm over the same block,
-passes a Number or BigInt64 id beside it, and returns once each of them has
-retrieved it, which an agent does once it has registered a callback; the
-callback then runs as a timer callback task. A block's length belongs to the
-block, so a `grow` in one agent is the `byteLength` every agent's buffer and
-length-tracking view observes. TypedArray `set` treats two buffer objects of
-one agent over one block as the same buffer. Reports are copied strings that
-`getReport` returns in order, or `null` when none is waiting. `sleep` blocks
-the calling agent for at least the requested milliseconds, and
+and passes a Number or BigInt64 id beside it. It returns once each of them has
+retrieved it. An agent retrieves it once it has registered a callback, and
+the callback then runs as a timer callback task. A block's length belongs to
+the block, so a `grow` in one agent is the `byteLength` every agent's buffer
+and length-tracking view observes. TypedArray `set` treats two buffer objects
+of one agent over one block as the same buffer. Reports are copied strings
+that `getReport` returns in order, or `null` when none is waiting. `sleep`
+blocks the calling agent for at least the requested milliseconds.
 `monotonicNow` returns milliseconds since one cluster-wide origin.
 
-The WaiterList store belongs to the cluster: blocking waiters of every agent
+The WaiterList store belongs to the cluster. Blocking waiters of every agent
 and each agent's `waitAsync` waiters share one FIFO per block and byte index.
 `Atomics.notify` wakes a blocking waiter of another agent, resolves its own
 agent's `waitAsync` promise synchronously, and resolves another agent's
-promise in that agent as a task, as NotifyWaiter specifies; a timeout job
-whose waiter a notification already removed does nothing. A wait with a
-finite timeout lasts at least that timeout as another agent measures it.
+promise in that agent as a task, as NotifyWaiter specifies. If a notification
+already removed a waiter, its timeout job does nothing. A wait with a finite
+timeout lasts at least that timeout as another agent measures it.
 
 Agents of one cluster share one executing thread, as ECMA-262's forward
-progress clause permits: exactly one agent evaluates at a time, and the turn
+progress clause permits. Exactly one agent evaluates at a time. The turn
 passes when that agent suspends in `Atomics.wait`, `sleep`, `broadcast`,
-`start`, or an idle event loop, when it finishes, and at every `Atomics`
-operation and `getReport`, where the longest-ready agent takes it. `start`
-returns once the new agent has run to its first suspension. An agent's event
-loop keeps waiting while it has incoming work, timers, pending `waitAsync`
-waiters, or a broadcast callback it has not left with `leaving()`, and the
-main agent keeps waiting for its own pending waiters only while another agent
-can still make progress. When the main agent's event loop ends the process
-ends, and an agent that still waits never evaluates again. An agent's uncaught
-throw prints that agent's error and ends the process with status 1, and a
-cluster whose every agent waits without a deadline while the main agent is
-blocked reports `OSEO3001` “The agent cluster cannot make progress.”
+`start`, or an idle event loop, or when it finishes. It also passes at every
+`Atomics` operation and `getReport`, where the longest-ready agent takes it.
+`start` returns once the new agent has run to its first suspension.
+
+An agent's event loop keeps waiting while it has incoming work, timers,
+pending `waitAsync` waiters, or a broadcast callback it has not left with
+`leaving()`. The main agent keeps waiting for its own pending waiters only
+while another agent can still make progress. When the main agent's event loop
+ends the process ends, and an agent that still waits never evaluates again. An
+agent's uncaught throw prints that agent's error and ends the process with
+status 1, and a cluster whose every agent waits without a deadline while the
+main agent is blocked reports `OSEO3001` “The agent cluster cannot make
+progress.”
 
 `$262.agent.start` runs only agent programs compiled ahead of time. The
 compiler turns every `$262.agent.start` whose argument is a template literal
 or a string literal into an agent program, with one numeric hole per
-substitution, and rejects a template whose holes are not each one
+substitution. It rejects a template whose holes are not each one
 PrimaryExpression token position read exactly once. `start` matches its
-source string against those templates, and each hole must hold a decimal
-integer literal without a leading zero, optionally with the BigInt suffix
-`n`; any other source reaches the owned `OSEO2001` boundary “Agent source
-text outside the ahead-of-time agent programs is not admitted.” of
-[ADR 0016](./adr/0016-dynamic-source-boundary.md).
+source string against those templates. Each hole must hold a decimal integer
+literal without a leading zero, optionally with the BigInt suffix `n`. Any
+other source reaches the owned `OSEO2001` boundary of
+[ADR 0016](./adr/0016-dynamic-source-boundary.md) (“Agent source text outside
+the ahead-of-time agent programs is not admitted.”).
 
-Fixed native differential fixtures run five clusters through Node.js and Deno,
-whose worker-based reference `$262.agent` shares memory through the same
-Shared Data Blocks, and through both native specialization policies with
-collection forced at every safepoint in every agent: broadcasts with Number,
-BigInt, and empty buffers, cross-agent wait, not-equal, timeout, and
-notification counts, cross-agent waitAsync settlement in both directions,
-cross-agent growth, and contended read-modify-write and compareExchange
-updates, with a false numeric hint that misses its guard and reaches the
-generic fallback. Every printed observation is one that any interleaving
-produces. The generated property suite at seed `0x60007f00` builds one to
-three agents whose templates pass their operands as literal text or as Number
-and BigInt holes, applies commutative update families to Int32Array and
-BigInt64Array cells, ends each agent at a notified wait, a notified
-waitAsync, a not-equal wait, or a timed-out wait, and compares both
-references and both native policies against an interleaving-independent
-model. Native-only checks pin FIFO notification order across agents, which
-the parallel references cannot, the BigInt hole, every rejected template and
-source shape, an agent's uncaught throw, the stalled cluster, and a main
-agent that ends while another agent waits.
+Fixed native differential fixtures run five clusters through Node.js and
+Deno, whose worker-based reference `$262.agent` shares memory through the
+same Shared Data Blocks. They also run through both native specialization
+policies, with collection forced at every safepoint in every agent. The
+fixtures cover broadcasts with Number, BigInt, and empty buffers; cross-agent
+wait, not-equal, timeout, and notification counts; cross-agent waitAsync
+settlement in both directions; cross-agent growth; and contended
+read-modify-write and compareExchange updates, with a false numeric hint that
+misses its guard and reaches the generic fallback. Every printed observation
+is one that any interleaving produces.
+
+The generated property suite at seed `0x60007f00` builds one to three agents
+whose templates pass their operands as literal text or as Number and BigInt
+holes. It applies commutative update families to Int32Array and BigInt64Array
+cells. It ends each agent at a notified wait, a notified waitAsync, a
+not-equal wait, or a timed-out wait, and compares both references and both
+native policies against an interleaving-independent model. Native-only checks
+pin FIFO notification order across agents, which the parallel references
+cannot. They also pin the BigInt hole, every rejected template and source
+shape, an agent's uncaught throw, the stalled cluster, and a main agent that
+ends while another agent waits.
 
 The reviewed runner builds every case that reads `$262.agent` with the test262
-host and executes it. Its execution records no `scheduler` value, because it
+host and executes it. Its execution records no `scheduler` value because it
 runs under this real-clock cluster rather than the deterministic logical
-clock, while every other module and asynchronous execution keeps that value.
-The reviewed harness gains *atomicsHelper.js*, the upstream helper except that
-`$262.agent.setTimeout` forwards to the host timer, which this profile reaches
-only as a call target. The dependency vocabulary gains
-`atomics-and-shared-memory`, and the node declares no inventory roots. Of the
-112 reviewed paths that name `$262.agent`, all move to `pass`.
-The runtime ABI moves to `oseo-runtime-m5-123` with code range index 28 for
-the eight `$262.agent` functions, the reference-counted Shared Data Block, the
+clock. Every other module and asynchronous execution keeps that value. The
+reviewed harness gains *atomicsHelper.js*. It is the upstream helper except
+that `$262.agent.setTimeout` forwards to the host timer, which this profile
+reaches only as a call target. The dependency vocabulary gains
+`atomics-and-shared-memory`. The node declares no inventory roots. Of the 112
+reviewed paths that name `$262.agent`, all move to `pass`. The runtime ABI
+moves to `oseo-runtime-m5-123` with code range index 28 for the eight
+`$262.agent` functions, the reference-counted Shared Data Block, the
 context's agent record and broadcast callback root, and the generated-code
 entry points `oseo_test262_host_install` and `oseo_agent_hole`.
 
@@ -8104,39 +8287,45 @@ Weak collections
 
 M5b node `weak-collections` materializes `WeakMap`, `WeakSet`, `WeakRef`, and
 `FinalizationRegistry` with their prototypes as one realm-owned intrinsic
-cluster and installs the four constructors as writable, configurable global
+cluster. It installs the four constructors as writable, configurable global
 properties. Each constructor rejects a call without `new` and selects the
 instance prototype through the new target's observable `prototype` property.
 `WeakRef` checks its target and `FinalizationRegistry` checks its cleanup
-callback before that lookup. Every prototype carries its constructor, its
-methods, and a `Symbol.toStringTag` string, and every method rejects a
-receiver of another brand with a `TypeError`.
+callback before that lookup.
 
-A value can be held weakly when it is an object or an unregistered symbol.
-A symbol the `symbol-intrinsic` node's registry returned from `Symbol.for`
-is registered and cannot be held weakly; every other symbol, including a
-well-known symbol, is unregistered. A `WeakMap` or `WeakSet` owns one collector
-ephemeron table, and an address-keyed open-addressed index keeps `get`, `has`,
-`set`, `add`, and `delete` independent of the table's size. `set` and `add`
-throw a `TypeError` for a key that cannot be held weakly; `get`, `has`, and
-`delete` answer `undefined` or `false` instead. Deletion unlinks the entry and
-its index slot at once. A collection unlinks an entry whose key died and
-replaces its index slot with a tombstone, so lookup never observes a cleared
-entry. The `WeakMap` constructor reads the observable `set` adder and the
-`WeakSet` constructor reads `add` before either acquires the iterator. A
-non-object `WeakMap` entry, an abrupt `"0"` or `"1"` read, or an abrupt adder
-call closes the iterator, while an abrupt iterator step propagates without a
-close.
+Every prototype carries its constructor, its methods, and a
+`Symbol.toStringTag` string. Every method rejects a receiver of another brand
+with a `TypeError`.
+
+A value can be held weakly when it is an object or an unregistered symbol. A
+symbol the `symbol-intrinsic` node's registry returned from `Symbol.for` is
+registered and cannot be held weakly. Every other symbol, including a
+well-known symbol, is unregistered.
+
+A `WeakMap` or `WeakSet` owns one collector ephemeron table. An address-keyed
+open-addressed index keeps `get`, `has`, `set`, `add`, and `delete` independent
+of the table's size. `set` and `add` throw a `TypeError` for a key that cannot
+be held weakly; `get`, `has`, and `delete` answer `undefined` or `false`
+instead. Deletion unlinks the entry and its index slot at once. A collection
+unlinks an entry whose key died and replaces its index slot with a tombstone,
+so lookup never observes a cleared entry.
+
+The `WeakMap` constructor reads the observable `set` adder and the `WeakSet`
+constructor reads `add` before either acquires the iterator. A non-object
+`WeakMap` entry, an abrupt `"0"` or `"1"` read, or an abrupt adder call closes
+the iterator, while an abrupt iterator step propagates without a close.
 
 `new WeakRef(target)` and `deref` add a live target to the current job's
-KeptAlive set. The set ends with that job: the runtime clears it before every
-promise job, before every timer turn, and before the cleanup checkpoint, so
-each promise reaction is a job of its own, including a reaction that an
+KeptAlive set. The set ends with that job. The runtime clears it before every
+promise job, before every timer turn, and before the cleanup checkpoint. Each
+promise reaction is therefore a job of its own, including a reaction that an
 internal await drains. A target therefore survives collection for the rest of
-the job that created or dereferenced its reference, and a `deref` in a later
-job, including the next promise job, answers `undefined` once a collection has
-cleared it. `register` requires a target that can be held weakly and differs
-from the held value, and an unregister token that can be held weakly or is
+the job that created or dereferenced its reference. A `deref` in a later job,
+including the next promise job, answers `undefined` once a collection has
+cleared it.
+
+`register` requires a target that can be held weakly and differs from the held
+value. It also requires an unregister token that can be held weakly or is
 `undefined`. Targets and tokens are weak. `unregister` removes every
 registration with that token, including one the collector has already queued,
 and reports whether it removed any.
@@ -8145,143 +8334,162 @@ The collector's existing fixed point, weak-target clearing, and deterministic
 queue decide what is eligible for cleanup. After the script's promise jobs
 drain, and again after each timer turn, the event loop consumes that queue in
 order. An internal await that drives timers directly consumes it the same way
-before each of those timer turns while its promise is pending. The queue
-appends the records each collection makes eligible in their
+before each of those timer turns while its promise is pending. Collection
+itself still neither allocates nor invokes user code.
+
+The queue appends the records each collection makes eligible in their
 registration order, so records from an earlier collection run before records
 from a later one. Each registry with queued records gets one cleanup job,
 ordered by its oldest record. The job calls the registry's callback with an
-`undefined` receiver and each record's held value in queue order, including a
-record queued while the job runs and excluding one an earlier callback
-unregistered, and promise jobs drain only after the job ends. In the outer
-event loop, an abrupt callback ends the program with that completion, exactly
-as an abrupt timer callback does, unless the promise jobs or the rejection
-checkpoint that follow it produce a host diagnostic, which then takes
-precedence. A cleanup job that an internal await drives does not end the
-program there: like a timer turn that await drives, the cleanup turn's
-resulting abrupt completion, chosen with the same host-diagnostic precedence,
-becomes the await's own completion for the iterator operation that awaited,
-which handles a language throw like any other throw completion, as the Known
-gaps entry on unhandled rejections describes. Collection itself still neither
-allocates nor invokes user code.
+`undefined` receiver and each record's held value in queue order. The job
+includes a record queued while the job runs and excludes one an earlier
+callback unregistered. Promise jobs drain only after the job ends.
+
+In the outer event loop, an abrupt callback ends the program with that
+completion, exactly as an abrupt timer callback does. If the promise jobs or
+the rejection checkpoint that follow it produce a host diagnostic, that
+diagnostic takes precedence instead.
+
+A cleanup job that an internal await drives does not end the program there.
+Like a timer turn that await drives, the cleanup turn's resulting abrupt
+completion, chosen with the same host-diagnostic precedence, becomes the
+await's own completion for the iterator operation that awaited. That operation
+handles a language throw like any other throw completion, as the Known gaps
+entry on unhandled rejections describes.
 
 Fixed Node.js, Deno, and native differential evidence covers descriptors,
-brands, object, function, Array, and symbol keys, primitives that cannot be
-held weakly, index growth under deletion churn, constructor adder order and
-iterator closing, derived construction, prototype fallback, `WeakRef` and
-`FinalizationRegistry` validation, and unregistration. Every observation there
-is independent of collection timing. A native-only observation with
-collection forced at every safepoint checks KeptAlive lifetime across the
-script and consecutive promise jobs, one cleanup job
-per registry with its promise jobs deferred until the job ends, skipping a
-queued record after `unregister` before or during its job, and an abrupt
-cleanup callback. Sanitized fixed C evidence checks index
-synchronization with deletion and collector unlinking, weak unregister tokens,
-KeptAlive roots, and a KeptAlive set that ends before each promise job of one
-drain and before each promise job or timer turn an internal await drives, a
-cleanup job that runs between two timers one internal await drives, and
-retains the AArch64 Linux cross-link. Generated
-evidence at property seed `0x60007500` starts with two or three fresh
-registrations, then compares one to sixteen `WeakMap`,
-`WeakSet`, `WeakRef`, and `FinalizationRegistry` operations over stable
-objects, unregistered symbols, fresh unreachable objects, and primitives with
-an independent identity model, Node.js, Deno, and both native specialization
-policies under forced collection, and checks the native cleanup report
-against a model where every callback precedes every promise job it enabled.
+brands, object, function, Array, and symbol keys. It also covers primitives
+that cannot be held weakly, index growth under deletion churn, constructor
+adder order and iterator closing, derived construction, prototype fallback,
+`WeakRef` and `FinalizationRegistry` validation, and unregistration. Every
+observation there is independent of collection timing.
+
+A native-only observation with collection forced at every safepoint checks
+KeptAlive lifetime across the script and consecutive promise jobs. It also
+checks one cleanup job per registry with its promise jobs deferred until the
+job ends, skipping a queued record after `unregister` before or during its job,
+and an abrupt cleanup callback.
+
+Sanitized fixed C evidence checks index synchronization with deletion and
+collector unlinking, weak unregister tokens, and KeptAlive roots. It also
+checks a KeptAlive set that ends before each promise job of one drain and
+before each promise job or timer turn an internal await drives, and a cleanup
+job that runs between two timers one internal await drives. The evidence
+retains the AArch64 Linux cross-link.
+
+Generated evidence at property seed `0x60007500` starts with two or three fresh
+registrations. It then compares one to sixteen `WeakMap`, `WeakSet`, `WeakRef`,
+and `FinalizationRegistry` operations over stable objects, unregistered
+symbols, fresh unreachable objects, and primitives with an independent identity
+model, Node.js, Deno, and both native specialization policies under forced
+collection. It checks the native cleanup report against a model where every
+callback precedes every promise job it enabled.
+
 One to four generated sibling or chained promise jobs then construct a
-`WeakRef` and dereference every earlier one, and the native report must show
-fresh targets from the script and earlier jobs already cleared; a
-false numeric hint deliberately misses its guard and reaches the compiled
-generic fallback.
+`WeakRef` and dereference every earlier one. The native report must show fresh
+targets from the script and earlier jobs already cleared. A false numeric hint
+deliberately misses its guard and reaches the compiled generic fallback.
 
 Of the 262 paths under the node's four inventory roots, 249 are reviewed: 245
 pass and four retain the explicit cross-realm prerequisite. The other 13 use
-`Symbol.for` to create a registered symbol. The `symbol-intrinsic` node has
-since admitted the registry and narrowed this shared CanBeHeldWeakly check to
-unregistered symbols, and a focused run shows all 13 passing, but they belong
-to this node's inventory rather than that one's, so the reviewed-subset-growth
-backlog promotes them in a later change.
+`Symbol.for` to create a registered symbol.
+
+The `symbol-intrinsic` node has since admitted the registry and narrowed this
+shared CanBeHeldWeakly check to unregistered symbols. A focused run shows all
+13 passing, but they belong to this node's inventory rather than that one's, so
+the reviewed-subset-growth backlog promotes them in a later change.
+
 Twenty-five previously reviewed paths outside the roots also move from
 `unsupported-profile-feature` to `pass` because each uses a weak collection as
 an ordinary operand: ten `Map` and seven `Set` brand-check cases, two
 `Object.prototype.toString` tag cases, four `Object.seal` cases, and the `Map`
-and `Set` value-domain cases, whose only other gate the landed
-`typed-array-core` node had already lifted. No reviewed path moves away from
-`pass`. The reviewed feature list gains
-`FinalizationRegistry`, `WeakMap`, `WeakRef`, `WeakSet`, and
-`symbols-as-weakmap-keys`, and the dependency vocabulary gains
-`weak-collections`. The manifest moves from 20,168 to 20,417 cases and from
-16,519 to 16,789 passes, keeps 1,556 expected negatives, and moves from 2,093
-to 2,072 unsupported profile features with no semantic, harness, or
-infrastructure failures. The suite revision, applicable inventory,
-classification vocabulary, forced-collection policy, and zero-override policy
-are unchanged. The new component, four heap kinds, and the public KeptAlive
-fields move the runtime ABI to `oseo-runtime-m5-113` without changing the
-graph's orchestration state.
+and `Set` value-domain cases. The landed `typed-array-core` node had already
+lifted the value-domain cases' only other gate. No reviewed path moves away
+from `pass`.
+
+The reviewed feature list gains `FinalizationRegistry`, `WeakMap`, `WeakRef`,
+`WeakSet`, and `symbols-as-weakmap-keys`, and the dependency vocabulary gains
+`weak-collections`.
+
+The manifest moves from 20,168 to 20,417 cases and from 16,519 to 16,789
+passes, keeps 1,556 expected negatives, and moves from 2,093 to 2,072
+unsupported profile features with no semantic, harness, or infrastructure
+failures.
+
+The suite revision, applicable inventory, classification vocabulary,
+forced-collection policy, and zero-override policy are unchanged.
+
+The new component, four heap kinds, and the public KeptAlive fields move the
+runtime ABI to `oseo-runtime-m5-113` without changing the graph's orchestration
+state.
 
 
 Array prototype change by copy
 ------------------------------
 
 M5b node `array-prototype-change-by-copy` adds ordinary `with`, `toSpliced`,
-and `toReversed` functions to the realm-owned `%Array.prototype%`. Each first
-applies ToObject and snapshots LengthOfArrayLike. `with` converts its relative
-index and throws a `RangeError` when the resolved position is outside that
-snapshot. `toSpliced` distinguishes an absent start, an absent delete count,
-and an explicit `undefined` delete count, clamps the supplied values, and
-rejects a result length above `2**53 - 1` before allocation.
+and `toReversed` functions to the realm-owned `%Array.prototype%`. Each method
+first applies ToObject and snapshots LengthOfArrayLike. `with` converts its
+relative index and throws a `RangeError` when the resolved position is outside
+that snapshot. `toSpliced` distinguishes an absent start, an absent delete
+count, and an explicit `undefined` delete count. It clamps the supplied values
+and rejects a result length above `2**53 - 1` before allocation.
 
 All three methods allocate a realm Array at their result length before reading
-any retained source element. A result length above `2**32 - 1` therefore
-throws a `RangeError` without an indexed read. `toSpliced` can accept a source
-length above that limit when deletion reduces the result length to the limit
-or below. They use Get for every retained index and CreateDataProperty on the
-result, so holes become own `undefined` properties and inherited values are
-copied. `toReversed` reads from the last index to the first. `toSpliced` does
-not read deleted entries and inserts its argument values between ascending
-prefix and suffix reads. `with` does not read the replaced index. The source
-is never written. None reads `constructor` or `Symbol.species`, so an Array
-subclass or generic receiver still produces a plain Array with
-`%Array.prototype%`.
+any retained source element. A result length above `2**32 - 1` therefore throws
+a `RangeError` without an indexed read. `toSpliced` can accept a source length
+above that limit when deletion reduces the result length to the limit or below.
 
-Fixed native and generated differential evidence at property seed
-`0x60007700` covers all three methods over one through six sparse Array or
+They use Get for every retained index and CreateDataProperty on the result, so
+holes become own `undefined` properties and inherited values are copied.
+`toReversed` reads from the last index to the first. `toSpliced` does not read
+deleted entries and inserts its argument values between ascending prefix and
+suffix reads. `with` does not read the replaced index. The source is never
+written. None reads `constructor` or `Symbol.species`, so an Array subclass or
+generic receiver still produces a plain Array with `%Array.prototype%`.
+
+Fixed native and generated differential evidence at property seed `0x60007700`
+covers all three methods. The cases span one through six sparse Array or
 ordinary array-like entries, inherited and primitive receivers, negative and
 fractional indices, omitted and explicit splice arguments, clamped splice
-ranges, zero through three inserted values,
-plain-Array allocation, snapshot mutation, read and coercion order, abrupt
-completion, frozen sources, and range limits. Both specialization policies,
-collection forced at every safepoint, false hints, deliberate shape-guard
-misses, and compiled generic fallback are exercised. The generated family has
-a 12-case ordinary budget and an independent indexed-copy model.
+ranges, zero through three inserted values, plain-Array allocation, snapshot
+mutation, read and coercion order, abrupt completion, frozen sources, and range
+limits. It covers both specialization policies, collection forced at every
+safepoint, false hints, deliberate shape-guard misses, and compiled generic
+fallback. The generated family has a 12-case ordinary budget and an independent
+indexed-copy model.
 
 All 68 paths under the node's three inventory roots are reviewed: 65 pass and
 three retain the separately owned Boolean intrinsic prerequisite. No reviewed
 path outside the roots changes classification, and no reviewed path moves away
-from `pass`. The manifest moves from 20,773 to 20,841 paths and from 17,133 to
-17,198 passes, keeps 1,556 expected negatives, and moves from 2,084 to 2,087
-unsupported profile features, with no semantic, harness, or infrastructure
-failures. The property ratchet moves from 151 to 152 domains and seeds and
-from 5,731 to 5,743 ordinary cases. The runtime ABI moves to
-`oseo-runtime-m5-115`, allocates three internal code IDs in the existing Array
-range, and adds no generated-code entry point or realm intrinsic slot. The
-suite revision, 41,091-path inventory, manifest schema and vocabulary,
-forced-collection policy, and zero-override policy are unchanged.
+from `pass`.
+
+The manifest has 20,841 paths, 17,198 passes, 1,556 expected negatives, and
+2,087 unsupported profile features, with no semantic, harness, or
+infrastructure failures. The property ratchet has 152 domains and seeds, with
+5,743 ordinary cases.
+
+The runtime ABI is `oseo-runtime-m5-115`. The node allocates three internal
+code IDs in the existing Array range, and adds no generated-code entry point or
+realm intrinsic slot. The suite revision, 41,091-path inventory, manifest
+schema and vocabulary, forced-collection policy, and zero-override policy are
+unchanged.
 
 
 String prototype padding and well-formedness
 --------------------------------------------
 
 M5b node `string-prototype-pad` adds `repeat`, `padStart`, `padEnd`,
-`isWellFormed`, and `toWellFormed` to the realm-owned
-`%String.prototype%`. Every method first rejects a nullish receiver and then
-applies the shared `ToString`, so String primitives, String wrappers, and
-generic receivers preserve the same conversion order and abrupt completion.
+`isWellFormed`, and `toWellFormed` to the realm-owned `%String.prototype%`.
+Every method first rejects a nullish receiver and then applies the shared
+`ToString`, so String primitives, String wrappers, and generic receivers
+preserve the same conversion order and abrupt completion.
 
 `repeat` converts its count with `ToIntegerOrInfinity`, rejects a negative
 value or positive infinity, and checks the reviewed maximum UTF-16 length
 before allocating. `padStart` and `padEnd` convert their target with
-`ToLength`, return the converted receiver without converting the filler when
-the target is not longer, and otherwise use a single space for an omitted
+`ToLength`. They return the converted receiver without converting the filler
+when the target is not longer, and otherwise use a single space for an omitted
 filler. An empty converted filler returns the receiver. A nonempty filler is
 repeated and truncated to the exact required code-unit length before it is
 prepended or appended, with the same reviewed result-length ceiling.
@@ -8297,20 +8505,22 @@ constructor rejection, length limits, default and explicit fillers, receiver
 and argument conversion order, abrupt conversions, valid pairs, and lone
 surrogates. Generated differential evidence at seed `0x60007a00` covers
 arbitrary bounded UTF-16 subjects and fillers, primitive, wrapper, and generic
-receivers, both specialization policies, collection forced at every
-safepoint, false hints, and a deliberate shape-guard miss that reaches the
-compiled generic fallback. All 58 paths under the node's five inventory roots
-are reviewed: 56 pass, while the two primitive-conversion cases retain the
-separately owned Boolean intrinsic prerequisite. No reviewed path outside
-those roots changes classification, and no reviewed path moves away from
-`pass`. The manifest moves from 21,156 to 21,214 paths and from 17,524 to
-17,580 passes, keeps 1,556 expected negatives, and moves from 2,076 to 2,078
-unsupported profile features with no semantic, harness, or infrastructure
-failures. The property ratchet moves from 154 to 155 domains and seeds and
-from 5,767 to 5,779 ordinary cases, and the evidence inventory moves from 132
-to 133 families. The node allocates five IDs in the existing String built-in
-range, adds no runtime component or generated-code entry point, and moves the
-runtime ABI to `m5-118`.
+receivers, both specialization policies, collection forced at every safepoint,
+false hints, and a deliberate shape-guard miss that reaches the compiled
+generic fallback.
+
+All 58 paths under the node's five inventory roots are reviewed: 56 pass, while
+the two primitive-conversion cases retain the separately owned Boolean
+intrinsic prerequisite. No reviewed path outside those roots changes
+classification, and no reviewed path moves away from `pass`.
+
+The manifest has 21,214 paths, 17,580 passes, 1,556 expected negatives, and
+2,078 unsupported profile features, with no semantic, harness, or
+infrastructure failures. The property ratchet has 155 domains and seeds, with
+5,779 ordinary cases. The evidence inventory has 133 families.
+
+The runtime ABI is `m5-118`. The node allocates five IDs in the existing String
+built-in range, and adds no runtime component or generated-code entry point.
 
 
 Boolean intrinsic and wrappers
@@ -8319,31 +8529,33 @@ Boolean intrinsic and wrappers
 M5b node `boolean-intrinsic` materializes the callable and constructible
 `Boolean` global, its false-valued `%Boolean.prototype%`, collector-traced
 wrapper objects carrying `[[BooleanData]]`, and the branded `toString` and
-`valueOf` methods. Calling the constructor applies `ToBoolean` without
-coercing an object. Construction applies the same conversion and then uses the
-new target's prototype, falling back to the constructor realm's intrinsic
-prototype. The methods accept Boolean primitives and branded wrappers only,
-and `toString` returns the exact `"true"` or `"false"` text.
+`valueOf` methods. Calling the constructor applies `ToBoolean` without coercing
+an object. Construction applies the same conversion and then uses the new
+target's prototype, falling back to the constructor realm's intrinsic
+prototype. The methods accept Boolean primitives and branded wrappers only, and
+`toString` returns the exact `"true"` or `"false"` text.
 
-Fixed Node.js, Deno, and native differential evidence and generated evidence
-at seed `0x60007b00` cover falsy and truthy primitive classes, object
-conversion without `ToPrimitive`, branded and unbranded receivers, derived
-and alternate prototype construction, both specialization policies, false
-numeric hints, deliberate shape-guard misses, generic fallback, and collection
-forced at every safepoint. All 51 paths under *test/built-ins/Boolean/* are
-reviewed: 47 pass, one retains the cross-realm prerequisite, and three retain
-the separately owned dynamic `eval`, Function-constructor, and sloppy
-undeclared-binding boundaries. Another 268 reviewed paths outside the root
-move from `unsupported-profile-feature` to `pass`, and no reviewed path moves
-away from `pass`. The manifest moves from 21,214 to 21,265 paths and from
-17,580 to 17,895 passes, keeps 1,556 expected negatives, and moves from 2,078
-to 1,814 unsupported profile features with no semantic, harness, or
-infrastructure failures. The property ratchet moves from 155 to 156 domains
-and seeds and from 5,779 to 5,791 ordinary cases, and the evidence inventory
-moves from 133 to 134 families. The public intrinsic table, Boolean built-in
-code range, and new runtime component move the ABI to `oseo-runtime-m5-119`
-without adding a generated-code entry point. The graph's orchestration state
-remains coordinator-owned.
+Fixed Node.js, Deno, and native differential evidence and generated evidence at
+seed `0x60007b00` cover falsy and truthy primitive classes, object conversion
+without `ToPrimitive`, branded and unbranded receivers, derived and alternate
+prototype construction, both specialization policies, false numeric hints,
+deliberate shape-guard misses, generic fallback, and collection forced at every
+safepoint.
+
+All 51 paths under *test/built-ins/Boolean/* are reviewed: 47 pass, one retains
+the cross-realm prerequisite, and three retain the separately owned dynamic
+`eval`, Function-constructor, and sloppy undeclared-binding boundaries. Another
+268 reviewed paths outside the root now count as `pass` instead of
+`unsupported-profile-feature`, and no reviewed path moves away from `pass`.
+
+The manifest has 21,265 paths, 17,895 passes, 1,556 expected negatives, and
+1,814 unsupported profile features, with no semantic, harness, or
+infrastructure failures. The property ratchet has 156 domains and seeds and
+5,791 ordinary cases, and the evidence inventory has 134 families.
+
+The public intrinsic table, Boolean built-in code range, and new runtime
+component put the ABI at `oseo-runtime-m5-119` without adding a generated-code
+entry point. The graph's orchestration state remains coordinator-owned.
 
 
 globalThis binding
@@ -8351,40 +8563,45 @@ globalThis binding
 
 M5b node `globalthis-binding` exposes the realm global object as the writable,
 non-enumerable, configurable `globalThis` property. Known globals keep their
-property-backed cells. Every other unshadowed name that no declaration
-resolves, except the runtime-owned call targets `console`, `setTimeout`, and
-`clearTimeout` and the unadmitted standard globals `eval` and `Float16Array`,
-resolves through the realm global object at run time. ResolveBinding,
-GetBindingValue, and SetMutableBinding each perform their own `HasProperty`,
-so a Proxy on the global object's prototype chain observes every test and
-may answer each one differently. A read tests the property to resolve the
-reference, and an absent property reaches a hidden cell that throws the
-`ReferenceError` naming the unresolvable reference; a found reference tests
-it again before `Get`, and a property gone by then reads as `undefined` in
+property-backed cells. Every other unshadowed name that no declaration resolves
+resolves through the realm global object at run time. The exceptions are the
+runtime-owned call targets `console`, `setTimeout`, and `clearTimeout` and the
+unadmitted standard globals `eval` and `Float16Array`.
+
+ResolveBinding, GetBindingValue, and SetMutableBinding each perform their own
+`HasProperty`, so a Proxy on the global object's prototype chain observes every
+test and may answer each one differently. A read tests the property to resolve
+the reference. An absent property reaches a hidden cell that throws the
+`ReferenceError` naming the unresolvable reference. A found reference tests it
+again before `Get`, and a property gone by then reads as `undefined` in
 non-strict code and throws `ReferenceError` in strict code. `typeof` answers
 `"undefined"` for an unresolvable name without reading it and otherwise reads
-through the same second test. `delete` deletes a present property and answers
-`true` for an absent one, a sloppy write creates or updates the property, and
-a strict write to an absent name throws `ReferenceError`. Each write and
-delete tests the property's presence when its reference is resolved, before
-a right-hand side, iterator value, or loop body runs, and a write to a
-resolved reference tests it once more before the store, where only strict
-code throws for a missing property. Node.js and Deno perform one test per
-reference and skip the others on the global object's prototype chain, so
-fixed native evidence checks the specified order against the model alone. A
-property
-a program creates at run time, directly, through `globalThis`, or through
-`Object.defineProperty`, is therefore visible to every later reference,
-including accessors and inherited properties. Sloppy and strict all-miss
-`with` chains reach the same property for simple, compound, logical, and
-update writes. Global-object fallback destructuring and loop-head targets
-retain source-located rejections, as do strict all-miss simple,
-destructuring, and loop-head writes to the runtime-owned call targets
-`console`, `setTimeout`, and `clearTimeout`. An unhandled rejection reports
-the rejection boundary text, followed by a kind marker only when the reason
-itself or an object on its stored prototype chain is one of the current
-context realm's intrinsic error prototypes, the first one reached giving the
-kind; the reason's origin alone does not decide it.
+through the same second test.
+
+`delete` deletes a present property and answers `true` for an absent one, a
+sloppy write creates or updates the property, and a strict write to an absent
+name throws `ReferenceError`. Each write and delete tests the property's
+presence when its reference is resolved, before a right-hand side, iterator
+value, or loop body runs. A write to a resolved reference tests it once more
+before the store, where only strict code throws for a missing property.
+
+Node.js and Deno perform one test per reference and skip the others on the
+global object's prototype chain, so fixed native evidence checks the specified
+order against the model alone. A property a program creates at run time,
+directly, through `globalThis`, or through `Object.defineProperty`, is
+therefore visible to every later reference, including accessors and inherited
+properties.
+
+Sloppy and strict all-miss `with` chains reach the same property for simple,
+compound, logical, and update writes. Global-object fallback destructuring and
+loop-head targets retain source-located rejections, as do strict all-miss
+simple, destructuring, and loop-head writes to the runtime-owned call targets
+`console`, `setTimeout`, and `clearTimeout`.
+
+An unhandled rejection reports the rejection boundary text. A kind marker
+follows only when the reason itself or an object on its stored prototype chain
+is one of the current context realm's intrinsic error prototypes; the first one
+reached gives the kind. The reason's origin alone does not decide it.
 
 The reviewed test262 environment installs neither the `$262` nor the `print`
 host binding. The runner classifies an uncaught `ReferenceError` whose exact
@@ -8396,28 +8613,33 @@ does not declare, with the `harness-definition` capability. A name inside a
 comment or string, a property key, a `typeof` operand, and a name the case
 declares itself never withhold execution.
 
-Fixed Node.js, Deno, and native differential evidence and generated evidence
-at seed `0x60007e00` cover absent, writable, accessor, non-writable, and
-inherited global properties under reads, `typeof`, `delete`, sloppy and strict
+Fixed Node.js, Deno, and native differential evidence and generated evidence at
+seed `0x60007e00` cover absent, writable, accessor, non-writable, and inherited
+global properties under reads, `typeof`, `delete`, sloppy and strict
 assignment, compound assignment, update, `globalThis` property reads, and
-all-miss `with` reads and writes, plus `globalThis` identity, descriptor,
-replacement, deletion, and restoration, both specialization policies, false
-numeric hints, deliberate shape-guard misses, generic fallback, and
-collection forced at every safepoint. Node.js and Deno throw `ReferenceError`
-for a strict assignment to a name found only on the global object's prototype,
-where ECMA-262 performs an ordinary `Set`, so that one generated combination
-compares native execution with the specification model alone. All 29 paths
-under *test/built-ins/global/* are reviewed: 19 pass and 10 retain the
-dynamic-source boundary. Another 141 reviewed paths outside the root move from
-`unsupported-profile-feature` to `pass`, four switch lexical-scope negative
-tests move to `expected-negative`, and no reviewed path moves away from
-`pass`. The manifest moves from 21,312 to 21,341 paths, from 18,001 to 18,161
-passes, from 1,556 to 1,560 expected negatives, and from 1,755 to 1,620
-unsupported profile features with no semantic, harness, or infrastructure
-failures. The property ratchet moves from 160 to 161 domains and seeds and
-from 5,839 to 5,855 ordinary cases, and the evidence inventory moves from 137
-to 138 families. The new `oseo_unresolvable_cell_create` entry point moves
-the ABI to `oseo-runtime-m5-122`. The graph's orchestration state remains
+all-miss `with` reads and writes. The same evidence also covers `globalThis`
+identity, descriptor, replacement, deletion, and restoration, both
+specialization policies, false numeric hints, deliberate shape-guard misses,
+generic fallback, and collection forced at every safepoint.
+
+Node.js and Deno throw `ReferenceError` for a strict assignment to a name found
+only on the global object's prototype; ECMA-262 performs an ordinary `Set`
+there. That one generated combination compares native execution with the
+specification model alone.
+
+All 29 paths under *test/built-ins/global/* are reviewed: 19 pass and 10 retain
+the dynamic-source boundary. Another 141 reviewed paths outside the root now
+count as `pass` instead of `unsupported-profile-feature`, and four switch
+lexical-scope negative tests now count as `expected-negative`. No reviewed path
+moves away from `pass`.
+
+The manifest has 21,341 paths, 18,161 passes, 1,560 expected negatives, and
+1,620 unsupported profile features, with no semantic, harness, or
+infrastructure failures. The property ratchet has 161 domains and seeds and
+5,855 ordinary cases, and the evidence inventory has 138 families.
+
+The new `oseo_unresolvable_cell_create` entry point puts the ABI at
+`oseo-runtime-m5-122`. The graph's orchestration state remains
 coordinator-owned.
 
 
@@ -8426,18 +8648,19 @@ Realms beyond the initial realm
 
 M5c node `cross-realm-host` admits realm creation beyond the initial realm and
 the `$262.createRealm` harness capability under
-[ADR 0027](./adr/0027-realms-beyond-the-initial-realm.md). A Script built with
-the CLI's `--test262-host` option has a `$262` global whose `createRealm`
-creates a realm in the running agent and returns that realm's own host
-object, and whose `global` is the realm's global object. A created realm's
+[ADR 0027](./adr/0027-realms-beyond-the-initial-realm.md).
+
+A Script built with the CLI's `--test262-host` option has a `$262` global whose
+`createRealm` creates a realm in the running agent and returns that realm's own
+host object, and whose `global` is the realm's global object. A created realm's
 host object is an object of that realm with its own `global` and
 `createRealm` and no `agent`. `createRealm` has `length` 0 and is not a
 constructor. In an ordinary program `$262` stays unresolvable.
 
 Each realm owns its intrinsic graph, its global object with every standard
-global this profile installs, its template and regular expression literal
-caches, and its Math.random state, seeded from its own realm ordinal so that
-no two realms draw one sequence. All realms of one agent share the heap, the
+global this profile installs, and its template and regular expression literal
+caches. Its Math.random state is seeded from its own realm ordinal so that no
+two realms draw one sequence. All realms of one agent share the heap, the
 collector, the job queues, the well-known symbols, and the
 GlobalSymbolRegistry, so `Symbol.iterator` and `Symbol.for` results are the
 same values in every realm. A created realm that nothing reaches is collected
@@ -8449,18 +8672,20 @@ until the call returns or throws. Errors a built-in throws, objects it
 allocates, and functions it creates therefore belong to the built-in's realm:
 another realm's `String.prototype.toString` throws that realm's TypeError,
 and its `RegExp.prototype` flag getters compare with that realm's
-`%RegExp.prototype%`. A class constructor called without `new` throws a
-TypeError of the class's realm. A bound function and a Proxy have no realm of
-their own and never switch. A generator resumption runs in the generator
-function's realm, and a promise job runs in the realm of its handler or of a
-thenable's `then`, or in the realm that enqueued it when there is no function
-or GetFunctionRealm would throw.
+`%RegExp.prototype%`.
+
+A class constructor called without `new` throws a TypeError of the class's
+realm. A bound function and a Proxy have no realm of their own and never
+switch. A generator resumption runs in the generator function's realm. A
+promise job runs in the realm of its handler or of a thenable's `then`, or in
+the realm that enqueued it when there is no function or GetFunctionRealm would
+throw.
 
 GetFunctionRealm walks bound targets and Proxy targets and throws a TypeError
 for a revoked Proxy. Every GetPrototypeFromConstructor fallback uses the named
-intrinsic of GetFunctionRealm of the new target, so constructing a built-in
-with another realm's bound `Object` as new target produces an object of that
-realm, and an ordinary [[Construct]] whose new target has a non-object
+intrinsic of GetFunctionRealm of the new target. Constructing a built-in with
+another realm's bound `Object` as new target therefore produces an object of
+that realm, and an ordinary [[Construct]] whose new target has a non-object
 `prototype` uses that realm's `%Object.prototype%`. ArraySpeciesCreate treats
 another realm's `%Array%` as undefined before it reads `Symbol.species`, so an
 array whose constructor is another realm's `Array` keeps producing arrays of
@@ -8469,70 +8694,74 @@ the running realm.
 ADR 0029 extends generated execution beyond the initial realm for its finite
 ahead-of-time host Script set. A created realm can evaluate one of those
 Scripts and create closures with its own globals, cells and intrinsic graph.
+
 Every realm has a `%eval%` intrinsic, installed as the global object's
 writable, non-enumerable, configurable `eval` property with `length` 1 and
 `name` `"eval"`. It returns a non-String argument unchanged, as PerformEval
 does without parsing, and reports `OSEO1001` “eval compiles source text at run
 time, which is outside the admitted profile.” for a String, the boundary of
-[ADR 0016](./adr/0016-dynamic-source-boundary.md); it never evaluates source.
+[ADR 0016](./adr/0016-dynamic-source-boundary.md). It never evaluates source.
 The `eval-intrinsic-value` node admits the bare `eval` identifier as a value.
 The `direct-eval-non-string-dispatch` node admits direct non-String calls;
-String arguments retain the located ADR 0016 run-time rejection.
-`%Function%`'s [[Call]] and [[Construct]] report the same boundary as
-`OSEO1001`, as the generator and async function constructors do.
+String arguments retain the located ADR 0016 run-time rejection. `%Function%`'s
+[[Call]] and [[Construct]] report the same boundary as `OSEO1001`, as the
+generator and async function constructors do.
 
 Six fixed native differential fixtures run through Node.js and Deno, whose
 reference `$262.createRealm` creates a `node:vm` context, and through both
-native specialization policies with collection forced at every safepoint:
-intrinsic and symbol identity across realms, the errors other realms'
-built-ins throw and the errors that cross them, construction through bound
-and Proxy new targets of other realms, ArraySpeciesCreate across realms,
-promise jobs and awaits over other realms' promises, realms created and
-dropped while others stay reachable, and a property read whose shape guard
-misses on other realms' objects and reaches the compiled generic read. A C
-heap fixture creates and drops realms through the public runtime API under
+native specialization policies with collection forced at every safepoint. They
+cover intrinsic and symbol identity across realms; the errors other realms'
+built-ins throw and the errors that cross them; construction through bound and
+Proxy new targets of other realms; ArraySpeciesCreate across realms; promise
+jobs and awaits over other realms' promises; realms created and dropped while
+others stay reachable; and a property read whose shape guard misses on other
+realms' objects and reaches the compiled generic read.
+
+A C heap fixture creates and drops realms through the public runtime API under
 collection. The generated property suite at seed `0x60008300` builds one to
 three realms, directly or from another realm's host object, and up to eight
 constructions, species creations, throwing methods, crossing callback errors,
-symbol identities, and `%eval%` calls, and compares both references and both
-native policies against an independent realm model. Native-only checks pin
-the host objects' realm and shape, distinct Math.random sequences, the
-`OSEO1001` boundary of `%eval%` and `%Function%` in either realm, and the
-unresolvable `$262` of an ordinary build.
+symbol identities, and `%eval%` calls. It compares both references and both
+native policies against an independent realm model. Native-only checks pin the
+host objects' realm and shape, distinct Math.random sequences, the `OSEO1001`
+boundary of `%eval%` and `%Function%` in either realm, and the unresolvable
+`$262` of an ordinary build.
 
 The reviewed runner builds a case with the test262 host when it references
 `$262.agent`, `$262.createRealm`, `$262.evalScript`, or `$262.global`,
-references `print`, or loads *atomicsHelper.js*; a case that reads any other
-`$262` member keeps the
-`host-binding` capability. `cross-realm` joins the supported features. Of the
-84 reviewed paths whose unadmitted feature was `cross-realm`, 43 move to
+references `print`, or loads *atomicsHelper.js*. A case that reads any other
+`$262` member keeps the `host-binding` capability. `cross-realm` joins the
+supported features.
+
+Of the 84 reviewed paths whose unadmitted feature was `cross-realm`, 43 move to
 `pass`. 40 reach the ADR 0016 boundary at run time, 30 through
 `new other.Function()` and 10 through `other.eval` with a source string, so
 they remain unsupported. The exclusion audit assigns the 5 that construct
 through another realm's source-compiling generator or async function
-constructor to `adr:0016-dynamic-source-boundary` and the other 35, which
-need dynamic source only to obtain a function of another realm or to observe
-its template registry, to `node:dynamic-source-coverage-remediation`. The
-remaining
+constructor to `adr:0016-dynamic-source-boundary` and the other 35, which need
+dynamic source only to obtain a function of another realm or to observe its
+template registry, to `node:dynamic-source-coverage-remediation`. The remaining
 *test/built-ins/Iterator/proto-from-ctor-realm.js* also needs the unadmitted
-`iterator-helpers` feature and moves to `node:iterator-helpers`. The manifest
-keeps 21,383 paths and moves from 18,343 to 18,386 passes and from 1,480 to
-1,437 unsupported profile features with no semantic, harness, or
-infrastructure failures. The property ratchet moves from 166 to 167 domains and
-seeds and from 6,305 to 6,313 ordinary cases, and the evidence inventory moves
-from 141 to 142 families. The runtime ABI moves to `oseo-runtime-m5-127` with
-code range index 29 for `%eval%` and `createRealm`, the realm record heap kind,
-and the context's initial and running realm.
+`iterator-helpers` feature and moves to `node:iterator-helpers`.
+
+The manifest keeps 21,383 paths, with 18,386 passes and 1,437 unsupported
+profile features, and no semantic, harness, or infrastructure failures. The
+property ratchet is at 167 domains and seeds and 6,313 ordinary cases. The
+evidence inventory is at 142 families. The runtime ABI is
+`oseo-runtime-m5-127`, with code range index 29 for `%eval%` and `createRealm`,
+the realm record heap kind, and the context's initial and running realm.
 
 
 The import.meta meta property
 -----------------------------
 
-M5c node `import-meta` admits the test262 `import.meta` feature. `import.meta`
-in Module code evaluates to one ordinary, extensible object per module whose
-`[[Prototype]]` is null and which has no own properties; the closed module host
-adds none. It exists before any module function initializer runs, so a cyclic
-dependency that calls a hoisted function early reads the same object.
+M5c node `import-meta` admits the test262 `import.meta` feature. In Module
+code, `import.meta` evaluates to one ordinary, extensible object per module.
+Its `[[Prototype]]` is null, it has no own properties, and the closed module
+host adds none. The object exists before any module function initializer runs,
+so a cyclic dependency that calls a hoisted function early reads the same
+object.
+
 `import.meta` in Script code, escaped, or as an assignment target is an early
 SyntaxError.
 
@@ -8541,39 +8770,50 @@ Module export forms
 -------------------
 
 M5c node `module-export-forms` admits `export var`,
-`export * as name from "./module.js"`, and arbitrary module namespace
-names. `export var` exports every bound name, including declarators
-without an initializer and binding-pattern leaves. Every module `var`
-cell is created as `undefined` while linking, so a cyclic importer or a
-hoisted function reads `undefined` before the declaring module
-evaluates, while lexical bindings keep their temporal dead zones.
-`export * as` exports the requested module's one namespace object under
-an explicit name, including `default` or a string name; it shadows star
-exports and shares the namespace identity of `import * as`, so star
-resolution stays ambiguous only for distinct bindings. Import and export
-names may be any well-formed string, and the string name `"*"` never
-selects a namespace import. Duplicate names, lone surrogates, and a
-string local name without `from` are early errors. A namespace lists its
-string keys in code-unit order, array-index names included, where an
-ordinary object lists array-index keys first. The reviewed test262
+`export * as name from "./module.js"`, and arbitrary module namespace names.
+`export var` exports every bound name, including declarators without an
+initializer and binding-pattern leaves. Every module `var` cell is created as
+`undefined` while linking. A cyclic importer or a hoisted function therefore
+reads `undefined` before the declaring module evaluates, while lexical bindings
+keep their temporal dead zones.
+
+`export * as` exports the requested module's one namespace object under an
+explicit name, including `default` or a string name. It shadows star exports
+and shares the namespace identity of `import * as`, so star resolution stays
+ambiguous only for distinct bindings.
+
+Import and export names may be any well-formed string. The string name `"*"`
+never selects a namespace import. Duplicate names, lone surrogates, and a
+string local name without `from` are early errors.
+
+A namespace lists its string keys in code-unit order, array-index names
+included. An ordinary object lists array-index keys first. The reviewed test262
 features `arbitrary-module-namespace-names` and
 `export-star-as-namespace-from-module` are admitted.
 
 M5c node `module-namespace-uninitialized-bindings` completes a namespace's
 `[[GetOwnProperty]]` for uninitialized exports. It reads each export through
-`[[Get]]`, so while the binding is uninitialized every operation that asks
-for the export's own descriptor throws a `ReferenceError`:
-`hasOwnProperty`, `Object.hasOwn`, `propertyIsEnumerable`, descriptor
-queries, `Object.keys`, `values`, and `entries`, `for-in` over the
-namespace or an inheriting object, copies, `JSON.stringify`,
-`Object.isSealed` and `isFrozen`, property-list definitions, forwarding
-Proxy operations and their invariant checks, and a namespace `[[Set]]`
-receiver. `[[HasProperty]]`, `[[OwnPropertyKeys]]`, and `[[Delete]]` read
-no binding. A Proxy target descriptor query also reports the value of a
-cell-backed global binding or mapped arguments index instead of its
-binding cell. The generated domain in
-*tests/property/m5-module-namespace-uninitialized.property.test.ts*
-reserves seed block `0x60009000`.
+`[[Get]]`, so while the binding is uninitialized, every operation that asks for
+the export's own descriptor throws a `ReferenceError`. The operations are:
+
+ -  `hasOwnProperty`, `Object.hasOwn`, `propertyIsEnumerable`, descriptor
+    queries
+ -  `Object.keys`, `values`, and `entries`
+ -  `for-in` over the namespace or an inheriting object
+ -  copies
+ -  `JSON.stringify`
+ -  `Object.isSealed` and `isFrozen`
+ -  property-list definitions
+ -  forwarding Proxy operations and their invariant checks
+ -  a namespace `[[Set]]` receiver
+
+`[[HasProperty]]`, `[[OwnPropertyKeys]]`, and `[[Delete]]` read no binding. A
+Proxy target descriptor query also reports the value of a cell-backed global
+binding or mapped arguments index instead of its binding cell.
+
+The generated domain in
+*tests/property/m5-module-namespace-uninitialized.property.test.ts* reserves
+seed block `0x60009000`.
 
 
 Known gaps inside the claim
@@ -8582,154 +8822,180 @@ Known gaps inside the claim
 Each gap names its owner. This list shrinks as M5 lands semantic units; it
 must never shrink by reclassification alone.
 
-M5a Unit 8.5n removed stale rejection claims for behavior the implementation
-already admits and assigned every genuine remaining rejection an explicit
-owner. Unit 8.5o closes the sole M5a evidence gap from that audit, so M5a is
-complete. The remaining gaps retain their existing owners.
+M5a is complete: Unit 8.5n removed stale rejection claims for behavior the
+implementation already admits and assigned every genuine remaining rejection
+an explicit owner, and Unit 8.5o closes the sole M5a evidence gap from that
+audit. The remaining gaps retain their existing owners.
 
  -  Weak collections, admitted by the M5b `weak-collections` node as recorded
-    above, observe collection only when one runs. The native runtime
-    collects when collection is forced at every safepoint and when a context
-    is destroyed, and has no allocation-pressure trigger yet. In an ordinary
-    run, `WeakRef.prototype.deref` therefore keeps answering its target and
-    no cleanup callback runs, which the liveness rules allow but other
-    engines do not exhibit, and weak entries hold memory until a collection.
+    above, observe collection only when one runs. The native runtime collects
+    when collection is forced at every safepoint and when a context is
+    destroyed, and has no allocation-pressure trigger yet.
+
+    In an ordinary run, `WeakRef.prototype.deref` therefore keeps answering
+    its target and no cleanup callback runs. The liveness rules allow that,
+    but other engines do not exhibit it, and weak entries hold memory until a
+    collection.
+
     `FinalizationRegistry.prototype.unregister` scans that registry's
     registrations linearly. A pressure-driven collection policy is owned by
-    [*PLAN-GC.md*](../PLAN-GC.md). Registered symbols cannot yet be created,
-    so the rule that they cannot be held weakly has no reachable value until
-    the `symbol-intrinsic` node admits `Symbol.for`, which must then reject
-    them in the shared CanBeHeldWeakly check.
- -  `Set` element storage, admitted by the M5b `set-intrinsic` node as recorded
-    above, is one insertion-ordered vector whose deleted slots stay as
-    tombstones so that live iterators keep their forward cursor. Nothing
+    [*PLAN-GC.md*](../PLAN-GC.md).
+
+    Because registered symbols cannot yet be created, the rule that they
+    cannot be held weakly has no reachable value until the `symbol-intrinsic`
+    node admits `Symbol.for`, which must then reject them in the shared
+    `CanBeHeldWeakly` check.
+
+ -  `Set` element storage, admitted by the M5b `set-intrinsic` node as
+    recorded above, is one insertion-ordered vector whose deleted slots stay
+    as tombstones so that live iterators keep their forward cursor. Nothing
     compacts or reuses a tombstone, so the vector and every membership scan
-    grow with the lifetime insertion count rather than with `size`, and a
-    long add-and-delete cycle over one Set holds memory and time that other
-    engines bound by the live count. The `set-composition-methods` node
-    builds its results on that same linear lookup, so each composition
-    method takes time proportional to the product of the two operands'
-    element counts rather than to their sum. `Map` storage shares the same
-    shape.
+    grow with the lifetime insertion count rather than with `size`. A long
+    add-and-delete cycle over one `Set` holds memory and time that other
+    engines bound by the live count.
+
+    The `set-composition-methods` node builds its results on that same linear
+    lookup, so each composition method takes time proportional to the product
+    of the two operands' element counts rather than to their sum. `Map`
+    storage shares the same shape.
+
     Compaction that preserves open cursors is a measured storage checkpoint
     that [*PLAN-M5.md*](../PLAN-M5.md) owns; the observable semantics are
     complete without it.
+
  -  The BigInt primitive, exact literals, `ToNumeric`, comparisons, operators,
-    assignment, and update are admitted by M5a Unit 8.1a, and the callable
+    assignment, and update are admitted by M5a Unit 8.1a. The callable
     `BigInt` intrinsic, `BigInt.prototype`, branded wrappers, `toString`,
-    `toLocaleString`, `valueOf`, `asIntN`, and `asUintN` by the M5b
-    `bigint-intrinsic` node, both as recorded above. `Object` supplies
-    collector-traced BigInt wrappers whose ordinary `ToPrimitive` now reaches
-    the real prototype methods. What remains is the dependent-family
-    connection: the M5b `data-view` node now consumes `ToBigInt` for its two
-    64-bit element types, and `json-stringify` now performs the specified
-    `toJSON`, replacer, wrapper, and rejection steps. Typed arrays and
-    `Atomics` keep their own object and concurrency prerequisites. `BigInt` has
-    the
-    throwing `[[Construct]]`, and the reviewed cases that detect it through
-    `Reflect.construct` execute now that the `reflect-namespace` node admits
-    that namespace. [*PLAN-BIGINT.md*](../PLAN-BIGINT.md) owns
-    delivery items 8 through 10.
+    `toLocaleString`, `valueOf`, `asIntN`, and `asUintN` are admitted by the
+    M5b `bigint-intrinsic` node. Both admissions are recorded above.
+
+    `Object` supplies collector-traced BigInt wrappers whose ordinary
+    `ToPrimitive` reaches the real prototype methods. What remains is the
+    dependent-family connection: the M5b `data-view` node consumes `ToBigInt`
+    for its two 64-bit element types, and `json-stringify` performs the
+    specified `toJSON`, replacer, wrapper, and rejection steps. Typed arrays
+    and `Atomics` keep their own object and concurrency prerequisites.
+
+    `BigInt` has the throwing `[[Construct]]`, and the reviewed cases that
+    detect it through `Reflect.construct` execute because the
+    `reflect-namespace` node admits that namespace.
+    [*PLAN-BIGINT.md*](../PLAN-BIGINT.md) owns delivery items 8 through 10.
+
  -  Regular expression allocation, initialization, `lastIndex`, dynamic
     validation, and intrinsic identity are admitted by the M5b
-    `regexp-intrinsic` node, and matching, result construction, `exec`,
-    `test`, `toString`, and the ten prototype accessors by
+    `regexp-intrinsic` node. Matching, result construction, `exec`, `test`,
+    `toString`, and the ten prototype accessors are admitted by
     `regexp-prototype-and-exec`, and ahead-of-time literal compilation by
-    `regexp-literal-aot`, all as recorded above. What remains
-    outside the admitted profile is the pattern grammar this edition still
-    defers and matcher backend selection, both owned by
-    [*PLAN-REGEXP.md*](../PLAN-REGEXP.md). `%RegExp.prototype%` carries the
-    real `@@match`, `@@matchAll`, `@@replace`, `@@search`, and `@@split`
-    methods, `%RegExp%` carries `escape`, and `String.prototype.match`,
-    `matchAll`, and `search` reach them through RegExpCreate and Invoke,
-    all admitted by the `regexp-symbol-methods` node. That routing makes
-    the deferred grammar reachable from a `String` operand: a pattern only
-    Annex B admits is now a `SyntaxError` there, as it already was for
-    `new RegExp`. Literal syntax is admitted:
-    the frontend records a literal's pattern text, flag text, and range as
-    an owned value, validates it with the owned pattern parser so an
-    invalid pattern or flag set is an early error at the offending text,
-    and compiles it to the immutable matcher artifact `@oseo/compiler`
-    owns, which the C backend writes as generated data. Unicode property
-    escapes resolve through the pinned tables, and a construct a later unit
-    owns is refused where it appears.
-    That artifact and its executor are the semantic authority both
-    compilation paths reproduce. Dynamic construction reaches its
-    admitted validation and artifact boundary, and `regexp-prototype-and-exec`
-    connected that artifact to built-in execution and result construction.
-    The runtime's own pattern compiler still refuses an ignore-case closure
-    over a non-ASCII class and a Unicode property escape, so a dynamic
-    pattern reaches those through the documented `OSEO2001` boundary while
-    a literal compiles them; that is profile reach, not matching behavior.
+    `regexp-literal-aot`, all as recorded above.
+
+    What remains outside the admitted profile is the pattern grammar this
+    edition still defers and matcher backend selection, both owned by
+    [*PLAN-REGEXP.md*](../PLAN-REGEXP.md).
+
+    `%RegExp.prototype%` carries the real `@@match`, `@@matchAll`, `@@replace`,
+    `@@search`, and `@@split` methods, and `%RegExp%` carries `escape`.
+    `String.prototype.match`, `matchAll`, and `search` reach them through
+    `RegExpCreate` and `Invoke`, all admitted by the `regexp-symbol-methods`
+    node. That routing makes the deferred grammar reachable from a `String`
+    operand: a pattern only Annex B admits is a `SyntaxError` there, as it
+    already was for `new RegExp`.
+
+    Literal syntax is admitted. The frontend records a literal's pattern text,
+    flag text, and range as an owned value. It validates the literal with the
+    owned pattern parser, so an invalid pattern or flag set is an early error
+    at the offending text, and compiles it to the immutable matcher artifact
+    `@oseo/compiler` owns, which the C backend writes as generated data.
+    Unicode property escapes resolve through the pinned tables, and a
+    construct a later unit owns is refused where it appears.
+
+    That artifact and its executor are the semantic authority both compilation
+    paths reproduce. Dynamic construction reaches its admitted validation and
+    artifact boundary, and `regexp-prototype-and-exec` connects that artifact
+    to built-in execution and result construction. The runtime's own pattern
+    compiler still refuses an ignore-case closure over a non-ASCII class and a
+    Unicode property escape, so a dynamic pattern reaches those through the
+    documented `OSEO2001` boundary while a literal compiles them; that is
+    profile reach, not matching behavior.
+
     The reviewed property and character class escape roots contribute 142
     expected negatives and their remaining explicit later-node boundaries.
     [*regexp-inventory.md*](./regexp-inventory.md) records the clause,
     directory, flag, prototype, symbol, Unicode, and diagnostic inventory,
     including the Annex B constructs this grammar rejects in every mode.
- -  The realm root now owns one collector-traced intrinsic graph, a callable
-    and constructible `Object` value, primitive wrappers, the
-    `ArrayBuffer` constructor with its Data Block, `DataView` over that
-    block, the `Date` constructor with its statics and prototype, `Set`
-    with its insertion-ordered element vector, `%TypedArray%`, the
-    twelve concrete TypedArray constructors, and `WeakMap`, `WeakSet`,
-    `WeakRef`, and `FinalizationRegistry`. The remaining standard
-    constructors stay assigned to their dependency-ordered M5b nodes.
+
+ -  The realm root owns one collector-traced intrinsic graph: a callable and
+    constructible `Object` value, primitive wrappers, the `ArrayBuffer`
+    constructor with its Data Block, `DataView` over that block, the `Date`
+    constructor with its statics and prototype, `Set` with its
+    insertion-ordered element vector, `%TypedArray%`, the twelve concrete
+    TypedArray constructors, and `WeakMap`, `WeakSet`, `WeakRef`, and
+    `FinalizationRegistry`. The remaining standard constructors stay
+    assigned to their dependency-ordered M5b nodes.
+
     `ArrayBuffer.isView` reports `true` for each admitted `DataView` or
-    TypedArray view and `false` for every other value this profile can produce.
-    No built-in dispatches through `Symbol.hasInstance` yet. A test262
-    runtime negative whose thrown value exposes an identity, including a
-    thrown `Test262Error`, is now observable. One whose thrown value is a
-    primitive, or whose constructor name is unreachable or outside the
+    TypedArray view and `false` for every other value this profile can
+    produce. No built-in dispatches through `Symbol.hasInstance` yet. A
+    test262 runtime negative whose thrown value exposes an identity,
+    including a thrown `Test262Error`, is observable. One whose thrown value
+    is a primitive, or whose constructor name is unreachable or outside the
     ASCII identifier shape, still classifies as unsupported with the
-    `runtime-error-observation` capability named. Owner: the intrinsics
-    and built-in objects stream.
+    `runtime-error-observation` capability named. Owner: the intrinsics and
+    built-in objects stream.
+
  -  The global binding model is complete only for names the realm admits as
     values. M5a Unit 8.1d gives Script top-level `this` and every non-strict
-    nullish receiver one realm-wide global object, M5b `global-object-record`
+    nullish receiver one realm-wide global object. M5b `global-object-record`
     completes its static declaration model, the intrinsic nodes install the
     admitted standard globals as replaceable properties of the same object,
     and M5b `globalthis-binding` exposes it as `globalThis` and resolves every
-    other unresolved global reference through it at run time. Three
-    boundaries remain. First, M5c node `eval-intrinsic-value` admits a bare
-    `eval` identifier read as the global object's `eval` property.
-    The direct-eval-non-string-dispatch node also admits direct calls
-    with non-String arguments, preserving identity without coercion.
-    Every call that passes a String to `%eval%` reaches its located
-    run-time `OSEO1001` boundary under ADR 0016. Every realm's global
-    object holds the `%eval%` value of
+    other unresolved global reference through it at run time.
+
+    Three boundaries remain. First, M5c node `eval-intrinsic-value` admits a
+    bare `eval` identifier read as the global object's `eval` property. The
+    direct-eval-non-string-dispatch node also admits direct calls with
+    non-String arguments, preserving identity without coercion. Every call
+    that passes a String to `%eval%` reaches its located run-time `OSEO1001`
+    boundary under ADR 0016.
+
+    Every realm's global object holds the `%eval%` value of
     [ADR 0027](./adr/0027-realms-beyond-the-initial-realm.md), so a Script
     top-level `var eval` keeps it. M5c node `typed-array-feature-admission`
     installs `Float16Array` as a replaceable global object property, so a
     top-level `var Float16Array` keeps the standard value as well. The
-    runtime-owned call targets `console`, `setTimeout`, and
-    `clearTimeout` likewise keep hidden cells rather than global properties,
-    so `typeof` and `delete` of them stay rejected. Second, an all-miss
-    `with` chain admits sloppy and strict simple, compound, logical, or
-    update writes to the global object. Global-object fallback destructuring,
-    `for-in`, and `for-of` targets retain source-located rejections. Strict
-    all-miss simple, destructuring, `for-in`, and `for-of` writes to the
     runtime-owned call targets `console`, `setTimeout`, and `clearTimeout`
-    also stay rejected, because their hidden cells cannot model strict
-    PutValue. Third, outside the explicit host build described below,
-    the record validates one independently compiled
-    Script at a time and does not retain `[[VarNames]]` across Scripts.
-    Two interactions sit outside this unit for different reasons. Annex B
-    block-level function hoisting is outside the candidate claim under
+    likewise keep hidden cells rather than global properties, so `typeof` and
+    `delete` of them stay rejected.
+
+    Second, an all-miss `with` chain admits sloppy and strict simple,
+    compound, logical, or update writes to the global object. Global-object
+    fallback destructuring, `for-in`, and `for-of` targets retain
+    source-located rejections. Strict all-miss simple, destructuring,
+    `for-in`, and `for-of` writes to the runtime-owned call targets `console`,
+    `setTimeout`, and `clearTimeout` also stay rejected, because their hidden
+    cells cannot model strict `PutValue`.
+
+    Third, outside the explicit host build described below, the record
+    validates one independently compiled Script at a time and does not retain
+    `[[VarNames]]` across Scripts. Two interactions sit outside this unit for
+    different reasons. Annex B block-level function hoisting is outside the
+    candidate claim under
     [ADR 0013](./adr/0013-m5-edition-and-manifest.md). Indirect `eval` var
     bindings stay inside that claim and outside this profile, because
     [ADR 0016](./adr/0016-dynamic-source-boundary.md) keeps the dynamic
     source family unsupported and
-    [ADR 0019](./adr/0019-m5-claim-closure.md) authorizes that exclusion
-    for M5 completion while leaving the conformance label to its own later
-    gate. A case that depends on either classifies unsupported under the
-    record that owns it instead of blocking this unit. Reviewed test262
-    cases that reach a `$262` or `print` host binding absent from their
-    selected environment classify as unsupported with the
-    `host-binding` capability named, and cases that call a definition the
+    [ADR 0019](./adr/0019-m5-claim-closure.md) authorizes that exclusion for
+    M5 completion while leaving the conformance label to its own later gate.
+    A case that depends on either classifies unsupported under the record
+    that owns it instead of blocking this unit.
+
+    Reviewed test262 cases that reach a `$262` or `print` host binding absent
+    from their selected environment classify as unsupported with the
+    `host-binding` capability named. Cases that call a definition the
     reviewed *regExpUtils.js* omits classify with the `harness-definition`
     capability, as the `globalthis-binding` section records. Owner: the
     intrinsics and built-in objects stream and the dynamic-source boundary;
     the surface audit in [*PLAN-M6.md*](../PLAN-M6.md) depends on this unit.
+
  -  `%AsyncFromSyncIteratorPrototype%` is not materialized. ECMA-262 never
     exposes an AsyncFromSyncIterator object to a program, so no
     `Object.getPrototypeOf` route reaches it and the unreachable internal
@@ -8737,129 +9003,141 @@ complete. The remaining gaps retain their existing owners.
     a representation choice, not a behavior difference, and it would become
     real only if a later edition exposed the wrapper. Owner: the intrinsics
     and built-in objects stream.
+
  -  A rejected promise that no reaction ever handles ends the program at the
     next rejection checkpoint, except under an internal await as described
-    below, and that checkpoint reports the owned
-    `unhandled-rejection-policy` boundary text for any reason. When the
-    reason itself or an object on its stored prototype chain is one of the
-    current context realm's intrinsic error prototypes, the report also
-    carries the marker of the first such prototype reached; any other
-    reason gets the boundary text alone. The predicate is that chain, not
-    where the reason was created. When the entry script, a timer callback,
-    or a finalization callback ends with an uncaught JavaScript throw, the
-    runtime drains pending promise jobs and runs that checkpoint only if
-    the drain completes normally. A timer or finalization turn that an
-    internal await drives drains only until the awaited promise settles
-    and skips the checkpoint once it has. For the entry script and for a
-    timer or finalization turn of the outer event loop, the runtime then
-    reports the throw unless that work produced a host diagnostic. An
-    internal await reports nothing itself: a throw kept that way in a turn
+    below. That checkpoint reports the owned `unhandled-rejection-policy`
+    boundary text for any reason. When the reason itself or an object on its
+    stored prototype chain is one of the current context realm's intrinsic
+    error prototypes, the report also carries the marker of the first such
+    prototype reached; any other reason gets the boundary text alone. The
+    predicate is that chain, not where the reason was created.
+
+    When the entry script, a timer callback, or a finalization callback ends
+    with an uncaught JavaScript throw, the runtime drains pending promise jobs
+    and runs that checkpoint only if the drain completes normally. A timer or
+    finalization turn that an internal await drives drains only until the
+    awaited promise settles and skips the checkpoint once it has. For the
+    entry script and for a timer or finalization turn of the outer event loop,
+    the runtime then reports the throw unless that work produced a host
+    diagnostic.
+
+    An internal await reports nothing itself. A throw kept that way in a turn
     it drives, or a rejection that a checkpoint finds during that await,
     becomes the await's throw completion, with no host diagnostic, for the
-    iterator operation that awaited. That operation handles it like any
-    other throw completion; it may close the iterator and propagate it,
-    turn it into a rejected promise, or, when it already holds a throw
-    completion of its own, keep that completion instead.
+    iterator operation that awaited. That operation handles it like any other
+    throw completion; it may close the iterator and propagate it, turn it into
+    a rejected promise, or, when it already holds a throw completion of its
+    own, keep that completion instead.
+
     *Promise/prototype/then/rxn-handler-fulfilled-next-abrupt.js* and
     *Promise/prototype/then/rxn-handler-rejected-next-abrupt.js* leave a
     rejection with an intrinsic `Error` unhandled, and the three
-    settled-combinator cases recorded under Promise settled combinators
-    leave one with an `Error` or an `AggregateError`. None of the five is
-    in the reviewed subset, and no observation of them is recorded. The
-    two `then` cases were withheld while such a rejection was reported like
-    an unhandled throw, before the M5b `globalthis-binding` node gave it the
-    boundary text. The closure ledger assigns all five, unreviewed, to node
-    `observation-batch-01`; observing them needs no new host-policy
-    decision. Owner of the rejection host policy: the modules and
-    asynchronous execution stream.
+    settled-combinator cases recorded under Promise settled combinators leave
+    one with an `Error` or an `AggregateError`. None of the five is in the
+    reviewed subset, and no observation of them is recorded. The two `then`
+    cases were withheld while such a rejection was reported like an unhandled
+    throw, before the M5b `globalthis-binding` node gave it the boundary text.
+    The closure ledger assigns all five, unreviewed, to node
+    `observation-batch-01`; observing them needs no new host-policy decision.
+    Owner of the rejection host policy: the modules and asynchronous execution
+    stream.
+
  -  `eval`, dynamic `Function` construction, and dynamic import stay
-    explicitly
-    unsupported under [ADR 0016](./adr/0016-dynamic-source-boundary.md).
-    Reviewed cases that need them carry the `dynamic-source` dependency
-    tag, and no release uses an unqualified conformance label while this
-    boundary stands.
+    explicitly unsupported under
+    [ADR 0016](./adr/0016-dynamic-source-boundary.md). Reviewed cases that
+    need them carry the `dynamic-source` dependency tag, and no release uses
+    an unqualified conformance label while this boundary stands.
+
  -  Realms beyond the initial realm, agent clusters, cross-agent shared
     memory, and the `$262.createRealm`, `$262.global`, and `$262.agent`
     capabilities are admitted as recorded above, including the main-agent
-    `[[CanBlock]]` policy of ADR 0026. An agent source that no
-    ahead-of-time template describes
-    stays behind the dynamic source boundary. ADR 0029 permits a created
-    realm to evaluate a member of the finite ahead-of-time host Script set.
-    Ordinary `eval` and `Function` source compilation retain ADR 0016.
+    `[[CanBlock]]` policy of ADR 0026. An agent source that no ahead-of-time
+    template describes stays behind the dynamic source boundary. ADR 0029
+    permits a created realm to evaluate a member of the finite ahead-of-time
+    host Script set. Ordinary `eval` and `Function` source compilation retain
+    ADR 0016.
+
  -  The reviewed harness implements *base.js*, *doneprintHandle.js*,
     *asyncHelpers.js*, *compareArray.js*, *decimalToHexString.js*,
     *fnGlobalObject.js*, *nans.js*, *nativeFunctionMatcher.js*,
     *promiseHelper.js*, *propertyHelper.js*,
     *resizableArrayBufferUtils.js*, and *wellKnownIntrinsicObjects.js*.
-    The RAB copy replaces only the three
-    Function-constructed subclasses with named class expressions of the same
-    global heritage, preserving both Float16Array probes and the upstream
-    constructor lists. It does not admit dynamic source construction.
-    *nans.js* joined that list
-    with the `math-namespace` node, whose `Math.pow` intrinsic was its only
-    unadmitted dependency, *decimalToHexString.js* with the
-    `uri-handling-functions` node that its 78 reviewed cases observe, and
-    *nativeFunctionMatcher.js* with the `harness-native-function-matcher`
-    node whose function-to-string cases observe it. *fnGlobalObject.js*
-    joined with the M5c `fn-global-object-harness` node. Upstream obtains
-    the global object by calling `Function("return this;")`, a dynamic
-    source compilation that ADR 0016 keeps outside the profile, so the
-    reviewed copy caches the initial `globalThis` value when the harness
-    loads instead. It keeps the upstream `fnGlobalObject` definition and
-    its cache, compiles no source text, and also works in module cases,
-    where a top-level `this` probe would yield `undefined`.
+
+    The RAB copy replaces only the three Function-constructed subclasses with
+    named class expressions of the same global heritage, preserving both
+    Float16Array probes and the upstream constructor lists. It does not admit
+    dynamic source construction.
+
+    *nans.js* joined that list with the `math-namespace` node, whose
+    `Math.pow` intrinsic was its only unadmitted dependency,
+    *decimalToHexString.js* with the `uri-handling-functions` node that its 78
+    reviewed cases observe, and *nativeFunctionMatcher.js* with the
+    `harness-native-function-matcher` node whose function-to-string cases
+    observe it. *fnGlobalObject.js* joined with the M5c
+    `fn-global-object-harness` node.
+
+    Upstream obtains the global object by calling `Function("return this;")`,
+    a dynamic source compilation that ADR 0016 keeps outside the profile, so
+    the reviewed copy caches the initial `globalThis` value when the harness
+    loads instead. It keeps the upstream `fnGlobalObject` definition and its
+    cache, compiles no source text, and also works in module cases, where a
+    top-level `this` probe would yield `undefined`.
+
     *wellKnownIntrinsicObjects.js* joined with M5c node
-    `well-known-intrinsics-harness`. Upstream obtains each intrinsic of
-    that include by passing its source string to the `Function`
-    constructor, which [ADR 0016](./adr/0016-dynamic-source-boundary.md)
-    keeps outside the profile. The reviewed copy keeps every name, source
-    string, record, and lookup failure of the pinned upstream text and
-    obtains each value from a statically compiled function that returns
-    the same source expression, ignoring an abrupt completion as upstream
-    does. Its one respelling, `%eval%`, is retained from before
-    `eval-intrinsic-value` admitted bare `eval` identifier reads.
-    Upstream's bare `eval` resolves in the global environment; when no
-    global lexical `eval` exists, that is the
-    global object record, so the lookup performs its HasProperty and Get
-    on the Script's top-level `this`, which is the global object in either
-    strictness and does not depend on the `globalThis` binding. An absent
-    property yields undefined, the value upstream records after discarding
-    the realm's own `ReferenceError`, without constructing one through the
-    replaceable `ReferenceError` global. The lookup does not reproduce a
-    non-strict Script's top-level `let` or `const` named `eval`, which only
-    an identifier read can observe, and a Module's undefined top-level
-    `this` would leave `%eval%` undefined. No consumer of the include at
-    the pinned upstream revision is either, which a source test checks
-    against every pinned consumer. M5c node `eval-intrinsic-value` now admits
-    reading the identifier itself. A case that then calls or constructs one
-    of the source-compiling constructors the include returns still reaches the
-    ADR 0016 boundary at that call. The reviewed *asyncHelpers.js* probes
-    `$DONE` with `typeof` rather than through
-    `Object.prototype.hasOwnProperty.call(globalThis, "$DONE")`, a choice kept
-    from before M5b node `globalthis-binding` admitted `globalThis`. Its
-    `assert.throwsAsync` reports a constructor mismatch without composing a
-    message from the observed value, so a rejection whose `constructor` is
-    missing or exotic cannot replace the mismatch report with a thrown
-    conversion. Owner: the standards harness expansion in
+    `well-known-intrinsics-harness`. Upstream obtains each intrinsic of that
+    include by passing its source string to the `Function` constructor, which
+    [ADR 0016](./adr/0016-dynamic-source-boundary.md) keeps outside the
+    profile. The reviewed copy keeps every name, source string, record, and
+    lookup failure of the pinned upstream text. It obtains each value from a
+    statically compiled function that returns the same source expression,
+    ignoring an abrupt completion as upstream does. Its one respelling,
+    `%eval%`, is retained from before `eval-intrinsic-value` admitted bare
+    `eval` identifier reads.
+
+    Upstream's bare `eval` resolves in the global environment; when no global
+    lexical `eval` exists, that is the global object record, so the lookup
+    performs its `HasProperty` and `Get` on the Script's top-level `this`,
+    which is the global object in either strictness and does not depend on the
+    `globalThis` binding. An absent property yields `undefined`, the value
+    upstream records after discarding the realm's own `ReferenceError`,
+    without constructing one through the replaceable `ReferenceError` global.
+    The lookup does not reproduce a non-strict Script's top-level `let` or
+    `const` named `eval`, which only an identifier read can observe, and a
+    Module's `undefined` top-level `this` would leave `%eval%` undefined. No
+    consumer of the include at the pinned upstream revision is either, which a
+    source test checks against every pinned consumer. M5c node
+    `eval-intrinsic-value` admits reading the identifier itself. A case that
+    then calls or constructs one of the source-compiling constructors the
+    include returns still reaches the ADR 0016 boundary at that call.
+
+    The reviewed *asyncHelpers.js* probes `$DONE` with `typeof` rather than
+    through `Object.prototype.hasOwnProperty.call(globalThis, "$DONE")`, a
+    choice kept from before M5b node `globalthis-binding` admitted
+    `globalThis`. Its `assert.throwsAsync` reports a constructor mismatch
+    without composing a message from the observed value, so a rejection whose
+    `constructor` is missing or exotic cannot replace the mismatch report with
+    a thrown conversion. Owner: the standards harness expansion in
     [*PLAN-M5.md*](../PLAN-M5.md).
- -  The native host fails an executable with an unhandled rejection, as
-    the M4 event-loop profile requires, while the upstream test262 host
-    contract tolerates one. Twenty reviewed paths stop at that checkpoint
-    and stay `unsupported-profile-feature` with the
-    `unhandled-rejection-policy` capability; node
-    `unhandled-rejection-observation` owns them, and none is a pass or an
-    exclusion. The five unreviewed cases recorded above belong to node
-    `observation-batch-01`, not to this boundary's owner. The host-profile
-    decision that reconciles the native policy with the test262 host
-    contract is
+
+ -  The native host fails an executable with an unhandled rejection, as the
+    M4 event-loop profile requires, while the upstream test262 host contract
+    tolerates one. Twenty reviewed paths stop at that checkpoint and stay
+    `unsupported-profile-feature` with the `unhandled-rejection-policy`
+    capability. Node `unhandled-rejection-observation` owns them, and none is
+    a pass or an exclusion. The five unreviewed cases recorded above belong
+    to node `observation-batch-01`, not to this boundary's owner.
+
+    The host-profile decision that reconciles the native policy with the
+    test262 host contract is
     [ADR 0030](./adr/0030-test262-unhandled-rejection-policy.md): the
     reviewed runner selects the explicit observe policy for test262 harness
-    runs, while ordinary executables keep the fatal policy. Until Root's
-    full UPDATE observes these paths under it, their checked-in records
-    keep the classification above.
- -  Large intrinsic tables and built-in families land in the owned
-    runtime components recorded in
-    [*runtime-components.md*](./runtime-components.md).
+    runs, while ordinary executables keep the fatal policy. Until Root's full
+    UPDATE observes these paths under it, their checked-in records keep the
+    classification above.
+
+ -  Large intrinsic tables and built-in families land in the owned runtime
+    components recorded in [*runtime-components.md*](./runtime-components.md).
 
 
 Measurement workflow
@@ -8868,12 +9146,12 @@ Measurement workflow
 `mise run test:test262` executes the reviewed subset and rejects any drift
 from the expected classifications. `mise run test262:update` regenerates the
 *results.yaml* index and its record partitions after a reviewed change.
-Applicable Script cases execute in
-every requested strictness mode, and every executed case compares
-specialization-disabled and specialization-enabled native observations.
-Forced-collection coverage runs in the per-family native and property lanes
-recorded by [ADR 0018](./adr/0018-recorded-evidence-coverage.md), not as a
-collector-policy override across the standards corpus.
+Applicable Script cases execute in every requested strictness mode, and every
+executed case compares specialization-disabled and specialization-enabled
+native observations. Forced-collection coverage runs in the per-family native
+and property lanes recorded by
+[ADR 0018](./adr/0018-recorded-evidence-coverage.md), not as a collector-policy
+override across the standards corpus.
 
 CI can execute the reviewed subset in deterministic round-robin partitions by
 passing `--shard INDEX/TOTAL` to `mise run test:test262`. Every one-based index
@@ -8897,19 +9175,17 @@ is recorded as manifest evidence. Asynchronous cases insert the reviewed
 output line, appears exactly once, and no failure marker was printed.
 Module negatives classify by the owned diagnostic phase: an entry parse
 rejection is a parse failure, while dependency parse rejections and link
-and loader failures are resolution failures observed before any
-evaluation.
+and loader failures are resolution failures observed before any evaluation.
 
-The reviewed harness deviates from the upstream test262 host contract in
-two documented ways. Harness sources are assembled into the compiled
-source, so in module cases they become module-scoped bindings instead of
-globals; a case whose fixtures need harness globals or whose bindings
-collide with harness names stays out of the reviewed subset. The reviewed
-`$DONE` now composes the upstream failure detail, because generic string
-coercion renders an ordinary object failure value; it guards that
-composition and falls back to the bare marker for a Symbol and for any
-object whose conversion completes abruptly, rather than replacing a case's
-failure report with a thrown conversion.
+The reviewed harness deviates from the upstream test262 host contract in two
+documented ways. Harness sources are assembled into the compiled source, so
+in module cases they become module-scoped bindings instead of globals. A case
+whose fixtures need harness globals or whose bindings collide with harness
+names stays out of the reviewed subset. The reviewed `$DONE` composes the
+upstream failure detail, because generic string coercion renders an ordinary
+object failure value. It guards that composition and falls back to the bare
+marker for a Symbol and for any object whose conversion completes abruptly,
+rather than replacing a case's failure report with a thrown conversion.
 
 A newly supported feature moves tests out of `unsupported-profile-feature`
 only after every applicable variant executes. A changed upstream revision is
@@ -8943,68 +9219,59 @@ Strict assignment through with environments
 M5c node `with-strict-assignment-fallback` retains the selected Object
 Environment Record through simple, compound, logical, and update writes.
 ECMA-262 2025 `SetMutableBinding` and assignment evaluation require
-`HasProperty` on the retained binding object: a deleted strict
-binding throws `ReferenceError`; a failed strict `Set` throws `TypeError`.
-Sloppy writes retain the selected object after deletion. A nearer binding
-created during the right operand does not redirect the write. Read-first
-operators also preserve `GetBindingValue`'s separate presence check.
+`HasProperty` on the retained binding object: a deleted strict binding throws
+`ReferenceError`; a failed strict `Set` throws `TypeError`. Sloppy writes
+retain the selected object after deletion. A nearer binding created during the
+right operand does not redirect the write. Read-first operators also preserve
+`GetBindingValue`'s separate presence check.
+
 Class code is strict even inside sloppy code, so a class heritage operand,
-computed key, static block, static field initializer, or static method
-applies the same strict checks. The heritage operand now lowers as strict
-code; this also gives any failed `Set` or `delete` in it, with or without
-`with`, the `TypeError` that ECMA-262 2025 requires.
+computed key, static block, static field initializer, or static method applies
+the same strict checks. The heritage operand lowers as strict code; this also
+gives any failed `Set` or `delete` in it, with or without `with`, the
+`TypeError` that ECMA-262 2025 requires.
 
 Existing array/object assignment leaves and for-in/of binding heads with
-lexical fallbacks preserve strictness when a selected binding disappears
-while reading `Symbol.unscopables`. Initial misses write their lexical
-fallbacks. This evidence did not establish general destructuring reference
-preparation order. M5c node `destructuring-binding-target-order` later
-repaired keyed object pattern identifier leaves; see *Keyed pattern targets
-through with environments* below. Array element and rest identifier targets
-are still resolved after iterator or property reads, a separate boundary.
+lexical fallbacks preserve strictness when a selected binding disappears while
+reading `Symbol.unscopables`. Initial misses write their lexical fallbacks. The
+evidence did not establish general destructuring reference preparation order.
+M5c node `destructuring-binding-target-order` repaired keyed object pattern
+identifier leaves; see *Keyed pattern targets through with environments* below.
+Array element and rest identifier targets are still resolved after iterator or
+property reads, a separate boundary.
 
 The existing *m5-globalthis-binding.property.test.ts* family reserves slots
 `0x60007e01`, `0x60007e02`, and `0x60007e03` for retained-object writes,
-existing write leaves, and retained-object writes from five class code
-contexts inside sloppy code. Each structured domain has 16 ordinary cases
-and a 240-second interrupt limit. Shrinking retains the selected object,
-operation, mutation, strictness or class context, and bounded positive
-integer. Slot03 reuses the slot01 source and strict model unchanged, so
-slot01's generated sources stay byte for byte the same. The independent
-ECMA-262 2025 model checks full global/outer/inner binding state. Both
-specialization policies force collection and retain false numeric hints, shape
-misses and compiled generic fallback; this change adds no specialization or
-guard.
+existing write leaves, and retained-object writes from five class code contexts
+inside sloppy code. Each structured domain has 16 ordinary cases and a
+240-second interrupt limit. Shrinking retains the selected object, operation,
+mutation, strictness or class context, and bounded positive integer. Slot03
+reuses the slot01 source and strict model unchanged, so slot01's generated
+sources stay byte for byte the same. The independent ECMA-262 2025 model checks
+full global/outer/inner binding state. Both specialization policies force
+collection and retain false numeric hints, shape misses and compiled generic
+fallback; this change adds no specialization or guard.
 
 Node.js 24.21.0 and Deno 2.9.7 disagree with the normative model in measured
 classes. For values 1 through 8, slot01 records reference discrepancies when
-`=`, `+=` or `&&=` takes its right operand and the selected object is global
-or outer, or is inner with sloppy deletion. Slot02 records discrepancies
-only for strict selected hits. Slot03 records the strict slot01 classes:
-`=`, `+=`, or `&&=` with a global or outer selected object, in every class
-context. Every generated case collects both reference
-outputs and requires successful reference execution. Outside these classes,
-reference outputs must match the model. Native assertions require model
-output, including six private fixed discrepancy subjects in this suite.
-Shared differential fixtures retain matching controls.
+`=`, `+=` or `&&=` takes its right operand and the selected object is global or
+outer, or is inner with sloppy deletion. Slot02 records discrepancies only for
+strict selected hits. Slot03 records the strict slot01 classes: `=`, `+=`, or
+`&&=` with a global or outer selected object, in every class context. Every
+generated case collects both reference outputs and requires successful
+reference execution. Outside these classes, reference outputs must match the
+model. Native assertions require model output, including six private fixed
+discrepancy subjects in this suite. Shared differential fixtures retain
+matching controls.
 
-The complete eight-registration focused suite passed on the original source
-base, including all six fixed subjects. Exact source bytes survived the
-fresh-base integration. This focused observation does not replace the whole
-ordinary and extended gates. The existing seed block and slot00 budget,
-runtime ABI and package versions remain unchanged. B12 retains first
-canonical admission of its eleven compound-assignment paths.
-
-Review R2 found that the heritage operand kept the enclosing sloppy
-strictness. Slot03 and the fixed `with-strict-heritage-write` native
-fixture were added with that repair. Before native execution, all 600
-slot03 sources with values 1 and 8 compiled without a diagnostic, and Node.js
-and Deno matched the model outside the slot03 discrepancy classes. On Linux
-x86-64, the focused native run of that fixture matched Node.js and Deno under
-both policies with forced collection. All nine registrations of the property
-file passed, including slot03. Both R2 reproducer sources printed `TypeError`
-natively under both policies with forced collection. These focused runs do
-not replace the whole ordinary and extended gates.
+The focused suite includes the fixed `with-strict-heritage-write` native
+fixture and slot03. On Linux x86-64, the focused native run of that fixture
+matched Node.js and Deno under both policies with forced collection. The two
+reproducer sources for the strict heritage write printed `TypeError` natively
+under both policies with forced collection. The existing seed block and slot00
+budget, runtime ABI, and package versions remain unchanged. B12 retains first
+canonical admission of its eleven compound-assignment paths. This focused
+evidence does not replace the whole ordinary and extended gates.
 
 
 Compound member key order
@@ -9143,41 +9410,48 @@ Keyed pattern targets through with environments
 -----------------------------------------------
 
 M5c node `destructuring-binding-target-order` resolves a keyed object pattern
-identifier leaf before its source read. ECMA-262 2025 KeyedBindingInitialization
-(14.3.3.3) evaluates ResolveBinding for a SingleNameBinding, and
-KeyedDestructuringAssignmentEvaluation evaluates a non-pattern target
-reference, after the property key and before GetV and the default
-initializer. MIR now prepares that reference in the keyed property loop that
-`var` object binding declarations and object destructuring assignments share.
-A leaf inside `with` therefore performs each object environment's
-`HasProperty` lookup first, followed by its `Symbol.unscopables` lookup when
-the binding object has the property. Its write uses the reference selected
+identifier leaf before its source read. ECMA-262 2025
+KeyedBindingInitialization (14.3.3.3) evaluates ResolveBinding for a
+SingleNameBinding after the property key and before GetV and the default
+initializer. KeyedDestructuringAssignmentEvaluation evaluates a non-pattern
+target reference after the property key and before GetV and the default
+initializer. MIR prepares that reference in the keyed property loop shared by
+`var` object binding declarations and object destructuring assignments.
+
+A leaf inside `with` therefore performs each object environment's `HasProperty`
+lookup first. It then performs that environment's `Symbol.unscopables` lookup
+when the binding object has the property. Its write uses the reference selected
 then, without a second name resolution: the Object Environment Record that
-holds the binding or, when every object environment misses, the enclosing
-declarative or global binding. A getter or default that deletes
-the selected property does not redirect the write: sloppy SetMutableBinding
-recreates it, and a strict assignment throws `ReferenceError`. A default that
-adds the property after a miss does not capture the write. An abrupt `has`
-trap or `Symbol.unscopables` getter prevents the source read. The same loop
-serves object pattern heads of `for-in` and `for-of`. Array elements, array
-rest, object rest, and plain identifier heads keep their existing
-preparation order, a separate source-based concern.
+holds the binding, or the enclosing declarative or global binding when every
+object environment misses.
+
+If a getter or default deletes the selected property, the write is not
+redirected. Sloppy SetMutableBinding recreates it, and a strict assignment
+throws `ReferenceError`. A default that adds the property after a miss does not
+capture the write. An abrupt `has` trap or `Symbol.unscopables` getter prevents
+the source read.
+
+The same loop serves object pattern heads of `for-in` and `for-of`. Array
+elements, array rest, object rest, and plain identifier heads keep their
+existing preparation order. That order is a separate source-based concern.
 
 The reference hosts diverge from this order. Node.js 24.21.0 (V8 13.6.233.17)
 and Deno 2.9.7 (V8 15.0.245.2) resolve the leaf after GetV and the default
-initializer, and both fail the unmodified reviewed [keyed binding case] with
-`Test262Error`. That is a recorded reference failure, not an oracle, so
-this evidence uses no Node.js or Deno differential for the new leaf. It relies
-on the ECMA-262 2025 algorithms, that upstream case, a fixed native-only
-observation, and an independent generated model. No assertion requires the
-reference hosts to stay wrong.
+initializer. Both fail the unmodified reviewed [keyed binding case] with
+`Test262Error`.
+
+That is a recorded reference failure, not an oracle, so this evidence uses no
+Node.js or Deno differential for the new leaf. It relies on the ECMA-262 2025
+algorithms, that upstream case, a fixed native-only observation, and an
+independent generated model. No assertion requires the reference hosts to stay
+wrong.
 
 The fixed observation in *tests/native.ts* compiles the program in
 *tests/native/fixtures/with-keyed-binding-target-order.ts* under both
-specialization policies with collection forced at every safepoint, and
-requires a positive collection count and the exact ECMA-262 trace. With
-specialization disabled it also requires zero guard hits and misses. Its
-twelve programs cover:
+specialization policies with collection forced at every safepoint. It requires
+a positive collection count and the exact ECMA-262 trace. With specialization
+disabled, it also requires zero guard hits and misses. Its twelve programs
+cover:
 
  -  computed key order and nested and sibling leaves;
  -  shorthand defaults and a getter that deletes the selected binding;
@@ -9186,26 +9460,28 @@ twelve programs cover:
  -  a throwing `has` trap and a throwing `Symbol.unscopables` getter;
  -  sloppy and strict assignment after deletion or addition.
 
-The existing *m5-object-binding.property.test.ts* family adds slot
-`0x60002001` with 10 ordinary cases and a 180-second interrupt limit. It
-generates the caller form (sloppy `var`, sloppy or strict assignment), the
-initial selection (miss, hit, unscopables-blocked, throwing `has`, throwing
-`Symbol.unscopables`), key kind, source and default presence, and the
-mutation and its site. Native execution under both specialization policies,
-with forced collection and a positive collection count, must equal an
-independent ECMA-262 model. A minimized regression case from that domain
-runs as an ordinary test. The slot `0x60002000` domain and its Node.js and
-Deno comparisons are unchanged. Parser and MIR structural tests check that
-the leaf's `in` lookup precedes GetV under both policies for a `var`
-declaration and an assignment, and that a leaf without a lexical fallback
-still reports `OSEO1001`.
+The existing *m5-object-binding.property.test.ts* family adds slot `0x60002001`
+with 10 ordinary cases and a 180-second interrupt limit. It generates the
+caller form, the initial selection, key kind, source and default presence, and
+the mutation and its site. The caller form can be sloppy `var`, a sloppy
+assignment, or a strict assignment. The initial selection can be miss, hit,
+unscopables-blocked, throwing `has`, or throwing `Symbol.unscopables`.
+
+Native execution under both specialization policies, with forced collection and
+a positive collection count, must equal an independent ECMA-262 model. A
+minimized regression case from that domain runs as an ordinary test. The slot
+`0x60002000` domain and its Node.js and Deno comparisons are unchanged.
+
+Parser and MIR structural tests check that the leaf's `in` lookup precedes GetV
+under both policies for a `var` declaration and an assignment. They also check
+that a leaf without a lexical fallback still reports `OSEO1001`.
 
 The repair adds no specialized path or guard and no runtime, ABI, or heap
-change, so the object-binding and destructuring-assignment guard-fallback
-omissions and their replacement evidence remain. This node admits exactly
-the one reviewed path above as an observed pass. Its [assignment-pattern twin]
-stays unreviewed with `observation-batch-08`, which keeps its first
-canonical admission.
+change. The object-binding and destructuring-assignment guard-fallback
+omissions and their replacement evidence therefore remain. This node admits
+exactly the one reviewed path above as an observed pass. Its
+[assignment-pattern twin] stays unreviewed with `observation-batch-08`, which
+keeps its first canonical admission.
 
 [keyed binding case]: https://github.com/tc39/test262/blob/f2d1435644797268dca1f7988cad5a4e89ccd8d2/test/language/destructuring/binding/keyed-destructuring-property-reference-target-evaluation-order-with-bindings.js
 [assignment-pattern twin]: https://github.com/tc39/test262/blob/f2d1435644797268dca1f7988cad5a4e89ccd8d2/test/language/expressions/assignment/destructuring/keyed-destructuring-property-reference-target-evaluation-order-with-bindings.js
@@ -9219,18 +9495,23 @@ Object Environment Record perform ECMA-262 2025 GetBindingValue (9.1.1.2.6).
 HasBinding selects the nearest object whose `HasProperty` succeeds and whose
 `Symbol.unscopables` does not block the name. GetValue then calls
 GetBindingValue, which tests `HasProperty` on that object again before `Get`.
-A binding gone in between, for example deleted by a `Symbol.unscopables`
-getter or denied by a Proxy `has` trap, reads `undefined` in non-strict code
-and throws `ReferenceError` in strict code. The reference is strict when the
-code containing it is strict, so a strict function nested in a sloppy `with`
-body throws. The rule covers a value read; `typeof`, which special-cases
-only an unresolvable reference before GetValue, so a reference resolved to a
-selected object still performs GetBindingValue and propagates its strict
-`ReferenceError`; and a call callee, whose strict `ReferenceError` precedes
-argument evaluation. An ordinary call expression keeps the selected object
-as `this` whether or not the property survived. An abrupt
-second `has` propagates before any `Get`. An all-miss chain is unchanged, and
-compound, logical, and update reads already performed the second test.
+
+A binding gone in between, for example deleted by a `Symbol.unscopables` getter
+or denied by a Proxy `has` trap, reads `undefined` in non-strict code and
+throws `ReferenceError` in strict code. The reference is strict when the code
+containing it is strict, so a strict function nested in a sloppy `with` body
+throws.
+
+The rule covers a value read, `typeof`, and a call callee. `typeof`
+special-cases only an unresolvable reference before GetValue, so a reference
+resolved to a selected object still performs GetBindingValue and propagates its
+strict `ReferenceError`. For a call callee, the strict `ReferenceError`
+precedes argument evaluation.
+
+An ordinary call expression keeps the selected object as `this` whether or not
+the property survived. An abrupt second `has` propagates before any `Get`. An
+all-miss chain is unchanged, and compound, logical, and update reads already
+performed the second test.
 
 HIR records the read's strictness on the `with-get` reference, and MIR reuses
 the global Environment Record's GetBindingValue lowering on the selected
@@ -9240,56 +9521,58 @@ receiver stay rooted across it.
 The reference hosts diverge from this algorithm. Node.js 24.21.0 (V8
 13.6.233.17) and Deno 2.9.7 (V8 15.0.245.2) skip the second `HasProperty` and
 return what `Get` yields. Node.js fails the pinned [identifier trace] and
-[call trace] cases and the [strict deletion case]. This evidence therefore
-uses no Node.js or Deno differential for the selected path. The fixed
-observation in *tests/native.ts* compiles the program in
+[call trace] cases and the [strict deletion case]. This evidence therefore uses
+no Node.js or Deno differential for the selected path.
+
+The fixed observation in *tests/native.ts* compiles the program in
 *tests/native/fixtures/with-get-binding-value.ts* under both specialization
-policies with collection forced at every safepoint, and requires a positive
-collection count and the exact ECMA-262 output. With specialization disabled
-it also requires zero guard hits and misses. Its 35 rows cover, in sloppy and
+policies with collection forced at every safepoint. It requires a positive
+collection count and the exact ECMA-262 output. With specialization disabled it
+also requires zero guard hits and misses. Its 35 rows cover, in sloppy and
 strict code:
 
- -  a binding deleted by a `Symbol.unscopables` getter, behind a global or a
-    lexical fallback, and present and inherited bindings;
+ -  a binding deleted by a `Symbol.unscopables` getter behind a global or a
+    lexical fallback, plus present and inherited bindings;
  -  `typeof` of a deleted binding and of an all-miss name;
- -  a call after deletion with its argument trace, and a present call's
-    `this`;
- -  the Proxy trace that the pinned test262 cases assert, a Proxy whose
-    second `has` answers `false` or throws, and a Proxy miss followed by the
-    next object.
+ -  a call after deletion with its argument trace, and a present call's `this`;
+ -  the Proxy trace that the pinned test262 cases assert, a Proxy whose second
+    `has` answers `false` or throws, and a Proxy miss followed by the next
+    object.
  -  an optional call `f?.()` after deletion, which short-circuits non-strict
-    code before its arguments, and a traced Proxy's optional call, whose
-    `this` is the Proxy, beside a second `has` that answers `false` or
-    throws. Node `with-optional-call-receiver-non-tail` added these eight
-    rows.
+    code before its arguments, and a traced Proxy's optional call, whose `this`
+    is the Proxy, alongside a second `has` that answers `false` or throws. The
+    eight optional-call rows come from node
+    `with-optional-call-receiver-non-tail`.
 
 The existing *m5-global-object-record.property.test.ts* family adds slot
 `0x60003d02` with 12 ordinary cases and a 180-second interrupt limit. It
 generates one to four value, `typeof`, and call references, sloppy or in a
-nested strict function, behind a lexical or unresolvable outer binding,
-through one to three plain or Proxy objects with scripted `has` answers and
-six `Symbol.unscopables` forms. Native output under both specialization
-policies, with forced collection and a positive collection count, must equal
-an independent symbolic model of HasBinding, GetBindingValue, GetValue,
-`typeof`, and EvaluateCall; no reference host runs. With specialization
-disabled the domain also requires zero guard hits and misses. Slots
-`0x60003d00` and `0x60003d01` and their Node.js and Deno comparisons are
-unchanged. Parser and MIR structural tests check, under both policies, that a
-value read, `typeof`, and a callee test the selected object again before its
-`Get`, that only strict code reaches the missing binding's `ReferenceError`,
-that a call's receiver is the selected object, and that the path has no
-guard.
+nested strict function, behind a lexical or unresolvable outer binding, through
+one to three plain or Proxy objects with scripted `has` answers and six
+`Symbol.unscopables` forms.
+
+Native output under both specialization policies, with forced collection and a
+positive collection count, must equal an independent symbolic model of
+HasBinding, GetBindingValue, GetValue, `typeof`, and EvaluateCall; no reference
+host runs. With specialization disabled the domain also requires zero guard
+hits and misses. Slots `0x60003d00` and `0x60003d01` and their Node.js and Deno
+comparisons are unchanged.
+
+Parser and MIR structural tests check, under both policies, that a value read,
+`typeof`, and a callee test the selected object again before its `Get`. They
+also check that only strict code reaches the missing binding's
+`ReferenceError`, that a call's receiver is the selected object, and that the
+path has no guard.
 
 The repair adds no specialized path or guard and no runtime, ABI, or heap
-change. It admits no test262 path: the four pinned GetBindingValue cases
-under *test/language/statements/with/* remain unreviewed with
-`observation-batch-28`.
+change. It admits no test262 path: the four pinned GetBindingValue cases under
+*test/language/statements/with/* remain unreviewed with `observation-batch-28`.
 
 Optional calls follow the same order. An optional call such as
 `with (o) { f?.() }` keeps its identifier callee's Reference, so outside tail
-position its first call link receives WithBaseObject as `this`: the selected
-object after GetBindingValue's own HasProperty and Get, or `undefined` for a
-lexical or global fallback. Before M5c node
+position its first call link receives WithBaseObject as `this`. That `this` is
+the selected object after GetBindingValue's own HasProperty and Get, or
+`undefined` for a lexical or global fallback. Before M5c node
 `with-optional-call-receiver-non-tail` the lowering read the callee as a value
 and passed `undefined`. A binding gone before Get short-circuits a non-strict
 chain and throws `ReferenceError` in strict code, both before the arguments.
@@ -9297,21 +9580,21 @@ The
 [*with-optional-call-receiver-non-tail.md*](./m5c-graph/with-optional-call-receiver-non-tail.md)
 record lists the native, generated, and structural evidence.
 
-Strict tail-position optional calls through `with`, such as `return f?.()`
-in a strict function nested in a `with` body, retain that same receiver.
-WOC-1's lowering already supplies the receiver to the tail call. WOC-2 adds
-fixed native evidence, an independent generated oracle at seed `0x60002402`,
-and MIR assertions that the call is a tail call returned directly. The
-fixed fixture pairs optional and ordinary strict tail calls for normal,
-nullish, non-callable and abrupt completions, including argument order.
-Both specialization policies force collection while the trampoline retains
-the selected receiver, getter-produced callee and freshly allocated
-arguments. The
-[*WOC-2 work note*](./m5c-graph/with-optional-call-receiver-tail.md)
-records the focused Linux execution and its limits. No manifest
-classification or exclusion changes. Publication and graph landing remain
-Root-owned gates; `m5-exit-audit` still depends on the umbrella
-`with-optional-call-receiver` until it lands.
+Strict tail-position optional calls through `with`, such as `return f?.()` in a
+strict function nested in a `with` body, retain that same receiver. WOC-1's
+lowering already supplies the receiver to the tail call. WOC-2 adds fixed
+native evidence, an independent generated oracle at seed `0x60002402`, and MIR
+assertions that the call is a tail call returned directly. The fixed fixture
+pairs optional and ordinary strict tail calls for normal, nullish, non-callable
+and abrupt completions, including argument order. Both specialization policies
+force collection while the trampoline retains the selected receiver,
+getter-produced callee and freshly allocated arguments.
+
+The [*WOC-2 work note*](./m5c-graph/with-optional-call-receiver-tail.md)
+records the focused Linux execution and its limits. No manifest classification
+or exclusion changes. Publication and graph landing remain Root-owned gates;
+`m5-exit-audit` still depends on the umbrella `with-optional-call-receiver`
+until it lands.
 
 [identifier trace]: https://github.com/tc39/test262/blob/f2d1435644797268dca1f7988cad5a4e89ccd8d2/test/language/statements/with/get-binding-value-idref-with-proxy-env.js
 [call trace]: https://github.com/tc39/test262/blob/f2d1435644797268dca1f7988cad5a4e89ccd8d2/test/language/statements/with/get-binding-value-call-with-proxy-env.js
@@ -9472,75 +9755,76 @@ Synchronous yield-star throw callability correction
 
 M5c node `yield-star-throw-callability` corrects the synchronous GetMethod
 boundary for a noncallable delegate `throw`. That failure raises `TypeError`
-without reading or calling `return`; the separate absent/nullish-method branch
-still performs IteratorClose with its observable getters, calls and result
+without reading or calling `return`. The separate absent/nullish-method branch
+still performs IteratorClose with its observable getters, calls, and result
 validation. Callable dispatch and abrupt getters retain their original values,
-roots, completion and finally ordering. No asynchronous-generator or ABI change
-is included.
+roots, completion, and finally ordering. No asynchronous-generator or ABI
+change is included.
 
 The exact minimized counterexample is retained in
 *tests/native/fixtures/yield-star-noncallable-throw.js.txt*. The fixed and
 modeled 88-boundary programs in *tests/yield-star-throw-callability.test.ts*
-and *tests/helpers/yield-star-throw.ts* distinguish those branches. The
-existing *tests/property/m5-generator-throw.property.test.ts* retains its
-original throw-resumption domain with default compiler options, the C backend
+and *tests/helpers/yield-star-throw.ts* distinguish those branches.
+
+The existing *tests/property/m5-generator-throw.property.test.ts* retains its
+original throw-resumption domain with default compiler options, the C backend,
 and a constructed expected stdout string. Its added structured delegation
 domain has an independent oracle, Node/Deno references, both native policies,
 forced collection, positive allocation and collection counters, and public
 context balance checks. The minimized regression and 88-boundary packet use
 those same checks. Both property domains retain their original seeds, 15 cases,
-180-second limits and replay. On the original author source, the Linux AMD64
-Node/Deno fixed and property entry points passed once each, ten registrations
-total. Numeric counter values were not retained by the assertion-based tests.
-Matching Mac/sanitizer, full gates and new manifest observations remain
-pending.
+180-second limits, and replay.
+
+Numeric counter values were not retained by the assertion-based tests. Matching
+Mac/sanitizer, full gates, and new manifest observations remain pending.
 
 The original 14 pinned B16 subjects retain their complete source and assertions
 in the focused regression entry point. Their prior diagnostic passes do not
-admit those reserved rows or repair the distinct noncallable-method repro.
-The synchronous-generator family keeps its guard-fallback omission because
-this generic runtime correction introduces no specialized path. Required
-full/cross-host/sanitizer gates, D3 regeneration, review and landing remain
+admit those reserved rows or repair the distinct noncallable-method repro. The
+synchronous-generator family keeps its guard-fallback omission because this
+generic runtime correction introduces no specialized path. Required
+full/cross-host/sanitizer gates, D3 regeneration, review, and landing remain
 separate from the source change and pure model checks.
 
-This F3-only preparation starts at successful Main `f100ab8e`. Earlier
-focused execution above stays bound to its original author source; none is
-relabeled as validation of this composition. Only the synchronous runtime
-throw branch changes. The extracted teardown helper uses existing public
-context fields, while Array/backend/layout, Set, RegExp and TCO source stay
-exact Main. Native validation, affected review, actual D3/full observations
-and exact candidate/Main gates remain pending under Root ownership.
+This F3-only preparation starts at successful Main `f100ab8e`. Earlier focused
+execution stays bound to its original author source; none is relabeled as
+validation of this composition. Only the synchronous runtime throw branch
+changes. The extracted teardown helper uses existing public context fields,
+while Array/backend/layout, Set, RegExp, and TCO source stay exact Main. Native
+validation, affected review, actual D3/full observations, and exact
+candidate/Main gates remain pending under Root ownership.
 
-The following Set contracts are restored for the standalone source
-preparation on Main `cf0902db`. Every historical execution result remains
-bound to its named source; none validates this new composition. Fresh
-in-memory structural checks and CHECK/hooks are recorded in the source
-preparation report. Runtime, reference and native execution, affected review,
-fresh full observations and exact candidate/Main gates remain pending.
+Set contracts are restored for the standalone source preparation on Main
+`cf0902db`. Every historical execution result remains bound to its named
+source; none validates this new composition. Fresh in-memory structural checks
+and CHECK/hooks are recorded in the source preparation report. Runtime,
+reference, and native execution, affected review, fresh full observations, and
+exact candidate/Main gates remain pending.
 
 
 Primitive receiver inherited Set preparation
 --------------------------------------------
 
-The `primitive-receiver-inherited-set` source prepares wrapper lookup with
-the original primitive Receiver, following ECMA-262 2025 PutValue,
-OrdinarySetWithOwnDescriptor, and OrdinaryCallBindThis. String own
-restrictions precede inherited descriptors; inherited callable setters and
-Proxy Set dispatch keep the primitive; data writes may still fail. Caller
-strictness affects a false Set result independently of setter strictness.
-The existing ordinary call boundary boxes sloppy this in the callee realm.
+The `primitive-receiver-inherited-set` source prepares wrapper lookup with the
+original primitive Receiver, following ECMA-262 2025 PutValue,
+OrdinarySetWithOwnDescriptor, and OrdinaryCallBindThis. String own restrictions
+precede inherited descriptors. Inherited callable setters and Proxy Set
+dispatch keep the primitive; data writes may still fail. Caller strictness
+affects a false Set result independently of setter strictness. The existing
+ordinary call boundary boxes sloppy this in the callee realm.
 
 *tests/primitive-receiver-inherited-set.test.ts* supplies pure reference and
-structural checks. The independent structured model and the source for
-later native evidence are in
-*tests/helpers/primitive-receiver-set.ts*,
+structural checks. The independent structured model and the source for later
+native evidence are in *tests/helpers/primitive-receiver-set.ts*,
 *tests/property/m5-primitive-receiver-inherited-set.property.test.ts*, and
 *tests/fixtures/primitive-receiver-inherited-set/allocation.c*.
+
 Native seed `0x60008c00` has 12 ordinary cases and a 240-second deadline; each
 case retains all primitive kinds and two writes while shrinking. The separate
 pure sixteen-sample seed remains `0x60008b00`; the unpublished native default
-moved to avoid Main's Script/Module seed block. Forced
-collection and allocation-failure assertions are pending native execution.
+moved to avoid Main's Script/Module seed block. Forced collection and
+allocation-failure assertions are pending native execution.
+
 This preparation changes no covered evidence assessment, compatibility
 observation, reviewed selector, or exclusion. The wrapper family's earlier
 coverage does not establish this Set repair. See *PLAN-M5.md* for the
@@ -9550,70 +9834,77 @@ implementation contract and Root-owned validation and publication gates.
 Omitted legacy accessor metadata boundary
 -----------------------------------------
 
-The __proto__ rejection diagnoses required legacy getter/setter behavior.
-Core descriptor queries expose distinct, stable native getter/setter identities
+The __proto__ rejection diagnoses required legacy getter/setter behavior. Core
+descriptor queries expose distinct, stable native getter/setter identities
 owned by their realm's Object.prototype. Existing property-vector tracing keeps
-them live; metadata, Function.toString, nonconstructability and Function
-prototype ownership follow the ordinary built-in contracts. They are distinct
-from Object.getPrototypeOf and Object.setPrototypeOf. Describing or copying an
-identity does not invoke its body. Actual calls, including forwarding through
-call/apply/bind and transparent Proxies, retain the source-located OSEO1001
-boundary; reference Node/Deno Annex behavior is not claimed equivalent.
+them live. Metadata, Function.toString, nonconstructability and Function
+prototype ownership follow the ordinary built-in contracts.
 
-Partial definitions preserve the other identity, concrete user halves execute
+They are distinct from Object.getPrototypeOf and Object.setPrototypeOf.
+Describing or copying an identity does not invoke its body. Actual calls,
+including forwarding through call/apply/bind and transparent Proxies, retain
+the source-located OSEO1001 boundary. Reference Node/Deno Annex behavior is not
+claimed equivalent.
+
+Partial definitions preserve the other identity. Concrete user halves execute
 normally, and explicit undefined halves remain undefined. Core identity
 comparison governs descriptor round trips, integrity and Proxy invariants.
-Successful deletion removes the property, failed deletion changes nothing,
-and recreation uses new creation order. The earlier descriptor-query rejection
-contract conflicted with the existing intrinsic-walk pass and is replaced by
-positive reflection and negative excluded-call controls. No Annex body,
-accepted exclusion, feature, public ABI shape or family count is added.
+
+Successful deletion removes the property, and failed deletion changes nothing.
+Recreation uses new creation order. The earlier descriptor-query rejection
+contract conflicted with the existing intrinsic-walk pass. Positive reflection
+and negative excluded-call controls replace it. No Annex body, accepted
+exclusion, feature, public ABI shape or family count is added.
 
 The original Annex and primitive Set assertions, apart from the superseded
-descriptor-identity rejection oracle above, remain. The initial six Linux
-commands passed 20 registrations on 1c96126b, then an independent native probe
-found a freeze/seal hole. Those passes are not evidence for the expanded
-metadata source. At preparation, its fixed/generated programs and layout
-assertions had only source/reference evidence; later focused results follow
-below. Affected review and fresh full observations remain pending.
-*PLAN-M5.md* names the files and exact raw packets.
-No numeric GC/frame or macOS/sanitizer/candidate/Main success is claimed, and
-no covered assessment or compatibility classification changes.
+descriptor-identity rejection oracle above, remain. An independent native probe
+found a freeze/seal hole. The initial Linux passes on `1c96126b` are not
+evidence for the expanded metadata source. At preparation, its fixed/generated
+programs and layout assertions had only source/reference evidence. Affected
+review and fresh full observations remain pending. *PLAN-M5.md* names the files
+and exact raw packets. No numeric GC/frame or macOS/sanitizer/candidate/Main
+success is claimed, and no covered assessment or compatibility classification
+changes.
 
 
 Set-only generic interaction preparation
 ----------------------------------------
 
-The earlier generic Set interaction preparation used Array/F3 base
-`f032576f`. This standalone composition instead starts from successful Main
-`cf0902db05ee8a51a2801f5d70372bfc5ca37b48`, retaining its `m5-135`
-interface and ordinary call/GC/realm/backend source. The original fifth
-dense-apply Script and literal oracle move to
-*tests/helpers/primitive-set-array-interop.ts*. Its separate preparation file
-checks reference/MIR/C contracts; its native driver retains both policies,
-positive forced-GC counters and balanced frame/call/root teardown. *PLAN-M5.md*
-names the exact contracts and paths. This preparation initially had no new
-native/layout or model review. The private metadata represents presence,
-attributes and accessor-half availability; reflected legacy identities are core
-metadata; only excluded behavior still requires OSEO1001.
+The earlier generic Set interaction preparation used Array/F3 base `f032576f`.
+This standalone composition instead starts from successful Main
+`cf0902db05ee8a51a2801f5d70372bfc5ca37b48`, retaining its `m5-135` interface
+and ordinary call/GC/realm/backend source. The original fifth dense-apply
+Script and literal oracle move to
+*tests/helpers/primitive-set-array-interop.ts*.
+
+Its separate preparation file checks reference/MIR/C contracts. Its native
+driver retains both policies, positive forced-GC counters and balanced
+frame/call/root teardown. *PLAN-M5.md* names the exact contracts and paths.
+This preparation initially had no new native/layout or model review.
+
+The private metadata represents presence, attributes and accessor-half
+availability. Reflected legacy identities are core metadata. Only excluded
+behavior still requires OSEO1001.
 
 TCO remains deferred under D6.5. Its protocol-specific assertions and the
-complete original interaction module remain protected history; their
+complete original interaction module remain protected history. Their
 requirements are not claimed tested or satisfied on this generic runtime.
+
 Original Set domains, seeds, budgets, programs, independent oracles and
 applicable semantic assertions remain. Current reviewed classifications,
 profile-family count, owners, exclusions and graph status stay exact base.
 
-The later focused Linux AMD64 run on exact `eab6f366` passed eight whole
-Node.js/Deno commands with 28 actual registrations and natural process/scope
-drain. All tracked source hashes/modes stayed exact. The original Annex/Set
-properties retain 12 cases, their seeds and limits, both policies, forced
-collection and applicable guard/fallback assertions. Both allocation fixture
-registrations compiled the expanded layout assertions on the selected Linux
-ABI; the independent generic driver retained its seven callback assertions
-and balanced teardown. Numeric sizes/GC/frame counters and successful
-temporary C/MIR/binaries were not printed or retained. *PLAN-M5C.md* binds
-the actual commands, walls and raw packet to eab6, not a later prose commit.
+Focused Linux AMD64 results on exact `eab6f366` are recorded in *PLAN-M5C.md*,
+which binds the actual commands, walls and raw packet to `eab6`, not a later
+prose commit. All tracked source hashes/modes remained exact.
+
+The original Annex/Set properties retain 12 cases, their seeds and limits, both
+policies, forced collection and applicable guard/fallback assertions. Both
+allocation fixture registrations compiled the expanded layout assertions on the
+selected Linux ABI. The independent generic driver retained its seven callback
+assertions and balanced teardown. Numeric sizes/GC/frame counters and
+successful temporary C/MIR/binaries were not printed or retained.
+
 Affected review, fresh observations, macOS/sanitizer and exact candidate/Main
 gates remain pending; no compatibility or evidence-vocabulary change follows.
 
@@ -9622,74 +9913,80 @@ virtual-key enumeration, hidden-own-key shadowing and rooted ToObject
 reachability for all primitive kinds. Its new independent fixed/reference
 subjects, allocation/root/realm retry fixture and fresh third Annex property
 subject preserve the earlier programs/oracles, seeds, cases and limits.
+
 The changed implementation now has 40 required focused registrations with
-explicit source bindings: the first eight whole commands passed 28 on
-46933fd3, and the six for-in follow-ups passed 12 on 97f06518. Only the
-C fixture observation flag changed between them; all other 8,046 files/modes,
-including runtime/program/oracle/generator/flag inputs, remain exact. The
-original command 9 counter assertion failure remains recorded. Both hosts
-passed the new both-policy forced-GC matrix and all five acquisition
-failure/retry sweeps with positive collection and balanced realm/root checks.
-Numeric GC counts and sizeof values were not printed. *PLAN-M5C.md* records
-all commands, walls and source-bound packets. Affected review, fresh full
-observations, macOS/sanitizer, extended and exact candidate/Main gates remain
-pending. The required Array CI failure blocked that historical bundle;
-it is not a standalone Set prerequisite. No family assessment, vocabulary,
-admission or classification changes.
+explicit source bindings. Only the C fixture observation flag changed between
+the two focused runs; all other 8,046 files/modes, including
+runtime/program/oracle/generator/flag inputs, remain exact. The original
+command 9 counter assertion failure remains recorded.
+
+Both hosts now have positive collection and balanced realm/root checks for the
+new both-policy forced-GC matrix and all five acquisition failure/retry sweeps.
+Numeric GC counts and sizeof values were not printed. *PLAN-M5C.md* records all
+commands, walls and source-bound packets.
+
+Affected review, fresh full observations, macOS/sanitizer, extended and exact
+candidate/Main gates remain pending. The required Array CI failure blocked that
+historical bundle; it is not a standalone Set prerequisite. No family
+assessment, vocabulary, admission or classification changes.
 
 
 Historical TCO source on the Array base
 ---------------------------------------
 
-Initial preparation on Set `a111c31e` is preserved as TCO `54973309`.
-That base failed CI because its native prototype-root injection locator
-still matched three slots after Set changed that root frame to four.
-Current preparation carries the complete owned `9945b7b8` to `b1eaeff0`
-TCO delta onto Array U`cccb7195`, tree
-`89d907b342885089374ffadd53eff606d31e6131`. All thirteen Array paths,
-three runtime guard hunks, six coverage files and new worknote stay exact.
-Set's locator, state prose, Receiver/descriptor/identity/invariant rules
-remain inherited. All fifteen TCO product postimages stay exact `b1eaeff0`.
-At initial preparation, Main was `cf0902db`/54; Set55 was prospective and
-Array was unlanded. Root's then-running standalone Array Full excluded TCO.
-The later combined-source U`68e298a9` evidence is distinct. Prior TCO sources
-and reviews remain
-preserved, including the incomplete32 and known-Gate-only33 outcomes.
+Initial preparation on Set `a111c31e` is preserved as TCO `54973309`. That base
+failed CI because its native prototype-root injection locator still matched
+three slots after Set changed that root frame to four.
+
+Current preparation carries the complete owned `9945b7b8` to `b1eaeff0` TCO
+delta onto Array U`cccb7195`, tree `89d907b342885089374ffadd53eff606d31e6131`.
+All thirteen Array paths, three runtime guard hunks, six coverage files and new
+worknote stay exact. Set's locator, state prose,
+Receiver/descriptor/identity/invariant rules remain inherited. All fifteen TCO
+product postimages stay exact `b1eaeff0`.
+
+At initial preparation, Main was `cf0902db`/54, Set55 was prospective and Array
+was unlanded. Root's then-running standalone Array Full excluded TCO. The later
+combined-source U`68e298a9` evidence is distinct. Prior TCO sources and reviews
+remain preserved, including the incomplete32 and known-Gate-only33 outcomes.
+
 Generic/host-tail, bound/Proxy Call forwarding, pending roots, derived/realm
 rules and four owner-local counters keep the full `m5-137` unit. The two
-changed internal interfaces retain Set metadata and all post-call checks.
-Main chunk/include/static/source-coordinate and logical frame contracts stay.
-The existing fifth Set Script/oracle and all four TCO subjects remain; only
-its deferred no-tail assertions become exact positive protocol checks.
-Old Set Full, TCO checks/reviews and Array proofs keep their own sources.
-Array's worknote describes its standalone source before this TCO overlay;
-its measurements and unchanged-compiler statements do not validate the
-combined implementation. Changed lookup/Set/coercion/truncation/pending-GC
-interfaces received bounded interaction review and current-source execution.
-No rejected
+changed internal interfaces retain Set metadata and all post-call checks. Main
+chunk/include/static/source-coordinate and logical frame contracts stay. The
+existing fifth Set Script/oracle and all four TCO subjects remain; only its
+deferred no-tail assertions become exact positive protocol checks. Old Set
+Full, TCO checks/reviews and Array proofs keep their own sources.
+
+Array's worknote describes its standalone source before this TCO overlay; its
+measurements and unchanged-compiler statements do not validate the combined
+implementation. Changed lookup/Set/coercion/truncation/pending-GC interfaces
+received bounded interaction review and current-source execution. No rejected
 Array packing, completion-layout, B8 or RegExp implementation is imported.
 
 The new family indexes retained fixed, generated, structural and native
 contracts. Historical Array-bound author execution on `353a9f17` is recorded in
 *PLAN-M5C.md*, with its framework, host, target and policy limits. It does not
 validate this current Array/TCO composition.
-The single source-admission entry for `tail-call-optimization` remains
-in the 147-feature implementation. The six focused vectors and original
-full UPDATE ran on source `68e298a9a96a6d22dc2e33b9e70b7c6a86720e41`, tree
-`dcca1b0bf57b63d0446fab54c676f42a2ca19739`. The Full observed 29,901 paths:
+
+The single source-admission entry for `tail-call-optimization` remains in the
+147-feature implementation. The original U68 full UPDATE observed 29,901 paths:
 25,604 pass, 2,802 expected negatives and 1,495 unsupported, with no semantic,
 harness or infrastructure failures. Its only promotions are the two owned
 strict tagged-template TCO subjects, using the unchanged 100,000-depth helper
 and both specialization policies. All other 29,899 result records stay
-byte-identical. Derived observation ownership replaces remediation only for
-those two passes; other owners, inventory, policy and exclusions stay exact.
-The standards assessment cites these actual observations. Admission data
-review, candidate/Main gates and adoption remain separate requirements;
-source admission alone supplies no candidate gate pass.
-See [*current U68 evidence*](evidence/proper-tail-calls-u68-20261027.md).
-Native935 remains historical `05c1f074` evidence; the old 39/60 interruption
-is failed incomplete evidence. All 33 other pinned TCO paths remain
-unreviewed under batch32, whose accepted source plan remains separate.
+byte-identical. See
+[*current U68 evidence*](evidence/proper-tail-calls-u68-20261027.md).
+
+Derived observation ownership replaces remediation only for those two passes;
+other owners, inventory, policy and exclusions stay exact. The standards
+assessment cites these actual observations. Admission data review,
+candidate/Main gates and adoption remain separate requirements; source
+admission alone supplies no candidate gate pass.
+
+Native935 remains historical `05c1f074` evidence; the old 39/60 interruption is
+failed incomplete evidence. All 33 other pinned TCO paths remain unreviewed
+under batch32, whose accepted source plan remains separate.
 
 
 TCO source preparation on the fixed Reg candidate
@@ -9698,19 +9995,19 @@ TCO source preparation on the fixed Reg candidate
 Final bitmap source `f5bdd44d` is prepared on Reg publication candidate
 `98460f7c`, based on successful Main `d4d81be9`, under D10.4. Reg remains
 prospective and TCO remains unlanded. All compiler/runtime programs and
-generators retain f5, including ABI `m5-139`; the leaf proposal is absent.
-Only the original source feature admission is carried. At source
-preparation, Reg's complete observations, owners and per-path expectations
-stayed unchanged pending a new Full, including both unsupported TCO
-expectations.
+generators retain f5, including ABI `m5-139`; the leaf proposal is absent. Only
+the original source feature admission is carried.
 
-*PLAN-M5C.md* defines this preparation phase. The existing
-[TCO evidence contract](evidence/proper-tail-calls-u68-20261027.md)
-records f5 author execution with exact sources and one-pair timing limits.
-Those checks and the historical U68 Full did not run on this composition.
-The later Full on accepted U`e2dba363` observed all 29,901 reviewed paths
-and promoted exactly *tco-call.js* and *tco-member.js* from unsupported to
-pass, with no demotion; the
+At source preparation, Reg's complete observations, owners and per-path
+expectations stayed unchanged pending a new Full, including both unsupported
+TCO expectations. *PLAN-M5C.md* defines this preparation phase. The existing
+[TCO evidence contract](evidence/proper-tail-calls-u68-20261027.md) records f5
+author execution with exact sources and one-pair timing limits. Those checks
+and the historical U68 Full did not run on this composition.
+
+The later Full on accepted U`e2dba363` observed all 29,901 reviewed paths and
+promoted exactly *tco-call.js* and *tco-member.js* from unsupported to pass,
+with no demotion; the
 [evidence contract](evidence/proper-tail-calls-u68-20261027.md) records it.
 Affected reviews and publication remain Root-owned.
 
@@ -10022,30 +10319,32 @@ and evidence.
 With var loop-head resolution
 -----------------------------
 
-Simple `var` heads in `for-in` and `for-of`, including `for await`, now
-resolve the identifier through the active `with` chain on each iteration.
-A classic `for` var initializer selects its reference before evaluating the
-initializer. Lexical heads retain their own declaration environments.
-Nested environments, inherited properties, `Symbol.unscopables`, accessors,
-and abrupt lookup use the existing generic reference and PutValue paths.
-An all-miss host Script reference reaches the persistent Global Environment
+Simple `var` heads in `for-in` and `for-of`, including `for await`, resolve the
+identifier through the active `with` chain on each iteration. A classic `for`
+var initializer selects its reference before evaluating the initializer.
+Lexical heads retain their own declaration environments.
+
+Nested environments, inherited properties, `Symbol.unscopables`, accessors, and
+abrupt lookup use the existing generic reference and PutValue paths. An
+all-miss host Script reference reaches the persistent Global Environment
 Record, including a later lexical shadow of a configurable global property.
 
 Array-pattern identifier leaves select their reference before the iterator
-step, default initializer, or rest collection, as ECMA-262 2025 section
-8.6.3 requires. The same preparation helper retains the existing keyed
-object leaf order without changing object rest preparation.
-A later addition or deletion cannot change the selected environment.
+step, default initializer, or rest collection, as ECMA-262 2025 section 8.6.3
+requires. The same preparation helper retains the existing keyed object leaf
+order without changing object rest preparation. A later addition or deletion
+cannot change the selected environment.
+
 Lookup failures close acquired iterators through the existing cleanup path.
 Fixed traces use the specification where V8's var binding order differs.
 
-*tests/with-var-loop-head-source.test.ts*,
-*tests/with-var-loop-head.test.ts*, and
-*tests/native/fixtures/with-var-loop-head-resolution.ts* cover both targets.
-*tests/property/m5-with-var-loop-head.property.test.ts* adds independent
-models for nested hit, miss, blocking and deletion sequences, and array
-reference order with mutations. Seeds `0x60009200` and `0x60009201` use
-8 ordinary cases each, both specialization policies and forced collection.
+*tests/with-var-loop-head-source.test.ts*, *tests/with-var-loop-head.test.ts*,
+and *tests/native/fixtures/with-var-loop-head-resolution.ts* cover both
+targets. *tests/property/m5-with-var-loop-head.property.test.ts* adds
+independent models for nested hit, miss, blocking and deletion sequences, and
+array reference order with mutations. Seeds `0x60009200` and `0x60009201` use 8
+ordinary cases each, both specialization policies and forced collection.
+
 These sources add no test262 path or classification. D3, full observation,
 review and publication remain separate gates owned by Root.
 
@@ -10054,17 +10353,19 @@ Module top-level await patterns
 -------------------------------
 
 Module binding and assignment patterns admit await in computed keys, defaults,
-and member targets. Catch parameters, classic for initializers, and for-of
-and object-pattern for-in heads use the same traced evaluator frame. Defaults
-run only for undefined; rejection resumes the pending throw at the await,
-retaining iterator cleanup, finally precedence and live binding cells. The
-module scheduler recognizes a pattern await even when it occurs only in a
+and member targets. Catch parameters, classic for initializers, and for-of and
+object-pattern for-in heads use the same traced evaluator frame.
+
+Defaults run only for undefined; rejection resumes the pending throw at the
+await, retaining iterator cleanup, finally precedence and live binding cells.
+The module scheduler recognizes a pattern await even when it occurs only in a
 classic for declaration. No new runtime operation or ABI is introduced.
 
 The fixed module fixture and the generated pattern domain with seed
 `0x60001f01` cover both specialization policies and forced collection, with
-Node.js, Deno and independent expected output. Parameter
-early errors and the ADR 0016 boundary remain.
-The thirteen owned test262 records retain their prior unsupported results
-until Root's actual full UPDATE; compilation alone supplies no promotion.
-See [the work note](./m5c-graph/module-top-level-await-patterns.md).
+Node.js, Deno and independent expected output.
+
+Parameter early errors and the ADR 0016 boundary remain. The thirteen owned
+test262 records retain their prior unsupported results until Root's actual full
+UPDATE; compilation alone supplies no promotion. See
+[the work note](./m5c-graph/module-top-level-await-patterns.md).

@@ -5,13 +5,16 @@ The native target descriptions request `address` and `undefined`, but the
 pinned Zig 0.16.0 build does not provide AddressSanitizer coverage. Passing the
 flags and completing a gate do not establish that ASan ran. This finding
 qualifies the sanitizer claims in the design, native-target ADR, plans, runtime
-documentation, and gate-cost records. The Linux host C lane below supplies
-separate verified instrumentation. Historical Zig runs still lack ASan
-evidence. A bounded Apple Clang sample below shows ASan and UBSan working
-through the host C adapter on one macOS arm64 machine. The macOS CI jobs
-below are configured but have not run; the sample does not verify them.
-Leak detection remains excluded on macOS. The declared target policy has not
-changed.
+documentation, and gate-cost records.
+
+The Linux host C lane below supplies separate verified instrumentation.
+Historical Zig runs still lack ASan evidence. A bounded Apple Clang sample
+below shows ASan and UBSan working through the host C adapter on one macOS
+arm64 machine.
+
+The macOS CI jobs below are configured but have not run. The sample does not
+verify them. Leak detection remains excluded on macOS. The declared target
+policy has not changed.
 
 
 Cause and reproduction
@@ -19,19 +22,17 @@ Cause and reproduction
 
 Zig's driver consumes a comma-separated sanitizer argument when it recognizes
 *any* member. It recognizes `undefined`, `thread`, and fuzzing modes; it does
-not forward the remaining `address` member. This is visible in
-*src/main.zig*, lines 2275–2294 of the
-[Zig 0.16.0 source release].
-The matching argument order `undefined,address` has the same result.
+not forward the remaining `address` member. This is visible in *src/main.zig*,
+lines 2275–2294 of the [Zig 0.16.0 source release]. The matching argument order
+`undefined,address` has the same result.
 
 Separate `-fsanitize=address -fsanitize=undefined` arguments preserve the ASan
-instrumentation, but linking then fails on unresolved `__asan_*` symbols.
-Zig does not supply the required ASan runtime in this configuration. The
-upstream reports [#24377] and
-[#11403] describe missing ASan
-runtime linking on Linux and macOS. They concern older Zig versions; the
-measurements below establish the behavior of the current pin. The
-[0.16.0 release notes]
+instrumentation, but linking then fails on unresolved `__asan_*` symbols. Zig
+does not supply the required ASan runtime in this configuration.
+
+The upstream reports [#24377] and [#11403] describe missing ASan runtime
+linking on Linux and macOS. They concern older Zig versions. The measurements
+below establish the behavior of the current pin. The [0.16.0 release notes]
 identify its LLVM version, but do not promise ASan support.
 
 The self-check allocates one `int`, writes through a volatile pointer at index
@@ -74,11 +75,13 @@ Measured on Linux x86-64 on 2026-09-17:
 | System Clang 22, Linux x86-64 | combined |                   5 | succeeds; 322 ASan symbols         | exit 1, heap-buffer-overflow |
 
 Counts are matching symbol-table lines from `llvm-nm`, not counts of checks.
-Both combined-flag Zig objects contain one UBSan symbol reference. A fresh
-`-v` build with a distinct preprocessor definition confirms that the combined
-argument does *not* pass `address` to the Clang frontend. An address-only
-argument does reach it and fails at link time. This distinguishes argument
-handling from a missing instrumentation pass or optimization of the probe.
+Both combined-flag Zig objects contain one UBSan symbol reference.
+
+A fresh `-v` build with a distinct preprocessor definition confirms that the
+combined argument does *not* pass `address` to the Clang frontend. An
+address-only argument does reach it and fails at link time. This distinguishes
+argument handling from a missing instrumentation pass or optimization of the
+probe.
 
 [Zig 0.16.0 source release]: https://ziglang.org/download/0.16.0/zig-0.16.0.tar.xz
 [0.16.0 release notes]: https://ziglang.org/download/0.16.0/release-notes.html#LLVM-21
@@ -92,12 +95,13 @@ Regression coverage
 *packages/toolchain-zig/tests/sanitizer-activity.test.ts* uses the real adapter
 and host target declaration. For every declared sanitizer it builds a standard
 fault both in an optimized runtime archive member and in generated C, then
-requires the corresponding diagnostic. Signed integer overflow exercises
-UBSan. Under Node.js, the address cases remain executable `node:test` TODOs
-naming this finding. Deno 2.9.2 ignores these TODO cases, as confirmed by the
-focused Deno test run. Unsupported hosts skip native execution. Build and run
-timeouts bound the probes, and the adapter's environment allowlist keeps
-ambient sanitizer options out.
+requires the corresponding diagnostic. Signed integer overflow exercises UBSan.
+
+Under Node.js, the address cases remain executable `node:test` TODOs naming
+this finding. Deno 2.9.2 ignores these TODO cases, as confirmed by the focused
+Deno test run. Unsupported hosts skip native execution. Build and run timeouts
+bound the probes. The adapter's environment allowlist keeps ambient sanitizer
+options out.
 
 A TODO is an acknowledged coverage gap. Remove it only after the self-check
 reports the heap overflow on both primary execution targets. If a TODO test
@@ -109,7 +113,7 @@ Host C sanitizer lane
 ---------------------
 
 The sanitizer lane uses a separate host compiler; Zig remains the ordinary
-compiler. The new `@oseo/toolchain-host-cc` package plans builds;
+compiler. A new package, `@oseo/toolchain-host-cc`, plans builds.
 *tests/native-toolchain.ts* selects an absolute compiler path and verifies its
 runtime before composing the native test entry points. The adapter has paired
 npm and JSR manifests at the lockstep version and its own GPL license. Its only
@@ -119,8 +123,8 @@ The lane selects `clang` when available and otherwise selects `gcc`. Set
 `OSEO_HOST_CC=clang` or `OSEO_HOST_CC=gcc` to require one. Selection never
 falls back after a failed probe. The probe compiles and executes a known heap
 overflow and requires the ASan diagnostic. Build failures name missing runtime
-libraries through the compiler's linker output. Foreign targets are rejected;
-the existing Zig task retains cross-link and assembly checks.
+libraries through the compiler's linker output. Foreign targets are rejected.
+The existing Zig task retains cross-link and assembly checks.
 
 ~~~~ sh
 mise run test:sanitizer:self
@@ -131,11 +135,11 @@ mise run test:sanitizer:test262 --shard 3/200
 OSEO_HOST_CC=gcc mise run test:sanitizer:self
 ~~~~
 
-The runtime task uses one test-file worker; the property task uses four and
+The runtime task uses one test-file worker. The property task uses four and
 retains the ordinary seeds, sizes, and case counts. Generated native fixtures
 still exercise the suite's specialization and forced collection modes. The
-sanitizer native task omits only Zig-specific assembly and cross-link checks;
-all executable scenarios remain. The ordinary native gate still runs the
+sanitizer native task omits only Zig-specific assembly and cross-link checks.
+All executable scenarios remain. The ordinary native gate still runs the
 assembly and cross-link checks.
 
 For a bounded ordinary property measurement, pass Node.js test options before
@@ -147,19 +151,19 @@ mise run test:sanitizer:property:shard \
   --test-shard=1/12 tests/property/*.property.test.ts
 ~~~~
 
-The macOS CI lane runs the native task as two file shards with
-`--shard N/2`; the first also carries the runtime fixtures, and the `native`
-aggregate requires both. See
+The macOS CI lane runs the native task as two file shards with `--shard N/2`.
+The first also carries the runtime fixtures, and the `native` aggregate
+requires both. See
 [*macOS native sanitizer split*](evidence/macos-sanitizer-split/README.md).
 
 The full property task remains unsharded. The Linux CI lane runs all three
-shards of `mise run test:sanitizer:property:shared --shard N/3`, which keeps
-Node's `--test-shard=N/3` positions over _tests/property/\*.property.test.ts_
-and drops the files in `dedicatedSanitizerPropertyFiles`. Those files run in
-one dedicated job per host, and the `native` aggregate requires the whole
-matrix and both dedicated jobs. The macOS property job runs the same shared
-task unsharded. Every task uses ordinary seeds, sizes, and case counts, not
-the extended property budget.
+shards of `mise run test:sanitizer:property:shared --shard N/3`. That command
+keeps Node's `--test-shard=N/3` positions over
+_tests/property/\*.property.test.ts_ and drops the files in
+`dedicatedSanitizerPropertyFiles`. Those files run in one dedicated job per
+host, and the `native` aggregate requires the whole matrix and both dedicated
+jobs. The macOS property job runs the same shared task unsharded. Every task
+uses ordinary seeds, sizes, and case counts, not the extended property budget.
 
 The archive reuse key includes the exact resolved compiler path, full version
 output, archiver path, compile flags, target, runtime contents, and captured
@@ -169,28 +173,26 @@ The lane refuses ambient ASAN\_OPTIONS, LSAN\_OPTIONS, UBSAN\_OPTIONS,
 LD\_PRELOAD, and DYLD\_INSERT\_LIBRARIES so these cannot suppress a diagnostic.
 UBSan recovery is disabled in both runtime and generated code.
 
-On this Linux host, Clang 22.1.8 passed all four self-check assertions:
-address and undefined behavior in a runtime archive member and generated C.
-The host address probe calls malloc through a volatile function pointer, so
-GCC cannot terminate it with an object-size UBSan check before ASan reports the
-heap overflow. Both sanitizers stay enabled with recovery disabled. The
-unchanged Zig address cases remain TODOs. GCC 16.2.1 is installed and
-`gcc -print-file-name=libasan.so` returns a linker-script path, but its link
-fails because */usr/lib64/libasan.so.8.0.0* and
-*/usr/lib64/libubsan.so.1.0.0* are absent. The explicit GCC lane fails at
-preflight, naming those missing libraries. GCC execution coverage is not
-established on this host, and no system packages or sanitizer suppressions were
-added.
+On this Linux host, the self-check passes all four assertions with Clang
+22.1.8: address and undefined behavior in a runtime archive member and
+generated C. The host address probe calls malloc through a volatile function
+pointer, so GCC cannot terminate it with an object-size UBSan check before ASan
+reports the heap overflow. Both sanitizers stay enabled with recovery disabled.
+The unchanged Zig address cases remain TODOs. GCC 16.2.1 is installed, and
+`gcc -print-file-name=libasan.so` returns a linker-script path. Its link fails
+because */usr/lib64/libasan.so.8.0.0* and */usr/lib64/libubsan.so.1.0.0* are
+absent. The explicit GCC lane fails at preflight, naming those missing
+libraries. GCC execution coverage is not established on this host, and no
+system packages or sanitizer suppressions were added.
 
-Compiling the Date component with GCC also required its compiler-specific
-spelling of the existing no-contraction pragma. The guarded directive keeps the
-same rounding contract; Clang and Zig retain the original standard pragma. A
-compile-only regression checks strict warnings, ASan instrumentation, and the
-absence of fused multiply-add instructions with both installed compilers,
-without needing GCC's missing link runtime. All 41 runtime translation units
-also compiled to ASan/UBSan-instrumented GCC objects with the adapter flags in
-30.55 seconds (measured); no warning or compiler error occurred. This is
-compile evidence, not GCC execution evidence.
+The Date component also needs GCC's compiler-specific spelling of the existing
+no-contraction pragma. The guarded directive keeps the same rounding contract;
+Clang and Zig retain the original standard pragma. A compile-only regression
+checks strict warnings, ASan instrumentation, and the absence of fused
+multiply-add instructions with both installed compilers. It does not need GCC's
+missing link runtime. All 41 runtime translation units also compile to
+ASan/UBSan-instrumented GCC objects with the adapter flags and no warnings or
+compiler errors. This is compile evidence, not GCC execution evidence.
 
 
 Independent Clang runtime probe

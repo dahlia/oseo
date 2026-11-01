@@ -19,25 +19,23 @@ the surface when its contents are copied, compiled, or linked into that
 program. Compiler-only lowering, providers, tests, documentation, manifests,
 and build configuration remain outside.
 
-A mixed tracked file must not land. If a file would contain both support
-surface content and compiler-only content, split it into separately tracked
-files before merging the change. Review the inventory in the same change when
-the split adds, removes, or reclassifies a file.
+A mixed tracked file must not land. Split a file that would contain both
+support surface content and compiler-only content into separately tracked files
+before merging the change. Review the inventory in the same change when the
+split adds, removes, or reclassifies a file.
 
 
 Tracked source inventory
 ------------------------
 
-The backend contribution to generated programs is:
+The backend contributes *packages/backend-c/src/emitted-c.ts* to generated
+programs. The file is data-only.
 
- -  *packages/backend-c/src/emitted-c.ts*
-
-That file is data-only. It groups fixed C templates by emitted construct and
-shares common forms. The template tuple shape records each interpolation site,
-so TypeScript checks the number of names, values, counts, and labels supplied
-by the backend. MIR lowering, validation, interpolation-value selection, and
-template composition remain in *packages/backend-c/src/index.ts*, outside the
-support surface.
+It groups fixed C templates by emitted construct and shares common forms. The
+template tuple shape records each interpolation site, so TypeScript checks the
+number of names, values, counts, and labels supplied by the backend. MIR
+lowering, validation, interpolation-value selection, and template composition
+remain in *packages/backend-c/src/index.ts*, outside the support surface.
 
 The linked runtime contribution is:
 
@@ -73,7 +71,7 @@ The unbundled backend build maps
 *packages/backend-c/dist/emitted-c.js* and its generated declaration and
 source-map companions. Those artifacts inherit the support-surface treatment.
 *packages/backend-c/dist/index.js* is generated from compiler-only lowering
-and retains the compiler treatment; it imports the separate fragment module
+and retains the compiler treatment. It imports the separate fragment module
 instead of bundling its text.
 
 Published runtime native files are copied from
