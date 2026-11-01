@@ -618,12 +618,14 @@ zero directly owned paths before its own landing.
 Static-specifier import design child
 ------------------------------------
 
-Item 3 of the 2026-11-01 maintainer answer adds the design-only
-`static-specifier-import-design` node for exactly 20 paths: 19 DS-12
-module-loading-and-promises rows and DS-8's *usage-from-eval.js*. Its pinned
-selector and authority are in that child's work note. The node designs the
-build-time-resolvable literal `import()` track and drafts a Proposed ADR 0016
-amendment; it moves no owner. The umbrella retains all 20 paths.
+The design-only `static-specifier-import-design` node covers exactly 20
+paths: 19 DS-12 module-loading-and-promises rows and DS-8's
+*usage-from-eval.js*. Its pinned selector and authority are in that child's
+work note. The maintainer deferred the build-time-resolvable literal
+`import()` track past M5; its reviewed design is the post-M5 plan under
+*PLAN-DYN.md*, and its ADR 0016 amendment stays Proposed. The umbrella
+retains all 20 paths until ADR 0031 deferral entries, with *PLAN-DYN.md* as
+`targetMilestone`, take them over.
 
 
 Host Script evidence child

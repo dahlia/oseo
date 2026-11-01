@@ -674,12 +674,17 @@ and every result inside it is a pass, an expected negative, or an unsupported
 result covered by an accepted record that explicitly authorizes an M5 exclusion
 and bounds its surface. Naming a record as owner is not sufficient;
 [ADR 0019](./docs/adr/0019-m5-claim-closure.md) states what an authorizing
-record must say.
+record must say. An unsupported result may instead be a named deferral under
+[ADR 0031](./docs/adr/0031-m5-named-deferral.md): a reviewed entry giving its
+reason, remaining contract, and the later milestone or deferred track that
+inherits it. A deferral is reported separately and is never counted as a
+pass, an exclusion, or a closure.
 
 The unqualified ECMA-262 conformance label is a separate later gate under that
 same record, because
 [ADR 0016](./docs/adr/0016-dynamic-source-boundary.md) keeps the dynamic source
-family unsupported inside the claimed edition. Intermediate releases publish
+family unsupported inside the claimed edition. The label also requires the
+deferral list to be empty. Intermediate releases publish
 exact coverage and known gaps without using the label.
 
 
