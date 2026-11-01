@@ -54,10 +54,9 @@ records each path's contract, witness and digests.
 The umbrella's ownership drops by 15.
 
 
-Checks and review
------------------
+Checks
+------
 
 The evidence commit runs the focused native test, its source test, the graph
 test and capacity-wrapped `mise run check`; no full or extended gate or
-UPDATE. Review uses scope `fixture-construction-evidence` with the pre-gate
-and internal reviewers.
+UPDATE.
