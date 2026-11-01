@@ -305,7 +305,12 @@ delivers: "Resolves the 334 reviewed unsupported paths assigned to
   dynamic-source-regexp-exhaustive moves its four exhaustive BMP literal
   paths, leaving 260. dynamic-source-host-script-trainc-evidence accounts
   for all 98 of its train C paths under ADR 0016, leaving 162; see
-  docs/m5c-graph/dynamic-source-host-script-trainc-evidence.md."
+  docs/m5c-graph/dynamic-source-host-script-trainc-evidence.md.
+  m5c-deferral-ledger-checker moves 26 paths to the deferred owner under
+  ADR 0031, leaving 136; see docs/m5c-closure/deferrals.yaml.
+  dynamic-source-eval-code-assessment accounts for all 48 of its eval code
+  paths under ADR 0016, leaving 88; see
+  docs/m5c-graph/dynamic-source-eval-code-assessment.md."
 dependencies:
   - authorized-exclusion-audit
   - dynamic-source-binding-reference-evidence

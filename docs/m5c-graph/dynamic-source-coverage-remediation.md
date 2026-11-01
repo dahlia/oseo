@@ -1,7 +1,7 @@
 B19/B20/B30 dynamic-source coverage remediation
 ===============================================
 
-The umbrella now owns 136 paths. The child sections below give each move. In
+The umbrella now owns 88 paths. The child sections below give each move. In
 bundle 3, the residual evidence candidate accounted for 17 of the 209 paths it
 owned then. The assessment keeps two of its 19 selected paths here; the other
 190 are outside that bounded child.
@@ -716,4 +716,4 @@ attempt for exactly 48 umbrella paths that test eval code itself, as
 pins them. Root's 2026-11-02 rulings send 32 of them to the existing ADR 0016
 `eval-semantics` exclusion and close the other 16, including the two
 *S11.13.1\_A6* assignment rows, with static replacement evidence. No path is
-deferred.
+deferred, and the umbrella owns 88 paths.
