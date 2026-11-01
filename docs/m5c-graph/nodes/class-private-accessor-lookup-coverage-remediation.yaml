@@ -30,5 +30,5 @@ delivers: "Resolves exactly 4 mixed-coverage class paths. The two
   batch11's exact 1199-path reservation and first admission authority."
 dependencies:
   - annexb-legacy-lookup-dependency-classification
-landed: false
+landed: true
 status: ready

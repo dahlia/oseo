@@ -4,12 +4,14 @@ title: Audit the M5 exit condition
 delivers: Verifies that the manifest covers all 41,091 applicable paths, that
   failures, remediation-owned and unowned unsupported results are zero, that
   authorized exclusions are bounded, and that every ADR 0031 named deferral
-  has a fresh reviewed entry with its reason, remaining contract and target
-  milestone, after mailing the maintainer the deferral summary of total path
+  has a fresh reviewed entry with its reason, remaining contract and the
+  milestone or deferred track that inherits it, after mailing the maintainer
+  the complete docs/m5c-closure/deferrals.yaml with a summary of total path
   count, per-family counts, each distinct reason with its count, and target
-  milestones. Reports exclusions and deferrals separately
-  and verifies that the reproducible coverage report and all required gates
-  pass without claiming unqualified ECMA-262 conformance.
+  milestones that flags every entry outside the dynamic source family.
+  Reports exclusions and deferrals separately and verifies that the
+  reproducible coverage report and all required gates pass without claiming
+  unqualified ECMA-262 conformance.
 dependencies:
   - annexb-proto-dependency-classification
   - array-generated-property-cost-remediation
@@ -71,6 +73,7 @@ dependencies:
   - iterator-helpers
   - iterator-helpers-tag-activation
   - iterator-next-callability
+  - m5c-deferral-ledger-checker
   - m5c-named-deferral-policy
   - minor-feature-tag-admission
   - module-export-forms

@@ -54,6 +54,15 @@ export const m5cObservationOwner = "observation";
  */
 export const m5cUnassignedOwner = "unassigned";
 
+/**
+ * Owner of a reviewed unsupported path named in the ADR 0031 deferral list.
+ * The path stays open after M5 and is neither closed nor excluded.
+ */
+export const m5cDeferredOwner = "deferred";
+
+/** Checked-in ADR 0031 deferral list, keyed by inventory path. */
+export const m5cDeferralsPath = "docs/m5c-closure/deferrals.yaml";
+
 /** Graph node that owns unreviewed paths until it partitions them. */
 export const m5cUnreviewedDefaultNode = "observation-batch-plan";
 
@@ -76,6 +85,7 @@ const ownerAssignableStates: ReadonlySet<M5cLedgerState> = new Set([
 ]);
 const headerKeys: ReadonlySet<string> = new Set([
   "closedPaths",
+  "deferredPaths",
   "inventoryPaths",
   "openPaths",
   "owners",
@@ -89,6 +99,13 @@ const defaultOwnerNotes: ReadonlyMap<string, string> = new Map([
     "Absent from the reviewed manifest. The observation-batch-plan node " +
       "partitions these paths into deterministic observation batches; no " +
       "classification is assumed before a batch observes them.",
+  ],
+  [
+    m5cDeferredOwner,
+    "Reviewed unsupported paths named in docs/m5c-closure/deferrals.yaml " +
+      "under ADR 0031. Each entry gives the reason, the remaining " +
+      "contract, and the milestone after M5 that inherits the path. They " +
+      "stay open and are counted neither as closed nor as excluded.",
   ],
   [
     m5cObservationOwner,
@@ -121,9 +138,10 @@ export interface M5cLedgerEntry {
   /** Derived state; never edited by hand. */
   readonly state: M5cLedgerState;
   /**
-   * `observation`, `unassigned`, `node:<id>` naming a graph node, or
+   * `observation`, `unassigned`, `node:<id>` naming a graph node,
    * `adr:<stem>` naming the accepted record *docs/adr/<stem>.md* that
-   * explicitly authorizes and bounds an M5 exclusion of an unsupported path.
+   * explicitly authorizes and bounds an M5 exclusion of an unsupported path,
+   * or `deferred` for an unsupported path with an ADR 0031 deferral entry.
    */
   readonly owner: string;
   /**
@@ -162,6 +180,8 @@ export interface M5cLedgerStateCounts {
 
 /** Counts reported by a valid ledger. */
 export interface M5cLedgerSummary extends M5cLedgerStateCounts {
+  /** Paths with the `deferred` owner, reported apart from closed paths. */
+  readonly deferredPaths: number;
   /** Path count per owner in code-unit order. */
   readonly owners: ReadonlyMap<string, number>;
 }
@@ -193,6 +213,11 @@ interface ParsedLedger {
 export interface M5cLedgerOwnerTargets {
   /** File stems of accepted records under *docs/adr/*. */
   readonly acceptedRecords: ReadonlySet<string>;
+  /**
+   * Paths with an entry in *docs/m5c-closure/deferrals.yaml*. Absent means
+   * that no path may take the `deferred` owner.
+   */
+  readonly deferredPaths?: ReadonlySet<string>;
   /** IDs of the checked-in M5c graph nodes. */
   readonly nodeIds: ReadonlySet<string>;
 }
@@ -250,14 +275,23 @@ function defaultOwner(state: M5cLedgerState): string {
  * Explain why an owner cannot own a path in a state, or return undefined.
  * Closed states belong to their observation, unreviewed paths to a graph
  * node, and reviewed open states to a node or explicitly to nobody yet. Only
- * an unsupported path may cite an authorizing record: a failure is a defect
- * to repair, never an exclusion.
+ * an unsupported path may cite an authorizing record or be deferred: a
+ * failure is a defect to repair, never an exclusion or a deferral.
  */
 function ownerProblem(
+  path: string,
   state: M5cLedgerState,
   owner: string,
   targets: M5cLedgerOwnerTargets,
 ): string | undefined {
+  if (owner === m5cDeferredOwner) {
+    if (state !== "unsupported-profile-feature") {
+      return `cannot defer a ${state} path`;
+    }
+    return targets.deferredPaths?.has(path) === true
+      ? undefined
+      : `needs an entry in ${m5cDeferralsPath}`;
+  }
   const node = ownerNode(owner);
   if (node != null && !targets.nodeIds.has(node)) {
     return `names unknown M5c graph node ${node}`;
@@ -286,7 +320,7 @@ function ownerProblem(
     if (node != null || owner === m5cUnassignedOwner) return undefined;
     const forms =
       state === "unsupported-profile-feature"
-        ? "a node: or adr: owner"
+        ? "a node:, adr:, or deferred owner"
         : "a node: owner";
     return `must be ${m5cUnassignedOwner} or ${forms} for a ${state} path`;
   }
@@ -369,7 +403,7 @@ export function deriveM5cClosureLedger(
       const owner =
         earlier != null &&
         earlier.state === state &&
-        ownerProblem(state, earlier.owner, targets) == null
+        ownerProblem(path, state, earlier.owner, targets) == null
           ? earlier.owner
           : defaultOwner(state);
       return { owner, path, prerequisites, state };
@@ -414,6 +448,7 @@ export function summarizeM5cClosureLedger(
   }
   return {
     ...countStates(ledger.entries),
+    deferredPaths: owners.get(m5cDeferredOwner) ?? 0,
     owners: new Map(
       [...owners.entries()].toSorted(([left], [right]) =>
         compareCodeUnits(left, right),
@@ -445,6 +480,7 @@ export function serializeM5cClosureLedger(ledger: M5cClosureLedger): string {
       inventoryPaths: summary.inventoryPaths,
       closedPaths: summary.closedPaths,
       openPaths: summary.openPaths,
+      deferredPaths: summary.deferredPaths,
       states: Object.fromEntries(summary.states),
       owners,
     },
@@ -504,7 +540,15 @@ export function parseM5cClosureLedger(text: string): ParsedLedger {
     });
   }
   const header = record(headerValue, "M5c closure ledger header");
-  requireExactKeys(header, headerKeys, "M5c closure ledger header");
+  // A ledger written before ADR 0031 lacks deferredPaths. Parsing admits it
+  // so that the update can migrate it; validation still requires the count.
+  requireExactKeys(
+    header,
+    "deferredPaths" in header
+      ? headerKeys
+      : new Set([...headerKeys].filter((key) => key !== "deferredPaths")),
+    "M5c closure ledger header",
+  );
   if (header.version !== ledgerVersion) {
     throw new Error(`M5c closure ledger version must be ${ledgerVersion}.`);
   }
@@ -580,6 +624,7 @@ function validateHeaderCounts(
   header: StructuredDataRecord,
   expected: M5cLedgerStateCounts,
   owners: ReadonlyMap<string, number>,
+  deferredPaths: number,
 ): void {
   const context = "M5c closure ledger";
   for (const key of ["closedPaths", "inventoryPaths", "openPaths"] as const) {
@@ -590,6 +635,13 @@ function validateHeaderCounts(
           `${expected[key]}.`,
       );
     }
+  }
+  const deferred = countValue(header.deferredPaths, `${context} deferredPaths`);
+  if (deferred !== deferredPaths) {
+    throw new Error(
+      `${context} deferredPaths is ${deferred} but entries record ` +
+        `${deferredPaths}.`,
+    );
   }
   const states = record(header.states, `${context} states`);
   requireExactKeys(states, new Set(m5cLedgerStates), `${context} states`);
@@ -659,7 +711,7 @@ export function validateM5cClosureLedger(
           `the manifest dependencies [${expected.prerequisites.join(", ")}].`,
       );
     }
-    const problem = ownerProblem(entry.state, entry.owner, targets);
+    const problem = ownerProblem(entry.path, entry.state, entry.owner, targets);
     if (problem != null) {
       throw new Error(
         `M5c closure ledger owner ${entry.owner} of ${entry.path} ` +
@@ -686,7 +738,23 @@ export function validateM5cClosureLedger(
       );
     }
   }
-  validateHeaderCounts(header, countStates(derived.entries), summary.owners);
+  const owners = new Map(
+    ledger.entries.map((entry) => [entry.path, entry.owner]),
+  );
+  for (const path of targets.deferredPaths ?? []) {
+    if (owners.get(path) !== m5cDeferredOwner) {
+      throw new Error(
+        `M5c closure ledger needs the ${m5cDeferredOwner} owner for ` +
+          `deferral entry ${path}.`,
+      );
+    }
+  }
+  validateHeaderCounts(
+    header,
+    countStates(derived.entries),
+    summary.owners,
+    summary.deferredPaths,
+  );
   if (serializeM5cClosureLedger(ledger) !== text) {
     throw new Error(
       "M5c closure ledger is not in canonical order or layout; run " +
@@ -738,12 +806,35 @@ export function readCurrentAcceptedRecords(): ReadonlySet<string> {
   );
 }
 
+/**
+ * Read the paths of a deferral list. Only the keys matter here; the deferral
+ * checker validates every entry against its evidence.
+ */
+export function parseM5cDeferralPaths(text: string): ReadonlySet<string> {
+  // SAFETY: record validates the parsed document and its paths section.
+  const document = record(
+    parseYaml(text) as StructuredDataInput,
+    "M5c deferral list",
+  );
+  return new Set(
+    Object.keys(record(document.paths, "M5c deferral list paths")),
+  );
+}
+
+/** Read the paths of the checked-in deferral list. */
+export function readCurrentM5cDeferralPaths(): ReadonlySet<string> {
+  return parseM5cDeferralPaths(
+    readFileSync(join(repositoryRoot, m5cDeferralsPath), "utf8"),
+  );
+}
+
 function readCurrentInputs(): CurrentInputs {
   return {
     inventoryText: readFileSync(join(repositoryRoot, m5cInventoryPath), "utf8"),
     manifest: readCurrentM5cManifest(),
     targets: {
       acceptedRecords: readCurrentAcceptedRecords(),
+      deferredPaths: readCurrentM5cDeferralPaths(),
       nodeIds: readCurrentM5cNodeIds(),
     },
   };
@@ -786,7 +877,8 @@ function describe(summary: M5cLedgerSummary): string {
     .join(" ");
   return (
     `paths=${summary.inventoryPaths} closed=${summary.closedPaths} ` +
-    `open=${summary.openPaths}\nstates: ${states}\nowners: ${owners}`
+    `open=${summary.openPaths} deferred=${summary.deferredPaths}\n` +
+    `states: ${states}\nowners: ${owners}`
   );
 }
 

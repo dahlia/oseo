@@ -7931,8 +7931,12 @@ M5 is complete only when:
     remains inside that inventory. An unsupported result is recorded rather
     than closed when an accepted record explicitly authorizes an M5 exclusion
     and bounds its surface, under
-    [ADR 0019](./docs/adr/0019-m5-claim-closure.md). The unqualified
-    conformance label is a separate later gate under that same record;
+    [ADR 0019](./docs/adr/0019-m5-claim-closure.md). An unsupported result
+    named in the [ADR 0031](./docs/adr/0031-m5-named-deferral.md) deferral
+    list with its reason, remaining contract, and inheriting milestone or
+    deferred track is reported separately, never as a pass, an exclusion, or
+    a closure. The unqualified conformance label is a separate later gate
+    under ADR 0019 and also requires the deferral list to be empty;
  -  every admitted syntax and built-in has generic semantics, negative cases,
     collector coverage, and source-located diagnostics;
  -  module, promise, asynchronous, and scheduler tests exercise the expanded

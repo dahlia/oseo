@@ -1,7 +1,7 @@
 B19/B20/B30 dynamic-source coverage remediation
 ===============================================
 
-The umbrella now owns 162 paths. The child sections below give each move. In
+The umbrella now owns 136 paths. The child sections below give each move. In
 bundle 3, the residual evidence candidate accounted for 17 of the 209 paths it
 owned then. The assessment keeps two of its 19 selected paths here; the other
 190 are outside that bounded child.
@@ -627,12 +627,14 @@ zero directly owned paths before its own landing.
 Static-specifier import design child
 ------------------------------------
 
-Item 3 of the 2026-11-01 maintainer answer adds the design-only
-`static-specifier-import-design` node for exactly 20 paths: 19 DS-12
-module-loading-and-promises rows and DS-8's *usage-from-eval.js*. Its pinned
-selector and authority are in that child's work note. The node designs the
-build-time-resolvable literal `import()` track and drafts a Proposed ADR 0016
-amendment; it moves no owner. The umbrella retains all 20 paths.
+The design-only `static-specifier-import-design` node covers exactly 20
+paths: 19 DS-12 module-loading-and-promises rows and DS-8's
+*usage-from-eval.js*. Its pinned selector and authority are in that child's
+work note. The maintainer deferred the build-time-resolvable literal
+`import()` track past M5; its reviewed design is the post-M5 plan under
+*PLAN-DYN.md*, and its ADR 0016 amendment stays Proposed. The umbrella
+retains all 20 paths until ADR 0031 deferral entries, with *PLAN-DYN.md* as
+`targetMilestone`, take them over.
 
 
 Host Script evidence child
@@ -686,5 +688,20 @@ child's work note. Ownership moves only with reviewed closure; the umbrella
 retains every remaining path and requires child landing plus zero directly
 owned paths before its own landing.
 
-The child accounts for all 98 under ADR 0016, so with the other children
-the umbrella owns 162 paths.
+The child accounts for all 98 under ADR 0016.
+
+
+Named deferral
+--------------
+
+The `m5c-deferral-ledger-checker` node moves 26 paths to the `deferred`
+owner under [ADR 0031](../adr/0031-m5-named-deferral.md). Twenty are the
+static-specifier import rows of
+[*static-specifier-import-design.md*](./static-specifier-import-design.md).
+The other six observe their contract only through a run-time var
+declaration by direct eval or through the Function constructor: the two
+parameter-expression environment probes, the for-in, for-of, and catch
+variable-environment probes, and *subclass-Function.js*.
+[*docs/m5c-closure/deferrals.yaml*](../m5c-closure/deferrals.yaml) gives each
+path's remaining contract and reason. With this move the umbrella owns 136
+paths.

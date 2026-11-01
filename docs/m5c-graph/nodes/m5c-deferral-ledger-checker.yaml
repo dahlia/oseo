@@ -1,0 +1,15 @@
+version: 1
+id: m5c-deferral-ledger-checker
+title: Check ADR 0031 named deferrals in the closure ledger
+delivers: >-
+  Adds docs/m5c-closure/deferrals.yaml with its check, the deferred owner
+  kind in tools/m5c-closure-ledger.ts and the deferral disposition in
+  tools/m5c-exclusion-audit.ts, with a test for each rejection, so that a
+  reviewed ADR 0031 entry can defer an unsupported path. The check verifies
+  that targetMilestone names a ROADMAP.md milestone after M5 or the plan of
+  a deferred ROADMAP.md track. Scope is recorded in
+  docs/m5c-graph/m5c-deferral-ledger-checker.md.
+dependencies:
+  - m5c-named-deferral-policy
+landed: true
+status: ready

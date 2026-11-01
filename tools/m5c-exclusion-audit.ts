@@ -29,6 +29,8 @@ const auditPath = "docs/m5c-closure/exclusion-audit.yaml";
 const dynamicOwner = "adr:0016-dynamic-source-boundary";
 const annexOwner = "adr:0013-m5-edition-and-manifest";
 const remediationOwner = "node:dynamic-source-coverage-remediation";
+/** Ledger owner of a path named in the ADR 0031 deferral list. */
+const deferredOwner = "deferred";
 /**
  * Paths whose only Annex B dependence sits behind the eval rejection they
  * observe. The maintainer decision of 2026-11-01 applied item 3 of the
@@ -72,6 +74,19 @@ const annexProtoRejection = new RegExp(
  */
 const lookupRemediationOwner =
   "node:class-private-accessor-lookup-coverage-remediation";
+/**
+ * Class expression paths whose only Annex B subject is the legacy lookup
+ * call. The maintainer decision of 2026-11-01 applied item 3 of the
+ * 2026-10-28 decision to exactly these two: the public-absence replacement
+ * fixtures witness every core subject. The class declaration paths of the
+ * same shape keep the lookup remediation owner. ADR 0013 is unchanged.
+ */
+export const m5cAnnexLookupClosedPaths: ReadonlySet<string> = new Set([
+  "test/language/expressions/class/elements/" +
+    "private-getter-is-not-a-own-property.js",
+  "test/language/expressions/class/elements/" +
+    "private-setter-is-not-a-own-property.js",
+]);
 const annexLookupRejection = new RegExp(
   "error\\[OSEO1001\\]: The Object\\.prototype\\." +
     "(__lookupGetter__|__lookupSetter__) method is excluded by the M5 " +
@@ -290,6 +305,70 @@ export function legacyCallerSelector(record: string): ReadonlySet<string> {
   return new Set(paths);
 }
 
+/** Record surfaces an unsupported observation falls on. */
+interface RecordSurfaces {
+  /** Process stderr, or the whole detail of a direct rejection. */
+  readonly accessorDetail: string;
+  readonly annexSurface: boolean;
+  readonly callerSurface: boolean;
+  readonly dynamicSurface: boolean;
+}
+
+/**
+ * Find the accepted record surfaces an observation's rejection falls on. The
+ * legacy lookup rejection is read from `accessorDetail` by the caller.
+ */
+function recordSurfaces(result: Test262Result, source: string): RecordSurfaces {
+  const detail = result.observation.detail ?? "";
+  // Process observations quote stderr separately. Text printed to stdout
+  // cannot authorize the new accessor surface. Direct diagnostic fixtures
+  // and non-process rejections have no such wrapper.
+  const stderrStart = detail.lastIndexOf('stderr="');
+  const accessorDetail = (
+    stderrStart < 0
+      ? detail
+      : detail.slice(
+          stderrStart + 'stderr="'.length,
+          detail.endsWith('"') ? -1 : undefined,
+        )
+  ).replace(/(?:\r?\n|\\n)+$/u, "");
+  const dynamicSurface =
+    detail.includes("error[OSEO1001]:") &&
+    ((detail.includes("Unknown binding 'eval'.") &&
+      hasEvalCall(source, result.case.mode)) ||
+      dynamicImportRejection.test(detail) ||
+      detail.includes("The Function constructor requires dynamic source") ||
+      // The run-time boundary of each realm's source-compiling
+      // constructors and of %eval% called with a String (ADR 0027).
+      [
+        "AsyncGeneratorFunction",
+        "AsyncFunction",
+        "GeneratorFunction",
+        "Function",
+        "eval",
+      ].some((name) =>
+        detail.includes(`${name} compiles source text at run time`),
+      ));
+  const annexSurface =
+    (detail.includes("error[OSEO1001]:") &&
+      detail.includes(
+        "A named backreference in a pattern that declares no group name " +
+          "is admitted only by Annex B",
+      )) ||
+    annexProtoRejection.test(accessorDetail);
+  // The frontmatter check runs before compilation, so caller must be the
+  // only unadmitted feature: another one would hide work behind this
+  // record. The observation digest binds the remaining fields.
+  const callerSurface =
+    detail === callerRejectionDetail &&
+    result.unsupportedFeatures.length === 1 &&
+    result.unsupportedFeatures[0] === "caller" &&
+    result.case.features.includes("caller") &&
+    result.case.flags.includes("noStrict") &&
+    hasCallerRead(source, result.case.mode);
+  return { accessorDetail, annexSurface, callerSurface, dynamicSurface };
+}
+
 /** Inputs are explicit so regression tests need no corpus execution. */
 export interface M5cExclusionAuditInputs {
   /** Exact separately accepted dynamic attribute reservation. */
@@ -301,6 +380,11 @@ export interface M5cExclusionAuditInputs {
    * checked-in audit passes `m5cAnnexDynamicResiduePaths`.
    */
   readonly annexDynamicResiduePaths?: ReadonlySet<string>;
+  /**
+   * Exact ADR 0013 exclusions over a legacy lookup rejection; absent means
+   * none. The checked-in audit passes `m5cAnnexLookupClosedPaths`.
+   */
+  readonly annexLookupClosedPaths?: ReadonlySet<string>;
   readonly ledger: M5cClosureLedger;
   readonly results: readonly Test262Result[];
   readonly records: ReadonlyMap<string, string>;
@@ -309,10 +393,14 @@ export interface M5cExclusionAuditInputs {
   readonly replacementEvidence?: ReadonlyMap<string, string>;
 }
 
-/** Counts distinguish authorized rejection from unresolved subject coverage. */
+/**
+ * Counts distinguish authorized rejection from unresolved subject coverage,
+ * and both from audited paths that ADR 0031 defers past M5.
+ */
 export interface M5cExclusionAuditSummary {
   readonly exclusions: number;
   readonly remediation: number;
+  readonly deferrals: number;
   readonly missingDynamicTags: number;
 }
 
@@ -399,6 +487,7 @@ export function validateM5cExclusionAudit(
   const seen = new Set<string>();
   let exclusions = 0;
   let remediation = 0;
+  let deferrals = 0;
   let missingDynamicTags = 0;
   let previous = "";
   for (const value of audit.paths) {
@@ -468,7 +557,8 @@ export function validateM5cExclusionAudit(
       throw new Error(`Audit needs the exact ADR 0028 selector: ${path}.`);
     }
     const excluded = assessment.disposition === "exclusion";
-    if (!excluded && assessment.disposition !== "remediation") {
+    const deferred = assessment.disposition === "deferral";
+    if (!excluded && !deferred && assessment.disposition !== "remediation") {
       throw new Error(`Audit needs a disposition: ${path}.`);
     }
     if (callerPath && !excluded) {
@@ -477,6 +567,13 @@ export function validateM5cExclusionAudit(
     if (excluded && assessment.normativeDependency === "not-demonstrated") {
       throw new Error(
         `Unresolved subject coverage cannot keep an ADR: ${path}.`,
+      );
+    }
+    // ADR 0031 defers only a path no accepted record authorizes excluding,
+    // so every other dependency assessment calls for the exclusion instead.
+    if (deferred && assessment.normativeDependency !== "not-demonstrated") {
+      throw new Error(
+        `An authorized exclusion surface cannot be deferred: ${path}.`,
       );
     }
     if (
@@ -506,54 +603,9 @@ export function validateM5cExclusionAudit(
     ) {
       throw new Error(`Audit observation changed: ${path}.`);
     }
-    const detail = result.observation.detail ?? "";
-    // Process observations quote stderr separately. Text printed to stdout
-    // cannot authorize the new accessor surface. Direct diagnostic fixtures
-    // and non-process rejections have no such wrapper.
-    const stderrStart = detail.lastIndexOf('stderr="');
-    const accessorDetail = (
-      stderrStart < 0
-        ? detail
-        : detail.slice(
-            stderrStart + 'stderr="'.length,
-            detail.endsWith('"') ? -1 : undefined,
-          )
-    ).replace(/(?:\r?\n|\\n)+$/u, "");
-    const dynamicSurface =
-      detail.includes("error[OSEO1001]:") &&
-      ((detail.includes("Unknown binding 'eval'.") &&
-        hasEvalCall(source, result.case.mode)) ||
-        dynamicImportRejection.test(detail) ||
-        detail.includes("The Function constructor requires dynamic source") ||
-        // The run-time boundary of each realm's source-compiling
-        // constructors and of %eval% called with a String (ADR 0027).
-        [
-          "AsyncGeneratorFunction",
-          "AsyncFunction",
-          "GeneratorFunction",
-          "Function",
-          "eval",
-        ].some((name) =>
-          detail.includes(`${name} compiles source text at run time`),
-        ));
-    const annexSurface =
-      (detail.includes("error[OSEO1001]:") &&
-        detail.includes(
-          "A named backreference in a pattern that declares no group name " +
-            "is admitted only by Annex B",
-        )) ||
-      annexProtoRejection.test(accessorDetail);
+    const { accessorDetail, annexSurface, callerSurface, dynamicSurface } =
+      recordSurfaces(result, source);
     const lookupMethod = annexLookupRejection.exec(accessorDetail)?.[1];
-    // The frontmatter check runs before compilation, so caller must be the
-    // only unadmitted feature: another one would hide work behind this
-    // record. The observation digest binds the remaining fields.
-    const callerSurface =
-      detail === callerRejectionDetail &&
-      result.unsupportedFeatures.length === 1 &&
-      result.unsupportedFeatures[0] === "caller" &&
-      result.case.features.includes("caller") &&
-      result.case.flags.includes("noStrict") &&
-      hasCallerRead(source, result.case.mode);
     // An ADR 0013 row may stand over the eval rejection only in the exact
     // residue selector, only as a bound annex-b-only exclusion, and every
     // selector path must be such a row.
@@ -590,12 +642,31 @@ export function validateM5cExclusionAudit(
     }
     if (missingTag) missingDynamicTags += 1;
     const annexRemediationOwner = assessment.remediationOwner;
+    // A legacy lookup row may be an exclusion only in the exact closure
+    // selector, only as a bound annex-b-only exclusion, and every selector
+    // path must be such a row.
+    const lookupClosed = inputs.annexLookupClosedPaths?.has(path) ?? false;
+    if (
+      lookupClosed !==
+      (lookupMethod != null &&
+        proposedOwner === annexOwner &&
+        excluded &&
+        assessment.normativeDependency === "annex-b-only" &&
+        assessment.replacementEvidence != null &&
+        annexRemediationOwner == null)
+    ) {
+      throw new Error(
+        `Audit needs the exact legacy lookup closure selector: ${path}.`,
+      );
+    }
     if (lookupMethod != null) {
-      // A rejected optional observer never closes its in-claim subject.
+      // Outside the selector, a rejected optional observer never closes its
+      // in-claim subject.
       if (
-        proposedOwner !== annexOwner ||
-        excluded ||
-        annexRemediationOwner !== lookupRemediationOwner
+        !lookupClosed &&
+        (proposedOwner !== annexOwner ||
+          excluded ||
+          annexRemediationOwner !== lookupRemediationOwner)
       ) {
         throw new Error(
           `Audit needs the legacy lookup remediation owner: ${path}.`,
@@ -613,6 +684,7 @@ export function validateM5cExclusionAudit(
     }
     if (
       !excluded &&
+      !deferred &&
       proposedOwner === annexOwner &&
       annexRemediationOwner !== lookupRemediationOwner &&
       (!isString(annexRemediationOwner) ||
@@ -669,15 +741,20 @@ export function validateM5cExclusionAudit(
         `Audit needs the exact dynamic attribute reservation: ${path}.`,
       );
     }
+    // A deferral is neither an exclusion nor remediation. The deferral
+    // checker binds the ledger owner to its ADR 0031 entry.
     const owner = excluded
       ? proposedOwner
-      : proposedOwner === annexOwner
-        ? annexRemediationOwner
-        : remediationOwner;
+      : deferred
+        ? deferredOwner
+        : proposedOwner === annexOwner
+          ? annexRemediationOwner
+          : remediationOwner;
     if (entry.owner !== owner) {
       throw new Error(`Audit requires owner ${owner} for ${path}.`);
     }
     if (excluded) exclusions += 1;
+    else if (deferred) deferrals += 1;
     else remediation += 1;
   }
   for (const entry of inputs.ledger.entries) {
@@ -691,6 +768,31 @@ export function validateM5cExclusionAudit(
     ) {
       throw new Error(
         `Ledger owner has no reviewed exclusion audit: ${entry.path}.`,
+      );
+    }
+  }
+  // ADR 0031 lets a deferral skip the audit only when no accepted record
+  // could exclude the path, so a deferred path whose rejection falls on a
+  // record surface keeps its row whatever its owner history.
+  for (const entry of inputs.ledger.entries) {
+    if (entry.owner !== deferredOwner || seen.has(entry.path)) continue;
+    const result = results.get(entry.path);
+    const source = inputs.sources.get(entry.path);
+    if (result == null || source == null) {
+      throw new Error(
+        `Deferred path lacks its observation or source: ${entry.path}.`,
+      );
+    }
+    const surfaces = recordSurfaces(result, source);
+    if (
+      surfaces.dynamicSurface ||
+      surfaces.annexSurface ||
+      surfaces.callerSurface ||
+      annexLookupRejection.test(surfaces.accessorDetail)
+    ) {
+      throw new Error(
+        `Deferred path on a record surface needs its audit row: ` +
+          `${entry.path}.`,
       );
     }
   }
@@ -716,6 +818,13 @@ export function validateM5cExclusionAudit(
       );
     }
   }
+  for (const closed of inputs.annexLookupClosedPaths ?? []) {
+    if (!seen.has(closed)) {
+      throw new Error(
+        `Legacy lookup closure selector lacks its audit row: ${closed}.`,
+      );
+    }
+  }
   for (const reserved of inputs.importAttributesDynamicPaths ?? []) {
     if (!seen.has(reserved)) {
       throw new Error(
@@ -723,7 +832,7 @@ export function validateM5cExclusionAudit(
       );
     }
   }
-  return { exclusions, remediation, missingDynamicTags };
+  return { exclusions, remediation, deferrals, missingDynamicTags };
 }
 
 /** Check the audit against pinned source and checked-in observations. */
@@ -768,9 +877,18 @@ export function validateCurrentM5cExclusionAudit(): M5cExclusionAuditSummary {
   }
   if (!Array.isArray(audit.paths))
     throw new Error("Audit paths must be an array.");
-  for (const value of audit.paths) {
-    const row = parsedObject(value, "audit path");
-    const path = string(row.path, "audit path");
+  const ledger = parseM5cClosureLedger(
+    readFileSync(join(repositoryRoot, m5cClosureLedgerPath), "utf8"),
+  ).ledger;
+  const deferredPaths = ledger.entries
+    .filter((entry) => entry.owner === deferredOwner)
+    .map((entry) => entry.path);
+  for (const path of [
+    ...audit.paths.map((value) =>
+      string(parsedObject(value, "audit path").path, "audit path"),
+    ),
+    ...deferredPaths,
+  ]) {
     if (
       !/^test\/(?:built-ins|language)\/[A-Za-z0-9_./-]+\.js$/u.test(path) ||
       path.split("/").includes("..")
@@ -781,13 +899,12 @@ export function validateCurrentM5cExclusionAudit(): M5cExclusionAuditSummary {
   }
   return validateM5cExclusionAudit(text, {
     annexDynamicResiduePaths: m5cAnnexDynamicResiduePaths,
+    annexLookupClosedPaths: m5cAnnexLookupClosedPaths,
     importAttributesDynamicPaths: readImportAttributesReservation(),
     legacyCallerPaths: readLegacyCallerSelector(
       recordSources.get(callerRecordStem) ?? "",
     ),
-    ledger: parseM5cClosureLedger(
-      readFileSync(join(repositoryRoot, m5cClosureLedgerPath), "utf8"),
-    ).ledger,
+    ledger,
     results: readCurrentM5cManifest().results,
     records: recordSources,
     sources,
@@ -834,6 +951,7 @@ if (entry != null && resolve(entry) === fileURLToPath(import.meta.url)) {
   console.log(
     `m5c-exclusion-audit passed exclusions=${summary.exclusions} ` +
       `remediation=${summary.remediation} ` +
+      `deferrals=${summary.deferrals} ` +
       `missing-dynamic-tags=${summary.missingDynamicTags}`,
   );
 }
