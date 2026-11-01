@@ -1,0 +1,449 @@
+version: 1
+base: bc8e3a93ec4a03d4cd23d5d1d39f43bb4b1a0d1b
+suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+pathSetDigest: 54903b18184f53cb5b39d11a07358495b5d7c573922ed2c6e45e0107cc140b24
+assessed: 24
+closed: 6
+deferred: 18
+evidenceAdded:
+  nativeWitnesses: 6
+paths:
+  - path: "test/language/eval-code/direct/arrow-fn-body-cntns-arguments-func-de\
+      cl-arrow-func-declare-arguments-assign-incl-def-param-arrow-arguments.js"
+    section: sec-evaldeclarationinstantiation
+    subject: Declare "arguments" and assign to it in direct eval code
+      (Declare |arguments| when the function body contains an
+      |arguments| function declaration.)
+    sourceDigest: "0ffff8e2ef3adc4c98d6c8da624872c513636f6acbd49bce4943ba0d01fe\
+      0026"
+    observationDigest: "807390aff14927b1dcfaed7ee6e10ea033bac8e1e06439b150276a5\
+      16a3149a6"
+    disposition: exclusion
+    witness: ds9-arguments-func-decl-closure
+    evidence:
+      - tests/scope-arguments-native.test.ts
+      - tests/native/fixtures/scope-arguments-evidence.ts
+    reason: The witness keeps the arrow's parameter default and its
+      function-valued body declaration function arguments() {} read
+      through typeof, the counter reaching 1 and the unchanged
+      globalThis.arguments; its default-parameter closure q() reads
+      "param" from a binding outside the parameter and body
+      environments, as the eval-created binding is. Only the eval
+      declaration of arguments in the parameter default remains.
+  - path: "test/language/eval-code/direct/arrow-fn-body-cntns-arguments-func-de\
+      cl-arrow-func-declare-arguments-assign.js"
+    section: sec-evaldeclarationinstantiation
+    subject: Declare "arguments" and assign to it in direct eval code
+      (Declare |arguments| when the function body contains an
+      |arguments| function declaration.)
+    sourceDigest: "b4c5fc945ea60524c3e45986a7412bcf298b98eeb01348a8023b3a47f6b4\
+      c6a9"
+    observationDigest: "a7313053eeab727cd4e39f6b12ed059b0a82a4c43c0453969a62dfe\
+      94fdf4e4a"
+    disposition: exclusion
+    witness: ds9-arguments-func-decl
+    evidence:
+      - tests/scope-arguments-native.test.ts
+      - tests/native/fixtures/scope-arguments-evidence.ts
+    reason: The witness keeps the arrow's parameter default and its
+      function-valued body declaration function arguments() {} read
+      through typeof, the counter reaching 1 and the unchanged
+      globalThis.arguments. Only the eval declaration of arguments in
+      the parameter default remains.
+  - path: "test/language/eval-code/direct/arrow-fn-body-cntns-arguments-lex-bin\
+      d-arrow-func-declare-arguments-assign-incl-def-param-arrow-arguments.js"
+    section: sec-evaldeclarationinstantiation
+    subject: Declare "arguments" and assign to it in direct eval code
+      (Declare |arguments| when the function body contains an
+      |arguments| lexical binding.)
+    sourceDigest: "39f28f268b0c69aceb022bef74c2575daedc4781fef447a6702c688ef916\
+      e8b2"
+    observationDigest: "5a1064ec822476aeb9a4cfc44943763cc09092b4e3bf6e1f672a946\
+      90bb777ee"
+    disposition: exclusion
+    witness: ds9-arguments-lex-bind-closure
+    evidence:
+      - tests/scope-arguments-native.test.ts
+      - tests/native/fixtures/scope-arguments-evidence.ts
+    reason: The witness keeps the arrow's parameter default and its lexical
+      body binding let arguments = "local", the counter reaching 1 and
+      the unchanged globalThis.arguments; its default-parameter closure
+      q() reads "param" from a binding outside the parameter and body
+      environments, as the eval-created binding is. Only the eval
+      declaration of arguments in the parameter default remains.
+  - path: "test/language/eval-code/direct/arrow-fn-body-cntns-arguments-lex-bin\
+      d-arrow-func-declare-arguments-assign.js"
+    section: sec-evaldeclarationinstantiation
+    subject: Declare "arguments" and assign to it in direct eval code
+      (Declare |arguments| when the function body contains an
+      |arguments| lexical binding.)
+    sourceDigest: "177cb04c0178b869aff8374c4c1454455740fcffce0eda3ec8a24c8cf471\
+      3270"
+    observationDigest: "e0e60177d4b3e3d864c305c89e47cc4c49f92c639726d5044e0ff3e\
+      320c9c842"
+    disposition: exclusion
+    witness: ds9-arguments-lex-bind
+    evidence:
+      - tests/scope-arguments-native.test.ts
+      - tests/native/fixtures/scope-arguments-evidence.ts
+    reason: The witness keeps the arrow's parameter default and its lexical
+      body binding let arguments = "local", the counter reaching 1 and
+      the unchanged globalThis.arguments. Only the eval declaration of
+      arguments in the parameter default remains.
+  - path: "test/language/eval-code/direct/arrow-fn-body-cntns-arguments-var-bin\
+      d-arrow-func-declare-arguments-assign-incl-def-param-arrow-arguments.js"
+    section: sec-evaldeclarationinstantiation
+    subject: Declare "arguments" and assign to it in direct eval code
+      (Declare |arguments| when the function body contains an
+      |arguments| var-binding.)
+    sourceDigest: "53c63ee086de34c0273a5d797aca2ef6749361678a5003524a35c9635f96\
+      53e2"
+    observationDigest: "e2ec86145c1e99f2304083224ff20346c18145b596ace5c90543d6a\
+      5c9347f88"
+    disposition: exclusion
+    witness: ds9-arguments-var-bind-closure
+    evidence:
+      - tests/scope-arguments-native.test.ts
+      - tests/native/fixtures/scope-arguments-evidence.ts
+    reason: The witness keeps the arrow's parameter default and its body var
+      arguments = "local", the counter reaching 1 and the unchanged
+      globalThis.arguments; its default-parameter closure q() reads
+      "param" from a binding outside the parameter and body
+      environments, as the eval-created binding is. Only the eval
+      declaration of arguments in the parameter default remains.
+  - path: "test/language/eval-code/direct/arrow-fn-body-cntns-arguments-var-bin\
+      d-arrow-func-declare-arguments-assign.js"
+    section: sec-evaldeclarationinstantiation
+    subject: Declare "arguments" and assign to it in direct eval code
+      (Declare |arguments| when the function body contains an
+      |arguments| var-binding.)
+    sourceDigest: "82ff133b39849ec8664517ebd8ccb6a5d18b709c8885902fba0a1800a2fd\
+      4346"
+    observationDigest: "b5388832c6b0a07c1443feb9d0148f050c5fb962848e52be42c9919\
+      c0acf57f4"
+    disposition: exclusion
+    witness: ds9-arguments-var-bind
+    evidence:
+      - tests/scope-arguments-native.test.ts
+      - tests/native/fixtures/scope-arguments-evidence.ts
+    reason: The witness keeps the arrow's parameter default and its body var
+      arguments = "local", the counter reaching 1 and the unchanged
+      globalThis.arguments. Only the eval declaration of arguments in
+      the parameter default remains.
+  - path: test/language/statements/for/scope-body-var-none.js
+    section: sec-for-statement-runtime-semantics-labelledevaluation
+    subject: No variable environment is created for each evaluation of the
+      statement body
+    sourceDigest: "f1e1b5089561ac4bad90677bee5735b1302ca93c0ebfb1e81eebc8dbfcd7\
+      0297"
+    observationDigest: "6b5dabaaf02b833e33f3c7121b8b82278c4080f8311040024969f24\
+      99f83bc96"
+    disposition: deferral
+    witness: null
+    remainingContract: Vars declared by direct eval in the for test and
+      increment expressions and a var in the body all land in the
+      enclosing variable environment, so closures created before the
+      statement and in the test, increment and body positions read 2 for
+      x, y and z.
+    reason: The body creates no variable environment, which only a run-time
+      var declaration inside the statement can show; replacing eval with
+      assignment does not distinguish the environments, as the reviewed
+      for-in assessment found.
+  - path: test/language/statements/for/scope-head-var-none.js
+    section: sec-for-statement-runtime-semantics-labelledevaluation
+    subject: No variable environment is created for the statement "head"
+    sourceDigest: "f980cdb9d3bc1ebdfc8cfa9c5dc8dd89e0534e8601377290c20b59ee4dc8\
+      9fb1"
+    observationDigest: "0548e5f243f6c9091e1990cf941d1debd8148a2e52b69a3edda4450\
+      c86d33666"
+    disposition: deferral
+    witness: null
+    remainingContract: "A var declared by direct eval in the for head
+      initializer lands in the enclosing variable environment: closures
+      created before the statement and in the test, increment and body
+      positions, and the following reference, all read 2."
+    reason: The head creates no variable environment, which only a run-time
+      var declaration inside the head can show; replacing eval with
+      assignment does not distinguish the environments, as the reviewed
+      for-in assessment found.
+  - path: test/language/statements/function/S13.2.2_A14.js
+    section: "Original es5id: 13.2.2_A14"
+    subject: Calling a function as a constructor after it has been declared
+      by eval
+    sourceDigest: "430f5fa5fdcbc69f280bdd32846e7160ee62543357c5ac9482a665e97ef8\
+      e88d"
+    observationDigest: "303060dad9dbb6e255b943200610d33ab48e667c16b4ecc4f72994e\
+      5465f6af6"
+    disposition: deferral
+    witness: null
+    remainingContract: A function declared by direct eval inside a
+      constructor body is callable from that body afterwards, so new
+      FACTORY() completes without throwing.
+    reason: The callee binding exists only because eval code declares it at
+      run time in the constructor's variable environment; a static
+      declaration is instantiated before the body runs, and no host
+      Script runs inside a function.
+  - path: test/language/statements/function/eval-var-scope-syntax-err.js
+    section: "sec-function-definitions-runtime-semantics-instantiatefunctionobj\
+      ect"
+    subject: sloppy direct eval in params introduces var (function
+      declaration in sloppy code)
+    sourceDigest: "794cb526b9757815d020a52fa99e711b9e62aae573caaf40dcbf8d84f3ce\
+      3581"
+    observationDigest: "582819c5c5426febd823df97cea93c5a2af69d6d75be91b9629b043\
+      6eae5c29f"
+    disposition: deferral
+    witness: null
+    remainingContract: Calling f(a = eval("var a = 42")) throws SyntaxError
+      before the body runs, so callCount stays 0.
+    reason: The SyntaxError comes from EvalDeclarationInstantiation while
+      the parameter initializer runs; a static var named after a
+      parameter is legal and throws nothing, and a static duplicate
+      binding is an early error before the call.
+  - path: test/language/statements/function/scope-body-lex-distinct.js
+    section: sec-functiondeclarationinstantiation
+    subject: Creation of new lexical environment (distinct from the variable
+      environment) for the function body outside of strict mode
+    sourceDigest: "6281b61286a9b75e8c9a505752dbe5b9f22dd41b1e36b859497c470fdfdb\
+      8290"
+    observationDigest: "7052e37f3c10736f48f62887cc2f3b3002016f278d1e424a2c9ec51\
+      6502d4d7e"
+    disposition: deferral
+    witness: null
+    remainingContract: Calling f, whose body declares let x and then runs
+      direct eval of var x, throws SyntaxError.
+    reason: The conflict is raised by EvalDeclarationInstantiation when the
+      function runs; the static spelling of a body var beside the let is
+      an early SyntaxError before any call, a different operation and
+      error phase.
+  - path: test/language/statements/function/scope-param-elem-var-close.js
+    section: sec-functiondeclarationinstantiation
+    subject: sloppy direct evals in params introduce vars
+    sourceDigest: "0330fd8c9e3256a87ccde36f778ed856fb18488fbdbab2042fde89839033\
+      04f2"
+    observationDigest: "d898433b80356cae99a3fd519fc65b7ddc41375fd0bed77a60fba88\
+      1a34ec3cc"
+    disposition: deferral
+    witness: null
+    remainingContract: A var x declared by direct eval in the first
+      parameter initializer shadows the outer x for closures from that
+      parameter, the next parameter and the body, which all read
+      'inside'.
+    reason: Only a var that direct eval declares while a parameter
+      initializer runs adds a binding to the environment the parameter
+      closures already captured. A static body var lives in the separate
+      body environment that parameter closures do not see, and a
+      parameter named x shadows the outer x before any initializer runs,
+      so neither reproduces the observation.
+  - path: test/language/statements/function/scope-param-elem-var-open.js
+    section: sec-functiondeclarationinstantiation
+    subject: sloppy direct evals in params introduce vars
+    sourceDigest: "315cd3fb3e2bbebe069f3a456e02b26201afd1be3ee06c0e77e87243265d\
+      a3fe"
+    observationDigest: "92d6fb229ef3316af2d3d051af1d15312fd21067a529d0288babd9d\
+      f8ff5c852"
+    disposition: deferral
+    witness: null
+    remainingContract: A var x declared by direct eval in the second
+      parameter initializer is visible to the closure the first
+      parameter created earlier and to the second's, which both read
+      'inside'.
+    reason: Only a var that direct eval declares while a parameter
+      initializer runs adds a binding to the environment the parameter
+      closures already captured. A static body var lives in the separate
+      body environment that parameter closures do not see, and a
+      parameter named x shadows the outer x before any initializer runs,
+      so neither reproduces the observation.
+  - path: test/language/statements/function/scope-param-rest-elem-var-close.js
+    section: sec-functiondeclarationinstantiation
+    subject: sloppy direct evals in params introduce vars
+    sourceDigest: "0d44e13829f555a5bf08327cbe639dbec1ec628144188e3de4ef2ea4965a\
+      2ef1"
+    observationDigest: "d3d48114e117e3dd11180a160e40bd23a042c4827786fcf6febb7c1\
+      92f79ebec"
+    disposition: deferral
+    witness: null
+    remainingContract: A var x declared by direct eval in a rest element
+      initializer shadows the outer x for closures from that element and
+      the body, which both read 'inside'.
+    reason: Only a var that direct eval declares while a parameter
+      initializer runs adds a binding to the environment the parameter
+      closures already captured. A static body var lives in the separate
+      body environment that parameter closures do not see, and a
+      parameter named x shadows the outer x before any initializer runs,
+      so neither reproduces the observation.
+  - path: test/language/statements/function/scope-param-rest-elem-var-open.js
+    section: sec-functiondeclarationinstantiation
+    subject: sloppy direct evals in params introduce vars
+    sourceDigest: "0c957877eea8f8791a82bb3f11c3ad218640382e27d751e8c4bc9146e6ee\
+      8373"
+    observationDigest: "98b361eaecba0041657e443857fb950e0856e3d1831386684d1d49b\
+      e47e93c99"
+    disposition: deferral
+    witness: null
+    remainingContract: A var x declared by direct eval in a rest element
+      initializer is visible to the closure the first parameter created
+      earlier and to the element's, which both read 'inside'.
+    reason: Only a var that direct eval declares while a parameter
+      initializer runs adds a binding to the environment the parameter
+      closures already captured. A static body var lives in the separate
+      body environment that parameter closures do not see, and a
+      parameter named x shadows the outer x before any initializer runs,
+      so neither reproduces the observation.
+  - path: test/language/statements/generators/eval-var-scope-syntax-err.js
+    section: "sec-generator-function-definitions-runtime-semantics-instantiatef\
+      unctionobject"
+    subject: sloppy direct eval in params introduces var (generator function
+      declaration in sloppy code)
+    sourceDigest: "68635098aab3060cec3a28b0409542a0360393a2b0aba6aedd7478f3a389\
+      7a07"
+    observationDigest: "c05ac54750e470cefa1ce3a108f1c744b05da9797e8344eab26ddc9\
+      b5e73f578"
+    disposition: deferral
+    witness: null
+    remainingContract: Calling generator f(a = eval("var a = 42")) throws
+      SyntaxError during parameter initialization, so callCount stays 0.
+    reason: The SyntaxError comes from EvalDeclarationInstantiation while
+      the parameter initializer runs; a static var named after a
+      parameter is legal and throws nothing, and a static duplicate
+      binding is an early error before the call.
+  - path: test/language/statements/generators/scope-body-lex-distinct.js
+    section: sec-functiondeclarationinstantiation
+    subject: Creation of new lexical environment (distinct from the variable
+      environment) for the function body outside of strict mode
+    sourceDigest: "a9d63b3d409b49fbad33999f9bd3d20ceeac4fddc7f83105e19c243ded93\
+      7bbb"
+    observationDigest: "1c4fc11048a5b0e5e625fd264b3a10a7ea5f37feb450713af21fd1d\
+      f04f25b66"
+    disposition: deferral
+    witness: null
+    remainingContract: Resuming generator g, whose body declares let x and
+      then runs direct eval of var x, throws SyntaxError from next().
+    reason: The conflict is raised by EvalDeclarationInstantiation when the
+      function runs; the static spelling of a body var beside the let is
+      an early SyntaxError before any call, a different operation and
+      error phase.
+  - path: test/language/statements/generators/scope-param-elem-var-close.js
+    section: sec-functiondeclarationinstantiation
+    subject: sloppy direct evals in params introduce vars
+    sourceDigest: "667c02e7a916f41de5cd149df92400643b6df22971e9670e322b265ec36e\
+      6e68"
+    observationDigest: "eb71b9774849615e1f50a93e27fa88eddb83f89d51507f3fe0ba9bf\
+      8a7c0e6a6"
+    disposition: deferral
+    witness: null
+    remainingContract: A var x declared by direct eval in the first
+      parameter initializer shadows the outer x for closures from that
+      parameter, the next parameter and the generator body, which all
+      read 'inside'.
+    reason: Only a var that direct eval declares while a parameter
+      initializer runs adds a binding to the environment the parameter
+      closures already captured. A static body var lives in the separate
+      body environment that parameter closures do not see, and a
+      parameter named x shadows the outer x before any initializer runs,
+      so neither reproduces the observation.
+  - path: test/language/statements/generators/scope-param-elem-var-open.js
+    section: sec-functiondeclarationinstantiation
+    subject: sloppy direct evals in params introduce vars
+    sourceDigest: "c80658a401237ef617e42c8224afa1a0ca94079611b0e00c32d2e10232ca\
+      90c4"
+    observationDigest: "53cbeb1b1e493a35938a21ca1236e0011e4878c04045c8994058dab\
+      2680de78a"
+    disposition: deferral
+    witness: null
+    remainingContract: A var x declared by direct eval in the second
+      parameter initializer is visible to the closure the first
+      parameter created earlier and to the second's, which both read
+      'inside'.
+    reason: Only a var that direct eval declares while a parameter
+      initializer runs adds a binding to the environment the parameter
+      closures already captured. A static body var lives in the separate
+      body environment that parameter closures do not see, and a
+      parameter named x shadows the outer x before any initializer runs,
+      so neither reproduces the observation.
+  - path: test/language/statements/generators/scope-param-rest-elem-var-close.js
+    section: sec-functiondeclarationinstantiation
+    subject: sloppy direct evals in params introduce vars
+    sourceDigest: "929be78f0fd82de3f3d6346c21a6702387a3be8938892735d337e0c41171\
+      7a12"
+    observationDigest: "4c6b708aee2b0017229461b3378eab5053f2765afd1339c6c8e5687\
+      d02b3f4d8"
+    disposition: deferral
+    witness: null
+    remainingContract: A var x declared by direct eval in a rest element
+      initializer shadows the outer x for closures from that element and
+      the generator body, which both read 'inside'.
+    reason: Only a var that direct eval declares while a parameter
+      initializer runs adds a binding to the environment the parameter
+      closures already captured. A static body var lives in the separate
+      body environment that parameter closures do not see, and a
+      parameter named x shadows the outer x before any initializer runs,
+      so neither reproduces the observation.
+  - path: test/language/statements/generators/scope-param-rest-elem-var-open.js
+    section: sec-functiondeclarationinstantiation
+    subject: sloppy direct evals in params introduce vars
+    sourceDigest: "a59a8959d711701c4daf4d7433b8e54f0d9ceb43dd1a7e395a24c6d2c711\
+      17d6"
+    observationDigest: "d50341a20763a0b0f41cc1ee947193dafe36f2ec37b7e6821d5dbf3\
+      b4fb91847"
+    disposition: deferral
+    witness: null
+    remainingContract: A var x declared by direct eval in a rest element
+      initializer is visible to the closure the first parameter created
+      earlier and to the element's, which both read 'inside'.
+    reason: Only a var that direct eval declares while a parameter
+      initializer runs adds a binding to the environment the parameter
+      closures already captured. A static body var lives in the separate
+      body environment that parameter closures do not see, and a
+      parameter named x shadows the outer x before any initializer runs,
+      so neither reproduces the observation.
+  - path: test/language/statements/switch/scope-var-none-case.js
+    section: sec-switch-statement-runtime-semantics-evaluation
+    subject: Retainment of existing variable environment (`case` clause)
+    sourceDigest: "9c78d35d1aafb6b3e55800661a4ad178eace890c43582dc8cddbb376b85c\
+      4c49"
+    observationDigest: "b509ae81c9b1c532c13e80ee407a6bc12a257e29d550dae9c7c013c\
+      315896147"
+    disposition: deferral
+    witness: null
+    remainingContract: Vars declared by direct eval in the switch
+      discriminant and case selector land in the existing variable
+      environment, so closures from before the statement, the
+      discriminant, the selector and the case statement, and the
+      following reference, all read 3.
+    reason: The switch keeps the existing variable environment, which only a
+      run-time var declaration in its expressions can show; replacing
+      eval with assignment does not distinguish the environments, as the
+      reviewed for-in assessment found.
+  - path: test/language/statements/switch/scope-var-none-dflt.js
+    section: sec-switch-statement-runtime-semantics-evaluation
+    subject: Retainment of existing variable environment (`default` clause)
+    sourceDigest: "020a47060232672db3fe6de79c49e75a875b5749964f616f63f25a9f4aab\
+      92cb"
+    observationDigest: "4bad89ba5f9f72428159d262c9e652118f14ec427b9efec51bf08ef\
+      cc6cbffb2"
+    disposition: deferral
+    witness: null
+    remainingContract: A var declared by direct eval in the switch
+      discriminant lands in the existing variable environment, so
+      closures from before the statement, the discriminant and the
+      default statement, and the following reference, all read 2.
+    reason: The switch keeps the existing variable environment, which only a
+      run-time var declaration in its discriminant can show; replacing
+      eval with assignment does not distinguish the environments, as the
+      reviewed for-in assessment found.
+  - path: test/language/statements/variable/12.2.1-11.js
+    section: "Original es5id: 12.2.1-11"
+    subject: arguments as var identifier in eval code is allowed
+    sourceDigest: "9b979d078208a2bc7748ad775857e235c6418178e3c205e469af48046170\
+      f574"
+    observationDigest: "ed6e933c6c82b232e4347c7adaedddbc58a7d347bc875c2f8095c90\
+      f34b3e2ea"
+    disposition: deferral
+    witness: null
+    remainingContract: Sloppy direct eval code inside a function may declare
+      var arguments without throwing.
+    reason: The subject is EvalDeclarationInstantiation of a var named
+      arguments; a static var arguments in a function body goes through
+      FunctionDeclarationInstantiation instead, and no host Script runs
+      inside a function.

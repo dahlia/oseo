@@ -200,18 +200,32 @@ assessments:
       core contract. Existing reviewed OSEO1001 observations and freshly
       recomputed pinned-source and observation digests bind every row.
       Ordinary arguments and parameter contracts remain inside the claim;
-      the six cells asserting ordinary body bindings stay in remediation.
+      the six cells asserting ordinary body bindings are accounted
+      separately under ds9-eval-arguments-mixed.
   ds9-eval-arguments-mixed:
-    disposition: remediation
-    normativeDependency: not-demonstrated
-    reason: >-
-      These six arrow cells also assert a function-valued, lexical or var
-      body binding named arguments; three call a default-parameter closure
-      to distinguish its captured binding from the body binding. Complete
-      static replacement evidence for those core contracts is not
-      established. The per-path audit in
-      docs/m5c-graph/dynamic-source-eval-arguments-assessment.md
-      retains each cell with dynamic-source-coverage-remediation.
+    disposition: exclusion
+    normativeDependency: source-evaluation-only
+    replacementEvidence:
+      docs/m5c-graph/dynamic-source-scope-arguments-assessment.yaml:
+        "26479b20aee86b42424d194520880c20\
+        12e56084bf24568daf7b5aa7d8970e75"
+      tests/scope-arguments-native.test.ts: "557add2d4107210fd3ab18027c4f7a18\
+        061bd830a74f565ae1f5e748762d7143"
+      tests/native/fixtures/scope-arguments-evidence.ts:
+        "ebb6c52f9eeb8b66f205ce4190a1720e\
+        e66f0cdd7023b086a77760ddf94c97da"
+    reason: Maintainer decision 2026-10-28 item 1 applies path by path as mapped
+      in docs/m5c-graph/dynamic-source-scope-arguments-evidence.md. Each of the
+      six arrow cells has a static native witness that keeps its
+      function-valued, lexical or var body binding named arguments, its counter
+      and its global non-leakage check; the three cells that call q() read
+      "param" from a binding outside both the parameter and body environments,
+      as the eval-created binding is. Only the eval declaration of arguments in
+      a parameter default remains, an EvalDeclarationInstantiation subject
+      inside ADR 0016. Original unsupported-profile-feature classifications and
+      all assertions remain unchanged; none counts as a pass. Reopen if original
+      or replacement evidence changes or ADR 0016 admits direct eval; all ADR
+      0016/0019 reopening triggers remain in force.
   dynamic-construction:
     disposition: exclusion
     normativeDependency: source-evaluation-only
@@ -5625,17 +5639,17 @@ assessments:
         "3de085960212e3ddc5acc83e41ccf933ce09031ba9ed3cc3\
         b35ac9a8dce594b5"
   observation-train-b26a-b26b-b27:
-    disposition: remediation
+    disposition: deferral
     normativeDependency: not-demonstrated
-    reason: Retain the 143 original B26a/B26b/B27 dynamic-source
-      rejections as active coverage remediation. Source hashes and normalized
-      observation digests bind every assessment to its original subject. No
-      equivalent replacement or whole-path exclusion is claimed; ADR 0013,
-      ADR 0016 and ADR 0019 and their reopening triggers remain unchanged. The
-      bundle 4 UPDATE promoted S13.2.2_A13.js, and the train C ordinary
-      evidence node moved 26 Function-constructor paths to trainc assessments.
-      The train C host Script evidence node then accounted 98 paths under
-      ADR 0016.
+    reason: Deferred under ADR 0031; docs/m5c-closure/deferrals.yaml names each
+      path's remaining contract. The 18 remaining B26a/B26b/B27 rows observe a
+      binding that direct eval creates or conflicts with at run time in a for,
+      switch, function, generator or parameter scope. The per-path assessment in
+      docs/m5c-graph/dynamic-source-scope-arguments-evidence.md records why no
+      static or literal host Script witness reproduces them, as for the deferred
+      for-in, for-of and catch rows, and direct eval is not approved for M5. The
+      bundle 4 UPDATE promoted S13.2.2_A13.js; the train C evidence nodes moved
+      the other 124 rows earlier. ADR 0016 and ADR 0019 remain unchanged.
   annex-b-ordinary-object-prototype:
     disposition: exclusion
     normativeDependency: annex-b-only

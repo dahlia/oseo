@@ -66,6 +66,41 @@ observation is promoted, and the subset and results do not change, so no
 UPDATE is needed.
 
 
+Outcomes
+--------
+
+The per-path record is
+[*dynamic-source-scope-arguments-assessment.yaml*](./dynamic-source-scope-arguments-assessment.yaml),
+with each path's source and observation digests.
+
+All six ds9 arrow cells close under ADR 0016. The witness for each is a
+fixture in *tests/native/fixtures/scope-arguments-evidence.ts*, run by
+*tests/scope-arguments-native.test.ts*. It keeps the original arrow with a
+parameter default, its function-valued, lexical or var body binding named
+`arguments`, the counter and the `globalThis.arguments` check, and drops only
+the eval. In the three cells that call `q()`, the value `"param"` comes from an
+enclosing arrow's parameter. The eval-created binding lands in the function
+environment that encloses the parameter environment, so both bindings lie
+outside the parameter and body environments of `f`, and `q()` must skip the
+body binding to reach either one. The test checks that every original
+assertion appears in its witness, that a closure created in the body fails
+the `q()` check, and that Node.js, Deno and native code under both
+specialization policies with forced collection all print the same result.
+
+All 18 scope rows are deferred under ADR 0031. Each one observes where a
+declaration made by direct eval at run time lands: the environment enclosing a
+for or switch statement, or the variable environment of a function, generator
+or parameter list. The rest observe the SyntaxError that
+EvalDeclarationInstantiation raises when such a declaration conflicts with a
+parameter or a lexical body binding. A static
+declaration is instantiated before the code runs, or is an early error, so it
+does not show the observation. A literal host Script is a separate Script
+evaluated as a whole, so it cannot declare a binding from inside a for head,
+switch expression, parameter list or function body, even where the statement
+itself runs at global top level. *docs/m5c-closure/deferrals.yaml*
+gives each row's remaining contract and reason.
+
+
 Checks and review
 -----------------
 
