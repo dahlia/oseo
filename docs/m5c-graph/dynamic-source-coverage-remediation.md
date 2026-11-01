@@ -714,7 +714,8 @@ The
 [`dynamic-source-scope-arguments-evidence`](./dynamic-source-scope-arguments-evidence.md)
 child gives 24 paths one outcome each. It moves the six ds9 arrow cells to ADR
 0016 with static native witnesses of their body bindings named `arguments` and
-of the parameter closure that reads past them. It defers the 18 remaining
-B26a/B26b/B27 scope rows under ADR 0031, because each observes a binding that
-direct eval creates or conflicts with at run time. With this move the umbrella
-owns 112 paths.
+of the parameter closure that reads past them. Six eval-declaration-only scope
+rows also move to ADR 0016, without replacement evidence, because their only
+subject is EvalDeclarationInstantiation. The other 12 B26a/B26b/B27 scope rows
+are deferred under ADR 0031, because only a direct eval declaration shows the
+environment structure they probe. With this move the umbrella owns 112 paths.

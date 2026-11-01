@@ -56,6 +56,10 @@ Closure routes and obligations
     why neither a static nor a literal host Script witness reproduces it, in
     the same terms as the three deferred *scope-head-var-none* and
     *scope-catch-param-var-none* rows.
+ -  A path whose only subject is EvalDeclarationInstantiation has no
+    non-source contract to witness and lies on the ADR 0016 surface. With
+    Root's approval it closes there without replacement evidence, like the
+    `ds9-eval-arguments-only` cells, naming the DS-9 cell it matches.
  -  A path that needs an engine fix, or whose subject may lie on the ADR 0016
     exclusion surface, goes back to Root with its evidence.
 
@@ -87,17 +91,26 @@ assertion appears in its witness, that a closure created in the body fails
 the `q()` check, and that Node.js, Deno and native code under both
 specialization policies with forced collection all print the same result.
 
-All 18 scope rows are deferred under ADR 0031. Each one observes where a
-declaration made by direct eval at run time lands: the environment enclosing a
-for or switch statement, or the variable environment of a function, generator
-or parameter list. The rest observe the SyntaxError that
-EvalDeclarationInstantiation raises when such a declaration conflicts with a
-parameter or a lexical body binding. A static
-declaration is instantiated before the code runs, or is an early error, so it
-does not show the observation. A literal host Script is a separate Script
-evaluated as a whole, so it cannot declare a binding from inside a for head,
-switch expression, parameter list or function body, even where the statement
-itself runs at global top level. *docs/m5c-closure/deferrals.yaml*
+Six scope rows close under ADR 0016 in the `scope-eval-declaration-only`
+assessment, without replacement evidence. *variable/12.2.1-11.js* asserts only
+that eval code may declare `var arguments`, and *function/S13.2.2\_A14.js*
+calls only a function that eval code declared. The function and generator
+*scope-body-lex-distinct.js* and *eval-var-scope-syntax-err.js* rows assert the
+SyntaxError that EvalDeclarationInstantiation raises when an eval var collides
+with a lexical body binding or a parameter. None has a non-source subject; each
+row of the assessment names the DS-9 cell with the same shape, which ADR 0016
+already owns.
+
+The other 12 scope rows are deferred under ADR 0031. Four probe the for and
+switch statements, which create no variable environment of their own, and
+eight probe the parameter list, whose closures see a var that eval declares in
+any initializer. Only a declaration made while the environment is live shows
+either structure. A static var is hoisted at parse time into the environment
+the test expects either way, or lives in a body environment that parameter
+closures cannot see, and assignment creates no binding. A literal host Script
+is a separate Script evaluated as a whole, so it cannot declare a binding from
+inside a for head, switch expression or parameter list, even where the
+statement itself runs at global top level. *docs/m5c-closure/deferrals.yaml*
 gives each row's remaining contract and reason.
 
 

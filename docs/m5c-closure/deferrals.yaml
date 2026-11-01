@@ -514,9 +514,11 @@ paths:
       variable environment, so closures created before the statement and in the
       test, increment and body positions read 2 for x, y and z.
     reason: The body creates no variable environment, which only a run-time var
-      declaration inside the statement can show; replacing eval with assignment
-      does not distinguish the environments, as the reviewed for-in assessment
-      found.
+      declaration inside the statement can show. A static var in the head or
+      body is hoisted at parse time into the enclosing variable environment, the
+      place the test expects either way, so it cannot show whether the statement
+      creates an environment of its own; assignment creates no binding, and a
+      literal host Script cannot run inside the statement.
     attempts:
       nodes:
         - dynamic-source-scope-arguments-evidence
@@ -537,8 +539,11 @@ paths:
       before the statement and in the test, increment and body positions, and
       the following reference, all read 2."
     reason: The head creates no variable environment, which only a run-time var
-      declaration inside the head can show; replacing eval with assignment does
-      not distinguish the environments, as the reviewed for-in assessment found.
+      declaration inside the head can show. A static var in the head or body is
+      hoisted at parse time into the enclosing variable environment, the place
+      the test expects either way, so it cannot show whether the statement
+      creates an environment of its own; assignment creates no binding, and a
+      literal host Script cannot run inside the statement.
     attempts:
       nodes:
         - dynamic-source-scope-arguments-evidence
@@ -551,70 +556,6 @@ paths:
       9fb1"
     observationDigest: "0548e5f243f6c9091e1990cf941d1debd8148a2e52b69a3edda4450\
       c86d33666"
-  test/language/statements/function/S13.2.2_A14.js:
-    family: run-time-source
-    section: "Original es5id: 13.2.2_A14"
-    remainingContract: A function declared by direct eval inside a constructor
-      body is callable from that body afterwards, so new FACTORY() completes
-      without throwing.
-    reason: The callee binding exists only because eval code declares it at run
-      time in the constructor's variable environment; a static declaration is
-      instantiated before the body runs, and no host Script runs inside a
-      function.
-    attempts:
-      nodes:
-        - dynamic-source-scope-arguments-evidence
-        - observation-batch-26b
-      decisions:
-        - "2026-11-01 umbrella-residual answer: bounded general eval and
-          Function construction are not approved for M5"
-    targetMilestone: PLAN-DYN.md
-    sourceDigest: "430f5fa5fdcbc69f280bdd32846e7160ee62543357c5ac9482a665e97ef8\
-      e88d"
-    observationDigest: "303060dad9dbb6e255b943200610d33ab48e667c16b4ecc4f72994e\
-      5465f6af6"
-  test/language/statements/function/eval-var-scope-syntax-err.js:
-    family: run-time-source
-    section: "sec-function-definitions-runtime-semantics-\
-      instantiatefunctionobject"
-    remainingContract: Calling f(a = eval("var a = 42")) throws SyntaxError
-      before the body runs, so callCount stays 0.
-    reason: The SyntaxError comes from EvalDeclarationInstantiation while the
-      parameter initializer runs; a static var named after a parameter is legal
-      and throws nothing, and a static duplicate binding is an early error
-      before the call.
-    attempts:
-      nodes:
-        - dynamic-source-scope-arguments-evidence
-        - observation-batch-26b
-      decisions:
-        - "2026-11-01 umbrella-residual answer: bounded general eval and
-          Function construction are not approved for M5"
-    targetMilestone: PLAN-DYN.md
-    sourceDigest: "794cb526b9757815d020a52fa99e711b9e62aae573caaf40dcbf8d84f3ce\
-      3581"
-    observationDigest: "582819c5c5426febd823df97cea93c5a2af69d6d75be91b9629b043\
-      6eae5c29f"
-  test/language/statements/function/scope-body-lex-distinct.js:
-    family: run-time-source
-    section: sec-functiondeclarationinstantiation
-    remainingContract: Calling f, whose body declares let x and then runs direct
-      eval of var x, throws SyntaxError.
-    reason: The conflict is raised by EvalDeclarationInstantiation when the
-      function runs; the static spelling of a body var beside the let is an
-      early SyntaxError before any call, a different operation and error phase.
-    attempts:
-      nodes:
-        - dynamic-source-scope-arguments-evidence
-        - observation-batch-26b
-      decisions:
-        - "2026-11-01 umbrella-residual answer: bounded general eval and
-          Function construction are not approved for M5"
-    targetMilestone: PLAN-DYN.md
-    sourceDigest: "6281b61286a9b75e8c9a505752dbe5b9f22dd41b1e36b859497c470fdfdb\
-      8290"
-    observationDigest: "7052e37f3c10736f48f62887cc2f3b3002016f278d1e424a2c9ec51\
-      6502d4d7e"
   test/language/statements/function/scope-param-elem-var-close.js:
     family: run-time-source
     section: sec-functiondeclarationinstantiation
@@ -707,48 +648,6 @@ paths:
       8373"
     observationDigest: "98b361eaecba0041657e443857fb950e0856e3d1831386684d1d49b\
       e47e93c99"
-  test/language/statements/generators/eval-var-scope-syntax-err.js:
-    family: run-time-source
-    section: "sec-generator-function-definitions-runtime-semantics-\
-      instantiatefunctionobject"
-    remainingContract: Calling generator f(a = eval("var a = 42")) throws
-      SyntaxError during parameter initialization, so callCount stays 0.
-    reason: The SyntaxError comes from EvalDeclarationInstantiation while the
-      parameter initializer runs; a static var named after a parameter is legal
-      and throws nothing, and a static duplicate binding is an early error
-      before the call.
-    attempts:
-      nodes:
-        - dynamic-source-scope-arguments-evidence
-        - observation-batch-26b
-      decisions:
-        - "2026-11-01 umbrella-residual answer: bounded general eval and
-          Function construction are not approved for M5"
-    targetMilestone: PLAN-DYN.md
-    sourceDigest: "68635098aab3060cec3a28b0409542a0360393a2b0aba6aedd7478f3a389\
-      7a07"
-    observationDigest: "c05ac54750e470cefa1ce3a108f1c744b05da9797e8344eab26ddc9\
-      b5e73f578"
-  test/language/statements/generators/scope-body-lex-distinct.js:
-    family: run-time-source
-    section: sec-functiondeclarationinstantiation
-    remainingContract: Resuming generator g, whose body declares let x and then
-      runs direct eval of var x, throws SyntaxError from next().
-    reason: The conflict is raised by EvalDeclarationInstantiation when the
-      function runs; the static spelling of a body var beside the let is an
-      early SyntaxError before any call, a different operation and error phase.
-    attempts:
-      nodes:
-        - dynamic-source-scope-arguments-evidence
-        - observation-batch-26b
-      decisions:
-        - "2026-11-01 umbrella-residual answer: bounded general eval and
-          Function construction are not approved for M5"
-    targetMilestone: PLAN-DYN.md
-    sourceDigest: "a9d63b3d409b49fbad33999f9bd3d20ceeac4fddc7f83105e19c243ded93\
-      7bbb"
-    observationDigest: "1c4fc11048a5b0e5e625fd264b3a10a7ea5f37feb450713af21fd1d\
-      f04f25b66"
   test/language/statements/generators/scope-param-elem-var-close.js:
     family: run-time-source
     section: sec-functiondeclarationinstantiation
@@ -849,9 +748,12 @@ paths:
       from before the statement, the discriminant, the selector and the case
       statement, and the following reference, all read 3.
     reason: The switch keeps the existing variable environment, which only a
-      run-time var declaration in its expressions can show; replacing eval with
-      assignment does not distinguish the environments, as the reviewed for-in
-      assessment found.
+      run-time var declaration in its expressions can show. A static var in the
+      head or body is hoisted at parse time into the enclosing variable
+      environment, the place the test expects either way, so it cannot show
+      whether the statement creates an environment of its own; assignment
+      creates no binding, and a literal host Script cannot run inside the
+      statement.
     attempts:
       nodes:
         - dynamic-source-scope-arguments-evidence
@@ -872,9 +774,12 @@ paths:
       statement, the discriminant and the default statement, and the following
       reference, all read 2.
     reason: The switch keeps the existing variable environment, which only a
-      run-time var declaration in its discriminant can show; replacing eval with
-      assignment does not distinguish the environments, as the reviewed for-in
-      assessment found.
+      run-time var declaration in its discriminant can show. A static var in the
+      head or body is hoisted at parse time into the enclosing variable
+      environment, the place the test expects either way, so it cannot show
+      whether the statement creates an environment of its own; assignment
+      creates no binding, and a literal host Script cannot run inside the
+      statement.
     attempts:
       nodes:
         - dynamic-source-scope-arguments-evidence
@@ -908,24 +813,3 @@ paths:
       0c2b"
     observationDigest: "313ab466162dcbcb837932efca2b3d154088efead3bd3897cf630d8\
       035763c20"
-  test/language/statements/variable/12.2.1-11.js:
-    family: run-time-source
-    section: "Original es5id: 12.2.1-11"
-    remainingContract: Sloppy direct eval code inside a function may declare var
-      arguments without throwing.
-    reason: The subject is EvalDeclarationInstantiation of a var named
-      arguments; a static var arguments in a function body goes through
-      FunctionDeclarationInstantiation instead, and no host Script runs inside a
-      function.
-    attempts:
-      nodes:
-        - dynamic-source-scope-arguments-evidence
-        - observation-batch-27
-      decisions:
-        - "2026-11-01 umbrella-residual answer: bounded general eval and
-          Function construction are not approved for M5"
-    targetMilestone: PLAN-DYN.md
-    sourceDigest: "9b979d078208a2bc7748ad775857e235c6418178e3c205e469af48046170\
-      f574"
-    observationDigest: "ed6e933c6c82b232e4347c7adaedddbc58a7d347bc875c2f8095c90\
-      f34b3e2ea"

@@ -3,8 +3,9 @@ base: bc8e3a93ed3b6aa8daac70d08fd146f202755f99
 suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
 pathSetDigest: 54903b18184f53cb5b39d11a07358495b5d7c573922ed2c6e45e0107cc140b24
 assessed: 24
-closed: 6
-deferred: 18
+closed: 12
+closedWithWitness: 6
+deferred: 12
 evidenceAdded:
   nativeWitnesses: 6
 paths:
@@ -146,9 +147,12 @@ paths:
       statement and in the test, increment and body positions read 2 for
       x, y and z.
     reason: The body creates no variable environment, which only a run-time
-      var declaration inside the statement can show; replacing eval with
-      assignment does not distinguish the environments, as the reviewed
-      for-in assessment found.
+      var declaration inside the statement can show. A static var in the
+      head or body is hoisted at parse time into the enclosing variable
+      environment, the place the test expects either way, so it cannot
+      show whether the statement creates an environment of its own;
+      assignment creates no binding, and a literal host Script cannot
+      run inside the statement.
   - path: test/language/statements/for/scope-head-var-none.js
     section: sec-for-statement-runtime-semantics-labelledevaluation
     subject: No variable environment is created for the statement "head"
@@ -163,9 +167,12 @@ paths:
       created before the statement and in the test, increment and body
       positions, and the following reference, all read 2."
     reason: The head creates no variable environment, which only a run-time
-      var declaration inside the head can show; replacing eval with
-      assignment does not distinguish the environments, as the reviewed
-      for-in assessment found.
+      var declaration inside the head can show. A static var in the head
+      or body is hoisted at parse time into the enclosing variable
+      environment, the place the test expects either way, so it cannot
+      show whether the statement creates an environment of its own;
+      assignment creates no binding, and a literal host Script cannot
+      run inside the statement.
   - path: test/language/statements/function/S13.2.2_A14.js
     section: "Original es5id: 13.2.2_A14"
     subject: Calling a function as a constructor after it has been declared
@@ -174,15 +181,14 @@ paths:
       e88d"
     observationDigest: "303060dad9dbb6e255b943200610d33ab48e667c16b4ecc4f72994e\
       5465f6af6"
-    disposition: deferral
+    disposition: exclusion
     witness: null
-    remainingContract: A function declared by direct eval inside a
-      constructor body is callable from that body afterwards, so new
-      FACTORY() completes without throwing.
-    reason: The callee binding exists only because eval code declares it at
-      run time in the constructor's variable environment; a static
-      declaration is instantiated before the body runs, and no host
-      Script runs inside a function.
+    precedent: "test/language/eval-code/direct/arrow-fn-no-pre-existing-argumen\
+      ts-bindings-are-present-arrow-func-declare-arguments-assign.js"
+    reason: Like that DS-9 cell, the only binding the path reads is one eval
+      code created; new FACTORY() calls func only after
+      EvalDeclarationInstantiation declares it in the constructor
+      variable environment.
   - path: test/language/statements/function/eval-var-scope-syntax-err.js
     section: "sec-function-definitions-runtime-semantics-instantiatefunctionobj\
       ect"
@@ -192,14 +198,14 @@ paths:
       3581"
     observationDigest: "582819c5c5426febd823df97cea93c5a2af69d6d75be91b9629b043\
       6eae5c29f"
-    disposition: deferral
+    disposition: exclusion
     witness: null
-    remainingContract: Calling f(a = eval("var a = 42")) throws SyntaxError
-      before the body runs, so callCount stays 0.
-    reason: The SyntaxError comes from EvalDeclarationInstantiation while
-      the parameter initializer runs; a static var named after a
-      parameter is legal and throws nothing, and a static duplicate
-      binding is an early error before the call.
+    precedent: "test/language/eval-code/direct/func-decl-a-preceding-parameter-\
+      is-named-arguments-declare-arguments.js"
+    reason: Like that DS-9 collision cell, the asserted SyntaxError is
+      raised by EvalDeclarationInstantiation when the eval var in a
+      parameter initializer collides with a parameter name; the
+      unchanged counter only shows the call stopped there.
   - path: test/language/statements/function/scope-body-lex-distinct.js
     section: sec-functiondeclarationinstantiation
     subject: Creation of new lexical environment (distinct from the variable
@@ -208,14 +214,13 @@ paths:
       8290"
     observationDigest: "7052e37f3c10736f48f62887cc2f3b3002016f278d1e424a2c9ec51\
       6502d4d7e"
-    disposition: deferral
+    disposition: exclusion
     witness: null
-    remainingContract: Calling f, whose body declares let x and then runs
-      direct eval of var x, throws SyntaxError.
-    reason: The conflict is raised by EvalDeclarationInstantiation when the
-      function runs; the static spelling of a body var beside the let is
-      an early SyntaxError before any call, a different operation and
-      error phase.
+    precedent: "test/language/eval-code/direct/func-decl-fn-body-cntns-argument\
+      s-lex-bind-declare-arguments.js"
+    reason: Like that DS-9 collision cell, the asserted SyntaxError is
+      raised by EvalDeclarationInstantiation when the eval var collides
+      with a lexical body binding.
   - path: test/language/statements/function/scope-param-elem-var-close.js
     section: sec-functiondeclarationinstantiation
     subject: sloppy direct evals in params introduce vars
@@ -299,14 +304,14 @@ paths:
       7a07"
     observationDigest: "c05ac54750e470cefa1ce3a108f1c744b05da9797e8344eab26ddc9\
       b5e73f578"
-    disposition: deferral
+    disposition: exclusion
     witness: null
-    remainingContract: Calling generator f(a = eval("var a = 42")) throws
-      SyntaxError during parameter initialization, so callCount stays 0.
-    reason: The SyntaxError comes from EvalDeclarationInstantiation while
-      the parameter initializer runs; a static var named after a
-      parameter is legal and throws nothing, and a static duplicate
-      binding is an early error before the call.
+    precedent: "test/language/eval-code/direct/gen-func-decl-a-preceding-parame\
+      ter-is-named-arguments-declare-arguments.js"
+    reason: Like that DS-9 collision cell, the asserted SyntaxError is
+      raised by EvalDeclarationInstantiation when the eval var in a
+      parameter initializer collides with a parameter name; the
+      unchanged counter only shows the call stopped there.
   - path: test/language/statements/generators/scope-body-lex-distinct.js
     section: sec-functiondeclarationinstantiation
     subject: Creation of new lexical environment (distinct from the variable
@@ -315,14 +320,13 @@ paths:
       7bbb"
     observationDigest: "1c4fc11048a5b0e5e625fd264b3a10a7ea5f37feb450713af21fd1d\
       f04f25b66"
-    disposition: deferral
+    disposition: exclusion
     witness: null
-    remainingContract: Resuming generator g, whose body declares let x and
-      then runs direct eval of var x, throws SyntaxError from next().
-    reason: The conflict is raised by EvalDeclarationInstantiation when the
-      function runs; the static spelling of a body var beside the let is
-      an early SyntaxError before any call, a different operation and
-      error phase.
+    precedent: "test/language/eval-code/direct/gen-func-decl-fn-body-cntns-argu\
+      ments-lex-bind-declare-arguments.js"
+    reason: Like that DS-9 collision cell, the asserted SyntaxError is
+      raised by EvalDeclarationInstantiation when the eval var collides
+      with a lexical body binding.
   - path: test/language/statements/generators/scope-param-elem-var-close.js
     section: sec-functiondeclarationinstantiation
     subject: sloppy direct evals in params introduce vars
@@ -412,9 +416,12 @@ paths:
       discriminant, the selector and the case statement, and the
       following reference, all read 3.
     reason: The switch keeps the existing variable environment, which only a
-      run-time var declaration in its expressions can show; replacing
-      eval with assignment does not distinguish the environments, as the
-      reviewed for-in assessment found.
+      run-time var declaration in its expressions can show. A static var
+      in the head or body is hoisted at parse time into the enclosing
+      variable environment, the place the test expects either way, so it
+      cannot show whether the statement creates an environment of its
+      own; assignment creates no binding, and a literal host Script
+      cannot run inside the statement.
   - path: test/language/statements/switch/scope-var-none-dflt.js
     section: sec-switch-statement-runtime-semantics-evaluation
     subject: Retainment of existing variable environment (`default` clause)
@@ -429,9 +436,12 @@ paths:
       closures from before the statement, the discriminant and the
       default statement, and the following reference, all read 2.
     reason: The switch keeps the existing variable environment, which only a
-      run-time var declaration in its discriminant can show; replacing
-      eval with assignment does not distinguish the environments, as the
-      reviewed for-in assessment found.
+      run-time var declaration in its discriminant can show. A static
+      var in the head or body is hoisted at parse time into the
+      enclosing variable environment, the place the test expects either
+      way, so it cannot show whether the statement creates an
+      environment of its own; assignment creates no binding, and a
+      literal host Script cannot run inside the statement.
   - path: test/language/statements/variable/12.2.1-11.js
     section: "Original es5id: 12.2.1-11"
     subject: arguments as var identifier in eval code is allowed
@@ -439,11 +449,10 @@ paths:
       f574"
     observationDigest: "ed6e933c6c82b232e4347c7adaedddbc58a7d347bc875c2f8095c90\
       f34b3e2ea"
-    disposition: deferral
+    disposition: exclusion
     witness: null
-    remainingContract: Sloppy direct eval code inside a function may declare
-      var arguments without throwing.
-    reason: The subject is EvalDeclarationInstantiation of a var named
-      arguments; a static var arguments in a function body goes through
-      FunctionDeclarationInstantiation instead, and no host Script runs
-      inside a function.
+    precedent: "test/language/eval-code/direct/arrow-fn-no-pre-existing-argumen\
+      ts-bindings-are-present-arrow-func-declare-arguments-assign.js"
+    reason: Like that DS-9 cell, eval code declares var arguments where no
+      collision applies; the path asserts only that
+      EvalDeclarationInstantiation accepts it.
