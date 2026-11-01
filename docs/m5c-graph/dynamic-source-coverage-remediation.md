@@ -691,6 +691,18 @@ owned paths before its own landing.
 The child accounts for all 98 under ADR 0016.
 
 
+Fixture-construction evidence child
+-----------------------------------
+
+Root's 2026-11-01 classification adds
+`dynamic-source-fixture-construction-evidence` for exactly 15 paths that
+had no recorded evidence attempt: the 11 compound assignment
+*S11.13.2\_A6.N\_T1* rows, *script-decl-lex-var-declared-via-eval.js*,
+and the three direct eval calls with spread arguments. Its pinned selector
+and routes are in that child's work note. Ownership moves only with
+reviewed closure, and the umbrella is blocked until the child lands.
+
+
 Named deferral
 --------------
 
