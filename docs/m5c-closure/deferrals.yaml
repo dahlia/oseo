@@ -1,0 +1,10 @@
+# Reviewed M5 named deferral list under ADR 0031, which defines each field.
+# Validated by `mise run check:m5c-deferrals`. An entry is added only with
+# its path's `deferred` ledger owner, in the same reviewed change.
+version: 1
+suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+record:
+  stem: 0031-m5-named-deferral
+  digest: c5e795e830be3011256ff8b653c156a44f881c9eabb1883b7bacb9992a42758b
+families: {}
+paths: {}

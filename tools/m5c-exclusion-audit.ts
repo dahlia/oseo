@@ -29,6 +29,8 @@ const auditPath = "docs/m5c-closure/exclusion-audit.yaml";
 const dynamicOwner = "adr:0016-dynamic-source-boundary";
 const annexOwner = "adr:0013-m5-edition-and-manifest";
 const remediationOwner = "node:dynamic-source-coverage-remediation";
+/** Ledger owner of a path named in the ADR 0031 deferral list. */
+const deferredOwner = "deferred";
 /**
  * Paths whose only Annex B dependence sits behind the eval rejection they
  * observe. The maintainer decision of 2026-11-01 applied item 3 of the
@@ -309,10 +311,14 @@ export interface M5cExclusionAuditInputs {
   readonly replacementEvidence?: ReadonlyMap<string, string>;
 }
 
-/** Counts distinguish authorized rejection from unresolved subject coverage. */
+/**
+ * Counts distinguish authorized rejection from unresolved subject coverage,
+ * and both from audited paths that ADR 0031 defers past M5.
+ */
 export interface M5cExclusionAuditSummary {
   readonly exclusions: number;
   readonly remediation: number;
+  readonly deferrals: number;
   readonly missingDynamicTags: number;
 }
 
@@ -399,6 +405,7 @@ export function validateM5cExclusionAudit(
   const seen = new Set<string>();
   let exclusions = 0;
   let remediation = 0;
+  let deferrals = 0;
   let missingDynamicTags = 0;
   let previous = "";
   for (const value of audit.paths) {
@@ -468,7 +475,8 @@ export function validateM5cExclusionAudit(
       throw new Error(`Audit needs the exact ADR 0028 selector: ${path}.`);
     }
     const excluded = assessment.disposition === "exclusion";
-    if (!excluded && assessment.disposition !== "remediation") {
+    const deferred = assessment.disposition === "deferral";
+    if (!excluded && !deferred && assessment.disposition !== "remediation") {
       throw new Error(`Audit needs a disposition: ${path}.`);
     }
     if (callerPath && !excluded) {
@@ -613,6 +621,7 @@ export function validateM5cExclusionAudit(
     }
     if (
       !excluded &&
+      !deferred &&
       proposedOwner === annexOwner &&
       annexRemediationOwner !== lookupRemediationOwner &&
       (!isString(annexRemediationOwner) ||
@@ -669,15 +678,20 @@ export function validateM5cExclusionAudit(
         `Audit needs the exact dynamic attribute reservation: ${path}.`,
       );
     }
+    // A deferral is neither an exclusion nor remediation. The deferral
+    // checker binds the ledger owner to its ADR 0031 entry.
     const owner = excluded
       ? proposedOwner
-      : proposedOwner === annexOwner
-        ? annexRemediationOwner
-        : remediationOwner;
+      : deferred
+        ? deferredOwner
+        : proposedOwner === annexOwner
+          ? annexRemediationOwner
+          : remediationOwner;
     if (entry.owner !== owner) {
       throw new Error(`Audit requires owner ${owner} for ${path}.`);
     }
     if (excluded) exclusions += 1;
+    else if (deferred) deferrals += 1;
     else remediation += 1;
   }
   for (const entry of inputs.ledger.entries) {
@@ -723,7 +737,7 @@ export function validateM5cExclusionAudit(
       );
     }
   }
-  return { exclusions, remediation, missingDynamicTags };
+  return { exclusions, remediation, deferrals, missingDynamicTags };
 }
 
 /** Check the audit against pinned source and checked-in observations. */
@@ -834,6 +848,7 @@ if (entry != null && resolve(entry) === fileURLToPath(import.meta.url)) {
   console.log(
     `m5c-exclusion-audit passed exclusions=${summary.exclusions} ` +
       `remediation=${summary.remediation} ` +
+      `deferrals=${summary.deferrals} ` +
       `missing-dynamic-tags=${summary.missingDynamicTags}`,
   );
 }

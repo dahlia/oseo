@@ -280,7 +280,7 @@ test("owners must fit the path state", () => {
     [
       realmPath,
       "observation",
-      /must be unassigned or a node: or adr: owner for a unsupported/u,
+      /must be unassigned or a node:, adr:, or deferred owner for a unsupp/u,
     ],
     [realmPath, "node:missing-node", /unknown M5c graph node missing-node/u],
   ];
@@ -322,7 +322,10 @@ test("an authorizing owner must name an accepted record", () => {
       "adr:dynamic-source",
       /names no accepted record docs\/adr\/dynamic-source\.md/u,
     ],
-    ["exclusion:realms", /must be unassigned or a node: or adr: owner/u],
+    [
+      "exclusion:realms",
+      /must be unassigned or a node:, adr:, or deferred owner/u,
+    ],
   ];
   for (const [owner, message] of cases) {
     const text = serializeM5cClosureLedger(
@@ -445,6 +448,76 @@ test("a remediation node may own an unsupported path", () => {
   assert.equal(summary.owners.get("node:realm-remediation"), 1);
   assert.equal(summary.owners.get("unassigned"), undefined);
   assert.equal(summary.openPaths, 2);
+});
+
+const deferredTargets: M5cLedgerOwnerTargets = {
+  ...targets,
+  deferredPaths: new Set([realmPath]),
+};
+
+test("a deferred owner needs an unsupported path with an entry", () => {
+  const text = serializeM5cClosureLedger(withOwner(realmPath, "deferred"));
+  const summary = validate(text, manifest, deferredTargets);
+  assert.equal(summary.deferredPaths, 1);
+  assert.equal(summary.owners.get("deferred"), 1);
+  assert.equal(summary.closedPaths, 2);
+  assert.equal(summary.openPaths, 2);
+  assert.match(text, /\ndeferredPaths: 1\n/u);
+  assert.throws(
+    () => validate(text),
+    /owner deferred of .*realm\.js needs an entry in docs\/m5c-closure\//u,
+  );
+  assert.throws(
+    () =>
+      validate(
+        serializeM5cClosureLedger(withOwner(passPath, "deferred")),
+        manifest,
+        { ...targets, deferredPaths: new Set([passPath]) },
+      ),
+    /owner deferred of .*pass\.js cannot defer a pass path/u,
+  );
+  assert.throws(
+    () =>
+      validate(
+        text.replace("deferredPaths: 1", "deferredPaths: 0"),
+        manifest,
+        deferredTargets,
+      ),
+    /deferredPaths is 0 but entries record 1/u,
+  );
+});
+
+test("a deferral entry needs the deferred ledger owner", () => {
+  assert.throws(
+    () => validate(ledgerText, manifest, deferredTargets),
+    /needs the deferred owner for deferral entry .*realm\.js/u,
+  );
+});
+
+test("a ledger without deferredPaths parses but fails validation", () => {
+  const legacy = ledgerText.replace("deferredPaths: 0\n", "");
+  assert.equal(parseM5cClosureLedger(legacy).ledger.entries.length, 4);
+  assert.throws(
+    () => validate(legacy),
+    /deferredPaths must be a non-negative integer/u,
+  );
+});
+
+test("regeneration drops a deferral whose entry is gone", () => {
+  const deferred = withOwner(realmPath, "deferred");
+  assert.equal(
+    deriveM5cClosureLedger(
+      inventoryText,
+      manifest,
+      deferredTargets,
+      deferred,
+    ).entries.find((entry) => entry.path === realmPath)?.owner,
+    "deferred",
+  );
+  assert.equal(
+    derive(deferred).entries.find((entry) => entry.path === realmPath)?.owner,
+    "unassigned",
+  );
 });
 
 test("a node ID containing digits round-trips as an owner", () => {
