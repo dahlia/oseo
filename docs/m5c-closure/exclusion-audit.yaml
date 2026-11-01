@@ -274,15 +274,13 @@ assessments:
       maintainer boundary decision; ADR 0019 reopening
       remains a concrete question.
   variable-environment:
-    disposition: remediation
+    disposition: deferral
     normativeDependency: not-demonstrated
-    reason: The test uses eval var declarations to distinguish
-      the variable environment retained by a for-in head or
-      catch parameter. The rejected call is authorized, but
-      environment retention is inside the claim. Replacing
-      eval with assignment does not distinguish those
-      environments; retain remediation until independent
-      evidence or a maintainer decision bounds the gap.
+    reason: "Deferred under ADR 0031. The test uses eval var declarations to
+      distinguish the variable environment retained by a for-in head or
+      catch parameter. Replacing eval with assignment does not distinguish
+      those environments; only a run-time var declaration by direct eval
+      does, and direct eval is not approved for M5."
   annex-b-pattern:
     disposition: exclusion
     normativeDependency: annex-b-only
@@ -705,16 +703,14 @@ assessments:
       contracts pending reviewed replacement evidence and
       maintainer accounting; this is not an exclusion.
   parameter-expression-variable-environment:
-    disposition: remediation
+    disposition: deferral
     normativeDependency: not-demonstrated
-    reason: Parameter-expression eval var declarations
-      distinguish the environment used by computed keys or
-      destructuring defaults from parameter and body
-      bindings. Assignment is not demonstrated equivalence
-      for those environments. Preserve the exact inner/outer
-      binding visibility assertions pending independent
-      evidence or a maintainer accounting decision; no
-      exclusion is authorized.
+    reason: "Deferred under ADR 0031. Parameter-expression eval var
+      declarations distinguish the environment used by computed keys or
+      destructuring defaults from parameter and body bindings. Assignment is
+      not demonstrated equivalence for those environments; only a run-time
+      var declaration by direct eval observes them, and direct eval is not
+      approved for M5."
   observation-train-dynamic-source:
     disposition: remediation
     normativeDependency: not-demonstrated
@@ -817,13 +813,14 @@ assessments:
       substituting a return statement would not prove Completion Record
       equivalence. No complete replacement is established.
   ds3-import-from-eval:
-    disposition: remediation
+    disposition: deferral
     normativeDependency: not-demonstrated
-    reason: usage-from-eval.js checks ImportCall from eval code, intrinsic
-      Promise identity and prototype, and four imported values. No reviewed
-      replacement covers every non-source assertion. Static import alone
-      cannot prove the ImportCall promise contract; retain the original as
-      unsupported remediation.
+    reason: "Deferred under ADR 0031. usage-from-eval.js checks ImportCall
+      from eval code, intrinsic Promise identity and prototype, and four
+      imported values. No reviewed replacement covers every non-source
+      assertion. Closing it needs both direct eval, which is not approved
+      for M5, and ImportCall admission, which the static-specifier import
+      track defers past M5."
   ds2-static-module-semantics:
     disposition: exclusion
     normativeDependency: source-evaluation-only
@@ -1057,15 +1054,13 @@ assessments:
         "84efc96b2fc51a77523b989e7e657f4f\
         679e1821c6bc57c2c00504bad38000c0"
   ds4-callable-remediation:
-    disposition: remediation
+    disposition: deferral
     normativeDependency: not-demonstrated
-    reason: The per-path assessment in
-      docs/m5c-graph/dynamic-source-callable-family-assessment.md names the
-      remaining non-source assertions for each of these paths. Existing
-      partial static witnesses do not establish every asserted contract. Keep
-      the original unsupported classification and umbrella owner; the observed
-      dynamic-source rejection authorizes no exclusion of those missing
-      observations.
+    reason: "Deferred under ADR 0031. new Subclass() of class extends
+      Function reaches the source-compiling Function constructor, and
+      docs/m5c-graph/dynamic-source-callable-family-assessment.md records
+      that static subclass heritage does not replace that invocation.
+      Bounded Function construction is not approved for M5."
   ds5-static-u180e:
     disposition: exclusion
     normativeDependency: source-evaluation-only
@@ -1322,13 +1317,14 @@ assessments:
         "c5eb018779c47f7de2959da4a1a64969475c8026fc831102\
         f06e8bef6382e1e3"
   observation-train-b24-b25:
-    disposition: remediation
+    disposition: deferral
     normativeDependency: not-demonstrated
-    reason: Retain the 7 original B24/B25 dynamic-source
-      rejections as active coverage remediation. Source hashes and normalized
-      observation digests bind every assessment to its original subject. No
-      equivalent replacement or whole-path exclusion is claimed; ADR 0013,
-      ADR 0016 and ADR 0019 and their reopening triggers remain unchanged.
+    reason: "Deferred under ADR 0031. The remaining B24/B25 row,
+      for-of/scope-head-var-none.js, uses an eval var declaration in the
+      for-of head to show that the head creates no variable environment, the
+      contract the variable-environment assessment records for for-in. Only
+      a run-time var declaration by direct eval observes it, and direct eval
+      is not approved for M5."
   class-declaration-setter-mixed-assertion:
     disposition: remediation
     normativeDependency: not-demonstrated
@@ -2354,15 +2350,16 @@ assessments:
       replacement evidence, source or observation, or ADR 0019
       non-source normative dependence."
   "ds12-module-observable-residual":
-    "disposition": "remediation"
+    "disposition": "deferral"
     "normativeDependency": "not-demonstrated"
-    "reason": "Exactly 19 DS-12 paths retain uncovered repeated-load
-      identity, cached error, deferred evaluation, staggered graph-start
-      or exact TLA result/error/ordering observations. The per-path
-      table names each residual; nearby static namespace or continuation
-      evidence is not asserted to prove it. Keep umbrella remediation
-      ownership pending faithful observations or a bounded maintainer
-      decision. ADR 0016 and ADR 0019 remain unchanged."
+    "reason": "Deferred under ADR 0031; docs/m5c-closure/deferrals.yaml
+      names each path's remaining contract. Exactly 19 DS-12 paths retain
+      repeated-load identity, cached error, deferred evaluation, staggered
+      graph-start or exact TLA result, error and ordering observations that
+      only an ImportCall site exposes. The per-path table records why static
+      module evidence cannot witness them, and the static-specifier import
+      track that could admit those sites is not implemented in M5. ADR 0016
+      and ADR 0019 remain unchanged."
 
   ds16-static-syntax:
     disposition: exclusion
