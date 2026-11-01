@@ -32,8 +32,8 @@ than preserving an obsolete plan.
 Development environment
 -----------------------
 
-Oseo uses [mise] as the entry point for development
-tools and repository tasks. Start with:
+Oseo uses [mise] as the entry point for development tools and repository tasks.
+Start with:
 
 ~~~~ sh
 mise install
@@ -48,18 +48,18 @@ commit-msg hook runs `mise run check:commit-message` on the message file Git
 passes it. Repeating the install refreshes both.
 
 A commit message uses a subject of 50 columns or fewer, a blank second line,
-and a body wrapped at 72. The commit-msg hook does not enforce that. It
-rejects a message whose subject reaches 80 columns, whose second line is
-not blank, or whose body has a line past 100 columns that wrapping could have
-shortened. It also rejects an escaped paragraph break, a doubled `\n` or `\t`
-on a line already past its limit, which is what a message looks like when
-shell quoting turned its line breaks into literal characters. Writing about an
-escape sequence is fine; only that combination is refused.
+and a body wrapped at 72. The commit-msg hook does not enforce that. It rejects
+a message whose subject reaches 80 columns, whose second line is not blank, or
+whose body has a line past 100 columns that wrapping could have shortened. It
+also rejects an escaped paragraph break, a doubled `\n` or `\t` on a line
+already past its limit. That pattern appears when shell quoting turns a
+message's line breaks into literal characters. Writing about an escape sequence
+is fine; only that combination is refused.
 
 The looser thresholds are deliberate. The hook catches a message that went
 wrong mechanically and leaves style to review, so a message written to the
 convention never reaches them. A rejection names the line at fault and how to
-fix it, and keeps what you wrote for editing rather than discarding it.
+fix it.
 
 Assistant contributions are credited only with `Assisted-by: AGENT:MODEL`
 trailers. The hook rejects any `Claude-Session` trailer, and any
@@ -67,30 +67,32 @@ trailers. The hook rejects any `Claude-Session` trailer, and any
 address at anthropic.com (including subdomains). Keys, Claude, and domains are
 matched without regard to case. Human co-authors remain allowed.
 
-Trailer recognition uses `git interpret-trailers --parse --no-divider` with
-`:` as the separator. Git selects a final block preceded by a blank line:
-either every line is a trailer, or at least 25% are trailers and one is a
+Trailer recognition uses `git interpret-trailers --parse --no-divider` with `:`
+as the separator. Git selects a final block preceded by a blank line. Either
+every line is a trailer, or at least 25% are trailers and one is a
 Git-recognized or configured trailer, such as `Signed-off-by`. A key starts at
-column one, has no internal whitespace, and may have spaces or tabs before
-its colon. Indented continuation lines belong to the preceding value.
-The `--no-divider` option treats `---` as message text, not a patch boundary.
-A prose mention or an example in an earlier paragraph is not a trailer.
-These rules also apply to merge messages. Rejection leaves the message file
-available for correction and another commit attempt.
+column one, has no internal whitespace, and may have spaces or tabs before its
+colon. Indented continuation lines belong to the preceding value.
+
+The `--no-divider` option treats `---` as message text, not a patch boundary. A
+prose mention or an example in an earlier paragraph is not a trailer. These
+rules also apply to merge messages. Rejection leaves the message file available
+for correction and another commit attempt.
 
 CI's `check` job runs the same attribution check through
-`mise run check:commit-messages base..head`. Pull requests use the event's
-base and head commits; pushes use `before..sha`. An all-zero `before` checks
-every commit reachable from `sha`, including merged side branches. Locally,
+`mise run check:commit-messages base..head`. Pull requests use the event's base
+and head commits; pushes use `before..sha`. An all-zero `before` checks every
+commit reachable from `sha`, including merged side branches. Locally,
 `mise run check:commit-messages HEAD` checks all reachable history too.
+
 Range checks enforce only the attribution rule: published history includes
 messages that predate the hook's length rules. A missing revision fails the
 check. Manual workflow runs have no introduced range and skip this step.
 
 `mise tasks` is the source of truth for commands available in the current
 checkout. A command described in a design or plan document may not exist until
-its implementation lands. Do not add instructions that present planned
-commands as already available.
+its implementation lands. Do not add instructions that present planned commands
+as already available.
 
 The mise aube dependency provider checks *package.json* and *aube-lock.yaml*
 before every `mise run`. It performs a frozen install only when the inputs have
@@ -113,13 +115,15 @@ The workspace uses this toolchain:
     generated C11 and the initial runtime.
 
 Standalone repository-wide tools must be pinned through mise and exposed
-through mise tasks. Node.js-hosted tools that load workspace packages belong
-in the aube workspace manifest and must run through `aube exec` from a mise
-task. Oxlint follows the latter rule because its local JavaScript plugin
-requires the Node.js wrapper. Package build and test dependencies also belong
-in aube workspace manifests. Oxfmt owns JavaScript, TypeScript, and supported
-data files. Hongdown owns Markdown, and `mise fmt` owns *mise.toml*. Generated
-lockfiles are never formatter inputs.
+through mise tasks. Node.js-hosted tools that load workspace packages belong in
+the aube workspace manifest and must run through `aube exec` from a mise task.
+Oxlint follows the latter rule because its local JavaScript plugin requires the
+Node.js wrapper. Package build and test dependencies also belong in aube
+workspace manifests.
+
+Oxfmt owns JavaScript, TypeScript, and supported data files. Hongdown owns
+Markdown, and `mise fmt` owns *mise.toml*. Generated lockfiles are never
+formatter inputs.
 
 Anti-slop rules with existing violations remain warnings during migration.
 Rules with a clean baseline stay errors. Promote each warning after its
@@ -129,9 +133,9 @@ Using Zig as a C toolchain does not make Zig the runtime implementation
 language. The C runtime and the native backend remain replaceable architectural
 components.
 
-When aube workspace files exist, do not introduce npm or pnpm lockfiles or use a
-different package manager to modify dependency state. Do not hand-edit generated
-lockfiles.
+When aube workspace files exist, do not introduce npm or pnpm lockfiles or use
+a different package manager to modify dependency state. Do not hand-edit
+generated lockfiles.
 
 [mise]: https://mise.jdx.dev/
 [jactionlint]: https://github.com/jdx/jactionlint
@@ -149,8 +153,8 @@ Repository layout and package boundaries
 Publishable TypeScript components live under *packages/*, not a root-level
 *src/* directory. Each package owns its source, tests, manifest, build
 configuration, and public API. Public packages use the reserved `@oseo/*`
-scope and should be designed so that they can be published independently to npm
-and JSR, even though the repository releases them together.
+scope. They should be designed so that they can be published independently to
+npm and JSR, even though the repository releases them together.
 
 The initial package boundaries are expected to cover these roles:
 
@@ -168,7 +172,7 @@ Names and exact splits may change in milestone plans. The dependency direction
 is more important than the initial names: the compiler core defines interfaces,
 concrete adapters implement them, and composition happens at an outer entry
 point. The compiler core must not import a concrete parser, backend, runtime, or
-toolchain. The C backend should emit C without owning process execution, and the
+toolchain. The C backend should emit C without owning process execution. The
 toolchain adapter should compile inputs without defining JavaScript semantics.
 
 Avoid importing through another package's private files. Add a public entry
@@ -192,6 +196,7 @@ Prefer immutable data unless mutation is part of the implementation contract.
 Mark object fields `readonly` by default, including fields on internal and test
 types. Spell immutable array types as `readonly T[]`; use mutable `T[]` only
 when the code deliberately changes that array, such as a local accumulator.
+
 Use `interface` for named object shapes. Reserve `type` for unions,
 intersections, primitive aliases, tuples, and other declarations that an
 interface cannot express clearly.
@@ -205,9 +210,10 @@ syntax.
 Repository checks use `tsc --noEmit` to validate Oseo's own TypeScript source.
 Source type annotations and JSDoc types in programs compiled by Oseo remain
 optimization hints. The Oseo compiler must not depend on `tsc` or the
-TypeScript type checker to extract them. A bootstrap parser's AST must be
-converted at the frontend boundary rather than leaking into intermediate
-representations or backend code.
+TypeScript type checker to extract them.
+
+A bootstrap parser's AST must be converted at the frontend boundary rather than
+leaking into intermediate representations or backend code.
 
 
 Line length
@@ -217,12 +223,14 @@ Keep every manually maintained source, configuration, and documentation line
 at or below 80 columns. Wrap prose and code instead of relying on an editor's
 soft wrapping. Markdown table rows and link destinations are exempt. A URL may
 also exceed the limit wherever it appears, including in a source-code comment.
+
 Generated lockfiles are exempt and must not be hand-edited.
 Path entry lines in the generated *docs/m5c-closure/ledger.yaml* are exempt
 because `mise run check:m5c-closure-ledger` owns their canonical layout.
 A line in the generated *docs/m5c-closure/observation-batches.yaml* is exempt
 when it would fit without its upstream test path, as in the reviewed test262
 subset and manifest.
+
 Vendored source under *tools/oxlint/anti-slop/* is also exempt so that it stays
 directly comparable with upstream. Do not reformat it.
 
@@ -236,7 +244,7 @@ floating-point edge cases. Target-dependent assumptions belong in explicit
 target or ABI descriptions, not scattered through backend lowering.
 
 Use the repository's Zig toolchain task once it is available. Cross-compilation
-must select a target explicitly and must not silently inherit the developer
+must select a target explicitly. It must not silently inherit the developer
 machine's ABI. Platform-specific work should stay behind the toolchain and host
 interfaces so that another C compiler, native backend, or runtime language can
 replace the initial implementation.
@@ -244,14 +252,14 @@ replace the initial implementation.
 Linux on AMD64 and macOS on AArch64 are supported native execution
 environments. AArch64 Linux is a compile-link and inspection target. A
 successful cross-link is portability evidence, not a native semantic pass.
-Target and host changes must preserve explicit selection, reject unsupported
-pairs before execution, and retain the exact host and target in failure and
-replay metadata.
+Target and host changes must preserve explicit selection and reject unsupported
+pairs before execution. They must also retain the exact host and target in
+failure and replay metadata.
 
 Native target IDs use operating-system, architecture, and optional ABI order,
 such as `macos-aarch64` and `linux-x86_64-gnu`. These are stable Oseo IDs, not
 external compiler strings. A concrete toolchain adapter owns that mapping.
-Keep `NativeOperatingSystem` limited to operating-system facts; unknown values
+Keep `NativeOperatingSystem` limited to operating-system facts. Unknown values
 belong to host detection rather than build targets.
 
 
@@ -259,7 +267,7 @@ Semantics and optimization
 --------------------------
 
 Every accepted language construct must have defined behavior for every value
-that can reach it. Add support in complete semantic units; reject unsupported
+that can reach it. Add support in complete semantic units. Reject unsupported
 syntax or host capabilities with a source-located diagnostic.
 
 Optimization hints must never become correctness requirements. Adding,
@@ -324,6 +332,7 @@ Zig.
 `mise run check:native-toolchains`, included in `mise run check`, checks all
 of *tests/*, *tools/test262.ts*, and *tools/native-io/*. Only
 *tests/native-toolchain.ts* may select concrete adapters: it owns composition.
+
 Unit tests and their helpers under *packages/toolchain-zig/tests/* and
 *packages/toolchain-host-cc/tests/* are exempt because they test those concrete
 adapters' contracts independently of the selected integration lane. Type-only
@@ -341,15 +350,17 @@ selected by `targetForExecutionHost`:
 ~~~~
 
 The check follows calls and named callbacks through functions in the same file,
-including enclosing registration functions and Promise/array callbacks.
-It recognizes value imports, including aliases, of `runNativeCli`,
-`withNativeFixture`, and `buildHostCcFixture`; the compound Reference helpers
-`assertNativeMemberReference`, `assertMemberReferenceCase`, and
-`assertReferenceCase`; `runNativeUnits` and
-`prepareHarnessObject` with the imported `nativeToolchain`; execution through
-`createTest262FragmentExecutor` with that toolchain; consumption of
-a `nativeToolchain.createBuildPlan` result's `executablePath` or iterated
-`requests` in process calls (including `runNativeFixture`); and literal
+including enclosing registration functions and Promise/array callbacks. It
+recognizes value imports, including aliases, of `runNativeCli`,
+`withNativeFixture`, and `buildHostCcFixture`. It also recognizes the compound
+Reference helpers `assertNativeMemberReference`, `assertMemberReferenceCase`,
+and `assertReferenceCase`.
+
+The check recognizes `runNativeUnits` and `prepareHarnessObject` with the
+imported `nativeToolchain`, and execution through
+`createTest262FragmentExecutor` with that toolchain. It also recognizes
+consumption of a `nativeToolchain.createBuildPlan` result's `executablePath` or
+iterated `requests` in process calls (including `runNativeFixture`), and literal
 `zig`/`cc` invocations through local wrappers. The clock entry points
 `buildClockProgram`, `runClockProbe`, and `runClockScheduler` are included too.
 It accepts `hostClockTarget()` and shared skip constants, plus the existing
@@ -406,16 +417,18 @@ replay quality.
 Failures report `fast-check` version, seed, replay path, profile, and domain.
 Replay an ordinary or extended suite by setting `OSEO_PROPERTY_SEED` and
 `OSEO_PROPERTY_PATH`; use `OSEO_PROPERTY_RUN_SCALE` and `OSEO_PROPERTY_SIZE`
-only to change the reviewed case budget and size. `OSEO_PROPERTY_TIME_SCALE`
-multiplies only the interrupt time limit. It exists for lanes that run every
-case slower than the runner a limit was budgeted on: the host C compiler
-sanitizer lane and a generated Mac-lane `native support` job whose readiness
-probe fell back to a hosted runner. A job-level value is visible to every
-test in the job, including the `packages/testkit` tests that assert the
-unscaled limit, so the always-hosted `test` jobs carry none. It never
-changes the case budget, so an interrupted run still fails. Minimize
-a failure and retain it as an ordinary regression fixture before fixing the
-implementation.
+only to change the reviewed case budget and size.
+
+`OSEO_PROPERTY_TIME_SCALE` multiplies only the interrupt time limit. It exists
+for lanes that run every case slower than the runner a limit was budgeted on.
+Those lanes are the host C compiler sanitizer lane and a generated Mac-lane
+`native support` job whose readiness probe fell back to a hosted runner.
+
+A job-level value is visible to every test in the job, including the
+`packages/testkit` tests that assert the unscaled limit. The always-hosted
+`test` jobs therefore carry none. It never changes the case budget, so an
+interrupted run still fails. Minimize a failure and retain it as an ordinary
+regression fixture before fixing the implementation.
 
 CI may set `OSEO_PROPERTY_CASE_SHARD=INDEX/TOTAL` for a dedicated property
 file. Three files have one:
@@ -425,37 +438,44 @@ jobs per native host, and
 *tests/property/m5-regexp-literal-exhaustive.property.test.ts*, in five
 jobs per native host. `caseShardedNativeFiles` in *tools/native-shard.ts*
 is the list, and the file shards exclude every entry. The index is
-one-based. Every shard uses the same seed, replay path,
-generator, `numRuns`, and size; generated run `i` executes its predicate only
-when `i % TOTAL == INDEX - 1`. The union of all indices is the ordinary
-suite, and no index executes in two shards. Shrink candidates run normally
-after a failure. Case-sharded suites must not use `fc.pre`; a precondition
-rejection fails the shard because it would change generated run alignment.
-Set `OSEO_PROPERTY_SEED` and `OSEO_PROPERTY_PATH` to replay
-a reported counterexample without the shard filter. Failure text names the
-active shard. The first failing case may differ from an unsharded run because
-other shards can fail earlier.
+one-based.
+
+Every shard uses the same seed, replay path, generator, `numRuns`, and size.
+Generated run `i` executes its predicate only when `i % TOTAL == INDEX - 1`.
+The union of all indices is the ordinary suite, and no index executes in two
+shards.
+
+Shrink candidates run normally after a failure. Case-sharded suites
+must not use `fc.pre`. A precondition rejection fails the shard because it
+would change generated run alignment. Set `OSEO_PROPERTY_SEED` and
+`OSEO_PROPERTY_PATH` to replay a reported counterexample without the shard
+filter. Failure text names the active shard. The first failing case may differ
+from an unsharded run because other shards can fail earlier.
 
 Each shard keeps the original hard interrupt limit. Set
 `OSEO_PROPERTY_DURATION_FILE` to a writable JSON path to record its measured
 property duration; this requires `OSEO_PROPERTY_CASE_SHARD` as well. The
-own-key shards set it, so the `native` aggregate requires all six of their
+own-key shards set it. The `native` aggregate requires all six of their
 results and duration records, then fails if their duration sum on either
-host exceeds the original limit. The Reflect namespace shards do not: that
-file has three property domains and the recorder writes one record per job
+host exceeds the original limit.
+
+The Reflect namespace shards do not. That
+file has three property domains, and the recorder writes one record per job
 with an exclusive create, so three domains cannot each record without a
 record-format change. Its shards are still required by the aggregate. The
-exhaustive RegExp literal shards record nothing for the same reason, with
-four properties, and the aggregate requires them too.
+exhaustive RegExp literal shards record nothing for the same reason. That
+file has four properties, and the aggregate requires them too.
+
 An interrupted shard fails independently of any record. The case budget
 and generators do not change. A replay path disables the shard filter and
 keeps the original interrupt limit.
 
-`mise run test` owns the ordinary property gate. Run
+`mise run test` is the ordinary property gate. Run
 `mise run test:property:extended` before submitting changes to generators,
-compiler lowering, runtime state, or specialization. The extended task executes
-ten times the ordinary case budget under both hosts and treats an interrupted
-run as a failure.
+compiler lowering, runtime state, or specialization. The extended task is the
+one task the ordinary gate does not contain. It runs the same property files
+at ten times the ordinary case budget under both hosts and treats an
+interrupted run as a failure.
 
 Before submitting a change, run:
 
@@ -466,10 +486,10 @@ mise run test
 
 An M5c landing meets the `mise run test` and extended property requirements
 with the CI run of its exact candidate commit instead, as the Gates section of
-[*PLAN-M5C.md*](./PLAN-M5C.md) describes; `mise run check` still runs locally.
+[*PLAN-M5C.md*](./PLAN-M5C.md) describes. `mise run check` still runs locally.
 
 The `mise run test` gate already runs `test:node`, `test:deno`, `test:native`,
-and `test:test262`, so it covers the native fixtures, the cross-target links,
+and `test:test262`. It covers the native fixtures, the cross-target links,
 and the complete reviewed test262 corpus. `test:node` runs `node --test` at
 the repository root, which also discovers every *.property.test.ts* file, so
 the ordinary property suites run inside it as well. Naming `test:native`,
@@ -481,9 +501,8 @@ changed. Do not commit generated binaries, temporary C output, or debug dumps
 unless they are reviewed fixtures with a documented purpose.
 
 Changes to targets, host adapters, C lowering, the runtime, collector,
-specialization, or native generators also run `mise run test:property:extended`
-before submission. That is the one task the ordinary gate does not contain: it
-runs the same property files at ten times the case budget. The native and
+specialization, or native generators also require
+`mise run test:property:extended` before submission. The native and
 standards tasks inside the ordinary gate execute the matching host target and
 retain the AArch64 Linux cross-link; do not replace a required execution with a
 blanket skip.
@@ -511,40 +530,42 @@ sharding.
 ### Scoped manifest regeneration
 
 `mise run test262:update:changed` observes only the reviewed subset entries
-that are new or changed against a baseline revision and rewrites only the
-partitions those paths occupy; the index summary, per-dependency counts, and
+that are new or changed against a baseline revision. It rewrites only the
+partitions those paths occupy. The index summary, per-dependency counts, and
 *target-parity.yaml* digest are recomputed from the union of all partitions.
-The baseline defaults to the compatibility ratchet's local rule, `HEAD` on
-*main* and the merge base with *main* elsewhere; pass `--baseline REV` to
-name one explicitly, for example after a rebase.
+The baseline defaults to the compatibility ratchet's local rule: `HEAD` on
+*main* and the merge base with *main* elsewhere. Pass `--baseline REV` to name
+one explicitly, for example after a rebase.
 
 The scoped mode is sound only when every untouched record still describes the
 implementation being landed. The runner cannot verify that without observing
 the whole corpus, so it refuses the scoped mode unless every path that differs
-from the baseline is observation-neutral: *tests/test262/subset.yaml* with its
-`suiteRevision` and `supportedFeatures` unchanged and no path removed, the
-manifest files under *tests/test262/results/*, *results.yaml*,
-*target-parity.yaml*, *docs/*, and Markdown. Any change under *packages/*,
-*tools/*, *tests/test262/harness/*, the lockfile, or the toolchain pins
-requires `mise run test262:update`. The refusal is syntactic and deliberate:
-a comment-only change under *tools/* is refused like any other. It also
-refuses a checked-in manifest that is not canonical, meaning a partition
-whose text differs from what the serializer emits for its parsed values.
+from the baseline is observation-neutral. The allowed differences are
+*tests/test262/subset.yaml* with its `suiteRevision` and `supportedFeatures`
+unchanged and no path removed, the manifest files under
+*tests/test262/results/*, *results.yaml*, *target-parity.yaml*, *docs/*, and
+Markdown.
 
-A scoped update must be rerun after any rebase or merge that brings in a
-change outside that allow-list, because its earlier observations were made
-under the previous implementation. For that decision only, a changed file
-under *tools/*, or under *tests/* outside *tests/test262/*, does not count
-when the runner cannot reach it: the file lies outside the relative-import
-closure of the runner entry points *tools/test262.ts*,
-*tools/test262-fragments.ts*, and *tools/test262-incremental.ts* at both
-commits, and no module in that closure names it as data, whether through
-`new URL(..., import.meta.url)` or a repository-relative path. Absence from
-the import closure alone is not enough, because the runner also reads files
-as data. CI scheduling tools are the usual case. The scoped mode's own refusal
-stays syntactic.
+Any change under *packages/*, *tools/*, *tests/test262/harness/*, the lockfile,
+or the toolchain pins requires `mise run test262:update`. The refusal is
+syntactic and deliberate: a comment-only change under *tools/* is refused like
+any other. The runner also refuses a checked-in manifest that is not canonical,
+meaning a partition whose text differs from what the serializer emits for its
+parsed values.
 
-The runner cannot detect an omitted rerun; the full `test:test262` gate, which
+A scoped update must be rerun after any rebase or merge that brings in a change
+outside that allow-list, because its earlier observations were made under the
+previous implementation. For that decision only, a changed file under *tools/*,
+or under *tests/* outside *tests/test262/*, does not count when the runner
+cannot reach it. The file lies outside the relative-import closure of the
+runner entry points *tools/test262.ts*, *tools/test262-fragments.ts*, and
+*tools/test262-incremental.ts* at both commits, and no module in that closure
+names it as data, whether through `new URL(..., import.meta.url)` or a
+repository-relative path. Absence from the import closure alone is not enough,
+because the runner also reads files as data. CI scheduling tools are the usual
+case. The scoped mode's own refusal stays syntactic.
+
+The runner cannot detect an omitted rerun. The full `test:test262` gate, which
 `mise run test` and every CI shard run, compares fresh observations against the
 checked-in manifest and rejects a manifest whose records describe two
 implementations. An unsharded run compares the checked-in manifest text with
@@ -553,19 +574,19 @@ compares the values of the records it selects, so it does not detect a
 partition whose text is not canonical but parses to the same records. Never
 land a scoped update with that gate skipped.
 
-`mise run test262:reindex` executes nothing. It discovers every partition
-file on disk, requires their path set to equal the reviewed subset exactly
-with no path recorded twice, and rewrites the index, summary, and parity
-from that union. Use it to repair the derived files after merging two
-branches whose scoped updates touched disjoint paths; it never changes a
-record, cannot judge freshness, and treats a path recorded twice as an error
-to resolve by hand.
+`mise run test262:reindex` executes nothing. It discovers every partition file
+on disk, requires their path set to equal the reviewed subset exactly with no
+path recorded twice, and rewrites the index, summary, and parity from that
+union. Use it to repair the derived files after merging two branches whose
+scoped updates touched disjoint paths. It never changes a record, cannot judge
+freshness, and treats a path recorded twice as an error to resolve by hand.
 
 The wrapper's `--shard INDEX/TOTAL` uses the checked-in measured weights in
 *tools/native-shard-costs.ts*. It sorts files by descending weight, breaking
 ties by path, and groups them in batches of three on macOS and four on Linux.
 Each batch goes to the shard with the shortest modeled completion time, with
 ties going to the lowest index. Each shard starts its expensive files first.
+
 On Linux, totals greater than one reserve index one exclusively for
 *tests/property/m5-object-own-keys.property.test.ts* when it is present; the
 other indices partition the remaining files by the same cost rule. The
@@ -574,20 +595,42 @@ margin. These model widths are fixed independently of local CPU availability,
 so every index of a total selects disjoint files from the same complete input
 set.
 
-CI now passes `--exclude-case-sharded` to those file shards and runs each
-file in `caseShardedNativeFiles` in separate case-shard jobs on each native
-host: three per host for own-key and Reflect, five per host for exhaustive
-RegExp literals. Every one is required by the `native` aggregate. Linux file
-shards also pass `--exclude-dedicated-linux`, which removes
+CI passes `--exclude-case-sharded` to those file shards and runs each file in
+`caseShardedNativeFiles` in separate case-shard jobs on each native host: three
+per host for own-key and Reflect, and five per host for exhaustive RegExp
+literals. Every one is required by the `native` aggregate.
+
+Linux file shards also pass `--exclude-dedicated-linux`, which removes
 `dedicatedLinuxNativeFiles` before partitioning. That list contains
 *tests/property/m5-array-constructor.property.test.ts*, run in one required
 Linux job with all 120 extended cases and its unchanged 1,800-second limit. The
 seven Linux file shards partition the remaining files. macOS extended file
 shards omit that flag and still run the Array file once.
 
-The ordinary macOS Node.js gate uses a separate dedicated hosted
-`macos-latest` job for that same file. It runs all 12 cases with the original
-seed and 180-second interrupt, with one file worker and no time scaling.
+The native weights are derived sums of concurrent test-case durations, not
+isolated file latencies or processor time. Refresh them from CI logs when the
+file set or relative costs change; *docs/evidence/u6/README.md* records their
+source and model limits. Linux file weights use the median of three runs'
+per-file sums, converted from milliseconds to seconds and rounded up. The total
+remains seven.
+
+Raising totals adds approximately one derived macOS minute of fixed job cost
+per extra job in the current measured baseline. Keep every shard of every total
+and the complete input set when changing the partition.
+
+The local unsharded extended task still runs every file with all cases. The
+Linux singleton rule still applies to wrapper invocations that include
+*m5-object-own-keys.property.test.ts* without the exclusion flag; it covers
+that file alone, because its deadline margin, not its weight, is what the
+singleton protects.
+
+Unknown files use the measured table's upper median weight. Empty shards
+execute nothing. Node.js's own `--test-shard` still assigns files by position;
+CI uses the wrapper flag instead.
+
+The ordinary macOS Node.js gate uses a separate dedicated hosted `macos-latest`
+job for that same Array file. It runs all 12 cases with the original seed and
+180-second interrupt, with one file worker and no time scaling.
 `dedicatedMacosNodeFiles` lists this ordinary exclusion independently of the
 Linux extended one. The lane generator puts the additional job on one of the
 existing five hosted macOS lanes; `native` requires its result even if an
@@ -595,71 +638,52 @@ earlier lane job fails. See
 [*macOS Array placement evidence*](docs/evidence/array-macos/README.md).
 
 The ordinary Node.js gate runs in four Linux and six macOS shards through
-`mise run test:node:shard --shard INDEX/TOTAL`; Windows still runs it
-unsharded through `mise run test:node`. *tools/node-shard.ts* reproduces
-Node 24's default discovery, removes `dedicatedMacosNodeFiles` on macOS
-only, and passes each shard's files to Node without `--test-shard`. The
-shards on each host, with the dedicated macOS job, execute the inventory
-exactly once.
+`mise run test:node:shard --shard INDEX/TOTAL`; Windows still runs it unsharded
+through `mise run test:node`. *tools/node-shard.ts* reproduces Node 24's
+default discovery, removes `dedicatedMacosNodeFiles` on macOS only, and passes
+each shard's files to Node without `--test-shard`. The shards on each host,
+with the dedicated macOS job, execute the inventory exactly once.
 
 Files are assigned by the weights in *tools/node-shard-costs.ts*: heaviest
-first, ties in path order, each to the shard whose modeled run ends
-earliest with it, ties to the lowest index. The model follows Node's own
-scheduling. Node sorts the files it is given and starts each on the first
-free worker, three on Linux and two on macOS, so a heavy file sorted late
-ends its shard late. A file without a weight weighs the host fallback, the
-median of the measured weights. *tests/node-shard.test.ts* requires every
-modeled shard to finish within 40 minutes including setup.
+first, ties in path order, each to the shard whose modeled run ends earliest
+with it, ties to the lowest index. The model follows Node's own scheduling.
+Node sorts the files it is given and starts each on the first free worker,
+three on Linux and two on macOS, so a heavy file sorted late ends its shard
+late. A file without a weight weighs the host fallback, the median of the
+measured weights. *tests/node-shard.test.ts* requires every modeled shard to
+finish within 40 minutes including setup.
 
-A new test file that runs for minutes on CI must add its weight on both
-hosts in the same change, or the placement treats it as light. Weights are
-the largest of three CI observations of a file's summed top-level test
-durations. Refresh them when the file set or relative costs change, as
+A new test file that runs for minutes on CI must add its weight on both hosts
+in the same change, or the placement treats it as light. Weights are the
+largest of three CI observations of a file's summed top-level test durations.
+Refresh them when the file set or relative costs change, as
 [*Node shard evidence*](docs/evidence/node-shards/README.md) describes.
 
 The host C sanitizer property jobs exclude the files in
-`dedicatedSanitizerPropertyFiles`, now only
-*tests/property/m5-regexp-literal-exhaustive.property.test.ts*. Each host
-runs them in one dedicated sanitizer job with every ordinary case, seed and
-interrupt limit, and `native` requires both. The shared jobs use
-`test:sanitizer:property:shared`: *tools/sanitizer-property-shard.ts* keeps
-the files Node's `--test-shard` would select from the complete property list
-and only then drops the dedicated ones, so no other file changes shard. The
-shared shards and the dedicated jobs execute the inventory exactly once. On
-macOS the dedicated job chains on the property sanitizer lane and takes no
-extra hosted slot, as the two native sanitizer shards chain on theirs. See
+`dedicatedSanitizerPropertyFiles`, which lists only
+*tests/property/m5-regexp-literal-exhaustive.property.test.ts*. Each host runs
+them in one dedicated sanitizer job with every ordinary case, seed, and
+interrupt limit, and `native` requires both.
+
+The shared jobs use `test:sanitizer:property:shared`:
+*tools/sanitizer-property-shard.ts* keeps the files Node's `--test-shard` would
+select from the complete property list and only then drops the dedicated ones,
+so no other file changes shard. The shared shards and the dedicated jobs
+execute the inventory exactly once. On macOS the dedicated job chains on the
+property sanitizer lane and takes no extra hosted slot, as the two native
+sanitizer shards chain on theirs. See
 [*exhaustive RegExp literal evidence*](docs/evidence/regexp-literal-exhaustive/README.md)
 and
 [*macOS native sanitizer split*](docs/evidence/macos-sanitizer-split/README.md).
-
-The local unsharded extended
-task still runs every file with all cases. The Linux singleton rule still
-applies to wrapper invocations that include
-*m5-object-own-keys.property.test.ts* without the
-exclusion flag; it covers that file alone, because its deadline margin,
-not its weight, is what the singleton protects.
-Unknown files use the measured table's upper median weight. Empty shards execute
-nothing. Node.js's own `--test-shard` still assigns files by position; CI uses
-the wrapper flag instead.
-
-Weights are derived sums of concurrent test-case durations, not isolated file
-latencies or processor time. Refresh them from CI logs when the file set or
-relative costs change; *docs/evidence/u6/README.md* records their source and
-model limits. Linux file weights use the median of three runs' per-file sums,
-converted from milliseconds to seconds and rounded up. The total remains
-seven. Raising totals adds approximately
-one derived macOS minute of fixed job cost per extra job in the current
-measured baseline. Keep every shard of every total and the complete input set
-when changing the partition.
 
 
 Package manifests and versions
 ------------------------------
 
-All published `@oseo/*` packages use one lockstep version. Never bump a single
-package independently. npm and JSR manifests for the same package must report
-the same version, and internal package dependencies should use the workspace
-protocol rather than hard-coded local versions.
+All published `@oseo/*` packages use one lockstep version. npm and JSR
+manifests for the same package must report the same version. Internal package
+dependencies should use the workspace protocol rather than hard-coded local
+versions.
 
 The root *VERSION* file is the single source of truth for the lockstep version.
 `mise run check:versions` verifies its strict SemVer value against every
@@ -669,8 +693,8 @@ pairs, package names, and `workspace:*` internal dependency ranges. Do not edit
 
 Version changes are maintainer-driven and should not be included in unrelated
 contributions. Use `mise run bump-versions <version>` to update *VERSION* and
-every package manifest atomically. The command restores the previous contents
-if it cannot complete the full update.
+every package manifest atomically. If the command cannot complete the full
+update, it restores the previous contents.
 
 npm artifacts should be ESM packages built with tsdown and include declaration
 files and source maps. JSR packages should publish TypeScript source. Package
@@ -680,8 +704,8 @@ paths, and do not bundle other `@oseo/*` packages into an npm artifact.
 `mise run check:packages` stages npm artifacts without changing their source
 manifests. The staging step rewrites internal `workspace:*` dependencies to the
 exact lockstep release version, then inspects the packed manifest. Every package
-root must also contain a *LICENSE* file identical to the repository license so
-that both npm and JSR artifacts distribute the GPL text.
+root must contain a *LICENSE* file identical to the repository license so that
+both npm and JSR artifacts distribute the GPL text.
 
 
 Documentation and design changes
@@ -694,9 +718,7 @@ from intended behavior.
 
 Update documentation whenever a change alters a public contract, supported
 language profile, command, package boundary, or milestone criterion. Record a
-decision and its evidence when it changes a costly architectural choice. Use
-Mermaid for diagrams rather than ASCII art so that relationships remain readable
-and maintainable.
+decision and its evidence when it changes a costly architectural choice.
 
 
 Markdown style

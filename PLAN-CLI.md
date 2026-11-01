@@ -49,6 +49,7 @@ Current boundary
 The current parser accepts exactly one source path. With no output-mode flag,
 the CLI compiles the source, links a native executable in a temporary
 directory, runs it, forwards its output and status, and removes the directory.
+
 `--dump-mir` and `--emit-c` replace execution with textual compiler output.
 `--target` applies only to native execution and must name a target that the
 current host can execute.
@@ -91,26 +92,26 @@ either `oseo ./build` or `oseo run build`. The same rule applies to other
 top-level and meta-command names.
 
 The command program keeps `--help` and `--version` at the root. Help and shell
-completion are public in both command and option form. The implementation
-configures Optique with `help: "both"` and `completion: "both"` explicitly so
-this contract does not depend on library defaults. Supported forms include
+completion are public in both command and option form, including
 `oseo help build`, `oseo build --help`, `oseo completion bash`, and
-`oseo --completion bash`.
+`oseo --completion bash`. The implementation configures Optique with
+`help: "both"` and `completion: "both"` explicitly so this contract does not
+depend on library defaults.
 
 
 Run command
 -----------
 
 `oseo run SOURCE` owns compile-and-execute behavior. It compiles the source or
-closed module graph, creates a temporary native build, starts the resulting
-program, forwards its standard output, standard error, and exit status, and
-removes the temporary directory on both success and failure. The root shortcut
-does exactly the same work.
+closed module graph and creates a temporary native build. It starts the
+resulting program and forwards its standard output, standard error, and exit
+status. It removes the temporary directory on both success and failure. The
+root shortcut does exactly the same work.
 
 When `--target` is absent, `run` selects the target for the normalized
 execution host. An explicit target must still pass `canExecuteTarget()` before
 compilation starts. A target that Oseo can build but the current host cannot
-execute is rejected by `run`; the caller must use `build` for that target.
+execute is rejected by `run`. The caller must use `build` for that target.
 
 The existing `--module`, `--no-specialization`, `--target`, and
 `--no-runtime-archive-reuse` behavior belongs to `run` where it affects this
@@ -122,9 +123,11 @@ Build command
 
 `oseo build SOURCE` owns retained and inspectable compiler output. Its normal
 mode produces a native executable at a caller-visible destination and does not
-start it. Before this mode lands, the plan or an architecture decision must
-record the destination option, default file name, overwrite policy, executable
-suffix, permission behavior, and atomic replacement rules. The current
+start it.
+
+Before this mode lands, the plan or an architecture decision must record the
+destination option, default file name, overwrite policy, executable suffix,
+permission behavior, and atomic replacement rules. The current
 temporary-execution workflow provides no safe defaults for those choices.
 
 Native `build` accepts every supported target that the selected toolchain can
@@ -137,28 +140,27 @@ deliberate uncached runtime build.
 `--dump-mir` and `--emit-c` move under `build` and remain mutually exclusive.
 They preserve their current textual behavior:
 
- -  `oseo build --dump-mir SOURCE` writes deterministic MIR to standard
-    output without invoking the native toolchain.
+ -  `oseo build --dump-mir SOURCE` writes deterministic MIR to standard output
+    without invoking the native toolchain.
  -  `oseo build --emit-c SOURCE` writes generated C11 to standard output
     without compiling or linking it.
 
 These two modes are target-neutral. They reject `--target` and
-`--no-runtime-archive-reuse` rather than accepting options that cannot affect
-their result. The compiler-input options `--module` and
-`--no-specialization` remain available because they can change the selected
-source goal or emitted program.
+`--no-runtime-archive-reuse`, which cannot affect their result. The
+compiler-input options `--module` and `--no-specialization` remain available
+because they can change the selected source goal or emitted program.
 
 The old direct forms `oseo --dump-mir SOURCE` and `oseo --emit-c SOURCE` are
-not compatibility aliases. They become parse errors when the subcommand
-grammar lands. Oseo has not published a release, so carrying two placements
-would add ambiguity without preserving a released contract.
+not compatibility aliases. They become parse errors when the subcommand grammar
+lands. Oseo has not published a release, so carrying two placements would add
+ambiguity without preserving a released contract.
 
 
 Command modules and discovery
 -----------------------------
 
-The first implementation unit upgrades the CLI to a stable Optique release
-that includes `@optique/discover`, at least version 1.2.0. Direct Optique
+The first implementation unit upgrades the CLI to a stable Optique release that
+includes `@optique/discover`, at least version 1.2.0. Direct Optique
 dependencies move together so parser, runner, and discovery behavior come from
 one compatible release line.
 
@@ -179,9 +181,9 @@ packages/cli/src/
 
 *commands/index.ts* defines the root shortcut. *commands/run.ts* defines the
 explicit command. They import their shared parser and handler from outside the
-discovered directory so the two definitions cannot drift. Helper modules do
-not live under *commands/*, where a matching filename would become an
-unintended command.
+discovered directory so the two definitions cannot drift. Helper modules do not
+live under *commands/*, where a matching filename would become an unintended
+command.
 
 Oseo does not scan *commands/* at application startup. Runtime discovery uses
 dynamic imports that a bundler or single-file compiler cannot reliably see,
@@ -194,8 +196,8 @@ The generated registry is checked in because JSR publishes package source and
 the standalone CLI build must see the same static graph. Repository generation
 and check tasks keep it synchronized with *commands/*. A stale registry is a
 check failure. Developers may use generator watch mode while adding, removing,
-or renaming command modules, but the ordinary build never depends on a
-long-running watcher.
+or renaming command modules. The ordinary build never depends on a long-running
+watcher.
 
 Optique synthesizes the `help` and `completion` meta commands from the command
 tree. They do not need command modules of their own. Their output and shell
@@ -205,7 +207,7 @@ scripts are derived from the same generated registry used for dispatch.
 Application boundary
 --------------------
 
-Command discovery organizes the outer application; it does not move compiler
+Command discovery organizes the outer application. It does not move compiler
 work into Optique handlers. The compiler, module graph, backend, runtime,
 toolchain, and host interfaces keep their current dependency direction. A
 command handler translates its parsed value into an Oseo workflow request and
@@ -219,12 +221,12 @@ the destination fixed by its artifact contract and never starts it. This split
 belongs at a workflow boundary, not inside the compiler core or backend.
 
 The current package tests can supply source text, a diagnostic source ID, a
-version, and a fake `CompilerHost`, then inspect a `CliResult` without mutating
-global process streams. The migration preserves that capability even if the
-public function names change before the first release. `runProgram()` receives
-explicit arguments, output callbacks, and an exit callback in tests. Command
-handlers call host-independent or host-injected workflow functions rather than
-reading `process.argv` or constructing a concrete host themselves.
+version, and a fake `CompilerHost`. They can then inspect a `CliResult` without
+mutating global process streams. The migration preserves that capability even
+if the public function names change before the first release. `runProgram()`
+receives explicit arguments, output callbacks, and an exit callback in tests.
+Command handlers call host-independent or host-injected workflow functions
+rather than reading `process.argv` or constructing a concrete host themselves.
 
 Help, version, completion, and parse errors remain Optique-owned output.
 Compiler diagnostics and native process output remain Oseo-owned results. The
@@ -240,11 +242,11 @@ archives, and toolchain acquisition. This plan owns the command graph embedded
 in each distribution. Every channel must expose the same commands and generated
 help for one lockstep Oseo version.
 
-[*PLAN-REPL.md*](./PLAN-REPL.md) owns persistent-session semantics,
-incremental native units, code lifetime, terminal behavior, and its entry
-criteria. This plan does not add a REPL command or move that deferred work into
-the active queue. When the REPL implementation satisfies its own plan, it can
-join this command graph without changing the `run` and `build` contracts.
+[*PLAN-REPL.md*](./PLAN-REPL.md) owns persistent-session semantics, incremental
+native units, code lifetime, terminal behavior, and its entry criteria. This
+plan does not add a REPL command or move that deferred work into the active
+queue. When the REPL implementation satisfies its own plan, it can be added to
+this command graph without changing the `run` and `build` contracts.
 
 [*PLAN-BACKEND.md*](./PLAN-BACKEND.md) owns project-wide code-generation
 choices. The `build` command publishes output from the selected backend but
@@ -265,28 +267,28 @@ the two compiler-output flags.
 Unknown or duplicate options, missing source arguments, and extra positional
 arguments fail before source loading. Optique owns their usage and suggestion
 output. An extensionless shortcut argument that equals a registered command
-name selects that command; the explicit `run` spelling and a path beginning
+name selects that command. The explicit `run` spelling and a path beginning
 with `./` remain escape hatches for source files with those names.
 
 The shortcut makes every other non-option token a valid source candidate. A
 misspelled command such as `oseo buid` therefore reaches source loading and
 reports an unreadable source instead of an unknown-command suggestion. This is
 the deliberate cost of preserving `oseo SOURCE`. The common *.js* and *.ts*
-paths remain visually distinct from command names, and the explicit `run`
-form is available whenever intent needs to be stated.
+paths remain visually distinct from command names. The explicit `run` form is
+available whenever intent needs to be stated.
 
 Successful help, version, and completion requests exit with status `0`.
 Command-line parse errors and Oseo diagnostics exit with status `1`. A program
-started by `run` keeps its own exit status, standard output, and standard error.
-`build` never observes a produced program's exit status because it does not
-start the artifact.
+started by `run` keeps its own exit status, standard output, and standard
+error. `build` does not start the artifact, so it never has a produced
+program's exit status.
 
 
 Verification
 ------------
 
-The command transition needs focused tests under both Node.js and Deno. The
-suite proves at least these contracts:
+The command transition needs focused tests under both Node.js and Deno that
+prove at least these contracts:
 
  -  `oseo SOURCE` and `oseo run SOURCE` reach the same parser and workflow;
  -  registered command names win at the shortcut position, while `./NAME` and
@@ -306,7 +308,7 @@ suite proves at least these contracts:
     the same statically imported command graph.
 
 `mise run check` and `mise run test` remain the ordinary gates. The standalone
-archive smoke test joins the release gate when that pipeline exists; it must
+archive smoke test joins the release gate when that pipeline exists. It must
 run from a clean extraction without a repository command directory available
 for discovery.
 
@@ -315,37 +317,39 @@ Delivery order
 --------------
 
 1.  Add this plan and its roadmap link without changing the implemented CLI.
-2.  Freeze the retained-executable destination and replacement contract in
-    this plan or an architecture decision.
+2.  Freeze the retained-executable destination and replacement contract in this
+    plan or an architecture decision.
 3.  Add failing Node.js and Deno tests for the planned root, `run`, `build`,
     help, completion, output-mode, and target behaviors.
-4.  Upgrade Optique, introduce the static generated registry, and move command
+4.  Upgrade Optique and introduce the static generated registry. Move command
     parsing and dispatch into typed command modules while preserving the
     host-injected workflow boundary.
-5.  Split temporary execution from retained artifact publication, move
+5.  Split temporary execution from retained artifact publication. Move
     `--dump-mir` and `--emit-c` under `build`, and enforce the distinct target
     policies.
 6.  Update *docs/cli.md*, package documentation, examples, generation checks,
     and clean-package smoke tests in the implementation change that makes the
     new syntax available.
 
-Each checkpoint leaves the repository checks green. A partial checkpoint must
-not document a planned command as usable or leave the generated command
-registry stale.
+At every checkpoint, the repository checks pass. A partial checkpoint must not
+document a planned command as usable or leave the generated command registry
+stale.
 
 
 Exit criteria
 -------------
 
-The initial command-line evolution is complete when the root shortcut,
-explicit `run`, native `build`, MIR and C output modes, help, and completion
-all satisfy the contracts above on both compiler hosts. `build` must retain a
-native artifact under a recorded destination policy, support reviewed
-cross-targets, and never execute its result. `run` must preserve temporary
-cleanup and reject non-executable host-target pairs before compilation.
+The initial command-line evolution is complete when the root shortcut, explicit
+`run`, native `build`, MIR and C output modes, help, and completion all satisfy
+the contracts above on both compiler hosts.
+
+`build` must retain a native artifact under a recorded destination policy,
+support reviewed cross-targets, and never execute its result. `run` must
+preserve temporary cleanup and reject non-executable host-target pairs before
+compilation.
 
 The same statically imported command registry must pass source tests, built
 package tests, JSR dry publication, and the applicable standalone CLI smoke
-test. Future command modules extend this living plan only when they change a
-cross-command contract; feature-specific semantics remain in their owning plan
+test. Extend this plan for future command modules only when they change a
+cross-command contract. Feature-specific semantics remain in their owning plan
 or decision record.
