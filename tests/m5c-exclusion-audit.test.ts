@@ -571,6 +571,12 @@ test("a deferral row needs the deferred owner and is counted apart", () => {
     () => validateM5cExclusionAudit(stringifyYaml(audit), deferred),
     /Audit needs a disposition/u,
   );
+  audit.assessments.reviewed.disposition = "deferral";
+  audit.assessments.reviewed.normativeDependency = "source-evaluation-only";
+  assert.throws(
+    () => validateM5cExclusionAudit(stringifyYaml(audit), deferred),
+    /An authorized exclusion surface cannot be deferred/u,
+  );
 });
 
 test("the Annex B residue selector bounds ADR 0013 over eval", () => {

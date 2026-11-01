@@ -487,6 +487,13 @@ export function validateM5cExclusionAudit(
         `Unresolved subject coverage cannot keep an ADR: ${path}.`,
       );
     }
+    // ADR 0031 defers only a path no accepted record authorizes excluding,
+    // so every other dependency assessment calls for the exclusion instead.
+    if (deferred && assessment.normativeDependency !== "not-demonstrated") {
+      throw new Error(
+        `An authorized exclusion surface cannot be deferred: ${path}.`,
+      );
+    }
     if (
       (assessment.normativeDependency === "annex-b-only" &&
         proposedOwner !== annexOwner) ||
