@@ -1,0 +1,16 @@
+version: 1
+id: dynamic-source-host-script-trainc-evidence
+title: Dynamic source host Script train C evidence
+delivers: >-
+  Reviews exactly 98 pinned train C residual paths under item 1 of the
+  2026-11-01 umbrella-residual decision: 62 script completion values, 34
+  eval syntax errors, one global binding and one eval binding row. Extends
+  the DS-21 finite literal host Script replacement evidence only where the
+  contract is independent of the caller environment and strictness and
+  error phase match. Uncovered paths retain umbrella ownership. Scope,
+  SHA256, routes and authority are recorded in
+  docs/m5c-graph/dynamic-source-host-script-trainc-evidence.md.
+dependencies:
+  - unsupported-ownership-audit
+landed: false
+status: ready

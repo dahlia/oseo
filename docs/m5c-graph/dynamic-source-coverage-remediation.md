@@ -1,7 +1,7 @@
 B19/B20/B30 dynamic-source coverage remediation
 ===============================================
 
-The umbrella now owns 260 paths; the child sections below give each move.
+The umbrella now owns 162 paths; the child sections below give each move.
 In bundle 3 the residual evidence candidate accounted for 17 of the 209
 paths it owned then. The assessment keeps two of its 19 selected paths here;
 the other 190 are outside that bounded child.
@@ -664,3 +664,18 @@ exhaustive witness moves the two plain paths to ADR 0016 and the two escaped
 paths, whose ZWNJ and ZWJ assertions only Annex B meets, to ADR 0013 under
 the maintainer decision of 2026-11-01, so with the other children the
 umbrella owns 260 paths. The umbrella is blocked until the child lands.
+
+
+Train C host Script evidence child
+----------------------------------
+
+Item 1 of the 2026-11-01 umbrella-residual answer adds
+`dynamic-source-host-script-trainc-evidence` for exactly 98 train C paths:
+script completion values 62, eval syntax errors 34, one global binding row
+and one eval binding row. Its pinned selector and obligations are in that
+child's work note. Ownership moves only with reviewed closure; the umbrella
+retains every remaining path and requires child landing plus zero directly
+owned paths before its own landing.
+
+The child accounts for all 98 under ADR 0016, so with the other children
+the umbrella owns 162 paths.
