@@ -4,8 +4,9 @@ Realm, string, and intrinsic dynamic source subjects
 This record backs the M5c graph node `dynamic-source-realm-string-family`
 (DS-7). The maintainer decision of 2026-10-28 on the big-node split review
 (*20261028-m5c-scope-big-node-split.md*) approves splitting
-`dynamic-source-coverage-remediation` into DS-1 through DS-7 and keeps it as an
-umbrella that lands when it owns zero paths.
+`dynamic-source-coverage-remediation` into DS-1 through DS-7. That decision
+keeps `dynamic-source-coverage-remediation` as an umbrella that lands when it
+owns zero paths.
 
 This node owns exactly the 80 paths below at test262 revision
 `f2d1435644797268dca1f7988cad5a4e89ccd8d2`. At base main
@@ -29,7 +30,7 @@ Evidence obligations
     assertion.
  -  A path closes under `adr:0016-dynamic-source-boundary` only by item 1 of
     the decision: reviewed replacement evidence covers every non-source
-    subject and only source evaluation remains. Its exclusion-audit record
+    subject, and only source evaluation remains. Its exclusion-audit record
     has fresh source and observation digests, names the replacement paths
     and observations, and shows that no non-source subject remains.
  -  A path whose non-source subjects are not all covered stays in
@@ -43,23 +44,26 @@ Evidence obligations
 Per-path review result
 ----------------------
 
-The [per-path assessment](./dynamic-source-realm-string-assessment.md)
-records each original normative subject, selected evidence or remaining gap,
-and its decision. Nine paths close under the 2026-10-28 decision, item 1:
+Nine paths close under the 2026-10-28 decision, item 1:
 four template-site paths, four ASCII string case-conversion paths, and one
-mixed generator-instance path.
-Their audit records bind fresh source and observation digests and name the
-existing passing static paths or native fixtures. No evidence was added.
+mixed generator-instance path. The
+[per-path assessment](./dynamic-source-realm-string-assessment.md) records each
+original normative subject, selected evidence or remaining gap, and its
+decision. Their audit records bind fresh source and observation digests and
+name the existing passing static paths or native fixtures. No evidence was
+added.
 
 The other 71 paths stay with the umbrella: all 34 foreign-realm subjects,
 the realm template registry path, the same-site template identity path
 whose substitution values change between calls, seven RegExp paths, 23
 string/global/block paths, and five intrinsic/mixed-function paths. Their table
-rows name the uncovered assertions in the candidates inspected. The umbrella
-now owns 1,037 paths on this base, before parallel DS-4 through DS-6
-integration (451 of the historical 765-path cohort and 586 later admissions).
-All 80 classifications remain unsupported-profile-feature; all 41,091 inventory
-paths remain. No subset, result, tag or runtime change was made, so no UPDATE
+rows name the uncovered assertions in the candidates inspected.
+
+The umbrella now owns 1,037 paths on this base, before parallel DS-4 through
+DS-6 integration (451 of the historical 765-path cohort and 586 later
+admissions). All 80 classifications remain unsupported-profile-feature.
+
+No subset, result, tag or runtime change was made, so no UPDATE
 is needed. No native tests were added; Root retains the full publication suites
 and outer review.
 

@@ -10,43 +10,49 @@ selector and SHA256 remain in the
 
 Each subject is an EvalDeclarationInstantiation subject unless its row
 explicitly retains an ordinary body binding contract. The six mixed arrow
-cells stay with the umbrella. The other 186 cells have no independent
-non-source subject to replace: 184 observe the eval declaration collision
-and its global non-leakage, and two observe the eval-created arrow binding.
-No replacement path is claimed and no evidence is added. Their evidence
-is the original pinned source and existing reviewed unsupported observation,
-bound by the freshly recomputed digests in *exclusion-audit.yaml*.
+cells stay with the umbrella.
+
+The other 186 cells have no independent non-source subject to replace: 184
+observe the eval declaration collision and its global non-leakage, and two
+observe the eval-created arrow binding. No replacement path is claimed and
+no evidence is added. Their evidence is the original pinned source and
+existing reviewed unsupported observation, bound by the freshly recomputed
+digests in *exclusion-audit.yaml*.
 
 `var arguments` and `var arguments = 'param'` are assessed separately.
 For non-arrow functions the parameter environment has an arguments binding
 even when no explicit arguments parameter is present. Body declarations
-in the collision cells are never observed after the eval error. For async
-functions the error assertions are in the rejection callback; the fulfillment
-callback also calls `$DONE`. This assessment does not strengthen those
-assertions into a mandatory rejection check. Promise plumbing is not a
+in the collision cells are never observed after the eval error.
+
+For async functions the error assertions are in the rejection callback; the
+fulfillment callback also calls `$DONE`. This assessment does not strengthen
+those assertions into a mandatory rejection check. Promise plumbing is not a
 separate parameter or arguments contract. Generator bodies are not advanced.
 
 The global assertions check that eval did not leak a binding. Counters
 record body reachability. An unused `q = () => arguments` is not evidence
-of captured-binding lookup. The mixed rows that call `q()` additionally
-need parameter/body environment separation evidence. Ordinary static
-arguments, default parameter, body binding and closure contracts remain
-inside the claim. A later accepted ADR 0016 replacement or newly uncovered
-non-source subject reopens the affected accounting.
+of captured-binding lookup.
 
-Candidate evidence was checked for the six retained cells.
-*tests/property/m5-parameter-var.property.test.ts* separates a parameter
-cell from body var/function bindings in an ordinary function named
-`consume`, using the name `value`; it does not observe an arrow's
-arguments binding or a lexical body binding. The arrow boundary check in
+The mixed rows that call `q()` additionally need parameter/body environment
+separation evidence. Ordinary static arguments, default parameter, body
+binding and closure contracts remain inside the claim. A later accepted ADR
+0016 replacement or newly uncovered non-source subject reopens the affected
+accounting.
+
+Candidate evidence was checked for the six retained cells and does not
+establish complete replacements.
+*tests/property/m5-parameter-var.property.test.ts* separates a parameter cell
+from body var/function bindings in an ordinary function named `consume`, using
+the name `value`; it does not observe an arrow's arguments binding or a lexical
+body binding. The arrow boundary check in
 *tests/property/m5-arguments-object.property.test.ts* checks unresolved
-arguments lookup in HIR. Under
-*test/language/expressions/arrow-function/*, the reviewed static
+arguments lookup in HIR.
+
+Under *test/language/expressions/arrow-function/*, the reviewed static
 *lexical-arguments.js* reads an enclosing function's arguments object, and
 *syntax/arrowparameters-bindingidentifier-arguments.js* reads an explicit
-arrow parameter. Neither separates a non-simple arrow's
-parameter binding from the three body declaration forms. These candidates do
-not establish complete replacements for the retained cells.
+arrow parameter. Neither separates a non-simple arrow's parameter binding
+from the three body declaration forms.
 
 | Path                                                                                                                            | Normative subject                                                                                                     | Disposition | Replacement evidence and reason                                                                                                                                      |
 | ------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------- | ----------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------- |

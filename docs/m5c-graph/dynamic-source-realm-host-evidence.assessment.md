@@ -1,13 +1,13 @@
 DS-19 per-path assessment
 =========================
 
-This table records the DS-19 checkpoint. Its two derived-constructor
-remediation entries are superseded by the later
-[*residual assessment*](./dynamic-source-residual-evidence.assessment.md);
-the other 80 entries are unchanged.
+The table records the DS-19 checkpoint. Two derived-constructor remediation
+entries are superseded by the later
+[*residual assessment*](./dynamic-source-residual-evidence.assessment.md). The
+other 80 entries are unchanged.
 
-All 82 source and normalized observation digests were freshly verified.
-No dependency tags, subset entries, result records or inventory paths change.
+All 82 source and normalized observation digests were freshly verified. No
+dependency tags, subset entries, result records or inventory paths change.
 
 | Path                                                                                                              | Normative subject                                                                                                                                            | Replacement evidence                                                                                        | Disposition and reason                                                                                                                                                                                                                                                                                                                                                                                                  |
 | ----------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------ | ----------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |

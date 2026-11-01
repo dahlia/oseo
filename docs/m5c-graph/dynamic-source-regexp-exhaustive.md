@@ -51,10 +51,11 @@ units per path.
 | *test/language/literals/regexp/S7.8.5\_A2.4\_T2.js* | `/a\X/`          | Accepted with `source` `a\X`, or SyntaxError for UnicodeIDContinue only |
 
 The escaped paths accept a SyntaxError only when the code unit is not `$`,
-ZWNJ or ZWJ and `var _X` parses, the original's UnicodeIDContinue check.
-Annex B identity escapes remain separate: under ADR 0013 the build reports
-an Annex-B-only escape as unsupported, which is the core grammar's
-SyntaxError outcome, and the evidence must keep every core assertion.
+ZWNJ or ZWJ and `var _X` parses. That condition is the original's
+UnicodeIDContinue check. Annex B identity escapes remain separate. Under
+ADR 0013 the build reports an Annex-B-only escape as unsupported, which is
+the core grammar's SyntaxError outcome. The evidence must keep every core
+assertion.
 
 
 Closure route and evidence obligations
@@ -81,55 +82,55 @@ integration and publication.
 Implementation delta
 --------------------
 
-*tests/property/m5-regexp-literal-exhaustive.property.test.ts* reproduces
-each original loop, its exclusions and its fallback condition. Build-time
-tests compile every selected code unit as the literal the original evaluates,
-`/` + text + `/` with no flags, in sloppy and strict scripts:
+*tests/property/m5-regexp-literal-exhaustive.property.test.ts* reproduces each
+original loop, its exclusions and its fallback condition. Build-time tests
+compile every selected code unit as the literal the original evaluates, `/` +
+text + `/` with no flags, in sloppy and strict scripts:
 
  -  An accepted literal must compile with no diagnostic to exactly one
-    ahead-of-time literal whose recorded source is the original's spelling
-    and whose flags are empty.
- -  A rejected literal is allowed only in the escaped domains. Every
-    diagnostic must be `OSEO1001` with the Annex B message, the code unit
-    must not be one the original exempts, and `var _X` must compile, which is
-    the original's own UnicodeIDContinue check.
- -  Both strictness modes must agree. Independently of the parser, the
-    accepted set must equal the selected code units outside `ID_Continue` of
-    the pinned Unicode tables plus the core escapes
-    `f n r t v d D s S w W b B 0`.
+    ahead-of-time literal whose recorded source is the original's spelling and
+    whose flags are empty.
+ -  A rejected literal is allowed only in the escaped domains. Every diagnostic
+    must be `OSEO1001` with the Annex B message, the code unit must not be one
+    the original exempts, and `var _X` must compile, which is the original's
+    own UnicodeIDContinue check.
+ -  Both strictness modes must agree. Independently of the parser, the accepted
+    set must equal the selected code units outside `ID_Continue` of the pinned
+    Unicode tables plus the core escapes `f n r t v d D s S w W b B 0`.
 
 Four native properties execute all 160,516 accepted literals, each once per
-run, comparing `source` in the program with the spelling the original builds
-from the same code unit through `String.fromCharCode`. The reference host
-runs every program from memory, the build must emit one literal descriptor
-per selected code unit, and mutation controls show that a wrong prefix or a
-wrong code unit fails before the success line.
+run. Each compares `source` in the program with the spelling the original
+builds from the same code unit through `String.fromCharCode`. The reference
+host runs every program from memory, and the build must emit one literal
+descriptor per selected code unit. Mutation controls show that a wrong prefix
+or a wrong code unit fails before the success line.
 
 No parser, escape or source defect was found, so `packages/` is unchanged.
 
-The witness found one residue. Unicode 15.1 made ZWNJ and ZWJ
-`ID_Continue`, and the pinned tables are Unicode 17. The core grammar
-therefore rejects `‌` and `‍` as identity escapes, while both
-escaped originals exempt exactly these two code units from their fallback
-and rethrow. Only Annex B's identity escape satisfies those two assertions;
-every other code unit of the four originals is witnessed.
+One residue remains. Unicode 15.1 made ZWNJ and ZWJ `ID_Continue`, and the
+pinned tables are Unicode 17. The core grammar therefore rejects `‌` and `‍` as
+identity escapes. Both escaped originals exempt exactly these two code units
+from their fallback and rethrow. Only Annex B's identity escape satisfies those
+two assertions; every other code unit of the four originals is witnessed.
 
 Root's ruling of 2026-11-01 closes S7.8.5\_A1.1\_T2 and S7.8.5\_A2.1\_T2 under
-ADR 0016 through the new `ds17-exhaustive-plain-literals` assessment. The
-maintainer decision of 2026-11-01 applies item 3 of the 2026-10-28 decision
-to S7.8.5\_A1.4\_T2 and S7.8.5\_A2.4\_T2 and to no other path: every core
-subject has the replacement evidence above, so both close under ADR 0013 as
-`annex-b-only` exclusions through `ds17-exhaustive-escaped-annex-b`. ADR 0013
-is unchanged. Their observation is still the eval rejection, so the exclusion
-audit admits an ADR 0013 row over that rejection only for these two exact
-paths, only as a bound `annex-b-only` exclusion, and requires both rows. The
-umbrella now owns 330 paths and this node owns none.
+ADR 0016 through the new `ds17-exhaustive-plain-literals` assessment.
+
+The maintainer decision of 2026-11-01 applies item 3 of the 2026-10-28 decision
+to S7.8.5\_A1.4\_T2 and S7.8.5\_A2.4\_T2 and to no other path. Every core
+subject has the replacement evidence above, so both paths close under ADR 0013
+as `annex-b-only` exclusions through `ds17-exhaustive-escaped-annex-b`. ADR
+0013 is unchanged. Their observation is still the eval rejection. The exclusion
+audit therefore admits an ADR 0013 row over that rejection only for these two
+exact paths, only as a bound `annex-b-only` exclusion, and requires both rows.
+
+The umbrella now owns 330 paths and this node owns none.
 
 Cost, shard weights and CI placement are recorded in
 [*exhaustive RegExp literal evidence*](../evidence/regexp-literal-exhaustive/README.md).
 The macOS native sanitizer split is recorded in
 [*macOS native sanitizer split*](../evidence/macos-sanitizer-split/README.md).
 
-The subset, classifications, dependency tags and observations are unchanged,
-so no test262 UPDATE is needed. The test262 runner reads none of the changed
+The subset, classifications, dependency tags and observations are unchanged, so
+no test262 UPDATE is needed. The test262 runner reads none of the changed
 *tools/* files.

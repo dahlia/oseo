@@ -2,18 +2,18 @@ Per-path binding reference assessment
 =====================================
 
 All 41 pinned paths were read individually against the source and ledger at
-`362ddb13`. The selector digest is unchanged. No existing reviewed path was
-accepted as a complete replacement without the new witnesses.
+`362ddb13`. The selector digest is unchanged. Every existing reviewed path
+accepted as a complete replacement required the new witnesses.
 
 The evidence column names a fixture in
 [*binding-reference-evidence.ts*](../../tests/native/fixtures/binding-reference-evidence.ts).
 `tests/native.ts` runs these witnesses under both specialization policies, with
 forced collection, differential Node.js/Deno execution and structural checks.
-Each exclusion remains an unsupported profile feature; only source evaluation
-remains after these replacement observations.
+Each exclusion remains an unsupported profile feature. After these replacement
+observations, only source evaluation remains.
 
-The original audit subjects are retained verbatim in the audit records and
-named alongside the replacement observations below. Eval-specific rules stay
+The audit records retain the original audit subjects verbatim, and the table
+names them alongside the replacement observations. Eval-specific rules stay
 visible even when only their source-evaluation portion remains excluded.
 
 | Path                                                                                            | Original recorded subject                                                                                                                                                                                                                                                                                                                                                                              | Non-source subject                                                                          | Disposition | Evidence                                | Reason                                                                                                                                                                                       |

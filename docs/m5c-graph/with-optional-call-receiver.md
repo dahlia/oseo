@@ -96,18 +96,20 @@ Source location
 ---------------
 
 On the tree of `12ec5922`, which carries the `0ae8de51` correction,
-`lowerOptionalChain` in *packages/compiler/src/mir-build.ts* (line 3572)
-lowers the chain base with `lowerExpression` (line 3580). For a
-`with-get` base, that reaches `lowerWithRead` with `retainReceiver` false, so
-only the value survives. A first call link with no preceding member link then
-passes a synthetic `undefined` receiver, at line 3667 for a chain-boundary call
-and line 3685 otherwise. The ordinary call path asks `lowerWithRead` to retain
-the receiver and passes the selected object, or `undefined` for a lexical or
-global fallback. On `13ab5051` the same lines are 3564, 3572, 3659, and 3677.
+`lowerOptionalChain` in *packages/compiler/src/mir-build.ts* (line 3572) lowers
+the chain base with `lowerExpression` (line 3580). For a `with-get` base, that
+reaches `lowerWithRead` with `retainReceiver` false, so only the value
+survives. A first call link with no preceding member link then passes a
+synthetic `undefined` receiver, at line 3667 for a chain-boundary call and line
+3685 otherwise.
+
+The ordinary call path asks `lowerWithRead` to retain the receiver and passes
+the selected object, or `undefined` for a lexical or global fallback. On
+`13ab5051` the same lines are 3564, 3572, 3659, and 3677.
 
 `with-optional-call-receiver-non-tail` changes this lowering to read such a
-base through `lowerWithRead` with the receiver retained when the first link
-is a call.
+base through `lowerWithRead` with the receiver retained when the first link is
+a call.
 [*with-optional-call-receiver-non-tail.md*](./with-optional-call-receiver-non-tail.md)
 records the repair and its evidence outside tail position.
 
@@ -115,8 +117,8 @@ records the repair and its evidence outside tail position.
 Repair and evidence contract
 ----------------------------
 
-The repair keeps the selected object, or `undefined` for a fallback binding,
-as the receiver of the first call link of an optional chain whose base is an
+The repair keeps the selected object, or `undefined` for a fallback binding, as
+the receiver of the first call link of an optional chain whose base is an
 identifier resolved through `with`. It leaves the GetBindingValue order that
 `eval-intrinsic-value` establishes, nullish short-circuiting, argument
 evaluation order, and optional member calls unchanged.

@@ -4,22 +4,25 @@ DS-7 per-path assessment
 Base: `1f3ade138ea7cbee80b2d62940e8f497db2bc1a2`. The selected set is
 the 80 paths in the node note, SHA256
 `e0822eea02a0a34eef63da1fe738fe0a8e13c5be2094b3d937c2a7c92c33e87e`.
+
 All 80 were independently read at the pinned test262 revision and matched
 unsupported umbrella rows in the base ledger. Nine close under decision
-2026-10-28 item 1; 71 stay with the umbrella; evidence added: zero.
+2026-10-28 item 1; 71 stay with the umbrella. Evidence added: zero.
 
-Each row names the normative subject and the evidence selected or the gap
-found in inspected candidates. A retained row is an evidence gap in this
-audit, not a claim that no equivalent observation can ever exist. Realm
-fallback tests need the foreign realm and their operation-specific inputs;
-a local default prototype assertion alone does not cover them. RegExp
-source spelling alone does not cover literal matcher equivalence.
+Each row names the normative subject and either the evidence selected or the
+gap found in inspected candidates. A retained row is an evidence gap in this
+audit, not a claim that no equivalent observation can ever exist.
 
-Closed-path audit assessments bind replacement file digests. The source
-digests and passing observations of upstream replacement paths follow the
-table. Unsupported observations, dependency tags and classifications stay
-unchanged. Reopen on changed source, observations or replacement evidence,
-or an accepted ADR 0016 amendment admitting the relevant source form.
+Realm fallback tests need the foreign realm and their operation-specific inputs;
+a local default prototype assertion alone does not cover them. RegExp source
+spelling alone does not cover literal matcher equivalence.
+
+Closed-path audit assessments bind replacement file digests. The source digests
+and passing observations of upstream replacement paths follow the table.
+Unsupported observations, dependency tags and classifications stay unchanged.
+
+A path reopens on changed source, observations or replacement evidence. It also
+reopens on an accepted ADR 0016 amendment admitting the relevant source form.
 
 | Path                                                                                                                               | Normative subject                                                                                                                                          | Decision    | Replacement evidence or remaining gap                                                                                                                                                                                                                                                                                                                                                                                                                                    |
 | ---------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |

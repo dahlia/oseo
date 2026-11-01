@@ -1,52 +1,59 @@
 B19/B20/B30 dynamic-source coverage remediation
 ===============================================
 
-The umbrella now owns 162 paths; the child sections below give each move.
-In bundle 3 the residual evidence candidate accounted for 17 of the 209
-paths it owned then. The assessment keeps two of its 19 selected paths here;
-the other 190 are outside that bounded child.
+The umbrella now owns 162 paths. The child sections below give each move. In
+bundle 3, the residual evidence candidate accounted for 17 of the 209 paths it
+owned then. The assessment keeps two of its 19 selected paths here; the other
+190 are outside that bounded child.
 
 At the earlier split checkpoint, the umbrella owned 757 paths: DS1 accounts for
-218, DS-3 for 11, DS2 for 76, DS4 for 40, DS-5 for 2, DS-6 for 42 and DS-7 for
-9 of the paths it has held; later observation trains added the rest, and five
+218, DS-3 for 11, DS2 for 76, DS4 for 40, DS-5 for 2, DS-6 for 42, and DS-7 for
+9 of the paths it has held. Later observation trains added the rest, and five
 promoted to pass when direct eval stopped parsing absent or non-String
-arguments. DS-5's
+arguments.
+
+DS-5's
 [*per-path assessment*](./dynamic-source-lexical-completion-assessment.yaml)
-closes two U+180E lexical probes through paired static passes and keeps 71 in
-remediation. DS-6's
+closes two U+180E lexical probes through paired static passes. The assessment
+keeps 71 of DS-5's 73 selected paths here in remediation and records every
+disposition. No DS-5 native or fixture evidence was added.
+
+DS-6's
 [*per-path assessment*](./dynamic-source-private-binding-assessment.yaml)
-closes 42 of its 66 private identity, binding, call-order and this-binding
-paths through 20 reviewed static replacement paths and keeps 24 in remediation.
+closes 42 of its 66 private identity, binding, call-order, and this-binding
+paths through 20 reviewed static replacement paths. It keeps 24 in remediation.
+
 DS4's [*per-path assessment*](./dynamic-source-callable-family-assessment.md)
 reviews all 86 reserved callable-family paths, closes 40 through existing
 passing static replacements under decision item 1, and keeps 46 in remediation.
-It adds no native evidence. DS2's
+It adds no native evidence.
+
+DS2's
 [*per-path assessment*](./dynamic-source-module-semantics-assessment.yaml) uses
 reviewed static-import observations and one new native test of a live default
-namespace property, keeping 32 selected module subjects and 67 candidates
-outside DS2 in remediation. DS-5 closes two U+180E lexical probes using paired
-static passes, with 71 of its 73 selected paths remaining here; its
-[*per-path assessment*](./dynamic-source-lexical-completion-assessment.yaml)
-records every disposition. No DS-5 native or fixture evidence was added. DS-7's
-[per-path assessment](./dynamic-source-realm-string-assessment.md) reviews its
-exact 80-path reservation, accounts for 9 using existing static replacement
-evidence, and retains 71 with their uncovered contracts. It adds no evidence or
-native tests. DS-10's
-[*per-path assessment*](./dynamic-source-eval-contract-assessment.md) reviews
-105 eval-contract paths: seven acceptance-only eval environment construction
-cases move to ADR 0016 under existing `eval-semantics`, and 98 stay here with
-their ordinary subjects and evidence gaps. Root's 2026-10-31 ruling requires no
-replacement for the seven because no non-source subject remains. No tests or
-replacement evidence were added. All original paths and observations remain; no
-UPDATE is needed.
+namespace property. It keeps 32 selected module subjects and 67 candidates
+outside DS2 in remediation.
+
+DS-7's [per-path assessment](./dynamic-source-realm-string-assessment.md)
+reviews its exact 80-path reservation, accounts for 9 using existing static
+replacement evidence, and retains 71 with their uncovered contracts. It adds no
+evidence or native tests.
+
+DS-10's [*per-path assessment*](./dynamic-source-eval-contract-assessment.md)
+reviews 105 eval-contract paths: seven acceptance-only eval environment
+construction cases move to ADR 0016 under existing `eval-semantics`, and 98
+stay here with their ordinary subjects and evidence gaps. Root's 2026-10-31
+ruling requires no replacement for the seven because no non-source subject
+remains. No tests or replacement evidence were added. All original paths and
+observations remain; no UPDATE is needed.
 
 DS-9's [per-path assessment](./dynamic-source-eval-arguments-assessment.md)
 reviews its exact 192-path reservation and accounts for 186 eval-specific
 arguments declaration cells under ADR 0016. Six arrow cells still assert
 ordinary body bindings, including three parameter/body closure separation
-checks, and remain here without complete static replacement evidence.
-No native or fixture evidence is added. This worker accounting leaves all
-graph landing and publication gates to Root.
+checks. They remain here without complete static replacement evidence. No
+native or fixture evidence is added. This worker accounting leaves all graph
+landing and publication gates to Root.
 
 
 Approved second split
@@ -79,29 +86,31 @@ preserves its exact selector, SHA256, closure route and evidence obligations.
 | DS-22 |    19 | M    | [*dynamic-source-boundary-overlap-review.md*](./dynamic-source-boundary-overlap-review.md)               |
 
 Ownership moves to each child only as that child lands. All 950 paths
-remained owned here during the metadata split. DS-9's accounting moves
-186 to ADR 0016 and DS-10's moves seven, leaving 757 directly owned at that
+remained owned here during the metadata split. DS-9's per-cell audit accounts
+for 186 paths moved to ADR 0016, and DS-10's accounts for seven. After those
+audits, 757 original paths remained directly owned and unresolved at that
 historical checkpoint, including DS-9's six unresolved cells and DS-10's 98
-retained paths. The umbrella depends on DS-1 through DS-22, stays blocked until
+retained paths.
+
+The umbrella depends on DS-1 through DS-22, stays blocked until
 all children land, and lands when it owns zero paths. Zero direct ownership
 alone does not establish that a child's evidence and publication gates have
 landed. Every child reports exact newly covered and still-uncovered subsets;
 unresolved subjects retain active remediation.
 
 The split establishes no exclusions, passes or new replacement evidence.
-The first three children had at most 299 audit-only candidates; DS-9's
-per-cell audit accounts for 186 and DS-10's for seven, with 757 of the
-original paths unresolved at that checkpoint. No estimate permits weakening
-ordinary core assertions or broadening ADR 0013/0016/0019 or an ADR 0028
-selector.
+The first three children had at most 299 audit-only candidates. No estimate
+permits weakening ordinary core assertions or broadening ADR 0013/0016/0019
+or an ADR 0028 selector.
 
 Root authorized exactly 459 additions on 2026-10-27: 66 observed
 `OSEO1001` unknown-eval binding paths and 393 observed ImportExpression
 rejections. Preserve the existing 306 owned paths and dependencies. The
-original combined remediation scope was 765 paths. DS-1 subsequently
-accounted for 218 ImportCall paths under ADR 0016, leaving 547. DS-3
+original combined remediation scope was 765 paths.
+
+DS-1 accounted for 218 ImportCall paths under ADR 0016, leaving 547. DS-3
 accounts for 11 unknown-eval paths with reviewed static replacement
-evidence under item 1 of the 2026-10-28 decision, leaving 536; its other
+evidence under item 1 of the 2026-10-28 decision, leaving 536. Its other
 55 remain remediation. The per-path reasons are in
 [the DS-3 assessment](./dynamic-source-unknown-eval-assessment.md).
 ADR 0016 and ADR 0019 remain unchanged; no path becomes a semantic pass.

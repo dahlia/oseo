@@ -1,15 +1,15 @@
 Observation batch 17 admission preparation
 ==========================================
 
-This is a fixed Source4 preparation snapshot, pending independent review,
-Root integration, D3, required later observation and publication gates.
-No node status or landed flag changes through this preparation.
+This is a fixed Source4 preparation snapshot, pending independent review, Root
+integration, D3, required later observation and publication gates. No node
+status or landed flag changes through this preparation.
 
 All 287 original paths (287 review units) are added together from the accepted
-leading results on R `db4104dce27cdadea7825f809c4def1987a43e0c`,
-tree `fef6a24456493d6a87a42751ebd2e90d7b2ad00f`.
-The overall leading run failed later in B18; this batch completed.
-No new observation, compiler emission or native execution ran here.
+leading results on R `db4104dce27cdadea7825f809c4def1987a43e0c`, tree
+`fef6a24456493d6a87a42751ebd2e90d7b2ad00f`. The overall leading run failed
+later in B18; this batch completed. No new observation, compiler emission or
+native execution ran here.
 
 | Pass | Expected negative | Unsupported | Requests | Native executed |
 | ---: | ----------------: | ----------: | -------: | --------------: |
@@ -26,38 +26,42 @@ The original captures and all request/result/stdout/stderr links are in:
 
 These are author execution/source evidence, not previous model review
 certificates. Source metadata, bodies, assertions, flags, negative phases,
-strictness and actual early exits remain unchanged. Unsupported reasons
-are the original OSEO1001 rejections; absent native execution is not a
-runtime result. Parse negatives expose no raw parser diagnostic here.
-The leading packet captured no emitted C/MIR, and none is claimed.
+strictness and actual early exits remain unchanged.
+
+Unsupported reasons are the original OSEO1001 rejections. Absent native
+execution is not a runtime result. Parse negatives expose no raw parser
+diagnostic here. The leading packet captured no emitted C/MIR, and none is
+claimed.
 
 Tags name the original subject and concrete non-harness prerequisites.
 Whitespace/keyword mentions alone do not justify lexical-grammar, and a
-failure-only assertion throw does not justify abrupt-completion coverage.
-Eval update/value reads and Function.prototype reads are not dynamic
-source compilation. All existing vocabulary and supportedFeatures stay
-unchanged. Full original bodies and source-string literals were inspected.
+failure-only assertion throw does not justify abrupt-completion coverage. Eval
+update/value reads and Function.prototype reads are not dynamic source
+compilation. All existing vocabulary and supportedFeatures stay unchanged. Full
+original bodies and source-string literals were inspected.
 
 The original global-code import/export negatives keep Script goal and zero
 executor calls. module-linking identifies their import/export declaration
-grammar boundary against ScriptBody, rather than clause12 token grammar;
-this tag claims no module execution, linking pass, or new vocabulary.
+grammar boundary against ScriptBody, rather than clause12 token grammar. This
+tag claims no module execution, linking pass, or new vocabulary.
 
 
 Bounded unsupported ownership
 -----------------------------
 
 Existing ADR0016 dynamic-construction/eval-semantics assessments bind only
-source-subject originals below; ADR0019 mixed-core and reopening conditions
-remain unchanged. They are preparation decisions subject to independent
-review, not a newly accepted exemption. Mixed-core originals retain the
-existing remediation node, whose prepared scope is now exactly 304.
-Remediation-only assessments name the retained missing core contracts.
-The new parameter-expression-variable-environment assessment is remediation,
-with normativeDependency not-demonstrated. It grants no exclusion.
-The earlier 290 owners and contracts remain intact. No replacement evidence
-is represented as completed or equivalent. Every row below names its
-unchanged original source and actual deciding observation.
+source-subject originals below. ADR0019 mixed-core and reopening conditions
+remain unchanged. They are preparation decisions subject to independent review,
+not a newly accepted exemption.
+
+Mixed-core originals retain the existing remediation node, whose prepared scope
+is now exactly 304. Remediation-only assessments name the retained missing core
+contracts. The new parameter-expression-variable-environment assessment is
+remediation, with normativeDependency not-demonstrated. It grants no exclusion.
+
+The earlier 290 owners and contracts remain intact. No replacement evidence is
+represented as completed or equivalent. Every row below names its unchanged
+original source and actual deciding observation.
 
 | Original path                                                       | Source SHA-256                                                   | Prepared owner                           | Assessment                                |
 | ------------------------------------------------------------------- | ---------------------------------------------------------------- | ---------------------------------------- | ----------------------------------------- |
@@ -196,44 +200,43 @@ Missing core contracts and replacement obligations
     is not yet reviewed source equivalence.
 
  -  [function-code/10.4.3-1-84-s.js]
-
     A statically declared or expression-defined f has its own strict/non-strict
-    this contract, but is invoked only from rejected eval or Function-produced
-    caller code.
-    Preserve exact callee strictness, global binding/property installation and
-    caller strictness, with equivalent static call-context evidence and an
-    explicit mixed-core accounting decision; replacing only the dynamic caller
-    is not yet reviewed source equivalence.
+    this contract, but it is invoked only from rejected eval or
+    Function-produced caller code. Preserve exact callee strictness, global
+    binding/property installation, and caller strictness. The static
+    call-context evidence must be equivalent, and the mixed-core accounting
+    decision must be explicit. Replacing only the dynamic caller is not yet
+    reviewed source equivalence.
 
  -  [function-code/10.4.3-1-84gs.js]
 
     A statically declared or expression-defined f has its own strict/non-strict
-    this contract, but is invoked only from rejected eval or Function-produced
-    caller code.
-    Preserve exact callee strictness, global binding/property installation and
-    caller strictness, with equivalent static call-context evidence and an
-    explicit mixed-core accounting decision; replacing only the dynamic caller
-    is not yet reviewed source equivalence.
+    this contract, but it is invoked only from rejected eval or
+    Function-produced caller code. Preserve exact callee strictness, global
+    binding/property installation, and caller strictness. The static
+    call-context evidence must be equivalent, and the mixed-core accounting
+    decision must be explicit. Replacing only the dynamic caller is not yet
+    reviewed source equivalence.
 
  -  [function-code/eval-param-env-with-computed-key.js]
 
     FunctionDeclarationInstantiation keeps parameter-expression eval var
     declarations in the required environment relative to parameter and body
-    bindings; the original inner/outer x assertion is unresolved.
-    Account for the computed-key or destructuring-default parameter expression
-    and exact eval-created var visibility. Replacing eval by assignment does
-    not distinguish these environments; require independently justified
-    equivalent evidence or a maintainer boundary/accounting decision.
+    bindings. The original inner/outer x assertion is unresolved. Account for
+    the computed-key or destructuring-default parameter expression and exact
+    eval-created var visibility. Replacing eval by assignment does not
+    distinguish these environments. Require independently justified equivalent
+    evidence or a maintainer boundary/accounting decision.
 
  -  [function-code/eval-param-env-with-prop-initializer.js]
 
     FunctionDeclarationInstantiation keeps parameter-expression eval var
     declarations in the required environment relative to parameter and body
-    bindings; the original inner/outer x assertion is unresolved.
-    Account for the computed-key or destructuring-default parameter expression
-    and exact eval-created var visibility. Replacing eval by assignment does
-    not distinguish these environments; require independently justified
-    equivalent evidence or a maintainer boundary/accounting decision.
+    bindings. The original inner/outer x assertion is unresolved. Account for
+    the computed-key or destructuring-default parameter expression and exact
+    eval-created var visibility. Replacing eval by assignment does not
+    distinguish these environments. Require independently justified equivalent
+    evidence or a maintainer boundary/accounting decision.
 
 [function-code/10.4.3-1-63-s.js]: https://github.com/tc39/test262/blob/f2d1435644797268dca1f7988cad5a4e89ccd8d2/test/language/function-code/10.4.3-1-63-s.js
 [function-code/10.4.3-1-63gs.js]: https://github.com/tc39/test262/blob/f2d1435644797268dca1f7988cad5a4e89ccd8d2/test/language/function-code/10.4.3-1-63gs.js
@@ -254,55 +257,59 @@ Missing core contracts and replacement obligations
 Two historical dependency proposals corrected
 ---------------------------------------------
 
-The immutable proposal table originally tagged the following two subjects
-with lexical-bindings. Complete bodies have no let, const, class, or strict
-block function declaration, so the final records remove that tag under
+The immutable proposal table originally tagged the following two subjects with
+lexical-bindings. Complete bodies have no let, const, class, or strict block
+function declaration. The final records therefore remove that tag under
 ADR0013's existing vocabulary:
 
  -  test/language/identifier-resolution/assign-to-global-undefined.js
  -  test/language/identifier-resolution/unscopables.js
 
-The first keeps its runtime ReferenceError negative; the second keeps its
-pass for global var lookup independent of Symbol.unscopables. All other
-tags, actual observations, source bodies, negative phases and owners stay
-exact. The source proposal table remains preserved; it is not a final tag
-certificate. This correction adds no vocabulary or exclusion.
+The first keeps its runtime ReferenceError negative. The second keeps its pass
+for global var lookup independent of Symbol.unscopables. All other tags, actual
+observations, source bodies, negative phases, and owners stay exact.
+
+The source proposal table remains preserved. It is not a final tag certificate.
+This correction adds no vocabulary or exclusion.
 
 
 Main-only reanchor preparation
 ------------------------------
 
 The earlier source-bound preparation and leading-run descriptions are
-historical evidence on R db4104; that original run failed later in B18.
-All original sources, negative phases, assertions and B18 reservations
-remain unchanged, with304 active remediation owners and17 existing ADR0016
+historical evidence on R db4104. That original run failed later in B18. All
+original sources, negative phases, assertions, and B18 reservations remain
+unchanged. There are 304 active remediation owners and 17 existing ADR0016
 assessment bindings. They grant no new exclusion or publication approval.
 
 The subsequent Main-only execution used actual clean U
 `44d2c4f03d65f8742c043532a9bef909c852cce1`, tree
-`b83c495e945e76a508b76aef63e1e8859caeef8d`, with product code exact successful
-Main128d63. Its single stock scoped command was:
+`b83c495e945e76a508b76aef63e1e8859caeef8d`, with product code exact and
+successful Main128d63. Its single stock scoped command was:
 
 ~~~~ sh
 mise run test262:update:changed -- \
     --baseline 128d63fcec3a625eca799f5bd9df8b9267b8c6b2
 ~~~~
 
-It naturally completed0 on2026-10-25: all754 originals freshly observed,
-636passes,70expected negatives and48unsupported, pool8/retries0. The actual
-manifest update wrote0 partitions with6688 unchanged index/partition files;
-all29147 old Main records and all754 prepared values/tags remain exact.
-No expected value, owner, source or failure was normalized. Two naturally
-empty owned drains were15.106281s apart; source/dist/tool bindings held.
+The run completed naturally with 0 on 2026-10-25. All 754 originals were
+freshly observed: 636 passes, 70 expected negatives, and 48 unsupported, with
+pool 8 and retries 0. The actual manifest update wrote 0 partitions. 6688 index
+and partition files were unchanged. All 29147 old Main records and all 754
+prepared values/tags remain exact. No expected value, owner, source, or failure
+was normalized. Two naturally empty owned drains were 15.106281s apart. The
+source, dist, and tool bindings held.
 
 [Actual command output, argv, bindings and owned drains](/data/m5c-b16-b17-main-scoped-observation-20261025/task_3335cb68b22b/ctx_fb50e986ca95/)
 are the fresh execution evidence. This observation-provenance commit records
-the genuine zero record delta after that actual U; it does not relabel the
-older R as a new U/R. The original leading packet and B18's semantic failure
-plus264 unreached paths remain preserved separately. All336 B18 paths remain
-unreviewed. Root owns actual D3, affected internal/ outer review judgment,
-final owners/exclusions, candidate gates and publication; no node is marked
-landed or final gate claimed here.
+the genuine zero record delta after that actual U. It does not relabel the
+older R as a new U/R.
+
+The original leading packet, B18's semantic failure, and 264 unreached paths
+remain preserved separately. All 336 B18 paths remain unreviewed. Root owns
+actual D3, the affected internal/outer review judgment, final
+owners/exclusions, candidate gates, and publication. No node is marked landed,
+and no final gate is claimed here.
 
 
 Dependency-tag metadata repair
@@ -327,28 +334,32 @@ lexical-bindings corrections stay preserved.
 [The complete 754-path audit](/data/m5c-b16-b17-dependency-tag-repair-20261025/task_6fb3f44dbafb/ctx_869904f6cbc9/AUDIT.tsv)
 and its JSON companion include unchanged paths and body-line evidence for every
 retained tag. The batch 16 repair section records the shared method and
-original U/R provenance. T changes dependency metadata only; the actual 229
-passes, 29 expected negatives and 29 unsupported results remain exact. All 31
-mixed-core remediation and 17 bounded existing ADR bindings across both batches
-remain exact. No new exclusion or landing is recorded. Affected independent
-review and Root's D3 decision remain pending.
+original U/R provenance.
+
+T changes dependency metadata only. The actual 229 passes, 29 expected
+negatives and 29 unsupported results remain exact. All 31 mixed-core
+remediation and 17 bounded existing ADR bindings across both batches remain
+exact. No new exclusion or landing is recorded. Affected independent review
+and Root's D3 decision remain pending.
 
 
 Fresh observation of the corrected tags
 ---------------------------------------
 
-Root's fresh D3 selected the 20 repaired entries. One stock scoped UPDATE
-ran on clean T `1a040fe26557e3ef68c5f75bb3456812130fc011`, using baseline
-R `2609fcd5e8dcff6365e4db15a155676192de4c79`. It completed naturally on
+Root's fresh D3 selected the 20 repaired entries. One stock scoped UPDATE ran
+on clean T `1a040fe26557e3ef68c5f75bb3456812130fc011`. It used baseline
+R `2609fcd5e8dcff6365e4db15a155676192de4c79`. The run completed naturally on
 2026-10-26 with 19 passes and one expected negative, pool 8 and zero retries.
-It wrote zero partitions and retained all 6,688 index/partition files.
-All other 29,881 records and every dependency, observation and owner remain
-exact T values. Two owned empty drains were 15.100685 seconds apart.
+The run wrote zero partitions and retained all 6,688 index/partition files. All
+other 29,881 records and every dependency, observation and owner remain exact
+T values. Two owned empty drains were 15.100685 seconds apart.
 
 [The actual scoped run and drain records](/data/m5c-b16-b17-dependency-tag-repair-20261025/task_6fb3f44dbafb/ctx_869904f6cbc9/update20/)
-record this execution. The resulting provenance commit R20 has sole parent T;
-original U44d2c4f/R2609 and the leading run's later B18 failure remain
-historical evidence. All 754 original paths still total 636 passes, 70 expected
-negatives and 48 unsupported results, with the same 31 active remediation and
-17 bounded ADR assignments. Affected internal/outer review and Root's final D3,
-candidate gates and publication remain pending.
+document the execution. R20, the resulting provenance commit, has T as its sole
+parent. Original U44d2c4f/R2609 and the leading run's later B18 failure remain
+historical evidence.
+
+All 754 original paths still total 636 passes, 70 expected negatives and 48
+unsupported results, with the same 31 active remediation and 17 bounded ADR
+assignments. Affected internal/outer review and Root's final D3, candidate
+gates and publication remain pending.

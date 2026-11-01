@@ -97,9 +97,11 @@ Audit record
 source and observation digests, and changes the
 `annex-b-ordinary-object-prototype` assessment to `disposition: exclusion`
 and `normativeDependency: annex-b-only`. It binds the digests of both
-evidence files. The ledger moves the path to
+evidence files.
+
+The ledger moves the path to
 `adr:0013-m5-edition-and-manifest` through the ledger API and
-`mise run m5c:closure-ledger:update`. This node then owns no path.
+`mise run m5c:closure-ledger:update`. This node owns no path.
 
 | Path                                  | Outcome  | Assessment                          |
 | ------------------------------------- | -------- | ----------------------------------- |

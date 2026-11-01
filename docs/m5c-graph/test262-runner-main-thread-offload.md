@@ -3,8 +3,10 @@ Test262 runner main-thread offload
 
 This ready, unlanded node owns no test262 paths. The user registered it on
 2026-10-28 as a remediation node, depending on
-`unsupported-ownership-audit`. It changes how the reviewed test262 runner
-creates processes and emits split-fragment C, as
+`unsupported-ownership-audit`.
+
+It changes how the reviewed test262 runner creates processes and emits
+split-fragment C, as
 [*docs/test262-runner-offload.md*](../test262-runner-offload.md) describes.
 The product CLI keeps its direct spawn path, and the execution pool stays
 at eight.
@@ -20,12 +22,12 @@ in this worktree.
 | `c814b5c5` with pool 16, never-merge `dff06dd0` | 16   | 2,222.208 s (37.0 min), −51% | `written=0`, 29,901 tests, `retries=0` |
 
 All three report 26,456 passes, 2,802 expected negatives and 643
-unsupported, the totals then checked in. In the pool 16
-run, cgroup memory, page cache included, reached its 52 GiB cap without an
-OOM or retry. That run is diagnostic only: this node keeps pool eight, and
-raising it is a separate follow-up that needs a D13 evidence text change,
-a memory headroom check, and a check of the CI macOS lanes that share one
-machine.
+unsupported, the totals then checked in. In the pool 16 run, cgroup memory,
+page cache included, reached its 52 GiB cap without an OOM or retry.
+
+That run is diagnostic only. Raising the pool is a separate follow-up that
+needs a D13 evidence text change, a memory headroom check, and a check of
+the CI macOS lanes that share one machine.
 
 | Evidence                               | Pointer                                                                      |
 | -------------------------------------- | ---------------------------------------------------------------------------- |

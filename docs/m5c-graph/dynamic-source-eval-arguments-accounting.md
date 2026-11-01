@@ -34,10 +34,10 @@ original assertion; accounting never counts as a pass.
 This node depends on landed `authorized-exclusion-audit` and starts
 ready/unlanded. Ownership stays with `dynamic-source-coverage-remediation`
 until this child lands. Each child landing reports exact newly covered and
-still-uncovered subsets and moves ownership in the derived ledger. The
-umbrella remains an aggregate gate until all children land and it owns zero
-paths. Serialize shared audit, ledger and manifest publication; Root owns
-integration and publication.
+still-uncovered subsets and moves ownership in the derived ledger.
+
+The umbrella remains an aggregate gate until all children land and it owns
+zero paths. Serialize shared audit, ledger and manifest publication.
 
 
 Closure route and evidence obligations
@@ -57,7 +57,7 @@ distinguish the eval-created binding from parameter, body and global bindings.
 These appear to test eval declaration semantics themselves, rather than use
 eval merely to build an input.
 
-Accounting audit using the pinned source and existing reviewed rejection
+The accounting audit uses the pinned source and existing reviewed rejection
 observations. The
 [per-path assessment](./dynamic-source-eval-arguments-assessment.md) records
 each cell's normative subject, disposition and reason. All 192 selector paths
@@ -68,29 +68,34 @@ snapshots.
 Of these, 184 cells observe eval declaration collisions and global
 non-leakage only; two arrow cells read an eval-created arguments binding.
 These 186 have no independent non-source subject requiring replacement
-evidence. Six arrow cells also assert ordinary function-valued, lexical or
-var body bindings named arguments. Three of those invoke a parameter
-closure and compare its binding with the body binding. No complete static
-replacement is established for those contracts, so all six stay with the
-umbrella. A default closure that is never called is not a binding-lookup
-witness. No new native or fixture evidence is added.
+evidence.
+
+Six arrow cells also assert ordinary function-valued, lexical or var body
+bindings named arguments. Three of those invoke a parameter closure and
+compare its binding with the body binding. No complete static replacement is
+established for those contracts, so all six stay with the umbrella. A default
+closure that is never called is not a binding-lookup witness. No new native or
+fixture evidence is added.
 
 The umbrella goes from 950 to 764 directly owned paths; ADR 0016 goes from
-677 to 863. All 41,091 inventory paths, 29,038 passes, 3,627 expected
-negatives and 1,684 unsupported observations remain. No subset, result or
-dependency tag changes; no UPDATE is needed. The graph remains unlanded,
-and Root owns outer review, publication, integration and landing.
+677 to 863. All 41,091 inventory paths, 29,038 passes, 3,627 expected negatives
+and 1,684 unsupported observations remain. No subset, result or dependency tag
+changes; no UPDATE is needed.
+
+The graph remains unlanded, and Root owns outer review, publication,
+integration and landing.
 
 The dependency-tag self-audit changes no rows: the unsupported observations
-retain their asserted-contract tags under the 2026-10-29 shared rules.
-Unused closures, unreachable body bindings and harness counters supply no
-new semantic evidence in this accounting.
+retain their asserted-contract tags under the 2026-10-29 shared rules. Unused
+closures, unreachable body bindings and harness counters supply no new semantic
+evidence in this accounting.
 
 For every eventual exclusion, name the exact replacement paths and reviewed
-observations, refresh source and normalized observation digests, and show
-that every non-source subject is covered. Keep mixed or uncovered subjects
-open and ask for a bounded maintainer decision when a faithful witness is
-unavailable. Preserve ADR 0016/0019 reopening triggers; an accepted ADR 0016
-amendment admitting dynamic import reopens ImportCall accounting. Each child
-requires normal D1/D11 review and D3/D4 publication. This metadata change
-performs none of those closure or landing steps.
+observations, refresh source and normalized observation digests, and show that
+every non-source subject is covered. Keep mixed or uncovered subjects open and
+ask for a bounded maintainer decision when a faithful witness is unavailable.
+
+Preserve ADR 0016/0019 reopening triggers; an accepted ADR 0016 amendment
+admitting dynamic import reopens ImportCall accounting. Each child requires
+normal D1/D11 review and D3/D4 publication. This metadata change performs none
+of those closure or landing steps.

@@ -5,7 +5,7 @@ Resolves var loop heads and array-pattern identifier leaves inside with
 statements through the with object environment in the order ECMA-262 specifies,
 on the ordinary and host targets.
 
-This ready, unlanded node owns no test262 path yet. It depends on
+This node is ready. It owns no test262 path yet. It depends on
 `unsupported-ownership-audit` and is an `m5-exit-audit` prerequisite.
 
 The retained repro and raw files are external evidence from the host lane:
@@ -15,9 +15,9 @@ The retained repro and raw files are external evidence from the host lane:
 | Repro, source diagnosis and stdout comparison | /data/m5c-host-script-bindings-20261027/claude-native/diag-with02/README.md                        |
 | Raw stdout, stderr and gate metadata          | /data/m5c-host-script-bindings-20261027/claude-native/diag-with02/diag-with02.{stdout,stderr,json} |
 
-The combined with-hit case prints `g 6 z undefined` in Node and Deno,
-while both native targets print `g 6 0 string`. The all-miss host Script
-repro prints `1 3` natively against Node's `3 0`. These are stdout
+The combined with-hit case prints `g 6 z undefined` in Node.js and Deno.
+Both native targets print `g 6 0 string`. The all-miss host Script repro
+prints `1 3` natively, while Node.js prints `3 0`. These are stdout
 discrepancies, not compiler diagnostics. Preserve the ordinary and host
 target contracts, including array-pattern identifier leaves.
 
@@ -27,19 +27,21 @@ Implementation
 
 Source preparation starts at Main
 `74bb8e47c26e47c765c98c86bb37c41d152c699d`. The checked-in ledger and
-partitioned results assign zero paths to this node. Entry manifest counts
-are 31,337 reviewed paths: 26,963 passes, 3,263 expected negatives and
-1,111 unsupported results, with zero semantic, harness or infrastructure
-failures. No subset, result, ownership, inventory or policy is changed.
+partitioned results assign zero paths to this node. The entry manifest lists
+31,337 reviewed paths: 26,963 passes, 3,263 expected negatives, and
+1,111 unsupported results. It shows zero semantic, harness, or infrastructure
+failures. No subset, result, ownership, inventory, or policy is changed.
 
 The HIR resolver sends a simple `var` for-in/of head with intervening
 `with` environments through the existing assignment-head resolution.
 It keeps the hoisted declaration identity, resolves each iteration through
-the active object environments and uses the host Script global fallback
-when needed. Lexical heads keep their own environment, and ordinary heads
-without an intervening `with` keep their previous representation.
-Classic `for` var initializers use a resolved identifier pattern when a
-`with` environment intervenes, preparing the reference before the value.
+the active object environments, and uses the host Script global fallback
+when needed.
+
+Lexical heads keep their own environment. Ordinary heads without an
+intervening `with` keep their previous representation. Classic `for` var
+initializers use a resolved identifier pattern when a `with` environment
+intervenes, preparing the reference before the value.
 
 MIR reference preparation now handles a pattern's identifier leaf along
 with its existing member and private targets. Array elements and rest
@@ -53,10 +55,11 @@ The fixed fixture retains the original combined repro. Additional cases
 cover nested hit and miss, unscopables, inherited and frozen properties,
 per-iteration deletion, lexical heads, for-await-of and abrupt lookup
 with IteratorClose.
-The fixed reference-order trace uses specification expectations because
-Node.js and Deno resolve var-binding identifier leaves and mutating classic
+
+The fixed reference-order trace uses specification expectations. Node.js
+and Deno resolve var-binding identifier leaves and mutating classic
 var initializers later than ECMA-262 2025 sections 8.6.3 and 14.3.2.1 require.
-The later host Script lexical-shadow repro uses Node.js as reference; Deno's
+The later host Script lexical-shadow repro uses Node.js as reference. Deno's
 legacy var-name check rejects that shadowing declaration. Both native target
 modes run both specialization policies with collection forced at every
 safepoint.
@@ -65,10 +68,12 @@ safepoint.
 `0x60009200` through `0x600092ff`. Its two independent destination/order
 models use seeds `0x60009200` and `0x60009201`, 8 ordinary cases each,
 small structured domains, shrinking and replay, with a 180-second limit
-per domain. The first generates nested hit, miss, blocking and deletion
-sequences with in/of/classic heads; the second generates array element,
-rest, default, assignment and var-loop leaves whose iterator or default
-adds or deletes a property. Both modes and both policies run per draw.
+per domain.
+
+The first generates nested hit, miss, blocking, and deletion sequences with
+in/of/classic heads. The second generates array element, rest, default,
+assignment, and var-loop leaves whose iterator or default adds or deletes a
+property. Both modes and both policies run per draw.
 
 Validation and review evidence is recorded under
 */data/m5c-withvar-20261030/*. Root owns D3, any full UPDATE, affected
