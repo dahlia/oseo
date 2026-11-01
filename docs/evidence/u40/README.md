@@ -3,8 +3,7 @@ Hosted macOS lane placement (U40)
 
 Main run 39084043803 finished 12.31 minutes above the lower bound its five
 hosted macOS lanes imply. Its six Mac lanes ran 5.21 minutes above theirs
-and still finished 13.73 minutes before the run ended. This records why,
-and what changed.
+and still finished 13.73 minutes before the run ended.
 
 
 What the placement did
@@ -81,20 +80,20 @@ between 2026-10-14T15:52Z and 2026-10-18T00:47Z. Seconds.
 
 The seven jobs with eighteen or twenty-two observations belong to families
 no Mac lane runs, so every attempt observed them hosted. The three with
-three observations are the ones placement sent hosted, and their window
-starts at `b59ac914`: the macOS file shards dropped the two case-sharded
-files at `c78d9df1` and were repartitioned at `b59ac914`, so shard 8/12
-held twelve different files before and after, with two in common. A longer
-window would average two partitions. Three observations estimate no
-run-to-run variation, and U39 measured a derived property weight moving by
-up to 3.34 times between two runs two hours apart, so these three entries
-are the least settled in the table.
+three observations are the ones placement sent hosted. Their window starts
+at `b59ac914`: the macOS file shards dropped the two case-sharded files at
+`c78d9df1` and were repartitioned at `b59ac914`, so shard 8/12 held twelve
+different files before and after, with two in common. A longer window
+would average two partitions. Three observations estimate no run-to-run
+variation, and U39 measured a derived property weight moving by up to 3.34
+times between two runs two hours apart, so these three entries are the
+least settled in the table.
 
 `native support (macos-aarch64, 8/12)` moved furthest, from 1,499 to
 1,963 seconds. Its earlier value was a single observation of a partition
-that no longer exists. The other nine moved by under eleven percent, which
-is the useful result: the always-hosted entries were already close, and
-the single-observation entries were not.
+that no longer exists. The other nine moved by under eleven percent: the
+always-hosted entries were already close, and the single-observation
+entries were not.
 
 
 What the first run measured
@@ -103,7 +102,7 @@ What the first run measured
 Branch run 39104204370 at `731ffba9` is green and ran the new order. The
 four Node `test` shards started within ten seconds of the run and were
 done by 24.57 minutes; in run 39084043803 one of them ended the run at
-60.43. That part worked.
+60.43.
 
 The run still took 60.17 minutes, and the hosted lanes are still why.
 
@@ -139,23 +138,25 @@ The split is along vintage, not along family. Every entry with eighteen or
 more observations, and the four-observation `native (macos-aarch64, 1/3)`,
 measured between 0.79 and 1.21 times its value. The three `reflect cases`
 estimates and the retained `native support (macos-aarch64, 5/12)` are the
-only entries above 1.21, and they are the two the table flagged: U38
-derived the `reflect cases` figures without any hosted observation, and
-the retained entry predates the `b59ac914` repartition. Those four are now
-refreshed from this run, one observation each. The derived maximum lane
-end moves from 43.53 to 43.50, and the placement sends
+only entries above 1.21, and they are the two kinds the table flagged.
+U38 derived the `reflect cases` figures without any hosted observation,
+and the retained entry predates the `b59ac914` repartition. Those four
+are now refreshed from this run, one observation each. The derived
+maximum lane end moves from 43.53 to 43.50, and the placement sends
 `native support (macos-aarch64, 5/12)` and two `reflect cases` shards to
 Mac lanes.
 
-Two terms the model still does not carry. A hosted macOS job starting
-mid-run waits for a machine: the gaps between consecutive jobs in a lane
-were 0.12, 0.12, 0.14, 0.73, 1.68, and 3.54 minutes, and then 8.93 before
-`reflect cases (macos-aarch64, 1/3)`, with four of the five hosted lanes
-free of other work at that moment, so the wait was allocation and not the
-five-lane limit. And the pools other than hosted macOS now bound the run
-near where it already runs: the Mac lanes carried 262.45 job-minutes over
-28 jobs and finished at 50.18, and the longest Linux file shard measured
-46.05. The `native` aggregate ended the run at 60.17 waiting on
+The model still does not carry two terms. A hosted macOS job starting
+mid-run waits for a machine. The gaps between consecutive jobs in a lane
+were 0.12, 0.12, 0.14, 0.73, 1.68, and 3.54 minutes, then 8.93 before
+`reflect cases (macos-aarch64, 1/3)`. Four of the five hosted lanes were
+free of other work at that moment, so the wait was allocation, not the
+five-lane limit.
+
+The pools other than hosted macOS now bound the run near where it already
+runs. The Mac lanes carried 262.45 job-minutes over 28 jobs and finished
+at 50.18, and the longest Linux file shard measured 46.05. The `native`
+aggregate ended the run at 60.17 waiting on
 `reflect cases (macos-aarch64, 3/3)`.
 
 
@@ -222,17 +223,19 @@ The `native` aggregate ended the run at 56.95 waiting on
 `test262 (macos-aarch64, 12/12)`, the last job on `oseo-mac-3`. Dividing
 the observed work equally gives 48.36 minutes per lane, or 48.76
 including the 0.40-minute probe. That idealized figure sits about eight
-minutes below the latest Mac lane finish, and it assumes work is
-divisible and that durations do not change when a job moves to another
-lane. The longest Linux file shard took 47.58 minutes.
+minutes below the latest Mac lane finish. It assumes work is divisible
+and that durations do not change when a job moves to another lane. The
+longest Linux file shard took 47.58 minutes.
 
 The cost inputs may explain part of the imbalance.
 `selfHostedJobSeconds` holds 18 measured Mac walls, all of them from
 `oseo-mac-1`; every other job converts a hosted median through a family
-speed ratio. Mean measured-to-table ratios in this run were 0.92, 1.38,
-1.91, 2.11, 1.98, and 1.77 for lanes one through six, over four, three,
-three, three, two, and two entries. These averages do not separate job
-mix, machine speed, and contention between the two lanes that share a Mac
+speed ratio.
+
+Mean measured-to-table ratios in this run were 0.92, 1.38, 1.91, 2.11,
+1.98, and 1.77 for lanes one through six, over four, three, three,
+three, two, and two entries. These averages do not separate job mix,
+machine speed, and contention between the two lanes that share a Mac
 mini. The next unit starts from this run's 30 durations and lane
 assignments, which support a cost refresh but do not establish how a job
 would perform on a different lane.

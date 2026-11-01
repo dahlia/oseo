@@ -123,10 +123,10 @@ is gone and the change cost what it was expected to cost:
 | latest Mac lane end     | 46.67           | 54.83           | 46.75           |
 
 All six lanes started at 0.48 against the 0.42 to 0.43 of run
-39227927384, so in a run whose probe would not have waited the
+39227927384, so in a run whose probe would not have waited, the
 prerequisite cost 0.06. One run does not establish that it costs this
-little in general, and no run since has saturated the ceiling, which is
-the case the change exists for.
+little in general. No run since has saturated the ceiling, which is the
+case the change exists for.
 
 The run did not get shorter, because the queueing moved rather than
 disappearing. Its Linux side ended at 55.42 on
@@ -141,15 +141,15 @@ then ran 46.42:
 | `native support (linux-x86_64-gnu, 6/7)` | 0.03 | 47.90    | 48.37 |
 
 Thirty-four of the run's forty Ubuntu jobs started by 0.48 and five
-waited, two of them these long shards; summed Ubuntu allocation waiting
+waited, two of them these long shards. Summed Ubuntu allocation waiting
 was 26.6 job-minutes, between the 5.1 of run 39227927384 and the 59.6 of
 run 39244971256. A wait on a long job is added to the Linux side, while
-the same wait on a short job is absorbed, so which jobs lose the
+the same wait on a short job is absorbed. So which jobs lose the
 allocation decides the side. *docs/evidence/u48/README.md* takes up the
 job count that produces those losers.
 
 The macOS side of this run was not a Mac lane. Its hosted lanes ended at
-41.93, 44.48, 48.13, 49.42 and 51.57, and the last of those carried 50.80
+41.93, 44.48, 48.13, 49.42 and 51.57. The last of those carried 50.80
 minutes of work against 0.33 of waiting, so removing its waiting entirely
 would leave it near 51.2. *docs/evidence/u49/README.md* takes that up.
 

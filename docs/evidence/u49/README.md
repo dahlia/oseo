@@ -38,16 +38,17 @@ Reconstructing run 39292194312's hosted lane chains from the generated
 | node 3/4, native support 12/12       | 51.57 | 50.80 | 0.33    |
 
 Ends are minutes from the run's first job creation. Every hosted job now
-needs the probe, which completed at 0.43, so each chain's end is 0.43 plus
+needs the probe, which completed at 0.43. Each chain's end is 0.43 plus
 its waiting plus its work; that reproduces all five to within 0.04.
 
-The longest chain waited 0.33 minutes, so its 50.80 minutes of work is
-what put it at 51.57, later than every Mac lane in that run, which ended
-between 40.35 and 46.75. The model gave that chain 42.18 minutes, from
-1,311 seconds for the Node.js shard and 1,220 for the `native support`
-shard. It gave the sanitizer property chain 36.32 against 43.93 measured.
+The longest chain waited 0.33 minutes, so its 50.80 minutes of work put
+it at 51.57. That end is later than every Mac lane in that run, which
+ended between 40.35 and 46.75. The model estimated that chain at 42.18
+minutes, from 1,311 seconds for the Node.js shard and 1,220 for the
+`native support` shard. It estimated the sanitizer property chain at 36.32
+against 43.93 measured.
 
-Those two entries are the ones the model had least evidence for. U44 set
+Those two entries rest on the least evidence. U44 set
 `native support (macos-aarch64, 12/12)` to 1,220 from two hosted
 observations, 1,044 and 1,397 seconds; the three since are 1,304, 1,500
 and 1,529.
@@ -56,9 +57,8 @@ and 1,529.
 What changes
 ------------
 
-Seven entries take the median of their hosted observations in the window
-since `b59ac914`, which are the entries whose median had moved by at least
-five percent:
+Seven entries whose median moved by at least five percent take the median
+of their hosted observations in the window since `b59ac914`:
 
 | entry                                   | before | after | observations |
 | --------------------------------------- | ------ | ----- | ------------ |
@@ -78,11 +78,11 @@ which Mac lane. The pair is what the earlier placement turned on, not
 either entry alone.
 
 `11/12` stays hosted, paired with the Node.js shard, at a modeled 47.08
-against the 46.18 minutes of work that pairing measured, which waiting
-carried to an end of 49.42. The model's highest lane end rises from 47.00
-to 47.31 minutes, and the highest Mac-lane end in `macosLaneEnds` from
-2,820 to 2,839 seconds, because a Mac lane now carries the shard the
-hosted lane gave up.
+against the 46.18 minutes of work that pairing measured. Waiting carried
+that pairing to an end of 49.42. The model's highest lane end rises from
+47.00 to 47.31 minutes, and the highest Mac-lane end in `macosLaneEnds`
+from 2,820 to 2,839 seconds, because a Mac lane now carries the shard
+that left the hosted lane.
 
 A higher modeled maximum is the point. The previous 47.00 was reached by
 charging a hosted lane less than it measured, and the refinement's
@@ -101,17 +101,17 @@ above it, and the hosted lanes carry the entries with the widest spread.
 
 Four of the seven entries rest on six or fewer observations, so they will
 move again: both `native support` shards, which the placement turns on,
-and both `reflect cases` shards. Separately, the two sanitizer entries
-replace values the table had recorded from twenty-two observations with
-medians over eighteen; the eighteen are the window since `b59ac914` and
-the twenty-two reach further back, so this trades sample size for recency
-on jobs that always run hosted.
+and both `reflect cases` shards. The two sanitizer entries replace values
+the table had recorded from twenty-two observations with medians over
+eighteen. The eighteen are the window since `b59ac914`. The twenty-two
+reach further back. This trades sample size for recency on jobs that
+always run hosted.
 
 Nothing here reduces the macOS work. Five hosted lanes and six Mac lanes
 hold what the model now prices at 47.31 minutes at the longest. A greedy
 pass and a first-improvement local search reached that placement, so it is
-not shown to be the shortest one available, and the account's five
-concurrent hosted macOS slots cap how many hosted lanes there can be.
+not shown to be the shortest one available. The account's five concurrent
+hosted macOS slots cap how many hosted lanes there can be.
 
 This lands with U48 and one run cannot separate their contributions.
 
@@ -135,10 +135,10 @@ span.
 The hosted chains ended at 36.00, 38.97, 40.63, 44.72 and 49.77. The
 longest holds `test (macos-latest, node)` shards 2/4, 1/4 and 4/4, with
 48.97 minutes of work and 0.42 of waiting. The model gives those three
-45.73 minutes and gives the `node 3/4` and
-`native support (macos-aarch64, 11/12)` chain 47.08, so it expects the second
-to be the longer by 1.35; measured work put the first ahead by 4.85, that
-second chain having measured 44.12.
+45.73 minutes and the `node 3/4` and
+`native support (macos-aarch64, 11/12)` chain 47.08, so it predicts the
+second to be the longer by 1.35. Measured work put the first ahead by 4.85;
+the second chain measured 44.12.
 
 With these modeled costs and the current ten indivisible hosted jobs, the
 generated placement minimizes the longest hosted macOS lane. Partitioning
@@ -166,9 +166,9 @@ waiting is summed waiting in job-minutes.
 | 39455962104 | 50.63 | 48.80      | 48.55        | 47.60     | 259.6         | 1.4            |
 
 The 54.00-minute run drew slow Mac lanes. Each lane held the same jobs in
-all three runs, and the lanes' summed work was 263.2 and 259.6 minutes in
-the other two against 292.0 in that one, with every lane 6 to 20 percent
-slower than in the branch run. Its last Mac-lane job,
+all three runs. The lanes' summed work was 263.2 and 259.6 minutes in the
+other two against 292.0 in that one, with every lane 6 to 20 percent slower
+than in the branch run. Its last Mac-lane job,
 `reflect cases (macos-aarch64, 1/3)`, ended at 53.62, and the `native`
 aggregate closed the run at 54.00. The six self-hosted lanes share three Mac
 minis, two lanes per machine. The cause of the longer job durations was not

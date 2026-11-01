@@ -110,48 +110,51 @@ gh api --paginate repos/dahlia/oseo/actions/runs/37999730012/jobs
 
 ### U21 dedicated Mac mini day-one measurements
 
-The new dedicated Mac mini is an Apple M6 with 12 logical CPUs and 16 GiB
-RAM. It runs macOS 27.0.1 (26A434), Apple clang 21.0.0, and mise-pinned
-Zig 0.16.0. These observed host facts and the commands are in
+The new dedicated Mac mini is an Apple M6 with 12 logical CPUs and 16 GiB RAM.
+It runs macOS 27.0.1 (26A434), Apple clang 21.0.0, and mise-pinned Zig 0.16.0.
+These observed host facts and the commands are in
 [*docs/evidence/u21/README.md*](./evidence/u21/README.md). All Mac job
-measurements use main commit `2434dd8b`. The machine remains unregistered
-as a GitHub runner, and the self-hosted routing switch remains off.
+measurements use main commit `2434dd8b`. The machine remains unregistered as a
+GitHub runner, and the self-hosted routing switch remains off.
 
-The exact U17 probe measured 48 fresh binaries in each cohort, twice
-under each policy. With the default policy, the serial first pass took
-11.29–12.90 s for Zig or Apple clang across the two trials, and an
-immediate second pass took 0.32–0.36 s. After the user granted Developer
-Tools permission to the SSH wrapper in the GUI, the serial first pass
-took 0.108–0.109 s for both compilers in both new trials. Three launch
-workers reduced the default-policy first pass to 4.29–4.36 s in three
-of four trials; one Apple-clang trial took 0.218 s and remains an
-unexplained outlier. These measurements show the first-execution penalty
-on this M6 and its mitigation for SSH descendants. The eventual launchd
-runner needs a separate permission check.
+The exact U17 probe measured 48 fresh binaries in each cohort, twice under each
+policy. With the default policy, the serial first pass took 11.29–12.90 s for
+Zig or Apple clang across the two trials, and an immediate second pass took
+0.32–0.36 s. After the user granted Developer Tools permission to the SSH
+wrapper in the GUI, the serial first pass took 0.108–0.109 s for both compilers
+in both new trials. The grant mitigates the first-execution penalty on this M6
+for SSH descendants.
 
-The hosted reference is main run [36721134885] at the same SHA. Its
-four compared macOS steps were each measured once at that SHA. Main run
-[36657614384] is a second observation at the older SHA `df5cb7a1`, so it
-shows a spread but is not an exact-SHA repeat. The table uses step wall
-seconds, excluding checkout, mise install, runtime archive restore, and
-job cleanup. Mac setup and test wall times are reported separately. The
-Mac's cold and warm Zig caches are separate from the hosted cache state.
-The Mac cold steps also built their representative runtime archive keys
-inside the timed step, while every compared hosted job hit its action
-cache key in setup. Additional variant keys can be created by both
-machines, and [*mac-archive-counts.tsv*](./evidence/u21/mac-archive-counts.tsv)
-records their Mac-side counts. Thus the cold ratios below mix archive
-states. The warm ratios are closer in
-cache state, but still use different operating systems and, for the
-sanitizer, different Apple clang versions.
-All four compared hosted jobs reported runtime archive cache hits in
+Three launch workers reduced the default-policy first pass to 4.29–4.36 s in
+three of four trials; one Apple-clang trial took 0.218 s and remains an
+unexplained outlier. The eventual launchd runner needs a separate permission
+check.
+
+The hosted reference is main run [36721134885] at the same SHA. Its four
+compared macOS steps were each measured once at that SHA. Main run
+[36657614384] is a second observation at the older SHA `df5cb7a1`, so it shows
+a spread but is not an exact-SHA repeat.
+
+The table uses step wall seconds, excluding checkout, mise install, runtime
+archive restore, and job cleanup. Mac setup and test wall times are reported
+separately.
+
+The Mac's cold and warm Zig caches are separate from the hosted cache state.
+The Mac cold steps also built their representative runtime archive keys inside
+the timed step, while every compared hosted job hit its action cache key in
+setup. All four compared hosted jobs reported runtime archive cache hits in
 [*docs/evidence/u21/hosted-cache.txt*](./evidence/u21/hosted-cache.txt).
-All retained Mac family steps below ran after the user enabled Developer
-Tools access for the SSH wrapper. Their ratios are conditional on that
-grant; the unconfigured launchd runner may face the default-policy
-first-execution cost.
-Only the 48-binary probe has a same-host default-policy comparison;
-the M6 test262 shard was measured only after the GUI grant.
+Additional variant keys can be created by both machines, and
+[*mac-archive-counts.tsv*](./evidence/u21/mac-archive-counts.tsv) records their
+Mac-side counts. Thus the cold ratios below mix archive states. The warm ratios
+are closer in cache state, but still use different operating systems and, for
+the sanitizer, different Apple clang versions.
+
+All retained Mac family steps below ran after the user enabled Developer Tools
+access for the SSH wrapper. Their ratios are conditional on that grant; the
+unconfigured launchd runner may face the default-policy first-execution cost.
+Only the 48-binary probe has a same-host default-policy comparison; the M6
+test262 shard was measured only after the GUI grant.
 
 | Family and shard              | Hosted same SHA | First Mac cold | First Mac warm | Derived hosted/Mac cold | Derived hosted/Mac warm |
 | ----------------------------- | --------------: | -------------: | -------------: | ----------------------: | ----------------------: |
@@ -160,9 +163,9 @@ the M6 test262 shard was measured only after the GUI grant.
 | extended native property 1/12 |         2,815 s |     1,074.85 s |     1,069.89 s |                    2.62 |                    2.63 |
 | Apple-clang sanitizer native  |         1,935 s |       723.74 s |       719.09 s |                    2.67 |                    2.69 |
 
-The second Mac sequence used the same SHA, shard, seed, worker width,
-and toolchain within each family. The ratios again use the one same-SHA
-hosted step per family as their numerator:
+The second Mac sequence used the same SHA, shard, seed, worker width, and
+toolchain within each family. The ratios again use the one same-SHA hosted step
+per family as their numerator:
 
 | Family and shard              | Second Mac cold | Second Mac warm | Derived r cold | Derived r warm |
 | ----------------------------- | --------------: | --------------: | -------------: | -------------: |
@@ -280,16 +283,16 @@ a measured guest setup and a Zig-only bare-host assignment.
 
 ### Runner-mode Mac lane runs (U23)
 
-Five run attempts have executed with `OSEO_SELFHOSTED_MAC_ENABLED` on and
-`oseo-mac-1` online. The table reads every value from the GitHub jobs API
-for the named attempt. Push-to-green time runs from the attempt's
-`run_started_at` to the last job's `completed_at`. Job minutes are summed
-job walls from `started_at` to `completed_at`, so they exclude queue waiting.
-Mac jobs are those whose `runner_name` is `oseo-mac-1`; hosted macOS jobs
-are the other jobs of the 34-job macOS matrix. The Linux-hosted
-`macOS self-hosted availability` probe is counted in neither. Lane ends are
-minutes after `run_started_at`. All values are measured and rounded to
-0.1 min.
+Five run attempts ran with `OSEO_SELFHOSTED_MAC_ENABLED` on and `oseo-mac-1`
+online. Mac jobs are those whose `runner_name` is `oseo-mac-1`; hosted macOS
+jobs are the other jobs of the 34-job macOS matrix. The Linux-hosted
+`macOS self-hosted availability` probe is counted in neither.
+
+The table reads every value from the GitHub jobs API for the named attempt.
+Push-to-green time runs from the attempt's `run_started_at` to the last job's
+`completed_at`. Job minutes are summed job walls from `started_at` to
+`completed_at`, so they exclude queue waiting. Lane ends are minutes after
+`run_started_at`. All values are measured and rounded to 0.1 min.
 
 | Source run, attempt | Commit     | Push-to-green | Mac jobs | Mac job min | Mac lane end | Hosted jobs | Hosted job min | Last hosted end |
 | ------------------- | ---------- | ------------: | -------: | ----------: | -----------: | ----------: | -------------: | --------------: |
@@ -348,10 +351,10 @@ attempt columns are measured job walls from run [37215661294]:
 | `native support (macos-aarch64, 10/12)` |      1,091 |   2.9 |     6.9 |       5.1 |       5.0 |
 | `native (macos-aarch64, 3/3)`           |      1,039 |   2.2 |     8.4 |       6.1 |       6.0 |
 
-The five hosted lanes are serial chains in the generated order. The
-modeled end is the derived sum of the chain's weights. Overhead is the
-measured lane end minus the measured sum of its job walls, so it contains
-the first start delay and every handoff:
+The five hosted lanes are serial chains in the generated order. The modeled end
+is the derived sum of the chain's weights. Overhead is the measured lane end
+minus the measured sum of its job walls, so it contains the first start delay
+and every handoff:
 
 | Lane | Jobs in chain order                                                          | Modeled end | Attempt 1 end | Attempt 2 end | Overhead 1 | Overhead 2 |
 | ---- | ---------------------------------------------------------------------------- | ----------: | ------------: | ------------: | ---------: | ---------: |
@@ -363,11 +366,11 @@ the first start delay and every handoff:
 | Mac  | the 12 jobs above, plus the 1.0-min probe allowance                          |        99.5 |          80.4 |          80.3 |        0.9 |        1.5 |
 
 The Mac lane's attempt 2 overhead includes the availability probe, which
-started a measured 0.67 min after `run_started_at`. Over seven runs,
-all-hosted [37121778924] and [37167895777] plus the five attempts above,
-hosted `test262 (macos-aarch64, 6/12)` measured 1,366 to 1,617 s against
-its 1,083-second weight. Hosted `host C sanitizers (macOS, property)`
-measured 1,723 to 2,727 s, with a 2,189-second median, against 1,923 s.
+started a measured 0.67 min after `run_started_at`. Over seven runs, all-hosted
+[37121778924] and [37167895777] plus the five attempts above, hosted
+`test262 (macos-aarch64, 6/12)` measured 1,366 to 1,617 s against its
+1,083-second weight. Hosted `host C sanitizers (macOS, property)` measured
+1,723 to 2,727 s, with a 2,189-second median, against 1,923 s.
 [*PLAN-GATE.md*](../PLAN-GATE.md) explains these gaps and derives the
 recommended next retune.
 
@@ -410,13 +413,16 @@ its job walls:
 
 The 12 Mac jobs other than the own-key shards were test262 8/12, 9/12,
 5/12, 1/12, 7/12, 12/12, 4/12, and 3/12, native support 4/12, 3/12, and
-12/12, and native 1/3. The seven Mac jobs with a measured Mac median were
-modeled at 45.1 min and measured 40.6 and 41.6 min. The eight converted
-from hosted medians were modeled at 47.4 min and measured 40.2 min in
-both attempts. Against their hosted medians, the converted test262 jobs
-ran at a derived pooled ratio of 5.43 in both attempts, against the
-modeled 4.2. The converted native support and native jobs ran at 3.60
-and 3.55, and 3.12 and 3.18, against 3.2 and 3.1.
+12/12, and native 1/3.
+
+The seven Mac jobs with a measured Mac median were modeled at 45.1 min and
+measured 40.6 and 41.6 min. The eight converted from hosted medians were
+modeled at 47.4 min and measured 40.2 min in both attempts.
+
+Against their hosted medians, the converted test262 jobs ran at a derived
+pooled ratio of 5.43 in both attempts, against the modeled 4.2. The
+converted native support and native jobs ran at 3.60 and 3.55, and 3.12
+and 3.18, against 3.2 and 3.1.
 
 [*PLAN-GATE.md*](../PLAN-GATE.md) compares these runs with the prediction
 and with the earlier spread.
@@ -441,16 +447,19 @@ and rounded to 0.1 min:
 Attempt 1 was red only in the Linux-hosted `test (ubuntu-latest, node)`
 job; every macOS job passed in both attempts. Only attempt 2's wall to the
 last job is therefore a push-to-green time. Each attempt placed the 19
-generated Mac jobs on their generated runners. The one-lane runs after
-U24 measured 98.6 min (main run [37251028948] at `bdf2dddd`), 99.5 min
-(branch run [37315038080] at `4b20631b`, with the U26 disk sampler on the
-Mac), and 100.2 min (main run [37332256715] at `6654ccf7`, attempt 1, red
-only in the same Linux job), beside the 98.3 and 95.8 min of [37237684441].
-The two-lane attempts are a derived 16.2 to 21.3 min shorter, measured in
-one run of one commit. The derived prediction was 77.2 min, with a 72.1 to
-86.5 min per-run range; the last macOS job ended at a measured 79.3 and
-78.5 min, inside that range. The coordinator measured 115 GiB free on the
-Mac after the runs.
+generated Mac jobs on their generated runners.
+
+The one-lane runs after U24 measured 98.6 min (main run [37251028948] at
+`bdf2dddd`), 99.5 min (branch run [37315038080] at `4b20631b`, with the
+U26 disk sampler on the Mac), and 100.2 min (main run [37332256715] at
+`6654ccf7`, attempt 1, red only in the same Linux job), beside the 98.3
+and 95.8 min of [37237684441]. The two-lane attempts are a derived 16.2 to
+21.3 min shorter, measured in one run of one commit.
+
+The derived prediction was 77.2 min, with a 72.1 to 86.5 min per-run
+range; the last macOS job ended at a measured 79.3 and 78.5 min, inside
+that range. The coordinator measured 115 GiB free on the Mac after the
+runs.
 
 Two-lane Mac job walls are longer than one-lane ones. The 19 Mac jobs
 summed a measured 147.5 and 148.2 min. Against each job's one-lane
@@ -514,19 +523,20 @@ for the five test262 jobs (3.74), 1.77 for the three own-key shards (1.86),
 and 2.29 for the one native fixture job. The Mac walls are two-lane walls.
 
 Four native support shards ran the same properties on `oseo-mac-2` and on
-a hosted runner; the per-property durations are Node test-runner
-`duration_ms` values from both job logs, measured, in
+a hosted runner. The per-property durations are measured Node test-runner
+`duration_ms` values from both job logs in
 [*evidence/u28/native-support-properties.tsv*](./evidence/u28/native-support-properties.tsv).
 Pooled over the passing properties of each shard, the derived hosted/Mac
 duration ratio was 2.64 for 1/12 (6 properties, 2.01 to 2.78), 1.06 for 7/12
 (12, 0.62 to 1.46), 1.75 for 9/12 (10, 1.20 to 8.23, the 8.23 on a 7-second
-property), and 1.84 for 10/12 (12, 1.49 to 2.19). Hosted passing extended
-properties used a derived 6 to 45 percent of their interrupt limits; the same
-properties on the Mac used 5 to 25 percent. In shard 9/12 the hosted runner
-interrupted its last six properties at 1,800 s after a measured 91, 88, and 84
-of 120 cases and 32, 31, and 30 of 100 cases. Their extrapolated hosted need is
-a derived 2,383 to 2,572 s and 5,635 to 6,006 s, 7.5 to 33 times their Mac
-durations of 170 to 319 s.
+property), and 1.84 for 10/12 (12, 1.49 to 2.19).
+
+Hosted passing extended properties used a derived 6 to 45 percent of their
+interrupt limits; the same properties on the Mac used 5 to 25 percent. In
+shard 9/12 the hosted runner interrupted its last six properties at 1,800 s
+after a measured 91, 88, and 84 of 120 cases and 32, 31, and 30 of 100
+cases. Their extrapolated hosted need is a derived 2,383 to 2,572 s and
+5,635 to 6,006 s, 7.5 to 33 times their Mac durations of 170 to 319 s.
 [*evidence/u28/ratios.txt*](./evidence/u28/ratios.txt) is the derived output of
 the script beside it.
 
@@ -536,10 +546,11 @@ are measured in
 The macOS sums were a derived 2,638.9 s in [37121778924], 2,343.2 s in
 [37167895777], 1,486.4 s on the two-lane `oseo-mac-1` in `37499455406`, and
 2,878.1 s hosted in `37506307446`, against the 3,600 s aggregate deadline.
+
 The ordinary own-key property of `test (macos-latest, node)` measured
 299,906.5 ms in `37499455406`, 360,023.6 ms interrupted at 15 of 16 cases in
 attempt 1 of `37506307446`, and 251,814.7 ms in its attempt 2, against the
-360,000 ms limit; `test (ubuntu-latest, node)` measured 286,721.1 ms in
+360,000 ms limit. `test (ubuntu-latest, node)` measured 286,721.1 ms in
 `37499455406`
 ([*evidence/u28/macos-node-own-key.tsv*](./evidence/u28/macos-node-own-key.tsv)).
 [*PLAN-GATE.md*](../PLAN-GATE.md) derives the fallback time scale from these
@@ -552,12 +563,14 @@ values.
 
 Five main runs of 2026-10-06 and 2026-10-07 measure what the U28 fallback
 cost when the orchestrator's next push probed while the previous run held
-the Mac lanes, and what the lanes did when they were free. The table uses
-the U23 definitions: walls are `started_at` to `completed_at`, ends are
-minutes after `run_started_at`, and the 19 lane jobs are those the
-generator places on `oseo-mac-1` and `oseo-mac-2`. G is the measured gap
-after the previous main push. All values are measured and rounded to 0.1
-min; [*evidence/u29/*](./evidence/u29/) holds the job rows and the script.
+the Mac lanes. They also measure what the lanes did when they were free.
+
+The table uses the U23 definitions: walls are `started_at` to
+`completed_at`, ends are minutes after `run_started_at`, and the 19 lane
+jobs are those the generator places on `oseo-mac-1` and `oseo-mac-2`. G is
+the measured gap after the previous main push. All values are measured and
+rounded to 0.1 min; [*evidence/u29/*](./evidence/u29/) holds the job rows
+and the script.
 
 | Source run, attempt |     G | Lane jobs ran on | Lane job min | Lane jobs' last end                      | Hosted-lane job min | Hosted-lane last end | Wall to last job |
 | ------------------- | ----: | ---------------- | -----------: | ---------------------------------------- | ------------------: | -------------------: | ---------------: |
@@ -567,25 +580,26 @@ min; [*evidence/u29/*](./evidence/u29/) holds the job rows and the script.
 | [37581978950], 1    |  80.8 | both Mac runners |        152.2 | 81.4 (`oseo-mac-1`), 72.3 (`oseo-mac-2`) |               361.3 |                403.0 |            403.5 |
 | [37606214007], 1    |  30.6 | hosted           |        411.3 | 159.0                                    |               382.2 |                212.7 |            213.1 |
 
-The hosted lane jobs' median queue wait was a measured 71.2 to 89.5 min and
-their maximum 116.6 to 137.6 min; on the Mac the first lane job started 0.3
-to 0.5 min after the run and the last queue wait was the runner's own
-serial backlog, 74.4 and 75.0 min. The hosted-lane jobs of the two lane
-runs waited up to a measured 130.1 and 146.1 min for hosted slots that the
-neighboring fallback runs were holding, against the 72.7 and 77.8 min
-hosted-lane ends of the uncongested two-lane attempts in U27. The failures
-of `37506307446` and `37575037950` were property interrupts on hosted
-runners, recorded in U28 and in the revert `4322c657`; `37606214007` and
-the two lane runs passed.
+The hosted lane jobs' median queue wait was 71.2 to 89.5 min and their
+maximum 116.6 to 137.6 min. On the Mac the first lane job started 0.3 to
+0.5 min after the run, and the last queue wait was the runner's own serial
+backlog, 74.4 and 75.0 min. The hosted-lane jobs of the two lane runs
+waited up to 130.1 and 146.1 min for hosted slots that the neighboring
+fallback runs were holding, against the 72.7 and 77.8 min hosted-lane ends
+of the uncongested two-lane attempts in U27. The failures of `37506307446`
+and `37575037950` were property interrupts on hosted runners, recorded in
+U28 and in the revert `4322c657`. `37606214007` and the two lane runs
+passed.
 
 Derived from the two lane runs, `oseo-mac-1` carries 79.7 to 80.6 min of
-work per run and ends at 80.8 to 81.4 min. A push G minutes after a run that
-holds the lanes, with lane jobs queued on the runner label as U29 does, ends
-its lane work at about `162.0 - G` min for G below 81.4: about 109, 156, and
-83 min for the three fallback runs above (the jobs ahead of the third were
-cancelled 27 and 87 s after its probe), against their measured 197.5,
-168.5, and 159.0. [*PLAN-GATE.md*](../PLAN-GATE.md) records the losing cases
-and the wedged-runner bound.
+work per run and ends at 80.8 to 81.4 min. A push G minutes after a run
+that holds the lanes, with lane jobs queued on the runner label as U29
+does, ends its lane work at about `162.0 - G` min for G below 81.4. For
+the three fallback runs above that is about 109, 156, and 83 min, against
+their measured 197.5, 168.5, and 159.0. The jobs ahead of the third
+fallback run were cancelled 27 and 87 s after its probe.
+[*PLAN-GATE.md*](../PLAN-GATE.md) records the losing cases and the
+wedged-runner bound.
 
 [37575037950]: https://github.com/dahlia/oseo/actions/runs/37575037950
 [37581978950]: https://github.com/dahlia/oseo/actions/runs/37581978950
@@ -625,42 +639,42 @@ The lane membership is the generated plan in
 | 36640728403 | 5    | 0.10              | 124.95            | 8, 9, 8, 5, 8, 11             | 0.82          |
 
 Run `36598029271` was created at `2026-09-29T16:28:58Z`; its last recorded
-update was at `19:11:35Z`, a derived 162.62 min. It has no
-push-to-green observation. Run `36640728403` was created at
-`2026-09-29T22:38:08Z` and last updated at `2026-09-30T01:18:14Z`:
-160.10 min from workflow creation to green. Workflow creation is the
-available timestamp proxy for the push; neither duration measures the
-push-to-workflow-creation delay. Derived sums of measured macOS job times are
-729.02 and 701.75 min, respectively, versus 718.15 min in comparison
-main run `36516215200` at `97278fc6`. That run's derived
-creation-to-completion time is 175.83 min. These branch observations are
-13.21 and 15.73 min shorter than that one main run, respectively; this
-difference is not separated from runner variance. Another successful main
-run, [36369711059] at `98e66719`, also had 31 macOS jobs and a measured
-five-job peak. Its derived creation-to-completion time was 165.55 min and
-its macOS job sum was 775.63 min. The branch wall differences from this
-second same-size sample are only 2.93 and 5.45 min, while their job sums
-differ by 46.61 and 73.88 min. This spread prevents a causal wall-time
-improvement claim from these single-run comparisons.
+update was at `19:11:35Z`, a derived 162.62 min. It has no push-to-green
+observation. Run `36640728403` was created at `2026-09-29T22:38:08Z` and last
+updated at `2026-09-30T01:18:14Z`: 160.10 min from workflow creation to green.
+Workflow creation is the available timestamp proxy for the push; neither
+duration measures the push-to-workflow-creation delay.
+
+Derived sums of measured macOS job times are 729.02 and 701.75 min,
+respectively, versus 718.15 min in comparison main run `36516215200` at
+`97278fc6`. That run's derived creation-to-completion time is 175.83 min. These
+branch observations are 13.21 and 15.73 min shorter than that one main run,
+respectively; this difference is not separated from runner variance.
+
+Another successful main run, [36369711059] at `98e66719`, also had 31 macOS
+jobs. Its derived creation-to-completion time was 165.55 min and its macOS job
+sum was 775.63 min. The branch wall differences from this second same-size
+sample are only 2.93 and 5.45 min, while their job sums differ by 46.61 and
+73.88 min. This spread prevents a causal wall-time improvement claim from these
+single-run comparisons.
 
 In comparison main run `36516215200`, the 50.30 min
 `native support (macos-aarch64, 1/12)` job started 125.42 min after run
-creation and finished last among macOS jobs at 175.72 min. The same job
-started at 0.10 and 0.13 min in the branch runs. This directly observes
-the intended dispatch-order change; it does not isolate its wall-time effect
-from job-duration spread. The measured peak macOS concurrency was five in
-both same-size main runs and both
-branch runs.
+creation and finished last among macOS jobs at 175.72 min. The same job started
+at 0.10 and 0.13 min in the branch runs. These start times directly show the
+intended dispatch-order change but do not isolate its wall-time effect from
+job-duration spread. The measured peak macOS concurrency was five in both
+same-size main runs and both branch runs.
 
-The derived ideal longest lane is 8872 s (147.87 min, or 147.9 at one
-decimal place) from the main run's measured whole-job costs, with immediate
-starts and handoffs. Lane 2 was the last macOS chain in both branch runs.
-Its derived 14.65 and 12.11 min finish gaps from that model contain only
-0.68 and 0.80 min of derived handoff gaps, plus 0.15 and 0.13 min of initial
-assignment delay. The remaining 13.82 and 11.18 min are differences in
-summed job wall time from the model's source run. Thus chain assignment
-delays explain part of the model gap, but these one-run samples cannot
-attribute the larger job-time difference to the lane change.
+The derived ideal longest lane is 8872 s (147.87 min, or 147.9 at one decimal
+place) from the main run's measured whole-job costs, with immediate starts and
+handoffs. Lane 2 was the last macOS chain in both branch runs. Its derived
+14.65 and 12.11 min finish gaps from that model contain only 0.68 and 0.80 min
+of derived handoff gaps, plus 0.15 and 0.13 min of initial assignment delay.
+The remaining 13.82 and 11.18 min are differences in summed job wall time from
+the model's source run. Thus chain assignment delays explain part of the model
+gap, but these one-run samples cannot attribute the larger job-time difference
+to the lane change.
 
 [36369711059]: https://github.com/dahlia/oseo/actions/runs/36369711059
 [36516215200]: https://github.com/dahlia/oseo/actions/runs/36516215200
@@ -669,11 +683,11 @@ attribute the larger job-time difference to the lane change.
 
 ### Family costs and shard imbalance
 
-Derived count/sum/max and max/mean from measured `startedAt`/`completedAt`
-in `gh run view RUN --repo dahlia/oseo --json headSha,jobs` follow.
-Each platform total sums only its listed families; Linux's separate `check`
-and the platform-independent aggregation job are excluded. Windows is outside
-this measurement. The `native support` family is the extended native property
+Count/sum/max and max/mean derive from measured `startedAt`/`completedAt`
+in `gh run view RUN --repo dahlia/oseo --json headSha,jobs`. Each platform
+total sums only its listed families; Linux's separate `check` and the
+platform-independent aggregation job are excluded. Windows is outside this
+measurement. The `native support` family is the extended native property
 file shards, plus extended package properties on its first shard.
 
 Run 35456667007 at `32ece7f4`, derived minutes from its measured job
@@ -739,86 +753,94 @@ native case costs and test262 shard durations from runs 36243816479 and
 36261458909. It selects a deterministic cost-based native file partition at
 unchanged macOS totals, with estimated tail reduction and no estimated macOS
 workload increase. The estimates replay concurrent case durations and do not
-establish an improvement. Branch run 36343919872 failed Linux own-key at the
-unchanged 3,600-second property deadline after a reported 149 examples;
-its generated budget is incomplete. The
-[failed-run analysis](./evidence/u6/failed-branch-run.md) records measured
-costs and scheduling assumptions. Its
-[full per-shard comparison](./evidence/u6/first-branch-comparison.md) records
-a one-run measured macOS native job maximum of 46.10 minutes versus 51.43
-in run 36312192623, and test262 maximum of 35.23 versus 34.50 minutes.
+establish an improvement.
+
+Branch run 36343919872 failed Linux own-key at the unchanged 3,600-second
+property deadline after a reported 149 examples; its generated budget is
+incomplete. The [failed-run analysis](./evidence/u6/failed-branch-run.md)
+records measured costs and scheduling assumptions.
+
+Its [full per-shard comparison](./evidence/u6/first-branch-comparison.md)
+records a one-run measured macOS native job maximum of 46.10 minutes versus
+51.43 in run 36312192623, and test262 maximum of 35.23 versus 34.50 minutes.
 Their derived combined job sum differs by -20.70 macOS minutes; runner
-variance is not separated, and runtime-archive conditions differ. The
-correction isolates Linux own-key in its first shard and raises Linux native
-support from four to five, retaining four shards for all remaining files; its
-corrected branch run 36358067906 passed all 58 jobs. Its
-[full comparison](./evidence/u6/second-branch-comparison.md) retains derived
-macOS native/test262 job maxima from observed timestamps of 34.35/31.67 minutes
-versus 51.43/34.50 before, and derived total macOS workload of 731.40 versus
-778.12 minutes. Five-slot wall lower bounds are derived as 146.28 versus 155.62
-minutes. This is one corrected observation; variance and cache effects are not
-separated. The same macOS own-key cohort varies by a derived 11.80 case-minutes
-between branch runs. Linux singleton own-key passes in 41.36 measured
-case-minutes, with a derived 18.64-minute margin against its unchanged property
-deadline. Test262 keeps its round-robin assignment and raises the total from
-ten to twelve. Using run 36261458909's derived slowest residual rate, the
-estimate leaves 47.53 minutes against the 120-minute timeout, up from 33.22, at
-a derived 1.89 minutes of added macOS fixed cost. Extra harness preparation has
-no separate timing measurement; the corrected combined-workload observation
+variance is not separated, and runtime-archive conditions differ.
+
+The correction isolates Linux own-key in its first shard and raises Linux
+native support from four to five, retaining four shards for all remaining
+files. Its corrected branch run 36358067906 passed all 58 jobs.
+
+Its [full comparison](./evidence/u6/second-branch-comparison.md) retains
+derived macOS native/test262 job maxima from observed timestamps of
+34.35/31.67 minutes versus 51.43/34.50 before, and derived total macOS
+workload of 731.40 versus 778.12 minutes. Five-slot wall lower bounds are
+derived as 146.28 versus 155.62 minutes.
+
+This is one corrected observation; variance and cache effects are not
+separated. The same macOS own-key cohort varies by a derived 11.80
+case-minutes between branch runs.
+
+Linux singleton own-key passes in 41.36 measured case-minutes, with a derived
+18.64-minute margin against its unchanged property deadline. Test262 keeps
+its round-robin assignment and raises the total from ten to twelve.
+
+Using run 36261458909's derived slowest residual rate, the estimate leaves
+47.53 minutes against the 120-minute timeout, up from 33.22, at a derived
+1.89 minutes of added macOS fixed cost. Extra harness preparation has no
+separate timing measurement; the corrected combined-workload observation
 meets the limit without establishing repeatable savings.
 
 ### U17 hosted first executable launch probe
 
-Branch run [36594796547]
-at `1b5970ff` measured `macos-15`, `macos-latest`, and `ubuntu-latest`
-once each on 2026-09-29 UTC. All jobs passed. The
+Branch run [36594796547] at `1b5970ff` measured `macos-15`, `macos-latest`, and
+`ubuntu-latest` once each on 2026-09-29 UTC. All jobs passed. The
 [probe and compact outputs](./evidence/u17/README.md) preserve the exact
-script, environment, per-binary durations, build costs, and policy logs.
-The workflow experiment branch must never be merged; these results come
-from a separate documentation branch based on `main`. The
-[historical Mac mini comparison](./evidence/u17/mac-mini-baseline.txt)
-is preserved with its report provenance.
+script, environment, per-binary durations, build costs, and policy logs. The
+workflow experiment branch must never be merged. These results come from a
+separate documentation branch based on `main`. The
+[historical Mac mini comparison](./evidence/u17/mac-mini-baseline.txt) is
+preserved with its report provenance.
 
-The tested hosted images did not exhibit the Mac mini's reported
-sustained serialized first-execution cost. For fresh Zig binaries on
-macOS 15.7.9, measured totals for 48 first launches were 428.907 ms at
-concurrency one and 133.483 ms at concurrency three; repeats took
-446.241 and 107.836 ms. On macOS 26.6.2, the corresponding first totals
-were 507.555 and 174.809 ms, versus 503.678 and 197.351 ms on repeat.
-Fresh shared-library loads measured 0.938–2.348 ms across the macOS
-compiler/image cells. Builds and installation are excluded from these
-launch/load measurements; cold and warmed Zig build costs are recorded
-separately in the evidence.
+The tested hosted images did not exhibit the Mac mini's reported sustained
+serialized first-execution cost. For fresh Zig binaries on macOS 15.7.9,
+measured totals for 48 first launches were 428.907 ms at concurrency one and
+133.483 ms at concurrency three. Repeats took 446.241 and 107.836 ms. On macOS
+26.6.2, the corresponding first totals were 507.555 and 174.809 ms. Repeats
+took 503.678 and 197.351 ms. Fresh shared-library loads measured 0.938–2.348 ms
+across the macOS compiler/image cells.
 
-Apple-clang macOS 15 first totals measured 361.789/111.009 ms for
-concurrency one/three. The macOS 26 concurrent first pass had outliers:
-813.272 ms total versus 202.850 ms on repeat, with a derived maximum
-individual launch of 400.838 ms. Its cause was not isolated, and that
-cohort does not establish a concurrency speedup. Both macOS images
-reported assessments enabled and SIP disabled without any policy change
-by the probe. `syspolicyd` was active; these observations do not prove
-that security checks are absent or identify the image setting responsible.
+Builds and installation are excluded from these launch/load measurements. Cold
+and warmed Zig build costs are recorded separately in the evidence.
 
-The research report's candidate 3, rented dedicated Mac capacity, still
-needs this probe measured in the actual guest under its default policy.
-Candidate 4, measuring family speed before spending, remains necessary:
-use the same SHA, image, toolchain, shard, seeds, budgets, and cache state
-for test262, extended properties, and Apple-clang sanitizers. This
-single tiny-program measurement replaces the inference about hosted
-first-exec cost; it establishes no repeatable gate speedup or rented-Mac
-throughput ratio. Production workflow coverage is unchanged.
+Apple-clang macOS 15 first totals measured 361.789 ms at concurrency one and
+111.009 ms at concurrency three. The macOS 26 concurrent first pass had
+outliers: 813.272 ms total versus 202.850 ms on repeat, with a derived maximum
+individual launch of 400.838 ms. Its cause was not isolated, and that cohort
+does not establish a concurrency speedup. Both macOS images reported
+assessments enabled and SIP disabled without any policy change by the probe.
+`syspolicyd` was active. These observations do not prove that security checks
+are absent or identify the image setting responsible.
+
+The research report's candidate 3, rented dedicated Mac capacity, still needs
+this probe measured in the actual guest under its default policy. Candidate 4,
+measuring family speed before spending, remains necessary: use the same SHA,
+image, toolchain, shard, seeds, budgets, and cache state for test262, extended
+properties, and Apple-clang sanitizers. This single tiny-program measurement
+replaces the inference about hosted first-exec cost. It establishes no
+repeatable gate speedup or rented-Mac throughput ratio. Production workflow
+coverage is unchanged.
 
 [36594796547]: https://github.com/dahlia/oseo/actions/runs/36594796547
 
 ### U3 fixed-cost cache audit
 
-U3 leaves the workflow unchanged. Mise already caches the installed tools;
-an additional aube store cache did not meet the local cost test below. Npm
-builds are too short to justify another cross-job artifact restore. This
-is an audit-only result, with no claimed runner-minute reduction and no
-branch CI experiment. The coordinator directed an audit-only commit if
-local store restore was not clearly cheaper than the install's download
-part. No install or build is skipped, and no coverage changes.
+U3 leaves the workflow unchanged. The installed tools are already cached by
+mise; an additional aube store cache did not meet the local cost test below.
+The npm builds are too short to justify another cross-job artifact restore.
+This is an audit-only result, with no claimed runner-minute reduction and no
+branch CI experiment. The coordinator directed an audit-only commit if local
+store restore was not clearly cheaper than the install's download part. No
+install or build is skipped, and no coverage changes.
 
 #### Existing CI step decomposition
 
@@ -828,8 +850,8 @@ Sources are runs 36243816479, 36261458909 and 36312192623, fetched with
 `af9bb68c`; runtime versions differ from the first two as recorded under U8.
 These are historical observations, not before/after measurements of a change.
 The same named jobs appear in each run. The
-[compact inputs and reproduction scripts](./evidence/u3/README.md)
-preserve these observations after GitHub log retention expires.
+[compact inputs and reproduction scripts](./evidence/u3/README.md) preserve
+these observations after GitHub log retention expires.
 
 Each row below covers all 29 macOS jobs or all 20 Linux test-family jobs;
 Linux's separate `check`, Windows and aggregation are excluded. Step seconds
@@ -847,22 +869,21 @@ restore, so its column must not be added to those substeps again.
 | 36312192623 | Linux | 1.85            | 61.20              | 2.95                          |
 
 Mise-action is the largest setup step, but its name hides the dependency
-install that the `[deps.aube]` provider runs when the postinstall hook
-invokes `mise run install-hooks`. Its `cache` input
-already defaults to `true`, as the run logs confirm. The action restores
-its mise data directory, including installed tools. The source inspected
-was the action revision reported by run 36312192623,
-[`c2a87611`].
-Its default key includes platform/image and configuration content; a mise
-version is included only when the workflow supplies that input. Adding a
-second installed-tool cache would duplicate the existing restore.
+install. The `[deps.aube]` provider runs that install when the postinstall hook
+invokes `mise run install-hooks`. Its `cache` input already defaults to `true`,
+as the run logs confirm. The action restores its mise data directory, including
+installed tools. The source inspected was the action revision reported by run
+36312192623, [`c2a87611`]. Its default key includes platform/image and
+configuration content; a mise version is included only when the workflow
+supplies that input. Adding a second installed-tool cache would duplicate the
+existing restore.
 
-The next table splits that step using runner-log markers. Restore means are
-derived from measured intervals between `Restoring mise cache` and the
-restored-key/miss message, including miss lookups. Dependency means are
-derived from aube's measured `in Ns` summary, including download, store
-population and linking. The observed cache counts are restored/missing
-entries, not evidence about the Zig compilation cache.
+Runner-log markers split mise-action into restore and dependency install.
+Restore means are derived from measured intervals between
+`Restoring mise cache` and the restored-key/miss message, including miss
+lookups. Dependency means are derived from aube's measured `in Ns` summary,
+including download, store population and linking. The observed cache counts are
+restored/missing entries, not evidence about the Zig compilation cache.
 
 | Run         | Host  | Mise restored/missing jobs | Mise restore/lookup mean s | Aube install mean s |
 | ----------- | ----- | -------------------------- | -------------------------- | ------------------- |
@@ -875,30 +896,34 @@ entries, not evidence about the Zig compilation cache.
 
 For the same `native (macos-aarch64, 1/3)` job, the measured tool-install
 summaries report zero new tools and nine already installed in 14/11/46 ms,
-respectively. Aube instead downloads 61 packages, measured at 30.9 MB,
-in 25.8/18.1/23.5 s. The derived tails from the first `linking` progress
-message to its completion are 11.25/10.09/11.02 s. Subtracting those tails
-from aube's summary gives derived earlier intervals of 14.55/8.01/12.48 s.
-Those intervals include fetching, unpacking and content-addressed store
-population; they are not isolated network-download measurements. A store
-cache replaces fetching and store population with archive extraction; the
-mandatory frozen install still performs linking.
+respectively. Aube instead downloads 61 packages, measured at 30.9 MB, in
+25.8/18.1/23.5 s. The derived tails from the first `linking` progress message
+to its completion are 11.25/10.09/11.02 s. Subtracting those tails from aube's
+summary gives derived earlier intervals of 14.55/8.01/12.48 s. Those intervals
+include fetching, unpacking and content-addressed store population; they are
+not isolated network-download measurements.
 
-The matching `native (linux-x86_64-gnu, 1/3)` job reports zero new tools in
-5/6 ms in the first two runs, then nine tools installed in 12.9 s on a
-mise miss in the third. Its measured aube installs are 9.2/6.5/4.9 s,
-downloading 61 packages at 33.0 MB. For a cold macOS example in the third
-run, `test262 (macos-aarch64, 6/10)` installs nine tools in a measured
-17.6 s; progress reports Zig extracting at elapsed 8.8, 11.9 and 15.0 s.
-Concurrent, sparse tool progress does not separate total download and
-extraction times. The third Linux action mean mixes cold and warm tool
-states and includes cache saves; it is not evidence of slower aube installs.
+A store cache replaces fetching and store population with archive extraction;
+the mandatory frozen install still performs linking.
 
-The initial npm build is inside the small runtime archive action above.
-U7's per-job table separately records later npm builds at derived intervals
-of about 1.1–8.9 s, including task dispatch. A cached dist would add a
-restore and complete build-input key while most jobs repeat only one short
-build. No measured net benefit supports that additional cache here.
+The matching `native (linux-x86_64-gnu, 1/3)` job reports zero new tools in 5/6
+ms in the first two runs, then nine tools installed in 12.9 s on a mise miss in
+the third. Its measured aube installs are 9.2/6.5/4.9 s, downloading 61
+packages at 33.0 MB.
+
+For a cold macOS example in the third run, `test262 (macos-aarch64, 6/10)`
+installs nine tools in a measured 17.6 s; progress reports Zig extracting at
+elapsed 8.8, 11.9 and 15.0 s. Concurrent, sparse tool progress does not
+separate total download and extraction times.
+
+The third Linux action mean mixes cold and warm tool states and includes cache
+saves; it is not evidence of slower aube installs.
+
+The initial npm build is inside the small runtime archive action above. U7's
+per-job table separately records later npm builds at derived intervals of about
+1.1–8.9 s, including task dispatch. A cached dist would add a restore and
+complete build-input key while most jobs repeat only one short build. No
+measured net benefit supports that additional cache here.
 
 #### Local store restore experiment
 
@@ -915,12 +940,13 @@ Before each warm trial, the probe deleted the store and all root/package
 *node\_modules* directories, extracted the saved store, and ran the same
 frozen install. It did not restore *node\_modules* or dependency freshness
 state. The [preserved probes and outputs](./evidence/u3/README.md) use Python
-`time.perf_counter()` to measure subprocess wall time. The
-macOS restore command used Homebrew GNU tar and `unzstd`, matching the
-cache action's extraction tools. Both archive creation and extraction
-used GNU tar; an earlier BSD-tar probe was discarded because it introduced
-AppleDouble metadata files. Linux's uncompressed local tar is a
-favorable lower-cost control, with no decompression or network transfer.
+`time.perf_counter()` to measure subprocess wall time.
+
+The macOS restore command used Homebrew GNU tar and `unzstd`, matching the
+cache action's extraction tools. Both archive creation and extraction used
+GNU tar; BSD tar introduced AppleDouble metadata files. Linux's uncompressed
+local tar is a favorable lower-cost control, with no decompression or network
+transfer.
 
 | Local host  | Empty-store install s, measured once | Restore s, measured trials | Mandatory warm install s, measured trials | Restore + install s, derived trials |
 | ----------- | ------------------------------------ | -------------------------- | ----------------------------------------- | ----------------------------------- |
@@ -997,14 +1023,14 @@ This audit inspected *mise.toml*, *.github/workflows/main.yaml*, the
 runtime-archive cache action, and the property harness at `86180894`.
 The coordinator assigned repeated npm builds to U3 and explicitly directed
 U7 to retain the focused Linux checks. U7 therefore changes documentation
-only: the coordinator retained the small isolated selection-test duplicate,
+only. The coordinator retained the small isolated selection-test duplicate;
 no workflow or task changes were made, and no branch CI run was requested.
 
 The table's costs are measured execution-step seconds from run 36261458909
 using `gh run view 36261458909 --repo dahlia/oseo --json headSha,jobs`.
 A slash separates the two compared executions, not hosts. Sharded costs are
-derived sums of measured step intervals, including task builds and startup;
-they are enclosing costs, not separately measured duplicate-case costs.
+derived sums of measured step intervals, including task builds and startup.
+They are enclosing costs, not separately measured duplicate-case costs.
 The Node step includes all discovered tests. No savings estimate is inferred
 from these costs. Separate fixed build costs follow below.
 
@@ -1045,16 +1071,18 @@ A measured local counterexample used fast-check 4.9.0 and the actual
 [*docs/evidence/u7/property-probe.mjs.txt*](./evidence/u7/property-probe.mjs.txt).
 The preserved probe uses `fc.assert`, recording predicate arguments rather than
 `fc.sample`; [its output](./evidence/u7/property-probe.log) and the
-[reproduction commands](./evidence/u7/README.md) are retained. With suite seed
-`0x60001200`, budget 12, and `fc.integer()`, the ordinary first four
-observations were 556484374, 1586950928, 1425465318, and 10. The
+[reproduction commands](./evidence/u7/README.md) are retained.
+
+With suite seed `0x60001200`, budget 12, and `fc.integer()`, the ordinary
+first four observations were 556484374, 1586950928, 1425465318, and 10. The
 extended-native configuration produced 24, -2147483644, 1324788078, and
--226402400, at budget 120. The first extended-package seed produced -820612415,
-107459006, -23, and 1035396571, also at budget 120. This is a harness
-counterexample, not a measurement of native gate cost or an exhaustive
-comparison of suite outputs. Source inspection establishes the seed mismatch;
-the probe demonstrates why a budget multiplier alone is insufficient. Ordinary
-evidence stays on each currently selected host.
+-226402400, at budget 120. The first extended-package seed produced
+-820612415, 107459006, -23, and 1035396571, also at budget 120.
+
+This is a harness counterexample, not a measurement of native gate cost or an
+exhaustive comparison of suite outputs. Source inspection establishes the seed
+mismatch; the probe demonstrates why a budget multiplier alone is
+insufficient. Ordinary evidence stays on each currently selected host.
 
 #### Focused Linux tooling checks
 
@@ -1072,8 +1100,8 @@ were measured at 67 s and 66 s respectively. No macOS check job exists.
 
 The focused tasks execute actual unit tests and then, where configured, a
 repository scan; the scan is not the same work as its unit tests. This audit
-records repeated test-file selection without asserting a behavior difference
-caused by checkout depth or concurrency, or claiming identical complete
+records repeated test-file selection. It does not assert a behavior difference
+caused by checkout depth or concurrency, or claim identical complete
 configuration. The coordinator directed retention of this Linux-only work.
 
 #### Repeated npm build input for U3
@@ -1090,7 +1118,7 @@ execution, not this npm build command.
 Each row below identifies the source job by its workflow name. Columns are
 derived per-job sums of measured runner-log timestamp intervals from each
 later `[build] $ aube exec -- tsdown --workspace` line to the next test-task
-launch; the initial cache-action build is excluded. They include dispatch
+launch. The initial cache-action build is excluded. They include dispatch
 cost and are neither an isolated tsdown duration nor measured recoverable
 savings. Logs were retrieved with
 `gh api repos/dahlia/oseo/actions/runs/RUN/logs`; main run IDs are in the
@@ -1152,32 +1180,33 @@ and the observed runtime archive states do not establish Zig cache contents.
 
 Deno's cache-action build has no later `build` dependency to duplicate.
 `test:deno` reads package source entry points through the Deno workspace,
-not built npm output; its initial npm build is an unconsumed-build candidate
+not built npm output. Its initial npm build is an unconsumed-build candidate
 for U3. This does not establish whether the restored runtime archive is used.
-Windows skips that action and builds once for Node. U3 owns whether and how
-to reuse the already validated npm output; U7 does not remove its validation.
-These two different-commit samples describe observed costs, not an
-implementation improvement. There is no before/after branch comparison and
-no claimed macOS minute reduction from this documentation-only audit.
+Windows skips that action and builds once for Node.
+
+U3 owns whether and how to reuse the already validated npm output; U7 does
+not remove its validation. These two different-commit samples describe
+observed costs, not an implementation improvement. There is no before/after
+branch comparison and no claimed macOS minute reduction from this
+documentation-only audit.
 
 ### U8 macOS host split audit
 
-U8 inspected the workflow and mise tasks at `875506fe` (including U7),
-then compared the historical sources and logs for runs 36243816479,
-36261458909 and [36312192623] at `af9bb68c`. The first two runs used
-Node 24.18.0 and Deno 2.9.2; the third and current checkout use Node 24.21.0
-and Deno 2.9.7. Within each run, Linux and macOS use the same pinned runtime,
-source revision, task command and ordinary property inputs. These samples are
-not three repetitions of one unchanged configuration or workload.
+U8 inspected the workflow and mise tasks at `875506fe` (including U7) and
+compared the historical sources and logs for runs 36243816479, 36261458909
+and [36312192623] at `af9bb68c`. The first two runs used Node 24.18.0 and
+Deno 2.9.2; the third and current checkout use Node 24.21.0 and Deno 2.9.7.
+Within each run, Linux and macOS use the same pinned runtime, source
+revision, task command and ordinary property inputs. These samples are not
+three repetitions of one unchanged configuration or workload.
 
-The coordinator explicitly requested an audit-only result after the initial
-source inspection: do not introduce a Node discovery runner for a small share
-of the job, and do not spend a CI cycle on a narrow Deno exclusion. U8 therefore
+The coordinator requested an audit-only result: no Node discovery runner for
+a small share of the job and no CI cycle on a narrow Deno exclusion. U8
 moves no component. Provably movable evidence exists, but its attributable
 Node case time is a derived 0.14/0.14/0.21 min, far below the coordinator's
 specified 10-minute follow-up threshold. This does not mean every remaining
-file proves a macOS-specific contract. Uncertain host and timing evidence is
-listed below and retained. No recovered runner minutes are claimed.
+file proves a macOS-specific contract. Uncertain host and timing evidence
+is listed below and retained. No recovered runner minutes are claimed.
 
 #### Classification and complete inventories
 
@@ -1234,7 +1263,7 @@ case durations, and target-dependent work is never moved by file-name alone.
 
 #### Measured costs and attribution limits
 
-The following wall times are **measured** from GitHub step/job timestamps.
+The following wall times are measured from GitHub step/job timestamps.
 The source jobs are `test (macos-latest, node)`,
 `test (macos-latest, deno)` and
 `native support (macos-aarch64, 1/12)` in the named run.
@@ -1249,7 +1278,7 @@ All other job instances/steps are preserved in the step inventory.
 | Deno test step                                  |          38 |          47 |          62 |
 | Extended package step, including repeated build |          11 |          10 |          10 |
 
-The next table contains **derived sums of measured Node case durations**, not
+The next table contains derived sums of measured Node case durations, not
 wall-time allocations. Node's spec output exposes each case's `ms`, but no
 file subprocess start/end or per-file duration summary. The extraction starts
 at the Node task launch and stops before its final summary; it does not count
@@ -1291,10 +1320,12 @@ timing verdict, not evidence that removing the macOS test preserves coverage.
 Parse-only semantics, hint-scaling ratios and property interruption are assessed
 separately; all timing-verdict files remain.
 
-A future Node host split would need a reviewed discovery runner that excludes
-only explicit audited files on macOS, retains default discovery coverage for
-new files, and leaves full Linux Node coverage and macOS native tests intact.
-Node 24 has no test-file exclusion flag; a name-based skip would be too broad.
+A future Node host split would need a reviewed discovery runner. The runner
+would exclude only explicit audited files on macOS, retain default discovery
+coverage for new files, and leave full Linux Node coverage and macOS native
+tests intact. Node 24 has no test-file exclusion flag; a name-based skip would
+be too broad.
+
 The attributable movable share here is below 10 min in every observed run and
 does not justify that runner change. Exact recovery would require a controlled
 CI experiment measuring process/import cost and overlap, not extrapolation
@@ -1310,13 +1341,15 @@ ceiling, not an evidenced host-split saving.
 The measured series below covers every main workflow run from `32ece7f4`
 through `6b435b4f`, including failed and cancelled runs. Sources are the
 linked runs' measured step `startedAt`/`completedAt` timestamps from
-`gh run view RUN --repo dahlia/oseo --json headSha,jobs`. Execution seconds
-are the derived sum across all ten macOS shards of the step named
-`Run mise run test:test262 --shard N/10`. They exclude job setup and cleanup,
-but retain any startup and builds inside that execution step. Reviewed paths
-are measured from each commit's manifest with the count command below;
-seconds per path are derived by dividing the execution sum by that count.
-Each commit was measured once, with no same-commit repeated sample.
+`gh run view RUN --repo dahlia/oseo --json headSha,jobs`.
+
+Execution seconds are the derived sum across all ten macOS shards of the step
+named `Run mise run test:test262 --shard N/10`. They exclude job setup and
+cleanup, but retain any startup and builds inside that execution step.
+Reviewed paths are measured from each commit's manifest with the count
+command below; seconds per path are derived by dividing the execution sum by
+that count. Each commit was measured once, with no same-commit repeated
+sample.
 
 | Commit     | Source run    | Measured paths | Derived execution s | Derived s/path | Observed run result |
 | ---------- | ------------- | -------------- | ------------------- | -------------- | ------------------- |
@@ -1358,13 +1391,16 @@ test262 job time, of which 97.20 min is inside the measured execution steps
 (`(18935 - 13103) / 60`). Holding the older step rate constant while adding
 542 paths accounts for only a derived 5.68 min
 (`13103 * 542 / 20841 / 60`). Run 36261458909 similarly adds a derived
-94.13 min of job time and 93.05 min of execution-step time. Thus most of the
-increase in macOS test262 minutes relative to the 226.27-minute test262
-family in the brief's baseline source run is per-path execution cost, rather
-than corpus size or job fixed cost. The 628-minute ceiling covers all five
-macOS families; this decomposition applies only to its test262 family. This is
-a workload-normalized observation, not an attribution to a particular
-implementation change or a measured isolated speedup.
+94.13 min of job time and 93.05 min of execution-step time.
+
+Most of the increase in macOS test262 minutes relative to the 226.27-minute
+test262 family in the brief's baseline source run is per-path execution cost,
+rather than corpus size or job fixed cost.
+
+The 628-minute ceiling covers all five macOS families; this decomposition
+applies only to its test262 family. This is a workload-normalized
+observation, not an attribution to a particular implementation change or a
+measured isolated speedup.
 
 [35463308291]: https://github.com/dahlia/oseo/actions/runs/35463308291
 [35493049199]: https://github.com/dahlia/oseo/actions/runs/35493049199
@@ -1393,59 +1429,64 @@ In the detailed tables, C is measured checkout time. T is derived mise tool
 setup time: its measured action interval minus D and M. D is the measured
 interval from `[deps.aube] aube` to `[deps.aube]` completion. M is the measured
 mise cache-restore interval from `Restoring mise cache` to the restored-key
-message. R is measured runtime archive restore or miss-lookup time. B is
-derived total build time: the initial nested build's measured duration plus
-later measured intervals from `[build]` launch to the next test-task launch.
-Those later intervals include task dispatch overhead and builds repeated by
-test tasks. The tables use seconds, rounded only after calculation.
+message. R is measured runtime archive restore or miss-lookup time.
 
-F is a derived fixed-cost proxy, not a separately timed no-test job. It is
-job elapsed time minus the interval from cache-action completion to final
-test-step completion, plus the repeated build intervals. It includes checkout,
-mise setup, dependency install, builds, archive key generation, cache lookup,
-action gaps, setup, and cleanup. Some test-runner startup remains in the
-residual, so the normalized rates below include that cost. C/T/D/B/M/R do
-not sum to F because F also retains those otherwise unassigned intervals.
+B is derived total build time: the initial nested build's measured duration
+plus later measured intervals from `[build]` launch to the next test-task
+launch. Those later intervals include task dispatch overhead and builds
+repeated by test tasks. The tables use seconds, rounded only after calculation.
+
+F is a derived fixed-cost proxy, not a separately timed no-test job. It is job
+elapsed time minus the interval from cache-action completion to final test-step
+completion, plus the repeated build intervals. It includes checkout, mise
+setup, dependency install, builds, archive key generation, cache lookup, action
+gaps, setup, and cleanup.
+
+Some test-runner startup remains in the residual, so the normalized rates below
+include that cost. C/T/D/B/M/R do not sum to F because F also retains those
+otherwise unassigned intervals.
+
 The native-support first shard's package-property step is variable evidence
-work and is subtracted separately for the per-native-file rate, after
-removing its already allocated repeated build cost.
+work. It is subtracted separately for the per-native-file rate, after removing
+its already allocated repeated build cost.
 
 Every measured job restored the mise tool-installation cache. That is a warm
-Zig *installation*, not proof of a warm Zig compilation cache. Neither
-commit's workflow restores a Zig compilation-cache directory; the derived
-start state is cold on fresh hosted runners, with in-job warming possible.
-These jobs' compilation-cache contents were not inspected, so this cold
-inference must not be presented as measured cache contents for them. U5 has
-since measured those contents locally; see
+Zig *installation*, not proof of a warm Zig compilation cache. Neither commit's
+workflow restores a Zig compilation-cache directory. The derived start state is
+cold on fresh hosted runners, with in-job warming possible. These jobs'
+compilation-cache contents were not inspected, so this cold inference must not
+be presented as measured cache contents for them. U5 has since measured those
+contents locally; see
 [Zig compilation cache sharing](#zig-compilation-cache-sharing-u5).
+
 Runtime archive cold/warm states below are observed cold misses and warm
-exact-key restores, respectively,
-from `Cache not found for input keys: oseo-runtime...` or
+exact-key restores, respectively, from
+`Cache not found for input keys: oseo-runtime...` or
 `Cache restored from key: oseo-runtime...`. The workflow removes a non-exact
 restore before compilation. Harness objects are not restored by CI.
 
-Cold and warm runtime-archive residual rates are kept separate below.
-A cache hit or a tool-install cache restore is not an implementation
-improvement. Host C sanitizer jobs use the host compiler and its archive;
-the inferred Zig compilation-cache state is inapplicable to their execution.
+Cold and warm runtime-archive residual rates are kept separate below. A cache
+hit or a tool-install cache restore is not an implementation improvement. Host
+C sanitizer jobs use the host compiler and its archive. The inferred Zig
+compilation-cache state is inapplicable to their execution.
 
-Deno test jobs have no repeated build inside their test task, so their
-F is an integer difference of the measured API timestamps; Node jobs add
-a log-timed repeated build by the same formula. The observed macOS Deno
-job `108457960713` is an outlier: its API completion is 18:47:09 UTC,
-while its final step ends at 18:45:47 UTC in run 36261458909. The derived
-82 s reporting tail is retained in its derived F of 135.00 s and the family
-total because both use job timestamps. It is not measured useful setup work;
-this proxy includes post-step reporting latency as well as executed cleanup.
-The derived means include this outlier, not a normalized replacement.
+Deno test jobs have no repeated build inside their test task, so their F is an
+integer difference of the measured API timestamps. Node jobs add a log-timed
+repeated build by the same formula. The observed macOS Deno job `108457960713`
+is an outlier. Its API completion is 18:47:09 UTC, while its final step ends at
+18:45:47 UTC in run 36261458909. The derived 82 s reporting tail is retained in
+its derived F of 135.00 s and the family total because both use job timestamps.
+It is not measured useful setup work. This proxy includes post-step reporting
+latency as well as executed cleanup. The derived means include this outlier,
+not a normalized replacement.
 
 | Host  | Run         | Mean C | Mean T | Mean D | Mean B | Mean M | Mean R | Mean F |
 | ----- | ----------- | ------ | ------ | ------ | ------ | ------ | ------ | ------ |
 | macOS | 36243816479 | 4.07   | 2.72   | 24.51  | 4.40   | 13.12  | 1.40   | 59.82  |
 | macOS | 36261458909 | 3.97   | 2.71   | 21.76  | 4.23   | 11.50  | 1.20   | 56.81  |
 
-Derived macOS means in seconds above use every measured job in the
-listed families of each run. The per-job values follow.
+Derived macOS means in seconds above use every measured job in the listed
+families of each run. The per-job values follow.
 
 macOS, run 36243816479: measured source jobs; derived allocations in seconds.
 C/D/M/R are measured intervals; T/B/F are derived as defined above.
@@ -1595,16 +1636,17 @@ or variant throughput. The source logs confirm each shard's result count.
 Derived native-support rates are
 `(job seconds - F - package evidence seconds) / selected native property files`.
 Package evidence seconds are derived from the measured package-property step
-minus its repeated build interval, which is already included in F; subtracting
-the whole step again would double-count that build. The exact file list comes
-from the measured expanded `node tools/run-native-tests.ts` command in each job
-log, not today's checkout. Node's `--test-shard=INDEX/TOTAL` selects
-round-robin positions in that ordered list. A Git tree comparison and the
-expanded commands show one additional property file in the later run, so
-selected file sets can shift. These are wall-time residuals per selected file
-with concurrent execution; they are not mean standalone file latency or
-processor-seconds per file. Neither rate supports a linear projection over a
-changed semantic workload.
+minus its repeated build interval. That build interval is already included in
+F; subtracting the whole step again would double-count it. The exact file
+list comes from the measured expanded `node tools/run-native-tests.ts` command
+in each job log, not today's checkout. Node's `--test-shard=INDEX/TOTAL`
+selects round-robin positions in that ordered list. A Git tree comparison and
+the expanded commands show one additional property file in the later run, so
+selected file sets can shift.
+
+These are wall-time residuals per selected file with concurrent execution,
+not mean standalone file latency or processor-seconds per file. Neither rate
+supports a linear projection over a changed semantic workload.
 
 The following derived ranges separate observed runtime archive states.
 Every figure is seconds per reviewed path or selected property file from
@@ -1624,9 +1666,9 @@ the indicated run's measured job logs and timestamps.
 | 36261458909 | Linux | test262        | cold    | 10   | 0.323      | 0.690      |
 | 36261458909 | Linux | native support | cold    | 4    | 78.767     | 161.940    |
 
-The first native-support shard package allocation is recorded explicitly
-below: step seconds are measured from the source job API; build and package
-evidence seconds are derived from the step and its measured build interval.
+The first native-support shard package allocation is recorded below. Step
+seconds are measured from the source job API. Build and package evidence
+seconds are derived from the step and its measured build interval.
 
 | Run         | Host  | Source job ID | Step s | Build s  | Package evidence s |
 | ----------- | ----- | ------------- | ------ | -------- | ------------------ |
@@ -1688,7 +1730,7 @@ Linux per-shard derived rates:
 
 ### Same-job spread and dominant files
 
-Derived observed spread below is the absolute difference between matched
+The derived observed spread below is the absolute difference between matched
 job names in the two source runs. It is a conservative comparison floor,
 not an isolated measurement of hardware variance: runtime keys differ,
 some jobs change cold/warm state, the reviewed classifications change, and
@@ -1711,9 +1753,8 @@ The full per-job elapsed tables permit the same comparison for every shard.
 | Linux | native            | 0.58           | 3.40           | native 2/3          |
 
 The measured slowest macOS native-support job in both runs is shard 5/12:
-source jobs `108409155582`
-and `108457960771`. Its derived max/mean imbalance is reported above.
-The measured long test durations in that shard are:
+source jobs `108409155582` and `108457960771`. Its derived max/mean imbalance
+is reported above. The measured long test durations in that shard are:
 
 | Run         | Dominant source file                                   | Measured test ms | Derived min |
 | ----------- | ------------------------------------------------------ | ---------------- | ----------- |
@@ -1725,7 +1766,7 @@ The measured long test durations in that shard are:
 On Linux, the measured slowest native-support job is shard 1/4 in both
 runs. Source jobs `108409155547` and `108457960742` report measured own-key
 test durations of 3,286,293.570 ms and 3,326,074.799 ms, respectively
-(derived 54.77 min and 55.43 min); their measured Reflect durations are
+(derived 54.77 min and 55.43 min). Their measured Reflect durations are
 1,283,650.209 ms and 1,307,274.984 ms (derived 21.39 min and 21.79 min).
 These observations come from the same two run logs.
 
@@ -1958,7 +1999,7 @@ again.
 
 U5 asks whether restoring the Zig global compilation cache between CI jobs
 would save more macOS runner time than the transfer costs. The answer is do
-nothing, but not because every variant loses: the two variants worth
+nothing, but not because every variant loses. The two variants worth
 considering are estimated to save a little more than they cost, and these
 measurements do not establish an improvement from either one large enough to
 justify implementing a cache that can serve a wrong entry. The unit leaves the
@@ -1978,8 +2019,8 @@ instead of reusing it.
 The series below ran `mise run test:test262 --shard 1/10` four times on the
 Linux workstation against `linux-x86_64-gnu`, alternating an emptied and a
 retained `ZIG_GLOBAL_CACHE_DIR`. It models a CI job by restoring the runtime
-archive once and keeping it, as the runtime archive cache action does, and by
-removing the harness object directory before every arm, because CI never
+archive once and keeping it, as the runtime archive cache action does. It also
+removes the harness object directory before every arm, because CI never
 restores one. A competing gate ran throughout; the measured one-minute load
 average at the start of the arms ranged from 12.97 to 18.59. Every arm executed
 the same 2,139 reviewed paths and reported 1,831 passes, 162 expected
@@ -1992,14 +2033,16 @@ negatives, 146 unsupported profile features, and no failures.
 | cold 2 | 628.46 |           14,637 |       2,529,612 |             14,637 |
 | warm 2 | 618.08 |           14,606 |       5,003,220 |             29,243 |
 
-The two cold arms agree to 0.45 s and produce byte-identical cache sizes, and a
+The two cold arms agree to 0.45 s and produce byte-identical cache sizes. A
 third cold run taken separately for the payload measurement reports 627.68 s
 with the same 14,637 entries and the same 2,529,612 KiB, so the series is
-reproducible rather than a single observation. Each warm arm began with every
-one of the preceding cold arm's 14,637 entries present and still created 14,606
-new ones. Taking both arms to issue the same number of cacheable invocations, a
-warm run reuses a derived 31 entries, a derived 0.21 percent of them, and
-roughly doubles the cache instead of reusing it.
+reproducible rather than a single observation.
+
+Each warm arm began with every one of the preceding cold arm's 14,637 entries
+present and still created 14,606 new ones. Taking both arms to issue the same
+number of cacheable invocations, a warm run reuses a derived 31 entries, a
+derived 0.21 percent of them, and roughly doubles the cache instead of reusing
+it.
 
 This is the most favorable sharing case that can be constructed: the same
 shard, the same commit, the same host, and a cache built by the immediately
@@ -2007,11 +2050,11 @@ preceding run. Cross-job sharing inside one CI run is strictly worse, because
 shards select disjoint paths.
 
 The derived cold-minus-warm difference is 16.08 s on derived means of 628.68
-and 612.60 s, a derived 2.6 percent. The separately measured
-`linux-x86_64-gnu` target-constant build below accounts for 8.66 to 8.96 s of
-it, and the remainder is not separable from the load drift between arms. No
-part of this difference is evidence for a cross-job cache, because a restored
-cache would supply only the entries a warm local cache also supplies.
+and 612.60 s, a derived 2.6 percent. The separately measured `linux-x86_64-gnu`
+target-constant build below accounts for 8.66 to 8.96 s of it, and the
+remainder is not separable from the load drift between arms. No part of this
+difference is evidence for a cross-job cache, because a restored cache would
+supply only the entries a warm local cache also supplies.
 
 #### The other two native families
 
@@ -2020,7 +2063,7 @@ ran on the other two native families.
 
 The `native support` family, which is twelve of the macOS jobs, behaves exactly
 like test262. One extended property shard reuses a derived 31 of 3,211 entries,
-a derived 0.97 percent, and the pair is 381.42 s cold against 378.04 s warm, a
+a derived 0.97 percent. The pair is 381.42 s cold against 378.04 s warm, a
 derived 3.38 s. Each arm was measured once. The shard is:
 
 ~~~~ sh
@@ -2029,9 +2072,9 @@ mise run test:property:extended:native:shard \
 ~~~~
 
 The `native` family, three of the macOS jobs, is the exception: it reuses most
-of its entries. The competing gate finished between the first pair's arms, so
-only the second pair is a usable wall-time comparison; both of its arms ran at
-a measured one-minute load average of 1.42 and 1.29.
+of its entries. Only the second pair is a usable wall-time comparison, because
+the competing gate finished between the first pair's arms. Both of its arms ran
+at a measured one-minute load average of 1.42 and 1.29.
 
 | Arm    |  Load | Wall s | New *o/* entries | Cache KiB after |
 | ------ | ----: | -----: | ---------------: | --------------: |
@@ -2041,10 +2084,10 @@ a measured one-minute load average of 1.42 and 1.29.
 | warm 2 |  1.29 | 396.26 |              345 |       1,701,252 |
 
 The comparable pair reuses a derived 1,155 of 1,500 entries, a derived 77.0
-percent, and its derived cold-minus-warm difference is 33.85 s of 430.11, a
-derived 7.9 percent. Most of a native shard's wall time is execution rather
-than compilation, so even a high reuse rate converts into a small wall saving.
-This family is priced with the other options below.
+percent. Its derived cold-minus-warm difference is 33.85 s of 430.11, a derived
+7.9 percent. Most of a native shard's wall time is execution rather than
+compilation, so even a high reuse rate converts into a small wall saving. This
+family is priced with the other options below.
 
 The 31 entries that test262 and `native support` each reuse are the same small
 set: the two target-constant libraries and the 29 C startup and libc objects
@@ -2135,15 +2178,17 @@ slightly different sizes.
 | runtime archive hit | 108600171460 | 3,257,528   | 1.584      | latency      |
 
 Restore intervals run from the `Cache hit for:` line to the action's own
-completion, which is `Cache restored successfully` for the mise rows and
-`Cache restored from key` for the runtime archive rows, so they include
-download, `unzstd` and `gtar`. The nonzero network rates the mise
+completion. That completion is `Cache restored successfully` for the mise rows
+and `Cache restored from key` for the runtime archive rows, so the intervals
+include download, `unzstd` and `gtar`. The nonzero network rates the mise
 intervals report range from 32.0 to 154.4 MB/s; the end-to-end rate is lower
-because decompression and extraction dominate. The save row's own log does not
-state the size of the entry it wrote; that byte count is the same `macos26` key
-measured when job 108600171522 restored it. The two small runtime archive hits
-show what a restore costs when transfer is negligible, 0.952 and 1.584 s, which
-is the per-step overhead any added cache pays.
+because decompression and extraction dominate.
+
+The save row's own log does not state the size of the entry it wrote; that byte
+count is the same `macos26` key measured when job 108600171522 restored it. The
+two small runtime archive hits show what a restore costs when transfer is
+negligible, 0.952 and 1.584 s. That is the per-step overhead any added cache
+pays.
 
 #### The three options, priced
 
@@ -2153,36 +2198,42 @@ is a derived 5.9 to 11.5 s for each job, and the save is a derived 21.8 s at
 the derived save rate. Against that, a warm cache reuses a derived 0.21
 percent of entries. The restore alone costs more than the 4.20 to 4.66 s
 target-constant build it would skip, and the per-case bulk it carries is not
-reused. Storage forbids it independently: the 27 macOS shard keys alone are a
+reused.
+
+Storage forbids it independently: the 27 macOS shard keys alone are a
 derived 7.91 GB for each commit, and with the 19 Linux keys a derived 13.47 GB,
 against a measured 4,058,176,690 active bytes already held in 69 entries of the
-10 GB repository limit, a derived 5.94 GB of headroom. Neither set fits. A
-single shared key cannot substitute, because shards compile disjoint cases and
-whichever job saved first would define the entry; three macOS jobs in run
+10 GB repository limit, a derived 5.94 GB of headroom. Neither set fits.
+
+A single shared key cannot substitute, because shards compile disjoint cases and
+whichever job saved first would define the entry. Three macOS jobs in run
 36312192623 already log `Failed to save: Unable to reserve cache with key` for
 the one runtime archive key, because they raced to publish it.
 
 Caching only the target-constant part. This is exactly keyable on the Zig
-version, the target and the flags, and it carries no per-case content, so it is
+version, the target, and the flags, and it carries no per-case content, so it is
 the only option that is safe to key. Its payload is a measured 19.98 MB, a
 derived 0.41 to 0.78 s of transfer, plus the measured 0.952 to 1.584 s of
-per-step overhead, so a hit costs a derived 1.36 to 2.37 s to save a measured
-4.20 to 4.66 s. The net is positive, a derived 1.83 to 3.30 s for each of the
-27 macOS jobs that select Zig, a derived 0.83 to 1.49 min for a whole run, and
-a miss pays a derived 1.49 s of save instead of saving anything. Against the
-derived macOS family totals of 764.12 and 795.45 min recorded earlier in this
-file, that is a derived 0.10 to 0.19 percent.
+per-step overhead. A hit therefore costs a derived 1.36 to 2.37 s to save a
+measured 4.20 to 4.66 s.
+
+The net is positive: a derived 1.83 to 3.30 s for each of the 27 macOS jobs
+that select Zig, and a derived 0.83 to 1.49 min for a whole run. A miss pays a
+derived 1.49 s of save instead of saving anything. Against the derived macOS
+family totals of 764.12 and 795.45 min recorded earlier in this file, that is a
+derived 0.10 to 0.19 percent.
 
 Caching only the `native` family, the one that reuses. One native shard's cache
 is a measured 902,632 KiB, a derived 104.5 MB compressed at the ratio the
-test262 payload measured, so a restore is a derived 2.1 to 4.1 s plus the same
+test262 payload measured. A restore is a derived 2.1 to 4.1 s plus the same
 per-step overhead against a derived 33.85 s saving. That leaves a derived 28.18
-to 30.78 s net for each job. There are only three macOS `native` jobs, so a
-whole run gains a derived 1.41 to 1.54 min net, or a derived 0.91 to 0.99 min
-once the 64.6 percent input-stability proportion recorded for U4 is applied as
-a hit rate. Against the same family totals that is a derived 0.18 to 0.20
-percent before the hit-rate discount and a derived 0.11 to 0.13 percent after
-it.
+to 30.78 s net for each job.
+
+There are only three macOS `native` jobs, so a whole run gains a derived 1.41 to
+1.54 min net, or a derived 0.91 to 0.99 min once the 64.6 percent
+input-stability proportion recorded for U4 is applied as a hit rate. Against the
+same family totals that is a derived 0.18 to 0.20 percent before the hit-rate
+discount and a derived 0.11 to 0.13 percent after it.
 
 Two of the 29 macOS jobs are excluded from the 27 above, and one of the 20
 Linux jobs from the 19: the `host C sanitizers` jobs set
@@ -2191,18 +2242,21 @@ Zig cache reaches their work.
 
 #### Result
 
-Do nothing. Neither positive option is established well enough to act on. The
-derived same-job spread for a macOS test262 shard is 0.35 to 16.53 min,
-recorded earlier in this file, and although that spread describes one job
-rather than a whole run, a derived 0.83 to 1.49 min for the target-constant
-option or a derived 1.41 to 1.54 min for the `native` option is small beside
-it. Both also rest on a restore band and a per-step overhead measured from a
+Do nothing. Neither positive option is established well enough to act on.
+
+The derived same-job spread for a macOS test262 shard is 0.35 to 16.53 min,
+recorded earlier in this file. Although that spread describes one job rather
+than a whole run, a derived 0.83 to 1.49 min for the target-constant option or
+a derived 1.41 to 1.54 min for the `native` option is small beside it.
+
+Both also rest on a restore band and a per-step overhead measured from a
 different cache rather than from the one being proposed. These measurements
 therefore do not establish a runner-level improvement large enough to justify
-implementing either cache. The
-`native` option additionally rests on a wall saving measured on this Linux host
-rather than a macOS runner and on a compressed payload that is derived rather
-than measured. Against that, each option adds a cache entry that can be
+implementing either cache.
+
+The `native` option additionally rests on a wall saving measured on this Linux
+host rather than a macOS runner and on a compressed payload that is derived
+rather than measured. Against that, each option adds a cache entry that can be
 restored wrongly, and the whole-cache option loses outright while exceeding the
 repository cache limit.
 
@@ -2212,10 +2266,9 @@ defeat it inside a single job, which is why one shard writes a measured 2.41
 GiB of which it reuses a derived 0.21 percent of the entries on a repeat.
 Making the invocations path-independent would be a change to the compiler's
 staging, not a CI cache. How far that would raise the reusable fraction of the
-other families is not measured here; the `native` family's derived 77.0 percent
+other families is not measured here. The `native` family's derived 77.0 percent
 shows only what is reachable where the staging path happens not to reach most
-of the command lines. This unit measured that boundary rather than crossing
-it.
+of the command lines.
 
 The preserved sources are in [*docs/evidence/u5/*](./evidence/u5/README.md).
 
@@ -2453,16 +2506,17 @@ a measured 17.21 ms per execution and the identity probe a measured 9.39 ms,
 against a measured 154.2 ms of runner time per execution. The two together are
 a derived 17.3 percent of fully serialized per-execution elapsed time. By
 contrast the body compile is a measured 0.57 ms, harness fragment emission
-2.41 ms, and case parsing 0.24 ms. Processor time for the same work is
-attributed separately by the profile above: the key group's 11.88 s of
-main-thread self time is measured, a derived 27.4 percent of the sampled
-total, and the identity probes are a derived 11.7 percent of it. That second
-figure applies their 730 of the observed 2,190 process starts to the measured
-`spawn` self time, which assumes every start costs the same. The profile does
-not separate an identity-probe start from a build or an execution start, so
-that assumption is unverified. It is plausible because the dominant term in a
-start is copying the parent's page tables, which does not depend on the
-child.
+2.41 ms, and case parsing 0.24 ms.
+
+Processor time for the same work is attributed separately by the profile
+above: the key group's 11.88 s of main-thread self time is measured, a derived
+27.4 percent of the sampled total, and the identity probes are a derived 11.7
+percent of it. That second figure applies their 730 of the observed 2,190
+process starts to the measured `spawn` self time, which assumes every start
+costs the same. The profile does not separate an identity-probe start from a
+build or an execution start, so that assumption is unverified. It is plausible
+because the dominant term in a start is copying the parent's page tables,
+which does not depend on the child.
 
 Both values are invariant within one runner process: the runtime sources, the
 target, the captured toolchain environment, and the toolchain identity do not
@@ -2479,24 +2533,24 @@ actually occupy a processor. On that assumption, removing a derived 19.4 s of
 tree CPU per 214-path shard lowers the CPU floor on a 3-core runner from a
 derived 50.5 to 44.0 s and on a 4-core runner from 38.8 to 34.0 s. Holding the
 measured ratio of wall time to that floor constant estimates 55.9 s on 3 CPUs
-and 47.1 s on 4, a derived 12.4 to 12.8 percent. The second uses the profile's
-main-thread attribution instead, and inherits the equal-cost-per-start
-assumption above: on a large host, where the runner process is the binding
-constraint, the profile removes a derived 39.2 percent of main-thread CPU,
-which estimates 31 to 36 s against the measured 45.9 s at pool 8, a derived
-22 to 33 percent. These are estimates from the measured
+and 47.1 s on 4, a derived 12.4 to 12.8 percent.
+
+The second uses the profile's main-thread attribution instead, and inherits
+the equal-cost-per-start assumption above. On a large host, where the runner
+process is the binding constraint, the profile removes a derived 39.2 percent
+of main-thread CPU, which estimates 31 to 36 s against the measured 45.9 s at
+pool 8, a derived 22 to 33 percent. These are estimates from the measured
 decomposition, not an observed before-and-after. The Phase B section below
 replaces them with a measured result.
 
 Applying the 12.4 to 12.8 percent small-runner estimate to the measured CI
 series gives the derived figures below. The macOS row uses the measured
 10-shard execution-step sums already recorded above, which exclude job setup
-and cleanup. The Linux row uses measured 10-job family totals, because this
-document does not separate the Linux test262 execution step from its job fixed
-cost; its saving is therefore stated only as a percentage of the execution
-portion. The 41,091-path column scales the measured per-path rate by a derived
-1.922 and assumes the same per-path cost, which the corpus has not
-demonstrated.
+and cleanup. The Linux row uses measured 10-job family totals. This document
+does not separate the Linux test262 execution step from its job fixed cost, so
+its saving is stated only as a percentage of the execution portion. The
+41,091-path column scales the measured per-path rate by a derived 1.922 and
+assumes the same per-path cost, which the corpus has not demonstrated.
 
 | Host  | Measured current s, 21,383 paths | Derived saving, 21,383 paths | Derived saving, 41,091 paths |
 | ----- | -------------------------------- | ---------------------------- | ---------------------------- |
@@ -2510,11 +2564,11 @@ populated in both, so this separates only the Oseo harness objects and runtime
 archives. Fixed per-run cost, measured as wall time minus the runner's own
 duration, is 6.3 s on the 3-core configuration and is not a per-path cost.
 
-Two further observations are recorded without a proposal. The summed
-runtime-asset read interval grows from a measured 3.3 s at pool 1 to 260.3 s
-at pool 16 while the work is unchanged, which is queueing on the default
-four-thread libuv pool. Reading the checked-in manifest costs a measured 3.4 s
-of YAML parsing per run regardless of shard size, which matters only for small
+Two observations are recorded without a proposal. The summed runtime-asset
+read interval grows from a measured 3.3 s at pool 1 to 260.3 s at pool 16
+while the work is unchanged, which is queueing on the default four-thread
+libuv pool. Reading the checked-in manifest costs a measured 3.4 s of YAML
+parsing per run regardless of shard size, which matters only for small
 shards.
 
 ### Reviewed test262 prepared runtime (U13 Phase B)
@@ -2528,13 +2582,15 @@ The contract change is explicit rather than ambient. `prepareNativeRuntime`
 is a new public entry point in `@oseo/cli` that reads the runtime assets,
 identifies the toolchain, pins the executable that identity describes, and
 derives the archive key, once for one host, toolchain, target, and runtime
-provider. `runNativeUnits` takes the result as a new optional argument and
-then performs no per-execution runtime read, identity probe, or key
-derivation. A caller that passes nothing behaves exactly as before, so
-`runNativeCli`, the published CLI, the testkit native workflow, the native
-fixtures, and the property suites are unchanged. Only the reviewed test262
-fragment executor passes a prepared runtime, and it derives it from the same
-initialization that already builds the harness object key.
+provider.
+
+`runNativeUnits` takes the result as a new optional argument and then
+performs no per-execution runtime read, identity probe, or key derivation. A
+caller that passes nothing behaves exactly as before, so `runNativeCli`, the
+published CLI, the testkit native workflow, the native fixtures, and the
+property suites are unchanged. Only the reviewed test262 fragment executor
+passes a prepared runtime, and it derives it from the same initialization that
+already builds the harness object key.
 
 Two properties make the reuse safe, and both are enforced rather than
 documented. First, the prepared snapshot is the only source of runtime bytes:
@@ -2543,46 +2599,53 @@ the bytes compiled and archived are always the bytes hashed into the key, and
 a runtime file edited after preparation is neither read nor compiled. A test
 edits a runtime file after preparation and asserts that the staged bytes and
 the archive key are still the snapshot's, and that preparing again derives a
-different key. Second, the compiler is pinned. `prepareNativeRuntime` asks the
-toolchain which executable its identity output describes, resolves that path to
-its real location, fingerprints every watched path, repeats the identity probe
-through the resolved executable, and fingerprints again, accepting the
+different key.
+
+Second, the compiler is pinned. `prepareNativeRuntime` asks the toolchain
+which executable its identity output describes, resolves that path to its
+real location, fingerprints every watched path, repeats the identity probe
+through the resolved executable, and fingerprints again. It accepts the
 preparation only when the repeat names the same executable and the same
-watched paths and nothing moved around it; a single probe would otherwise
+watched paths and nothing moved around it. A single probe would otherwise
 leave a window in which a replacement pairs a new compiler with an old
 identity, and accepting a repeat that watched different paths would record an
-identity describing a directory nothing rechecks. The fingerprint compares the
-inode change time as well as the device, inode, size, modification time, and
-resolved path, so an in-place rewrite that restores the size and the
-modification time is still caught; a host that cannot report a change time
-refuses to prepare rather than comparing the weaker set. Every build of that
-preparation then invokes the resolved path rather than a search-path name, and
-the fingerprints are rechecked after validation, after the archive cache lock
-is acquired, immediately before the compiler runs, and once the build has
-finished, before any artifact it produced is executed or published. The harness
-object build uses the same pinned path and the same checkpoints. A mismatch
-raises and is propagated rather than falling back to a build without archive
-reuse, so a compiler replaced in place, or a reported path repointed at a
-different file, cannot build, run, or publish under the previous compiler's
-key. Tests cover a replaced, a relinked, and a removed compiler, one rewritten
-in place with its size and modification time preserved, a confirming probe that
+identity describing a directory nothing rechecks.
+
+The fingerprint compares the inode change time as well as the device, inode,
+size, modification time, and resolved path, so an in-place rewrite that
+restores the size and the modification time is still caught. A host that
+cannot report a change time refuses to prepare rather than comparing the
+weaker set.
+
+Every build of that preparation then invokes the resolved path rather than a
+search-path name. The fingerprints are rechecked after validation, after the
+archive cache lock is acquired, immediately before the compiler runs, and
+once the build has finished, before any artifact it produced is executed or
+published. The harness object build uses the same pinned path and the same
+checkpoints.
+
+A mismatch raises and is propagated rather than falling back to a build
+without archive reuse, so a compiler replaced in place, or a reported path
+repointed at a different file, cannot build, run, or publish under the
+previous compiler's key.
+
+Tests cover a replaced, a relinked, and a removed compiler, one rewritten in
+place with its size and modification time preserved, a confirming probe that
 names different watched paths, a host that reports no change time, one swapped
 inside the confirming probe, one swapped during the lock wait, and one swapped
-during the build with an archive published, with an archive already cached, and
-with archive reuse disabled, plus an uncached harness object whose pin fails at
-each of its three checkpoints. A toolchain that cannot name its executable, or
-a host that cannot fingerprint files, refuses to prepare rather than reusing an
-unpinned identity.
+during the build with an archive published, with an archive already cached,
+and with archive reuse disabled, plus an uncached harness object whose pin
+fails at each of its three checkpoints. A toolchain that cannot name its
+executable, or a host that cannot fingerprint files, refuses to prepare rather
+than reusing an unpinned identity.
 
-What a prepared runtime checks, and when, is worth separating. At preparation
-the identity is taken twice and bracketed by fingerprints, as above. At every
-later use `runNativeUnits` compares the execution's compiler host, toolchain,
-target, captured environment snapshot, runtime ABI version and runtime asset
-set against the recorded ones, and re-fingerprints the watched paths; it does
-not probe the identity again. A search path that later resolves to a different
-installation therefore does not change what a prepared runtime builds with,
-because the pinned executable keeps being used, while an unprepared execution
-would pick up the new one. In the other direction the fingerprints catch a
+At every later use `runNativeUnits` compares the execution's compiler host,
+toolchain, target, captured environment snapshot, runtime ABI version and
+runtime asset set against the recorded ones, and re-fingerprints the watched
+paths; it does not probe the identity again. A search path that later
+resolves to a different installation therefore does not change what a prepared
+runtime builds with, because the pinned executable keeps being used, while an
+unprepared execution would pick up the new one. The fingerprints catch a
 rewrite of the pinned executable that unchanged identity output alone would
 miss.
 
@@ -2595,45 +2658,47 @@ runtime-archive key itself and predates this unit;
 [*PLAN-GATE.md*](../PLAN-GATE.md) records it as a candidate follow-up.
 
 Each recheck is one `realpath` and one `stat` per watched path, with no
-process start. The inode change time the comparison
-includes comes out of that same stat, so it costs no extra call. Measured on
-the same host, four rechecks of the two paths the Zig identity reports cost
-59.8 to 64.2 ms for a whole 730-execution shard, a measured 0.082 to
-0.088 ms per execution, against the per-execution saving below. Its cost is a
-derived 0.5 to 0.6 percent of that saving. The figures are in
+process start. The inode change time included in the comparison comes out of
+that same stat, so it costs no extra call. Measured on the same host, four
+rechecks of the two paths the Zig identity reports cost 59.8 to 64.2 ms for a
+whole 730-execution shard, a measured 0.082 to 0.088 ms per execution, against
+the per-execution saving below. Its cost is a derived 0.5 to 0.6 percent of
+that saving. The figures are in
 [*evidence/u13/pin-recheck-cost.txt*](./evidence/u13/pin-recheck-cost.txt).
 
 A prepared runtime also records the host, toolchain, target, environment
 snapshot, ABI version, ordered asset set, and a digest of the asset contents
-it came from, taking immutable copies of the target, its sanitizer list, the
+it came from. It takes immutable copies of the target, its sanitizer list, the
 environment variables, the ABI version, and each asset's location before any
 await. `runNativeUnits` compares those against the execution's own inputs and
 raises `PreparedNativeRuntimeMismatchError` on any difference, after removing
 the temporary directory and before any build plan is created. Hosts and
 toolchains are compared by identity, so a host that would read different
-runtime bytes and a toolchain with different flags are both refused. Package
-tests cover a rejected host, toolchain, target, sanitizer list, asset
+runtime bytes and a toolchain with different flags are both refused.
+
+Package tests cover a rejected host, toolchain, target, sanitizer list, asset
 location, environment snapshot, and runtime provider, and assert that no build
 plan was created in any of them. Two further tests run the same units with and
-without a prepared runtime, against both a missing and a published archive,
-and assert that the result, the archive key, the cache lookups, the written
+without a prepared runtime, against both a missing and a published archive.
+They assert that the result, the archive key, the cache lookups, the written
 artifacts, and the build plan are identical apart from the pinned compiler
-path, that the prepared execution reads no runtime asset and starts no
-identity probe, and that preparing reads exactly the assets one per-execution
-workflow reads. The existing Zig identity-probe retry test is unchanged and
-still passes: it uses `runNativeCli`, which never takes a prepared runtime.
+path. They also assert that the prepared execution reads no runtime asset and
+starts no identity probe, and that preparing reads exactly the assets one
+per-execution workflow reads. The existing Zig identity-probe retry test is
+unchanged and still passes: it uses `runNativeCli`, which never takes a
+prepared runtime.
+Before and after were measured on the same 214-path reviewed shard on one Linux
+host, with the whole process tree restricted by `taskset` to the CI runners'
+core counts, on an uninstrumented tree. Before is `98e66719`; every source this
+unit changes under *packages/* and *tools/* is checked out and rebuilt between
+arms, because the runner loads several of those packages from their built
+output.
 
-Before and after were measured on the same 214-path reviewed shard on one
-Linux host, with the whole process tree restricted by `taskset` to the CI
-runners' core counts, on an uninstrumented tree. Before is `98e66719`; every
-source this unit changes under *packages/* and *tools/* is checked out and
-rebuilt between arms, because the runner loads several of those packages from
-their built output. Both arms run inside one session, which alternates them
-once per repetition rather than run by run: a repetition runs all six of one
-arm's runs and then all six of the other's. Each arm has four warm and two
-cold runs per core count. Cold empties the Oseo object and archive cache; the
-lane Zig cache stays populated throughout, so this separates only the Oseo
-caches. Per-run values are in
+Both arms run inside one session, alternating once per repetition rather than
+run by run: a repetition runs all six of one arm's runs and then all six of the
+other's. Each arm has four warm and two cold runs per core count. Cold empties
+the Oseo object and archive cache; the lane Zig cache stays populated
+throughout, so this separates only the Oseo caches. Per-run values are in
 [*evidence/u13/before-after.txt*](./evidence/u13/before-after.txt).
 
 | CPUs | Cache | Measured before s | Measured after s | Derived change | Derived tree CPU change |
@@ -2645,11 +2710,11 @@ caches. Per-run values are in
 
 The host's one-minute load stayed between 1.3 and 5.6 across the session, and
 the widest spread inside any arm is a derived 1.28 s, far under the effect.
-Pairing each run against the run of the other arm at the same core count,
-cache state, and repetition gives derived means of 17.8 and 20.5 percent cold
-and 22.3 and 26.3 percent warm at three and four cores, and all twelve pairs
-are reductions, from a derived 16.9 to 26.9 percent. Host drift is reduced but
-not controlled, because the two runs of a pair are minutes apart rather than
+Pairing each run against the run of the other arm at the same core count, cache
+state, and repetition gives derived means of 17.8 and 20.5 percent cold and
+22.3 and 26.3 percent warm at three and four cores, and all twelve pairs are
+reductions, from a derived 16.9 to 26.9 percent. Host drift is reduced but not
+controlled, because the two runs of a pair are minutes apart rather than
 adjacent.
 
 The saving is a derived 15.8 to 17.4 ms of wall time per native execution
@@ -2664,17 +2729,16 @@ execution-step sums of 16,159 to 18,935 s at 21,383 paths estimates 2,876 to
 4,980 s, a derived 47.9 to 83.0 min per run. At 41,091 paths the same per-path
 rate estimates a derived 92.1 to 159.5 min. Those estimates were made on a
 Linux host restricted to three and four cores, not on a GitHub macOS runner.
-One branch CI run has since measured the change, and the paragraphs below
-record it. An earlier branch run, 36451319573 on `f483a129`, was cancelled by
-the coordinator about three minutes in, after a review of that commit found the
-two cache-safety defects this section's pinning and snapshot-bytes rules now
-close; every test262 job was stopped during setup, so it produced no step time.
 
-Branch run [36496566681] on `390cf60d` succeeded in all 58 jobs and is
-compared here against main run [36369711059] on `98e66719`, the same twelve
-shard totals on both hosts. Both runs were measured once. Per-shard values are
-in [*evidence/u13/ci-comparison.txt*](./evidence/u13/ci-comparison.txt),
-produced by *evidence/u13/ci-compare.py* from each run's measured job and step
+Branch run [36496566681] on `390cf60d` succeeded in all 58 jobs and is compared
+against main run [36369711059] on `98e66719`, the same twelve shard totals on
+both hosts. Both runs were measured once. An earlier branch run, 36451319573 on
+`f483a129`, was cancelled about three minutes in, after a review found the two
+cache-safety defects this section's pinning and snapshot-bytes rules now close;
+every test262 job was stopped during setup, so it produced no step time.
+Per-shard values are in
+[*evidence/u13/ci-comparison.txt*](./evidence/u13/ci-comparison.txt), produced
+by *evidence/u13/ci-compare.py* from each run's measured job and step
 timestamps.
 
 | Host  | Measured before s | Measured after s | Derived change | Derived saving |
@@ -2694,14 +2758,14 @@ numbers show why: individual test262 shards move between a derived -53.1 and
 +12.4 percent. The families this change does not touch moved in the same pair
 of runs too, by a derived -18.9 percent (Linux host C sanitizers), -17.3 and
 -15.0 percent (the `test` families), -11.8 percent (macOS native), and +8.7,
-+2.2 and +1.8 percent (Linux native and both native-support families). What
-the run establishes is that all 58 jobs succeeded and that the change is
-consistent with the local measurement in direction and rough size on both
-hosts; it does not on its own measure the saving to the precision of the local
-before-and-after, and it cannot show the absence of a regression in any
-individual job, several of which took longer than their counterpart.
++2.2 and +1.8 percent (Linux native and both native-support families). The run
+establishes that all 58 jobs succeeded and that the change is consistent with
+the local measurement in direction and rough size on both hosts. It does not,
+on its own, measure the saving to the precision of the local before-and-after,
+and it cannot show the absence of a regression in any individual job; several
+jobs took longer than their counterpart.
 
-Native support and property native executions do go through the same shape of
+Native support and property native executions go through the same shape of
 per-execution work, through `packages/testkit`'s own native workflow rather
 than through `@oseo/cli`. One measured run of
 *tests/property/m5-array-buffer.property.test.ts* starts 24 native executions
@@ -2709,11 +2773,11 @@ and exactly 24 `zig env` identity probes, one per execution, alongside 24
 `zig cc` builds. At the Phase A per-execution figure that file holds a derived
 0.64 s of removable serial work against a measured 18.42 and 19.29 s of clean
 wall time, a derived 3.4 percent. The share is much smaller there than in the
-reviewed test262 runner because each of those executions compiles and links a
-whole program, while a reviewed test262 execution links against an already
-built harness object and a cached runtime archive, so the per-execution
-constant is a far larger fraction of it. Those lanes are a different function
-and were deliberately left unchanged in this unit.
+reviewed test262 runner. Each of those executions compiles and links a whole
+program, while a reviewed test262 execution links against an already built
+harness object and a cached runtime archive, so the per-execution constant is a
+far larger fraction of it. Those lanes are a different function and were
+deliberately left unchanged in this unit.
 
 Reviewed paths, variants, strictness modes, specialization policies, targets,
 sanitizer flags, retry policy, verdicts, result order, budgets, and timeouts
@@ -2737,8 +2801,8 @@ Scripts, the throwaway prototype, and the compact outputs are preserved in
 *evidence/u14/host.log*. Every reviewed run used only
 `ZIG_GLOBAL_CACHE_DIR=/data/zig-cache/m5ci-native-spawn-cost`. A reviewed run
 without `--update` serializes the shard it produced and throws when it differs
-from the checked-in partitions, so every run recorded here reproduced the
-checked-in manifest shard exactly. No reviewed path, variant, mode, target,
+from the checked-in partitions. Every run recorded here therefore reproduced
+the checked-in manifest shard exactly. No reviewed path, variant, mode, target,
 sanitizer flag, retry policy, budget, or verdict was changed.
 
 The workload is the reviewed shard 1/100, a measured 214 paths and 730 native
@@ -2758,23 +2822,22 @@ Main-thread CPU was attributed with `--cpu-prof` on one pool 8 run of shard
 | `createHarnessObjectKey`                  | 0.98            | 3.1%          |
 | Garbage collector                         | 0.94            | 3.0%          |
 
-Starting processes is now the largest item by a factor of ten over the next
-one that is not idle. U13's profile of the same shard before its change
-measured 43.34 s sampled, of which `spawn` was 15.26 s and the
-runtime-archive key group 11.88 s. U13 removed the key group and one of the
-three starts per execution, so the share of what remains rose while its
-absolute value fell.
+Starting processes is now the largest item by a factor of ten over the next one
+that is not idle. U13's profile of the same shard before its change measured
+43.34 s sampled, of which `spawn` was 15.26 s and the runtime-archive key group
+11.88 s. U13 removed the key group and one of the three starts per execution,
+so the share of what remains rose while its absolute value fell.
 
 Without the profiler, a preload that wraps `ChildProcess.prototype.spawn`
 counts every start and records the main-thread time blocked inside the call.
 There are exactly two starts per native execution, one `zig cc` compile and
 link and the native executable itself. That accounts for the 730
-`fixture-linux-x86_64-gnu` starts and for 730 of the 736 `zig` starts, and
-the remaining six are unclassified overhead. The recorder groups starts by the
+`fixture-linux-x86_64-gnu` starts and for 730 of the 736 `zig` starts, and the
+remaining six are unclassified overhead. The recorder groups starts by the
 executable's basename and retained no arguments, so it cannot say what they
-were, and more than one caller reaches the compiler under that name: besides
-a harness object build, `prepareNativeRuntime` runs two `zig env` identity
-probes while the executor initializes.
+were. More than one caller reaches the compiler under that name: besides a
+harness object build, `prepareNativeRuntime` runs two `zig env` identity probes
+while the executor initializes.
 
 | Shard | Measured starts | Measured blocked s | Measured runner s | Derived share |
 | ----- | --------------- | ------------------ | ----------------- | ------------- |
@@ -2782,52 +2845,56 @@ probes while the executor initializes.
 | 1/100 | 1,466           | 9.65               | 21.22             | 45.5%         |
 | 1/25  | 5,930           | 53.38              | 103.88            | 51.4%         |
 
-The cost is the parent's size, not the child's. On Linux libuv starts a
-process with `fork`, which copies the parent's page tables, and the reviewed
-runner's measured peak resident set is 996,640 kB at shard 1/100 and
-1,148,912 kB at shard 1/25. A synthetic parent shows the relationship
-directly: 300 sequential starts of a trivial child cost a measured 1.830 ms
-each at a 99.6 MiB resident set and 22.311 ms each at 1,054.2 MiB, a derived
-22.0 ms per GiB. The parent's own system time over those 300 starts grows
-with it, from a measured 241.9 to 3,147.0 ms, a derived 44 and 47 percent of
-the summed call time; kernel time in the parent that grows with the parent's
-own size is what copying its page tables looks like, and this measurement
-does not attribute the remainder of the call. The same relationship holds
-inside the runner at a lower slope: grouping the run's own starts by the
-resident set at the moment of the start gives a measured 4.403 ms median in
-the 400 to 500 MiB group and 6.922 ms in the 600 to 700 MiB group, an
-estimated 12.9 ms per GiB between those groups' midpoints.
+The cost is the parent's size, not the child's. On Linux libuv starts a process
+with `fork`, which copies the parent's page tables, and the reviewed runner's
+measured peak resident set is 996,640 kB at shard 1/100 and 1,148,912 kB at
+shard 1/25.
 
-The same measurement on macOS does not find this cost. On an Apple M4 a
-start costs a measured 0.265 ms at a 96.1 MiB resident set and 0.263 ms at
-898.5 MiB, flat within its own noise across a tenfold range, which is what
-libuv starting a process with `posix_spawn` there would predict. Scaling
-that rate to the 1,466 starts of a 1/100 shard estimates 0.4 s in total
-against the Linux 9.7 s. Those macOS figures are micro-benchmarks on a
-desktop M4, not GitHub macOS runner measurements and not a reviewed run, and
-no macOS before-and-after was taken. What they support is that there is no
-demonstrated macOS saving here, not a measured macOS runner time.
+A synthetic parent shows the relationship directly: 300 sequential starts of a
+trivial child cost a measured 1.830 ms each at a 99.6 MiB resident set and
+22.311 ms each at 1,054.2 MiB, a derived 22.0 ms per GiB. The parent's own
+system time over those 300 starts grows with it, from a measured 241.9 to
+3,147.0 ms, a derived 44 and 47 percent of the summed call time. Kernel time in
+the parent that grows with the parent's own size is what copying its page
+tables looks like, and this measurement does not attribute the remainder of the
+call.
 
-Why the runner holds about a gigabyte is worth recording, because it is what
-makes each start expensive. The recorder samples `heapUsed` once a second
-without observing collection boundaries, so the smallest sample in a window
-is a proxy for the live set rather than an observation of it. That proxy
-grows from a measured 97 to 243 MiB over the 856 paths of shard 1/25, an
-estimated 0.17 MiB retained per path, while the largest `heapTotal` sample,
-which covers the whole heap rather than old space alone, is 918 MiB against a
-1,083 MiB resident set. The shape is consistent with a resident set dominated
-by heap reserve for per-case allocation churn over a retained component that
-grows with the path count; it does not by itself exclude a leak, and this
-unit did not look further. Reducing the resident set is in any case not
-free. Capping the old space with
+The same relationship holds inside the runner at a lower slope. Grouping the
+run's own starts by the resident set at the moment of the start gives a
+measured 4.403 ms median in the 400 to 500 MiB group and 6.922 ms in the 600 to
+700 MiB group, an estimated 12.9 ms per GiB between those groups' midpoints.
+
+The same measurement on macOS does not find this cost. On an Apple M4 a start
+costs a measured 0.265 ms at a 96.1 MiB resident set and 0.263 ms at 898.5 MiB,
+flat within its own noise across a tenfold range. That is what libuv starting a
+process with `posix_spawn` there would predict. Scaling that rate to the 1,466
+starts of a 1/100 shard estimates 0.4 s in total against the Linux 9.7 s. Those
+macOS figures are micro-benchmarks on a desktop M4, not GitHub macOS runner
+measurements and not a reviewed run, and no macOS before-and-after was taken.
+What they support is that there is no demonstrated macOS saving here, not a
+measured macOS runner time.
+
+The runner holds about a gigabyte, and that size is what makes each start
+expensive. The recorder samples `heapUsed` once a second without observing
+collection boundaries, so the smallest sample in a window is a proxy for the
+live set rather than an observation of it. That proxy grows from a measured 97
+to 243 MiB over the 856 paths of shard 1/25, an estimated 0.17 MiB retained per
+path, while the largest `heapTotal` sample, which covers the whole heap rather
+than old space alone, is 918 MiB against a 1,083 MiB resident set.
+
+The shape is consistent with a resident set dominated by heap reserve for
+per-case allocation churn over a retained component that grows with the path
+count. It does not by itself exclude a leak, and this unit did not look further.
+
+Reducing the resident set is in any case not free. Capping the old space with
 `--max-old-space-size=256` halves the measured peak resident set, from
-1,010,984 to 548,248 kB, but the two four-core measurements disagree on the
-sign of the wall-time change and a cap sized against a 214-path sample risks
-an out-of-memory failure on a CI shard of 1,782 paths. More collector time
-would explain paying for the smaller resident set; these rows record no
-collector duration and do not test it. Those four rows were also taken on a
-contended host, at loads between 8.4 and 11.1, and are recorded as a
-direction rather than a result.
+1,010,984 to 548,248 kB. The two four-core measurements disagree on the sign of
+the wall-time change, and a cap sized against a 214-path sample risks an
+out-of-memory failure on a CI shard of 1,782 paths. More collector time would
+explain paying for the smaller resident set; these rows record no collector
+duration and do not test it. Those four rows were also taken on a contended
+host, at loads between 8.4 and 11.1, and are recorded as a direction rather
+than a result.
 
 Moving the start onto a `worker_threads` worker was measured and is worse. A
 worker shares the parent's address space, so the same page tables are still
@@ -2910,17 +2977,18 @@ this investigation, including the native attribution and generated-C hashes.
 The largest measured new cost is three 10,000-element TypedArray
 `copyWithin` detachment security cases admitted by `1a879b2e`. They
 account for a derived 97.4/97.3 percent of summed native elapsed
-time among the 315 newly reviewed paths in two warm Linux runs. The
-fixed old-path sample's warm-trial mean runner time grows from 31.99
-to 34.01 seconds, a derived 6.3 percent; the
-CI series grows 21.0 percent in normalized step time. U10 finds no lost
-reuse or runner change, retains the required semantic work, and claims
-no recovered CI capacity. The macOS remainder is not causally allocated
-by these Linux measurements.
+time among the 315 newly reviewed paths in two warm Linux runs.
+
+The fixed old-path sample's warm-trial mean runner time grows from 31.99
+to 34.01 seconds, a derived 6.3 percent.
+
+U10 finds no lost reuse or runner change, retains the required semantic
+work, and claims no recovered CI capacity. The macOS remainder is not
+causally allocated by these Linux measurements.
 
 The U10 comparison uses the historical commits `32ece7f4`,
 `e99620d5`, and `aff3ade3`. The measured CI execution steps below
-come from main runs 35456667007, 35463308291, and 35493049199;
+come from main runs 35456667007, 35463308291, and 35493049199.
 `gh run view RUN --json headSha,jobs` supplies timestamps and
 `gh run view RUN --job JOB --log` supplies runner metadata. Each commit
 has one CI run in this comparison, so these measurements do not establish
@@ -2945,27 +3013,33 @@ Measured macOS execution-step seconds and source job IDs, from
 The derived sums are 13,103, 14,123, and 16,096 seconds. Dividing by
 the measured reviewed counts of 20,841, 20,898, and 21,156 gives
 0.629, 0.676, and 0.761 seconds per path. The derived rate increase is 21.0
-percent; the execution-sum increase is 22.8 percent. Job setup is outside these
-steps. The mise task's prerequisite package build remains inside each step and
-has not been subtracted here. Shard indices use each commit's reviewed order,
-so an equal index does not select an equal path set across these commits.
+percent; the execution-sum increase is 22.8 percent.
+
+Job setup is outside these steps. The mise task's prerequisite package
+build remains inside each step and has not been subtracted here. Shard
+indices use each commit's reviewed order, so an equal index does not
+select an equal path set across these commits.
 
 All thirty observed runner logs report `pool=3` and `retries=0`.
 The measured harness-object build/reuse sums are 954/0, 954/0, and
 992/0, respectively. The cold harness state was already present at the
-baseline, so it is not a newly lost cache in this interval. The measured
-runtime archive restore-hit counts are 9/10, 7/10, and 10/10. The
-TypedArray run has the highest normalized cost despite restoring every
-archive; archive misses cannot explain that endpoint increase.
+baseline, so it is not a newly lost cache in this interval.
+
+The measured runtime archive restore-hit counts are 9/10, 7/10, and
+10/10. The TypedArray run has the highest normalized cost despite
+restoring every archive; archive misses cannot explain that endpoint
+increase.
 
 The measured canonical execution-variant counts are 68,275, 68,557,
 and 69,552, obtained by reading every partition from
 `git archive REV tests/test262/results` and counting
 `execution.variants`. Their derived endpoint increase is 1.87 percent.
+
 The original 20,841 paths account for 68,275, 68,341, and 68,344
 variants; 22 old paths become pass with Symbol support and one more
 with TypedArray mutation. The measured new-path counts are 57 at
 `e99620d5` and 315 at `aff3ade3`, with 216 and 1,208 variants.
+
 The runtime changes are `a41aeb0b` (Symbol), its identity/lifetime
 repairs `9ecf1642`, `7df433ae`, and `61a5214d`, and `1a879b2e`
 (TypedArray mutation). The historical test262 runner, fragment runner,
@@ -3010,7 +3084,6 @@ Zig cache and that commit's Oseo cache were empty. Two warm runs retained
 both caches after the cold run. Every cold run built 52 harness objects;
 every warm run reused all 52 and built none. All runs used the observed
 eight-worker bound and no retry.
-
 Measured runner, command-wall, user, and system seconds follow; CPU/wall
 is derived from the latter three measurements. Runner time excludes
 manifest preparation and verification outside `createReviewedManifest`.
@@ -3074,6 +3147,7 @@ An instrumented wrapper records elapsed `host.run` intervals and hashes
 the generated launcher/body C before writing it. Two module variants use
 the whole-Script fallback and are outside this fragment-host instrumentation;
 all 665 variants still execute and match the reviewed results.
+
 After an untimed-for-comparison primer, the two warm runs capture 663
 compile/link and 663 native-executable calls each. The 1,326 observed C
 files have identical name/length/SHA-256 multisets at both endpoints,
@@ -3208,14 +3282,17 @@ They describe that historical corpus, not current CI cost.
 Historical task timings, host facts, counts, decomposition samples, cgroup
 peaks, and sampler readings below are observed single-host measurements from
 the named commands. Ratios, differences, percentages, and concurrency
-aggregates are derived from those observations. Earlier `e57a184` samples
-also date to 2026-07-25. Archive reuse and concurrency were recorded at
-`ddaf4a91` and `a5b3e105` on 2026-07-26 with the same measured 681 paths;
-the explicitly named `9eb7de2` footprint sample also dates to 2026-07-26.
-Later inventory and partition checkpoints below label their own larger
-corpus and commands; the partition checkpoint was recorded at `6676520b`
-on 2026-08-05. Cache warmth was not fully established for the original
-baseline, so these historical values are not cold/warm CI comparisons.
+aggregates are derived from those observations.
+
+Earlier `e57a184` samples also date to 2026-07-25. Archive reuse and
+concurrency were recorded at `ddaf4a91` and `a5b3e105` on 2026-07-26 with the
+same measured 681 paths. The explicitly named `9eb7de2` footprint sample also
+dates to 2026-07-26. Later inventory and partition checkpoints below label
+their own larger corpus and commands. The partition checkpoint was recorded at
+`6676520b` on 2026-08-05.
+
+Cache warmth was not fully established for the original baseline, so these
+historical values are not cold/warm CI comparisons.
 
 Sanitizer audit (observed 2026-09-17): historical Zig 0.16.0 runs did not
 provide ASan coverage. The separate Linux host C sanitizer lane verifies
@@ -3295,29 +3372,30 @@ execution is not established: the gate copies sources into a fresh working
 directory for every execution, so its include paths differ from these samples
 and may or may not produce the same cache keys.
 
-Derived from the observed task duration: 980.2 s divided by 1,192 recorded
-observations is 822 ms of task wall clock for each native cycle. That figure
-includes runner overhead and is not a direct measurement of one native
-execution. The archive build's share of it is not established here, and no
-residual figure is projected from these samples.
+The observed task duration of 980.2 s divided by 1,192 recorded observations
+is 822 ms of task wall clock for each native cycle. That figure includes
+runner overhead and is not a direct measurement of one native execution. The
+archive build's share of it is not established here, and no residual figure is
+projected from these samples.
 
-What the samples do show is that linking and running a trivial program against
-an existing archive costs 20-43 ms, while building the archive costs 333 to
-641 ms. Across the recorded pairs that is a factor of roughly 8 to 32. The
-archive depends on the reviewed runtime sources and headers, the compile flags,
-the resolved toolchain identity, one immutable admitted-environment snapshot,
-the exact inherited environment policy, and the target and sanitizer
+Linking and running a trivial program against an existing archive costs
+20-43 ms, while building the archive costs 333 to 641 ms. Across the recorded
+pairs that is a factor of roughly 8 to 32.
+
+The archive depends on the reviewed runtime sources and headers, the compile
+flags, the resolved toolchain identity, one immutable admitted-environment
+snapshot, the exact inherited environment policy, and the target and sanitizer
 selection. Ambient compiler inputs outside that policy are removed. None of
-those change between reviewed cases in one gate run, and the archive is rebuilt
-for every execution.
+those change between reviewed cases in one gate run, and the archive is
+rebuilt for every execution.
 
 ### Per-execution footprint before archive reuse
 
-The runtime archive checkpoint first measured one complete `runNativeCli`
-execution of `const x = 1 + 1;` at commit `9eb7de2`. The execution ran alone
-in a transient user systemd service with memory accounting enabled. The
-service cgroup reported the peak resident memory for the Node.js process and
-all of its native toolchain children.
+The runtime archive checkpoint measured one complete `runNativeCli` execution
+of `const x = 1 + 1;` at commit `9eb7de2`. The execution ran alone in a
+transient user systemd service with memory accounting enabled. The service
+cgroup reported the peak resident memory for the Node.js process and all of
+its native toolchain children.
 
 The new _oseo-cli-\*_ working directory was sampled every 5 ms from creation
 through the final pre-removal observation. Allocated storage is the sum of
@@ -3388,16 +3466,16 @@ property wall clock fell from 42.8 s to 8.93 s and its processor time fell from
 420.9 s to 97.44 s.
 
 The test262 difference establishes the net share of the complete runtime
-archive rebuild path that reuse removes. It includes avoiding runtime source
-copies and includes the new key calculation and cache lookup overhead, so it
-does not claim that 77.1 percent is isolated `zig cc` time. It does establish
-that repeated runtime preparation, rather than the generated-program link and
+archive rebuild path that reuse removes. It covers avoiding runtime source
+copies and the new key calculation and cache lookup overhead, so it does not
+claim that 77.1 percent is isolated `zig cc` time. It does establish that
+repeated runtime preparation, rather than the generated-program link and
 execution alone, occupied most of the gate.
 
 One earlier bypass attempt is excluded from the table. A competing
 eight-worker Node.js test started during that run; the host reached 55 GiB in
 use, exhausted all 8 GiB of swap, and exceeded a load average of 70. The Oseo
-run then reported many unrelated expected passes as harness failures after
+run reported many unrelated expected passes as harness failures after
 1,098.22 s. No Oseo or Zig child remained afterward. The successful isolated
 bypass above replaces that load-contaminated sample rather than averaging it
 into the checkpoint result.
@@ -3424,18 +3502,19 @@ test task ran at the same time.
 | Deno                      | 2.9.2                                  |
 
 The worker bound is eight, one for each physical core. A host with less
-available parallelism uses and reports that lower effective bound. The bound
-counts concurrent native executions rather than reviewed paths: the pool
-schedules one work item for each strictness and specialization variant, so one
-path's variants can hold several slots at once and a single long path no longer
-serializes every execution behind one worker. A subset with fewer paths than
-the configured bound clamps against that work-item count instead of the path
-count.
+available parallelism uses and reports that lower effective bound.
+
+The bound counts concurrent native executions rather than reviewed paths. The
+pool schedules one work item for each strictness and specialization variant, so
+one path's variants can hold several slots at once. A single long path no
+longer serializes every execution behind one worker. A subset with fewer paths
+than the configured bound clamps against that work-item count instead of the
+path count.
 
 A path's first variant runs alone as a probe, because a case that stops at
 that variant records only that variant, and ADR 0013 requires every executed
 combination to be listed and compared. Once the probe shows that the case does
-not stop there, the remaining variants start together, and every one of their
+not stop there, the remaining variants start together. Every one of their
 outcomes is awaited, recorded, and compared before the result is decided. No
 combination executes that the result would not list. The measured reused
 footprint makes the resource comparison explicit:
@@ -3462,9 +3541,9 @@ change. The run performed no retry.
 | --------------------------------------------- | ------- | -------- | ------- | ---------- |
 | `mise run test:test262`, reuse, eight workers | 44.57 s | 256.73 s | 89.23 s | 7.76       |
 
-Derived from the observations, concurrent execution removed 226.07 s from the
-270.64 s sequential reuse path, a reduction of 83.5 percent. The gate was 6.07
-times faster, and its processor-time-to-wall ratio rose from 1.08 to 7.76.
+Concurrent execution removed 226.07 s from the 270.64 s sequential reuse path,
+a reduction of 83.5 percent. The gate was 6.07 times faster, and its
+processor-time-to-wall ratio rose from 1.08 to 7.76.
 
 The CLI narrows a process-start failure caused by temporary host process
 resource exhaustion before the harness considers a retry. Only that diagnostic

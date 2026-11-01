@@ -25,8 +25,8 @@ The measurement ran on 2026-09-28 from the branch *m5ci-zig-cache-share*. Every
 Linux subprocess used
 `ZIG_GLOBAL_CACHE_DIR=/data/zig-cache/m5ci-zig-cache-share`. A competing gate
 ran on the Linux host through the whole test262 series and finished during the
-native series, between that series' first two arms, so each arm records its own
-load average and only same-load pairs are compared.
+native series, between that series' first two arms. Each arm therefore records
+its own load average, and only same-load pairs are compared.
 The macOS measurements ran over `ssh macbook-air` in a probe directory under
 *~/Desktop/*; they did not modify, commit, or push in the macOS project
 checkout. Timestamps inside a log are that log's own.
@@ -42,10 +42,10 @@ Preserved observations
 the cold and warm series: two cold and two warm runs of
 `mise run test:test262 --shard 1/10` on `linux-x86_64-gnu`. Each arm records
 the paths executed and their classifications, so the arms are checkable
-against each other, and records the new cache entries, total cache bytes, and
-total entry count, so the cold and warm labels are observations rather than
-assertions. The two cold arms agree to 0.45 s and produce byte-identical cache
-sizes.
+against each other. Each arm also records the new cache entries, total cache
+bytes, and total entry count, so the cold and warm labels are observations
+rather than assertions. The two cold arms agree to 0.45 s and produce
+byte-identical cache sizes.
 
 [*one-shard-payload.log*](./one-shard-payload.log) holds a further cold run
 whose only purpose is the transfer payload: the complete cache directory after
@@ -63,7 +63,7 @@ also reproduce the series' cold arms.
 a fresh job rebuilds that is identical in every job, *libcompiler\_rt.a* and
 *libubsan\_rt.a* for the job's target. It links a trivial C program with the
 exact flags *packages/toolchain-zig/src/index.ts* builds, twice for each
-target on each host, against an emptied cache, and records the warm repeat and
+target on each host, against an emptied cache. It records the warm repeat and
 the compressed payload. The macOS host has no `zstd`, so its compressed
 figures are `gzip -6`.
 

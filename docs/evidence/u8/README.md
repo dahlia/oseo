@@ -54,7 +54,7 @@ inputs used for the derived tables without requiring a new CI run.
 
 *test-names.mjs.txt* parses historical test sources with Babel; it never
 imports or executes them. The extractor starts at the exact Node test-task
-launch, excluding build-tool checkmarks, and stops at the runner's first final
+launch, excluding build-tool checkmarks. It stops at the runner's first final
 `tests` summary, excluding repeated failure details. It first tries literal
 registration names, then literal labels in test tables, then template patterns.
 Only a unique source-file match receives a duration. Ambiguous names are not

@@ -3,14 +3,14 @@ U6 first branch comparison
 
 Source runs are [36312192623] (`af9bb68c`, before) and [36343919872]
 (`e98edd15`, first branch experiment). The latter completed with failure:
-Linux own-key interrupted its unchanged generated budget. This is one after
+Linux own-key interrupted its unchanged generated budget. There is one after
 run, so runner variance is not separated. Native shard indices contain
 different files; test262 totals changed from ten to twelve.
 
-The per-shard tables below retain every comparison job. Native file inventories
+The per-shard tables below list every comparison job. Native file inventories
 are derived as equal/disjoint unions of 128 selected paths on each host in both
 runs; Linux's first branch still has an incomplete generated budget. Both
-test262 targets retain derived summary sums of 21,383 paths, 18,343 passes,
+test262 targets have derived summary sums of 21,383 paths, 18,343 passes,
 1,560 expected negatives, and 1,480 unsupported paths. Local partition tests
 prove exact path/file union and disjointness; CI summary counts alone do not
 prove path identity.
@@ -37,8 +37,9 @@ outside-runner differences below include setup, builds, package evidence,
 input loading and reporting, and must not be called pure fixed cost.
 
 Other macOS job definitions and totals were unchanged; Node also executes the
-added partition regression tests. Their measured elapsed minutes from the same
-run API job timestamps are retained here to make full-workload sums auditable:
+added partition regression tests. The table lists their measured elapsed
+minutes from the same run API job timestamps, so the full-workload sums are
+auditable:
 
 | Job                        | 36312192623 | 36343919872 |
 | -------------------------- | ----------- | ----------- |
@@ -56,7 +57,7 @@ workload by five slots derives wall-clock lower bounds of 155.62 and 150.82
 minutes, respectively. These are lower bounds, not measured run makespans or
 scheduling savings, and include variation across the other jobs.
 
-Reproduce the following tables from the retained compact inputs:
+Reproduce the following tables from the compact inputs:
 
 ~~~~ sh
 python3 docs/evidence/u6/compare-ci.py \
@@ -69,7 +70,7 @@ python3 docs/evidence/u6/compare-ci.py \
 
 ### macos-aarch64 native support
 
-All row durations are measured minutes from the named run.
+All row durations are measured in minutes from the named run.
 Aggregates and outside-runner differences are derived.
 Shard indices with changed assignments are not matched work.
 
@@ -90,7 +91,7 @@ Shard indices with changed assignments are not matched work.
 
 Run 36312192623 derived job max/sum: 51.43/306.93 min; runner max/sum:
 50.83/295.97 min; outside-runner sum: 10.96 min. Derived unique selected files:
-128; native summary count sums: {‘tests’: 224, ‘pass’: 224, ‘fail’: 0,
+128. Native summary count sums: {‘tests’: 224, ‘pass’: 224, ‘fail’: 0,
 ‘skipped’: 0, ‘todo’: 0}. Derived file case-sum min/median/p90/max min:
 0.00/4.85/11.41/44.31
 
@@ -111,13 +112,13 @@ Run 36312192623 derived job max/sum: 51.43/306.93 min; runner max/sum:
 
 Run 36343919872 derived job max/sum: 46.10/276.93 min; runner max/sum:
 45.08/266.93 min; outside-runner sum: 10.00 min. Derived unique selected files:
-128; native summary count sums: {‘tests’: 224, ‘pass’: 224, ‘fail’: 0,
+128. Native summary count sums: {‘tests’: 224, ‘pass’: 224, ‘fail’: 0,
 ‘skipped’: 0, ‘todo’: 0}. Derived file case-sum min/median/p90/max min:
 0.00/4.52/9.69/45.07
 
 ### macos-aarch64 test262
 
-All row durations are measured minutes from the named run.
+All row durations are measured in minutes from the named run.
 Aggregates and outside-runner differences are derived.
 Shard indices with changed assignments are not matched work.
 
@@ -137,7 +138,7 @@ Shard indices with changed assignments are not matched work.
 Run 36312192623 derived job max/sum: 34.50/296.68 min; runner max/sum:
 33.25/285.21 min; outside-runner sum: 11.47 min. Derived classification count
 sums: {‘tests’: 21383, ‘pass’: 18343, ‘expected-negative’: 1560, ‘unsupported’:
-1480}; derived sum objectsBuilt: 1117.
+1480}. Derived sum objectsBuilt: 1117.
 
 | Run         | Shard | Verdict | Archive | Job   | Runner |
 | ----------- | ----- | ------- | ------- | ----- | ------ |
@@ -157,11 +158,11 @@ sums: {‘tests’: 21383, ‘pass’: 18343, ‘expected-negative’: 1560, ‘
 Run 36343919872 derived job max/sum: 35.23/305.98 min; runner max/sum:
 33.88/292.84 min; outside-runner sum: 13.15 min. Derived classification count
 sums: {‘tests’: 21383, ‘pass’: 18343, ‘expected-negative’: 1560, ‘unsupported’:
-1480}; derived sum objectsBuilt: 1312.
+1480}. Derived sum objectsBuilt: 1312.
 
 ### linux-x86\_64-gnu native support
 
-All row durations are measured minutes from the named run.
+All row durations are measured in minutes from the named run.
 Aggregates and outside-runner differences are derived.
 Shard indices with changed assignments are not matched work.
 

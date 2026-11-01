@@ -54,10 +54,14 @@ seconds from Python `time.perf_counter()`, archive byte sizes, file counts,
 content bytes and content hashes. The associated cold/warm install logs
 confirm downloads on the empty-store install. The macOS warm logs report
 `reused 62`; Linux prints only an install summary, without a download or
-reuse count. The restored-store state is established by the probe procedure
+reuse count.
+
+The restored-store state is established by the probe procedure
 and recorded content hashes. Each host has one empty-store sample and two
 restored-store trials. Save, deletion and fingerprint time are excluded from
-restore/install time. Every warm trial deletes all root/package *node\_modules*
+restore/install time.
+
+Every warm trial deletes all root/package *node\_modules*
 directories and extracts the saved store into an absent directory before the
 frozen install. No dependency freshness marker or built output is restored.
 

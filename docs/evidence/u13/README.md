@@ -39,10 +39,10 @@ path rather than through `RECORDER`.
  -  *cpu-profile-top.txt*: the main-thread self-time attribution for one pool 8
     run.
  -  *before-after.sh.txt*: the Phase B measurement driver. Each repetition
-    runs one arm's six runs and then the other's, checking every changed
-    source under *packages/* and *tools/* out of `BASE` and `HEAD` in turn and
-    rebuilding between arms, so the two runs of a pair are minutes apart
-    rather than adjacent.
+    runs one arm's six runs and then the other's. Between arms it checks every
+    changed source under *packages/* and *tools/* out of `BASE` and `HEAD` in
+    turn and rebuilds, so the two runs of a pair are minutes apart rather than
+    adjacent.
  -  *pin-recheck-cost.mjs.txt* and *pin-recheck-cost.txt*: the cost of the
     per-execution pinned-toolchain recheck, and the script that measures it.
  -  *before-after.txt*: the Phase B before-and-after table, on an
@@ -111,19 +111,20 @@ Limits
 The host is a shared developer machine running other lanes, so `load1` is
 recorded for every run and each configuration was measured at least twice.
 Shard 1/100 is the deterministic round-robin sample of the reviewed order, not
-a hand-picked subset, but it is one 214-path sample of 21,383 paths and its
-per-path cost is not identical to a whole-corpus average. Every local
-experiment here was run on that one Linux host, so the estimates the baseline
-section derives from them, including its projections of macOS and Linux CI
-time, are labelled as estimates. The one exception is *ci-comparison.txt*,
+a hand-picked subset. It is one 214-path sample of 21,383 paths, and its
+per-path cost is not identical to a whole-corpus average.
+
+Every local experiment ran on that one Linux host, so the estimates the
+baseline section derives from them, including its projections of macOS and
+Linux CI time, are labeled as estimates. The exception is *ci-comparison.txt*,
 which is measured from two GitHub runs' own timestamps and covers both hosts;
 it is one run per side.
 
-An earlier branch CI run, 36451319573 on `f483a129`, was cancelled by the
-coordinator about three minutes in, after a review of that commit found the
-two cache-safety defects the pinned compiler and the snapshot-only runtime
-bytes now close. Every test262 job was stopped during setup, so that run holds
-no execution-step time. Branch run 36496566681 on `390cf60d` then succeeded in
-all 58 jobs; *ci-comparison.txt* holds its comparison against main run
-36369711059, produced by *ci-compare.py*. Both runs were measured once, so the
-comparison is one observation per side.
+Branch CI run 36451319573 on `f483a129` was canceled by the coordinator about
+three minutes in, after a review of that commit found the two cache-safety
+defects the pinned compiler and the snapshot-only runtime bytes now close.
+Every test262 job was stopped during setup, so that run holds no execution-step
+time. Branch run 36496566681 on `390cf60d` succeeded in all 58 jobs;
+*ci-comparison.txt* holds its comparison against main run 36369711059,
+produced by *ci-compare.py*. Both runs were measured once, so the comparison is
+one observation per side.

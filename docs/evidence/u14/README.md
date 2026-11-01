@@ -91,19 +91,22 @@ Limits
 ------
 
 The Linux host is a shared developer machine running other lanes, so the
-one-minute load is recorded for every run and each configuration was measured
-at least twice. Shard 1/100 is the deterministic round-robin sample of the
-reviewed order, not a hand-picked subset, but it is one 214-path sample of
-21,383 paths. The macOS numbers here are micro-benchmarks on an Apple M4
-desktop, not GitHub macOS runner measurements and not a reviewed run. What
-they support is that no growth with the parent's resident set was observed
-there and that no macOS saving was demonstrated, not that the platform is
+one-minute load is recorded for every run and each configuration was
+measured at least twice.
+
+Shard 1/100 is the deterministic round-robin sample of the reviewed order,
+not a hand-picked subset, but it is one 214-path sample of 21,383 paths.
+
+The macOS numbers here are micro-benchmarks on an Apple M4 desktop, not
+GitHub macOS runner measurements and not a reviewed run. They support that
+no growth with the parent's resident set was observed there and that no
+macOS saving was demonstrated. They do not support that the platform is
 free of every cost this unit is about.
 
 The A/B was run against persistent caches. The Oseo compiler cache, which
 `XDG_CACHE_HOME` locates, and the lane's `ZIG_GLOBAL_CACHE_DIR` survived
-every run, the driver neither reset nor warmed them and recorded no cache
-state, and it ran the base arm before the helper arm in every repetition. The
+every run. The driver neither reset nor warmed them and recorded no cache
+state. It ran the base arm before the helper arm in every repetition. The
 reductions it reports therefore do not separate the helper's effect from
 possible cache warming across the sequence.
 

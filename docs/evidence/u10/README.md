@@ -18,6 +18,7 @@ instrumentation template also incorporates the original inline edits recovered
 from the U10 Codex session `01a0e28c-aab4-7583-9934-8fc60f427b7a`: mapping
 working directories to source IDs and writing metrics on process exit. These
 are preserved source templates with formatting only.
+
 The TypeScript templates use *.ts.txt* because historical runner internals do
 not form a supported tool API and these files must not be treated as live
 TypeScript by lint/type checks. Captured JSON uses *.json.txt* to retain
@@ -28,15 +29,19 @@ a disposable checkout at the named historical commit.
 *prepare.py*, *compact.py*, and *summarize.py* are preservation helpers added
 in this follow-up. The original corpus and CI extraction drivers are retained
 as *u10-corpus.py* and *u10-ci-summary.py*, with source lines wrapped.
+
 The CI driver also retains the runtime-archive restore log line, added during
 this preservation pass. *ci-summary.json.txt* was re-extracted from the
 retained raw job logs with that extended driver during preservation. Every
 field present in the original *ci-summary.json* extraction is unchanged;
 the preserved copy adds provenance fields and wraps each run with its SHA.
-The latter driver reads the saved response
+
+The CI driver reads the saved response
 from `gh run view RUN --json headSha,jobs` and that run's downloaded job logs.
 Each run preserves its `headSha` and `jobs`; recomputation checks the SHA
-against the named historical commit. The corpus driver requires PyYAML
+against the named historical commit.
+
+The corpus driver requires PyYAML
 with its LibYAML `CSafeLoader`. Those original raw CI files need not exist
 to recompute the checked-in table.
 
@@ -144,12 +149,15 @@ new-path instrumentation writes a separate *.json.metrics* file. Remove the
 two temporary *tools/u10-*.ts\* files before switching historical commits.
 
 The old sample uses all nine commits named in its table. Control runs use
-`32ece7f4` and `aff3ade3`; new-path runs use `aff3ade3`. For an old-sample
-cold replay, start with empty Zig and per-commit Oseo caches, only when this
-lane is idle and its cache can be cleared. Reuse the same lane directory for
-both warm trials. Do not create suffixed Zig cache directories. Control runs
-use an untimed primer followed by two warm trials; new-path runs start with
-populated Zig/runtime caches and mixed harness state, then two warm repeats.
+`32ece7f4` and `aff3ade3`; new-path runs use `aff3ade3`.
+
+For an old-sample cold replay, start with empty Zig and per-commit Oseo
+caches, only when this lane is idle and its cache can be cleared. Reuse the
+same lane directory for both warm trials. Do not create suffixed Zig cache
+directories. Control runs use an untimed primer followed by two warm trials;
+new-path runs start with populated Zig/runtime caches and mixed harness
+state, then two warm repeats.
+
 The original cache contents are deliberately not retained, so exact mixed
 build/reuse counts require recreating that state. Timings on another host
 are new measurements, not replacements for the preserved observations.

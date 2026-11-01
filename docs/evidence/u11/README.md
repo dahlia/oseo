@@ -17,12 +17,14 @@ All builds share the single assigned Zig cache directory.
 Counters record calls to `oseo_collect`, allocation attempts (managed and
 work-area allocations), calls to `oseo_internal_own_property_index`, and
 property-key comparisons inside that lookup. `large_comparisons` counts the
-comparisons in objects with at least 1,000 own properties. `clock()` measures
-process CPU at teardown and inclusive collector and own-property lookup CPU.
-Lookup timing and counters add overhead; the instrumented totals are a profile,
-not a gate performance comparison. Collector timing includes its teardown call.
-Subtracting collector CPU from total CPU gives non-collector CPU, including
-startup, lookup instrumentation, and teardown work outside collection.
+comparisons in objects with at least 1,000 own properties.
+
+`clock()` measures process CPU at teardown and inclusive collector and
+own-property lookup CPU. Lookup timing and counters add overhead; the
+instrumented totals are a profile, not a gate performance comparison.
+Collector timing includes its teardown call. Subtracting collector CPU from
+total CPU gives non-collector CPU, including startup, lookup instrumentation,
+and teardown work outside collection.
 
 The single case keeps the upstream 10,000-element array and runs the
 non-strict, specialization-enabled variant. The shard selects zero-based
@@ -51,13 +53,17 @@ establish a cold Zig build; these two states are reported separately.
 
 The host wrapper captures the diagnostic `U11` stderr lines before removing
 only those added lines from the observation returned to the runner. All
-program and sanitizer diagnostics remain intact. An initial shard pilot
-returned the timing lines verbatim and the runner correctly rejected their
-variant-dependent bytes; that pilot is excluded from the accepted sample.
-The successful rerun preserves exact reviewed-manifest comparison.
+program and sanitizer diagnostics remain intact.
+
+An initial shard pilot returned the timing lines verbatim and the runner
+correctly rejected their variant-dependent bytes; that pilot is excluded from
+the accepted sample. The successful rerun preserves exact reviewed-manifest
+comparison.
+
 `profile3` predates the stderr-strip correction, so its stored result still
 contains the diagnostic line. Only the host's JavaScript stderr handling
 changed; the runtime counters are identical to those in `nosan1`.
+
 The compactor requires exactly one profile line per native execution for
 instrumented runs. Agent processes with multiple contexts are outside this
 probe's scope and cannot produce an accepted aggregate.

@@ -106,51 +106,50 @@ cause. The slowdowns below compare SSH runs with SSH runs only.
 Zig cache growth and the disk floor
 -----------------------------------
 
-[*cache-growth.tsv*](./cache-growth.tsv) bins every file of both Zig caches
-by its birth time into the experiment that created it. Every run, cold or
-warm, added new files: a measured 1.9 to 2.2 GiB per test262 job, 3.8 GiB
-per `ns-1`, and about 1.0 GiB per `ok-3` or `nat-3`. Warm runs added as
-much as cold ones because each run builds in fresh per-run staging paths,
-as U5 found, so the Zig cache gives almost no reuse to these jobs.
+[*cache-growth.tsv*](./cache-growth.tsv) bins every file of both Zig caches by
+its birth time into the experiment that created it. Every run, cold or warm,
+added new files: a measured 1.9 to 2.2 GiB per test262 job, 3.8 GiB per `ns-1`,
+and about 1.0 GiB per `ok-3` or `nat-3`. Warm runs added as much as cold ones
+because each run builds in fresh per-run staging paths, as U5 found, so the Zig
+cache gives almost no reuse to these jobs.
 
-Before deletion, `du -sk` measured 49.5 GiB of allocated space in each
-cache, 99.0 GiB together. The file sizes in *cache-growth.tsv* sum to
-97.8 GiB, all of it born inside an experiment window; the 1.2 GiB
-difference is block allocation and directory overhead that `du` counts.
-Free
-disk space fell below the 60 GiB floor set for this unit between 09:08
-and 09:17 UTC (derived from the cumulative file growth against the 119 GiB
-free at the start) and measured 16 GiB at 11:01 UTC, when both caches were
-deleted. Free space then measured 116 GiB. No CI job ran in that window. The
-free space was not sampled during the runs; this is a reconstruction, not a
+Before deletion, `du -sk` measured 49.5 GiB of allocated space in each cache,
+99.0 GiB together. The file sizes in *cache-growth.tsv* sum to 97.8 GiB, all of
+it born inside an experiment window; the 1.2 GiB difference is block allocation
+and directory overhead that `du` counts.
+
+Free disk space fell below the 60 GiB floor set for this unit between 09:08 and
+09:17 UTC. The time is derived from the cumulative file growth against the 119
+GiB free at the start. Free space measured 16 GiB at 11:01 UTC, when both
+caches were deleted, and 116 GiB after. No CI job ran in that window. The free
+space was not sampled during the runs; this is a reconstruction, not a
 continuous measurement.
 
-Before the measurements, with the coordinator's approval, the U21 Zig
-caches under *~/m5ci-results/caches/* were deleted to make room: 59 GiB
-across `native-serial*`, `ownkeys-*`, `test262-serial*`, and
-`sanitizer-serial*`. [*deleted-caches.txt*](./deleted-caches.txt) lists
-both deletions with sizes and `df` before and after. The U21 logs,
-TSVs, clone, and images were kept.
+Before the measurements, with the coordinator's approval, the U21 Zig caches
+under *~/m5ci-results/caches/* were deleted to make room: 59 GiB across
+`native-serial*`, `ownkeys-*`, `test262-serial*`, and `sanitizer-serial*`.
+[*deleted-caches.txt*](./deleted-caches.txt) lists both deletions with sizes
+and `df` before and after. The U21 logs, TSVs, clone, and images were kept.
 
-This growth is an observation of the SSH clones, not of the runner
-account. The runner's hooks prune its Zig cache when free space falls below
-40 GiB. A second runner would add cache files at up to twice the rate.
+This growth is an observation of the SSH clones, not of the runner account. The
+runner's hooks prune its Zig cache when free space falls below 40 GiB. A second
+runner would add cache files at up to twice the rate.
 
 
 Pairs
 -----
 
-Each pair ran two runner slots at once, one in each clone. A slot can run
-two jobs back to back, as a CI lane does, so that a short job stays
-overlapped with a long one. Each pairing ran twice with the clones
-swapped. [*pair-jobs.tsv*](./pair-jobs.tsv) gives every job, and
+Each pair ran two runner slots at once, one in each clone. A slot can run two
+jobs back to back, as a CI lane does, so that a short job stays overlapped with
+a long one. Each pairing ran twice with the clones swapped.
+[*pair-jobs.tsv*](./pair-jobs.tsv) gives every job, and
 [*pair-throughput.tsv*](./pair-throughput.tsv) every pair.
 
-The slowdown is the measured pair wall divided by the warm solo mean. When
-a job ran partly alone after its partner finished, the overlapped factor
-is derived as the overlapped seconds divided by the solo work left for
-the overlap, assuming solo speed while alone. The throughput factor is
-the sum of the jobs' warm solo means divided by the pair's elapsed time.
+The slowdown is the measured pair wall divided by the warm solo mean. When a
+job ran partly alone after its partner finished, the overlapped factor is
+derived as the overlapped seconds divided by the solo work left for the
+overlap, assuming solo speed while alone. The throughput factor is the sum of
+the jobs' warm solo means divided by the pair's elapsed time.
 
 | Pairing                         | Slot 1   | Slot 2             | Slowdown, slot 1 | Slowdown, slot 2           | Overlapped factor, slot 1 | Throughput   |
 | ------------------------------- | -------- | ------------------ | ---------------- | -------------------------- | ------------------------- | ------------ |
@@ -161,25 +160,26 @@ the sum of the jobs' warm solo means divided by the pair's elapsed time.
 | native fixture + test262        | `nat-3`  | `t262-8`           | 1.328, 1.326     | 0.998, 1.003               | 1.404, 1.398              | 1.613, 1.615 |
 | native support + native support | `ns-1`   | `ns-1`             | 1.124, 1.119     | 1.124, 1.119               | 1.124, 1.119              | 1.779, 1.787 |
 
-The interference is asymmetric. Test262, with its eight-worker pool, ran
-close to its solo speed beside a property or fixture job, a measured
-0.997 to 1.073 times its solo wall, and slowed 1.19 to 1.21 beside another
-test262 job. Jobs with one to three workers paid most of the cost: beside
-test262, `ns-1` ran a derived 1.36 to 1.37 times slower while overlapped,
-`nat-3` 1.398 to 1.404, and `ok-3` 1.44 to 1.45. Two property jobs together
-slowed only 1.12. Every pair raised throughput, by a derived 1.49 to 1.79
-times. Four of the six pairings exceeded U21's 1.55 for one duplicated property
-shard; the two with test262 beside test262 or native support did not.
+The interference is asymmetric. Test262, with its eight-worker pool, ran close
+to its solo speed beside a property or fixture job, a measured 0.997 to 1.073
+times its solo wall, and slowed 1.19 to 1.21 beside another test262 job. Jobs
+with one to three workers paid most of the cost: beside test262, `ns-1` ran a
+derived 1.36 to 1.37 times slower while overlapped, `nat-3` 1.398 to 1.404, and
+`ok-3` 1.44 to 1.45. Two property jobs together slowed only 1.12.
 
-All 48 jobs passed. Every job's steps exited 0 and its failure flag was 0,
-as the `exit` and `fail` columns of [*solo.tsv*](./solo.tsv) and the
-`step_exits` and `fail_flag` columns of [*pair-jobs.tsv*](./pair-jobs.tsv)
-record. The retained *exp.sh* and *slot.sh* do not propagate a job's
-failure to the experiment, so these per-job records are the source of the
-verdict. [*results.txt*](./results.txt) keeps each job's result lines: 1,782
-selected test262 paths with the same pass, expected-negative, and unsupported
-counts in every run of each shard; 88 of 264 native fixtures and 88 cross
-builds; and zero failed or canceled property tests. No job hit a timeout.
+Every pair raised throughput, by a derived 1.49 to 1.79 times. Four of the six
+pairings exceeded U21's 1.55 for one duplicated property shard; the two with
+test262 beside test262 or native support did not.
+
+All 48 jobs passed. Every job's steps exited 0 and its failure flag was 0, as
+the `exit` and `fail` columns of [*solo.tsv*](./solo.tsv) and the `step_exits`
+and `fail_flag` columns of [*pair-jobs.tsv*](./pair-jobs.tsv) record. The
+retained *exp.sh* and *slot.sh* do not propagate a job's failure to the
+experiment, so these per-job records are the source of the verdict.
+[*results.txt*](./results.txt) keeps each job's result lines: 1,782 selected
+test262 paths with the same pass, expected-negative, and unsupported counts in
+every run of each shard; 88 of 264 native fixtures and 88 cross builds; and
+zero failed or canceled property tests. No job hit a timeout.
 
 The own-key shard used its hard limit least of all. Its measured
 `durationMilliseconds` was 347.5 to 348.5 s solo (*solo.tsv*), 439.9 and 441.0
@@ -200,11 +200,11 @@ Measured over the 12 paired experiments, from 240 to 586 samples each:
     then fell to 49.31 MiB and stayed there. Swapouts were 0 in every pair;
     one pair recorded 4 swapins.
  -  Pageouts were 0 to 4 per pair, as in solo runs.
- -  The compressor worked harder. Pairs with two test262 pools, or test262
-    beside `ns-1`, compressed up to a measured 253,085 pages (3.9 GiB)
-    and decompressed up to 170,467 pages in one experiment, against at most
-    5,090 compressions solo. The memory it occupied rose from about
-    1,780 MiB idle to at most 2,357 MiB.
+ -  The compressor did more work. Pairs with two test262 pools, or test262
+    beside `ns-1`, compressed up to a measured 253,085 pages (3.9 GiB) and
+    decompressed up to 170,467 pages in one experiment. Solo runs had at most
+    5,090 compressions. The memory it occupied rose from about 1,780 MiB idle
+    to at most 2,357 MiB.
  -  The summed peak tree RSS of both jobs was at most 5,996 MiB, which
     leaves about 10 GiB of the 16 GiB for the system, file cache, and the
     compressor.
@@ -241,7 +241,7 @@ interference can change them:
 | own-key + own-key               |   2,504 (1,252 + 1,252) |
 
 All three are below the measured 5,996 MiB maximum pair and the 16 GiB of
-memory, but two exceed the measured 3,177 MiB peak of experiment `p-ok-ns-1`
+memory. But two exceed the measured 3,177 MiB peak of experiment `p-ok-ns-1`
 (native support beside own-key, then native fixture), so they are not
 bounded by every measured pair.
 
@@ -271,13 +271,13 @@ multiplies every Mac job's cost by its family's factor. Rename the
 *.py.txt* files to *.py* to run them. Called with a uniform 1.29, it
 reproduces the U12 rows exactly.
 
-The factors are derived per-family maxima of the overlapped factor, which
-is itself derived from measured job walls:
-1.26 for test262, 1.37 for native support, 1.45 for own-key cases, and 1.41
-for native fixtures, each rounded up from the largest value in
-*pair-jobs.tsv*. Applying them to every Mac job is pessimistic,
-because most jobs either ran beside a lighter partner or partly alone. A
-uniform 1.45, the largest factor of any family, is the upper check.
+The factors are derived per-family maxima of the overlapped factor, itself
+derived from measured job walls: 1.26 for test262, 1.37 for native
+support, 1.45 for own-key cases, and 1.41 for native fixtures. Each is
+rounded up from the largest value in *pair-jobs.tsv*. Applying them to
+every Mac job is pessimistic, because most jobs either ran beside a
+lighter partner or partly alone. A uniform 1.45, the largest factor of
+any family, is the upper check.
 [*model/u25model-output.tsv*](./model/u25model-output.tsv) has the
 output.
 
@@ -304,8 +304,8 @@ native fixture 3/3, so the Mac factors no longer set that value. In the median
 scenario the second Mac lane ends last, at 96.3 min. The model omits the
 measured 0.5 to 1.5 min of lane overhead, hosted waits, and the aggregate job.
 Its Mac costs are runner-mode medians with factors derived from SSH
-measurements applied. A
-two-attempt branch run with two runner slots would need to confirm it.
+measurements applied. A two-attempt branch run with two runner slots would
+need to confirm it.
 
 
 Disk with a second runner (derived)
@@ -314,26 +314,28 @@ Disk with a second runner (derived)
 [*disk-usage.txt*](./disk-usage.txt) records a read-only measurement as
 `dahlia` over SSH at 11:21 UTC, after the U25 caches were deleted. `df -Pk`
 measured a 228.2 GiB volume group with 116.3 GiB free and 111.9 GiB used,
-below the 256 GiB that *docs/self-hosted-mac.md* names. Of the used space, a
-measured 46.0 GiB is attributable without the runner account: 12.7 GiB on
-the system volume, 13.3 GiB on the preboot, recovery, and VM volumes, and
-20.0 GiB that `du` could read on the data volume. The other 65.7 GiB of the
-data volume is unattributed by this measurement. Known paths that `dahlia`
-cannot read include the mode-700 *~oseo-runner* home, with `oseo-mac-1`'s
-runner, tools, Zig cache, and runtime archive, and root-only system
-directories. Attributing it needs *tools/selfhosted-mac/health.sh* or
-`du` under `sudo`. The macOS 15.6.1 restore image that U21 kept in
-*~/m5ci-images/* is gone, and no *.ipsw* file was visible to `dahlia`.
+below the 256 GiB that *docs/self-hosted-mac.md* names.
 
-*tools/selfhosted-mac/cleanup.sh* runs at the start and the end of every job.
-It reads free space on the shared volume and, below 40 GiB, removes the
+Of the used space, a measured 46.0 GiB is attributable without the runner
+account: 12.7 GiB on the system volume, 13.3 GiB on the preboot, recovery,
+and VM volumes, and 20.0 GiB that `du` could read on the data volume. The
+other 65.7 GiB of the data volume is unattributed by this measurement.
+Known paths that `dahlia` cannot read include the mode-700 *~oseo-runner*
+home, with `oseo-mac-1`'s runner, tools, Zig cache, and runtime archive, and
+root-only system directories. Attributing it needs
+*tools/selfhosted-mac/health.sh* or `du` under `sudo`. The macOS 15.6.1
+restore image that U21 kept in *~/m5ci-images/* is gone, and no *.ipsw* file
+was visible to `dahlia`.
+
+*tools/selfhosted-mac/cleanup.sh* runs at the start and the end of every
+job. It reads free space on the shared volume and, below 40 GiB, removes the
 *~/.cache/zig* of the invoking account only. The LaunchDaemon that
 *tools/selfhosted-mac/install-service.sh* writes sets `ZIG_GLOBAL_CACHE_DIR`
 to that same account-local path, and the workflow does not override it, so
-each job grows its own account's cache. The hook is therefore a shared
-free-space trigger with a per-account action, not a cap on any cache. With a
-second runner under a second account, derived from that logic and the
-measured 3.8 GiB maximum growth of one job:
+each job grows its own account's cache. The hook is a shared free-space
+trigger with a per-account action, not a cap on any cache. With a second
+runner under a second account, derived from that logic and the measured
+3.8 GiB maximum growth of one job:
 
  -  The current hook guarantees no free-space floor and no bound on the
     combined caches. A prune restores 40 GiB free only when the invoking
@@ -341,8 +343,8 @@ measured 3.8 GiB maximum growth of one job:
     cache or other usage holds free space below 40 GiB, and a skipped prune
     reclaims nothing. Even when every hook leaves at least 40 GiB free, two
     concurrent jobs add up to 7.6 GiB between hooks, so free space can fall
-    to 32.4 GiB before the jobs' work directories and temporary files, which
-    this unit did not measure.
+    to 32.4 GiB. That excludes the jobs' work directories and temporary
+    files, which this unit did not measure.
  -  A runner whose last hook saw at least 40 GiB free keeps its cache when
     it goes idle. For example, that cache can then be as large as 228.2 GiB
     minus the non-cache usage, the other cache, and 40 GiB: 142.2 GiB with
@@ -353,8 +355,8 @@ measured 3.8 GiB maximum growth of one job:
     nearly every hook and prunes its own cache, which holds its own jobs'
     growth. While those prunes succeed, job growth alone cannot push free
     space below about 36.2 GiB with one active job at the measured rates.
-    The active runner loses its cache each time, which cost at most the
-    measured 14 to 18 s warm saving, and nothing reclaims the idle cache
+    The active runner loses its cache each time, which costs at most the
+    measured 14 to 18 s of warm saving, and nothing reclaims the idle cache
     when other usage grows, such as runner updates, *oseo-temp/*,
     diagnostics, or macOS updates.
  -  With two runner roots under one account, both LaunchDaemons point
@@ -363,27 +365,31 @@ measured 3.8 GiB maximum growth of one job:
     layout was not measured and is not safe with the current hook.
 
 A lower free-space threshold would not bound the idle cache, because the
-threshold is only the trigger level. A per-account size cap would: each
-hook also removes its own account's cache when it exceeds a size `S`, with
-the 40 GiB trigger kept as the backstop. For two accounts it suffices when
-two full caches, two jobs' growth, each job's work directory and
-temporary files `W` (including the runner's `TMPDIR`, *oseo-temp/*, which
-the hooks never clear), the second account's own non-cache usage `R`
-(runner, tools, and runtime archive), a reserve for other growth, and
-today's usage leave 40 GiB free. Counting all 111.9 GiB in use
-today as non-cache, which overstates it by `oseo-mac-1`'s current cache,
-that bounds twice `S`, plus `R`, plus twice `W`, plus the reserve at a
-derived 68.7 GiB. Neither
-`R` nor `W` was measured; for scale, `dahlia`'s own mise tools and runtime
-archive directory measured 1.0 and 1.8 GiB. `S` is therefore strictly below
-34.3 GiB, and a 34 GiB cap would leave about 0.7 GiB for `R`, both `W`, and
-the reserve, so the cap must be derived after measuring both accounts' usage
-and a job's peak work-directory and temporary use under `sudo`. The measured
-warm reuse is small enough that a much lower cap costs little. Two runner roots
-under one account need cross-runner management instead: a separate
-`ZIG_GLOBAL_CACHE_DIR` per runner, and a hook that caps and prunes each
-runner's own path so that the combined size stays bounded and no prune removes
-a cache in use. Neither change is made here.
+threshold is only the trigger level. A per-account size cap would bound the
+idle cache: each hook also removes its own account's cache when it exceeds a
+size `S`, with the 40 GiB trigger kept as the backstop.
+
+A cap `S` suffices for two accounts when two full caches, two jobs' growth,
+each job's work directory and temporary files `W` (including the runner's
+`TMPDIR`, *oseo-temp/*, which the hooks never clear), the second account's
+own non-cache usage `R` (runner, tools, and runtime archive), a reserve for
+other growth, and today's usage leave 40 GiB free. Counting all 111.9 GiB in
+use today as non-cache overstates non-cache usage by `oseo-mac-1`'s current
+cache and bounds twice `S`, plus `R`, plus twice `W`, plus the reserve at a
+derived 68.7 GiB.
+
+Neither `R` nor `W` was measured; for scale, `dahlia`'s own mise tools and
+runtime archive directory measured 1.0 and 1.8 GiB. `S` is therefore
+strictly below 34.3 GiB, and a 34 GiB cap would leave about 0.7 GiB for
+`R`, both `W`, and the reserve. The cap must be derived after measuring both
+accounts' usage and a job's peak work-directory and temporary use under
+`sudo`. The measured warm reuse is small enough that a much lower cap costs
+little.
+
+Two runner roots under one account need cross-runner management instead: a
+separate `ZIG_GLOBAL_CACHE_DIR` per runner, and a hook that caps and prunes
+each runner's own path so that the combined size stays bounded and no prune
+removes a cache in use. Neither change is made here.
 
 
 Proposal, not applied

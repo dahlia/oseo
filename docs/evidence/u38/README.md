@@ -46,9 +46,9 @@ each with its own `ZIG_GLOBAL_CACHE_DIR`.
 checkout and tool installation exactly as the generated workflow does:
 `mise run build` and `mise run ci:runtime-archive-cache` from the
 runtime-archive action, then
-`mise run test:property:extended:native:shard` on the one file with
-`OSEO_PROPERTY_CASE_SHARD` set and no duration file, which is the shape
-the workflow gives these jobs.
+`mise run test:property:extended:native:shard` on the one file. The test
+runs with `OSEO_PROPERTY_CASE_SHARD` set and no duration file, which is
+the shape the workflow gives these jobs.
 [*scripts/drive.sh.txt*](./scripts/drive.sh.txt) waited for `oseo-mac-1`
 and `oseo-mac-2` to report idle before each experiment and sampled their
 busy state every 30 seconds. No sample recorded a busy lane and no step
@@ -73,16 +73,16 @@ Full step timings are in [*solo.tsv*](./solo.tsv).
 
 The three shards agree within 0.3 percent, which is what a round-robin
 case filter over three balanced suites should produce. Each shard ran all
-three suites and reported three passing tests, and the shard that ran
-beside another measured 191.7 seconds against an unsharded Mac equivalent
-of about 615, so the filter did reduce the case count rather than silently
+three suites and reported three passing tests. The shard that ran beside
+another measured 191.7 seconds against an unsharded Mac equivalent of
+about 615, so the filter did reduce the case count rather than silently
 pass the whole file.
 
 [*pair-jobs.tsv*](./pair-jobs.tsv) reports the two experiments that ran two
-of these jobs at once, one per Mac lane of the same machine. Using the U25
-definition, the overlapped seconds of a job divided by the solo work left
-for that overlap, the warm pair gives a measured 1.069 on both sides.
-Rounded up, the pair factor is **1.07**, the lowest in
+of these jobs at once, one per Mac lane of the same machine. The pair
+factor follows the U25 definition: the overlapped seconds of a job divided
+by the solo work left for that overlap. The warm pair gives a measured
+1.069 on both sides. Rounded up, the pair factor is **1.07**, the lowest in
 `selfHostedPairSlowdowns`. These jobs are short and nearly equal in
 length, so they overlap for essentially their whole walls.
 
@@ -97,10 +97,9 @@ measured Mac walls, giving 336 seconds each. A proportional route, scaling
 the own-key hosted medians by the ratio of the two files' Mac walls, gives
 383, so 336 is the lower of the two.
 
-Two other bases were rejected, and the reason matters for anyone refreshing
-these numbers. Hosted Linux walls do not convert, because the 1,754
-seconds the file measured in run 39025004305 were measured while three
-other files shared the same runner; treating a third of that as a
+Two other bases were rejected. Hosted Linux walls do not convert: the
+1,754 seconds the file measured in run 39025004305 were measured while
+three other files shared the same runner. Treating a third of that as a
 dedicated job gives 615 seconds and implies a Mac lane 3.25 times faster
 than hosted Linux, where the own-key case shards measure 1.14. The U6
 weight table does not convert either, because it overstates the two
@@ -114,10 +113,10 @@ first run that places one of these jobs hosted replaces the estimate with
 an observation.
 
 Pairings against other families were not measured. Each uses the largest
-factor any family suffers beside that partner, a derived 1.45 beside
-test262, own-key cases and native fixtures and 1.27 beside native support,
-rather than this family's own 1.07, which would understate a pairing with
-heavier work.
+factor any family suffers beside that partner: a derived 1.45 beside
+test262, own-key cases, and native fixtures, and 1.27 beside native
+support. It does not use this family's own 1.07, which would understate a
+pairing with heavier work.
 
 
 Derived effect on the schedule
@@ -131,15 +130,15 @@ shard, measured against the checked-in weight model:
 | Linux, 7 file shards  | 38.3 min | 33.4 min |
 | macOS, 12 file shards | 38.0 min | 22.7 min |
 
-The Linux spread tightens from 34.7 to 38.3 minutes to 32.1 to 33.4, and
-the macOS spread from 22.5 to 38.0 down to 21.1 to 22.7. Both lose their
-single-file floor, so raising a total lowers the maximum again, which U31
-showed it could not do while this file was present.
+The Linux spread tightens from 34.7 to 38.3 minutes to 32.1 to 33.4. The
+macOS spread tightens from 22.5 to 38.0 down to 21.1 to 22.7. Both lose
+their single-file floor, so raising a total lowers the maximum again,
+which U31 showed it could not do while this file was present.
 
 The three new macOS jobs cost the lane model nothing. With six Mac lanes
 the derived macOS makespan stays at 49.1 minutes and the hosted job set is
 unchanged at 221.0 derived minutes, because every new job is Mac-lane
-eligible and the lanes had the headroom: Mac lane ends move from 36.3 to
+eligible and the lanes had the headroom. Mac lane ends move from 36.3 to
 42.1 minutes to 36.0 to 43.0.
 
 That 49.1 figure is an upper bound on what the change achieves on macOS.
@@ -155,8 +154,8 @@ What the first run measured
 Branch run 39053800730 ran the change. All six new jobs passed, at a
 measured 8.5, 9.0 and 8.5 minutes on hosted Linux and 7.0, 4.6 and 5.5 on
 Mac lanes. The Linux walls sit just under the 9.8-minute upper bound above,
-so a third of the contended figure was a fair ceiling and the dedicated
-job is only slightly cheaper than it.
+so a third of the contended figure was a fair ceiling. The dedicated job is
+only slightly cheaper than it.
 
 The predicted Linux gain did not appear, and the prediction's basis is
 what failed. The model expected all seven file shards to land between
@@ -188,11 +187,10 @@ scheduling. One run cannot separate a 2.3-minute move from that noise.
 
 The structural finding U31 made is still fixed. No shard is owned by one
 file any longer: shard 1/7 held four files before and holds twelve now.
-What that bought is that a larger total can lower the maximum again,
-which it could not while this file was present. What it did not buy is a
-lower wall today, because another file became the pole of the shard that
-sets it, and shard 1/7 itself rose from a measured 40.3 minutes to 48.4
-as the partition redistributed.
+A larger total can lower the maximum again, which it could not while this
+file was present. The wall is not lower today, because another file became
+the pole of the shard that sets it, and shard 1/7 itself rose from a
+measured 40.3 minutes to 48.4 as the partition redistributed.
 
 Refreshing the weight table from CI logs, by the procedure in
 *docs/evidence/u6/README.md*, is the prerequisite for trusting any further

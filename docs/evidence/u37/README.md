@@ -104,7 +104,7 @@ shorter job overlaps for its whole wall; the longer one finishes alone.
 | `pair`      | 1.380            | 1.076             |
 | `pair-2`    | 1.373            | 1.072             |
 
-Rounded up to two decimals, the largest factors are **1.41** and **1.09**.
+Rounded up to two decimals, the largest factors are 1.41 and 1.09.
 The whole-wall slowdowns, 1.21 to 1.23, are not the model's input and are
 reported only to keep the raw ratio visible. A reader who takes 1.22 as
 the pair factor understates the penalty, because two thirds of the longer
@@ -118,9 +118,9 @@ Derived effect on the schedule
 ------------------------------
 
 [*model.tsv*](./model.tsv) records what `macosLanes(6)` produces once the
-measured walls, the 2.9 ratio, and the pair factors are in the model, with
-unmeasured pairings against this family given the pessimistic stand-in the
-table's convention requires.
+measured walls, the 2.9 ratio, and the pair factors are in the model.
+Unmeasured pairings against this family are given the pessimistic
+stand-in the table's convention requires.
 
 | Variant                      | Derived makespan | Hosted jobs | Hosted total | Per-lane bound |
 | ---------------------------- | ---------------- | ----------- | ------------ | -------------- |
@@ -138,36 +138,35 @@ baseline's 44.2.
 
 The mechanism is capacity arithmetic, not instrumentation cost. Moving
 both suites off the hosted pool removes a derived 76.4 hosted minutes.
-Running them on Mac lanes consumes a measured 27.5 Mac-lane minutes, and
-because a Mac-lane minute is worth 2.5 to 4.2 hosted minutes, the
-test262 and `native support` work displaced to make room costs about 90
-hosted minutes. The family's own 2.9 is below the 3.2 and 4.2 of the work
-it evicts, so the exchange loses whichever suite makes it.
+Running them on Mac lanes consumes a measured 27.5 Mac-lane minutes. A
+Mac-lane minute is worth 2.5 to 4.2 hosted minutes, so the test262 and
+`native support` work displaced to make room costs about 90 hosted
+minutes. The family's own 2.9 is below the 3.2 and 4.2 of the work it
+evicts, so the exchange loses whichever suite makes it.
 
 
 What this unit concludes
 ------------------------
 
 The `host C sanitizers` family stays on hosted `macos-15` lanes. The
-reason recorded in *tools/macos-job-costs.ts* is now a measurement rather
-than an absent one: the family converts at 2.9, below every family it
-would displace, and its own pair factor is the worst in the matrix.
+reason recorded in *tools/macos-job-costs.ts* is a measurement: the family
+converts at 2.9, below every family it would displace, and its own pair
+factor is the worst in the matrix.
 
-Two limits are worth stating. The ratio rests on one hosted median per
-suite, each over 8 observations, and the Mac side has three solo walls for
-`san-nat` and two for `san-prop`; the spread within each set is under half
-a percent, so the means are tight, but a change in either suite's corpus
-invalidates the ratio rather than scaling it. The pair factors were
-measured only for this family against itself. Every pairing against
-another family uses the pessimistic stand-in, so a measurement of those
-could only lower the penalty, and the `native only` variant shows that
-even a penalty of zero on the displaced work leaves the hosted bound
-above the baseline.
+The ratio rests on one hosted median per suite, each over 8 observations,
+and the Mac side has three solo walls for `san-nat` and two for `san-prop`.
+The spread within each set is under half a percent, so the means are
+tight, but a change in either suite's corpus invalidates the ratio rather
+than scaling it. The pair factors were measured only for this family
+against itself. Every pairing against another family uses the pessimistic
+stand-in, so a measurement of those could only lower the penalty. The
+`native only` variant shows that even a penalty of zero on the displaced
+work leaves the hosted bound above the baseline.
 
 The measurement also does not argue for keeping the jobs hosted on cost
-grounds. It says the opposite about billed minutes: the two jobs spend a
+grounds. The opposite holds for billed minutes: the two jobs spend a
 measured 75.9 minutes of hosted macOS time per run, which Mac lanes would
 absorb in 27.5. Reclaiming that bill would need Mac capacity this
-configuration does not have, so it is a reason to revisit the question if
+configuration does not have. That is a reason to revisit the question if
 a fourth Mac mini joins, not a reason to accept 2.7 to 5.5 minutes of
 makespan now.

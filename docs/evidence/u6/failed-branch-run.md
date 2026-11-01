@@ -4,14 +4,15 @@ U6 interrupted branch experiment
 Branch run [36343919872] at `e98edd15` is a failed experiment. Linux native
 support shard `1/4` interrupted own-key statics at the unchanged property
 deadline. This is incomplete generated work and must not be used as a clean
-coverage or performance measurement. The run has completed with failure; the
-full per-shard observation is in *first-branch-comparison.md*. The retained
+coverage or performance measurement. The run has completed with failure.
+
+The full per-shard observation is in *first-branch-comparison.md*. The retained
 input *ci-36343919872.json.txt* records all comparison jobs;
 *ci-36343919872-linux-1.json.txt* preserves the earlier single-job snapshot.
 Both record the interrupted job, including the censored case, counts, and
-command/marker/failure timestamps. Historical inputs *ci-36243816479.json.txt*,
-*ci-36261458909.json.txt*, and *ci-36312192623.json.txt* retain the comparison
-jobs and package intervals.
+command/marker/failure timestamps. Historical inputs
+*ci-36243816479.json.txt*, *ci-36261458909.json.txt*, and
+*ci-36312192623.json.txt* retain the comparison jobs and package intervals.
 
 Individual case, runner, and job durations below are measured from the named
 CI logs. Per-file case sums and scheduling replays are derived. The historical
@@ -28,7 +29,7 @@ Neither cache effects nor runner variance have been separated from scheduling.
 
 The branch observed 58 tests, 57 passes, one failure, and no skips or TODOs.
 The interrupted test reported 149 examples and seed `1592590339`. Each source
-revision configures `numRuns: 16` and `timeLimitMilliseconds: 360_000`; the
+revision configures `numRuns: 16` and `timeLimitMilliseconds: 360_000`. The
 extended task configures scale ten, deriving 160 examples and a 3,600-second
 deadline. Those settings are preserved. The measured interrupted duration is
 3,600,008.22068 milliseconds, including timer/callback overhead.
@@ -149,8 +150,8 @@ and totals are unchanged by this correction; test262 retains the raised total
 of twelve on both targets.
 
 The correction changes neither generated budgets nor the interruption verdict.
-It adds one Linux job and zero macOS jobs, so its derived additional macOS fixed
-cost is zero. The explicitly authorized second run 36358067906 validated
+It adds one Linux job and zero macOS jobs, so its derived additional macOS
+fixed cost is zero. The explicitly authorized second run 36358067906 validated
 completion of the corrected partition; its observations are retained in
 [second-branch-comparison.md](./second-branch-comparison.md). No success or
 complete-coverage claim is made for the failed first run.
@@ -172,8 +173,7 @@ remain unchanged by the Linux correction.
 
 The correction trades additional estimated Linux execution for deadline
 isolation; Linux fixed cost for its added job has not been separately measured.
-The macOS fixed-cost increment is zero because its job count is unchanged.
 The replay command is `python3 docs/evidence/u6/summarize.py`, and its output
 is retained in *model.txt*. Case durations were measured concurrently and can
-change with peers; corrected run 36358067906 validates completion of the new
-partition, without isolating scheduling from variance or cache effects.
+change with peers; run 36358067906 does not isolate scheduling from variance or
+cache effects.

@@ -22,11 +22,13 @@ What the pass does
 `refineLanes` sweeps two neighborhoods of the greedy placement. The move
 neighborhood takes one job off a lane and puts it on another; the exchange
 neighborhood swaps one job on a lane with one job on another. A candidate
-is accepted when it is feasible and its `macosLaneEnds` maximum is lower,
-first improvement wins, and the sweeps repeat until one full sweep accepts
-nothing. With the lane configuration and placement rules fixed, the fixed
-sweep order makes the result deterministic for a given set of cost tables,
-and three consecutive runs of the generator produce identical output.
+is accepted when it is feasible and its `macosLaneEnds` maximum is lower.
+First improvement wins, and the sweeps repeat until one full sweep accepts
+nothing.
+
+With the lane configuration, placement rules, and sweep order fixed, the
+result is deterministic for a given set of cost tables. Three consecutive
+runs of the generator produce identical output.
 `mise run generate:macos-lanes --check` takes 0.40 seconds.
 
 Every candidate is re-canonicalized and then checked, so a refined
@@ -48,9 +50,9 @@ The same neighborhood searched without those checks reaches 46.98 minutes,
 minimum achievable maximum with or without the invariants.
 
 The pass runs only when a Mac lane exists. With none, the five hosted
-lanes hold every job and the descending greedy order is the LPT partition
-the pure-hosted fallback documents, which *tests/macos-lanes.test.ts*
-asserts directly, so that partition is unchanged.
+lanes hold every job, and the descending greedy order is the LPT partition
+the pure-hosted fallback documents. *tests/macos-lanes.test.ts* asserts
+that partition directly, so the partition is unchanged.
 
 
 What moved
@@ -70,8 +72,8 @@ What moved
 | Mac 5    | 48.28  | 46.62   |
 | Mac 6    | 48.26  | 46.98   |
 
-The six Mac lanes end within 1.53 minutes of each other rather than 2.67,
-and the maximum falls to a Mac lane at 47.00 with the next two at 46.98.
+The six Mac lanes end within 1.53 minutes of each other rather than 2.67.
+The maximum falls to a Mac lane at 47.00, with the next two at 46.98.
 `native support (macos-aarch64, 11/12)` and `(12/12)` move onto hosted
 lanes. Hosted lane four's modeled end rises from 39.90 to 45.62 minutes.
 The three `native (macos-aarch64, k/3)` shards end up on the first Mac lane

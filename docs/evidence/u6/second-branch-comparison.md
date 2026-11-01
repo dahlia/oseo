@@ -23,26 +23,28 @@ Neither branch run measures the projected 41,091-path corpus.
 Observed tail and workload
 --------------------------
 
-Corrected run 36358067906 completes successfully with all 58 jobs passing.
-Derived native job maxima from observed timestamps are 34.35 macOS and
-60.52 Linux minutes, versus 51.43 and 64.83 in run 36312192623. Derived
-test262 maxima are 31.67 macOS and 22.92 Linux minutes, versus 34.50 and
-26.25 before. These are material observed native-tail reductions, but the
-unchanged macOS cohort's variation below prevents attributing the full change
-to scheduling. The first experiment's macOS test262 maximum was 35.23 minutes,
-so that run did not show a test262 tail improvement over the closest baseline.
+Corrected run 36358067906 completes with all 58 jobs passing. Derived native
+job maxima from observed timestamps are 34.35 macOS and 60.52 Linux minutes,
+versus 51.43 and 64.83 in run 36312192623. Derived test262 maxima are 31.67
+macOS and 22.92 Linux minutes, versus 34.50 and 26.25 before.
 
-The corrected native/test262 macOS job sum is derived as 556.68 minutes,
-versus 603.62 before, a difference of -46.93 using unrounded inputs. Across
-all macOS jobs it is 731.40 minutes (31 jobs), versus 778.12 (29 jobs), a
-derived difference of -46.72 minutes. This observation meets the few-minute
-workload constraint; it does not establish repeatable savings. Dividing those
-unrounded totals by five slots derives wall-clock lower bounds of 146.28 and
-155.62 minutes, respectively. These are workload bounds, not run makespans.
-API created-to-updated intervals derive 173.23 minutes before, 159.45 for the
-failed first experiment, and 163.35 for the corrected run. Queue order and
-runner variance are not separated, and the failed interval is not a clean
-end-to-end performance result.
+These are material observed native-tail reductions, but the unchanged macOS
+cohort's variation below prevents attributing the full change to scheduling.
+The first experiment's macOS test262 maximum was 35.23 minutes, so that run did
+not show a test262 tail improvement over the closest baseline.
+
+The corrected native/test262 macOS job sum is derived as 556.68 minutes, versus
+603.62 before, a difference of -46.93 using unrounded inputs. Across all macOS
+jobs it is 731.40 minutes (31 jobs), versus 778.12 (29 jobs), a derived
+difference of -46.72 minutes. This observation meets the few-minute workload
+constraint; it does not establish repeatable savings.
+
+Dividing those unrounded totals by five slots derives wall-clock lower bounds of
+146.28 and 155.62 minutes, respectively. These are workload bounds, not run
+makespans. API created-to-updated intervals derive 173.23 minutes before,
+159.45 for the failed first experiment, and 163.35 for the corrected run.
+Queue order and runner variance are not separated, and the failed interval is
+not a clean end-to-end performance result.
 
 *macos-job-times.json.txt* retains every macOS job's API timestamps and each
 run's created/updated timestamps. Fetch these with
@@ -71,12 +73,14 @@ Both corrected native-support families report 224 passes, zero failures, skips,
 or TODOs, and no interrupted property. Each selected-file union equals the full
 128-file inventory and is disjoint. These checks use the retained CI selections
 and current inventory; the local partition tests also prove deterministic exact
-union and disjointness, including unknown files and alternate totals. Test262
-path identity is established by the partition tests, not aggregate CI counts.
-Both corrected test262 targets retain derived summary sums of 21,383 paths,
-18,343 passes, 1,560 expected negatives, and 1,480 unsupported paths. Each
-reports a derived sum of 1,312 harness objects built, versus 1,117 before;
+union and disjointness, including unknown files and alternate totals.
+
+Test262 path identity is established by the partition tests, not aggregate CI
+counts. Both corrected test262 targets retain derived summary sums of 21,383
+paths, 18,343 passes, 1,560 expected negatives, and 1,480 unsupported paths.
+Each reports a derived sum of 1,312 harness objects built, versus 1,117 before;
 the extra 195 preparations per target have no separate timing measurement.
+
 All corrected comparison jobs report warm runtime archives. The closest-before
 macOS native jobs are warm; macOS test262 has three cold and seven warm jobs,
 and both Linux families are cold. These conditions are not controlled.
@@ -86,10 +90,11 @@ worker. Its measured case duration is 41.36 minutes; the derived margin against
 the unchanged sixty-minute property deadline is 18.64 minutes. The job takes
 41.97 measured minutes. It passes the unchanged generated budget: the configured
 sixteen examples times extended scale ten derives 160 examples; the passing log
-does not separately report that successful example count. Historical own-key
-case durations vary from 33.72 to 55.43 minutes across the retained main runs.
-Isolation removes sibling file processes, but one run does not isolate its
-contribution to the observed duration.
+does not separately report that successful example count.
+
+Historical own-key case durations vary from 33.72 to 55.43 minutes across the
+retained main runs. Isolation removes sibling file processes, but one run does
+not isolate its contribution to the observed duration.
 
 Linux native job max/sum is derived from the measured job timestamps as
 60.52/245.67 minutes, versus 64.83/229.38 in the closest before run. The derived
@@ -102,10 +107,11 @@ macOS own-key has the same three-worker cohort and file order in both branch
 runs. Its measured case duration changes from 45.07 to 33.27 minutes, a derived
 11.80-minute spread without a macOS assignment change. The corresponding job
 durations are 46.10 and 34.35 minutes. This variation must not be credited as an
-additional scheduling improvement. The closest-before own-key case is 44.31
-minutes, in a different cohort; the baseline native family maximum is 51.43
-measured minutes. The distribution tables retain every shard instead of
-matching changed indices as equal work.
+additional scheduling improvement.
+
+The closest-before own-key case is 44.31 minutes, in a different cohort; the
+baseline native family maximum is 51.43 measured minutes. The distribution
+tables retain every shard instead of matching changed indices as equal work.
 
 
 Reproduction and limits

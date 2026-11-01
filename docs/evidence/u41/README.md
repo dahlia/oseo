@@ -188,7 +188,7 @@ Hosted lane three finished at 62.92. It held
 `test (macos-latest, node, 3/4)` and then
 `test262 (macos-aarch64, 1/12)`, which the refreshed Mac costs sent
 hosted for the first time since the `b59ac914` repartition. Its hosted
-entry was a retained 1,288 seconds and it ran 1,932, a ratio of 1.50 and
+entry was a retained 1,288 seconds. It ran 1,932, a ratio of 1.50 and
 10.73 minutes above its estimate. The lane also waited 9.17 minutes for a
 runner between its two jobs. The other nine hosted jobs ran between 0.68
 and 1.07 times their entries.

@@ -51,7 +51,7 @@ in its log to its file gives these summed test-case durations:
 | *m5-proxy-exotic-object*  | 2     | 2,106 s                   |
 
 Those four sum to 9,297 seconds, and 9 further seconds went to tests this
-attribution could not place, which is where the 38.77 above comes from. The
+attribution could not place. That is where the 38.77 above comes from. The
 job took 2,768 seconds. The largest file sum plus about 20 seconds of setup
 is 2,752, which is 16 seconds below the job. These figures are consistent
 with that one file limiting the shard; they do not measure its elapsed time
@@ -86,9 +86,9 @@ The file has nine top-level tests across four property domains and uses no
 seconds. Those observations do not establish how evenly three case shards
 will divide it.
 
-Its shards record no duration, for the reason the Reflect namespace shards
-record none: the recorder exclusively creates one record per job, so more
-than one property domain per file cannot each record without a
+Its shards record no duration, for the same reason the Reflect namespace
+shards record none. The recorder exclusively creates one record per job, so
+more than one property domain per file cannot each record without a
 record-format change. Each shard keeps the whole property's interrupt limit
 and fails on interruption.
 
@@ -113,12 +113,15 @@ What the ceiling allows
 
 The hosted job count rises from 49 to 55. That run peaked at 39 concurrent
 hosted jobs against the account's ceiling of 40. Its 965.5 hosted
-job-minutes divided by 40 give an idealized capacity floor of 24.1 minutes
-against a longest hosted job of 48.13, and Linux setup measured 18 to 23
-seconds per job across all nine of its long jobs, with
-`test:property:extended:package`, which only the first `native support`
-shard runs, taking 13 seconds. These figures suggest room for shorter jobs;
-they do not establish the queueing or elapsed-time effect of adding them.
+job-minutes divided by 40 give an idealized capacity floor of 24.1 minutes,
+against a longest hosted job of 48.13.
+
+Linux setup measured 18 to 23 seconds per job across all nine of its long
+jobs. `test:property:extended:package`, which only the first `native support`
+shard runs, took 13 seconds.
+
+These figures suggest room for shorter jobs. They do not establish the
+queueing or elapsed-time effect of adding them.
 
 
 What changes
@@ -136,10 +139,10 @@ partitions while holding that run's runner speeds fixed. They are
 conditional estimates, not measured outcomes or predictions for a later
 run.
 
-Two of the three use Node's own `--test-shard`, which partitions the files
-it discovers so the union of the shards equals the unsharded set by
+Two of the three use Node's own `--test-shard`. It partitions the files it
+discovers, so the union of the shards equals the unsharded set by
 construction. The flag precedes every positional path in both, which Node
-requires: given six files and three shards, placing it after a positional
+requires. Given six files and three shards, placing it after a positional
 ran all six in every shard rather than two in each.
 
 
@@ -194,6 +197,7 @@ the job's completion.
 That table also contradicts this record's earlier reading of shard one.
 A shard limited by 2,732 seconds of test time on a single worker cannot
 finish in 1,496 seconds, and shard one's minimum is 24.93 minutes.
+
 Comparing the same shard's cases between two runs shows the size of the
 variation: all nineteen cases over five seconds ran 1.55 to 1.73 times
 slower in run 39206357696 than in run 39227927384, median 1.66, summing
@@ -225,29 +229,32 @@ either job's duration.
 The run still took 55.25 minutes, and the macOS side accounts for it. All
 six Mac lanes started at 7.33 minutes instead of the 0.42 to 0.43 of run
 39227927384, because the `macOS self-hosted availability` probe waited 6.97
-minutes for a hosted runner against 0.05 there. The lane-work ranges
-overlapped, 39.43 to 47.35 minutes against 43.02 to 46.03, and lane idle
-time stayed between 0.15 and 0.30 in both runs. Holding the later
-allocation and execution times fixed, each minute the probe waits delays
-every lane end by a minute, which is how a 6.92-minute difference in probe
-waiting appears as a 6.91-minute difference in lane starts. Summed Ubuntu
-allocation waiting rose from 5.1 job-minutes over 37 jobs, one of them
-above two minutes, to 59.6 over 43, seven of them above two minutes and
-the longest 9.42.
+minutes for a hosted runner against 0.05 there.
 
-So the six added jobs were affordable in job-minutes and not in
-allocation. This record's earlier reading of the ceiling compared 24.1
-idealized minutes against a 48.13-minute job and concluded there was room.
-That comparison bounds the makespan; it says nothing about which jobs
-absorb the queueing, and one of them is a twenty-second job on which every
-Mac lane depends. *docs/evidence/u47/README.md* records that mechanism and
+The lane-work ranges overlapped, 39.43 to 47.35 minutes against 43.02 to
+46.03, and lane idle time stayed between 0.15 and 0.30 in both runs.
+Holding the later allocation and execution times fixed, each minute the
+probe waits delays every lane end by a minute. That is how a 6.92-minute
+difference in probe waiting appears as a 6.91-minute difference in lane
+starts.
+
+Summed Ubuntu allocation waiting rose from 5.1 job-minutes over 37 jobs,
+one of them above two minutes, to 59.6 over 43, seven of them above two
+minutes and the longest 9.42.
+
+The six added jobs were affordable in job-minutes and not in allocation.
+This record's earlier reading of the ceiling compared 24.1 idealized
+minutes against a 48.13-minute job and concluded there was room. That
+comparison bounds the makespan; it says nothing about which jobs absorb
+the queueing, and one of them is a twenty-second job on which every Mac
+lane depends. *docs/evidence/u47/README.md* records that mechanism and
 what changed for it.
 
 The three `globalThis cases` jobs are reverted. They add three jobs to a
 run that observed thirty-five of its Ubuntu jobs starting at once, and the
 branch run observed no reduction in the longest Linux job. The per-shard
 minima above are within about 6 percent of their mean, though they come
-from different runs and do not control for runner performance; these
+from different runs and do not control for runner performance. These
 observations do not establish how much a refreshed weight table could
 improve the longest shard. The node and sanitizer splits stay.
 
@@ -256,19 +263,18 @@ What this does not address
 --------------------------
 
 Shortening the Linux side stops paying once the macOS side becomes the
-limit. Across the six runs before this one the Linux side ended between
-5.88 minutes before the macOS side and 1.52 minutes after it, so neither
-side is reliably the one that holds the run. The branch run left Linux at
-47.48. In those six runs the macOS side ended at 46.67, 47.72, 49.63,
-50.22, 53.77 and 63.17, exceeding 47.48 in five of the six. Reducing Linux
-completion below 47.48 shortens a run only when its macOS side ends
-earlier than that, which among those six would have saved 0.81 minutes
-once and nothing otherwise.
+limit. Across the six runs before this one, the Linux side ended between
+5.88 minutes before the macOS side and 1.52 minutes after it. Neither side
+reliably holds the run. The branch run left Linux at 47.48. In those six
+runs the macOS side ended at 46.67, 47.72, 49.63, 50.22, 53.77 and 63.17,
+exceeding 47.48 in five of the six. Reducing Linux completion below 47.48
+shortens a run only when its macOS side ends earlier than that. Among those
+six, this would have saved 0.81 minutes once and nothing otherwise.
 
-Both of the sources of variance U44 measured, and the repository does not
-control, produced this run's outcome. An individual Linux job's duration
-varies by close to a factor of two between runs, which is what let one
-job's derived file sum read as a latency bound. Allocation waiting varies
-with what else the account is running, which is what the six added jobs
-met. *docs/evidence/u47/README.md* removes the probe's exposure to other
-jobs in the same run; nothing here reduces either source.
+U44 measured two sources of variance that the repository does not control.
+Both produced this run's outcome. An individual Linux job's duration varies
+by close to a factor of two between runs. That variance let one job's
+derived file sum read as a latency bound. Allocation waiting varies with
+what else the account is running. The six added jobs met this variance.
+*docs/evidence/u47/README.md* removes the probe's exposure to other jobs in
+the same run; nothing here reduces either source.

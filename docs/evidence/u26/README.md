@@ -4,6 +4,7 @@ Per-account Zig cache cap on the Mac mini
 This unit derives the per-account Zig cache size cap that
 [U25 evidence](../u25/README.md) set as the precondition for a second
 self-hosted Mac runner, and adds it to *tools/selfhosted-mac/cleanup.sh*.
+
 The maintainer ran two read-only measurement scripts under `sudo` on the
 Mac mini that hosts `oseo-mac-1` on 2026-10-05. The coordinator wrote
 them, and copies are under [*scripts/*](./scripts/). This unit read their
@@ -29,8 +30,10 @@ to 14:52:19 UTC. Each row has free space, `du -skx` of the runner's
 whether a `Runner.Worker` process existed. The script sleeps 30 seconds
 between rows, but the `du` calls made the measured interval 36 to 221
 seconds, 53.4 seconds on average, over 117 rows. A worker existed in 109
-rows. The rows cover branch run `37315038080` (`m5ci-disk-sample` at
-`4b20631b`), whose 15 jobs on `oseo-mac-1` ran from 13:12:58 to 14:51:05
+rows.
+
+The rows cover branch run `37315038080` (`m5ci-disk-sample` at
+`4b20631b`). Its 15 jobs on `oseo-mac-1` ran from 13:12:58 to 14:51:05
 UTC according to the GitHub jobs API: three own-key case shards, eight
 test262 shards, three native support shards, and one native fixture shard.
 
@@ -104,15 +107,18 @@ during a job, where `G` is one job's growth. The terms, in GiB:
 
 `N` already contains the first runner's account, one job's `W` and `X`,
 and everything else on the volume. The second runner adds `R`, `W`, `X`,
-and its own cache. The condition is
+and its own cache.
+
+The condition is
 `N + R + W + X + 2 (S + G) + reserve <= T - F`, so
 `2 S <= 97.7 - reserve`, derived. A 20 GiB reserve for other growth, such
-as macOS updates, runner updates, and diagnostics, gives `S <= 38.8`. This
-unit adopts the coordinator's proposed `S = 30`, which leaves a derived
-37.7 GiB reserve. With one runner, the cap bounds that runner's cache at a
-derived 33.8 GiB during a job and keeps a derived 119.3 GiB free at the
-measured peak of other usage, instead of the measured 92.5 GiB minimum and
-no bound.
+as macOS updates, runner updates, and diagnostics, gives `S <= 38.8`.
+
+This unit adopts the coordinator's proposed `S = 30`, which leaves a
+derived 37.7 GiB reserve. With one runner, the cap bounds that runner's
+cache at a derived 33.8 GiB during a job. It keeps a derived 119.3 GiB
+free at the measured peak of other usage, instead of the measured
+92.5 GiB minimum and no bound.
 
 `N`, `R`, and `X` were measured with one runner account. A second account
 has not been measured; watch free disk during its first runs. Two runner
@@ -125,23 +131,26 @@ Cost in warm reuse
 
 U25 measured that a warm Zig cache saved 14 to 18 seconds for its native
 fixture and test262 8/12 jobs and nothing measurable for the other three,
-because every job builds in fresh per-run staging paths. Run
-`37315038080` agrees: the cache grew 25.0 GiB although it started at a
+because every job builds in fresh per-run staging paths.
+
+Run `37315038080` agrees: the cache grew 25.0 GiB although it started at a
 warm 38.6 GiB. At the run's 1.67 GiB per job, an emptied cache reaches
-30 GiB after a derived 18 jobs, so the cap would trip about once per run of
-15 Mac jobs. Each trip empties the cache. If every remaining job of that
-run then lost the full measured warm saving, the cost would be a derived
-4.5 minutes of Mac lane time at most (15 jobs times 18 seconds); jobs that
-U25 measured with no warm saving lose nothing.
+30 GiB after a derived 18 jobs. The cap would trip about once per run of
+15 Mac jobs. Each trip empties the cache.
+
+If every remaining job of that run then lost the full measured warm
+saving, the cost would be a derived 4.5 minutes of Mac lane time at most
+(15 jobs times 18 seconds). Jobs that U25 measured with no warm saving
+lose nothing.
 
 The hook also measures the cache with `du` on every job start and
 completion while free space is above 40 GiB. It cannot read the runner's
 real cache as `dahlia`, so the timings use synthetic trees built by
 [*scripts/synthetic-cache.py.txt*](./scripts/synthetic-cache.py.txt) under
-*~/Desktop/*, with entry counts scaled from a 97.5 GiB Linux lane Zig cache
+*~/Desktop/*. Entry counts are scaled from a 97.5 GiB Linux lane Zig cache
 (2,286 *o/* directories and 2,291 *h/* files per GiB, derived). Spotlight
 indexed the first trees and loaded the machine, so those timings were
-discarded; the trees were then moved under a *.noindex* directory and
+discarded. The trees were then moved under a *.noindex* directory and
 timed after the load average fell to 2.0 to 2.4. Measured on the Mac mini,
 once each in sequence:
 
@@ -155,13 +164,15 @@ evicted it from the vnode cache, whose limit `kern.maxvnodes` is 249,770.
 The whole-hook rows ran the new *cleanup.sh* `completed` phase against
 `dahlia`'s real home with the tree moved to *~/.cache/zig*: the 30 GiB
 shape stayed under its 30 GiB cap, and the 63.6 GiB shape with a 1 GiB cap
-was measured and removed in 39.04 seconds. The live sampler gives an
-indirect observation of the real cache: with no job running, its 38.6 GiB
-cache plus the other three paths took 6 to 11 seconds per row beyond the
-30-second sleep, slower per GiB than the synthetic shape. The Mac Zig
-cache's entry count was not measured, so the hook's measurement cost on
-the real cache is observed only within that bound. With the cap applied, a
-hook measures at most `S + G`, about 34 GiB.
+was measured and removed in 39.04 seconds.
+
+The live sampler gives an indirect observation of the real cache: with no
+job running, its 38.6 GiB cache plus the other three paths took 6 to 11
+seconds per row beyond the 30-second sleep, slower per GiB than the
+synthetic shape. The Mac Zig cache's entry count was not measured, so the
+hook's measurement cost on the real cache is observed only within that
+bound. With the cap applied, a hook measures at most `S + G`, about
+34 GiB.
 
 
 What changed
@@ -170,14 +181,16 @@ What changed
 *tools/selfhosted-mac/cleanup.sh* keeps the 40 GiB free-space prune as a
 backstop and adds the size cap. When free space is at least 40 GiB, it runs
 `du -skPx zig` inside the physically resolved *.cache* directory of the
-account home that `dscl` reports, after the same checks as the prune: that
-home and *.cache* have no linked component, *zig* is not a link, and
-`$HOME` resolves to the same home. Above the cap it removes that cache. A
-failed measurement or removal is logged and keeps the cache. The cap comes
-from `OSEO_ZIG_CACHE_CAP_GIB`, a whole number of GiB from 1 to 38 that
-*tools/selfhosted-mac/install-service.sh* writes into the LaunchDaemon
-environment with a default of 30. The hook falls back to 30 and logs a
-warning for an invalid value; the installer rejects one.
+account home that `dscl` reports. It runs after the same checks as the
+prune: that home and *.cache* have no linked component, *zig* is not a
+link, and `$HOME` resolves to the same home. Above the cap it removes that
+cache. A failed measurement or removal is logged and keeps the cache.
+
+The cap comes from `OSEO_ZIG_CACHE_CAP_GIB`, a whole number of GiB from 1
+to 38 that *tools/selfhosted-mac/install-service.sh* writes into the
+LaunchDaemon environment with a default of 30. The hook falls back to 30
+and logs a warning for an invalid value; the installer rejects one.
+
 *tests/macos-lanes.test.ts* covers the cap on Linux with stubbed `dscl`,
 `df`, and `du`, plus one run of the host's real `du`. The macOS runs above
 used the real `dscl` and BSD `du`.
@@ -202,26 +215,25 @@ GitHub jobs API and job logs:
  -  The first, test262 7/12 (job `111933637542`), entered the job-started
     hook at 19:02:44Z and logged
     `Pruned Zig cache because it exceeded the 30 GiB cap` at 19:08:15Z.
-    The hook took a measured 5.5 min from entry to that message, which
-    includes measuring and removing the 63.6 GiB live cache. The log does
-    not separate the two. That is far above the measured 39.04 seconds for
-    measuring and removing the synthetic 63.6 GiB tree above, so the
+    The hook took a measured 5.5 min from entry to that message. That time
+    includes measuring and removing the 63.6 GiB live cache, and the log
+    does not separate the two. That is far above the measured 39.04 seconds
+    for measuring and removing the synthetic 63.6 GiB tree above, so the
     synthetic shape understates the real cache's cost. The job took a
     measured 10.0 min.
  -  That prune was a one-off: the cache had grown past the cap before the
     hooks were installed. With the cap in place, a hook finds the cap plus
-    one job's growth, a derived 33.8 GiB with U25's measured 3.8 GiB maximum
-    growth. That is an estimate rather than a bound, but a later prune is
-    expected to remove far less than this one. Its removal time has not been
-    measured.
+    one job's growth. That derived amount is 33.8 GiB, from U25's measured
+    3.8 GiB maximum growth. It is an estimate rather than a bound, but a
+    later prune is expected to remove far less than this one. Its removal
+    time has not been measured.
  -  The coordinator observed free disk rise from the measured 92.5 GiB
     minimum of run `37315038080` to 155 GiB after the prune.
  -  The other 14 jobs took a measured 4.3 to 6.9 min after the cache was
     emptied, with no sign of the first-execution penalty after the
     installer's daemon restart. The U17 probe was not rerun.
- -  All 15 jobs passed, a derived 87.1 min as the sum of their measured
-    durations. This run was measured
-    once.
+ -  All 15 jobs passed. Their measured durations sum to a derived 87.1 min.
+    This run was measured once.
 
 Attempt 1 of the run failed only because three hosted macOS jobs were never
-acquired by a hosted runner; the `--failed` rerun, attempt 2, passed.
+acquired by a hosted runner. The `--failed` rerun, attempt 2, passed.

@@ -8,45 +8,45 @@ matrix values to their required check names. Linux and Windows keep their
 existing matrix jobs.
 
 The current default generates five hosted lanes and one optional Mac lane.
-When that lane falls back, its jobs have no predecessor chain and can use all
-five hosted slots.
-The 8872-second estimate below applies only to the historical five-lane
-topology. The current workflow generates a sixth optional lane whose jobs
-fall back to hosted runners while the switch is off. See
-[*self-hosted-mac.md*](../../self-hosted-mac.md). The availability check adds
-one name to this document's original 58-name baseline.
+While the switch is off, the optional lane's jobs fall back to hosted runners,
+have no predecessor chain, and can use all five hosted slots. The 8872-second
+estimate below applies only to the historical five-lane topology. The
+availability check adds one name to this document's original 58-name baseline.
+See [*self-hosted-mac.md*](../../self-hosted-mac.md).
 
 The source template is *tools/main-workflow.template.yaml*; regenerate with
 `mise run generate:macos-lanes`. `mise run check:macos-lanes`, included in
 `mise run check`, rejects workflow drift and checks the preserved contracts.
 
 Unchanged job costs are measured wall seconds from main run `36516215200`
-(`97278fc6`), including setup and execution. The twelve native-support
-weights are derived estimates for their changed file sets: each applies the
-ratio of new to old modeled worker makespan to the observed variable time,
-with 71 seconds of observed shard-1 fixed cost retained as a proxy. Three
-new own-key case jobs use derived 1,300-second weights. These estimates
-were compared with one branch CI observation in run `37121778924`:
-the native-support weight total was a derived 427 seconds below the
-observed job-wall total, while all three own-key weights exceeded their
+(`97278fc6`), including setup and execution. The twelve native-support weights
+are derived estimates for their changed file sets: each applies the ratio of
+new to old modeled worker makespan to the observed variable time, with 71
+seconds of observed shard-1 fixed cost retained as a proxy. Three new own-key
+case jobs use derived 1,300-second weights.
+
+These estimates were compared with one branch CI observation in run
+`37121778924`. The native-support weight total was a derived 427 seconds below
+the observed job-wall total, while all three own-key weights exceeded their
 observed job walls of 806 to 1,085 seconds. The measurements are in
-[*PLAN-GATE.md*](../../../PLAN-GATE.md). The weights remain planning
-estimates because one run does not separate runner variance from
-repeatable cost. The model assumes five exclusive slots and excludes
-queue delays; its derived longest lane is 9,414 seconds (156.9 minutes).
-The measured baseline's longest lane was 8,872 seconds (147.9 minutes).
-A changed lane estimate is not a measured improvement.
+[*PLAN-GATE.md*](../../../PLAN-GATE.md).
+
+The weights remain planning estimates because one run does not separate runner
+variance from repeatable cost. The model assumes five exclusive slots and
+excludes queue delays; its derived longest lane is 9,414 seconds (156.9
+minutes). The measured baseline's longest lane was 8,872 seconds (147.9
+minutes). A changed lane estimate is not a measured improvement.
 
 
 Lane plan
 ---------
 
-All start, finish, and lane totals below are derived seconds from the
-mixed measured and estimated costs above, relative to an ideal simultaneous
-lane start. This table is the historical `macosLanes(0)` assignment, not
-the current one-lane-enabled workflow. The current optional lane contains
-all three own-key case shards; the generated *main.yaml* records every job
-assignment and dependency.
+All start, finish, and lane totals below are derived seconds from the mixed
+measured and estimated costs above, relative to an ideal simultaneous lane
+start. This table is the historical `macosLanes(0)` assignment, not the current
+one-lane-enabled workflow. The current optional lane contains all three own-key
+case shards; the generated *main.yaml* records every job assignment and
+dependency.
 
 | Lane | Job                                     | Start (derived s) | Finish (derived s) |
 | ---- | --------------------------------------- | ----------------- | ------------------ |
@@ -90,27 +90,30 @@ Scheduling and cancellation
 ---------------------------
 
 In the historical five-lane plan, only the first job of each lane is initially
-eligible. Later jobs depend on
-the previous job and use `!cancelled()`, so predecessor failure does not skip
-coverage. Cancellation stops the remaining lane. The `native` aggregate
-uses `always()` and requires success from every Linux matrix and every
-explicit macOS native, native support, own-key case, and test262 job;
-skipped and cancelled results fail. The aggregate downloads all six case
-duration artifacts and runs `mise run check:property-case-durations`;
-missing records or a host sum above the original limit fail. Tests execute
-that predicate for all four result states.
+eligible. Later jobs depend on the previous job and use `!cancelled()`, so
+predecessor failure does not skip coverage. Cancellation stops the remaining
+lane.
+
+The `native` aggregate uses `always()` and requires success from every Linux
+matrix and every explicit macOS native, native support, own-key case, and
+test262 job. Skipped and cancelled results fail. The aggregate downloads all
+six case duration artifacts and runs `mise run check:property-case-durations`.
+Missing records or a host sum above the original limit fail. Tests execute that
+predicate for all four result states.
+
 The aggregate now also performs checkout, pinned tool installation, and
-workspace dependency setup before checking the downloaded records. Its
-previous whole-job time was an observed three seconds in main run
-`36516215200`; the changed fixed cost is not yet measured and is outside
-the derived macOS lane totals above.
+workspace dependency setup before checking the downloaded records. Its previous
+whole-job time was an observed three seconds in main run `36516215200`. The
+changed fixed cost is not yet measured and is outside the derived macOS lane
+totals above.
 
 GitHub still controls runner allocation. Lanes constrain eligibility, not
 runner start times or global priority. The workflow concurrency policy is
-unchanged: main pushes use separate SHA groups and do not cancel each other;
-other refs share a group per ref and cancel superseded runs. Other main
-pushes, refs, or repository workflows can compete for the five macOS slots.
-The two `macos-latest` tests retain that exact runner label; the other macOS
+unchanged. Main pushes use separate SHA groups and do not cancel each other.
+Other refs share a group per ref and cancel superseded runs. Other main pushes,
+refs, or repository workflows can compete for the five macOS slots.
+
+The two `macos-latest` tests retain that exact runner label. The other macOS
 jobs retain `macos-15`.
 
 
@@ -122,24 +125,24 @@ macOS matrices and literal job names. Its measured GitHub job names included
 `test (macos-latest, node) (macos-latest, node)`. This falsified the original
 local name-expansion model: GitHub appends matrix values to a literal name,
 even when the matrix has only one entry. The lane topology and workloads in
-that revision remain a timing sample; it does not prove name preservation.
+that revision remain a timing sample. It does not prove name preservation.
 
 The same run's unchanged [Linux sanitizer job] failed in
 `test:sanitizer:native` before compiling the `monotonic-timer-wakeups` fixture.
-Node printed `nested zero delay` before the equal-time callbacks; Deno
-printed it afterward. Both reference processes exited with status zero, but
-their differential comparison failed, so the following property step was
-skipped. The fixture assumes timers spaced by at least 30 ms cannot reorder
-under host stalls; that assumption did not hold in this sanitizer run. The
-name fix does not remove the risk of another reference divergence. This run
-cannot supply a push-to-green time. Its macOS lane timings remain a
-failed-run observation.
+Node printed `nested zero delay` before the equal-time callbacks; Deno printed
+it afterward. Both reference processes exited with status zero, but their
+differential comparison failed, so the following property step was skipped. The
+fixture assumes timers spaced by at least 30 ms cannot reorder under host
+stalls; that assumption did not hold in this sanitizer run.
 
-The corrected generator binds the original matrix values directly and emits
-no macOS matrices. It selects the same active conditional steps. The
-corrected workflow passed branch run [36640728403] at `82bba77e`.
-Its 58 displayed check names match the main-run inventory. Both samples
-are recorded by revision in
+The name fix does not remove the risk of another reference divergence. This run
+cannot supply a push-to-green time. Its macOS lane timings remain a failed-run
+observation.
+
+The corrected generator binds the original matrix values directly and emits no
+macOS matrices. It selects the same active conditional steps. The corrected
+workflow passed branch run [36640728403] at `82bba77e`. Its 58 displayed check
+names match the main-run inventory. Both samples are recorded by revision in
 [*docs/gate-cost-baseline.md*](../../gate-cost-baseline.md), with runner
 variance and queue delays left unseparated.
 
@@ -153,8 +156,8 @@ gh api repos/dahlia/oseo/actions/runs/36516215200/jobs \
 
 The fixture contains the sorted `name` fields from every page's `jobs` array,
 plus the source run and URL. The generator tests compare the 58 existing
-rendered names against this observed list and require every macOS job to
-have no matrix. U19 adds six own-key case job names, three for each host.
+rendered names against this observed list and require every macOS job to have
+no matrix. U19 adds six own-key case job names, three for each host.
 
 [Linux sanitizer job]: https://github.com/dahlia/oseo/actions/runs/36598029271/job/109507894548
 [36516215200]: https://github.com/dahlia/oseo/actions/runs/36516215200
@@ -166,11 +169,14 @@ Check name inventory
 --------------------
 
 The before column expands the source workflow matrices and matches the
-observed baseline fixture; the after column shows how each of those 58
+observed baseline fixture. The after column shows how each of those 58
 existing names appears in the current generated workflow. No macOS job has
-a matrix. All 58 existing names match, including
-the aggregate and Linux/Windows checks. The focused generator test repeats
-this comparison; explicit job IDs change only for macOS lane dependencies.
+a matrix. All 58 existing names match, including the aggregate and
+Linux/Windows checks.
+
+The focused generator test repeats this comparison. Explicit job IDs change
+only for macOS lane dependencies.
+
 The six new names are `own-key cases (linux-x86_64-gnu, 1/3)` through
 `own-key cases (linux-x86_64-gnu, 3/3)` and
 `own-key cases (macos-aarch64, 1/3)` through

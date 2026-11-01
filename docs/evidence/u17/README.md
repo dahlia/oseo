@@ -34,9 +34,10 @@ launch is visible as `warmup-exec` and excluded from cohort totals. Each
 of the concurrency-one and concurrency-three cohorts then gets 48 fresh
 executables with distinct embedded constants and verified distinct binary
 hashes. Every executable returns zero after checking its constant.
-Compilation is serial for both cohorts and is timed separately. The
-first pass launches each executable once; the second pass launches the
-same executable again. Thus the concurrency-three first pass never
+Compilation is serial for both cohorts and is timed separately.
+
+The first pass launches each executable once; the second pass launches
+the same executable again. Thus the concurrency-three first pass never
 reuses the concurrency-one binaries. Warmup absorbs process-wide startup
 but does not pre-execute the measured files.
 
@@ -159,6 +160,7 @@ speedups. Every binary has different source bytes, so compilation work
 remains. Apple/host-clang builds are retained individually; their cohort cache
 state is labeled `uncontrolled`. No cold/warm compiler comparison is
 claimed.
+
 The throwaway first launches measured 11.199/7.029 ms on macOS 15 and
 27.388/10.380 ms on macOS 26 for Zig/Apple clang, respectively.
 
@@ -214,10 +216,10 @@ variable. Hosted reproduction requires a separately authorized push of
 the experiment branch; the preserved workflow must never replace the
 normal workflow on `main`.
 
-Validation: `mise run check` and the Linux probe smoke passed on the
-experiment branch. `mise run check` also passed on the results branch.
-Claude Opus 5 returned a clean review after timing,
-logging, and metadata fixes. The coordinator waived full test and
-extended-property gates for this isolated workflow experiment and the
-separate documentation branch. Neither branch changes compatibility
-counts, property budgets, targets, or production CI coverage.
+`mise run check` and the Linux probe smoke passed on the experiment
+branch, and `mise run check` also passed on the results branch. The
+timing, logging, and metadata fixes received a clean review from
+Claude Opus 5. The coordinator waived full test and extended-property
+gates for this isolated workflow experiment and the separate
+documentation branch. Neither branch changes compatibility counts,
+property budgets, targets, or production CI coverage.

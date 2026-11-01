@@ -15,8 +15,8 @@ These files support the measured runs of the two Mac lanes in
  -  *own-key-durations.tsv* holds the `durationMilliseconds` of every
     downloadable macOS own-key duration artifact of the eight one-lane
     Mac-lane runs and of attempt 2 of `37398055382`, measured. Each run's
-    artifacts belong to its latest attempt that ran the own-key jobs;
-    `37332256715` attempt 2 reran only a Linux job, so its records are from
+    artifacts belong to its latest attempt that ran the own-key jobs. For
+    `37332256715`, attempt 2 reran only a Linux job, so its records are from
     attempt 1. Attempt 1 of `37398055382` returned HTTP 404 after the rerun.
  -  *pairs.py.txt* derives each Mac job's overlapped pair factor from the
     two-lane rows and the one-lane `oseo-mac-1` medians, taken from these

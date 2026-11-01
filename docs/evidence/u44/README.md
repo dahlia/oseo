@@ -5,10 +5,10 @@ U43 landed as `0dca3e8f` and its main run, 39154284680, passed in 63.50
 minutes against 50.60 for the branch run of the same tree. The U43 record
 left one question open. Across the twelve runs it covered,
 `test (ubuntu-latest, node)` took 24.72 to 36.17 minutes in six runs and
-48.18 to 49.30 in the other six, with nothing in between, and what
-accounted for the difference was not established. This record locates the
-difference, measures what sharding the job would return, and refreshes the
-three entries run 39154284680 observed hosted.
+48.18 to 49.30 in the other six, with nothing in between. What accounted
+for the difference was not established. This record locates the difference,
+measures what sharding the job would return, and refreshes the three
+entries run 39154284680 observed hosted.
 
 The window is the thirteen main and branch runs since `b59ac914`, the
 repartition that last changed macOS shard contents: 39076279469,
@@ -49,13 +49,13 @@ the earlier has a median of 1.98 among the 146 tests that took more than 10
 seconds in the earlier run, with quartiles of 1.92 and 2.04. The whole
 expensive part of the suite moved by one factor. The 654 tests under 1
 millisecond in the earlier run have a median ratio of 1.75 with quartiles
-of 1.42 and 2.08: slower in the same direction, but at that scale the
+of 1.42 and 2.08: slower in the same direction. At that scale the
 measurements are too coarse to carry a factor, and whether a short test
 also waits on a worker slot is not resolved here.
 
 The fields the logs report do not separate the two groups. The runner image
 was `20261012.334.1` and the hosted compute agent `20261012.601` in all
-thirteen runs, and the Azure region differs within each group rather than
+thirteen runs. The Azure region differs within each group rather than
 between them: `westus2` served both the 1,582.64-second run and the
 2,931.85-second run.
 
@@ -92,14 +92,14 @@ groupings read off the table, not identified runner configurations; a job's
 baseline is its own fastest observation, not a common reference, so the
 ratios compare a job to itself and not to each other.
 
-What the table does settle is that a run does not get one factor for its
-Linux jobs. The spread within a run is 0.49 to 0.97 in all thirteen, so a
-run that runs one job near 1.0 runs another near 1.9. The consequence is
-that the slowest of nine jobs is near the top of the range in every run,
-and the Linux side's end is far steadier than any job in it: the longest
-Linux job other than `test (ubuntu-latest, node)` ran between 46.05 and
-48.30 minutes in all thirteen runs, a 2.25-minute range, while the
-individual jobs vary by close to a factor of two.
+The table does settle that a run does not get one factor for its Linux
+jobs. The spread within a run is 0.49 to 0.97 in all thirteen, so a run
+that runs one job near 1.0 runs another near 1.9. The consequence is that
+the slowest of nine jobs is near the top of the range in every run, and the
+Linux side's end is far steadier than any job in it. The longest Linux job
+other than `test (ubuntu-latest, node)` ran between 46.05 and 48.30
+minutes in all thirteen runs, a 2.25-minute range, while the individual
+jobs vary by close to a factor of two.
 
 
 What sharding the Linux job would return
@@ -132,22 +132,24 @@ hosted `test (macos-latest, node, k/4)` job was the last job of the run.
 
 The closest margin is run 39149674951, the shortest of the thirteen. There
 `test (ubuntu-latest, node)` ended at 48.83 and the next Linux job at
-46.25, so shortening the first one, with every other job's timing held
-fixed, moves the Linux end by 2.58 minutes and the run's end by none. The
-other twelve runs have a larger margin and the same conclusion.
+46.25. With every other job's timing held fixed, shortening the first one
+moves the Linux end by 2.58 minutes and the run's end by none. The other
+twelve runs have a larger margin and the same conclusion.
 
 The run creates 49 GitHub-hosted jobs: 37 Ubuntu, 10 hosted macOS, and 2
 Windows. The account's ceiling is 40 concurrent jobs with 5 of them macOS,
-which *docs/evidence/u43/README.md* records as permanent. Run 39154284680
-accumulated 88.1 job-minutes of allocation waiting over its Ubuntu jobs,
-with six waits between 8.45 and 10.97 minutes, and hosted lane five waited
-14.90 minutes before its first job started. Whether that wait came from the
-40-job ceiling, the 5-job macOS ceiling, or runner availability is not
-identified here; the first two are both oversubscribed, since 39 non-macOS
-hosted jobs plus 5 macOS slots exceed 40. Extra Linux shards would draw on
-the same 40, so they are not free, and these runs show no completion-time
-gain from shortening this Linux job alone. A macOS end below about 48
-minutes is the point at which to measure the question again.
+which *docs/evidence/u43/README.md* records as permanent.
+
+Run 39154284680 accumulated 88.1 job-minutes of allocation waiting over its
+Ubuntu jobs, with six waits between 8.45 and 10.97 minutes, and hosted lane
+five waited 14.90 minutes before its first job started. Whether that wait
+came from the 40-job ceiling, the 5-job macOS ceiling, or runner
+availability is not identified here; the first two are both oversubscribed,
+since 39 non-macOS hosted jobs plus 5 macOS slots exceed 40.
+
+Extra Linux shards would draw on the same 40, so they are not free. A macOS
+end below about 48 minutes is the point at which to measure the question
+again.
 
 
 What the macOS side holds
@@ -171,12 +173,12 @@ The hosted slots are where the room is, and two jobs hold 74.8 of their
 40.82 minutes and `host C sanitizers (macOS, native)` 34.02.
 `selfHostedEligible` excludes that family for the reason
 *docs/evidence/u37/README.md* records, so neither can move to a Mac lane
-under the current policy. While the longer of the two takes 40.82 minutes,
-no arrangement of the ten hosted jobs ends the hosted side before that,
-against an even share of 41.5, so the hosted end cannot approach its even
-share until those two suites are shorter. Sharding them is the next thing
-to try, and the effect on the hosted end remains to be measured.
-`test:sanitizer:property:shard` exists already, and the Linux native suite
+under the current policy. The longer of the two takes 40.82 minutes, so no
+arrangement of the ten hosted jobs ends the hosted side before that. Against
+an even share of 41.5, the hosted end cannot approach its even share until
+those two suites are shorter. Sharding them is the next thing to try, and
+the effect on the hosted end remains to be measured.
+`test:sanitizer:property:shard` already exists, and the Linux native suite
 already runs as `host C sanitizers (Linux, {shard}/3)`.
 
 
@@ -194,8 +196,8 @@ median of its hosted observations in the window, in seconds.
 
 The run's own durations were 1.35, 0.95, and 1.05 times the entry in force
 for it. The 1.35 is the fifth consecutive run ended by a Mac-eligible job
-the placement sent to a hosted lane, after 1.37, 1.13, 1.34, and 1.29, and
-every one of those five entries had been tested in the window. U43 recorded
+the placement sent to a hosted lane, after 1.37, 1.13, 1.34, and 1.29.
+Every one of those five entries had been tested in the window. U43 recorded
 that `measuredHostedJobs` membership does not predict an overrun; a fifth
 case does not change that, and this refresh corrects the entry rather than
 the distinction.
@@ -252,7 +254,7 @@ cost the rest of the run.
 The entry change placed `native (macos-aarch64, 2/3)` on Mac lane four,
 which is what raising it to 1,162 was for, and it ran there in 8.10
 minutes. The hosted lanes ended at 43.43, 39.88, 41.38, 42.23, and 38.72
-minutes against modeled 41.30, 36.32, 42.45, 39.90, and 42.18, so the
+minutes against modeled 41.30, 36.32, 42.45, 39.90, and 42.18. The
 largest hosted end was 43.43 against a modeled 42.45, and no hosted lane
 ended the run. The streak of five runs each ended by a Mac-eligible job the
 placement had sent to a hosted lane stopped here.
@@ -298,9 +300,9 @@ Shortening `test (ubuntu-latest, node)` enough, with every other job's
 timing and the aggregate's own duration held fixed, moves the Linux end to
 the 48.27 of `native support (linux-x86_64-gnu, 6/7)` and the run's end
 from 48.62 to about 48.3. Going lower means shortening the `native support`
-shards too. The two sides ended 0.83 minutes apart, both near 48, so shortening
-either one alone returns a fraction of a minute; shortening the macOS jobs
-alone would not have changed this run's end at all.
+shards too. The two sides ended 0.83 minutes apart, both near 48, so
+shortening either one alone returns a fraction of a minute. Shortening the
+macOS jobs alone would not have changed this run's end at all.
 
 
 What a search of the placement model says
@@ -315,20 +317,20 @@ Applying the same search to a job set with both macOS sanitizer suites
 split three ways reaches 45.50, with every lane between 41.63 and 45.50.
 The greedy placement on that job set instead gives 49.72, worse than its
 48.79 on the current set. In that placement the hosted lanes hold five
-Mac-eligible jobs rather than the current three: with the sanitizer shards
+Mac-eligible jobs rather than the current three. With the sanitizer shards
 no longer filling those lanes, the greedy scoring, which compares a hosted
 candidate by its own lane load, sends jobs there that cost 2.9 to 4.2
 times their Mac seconds. Scoring each candidate by the resulting maximum
-over all eleven lanes instead was tried and reached 51.39; in that result
-the hosted lanes ended between 26.23 and 42.22 while the Mac lanes rose to
-between 50.59 and 51.39.
+over all eleven lanes instead reaches 51.39. In that result the hosted
+lanes ended between 26.23 and 42.22 while the Mac lanes rose to between
+50.59 and 51.39.
 
-So the searched maximum is 1.48 minutes lower on the sharded job set,
-while the search improves on the greedy placement by 1.81 minutes on the
-current job set and 4.22 on the sharded one, and sharding alone raises the
-greedy maximum by 0.93. These are model comparisons, not measured run
-improvements, and they favor investigating the placement before the
-sharding. The search also respects only lane eligibility, not the
-invariants *tests/macos-lanes.test.ts* asserts about which jobs lead a
-hosted lane and which entries may reach one, so what a refinement pass
-carrying those constraints can reach is not established.
+The searched maximum is 1.48 minutes lower on the sharded job set. The
+search improves on the greedy placement by 1.81 minutes on the current job
+set and 4.22 on the sharded one. Sharding alone raises the greedy maximum
+by 0.93. These are model comparisons, not measured run improvements. They
+favor investigating the placement before the sharding. The search respects
+only lane eligibility, not the invariants *tests/macos-lanes.test.ts*
+asserts about which jobs lead a hosted lane and which entries may reach
+one. What a refinement pass carrying those constraints can reach is
+therefore not established.
