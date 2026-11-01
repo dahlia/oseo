@@ -315,6 +315,7 @@ dependencies:
   - dynamic-source-completion-record-evidence
   - dynamic-source-construction-contracts
   - dynamic-source-eval-arguments-accounting
+  - dynamic-source-eval-code-assessment
   - dynamic-source-eval-contract-accounting
   - dynamic-source-host-script-evidence
   - dynamic-source-host-script-trainc-evidence
@@ -337,4 +338,4 @@ dependencies:
   - dynamic-source-unknown-eval
   - static-specifier-import-design
 landed: false
-status: ready
+status: blocked

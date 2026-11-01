@@ -705,3 +705,15 @@ variable-environment probes, and *subclass-Function.js*.
 [*docs/m5c-closure/deferrals.yaml*](../m5c-closure/deferrals.yaml) gives each
 path's remaining contract and reason. With this move the umbrella owns 136
 paths.
+
+
+Eval code assessment child
+--------------------------
+
+The `dynamic-source-eval-code-assessment` child records the evidence
+attempt for exactly 48 umbrella paths that test eval code itself, as
+[*dynamic-source-eval-code-assessment.md*](./dynamic-source-eval-code-assessment.md)
+pins them. Root's 2026-11-02 ruling sends 32 of them to the existing ADR 0016
+`eval-semantics` exclusion, closes 14 with static replacement evidence, and
+defers the two assignment rows under ADR 0031. The umbrella keeps every path
+until the child moves its owner.
