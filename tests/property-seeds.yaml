@@ -596,3 +596,7 @@ families:
     owner: tests/property/m5-non-blocking-agent.property.test.ts
     start: 0x60009400
     end: 0x600094ff
+  - family: m5-regexp-literal-exhaustive
+    owner: tests/property/m5-regexp-literal-exhaustive.property.test.ts
+    start: 0x60009500
+    end: 0x600095ff

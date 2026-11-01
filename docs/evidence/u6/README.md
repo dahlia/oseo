@@ -1974,3 +1974,32 @@ unknown-file median fallback.
 
 The TSV retains this later file with `-` for all three historical source
 samples, and the extraction script and its unit test retain it explicitly.
+
+
+Exhaustive RegExp literal local cost
+------------------------------------
+
+*tests/property/m5-regexp-literal-exhaustive.property.test.ts* also
+postdates the three Linux source runs. Its initial shard weight was measured
+the same way as the non-blocking agent file: one local Linux AMD64 extended
+run on the Zig lane with `OSEO_PROPERTY_RUN_SCALE=10`, under the heavy lock
+and a fresh capacity prefix. Its seeds `0x60009500` to `0x60009503`, sizes
+and base limits were unchanged; no seed, size or time-scale override was
+set.
+
+The eleven passing registrations summed to 1584763.498332 milliseconds, a
+rounded-up 1585 seconds. This is one local observation, not a CI file-shard
+sum, a run-to-run bound or a macOS measurement. macOS keeps a provisional
+921 seconds, that local weight scaled by the 353/608 host ratio of
+*tests/property/m5-regexp-literal-aot.property.test.ts*, whose generated
+literals compile through the same path.
+
+The file is now case-sharded, and its Linux weight is 8,821 seconds,
+derived from candidate CI run 41257794727: two hosted property durations
+and two estimates scaled from the local run, because the file shard timed
+out before the last two properties finished. The TSV records that weight
+with `-` for all three historical source samples. The extraction script
+and its unit test treat the file as a CI exclusion, like the other
+case-sharded files. The regenerated Linux model keeps the 443-second
+upper-median fallback, and its largest seven-shard load is 3036 seconds. See
+[*exhaustive RegExp literal evidence*](../regexp-literal-exhaustive/README.md).

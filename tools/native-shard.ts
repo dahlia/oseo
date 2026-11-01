@@ -22,6 +22,7 @@ export const ownKeyNativeFile =
 export const caseShardedNativeFiles: readonly string[] = [
   ownKeyNativeFile,
   "tests/property/m5-reflect-namespace.property.test.ts",
+  "tests/property/m5-regexp-literal-exhaustive.property.test.ts",
 ];
 
 /**
@@ -39,6 +40,16 @@ export const dedicatedLinuxNativeFiles: readonly string[] = [
  */
 export const dedicatedMacosNodeFiles: readonly string[] = [
   "tests/property/m5-array-constructor.property.test.ts",
+];
+
+/**
+ * Ordinary property files with dedicated host C sanitizer jobs on both
+ * hosts. Each one compiles enough native code under ASan and UBSan that it
+ * would move a shared sanitizer property job toward its limit, so the shared
+ * jobs leave it out and its own job runs every case with the ordinary budget.
+ */
+export const dedicatedSanitizerPropertyFiles: readonly string[] = [
+  "tests/property/m5-regexp-literal-exhaustive.property.test.ts",
 ];
 
 /** Fixed host-specific scheduling model for native property partitions. */

@@ -74,10 +74,10 @@
  * partition estimates that omit the new pure model-property overhead,
  * pending candidate CI; they are not fresh file measurements. See U6.
  *
- * The two entries in `caseShardedNativeFiles` are retained from the
- * earlier source. CI excludes them from the file shards, so this run did
- * not observe them here; they still weigh other wrapper invocations and
- * divide into the case-shard estimates below.
+ * The own-key and Reflect entries in `caseShardedNativeFiles` are retained
+ * from the earlier source. CI excludes them from the file shards, so this
+ * run did not observe them here; they still weigh other wrapper
+ * invocations and divide into the case-shard estimates below.
  *
  * Primitive wrapper objects reserves 900 seconds on each host as an
  * unmeasured extended planning estimate. Its two local ordinary properties
@@ -120,6 +120,18 @@
  * at the unchanged source seed and size. This is a local case duration,
  * not a CI file-shard sum or a matching-host macOS measurement. macOS
  * keeps the unknown-file median fallback. See U6 provenance.
+ *
+ * Exhaustive RegExp literals are case-sharded, so this table weighs them
+ * only for other wrapper invocations. The Linux entry is a derived
+ * hosted extended sum from file shard 3/7 of candidate CI 41257794727 at
+ * `b5ccc6ee`, which ran the file beside three others on four workers:
+ * two measured properties, 4,274.6 and 586.5 seconds, and two estimates
+ * that scale the local durations by the measured property of the same
+ * literal kind, 3,481.7 and 477.6. The job hit its timeout before those
+ * two finished, so the entry is not a complete measurement. Its macOS
+ * entry is a provisional estimate, the earlier local Linux weight of 1,585
+ * seconds scaled by the AOT literal file's 353/608 host ratio, not a
+ * measurement. See U6 provenance.
  */
 export const nativeShardCosts = {
   "linux-x86_64-gnu": {
@@ -236,6 +248,8 @@ export const nativeShardCosts = {
     "tests/property/m5-reflect-namespace.property.test.ts": 2299,
     "tests/property/m5-regexp-intrinsic.property.test.ts": 344,
     "tests/property/m5-regexp-literal-aot.property.test.ts": 608,
+    // Derived from a timed-out CI file shard; see the note above.
+    "tests/property/m5-regexp-literal-exhaustive.property.test.ts": 8821,
     "tests/property/m5-regexp-matcher.property.test.ts": 7,
     "tests/property/m5-regexp-pattern-extensions.property.test.ts": 53,
     "tests/property/m5-regexp-pattern.property.test.ts": 2,
@@ -394,6 +408,7 @@ export const nativeShardCosts = {
     "tests/property/m5-reflect-namespace.property.test.ts": 2283,
     "tests/property/m5-regexp-intrinsic.property.test.ts": 185,
     "tests/property/m5-regexp-literal-aot.property.test.ts": 353,
+    "tests/property/m5-regexp-literal-exhaustive.property.test.ts": 921,
     "tests/property/m5-regexp-matcher.property.test.ts": 4,
     "tests/property/m5-regexp-pattern-extensions.property.test.ts": 44,
     "tests/property/m5-regexp-pattern.property.test.ts": 2,

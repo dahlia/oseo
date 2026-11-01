@@ -39,6 +39,7 @@ dependencies:
   - dynamic-source-eval-arguments-accounting
   - dynamic-source-eval-contract-accounting
   - dynamic-source-host-script-evidence
+  - dynamic-source-host-script-trainc-evidence
   - dynamic-source-importcall-accounting
   - dynamic-source-importcall-residual-accounting
   - dynamic-source-lexical-completion-family
@@ -49,6 +50,7 @@ dependencies:
   - dynamic-source-private-binding-family
   - dynamic-source-realm-host-evidence
   - dynamic-source-realm-string-family
+  - dynamic-source-regexp-exhaustive
   - dynamic-source-regexp-static-evidence
   - dynamic-source-residual-evidence
   - dynamic-source-retagging

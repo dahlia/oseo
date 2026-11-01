@@ -12,6 +12,7 @@ import {
   hasEvalCall,
   hasLookupCall,
   legacyCallerSelector,
+  m5cAnnexDynamicResiduePaths,
   validateCurrentM5cExclusionAudit,
   validateM5cExclusionAudit,
 } from "../tools/m5c-exclusion-audit.ts";
@@ -537,6 +538,75 @@ test("unresolved non-source coverage requires remediation ownership", () => {
   assert.throws(
     () => validateM5cExclusionAudit(stringifyYaml(audit), inputs),
     /Unresolved subject coverage cannot keep an ADR/u,
+  );
+});
+
+test("the Annex B residue selector bounds ADR 0013 over eval", () => {
+  const { audit, inputs } = fixture();
+  audit.assessments.reviewed.normativeDependency = "annex-b-only";
+  audit.paths[0]!.proposedOwner = annexOwner;
+  audit.paths[0]!.missingDynamicTag = false;
+  const owned = {
+    ...inputs,
+    ledger: {
+      ...inputs.ledger,
+      entries: [
+        {
+          path,
+          owner: annexOwner,
+          prerequisites: result.dependencies,
+          state: result.classification,
+        },
+      ],
+    },
+  };
+  const selected = { ...owned, annexDynamicResiduePaths: new Set([path]) };
+  assert.equal(
+    validateM5cExclusionAudit(stringifyYaml(audit), selected).exclusions,
+    1,
+  );
+  // Outside the selector, an eval rejection cannot authorize ADR 0013.
+  assert.throws(
+    () => validateM5cExclusionAudit(stringifyYaml(audit), owned),
+    /exact Annex B residue selector/u,
+  );
+  // Inside it, the row must stay a bound exclusion.
+  const { replacementEvidence, ...unbound } = audit.assessments.reviewed;
+  assert.ok(replacementEvidence);
+  assert.throws(
+    () =>
+      validateM5cExclusionAudit(
+        stringifyYaml({ ...audit, assessments: { reviewed: unbound } }),
+        selected,
+      ),
+    /exact Annex B residue selector/u,
+  );
+  audit.assessments.reviewed.disposition = "remediation";
+  audit.assessments.reviewed.normativeDependency = "not-demonstrated";
+  assert.throws(
+    () => validateM5cExclusionAudit(stringifyYaml(audit), selected),
+    /exact Annex B residue selector/u,
+  );
+  // A selector path cannot leave the audit.
+  assert.throws(
+    () =>
+      validateM5cExclusionAudit(stringifyYaml(fixture().audit), {
+        ...fixture().inputs,
+        annexDynamicResiduePaths: new Set([
+          "test/language/literals/regexp/absent.js",
+        ]),
+      }),
+    /Annex B residue selector lacks its audit row/u,
+  );
+});
+
+test("the checked-in Annex B residue selector names the two escapes", () => {
+  assert.deepEqual(
+    [...m5cAnnexDynamicResiduePaths],
+    [
+      "test/language/literals/regexp/S7.8.5_A1.4_T2.js",
+      "test/language/literals/regexp/S7.8.5_A2.4_T2.js",
+    ],
   );
 });
 

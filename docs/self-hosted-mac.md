@@ -12,7 +12,7 @@ macOS lanes, one per runner. `oseo-mac-1` was registered earliest and
 hosted; a busy lane queues its jobs on the runner. Branch run `37398055382`
 measured the first machine's two lanes, and branch run `38551733723`
 measured all four; its attempt 2 passed every job in a measured 67.65 min
-against the 51.3 min the lane model derives. See *PLAN-GATE.md* (U30). The
+against the 51.3 min the lane model then derived. See *PLAN-GATE.md* (U30). The
 coordinator owns registration, repository variables, secrets, and branch
 pushes. The operator checklist is outside the repository.
 
@@ -534,11 +534,11 @@ second and third owned machines; the setup section for the second owned
 machine describes the first owned machine as the same hardware class. No
 larger owned-machine RAM configuration is recorded here.
 
-With current costs, the six-lane model ends at 47.31 min and the eight-lane
-model at 40.87 min, limited by a hosted lane. These are modeled values;
-partial hosted fallback and the rented machine's actual performance remain
-unmeasured. Landing before registration preserves required work: the probe
-emits hosted `macos-15` independently for each missing or offline runner.
+With costs at `a0cd901d`, the six-lane and eight-lane models both end at
+71.07 min, limited by the hosted property sanitizer lane. These are modeled
+values; partial hosted fallback and the rented machine's actual performance
+remain unmeasured. Landing before registration preserves required work: the
+probe emits hosted `macos-15` independently for each missing or offline runner.
 After the rental ends, absent runners take that same fallback path.
 
 

@@ -1,5 +1,6 @@
 /**
- * Except for the explicitly unmeasured Array scheduling allowance, each
+ * Except for the explicitly unmeasured Array scheduling allowance and the
+ * entries marked `derived` below, each
  * entry is the median, rounded to whole seconds, of the job's measured
  * hosted `macos-15` or `macos-latest` walls (`started_at` to
  * `completed_at`). The lane generator sorts hosted jobs by these weights
@@ -41,6 +42,17 @@
  *     2, main run 37206614757, and branch run 37215661294 attempts 1
  *     and 2.
  *
+ *  -  Two `derived` entries are the macOS native sanitizer shards. No
+ *     hosted run has executed either shard yet; each sums the setup, the
+ *     preflight, the runtime fixtures on the first shard, and that shard's
+ *     share of three hosted native logs. See
+ *     *docs/evidence/macos-sanitizer-split/README.md*.
+ *
+ *  -  One `derived` entry is the dedicated sanitizer property files' job,
+ *     which no hosted run has executed. It is a planning allowance of
+ *     twice the local Linux clang wall plus setup; see
+ *     *docs/evidence/regexp-literal-exhaustive/README.md*.
+ *
  *  -  Three entries are marked `derived`, the `reflect cases` shards that
  *     U38 introduced. CI has never run them, so they have no hosted
  *     observation at all, and these are estimates rather than medians.
@@ -59,6 +71,28 @@
  *     not either, because it overstates the two files by a derived 1.31
  *     against 2.50. The first run that places one of these hosted
  *     replaces the estimate.
+ *  -  Five entries are marked `derived`, the `regexp exhaustive cases`
+ *     shards. CI has not run them. Run 41257794727 ran the whole file in
+ *     `native support (macos-aarch64, 1/12)` on a Mac lane, where its
+ *     four properties took a measured 1,790.6 seconds and the rest of the
+ *     job, less the package suite only that shard runs, 157.8. One fifth
+ *     of the properties plus that remainder is a derived 516 Mac seconds
+ *     per shard; the hosted entry converts it at the 3.4 native support
+ *     ratio, the family whose job it was measured in. The Mac figure was
+ *     measured beside eleven other files and a busy partner lane, so it
+ *     is not a one-lane wall. See
+ *     *docs/evidence/regexp-literal-exhaustive/README.md*.
+ *  -  Six entries marked `derived` are the weighted ordinary Node shards
+ *     that replaced the four positional ones, four of the seven U40
+ *     entries above. CI has not run them yet. Each is the modeled wall of
+ *     its shard: the per-file sums of *docs/evidence/node-shards/*, the
+ *     median of three runs, replayed in Node's sorted order on two
+ *     workers, plus one minute of setup. The four positional entries they
+ *     replace summed to 4,055 seconds, against 5,717 to 7,788 for the
+ *     same four jobs in those runs. The same model reproduced every
+ *     positional macOS shard of those runs within 0.9 minutes but one, a
+ *     runner that finished 7.2 minutes early. The first run that places
+ *     them replaces the estimates.
  *
  * The refreshed entries rose against their retained neighbours, so the
  * table is likely to understate the retained ones and to place them on a
@@ -78,7 +112,13 @@ interface MacosJobCosts {
 /** Measured hosted medians used only for lane assignment. */
 export const macosJobCosts: MacosJobCosts = {
   "host C sanitizers (macOS, property)": 2452, // 18
-  "host C sanitizers (macOS, native)": 2337, // 18
+  // Planning allowance, not a hosted wall: twice the 873-second local Linux
+  // clang run plus setup; see docs/evidence/regexp-literal-exhaustive.
+  "host C sanitizers (macOS, property, regexp literals)": 1812, // derived
+  // Derived from the native progress logs of three hosted runs, not
+  // measured job walls; see docs/evidence/macos-sanitizer-split/README.md.
+  "host C sanitizers (macOS, native, 1/2)": 2014, // derived
+  "host C sanitizers (macOS, native, 2/2)": 1593, // derived
   "test262 (macos-aarch64, 12/12)": 2212, // 1
   "native support (macos-aarch64, 5/12)": 2063, // 1 hosted since b59ac914
   "test262 (macos-aarch64, 2/12)": 2054, // 4
@@ -105,20 +145,30 @@ export const macosJobCosts: MacosJobCosts = {
   // Scheduling allowance only: unchanged 180-second interrupt plus setup.
   // Dedicated hosted macOS execution has not yet been measured.
   "Array constructor (macos-latest, node)": 240,
-  "test (macos-latest, node, 3/4)": 1311, // 18
+  // Derived, not observed: modeled walls of the six weighted shards; see
+  // docs/evidence/node-shards/README.md.
+  "test (macos-latest, node, 1/6)": 1622, // derived
+  "test (macos-latest, node, 5/6)": 1387, // derived
+  "test (macos-latest, node, 2/6)": 1339, // derived
   "native support (macos-aarch64, 3/12)": 1293, // 5 hosted since b59ac914
+  "test (macos-latest, node, 3/6)": 1273, // derived
+  "test (macos-latest, node, 4/6)": 1254, // derived
   "native (macos-aarch64, 1/3)": 1236, // 6 hosted since b59ac914
+  "test (macos-latest, node, 6/6)": 1224, // derived
   "native (macos-aarch64, 2/3)": 1162, // 3 hosted since b59ac914
   "native (macos-aarch64, 3/3)": 1160, // 2 hosted since b59ac914
-  "test (macos-latest, node, 2/4)": 996, // 18
   "own-key cases (macos-aarch64, 2/3)": 995, // retained
-  "test (macos-latest, node, 1/4)": 884, // 18
-  "test (macos-latest, node, 4/4)": 864, // 18
   "own-key cases (macos-aarch64, 3/3)": 854, // retained
   "own-key cases (macos-aarch64, 1/3)": 810, // retained
   "reflect cases (macos-aarch64, 1/3)": 690, // 2 hosted since b59ac914
   "reflect cases (macos-aarch64, 3/3)": 685, // 6 hosted since b59ac914
   "reflect cases (macos-aarch64, 2/3)": 643, // 3 hosted since b59ac914
+  // Derived, not observed: 60 + (516 - 60) * 3.4; see the comment above.
+  "regexp exhaustive cases (macos-aarch64, 1/5)": 1610, // derived
+  "regexp exhaustive cases (macos-aarch64, 2/5)": 1610, // derived
+  "regexp exhaustive cases (macos-aarch64, 3/5)": 1610, // derived
+  "regexp exhaustive cases (macos-aarch64, 4/5)": 1610, // derived
+  "regexp exhaustive cases (macos-aarch64, 5/5)": 1610, // derived
   "test (macos-latest, deno)": 105, // 22
 };
 
@@ -204,6 +254,8 @@ export const hostedUnmeasuredAllowance = 1.5;
  *
  * The trailing comment gives the observation count; a count below eight
  * means the placement sent the job to a hosted lane in some of those runs.
+ * The `regexp exhaustive cases` entries are derived instead, from one
+ * file-shard observation, as `macosJobCosts` explains.
  * Changes to shard contents or hardware require revalidating the affected
  * estimates. U41 replaced the whole table and
  * *docs/evidence/u41/README.md* records what the 18 entries before it were
@@ -247,6 +299,11 @@ export const selfHostedJobSeconds: SelfHostedJobSeconds = {
   "own-key cases (macos-aarch64, 1/3)": 241, // 8
   "own-key cases (macos-aarch64, 3/3)": 205, // 8
   "own-key cases (macos-aarch64, 2/3)": 197, // 8
+  "regexp exhaustive cases (macos-aarch64, 1/5)": 516, // derived
+  "regexp exhaustive cases (macos-aarch64, 2/5)": 516, // derived
+  "regexp exhaustive cases (macos-aarch64, 3/5)": 516, // derived
+  "regexp exhaustive cases (macos-aarch64, 4/5)": 516, // derived
+  "regexp exhaustive cases (macos-aarch64, 5/5)": 516, // derived
 };
 
 /**
@@ -267,6 +324,9 @@ export const selfHostedJobSeconds: SelfHostedJobSeconds = {
  * used that same borrowed ratio to derive their hosted estimates, which
  * U40 then replaced with hosted observations. Their 2.9 is no longer
  * borrowed from either side.
+ *
+ * The `regexp exhaustive cases` ratio is the native support one, because
+ * the only measurement of that work is a native support job's.
  *
  * Every Mac-eligible job has an entry in `selfHostedJobSeconds`, so these
  * ratios reach no job the generator places today. They guard a future
@@ -293,6 +353,7 @@ export const selfHostedFamilySpeedRatios: SelfHostedFamilySpeedRatios = {
   "native support": 3.4,
   "own-key cases": 5.4,
   "reflect cases": 2.6,
+  "regexp exhaustive cases": 3.4,
   native: 3.2,
   test262: 4.3,
   "host C sanitizers": 2.9,
@@ -375,7 +436,9 @@ export const macosFixedSetupSeconds = 60;
  * own-key, and own-key + native fixture were not measured; each uses the
  * family's largest measured factor, 1.41 or 1.45, as a pessimistic
  * stand-in. The generator keeps all own-key shards on one Mac lane, so
- * own-key + own-key cannot occur.
+ * own-key + own-key cannot occur. The `regexp exhaustive cases` family
+ * has no pair measurement; it uses the native support row and column,
+ * because its work ran in that family's jobs until it was case-sharded.
  *
  * The refit raises every pairing that a balanced Mac placement creates in
  * quantity, because U25 overlapped its partners for part of their walls
@@ -401,6 +464,7 @@ export const selfHostedPairSlowdowns: SelfHostedPairSlowdowns = {
     "own-key cases": 1.45,
     native: 1.45,
     "reflect cases": 1.07,
+    "regexp exhaustive cases": 1.27,
   },
   test262: {
     test262: 1.37, // 5.46 h
@@ -408,6 +472,7 @@ export const selfHostedPairSlowdowns: SelfHostedPairSlowdowns = {
     "own-key cases": 1.01,
     native: 1.01,
     "reflect cases": 1.26,
+    "regexp exhaustive cases": 1.23,
   },
   "native support": {
     test262: 1.39, // 4.89 h
@@ -415,6 +480,15 @@ export const selfHostedPairSlowdowns: SelfHostedPairSlowdowns = {
     "own-key cases": 1.05,
     native: 1.05,
     "reflect cases": 1.37,
+    "regexp exhaustive cases": 1.2,
+  },
+  "regexp exhaustive cases": {
+    test262: 1.39,
+    "native support": 1.2,
+    "own-key cases": 1.05,
+    native: 1.05,
+    "reflect cases": 1.37,
+    "regexp exhaustive cases": 1.2,
   },
   "own-key cases": {
     test262: 1.45,
@@ -422,6 +496,7 @@ export const selfHostedPairSlowdowns: SelfHostedPairSlowdowns = {
     "own-key cases": 1.45,
     native: 1.45,
     "reflect cases": 1.45,
+    "regexp exhaustive cases": 1.34,
   },
   native: {
     test262: 1.45, // 1.53 h
@@ -429,5 +504,6 @@ export const selfHostedPairSlowdowns: SelfHostedPairSlowdowns = {
     "own-key cases": 1.41,
     native: 1.41,
     "reflect cases": 1.41,
+    "regexp exhaustive cases": 1.18,
   },
 };

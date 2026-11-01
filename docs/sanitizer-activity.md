@@ -147,10 +147,19 @@ mise run test:sanitizer:property:shard \
   --test-shard=1/12 tests/property/*.property.test.ts
 ~~~~
 
+The macOS CI lane runs the native task as two file shards with
+`--shard N/2`; the first also carries the runtime fixtures, and the `native`
+aggregate requires both. See
+[*macOS native sanitizer split*](evidence/macos-sanitizer-split/README.md).
+
 The full property task remains unsharded. The Linux CI lane runs all three
-shards with `--test-shard=N/3` over _tests/property/\*.property.test.ts_,
-and the `native` aggregate requires the whole matrix. The shard task uses
-ordinary seeds, sizes, and case counts, not the extended property budget.
+shards of `mise run test:sanitizer:property:shared --shard N/3`, which keeps
+Node's `--test-shard=N/3` positions over _tests/property/\*.property.test.ts_
+and drops the files in `dedicatedSanitizerPropertyFiles`. Those files run in
+one dedicated job per host, and the `native` aggregate requires the whole
+matrix and both dedicated jobs. The macOS property job runs the same shared
+task unsharded. Every task uses ordinary seeds, sizes, and case counts, not
+the extended property budget.
 
 The archive reuse key includes the exact resolved compiler path, full version
 output, archiver path, compile flags, target, runtime contents, and captured

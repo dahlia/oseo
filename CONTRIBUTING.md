@@ -418,9 +418,11 @@ a failure and retain it as an ordinary regression fixture before fixing the
 implementation.
 
 CI may set `OSEO_PROPERTY_CASE_SHARD=INDEX/TOTAL` for a dedicated property
-file. Two files have one:
+file. Three files have one:
 *tests/property/m5-object-own-keys.property.test.ts* and
 *tests/property/m5-reflect-namespace.property.test.ts*, each in three
+jobs per native host, and
+*tests/property/m5-regexp-literal-exhaustive.property.test.ts*, in five
 jobs per native host. `caseShardedNativeFiles` in *tools/native-shard.ts*
 is the list, and the file shards exclude every entry. The index is
 one-based. Every shard uses the same seed, replay path,
@@ -442,7 +444,9 @@ results and duration records, then fails if their duration sum on either
 host exceeds the original limit. The Reflect namespace shards do not: that
 file has three property domains and the recorder writes one record per job
 with an exclusive create, so three domains cannot each record without a
-record-format change. Its shards are still required by the aggregate.
+record-format change. Its shards are still required by the aggregate. The
+exhaustive RegExp literal shards record nothing for the same reason, with
+four properties, and the aggregate requires them too.
 An interrupted shard fails independently of any record. The case budget
 and generators do not change. A replay path disables the shard filter and
 keeps the original interrupt limit.
@@ -571,27 +575,62 @@ so every index of a total selects disjoint files from the same complete input
 set.
 
 CI now passes `--exclude-case-sharded` to those file shards and runs each
-file in `caseShardedNativeFiles` in three separate case-shard jobs on each
-native host, six jobs per file. Every one is required by the `native`
-aggregate. Linux file shards also pass `--exclude-dedicated-linux`, which
-removes `dedicatedLinuxNativeFiles` before partitioning. That list contains
+file in `caseShardedNativeFiles` in separate case-shard jobs on each native
+host: three per host for own-key and Reflect, five per host for exhaustive
+RegExp literals. Every one is required by the `native` aggregate. Linux file
+shards also pass `--exclude-dedicated-linux`, which removes
+`dedicatedLinuxNativeFiles` before partitioning. That list contains
 *tests/property/m5-array-constructor.property.test.ts*, run in one required
-Linux job with all 120 extended cases and its unchanged 1,800-second limit.
-The seven Linux file shards partition the remaining files. macOS extended
-file shards omit that flag and still run the Array file once.
+Linux job with all 120 extended cases and its unchanged 1,800-second limit. The
+seven Linux file shards partition the remaining files. macOS extended file
+shards omit that flag and still run the Array file once.
 
 The ordinary macOS Node.js gate uses a separate dedicated hosted
 `macos-latest` job for that same file. It runs all 12 cases with the original
 seed and 180-second interrupt, with one file worker and no time scaling.
 `dedicatedMacosNodeFiles` lists this ordinary exclusion independently of the
-Linux extended one. The four ordinary shards use `test:node:macos:shard`:
-*tools/node-shard.ts* reproduces Node 24's default discovery, removes the
-dedicated file, and passes the remaining files to Node's `--test-shard`.
-The four shards and dedicated job together execute the original inventory
-exactly once. Linux ordinary Node discovery is unchanged. The lane generator
-puts the additional job on one of the existing five hosted macOS lanes;
-`native` requires its result even if an earlier lane job fails. See
+Linux extended one. The lane generator puts the additional job on one of the
+existing five hosted macOS lanes; `native` requires its result even if an
+earlier lane job fails. See
 [*macOS Array placement evidence*](docs/evidence/array-macos/README.md).
+
+The ordinary Node.js gate runs in four Linux and six macOS shards through
+`mise run test:node:shard --shard INDEX/TOTAL`; Windows still runs it
+unsharded through `mise run test:node`. *tools/node-shard.ts* reproduces
+Node 24's default discovery, removes `dedicatedMacosNodeFiles` on macOS
+only, and passes each shard's files to Node without `--test-shard`. The
+shards on each host, with the dedicated macOS job, execute the inventory
+exactly once.
+
+Files are assigned by the weights in *tools/node-shard-costs.ts*: heaviest
+first, ties in path order, each to the shard whose modeled run ends
+earliest with it, ties to the lowest index. The model follows Node's own
+scheduling. Node sorts the files it is given and starts each on the first
+free worker, three on Linux and two on macOS, so a heavy file sorted late
+ends its shard late. A file without a weight weighs the host fallback, the
+median of the measured weights. *tests/node-shard.test.ts* requires every
+modeled shard to finish within 40 minutes including setup.
+
+A new test file that runs for minutes on CI must add its weight on both
+hosts in the same change, or the placement treats it as light. Weights are
+the largest of three CI observations of a file's summed top-level test
+durations. Refresh them when the file set or relative costs change, as
+[*Node shard evidence*](docs/evidence/node-shards/README.md) describes.
+
+The host C sanitizer property jobs exclude the files in
+`dedicatedSanitizerPropertyFiles`, now only
+*tests/property/m5-regexp-literal-exhaustive.property.test.ts*. Each host
+runs them in one dedicated sanitizer job with every ordinary case, seed and
+interrupt limit, and `native` requires both. The shared jobs use
+`test:sanitizer:property:shared`: *tools/sanitizer-property-shard.ts* keeps
+the files Node's `--test-shard` would select from the complete property list
+and only then drops the dedicated ones, so no other file changes shard. The
+shared shards and the dedicated jobs execute the inventory exactly once. On
+macOS the dedicated job chains on the property sanitizer lane and takes no
+extra hosted slot, as the two native sanitizer shards chain on theirs. See
+[*exhaustive RegExp literal evidence*](docs/evidence/regexp-literal-exhaustive/README.md)
+and
+[*macOS native sanitizer split*](docs/evidence/macos-sanitizer-split/README.md).
 
 The local unsharded extended
 task still runs every file with all cases. The Linux singleton rule still

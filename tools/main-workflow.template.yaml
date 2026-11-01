@@ -84,13 +84,69 @@ jobs:
         if: runner.os != 'Windows'
       - run: mise run test:${{ matrix.runtime }}
 
-  # macOS only. The wrapper uses Node's default discovery and removes the
-  # dedicated Array file before Node partitions the rest into four shards.
+  # macOS. The wrapper reproduces Node's default discovery, removes the
+  # dedicated Array file, and assigns the rest to six shards by measured
+  # file weights; see docs/evidence/node-shards/README.md.
   test_node_shard:
     name: >-
       test (macos-latest, node,
       ${{ matrix.shard }}/${{ matrix.total }})
     runs-on: macos-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - shard: 1
+            total: 6
+          - shard: 2
+            total: 6
+          - shard: 3
+            total: 6
+          - shard: 4
+            total: 6
+          - shard: 5
+            total: 6
+          - shard: 6
+            total: 6
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: jdx/mise-action@v4
+        with:
+          install: true
+      - uses: ./.github/actions/runtime-archive-cache
+      - run: >-
+          mise run test:node:shard
+          --shard=${{ matrix.shard }}/${{ matrix.total }}
+
+  # Hosted macos-latest, like the ordinary Node shards. No time scaling.
+  # The generator places this on one of the same five hosted capacity lanes.
+  test_array_constructor_macos:
+    name: Array constructor (macos-latest, node)
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: jdx/mise-action@v4
+        with:
+          install: true
+      - uses: ./.github/actions/runtime-archive-cache
+      - run: >-
+          mise run test:node --test-concurrency=1
+          tests/property/m5-array-constructor.property.test.ts
+
+  # Linux. The same wrapper assigns Node's whole discovery to four shards
+  # by measured file weights. Positional --test-shard left late-sorted
+  # heavy files as tails: run 41238903460 ended shard 2/2 at 56.0 minutes
+  # while 1/2 took 37.4. The weights, the model and its modeled maxima are
+  # in docs/evidence/node-shards/README.md.
+  test_node_shard_linux:
+    name: >-
+      test (ubuntu-latest, node,
+      ${{ matrix.shard }}/${{ matrix.total }})
+    runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix:
@@ -112,57 +168,8 @@ jobs:
           install: true
       - uses: ./.github/actions/runtime-archive-cache
       - run: >-
-          mise run test:node:macos:shard
+          mise run test:node:shard
           --shard=${{ matrix.shard }}/${{ matrix.total }}
-
-  # Hosted macos-latest, like the ordinary Node shards. No time scaling.
-  # The generator places this on one of the same five hosted capacity lanes.
-  test_array_constructor_macos:
-    name: Array constructor (macos-latest, node)
-    runs-on: macos-latest
-    steps:
-      - uses: actions/checkout@v7
-        with:
-          persist-credentials: false
-      - uses: jdx/mise-action@v4
-        with:
-          install: true
-      - uses: ./.github/actions/runtime-archive-cache
-      - run: >-
-          mise run test:node --test-concurrency=1
-          tests/property/m5-array-constructor.property.test.ts
-
-  # Linux only. Over the fifteen runs since b59ac914 the unsharded job
-  # took 24.72 to 49.30 minutes, a per-job runner speed factor rather
-  # than a workload difference: all 1,623 tests scale together and
-  # `mise run test:node` is the only step of consequence, the rest taking
-  # 16 to 23 seconds. It ended run 39206357696 at 48.52 minutes. Node's
-  # own --test-shard partitions the files it discovers, so the union of
-  # the shards equals the unsharded set by construction.
-  test_node_shard_linux:
-    name: >-
-      test (ubuntu-latest, node,
-      ${{ matrix.shard }}/${{ matrix.total }})
-    runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
-      matrix:
-        include:
-          - shard: 1
-            total: 2
-          - shard: 2
-            total: 2
-    steps:
-      - uses: actions/checkout@v7
-        with:
-          persist-credentials: false
-      - uses: jdx/mise-action@v4
-        with:
-          install: true
-      - uses: ./.github/actions/runtime-archive-cache
-      - run: >-
-          mise run test:node
-          --test-shard=${{ matrix.shard }}/${{ matrix.total }}
 
   test_native:
     name: native (${{ matrix.platform.target }}, ${{ matrix.shard }}/3)
@@ -278,10 +285,10 @@ jobs:
           toolchain: host-cc
       # Each shard retains its own instrumentation preflight.
       - run: mise run test:sanitizer:self
+      # Node's positional shards, without the dedicated sanitizer files.
       - run: >-
-          mise run test:sanitizer:property:shard
-          --test-shard=${{ matrix.shard }}/3
-          tests/property/*.property.test.ts
+          mise run test:sanitizer:property:shared
+          --shard ${{ matrix.shard }}/3
       - if: failure() || cancelled()
         uses: actions/upload-artifact@v7
         with:
@@ -289,13 +296,45 @@ jobs:
           path: /tmp/oseo-native-*
           if-no-files-found: warn
 
+  # The dedicated sanitizer property files, left out of the shards above;
+  # see docs/evidence/regexp-literal-exhaustive/README.md. Every case keeps
+  # its ordinary budget and the lane's interrupt scale.
+  test_sanitizer_property_dedicated:
+    name: host C sanitizers (Linux, property, regexp literals)
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: jdx/mise-action@v4
+        with:
+          install: true
+      - uses: ./.github/actions/runtime-archive-cache
+        with:
+          toolchain: host-cc
+      - run: mise run test:sanitizer:self
+      - run: >-
+          mise run test:sanitizer:property:shard
+          tests/property/m5-regexp-literal-exhaustive.property.test.ts
+      - if: failure() || cancelled()
+        uses: actions/upload-artifact@v7
+        with:
+          name: host-cc-sanitizer-property-regexp-literals-failures
+          path: /tmp/oseo-native-*
+          if-no-files-found: warn
+
   test_sanitizer_macos:
-    name: host C sanitizers (macOS, ${{ matrix.suite }})
+    name: host C sanitizers (macOS, ${{ matrix.label }})
     runs-on: macos-15
-    # Each suite retains its own instrumentation preflight. About 36–44
-    # minutes for runtime/native and 29–35 for properties. Run 41191483370
-    # cancelled native at 75.5 minutes on commit 216503f8 and passed its
-    # rerun at 58.9, so native gets 90 and property keeps 75; see
+    # Each job retains its own instrumentation preflight. The native suite
+    # runs as two file shards, with the unsharded runtime fixtures on the
+    # first; see docs/evidence/macos-sanitizer-split/README.md. The listed
+    # dedicated property files run in their own job; see
+    # docs/evidence/regexp-literal-exhaustive/README.md. Run 41191483370
+    # cancelled the unsplit native suite at 75.5 minutes on commit 216503f8
+    # and passed its rerun at 58.9, so each native shard keeps the 90
+    # minutes that suite had and the property jobs keep 75; see
     # docs/sanitizer-activity.md. Each leaves room for setup, cold caches,
     # and slower runner images.
     timeout-minutes: ${{ matrix.timeout }}
@@ -304,8 +343,26 @@ jobs:
       matrix:
         include:
           - suite: native
+            label: native, 1/2
+            part: native-1-of-2
+            runtime: 1
+            shard: 1
+            timeout: 90
+          - suite: native
+            label: native, 2/2
+            part: native-2-of-2
+            runtime: 0
+            shard: 2
             timeout: 90
           - suite: property
+            label: property
+            part: property
+            runtime: 0
+            timeout: 75
+          - suite: property
+            label: property, regexp literals
+            part: property-regexp-literals
+            runtime: 0
             timeout: 75
     env:
       OSEO_HOST_CC: clang
@@ -325,25 +382,35 @@ jobs:
         env:
           TMPDIR: ${{ runner.temp }}
       # No GCC verification: macOS gcc is an Apple Clang alias.
-      - if: matrix.suite == 'native'
+      - if: matrix.runtime == 1
         run: mise run test:sanitizer:runtime
         env:
           TMPDIR: ${{ runner.temp }}
       - if: matrix.suite == 'native'
-        run: mise run test:sanitizer:native
+        run: >-
+          mise run test:sanitizer:native
+          --shard ${{ matrix.shard }}/2
         env:
           TMPDIR: ${{ runner.temp }}
-      - if: matrix.suite == 'property'
-        run: mise run test:sanitizer:property
+      - if: matrix.part == 'property'
+        run: mise run test:sanitizer:property:shared
         env:
           # Four workers share three CPUs. Double Linux's interrupt allowance,
           # retaining every ordinary case and seed; interruptions still fail.
           OSEO_PROPERTY_TIME_SCALE: "6"
           TMPDIR: ${{ runner.temp }}
+      - if: matrix.part == 'property-regexp-literals'
+        run: >-
+          mise run test:sanitizer:property:shard
+          tests/property/m5-regexp-literal-exhaustive.property.test.ts
+        env:
+          # The same allowance as the shared property job on this runner.
+          OSEO_PROPERTY_TIME_SCALE: "6"
+          TMPDIR: ${{ runner.temp }}
       - if: failure() || cancelled()
         uses: actions/upload-artifact@v7
         with:
-          name: host-cc-sanitizer-macos-${{ matrix.suite }}-failures
+          name: host-cc-sanitizer-macos-${{ matrix.part }}-failures
           path: ${{ runner.temp }}/oseo-native-*
           if-no-files-found: warn
 
@@ -713,6 +780,78 @@ jobs:
           path: ${{ runner.temp }}/oseo-native-*
           if-no-files-found: warn
 
+  test_regexp_exhaustive_case:
+    name: >-
+      regexp exhaustive cases (${{ matrix.target }},
+      ${{ matrix.caseShard }}/5)
+    runs-on: ${{ matrix.os }}
+    # Each shard runs two of the ten extended sweeps of every property.
+    # Run 41257794727 measured hosted Linux sweeps of the whole file at a
+    # derived 882 seconds beside three other files, so a shard needs about
+    # 31 minutes with setup, half of this limit. See
+    # docs/evidence/regexp-literal-exhaustive/README.md.
+    timeout-minutes: 60
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-latest
+            target: linux-x86_64-gnu
+            caseShard: 1
+          - os: ubuntu-latest
+            target: linux-x86_64-gnu
+            caseShard: 2
+          - os: ubuntu-latest
+            target: linux-x86_64-gnu
+            caseShard: 3
+          - os: ubuntu-latest
+            target: linux-x86_64-gnu
+            caseShard: 4
+          - os: ubuntu-latest
+            target: linux-x86_64-gnu
+            caseShard: 5
+          - os: macos-15
+            target: macos-aarch64
+            caseShard: 1
+          - os: macos-15
+            target: macos-aarch64
+            caseShard: 2
+          - os: macos-15
+            target: macos-aarch64
+            caseShard: 3
+          - os: macos-15
+            target: macos-aarch64
+            caseShard: 4
+          - os: macos-15
+            target: macos-aarch64
+            caseShard: 5
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: jdx/mise-action@v4
+        with:
+          install: true
+      - uses: ./.github/actions/runtime-archive-cache
+      # No duration record, for the Reflect namespace file's reason: the
+      # file has four properties and the recorder writes one record per
+      # job. Each shard keeps the whole property's interrupt limit and
+      # fails on interruption.
+      - run: >-
+          mise run test:property:extended:native:shard
+          tests/property/m5-regexp-literal-exhaustive.property.test.ts
+        env:
+          OSEO_PROPERTY_CASE_SHARD: ${{ matrix.caseShard }}/5
+          TMPDIR: ${{ runner.temp }}
+      - if: failure() || cancelled()
+        uses: actions/upload-artifact@v7
+        with:
+          name: >-
+            ${{ format('regexp-exhaustive-cases-{0}-{1}-of-5',
+            matrix.target, matrix.caseShard) }}
+          path: ${{ runner.temp }}/oseo-native-*
+          if-no-files-found: warn
+
   test_array_constructor:
     name: Array constructor (linux-x86_64-gnu)
     # Only trusted push/manual runs in dahlia/oseo may use the repository
@@ -757,9 +896,12 @@ jobs:
     needs:
       - test_native
       - test_sanitizer_property
+      - test_sanitizer_property_dedicated
+      - test_sanitizer_macos
       - test_native_support
       - test_property_case
       - test_reflect_case
+      - test_regexp_exhaustive_case
       - test_array_constructor
       - test_array_constructor_macos
       - test_test262

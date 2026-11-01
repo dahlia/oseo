@@ -781,18 +781,6 @@ assessments:
       observe the StatementList value, returned object, or returned function;
       substituting a return statement would not prove Completion Record
       equivalence. No complete replacement is established.
-  ds3-literal-coverage:
-    disposition: remediation
-    normativeDependency: not-demonstrated
-    reason: >-
-      The five remaining DS-3 literal probes retain the strict octal error and
-      the four selected BMP character/source domains, including
-      UnicodeIDContinue fallback, listed in
-      docs/m5c-graph/dynamic-source-unknown-eval-assessment.md. No complete
-      replacement is established for those five contracts; an unknown eval
-      binding diagnostic is not such evidence. The other 18 original literal
-      grammar probes now use ds17-static-literal-grammar and its reviewed
-      static rejection witnesses.
   ds3-import-from-eval:
     disposition: remediation
     normativeDependency: not-demonstrated
@@ -5431,6 +5419,46 @@ assessments:
       tests/regexp-static-grammar.test.ts:
         "6582ae85e7bca86210008bfb7640b9942d58786b2bb32b\
         97d0a9a824c8d960f1"
+  ds17-exhaustive-plain-literals:
+    disposition: exclusion
+    normativeDependency: source-evaluation-only
+    reason: >-
+      Maintainer decision 2026-10-28 item 1, with the 2026-11-01 answer item 2
+      approving exhaustive coverage, applies to S7.8.5_A1.1_T2 and
+      S7.8.5_A2.1_T2. The exhaustive literal property compiles every one of
+      the 65,521 code units each original loop selects as a build-time literal
+      in both strictness modes, and each is accepted with its exact source.
+      Every one then executes natively as a literal whose source the program
+      compares with the original's spelling, on the reference host too. No
+      sample or RegExp constructor substitutes for a literal. Only eval of the
+      literal text remains. Reopen on changed source, observations or
+      replacement evidence, or an ADR 0016 amendment admitting eval; ADR 0019
+      non-source reopening remains in force.
+    replacementEvidence:
+      tests/property/m5-regexp-literal-exhaustive.property.test.ts:
+        "0231397301b0298580bbe87634690f4f279ce3676410d5\
+        50bb3ab68649f669fc"
+  ds17-exhaustive-escaped-annex-b:
+    disposition: exclusion
+    normativeDependency: annex-b-only
+    reason: >-
+      The maintainer decision of 2026-11-01 applies item 3 of the 2026-10-28
+      decision to S7.8.5_A1.4_T2 and S7.8.5_A2.4_T2 and closes both under ADR
+      0013, which is unchanged. Each selects 65,521 escaped code units. The
+      exhaustive literal property witnesses 14,737 accepted with exact source
+      at build time and natively, and 50,782 rejected with the Annex B
+      OSEO1001 diagnostic whose code unit is ID_Continue and passes the
+      original's var _X check, which is the original's SyntaxError fallback.
+      Only U+200C and U+200D need Annex B: Unicode 15.1 made them
+      ID_Continue, so the core grammar rejects their identity escapes, while
+      the originals exempt them from the fallback. No core subject remains;
+      the eval rejection the paths observe stays recorded. Reopen on changed
+      source, observation, or replacement evidence, on an amendment of ADR
+      0013's optional Annex B policy, or on ADR 0019's reopening triggers.
+    replacementEvidence:
+      tests/property/m5-regexp-literal-exhaustive.property.test.ts:
+        "0231397301b0298580bbe87634690f4f279ce3676410d5\
+        50bb3ab68649f669fc"
   residual-exact-completion:
     disposition: exclusion
     normativeDependency: source-evaluation-only
@@ -5574,6 +5602,8 @@ assessments:
       ADR 0016 and ADR 0019 and their reopening triggers remain unchanged. The
       bundle 4 UPDATE promoted S13.2.2_A13.js, and the train C ordinary
       evidence node moved 26 Function-constructor paths to trainc assessments.
+      The train C host Script evidence node then accounted 98 paths under
+      ADR 0016.
   annex-b-ordinary-object-prototype:
     disposition: exclusion
     normativeDependency: annex-b-only
@@ -5656,6 +5686,57 @@ assessments:
       tests/test262/harness/propertyHelper.js:
         "bf9ce5ce4509a5b848cac4c3902e054dec385f1ed86284c0\
         543f5da4949e7c35"
+  host-script-trainc-completion:
+    disposition: exclusion
+    normativeDependency: source-evaluation-only
+    reason: >-
+      Item 1 of the 2026-11-01 umbrella-residual answer applies the DS-21
+      finite literal host Script condition to 98 train C paths: 64
+      completion and binding rows at global Script top level, 28 direct
+      early SyntaxError rows whose callback caller has no reachable local
+      state, and five indirect rows. Each eval call is replaced at its pinned
+      offset by a literal ADR 0029 Script, retaining every original
+      assertion. Completions get strict value/type checks; early errors get
+      exact caller-realm SyntaxError identity and no global effects. Direct
+      strict source receives a directive and void 0; indirect source stays
+      sloppy. Each site's mutation is rejected by its original consumer or
+      the added check, with an error-identity verdict. Both native policies
+      and forced GC observe the same operation. Only the original source
+      evaluation remains excluded under ADR 0016; accounting counts no path
+      as pass. Reopen on changed source, observed rejection or replacement
+      evidence, an accepted source admission, or any uncovered non-source
+      assertion under ADR 0019.
+    replacementEvidence:
+      docs/m5c-graph/dynamic-source-host-script-trainc-evidence.assessment.md:
+        "a191e21285ea733d00f91d2d717430356a92f748e9530f9b\
+        0d0a18d193151df1"
+      tests/native/fixtures/host-script-trainc-cases.ts:
+        "27ef80d272a4d9ed39a8e1091d83e6ff340ffcc8045b7aa0\
+        90b0cda2399de5b0"
+      tests/native/fixtures/host-script-trainc.ts:
+        "80cacb1a95fd173f8b5d5fbcaff2cdfb8a3734136c42d462\
+        baefa28b9f2ac388"
+      tests/host-script-trainc-evidence.ts:
+        "47ffdb769b37f2ac888d517bc8523b9a22a35df11327b400\
+        26de49abe987520f"
+      tests/host-script-trainc-evidence-1.test.ts:
+        "c4c3e794b71efb89ca6d635e4be2656f302f2893afd57aeb\
+        1f14989e72ca8b63"
+      tests/host-script-trainc-evidence-2.test.ts:
+        "5bb296c521ac0cd82fcaf3f8c532284e483990028c5045a8\
+        71f28aee7cedc4c4"
+      tests/host-script-trainc-evidence-3.test.ts:
+        "292eabe309cd3d7c2f60eb1bf39680ff57311989f1fcf4a9\
+        c81463ea44e26dba"
+      tests/host-script-trainc-evidence-4.test.ts:
+        "81f5c192b1d54c35414ec5d72d5f18e16a0cf1ca23fea152\
+        1e7a118fc9aa1dda"
+      tests/host-script-trainc-source.test.ts:
+        "ce9202b76651d3e4d0b3eb1de117322f9de76ddea1c2c05d\
+        556f23993545153d"
+      tests/test262/harness/base.js:
+        "50331feeca513cb2e2354e05e7c68f82d5aeccd9b766d6c8\
+        8438c5ef118075f6"
 paths:
   - path: test/built-ins/AggregateError/newtarget-proto-fallback.js
     proposedOwner: adr:0016-dynamic-source-boundary
@@ -24945,7 +25026,7 @@ paths:
     missingDynamicTag: false
     section: "Original es5id: 7.8.5_A1.1_T2"
     subject: "Complex test with eval, using syntax pattern"
-    assessment: ds3-literal-coverage
+    assessment: ds17-exhaustive-plain-literals
   - path: "test/language/literals/regexp/S7.8.5_A1.3_T2.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "incidental-scaffolding"
@@ -24995,7 +25076,7 @@ paths:
       tested through evaluated source"
     assessment: ds17-static-literal-grammar
   - path: "test/language/literals/regexp/S7.8.5_A1.4_T2.js"
-    proposedOwner: "adr:0016-dynamic-source-boundary"
+    proposedOwner: "adr:0013-m5-edition-and-manifest"
     priorCohort: "incidental-scaffolding"
     sourceDigest: "0de2b7c36d7aeacf749dc1942f2a60301095339842cb3d924d6\
       7d0a55fe96b59"
@@ -25004,7 +25085,7 @@ paths:
     missingDynamicTag: false
     section: "Original es5id: 7.8.5_A1.4_T2"
     subject: "Complex test with eval, using syntax pattern"
-    assessment: ds3-literal-coverage
+    assessment: ds17-exhaustive-escaped-annex-b
   - path: "test/language/literals/regexp/S7.8.5_A1.5_T2.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "incidental-scaffolding"
@@ -25063,7 +25144,7 @@ paths:
     missingDynamicTag: false
     section: "Original es5id: 7.8.5_A2.1_T2"
     subject: "Complex test with eval, using syntax pattern"
-    assessment: ds3-literal-coverage
+    assessment: ds17-exhaustive-plain-literals
   - path: "test/language/literals/regexp/S7.8.5_A2.3_T2.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "incidental-scaffolding"
@@ -25113,7 +25194,7 @@ paths:
       evaluated"
     assessment: ds17-static-literal-grammar
   - path: "test/language/literals/regexp/S7.8.5_A2.4_T2.js"
-    proposedOwner: "adr:0016-dynamic-source-boundary"
+    proposedOwner: "adr:0013-m5-edition-and-manifest"
     priorCohort: "incidental-scaffolding"
     sourceDigest: "a81734f3c0609fa8fb61345a8f917fc6aa6f9ab9dacd82430aa\
       d254a6a23ee4d"
@@ -25122,7 +25203,7 @@ paths:
     missingDynamicTag: false
     section: "Original es5id: 7.8.5_A2.4_T2"
     subject: "Complex test with eval, using syntax pattern"
-    assessment: ds3-literal-coverage
+    assessment: ds17-exhaustive-escaped-annex-b
   - path: "test/language/literals/regexp/S7.8.5_A2.5_T2.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "incidental-scaffolding"
@@ -27755,7 +27836,7 @@ paths:
     missingDynamicTag: false
     section: "Original es5id: 12.6.3_A5"
     subject: 'Using eval "for(eval("i in arr");1;)"'
-    assessment: "observation-train-b26a-b26b-b27"
+    assessment: "host-script-trainc-completion"
   - path: "test/language/statements/for/cptn-decl-expr-iter.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "incidental-scaffolding"
@@ -27767,7 +27848,7 @@ paths:
     section: "Original es6id: 13.7.4.7"
     subject: 'Completion value when head has a declaration and a "test"
       expression and iteration occurs'
-    assessment: "observation-train-b26a-b26b-b27"
+    assessment: "host-script-trainc-completion"
   - path: "test/language/statements/for/cptn-decl-expr-no-iter.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "incidental-scaffolding"
@@ -27779,7 +27860,7 @@ paths:
     section: "Original es6id: 13.7.4.7"
     subject: 'Completion value when head has a declaration and a "test"
       expression and no iteration occurs'
-    assessment: "observation-train-b26a-b26b-b27"
+    assessment: "host-script-trainc-completion"
   - path: "test/language/statements/for/cptn-expr-expr-iter.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "incidental-scaffolding"
@@ -27791,7 +27872,7 @@ paths:
     section: "Original es6id: 13.7.4.7"
     subject: 'Completion value when head has no declaration and a "test"
       expression and iteration occurs'
-    assessment: "observation-train-b26a-b26b-b27"
+    assessment: "host-script-trainc-completion"
   - path: "test/language/statements/for/cptn-expr-expr-no-iter.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "incidental-scaffolding"
@@ -27803,7 +27884,7 @@ paths:
     section: "Original es6id: 13.7.4.7"
     subject: 'Completion value when head has no declaration and a "test"
       expression and no iteration occurs'
-    assessment: "observation-train-b26a-b26b-b27"
+    assessment: "host-script-trainc-completion"
   - path: "test/language/statements/for/head-init-expr-check-empty-inc-empty-co\
       mpletion.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -27815,7 +27896,7 @@ paths:
     missingDynamicTag: false
     section: "Original es5id: 12.6.3_A9.1"
     subject: "Using eval"
-    assessment: "observation-train-b26a-b26b-b27"
+    assessment: "host-script-trainc-completion"
   - path: "test/language/statements/for/head-init-var-check-empty-inc-empty-com\
       pletion.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -27827,7 +27908,7 @@ paths:
     missingDynamicTag: false
     section: "Original es5id: 12.6.3_A9"
     subject: "Using eval"
-    assessment: "observation-train-b26a-b26b-b27"
+    assessment: "host-script-trainc-completion"
   - path: "test/language/statements/for/scope-body-var-none.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "source-subject"
@@ -27900,7 +27981,7 @@ paths:
     section: "Original es5id: 13.0-15-s"
     subject: "Strict Mode - SourceElements is evaluated as strict mode code when
       a FunctionDeclaration is contained in strict mode code within eval code"
-    assessment: "observation-train-b26a-b26b-b27"
+    assessment: "host-script-trainc-completion"
   - path: "test/language/statements/function/13.0-16-s.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "source-subject"
@@ -27912,7 +27993,7 @@ paths:
     section: "Original es5id: 13.0-16-s"
     subject: "Strict Mode - SourceElements is evaluated as strict mode code when
       a FunctionExpression is contained in strict mode code within eval code"
-    assessment: "observation-train-b26a-b26b-b27"
+    assessment: "host-script-trainc-completion"
   - path: "test/language/statements/function/13.0-17-s.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "source-subject"
@@ -27938,7 +28019,7 @@ paths:
     subject: "Strict Mode - SourceElements is evaluated as strict mode code when
       the code of this FunctionDeclaration is contained in non-strict mode but
       the call to eval is a direct call in strict mode code"
-    assessment: "observation-train-b26a-b26b-b27"
+    assessment: "host-script-trainc-completion"
   - path: "test/language/statements/function/13.0-8-s.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "source-subject"
@@ -27951,7 +28032,7 @@ paths:
     subject: "Strict Mode - SourceElements is evaluated as strict mode code when
       the code of this FunctionExpression is contained in non-strict mode but
       the call to eval is a direct call in strict mode code"
-    assessment: "observation-train-b26a-b26b-b27"
+    assessment: "host-script-trainc-completion"
   - path: "test/language/statements/function/13.0_4-17gs.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "source-subject"
@@ -27976,7 +28057,7 @@ paths:
     subject: "Strict Mode - SyntaxError is thrown if the identifier 'arguments'
       appears within a FormalParameterList of a strict mode
       FunctionDeclaration in strict eval code"
-    assessment: "observation-train-b26a-b26b-b27"
+    assessment: "host-script-trainc-completion"
   - path: "test/language/statements/function/13.1-2-s.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "source-subject"
@@ -27989,7 +28070,7 @@ paths:
     subject: "Strict Mode - SyntaxError is thrown if the identifier 'eval'
       appears within a FormalParameterList of a strict mode
       FunctionExpression"
-    assessment: "observation-train-b26a-b26b-b27"
+    assessment: "host-script-trainc-completion"
   - path: "test/language/statements/function/13.1-21-s.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "source-subject"
@@ -28002,7 +28083,7 @@ paths:
     subject: "StrictMode - SyntaxError is thrown if the identifier 'arguments'
       appears within a FormalParameterList of a strict mode FunctionExpression
       in strict eval code"
-    assessment: "observation-train-b26a-b26b-b27"
+    assessment: "host-script-trainc-completion"
   - path: "test/language/statements/function/13.1-22-s.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "source-subject"
@@ -28015,7 +28096,7 @@ paths:
     subject: "StrictMode - SyntaxError is thrown if the identifier 'arguments'
       appears within a FormalParameterList of a strict mode FunctionExpression
       when FuctionBody is strict code"
-    assessment: "observation-train-b26a-b26b-b27"
+    assessment: "host-script-trainc-completion"
   - path: "test/language/statements/function/13.1-23-s.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "source-subject"
@@ -28028,7 +28109,7 @@ paths:
     subject: "Strict Mode - SyntaxError is thrown if a function is created using
       a FunctionDeclaration that is contained in eval strict code and the
       function has two identical parameters"
-    assessment: "observation-train-b26a-b26b-b27"
+    assessment: "host-script-trainc-completion"
   - path: "test/language/statements/function/13.1-25-s.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "source-subject"
@@ -28042,7 +28123,7 @@ paths:
       a FunctionDeclaration that is contained in eval strict code and the
       function has two identical parameters which are separated by a unique
       parameter name"
-    assessment: "observation-train-b26a-b26b-b27"
+    assessment: "host-script-trainc-completion"
   - path: "test/language/statements/function/13.1-27-s.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "source-subject"
@@ -28055,7 +28136,7 @@ paths:
     subject: "Strict Mode - SyntaxError is thrown if a function is created using
       a FunctionDeclaration that is contained in eval strict code and the
       function has three identical parameters"
-    assessment: "observation-train-b26a-b26b-b27"
+    assessment: "host-script-trainc-completion"
   - path: "test/language/statements/function/13.1-29-s.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "source-subject"
@@ -28068,7 +28149,7 @@ paths:
     subject: "Strict Mode - SyntaxError is thrown if a function is created using
       a FunctionExpression that is contained in eval strict code and the
       function has two identical parameters"
-    assessment: "observation-train-b26a-b26b-b27"
+    assessment: "host-script-trainc-completion"
   - path: "test/language/statements/function/13.1-31-s.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "source-subject"
@@ -28082,7 +28163,7 @@ paths:
       a FunctionExpression that is contained in eval strict code and the
       function has two identical parameters, which are separated by a unique
       parameter name"
-    assessment: "observation-train-b26a-b26b-b27"
+    assessment: "host-script-trainc-completion"
   - path: "test/language/statements/function/13.1-33-s.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "source-subject"
@@ -28095,7 +28176,7 @@ paths:
     subject: "Strict Mode - SyntaxError is thrown if function is created using a
       FunctionExpression that is contained in eval strict code and the
       function has three identical parameters"
-    assessment: "observation-train-b26a-b26b-b27"
+    assessment: "host-script-trainc-completion"
   - path: "test/language/statements/function/13.1-39-s.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "source-subject"
@@ -28107,7 +28188,7 @@ paths:
     section: "Original es5id: 13.1-39-s"
     subject: "StrictMode - SyntaxError is thrown if 'arguments' occurs as the
       function name of a FunctionDeclaration in strict eval code"
-    assessment: "observation-train-b26a-b26b-b27"
+    assessment: "host-script-trainc-completion"
   - path: "test/language/statements/function/13.1-4-s.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "source-subject"
@@ -28120,7 +28201,7 @@ paths:
     subject: "Strict Mode - SyntaxError is thrown if the identifier 'arguments'
       appears within a FormalParameterList of a strict mode
       FunctionExpression"
-    assessment: "observation-train-b26a-b26b-b27"
+    assessment: "host-script-trainc-completion"
   - path: "test/language/statements/function/13.1-41-s.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "source-subject"
@@ -28132,7 +28213,7 @@ paths:
     section: "Original es5id: 13.1-41-s"
     subject: "StrictMode - SyntaxError is thrown if 'arguments' occurs as the
       Identifier of a FunctionExpression in strict eval code"
-    assessment: "observation-train-b26a-b26b-b27"
+    assessment: "host-script-trainc-completion"
   - path: "test/language/statements/function/13.2-10-s.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "incidental-scaffolding"
@@ -28371,7 +28452,7 @@ paths:
     missingDynamicTag: false
     section: "Original es5id: 13_A14"
     subject: "Defining function name with unicode symbols"
-    assessment: "observation-train-b26a-b26b-b27"
+    assessment: "host-script-trainc-completion"
   - path: "test/language/statements/function/cptn-decl.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "incidental-scaffolding"
@@ -28382,7 +28463,7 @@ paths:
     missingDynamicTag: false
     section: "sec-function-definitions-runtime-semantics-evaluation"
     subject: "Function declaration completion value is empty."
-    assessment: "observation-train-b26a-b26b-b27"
+    assessment: "host-script-trainc-completion"
   - path: "test/language/statements/function/eval-var-scope-syntax-err.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "source-subject"
@@ -28407,7 +28488,7 @@ paths:
     section: "Original es5id: 13.1-35-s"
     subject: "StrictMode - SyntaxError is thrown if 'eval' occurs as the
       function name of a FunctionDeclaration in strict eval code"
-    assessment: "observation-train-b26a-b26b-b27"
+    assessment: "host-script-trainc-completion"
   - path: "test/language/statements/function/name-unicode.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "incidental-scaffolding"
@@ -28418,7 +28499,7 @@ paths:
     missingDynamicTag: false
     section: "Original es5id: 13_A14"
     subject: "Defining function name with unicode symbols"
-    assessment: "observation-train-b26a-b26b-b27"
+    assessment: "host-script-trainc-completion"
   - path: "test/language/statements/function/param-eval-stricteval.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "source-subject"
@@ -28431,7 +28512,7 @@ paths:
     subject: "Strict Mode - SyntaxError is thrown if the identifier 'eval'
       appears within a FormalParameterList of a strict mode
       FunctionDeclaration in strict eval code"
-    assessment: "observation-train-b26a-b26b-b27"
+    assessment: "host-script-trainc-completion"
   - path: "test/language/statements/function/scope-body-lex-distinct.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "source-subject"
@@ -28498,7 +28579,7 @@ paths:
     missingDynamicTag: false
     section: "sec-statement-semantics-runtime-semantics-evaluation"
     subject: "Generator declaration completion value is empty."
-    assessment: "observation-train-b26a-b26b-b27"
+    assessment: "host-script-trainc-completion"
   - path: "test/language/statements/generators/eval-var-scope-syntax-err.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "source-subject"
@@ -28580,7 +28661,7 @@ paths:
     missingDynamicTag: false
     section: "Original es5id: 12.5_A2"
     subject: 'Checking by using eval "eval("true")"'
-    assessment: "observation-train-b26a-b26b-b27"
+    assessment: "host-script-trainc-completion"
   - path: "test/language/statements/if/cptn-else-false-abrupt-empty.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "incidental-scaffolding"
@@ -28592,7 +28673,7 @@ paths:
     section: "sec-if-statement-runtime-semantics-evaluation"
     subject: "Completion value when expression is false with an `else` clause
       and body returns an empty abrupt completion"
-    assessment: "observation-train-b26a-b26b-b27"
+    assessment: "host-script-trainc-completion"
   - path: "test/language/statements/if/cptn-else-false-nrml.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "incidental-scaffolding"
@@ -28604,7 +28685,7 @@ paths:
     section: "Original es6id: 13.6.7"
     subject: "Completion value when expression is false with an `else` clause
       and body returns a normal completion"
-    assessment: "observation-train-b26a-b26b-b27"
+    assessment: "host-script-trainc-completion"
   - path: "test/language/statements/if/cptn-else-true-abrupt-empty.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "incidental-scaffolding"
@@ -28616,7 +28697,7 @@ paths:
     section: "sec-if-statement-runtime-semantics-evaluation"
     subject: "Completion value when expression is true with an `else` clause and
       body returns an abrupt completion"
-    assessment: "observation-train-b26a-b26b-b27"
+    assessment: "host-script-trainc-completion"
   - path: "test/language/statements/if/cptn-else-true-nrml.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "incidental-scaffolding"
@@ -28628,7 +28709,7 @@ paths:
     section: "Original es6id: 13.6.7"
     subject: "Completion value when expression is true with an `else` clause and
       body returns a normal completion"
-    assessment: "observation-train-b26a-b26b-b27"
+    assessment: "host-script-trainc-completion"
   - path: "test/language/statements/if/cptn-empty-statement.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "incidental-scaffolding"
@@ -28639,7 +28720,7 @@ paths:
     missingDynamicTag: false
     section: "Original es5id: 12.5_A7"
     subject: 'Checking by using eval "eval("if(1);"))"'
-    assessment: "observation-train-b26a-b26b-b27"
+    assessment: "host-script-trainc-completion"
   - path: "test/language/statements/if/cptn-no-else-false.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "incidental-scaffolding"
@@ -28651,7 +28732,7 @@ paths:
     section: "Original es6id: 13.6.7"
     subject: "Completion value when expression is false without an `else` c\
       lause"
-    assessment: "observation-train-b26a-b26b-b27"
+    assessment: "host-script-trainc-completion"
   - path: "test/language/statements/if/cptn-no-else-true-abrupt-empty.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "incidental-scaffolding"
@@ -28663,7 +28744,7 @@ paths:
     section: "sec-if-statement-runtime-semantics-evaluation"
     subject: "Completion value when expression is true without an `else` clause
       and body returns an empty abrupt completion"
-    assessment: "observation-train-b26a-b26b-b27"
+    assessment: "host-script-trainc-completion"
   - path: "test/language/statements/if/cptn-no-else-true-nrml.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "incidental-scaffolding"
@@ -28675,7 +28756,7 @@ paths:
     section: "Original es6id: 13.6.7"
     subject: "Completion value when expression is true without an `else` clause
       and body returns a normal completion."
-    assessment: "observation-train-b26a-b26b-b27"
+    assessment: "host-script-trainc-completion"
   - path: "test/language/statements/labeled/cptn-break.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "incidental-scaffolding"
@@ -28686,7 +28767,7 @@ paths:
     missingDynamicTag: false
     section: "sec-labelled-statements-runtime-semantics-labelledevaluation"
     subject: 'Completion value when LabelledItem returns a "break" completion'
-    assessment: "observation-train-b26a-b26b-b27"
+    assessment: "host-script-trainc-completion"
   - path: "test/language/statements/labeled/cptn-nrml.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "incidental-scaffolding"
@@ -28697,7 +28778,7 @@ paths:
     missingDynamicTag: false
     section: "sec-labelled-statements-runtime-semantics-labelledevaluation"
     subject: "Completion value when LabelledItem returns normally"
-    assessment: "observation-train-b26a-b26b-b27"
+    assessment: "host-script-trainc-completion"
   - path: "test/language/statements/let/cptn-value.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "incidental-scaffolding"
@@ -28708,7 +28789,7 @@ paths:
     missingDynamicTag: false
     section: "sec-let-and-const-declarations-runtime-semantics-evaluation"
     subject: "Returns an empty completion"
-    assessment: "observation-train-b26a-b26b-b27"
+    assessment: "host-script-trainc-completion"
   - path: "test/language/statements/switch/cptn-a-abrupt-empty.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "incidental-scaffolding"
@@ -28720,7 +28801,7 @@ paths:
     section: "Original es6id: 13.12.11"
     subject: "Completion value when the matching case is exited via an empty
       abrupt completion"
-    assessment: "observation-train-b26a-b26b-b27"
+    assessment: "host-script-trainc-completion"
   - path: "test/language/statements/switch/cptn-a-fall-thru-abrupt-empty.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "incidental-scaffolding"
@@ -28732,7 +28813,7 @@ paths:
     section: "Original es6id: 13.12.11"
     subject: "Completion value when execution continues through multiple cases
       and ends with an empty abrupt completion"
-    assessment: "observation-train-b26a-b26b-b27"
+    assessment: "host-script-trainc-completion"
   - path: "test/language/statements/switch/cptn-a-fall-thru-nrml.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "incidental-scaffolding"
@@ -28744,7 +28825,7 @@ paths:
     section: "Original es6id: 13.12.11"
     subject: "Completion value when execution continues through multiple cases
       and ends with a normal completion"
-    assessment: "observation-train-b26a-b26b-b27"
+    assessment: "host-script-trainc-completion"
   - path: "test/language/statements/switch/cptn-abrupt-empty.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "incidental-scaffolding"
@@ -28755,7 +28836,7 @@ paths:
     missingDynamicTag: false
     section: "Original es6id: 13.12.11"
     subject: "Completion value when case block is empty"
-    assessment: "observation-train-b26a-b26b-b27"
+    assessment: "host-script-trainc-completion"
   - path: "test/language/statements/switch/cptn-b-abrupt-empty.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "incidental-scaffolding"
@@ -28767,7 +28848,7 @@ paths:
     section: "Original es6id: 13.12.11"
     subject: "Completion value when the matching case is exited via an empty
       abrupt completion"
-    assessment: "observation-train-b26a-b26b-b27"
+    assessment: "host-script-trainc-completion"
   - path: "test/language/statements/switch/cptn-b-fall-thru-abrupt-empty.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "incidental-scaffolding"
@@ -28779,7 +28860,7 @@ paths:
     section: "Original es6id: 13.12.11"
     subject: "Completion value when execution continues through multiple cases
       and ends with an empty abrupt completion"
-    assessment: "observation-train-b26a-b26b-b27"
+    assessment: "host-script-trainc-completion"
   - path: "test/language/statements/switch/cptn-b-fall-thru-nrml.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "incidental-scaffolding"
@@ -28791,7 +28872,7 @@ paths:
     section: "Original es6id: 13.12.11"
     subject: "Completion value when execution continues through multiple cases
       and ends with a normal completion"
-    assessment: "observation-train-b26a-b26b-b27"
+    assessment: "host-script-trainc-completion"
   - path: "test/language/statements/switch/cptn-b-final.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "incidental-scaffolding"
@@ -28802,7 +28883,7 @@ paths:
     missingDynamicTag: false
     section: "Original es6id: 13.12.11"
     subject: "Completion value when the final case matches"
-    assessment: "observation-train-b26a-b26b-b27"
+    assessment: "host-script-trainc-completion"
   - path: "test/language/statements/switch/cptn-dflt-abrupt-empty.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "incidental-scaffolding"
@@ -28814,7 +28895,7 @@ paths:
     section: "Original es6id: 13.12.11"
     subject: "Completion value when the default case is exited via an empty
       abrupt completion"
-    assessment: "observation-train-b26a-b26b-b27"
+    assessment: "host-script-trainc-completion"
   - path: "test/language/statements/switch/cptn-dflt-b-abrupt-empty.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "incidental-scaffolding"
@@ -28826,7 +28907,7 @@ paths:
     section: "Original es6id: 13.12.11"
     subject: "Completion value when the matching case is exited via an empty
       abrupt completion"
-    assessment: "observation-train-b26a-b26b-b27"
+    assessment: "host-script-trainc-completion"
   - path: "test/language/statements/switch/cptn-dflt-b-fall-thru-abrupt-emp\
       ty.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -28839,7 +28920,7 @@ paths:
     section: "Original es6id: 13.12.11"
     subject: "Completion value when execution continues through multiple cases
       and ends with an empty abrupt completion"
-    assessment: "observation-train-b26a-b26b-b27"
+    assessment: "host-script-trainc-completion"
   - path: "test/language/statements/switch/cptn-dflt-b-fall-thru-nrml.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "incidental-scaffolding"
@@ -28851,7 +28932,7 @@ paths:
     section: "Original es6id: 13.12.11"
     subject: "Completion value when execution continues through multiple cases
       and ends with a normal completion"
-    assessment: "observation-train-b26a-b26b-b27"
+    assessment: "host-script-trainc-completion"
   - path: "test/language/statements/switch/cptn-dflt-b-final.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "incidental-scaffolding"
@@ -28862,7 +28943,7 @@ paths:
     missingDynamicTag: false
     section: "Original es6id: 13.12.11"
     subject: "Completion value when the final case matches"
-    assessment: "observation-train-b26a-b26b-b27"
+    assessment: "host-script-trainc-completion"
   - path: "test/language/statements/switch/cptn-dflt-fall-thru-abrupt-empty.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "incidental-scaffolding"
@@ -28874,7 +28955,7 @@ paths:
     section: "Original es6id: 13.12.11"
     subject: "Completion value when execution continues through multiple cases
       and ends with an empty abrupt completion in the default case"
-    assessment: "observation-train-b26a-b26b-b27"
+    assessment: "host-script-trainc-completion"
   - path: "test/language/statements/switch/cptn-dflt-fall-thru-nrml.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "incidental-scaffolding"
@@ -28886,7 +28967,7 @@ paths:
     section: "Original es6id: 13.12.11"
     subject: "Completion value when execution continues through multiple cases
       and ends with a normal completion in the default case"
-    assessment: "observation-train-b26a-b26b-b27"
+    assessment: "host-script-trainc-completion"
   - path: "test/language/statements/switch/cptn-dflt-final.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "incidental-scaffolding"
@@ -28897,7 +28978,7 @@ paths:
     missingDynamicTag: false
     section: "Original es6id: 13.12.11"
     subject: "Completion value when the default case matches and is final"
-    assessment: "observation-train-b26a-b26b-b27"
+    assessment: "host-script-trainc-completion"
   - path: "test/language/statements/switch/cptn-no-dflt-match-abrupt-empty.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "incidental-scaffolding"
@@ -28909,7 +28990,7 @@ paths:
     section: "Original es6id: 13.12.11"
     subject: "Completion value when the matching case is exited via an empty
       abrupt completion"
-    assessment: "observation-train-b26a-b26b-b27"
+    assessment: "host-script-trainc-completion"
   - path: "test/language/statements/switch/cptn-no-dflt-match-fall-thru-abrupt-\
       empty.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -28922,7 +29003,7 @@ paths:
     section: "Original es6id: 13.12.11"
     subject: "Completion value when execution continues through multiple cases
       and ends with an empty abrupt completion"
-    assessment: "observation-train-b26a-b26b-b27"
+    assessment: "host-script-trainc-completion"
   - path: "test/language/statements/switch/cptn-no-dflt-match-fall-thru-nrml.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "incidental-scaffolding"
@@ -28934,7 +29015,7 @@ paths:
     section: "Original es6id: 13.12.11"
     subject: "Completion value when execution continues through multiple cases
       and ends with a normal completion"
-    assessment: "observation-train-b26a-b26b-b27"
+    assessment: "host-script-trainc-completion"
   - path: "test/language/statements/switch/cptn-no-dflt-match-final.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "incidental-scaffolding"
@@ -28945,7 +29026,7 @@ paths:
     missingDynamicTag: false
     section: "Original es6id: 13.12.11"
     subject: "Completion value when only the final case matches"
-    assessment: "observation-train-b26a-b26b-b27"
+    assessment: "host-script-trainc-completion"
   - path: "test/language/statements/switch/cptn-no-dflt-no-match.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "incidental-scaffolding"
@@ -28956,7 +29037,7 @@ paths:
     missingDynamicTag: false
     section: "Original es6id: 13.12.11"
     subject: "Completion value when no cases match"
-    assessment: "observation-train-b26a-b26b-b27"
+    assessment: "host-script-trainc-completion"
   - path: "test/language/statements/switch/scope-var-none-case.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "source-subject"
@@ -28992,7 +29073,7 @@ paths:
     subject: "It is a SyntaxError if a CatchParameter occurs within strict mode
       code and BoundNames of CatchParameter contains either eval or arguments
       (13.15.1)."
-    assessment: "observation-train-b26a-b26b-b27"
+    assessment: "host-script-trainc-completion"
   - path: "test/language/statements/try/catch-parameter-boundnames-restriction-\
       eval-eval-throws.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -29006,7 +29087,7 @@ paths:
     subject: "It is a SyntaxError if a CatchParameter occurs within strict mode
       code and BoundNames of CatchParameter contains either eval or arguments
       (13.15.1)."
-    assessment: "observation-train-b26a-b26b-b27"
+    assessment: "host-script-trainc-completion"
   - path: "test/language/statements/try/completion-values.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "incidental-scaffolding"
@@ -29017,7 +29098,7 @@ paths:
     missingDynamicTag: false
     section: "sec-try-statement-runtime-semantics-evaluation"
     subject: "Direct eval try/catch/finally for completion value"
-    assessment: "observation-train-b26a-b26b-b27"
+    assessment: "host-script-trainc-completion"
   - path: "test/language/statements/try/cptn-catch-empty-break.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "incidental-scaffolding"
@@ -29028,7 +29109,7 @@ paths:
     missingDynamicTag: false
     section: "sec-try-statement-runtime-semantics-evaluation"
     subject: "Abrupt completion from catch block calls UpdatEmpty()"
-    assessment: "observation-train-b26a-b26b-b27"
+    assessment: "host-script-trainc-completion"
   - path: "test/language/statements/try/cptn-catch-empty-continue.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "incidental-scaffolding"
@@ -29039,7 +29120,7 @@ paths:
     missingDynamicTag: false
     section: "sec-try-statement-runtime-semantics-evaluation"
     subject: "Abrupt completion from catch block calls UpdatEmpty()"
-    assessment: "observation-train-b26a-b26b-b27"
+    assessment: "host-script-trainc-completion"
   - path: "test/language/statements/try/cptn-catch-finally-empty-break.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "incidental-scaffolding"
@@ -29050,7 +29131,7 @@ paths:
     missingDynamicTag: false
     section: "sec-try-statement-runtime-semantics-evaluation"
     subject: "Abrupt completion from finally block calls UpdatEmpty()"
-    assessment: "observation-train-b26a-b26b-b27"
+    assessment: "host-script-trainc-completion"
   - path: "test/language/statements/try/cptn-catch-finally-empty-continue.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "incidental-scaffolding"
@@ -29061,7 +29142,7 @@ paths:
     missingDynamicTag: false
     section: "sec-try-statement-runtime-semantics-evaluation"
     subject: "Abrupt completion from finally block calls UpdatEmpty()"
-    assessment: "observation-train-b26a-b26b-b27"
+    assessment: "host-script-trainc-completion"
   - path: "test/language/statements/try/cptn-catch.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "incidental-scaffolding"
@@ -29072,7 +29153,7 @@ paths:
     missingDynamicTag: false
     section: "Original es6id: 13.15.8"
     subject: "Completion value from `catch` clause of a try..catch statement"
-    assessment: "observation-train-b26a-b26b-b27"
+    assessment: "host-script-trainc-completion"
   - path: "test/language/statements/try/cptn-finally-empty-break.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "incidental-scaffolding"
@@ -29083,7 +29164,7 @@ paths:
     missingDynamicTag: false
     section: "sec-try-statement-runtime-semantics-evaluation"
     subject: "Abrupt completion from finally block calls UpdatEmpty()"
-    assessment: "observation-train-b26a-b26b-b27"
+    assessment: "host-script-trainc-completion"
   - path: "test/language/statements/try/cptn-finally-empty-continue.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "incidental-scaffolding"
@@ -29094,7 +29175,7 @@ paths:
     missingDynamicTag: false
     section: "sec-try-statement-runtime-semantics-evaluation"
     subject: "Abrupt completion from finally block calls UpdatEmpty()"
-    assessment: "observation-train-b26a-b26b-b27"
+    assessment: "host-script-trainc-completion"
   - path: "test/language/statements/try/cptn-finally-from-catch.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "incidental-scaffolding"
@@ -29106,7 +29187,7 @@ paths:
     section: "Original es6id: 13.15.8"
     subject: "Completion value from `finally` clause of a try..catch..finally
       statement (following execution of `catch` block)"
-    assessment: "observation-train-b26a-b26b-b27"
+    assessment: "host-script-trainc-completion"
   - path: "test/language/statements/try/cptn-finally-skip-catch.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "incidental-scaffolding"
@@ -29118,7 +29199,7 @@ paths:
     section: "Original es6id: 13.15.8"
     subject: "Completion value from `finally` clause of a try..catch..finally
       statement (when `catch` block is not executed)"
-    assessment: "observation-train-b26a-b26b-b27"
+    assessment: "host-script-trainc-completion"
   - path: "test/language/statements/try/cptn-finally-wo-catch.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "incidental-scaffolding"
@@ -29130,7 +29211,7 @@ paths:
     section: "Original es6id: 13.15.8"
     subject: "Completion value from `finally` clause of a try..finally stat\
       ement"
-    assessment: "observation-train-b26a-b26b-b27"
+    assessment: "host-script-trainc-completion"
   - path: "test/language/statements/try/cptn-try.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "incidental-scaffolding"
@@ -29141,7 +29222,7 @@ paths:
     missingDynamicTag: false
     section: "Original es6id: 13.15.8"
     subject: "Completion value from `try` clause of a try..catch statement"
-    assessment: "observation-train-b26a-b26b-b27"
+    assessment: "host-script-trainc-completion"
   - path: test/language/statements/try/scope-catch-param-var-none.js
     proposedOwner: adr:0016-dynamic-source-boundary
     priorCohort: source-subject
@@ -29165,7 +29246,7 @@ paths:
     section: "Original es5id: 12.2.1-10-s"
     subject: "Strict Mode: an indirect eval assigning into 'eval' does not \
       throw"
-    assessment: "observation-train-b26a-b26b-b27"
+    assessment: "host-script-trainc-completion"
   - path: "test/language/statements/variable/12.2.1-11.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "source-subject"
@@ -29213,7 +29294,7 @@ paths:
     section: "Original es5id: 12.2.1-18-s"
     subject: "A direct eval declaring a var named 'arguments' throws SyntaxError
       in strict mode"
-    assessment: "observation-train-b26a-b26b-b27"
+    assessment: "host-script-trainc-completion"
   - path: "test/language/statements/variable/12.2.1-19-s.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "source-subject"
@@ -29225,7 +29306,7 @@ paths:
     section: "Original es5id: 12.2.1-19-s"
     subject: "A direct eval assigning into 'arguments' throws SyntaxError in
       strict mode"
-    assessment: "observation-train-b26a-b26b-b27"
+    assessment: "host-script-trainc-completion"
   - path: "test/language/statements/variable/12.2.1-2-s.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "source-subject"
@@ -29237,7 +29318,7 @@ paths:
     section: "Original es5id: 12.2.1-2-s"
     subject: "eval - a function assigning into 'eval' throws SyntaxError in
       strict mode"
-    assessment: "observation-train-b26a-b26b-b27"
+    assessment: "host-script-trainc-completion"
   - path: "test/language/statements/variable/12.2.1-20-s.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "source-subject"
@@ -29249,7 +29330,7 @@ paths:
     section: "Original es5id: 12.2.1-20-s"
     subject: "Strict Mode: an indirect eval declaring a var named 'arguments'
       does not throw"
-    assessment: "observation-train-b26a-b26b-b27"
+    assessment: "host-script-trainc-completion"
   - path: "test/language/statements/variable/12.2.1-21-s.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "source-subject"
@@ -29261,7 +29342,7 @@ paths:
     section: "Original es5id: 12.2.1-21-s"
     subject: "Strict Mode: an indirect eval assigning into 'arguments' doe\
       s not throw"
-    assessment: "observation-train-b26a-b26b-b27"
+    assessment: "host-script-trainc-completion"
   - path: "test/language/statements/variable/12.2.1-22-s.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "source-subject"
@@ -29273,7 +29354,7 @@ paths:
     section: "Original es5id: 12.2.1-22-s"
     subject: "arguments as global var identifier throws SyntaxError in stri\
       ct mode"
-    assessment: "observation-train-b26a-b26b-b27"
+    assessment: "host-script-trainc-completion"
   - path: "test/language/statements/variable/12.2.1-3-s.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "source-subject"
@@ -29285,7 +29366,7 @@ paths:
     section: "Original es5id: 12.2.1-3-s"
     subject: "eval - a function expr declaring a var named 'eval' throws
       SyntaxError in strict mode"
-    assessment: "observation-train-b26a-b26b-b27"
+    assessment: "host-script-trainc-completion"
   - path: "test/language/statements/variable/12.2.1-4-s.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "source-subject"
@@ -29297,7 +29378,7 @@ paths:
     section: "Original es5id: 12.2.1-4-s"
     subject: "eval - a function expr assigning into 'eval' throws a SyntaxError
       in strict mode"
-    assessment: "observation-train-b26a-b26b-b27"
+    assessment: "host-script-trainc-completion"
   - path: "test/language/statements/variable/12.2.1-5-s.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "source-subject"
@@ -29333,7 +29414,7 @@ paths:
     section: "Original es5id: 12.2.1-7-s"
     subject: "eval - a direct eval declaring a var named 'eval' throws
       SyntaxError in strict mode"
-    assessment: "observation-train-b26a-b26b-b27"
+    assessment: "host-script-trainc-completion"
   - path: "test/language/statements/variable/12.2.1-8-s.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "source-subject"
@@ -29345,7 +29426,7 @@ paths:
     section: "Original es5id: 12.2.1-8-s"
     subject: "eval - a direct eval assigning into 'eval' throws SyntaxError in
       strict mode"
-    assessment: "observation-train-b26a-b26b-b27"
+    assessment: "host-script-trainc-completion"
   - path: "test/language/statements/variable/12.2.1-9-s.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "source-subject"
@@ -29356,7 +29437,7 @@ paths:
     missingDynamicTag: false
     section: "Original es5id: 12.2.1-9-s"
     subject: "an indirect eval declaring a var named 'eval' does not throw"
-    assessment: "observation-train-b26a-b26b-b27"
+    assessment: "host-script-trainc-completion"
   - path: "test/language/statements/variable/S12.2_A5.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "source-subject"
@@ -29367,7 +29448,7 @@ paths:
     missingDynamicTag: false
     section: "Original es5id: 12.2_A5"
     subject: 'Executing eval("var x")'
-    assessment: "observation-train-b26a-b26b-b27"
+    assessment: "host-script-trainc-completion"
   - path: "test/language/statements/variable/cptn-value.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "incidental-scaffolding"
@@ -29378,7 +29459,7 @@ paths:
     missingDynamicTag: false
     section: "sec-variable-statement-runtime-semantics-evaluation"
     subject: "Returns an empty completion"
-    assessment: "observation-train-b26a-b26b-b27"
+    assessment: "host-script-trainc-completion"
   - path: "test/language/statements/while/S12.6.2_A3.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "incidental-scaffolding"
@@ -29389,7 +29470,7 @@ paths:
     missingDynamicTag: false
     section: "Original es5id: 12.6.2_A3"
     subject: "Using eval"
-    assessment: "observation-train-b26a-b26b-b27"
+    assessment: "host-script-trainc-completion"
   - path: "test/language/statements/while/S12.6.2_A5.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "incidental-scaffolding"
@@ -29400,7 +29481,7 @@ paths:
     missingDynamicTag: false
     section: "Original es5id: 12.6.2_A5"
     subject: "Using eval"
-    assessment: "observation-train-b26a-b26b-b27"
+    assessment: "host-script-trainc-completion"
   - path: "test/language/statements/while/S12.6.2_A7.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "incidental-scaffolding"
@@ -29411,7 +29492,7 @@ paths:
     missingDynamicTag: false
     section: "Original es5id: 12.6.2_A7"
     subject: "using eval"
-    assessment: "observation-train-b26a-b26b-b27"
+    assessment: "host-script-trainc-completion"
   - path: "test/language/statements/while/S12.6.2_A8.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "incidental-scaffolding"
@@ -29422,7 +29503,7 @@ paths:
     missingDynamicTag: false
     section: "Original es5id: 12.6.2_A8"
     subject: "using eval"
-    assessment: "observation-train-b26a-b26b-b27"
+    assessment: "host-script-trainc-completion"
   - path: "test/language/statements/while/cptn-abrupt-empty.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "incidental-scaffolding"
@@ -29434,7 +29515,7 @@ paths:
     section: "Original es6id: 13.7.3.6"
     subject: "Completion value when iteration completes due to an empty abrupt
       completion"
-    assessment: "observation-train-b26a-b26b-b27"
+    assessment: "host-script-trainc-completion"
   - path: "test/language/statements/while/cptn-iter.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "incidental-scaffolding"
@@ -29445,7 +29526,7 @@ paths:
     missingDynamicTag: false
     section: "Original es6id: 13.7.3.6"
     subject: "Completion value when iteration completes due to expression value"
-    assessment: "observation-train-b26a-b26b-b27"
+    assessment: "host-script-trainc-completion"
   - path: "test/language/statements/while/cptn-no-iter.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "incidental-scaffolding"
@@ -29456,7 +29537,7 @@ paths:
     missingDynamicTag: false
     section: "Original es6id: 13.7.3.6"
     subject: "Completion value when no iteration occurs"
-    assessment: "observation-train-b26a-b26b-b27"
+    assessment: "host-script-trainc-completion"
   - path: "test/language/statements/with/12.10.1-10-s.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "incidental-scaffolding"
