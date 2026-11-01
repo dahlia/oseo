@@ -7,7 +7,7 @@ suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
 inventoryPaths: 41091
 closedPaths: 39179
 openPaths: 1912
-deferredPaths: 0
+deferredPaths: 26
 states:
   expected-negative: 4401
   harness-failure: 0
@@ -210,6 +210,13 @@ owners:
       five paths that also call eval or Function are not owned by ADR
       0016, which this record does not broaden; 23 paths.
     paths: 23
+  deferred:
+    note: Reviewed unsupported paths named in
+      docs/m5c-closure/deferrals.yaml under ADR 0031. Each entry gives
+      the reason, the remaining contract, and the milestone after M5
+      that inherits the path. They stay open and are counted neither as
+      closed nor as excluded.
+    paths: 26
   node:class-private-accessor-lookup-coverage-remediation:
     note: Observation-batch-11 admits the two class-elements tests that call
       Object.prototype.__lookupGetter__ or __lookupSetter__ before their
@@ -358,8 +365,12 @@ owners:
       observation-batch-26b.md and observation-batch-27.md.
       Dynamic-source-regexp-exhaustive moves the four DS-17 exhaustive
       BMP literal paths out: two to ADR 0016 and two escaped ones, whose
-      ZWNJ and ZWJ assertions only Annex B meets, to ADR 0013."
-    paths: 162
+      ZWNJ and ZWJ assertions only Annex B meets, to ADR 0013.
+      M5c-deferral-ledger-checker moves 26 paths to the deferred owner
+      under ADR 0031: the 20 static-specifier import rows and six rows
+      that only run-time eval or Function source observes, including
+      both variable-environment probes."
+    paths: 136
   observation:
     note: Closed by a reviewed pass or expected negative in the manifest.
       The owner changes only when a regenerated manifest changes the
@@ -25769,7 +25780,7 @@ paths:
   test/language/expressions/class/subclass-builtins/subclass-EvalError.js: [pass, observation]
   test/language/expressions/class/subclass-builtins/subclass-Float32Array.js: [pass, observation]
   test/language/expressions/class/subclass-builtins/subclass-Float64Array.js: [pass, observation]
-  test/language/expressions/class/subclass-builtins/subclass-Function.js: [unsupported-profile-feature, node:dynamic-source-coverage-remediation, [classes, dynamic-source]]
+  test/language/expressions/class/subclass-builtins/subclass-Function.js: [unsupported-profile-feature, deferred, [classes, dynamic-source]]
   test/language/expressions/class/subclass-builtins/subclass-Int16Array.js: [pass, observation]
   test/language/expressions/class/subclass-builtins/subclass-Int32Array.js: [pass, observation]
   test/language/expressions/class/subclass-builtins/subclass-Int8Array.js: [pass, observation]
@@ -26612,9 +26623,9 @@ paths:
   test/language/expressions/dynamic-import/eval-export-dflt-expr-gen-anon.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [dynamic-source, functions, generators, module-linking, object-properties, promise-settlement]]
   test/language/expressions/dynamic-import/eval-export-dflt-expr-gen-named.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [dynamic-source, functions, generators, module-linking, object-properties, promise-settlement]]
   test/language/expressions/dynamic-import/eval-export-dflt-expr-in.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [dynamic-source, expression-operators, functions, module-linking, object-literals, object-properties, promise-settlement, var-bindings]]
-  test/language/expressions/dynamic-import/eval-rqstd-once.js: [unsupported-profile-feature, node:dynamic-source-coverage-remediation, [async-functions, dynamic-source, functions, iterator-protocol, module-linking, object-properties, promise-settlement, symbols, var-bindings]]
-  test/language/expressions/dynamic-import/eval-self-once-module.js: [unsupported-profile-feature, node:dynamic-source-coverage-remediation, [async-functions, control-flow, dynamic-source, expression-operators, functions, iterator-protocol, module-linking, object-properties, promise-settlement, symbols, var-bindings]]
-  test/language/expressions/dynamic-import/eval-self-once-script.js: [unsupported-profile-feature, node:dynamic-source-coverage-remediation, [async-functions, control-flow, dynamic-source, expression-operators, functions, iterator-protocol, module-linking, object-properties, promise-settlement, symbols, var-bindings]]
+  test/language/expressions/dynamic-import/eval-rqstd-once.js: [unsupported-profile-feature, deferred, [async-functions, dynamic-source, functions, iterator-protocol, module-linking, object-properties, promise-settlement, symbols, var-bindings]]
+  test/language/expressions/dynamic-import/eval-self-once-module.js: [unsupported-profile-feature, deferred, [async-functions, control-flow, dynamic-source, expression-operators, functions, iterator-protocol, module-linking, object-properties, promise-settlement, symbols, var-bindings]]
+  test/language/expressions/dynamic-import/eval-self-once-script.js: [unsupported-profile-feature, deferred, [async-functions, control-flow, dynamic-source, expression-operators, functions, iterator-protocol, module-linking, object-properties, promise-settlement, symbols, var-bindings]]
   test/language/expressions/dynamic-import/for-await-resolution-and-error-agen-yield.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [abrupt-completion, async-functions, async-iteration, dynamic-source, expression-operators, functions, generators, module-linking, object-properties, promise-settlement, var-bindings]]
   test/language/expressions/dynamic-import/for-await-resolution-and-error-agen.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [abrupt-completion, async-functions, async-iteration, control-flow, dynamic-source, expression-operators, functions, generators, iterator-protocol, lexical-bindings, module-linking, object-properties, promise-settlement, symbols, var-bindings]]
   test/language/expressions/dynamic-import/for-await-resolution-and-error.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [abrupt-completion, async-functions, async-iteration, control-flow, dynamic-source, functions, iterator-protocol, lexical-bindings, module-linking, object-properties, promise-settlement, symbols]]
@@ -26640,8 +26651,8 @@ paths:
   test/language/expressions/dynamic-import/import-attributes/2nd-param-yield-ident-valid.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [dynamic-source, module-linking]]
   test/language/expressions/dynamic-import/import-attributes/trailing-comma-fulfill.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [dynamic-source, module-linking]]
   test/language/expressions/dynamic-import/import-attributes/trailing-comma-reject.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [dynamic-source, module-linking]]
-  test/language/expressions/dynamic-import/import-errored-module.js: [unsupported-profile-feature, node:dynamic-source-coverage-remediation, [abrupt-completion, async-functions, dynamic-source, error-intrinsics, functions, module-linking, promise-settlement]]
-  test/language/expressions/dynamic-import/import-fulfilled-member-of-errored-cycle.js: [unsupported-profile-feature, node:dynamic-source-coverage-remediation, [abrupt-completion, async-functions, dynamic-source, error-intrinsics, expression-operators, functions, module-linking, object-properties, promise-settlement, symbols, top-level-await, var-bindings]]
+  test/language/expressions/dynamic-import/import-errored-module.js: [unsupported-profile-feature, deferred, [abrupt-completion, async-functions, dynamic-source, error-intrinsics, functions, module-linking, promise-settlement]]
+  test/language/expressions/dynamic-import/import-fulfilled-member-of-errored-cycle.js: [unsupported-profile-feature, deferred, [abrupt-completion, async-functions, dynamic-source, error-intrinsics, expression-operators, functions, module-linking, object-properties, promise-settlement, symbols, top-level-await, var-bindings]]
   test/language/expressions/dynamic-import/imported-self-update.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [async-functions, dynamic-source, expression-operators, functions, lexical-bindings, module-linking, object-properties, promise-settlement, var-bindings]]
   test/language/expressions/dynamic-import/indirect-resolution.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [async-functions, dynamic-source, functions, module-linking, object-properties, promise-settlement, var-bindings]]
   test/language/expressions/dynamic-import/namespace/await-ns-Symbol-toStringTag.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [async-functions, dynamic-source, functions, lexical-bindings, module-linking, object-properties, promise-settlement, symbols, var-bindings]]
@@ -26712,9 +26723,9 @@ paths:
   test/language/expressions/dynamic-import/namespace/promise-then-ns-set-same-values-strict.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [abrupt-completion, dynamic-source, error-intrinsics, expression-operators, functions, module-linking, object-properties, promise-settlement, reflect-namespace, symbols]]
   test/language/expressions/dynamic-import/namespace/promise-then-ns-set-strict.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [abrupt-completion, dynamic-source, error-intrinsics, expression-operators, functions, module-linking, object-properties, promise-settlement, reflect-namespace, symbols, var-bindings]]
   test/language/expressions/dynamic-import/returns-promise.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [dynamic-source, expression-operators, functions, lexical-bindings, module-linking, object-properties, promise-settlement]]
-  test/language/expressions/dynamic-import/reuse-namespace-object-from-import.js: [unsupported-profile-feature, node:dynamic-source-coverage-remediation, [destructuring-bindings, dynamic-source, functions, iterator-protocol, module-linking, object-properties, promise-settlement, symbols]]
-  test/language/expressions/dynamic-import/reuse-namespace-object-from-script.js: [unsupported-profile-feature, node:dynamic-source-coverage-remediation, [destructuring-bindings, dynamic-source, functions, iterator-protocol, module-linking, object-properties, promise-settlement, symbols]]
-  test/language/expressions/dynamic-import/reuse-namespace-object.js: [unsupported-profile-feature, node:dynamic-source-coverage-remediation, [destructuring-bindings, dynamic-source, functions, iterator-protocol, module-linking, object-properties, promise-settlement, symbols]]
+  test/language/expressions/dynamic-import/reuse-namespace-object-from-import.js: [unsupported-profile-feature, deferred, [destructuring-bindings, dynamic-source, functions, iterator-protocol, module-linking, object-properties, promise-settlement, symbols]]
+  test/language/expressions/dynamic-import/reuse-namespace-object-from-script.js: [unsupported-profile-feature, deferred, [destructuring-bindings, dynamic-source, functions, iterator-protocol, module-linking, object-properties, promise-settlement, symbols]]
+  test/language/expressions/dynamic-import/reuse-namespace-object.js: [unsupported-profile-feature, deferred, [destructuring-bindings, dynamic-source, functions, iterator-protocol, module-linking, object-properties, promise-settlement, symbols]]
   test/language/expressions/dynamic-import/syntax/invalid/invalid-assignmenttargettype-syntax-error-1-update-expression.js: [expected-negative, observation]
   test/language/expressions/dynamic-import/syntax/invalid/invalid-assignmenttargettype-syntax-error-10-lhs-assignment-operator-assignment-expression.js: [expected-negative, observation]
   test/language/expressions/dynamic-import/syntax/invalid/invalid-assignmenttargettype-syntax-error-11-lhs-assignment-operator-assignment-expression.js: [expected-negative, observation]
@@ -26966,8 +26977,8 @@ paths:
   test/language/expressions/dynamic-import/syntax/valid/top-level-import-attributes-trailing-comma-second.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [dynamic-source, module-linking]]
   test/language/expressions/dynamic-import/syntax/valid/top-level-nested-imports.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [dynamic-source, functions, object-properties, symbols]]
   test/language/expressions/dynamic-import/syntax/valid/top-level-script-code-valid.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [dynamic-source, functions, var-bindings]]
-  test/language/expressions/dynamic-import/update-to-dynamic-import.js: [unsupported-profile-feature, node:dynamic-source-coverage-remediation, [async-functions, dynamic-source, functions, lexical-bindings, module-linking, object-properties, promise-settlement]]
-  test/language/expressions/dynamic-import/usage-from-eval.js: [unsupported-profile-feature, node:dynamic-source-coverage-remediation, [dynamic-source, functions, lexical-bindings, module-linking, object-properties, promise-settlement]]
+  test/language/expressions/dynamic-import/update-to-dynamic-import.js: [unsupported-profile-feature, deferred, [async-functions, dynamic-source, functions, lexical-bindings, module-linking, object-properties, promise-settlement]]
+  test/language/expressions/dynamic-import/usage-from-eval.js: [unsupported-profile-feature, deferred, [dynamic-source, functions, lexical-bindings, module-linking, object-properties, promise-settlement]]
   test/language/expressions/dynamic-import/usage/nested-arrow-assignment-expression-eval-gtbndng-indirect-update-dflt.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [dynamic-source, functions, lexical-bindings, module-linking, object-properties, promise-settlement]]
   test/language/expressions/dynamic-import/usage/nested-arrow-assignment-expression-eval-gtbndng-indirect-update.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [dynamic-source, functions, lexical-bindings, module-linking, object-properties, promise-settlement]]
   test/language/expressions/dynamic-import/usage/nested-arrow-assignment-expression-eval-script-code-host-resolves-module-code.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [dynamic-source, functions, lexical-bindings, module-linking, object-properties, promise-settlement, var-bindings]]
@@ -30416,8 +30427,8 @@ paths:
   test/language/function-code/S10.4A1.1_T2.js: [pass, observation]
   test/language/function-code/S10.4_A1.1_T1.js: [pass, observation]
   test/language/function-code/block-decl-onlystrict.js: [pass, observation]
-  test/language/function-code/eval-param-env-with-computed-key.js: [unsupported-profile-feature, node:dynamic-source-coverage-remediation, [destructuring-bindings, dynamic-source, functions, object-literals, object-properties, var-bindings]]
-  test/language/function-code/eval-param-env-with-prop-initializer.js: [unsupported-profile-feature, node:dynamic-source-coverage-remediation, [default-parameters, destructuring-bindings, dynamic-source, functions, object-literals, object-properties, var-bindings]]
+  test/language/function-code/eval-param-env-with-computed-key.js: [unsupported-profile-feature, deferred, [destructuring-bindings, dynamic-source, functions, object-literals, object-properties, var-bindings]]
+  test/language/function-code/eval-param-env-with-prop-initializer.js: [unsupported-profile-feature, deferred, [default-parameters, destructuring-bindings, dynamic-source, functions, object-literals, object-properties, var-bindings]]
   test/language/function-code/switch-case-decl-onlystrict.js: [pass, observation]
   test/language/function-code/switch-dflt-decl-onlystrict.js: [pass, observation]
   test/language/future-reserved-words/_implements.js: [pass, observation]
@@ -31762,8 +31773,8 @@ paths:
   test/language/module-code/top-level-await/await-awaits-thenable-not-callable.js: [pass, observation]
   test/language/module-code/top-level-await/await-awaits-thenables-that-throw.js: [pass, observation]
   test/language/module-code/top-level-await/await-awaits-thenables.js: [pass, observation]
-  test/language/module-code/top-level-await/await-dynamic-import-rejection.js: [unsupported-profile-feature, node:dynamic-source-coverage-remediation, [abrupt-completion, dynamic-source, error-intrinsics, module-linking, promise-settlement, top-level-await]]
-  test/language/module-code/top-level-await/await-dynamic-import-resolution.js: [unsupported-profile-feature, node:dynamic-source-coverage-remediation, [dynamic-source, module-linking, object-properties, promise-settlement, top-level-await, var-bindings]]
+  test/language/module-code/top-level-await/await-dynamic-import-rejection.js: [unsupported-profile-feature, deferred, [abrupt-completion, dynamic-source, error-intrinsics, module-linking, promise-settlement, top-level-await]]
+  test/language/module-code/top-level-await/await-dynamic-import-resolution.js: [unsupported-profile-feature, deferred, [dynamic-source, module-linking, object-properties, promise-settlement, top-level-await, var-bindings]]
   test/language/module-code/top-level-await/await-expr-func-expression.js: [pass, observation]
   test/language/module-code/top-level-await/await-expr-new-expr-reject.js: [pass, observation]
   test/language/module-code/top-level-await/await-expr-new-expr.js: [pass, observation]
@@ -31772,14 +31783,14 @@ paths:
   test/language/module-code/top-level-await/await-expr-resolution.js: [pass, observation]
   test/language/module-code/top-level-await/await-void-expr.js: [pass, observation]
   test/language/module-code/top-level-await/dfs-invariant.js: [pass, observation]
-  test/language/module-code/top-level-await/dynamic-import-of-waiting-module.js: [unsupported-profile-feature, node:dynamic-source-coverage-remediation, [async-functions, dynamic-source, expression-operators, functions, iterator-protocol, lexical-bindings, module-linking, object-properties, promise-settlement, symbols, top-level-await]]
-  test/language/module-code/top-level-await/dynamic-import-rejection.js: [unsupported-profile-feature, node:dynamic-source-coverage-remediation, [abrupt-completion, dynamic-source, error-intrinsics, expression-operators, functions, module-linking, object-properties, promise-settlement, symbols, top-level-await]]
-  test/language/module-code/top-level-await/dynamic-import-resolution.js: [unsupported-profile-feature, node:dynamic-source-coverage-remediation, [dynamic-source, functions, module-linking, object-properties, promise-settlement, top-level-await]]
+  test/language/module-code/top-level-await/dynamic-import-of-waiting-module.js: [unsupported-profile-feature, deferred, [async-functions, dynamic-source, expression-operators, functions, iterator-protocol, lexical-bindings, module-linking, object-properties, promise-settlement, symbols, top-level-await]]
+  test/language/module-code/top-level-await/dynamic-import-rejection.js: [unsupported-profile-feature, deferred, [abrupt-completion, dynamic-source, error-intrinsics, expression-operators, functions, module-linking, object-properties, promise-settlement, symbols, top-level-await]]
+  test/language/module-code/top-level-await/dynamic-import-resolution.js: [unsupported-profile-feature, deferred, [dynamic-source, functions, module-linking, object-properties, promise-settlement, top-level-await]]
   test/language/module-code/top-level-await/early-errors-await-not-simple-assignment-target.js: [expected-negative, observation]
-  test/language/module-code/top-level-await/fulfillment-order.js: [unsupported-profile-feature, node:dynamic-source-coverage-remediation, [dynamic-source, functions, iterator-protocol, lexical-bindings, module-linking, object-properties, promise-settlement, symbols, top-level-await]]
+  test/language/module-code/top-level-await/fulfillment-order.js: [unsupported-profile-feature, deferred, [dynamic-source, functions, iterator-protocol, lexical-bindings, module-linking, object-properties, promise-settlement, symbols, top-level-await]]
   test/language/module-code/top-level-await/if-await-expr.js: [pass, observation]
   test/language/module-code/top-level-await/module-async-import-async-resolution-ticks.js: [pass, observation]
-  test/language/module-code/top-level-await/module-graphs-does-not-hang.js: [unsupported-profile-feature, node:dynamic-source-coverage-remediation, [dynamic-source, module-linking, promise-settlement, top-level-await]]
+  test/language/module-code/top-level-await/module-graphs-does-not-hang.js: [unsupported-profile-feature, deferred, [dynamic-source, module-linking, promise-settlement, top-level-await]]
   test/language/module-code/top-level-await/module-import-rejection-body.js: [expected-negative, observation]
   test/language/module-code/top-level-await/module-import-rejection-tick.js: [expected-negative, observation]
   test/language/module-code/top-level-await/module-import-rejection.js: [expected-negative, observation]
@@ -31792,7 +31803,7 @@ paths:
   test/language/module-code/top-level-await/new-await.js: [expected-negative, observation]
   test/language/module-code/top-level-await/no-operand.js: [expected-negative, observation]
   test/language/module-code/top-level-await/pending-async-dep-from-cycle.js: [pass, observation]
-  test/language/module-code/top-level-await/rejection-order.js: [unsupported-profile-feature, node:dynamic-source-coverage-remediation, [abrupt-completion, dynamic-source, functions, iterator-protocol, lexical-bindings, module-linking, object-properties, promise-settlement, symbols, top-level-await]]
+  test/language/module-code/top-level-await/rejection-order.js: [unsupported-profile-feature, deferred, [abrupt-completion, dynamic-source, functions, iterator-protocol, lexical-bindings, module-linking, object-properties, promise-settlement, symbols, top-level-await]]
   test/language/module-code/top-level-await/syntax/await-expr-dyn-import.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [dynamic-source, module-linking, promise-settlement, top-level-await]]
   test/language/module-code/top-level-await/syntax/block-await-expr-array-literal.js: [pass, observation]
   test/language/module-code/top-level-await/syntax/block-await-expr-func-expression.js: [pass, observation]
@@ -32006,10 +32017,10 @@ paths:
   test/language/module-code/top-level-await/syntax/while-await-expr-this.js: [pass, observation]
   test/language/module-code/top-level-await/top-level-ticks-2.js: [pass, observation]
   test/language/module-code/top-level-await/top-level-ticks.js: [pass, observation]
-  test/language/module-code/top-level-await/unobservable-global-async-evaluation-count-reset.js: [unsupported-profile-feature, node:dynamic-source-coverage-remediation, [dynamic-source, expression-operators, functions, iterator-protocol, lexical-bindings, module-linking, object-properties, promise-settlement, symbols, top-level-await]]
+  test/language/module-code/top-level-await/unobservable-global-async-evaluation-count-reset.js: [unsupported-profile-feature, deferred, [dynamic-source, expression-operators, functions, iterator-protocol, lexical-bindings, module-linking, object-properties, promise-settlement, symbols, top-level-await]]
   test/language/module-code/top-level-await/void-await-expr.js: [pass, observation]
   test/language/module-code/top-level-await/while-dynamic-evaluation.js: [pass, observation]
-  test/language/module-code/verify-dfs.js: [unsupported-profile-feature, node:dynamic-source-coverage-remediation, [control-flow, dynamic-source, expression-operators, functions, module-linking, object-properties, promise-settlement]]
+  test/language/module-code/verify-dfs.js: [unsupported-profile-feature, deferred, [control-flow, dynamic-source, expression-operators, functions, module-linking, object-properties, promise-settlement]]
   test/language/punctuators/S7.7_A1.js: [pass, observation]
   test/language/punctuators/S7.7_A2_T1.js: [expected-negative, observation]
   test/language/punctuators/S7.7_A2_T10.js: [expected-negative, observation]
@@ -38450,7 +38461,7 @@ paths:
   test/language/statements/for-in/scope-body-var-none.js: [pass, observation]
   test/language/statements/for-in/scope-head-lex-close.js: [pass, observation]
   test/language/statements/for-in/scope-head-lex-open.js: [pass, observation]
-  test/language/statements/for-in/scope-head-var-none.js: [unsupported-profile-feature, node:dynamic-source-coverage-remediation, [control-flow, dynamic-source, property-enumeration, var-bindings]]
+  test/language/statements/for-in/scope-head-var-none.js: [unsupported-profile-feature, deferred, [control-flow, dynamic-source, property-enumeration, var-bindings]]
   test/language/statements/for-in/var-arguments-fn-strict-init.js: [expected-negative, observation]
   test/language/statements/for-in/var-arguments-fn-strict.js: [expected-negative, observation]
   test/language/statements/for-in/var-arguments-strict-init.js: [expected-negative, observation]
@@ -39165,7 +39176,7 @@ paths:
   test/language/statements/for-of/scope-body-var-none.js: [pass, observation]
   test/language/statements/for-of/scope-head-lex-close.js: [pass, observation]
   test/language/statements/for-of/scope-head-lex-open.js: [pass, observation]
-  test/language/statements/for-of/scope-head-var-none.js: [unsupported-profile-feature, node:dynamic-source-coverage-remediation, [control-flow, destructuring-bindings, dynamic-source, expression-operators, functions, iterator-protocol, lexical-bindings, object-properties, symbols, var-bindings]]
+  test/language/statements/for-of/scope-head-var-none.js: [unsupported-profile-feature, deferred, [control-flow, destructuring-bindings, dynamic-source, expression-operators, functions, iterator-protocol, lexical-bindings, object-properties, symbols, var-bindings]]
   test/language/statements/for-of/set-contract-expand.js: [pass, observation]
   test/language/statements/for-of/set-contract.js: [pass, observation]
   test/language/statements/for-of/set-expand-contract.js: [pass, observation]
@@ -40874,7 +40885,7 @@ paths:
   test/language/statements/try/scope-catch-block-var-none.js: [pass, observation]
   test/language/statements/try/scope-catch-param-lex-close.js: [pass, observation]
   test/language/statements/try/scope-catch-param-lex-open.js: [pass, observation]
-  test/language/statements/try/scope-catch-param-var-none.js: [unsupported-profile-feature, node:dynamic-source-coverage-remediation, [abrupt-completion, destructuring-bindings, dynamic-source, functions, var-bindings]]
+  test/language/statements/try/scope-catch-param-var-none.js: [unsupported-profile-feature, deferred, [abrupt-completion, destructuring-bindings, dynamic-source, functions, var-bindings]]
   test/language/statements/try/static-init-await-binding-invalid.js: [expected-negative, observation]
   test/language/statements/try/static-init-await-binding-valid.js: [pass, observation]
   test/language/statements/try/tco-catch-finally.js: [pass, observation]

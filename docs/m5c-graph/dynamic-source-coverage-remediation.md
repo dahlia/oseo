@@ -1,7 +1,7 @@
 B19/B20/B30 dynamic-source coverage remediation
 ===============================================
 
-The umbrella now owns 162 paths; the child sections below give each move.
+The umbrella now owns 136 paths; the child sections below give each move.
 In bundle 3 the residual evidence candidate accounted for 17 of the 209
 paths it owned then. The assessment keeps two of its 19 selected paths here;
 the other 190 are outside that bounded child.
@@ -679,5 +679,20 @@ child's work note. Ownership moves only with reviewed closure; the umbrella
 retains every remaining path and requires child landing plus zero directly
 owned paths before its own landing.
 
-The child accounts for all 98 under ADR 0016, so with the other children
-the umbrella owns 162 paths.
+The child accounts for all 98 under ADR 0016.
+
+
+Named deferral
+--------------
+
+The `m5c-deferral-ledger-checker` node moves 26 paths to the `deferred`
+owner under [ADR 0031](../adr/0031-m5-named-deferral.md). Twenty are the
+static-specifier import rows of
+[*static-specifier-import-design.md*](./static-specifier-import-design.md).
+The other six observe their contract only through a run-time var
+declaration by direct eval or through the Function constructor: the two
+parameter-expression environment probes, the for-in, for-of, and catch
+variable-environment probes, and *subclass-Function.js*.
+[*docs/m5c-closure/deferrals.yaml*](../m5c-closure/deferrals.yaml) gives each
+path's remaining contract and reason. With this move the umbrella owns 136
+paths.
