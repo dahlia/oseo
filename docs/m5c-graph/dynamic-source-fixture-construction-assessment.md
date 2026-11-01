@@ -8,9 +8,9 @@ digests are its normalized observation digests; both match the existing
 audit rows. Accounting changes no observation or dependency tag and counts
 no path as pass.
 
-Fourteen paths close under ADR 0016: the 11 compound assignment rows with a
-new native witness, and the three direct eval spread rows under the existing
-`eval-semantics` assessment. One path is deferred under ADR 0031.
+All 15 paths close under ADR 0016: the 11 compound assignment rows and the
+global lexical row with new native witnesses, and the three direct eval spread
+rows under the existing `eval-semantics` assessment. No path is deferred.
 
 
 Compound assignment reference base (11, closed)
@@ -53,11 +53,18 @@ the compound assignment, so the reference names it, and never adding it.
 runs the witnesses and mutants natively with both specialization policies and a
 collection at every safepoint.
 
-Node.js and Deno are not references for this witness. V8 resolves the
-`with` reference again at PutValue and writes `scope.x`, which is the
-same divergence the passing plain assignment path
-*assignment/S11.13.1\_A6\_T3.js* exposes. JavaScriptCore (Bun 1.4.4)
-observes the specified `innerX === 2` and `x === 12` for the first row.
+The expected values are the originals' own assertions, re-derived from the
+pinned sources, and they follow from the specification: compound assignment
+evaluates the left-hand side to a Reference, reads it with GetValue, evaluates
+the right operand, and writes the result with PutValue through the same
+Reference. Its base is the outer function's environment record because `scope`
+had no `x` when the name was resolved.
+
+Node.js and Deno are not references for this witness. V8 resolves the `with`
+reference again at PutValue and writes `scope.x`, which is the same divergence
+the passing plain assignment path *assignment/S11.13.1\_A6\_T3.js* exposes.
+JavaScriptCore (Bun 1.4.4) runs all 11 witness programs with every check
+passing.
 
 
 Direct eval with spread arguments (3, closed)
@@ -83,34 +90,49 @@ list, and *call/eval-spread-empty.js* passes with the same direct eval callee
 and an empty spread, `nextCount === 1`. All three rows move to ADR 0016.
 
 
-Global lexical over an eval var (1, deferred)
----------------------------------------------
+Global lexical over a configurable var (1, closed)
+--------------------------------------------------
 
 *global-code/script-decl-lex-var-declared-via-eval.js* declares
 `var test262Var` and `function test262Fn` through global direct eval, then
-declares `let test262Var` and `const test262Fn` in later host Scripts and
-reads 1 and 2. In non-strict code the subject is GlobalDeclarationInstantiation
-step 3: a lexical name may shadow an existing global var or function only if
-its property is configurable, and only non-strict direct eval creates
-configurable var and function bindings. In strict code, eval keeps its
-declarations in its own variable environment, which is eval semantics.
+declares `let test262Var` and `const test262Fn` in later host Scripts and reads
+1 and 2. Its non-strict subject is GlobalDeclarationInstantiation step 3 in
+the current specification: a later lexical declaration may shadow a declared
+global var or function name as long as its property is configurable. The
+former check against the global record's var names no longer exists. Non-strict
+direct eval only supplies the configurable bindings; in strict code, eval keeps
+its declarations local, which is eval semantics.
 
-No witness reproduces the non-strict observation:
+The witness in
+[*global-lexical-configurable-var.ts*](../../tests/native/fixtures/global-lexical-configurable-var.ts)
+reaches the same state with literal host Scripts. Assignment creates
+configurable global properties `test262Var` and `test262Fn`, and a Script
+declares `var` over both. CreateGlobalVarBinding leaves an existing property
+alone, so strict checks confirm both descriptors stay configurable. The later
+Scripts are the original's `let test262Var = 1` and `const test262Fn = 2`, with
+`check(test262Var, 1)` and `check(test262Fn, 2)` in place of the original
+assertions.
+[*global-lexical-configurable-var-source.test.ts*](../../tests/global-lexical-configurable-var-source.test.ts)
+compares the whole original body so only the two eval declarations differ.
 
- -  The literal host Script track declares the var in one Script and the
-    lexical in the next. A Script var or function is non-configurable, so
-    the next Script throws SyntaxError, the opposite outcome; the passing
-    *global-code/script-decl-lex-var.js* asserts exactly that.
- -  A configurable global property made by assignment or
-    `Object.defineProperty` is shadowed without error, as the passing
-    *global-code/decl-lex-configurable-global.js* shows, but it is not a
-    declared var or function binding and does not test eval's declaration
-    instantiation.
- -  Deleting a declared global var to make room is impossible, since the
-    declaration is non-configurable.
+In a second realm the `var` is declared without the configurable property
+first. It is then non-configurable, and the later `let` must throw that
+realm's SyntaxError, the observation of the passing
+*global-code/script-decl-lex-var.js*.
+[*global-lexical-configurable-var-evidence.test.ts*](../../tests/global-lexical-configurable-var-evidence.test.ts)
+compares Node.js and both native specialization policies with forced
+collection. Deno keeps the removed var-name check and rejects the `let`, as the
+alias fixture in *host-script-bindings.ts* already records; JavaScriptCore (Bun
+1.4.4) agrees with Node.js.
 
-The path is deferred to *PLAN-DYN.md* in the `run-time-source` family under
-the new `global-eval-var-configurability` audit assessment.
+A Script `function` declaration cannot stand in for the eval function: it
+redefines a configurable property as non-configurable. The const row
+therefore shadows a configurable var-declared name instead. The lexical step
+it exercises is the same, and only eval creating a configurable function
+binding stays excluded.
+
+The path moves to ADR 0016 under the new
+`global-lexical-configurable-var-witness` audit assessment.
 
 
 Digests

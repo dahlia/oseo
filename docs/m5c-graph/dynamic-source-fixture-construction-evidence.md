@@ -45,13 +45,14 @@ records each path's contract, witness and digests.
     *eval-spread-empty-leading.js* and *eval-spread-empty-trailing.js* close
     under ADR 0016 with the existing `eval-semantics` assessment, unchanged.
     Their spread iteration counts are witnessed by passing static paths.
- -  Global lexical over an eval var (1):
-    *global-code/script-decl-lex-var-declared-via-eval.js* is deferred to
-    *PLAN-DYN.md*. Only non-strict direct eval creates the configurable var
-    and function bindings it observes; a host Script var is non-configurable
-    and makes the later lexical declaration throw.
+ -  Global lexical over a configurable var (1):
+    *global-code/script-decl-lex-var-declared-via-eval.js* closes under ADR
+    0016 with the new `global-lexical-configurable-var-witness` assessment.
+    Literal host Scripts declare `var` over configurable global properties,
+    which stay configurable, and the original's later `let` and `const`
+    Scripts read 1 and 2.
 
-The umbrella's ownership drops by 15.
+No path is deferred, and the umbrella's ownership drops by 15.
 
 
 Checks

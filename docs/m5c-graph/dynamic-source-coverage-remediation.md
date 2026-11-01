@@ -699,9 +699,8 @@ Root's 2026-11-01 classification adds
 had no recorded evidence attempt: the 11 compound assignment
 *S11.13.2\_A6.N\_T1* rows, *script-decl-lex-var-declared-via-eval.js*,
 and the three direct eval calls with spread arguments. Its pinned selector
-and routes are in that child's work note. The child moves 14 paths to ADR
-0016 and defers *script-decl-lex-var-declared-via-eval.js* under ADR 0031, so
-the umbrella owns 121. The umbrella is blocked until the child lands.
+and routes are in that child's work note. The child moves all 15 paths to ADR
+0016, so the umbrella owns 121. The umbrella is blocked until the child lands.
 
 
 Named deferral

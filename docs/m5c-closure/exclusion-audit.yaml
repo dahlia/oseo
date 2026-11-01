@@ -263,8 +263,8 @@ assessments:
       source admission, or any uncovered non-source assertion under ADR 0019.
     replacementEvidence:
       docs/m5c-graph/dynamic-source-fixture-construction-assessment.md:
-        "cf6f4d192fcc8a67aa995e6144b4956b92f58805151f6142\
-        3af2eaf6dc741491"
+        "a10e31e227b720dd22f70347ac142698107d50f0365a0fa6\
+        89446ee44f8dd85a"
       tests/native/fixtures/compound-reference-base.ts:
         "5e76424696454ae6172d498b911e2898204cafc862fe8bdb\
         f77d68b58bf0757e"
@@ -317,19 +317,47 @@ assessments:
       catch parameter. Replacing eval with assignment does not distinguish
       those environments; only a run-time var declaration by direct eval
       does, and direct eval is not approved for M5."
-  global-eval-var-configurability:
-    disposition: deferral
-    normativeDependency: not-demonstrated
-    reason: "Deferred under ADR 0031. GlobalDeclarationInstantiation lets a
-      later Script declare a let or const over an existing global var or
-      function only when its property is configurable, and only non-strict
-      direct eval creates configurable var and function bindings. A host
-      Script var or function is non-configurable, so the next Script's
-      lexical declaration throws SyntaxError, as the passing
-      script-decl-lex-var.js asserts. A configurable property made by
-      assignment, as in the passing decl-lex-configurable-global.js, is not a
-      declared binding. Only a run-time declaration by direct eval
-      reproduces the observation, and direct eval is not approved for M5."
+  global-lexical-configurable-var-witness:
+    disposition: exclusion
+    normativeDependency: source-evaluation-only
+    reason: >-
+      Evidence for script-decl-lex-var-declared-via-eval.js. Its non-strict
+      subject is GlobalDeclarationInstantiation letting a later Script's let
+      or const shadow a declared global var or function name whose property
+      is configurable. Global properties made by assignment, then a Script
+      var over each, keep configurable descriptors, which strict checks
+      confirm; the later let and const Scripts then read 1 and 2 as the
+      original asserts. A mutant whose var is declared without the
+      configurable property must throw its realm's SyntaxError. Node.js
+      observes the same output, and both native policies with forced GC
+      agree; Deno keeps the removed VarNames check. Only eval creating
+      configurable var and function bindings, and strict eval keeping them
+      local, remain excluded under ADR 0016; accounting counts no path as
+      pass. Reopen on changed source, observed rejection or replacement
+      evidence, an accepted source admission, or any uncovered non-source
+      assertion under ADR 0019.
+    replacementEvidence:
+      docs/m5c-graph/dynamic-source-fixture-construction-assessment.md:
+        "a10e31e227b720dd22f70347ac142698107d50f0365a0fa6\
+        89446ee44f8dd85a"
+      tests/native/fixtures/global-lexical-configurable-var.ts:
+        "db8f75afb722b38b2553bb286f4599b5bcb1ff00ffc4ca2b\
+        1367a370a1d9a88a"
+      tests/native/fixtures/compound-reference-base.ts:
+        "5e76424696454ae6172d498b911e2898204cafc862fe8bdb\
+        f77d68b58bf0757e"
+      tests/global-lexical-configurable-var-evidence.test.ts:
+        "73de4c7a393fa79caf2023904f1f926714aed314fe285288\
+        7504802204d7837c"
+      tests/global-lexical-configurable-var-source.test.ts:
+        "dfbde9b8ce31fc07a7fa172416a42a1adb090a8ac1160d22\
+        8be653e1d14d0ea4"
+      tests/native/host-script-reference.ts:
+        "d01339d26b85c0c7e315f453a831bd12a725261ce11635ba\
+        a6ea62c1b8cab262"
+      tests/test262/harness/base.js:
+        "50331feeca513cb2e2354e05e7c68f82d5aeccd9b766d6c8\
+        8438c5ef118075f6"
   annex-b-pattern:
     disposition: exclusion
     normativeDependency: annex-b-only
@@ -24960,7 +24988,7 @@ paths:
       properties. The original assertions read the later let and
       const bindings through $262.evalScript; their declaration
       contract remains in-claim pending remediation."
-    assessment: global-eval-var-configurability
+    assessment: global-lexical-configurable-var-witness
   - path: "test/language/import/import-attributes/json-idempote\
       ncy.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
