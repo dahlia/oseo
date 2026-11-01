@@ -7,7 +7,7 @@ suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
 inventoryPaths: 41091
 closedPaths: 39179
 openPaths: 1912
-deferredPaths: 26
+deferredPaths: 62
 states:
   expected-negative: 4401
   harness-failure: 0
@@ -203,8 +203,15 @@ owners:
       accounts for S7.8.5_A1.1_T2 and S7.8.5_A2.1_T2 under the
       2026-10-28 item 1 rule: its exhaustive literal property witnesses
       every selected code unit at build time and natively, and only eval
-      of the literal text remains."
-    paths: 1716
+      of the literal text remains.
+      Dynamic-source-function-constructor-assessment accounts for 13 of
+      its 49 paths under the 2026-10-28 item 1 rule: four with faithful
+      native or passing static witnesses, and nine that assert only eval
+      or Function source handling inside the existing eval-semantics and
+      dynamic-construction surfaces, each with a sibling precedent named
+      in dynamic-source-function-constructor-assessment.yaml. No pass is
+      added."
+    paths: 1729
   adr:0028-legacy-function-caller-boundary:
     note: ADR 0028 authorizes "an M5 exclusion of the expectation that
       reading the `caller` property of a non-strict ordinary function
@@ -223,7 +230,7 @@ owners:
       the reason, the remaining contract, and the milestone after M5
       that inherits the path. They stay open and are counted neither as
       closed nor as excluded.
-    paths: 26
+    paths: 62
   node:class-private-accessor-lookup-coverage-remediation:
     note: Observation-batch-22b admits the two class declaration tests under
       test/language/statements/class/elements/ that call
@@ -375,8 +382,11 @@ owners:
       M5c-deferral-ledger-checker moves 26 paths to the deferred owner
       under ADR 0031: the 20 static-specifier import rows and six rows
       that only run-time eval or Function source observes, including
-      both variable-environment probes."
-    paths: 136
+      both variable-environment probes.
+      Dynamic-source-function-constructor-assessment moves its 49 paths
+      out: 13 to ADR 0016 and 36 to the deferred owner under ADR 0031,
+      25 of them Function argument conversion rows (87)."
+    paths: 87
   observation:
     note: Closed by a reviewed pass or expected negative in the manifest.
       The owner changes only when a regenerated manifest changes the
@@ -5590,39 +5600,39 @@ paths:
   test/built-ins/Function/15.3.5.4_2-9gs.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [abrupt-completion, dynamic-source, error-intrinsics, functions, object-properties, var-bindings]]
   test/built-ins/Function/S10.1.1_A1_T3.js: [pass, observation]
   test/built-ins/Function/S15.3.1_A1_T1.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [dynamic-source, expression-operators, functions, object-properties, symbols, var-bindings]]
-  test/built-ins/Function/S15.3.2.1_A1_T1.js: [unsupported-profile-feature, node:dynamic-source-coverage-remediation, [abrupt-completion, dynamic-source, functions, object-literals, symbols, var-bindings]]
-  test/built-ins/Function/S15.3.2.1_A1_T10.js: [unsupported-profile-feature, node:dynamic-source-coverage-remediation, [dynamic-source, functions, object-properties, var-bindings]]
-  test/built-ins/Function/S15.3.2.1_A1_T11.js: [unsupported-profile-feature, node:dynamic-source-coverage-remediation, [dynamic-source, functions, object-properties, var-bindings]]
-  test/built-ins/Function/S15.3.2.1_A1_T12.js: [unsupported-profile-feature, node:dynamic-source-coverage-remediation, [dynamic-source, expression-operators, functions, object-properties, var-bindings]]
-  test/built-ins/Function/S15.3.2.1_A1_T13.js: [unsupported-profile-feature, node:dynamic-source-coverage-remediation, [abrupt-completion, dynamic-source, error-intrinsics, expression-operators, functions, object-literals, object-properties, symbols]]
-  test/built-ins/Function/S15.3.2.1_A1_T2.js: [unsupported-profile-feature, node:dynamic-source-coverage-remediation, [dynamic-source, functions, object-literals, object-properties, symbols, var-bindings]]
-  test/built-ins/Function/S15.3.2.1_A1_T3.js: [unsupported-profile-feature, node:dynamic-source-coverage-remediation, [dynamic-source, functions, object-properties, var-bindings]]
-  test/built-ins/Function/S15.3.2.1_A1_T4.js: [unsupported-profile-feature, node:dynamic-source-coverage-remediation, [dynamic-source, functions, object-properties, var-bindings]]
-  test/built-ins/Function/S15.3.2.1_A1_T5.js: [unsupported-profile-feature, node:dynamic-source-coverage-remediation, [dynamic-source, functions, object-properties, symbols, var-bindings]]
+  test/built-ins/Function/S15.3.2.1_A1_T1.js: [unsupported-profile-feature, deferred, [abrupt-completion, dynamic-source, functions, object-literals, symbols, var-bindings]]
+  test/built-ins/Function/S15.3.2.1_A1_T10.js: [unsupported-profile-feature, deferred, [dynamic-source, functions, object-properties, var-bindings]]
+  test/built-ins/Function/S15.3.2.1_A1_T11.js: [unsupported-profile-feature, deferred, [dynamic-source, functions, object-properties, var-bindings]]
+  test/built-ins/Function/S15.3.2.1_A1_T12.js: [unsupported-profile-feature, deferred, [dynamic-source, expression-operators, functions, object-properties, var-bindings]]
+  test/built-ins/Function/S15.3.2.1_A1_T13.js: [unsupported-profile-feature, deferred, [abrupt-completion, dynamic-source, error-intrinsics, expression-operators, functions, object-literals, object-properties, symbols]]
+  test/built-ins/Function/S15.3.2.1_A1_T2.js: [unsupported-profile-feature, deferred, [dynamic-source, functions, object-literals, object-properties, symbols, var-bindings]]
+  test/built-ins/Function/S15.3.2.1_A1_T3.js: [unsupported-profile-feature, deferred, [dynamic-source, functions, object-properties, var-bindings]]
+  test/built-ins/Function/S15.3.2.1_A1_T4.js: [unsupported-profile-feature, deferred, [dynamic-source, functions, object-properties, var-bindings]]
+  test/built-ins/Function/S15.3.2.1_A1_T5.js: [unsupported-profile-feature, deferred, [dynamic-source, functions, object-properties, symbols, var-bindings]]
   test/built-ins/Function/S15.3.2.1_A1_T6.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [dynamic-source, functions, object-properties, var-bindings]]
-  test/built-ins/Function/S15.3.2.1_A1_T7.js: [unsupported-profile-feature, node:dynamic-source-coverage-remediation, [dynamic-source, functions, object-properties, symbols, var-bindings]]
+  test/built-ins/Function/S15.3.2.1_A1_T7.js: [unsupported-profile-feature, deferred, [dynamic-source, functions, object-properties, symbols, var-bindings]]
   test/built-ins/Function/S15.3.2.1_A1_T8.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [abrupt-completion, dynamic-source, error-intrinsics, expression-operators, functions, object-properties, symbols, var-bindings]]
   test/built-ins/Function/S15.3.2.1_A1_T9.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [dynamic-source, expression-operators, functions, object-properties, symbols, var-bindings]]
   test/built-ins/Function/S15.3.2.1_A2_T1.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [dynamic-source, expression-operators, functions, object-properties, symbols, var-bindings]]
   test/built-ins/Function/S15.3.2.1_A2_T2.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [dynamic-source, expression-operators, functions, object-properties, symbols, var-bindings]]
   test/built-ins/Function/S15.3.2.1_A2_T3.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [dynamic-source, expression-operators, functions, object-properties, symbols, var-bindings]]
-  test/built-ins/Function/S15.3.2.1_A2_T4.js: [unsupported-profile-feature, node:dynamic-source-coverage-remediation, [dynamic-source, expression-operators, functions, object-literals, object-properties, symbols, var-bindings]]
-  test/built-ins/Function/S15.3.2.1_A2_T5.js: [unsupported-profile-feature, node:dynamic-source-coverage-remediation, [dynamic-source, expression-operators, functions, object-literals, object-properties, symbols, var-bindings]]
-  test/built-ins/Function/S15.3.2.1_A2_T6.js: [unsupported-profile-feature, node:dynamic-source-coverage-remediation, [dynamic-source, expression-operators, functions, object-literals, object-properties, symbols, var-bindings]]
-  test/built-ins/Function/S15.3.2.1_A3_T1.js: [unsupported-profile-feature, node:dynamic-source-coverage-remediation, [abrupt-completion, dynamic-source, functions, object-literals, symbols, var-bindings]]
-  test/built-ins/Function/S15.3.2.1_A3_T10.js: [unsupported-profile-feature, node:dynamic-source-coverage-remediation, [abrupt-completion, dynamic-source, error-intrinsics, expression-operators, functions, object-literals, object-properties, symbols, var-bindings]]
-  test/built-ins/Function/S15.3.2.1_A3_T11.js: [unsupported-profile-feature, node:dynamic-source-coverage-remediation, [dynamic-source, expression-operators, functions, object-properties, var-bindings]]
-  test/built-ins/Function/S15.3.2.1_A3_T12.js: [unsupported-profile-feature, node:dynamic-source-coverage-remediation, [dynamic-source, functions, object-properties, var-bindings]]
-  test/built-ins/Function/S15.3.2.1_A3_T13.js: [unsupported-profile-feature, node:dynamic-source-coverage-remediation, [dynamic-source, functions, object-properties, var-bindings]]
-  test/built-ins/Function/S15.3.2.1_A3_T14.js: [unsupported-profile-feature, node:dynamic-source-coverage-remediation, [dynamic-source, functions, object-properties, var-bindings]]
+  test/built-ins/Function/S15.3.2.1_A2_T4.js: [unsupported-profile-feature, deferred, [dynamic-source, expression-operators, functions, object-literals, object-properties, symbols, var-bindings]]
+  test/built-ins/Function/S15.3.2.1_A2_T5.js: [unsupported-profile-feature, deferred, [dynamic-source, expression-operators, functions, object-literals, object-properties, symbols, var-bindings]]
+  test/built-ins/Function/S15.3.2.1_A2_T6.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [dynamic-source, expression-operators, functions, object-literals, object-properties, symbols, var-bindings]]
+  test/built-ins/Function/S15.3.2.1_A3_T1.js: [unsupported-profile-feature, deferred, [abrupt-completion, dynamic-source, functions, object-literals, symbols, var-bindings]]
+  test/built-ins/Function/S15.3.2.1_A3_T10.js: [unsupported-profile-feature, deferred, [abrupt-completion, dynamic-source, error-intrinsics, expression-operators, functions, object-literals, object-properties, symbols, var-bindings]]
+  test/built-ins/Function/S15.3.2.1_A3_T11.js: [unsupported-profile-feature, deferred, [dynamic-source, expression-operators, functions, object-properties, var-bindings]]
+  test/built-ins/Function/S15.3.2.1_A3_T12.js: [unsupported-profile-feature, deferred, [dynamic-source, functions, object-properties, var-bindings]]
+  test/built-ins/Function/S15.3.2.1_A3_T13.js: [unsupported-profile-feature, deferred, [dynamic-source, functions, object-properties, var-bindings]]
+  test/built-ins/Function/S15.3.2.1_A3_T14.js: [unsupported-profile-feature, deferred, [dynamic-source, functions, object-properties, var-bindings]]
   test/built-ins/Function/S15.3.2.1_A3_T15.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [dynamic-source, functions, object-properties, var-bindings]]
-  test/built-ins/Function/S15.3.2.1_A3_T2.js: [unsupported-profile-feature, node:dynamic-source-coverage-remediation, [dynamic-source, functions, object-literals, object-properties, symbols, var-bindings]]
-  test/built-ins/Function/S15.3.2.1_A3_T3.js: [unsupported-profile-feature, node:dynamic-source-coverage-remediation, [abrupt-completion, dynamic-source, expression-operators, functions, object-literals, symbols, var-bindings]]
-  test/built-ins/Function/S15.3.2.1_A3_T4.js: [unsupported-profile-feature, node:dynamic-source-coverage-remediation, [dynamic-source, functions, object-properties, var-bindings]]
-  test/built-ins/Function/S15.3.2.1_A3_T5.js: [unsupported-profile-feature, node:dynamic-source-coverage-remediation, [dynamic-source, expression-operators, functions, object-properties, var-bindings]]
-  test/built-ins/Function/S15.3.2.1_A3_T6.js: [unsupported-profile-feature, node:dynamic-source-coverage-remediation, [abrupt-completion, dynamic-source, error-intrinsics, expression-operators, functions, object-properties, symbols, var-bindings]]
-  test/built-ins/Function/S15.3.2.1_A3_T7.js: [unsupported-profile-feature, node:dynamic-source-coverage-remediation, [dynamic-source, functions, object-properties, symbols, var-bindings]]
-  test/built-ins/Function/S15.3.2.1_A3_T8.js: [unsupported-profile-feature, node:dynamic-source-coverage-remediation, [dynamic-source, functions, object-properties, var-bindings]]
+  test/built-ins/Function/S15.3.2.1_A3_T2.js: [unsupported-profile-feature, deferred, [dynamic-source, functions, object-literals, object-properties, symbols, var-bindings]]
+  test/built-ins/Function/S15.3.2.1_A3_T3.js: [unsupported-profile-feature, deferred, [abrupt-completion, dynamic-source, expression-operators, functions, object-literals, symbols, var-bindings]]
+  test/built-ins/Function/S15.3.2.1_A3_T4.js: [unsupported-profile-feature, deferred, [dynamic-source, functions, object-properties, var-bindings]]
+  test/built-ins/Function/S15.3.2.1_A3_T5.js: [unsupported-profile-feature, deferred, [dynamic-source, expression-operators, functions, object-properties, var-bindings]]
+  test/built-ins/Function/S15.3.2.1_A3_T6.js: [unsupported-profile-feature, deferred, [abrupt-completion, dynamic-source, error-intrinsics, expression-operators, functions, object-properties, symbols, var-bindings]]
+  test/built-ins/Function/S15.3.2.1_A3_T7.js: [unsupported-profile-feature, deferred, [dynamic-source, functions, object-properties, symbols, var-bindings]]
+  test/built-ins/Function/S15.3.2.1_A3_T8.js: [unsupported-profile-feature, deferred, [dynamic-source, functions, object-properties, var-bindings]]
   test/built-ins/Function/S15.3.2.1_A3_T9.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [abrupt-completion, dynamic-source, error-intrinsics, expression-operators, functions, object-properties, symbols, var-bindings]]
   test/built-ins/Function/S15.3.2_A1.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [dynamic-source, functions, object-properties, var-bindings]]
   test/built-ins/Function/S15.3.3_A1.js: [pass, observation]
@@ -5648,7 +5658,7 @@ paths:
   test/built-ins/Function/StrictFunction_restricted-properties.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [abrupt-completion, dynamic-source, error-intrinsics, expression-operators, functions, object-literals, object-properties, var-bindings]]
   test/built-ins/Function/call-bind-this-realm-undef.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [dynamic-source, functions, object-properties, var-bindings]]
   test/built-ins/Function/call-bind-this-realm-value.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [dynamic-source, expression-operators, functions, object-literals, object-properties, symbols, var-bindings]]
-  test/built-ins/Function/instance-name.js: [unsupported-profile-feature, node:dynamic-source-coverage-remediation, [dynamic-source, functions, object-properties]]
+  test/built-ins/Function/instance-name.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [dynamic-source, functions, object-properties]]
   test/built-ins/Function/internals/Call/class-ctor-realm.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [dynamic-source, functions]]
   test/built-ins/Function/internals/Call/class-ctor.js: [pass, observation]
   test/built-ins/Function/internals/Construct/base-ctor-revoked-proxy-realm.js: [pass, observation]
@@ -19018,7 +19028,7 @@ paths:
   test/language/comments/hashbang/line-terminator-paragraph-separator.js: [pass, observation]
   test/language/comments/hashbang/module.js: [pass, observation]
   test/language/comments/hashbang/multi-line-comment.js: [expected-negative, observation]
-  test/language/comments/hashbang/no-line-separator.js: [unsupported-profile-feature, node:dynamic-source-coverage-remediation, [dynamic-source, functions, lexical-grammar]]
+  test/language/comments/hashbang/no-line-separator.js: [unsupported-profile-feature, deferred, [dynamic-source, functions, lexical-grammar]]
   test/language/comments/hashbang/not-empty.js: [pass, observation]
   test/language/comments/hashbang/preceding-directive-prologue-sc.js: [expected-negative, observation]
   test/language/comments/hashbang/preceding-directive-prologue.js: [expected-negative, observation]
@@ -19406,15 +19416,15 @@ paths:
   test/language/eval-code/direct/strict-caller-function-context.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [abrupt-completion, dynamic-source, error-intrinsics, functions, var-bindings]]
   test/language/eval-code/direct/strict-caller-global.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [abrupt-completion, dynamic-source, error-intrinsics, functions, var-bindings]]
   test/language/eval-code/direct/strictness-override.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [abrupt-completion, dynamic-source, error-intrinsics, expression-operators, functions]]
-  test/language/eval-code/direct/super-call-arrow.js: [unsupported-profile-feature, node:dynamic-source-coverage-remediation, [abrupt-completion, dynamic-source, error-intrinsics, expression-operators, functions, object-properties, var-bindings]]
-  test/language/eval-code/direct/super-call-fn.js: [unsupported-profile-feature, node:dynamic-source-coverage-remediation, [abrupt-completion, dynamic-source, error-intrinsics, functions, var-bindings]]
-  test/language/eval-code/direct/super-call-method.js: [unsupported-profile-feature, node:dynamic-source-coverage-remediation, [abrupt-completion, dynamic-source, error-intrinsics, functions, object-literals, object-properties, var-bindings]]
+  test/language/eval-code/direct/super-call-arrow.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [abrupt-completion, dynamic-source, error-intrinsics, expression-operators, functions, object-properties, var-bindings]]
+  test/language/eval-code/direct/super-call-fn.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [abrupt-completion, dynamic-source, error-intrinsics, functions, var-bindings]]
+  test/language/eval-code/direct/super-call-method.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [abrupt-completion, dynamic-source, error-intrinsics, functions, object-literals, object-properties, var-bindings]]
   test/language/eval-code/direct/super-call.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [abrupt-completion, dynamic-source, error-intrinsics, expression-operators, functions, object-properties, var-bindings]]
-  test/language/eval-code/direct/super-prop-arrow.js: [unsupported-profile-feature, node:dynamic-source-coverage-remediation, [abrupt-completion, dynamic-source, error-intrinsics, expression-operators, functions, object-properties, var-bindings]]
-  test/language/eval-code/direct/super-prop-dot-no-home.js: [unsupported-profile-feature, node:dynamic-source-coverage-remediation, [abrupt-completion, dynamic-source, error-intrinsics, expression-operators, functions, object-properties, var-bindings]]
-  test/language/eval-code/direct/super-prop-expr-no-home-no-eval.js: [unsupported-profile-feature, node:dynamic-source-coverage-remediation, [dynamic-source, functions, var-bindings]]
-  test/language/eval-code/direct/super-prop-expr-no-home.js: [unsupported-profile-feature, node:dynamic-source-coverage-remediation, [abrupt-completion, dynamic-source, error-intrinsics, expression-operators, functions, object-properties, var-bindings]]
-  test/language/eval-code/direct/super-prop-method.js: [unsupported-profile-feature, node:dynamic-source-coverage-remediation, [dynamic-source, expression-operators, functions, object-literals, object-properties, var-bindings]]
+  test/language/eval-code/direct/super-prop-arrow.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [abrupt-completion, dynamic-source, error-intrinsics, expression-operators, functions, object-properties, var-bindings]]
+  test/language/eval-code/direct/super-prop-dot-no-home.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [abrupt-completion, dynamic-source, error-intrinsics, expression-operators, functions, object-properties, var-bindings]]
+  test/language/eval-code/direct/super-prop-expr-no-home-no-eval.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [dynamic-source, functions, var-bindings]]
+  test/language/eval-code/direct/super-prop-expr-no-home.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [abrupt-completion, dynamic-source, error-intrinsics, expression-operators, functions, object-properties, var-bindings]]
+  test/language/eval-code/direct/super-prop-method.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [dynamic-source, expression-operators, functions, object-literals, object-properties, var-bindings]]
   test/language/eval-code/direct/super-prop.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [abrupt-completion, dynamic-source, error-intrinsics, expression-operators, functions, object-properties, var-bindings]]
   test/language/eval-code/direct/switch-case-decl-eval-source-is-strict-nostrict.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [abrupt-completion, control-flow, dynamic-source, error-intrinsics, functions, object-properties, var-bindings]]
   test/language/eval-code/direct/switch-case-decl-eval-source-is-strict-onlystrict.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [abrupt-completion, control-flow, dynamic-source, error-intrinsics, functions, object-properties, var-bindings]]
@@ -21755,7 +21765,7 @@ paths:
   test/language/expressions/call/spread-sngl-obj-ident.js: [pass, observation]
   test/language/expressions/call/tco-call-args.js: [pass, observation]
   test/language/expressions/call/tco-member-args.js: [pass, observation]
-  test/language/expressions/call/tco-non-eval-function-dynamic.js: [unsupported-profile-feature, node:dynamic-source-coverage-remediation, [control-flow, dynamic-source, expression-operators, functions, var-bindings]]
+  test/language/expressions/call/tco-non-eval-function-dynamic.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [control-flow, dynamic-source, expression-operators, functions, var-bindings]]
   test/language/expressions/call/tco-non-eval-function.js: [pass, observation]
   test/language/expressions/call/tco-non-eval-global.js: [pass, observation]
   test/language/expressions/call/tco-non-eval-with.js: [pass, observation]
@@ -36771,7 +36781,7 @@ paths:
   test/language/statements/class/subclass-builtins/subclass-EvalError.js: [pass, observation]
   test/language/statements/class/subclass-builtins/subclass-Float32Array.js: [pass, observation]
   test/language/statements/class/subclass-builtins/subclass-Float64Array.js: [pass, observation]
-  test/language/statements/class/subclass-builtins/subclass-Function.js: [unsupported-profile-feature, node:dynamic-source-coverage-remediation, [classes, dynamic-source, expression-operators, functions, lexical-bindings, object-properties, symbols]]
+  test/language/statements/class/subclass-builtins/subclass-Function.js: [unsupported-profile-feature, deferred, [classes, dynamic-source, expression-operators, functions, lexical-bindings, object-properties, symbols]]
   test/language/statements/class/subclass-builtins/subclass-Int16Array.js: [pass, observation]
   test/language/statements/class/subclass-builtins/subclass-Int32Array.js: [pass, observation]
   test/language/statements/class/subclass-builtins/subclass-Int8Array.js: [pass, observation]
@@ -36812,15 +36822,15 @@ paths:
   test/language/statements/class/subclass/builtin-objects/Error/message-property-assignment.js: [pass, observation]
   test/language/statements/class/subclass/builtin-objects/Error/regular-subclassing.js: [pass, observation]
   test/language/statements/class/subclass/builtin-objects/Error/super-must-be-called.js: [pass, observation]
-  test/language/statements/class/subclass/builtin-objects/Function/instance-length.js: [unsupported-profile-feature, node:dynamic-source-coverage-remediation, [classes, dynamic-source, functions, object-properties, var-bindings]]
-  test/language/statements/class/subclass/builtin-objects/Function/instance-name.js: [unsupported-profile-feature, node:dynamic-source-coverage-remediation, [classes, dynamic-source, functions, object-properties, var-bindings]]
-  test/language/statements/class/subclass/builtin-objects/Function/regular-subclassing.js: [unsupported-profile-feature, node:dynamic-source-coverage-remediation, [classes, dynamic-source, expression-operators, functions, var-bindings]]
-  test/language/statements/class/subclass/builtin-objects/Function/super-must-be-called.js: [unsupported-profile-feature, node:dynamic-source-coverage-remediation, [abrupt-completion, classes, dynamic-source, error-intrinsics, expression-operators, functions, object-properties, symbols, var-bindings]]
-  test/language/statements/class/subclass/builtin-objects/GeneratorFunction/instance-length.js: [unsupported-profile-feature, node:dynamic-source-coverage-remediation, [classes, dynamic-source, functions, generators, object-properties, var-bindings]]
-  test/language/statements/class/subclass/builtin-objects/GeneratorFunction/instance-name.js: [unsupported-profile-feature, node:dynamic-source-coverage-remediation, [classes, dynamic-source, functions, generators, object-properties, var-bindings]]
-  test/language/statements/class/subclass/builtin-objects/GeneratorFunction/instance-prototype.js: [unsupported-profile-feature, node:dynamic-source-coverage-remediation, [classes, dynamic-source, functions, generators, object-own-keys, object-properties, var-bindings]]
-  test/language/statements/class/subclass/builtin-objects/GeneratorFunction/regular-subclassing.js: [unsupported-profile-feature, node:dynamic-source-coverage-remediation, [classes, dynamic-source, expression-operators, functions, generators, object-properties, var-bindings]]
-  test/language/statements/class/subclass/builtin-objects/GeneratorFunction/super-must-be-called.js: [unsupported-profile-feature, node:dynamic-source-coverage-remediation, [abrupt-completion, classes, dynamic-source, error-intrinsics, expression-operators, functions, generators, object-properties, symbols, var-bindings]]
+  test/language/statements/class/subclass/builtin-objects/Function/instance-length.js: [unsupported-profile-feature, deferred, [classes, dynamic-source, functions, object-properties, var-bindings]]
+  test/language/statements/class/subclass/builtin-objects/Function/instance-name.js: [unsupported-profile-feature, deferred, [classes, dynamic-source, functions, object-properties, var-bindings]]
+  test/language/statements/class/subclass/builtin-objects/Function/regular-subclassing.js: [unsupported-profile-feature, deferred, [classes, dynamic-source, expression-operators, functions, var-bindings]]
+  test/language/statements/class/subclass/builtin-objects/Function/super-must-be-called.js: [unsupported-profile-feature, deferred, [abrupt-completion, classes, dynamic-source, error-intrinsics, expression-operators, functions, object-properties, symbols, var-bindings]]
+  test/language/statements/class/subclass/builtin-objects/GeneratorFunction/instance-length.js: [unsupported-profile-feature, deferred, [classes, dynamic-source, functions, generators, object-properties, var-bindings]]
+  test/language/statements/class/subclass/builtin-objects/GeneratorFunction/instance-name.js: [unsupported-profile-feature, deferred, [classes, dynamic-source, functions, generators, object-properties, var-bindings]]
+  test/language/statements/class/subclass/builtin-objects/GeneratorFunction/instance-prototype.js: [unsupported-profile-feature, deferred, [classes, dynamic-source, functions, generators, object-own-keys, object-properties, var-bindings]]
+  test/language/statements/class/subclass/builtin-objects/GeneratorFunction/regular-subclassing.js: [unsupported-profile-feature, deferred, [classes, dynamic-source, expression-operators, functions, generators, object-properties, var-bindings]]
+  test/language/statements/class/subclass/builtin-objects/GeneratorFunction/super-must-be-called.js: [unsupported-profile-feature, deferred, [abrupt-completion, classes, dynamic-source, error-intrinsics, expression-operators, functions, generators, object-properties, symbols, var-bindings]]
   test/language/statements/class/subclass/builtin-objects/Map/regular-subclassing.js: [pass, observation]
   test/language/statements/class/subclass/builtin-objects/Map/super-must-be-called.js: [pass, observation]
   test/language/statements/class/subclass/builtin-objects/NativeError/EvalError-message.js: [pass, observation]
@@ -41132,7 +41142,7 @@ paths:
   test/language/statements/with/12.10.1-12-s.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [abrupt-completion, dynamic-source, error-intrinsics, functions, object-properties]]
   test/language/statements/with/12.10.1-13-s.js: [pass, observation]
   test/language/statements/with/12.10.1-4-s.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [abrupt-completion, dynamic-source, error-intrinsics, functions, object-properties, var-bindings]]
-  test/language/statements/with/12.10.1-5-s.js: [unsupported-profile-feature, node:dynamic-source-coverage-remediation, [dynamic-source, functions]]
+  test/language/statements/with/12.10.1-5-s.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [dynamic-source, functions]]
   test/language/statements/with/12.10.1-8-s.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [abrupt-completion, dynamic-source, error-intrinsics, functions, object-properties]]
   test/language/statements/with/S12.10_A1.10_T1.js: [pass, observation]
   test/language/statements/with/S12.10_A1.10_T2.js: [pass, observation]
@@ -41277,7 +41287,7 @@ paths:
   test/language/statements/with/let-block-with-newline.js: [pass, observation]
   test/language/statements/with/let-identifier-with-newline.js: [pass, observation]
   test/language/statements/with/scope-var-close.js: [pass, observation]
-  test/language/statements/with/scope-var-open.js: [unsupported-profile-feature, node:dynamic-source-coverage-remediation, [dynamic-source, expression-operators, functions, object-literals, object-properties, symbols, var-bindings]]
+  test/language/statements/with/scope-var-open.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [dynamic-source, expression-operators, functions, object-literals, object-properties, symbols, var-bindings]]
   test/language/statements/with/set-mutable-binding-binding-deleted-in-get-unscopables-strict-mode.js: [pass, observation]
   test/language/statements/with/set-mutable-binding-binding-deleted-in-get-unscopables.js: [pass, observation]
   test/language/statements/with/set-mutable-binding-binding-deleted-with-typed-array-in-proto-chain-strict-mode.js: [pass, observation]

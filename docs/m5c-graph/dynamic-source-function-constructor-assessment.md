@@ -45,7 +45,7 @@ records the outcome those attempts left open.
 Outcomes
 --------
 
-Each path takes exactly one outcome:
+Each path takes exactly one outcome, as Root ruled on 2026-11-02:
 
  -  Closed under ADR 0016. Either a faithful witness observes the same
     operation and compares the same values as every non-source assertion,
@@ -57,10 +57,56 @@ Each path takes exactly one outcome:
     0016 assessment already excludes it.
  -  Anything else goes back to Root before any ownership change.
 
-The per-path outcome, witness and digests are recorded in the assessment
-beside this note. Ledger owners move only with that reviewed assessment,
-through the ledger tool. No subset row, dependency tag or observation
-changes, and no path counts as a pass.
+[*dynamic-source-function-constructor-assessment.yaml*](./dynamic-source-function-constructor-assessment.yaml)
+records each path's outcome, witness or precedent, and source and observation
+digests. Deferred entries are in
+[*docs/m5c-closure/deferrals.yaml*](../m5c-closure/deferrals.yaml). No subset
+row, dependency tag or observation changes, and no path counts as a pass.
+
+
+Result
+------
+
+| Outcome                                                        |  Paths |
+| -------------------------------------------------------------- | -----: |
+| Closed under ADR 0016 with a faithful witness                  |      4 |
+| Closed under ADR 0016, source handling only, sibling precedent |      9 |
+| Deferred: Function argument conversion                         |     25 |
+| Deferred: Function and GeneratorFunction subclass construction |     10 |
+| Deferred: strict no-newline hashbang                           |      1 |
+| **Total**                                                      | **49** |
+
+The four witnessed closures are *S15.3.2.1\_A2\_T6.js*, whose Function call
+receives only String values, *super-prop-method.js*,
+*tco-non-eval-function-dynamic.js* and *scope-var-open.js*. Three of the
+witnesses are native fixtures in
+*tests/native/fixtures/function-constructor-evidence.ts*. Each keeps every
+byte of the pinned original after its frontmatter except the one
+source-compiling call: a strict parameter-string check with a static
+function, a direct `super.test262` read in the same method, or a literal
+global host Script of the same eval source. Every mutation must throw the
+realm's Test262Error. *tests/function-constructor-evidence.test.ts* compares
+Node.js and Deno references with native execution under both specialization
+policies with forced collection. The fourth witness is the passing
+*tco-non-eval-function.js*, which makes the same tail call through a static
+`var eval = f`.
+
+The nine source-only closures are *built-ins/Function/instance-name.js* and
+*12.10.1-5-s.js* under `dynamic-construction`, and the seven direct eval
+`super` early-error rows under `eval-semantics`. The passing
+*statements/function/name.js* observes the descriptor flags of
+*instance-name.js*; its `'anonymous'` value is the CreateDynamicFunction
+result.
+
+The 25 conversion rows pass a non-String parameter or body to Function.
+Only CreateDynamicFunction converts them, the runtime rejects Function
+before any conversion, and the maintainer answer names that conversion as
+a contract to evidence or defer, so the `dynamic-construction` exclusion
+does not reach them. The ten subclass rows reach the source-compiling
+constructor through `super()`; the ReferenceError half of the two
+*super-must-be-called.js* rows is observed by the passing
+*Array/super-must-be-called.js*. The strict variant of the hashbang probe
+cannot be a host Script, because no directive can precede `#!`.
 
 
 Ownership
@@ -68,5 +114,5 @@ Ownership
 
 The node starts ready and unlanded, depending on the landed
 `unsupported-ownership-audit`. The umbrella and `m5-exit-audit` depend on
-it. This graph change moves no ledger owner. Root owns publication, outer
+it. The 49 ledger owners move with the assessment. Root owns publication, outer
 review and landing. ADR 0013, 0016, 0019, 0029 and 0031 remain unchanged.

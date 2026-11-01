@@ -1,7 +1,7 @@
 B19/B20/B30 dynamic-source coverage remediation
 ===============================================
 
-The umbrella now owns 136 paths. The child sections below give each move. In
+The umbrella now owns 87 paths. The child sections below give each move. In
 bundle 3, the residual evidence candidate accounted for 17 of the 209 paths it
 owned then. The assessment keeps two of its 19 selected paths here; the other
 190 are outside that bounded child.
@@ -713,7 +713,7 @@ Function constructor assessment child
 `dynamic-source-function-constructor-assessment` gives exactly 49 umbrella
 paths one reviewed outcome each: 27 Function constructor rows of
 observation batches 01 and 18 and 22 dynamic coverage train rows. Its pinned
-selector and outcome rules are in that child's work note. Ownership moves
-only with its reviewed assessment; the umbrella retains every remaining path
-and requires child landing plus zero directly owned paths before its own
-landing.
+selector and outcome rules are in that child's work note. Its assessment
+moves 13 paths to ADR 0016 and defers 36 under ADR 0031, so the umbrella
+owns 87 paths. The umbrella requires child landing plus zero directly owned
+paths before its own landing.
