@@ -40,6 +40,19 @@ durations, in path order A1.1, A1.4, A2.1, A2.4.
 | Host clang ASan and UBSan | 387.2, 96.6, 319.0, 57.3   |           873 |
 | Zig, extended (×10)       | 713.2, 154.6, 580.9, 125.9 |         1,585 |
 
+Candidate CI run 41257794727 ran the file inside the extended native file
+shards, before it was case-sharded:
+
+| Job                                     | Runner and file workers   | Native properties (s)                   |
+| --------------------------------------- | ------------------------- | --------------------------------------- |
+| native support (linux-x86\_64-gnu, 3/7) | hosted `ubuntu-latest`, 4 | 4,274.6, 586.5, unfinished, not started |
+| native support (macos-aarch64, 1/12)    | Mac lane `oseo-mac-2`, 12 | 938.9, 223.9, 514.1, 113.8              |
+
+The Linux job reached its 120-minute timeout 2,292 seconds into A2.1. Its
+two finished properties took 6.0 and 3.8 times their local extended
+durations. The macOS job took 1,959 seconds, of which the file's properties
+were 1,790.6.
+
 The emitted C for one 4,096-literal program is about 14 MB. A top-level
 program of more than about 4,000 literal statements exceeds the native frame
 budget, and under ASan a function of 1,024 does too, which is why programs
@@ -49,13 +62,47 @@ group literals into functions of at most 256.
 Placement
 ---------
 
-**Extended native shards.** The Linux weight is the extended run's summed
-case durations, 1,585 seconds, recorded like the other later files in
-*docs/evidence/u6/*. macOS has no measurement of this file. Its entry is
-921 seconds, the Linux weight scaled by the 353/608 macOS-to-Linux
-ratio of *m5-regexp-literal-aot.property.test.ts*, whose generated literals
-compile the same way. This is a provisional estimate, not a measured
-duration.
+**Extended native shards.** The file is in `caseShardedNativeFiles` in
+*tools/native-shard.ts*, so the native file shards leave it out and the
+`regexp exhaustive cases` jobs run it in five case shards on each native
+host. The `native` aggregate requires all ten. The extended budget runs
+each property's sweep ten times, and the case-shard filter gives shard *k*
+the sweeps numbered *k* − 1 and *k* + 4, counting from zero, so every sweep
+still runs exactly once on each host. Seeds, sizes, generators and the
+6,000-second extended interrupt limit of each property are unchanged. As with
+the Reflect namespace shards, the jobs write no duration record, because the
+file has four properties and the recorder writes one record per job. Without
+the file, both hosts' file-shard partitions are the ones from before the file
+was added.
+
+The Linux weight in *tools/native-shard-costs.ts* is 8,821 seconds, derived
+from the CI run above. It sums the two measured properties and two
+estimates: A2.1 and A2.4 take their local durations scaled by the measured
+property of the same literal kind, 6.0 for plain and 3.8 for escaped,
+giving 3,481.7 and 477.6 seconds. That is 882 seconds per sweep. The figure
+comes from one job that shared four workers with three other files, so it
+is not a dedicated job's time, and the two estimates are not measurements.
+
+A Linux shard therefore needs an estimated 1,764 seconds of properties plus
+about a minute of setup and build-time tests, 31 minutes in all, or about
+half of the jobs' 60-minute timeout. A1.1, the slowest property, needs an
+estimated 855 seconds of its 6,000-second limit per shard.
+
+macOS has no hosted measurement of the file. The Mac lane job above gives
+the derived 516 seconds per shard that *tools/macos-job-costs.ts* records:
+one fifth of the four properties plus the 157.8 seconds the rest of that
+job took, less its package suite. The hosted entry converts that at the
+3.4 native support ratio to 1,610 seconds, and the shards borrow the native
+support pair slowdowns. The Mac figure was measured beside eleven other
+files and a busy partner lane, so it overstates one-lane work. The macOS
+entry in the weight table stays the provisional 921 seconds, the earlier
+local Linux weight of 1,585 seconds scaled by the 353/608 macOS-to-Linux
+ratio of *m5-regexp-literal-aot.property.test.ts*; it now weighs only other
+wrapper invocations.
+
+The five Linux shards raise the run's hosted Ubuntu jobs from 35 to 40, the
+count that U48 in *PLAN-GATE.md* reduced because some of them waited for
+a slot.
 
 **Ordinary Node.js shards.** The file adds about four minutes of local Zig
 work to one shard on each host. No ordinary shard runs near a limit.
@@ -79,14 +126,15 @@ the two native sanitizer shards, so it takes no hosted slot. Its 1,812-second
 lane entry is a planning allowance, twice the local clang wall plus setup,
 until a hosted run measures it.
 
-At `a0cd901d`, which also carries the weighted Node shards and the native
-sanitizer split, the property sanitizer lane ends at 4,264 seconds and the
-chained native sanitizer lane at 3,607. The generator models these maxima:
+With the weighted Node shards, the native sanitizer split and the
+exhaustive case shards, the property sanitizer lane ends at 4,264 seconds
+and the chained native sanitizer lane at 3,607. The generator models these
+maxima:
 
 | Mac lanes      | Modeled maximum, minutes | Set by                  |
 | -------------- | -----------------------: | ----------------------- |
-| 0              |                    236.4 | property sanitizer lane |
-| 2              |                    119.4 | a Mac lane              |
+| 0              |                    263.2 | property sanitizer lane |
+| 2              |                    139.1 | a Mac lane              |
 | 6              |                     71.1 | property sanitizer lane |
 | 8 (configured) |                     71.1 | property sanitizer lane |
 

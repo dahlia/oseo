@@ -77,6 +77,7 @@ function macLaneEligible(job: MacosLaneJob): boolean {
       "test262",
       "own-key cases",
       "reflect cases",
+      "regexp exhaustive cases",
     ].includes(job.family)
   );
 }
@@ -323,9 +324,17 @@ test("every check name and concurrency policy is preserved", () => {
           (_, index) => `reflect cases (${target}, ${index + 1}/3)`,
         ),
       ),
+      // The exhaustive RegExp literal file does too; see
+      // docs/evidence/regexp-literal-exhaustive/README.md.
+      ...["linux-x86_64-gnu", "macos-aarch64"].flatMap((target) =>
+        Array.from(
+          { length: 5 },
+          (_, index) => `regexp exhaustive cases (${target}, ${index + 1}/5)`,
+        ),
+      ),
     ].toSorted(),
   );
-  assert.equal(names(after).length, 86);
+  assert.equal(names(after).length, 96);
   const { jobs: _beforeJobs, ...beforeHeader } = before;
   const { jobs: _afterJobs, ...afterHeader } = after;
   assert.deepEqual(afterHeader, beforeHeader);
@@ -377,8 +386,8 @@ test("every macOS job occurs exactly once in five LPT chains", () => {
   const lanes = macosLanes();
   assert.equal(lanes.length, 5);
   const jobs = lanes.flat();
-  assert.equal(jobs.length, 45);
-  assert.equal(new Set(jobs.map((job) => job.id)).size, 45);
+  assert.equal(jobs.length, 50);
+  assert.equal(new Set(jobs.map((job) => job.id)).size, 50);
   assert.deepEqual(
     jobs.map((job) => job.name).toSorted(),
     macosJobs()
@@ -419,12 +428,14 @@ test("every macOS job occurs exactly once in five LPT chains", () => {
   // property job adds a planning allowance; see
   // docs/evidence/regexp-literal-exhaustive/README.md. The six weighted
   // Node shards replaced four stale positional entries with modeled walls;
-  // see docs/evidence/node-shards/README.md.
+  // see docs/evidence/node-shards/README.md. The five exhaustive RegExp
+  // literal case shards raised this from 14184 with derived hosted
+  // entries; see docs/evidence/regexp-literal-exhaustive/README.md.
   assert.equal(
     Math.max(
       ...lanes.map((lane) => lane.reduce((sum, job) => sum + job.seconds, 0)),
     ),
-    14184,
+    15794,
   );
 });
 
@@ -747,7 +758,12 @@ test("native aggregate explicitly requires all native and test262 jobs", () => {
     needs.includes("test_sanitizer_macos_macos_property_regexp_literals"),
   );
   assert.ok(!needs.includes("test_sanitizer_macos_macos_property"));
-  assert.equal(expected.length, 45);
+  // The exhaustive RegExp literal case shards are required on both hosts.
+  assert.ok(needs.includes("test_regexp_exhaustive_case"));
+  for (let shard = 1; shard <= 5; shard++) {
+    assert.ok(needs.includes(`test_regexp_exhaustive_case_macos_${shard}`));
+  }
+  assert.equal(expected.length, 51);
   assert.deepEqual(aggregate.steps[0]!.env, {
     RESULTS: "${{ toJSON(needs.*.result) }}",
   });
@@ -802,7 +818,7 @@ test("aggregate follows additional dependencies in the source template", () => {
   const needs = workflow.jobs.native!.needs;
   assert.ok(needs != null && !isString(needs));
   assert.ok(needs.includes("test_sanitizer"));
-  assert.equal(needs.length, 46);
+  assert.equal(needs.length, 52);
 });
 
 test("committed workflow matches generator output exactly", () => {
@@ -840,8 +856,8 @@ test("lane-count preview leaves the committed workflow alone", () => {
 test("one extra lane retains every job and aggregate dependency", () => {
   const lanes = macosLanes(1);
   assert.equal(lanes.length, 6);
-  assert.equal(lanes.flat().length, 45);
-  assert.equal(new Set(lanes.flat().map((job) => job.id)).size, 45);
+  assert.equal(lanes.flat().length, 50);
+  assert.equal(new Set(lanes.flat().map((job) => job.id)).size, 50);
   assert.ok(lanes[5]!.length > 0);
   assert.deepEqual(
     lanes[5]!
@@ -865,6 +881,7 @@ test("one extra lane retains every job and aggregate dependency", () => {
           "test262",
           "own-key cases",
           "reflect cases",
+          "regexp exhaustive cases",
         ].includes(job.family),
       ),
   );
@@ -1230,6 +1247,7 @@ test("own-key cases lead the Mac lane with measured Mac seconds", () => {
         "test262",
         "own-key cases",
         "reflect cases",
+        "regexp exhaustive cases",
       ].includes(job.family),
     );
   }
@@ -1246,7 +1264,8 @@ test("own-key cases lead the Mac lane with measured Mac seconds", () => {
   // The dedicated ordinary Array allowance also loads a hosted lane.
   // The six weighted Node shards' modeled walls raised this from 8909,
   // because the heavier hosted lanes leave more work to the Mac lane.
-  assert.equal(Math.round(modeled), 9485);
+  // The exhaustive RegExp literal case shards raised it from 9485.
+  assert.equal(Math.round(modeled), 11051);
 });
 
 test("hosted lanes take the jobs no Mac lane can run first", () => {
@@ -1441,8 +1460,8 @@ test("availability decides the second machine's lanes too", async () => {
 test("three Mac lanes keep every job and the own-key lane", () => {
   const lanes = macosLanes(3);
   assert.equal(lanes.length, 8);
-  assert.equal(lanes.flat().length, 45);
-  assert.equal(new Set(lanes.flat().map((job) => job.id)).size, 45);
+  assert.equal(lanes.flat().length, 50);
+  assert.equal(new Set(lanes.flat().map((job) => job.id)).size, 50);
   for (const lane of lanes.slice(5)) assert.ok(lane.length > 0);
   assert.deepEqual(
     lanes
@@ -1525,8 +1544,8 @@ test("eight Mac lanes route each label with its own hosted fallback", () => {
   ]);
   const lanes = macosLanes(8);
   assert.equal(lanes.length, 13);
-  assert.equal(lanes.flat().length, 45);
-  assert.equal(new Set(lanes.flat().map((job) => job.id)).size, 45);
+  assert.equal(lanes.flat().length, 50);
+  assert.equal(new Set(lanes.flat().map((job) => job.id)).size, 50);
   for (const lane of lanes.slice(5)) assert.ok(lane.length > 0);
   // One readiness output, so one runner class, for the shared deadline.
   assert.deepEqual(
@@ -1545,6 +1564,7 @@ test("eight Mac lanes route each label with its own hosted fallback", () => {
         "test262",
         "own-key cases",
         "reflect cases",
+        "regexp exhaustive cases",
       ].includes(job.family),
     );
   }

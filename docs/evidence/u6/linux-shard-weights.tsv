@@ -105,7 +105,7 @@ tests/property/m5-proxy-exotic-object.property.test.ts	1559	1148111.288736	20573
 tests/property/m5-reflect-namespace.property.test.ts	2299	-	-	-	2299
 tests/property/m5-regexp-intrinsic.property.test.ts	223	343196.558951	347885.700287	188700.008979	344
 tests/property/m5-regexp-literal-aot.property.test.ts	438	611442.563975	599953.476745	607187.297936	608
-tests/property/m5-regexp-literal-exhaustive.property.test.ts	1585	-	-	-	1585
+tests/property/m5-regexp-literal-exhaustive.property.test.ts	8821	-	-	-	8821
 tests/property/m5-regexp-matcher.property.test.ts	8	6884.04251	4062.136429	7006.357233	7
 tests/property/m5-regexp-pattern-extensions.property.test.ts	44	52648.459136	50777.522586	53133.416472	53
 tests/property/m5-regexp-pattern.property.test.ts	2	1435.667494	770.923270	1557.613153	2
