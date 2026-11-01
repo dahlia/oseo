@@ -966,17 +966,68 @@ assessments:
       reviewed equivalent replacement evidence is asserted and no whole-path
       exclusion is authorized. The existing ADR 0016 boundary and ADR 0019
       reopening triggers remain unchanged.
-  observation-train-b06-b08-b14:
-    disposition: remediation
+  ec-static-eval-code:
+    disposition: exclusion
+    normativeDependency: source-evaluation-only
+    reason: "Root's 2026-11-02 ruling closes 14 eval code paths whose
+      non-source subject static code observes with the same operation and the
+      same compared values, as dynamic-source-eval-code-assessment.yaml maps
+      path by path. global-code/export.js, import.js and new.target-arrow.js
+      reject the same declarations at parse with SyntaxError; new.target
+      value-via-call.js and value-via-new.js compare undefined and the
+      function. Nine pinned originals keep every byte with each eval call
+      replaced by its evaluated expression, so the same name, this or
+      new.target resolution happens in the caller; each call's
+      wrong-environment mutation is rejected by an independent Test262Error
+      verdict, and both native policies with forced GC and Node/Deno references
+      agree. Only eval context selection, eval code parsing, and the conversion
+      of an early error into a run-time eval exception remain excluded under
+      ADR 0016; accounting counts no path as pass. Reopen on changed source,
+      observed rejection or replacement evidence, an accepted source admission,
+      or any uncovered non-source assertion under ADR 0019."
+    replacementEvidence:
+      docs/m5c-graph/dynamic-source-eval-code-assessment.yaml:
+        "af0fc69f978acf750611527d65f1a84a\
+        f641615a6935f837967c88ee8a7bd081"
+      tests/native/fixtures/eval-code-inline-evidence.ts:
+        "1d81b5ee9597f586cc4fe72991061fbd\
+        bff15b2616d6cdf44cae419b94b38d9d"
+      tests/eval-code-inline-evidence.test.ts:
+        "5a2a30605deda066547518c8b6a12ea7\
+        6cfda4bc216e1caa0c8bd1f3721f22e6"
+      tests/native/fixtures/host-script-evidence.ts:
+        "d804fcda15e50a5b2f9ecbaaa1679671\
+        0150e5cefb8d98fc213693f3ca618a0c"
+      tests/native/host-script-reference.ts: "d01339d26b85c0c7e315f453a831bd12\
+        a725261ce11635baa6ea62c1b8cab262"
+      tests/test262/harness/base.js: "50331feeca513cb2e2354e05e7c68f82\
+        d5aeccd9b766d6c88438c5ef118075f6"
+      tests/test262/results/language/global-code/c0.yaml:
+        "dea613977e65f47e379b5f4886bd9e43\
+        6be72f458ca522552341fac76b41215c"
+      tests/test262/results/language/global-code/52.yaml:
+        "d98511e2d6c0f2bd6e3555a9c6b58d7f\
+        5d91f7dd52151806bfb0386d7cf0c061"
+      tests/test262/results/language/global-code/0a.yaml:
+        "797052de32878d241fcd1d42b4522afc\
+        34781eed53f80345d2618b6e0af9735a"
+      tests/test262/results/language/expressions/72.yaml:
+        "b7fc09e8d00cdd9238f039327de266c0\
+        8f371d0ff2e50c9dc2668b5ce0cfbd98"
+      tests/test262/results/language/expressions/81.yaml:
+        "3911a5d61c7521021bfeafbbd01074c3\
+        4b47f2425a84b34a762de0c0e7234b3a"
+  ec-declarative-lref-deferral:
+    disposition: deferral
     normativeDependency: not-demonstrated
-    reason: Root retains exactly 341 original B06/B08/B14 source-rejection
-      paths as active in-claim coverage remediation. Their original source
-      evaluation, completion, Reference, lexical, property and operator
-      contracts remain unresolved where rejection prevents observation.
-      This assessment supplies no equivalent replacement evidence and
-      authorizes no whole-path exclusion. The two direct non-String eval
-      identity paths have a separate bounded remediation owner. ADR 0013,
-      ADR 0016 and ADR 0019, including reopening triggers, remain unchanged.
+    reason: "Deferred under ADR 0031; docs/m5c-closure/deferrals.yaml names
+      each path's remaining contract. S11.13.1_A6_T1 and S11.13.1_A6_T2 assert
+      that PutValue writes through the Reference resolved before the right-hand
+      side while a direct eval var declaration adds a nearer binding to a
+      function's declarative record. S11.13.1_A5_T1 to S11.13.1_A5_T3 already
+      pass for the object environment record variant; only direct eval adds a
+      declarative binding after instantiation, and direct eval is not approved
+      for M5."
   observation-train-dynamic-coverage:
     disposition: remediation
     normativeDependency: not-demonstrated
@@ -11605,7 +11656,7 @@ paths:
     missingDynamicTag: false
     section: "sec-scripts"
     subject: "The `export` declaration may not appear within eval code"
-    assessment: "observation-train-b06-b08-b14"
+    assessment: ec-static-eval-code
   - path: "test/language/eval-code/direct/func-decl-a-following-parameter-is-na\
       med-arguments-declare-arguments-and-assign.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -12601,7 +12652,7 @@ paths:
     section: "Original es5id: 10.4.2-1-3"
     subject: "Direct call to eval has context set to local context (catch bl\
       ock)"
-    assessment: "observation-train-b06-b08-b14"
+    assessment: ec-static-eval-code
   - path: "test/language/eval-code/direct/global-env-rec-eval.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "source-subject"
@@ -12613,7 +12664,7 @@ paths:
     section: "Original es5id: 10.4.2-1-5"
     subject: "Direct call to eval has context set to local context (inside
       another eval)"
-    assessment: "observation-train-b06-b08-b14"
+    assessment: eval-semantics
   - path: "test/language/eval-code/direct/global-env-rec-fun.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "source-subject"
@@ -12625,7 +12676,7 @@ paths:
     section: "Original es5id: 10.4.2-1-2"
     subject: "Direct call to eval has context set to local context (nested f\
       unction)"
-    assessment: "observation-train-b06-b08-b14"
+    assessment: ec-static-eval-code
   - path: "test/language/eval-code/direct/global-env-rec-with.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "source-subject"
@@ -12636,7 +12687,7 @@ paths:
     missingDynamicTag: false
     section: "Original es5id: 10.4.2-1-4"
     subject: "Direct call to eval has context set to local context (with block)"
-    assessment: "observation-train-b06-b08-b14"
+    assessment: ec-static-eval-code
   - path: "test/language/eval-code/direct/global-env-rec.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "source-subject"
@@ -12647,7 +12698,7 @@ paths:
     missingDynamicTag: false
     section: "Original es5id: 10.4.2-1-1"
     subject: "Direct call to eval has context set to local context"
-    assessment: "observation-train-b06-b08-b14"
+    assessment: ec-static-eval-code
   - path: "test/language/eval-code/direct/import.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "source-subject"
@@ -12658,7 +12709,7 @@ paths:
     missingDynamicTag: false
     section: "sec-scripts"
     subject: "The `import` declaration may not appear within eval code"
-    assessment: "observation-train-b06-b08-b14"
+    assessment: ec-static-eval-code
   - path: "test/language/eval-code/direct/lex-env-distinct-cls.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "source-subject"
@@ -12670,7 +12721,7 @@ paths:
     section: "sec-performeval"
     subject: "Direct eval code creates a new declarative environment for
       lexically-scoped declarations (class)"
-    assessment: "observation-train-b06-b08-b14"
+    assessment: eval-semantics
   - path: "test/language/eval-code/direct/lex-env-distinct-const.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "source-subject"
@@ -12682,7 +12733,7 @@ paths:
     section: "sec-performeval"
     subject: "Direct eval code creates a new declarative environment for
       lexically-scoped declarations (const)"
-    assessment: "observation-train-b06-b08-b14"
+    assessment: eval-semantics
   - path: "test/language/eval-code/direct/lex-env-distinct-let.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "source-subject"
@@ -12694,7 +12745,7 @@ paths:
     section: "sec-performeval"
     subject: "Direct eval code creates a new declarative environment for
       lexically-scoped declarations (let)"
-    assessment: "observation-train-b06-b08-b14"
+    assessment: eval-semantics
   - path: "test/language/eval-code/direct/lex-env-heritage.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "source-subject"
@@ -12706,7 +12757,7 @@ paths:
     section: "sec-performeval"
     subject: "Direct eval code sets the new declarative environment's outer
       environment to that of the current context."
-    assessment: "observation-train-b06-b08-b14"
+    assessment: ec-static-eval-code
   - path: "test/language/eval-code/direct/lex-env-no-init-cls.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "source-subject"
@@ -12918,7 +12969,7 @@ paths:
     section: "sec-scripts-static-semantics-early-errors"
     subject: "A direct eval in the functon code of an ArrowFunction may not
       contain `new.target`"
-    assessment: "observation-train-b06-b08-b14"
+    assessment: ec-static-eval-code
   - path: "test/language/eval-code/direct/new.target-fn.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "source-subject"
@@ -12930,7 +12981,7 @@ paths:
     section: "sec-scripts-static-semantics-early-errors"
     subject: "A direct eval in the functon code of a non-ArrowFunction may
       contain `new.target`"
-    assessment: "observation-train-b06-b08-b14"
+    assessment: ec-static-eval-code
   - path: "test/language/eval-code/direct/new.target.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "source-subject"
@@ -13311,7 +13362,7 @@ paths:
     section: "sec-performeval"
     subject: "Direct eval code has the same `this` binding as the calling
       context (non-strict function scope)"
-    assessment: "observation-train-b06-b08-b14"
+    assessment: ec-static-eval-code
   - path: "test/language/eval-code/direct/this-value-func-strict-caller.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "source-subject"
@@ -13323,7 +13374,7 @@ paths:
     section: "sec-performeval"
     subject: "Direct eval code has the same `this` binding as the calling
       context (strict function scope)"
-    assessment: "observation-train-b06-b08-b14"
+    assessment: ec-static-eval-code
   - path: "test/language/eval-code/direct/this-value-func-strict-source.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "source-subject"
@@ -13335,7 +13386,7 @@ paths:
     section: "sec-performeval"
     subject: "Direct eval code has the same `this` binding as the calling
       context (strict function scope)"
-    assessment: "observation-train-b06-b08-b14"
+    assessment: ec-static-eval-code
   - path: "test/language/eval-code/direct/this-value-global.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "source-subject"
@@ -13358,7 +13409,7 @@ paths:
     missingDynamicTag: false
     section: "sec-evaldeclarationinstantiation"
     subject: "Initialization of new global property"
-    assessment: "observation-train-b06-b08-b14"
+    assessment: eval-semantics
   - path: "test/language/eval-code/direct/var-env-func-init-global-update-confi\
       gurable.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -13370,7 +13421,7 @@ paths:
     missingDynamicTag: false
     section: "sec-evaldeclarationinstantiation"
     subject: "Modification of previously-existing configurable global property"
-    assessment: "observation-train-b06-b08-b14"
+    assessment: eval-semantics
   - path: "test/language/eval-code/direct/var-env-func-init-global-update-non-c\
       onfigurable.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -13394,7 +13445,7 @@ paths:
     missingDynamicTag: false
     section: "sec-evaldeclarationinstantiation"
     subject: "Newly-created local binding may be deleted"
-    assessment: "observation-train-b06-b08-b14"
+    assessment: eval-semantics
   - path: "test/language/eval-code/direct/var-env-func-init-local-new.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "source-subject"
@@ -13405,7 +13456,7 @@ paths:
     missingDynamicTag: false
     section: "sec-evaldeclarationinstantiation"
     subject: "Initialization of new local binding"
-    assessment: "observation-train-b06-b08-b14"
+    assessment: eval-semantics
   - path: "test/language/eval-code/direct/var-env-func-init-local-update.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "source-subject"
@@ -13416,7 +13467,7 @@ paths:
     missingDynamicTag: false
     section: "sec-evaldeclarationinstantiation"
     subject: "Re-declaration of an existing local variable binding"
-    assessment: "observation-train-b06-b08-b14"
+    assessment: eval-semantics
   - path: "test/language/eval-code/direct/var-env-func-init-multi.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "source-subject"
@@ -13439,7 +13490,7 @@ paths:
     section: "sec-performeval"
     subject: "Non-stict mode direct eval code cannot instantiate functions in
       the variable environment of the caller"
-    assessment: "observation-train-b06-b08-b14"
+    assessment: eval-semantics
   - path: "test/language/eval-code/direct/var-env-func-strict-caller-2.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "source-subject"
@@ -13451,7 +13502,7 @@ paths:
     section: "Original es5id: 10.4.2.1-2-s"
     subject: "Strict Mode - Strict mode eval code cannot instantiate functions
       in the variable environment of the caller to eval"
-    assessment: "observation-train-b06-b08-b14"
+    assessment: eval-semantics
   - path: "test/language/eval-code/direct/var-env-func-strict-caller.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "source-subject"
@@ -13463,7 +13514,7 @@ paths:
     section: "Original es5id: 10.4.2-2-s"
     subject: "Strict Mode - Strict mode eval code cannot instantiate functions
       in the variable environment of the caller to eval"
-    assessment: "observation-train-b06-b08-b14"
+    assessment: eval-semantics
   - path: "test/language/eval-code/direct/var-env-func-strict-source.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "source-subject"
@@ -13475,7 +13526,7 @@ paths:
     section: "Original es5id: 10.4.2.1-4-s"
     subject: "Strict Mode - Strict mode eval code cannot instantiate functions
       in the variable environment of the caller to eval."
-    assessment: "observation-train-b06-b08-b14"
+    assessment: eval-semantics
   - path: "test/language/eval-code/direct/var-env-gloabl-lex-strict-caller.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "source-subject"
@@ -13519,7 +13570,7 @@ paths:
     missingDynamicTag: false
     section: "sec-evaldeclarationinstantiation"
     subject: "Variable collision with lexical binding in lower scope"
-    assessment: "observation-train-b06-b08-b14"
+    assessment: eval-semantics
   - path: "test/language/eval-code/direct/var-env-lower-lex-strict-caller.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "source-subject"
@@ -13563,7 +13614,7 @@ paths:
     missingDynamicTag: false
     section: "sec-evaldeclarationinstantiation"
     subject: "Initialization of new global property"
-    assessment: "observation-train-b06-b08-b14"
+    assessment: eval-semantics
   - path: "test/language/eval-code/direct/var-env-var-init-local-exstng.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "source-subject"
@@ -13575,7 +13626,7 @@ paths:
     section: "sec-evaldeclarationinstantiation"
     subject: "Re-declaration of an existing local variable binding has no ef\
       fect"
-    assessment: "observation-train-b06-b08-b14"
+    assessment: eval-semantics
   - path: "test/language/eval-code/direct/var-env-var-init-local-new-delete.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "source-subject"
@@ -13586,7 +13637,7 @@ paths:
     missingDynamicTag: false
     section: "sec-evaldeclarationinstantiation"
     subject: "Newly-created local binding may be deleted"
-    assessment: "observation-train-b06-b08-b14"
+    assessment: eval-semantics
   - path: "test/language/eval-code/direct/var-env-var-init-local-new.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "source-subject"
@@ -13597,7 +13648,7 @@ paths:
     missingDynamicTag: false
     section: "sec-evaldeclarationinstantiation"
     subject: "Initialization of new variable binding"
-    assessment: "observation-train-b06-b08-b14"
+    assessment: eval-semantics
   - path: "test/language/eval-code/direct/var-env-var-non-strict.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "source-subject"
@@ -13609,7 +13660,7 @@ paths:
     section: "Original es5id: 10.4.2-2-c-1"
     subject: "Direct val code in non-strict mode - can instantiate variable in
       calling context"
-    assessment: "observation-train-b06-b08-b14"
+    assessment: eval-semantics
   - path: "test/language/eval-code/direct/var-env-var-strict-caller-2.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "source-subject"
@@ -13622,7 +13673,7 @@ paths:
     subject: "Strict Mode - eval code cannot instantiate variable in the
       variable environment of the calling context that invoked the eval if the
       code of the calling context is strict code"
-    assessment: "observation-train-b06-b08-b14"
+    assessment: eval-semantics
   - path: "test/language/eval-code/direct/var-env-var-strict-caller-3.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "source-subject"
@@ -13634,7 +13685,7 @@ paths:
     section: "Original es5id: 10.4.2-3-c-3-s"
     subject: "Calling code in strict mode - eval cannot instantiate variable in
       the global context"
-    assessment: "observation-train-b06-b08-b14"
+    assessment: eval-semantics
   - path: "test/language/eval-code/direct/var-env-var-strict-caller.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "source-subject"
@@ -13646,7 +13697,7 @@ paths:
     section: "Original es5id: 10.4.2-3-c-2-s"
     subject: "Calling code in strict mode - eval cannot instantiate variable in
       the variable environment of the calling context"
-    assessment: "observation-train-b06-b08-b14"
+    assessment: eval-semantics
   - path: "test/language/eval-code/direct/var-env-var-strict-source.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "source-subject"
@@ -13658,7 +13709,7 @@ paths:
     section: "Original es5id: 10.4.2-3-c-1-s"
     subject: "Direct eval code in strict mode - cannot instantiate variable in
       the variable environment of the calling context"
-    assessment: "observation-train-b06-b08-b14"
+    assessment: eval-semantics
   - path: "test/language/eval-code/indirect/always-non-strict.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "source-subject"
@@ -13802,7 +13853,7 @@ paths:
     missingDynamicTag: false
     section: "sec-scripts"
     subject: "The `export` declaration may not appear within eval code"
-    assessment: "observation-train-b06-b08-b14"
+    assessment: ec-static-eval-code
   - path: "test/language/eval-code/indirect/global-env-rec-catch.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "source-subject"
@@ -13826,7 +13877,7 @@ paths:
     section: "Original es5id: 10.4.2-1-5"
     subject: "Indirect call to eval has context set to global context (inside
       another eval)"
-    assessment: "observation-train-b06-b08-b14"
+    assessment: eval-semantics
   - path: "test/language/eval-code/indirect/global-env-rec-fun.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "source-subject"
@@ -13872,7 +13923,7 @@ paths:
     missingDynamicTag: false
     section: "sec-scripts"
     subject: "The `import` declaration may not appear within eval code"
-    assessment: "observation-train-b06-b08-b14"
+    assessment: ec-static-eval-code
   - path: "test/language/eval-code/indirect/lex-env-distinct-cls.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "source-subject"
@@ -13884,7 +13935,7 @@ paths:
     section: "sec-performeval"
     subject: "Indirect eval code creates a new declarative environment for
       lexically-scoped declarations (class)"
-    assessment: "observation-train-b06-b08-b14"
+    assessment: eval-semantics
   - path: "test/language/eval-code/indirect/lex-env-distinct-const.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "source-subject"
@@ -13896,7 +13947,7 @@ paths:
     section: "sec-performeval"
     subject: "Indirect eval code creates a new declarative environment for
       lexically-scoped declarations (const)"
-    assessment: "observation-train-b06-b08-b14"
+    assessment: eval-semantics
   - path: "test/language/eval-code/indirect/lex-env-distinct-let.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "source-subject"
@@ -13908,7 +13959,7 @@ paths:
     section: "sec-performeval"
     subject: "Indirect eval code creates a new declarative environment for
       lexically-scoped declarations (let)"
-    assessment: "observation-train-b06-b08-b14"
+    assessment: eval-semantics
   - path: "test/language/eval-code/indirect/lex-env-heritage.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "source-subject"
@@ -14186,7 +14237,7 @@ paths:
     missingDynamicTag: false
     section: "sec-evaldeclarationinstantiation"
     subject: "Initialization of new global property"
-    assessment: "observation-train-b06-b08-b14"
+    assessment: eval-semantics
   - path: "test/language/eval-code/indirect/var-env-func-init-global-update-con\
       figurable.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -14198,7 +14249,7 @@ paths:
     missingDynamicTag: false
     section: "sec-evaldeclarationinstantiation"
     subject: "Modification of previously-existing configurable global property"
-    assessment: "observation-train-b06-b08-b14"
+    assessment: eval-semantics
   - path: "test/language/eval-code/indirect/var-env-func-init-global-update-non\
       -configurable.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -14246,7 +14297,7 @@ paths:
     section: "sec-performeval"
     subject: "Strict Mode - Strict mode eval code cannot instantiate functions
       in the variable environment of the caller to eval."
-    assessment: "observation-train-b06-b08-b14"
+    assessment: eval-semantics
   - path: "test/language/eval-code/indirect/var-env-global-lex-non-strict.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "source-subject"
@@ -14312,7 +14363,7 @@ paths:
     missingDynamicTag: false
     section: "sec-evaldeclarationinstantiation"
     subject: "Initialization of new global property"
-    assessment: "observation-train-b06-b08-b14"
+    assessment: eval-semantics
   - path: "test/language/eval-code/indirect/var-env-var-non-strict.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "source-subject"
@@ -14335,7 +14386,7 @@ paths:
     section: "Original es5id: 10.4.2.1_A1"
     subject: "Strict indirect eval should not leak top level declarations into
       the global scope"
-    assessment: "observation-train-b06-b08-b14"
+    assessment: eval-semantics
   - path: "test/language/expressions/addition/S11.6.1_A1.js"
     proposedOwner: adr:0016-dynamic-source-boundary
     priorCohort: incidental-scaffolding
@@ -14484,7 +14535,7 @@ paths:
       Reference base value is an environment record and environment record
       kind is declarative environment record. PutValue(lref, rval) uses the
       initially created Reference even if a more local binding is available."
-    assessment: "observation-train-b06-b08-b14"
+    assessment: ec-declarative-lref-deferral
   - path: "test/language/expressions/assignment/S11.13.1_A6_T2.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "incidental-scaffolding"
@@ -14498,7 +14549,7 @@ paths:
       Reference base value is an environment record and environment record
       kind is declarative environment record. PutValue(lref, rval) uses the
       initially created Reference even if a more local binding is available."
-    assessment: "observation-train-b06-b08-b14"
+    assessment: ec-declarative-lref-deferral
   - path: "test/language/expressions/async-arrow-function/eval-\
       var-scope-syntax-err.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"

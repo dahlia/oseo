@@ -23,6 +23,60 @@ families:
       import track, which the maintainer moved past M5; its reviewed
       design is the post-M5 plan that PLAN-DYN.md links.
 paths:
+  test/language/expressions/assignment/S11.13.1_A6_T1.js:
+    family: run-time-source
+    section: sec-assignment-operators-runtime-semantics-evaluation
+    remainingContract: 'In a sloppy inner function, x = (eval("var x;"), 1)
+      writes 1 to the outer function''s x resolved before the right-hand side,
+      although the eval adds var x to the inner function''s variable
+      environment: the inner x then reads undefined and the outer x reads 1.'
+    reason: "S11.13.1_A5_T1, S11.13.1_A5_T2 and S11.13.1_A5_T3 pass for the
+      object environment record variant, where the right-hand side deletes the
+      with object's binding. A declarative environment record gains a binding
+      after its function is instantiated only through a direct eval var
+      declaration; a static var is instantiated before the assignment runs, and
+      a host Script declares globally, so no static or host Script witness
+      reproduces this variant."
+    attempts:
+      nodes:
+        - dynamic-source-eval-code-assessment
+      decisions:
+        - "2026-11-01 umbrella-residual answer: bounded general eval and
+          Function construction are not approved for M5"
+        - "2026-11-02 Root ruling on the eval code disposition question: the
+          two declarative-record assignment rows are run-time source deferrals"
+    targetMilestone: PLAN-DYN.md
+    sourceDigest: "3237b19c38d727e37cb184fb0c760c8996622e4fd9e53c39ee8ae5305d0\
+      3b4d6"
+    observationDigest: "ecc5d0f47951110d25ee5a19dca34fa5c03ef5358346a0f24b1ddd\
+      f4126738a9"
+  test/language/expressions/assignment/S11.13.1_A6_T2.js:
+    family: run-time-source
+    section: sec-assignment-operators-runtime-semantics-evaluation
+    remainingContract: 'In a sloppy inner function, x = (eval("var x = 2;"),
+      1) writes 1 to the outer function''s x resolved before the right-hand
+      side, although the eval adds var x = 2 to the inner function''s variable
+      environment: the inner x then reads 2 and the outer x reads 1.'
+    reason: "S11.13.1_A5_T1, S11.13.1_A5_T2 and S11.13.1_A5_T3 pass for the
+      object environment record variant, where the right-hand side deletes the
+      with object's binding. A declarative environment record gains a binding
+      after its function is instantiated only through a direct eval var
+      declaration; a static var is instantiated before the assignment runs, and
+      a host Script declares globally, so no static or host Script witness
+      reproduces this variant."
+    attempts:
+      nodes:
+        - dynamic-source-eval-code-assessment
+      decisions:
+        - "2026-11-01 umbrella-residual answer: bounded general eval and
+          Function construction are not approved for M5"
+        - "2026-11-02 Root ruling on the eval code disposition question: the
+          two declarative-record assignment rows are run-time source deferrals"
+    targetMilestone: PLAN-DYN.md
+    sourceDigest: "469ebce92c821387a71da2e244ff90aa94a94740b32233691b3aacc2510\
+      142c9"
+    observationDigest: "e8d10606327ae9aa0b80e79cfbcc6bccf2848ccffc4b99dfbc7f6e\
+      ef556ccce2"
   test/language/expressions/class/subclass-builtins/subclass-Function.js:
     family: run-time-source
     section: sec-function-constructor

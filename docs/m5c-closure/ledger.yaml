@@ -7,7 +7,7 @@ suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
 inventoryPaths: 41091
 closedPaths: 39179
 openPaths: 1912
-deferredPaths: 26
+deferredPaths: 28
 states:
   expected-negative: 4401
   harness-failure: 0
@@ -203,8 +203,13 @@ owners:
       accounts for S7.8.5_A1.1_T2 and S7.8.5_A2.1_T2 under the
       2026-10-28 item 1 rule: its exhaustive literal property witnesses
       every selected code unit at build time and natively, and only eval
-      of the literal text remains."
-    paths: 1716
+      of the literal text remains. Dynamic-source-eval-code-assessment
+      accounts for 46 eval code paths under Root's 2026-11-02 ruling: 32
+      under the eval-semantics assessment, whose only subject is eval
+      environment selection or declaration instantiation, and 14 whose
+      non-source subjects static witnesses observe, as
+      dynamic-source-eval-code-assessment.yaml maps them."
+    paths: 1762
   adr:0028-legacy-function-caller-boundary:
     note: ADR 0028 authorizes "an M5 exclusion of the expectation that
       reading the `caller` property of a non-strict ordinary function
@@ -223,7 +228,7 @@ owners:
       the reason, the remaining contract, and the milestone after M5
       that inherits the path. They stay open and are counted neither as
       closed nor as excluded.
-    paths: 26
+    paths: 28
   node:class-private-accessor-lookup-coverage-remediation:
     note: Observation-batch-22b admits the two class declaration tests under
       test/language/statements/class/elements/ that call
@@ -375,8 +380,12 @@ owners:
       M5c-deferral-ledger-checker moves 26 paths to the deferred owner
       under ADR 0031: the 20 static-specifier import rows and six rows
       that only run-time eval or Function source observes, including
-      both variable-environment probes."
-    paths: 136
+      both variable-environment probes.
+      Dynamic-source-eval-code-assessment moves 48 eval code paths out:
+      46 to ADR 0016 and the two S11.13.1_A6 assignment rows, whose
+      declarative-record contract only a direct eval var declaration
+      observes, to the deferred owner under ADR 0031."
+    paths: 88
   observation:
     note: Closed by a reviewed pass or expected negative in the manifest.
       The owner changes only when a regenerated manifest changes the
@@ -19289,7 +19298,7 @@ paths:
   test/language/eval-code/direct/cptn-nrml-expr-obj.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [dynamic-source, expression-operators, functions, object-literals, var-bindings]]
   test/language/eval-code/direct/cptn-nrml-expr-prim.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [dynamic-source, expression-operators, functions, var-bindings]]
   test/language/eval-code/direct/cptn-thrw-prim.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [abrupt-completion, dynamic-source, functions]]
-  test/language/eval-code/direct/export.js: [unsupported-profile-feature, node:dynamic-source-coverage-remediation, [abrupt-completion, dynamic-source, error-intrinsics, functions, module-linking]]
+  test/language/eval-code/direct/export.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [abrupt-completion, dynamic-source, error-intrinsics, functions, module-linking]]
   test/language/eval-code/direct/func-decl-a-following-parameter-is-named-arguments-declare-arguments-and-assign.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [abrupt-completion, default-parameters, dynamic-source, error-intrinsics, expression-operators, functions, object-properties, var-bindings]]
   test/language/eval-code/direct/func-decl-a-following-parameter-is-named-arguments-declare-arguments.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [abrupt-completion, default-parameters, dynamic-source, error-intrinsics, expression-operators, functions, object-properties, var-bindings]]
   test/language/eval-code/direct/func-decl-a-preceding-parameter-is-named-arguments-declare-arguments-and-assign.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [abrupt-completion, default-parameters, dynamic-source, error-intrinsics, expression-operators, functions, object-properties, var-bindings]]
@@ -19362,16 +19371,16 @@ paths:
   test/language/eval-code/direct/gen-meth-fn-body-cntns-arguments-var-bind-declare-arguments.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [abrupt-completion, default-parameters, dynamic-source, error-intrinsics, expression-operators, functions, generators, lexical-bindings, object-literals, object-properties, var-bindings]]
   test/language/eval-code/direct/gen-meth-no-pre-existing-arguments-bindings-are-present-declare-arguments-and-assign.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [abrupt-completion, default-parameters, dynamic-source, error-intrinsics, expression-operators, functions, generators, lexical-bindings, object-literals, object-properties, var-bindings]]
   test/language/eval-code/direct/gen-meth-no-pre-existing-arguments-bindings-are-present-declare-arguments.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [abrupt-completion, default-parameters, dynamic-source, error-intrinsics, expression-operators, functions, generators, lexical-bindings, object-literals, object-properties, var-bindings]]
-  test/language/eval-code/direct/global-env-rec-catch.js: [unsupported-profile-feature, node:dynamic-source-coverage-remediation, [abrupt-completion, control-flow, dynamic-source, expression-operators, functions, var-bindings]]
-  test/language/eval-code/direct/global-env-rec-eval.js: [unsupported-profile-feature, node:dynamic-source-coverage-remediation, [dynamic-source, expression-operators, functions, var-bindings]]
-  test/language/eval-code/direct/global-env-rec-fun.js: [unsupported-profile-feature, node:dynamic-source-coverage-remediation, [dynamic-source, expression-operators, functions, var-bindings]]
-  test/language/eval-code/direct/global-env-rec-with.js: [unsupported-profile-feature, node:dynamic-source-coverage-remediation, [control-flow, dynamic-source, expression-operators, functions, object-properties, symbols, var-bindings]]
-  test/language/eval-code/direct/global-env-rec.js: [unsupported-profile-feature, node:dynamic-source-coverage-remediation, [dynamic-source, expression-operators, functions, var-bindings]]
-  test/language/eval-code/direct/import.js: [unsupported-profile-feature, node:dynamic-source-coverage-remediation, [abrupt-completion, dynamic-source, error-intrinsics, functions, module-linking]]
-  test/language/eval-code/direct/lex-env-distinct-cls.js: [unsupported-profile-feature, node:dynamic-source-coverage-remediation, [abrupt-completion, classes, dynamic-source, error-intrinsics, expression-operators, functions, lexical-bindings]]
-  test/language/eval-code/direct/lex-env-distinct-const.js: [unsupported-profile-feature, node:dynamic-source-coverage-remediation, [abrupt-completion, dynamic-source, error-intrinsics, expression-operators, functions, lexical-bindings]]
-  test/language/eval-code/direct/lex-env-distinct-let.js: [unsupported-profile-feature, node:dynamic-source-coverage-remediation, [abrupt-completion, dynamic-source, error-intrinsics, expression-operators, functions, lexical-bindings]]
-  test/language/eval-code/direct/lex-env-heritage.js: [unsupported-profile-feature, node:dynamic-source-coverage-remediation, [dynamic-source, functions, lexical-bindings, var-bindings]]
+  test/language/eval-code/direct/global-env-rec-catch.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [abrupt-completion, control-flow, dynamic-source, expression-operators, functions, var-bindings]]
+  test/language/eval-code/direct/global-env-rec-eval.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [dynamic-source, expression-operators, functions, var-bindings]]
+  test/language/eval-code/direct/global-env-rec-fun.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [dynamic-source, expression-operators, functions, var-bindings]]
+  test/language/eval-code/direct/global-env-rec-with.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [control-flow, dynamic-source, expression-operators, functions, object-properties, symbols, var-bindings]]
+  test/language/eval-code/direct/global-env-rec.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [dynamic-source, expression-operators, functions, var-bindings]]
+  test/language/eval-code/direct/import.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [abrupt-completion, dynamic-source, error-intrinsics, functions, module-linking]]
+  test/language/eval-code/direct/lex-env-distinct-cls.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [abrupt-completion, classes, dynamic-source, error-intrinsics, expression-operators, functions, lexical-bindings]]
+  test/language/eval-code/direct/lex-env-distinct-const.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [abrupt-completion, dynamic-source, error-intrinsics, expression-operators, functions, lexical-bindings]]
+  test/language/eval-code/direct/lex-env-distinct-let.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [abrupt-completion, dynamic-source, error-intrinsics, expression-operators, functions, lexical-bindings]]
+  test/language/eval-code/direct/lex-env-heritage.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [dynamic-source, functions, lexical-bindings, var-bindings]]
   test/language/eval-code/direct/lex-env-no-init-cls.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [abrupt-completion, classes, dynamic-source, error-intrinsics, expression-operators, functions, lexical-bindings]]
   test/language/eval-code/direct/lex-env-no-init-const.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [abrupt-completion, dynamic-source, error-intrinsics, expression-operators, functions, lexical-bindings]]
   test/language/eval-code/direct/lex-env-no-init-let.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [abrupt-completion, dynamic-source, error-intrinsics, expression-operators, functions, lexical-bindings]]
@@ -19387,8 +19396,8 @@ paths:
   test/language/eval-code/direct/meth-fn-body-cntns-arguments-var-bind-declare-arguments.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [abrupt-completion, default-parameters, dynamic-source, error-intrinsics, expression-operators, functions, lexical-bindings, object-literals, object-properties, var-bindings]]
   test/language/eval-code/direct/meth-no-pre-existing-arguments-bindings-are-present-declare-arguments-and-assign.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [abrupt-completion, default-parameters, dynamic-source, error-intrinsics, expression-operators, functions, lexical-bindings, object-literals, object-properties, var-bindings]]
   test/language/eval-code/direct/meth-no-pre-existing-arguments-bindings-are-present-declare-arguments.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [abrupt-completion, default-parameters, dynamic-source, error-intrinsics, expression-operators, functions, lexical-bindings, object-literals, object-properties, var-bindings]]
-  test/language/eval-code/direct/new.target-arrow.js: [unsupported-profile-feature, node:dynamic-source-coverage-remediation, [abrupt-completion, dynamic-source, error-intrinsics, expression-operators, functions, object-properties, var-bindings]]
-  test/language/eval-code/direct/new.target-fn.js: [unsupported-profile-feature, node:dynamic-source-coverage-remediation, [dynamic-source, expression-operators, functions, var-bindings]]
+  test/language/eval-code/direct/new.target-arrow.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [abrupt-completion, dynamic-source, error-intrinsics, expression-operators, functions, object-properties, var-bindings]]
+  test/language/eval-code/direct/new.target-fn.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [dynamic-source, expression-operators, functions, var-bindings]]
   test/language/eval-code/direct/new.target.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [abrupt-completion, dynamic-source, error-intrinsics, expression-operators, functions, object-properties, var-bindings]]
   test/language/eval-code/direct/non-definable-function-with-function.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [abrupt-completion, dynamic-source, functions, object-properties]]
   test/language/eval-code/direct/non-definable-function-with-variable.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [abrupt-completion, dynamic-source, functions, object-properties, var-bindings]]
@@ -19422,37 +19431,37 @@ paths:
   test/language/eval-code/direct/switch-dflt-decl-eval-source-is-strict-nostrict.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [abrupt-completion, control-flow, dynamic-source, error-intrinsics, functions, object-properties, var-bindings]]
   test/language/eval-code/direct/switch-dflt-decl-eval-source-is-strict-onlystrict.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [abrupt-completion, control-flow, dynamic-source, error-intrinsics, functions, object-properties, var-bindings]]
   test/language/eval-code/direct/switch-dflt-decl-onlystrict.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [abrupt-completion, control-flow, dynamic-source, error-intrinsics, functions, object-properties, var-bindings]]
-  test/language/eval-code/direct/this-value-func-non-strict.js: [unsupported-profile-feature, node:dynamic-source-coverage-remediation, [dynamic-source, functions, var-bindings]]
-  test/language/eval-code/direct/this-value-func-strict-caller.js: [unsupported-profile-feature, node:dynamic-source-coverage-remediation, [dynamic-source, functions, var-bindings]]
-  test/language/eval-code/direct/this-value-func-strict-source.js: [unsupported-profile-feature, node:dynamic-source-coverage-remediation, [dynamic-source, functions, var-bindings]]
+  test/language/eval-code/direct/this-value-func-non-strict.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [dynamic-source, functions, var-bindings]]
+  test/language/eval-code/direct/this-value-func-strict-caller.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [dynamic-source, functions, var-bindings]]
+  test/language/eval-code/direct/this-value-func-strict-source.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [dynamic-source, functions, var-bindings]]
   test/language/eval-code/direct/this-value-global.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [dynamic-source, functions]]
-  test/language/eval-code/direct/var-env-func-init-global-new.js: [unsupported-profile-feature, node:dynamic-source-coverage-remediation, [dynamic-source, expression-operators, functions, object-properties, var-bindings]]
-  test/language/eval-code/direct/var-env-func-init-global-update-configurable.js: [unsupported-profile-feature, node:dynamic-source-coverage-remediation, [dynamic-source, expression-operators, functions, object-literals, object-properties, var-bindings]]
+  test/language/eval-code/direct/var-env-func-init-global-new.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [dynamic-source, expression-operators, functions, object-properties, var-bindings]]
+  test/language/eval-code/direct/var-env-func-init-global-update-configurable.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [dynamic-source, expression-operators, functions, object-literals, object-properties, var-bindings]]
   test/language/eval-code/direct/var-env-func-init-global-update-non-configurable.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [dynamic-source, expression-operators, functions, object-literals, object-properties, var-bindings]]
-  test/language/eval-code/direct/var-env-func-init-local-new-delete.js: [unsupported-profile-feature, node:dynamic-source-coverage-remediation, [abrupt-completion, dynamic-source, error-intrinsics, expression-operators, functions, var-bindings]]
-  test/language/eval-code/direct/var-env-func-init-local-new.js: [unsupported-profile-feature, node:dynamic-source-coverage-remediation, [abrupt-completion, dynamic-source, error-intrinsics, expression-operators, functions, var-bindings]]
-  test/language/eval-code/direct/var-env-func-init-local-update.js: [unsupported-profile-feature, node:dynamic-source-coverage-remediation, [abrupt-completion, dynamic-source, error-intrinsics, expression-operators, functions, var-bindings]]
+  test/language/eval-code/direct/var-env-func-init-local-new-delete.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [abrupt-completion, dynamic-source, error-intrinsics, expression-operators, functions, var-bindings]]
+  test/language/eval-code/direct/var-env-func-init-local-new.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [abrupt-completion, dynamic-source, error-intrinsics, expression-operators, functions, var-bindings]]
+  test/language/eval-code/direct/var-env-func-init-local-update.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [abrupt-completion, dynamic-source, error-intrinsics, expression-operators, functions, var-bindings]]
   test/language/eval-code/direct/var-env-func-init-multi.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [dynamic-source, expression-operators, functions, var-bindings]]
-  test/language/eval-code/direct/var-env-func-non-strict.js: [unsupported-profile-feature, node:dynamic-source-coverage-remediation, [dynamic-source, expression-operators, functions, var-bindings]]
-  test/language/eval-code/direct/var-env-func-strict-caller-2.js: [unsupported-profile-feature, node:dynamic-source-coverage-remediation, [dynamic-source, expression-operators, functions]]
-  test/language/eval-code/direct/var-env-func-strict-caller.js: [unsupported-profile-feature, node:dynamic-source-coverage-remediation, [dynamic-source, expression-operators, functions]]
-  test/language/eval-code/direct/var-env-func-strict-source.js: [unsupported-profile-feature, node:dynamic-source-coverage-remediation, [dynamic-source, expression-operators, functions]]
+  test/language/eval-code/direct/var-env-func-non-strict.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [dynamic-source, expression-operators, functions, var-bindings]]
+  test/language/eval-code/direct/var-env-func-strict-caller-2.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [dynamic-source, expression-operators, functions]]
+  test/language/eval-code/direct/var-env-func-strict-caller.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [dynamic-source, expression-operators, functions]]
+  test/language/eval-code/direct/var-env-func-strict-source.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [dynamic-source, expression-operators, functions]]
   test/language/eval-code/direct/var-env-gloabl-lex-strict-caller.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [dynamic-source, functions, lexical-bindings, var-bindings]]
   test/language/eval-code/direct/var-env-global-lex-non-strict.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [abrupt-completion, dynamic-source, error-intrinsics, functions, lexical-bindings, var-bindings]]
   test/language/eval-code/direct/var-env-global-lex-strict-source.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [dynamic-source, functions, lexical-bindings, var-bindings]]
-  test/language/eval-code/direct/var-env-lower-lex-non-strict.js: [unsupported-profile-feature, node:dynamic-source-coverage-remediation, [abrupt-completion, dynamic-source, error-intrinsics, functions, lexical-bindings, var-bindings]]
+  test/language/eval-code/direct/var-env-lower-lex-non-strict.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [abrupt-completion, dynamic-source, error-intrinsics, functions, lexical-bindings, var-bindings]]
   test/language/eval-code/direct/var-env-lower-lex-strict-caller.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [dynamic-source, functions, lexical-bindings, var-bindings]]
   test/language/eval-code/direct/var-env-lower-lex-strict-source.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [dynamic-source, functions, lexical-bindings, var-bindings]]
   test/language/eval-code/direct/var-env-var-init-global-exstng.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [dynamic-source, expression-operators, functions, object-properties, var-bindings]]
-  test/language/eval-code/direct/var-env-var-init-global-new.js: [unsupported-profile-feature, node:dynamic-source-coverage-remediation, [dynamic-source, expression-operators, functions, object-properties, var-bindings]]
-  test/language/eval-code/direct/var-env-var-init-local-exstng.js: [unsupported-profile-feature, node:dynamic-source-coverage-remediation, [abrupt-completion, dynamic-source, error-intrinsics, expression-operators, functions, var-bindings]]
-  test/language/eval-code/direct/var-env-var-init-local-new-delete.js: [unsupported-profile-feature, node:dynamic-source-coverage-remediation, [abrupt-completion, dynamic-source, error-intrinsics, expression-operators, functions, var-bindings]]
-  test/language/eval-code/direct/var-env-var-init-local-new.js: [unsupported-profile-feature, node:dynamic-source-coverage-remediation, [abrupt-completion, dynamic-source, error-intrinsics, expression-operators, functions, var-bindings]]
-  test/language/eval-code/direct/var-env-var-non-strict.js: [unsupported-profile-feature, node:dynamic-source-coverage-remediation, [dynamic-source, functions, var-bindings]]
-  test/language/eval-code/direct/var-env-var-strict-caller-2.js: [unsupported-profile-feature, node:dynamic-source-coverage-remediation, [abrupt-completion, dynamic-source, error-intrinsics, expression-operators, functions, var-bindings]]
-  test/language/eval-code/direct/var-env-var-strict-caller-3.js: [unsupported-profile-feature, node:dynamic-source-coverage-remediation, [dynamic-source, functions, var-bindings]]
-  test/language/eval-code/direct/var-env-var-strict-caller.js: [unsupported-profile-feature, node:dynamic-source-coverage-remediation, [dynamic-source, functions, var-bindings]]
-  test/language/eval-code/direct/var-env-var-strict-source.js: [unsupported-profile-feature, node:dynamic-source-coverage-remediation, [dynamic-source, functions, var-bindings]]
+  test/language/eval-code/direct/var-env-var-init-global-new.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [dynamic-source, expression-operators, functions, object-properties, var-bindings]]
+  test/language/eval-code/direct/var-env-var-init-local-exstng.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [abrupt-completion, dynamic-source, error-intrinsics, expression-operators, functions, var-bindings]]
+  test/language/eval-code/direct/var-env-var-init-local-new-delete.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [abrupt-completion, dynamic-source, error-intrinsics, expression-operators, functions, var-bindings]]
+  test/language/eval-code/direct/var-env-var-init-local-new.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [abrupt-completion, dynamic-source, error-intrinsics, expression-operators, functions, var-bindings]]
+  test/language/eval-code/direct/var-env-var-non-strict.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [dynamic-source, functions, var-bindings]]
+  test/language/eval-code/direct/var-env-var-strict-caller-2.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [abrupt-completion, dynamic-source, error-intrinsics, expression-operators, functions, var-bindings]]
+  test/language/eval-code/direct/var-env-var-strict-caller-3.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [dynamic-source, functions, var-bindings]]
+  test/language/eval-code/direct/var-env-var-strict-caller.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [dynamic-source, functions, var-bindings]]
+  test/language/eval-code/direct/var-env-var-strict-source.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [dynamic-source, functions, var-bindings]]
   test/language/eval-code/indirect/always-non-strict.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [control-flow, dynamic-source, expression-operators, functions, object-literals, var-bindings]]
   test/language/eval-code/indirect/block-decl-strict.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [abrupt-completion, dynamic-source, error-intrinsics, expression-operators, functions, object-properties, var-bindings]]
   test/language/eval-code/indirect/cptn-nrml-empty-block.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [dynamic-source, expression-operators, functions]]
@@ -19465,16 +19474,16 @@ paths:
   test/language/eval-code/indirect/cptn-nrml-empty-while.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [control-flow, dynamic-source, expression-operators, functions]]
   test/language/eval-code/indirect/cptn-nrml-expr-obj.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [dynamic-source, expression-operators, functions, object-literals, var-bindings]]
   test/language/eval-code/indirect/cptn-nrml-expr-prim.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [dynamic-source, expression-operators, functions, var-bindings]]
-  test/language/eval-code/indirect/export.js: [unsupported-profile-feature, node:dynamic-source-coverage-remediation, [abrupt-completion, dynamic-source, error-intrinsics, expression-operators, functions, module-linking]]
+  test/language/eval-code/indirect/export.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [abrupt-completion, dynamic-source, error-intrinsics, expression-operators, functions, module-linking]]
   test/language/eval-code/indirect/global-env-rec-catch.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [abrupt-completion, control-flow, dynamic-source, expression-operators, functions, var-bindings]]
-  test/language/eval-code/indirect/global-env-rec-eval.js: [unsupported-profile-feature, node:dynamic-source-coverage-remediation, [dynamic-source, expression-operators, functions, var-bindings]]
+  test/language/eval-code/indirect/global-env-rec-eval.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [dynamic-source, expression-operators, functions, var-bindings]]
   test/language/eval-code/indirect/global-env-rec-fun.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [dynamic-source, expression-operators, functions, var-bindings]]
   test/language/eval-code/indirect/global-env-rec-with.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [control-flow, dynamic-source, expression-operators, functions, object-properties, var-bindings]]
   test/language/eval-code/indirect/global-env-rec.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [dynamic-source, expression-operators, functions, var-bindings]]
-  test/language/eval-code/indirect/import.js: [unsupported-profile-feature, node:dynamic-source-coverage-remediation, [abrupt-completion, dynamic-source, error-intrinsics, expression-operators, functions, module-linking]]
-  test/language/eval-code/indirect/lex-env-distinct-cls.js: [unsupported-profile-feature, node:dynamic-source-coverage-remediation, [abrupt-completion, classes, dynamic-source, error-intrinsics, expression-operators, functions, lexical-bindings]]
-  test/language/eval-code/indirect/lex-env-distinct-const.js: [unsupported-profile-feature, node:dynamic-source-coverage-remediation, [abrupt-completion, dynamic-source, error-intrinsics, expression-operators, functions, lexical-bindings]]
-  test/language/eval-code/indirect/lex-env-distinct-let.js: [unsupported-profile-feature, node:dynamic-source-coverage-remediation, [abrupt-completion, dynamic-source, error-intrinsics, expression-operators, functions, lexical-bindings]]
+  test/language/eval-code/indirect/import.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [abrupt-completion, dynamic-source, error-intrinsics, expression-operators, functions, module-linking]]
+  test/language/eval-code/indirect/lex-env-distinct-cls.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [abrupt-completion, classes, dynamic-source, error-intrinsics, expression-operators, functions, lexical-bindings]]
+  test/language/eval-code/indirect/lex-env-distinct-const.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [abrupt-completion, dynamic-source, error-intrinsics, expression-operators, functions, lexical-bindings]]
+  test/language/eval-code/indirect/lex-env-distinct-let.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [abrupt-completion, dynamic-source, error-intrinsics, expression-operators, functions, lexical-bindings]]
   test/language/eval-code/indirect/lex-env-heritage.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [dynamic-source, expression-operators, functions, lexical-bindings, var-bindings]]
   test/language/eval-code/indirect/lex-env-no-init-cls.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [abrupt-completion, classes, dynamic-source, error-intrinsics, expression-operators, functions, lexical-bindings]]
   test/language/eval-code/indirect/lex-env-no-init-const.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [abrupt-completion, dynamic-source, error-intrinsics, expression-operators, functions, lexical-bindings]]
@@ -19500,20 +19509,20 @@ paths:
   test/language/eval-code/indirect/switch-dflt-decl-strict.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [abrupt-completion, control-flow, dynamic-source, error-intrinsics, expression-operators, functions, object-properties, var-bindings]]
   test/language/eval-code/indirect/this-value-func.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [dynamic-source, expression-operators, functions, var-bindings]]
   test/language/eval-code/indirect/this-value-global.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [dynamic-source, expression-operators, functions]]
-  test/language/eval-code/indirect/var-env-func-init-global-new.js: [unsupported-profile-feature, node:dynamic-source-coverage-remediation, [dynamic-source, expression-operators, functions, object-properties, var-bindings]]
-  test/language/eval-code/indirect/var-env-func-init-global-update-configurable.js: [unsupported-profile-feature, node:dynamic-source-coverage-remediation, [dynamic-source, expression-operators, functions, object-literals, object-properties, var-bindings]]
+  test/language/eval-code/indirect/var-env-func-init-global-new.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [dynamic-source, expression-operators, functions, object-properties, var-bindings]]
+  test/language/eval-code/indirect/var-env-func-init-global-update-configurable.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [dynamic-source, expression-operators, functions, object-literals, object-properties, var-bindings]]
   test/language/eval-code/indirect/var-env-func-init-global-update-non-configurable.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [dynamic-source, expression-operators, functions, object-literals, object-properties, var-bindings]]
   test/language/eval-code/indirect/var-env-func-init-multi.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [dynamic-source, expression-operators, functions, var-bindings]]
   test/language/eval-code/indirect/var-env-func-non-strict.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [dynamic-source, expression-operators, functions, var-bindings]]
-  test/language/eval-code/indirect/var-env-func-strict.js: [unsupported-profile-feature, node:dynamic-source-coverage-remediation, [dynamic-source, expression-operators, functions, var-bindings]]
+  test/language/eval-code/indirect/var-env-func-strict.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [dynamic-source, expression-operators, functions, var-bindings]]
   test/language/eval-code/indirect/var-env-global-lex-non-strict.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [abrupt-completion, dynamic-source, error-intrinsics, expression-operators, functions, lexical-bindings, object-properties, var-bindings]]
   test/language/eval-code/indirect/var-env-global-lex-strict.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [dynamic-source, expression-operators, functions, lexical-bindings, var-bindings]]
   test/language/eval-code/indirect/var-env-lower-lex-non-strict.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [dynamic-source, expression-operators, functions, lexical-bindings, var-bindings]]
   test/language/eval-code/indirect/var-env-lower-lex-strict.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [dynamic-source, expression-operators, functions, lexical-bindings, var-bindings]]
   test/language/eval-code/indirect/var-env-var-init-global-exstng.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [dynamic-source, expression-operators, functions, object-properties, var-bindings]]
-  test/language/eval-code/indirect/var-env-var-init-global-new.js: [unsupported-profile-feature, node:dynamic-source-coverage-remediation, [dynamic-source, expression-operators, functions, object-properties, var-bindings]]
+  test/language/eval-code/indirect/var-env-var-init-global-new.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [dynamic-source, expression-operators, functions, object-properties, var-bindings]]
   test/language/eval-code/indirect/var-env-var-non-strict.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [dynamic-source, expression-operators, functions, var-bindings]]
-  test/language/eval-code/indirect/var-env-var-strict.js: [unsupported-profile-feature, node:dynamic-source-coverage-remediation, [dynamic-source, expression-operators, functions, object-properties, var-bindings]]
+  test/language/eval-code/indirect/var-env-var-strict.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [dynamic-source, expression-operators, functions, object-properties, var-bindings]]
   test/language/export/escaped-as-export-specifier.js: [expected-negative, observation]
   test/language/export/escaped-default.js: [expected-negative, observation]
   test/language/export/escaped-from.js: [expected-negative, observation]
@@ -19985,8 +19994,8 @@ paths:
   test/language/expressions/assignment/S11.13.1_A5_T1.js: [pass, observation]
   test/language/expressions/assignment/S11.13.1_A5_T2.js: [pass, observation]
   test/language/expressions/assignment/S11.13.1_A5_T3.js: [pass, observation]
-  test/language/expressions/assignment/S11.13.1_A6_T1.js: [unsupported-profile-feature, node:dynamic-source-coverage-remediation, [dynamic-source, expression-operators, functions, var-bindings]]
-  test/language/expressions/assignment/S11.13.1_A6_T2.js: [unsupported-profile-feature, node:dynamic-source-coverage-remediation, [dynamic-source, expression-operators, functions, var-bindings]]
+  test/language/expressions/assignment/S11.13.1_A6_T1.js: [unsupported-profile-feature, deferred, [dynamic-source, expression-operators, functions, var-bindings]]
+  test/language/expressions/assignment/S11.13.1_A6_T2.js: [unsupported-profile-feature, deferred, [dynamic-source, expression-operators, functions, var-bindings]]
   test/language/expressions/assignment/S11.13.1_A6_T3.js: [pass, observation]
   test/language/expressions/assignment/S11.13.1_A7_T4.js: [pass, observation]
   test/language/expressions/assignment/S8.12.4_A1.js: [pass, observation]
