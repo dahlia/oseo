@@ -331,10 +331,11 @@ dependencies:
   - dynamic-source-regexp-exhaustive
   - dynamic-source-regexp-static-evidence
   - dynamic-source-residual-evidence
+  - dynamic-source-scope-arguments-evidence
   - dynamic-source-static-core-evidence
   - dynamic-source-template-site-evidence
   - dynamic-source-trainc-ordinary-evidence
   - dynamic-source-unknown-eval
   - static-specifier-import-design
 landed: false
-status: ready
+status: blocked
