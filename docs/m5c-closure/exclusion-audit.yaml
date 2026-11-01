@@ -5602,6 +5602,8 @@ assessments:
       ADR 0016 and ADR 0019 and their reopening triggers remain unchanged. The
       bundle 4 UPDATE promoted S13.2.2_A13.js, and the train C ordinary
       evidence node moved 26 Function-constructor paths to trainc assessments.
+      The train C host Script evidence node then accounted 98 paths under
+      ADR 0016.
   annex-b-ordinary-object-prototype:
     disposition: exclusion
     normativeDependency: annex-b-only
