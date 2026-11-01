@@ -36,13 +36,20 @@ owners:
       extends it to no other path. exclusion-audit.yaml binds their
       original source and observation digests and the annex-b-mixed-core
       native evidence. Their unsupported results are not counted as
-      passes. Other Annex B observers, including the legacy accessor
-      lookups, keep their remediation owners. The maintainer decision of
-      2026-11-01 applies the same rule to S7.8.5_A1.4_T2 and
-      S7.8.5_A2.4_T2, which observe the eval rejection: the exhaustive
-      literal property witnesses every core subject, and only the U+200C
-      and U+200D identity escapes need Annex B; 7 paths."
-    paths: 7
+      passes. Other Annex B observers, including the class declaration
+      legacy accessor lookups, keep their remediation owners. The
+      maintainer decision of 2026-11-01 applies the same rule to
+      S7.8.5_A1.4_T2 and S7.8.5_A2.4_T2, which observe the eval
+      rejection: the exhaustive literal property witnesses every core
+      subject, and only the U+200C and U+200D identity escapes need
+      Annex B. The same decision applies the rule to the class
+      expression paths private-getter-is-not-a-own-property.js and
+      private-setter-is-not-a-own-property.js, whose only Annex B
+      subject is the __lookupGetter__ or __lookupSetter__ call: the
+      class-private-getter-public-absence and
+      class-private-setter-public-absence native fixtures witness every
+      private accessor subject; 9 paths."
+    paths: 9
   adr:0016-dynamic-source-boundary:
     note: "ADR 0016 excludes \"`eval` in call position, the `Function`
       constructor, `new Function`, and every constructor that compiles
@@ -210,17 +217,16 @@ owners:
       0016, which this record does not broaden; 23 paths.
     paths: 23
   node:class-private-accessor-lookup-coverage-remediation:
-    note: Observation-batch-11 admits the two class-elements tests that call
+    note: Observation-batch-22b admits the two class declaration tests under
+      test/language/statements/class/elements/ that call
       Object.prototype.__lookupGetter__ or __lookupSetter__ before their
       private accessor assertions. Each observes the owned OSEO1001
       optional legacy accessor rejection (ECMA-262 20.1.3.9, ADR 0020
       onto ADR 0013). The audit records mixed remediation, not an
-      exclusion; the private getter and setter subjects remain open
-      until reviewed replacement evidence and the maintainer accounting
-      decision. B22b adds the two statement-form optional lookup
-      rejections; their private-accessor subjects retain active
-      remediation.
-    paths: 4
+      exclusion; their private getter and setter subjects remain open.
+      The two class expression paths of observation-batch-11 moved to
+      ADR 0013 under the 2026-11-01 maintainer decision.
+    paths: 2
   node:dynamic-source-coverage-remediation:
     note: "Authorized compile-stage rejection, unresolved in-claim subject
       coverage: 111 incidental-scaffolding paths, 5 template-site
@@ -24941,7 +24947,7 @@ paths:
   test/language/expressions/class/elements/private-generator-method-name.js: [pass, observation]
   test/language/expressions/class/elements/private-getter-access-on-inner-arrow-function.js: [pass, observation]
   test/language/expressions/class/elements/private-getter-access-on-inner-function.js: [pass, observation]
-  test/language/expressions/class/elements/private-getter-is-not-a-own-property.js: [unsupported-profile-feature, node:class-private-accessor-lookup-coverage-remediation, [classes]]
+  test/language/expressions/class/elements/private-getter-is-not-a-own-property.js: [unsupported-profile-feature, adr:0013-m5-edition-and-manifest, [classes]]
   test/language/expressions/class/elements/private-getter-on-nested-class.js: [pass, observation]
   test/language/expressions/class/elements/private-getter-shadowed-by-field-on-nested-class.js: [pass, observation]
   test/language/expressions/class/elements/private-getter-shadowed-by-getter-on-nested-class.js: [pass, observation]
@@ -24970,7 +24976,7 @@ paths:
   test/language/expressions/class/elements/private-methods/prod-private-method.js: [pass, observation]
   test/language/expressions/class/elements/private-setter-access-on-inner-arrow-function.js: [pass, observation]
   test/language/expressions/class/elements/private-setter-access-on-inner-function.js: [pass, observation]
-  test/language/expressions/class/elements/private-setter-is-not-a-own-property.js: [unsupported-profile-feature, node:class-private-accessor-lookup-coverage-remediation, [classes]]
+  test/language/expressions/class/elements/private-setter-is-not-a-own-property.js: [unsupported-profile-feature, adr:0013-m5-edition-and-manifest, [classes]]
   test/language/expressions/class/elements/private-setter-on-nested-class.js: [pass, observation]
   test/language/expressions/class/elements/private-setter-shadowed-by-field-on-nested-class.js: [pass, observation]
   test/language/expressions/class/elements/private-setter-shadowed-by-getter-on-nested-class.js: [pass, observation]
