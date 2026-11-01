@@ -17,11 +17,11 @@ families:
   static-specifier-import:
     reason: The path observes its contract only through an ImportCall site,
       which the parse-time OSEO1001 rejection blocks. The DS-12 assessment
-      records why static module evidence cannot witness repeated host loads,
-      cached evaluation state, deferred evaluation, or staggered graph
-      starts. The only route is the build-time static-specifier import
-      track, which the maintainer moved past M5; its reviewed design is the
-      post-M5 plan that PLAN-DYN.md links.
+      records why static module evidence cannot witness repeated host
+      loads, cached evaluation state, deferred evaluation, or staggered
+      graph starts. The only route is the build-time static-specifier
+      import track, which the maintainer moved past M5; its reviewed
+      design is the post-M5 plan that PLAN-DYN.md links.
 paths:
   test/language/expressions/class/subclass-builtins/subclass-Function.js:
     family: run-time-source
@@ -45,20 +45,20 @@ paths:
   test/language/expressions/dynamic-import/eval-rqstd-once.js:
     family: static-specifier-import
     section: sec-moduleevaluation
-    remainingContract: Concurrent and later dynamic imports of a module that a
-      static import already requested share its single evaluation; its body
-      runs exactly once.
-    reason: Besides an ImportCall, the fixtures call Function('return this;')(),
-      which the runtime rejects under ADR 0016. Closing the path needs both
-      the static-specifier import track, deferred past M5, and Function
-      construction, which is not approved for M5.
+    remainingContract: Two concurrent and then two serialized dynamic imports
+      of one module evaluate it exactly once; the module throws if it is
+      evaluated again, so the global test262 property it sets is 262.
+    reason: Besides an ImportCall, the fixtures call Function('return
+      this;')(), which the runtime rejects under ADR 0016. Closing the
+      path needs both the static-specifier import track, deferred past M5,
+      and Function construction, which is not approved for M5.
     attempts:
       nodes:
         - dynamic-source-module-observable-contracts
         - static-specifier-import-design
       decisions:
-        - "2026-11-01 remaining-node decisions, item 2: the static-specifier
-          import track is not implemented in M5"
+        - "2026-11-01 remaining-node decisions, item 2: the
+          static-specifier import track is not implemented in M5"
         - "2026-11-01 umbrella-residual answer: bounded general eval and
           Function construction are not approved for M5"
     targetMilestone: PLAN-DYN.md
@@ -69,15 +69,16 @@ paths:
   test/language/expressions/dynamic-import/eval-self-once-module.js:
     family: static-specifier-import
     section: sec-moduleevaluation
-    remainingContract: Concurrent and later dynamic self-imports of a module
-      observe one evaluation of its body.
+    remainingContract: Two concurrent and then two serialized dynamic imports
+      of the test module itself do not evaluate it again, so
+      global.evaluated stays 1.
     attempts:
       nodes:
         - dynamic-source-module-observable-contracts
         - static-specifier-import-design
       decisions:
-        - "2026-11-01 remaining-node decisions, item 2: the static-specifier
-          import track is not implemented in M5"
+        - "2026-11-01 remaining-node decisions, item 2: the
+          static-specifier import track is not implemented in M5"
     targetMilestone: PLAN-DYN.md
     sourceDigest: "c2499ec1969ed861b17f2a58bcb5f60db281d82da6580ca184f412f7fb65\
       697b"
@@ -86,16 +87,16 @@ paths:
   test/language/expressions/dynamic-import/eval-self-once-script.js:
     family: static-specifier-import
     section: sec-hostimportmoduledynamically
-    remainingContract: A file first run as a Script and then imported
-      dynamically evaluates exactly once as a Module, separately from its
-      Script run.
+    remainingContract: After the file runs as a Script, two concurrent and
+      then two serialized dynamic imports of itself evaluate it exactly
+      once more, as a Module, so global.evaluated is 2.
     attempts:
       nodes:
         - dynamic-source-module-observable-contracts
         - static-specifier-import-design
       decisions:
-        - "2026-11-01 remaining-node decisions, item 2: the static-specifier
-          import track is not implemented in M5"
+        - "2026-11-01 remaining-node decisions, item 2: the
+          static-specifier import track is not implemented in M5"
     targetMilestone: PLAN-DYN.md
     sourceDigest: "1ade26b3249019856801749bdb12f555eb7244b2cf82a789a79ebbbcbd09\
       e2dd"
@@ -104,15 +105,15 @@ paths:
   test/language/expressions/dynamic-import/import-errored-module.js:
     family: static-specifier-import
     section: sec-ContinueDynamicImport
-    remainingContract: A second dynamic import of a module whose evaluation
-      threw rejects from the cached evaluation error.
+    remainingContract: A first and a second dynamic import of a module whose
+      evaluation throws both reject with an Error.
     attempts:
       nodes:
         - dynamic-source-module-observable-contracts
         - static-specifier-import-design
       decisions:
-        - "2026-11-01 remaining-node decisions, item 2: the static-specifier
-          import track is not implemented in M5"
+        - "2026-11-01 remaining-node decisions, item 2: the
+          static-specifier import track is not implemented in M5"
     targetMilestone: PLAN-DYN.md
     sourceDigest: "355af91b34d16c41d3f10b2fa85dba1cd280fd9ffeeeefb31830fccdb563\
       c67c"
@@ -121,16 +122,16 @@ paths:
   test/language/expressions/dynamic-import/import-fulfilled-member-of-errored-cycle.js:
     family: static-specifier-import
     section: sec-moduleevaluation
-    remainingContract: A later dynamic import of the fulfilled member C of an
-      errored async cycle rejects with the same error object and message
-      recorded for the cycle root.
+    remainingContract: A dynamic import of main rejects with an Error whose
+      message is 'async error in B', and a later dynamic import of the
+      fulfilled cycle member C rejects with that same error object.
     attempts:
       nodes:
         - dynamic-source-module-observable-contracts
         - static-specifier-import-design
       decisions:
-        - "2026-11-01 remaining-node decisions, item 2: the static-specifier
-          import track is not implemented in M5"
+        - "2026-11-01 remaining-node decisions, item 2: the
+          static-specifier import track is not implemented in M5"
     targetMilestone: PLAN-DYN.md
     sourceDigest: "f88cc90a6755753ff88bcff5312d4322eed5cf23b4407fcdbf7e80b591c5\
       1d33"
@@ -139,15 +140,16 @@ paths:
   test/language/expressions/dynamic-import/reuse-namespace-object-from-import.js:
     family: static-specifier-import
     section: sec-import-call-runtime-semantics-evaluation
-    remainingContract: Two dynamic imports and a prior static import of one
-      module yield the same namespace object.
+    remainingContract: Two concurrent dynamic imports of a module that is also
+      statically imported fulfill with the same object, which is the
+      static namespace ns.
     attempts:
       nodes:
         - dynamic-source-module-observable-contracts
         - static-specifier-import-design
       decisions:
-        - "2026-11-01 remaining-node decisions, item 2: the static-specifier
-          import track is not implemented in M5"
+        - "2026-11-01 remaining-node decisions, item 2: the
+          static-specifier import track is not implemented in M5"
     targetMilestone: PLAN-DYN.md
     sourceDigest: "b8013653226c4d64eb51e88b3fdd7329b56f91b132be0055b0d10a8b6e5b\
       4895"
@@ -156,15 +158,15 @@ paths:
   test/language/expressions/dynamic-import/reuse-namespace-object-from-script.js:
     family: static-specifier-import
     section: sec-import-call-runtime-semantics-evaluation
-    remainingContract: Repeated dynamic imports of an export-free file from
-      Script code return the same namespace object.
+    remainingContract: Two concurrent dynamic imports of an empty module from
+      Script code fulfill with the same namespace object.
     attempts:
       nodes:
         - dynamic-source-module-observable-contracts
         - static-specifier-import-design
       decisions:
-        - "2026-11-01 remaining-node decisions, item 2: the static-specifier
-          import track is not implemented in M5"
+        - "2026-11-01 remaining-node decisions, item 2: the
+          static-specifier import track is not implemented in M5"
     targetMilestone: PLAN-DYN.md
     sourceDigest: "833b2a04d3fa699dbeba639f4e9a512a0488166ea68e381c2e9d3abdfb59\
       cf4e"
@@ -173,15 +175,15 @@ paths:
   test/language/expressions/dynamic-import/reuse-namespace-object.js:
     family: static-specifier-import
     section: sec-import-call-runtime-semantics-evaluation
-    remainingContract: Two dynamic imports of one module share one namespace
-      object.
+    remainingContract: Two concurrent dynamic imports of one module fulfill
+      with the same namespace object.
     attempts:
       nodes:
         - dynamic-source-module-observable-contracts
         - static-specifier-import-design
       decisions:
-        - "2026-11-01 remaining-node decisions, item 2: the static-specifier
-          import track is not implemented in M5"
+        - "2026-11-01 remaining-node decisions, item 2: the
+          static-specifier import track is not implemented in M5"
     targetMilestone: PLAN-DYN.md
     sourceDigest: "aa09ffc882f21eabd879596e11e83655c2146b20f5a9031d5202a2960cdf\
       a68b"
@@ -190,20 +192,21 @@ paths:
   test/language/expressions/dynamic-import/update-to-dynamic-import.js:
     family: static-specifier-import
     section: sec-finishdynamicimport
-    remainingContract: Calling the exported loader defers evaluation of the
-      other module until the call and then updates first.x, so first.x
-      differs before and after the call.
-    reason: Besides an ImportCall, the fixtures call Function('return this;')(),
-      which the runtime rejects under ADR 0016. Closing the path needs both
-      the static-specifier import track, deferred past M5, and Function
-      construction, which is not approved for M5.
+    remainingContract: A dynamic import of the module yields first.x 'first';
+      calling its default loader dynamically imports the other module,
+      after which first.x is 'other' and the loaded namespace's default is
+      42.
+    reason: Besides an ImportCall, the fixtures call Function('return
+      this;')(), which the runtime rejects under ADR 0016. Closing the
+      path needs both the static-specifier import track, deferred past M5,
+      and Function construction, which is not approved for M5.
     attempts:
       nodes:
         - dynamic-source-module-observable-contracts
         - static-specifier-import-design
       decisions:
-        - "2026-11-01 remaining-node decisions, item 2: the static-specifier
-          import track is not implemented in M5"
+        - "2026-11-01 remaining-node decisions, item 2: the
+          static-specifier import track is not implemented in M5"
         - "2026-11-01 umbrella-residual answer: bounded general eval and
           Function construction are not approved for M5"
     targetMilestone: PLAN-DYN.md
@@ -218,17 +221,17 @@ paths:
       intrinsic Promise, so Promise.resolve(p) is p and its prototype is
       Promise.prototype, and it fulfills with a namespace whose default is
       42, local1 and indirect are 'Test262', and renamed is 'TC39'.
-    reason: Its import() is inside an eval string, so the run-time rejection of
-      the direct eval call precedes any ImportCall. Closing the path needs
-      both direct eval, which is not approved for M5, and ImportCall
+    reason: Its import() is inside an eval string, so the run-time rejection
+      of the direct eval call precedes any ImportCall. Closing the path
+      needs both direct eval, which is not approved for M5, and ImportCall
       admission, which the static-specifier import track defers past M5.
     attempts:
       nodes:
         - dynamic-source-importcall-residual-accounting
         - static-specifier-import-design
       decisions:
-        - "2026-11-01 remaining-node decisions, item 2: the static-specifier
-          import track is not implemented in M5"
+        - "2026-11-01 remaining-node decisions, item 2: the
+          static-specifier import track is not implemented in M5"
         - "2026-11-01 umbrella-residual answer: bounded general eval and
           Function construction are not approved for M5"
     targetMilestone: PLAN-DYN.md
@@ -240,8 +243,8 @@ paths:
     family: run-time-source
     section: sec-functiondeclarationinstantiation
     remainingContract: A var x declared by direct eval while a destructuring
-      parameter's computed key is evaluated is the binding the function body
-      reads, so x is 'inner' there although an outer x is 'outer'.
+      parameter's computed key is evaluated is the binding the function
+      body reads, so x is 'inner' there although an outer x is 'outer'.
     reason: Only a run-time var declaration made inside a parameter expression
       observes the parameter variable environment; a static var or an
       assignment resolves differently.
@@ -279,15 +282,17 @@ paths:
   test/language/module-code/top-level-await/await-dynamic-import-rejection.js:
     family: static-specifier-import
     section: sec-moduleevaluation
-    remainingContract: Awaiting a dynamic import whose module body throws
-      propagates that error and skips the following statement.
+    remainingContract: Awaiting a dynamic import of a module whose top-level
+      await rejects with a TypeError fails the importing module with that
+      TypeError before its next statement, which would throw a
+      Test262Error.
     attempts:
       nodes:
         - dynamic-source-module-observable-contracts
         - static-specifier-import-design
       decisions:
-        - "2026-11-01 remaining-node decisions, item 2: the static-specifier
-          import track is not implemented in M5"
+        - "2026-11-01 remaining-node decisions, item 2: the
+          static-specifier import track is not implemented in M5"
     targetMilestone: PLAN-DYN.md
     sourceDigest: "ee609192b201b8194b4a6986aba7d3c1d1a237b037f4e7a505caf2e17614\
       a1ef"
@@ -296,16 +301,16 @@ paths:
   test/language/module-code/top-level-await/await-dynamic-import-resolution.js:
     family: static-specifier-import
     section: sec-moduleevaluation
-    remainingContract: Awaiting a dynamic import of an asynchronously evaluated
-      module yields a namespace whose default is 42, x is 'named', and y is
-      39.
+    remainingContract: Awaiting a dynamic import of an asynchronously
+      evaluated module yields a namespace whose default is 42, x is
+      'named', and y is 39.
     attempts:
       nodes:
         - dynamic-source-module-observable-contracts
         - static-specifier-import-design
       decisions:
-        - "2026-11-01 remaining-node decisions, item 2: the static-specifier
-          import track is not implemented in M5"
+        - "2026-11-01 remaining-node decisions, item 2: the
+          static-specifier import track is not implemented in M5"
     targetMilestone: PLAN-DYN.md
     sourceDigest: "487cec895aff7a3fd8051e08fd2c46cf8b3227d4bade937d239fb3f6563e\
       9c47"
@@ -314,16 +319,16 @@ paths:
   test/language/module-code/top-level-await/dynamic-import-of-waiting-module.js:
     family: static-specifier-import
     section: sec-ContinueDynamicImport
-    remainingContract: Two dynamic imports of a module still waiting on
-      top-level await settle in request order across an independent load of
-      an empty module.
+    remainingContract: While a module waits on top-level await, a second
+      dynamic import of it, followed by a completed import of an empty
+      module, does not fulfill before the first import does.
     attempts:
       nodes:
         - dynamic-source-module-observable-contracts
         - static-specifier-import-design
       decisions:
-        - "2026-11-01 remaining-node decisions, item 2: the static-specifier
-          import track is not implemented in M5"
+        - "2026-11-01 remaining-node decisions, item 2: the
+          static-specifier import track is not implemented in M5"
     targetMilestone: PLAN-DYN.md
     sourceDigest: "339720673a134559d91844bc177731cc494adf1a221087fa8de1089f8ef1\
       811f"
@@ -332,16 +337,17 @@ paths:
   test/language/module-code/top-level-await/dynamic-import-rejection.js:
     family: static-specifier-import
     section: sec-moduleevaluation
-    remainingContract: A dynamic import of a module whose async export throws
-      rejects with a TypeError whose constructor is TypeError and whose
-      message is 'error in the default export line'.
+    remainingContract: A dynamic import of a module whose default export
+      awaits a rejected TypeError rejects with that TypeError, whose
+      constructor is TypeError and whose message is 'error in the default
+      export line'.
     attempts:
       nodes:
         - dynamic-source-module-observable-contracts
         - static-specifier-import-design
       decisions:
-        - "2026-11-01 remaining-node decisions, item 2: the static-specifier
-          import track is not implemented in M5"
+        - "2026-11-01 remaining-node decisions, item 2: the
+          static-specifier import track is not implemented in M5"
     targetMilestone: PLAN-DYN.md
     sourceDigest: "6af1a75b3de0c7caeb5affd07d2ba598e04476b2e71cd4c3879b3e1b0cf2\
       54cf"
@@ -350,15 +356,16 @@ paths:
   test/language/module-code/top-level-await/dynamic-import-resolution.js:
     family: static-specifier-import
     section: sec-moduleevaluation
-    remainingContract: A dynamic import of a graph with top-level await fulfills
-      only after the graph has initialized default 42, x 'named', and y 39.
+    remainingContract: A dynamic import of a module with top-level await
+      fulfills with a namespace whose default is 42, x is 'named', and y
+      is 39.
     attempts:
       nodes:
         - dynamic-source-module-observable-contracts
         - static-specifier-import-design
       decisions:
-        - "2026-11-01 remaining-node decisions, item 2: the static-specifier
-          import track is not implemented in M5"
+        - "2026-11-01 remaining-node decisions, item 2: the
+          static-specifier import track is not implemented in M5"
     targetMilestone: PLAN-DYN.md
     sourceDigest: "76db157ba2be71d323f6f5e753737f9c0e51fc6a10028230f98532c76bae\
       8bad"
@@ -367,15 +374,16 @@ paths:
   test/language/module-code/top-level-await/fulfillment-order.js:
     family: static-specifier-import
     section: sec-async-module-execution-fulfilled
-    remainingContract: Independently started, overlapping evaluations of an
-      async graph fulfill in B, A order after both start barriers.
+    remainingContract: When the import of A starts only after B's evaluation
+      has started and both fulfill once p1 resolves, B's settlement is
+      logged before A's, so the log is B, A.
     attempts:
       nodes:
         - dynamic-source-module-observable-contracts
         - static-specifier-import-design
       decisions:
-        - "2026-11-01 remaining-node decisions, item 2: the static-specifier
-          import track is not implemented in M5"
+        - "2026-11-01 remaining-node decisions, item 2: the
+          static-specifier import track is not implemented in M5"
     targetMilestone: PLAN-DYN.md
     sourceDigest: "45c63f22d4028a425852a11e2592a48b82e51d0a959490ef9c99da34b48b\
       6686"
@@ -384,15 +392,16 @@ paths:
   test/language/module-code/top-level-await/module-graphs-does-not-hang.js:
     family: static-specifier-import
     section: Module evaluation (original frontmatter has no esid)
-    remainingContract: A graph already evaluated through its parent completes a
-      later dynamic import through its grandparent instead of hanging.
+    remainingContract: After a static import evaluates the parent graph with
+      top-level await, awaiting a dynamic import of its grandparent
+      completes and the test reaches $DONE.
     attempts:
       nodes:
         - dynamic-source-module-observable-contracts
         - static-specifier-import-design
       decisions:
-        - "2026-11-01 remaining-node decisions, item 2: the static-specifier
-          import track is not implemented in M5"
+        - "2026-11-01 remaining-node decisions, item 2: the
+          static-specifier import track is not implemented in M5"
     targetMilestone: PLAN-DYN.md
     sourceDigest: "5a715a19933abd179c881584fd6682f03ae6f1f941d00582823bc0af5f97\
       7d92"
@@ -401,15 +410,16 @@ paths:
   test/language/module-code/top-level-await/rejection-order.js:
     family: static-specifier-import
     section: sec-async-module-execution-rejected
-    remainingContract: Independently started, overlapping evaluations of an
-      async graph reject in B, A order after both start barriers.
+    remainingContract: When the import of A starts only after B's evaluation
+      has started and both reject once p1 rejects, B's settlement is
+      logged before A's, so the log is B, A.
     attempts:
       nodes:
         - dynamic-source-module-observable-contracts
         - static-specifier-import-design
       decisions:
-        - "2026-11-01 remaining-node decisions, item 2: the static-specifier
-          import track is not implemented in M5"
+        - "2026-11-01 remaining-node decisions, item 2: the
+          static-specifier import track is not implemented in M5"
     targetMilestone: PLAN-DYN.md
     sourceDigest: "a9d6eec9f4cae9d833c95f230c86a89ae1c3d2393b190d40e14909ad2d91\
       b5a3"
@@ -418,15 +428,16 @@ paths:
   test/language/module-code/top-level-await/unobservable-global-async-evaluation-count-reset.js:
     family: static-specifier-import
     section: sec-IncrementModuleAsyncEvaluationCount
-    remainingContract: Starting module D after C completes leaves the relative
-      async evaluation order of the still pending A unchanged.
+    remainingContract: A dynamic import of A started first evaluates before D,
+      which is imported only after the import of C completes, so the log
+      is A, D.
     attempts:
       nodes:
         - dynamic-source-module-observable-contracts
         - static-specifier-import-design
       decisions:
-        - "2026-11-01 remaining-node decisions, item 2: the static-specifier
-          import track is not implemented in M5"
+        - "2026-11-01 remaining-node decisions, item 2: the
+          static-specifier import track is not implemented in M5"
     targetMilestone: PLAN-DYN.md
     sourceDigest: "52efae1bed45325169a95cc6c7c40ec01802b76bae247c113e5234f575b1\
       eefd"
@@ -435,16 +446,16 @@ paths:
   test/language/module-code/verify-dfs.js:
     family: static-specifier-import
     section: sec-moduleevaluation
-    remainingContract: A dynamic import of B registered while A evaluates cannot
-      preempt depth-first evaluation, so the check observes A before B after
-      fulfillment.
+    remainingContract: A, statically imported, starts a dynamic import of B
+      and then logs itself; B is also a static import, so once that import
+      fulfills the log is exactly A, B.
     attempts:
       nodes:
         - dynamic-source-module-observable-contracts
         - static-specifier-import-design
       decisions:
-        - "2026-11-01 remaining-node decisions, item 2: the static-specifier
-          import track is not implemented in M5"
+        - "2026-11-01 remaining-node decisions, item 2: the
+          static-specifier import track is not implemented in M5"
     targetMilestone: PLAN-DYN.md
     sourceDigest: "f848091e31905679d740fd845820fa60c4356b2f58d93ab15f51a18c1d89\
       69df"
@@ -458,9 +469,9 @@ paths:
       expression lands in the enclosing variable environment: closures
       created before, in the ForDeclaration, in the expression, and in the
       body, and the following reference, all read 2."
-    reason: The head creates no variable environment, which only a run-time var
-      declaration inside the head can show; replacing eval with assignment
-      does not distinguish the environments.
+    reason: The head creates no variable environment, which only a run-time
+      var declaration inside the head can show; replacing eval with
+      assignment does not distinguish the environments.
     attempts:
       nodes:
         - dynamic-source-binding-reference-evidence
@@ -480,10 +491,10 @@ paths:
       expression lands in the enclosing variable environment: closures
       created before, in the ForDeclaration, in the expression, and in the
       body, and the following reference, all read 2."
-    reason: The head creates no variable environment, which only a run-time var
-      declaration inside the head can show. The reviewed evidence assessment
-      of the identical for-in contract found that replacing eval with
-      assignment does not distinguish the environments.
+    reason: The head creates no variable environment, which only a run-time
+      var declaration inside the head can show. The reviewed evidence
+      assessment of the identical for-in contract found that replacing
+      eval with assignment does not distinguish the environments.
     attempts:
       nodes:
         - observation-batch-25
