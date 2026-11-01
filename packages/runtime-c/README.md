@@ -6,224 +6,251 @@ A missing property read that reaches an intrinsic `Object.prototype` reports
 applies after ordinary descriptors and proxy dispatch, including another
 realm's prototype. Own and inherited user properties named `__proto__`, null
 prototype objects, and nullish receiver errors retain their core behavior.
-No legacy accessor is installed, and writes and reflection retain their
-existing contracts.
+No legacy accessor is installed. Writes and reflection retain their existing
+contracts.
 
 A missing `__lookupGetter__` or `__lookupSetter__` read that reaches an
 intrinsic `Object.prototype` reports `OSEO1001` for the omitted normative
-optional legacy method (ECMA-262 16th edition clause 20.1.3.9, which ADR 0020
-maps onto the ADR 0013 Annex B exclusion). The diagnostic follows the same
-ordinary descriptor and proxy dispatch and also applies to another realm's
-prototype. User properties and methods with those names, null prototype
-objects, symbols, and nullish receiver errors retain their core behavior. No
-legacy method is installed.
+optional legacy method. The method is specified in ECMA-262 16th edition
+clause 20.1.3.9, which ADR 0020 maps onto the ADR 0013 Annex B exclusion. The
+diagnostic follows the same ordinary descriptor and proxy dispatch. It also
+applies to another realm's prototype. User properties and methods with those
+names, null prototype objects, symbols, and nullish receiver errors retain
+their core behavior. No legacy method is installed.
 
-Sanitizer evidence (2026-09-17): historical Zig 0.16.0 runs did not
-provide ASan coverage. The separate Linux host C sanitizer lane now verifies
-instrumentation; its measured scope is recorded in the [activity audit]. This
-does not retroactively validate earlier gates or establish macOS ASan coverage.
-Zig address self-checks remain TODOs.
+Historical Zig 0.16.0 runs did not provide ASan coverage. The separate Linux
+host C sanitizer lane now verifies instrumentation; its measured scope is
+recorded in the [activity audit]. That evidence does not retroactively
+validate earlier gates or establish macOS ASan coverage. Zig address
+self-checks remain TODOs.
+This package provides versioned, reviewed C11 runtime source inputs. The
+runtime owns opaque NaN-boxed values, UTF-16 strings, primitive semantics,
+two-word call results, explicit root frames, mark-and-sweep collection,
+ordinary objects, arrays, environments, binding cells, function objects, and
+the deterministic `console.log` intrinsic. Native assets remain separate files
+and are included in npm and JSR packages.
 
-This package provides versioned, reviewed C11 runtime source inputs. The runtime
-owns opaque NaN-boxed values, UTF-16 strings, primitive semantics, two-word call
-results, explicit root frames, mark-and-sweep collection, ordinary objects,
-arrays, environments, binding cells, function objects, and the deterministic
-`console.log` intrinsic. Native assets remain separate files and are included
-in npm and JSR packages.
-The reviewed asset list is ordered: *oseo\_runtime.h* stays the only header
-included by generated C and direct native fixtures, while
-*runtime\_internal.h* is package-private and owns the shared heap layouts,
-tag masks, and inline value helpers used across the runtime translation
-units. Every listed C source compiles as its own translation unit and is
-archived in asset order.
+The reviewed asset list is ordered. *oseo\_runtime.h* stays the only header
+included by generated C and direct native fixtures. *runtime\_internal.h* is
+package-private and owns the shared heap layouts, tag masks, and inline value
+helpers used across the runtime translation units. Every listed C source
+compiles as its own translation unit and is archived in asset order.
+
 The shared NaN-boxed layout admits allocator-provided data pointers only after
 an explicit low-48-bit payload check. Linux AMD64 and macOS AArch64 execution
 exercise that boundary under the target's address and undefined-behavior
 sanitizer policy.
+
 The collector queues newly marked objects through an intrusive worklist, so it
 traces each reachable object once regardless of allocation-list order.
+
 M3 property operations implement descriptors, prototypes, array holes and
 length, ordered own-key enumeration, and private cache primitives for explicit
 MIR property-read guards.
+
 Function creation installs the standard configurable, non-enumerable `name` and
-`length` properties through the ordinary descriptor representation.
-Its ABI also retains callable kind and the traced lexical receiver of arrows.
-Arrow and asynchronous functions omit the implicit `prototype` property and
-reject construction.
+`length` properties through the ordinary descriptor representation. Its ABI
+also retains callable kind and the traced lexical receiver of arrows. Arrow and
+asynchronous functions omit the implicit `prototype` property and reject
+construction.
+
 The `m4-2` ABI adds traced promises, reactions, jobs, and timer tasks. Promise
 executors run synchronously through a generated-function dispatcher. Reactions
 and thenable assimilation enter a runtime-owned FIFO microtask queue. The
 context retains queued work as collector roots and records unhandled rejections
 only at an explicit microtask checkpoint.
+
 The `m4-3` ABI adds a top-level await scheduler checkpoint. It normalizes an
 awaited value through the promise job queue and advances timer turns only until
 that value settles. A pending value with no owned work reports `OSEO3001`
 instead of leaving the native executable blocked.
+
 The `m5-1` ABI adds the `oseo_typeof` and `oseo_remainder` helpers.
 `oseo_typeof` allocates its result string and can trigger collection, so
-lowering declares it a safepoint; `oseo_remainder` applies the shared
-primitive numeric coercion and IEEE 754 remainder semantics.
-The `m5-2` ABI adds `oseo_to_number`, `oseo_bitwise_not`,
-`oseo_exponentiate`, and the six bitwise and shift helpers. All apply the
-shared primitive numeric coercion. The 32-bit operations wrap through
-explicit modular unsigned arithmetic instead of implementation-defined
-casts, shifts mask their count to five bits, and exponentiation follows
-`Number::exponentiate`, including the `NaN` exponent and unit-base
-infinite-exponent cases where C `pow` differs.
-The `m5-3` ABI adds `oseo_loose_equal` and `oseo_not_loose_equal`,
-implementing `IsLooselyEqual` for the admitted values: nullish pairs are
-equal, a nullish operand compared with anything else is unequal without
-coercion, booleans and numeric strings coerce through the shared numeric
-conversion, objects compare by identity, and comparing an object with a
-number or string keeps the shared unsupported object-to-primitive
-boundary.
+lowering declares it a safepoint. `oseo_remainder` applies the shared primitive
+numeric coercion and IEEE 754 remainder semantics.
+
+The `m5-2` ABI adds `oseo_to_number`, `oseo_bitwise_not`, `oseo_exponentiate`,
+and the six bitwise and shift helpers. All apply the shared primitive numeric
+coercion. The 32-bit operations wrap through explicit modular unsigned
+arithmetic instead of implementation-defined casts. Shifts mask their count to
+five bits. Exponentiation follows `Number::exponentiate`, including the `NaN`
+exponent and unit-base infinite-exponent cases where C `pow` differs.
+
+The `m5-3` ABI adds `oseo_loose_equal` and `oseo_not_loose_equal`, implementing
+`IsLooselyEqual` for the admitted values. Nullish pairs are equal. A nullish
+operand compared with anything else is unequal without coercion. Booleans and
+numeric strings coerce through the shared numeric conversion. Objects compare
+by identity. Comparing an object with a number or string keeps the shared
+unsupported object-to-primitive boundary.
+
 The `m5-4` ABI adds `oseo_has_property` and `oseo_instanceof`.
-`oseo_has_property` converts its key through the shared property-key
-conversion and walks the prototype chain with the same own-descriptor
-and promise-method visibility as generic property reads, throwing a
-catchable error for non-object right operands. `oseo_instanceof`
-implements `OrdinaryHasInstance`: a non-callable right operand and a
-non-object `prototype` property throw catchable errors, a primitive left
-operand is false, and the walk compares prototype identity.
-The `m5-5` ABI adds `oseo_error_intrinsic` and
-`oseo_context_print_thrown`, and the *runtime\_error.c* component that
-owns the named error intrinsics. `oseo_error_intrinsic` returns the
-lazily created constructor for one `OseoErrorKind`; each constructor is
-callable and constructible, builds an instance with an own hidden
-`message` property, honors the ES2022 `cause` option, and shares one
-`Error.prototype.toString`. `oseo_context_print_thrown` renders an
-unhandled thrown error instance as `Name: message` in the owned
+`oseo_has_property` converts its key through the shared property-key conversion
+and walks the prototype chain with the same own-descriptor and promise-method
+visibility as generic property reads. It throws a catchable error for
+non-object right operands. `oseo_instanceof` implements `OrdinaryHasInstance`:
+a non-callable right operand and a non-object `prototype` property throw
+catchable errors, a primitive left operand is false, and the walk compares
+prototype identity.
+
+The `m5-5` ABI adds `oseo_error_intrinsic` and `oseo_context_print_thrown`, and
+the *runtime\_error.c* component that owns the named error intrinsics.
+`oseo_error_intrinsic` returns the lazily created constructor for one
+`OseoErrorKind`. Each constructor is callable and constructible, builds an
+instance with an own hidden `message` property, honors the ES2022 `cause`
+option, and shares one `Error.prototype.toString`. `oseo_context_print_thrown`
+renders an unhandled thrown error instance as `Name: message` in the owned
 diagnostic format.
-The `m5-6` ABI adds `oseo_to_string` and the generic `ToPrimitive`
-behind the numeric, string, addition, relational, loose-equality,
-property-key, console, error-message, and timer-delay conversions.
-`OrdinaryToPrimitive` runs user-reachable `valueOf` and `toString` in
-hint order; objects on the realm intrinsic chain use deferred
-`Object.prototype` and `Array.prototype` conversions with cycle-safe,
-call-depth-bounded array joins, and an object with no convertible
-method throws a catchable `TypeError`. Functions preserve their AOT-known
-source or use the native-function form; promise text conversion remains an
-owned unsupported diagnostic.
+
+The `m5-6` ABI adds `oseo_to_string` and the generic `ToPrimitive` behind the
+numeric, string, addition, relational, loose-equality, property-key, console,
+error-message, and timer-delay conversions. `OrdinaryToPrimitive` runs
+user-reachable `valueOf` and `toString` in hint order. Objects on the realm
+intrinsic chain use deferred `Object.prototype` and `Array.prototype`
+conversions with cycle-safe, call-depth-bounded array joins. An object with no
+convertible method throws a catchable `TypeError`. Functions preserve their
+AOT-known source or use the native-function form; promise text conversion
+remains an owned unsupported diagnostic.
+
 The `m5-7` ABI adds `oseo_symbol_intrinsic` and the *runtime\_symbol.c*
-component: unique GC-traced symbol primitives with descriptions, the
-lazily created non-constructible `Symbol` intrinsic carrying the
-well-known `iterator`, `toPrimitive`, and `toStringTag` symbols, and
-`Symbol(description)` creation. Symbols are identity-compared property
-keys, `typeof` reports `symbol`, numeric and string conversion throw
-catchable `TypeError` instances, console output renders
-`Symbol(description)`, and a reachable `Symbol.toPrimitive` method is
-dispatched by the generic `ToPrimitive`.
-The `m5-8` ABI adds the *runtime\_iterator.c* component and the
-synchronous iterator protocol: `oseo_internal_iterator_get`, `_next`, `_close`,
-over `Symbol.iterator`, `next`, and `return`, plus a first-class array iterator
-exposed through the realm's `%Array.prototype%`. The array
-iterator is an ordinary object that steps by re-reading the array length, and
-its `next` and `Symbol.iterator` methods live on realm-owned prototypes. The
-next method is captured once by `GetIterator` and
-reused each step, and `IteratorClose` invokes a present `return` method when a
-combinator rejects after a step. `Promise.all` and `Promise.race` consume any
-object iterable through this protocol. String and other primitive iteration and
-the generic array-like `%Array.prototype.values%` remain boundaries for later
-consumers.
+component: unique GC-traced symbol primitives with descriptions, the lazily
+created non-constructible `Symbol` intrinsic carrying the well-known
+`iterator`, `toPrimitive`, and `toStringTag` symbols, and `Symbol(description)`
+creation. Symbols are identity-compared property keys. `typeof` reports
+`symbol`. Numeric and string conversion throw catchable `TypeError` instances.
+Console output renders `Symbol(description)`, and a reachable
+`Symbol.toPrimitive` method is dispatched by the generic `ToPrimitive`.
+
+The `m5-8` ABI adds the *runtime\_iterator.c* component and the synchronous
+iterator protocol: `oseo_internal_iterator_get`, `_next`, `_close`, over
+`Symbol.iterator`, `next`, and `return`, plus a first-class array iterator
+exposed through the realm's `%Array.prototype%`.
+
+The array iterator is an ordinary object that steps by re-reading the array
+length, and its `next` and `Symbol.iterator` methods live on realm-owned
+prototypes. The next method is captured once by `GetIterator` and reused each
+step. `IteratorClose` invokes a present `return` method when a combinator
+rejects after a step. `Promise.all` and `Promise.race` consume any object
+iterable through this protocol.
+
+String and other primitive iteration and the generic array-like
+`%Array.prototype.values%` remain boundaries for later consumers.
+
 The `m5-9` ABI promotes that iterator record surface to the generated-code
 entry points `oseo_iterator_get`, `oseo_iterator_next`, and
 `oseo_iterator_close`. Generated C keeps the iterator, captured next method,
 and yielded value in separate root slots instead of allocating a hidden
-iterator-record object. Promise combinators use the same entry points.
-Array binding declarations reuse these entry points without changing
-the runtime ABI. Generated code owns their iterator done state and conditional
-close control flow, while rest accumulation reuses `oseo_array_append`.
+iterator-record object. Promise combinators use the same entry points. Array
+binding declarations reuse these entry points without changing the runtime ABI.
+Generated code owns their iterator done state and conditional close control
+flow, while rest accumulation reuses `oseo_array_append`.
+
 The `m5-10` ABI adds `oseo_array_append` and `oseo_array_append_hole` for
 generated array accumulation. Value append creates a new own data property
-without consulting the prototype, while hole append advances only the array
-length. The array and appended value remain caller-rooted across property-key
-and storage allocation. Generated accumulation is monotonic, so the array must
-not already own the property named by its current length. Accumulation beyond
-the runtime's 32-bit array-index limit fails with `OSEO2001` for value append
-and a catchable `RangeError` for a trailing hole.
+without consulting the prototype. Hole append advances only the array length.
+The array and appended value remain caller-rooted across property-key and
+storage allocation. Generated accumulation is monotonic, so the array must not
+already own the property named by its current length. Accumulation beyond the
+runtime's 32-bit array-index limit fails with `OSEO2001` for value append and a
+catchable `RangeError` for a trailing hole.
+
 The `m5-11` ABI adds GC-traced dynamic argument lists. Generated code creates
 and appends to a private list while evaluating spread arguments, then borrows
 its stable count and value pointer for the call or construction. The list
 remains rooted across invocation and is never exposed as a JavaScript object.
+
 The `m5-12` ABI adds `oseo_require_object_coercible` for object binding
 initialization. It rejects `null` and `undefined` with a catchable `TypeError`
 before a computed property name can run, while every other admitted value
 continues through the existing primitive-aware property-read operations.
+
 The `m5-13` ABI adds `oseo_object_rest` for `CopyDataProperties`. It snapshots
-own keys in ECMAScript order, skips excluded and non-enumerable keys, reads each
-remaining value through the generic property path, and creates ordinary data
-properties on a fresh result object.
+own keys in ECMAScript order, skips excluded and non-enumerable keys, reads
+each remaining value through the generic property path, and creates ordinary
+data properties on a fresh result object.
+
 The `m5-14` ABI adds synchronous generator objects and moves a generated
 function's saved abrupt completions into an `OseoCompletionRecord` array.
 `oseo_generator_create` allocates one record that owns the suspended body's
-root slots and completion records, so the collector traces a suspended frame
-through the generator object and no native C frame of a suspended body stays
+root slots and completion records. The collector traces a suspended frame
+through the generator object, so no native C frame of a suspended body stays
 alive. Generated code reacquires `oseo_generator_slots` and
 `oseo_generator_completions` on every entry, leaves through
 `oseo_generator_suspend`, and is reentered by the generator dispatcher that
 `oseo_context_set_generator_dispatcher` installs. `oseo_generator_next` is the
 materialized `%GeneratorPrototype%.next`, reached from a generator function's
 `prototype` object alongside `Symbol.iterator`.
+
 The `m5-15` ABI adds `oseo_generator_return` and `oseo_generator_resume_kind`.
 `oseo_generator_return` is the materialized `%GeneratorPrototype%.return`,
 served from the same `prototype` object, so `IteratorClose` reaches it whenever
 a consumer abandons a generator. It resumes the body with a return completion,
 which `oseo_generator_resume_kind` reports at the resume point as
-`OSEO_GENERATOR_RESUME_RETURN` so generated code leaves through the enclosing
-`finally` and iterator-close chain instead of continuing at the suspension. The
-kind describes one resumption only and returns to `OSEO_GENERATOR_RESUME_NEXT`
-once the body leaves. A generator body's iterator done state also moves into
-its generator record's root slots, because an automatic C local would not
-survive a suspension taken while a `for-of` or array binding is still
-stepping.
+`OSEO_GENERATOR_RESUME_RETURN`. Generated code then leaves through the
+enclosing `finally` and iterator-close chain instead of continuing at the
+suspension. The kind describes one resumption only and returns to
+`OSEO_GENERATOR_RESUME_NEXT` once the body leaves.
+
+A generator body's iterator done state also moves into its generator record's
+root slots, because an automatic C local would not survive a suspension taken
+while a `for-of` or array binding is still stepping.
+
 The `m5-28` ABI adds `oseo_class_static_private_method_define`. It installs
 static private methods directly on a class constructor and merges getter and
 setter halves into one accessor element under their shared private name.
+
 The `m5-29` ABI adds `oseo_private_in`. It performs the private-name brand
 check used by `#name in object`, returning a boolean for object operands and
 throwing a `TypeError` for non-objects.
+
 The `m5-30` ABI adds `oseo_bind_arrow_context`. It captures the enclosing
 function's home object and super-constructor context plus the current
-`new.target`; arrow calls restore that context alongside their existing
-lexical receiver.
+`new.target`; arrow calls restore that context alongside their existing lexical
+receiver.
+
 The `m5-31` ABI adds `oseo_async_function_start` and
 `oseo_async_function_reject`. Ordinary asynchronous functions now keep their
 locals, roots, and completion records in a traced suspension frame. A call
 drives that hidden frame until it completes or awaits, settles one capability
 promise, and resumes awaited operands through the existing centralized promise
 reaction paths.
+
 The same ABI virtualizes the narrow `%Array.prototype.push%` dependency used by
 the reviewed thenable-await case. Its cached function is context-rooted, reads
 and converts an object receiver's `length`, performs ordered strict writes
 through the generic property path, and leaves array length and abrupt
 completion behavior to the existing object semantics.
+
 The `m5-32` ABI adds start and result entry points for asynchronous iterator
 steps and asynchronous generator delegation. Generated traced-frame code starts
-one step, retains its promise and direct-value mode in owned root slots, returns
-to the caller, and inspects the settled result only after a promise reaction
-resumes the frame. Async-from-Sync continuation promises use a runtime-owned
-fulfillment reaction to await the stepped value without draining the scheduler.
-Module top-level asynchronous iterator closing retains the existing
-drain-based entry point.
-The `m5-33` ABI adds framed asynchronous iterator close start and result
-entry points. Generated code retains the pending completion in the owning
-traced frame while a present `return` method settles, and the runtime's
+one step, retains its promise and direct-value mode in owned root slots,
+returns to the caller, and inspects the settled result only after a promise
+reaction resumes the frame. Async-from-Sync continuation promises use a
+runtime-owned fulfillment reaction to await the stepped value without draining
+the scheduler. Module top-level asynchronous iterator closing retains the
+existing drain-based entry point.
+
+The `m5-33` ABI adds framed asynchronous iterator close start and result entry
+points. Generated code retains the pending completion in the owning traced
+frame while a present `return` method settles, and the runtime's
 Async-from-Sync rejection reaction closes the wrapped synchronous iterator
 before preserving the original rejection.
-The `m5-34` ABI removes `oseo_await_value` and changes
-`oseo_event_loop_run` from a context-only entry point to one that also accepts
-the entry promise. Generated code using the two-argument entry point must pair
-with `m5-34` runtime assets.
+
+The `m5-34` ABI removes `oseo_await_value` and changes `oseo_event_loop_run`
+from a context-only entry point to one that also accepts the entry promise.
+Generated code using the two-argument entry point must pair with `m5-34`
+runtime assets.
 
 The `m5-35` ABI adds the *runtime\_bigint.c* component, exact BigInt literal
-construction, `ToNumeric`, and numeric-one dispatch for update
-expressions. Every BigInt is an `OSEO_HEAP_BIGINT` primitive with an inline,
-normalized sign and magnitude using 30-bit limbs in `uint32_t` storage. Generic
-arithmetic, comparison, decimal conversion, and signed shifts remain behind
-the `OseoValue` runtime boundary. The collector traces the BigInt object but no
-limb edges, and tag 7 remains unassigned. The baseline rejects magnitudes above
-65,536 bits with a catchable `RangeError` before allocating the oversized
-result.
+construction, `ToNumeric`, and numeric-one dispatch for update expressions.
+Every BigInt is an `OSEO_HEAP_BIGINT` primitive with an inline, normalized sign
+and magnitude using 30-bit limbs in `uint32_t` storage.
+
+Generic arithmetic, comparison, decimal conversion, and signed shifts remain
+behind the `OseoValue` runtime boundary. The collector traces the BigInt object
+but no limb edges, and tag 7 remains unassigned. The baseline rejects
+magnitudes above 65,536 bits with a catchable `RangeError` before allocating
+the oversized result.
 
 The `m5-36` ABI adds `oseo_require_delete_object_coercible`. Generated delete
 lowering uses it after evaluating a computed key expression but before
@@ -235,39 +262,40 @@ prototype values and delegates object and null values to the existing
 `oseo_object_set_prototype` authority.
 
 The `m5-38` ABI adds `oseo_this_value`, `oseo_global_object_create`, and
-`oseo_global_binding_set`. `oseo_this_value` resolves a nullish receiver
-to the realm's global this value, which it
-creates on first use as an ordinary extensible object with a null
-`[[Prototype]]`. The context permanently roots that one object, so Script
-top-level `this` and every non-strict nullish receiver observe one identity
-across collection.
+`oseo_global_binding_set`. `oseo_this_value` resolves a nullish receiver to the
+realm's global this value, which it creates on first use as an ordinary
+extensible object with a null `[[Prototype]]`. The context permanently roots
+that one object, so Script top-level `this` and every non-strict nullish
+receiver observe one identity across collection.
 
-The M5c `primitive-wrapper-objects` unit completes the non-nullish branch
-with `ToObject`. Objects retain their identity; Boolean, Number, String,
-Symbol, and BigInt primitives produce fresh branded wrappers over the
-callee realm's intrinsic prototypes. The C backend binds and roots this
-receiver once at a non-strict function's entry, before parameter effects or
-suspension-frame creation. Repeated `this` reads and lexical arrows retain
-that identity, and the suspension record traces it across resumes. Strict
-functions receive their original values. Existing wrapper layouts, tracing,
-constructor behavior, and branded prototype methods remain authoritative;
-this unit adds no runtime entry point or heap field.
+The M5c `primitive-wrapper-objects` unit completes the non-nullish branch with
+`ToObject`. Objects retain their identity; Boolean, Number, String, Symbol, and
+BigInt primitives produce fresh branded wrappers over the callee realm's
+intrinsic prototypes. The C backend binds and roots this receiver once at a
+non-strict function's entry, before parameter effects or suspension-frame
+creation. Repeated `this` reads and lexical arrows retain that identity, and
+the suspension record traces it across resumes. Strict functions receive their
+original values.
 
-`Array.from` keeps the original receiver for its `GetMethod` iterator
-lookup, then materializes one `ToObject` result for the array-like branch's
-length and indexed reads. `Object.prototype.toString` likewise reads
-`Symbol.toStringTag` from its `ToObject` result. Ordinary primitive property
-References and `Object.prototype.toLocaleString`'s `Invoke` keep their
-primitive receivers. This admission does not complete primitive inherited
-`[[Set]]`, which has its own M5c node.
+Existing wrapper layouts, tracing, constructor behavior, and branded prototype
+methods remain authoritative; this unit adds no runtime entry point or heap
+field.
+
+`Array.from` keeps the original receiver for its `GetMethod` iterator lookup,
+then materializes one `ToObject` result for the array-like branch's length and
+indexed reads. `Object.prototype.toString` likewise reads `Symbol.toStringTag`
+from its `ToObject` result. Ordinary primitive property References and
+`Object.prototype.toLocaleString`'s `Invoke` keep their primitive receivers.
+This admission does not complete primitive inherited `[[Set]]`, which has its
+own M5c node.
 
 `oseo_global_object_create` performs GlobalDeclarationInstantiation's binding
 creation for one Script. Each named entry becomes a writable, enumerable,
 non-configurable own property of that object whose stored value is the binding
-cell in the passed environment, so the property and the binding are one
-storage location and no value is ever copied between them. A backend calls it
-once, after every binding cell exists and before the script body runs; module
-code never calls it.
+cell in the passed environment, so the property and the binding are one storage
+location and no value is ever copied between them. A backend calls it once,
+after every binding cell exists and before the script body runs; module code
+never calls it.
 
 `oseo_global_binding_set` is SetMutableBinding for a binding the global object
 also exposes. It writes the cell unless `[[DefineOwnProperty]]` made that
@@ -279,95 +307,95 @@ property through its cell, and the fixed-slot property cache excludes
 cell-backed slots so that a cached load never yields the cell itself.
 
 The `m5-39` ABI gives the virtualized `%GeneratorPrototype%.throw` its own
-permanently rooted context cache. The previous layout had no cache field for
-the throw method, so its lookup fell through to the `[Symbol.iterator]` self
-function's slot and whichever method a program resolved first was returned
-for both keys afterward.
+permanently rooted context cache. Without that cache, its lookup falls through
+to the `[Symbol.iterator]` self function's slot, and whichever method a program
+resolved first is returned for both keys afterward.
 
 The `m5-40` ABI adds `oseo_mapped_arguments_create` and a `mapped_arguments`
-object flag. The generated prologue calls it instead of
-`oseo_arguments_create` whenever a non-strict function's parameter list is
-simple: every supplied index first snapshots its call argument exactly as
-the unmapped constructor does, then a rightmost formal parameter's own
-index is redefined to hold that parameter's environment binding cell as
-its stored value. `cell_backed_property`, already shared by the global
-object and a module namespace, recognizes the flag, so `[[Get]]`,
-`[[Set]]`, and `[[GetOwnProperty]]` alias the index and the parameter with
-no exotic method table of their own. `[[DefineOwnProperty]]`'s
-redefinition path severs that alias, replacing the cell with a plain
-snapshot of the value just written, exactly when the accepted descriptor
-is an explicit non-writable data descriptor or an accessor; the parameter
-itself keeps its own binding cell and stays mutable regardless. A
-duplicate formal name maps only its rightmost occurrence, and an index at
-or beyond the parameter count keeps the unmapped snapshot.
+object flag. The generated prologue calls it instead of `oseo_arguments_create`
+whenever a non-strict function's parameter list is simple. Every supplied index
+first snapshots its call argument exactly as the unmapped constructor does,
+then a rightmost formal parameter's own index is redefined to hold that
+parameter's environment binding cell as its stored value.
 
-The `m5-41` ABI drops `oseo_arguments_create`'s `callee` parameter and adds
-the realm's `%ThrowTypeError%` intrinsic behind a new context cache. Every
-function form except an arrow now owns an implicit `arguments` binding, so
-the unmapped constructor also serves strict functions, methods, class
-constructors, asynchronous functions, and asynchronous generators.
+`cell_backed_property`, already shared by the global object and a module
+namespace, recognizes the flag, so `[[Get]]`, `[[Set]]`, and
+`[[GetOwnProperty]]` alias the index and the parameter with no exotic method
+table of their own. `[[DefineOwnProperty]]`'s redefinition path severs that
+alias, replacing the cell with a plain snapshot of the value just written. This
+happens exactly when the accepted descriptor is an explicit non-writable data
+descriptor or an accessor; the parameter itself keeps its own binding cell and
+stays mutable regardless.
+
+A duplicate formal name maps only its rightmost occurrence, and an index at or
+beyond the parameter count keeps the unmapped snapshot.
+
+The `m5-41` ABI drops `oseo_arguments_create`'s `callee` parameter and adds the
+realm's `%ThrowTypeError%` intrinsic behind a new context cache. Every function
+form except an arrow now owns an implicit `arguments` binding, so the unmapped
+constructor also serves strict functions, methods, class constructors,
+asynchronous functions, and asynchronous generators.
+
 CreateUnmappedArgumentsObject defines `callee` as a non-configurable,
 non-enumerable accessor whose `[[Get]]` and `[[Set]]` are both the single
-cached `%ThrowTypeError%` function, so reading or writing it throws a
-`TypeError` and the running function is never reachable through the
-object. The intrinsic is created on first use, permanently rooted, and
-shared by every unmapped arguments object in the realm, so both accessor
-slots and every object's pair compare equal, and 10.2.4.1's hardening is
-applied: its `length` and `name` are non-writable and non-configurable and
-the function itself is non-extensible. Only
-`oseo_mapped_arguments_create` still defines `callee` as a writable,
+cached `%ThrowTypeError%` function. Reading or writing it throws a `TypeError`,
+and the running function is never reachable through the object. The intrinsic
+is created on first use, permanently rooted, and shared by every unmapped
+arguments object in the realm. Both accessor slots and every object's pair
+compare equal. The 10.2.4.1 hardening applies: its `length` and `name` are
+non-writable and non-configurable, and the function itself is non-extensible.
+Only `oseo_mapped_arguments_create` still defines `callee` as a writable,
 configurable data property naming the running function.
 
-The same ABI gives both arguments object shapes an `@@iterator` data
-property holding the cached `%Array.prototype.values%` function, which
-makes that function and the array iterator's `next` generic over object
-array-likes. `next` now takes its bound as
-`ToLength(ToNumber(Get(O, "length")))`, keeping an ordinary array's own
-element count as an equivalent fast path, and it snapshots the iterated
-target and cursor before that read and advances the cursor before the
-element `Get`. The ordering matters because a non-array target's `length`
-and elements can be accessors: a reentrant step must not steal the index
-this step yields, and an abrupt element accessor must leave the iterator on
-the following index rather than retrying the one it failed to read.
+The same ABI gives both arguments object shapes an `@@iterator` data property
+holding the cached `%Array.prototype.values%` function, which makes that
+function and the array iterator's `next` generic over object array-likes.
+`next` now takes its bound as `ToLength(ToNumber(Get(O, "length")))`, keeping
+an ordinary array's own element count as an equivalent fast path.
+
+The iterator snapshots the iterated target and cursor before that read and
+advances the cursor before the element `Get`. The ordering matters because a
+non-array target's `length` and elements can be accessors: a reentrant step
+must not steal the index this step yields, and an abrupt element accessor must
+leave the iterator on the following index rather than retrying the one it
+failed to read.
 
 The `m5-44` ABI adds `AggregateError` as the eighth public error kind and
-expands the context's error constructor and prototype caches accordingly.
-Its constructor consumes the first argument through the shared iterator
-protocol into a fresh `errors` array. It also shares the optional `cause`
-installation path with `Error` and every NativeError constructor. These public
-enum and context layout changes shift the generated error code identifiers and
-require the ABI bump.
+expands the context's error constructor and prototype caches accordingly. Its
+constructor consumes the first argument through the shared iterator protocol
+into a fresh `errors` array. It also shares the optional `cause` installation
+path with `Error` and every NativeError constructor. These public enum and
+context layout changes shift the generated error code identifiers and require
+the ABI bump.
 
 The `m5-46` ABI replaces component-local intrinsic caches with one realm-owned
-intrinsic table and materializes `%Object.prototype%`,
-`%Function.prototype%`, and the admitted standard constructors as reachable
-values. The preceding `m5-45` ABI expanded the well-known symbol table from four
-entries to the complete thirteen-entry edition set. The public context layout
-changes with the table, so embedding code must use runtime inputs with the
-matching ABI.
+intrinsic table and materializes `%Object.prototype%`, `%Function.prototype%`,
+and the admitted standard constructors as reachable values. The preceding
+`m5-45` ABI expanded the well-known symbol table from four entries to the
+complete thirteen-entry edition set. The public context layout changes with the
+table, so embedding code must use runtime inputs with the matching ABI.
 
 The `m5-47` ABI populates the realm-owned `%Object.prototype%` with its six
-standard methods and `constructor` link. The intrinsic table gains stable
-slots for those functions and the `Object` constructor identity. Callable
-constructor behavior and primitive wrappers remain owned by their later M5b
-node.
+standard methods and `constructor` link. The intrinsic table gains stable slots
+for those functions and the `Object` constructor identity. Callable constructor
+behavior and primitive wrappers remain owned by their later M5b node.
 
-The `m5-48` ABI completes `%Function.prototype%` with its standard call,
-apply, bind, source-text, and has-instance behavior. The intrinsic table gains
-stable slots for the `Function` identity and those methods, and function heap
-objects gain traced initial-name, source, and bound-call state.
+The `m5-48` ABI completes `%Function.prototype%` with its standard call, apply,
+bind, source-text, and has-instance behavior. The intrinsic table gains stable
+slots for the `Function` identity and those methods, and function heap objects
+gain traced initial-name, source, and bound-call state.
 
 The `m5-49` ABI materializes `%Iterator%`, `%IteratorPrototype%`, and
 `Iterator.from`. The intrinsic table gains stable slots for the constructor,
 method, accessors, and wrap-for-valid-iterator prototype and methods. Ordinary
-objects also gain traced state for the wrapped iterator and its captured
-`next` method.
+objects also gain traced state for the wrapped iterator and its captured `next`
+method.
 
 The `m5-50` ABI adds the *runtime\_number.c* component and materializes the
 `Number` constructor, its branded wrapper objects, numeric constants, and
-static predicate and parser methods. Ordinary objects gain Number data,
-the intrinsic table gains stable Number slots, and the global object installs
-the writable, non-enumerable, configurable constructor property. The Number
+static predicate and parser methods. Ordinary objects gain Number data, the
+intrinsic table gains stable Number slots, and the global object installs the
+writable, non-enumerable, configurable constructor property. The Number
 prototype formatting methods remain owned by their later M5b node.
 
 The `m5-51` ABI makes the realm-owned `Object` constructor callable and
@@ -375,13 +403,15 @@ constructible and installs it on the global object. `Object` returns existing
 objects unchanged, creates ordinary objects for nullish inputs, and wraps
 primitives in collector-traced objects with stable intrinsic prototypes.
 `Object.is`, `Object.getPrototypeOf`, and `Object.setPrototypeOf` are ordinary
-static properties. Ordinary objects gain traced primitive wrapper state, and
-the intrinsic table gains the three static functions plus Boolean, String,
-and BigInt wrapper prototype slots. The previously admitted `create`,
-`defineProperty`, `getOwnPropertyDescriptor`, and `keys` helpers are also real
-function properties of `Object`. Transient primitive property lookup boxes
-without materializing String index properties that the lookup has already
-handled directly.
+static properties.
+
+Ordinary objects gain traced primitive wrapper state, and the intrinsic table
+gains the three static functions plus Boolean, String, and BigInt wrapper
+prototype slots. The previously admitted `create`, `defineProperty`,
+`getOwnPropertyDescriptor`, and `keys` helpers are also real function
+properties of `Object`. Transient primitive property lookup boxes without
+materializing String index properties that the lookup has already handled
+directly.
 
 The `m5-52` ABI admits `Object.defineProperty` as a complete descriptor
 operation. Property-key coercion precedes descriptor conversion, descriptor
@@ -390,68 +420,70 @@ completion stops before later observations or mutation. The shared descriptor
 component applies ordinary, array, function, arguments, String-wrapper, and
 module-namespace compatibility rules without changing public runtime layout.
 
-The `m5-53` ABI materializes `%Promise%`. The constructor, its prototype
-link, `Symbol.toStringTag`, the `Symbol.species` accessor, and the `resolve`,
+The `m5-53` ABI materializes `%Promise%`. The constructor, its prototype link,
+`Symbol.toStringTag`, the `Symbol.species` accessor, and the `resolve`,
 `reject`, `withResolvers`, `try`, `all`, and `race` statics are ordinary
 properties of one realm-owned constructor that the global object binds. A
 promise takes its `[[Prototype]]` from the new target, so a subclass keeps its
-own prototype. `Promise.prototype.then` and `finally` run SpeciesConstructor,
-and a capability over any constructor other than `%Promise%` is a
-three-slot record holding the constructed promise and the resolving functions
-its executor captured. `Promise.all` and `Promise.race` build that record
-from their `this` value rather than from `%Promise%`. The retired
-`oseo_promise_construct`, `oseo_promise_race`, and `oseo_promise_reject` entry
-points leave the generated-code ABI, because generated code now reads the
-properties instead.
+own prototype. `Promise.prototype.then` and `finally` run SpeciesConstructor.
 
-The `m5-54` ABI completes the descriptor checkpoint with the two query
-statics. `Object.getOwnPropertyDescriptor` and the new
+A capability over any constructor other than `%Promise%` is a three-slot record
+holding the constructed promise and the resolving functions its executor
+captured. `Promise.all` and `Promise.race` build that record from their `this`
+value rather than from `%Promise%`. The retired `oseo_promise_construct`,
+`oseo_promise_race`, and `oseo_promise_reject` entry points leave the
+generated-code ABI, because generated code now reads the properties instead.
+
+The `m5-54` ABI completes the descriptor checkpoint with the two query statics.
+`Object.getOwnPropertyDescriptor` and the new
 `Object.getOwnPropertyDescriptors` convert their target before their property
-key, report an absent property as `undefined` and an absent target property
-set as an empty object, and build every reported descriptor through one
-FromPropertyDescriptor body whose fields keep their specified order. The
-plural query walks ordinary own keys, so integer indices lead in ascending
-order, the array `length` and function `prototype` this runtime keeps outside
-the property vector hold their creation positions, and symbol keys trail
-every string key. Public runtime layout is unchanged.
+key. They report an absent property as `undefined` and an absent target
+property set as an empty object, and build every reported descriptor through
+one FromPropertyDescriptor body whose fields keep their specified order.
 
-The `m5-55` ABI materializes `%ArrayBuffer%`. The constructor takes its
-length through ToIndex and its optional `maxByteLength` from an object
-options bag, and it allocates one zero-initialized Data Block that exactly
-one buffer owns. A resizable buffer reserves its whole maximum at allocation,
-so `resize` moves the byte length inside a block that never moves and clears
-the bytes outside it. `transfer` and `transferToFixedLength` copy into a
-second block before detaching the source, `slice` allocates through
-SpeciesConstructor, and the `byteLength`, `detached`, `maxByteLength`, and
-`resizable` accessors report the detached state rather than throwing. Public
-runtime layout is unchanged; the runtime adds one internal heap kind for the
-buffer record.
+The plural query walks ordinary own keys, so integer indices lead in ascending
+order. The array `length` and function `prototype` this runtime keeps outside
+the property vector hold their creation positions, and symbol keys trail every
+string key. Public runtime layout is unchanged.
 
-The `m5-56` ABI gives every object an observable extensibility state and
-admits the six Object integrity statics. `preventExtensions` clears that
-state, `seal` also makes every own property non-configurable, and `freeze`
-also makes every own data property non-writable. `isExtensible`, `isSealed`,
-and `isFrozen` report the corresponding state without boxing primitives.
+The `m5-55` ABI materializes `%ArrayBuffer%`. The constructor takes its length
+through ToIndex and its optional `maxByteLength` from an object options bag,
+and it allocates one zero-initialized Data Block that exactly one buffer owns.
+A resizable buffer reserves its whole maximum at allocation, so `resize` moves
+the byte length inside a block that never moves and clears the bytes outside
+it. `transfer` and `transferToFixedLength` copy into a second block before
+detaching the source, `slice` allocates through SpeciesConstructor, and the
+`byteLength`, `detached`, `maxByteLength`, and `resizable` accessors report the
+detached state rather than throwing. Public runtime layout is unchanged; the
+runtime adds one internal heap kind for the buffer record.
+
+The `m5-56` ABI gives every object an observable extensibility state and admits
+the six Object integrity statics. `preventExtensions` clears that state, `seal`
+also makes every own property non-configurable, and `freeze` also makes every
+own data property non-writable. `isExtensible`, `isSealed`, and `isFrozen`
+report the corresponding state without boxing primitives.
+
 Stored properties still transition through the shared descriptor component,
 including arguments aliases and module namespace restrictions, while array
 `length` and function `prototype` retain their specialized storage. Public
-runtime layout is unchanged because the extensibility flag was reserved by
-the intrinsic graph root.
+runtime layout is unchanged because the extensibility flag was reserved by the
+intrinsic graph root.
 
-The `m5-58` ABI completes the static Global Environment Record boundary.
-The realm global object owns the standard `Infinity`, `NaN`, and `undefined`
-value properties with their specified read-only, non-enumerable, and
-non-configurable descriptors and every constructor global the profile admits.
-Global declaration instantiation checks lexical declarations against
-restricted properties and validates function and `var` declarations against
-existing descriptors and extensibility before mutation. A new property stores
-its binding cell. A declaration over an existing configurable property retains
-that property as Object Environment Record storage, so deletion, accessors,
-and later descriptor changes remain visible through the identifier, including
-inherited-property lookup and `with` fallback. A failed standard-global
-installation remains unpublished so it can be retried. Module declarations do
-not enter that record. The global object remains unavailable as a `globalThis`
-binding, which is owned by its later architecture decision.
+The `m5-58` ABI completes the static Global Environment Record boundary. The
+realm global object owns the standard `Infinity`, `NaN`, and `undefined` value
+properties with their specified read-only, non-enumerable, and non-configurable
+descriptors and every constructor global the profile admits. Global declaration
+instantiation checks lexical declarations against restricted properties and
+validates function and `var` declarations against existing descriptors and
+extensibility before mutation. A new property stores its binding cell.
+
+A declaration over an existing configurable property retains that property as
+Object Environment Record storage, so deletion, accessors, and later descriptor
+changes remain visible through the identifier, including inherited-property
+lookup and `with` fallback. A failed standard-global installation remains
+unpublished so it can be retried. Module declarations do not enter that record.
+The global object remains unavailable as a `globalThis` binding, which is owned
+by its later architecture decision.
 
 The `m5-59` ABI makes every admitted configurable constructor global use the
 same property-owned identifier path as the other mutable standard globals.
@@ -459,8 +491,10 @@ Property writes and deletes therefore change later bare reads, writes, and
 `typeof` results. Global lexical and object declaration tables also carry each
 declaration's line and column, which the runtime installs before
 HasRestrictedGlobalProperty, CanDeclareGlobalFunction, or CanDeclareGlobalVar
-can fail. Module declarations remain outside the global object record. Each
-call validates one independently compiled Script; the ABI does not retain
+can fail.
+
+Module declarations remain outside the global object record. Each call
+validates one independently compiled Script; the ABI does not retain
 `[[VarNames]]` or declarative names across successive Script instantiations in
 one realm, so multi-Script declaration collisions remain outside this unit.
 
@@ -472,24 +506,25 @@ unadmitted pre-ES2015 Array prototype methods explicitly unsupported.
 
 The `m5-60` ABI admits `Object.defineProperties` as a complete collection
 operation. The target check precedes every read of the properties argument,
-ToObject precedes the own-key walk, and the walk keeps the own enumerable
-keys in ordinary own-key order. Every kept descriptor is read with Get and
-converted through the ToPropertyDescriptor body `Object.defineProperty`
-shares before the first definition runs, so an abrupt collection leaves the
-target untouched while an abrupt definition keeps every earlier definition.
-The shared descriptor component applies ordinary, array, function,
-arguments, String-wrapper, and module-namespace compatibility rules without
-changing public runtime layout.
+ToObject precedes the own-key walk, and the walk keeps the own enumerable keys
+in ordinary own-key order. Every kept descriptor is read with Get and converted
+through the ToPropertyDescriptor body `Object.defineProperty` shares before the
+first definition runs, so an abrupt collection leaves the target untouched
+while an abrupt definition keeps every earlier definition. The shared
+descriptor component applies ordinary, array, function, arguments,
+String-wrapper, and module-namespace compatibility rules without changing
+public runtime layout.
 
 The `m5-63` ABI extends the realm-owned `%String%` cluster materialized at
 `m5-62`. The constructor, its prototype link, and the `fromCharCode`,
 `fromCodePoint`, and `raw` statics remain ordinary properties, and
-`%String.prototype%.constructor` links back to the realm-owned constructor.
-The prototype now supplies ordinary `at`, `charAt`, `charCodeAt`,
-`codePointAt`, `toString`, and `valueOf` functions. The four access methods
-are generic: they reject only a nullish receiver before applying `ToString`
-and `ToIntegerOrInfinity`. `toString` and `valueOf` instead require a String
-primitive or an object branded with `[[StringData]]`.
+`%String.prototype%.constructor` links back to the realm-owned constructor. The
+prototype now supplies ordinary `at`, `charAt`, `charCodeAt`, `codePointAt`,
+`toString`, and `valueOf` functions.
+
+The four access methods are generic: they reject only a nullish receiver before
+applying `ToString` and `ToIntegerOrInfinity`. `toString` and `valueOf` instead
+require a String primitive or an object branded with `[[StringData]]`.
 
 The `concat`, `lastIndexOf`, `localeCompare`, `match`, `replace`, `search`,
 `slice`, `split`, `substring`, `toLocaleLowerCase`, `toLocaleUpperCase`,
@@ -500,20 +535,22 @@ intrinsic code range remains runtime-internal.
 The `m5-64` ABI adds ordinary `every`, `forEach`, and `some` functions to the
 realm-owned `%Array.prototype%`. Each method converts its receiver, snapshots
 LengthOfArrayLike once, and validates the callback before visiting any index.
-It then performs a fresh HasProperty and Get for each index. The callback
-receives the value, index, and converted receiver with the supplied `thisArg`;
-`every` and `some` preserve their specified early completion, while `forEach`
-returns `undefined`. Deleting, creating, or inheriting an indexed property
-during the loop therefore affects a later visit, while appending beyond the
-initial length does not. The generated-code ABI gains no entry point.
+It then performs a fresh HasProperty and Get for each index.
+
+The callback receives the value, index, and converted receiver with the
+supplied `thisArg`. `every` and `some` preserve their specified early
+completion, while `forEach` returns `undefined`. Deleting, creating, or
+inheriting an indexed property during the loop therefore affects a later visit,
+while appending beyond the initial length does not. The generated-code ABI
+gains no entry point.
 
 The `m5-65` ABI implements `concat`, `indexOf`, `lastIndexOf`, `includes`,
 `startsWith`, `endsWith`, `slice`, and `substring` on the same realm-owned
 prototype. Each method converts its receiver before later operands. Search
-methods preserve search-value-before-position conversion, the predicate
-methods reject a true `@@match` result before search-value conversion, and
-matching uses UTF-16 code units. Converted indices use their method-specific
-defaults, clamping, negative-relative behavior, and endpoint swapping.
+methods preserve search-value-before-position conversion, the predicate methods
+reject a true `@@match` result before search-value conversion, and matching
+uses UTF-16 code units. Converted indices use their method-specific defaults,
+clamping, negative-relative behavior, and endpoint swapping.
 
 The `localeCompare`, `match`, `replace`, `search`, `split`,
 `toLocaleLowerCase`, `toLocaleUpperCase`, `toLowerCase`, `toUpperCase`, and
@@ -525,11 +562,12 @@ The `m5-66` ABI adds ordinary `filter` and `map` functions to the same
 prototype. Both retain the snapshot-length HasProperty and Get loop, then
 create their result through ArraySpeciesCreate. An actual Array reads its
 `constructor` and then `Symbol.species`; a nullish species selects the realm
-Array, and any other species must be a constructor. `map` defines each visited
-index and preserves holes in its requested-length result, while `filter`
-defines selected values consecutively in its zero-length result. A non-Array
-receiver skips both species reads and uses the realm Array. The generated-code
-ABI gains no entry point.
+Array, and any other species must be a constructor.
+
+`map` defines each visited index and preserves holes in its requested-length
+result, while `filter` defines selected values consecutively in its zero-length
+result. A non-Array receiver skips both species reads and uses the realm Array.
+The generated-code ABI gains no entry point.
 
 The `m5-67` ABI completes `Promise.all` and `Promise.race` over the
 materialized intrinsic. Both statics build a capability from their receiver,
@@ -546,78 +584,85 @@ The `m5-69` ABI adds ordinary `concat`, `flat`, `flatMap`, `join`, `slice`,
 observable indexed access, and abrupt completion. `concat` applies
 `Symbol.isConcatSpreadable`; it, `flat`, `flatMap`, and `slice` allocate Array
 results through ArraySpeciesCreate. Flattening skips holes, observes nested
-Array elements recursively, and enforces the runtime's deterministic call
-depth limit for cyclic or unbounded input. `join` and `toLocaleString` retain
-their distinct element conversion rules, including recursion-safe Array
-stringification. During element conversion, re-entry through `join`,
-`toString`, or `toLocaleString` on the same active receiver renders an empty
-string. These methods and ordinary string conversion that reaches intrinsic
-Array `toString` reject a length above `2**32 - 1` with a catchable `TypeError`.
+Array elements recursively, and enforces the runtime's deterministic call depth
+limit for cyclic or unbounded input.
+
+`join` and `toLocaleString` retain their distinct element conversion rules,
+including recursion-safe Array stringification. During element conversion,
+re-entry through `join`, `toString`, or `toLocaleString` on the same active
+receiver renders an empty string. These methods and ordinary string conversion
+that reaches intrinsic Array `toString` reject a length above `2**32 - 1` with
+a catchable `TypeError`.
+
 Runtime string construction follows the Node.js and Deno ceiling of 536,870,888
-UTF-16 code units and throws a catchable `RangeError` before publishing a larger
-string. `toString` calls a callable `join` or falls back to
+UTF-16 code units and throws a catchable `RangeError` before publishing a
+larger string. `toString` calls a callable `join` or falls back to
 `Object.prototype.toString`. The generated-code ABI gains no entry point.
 
 The `m5-70` ABI materializes `Map`, its keyed collection storage, and
 `%MapIteratorPrototype%`. `[[MapData]]` is a plain growable array searched by
-SameValueZero; a delete or clear marks a record dead in place instead of
+SameValueZero. A delete or clear marks a record dead in place instead of
 removing it, so a live `%MapIteratorPrototype%.next` walking the same array by
-index never skips or misaligns past a concurrent mutation, and a key deleted
-and re-added reappears at the end of insertion order rather than its original
-position. `set` normalizes a `-0` key to `+0` only when it creates a new
-record. The constructor reads `set` once and calls it for every iterated
-two-element entry, closing an unfinished iterable on a non-object entry, a
-failed element read, or an abrupt `set` call. `forEach` re-reads the entry
-array on every step, so a `set` call from inside the callback that grows the
-backing storage is still observed. `groupBy` builds its result directly into a
-fresh map's records instead of through an observable `set` lookup. The
-generated-code ABI gains no entry point.
+index never skips or misaligns past a concurrent mutation. A key deleted and
+re-added reappears at the end of insertion order rather than its original
+position. `set` normalizes a `-0` key to `+0` only when it creates a new record.
 
-The `m5-72` ABI adds the *runtime\_bigint\_object.c* component and
-materializes the callable `BigInt` intrinsic, `%BigInt.prototype%`, and their
-own properties over the already admitted primitive. `BigInt` has a
-`[[Construct]]` slot, so class heritage and generic constructor selection see
-it as a constructor, but every direct or derived construction throws
-`TypeError` before any conversion. Its `prototype` is a non-writable,
-non-enumerable, non-configurable own property whose value is an ordinary object
-with no `[[BigIntData]]` slot. The callable path
-applies `ToPrimitive` with the number hint exactly once, converts an integral
-Number exactly and rejects `NaN`, an infinity, and a fractional value with
-`RangeError`, and otherwise applies the shared `ToBigInt`, which rejects a
-Number, a Symbol, `undefined`, and `null` with `TypeError` and an unparseable
-string with `SyntaxError`. `BigInt.asIntN` and `BigInt.asUintN` convert the
-width through `ToIndex` before the operand through `ToBigInt`, then truncate to
-the exact value modulo `2**bits` inside a width-bounded two's complement, so a
-width above the operand's bit length never materializes `2**bits`;
-`BigInt.asUintN` of a negative operand is the one request whose result grows to
-the full width and rejects a width past the reviewed 65,536-bit ceiling with a
-catchable `RangeError`. `%BigInt.prototype%.toString` checks its receiver brand
-before converting an optional radix, admits radix 2 through 36 using lowercase
-`a` through `z` for digit values 10 through 35, and shares one exact
-repeated-division conversion with ordinary BigInt string conversion.
-`toLocaleString` returns the base specification's own fallback,
-`thisBigIntValue` followed by `ToString`. `valueOf` returns the receiver's
-primitive. All three admit a BigInt primitive or a BigInt wrapper object and
-reject every other receiver, including `%BigInt.prototype%` itself.
-`%BigInt.prototype%` carries `Symbol.toStringTag` `"BigInt"`. The
-generated-code ABI gains no entry point.
+The constructor reads `set` once and calls it for every iterated two-element
+entry, closing an unfinished iterable on a non-object entry, a failed element
+read, or an abrupt `set` call. `forEach` re-reads the entry array on every
+step, so a `set` call from inside the callback that grows the backing storage
+is still observed. `groupBy` builds its result directly into a fresh map's
+records instead of through an observable `set` lookup. The generated-code ABI
+gains no entry point.
+
+The `m5-72` ABI adds the *runtime\_bigint\_object.c* component and materializes
+the callable `BigInt` intrinsic, `%BigInt.prototype%`, and their own properties
+over the already admitted primitive. `BigInt` has a `[[Construct]]` slot, so
+class heritage and generic constructor selection see it as a constructor, but
+every direct or derived construction throws `TypeError` before any conversion.
+Its `prototype` is a non-writable, non-enumerable, non-configurable own
+property whose value is an ordinary object with no `[[BigIntData]]` slot.
+
+The callable path applies `ToPrimitive` with the number hint exactly once,
+converts an integral Number exactly and rejects `NaN`, an infinity, and a
+fractional value with `RangeError`, and otherwise applies the shared
+`ToBigInt`, which rejects a Number, a Symbol, `undefined`, and `null` with
+`TypeError` and an unparseable string with `SyntaxError`.
+
+`BigInt.asIntN` and `BigInt.asUintN` convert the width through `ToIndex` before
+the operand through `ToBigInt`, then truncate to the exact value modulo
+`2**bits` inside a width-bounded two's complement, so a width above the
+operand's bit length never materializes `2**bits`. `BigInt.asUintN` of a
+negative operand is the one request whose result grows to the full width and
+rejects a width past the reviewed 65,536-bit ceiling with a catchable
+`RangeError`.
+
+`%BigInt.prototype%.toString` checks its receiver brand before converting an
+optional radix, admits radix 2 through 36 using lowercase `a` through `z` for
+digit values 10 through 35, and shares one exact repeated-division conversion
+with ordinary BigInt string conversion. `toLocaleString` returns the base
+specification's own fallback, `thisBigIntValue` followed by `ToString`.
+`valueOf` returns the receiver's primitive. All three admit a BigInt primitive
+or a BigInt wrapper object and reject every other receiver, including
+`%BigInt.prototype%` itself. `%BigInt.prototype%` carries `Symbol.toStringTag`
+`"BigInt"`. The generated-code ABI gains no entry point.
 
 The `m5-73` ABI adds the *runtime\_data\_view.c* component and materializes
-`%DataView%` and `%DataView.prototype%` over the already admitted
-`ArrayBuffer` Data Block. `DataView` is a constructor the global object binds
-as a writable, non-enumerable, configurable property, so calling it without
-`new` throws `TypeError`. It requires an `ArrayBuffer` argument, runs `ToIndex`
-over `byteOffset` and then over `byteLength`, and validates the detached state
-and both bounds once before and once after `OrdinaryCreateFromConstructor`
-reads the new target's `prototype`, so arbitrary code in that read observes
-the specified second rejection. An absent `byteLength` fixes the view's length
-over a fixed-length buffer and makes it length-tracking over a resizable one.
+`%DataView%` and `%DataView.prototype%` over the already admitted `ArrayBuffer`
+Data Block. `DataView` is a constructor the global object binds as a writable,
+non-enumerable, configurable property, so calling it without `new` throws
+`TypeError`. It requires an `ArrayBuffer` argument, runs `ToIndex` over
+`byteOffset` and then over `byteLength`, and validates the detached state and
+both bounds once before and once after `OrdinaryCreateFromConstructor` reads
+the new target's `prototype`, so arbitrary code in that read observes the
+specified second rejection. An absent `byteLength` fixes the view's length over
+a fixed-length buffer and makes it length-tracking over a resizable one.
 
 A view owns no Data Block. It holds only its buffer's value, so the collector
 keeps the block alive by tracing the buffer, and nothing in the component
 allocates, resizes, or releases a block. Every accessor and every element
-access recomputes the buffer's detached state and byte length, so a detached
-or shrunk buffer produces the specified `TypeError` from `byteLength`,
+access recomputes the buffer's detached state and byte length, so a detached or
+shrunk buffer produces the specified `TypeError` from `byteLength`,
 `byteOffset`, and every `get` and `set`, while `buffer` still reports the
 detached buffer. A zero-length view exactly at the end of its buffer stays in
 bounds.
@@ -630,16 +675,17 @@ The eleven `get` and eleven `set` accessors cover `Int8`, `Uint8`, `Int16`,
 the out-of-bounds `TypeError` and the range `RangeError`, so a conversion that
 detaches or shrinks the buffer still reaches the specified rejection. A
 one-byte accessor takes no byte-order parameter: it passes little-endian
-directly and runs no `ToBoolean`. The integer element types truncate and wrap
-modulo the element width in two's complement. The float element types round to
-nearest with ties to even using exact integer arithmetic over the operand's own
-binary64 encoding, so no narrowing floating conversion happens and no operand
-can reach an out-of-range one; `Float64` is bit-preserving, a signed zero keeps
-its sign, and a NaN keeps its class. Each element moves through a local byte
-buffer rather than a cast, so an unaligned access is ordinary, and every index
-and size comparison is written so that no host addition can wrap.
-`ArrayBuffer.isView` now reports the one admitted view kind. The generated-code
-ABI gains no entry point.
+directly and runs no `ToBoolean`.
+
+The integer element types truncate and wrap modulo the element width in two's
+complement. The float element types round to nearest with ties to even using
+exact integer arithmetic over the operand's own binary64 encoding, so no
+narrowing floating conversion happens and no operand can reach an out-of-range
+one. `Float64` is bit-preserving, a signed zero keeps its sign, and a NaN keeps
+its class. Each element moves through a local byte buffer rather than a cast,
+so an unaligned access is ordinary, and every index and size comparison is
+written so that no host addition can wrap. `ArrayBuffer.isView` now reports the
+one admitted view kind. The generated-code ABI gains no entry point.
 
 The `m5-74` ABI records the admitted regular expression Unicode property and
 character class escape checkpoint. The frontend resolves exact ECMA-262 names
@@ -652,64 +698,69 @@ The `m5-75` ABI adds the *runtime\_regexp.c* component and materializes the
 callable and constructible `%RegExp%` intrinsic, `%RegExp.prototype%`, the
 constructor link, and the `Symbol.species` accessor. `IsRegExp` observes
 `Symbol.match` before the native brand. Calling the intrinsic uses it as
-`newTarget` and preserves the same-constructor identity case; construction
-retains the actual `newTarget`, reads its `prototype`, and allocates an object
-with one writable, non-enumerable, non-configurable `lastIndex` data property
-initialized to zero. Pattern conversion precedes flags conversion only after
-allocation. A separately allocated immutable matcher artifact owns the
-converted source, decoded flags, capture count, and instruction budget, and the
-collector traces the RegExp-to-artifact-to-strings ownership chain. Invalid
-dynamic patterns and flags throw a catchable `SyntaxError`; unadmitted pattern
-extensions and resource limits retain `OSEO2001`. Prototype execution, result
-construction, accessors, symbol methods, and String integration remain later
-RegExp nodes. The generated-code ABI gains no entry point.
+`newTarget` and preserves the same-constructor identity case.
+
+Construction retains the actual `newTarget`, reads its `prototype`, and
+allocates an object with one writable, non-enumerable, non-configurable
+`lastIndex` data property initialized to zero. Pattern conversion precedes
+flags conversion only after allocation. A separately allocated immutable
+matcher artifact owns the converted source, decoded flags, capture count, and
+instruction budget, and the collector traces the RegExp-to-artifact-to-strings
+ownership chain. Invalid dynamic patterns and flags throw a catchable
+`SyntaxError`; unadmitted pattern extensions and resource limits retain
+`OSEO2001`. Prototype execution, result construction, accessors, symbol
+methods, and String integration remain later RegExp nodes. The generated-code
+ABI gains no entry point.
 
 The `m5-76` ABI adds ordinary `sort` and `toSorted` functions to
-`%Array.prototype%` and removes `sort` from the unadmitted boundary table.
-Both reject a non-callable comparator before converting the receiver, then
-read every index into one collected list before the first comparison: `sort`
-skips holes so that they collapse behind the sorted elements, and `toSorted`
-reads through them so that a hole becomes an undefined element of the copy. An
-undefined element orders after every defined one without reaching the
-comparator, a supplied comparator decides every other pair through `ToNumber`
+`%Array.prototype%` and removes `sort` from the unadmitted boundary table. Both
+reject a non-callable comparator before converting the receiver, then read
+every index into one collected list before the first comparison. `sort` skips
+holes so that they collapse behind the sorted elements, and `toSorted` reads
+through them so that a hole becomes an undefined element of the copy.
+
+An undefined element orders after every defined one without reaching the
+comparator. A supplied comparator decides every other pair through `ToNumber`
 with `NaN` read as `+0`, and the default comparator compares the `ToString`
-results in code-unit order. The collected list and its merge scratch buffer
-are rooted for the whole sort, so the required stability and the first abrupt
-comparison both survive collection. `sort` writes the sorted elements back and
-deletes the trailing indices, while `toSorted` fills a plain Array allocated
-before any element is read and therefore never observes `constructor` or
-`Symbol.species`. Both code IDs come from the existing Array range, and the
-generated-code ABI gains no entry point.
+results in code-unit order. The collected list and its merge scratch buffer are
+rooted for the whole sort, so the required stability and the first abrupt
+comparison both survive collection.
+
+`sort` writes the sorted elements back and deletes the trailing indices, while
+`toSorted` fills a plain Array allocated before any element is read and
+therefore never observes `constructor` or `Symbol.species`. Both code IDs come
+from the existing Array range, and the generated-code ABI gains no entry point.
 
 The `m5-77` ABI adds the *runtime\_regexp\_matcher.c* component and admits
-built-in regular expression execution. The new component compiles one
-validated pattern into an owned instruction program over a register file and
-executes it with an explicit backtrack stack and undo trail, so backtracking
-depth is data rather than native recursion and every owned boundary is
-deterministic. `RegExp.prototype.exec` performs the specified `lastIndex`
-conversion, position loop, and update and builds the match result with
-`index`, `input`, `groups`, and optional `indices`; `test` dispatches through
-an overridden `exec`; `toString` reads `source` and `flags` generically; and
-the `source`, `flags`, and eight individual flag accessors answer from the
-artifact. The matcher artifact gains an owned program pointer the collector
-releases with the artifact, and the RegExp built-in code range replaces its
-one shared deferred-method ID with thirteen dedicated IDs, so nineteen of its
-two hundred fifty-six IDs are occupied. The generated-code ABI gains no entry
-point.
+built-in regular expression execution. The new component compiles one validated
+pattern into an owned instruction program over a register file and executes it
+with an explicit backtrack stack and undo trail, so backtracking depth is data
+rather than native recursion and every owned boundary is deterministic.
+
+`RegExp.prototype.exec` performs the specified `lastIndex` conversion, position
+loop, and update and builds the match result with `index`, `input`, `groups`,
+and optional `indices`. `test` dispatches through an overridden `exec`.
+`toString` reads `source` and `flags` generically, and the `source`, `flags`,
+and eight individual flag accessors answer from the artifact. The matcher
+artifact gains an owned program pointer the collector releases with the
+artifact, and the RegExp built-in code range replaces its one shared
+deferred-method ID with thirteen dedicated IDs, so nineteen of its two hundred
+fifty-six IDs are occupied. The generated-code ABI gains no entry point.
 
 The `m5-83` ABI adds ordinary `reduce` and `reduceRight` functions to
 `%Array.prototype%` and removes both from the unadmitted boundary table. One
-accumulator loop serves both methods: the receiver is converted and its
-length read before the callable check, `reduce` visits ascending indices and
+accumulator loop serves both methods. The receiver is converted and its length
+read before the callable check. `reduce` visits ascending indices and
 `reduceRight` descending ones over the shared HasProperty/Get path, and holes
 are skipped. Initial-value presence follows the argument count, a missing
-initial value is replaced by the first present element in traversal order,
-and a traversal that ends without an accumulator throws a catchable
-TypeError. The callback receives the accumulator, element, index, and
-converted receiver with an undefined this value, and the accumulator stays
-rooted across user code. Neither method allocates a result array, so no
-`constructor` or `Symbol.species` read is reachable. Both code IDs come from
-the existing Array range, and the generated-code ABI gains no entry point.
+initial value is replaced by the first present element in traversal order, and
+a traversal that ends without an accumulator throws a catchable TypeError.
+
+The callback receives the accumulator, element, index, and converted receiver
+with an undefined this value, and the accumulator stays rooted across user
+code. Neither method allocates a result array, so no `constructor` or
+`Symbol.species` read is reachable. Both code IDs come from the existing Array
+range, and the generated-code ABI gains no entry point.
 
 The `m5-84` ABI adds ordinary `toLowerCase`, `toUpperCase`,
 `toLocaleLowerCase`, `toLocaleUpperCase`, `trim`, `trimStart`, `trimEnd`,
@@ -724,12 +775,14 @@ Trimming owns the exact ECMAScript WhiteSpace and LineTerminator set.
 Normalization owns canonical and compatibility decomposition, combining-class
 ordering, composition exclusions, and algorithmic Hangul for `NFC`, `NFD`,
 `NFKC`, and `NFKD`. Locale comparison normalizes both converted operands to
-`NFD` before deterministic UTF-16 code-unit ordering, so canonically
-equivalent strings compare equal on every target. The Unicode generator emits
-the package-private *runtime\_unicode\_tables.h* asset beside the TypeScript
-tables from the same reviewed inputs, and the package includes the Unicode
-permission notice. Seven code IDs in the existing String range dispatch the
-nine function objects. The generated-code ABI gains no entry point.
+`NFD` before deterministic UTF-16 code-unit ordering, so canonically equivalent
+strings compare equal on every target.
+
+The Unicode generator emits the package-private *runtime\_unicode\_tables.h*
+asset beside the TypeScript tables from the same reviewed inputs, and the
+package includes the Unicode permission notice. Seven code IDs in the existing
+String range dispatch the nine function objects. The generated-code ABI gains
+no entry point.
 
 The `m5-85` ABI adds ordinary `at`, `includes`, `indexOf`, and `lastIndexOf`
 functions to `%Array.prototype%` and retires the two deferred search entries.
@@ -747,6 +800,7 @@ function on `%Array.prototype%`. Every method converts its receiver, snapshots
 its array-like length, and performs its specified final length update. Indexed
 moves distinguish present sources from holes, preserving holes and inherited
 values through the required Set and DeletePropertyOrThrow operations.
+
 `copyWithin` selects a safe overlap direction, `reverse` observes both ends
 before writing, and `splice` creates its result through ArraySpeciesCreate.
 Receiver, argument, result, and moved values stay rooted across every
@@ -754,45 +808,47 @@ observable operation. Seven new code IDs come from the existing Array range,
 and the generated-code ABI gains no entry point.
 
 The `m5-93` ABI adds ordinary `find`, `findIndex`, `findLast`, and
-`findLastIndex` functions to `%Array.prototype%`. One predicate loop serves
-all four: the receiver is converted and its length read before the callable
-check, `find` and `findIndex` visit ascending indices and `findLast` and
-`findLastIndex` descending ones, and every index below the snapshot length
-is read with Get, so a hole reaches the predicate as `undefined`. The
-predicate receives the element, index, and converted receiver with the
-caller's `this` argument; its first truthy result returns the element or its
-index, and an exhausted search returns `undefined` or `-1`. No method
-allocates a result array, so no `constructor` or `Symbol.species` read is
-reachable, and the current element stays rooted across the predicate call.
-All four code IDs come from the existing Array range, and the generated-code
-ABI gains no entry point.
+`findLastIndex` functions to `%Array.prototype%`. One predicate loop serves all
+four. The receiver is converted and its length read before the callable check.
+`find` and `findIndex` visit ascending indices and `findLast` and
+`findLastIndex` descending ones, and every index below the snapshot length is
+read with Get, so a hole reaches the predicate as `undefined`.
+
+The predicate receives the element, index, and converted receiver with the
+caller's `this` argument. Its first truthy result returns the element or its
+index, and an exhausted search returns `undefined` or `-1`. No method allocates
+a result array, so no `constructor` or `Symbol.species` read is reachable, and
+the current element stays rooted across the predicate call. All four code IDs
+come from the existing Array range, and the generated-code ABI gains no entry
+point.
 
 The `m5-94` ABI completes the realm-owned `Object` constructor's ordinary
-`keys`, `values`, `entries`, `getOwnPropertyNames`,
-`getOwnPropertySymbols`, `assign`, `fromEntries`, `hasOwn`, and `groupBy`
-functions. They share the existing ordinary own-key ordering and preserve
-descriptor rechecks, Get and Set order, iterator closing, symbol identity, and
-null-prototype grouping. The temporary default primitive String path in
-`groupBy` iterates Unicode code points without exposing the separate String
-iterator node. `oseo_internal_own_property_descriptor` becomes the one
-own-property query every reflective path uses, so the virtual
-%String.prototype%[`Symbol.iterator`] reports the same existence and
-attributes to HasOwnProperty, `propertyIsEnumerable`, the `in` operator,
-descriptor reads, redefinition rechecks, own-key spread, and assignment, and
-an ordinary read of the untouched default stops at %String.prototype%. An
-assignment to that virtual property replaces it in place, a read-only one
-refuses the assignment, and a non-configurable non-writable one accepts only
-a redefinition whose value is SameValue to the `undefined` it models and
-stays virtual through it. The
-generated-code ABI gains no entry point; the added intrinsic code IDs remain
-runtime-internal.
+`keys`, `values`, `entries`, `getOwnPropertyNames`, `getOwnPropertySymbols`,
+`assign`, `fromEntries`, `hasOwn`, and `groupBy` functions. They share the
+existing ordinary own-key ordering and preserve descriptor rechecks, Get and
+Set order, iterator closing, symbol identity, and null-prototype grouping. The
+temporary default primitive String path in `groupBy` iterates Unicode code
+points without exposing the separate String iterator node.
+
+`oseo_internal_own_property_descriptor` becomes the one own-property query
+every reflective path uses, so the virtual
+%String.prototype%[`Symbol.iterator`] reports the same existence and attributes
+to HasOwnProperty, `propertyIsEnumerable`, the `in` operator, descriptor reads,
+redefinition rechecks, own-key spread, and assignment. An ordinary read of the
+untouched default stops at %String.prototype%.
+
+An assignment to that virtual property replaces it in place. A read-only one
+refuses the assignment. A non-configurable non-writable one accepts only a
+redefinition whose value is SameValue to the `undefined` it models and stays
+virtual through it. The generated-code ABI gains no entry point; the added
+intrinsic code IDs remain runtime-internal.
 
 The `m5-97` ABI completes the realm-owned Array iterator cluster. Ordinary
 `entries`, `keys`, and `values` functions live on `%Array.prototype%`, whose
-`Symbol.iterator` property references the exact `values` function object.
-Their results share the materialized `%ArrayIteratorPrototype%`, which owns
-`next` and the `"Array Iterator"` `Symbol.toStringTag` while inheriting the
-iterator protocol from `%IteratorPrototype%`.
+`Symbol.iterator` property references the exact `values` function object. Their
+results share the materialized `%ArrayIteratorPrototype%`, which owns `next`
+and the `"Array Iterator"` `Symbol.toStringTag` while inheriting the iterator
+protocol from `%IteratorPrototype%`.
 
 One internal enum distinguishes key, value, and key-value records. Every step
 reads the converted receiver's live array-like length, advances the cursor
@@ -811,12 +867,12 @@ kind, and the public context gains the rooted WaiterList head and tail; the
 value representation and the generated-code entry points are unchanged.
 
 The `m5-109` ABI completes the TypedArray integer-indexed exotic object and
-adds the core `%TypedArray.prototype%` accessors, `at`, `set`, `subarray`,
-the three iterator methods, and the `%TypedArray%[Symbol.species]` getter.
-Twelve TypedArray code IDs and one public intrinsic slot, which holds the
-original `Array.prototype.toString` that `%TypedArray.prototype%.toString`
-shares, are added; the value representation and the generated-code entry
-points are unchanged.
+adds the core `%TypedArray.prototype%` accessors, `at`, `set`, `subarray`, the
+three iterator methods, and the `%TypedArray%[Symbol.species]` getter. Twelve
+TypedArray code IDs and one public intrinsic slot, which holds the original
+`Array.prototype.toString` that `%TypedArray.prototype%.toString` shares, are
+added; the value representation and the generated-code entry points are
+unchanged.
 
 The `m5-106` ABI materializes `%TypedArray%` and all eleven concrete
 element-type constructors. Views retain a collector-traced `ArrayBuffer`
@@ -825,56 +881,60 @@ element length. Construction accepts an element length, a buffer, an iterable,
 an array-like object, or another typed array; Number and BigInt content types
 remain distinct. Indexed element conversion and access are internal runtime
 operations, and every byte access reacquires the backing buffer after a
-possible safepoint. The public intrinsic table grows by 24 slots and the
-runtime adds one internal heap kind for the view record; the value
-representation and the generated-code entry points are unchanged. Deferred
-prototype and static API lookups report their later M5b owner instead of
-returning `undefined`, while own and intermediate prototype properties continue
-to shadow those defaults.
+possible safepoint.
 
-The `m5-99` ABI extends `oseo_context_print_thrown` to a thrown value with
-no intrinsic error identity. The identity is the `name` of the value's
+The public intrinsic table grows by 24 slots and the runtime adds one internal
+heap kind for the view record; the value representation and the generated-code
+entry points are unchanged. Deferred prototype and static API lookups report
+their later M5b owner instead of returning `undefined`, while own and
+intermediate prototype properties continue to shadow those defaults.
+
+The `m5-99` ABI extends `oseo_context_print_thrown` to a thrown value with no
+intrinsic error identity. The identity is the `name` of the value's
 `constructor` read with ordinary property access, and the message is its
-`message` property converted through the generic string coercion, so a
-user error class such as a test262 harness `Test262Error` renders as
+`message` property converted through the generic string coercion. A user error
+class such as a test262 harness `Test262Error` therefore renders as
 `Name: message` and reports the same identity in its `OSEO_THROWN` marker.
-The marker is one whitespace-free token, so an identity outside the ASCII
-identifier shape, an abrupt or non-object `constructor` or non-string
-`name`, and a thrown primitive all keep the untyped-throw diagnostic and
-print no marker. The identity read and message conversion run user
-JavaScript, so the throw site is restored around them and the thrown value
-stays rooted. An abrupt or unusable identity read leaves the value
-unidentified and keeps the untyped-throw diagnostic, while an abrupt
-message read or conversion keeps the established identity and renders it
-alone. The rendering applies to the unhandled-throw diagnostic only. An
-unhandled rejection is a separate reviewed host-policy boundary reported
-by its own text, so a rejected value with no intrinsic error identity
-leaves that path unchanged: the boundary text alone, with no identity
-read and no marker. An intrinsic error instance keeps the rendering and
-marker it already had on both paths. No component, code ID, or
-generated-code entry point is added.
 
-The `m5-101` ABI adds the *runtime\_date.c* component and materializes
-`%Date%` and `%Date.prototype%`. `Date` is a constructor the global object
-binds as a writable, non-enumerable, configurable property; calling it
-without `new` ignores every argument and returns the current time as a
-String. Constructing it copies an existing Date's `[[DateValue]]` without
-converting it, parses a String argument, converts any other single argument
-through `ToPrimitive` then `ToNumber`, and otherwise converts each of the
-seven components in order before `OrdinaryCreateFromConstructor` reads the
-new target's `prototype`. `%Date.prototype%` is an ordinary object with no
-`[[DateValue]]`, so every slot-reading method rejects it.
+The marker is one whitespace-free token. An identity outside the ASCII
+identifier shape, an abrupt or non-object `constructor` or non-string `name`,
+and a thrown primitive all keep the untyped-throw diagnostic and print no
+marker. The identity read and message conversion run user JavaScript, so the
+throw site is restored around them and the thrown value stays rooted. An abrupt
+or unusable identity read leaves the value unidentified and keeps the
+untyped-throw diagnostic. An abrupt message read or conversion keeps the
+established identity and renders it alone.
+
+The rendering applies to the unhandled-throw diagnostic only. An unhandled
+rejection is a separate reviewed host-policy boundary reported by its own text,
+so a rejected value with no intrinsic error identity leaves that path
+unchanged: the boundary text alone, with no identity read and no marker. An
+intrinsic error instance keeps the rendering and marker it already had on both
+paths. No component, code ID, or generated-code entry point is added.
+
+The `m5-101` ABI adds the *runtime\_date.c* component and materializes `%Date%`
+and `%Date.prototype%`. `Date` is a constructor the global object binds as a
+writable, non-enumerable, configurable property. Calling it without `new`
+ignores every argument and returns the current time as a String. Constructing
+it copies an existing Date's `[[DateValue]]` without converting it, parses a
+String argument, converts any other single argument through `ToPrimitive` then
+`ToNumber`, and otherwise converts each of the seven components in order before
+`OrdinaryCreateFromConstructor` reads the new target's `prototype`.
+`%Date.prototype%` is an ordinary object with no `[[DateValue]]`, so every
+slot-reading method rejects it.
 
 The realm's local time zone is UTC. `LocalTZA` is the constant +0, so
 `LocalTime` and `UTC` are identities on a finite time value,
 `getTimezoneOffset` reports +0, and every local getter agrees with its UTC
-counterpart. That is a host choice ECMA-262 permits; the clock adapter has
-no time-zone capability. The component reads no host clock: the current time is
-the realm's epoch real-time capability through `oseo_clock_real_time`, rounded
-down to its millisecond and passed through `TimeClip`, and an adapter without
-real time reports the owned `OSEO2001` diagnostic “The host real-time clock is
-unavailable.” Reading it opens the realm's clock adapter if nothing has yet but
-never takes the scheduler's monotonic origin.
+counterpart. That is a host choice ECMA-262 permits; the clock adapter has no
+time-zone capability.
+
+The component reads no host clock. The current time is the realm's epoch
+real-time capability through `oseo_clock_real_time`, rounded down to its
+millisecond and passed through `TimeClip`. An adapter without real time reports
+the owned `OSEO2001` diagnostic “The host real-time clock is unavailable.”
+Reading it opens the realm's clock adapter if nothing has yet but never takes
+the scheduler's monotonic origin.
 
 The forty-four prototype methods cover the eighteen getters, the fifteen
 setters, `toDateString`, `toISOString`, `toJSON`, the three locale methods,
@@ -883,13 +943,14 @@ setters, `toDateString`, `toISOString`, `toJSON`, the three locale methods,
 `[[DateValue]]` first, then converts its first parameter whether or not the
 call supplied it and each supplied trailing parameter in order. The NaN test
 and every component the call does not supply read that one snapshot, so a
-conversion that stores a new time value into the same Date does not change
-the result; a year-first setter starts from +0 when the snapshot is NaN, and
-every other window leaves the slot untouched and reports NaN. ECMA-402 is
-outside this claim, so each locale method reports the text of the operation it
-localizes. `Date.parse` accepts the Date Time String Format of 21.4.1.32,
-including expanded years and UTC offsets, and additionally recovers this
-realm's own `toString` and `toUTCString` texts, which is the non-normative
+conversion that stores a new time value into the same Date does not change the
+result. A year-first setter starts from +0 when the snapshot is NaN, and every
+other window leaves the slot untouched and reports NaN.
+
+ECMA-402 is outside this claim, so each locale method reports the text of the
+operation it localizes. `Date.parse` accepts the Date Time String Format of
+21.4.1.32, including expanded years and UTC offsets, and additionally recovers
+this realm's own `toString` and `toUTCString` texts, which is the non-normative
 recommendation of 21.4.3.2. `Object.prototype.toString` reports the `Date`
 builtin tag, and `ToPrimitive` on a Date reaches `OrdinaryToPrimitive` through
 the shared conversion *runtime\_primitive.c* now exports. One built-in code
@@ -899,8 +960,8 @@ generated-code ABI gains no entry point.
 The `m5-102` ABI materializes %String.prototype%[`Symbol.iterator`] and
 `%StringIteratorPrototype%`. The method snapshots `ToString(this)` and its
 branded iterator advances through UTF-16 by Unicode code point, pairing a lead
-and trailing surrogate while preserving lone surrogates. The iterator target
-is collector-traced and cleared at permanent exhaustion. Two code IDs are
+and trailing surrogate while preserving lone surrogates. The iterator target is
+collector-traced and cleared at permanent exhaustion. Two code IDs are
 allocated inside the existing iterator range and three intrinsic slots are
 added; the generated-code ABI gains no entry point.
 
@@ -914,14 +975,15 @@ constructor's prototype through the generic property path. Live iterators and
 their forward cursor. Public runtime layout is unchanged; the runtime adds
 internal Set and Set iterator heap kinds.
 
-The `m5-107` ABI adds the collector-only weak-edge checkpoint. Ephemeron entries
-park on unmarked key objects and activate through the ordinary worklist to a
-fixed point. Dead weak targets then clear and dead ephemeron entries unlink
-before sweep, so the sweep reclaims each dead entry record. Marked finalization
-registries append each collection's eligible cells, sorted by registration
-order, to a rooted context FIFO without allocating or invoking callbacks during
-collection, and a consumed cell unlinks from its registry at the next
-collection. Nine private runtime helpers let the later weak-collections
+The `m5-107` ABI adds the collector-only weak-edge checkpoint. Ephemeron
+entries park on unmarked key objects and activate through the ordinary worklist
+to a fixed point. Dead weak targets then clear and dead ephemeron entries
+unlink before sweep, so the sweep reclaims each dead entry record.
+
+Marked finalization registries append each collection's eligible cells, sorted
+by registration order, to a rooted context FIFO without allocating or invoking
+callbacks during collection. A consumed cell unlinks from its registry at the
+next collection. Nine private runtime helpers let the later weak-collections
 component create these records and consume cleanup records into rooted slots.
 No JavaScript global, intrinsic, built-in code ID, or generated-code operation
 is added at this checkpoint.
@@ -933,104 +995,107 @@ required by `WeakRef.prototype.deref`, together with its next ABI increment.
 The `m5-110` ABI adds the Set composition methods `union`, `intersection`,
 `difference`, `symmetricDifference`, `isSubsetOf`, `isSupersetOf`, and
 `isDisjointFrom` over GetSetRecord. Each validates its Set receiver, reads a
-set-like operand's `size`, `has`, and `keys`. `union` and
-`symmetricDifference` always walk `keys`; `intersection`, `difference`, and
-`isDisjointFrom` choose a `has` or `keys` walk by comparing sizes; and
-`isSubsetOf` and `isSupersetOf` answer `false` from sizes before a `has` or a
-`keys` walk respectively. Constructive results are fresh Sets on the realm's
-`%Set.prototype%`. Seven code IDs are allocated inside the existing Set range;
-no intrinsic slot, heap kind, public layout, or generated-code entry point is
-added.
+set-like operand's `size`, `has`, and `keys`. `union` and `symmetricDifference`
+always walk `keys`; `intersection`, `difference`, and `isDisjointFrom` choose a
+`has` or `keys` walk by comparing sizes; and `isSubsetOf` and `isSupersetOf`
+answer `false` from sizes before a `has` or a `keys` walk respectively.
+Constructive results are fresh Sets on the realm's `%Set.prototype%`. Seven
+code IDs are allocated inside the existing Set range; no intrinsic slot, heap
+kind, public layout, or generated-code entry point is added.
 
 The `m5-112` ABI adds the TypedArray iteration methods `every`, `some`,
 `forEach`, `map`, `filter`, `reduce`, and `reduceRight`. Each validates its
-receiver and snapshots the view length before checking the callback, then
-reads every snapshot index through the existing integer-indexed element getter
+receiver and snapshots the view length before checking the callback, then reads
+every snapshot index through the existing integer-indexed element getter
 without a hole test, so a callback that detaches or shrinks the buffer only
 makes later reads `undefined`. `map` species-creates before its first callback
 and `filter` collects first and species-creates with the captured count;
 `reduce` and `reduceRight` share one bidirectional snapshot walk. Seven code
-IDs are allocated inside the existing TypedArray range; no intrinsic slot,
-heap kind, public layout, or generated-code entry point is added.
+IDs are allocated inside the existing TypedArray range; no intrinsic slot, heap
+kind, public layout, or generated-code entry point is added.
 
 The `m5-113` ABI materializes `WeakMap`, `WeakSet`, `WeakRef`, and
 `FinalizationRegistry` in *runtime\_weak\_collection.c*. Each source-visible
 object wraps one collector weak record. Ephemeron tables gain an address-keyed
-index that deletion and collector unlinking keep synchronized, and
-finalization cells gain weak unregister tokens. The public context gains the
-job-scoped KeptAlive set behind `WeakRef` construction and `deref`. The job
-queue clears that set before every promise job, and the event loop clears it
-before every timer turn and after each script or timer turn and its promise
+index that deletion and collector unlinking keep synchronized, and finalization
+cells gain weak unregister tokens. The public context gains the job-scoped
+KeptAlive set behind `WeakRef` construction and `deref`.
+
+The job queue clears that set before every promise job. The event loop clears
+it before every timer turn and after each script or timer turn and its promise
 jobs, then runs queued cleanup records as separate jobs in queue order before
 the next timer, including each timer an internal await drives.
 
 The `m5-114` ABI adds the TypedArray search and join methods `find`,
-`findIndex`, `findLast`, `findLastIndex`, `includes`, `indexOf`,
-`lastIndexOf`, `join`, and `toLocaleString`. Each validates its receiver and
-snapshots the view length first. The predicate searches and `includes` read
-every visited snapshot index through the integer-indexed element getter,
-`indexOf` and `lastIndexOf` also test integer-indexed presence, and an empty
-view answers before fromIndex is converted. `join` converts its separator
-after the snapshot and `toLocaleString` forwards the outer locales and
-options to each element's method; both render an invalidated index as an
-empty field and share the Array stringification stack for re-entry. Nine code
-IDs are allocated inside the existing TypedArray range; no intrinsic slot,
-heap kind, public layout, or generated-code entry point is added.
+`findIndex`, `findLast`, `findLastIndex`, `includes`, `indexOf`, `lastIndexOf`,
+`join`, and `toLocaleString`. Each validates its receiver and snapshots the
+view length first. The predicate searches and `includes` read every visited
+snapshot index through the integer-indexed element getter, `indexOf` and
+`lastIndexOf` also test integer-indexed presence, and an empty view answers
+before fromIndex is converted. `join` converts its separator after the snapshot
+and `toLocaleString` forwards the outer locales and options to each element's
+method; both render an invalidated index as an empty field and share the Array
+stringification stack for re-entry. Nine code IDs are allocated inside the
+existing TypedArray range; no intrinsic slot, heap kind, public layout, or
+generated-code entry point is added.
 
-The `m5-115` ABI adds ordinary `with`, `toSpliced`, and `toReversed`
-functions to `%Array.prototype%`. Each converts its receiver, snapshots its
-array-like length, allocates a plain realm Array without reading `constructor`
-or `Symbol.species`, and copies retained indices with Get followed by
+The `m5-115` ABI adds ordinary `with`, `toSpliced`, and `toReversed` functions
+to `%Array.prototype%`. Each converts its receiver, snapshots its array-like
+length, allocates a plain realm Array without reading `constructor` or
+`Symbol.species`, and copies retained indices with Get followed by
 CreateDataProperty. Holes become own `undefined` properties, inherited values
 are copied, and the original receiver is never written. `toReversed` reads in
 descending source order, `toSpliced` skips deleted entries, and `with` skips
 the replaced index. Three code IDs come from the existing Array range; the
 generated-code ABI gains no entry point.
 
-The `m5-116` ABI completes the `Symbol` intrinsic with `for`, `keyFor`, and
-the `%Symbol.prototype%` methods, description getter, `Symbol.toPrimitive`
-method, and tag. The GlobalSymbolRegistry is a process-wide open-addressed
-table of immutable UTF-16 keys that is never freed, and the public context
-gains the `registered_symbols` table of one collector-rooted representative
-per entry, so `Symbol.for` returns the same heap value on every call. The
-registry entry, not the heap value, is the identity: strict and loose
-equality, SameValue, SameValueZero, property keys, and Map and Set keys treat
-two contexts' representatives of one entry as one symbol, while a property
-key, a Map key, and a Set element are always the storing context's own
-representative. A value position, such as an ordinary property value, an array
-element, a Map value, or a settled promise's result, keeps whatever
-representative reached it, so a representative outlives the context that
-created it: destroying a context takes its representatives and their
-descriptions out of that heap rather than freeing them, and every store another
-context made stays readable and keeps naming the same registry entry. Six code
-IDs are allocated inside the existing Symbol range and six intrinsic slots are
-added; no heap kind or generated-code entry point is. A value can be held
-weakly when it is an object or an unregistered symbol: a symbol the registry
-returned is registered and `WeakMap.prototype.set`, `WeakSet.prototype.add`,
-`WeakRef`, and `FinalizationRegistry.prototype.register` and `unregister`
-reject it.
+The `m5-116` ABI completes the `Symbol` intrinsic with `for`, `keyFor`, and the
+`%Symbol.prototype%` methods, description getter, `Symbol.toPrimitive` method,
+and tag. The GlobalSymbolRegistry is a process-wide open-addressed table of
+immutable UTF-16 keys that is never freed. The public context gains the
+`registered_symbols` table of one collector-rooted representative per entry, so
+`Symbol.for` returns the same heap value on every call.
 
-The `m5-117` ABI adds the TypedArray mutation and copying methods
-`copyWithin`, `fill`, `reverse`, `slice`, `toReversed`, and `with`. Each
-validates its receiver and snapshots the view length before converting an
-argument. `fill` then revalidates unconditionally, and `copyWithin` and
-`slice` revalidate only when their clamped count is positive; each throws a
-`TypeError` on an out-of-bounds view and clamps its write to the bytes the
-Data Block still holds. `with` instead answers IsValidIntegerIndex against
-the view its conversions left behind and throws a `RangeError` when the
-index no longer addresses an element. `slice` builds its result through
-TypedArraySpeciesCreate; `toReversed` and `with` allocate the receiver's own
-element kind without consulting `Symbol.species`. `reverse`, `toReversed`,
-the same-kind branch of `slice`, and the surviving prefix of `with` move raw
-bytes, so an element's exact encoding survives. Six code IDs are allocated
-inside the existing TypedArray range; no intrinsic slot, heap kind, public
-layout, or generated-code entry point is added.
+The registry entry, not the heap value, is the identity. Strict and loose
+equality, SameValue, SameValueZero, property keys, and Map and Set keys treat
+two contexts' representatives of one entry as one symbol. A property key, a Map
+key, and a Set element are always the storing context's own representative. A
+value position, such as an ordinary property value, an array element, a Map
+value, or a settled promise's result, keeps whatever representative reached it.
+A representative therefore outlives the context that created it: destroying a
+context takes its representatives and their descriptions out of that heap
+rather than freeing them, and every store another context made stays readable
+and keeps naming the same registry entry.
+
+Six code IDs are allocated inside the existing Symbol range and six intrinsic
+slots are added; no heap kind or generated-code entry point is. A value can be
+held weakly when it is an object or an unregistered symbol. A symbol the
+registry returned is registered, and `WeakMap.prototype.set`,
+`WeakSet.prototype.add`, `WeakRef`, and
+`FinalizationRegistry.prototype.register` and `unregister` reject it.
+
+The `m5-117` ABI adds the TypedArray mutation and copying methods `copyWithin`,
+`fill`, `reverse`, `slice`, `toReversed`, and `with`. Each validates its
+receiver and snapshots the view length before converting an argument. `fill`
+then revalidates unconditionally, and `copyWithin` and `slice` revalidate only
+when their clamped count is positive. Each throws a `TypeError` on an
+out-of-bounds view and clamps its write to the bytes the Data Block still holds.
+
+`with` instead answers IsValidIntegerIndex against the view its conversions
+left behind and throws a `RangeError` when the index no longer addresses an
+element. `slice` builds its result through TypedArraySpeciesCreate;
+`toReversed` and `with` allocate the receiver's own element kind without
+consulting `Symbol.species`. `reverse`, `toReversed`, the same-kind branch of
+`slice`, and the surviving prefix of `with` move raw bytes, so an element's
+exact encoding survives. Six code IDs are allocated inside the existing
+TypedArray range; no intrinsic slot, heap kind, public layout, or
+generated-code entry point is added.
 
 The `m5-118` ABI adds `String.prototype.repeat`, `padStart`, `padEnd`,
 `isWellFormed`, and `toWellFormed` within the existing String component and
-built-in code range. Repetition and padding enforce the reviewed maximum
-UTF-16 length before allocation, padding converts its filler only when padding
-is needed, and the well-formedness pair detects or replaces lone surrogates
+built-in code range. Repetition and padding enforce the reviewed maximum UTF-16
+length before allocation, padding converts its filler only when padding is
+needed, and the well-formedness pair detects or replaces lone surrogates
 without disturbing valid pairs. The generated-code ABI gains no entry point.
 
 The `m5-119` ABI materializes the callable and constructible `%Boolean%`, its
@@ -1041,14 +1106,14 @@ context layout expands with those slots; the generated-code ABI gains no entry
 point.
 
 The `m5-120` ABI completes PromiseResolve for native Promise values. It reads
-the value's `constructor` through ordinary property access and reuses the
-value only when that result is the selected constructor. A different
-constructor creates and settles a fresh capability, and an abrupt getter
-propagates before capability construction. Non-Promise thenables skip this
-constructor read. Await and asynchronous-generator drivers deliver that
-abrupt completion through their existing rejection or throw continuation
-instead of returning it synchronously. No built-in code ID, intrinsic slot,
-heap kind, public layout, or generated-code entry point is added.
+the value's `constructor` through ordinary property access and reuses the value
+only when that result is the selected constructor. A different constructor
+creates and settles a fresh capability, and an abrupt getter propagates before
+capability construction. Non-Promise thenables skip this constructor read.
+Await and asynchronous-generator drivers deliver that abrupt completion through
+their existing rejection or throw continuation instead of returning it
+synchronously. No built-in code ID, intrinsic slot, heap kind, public layout,
+or generated-code entry point is added.
 
 The `m5-121` ABI adds `%TypedArray.prototype%.sort` and `toSorted`. Both
 validate a supplied comparator before the receiver, capture the validated
@@ -1062,30 +1127,29 @@ allocates a same-kind result before collecting elements and does not consult
 existing TypedArray range; no intrinsic slot, heap kind, public layout, or
 generated-code entry point is added.
 
-The `m5-122` ABI adds `oseo_unresolvable_cell_create`, which creates the
-hidden cell standing for one unresolvable global reference. Reading that cell
-throws a catchable `ReferenceError` whose message is a generated static string
-naming the reference; nothing writes it, and the string needs no tracing.
-`oseo_global_object_create` now also installs the global object's own
-writable, non-enumerable, configurable `globalThis` property after every
-admitted intrinsic. `oseo_context_print_thrown` reports an unhandled
-rejection whose reason is an intrinsic error instance with the rejection
-boundary text and that instance's kind marker. No built-in code ID, intrinsic
-slot, or heap kind is added.
+The `m5-122` ABI adds `oseo_unresolvable_cell_create`, which creates the hidden
+cell standing for one unresolvable global reference. Reading that cell throws a
+catchable `ReferenceError` whose message is a generated static string naming
+the reference; nothing writes it, and the string needs no tracing.
+`oseo_global_object_create` now also installs the global object's own writable,
+non-enumerable, configurable `globalThis` property after every admitted
+intrinsic. `oseo_context_print_thrown` reports an unhandled rejection whose
+reason is an intrinsic error instance with the rejection boundary text and that
+instance's kind marker. No built-in code ID, intrinsic slot, or heap kind is
+added.
 
-The `m5-124` ABI adds `%TypedArray%.from` and `%TypedArray%.of`. Both require
-a constructor receiver and construct through TypedArrayCreateFromConstructor,
+The `m5-124` ABI adds `%TypedArray%.from` and `%TypedArray%.of`. Both require a
+constructor receiver and construct through TypedArrayCreateFromConstructor,
 which `subarray`, `map`, `filter`, and `slice` now share through
 TypedArraySpeciesCreate: Construct, ValidateTypedArray, and a minimum-length
 check for one Number argument. `from` checks its mapper before reading the
 source's `Symbol.iterator` method, drains an iterable source into a rooted
-argument list before construction, and reads an array-like source one index
-at a time after construction; `of` stores its arguments in order. Every value
-goes through TypedArraySetElement. The TypedArray deferred-surface
-diagnostics and the lookup, deletion, and own-key checks that consulted them
-are removed. Two code IDs are allocated inside the existing TypedArray range;
-no intrinsic slot, heap kind, public layout, or generated-code entry point is
-added.
+argument list before construction, and reads an array-like source one index at
+a time after construction; `of` stores its arguments in order. Every value goes
+through TypedArraySetElement. The TypedArray deferred-surface diagnostics and
+the lookup, deletion, and own-key checks that consulted them are removed. Two
+code IDs are allocated inside the existing TypedArray range; no intrinsic slot,
+heap kind, public layout, or generated-code entry point is added.
 
 The `m5-125` ABI moves `Date.now()`, argumentless `Date` construction, and
 `Date()` from the Date component's own C11 clock read onto
@@ -1094,27 +1158,26 @@ real-time clock is unavailable.” No entry point, built-in code ID, intrinsic
 slot, heap kind, or public layout is added.
 
 The `m5-131` ABI records deferred synchronous iterator-next callability.
-`oseo_iterator_get` captures the `next` property once, including an absent
-or non-callable value, and preserves getter errors as acquisition errors.
+`oseo_iterator_get` captures the `next` property once, including an absent or
+non-callable value, and preserves getter errors as acquisition errors.
 `oseo_iterator_next` calls the recorded value through the generic call ABI;
 that call owns the first-step `TypeError`. The iterator and captured value
-remain roots across a yielded assignment target and collection. Replacing
-the property does not replace the captured value. A generator return or
-throw before the first step can close the iterator without calling `next`.
-Direct asynchronous acquisition remains unchanged; Async-from-Sync fallback
-uses synchronous acquisition. No entry point, public layout, heap kind,
-intrinsic slot, or built-in code ID is added.
+remain roots across a yielded assignment target and collection. Replacing the
+property does not replace the captured value. A generator return or throw
+before the first step can close the iterator without calling `next`. Direct
+asynchronous acquisition remains unchanged; Async-from-Sync fallback uses
+synchronous acquisition. No entry point, public layout, heap kind, intrinsic
+slot, or built-in code ID is added.
 
-The `m5-132` ABI orders TypedArray construction from a primitive first
-argument as ECMA-262 does. A concrete constructor still rejects an undefined
-new target first. It then runs ToIndex on that argument before
-AllocateTypedArray reads the new target's `prototype`, so a Symbol or BigInt
-`TypeError` and an index `RangeError` win over a throwing prototype getter or
-Proxy `get` trap. A length the host cannot allocate still fails after the
-prototype read. Zero arguments, `ArrayBuffer`, TypedArray, iterable, and
-array-like sources keep reading the prototype before any argument
-conversion, iteration, or element read. No entry point, public layout, heap
-kind, intrinsic slot, or built-in code ID is added.
+The `m5-132` ABI orders TypedArray construction from a primitive first argument
+as ECMA-262 does. A concrete constructor still rejects an undefined new target
+first. It then runs ToIndex on that argument before AllocateTypedArray reads
+the new target's `prototype`, so a Symbol or BigInt `TypeError` and an index
+`RangeError` win over a throwing prototype getter or Proxy `get` trap. A length
+the host cannot allocate still fails after the prototype read. Zero arguments,
+`ArrayBuffer`, TypedArray, iterable, and array-like sources keep reading the
+prototype before any argument conversion, iteration, or element read. No entry
+point, public layout, heap kind, intrinsic slot, or built-in code ID is added.
 
 The `m5-133` ABI adds `Float16Array`, the twelfth concrete TypedArray
 constructor. Element kind `OSEO_TYPED_ARRAY_FLOAT16`, realm slots
@@ -1123,9 +1186,9 @@ constructor. Element kind `OSEO_TYPED_ARRAY_FLOAT16`, realm slots
 constructor code ID are appended, so every existing kind, slot, and code ID
 keeps its value. Elements use the exact binary16 encoder and decoder of
 DataView's `getFloat16` and `setFloat16`, which this component now exports
-internally. The cluster's in-progress marker is the last constructor it
-builds, now Float16Array. `Atomics` rejects the new kind. No entry point,
-public layout, or heap kind is added.
+internally. The cluster's in-progress marker is the last constructor it builds,
+now Float16Array. `Atomics` rejects the new kind. No entry point, public
+layout, or heap kind is added.
 
 The `m5-134` ABI adds the write half of the Annex B `__proto__` boundary. A
 `[[Set]]` of `"__proto__"` whose walk reaches an intrinsic
@@ -1135,22 +1198,22 @@ because only the omitted normative-optional setter could handle that write.
 Both walks, the ordinary assignment walk and the receiver walk that
 `Reflect.set` and `super` assignment use, apply it. Own and inherited user
 properties, proxy traps, null prototypes, module namespaces, typed-array
-numeric keys, and the object-literal prototype setter keep their behavior,
-and a primitive base keeps its existing early return. No entry point, public
+numeric keys, and the object-literal prototype setter keep their behavior, and
+a primitive base keeps its existing early return. No entry point, public
 layout, heap kind, intrinsic slot, or built-in code ID is added.
 
 The `m5-135` ABI admits Unicode group names in dynamically constructed
 patterns. *runtime\_unicode\_tables.h* gains the pinned `ID_Start` and
 `ID_Continue` inversion lists, which *runtime\_string.c* exposes as two
-internal predicates. The validator and the dynamic program builder share
-one RegExpIdentifierName decoder, so escaped and written spellings name the
-same group in duplicate checks, named references, and `groups` keys, and a
-name outside those properties is a `SyntaxError` rather than the profile
-boundary. Constructing a RegExp from a branded RegExp whose program the
-build compiled ahead of time borrows that static program when the new
-flags agree on `i`, `m`, `s`, `u`, and `v`; every other copy still parses
-its source dynamically. No entry point, public layout, heap kind,
-intrinsic slot, or built-in code ID is added.
+internal predicates. The validator and the dynamic program builder share one
+RegExpIdentifierName decoder, so escaped and written spellings name the same
+group in duplicate checks, named references, and `groups` keys, and a name
+outside those properties is a `SyntaxError` rather than the profile boundary.
+Constructing a RegExp from a branded RegExp whose program the build compiled
+ahead of time borrows that static program when the new flags agree on `i`, `m`,
+`s`, `u`, and `v`; every other copy still parses its source dynamically. No
+entry point, public layout, heap kind, intrinsic slot, or built-in code ID is
+added.
 
 The `m5-136` ABI records proper tail calls. `OSEO_STATUS_TAIL_CALL` reports
 that a PrepareForTailCall site recorded the call it owes in the context.
@@ -1160,88 +1223,98 @@ copied arguments, running realm, and, for a derived class constructor, its
 `this` binding cell. `oseo_call_function` and `oseo_call_complete` perform
 recorded calls in a loop, one rooted step at a time, so a chain of tail calls
 holds one step's native stack, call depth, frame budget, and roots.
+
 `Function.prototype.call`, `Function.prototype.apply`, and `Reflect.apply`
 record their final call, as their PrepareForTailCall steps require, and the
 [[Call]] of a bound function or a Proxy forwards the same way because it
-creates no execution context. A non-tail call through a bound function or
-Proxy therefore no longer adds a call-depth level for that wrapper.
-[[Construct]] is unchanged. The context gains one private record pointer.
-The existing host-tail entry points record direct `console.log`, `setTimeout`,
-and `clearTimeout` calls. The unpublished `m5-137` composition completes that
-contract with `OSEO_TAIL_HOST_CLEAR_TIMEOUT = 3`; values 1 and 2, all layouts,
-status values, and function signatures stay unchanged. Arguments finish
-before frame release. The clear-timeout step passes its first argument, or
-undefined when absent, to `oseo_clear_timeout`; evaluated extra arguments are
-ignored. Only numeric handles cancel a timer, and the result is undefined.
-Ordinary calls retain their direct entry point.
+creates no execution context. A non-tail call through a bound function or Proxy
+therefore no longer adds a call-depth level for that wrapper. [[Construct]] is
+unchanged. The context gains one private record pointer. The existing host-tail
+entry points record direct `console.log`, `setTimeout`, and `clearTimeout`
+calls.
+
+The unpublished `m5-137` composition completes that contract with
+`OSEO_TAIL_HOST_CLEAR_TIMEOUT = 3`; values 1 and 2, all layouts, status values,
+and function signatures stay unchanged. Arguments finish before frame release.
+The clear-timeout step passes its first argument, or undefined when absent, to
+`oseo_clear_timeout`; evaluated extra arguments are ignored. Only numeric
+handles cancel a timer, and the result is undefined. Ordinary calls retain
+their direct entry point.
 
 The `m5-137` ABI adds four context counts for published ephemeron tables,
 weak-reference records, finalization registries, and finalization cells.
 Publication increments a count only after linking its object, and sweep
 decrements it when removing that object. Consumed and unreachable records
 remain counted until sweep. The collector skips its owner-local weak-edge,
-cleanup scheduling, and registry compaction scans only when their record
-kinds are absent. Root and ephemeron fixed-point tracing still visit foreign
-objects, and collection policy and phase order do not change. The context
-layout changes, so native artifacts must use the matching runtime headers.
+cleanup scheduling, and registry compaction scans only when their record kinds
+are absent. Root and ephemeron fixed-point tracing still visit foreign objects,
+and collection policy and phase order do not change. The context layout
+changes, so native artifacts must use the matching runtime headers.
 
-The `m5-139` ABI adds an inline heap-slot bitmap to each environment.
-Creation initializes every slot and bit, setting a slot updates its bit
-without allocating or collecting, and cloning copies slots and bits into
-one fresh allocation. Tracing visits bitmap words and their heap-valued
-slots; it preserves every strong edge without rescanning primitive slots.
-The bitmap adds one `size_t` field and `ceil(slot_count / 64)` words of
-`uint64_t` storage to each environment. For valid-size requests, allocation
-attempts, safepoints and forced-collection policy remain unchanged. The
-overflow guard rejects impossible slot counts before allocation or GC.
-Root scanning and weak-edge phase order remain unchanged. This is a
-source-only candidate; native correctness and workload benefit remain
-unmeasured.
+The `m5-139` ABI adds an inline heap-slot bitmap to each environment. Creation
+initializes every slot and bit, setting a slot updates its bit without
+allocating or collecting, and cloning copies slots and bits into one fresh
+allocation. Tracing visits bitmap words and their heap-valued slots; it
+preserves every strong edge without rescanning primitive slots. The bitmap adds
+one `size_t` field and `ceil(slot_count / 64)` words of `uint64_t` storage to
+each environment.
 
-The `m5-140` ABI adds one private string-table pointer to the context.
-A string of at most 32 code units that the context allocates is recorded
-in the table, and while that string lives, a later request for the same
-code units returns it instead of allocating, publishing, or reaching a
-safepoint. Strings are immutable and cannot be WeakRef targets or weak
-collection keys, so the sharing is not observable. The table is weak: it
-roots nothing, and each collection removes the entries of the strings its
-sweep frees after marking is final, so an unrooted heap still collects to
-empty. Table growth uses the ordinary allocator without a safepoint,
-counts no allocation attempt, and on failure only leaves a string unshared.
-Context destruction releases the table. `oseo_function_create` keeps its
-own name and key strings out of the specialization allocation count
-whether the table shares them or not.
+For valid-size requests, allocation attempts, safepoints and forced-collection
+policy remain unchanged. The overflow guard rejects impossible slot counts
+before allocation or GC. Root scanning and weak-edge phase order remain
+unchanged. This is a source-only candidate; native correctness and workload
+benefit remain unmeasured.
+
+The `m5-140` ABI adds one private string-table pointer to the context. A string
+of at most 32 code units that the context allocates is recorded in the table,
+and while that string lives, a later request for the same code units returns it
+instead of allocating, publishing, or reaching a safepoint. Strings are
+immutable and cannot be WeakRef targets or weak collection keys, so the sharing
+is not observable.
+
+The table is weak: it roots nothing, and each collection removes the entries of
+the strings its sweep frees after marking is final, so an unrooted heap still
+collects to empty. Table growth uses the ordinary allocator without a
+safepoint, counts no allocation attempt, and on failure only leaves a string
+unshared. Context destruction releases the table. `oseo_function_create` keeps
+its own name and key strings out of the specialization allocation count whether
+the table shares them or not.
 
 `oseo_iterator_next` performs a step whose captured next method is the
 intrinsic `%ArrayIteratorPrototype%.next` and whose receiver is an array
 iterator without creating the iterator result object. It enters the next
 method's realm and one call level as [[Call]] would, and performs the same
-`length` and element `Get` steps in the same order. The skipped object
-would be fresh, with own `done` and `value` data properties, so
-IteratorComplete and IteratorValue observe nothing else. Any other next
-method, including a replacement installed before GetIterator read it,
-takes the generic path.
+`length` and element `Get` steps in the same order. The skipped object would be
+fresh, with own `done` and `value` data properties, so IteratorComplete and
+IteratorValue observe nothing else. Any other next method, including a
+replacement installed before GetIterator read it, takes the generic path.
 
 Lexical bindings use a private uninitialized sentinel for runtime TDZ checks.
-Catchable runtime-generated language errors are instances of the named
-error intrinsics with the applicable `TypeError`, `RangeError`, or
-`ReferenceError` identity and an own `message` property. Resource
-and host failures retain non-catchable diagnostics.
+Catchable runtime-generated language errors are instances of the named error
+intrinsics with the applicable `TypeError`, `RangeError`, or `ReferenceError`
+identity and an own `message` property. Resource and host failures retain
+non-catchable diagnostics.
+
 Power-of-two radix strings are rounded once from their exact integer value into
 binary64.
+
 Numeric coercion distinguishes an ordinary `NaN` conversion from temporary
 buffer allocation failure. Allocation failure propagates as an abrupt
 `OSEO2001` result through arithmetic and relational operations.
+
 String construction checks its combined UTF-16 length before allocation and
 throws a catchable `RangeError` above the host-compatible ceiling. Native
 allocation failure remains an `OSEO2001` diagnostic.
+
 Declared-function calls have a deterministic maximum active depth of 256. The
 runtime returns an owned `OSEO2001` diagnostic before entering another C frame
 when that limit is reached.
+
 Root slot arrays are allocated independently of the process stack. Allocation
 failure propagates as `OSEO2001`. The script and active declared functions also
 have a deterministic aggregate limit of 32,768 root slots. Exceeding this
 native-frame budget fails with `OSEO2001` before generated C is entered.
+
 The context ABI includes private inline small-integer recognition, unboxing,
 checked addition, and boxing primitives. Checked addition validates the signed
 48-bit range before using C signed arithmetic. Test builds can separately
@@ -1251,32 +1324,31 @@ identifiers with explicit byte lengths, heap-backed root-frame ownership, and
 active frame-budget accounting. Embedded null bytes are preserved during native
 error output.
 
-The historical Host `m5-140` ABI composes the `m5-139` environment bitmap
-with Host Script
-realm layout: persistent `global_lexicals`, Script evaluator metadata and
-host builtin identities. Bitmap allocation, slot updates, cloning and
-tracing retain their final implementation. Host lexical installation uses
-the environment APIs, while realm tracing retains the lexical-record root.
-This layout composition introduces no new collector algorithm. Fresh
-combined native execution is required separately from source preparation.
+The historical Host `m5-140` ABI composes the `m5-139` environment bitmap with
+Host Script realm layout: persistent `global_lexicals`, Script evaluator
+metadata and host builtin identities. Bitmap allocation, slot updates, cloning
+and tracing retain their final implementation. Host lexical installation uses
+the environment APIs, while realm tracing retains the lexical-record root. This
+layout composition introduces no new collector algorithm. Fresh combined native
+execution is required separately from source preparation.
 
-The combined `m5-141` ABI retains the TCO cost fix's `m5-140` weak string
-table and iterator path together with the Host Script realm additions.
-Both source branches used `m5-140` independently, so this composition uses
-the next unused identity after Main and both branches. Their ABI history
-notes retain their original source identities.
+The combined `m5-141` ABI retains the TCO cost fix's `m5-140` weak string table
+and iterator path together with the Host Script realm additions. Both source
+branches used `m5-140` independently, so this composition uses the next unused
+identity after Main and both branches. Their ABI history notes retain their
+original source identities.
 
-ABI `m5-142` adds `oseo_private_name_bind`. It replaces a private binding
-with a fresh cell and initializes it to a new private identity within one
-runtime call. The helper roots its environment and cell across allocation,
-then releases its intermediate roots before returning. Earlier class
-closures retain their original cells. The native frame ceiling, callable
-cost multiplier and general declaration charges stay unchanged.
+ABI `m5-142` adds `oseo_private_name_bind`. It replaces a private binding with
+a fresh cell and initializes it to a new private identity within one runtime
+call. The helper roots its environment and cell across allocation, then
+releases its intermediate roots before returning. Earlier class closures retain
+their original cells. The native frame ceiling, callable cost multiplier and
+general declaration charges stay unchanged.
 
 The `m5-143` ABI exports `oseo_to_object` for generated `with` entry, and
-`m5-144` adds the Array-cost archive compositions below. Both source
-branches used `m5-142` or `m5-143` independently of the landed `m5-142`
-private-name helper, so this composition carries all three as `m5-144`.
+`m5-144` adds the Array-cost archive compositions below. Both source branches
+used `m5-142` or `m5-143` independently of the landed `m5-142` private-name
+helper, so this composition carries all three as `m5-144`.
 
 The `m5-144` ABI adds archive compositions for generated binding reads,
 property-key conversion, and ordinary property gets. Each native call selects
@@ -1284,17 +1356,17 @@ its operation statically. A call-site record supplies root indices and its
 source position; it has no opcode or dispatch loop. The caller keeps the same
 registered frame and live operands. Each composition performs the existing
 runtime calls and stores the result in the same output root, including a
-language throw. A failed environment lookup returns before the binding read
-and output store, retaining the generated direct-abrupt route. Fragment code
-uses the same compositions after its existing relocated location call.
-These helpers introduce no collection point, language call, or specialization
-policy. The existing runtime calls retain their generic behavior.
+language throw. A failed environment lookup returns before the binding read and
+output store, retaining the generated direct-abrupt route. Fragment code uses
+the same compositions after its existing relocated location call. These helpers
+introduce no collection point, language call, or specialization policy. The
+existing runtime calls retain their generic behavior.
 
-ABI `m5-145` adds `agent_can_block` to `OseoContext`. The main test262
-agent's generated setup selects false for `CanBlockIsFalse`; ordinary
-contexts and child agents initialize true, and realms retain their owning
-context's policy. `Atomics.wait` checks it after argument validation and
-conversion, before comparing memory. `Atomics.waitAsync` is unchanged.
+ABI `m5-145` adds `agent_can_block` to `OseoContext`. The main test262 agent's
+generated setup selects false for `CanBlockIsFalse`; ordinary contexts and
+child agents initialize true, and realms retain their owning context's policy.
+`Atomics.wait` checks it after argument validation and conversion, before
+comparing memory. `Atomics.waitAsync` is unchanged.
 
 [activity audit]: https://github.com/dahlia/oseo/blob/main/docs/sanitizer-activity.md
 
@@ -1302,32 +1374,36 @@ conversion, before comparing memory. `Atomics.waitAsync` is unchanged.
 With binding object boxing
 --------------------------
 
-The `m5-143` ABI exports `oseo_to_object` for generated with entry.
-It uses the same ToObject implementation as the intrinsic built-ins:
-objects retain identity, primitives receive wrappers with their intrinsic
-prototype, and null or undefined throws TypeError. String wrappers carry
-their own indexed properties and length. The compiler roots the result
-before initializing the with environment, so repeated lookups and escaped
-closures retain one binding object. The helper does not read a mutable
-JavaScript `Object` binding or invoke primitive conversion hooks.
+The `m5-143` ABI exports `oseo_to_object` for the generated with entry. It uses
+the same ToObject implementation as the intrinsic built-ins: objects retain
+identity, primitives receive wrappers with their intrinsic prototype, and null
+or undefined throws TypeError. String wrappers carry their own indexed
+properties and length.
 
-ABI `m5-146` adds a context pointer to the active ordinary call's saved
-caller realm. The matching realm scope roots that realm until return.
-Derived constructor completion errors use the saved caller realm, while
-errors raised by the body retain the callee realm. A pending derived tail
-call retains and traces its constructor caller realm separately from the
-tail call's running realm, then checks its final result in that caller.
-Nested calls restore the previous scope. It follows `m5-145`, the
-non-blocking-agent policy above.
+The compiler roots the result before initializing the with environment, so
+repeated lookups and escaped closures retain one binding object. The helper
+does not read a mutable JavaScript `Object` binding or invoke primitive
+conversion hooks.
 
-ABI `m5-147` adds `unhandled_rejection_policy` to `OseoContext`, as
-[ADR 0030] records. Every context initializes it to the fatal policy. Under the
-observe policy, `oseo_rejection_checkpoint` still marks each unhandled
-rejected promise reported and counts it, then returns a normal
-completion instead of the first reason. Only generated setup compiled
-with the test262 observation option selects observe. The agent cluster
-records the main context's policy at installation, and each child agent
-copies it before running its program. Timer and cleanup callback throws,
-host diagnostics, and a rejected entry completion are unchanged.
+ABI `m5-146` adds a context pointer to the saved caller realm of the active
+ordinary call. The matching realm scope roots that realm until return.
+
+Derived constructor completion errors use the saved caller realm, while errors
+raised by the body retain the callee realm. A pending derived tail call retains
+and traces its constructor caller realm separately from the tail call's running
+realm. It then checks its final result in that caller. Nested calls restore the
+previous scope. This follows `m5-145`, the non-blocking-agent policy above.
+
+ABI `m5-147` adds `unhandled_rejection_policy` to `OseoContext`, as [ADR 0030]
+records. Every context initializes it to the fatal policy.
+
+Under the observe policy, `oseo_rejection_checkpoint` still marks each
+unhandled rejected promise reported and counts it. It then returns a normal
+completion instead of the first reason. Only generated setup compiled with the
+test262 observation option selects observe.
+
+The agent cluster records the main context's policy at installation, and each
+child agent copies it before running its program. Timer and cleanup callback
+throws, host diagnostics, and a rejected entry completion are unchanged.
 
 [ADR 0030]: https://github.com/dahlia/oseo/blob/main/docs/adr/0030-test262-unhandled-rejection-policy.md

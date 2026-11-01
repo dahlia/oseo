@@ -6,46 +6,53 @@ preserves generic and dynamic calls, receivers, constructors, explicit abrupt
 completion, guarded operations, root frames, and safepoint locations. It does
 not execute a compiler or choose runtime sources. MIR blocks and terminators are
 its only semantic input; it never replays HIR.
-Lexical bindings use traced environments and shared cells while their values
-remain rooted across calls and collection.
+
+Lexical bindings use traced environments and shared cells. Their values remain
+rooted across calls and collection.
 
 Binding reads, property-key conversion, and ordinary property gets use
 statically selected native helpers from the runtime archive. Their call-site
 records carry root indices and source positions, so each generated program
 compiles fewer operand loads and result stores. The helpers perform the same
-runtime calls and root stores; MIR still owns guards and abrupt routing.
+runtime calls and root stores. MIR still owns guards and abrupt routing.
 Fragment emission retains its dynamically relocated source-location call.
+
 Only functions reachable from the script and blocks reachable from function
 entry are emitted. Self-recursive calls use a standard C volatile function
 pointer so strict warning settings do not reject valid recursion.
+
 Every declared-function call enters the runtime call-depth budget before the
-callee enters generated C and leaves the budget while unwinding either a normal
-or abrupt result. Generated root slots and call-argument scratch slots use a
-heap-backed root frame instead of a variable-sized C stack array. The backend
-also charges each entry against the runtime's active root-slot budget before
-entering generated C, so a wide function cannot exhaust the process stack
-before an owned resource diagnostic is possible. Script entries charge dense
-value slots plus binding-access calls separately from heap allocation;
-non-recursive generated expression temporaries can also exhaust C stack space.
+callee enters generated C. The call leaves the budget while unwinding either a
+normal or abrupt result. Generated root slots and call-argument scratch slots
+use a heap-backed root frame instead of a variable-sized C stack array.
+
+The backend also charges each entry against the runtime's active root-slot
+budget before entering generated C. A wide function therefore cannot exhaust
+the process stack before an owned resource diagnostic is possible. Script
+entries charge dense value slots plus binding-access calls separately from heap
+allocation. Non-recursive generated expression temporaries can also exhaust C
+stack space.
+
 UTF-16 string-constant units use static read-only storage rather than automatic
 compound literals, so source literal size does not enlarge a generated stack
 frame.
+
 Large bodies run through bounded native helpers that return continuation
 indices to an iterative owner. The owner retains roots, completion records,
 and scalar state across helper calls. Static data keeps one identity, and
 normal or abrupt completion releases the owner's root frame exactly once.
 This preserves the existing logical frame charge and 65,536-unit ceiling.
 
-The backend also supplies optional compilation units for large programs.
-Each wrapper selects a bounded group of definitions from the standalone C
-source. Native composition stages and compiles these wrappers through the
-toolchain's existing multiple-source contract, without cross-unit LTO.
-This bounds compiler IR retention as well as individual execution bodies;
-splitting functions inside one translation unit alone is insufficient for
-unoptimized sanitizer builds. The standalone source remains available for
-inspection and direct C emission.
+The backend also supplies optional compilation units for large programs. Each
+wrapper selects a bounded group of definitions from the standalone C source.
+Native composition stages and compiles these wrappers through the toolchain's
+existing multiple-source contract, without cross-unit LTO. This bounds compiler
+IR retention as well as individual execution bodies. Splitting functions inside
+one translation unit alone is insufficient for unoptimized sanitizer builds.
+The standalone source remains available for inspection and direct C emission.
+
 Function creation passes MIR-owned UTF-16 names and plain parameter counts to
-the runtime, without consulting HIR or source syntax.
+the runtime. It does not consult HIR or source syntax.
 
 Value-slot discovery scans MIR argument IDs iteratively, so source-level call
 size does not become a JavaScript call-stack limit during C emission. Generated
@@ -55,6 +62,7 @@ M2 guard failures and checked-addition overflow branch to the same emitted
 generic addition block. The hit path uses private inline runtime primitives and
 does not call generic addition or allocate. Block parameters carry the selected
 result into one ordinary continuation.
+
 M3 named property reads likewise preserve MIR-owned object and shape guards, a
 fixed-slot hit, one generic fallback, and a block-parameter join. The runtime
 exposes only private cache tests, fixed-slot loads, and cache updates to the C
@@ -64,51 +72,62 @@ allocate or materialize the property key.
 Pending throws carry their diagnostic location and message through generated
 completion slots, so intervening `finally` operations cannot overwrite an
 unhandled exception's report.
+
 Iterator operations keep the iterator, captured next method, and yielded value
 in distinct root slots. Generated close blocks consult the stored completion
 kind so `IteratorClose` preserves the required throw precedence.
+
 Dynamic array accumulation emits runtime value and hole append operations.
 Array spread steps its captured iterator method in MIR control-flow blocks and
 returns abrupt acquisition, step, and append results without synthesizing a
 close block.
+
 Call and constructor spread use the same iterator control flow while appending
 values to a GC-traced argument list. Generated invocations borrow the list count
-and stable value pointer only for the call, while fixed-arity paths keep their
+and stable value pointer only for the call. Fixed-arity paths keep their
 positional arguments.
+
 Array binding lowering associates iterator get, next, and close operations with
-a backend-local done bit. Exhaustion suppresses later steps and close calls,
-while generated cleanup blocks close only a still-open iterator and preserve an
+a backend-local done bit. Exhaustion suppresses later steps and close calls.
+Generated cleanup blocks close only a still-open iterator and preserve an
 in-flight throw over a close failure.
+
 Object binding lowering emits the MIR-owned coercibility check before computed
 keys, then uses the existing property-key and generic property-read operations.
 Nested patterns reuse the same binding targets and abrupt-completion path.
-Catch parameter lowering captures the pending thrown value, resets every catch
-cell, and runs the same recursive binding path before entering the body.
+
+Catch parameter lowering captures the pending thrown value and resets every
+catch cell. It runs the same recursive binding path before entering the body.
 Pattern failures retain iterator cleanup and continue through an enclosing
 `finally`.
+
 `for-of` declaration patterns reuse that binding path after each outer iterator
-step. Generated code resets lexical cells per iteration, writes hoisted `var`
-cells in place, and closes nested iterators before the outer iterator when
-initialization fails.
+step. Generated code resets lexical cells per iteration and writes hoisted `var`
+cells in place. When initialization fails, generated code closes nested
+iterators before the outer iterator.
+
 `for-of` assignment patterns reuse the existing-target path after each outer
-step. They add no target cells, and a checked identifier or member write
-failure closes nested pattern iterators before the outer iterator.
-Standalone destructuring assignment reuses the same recursive path with checked
-writes to existing identifier cells and property writes through member
-references evaluated before the corresponding source value. Generated code
-preserves the original right-hand value as the expression result and routes an
-immutable, imported, member-reference, or member-write failure through every
-active array-pattern close block.
+step. They add no target cells. A checked identifier or member write failure
+closes nested pattern iterators before the outer iterator.
+
+Standalone destructuring assignment reuses the same recursive path. That path
+includes checked writes to existing identifier cells and property writes
+through member references evaluated before the corresponding source value.
+Generated code preserves the original right-hand value as the expression
+result. It routes an immutable, imported, member-reference, or member-write
+failure through every active array-pattern close block.
+
 Compound assignment emits the existing binding or property read, binary
 operation, and checked write sequence against one retained reference. Logical
-forms branch before emitting the right operand and write, preserving the
+forms branch before emitting the right operand and write. They preserve the
 current value on the short path without adding a runtime ABI operation.
+
 Update expressions emit the same checked binding or member read and write
 operations around numeric coercion and arithmetic by one. A postfix form keeps
-the coerced previous value in its root slot across the write, while a prefix
-form returns the assigned value. Member forms retain one object and raw key
-evaluation but emit separate property-key conversions for the read and write.
-A nullish-base check precedes those conversions.
+the coerced previous value in its root slot across the write. A prefix form
+returns the assigned value. Member forms retain one object and raw key
+evaluation but emit separate property-key conversions for the read and write. A
+nullish-base check precedes those conversions.
 
 M4 whole-graph programs allocate shared module cells and namespaces before
 executing dependency-ordered bodies. Generated functions register one shared
