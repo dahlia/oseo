@@ -20,10 +20,12 @@ snapshot rather than a new observation or a future landing.
 
 The reviewed total is 23,043. Passes and expected negatives account for 21,553
 paths; the ledger's 19,538 open paths include all unsupported results and
-unreviewed paths. Within the unsupported total, 82 paths have bounded ADR 0016
-authorization and 1,408 retain remediation owners. An authorized unsupported
-result remains recorded as unsupported. Unreviewed paths have neither a pass
-nor a failure classification.
+unreviewed paths.
+
+Within the unsupported total, 82 paths have bounded ADR 0016 authorization and
+1,408 retain remediation owners. An authorized unsupported result remains
+recorded as unsupported. Unreviewed paths have neither a pass nor a failure
+classification.
 
 *AGENTS.md* and *CLAUDE.md* both link to *CONTRIBUTING.md*. The applicable
 contracts are [*PLAN-M5C.md*](../../PLAN-M5C.md), the measurement contract in
@@ -37,13 +39,15 @@ contracts are [*PLAN-M5C.md*](../../PLAN-M5C.md), the measurement contract in
 Existing expansion
 ------------------
 
-The 78-node graph already supplies bounded observation, implementation,
-harness, decision, and evidence work. No checked-in gap requires another node
-at this snapshot. The original observation plan created 32 nodes; four batches,
-02, 04, 07, and 09, have finished their selectors. The other 28 selectors cover
-every remaining unreviewed path exactly once. Those batches contain 9,680
-review units in sum, each within 3,000 paths and 500 units. The sum counts a
-generator used by two batches once in each batch.
+The 78-node graph supplies bounded observation, implementation, harness,
+decision, and evidence work. No checked-in gap requires another node at this
+snapshot.
+
+The original observation plan created 32 nodes; four batches, 02, 04, 07, and
+09, have finished their selectors. The other 28 selectors cover every remaining
+unreviewed path exactly once. Those batches contain 9,680 review units in sum,
+each within 3,000 paths and 500 units. The sum counts a generator used by two
+batches once in each batch.
 
 The exact selectors are the `selector.prerequisiteSets` and `selector.prefixes`
 fields in
@@ -88,14 +92,15 @@ set. A directory name alone is never an owner or a support judgment.
 
 The batch checker reconstructs those selectors from upstream source, rejects an
 unknown prerequisite key, checks every required graph dependency, and compares
-each path with its ledger owner. Batch nodes may add dependencies beyond the
-frozen source-derived sets when observations expose a gap. Batches 01, 03, 05,
-06, and 08 already wait for such bounded repairs. Batch 03 waits for Annex B
-classification and TypedArray construction order; that dependency does not
-authorize excluding its mixed core assertions. Batch 31 waits for import
-attributes, and batch 32 for the union of its small prerequisite sets. Landed
-realm and dynamic-import accounting prerequisites remain dependencies even
-though their capabilities no longer block scheduling.
+each path with its ledger owner.
+
+Batch nodes may add dependencies beyond the frozen source-derived sets when
+observations expose a gap. Batches 01, 03, 05, 06, and 08 wait for such bounded
+repairs. Batch 03 waits for Annex B classification and TypedArray construction
+order; that dependency does not authorize excluding its mixed core assertions.
+Batch 31 waits for import attributes, and batch 32 for the union of its small
+prerequisite sets. Landed realm and dynamic-import accounting prerequisites
+remain dependencies even though their capabilities no longer block scheduling.
 
 Parsed unresolved dynamic-source references occur in 998 remaining paths for
 `eval` and 176 for `Function`; these counts can overlap. They identify review

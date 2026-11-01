@@ -46,9 +46,11 @@ Two new fixed fixtures in *tests/native/fixtures/classes.ts* are
 expression, private `#m` accessor, public own-property and `in` assertions,
 and zero return checked by the caller. The getter still returns `"Test262"`;
 the setter still stores `"Test262"` in `this._v`. Only the optional legacy
-lookup observer is omitted. A failing comparison throws. Additional checks
-cover descriptor absence, absence after access, and independence from a
-public property with spelling `"#m"`, followed by deletion and repetition.
+lookup observer is omitted. A failing comparison throws.
+
+Additional checks cover descriptor absence, absence after access, and
+independence from a public property with spelling `"#m"`, followed by
+deletion and repetition.
 
 *tests/class-private-accessor-coverage-native.test.ts* compares fixed
 expected output against Node.js and Deno references and native execution.

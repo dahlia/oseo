@@ -32,25 +32,28 @@ unreviewed under `node:observation-batch-23`; the historical failure above is
 an observation outside that manifest.
 
 The frontend had synthesized a rest parameter and `super(...args)`.
-That expansion incorrectly reads the Array iterator.
-Default constructors now carry an internal forwarding marker through
-syntax, HIR and MIR. The C backend passes the running function's incoming
-argument count and values directly to super construction. Explicit source
-spread retains iterator evaluation. The existing construction path keeps
-parent lookup, `new.target`, derived return checks, field initialization,
-and abrupt completions.
+That expansion incorrectly reads the Array iterator. Default constructors
+now carry an internal forwarding marker through syntax, HIR and MIR. The C
+backend passes the running function's incoming argument count and values
+directly to super construction.
+
+Explicit source spread retains iterator evaluation. The existing
+construction path keeps parent lookup, `new.target`, derived return checks,
+field initialization, and abrupt completions.
 
 The structural regression lives in the Babel frontend tests. The
 `class-default-forwarding` native fixture covers a throwing iterator
 getter, a null iterator, explicit-spread control, zero and extra arguments,
 object identity, subclass chains, fields and private fields, mutable
 heritage, replacement objects, throwing parents, and invalid parents.
-It belongs to both forced-collection lists. The existing class property
-file adds seed `0x60000b04` in its reserved block: generated argument lists
-with a throwing iterator getter or method compare an independent count,
-sum, field and new-target model with Node.js, Deno and both native policies.
-Shrinking retains the constructor chain and iterator override. Root assigned
-slot 4 because the concurrent Unicode-class candidate reserves slot 3.
+It belongs to both forced-collection lists.
+
+The existing class property file adds seed `0x60000b04` in its reserved
+block: generated argument lists with a throwing iterator getter or method
+compare an independent count, sum, field and new-target model with Node.js,
+Deno and both native policies. Shrinking retains the constructor chain and
+iterator override. Root assigned slot 4 because the concurrent Unicode-class
+candidate reserves slot 3.
 
 Root owns D3 and the full UPDATE. The implementation commits changed no
 subset entry, manifest result, exclusion boundary or landed state. The
@@ -123,13 +126,13 @@ The row's tag self-audit follows the consolidated 2026-10-29 rules:
  -  `symbols`: the well-known `Symbol.iterator` property key installs the
     poison hook whose non-use the test asserts.
 
-No iterator consumer executes, so `iterator-protocol` is omitted. The
-poison closure's throw is failure-only, so it contributes neither
-`abrupt-completion` nor `error-intrinsics`. Harness assertion internals,
-diagnostic text and incidental grammar supply no extra generic tags.
-The shared supported-feature list and all ADR boundaries remain unchanged.
+No iterator consumer executes, so `iterator-protocol` is omitted. The poison
+closure's throw is failure-only, so it contributes neither `abrupt-completion`
+nor `error-intrinsics`. Harness assertion internals, diagnostic text and
+incidental grammar supply no extra generic tags. The shared supported-feature
+list and all ADR boundaries remain unchanged.
 
-The preservation packet and scoped allow-list proof are under the same
-artifact directory. The allow-list is checked against U `58bd752b`;
-it establishes observation-neutral U2 inputs, not freshness of the
-untouched corpus or permission to omit Root's Full.
+The preservation packet and scoped allow-list proof are under the same artifact
+directory. The allow-list is checked against U `58bd752b`; it establishes
+observation-neutral U2 inputs, not freshness of the untouched corpus or
+permission to omit Root's Full.

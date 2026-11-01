@@ -82,16 +82,14 @@ ADR changes.
 Root coordination before U2
 ---------------------------
 
-Root's 2026-10-30T23:34Z ruling reserves `0x60000b05` for the ASI
-property domain. Slots `0x60000b03` and `0x60000b04` belong to other class
-nodes. The original author and review replay above remains historical;
-the current domain uses the new slot with the same eight-case budget.
+Root's 2026-10-30T23:34Z ruling reserves `0x60000b05` for the ASI property
+domain. Slots `0x60000b03` and `0x60000b04` belong to other class nodes.
 
 Root selected Full under D3 and authorized bootstrap admission of the one
 owned original in U2, using fresh focused observations and canonical
 manifest/ledger APIs. Root will run the combined Full after the semantic
-bundle lands and owns R, the outer gate and publication. No UPDATE has
-been run by this worker.
+bundle lands and owns R, the outer gate and publication. No UPDATE has been
+run by this worker.
 
 
 U2 bootstrap admission

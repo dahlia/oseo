@@ -5,9 +5,10 @@ Scope and accounting
 --------------------
 
 Item 3 of the 2026-10-28 *m5c-scope-big-node-split* maintainer decision
-closes a mixed Annex B path under ADR 0013's optional Annex B boundary only
-when reviewed replacement observations cover every core subject and a
-fresh-digest audit record names them. Otherwise the path stays here.
+closes a mixed Annex B path under ADR 0013's optional Annex B boundary. It
+closes the path only when reviewed replacement observations cover every core
+subject and a fresh-digest audit record names them. Otherwise the path stays
+here.
 
 This node owned one path, *test/built-ins/String/prototype/split/
 separator-regexp.js*. Its observation is the build-time `OSEO1001`
@@ -57,7 +58,7 @@ independent verdict are described in the
 mutants and the native lanes described there. It compiles through the
 command-line frontend, which links the Unicode data `\s` and `\S` need.
 It also compiles `"x".split(/…/)` for each Annex B form in both strictness
-modes and requires only `OSEO1001` diagnostics, with the form's own message
+modes. It requires only `OSEO1001` diagnostics, with the form's own message
 and no MIR.
 
 

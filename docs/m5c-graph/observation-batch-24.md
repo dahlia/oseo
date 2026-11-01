@@ -24,8 +24,7 @@ variants, while *raw/* retains every native execution request and result.
 *reviewed-tags.json* records per-path dependency evidence and audit
 corrections; *observation-batch-24.paths* and
 *observation-batch-24.review-units* name the 794 paths and 228 review units. U
-canonically materializes the saved focused observations. The independent scoped
-UPDATE and strict agreement are recorded below.
+canonically materializes the saved focused observations.
 
 
 Dependency self-audit
@@ -36,12 +35,13 @@ and every October 30 clarification. Tags name an asserted source contract
 or its prerequisites. Assertion messages, failure-only Test262Error
 branches, normally completing try statements and expected-error checking
 plumbing supply no independent coverage. Catch environments and statement
-completion forms retain control-flow only when they are subjects; helper
+completion forms retain control-flow only when they are subjects. Helper
 branches that change an asserted operation retain the prerequisite.
 
 Expected-descriptor objects passed only to verifyProperty are excluded
 from object-literals; Object.defineProperty descriptors remain prerequisites.
 Literal eval source strings are parsed for their actual subject syntax.
+
 The two B24 uncalled async generators retain syntax families and omit
 runtime iterator, symbol, promise and assignment claims. Object-rest copying
 retains own-key enumeration only after the non-null input reaches copying.
@@ -49,9 +49,11 @@ Implicit iterable consumers retain iterator-protocol and symbols where their
 Symbol-keyed lookup is reached. Parse-only negatives retain subject grammar
 families without runtime promise, abrupt-completion or protocol claims.
 Rejected declaration placements and destructuring targets retain their subject
-syntax families, without runtime protocol claims. No fixture module contributes
-a tag in this train; the fixture-derived row count is zero. Existing subset
-rows, classifications, tags and owners are preserved.
+syntax families, without runtime protocol claims.
+
+No fixture module contributes a tag in this train; the fixture-derived row
+count is zero. Existing subset rows, classifications, tags and owners are
+preserved.
 
 
 Scoped UPDATE agreement
@@ -61,11 +63,13 @@ Root independently observed U `fe82c8aea6f8d880b4ea3d3e38fc56873b8124c6`
 against baseline `8f4202628356e172e1b4093a371d086070619de3`.
 Its scoped UPDATE completed with exit 0, selecting all 1,440 B24/B25
 originals: 1,354 passes, 79 expected negatives and 7 unsupported results,
-with no retries. The remote result tree equals U's tree, all manifest
-partitions were unchanged, and the result patch and worktree status are
-empty. Every admitted record strictly agrees with the focused observations,
-including classifications and executed variants, after the reviewed
-dependency-tag projection.
+with no retries.
+
+The remote result tree equals U's tree. All manifest partitions were
+unchanged. The result patch and worktree status are empty. Every admitted
+record strictly agrees with the focused observations, including
+classifications and executed variants, after the reviewed dependency-tag
+projection.
 
 The
 [raw Root reply](/data/m5c-d17-20261031/train-d/task_f6880fe9a7b3/ctx_2931b5fdcc73/UPDATE-reply.json),
@@ -90,7 +94,7 @@ state. Named exceptions observed through promise rejection retain
 prefix or postfix increments do not establish `expression-operators`,
 whether their untouched counters are asserted or not. A throwing getter
 during object-rest copying retains `object-own-keys`, because enumeration
-precedes the getter; null and undefined still fail before enumeration.
+precedes the getter. Null and undefined still fail before enumeration.
 
 This batch corrects 22 dependency rows. The
 [round-1 fix plan](/data/m5c-d17-20261031/train-d/task_f6880fe9a7b3/ctx_2931b5fdcc73/round1-fix-plan.json)

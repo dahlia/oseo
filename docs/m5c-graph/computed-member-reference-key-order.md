@@ -2,11 +2,11 @@ Computed member Reference key order
 ===================================
 
 This record supports the graph node `computed-member-reference-key-order`.
-It separates four kinds of statement: the fixed ECMA-262 2025 contract, the
-actual observations that opened the node, known nonconformance on `main`
-that rests on source reading only, the evidence a repair must supply, and
-the repair that the node's implementation change makes. It uses test262
-revision `f2d1435644797268dca1f7988cad5a4e89ccd8d2`
+It separates the fixed ECMA-262 2025 contract, the actual observations that
+opened the node, known nonconformance on `main` that rests on source reading
+only, the evidence a repair must supply, and the repair that the node's
+implementation change makes. It uses test262 revision
+`f2d1435644797268dca1f7988cad5a4e89ccd8d2`
 and main `faa47159`. Nothing here is a test262 observation of the repair,
 and no path is excluded, removed, or retagged.
 
@@ -58,12 +58,12 @@ Actual observations
 -------------------
 
 The batch 14 focused first observation ran on 2026-10-22 at 23:27 UTC on
-main `faa47159` under the repository runner's `executeTest262Case`, targeting
-`linux-x86_64-gnu`. It produced four `semantic-failure` results. Each was
-decided by its first scheduled variant (Script, non-strict, specialization
-disabled), and no other variant of these paths ran. These four subjects
-remain unreviewed under `node:observation-batch-14`, which admits them only
-from its own later observation.
+main `faa47159`. It ran under the repository runner's `executeTest262Case`,
+targeting `linux-x86_64-gnu`. It produced four `semantic-failure` results.
+Each was decided by its first scheduled variant (Script, non-strict,
+specialization disabled), and no other variant of these paths ran. These
+four subjects remain unreviewed under `node:observation-batch-14`, which
+admits them only from its own later observation.
 
 | Path                                                                                              | Source SHA256                                                      | Observed                                                         |
 | ------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------ | ---------------------------------------------------------------- |
@@ -117,10 +117,10 @@ native run tested these hypotheses.
     `compound-member-assignment-key-order` follow the contract and keep
     their results.
 
-Related pinned subjects that other batches own have unknown
+The related pinned subjects owned by other batches have unknown
 classifications. Their sources make the simple assignment and update forms
 part of this contract, so `observation-batch-08` and `observation-batch-16`
-depend on this node. They predict no result.
+depend on this node and predict no result.
 
 | Path                                                                                 | Owner                       | Source SHA256                                                      | Source contract                                                        |
 | ------------------------------------------------------------------------------------ | --------------------------- | ------------------------------------------------------------------ | ---------------------------------------------------------------------- |
@@ -170,8 +170,8 @@ evidence contract applies:
 
 The repair regenerates the complete reviewed manifest; reviewed paths move
 only toward pass. Batches 14, 08, and 16 then admit their paths from their
-own observations. The four failing subjects above become a pass only
-through such an observation.
+own observations. The four failing subjects above pass only through such an
+observation.
 
 
 Repair
@@ -222,5 +222,5 @@ Focused evidence on the candidate tree:
     path.
 
 Batches 14, 8, and 16 observe and admit their own paths after the complete
-manifest regeneration this node still needs; this record claims no test262
+manifest regeneration this node still needs. This record claims no test262
 pass beyond that focused check.

@@ -32,11 +32,12 @@ original assertion; accounting never counts as a pass.
 
 This node depends on landed `authorized-exclusion-audit` and starts
 ready/unlanded. Ownership stays with `dynamic-source-coverage-remediation`
-until this child lands. Each child landing reports exact newly covered and
-still-uncovered subsets and moves ownership in the derived ledger. The
-umbrella remains an aggregate gate until all children land and it owns zero
-paths. Serialize shared audit, ledger and manifest publication; Root owns
-integration and publication.
+until this child lands.
+
+Each child landing reports exact newly covered and still-uncovered subsets
+and moves ownership in the derived ledger. The umbrella remains an aggregate
+gate until all children land and it owns zero paths. Serialize shared audit,
+ledger and manifest publication; Root owns integration and publication.
 
 
 Closure route and evidence obligations
@@ -55,19 +56,21 @@ string/numeric syntax, ordinary strict early errors and generic eval
 parse-failure probes. These remain grammar contracts inside the claim.
 
 Budget 20–35 generated parser/static test groups, not 20–35 individual code
-snippets. The two comment domains alone span 65,536 code units each; retain the
-domain, token positions, combined separator sequence, assignment effects and
-exact negative phases. DS-5 identifies three existing expected-negative
+snippets. The two comment domains alone span 65,536 code units each. Retain
+the domain, token positions, combined separator sequence, assignment effects
+and exact negative phases. DS-5 identifies three existing expected-negative
 counterparts as partial evidence, not an accepted whole-path replacement.
 
 For every eventual exclusion, name the exact replacement paths and reviewed
 observations, refresh source and normalized observation digests, and show
 that every non-source subject is covered. Keep mixed or uncovered subjects
 open and ask for a bounded maintainer decision when a faithful witness is
-unavailable. Preserve ADR 0016/0019 reopening triggers; an accepted ADR 0016
-amendment admitting dynamic import reopens ImportCall accounting. Each child
-requires normal D1/D11 review and D3/D4 publication. This metadata change
-performs none of those closure or landing steps.
+unavailable.
+
+Preserve ADR 0016/0019 reopening triggers; an accepted ADR 0016 amendment
+admitting dynamic import reopens ImportCall accounting. Each child requires
+normal D1/D11 review and D3/D4 publication. This metadata change performs
+none of those closure or landing steps.
 
 
 Static witness assessment
@@ -97,6 +100,7 @@ PS. Block comments retain zero for the entire domain. Bindings are shared
 between non-terminating probes without resetting them, so an escaped
 assignment cannot be hidden by a later reset. Structural checks retain the
 complete domains and distinguish comments from executable assignments.
+
 Both native policies execute with collection forced at every safepoint;
 the ordinary native runner includes the fixtures, enables forced collection
 and checks positive collection counters. These lexical subjects have no new
@@ -129,14 +133,14 @@ including the newly registered fixtures, for the exact integration candidate;
 this worker's focused Linux run does not establish macOS execution or CI.
 ADR 0016 and ADR 0019, including every reopening trigger, remain unchanged.
 
-Focused validation passed: 50 static/structural tests and all 25 native
-groups on Linux AMD64, with Node.js/Deno reference agreement, both native
+Focused validation on Linux AMD64 passed 50 static/structural tests and all
+25 native groups, with Node.js/Deno reference agreement, both native
 specialization policies, forced collection and positive collection counters.
 The 23 unchanged native groups retain their original execution inputs.
-Groups 19 and 20 were rerun after restoring their single-line comment
-probes; the static contract test now requires both original comment
-bodies for each of the five characters.
-The execution record is */data/m5c-d17-20261031/ds16/native1.json*.
+The static contract test now requires both original comment bodies for each
+of the five characters; groups 19 and 20 use their restored single-line
+comment probes. The execution record is
+*/data/m5c-d17-20261031/ds16/native1.json*.
 
 Dependency-tag self-audit: all 95 original tag sets are unchanged. The
 derived ledger changes only the 91 selected owners and their aggregate

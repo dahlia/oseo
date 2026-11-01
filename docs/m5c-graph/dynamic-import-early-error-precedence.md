@@ -36,13 +36,13 @@ over an earlier profile diagnostic, source order, eight valid ImportCall
 placements that keep `OSEO1001`, and `new` over `import.meta` and ordinary
 members.
 
-A focused observation of the 21 paths at the implementation source,
-calling the runner's exported `executeTest262Case` with the checked-in
-`supportedFeatures` and an executor that refuses to run, classified each
-as `expected-negative` with a parse-phase SyntaxError in every strictness mode
-its frontmatter selects: both modes for 19 paths, and non-strict only for the
-two `noStrict` `with` paths. It is not a manifest update. Observation batch 30
-still admits the paths, and Root runs the manifest update. The 21 reviewed bare
+A focused observation of the 21 paths at the implementation source called the
+runner's exported `executeTest262Case` with the checked-in `supportedFeatures`
+and an executor that refuses to run. It classified each as `expected-negative`
+with a parse-phase SyntaxError in every strictness mode its frontmatter
+selects: both modes for 19 paths, and non-strict only for the two `noStrict`
+`with` paths. It is not a manifest update. Observation batch 30 still admits
+the paths, and Root runs the manifest update. The 21 reviewed bare
 `new import('')` paths already fail in Babel before this scan and keep their
 `expected-negative` records.
 

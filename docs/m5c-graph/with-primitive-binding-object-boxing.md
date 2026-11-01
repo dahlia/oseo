@@ -5,11 +5,8 @@ Apply ToObject when entering with over Number, Boolean, and String values
 before object environment HasBinding. All three observed runtime failures
 report TypeError: The in operator requires an object.
 
-Focused observation on base `68b026bb8275b9b7ddd15b9bdd02ef90ef3b123f`,
-native target `linux-x86_64-gnu`, found these failures. The original train
-retained these paths unreviewed under observation-batch-28. This paragraph
-records the original failure; the source repair and its evidence are recorded
-below.
+A focused observation on base `68b026bb8275b9b7ddd15b9bdd02ef90ef3b123f`,
+native target `linux-x86_64-gnu`, recorded these failures.
 
  -  `test/language/statements/with/12.10-2-1.js`
  -  `test/language/statements/with/12.10-2-2.js`
@@ -24,9 +21,7 @@ Repair and re-observe these exact originals before closing this dependency.
 Source repair
 -------------
 
-This section records semantic U
-`d7808583c66ad45ef870ea4a28b394d9420fa7dd`. The later admission below is
-separate from that source repair.
+Semantic U is commit `d7808583c66ad45ef870ea4a28b394d9420fa7dd`.
 
 On base `1f3ade138ea7cbee80b2d62940e8f497db2bc1a2`, the three paths
 are absent from the checked-in result partitions and remain unreviewed in
@@ -39,18 +34,18 @@ The old with lowering called RequireObjectCoercible, which passed a
 primitive unchanged to HasBinding's `in` operation. A dedicated `to-object`
 MIR operation now materializes one binding object through the runtime's
 existing ToObject implementation. Its safepoint, abrupt check and root store
-precede environment initialization. ABI `m5-143` exports `oseo_to_object`;
-ordinary property References retain their existing primitive receiver rules.
+precede environment initialization. ABI `m5-143` exports `oseo_to_object`.
+Ordinary property References retain their existing primitive receiver rules.
 No hint or specialization policy controls boxing.
 
 The fixed native fixture covers Number (including NaN, negative zero and
 Infinity), Boolean, String, BigInt and Symbol wrappers; retained wrapper
 identity and mutation through escaped closures; String indexed and length
-descriptors; inherited strict-call receivers; unscopables fallback; object
-and proxy identity; mutable Object shadowing; nullish entry and throwing
-operand order. The focused suite executes the three original upstream
-bodies with a minimal sameValue assertion, without modifying them or their
-stored classifications. It compares Node.js and Deno Script observations
+descriptors. It also covers inherited strict-call receivers; unscopables
+fallback; object and proxy identity; mutable Object shadowing; nullish entry
+and throwing operand order. The focused suite executes the three original
+upstream bodies with a minimal sameValue assertion, without modifying them or
+their stored classifications. It compares Node.js and Deno Script observations
 and executes both specialization policies with forced collection in ordinary
 and host Script modes where named.
 
@@ -61,8 +56,8 @@ lookup, wrapper identity and closure mutation. Its independent expected
 output follows the selected property versus lexical fallback model. Both
 policies, both compilation modes, false object hints, forced collection,
 shrinking and replay remain active. Root must supply shard scheduling
-weights for the new file before publication. Root subsequently authorized
-one focused extended-budget measurement, recorded below.
+weights for the new file before publication. Root authorized one focused
+extended-budget measurement, recorded below.
 
 
 Author validation

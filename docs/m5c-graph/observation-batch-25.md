@@ -12,10 +12,11 @@ The 7 unsupported originals remain active in-claim coverage
 remediation under `node:dynamic-source-coverage-remediation`. Their
 observations report the existing unknown-eval source-compilation
 rejection. They gain source-bound assessments under
-`observation-train-b24-b25` in the exclusion audit, with original source
-hashes, normalized observation digests, normative sections and subjects.
-No replacement or whole-path exclusion is claimed. ADR 0013, ADR 0016 and
-ADR 0019, including their reopening triggers, remain unchanged.
+`observation-train-b24-b25` in the exclusion audit. Those assessments
+include original source hashes, normalized observation digests, normative
+sections and subjects. No replacement or whole-path exclusion is claimed.
+ADR 0013, ADR 0016 and ADR 0019, including their reopening triggers,
+remain unchanged.
 
 
 Evidence
@@ -47,6 +48,7 @@ branches that change an asserted operation retain the prerequisite.
 Expected-descriptor objects passed only to verifyProperty are excluded
 from object-literals; Object.defineProperty descriptors remain prerequisites.
 Literal eval source strings are parsed for their actual subject syntax.
+
 The two B24 uncalled async generators retain syntax families and omit
 runtime iterator, symbol, promise and assignment claims. Object-rest copying
 retains own-key enumeration only after the non-null input reaches copying.
@@ -54,9 +56,11 @@ Implicit iterable consumers retain iterator-protocol and symbols where their
 Symbol-keyed lookup is reached. Parse-only negatives retain subject grammar
 families without runtime promise, abrupt-completion or protocol claims.
 Rejected declaration placements and destructuring targets retain their subject
-syntax families, without runtime protocol claims. No fixture module contributes
-a tag in this train; the fixture-derived row count is zero. Existing subset
-rows, classifications, tags and owners are preserved.
+syntax families, without runtime protocol claims.
+
+No fixture module contributes a tag in this train; the fixture-derived row
+count is zero. Existing subset rows, classifications, tags and owners are
+preserved.
 
 
 Unsupported selector
@@ -109,9 +113,11 @@ The full-row protocol audit adds `object-properties` to four newly admitted
 implicit `Symbol.iterator` property lookup, including the primitive
 missing-method error and the empty-array case. The earlier tagging pass already
 retained `symbols` but omitted the paired property-read family. The complete
-1,440-row audit now checks this prerequisite consistently. This changes no
-executed variant, observation, classification or owner. R also refreshes the
-explicit current totals in *PLAN-M5.md* and *docs/language-profile-m5.md*.
+1,440-row audit now checks this prerequisite consistently.
+
+This changes no executed variant, observation, classification or owner. R also
+refreshes the explicit current totals in *PLAN-M5.md* and
+*docs/language-profile-m5.md*.
 
 
 Internal review round 1 corrections
@@ -124,11 +130,11 @@ state. Named exceptions observed through promise rejection retain
 prefix or postfix increments do not establish `expression-operators`,
 whether their untouched counters are asserted or not. A throwing getter
 during object-rest copying retains `object-own-keys`, because enumeration
-precedes the getter; null and undefined still fail before enumeration.
+precedes the getter. Null and undefined still fail before enumeration.
 
 This batch corrects 8 dependency rows. The
 [round-1 fix plan](/data/m5c-d17-20261031/train-d/task_f6880fe9a7b3/ctx_2931b5fdcc73/round1-fix-plan.json)
-records every original hash and before/after dependency list, and the companion
+records every original hash and before/after dependency list. The companion
 pattern audits cover all 1,440 train rows. Companion source evidence is in
 *round1-missing-rejection-abrupt-candidates.json*,
 *round1-unreachable-operator-pattern-audit.json*,

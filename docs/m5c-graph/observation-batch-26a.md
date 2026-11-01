@@ -30,6 +30,7 @@ and specialization variants, while *raw/* retains every native execution
 request and result. *self-audit.json* and *reviewed-tags.json* record per-path
 dependency evidence and audit corrections; *observation-batch-26a.paths* and
 *observation-batch-26a.review-units* name the 384 paths and 209 review units.
+
 The canonical serializer materializes the saved observations into the manifest
 before U; Root's scoped UPDATE must strictly agree before R is accepted.
 
@@ -39,20 +40,25 @@ Dependency self-audit
 
 Every row was checked against the consolidated tag rules of October 29
 and every October 30 clarification. Tags name an asserted source contract
-or its prerequisites. Assertion messages, failure-only Test262Error
-branches, normally completing try statements and expected-error checking
-plumbing supply no independent coverage. Catch environments and statement
-completion forms retain control-flow only when they are subjects; helper
-branches that change an asserted operation retain the prerequisite.
+or its prerequisites.
+
+Assertion messages, failure-only Test262Error branches, normally
+completing try statements and expected-error checking plumbing supply no
+independent coverage. Catch environments and statement completion forms
+retain control-flow only when they are subjects; helper branches that
+change an asserted operation retain the prerequisite.
 
 Expected-descriptor objects passed only to verifyProperty are excluded
 from object-literals; Object.defineProperty descriptors remain prerequisites.
 Literal eval and Function source strings are parsed for their actual subject
-syntax, including evaluated object literals. Implicit iterable consumers
-retain iterator-protocol and symbols where their Symbol-keyed lookup is
-reached. Parse-only negatives retain subject grammar families without
-runtime promise, abrupt-completion or protocol claims. Original declaration
-conflicts include both declarations in the rejected early-error contract.
+syntax, including evaluated object literals.
+
+Implicit iterable consumers retain iterator-protocol and symbols where
+their Symbol-keyed lookup is reached. Parse-only negatives retain subject
+grammar families without runtime promise, abrupt-completion or protocol
+claims. Original declaration conflicts include both declarations in the
+rejected early-error contract.
+
 No fixture module contributes a tag in this train; the fixture-derived
 row count is zero. Existing subset rows, classifications, tags and owners
 are preserved.
@@ -111,9 +117,8 @@ and Codex rollout path for Root's audit.
 Internal pass 2 corrections
 ---------------------------
 
-All 1,669 train rows were checked for every second-pass finding pattern
-against the latest consolidated tag rules. This batch has
-14 dependency rows corrected in that audit.
+All 1,669 train rows were checked against the latest consolidated tag rules
+for every second-pass finding pattern. The audit corrected 14 dependency rows.
 
 Expected-error sentinel comparisons and constant loop reach-marker assignments
 add no expression-operators coverage. Real loop input declarations, loop-head
@@ -134,9 +139,8 @@ counts, unsupported ownership and the original admitted rows are preserved.
 Internal pass 3 corrections
 ---------------------------
 
-All 1,669 train rows were checked for every third-pass finding pattern
-against the latest consolidated tag rules. This batch has
-106 dependency rows corrected in that audit.
+All 1,669 train rows were checked against the latest consolidated tag rules
+for every third-pass finding pattern. The audit corrected 106 dependency rows.
 
 Unused for-head declarations and constant reach markers do not establish
 var-binding coverage. Expected-error checks, marker assignments and their
@@ -161,9 +165,9 @@ counts, unsupported ownership and the original admitted rows are preserved.
 Internal pass 4 corrections
 ---------------------------
 
-All 1,669 train rows were checked for every fourth-pass finding pattern
-against the latest consolidated rules and original sources. This batch has
-88 dependency rows corrected in that audit.
+All 1,669 train rows were checked against the latest consolidated rules and
+original sources for every fourth-pass finding pattern. The audit corrected
+88 dependency rows.
 
 Implicit iterator acquisition and iteration reads are recorded through
 iterator-protocol and symbols. They add no independent object-properties

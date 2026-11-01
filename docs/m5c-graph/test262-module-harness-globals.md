@@ -2,10 +2,10 @@ Expose harness globals to imported test modules
 ===============================================
 
 Makes test262 harness bindings, which come from a global script, visible to
-modules imported by a module test, so the 1 observed path whose imported module
-calls assert can be observed.
+modules imported by a module test. This covers the 1 observed path whose
+imported module calls assert.
 
-The 1 paths below remain unreviewed in the closure ledger.
+The 1 path below remains unreviewed in the closure ledger.
 Root authorized this ready, unlanded owner on 2026-10-27. The saved API
 observations used clean source `6aab0fc8`, tree
 `d6723be80209aca0fcf0606c5c3e5959f152ad0c`.
@@ -28,15 +28,18 @@ every module in the graph must see it through the global environment.
 `compileModuleGraph` now accepts a prelude Script. It is resolved after the
 graph's cells and lowered ahead of every module initializer, keeping its
 own strictness, GlobalDeclarationInstantiation, and source identity, so
-a throw in the Script reports the Script's location. Its var, function, and
-lexical bindings form an outer scope of every module, so a module's own
-declarations and imports hide them. A var or function name keeps its
-global-object storage. A prelude whose top-level `with` statement may
-initialize a hidden fallback cell is rejected at the Script. The CLI
-exposes this as `--script SCRIPT` for a module entry, with an in-memory
-`scriptSource` on `CliRequest`. The test262 runner now passes a module
-case's harness through it and compiles the unmodified upstream body as the
-entry, in both the pre-execution graph build and native execution.
+a throw in the Script reports the Script's location.
+
+Its var, function, and lexical bindings form an outer scope of every
+module, so a module's own declarations and imports hide them. A var or
+function name keeps its global-object storage. A prelude whose top-level
+`with` statement may initialize a hidden fallback cell is rejected at the
+Script.
+
+The CLI exposes this as `--script SCRIPT` for a module entry, with an
+in-memory `scriptSource` on `CliRequest`. The test262 runner now passes a
+module case's harness through it and compiles the unmodified upstream body
+as the entry, in both the pre-execution graph build and native execution.
 
 
 Evidence
@@ -75,7 +78,7 @@ Manifest impact
 ---------------
 
 Every reviewed module record's entry `sourceHash` changes, because the
-entry is now the upstream body without the harness, and the positions in
+entry is now the upstream body without the harness. The positions in
 recorded module diagnostics lose the harness line offset. The change
 touches *packages/* and *tools/*, so the scoped manifest update cannot
 admit it; it needs `mise run test262:update`. A module case that declares

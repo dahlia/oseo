@@ -64,6 +64,7 @@ The later strict tail-forwarding registration is retained at the original
 and C assertions require the removed TCO implementation and are absent
 here; none of the earlier wrapper assertions is changed. No tail execution
 claim follows from this composition.
+
 The two independently modeled domains in
 *tests/property/m5-primitive-wrapper-objects.property.test.ts* reserve
 `0x60008a00` and `0x60008a01`. Their aligned seed block remains unchanged;

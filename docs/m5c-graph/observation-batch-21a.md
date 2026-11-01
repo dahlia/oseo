@@ -44,7 +44,7 @@ Unsupported ownership
 
 The four OSEO1001 unknown-eval observations have source and normalized
 observation digests in *docs/m5c-closure/exclusion-audit.yaml*. The parameter
-var collision in eval source and break target rejected in eval source use
+var collision and the break target rejected, both in eval source, use
 the existing eval-semantics assessment under ADR 0016. Their originals are
 *async-function/eval-var-scope-syntax-err.js* and *break/S12.8\_A7.js*.
 
@@ -65,11 +65,11 @@ exclusion boundary is introduced; ADR 0013, 0016, and 0019 are unchanged.
 Internal review corrections
 ---------------------------
 
-The first internal round prompted another audit of all 1,768 train rows.
-ADR 0013 reserves generators for synchronous generators: 199 async-only
-rows in this batch lose that tag, while 19 synchronous witnesses retain it.
-Reserved-word negatives retain their class and async-method grammar;
-incidental void expressions supply no expression-operators coverage.
+An audit of all 1,768 train rows applied ADR 0013, which reserves
+generators for synchronous generators: 199 async-only rows in this batch
+lose that tag, while 19 synchronous witnesses retain it. Reserved-word
+negatives retain their class and async-method grammar; incidental void
+expressions supply no expression-operators coverage.
 
 The audit adds asserted rejection completions, implicit Symbol lookup for
 generator-object property keys, and restricted-production line terminators.

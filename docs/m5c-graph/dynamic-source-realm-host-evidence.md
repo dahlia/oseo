@@ -184,11 +184,11 @@ Residual child follow-up
 
 The DS-19 assessment and execution statements above describe its original
 checkpoint. The later `dynamic-source-residual-evidence` candidate repairs
-the two retained derived-constructor error realms under ABI `m5-146`,
+the two retained derived-constructor error realms under ABI `m5-146`. It
 restores their native registrations without changing the normative
 assertions, and accounts for those two paths under ADR 0016. The
 [*residual assessment*](./dynamic-source-residual-evidence.assessment.md)
 supersedes only those two remediation entries. Its fixed and generated
 evidence covers both policies with forced collection. This product change
-requires Root's next bundle UPDATE; DS-19's earlier accounting-only
+requires Root's next bundle UPDATE. DS-19's earlier accounting-only
 no-UPDATE statement does not apply to that later candidate.

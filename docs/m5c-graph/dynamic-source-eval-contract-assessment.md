@@ -9,11 +9,12 @@ umbrella rows in the base ledger. Selector SHA256:
 
 Closed under ADR 0016: seven. Staying: 98. Evidence added: zero. No
 complete qualifying replacement is established for the retained paths.
-This is a bounded evidence gap,
-not a claim that no equivalent observation exists anywhere. The node's
-Root instructions retain any path with independent ordinary binding,
-strictness, property or completion assertions. An eval rejection and its
-dependency tags alone prove none of those assertions.
+This is a bounded evidence gap, not a claim that no equivalent
+observation exists anywhere.
+
+The node's Root instructions retain any path with independent ordinary
+binding, strictness, property or completion assertions. An eval rejection
+and its dependency tags alone prove none of those assertions.
 
 
 Candidate evidence inspected
@@ -44,14 +45,18 @@ deletable eval-local bindings or the selected caller/environment matrix.
 Seven acceptance-only declaration cases have no later value or property
 assertion: the direct strict-caller/global-lexical case, direct strict-source
 and strict-caller lower-lexical cases, direct strict-source/global-lexical
-case, and the three indirect strict/global and lower-lexical cases. Root
-ruled on 2026-10-31 that these seven, and only these seven, close under the
-existing `eval-semantics` assessment: source evaluation is their only
+case, and the three indirect strict/global and lower-lexical cases.
+
+Root ruled on 2026-10-31 that these seven, and only these seven, close under
+the existing `eval-semantics` assessment. Source evaluation is their only
 asserted contract, so no non-source subject remains and decision item 1
-requires no replacement evidence. Each existing audit row has fresh source
-and normalized observation digests. No new assessment or evidence was added.
-The other 98 retain remediation. A nested static block does not faithfully
-witness construction of eval environments; no emulation was added.
+requires no replacement evidence.
+
+Each existing audit row has fresh source and normalized observation digests.
+No new assessment or evidence was added. The other 98 retain remediation.
+
+A nested static block does not faithfully witness construction of eval
+environments; no emulation was added.
 
 The seven exclusions reopen on changed source or observation, an accepted
 ADR 0016 amendment admitting the relevant eval form, or evidence of an

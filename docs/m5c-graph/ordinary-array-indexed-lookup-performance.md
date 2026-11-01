@@ -228,11 +228,13 @@ fixtures under both specialization policies in each of three lanes:
 The lanes use actual NodeHost, actual DenoHost, and NodeHost with the real
 Clang 22.1.8 host-compiler sanitizer toolchain. All ten fixture/policy pairs
 agree across the lanes on complete expected/reference stdout, native exit
-zero, empty stderr and counters. Forced safepoint collection yields positive
-allocations and collections throughout. Existing applicable guard-miss,
-disabled-policy, fallback and MIR assertions remain; these counters do not
-measure hits in the new C runtime branches. Fixture flags and independent
-Node/Deno references remain part of the retained driver evidence.
+zero, empty stderr and counters.
+
+Forced safepoint collection yields positive allocations and collections
+throughout. Existing applicable guard-miss, disabled-policy, fallback and MIR
+assertions remain; these counters do not measure hits in the new C runtime
+branches. Fixture flags and independent Node/Deno references remain part of
+the retained driver evidence.
 
 Six complete property executions, ordinary Zig and host-compiler sanitizer
 for each family below, retain their arbitraries, size, shrinking/replay,
@@ -400,20 +402,22 @@ expected output. The recorded clocks are:
 | Surrogate native union         | 228.694822073 | 6.739456892  |
 
 The observed native-union BEFORE/AFTER ratio is 36.706576x, with ASCII
-40.110362x and Surrogate 33.933717x. These are single Linux observations.
-AFTER follows BEFORE in the assigned cache; neither cold nor warm state is
-certified. BEFORE overlapped a disposable Fable review at two CPUs/12G;
-that review and Array source CHECK/hooks finished before AFTER. Both sides
-used the same process-only strace and external observer. Interval categories
-can overlap and are not additive exclusive phases. They measure wall time,
-not CPU or exclusive helper, matcher or GC time. The millisecond helper and
-word-control differences establish no reliable improvement. There is no
-variance, corpus, CI, macOS or deadline inference, and adoption remains a
-Root decision after the remaining gates.
+40.110362x and Surrogate 33.933717x. These are single Linux observations. AFTER
+follows BEFORE in the assigned cache; neither cold nor warm state is certified.
 
-Exact unrounded clocks, source/blob proofs, complete inputs, raw traces,
-strict ownership, natural exits, source preservation, drains and these
-qualifications are retained in
+BEFORE overlapped a disposable Fable review at two CPUs/12G; that review and
+Array source CHECK/hooks finished before AFTER. Both sides used the same
+process-only strace and external observer. Interval categories can overlap and
+are not additive exclusive phases. They measure wall time, not CPU or exclusive
+helper, matcher or GC time.
+
+The millisecond helper and word-control differences establish no reliable
+improvement. There is no variance, corpus, CI, macOS or deadline inference, and
+adoption remains a Root decision after the remaining gates.
+
+Exact unrounded clocks, source/blob proofs, complete inputs, raw traces, strict
+ownership, natural exits, source preservation, drains and these qualifications
+are retained in
 [measurement *REPORT.md*](/data/m5c-array-faithful-comparison-20261026/task_ed8b29a6ee97/ctx_600db5aa21fe/REPORT.md)
 and its adjacent *COMPARISON.json*. No borrowed support file, Reg admission,
 observation, ownership or exclusion is added to Array publication here.

@@ -200,7 +200,7 @@ historical evidence for the preceding target.
 Internal review round 4 follow-up
 ---------------------------------
 
-Pass 4 completed all three combined batch scopes at
+The audit covered all three combined batch scopes at
 `ae77f78118b9b6d2211f2189f4546ca6d7241d81`. B06 was clean at both
 stages. Astra found one omitted genuine `with` environment subject in
 B08 and one uncalled conversion-hook abrupt claim in B14. Both fixes
@@ -209,12 +209,14 @@ are applied together after another full 1,153-row source/rule audit.
 *test/language/expressions/logical-not/S11.4.9\_A2.2\_T1.js* loses
 `abrupt-completion`. All eight checks apply logical not to objects.
 ToBoolean does not call their `valueOf` or `toString` hooks, so their
-throwing bodies supply no observed abrupt completion; the remaining
-throws only signal failed assertions. All 451 abrupt-tagged rows were
-reconciled: 398 direct assertion/catch/runtime contracts, 48 asserted
-async rejections, four generator-return resumptions and this one
-unreached-hook correction. The logical-assignment poison-hook rows
-retain their independently asserted DummyError/TypeError completions.
+throwing bodies supply no observed abrupt completion. The remaining
+throws only signal failed assertions.
+
+All 451 abrupt-tagged rows were reconciled: 398 direct
+assertion/catch/runtime contracts, 48 asserted async rejections, four
+generator-return resumptions and this one unreached-hook correction.
+The logical-assignment poison-hook rows retain their independently
+asserted DummyError/TypeError completions.
 
 The audit leaves B06 rows and its shared graph/note scope unchanged.
 Classifications, owners, raw observations and ADR/fixture boundaries
@@ -230,7 +232,7 @@ Outer review: evaluated source prerequisites
 The follow-up audit at R5 (`449842a9`) checked all 359 admitted rows
 in this batch and all 1,153 admitted rows across B06/B08/B14. Source
 hashes match the preceding audit. The audit traced eval and Function
-source arguments, including nested source strings, and distinguished
+source arguments, including nested source strings. It distinguished
 constructed subject prerequisites from assertion messages, non-String
 identity probes and rejected grammar. Both held B06 sources were also
 inspected and remain unreviewed.

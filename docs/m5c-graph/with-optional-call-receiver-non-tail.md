@@ -20,8 +20,8 @@ Evidence obligations
 
 The repair keeps the selected object, or `undefined` for a fallback binding,
 as the receiver of the first call link of an optional chain whose base is an
-identifier resolved through `with`, for every call outside tail position.
-Its evidence is the non-tail part of the umbrella's contract:
+identifier resolved through `with`. This holds for every call outside tail
+position. Its evidence is the non-tail part of the umbrella's contract:
 
  -  fixed native examples under both specialization policies with forced
     collection, covering selected, inherited, `Symbol.unscopables`-blocked,
@@ -46,8 +46,8 @@ Repair
 `with-get` chain base whose first link is a call through `lowerWithRead`
 with `retainReceiver` set, as the ordinary call path does. The join that
 carries the callee also carries the selected object, or `undefined` from a
-lexical or global fallback, and that receiver becomes the first call
-link's `this`. The read keeps the GetBindingValue order that
+lexical or global fallback. That receiver becomes the first call link's
+`this`. The read keeps the GetBindingValue order that
 `eval-intrinsic-value` establishes, so the nullish guard, the arguments,
 and the call follow the second HasProperty and the Get. A base whose first
 link is a member or private member, any later call link, a parenthesized
@@ -69,39 +69,39 @@ Evidence
     output under both specialization policies with collection forced at
     every safepoint. It covers own, inherited, `Symbol.unscopables`-blocked
     (global and lexical fallback), and all-miss (lexical and global)
-    references, nested `with` objects selected from the outer and inner
-    environments, a parenthesized callee, an `eval`-named property, a
-    following link, null and undefined short-circuits that skip their
-    arguments, a non-callable callee that throws after its arguments, a
-    getter-traced argument order, a strict nested caller, a sloppy
-    `return f?.()`, and controls for the ordinary call, a comma callee, and
-    optional member calls. Its arguments allocate while the selected
+    references. It covers nested `with` objects selected from the outer and
+    inner environments, a parenthesized callee, an `eval`-named property,
+    and a following link. It covers null and undefined short-circuits that
+    skip their arguments, a non-callable callee that throws after its
+    arguments, a getter-traced argument order, a strict nested caller, and a
+    sloppy `return f?.()`. Controls cover the ordinary call, a comma callee,
+    and optional member calls. Its arguments allocate while the selected
     receiver is live only in the call link. Without the repair, ten of
     its twenty-one lines report `undefined` as the receiver.
  -  Rows `O1` through `O4` of the native-only *with-get-binding-value.ts*
-    fixture cover what V8 cannot observe because it skips GetBindingValue's
-    second HasProperty: a binding gone before Get short-circuits the sloppy
-    chain and throws `ReferenceError` in strict code, both before the
-    arguments; a traced Proxy observes `has`, `@@unscopables`, `has`, and
-    `get` before the arguments and is the call's `this`; and an abrupt
-    second `has` propagates.
+    fixture cover what V8 cannot observe, because V8 skips GetBindingValue's
+    second HasProperty. A binding gone before Get short-circuits the sloppy
+    chain, and strict code throws `ReferenceError`, both before the
+    arguments. A traced Proxy observes `has`, `@@unscopables`, `has`, and
+    `get` before the arguments and is the call's `this`. An abrupt second
+    `has` propagates.
  -  *tests/property/m5-optional-chaining.property.test.ts* adds the domain
     at seed `0x60002401` to the family's existing block. Its independent
     model follows ResolveBinding, GetBindingValue, and EvaluateCall for a
-    traced `with` Proxy holding an own, inherited, blocked, or no `f`, an
-    optional outer `with` object, a lexical or global fallback, four callee
-    kinds, a present, missing, or abrupt second `has`, and a sloppy or
-    strict nested caller. Native runs under both policies with forced
-    collection must equal the model; the reference engines are not
-    consulted for the same reason as above. The earlier domain at
-    `0x60002400` keeps its twelve cases and budget. With the repair
-    reverted the domain fails on an unscopables-blocked case whose outer
-    `with` object is the receiver.
- -  *packages/parser-babel/tests/statements.test.ts* checks the MIR: the
+    traced `with` Proxy holding an own, inherited, blocked, or no `f`. The
+    model also covers an optional outer `with` object, a lexical or global
+    fallback, four callee kinds, a present, missing, or abrupt second
+    `has`, and a sloppy or strict nested caller. Native runs under both
+    policies with forced collection must equal the model; the reference
+    engines are not consulted for the same reason as above. The earlier
+    domain at `0x60002400` keeps its twelve cases and budget. With the
+    repair reverted the domain fails on an unscopables-blocked case whose
+    outer `with` object is the receiver.
+ -  *packages/parser-babel/tests/statements.test.ts* checks the MIR. The
     first call link's receiver is the parameter of the join that also
-    carries the callee, whose two incoming values are the selected object
-    tested by GetBindingValue's `in` and a constant `undefined` from the
-    fallback, for a sloppy call, a parenthesized callee followed by a
-    second call, a strict nested caller, and a sloppy `return`, none of
-    them a tail call. A later call link and a comma callee keep a constant
-    `undefined` receiver.
+    carries the callee. The join's two incoming values are the selected
+    object tested by GetBindingValue's `in` and a constant `undefined` from
+    the fallback. The test covers a sloppy call, a parenthesized callee
+    followed by a second call, a strict nested caller, and a sloppy
+    `return`, none of them a tail call. A later call link and a comma
+    callee keep a constant `undefined` receiver.

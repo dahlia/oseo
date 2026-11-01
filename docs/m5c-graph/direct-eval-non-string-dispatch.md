@@ -46,8 +46,8 @@ The resolver now reads the current global `eval` property for a direct call
 as it already does for indirect calls. The generic call path captures the
 callee before evaluating every argument, including unused extras and spread
 iteration. Existing runtime %eval% returns a non-String unchanged, without
-ToString or any property access on it, and reports located `OSEO1001` for a
-String before executing any supplied source. Replacement functions retain
+ToString or any property access on it. For a String it reports located
+`OSEO1001` before executing any supplied source. Replacement functions retain
 ordinary behavior, and missing/noncallable bindings retain ordinary errors.
 No runtime/backend implementation, ABI, specialization or source evaluation
 capability changes.
@@ -72,11 +72,10 @@ parenthesized and spread call forms plus non-String identity values to its
 state model. Its seed block, case budgets, shrinking and deadlines remain.
 No new property file or shard weight is added.
 
-Author validation and the affected-row inventory are recorded below. Root owns
-Full UPDATE, observed promotions, fresh rejection digests, result/owner
-derivation, outer review, merge, push and effective landed state. Current
-stored classifications are retained until Root's actual observation; this note
-predicts no pass.
+Root owns Full UPDATE, observed promotions, fresh rejection digests,
+result/owner derivation, outer review, merge, push and effective landed
+state. Current stored classifications are retained until Root's actual
+observation; this note predicts no pass.
 
 The conservative Full UPDATE impact list selects the 626 reviewed rows whose
 stored diagnostic is `Unknown binding 'eval'.`, including the two owned

@@ -27,6 +27,7 @@ ADR 0016 eval-semantics exclusion assessment. One uses eval as fixture
 construction; another asserts an ordinary method implicit return
 independently of the evaluated arrow value. Both retain dynamic-source
 coverage remediation.
+
 The [owner assignments](/data/m5c-d17-20261031/train-b/owner-assignments.json)
 list every path. The
 [source audit](/data/m5c-d17-20261031/train-b/round2-investigation/independent-assertion-audit.json)
@@ -44,38 +45,38 @@ evidence; rejected candidates record why their sites do not qualify. The review
 applies the consolidated October 29 rules and every October 30 clarification
 before U.
 
-Failure guards, custom failure-only $DONE helpers, assertion messages,
-and expected-descriptor literals passed only to verifyProperty do not
-contribute tags. Descriptor literals used by Object.defineProperty
-remain prerequisites. A normal try is not abrupt-completion evidence;
-asserted throws, rejected promises, and generator completion resumptions
-retain that tag. Catch plumbing does not add control-flow, while
-branches that deliberately change the asserted iterator or thrown value
-do. Conditional test gating and oracle helpers do not add control-flow.
+Failure guards, custom failure-only $DONE helpers, assertion messages, and
+expected-descriptor literals passed only to verifyProperty do not contribute
+tags. Descriptor literals used by Object.defineProperty remain prerequisites. A
+normal try is not abrupt-completion evidence; asserted throws, rejected
+promises, and generator completion resumptions retain that tag.
 
-Array patterns, iterable spread, yield delegation, and for-await-of
-retain their reached implicit symbol/protocol dependencies. Operand
-errors before iterator acquisition do not establish protocol dispatch.
-Async generator
-definitions and stepping use async-iteration; ordinary async methods
-use async-functions. Parse-only negatives keep grammar families of
-the rejected subject without inferred runtime settlement or throws.
-The audit includes eval source and private-name static semantics.
-All subjects use the primary source; no fixture-derived rows occur.
+Catch plumbing does not add control-flow, while branches that deliberately
+change the asserted iterator or thrown value do. Conditional test gating and
+oracle helpers do not add control-flow.
 
-Root owns the scoped UPDATE, landing, and publication. This observation
-commit does not mark any graph node landed.
+Array patterns, iterable spread, yield delegation, and for-await-of retain
+their reached implicit symbol/protocol dependencies. Operand errors before
+iterator acquisition do not establish protocol dispatch. Async generator
+definitions and stepping use async-iteration; ordinary async methods use
+async-functions. Parse-only negatives keep grammar families of the rejected
+subject without inferred runtime settlement or throws.
 
-The first internal review adds lexical-grammar to 44 ASI subjects:
-fields-asi-4, the six after-method literal-names-asi variants,
-multiple-definitions-literal-names-asi, and 36 stacked-definition cases.
-The
+The audit includes eval source and private-name static semantics. All subjects
+use the primary source; no fixture-derived rows occur.
+
+Root owns the scoped UPDATE, landing, and publication. This observation commit
+does not mark any graph node landed.
+
+Lexical-grammar is added to 44 ASI subjects: fields-asi-4, the six after-method
+literal-names-asi variants, multiple-definitions-literal-names-asi, and 36
+stacked-definition cases. The
 [ASI audit](/data/m5c-d17-20261031/train-b/round1-investigation/asi-audit.json)
 covers all 1,859 train rows and distinguishes asserted insertion from explicit
 semicolons and complete method definitions. Execution counts and ownership are
 unchanged.
 
-The second-round
+The
 [identifier audit](/data/m5c-d17-20261031/train-b/round2-investigation/identifier-audit.json)
 adds lexical-grammar to 177 additional identifier-matrix rows. The 27 shared
 rs-\* cases explicitly specify IdentifierStart, IdentifierPart and Unicode
@@ -92,26 +93,28 @@ per-row evidence claims no runtime property lookup; the
 [full-train audit](/data/m5c-d17-20261031/train-b/round2-investigation/constructor-property-audit.json)
 records every disposition.
 
-Internal review round 3 corrected reach-marker scaffolding missed by the
-earlier audit: 43 rows lost `var-bindings` supported only by
-`var executed = false`, and 15 lost `expression-operators` supported only by
-`executed = true`. Other bindings and operators remain only where a separate
-asserted or prerequisite witness exists; marker evidence was also removed from
-eight retained binding records across B22a/B22b. Five rejected indirect-eval
-SuperProperty subjects gained `object-properties` as a grammar family, without
-claiming a runtime lookup. All 1,859 train sources were checked for these
-patterns; the source hashes and dispositions are in
+Reach-marker scaffolding missed by the earlier audit was corrected: 43 rows
+lost `var-bindings` supported only by `var executed = false`, and 15 lost
+`expression-operators` supported only by `executed = true`. Other bindings and
+operators remain only where a separate asserted or prerequisite witness exists;
+marker evidence was also removed from eight retained binding records across
+B22a/B22b. Five rejected indirect-eval SuperProperty subjects gained
+`object-properties` as a grammar family, without claiming a runtime lookup. All
+1,859 train sources were checked for these patterns; the source hashes and
+dispositions are in
 [marker and grammar audit](/data/m5c-d17-20261031/train-b/round3-investigation/marker-and-superproperty-audit.json).
 
-Internal review round 4 audited all 1,859 sources for asserted values
-from ordinary methods that discard an eval-created value. The
+All 1,859 sources were audited for asserted values from ordinary methods that
+discard an eval-created value. The
 [implicit-return audit](/data/m5c-d17-20261031/train-b/round4-investigation/implicit-return-audit.json)
 identifies one B22a mixed assertion: the public x method drops its private
 arrow call result, so the final undefined value is independent of that arrow
 new.target value. The
 [controlled source probes](/data/m5c-d17-20261031/train-b/round4-investigation/implicit-return-probe.json)
 confirm this distinction without changing the pinned source or native
-observation. That path remains in claim under active remediation; B21d and B22b
-ownership is unchanged. The node now owns 886 paths, including five from this
-train; 95 train paths retain the existing eval-semantics exclusion. No
-replacement evidence or ADR boundary change is claimed.
+observation.
+
+That path remains in claim under active remediation; B21d and B22b ownership is
+unchanged. The node now owns 886 paths, including five from this train; 95
+train paths retain the existing eval-semantics exclusion. No replacement
+evidence or ADR boundary change is claimed.

@@ -2,12 +2,12 @@ Reject uninitialized namespace binding operations
 =================================================
 
 Makes module namespace exotic object operations over uninitialized bindings
-throw ReferenceError as ECMA-262 requires, so the 5 observed namespace internals
-paths can be observed.
+throw ReferenceError, as ECMA-262 requires. The 5 observed namespace
+internals paths below exercise that behavior.
 
-The 5 paths below remain unreviewed in the closure ledger.
-Root authorized this ready, unlanded owner on 2026-10-27. The saved API
-observations used clean source `6aab0fc8`, tree
+The 5 paths below remain unreviewed in the closure ledger. Root authorized
+this ready, unlanded owner on 2026-10-27. The saved API observations used
+clean source `6aab0fc8`, tree
 `d6723be80209aca0fcf0606c5c3e5959f152ad0c`. The table records those
 original observations; the repair below does not rewrite them.
 
@@ -26,8 +26,10 @@ ECMA-262 contract
 10.4.6.5 `[[GetOwnProperty]]` of a module namespace returns `undefined` for
 a name outside `[[Exports]]` and otherwise performs `? O.[[Get]](P, O)`
 before building its data descriptor, so an uninitialized export binding
-throws a `ReferenceError`. Every abstract operation that asks for an own
-descriptor inherits that abrupt completion: `HasOwnProperty`,
+throws a `ReferenceError`.
+
+Every abstract operation that asks for an own descriptor inherits that
+abrupt completion: `HasOwnProperty`,
 `Object.prototype.propertyIsEnumerable`, `EnumerableOwnProperties`,
 `%ForInIteratorPrototype%.next` over the namespace or an object inheriting
 from it, `TestIntegrityLevel`, `CopyDataProperties`,
@@ -43,6 +45,7 @@ Repair
 The descriptor primitive returns a namespace export's binding cell rather
 than its value. The consumers that dereferenced the cell already threw;
 the ones that reported only presence or attributes did not.
+
 `oseo_internal_namespace_export_ready` in
 *packages/runtime-c/native/runtime\_descriptor.c* performs the binding read
 for a namespace export's cell and completes normally for every other
@@ -51,10 +54,11 @@ own-descriptor query in `oseo_object_has_own`, the Object built-in
 descriptor query (`propertyIsEnumerable`, `Object.keys`, `values`,
 `entries`, `assign`, `defineProperties`, `create`, and the spread copy),
 for-in key filtering, the JSON enumerability query, the `[[Set]]` receiver
-lookup, the Iterator prototype setter, and the integrity test. The
-integrity test walks the property vector, which holds a namespace's exports
-in `[[OwnPropertyKeys]]` order, so `Object.isFrozen` stops at the first
-initialized writable export exactly where ECMA-262 does.
+lookup, the Iterator prototype setter, and the integrity test.
+
+The integrity test walks the property vector, which holds a namespace's
+exports in `[[OwnPropertyKeys]]` order, so `Object.isFrozen` stops at the
+first initialized writable export exactly where ECMA-262 does.
 
 The Proxy target descriptor query now replaces any cell-backed value with
 the cell's value, which is the namespace `[[Get]]` and its

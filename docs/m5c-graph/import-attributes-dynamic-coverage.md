@@ -4,23 +4,25 @@ Import attribute dynamic coverage reservation
 This exact 64-path reservation uses test262 revision
 `f2d1435644797268dca1f7988cad5a4e89ccd8d2`.
 The import-attributes node observed each path as unsupported through the
-existing ImportExpression rejection. It first reserved them for remediation
-by `node:import-attributes-dynamic-coverage-remediation`; Git history keeps
-that assessment.
+existing ImportExpression rejection.
 
 The maintainer accounting decision of 2026-10-22 accounts for the 64 paths
 under the accepted [ADR 0016](../adr/0016-dynamic-source-boundary.md)
-boundary instead. Each path contains an
-ImportCall, and its subject is ImportCall syntax or evaluation: forwarding of
-the Yield, Await, and In parameters, options evaluation and abrupt completions,
-the `with` lookup and its enumeration, rejection of invalid options, promise
-settlement, trailing-comma calls, or the dynamic import site of JSON module
-identity. Twenty generated syntax cases only parse the call inside a function
-that is never called. That behavior is reachable only through `import()`, which
-ADR 0016 keeps rejected at parse time. Their ledger owner is
-`adr:0016-dynamic-source-boundary`, and each reviewed exclusion-audit row binds
-the pinned source and the observed rejection. The paths stay in the 41,091-path
-inventory and never count as passes.
+boundary, instead of the earlier
+`node:import-attributes-dynamic-coverage-remediation` reservation.
+Each path contains an ImportCall. Its subject is ImportCall syntax or
+evaluation: forwarding of the Yield, Await, and In parameters, options
+evaluation and abrupt completions, the `with` lookup and its enumeration,
+rejection of invalid options, promise settlement, trailing-comma calls, or the
+dynamic import site of JSON module identity.
+
+Twenty generated syntax cases only parse the call inside a function that is
+never called. That behavior is reachable only through `import()`, which
+ADR 0016 keeps rejected at parse time.
+
+The ledger owner is `adr:0016-dynamic-source-boundary`, and each reviewed
+exclusion-audit row binds the pinned source and the observed rejection. The
+paths stay in the 41,091-path inventory and never count as passes.
 
 Three paths compute their specifier at run time and would stay outside even
 the build-time literal subset of

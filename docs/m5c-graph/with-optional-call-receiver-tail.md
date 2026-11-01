@@ -4,7 +4,7 @@ Optional-call receivers through with in tail position
 This record backs the M5c graph node `with-optional-call-receiver-tail`
 (WOC-2). The maintainer decision of 2026-10-28 on the big-node split review
 (*20261028-m5c-scope-big-node-split.md*), item 4, approves it as WOC-2 of the
-`with-optional-call-receiver` split and makes it depend on
+`with-optional-call-receiver` split. The decision makes it depend on
 `with-optional-call-receiver-non-tail` (WOC-1) and `proper-tail-calls`.
 [*with-optional-call-receiver.md*](./with-optional-call-receiver.md)
 records the defect and explains why tail position reaches the
@@ -47,7 +47,7 @@ calls for a getter-produced function, null, undefined, a non-callable value,
 a throwing getter, a throwing first argument, and a throwing callee. The
 callee checks the selected receiver and two distinct heap arguments after
 allocating. The selected object and getter-produced callee have no global
-owner. Both forced-GC lists in *tests/native.ts* include the fixture;
+owner. Both forced-GC lists in *tests/native.ts* include the fixture.
 *tests/with-optional-call-receiver-tail.test.ts* runs it independently with
 Node.js and Deno references and both native specialization policies, forcing
 collection and requiring a positive collection count in each native run.
@@ -57,18 +57,20 @@ its reserved `0x60002400` through `0x600024ff` block. Ten draws each run
 strict optional and ordinary tail-call programs under both policies with
 forced collection and a heap argument. The independent model retains WOC-1's
 own, inherited, blocked, missing, nested-object and fallback selection
-cases and its present, missing or abrupt second HasProperty. Ordinary calls
-evaluate arguments before a non-callable error, including null and undefined;
-optional nullish calls skip them. V8's second-HasProperty discrepancy still
-precludes using it as the oracle for these traces. The earlier domains,
-seeds, case counts and limits stay unchanged.
+cases and its present, missing or abrupt second HasProperty. The earlier
+domains, seeds, case counts and limits stay unchanged.
+
+Ordinary calls evaluate arguments before a non-callable error, including
+null and undefined; optional nullish calls skip them. V8's
+second-HasProperty discrepancy still precludes using it as the oracle for
+these traces.
 
 The parser's statement tests assert, under both policies, that optional,
 parenthesized optional and ordinary strict calls take their receiver from
-the callee/receiver join, whose incoming receivers are the selected object
-and fallback undefined. Each call has `tail: true`, and its own block returns
-its result directly. These assertions cover the MIR contract independently
-of output matching.
+the callee/receiver join. The join's incoming receivers are the selected
+object and fallback undefined. Each call has `tail: true`, and its own block
+returns its result directly. These assertions cover the MIR contract
+independently of output matching.
 
 No result classifications, feature admissions, ledger owners, exclusions,
 or graph landed states change. ADR 0013, ADR 0016 and ADR 0019 retain their

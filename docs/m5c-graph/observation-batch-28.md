@@ -30,50 +30,52 @@ Dependency self-audit
 ---------------------
 
 The corrective audit covers every selected primary source and all 903 new
-admissions across this train. The first independent round found missing
-subject families and assertion-plumbing witnesses in the initial metadata.
-This round corrects 218 rows in this batch while preserving every
-classification and native observation. No original Main row is changed.
+admissions across this train. The first independent round found missing subject
+families and assertion-plumbing witnesses in the initial metadata. This round
+corrects 218 rows in this batch while preserving every classification and
+native observation. No original Main row is changed.
 
 Root clarified the rules on 2026-10-30: unsupported rows retain the tags of
-their explicit asserted contracts and prerequisites; those tags do not
-claim an observed pass. The full audit restores explicitly asserted thrown
-completions, inherited iterable consumers, foreign-realm Proxy aliases,
-boxed primitive Symbol dispatch, concrete TypedArray construction, and the
-actual delegated resizable-buffer subject operations. Parse-only rows keep
-their subject grammar families and no runtime-only families.
+their explicit asserted contracts and prerequisites; those tags do not claim an
+observed pass. The full audit restores explicitly asserted thrown completions,
+inherited iterable consumers, foreign-realm Proxy aliases, boxed primitive
+Symbol dispatch, concrete TypedArray construction, and the actual delegated
+resizable-buffer subject operations. Parse-only rows keep their subject grammar
+families and no runtime-only families.
 
 Manual failure-only if guards and expected descriptor bags passed only to
 verifyProperty are assertion plumbing. Their generic control-flow and
-object-literal tags are removed across the full cohort. Actual operators
-and conversions asserted by the guarded conditions remain. Four embedded
-do-while subjects and the deliberately throwing Proxy trap retain their
-control-flow contracts. Real caught ReferenceError/SyntaxError contracts
-retain abrupt-completion; normally completed try syntax alone does not.
-The audit also removes abrupt-completion from 22 empty-catch probes that
-swallow both a missing-name error and their own failure-only throw without
-asserting either completion.
+object-literal tags are removed across the full cohort. Actual operators and
+conversions asserted by the guarded conditions remain. Four embedded do-while
+subjects and the deliberately throwing Proxy trap retain their control-flow
+contracts.
+
+Real caught ReferenceError/SyntaxError contracts retain abrupt-completion;
+normally completed try syntax alone does not. The audit also removes
+abrupt-completion from 22 empty-catch probes that swallow both a missing-name
+error and their own failure-only throw without asserting either completion.
+
 The propertyHelper implementation adds no generic loops, keys, or operator
 coverage. Source Object.defineProperty descriptors and resizable-buffer
 construction options remain actual prerequisites.
 
-Generic witnesses come from the primary source and necessary delegated
-subject operations in reviewed includes. Fixture modules contribute only
-asserted linking and awaited evaluation prerequisites; incidental fixture
-syntax contributes no generic families. The evidence packet records source
-and fixture hashes, original witnesses, every correction and Root ruling.
-The current rows are in reviewed-tag-evidence.json; round2-tag-draft.json
-records the complete metadata delta and full-pattern decisions.
+Generic witnesses come from the primary source and necessary delegated subject
+operations in reviewed includes. Fixture modules contribute only asserted
+linking and awaited evaluation prerequisites; incidental fixture syntax
+contributes no generic families. The evidence packet records source and fixture
+hashes, original witnesses, every correction and Root ruling. The current rows
+are in reviewed-tag-evidence.json; round2-tag-draft.json records the complete
+metadata delta and full-pattern decisions.
 
 All 41 unsupported admissions in this batch retain active ownership by
-node:dynamic-source-coverage-remediation, with source and canonical
-observation digests in the audit.
+node:dynamic-source-coverage-remediation, with source and canonical observation
+digests in the audit.
 
 Across the train, 165 unresolved dynamic-source prerequisites retain that
 existing owner; their recorded diagnostics distinguish source-compilation,
 ImportExpression and eval-binding resolution rejections. No whole-path
-exclusion or equivalent replacement is claimed. ADR 0013, ADR 0016 and
-ADR 0019 remain unchanged.
+exclusion or equivalent replacement is claimed. ADR 0013, ADR 0016 and ADR 0019
+remain unchanged.
 
 
 Unreviewed follow-ups
@@ -88,8 +90,8 @@ Unreviewed follow-ups
 Scoped UPDATE agreement
 -----------------------
 
-Root ran the stock scoped UPDATE at U `8855ff49` against base `68b026bb`.
-It selected all 903 admitted train paths and returned 641 pass, 96
+Root ran the stock scoped UPDATE at U `8855ff49` against base `68b026bb`. It
+selected all 903 admitted train paths and returned 641 pass, 96
 expected-negative, and 166 unsupported results, with zero retries and zero
 partition writes. All 903 materialized observations agree strictly with the
 focused records. Existing 31,310 manifest results, 40,188 unaffected ledger
@@ -160,19 +162,20 @@ retries or partition writes. Strict agreement covered all 903 admissions;
 precheck exited 0 with no findings.
 
 All 18 provider stages completed. One DeepSeek response lacked the adapter's
-marked result block; Root authorized one retry at the same pass and
+marked result block. Root authorized one retry at the same pass and
 snapshot. The invalid attempt and every completed review remain in the
 dispatch evidence.
 
 The corrective audit scanned all 903 admissions for each reported pattern.
-It examined 216 candidates and changed 6 rows in this batch. Across the
-train, 25 rows change dependency metadata. Five const TDZ reads throw before
-addition is evaluated; input enumeration, data preparation and assertion
-gates lose their control-flow tags. Four invalid assignment targets keep the
-assignment syntax family. `with` in strict mode and `import.meta` outside
-the Module goal keep their subject syntax families. Three invoked
-foreign-realm Proxy bodies gain the object-literal construction
-prerequisite.
+It examined 216 candidates and changed 6 rows in this batch.
+
+Across the train, 25 rows change dependency metadata. Five const TDZ reads
+throw before addition is evaluated. Input enumeration, data preparation and
+assertion gates lose their control-flow tags. Four invalid assignment
+targets keep the assignment syntax family. `with` in strict mode and
+`import.meta` outside the Module goal keep their subject syntax families.
+Three invoked foreign-realm Proxy bodies gain the object-literal
+construction prerequisite.
 
 Root confirmed that the six Array grow/shrink cases retain control-flow:
 CollectValuesAndResize resizes the subject during iteration, the behavior
@@ -227,19 +230,21 @@ source-bound decisions are in round5-strict-with-pattern-audit.json.
 Primitive with follow-up admission
 ----------------------------------
 
-Root authorized the bounded with-primitive-binding-object-boxing U2 to
-admit *test/language/statements/with/12.10-2-1.js*, *12.10-2-2.js* and
+Root authorized the bounded with-primitive-binding-object-boxing U2 to admit
+*test/language/statements/with/12.10-2-1.js*, *12.10-2-2.js* and
 *12.10-2-3.js*. Fresh stock-runner observations on semantic U
 `d7808583c66ad45ef870ea4a28b394d9420fa7dd` pass all six non-strict native
 variants across both policies. Their tags are `expression-operators`,
 `object-properties` and `var-bindings`, audited in the
 [*with work note*](./with-primitive-binding-object-boxing.md). Canonical
-records move only these three ledger rows from unreviewed batch ownership
-to pass under observation. This batch retains one unreviewed original,
-*test/language/types/object/S8.6.2\_A8.js*, with its unchanged follow-up.
-The original train's observations retain their historical source binding.
-Root owns the combined Full, R, outer gate and publication; none is claimed
-by this admission.
+records move only these three ledger rows from unreviewed batch ownership to
+pass under observation.
+
+This batch retains one unreviewed original,
+*test/language/types/object/S8.6.2\_A8.js*, with its unchanged follow-up. The
+original train's observations retain their historical source binding. Root owns
+the combined Full, R, outer gate and publication; none is claimed by this
+admission.
 
 
 Final Annex B prototype admission
@@ -247,31 +252,32 @@ Final Annex B prototype admission
 
 Root authorized the final batch admission of
 *test/language/types/object/S8.6.2\_A8.js* on base
-`999f3416fdc62e2c28c2d067f22797306a781af2`. The reviewed executor classifies
-it `unsupported-profile-feature` with capability `profile-syntax`. Direct
-native runs on `linux-x86_64-gnu` reject all four variants, non-strict and
-strict with specialization enabled and disabled, at compile time with the
-same OSEO1001 Annex B `Object.prototype.__proto__` accessor diagnostic. Raw
-records, source hashes and natural exits are in
+`999f3416fdc62e2c28c2d067f22797306a781af2`. The reviewed executor classifies it
+`unsupported-profile-feature` with capability `profile-syntax`. Direct native
+runs on `linux-x86_64-gnu` reject all four variants, non-strict and strict with
+specialization enabled and disabled, at compile time with the same OSEO1001
+Annex B `Object.prototype.__proto__` accessor diagnostic. Raw records, source
+hashes and natural exits are in
 [the observation packet](/data/m5c-d17-20261031/ob28/).
 
-Its tags are `object-literals`, `object-properties` and `var-bindings`. The
-two empty object literals construct the subject and its intended prototype,
-the `__proto__` assignment and the asserted `Object.getPrototypeOf` result
-are the property subjects, and both `var` bindings are read on the executed
-path. The try statement only swallows the rejected write's error, so it adds
-no `control-flow` or `abrupt-completion` (rules 1 and 4). The `!==`
-comparison guards a failure-only `Test262Error`, so it adds no
-`expression-operators` or `control-flow`. The test uses no fixture, Symbol
-dispatch or iterator protocol, and diagnostic text supplies no tag.
+Its tags are `object-literals`, `object-properties` and `var-bindings`. The two
+empty object literals construct the subject and its intended prototype. The
+`__proto__` assignment and the asserted `Object.getPrototypeOf` result are the
+property subjects. Both `var` bindings are read on the executed path.
+
+The try statement only swallows the rejected write's error, so it adds no
+`control-flow` or `abrupt-completion` (rules 1 and 4). The `!==` comparison
+guards a failure-only `Test262Error`, so it adds no `expression-operators` or
+`control-flow`. The test uses no fixture, Symbol dispatch or iterator protocol,
+and diagnostic text supplies no tag.
 
 Root ruled that the mixed path needs its own bounded owner. This change adds
 node `ordinary-object-proto-coverage-remediation`, lets the exclusion audit
 accept it as an Annex B remediation owner, and records assessment
 `annex-b-ordinary-object-prototype` with disposition `remediation` and
-normative dependency `not-demonstrated`. No exclusion or replacement
-evidence is claimed; the [*node work
-note*](./ordinary-object-proto-coverage-remediation.md) lists related
-passing core rows. The batch now owns no unreviewed path and leaves the
+normative dependency `not-demonstrated`. No exclusion or replacement evidence
+is claimed; the
+[*node work note*](./ordinary-object-proto-coverage-remediation.md) lists
+related passing core rows. The batch now owns no unreviewed path and leaves the
 observation batch plan. Root owns the scoped UPDATE, outer review and
 publication.

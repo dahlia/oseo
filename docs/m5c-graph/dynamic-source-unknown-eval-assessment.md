@@ -20,18 +20,18 @@ variants on `linux-x86_64-gnu`. The other 55 remained in remediation: 31
 completion-value probes, 23 literal probes and one ImportCall probe. DS-3
 added no native or fixture tests.
 
-DS-17 subsequently supplies fixed static rejection witnesses for 18 of
-those literal grammar paths. Their rows below now name
+DS-17 supplies fixed static rejection witnesses for 18 of those
+literal grammar paths. Their rows below name
 *tests/regexp-static-grammar.test.ts* and ADR 0016 accounting; the original
 11/55 summary above records the DS-3 publication result. The DS-17
 [per-path assessment](./dynamic-source-regexp-static-evidence.assessment.md)
-records this follow-up and retains the four exhaustive BMP domains.
+records the follow-up and retains the four exhaustive BMP domains.
 
 For a remediation row, a named static counterpart supplies partial syntax
 evidence only. “None established” means this assessment establishes no
 complete replacement, not that the repository contains no related tests.
 DS-3 recomputed original source and observation digests for every audit
-row, and its 11 original exclusions bind replacement result partitions by
+row. Its 11 original exclusions bind replacement result partitions by
 SHA256. The tables retain those pinned replacement source digests. The
 DS-17 audit assessments additionally bind its static grammar test source.
 

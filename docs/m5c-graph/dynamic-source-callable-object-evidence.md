@@ -96,16 +96,17 @@ The audit names the replacement groups and binds their fixture, focused
 runner, native registration and assessment by SHA256. Every selected source
 and normalized observation digest was recomputed. The 61 exclusions keep
 all original assertions and the unsupported-profile-feature classification;
-no result becomes a pass. All 41,091 inventory paths remain. ADR 0013/0016/
-0019, dependency tags, subset and results are unchanged, so no UPDATE is
-needed. Changed source, observation or replacement evidence requires a fresh
-assessment. ADR 0016's reopening triggers and ADR 0019's non-source
-normative-dependence trigger remain in force.
+no result becomes a pass. All 41,091 inventory paths remain.
+
+ADR 0013/0016/0019, dependency tags, subset and results are unchanged, so
+no UPDATE is needed. Changed source, observation or replacement evidence
+requires a fresh assessment. ADR 0016's reopening triggers and ADR 0019's
+non-source normative-dependence trigger remain in force.
 
 This note records only DS-14's delta. Root owns shared umbrella totals,
 outer review, full exact-candidate CI, UPDATE scheduling, publication,
 landing, merge and push. The full ordinary and extended property suites on
-both supported native hosts remain required by PLAN-M5C.md before landing;
+both supported native hosts remain required by *PLAN-M5C.md* before landing;
 this worker ran no full suite. Internal review artifacts and exact commit
 IDs are supplied in the worker report.
 

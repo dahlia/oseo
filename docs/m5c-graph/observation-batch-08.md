@@ -78,13 +78,14 @@ including implicit Symbol and iterator dispatch. Failure-only
 tags. A normally completing `try` alone supplies no abrupt-completion
 evidence; specific thrown-error assertions and required rejection
 propagation do. Every parse-only negative carries grammar families of
-its directly rejected subject. Generic grammar/runtime tags come from
-the primary source and relevant includes, excluding helper internals.
-Fixture modules propagate only asserted or prerequisite semantics; this
-cohort's observed module graphs have no fixture-module dependencies, so
-fixture-derived rows are zero. Non-String eval identity is not source
-compilation. Static scans are audit inputs, never observations or clean
-review verdicts.
+its directly rejected subject.
+
+Generic grammar/runtime tags come from the primary source and relevant
+includes, excluding helper internals. Fixture modules propagate only
+asserted or prerequisite semantics; this cohort's observed module graphs
+have no fixture-module dependencies, so fixture-derived rows are zero.
+Non-String eval identity is not source compilation. Static scans are
+audit inputs, never observations or clean review verdicts.
 
 
 Verification and publication
@@ -123,17 +124,18 @@ Internal review round 1 corrections
 -----------------------------------
 
 All seven train scopes completed both adapter v2x stages at
-`a70acc71099dba55f188d3b62e4abf30919bcbea`: OpenCode DeepSeek followed by Codex
-Astra at standard speed. Astra reported six blocking tag patterns across the
-direct-eval, indirect-eval and destructuring scopes. The remaining scopes were
-clean; this is a round history, not a final clean verdict for the corrected
-tree. Raw reviews and all attempt metadata are under
+`a70acc71099dba55f188d3b62e4abf30919bcbea`, OpenCode DeepSeek followed by
+Codex Astra at standard speed. Astra reported six blocking tag patterns
+across the direct-eval, indirect-eval and destructuring scopes. The
+remaining scopes were clean in this round, not a final clean verdict for
+the corrected tree. Raw reviews and all attempt metadata are under
 [the raw review directory](/data/m5c-train-b06-b08-b14-20261029/task_816c5a04798f/ctx_6f53d3a87142/internal-round1/).
 
-Before this correction, all 1,153 admitted train rows were audited again against
-the eight rules, with matching source identities. For this batch, all 462
-admitted rows were included and 11 rows change: remove 10 object-literals;
-remove 1 abrupt-completion. The per-row audit and source-bound decisions are in
+Before this correction, all 1,153 admitted train rows were audited again
+against the eight rules, with matching source identities. For this batch,
+all 462 admitted rows were included and 11 rows change: remove 10
+object-literals; remove 1 abrupt-completion. The per-row audit and
+source-bound decisions are in
 [the full-row audit](/data/m5c-train-b06-b08-b14-20261029/task_816c5a04798f/ctx_6f53d3a87142/round1-full-row-self-audit.json).
 Classification, ownership and actual observations are unchanged.
 
@@ -148,7 +150,7 @@ state remain prerequisites and carry that tag. The full pattern audit covers all
 The audit also covers eight `with` candidates, 41 eval/comparison candidates,
 all three runtime-negative frontmatters and 15 tagged `thrower` candidates.
 Original supplied eval comparisons and assignments that determine the assertion
-are distinguished from outer assertion plumbing; runtime-negative SyntaxError
+are distinguished from outer assertion plumbing. Runtime-negative SyntaxError
 metadata supplies an asserted error contract. Only reached property hits in a
 `with` environment require its implicit Symbol lookup. The unused thrower in
 normal iterator exhaustion supplies no abrupt-completion claim. Parse-only and
@@ -225,19 +227,20 @@ Outer review: evaluated source prerequisites
 The follow-up audit at R5 (`449842a9`) checked all 462 admitted rows
 in this batch and all 1,153 admitted rows across B06/B08/B14. Source
 hashes match the preceding audit. The audit traced eval and Function
-source arguments, including nested source strings, and distinguished
+source arguments, including nested source strings. It distinguished
 constructed subject prerequisites from assertion messages, non-String
-identity probes and rejected grammar. Both held B06 sources were also
+identity probes and rejected grammar. Both held B06 sources were
 inspected and remain unreviewed.
 
 Only B06-ROWS-001 changes a row: indirect *always-non-strict.js* gains
 `object-literals` because its evaluated `with ({}) {}` constructs the
 object required by the asserted strictness probe. Empty blocks in
 completion tests construct no objects. Other supplied declarations,
-operators and classes already have their applicable tags. No other tag
-family, classification, owner or raw observation changes. B06's deliver
-text now states partial observation: 332 admitted and two held from the
-334-path cohort.
+operators and classes already have their applicable tags.
+
+No other tag family, classification, owner or raw observation changes.
+B06's deliver text now states partial observation: 332 admitted and
+two held from the 334-path cohort.
 
 The full audit and candidate dispositions are recorded in
 [the outer-fix audit](/data/m5c-train-b06-b08-b14-20261029/task_327a4df2e5ee/ctx_3d3c7fa767fb/full-row-audit.json).

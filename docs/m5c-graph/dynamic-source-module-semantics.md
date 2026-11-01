@@ -5,7 +5,7 @@ This record backs the M5c graph node `dynamic-source-module-semantics`
 (DS-2). The maintainer decision of 2026-10-28 on the big-node split review
 (*20261028-m5c-scope-big-node-split.md*) keeps module evaluation order,
 top-level await, module namespace objects, and JSON module identity in
-remediation (item 2) and approves this node as DS-2 of the
+remediation (item 2). It approves this node as DS-2 of the
 `dynamic-source-coverage-remediation` split (item 4). The umbrella lands
 when it owns zero paths.
 
@@ -17,8 +17,8 @@ This node selects from the 393 OSEO1001 ImportExpression rejections that
 `observation-batch-20` and `observation-batch-30` add to the umbrella;
 *dynamic-source-importcall-accounting.md* records their path-set digest. The
 umbrella owns them once both batches land. The node records both batches in
-`after`; selection and publication wait for their landing without adding
-dependency ancestry. The candidates are:
+`after`. Selection and publication are deferred until both batches land,
+without adding dependency ancestry. The candidates are:
 
  -  the 61 paths under *test/language/expressions/dynamic-import/namespace/*;
  -  the 11 module code paths: 10 under
@@ -44,8 +44,8 @@ Evidence obligations
  -  Review replacement fixtures that observe each module subject through
     static imports, preserving every original path and assertion.
  -  A path closes under `adr:0016-dynamic-source-boundary` only by item 1 of
-    the decision, with a fresh-digest exclusion-audit record that names the
-    replacement paths and observations and shows that only source
+    the decision, with a fresh-digest exclusion-audit record. The record
+    names the replacement paths and observations and shows that only source
     evaluation remains. Otherwise it stays in remediation.
  -  Never count a pass, emulate dynamic import, or widen ADR 0016. ADR 0016
     and ADR 0019 remain unchanged, and all 41,091 inventory paths remain.
@@ -58,9 +58,11 @@ The per-path table is
 [*dynamic-source-module-semantics-assessment.yaml*](./dynamic-source-module-semantics-assessment.yaml).
 It lists every remaining ImportExpression rejection in the landed train: 175
 paths after DS1's 218 exclusions. Of these, 108 have DS2 subjects. The 48 catch
-cases concern target parsing or linking validation, and 18 usage cases concern
-the Script versus Module loading goal; these 66 stay outside the four DS2
-subject families. The grammar-only
+cases concern target parsing or linking validation; the 18 usage cases concern
+the Script versus Module loading goal. These 66 stay outside the four DS2
+subject families.
+
+The grammar-only
 *top-level-await/syntax/await-expr-dyn-import.js* stays with the umbrella for
 ImportCall reassessment. The separate *dynamic-import/usage-from-eval.js*
 observes an unknown-eval rejection and belongs to DS3, so it is not selected
@@ -93,15 +95,16 @@ Literal sentinels differ in some static tests without changing the observed
 operation. The named default-generator counterpart returns 88 instead of
 42, retaining the initialization and inferred-name assertions. The static
 default-binding counterpart calls the function returning 1 and then reads
-the updated binding value 2. Direct imports alone do not observe the
-namespace property's live value, so the added
-*tests/fixtures/module-default-namespace-update/entry.mjs* imports a
-namespace statically, calls `namespace.default()` and then reads
+the updated binding value 2.
+
+Direct imports alone do not observe the namespace property's live value. The
+added *tests/fixtures/module-default-namespace-update/entry.mjs* therefore
+imports a namespace statically, calls `namespace.default()` and then reads
 `namespace.default`. Its default function updates its own binding before
 returning 1, so the next property read must yield 2. This preserves the
-namespace assertions in all 18 usage variants. Await and then only acquire
-the namespace for these assertions; only the dynamic source-evaluation site
-remains after this replacement evidence.
+namespace assertions in all 18 usage variants. The await and then forms only
+acquire the namespace for these assertions; after this replacement evidence,
+only the dynamic source-evaluation site remains.
 
 The 32 selected module-subject paths without complete replacement evidence
 retain umbrella ownership, as do the 67 candidates outside DS2. Each

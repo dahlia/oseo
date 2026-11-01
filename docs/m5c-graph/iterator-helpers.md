@@ -29,7 +29,7 @@ contains 392 originally gated paths plus
 `cross-realm-host` landed. The three IH-B paths leave 390 IH-A paths:
 389 passes and one unsupported observation, matching IH-A's accounting.
 
-Every row was checked against the checked-in partition under
+Each row matches the checked-in partition under
 *tests/test262/results/* and the derived ledger at Main
 `74bb8e47c26e47c765c98c86bb37c41d152c699d`, suite revision
 `f2d1435644797268dca1f7988cad5a4e89ccd8d2`. Each original path occurs

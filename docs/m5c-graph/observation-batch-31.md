@@ -6,11 +6,12 @@ remaining unreviewed paths. Its task reconciles the 65 original path/source
 identities in
 [*import-attributes-reservation-reconciliation.md*](./import-attributes-reservation-reconciliation.md).
 The focused reconciliation confirms one parse `expected-negative` and 64
-`unsupported-profile-feature` records in the canonical manifest. Each of the 64
-unsupported originals remains owned by `adr:0016-dynamic-source-boundary` in
-the closure ledger under the maintainer accounting decision of October 22. An
-accepted ADR 0016 amendment admitting any form of dynamic import reopens that
-accounting decision.
+`unsupported-profile-feature` records in the canonical manifest.
+
+Each of the 64 unsupported originals remains owned by
+`adr:0016-dynamic-source-boundary` in the closure ledger under the maintainer
+accounting decision of October 22. An accepted ADR 0016 amendment admitting
+any form of dynamic import reopens that accounting decision.
 
 The audit reads all 65 pinned upstream sources and verifies their SHA256
 hashes against the historical reservation. Every original has exactly one

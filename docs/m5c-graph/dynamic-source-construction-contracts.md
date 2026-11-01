@@ -127,65 +127,67 @@ reconcile at publication.
 ### Ordinary grammar and results
 
 *tests/construction-static-contracts.test.ts* adds eight static negative
-groups, one structural group and seven string-result mutation checks.
-Complete ordinary function definitions reject strict duplicate parameters,
-strict `eval`/`arguments` parameters, strict `with`, an unbound private
-name, an invalid `var` binding and an invalid numeric parameter list. Both
-specialization policies report owned `OSEO0001` syntax diagnostics without
-MIR; the Node.js and Deno reference compilers report `SyntaxError`. These
-observations cover the same ordinary FormalParameters and FunctionBody
-early errors. Catching a SyntaxError object in the original is the
-observer for that parse failure, rather than a separate error-object
-mutation or descriptor contract.
+groups, one structural group and seven string-result mutation checks. Complete
+ordinary function definitions reject strict duplicate parameters, strict
+`eval`/`arguments` parameters, strict `with`, an unbound private name, an
+invalid `var` binding and an invalid numeric parameter list. Both
+specialization policies report owned `OSEO0001` syntax diagnostics without MIR;
+the Node.js and Deno reference compilers report `SyntaxError`. These
+observations cover the same ordinary FormalParameters and FunctionBody early
+errors. Catching a SyntaxError object in the original is the observer for that
+parse failure, rather than a separate error-object mutation or descriptor
+contract.
 
-The fixed *tests/native/fixtures/construction-static-contracts.ts* fixture
-adds six observation groups: duplicate parameter bindings; sloppy `eval` and
+The fixed *tests/native/fixtures/construction-static-contracts.ts* fixture adds
+six observation groups: duplicate parameter bindings; sloppy `eval` and
 `arguments` parameter acceptance; `arguments[0]` identity for numeric and
 String inputs; `instanceof Function` and `.constructor` identity; true and
 undefined return values; and the exact left-associative sums `6`, `ABBA1` and
 `2ABBA`. Each of its 17 primitive observations is checked with `Object.is`
 before printing, so a difference in type or value throws and fails execution.
+
 Seven mutations substitute strings with identical printed text: one each for
 duplicate bindings, named parameters, argument identity, Function predicates
-and numeric sums, plus separate true and undefined return cases. Each
-mutated test must throw in the reference hosts. Its native registration in
-*tests/native.ts* runs both policies,
-enters both forced-GC lists, checks the fixed expected output and positive
-collection count, and retains the structural property guards/generic fallback
-checks. No property-generator domain or compiler/runtime support is added.
+and numeric sums, plus separate true and undefined return cases. Each mutated
+test must throw in the reference hosts.
+
+Its native registration in *tests/native.ts* runs both policies, enters both
+forced-GC lists, checks the fixed expected output and positive collection
+count, and retains the structural property guards/generic fallback checks. No
+property-generator domain or compiler/runtime support is added.
 
 The local strictness tests share ordinary strict-function grammar with these
-negative witnesses. A constructed function's independence from a strict
-caller is different: the constructor parses a separate body whose own
-ContainsUseStrict controls that grammar. Static sloppy definitions witness
-the admitted ordinary grammar; the separate-source strictness selection
-remains part of the excluded CreateDynamicFunction operation. Likewise,
-combining primitive String parameter arguments and choosing call versus new
-are source-construction steps. The nine result closures use only primitive
-String source arguments; their exact ordinary result and Function identity
-assertions have static/native witnesses.
+negative witnesses. A constructed function's independence from a strict caller
+is different: the constructor parses a separate body whose own
+ContainsUseStrict controls that grammar. Static sloppy definitions witness the
+admitted ordinary grammar; the separate-source strictness selection remains
+part of the excluded CreateDynamicFunction operation. Combining primitive
+String parameter arguments and choosing call versus new are source-construction
+steps. The nine result closures use only primitive String source arguments;
+their exact ordinary result and Function identity assertions have static/native
+witnesses.
 
 ### Remaining mixed subjects
 
 The other 26 argument rows retain remediation because their conversions feed
-parameter or body parsing, or establish ordering across argument evaluation
-and constructor conversion. In particular, *A3\_T1* requires parameter ToString
-to throw `1` before the body conversion that would throw `"body"`; *A3\_T3*
+parameter or body parsing, or establish ordering across argument evaluation and
+constructor conversion. In particular, *A3\_T1* requires parameter ToString to
+throw `1` before the body conversion that would throw `"body"`. *A3\_T3*
 requires parameter conversion to change `p` before the body's exact thrown
 String. The *A2\_T4* through *A2\_T6* counters connect repeated conversion,
-created parameter names and later call results. Calling String explicitly
-would remove the constructor boundary these tests assert. Even the primitive
-non-String conversion cases keep their precise unwitnessed interaction in
-the table; the empty ordinary function alone does not establish it.
+created parameter names and later call results. Calling String explicitly would
+remove the constructor boundary these tests assert. Even the primitive
+non-String conversion cases keep their precise unwitnessed interaction in the
+table; the empty ordinary function alone does not establish it.
 
-All seven subclass rows retain remediation. Their Function-family allocation
-or internal-slot initialization cannot be reached without invoking the
-excluded source-compiling constructor. Static generator name/length/prototype
-checks and unrelated built-in subclasses would not witness these exact
-subclass instances. *super-must-be-called.js* also asserts successful super
-initialization and GeneratorFunction identity, so its ReferenceError half
-cannot close the whole path. Root was asked for a bounded decision on these
-unreachable mixed contracts; no broader exclusion is assumed.
+All seven subclass rows retain remediation. Their Function-family allocation or
+internal-slot initialization cannot be reached without invoking the excluded
+source-compiling constructor. Static generator name/length/prototype checks and
+unrelated built-in subclasses would not witness these exact subclass instances.
+*super-must-be-called.js* also asserts successful super initialization and
+GeneratorFunction identity, so its ReferenceError half cannot close the whole
+path. Root was asked for a bounded decision on these unreachable mixed
+contracts; no broader exclusion is assumed.
 
 ### Validation and publication
 

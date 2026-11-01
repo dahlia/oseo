@@ -20,7 +20,7 @@ retained CI measurements, not new executions in this worktree.
 The two fixed computed-member and compound-member tests and the generated
 compound-member test dominate the file. File-level partitioning cannot
 split this tail. The bounded remedy is to split the fixed tests into
-separately reviewed property files, with the compatibility ratchet and
-language-profile records updated, or reduce their native compile cost.
+separately reviewed property files, updating the compatibility ratchet
+and language-profile records, or to reduce their native compile cost.
 Preserve every case count, seed and budget. This node changes no generator,
 runner, observation, implementation or interrupt limit by itself.

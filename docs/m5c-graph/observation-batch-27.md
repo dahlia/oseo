@@ -39,20 +39,25 @@ Dependency self-audit
 
 Every row was checked against the consolidated tag rules of October 29
 and every October 30 clarification. Tags name an asserted source contract
-or its prerequisites. Assertion messages, failure-only Test262Error
-branches, normally completing try statements and expected-error checking
-plumbing supply no independent coverage. Catch environments and statement
-completion forms retain control-flow only when they are subjects; helper
-branches that change an asserted operation retain the prerequisite.
+or its prerequisites.
+
+Assertion messages, failure-only Test262Error branches, normally completing
+try statements and expected-error checking plumbing supply no independent
+coverage. Catch environments and statement completion forms retain
+control-flow only when they are subjects; helper branches that change an
+asserted operation retain the prerequisite.
 
 Expected-descriptor objects passed only to verifyProperty are excluded
 from object-literals; Object.defineProperty descriptors remain prerequisites.
 Literal eval and Function source strings are parsed for their actual subject
-syntax, including evaluated object literals. Implicit iterable consumers
-retain iterator-protocol and symbols where their Symbol-keyed lookup is
-reached. Parse-only negatives retain subject grammar families without
-runtime promise, abrupt-completion or protocol claims. Original declaration
-conflicts include both declarations in the rejected early-error contract.
+syntax, including evaluated object literals.
+
+Implicit iterable consumers retain iterator-protocol and symbols where their
+Symbol-keyed lookup is reached. Parse-only negatives retain subject grammar
+families without runtime promise, abrupt-completion or protocol claims.
+Original declaration conflicts include both declarations in the rejected
+early-error contract.
+
 No fixture module contributes a tag in this train; the fixture-derived
 row count is zero. Existing subset rows, classifications, tags and owners
 are preserved.
@@ -147,11 +152,16 @@ All 1,669 train rows were rechecked against each finding pattern and the
 latest consolidated tag rules, including Root's October 30 clarifications.
 This batch has 86 dependency rows corrected in that audit.
 
-The audit corrected lexical-declaration conflicts and ASI grammar, parse-only
-enumeration claims, unused function wrappers, skipped initializer and
-post-throw operators, executed rest-consumption counters, asserted abrupt
-completions and runtime errors, implicit with/concat Symbol dispatch, and
-checking-only control flow around thrown values.
+The audit corrected:
+
+ -  lexical-declaration conflicts and ASI grammar
+ -  parse-only enumeration claims
+ -  unused function wrappers
+ -  skipped initializer and post-throw operators
+ -  executed rest-consumption counters
+ -  asserted abrupt completions and runtime errors
+ -  implicit with/concat Symbol dispatch
+ -  checking-only control flow around thrown values
 
 Root confirmed that a declaration used only as an unread assignment
 target for source that must fail to parse adds no holder syntax coverage.
@@ -216,7 +226,7 @@ unexecuted operator. The function-local TDZ case retains its invoked inner
 function; ordinary assert.throws wrappers alone add no function family. Skipped
 default observers, shape-check predicates, unused holders and constant markers
 add no dependency coverage. The implicit iterator lookup stays in
-iterator-protocol rather than object-properties, and actual catch-scope
+iterator-protocol rather than object-properties. Actual catch-scope
 subjects, Error formatting calls and loop inputs retain their families.
 
 Root confirmed the skipped-default helper, Array.isArray oracle, implicit
@@ -244,13 +254,14 @@ The property audit preserves actual object-pattern reads, indexed element
 assertions and property setup. Implicit iterator lookups and Array.isArray
 oracle checks add no independent property family. Nullish inputs that abort
 before named-property reads retain their actual TypeError, binding and iterator
-contracts. The three closure getters lose their addition because a TDZ read
-throws first; direct closure assignments remain actual write subjects. Static
-lexical-name conflicts retain lexical-bindings for async functions, generators,
-classes and the early catch/block-function conflict. The false-gated labeled
-let/ASI case loses its unreachable assignment while the if/while contrasts
-retain their executed assignments. Actual var, catch and captured-scope
-subjects remain.
+contracts.
+
+The three closure getters lose their addition because a TDZ read throws first;
+direct closure assignments remain actual write subjects. Static lexical-name
+conflicts retain lexical-bindings for async functions, generators, classes and
+the early catch/block-function conflict. The false-gated labeled let/ASI case
+loses its unreachable assignment while the if/while contrasts retain their
+executed assignments. Actual var, catch and captured-scope subjects remain.
 
 Declarations used only to observe that a counter update never executes
 add no var-bindings coverage. The audit distinguishes skipped defaults,
@@ -275,7 +286,7 @@ The full-train audit checked every remaining var-bindings row against the
 executed-use rule, including all previously retained marker contrasts.
 In this batch, `try/S12.14_A17.js` drops var-bindings. Its sole var i only
 numbers failure messages; the constructor increments it without observing
-its value on a successful path. That diagnostic counter is scaffolding.
+its value on a successful path.
 
 Var declarations which are themselves the subject retain their tags under
 Root's clarified rule, including destructuring initialization and grammar

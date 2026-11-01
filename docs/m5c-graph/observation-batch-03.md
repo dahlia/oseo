@@ -30,12 +30,14 @@ before U.
 
 Tags describe asserted source operations or their prerequisites. The
 audit removes candidates whose only sites are diagnostic arguments,
-uncalled bodies, or unreached operations, and normal try completion is
-not an abrupt-completion witness. Asserted throws and runtime negatives
-retain their abrupt-completion tags. Implicit iterator consumers and
-object conversions carry their reached symbol/protocol dependencies.
-The TypedArray audit distinguishes static methods, construction, and
-indexed access, including the explicit makeCtorArg factory variants.
+uncalled bodies, or unreached operations. Normal try completion is not
+an abrupt-completion witness. Asserted throws and runtime negatives
+retain their abrupt-completion tags.
+
+Implicit iterator consumers and object conversions carry their reached
+symbol/protocol dependencies. The TypedArray audit distinguishes static
+methods, construction, and indexed access, including the explicit
+makeCtorArg factory variants.
 
 Parse-only negatives retain syntax families of the rejected subject;
 no promise-settlement, module-linking, or abrupt-completion runtime tag
@@ -79,6 +81,7 @@ The first paired internal review completed all four scopes. It found
 missing implicit symbol dispatch, TypedArray getter and construction
 phase mistakes, uncalled mapper/factory operations, async-only generator
 claims, normal try completion, and incidental parser-recovery syntax.
+
 The
 [full-row pattern audit](/data/m5c-b01-b03-b18-20261029/task_b827cc9b95b8/ctx_3dcead5a3eca/fix-round-1/all-row-pattern-audit.json)
 sweeps all 944 admitted rows before this bundled correction. The
@@ -101,9 +104,11 @@ removes operator tags recovered from deliberately invalid English prose.
 
 The saved observations remain unchanged. Root verified correction U2
 `5627d317` against baseline `6bdf3176` on the remote Linux pool. The
-scoped UPDATE finished naturally with exit 0: 152 selected records,
-138 pass, one expected-negative, 13 unsupported, and zero retries. It
-wrote no partitions and produced an empty diff. The
+scoped UPDATE finished with exit 0: 152 selected records, 138 pass, one
+expected-negative, 13 unsupported, and zero retries. It wrote no
+partitions and produced an empty diff.
+
+The
 [raw UPDATE output](/data/m5c-b01-b03-b18-20261029/root-scoped-5627d317/remote-20261029T155848Z-10dafd8b0ab5/stdout)
 and
 [metadata](/data/m5c-b01-b03-b18-20261029/root-scoped-5627d317/remote-20261029T155848Z-10dafd8b0ab5/meta.json)
@@ -132,14 +137,15 @@ changes 90 rows across the train and 89 in this batch; classifications,
 execution records, owners, and existing Main rows stay unchanged.
 
 All 48 SharedArrayBuffer subjects execute within one agent. Their tag is
-atomics-single-agent; none claims an agent cluster. Explicit successful
-makeCtorArg buffer factories contribute their reached buffer getter and
-any executed byte-copy prerequisites. Throwing newTarget prototype access
-contributes no later cloning witness, even when an earlier input factory is
-valid. A reached GetMethod @@iterator check is part of protocol acquisition
-when an array-like fallback is selected; it does not prove a later step when
-the method is absent. Mapper validation that prevents the check remains
-excluded.
+atomics-single-agent; none claims an agent cluster.
+
+Explicit successful makeCtorArg buffer factories contribute their reached
+buffer getter and any executed byte-copy prerequisites. Throwing newTarget
+prototype access contributes no later cloning witness, even when an earlier
+input factory is valid. A reached GetMethod @@iterator check is part of
+protocol acquisition when an array-like fallback is selected; it does not
+prove a later step when the method is absent. Mapper validation that prevents
+the check remains excluded.
 
 The
 [handoff state](/data/m5c-b01-b03-b18-20261029/task_b827cc9b95b8/ctx_3dcead5a3eca/source-and-result-state.json)
@@ -164,11 +170,15 @@ owners, and observations.
 Nine rows lose control-flow from input enumeration, oracle assertions,
 or branches that only gate the test body. Independent properties,
 operators, protocols, and actual error-producing branches retain their
-tags. The duplicate BoundNames ImportDeclaration negative carries
+tags.
+
+The duplicate BoundNames ImportDeclaration negative carries
 module-linking as its module static-semantics syntax family, as Root
 ruled under rule 6. It supplies no runtime linking evidence. The other
 three import negatives assert escaped contextual keywords and retain
-lexical-grammar. No fixture is evaluated, no exclusion changes, and
-all prior Main rows remain unchanged. The
+lexical-grammar.
+
+No fixture is evaluated, no exclusion changes, and all prior Main rows
+remain unchanged. The
 [finding resolutions](/data/m5c-b01-b03-b18-20261029/task_b827cc9b95b8/ctx_3dcead5a3eca/fix-round-4/finding-resolutions.json)
 record both review identities and the approved adjudication.

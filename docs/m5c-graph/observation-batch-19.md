@@ -24,7 +24,7 @@ The 66 unknown-eval and 393 ImportExpression rejections across this train
 belong to `dynamic-source-coverage-remediation`. The 12 await-in-top-level
 pattern rejections belong to `module-top-level-await-patterns`. These are
 active remediation, with no new exclusion or change to ADR 0016. The
-existing owners and their prior paths remain preserved.
+existing owners and their prior paths are preserved.
 
 The admission is intermediate until the stock scoped UPDATE agrees with
 the API records. Root owns candidate CI, landing state and publication.
@@ -53,10 +53,12 @@ initialization, loops, and branches are plumbing. The source audit also
 checks evaluated class bindings, observed Promise chains, reached object
 coercions, object-valued await reads, and heritage prototype reads.
 
-All counts below describe the **full dispatch**, comparing `3a0e7449`
+All counts below describe the full dispatch, comparing `3a0e7449`
 with the current subset. They come from the
 [full dispatch delta](/data/m5c-b19-b20-b30-20261027/task_c268e41dfa6d/ctx_e6fde0372f06/round9/all-dispatch-tag-changes.json).
-It changes 961 rows across the train and 168 owned rows here. The latest
+It changes 961 rows across the train and 168 owned rows here.
+
+The latest
 [correction-round delta](/data/m5c-b19-b20-b30-20261027/task_c268e41dfa6d/ctx_e6fde0372f06/round9/tag-changes.json)
 describes the separate comparison from `930a4c7c` to this correction. Its
 per-round counts must not be compared with the full dispatch totals. Both

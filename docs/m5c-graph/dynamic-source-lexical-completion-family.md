@@ -64,8 +64,7 @@ Evidence obligations
  -  A path whose non-source subjects are not all covered stays in
     remediation under this node or the umbrella.
  -  Never count a path as a pass, emulate eval or source construction,
-    remove an assertion, or widen ADR 0016. ADR 0016 and ADR 0019 stay
-    unchanged, and all 41,091 inventory paths remain.
+    remove an assertion, or widen ADR 0016.
  -  Split review scopes by subdirectory where a diff is large.
 
 

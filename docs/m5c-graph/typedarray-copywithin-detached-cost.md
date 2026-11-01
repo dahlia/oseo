@@ -40,14 +40,16 @@ Cause
 
 The copyWithin call is not the cost: after detachment it throws, or does
 one `memmove`. The cost is the setup each case repeats for every
-TypedArray constructor and argument factory. The case writes ten thousand
-holes with `array.fill(7, 0)`, and the harness's `makeArrayLike` copies
-them into `{ length: n }` one index at a time and reads them back.
-`oseo_internal_own_property_index` scanned the whole property vector for
-every index that was not already in its expected slot. An ascending write
-of index *i* into an object that holds only indices 0 through *i* − 1
-always missed, so each write scanned *i* slots and each fill or copy was
-quadratic: 10,000 array-like writes took 306 ms, 2,500 took 20 ms.
+TypedArray constructor and argument factory.
+
+The case writes ten thousand holes with `array.fill(7, 0)`, and the
+harness's `makeArrayLike` copies them into `{ length: n }` one index at a
+time and reads them back. `oseo_internal_own_property_index` scanned the
+whole property vector for every index that was not already in its expected
+slot. An ascending write of index *i* into an object that holds only indices
+0 through *i* − 1 always missed, so each write scanned *i* slots and each
+fill or copy was quadratic: 10,000 array-like writes took 306 ms, 2,500
+took 20 ms.
 
 
 Remedy
@@ -125,15 +127,18 @@ change. Every run exited 0.
 | *start-detached.js*, strict, specialized  | 1,911,795 | 33.050 s         | 3.944 s         | 1.396 s → 1.438 s               |
 | *start-detached.js*, strict, generic      | 1,508,878 | 33.061 s         | 3.899 s         | 1.305 s → 1.385 s               |
 
-Execution falls from 32.7–35.6 s to 3.7–4.1 s per variant, about 8.7
-times, or from about 134 s to about 15.6 s per path. The emitted C
-differs only by the scratch path bytes in the source name, and compile
-and link time is unchanged within noise, because the change is in the
-runtime archive, not in generated code. The remaining time is the
-harness's other per-constructor work, such as `Array.from`, the buffer
-copies, and global variable lookups, which scan the global object's
-named keys; none of it is index lookup. An intermediate Array-only form
-of the hint reached 9.5–10.4 s; the array-like copy was the rest.
+Execution falls from 32.7–35.6 s to 3.7–4.1 s per variant, about 8.7 times, or
+from about 134 s to about 15.6 s per path.
+
+The emitted C differs only by the scratch path bytes in the source name, and
+compile and link time is unchanged within noise, because the change is in the
+runtime archive, not in generated code.
+
+The remaining time is the harness's other per-constructor work, such as
+`Array.from`, the buffer copies, and global variable lookups, which scan the
+global object's named keys; none of it is index lookup. An intermediate
+Array-only form of the hint reached 9.5–10.4 s; the array-like copy was the
+rest.
 
 Raw rows: */data/m5c-typedarray-copywithin-before-20261028/measure-before.log*
 and *measure-after.log* (the Array-only intermediate is

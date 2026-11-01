@@ -92,7 +92,7 @@ plumbing, and uncalled bodies supply no runtime coverage. Syntax-family
 tags can describe explicitly tested grammar, including operator early
 errors. Normally completing try syntax alone proves no abrupt operation.
 Expected runtime/resolution errors and observed rejection retain
-abrupt-completion and their asserted named error-family tags.
+abrupt-completion tags and their asserted named error-family tags.
 
 Generic syntax/runtime tags derive from the primary test and includes.
 Fixture modules contribute asserted contracts or prerequisites, including
@@ -101,10 +101,12 @@ initialization, loops, and branches are plumbing. The source audit also
 checks evaluated class bindings, observed Promise chains, reached object
 coercions, object-valued await reads, and heritage prototype reads.
 
-All counts below describe the **full dispatch**, comparing `3a0e7449`
-with the current subset. They come from the
-[full dispatch delta](/data/m5c-b19-b20-b30-20261027/task_b6fabe177327/ctx_3b873992f3d6/all-dispatch-tag-changes.json).
-It changes 978 rows across the train and 468 owned rows here. The latest
+All counts below describe the full dispatch, comparing `3a0e7449` with
+the current subset. They come from the
+[full dispatch delta](/data/m5c-b19-b20-b30-20261027/task_b6fabe177327/ctx_3b873992f3d6/all-dispatch-tag-changes.json),
+which changes 978 rows across the train and 468 owned rows here.
+
+The latest
 [correction-round delta](/data/m5c-b19-b20-b30-20261027/task_b6fabe177327/ctx_3b873992f3d6/tag-changes.json)
 describes the separate comparison from `6ace689f` to this correction. Its
 per-round counts must not be compared with the full dispatch totals. Both
@@ -170,9 +172,9 @@ tags; these parse-only sources import no fixtures.
 
 The input inventory found zero ledger rows owned by the three landed
 remediation nodes. All 21 residual paths were owned by this observation
-batch. Their fresh expected negatives close under `observation` ownership after
-manifest and ledger regeneration. Existing unsupported owners and every
-previous subset row are preserved.
+batch. Their fresh expected negatives close under `observation` ownership
+after manifest and ledger regeneration. Existing unsupported owners and
+every previous subset row are preserved.
 
 Per-path sources, hashes, tag rationales and raw executor records are in
 */data/m5c-b20-b30-finish-20261029/*: *intake.json*, *tags.json*,

@@ -33,8 +33,9 @@ original assertion; accounting never counts as a pass.
 This node depends on landed `authorized-exclusion-audit` and starts
 ready/unlanded. Ownership stays with `dynamic-source-coverage-remediation`
 until this child lands. Each child landing reports exact newly covered and
-still-uncovered subsets and moves ownership in the derived ledger. The
-umbrella remains an aggregate gate until all children land and it owns zero
+still-uncovered subsets and moves ownership in the derived ledger.
+
+The umbrella remains an aggregate gate until all children land and it owns zero
 paths. Serialize shared audit, ledger and manifest publication; Root owns
 integration and publication.
 
@@ -80,9 +81,10 @@ observations, refresh source and normalized observation digests, and show
 that every non-source subject is covered. Keep mixed or uncovered subjects
 open and ask for a bounded maintainer decision when a faithful witness is
 unavailable. Preserve ADR 0016/0019 reopening triggers; an accepted ADR 0016
-amendment admitting dynamic import reopens ImportCall accounting. Each child
-requires normal D1/D11 review and D3/D4 publication. This metadata change
-performs none of those closure or landing steps.
+amendment admitting dynamic import reopens ImportCall accounting.
+
+Each child requires normal D1/D11 review and D3/D4 publication. This metadata
+change performs none of those closure or landing steps.
 
 
 DS-18 evidence delta

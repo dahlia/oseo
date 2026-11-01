@@ -11,7 +11,7 @@ The pinned native executor uses target linux-x86\_64-gnu with the stock
 fragment emitter and whole-CLI fallback. Cases ran serially, with one case
 in flight, MISE\_JOBS=1, a private TMPDIR, and a lane-specific Zig cache.
 Root authorized focused observation outside the heavy lock. The first
-segment stopped at its first semantic failure; Root authorized the
+segment stopped at its first semantic failure. Root authorized the
 remaining 531 paths to collect semantic failures while still stopping on
 harness or infrastructure failures. Both drivers exited naturally, with
 zero harness or infrastructure failures across the train.
@@ -29,10 +29,10 @@ Dependency self-audit
 ---------------------
 
 The corrective audit covers every selected primary source and all 903 new
-admissions across this train. The first independent round found missing
-subject families and assertion-plumbing witnesses in the initial metadata.
-This round corrects 70 rows in this batch while preserving every
-classification and native observation. No original Main row is changed.
+admissions across this train. The initial metadata lacked subject families
+and assertion-plumbing witnesses. The audit corrects 70 rows in this batch
+while preserving every classification and native observation. No original
+Main row is changed.
 
 Root clarified the rules on 2026-10-30: unsupported rows retain the tags of
 their explicit asserted contracts and prerequisites; those tags do not
@@ -45,10 +45,13 @@ their subject grammar families and no runtime-only families.
 Manual failure-only if guards and expected descriptor bags passed only to
 verifyProperty are assertion plumbing. Their generic control-flow and
 object-literal tags are removed across the full cohort. Actual operators
-and conversions asserted by the guarded conditions remain. Four embedded
-do-while subjects and the deliberately throwing Proxy trap retain their
-control-flow contracts. Real caught ReferenceError/SyntaxError contracts
-retain abrupt-completion; normally completed try syntax alone does not.
+and conversions asserted by the guarded conditions remain.
+
+Four embedded do-while subjects and the deliberately throwing Proxy trap
+retain their control-flow contracts. Real caught ReferenceError/SyntaxError
+contracts retain abrupt-completion; normally completed try syntax alone does
+not.
+
 The propertyHelper implementation adds no generic loops, keys, or operator
 coverage. Source Object.defineProperty descriptors and resizable-buffer
 construction options remain actual prerequisites.
@@ -112,7 +115,7 @@ All 171 newly required independent publication pairs are declared.
 Second review corrective audit
 ------------------------------
 
-All 18 provider stages completed at R2 after Root-approved bookkeeping
+All 18 provider stages completed at R2 after a Root-approved bookkeeping
 recovery. The driver had supplied the train-wide remaining-scopes count
 instead of the per-node count, leaving completed pass 1 records unfinished
 for batches 28, 29 and 32. The supported abandonment reason preserves the
@@ -151,7 +154,7 @@ retries or partition writes. Strict agreement covered all 903 admissions;
 precheck exited 0 with no findings.
 
 All 18 provider stages completed. One DeepSeek response lacked the adapter's
-marked result block; Root authorized one retry at the same pass and
+marked result block. Root authorized one retry at the same pass and
 snapshot. The invalid attempt and every completed review remain in the
 dispatch evidence.
 
@@ -181,7 +184,7 @@ full-row decisions, tag delta and reviews are under
 Fourth review corrective audit
 ------------------------------
 
-Pass 4 completed all 14 provider stages in the seven affected scopes.
+All 14 provider stages completed in the seven affected scopes.
 Three blocking findings remain in that snapshot. This correction adds
 module-linking to all four constructed import.meta parsing subjects and
 default-parameters to the three constructor variants that lacked it. All
@@ -211,9 +214,10 @@ source hashes and examines 77 module-related candidates. Of these, 64
 already carry module-linking. Two escaped import.meta terminal negatives
 retain lexical-grammar under the shared lexical-error exception. Two
 GetValue/PutValue prose matches contain “unimportant” and have no module
-subject. The nine cited rows are the only omissions. A broader whole-source
-module-keyword scan finds no additional candidates. Other tag families
-remain unchanged; no subset path is removed.
+subject. The nine cited rows are the only omissions.
+
+A broader whole-source module-keyword scan finds no additional candidates.
+Other tag families remain unchanged; no subset path is removed.
 
 The source hashes, candidate decisions and nine before/after rows are in
 [audit-summary.json](/data/m5c-b23-b28-b29-b32-20261029/task_4c0ba85de126/ctx_d04ac0db065f/audit-summary.json).

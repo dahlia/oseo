@@ -2,8 +2,8 @@ Reduce Array generated property native cost
 ===========================================
 
 This node targets the native cost growth of the ordinary Array generated
-property suite (macOS 40.3 s to 173 s against its 180 s interrupt) without
-lowering cases, seeds, generator domains or the interrupt.
+property suite without lowering cases, seeds, generator domains or the
+interrupt.
 
 This ready, unlanded node owns no test262 path yet. It depends on
 `unsupported-ownership-audit` and is an `m5-exit-audit` prerequisite.
@@ -14,22 +14,23 @@ This ready, unlanded node owns no test262 path yet. It depends on
 | Raw candidate failure logs                | /data/m5c-regexp-source-finisher-20261027/candidate-ci/                               |
 
 The ordinary property passed in 40.3 seconds before the Array node landed
-and 173.0 seconds after it on hosted macOS; one candidate attempt interrupted at
-180 seconds after 11 of 12 cases. The diagnostic is the property interrupt,
-not a semantic counterexample. Generated C size is a lead, not established
-causation. Preserve cases, seeds, generator domains and the interrupt, and
-measure the remedy on the same lane. No observation or product repair is
-claimed by this graph addition.
+and 173.0 seconds after it on hosted macOS, against its 180 s interrupt.
+One candidate attempt interrupted at 180 seconds after 11 of 12 cases. The
+diagnostic is the property interrupt, not a semantic counterexample.
+
+Generated C size is a lead, not established causation. Measure the remedy
+on the same lane. No observation or product repair is claimed by this graph
+addition.
 
 
 Attempt 2 compiler profile, 2026-10-31
 --------------------------------------
 
-This attempt produced no accepted cost remedy. Root requested a diagnostic-only
-commit and a failed worker outcome after the best bounded prototype reduced
-host-cc specimen compile-link time by about seven percent. Root did not accept
-that partial improvement as completion of this node. Every experiment was
-reverted; the node remains ready and unlanded.
+This attempt produced no accepted cost remedy. The best bounded prototype
+reduced host-cc specimen compile-link time by about seven percent, but Root
+did not accept that partial improvement as completion of this node and
+requested a diagnostic-only commit and a failed worker outcome. Every
+experiment was reverted; the node remains ready and unlanded.
 
 The source was `main` commit
 `1f3ade138ea7cbee80b2d62940e8f497db2bc1a2`. The node YAML and work note
@@ -52,8 +53,7 @@ execution 178.7–182.1 ms in the initial Zig profile. The enabled program's
 compile-link request took 1.271 seconds with the runtime archive available.
 The first disabled compile-link request took 9.266 seconds with a cold Zig
 cache; it is excluded from the paired comparisons below. Initial runtime
-archive compilation was separately logged and is not charged to either
-compile-link request.
+archive compilation is not charged to either compile-link request.
 
 Clang `-ftime-trace` records put approximately 70 percent of each substantial
 unit's compiler time in LLVM backend/code-generation work. Disabled body
@@ -143,17 +143,20 @@ approval before adoption.
 Attempt 3 archive compositions, 2026-10-31
 ------------------------------------------
 
-The third attempt carries forward the diagnostic note from `e4334397`
-and retains the same base, fixed seed, generator, independent output model,
-case budget, interrupt, specialization policies, and toolchain flags. This
-node still owns no test262 path, and no result classification changes.
+The third attempt carries forward the diagnostic note from `e4334397` and
+retains the same base, fixed seed, generator, independent output model, case
+budget, interrupt, specialization policies, and toolchain flags. This node
+still owns no test262 path, and no result classification changes.
 
 A fresh baseline profile again puts native compilation ahead of source
 compilation, C emission, and execution. The first disabled Zig request had a
-cold cache and is excluded from comparisons. The retained prototype moves
-binding-read, property-key, and ordinary property-get compositions into the
-runtime archive. It preserves the existing environment and cell calls,
-source locations, output root stores, guards, and fallback operations.
+cold cache and is excluded from comparisons.
+
+The retained prototype moves binding-read, property-key, and ordinary
+property-get compositions into the runtime archive. It preserves the existing
+environment and cell calls, source locations, output root stores, guards, and
+fallback operations.
+
 Static call-site records supply operands and locations to a function selected
 by generated native code. They contain no opcode and introduce no interpreter
 or dispatch loop. Fragments keep their dynamically relocated location call.
@@ -176,19 +179,21 @@ baseline/candidate pairs:
 
 These are Linux AMD64 specimen measurements. Runtime archives are warm,
 commands alternate baseline then candidate, and desktop load and cache history
-are not controlled. Individual paired reductions vary; ratios of medians do
-not establish a hosted macOS improvement. Every completed specimen matches
-the full output model and the original allocation, collection, guard and
-addition counters. The static records increase total standalone C text from
-1,047,906 to 1,326,149 bytes with specialization disabled and from 1,403,899
-to 1,683,706 bytes with it enabled. The benefit is less executable call-site
-code to generate, despite additional static declarations.
+are not controlled. Individual paired reductions vary; ratios of medians do not
+establish a hosted macOS improvement. Every completed specimen matches the full
+output model and the original allocation, collection, guard and addition
+counters.
 
-A representative paired specimen's executable `.text` section shrinks by
-about 1.09 MB under Zig and 1.30 MB under host-cc in both policies. Its
-`.rodata` grows by about 66 KB and 172 KB respectively. These ELF section
-measurements include the linked runtime and sanitizer code; the packet
-retains the exact binary paths and byte counts.
+The static records increase total standalone C text from 1,047,906 to 1,326,149
+bytes with specialization disabled and from 1,403,899 to 1,683,706 bytes with
+it enabled. The benefit is less executable call-site code to generate, despite
+additional static declarations.
+
+A representative paired specimen's executable `.text` section shrinks by about
+1.09 MB under Zig and 1.30 MB under host-cc in both policies. Its `.rodata`
+grows by about 66 KB and 172 KB respectively. These ELF section measurements
+include the linked runtime and sanitizer code; the packet retains the exact
+binary paths and byte counts.
 
 The paired prototype's reusable runtime archive grows from 12,323,202 to
 12,343,976 bytes under Zig and from 10,412,448 to 10,426,200 bytes under
@@ -246,18 +251,18 @@ Optimization-level measurement, 2026-10-31
 
 This separate, measurement-only experiment uses product U
 `fdc6e284a3ceff0e6f2dec01c6aff1f04eaeb3dd`. The maintainer permitted
-measurement and proposal; adoption still requires a separate decision.
-The current generated-program command has no `-O` option. The experiment
-adds only `-O1` or `-O2` to its generated-program compilation request;
-runtime archives retain `-O2`, their existing cache identity, and their
-existing sanitizer flags. No toolchain flag or policy changes in this commit.
+measurement and proposal; adoption still requires a separate decision. The
+current generated-program command has no `-O` option. The experiment adds only
+`-O1` or `-O2` to its generated-program compilation request; runtime archives
+retain `-O2`, their existing cache identity, and their existing sanitizer
+flags. No toolchain flag or policy changes in this commit.
 
-Each candidate level and toolchain has an excluded warm-up pair followed
-by three alternating current/candidate pairs, with both specialization
-policies. All 64 specimen executions, including warm-ups, match the same
-independent output model and every allocation, collection, guard and addition
-counter for their policy. The source, seed, forced-collection setting and
-emitted C remain fixed. Median compile-link time is:
+Each candidate level and toolchain has an excluded warm-up pair followed by
+three alternating current/candidate pairs, with both specialization policies.
+All 64 specimen executions, including warm-ups, match the same independent
+output model and every allocation, collection, guard and addition counter for
+their policy. The source, seed, forced-collection setting and emitted C remain
+fixed. Median compile-link time is:
 
 | Level | Lane    | Policy   | Current ms | Candidate ms |
 | ----- | ------- | -------- | ---------: | -----------: |
@@ -302,13 +307,13 @@ measurement remain pending under Root's ownership.
 Whole-property and resource checks for candidate levels
 -------------------------------------------------------
 
-The detailed measurement follow-up runs the unchanged ordinary Array property
-once at each candidate level on each toolchain. Its seed, generated domain,
-12-case budget, both policies, forced collection, and 180-second interrupt
-remain unchanged. Every candidate run exits one because fast-check reports an
-interrupt, with no semantic counterexample recorded. The current-level U
-runs passed all 12 cases in 43.402 seconds on Zig and 86.943 seconds on host-cc.
-The candidate-level observations are:
+The whole-property check runs the unchanged ordinary Array property once at
+each candidate level on each toolchain. Its seed, generated domain, 12-case
+budget, both policies, forced collection, and 180-second interrupt remain
+unchanged. Every candidate run exits one because fast-check reports an
+interrupt, with no semantic counterexample recorded. The current-level U runs
+passed all 12 cases in 43.402 seconds on Zig and 86.943 seconds on host-cc. The
+candidate-level observations are:
 
 | Level | Lane    | Property s | Command s | Reported tests |
 | ----- | ------- | ---------: | --------: | -------------: |

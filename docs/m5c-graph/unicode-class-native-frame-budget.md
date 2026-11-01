@@ -75,9 +75,9 @@ Focused execution
 -----------------
 
 The author checks ran on Linux AMD64. All ten upstream source digests match
-the preserved failure packet exactly. Each complete source now passes all
-four strictness/policy variants on Zig and on Clang ASan/UBSan, for 80
-native variants across the two lanes. No source was shortened or filtered.
+the preserved failure packet exactly. Each complete source passes all four
+strictness/policy variants on Zig and on Clang ASan/UBSan, for 80 native
+variants across the two lanes. No source was shortened or filtered.
 
 The raw command records and outputs live under
 */data/m5c-d17-20261031/unicode/*. The completed vectors are:
@@ -127,24 +127,27 @@ before Root's batched Full UPDATE. A fresh focused capture at `554b5236`
 passed all ten and all 40 strictness/policy variants in 492.7 seconds.
 */data/m5c-d17-20261031/unicode/observe-admission.json* records the
 capacity-wrapped command and natural exit zero; its sibling stdout retains
-each complete runner result. The canonical serializer materializes these
-results without changing any prior observation. Ledger ownership moves from
-`node:observation-batch-18` to `observation` for exactly these ten paths.
-Canonical batch-plan regeneration removes the now-empty batch 18 selector
-and refreshes the derived counts and cost model; every surviving selector
-and its planning basis are preserved. Graph readiness and landed flags
-remain unchanged.
+each complete runner result.
+
+The canonical serializer materializes these results without changing any
+prior observation. Ledger ownership moves from `node:observation-batch-18`
+to `observation` for exactly these ten paths. Canonical batch-plan
+regeneration removes the now-empty batch 18 selector and refreshes the
+derived counts and cost model; every surviving selector and its planning
+basis are preserved. Graph readiness and landed flags remain unchanged.
 
 The shared observation-tag rules give each row `classes` and
 `lexical-grammar`: class evaluation creates the private fields, and the
 subject is Unicode ID\_Start spelling in private identifiers. Escaped and
 unescaped originals assert the same grammar family. No harness internals,
 diagnostic text, failure-only branch, scaffolding, or fixture supplies a tag.
-The per-row source-hash and tag self-audit is in *admission-observations.json*.
-The scoped allow-list proof in *admission-allow-list-proof.json* verifies
-every prior subset row byte for byte, every prior result, all other ledger
-entries, and all graph fields outside the derived baseline. No exclusion,
-source, assertion, frame ceiling, feature list, or graph state changes.
+
+The per-row source-hash and tag self-audit is in
+*admission-observations.json*. The scoped allow-list proof in
+*admission-allow-list-proof.json* verifies every prior subset row byte for
+byte, every prior result, all other ledger entries, and all graph fields
+outside the derived baseline. No exclusion, source, assertion, frame
+ceiling, feature list, or graph state changes.
 
 This admission is separate from Root's Full UPDATE, R, outer gate,
 candidate CI, landing, and publication. Root retains all of those steps.

@@ -72,12 +72,12 @@ initialization, loops, and branches are plumbing. The source audit also
 checks evaluated class bindings, observed Promise chains, reached object
 coercions, object-valued await reads, and heritage prototype reads.
 
-All counts below describe the **full dispatch**, comparing `3a0e7449`
-with the current subset. They come from the
-[full dispatch delta](/data/m5c-b19-b20-b30-20261027/task_b6fabe177327/ctx_3b873992f3d6/all-dispatch-tag-changes.json).
-It changes 978 rows across the train and 342 owned rows here. The latest
+The counts below are for the full dispatch, comparing `3a0e7449` with the
+current subset. They come from the
+[full dispatch delta](/data/m5c-b19-b20-b30-20261027/task_b6fabe177327/ctx_3b873992f3d6/all-dispatch-tag-changes.json),
+which changes 978 rows across the train and 342 owned rows here. The latest
 [correction-round delta](/data/m5c-b19-b20-b30-20261027/task_b6fabe177327/ctx_3b873992f3d6/tag-changes.json)
-describes the separate comparison from `6ace689f` to this correction. Its
+records the separate comparison from `6ace689f` to this correction. Its
 per-round counts must not be compared with the full dispatch totals. Both
 artifacts agree with the current source-tag evidence and subset.
 
@@ -123,7 +123,7 @@ Remediation follow-up on ad1a1eba
 
 The six previously unreviewed paths above were observed directly with
 `executeTest262Case` on candidate `ad1a1eba`: six passes, zero failures.
-B20 now has all 430 paths admitted: 338 passes, 37 expected negatives and
+B20 has all 430 paths admitted: 338 passes, 37 expected negatives and
 55 unsupported profile features. The five namespace cases assert the
 ReferenceError from uninitialized exports; the remaining case exercises
 harness globals in an imported test module.
@@ -150,9 +150,11 @@ previous subset row are preserved.
 Per-path sources, hashes, tag rationales and raw executor records are in
 */data/m5c-b20-b30-finish-20261029/*: *intake.json*, *tags.json*,
 *observations.json* and *raw/*. The source tree is pinned in the observation
-record. Root authorized serial observation outside the heavy lock for this
+record.
+
+Root authorized serial observation outside the heavy lock for this
 27-path critical-chain follow-up (message `msg_0d0a186b6be2`), with one
-case at a time and a dedicated Zig cache and temporary directory.
-This preparation keeps the node unlanded; scoped UPDATE, strict
-agreement and internal review are recorded separately by the worker.
-Root owns publication, candidate CI and the outer gate.
+case at a time and a dedicated Zig cache and temporary directory. This
+keeps the node unlanded. Scoped UPDATE, strict agreement and internal
+review are recorded separately by the worker. Root owns publication,
+candidate CI and the outer gate.

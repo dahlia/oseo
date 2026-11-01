@@ -4,10 +4,10 @@ ImportCall-subject dynamic import accounting
 This record backs the M5c graph node `dynamic-source-importcall-accounting`
 (DS-1). The maintainer decision of 2026-10-28 on the big-node split review
 (*20261028-m5c-scope-big-node-split.md*), item 2, extends the 2026-10-22
-import-attributes accounting decision (option A) to dynamic import paths whose
-normative subject is ImportCall itself, including EvaluateImportCall and
-ContinueDynamicImport. Item 4 approves this node as DS-1 of the
-`dynamic-source-coverage-remediation` split; the umbrella lands when it owns
+import-attributes accounting decision (option A). It applies to dynamic import
+paths whose normative subject is ImportCall itself, including EvaluateImportCall
+and ContinueDynamicImport. Item 4 approves this node as DS-1 of the
+`dynamic-source-coverage-remediation` split. The umbrella lands when it owns
 zero paths.
 
 
@@ -20,8 +20,8 @@ rejections to the umbrella: 3 from batch 20 and 390 from batch 30. Their
 sorted path set, with one final newline, has SHA256
 `5009fc2b4fb24aa21e174e3da6aed28219f5e78ef01a3389b0ec7ec78ac55823`. The
 umbrella owns these paths once those batches land. This node does not depend on
-the batches, because the umbrella shares manifest collision groups with them;
-it selects nothing before they land, and its landing must follow theirs.
+the batches, because the umbrella shares manifest collision groups with them.
+It selects nothing before they land, and its landing must follow theirs.
 
 Of those, 382 lie under *test/language/expressions/dynamic-import/*:
 *syntax/* 66, *catch/* 112, *usage/* 90, *assignment-expression/* 27,

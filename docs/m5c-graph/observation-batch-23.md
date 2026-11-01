@@ -10,8 +10,9 @@ covered 271 paths and retained two unreviewed originals, tracked below.
 The pinned native executor uses target linux-x86\_64-gnu with the stock
 fragment emitter and whole-CLI fallback. Cases ran serially, with one case
 in flight, MISE\_JOBS=1, a private TMPDIR, and a lane-specific Zig cache.
+
 Root authorized focused observation outside the heavy lock. The first
-segment stopped at its first semantic failure; Root authorized the
+segment stopped at its first semantic failure. Root authorized the
 remaining 531 paths to collect semantic failures while still stopping on
 harness or infrastructure failures. Both drivers exited naturally, with
 zero harness or infrastructure failures across the train.
@@ -45,21 +46,24 @@ their subject grammar families and no runtime-only families.
 Manual failure-only if guards and expected descriptor bags passed only to
 verifyProperty are assertion plumbing. Their generic control-flow and
 object-literal tags are removed across the full cohort. Actual operators
-and conversions asserted by the guarded conditions remain. Four embedded
-do-while subjects and the deliberately throwing Proxy trap retain their
-control-flow contracts. Real caught ReferenceError/SyntaxError contracts
-retain abrupt-completion; normally completed try syntax alone does not.
-The propertyHelper implementation adds no generic loops, keys, or operator
-coverage. Source Object.defineProperty descriptors and resizable-buffer
-construction options remain actual prerequisites.
+and conversions asserted by the guarded conditions remain.
+
+Four embedded do-while subjects and the deliberately throwing Proxy trap
+retain their control-flow contracts. Real caught ReferenceError/SyntaxError
+contracts retain abrupt-completion; normally completed try syntax alone
+does not. The propertyHelper implementation adds no generic loops, keys, or
+operator coverage. Source Object.defineProperty descriptors and
+resizable-buffer construction options remain actual prerequisites.
 
 Generic witnesses come from the primary source and necessary delegated
 subject operations in reviewed includes. Fixture modules contribute only
 asserted linking and awaited evaluation prerequisites; incidental fixture
-syntax contributes no generic families. The evidence packet records source
-and fixture hashes, original witnesses, every correction and Root ruling.
-The current rows are in reviewed-tag-evidence.json; round2-tag-draft.json
-records the complete metadata delta and full-pattern decisions.
+syntax contributes no generic families.
+
+The evidence packet records source and fixture hashes, original witnesses,
+every correction and Root ruling. The current rows are in
+reviewed-tag-evidence.json; round2-tag-draft.json records the complete
+metadata delta and full-pattern decisions.
 
 All 20 unsupported admissions in this batch retain active ownership by
 node:dynamic-source-coverage-remediation, with source and canonical
@@ -140,13 +144,13 @@ non-evaluation case: the source expressly discards any exception and only
 asserts that the computed key did not run.
 
 The source-bound audit reviewed all 130 related binding, constructed-body
-and restricted-production candidates; incidental class naming, uninvoked
+and restricted-production candidates. Incidental class naming, uninvoked
 constructed bodies and ordinary continue statements gain no tags. The
 full native-Error assertion scan found exactly the ten missing foreign
 realm rows, and the remaining empty-catch scan found only the super-key
-case. That audit applied the earlier rules to every new admission, including
-parse-only subjects, failure-only guards, descriptor bags, implicit
-protocols and fixture prerequisites. The metadata delta is
+case. That audit applied the earlier rules to every new admission,
+including parse-only subjects, failure-only guards, descriptor bags,
+implicit protocols and fixture prerequisites. The metadata delta is
 round3-tag-delta.json; row evidence retains the original witnesses and
 each correction. No Main admission or ADR boundary changes.
 
@@ -201,7 +205,7 @@ pattern, all 165 added dynamic audit sections for placeholders, and all
 four batch notes for the earlier completeness claim. Four hashbang audit
 sections now name the applicable Hashbang Comments, PerformEval or
 CreateDynamicFunction contract. The earlier paragraph records the audit
-that was performed; later rounds found and corrected further omissions,
+that was performed. Later rounds found and corrected further omissions,
 so it does not establish complete or clean tag coverage. This batch has
 0 dependency rows changed by this correction.
 

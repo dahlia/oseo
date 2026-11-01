@@ -11,12 +11,13 @@ fresh-digest audit record names them. Otherwise the path stays here. The
 class-private-accessor-lookup-coverage-remediation precedent kept its two
 paths because not every core subject could be covered.
 
-This node owned three paths. Each upstream observation is `OSEO1001` for the
+This node owns three paths. Each upstream observation is `OSEO1001` for the
 `Object.prototype.__proto__` accessor, so no assertion of the original
-source ran. All three now close: their only Annex B subject is the accessor,
-and every core subject has fixed native evidence. ADR 0013, ADR 0016, ADR
-0019, the subset, the original sources and assertions, and the recorded
-unsupported results are unchanged. These paths are not counted as passes.
+source ran. All three close because their only Annex B subject is the
+accessor and every core subject has fixed native evidence. ADR 0013, ADR
+0016, ADR 0019, the subset, the original sources and assertions, and the
+recorded unsupported results are unchanged. These paths are not counted as
+passes.
 
 
 Per-path assertions
@@ -89,10 +90,10 @@ count, not the comparator, decides the verdict.
 context in both strictness modes. It also replaces the comparator with an
 always-true, a same-type, and a loose-equality comparator; each mutant must
 throw before printing. Natively, each fixture matches fixed expected output
-and the Node.js and Deno references, then runs strict and non-strict Scripts
-under both specialization policies with collection at every safepoint. The
-collection counter must be positive, and an unsupported native host skips
-these cases.
+and the Node.js and Deno references. Each also runs strict and non-strict
+Scripts under both specialization policies with collection at every
+safepoint. The collection counter must be positive, and an unsupported
+native host skips these cases.
 
 The earlier `typed-array-buffer-without-species-core`, out-of-bounds, and
 constructor-pair fixtures stay as they are. The closing assessments bind only
@@ -104,14 +105,16 @@ because another audit assessment binds its digest.
 Audit records
 -------------
 
-*docs/m5c-closure/exclusion-audit.yaml* keeps each path row, with current
-source and observation digests, and changes three assessments to
-`disposition: exclusion` and `normativeDependency: annex-b-only`. They are
+*docs/m5c-closure/exclusion-audit.yaml* keeps each path row with current
+source and observation digests. It changes three assessments to
+`disposition: exclusion` and `normativeDependency: annex-b-only`:
 `annex-b-typed-array-prototype`, `annex-b-resizable-typed-array-prototype`,
 and `annex-b-out-of-bounds-prototype-setup`. Each binds the digests of both
-evidence files. The ledger moves the three paths to
-`adr:0013-m5-edition-and-manifest` through the ledger API and
-`mise run m5c:closure-ledger:update`. This node then owns no path.
+evidence files.
+
+The ledger moves the three paths to `adr:0013-m5-edition-and-manifest`
+through the ledger API and `mise run m5c:closure-ledger:update`. This node
+owns no path.
 
 | Path                                                              | Outcome  | Assessment                                |
 | ----------------------------------------------------------------- | -------- | ----------------------------------------- |

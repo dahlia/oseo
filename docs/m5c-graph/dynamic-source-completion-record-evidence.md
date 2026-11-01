@@ -32,11 +32,12 @@ original assertion; accounting never counts as a pass.
 
 This node depends on landed `authorized-exclusion-audit` and starts
 ready/unlanded. Ownership stays with `dynamic-source-coverage-remediation`
-until this child lands. Each child landing reports exact newly covered and
-still-uncovered subsets and moves ownership in the derived ledger. The
-umbrella remains an aggregate gate until all children land and it owns zero
-paths. Serialize shared audit, ledger and manifest publication; Root owns
-integration and publication.
+until this child lands.
+
+Each child landing reports exact newly covered and still-uncovered subsets
+and moves ownership in the derived ledger. The umbrella remains an aggregate
+gate until all children land and it owns zero paths. Serialize shared audit,
+ledger and manifest publication; Root owns integration and publication.
 
 
 Closure route and evidence obligations
@@ -66,10 +67,13 @@ For every eventual exclusion, name the exact replacement paths and reviewed
 observations, refresh source and normalized observation digests, and show
 that every non-source subject is covered. Keep mixed or uncovered subjects
 open and ask for a bounded maintainer decision when a faithful witness is
-unavailable. Preserve ADR 0016/0019 reopening triggers; an accepted ADR 0016
-amendment admitting dynamic import reopens ImportCall accounting. Each child
-requires normal D1/D11 review and D3/D4 publication. This metadata change
-performs none of those closure or landing steps.
+unavailable.
+
+Preserve ADR 0016/0019 reopening triggers; an accepted ADR 0016 amendment
+admitting dynamic import reopens ImportCall accounting.
+
+Each child requires normal D1/D11 review and D3/D4 publication. This metadata
+change performs none of those closure or landing steps.
 
 
 Replacement evidence
@@ -99,8 +103,9 @@ compiler hook is added. Unknown source retains its OSEO1001 boundary.
 Every original eval site is in global Script code or its statement blocks.
 No selected call depends on a caller-local `this`, `new.target`, `arguments`
 or function variable environment. Each positive witness runs in a fresh
-realm, sharing its global declarations with its literal host Scripts. Both
-caller strictness variants run except the two `noStrict` with-statement
+realm, sharing its global declarations with its literal host Scripts.
+
+Both caller strictness variants run except the two `noStrict` with-statement
 paths. Indirect source stays non-strict. Direct strict source receives a
 strict directive followed by `void 0`: the latter prevents the directive's
 string completion from replacing eval's empty-to-undefined result. Original
@@ -136,12 +141,15 @@ fixture sources above unchanged.
 Delta: 81 accounted under ADR 0016, 0 staying, 15 new test groups (82
 fixed fixtures). The initial fourteen groups passed all 29 registrations in one
 focused command, and the fifteenth passed its two registrations separately.
+
 Both policies run with forced collection, strictness variants, mutations,
 structural checks and Node.js/Deno references. The native command completed
 naturally with exit 0 in 702.660 seconds. Raw evidence is in
 */data/m5c-ds21-20261101/native-isolated/completion.json*, with sibling
-*.stdout* and *.stderr* files. The table and fresh-digest audit records are
-part of this node's review target; normal internal/outer review gates apply.
-The subset and observations are unchanged, so no UPDATE is needed. Root retains
-full Node/Deno/native/sanitizer and macOS publication gates, outer review,
+*.stdout* and *.stderr* files.
+
+The table and fresh-digest audit records are part of this node's review
+target; normal internal/outer review gates apply. The subset and observations
+are unchanged, so no UPDATE is needed. Root retains full
+Node/Deno/native/sanitizer and macOS publication gates, outer review,
 integration and landing.

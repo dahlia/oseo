@@ -37,10 +37,10 @@ Where the cost is
 
 On G `e2ff16d4` (2026-10-28, local linux-x86\_64-gnu, Zig toolchain), the
 regular expressions are not the cost. Each generated case builds its match
-and non-match strings with the harness's `buildString`, which together
-cover almost every code point, one `codePoints[length++] = codePoint` store
-and one `String.fromCodePoint.apply` element read per code point. The four
-`testPropertyEscapes` calls then each match one string.
+and non-match strings with the harness's `buildString`. Together they
+cover almost every code point, with one `codePoints[length++] = codePoint`
+store and one `String.fromCodePoint.apply` element read per code point.
+The four `testPropertyEscapes` calls then each match one string.
 
  -  Replacing `testPropertyEscapes` with an empty function in
     *ID\_Start.js* left about 3.56 s of about 3.71 s native execution CPU
@@ -62,14 +62,15 @@ and one `String.fromCodePoint.apply` element read per code point. The four
     interning) with no single owner.
 
 The fix formats integers of magnitude below 2^53 directly in
-`oseo_internal_number_text` (*runtime\_primitive.c*). Every such integer is
-a double whose neighbors lie at most one apart, so no decimal with fewer
-significant digits reads back as it and Number::toString's digits are the
-integer's own, in plain notation because it is below 10^21. Every other
-value, including -0, fractions, 2^53 and larger, NaN and the infinities,
-keeps the existing path. Generated C, both specialization policies, GC
-behavior and every fallback are unchanged. The `--emit-c` output of all
-28 measured variants has the same SHA-256 under G and U
+`oseo_internal_number_text` (*runtime\_primitive.c*). Every such integer
+is a double whose neighbors lie at most one apart, so no decimal with
+fewer significant digits reads back as it. Number::toString's digits are
+the integer's own, in plain notation because it is below 10^21.
+
+Every other value, including -0, fractions, 2^53 and larger, NaN and the
+infinities, keeps the existing path. Generated C, both specialization
+policies, GC behavior and every fallback are unchanged. The `--emit-c`
+output of all 28 measured variants has the same SHA-256 under G and U
 (*raw/c-hashes-G.txt*, *raw/c-hashes-U.txt*).
 
 Tests: the native `number-prototype` fixture gains an integer-text line
@@ -139,11 +140,11 @@ property included as a control.
 Total native execution CPU over the 28 variants: before 90.39 s, after
 56.22 s (−37.8 %).
 
-Native execution is the family's dominant cost in the phase report
-(5,385 s of the 5,518 s over the 441 generated paths, against 1,133 s of
-compile and link), so the expected Full UPDATE saving is roughly a third of
-that execution time. Compile and link of the largest paths remains about
-4 to 5 s per variant here, driven by generic array-literal lowering of the
+Native execution dominates the family's cost in the phase report: 5,385 s
+of the 5,518 s over the 441 generated paths, against 1,133 s of compile and
+link. The expected Full UPDATE saving is therefore roughly a third of that
+execution time. Compile and link of the largest paths remains about 4 to 5 s
+per variant here, driven by generic array-literal lowering of the
 `buildString` range tables rather than by regular expression tables. Making
 constant array literals table-driven would be a separate backend change and
 is not part of this node.

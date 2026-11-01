@@ -14,11 +14,12 @@ contexts. All classifications stay unsupported; no pass is added.
 
 New evidence consists of 12 source registrations and two native registrations
 with 18 context units each (positive and string-mutation checks), three
-positive fixture files, fixed Node.js/Deno
-oracles, structural graph/MIR assertions and both native policies with
-collection forced at every safepoint. Root's 2026-10-31 ruling separates
-the statically witnessed target errors from ImportCall's excluded promise
-rejection routing. The table records the exact scope and observation limits.
+positive fixture files, fixed Node.js/Deno oracles, structural graph/MIR
+assertions and both native policies with collection forced at every safepoint.
+Root's 2026-10-31 ruling separates the statically witnessed target errors from
+ImportCall's excluded promise rejection routing. The table records the exact
+scope and observation limits.
+
 The umbrella retains 884 of the base 950 paths. Subset and results are
 unchanged; no UPDATE is needed. Root retains outer review, full candidate
 suites, publication and landing.

@@ -10,8 +10,9 @@ retain 0 unreviewed originals below.
 The pinned native executor uses target linux-x86\_64-gnu with the stock
 fragment emitter and whole-CLI fallback. Cases ran serially, with one case
 in flight, MISE\_JOBS=1, a private TMPDIR, and a lane-specific Zig cache.
+
 Root authorized focused observation outside the heavy lock. The first
-segment stopped at its first semantic failure; Root authorized the
+segment stopped at its first semantic failure. Root authorized the
 remaining 531 paths to collect semantic failures while still stopping on
 harness or infrastructure failures. Both drivers exited naturally, with
 zero harness or infrastructure failures across the train.
@@ -34,9 +35,9 @@ subject families and assertion-plumbing witnesses in the initial metadata.
 This round corrects 64 rows in this batch while preserving every
 classification and native observation. No original Main row is changed.
 
-Root clarified the rules on 2026-10-30: unsupported rows retain the tags of
-their explicit asserted contracts and prerequisites; those tags do not
-claim an observed pass. The full audit restores explicitly asserted thrown
+Root's 2026-10-30 ruling: unsupported rows retain the tags of their
+explicit asserted contracts and prerequisites; those tags do not claim an
+observed pass. The full audit restores explicitly asserted thrown
 completions, inherited iterable consumers, foreign-realm Proxy aliases,
 boxed primitive Symbol dispatch, concrete TypedArray construction, and the
 actual delegated resizable-buffer subject operations. Parse-only rows keep
@@ -45,13 +46,14 @@ their subject grammar families and no runtime-only families.
 Manual failure-only if guards and expected descriptor bags passed only to
 verifyProperty are assertion plumbing. Their generic control-flow and
 object-literal tags are removed across the full cohort. Actual operators
-and conversions asserted by the guarded conditions remain. Four embedded
-do-while subjects and the deliberately throwing Proxy trap retain their
-control-flow contracts. Real caught ReferenceError/SyntaxError contracts
-retain abrupt-completion; normally completed try syntax alone does not.
-The propertyHelper implementation adds no generic loops, keys, or operator
-coverage. Source Object.defineProperty descriptors and resizable-buffer
-construction options remain actual prerequisites.
+and conversions asserted by the guarded conditions remain.
+
+Four embedded do-while subjects and the deliberately throwing Proxy trap
+retain their control-flow contracts. Real caught ReferenceError/SyntaxError
+contracts retain abrupt-completion; normally completed try syntax alone
+does not. The propertyHelper implementation adds no generic loops, keys,
+or operator coverage. Source Object.defineProperty descriptors and
+resizable-buffer construction options remain actual prerequisites.
 
 Generic witnesses come from the primary source and necessary delegated
 subject operations in reviewed includes. Fixture modules contribute only

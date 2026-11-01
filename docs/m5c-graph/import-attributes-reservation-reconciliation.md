@@ -1,19 +1,19 @@
 Import attribute reservation reconciliation
 ===========================================
 
-This record preserves the exact original 89-path prerequisite selector at
-base `e2a1ef1c6e453fd881a80c6f4199ec4c14c93c81`. The test262 pin remains
-`f2d1435644797268dca1f7988cad5a4e89ccd8d2`. Original batch ownership is
-preserved below with each upstream source digest. Canonical observation
-planning prunes exhausted selectors; this historical reservation does not
-duplicate admission or override actual observations.
+This record preserves the exact original 89-path prerequisite selector at base
+`e2a1ef1c6e453fd881a80c6f4199ec4c14c93c81`, along with original batch ownership
+and each upstream source digest. The test262 pin remains
+`f2d1435644797268dca1f7988cad5a4e89ccd8d2`. Canonical observation planning
+prunes exhausted selectors. This historical reservation does not duplicate
+admission or override actual observations.
 
 The original batch 31 reservation contains 65 paths. Its future graph task
-reconciles one parse negative and 64 active remediation paths after their
-first observation by `import-attributes`; it makes no new admission or
-automatic closure claim. Its original dependencies and unlanded state stay
-intact. The other 24 paths come from batch 32, whose remaining reservation
-is recomputed canonically without removing any other path.
+reconciles one parse negative and 64 active remediation paths after their first
+observation by `import-attributes`. It makes no new admission or automatic
+closure claim. Its original dependencies and unlanded state stay intact. The
+other 24 paths come from batch 32, whose remaining reservation is recomputed
+canonically without removing any other path.
 
 | Original batch | Pinned path                                                                                                                                 | Source SHA256                                                      |
 | -------------- | ------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------ |

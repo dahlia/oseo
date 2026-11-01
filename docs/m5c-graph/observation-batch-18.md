@@ -1,18 +1,22 @@
 Observation batch 18: reviewed admission
 ========================================
 
-Focused observations on base `68b026bb` selected 336 paths
-from the pinned batch selector. Admit 326 paths: 150 pass,
-167 expected-negative, and 9 unsupported-profile-feature.
+Focused observations on base `68b026bb` selected 336 paths from the
+pinned batch selector. Of these, 326 were admitted: 150 pass, 167
+expected-negative, and 9 unsupported-profile-feature.
+
 Ten Unicode class tests remained unreviewed after runtime OSEO2001
 reported “Maximum active native frame budget exceeded” in the first
 non-strict variant with specialization disabled. Root approved admitting
-the other 944 train paths and retaining these ten under batch 18;
+the other 944 train paths and retaining these ten under batch 18.
 *unicode-class-native-frame-budget.md* records the bounded prerequisite.
-No frame budget, source, or test assertion changes in this train.
-The later Unicode frame-budget prerequisite repairs their implementation;
-its work note records Root's separate ten-path pass admission and the
-required Full UPDATE. That admission changes no original train observation.
+This train makes no frame budget, source, or test assertion changes.
+
+The later Unicode frame-budget prerequisite repairs their
+implementation. Its work note records Root's separate ten-path pass
+admission and the required Full UPDATE. That admission changes no
+original train observation.
+
 The nine eval-rejected line-terminator subjects belong to
 `node:dynamic-source-coverage-remediation`. These ownership assignments
 add no exclusion or change to ADR 0016.
@@ -40,20 +44,20 @@ records each admitted source hash, tag witnesses, and rejected candidates. All
 944 admitted rows were checked against the approved observation-tag rules
 before U.
 
-Tags describe asserted source operations or their prerequisites. The
-audit removes candidates whose only sites are diagnostic arguments,
-uncalled bodies, or unreached operations, and normal try completion is
-not an abrupt-completion witness. Asserted throws and runtime negatives
-retain their abrupt-completion tags. Implicit iterator consumers and
-object conversions carry their reached symbol/protocol dependencies.
-The TypedArray audit distinguishes static methods, construction, and
-indexed access, including the explicit makeCtorArg factory variants.
+Tags describe asserted source operations or their prerequisites. The audit
+removes candidates whose only sites are diagnostic arguments, uncalled bodies,
+or unreached operations. Normal try completion is not an abrupt-completion
+witness. Asserted throws and runtime negatives retain their abrupt-completion
+tags. Implicit iterator consumers and object conversions carry their reached
+symbol/protocol dependencies. The TypedArray audit distinguishes static
+methods, construction, and indexed access, including the explicit makeCtorArg
+factory variants.
 
-Parse-only negatives retain syntax families of the rejected subject;
-no promise-settlement, module-linking, or abrupt-completion runtime tag
-is inferred from nested syntax. Generic source tags use the primary
-test. No fixture-derived rows are admitted: all four selected import
-tests reject during parsing, before any fixture can be evaluated.
+Parse-only negatives retain syntax families of the rejected subject; no
+promise-settlement, module-linking, or abrupt-completion runtime tag is
+inferred from nested syntax. Generic source tags use the primary test. No
+fixture-derived rows are admitted: all four selected import tests reject during
+parsing, before any fixture can be evaluated.
 
 The
 [candidate analysis](/data/m5c-b01-b03-b18-20261029/task_b827cc9b95b8/ctx_3dcead5a3eca/source-reach-all.json)
@@ -66,11 +70,11 @@ gates.
 Scoped UPDATE agreement
 -----------------------
 
-Root ran `test262:update:changed --baseline 68b026bb` at U `904bef8c`.
-The run finished naturally with exit 0 in 971.25 seconds: 944 selected
-paths, 689 pass, 167 expected-negative, 88 unsupported, and zero retries.
-It wrote no partitions. These totals cover the full train; the batch
-counts above remain separate. The
+Root ran `test262:update:changed --baseline 68b026bb` at U `904bef8c`. The run
+finished naturally with exit 0 in 971.25 seconds: 944 selected paths, 689 pass,
+167 expected-negative, 88 unsupported, and zero retries. It wrote no
+partitions. These totals cover the full train; the batch counts above remain
+separate. The
 [raw UPDATE output](/data/m5c-b01-b03-b18-20261029/root-scoped-904bef8c/scoped.stdout)
 and [stderr](/data/m5c-b01-b03-b18-20261029/root-scoped-904bef8c/scoped.stderr)
 are the execution evidence.
@@ -95,7 +99,7 @@ The
 [full-row pattern audit](/data/m5c-b01-b03-b18-20261029/task_b827cc9b95b8/ctx_3dcead5a3eca/fix-round-1/all-row-pattern-audit.json)
 sweeps all 944 admitted rows before this bundled correction. The
 [exact delta](/data/m5c-b01-b03-b18-20261029/task_b827cc9b95b8/ctx_3dcead5a3eca/fix-round-1/changes.json)
-changes 152 rows across the train and 1 rows in this batch, preserving every
+changes 152 rows across the train and 1 row in this batch, preserving every
 classification, source hash, owner, original assertion, and prior Main row. The
 [review resolutions](/data/m5c-b01-b03-b18-20261029/task_b827cc9b95b8/ctx_3dcead5a3eca/fix-round-1/finding-resolutions.json)
 name all 19 blocking finding identities, including duplicate reports of a
@@ -106,6 +110,7 @@ keys; ordinary Symbol property writes are not indexed operations.
 Selected buffer factories supply no buffer witness when element
 conversion throws before allocation. Static method validation and
 collection supply no concrete-construction witness when they exit early.
+
 Synchronous generators are distinct from async generators. Primary
 Object.prototype.toString, object source conversion, and Promise species
 lookups supply the missing symbol witnesses. The lexical correction
@@ -119,7 +124,9 @@ wrote no partitions and produced an empty diff. The
 [raw UPDATE output](/data/m5c-b01-b03-b18-20261029/root-scoped-5627d317/remote-20261029T155848Z-10dafd8b0ab5/stdout)
 and
 [metadata](/data/m5c-b01-b03-b18-20261029/root-scoped-5627d317/remote-20261029T155848Z-10dafd8b0ab5/meta.json)
-bind that result. The
+bind that result.
+
+The
 [post-UPDATE agreement proof](/data/m5c-b01-b03-b18-20261029/task_b827cc9b95b8/ctx_3dcead5a3eca/fix-round-1/post-update-agreement.json)
 compares all 944 admitted records with the original focused evidence, changing
 only the reviewed tags. Root accepted the unchanged result set.
@@ -147,12 +154,15 @@ changes 45 rows across the train and 12 in this batch.
 Expected descriptors passed only to verifyProperty are assertion
 plumbing; the 30 matching rows lose object-literals. Actual descriptor
 objects passed to Object.defineProperty remain prerequisite witnesses.
+
 Fifteen rows lose control-flow because their conditionals only report
 or propagate assertion failure, including the analogous B18 identifier
 and line-terminator cases. Independent condition operators remain
 tagged. Expected runtime-negative comment tests retain their branches
 and abrupt-completion contracts. Unsupported asserted contracts remain
-intact. Classifications, owners, observations, existing Main rows, and
+intact.
+
+Classifications, owners, observations, existing Main rows, and
 ADR boundaries do not change. The
 [finding resolutions](/data/m5c-b01-b03-b18-20261029/task_b827cc9b95b8/ctx_3dcead5a3eca/fix-round-3/finding-resolutions.json)
 link every reported identity to this bundled correction.
@@ -174,11 +184,15 @@ owners, and observations.
 Nine rows lose control-flow from input enumeration, oracle assertions,
 or branches that only gate the test body. Independent properties,
 operators, protocols, and actual error-producing branches retain their
-tags. The duplicate BoundNames ImportDeclaration negative carries
+tags.
+
+The duplicate BoundNames ImportDeclaration negative carries
 module-linking as its module static-semantics syntax family, as Root
 ruled under rule 6. It supplies no runtime linking evidence. The other
 three import negatives assert escaped contextual keywords and retain
-lexical-grammar. No fixture is evaluated, no exclusion changes, and
+lexical-grammar.
+
+No fixture is evaluated, no exclusion changes, and
 all prior Main rows remain unchanged. The
 [finding resolutions](/data/m5c-b01-b03-b18-20261029/task_b827cc9b95b8/ctx_3dcead5a3eca/fix-round-4/finding-resolutions.json)
 record both review identities and the approved adjudication.

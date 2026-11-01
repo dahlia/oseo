@@ -28,18 +28,19 @@ the pinned native toolchain, reviewed harness assembly, fragment executor
 and emitter, both specialization policies and each original strictness
 variant. Its FIFO variant gate and single resource-exhaustion retry rule
 match the runner; actual retries were zero. It completed naturally with
-exit 0 in 623.37 seconds, with no semantic, harness or infrastructure
+exit 0 in 623.37 seconds and no semantic, harness or infrastructure
 failure. These are fresh observations, not results reused from October 24.
 
 Root authorized the focused observation outside the heavy lock after a
-single PID wait and lock retry, with at most four parallel cases. This
-run used one case at a time, the pinned variant gate, its own Zig cache
-and a private temporary directory. Root owns subsequent UPDATE and
-full-gate scheduling. The exact bindings and raw results are under
+single PID wait and lock retry. The authorization allowed at most four
+parallel cases. This run used one case at a time, the pinned variant gate,
+its own Zig cache and a private temporary directory. Root owns subsequent
+UPDATE and full-gate scheduling. The exact bindings and raw results are
+under
 */data/m5c-train-b06-b08-b14-20261029/task\_816c5a04798f/ctx\_6f53d3a87142/*:
 *observer.mjs*, *focused-run.json*, *observation-report.json* and
-*observed/observations.json*, with one *case-N-result.json* per original
-and raw request, result, stdout and stderr files.
+*observed/observations.json*, with one *case-N-result.json* per original and
+raw request, result, stdout and stderr files.
 
 
 Held diagnostic portability prerequisite
@@ -113,18 +114,23 @@ The rule corrections are: add 56 symbols; add 7 object-properties; remove 1
 abrupt-completion.
 
 Tags name original asserted contracts and their required evaluation,
-including implicit Symbol and iterator dispatch. Failure-only
-`Test262Error` throws and assertion diagnostic strings do not supply
-tags. A normally completing `try` alone supplies no abrupt-completion
-evidence; specific thrown-error assertions and required rejection
-propagation do. Every parse-only negative carries grammar families of
-its directly rejected subject. Generic grammar/runtime tags come from
-the primary source and relevant includes, excluding helper internals.
+including implicit Symbol and iterator dispatch.
+
+Failure-only `Test262Error` throws and assertion diagnostic strings do not
+supply tags. A normally completing `try` alone supplies no
+abrupt-completion evidence; specific thrown-error assertions and required
+rejection propagation do.
+
+Every parse-only negative carries grammar families of its directly
+rejected subject. Generic grammar/runtime tags come from the primary
+source and relevant includes, excluding helper internals.
+
 Fixture modules propagate only asserted or prerequisite semantics; this
 cohort's observed module graphs have no fixture-module dependencies, so
-fixture-derived rows are zero. Non-String eval identity is not source
-compilation. Static scans are audit inputs, never observations or clean
-review verdicts.
+fixture-derived rows are zero.
+
+Non-String eval identity is not source compilation. Static scans are
+audit inputs, never observations or clean review verdicts.
 
 
 Verification and publication
@@ -138,12 +144,14 @@ metadata. The ledger, source-bound audit and batch plan are derived from
 those records. This bootstrap is not a scoped UPDATE or a new execution.
 
 Root's scoped UPDATE ran at U
-`c3adf3a6266d1d899a60bb45e9e6313f0ba6dd40`, against baseline
-`68b026bb8275b9b7ddd15b9bdd02ef90ef3b123f`, outside the heavy lock under
-Root's scheduling decision with `MISE_JOBS=2`. It completed naturally
-with exit 0 in 224.62 seconds, selected 1,153 of 32,463 paths, and recorded
-711 passes, 101 expected negatives and 341 unsupported results, with
-`pool=8 retries=0` and zero partition writes. These are train-wide counts.
+`c3adf3a6266d1d899a60bb45e9e6313f0ba6dd40` against baseline
+`68b026bb8275b9b7ddd15b9bdd02ef90ef3b123f`. It ran outside the heavy
+lock, under Root's scheduling decision, with `MISE_JOBS=2`. It completed
+naturally with exit 0 in 224.62 seconds, selected 1,153 of 32,463 paths,
+and recorded 711 passes, 101 expected negatives and 341 unsupported
+results, with `pool=8 retries=0` and zero partition writes. These are
+train-wide counts.
+
 Every selected result strictly agrees with the focused observation after
 attaching its final audited dependency metadata; all 32,463 manifest
 records and every canonical file hash remain unchanged. Root accepted
@@ -300,18 +308,21 @@ held subset rows and canonical records before U2, with their fresh
 `unsupported-profile-feature` observations. Each has the six tags
 `abrupt-completion`, `dynamic-source`, `error-intrinsics`,
 `expression-operators`, `functions` and `module-linking`, reconciled with
-the shared rules and the original indirect-eval row audit. The comma
-expression supplies indirect invocation; the asserted SyntaxError supplies
-the abrupt/error contract, and import/export Script-goal rejection supplies
-the module syntax subject. Assertion plumbing contributes no extra tags;
-there are no imported fixtures or fixture-derived rows.
+the shared rules and the original indirect-eval row audit.
+
+The comma expression supplies indirect invocation; the asserted SyntaxError
+supplies the abrupt/error contract, and import/export Script-goal rejection
+supplies the module syntax subject. Assertion plumbing contributes no extra
+tags; there are no imported fixtures or fixture-derived rows.
 
 The two ledger owners move from B06 to
 `node:dynamic-source-coverage-remediation`, preserving its prior 881 paths
 for 883 total. Fresh source/observation-bound audit rows retain the original
 Script grammar subjects as unresolved coverage. No exclusion or equivalent
-replacement is claimed. This completes the cohort's admission at 334 paths:
-2 passes, 3 expected negatives and 329 unsupported results, including 327
+replacement is claimed.
+
+This completes the cohort's admission at 334 paths: 2 passes, 3 expected
+negatives and 329 unsupported results. The unsupported results include 327
 under the dynamic-source umbrella and the two non-String direct-eval paths
 under their existing bounded owner. Original raw observations remain
 historical evidence.

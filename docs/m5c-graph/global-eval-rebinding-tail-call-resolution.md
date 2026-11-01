@@ -18,10 +18,10 @@ Pinned source SHA-256:
 The source is test262 revision
 `f2d1435644797268dca1f7988cad5a4e89ccd8d2`.
 
-Root approved this bounded owner after the first internal review round.
-The ordinary binding/call rejection grants no ADR exclusion and does not
-change ADR 0016. Repair the reference resolution without allowing dynamic
-source compilation, then re-observe the exact original.
+Root approved this bounded owner. The ordinary binding/call rejection
+grants no ADR exclusion and does not change ADR 0016. Repair the reference
+resolution without allowing dynamic source compilation, then re-observe the
+exact original.
 
 [Raw observations](/data/m5c-b23-b28-b29-b32-20261029/task_96812c4ba689/ctx_b3822e0f35ef/all-observations.json)
 retain the historical unsupported result. Its dynamic-source tag and former

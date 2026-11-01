@@ -32,11 +32,12 @@ original assertion; accounting never counts as a pass.
 
 This node depends on landed `authorized-exclusion-audit` and starts
 ready/unlanded. Ownership stays with `dynamic-source-coverage-remediation`
-until this child lands. Each child landing reports exact newly covered and
-still-uncovered subsets and moves ownership in the derived ledger. The
-umbrella remains an aggregate gate until all children land and it owns zero
-paths. Serialize shared audit, ledger and manifest publication; Root owns
-integration and publication.
+until this child lands.
+
+Each child landing reports exact newly covered and still-uncovered subsets
+and moves ownership in the derived ledger. The umbrella remains an aggregate
+gate until all children land and it owns zero paths. Serialize shared audit,
+ledger and manifest publication; Root owns integration and publication.
 
 
 Closure route and evidence obligations
@@ -51,7 +52,7 @@ bounded decision before closure.
 Remaining reason: `new-evidence`.
 
 Namespace Set/Delete behavior including sloppy callers, nested namespace
-exports, identity/ToPrimitive and live binding updates, including eval-driven
+exports, identity/ToPrimitive and live binding updates such as eval-driven
 updates. Static-import observations cover many earlier DS-2 rows but not these
 complete assertions.
 
@@ -89,10 +90,12 @@ For every eventual exclusion, name the exact replacement paths and reviewed
 observations, refresh source and normalized observation digests, and show
 that every non-source subject is covered. Keep mixed or uncovered subjects
 open and ask for a bounded maintainer decision when a faithful witness is
-unavailable. Preserve ADR 0016/0019 reopening triggers; an accepted ADR 0016
-amendment admitting dynamic import reopens ImportCall accounting. Each child
-requires normal D1/D11 review and D3/D4 publication. This metadata change
-performs none of those closure or landing steps.
+unavailable.
+
+Preserve ADR 0016/0019 reopening triggers; an accepted ADR 0016 amendment
+admitting dynamic import reopens ImportCall accounting. Each child requires
+normal D1/D11 review and D3/D4 publication. This metadata change performs
+none of those closure or landing steps.
 
 
 DS-12 assessment
@@ -103,64 +106,63 @@ The
 assesses exactly the pinned 70 paths against base `362ddb13`. All 70 were
 unsupported and umbrella-owned at that base. This change accounts for 51 under
 ADR 0016 and leaves 19 with the umbrella. It adds 36 fixed native groups and
-nine Script/Module parser probes; none becomes a test262 pass. All 41,091
-inventory paths remain. The subset and results are unchanged, so no UPDATE is
-needed.
+nine Script/Module parser probes. None becomes a test262 pass.
 
-The namespace witnesses preserve all original assertions and export
-categories, including absent names, symbols, descriptor flags and values.
-The nested-property observer also checks the actual six unexported
-declaration names, preserving the upstream negative-name assertions.
-Their observers are defined in a Script prelude: sloppy assignment and
-delete remain sloppy, while strict observers retain their directive.
-Each observer receives a statically imported namespace, directly and after
-a promise continuation. The promise only transports an existing namespace;
-it does not model dynamic module loading.
+All 41,091 inventory paths remain. The subset and results are unchanged, so no
+UPDATE is needed.
+
+The namespace witnesses preserve all original assertions and export categories,
+including absent names, symbols, descriptor flags and values. The
+nested-property observer also checks the actual six unexported declaration
+names, preserving the upstream negative-name assertions. Their observers are
+defined in a Script prelude: sloppy assignment and delete remain sloppy, while
+strict observers retain their directive. Each observer receives a statically
+imported namespace, directly and after a promise continuation. The promise only
+transports an existing namespace; it does not model dynamic module loading.
 
 The live-binding witnesses keep the original enclosing syntax and the
 independent global updater. Static self-import observes both export aliases
 before and after a local update. Custom primitive witnesses retain all four
 String/Number results. The three static graph witnesses retain the original
-import/export forms (including default-plus-empty-named imports protected
-from formatter normalization), exact evaluation-count guard, global object
-identity and nine-dependency order. `globalThis` replaces only dynamic
-discovery of the existing global object.
+import/export forms, including default-plus-empty-named imports protected from
+formatter normalization. They also retain the exact evaluation-count guard,
+global object identity, and nine-dependency order. `globalThis` replaces only
+dynamic discovery of the existing global object.
 
 The ImportMeta specifier witness observes the null prototype and the exact
 conditional conversion failure; decision item 2 separately bounds ImportCall
-promise identity and abrupt-to-rejection conversion. The five constructor
-or eval goal probes assert source-goal rejection itself. Nine fixed parser
-probes separately reject Script and admit Module source in top-level,
-ordinary, generator, async and async-generator bodies and parameters.
+promise identity and abrupt-to-rejection conversion. The five constructor or
+eval goal probes assert source-goal rejection itself. Nine fixed parser probes
+separately reject Script and admit Module source in top-level, ordinary,
+generator, async and async-generator bodies and parameters.
 
 The dedicated native suite requires Node.js and Deno references, both native
 specialization policies with collection forced at every safepoint, positive
-allocation/collection counters and emitted module C. Namespace subjects
-also require explicit namespace construction in MIR and C. The parser
-probes live under *packages/parser-babel/tests/* and run unchanged under
-both bootstrap hosts. Its forced-collection
-matrix applies to every group directly; these module/prelude groups do not
-enter the Script-fixture allowlists in *tests/native.ts*. Existing property
-domains and seeds remain unchanged.
+allocation/collection counters, and emitted module C. Namespace subjects also
+require explicit namespace construction in MIR and C. The parser probes live
+under *packages/parser-babel/tests/* and run unchanged under both bootstrap
+hosts. Its forced-collection matrix applies to every group directly. These
+module/prelude groups do not enter the Script-fixture allowlists in
+*tests/native.ts*. Existing property domains and seeds remain unchanged.
 
 The 19 residuals include repeated namespace acquisition, cached evaluation
 errors and error-object identity, Script/Module dual execution, deferred
 binding updates, independently started TLA graphs and their exact values,
-errors or settlement traces. Their table rows state the missing observation.
-A static target error plus ImportCall rejection accounting cannot close a
-path that additionally asserts caching, identity, messages or ordering.
-Those residuals need faithful evidence or a bounded maintainer decision.
+errors or settlement traces. Their table rows state the missing observation. A
+static target error plus ImportCall rejection accounting cannot close a path
+that additionally asserts caching, identity, messages or ordering. Those
+residuals need faithful evidence or a bounded maintainer decision.
 
 Only the 70 selected audit records change assessment. Each source and
 normalized observation digest was checked against the pinned suite and
-manifest. The replacement-evidence digests bind the table, both test files
-and the complete copied fixture graph. The original observations remain
+manifest. The replacement-evidence digests bind the table, both test files and
+the complete copied fixture graph. The original observations remain
 `unsupported-profile-feature`. An accepted ADR 0016 amendment admitting the
-relevant source form reopens the exclusions; ADR 0019's non-source
+relevant source form reopens the exclusions. ADR 0019's non-source
 normative-dependence trigger remains in force.
 
 Root retains outer review, exact-candidate CI, integration, publication and
 landing. New native evidence requires the ordinary full gate on both native
 hosts, including the AArch64 Linux compile-link lane. No compiler, runtime,
 specialization or property generator changes require a new extended property
-run locally; Root's M5c candidate CI still owns its required full gates.
+run locally. Root's M5c candidate CI still owns its required full gates.

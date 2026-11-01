@@ -67,19 +67,20 @@ observations, refresh source and normalized observation digests, and show
 that every non-source subject is covered. Keep mixed or uncovered subjects
 open and ask for a bounded maintainer decision when a faithful witness is
 unavailable. Preserve ADR 0016/0019 reopening triggers; an accepted ADR 0016
-amendment admitting dynamic import reopens ImportCall accounting. Each child
-requires normal D1/D11 review and D3/D4 publication. The split performed none
-of those closure or landing steps. The assessment below prepares two exclusions
-for Root's review and publication gates.
+amendment admitting dynamic import reopens ImportCall accounting.
+
+Each child requires normal D1/D11 review and D3/D4 publication. The split
+performed none of those closure or landing steps. The assessment below
+prepares two exclusions for Root's review and publication gates.
 
 
 Per-path assessment
 -------------------
 
-The exact selector above matches three umbrella-owned unsupported rows at
-base `362ddb13d933600f6a0543ac332eb8479be9053f`. The source and normalized
+The exact selector above matches three umbrella-owned unsupported rows at base
+`362ddb13d933600f6a0543ac332eb8479be9053f`. The source and normalized
 observation digests of all three were recomputed from the pinned suite and
-checked-in result partitions and match their audit records. Every path
+checked-in result partitions. They match their audit records. Every path
 retains its classification, tags, source and original assertions.
 
 | Path                                                                        | Normative subject and assertions                                                                                                                                                                                                                                                                        | Replacement coverage                                                                                                                                                                                                                                                              | Disposition and reason                                                                                                                                                                                       |

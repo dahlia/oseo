@@ -18,7 +18,7 @@ sorted with one final newline, has SHA256
 Selection rule: the audit families of
 */data/m5c-dynamic-source-265-audit-20261024/group-counts.json* named below,
 plus the later umbrella additions that audit did not group, placed by the
-missing contracts their batch notes record.
+missing contracts that their batch notes record.
 
 
 Audit result
@@ -37,7 +37,9 @@ The other 46 paths retain their unsupported classification and umbrella
 owner because complete replacement evidence was not established. This
 includes the successful returned-function constructions whose descriptions
 incorrectly suggest call/apply non-constructibility. No native evidence was
-added. The exclusion audit recomputes all 86 original source and observation
+added.
+
+The exclusion audit recomputes all 86 original source and observation
 digests, which match the recorded values, and binds the replacement table
 and passing result partitions. Only source evaluation remains for the 40
 exclusion rows under decision item 1. Changed evidence or an accepted

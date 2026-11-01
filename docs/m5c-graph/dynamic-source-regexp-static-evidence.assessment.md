@@ -5,25 +5,29 @@ The 29-path selector matches 29 unsupported umbrella ledger rows at base
 `362ddb13d933600f6a0543ac332eb8479be9053f`. Every source was read at pinned
 suite revision `f2d1435644797268dca1f7988cad5a4e89ccd8d2`.
 
-Root approved retaining the four exhaustive BMP paths on 2026-10-31 in
-Orca reply `msg_39d48b1bac6b` to `msg_2dd962fad203`. A complete generated
-domain needs a separate budget, seed block and shard weights. No sample or
+Root approved retaining the four exhaustive BMP paths on 2026-10-31 in Orca
+reply `msg_39d48b1bac6b` to `msg_2dd962fad203`. A complete generated domain
+needs a separate budget, seed block and shard weights. No sample or
 constructor-based approximation establishes closure for those four paths.
 
 The table names each normative subject and its replacement or remaining gap.
-The grammar witnesses are build-time inputs to the Oseo frontend, never
-runtime eval. `OSEO0001` rejection with no MIR witnesses the same early-error
-contract as the original SyntaxError assertion. The native fixture checks
-all original constructor observations and every positive/negative matching
-input, under both specialization policies with collection forced at every
-safepoint. Exact source output is also parsed into static literal artifacts.
+
+The grammar witnesses are build-time inputs to the Oseo frontend, never runtime
+eval. `OSEO0001` rejection with no MIR witnesses the same early-error contract
+as the original SyntaxError assertion.
+
+The native fixture checks all original constructor observations and every
+positive/negative matching input. It runs under both specialization policies
+with collection forced at every safepoint. Exact source output is also parsed
+into static literal artifacts.
+
 The source pairs use no Annex B extension; the four exhaustive BMP domains
 retain their separate Annex B/UnicodeIDContinue assessment.
 
 The fixture's six comparator controls require six rejections through an
 independent strict check. Focused tests replace the comparator with an
-always-true expression and with one that equates all numbers; both mutants
-fail before the fixture can print its success marker.
+always-true expression and with one that equates all numbers; both mutants fail
+before the fixture can print its success marker.
 
 | Path                                                                             | Normative subject                                                                               | Disposition                   | Replacement evidence                                                                     | Reason                                                                                                                                                                                         |
 | -------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------- | ----------------------------- | ---------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |

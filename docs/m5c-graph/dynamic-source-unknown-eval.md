@@ -17,9 +17,11 @@ umbrella with the observed rejection `error[OSEO1001]: Unknown binding 'eval'`.
 The Host Full path
 *test/language/global-code/script-decl-lex-var-declared-via-eval.js* reports
 the same diagnostic but belongs to `dynamic-source-lexical-completion-family`.
+
 The umbrella owns these paths once those batches land. The node records all
 three batches in `after`; selection and publication wait for their landing
 without adding dependency ancestry to the umbrella's manifest collision groups.
+
 The path set sorted with `LC_ALL=en_US.UTF-8 sort`, with one final newline,
 has SHA256
 `f8cdae47b9f8cf413abce9a9546194caa38c727841c0b42ca361f5a471f86830`.
@@ -30,10 +32,10 @@ Evidence obligations
 
  -  Assess each path separately. The _statementList/eval-\*_ probes may make
     source evaluation their subject, while the *literals/regexp/* probes may
-    make RegExp literal grammar their subject; they can reach different
+    make RegExp literal grammar their subject. They can reach different
     conclusions.
  -  A path closes under `adr:0016-dynamic-source-boundary` only by item 1 of
-    the decision: reviewed replacement evidence covers every non-source
+    the decision. Reviewed replacement evidence covers every non-source
     subject, and a fresh-digest exclusion-audit record names it and shows
     that only source evaluation remains. Otherwise it stays in remediation.
  -  Never count a pass, emulate eval, remove an assertion, or widen ADR 0016.
