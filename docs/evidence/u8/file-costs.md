@@ -1,12 +1,12 @@
 U8 per-file Node case costs
 ===========================
 
-Derived seconds from measured case `ms` values in the named
-macOS Node job logs; see [*README.md*](./README.md) for limits.
-The word absent means the file did not exist at that run's commit.
-A zero means no uniquely attributable case duration,
-not zero file cost.
-Every source file is listed; categories apply to complete files.
+Seconds are derived from measured case `ms` values in the named macOS Node job
+logs. See [*README.md*](./README.md) for limits.
+
+The word absent means the file did not exist at that run's commit. A zero means
+no uniquely attributable case duration, not zero file cost. Every source file
+is listed. Categories apply to complete files.
 
 | Source file                                                            | Audit category    | 36243816479 s | 36261458909 s | 36312192623 s |
 | ---------------------------------------------------------------------- | ----------------- | ------------: | ------------: | ------------: |
@@ -212,5 +212,5 @@ Every source file is listed; categories apply to complete files.
 | *tests/unicode-tables.test.ts*                                         | independent-linux |         1.134 |         1.514 |         0.809 |
 | *tests/versions.test.ts*                                               | unclear           |         0.219 |         0.172 |         0.113 |
 
-Category totals and ambiguous cases are in the main audit.
-The JSON inputs retain each measured case duration and its source file.
+Category totals and ambiguous cases are in the main audit. The JSON inputs
+retain each measured case duration and its source file.

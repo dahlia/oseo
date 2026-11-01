@@ -368,11 +368,11 @@ with `MISE_JOBS=1`.
 | `mise run test262:update -- --accept-promotions` | Pass, all partitions unchanged                              | 3,126   |
 
 The ordinary Node gate reports 1,541 passes, zero failures, five existing
-skips, and two existing todos. Deno reports 759 passes, zero failures, and
-two existing ignored tests. Extended native tests report no failures,
-skips, or todos. The twenty-case large-literal property completed in
-1,389 seconds within its unchanged 1,800-second deadline. No case count,
-seed, size limit, timeout, shard total, or frame ceiling was lowered.
+skips, and two existing todos. Deno reports 759 passes, zero failures, and two
+existing ignored tests. Extended native tests report no failures, skips, or
+todos. The twenty-case large-literal property completed in 1,389 seconds within
+its unchanged 1,800-second deadline. No case count, seed, size limit, timeout,
+shard total, or frame ceiling was lowered.
 
 
 Accepted-body compiler bounds
@@ -382,84 +382,85 @@ The earlier repair removed bodies that cannot enter, but left accepted bodies
 large enough to exhaust the sanitizer compiler. Its 4,096-element object
 literal emitted 10,200,891 bytes of C in 185,854 lines, and the supplemental
 host C build exceeded a 7.5 GiB safety watchdog. That censored probe has no
-complete peak RSS. Even the successful 4,096-declaration companion peaked
-above 2 GiB, as the historical table records.
+complete peak RSS. Even the successful 4,096-declaration companion peaked above
+2 GiB, as the historical table records.
 
 Large bodies now run through native C helpers with an iterative continuation
 owner. Helpers share the compact root frame, completion records, result, and
 scalar state. A spread argument view remains in shared state, and an object
-rest scratch array stays in the scope of its consuming call. Static data
-keeps one identity across helpers. Return and throw release the owner's root
-frame exactly once; helper transfers add no language calls or recursive
-native dispatch. The existing frame charge and 65,536-unit ceiling remain
-unchanged.
+rest scratch array stays in the scope of its consuming call. Static data keeps
+one identity across helpers. Return and throw release the owner's root frame
+exactly once; helper transfers add no language calls or recursive native
+dispatch. The existing frame charge and 65,536-unit ceiling remain unchanged.
 
 A helper-only prototype preserved the exact 4,096-element observation under
-both policies, but Clang still peaked at 4,298,556 and 4,301,344 KiB because
-it retained the whole translation unit. The backend therefore groups helper
+both policies. Clang still peaked at 4,298,556 and 4,301,344 KiB because it
+retained the whole translation unit. The backend therefore groups helper
 definitions into compiler units and supplies their wrapper sources to native
-composition. The existing multi-source toolchain contract compiles these
-units without cross-unit LTO. Standalone C emission retains the full program
-for inspection.
+composition. The existing multi-source toolchain contract compiles these units
+without cross-unit LTO. Standalone C emission retains the full program for
+inspection.
 
 The bounded-unit 4,096-element fixture passes with exact output and counters
 under both policies. Serial Clang 22.1.8 ASan/UBSan builds, measured with
 `/usr/bin/time -v`, peak at 320,336 KiB with specialization disabled and
-320,636 KiB with it enabled. The 4,096-declaration companion peaks at 254,336
-and 254,376 KiB and prints 4095. The 1,000-binding callable still admits its
-base case and then reports OSEO2001; its builds peak at 220,460 and 219,932
-KiB. The unchanged 25,000-const and 25,000-var rejection builds peak at
-119,192 and 118,972 KiB, and 130,068 and 129,920 KiB, respectively.
+320,636 KiB with it enabled.
+
+The 4,096-declaration companion peaks at 254,336 and 254,376 KiB and prints
+4095. The 1,000-binding callable still admits its base case and then reports
+OSEO2001; its builds peak at 220,460 and 219,932 KiB. The unchanged
+25,000-const and 25,000-var rejection builds peak at 119,192 and 118,972 KiB,
+and 130,068 and 129,920 KiB, respectively.
 
 *packages/backend-c/tests/bounded-body.test.ts* covers shared scalar and
 spread-pointer lifetime, continuation edges, static identity, literal-safe
 rewrites, bounded compiler grouping, and separate generator helper namespaces
-for main and agent sources. The native
-`array-sort-outlined-generator-control` fixture combines sorting, spreads,
-object rest, generator suspension, catch, and finally across helper calls.
-Node.js and Deno both observe `511 false`, `3 false`, `7 false`, and
-`512 true`. Both generated specialization policies match that output under
-ASan/UBSan, peaking at 206,872 and 207,764 KiB.
+for main and agent sources. The native `array-sort-outlined-generator-control`
+fixture combines sorting, spreads, object rest, generator suspension, catch,
+and finally across helper calls. Node.js and Deno both observe `511 false`,
+`3 false`, `7 false`, and `512 true`. Both generated specialization policies
+match that output under ASan/UBSan, peaking at 206,872 and 207,764 KiB.
 
 The largest generated property inputs, 4,096 elements with seven keys and
-cyclic offset two, pass both methods and both specialization policies.
-Their compiler peaks are 320,220 and 320,924 KiB for `sort`, and 320,072
-and 321,192 KiB for `toSorted`. The 2,048-element fixture peaks at 259,612
-and 260,016 KiB. These are serial `/usr/bin/time -v` observations under
-the host compiler's ASan/UBSan configuration.
+cyclic offset two, pass both methods and both specialization policies. Their
+compiler peaks are 320,220 and 320,924 KiB for `sort`, and 320,072 and 321,192
+KiB for `toSorted`. The 2,048-element fixture peaks at 259,612 and 260,016 KiB.
+These are serial `/usr/bin/time -v` observations under the host compiler's
+ASan/UBSan configuration.
 
-The complete sanitizer-native gate passes 273/273 fixtures. Every one of
-its 1,356 compiler invocations has a resource receipt; the maximum peak
-is 321,356 KiB, below the 2 GiB acceptance limit. No build triggered the
-7.5 GiB watchdog. Full regeneration passes 23,043 reviewed paths with
-19,571 passes, 1,982 expected negatives, 1,490 unsupported results, and
-zero promotions or failures. Static checks and the complete ordinary and
-extended gates pass. Ordinary Node.js reports 1,551 passes, five existing
-skips, and two existing todos; Deno reports 769 passes and two expected
-ignores. Native execution passes 273 fixtures and 274 AArch64 Linux
-cross builds. Extended native properties pass 226 tests; the twenty-case
-large-literal property completes in 300 seconds against its unchanged
-1,800-second deadline.
+The complete sanitizer-native gate passes 273/273 fixtures. Every one of its
+1,356 compiler invocations has a resource receipt; the maximum peak is 321,356
+KiB, below the 2 GiB acceptance limit. No build triggered the 7.5 GiB watchdog.
 
-The final fifth paired reviews return `No issues found.` from both
-`gpt-6-astra` and `claude-opus-5-5`, with unchanged protected snapshots.
-Earlier findings corrected shared spread pointers, generator symbol
-namespaces, object-rest scratch scope, and documentation. The first
-ordinary gate exposed an existing collision diagnostic contract, which
-was restored and tested before the successful complete rerun. No test
-budget, seed, size limit, timeout, shard total, or frame ceiling changed.
+Full regeneration passes 23,043 reviewed paths with 19,571 passes, 1,982
+expected negatives, 1,490 unsupported results, and zero promotions or failures.
+Static checks and the complete ordinary and extended gates pass.
+
+Ordinary Node.js reports 1,551 passes, five existing skips, and two existing
+todos; Deno reports 769 passes and two expected ignores. Native execution
+passes 273 fixtures and 274 AArch64 Linux cross builds. Extended native
+properties pass 226 tests; the twenty-case large-literal property completes in
+300 seconds against its unchanged 1,800-second deadline.
+
+The fifth and final paired reviews return `No issues found.` from both
+`gpt-6-astra` and `claude-opus-5-5`; protected snapshots are unchanged. Earlier
+findings corrected shared spread pointers, generator symbol namespaces,
+object-rest scratch scope, and documentation.
+
+The first ordinary gate exposed an existing collision diagnostic contract. It
+was restored and tested before the successful complete rerun. No test budget,
+seed, size limit, timeout, shard total, or frame ceiling changed.
 
 This dispatch's raw probes, failed intermediate attempts, reviews, and gate
-receipts are retained under
-*/data/array-sort-bounded-task\_430cd5d8efa7/*.
+receipts are retained under */data/array-sort-bounded-task\_430cd5d8efa7/*.
 
 
 Hosted-runner interrupt budget
 ------------------------------
 
-The landed 180-second ordinary budget, which the extended tier scales to
-1,800 seconds for 20 cases, held on every 16-core host and failed on hosted
-Linux. Main runs [37867645790] at `e30aafca` and [37884543813] at `af4770eb`
+The landed 180-second ordinary budget held on every 16-core host and failed
+on hosted Linux. The extended tier scales that budget to 1,800 seconds for 20
+cases. Main runs [37867645790] at `e30aafca` and [37884543813] at `af4770eb`
 each failed `native support (linux-x86_64-gnu, 5/5)` twice and passed on the
 third attempt, so each landing cost two reruns. Both failures are the same
 observation: `large Array sorting preserves every identity` interrupted at
@@ -476,10 +477,10 @@ Measured extended durations for the same 20 cases:
 
 Every extended case builds, links, and runs a 2,048 to 4,096 object literal
 twice, once per specialization policy. A four-core hosted runner therefore
-spends about seven times the per-case time of a 16-core host, and its
-observed spread of 59 to over 106 seconds per case straddles the deadline.
-Earlier local measurements in this document, 300, 837, and 1,389 seconds,
-show that the margin was already thin where the budget was derived.
+spends about seven times the per-case time of a 16-core host. Its observed
+spread of 59 to over 106 seconds per case straddles the deadline. Earlier
+local measurements in this document, 300, 837, and 1,389 seconds, show that
+the margin was already thin where the budget was derived.
 
 The budget is now 300 ordinary seconds, which the extended tier scales to
 3,000 seconds. That is 1.42 times the 2,118-second extrapolation of the
@@ -487,10 +488,10 @@ interrupted run and 2.5 times the hosted run that passed. The deadline still
 fails an interrupted run, so a hang or a runaway generator is still caught.
 
 Nothing else changed. The case count stays at two ordinary and 20 extended
-cases, the seed stays at `0x60008400`, the size limits stay at 2,048 to
-2,056 ordinary and 4,096 extended, and no classification moves. The two
+cases, the seed stays at `0x60008400`, and the size limits stay at 2,048 to
+2,056 ordinary and 4,096 extended. No classification moves. The two
 scheduling weights for this file in *tools/native-shard-costs.ts* were
-estimates, because the file postdates the weight-source runs; they are now
+estimates, because the file postdates the weight-source runs. They are now
 the measured 1,187 seconds for hosted Linux and 384 seconds for the macOS
 lane, so the shard packer stops placing the file among heavy neighbors.
 *docs/evidence/u6/README.md* records that provenance.

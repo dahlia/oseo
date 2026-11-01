@@ -3,8 +3,9 @@ U7 duplicate-work audit evidence
 
 These files preserve inputs and extraction rules for the U7 section of
 [*gate-cost-baseline.md*](../../gate-cost-baseline.md). CI inputs were observed
-from main runs 36243816479 and 36261458909; no workflow was triggered. Each
-compact file retains its run ID, full commit SHA, job name/ID, selected API
+from main runs 36243816479 and 36261458909; no workflow was triggered.
+
+Each compact file retains its run ID, full commit SHA, job name/ID, selected API
 step timestamps, later-build interval timestamps and end markers, and measured
 Node tooling-test durations. Captured JSON uses *.json.txt* as historical
 reference data, following the U10 evidence convention.
@@ -19,7 +20,9 @@ python3 docs/evidence/u7/summarize.py
 It removes ANSI color escapes, identifies each exact
 `[build] $ aube exec -- tsdown --workspace` launch, excludes the first build
 in the job, and ends each later interval at the next log line matching
-`\[test:[^\]]+\] \$`. That is the test task's shell launch, not its final
+`\[test:[^\]]+\] \$`.
+
+That is the test task's shell launch, not its final
 completion, first test case, or a build output message. The timestamp
 subtraction includes dispatch overhead. For the check job, each named
 `duration_ms` summary measures only its Node unit-test subprocess.
@@ -46,6 +49,7 @@ for stdin execution, rather than a live repository test or build entry point.
 It records the arguments delivered to an `fc.assert` predicate using
 `fc.integer()` and the actual `propertyParameters` function. It does not use
 `fc.sample`, whose sampling bias would be a different observation.
+
 *property-probe.log* is the measured output. Run from the repository root:
 
 ~~~~ sh
