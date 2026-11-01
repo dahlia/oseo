@@ -20,6 +20,7 @@ EXCLUDED = {
     'tests/property/m5-object-own-keys.property.test.ts',
     'tests/property/m5-reflect-namespace.property.test.ts',
     'tests/property/m5-array-constructor.property.test.ts',
+    'tests/property/m5-regexp-literal-exhaustive.property.test.ts',
 }
 # Added to main after these runs, so the logs never observed them; their
 # table weights are retained unchanged. The two module files carry one-run

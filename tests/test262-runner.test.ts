@@ -2357,6 +2357,71 @@ test("records a deterministic scheduler outside the agent host", async () => {
   }
 });
 
+test("selects the observing rejection policy for every request", async () => {
+  // ADR 0030: the runner always observes unhandled rejections, whatever
+  // the goal, strictness, completion contract, or test262 host selection.
+  const cases = [
+    { flags: "", completion: "" },
+    { flags: "async", completion: `${asyncCompletionMarker}\n` },
+    { flags: "CanBlockIsFalse", completion: "" },
+    { flags: "onlyStrict", completion: "" },
+    { flags: "raw", completion: "" },
+  ];
+  await Promise.all(
+    cases.map(async ({ flags, completion }) => {
+      const source = `/*---\nflags: [${flags}]\n---*/\nAtomics.wait;\n`;
+      const parsed = parseTest262Case(source, "test/policy.js", revision);
+      const requests: Test262ExecutionRequest[] = [];
+      const result = await executeTest262Case(
+        source,
+        parsed,
+        new Set(["Atomics"]),
+        harnesses,
+        {
+          async execute(request) {
+            requests.push(request);
+            return { exitStatus: 0, stderr: "", stdout: completion };
+          },
+        },
+        ["atomics-single-agent"],
+      );
+      assert.equal(result.classification, "pass", flags);
+      assert.ok(requests.length > 0);
+      for (const request of requests) {
+        assert.equal(request.unhandledRejectionPolicy, "observe", flags);
+      }
+    }),
+  );
+  const directory = await mkdtemp(join(tmpdir(), "oseo-rejection-policy-"));
+  try {
+    const source = "/*---\nflags: [module]\n---*/\nexport {};\n";
+    const parsed = parseTest262Case(source, "test/policy.js", revision);
+    const requests: Test262ExecutionRequest[] = [];
+    const result = await executeTest262Case(
+      source,
+      parsed,
+      new Set<string>(),
+      harnesses,
+      {
+        async execute(request) {
+          requests.push(request);
+          return await Promise.resolve(successfulResult());
+        },
+      },
+      ["module-linking"],
+      { rootPath: directory, sourcePath: join(directory, "policy.js") },
+    );
+    assert.equal(result.classification, "pass");
+    assert.ok(requests.length > 0);
+    for (const request of requests) {
+      assert.equal(request.mode, "module");
+      assert.equal(request.unhandledRejectionPolicy, "observe");
+    }
+  } finally {
+    await rm(directory, { force: true, recursive: true });
+  }
+});
+
 test("selects the agent policy for every reviewed variant", async () => {
   await Promise.all(
     ["CanBlockIsFalse", "CanBlockIsTrue", ""].map(async (flag) => {

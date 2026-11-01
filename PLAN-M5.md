@@ -19,8 +19,8 @@ the deterministic native scheduler through the explicit CLI module goal, and
 the dependency-indexed baseline manifest covers module linking and early
 errors, top-level await, asynchronous functions, and the Promise family with
 honest unsupported classifications. The current reviewed manifest records
-41,091 reviewed cases: 34,751 passes, 4,401
-expected negatives, and 1,939 unsupported profile features with no semantic,
+41,091 reviewed cases: 34,778 passes, 4,401
+expected negatives, and 1,912 unsupported profile features with no semantic,
 harness, or infrastructure failures.
 [ADR 0020](./docs/adr/0020-m5-applicable-test-inventory.md) now fixes the M5a
 denominator at 41,091 paths from 47,381 candidates: 22,998 language tests and
@@ -4782,7 +4782,7 @@ The unchanged upstream path is admitted, and fixed 2,048- and
 both policies and deliberate shape-guard fallback. The pinned 2,048-element
 fixture forces collection at every safepoint throughout construction and
 sorting under both policies; the 4,096-element fixture uses normal
-collection. The sanitizer native CI job has a 75-minute limit, and these
+collection. The sanitizer native CI job has a 90-minute limit, and these
 fixtures have no individual execution timeout. Generated large literals
 use normal collection inside the unchanged two-case, 180-second property
 budget. The normative sorting family now includes all 75 upstream paths.

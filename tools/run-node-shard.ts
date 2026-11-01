@@ -4,7 +4,7 @@ import { parseTestShardArguments } from "./shard.ts";
 
 const { shard } = parseTestShardArguments(process.argv.slice(2));
 if (shard == null) throw new Error("Node shard runner requires --shard.");
-const args = nodeTestShardArguments(process.cwd(), shard);
+const args = nodeTestShardArguments(process.cwd(), shard, process.platform);
 if (args.length > 0) {
   const child = spawnSync(process.execPath, args, { stdio: "inherit" });
   if (child.error) throw child.error;

@@ -8425,6 +8425,10 @@ export function buildMir(
     globalObjectBindings,
     kind: "mir-program",
     observeSpecialization: options.observeSpecialization ?? false,
+    ...includePropertiesWhen(() => {
+      if (options.unhandledRejectionPolicy !== "observe") return undefined;
+      return { unhandledRejectionPolicy: "observe" as const };
+    }),
     script: buildMirFunction(
       -1,
       "<script>",

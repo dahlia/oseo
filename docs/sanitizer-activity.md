@@ -147,10 +147,19 @@ mise run test:sanitizer:property:shard \
   --test-shard=1/12 tests/property/*.property.test.ts
 ~~~~
 
+The macOS CI lane runs the native task as two file shards with
+`--shard N/2`; the first also carries the runtime fixtures, and the `native`
+aggregate requires both. See
+[*macOS native sanitizer split*](evidence/macos-sanitizer-split/README.md).
+
 The full property task remains unsharded. The Linux CI lane runs all three
-shards with `--test-shard=N/3` over _tests/property/\*.property.test.ts_,
-and the `native` aggregate requires the whole matrix. The shard task uses
-ordinary seeds, sizes, and case counts, not the extended property budget.
+shards of `mise run test:sanitizer:property:shared --shard N/3`, which keeps
+Node's `--test-shard=N/3` positions over _tests/property/\*.property.test.ts_
+and drops the files in `dedicatedSanitizerPropertyFiles`. Those files run in
+one dedicated job per host, and the `native` aggregate requires the whole
+matrix and both dedicated jobs. The macOS property job runs the same shared
+task unsharded. Every task uses ordinary seeds, sizes, and case counts, not
+the extended property budget.
 
 The archive reuse key includes the exact resolved compiler path, full version
 output, archiver path, compile flags, target, runtime contents, and captured
@@ -353,12 +362,20 @@ the maintainer's five macOS slots. A single late-starting job could add almost
 the entire lane's duration. Earlier splitting of the longest macOS job family
 reduced a repository run from 260.8 to 181.4 minutes; that observation
 motivates the split but does not predict this lane's wall time. Two jobs also
-limit repeated setup costs. Each has a 75-minute timeout: about 31 minutes
-above the larger central estimate, and roughly 16 minutes above its
-proportional share of the 105-minute upper planning bound. That margin covers
-tool installation, cold archives, runner variation, and corpus growth. Queue
-time is separate; the split does not reduce total compiler work or guarantee
-earlier scheduling.
+limit repeated setup costs. The property job keeps a 75-minute timeout: about
+31 minutes above the larger central estimate, and roughly 16 minutes above
+its proportional share of the 105-minute upper planning bound. On commit
+`216503f8`, run `41191483370` attempt 1 cancelled
+`test_sanitizer_macos_macos_native` at 75.48 minutes on runner instance
+`1000093502`; attempt 2 of the same run passed the same commit at 58.92
+minutes on instance `1000093512`, so that job now gets 90 minutes. Main runs
+`41201259627` at `999f3416` and `41212096408` at `4e4d8a4a` measured 54.05
+and 61.72 minutes with the same image and toolchain. The per-fixture progress
+lines show attempt 1 running 20 to 40 percent slower across every large
+fixture, which reads as runner variance rather than a workload regression.
+Those margins cover tool installation, cold archives, runner variation, and
+corpus growth. Queue time is separate; the split does not reduce total
+compiler work or guarantee earlier scheduling.
 
 The property job retains four Node workers and sets
 `OSEO_PROPERTY_TIME_SCALE=6`, twice Linux's value of 3, because four compiling

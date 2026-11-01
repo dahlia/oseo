@@ -271,8 +271,8 @@ with the executed variants and target, reviewed dependency tags, and summaries
 with raw, path-group, and dependency totals. Unsupported, harness, and
 infrastructure results never increase the pass count.
 
-The current manifest contains 41,091 reviewed cases: 34,751 passes, 4,401
-expected negatives, and 1,939 unsupported profile features. It records no
+The current manifest contains 41,091 reviewed cases: 34,778 passes, 4,401
+expected negatives, and 1,912 unsupported profile features. It records no
 semantic, harness, or infrastructure failures.
 
 The batch 16/17 dependency audit corrects 21 tag claims on 20 of their
@@ -4666,7 +4666,7 @@ The unchanged upstream path is admitted, and fixed 2,048- and
 both policies and deliberate shape-guard fallback. The pinned 2,048-element
 fixture forces collection at every safepoint throughout construction and
 sorting under both policies; the 4,096-element fixture uses normal
-collection. The sanitizer native CI job has a 75-minute limit, and these
+collection. The sanitizer native CI job has a 90-minute limit, and these
 fixtures have no individual execution timeout. Generated large literals
 use normal collection inside the unchanged two-case, 180-second property
 budget. The normative sorting family now includes all 75 upstream paths.
@@ -8849,10 +8849,14 @@ complete. The remaining gaps retain their existing owners.
     `unhandled-rejection-policy` capability; node
     `unhandled-rejection-observation` owns them, and none is a pass or an
     exclusion. The five unreviewed cases recorded above belong to node
-    `observation-batch-01`, not to this boundary's owner. Reconciling the
-    native policy with the test262 host contract, which would change how
-    such cases classify, is a separate host-profile decision. Owner of that
-    decision: the modules and asynchronous execution stream.
+    `observation-batch-01`, not to this boundary's owner. The host-profile
+    decision that reconciles the native policy with the test262 host
+    contract is
+    [ADR 0030](./adr/0030-test262-unhandled-rejection-policy.md): the
+    reviewed runner selects the explicit observe policy for test262 harness
+    runs, while ordinary executables keep the fatal policy. Until Root's
+    full UPDATE observes these paths under it, their checked-in records
+    keep the classification above.
  -  Large intrinsic tables and built-in families land in the owned
     runtime components recorded in
     [*runtime-components.md*](./runtime-components.md).

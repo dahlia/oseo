@@ -29,6 +29,17 @@ const auditPath = "docs/m5c-closure/exclusion-audit.yaml";
 const dynamicOwner = "adr:0016-dynamic-source-boundary";
 const annexOwner = "adr:0013-m5-edition-and-manifest";
 const remediationOwner = "node:dynamic-source-coverage-remediation";
+/**
+ * Paths whose only Annex B dependence sits behind the eval rejection they
+ * observe. The maintainer decision of 2026-11-01 applied item 3 of the
+ * 2026-10-28 decision to exactly these two: their exhaustive replacement
+ * evidence witnesses every core subject, and only the U+200C and U+200D
+ * identity escapes still need Annex B. ADR 0013 itself is unchanged.
+ */
+export const m5cAnnexDynamicResiduePaths: ReadonlySet<string> = new Set([
+  "test/language/literals/regexp/S7.8.5_A1.4_T2.js",
+  "test/language/literals/regexp/S7.8.5_A2.4_T2.js",
+]);
 const importAttributesOwner =
   "node:import-attributes-dynamic-coverage-remediation";
 const importAttributesReservationPath =
@@ -285,6 +296,11 @@ export interface M5cExclusionAuditInputs {
   readonly importAttributesDynamicPaths?: ReadonlySet<string>;
   /** Exact ADR 0028 selector; absent means no path may use its owner. */
   readonly legacyCallerPaths?: ReadonlySet<string>;
+  /**
+   * Exact ADR 0013 rows over an eval rejection; absent means none. The
+   * checked-in audit passes `m5cAnnexDynamicResiduePaths`.
+   */
+  readonly annexDynamicResiduePaths?: ReadonlySet<string>;
   readonly ledger: M5cClosureLedger;
   readonly results: readonly Test262Result[];
   readonly records: ReadonlyMap<string, string>;
@@ -538,12 +554,29 @@ export function validateM5cExclusionAudit(
       result.case.features.includes("caller") &&
       result.case.flags.includes("noStrict") &&
       hasCallerRead(source, result.case.mode);
+    // An ADR 0013 row may stand over the eval rejection only in the exact
+    // residue selector, only as a bound annex-b-only exclusion, and every
+    // selector path must be such a row.
+    const annexResidue = inputs.annexDynamicResiduePaths?.has(path) ?? false;
+    if (
+      annexResidue !==
+      (proposedOwner === annexOwner &&
+        dynamicSurface &&
+        !annexSurface &&
+        excluded &&
+        assessment.normativeDependency === "annex-b-only" &&
+        assessment.replacementEvidence != null)
+    ) {
+      throw new Error(
+        `Audit needs the exact Annex B residue selector: ${path}.`,
+      );
+    }
     if (
       proposedOwner === dynamicOwner
         ? !dynamicSurface
         : proposedOwner === callerOwner
           ? !callerSurface
-          : !annexSurface && lookupMethod == null
+          : !annexSurface && lookupMethod == null && !annexResidue
     ) {
       throw new Error(
         `Audit rejection is outside the record surface: ${path}.`,
@@ -676,6 +709,13 @@ export function validateM5cExclusionAudit(
   // The reservation is a set contract. Each reserved path keeps its reviewed
   // row, whose row checks require the bounded exclusion or an observation
   // promotion; reassigning a ledger owner cannot drop it from the audit.
+  for (const residue of inputs.annexDynamicResiduePaths ?? []) {
+    if (!seen.has(residue)) {
+      throw new Error(
+        `Annex B residue selector lacks its audit row: ${residue}.`,
+      );
+    }
+  }
   for (const reserved of inputs.importAttributesDynamicPaths ?? []) {
     if (!seen.has(reserved)) {
       throw new Error(
@@ -740,6 +780,7 @@ export function validateCurrentM5cExclusionAudit(): M5cExclusionAuditSummary {
     sources.set(path, readFileSync(join(suite, path), "utf8"));
   }
   return validateM5cExclusionAudit(text, {
+    annexDynamicResiduePaths: m5cAnnexDynamicResiduePaths,
     importAttributesDynamicPaths: readImportAttributesReservation(),
     legacyCallerPaths: readLegacyCallerSelector(
       recordSources.get(callerRecordStem) ?? "",

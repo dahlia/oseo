@@ -1,9 +1,10 @@
 B19/B20/B30 dynamic-source coverage remediation
 ===============================================
 
-The current umbrella owns 192 paths after the residual evidence candidate
-accounts for 17 of bundle 3's 209. The assessment keeps two of its 19
-selected paths here; the other 190 are outside that bounded child.
+The umbrella now owns 162 paths; the child sections below give each move.
+In bundle 3 the residual evidence candidate accounted for 17 of the 209
+paths it owned then. The assessment keeps two of its 19 selected paths here;
+the other 190 are outside that bounded child.
 
 At the earlier split checkpoint, the umbrella owned 757 paths: DS1 accounts for
 218, DS-3 for 11, DS2 for 76, DS4 for 40, DS-5 for 2, DS-6 for 42 and DS-7 for
@@ -612,3 +613,69 @@ unexecuted constructor accounting 1. Its pinned selector and obligations
 are in that child's work note. Ownership moves only with reviewed closure;
 the umbrella retains every remaining path and requires child landing plus
 zero directly owned paths before its own landing.
+
+
+Static-specifier import design child
+------------------------------------
+
+Item 3 of the 2026-11-01 maintainer answer adds the design-only
+`static-specifier-import-design` node for exactly 20 paths: 19 DS-12
+module-loading-and-promises rows and DS-8's *usage-from-eval.js*. Its pinned
+selector and authority are in that child's work note. The node designs the
+build-time-resolvable literal `import()` track and drafts a Proposed ADR 0016
+amendment; it moves no owner. The umbrella retains all 20 paths.
+
+
+Host Script evidence child
+--------------------------
+
+The 2026-11-01 umbrella-residual decision, item 1, adds
+`dynamic-source-host-script-evidence` for exactly 99 paths: 98 DS-10 eval
+rows and the DS-16 no-newline hashbang completion row. Its pinned selector,
+conditions and closure routes are in that child's work note. Ownership
+moves only with reviewed closure; the umbrella keeps every remaining path
+and now waits for this child. The child accounts for 44 paths under ADR 0016
+with finite literal host Script witnesses and keeps 55 with exact per-path
+reasons, so the umbrella owns 290.
+
+
+Train C ordinary evidence child
+-------------------------------
+
+Items 3 and 4 of the 2026-11-01 umbrella residual answer add
+`dynamic-source-trainc-ordinary-evidence` for exactly 44 train C paths:
+26 Function-constructor paths expected to close with ordinary evidence and
+ADR 0016 accounting, and 18 caller-local direct eval environment paths that
+try evidence first. Its pinned selector and obligations are in that child's
+work note. Ownership moves only with reviewed closure; paths that evidence
+cannot close stay here for the named-deferral route.
+The child accounts for 26 paths under ADR 0016 and keeps the 18
+caller-local paths with exact per-path reasons, so with both children the
+umbrella owns 264.
+
+
+Exhaustive regexp literal child
+-------------------------------
+
+The maintainer's 2026-11-01 answer adds `dynamic-source-regexp-exhaustive`
+for the four DS-17 BMP literal paths that need exhaustive witnesses. Its
+pinned selector and obligations are in that child's work note. Its
+exhaustive witness moves the two plain paths to ADR 0016 and the two escaped
+paths, whose ZWNJ and ZWJ assertions only Annex B meets, to ADR 0013 under
+the maintainer decision of 2026-11-01, so with the other children the
+umbrella owns 260 paths. The umbrella is blocked until the child lands.
+
+
+Train C host Script evidence child
+----------------------------------
+
+Item 1 of the 2026-11-01 umbrella-residual answer adds
+`dynamic-source-host-script-trainc-evidence` for exactly 98 train C paths:
+script completion values 62, eval syntax errors 34, one global binding row
+and one eval binding row. Its pinned selector and obligations are in that
+child's work note. Ownership moves only with reviewed closure; the umbrella
+retains every remaining path and requires child landing plus zero directly
+owned paths before its own landing.
+
+The child accounts for all 98 under ADR 0016, so with the other children
+the umbrella owns 162 paths.

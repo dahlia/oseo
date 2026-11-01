@@ -1,0 +1,15 @@
+version: 1
+id: dynamic-source-host-script-evidence
+title: Dynamic source host Script evidence
+delivers: >-
+  Reviews exactly 99 pinned residual paths under item 1 of the 2026-11-01
+  umbrella-residual decision: 98 DS-10 eval rows and one DS-16 completion
+  row. Extends the DS-21 finite literal host Script replacement evidence
+  only where the contract is independent of the caller environment and
+  strictness and error phase match. Uncovered paths retain umbrella
+  ownership. Scope, SHA256, routes and authority are recorded in
+  docs/m5c-graph/dynamic-source-host-script-evidence.md.
+dependencies:
+  - unsupported-ownership-audit
+landed: true
+status: ready

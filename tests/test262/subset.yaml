@@ -33125,7 +33125,7 @@ tests:
     expectedClassification: pass
     dependencies: [promise-settlement]
   - path: test/built-ins/Promise/all/capability-resolve-throws-no-close.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [promise-settlement]
   - path: test/built-ins/Promise/all/capability-resolve-throws-reject.js
     expectedClassification: pass
@@ -33146,7 +33146,7 @@ tests:
     expectedClassification: pass
     dependencies: [promise-settlement]
   - path: test/built-ins/Promise/all/invoke-resolve-error-close.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [promise-settlement]
   - path: test/built-ins/Promise/all/invoke-resolve-error-reject.js
     expectedClassification: pass
@@ -33158,7 +33158,7 @@ tests:
     expectedClassification: pass
     dependencies: [promise-settlement]
   - path: test/built-ins/Promise/all/invoke-resolve-get-once-multiple-calls.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [promise-settlement]
   - path: test/built-ins/Promise/all/invoke-resolve-get-once-no-calls.js
     expectedClassification: pass
@@ -33179,13 +33179,13 @@ tests:
     expectedClassification: pass
     dependencies: [promise-settlement]
   - path: test/built-ins/Promise/all/invoke-then-error-close.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [promise-settlement]
   - path: test/built-ins/Promise/all/invoke-then-error-reject.js
     expectedClassification: pass
     dependencies: [promise-settlement]
   - path: test/built-ins/Promise/all/invoke-then-get-error-close.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [promise-settlement]
   - path: test/built-ins/Promise/all/invoke-then-get-error-reject.js
     expectedClassification: pass
@@ -33243,7 +33243,7 @@ tests:
     expectedClassification: pass
     dependencies: [promise-settlement]
   - path: test/built-ins/Promise/all/iter-next-val-err-no-close.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [promise-settlement]
   - path: test/built-ins/Promise/all/iter-next-val-err-reject.js
     expectedClassification: pass
@@ -33270,7 +33270,7 @@ tests:
     expectedClassification: pass
     dependencies: [promise-settlement]
   - path: test/built-ins/Promise/all/iter-step-err-no-close.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [promise-settlement]
   - path: test/built-ins/Promise/all/iter-step-err-reject.js
     expectedClassification: pass
@@ -33378,7 +33378,7 @@ tests:
     expectedClassification: pass
     dependencies: [promise-settlement]
   - path: test/built-ins/Promise/allSettled/capability-resolve-throws-no-close.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [promise-settlement]
   - path: test/built-ins/Promise/allSettled/capability-resolve-throws-reject.js
     expectedClassification: pass
@@ -33399,7 +33399,7 @@ tests:
     expectedClassification: pass
     dependencies: [promise-settlement]
   - path: test/built-ins/Promise/allSettled/invoke-resolve-error-close.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies:
       [
         abrupt-completion,
@@ -33444,13 +33444,13 @@ tests:
     expectedClassification: pass
     dependencies: [promise-settlement]
   - path: test/built-ins/Promise/allSettled/invoke-then-error-close.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [promise-settlement]
   - path: test/built-ins/Promise/allSettled/invoke-then-error-reject.js
     expectedClassification: pass
     dependencies: [promise-settlement]
   - path: test/built-ins/Promise/allSettled/invoke-then-get-error-close.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [promise-settlement]
   - path: test/built-ins/Promise/allSettled/invoke-then-get-error-reject.js
     expectedClassification: pass
@@ -33517,7 +33517,7 @@ tests:
     expectedClassification: pass
     dependencies: [promise-settlement]
   - path: test/built-ins/Promise/allSettled/iter-next-val-err-no-close.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [promise-settlement]
   - path: test/built-ins/Promise/allSettled/iter-next-val-err-reject.js
     expectedClassification: pass
@@ -33544,7 +33544,7 @@ tests:
     expectedClassification: pass
     dependencies: [promise-settlement]
   - path: test/built-ins/Promise/allSettled/iter-step-err-no-close.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [promise-settlement]
   - path: test/built-ins/Promise/allSettled/iter-step-err-reject.js
     expectedClassification: pass
@@ -33718,7 +33718,7 @@ tests:
     expectedClassification: pass
     dependencies: [promise-settlement]
   - path: test/built-ins/Promise/any/ctx-ctor.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies:
       [
         classes,
@@ -33997,7 +33997,7 @@ tests:
     expectedClassification: pass
     dependencies: [promise-settlement]
   - path: test/built-ins/Promise/any/returns-promise.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies:
       [
         expression-operators,
@@ -34195,7 +34195,7 @@ tests:
     expectedClassification: pass
     dependencies: [promise-settlement]
   - path: test/built-ins/Promise/prototype/finally/subclass-species-constructor-reject-count.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [promise-settlement]
   - path: test/built-ins/Promise/prototype/finally/subclass-species-constructor-resolve-count.js
     expectedClassification: pass
@@ -34466,7 +34466,7 @@ tests:
     expectedClassification: pass
     dependencies: [promise-settlement]
   - path: test/built-ins/Promise/prototype/then/rxn-handler-fulfilled-next-abrupt.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies:
       [
         abrupt-completion,
@@ -34497,7 +34497,7 @@ tests:
     expectedClassification: pass
     dependencies: [promise-settlement]
   - path: test/built-ins/Promise/prototype/then/rxn-handler-rejected-next-abrupt.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies:
       [
         abrupt-completion,
@@ -34594,7 +34594,7 @@ tests:
     expectedClassification: pass
     dependencies: [promise-settlement]
   - path: test/built-ins/Promise/race/invoke-resolve-error-close.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [promise-settlement]
   - path: test/built-ins/Promise/race/invoke-resolve-error-reject.js
     expectedClassification: pass
@@ -34627,13 +34627,13 @@ tests:
     expectedClassification: pass
     dependencies: [promise-settlement]
   - path: test/built-ins/Promise/race/invoke-then-error-close.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [promise-settlement]
   - path: test/built-ins/Promise/race/invoke-then-error-reject.js
     expectedClassification: pass
     dependencies: [promise-settlement]
   - path: test/built-ins/Promise/race/invoke-then-get-error-close.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [promise-settlement]
   - path: test/built-ins/Promise/race/invoke-then-get-error-reject.js
     expectedClassification: pass
@@ -34691,7 +34691,7 @@ tests:
     expectedClassification: pass
     dependencies: [promise-settlement]
   - path: test/built-ins/Promise/race/iter-next-val-err-no-close.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [promise-settlement]
   - path: test/built-ins/Promise/race/iter-next-val-err-reject.js
     expectedClassification: pass
@@ -34718,7 +34718,7 @@ tests:
     expectedClassification: pass
     dependencies: [promise-settlement]
   - path: test/built-ins/Promise/race/iter-step-err-no-close.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [promise-settlement]
   - path: test/built-ins/Promise/race/iter-step-err-reject.js
     expectedClassification: pass
@@ -34880,7 +34880,7 @@ tests:
     expectedClassification: pass
     dependencies: [promise-settlement]
   - path: test/built-ins/Promise/reject/ctx-ctor.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [promise-settlement]
   - path: test/built-ins/Promise/reject/ctx-non-ctor.js
     expectedClassification: pass
@@ -35006,7 +35006,7 @@ tests:
     expectedClassification: pass
     dependencies: [promise-settlement]
   - path: test/built-ins/Promise/resolve/arg-uniq-ctor.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies:
       [
         expression-operators,
@@ -148571,7 +148571,7 @@ tests:
     expectedClassification: pass
     dependencies: [control-flow, expression-operators]
   - path: test/language/expressions/optional-chaining/member-expression-async-identifier.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-functions, expression-operators]
   - path: test/language/expressions/optional-chaining/member-expression-async-literal.js
     expectedClassification: pass
@@ -161028,7 +161028,7 @@ tests:
     expectedClassification: pass
     dependencies: [async-functions]
   - path: test/language/statements/async-function/evaluation-body.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies:
       [
         async-functions,

@@ -293,7 +293,19 @@ delivers: "Resolves the 334 reviewed unsupported paths assigned to
   observation-batch-27.md. No replacement, exclusion or ADR change is
   claimed. Root's bundle 4 scoped UPDATE then observed
   statements/function/S13.2.2_A13.js as pass on the bundle 3 runtime,
-  leaving 334."
+  leaving 334. dynamic-source-host-script-evidence then accounts for 44 of
+  its 99 DS-10 and completion paths under ADR 0016 with finite literal host
+  Script witnesses and keeps 55, leaving 290; see
+  docs/m5c-graph/dynamic-source-host-script-evidence.md.
+  dynamic-source-trainc-ordinary-evidence accounts for 26 of its 44 train C
+  paths under ADR 0016 with static, grammar and literal host Script
+  witnesses compared strictly and keeps 18 caller-local direct eval
+  environment paths, leaving 264; see
+  docs/m5c-graph/dynamic-source-trainc-ordinary-assessment.md.
+  dynamic-source-regexp-exhaustive moves its four exhaustive BMP literal
+  paths, leaving 260. dynamic-source-host-script-trainc-evidence accounts
+  for all 98 of its train C paths under ADR 0016, leaving 162; see
+  docs/m5c-graph/dynamic-source-host-script-trainc-evidence.md."
 dependencies:
   - authorized-exclusion-audit
   - dynamic-source-binding-reference-evidence
@@ -304,6 +316,8 @@ dependencies:
   - dynamic-source-construction-contracts
   - dynamic-source-eval-arguments-accounting
   - dynamic-source-eval-contract-accounting
+  - dynamic-source-host-script-evidence
+  - dynamic-source-host-script-trainc-evidence
   - dynamic-source-importcall-accounting
   - dynamic-source-importcall-residual-accounting
   - dynamic-source-lexical-completion-family
@@ -314,10 +328,13 @@ dependencies:
   - dynamic-source-private-binding-family
   - dynamic-source-realm-host-evidence
   - dynamic-source-realm-string-family
+  - dynamic-source-regexp-exhaustive
   - dynamic-source-regexp-static-evidence
   - dynamic-source-residual-evidence
   - dynamic-source-static-core-evidence
   - dynamic-source-template-site-evidence
+  - dynamic-source-trainc-ordinary-evidence
   - dynamic-source-unknown-eval
+  - static-specifier-import-design
 landed: false
-status: ready
+status: blocked

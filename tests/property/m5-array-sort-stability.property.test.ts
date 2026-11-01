@@ -5,7 +5,7 @@
  * collection at every safepoint under both policies; the 4,096-element
  * fixture uses normal collection. Instrumentation costs about 80 CPU seconds
  * per 2,048-element execution. Pinned fixtures have no individual timeout;
- * the sanitizer native CI job has a 75-minute limit.
+ * the sanitizer native CI job has a 90-minute limit.
  */
 import assert from "node:assert/strict";
 import process from "node:process";

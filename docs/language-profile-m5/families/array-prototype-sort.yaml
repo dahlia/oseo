@@ -22,7 +22,7 @@ scope:
     every safepoint during 2,048-element construction and sorting is pinned
     in tests/native.ts under both policies; the 4,096-element fixture uses
     normal collection. The pinned runner has no per-fixture timeout; the
-    sanitizer native CI job has a 75-minute limit. Forced instrumentation
+    sanitizer native CI job has a 90-minute limit. Forced instrumentation
     costs about 80 CPU seconds per 2,048-element execution."
   - "Callable entries retain conservative logical frame charges
     separately from dense heap roots: unoptimized sanitizer expression

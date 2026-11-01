@@ -29,7 +29,13 @@ bounds a first string-literal subset and its implementation and evidence
 gates. It proposes an ADR 0016 amendment for maintainer acceptance; the
 accepted rejection remains in force.
 
+The M5c [static-specifier import design] refines that subset for review
+under the 2026-11-01 maintainer answer. It adds a runtime module evaluation
+driver shared with static imports, Script referrers, and a Proposed ADR 0016
+amendment; the accepted rejection still applies.
+
 [build-time-resolvable proposal]: ./docs/dynamic-import-staged-plan.md
+[static-specifier import design]: ./docs/static-specifier-import-design.md
 
 
 Goal

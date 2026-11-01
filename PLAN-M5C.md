@@ -6,8 +6,10 @@ Status
 
 Implementation status: active. M5a fixed the applicable ECMA-262 16th edition
 inventory and M5b completed the built-in and intrinsic dependency graph. M5c
-closes every path in that inventory by observation, remediation, or an
-explicitly authorized exclusion. It does not reopen M5b or turn the remaining
+closes every path in that inventory by observation, remediation, an
+explicitly authorized exclusion, or, under proposed
+[ADR 0031](./docs/adr/0031-m5-named-deferral.md), a reviewed named deferral.
+It does not reopen M5b or turn the remaining
 19,708 unreviewed paths into one implementation unit.
 
 The checked-in starting point is 41,091 applicable paths at test262 revision
@@ -32,17 +34,26 @@ inventory. Every included path ends in exactly one of these states:
  -  a reviewed expected negative;
  -  a reviewed unsupported profile feature whose remediation is still active;
  -  a reviewed unsupported profile feature covered by an accepted record that
-    explicitly authorizes an M5 exclusion and bounds its surface; or
+    explicitly authorizes an M5 exclusion and bounds its surface;
+ -  a reviewed unsupported profile feature named in the ADR 0031 deferral
+    list with its reason, remaining contract, and target milestone; or
  -  unreviewed, which is allowed only while M5c remains active.
 
 M5 completes only when the last state is empty, all semantic, harness, and
-infrastructure failure counts are zero, and no unsupported result lacks either
-active remediation or an accepted exclusion. At the exit audit, active
-remediation is also empty.
+infrastructure failure counts are zero, and no unsupported result lacks active
+remediation, an accepted exclusion, or a named deferral. At the exit audit,
+active remediation is also empty.
+
+A named deferral is the disposition for measured residue that neither
+reviewed evidence nor a maintainer-approved track closes. It is never a
+silent exclusion or a scope cut: it is not an exclusion, a pass, or a
+closure, and a failure can never be deferred. ADR 0031 is proposed. Until it
+is accepted and a follow-up node teaches the ledger checker its `deferred`
+owner, no path can be deferred.
 
 Coverage reporting keeps the reviewed count, inventory size, classifications,
-and authorized-exclusion count separate. A percentage always uses the 41,091
-path inventory as its denominator.
+authorized-exclusion count, and deferral count separate. A percentage always
+uses the 41,091 path inventory as its denominator.
 
 
 Non-goals
@@ -127,6 +138,13 @@ The owner is the only per-path fact an M5c node edits:
     open path, or the node that will observe an unreviewed path;
  -  `adr:<stem>` names the record *docs/adr/<stem>.md* as the authorization
     of an unsupported path's M5 exclusion.
+
+ADR 0031 adds a planned `deferred` owner for an unsupported path with a
+reviewed entry in *docs/m5c-closure/deferrals.yaml*, and a `deferral`
+disposition for exclusion audit rows. Neither exists yet: the follow-up node
+named in the
+[*named deferral policy note*](./docs/m5c-graph/m5c-named-deferral-policy.md)
+adds the file, the owner, the disposition, and their checks.
 
 The checker accepts an `adr:` owner only for an unsupported path, only when
 the paragraph under the record's Status heading begins with `Accepted`, and
@@ -409,6 +427,50 @@ an exclusion. The batches follow
 [*docs/m5c-closure/exclusion-audit.md*](./docs/m5c-closure/exclusion-audit.md)
 for the record procedure. The separate `dynamic-import-staged-plan` node plans
 ADR 0016 alternative 3; it does not alter this interim ownership rule.
+
+### Static-specifier import track
+
+Item 3 of the 2026-11-01 maintainer answer approves only a design review of
+the build-time-resolvable `import()` track. Accepting the track needs a
+reviewed plan and an ADR 0016 amendment first; bounded general `eval` and
+`Function` construction are not approved. The `static-specifier-import-design`
+node owns that review. Its design is
+[*docs/static-specifier-import-design.md*](./docs/static-specifier-import-design.md),
+and its pinned 20-path selector is in its work note under *docs/m5c-graph/*.
+Until the maintainer accepts the amendment, the interim ownership rule above
+applies unchanged: every `import()` is rejected, and every pinned path keeps
+`node:dynamic-source-coverage-remediation`. Nineteen pinned rows observe the
+parse-time `ImportExpression` rejection. *usage-from-eval.js* instead observes
+the run-time `OSEO1001` rejection of the direct eval call whose source contains
+its `import()`.
+
+The admitted surface is an ImportCall whose only argument is a string
+literal, at a site in a module or in a Script with a build-side referrer.
+Every other form keeps the exact `ImportExpression` rejection that the audit
+accepts. A runtime module evaluation driver replaces the compiled evaluation
+schedule for every graph, so static and dynamic requests share one record,
+namespace, and evaluation state per canonical identity.
+
+After acceptance, Root may create the design's five implementation units as
+graph nodes, in this order:
+
+1.  the runtime evaluation driver for static graphs, with a full test262
+    UPDATE whose changed static observations are explained;
+2.  owned requests, Script referrers, discovery edges, and build refusals;
+3.  the import operation and its asynchronous settlement paths;
+4.  runner support and admission, with the `dynamic-import` feature moved
+    to the supported list, a full UPDATE, review of every changed
+    `dynamic-import` observation, and fresh assessments of the reopened
+    ADR 0016 dynamic-import exclusions; and
+5.  accounting for the pinned rows.
+
+Each unit meets the Gates section and needs Root's authorization. Unit 4
+must leave zero semantic failures. Seventeen pinned rows should close by
+observation after unit 4. *usage-from-eval.js* needs separate eval-context
+evidence, and *eval-rqstd-once.js* and *update-to-dynamic-import.js* reach
+the `Function` constructor in fixtures. Those three stay with the umbrella
+until reviewed evidence closes them or the named-deferral list of item 4
+records them.
 
 
 Static import attributes and JSON modules
@@ -857,8 +919,14 @@ The terminal audit additionally proves:
  -  the reviewed manifest covers all included paths;
  -  semantic, harness, and infrastructure failure counts are zero;
  -  every remaining unsupported result is covered by an accepted record that
-    authorizes and bounds an M5 exclusion;
- -  every accepted exclusion retains a stated reopening trigger;
+    authorizes and bounds an M5 exclusion, or by a reviewed ADR 0031
+    deferral entry whose source, observation, and record digests are fresh;
+ -  every accepted exclusion retains a stated reopening trigger, and every
+    deferral names its remaining contract and a target milestone after M5;
+ -  before the audit uses the deferral list, Root has mailed the maintainer
+    its total path count, per-family counts, each distinct reason with its
+    count, and target milestones, and no objection arrived within the
+    coordination wait period;
  -  the coverage report can be reproduced from checked-in inputs; and
  -  `mise run check`, `mise run test`, and the extended property task pass from
     a clean checkout.
@@ -868,13 +936,17 @@ Exit and reporting
 ------------------
 
 M5c is complete when `m5-exit-audit` lands. Its change records the final
-classification totals, authorized-exclusion count, exact inventory revision,
-and gate results. No queue-empty or all-current-nodes-landed condition can
-substitute for that audit, because the remediation graph may still need to
-expand after new observations.
+classification totals, authorized-exclusion count, deferral count with its
+per-family breakdown, exact inventory revision, and gate results. No
+queue-empty or all-current-nodes-landed condition can substitute for that
+audit, because the remediation graph may still need to expand after new
+observations.
 
 The completion report describes Oseo's measured M5 profile. It does not call
-the result unqualified ECMA-262 conformance while ADR 0016 remains accepted.
+the result unqualified ECMA-262 conformance while ADR 0016 remains accepted
+or the deferral list is not empty. When the list is not empty, the report
+says that measured residue was deferred by name and M5 closed, and never
+reports a deferred path as passing, excluded, or closed.
 
 
 Incidental Annex B prototype dependency

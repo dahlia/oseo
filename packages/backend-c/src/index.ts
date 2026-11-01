@@ -4964,6 +4964,18 @@ function emitHostScriptTables(
   return lines.join("\n");
 }
 
+/**
+ * The generated setup line that selects the observe rejection policy, or
+ * nothing. Ordinary programs carry no policy field, so their emitted C is
+ * unchanged and their context keeps the runtime's fatal default.
+ */
+function unhandledRejectionPolicySetup(program: MirProgram): string {
+  return program.unhandledRejectionPolicy === "observe"
+    ? "    context.unhandled_rejection_policy =\n" +
+        "        OSEO_UNHANDLED_REJECTION_OBSERVE;\n"
+    : "";
+}
+
 export const cBackend: NativeBackend = {
   emit(input) {
     const originalFunctions = reachableFunctions(input);
@@ -5144,6 +5156,8 @@ export const cBackend: NativeBackend = {
             host.scripts?.length ? "oseo_host_scripts" : "NULL"
           };\n` +
           `    context.host_script_count = ${host.scripts?.length ?? 0}u;\n`;
+    // Set before the host installs, which copies it to the agent cluster.
+    const rejectionPolicy = unhandledRejectionPolicySetup(input);
     const hostInstall =
       host == null
         ? empty
@@ -5170,7 +5184,10 @@ export const cBackend: NativeBackend = {
         sourceId,
         sourceIdByteLength,
         generatorRegistration,
-        specializationObservation + scriptInstall + hostInstall,
+        specializationObservation +
+          rejectionPolicy +
+          scriptInstall +
+          hostInstall,
         scriptRootCount,
         scriptRootCount,
         observations,
@@ -5495,9 +5512,9 @@ ${[
     sourceLength,
     "    oseo_context_set_generator_dispatcher(\n" +
       "        &context, oseo_dispatch_generator);\n",
-    harness.mir.observeSpecialization
+    (harness.mir.observeSpecialization
       ? "    context.observe_specialization = true;\n"
-      : "",
+      : "") + unhandledRejectionPolicySetup(harness.mir),
     2,
     2,
     harness.mir.observeSpecialization

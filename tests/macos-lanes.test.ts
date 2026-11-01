@@ -59,7 +59,10 @@ import {
   selfHostedPairSlowdowns,
   selfHostedProbeSeconds,
 } from "../tools/macos-job-costs.ts";
-import { selectNativeTestShard } from "../tools/native-shard.ts";
+import {
+  dedicatedSanitizerPropertyFiles,
+  selectNativeTestShard,
+} from "../tools/native-shard.ts";
 
 /**
  * Whether a Mac lane can run `job`, stated here rather than imported so
@@ -74,6 +77,7 @@ function macLaneEligible(job: MacosLaneJob): boolean {
       "test262",
       "own-key cases",
       "reflect cases",
+      "regexp exhaustive cases",
     ].includes(job.family)
   );
 }
@@ -236,6 +240,8 @@ function executedSteps(
 ): readonly StructuredDataRecord[] {
   const steps: StructuredDataRecord[] = [];
   for (const step of job.steps) {
+    // A skipped step's other expressions may name keys its row lacks.
+    if (normalize(step.if, row) === false) continue;
     const normalized = parsedMapping(normalize(step, row), "Test step");
     const { if: condition, ...unconditional } = normalized;
     if (condition === false) continue;
@@ -262,25 +268,36 @@ test("every check name and concurrency policy is preserved", () => {
           !name.startsWith("test262 (linux-x86_64-gnu,") &&
           name !== "test (macos-latest, node)" &&
           name !== "test (ubuntu-latest, node)" &&
-          name !== "host C sanitizers (Linux)",
+          name !== "host C sanitizers (Linux)" &&
+          name !== "host C sanitizers (macOS, native)",
       ),
+      // The macOS native sanitizer suite runs as two round-robin file
+      // shards; see docs/evidence/macos-sanitizer-split/README.md.
+      ...Array.from(
+        { length: 2 },
+        (_, index) => `host C sanitizers (macOS, native, ${index + 1}/2)`,
+      ),
+      // The dedicated sanitizer property files run in their own job on
+      // each host; see docs/evidence/regexp-literal-exhaustive/README.md.
+      "host C sanitizers (Linux, property, regexp literals)",
+      "host C sanitizers (macOS, property, regexp literals)",
       // The Linux native sanitizer fixtures are partitioned by the
       // round-robin shard flag; see PLAN-GATE.md (U36).
       ...Array.from(
         { length: 3 },
         (_, index) => `host C sanitizers (Linux, ${index + 1}/3)`,
       ),
-      // The hosted macOS Node.js suite is partitioned by Node's own
-      // --test-shard after excluding the dedicated Array file; Linux
-      // keeps default discovery. See PLAN-GATE.md (U32, U46).
+      // The ordinary Node.js suite is partitioned by measured file
+      // weights, after excluding the dedicated Array file on macOS. See
+      // PLAN-GATE.md (U32, U46) and docs/evidence/node-shards/README.md.
       "Array constructor (macos-latest, node)",
       ...Array.from(
-        { length: 4 },
-        (_, index) => `test (macos-latest, node, ${index + 1}/4)`,
+        { length: 6 },
+        (_, index) => `test (macos-latest, node, ${index + 1}/6)`,
       ),
       ...Array.from(
-        { length: 2 },
-        (_, index) => `test (ubuntu-latest, node, ${index + 1}/2)`,
+        { length: 4 },
+        (_, index) => `test (ubuntu-latest, node, ${index + 1}/4)`,
       ),
       // The Linux test262 total fell from twelve to eight so that the
       // run's Ubuntu jobs fit the slots it receives; see PLAN-GATE.md
@@ -307,9 +324,17 @@ test("every check name and concurrency policy is preserved", () => {
           (_, index) => `reflect cases (${target}, ${index + 1}/3)`,
         ),
       ),
+      // The exhaustive RegExp literal file does too; see
+      // docs/evidence/regexp-literal-exhaustive/README.md.
+      ...["linux-x86_64-gnu", "macos-aarch64"].flatMap((target) =>
+        Array.from(
+          { length: 5 },
+          (_, index) => `regexp exhaustive cases (${target}, ${index + 1}/5)`,
+        ),
+      ),
     ].toSorted(),
   );
-  assert.equal(names(after).length, 79);
+  assert.equal(names(after).length, 96);
   const { jobs: _beforeJobs, ...beforeHeader } = before;
   const { jobs: _afterJobs, ...afterHeader } = after;
   assert.deepEqual(afterHeader, beforeHeader);
@@ -361,8 +386,8 @@ test("every macOS job occurs exactly once in five LPT chains", () => {
   const lanes = macosLanes();
   assert.equal(lanes.length, 5);
   const jobs = lanes.flat();
-  assert.equal(jobs.length, 41);
-  assert.equal(new Set(jobs.map((job) => job.id)).size, 41);
+  assert.equal(jobs.length, 50);
+  assert.equal(new Set(jobs.map((job) => job.id)).size, 50);
   assert.deepEqual(
     jobs.map((job) => job.name).toSorted(),
     macosJobs()
@@ -398,15 +423,23 @@ test("every macOS job occurs exactly once in five LPT chains", () => {
   // median had moved by at least five percent. See PLAN-GATE.md
   // (U33, U40, U41, U42, U43, U44, U49). The Array ordinary job adds
   // an unmeasured 240-second allowance; see docs/evidence/array-macos.
+  // The macOS native sanitizer shards replaced a stale native entry; see
+  // docs/evidence/macos-sanitizer-split/README.md. The dedicated sanitizer
+  // property job adds a planning allowance; see
+  // docs/evidence/regexp-literal-exhaustive/README.md. The six weighted
+  // Node shards replaced four stale positional entries with modeled walls;
+  // see docs/evidence/node-shards/README.md. The five exhaustive RegExp
+  // literal case shards raised this from 14184 with derived hosted
+  // entries; see docs/evidence/regexp-literal-exhaustive/README.md.
   assert.equal(
     Math.max(
       ...lanes.map((lane) => lane.reduce((sum, job) => sum + job.seconds, 0)),
     ),
-    12334,
+    15794,
   );
 });
 
-test("commands, timeouts, environments and artifacts are unchanged", () => {
+test("generated macOS jobs preserve their template contract", () => {
   for (const planned of macosJobs()) {
     const original = before.jobs[planned.sourceId]!;
     const actual = after.jobs[planned.id]!;
@@ -469,6 +502,28 @@ test("commands, timeouts, environments and artifacts are unchanged", () => {
         (row) => !expand(original["runs-on"], row).startsWith("macos-"),
       ),
     );
+  }
+});
+
+test("macOS native sanitizer timeout covers the slow run", () => {
+  // Run 41191483370 cancelled the unsplit native suite at 75.5 minutes on
+  // commit 216503f8 and passed its rerun at 58.9, so each native shard
+  // keeps 90 minutes. The property jobs, including the dedicated RegExp
+  // literal job, keep 75. Cases, seeds, and budgets are unchanged. See
+  // docs/sanitizer-activity.md.
+  const timeouts = new Map(
+    macosJobs()
+      .filter((job) => job.sourceId === "test_sanitizer_macos")
+      .map((job) => [job.id, job.matrix.timeout]),
+  );
+  assert.deepEqual(Object.fromEntries(timeouts), {
+    test_sanitizer_macos_macos_native_1: 90,
+    test_sanitizer_macos_macos_native_2: 90,
+    test_sanitizer_macos_macos_property: 75,
+    test_sanitizer_macos_macos_property_regexp_literals: 75,
+  });
+  for (const [id, timeout] of timeouts) {
+    assert.equal(after.jobs[id]!["timeout-minutes"], timeout);
   }
 });
 
@@ -601,9 +656,7 @@ test("Linux sanitizer split retains every suite and its preflight", () => {
     property.steps.filter((step) => step.run).map((step) => step.run),
     [
       "mise run test:sanitizer:self",
-      "mise run test:sanitizer:property:shard " +
-        "--test-shard=${{ matrix.shard }}/3 " +
-        "tests/property/*.property.test.ts",
+      "mise run test:sanitizer:property:shared --shard ${{ matrix.shard }}/3",
     ],
   );
   assert.deepEqual(native.steps.slice(0, 3), property.steps.slice(0, 3));
@@ -639,6 +692,32 @@ test("Linux sanitizer split retains every suite and its preflight", () => {
       name: "host-cc-sanitizer-property-failures-${{ matrix.shard }}-of-3",
     },
   });
+  // The dedicated sanitizer property files run every case in one job.
+  const dedicated = after.jobs.test_sanitizer_property_dedicated!;
+  assert.equal(
+    dedicated.name,
+    "host C sanitizers (Linux, property, regexp literals)",
+  );
+  assert.equal(dedicated["runs-on"], "ubuntu-latest");
+  assert.equal(dedicated["timeout-minutes"], 45);
+  assert.equal(dedicated.strategy, undefined);
+  assert.equal(dedicated.env, undefined);
+  assert.deepEqual(dedicated.steps.slice(0, 4), property.steps.slice(0, 4));
+  assert.deepEqual(
+    dedicated.steps.filter((step) => step.run).map((step) => step.run),
+    [
+      "mise run test:sanitizer:self",
+      "mise run test:sanitizer:property:shard " +
+        dedicatedSanitizerPropertyFiles.join(" "),
+    ],
+  );
+  assert.deepEqual(dedicated.steps.at(-1), {
+    ...nativeUpload,
+    with: {
+      ...parsedMapping(nativeUpload.with, "Native sanitizer artifact"),
+      name: "host-cc-sanitizer-property-regexp-literals-failures",
+    },
+  });
 });
 
 test("native aggregate explicitly requires all native and test262 jobs", () => {
@@ -647,9 +726,17 @@ test("native aggregate explicitly requires all native and test262 jobs", () => {
     throw new Error("Template aggregate requires a dependency list");
   }
   const expected = [
-    ...nativeIds.filter((id) => id !== "test_array_constructor_macos"),
+    ...nativeIds.filter(
+      (id) =>
+        id !== "test_array_constructor_macos" && id !== "test_sanitizer_macos",
+    ),
     ...macosJobs()
-      .filter((job) => nativeIds.includes(job.sourceId))
+      .filter(
+        (job) =>
+          nativeIds.includes(job.sourceId) &&
+          (job.sourceId !== "test_sanitizer_macos" ||
+            job.matrix.part !== "property"),
+      )
       .map((job) => job.id),
   ].toSorted();
   const aggregate = after.jobs.native!;
@@ -661,7 +748,22 @@ test("native aggregate explicitly requires all native and test262 jobs", () => {
   assert.deepEqual(needs.toSorted(), expected);
   assert.ok(needs.includes("test_sanitizer_property"));
   assert.ok(needs.includes("test_array_constructor"));
-  assert.equal(expected.length, 41);
+  // Every macOS native sanitizer shard is required, and together they
+  // cover the whole native suite. Both dedicated sanitizer property jobs
+  // are required; the shared macOS property suite is not added here.
+  assert.ok(needs.includes("test_sanitizer_macos_macos_native_1"));
+  assert.ok(needs.includes("test_sanitizer_macos_macos_native_2"));
+  assert.ok(needs.includes("test_sanitizer_property_dedicated"));
+  assert.ok(
+    needs.includes("test_sanitizer_macos_macos_property_regexp_literals"),
+  );
+  assert.ok(!needs.includes("test_sanitizer_macos_macos_property"));
+  // The exhaustive RegExp literal case shards are required on both hosts.
+  assert.ok(needs.includes("test_regexp_exhaustive_case"));
+  for (let shard = 1; shard <= 5; shard++) {
+    assert.ok(needs.includes(`test_regexp_exhaustive_case_macos_${shard}`));
+  }
+  assert.equal(expected.length, 51);
   assert.deepEqual(aggregate.steps[0]!.env, {
     RESULTS: "${{ toJSON(needs.*.result) }}",
   });
@@ -716,7 +818,7 @@ test("aggregate follows additional dependencies in the source template", () => {
   const needs = workflow.jobs.native!.needs;
   assert.ok(needs != null && !isString(needs));
   assert.ok(needs.includes("test_sanitizer"));
-  assert.equal(needs.length, 42);
+  assert.equal(needs.length, 52);
 });
 
 test("committed workflow matches generator output exactly", () => {
@@ -754,8 +856,8 @@ test("lane-count preview leaves the committed workflow alone", () => {
 test("one extra lane retains every job and aggregate dependency", () => {
   const lanes = macosLanes(1);
   assert.equal(lanes.length, 6);
-  assert.equal(lanes.flat().length, 41);
-  assert.equal(new Set(lanes.flat().map((job) => job.id)).size, 41);
+  assert.equal(lanes.flat().length, 50);
+  assert.equal(new Set(lanes.flat().map((job) => job.id)).size, 50);
   assert.ok(lanes[5]!.length > 0);
   assert.deepEqual(
     lanes[5]!
@@ -779,6 +881,7 @@ test("one extra lane retains every job and aggregate dependency", () => {
           "test262",
           "own-key cases",
           "reflect cases",
+          "regexp exhaustive cases",
         ].includes(job.family),
       ),
   );
@@ -1144,6 +1247,7 @@ test("own-key cases lead the Mac lane with measured Mac seconds", () => {
         "test262",
         "own-key cases",
         "reflect cases",
+        "regexp exhaustive cases",
       ].includes(job.family),
     );
   }
@@ -1158,7 +1262,10 @@ test("own-key cases lead the Mac lane with measured Mac seconds", () => {
     selfHostedProbeSeconds,
   );
   // The dedicated ordinary Array allowance also loads a hosted lane.
-  assert.equal(Math.round(modeled), 8909);
+  // The six weighted Node shards' modeled walls raised this from 8909,
+  // because the heavier hosted lanes leave more work to the Mac lane.
+  // The exhaustive RegExp literal case shards raised it from 9485.
+  assert.equal(Math.round(modeled), 11051);
 });
 
 test("hosted lanes take the jobs no Mac lane can run first", () => {
@@ -1175,7 +1282,7 @@ test("hosted lanes take the jobs no Mac lane can run first", () => {
     );
   }
   const ineligible = macosJobs().filter((job) => !macLaneEligible(job));
-  assert.equal(ineligible.length, 8);
+  assert.equal(ineligible.length, 12);
   for (const job of ineligible) {
     const lane = hosted.find((candidate) =>
       candidate.some((placed) => placed.id === job.id),
@@ -1195,20 +1302,34 @@ test("hosted lanes take the jobs no Mac lane can run first", () => {
   // single jobs after the greedy pass; see PLAN-GATE.md (U45). U49's
   // refreshed hosted entries raised it from 2820 by charging the hosted
   // lanes what they measured, which moved a `native support` shard off a
-  // hosted lane; see PLAN-GATE.md (U49).
-  assert.equal(Math.round(Math.max(...macosLaneEnds(macosLanes(6)))), 2839);
-  // The rented pair lowers the maximum to the hosted floor; it has no
-  // measured walls of its own yet.
-  assert.equal(Math.round(Math.max(...macosLaneEnds(lanes))), 2452);
+  // hosted lane; see PLAN-GATE.md (U49). The macOS native sanitizer split
+  // replaced a stale 2,337-second entry with two shards derived from the
+  // current suite; see docs/evidence/macos-sanitizer-split/README.md. The
+  // dedicated sanitizer property job then chained a 1,812-second planning
+  // allowance on the property lane, whose 4,264 seconds are now the hosted
+  // floor, both with six Mac lanes and with the rented pair, which has no
+  // measured walls of its own yet; see
+  // docs/evidence/regexp-literal-exhaustive/README.md. The six weighted
+  // Node shards' modeled walls stay below that floor; see
+  // docs/evidence/node-shards/README.md.
+  assert.equal(Math.round(Math.max(...macosLaneEnds(macosLanes(6)))), 4264);
+  assert.equal(Math.round(Math.max(...macosLaneEnds(lanes))), 4264);
 });
 
 test("only a tested hosted entry reaches a hosted lane", () => {
-  const lanes = macosLanes(configuredSelfHostedLanes);
-  const eligible = lanes
-    .slice(0, 5)
-    .flatMap((lane) =>
-      lane.filter((job) => selfHostedJobSeconds[job.name] != null),
-    );
+  // The weighted Node shards fill the hosted lanes at the configured
+  // count, so the placements with three or more Mac lanes are checked
+  // together to keep at least one hosted Mac-eligible job in view.
+  const eligible = Array.from(
+    { length: Math.max(configuredSelfHostedLanes - 2, 0) },
+    (_, index) => macosLanes(index + 3),
+  ).flatMap((lanes) =>
+    lanes
+      .slice(0, 5)
+      .flatMap((lane) =>
+        lane.filter((job) => selfHostedJobSeconds[job.name] != null),
+      ),
+  );
   assert.ok(eligible.length > 0, "the placement hosts no Mac-eligible job");
   for (const job of eligible) {
     // The placement minimizes a projected finish, so it may select the
@@ -1245,19 +1366,34 @@ test("the unmeasured allowance prices a decision, not a lane end", () => {
   }
 });
 
-test("no job follows a macOS sanitizer job on a hosted lane", () => {
+test("no other job follows a macOS sanitizer job on a hosted lane", () => {
   const sanitizers = macosJobs().filter(
     (job) => job.family === "host C sanitizers",
   );
-  assert.equal(sanitizers.length, 2);
-  for (const lane of macosLanes(configuredSelfHostedLanes).slice(0, 5)) {
-    const index = lane.findIndex((job) => job.family === "host C sanitizers");
-    if (index === -1) continue;
-    // The property job's wall spread by a factor of two over 27
-    // observations, so a lane that follows it ends past the makespan
-    // whenever it runs long; see PLAN-GATE.md (U41, U42).
-    assert.equal(lane.length, 1, lane.map((job) => job.name).join(" | "));
-  }
+  assert.equal(sanitizers.length, 4);
+  const reserved = macosLanes(configuredSelfHostedLanes)
+    .slice(0, 5)
+    .filter((lane) => lane.some((job) => job.family === "host C sanitizers"));
+  // The property job's wall spread by a factor of two over 27
+  // observations, so a lane that follows it ends past the makespan
+  // whenever it runs long; see PLAN-GATE.md (U41, U42). The native file
+  // shards chain on one lane of their own, so the split takes no extra
+  // hosted slot; see docs/evidence/macos-sanitizer-split/README.md. The
+  // dedicated property files' job chains on the property lane; see
+  // docs/evidence/regexp-literal-exhaustive/README.md.
+  assert.deepEqual(
+    reserved.map((lane) => lane.map((job) => job.name)),
+    [
+      [
+        "host C sanitizers (macOS, property)",
+        "host C sanitizers (macOS, property, regexp literals)",
+      ],
+      [
+        "host C sanitizers (macOS, native, 1/2)",
+        "host C sanitizers (macOS, native, 2/2)",
+      ],
+    ],
+  );
   // With no Mac lane the five hosted lanes must hold all 33 jobs, so the
   // reservation cannot apply and the LPT partition is unchanged.
   const alone = macosLanes().filter((lane) =>
@@ -1324,8 +1460,8 @@ test("availability decides the second machine's lanes too", async () => {
 test("three Mac lanes keep every job and the own-key lane", () => {
   const lanes = macosLanes(3);
   assert.equal(lanes.length, 8);
-  assert.equal(lanes.flat().length, 41);
-  assert.equal(new Set(lanes.flat().map((job) => job.id)).size, 41);
+  assert.equal(lanes.flat().length, 50);
+  assert.equal(new Set(lanes.flat().map((job) => job.id)).size, 50);
   for (const lane of lanes.slice(5)) assert.ok(lane.length > 0);
   assert.deepEqual(
     lanes
@@ -1408,8 +1544,8 @@ test("eight Mac lanes route each label with its own hosted fallback", () => {
   ]);
   const lanes = macosLanes(8);
   assert.equal(lanes.length, 13);
-  assert.equal(lanes.flat().length, 41);
-  assert.equal(new Set(lanes.flat().map((job) => job.id)).size, 41);
+  assert.equal(lanes.flat().length, 50);
+  assert.equal(new Set(lanes.flat().map((job) => job.id)).size, 50);
   for (const lane of lanes.slice(5)) assert.ok(lane.length > 0);
   // One readiness output, so one runner class, for the shared deadline.
   assert.deepEqual(
@@ -1428,6 +1564,7 @@ test("eight Mac lanes route each label with its own hosted fallback", () => {
         "test262",
         "own-key cases",
         "reflect cases",
+        "regexp exhaustive cases",
       ].includes(job.family),
     );
   }
@@ -2817,8 +2954,35 @@ test("ordinary macOS Array keeps one hosted lane and deadline", () => {
     const commands = after.jobs[shard.id]!.steps.map((step) => step.run);
     assert.ok(
       commands.includes(
-        `mise run test:node:macos:shard --shard=${shard.matrix.shard}/4`,
+        `mise run test:node:shard --shard=${shard.matrix.shard}/6`,
       ),
     );
   }
+});
+
+test("ordinary Node shards cover four Linux and six macOS indices", () => {
+  const linux = after.jobs.test_node_shard_linux!;
+  assert.equal(linux["runs-on"], "ubuntu-latest");
+  assert.deepEqual(
+    entries(linux),
+    Array.from({ length: 4 }, (_, index) => ({ shard: index + 1, total: 4 })),
+  );
+  assert.ok(
+    linux.steps.some(
+      (step) =>
+        step.run ===
+        "mise run test:node:shard " +
+          "--shard=${{ matrix.shard }}/${{ matrix.total }}",
+    ),
+  );
+  assert.deepEqual(
+    entries(before.jobs.test_node_shard!),
+    Array.from({ length: 6 }, (_, index) => ({ shard: index + 1, total: 6 })),
+  );
+  assert.deepEqual(
+    macosJobs()
+      .filter((job) => job.sourceId === "test_node_shard")
+      .map((job) => job.matrix),
+    Array.from({ length: 6 }, (_, index) => ({ shard: index + 1, total: 6 })),
+  );
 });
