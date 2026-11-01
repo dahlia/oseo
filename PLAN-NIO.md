@@ -1,12 +1,11 @@
 Native I/O plan
 ===============
 
-Sanitizer evidence (2026-09-17): historical Zig 0.16.0 runs did not
-provide ASan coverage. The separate Linux host C sanitizer lane now verifies
-instrumentation; its measured scope is recorded in the
-[activity audit](docs/sanitizer-activity.md). This does not retroactively
-validate earlier gates or establish macOS ASan coverage. Zig address
-self-checks remain TODOs.
+Historical Zig 0.16.0 runs did not provide ASan coverage. The separate Linux
+host C sanitizer lane now verifies instrumentation; its measured scope is
+recorded in the [activity audit](docs/sanitizer-activity.md). This does not
+retroactively validate earlier gates or establish macOS ASan coverage. Zig
+address self-checks remain TODOs.
 
 
 Status
@@ -22,16 +21,20 @@ before measured prototypes exist.
 M5b node `nio-clock-wakeup-checkpoint` delivered the first backend decision,
 [ADR 0025](./docs/adr/0025-native-clock-and-wakeup.md). The runtime owns a
 platform-neutral clock adapter with separate monotonic and epoch real-time
-readings, a deadline wait, and a coalescing cross-thread wakeup. Linux selects
-`CLOCK_MONOTONIC` with `ppoll` on an eventfd, macOS selects `CLOCK_UPTIME_RAW`
-with `kevent` on `EVFILT_USER`, both read `CLOCK_REALTIME`, and both fall back
-to a self-pipe, then to a sleep without wakeup, and to `time` for real time.
+readings, a deadline wait, and a coalescing cross-thread wakeup.
+
+Linux selects `CLOCK_MONOTONIC` with `ppoll` on an eventfd. macOS selects
+`CLOCK_UPTIME_RAW` with `kevent` on `EVFILT_USER`. Both read `CLOCK_REALTIME`.
+Both fall back to a self-pipe, then to a sleep without wakeup, and to `time`
+for real time.
+
 Production timer waits now take monotonic elapsed time, while the
 deterministic adapter under *tests/native-io/* reproduces the logical clock as
 the test oracle. `mise run probe:native-io:clock` reproduces the measurements.
 The Linux AMD64 measurements are recorded; macOS AArch64 execution evidence
 comes from that host's native test gate rather than from the recorded run.
-M5b node `date-nio-clock-integration` then moved `Date` onto the real-time
+
+M5b node `date-nio-clock-integration` moved `Date` onto the real-time
 capability, so `Date.now()` and the other current-time reads no longer read a
 host clock directly and never take the monotonic origin.
 
@@ -375,10 +378,10 @@ Relationship to compatibility work
 
 M5's `Date` family consumes the completed clock and wakeup checkpoint. That
 checkpoint supplies epoch real time and moves existing production timer waits
-to monotonic elapsed time together. `Date.now()` and `Date` operations that
-obtain the current time use real time rather than the logical or monotonic
-clock. Standards, differential, and property tests inject fixed clock values;
-M5 code does not bypass this adapter to read a host clock directly.
+to monotonic elapsed time. `Date.now()` and `Date` operations that obtain the
+current time use real time rather than the logical or monotonic clock.
+Standards, differential, and property tests inject fixed clock values; M5 code
+does not bypass this adapter to read a host clock directly.
 
 M6 groups that use only pure data and the deterministic scheduler do not wait
 for native I/O. Its standardized timeout and performance work consumes the
@@ -408,16 +411,16 @@ Delivery order
     liveness parts remain open.
 2.  Add the checked-in native probe harness and retain reproducible build,
     target, capability, safety, and measurement records. The clock probe
-    harness is implemented; socket and resolver probes extend it.
+    harness is in place; socket and resolver probes extend it.
 3.  Probe monotonic time, epoch real time, and wakeup candidates and fallbacks
     on Linux AMD64 and macOS AArch64, preserving AArch64 musl compile-link
-    evidence. Implemented; ADR 0025 records the Linux AMD64 run.
+    evidence. This probe is complete; ADR 0025 records the Linux AMD64 run.
 4.  Accept the clock and wakeup backend decision, then integrate those
     capabilities and switch existing production timer waits and deadlines from
     instant logical-clock advancement to monotonic elapsed time. Deterministic
     tests keep the injected logical scheduler oracle, and promise-job semantics
-    do not change. Implemented by ADR 0025; the `Date` consumer follows in
-    `date-nio-clock-integration`.
+    do not change. This step is complete and recorded in ADR 0025; the `Date`
+    consumer follows in `date-nio-clock-integration`.
 5.  Before native completion properties enter a gate, add the explicit
     versioned-trace loader required by [*PLAN-PT.md*](./PLAN-PT.md) and retain
     merged-scheduler-trace and deterministic trace-replay records.

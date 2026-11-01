@@ -307,8 +307,8 @@ shared object. Provider headers and the archive come from the same pack.
 Initial pack evidence covers `linux-x86_64-gnu` and `macos-aarch64` execution,
 plus `linux-aarch64-musl` compile-link and inspection. Each pack proves that
 the selected C toolchain can consume its C ABI. Cross-target packs are
-downloaded or installed explicitly; the compiler does not pretend a same-host
-pack can satisfy another target.
+downloaded or installed explicitly; the compiler does not treat a same-host
+pack as satisfying another target.
 
 A downstream system-integration profile may intentionally build against a
 named system OpenSSL installation. It records the discovered version,
@@ -487,8 +487,13 @@ The M6 part of this plan is complete only when:
  -  `mise run check`, `mise run test`, and the extended property task pass from
     a clean checkout within the published gate budgets.
 
-The M7 part is complete only when its separate manifest names every supported
-`node:crypto` export and behavior, the selected package corpus passes, Node.js
-errors and completion forms have fixed evidence, and unavailable exports fail
-honestly. Completing M6 does not imply complete `node:crypto` compatibility,
-and completing the selected M7 surface does not widen the Web Crypto claim.
+The M7 part is complete only when:
+
+ -  its separate manifest names every supported `node:crypto` export and
+    behavior;
+ -  the selected package corpus passes;
+ -  Node.js errors and completion forms have fixed evidence; and
+ -  unavailable exports fail honestly.
+
+Completing M6 does not imply complete `node:crypto` compatibility, and
+completing the selected M7 surface does not widen the Web Crypto claim.

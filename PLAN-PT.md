@@ -302,34 +302,45 @@ groups, four constructor spellings, four line endings, strict directives and
 prefix lines preserve useful syntax and location boundaries. Invalid bodies may
 also place an unsupported field before the first constructor or an unsupported
 import in its body, so masking by earlier syntax stays covered; both shrink
-away. Its two domains reserve `0x60008700` and `0x60008701` and add 64 ordinary
-cases, with the same construction and shrinking at ten times the budget in the
-extended gate. Node.js syntax checks and Deno `eval --ext=js` provide
-independent oracles. The explicit JavaScript goal avoids TypeScript
-transpilation changing the source being measured. A fixed multiline static
-constructor method retains the minimized oracle-methodology regression. Invalid
-bodies reject with exact `OSEO0001` spans under both specialization options
-before HIR or MIR exists; there is no native executable, allocation, safepoint
-or guard to observe.
+away.
 
-The M5 optional legacy lookup suite generates one to three prototype levels,
-each empty or holding a user method, a getter that returns a method, or a
-non-callable value, over an intrinsic, null, or proxy root, for either
-`__lookupGetter__` or `__lookupSetter__`. A chain of empty levels over the
-intrinsic prototype is rewritten to start with a user method, so the first
-domain never needs a precondition. Its independent model chooses the innermost
-defined level, and Node.js and Deno must agree with that model before native
-execution runs under both specialization options with absent, truthful, and
-false hints and collection at every safepoint. Native runs assert collections
-and, when specialized, shape-guard misses. The second domain generates zero to
-three empty levels over the intrinsic prototype after one or two shadowed warm
-reads and checks the exact stdout, line and column, and `OSEO1001` text; its
-reference is the profile rule, not a reference host, because Node.js and Deno
-implement the optional methods. The runtime prints no counters after that
-uncatchable diagnostic, so this domain checks the specialized read shape in
-MIR while the first domain measures misses through the same read. The family
-reserves `0x60008800` and `0x60008801` and adds 20 ordinary cases, with the
-same construction and shrinking at ten times the budget in the extended gate.
+Its two domains reserve `0x60008700` and `0x60008701` and add 64 ordinary
+cases, with the same construction and shrinking at ten times the budget in the
+extended gate.
+
+Node.js syntax checks and Deno `eval --ext=js` provide independent oracles. The
+explicit JavaScript goal avoids TypeScript transpilation changing the source
+being measured. A fixed multiline static constructor method retains the
+minimized oracle-methodology regression.
+
+Invalid bodies reject with exact `OSEO0001` spans under both specialization
+options before HIR or MIR exists; there is no native executable, allocation,
+safepoint or guard to observe.
+
+The M5 optional legacy lookup suite generates one to three prototype levels for
+either `__lookupGetter__` or `__lookupSetter__`. Each level is empty or holds a
+user method, a getter that returns a method, or a non-callable value, over an
+intrinsic, null, or proxy root.
+
+A chain of empty levels over the intrinsic prototype is rewritten to start with
+a user method, so the first domain never needs a precondition. Its independent
+model chooses the innermost defined level. Node.js and Deno must agree with
+that model before native execution runs. Native execution runs under both
+specialization options with absent, truthful, and false hints and collection at
+every safepoint. Native runs assert collections and, when specialized,
+shape-guard misses.
+
+The second domain generates zero to three empty levels over the intrinsic
+prototype after one or two shadowed warm reads. It checks the exact stdout,
+line and column, and `OSEO1001` text. Its reference is the profile rule, not a
+reference host, because Node.js and Deno implement the optional methods. The
+runtime prints no counters after that uncatchable diagnostic, so this domain
+checks the specialized read shape in MIR while the first domain measures misses
+through the same read.
+
+The family reserves `0x60008800` and `0x60008801` and adds 20 ordinary cases,
+with the same construction and shrinking at ten times the budget in the
+extended gate.
 
 
 HIR and MIR properties
@@ -567,22 +578,25 @@ M5 array binding properties
 ---------------------------
 
 The array binding property generates a standalone `const`, `let`, or `var`
-declaration with one recursive array pattern. Shapes cover an ordinary head,
-an elision with an `undefined` default, a nested array, an identifier rest, and
-a nested array rest. Inputs vary across arrays, custom iterators, abrupt steps,
-throwing defaults, and absent, truthful, or deliberately false TypeScript
-hints from homogeneous array, fixed tuple-spread, and tuple-rest annotations.
+declaration with one recursive array pattern. Shapes cover an ordinary head, an
+elision with an `undefined` default, a nested array, an identifier rest, and a
+nested array rest. Inputs vary across arrays, custom iterators, abrupt steps,
+throwing defaults, and absent, truthful, or deliberately false TypeScript hints
+from homogeneous array, fixed tuple-spread, and tuple-rest annotations.
+
 Its independent model predicts the bound value, step count, close count, thrown
 error identity, and the exact binding leaves that receive hints, including
 unambiguous leaves inside a nested array rest and members or suffixes after a
 fixed tuple spread. Nested array patterns also vary matching and scalar
 annotation members; a scalar mismatch leaves that subtree unhinted without
-changing the modeled execution. Each case compares Node.js, Deno,
-specialization-disabled native execution, and specialization-enabled native
-execution with collection forced at every safepoint. Fixed frontend regressions
-retain variadic array rests, type-reference spreads, and object targets inside
-an array rest as unhinted. They also pin the ordinary unsupported-type
-diagnostic for a member exposed by fixed spread expansion.
+changing the modeled execution.
+
+Each case compares Node.js, Deno, specialization-disabled native execution, and
+specialization-enabled native execution with collection forced at every
+safepoint. Fixed frontend regressions retain variadic array rests,
+type-reference spreads, and object targets inside an array rest as unhinted.
+They also pin the ordinary unsupported-type diagnostic for a member exposed by
+fixed spread expansion.
 
 The ordinary suite uses seed `0x60000400`, ten successful cases, at most five
 values, and no filtering. The extended tier raises the reviewed size to nine
@@ -599,22 +613,25 @@ M5 object binding properties
 The object binding property generates a standalone `const`, `let`, or `var`
 declaration with static, computed, defaulted, nested object, or nested array
 properties. Inputs vary across ordinary objects, strings, numbers, `null`,
-`undefined`, and absent, truthful, or deliberately false TypeScript hints. Its
-independent model predicts the bound value, computed-key and default order, and
-nullish `TypeError`. Each case compares Node.js, Deno, specialization-disabled
-native execution, and specialization-enabled execution with collection forced
-at every safepoint. Generated computed properties include literal and dynamic
-keys with absent, truthful, and false annotations. They remain unhinted because
-the structural mapping admits only noncomputed source properties. Nested array
-and object properties also vary matching and scalar annotation members; a
-scalar mismatch leaves that subtree unhinted without changing the modeled
-execution.
+`undefined`, and absent, truthful, or deliberately false TypeScript hints.
 
-The ordinary suite uses seed `0x60002000`, ten successful cases, bounded integer
-values, and no filtering. The extended tier runs ten times the ordinary budget
-through the shared replay controls. Fixed native fixtures retain temporal dead
-zones, function-name inference, symbol keys, primitive property reads, nested
-patterns, nullish ordering, `var` hoisting, and awaited initialization.
+Its independent model predicts the bound value, computed-key and default order,
+and nullish `TypeError`. Each case compares Node.js, Deno,
+specialization-disabled native execution, and specialization-enabled execution
+with collection forced at every safepoint.
+
+Generated computed properties include literal and dynamic keys with absent,
+truthful, and false annotations. They remain unhinted because the structural
+mapping admits only noncomputed source properties. Nested array and object
+properties also vary matching and scalar annotation members; a scalar mismatch
+leaves that subtree unhinted without changing the modeled execution.
+
+The ordinary suite uses seed `0x60002000`, ten successful cases, bounded
+integer values, and no filtering. The extended tier runs ten times the ordinary
+budget through the shared replay controls. Fixed native fixtures retain
+temporal dead zones, function-name inference, symbol keys, primitive property
+reads, nested patterns, nullish ordering, `var` hoisting, and awaited
+initialization.
 
 The object rest property uses seed `0x60002200` and generates `const`, `let`,
 and `var` declarations with static, computed string, or computed symbol

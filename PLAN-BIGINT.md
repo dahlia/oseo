@@ -4,14 +4,15 @@ BigInt plan
 Status
 ------
 
-Implementation status: M5a Unit 8.1a is landed. M5b node `bigint-intrinsic`
-delivery item 7 is implemented on this branch pending mandatory review and
-landing. Unit 8.1a admits exact BigInt literals, primitive values,
+M5a Unit 8.1a is landed. It admits exact BigInt literals, primitive values,
 `ToNumeric`, the M5a operator, assignment, update, comparison, conversion, and
-collector contracts. The `bigint-intrinsic` node delivers item 7 of the
-delivery order below: the callable `BigInt` intrinsic, `BigInt.prototype`,
-branded wrapper objects, `toString`, `toLocaleString`, `valueOf`, `asIntN`, and
-`asUintN`.
+collector contracts.
+
+M5b node `bigint-intrinsic` is implemented on this branch and still requires
+the mandatory review before landing. It delivers item 7 of the delivery order
+below: the callable `BigInt` intrinsic, `BigInt.prototype`, branded wrapper
+objects, `toString`, `toLocaleString`, `valueOf`, `asIntN`, and `asUintN`.
+
 [ADR 0023](./docs/adr/0023-bigint-representation.md) selects an all-heap
 normalized sign-and-magnitude representation with 30-bit limbs and leaves the
 last unused NaN-box tag unassigned. Delivery items 8 through 10, which connect

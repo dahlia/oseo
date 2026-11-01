@@ -195,12 +195,15 @@ The owned pattern grammar covers every regular expression construct and flag in
 the candidate edition. The parser and validator implement the main-body
 grammar for every construct below except class set notation, which has no
 owned representation yet. It recognizes and refuses that notation and inline
-modifiers with located `unsupported` errors rather than early errors. Unicode
-property escapes are admitted through the parser's named extension point when
-the frontend's exact resolver finds their property set in the pinned tables;
-an invalid name is an early error at the escape. Annex B is outside the claim,
-so a construct only Annex B admits is rejected without the `u` flag too, which
-*docs/regexp-inventory.md* lists exactly. The initial inventory includes:
+modifiers with located `unsupported` errors rather than early errors.
+
+Unicode property escapes are admitted through the parser's named extension
+point when the frontend's exact resolver finds their property set in the
+pinned tables. An invalid name is an early error at the escape. Annex B is
+outside the claim, so a construct only Annex B admits is rejected without the
+`u` flag too, which *docs/regexp-inventory.md* lists exactly.
+
+The initial inventory includes:
 
  -  alternatives, sequences, assertions, greedy and non-greedy quantifiers;
  -  character escapes, classes, class set notation, and Unicode properties;
@@ -354,18 +357,20 @@ executors for a proved complete `^set+$` instruction shape, with exactly
 no flags, `u`, or `v`. It checks capture absence, the single forward
 consuming set, greedy unbounded minimum-one repetition, non-multiline
 edges and every register/branch link before selecting the scan. All other
-shapes and flags use ordered execution. The scan charges one entry step,
-one per tested character, and one terminal decision at input exhaustion;
-it uses no trail or backtrack entries. Numeric limits and ordered counters
-stay unchanged. It preserves UTF-16 spans and requires InputLength at `$`.
-The artifact remains the existing serialized ordered program; this adds
-neither an automaton artifact nor direct generated matcher control flow.
+shapes and flags use ordered execution.
+
+The scan charges one entry step, one per tested character, and one
+terminal decision at input exhaustion; it uses no trail or backtrack
+entries. Numeric limits and ordered counters stay unchanged. It preserves
+UTF-16 spans and requires InputLength at `$`. The artifact remains the
+existing serialized ordered program; this adds neither an automaton
+artifact nor direct generated matcher control flow.
 
 Choice order, capture reset and visibility, assertion and lookaround
 behavior, backreference resolution, quantifier priority, empty-progress
 failure, UTF-16 and code-point iteration, and canonicalization are frozen
 by that pair. Positions are UTF-16 code-unit indices, and under `u` or `v`
-they always name a code-point boundary: a start index that splits a
+they always name a code-point boundary. A start index that splits a
 surrogate pair names the pair, and the search advances past the whole
 pair, which is what
 *test/built-ins/RegExp/prototype/exec/u-lastindex-adv.js* requires.
@@ -375,8 +380,8 @@ consuming atom becomes one code-point set closed under the pattern's
 canonicalization, and a negated class is complemented after that closing,
 which is the order `CharacterSetMatcher` uses. Only a backreference has to
 compare two input characters at run time, so only a pattern with both `i`
-and a backreference carries a canonicalization table. The two unicode-mode flags
-complement a property differently: `v` folds a property set before
+and a backreference carries a canonicalization table. The two unicode-mode
+flags complement a property differently. `v` folds a property set before
 complementing it over the folded code points, while `u` complements the
 unfolded set and canonicalizes afterwards, so `\P{Ll}` accepts a lowercase
 letter under `iu` and refuses it under `iv`.
@@ -418,11 +423,11 @@ reviewed stress cases.
 
 They have run once. `mise run probe:regexp` performs all five over the
 reviewed corpus in *tools/regexp-probes/*, and
-[*docs/regexp-matcher-probes.md*](./docs/regexp-matcher-probes.md) is one
-recorded run of it with the host facts, commands, repetition counts, and
-limits of that run. The paragraphs below name what each probe measured
-and what it did not; the report holds the numbers, selects no backend,
-and leaves an unreached requirement open rather than optional.
+[*docs/regexp-matcher-probes.md*](./docs/regexp-matcher-probes.md) records one
+run with the host facts, commands, repetition counts, and limits of that run.
+The paragraphs below name what each probe measured and what it did not; the
+report holds the numbers, selects no backend, and leaves an unreached
+requirement open rather than optional.
 
 ### Matcher strategy
 
@@ -444,21 +449,20 @@ A pure DFA is accepted only for a proven subset and only with a size limit.
 State explosion must select another reviewed representation at build time
 instead of exhausting the compiler or silently truncating behavior.
 
-The probe measured what each shape could take and what the ordered matcher
-does today, and built no automaton and no C lowering, so every number about
-those two is a property of the artifact rather than a measurement of an
+The probe built no automaton and no C lowering, so the numbers for those two
+shapes are properties of the artifact rather than measurements of an
 implementation. Over the reviewed corpus the ordered matcher takes every
-pattern; a backreference and a lookaround are outside the automaton path
-the probe models, so those patterns need the fallback this item requires,
-and a counted repetition is where state explosion starts, with
-`a{0,2000}b` reaching 4,001 configurations from one artifact loop and one
-register. The comparison runs both ways: the ordered matcher answers
-`choice-graph` over 3,072 characters in 40 steps, which is the whole cost
-another shape could remove there, and takes 7,339,932 steps on a nested
-quantifier where the ceiling on a simulation of the same program is 20. Direct
-generated C stays unmeasured because no lowering exists to measure, so the
-report records the size budget one would have to fit, 1,149 bytes of executable
-for each literal, rather than a number for it.
+pattern. A backreference and a lookaround are outside the automaton path the
+probe models, so those patterns need the fallback this item requires. A
+counted repetition is where state explosion starts: `a{0,2000}b` reaches 4,001
+configurations from one artifact loop and one register.
+
+The comparison runs both ways. The ordered matcher answers `choice-graph` over
+3,072 characters in 40 steps, the whole cost another shape could remove there,
+and takes 7,339,932 steps on a nested quantifier where the ceiling on a
+simulation of the same program is 20. Direct generated C stays unmeasured
+because no lowering exists to measure; the report records the size budget one
+would have to fit, 1,149 bytes of executable for each literal.
 
 ADR 0024 selects the composed owned shape for M5b. The ordered matcher remains
 the complete semantic authority and fallback, and a later implementation may
@@ -470,11 +474,19 @@ reviewed implementation and measurements exist.
 
 ### Owned implementation or external component
 
-An external engine probe must cover the complete candidate grammar and match
-semantics, static-link support, both execution targets, the AArch64 Linux
-cross-link, license compatibility, Unicode version control, sanitizer behavior,
-thread and locale assumptions, allocator injection, error translation, and
-binary size.
+An external engine probe must cover:
+
+ -  the complete candidate grammar and match semantics;
+ -  static-link support;
+ -  both execution targets;
+ -  the AArch64 Linux cross-link;
+ -  license compatibility;
+ -  Unicode version control;
+ -  sanitizer behavior;
+ -  thread and locale assumptions;
+ -  allocator injection;
+ -  error translation; and
+ -  binary size.
 
 Missing observable behavior is not filled with unreviewed wrappers around the
 library. The probe lists each mismatch and measures the owned code needed to
@@ -484,20 +496,24 @@ external component behind an Oseo adapter.
 The probe compared PCRE2 in its 16-bit form over the reviewed corpus. It
 agreed on 38 of 52 cases, refused unbounded-length lookbehind, class set
 notation, and a lone surrogate in a class, and kept a capture the edition
-resets, which is the edition's own worked example. It also missed three
-class and flag rules the edition states and no mode of the component
-reproduces: `\s`, `\w` under `i` with a unicode-mode flag, and the
-line-terminator set. One refusal is caused by the mapping itself: the option
-that makes a reference to a non-participating group match the empty string also
-makes a backreference variable-length, so a lookbehind containing one is
-refused, and two rules the edition states independently cannot both be honored
-at once. The engine also answered two patterns in nanoseconds where the owned
-matcher spends millions of steps, and reproduced the same exponential growth on
-a nested quantifier, so an external component removes the missing optimizations
-rather than the exponential case. Static linking, both execution targets, the
-AArch64 Linux cross-link, sanitizer behavior, Unicode pinning, thread and
-locale assumptions, and a license review of the exact source tree stay
-unmeasured: they need a source build the probe did not perform.
+resets, which is the edition's own worked example. It also missed three class
+and flag rules the edition states and no mode of the component reproduces:
+`\s`, `\w` under `i` with a unicode-mode flag, and the line-terminator set.
+
+One refusal is caused by the mapping itself. The option that makes a reference
+to a non-participating group match the empty string also makes a backreference
+variable-length, so a lookbehind containing one is refused. Two rules the
+edition states independently cannot both be honored at once.
+
+The engine also answered two patterns in nanoseconds where the owned matcher
+spends millions of steps, and reproduced the same exponential growth on a
+nested quantifier. An external component therefore removes the missing
+optimizations rather than the exponential case.
+
+Static linking, both execution targets, the AArch64 Linux cross-link, sanitizer
+behavior, Unicode pinning, thread and locale assumptions, and a license review
+of the exact source tree stay unmeasured: they need a source build the probe
+did not perform.
 
 ADR 0024 therefore does not select an external component for M5b. The missing
 source-build and mismatch-closing evidence remains required before that
@@ -532,37 +548,40 @@ patterns need the tables required to resolve arbitrary admitted properties.
 Capability-aware runtime composition records that difference without changing
 semantics.
 
-The pinning half of this now exists. `@oseo/unicode` holds one reviewed copy
-of the Unicode Character Database for Unicode 17.0.0, pinned by URL, byte
-length, and SHA-256 in *packages/unicode/data/manifest.yaml*, and the tables
-generated from it. It covers `General_Category`, `Script`, and
-`Script_Extensions`, every binary property in table 70 of ECMA-262, simple and
-full case folding, the simple and unconditional full case mappings, the
-conditional mappings of *SpecialCasing.txt* recorded but not applied, both
-ECMAScript word-character sets, and the seven properties of strings derived
-from the pinned Unicode 17.0 emoji sequence files. Code-point sets are
-inversion lists, so a matcher may lower one into generated C without reshaping
-it, and string properties are immutable code-point sequence lists.
-`mise run unicode:update` regenerates the tables and
+The pinning half exists in `@oseo/unicode`. It holds one reviewed copy of the
+Unicode Character Database for Unicode 17.0.0, pinned by URL, byte length, and
+SHA-256 in *packages/unicode/data/manifest.yaml*, and the tables generated
+from it.
+
+It covers `General_Category`, `Script`, and `Script_Extensions`, every binary
+property in table 70 of ECMA-262, simple and full case folding, the simple and
+unconditional full case mappings, both ECMAScript word-character sets, and the
+seven properties of strings derived from the pinned Unicode 17.0 emoji
+sequence files. It records the conditional mappings of *SpecialCasing.txt* but
+does not apply them.
+
+Code-point sets are inversion lists, so a matcher may lower one into generated
+C without reshaping it, and string properties are immutable code-point
+sequence lists. `mise run unicode:update` regenerates the tables, and
 `mise run check:unicode-tables` fails when the checked-in module is not what
 the pinned inputs produce, offline in both directions.
 
-The generic matcher reads the tables through its caller rather than
-directly, so the builder resolves `\d`, `\s`, `\w`, `\p`, and every
-ignore-case closure into inversion lists while the artifact is built and
-the executor needs no table at all. That keeps the package boundary and
-already gives an artifact one native lowering could consume unchanged.
+The generic matcher reads the tables through its caller rather than directly,
+so the builder resolves `\d`, `\s`, `\w`, `\p`, and every ignore-case closure
+into inversion lists while the artifact is built, and the executor needs no
+table at all. That keeps the package boundary and gives an artifact one native
+lowering could consume unchanged.
 
 The runtime-side representation remains open. The tables are build-time data,
-so an ahead-of-time matcher reads them while it lowers a literal and the
+so an ahead-of-time matcher reads them while it lowers a literal, and the
 dynamic pattern compiler retains its located boundary for a property or class
-set that needs them. The probe still owns what a dynamic pattern must carry
-into the runtime before that boundary can move.
+set that needs them. The probe owns what a dynamic pattern must carry into the
+runtime before that boundary can move.
 
-It measured that demand. Reaching every admitted property from a run-time
-pattern is a 311,460-byte table payload, against 1,976 bytes of resolved
-sets for the whole 29-pattern corpus compiled ahead of time, and reaching
-pattern construction at all already costs 337,784 bytes of executable.
+The probe measured that demand: reaching every admitted property from a
+run-time pattern is a 311,460-byte table payload, against 1,976 bytes of
+resolved sets for the whole 29-pattern corpus compiled ahead of time, and
+reaching pattern construction at all costs 337,784 bytes of executable.
 Inversion lists, delta-encoded lists, per-set tries, and shared classifiers
 over the enumerated properties all have measured sizes and lookup costs in the
 report.
@@ -600,14 +619,15 @@ runtime reserves in the corpus is 99,360 bytes of stacks, trail, and
 registers, and the patterns that burn millions of steps stay in a few
 thousand with no measurable growth in backtracking depth. Compile work has one
 outlier, the ignore-case backreference that carries a 9,352-byte
-canonicalization table. Reaching a boundary is deterministic, and a program
-whose literal reaches one exits with a located `OSEO2001` diagnostic, so
-both implementations answer the same input at the same boundary. Native
-stack use and cleanup after failure are the two properties named above that
-the probe did not measure: the executor keeps its choices in an explicit
-stack rather than the C call stack, and the runtime work area a failed
-match releases is what the reviewed native gates observe under their
-sanitizers.
+canonicalization table.
+
+Reaching a boundary is deterministic, and a program whose literal reaches one
+exits with a located `OSEO2001` diagnostic, so both implementations answer the
+same input at the same boundary. Native stack use and cleanup after failure
+are the two properties named above that the probe did not measure: the
+executor keeps its choices in an explicit stack rather than the C call stack,
+and the runtime work area a failed match releases is what the reviewed native
+gates observe under their sanitizers.
 
 
 Optimization contract
@@ -643,24 +663,27 @@ Regular expression properties extend [*PLAN-PT.md*](./PLAN-PT.md). They keep a
 structured pattern model until printing so shrinking can preserve capture
 indices, group names, assertion direction, Unicode mode, and reference
 validity. The pattern domain exists at seeds `0x60004a00` and `0x60004a01`.
-Until a matcher exists it observes structure rather than match state: the
-host engine decides validity and reports its own capture count and group
-names, and a summary walk over the model is compared with one over the
-parsed tree. Pattern characters already cover the empty pattern, ASCII,
-syntax characters, embedded NUL, non-ASCII BMP code points, lone
-surrogates, and supplementary code points; the match-input half of the
-domain lands with the matcher that consumes it.
+
+Until a matcher exists, the domain observes structure rather than match
+state. The host engine decides validity and reports its own capture count
+and group names. A summary walk over the model is compared with one over
+the parsed tree.
+
+Pattern characters already cover the empty pattern, ASCII, syntax
+characters, embedded NUL, non-ASCII BMP code points, lone surrogates, and
+supplementary code points; the match-input half of the domain lands with
+the matcher that consumes it.
 
 The invalid domain applies one mutation to a valid case and asserts the
 exact error kind, section, and span. Its mutations cover escapes, class
 ranges, quantifier bounds, a quantifier without an atom, group names,
 numbered and named references, a property escape without a resolver, an
 unadmitted class set, a repeated flag, an undefined flag, and incompatible
-`u` and `v` flags. The host is a one-directional oracle, since it
-implements Annex B and this grammar does not, so host agreement is
-required for a flag error and for a pattern error under a unicode-mode
-flag, and never for an unadmitted construct, which is valid ECMAScript
-this unit refuses on purpose.
+`u` and `v` flags. The host is a one-directional oracle: it implements
+Annex B and this grammar does not. Host agreement is therefore required for
+a flag error and for a pattern error under a unicode-mode flag, and never
+for an unadmitted construct, which is valid ECMAScript this unit refuses on
+purpose.
 
 The Unicode property checkpoint adds three generated domains in reserved seed
 block `0x60004e00` through `0x60004eff`. Seed `0x60004e00` compares every
@@ -669,11 +692,12 @@ modes. Seed `0x60004e01` chooses exact binary, General\_Category, Script, and
 Script\_Extensions aliases from the pinned tables and compares positive and
 negative escapes. Seed `0x60004e02` mutates canonical forms into invalid
 property expressions and asserts the owned parser's exact kind, section,
-message, and source span as well as the host's early rejection. The valid
-domains generate code points directly and retain the Unicode version, seed,
-and replay path in every failure. The host rejects the retained `Hrkt` alias,
-so that empty Script value instead uses its absence from both pinned
-assignment files as an independent oracle.
+message, and source span as well as the host's early rejection.
+
+The valid domains generate code points directly and retain the Unicode
+version, seed, and replay path in every failure. The host rejects the
+retained `Hrkt` alias, so the empty Script value instead uses its absence
+from both pinned assignment files as an independent oracle.
 
 The valid generator starts with a bounded candidate-edition grammar. It
 constructs alternatives, sequences, quantifiers, classes, assertions,
@@ -734,12 +758,14 @@ expected control flow, and every guarded optimization retains its generic edge.
 The reviewed test262 corpus grows by semantic dependency. It begins with
 literal early errors and object identity, then initialization and built-in
 execution, prototype methods, symbols and string integration, Unicode behavior,
-and the complete candidate-edition directories. ADR 0013's dependency
-vocabulary is extensible through a reviewed amendment to that record, and one
-now admits the `regular-expressions` tag. The Unicode property checkpoint
-still selects its 625 paths through existing dependency tags; moving reviewed
-rows onto the new tag is a separate reviewed change. Unsupported results move
-only after every requested strictness and specialization variant executes.
+and the complete candidate-edition directories.
+
+ADR 0013's dependency vocabulary is extensible through a reviewed amendment to
+that record, and one admits the `regular-expressions` tag. The Unicode property
+checkpoint still selects its 625 paths through existing dependency tags; moving
+reviewed rows onto the new tag is a separate reviewed change. Unsupported
+results move only after every requested strictness and specialization variant
+executes.
 
 Native evidence runs on Linux AMD64 and macOS AArch64. AArch64 Linux
 compile-links and exposes static matcher artifacts and generated control flow

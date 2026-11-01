@@ -31,8 +31,8 @@ This plan is governed by [*WHITEPAPER.md*](./WHITEPAPER.md),
 [*PLAN-M6.md*](./PLAN-M6.md), [*PLAN-NIO.md*](./PLAN-NIO.md),
 [*PLAN-PT.md*](./PLAN-PT.md), [*PLAN-WASM.md*](./PLAN-WASM.md),
 [ADR 0006](./docs/adr/0006-root-stack-and-safepoints.md), and
-[ADR 0008](./docs/adr/0008-object-layout-and-shapes.md). Evidence that changes
-one of those contracts updates the affected document in the same change.
+[ADR 0008](./docs/adr/0008-object-layout-and-shapes.md). If evidence changes
+one of those contracts, update the affected document in the same change.
 
 
 Goal
@@ -94,7 +94,7 @@ evidence.
 Implemented baseline
 --------------------
 
-The current collector has several useful properties:
+The current collector:
 
  -  `OseoValue` tags identify heap references precisely;
  -  generated functions register contiguous root slots in linked frames;
@@ -105,8 +105,8 @@ The current collector has several useful properties:
     recurse on the native stack;
  -  collection can run at every declared safepoint; and
  -  deterministic allocation failure, root-budget failure, strict warnings,
-    address sanitization, and undefined-behavior sanitization are ordinary
-    test evidence.
+    address sanitization, and undefined-behavior sanitization are covered by
+    ordinary tests.
 
 The baseline is deliberately simple. Each published object joins one allocation
 list, each object is allocated separately, and every collection marks all
@@ -180,7 +180,7 @@ and unlink an ephemeron entry whose key stayed unmarked, so the same sweep
 reclaims the entry record and a churning table does not grow. Marked
 finalization registries then publish dead-target cells to one collector-owned
 FIFO. Each collection sorts its newly eligible cells by their realm-wide
-registration ordinal and appends that batch to the FIFO, which retains the
+registration ordinal and appends that batch to the FIFO. The FIFO retains the
 registry and holdings as strong edges and is itself a context root until the
 scheduler consumes each record. A record the scheduler has consumed is unlinked
 from its registry at the next collection so a long-lived registry does not
@@ -198,29 +198,36 @@ the phase order. Each ephemeron table owns an open-addressed index keyed by
 heap address, and each entry carries an untraced back link. A source-level
 delete unlinks its entry and tombstones the index slot immediately. When the
 collector unlinks an entry whose key died, it tombstones that slot in the same
-pass, which needs no allocation. Finalization cells carry a weak unregister
-token that clears with the other weak edges. Unregistration marks matching
-live and queued cells consumed; the cleanup dequeue skips a consumed cell, and
-compaction keeps a consumed cell that is still queued alive until then.
+pass, which needs no allocation.
+
+Finalization cells carry a weak unregister token that clears with the other
+weak edges. Unregistration marks matching live and queued cells consumed; the
+cleanup dequeue skips a consumed cell, and compaction keeps a consumed cell
+that is still queued alive until then.
 
 The context's KeptAlive set is a root set filled by `WeakRef` construction and
 `deref`. The job queue clears it before every promise job, so each reaction ends
 the set of the script, timer callback, or earlier reaction before it, including
-the reactions an internal await drains. The native event loop clears it again
-after the script or a timer callback and every promise job it enabled, and the
-same checkpoint then runs one cleanup job per registry before the next timer.
-Every timer turn also clears the set before its callback, because an internal
-await can drive a timer turn directly. Such an await runs the same cleanup
-checkpoint before each timer turn it drives while its promise stays pending, so
-a record one of its timers queues runs before the next; its drains stop once
-that promise settles, and the outer loop runs any remaining work. Jobs follow
-each registry's oldest record in the FIFO, and a job consumes every record of
-its registry, including one queued while it runs, before promise jobs drain;
-ordering by registration ordinal therefore holds among the records one
-collection publishes, not across collections. Collection currently runs only
-when forced at every safepoint or when a context is destroyed, so in an
-ordinary run no weak target clears and no cleanup job runs. A pressure-driven
-collection trigger remains the policy work this plan owns.
+the reactions an internal await drains.
+
+The native event loop clears it again after the script or a timer callback and
+every promise job it enabled, and the same checkpoint then runs one cleanup job
+per registry before the next timer. Every timer turn also clears the set before
+its callback, because an internal await can drive a timer turn directly. Such an
+await runs the same cleanup checkpoint before each timer turn it drives while
+its promise stays pending, so a record one of its timers queues runs before the
+next. Its drains stop once that promise settles, and the outer loop runs any
+remaining work.
+
+Jobs follow each registry's oldest record in the FIFO, and a job consumes every
+record of its registry, including one queued while it runs, before promise jobs
+drain. Ordering by registration ordinal therefore holds among the records one
+collection publishes, not across collections.
+
+Collection currently runs only when forced at every safepoint or when a context
+is destroyed, so in an ordinary run no weak target clears and no cleanup job
+runs. A pressure-driven collection trigger remains the policy work this plan
+owns.
 
 The context counts its published ephemeron tables, weak-reference records,
 finalization registries, and finalization cells until its sweep removes them.
@@ -312,8 +319,8 @@ before changing the collection algorithm.
 The runtime records requested, committed, live, and peak bytes. It distinguishes
 managed object bodies, managed backing stores, root storage, collector
 metadata, and native or external storage retained on behalf of heap objects.
-Counters must not pretend that a separately allocated property vector costs
-nothing merely because the object header is small.
+A separately allocated property vector must still be counted as a cost even
+when the object header is small.
 
 Ordinary allocation triggers collection from an explicit policy based on bytes
 allocated since the last collection, the previous live size, a minimum growth

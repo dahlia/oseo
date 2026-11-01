@@ -22,9 +22,9 @@ JavaScript engines. There is no profiling tier to warm up.
 
 Normally `tsc` erases type annotations before an engine ever sees the code.
 Because Oseo compiles from the original source, it keeps those annotations, and
-JSDoc types in plain JavaScript, as optimization hints that select which
-specialized path to generate. Every resulting assumption stays guarded at
-runtime, since a `: number` annotation can be wrong through `any`, type
+JSDoc types in plain JavaScript, as optimization hints. Those hints select
+which specialized path to generate. Every resulting assumption stays guarded
+at runtime, since a `: number` annotation can be wrong through `any`, type
 assertions, or interop with untyped code. Oseo does not type-check: it reads
 annotations at the syntax level and never depends on `tsc`.
 

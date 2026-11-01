@@ -213,11 +213,11 @@ validated, parser-independent module representation.
 
 Decoding discovers every WebAssembly import before native code generation.
 The module portion of a WebAssembly import is resolved through the same injected
-resolver policy as an ECMAScript specifier, relative to the importing *.wasm*
-module where the selected ES module integration contract requires that
-behavior. The field portion selects one export from the resolved module. Import
-maps, package aliases, URL policy, integrity policy, and network access remain
-host resolver concerns rather than WebAssembly compiler behavior.
+resolver policy as an ECMAScript specifier. Where the selected ES module
+integration contract requires it, resolution is relative to the importing
+*.wasm* module. The field portion selects one export from the resolved module.
+Import maps, package aliases, URL policy, integrity policy, and network access
+remain host resolver concerns rather than WebAssembly compiler behavior.
 
 Canonical identity preserves one static instance for repeated imports of the
 same module. Re-exports and namespace access retain stable JavaScript wrapper
@@ -390,10 +390,10 @@ Artifact, toolchain, and cache policy
 -------------------------------------
 
 Every static module artifact key includes the exact input digest, selected core
-and integration feature matrices, compiler and validator identities, compiler
-options, Oseo runtime ABI, native target, object format, optimization and
-sanitizer modes, and any external runtime or compiler pack digest. A cache hit
-never crosses one of those boundaries.
+and integration feature matrices, and compiler and validator identities. It
+also includes compiler options, Oseo runtime ABI, native target, object format,
+optimization and sanitizer modes, and any external runtime or compiler pack
+digest. A cache hit never crosses one of those boundaries.
 
 Official builds use pinned, validated compiler and runtime inputs. They do not
 discover an ambient system WebAssembly engine, invoke an unspecified compiler
@@ -406,14 +406,16 @@ The reference toolchain remains the pinned Zig C compiler and linker for C11
 and final native linking. A selected WebAssembly compiler may emit C, object
 files, or another reviewed input, but it does not change stable Oseo target
 names or choose the final linker through ambient state. Linux AMD64 and macOS
-AArch64 need execution evidence. AArch64 Linux retains compile-link, relocation,
-symbol, and artifact inspection until it becomes an execution target.
+AArch64 need execution evidence. AArch64 Linux retains compile-link,
+relocation, symbol, and artifact inspection until it becomes an execution
+target.
 
 Build records retain each WebAssembly module identity, input and artifact
-digest, admitted features, imports and exports, compiler path, target, output
-sections and symbols, runtime components, link inputs, and final executable
-identity. A source-only program provides structural evidence that no static AOT
-compiler or WebAssembly runtime component entered its executable.
+digest, admitted features, imports and exports, compiler path, and target. They
+also retain output sections and symbols, runtime components, link inputs, and
+final executable identity. A source-only program provides structural evidence
+that no static AOT compiler or WebAssembly runtime component entered its
+executable.
 
 
 Security and resource boundary
@@ -421,8 +423,8 @@ Security and resource boundary
 
 Validation completes before a module is compiled, linked, instantiated, or
 published. The validator checks every selected core rule and configured limit;
-native lowering cannot treat successful code generation as proof that the
-input was valid.
+native lowering cannot use successful code generation as proof that the input
+was valid.
 
 Generated native code preserves WebAssembly's sandbox. Every linear-memory and
 table access has the required bounds behavior, integer and floating-point
@@ -430,17 +432,17 @@ operations avoid host undefined behavior, indirect calls check their types, and
 traps cannot continue through corrupted Oseo state. Signal or guard-page
 optimizations require target-specific proof and a portable checked fallback.
 
-Modules receive no ambient filesystem, network, clock, environment, process,
-or native-symbol access. Their only host capabilities are validated imports
-from the selected module graph or explicit dynamic instantiation object. WASI
-or another host interface requires its own permission and compatibility plan.
+Modules receive no ambient filesystem, network, clock, environment, process, or
+native-symbol access. Their only host capabilities are validated imports from
+the selected module graph or explicit dynamic instantiation object. WASI or
+another host interface requires its own permission and compatibility plan.
 
 The architecture decisions freeze limits for binary size, section counts,
-types, functions, locals, control nesting, call depth, memories, tables,
-instances, compilation work, generated code, and retained native bytes. Limit
-failures map to an owned build diagnostic or the specified JavaScript error.
-They do not abort the process, wrap arithmetic, or fall back to an unvalidated
-path.
+types, functions, locals, control nesting, call depth, memories, tables, and
+instances. They also freeze limits for compilation work, generated code, and
+retained native bytes. Limit failures map to an owned build diagnostic or the
+specified JavaScript error. They do not abort the process, wrap arithmetic, or
+fall back to an unvalidated path.
 
 Runtime native-code generation is an explicit capability. Targets or sandboxes
 that forbid it may still support static modules and an interpreter-backed
@@ -479,10 +481,11 @@ The properties compare:
     store, instance, table, global, wrapper, or suspended call.
 
 One failure record retains the minimized structured module, binary bytes,
-textual diagnostic rendering, module graph, imports, feature matrix, compiler
-and engine identities, target, artifact and executable paths, seed, replay
-path, collection and sanitizer modes, and complete observations. A runtime-code
-failure also retains its publication and lifetime schedule.
+textual diagnostic rendering, module graph, imports, and feature matrix. It
+also retains compiler and engine identities, target, artifact and executable
+paths, seed, replay path, collection and sanitizer modes, and complete
+observations. A runtime-code failure also retains its publication and lifetime
+schedule.
 
 Strict warnings, address and undefined-behavior sanitizers, Linux AMD64 and
 macOS AArch64 execution, and AArch64 Linux compile-link and inspection remain
@@ -597,10 +600,10 @@ The static WebAssembly module checkpoint is complete when:
     target, while every rejected module fails before native linking at its owned
     phase;
  -  the observable `WebAssembly` namespace for builds with and without static
-    modules has a frozen, tested surface, and every unavailable runtime-byte API
-    is absent or fails with its specified error rather than acting as a stub;
+    modules has a frozen, tested surface. Every unavailable runtime-byte API is
+    absent or fails with its specified error rather than acting as a stub;
  -  JavaScript wrappers preserve conversion, identity, exception, and trap
-    behavior, including either implemented BigInt conversion or the owned
+    behavior. This includes either implemented BigInt conversion or the owned
     rejection diagnostic for an `i64` interoperation edge, according to the
     frozen feature matrix;
  -  memories, tables, globals, instances, references, native storage, and

@@ -94,47 +94,47 @@ Each group lands as one or more coherent semantic units with its
 prerequisites named. The order may change when web-platform tests expose a
 shared prerequisite; changing it updates this plan in the same change.
 
-1.  **Text encoding and URLs.** `TextEncoder`, `TextDecoder`, `URL`, and
+1.  Text encoding and URLs. `TextEncoder`, `TextDecoder`, `URL`, and
     `URLSearchParams`. Prerequisites: a UTF-8 transcoding boundary for the
     runtime's UTF-16 strings and the binary-data built-ins from the M5
     stream, because encoding APIs produce `Uint8Array` values.
-2.  **Events and abort signals.** `Event`, `EventTarget`, `AbortController`,
+2.  Events and abort signals. `Event`, `EventTarget`, `AbortController`,
     and `AbortSignal`. `AbortSignal.timeout()` remains deferred to group 3.
     Prerequisites: stable class-shaped built-ins from M5 and reentrancy rules
     for listener invocation order.
-3.  **Timers, performance, and error reporting.** Standardized `setTimeout`
+3.  Timers, performance, and error reporting. Standardized `setTimeout`
     and `setInterval` behavior beyond the M4 subset, `AbortSignal.timeout()`,
     `queueMicrotask()`, `performance.now()`, `structuredClone()`, and host error
     reporting events. Prerequisites: the completed clock and wakeup integration
     checkpoint from [*PLAN-NIO.md*](./PLAN-NIO.md) and the serialization walk
     shared with later `Blob` work.
-4.  **Binary payload containers.** `Blob`, `File`, and `FormData`.
+4.  Binary payload containers. `Blob`, `File`, and `FormData`.
     Prerequisites: groups 1 and 3.
-5.  **Streams.** `ReadableStream`, `WritableStream`, `TransformStream`, and
+5.  Streams. `ReadableStream`, `WritableStream`, `TransformStream`, and
     the compression streams. Prerequisites: the complete promise and
     queuing semantics from M5 and group 2 abort integration. Streams are
     the largest single specification in the profile and receive their own
     conformance matrix before implementation begins.
-6.  **HTTP primitives.** `Headers`, `Request`, `Response`, and `fetch()`.
+6.  HTTP primitives. `Headers`, `Request`, `Response`, and `fetch()`.
     Prerequisites: groups 1 through 5; accepted and implemented socket and
     name-resolution backends on Linux AMD64 and macOS AArch64, including the
     cancellation, buffer-lifetime, and fallback decisions under
     [*PLAN-NIO.md*](./PLAN-NIO.md); and the accepted TLS client and trust-store
     decision described below.
-7.  **Web Crypto.** `crypto.getRandomValues()`, `crypto.randomUUID()`, and
+7.  Web Crypto. `crypto.getRandomValues()`, `crypto.randomUUID()`, and
     `SubtleCrypto`. Prerequisites: binary data and a reviewed cryptography
     dependency decision. [*PLAN-CRYPTO.md*](./PLAN-CRYPTO.md) owns the frozen
     algorithm matrix, provider-independent semantic boundary, target artifact
     packs, security updates, and conformance evidence. Oseo does not implement
     primitives itself without recorded rationale.
-8.  **WebAssembly.** The JavaScript and web APIs required by the targeted
+8.  WebAssembly. The JavaScript and web APIs required by the targeted
     edition. [*PLAN-WASM.md*](./PLAN-WASM.md) owns the core and API feature
     matrices, runtime store, JavaScript value boundary, execution engine,
     artifacts, limits, security policy, and conformance evidence. A prior
     static-import checkpoint may precompile known *.wasm* modules, but group 8
     additionally requires an architecture decision for arbitrary runtime bytes
     and does not count that checkpoint as API completion.
-9.  **Remaining globals and integration.** `globalThis` surface audit,
+9.  Remaining globals and integration. `globalThis` surface audit,
     `console` beyond the M1 intrinsic, base64 and timer edge behavior, and
     the documented server-runtime deviations.
 
@@ -152,14 +152,16 @@ time-based `AbortSignal` method remains absent until group 3. The NIO clock and
 wakeup checkpoint already makes existing positive-delay timers wait for elapsed
 monotonic time in production before M5 exposes `Date`. Group 3 consumes that
 integration to standardize timer edge behavior and add `AbortSignal.timeout()`
-and `performance.now()`; it does not first activate elapsed waiting. Groups 4
-and 5 can implement their data and queuing semantics before a real network
-backend exists. Before group 6 begins, both supported execution targets need
-accepted and implemented socket and name-resolution capabilities with
-cancellation, buffer ownership, wakeup, and liveness behavior. Sandboxed tests
-keep using the deterministic adapter and injected endpoints rather than public
-network access. The M6-owned HTTPS security decision below is a separate
-prerequisite.
+and `performance.now()`; it does not first activate elapsed waiting.
+
+Groups 4 and 5 can implement their data and queuing semantics before a real
+network backend exists. Before group 6 begins, both supported execution targets
+need accepted and implemented socket and name-resolution capabilities with
+cancellation, buffer ownership, wakeup, and liveness behavior.
+
+Sandboxed tests keep using the deterministic adapter and injected endpoints
+rather than public network access. The M6-owned HTTPS security decision below is
+a separate prerequisite.
 
 Host traces are not entry evidence for M6 as a whole or for starting any group.
 Once the versioned trace loader in [*PLAN-NIO.md*](./PLAN-NIO.md) lands, an
@@ -297,15 +299,15 @@ It does not depend on the earlier M6 API groups and does not complete group 8.
 5.  Complete the native socket and name-resolution adapter decision and both
     supported backends.
 6.  Probe candidate TLS clients and trust sources on Linux AMD64 and macOS
-    AArch64, recording Zig and C integration, static-link behavior, binary cost,
+    AArch64. Record Zig and C integration, static-link behavior, binary cost,
     default trust-store discovery, deterministic loopback HTTPS evidence, and
     AArch64 Linux compile-link evidence.
 7.  Accept the TLS client and trust-store decision from that target evidence.
 8.  Implement group 6 with deterministic transport and TLS completion
     injection.
 9.  Freeze the Web Crypto edition, algorithm matrix, key formats, and
-    server-runtime deviations in the separate cryptography standards decision,
-    then complete the provider probes, accept the provider decision, build the
+    server-runtime deviations in the separate cryptography standards decision.
+    Then complete the provider probes, accept the provider decision, build the
     validated target packs, and implement group 7 through
     [*PLAN-CRYPTO.md*](./PLAN-CRYPTO.md).
 10. Freeze the WebAssembly API matrix, resolve the runtime execution decision,

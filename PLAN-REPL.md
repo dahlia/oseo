@@ -118,10 +118,10 @@ run the compiler under Node.js or Deno and send verified native artifacts to a
 persistent Oseo runtime. After M8, the same compiler interface may be composed
 inside a native development environment. The session and artifact contracts
 must not depend on which supported compiler host performs that compilation.
+
 The loader, validation, and code-lifetime evidence should satisfy the shared
 late-artifact criteria in [*PLAN-DYN.md*](./PLAN-DYN.md) rather than creating a
-REPL-only native format.
-The latency and distribution results also feed
+REPL-only native format. The latency and distribution results also feed
 [*PLAN-BACKEND.md*](./PLAN-BACKEND.md), but the REPL does not select Oseo's
 general code-generation backend.
 
@@ -306,8 +306,8 @@ Delivery order
 8.  Compose the same interfaces with the self-hosted compiler after M8 and
     remove any bootstrap-host requirement from the native REPL distribution.
 
-Every checkpoint updates this plan and the accepted decisions with measured
-latency, code size, target behavior, and retained failure evidence. A probe that
+Each checkpoint records measured latency, code size, target behavior, and
+retained failure evidence in this plan and the accepted decisions. A probe that
 invalidates incremental loading or safe reclamation is useful evidence; it
 reopens the affected boundary before implementation continues.
 

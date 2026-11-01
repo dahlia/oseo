@@ -68,11 +68,12 @@ ahead-of-time JavaScript compiler. Its language engine is V8. In V8, JavaScript
 first becomes Ignition bytecode and begins execution without assumptions about
 future values. The engine gathers type and object-shape feedback while the
 program runs. Sparkplug, Maglev, and TurboFan then occupy progressively more
-optimized tiers. Maglev can emit a checked fixed-offset property load after
-observing a stable shape, but it also emits frame-state metadata so a failed
-assumption can reconstruct less optimized execution. V8's own
-[Maglev description] calls out both the runtime feedback and the deoptimization
-metadata.
+optimized tiers.
+
+Maglev can emit a checked fixed-offset property load after observing a stable
+shape, but it also emits frame-state metadata so a failed assumption can
+reconstruct less optimized execution. V8's own [Maglev description] calls out
+both the runtime feedback and the deoptimization metadata.
 
 The two shapes can be reduced to this:
 
@@ -90,7 +91,7 @@ flowchart TD
     specialized -->|failed guard| generic
 ~~~~
 
-V8's design has a major advantage: it can learn what a particular deployment
+V8's design has an advantage: it can learn what a particular deployment
 actually does. Oseo deliberately gives that up. It has no runtime hotness data,
 cannot specialize again when a workload changes, and cannot use an interpreter
 as a compact home for cold code. In return, its executable does not need the
@@ -156,13 +157,15 @@ type annotation must not change the result.
 The deployment boundary differs as much as the type system. AssemblyScript
 produces a WebAssembly module whose access to the outside world comes through
 explicit imports. That gives it a strong sandbox and makes a JavaScript or
-standalone WebAssembly host part of the application design. Oseo currently
-emits native executables and owns a private runtime ABI, collector, module
-linker, promise jobs, and scheduler. Its future web and Node.js layers are
-intended to make the executable itself a server runtime. Oseo plans to compile
-statically imported *.wasm* dependencies into the same native executable and
-later provide the dynamic JavaScript and web APIs. Neither capability makes
-WebAssembly the output target for Oseo's JavaScript compiler.
+standalone WebAssembly host part of the application design.
+
+Oseo currently emits native executables and owns a private runtime ABI,
+collector, module linker, promise jobs, and scheduler. Its future web and
+Node.js layers are intended to make the executable itself a server runtime.
+Oseo plans to compile statically imported *.wasm* dependencies into the same
+native executable and later provide the dynamic JavaScript and web APIs.
+Neither capability makes WebAssembly the output target for Oseo's JavaScript
+compiler.
 
 AssemblyScript is a good choice when a developer can write or port a
 computation into a statically typed WebAssembly-oriented language. Oseo is
@@ -188,7 +191,7 @@ JavaScript, npm, Node.js, and platform UI code can become a deployable native
 application now. It supports a practical subset, infers types for native code,
 and offers an optional JavaScript evaluator for packages that are not compiled
 natively. Its [runtime opt-in policy] treats that evaluator as privileged and
-requires an explicit build choice, which is a thoughtful boundary, but it is
+requires an explicit build choice. That boundary is thoughtful, but it is
 still a compatibility route that Oseo's present design excludes.
 
 Oseo asks a narrower engine question before it asks the product question:
@@ -271,9 +274,11 @@ JavaScript and for values typed as `any`. Values are copied and validated when
 they cross the boundary, and the island has its own heap and microtask queue.
 This makes the compatibility cost visible and opt-in. It also means scriptc
 does not require a compiled generic ECMAScript path beside every typed native
-function. Oseo's closed profile excludes this VM tier. Its generic fallback
-must be native code in the same artifact, while any future runtime source
-compiler must also produce native code as an explicit capability.
+function.
+
+Oseo's closed profile excludes this VM tier. Its generic fallback must be
+native code in the same artifact, while any future runtime source compiler must
+also produce native code as an explicit capability.
 
 scriptc's LLVM-to-C fallback should not be confused with that dynamic island.
 Both backends consume the same typed IR and produce native code. When the
@@ -303,13 +308,13 @@ manifest. scriptc is measuring whether its supported programs behave like
 Node.js. Oseo is building a versioned standards claim before broadening its
 host APIs.
 
-Finally, scriptc demonstrates why Oseo's lack of a `tsc` dependency is a
-choice rather than a technical impossibility. The compiler pins TypeScript
-7.0.2 and its [TypeScript frontend adapter] imports
-`typescript/unstable/sync`. That gives scriptc authoritative checker types at
-the cost of tracking an explicitly unstable API. Oseo avoids that dependency
-because checker authority would conflict with its false-hint invariant, and
-because syntax-level hints are enough for the guarded optimizations it permits.
+scriptc demonstrates why Oseo's lack of a `tsc` dependency is a choice rather
+than a technical impossibility. The compiler pins TypeScript 7.0.2 and its
+[TypeScript frontend adapter] imports `typescript/unstable/sync`. That gives
+scriptc authoritative checker types at the cost of tracking an explicitly
+unstable API. Oseo avoids that dependency because checker authority would
+conflict with its false-hint invariant, and because syntax-level hints are
+enough for the guarded optimizations it permits.
 
 This comparison uses scriptc 0.0.14 at the fixed revision above. It compares
 contracts rather than benchmark results: scriptc is already much broader as a
@@ -335,8 +340,6 @@ experimental JavaScript/TypeScript-to-WebAssembly/C engine, compiler, and
 runtime. It even offers `--opt-types`, which uses unchecked type annotations as
 compiler hints.
 
-Those similarities make the remaining differences more revealing.
-
 Porffor's primary artifact is WebAssembly. Its experimental native path lowers
 its own generated low-level instruction arrays through the 2c IR-to-C compiler
 and then a system compiler. Oseo's MIR is backend-neutral, but its current
@@ -346,11 +349,10 @@ library, or direct emitter becomes primary. Oseo target identities, runtime
 ABI, collector metadata, and JavaScript semantics are not defined by
 WebAssembly or C.
 
-More important, Porffor does not publish Oseo's hint-safety invariant. Its
-README says type annotations can be optimization hints without type checking,
-but the current implementation also treats assignment to an annotated local as
-a TypeScript assertion and may lower the value according to that annotation.
-This is observable today.
+Porffor does not publish Oseo's hint-safety invariant. Its README says type
+annotations can be optimization hints without type checking, but the current
+implementation also treats assignment to an annotated local as a TypeScript
+assertion and may lower the value according to that annotation.
 
 At Porffor commit
 [`8ef8aaa`], the following deliberately ill-typed program was run in three
@@ -371,14 +373,15 @@ console.log(f("2"));
 | Node.js after TypeScript erasure  |     21 |
 
 The exact `17` is an implementation artifact, not a meaningful alternate
-language rule. The useful result is that the annotation changed observable
-behavior. Porffor is explicit that it implements a limited sub- and superset of
-JavaScript and is not based on a particular specification version, so this
-experiment does not show Porffor breaking its stated contract. It shows that
-its contract is not Oseo's contract. The relevant Porffor source makes
-[`optTypes` a default preference], turns [writes to annotated locals] into
-type-assertion nodes, and [lowers those assertions] according to the annotated
-representation.
+language rule. The annotation changed observable behavior. Porffor is explicit
+that it implements a limited sub- and superset of JavaScript and is not based
+on a particular specification version, so this experiment does not show Porffor
+breaking its stated contract. It shows that its contract is not Oseo's
+contract.
+
+The relevant Porffor source makes [`optTypes` a default preference], turns
+[writes to annotated locals] into type-assertion nodes, and
+[lowers those assertions] according to the annotated representation.
 
 Under Oseo's design, this is the canonical false-hint test. Provided that the
 source forms are in the active profile, both specialization-enabled and
@@ -394,12 +397,12 @@ retain unused compiler or loader machinery, but it does not make â€œno runtimeâ€
 the semantic goal. The runtime is where much of JavaScript's generic meaning
 lives.
 
-Finally, Porffor describes current language support pragmatically and warns
-that it is seriously limited. Oseo is building toward a named ECMA-262 edition
-with one reviewed manifest row per upstream test path. The difference is not
-that Oseo is presently more compatible. It is not. The difference is that a
-versioned standards claim, including negative and unsupported results, is part
-of Oseo's architecture rather than a later scorecard.
+Porffor describes current language support pragmatically and warns that it is
+seriously limited. Oseo is building toward a named ECMA-262 edition with one
+reviewed manifest row per upstream test path. Oseo is not presently more
+compatible. The difference is that a versioned standards claim, including
+negative and unsupported results, is part of Oseo's architecture rather than a
+later scorecard.
 
 [project site]: https://porffor.dev/
 [current README]: https://github.com/CanadaHonk/porffor/blob/8ef8aaaad9199de14a35bd1aa214f4d3e23bf97a/README.md
@@ -412,8 +415,7 @@ of Oseo's architecture rather than a later scorecard.
 Static Hermes: sound typed JavaScript beside untyped JavaScript
 ---------------------------------------------------------------
 
-Static Hermes is an important neighboring design because it takes types more
-seriously than either ordinary TypeScript or Oseo. Its
+Static Hermes treats types more strictly than ordinary TypeScript or Oseo. Its
 [typed-language guide] describes a sound subset with exact object types,
 homogeneous arrays without holes, compile-time type errors, and runtime checked
 casts from `any`. If a declaration has an annotation, the annotation wins.
@@ -448,12 +450,12 @@ the QuickJS engine. The system C compiler then produces an ordinary executable.
 The [QuickJS internals documentation] is explicit that the C source contains
 bytecode and initializes the engine to evaluate it.
 
-This is a useful and coherent design. It offers small deployment, fast
-compilation, broad JavaScript behavior, and optional removal of the source
-compiler when `eval` is not needed. It simply solves a different problem.
-Generic execution is bytecode interpretation. In Oseo, generic execution is
-native code generated from MIR, and generated C contains the function's control
-flow rather than a serialized instruction stream for a JavaScript VM.
+QuickJS offers small deployment, fast compilation, broad JavaScript behavior,
+and optional removal of the source compiler when `eval` is not needed. It
+solves a different problem. Generic execution is bytecode interpretation. In
+Oseo, generic execution is native code generated from MIR, and generated C
+contains the function's control flow rather than a serialized instruction
+stream for a JavaScript VM.
 
 [QuickJS internals documentation]: https://bellard.org/quickjs/quickjs.html
 
@@ -485,8 +487,8 @@ stronger and more restrictive rule is:
 > If adding, removing, or falsifying a type hint changes observable behavior,
 > the compiler is wrong.
 
-That statement reaches beyond a type-erasure promise. Oseo actually uses the
-annotation, then proves through guards and differential tests that using it was
+That statement reaches beyond a type-erasure promise. Oseo uses the annotation,
+then proves through guards and differential tests that using it was
 semantically harmless.
 
 ### Whole-program AOT is also a deployment policy
@@ -518,7 +520,7 @@ The property-testing plan applies the same suspicion to Oseo's own optimizer.
 Generated programs run under Node.js, Deno, specialization-disabled Oseo,
 specialization-enabled Oseo, and forced collection. Failures retain seeds,
 structured inputs, source, target, and native artifacts. This testing model is
-not unique by itself. What matters is that false hints, guard misses, generic
+not unique. What matters is that false hints, guard misses, generic
 fallbacks, collectors, targets, and standards classifications are tested as one
 contract.
 

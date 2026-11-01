@@ -50,13 +50,17 @@ receive a CLI archive.
 Before M8, `deno compile` produces the archive binary and embeds the `denort`
 runtime in it. That runtime executes the compiler; it is not linked into the
 native executables the CLI produces. The archive README identifies the CLI
-host. `deno compile` includes only statically analyzable imports, so the CLI's
+host.
+
+`deno compile` includes only statically analyzable imports, so the CLI's
 module graph must stay within that bound or list additional modules explicitly
 at build time. The CLI also reads non-module assets at run time, such as the C
 runtime sources and package manifests; each one must be embedded through
-`--include` or a generated module. Every archive receives a smoke test that
-extracts it into a clean directory and compiles a fixture without the
-repository or an installed package tree present.
+`--include` or a generated module.
+
+Every archive receives a smoke test that extracts it into a clean directory
+and compiles a fixture without the repository or an installed package tree
+present.
 
 ### npm and JSR packages
 
@@ -128,8 +132,8 @@ Zig version has one source of truth shared with the *mise.toml* development
 pin, and a repository check keeps the two equal once the downloader lands.
 
 The downloaded Zig build matches the machine running the compiler, not the
-Oseo build target: one host installation cross-compiles every supported
-target, and the Oseo target ID selects only the target argument the adapter
+Oseo build target. One host installation cross-compiles every supported
+target. The Oseo target ID selects only the target argument the adapter
 passes to `zig cc`, following
 [ADR 0015](./docs/adr/0015-native-target-identifiers.md). The Zig toolchain
 adapter package owns the protocol, the cache layout, and the mapping from the
@@ -149,10 +153,12 @@ the runtime linking exception in
 [ADR 0021](./docs/adr/0021-runtime-linking-exception.md), including its
 required notices and artifact checks, is a mandatory first-release
 prerequisite, because every release invites users to distribute executables
-that link the Oseo runtime. Every release publishes exact coverage and known
-gaps without the conformance label, as the M5 exit criteria already require.
-Within the recorded prerequisites, selecting the actual moment remains a
-maintainer judgment based on timing and surrounding conditions.
+that link the Oseo runtime.
+
+Every release publishes exact coverage and known gaps without the
+conformance label, as the M5 exit criteria already require. Within the
+recorded prerequisites, selecting the actual moment remains a maintainer
+judgment based on timing and surrounding conditions.
 
 Until that gate is recorded, this plan authorizes no publication. Reserving
 the unscoped npm name is the only action that may precede the gate, because
@@ -164,7 +170,7 @@ Self-hosting transition
 
 M8 replaces the artifact-production step only. The self-hosted native
 compiler produces the CLI executable that enters the same archives, names,
-channels, and toolchain-acquisition behavior, and `deno compile` leaves the
+channels, and toolchain-acquisition behavior. `deno compile` leaves the
 pipeline at that point. The npm and JSR packages remain host-run packages for
 library and API use on Node.js and Deno, which stay supported development
 hosts after M8.

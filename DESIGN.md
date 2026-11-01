@@ -146,12 +146,14 @@ linking, and native execution. M2 added guarded specialization to this same
 pipeline without creating a second composition path.
 
 M5b added `@oseo/unicode` as a ninth package. It owns one reviewed copy of the
-Unicode Character Database and the tables generated from it, and nothing else:
-its allowed internal dependency set is empty, so a table lookup cannot pull the
-compiler core, a backend, or the runtime adapter in behind it. Unicode answers
-therefore come from reviewed bytes rather than from a host locale, a `wchar_t`
-classification routine, or a C library regular-expression facility, and a
-cross-compiled target agrees with the host that built it.
+Unicode Character Database and the tables generated from it, and nothing else.
+Its allowed internal dependency set is empty, so a table lookup cannot pull the
+compiler core, a backend, or the runtime adapter in behind it.
+
+Unicode answers therefore come from reviewed bytes rather than from a host
+locale, a `wchar_t` classification routine, or a C library regular-expression
+facility. A cross-compiled target agrees with the host that built it.
+
 `mise run check:unicode-tables` rebuilds the tables in memory from the pinned
 inputs and fails when the checked-in module differs, so the pinned version, the
 input digests, and the generated data cannot disagree.
@@ -165,8 +167,10 @@ lowering, guarded specialization, and MIR rendering. *module-compile.ts* owns
 whole-graph asynchronous compilation, *module-json.ts* constructs JSON module
 data through generic owned syntax, *compile.ts* composes source compilation,
 and *native.ts* owns native extension contracts. *index.ts* remains the public
-export and composition surface. Automated boundary checks reject cycles in the
-compiler and Babel adapter source graphs.
+export and composition surface.
+
+Automated boundary checks reject cycles in the compiler and Babel adapter
+source graphs.
 
 The Babel adapter isolates raw parser shapes in *babel.ts*, source indexing and
 diagnostics in *locations.ts*, and hint extraction in *hints.ts*. Its
@@ -373,9 +377,10 @@ records live generic values in linked root frames around allocation points and
 runtime calls that may collect. Each frame points to a contiguous slot array and
 the previous frame. A non-moving mark-and-sweep collector avoids relocation
 barriers while the object representation and compiler ABI are still changing.
-Root slot arrays are allocated independently of generated C stack frames. A
-deterministic aggregate root-slot budget is checked before entering generated C
-so compiler spill space for wide functions cannot bypass the owned runtime
+Root slot arrays are allocated independently of generated C stack frames.
+
+A deterministic aggregate root-slot budget is checked before entering generated
+C so compiler spill space for wide functions cannot bypass the owned runtime
 failure boundary. Continuation dispatch charges the same conservative
 callable-frame cost before entering a generator, asynchronous function, or
 asynchronous generator body. That charge lasts only for the active native
@@ -433,8 +438,9 @@ Nullish values select the callee realm's global this value; other primitives
 produce fresh Boolean, Number, String, Symbol, or BigInt wrappers through
 `ToObject`. The generated entry roots that value for the call, and a
 suspension record retains it across resumes. Lexical arrows capture the
-bound receiver, while strict functions preserve the original value. This
-binding is separate from a primitive property Reference: its original
+bound receiver, while strict functions preserve the original value.
+
+This binding is separate from a primitive property Reference: its original
 primitive still reaches an inherited getter, even when lookup uses a box.
 An algorithm that actually performs `ToObject`, such as `Array.from`'s
 array-like branch, instead uses that one object's identity for its reads.
@@ -466,11 +472,14 @@ region. Normal exhaustion, a failed iterator step, and a `continue` targeting
 the same loop bypass `IteratorClose`; a head-assignment failure or transfer out
 of the loop enters the close block. The stored completion decides whether a
 close-time language error replaces a non-throw completion or yields to the
-original throw. A `const`, `let`, or `var` declaration head may use the same
-recursive array or object binding patterns as a standalone declaration.
-Lexical pattern names enter the temporal dead zone before iterator acquisition
-and receive fresh cells before each iteration. A pattern failure closes its
-own nested iterators before closing the outer `for-of` iterator.
+original throw.
+
+A `const`, `let`, or `var` declaration head may use the same recursive array or
+object binding patterns as a standalone declaration. Lexical pattern names enter
+the temporal dead zone before iterator acquisition and receive fresh cells
+before each iteration. A pattern failure closes its own nested iterators before
+closing the outer `for-of` iterator.
+
 An assignment head may use the corresponding recursive assignment patterns.
 Its identifier and member leaves write existing targets without creating
 cells, and a target failure follows the same inner-before-outer cleanup order.
@@ -493,16 +502,19 @@ regions, and rest drains the iterator into a rooted array. A step failure
 returns directly because the iterator record has already completed abruptly;
 later target or default failures close every still-open pattern from the inside
 out. The stored completion preserves the original throw over a failing close.
+
 The frontend predeclares every lexical name before evaluating the initializer,
 and direct awaited initializers resume by initializing those existing cells.
 `var` pattern names join the existing function-scope hoisting pass as
 `undefined`-initialized cells, then pattern leaves write those cells in source
-order. A declaration list of any kind may mix plain and array declarators
-without changing redeclaration or parameter-sharing behavior. A `const` or
-`let` list reaches the compiler as one declaration whose declarators are
-expanded into the statement list that contains it, which keeps ECMAScript's
-one scope for the whole list instead of adding a block that would reset the
-declared cells a second time.
+order.
+
+A declaration list of any kind may mix plain and array declarators without
+changing redeclaration or parameter-sharing behavior. A `const` or `let` list
+reaches the compiler as one declaration whose declarators are expanded into the
+statement list that contains it. This keeps ECMAScript's one scope for the whole
+list instead of adding a block that would reset the declared cells a second
+time.
 
 Standalone object binding declarations use the same compiler-owned recursive
 patterns and binding leaves. Lowering checks `RequireObjectCoercible` before it
@@ -522,7 +534,6 @@ binding is created uninitialized before the pattern runs. Array patterns retain
 their conditional iterator cleanup, object patterns retain nullish and
 property-order behavior, and a pattern failure skips the catch body while
 continuing through an enclosing `finally` or abrupt target.
-
 Synchronous function binding-pattern, default, and rest parameters reuse the
 same operations without changing the generic call ABI. The frontend replaces
 each pattern source parameter with a private plain parameter, initializes every
@@ -530,42 +541,52 @@ source binding in order in the outer function environment, then enters a
 private lexical body block. A default selects its initializer only when the raw
 argument is `undefined`. A rest marker survives through HIR and MIR so the C
 backend can copy every argument from that parameter index into a fresh array.
+
 This environment split keeps later parameters in their temporal dead zones
 during earlier defaults, prevents body declarations from becoming visible to
 parameter initializers, and adds no observable call. It also preserves dynamic
 `this` for ordinary functions and lexical `this` for arrows. HIR and MIR retain
 JavaScript function length separately from the ABI parameter count, so the
 first default or rest parameter truncates only the reported `length`.
+
 Name-based JSDoc parameter hints attach to the binding-identifier leaf they
 describe, not the hidden aggregate ABI parameter. Owned syntax and HIR retain
 that leaf metadata so adding, removing, or falsifying it cannot alter binding
-initialization. Inline object, tuple, and array TypeScript annotations use a
-frontend-owned structural mapping from syntactically visible primitive member
-types to binding-identifier leaves. This mapping does not resolve aliases or
-interfaces and does not invoke the TypeScript type checker. Standalone
-declarations and classic `for` declaration heads reuse the mapping. Optional
-members remain unhinted. Array element types continue through unambiguous nested
-array rest targets. Direct fixed-length tuple spreads expand before mapping, so
-their members and following suffix retain their syntactic positions. Expanded
-members follow the ordinary primitive-hint and unsupported-type rules. Variadic
-array rests and type-reference spreads remain unhinted where their length makes
-a position ambiguous. Object targets inside an array rest remain unhinted.
-Object member types map only through noncomputed source properties, so even a
-computed literal key remains unhinted. An annotation that requires type
-resolution remains an owned unsupported boundary. When an inline annotation's
-container shape disagrees with a nested binding subtree, mapping stops only for
-that subtree and leaves its binding leaves unhinted without a diagnostic.
-Sibling mappings continue. A root container mismatch and a type reference that
-requires alias or interface resolution, or another type without an admitted
-concrete syntactic shape, remain source-located unsupported boundaries.
+initialization.
+
+Inline object, tuple, and array TypeScript annotations use a frontend-owned
+structural mapping from syntactically visible primitive member types to
+binding-identifier leaves. This mapping does not resolve aliases or interfaces
+and does not invoke the TypeScript type checker. Standalone declarations and
+classic `for` declaration heads reuse the mapping.
+
+Optional members remain unhinted. Array element types continue through
+unambiguous nested array rest targets. Direct fixed-length tuple spreads expand
+before mapping, so their members and following suffix retain their syntactic
+positions. Expanded members follow the ordinary primitive-hint and
+unsupported-type rules.
+
+Variadic array rests and type-reference spreads remain unhinted where their
+length makes a position ambiguous. Object targets inside an array rest remain
+unhinted. Object member types map only through noncomputed source properties,
+so even a computed literal key remains unhinted.
+
+An annotation that requires type resolution remains an owned unsupported
+boundary. When an inline annotation's container shape disagrees with a nested
+binding subtree, mapping stops only for that subtree and leaves its binding
+leaves unhinted without a diagnostic. Sibling mappings continue. A root
+container mismatch, a type reference that requires alias or interface
+resolution, or another type without an admitted concrete syntactic shape remain
+source-located unsupported boundaries.
+
 When a parameter list contains an expression, a body `var` that shares a
 parameter name receives a distinct body cell initialized from an outer copy of
 the completed parameter binding. A closure created by a parameter initializer
-therefore retains the parameter cell when the body later writes its `var`
-cell. Lists without parameter expressions reuse the parameter cell. A
-top-level body function declaration owns its body binding even when a
-same-name `var` also appears, so that declaration suppresses a synthetic
-parameter-copy binding.
+therefore retains the parameter cell when the body later writes its `var` cell.
+Lists without parameter expressions reuse the parameter cell. A top-level body
+function declaration owns its body binding even when a same-name `var` also
+appears, so that declaration suppresses a synthetic parameter-copy binding.
+
 An asynchronous function creates the same parameter environment inside its
 owned asynchronous executor. Defaults, patterns, and rest collection therefore
 complete before the body begins, while an abrupt initializer rejects the
@@ -580,9 +601,11 @@ expression before the corresponding iterator step, source property read, or
 default. Property-key conversion and storage occur after the selected value is
 known. A nullish member base fails before property-key conversion and resumes
 through any active pattern cleanup. The expression produces the original
-right-hand value. Array patterns conditionally close their iterators after an
-early normal completion or a target or default failure. Object patterns check
-coercibility before computed source keys and share the same ordered reads and
+right-hand value.
+
+Array patterns conditionally close their iterators after an early normal
+completion or a target or default failure. Object patterns check coercibility
+before computed source keys and share the same ordered reads and
 `CopyDataProperties` path. Await inside a member target remains outside the
 admitted continuation positions.
 
@@ -628,8 +651,8 @@ declaration order semantic.
 M5c extends this graph with default-only JSON nodes and owned static import
 attributes. The file host supplies the module-kind discriminant and original
 content digest. It removes leading U+FEFF characters from JSON files before
-grammar validation while the digest still identifies the original content;
-interior U+FEFF data, JavaScript files, and custom loader text stay unchanged.
+grammar validation, while the digest still identifies the original content.
+Interior U+FEFF data, JavaScript files, and custom loader text stay unchanged.
 The compiler validates every request before deduplication.
 JSON grammar is checked during graph discovery. Generic data construction
 prepares each JSON value before any JavaScript evaluator starts. Synthetic
@@ -658,8 +681,8 @@ binary has been built.
 [ADR 0016](./docs/adr/0016-dynamic-source-boundary.md) keeps them outside
 the language profile with owned diagnostics and honest manifest
 classifications. Supporting any of them requires an explicit design that
-does not quietly introduce an interpreter or JIT tier; staged compilation
-is the recorded candidate for `eval`, and build-time-resolvable dynamic
+does not quietly introduce an interpreter or JIT tier. Staged compilation
+is the recorded candidate for `eval`; build-time-resolvable dynamic
 import remains a deferred admission.
 [*PLAN-DYN.md*](./PLAN-DYN.md) scopes the capability derivation, optional
 runtime composition, artifact loading, and evidence required by either route.
@@ -712,6 +735,7 @@ owns the measured probes, deterministic test adapter, platform capability
 model, and decisions that turn this replacement boundary into a native I/O
 interface. Platform completions become runtime tasks; they do not call
 generated functions directly or take ownership of the ECMAScript job queue.
+
 Monotonic time drives waits and timer deadlines; epoch-based real time supplies
 `Date` and other civil-time observations. Adjustment of the real-time clock
 must not accelerate or delay scheduled work.
@@ -719,7 +743,7 @@ must not accelerate or delay scheduled work.
 [ADR 0025](./docs/adr/0025-native-clock-and-wakeup.md) implements the first
 part of that interface. The runtime reads monotonic and real time and waits
 through a platform-neutral clock adapter with a coalescing cross-thread
-wakeup, so production timer turns take monotonic elapsed time while the M4
+wakeup. So production timer turns take monotonic elapsed time while the M4
 ordering rules stay unchanged. The Linux and macOS adapter links only the C
 library and starts no thread, and a deterministic adapter outside the runtime
 assets keeps the logical clock as the test oracle.
@@ -780,19 +804,24 @@ unit separately with the same target, C11 mode, warning, sanitizer, and
 include policy, gives each object a deterministic collision-free name, and
 archives the objects in input order before linking generated C against the
 complete archive. Filesystem enumeration and shell glob order never select
-sources or archive layout. The runtime implementation is split across
+sources or archive layout.
+
+The runtime implementation is split across
 component translation units for context lifecycle, memory, bindings,
 objects, functions, errors, symbols, iterators, primitives, promises,
 and the event loop, sharing the
 package-private *runtime\_internal.h* that is never included by generated
 C; [*docs/runtime-components.md*](./docs/runtime-components.md) records
-that componentization and its ownership rules. Generated programs may
+that componentization and its ownership rules.
+
+Generated programs may
 still depend on
 selected system libraries. Those dependencies must be listed as part of
 the target definition and must not be confused with Node-API addon
 support. Native I/O libraries and system frameworks are selected per operation
 and target under [*PLAN-NIO.md*](./PLAN-NIO.md), with a tested fallback rather
 than an assumption that one API covers every clock, socket, and file operation.
+
 The M6 compatibility boundary separately owns the TLS client, certificate and
 hostname verification, and trust-store decision layered over that transport.
 The Web Crypto and selected `node:crypto` surfaces use the separate
@@ -812,7 +841,9 @@ place of runtime source paths. Its key covers the ordered runtime source and
 header names, kinds, and contents, the runtime ABI version, its complete
 compile, archive, and link invocations, the observed toolchain identity and
 environment snapshot and policy, and the complete target and sanitizer
-description. The host captures the adapter-owned allowlist once for a native
+description.
+
+The host captures the adapter-owned allowlist once for a native
 workflow. The identity probe and every Zig build request use that immutable
 snapshot, which is also included directly in the reuse key. Unlisted ambient
 inputs such as `CPATH` and `SDKROOT` cannot affect compilation. Mutable
@@ -820,6 +851,7 @@ compiler-input overrides such as `ZIG_LIBC`, `ZIG_LIB_DIR`,
 `C_INCLUDE_PATH`, and Nix compiler flags are also excluded instead of treating
 their path strings as content identities. The supported targets use the pinned
 Zig installation and reviewed Oseo runtime assets.
+
 Temporary build paths are represented by stable placeholders so relocating one
 build does not change the artifact identity. Runtime objects are compiled from
 their stable relative source names with the runtime directory as the process
@@ -828,6 +860,7 @@ compiler metadata that canonicalizes the working directory. Source and header
 paths embedded in sanitizer records therefore never name the deleted producer
 directory, and equivalent builds in different temporary directories produce
 identical archives.
+
 Each workflow observes a nonempty toolchain identity against its own snapshot.
 A host that cannot read its environment, including a Deno host without
 `--allow-env`, disables archive reuse for that workflow and builds with ordinary
@@ -841,11 +874,15 @@ selected root is resolved to an absolute normalized path before clients
 receive it, so a toolchain process with a different working directory observes
 the same archive. The
 namespace API accepts portable leaf names other than `.` and `..`, so a cache
-client cannot select a parent or sibling namespace. The lease serializes the
+client cannot select a parent or sibling namespace.
+
+The lease serializes the
 check-through-publication interval for one key, so
 concurrent cold callers build that archive once. Each lease records an owner
 token and renewable expiration time in a token-specific state file. An active
-owner advances that expiration while it holds the lease. Release and stale
+owner advances that expiration while it holds the lease.
+
+Release and stale
 reclamation first rename the exact observed state file, so only the process
 that atomically claims that state may move the complete lock directory to a
 unique disposal path before deleting it. A replacement can then use the stable
@@ -854,11 +891,15 @@ already-claimed state file without permission to recreate a missing path. If a
 reclaimer replaces the directory, a suspended renewal therefore loses
 ownership instead of joining or removing the replacement lease. An exclusive
 state file protects the ownerless interval between directory creation and
-initial owner publication. A host without cache support, or one whose cache
+initial owner publication.
+
+A host without cache support, or one whose cache
 setup, lookup, lease, or publication fails, continues through the rebuilding
 path. The
 CLI's `--no-runtime-archive-reuse` option selects that same path deliberately
-when staleness is under investigation. A cache hit still copies the reviewed
+when staleness is under investigation.
+
+A cache hit still copies the reviewed
 public runtime header needed to compile generated C, but it does not copy
 runtime source translation units or create their objects in the execution
 working directory. Content-addressed archives remain until the operating
@@ -948,6 +989,7 @@ the admitted profile. A failure report records enough metadata to replay the
 same case directly. Interrupted or incomplete runs are failures, not shortened
 passes. M4 begins this infrastructure with `fast-check`; M5 extends the same
 models and replay contract into grammar-based differential generation.
+
 Each property source owns one non-overlapping, aligned seed block in the
 checked-in registry. The compatibility ratchet validates every ordinary seed
 against that ownership before comparing monotonic seed sets and case budgets.
@@ -961,7 +1003,7 @@ cases; the extended task increases both case count and schedule size.
 Each run records the normalized execution host, exact native target, and
 sanitizer modes in its retained failure context.
 
-The native integration command remains *tests/native.ts*. It owns argument
+The native integration command is *tests/native.ts*. It owns argument
 parsing, deterministic shard selection, orchestration, and stable summaries.
 The immutable fixture contract and ordered semantic families live under
 *tests/native/*; their explicit concatenation order, rather than filesystem
@@ -977,33 +1019,38 @@ M2 observation-enabled builds emit one private counter record. The testkit
 removes it from process stderr before differential comparison. Ordinary CLI
 builds neither update specialized counters nor print an observation record.
 
-M3 pinned a reviewed test262 subset and retained its complete frontmatter
-and native observations in a deterministic manifest. M5 freezes the
-measurement boundary and manifest schema in
+M3 pins a reviewed test262 subset and retains its complete frontmatter and
+native observations in a deterministic manifest. M5 freezes the measurement
+boundary and manifest schema in
 [ADR 0013](./docs/adr/0013-m5-edition-and-manifest.md): one counted row per
 upstream path with executed variants, execution mode, dependency tags, and
-module-graph evidence recorded inside it. A partitioned index and record files
-carry exactly six classifications, with expected-negative covering matched
-parse, resolution, and runtime negatives and infrastructure failures kept
-apart from harness defects. Applicable Script cases run in every requested
-strictness mode
-with specialization disabled and enabled; module and asynchronous cases run
-under the deterministic native scheduler through the explicit CLI module
-goal. The gate rejects semantic failures, harness failures, or changes from
-the reviewed classification instead of counting unsupported cases as
-passes, and summaries keep raw, path-group, and dependency-tag totals.
-ADR 0015 keeps `linux-x86_64-gnu` as the canonical manifest target, while ADR
-0014 adds a digest-pinned parity record over the index and every ordered
-partition. Each supported execution host reruns the complete reviewed subset
-and normalizes only the target ID before comparing the manifest, so target
+module-graph evidence recorded inside it.
+
+A partitioned index and record files carry exactly six classifications.
+Expected-negative covers matched parse, resolution, and runtime negatives.
+Infrastructure failures are kept apart from harness defects.
+
+Applicable Script cases run in every requested strictness mode with
+specialization disabled and enabled. Module and asynchronous cases run under
+the deterministic native scheduler through the explicit CLI module goal.
+
+The gate rejects semantic failures, harness failures, or changes from the
+reviewed classification instead of counting unsupported cases as passes.
+Summaries keep raw, path-group, and dependency-tag totals.
+
+ADR 0015 keeps `linux-x86_64-gnu` as the canonical manifest target. ADR 0014
+adds a digest-pinned parity record over the index and every ordered partition.
+Each supported execution host reruns the complete reviewed subset and
+normalizes only the target ID before comparing the manifest, so target
 evidence cannot duplicate compatibility counts.
 
-The test262 runner compiles admitted Script harnesses into reusable objects
-and links each case with its own unit and launcher. The
+The test262 runner compiles admitted Script harnesses into reusable objects and
+links each case with its own unit and launcher. The
 [harness fragment ABI](./docs/harness-fragment-abi.md) defines admission,
-source mapping, and cache ownership. Shadowing and other admission failures
-use the exact original assembled source through whole-Script compilation;
-build failures stay infrastructure failures.
+source mapping, and cache ownership.
+
+Shadowing and other admission failures use the exact original assembled source
+through whole-Script compilation; build failures stay infrastructure failures.
 `OSEO_TEST262_HARNESS_REUSE=disabled` forces whole-Script compilation for a
 comparison run. These operational choices never change manifest schema,
 variant coverage, or compatibility classifications.

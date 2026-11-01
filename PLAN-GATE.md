@@ -76,18 +76,18 @@ coverage, or target coverage.
 
 The M5CI CI capacity work now has a merge-wait goal: one push should reach a
 green run in about two hours or less. The maintainer chose this goal on
-2026-10-05 in place of the earlier ceiling of 628 macOS runner minutes per
-run, without giving up any coverage. The old ceiling and its evidence remain
-below, marked as superseded. The new goal, the measured values, and the
-projection at 41,091 reviewed paths are in
+2026-10-05 in place of the earlier ceiling of 628 macOS runner minutes per run,
+without giving up any coverage. The old ceiling and its evidence remain below,
+marked as superseded. The new goal, the measured values, and the projection at
+41,091 reviewed paths are in
 [Merge-wait goal and projection (U12)](#merge-wait-goal-and-projection-u12).
 
 
 Non-goals
 ---------
 
-This plan does not reduce required evidence. Making the existing
-applicability judgment auditable is a separate question decided by
+This plan does not reduce required evidence. Making the existing applicability
+judgment auditable is a separate question decided by
 [ADR 0018](./docs/adr/0018-recorded-evidence-coverage.md); this plan only
 carries the profile template that records it.
 
@@ -220,42 +220,42 @@ subset order, not completion order. The pool bound is explicit and recorded in
 failure metadata so that a concurrency-dependent observation is reproducible.
 
 The bound is eight workers, one for each physical core on the measurement host.
-The runner also caps this value at the execution host's available parallelism,
-so a smaller host reports and uses its lower effective bound.
+The runner caps this value at the execution host's available parallelism, so a
+smaller host reports and uses its lower effective bound.
+
 One reused execution peaked at 47.8 MiB of process-tree resident memory and
 4.40 MiB of allocated temporary storage. Eight simultaneous executions
 therefore bound the measured aggregate footprint at 382.4 MiB of resident
 memory and 35.2 MiB of temporary storage. Even the more constrained successful
 reuse sample began with 6.1 GiB of memory available and about 6.2 GiB free on
-*/tmp*. Those capacities would admit more than eight measured working sets, so
-the physical core count is the tighter bound. The host exposes 16 logical
-threads, but the native compiler and linker work is CPU-intensive; simultaneous
-multithreading is not treated as another physical-core budget.
+*/tmp*. Those capacities admit more than eight measured working sets, so the
+physical core count is the tighter bound.
+
+The host exposes 16 logical threads. Native compiler and linker work is
+CPU-intensive, so simultaneous multithreading is not treated as another
+physical-core budget.
 
 `OSEO3001` also covers deterministic toolchain, temporary-directory,
 executable-launch, and cleanup failures, so retrying every occurrence would
-mask real defects. The CLI now distinguishes a process that could not start
-because the host temporarily exhausted process resources from an unavailable
-toolchain or executable. Only that named resource failure is retried, at most
-once for each native variant. A nonzero toolchain exit, temporary-directory
-failure, ordinary executable-launch failure, and cleanup failure are not
-retried.
+mask real defects. The CLI distinguishes a process that could not start because
+the host temporarily exhausted process resources from an unavailable toolchain
+or executable. Only that named resource failure is retried, at most once for
+each native variant. A nonzero toolchain exit, temporary-directory failure,
+ordinary executable-launch failure, and cleanup failure are not retried.
 
 The duration, effective pool bound, and total retry count are reported in the
 run output. A failed run carries the same fields in its error metadata. None
 enters the canonical manifest. *target-parity.yaml* pins one digest over that
 manifest, so a field that varies with host conditions would change the digest
-on every run. Keeping retry counts outside it also means this checkpoint adds
-no manifest field and changes no classification vocabulary, so it needs no ADR
-0013 amendment.
+on every run. Keeping retry counts outside the manifest means this checkpoint
+adds no manifest field and changes no classification vocabulary, so it needs
+no ADR 0013 amendment.
 
-The isolated full-corpus run completed in 44.57 s with 256.73 s of user time,
-89.23 s of system time, and a processor-time-to-wall ratio of 7.76. It retained
-all 681 sequential classifications, matched the checked-in canonical manifest
-byte for byte, and used no retry. The prior reuse path took 270.64 s with a
-ratio of 1.08. Concurrent execution removed 226.07 s, or 83.5 percent of that
-wall clock, and made the gate 6.07 times faster. The complete host facts and
-measurement table are recorded in
+The isolated full-corpus run completed in 44.57 s, down from 270.64 s on the
+prior reuse path. Concurrent execution removed 226.07 s, or 83.5 percent of
+that wall clock, and made the gate 6.07 times faster. It retained all 681
+sequential classifications and matched the checked-in canonical manifest byte
+for byte. The complete host facts and measurement table are recorded in
 [*docs/gate-cost-baseline.md*](./docs/gate-cost-baseline.md).
 
 Owner: the standards harness expansion in [*PLAN-M5.md*](./PLAN-M5.md).
@@ -287,7 +287,7 @@ The baseline follows the context named by this plan:
  -  uncommitted work on a local `main` compares against `HEAD`, so an unrelated
     commit already on the branch is not counted as part of the change.
 
-The check job now fetches complete history for its detached checkout and
+The check job fetches complete history for its detached checkout and
 fetches the exact base or `before` commit by object ID. The second fetch keeps a
 force-push comparison anchored to the commit the push started from even when no
 ref reaches that commit afterward. Missing commits, a missing `main` reference,
@@ -299,6 +299,7 @@ Evidence-backed reversals use
 `pass-count`, `pass-classification`, `subset-path`, `property-seed`, or
 `property-case-budget`; gives the result path, reviewed path, or generated
 domain it covers; states the exact `from` and `to` values; and gives a reason.
+
 The subset/result path-set equality has no override because the measurement
 contract permits no inconsistent checked-in state. Only a record absent from
 the baseline can approve a current transition. A record already present in the
@@ -313,10 +314,8 @@ cannot provide. The later per-family evidence lanes checkpoint owns the fixed
 profile template that can make such a comparison mechanical.
 
 Deliberate regression tests cover every enforced invariant, exact override
-matching, and stale overrides. Comparisons of merges `ad8955b`, `0918376`,
-`7b5b74a`, `9d2b8ff`, and `c2b0445` against their first parents passed.
-Commit `b396d20` failed with the expected eleven paths present in *subset.yaml*
-and absent from *results.yaml*.
+matching, and stale overrides. A regression test fails as expected with eleven
+paths present in *subset.yaml* and absent from *results.yaml*.
 
 The isolated measurement and complete check ran on Linux
 7.1.4-200.fc44.x86\_64 with the same AMD Ryzen 7 7700X, 8-core/16-thread
@@ -468,7 +467,7 @@ classification vocabulary.
 
 Checkpoint status: complete.
 
-The M5 profile now indexes one YAML record per family through matching index and
+The M5 profile indexes one YAML record per family through matching index and
 record files under *docs/language-profile-m5/*. A new family adds its own two
 files and edits no shared inventory. The stable filename and kebab-case ID are
 the same in both files. The fixed record template carries the title, scope,
@@ -563,16 +562,15 @@ Failure modes and replacement triggers
     reverts archive reuse and reopens the key definition.
  -  Concurrent execution that produces a canonical manifest differing from the
     sequential one in any field invalidates concurrent execution until the
-    difference is explained. Run output may differ in duration, pool bound,
-    and retry counts, which are not manifest fields.
+    difference is explained. Run output may differ in duration, pool bound, and
+    retry counts, which are not manifest fields.
  -  Archive reuse reduces the per-execution footprint; concurrency multiplies
     whatever remains. Native infrastructure failures that persist after archive
     reuse has landed and while concurrency is bounded to the measured aggregate
     footprint mean the cause is not the footprint, and the next checkpoint
     investigates the host interface instead of continuing this order.
  -  If the wall clock after archive reuse and concurrency is dominated by the
-    Node.js
-    and Deno reference executions rather than native builds, the next
+    Node.js and Deno reference executions rather than native builds, the next
     checkpoint addresses reference execution instead of continuing this order.
  -  A retry that hides a genuine intermittent semantic failure reopens the
     retry policy. Retry counts exist so that this is detectable.
@@ -596,12 +594,11 @@ This plan is complete when:
     harness defects under an amended ADR 0013;
  -  the manifest record format supports the corpus size the claim requires
     without a single-file conflict for every concurrent unit;
- -  a deliberate reversal of each monotonicity rule in the measurement
-    contract fails the ratchet check, and an unresolvable baseline fails it
-    too;
+ -  a deliberate reversal of each monotonicity rule in the measurement contract
+    fails the ratchet check, and an unresolvable baseline fails it too;
  -  property seeds are allocated from a checked-in registry;
- -  each admitted family has one normative profile record that concurrent
-    units extend without conflicting; and
+ -  each admitted family has one normative profile record that concurrent units
+    extend without conflicting; and
  -  every preserved invariant above has a test that fails when it is broken.
 
 
@@ -612,15 +609,16 @@ The test262 runner now reuses a compiled harness object for admitted Scripts.
 The [fragment ABI](./docs/harness-fragment-abi.md) defines the unit boundary,
 admission and whole-Script fallback. The runtime archive cache remains in use.
 The environment bypass `OSEO_TEST262_HARNESS_REUSE=disabled` retains the
-original assembled-source compilation for regression comparisons. Neither
-path changes the reviewed manifest, variant budget, or evidence classes.
+original assembled-source compilation for regression comparisons. Neither path
+changes the reviewed manifest, variant budget, or evidence classes.
 
 The following local measurements use the same reviewed shard, `3/200`, on a
-shared Linux x86\_64 host. The task runs 101 reviewed paths: 80 pass, 7 expected
-negatives, and 14 unsupported. Both compilation paths retain 316 variants
-counted as execution evidence. CPU is user plus system time from GNU time,
-including child processes; wall time includes task setup and manifest checks.
-These are single-run measurements, not statistical estimates or CI timings.
+shared Linux x86\_64 host. The task runs 101 reviewed paths: 80 pass, 7
+expected negatives, and 14 unsupported. Both compilation paths retain 316
+variants counted as execution evidence. CPU is user plus system time from GNU
+time, including child processes; wall time includes task setup and manifest
+checks. These are single-run measurements, not statistical estimates or CI
+timings.
 
 | Adapter                   | Harness path              | Wall seconds | CPU seconds | Objects built/reused |
 | ------------------------- | ------------------------- | -----------: | ----------: | -------------------- |
@@ -643,28 +641,29 @@ restore or publish harness objects between shards; workers within one process
 share preparation promises. Separate processes using the same cache directory
 coordinate through the host's exclusive publication lock. Linux Zig and host
 Clang execution were measured locally. Sharing those objects between CI jobs
-was investigated and rejected. The distinct-object count for each shard is
-measured in CI; the cold and warm shard wall times are measured on two hosts
-outside CI, at each host's own pool and again at the macOS runner's pool of 3,
-with the Linux runner's pool of 4 not reproduced; the key-input stability of
-main's history is derived from measured commit counts rather than observed as a
-cache hit rate; and the transfer cost is estimated from other caches. All of it
-is in [*docs/gate-cost-baseline.md*](./docs/gate-cost-baseline.md), where the
-derived recovery is 12.2 macOS min for a complete run at the current workload
-on the most favorable of the four configurations. The earlier macOS work
-projection was an estimate and must not be presented as an observed CI
-improvement.
+was investigated and rejected.
+
+The distinct-object count for each shard is measured in CI. The cold and warm
+shard wall times are measured on two hosts outside CI, at each host's own pool
+and again at the macOS runner's pool of 3, with the Linux runner's pool of 4
+not reproduced. The key-input stability of main's history is derived from
+measured commit counts rather than observed as a cache hit rate, and the
+transfer cost is estimated from other caches. All of it is in
+[*docs/gate-cost-baseline.md*](./docs/gate-cost-baseline.md), where the derived
+recovery is 12.2 macOS min for a complete run at the current workload on the
+most favorable of the four configurations. The earlier macOS work projection
+was an estimate and must not be presented as an observed CI improvement.
 
 
 Projected cost at the M5c edition denominator
 ---------------------------------------------
 
-The tables below preserve the measured ten-shard baseline. U6 raises current
-CI test262 totals to twelve; its tail, fixed-cost, and combined-workload
-comparison is in [U6 evidence](./docs/evidence/u6/README.md).
-The Linux native-support total is seven; the historical rates and tables
-below retain their source run totals, including the earlier five with its
-singleton own-key shard.
+The tables below preserve the measured ten-shard baseline. U6 raises current CI
+test262 totals to twelve; its tail, fixed-cost, and combined-workload
+comparison is in [U6 evidence](./docs/evidence/u6/README.md). The Linux
+native-support total is seven; the historical rates and tables below retain
+their source run totals, including the earlier five with its singleton own-key
+shard.
 
 This projection extends the measured CI baseline in
 [*docs/gate-cost-baseline.md*](./docs/gate-cost-baseline.md) from its measured
@@ -680,14 +679,16 @@ superseded this ceiling on 2026-10-05. This section keeps the ceiling and its
 projection as the record of that decision.
 
 The planning ceiling was 628 macOS runner minutes for one CI run. The baseline
-records it as the value the M5CI planning brief specifies and states that its
-exact value is not reproduced by rounding or flooring the preserved timestamps,
-so it is a specified planning budget rather than a measurement. The brief names
-main run 35456667007 at `32ece7f4` as its source. That run's separately derived
-macOS family total is 629.52 min from measured job timestamps, or 629 min when
-the aggregate is floored, at a measured 20,841 reviewed paths. Runner minutes
-here are the sum of elapsed macOS job minutes, the same quantity the baseline's
-family tables report; wall clock is projected separately below.
+records it as the value the M5CI planning brief specifies. The baseline states
+that the exact value is not reproduced by rounding or flooring the preserved
+timestamps, so it is a specified planning budget rather than a measurement. The
+brief names main run 35456667007 at `32ece7f4` as its source. That run's
+separately derived macOS family total is 629.52 min from measured job
+timestamps, or 629 min when the aggregate is floored, at a measured 20,841
+reviewed paths.
+
+Runner minutes here are the sum of elapsed macOS job minutes, the same quantity
+the baseline's family tables report. Wall clock is projected separately below.
 
 The projection model is:
 
@@ -703,18 +704,19 @@ The projection model is:
  -  the shard totals stay at their measured baseline values, test262 10 and
     native support 12.
 
-Two limits apply to every derived number below. A constant second-per-path
-rate assumes that the further paths carry the same classification and variant
-mix as the measured 21,383, which no measurement establishes. That remainder is
-a derived 19,708 paths, the difference of the two measured counts, and
-`mise run check:m5c-graph` reports the same value as `unreviewed`; the
-baseline states that neither of its residual rates supports a linear
-projection over a changed semantic workload. And F re-adds the repeated build
-intervals that also fall inside the execution step. The baseline's B column is
-total build time, the initial build plus those later intervals, and does not
-separate them, so that overlap is not quantified here. It is bounded above by B
-summed over a run's ten macOS test262 jobs, a derived 0.68 min for run
-36261458909 and 0.74 min for run 36243816479.
+Two limits apply to every derived number below. A constant second-per-path rate
+assumes that the further paths carry the same classification and variant mix as
+the measured 21,383, which no measurement establishes. That remainder is a
+derived 19,708 paths, the difference of the two measured counts.
+`mise run check:m5c-graph` reports the same value as `unreviewed`. The baseline
+states that neither of its residual rates supports a linear projection over a
+changed semantic workload.
+
+F re-adds the repeated build intervals that also fall inside the execution
+step. The baseline's B column is total build time, the initial build plus those
+later intervals, and does not separate them, so that overlap is not quantified
+here. It is bounded above by B summed over a run's ten macOS test262 jobs, a
+derived 0.68 min for run 36261458909 and 0.74 min for run 36243816479.
 
 ### What scales with reviewed paths
 
@@ -777,8 +779,8 @@ duplication U7 examines.
 ### Projected workload at 41,091 paths
 
 Derived macOS test262 family minutes at 41,091 paths with 10 shards held
-constant. Every column is derived: the rate column is the baseline's derived
-step-level seconds per path, itself a quotient of a derived execution sum over
+constant. Every column is derived. The rate column is the baseline's derived
+step-level seconds per path, a quotient of a derived execution sum over
 measured step timestamps and a measured path count. Fixed cost is 10 jobs times
 the derived mean F of the named run.
 
@@ -855,14 +857,15 @@ workload term remains at least 1.9 times the longest job.
 The projected longest test262 shard at the baseline total of 10 holds a derived
 4,110 paths, since 41,091 is 10 times 4,109 plus 1. At the family-level rates
 that shard is a derived 44.03 to 44.08 min at 0.629 s/path, depending on which
-run's mean F is used, and 61.69 min at 0.886 with run 36243816479's F. The
-baseline's derived per-shard residual rates spread wider than the family mean.
-The slowest macOS shards are 1.193 s/path in run 36243816479 and 1.253 s/path in
-run 36261458909, which with each run's own mean F project a derived 82.72 min
-and 86.78 min for the slowest shard. Against the workflow's 120-minute
-`test_test262` timeout that leaves a derived 33.22 min of headroom in the least
-favorable case, so the baseline shard total does not itself breach the timeout
-at 41,091 paths.
+run's mean F is used, and 61.69 min at 0.886 with run 36243816479's F.
+
+The baseline's derived per-shard residual rates spread wider than the family
+mean. The slowest macOS shards are 1.193 s/path in run 36243816479 and 1.253
+s/path in run 36261458909, which with each run's own mean F project a derived
+82.72 min and 86.78 min for the slowest shard. Against the workflow's
+120-minute `test_test262` timeout that leaves a derived 33.22 min of headroom in
+the least favorable case, so the baseline shard total does not itself breach the
+timeout at 41,091 paths.
 
 The derived `native support` maximum is 68.13 min in run 36243816479 and 51.58
 min in run 36261458909, with a derived max/mean of 2.64 and 2.17. The observed
@@ -888,91 +891,103 @@ estimate. They are attributed first to the measured cost component they act on
 and then to the plan unit that owns that component. Every subtraction is an
 estimated ceiling unless it says otherwise.
 
-Job fixed cost, U3. The derived ceiling is the whole macOS job fixed cost that
-a scenario embeds, and the derived figure for the dependency and build
-components alone is 13.97 min or 12.56 min of the measured runs' 28.91 min and
-27.46 min. A scenario embeds 10 times the derived mean F for its projected
-test262 jobs, 9.97 min at run 36243816479's mean, plus the F inside its 19
-held-family jobs. That held sum is a derived 18.09 min in run 36243816479, so
-the least favorable scenario's ceiling is 28.06 min. Run 35456667007 has no
-per-job F, so its held families are assumed at the same mean and the most
-favorable scenario's ceiling is the full 28.91 min. Even the ceiling is 13.4
-percent of the smallest derived gap and 6.1 percent of the largest. U3 cannot
-close this gap; its value is that it is cheap, measurable, and does not touch
-coverage. Raising a shard total under U6 adds a derived 1 min or so of fixed
-cost for each added macOS job, which works against this same budget.
+U3 targets the job fixed cost. The derived ceiling is the whole macOS job
+fixed cost that a scenario embeds. The derived figure for the dependency and
+build components alone is 13.97 min or 12.56 min of the measured runs' 28.91
+min and 27.46 min.
 
-test262 per-path execution, U4 and U10. Both act on the same family. U10 is
-several times the larger, and U4 is now measured and bounded well below the
-gap.
+A scenario embeds 10 times the derived mean F for its projected test262 jobs,
+9.97 min at run 36243816479's mean, plus the F inside its 19 held-family jobs.
+That held sum is a derived 18.09 min in run 36243816479, so the least
+favorable scenario's ceiling is 28.06 min. Run 35456667007 has no per-job F, so
+its held families are assumed at the same mean and the most favorable
+scenario's ceiling is the full 28.91 min.
+
+Even the ceiling is 13.4 percent of the smallest derived gap and 6.1 percent
+of the largest. U3 cannot close this gap; its value is that it is cheap,
+measurable, and does not touch coverage. Raising a shard total under U6 adds a
+derived 1 min or so of fixed cost for each added macOS job, which works against
+this same budget.
+
+U4 and U10 both act on test262 per-path execution. U10 is several times the
+larger. U4 is now measured and bounded well below the gap.
 
 U10 recovers the observed rise from 0.629 s/path to the 0.741 to 0.886 band.
 Returning to 0.629 is a derived saving of 76.70 min from 0.741, 167.79 min from
 0.874, and 176.01 min from 0.886. The baseline states that the cause is not
-identified; it also shows that most of the increase in macOS test262 minutes
+identified. It also shows that most of the increase in macOS test262 minutes
 relative to the brief's baseline run is per-path execution cost rather than
-corpus size or fixed cost. The onset in the series lies between
-`e99620d5` at 0.676 and `aff3ade3` at 0.761, a range whose only non-merge
-commits are `9e71f689` and `1a879b2e`. That interval is a pointer for U10's own
-investigation, not an attribution: the baseline records the same runs as a
-run-to-run spread with no established cause, and runner variance and cache
-warmth are not improvements.
+corpus size or fixed cost.
 
-U4 shares the test262 harness object cache across jobs. Its unmeasured input,
-k, is now measured, and the measurement removes the case for the unit. Every
-reviewed test262 job prints its own object count, and the ten macOS shards of
-both baseline runs built 96, 96, 116, 128, 128, 108, 109, 112, 116, and 108
-objects, a derived sum of 1,117 and a derived mean of 111.7. The same ten
-values appear on `linux-x86_64-gnu`, so k belongs to the shard's reviewed path
-set rather than to the host. The reported reuse count is zero in every one of
-those jobs because the persistent object directory starts empty on a fresh
-runner; later cases in the same job still share each prepared object through
-the runner's promise map. U6 independently preserves these measured counters in
-three source runs at 21,383 measured paths in
-[U6 evidence](./docs/evidence/u6/README.md).
+The onset in the series lies between `e99620d5` at 0.676 and `aff3ade3` at
+0.761. The only non-merge commits in that range are `9e71f689` and `1a879b2e`.
+That interval is a pointer for U10's own investigation, not an attribution. The
+baseline records the same runs as a run-to-run spread with no established
+cause, and runner variance and cache warmth are not improvements.
 
-k saturates, and its ceiling is the harness include vocabulary rather than the
-path count. The reviewed corpus of 21,383 paths uses 53 distinct combinations
-of the asynchronous flag and the ordered include list, bounding it at 212 keys
-across both strictness modes and both specialization policies; the whole
-pinned upstream suite uses 75, bounding it at 300. A 101-path shard built 36
-objects and a 2,139-path shard of the same corpus builds 96, so 21 times the
-paths gave 2.7 times the objects. Doubling a shard's paths at 41,091 cannot
-take k past that ceiling, and the earlier estimate of 0.13k min was therefore
-being applied to a k that cannot reach the values it projected.
+U4 shares the test262 harness object cache across jobs. Its unmeasured input k
+is now measured, and the measurement removes the case for the unit. Every
+reviewed test262 job prints its own object count. The ten macOS shards of both
+baseline runs built 96, 96, 116, 128, 128, 108, 109, 112, 116, and 108 objects,
+a derived sum of 1,117 and a derived mean of 111.7. The same ten values appear
+on `linux-x86_64-gnu`, so k belongs to the shard's reviewed path set rather
+than to the host.
+
+The reported reuse count is zero in every one of those jobs because the
+persistent object directory starts empty on a fresh runner. Later cases in the
+same job still share each prepared object through the runner's promise map. U6
+independently preserves these measured counters in three source runs at 21,383
+measured paths in [U6 evidence](./docs/evidence/u6/README.md).
+
+k saturates. Its ceiling is the harness include vocabulary rather than the path
+count. The reviewed corpus of 21,383 paths uses 53 distinct combinations of the
+asynchronous flag and the ordered include list, bounding it at 212 keys across
+both strictness modes and both specialization policies. The whole pinned
+upstream suite uses 75, bounding it at 300.
+
+A 101-path shard built 36 objects and a 2,139-path shard of the same corpus
+builds 96, so 21 times the paths gave 2.7 times the objects. Doubling a shard's
+paths at 41,091 cannot take k past that ceiling. The earlier estimate of 0.13k
+min was therefore being applied to a k that cannot reach the values it
+projected.
 
 The wall-clock saving is also smaller than the per-object build cost suggests.
-The likely reason, which the measurement does not establish, is that the
-worker pool overlaps harness preparation with case execution: shard 1/10
-performs 7,195 split attempts against 96 harness objects, so preparation is
-1.3 percent of the compile and link units it starts. Derived cold-minus-warm
-differences for that shard, computed before rounding, are -0.16 s on a Linux
-host at pool 8, 12.86 s on the same host at pool 3, 63 s on an Apple M4 host
-at pool 8, and -96 s on that host at pool 3. In two of the four
-configurations, including the one matching the macOS runner's own pool size,
-the warm runs were the slower ones, so none of them separates the cache from
-its sample's spread. Taking the largest per-object wall saving anyway, 0.656
-s, applied to the measured 1,117 objects of the ten macOS shards, gives a
-derived 12.2 min for one complete run at the current workload, and a derived
-7.9 min if the derived 64.6 percent of main steps that leave the key inputs
-unchanged is taken as a hit rate, less a derived 0.6 to 1.4 min of restore and
-publication that every run pays whether it hits or misses. The two baseline
-runs establish no improvement of this size either way: each job was measured
-once per commit and the derived same-job spread for a macOS test262 shard
-ranges from 0.35 to 16.53 min, so showing a change this small would need
-matched repeated measurements. At 41,091 paths the same rate gives a larger
-derived bound, 32.8 min, because a shard's 300-key ceiling times ten shards
-bounds it at 3,000 objects; that bound, not the current-workload figure, is
-what would justify revisiting the unit. The measurement, its hosts, and the
-cache-key and storage costs are recorded in
+The likely reason, which the measurement does not establish, is that the worker
+pool overlaps harness preparation with case execution. Shard 1/10 performs
+7,195 split attempts against 96 harness objects, so preparation is 1.3 percent
+of the compile and link units it starts.
+
+Derived cold-minus-warm differences for that shard, computed before rounding,
+are -0.16 s on a Linux host at pool 8, 12.86 s on the same host at pool 3, 63
+s on an Apple M4 host at pool 8, and -96 s on that host at pool 3. In two of
+the four configurations, including the one matching the macOS runner's own pool
+size, the warm runs were the slower ones, so none of them separates the cache
+from its sample's spread.
+
+Taking the largest per-object wall saving anyway, 0.656 s, applied to the
+measured 1,117 objects of the ten macOS shards, gives a derived 12.2 min for
+one complete run at the current workload. If the derived 64.6 percent of main
+steps that leave the key inputs unchanged is taken as a hit rate, the saving is
+a derived 7.9 min, less a derived 0.6 to 1.4 min of restore and publication
+that every run pays whether it hits or misses. The two baseline runs establish
+no improvement of this size either way: each job was measured once per commit
+and the derived same-job spread for a macOS test262 shard ranges from 0.35 to
+16.53 min, so showing a change this small would need matched repeated
+measurements.
+
+At 41,091 paths the same rate gives a larger derived bound, 32.8 min, because a
+shard's 300-key ceiling times ten shards bounds it at 3,000 objects. That
+bound, not the current-workload figure, is what would justify revisiting the
+unit.
+
+The measurement, its hosts, and the cache-key and storage costs are recorded in
 [*docs/gate-cost-baseline.md*](./docs/gate-cost-baseline.md), and their
-preserved sources in
-[*docs/evidence/u4/*](./docs/evidence/u4/README.md). U4 was therefore
-not implemented, and this projection subtracts nothing for it.
+preserved sources in [*docs/evidence/u4/*](./docs/evidence/u4/README.md). U4 was
+therefore not implemented, and this projection subtracts nothing for it.
 
 The harness split landed at `f131a798` and `30c9f690` on 2026-09-17, before
 `32ece7f4`, so the derived 0.629 s/path rate already includes the split path
-with a per-job cold harness cache. On the evidence available the two levers
+with a per-job cold harness cache. On the evidence available, the two levers
 therefore act on different costs. That chronology does not prove independence:
 the cause of the later per-path rise is unidentified and could itself lie in
 harness preparation, so U10's investigation still owns that question.
@@ -1141,23 +1156,22 @@ or +149.77 min against the ceiling.
 
 The least favorable scenario is 1086.12 derived min at 0.886 s/path with run
 36243816479's held families. Recovering the rise to 0.629 under U10 leaves
-910.11 min, the 28.06 min U3 could reach leaves 882.05 min, and U7 with U8 net
-of the 1.77 min of derived F U3 already took from those two jobs leave an
+910.11 min. The 28.06 min U3 could reach leaves 882.05 min. U7 with U8, net of
+the 1.77 min of derived F U3 already took from those two jobs, leave an
 estimated 841.97 min, or +213.97 min against the ceiling. U5 and U6 recover no
-derived runner minutes in these stacks. U6's once-measured green run does
-not justify subtracting its lower observed total from either projection.
+derived runner minutes in these stacks. U6's once-measured green run does not
+justify subtracting its lower observed total from either projection.
 
 So U3, U7, U8, and U10 taken at their estimated ceilings close a derived 30.7
 percent of the excess in the most favorable scenario and 53.3 percent in the
-least favorable one, roughly a third to a half, and leave 150 to 214 min that
-U4 cannot close. Closing the most favorable scenario's residual through U4
-alone would need k of about 1,154 distinct harness objects for each shard under
-the earlier 0.78 s per object model, or a derived 1,369 under the 0.656 s the
-measurement gives. The measurement excludes both: k is 96 to 128 for each shard
-at the current corpus, and the whole pinned upstream suite is bounded at 300
-distinct keys, so no corpus size puts k near either figure. Reachability no
-longer turns on this quantity; it turns on a lever this plan has not
-identified.
+least favorable one, and leave 150 to 214 min that U4 cannot close. Closing the
+most favorable scenario's residual through U4 alone would need k of about 1,154
+distinct harness objects for each shard under the earlier 0.78 s per object
+model, or a derived 1,369 under the 0.656 s the measurement gives. The
+measurement excludes both: k is 96 to 128 for each shard at the current corpus,
+and the whole pinned upstream suite is bounded at 300 distinct keys, so no
+corpus size puts k near either figure. Reachability no longer turns on this
+quantity; it turns on a lever this plan has not identified.
 
 Those subtractions are already generous in three ways. U3's ceiling is the whole
 of F, including the cleanup and reporting tails no cache can remove. U7 and U8
@@ -1170,7 +1184,7 @@ invariants and the milestone coverage rules forbid it. The options that would
 reduce it, such as running the full corpus less often than every merge, reducing
 case counts, seeds, or property case budgets, removing reviewed paths, changing
 an expected classification, or dropping a macOS job, are recorded here only as
-choices that require an explicit decision from the maintainer; this plan selects
+choices that require an explicit decision from the maintainer. This plan selects
 none of them. Lowering a shard total is forbidden by the same rules but belongs
 in a different category: running all shards of a smaller partition still
 executes the complete corpus, so its cost is longer jobs and timeout risk
@@ -1245,40 +1259,37 @@ Linux-hosted availability probe.
 | `37398055382`, 1 | `11634e90` | U27        |             79.6 |                332.3 |       147.5 |
 | `37398055382`, 2 | `11634e90` | U27        |             78.9 |                338.2 |       148.2 |
 
-Main run `36312192623` at `af9bb68c` measured 173.2 min when this work
-started. After U13 (`390cf60d`, merged as `97278fc6`) and U16 (`82bba77e`,
-merged as `df5cb7a1`), the seven green all-hosted attempts measured 147.0 to
-175.8 min. Main run `36657614384` at `df5cb7a1` is omitted: its first attempt
-failed at a measured 145.4 min, and its second attempt reran only the failed
-job. With the U22 and U23 assignments, the six green attempts measured 105.3
-to 113.5 min. The five U24 attempts measured 95.8 to 100.2 min, and the two
-U27 attempts 79.6 and 78.9 min. Attempt 1 of main run `37332256715` and
+The all-hosted attempts measured 147.0 to 175.8 min. The six green U22 and
+U23 attempts measured 105.3 to 113.5 min, the five U24 attempts measured 95.8
+to 100.2 min, and the two U27 attempts measured 79.6 and 78.9 min. The U27
+attempts lie a derived 16.2 to 21.3 min below the U24 attempts, more than
+either group's own spread of 4.4 and 0.7 min; the U27 section below compares
+them with the derived prediction.
+
+One main run is omitted because its first attempt failed at 145.4 min and its
+second reran only the failed job. Attempt 1 of main run `37332256715` and
 attempt 1 of branch run `37398055382` were red only in the Linux-hosted
-`test (ubuntu-latest, node)` job; every macOS job passed, so their values
-are the measured wall to the last job, not a green verdict. Run `37315038080`
-is the U26 disk-sampling branch run, with a sampler running on the Mac, and
-its Mac job minutes include that run's cache state. Every value above is one
-attempt. The seven all-hosted attempts after U13 span an
-observed 28.8 min, but they straddle U16 and other merged work, so that
-spread is not runner variance alone. The six U22 and U23 attempts span an
-observed 8.2 min, and a difference of that size between two single attempts
-does not by itself separate an assignment effect from runner variation.
-Main run `37251028948`, the first main run with the U24 assignment, measured
-98.6 min. The U27 attempts lie a derived 16.2 to 21.3 min below the five U24
-attempts, more than either group's own spread of 4.4 and 0.7 min; the U27
-section below compares them with the derived prediction.
+`test (ubuntu-latest, node)` job; every macOS job passed, so their values are
+the measured wall to the last job, not a green verdict. Run `37315038080` is
+the U26 disk-sampling branch run, with a sampler on the Mac, and its Mac job
+minutes include that run's cache state.
+
+The all-hosted attempts span an observed 28.8 min, but they straddle U16 and
+other merged work, so that spread is not runner variance alone. The six U22
+and U23 attempts span an observed 8.2 min, and a difference of that size
+between two single attempts does not by itself separate an assignment effect
+from runner variation.
 
 #### Linux sanitizer job split (2026-10-10)
 
-Main run [37999730012] at `24183386` measured 107.80 minutes from
-`run_started_at` to the last job's `completed_at`, within the two-hour
-goal. `host C sanitizers (Linux)` measured 107.75 minutes and set the
-critical path. Its steps measured 56.02 minutes for
-`test:sanitizer:native`, 45.52 for `test:sanitizer:property`, and 5.55
-for `test:sanitizer:runtime`; every other step was under one minute.
-The next longest job, `native support (linux-x86_64-gnu, 2/5)`, measured
-66.63 minutes. The 35 macOS jobs summed to a derived 560.18 minutes.
-The per-step evidence is in
+The main run measured 107.80 minutes from `run_started_at` to the last job's
+`completed_at`, within the two-hour goal. `host C sanitizers (Linux)` measured
+107.75 minutes and set the critical path. Its steps measured 56.02 minutes
+for `test:sanitizer:native`, 45.52 for `test:sanitizer:property`, and 5.55
+for `test:sanitizer:runtime`; every other step was under one minute. The next
+longest job, `native support (linux-x86_64-gnu, 2/5)`, measured 66.63
+minutes. The 35 macOS jobs summed to a derived 560.18 minutes. The per-step
+evidence is in
 [*docs/gate-cost-baseline.md*](./docs/gate-cost-baseline.md#linux-sanitizer-job-split-2026-10-10).
 
 Split the Linux sanitizer job the same way as macOS. `test_sanitizer`
@@ -1293,19 +1304,22 @@ Only the GCC verification step sets `OSEO_HOST_CC: gcc`.
 The projected sanitizer lane critical path is about 62 minutes,
 with about 46 minutes in the parallel property job. Set the native job
 timeout to 90 minutes and the property job timeout to 75 minutes for
-setup, cold caches, and runner variation. The proposed whole-run
-projection of about 66 to 70 minutes uses the next longest individual
-job, but misses the observed macOS lane completion schedule.
-`test262 (macos-aarch64, 4/12)` finished 92.52 minutes after run start,
-and the `native` aggregate, the latest completion other than the Linux
-sanitizer job, finished at 92.83 minutes. Holding other
-completion times fixed therefore projects about 93 minutes for the run.
-Reaching 66 to 70 minutes would also require shorter macOS lane
-completion times; the split alone supplies no evidence for that.
-These projections are not measurements of a split run. No workflow
-dependency references the Linux sanitizer job, and GitHub reported main
-as unprotected on 2026-10-10, so no aggregate or required-check list
-needs to change.
+setup, cold caches, and runner variation.
+
+The proposed whole-run projection of about 66 to 70 minutes uses the
+next longest individual job, but misses the observed macOS lane
+completion schedule. `test262 (macos-aarch64, 4/12)` finished 92.52
+minutes after run start, and the `native` aggregate, the latest
+completion other than the Linux sanitizer job, finished at 92.83
+minutes. Holding other completion times fixed therefore projects about
+93 minutes for the run. Reaching 66 to 70 minutes would also require
+shorter macOS lane completion times; the split alone supplies no
+evidence for that. These projections are not measurements of a split
+run.
+
+No workflow dependency references the Linux sanitizer job, and GitHub
+reported main as unprotected on 2026-10-10, so no aggregate or
+required-check list needs to change.
 
 This is a job split only. It changes no test budget, case count, seed,
 size limit, suite timeout, or shard total. The sanitizer property task
@@ -1313,47 +1327,45 @@ keeps its *mise.toml* `OSEO_PROPERTY_TIME_SCALE` default of `3`.
 
 #### Projection at 41,091 paths
 
-This projection is derived. It uses the same split as the projection above:
-test262 work scales linearly in reviewed paths, and every other family is
-held, because its inputs are property files, native fixtures, or sanitizer
-suites. Its inputs are the per-job walls of the ten newest green attempts:
+This projection is derived using the same split as the projection above:
+test262 work scales linearly in reviewed paths, and every other family is held,
+because its inputs are property files, native fixtures, or sanitizer suites.
+The projection's inputs are the per-job walls of the ten newest green attempts:
 all-hosted runs `37121778924` and `37167895777`, and the eight Mac-lane
 attempts above. The model is:
 
- -  Each job's hosted and Mac costs are the minimum, median, and maximum of
-    its own observations on that runner class, which gives three cost
-    scenarios. Every job that one of the evaluated assignments places on
-    the Mac has at least two Mac observations.
+ -  Each job's hosted and Mac costs are the minimum, median, and maximum of its
+    own observations on that runner class, which gives three cost scenarios.
+    Every job that one of the evaluated assignments places on the Mac has at
+    least two Mac observations.
  -  A test262 job keeps the 60-second fixed setup share of
-    *tools/macos-job-costs.ts*. Its remainder is multiplied by
-    41,091 / 21,383, a derived 1.922. The 21,383 is the current reviewed
-    count that test262 job logs report as `tests=1782/21383` in runs
-    `37206614757` and `37237684441`.
+    *tools/macos-job-costs.ts*. Its remainder is multiplied by 41,091 / 21,383,
+    a derived 1.922. The 21,383 is the current reviewed count that test262 job
+    logs report as `tests=1782/21383` in runs `37206614757` and `37237684441`.
  -  A Mac-eligible job with no Mac observation is converted from its hosted
-    cost in the same scenario by a pooled ratio, the sum of hosted medians less
-    setup divided by the sum of Mac medians less setup over jobs with both: a
-    derived 4.91 for test262, 3.63 for native support, and 3.21 for native
-    fixtures. These differ from the rounded 4.2, 3.2, and 3.1 in
-    *tools/macos-job-costs.ts* because they include the U24 attempts, in
-    which the converted test262 jobs ran faster than modeled. Only the
-    recomputed assignment below uses them.
- -  Each scenario holds one assignment fixed and sums its lanes' costs. The
-    Mac lane starts after the 60-second probe allowance. The U22, U23, and
-    U24 rows hold each job on the lane that `macosLanes(1)` in
+    cost in the same scenario by a pooled ratio: the sum of hosted medians less
+    setup divided by the sum of Mac medians less setup, over jobs with both.
+    That gives a derived 4.91 for test262, 3.63 for native support, and 3.21
+    for native fixtures. These differ from the rounded 4.2, 3.2, and 3.1 in
+    *tools/macos-job-costs.ts* because they include the U24 attempts, in which
+    the converted test262 jobs ran faster than modeled. Only the recomputed
+    assignment below uses them.
+ -  Each scenario holds one assignment fixed and sums its lanes' costs. The Mac
+    lane starts after the 60-second probe allowance. The U22, U23, and U24 rows
+    hold each job on the lane that `macosLanes(1)` in
     *tools/generate-macos-lanes.ts* assigns at `e115c408`, `840c387e`, and
     `bdf2dddd`, respectively. U24 is the assignment on current main.
- -  The recomputed rows are not a merged assignment. They model the U24
-    rule, own-key case shards on the Mac lane first and then the other jobs
-    longest first to whichever of five hosted lanes or one Mac lane would
-    finish them sooner, applied to median costs from the ten attempts. At
-    41,091 paths the assignment uses the scaled medians, standing in for
-    medians that would be measured at that path count. Only Zig-backed
-    families are Mac-eligible.
+ -  The recomputed rows are not a merged assignment. They model the U24 rule
+    applied to median costs from the ten attempts: own-key case shards on the
+    Mac lane first, then the other jobs, longest first, to whichever of five
+    hosted lanes or one Mac lane would finish them sooner. At 41,091 paths the
+    assignment uses the scaled medians, standing in for medians that would be
+    measured at that path count. Only Zig-backed families are Mac-eligible.
  -  The model omits hosted job waits, the aggregate job, and the Linux and
-    Windows jobs. At 41,091 paths the longest Linux test262 shard is a
-    derived 35.9 min at its median. The longest unscaled job is the Linux
-    sanitizer job, at a measured 64.6-min median and 72.2-min maximum. Both
-    stay below the macOS makespan.
+    Windows jobs. At 41,091 paths the longest Linux test262 shard is a derived
+    35.9 min at its median. The longest unscaled job is the Linux sanitizer
+    job, at a measured 64.6-min median and 72.2-min maximum. Both stay below
+    the macOS makespan.
 
 | Assignment, scenario        | Derived at 21,383 | Derived at 41,091 |
 | --------------------------- | ----------------: | ----------------: |
@@ -1370,88 +1382,85 @@ attempts above. The model is:
 | Recomputed medians, median  |              93.2 |             116.3 |
 | Recomputed medians, maximum |             115.3 |             132.3 |
 
-At the current paths each fixed assignment's median evaluation lies near
-its measured attempts. U24 gives 94.1 min against a measured 98.3 and 95.8
-min, 4.2 and 1.7 min above it. U23 gives 105.4 min against a measured
-112.2, 105.3, and 106.8 min, and U22 gives 105.1 min against a measured
-107.9, 111.1, and 113.5 min. The modeled U24 Mac lane ends at a derived 83.2
-min at the median, against a measured 82.0 and 83.0 min. The maximum
-scenario puts every job at its own worst observation at once, which no
-single measured run did; it is a pessimistic bound rather than an expected
-value.
+At the current paths each fixed assignment's median evaluation lies near its
+measured attempts. U24 gives 94.1 min against a measured 98.3 and 95.8 min, 4.2
+and 1.7 min above it. U23 gives 105.4 min against a measured 112.2, 105.3, and
+106.8 min, and U22 gives 105.1 min against a measured 107.9, 111.1, and 113.5
+min. The modeled U24 Mac lane ends at a derived 83.2 min at the median, against
+a measured 82.0 and 83.0 min. The maximum scenario puts every job at its own
+worst observation at once, which no single measured run did; it is a
+pessimistic bound rather than an expected value.
 
-At 41,091 paths the U24 assignment grows by a derived 30.6 to 37.0 min,
-because the scaled test262 jobs stay on the lanes chosen for their current
-weights. At the median, hosted lane 5 grows from 89.7 to 130.3 min with
-test262 6/12 and 10/12, and the Mac lane grows from 83.2 to 112.4 min with
-eight test262 shards. The two-hour goal therefore holds with the current
-U24 assignment only in the minimum scenario, by 6.7 min. It does not hold at
-the median, a derived 130.3 min, or in the maximum scenario, 145.1 min, both
-before the unmodeled overhead. The U22 and U23 assignments, at a derived
-130.6 to 193.8 min, do not hold it in any scenario.
+At 41,091 paths the U24 assignment grows by a derived 30.6 to 37.0 min, because
+the scaled test262 jobs stay on the lanes chosen for their current weights. At
+the median, hosted lane 5 grows from 89.7 to 130.3 min with test262 6/12 and
+10/12, and the Mac lane grows from 83.2 to 112.4 min with eight test262 shards.
+The two-hour goal therefore holds with the current U24 assignment only in the
+minimum scenario, by 6.7 min. It does not hold at the median, a derived 130.3
+min, or in the maximum scenario, 145.1 min, both before the unmodeled overhead.
+The U22 and U23 assignments, at a derived 130.6 to 193.8 min, do not hold it in
+any scenario.
 
-The recomputed assignment holds the goal in the minimum and median
-scenarios, the median by 3.7 min, which is less than one run's spread. In
-the maximum scenario it exceeds two hours by 12.3 min. At the current paths
-it gives no improvement over U24: its median is 0.9 min lower and its
-maximum 7.2 min higher. Its effect at 41,091 paths comes from assigning the
-scaled test262 jobs, so it depends on recomputing the medians as reviewed
-paths grow.
+The recomputed assignment holds the goal in the minimum and median scenarios,
+the median by 3.7 min, which is less than one run's spread. In the maximum
+scenario it exceeds two hours by 12.3 min. At the current paths it gives no
+improvement over U24: its median is 0.9 min lower and its maximum 7.2 min
+higher. Its effect at 41,091 paths comes from assigning the scaled test262
+jobs, so it depends on recomputing the medians as reviewed paths grow.
 
-These rows model one Mac lane. With the two Mac lanes of U27, the
-projection from the measured two-lane job walls of branch run
-`37398055382` gives a derived 103.1 and 104.0 min at 41,091 paths, and the
-U27 model a derived 106.3 min; the U27 section below derives both.
+These rows model one Mac lane. With the two Mac lanes of U27, the projection
+from the measured two-lane job walls of branch run `37398055382` gives a
+derived 103.1 and 104.0 min at 41,091 paths, and the U27 model a derived 106.3
+min; the U27 section below derives both.
 
-The goal also depends on the Mac runners being online. When the readiness
-probe falls back to hosted macOS for every lane, the same model gives a derived
-177.2 to 228.2 min on five hosted lanes at 41,091 paths, against 136.4 to 177.9
-min at the current paths. Both use the longest-first assignment, because the
+The goal also depends on the Mac runners being online. When the readiness probe
+falls back to hosted macOS for every lane, the same model gives a derived 177.2
+to 228.2 min on five hosted lanes at 41,091 paths, against 136.4 to 177.9 min
+at the current paths. Both use the longest-first assignment, because the
 fallback schedule is not modeled separately.
 
-Shard totals are held at the current twelve for test262 and twelve for
-macOS native support. Raising the test262 total is allowed and lowering it
-is not. With each total's family work split evenly, one fixed setup share
-per job, and the recomputed assignment, the median scenario gives a derived
-118.2, 120.0, and 121.5 min at 16, 20, and 24 test262 shards against 116.3
-min at twelve. The minimum scenario gives 113.5, 113.2, and 112.7 min
-against 112.1, and the maximum gives 131.8, 130.5, and 138.5 min against
-132.3. Raising the total therefore does not improve the median scenario,
-and no modeled total makes the goal hold in the maximum scenario. The
-longest scaled hosted test262 job at twelve shards is a derived 48.3 min at
-its median and 55.1 min at its maximum, below the 120-minute job timeout,
-so raising the total is not needed for timeout margin either.
+Shard totals are held at the current twelve for test262 and twelve for macOS
+native support. Raising the test262 total is allowed and lowering it is not.
 
-U22, U23, U24, and U27 are applied. Two concurrent Mac jobs, lever 2 of
-earlier revisions of this list, is no longer a remaining lever: U27 runs
-them as two runners on the Mac mini, measured in branch run `37398055382`
-below. With the measured two-lane walls, the derived makespan at 41,091
-paths is 103.1 and 104.0 min with the U27 assignment held fixed. The
+With each total's family work split evenly, one fixed setup share per job, and
+the recomputed assignment, the median scenario gives a derived 118.2, 120.0,
+and 121.5 min at 16, 20, and 24 test262 shards against 116.3 min at twelve. The
+minimum scenario gives 113.5, 113.2, and 112.7 min against 112.1, and the
+maximum gives 131.8, 130.5, and 138.5 min against 132.3. Raising the total
+therefore does not improve the median scenario, and no modeled total makes the
+goal hold in the maximum scenario.
+
+The longest scaled hosted test262 job at twelve shards is a derived 48.3 min at
+its median and 55.1 min at its maximum, below the 120-minute job timeout, so
+raising the total is not needed for timeout margin either.
+
+U22, U23, U24, and U27 are applied. Two concurrent Mac jobs, lever 2 in earlier
+revisions of this list, is no longer a remaining lever: U27 runs them as two
+runners on the Mac mini, measured in branch run `37398055382` below. The
 remaining coverage-preserving levers, none of which is applied, are:
 
-1.  Recompute the median tables in *tools/macos-job-costs.ts* from the
-    newer attempts, including the U24 and U27 attempts, and again as
-    reviewed paths grow. The one-lane recomputed rows above estimate a
-    derived 112.1 to 132.3 min at 41,091 paths. In the U27 projection the
-    hosted lanes that carry two test262 shards end last, so recomputing the
-    assignment from scaled medians would rebalance them; that two-lane
-    recomputation is not modeled. A two-attempt branch measurement must
-    confirm any recomputed assignment.
-2.  Add a second Mac with the same measured speed as an independent lane.
-    With the recomputed one-lane assignment over the two Macs, the U12
-    model gives a derived 78.3 to 103.0 min; it does not model two runners
-    on each machine. It also halves the exposure to one machine's absence.
-3.  Raise shard totals only as tail or timeout insurance. Under this model
-    they do not improve the median makespan or make the goal hold in the
-    maximum scenario.
+1.  Recompute the median tables in *tools/macos-job-costs.ts* from the newer
+    attempts, including the U24 and U27 attempts, and again as reviewed paths
+    grow. The one-lane recomputed rows above estimate a derived 112.1 to 132.3
+    min at 41,091 paths. In the U27 projection the hosted lanes that carry two
+    test262 shards end last, so recomputing the assignment from scaled medians
+    would rebalance them. That two-lane recomputation is not modeled. A
+    two-attempt branch measurement must confirm any recomputed assignment.
+2.  Add a second Mac with the same measured speed as an independent lane. With
+    the recomputed one-lane assignment over the two Macs, the U12 model gives a
+    derived 78.3 to 103.0 min; it does not model two runners on each machine.
+    It also halves the exposure to one machine's absence.
+3.  Raise shard totals only as tail or timeout insurance. Under this model they
+    do not improve the median makespan or make the goal hold in the maximum
+    scenario.
 
-Hosted macOS runner minutes at 41,091 paths are restated for reference
-only. With every macOS job on hosted runners, the same inputs give a
-derived 834.5, 962.4, and 1,091.1 min for the three scenarios. At the
-current paths they give 642.2, 737.7, and 832.7 min, against a measured
-716.0 and 734.8 min in the two all-hosted runs. These figures use
-different inputs from the 844 to 1,086 min projected above, which predates
-U13 and the own-key case shards, and neither is a goal any more.
+Hosted macOS runner minutes at 41,091 paths are for reference only. With every
+macOS job on hosted runners, the same inputs give a derived 834.5, 962.4, and
+1,091.1 min for the three scenarios. At the current paths they give 642.2,
+737.7, and 832.7 min, against a measured 716.0 and 734.8 min in the two
+all-hosted runs. These figures use different inputs from the 844 to 1,086 min
+projected above, which predates U13 and the own-key case shards. Neither is a
+goal any more.
 
 #### Two concurrent Mac jobs (U25)
 
@@ -1622,40 +1631,44 @@ jobs API with the definitions of the U12 table above and rounded to
 
 Attempt 1 was red only because the Linux-hosted `test (ubuntu-latest, node)`
 job failed in the known flaky test “supervisor SIGTERM cancels and reaps the
-detached fixture” of *tests/native-fixture.test.ts*; every macOS job passed in
+detached fixture” of *tests/native-fixture.test.ts*. Every macOS job passed in
 both attempts, so the wall to the last job is a push-to-green time only for
-attempt 2. Both attempts placed exactly the generated 10 and 9 jobs on
-their lanes, so neither lane fell back. Each runner took its lane's jobs in an
-order that differed from the generated one and between the attempts. The last
-macOS job ended at a measured 79.3 and 78.5 min; the native aggregate then
-ended the run 0.3 and 0.4 min later.
+attempt 2.
 
-The measured makespan matches the derived prediction within its stated
-range. It is 2.1 and 1.3 min above the derived 77.2 min, inside the derived
-72.1 to 86.5 min per-run range, and 1.0 and 0.2 min above the derived 76.3
-to 78.3 min order sample. The lanes deviated in opposite directions. With
-each attempt's observed pickup order, the model ends `oseo-mac-1` at a
-derived 77.1 and 77.3 min, 2.2 and 1.2 min before its measured end, and
-`oseo-mac-2` at 73.8 min in both, 3.9 and 2.1 min after its measured end.
-The measured lane overhead, lane end minus the sum of its job walls, was
-0.8 min on both lanes in attempt 1 and 1.0 min on both in attempt 2,
-against the model's 1.0 min allowance. The measured walls to the last job
-are a derived 16.2 to 21.3 min below the five one-lane U24 attempts above.
+Both attempts placed exactly the generated 10 and 9 jobs on their lanes, so
+neither lane fell back. Each runner took its lane's jobs in an order that
+differed from the generated one and between the attempts. The last macOS job
+ended at a measured 79.3 and 78.5 min; the native aggregate then ended the run
+0.3 and 0.4 min later.
 
-The pair slowdowns below are derived per job with U25's overlapped factor:
-the job's overlapped seconds divided by the work left for the overlap,
-which is its one-lane median less its non-overlapped seconds. The
-one-lane median is the median of the job's measured `oseo-mac-1` walls in
-the eight Mac-lane attempts of the U12 model and one-lane runs
-`37251028948`, `37315038080`, and `37332256715`. It has 3 to 11
-observations per job, and one job's one-lane walls range by up to a
-derived 100 s, so a single factor carries that noise; four factors below
-fell under 1, one of them rounding to 1.00. `native support` 7/12 and 9/12 have
-never run one-lane on the Mac and have no factor. The table keeps the 24 jobs
-that overlapped the other lane for at least 80 percent of their wall and spent
-at least two thirds of that overlap beside one partner family; it omits eight
-jobs with a more even mix or a shorter overlap. Each factor comes from runner
-mode with separate accounts, where U25 used SSH clones:
+The measured makespan matches the derived prediction within its stated range.
+It is 2.1 and 1.3 min above the derived 77.2 min, inside the derived 72.1 to
+86.5 min per-run range, and 1.0 and 0.2 min above the derived 76.3 to 78.3 min
+order sample. The lanes deviated in opposite directions.
+
+With each attempt's observed pickup order, the model ends `oseo-mac-1` at a
+derived 77.1 and 77.3 min, 2.2 and 1.2 min before its measured end. It ends
+`oseo-mac-2` at 73.8 min in both, 3.9 and 2.1 min after its measured end. The
+measured lane overhead, lane end minus the sum of its job walls, was 0.8 min on
+both lanes in attempt 1 and 1.0 min on both in attempt 2, against the model's
+1.0 min allowance. The measured walls to the last job are a derived 16.2 to
+21.3 min below the five one-lane U24 attempts above.
+
+The pair slowdowns below are derived per job with U25's overlapped factor: the
+job's overlapped seconds divided by the work left for the overlap, which is its
+one-lane median less its non-overlapped seconds. The one-lane median is the
+median of the job's measured `oseo-mac-1` walls in the eight Mac-lane attempts
+of the U12 model and one-lane runs `37251028948`, `37315038080`, and
+`37332256715`. It has 3 to 11 observations per job, and one job's one-lane
+walls range by up to a derived 100 s, so a single factor carries that noise;
+four factors below fell under 1, one of them rounding to 1.00. `native support`
+7/12 and 9/12 have never run one-lane on the Mac and have no factor.
+
+The table keeps the 24 jobs that overlapped the other lane for at least 80
+percent of their wall and spent at least two thirds of that overlap beside one
+partner family. It omits eight jobs with a more even mix or a shorter overlap.
+Each factor comes from runner mode with separate accounts, where U25 used SSH
+clones:
 
 | Job family     | Main partner   | Observed factors                   | Model factor | U25 overlapped factor |
 | -------------- | -------------- | ---------------------------------- | -----------: | --------------------- |
@@ -1671,49 +1684,50 @@ mode with separate accounts, where U25 used SSH clones:
 
 Every observation exceeded the model factor in the rows for test262 beside
 test262, native support beside native support or test262, own-key beside
-test262, and native fixture beside native support, and at least one did in
-each other row. Pooled over each lane's jobs
-with a one-lane median, the derived wall-to-median ratio was 1.297 and
-1.282 on `oseo-mac-1` (10 jobs) and 1.176 and 1.242 on `oseo-mac-2` (7 of 9
-jobs) in attempts 1 and 2. That is below the uniform 1.45 of the
-pessimistic check above and close to the U21 latency factor of 1.29. The
-model still matched the makespan because the lanes' errors offset;
-refitting `selfHostedPairSlowdowns` to these observations needs more
-attempts and is not done here.
+test262, and native fixture beside native support, and at least one did in each
+other row. Pooled over each lane's jobs with a one-lane median, the derived
+wall-to-median ratio was 1.297 and 1.282 on `oseo-mac-1` (10 jobs) and 1.176
+and 1.242 on `oseo-mac-2` (7 of 9 jobs) in attempts 1 and 2. That is below the
+uniform 1.45 of the pessimistic check above and close to the U21 latency factor
+of 1.29. The model still matched the makespan because the lanes' errors offset;
+refitting `selfHostedPairSlowdowns` to these observations needs more attempts
+and is not done here.
 
 `oseo-runner2` was created on 2026-10-06, so attempt 1's `oseo-mac-2` jobs
-started without a Zig cache from earlier runs; cold and warm cache effects
-were not measured separately. The own-key duration records of attempt 2
-were a measured 392.5, 563.6, and 466.8 s for shards 1 to 3, a derived
-1,422.9 s sum against the 3,600 s hard limit. That leaves a derived
-2,177.1 s margin; the sum is a derived 39.5% of the limit. Shard 2, which
-overlapped test262 for most of its wall, exceeded U25's measured 479.7 s
-maximum. Attempt 1's records were no longer downloadable after the full
-rerun (HTTP 404).
+started without a Zig cache from earlier runs; cold and warm cache effects were
+not measured separately.
+
+The own-key duration records of attempt 2 were a measured 392.5, 563.6, and
+466.8 s for shards 1 to 3, a derived 1,422.9 s sum against the 3,600 s hard
+limit. That leaves a derived 2,177.1 s margin; the sum is a derived 39.5% of
+the limit. Shard 2, which overlapped test262 for most of its wall, exceeded
+U25's measured 479.7 s maximum. Attempt 1's records were no longer downloadable
+after the full rerun (HTTP 404).
 
 The comparable one-lane sums come from the measured records of the eight
-one-lane Mac-lane runs. Each run keeps only the records of its latest
-attempt that ran the own-key jobs, so three earlier attempts have none. In
-each, the three shards ran on `oseo-mac-1` with no other job on the Mac:
-`37194069657` 2, `37206614757` 1, `37215661294` 2, `37230598930` 1,
-`37237684441` 2, `37251028948` 1, `37315038080` 1, and `37332256715` 1.
-Their derived sums were 930.5 to 960.2 s, a derived 25.8% to 26.7% of the
-limit, leaving 2,639.8 to 2,669.5 s; no one-lane shard exceeded a
-measured 337.3 s. The two-lane sum is a derived 462.7 to 492.4 s, or 1.48
-to 1.53 times, above those, so the second lane cost a derived 462.7 to
-492.4 s of the deadline margin in this one attempt. The margin is still
-more than half the limit. One attempt does not show whether that holds
-with other pickup orders, which decide how long each shard overlaps
-test262.
+one-lane Mac-lane runs. Each run keeps only the records of its latest attempt
+that ran the own-key jobs, so three earlier attempts have none. In each, the
+three shards ran on `oseo-mac-1` with no other job on the Mac: `37194069657` 2,
+`37206614757` 1, `37215661294` 2, `37230598930` 1, `37237684441` 2,
+`37251028948` 1, `37315038080` 1, and `37332256715` 1. Their derived sums were
+930.5 to 960.2 s, a derived 25.8% to 26.7% of the limit, leaving 2,639.8 to
+2,669.5 s; no one-lane shard exceeded a measured 337.3 s.
+
+The two-lane sum is a derived 462.7 to 492.4 s, or 1.48 to 1.53 times, above
+those, so the second lane cost a derived 462.7 to 492.4 s of the deadline
+margin in this one attempt. The margin is still more than half the limit. One
+attempt does not show whether that holds with other pickup orders, which decide
+how long each shard overlaps test262.
+
 [*docs/evidence/u27/own-key-durations.tsv*](./docs/evidence/u27/own-key-durations.tsv)
 keeps every record. The coordinator measured 115 GiB free on the Mac after the
 runs, above the 40 GiB backstop.
 
 At 41,091 paths, this projection is derived from the measured two-lane job
-walls. It holds each job on the lane it ran on and adds, for every test262
-job, its measured wall less the 60-second setup share times 0.922, the
-growth to 41,091 / 21,383 of the path-proportional part. Lanes are serial,
-so each lane end grows by the sum of its test262 increments:
+walls. It holds each job on the lane it ran on and adds, for every test262 job,
+its measured wall less the 60-second setup share times 0.922, the growth to
+41,091 / 21,383 of the path-proportional part. Lanes are serial, so each lane
+end grows by the sum of its test262 increments:
 
 | Attempt | Derived at 41,091 | Hosted lanes 1 to 5            | `oseo-mac-1` | `oseo-mac-2` |
 | ------: | ----------------: | ------------------------------ | -----------: | -----------: |
@@ -1723,14 +1737,14 @@ so each lane end grows by the sum of its test262 increments:
 Hosted lanes 4 and 5, each with two test262 shards, end last. The same U27
 model with current costs, the generated assignment held fixed, and test262
 scaled likewise gives a derived 106.3 min. The goal therefore holds with a
-derived 16.0 to 16.9 min of margin from the measured walls and 13.7 min
-from the model, against a derived 112.1 to 132.3 min for the recomputed
-one-lane assignment and 113.3 to 145.1 min for the fixed U24 assignment in
-the U12 projection. Unlike those scenarios, these values come from two
-attempts of one commit, not per-job minimum, median, and maximum
-observations. They keep the measured interference per second of test262
-work, although longer Mac test262 jobs would change which jobs overlap, and
-they omit hosted job waits and the fallback schedule.
+derived 16.0 to 16.9 min of margin from the measured walls and 13.7 min from
+the model, against a derived 112.1 to 132.3 min for the recomputed one-lane
+assignment and 113.3 to 145.1 min for the fixed U24 assignment in the U12
+projection. Unlike those scenarios, these values come from two attempts of one
+commit, not per-job minimum, median, and maximum observations. They keep the
+measured interference per second of test262 work, although longer Mac test262
+jobs would change which jobs overlap. They omit hosted job waits and the
+fallback schedule.
 
 #### Hosted fallback property deadlines (U28)
 
@@ -1863,41 +1877,38 @@ lanes. The congestion also reached the runs that held the lanes: the
 hosted-lane jobs of `37499455406` and `37581978950` ended at 205.0 and
 403.0 min with queue waits up to a measured 130.1 and 146.1 min, against
 72.7 and 77.8 min in the uncongested two-lane attempts of U27. The
-fallback of `37606214007` was decided at 10:15:47Z while both runners ran
-jobs of main run `37602749736`; that run was cancelled, its two Mac jobs
-ended at 10:16:14Z and 10:17:14Z, and the lanes then sat idle through the
-159 min of hosted lane work. The probe of `37575037950` at 05:20:07Z found
-both runners on test262 shards of `37574505205`, pushed 6.5 min earlier.
+fallback of `37606214007` was decided while both runners ran jobs of the
+main run that was then cancelled, and the lanes sat idle through the
+159 min of hosted lane work.
 
-A live check on 2026-10-07 at 14:57Z observed the same shape: the probe
-of run `37636486388` ran from 14:26:06Z to 14:26:22Z while `oseo-mac-2`
-was on a job of the cancelled run `37631945458` that ended at 14:26:21Z,
-so its nine `r2` jobs went hosted and its ten `r1` jobs queued on the
-idle `oseo-mac-1`. At 14:57Z `oseo-mac-2` reported `busy: false` and seven
-of the nine hosted jobs were still queued. The runner API
-reports only `busy`, `status`, `labels`, `name`, `os`, `id`, and
-`version`; the GitHub run status was `queued` with nine jobs running, so
-a probe that lists active runs must ask for both `queued` and
-`in_progress`.
+A live check observed the same shape: a probe ran while `oseo-mac-2` was
+finishing a job of a cancelled run, so the probed run's nine `r2` jobs
+went hosted and its ten `r1` jobs queued on the idle `oseo-mac-1`.
+Minutes later, `oseo-mac-2` reported `busy: false` and seven of the nine
+hosted jobs were still queued. The runner API reports only `busy`,
+`status`, `labels`, `name`, `os`, `id`, and `version`; the GitHub run
+status was `queued` with nine jobs running, so a probe that lists active
+runs must ask for both `queued` and `in_progress`.
 
 The change makes the probe ask whether a lane is usable, not whether it
 is idle. *tools/selfhosted-mac/availability.ts* selects lane `i` when
 exactly one runner carries `oseo-mac-i`, is named so, carries no other
-lane label, and is online; the repository variable, the push event, the
+lane label, and is online. The repository variable, the push event, the
 repository, and both tokens are still required, and any API failure
 still emits hosted for every lane. A busy usable runner is selected, so
 its jobs queue on `["self-hosted","macOS","ARM64","oseo-mac-i"]` and
-GitHub starts them when the runner frees up. `runs-on`, the required
-check names, commands, timeouts, shard totals, seeds, case budgets, the
-reviewed manifest, and the native aggregate are unchanged. The job-level
-`OSEO_PROPERTY_TIME_SCALE` of a lane's `native support` jobs still reads
-the lane output: 1 on the runner, however long the job waited, and 4 on
-a hosted fallback. Its readers are
-*packages/testkit/tests/property-support.ts* (the interrupt limit and the
-limit written to a duration record), the `test:sanitizer:property` tasks
-in *mise.toml* (their own default of 3 when unset), and the tests that
-assert the unscaled limit in *packages/testkit/tests/*; none runs in a
-lane job, and the `test` matrix jobs still carry no scale.
+GitHub starts them when the runner frees up.
+
+`runs-on`, the required check names, commands, timeouts, shard totals,
+seeds, case budgets, the reviewed manifest, and the native aggregate are
+unchanged. The job-level `OSEO_PROPERTY_TIME_SCALE` of a lane's
+`native support` jobs still reads the lane output: 1 on the runner, however
+long the job waited, and 4 on a hosted fallback. Its readers are
+*packages/testkit/tests/property-support.ts* (the interrupt limit and the limit
+written to a duration record), the `test:sanitizer:property` tasks in
+*mise.toml* (their own default of 3 when unset), and the tests that assert the
+unscaled limit in *packages/testkit/tests/*. None runs in a lane job, and the
+`test` matrix jobs still carry no scale.
 
 Derived from the measured lane ends and work above, a push G minutes
 after a run that holds the lanes waits `max(0, 81.4 - G)` for its first
@@ -1907,17 +1918,20 @@ earlier). Against the measured hosted ends of the three fallback runs:
 `37506307446` would have ended its lane work at about 109 min instead of
 197.5, `37575037950` at about 156 instead of 168.5, and `37606214007` at
 about 83 instead of 159, because the jobs ahead of it were cancelled 27
-and 87 seconds after the probe. Hosted-lane jobs then keep the five hosted
-slots, which U27 measured at 72.7 to 77.8 min without fallback traffic.
-Queueing loses in two cases. A push within a derived 3.0 min of the previous
-one ends at about 159 to 162 min, level with the best measured fallback; and
-two or more runs of lane work ahead in the queue put the third push at about
-243 min, a derived `2 × 81.4 + 80.6`, behind every measured fallback. The
-measured gaps between consecutive main pushes that were not cancelled, from
-2026-10-06T16:55Z to 2026-10-07T14:25Z, were 52.8, 250.9, 162.1, 163.0, 100.5,
-6.5, 80.8, 224.1, and 249.2 min, with cancelled pushes between some of them
-holding the lanes for minutes, so one run of lane work ahead is common and two
-have not been observed.
+and 87 seconds after the probe.
+
+Hosted-lane jobs then keep the five hosted slots, which U27 measured at
+72.7 to 77.8 min without fallback traffic. Queueing loses in two cases.
+A push within a derived 3.0 min of the previous one ends at about 159 to
+162 min, level with the best measured fallback. Two or more runs of lane
+work ahead in the queue put the third push at about 243 min, a derived
+`2 × 81.4 + 80.6`, behind every measured fallback.
+
+The measured gaps between consecutive main pushes that were not
+cancelled, from 2026-10-06T16:55Z to 2026-10-07T14:25Z, were 52.8,
+250.9, 162.1, 163.0, 100.5, 6.5, 80.8, 224.1, and 249.2 min, with
+cancelled pushes between some of them holding the lanes for minutes, so
+one run of lane work ahead is common and two have not been observed.
 
 The risk the busy signal used to mask is a runner that GitHub lists as
 online but that takes no work: its queued jobs would wait, because
@@ -1925,25 +1939,31 @@ online but that takes no work: its queued jobs would wait, because
 for 24 hours, which fails the run, and the operator can disable
 `OSEO_SELFHOSTED_MAC_ENABLED` and rerun at any time; both keep the gate
 verdict and give up no coverage. The probe bounds the common case
-earlier. With the workflow token and `actions: read`, it reads the
-queued and running jobs of every active run and compares two
-observations two minutes apart. A lane is wedged when its runner was
-idle both times while every job that waited for its label the first time
-was still waiting the second time, or busy both times while no job of its
-label was running either time; such a lane falls back to hosted with the
-U28 scale. One observation would misread a handover, which U23 measured
-at 2 to 3 seconds between jobs, and a queue that lost a job between the
+earlier.
+
+With the workflow token and `actions: read`, it reads the queued and
+running jobs of every active run and compares two observations two
+minutes apart. A lane is wedged when its runner was idle both times while
+every job that waited for its label the first time was still waiting the
+second time, or busy both times while no job of its label was running
+either time. Such a lane falls back to hosted with the U28 scale.
+
+One observation would misread a handover, which U23 measured at 2 to 3
+seconds between jobs, and a queue that lost a job between the
 observations has advanced whatever instants they caught, so the second
-pass runs only when the first shows one of those signatures; an ordinary
+pass runs only when the first shows one of those signatures. An ordinary
 probe makes one pass of one runner call, two run-list calls, and one job
-call per active run, and finishes in seconds. Two minutes is below the
-five-minute readiness timeout with the second pass included, and a runner stays
-`busy` through its job-completed hook, so a prune the length of the one-off
-measured 5.5 min in `37360463788` could still show the busy signature and send
-one run's lane to hosted; that is the previous behavior, not a lost job. Not
-covered: a runner that wedges after the probe selected it, a wedge shorter than
-two minutes, and the 24-hour GitHub bound itself, which this change neither
-shortens nor lengthens.
+call per active run, and finishes in seconds.
+
+Two minutes is below the five-minute readiness timeout with the second
+pass included, and a runner stays `busy` through its job-completed hook,
+so a prune the length of the one-off measured 5.5 min in `37360463788`
+could still show the busy signature and send one run's lane to hosted;
+that is the previous behavior, not a lost job.
+
+Not covered: a runner that wedges after the probe selected it, a wedge
+shorter than two minutes, and the 24-hour GitHub bound itself, which this
+change neither shortens nor lengthens.
 
 Two questions were examined and left unchanged. First, the Mac-lane
 jobs have never been chained: each needs only `mac_ready`, GitHub picks
@@ -1954,13 +1974,14 @@ two lanes, which `node tools/macos-lane-report.ts` bounds at a derived
 76.3 to 78.3 min across orders for the current costs, and once jobs of
 two runs share a queue no chain inside one run could order them. The
 “longest jobs first” comment in the generated workflow therefore names
-the generator's assignment order, not an execution order. Second,
-`selfHostedLaneEnds` models one run starting on idle lanes after the
-60-second probe allowance, and `selfHostedPairSlowdowns` is indexed by
-family, so a partner job from the previous run slows a job as the same
-family from the same run would. The own-key case shards still share
-`oseo-mac-1`'s single decision, so one run's three duration records
-still come from one runner class, which `check:property-case-durations`
+the generator's assignment order, not an execution order.
+
+Second, `selfHostedLaneEnds` models one run starting on idle lanes after
+the 60-second probe allowance, and `selfHostedPairSlowdowns` is indexed
+by family, so a partner job from the previous run slows a job as the
+same family from the same run would. The own-key case shards still share
+`oseo-mac-1`'s single decision, so one run's three duration records still
+come from one runner class, which `check:property-case-durations`
 requires; their two-lane sum of a measured 1,422.9 to 1,486.4 s against
 the 3,600 s limit already includes a busy partner lane. No weight in
 *tools/macos-job-costs.ts* assumes a whole run on one class: hosted
@@ -1969,56 +1990,51 @@ the fallback schedule was unmodeled before this change as well. The
 derived makespan of 77.2 min remains the isolated-run value; a queued
 run's lane end is that value plus the previous run's remaining lane work.
 
-[37999730012]: https://github.com/dahlia/oseo/actions/runs/37999730012
-
 ### macOS static capacity lanes (U16)
 
-The workflow now generates five macOS job chains from measured whole-job
-costs in *tools/macos-job-costs.ts*. All 31 macOS workloads and all 58 check
-names remain present. Each successor uses `!cancelled()` so predecessor
-failure does not skip coverage; the native aggregate requires success from
-every native and test262 shard. *tools/main-workflow.template.yaml* owns the
-commands, and `mise run check:macos-lanes` rejects generated workflow drift.
+The workflow now generates five macOS job chains from measured whole-job costs
+in *tools/macos-job-costs.ts*. All 31 macOS workloads and all 58 check names
+remain present. Each successor uses `!cancelled()` so predecessor failure does
+not skip coverage; the native aggregate requires success from every native and
+test262 shard. *tools/main-workflow.template.yaml* owns the commands, and
+`mise run check:macos-lanes` rejects generated workflow drift.
 
-The derived longest lane is 8872 s (147.87 min, or 147.9 at one decimal
-place) using measured durations from main run `36516215200`; this models
-five exclusive slots and excludes additional queue delays. The measured
-peak was five macOS jobs in that run and same-size main run `36369711059`,
-where the jobs were eligible together. Both branch runs also reached five,
-as constrained by the new lanes. Workflow concurrency is unchanged, so
-other runs can still compete for those slots.
+The derived longest lane is 8872 s (147.87 min, or 147.9 at one decimal place)
+using measured durations from main run `36516215200`; this models five
+exclusive slots and excludes additional queue delays. The measured peak was
+five macOS jobs in that run and same-size main run `36369711059`, where the
+jobs were eligible together. Both branch runs also reached five, as constrained
+by the new lanes. Workflow concurrency is unchanged, so other runs can still
+compete for those slots.
 
 The first branch run, `36598029271` at `d0a39f79`, falsified the original
 one-entry-matrix name model: GitHub appended matrix values to literal job
 names. The corrected generator binds values directly and emits no macOS
-matrices; its 58 rendered names are compared with the measured names from
-main run `36516215200`. The first revision remains a lane timing sample.
-Its unchanged Linux sanitizer job failed before compiling the
-`monotonic-timer-wakeups` fixture when Node and Deno disagreed on timer
-ordering in a differential reference comparison. The fixture's 30 ms
-spacing assumption did not hold in this run;
-the name fix does not eliminate that risk. This run has no push-to-green
-time, and its lane timings are a failed-run observation. The corrected
-configuration passed branch run `36640728403` at `82bba77e`. Its 58
-displayed check names match main run `36516215200`. From workflow creation
-to completion, the first branch run took a derived 162.62 min and the green
-second run took 160.10 min. Their derived sums of measured macOS job times
-were 729.02 and 701.75 min; comparison main run `36516215200` took a
-derived 175.83 min and 718.15 macOS job minutes. The branch runs differ
-from it by 13.21 and 15.73 min in wall time; these differences are not
-separated from runner variance. A second main run with 31 macOS jobs,
-`36369711059`, took a derived 165.55 min and 775.63 macOS
-job minutes. Its branch wall differences are 2.93 and 5.45 min. The longest
-macOS job in `36516215200` started last among macOS jobs, 125.42 min after
-workflow creation; it started at 0.10 and 0.13 min in the branch runs.
-This verifies a changed dispatch order, while the wall-time effect remains
-unseparated. In lane 2,
-the final lane in both branch runs, derived handoff gaps totaled 0.68 and
-0.80 min, with initial start delays of 0.15 and 0.13 min. The remaining
-13.82 and 11.18 min above the 147.87 min ideal
-model came from different summed job wall times. The failed run has no
-push-to-green result; the green run's 160.10 min uses workflow creation as
-the available push timestamp proxy. The per-lane measurements are in
+matrices; its 58 rendered names are compared with the measured names from main
+run `36516215200`.
+
+The first revision remains a lane timing sample. Its unchanged Linux sanitizer
+job failed before compiling the `monotonic-timer-wakeups` fixture, where Node
+and Deno disagreed on timer ordering in a differential reference comparison.
+The fixture's 30 ms spacing assumption did not hold in this run, and the name
+fix does not eliminate that risk. The run has no push-to-green time, and its
+lane timings are a failed-run observation.
+
+The corrected configuration passed branch run `36640728403` at `82bba77e`; its
+58 displayed check names match main run `36516215200`. The branch runs differ
+from `36516215200` by 13.21 and 15.73 min in wall time. Against a second main
+run with 31 macOS jobs, `36369711059`, the wall differences are 2.93 and 5.45
+min. The differences are not separated from runner variance.
+
+The longest macOS job in `36516215200` started last among macOS jobs, 125.42
+min after workflow creation; it started at 0.10 and 0.13 min in the branch
+runs. This verifies a changed dispatch order. In lane 2, the final lane in both
+branch runs, derived handoff gaps totaled 0.68 and 0.80 min, with initial start
+delays of 0.15 and 0.13 min. The remaining 13.82 and 11.18 min above the 147.87
+min ideal model came from different summed job wall times. The green run's
+160.10 min uses workflow creation as the available push timestamp proxy.
+
+The per-lane measurements are in
 [*docs/gate-cost-baseline.md*](./docs/gate-cost-baseline.md).
 [U16 evidence](./docs/evidence/u16/README.md) records the complete lane plan,
 check name inventory, and scheduling limits.
@@ -2029,76 +2045,77 @@ U19 property case partition
 
 The extended native CI gate now executes the own-key property in three
 case-shard jobs on each native host. Every job generates the same 160-case
-sequence (16 reviewed runs times the existing extended scale of 10), with
-the same seed, replay path, generator, and size. Job `k` of three executes
-the predicate for generated indices congruent to `k - 1` modulo three.
-The three job sets are disjoint and cover the unsharded set. The existing
-native-support job names and file-shard totals remain unchanged; those jobs
-exclude this one file, and the `native` aggregate requires every new job.
-The Proxy and Reflect properties remain in the file shards for this first
-measurement. This branch run does not isolate their per-property costs:
-the macOS support shard 1/12 ran Reflect, Proxy, and Math together with
-three file workers. Their case-shard value remains undecided.
+sequence (16 reviewed runs times the existing extended scale of 10), with the
+same seed, replay path, generator, and size. Job `k` of three executes the
+predicate for generated indices congruent to `k - 1` modulo three. The three
+job sets are disjoint and cover the unsharded set.
 
-Each job retains the original 3,600,000 ms extended hard interrupt limit.
-Every successful job uploads the interval measured around its property
-assertion. The `native` aggregate requires all six records and sums the
-three durations separately for Linux and macOS, failing either sum above
-3,600,000 ms through `mise run check:property-case-durations`. This
-preserves the original aggregate deadline while allowing
-case costs to vary. An interrupt remains a failure. A failing shard runs the
-usual shrinker, and its seed and path replay the counterexample without the
-shard filter. The first counterexample may differ from an unsharded run.
-Case-sharded properties must be precondition-free, so every shard generates
-the same run sequence. The local `mise run test:property:extended` task
-remains unsharded.
+The existing native-support job names and file-shard totals remain unchanged;
+those jobs exclude this one file, and the `native` aggregate requires every new
+job.
 
-The previous unsharded macOS own-key interval was observed at 3,565,117 ms
-in run `36243816479`, leaving a derived 34,883 ms margin (0.97%) below the
-3,600,000 ms limit. Other U6 branch observations differed by a derived
-11.80 case-minutes, so the margin is sensitive to runner variance. Each
-case shard repeats generation of the complete stream; summing three runs
-can cost more than one unsharded run even when all predicates pass. The
-branch CI run reports each host's measured three-shard sum and derived
-margin, as well as every per-job duration. A negative margin fails the gate;
-the deadline is not relaxed to absorb variance.
+The Proxy and Reflect properties remain in the file shards, so their
+per-property costs are not isolated: the macOS support shard 1/12 runs Reflect,
+Proxy, and Math together with three file workers. Their case-shard value
+remains undecided.
+
+Each job retains the original 3,600,000 ms extended hard interrupt limit. Every
+successful job uploads the interval measured around its property assertion. The
+`native` aggregate requires all six records and sums the three durations
+separately for Linux and macOS, failing either sum above 3,600,000 ms through
+`mise run check:property-case-durations`. This preserves the original aggregate
+deadline while allowing case costs to vary.
+
+An interrupt remains a failure. A failing shard runs the usual shrinker, and
+its seed and path replay the counterexample without the shard filter. The first
+counterexample may differ from an unsharded run.
+
+Case-sharded properties must be precondition-free, so every shard generates the
+same run sequence. The local `mise run test:property:extended` task remains
+unsharded.
+
+The previous unsharded macOS own-key interval was 3,565,117 ms, leaving a
+derived 34,883 ms margin (0.97%) below the 3,600,000 ms limit. Other U6 branch
+observations differed by a derived 11.80 case-minutes, so the margin is
+sensitive to runner variance. Each case shard repeats generation of the
+complete stream; summing three runs can cost more than one unsharded run even
+when all predicates pass. The branch CI reports each host's measured
+three-shard sum and derived margin, as well as every per-job duration. A
+negative margin fails the gate; the deadline is not relaxed to absorb variance.
 
 The scheduling weights for the three new macOS jobs are derived estimates:
-1,300 seconds each from the U6 measured 3,566 concurrent case seconds for
-the own-key file divided by three, plus estimated setup margin. The macOS
-native-support shard 1 weight is a derived 1,958 seconds from 71 seconds of
+1,300 seconds each, from the U6 measured 3,566 concurrent case seconds for the
+own-key file divided by three, plus estimated setup margin. The macOS
+native-support shard 1 weight is a derived 1,958 seconds, from 71 seconds of
 observed fixed cost plus its remaining variable cost times the modeled
-worker-load ratio 2,283/3,566. All twelve native-support weights use the
-same derived ratio rule because excluding own-keys changes their file sets.
-The U6 concurrent-duration inputs came from CI runs `36243816479` and
-`36261458909`; the 3,018-second job observation came from main run
-`36516215200`. These are estimates for the changed job layout;
-the branch CI observation below compares them with measured per-job times
-and separates fixed setup cost from case execution. The corresponding
-Linux U6 weight is 3,327 concurrent case seconds, or a derived 1,109
-seconds per case shard.
+worker-load ratio 2,283/3,566. All twelve native-support weights use the same
+derived ratio rule because excluding own-keys changes their file sets. The U6
+concurrent-duration inputs came from U6 branch runs; the 3,018-second job
+observation came from a main run. These are estimates for the changed job
+layout; the branch CI observation below compares them with measured per-job
+times and separates fixed setup cost from case execution. The corresponding
+Linux U6 weight is 3,327 concurrent case seconds, or a derived 1,109 seconds
+per case shard.
 
 With only five hosted macOS slots, the changed layout has a derived longest
-lane of 9,414 seconds versus the baseline model's 8,872 seconds. U19 must
-merge together with the Mac mini capacity lanes in U20; merging U19 alone
-would make the modeled hosted-lane wait longer. The lane values remain
-pre-run scheduling estimates; one branch run cannot establish repeatable
-lane timing or turn these estimates into observed results.
+lane of 9,414 seconds versus the baseline model's 8,872 seconds. U19 must merge
+together with the Mac mini capacity lanes in U20; merging U19 alone would make
+the modeled hosted-lane wait longer. The lane values remain pre-run scheduling
+estimates; one branch run cannot establish repeatable lane timing or turn these
+estimates into observed results.
 
-The `native` aggregate also adds checkout, pinned tool installation,
-workspace dependency setup, artifact download, and the duration check.
-Its previous job wall time was an observed three seconds in main run
-`36516215200`; its new fixed cost is reported below and remains outside
-the 9,414-second macOS lane model.
+The `native` aggregate also adds checkout, pinned tool installation, workspace
+dependency setup, artifact download, and the duration check. Its previous job
+wall time was three seconds; its new fixed cost is reported below and remains
+outside the 9,414-second macOS lane model.
 
-One branch CI observation from run `37121778924` measured the six new
-case-shard jobs. Job wall and task-step times below come from GitHub job
-timestamps, rounded to whole seconds. Property intervals come from the
-uploaded duration records, rounded to one decimal second. The final column
-is the derived difference between job wall and task-step time; it includes
-job setup, checkout, tool installation, the workspace build and runtime
-archive cache setup in the composite action, artifact upload, and cleanup.
-It does not include generated-case execution.
+The table below is one branch observation of the six new case-shard jobs. Job
+wall and task-step times come from GitHub job timestamps, rounded to whole
+seconds. Property intervals come from the uploaded duration records, rounded to
+one decimal second. The final column is the derived difference between job wall
+and task-step time; it includes job setup, checkout, tool installation, the
+workspace build and runtime archive cache setup in the composite action,
+artifact upload, and cleanup. It does not include generated-case execution.
 
 | Host               | Shard | Observed job wall (s) | Observed task step (s) | Observed property (s) | Derived other (s) |
 | ------------------ | ----: | --------------------: | ---------------------: | --------------------: | ----------------: |
@@ -2110,111 +2127,109 @@ It does not include generated-case execution.
 | `macos-aarch64`    |   3/3 |                   806 |                    753 |                 750.8 |                53 |
 
 The 382-second derived non-task interval on Linux shard 2/3 includes an
-observed 372-second `jdx/mise-action` step; the other Linux shards' mise
-steps were observed at 23 and 20 seconds. These are fixed setup variations
-in this run, not evidence that a generated case became slower. The task
-step also includes the Node test runner around the measured property.
-Shard 2/3 had the largest property interval on both hosts: a derived
-30% above shard 3/3 on Linux and 37% above it on macOS. The repeated
-ordering suggests an uneven generated-case cost distribution; the longer
-Linux mise step is a separate fixed-cost effect. All three Linux case
-jobs logged a missing mise tool cache for the same key, so that step
-variation is not explained by different cache-hit states.
+observed 372-second `jdx/mise-action` step; the other Linux shards' mise steps
+were observed at 23 and 20 seconds. These are fixed setup variations in this
+run, not evidence that a generated case became slower. The task step also
+includes the Node test runner around the measured property. Shard 2/3 had the
+largest property interval on both hosts: a derived 30% above shard 3/3 on Linux
+and 37% above it on macOS. The repeated ordering suggests an uneven
+generated-case cost distribution, separate from the longer Linux mise step. All
+three Linux case jobs logged a missing mise tool cache for the same key, so
+that step variation is not explained by different cache-hit states.
 
 The gate reported a measured Linux sum of 1,704,680.7 ms, derived from the
 three duration records, leaving a derived 1,895,319.3 ms margin to the
-unchanged 3,600,000 ms deadline. The same gate reported a measured macOS
-sum of 2,638,897.5 ms, derived from its records, leaving a derived
-961,102.5 ms margin. All six job logs report a runtime archive cache hit;
-Zig object cache reuse was not separately measured. The case jobs used
-separate runners and warm runtime archives; no cold-run comparison was
-measured. Their different job wall times do not establish a repeatable
-speedup over the historical unsharded job. The case jobs also have a
-different scope from the former native-support shard.
+unchanged 3,600,000 ms deadline. The gate also reported a measured macOS sum of
+2,638,897.5 ms, derived from its records, leaving a derived 961,102.5 ms
+margin. All six job logs report a runtime archive cache hit; Zig object cache
+reuse was not separately measured. The case jobs used separate runners and warm
+runtime archives; no cold-run comparison was measured. Their different job wall
+times do not establish a repeatable speedup over the historical unsharded job.
+The case jobs also have a different scope from the former native-support shard.
+Main run `36516215200` observed the unsharded own-key property at 2,944,315.2
+ms on macOS within a three-file, three-worker cohort and at 2,276,373.5 ms on
+Linux as a one-file singleton. Relative to those observations, the branch run's
+case-shard sums were a derived 305,417.7 ms (10.4%) lower on macOS and
+571,692.8 ms (25.1%) lower on Linux, using one-decimal values. The macOS case
+jobs ran own-keys alone, unlike the old three-file cohort.
 
-Main run `36516215200` observed the unsharded own-key property at
-2,944,315.2 ms on macOS within a three-file, three-worker cohort and at
-2,276,373.5 ms on Linux as a one-file singleton. Relative to those
-observations, the branch run's case-shard sums were a derived 305,417.7 ms
-(10.4%) lower on macOS and 571,692.8 ms (25.1%) lower on Linux, using
-the one-decimal values stated here. The macOS case jobs ran own-keys
-alone, unlike the old three-file cohort. The U6 macOS own-key jobs passed
-in failed branch run `36343919872` and corrected run `36358067906`;
-their observed durations ranged from 33.27 to 45.07 case-minutes,
-bracketing the new 43.98-minute derived sum. The first run failed on a
-Linux property deadline, so its macOS duration is a valid job observation
-but not an end-to-end green-run result. These one-run differences do not
-establish that partitioning made the same cases cheaper; the strict
-aggregate rule remains useful when case cost or runner load varies.
+The U6 macOS own-key jobs passed. Their observed durations ranged from 33.27 to
+45.07 case-minutes, bracketing the new 43.98-minute derived sum. The first
+branch run failed on a Linux property deadline, so its macOS duration is a
+valid job observation but not an end-to-end green-run result. These one-run
+differences do not establish that partitioning made the same cases cheaper; the
+strict aggregate rule remains useful when case cost or runner load varies.
 
 The macOS case-job planning weight was a derived 1,300 seconds per shard,
-versus observed job walls of 916, 1,085, and 806 seconds in run
-`37121778924`. The Linux U6 planning weight was a derived 1,109 seconds
-per shard, versus observed 556, 1,053, and 547 seconds. These one-run
-observations do not recalibrate the planning weights in
-*tools/macos-job-costs.ts* or the five-slot lane model built from them:
-setup varied across jobs, and repeat runs would be needed to separate
-scheduling behavior from runner variance. The twelve derived macOS
-native-support weights sum to 16,163 seconds; their observed job walls
-summed to 16,590 seconds in run `37121778924`.
-Seven of twelve weights were below observed walls, and the total was a
-derived 427 seconds low. The derived 9,414-second five-slot model remains
-a pre-run planning estimate, not an observed completion time or a bound
-on future runs.
+versus observed job walls of 916, 1,085, and 806 seconds in run `37121778924`.
+The Linux U6 planning weight was a derived 1,109 seconds per shard, versus
+observed 556, 1,053, and 547 seconds. These one-run observations do not
+recalibrate the planning weights in *tools/macos-job-costs.ts* or the five-slot
+lane model built from them. Setup varied across jobs, and repeat runs would be
+needed to separate scheduling behavior from runner variance.
+
+The twelve derived macOS native-support weights sum to 16,163 seconds; their
+observed job walls summed to 16,590 seconds in run `37121778924`. Seven of
+twelve weights were below observed walls, and the total was a derived 427
+seconds low. The derived 9,414-second five-slot model remains a pre-run
+planning estimate, not an observed completion time or a bound on future runs.
 
 The unchanged native-support shard 1 job names allow a before/after
-observation, although removing the own-key file changed their workloads.
-Main run `36516215200` observed 3,018 s for macOS shard 1/12, including
-2,947 s in its property step and a derived 71 s outside that step.
-Branch run `37121778924` observed 1,963 s for the same named job,
-including 1,882 s in its native-property step and a derived 81 s of
-package property work and setup. For Linux shard 1/5, the main run
-observed 2,310 s total and 2,279 s in its property step, with a derived
-31 s outside it. The branch run observed 3,010 s total, including
-2,965 s in its native-property step and a derived 45 s of package
-property work and setup. The old Linux job was a reserved own-key
+observation, although removing the own-key file changed their workloads. Main
+run `36516215200` observed 3,018 s for macOS shard 1/12, including 2,947 s in
+its property step and a derived 71 s outside that step. Branch run
+`37121778924` observed 1,963 s for the same named job, including 1,882 s in its
+native-property step and a derived 81 s of package property work and setup.
+
+For Linux shard 1/5, the main run observed 2,310 s total and 2,279 s in its
+property step, with a derived 31 s outside it. The branch run observed 3,010 s
+total, including 2,965 s in its native-property step and a derived 45 s of
+package property work and setup. The old Linux job was a reserved own-key
 singleton with one file worker; the new job ran 20 other files with four
 workers. Its two wall times therefore compare unrelated workloads.
-The macOS job had three files and three workers on each side, with
-own-keys replaced by Math. Each comparison is one observation per run,
-so neither establishes a repeatable per-file speedup or slowdown.
 
-The branch run's required `native` aggregate passed. Its log reports
-the two measured duration sums above and the unchanged 3,600,000 ms
-limit for each host. Its observed job wall time was 24 s, compared with
-the observed 3 s of the old aggregate in main run `36516215200`.
-The new run spent observed whole-second step intervals of 2 s setting
-up, 3 s requiring all dependencies, 2 s checking out, 12 s installing
-mise tools, and 1 s downloading all six artifacts. The duration-check
-step completed within one GitHub timestamp second. The aggregate runs
-no generated case; this 24-second wall time is fixed gate overhead for
-the changed workflow, measured once.
+The macOS job had three files and three workers on each side, with own-keys
+replaced by Math. Each comparison is one observation per run, so neither
+establishes a repeatable per-file speedup or slowdown.
+
+The branch run's required `native` aggregate passed. Its log reports the two
+measured duration sums above and the unchanged 3,600,000 ms limit for each
+host. Its observed job wall time was 24 s, compared with the observed 3 s of
+the old aggregate in main run `36516215200`.
+
+The new run spent observed whole-second step intervals of 2 s setting up, 3 s
+requiring all dependencies, 2 s checking out, 12 s installing mise tools, and 1
+s downloading all six artifacts. The duration-check step completed within one
+GitHub timestamp second. The aggregate runs no generated case; this 24-second
+wall time is fixed gate overhead for the changed workflow, measured once.
 
 ### One optional self-hosted Mac lane (U22)
 
 The workflow now generates one optional `oseo-mac-1` lane beside five hosted
 macOS lanes. `OSEO_SELFHOSTED_MAC_ENABLED` is off until the operator completes
 registration and the runner-path U17 probe. The readiness job uses a
-repository-scoped Administration: read token only on a push and falls back
-to hosted `macos-15` when the switch, token, API, or runner is unavailable.
-Pull requests remain hosted. The lane accepts only Zig-backed test262,
-extended native-property, own-key case, and native-fixture jobs. Apple clang
-host sanitizers and `macos-latest` Node.js/Deno jobs stay hosted.
-Optional jobs have no predecessor chain, so they can fill the five hosted
-slots concurrently when the readiness probe selects fallback.
-All three own-key case shards use the same readiness decision so their
-duration sum represents one Mac class under the unchanged hard limit.
+repository-scoped Administration: read token only on a push and falls back to
+hosted `macos-15` when the switch, token, API, or runner is unavailable. Pull
+requests remain hosted.
+
+The lane accepts only Zig-backed test262, extended native-property, own-key
+case, and native-fixture jobs. Apple clang host sanitizers and `macos-latest`
+Node.js/Deno jobs stay hosted. Optional jobs have no predecessor chain, so they
+can fill the five hosted slots concurrently when the readiness probe selects
+fallback. All three own-key case shards use the same readiness decision, so
+their duration sum represents one Mac class under the unchanged hard limit.
 
 The scheduling ratios are conservative derived estimates from the U21
-one-machine cold/warm and repeat observations: 3.5 for test262, 2.2 for
-native fixtures, and 2.4 for extended properties. They exclude a derived
-60-second fixed setup share per job and do not claim runner-mode speedup.
-The persistent registration removes the proposed per-job token and
-registration step. The first branch CI run keeps the switch off and checks
-all jobs on hosted runners. A later branch run with the switch on must
-measure the same jobs at least twice, separate cold and warm caches, and
-record the macOS version printed by every macOS job. No coverage count,
-shard total, seed, target, or sanitizer lane changes here.
+one-machine cold/warm and repeat observations: 3.5 for test262, 2.2 for native
+fixtures, and 2.4 for extended properties. They exclude a derived 60-second
+fixed setup share per job and do not claim runner-mode speedup.
+
+The persistent registration removes the proposed per-job token and registration
+step. The first branch CI run keeps the switch off and checks all jobs on
+hosted runners. A later branch run with the switch on must measure the same
+jobs at least twice, separate cold and warm caches, and record the macOS
+version printed by every macOS job. No coverage count, shard total, seed,
+target, or sanitizer lane changes here.
 
 ### Measured Mac-lane ratios (U23)
 
@@ -2262,91 +2277,93 @@ eligibility, hosted fallback, shard totals, and coverage are unchanged.
 
 ### Measured runs of the U23 ratios
 
-Branch run `37215661294` at `29f11948` passed in both attempts, with the
-same 12 jobs on `oseo-mac-1`. The measured push-to-green times were 112.2
-and 105.3 min, the Mac lane ended at 80.4 and 80.3 min, and the last hosted
-macOS job ended at 111.8 and 104.8 min. The model had predicted a derived
-102.7-min makespan with a 99.5-min Mac lane, so the prediction did not
-hold. Against the earlier measured 107.9, 111.1, and 113.5 min, the
-difference is smaller than the run-to-run spread, so these runs cannot
-distinguish a retune effect from runner variation.
+Branch run `37215661294` at `29f11948` ran the same 12 jobs on `oseo-mac-1` in
+both attempts. The measured push-to-green times were 112.2 and 105.3 min, the
+Mac lane ended at 80.4 and 80.3 min, and the last hosted macOS job ended at
+111.8 and 104.8 min. The model had predicted a derived 102.7-min makespan with
+a 99.5-min Mac lane, so the prediction did not hold. Against the earlier
+measured 107.9, 111.1, and 113.5 min, the difference is smaller than the
+run-to-run spread, so these runs cannot distinguish a retune effect from runner
+variation.
+
 [*docs/gate-cost-baseline.md*](./docs/gate-cost-baseline.md) records the
 measured per-run, per-job, and per-lane values.
 
-The model erred on both sides. The Mac jobs measured 79.5 and 78.8 min
-against a derived 98.5 modeled minutes, about 0.8 times the model:
+The model erred on both sides. The Mac jobs measured 79.5 and 78.8 min against
+a derived 98.5 modeled minutes, about 0.8 times the model:
 
- -  The five Mac jobs also run in earlier attempts were modeled at
-    44.2 min and measured 38.4 and 37.9 min.
- -  Native support 6/12, 8/12, and 12/12, newly moved to the Mac, were
-    modeled at 23.5 min and measured 16.4 and 16.1 min. Against their
-    weights they ran at derived ratios of 4.0 to 4.8, not 2.9.
+ -  The five Mac jobs that also ran in earlier attempts were modeled at 44.2
+    min and measured 38.4 and 37.9 min.
+ -  Native support 6/12, 8/12, and 12/12, newly moved to the Mac, were modeled
+    at 23.5 min and measured 16.4 and 16.1 min. Against their weights they ran
+    at derived ratios of 4.0 to 4.8, not 2.9.
  -  Native fixture 3/3 was modeled at 8.4 min with the U21 ratio 2.2 and
     measured 6.1 and 6.0 min, a derived ratio of 3.2.
- -  The three own-key shards were modeled at 22.5 min and measured 18.7
-    and 18.8 min.
+ -  The three own-key shards were modeled at 22.5 min and measured 18.7 and
+    18.8 min.
 
 Only `native support (macos-aarch64, 1/12)` ran slower than modeled. Its
-derived ratio against its weight is 2.7, and it dominated the earlier
-pooled native-support ratio. Within that family, per-job ratios against
-the current weights range from a derived 2.7 to 4.8, and within test262
-from 3.6 to 6.4. One ratio per family cannot fit both.
+derived ratio against its weight is 2.7, and it dominated the earlier pooled
+native-support ratio. Within that family, per-job ratios against the current
+weights range from a derived 2.7 to 4.8, and within test262 from 3.6 to 6.4.
+One ratio per family cannot fit both.
 
-The hosted side was underestimated. Lane 3 ended a measured 19.3 and 7.2
-min after its modeled 92.5 min; it set the makespan in attempt 1.
-`test262 (macos-aarch64, 6/12)` measured 26.6 and 24.8 min against an
-18.1-min weight that lies below all seven hosted observations, 1,366 to
-1,617 s, of runs `37121778924`, `37167895777`, and the five Mac-lane
-attempts. `host C sanitizers (macOS, property)` measured 42.4 and 28.7 min
-against a 32.0-min weight. Its weight lies inside the observed 1,723 to
-2,727 s range, but 266 s below the 2,189-second median, so that job is
-mostly noisy. Lane 2 ended 8.8 and 9.3 min late in both attempts:
-`test262 (macos-aarch64, 1/12)` measured 21.5 and 21.4 min against a
-17.9-min weight below its four hosted observations, and test262 9/12
-measured 25.4 and 24.3 min against 21.3. Queueing does not explain the
-gap: each hosted lane's measured start delay and handoffs summed to 0.5 to
-0.7 min per attempt, and the Mac lane's to 0.9 and 1.5 min against the
-modeled 1.0 min.
+The hosted side was underestimated. Lane 3 ended a measured 19.3 and 7.2 min
+after its modeled 92.5 min; it set the makespan in attempt 1.
+`test262 (macos-aarch64, 6/12)` measured 26.6 and 24.8 min against an 18.1-min
+weight. The weight lies below all seven hosted observations, 1,366 to 1,617 s,
+of runs `37121778924`, `37167895777`, and the five Mac-lane attempts.
+`host C sanitizers (macOS, property)` measured 42.4 and 28.7 min against a
+32.0-min weight. Its weight lies inside the observed 1,723 to 2,727 s range,
+but 266 s below the 2,189-second median, so that job is mostly noisy.
 
-Pooled over all five Mac-lane attempts against the current weights and
-rounded down, the corrected derived ratios would be 4.8 for test262 over
-14 job observations, 3.2 for native support over 26, 3.5 for own-key
-cases over 15, and 3.2 for native fixtures over 2. Changing only these
-ratios moves 14 jobs to the Mac. The model then predicts a derived 92.0
-min. Evaluated against the hosted medians and the measured Mac
-medians, the same assignment gives a derived 97.3 min, because the stale
-hosted weights remain.
+Lane 2 ended 8.8 and 9.3 min late in both attempts.
+`test262 (macos-aarch64, 1/12)` measured 21.5 and 21.4 min against a 17.9-min
+weight below its four hosted observations, and test262 9/12 measured 25.4 and
+24.3 min against 21.3.
+
+Queueing does not explain the gap: each hosted lane's measured start delay and
+handoffs summed to 0.5 to 0.7 min per attempt, and the Mac lane's to 0.9 and
+1.5 min against the modeled 1.0 min.
+
+Pooled over all five Mac-lane attempts against the current weights and rounded
+down, the corrected derived ratios would be 4.8 for test262 over 14 job
+observations, 3.2 for native support over 26, 3.5 for own-key cases over 15,
+and 3.2 for native fixtures over 2. Changing only these ratios moves 14 jobs to
+the Mac. The model then predicts a derived 92.0 min. Evaluated against the
+hosted medians and the measured Mac medians, the same assignment gives a
+derived 97.3 min, because the stale hosted weights remain.
 
 The recommended next retune changes three things. It is not applied here:
 
 1.  Replace every hosted weight with the median of the job's hosted
-    observations in the seven runs. Jobs placed on the Mac in all five
-    Mac-lane attempts have only 2 hosted observations, and others have
-    up to 7. For example, the median is 1,540 s for test262 6/12 instead of
-    1,083, 2,189 s for the sanitizer property job instead of 1,923, and 1,288 s
-    for test262 1/12 instead of 1,074.
-2.  Model a Mac job by its measured Mac median when one exists, which
-    covers 15 jobs. Convert any other job from its hosted median with
-    ratios pooled against hosted medians: a derived 4.2 for test262, 3.2
-    for native support, and 3.1 for native fixtures.
-3.  Assign the three own-key shards before the other jobs. They must run
-    on the Mac lane, and with hosted-median weights of 810 to 995 s the
-    longest-first order would place them near the end. The model would then
-    overload that lane to a derived 106.4 min.
+    observations in the seven runs. Jobs placed on the Mac in all five Mac-lane
+    attempts have only 2 hosted observations, and others have up to 7. For
+    example, the median is 1,540 s for test262 6/12 instead of 1,083, 2,189 s
+    for the sanitizer property job instead of 1,923, and 1,288 s for test262
+    1/12 instead of 1,074.
+2.  Model a Mac job by its measured Mac median when one exists, which covers 15
+    jobs. Convert any other job from its hosted median with ratios pooled
+    against hosted medians: a derived 4.2 for test262, 3.2 for native support,
+    and 3.1 for native fixtures.
+3.  Assign the three own-key shards before the other jobs. They must run on the
+    Mac lane, and with hosted-median weights of 810 to 995 s the longest-first
+    order would place them near the end. The model would then overload that
+    lane to a derived 106.4 min.
 
-With these inputs the greedy assignment puts 15 jobs on the Mac and
-gives a derived, unvalidated scheduling estimate of a 93.3-min makespan,
-set by the Mac lane. Hosted lanes end at a derived 80.8 to 92.8 min,
-using 439.1 hosted macOS job minutes. The current assignment evaluated
-the same way gives 106.1 min and 494.5 min. That evaluation lies between
-the measured 105.3 and 112.2 min, so the medians model this run better
-than the weights did. Medians omit the measured 0.5 to 1.5 min of lane
-overhead and per-job spread, and the current assignment's 106.1-min
-estimate was exceeded by 6.1 min in one attempt. Only a branch
-measurement of the retuned assignment can establish its makespan. The
-retune needed generator and cost-table changes and the usual two-attempt
-branch measurement; the two U24 sections below record both. Job names,
-eligibility, the aggregate's required set, shard totals, and coverage
+With these inputs the greedy assignment puts 15 jobs on the Mac and gives a
+derived, unvalidated scheduling estimate of a 93.3-min makespan, set by the Mac
+lane. Hosted lanes end at a derived 80.8 to 92.8 min, using 439.1 hosted macOS
+job minutes. The current assignment evaluated the same way gives 106.1 min and
+494.5 min. That evaluation lies between the measured 105.3 and 112.2 min, so
+the medians model this run better than the weights did.
+
+Medians omit the measured 0.5 to 1.5 min of lane overhead and per-job spread,
+and the current assignment's 106.1-min estimate was exceeded by 6.1 min in one
+attempt. Only a branch measurement of the retuned assignment can establish its
+makespan. The retune needed generator and cost-table changes and the usual
+two-attempt branch measurement; the two U24 sections below record both. Job
+names, eligibility, the aggregate's required set, shard totals, and coverage
 would not change.
 
 ### Median weights (U24)
@@ -2573,20 +2590,22 @@ limits, and the own-key shared-lane rule did not change.
 ### Linux extended property total and timeout (U31)
 
 `native support (linux-x86_64-gnu, 1/5)` reached the job's 90-minute
-timeout in attempt 1 of branch run `38551733723` and was cancelled, which
-failed the run. The job's work is not near that limit on average: the same
-job measured 37.3, 48.7, 59.0, and 59.2 minutes in the four preceding main
-runs and 32.9 minutes in attempt 2. In the clean four-lane main run
-`38593093817` the five shards measured 54, 38, 31, 62, and 55 minutes, so
-the lane sat between a third and two thirds of the limit and one slow
-hosted runner exceeded it.
+timeout and was canceled, which failed the run. The job's work is not near
+that limit on average: the same job measured 37.3, 48.7, 59.0, and 59.2
+minutes in the four preceding main runs and 32.9 minutes in a second
+attempt.
 
-The measured spread is not explained by the cost model, which puts the five
-shards within 1.04 times of each other, so the model cannot be used to
-rebalance what it already treats as balanced. Raising the total does help,
-because the model's per-shard cost is its widest worker's load rather than
-its weight sum. Modeled maximum shard walls by total, over the 133 files
-that remain after `--exclude-case-sharded`, with the Linux width of four:
+In a clean four-lane main run the five shards measured 54, 38, 31, 62, and
+55 minutes, so the lane sat between a third and two thirds of the limit and
+one slow hosted runner exceeded it. The measured spread is not explained by
+the cost model, which puts the five shards within 1.04 times of each other.
+The model therefore cannot be used to rebalance what it already treats as
+balanced.
+
+Raising the total does help, because the model's per-shard cost is its
+widest worker's load rather than its weight sum. Modeled maximum shard
+walls by total, over the 133 files that remain after
+`--exclude-case-sharded`, with the Linux width of four:
 
 | Total | Modeled maximum shard wall |
 | ----: | -------------------------: |
@@ -2615,20 +2634,20 @@ new total still run on each matching host.
 
 ### Hosted macOS Node.js partition (U32)
 
-In the clean four-lane main run `38593093817` the longest single job was
-`test (macos-latest, node)` at a measured 63 minutes, which ended 63
-minutes into a 64.42-minute run. The same task measured 34 minutes on
-`ubuntu-latest` and 6 on `windows-latest`, where no native test can run
-because the host is not a supported native execution environment. The cost
-is therefore native build and execution on a hosted macOS runner, the work
-the Mac lanes exist to avoid, in the one macOS job the lanes deliberately
-leave hosted for image coverage.
+`test (macos-latest, node)` was the longest single job in a clean
+four-lane main run at a measured 63 minutes, ending 63 minutes into a
+64.42-minute run. The same task measured 34 minutes on `ubuntu-latest` and
+6 on `windows-latest`, where no native test can run because the host is not
+a supported native execution environment. The cost is therefore native
+build and execution on a hosted macOS runner, the work the Mac lanes exist
+to avoid. It is incurred by the one macOS job the lanes deliberately leave
+hosted for image coverage.
 
 The job is now four, partitioned by Node's own `--test-shard`. That flag
 partitions the files Node discovers, so the union of the shards equals the
 unsharded set by construction and no file can be missed by a reimplemented
 discovery rule. It assigns files by position rather than cost, so the four
-will not be equal; their weights in *tools/macos-job-costs.ts* are the
+will not be equal. Their weights in *tools/macos-job-costs.ts* are the
 single measured 2,772 seconds divided by four and must be refreshed from a
 measured run.
 
@@ -2974,285 +2993,317 @@ one.
 
 ### Refreshed native shard weights (U39)
 
-Refreshing the native file weights lowers the modeled Linux maximum over
-seven shards from 47.3 minutes to 44.1, holding main run 39070198868's
-measured case costs fixed. Branch run 39076279469 then measured that
-partition at 46.52 minutes against 47.77, so most of the modeled gain did
-not appear, for reasons the closing paragraphs record. The remaining 44.1
-minutes belongs to *tests/property/m5-globalthis-binding.property.test.ts*,
-whose summed case durations give it a 2,647-second weight, and no whole-file
-partition can model a shorter longest shard than one file's weight. The
-aggregate work bound over all 132 refreshed files and 28 Linux workers is 35.7
-minutes, so raising the Linux total cannot approach it while this file stays
-whole. That is the shape U31 established and U38 removed for the Reflect
-namespace. Case-sharding this file is the next candidate and would be the
-third. Its weight is 2.34 times the superseded 1,133 seconds, which dates the
-table's error rather than the file's execution.
+Refreshing the native file weights lowers the modeled Linux maximum over seven
+shards from 47.3 minutes to 44.1, holding main run 39070198868's measured case
+costs fixed. Branch run 39076279469 measured that partition at 46.52 minutes
+against 47.77, so most of the modeled gain did not appear, for reasons the
+closing paragraphs record.
 
-*tools/native-shard-costs.ts* now derives from run 39070198868 at
-`c78d9df1`, which observed all seven Linux and all twelve macOS file
-shards under Node.js 24.21.0 and Deno 2.9.7.
-*docs/evidence/u6/ci-39070198868.json.txt* retains its measured case
-durations, and `python3 docs/evidence/u6/summarize.py` derives the same
-weights internally and reproduces *docs/evidence/u6/model.txt*. The
-refresh covers 132 files per host; the two entries in
-`caseShardedNativeFiles` keep their older values, because CI excludes
-those files from the file shards and this run did not observe them there.
+The remaining 44.1 minutes belongs to
+*tests/property/m5-globalthis-binding.property.test.ts*, whose summed case
+durations give it a 2,647-second weight. No whole-file partition can model a
+shorter longest shard than one file's weight. The aggregate work bound over all
+132 refreshed files and 28 Linux workers is 35.7 minutes, so raising the Linux
+total cannot approach it while this file stays whole.
+
+That is the shape U31 established and U38 removed for the Reflect namespace.
+Case-sharding this file is the next candidate and would be the third. Its
+weight is 2.34 times the superseded 1,133 seconds, which dates the table's
+error rather than the file's execution.
+
+*tools/native-shard-costs.ts* derives from run 39070198868 at `c78d9df1`, which
+observed all seven Linux and all twelve macOS file shards under Node.js 24.21.0
+and Deno 2.9.7. *docs/evidence/u6/ci-39070198868.json.txt* retains its measured
+case durations, and `python3 docs/evidence/u6/summarize.py` derives the same
+weights internally and reproduces *docs/evidence/u6/model.txt*. The refresh
+covers 132 files per host. The two entries in `caseShardedNativeFiles` keep
+their older values, because CI excludes those files from the file shards and
+this run did not observe them there.
 
 The superseded table was stale file by file. Across both hosts its entries
 range from 0.26 to 3.59 times the refreshed weight for the same file.
 
-`selectNativeTestShard` already simulates each shard's workers and assigns
-a batch to the shard with the shortest modeled completion. Replaying run
+`selectNativeTestShard` already simulates each shard's workers and assigns a
+batch to the shard with the shortest modeled completion. Replaying run
 39070198868's own partition in its observed file order gives a 47.3-minute
-longest shard against 47.8 measured, with per-shard differences of 0.38 to
-0.53 minutes. That is evidence the inputs, not the partitioning rule,
-carried the error, which is the part of U38's reading that needs
-correcting: U38 attributed the spread to stale weights and also described
-the error as tracking a shard's file count, and this replay gives that
-second reading no support. One run's agreement does not establish the
-model across runs, and U38's 25.3-to-48.4-minute spread came from branch
-run 39053800730, not from this source.
+longest shard against 47.8 measured, with per-shard differences of 0.38 to 0.53
+minutes. That is evidence the inputs, not the partitioning rule, carried the
+error.
+
+This corrects part of U38's reading. U38 attributed the spread to stale weights
+and also described the error as tracking a shard's file count; this replay
+gives that second reading no support. One run's agreement does not establish
+the model across runs. U38's 25.3-to-48.4-minute spread came from branch run
+39053800730, not from this source.
 
 Two limits apply to the refreshed table. It replaces a maximum over two
-historical observations with a single newer one, so it estimates no
-run-to-run variation and its entries are not conservative bounds. And the
-macOS column is not comparable with its predecessor: over the 132
-refreshed files, total weight falls 18 percent on macOS and rises 10 on
-Linux, or 16 and 9 over the complete tables, while the superseded macOS
-figures were measured on hosted runners and most macOS file shards now run
-on Mac lanes. This run's macOS jobs ran at three, six, nine and twelve
-workers, which also changes how much concurrent time a case accumulates.
-Per-job median ratios of refreshed to superseded weight range from 0.55 to
-1.42 with no monotone relationship to worker count, which is not enough to
-separate hardware, concurrency, file cohort and implementation change.
+historical observations with a single newer one, so it estimates no run-to-run
+variation and its entries are not conservative bounds.
+
+The macOS column is not comparable with its predecessor. Over the 132 refreshed
+files, total weight falls 18 percent on macOS and rises 10 on Linux, or 16 and
+9 over the complete tables. The superseded macOS figures were measured on
+hosted runners, and most macOS file shards now run on Mac lanes.
+
+This run's macOS jobs ran at three, six, nine and twelve workers, which also
+changes how much concurrent time a case accumulates. Per-job median ratios of
+refreshed to superseded weight range from 0.55 to 1.42 with no monotone
+relationship to worker count. That is not enough to separate hardware,
+concurrency, file cohort and implementation change.
 
 The source run also had large hosted macOS queue delays, measured from
 `created_at` to `started_at`. They sum to 53.4 minutes against 1.35 in run
-39025004305 across the same ten hosted macOS jobs, and the five that
-needed a fresh `macos-latest` machine later in the run waited 7.55 to
-13.12 minutes each while the five that start with the run waited under ten
-seconds. Peak measured hosted macOS concurrency was five in both runs, and
-three of those jobs were active when the predecessor of
-`test (macos-latest, node, 4/4)` finished, so lane contention does not
-explain that job's 13.1-minute wait. These intervals are outside
-`macosFixedSetupSeconds`, which applies to modeled execution. They are
-also not the whole gap between the two runs' 64.2 and 51.8 minutes:
-`host C sanitizers (macOS, property)`, which heads the critical path, took
-39.68 minutes against 28.88. The queue intervals bear on reading this
-run's wall clock, not on the weights, and one run is not evidence for a
-model term.
+39025004305 across the same ten hosted macOS jobs. The five that needed a fresh
+`macos-latest` machine later in the run waited 7.55 to 13.12 minutes each,
+while the five that started with the run waited under ten seconds.
+
+Peak measured hosted macOS concurrency was five in both runs. Three of those
+jobs were active when the predecessor of `test (macos-latest, node, 4/4)`
+finished, so lane contention does not explain that job's 13.1-minute wait.
+
+These intervals are outside `macosFixedSetupSeconds`, which applies to modeled
+execution. They are also not the whole gap between the two runs' 64.2 and 51.8
+minutes. `host C sanitizers (macOS, property)`, which heads the critical path,
+took 39.68 minutes against 28.88. The queue intervals bear on reading this
+run's wall clock, not on the weights, and one run is not evidence for a model
+term.
 
 #### What the first run measured
 
-Branch run 39121592150 at `354b9906` passed in 62.93 minutes, 4.26
-minutes longer than the last main run. The Mac lane finish spread fell
-from 23.65 minutes to 3.80 and the latest finish sits 2.86 minutes above
-the equal share of work, against 9.10 in run 39112383050, with at most
-0.28 minutes of idle per lane. Hosted lane three determined completion.
+Branch run 39121592150 at `354b9906` passed in 62.93 minutes, 4.26 minutes
+longer than the last main run. The Mac lane finish spread fell from 23.65
+minutes to 3.80. The latest finish sits 2.86 minutes above the equal share of
+work, against 9.10 in run 39112383050, with at most 0.28 minutes of idle per
+lane. Hosted lane three determined completion.
 
 It finished at 62.92. The refreshed Mac costs sent
-`test262 (macos-aarch64, 1/12)` there for the first time since the
-`b59ac914` repartition; it ran 1,932 seconds against an entry of 1,288,
-exceeding the estimate by 10.73 minutes, and the lane also waited 9.17
-minutes for a runner between its two jobs. The other nine hosted jobs ran
-between 0.68 and 1.07 times their entries, and the longest Linux file
-shard took 46.55 minutes against 44.12 to 48.18 over the preceding six
-runs.
+`test262 (macos-aarch64, 1/12)` there for the first time since the `b59ac914`
+repartition. It ran 1,932 seconds against an entry of 1,288, exceeding the
+estimate by 10.73 minutes. The lane also waited 9.17 minutes for a runner
+between its two jobs.
 
-Hosted medians were refreshed for all twelve `macos-aarch64` jobs
-observed hosted in the seven-run window, which is every job the placement
-has sent hosted since `b59ac914`; six entries changed. Of the remaining
-21, 18 predate changes to their shard contents, and CI cannot refresh an
-entry for a job it never runs hosted.
-*docs/evidence/u41/README.md* records the refresh, why a conversion from
-the measured one-lane Mac seconds was rejected as an estimator, and a
-scenario that charges all 21 that conversion and leaves the modeled
-maximum at 48.17 minutes. Two jobs the placement assigns hosted still
-lack hosted observations in that window.
+The other nine hosted jobs ran between 0.68 and 1.07 times their entries. The
+longest Linux file shard took 46.55 minutes against 44.12 to 48.18 over the
+preceding six runs.
+
+Hosted medians were refreshed for all twelve `macos-aarch64` jobs observed
+hosted in the seven-run window, which is every job the placement has sent
+hosted since `b59ac914`. Six entries changed. Of the remaining 21, 18 predate
+changes to their shard contents, and CI cannot refresh an entry for a job it
+never runs hosted.
+
+*docs/evidence/u41/README.md* records the refresh. It also records why a
+conversion from the measured one-lane Mac seconds was rejected as an estimator,
+and a scenario that charges all 21 that conversion and leaves the modeled
+maximum at 48.17 minutes. Two jobs the placement assigns hosted still lack
+hosted observations in that window.
 
 ### Mac lane contention refresh (U42)
 
-Branch run 39126360392 at `733dffa2` passed in 66.25 minutes, 7.58
-minutes longer than the last main run. Hosted lane four was the last
-lane to finish, 65.82 minutes after the run began, holding 49.89 minutes
-of work and 15.93 of waiting, including a 15.20-minute allocation wait
-before `test (macos-latest, deno)` and 31.67 minutes for
-`native support (macos-aarch64, 10/12)` against a 1,432-second entry. That wait
-is the largest hosted macOS allocation wait in the eight runs since `b59ac914`.
-Across their 90 hosted macOS jobs the wait has a median of 0.15 minutes and a
-p90 of 5.22, and the per-run sum ranges from 2.4 to 37.7; this run is the 37.7
-and the 58.67-minute main run it is measured against is the 2.4.
+Hosted lane four finished last, and its 15.20-minute allocation wait before
+`test (macos-latest, deno)` was the largest hosted macOS allocation wait in the
+eight runs since `b59ac914`. Across those runs' 90 hosted macOS jobs the wait
+has a median of 0.15 minutes and a p90 of 5.22, and the per-run sum ranges from
+2.4 to 37.7 minutes.
 
 On the Mac side the heaviest lane, `oseo-mac-6`, ended at 57.98 against a
 derived 48.17. Its six jobs deconvolve to 50.55 minutes of one-lane work
-against the 41.03 their entries sum to, and by machine the run's 248.9
-deconvolved minutes split 76.5, 81.7, and 90.7.
+against the 41.03 their entries sum to, and by machine the 248.9 deconvolved
+minutes split 76.5, 81.7, and 90.7.
 
 Two comparisons support revising `selfHostedPairSlowdowns` while holding
-`selfHostedJobSeconds` fixed. The 12 observations whose partner lane was
-idle for over three quarters of the wall measured 0.81 to 1.06 of their
-entry, median 0.94; among those whose partner lane was busy for over nine
-tenths of the wall, the per-run median ratio of wall to entry ran 1.12,
-1.11, 1.13, 1.23, 1.33, 1.34, 1.30, and 1.31 in chronological order. The lane
-model's error flips sign with packing density in the same way: it
+`selfHostedJobSeconds` fixed. The 12 observations whose partner lane was idle
+for over three quarters of the wall measured 0.81 to 1.06 of their entry,
+median 0.94. Among those whose partner lane was busy for over nine tenths of
+the wall, the per-run median ratio of wall to entry ran 1.12, 1.11, 1.13, 1.23,
+1.33, 1.34, 1.30, and 1.31 in chronological order.
+
+The lane model's error flips sign with packing density in the same way: it
 over-predicts the first three runs by 2.32 to 3.50 minutes per lane and
 under-predicts the last four by 3.23 to 4.19.
 
-U42 refits the eight pairings with at least 0.78 hours of contended time
-from the 238 Mac-lane observations, holding the one-lane table fixed, and
-then recomputes every one-lane entry under the new factors. All eight
-rise, the four with the most evidence being the pairings a balanced Mac
-placement creates in quantity: `native support` beside `native support`
-1.13 to 1.20, `test262` beside `test262` 1.26 to 1.37, `native support`
-beside `test262` 1.37 to 1.39, and `test262` beside `native support` 1.08
-to 1.23. The one-lane table moves a median 0.97 of its U41 values. Mean
-absolute lane error against measured work spans falls from 3.09 to 2.76
-minutes and the bias from 0.84 low to 0.25 high, with the gain
-concentrated in the five most recent runs.
+U42 refits the eight pairings with at least 0.78 hours of contended time from
+the 238 Mac-lane observations, holding the one-lane table fixed, and then
+recomputes every one-lane entry under the new factors. All eight rise. The four
+with the most evidence are the pairings a balanced Mac placement creates in
+quantity: `native support` beside `native support` 1.13 to 1.20, `test262`
+beside `test262` 1.26 to 1.37, `native support` beside `test262` 1.37 to 1.39,
+and `test262` beside `native support` 1.08 to 1.23.
 
-The same 33 jobs have a higher modeled cost under the refreshed tables,
-and the derived maximum rises from 48.17 to 50.47 minutes. The refreshed
-numbers also size the Mac side: the jobs carry 242.62 minutes of one-lane
-work, and applying the 1.31 contended ratio run 39126360392 measured as a
-uniform factor over six lanes gives an illustrative 53.0 minutes, against
-48.1 once the placement moves 22.37 minutes of it to hosted lanes. These
-estimates do not establish whether another placement of this work could
+The one-lane table moves a median 0.97 of its U41 values. Mean absolute lane
+error against measured work spans falls from 3.09 to 2.76 minutes and the bias
+from 0.84 low to 0.25 high, with the gain concentrated in the five most recent
+runs.
+
+The same 33 jobs have a higher modeled cost under the refreshed tables, and the
+derived maximum rises from 48.17 to 50.47 minutes. The refreshed numbers also
+size the Mac side: the jobs carry 242.62 minutes of one-lane work, and applying
+the 1.31 contended ratio as a uniform factor over six lanes gives an
+illustrative 53.0 minutes, against 48.1 once the placement moves 22.37 minutes
+of it to hosted lanes.
+
+These estimates do not establish whether another placement of this work could
 go below 50.47.
-*docs/evidence/u42/README.md* records the measurements, the refit, why a
-joint fit of work and slowdown was rejected, and why the retained hosted
-entries were not raised to their conversions.
+
+*docs/evidence/u42/README.md* records the measurements, the refit, why a joint
+fit of work and slowdown was rejected, and why the retained hosted entries were
+not raised to their conversions.
 
 ### Untested hosted entries (U43)
 
-Main run 39139466097 followed the U42 merge. Branch run 39132976769 at
-`c56e1bc7` had passed in 57.27 minutes against 58.67 for the previous main
-run, with the Mac lane maximum down from 58.25 to 51.08 minutes, the spread
-between the earliest and latest Mac lane end down from 23.65 to 4.72, and
-the binding Mac lane 0.61 minutes from its derived 50.47. A hosted lane
-determined the run anyway: `native support (macos-aarch64, 11/12)` ran
-29.88 minutes against a 21.88-minute model and its lane ended at 56.92.
+A branch run brought the Mac lane maximum down from 58.25 to 51.08 minutes and
+the spread between the earliest and latest Mac lane end down from 23.65 to
+4.72, with the binding Mac lane 0.61 minutes from its derived 50.47. A hosted
+lane determined the run anyway: `native support (macos-aarch64, 11/12)` ran
+29.88 minutes against a 21.88-minute model, and its lane ended at 56.92.
 
-That was the third consecutive run ended by a Mac-eligible job the
-placement had just sent to a hosted lane against an entry no run since
-`b59ac914` had tested. The three ran 1.50, 1.33, and 1.37 times their
-entries, and a fourth untested entry in the same run as the third ran 1.24,
-while the one tested entry hosted beside it ran 1.04.
+That was the third consecutive run ended by a Mac-eligible job the placement
+had just sent to a hosted lane against an entry no run since `b59ac914` had
+tested. The three ran 1.50, 1.33, and 1.37 times their entries; a fourth
+untested entry in the same run as the third ran 1.24, while the one tested
+entry hosted beside it ran 1.04.
 
-The U42 record rejected a correction here on the five pre-repartition
-entries the window had observed, whose ratios had a median of 0.99. That
-sample cannot test the question: once the window observes a job, U41 or U42
-set its entry to the median of those same walls. The non-circular sample is
-a job's first observation in the window against an entry that predates it.
-Eight exist, at 0.81, 0.93, 0.99, 1.07, 1.24, 1.33, 1.37, and 1.50 times
-the entry, a mean of 1.16. Those entries are not biased low as a group. The
-four largest are the four the placement had just chosen to host, which is
-what minimizing a projected finish over uncertain estimates selects.
+The U42 record rejected a correction here on the five pre-repartition entries
+the window had observed, whose ratios had a median of 0.99. That sample cannot
+test the question: once a job appears in the window, U41 or U42 set its entry
+to the median of those same walls. The non-circular sample is a job's first
+observation in the window against an entry that predates it.
 
-U43 refreshes the three entries run 39132976769 observed, bringing the
-jobs with a tested entry to 16 of 33 in `measuredHostedJobs`, and charges
+Eight such observations exist, at 0.81, 0.93, 0.99, 1.07, 1.24, 1.33, 1.37, and
+1.50 times the entry, a mean of 1.16. Those entries are not biased low as a
+group. The four largest are the four the placement had just sent to hosted
+lanes, which is what minimizing a projected finish over uncertain estimates
+selects.
+
+U43 refreshes the three entries the branch run observed, bringing the jobs with
+a tested entry to 16 of 33 in `measuredHostedJobs`, and charges
 `hostedUnmeasuredAllowance` of 1.5, the largest of those eight ratios, on the
 rest when the placement projects a hosted finish. At the tabulated costs the
-allowance raises the modeled maximum from 49.95 to 50.78 minutes. Without it
-the placement hosts `test262 (macos-aarch64, 9/12)` against an untested
-1,456-second entry on a lane modeled at 42.62 minutes; charging that job 1.50
-times its entry adds 12.13 minutes and raises the maximum to 54.75. With it the
-placement hosts the tested `native support (macos-aarch64, 9/12)` and the
-maximum stays 50.78 under the same assumption. Every factor tested between 1.2
-and 1.8, namely 1.2, 1.4, 1.5, and 1.8, gives the same partition. The allowance
-applies to the projection only, so `macosLaneEnds` still sums unadjusted
-entries and the derived maximum stays a model output over per-job medians.
+allowance raises the modeled maximum from 49.95 to 50.78 minutes.
+
+Without the allowance the placement hosts `test262 (macos-aarch64, 9/12)`
+against an untested 1,456-second entry on a lane modeled at 42.62 minutes;
+charging that job 1.50 times its entry adds 12.13 minutes and raises the
+maximum to 54.75. With it the placement hosts the tested
+`native support (macos-aarch64, 9/12)` and the maximum stays 50.78 under the
+same assumption. Every factor tested between 1.2 and 1.8, namely 1.2, 1.4, 1.5,
+and 1.8, gives the same partition.
+
+The allowance applies to the projection only, so `macosLaneEnds` still sums
+unadjusted entries and the derived maximum stays a model output over per-job
+medians.
+
 *docs/evidence/u43/README.md* records the measurements and what this does not
 address: the account's GitHub Pro ceiling of 40 concurrent jobs and 5
-concurrent macOS jobs shared across every repository it owns, and a Linux
-job that finished 52.92 minutes after its run began.
+concurrent macOS jobs shared across every repository it owns, and a Linux job
+that finished 52.92 minutes after its run began.
 
 #### What the merged U42 run measured
 
-Main run 39139466097 at `005be48b` passed in 54.00 minutes, against 58.67
-for the main run before the merge. Each of the six self-hosted Mac lanes
-finished before its own modeled finish time: the latest actual finish was
-45.87 minutes after the run started, on `oseo-mac-3`, against a largest
-modeled finish of 50.47 on `oseo-mac-1`, and actual finishes spanned 3.29
-minutes. A hosted macOS lane finished last, 53.62 minutes after the run
-started, running three jobs in sequence with a 2.70-minute offset before
-the first and gaps of 1.93 and 2.08 minutes between them. The latest Linux
-job finished at 51.35 minutes.
+Main run 39139466097 at `005be48b` finished in 54.00 minutes, against 58.67 for
+the main run before the merge.
+
+Each of the six self-hosted Mac lanes finished before its own modeled finish
+time. The latest actual finish was 45.87 minutes after the run started, on
+`oseo-mac-3`, against a largest modeled finish of 50.47 on `oseo-mac-1`. Actual
+finishes spanned 3.29 minutes.
+
+A hosted macOS lane finished last, 53.62 minutes after the run started. It ran
+three jobs in sequence, with a 2.70-minute offset before the first and gaps of
+1.93 and 2.08 minutes between them. The latest Linux job finished at 51.35
+minutes.
 
 The run measured a duration for each of the three jobs whose entries U43
 refreshed, and all three change again: `native support (macos-aarch64, 11/12)`
 to the 1,636 median of 1,479 and 1,793, `native (macos-aarch64, 3/3)` to the
 1,160 median of 1,066 and 1,254, and `native support (macos-aarch64, 9/12)` to
-the 1,475 median of 1,421, 1,475, and 1,634. Those three durations were 0.82,
-0.85, and 1.13 times the entry in force. Earlier observations do not make an
-entry exact: the 1.13 is the tested job U43 assigns to a hosted lane in place
-of an untested one. Recomputing the U43 placement with the three lowers its
-maximum modeled lane finish from 50.78 to 48.28 minutes, and it still assigns
-no untested entry to a hosted lane.
+the 1,475 median of 1,421, 1,475, and 1,634.
+
+Those three durations were 0.82, 0.85, and 1.13 times the entry in force.
+Earlier observations do not make an entry exact: the 1.13 is the tested job U43
+assigns to a hosted lane in place of an untested one.
+
+Recomputing the U43 placement with the three lowers its maximum modeled lane
+finish from 50.78 to 48.28 minutes, and it still assigns no untested entry to a
+hosted lane.
 
 #### What the U43 branch run measured
 
-Branch run 39144030177 at `af8e6bd2` passed in 54.17 minutes, against 54.00
-for the main run before it. Hosted macOS allocation waiting totaled 3.7
-job-minutes against that run's 13.2, and on the lane that bound each run the
-branch run spent 0.45 minutes waiting to start and between its jobs where the
-main run spent 6.71, so what separates the two walls is lane work content and
-hosted runner speed rather than allocation waiting. No hosted lane received a
-Mac-eligible entry the window had not tested, which is what the allowance is
-for. The run was still ended by a hosted macOS lane and again by a
-Mac-eligible job the placement had sent there:
+Branch run 39144030177 at `af8e6bd2` finished in 54.17 minutes, against 54.00
+for the main run before it.
+
+Hosted macOS allocation waiting totaled 3.7 job-minutes against that run's
+13.2. On the lane that bound each run, the branch run spent 0.45 minutes
+waiting to start and between its jobs, where the main run spent 6.71. What
+separates the two walls is lane work content and hosted runner speed rather
+than allocation waiting.
+
+No hosted lane received a Mac-eligible entry the window had not tested, which
+is what the allowance is for. The run was still ended by a hosted macOS lane
+and again by a Mac-eligible job the placement had sent there.
 `native support (macos-aarch64, 12/12)` ran 23.28 minutes against its
 17.40-minute entry, 1.34 times it, after which the `native` aggregate ran 0.37
 minutes and the run finished 0.40 minutes after that lane ended. One hosted
 observation put that job in `measuredHostedJobs`, so the placement projected
 its entry unmultiplied; it did not make the entry a close estimate of the next
-duration. Hosted lane five holds the same three jobs at every allowance
-tested, 1.0 included, so the allowance did not assemble that lane. Four Mac
-lanes finished before their modeled end and two after it, by 0.78 and 0.99
-minutes, each with at most 0.28 minutes of idle between jobs; the ten hosted
-durations ran 0.85 to 1.34 times their entries, and the latest Linux job
+duration.
+
+Hosted lane five holds the same three jobs at every allowance tested, 1.0
+included, so the allowance did not assemble that lane.
+
+Four Mac lanes finished before their modeled end and two after it, by 0.78 and
+0.99 minutes, each with at most 0.28 minutes of idle between jobs. The ten
+hosted durations ran 0.85 to 1.34 times their entries, and the latest Linux job
 finished at 48.68 minutes.
 
 With this run included, three entries change, each to the median of its
 observations in seconds: `native support (macos-aarch64, 3/12)` from 1,264 to
 1,293 on three observations, `native (macos-aarch64, 1/3)` from 1,236 to 1,239
-on four, and `native support (macos-aarch64, 12/12)` from 1,044 to 1,220 on
-two. The third sends that job to a Mac lane and brings
-`native (macos-aarch64, 2/3)` onto hosted lane five, which lowers the modeled
-hosted maximum from 47.98 to 45.65 minutes, raises the modeled Mac maximum
-from 48.28 to 49.10, and so raises the derived maximum to 49.10. Those eleven
-modeled lane ends span 36.32 to 49.10 and average 44.85, with the two
-sanitizer lanes below that average because the reservation lets no other job
-follow them; a hosted lane end and a Mac lane end come from different cost
+on four, and `native support (macos-aarch64, 12/12)` from 1,044 to 1,220 on two.
+
+The third sends that job to a Mac lane and brings `native (macos-aarch64, 2/3)`
+onto hosted lane five. This lowers the modeled hosted maximum from 47.98 to
+45.65 minutes, raises the modeled Mac maximum from 48.28 to 49.10, and so
+raises the derived maximum to 49.10.
+
+Those eleven modeled lane ends span 36.32 to 49.10 and average 44.85, with the
+two sanitizer lanes below that average because the reservation lets no other
+job follow them. A hosted lane end and a Mac lane end come from different cost
 models, so the figures do not establish how much further partitioning could
 lower the maximum. *docs/evidence/u43/README.md* records the per-lane figures.
 
 #### What the refreshed placement measured
 
-Branch run 39149674951 at `6c4e21cb` passed in 50.60 minutes, the shortest of
+Branch run 39149674951 at `6c4e21cb` finished in 50.60 minutes, the shortest of
 the twelve runs since `b59ac914` and 3.40 below the 54.00-minute main run. All
 six Mac lanes finished before their modeled end, with actual finishes spanning
-4.32 minutes and at most 0.30 minutes of idle between a lane's jobs. Hosted
-lane five bound the run, and again with a Mac-eligible job the placement had
-sent there: `native (macos-aarch64, 2/3)`, the job this refresh moved onto that
-lane, ran 19.37 minutes against its 15.07-minute entry, 1.29 times it. It is
-the fourth run in a row ended that way, at 1.37, 1.13, 1.34, and 1.29 times
-the entry, by four different jobs. All four entries had been tested in the
-window, so the placement charged each unmultiplied; an entry tested since
-`b59ac914` can still underestimate a later duration, and `measuredHostedJobs`
-membership does not account for variation among tested entries. Each of the
-four rested on one or two observations, but four comparisons do not establish
-whether observation count predicts an overrun.
+4.32 minutes and at most 0.30 minutes of idle between a lane's jobs.
+
+Hosted lane five bound the run, and again with a Mac-eligible job the placement
+had sent there. `native (macos-aarch64, 2/3)`, the job this refresh moved onto
+that lane, ran 19.37 minutes against its 15.07-minute entry, 1.29 times it. It
+is the fourth run in a row ended that way, at 1.37, 1.13, 1.34, and 1.29 times
+the entry, by four different jobs.
+
+All four entries had been tested in the window, so the placement charged each
+unmultiplied. An entry tested since `b59ac914` can still underestimate a later
+duration, and `measuredHostedJobs` membership does not account for variation
+among tested entries. Each of the four rested on one or two observations, but
+four comparisons do not establish whether observation count predicts an overrun.
 
 The unsharded `test (ubuntu-latest, node)` finished at 48.83 minutes, 1.77
-short of the run's end. Its durations over the twelve runs fall into two
-groups: 24.72, 26.75, 34.85, 35.30, 35.90, and 36.17 minutes in six runs and
-48.18, 48.60, 48.63, 48.67, 48.80, and 49.30 in the other six, with no
-observed duration between 36.17 and 48.18. The longer durations are roughly 13
-minutes above the four near 35 to 36 and 22 to 25 above the two shortest, and
-at those durations the job can decide a run that the macOS lanes finish near
-48. What accounts for the difference is the next thing to measure.
-*docs/evidence/u43/README.md* records the per-lane figures.
+short of the run's end.
+
+Its durations over the twelve runs fall into two groups: 24.72, 26.75, 34.85,
+35.30, 35.90, and 36.17 minutes in six runs and 48.18, 48.60, 48.63, 48.67,
+48.80, and 49.30 in the other six, with no observed duration between 36.17 and
+48.18.
+
+The longer durations are roughly 13 minutes above the four near 35 to 36 and 22
+to 25 above the two shortest. At those durations the job can determine a run
+that the macOS lanes finish near 48. What accounts for the difference is the
+next thing to measure. *docs/evidence/u43/README.md* records the per-lane
+figures.
 
 ### Linux duration and the binding macOS side (U44)
 
@@ -3592,90 +3643,93 @@ address.
 
 U45's refinement accepted two moves that sent
 `native support (macos-aarch64, 11/12)` and `12/12` from `oseo-mac-5` and
-`oseo-mac-2` to hosted lanes, where they measured 25.23, 17.30 and 26.07
-and 21.73, 25.00 and 25.48 minutes against 10.53, 9.95 and 9.15, 9.03 on
-the Mac lanes. The model prices hosted execution of the family higher too,
-at the 3.4 of `selfHostedFamilySpeedRatios`, and accepted the moves anyway
-under the hosted costs it carried. Reconstructing run 39292194312's hosted
-chains from the generated `needs` edges, the longest ended at 51.57, later
-than every Mac lane, carrying 50.80 minutes of work against 0.33 of
-waiting on top of the probe's 0.43, where the model gave it 42.18 from
-1,311 seconds for its Node.js shard and 1,220 for `12/12`. U44 had set that
-1,220 from two observations, 1,044 and 1,397 seconds; the three since are
-1,304, 1,500 and 1,529.
+`oseo-mac-2` to hosted lanes. There they measured 25.23, 17.30 and 26.07 and
+21.73, 25.00 and 25.48 minutes against 10.53, 9.95 and 9.15, 9.03 on the Mac
+lanes. The model prices hosted execution of the family higher, at the 3.4 of
+`selfHostedFamilySpeedRatios`, and accepted the moves anyway under the hosted
+costs it carried.
+
+The longest hosted chain in run 39292194312, reconstructed from the generated
+`needs` edges, ended at 51.57, later than every Mac lane. It carried 50.80
+minutes of work against 0.33 of waiting, on top of the probe's 0.43. The model
+had given it 42.18, from 1,311 seconds for its Node.js shard and 1,220 for
+`12/12`. U44 set that 1,220 from two observations, 1,044 and 1,397 seconds; the
+three since are 1,304, 1,500 and 1,529.
 
 U49 gives seven entries the median of their hosted observations since
-`b59ac914`, those whose median had moved by at least five percent: the two
-macOS sanitizer jobs, `native support (macos-aarch64, 11/12)` and `12/12`,
-`test (macos-latest, node, 1/4)`, and two `reflect cases` shards. The
-refinement then places `12/12` on a Mac lane and leaves `11/12` hosted at
-a modeled 47.08 against the 46.18 minutes of work that pairing measured.
-Refreshing `12/12` alone leaves it hosted, so the pair of `native support`
-entries is what the earlier placement turned on. The model's
-highest lane end rises from 47.00 to 47.31 minutes and the highest
-`macosLaneEnds` value from 2,820 to 2,839 seconds, which is the point: the
-previous maximum was reached by charging a hosted lane less than it
-measured, and an entry below its observations buys placements that do not
-hold.
+`b59ac914`: the entries whose median moved by at least five percent. They are
+the two macOS sanitizer jobs, `native support (macos-aarch64, 11/12)` and
+`12/12`, `test (macos-latest, node, 1/4)`, and two `reflect cases` shards.
 
-The refreshed values are medians, not bounds, and the hosted lanes carry
-the widest spreads, from 1,700 to 3,146 seconds on the sanitizer property
-job. Four entries rest on six or fewer observations, including both
-`native support` shards, and the two sanitizer entries separately trade
-sample size for recency. Nothing here reduces the macOS work, which the
-model now prices at 47.31 minutes at the longest across five hosted and
-six Mac lanes; a greedy pass and a first-improvement local search reached
-that placement, which is not shown to be the shortest available. This lands
-with U48 and one run cannot separate their contributions.
-*docs/evidence/u49/README.md* records the measurements and what they do not
-address.
+The refinement then places `12/12` on a Mac lane and leaves `11/12` hosted at a
+modeled 47.08 against the 46.18 minutes of work that pairing measured.
+Refreshing `12/12` alone leaves it hosted, so the pair of `native support`
+entries is what the earlier placement turned on.
+
+The model's highest lane end rises from 47.00 to 47.31 minutes, and the highest
+`macosLaneEnds` value from 2,820 to 2,839 seconds. The previous maximum was
+reached by charging a hosted lane less than it measured, and an entry below its
+observations buys placements that do not hold.
+
+The refreshed values are medians, not bounds, and the hosted lanes carry the
+widest spreads, from 1,700 to 3,146 seconds on the sanitizer property job. Four
+entries rest on six or fewer observations, including both `native support`
+shards, and the two sanitizer entries separately trade sample size for recency.
+
+Nothing here reduces the macOS work, which the model now prices at 47.31
+minutes at the longest across five hosted and six Mac lanes. A greedy pass and
+a first-improvement local search reached that placement, which is not shown to
+be the shortest available. This lands with U48, and one run cannot separate
+their contributions. *docs/evidence/u49/README.md* records the measurements and
+what they do not address.
 
 ### What the combined run measured (U48, U49)
 
-Run 39351734495 at `57e0d6da` ended at 49.77 minutes. The Linux side ended
-at 48.00 and the hosted macOS lanes at 49.77, 1.77 minutes apart, with
-hosted macOS last. Summed Ubuntu allocation waiting was 2.5 job-minutes
-against run 39292194312's 26.6, and 33 of the 35 Ubuntu jobs started
-within 0.5 minutes. U48's two estimates held: the eight Linux test262
-shards measured a mean of 30.1 minutes against 31.1 and a longest of
-35.87, and the two Node.js shards 20.28 and 15.70 against 20.4.
-`native support (macos-aarch64, 12/12)` ran 11.50 minutes on a Mac lane against
-the 21.73 to 25.48 it had measured hosted, the 50.80-minute hosted chain is
-gone, and the Mac lanes ended at 47.68 against the model's 47.32.
+Run 39351734495 at `57e0d6da` ended at 49.77 minutes. The Linux side ended at
+48.00 and the hosted macOS lanes at 49.77, 1.77 minutes apart, with hosted
+macOS last. Summed Ubuntu allocation waiting was 2.5 job-minutes against run
+39292194312's 26.6, and 33 of the 35 Ubuntu jobs started within 0.5 minutes.
+
+U48's two estimates held. The eight Linux test262 shards measured a mean of
+30.1 minutes against 31.1 and a longest of 35.87, and the two Node.js shards
+measured 20.28 and 15.70 against 20.4. `native support (macos-aarch64, 12/12)`
+ran 11.50 minutes on a Mac lane against the 21.73 to 25.48 it had measured
+hosted, the 50.80-minute hosted chain is gone, and the Mac lanes ended at 47.68
+against the model's 47.32.
 
 With these modeled costs and the current ten indivisible hosted jobs, the
-generated placement minimizes the longest hosted macOS lane: partitioning
-them across the five lanes exhaustively gives a lowest achievable maximum
-of 2,825 seconds, or 47.08 minutes, and the placement reaches it. Going
-below that needs different job costs, different job boundaries, different
-eligibility, or more concurrency, and the `test` family that holds the
-longest measured chain is not Mac-eligible.
+generated placement minimizes the longest hosted macOS lane. Partitioning them
+across the five lanes exhaustively gives a lowest achievable maximum of 2,825
+seconds, or 47.08 minutes, and the placement reaches it. Going below that needs
+different job costs, different job boundaries, different eligibility, or more
+concurrency, and the `test` family that holds the longest measured chain is not
+Mac-eligible.
 
-The branch merges on the placement changes and this run, not on a best
-number: 49.77 is above main's best observed 48.53. That run had 5.1
-job-minutes of Ubuntu waiting, and across the preceding eighteen runs the
-waiting ranged from 1.2 to 88.1 while the Linux side ranged from 48.53 to
-66.25. The two ranges do not pair. Run 39126360392 ended its Linux side at
-66.25 with 1.2 job-minutes of waiting, so the per-job runner speed factor
-moves that side on its own, and U47 and U48 address only the waiting
-component. What that is worth across runs is not yet measured.
+The branch merges on the placement changes and this run, not on a best number:
+49.77 is above main's best observed 48.53. That run had 5.1 job-minutes of
+Ubuntu waiting, and across the preceding eighteen runs the waiting ranged from
+1.2 to 88.1 while the Linux side ranged from 48.53 to 66.25. The two ranges do
+not pair. Run 39126360392 ended its Linux side at 66.25 with 1.2 job-minutes of
+waiting, so the per-job runner speed factor moves that side on its own, and U47
+and U48 address only the waiting component. What that is worth across runs is
+not yet measured.
 
 ### What the two main runs measured (U48, U49)
 
 Main runs 39422744044 and 39455962104 ran the branch run's workflow and
-placement and ended at 54.00 and 50.63 minutes. The first drew slow Mac
-lanes: with each lane holding the same jobs, the lanes' summed work was
-292.0 minutes against 263.2 in the branch run and 259.6 in the second main
-run, and the `native` aggregate, which waits for the macOS case shards,
-closed it after the last Mac-lane job. Summed Ubuntu waiting stayed between
-1.4 and 2.5 job-minutes across the three runs.
+placement and ended at 54.00 and 50.63 minutes. The first drew slow Mac lanes:
+with each lane holding the same jobs, the lanes' summed work was 292.0 minutes
+against 263.2 in the branch run and 259.6 in the second main run, and the
+`native` aggregate, which waits for the macOS case shards, closed it after the
+last Mac-lane job. Summed Ubuntu waiting stayed between 1.4 and 2.5 job-minutes
+across the three runs.
 
 The earlier Linux figures in this plan took the latest Ubuntu job end, which
-includes that aggregate. Excluding aggregates, the latest Ubuntu work ended
-at 47.30 in the branch run rather than 48.00, and at 45.47 and 48.80 in the
-two main runs. A `workflow_dispatch` repeat was canceled because the
-readiness probe runs only on push events and every Mac lane fell back to the
-hosted slots. *docs/evidence/u49/README.md* records the table.
+includes that aggregate. Excluding aggregates, the latest Ubuntu work ended at
+47.30 in the branch run rather than 48.00, and at 45.47 and 48.80 in the two
+main runs. A `workflow_dispatch` repeat was canceled because the readiness
+probe runs only on push events and every Mac lane fell back to the hosted
+slots. *docs/evidence/u49/README.md* records the table.
 
 ### Rented fourth Mac mini
 

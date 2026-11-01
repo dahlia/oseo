@@ -144,7 +144,7 @@ reproducibility an Oseo guarantee.
 
 Pinned `zig cc` remains the canonical C11 adapter and reference evidence. A
 future same-host system adapter may invoke GCC or Clang on Linux and Apple
-Clang on macOS, but it must be selected explicitly or through a documented
+Clang on macOS. It must be selected explicitly or through a documented
 `auto` policy. Automatic fallback is permitted only when the Zig executable
 cannot be found or started. It must not retry a failed Zig compile or link with
 an ambient compiler, because doing so would hide a reproducibility, source, or
@@ -174,8 +174,8 @@ publication. Debug-only metadata may be optional when its absence cannot affect
 program behavior or memory safety.
 
 Collector metadata follows the same rule. MIR supplies safepoint liveness and
-heap-store facts before lowering; a candidate may encode them as explicit
-frames, stack maps, spills, or registers but cannot discover a missing live
+heap-store facts before lowering. A candidate may encode them as explicit
+frames, stack maps, spills, or registers. It cannot discover a missing live
 value afterward.
 
 
@@ -192,8 +192,8 @@ primitives, translation-unit boundaries, optimization flags, or link-time
 optimization while preserving ADR 0003. Improvements must keep `--emit-c`
 useful and preserve strict-warning, sanitizer, and cross-target evidence.
 
-The control candidate matters because a local C-lowering fix may remove the
-observed problem at much lower maintenance cost than a second backend.
+A local C-lowering fix may remove the observed problem at much lower
+maintenance cost than a second backend.
 
 ### External optimizing IR
 
