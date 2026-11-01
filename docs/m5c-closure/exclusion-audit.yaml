@@ -207,8 +207,8 @@ assessments:
     normativeDependency: source-evaluation-only
     replacementEvidence:
       docs/m5c-graph/dynamic-source-scope-arguments-assessment.yaml:
-        "26479b20aee86b42424d194520880c20\
-        12e56084bf24568daf7b5aa7d8970e75"
+        "34f202becb7f56ab3173978882db7350\
+        b62658cb58f8d4602484d704fb59f2f0"
       tests/scope-arguments-native.test.ts: "557add2d4107210fd3ab18027c4f7a18\
         061bd830a74f565ae1f5e748762d7143"
       tests/native/fixtures/scope-arguments-evidence.ts:
