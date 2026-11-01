@@ -115,8 +115,8 @@ forced collection. M2 fixtures also compile and link in both modes for
 
 Strict C11 warnings and undefined-behavior sanitization apply to native x86-64
 execution. The assembly inspection compiles the same selected path with `-O2`
-for both configured targets. These checks demonstrate code shape and fallback;
-they are not a broad performance comparison with another engine.
+for both configured targets. These checks show code shape and fallback; they
+are not a broad performance comparison with another engine.
 
 
 Limits

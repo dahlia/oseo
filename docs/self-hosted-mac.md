@@ -134,60 +134,72 @@ Runner service
 Each runner is registered once without `--ephemeral` under its own dedicated
 standard macOS account: `oseo-mac-1` under `oseo-runner`, and `oseo-mac-2`
 under `oseo-runner2`. The account holds only the runner's own registration
-credential. No PAT or GitHub API credential is stored on the Mac. The
-operator pins and verifies the downloaded runner archive, registers
+credential. No PAT or GitHub API credential is stored on the Mac.
+`OSEO_RUNNER_LABEL` selects the runner, `oseo-mac-1` by default or any of
+`oseo-mac-2` through `oseo-mac-6`; any other value is rejected.
+
+The operator pins and verifies the downloaded runner archive, registers
 `oseo-mac-1` once, and installs the system LaunchDaemon with
-*tools/selfhosted-mac/install-service.sh*. `OSEO_RUNNER_LABEL` selects the
-runner, `oseo-mac-1` by default or any of `oseo-mac-2` through
-`oseo-mac-6`; any other value is rejected.
+*tools/selfhosted-mac/install-service.sh*.
+
 The daemon is `org.oseo.runner.<label>`, and the installer requires the
 runner root to be registered under that name. The daemon's `UserName` is the
 dedicated account; it starts at boot without a GUI login. Its executable is
 *bin/Runner.Listener* with the `run` argument. Updates are disabled at
 registration, so the operator must update the pinned runner when required.
+
 The installer sets */usr/local*, */usr/local/libexec*, and the hook
 directory to mode `755` with owner `root:wheel`. It verifies that the
 runner account can execute every hook and owns and can traverse its home.
 The installer rejects linked components in the runner root and home; the
-hooks reject a linked runner root.
-It sets the runner home and root to mode `700` and its `.credentials*`
-files to mode `600` after registration. The installer calls
-*tools/selfhosted-mac/prepare-service-files.sh* internally; run the
-installer, not that helper, for service setup.
+hooks reject a linked runner root. It sets the runner home and root to mode
+`700` and its `.credentials*` files to mode `600` after registration. The
+installer calls *tools/selfhosted-mac/prepare-service-files.sh* internally;
+run the installer, not that helper, for service setup.
 
 The daemon sets `ACTIONS_RUNNER_HOOK_JOB_STARTED` and
 `ACTIONS_RUNNER_HOOK_JOB_COMPLETED` to scripts outside the workspace. The
 hooks live in root-owned */usr/local/libexec/oseo-runner/* so a job cannot
-rewrite them. The start hook clears only the repository checkout, preserving
-Actions files and job metadata prepared by the runner. It also removes a
-stale own-key duration record if the runner's temp cleanup missed it. At
-completion, the hook clears the work tree and the contents of the
+rewrite them.
+
+The start hook clears only the repository checkout, preserving Actions files
+and job metadata prepared by the runner. It also removes a stale own-key
+duration record if the runner's temp cleanup missed it.
+
+At completion, the hook clears the work tree and the contents of the
 runner-managed job temp directory, *\_work/\_temp/*, preserving that
 directory itself and registration files. That includes the runner's
-action cache in *\_work/\_actions/*. Preserving the cache was tried, to
-stop every job re-downloading its actions, and measured as ineffective:
-the runner fetches them again whether or not the cache survives. See
-*PLAN-GATE.md* (U30). The daemon's
-*oseo-temp/* is separate: the live listener keeps .NET pipes and sockets
-there, and worker and job processes can leave cache files. Hooks never
-clear it. Inspect its size through the health check and remove stale files
-only while the daemon is stopped. Either hook removes the Zig cache under
-the runner account home reported by the directory service when the cache
-exceeds `OSEO_ZIG_CACHE_CAP_GIB`, 30 GiB by default, or when free disk falls
-below 40 GiB on the 228 GiB volume. The free-space prune is the backstop
-and skips the size measurement. The installer writes the cap into the
-LaunchDaemon environment and rejects a value that is not a whole number of
-GiB from 1 to 38, the derived two-account ceiling; the hook falls back to 30
-GiB for such a value. Measuring a cache near the cap took a measured 1.1 to 3.3
-seconds per hook on synthetic trees in [U26 evidence]. The hook requires
-`$HOME` to resolve to that home and rejects linked home or cache paths. A
-skipped prune or a failed measurement is logged and keeps the cache. The hook
-removes runner diagnostic logs older than seven days; launchd output is
-discarded. Check the daemon, recent diagnostics, and disk with
-*tools/selfhosted-mac/health.sh* under `sudo`. Keep the runner account, root,
-hook scripts, and logs inaccessible to other standard accounts. Keep the
-machine isolated from the home LAN and do not mount personal data or
-credentials into jobs.
+action cache in *\_work/\_actions/*. Preserving the cache to stop every job
+re-downloading its actions was tried and measured as ineffective: the runner
+fetches them again whether or not the cache survives. See *PLAN-GATE.md*
+(U30).
+
+The daemon's *oseo-temp/* is separate: the live listener keeps .NET pipes
+and sockets there, and worker and job processes can leave cache files.
+Hooks never clear it. The hook's IPC preservation has local test evidence
+only. Inspect its size through the health check and remove stale files only
+while the daemon is stopped.
+
+Either hook removes the Zig cache under the runner account home reported by
+the directory service when the cache exceeds `OSEO_ZIG_CACHE_CAP_GIB`,
+30 GiB by default, or when free disk falls below 40 GiB on the 228 GiB
+volume. The free-space prune is the backstop and skips the size
+measurement. The installer writes the cap into the LaunchDaemon environment
+and rejects a value that is not a whole number of GiB from 1 to 38, the
+derived two-account ceiling; the hook falls back to 30 GiB for such a value.
+
+Measuring a cache near the cap took 1.1 to 3.3 seconds per hook on
+synthetic trees in [U26 evidence]. The hook requires `$HOME` to resolve to
+that home and rejects linked home or cache paths. A skipped prune or a
+failed measurement is logged and keeps the cache.
+
+The hook removes runner diagnostic logs older than seven days; launchd
+output is discarded. Check the daemon, recent diagnostics, and disk with
+*tools/selfhosted-mac/health.sh* under `sudo`.
+
+Keep the runner account, root, hook scripts, and logs inaccessible to other
+standard accounts. Keep the machine isolated from the home LAN and do not
+mount personal data or credentials into jobs.
 
 The operator grants **Developer Tools** to the exact
 *bin/Runner.Listener* executable used by the LaunchDaemon. The U17
@@ -196,20 +208,11 @@ SSH results do not verify this path. [U21 evidence] observed 11.29 to
 12.90 seconds before an SSH Developer Tools grant and 0.108 to 0.109 seconds
 after it. After granting access, restart the daemon with
 `sudo launchctl kickstart -k system/org.oseo.runner.oseo-mac-1`, then verify
-the grant with the runner probe. In run `37181275283`, attempt 2 before the
-restart observed one-worker totals of 14,489 ms for 48 fresh Zig executions
-and 497 ms for their second executions. Apple clang's first executions took
-13,743 ms. Attempt 3 after the restart observed one-worker totals of
-554 ms and 494 ms for Zig, and 544 ms for Apple clang's first executions.
-The first-execution penalty was absent; the one-worker runner total
-remained above the 108 ms SSH observation. Test262 shard 1/100 observed
-58.5 seconds with 60 fragment objects built before the restart, then
-25.1 seconds with all 60 reused. Those cache states differ, so the shard
-times do not isolate the grant. Attempt 1 logged missing hooks; the
-inaccessible parent directory was then identified. Attempts 2 and 3
-showed the old hook removing live listener IPC. The revised hook's IPC
-preservation has local test evidence only. The operator should
-review and remove the earlier SSH-wrapper grant if it is no longer needed.
+the grant with the runner probe. After the grant, the first-execution
+penalty is absent; the one-worker runner total remains above the 108 ms SSH
+observation. The revised hook's IPC preservation has local test evidence
+only. The operator should review and remove the earlier SSH-wrapper grant if
+it is no longer needed.
 
 
 Installing the updated hooks
@@ -497,7 +500,7 @@ uses: the health check under `sudo` for each label, the U17 first-execution
 probe through each listener, and free disk during the first runs. Then enable
 the switch for a two-attempt branch push and compare the four lanes with the
 two-lane measurements in *PLAN-GATE.md*. Expect the first attempt to be
-slower than the second: in branch run `38551733723` the second machine's
+slower than the second. In branch run `38551733723`, the second machine's
 `oseo-mac-3` took a measured 81 min of serial work for its five jobs with an
 empty Zig cache and 60.3 min for the same five with a warm one.
 
@@ -523,22 +526,20 @@ must run from a checkout that includes *tools/selfhosted-mac/lane-labels.txt*.
 
 The lane model reuses the M6 per-family ratios, one-lane job walls, and pair
 slowdowns for this machine. These model inputs have not been validated on
-the rented machine, and its memory and cache pressure are also unmeasured;
-measure runner-mode walls, memory pressure, swap, and cache
-behavior before treating the forecast as observed performance. Its 16 GB
-RAM may constrain two concurrent jobs. U30 and U35 in *PLAN-GATE.md* record
-16 GiB for the second and third owned machines; the setup section for the
-second owned machine describes the first owned machine as the same hardware
-class. No larger owned-machine RAM
-configuration is recorded here.
+the rented machine, and its memory and cache pressure are also unmeasured.
+Measure runner-mode walls, memory pressure, swap, and cache behavior before
+treating the forecast as observed performance. Its 16 GB RAM may constrain
+two concurrent jobs. U30 and U35 in *PLAN-GATE.md* record 16 GiB for the
+second and third owned machines; the setup section for the second owned
+machine describes the first owned machine as the same hardware class. No
+larger owned-machine RAM configuration is recorded here.
 
 With current costs, the six-lane model ends at 47.31 min and the eight-lane
 model at 40.87 min, limited by a hosted lane. These are modeled values;
 partial hosted fallback and the rented machine's actual performance remain
 unmeasured. Landing before registration preserves required work: the probe
-emits hosted
-`macos-15` independently for each missing or offline runner. After the rental
-ends, absent runners take that same fallback path.
+emits hosted `macos-15` independently for each missing or offline runner.
+After the rental ends, absent runners take that same fallback path.
 
 
 Security and activation
@@ -548,9 +549,11 @@ The repository uses read-only default workflow permissions and requires
 approval for all external fork contributors. Inspect fork workflow changes
 before approval, especially edits to self-hosted labels, triggers, and
 secrets. A PR can modify workflow code, so the generated push condition alone
-does not secure the runner. Never expose the availability PAT to a job on
-the Mac. Keep a short PAT expiry and rotate it before expiry. Monitor queued
-jobs, logs, runner updates, disk, and host sleep behavior.
+does not secure the runner.
+
+Never expose the availability PAT to a job on the Mac. Keep a short PAT
+expiry and rotate it before expiry. Monitor queued jobs, logs, runner
+updates, disk, and host sleep behavior.
 
 Keep the switch off for the first branch CI run. After the operator completes
 installation, run the U17 probe through the runner and a complete test job.

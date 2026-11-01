@@ -167,7 +167,7 @@ The last four stress cases exist because each names one rule the
 edition states and no candidate component reproduces for free. They are
 described where the external-component probe reads them.
 
-Two of the probes run over a subset of the corpus and say why:
+Two of the probes run over a subset of the corpus:
 
  -  A dynamic program can carry only what the runtime's own pattern
     compiler admits, which is 25 of the 29. It excludes
@@ -182,14 +182,15 @@ Two of the probes run over a subset of the corpus and say why:
     most entries name a single repetition and a timed program would
     otherwise measure a match over a handful of characters. It excludes
     `word-scan` and `sticky-attempt` because a reused object keeps a
-    `lastIndex` cursor that would be measured instead of the match,
-    `nested-quantifier`, `ambiguous-alternation`, and `empty-repetition`
-    because one attempt over that subject reaches an owned boundary, and
-    `lazy-any-scan` because one attempt costs 667,851 steps, which would
-    measure only itself. Three of those four exclusions are a property
-    of the longer subject rather than of the entry's own input: over the
-    input each entry names, `nested-quantifier` spends 1,834,918 steps
-    and `ambiguous-alternation` 16,366 without reaching a boundary.
+    `lastIndex` cursor that would be measured instead of the match. It
+    excludes `nested-quantifier`, `ambiguous-alternation`, and
+    `empty-repetition` because one attempt over that subject reaches an
+    owned boundary. It excludes `lazy-any-scan` because one attempt
+    costs 667,851 steps, which would measure only itself. Three of
+    those four exclusions are a property of the longer subject rather
+    than of the entry's own input: over the input each entry names,
+    `nested-quantifier` spends 1,834,918 steps and
+    `ambiguous-alternation` 16,366 without reaching a boundary.
 
 
 Artifact storage
@@ -260,62 +261,63 @@ the program.
 | `unset-backreference`      | 12           | 4         | -              | -                    | -       | backreference             |
 | `ignore-case-closure`      | 9            | 4         | 1              | 3                    | 9       | none                      |
 
-The ordered matcher takes all 29, which is what makes it the semantic
-authority. The automaton path this probe models refuses a backreference
-and a lookaround instead of transforming either, so 4 of the 29 here
-need the fallback the strategy item requires: `lookbehind-greedy`,
-`lookbehind-backreference`, `deep-lookaround`, and
-`unset-backreference`. That is this probe's modeled path rather than a
-result about automata: a lookaround over a regular subexpression and
-some backreference patterns do denote regular languages, and a path that
-transformed them would have to be built and measured separately. An assertion
-is a weaker blocker: a simulation evaluates `^`, `$`, and `\b` at each
-position, so the 9 patterns blocked only by an assertion stay available to an
-automaton path, while a deterministic automaton would have to widen its state
-with the preceding character class to keep them. This probe does not measure
-that widening, so those rows report a configuration count and no deterministic
-state count. A deterministic state count includes the dead state a failed
-transition leads to.
+The ordered matcher takes all 29, which makes it the semantic authority.
+The automaton path this probe models refuses a backreference and a
+lookaround instead of transforming either, so 4 of the 29 here need the
+fallback the strategy item requires: `lookbehind-greedy`,
+`lookbehind-backreference`, `deep-lookaround`, and `unset-backreference`.
+That is this probe's modeled path rather than a result about automata. A
+lookaround over a regular subexpression and some backreference patterns do
+denote regular languages; a path that transformed them would have to be
+built and measured separately.
+
+An assertion is a weaker blocker. A simulation evaluates `^`, `$`, and
+`\b` at each position, so the 9 patterns blocked only by an assertion stay
+available to an automaton path. A deterministic automaton would have to
+widen its state with the preceding character class to keep them. This
+probe does not measure that widening, so those rows report a configuration
+count and no deterministic state count. A deterministic state count
+includes the dead state a failed transition leads to.
 
 An alphabet symbol is the representative of one interval the program's
 consuming sets induce. The closing sentinel of an inversion list that
-reaches the top of the code space is not one, because the interval it
-would open holds no code point, so a negated class such as
-`property-escape-negated` reports 2 symbols rather than 3.
+reaches the top of the code space is not one. The interval it would open
+holds no code point, so a negated class such as `property-escape-negated`
+reports 2 symbols rather than 3.
 
 Two rows carry the state-explosion warning the plan asks about. The
 counted repetition in `large-bounded-repetition` is one loop and one
 counter in the artifact and 4,001 configurations in an automaton, and
 `email-address` reaches 23,499 configurations from two `{0,61}` bounds
-that an artifact stores in two registers. Neither exhausts the reviewed
+that the artifact stores in two registers. Neither exhausts the reviewed
 caps of 65,536 configurations, 4,096 deterministic states, and 2,048
 alphabet symbols, so no row in this corpus was capped.
 
 ### What the ordered matcher does today
 
-`steps` is the executor's own deterministic work counter, so it is the
-same on every host. Neither column beside it measures this executor, and
-only one of the two is a bound. `span` is a coordinate of the reported
-answer rather than work: it is the positions up to the end of the match
-on a matched row, the subject's whole position count on a row that
-reported no match, and nothing on a row that reached a boundary and so
-has no answer to describe. Reading it as a cost is wrong in both
-directions: a sticky or an anchored failure is settled at the first
-position and still prints the whole subject, and a pattern such as `$`
-reports a match at an end that no engine has to read through to find.
-`ceiling` is the configurations times one more than the subject's
-position count, which bounds the configuration visits a simulation
-performs; it excludes the epsilon-closure work each visit needs, so it
-understates the cost of a visit while it overstates how many of them
-happen.
+`steps` is the executor's own deterministic work counter, so it is the same on
+every host. Neither column beside it measures this executor, and only one of
+the two is a bound.
 
-A position is not always a code unit. In unicode mode the matcher
-advances over a surrogate pair once, so `positions` counts code points
-there and code units otherwise, and both columns are counted in
-positions. `units` stays the subject's code-unit length, which is its
-size and the unit every capture index is measured in. Only
-`property-escape-negated` over its `mixed` subject separates the two in
-this corpus, at 704 units and 640 positions.
+`span` is a coordinate of the reported answer rather than work. It is the
+positions up to the end of the match on a matched row, the subject's whole
+position count on a row that reported no match, and nothing on a row that
+reached a boundary and so has no answer to describe. Reading it as a cost is
+wrong in both directions: a sticky or an anchored failure is settled at the
+first position and still prints the whole subject, and a pattern such as `$`
+reports a match at an end that no engine has to read through to find.
+
+`ceiling` is the configurations times one more than the subject's position
+count. It bounds the configuration visits a simulation performs. It excludes
+the epsilon-closure work each visit needs, so it understates the cost of a
+visit while it overstates how many of them happen.
+
+A position is not always a code unit. In unicode mode the matcher advances over
+a surrogate pair once, so `positions` counts code points there and code units
+otherwise, and both columns are counted in positions. `units` stays the
+subject's code-unit length, which is its size and the unit every capture index
+is measured in. Only `property-escape-negated` over its `mixed` subject
+separates the two in this corpus, at 704 units and 640 positions.
 
 | Pattern                    | Input       | Outcome   | Units | Positions | Steps      | Span  | Ceiling | Attempt      |
 | -------------------------- | ----------- | --------- | ----- | --------- | ---------- | ----- | ------- | ------------ |
@@ -375,40 +377,39 @@ Resource behavior
 The peak entry counts are measured rather than estimated. Lowering an
 owned limit can only replace an answer with that limit's failure, so the
 smallest backtrack-entry and trail-entry limits at which an attempt
-still reaches its ordinary answer are its peaks, and the probe searches
-for them with the other limits at their reviewed defaults. It doubles
-from one before it bisects, because a sufficient limit is the expensive
-question: it runs the attempt to completion where an insufficient one
-stops at the boundary.
+still reaches its ordinary answer are its peaks. The probe searches for
+them with the other limits at their reviewed defaults. It doubles from
+one before it bisects. A sufficient limit is the expensive question,
+because the probe runs the attempt to completion; with an insufficient
+one, the attempt stops at the boundary.
 
 The ordinary answer is whatever the reviewed defaults produce, and a
 reached step boundary is one of them. A pattern that exhausts the step
 limit still holds a finite stack and a finite trail while it does, so
 `empty-repetition` reports its peaks like every other row. A dimension
 is left empty only when the ordinary answer is that dimension's own
-boundary. That says its peak is above the reviewed limit, which is the
-largest value this search can ask about, not that the attempt has no
-peak. No row in this corpus is in that position.
+boundary. An empty dimension means the peak is above the reviewed
+limit, the largest value this search can ask about, not that the
+attempt has no peak. No row in this corpus is in that position.
 
 The entry counts are what this probe measures. The two byte columns
 beside them are derived from those counts and from the runtime's own
-layout, which charges 16 for a backtrack entry, a `uint32_t` resume
-address with an `int64_t` input position and a `uint32_t` trail height,
-and 12 for a trail entry, a `uint32_t` register index with its `int64_t`
-previous value.
+layout. That layout charges 16 for a backtrack entry, a `uint32_t`
+resume address with an `int64_t` input position and a `uint32_t` trail
+height, and 12 for a trail entry, a `uint32_t` register index with its
+`int64_t` previous value.
 
 `packed` is what the peaks occupy at those widths. `arrays` is what the
 runtime requests for them: each array is allocated at 64 entries,
-doubles when it fills, and never shrinks within an attempt, so a peak is
+doubles when it fills, and never shrinks within an attempt. A peak is
 rounded up to 64 or to the next power of two, and the `int64_t` register
 array is added.
 
 Neither is one attempt's total memory. `arrays` is exact for the five
 growing arrays and the registers it names, and charges no allocator
 rounding or bookkeeping, no machine structure, and nothing the matcher
-holds outside them. Every conclusion below is about that work area
-rather than about a process, and is drawn from `arrays` rather than from
-`packed`.
+holds outside them. The conclusions below are about that work area, not
+a process, and are drawn from `arrays` rather than from `packed`.
 
 | Pattern                    | Input        | Outcome      | Steps      | Backtrack peak | Trail peak | Packed | Arrays | Build    |
 | -------------------------- | ------------ | ------------ | ---------- | -------------- | ---------- | ------ | ------ | -------- |
@@ -442,7 +443,7 @@ Three results matter for the decision:
     counterpart, keeping 5,124 register writes over a 2,560-character
     scan.
  -  Compile work is small and has one outlier.
-    `lookbehind-backreference` costs 243.9 us to build against 2.8 to
+    `lookbehind-backreference` costs 243.9 us to build, against 2.8 to
     83.0 us for every other pattern, because `i` with a backreference is
     the one shape that has to carry a complete `Canonicalize` table into
     the artifact.
@@ -454,22 +455,22 @@ Three results matter for the decision:
     code-size probe records below.
 
 Two properties the plan lists for this probe are not measured here.
-Native stack use is not, because the executor keeps its choices in an
-explicit stack and the probe observes that stack's height rather than
-the C call stack. Cleanup after failure is not, because the
-compiler-side executor allocates nothing to release; the runtime's work
-area is what would have to be observed, and the reviewed native gates
-own that under their sanitizers.
+Native stack use is not measured: the executor keeps its choices in an
+explicit stack, and the probe observes that stack's height rather than
+the C call stack. Cleanup after failure is not measured either, because
+the compiler-side executor allocates nothing to release. The runtime's
+work area is what would have to be observed, and the reviewed native
+gates own that under their sanitizers.
 
 
 Unicode data
 ------------
 
-Every layout is measured from the pinned Unicode 17.0.0 tables. The
-question the plan asks this probe to own is what a dynamic pattern must
-carry into the runtime before the runtime's own property boundary can
-move, and the answer is the whole of the first table below, because a
-dynamic pattern names its property at run time.
+Every layout is measured from the pinned Unicode 17.0.0 tables. The plan asks
+this probe to own one question: what a dynamic pattern must carry into the
+runtime before the runtime's own property boundary can move. Because a dynamic
+pattern names its property at run time, the answer is the whole of the first
+table below.
 
 | Group              | Sets | Boundaries | Code points | Inversion | Inversion varint | Bitmap    | Per-set trie | Search steps |
 | ------------------ | ---- | ---------- | ----------- | --------- | ---------------- | --------- | ------------ | ------------ |
@@ -479,47 +480,45 @@ dynamic pattern names its property at run time.
 | Script extensions  | 176  | 4,174      | 1,115,103   | 16,696    | 4,975            | 1,448,696 | 1,558,912    | 11           |
 | Word characters    | 2    | 20         | 128         | 80        | 22               | 16,384    | 17,600       | 4            |
 
-Two more tables complete the demand. Simple case folding is 1,512
-entries, 12,096 bytes as code-point pairs and 3,480 bytes as base-128
-deltas with a zigzag-encoded signed distance to the target; it is the
-one table a matcher cannot resolve while it builds an artifact, because
-an ignore-case backreference folds an input character at match time. The
-seven properties of strings hold 7,906 sequences of at most 10 code
-points, 114,924 bytes as sequences with their lengths.
+Two more tables complete the demand. Simple case folding is 1,512 entries,
+12,096 bytes as code-point pairs and 3,480 bytes as base-128 deltas with a
+zigzag-encoded signed distance to the target. It is the one table a matcher
+cannot resolve while it builds an artifact, because an ignore-case
+backreference folds an input character at match time. The seven properties of
+strings hold 7,906 sequences of at most 10 code points, 114,924 bytes as
+sequences with their lengths.
 
 The payload a dynamic pattern compiler would carry to reach all of it is
-therefore 311,460 bytes: the five groups as inversion lists, the
-case-folding mapping as pairs, and the properties of strings. That is a
-total for one selected layout rather than a floor. It charges no
-property-name table, no per-set index, and none of the code the lookups
-need, and substituting a cheaper layout for one group lowers it:
-answering the general categories from the classifier below instead of
-from inversion lists takes the same payload to 308,708 bytes.
+therefore 311,460 bytes: the five groups as inversion lists, the case-folding
+mapping as pairs, and the properties of strings. That total is for one selected
+layout, not a floor. It charges no property-name table, no per-set index, and
+none of the code the lookups need. Substituting a cheaper layout for one group
+lowers it: answering the general categories from the classifier below instead
+of from inversion lists takes the same payload to 308,708 bytes.
 
-A per-set trie is the worst layout in every group, because each set pays
-for its own block index. The layout that makes a constant-time lookup
-affordable is one shared classifier over an enumerated property's
-disjoint values, with one bit for each queryable value so that a union
-such as `General_Category=L` is answered from the same table:
+A per-set trie is the worst layout in every group, because each set pays for
+its own block index. The layout that makes a constant-time lookup affordable is
+one shared classifier over an enumerated property's disjoint values, with one
+bit for each queryable value so that a union such as `General_Category=L` is
+answered from the same table:
 
 | Classifier         | Disjoint values | Queries | Unique blocks of 256 | Shared bytes | Mask bytes | Separate tries |
 | ------------------ | --------------- | ------- | -------------------- | ------------ | ---------- | -------------- |
 | `General_Category` | 30              | 38      | 162                  | 50,176       | 152        | 376,192        |
 | `Script`           | 176             | 176     | 165                  | 50,944       | 4,048      | 1,553,376      |
 
-So the candidate shapes have measured costs. Inversion lists as 32-bit
-boundaries cost 184,440 bytes for the five groups and answer in at most
-11 comparisons. The same lists as deltas cost 50,052 bytes and have to
-be decoded before they can be searched. Shared classifiers for the two
-enumerated properties cost 105,320 bytes with their masks and answer in
-two loads, but they answer only about those two properties, so the 53
-binary properties still need their own representation.
+Inversion lists as 32-bit boundaries cost 184,440 bytes for the five groups and
+answer in at most 11 comparisons. The same lists as deltas cost 50,052 bytes
+and have to be decoded before they can be searched. Shared classifiers for the
+two enumerated properties cost 105,320 bytes with their masks and answer in two
+loads. They answer only about those two properties, so the 53 binary properties
+still need their own representation.
 
-An ahead-of-time literal carries none of this. The builder resolves
-every escape into an inversion list while it builds the artifact, so the
-whole 29-pattern corpus carries 1,976 bytes of sets and one 9,352-byte
-canonicalization table against the 311,460-byte payload a dynamic
-pattern needs to reach every admitted property.
+An ahead-of-time literal carries none of this. The builder resolves every
+escape into an inversion list while it builds the artifact, so the whole
+29-pattern corpus carries 1,976 bytes of sets and one 9,352-byte
+canonicalization table against the 311,460-byte payload a dynamic pattern needs
+to reach every admitted property.
 
 
 Code size and first-use cost
@@ -553,7 +552,7 @@ once and prints one digit for each. Both shapes are compared pattern by
 pattern rather than by a sum in which two disagreements could cancel.
 
 A timed program embeds its own subject rather than the one its corpus
-entry names, repeating the entry's unit until one more copy would pass
+entry names. It repeats the entry's unit until one more copy would pass
 512 code units, which lands each subject between 493 and 512 of them.
 That is why the three timed programs carry more generated C than
 `literal-all` does over ten more patterns: the subject is the larger
@@ -574,9 +573,9 @@ separates a fixed cost from a per-evaluation one. It keeps the
 statements the others wrap around their evaluations, the answer string
 and the line that prints it, and makes no evaluation at all, so it links
 no matcher while costing everything else those programs cost. The
-difference between two controls is then what one more evaluation costs,
-and what is left of `literal-control-one` against `literal-control-none`
-is the fixed cost alone. `baseline` cannot play that part: it prints a
+difference between two controls is what one more evaluation costs, and
+what is left of `literal-control-one` against `literal-control-none` is
+the fixed cost alone. `baseline` cannot play that part: it prints a
 constant and does not build an answer, so a difference against it also
 carries statements that have nothing to do with the matcher, which is
 4,984 bytes of executable and 2,832 bytes of text here.
@@ -586,17 +585,15 @@ are *runtime\_regexp.c* at 220,584 object bytes and 21,783 text bytes,
 *runtime\_regexp\_matcher.c* at 261,320 and 29,984, and
 *runtime\_regexp\_symbol.c* at 136,416 and 12,499.
 
-Derived from those observations:
-
  -  One corpus literal costs 1,717 bytes of generated C, 1,270 bytes of
     generated object, and 1,149 bytes of executable above the smallest
     artifact, from `literal-all` against `literal-control` over the same
     29 patterns.
  -  A literal costs no executable text at all. Those two programs report
     the same 1,097,354 text bytes and differ by 4 object text bytes over
-    29 patterns, and the one-pattern pair reports the same 907,578 text
-    bytes and the same 12,090 object text bytes, which says the artifact
-    a literal adds is data the linker places outside `.text` rather than
+    29 patterns. The one-pattern pair reports the same 907,578 text
+    bytes and the same 12,090 object text bytes, so the artifact a
+    literal adds is data the linker places outside `.text` rather than
     code. A candidate that lowered a pattern to C control flow instead
     would spend text where this one spends none, and 1,149 bytes for
     each pattern is the budget it would have to fit.
@@ -605,7 +602,7 @@ Derived from those observations:
     against `literal-control` over 28 more evaluations. That is the site
     rather than the pattern: the statement, the fresh object, the call,
     and the answer it appends.
- -  Reaching the matcher at all then costs about 705 bytes of executable
+ -  Reaching the matcher at all costs about 705 bytes of executable
     and 6 bytes of text, which is what is left of `literal-control-one`
     against `literal-control-none` once one evaluation is charged at the
     figure above. Almost nothing about this family is a one-time cost a
@@ -626,7 +623,7 @@ Derived from those observations:
     3.2 us more than evaluating a compiled literal, from
     `dynamic-construct` against `literal-match` over the same 38,000
     attempts. Both evaluate a fresh object for every attempt, so the
-    allocation cancels, but what is left is a whole `new RegExp`
+    allocation cancels. What is left is a whole `new RegExp`
     evaluation rather than compilation alone: the constructor call, its
     two string arguments, and the argument handling the edition
     specifies sit inside the figure beside the pattern compiler.
@@ -678,27 +675,32 @@ External component
 The candidate is PCRE2 in its 16-bit form, because a subject is UTF-16
 and a component that accepts only UTF-8 would be measured through a
 conversion. The harness in *tools/regexp-probes/pcre2-probe.c* owns the
-option mapping: `PCRE2_UTF` only for a `u` or `v` pattern, because
-without those flags the edition matches over UTF-16 code units;
-`PCRE2_DOLLAR_ENDONLY` because `$` in the edition never matches before a
-final line terminator; `PCRE2_MATCH_UNSET_BACKREF` because a reference
-to a group that did not participate matches the empty string;
-`PCRE2_ALT_BSUX` with `PCRE2_EXTRA_ALT_BSUX` for the edition's `\u`
-escapes; and no `PCRE2_UCP`, because the edition's `\d` is ASCII
-whatever the Unicode mode says.
+option mapping:
+
+ -  `PCRE2_UTF` only for a `u` or `v` pattern, because without those
+    flags the edition matches over UTF-16 code units.
+ -  `PCRE2_DOLLAR_ENDONLY`, because `$` in the edition never matches
+    before a final line terminator.
+ -  `PCRE2_MATCH_UNSET_BACKREF`, because a reference to a group that
+    did not participate matches the empty string.
+ -  `PCRE2_ALT_BSUX` with `PCRE2_EXTRA_ALT_BSUX`, for the edition's
+    `\u` escapes.
+ -  No `PCRE2_UCP`, because the edition's `\d` is ASCII whatever the
+    Unicode mode says.
 
 Two class escapes have no faithful mapping in either direction, so they
 are left unmapped and measured instead. The edition's `\s` is not
 ASCII: it holds NBSP, ZWNBSP, and every `Space_Separator`, and its line
 terminators add U+2028 and U+2029. Without `PCRE2_UCP` this component's
 `\s` is narrower than that, and with `PCRE2_UCP` it becomes the Unicode
-`White_Space` property, which is a third set again. The edition's `\w`
-is ASCII only until `i` and a unicode-mode flag are both set: U+017F and
-U+212A fold into the basic word set, so `\w` admits them there, and
-neither this component's ASCII `\w` nor its `PCRE2_UCP` `\w` is that
-set. The corpus carries `unicode-whitespace` and
-`folded-word-character` so each difference is a measured row rather than
-a claim.
+`White_Space` property, which is a third set again.
+
+The edition's `\w` is ASCII only except when `i` and a unicode-mode flag
+are both set. U+017F and U+212A fold into the basic word set, so `\w`
+admits them there. Neither this component's ASCII `\w` nor its
+`PCRE2_UCP` `\w` is that set. The corpus carries `unicode-whitespace`
+and `folded-word-character` so each difference is a measured row rather
+than a claim.
 
 `y` maps to `PCRE2_ANCHORED`, because the owned side honors it: a
 matcher program carries the flag and the owned search stops after the
@@ -767,7 +769,7 @@ fixed-length, so a lookbehind that contains one becomes unlimited and
 is refused. Compiling `((\w)\w)(?<=\1\2\1)` with `PCRE2_CASELESS`
 alone succeeds and with `PCRE2_CASELESS | PCRE2_MATCH_UNSET_BACKREF`
 fails with error 125. Two rules the edition states independently cannot
-both be honored by this component at once.
+both be honored by this component.
 
 The last difference runs the other way and is the most useful
 measurement in this section, because it is not about semantics:

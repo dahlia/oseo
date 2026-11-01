@@ -126,9 +126,10 @@ Calling an asynchronous function immediately returns an M4 promise. The
 frontend converts each suspension suffix into a private continuation closure.
 `await` uses promise resolution, returns from the native call, and resumes that
 closure through one queued reaction. Captured environments retain locals across
-suspension without retaining a native C stack frame. A thrown completion
-rejects the function promise. A returned value fulfills it after promise
-resolution.
+suspension without retaining a native C stack frame.
+
+A thrown completion rejects the function promise. A returned value fulfills it
+after promise resolution.
 
 Linked module bodies become private evaluators in one native program. A
 top-level await returns from its evaluator and resumes a generated continuation

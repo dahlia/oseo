@@ -75,6 +75,7 @@ as `this`; plain calls pass `undefined` under the M3 function-body contract.
 Function bodies may read `this`. `new` accepts an admitted function value,
 creates a receiver whose prototype comes from the function's `prototype`
 property, and returns the explicit object result or otherwise the receiver.
+
 Every function has own `name` and `length` data properties. They are
 non-writable, non-enumerable, and configurable. `length` is the number of plain
 parameters. Named functions retain their declared name; anonymous functions
@@ -111,11 +112,13 @@ Specialization
 M3 specializes named property reads with an explicit backend-neutral MIR graph.
 The graph checks object kind, then checks a private monomorphic call-site cache
 for dictionary state, layout identity, and slot bounds. Each cache belongs to
-one static named-key site, so the hit path reads a fixed slot without allocating
-the key or entering generic lookup. Any miss materializes the key in one generic
-lookup block, may relearn a stable own slot, and joins the hit result at one
-continuation. Deletion, descriptor change, prototype mutation, another layout,
-or a non-object receiver cannot reuse the cached slot. Disabling specialization
+one static named-key site, so the hit path reads a fixed slot without
+allocating the key or entering generic lookup. Any miss materializes the key in
+one generic lookup block, may relearn a stable own slot, and joins the hit
+result at one continuation.
+
+Deletion, descriptor change, prototype mutation, another layout, or a
+non-object receiver cannot reuse the cached slot. Disabling specialization
 removes this graph while preserving observable behavior.
 
 
@@ -152,7 +155,7 @@ Negative profile boundaries
 ---------------------------
 
 Each withheld syntax family receives a source-located `OSEO1001` diagnostic.
-The negative corpus includes modules, promises, `async` and `await`, generators,
-classes, accessors, proxies, symbols, big integers, regular expressions, typed
-arrays, destructuring, spread, arrows, optional chaining, and dynamic import.
-No withheld form receives approximate semantics.
+The negative corpus includes modules, promises, `async` and `await`,
+generators, classes, accessors, proxies, symbols, big integers, regular
+expressions, typed arrays, destructuring, spread, arrows, optional chaining,
+and dynamic import. No withheld form receives approximate semantics.

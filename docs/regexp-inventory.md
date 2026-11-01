@@ -10,7 +10,7 @@ planned, and it is updated by the unit that changes one of those facts.
 
 The edition boundary is ECMAScript 2025, fixed by
 [ADR 0013](./adr/0013-m5-edition-and-manifest.md). Annex B is outside that
-claim, which is what the pattern-grammar section below turns into a
+claim; the pattern-grammar section below turns this into a
 concrete acceptance rule.
 
 
@@ -42,10 +42,10 @@ Applicable test262 directories
 
 Every count below is the applicable-test inventory in
 *tests/test262/inventory.tsv* at suite revision
-`f2d1435644797268dca1f7988cad5a4e89ccd8d2`, which
-[ADR 0020](./adr/0020-m5-applicable-test-inventory.md) defines. Every one
-of these paths is `included`: no regular expression path is excluded from
-the candidate boundary.
+`f2d1435644797268dca1f7988cad5a4e89ccd8d2`.
+[ADR 0020](./adr/0020-m5-applicable-test-inventory.md) defines that
+inventory. Every one of these paths is `included`: no regular expression
+path is excluded from the candidate boundary.
 
 | Directory                                       | Included paths |
 | ----------------------------------------------- | -------------- |
@@ -76,10 +76,11 @@ The Unicode property checkpoint selects all 625 paths under
 *test/built-ins/RegExp/CharacterClassEscapes/*. Of those, 142 parse-negative
 paths are expected negatives and 483 retain explicit boundaries for the
 RegExp intrinsic and execution, class set notation, or other later nodes.
+
 ADR 0013's reviewed dependency-tag vocabulary is extensible through a reviewed
 amendment to that record, and one now admits `regular-expressions`. These rows
 keep the existing tags they were reviewed under, because admitting a tag moves
-no reviewed row; retagging them is a separate reviewed change, and neither
+no reviewed row. Retagging them is a separate reviewed change, and neither
 change touches the classification vocabulary.
 
 
@@ -220,9 +221,9 @@ Which diagnostic a rejection reports follows from that list. Under `u` and
 itself requires and reports `OSEO0001`. Without them the text is one a web
 browser accepts, so the rejection is this claim's own boundary and reports
 `OSEO1001` naming Annex B. The generated invalid domain at seed
-`0x60004a01` asserts that split, and it uses the reported kind to decide
-when the host engines are a sound oracle: they agree with every
-`OSEO0001` rejection and with none of the Annex B ones.
+`0x60004a01` asserts that split. It uses the reported kind to decide when
+the host engines are a sound oracle: they agree with every `OSEO0001`
+rejection and with none of the Annex B ones.
 
 A rejection Annex B shares stays an early error in both modes. A
 quantified lookbehind, edge assertion, or word boundary, an out-of-order
@@ -241,13 +242,13 @@ the grammar's own alphabet found no pattern this parser calls invalid that
 a web browser accepts.
 
 The inventory's candidate roots are *test/built-ins/* and *test/language/*,
-so *test/annexB/* is outside it entirely, and the `u-invalid-` and
+so *test/annexB/* is outside it entirely. The `u-invalid-` and
 `unicode_restricted_` cases inside the boundary assert exactly the
 rejections above. Whether an included path also requires accepting one of
-these constructs without `u` is now measured for the 625 paths under
+these constructs without `u` is measured for the 625 paths under
 *test/built-ins/RegExp/CharacterClassEscapes/* and
 *test/built-ins/RegExp/property-escapes/*. None requires that Annex B
 acceptance. The next node that reviews another RegExp directory owns the
-same measurement for its paths, and a path that needs Annex B acceptance
+same measurement for its paths. A path that needs Annex B acceptance
 classifies as an unsupported profile feature rather than silently widening
 the grammar.

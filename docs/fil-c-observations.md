@@ -17,12 +17,12 @@ What Fil-C is
 [Fil-C] is Filip Pizlo's memory-safe implementation of C and C++. Its project
 documentation reports that many existing programs compile with no or minimal
 changes and that every memory safety violation becomes a defined panic. The
-language has no `unsafe` construct, although the *stdfil.h* runtime API keeps
-a small set of explicitly unsafe foreign-call functions such as
-`zunsafe_call`, and the guarantee does not extend across those calls. The
-GIMSO LLVM pass rewrites possibly-unsafe
-operations into checked ones, InvisiCaps carry the pointer capabilities those
-checks consult, and the FUGC collector defines deallocation behavior.
+language has no `unsafe` construct, but the *stdfil.h* runtime API keeps a
+small set of explicitly unsafe foreign-call functions such as `zunsafe_call`.
+The guarantee does not extend across those calls. The GIMSO LLVM pass rewrites
+possibly-unsafe operations into checked ones, InvisiCaps carry the pointer
+capabilities those checks consult, and the FUGC collector defines deallocation
+behavior.
 
  -  InvisiCaps keep pointers 64 bits wide by pairing an untrusted integer
     value with a trusted capability that lives outside the program-visible
@@ -57,7 +57,7 @@ External events
 ---------------
 
 On July 20, 2026, Andrew Kelley filed [ziglang/zig#36237], proposing a `fil`
-target ABI for Zig alongside `musl` and `gnu` that would apply Fil-C's
+target ABI for Zig alongside `musl` and `gnu`. The ABI would apply Fil-C's
 techniques to Zig-emitted code with no source changes. The issue is accepted
 and assigned to the Upcoming milestone. The same day, Filip Pizlo opened
 [pizlonator/fil-c#279] to freeze the x86-64 Fil-C ABI, stating that the
@@ -90,6 +90,7 @@ rest is an integer-typed 64-bit word in heap slots and root frames. Fil-C
 assigns no capability to an integer load, so a heap reference reloaded from a
 stored `OseoValue` could not be dereferenced. This is the pattern behind
 Ruby's 1 MB port, and the low-tag alternative measured in ADR 0004 shares it.
+
 A Fil-C-compatible runtime would need a different private representation,
 for example pointer-typed value slots or integer handles into pointer-typed
 tables. That change would reach the runtime, backend lowering, and the

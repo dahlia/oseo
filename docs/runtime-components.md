@@ -76,146 +76,135 @@ the include boundaries, and the one-definition rule on every change.
 
 Ownership follows the plan's target layout:
 
- -  *runtime\_core.c*: results, context lifecycle, diagnostics, call
-    limits, frames, root-stack operations, and immediate value
-    constructors;
- -  *runtime\_memory.c*: GC-managed heap allocation, the unmanaged
-    work-area allocator that shares its deterministic allocation-attempt
-    counter without collecting, publication, strong and ephemeron tracing,
-    weak-edge clearing, finalization-record scheduling, collection, and
-    destruction; [*PLAN-GC.md*](../PLAN-GC.md) owns the planned policy,
-    accounting, slot, descriptor, and collector evolution boundaries;
- -  *runtime\_binding.c*: environments, binding cells including the
-    hidden cells that report an unresolvable global reference, module
-    namespaces, and the realm's global this value with its own `globalThis`
-    property;
- -  *runtime\_string.c*: string values and the string half of a property
-    key, meaning allocation, content equality, ASCII name matching,
-    canonical array-index recognition, and the own properties a String
-    exotic object exposes, together with the `String` constructor,
-    %String.prototype%, and the `fromCharCode`, `fromCodePoint`, and
-    `raw` statics, together with the prototype case conversions, locale case
-    forms, trimming methods, Unicode normalization, and deterministic locale
-    comparison. *runtime\_unicode\_tables.h* is its generated, package-private
-    view of the pinned Unicode data;
- -  *runtime\_string\_match.c*: the `String.prototype` `match`,
-    `matchAll`, `search`, `split`, `replace`, and `replaceAll`
-    well-known-symbol dispatch, the RegExpCreate and Invoke tail that
-    `match`, `matchAll`, and `search` take when the operand carries no
-    method, the code-unit fallbacks the specification gives `split`,
-    `replace`, and `replaceAll`, the RegExp String iterator record and its
-    prototype, and the GetSubstitution replacement template every
-    replacement path shares;
- -  *runtime\_object.c*: ordinary object creation and layout, the
-    property vector and its growth, own-property lookup and removal,
-    cell-backed property recognition, shape identifiers and the
-    generated-code property caches, object coercibility checks, and
-    `[[SetPrototypeOf]]`;
- -  *runtime\_property.c*: the generic property access paths, meaning
-    `[[Get]]` and `[[Set]]` with their `super` forms and `HasOwnProperty`;
- -  *runtime\_descriptor.c*: `[[GetOwnProperty]]`,
-    `[[DefineOwnProperty]]` for data and accessor descriptors,
-    `[[Delete]]`, the `SameValue` comparison
-    `ValidateAndApplyPropertyDescriptor` performs, and the scan-free
-    append an exotic object filling a freshly created, empty receiver
-    with pairwise distinct keys uses in its place;
- -  *runtime\_array.c*: array exotic behavior, meaning array creation,
-    the `length` own property and its truncation rules, canonical index
-    keys, monotonic literal and spread accumulation, frozen template
-    objects, and the realm-owned `%Array.prototype%` methods;
+ -  *runtime\_core.c*: results, context lifecycle, diagnostics, call limits,
+    frames, root-stack operations, and immediate value constructors;
+ -  *runtime\_memory.c*: GC-managed heap allocation, the unmanaged work-area
+    allocator that shares its deterministic allocation-attempt counter without
+    collecting, publication, strong and ephemeron tracing, weak-edge clearing,
+    finalization-record scheduling, collection, and destruction;
+    [*PLAN-GC.md*](../PLAN-GC.md) owns the planned policy, accounting, slot,
+    descriptor, and collector evolution boundaries;
+ -  *runtime\_binding.c*: environments, binding cells including the hidden
+    cells that report an unresolvable global reference, module namespaces, and
+    the realm's global this value with its own `globalThis` property;
+ -  *runtime\_string.c*: string values and the string half of a property key:
+    allocation, content equality, ASCII name matching, canonical array-index
+    recognition, and the own properties a String exotic object exposes. It also
+    provides the `String` constructor, %String.prototype%, the `fromCharCode`,
+    `fromCodePoint`, and `raw` statics, the prototype case conversions, locale
+    case forms, trimming methods, Unicode normalization, and deterministic
+    locale comparison. *runtime\_unicode\_tables.h* is its generated,
+    package-private view of the pinned Unicode data;
+ -  *runtime\_string\_match.c*: the `String.prototype` `match`, `matchAll`,
+    `search`, `split`, `replace`, and `replaceAll` well-known-symbol dispatch,
+    the RegExpCreate and Invoke tail that `match`, `matchAll`, and `search`
+    take when the operand carries no method, the code-unit fallbacks the
+    specification gives `split`, `replace`, and `replaceAll`, the RegExp String
+    iterator record and its prototype, and the GetSubstitution replacement
+    template every replacement path shares;
+ -  *runtime\_object.c*: ordinary object creation and layout, the property
+    vector and its growth, own-property lookup and removal, cell-backed
+    property recognition, shape identifiers and the generated-code property
+    caches, object coercibility checks, and `[[SetPrototypeOf]]`;
+ -  *runtime\_property.c*: the generic property access paths, meaning `[[Get]]`
+    and `[[Set]]` with their `super` forms and `HasOwnProperty`;
+ -  *runtime\_descriptor.c*: `[[GetOwnProperty]]`, `[[DefineOwnProperty]]` for
+    data and accessor descriptors, `[[Delete]]`, the `SameValue` comparison
+    `ValidateAndApplyPropertyDescriptor` performs, and the scan-free append an
+    exotic object filling a freshly created, empty receiver with pairwise
+    distinct keys uses in its place;
+ -  *runtime\_array.c*: array exotic behavior, meaning array creation, the
+    `length` own property and its truncation rules, canonical index keys,
+    monotonic literal and spread accumulation, frozen template objects, and the
+    realm-owned `%Array.prototype%` methods;
  -  *runtime\_object\_builtin.c*: the `Object` built-ins and the own-key
     operations they share with object rest and spread, meaning
-    `ToPropertyDescriptor` field reads, `CopyDataProperties`, own-key
-    ordering, and the `Object.create`, `Object.defineProperty`,
+    `ToPropertyDescriptor` field reads, `CopyDataProperties`, own-key ordering,
+    and the `Object.create`, `Object.defineProperty`,
     `Object.defineProperties`, `Object.getOwnPropertyDescriptor`,
     `Object.keys`, and `Object.setPrototypeOf` entry points;
  -  *runtime\_number.c*: the `Number` constructor, branded wrapper state,
-    numeric constants, predicate statics, parser statics, the standard
-    global constructor property, the global `isFinite`, `isNaN`,
-    `parseFloat`, and `parseInt` function properties of 19.2, of which the
-    two parsers are the same function objects as the Number statics and
-    the two predicates convert their operand with `ToNumber` first, and
-    the `%Number.prototype%` formatting methods `toString`, `toFixed`,
-    `toExponential`, `toPrecision`, `toLocaleString`, and `valueOf`,
-    including the exact bignum arithmetic their rounding and radix
-    conversion share;
+    numeric constants, predicate statics, parser statics, the standard global
+    constructor property, the global `isFinite`, `isNaN`, `parseFloat`, and
+    `parseInt` function properties of 19.2, and the `%Number.prototype%`
+    formatting methods `toString`, `toFixed`, `toExponential`, `toPrecision`,
+    `toLocaleString`, and `valueOf`, including the exact bignum arithmetic
+    their rounding and radix conversion share. The `parseFloat` and `parseInt`
+    function properties are the same function objects as the Number statics,
+    and the `isFinite` and `isNaN` function properties convert their operand
+    with `ToNumber` first;
  -  *runtime\_boolean.c*: the `Boolean` constructor, branded wrapper
     construction, the false-valued `%Boolean.prototype%`, its `constructor`
-    link, its branded `toString` and `valueOf` methods, and the standard
-    global constructor property;
+    link, its branded `toString` and `valueOf` methods, and the standard global
+    constructor property;
  -  *runtime\_array\_buffer.c*: the `ArrayBuffer` and `SharedArrayBuffer`
     constructors, the Data Block or Shared Data Block one buffer owns,
     `isView`, both `Symbol.species` accessors, the `byteLength`, `detached`,
     `maxByteLength`, `resizable`, and `growable` accessors, the shared brand
-    every prototype member checks, and `resize`, `grow`, `slice`,
-    `transfer`, and `transferToFixedLength`;
+    every prototype member checks, and `resize`, `grow`, `slice`, `transfer`,
+    and `transferToFixedLength`;
  -  *runtime\_atomics.c*: the `Atomics` namespace object, integer-view
     validation and revalidation, the read-modify-write functions over raw
-    element bits, `compareExchange`, `isLockFree`, the suspending `wait`,
-    and the realm-owned WaiterList store that `waitAsync` fills and
-    `notify` and waiter timeout jobs drain, or the cluster's store when the
-    realm is one agent of a multi-agent cluster;
- -  *runtime\_agent.c*: agent clusters, the POSIX threads their agents run
-    on, the turn that lets exactly one agent evaluate at a time, the
-    cluster WaiterList, broadcasts, reports, cluster liveness and stall
-    detection, the ahead-of-time agent program table and its source
-    matching, and the test262 host object `$262` with its `agent` functions;
+    element bits, `compareExchange`, `isLockFree`, the suspending `wait`, and
+    the realm-owned WaiterList store that `waitAsync` fills and `notify` and
+    waiter timeout jobs drain, or the cluster's store when the realm is one
+    agent of a multi-agent cluster;
+ -  *runtime\_agent.c*: agent clusters, the POSIX threads their agents run on,
+    the turn that lets exactly one agent evaluate at a time, the cluster
+    WaiterList, broadcasts, reports, cluster liveness and stall detection, the
+    ahead-of-time agent program table and its source matching, and the test262
+    host object `$262` with its `agent` functions;
  -  *runtime\_realm.c*: realm records beyond the initial realm, the
     running-realm scope a call enters and leaves, GetFunctionRealm, the
-    realm-dependent defaults of GetPrototypeFromConstructor and of an
-    ordinary [[Construct]] receiver, the `%eval%` intrinsic that reports the
-    ADR 0016 boundary, and the test262 host's `createRealm` and `global`;
+    realm-dependent defaults of GetPrototypeFromConstructor and of an ordinary
+    [[Construct]] receiver, the `%eval%` intrinsic that reports the ADR 0016
+    boundary, and the test262 host's `createRealm` and `global`;
  -  *runtime\_regexp.c*: the `RegExp` constructor, `IsRegExp`,
     `OrdinaryCreateFromConstructor` allocation, `lastIndex`, dynamic pattern
-    and flag validation, immutable matcher artifact, `Symbol.species`,
-    built-in execution and its match result object, `exec`, `test`,
-    `toString`, the `source` and `flags` accessors, the eight individual
-    flag accessors, the ahead-of-time literal entry point with the
-    realm-local artifact cache its descriptors key, and the program reuse
-    that lets a copy of a branded RegExp borrow its ahead-of-time program
-    when the parse flags agree;
- -  *runtime\_regexp\_matcher.c*: the generic matcher, meaning the
-    pattern compiler that lowers one validated pattern into an owned
-    instruction program over a register file and the executor that runs
-    that program with an explicit backtrack stack and undo trail; it owns
-    the runtime's choice order, capture visibility, assertion and
-    lookaround behavior, backreference resolution, quantifier priority,
-    empty-progress failure, UTF-16 and code-point traversal, ignore-case
-    closure, the RegExpIdentifierName decoder the validator shares, and the
-    reviewed instruction, register, step, backtrack, and trail boundaries;
- -  *runtime\_regexp\_symbol.c*: the five `RegExp.prototype`
-    well-known symbol methods of 22.2.6 and the `RegExp.escape` static of
-    22.2.5, meaning their receiver requirement, their `flags`,
-    `lastIndex`, `constructor`, and `Symbol.species` reads, the
-    `SpeciesConstructor` and `Construct` steps `@@matchAll` and `@@split`
-    take, `AdvanceStringIndex`, the replacement list `@@replace` collects
-    before it builds, and `EncodeForRegExpEscape`. It executes only
-    through `RegExpExec`, so an overridden `exec` is observed, and it owns
-    no pattern grammar, matcher, or String entry point of its own;
- -  *runtime\_math.c*: the `Math` namespace object, its eight value
-    properties, its `Symbol.toStringTag`, the thirty-six function
-    properties of 21.3.2, and the realm's `Math.random` draw, whose
-    xorshift128+ state *runtime\_core.c* seeds from the realm's
-    initialization ordinal. It owns no numeric conversion of its own:
-    `ToNumber`, `ToUint32`, and Number::exponentiate stay with
-    *runtime\_primitive.c*;
- -  *runtime\_uri.c*: the four URI handling functions of 19.2.6, the
-    Encode and Decode operations they share, the unescaped and preserved
-    ASCII sets that separate the two pairs, the UTF-8 transformation both
-    directions run, and the `URIError` every malformed operand raises. It
-    owns no string representation of its own: `ToString`, the growable
-    UTF-16 builder, and string allocation stay with
-    *runtime\_primitive.c* and *runtime\_string.c*;
+    and flag validation, immutable matcher artifact, `Symbol.species`, built-in
+    execution and its match result object, `exec`, `test`, `toString`, the
+    `source` and `flags` accessors, the eight individual flag accessors, the
+    ahead-of-time literal entry point with the realm-local artifact cache its
+    descriptors key, and the program reuse that lets a copy of a branded RegExp
+    borrow its ahead-of-time program when the parse flags agree;
+ -  *runtime\_regexp\_matcher.c*: the generic matcher, meaning the pattern
+    compiler that lowers one validated pattern into an owned instruction
+    program over a register file and the executor that runs that program with
+    an explicit backtrack stack and undo trail; it owns the runtime's choice
+    order, capture visibility, assertion and lookaround behavior, backreference
+    resolution, quantifier priority, empty-progress failure, UTF-16 and
+    code-point traversal, ignore-case closure, the RegExpIdentifierName decoder
+    the validator shares, and the reviewed instruction, register, step,
+    backtrack, and trail boundaries;
+ -  *runtime\_regexp\_symbol.c*: the five `RegExp.prototype` well-known symbol
+    methods of 22.2.6 and the `RegExp.escape` static of 22.2.5, meaning their
+    receiver requirement, their `flags`, `lastIndex`, `constructor`, and
+    `Symbol.species` reads, the `SpeciesConstructor` and `Construct` steps
+    `@@matchAll` and `@@split` take, `AdvanceStringIndex`, the replacement list
+    `@@replace` collects before it builds, and `EncodeForRegExpEscape`. It
+    executes only through `RegExpExec`, so an overridden `exec` is observed,
+    and it owns no pattern grammar, matcher, or String entry point of its own;
+ -  *runtime\_math.c*: the `Math` namespace object, its eight value properties,
+    its `Symbol.toStringTag`, the thirty-six function properties of 21.3.2, and
+    the realm's `Math.random` draw, whose xorshift128+ state *runtime\_core.c*
+    seeds from the realm's initialization ordinal. It owns no numeric
+    conversion of its own: `ToNumber`, `ToUint32`, and Number::exponentiate
+    stay with *runtime\_primitive.c*;
+ -  *runtime\_uri.c*: the four URI handling functions of 19.2.6, the Encode and
+    Decode operations they share, the unescaped and preserved ASCII sets that
+    separate the two pairs, the UTF-8 transformation both directions run, and
+    the `URIError` every malformed operand raises. It owns no string
+    representation of its own: `ToString`, the growable UTF-16 builder, and
+    string allocation stay with *runtime\_primitive.c* and *runtime\_string.c*;
  -  *runtime\_reflect.c*: the `Reflect` namespace object of 28.1 and its
-    thirteen function properties, each of which requires an object target
-    and reports the internal method's own result rather than the language
-    error the matching `Object` static raises. It owns no property
-    semantics of its own: OrdinaryOwnPropertyKeys and
-    ToPropertyDescriptor stay with *runtime\_object\_builtin.c*,
-    ValidateAndApplyPropertyDescriptor and `[[Delete]]` with
-    *runtime\_descriptor.c*, `[[Get]]` and `[[Set]]` with
-    *runtime\_property.c*, `[[SetPrototypeOf]]` with *runtime\_object.c*,
-    and CreateListFromArrayLike with *runtime\_function.c*;
+    thirteen function properties, each of which requires an object target and
+    reports the internal method's own result rather than the language error the
+    matching `Object` static raises. It owns no property semantics of its own:
+    OrdinaryOwnPropertyKeys and ToPropertyDescriptor stay with
+    *runtime\_object\_builtin.c*, ValidateAndApplyPropertyDescriptor and
+    `[[Delete]]` with *runtime\_descriptor.c*, `[[Get]]` and `[[Set]]` with
+    *runtime\_property.c*, `[[SetPrototypeOf]]` with *runtime\_object.c*, and
+    CreateListFromArrayLike with *runtime\_function.c*;
  -  *runtime\_proxy.c*: the `Proxy` constructor, `Proxy.revocable`, the
     revocation closure, and the thirteen Proxy exotic internal methods. It
     calls the handler's trap when present, delegates to the target otherwise,
@@ -228,134 +217,128 @@ Ownership follows the plan's target layout:
     string keys. It owns no dynamic-source entry point: ToString remains in
     *runtime\_primitive.c*, ordinary property operations remain in the object
     components, and the parsed text is data rather than JavaScript source;
- -  *runtime\_set.c*: the `Set` constructor, insertion-ordered element
-    storage, SameValueZero lookup, the core prototype methods, the seven
-    composition methods over GetSetRecord, and the live
-    `%SetIteratorPrototype%` cursor;
- -  *runtime\_typed\_array.c*: `%TypedArray%`, the twelve concrete
-    constructor and prototype pairs, construction from lengths, buffers,
-    iterables, array-like objects, and typed arrays, element conversion,
-    the backing-buffer view record, the integer-indexed element operations
-    the generic property components delegate to, the core prototype
-    accessors and methods, the every, some, forEach, map, filter,
-    reduce, and reduceRight iteration methods, the find, findIndex,
-    findLast, findLastIndex, includes, indexOf, lastIndexOf, join, and
-    toLocaleString search and join methods, and the copyWithin, fill,
-    reverse, slice, toReversed, and with mutation and copying methods;
+ -  *runtime\_set.c*: the `Set` constructor, insertion-ordered element storage,
+    SameValueZero lookup, the core prototype methods, the seven composition
+    methods over GetSetRecord, and the live `%SetIteratorPrototype%` cursor;
+ -  *runtime\_typed\_array.c*: `%TypedArray%`, the twelve concrete constructor
+    and prototype pairs, construction from lengths, buffers, iterables,
+    array-like objects, and typed arrays, element conversion, the
+    backing-buffer view record, the integer-indexed element operations the
+    generic property components delegate to, and the core prototype accessors
+    and methods. It also provides the every, some, forEach, map, filter,
+    reduce, and reduceRight iteration methods; the find, findIndex, findLast,
+    findLastIndex, includes, indexOf, lastIndexOf, join, and toLocaleString
+    search and join methods; and the copyWithin, fill, reverse, slice,
+    toReversed, and with mutation and copying methods;
  -  *runtime\_weak\_collection.c*: the `WeakMap`, `WeakSet`, `WeakRef`, and
     `FinalizationRegistry` constructors and prototypes, CanBeHeldWeakly, the
-    job-scoped KeptAlive set, and the cleanup job step that calls a
-    registry's callback for each of its queued records;
- -  *runtime\_arguments.c*: the unmapped arguments object 10.2.4 creates,
-    the mapped object 10.4.4 creates from a simple parameter list, the
-    `@@iterator` both shapes define, and the realm's single
-    `%ThrowTypeError%` intrinsic their `callee` accessor reports;
- -  *runtime\_enumeration.c*: `EnumerateObjectProperties`, meaning the
-    for-in key collection over one prototype chain and the reachability
-    rule each step applies;
- -  *runtime\_function.c*: function creation, callable metadata,
-    construction, and generic dispatch;
+    job-scoped KeptAlive set, and the cleanup job step that calls a registry's
+    callback for each of its queued records;
+ -  *runtime\_arguments.c*: the unmapped arguments object 10.2.4 creates, the
+    mapped object 10.4.4 creates from a simple parameter list, the `@@iterator`
+    both shapes define, and the realm's single `%ThrowTypeError%` intrinsic
+    their `callee` accessor reports;
+ -  *runtime\_enumeration.c*: `EnumerateObjectProperties`, meaning the for-in
+    key collection over one prototype chain and the reachability rule each step
+    applies;
+ -  *runtime\_function.c*: function creation, callable metadata, construction,
+    and generic dispatch;
  -  *runtime\_error.c*: the named error intrinsics, their lazily created
-    constructor and prototype pairs, typed runtime error creation, the
-    shared `Error.prototype.toString`, and unhandled-throw rendering;
- -  *runtime\_symbol.c*: symbol values, the lazily created `Symbol`
-    intrinsic and `%Symbol.prototype%` methods, the well-known symbols, the
-    process-wide GlobalSymbolRegistry, and descriptive symbol text;
- -  *runtime\_iterator.c*: the synchronous iterator protocol
-    (GetIterator, IteratorStep, IteratorValue, IteratorClose), the
-    first-class array iterator, its realm-owned prototype methods, and
-    the lazy iterator helpers with `%IteratorHelperPrototype%`;
+    constructor and prototype pairs, typed runtime error creation, the shared
+    `Error.prototype.toString`, and unhandled-throw rendering;
+ -  *runtime\_symbol.c*: symbol values, the lazily created `Symbol` intrinsic
+    and `%Symbol.prototype%` methods, the well-known symbols, the process-wide
+    GlobalSymbolRegistry, and descriptive symbol text;
+ -  *runtime\_iterator.c*: the synchronous iterator protocol (GetIterator,
+    IteratorStep, IteratorValue, IteratorClose), the first-class array
+    iterator, its realm-owned prototype methods, and the lazy iterator helpers
+    with `%IteratorHelperPrototype%`;
  -  *runtime\_generator.c*: the suspended body frame both generator kinds
-    share, its collector-traced root slots and saved completion records,
-    and the `%GeneratorPrototype%` resumptions that drive a synchronous
-    generator;
+    share, its collector-traced root slots and saved completion records, and
+    the `%GeneratorPrototype%` resumptions that drive a synchronous generator;
  -  *runtime\_async\_generator.c*: the `AsyncGeneratorRequest` queue, the
-    driver that runs one request at a time, and the two reactions that
-    resume a body parked on an awaited operand;
- -  *runtime\_bigint.c*: exact BigInt primitives, their limb
-    representation, arithmetic and bitwise operators, comparison, and
-    string conversion in both directions;
- -  *runtime\_primitive.c*: coercions including the generic
-    `ToPrimitive`, arithmetic, comparison, string
-    conversion, and console output;
- -  *runtime\_promise.c*: the `%Promise%` intrinsic and its statics,
-    promises, capabilities, reactions, thenable jobs, combinators,
-    rejection tracking, and job draining;
- -  *runtime\_event\_loop.c*: timer queues, task
-    checkpoints, top-level await progress, and shutdown; timer delay
-    coercion goes through the shared primitive conversions, and every timer
-    wait goes through the clock component;
+    driver that runs one request at a time, and the two reactions that resume a
+    body parked on an awaited operand;
+ -  *runtime\_bigint.c*: exact BigInt primitives, their limb representation,
+    arithmetic and bitwise operators, comparison, and string conversion in both
+    directions;
+ -  *runtime\_primitive.c*: coercions including the generic `ToPrimitive`,
+    arithmetic, comparison, string conversion, and console output;
+ -  *runtime\_promise.c*: the `%Promise%` intrinsic and its statics, promises,
+    capabilities, reactions, thenable jobs, combinators, rejection tracking,
+    and job draining;
+ -  *runtime\_event\_loop.c*: timer queues, task checkpoints, top-level await
+    progress, and shutdown; timer delay coercion goes through the shared
+    primitive conversions, and every timer wait goes through the clock
+    component;
  -  *runtime\_clock.c*: the platform-neutral clock and wakeup boundary of
     [ADR 0025](./adr/0025-native-clock-and-wakeup.md), meaning adapter
     installation and selection, the realm's monotonic origin and cached
     scheduler time, millisecond deadline waits, epoch real-time reads, and
     cross-thread wakeup. It names no operating-system facility;
  -  *runtime\_clock\_posix.c*: the Linux and macOS clock adapter and its
-    fallbacks, the one runtime translation unit that includes
-    operating-system headers. It selects its facilities when a realm first
-    needs a clock, links only the C library, and starts no thread;
- -  *runtime\_map.c*: the `%Map%` intrinsic and its statics, keyed
-    collection storage with SameValueZero identity, insertion order, and
-    in-place tombstone deletion, its realm-owned prototype methods, and
+    fallbacks, the one runtime translation unit that includes operating-system
+    headers. It selects its facilities when a realm first needs a clock, links
+    only the C library, and starts no thread;
+ -  *runtime\_map.c*: the `%Map%` intrinsic and its statics, keyed collection
+    storage with SameValueZero identity, insertion order, and in-place
+    tombstone deletion, its realm-owned prototype methods, and
     `%MapIteratorPrototype%`;
  -  *runtime\_bigint\_object.c*: the callable `%BigInt%` intrinsic,
     `BigInt.asIntN` and `BigInt.asUintN`, `%BigInt.prototype%` and its
-    `toString`, `toLocaleString`, and `valueOf` methods, the
-    `thisBigIntValue` brand check, and the `ToBigInt` and `NumberToBigInt`
-    conversions. It reads no limb: the representation stays behind the
-    private operations *runtime\_bigint.c* exports;
- -  *runtime\_data\_view.c*: the `%DataView%` intrinsic,
-    `%DataView.prototype%` with its `buffer`, `byteLength`, and
-    `byteOffset` accessors, and the eleven `get` and eleven `set`
-    element accessors with their `NumericToRawBytes` and
-    `RawBytesToNumeric` conversions and byte-order handling. It owns no
-    Data Block: it holds only its buffer's value, rereads that buffer's
-    pointer, byte length, and detached state on every access, and never
-    allocates, resizes, or releases a block;
- -  *runtime\_date.c*: the `%Date%` intrinsic with its call and
-    construct behavior, the `now`, `parse`, and `UTC` statics,
-    `%Date.prototype%` with its forty-four own methods, and the
-    time-value arithmetic of 21.4.1, including the Date Time String
-    Format parser and the `ToDateString`, `toUTCString`, and
-    `toISOString` writers. It reads no host clock: the current time comes
-    from the clock component's epoch real-time capability, which never
-    takes the monotonic origin, and its `LocalTZA` is the constant +0
+    `toString`, `toLocaleString`, and `valueOf` methods, the `thisBigIntValue`
+    brand check, and the `ToBigInt` and `NumberToBigInt` conversions. It reads
+    no limb: the representation stays behind the private operations
+    *runtime\_bigint.c* exports;
+ -  *runtime\_data\_view.c*: the `%DataView%` intrinsic, `%DataView.prototype%`
+    with its `buffer`, `byteLength`, and `byteOffset` accessors, and the eleven
+    `get` and eleven `set` element accessors with their `NumericToRawBytes` and
+    `RawBytesToNumeric` conversions and byte-order handling. It owns no Data
+    Block: it holds only its buffer's value, rereads that buffer's pointer,
+    byte length, and detached state on every access, and never allocates,
+    resizes, or releases a block;
+ -  *runtime\_date.c*: the `%Date%` intrinsic with its call and construct
+    behavior, the `now`, `parse`, and `UTC` statics, `%Date.prototype%` with
+    its forty-four own methods, and the time-value arithmetic of 21.4.1,
+    including the Date Time String Format parser and the `ToDateString`,
+    `toUTCString`, and `toISOString` writers. It reads no host clock: the
+    current time comes from the clock component's epoch real-time capability,
+    which never takes the monotonic origin. Its `LocalTZA` is the constant +0
     because the clock adapter has no time-zone capability.
 
-The iterator protocol operations `oseo_iterator_get`, `oseo_iterator_next`,
-and `oseo_iterator_close` are generated-code ABI entry points declared in
+The iterator protocol operations `oseo_iterator_get`, `oseo_iterator_next`, and
+`oseo_iterator_close` are generated-code ABI entry points declared in
 *oseo\_runtime.h*. Promise combinators share those public operations.
 
-The `m5-131` runtime identity records a semantic change to synchronous
-acquisition: `oseo_iterator_get` reads and returns the arbitrary `next`
-value without requiring it to be callable. Getter errors still propagate
-from acquisition. `oseo_iterator_next` calls that captured value, so its
-existing generic call path owns the first-step `TypeError`. Compiler-owned
-iterator records keep the iterator and captured value rooted across target
-suspension, replacement of `next`, and collection. Closing before the first
-step does not call `next`. No entry point, public layout, heap kind, code
-ID, or package version is added. Direct asynchronous iterator acquisition
-retains its existing separate validation; Async-from-Sync acquisition shares
-the repaired synchronous helper.
+The `m5-131` runtime identity changes the semantics of synchronous acquisition.
+`oseo_iterator_get` reads and returns the arbitrary `next` value without
+requiring it to be callable, and getter errors still propagate from
+acquisition. `oseo_iterator_next` calls that captured value, so its existing
+generic call path owns the first-step `TypeError`. Compiler-owned iterator
+records keep the iterator and captured value rooted across target suspension,
+replacement of `next`, and collection. Closing before the first step does not
+call `next`. The identity adds no entry point, public layout, heap kind, code
+ID, or package version. Direct asynchronous iterator acquisition retains its
+existing separate validation; Async-from-Sync acquisition shares the repaired
+synchronous helper.
 
 The `m5-135` runtime identity links the pinned `ID_Start` and `ID_Continue`
 tables, which *runtime\_string.c* exposes to the RegExp components, so a
-dynamically constructed pattern decides its group names as a literal does.
-No entry point, public layout, heap kind, intrinsic slot, or code ID is
-added.
+dynamically constructed pattern decides its group names as a literal does. No
+entry point, public layout, heap kind, intrinsic slot, or code ID is added.
 
-The `m5-136` runtime identity records proper tail calls.
-`OSEO_STATUS_TAIL_CALL`, `oseo_tail_call`,
-`oseo_tail_call_derived`, `oseo_tail_host_call`,
-`oseo_tail_host_call_derived`, and `oseo_call_complete` are generated-code ABI
-entry points. The context gains one private pointer to its pending tail call
-record, which the collector traces while a call is pending. The trampoline in
-`oseo_call_function` moves each record into a root frame of its own before the
-call runs, so nested calls never overwrite it, and releases that step's frame,
-realm scope, call depth, and frame budget before the next.
-`Function.prototype.call`, `Function.prototype.apply`, `Reflect.apply`, and the
-[[Call]] of bound functions and Proxies record their final call instead of
-nesting it. No heap kind, intrinsic slot, or built-in code ID is added.
+The `m5-136` runtime identity introduces proper tail calls.
+`OSEO_STATUS_TAIL_CALL`, `oseo_tail_call`, `oseo_tail_call_derived`,
+`oseo_tail_host_call`, `oseo_tail_host_call_derived`, and `oseo_call_complete`
+are generated-code ABI entry points. The context gains one private pointer to
+its pending tail call record, which the collector traces while a call is
+pending. The trampoline in `oseo_call_function` moves each record into a root
+frame of its own before the call runs, so nested calls never overwrite it, and
+releases that step's frame, realm scope, call depth, and frame budget before
+the next. `Function.prototype.call`, `Function.prototype.apply`,
+`Reflect.apply`, and the [[Call]] of bound functions and Proxies record their
+final call instead of nesting it. No heap kind, intrinsic slot, or built-in
+code ID is added.
 
 The composed `m5-137` runtime identity adds four owner-local counts of
 published ephemeron tables, weak-reference records, finalization registries,
@@ -363,84 +346,97 @@ and finalization cells. Publication rejects overflow before linking a record;
 consumed, queued, and unreachable records remain counted until their owner's
 sweep removes them. Empty local counts skip only the corresponding weak
 clearing, cleanup scheduling, and registry compaction scans. Ephemeron
-fixed-point tracing remains unconditional for foreign-heap activation, and
-root tracing, forced safepoints, and sweep retain their existing behavior.
+fixed-point tracing remains unconditional for foreign-heap activation, and root
+tracing, forced safepoints, and sweep retain their existing behavior.
+
 The same unpublished identity completes the host-tail enum with
 `OSEO_TAIL_HOST_CLEAR_TIMEOUT = 3`, preserving values 1 and 2 and every layout,
 status value, and signature. Tail calls to `clearTimeout` evaluate all
-arguments before releasing the caller's frame, then run the direct intrinsic
-as one rooted trampoline step in the recorded realm. Missing handles become
-undefined; extras are ignored after evaluation. Numeric-only cancellation
-and the undefined result remain the existing host contract.
+arguments before releasing the caller's frame, then run the direct intrinsic as
+one rooted trampoline step in the recorded realm. Missing handles become
+undefined; extras are ignored after evaluation. Numeric-only cancellation and
+the undefined result remain the existing host contract.
 
-Array literal spread also shares iterator get and next, then calls the
+Array literal spread shares iterator get and next, then calls the
 `oseo_array_append` and `oseo_array_append_hole` generated-code ABI operations
 owned by *runtime\_array.c*. The append operations preserve monotonic own
 indexed-property accumulation and keep allocation policy outside the backend.
+
 Call and constructor argument spread share iterator get and next without
 iterator close, then use the `oseo_argument_list_create`,
 `oseo_argument_list_append`, and `oseo_argument_list_view` ABI operations owned
 by *runtime\_function.c*. The GC-traced private list keeps dynamic invocation
 arguments rooted without exposing a JavaScript object or moving process
 execution into the backend.
-Array binding declarations reuse iterator get, next, and close without
-adding a runtime ABI entry point. Generated control flow owns the per-pattern
-done state and conditional cleanup, and rest targets reuse array append.
-Function rest parameters also reuse array creation and append without changing
-the generic function call ABI. Generated code copies the unbound suffix while
-the caller retains the argument vector and the function environment roots the
-fresh array.
+
+Array binding declarations reuse iterator get, next, and close without adding a
+runtime ABI entry point. Generated control flow owns the per-pattern done state
+and conditional cleanup, and rest targets reuse array append.
+
+Function rest parameters reuse array creation and append without changing the
+generic function call ABI. Generated code copies the unbound suffix while the
+caller retains the argument vector and the function environment roots the fresh
+array.
+
 Object binding declarations use the `oseo_require_object_coercible`
 generated-code ABI operation owned by *runtime\_object.c*, followed by the
 existing property-key conversion and property-read operations. The compiler
 owns recursive target initialization and default selection.
-Property deletion uses the separate
-`oseo_require_delete_object_coercible` operation after key-expression
-evaluation and before property-key conversion. The separate entry point keeps
-the delete-specific nullish error while preserving object-binding diagnostics.
+
+Property deletion uses the separate `oseo_require_delete_object_coercible`
+operation after key-expression evaluation and before property-key conversion.
+The separate entry point keeps the delete-specific nullish error while
+preserving object-binding diagnostics.
+
 Catch binding patterns reuse the same iterator, coercibility, property-read,
 array-append, and object-rest operations after generated code captures the
 pending thrown value. They add no runtime ABI entry point; compiler-owned
 cleanup regions route a pattern failure around the catch body and through an
 enclosing `finally`.
-Synchronous `for-of` declaration patterns also add no runtime ABI entry point.
-They initialize or write the same compiler-owned binding leaves, while nested
-array patterns close before the existing outer `for-of` cleanup resumes.
-Assignment-pattern heads likewise reuse the existing-target path without a new
-runtime operation. Checked identifier and member writes retain the same
+
+Synchronous `for-of` declaration patterns add no runtime ABI entry point. They
+initialize or write the same compiler-owned binding leaves, while nested array
+patterns close before the existing outer `for-of` cleanup resumes.
+
+Assignment-pattern heads reuse the existing-target path without a new runtime
+operation. Checked identifier and member writes retain the same
 inner-before-outer iterator cleanup.
-Standalone destructuring assignment likewise adds no runtime ABI entry point.
-It writes existing identifier cells through the declaration paths and preserves
-the original right-hand result. Array patterns retain conditional iterator
-close, while object patterns retain coercibility, property-read, and rest-copy
+
+Standalone destructuring assignment adds no runtime ABI entry point. It writes
+existing identifier cells through the declaration paths and preserves the
+original right-hand result. Array patterns retain conditional iterator close,
+while object patterns retain coercibility, property-read, and rest-copy
 operations.
-Compound assignment also adds no runtime ABI entry point. Generated code
-retains one checked binding read or one object and converted property key, then
-reuses the existing binary, property-read, and checked write operations.
+
+Compound assignment adds no runtime ABI entry point. Generated code retains one
+checked binding read or one object and converted property key, then reuses the
+existing binary, property-read, and checked write operations.
+
 Logical forms branch before the right operand and write, so their short path
 introduces no hidden runtime call.
-Update expressions likewise add no runtime ABI entry point. Generated code
-reuses Number coercion, arithmetic, property-key conversion, property reads,
-and checked binding or property writes. A member step retains one raw key value
-and invokes the existing coercibility check before converting separately for
-its read and write.
+
+Update expressions add no runtime ABI entry point. Generated code reuses Number
+coercion, arithmetic, property-key conversion, property reads, and checked
+binding or property writes. A member step retains one raw key value and invokes
+the existing coercibility check before converting separately for its read and
+write.
+
 Regular expression literals add one generated-code ABI entry point,
 `oseo_regexp_literal`, owned by *runtime\_regexp.c*. Its argument is an
 `OseoRegExpLiteral` descriptor of generated data: the written pattern and flag
 text, the normalized flag mask, and the compiled matcher program the build
-produced, whose instruction, set, repetition, capture, name, and
-canonicalization layout *oseo\_runtime.h* declares because the build now
+produced. The matcher program's instruction, set, repetition, capture, name,
+and canonicalization layout is declared in *oseo\_runtime.h* because the build
 writes it. The entry point parses and compiles nothing; it takes the realm's
-one immutable artifact for that descriptor, from a realm-local table
-addressed by the descriptor's own address, and returns a fresh RegExp object
-over it whose own `lastIndex` starts at zero. The table reserves the slot
-through the work-area allocator before the artifact exists, so the
-allocation-attempt sweep covers its growth and the insertion afterwards
-cannot fail.
-Deciding whether an artifact owns its program is what keeps the collector from
-freeing generated data: an artifact built from a dynamic pattern owns its
-program and releases it, while an artifact over a literal descriptor borrows
-one.
+one immutable artifact for that descriptor, from a realm-local table addressed
+by the descriptor's own address, and returns a fresh RegExp object over it
+whose own `lastIndex` starts at zero. The table reserves the slot through the
+work-area allocator before the artifact exists, so the allocation-attempt sweep
+covers its growth and the insertion afterwards cannot fail.
+
+Whether an artifact owns its program keeps the collector from freeing generated
+data. An artifact built from a dynamic pattern owns its program and releases
+it; an artifact over a literal descriptor borrows one.
 
 ### Internal helpers
 
@@ -729,10 +725,10 @@ and *runtime\_enumeration.c*.
     `oseo_internal_to_number`, while coercions and operators use public
     object reads and `oseo_internal_own_descriptor`;
  -  binding and object: module-namespace creation builds its backing
-    object through public object operations, the global this value a
+    object through public object operations. The global this value a
     nullish receiver resolves to is one ordinary object created through
     `oseo_object_literal_create` whose var-scoped Script properties are
-    defined through `oseo_object_define`, and object reads, writes,
+    defined through `oseo_object_define`. Object reads, writes,
     descriptor queries, and definitions resolve both a module-namespace
     entry and a global-object binding through the cell the property
     stores;
@@ -788,7 +784,7 @@ M5b node `intrinsic-graph-root` gives `OseoContext` one
 `intrinsics[OSEO_INTRINSIC_COUNT]` table. *runtime\_function.c* owns root
 materialization and dispatches component slots to their existing builders;
 *runtime\_memory.c* traces the table as one permanent realm root. Ordinary
-objects and functions now inherit from the materialized `%Object.prototype%`
+objects and functions inherit from the materialized `%Object.prototype%`
 and callable `%Function.prototype%`. Arrays, promises, iterators, generators,
 errors, symbols, and asynchronous generators expose their existing methods and
 constructors through ordinary prototype objects instead of name comparison in
@@ -796,7 +792,7 @@ constructors through ordinary prototype objects instead of name comparison in
 
 The public context layout and intrinsic accessor move `abiVersion` to `m5-46`.
 The structural runtime tests reject a return of `default_intrinsics` or
-`OseoVirtualProperty`; fixed and generated native evidence covers method
+`OseoVirtualProperty`. Fixed and generated native tests cover method
 identity, prototype replacement, both specialization policies, and forced
 collection. The node owns no test262 inventory roots and changes no reviewed
 compatibility count.
@@ -806,30 +802,32 @@ compatibility count.
 M5b node `ephemeron-tracing-checkpoint` adds five collector-only heap kinds to
 *runtime\_memory.c*: tables and their entry records, weak references,
 finalization registries, and finalization cells. Tables strongly trace only
-their entry chain. Collection parks an entry on its unmarked key and activates
-the value when that key becomes reachable, clears dead weak targets,
-unlinks dead ephemeron entries and consumed finalization cells so the sweep
-reclaims them, then publishes eligible finalization cells to the context's
-rooted FIFO, sorting each collection's batch by registration order. The
-collector performs neither allocation
-nor callback invocation in these phases.
+their entry chain.
+
+Collection parks an entry on its unmarked key and activates the value when
+that key becomes reachable. It clears dead weak targets and unlinks dead
+ephemeron entries and consumed finalization cells so the sweep reclaims them.
+It then publishes eligible finalization cells to the context's rooted FIFO,
+sorting each collection's batch by registration order. The collector performs
+neither allocation nor callback invocation in these phases.
 
 Nine private helpers create and inspect those records for the later weak
 collections component. The public context layout gains the cleanup queue and
-its ordering state, moving `abiVersion` to `m5-107`, but no global, intrinsic,
-built-in code ID, or generated-code operation is added. Fixed sanitized native
-evidence covers ephemeron chains and cycles, clearing timing, delayed cleanup,
-collection forced at every safepoint, and the AArch64 Linux cross-link. The
-generated native domain at seed `0x60006f00` compares bounded cyclic graphs and
-cleanup permutations with an independent fixed-point model under both
-specialization policy settings. The node owns no test262 paths and admits no
-language-profile family.
+its ordering state, moving `abiVersion` to `m5-107`. No global, intrinsic,
+built-in code ID, or generated-code operation is added.
+
+Fixed sanitized native evidence covers ephemeron chains and cycles, clearing
+timing, delayed cleanup, collection forced at every safepoint, and the AArch64
+Linux cross-link. The generated native domain at seed `0x60006f00` compares
+bounded cyclic graphs and cleanup permutations with an independent fixed-point
+model under both specialization policy settings. The node owns no test262
+paths and admits no language-profile family.
 
 The entry chain is collector traversal state, not the indexed representation
 for JavaScript lookup. The weak-collections component, recorded below under
 weak collection evidence, adds that index, its synchronization with
 dead-entry unlinking, and the job-scoped strong root required by
-`WeakRef.prototype.deref`; private target inspection at this checkpoint does
+`WeakRef.prototype.deref`. Private target inspection at this checkpoint does
 not implement `KeepDuringJob`.
 
 ### Object prototype evidence
@@ -854,15 +852,15 @@ retires the two private text substitutes it selected by intrinsic prototype
 identity: a virtual receiver-sensitive tag text and a function-and-promise
 unsupported diagnostic. OrdinaryToPrimitive now reads `valueOf` and
 `toString` with the ordinary property lookup and calls whichever function it
-finds, so `%Object.prototype.toString%` composes every tag from one owner
+finds. So `%Object.prototype.toString%` composes every tag from one owner,
 and a deleted or replaced default is observable. Array text keeps its
 deferred conversion, which the Array prototype nodes own because it honors a
 user `join` and shares the conversion cycle stack.
 
 Fixed and generated native differential evidence covers `@@toPrimitive`
-dispatch and its rejections, hint order and fallthrough, `@@toStringTag`
-in own, inherited, non-string, getter, and shadowing forms, every builtinTag
-receiver, deleted and replaced default methods, both specialization
+dispatch and its rejections, hint order and fallthrough, `@@toStringTag` in
+own, inherited, non-string, getter, and shadowing forms, and every builtinTag
+receiver. It covers deleted and replaced default methods, both specialization
 policies, deliberate shape-guard misses, generic fallback, and collection
 forced at every safepoint. The node adds no component, no internal helper,
 and no generated-code entry point, and moves `abiVersion` to `m5-79`.
@@ -894,10 +892,11 @@ the constructor as the realm global's writable, non-enumerable, configurable
 The public intrinsic table expands, one built-in code range and three internal
 helpers are added, and `abiVersion` moves to `m5-119`. Fixed and generated
 native differential evidence covers falsy and truthy inputs, object conversion
-without primitive coercion, branded and unbranded receivers, derived and
-alternate prototype construction, both specialization policies, false hints,
-deliberate shape-guard misses, generic fallback, and collection forced at every
-safepoint. The node reviews its declared Boolean test262 inventory root.
+without primitive coercion, branded and unbranded receivers, and derived and
+alternate prototype construction. It covers both specialization policies,
+false hints, deliberate shape-guard misses, generic fallback, and collection
+forced at every safepoint. The node reviews its declared Boolean test262
+inventory root.
 
 ### Object define-property evidence
 
@@ -917,7 +916,7 @@ node reviews only its declared `Object.defineProperty` test262 inventory root.
 
 M5b node `promise-intrinsic` materializes `%Promise%` in *runtime\_promise.c*.
 The component keeps its existing ownership of promises, reactions, thenable
-jobs, and job draining, and gains the constructor, the prototype links, the
+jobs, and job draining. It gains the constructor, the prototype links, the
 `Symbol.species` accessor, the `resolve`, `reject`, `withResolvers`, and `try`
 statics, and the PromiseCapability record that `then`, `finally`, and the two
 existing combinators build from SpeciesConstructor or their `this` value. The
@@ -996,9 +995,9 @@ a second reading path.
 Reporting the unstored `prototype` in creation order needs one shared
 `OseoFunction` field rather than a new call between components, the way
 `prototype_writable` already works. *runtime\_function.c* records the
-position MakeConstructor gives it, *runtime\_descriptor.c* moves that
+position MakeConstructor gives it. *runtime\_descriptor.c* moves that
 position when `[[Delete]]` removes one of the properties created ahead of
-it, and *runtime\_object\_builtin.c* only reads it.
+it. *runtime\_object\_builtin.c* only reads it.
 
 The completed semantic checkpoint moves `abiVersion` to `m5-54` without a
 public layout change. Fixed and generated native differential evidence covers
@@ -1019,15 +1018,19 @@ kind.
 `[[ArrayBufferData]]` is the first runtime state that is host memory rather
 than traced values, so its ownership is stated once and enforced in one
 place. Exactly one buffer owns each Data Block.
+
 `oseo_internal_array_buffer_release` frees the block and leaves the record
 detached, and it is the only release path: *runtime\_memory.c* calls it when
 the collector destroys a buffer, and the detaching half of
 ArrayBufferCopyAndDetach calls it while the buffer stays alive. Because the
 release detaches, a block a transfer already gave up cannot be freed a second
-time. No operation copies a block pointer between records: a resizable buffer
+time.
+
+No operation copies a block pointer between records: a resizable buffer
 reserves its whole maximum at allocation so `resize` never reallocates, and
-both transfers and `slice` allocate a second block and copy into it. Both
-native execution targets build under the address and undefined-behavior
+both transfers and `slice` allocate a second block and copy into it.
+
+Both native execution targets build under the address and undefined-behavior
 sanitizers, so the forced-collection fixture and the generated property suite
 execute these rules under them.
 
@@ -1059,14 +1062,14 @@ prerequisite it satisfies.
 
 M5b node `object-define-properties` adds `Object.defineProperties` to
 *runtime\_object\_builtin.c* over the components it already composes. One
-shared ToPropertyDescriptor body now serves both define entry points, one
+shared ToPropertyDescriptor body now serves both define entry points, and one
 shared DefinePropertyOrThrow body applies every converted descriptor
-through the descriptor component, and the plural entry point reuses the
-ordinary own-key walk the descriptor-reporting query owns. The collection
-pass roots every collected key and descriptor field, completes before the
-first definition, and applies the collected descriptors in own-key order,
-so an abrupt collection leaves the target untouched while an abrupt
-definition keeps its predecessors.
+through the descriptor component. The plural entry point reuses the ordinary
+own-key walk the descriptor-reporting query owns. The collection pass roots
+every collected key and descriptor field, completes before the first
+definition, and applies the collected descriptors in own-key order. An abrupt
+collection leaves the target untouched, while an abrupt definition keeps its
+predecessors.
 
 The completed collection checkpoint moves `abiVersion` to `m5-60` without
 a public layout change. Fixed and generated native differential evidence
@@ -1177,17 +1180,22 @@ disturbing valid pairs. The node allocates five code IDs inside the existing
 String range, adds no component, heap kind, intrinsic slot, public layout, or
 generated-code entry point, and moves `abiVersion` to `m5-118`.
 
+None of the M5b array-prototype nodes in this section adds a generated-code
+entry point. Their fixed and generated native differential evidence covers
+both specialization policies and collection at every safepoint. The
+`array-prototype-copying`, `array-prototype-sort`, `array-prototype-reduction`,
+and `array-prototype-index-search` nodes also cover false hints and deliberate
+guard hits and misses.
+
 M5b node `array-prototype-species-mapping` keeps ownership in
 *runtime\_array.c* and adds ordinary `filter` and `map` functions to the
 materialized `%Array.prototype%`. Both methods retain the shared
 snapshot-length HasProperty and Get iteration contract, then create their
 results through ArraySpeciesCreate. Array receivers perform the observable
-`constructor` and `Symbol.species` reads, while generic receivers use the
-realm Array without those reads. Fixed and generated native differential
-evidence covers sparse and generic receivers, default and custom species,
-abrupt reads, mutation, both specialization policies, generic fallback, and
-collection at every safepoint. The node adds no generated-code entry point and
-moves `abiVersion` to `m5-66`.
+`constructor` and `Symbol.species` reads; generic receivers use the realm
+Array without those reads. Its differential evidence also covers sparse and
+generic receivers, default and custom species, abrupt reads, mutation, and
+generic fallback. The node moves `abiVersion` to `m5-66`.
 
 M5b node `array-prototype-copying` remains in *runtime\_array.c* because the
 methods share ordinary property access, ArraySpeciesCreate, collector roots,
@@ -1197,17 +1205,16 @@ primitive. The component adds `concat`, `flat`, `flatMap`, `join`, `slice`,
 `toLocaleString`, and `toString` to the materialized `%Array.prototype%`.
 
 The copying paths preserve sparse HasProperty behavior and generic receiver
-order. `concat` honors `Symbol.isConcatSpreadable`; `concat`, `flat`, `flatMap`,
-and `slice` use ArraySpeciesCreate and propagate every constructor, species,
-indexed, callback, and coercion abrupt completion. Flattening skips holes and
-uses the deterministic runtime depth boundary for cycles or unbounded depth.
-`toLocaleString` calls every non-nullish element method with no arguments, as
-ECMA-262 specifies; M5c node `array-tolocalestring-arguments` removed the
-earlier forwarding of the rooted outer locales and options.
-Fixed and generated native differential evidence covers both specialization
-policies, every species fallback, false hints, deliberate guard hits and
-misses, and collection at every safepoint. The node adds no generated-code
-entry point and moves `abiVersion` to `m5-69`.
+order. `concat` honors `Symbol.isConcatSpreadable`. `concat`, `flat`,
+`flatMap`, and `slice` use ArraySpeciesCreate and propagate every constructor,
+species, indexed, callback, and coercion abrupt completion. Flattening skips
+holes and uses the deterministic runtime depth boundary for cycles or
+unbounded depth. `toLocaleString` calls every non-nullish element method with
+no arguments, as ECMA-262 specifies; M5c node `array-tolocalestring-arguments`
+removed the earlier forwarding of the rooted outer locales and options.
+
+Its differential evidence also covers every species fallback. The node moves
+`abiVersion` to `m5-69`.
 
 M5b node `array-prototype-sort` also remains in *runtime\_array.c* because
 sorting reuses the same ordinary property access, collector roots, and
@@ -1224,17 +1231,14 @@ list declares to the collector stays initialized. One bottom-up merge sort over
 that list and one equally rooted scratch buffer supplies the required
 stability and stops at the first abrupt comparison. `sort` then writes the
 sorted elements back with Set and deletes the trailing indices with
-DeletePropertyOrThrow, while `toSorted` fills the plain Array it allocated
-before reading, which is why neither method reads `constructor` or
-`Symbol.species`.
+DeletePropertyOrThrow. `toSorted` fills the plain Array it allocated before
+reading, so neither method reads `constructor` or `Symbol.species`.
 
-Fixed and generated native differential evidence covers sparse, generic, and
-frozen receivers, undefined and hole ordering, comparator coercion and abrupt
-completion, stability, mutation observed through accessors during collection
-and write-back, both specialization policies, false hints, deliberate guard
-hits and misses, and collection at every safepoint. The node adds no
-generated-code entry point, allocates its two code IDs inside the existing
-Array range, and moves `abiVersion` to `m5-76`.
+Its differential evidence also covers sparse, generic, and frozen receivers,
+undefined and hole ordering, comparator coercion and abrupt completion,
+stability, and mutation observed through accessors during collection and
+write-back. The node allocates its two code IDs inside the existing Array
+range and moves `abiVersion` to `m5-76`.
 
 M5b node `array-prototype-reduction` also remains in *runtime\_array.c*
 because both methods reuse the ordinary property access, collector roots, and
@@ -1244,29 +1248,27 @@ retires both entries from the unadmitted boundary table.
 
 One accumulator loop serves both methods: `reduce` visits ascending indices
 and `reduceRight` descending ones over the shared HasProperty/Get path, so
-holes are skipped and inherited entries participate. The receiver is
-converted and its length read before the callable check, initial-value
-presence follows the argument count rather than an undefined test, a missing
-initial value is replaced by the first present element in traversal order,
-and a traversal that ends without an accumulator throws a TypeError. The
-callback receives the accumulator, element, index, and converted receiver
-with an undefined this value, and the receiver, callback, and accumulator
-stay rooted across user code, so element and accumulator identity survive a
-collection inside any callback or accessor.
+holes are skipped and inherited entries participate. The receiver is converted
+and its length read before the callable check. Initial-value presence follows
+the argument count rather than an undefined test; a missing initial value is
+replaced by the first present element in traversal order; a traversal that
+ends without an accumulator throws a TypeError. The callback receives the
+accumulator, element, index, and converted receiver with an undefined this
+value. The receiver, callback, and accumulator stay rooted across user code,
+so element and accumulator identity survive a collection inside any callback
+or accessor.
 
-Fixed and generated native differential evidence covers sparse, generic,
-inherited, primitive, and frozen receivers, both traversal orders,
-accumulator seeding, the empty-traversal TypeError, callback argument order,
-abrupt completion at each observable step, mutation during the
-snapshot-length loop, both specialization policies, false hints, deliberate
-guard hits and misses, and collection at every safepoint. The node adds no
-generated-code entry point, allocates its two code IDs inside the existing
-Array range, and moves `abiVersion` to `m5-83`.
+Its differential evidence also covers sparse, generic, inherited, primitive,
+and frozen receivers, both traversal orders, accumulator seeding, the
+empty-traversal TypeError, callback argument order, abrupt completion at each
+observable step, and mutation during the snapshot-length loop. The node
+allocates its two code IDs inside the existing Array range and moves
+`abiVersion` to `m5-83`.
 
 M5b node `array-prototype-index-search` also remains in *runtime\_array.c*
-because relative-index search reuses the ordinary property access,
-array-like length conversion, and collector roots the other Array methods
-own. The component adds `at`, `includes`, `indexOf`, and `lastIndexOf` to the
+because relative-index search reuses the ordinary property access, array-like
+length conversion, and collector roots the other Array methods own. The
+component adds `at`, `includes`, `indexOf`, and `lastIndexOf` to the
 materialized `%Array.prototype%` and retires the two deferred search entries.
 
 All four methods convert the receiver and snapshot its length before relative
@@ -1323,68 +1325,70 @@ ordinary property operations, array-like length conversion, species creation,
 and collector roots that the other Array methods already own.
 
 Every indexed move uses HasProperty before Get, then Set for a present source
-or DeletePropertyOrThrow for a hole. This preserves sparse receivers and
-turns an inherited source into an own destination. `copyWithin` selects its
-direction before overlap, `reverse` observes both sides before writing, and
-`splice` creates and roots its species result before collecting removed
-elements. Receiver, arguments, moved values, and results stay rooted across
-every observable conversion and property operation.
+or DeletePropertyOrThrow for a hole. This preserves sparse receivers and turns
+an inherited source into an own destination. `copyWithin` selects its direction
+before overlap, `reverse` observes both sides before writing, and `splice`
+creates and roots its species result before collecting removed elements.
+Receiver, arguments, moved values, and results stay rooted across every
+observable conversion and property operation.
 
 Fixed and generated native differential evidence covers all eight methods,
 sparse and generic receivers, hole preservation, inherited values, overlap,
-species construction, length limits and writes, coercion order, abrupt
-completion, both specialization policies, false hints, deliberate guard hits
-and misses, generic fallback, and collection at every safepoint. The node adds
-no generated-code entry point, allocates seven code IDs inside the existing
-Array range because `push` already owns its ID, and moves `abiVersion` to
-`m5-88`.
+species construction, length limits and writes, coercion order, and abrupt
+completion. It also covers both specialization policies, false hints,
+deliberate guard hits and misses, generic fallback, and collection at every
+safepoint. The node adds no generated-code entry point, allocates seven code
+IDs inside the existing Array range because `push` already owns its ID, and
+moves `abiVersion` to `m5-88`.
 
-M5b node `array-prototype-predicate-search` also remains in
-*runtime\_array.c*. It adds `find`, `findIndex`, `findLast`, and
-`findLastIndex` to the materialized `%Array.prototype%` over the ordinary
-property access, array-like length conversion, and collector roots the
-other Array methods already own.
+M5b node `array-prototype-predicate-search` also remains in *runtime\_array.c*.
+It adds `find`, `findIndex`, `findLast`, and `findLastIndex` to the
+materialized `%Array.prototype%` over the ordinary property access, array-like
+length conversion, and collector roots the other Array methods already own.
 
-One predicate loop serves all four methods: the receiver is converted and
-its length read before the callable check, `find` and `findIndex` visit
-ascending indices and `findLast` and `findLastIndex` descending ones, and
-every index is read with Get rather than filtered through HasProperty, so a
-hole reaches the predicate as `undefined`. The predicate receives the
-element, index, and converted receiver with the caller's `this` argument,
-its first truthy result returns the element or its index, and an exhausted
-search returns `undefined` or `-1`. The receiver, predicate, `this`
-argument, and current element stay rooted across user code, so the returned
-element survives a collection inside any predicate or accessor.
+One predicate loop serves all four methods. The receiver is converted and its
+length read before the callable check. `find` and `findIndex` visit ascending
+indices and `findLast` and `findLastIndex` descending ones. Every index is read
+with Get rather than filtered through HasProperty, so a hole reaches the
+predicate as `undefined`.
+
+The predicate receives the element, index, and converted receiver with the
+caller's `this` argument. Its first truthy result returns the element or its
+index, and an exhausted search returns `undefined` or `-1`. The receiver,
+predicate, `this` argument, and current element stay rooted across user code,
+so the returned element survives a collection inside any predicate or accessor.
 
 Fixed and generated native differential evidence covers all four methods,
 sparse, generic, inherited, primitive, and frozen receivers, both traversal
 directions, hole visits, result truthiness, length coercion and clamping,
-mutation during the snapshot-length loop, abrupt completion at each
-observable step, both specialization policies, false hints, deliberate guard
-hits and misses, generic fallback, and collection at every safepoint. The
-node adds no generated-code entry point, allocates four code IDs inside the
-existing Array range, and moves `abiVersion` to `m5-93`.
+mutation during the snapshot-length loop, and abrupt completion at each
+observable step. It also covers both specialization policies, false hints,
+deliberate guard hits and misses, generic fallback, and collection at every
+safepoint. The node adds no generated-code entry point, allocates four code IDs
+inside the existing Array range, and moves `abiVersion` to `m5-93`.
 
 M5b node `array-prototype-iterators` completes the Array iterator cluster
 across *runtime\_array.c* and *runtime\_iterator.c*. The Array component
-installs ordinary `entries`, `keys`, and `values` functions on the
-materialized `%Array.prototype%` and gives `Symbol.iterator` the exact cached
-`values` function. The iterator component owns the materialized
-`%ArrayIteratorPrototype%`, its `next` and `Symbol.toStringTag` properties,
-and the branded iterator record's key, value, and key-value result kinds.
+installs ordinary `entries`, `keys`, and `values` functions on the materialized
+`%Array.prototype%` and gives `Symbol.iterator` the exact cached `values`
+function. The iterator component owns the materialized
+`%ArrayIteratorPrototype%`, its `next` and `Symbol.toStringTag` properties, and
+the branded iterator record's key, value, and key-value result kinds.
 
 Each step reads the target's live array-like length, advances the cursor before
 an observable element Get, and clears the target at exhaustion. Keys avoid the
 element read, values preserve sparse and inherited lookup, and entries allocate
 and root a fresh pair Array. The existing object layout's iterator state
 changes from a Boolean brand to an enum kind, and the collector follows the
-target for every nonzero kind. Fixed and generated native differential
-evidence covers metadata, prototype identities, all three result kinds,
-generic and sparse receivers, live mutation, reentrancy, abrupt completion,
-both specialization policies, deliberate guard hits and misses, generic
-fallback, and collection at every safepoint. The node adds no component or
-generated-code entry point, allocates two IDs inside the existing iterator
-range and two realm intrinsic slots, and moves `abiVersion` to `m5-97`.
+target for every nonzero kind.
+
+Fixed and generated native differential evidence covers metadata, prototype
+identities, all three result kinds, generic and sparse receivers, live
+mutation, reentrancy, and abrupt completion. It also covers both specialization
+policies, deliberate guard hits and misses, generic fallback, and collection at
+every safepoint. The node adds no component or generated-code entry point,
+allocates two IDs inside the existing iterator range and two realm intrinsic
+slots, and moves `abiVersion` to `m5-97`.
 
 M5b node `json-parse` adds *runtime\_json.c* as the owner of the replaceable
 `JSON` namespace and its ordinary, non-constructible `parse` function. The
@@ -1505,18 +1509,18 @@ translation unit and no generated-code entry point.
 An eager helper needs no heap kind, because it never suspends. One root frame
 holds the receiver, the callback, the captured `next` method, the `toArray`
 result array, and the contiguous callback argument list for the length of the
-drain, so the accumulator and every in-flight value survive a collection at
-any safepoint inside user code.
+drain, so the accumulator and every in-flight value survive a collection at any
+safepoint inside user code.
 
 The node allocates six code IDs inside the existing iterator range, adds six
 realm intrinsics, adds no internal helper, and moves `abiVersion` to `m5-100`.
 Fixed and generated native differential evidence covers all six methods,
 receiver and callback validation with the close it performs before `next` is
 read, the reduce accumulator with and without an initial value, the
-empty-iterator `TypeError`, the early stop `some`, `every`, and `find`
-perform, close failures in both the abrupt and the normal-completion
-position, both specialization policies, deliberate guard hits and misses,
-generic fallback, and collection at every safepoint.
+empty-iterator `TypeError`, and the early stop `some`, `every`, and `find`
+perform. It also covers close failures in both the abrupt and the
+normal-completion position, both specialization policies, deliberate guard hits
+and misses, generic fallback, and collection at every safepoint.
 
 ### String iterator evidence
 
@@ -1534,9 +1538,9 @@ The node allocates two code IDs inside the existing iterator range, adds three
 realm intrinsics, adds three internal helpers, and moves `abiVersion` to
 `m5-102`. Fixed and generated native differential evidence covers method and
 prototype metadata, receiver conversion, branding, BMP and astral code points,
-lone surrogates, permanent exhaustion, `for-in` array-pattern destructuring of
-each String key, both specialization policies, deliberate guard hits and
-misses, generic fallback, and collection at every safepoint.
+lone surrogates, permanent exhaustion, and `for-in` array-pattern destructuring
+of each String key. It also covers both specialization policies, deliberate
+guard hits and misses, generic fallback, and collection at every safepoint.
 
 ### Set evidence
 
@@ -1546,7 +1550,7 @@ element vector. Deletion leaves a tombstone, so an iterator cursor never moves
 backward, and re-insertion appends a new live slot. SameValueZero lookup folds
 both zero signs together and treats every `NaN` as one value. The vector is
 never compacted, so storage and each linear membership scan grow with the
-lifetime insertion count rather than with `size`; the language profile records
+lifetime insertion count rather than with `size`. The language profile records
 that limit under its known gaps.
 
 Set iterators trace the Set whose live element vector they traverse. The
@@ -1644,7 +1648,7 @@ The `resizable-array-buffer-harness` node moves `abiVersion` to `m5-134`.
 *runtime\_property.c*'s ordinary assignment walk in `oseo_object_set` and
 receiver walk in `oseo_internal_set_with_receiver` report the owned
 `OSEO1001` for a `"__proto__"` write that reaches an intrinsic
-`%Object.prototype%` without finding the key, mirroring the read in
+`%Object.prototype%` without finding the key. This mirrors the read in
 `object_get`. Every earlier answer on either walk is unchanged, and a
 primitive base still returns before walking. No code ID, intrinsic, heap
 kind, or entry point is added.
@@ -1667,115 +1671,130 @@ The Linux adapter waits in `ppoll` on an eventfd and the macOS adapter in
 `kevent` on `EVFILT_USER`; both fall back to a nonblocking self-pipe and then
 to a sleep with no wakeup, and real time falls back from `CLOCK_REALTIME` to
 `time`. A missing monotonic clock is an owned `OSEO2001` diagnostic rather
-than a real-time substitute. The event loop now drops canceled head timers
-before it waits, waits through the adapter until the earliest live deadline
-has elapsed, and caches that elapsed time for the task it runs. Fixed probe,
-scheduler-harness, and differential fixture evidence and generated schedules
-against an independent model cover every facility configuration, idle CPU
-use, descriptor and thread lifetime, wakeups, wall-clock jumps, failures, both
-specialization policies, a guard miss, and collection forced at every
-safepoint. The node adds no code ID, intrinsic, or heap kind and moves
-`abiVersion` to `m5-108`.
+than a real-time substitute.
+
+The event loop now drops canceled head timers before it waits, waits through
+the adapter until the earliest live deadline has elapsed, and caches that
+elapsed time for the task it runs. Fixed probe, scheduler-harness, and
+differential fixture evidence and generated schedules against an independent
+model cover every facility configuration, idle CPU use, descriptor and thread
+lifetime, wakeups, wall-clock jumps, failures, both specialization policies, a
+guard miss, and collection forced at every safepoint. The node adds no code
+ID, intrinsic, or heap kind and moves `abiVersion` to `m5-108`.
 
 ### TypedArray core evidence
 
 M5b node `typed-array-core` keeps the view record unchanged and adds the
 integer-indexed exotic operations to *runtime\_typed\_array.c*. One helper
-classifies a canonical numeric key into an element index, with `SIZE_MAX`
-standing for a key that can never be valid, and the descriptor, property,
-primitive, enumeration, JSON, Proxy, and Object built-in components call the
-component's element get, set, define, own-property, and index-key helpers
-instead of their former boundary. The own-key snapshots place the current
-indices ahead of the stored keys, and a view's property vector never holds a
-canonical numeric key. The receiver-provenance flag that let only a `[[Set]]`
-continuation reach a TypedArray element through a trap-free Proxy is removed,
-because the view's `[[DefineOwnProperty]]` now answers every definition.
+classifies a canonical numeric key into an element index; `SIZE_MAX` stands for
+a key that can never be valid.
+
+The descriptor, property, primitive, enumeration, JSON, Proxy, and Object
+built-in components call the component's element get, set, define,
+own-property, and index-key helpers instead of their former boundary. The
+own-key snapshots place the current indices ahead of the stored keys, and a
+view's property vector never holds a canonical numeric key. The
+receiver-provenance flag that let only a `[[Set]]` continuation reach a
+TypedArray element through a trap-free Proxy is removed, because the view's
+`[[DefineOwnProperty]]` now answers every definition.
 
 The prototype accessors, `at`, `set`, `subarray`, and the three iterator
 methods take twelve code IDs from the TypedArray range. `set` writes Number
 elements through the same conversion as indexed stores, copies a same-kind
-typed source with `memmove`, and snapshots a cross-kind source that shares
-the target's buffer before converting it, so no step reads bytes it already
-overwrote. The Array component records the original `Array.prototype.toString`
-in the new `OSEO_INTRINSIC_ARRAY_TO_STRING` slot, so the TypedArray cluster can
-share that identity even when a program replaced the Array method first; the
-TypedArray cluster's failure path now clears only its own slots. The component
-moves `abiVersion` to `m5-109`; the value representation and the
-generated-code entry points are unchanged.
+typed source with `memmove`, and snapshots a cross-kind source that shares the
+target's buffer before converting it, so no step reads bytes it already
+overwrote.
+
+The Array component records the original `Array.prototype.toString` in the new
+`OSEO_INTRINSIC_ARRAY_TO_STRING` slot, so the TypedArray cluster can share that
+identity even when a program replaced the Array method first; the TypedArray
+cluster's failure path now clears only its own slots. The component moves
+`abiVersion` to `m5-109`; the value representation and the generated-code entry
+points are unchanged.
 
 ### Single-agent Atomics evidence
 
-M5b node `atomics-single-agent` adds `shared` to the ArrayBuffer record
-instead of a second buffer kind, so the TypedArray, DataView, and collector
-paths that already accept an ArrayBuffer value reach a SharedArrayBuffer
-unchanged and only the brand checks in *runtime\_array\_buffer.c* read it.
+M5b node `atomics-single-agent` adds `shared` to the ArrayBuffer record instead
+of a second buffer kind, so the TypedArray, DataView, and collector paths that
+already accept an ArrayBuffer value reach a SharedArrayBuffer unchanged. Only
+the brand checks in *runtime\_array\_buffer.c* read it.
+
 The SharedArrayBuffer constructor, accessors, `grow`, `slice`, and species
-getter take seven code IDs from the ArrayBuffer range, and `slice` shares the
+getter take seven code IDs from the ArrayBuffer range. `slice` shares the
 ArrayBuffer bounds, species construction, and copy with a brand parameter.
 
 The new *runtime\_atomics.c* takes built-in code range index 25 and reads a
 view through three TypedArray component helpers: validation with the current
-length, the out-of-bounds state with the current buffer length, and the
-element size. It reads and writes element bytes through local copies, so no
-access assumes an aligned block. The `OSEO_HEAP_ATOMICS_WAITER` record roots
-one waiter's buffer, promise, and timeout job, the context gains the
-collector-rooted head and tail of the WaiterList FIFO, and a timer gains a
-`waiter` field so one queue holds both `setTimeout` callbacks and waiter
-timeout jobs. A waiter job takes id 0, which `clearTimeout` never matches.
+length, the out-of-bounds state with the current buffer length, and the element
+size. It reads and writes element bytes through local copies, so no access
+assumes an aligned block.
+
+The `OSEO_HEAP_ATOMICS_WAITER` record roots one waiter's buffer, promise, and
+timeout job. The context gains the collector-rooted head and tail of the
+WaiterList FIFO, and a timer gains a `waiter` field so one queue holds both
+`setTimeout` callbacks and waiter timeout jobs. A waiter job takes id 0, which
+`clearTimeout` never matches.
+
 Four public intrinsic slots hold `%SharedArrayBuffer.prototype%`,
-`%SharedArrayBuffer%`, its species marker, and `%Atomics%`. The component
-moves `abiVersion` to `m5-111`; the value representation and the
-generated-code entry points are unchanged.
+`%SharedArrayBuffer%`, its species marker, and `%Atomics%`. The component moves
+`abiVersion` to `m5-111`; the value representation and the generated-code entry
+points are unchanged.
 
 ### Agent cluster evidence
 
 M5b node `atomics-and-shared-memory` adds *runtime\_agent.c* under
-[ADR 0026](./adr/0026-agent-clusters-and-shared-memory.md). A Shared Data
-Block becomes a reference-counted record, `OseoSharedBlock`, that holds its
-bytes, its current length, and its growable maximum, and a SharedArrayBuffer
-object references it instead of owning it; every read of a shared buffer's
-length goes through the block, so a grow in one agent is the length every
-agent observes. The TypedArray, DataView, and ArrayBuffer components read the
-length through the one inline accessor, and TypedArray `set` treats two
-objects over one block as the same buffer.
+[ADR 0026](./adr/0026-agent-clusters-and-shared-memory.md). A Shared Data Block
+becomes a reference-counted record, `OseoSharedBlock`, that holds its bytes,
+its current length, and its growable maximum. A SharedArrayBuffer object
+references it instead of owning it. Every read of a shared buffer's length goes
+through the block, so a grow in one agent is the length every agent observes.
+
+The TypedArray, DataView, and ArrayBuffer components read the length through
+the one inline accessor, and TypedArray `set` treats two objects over one block
+as the same buffer.
 
 The component takes built-in code range index 28 for the eight `$262.agent`
 functions and is the second translation unit that asks for operating-system
-interfaces beyond C11: it creates one POSIX thread per started agent and
-guards every cluster state change with one mutex. Exactly one agent holds
-the turn at a time, so no two threads touch a block, a heap, or cluster
-state at once. A blocked agent waits in its own clock adapter, and the agent
-that makes it ready wakes that adapter through `oseo_clock_wake`. The
-context gains the agent record and the collector-rooted broadcast callback,
+interfaces beyond C11. It creates one POSIX thread per started agent and guards
+every cluster state change with one mutex.
+
+Exactly one agent holds the turn at a time, so no two threads touch a block, a
+heap, or cluster state at once. A blocked agent waits in its own clock adapter,
+and the agent that makes it ready wakes that adapter through `oseo_clock_wake`.
+
+The context gains the agent record and the collector-rooted broadcast callback,
 the Atomics waiter record gains its block and cluster entry, the runtime input
 gains one source, and *oseo\_runtime.h* gains the agent program table and two
-generated-code entry points, `oseo_test262_host_install` and
-`oseo_agent_hole`. The component moves `abiVersion` to `m5-123`.
+generated-code entry points, `oseo_test262_host_install` and `oseo_agent_hole`.
+The component moves `abiVersion` to `m5-123`.
 
 ### Cross-realm evidence
 
 M5c node `cross-realm-host` adds *runtime\_realm.c* under
-[ADR 0027](./adr/0027-realms-beyond-the-initial-realm.md). `OseoRealm` now
-holds the intrinsic table, the global this value, both literal caches, and
-the Math.random state; `OseoContext` embeds its initial realm, points at the
-running realm, and keeps the agent's heap, job queues, well-known symbols,
-and registered symbol representatives shared by every realm. Every runtime
-read of a realm-owned field goes through the running realm pointer. A created
-realm is a heap record of the new kind `OSEO_HEAP_REALM`, which the collector
-traces and whose caches it frees; a function's and a job's `realm` slot and
-the running realm's record keep it alive.
+[ADR 0027](./adr/0027-realms-beyond-the-initial-realm.md).
+
+`OseoRealm` now holds the intrinsic table, the global this value, both literal
+caches, and the Math.random state. `OseoContext` embeds its initial realm,
+points at the running realm, and keeps the agent's heap, job queues, well-known
+symbols, and registered symbol representatives shared by every realm. Every
+runtime read of a realm-owned field goes through the running realm pointer.
+
+A created realm is a heap record of the new kind `OSEO_HEAP_REALM`, which the
+collector traces and whose caches it frees; a function's and a job's `realm`
+slot and the running realm's record keep it alive.
 
 `oseo_call_function` enters the callee's realm around every ordinary and
 built-in [[Call]] and [[Construct]] and roots the realm it leaves until the
 call returns. Generator resumptions and promise jobs enter their own realms,
 and the GetPrototypeFromConstructor sites of the Array, ArrayBuffer, Boolean,
 DataView, Date, Error, Iterator, Map, Number, Object, Promise, RegExp, Set,
-String, TypedArray, and weak-collection components materialize their default
-in GetFunctionRealm's realm. The component takes built-in code range index 29
-for `%eval%` and `createRealm`, the intrinsic table gains `%eval%`, the
-global object installs it, `%Function%`'s boundary diagnostic becomes
-`OSEO1001`, the runtime input gains one source, and `abiVersion` moves to
-`m5-127`.
+String, TypedArray, and weak-collection components materialize their default in
+GetFunctionRealm's realm.
+
+The component takes built-in code range index 29 for `%eval%` and
+`createRealm`. The intrinsic table gains `%eval%`, the global object installs
+it, `%Function%`'s boundary diagnostic becomes `OSEO1001`, the runtime input
+gains one source, and `abiVersion` moves to `m5-127`.
 
 ### TypedArray iterative methods evidence
 
@@ -1823,52 +1842,56 @@ cell that is still queued alive until that dequeue.
 
 The public context gains the KeptAlive set that `WeakRef` construction and
 `deref` fill and that the collector marks as roots. *runtime\_promise.c* clears
-it before every promise job, and *runtime\_event\_loop.c* clears it before every
+it before every promise job. *runtime\_event\_loop.c* clears it before every
 timer turn and after the script or a timer callback and the promise jobs it
-enabled, and then runs one cleanup job per registry with queued records before
-the next timer, including each timer an internal await drives. The component,
-the four heap kinds, eighteen intrinsic slots, one built-in code ID range, and
-the context fields move `abiVersion` to `m5-113`; no generated-code entry point
-is added. Fixed and generated native differential evidence, a native-only
-cleanup observation, and sanitized fixed C evidence with the AArch64 Linux
-cross-link cover the node under both specialization policies and collection
-forced at every safepoint. The node reviews 249 paths from its four test262
-inventory roots and promotes 25 already reviewed `Map`, `Set`, and `Object`
-cases whose last unmet prerequisite was a weak collection; two of them, the
-`Map` and `Set` value-domain cases, also needed the landed `typed-array-core`
-node.
+enabled. It then runs one cleanup job per registry with queued records before
+the next timer, including each timer an internal await drives.
+
+The component, the four heap kinds, eighteen intrinsic slots, one built-in code
+ID range, and the context fields move `abiVersion` to `m5-113`. No
+generated-code entry point is added.
+
+Fixed and generated native differential evidence, a native-only cleanup
+observation, and sanitized fixed C evidence with the AArch64 Linux cross-link
+cover the node under both specialization policies and collection forced at
+every safepoint. The node reviews 249 paths from its four test262 inventory
+roots and promotes 25 already reviewed `Map`, `Set`, and `Object` cases whose
+last unmet prerequisite was a weak collection. Two of them, the `Map` and `Set`
+value-domain cases, also needed the landed `typed-array-core` node.
 
 ### TypedArray search and join evidence
 
 M5b node `typed-array-search-and-join` adds nine search and join methods to
-*runtime\_typed\_array.c* without changing the view record or the
-component's helper surface. Each method validates the receiver and snapshots
-the view length before converting an argument or calling user code. The
-predicate searches and `includes` read every visited snapshot index through
-the existing integer-indexed element getter, `indexOf` and `lastIndexOf` add
-the integer-indexed presence test, and `join` and `toLocaleString` append
-each element's string into a host-memory `OseoStringBuilder`, so collection
-between two appends cannot move the partial result. The stringifiers push
-the receiver onto the context's existing array-string stack that
-*runtime\_array.c* and *runtime\_primitive.c* already consult, which makes
-cross-component re-entry render an empty string. The nine methods take nine
-code IDs from the TypedArray range and add no helper, intrinsic slot, heap
-kind, component, or generated-code entry point; the component moves
-`abiVersion` to `m5-114`.
+*runtime\_typed\_array.c* without changing the view record or the component's
+helper surface. Each method validates the receiver and snapshots the view
+length before converting an argument or calling user code.
+
+The predicate searches and `includes` read every visited snapshot index through
+the existing integer-indexed element getter, and `indexOf` and `lastIndexOf`
+add the integer-indexed presence test. `join` and `toLocaleString` append each
+element's string into a host-memory `OseoStringBuilder`, so collection between
+two appends cannot move the partial result. The stringifiers push the receiver
+onto the context's existing array-string stack that *runtime\_array.c* and
+*runtime\_primitive.c* already consult, which makes cross-component re-entry
+render an empty string.
+
+The nine methods take nine code IDs from the TypedArray range and add no
+helper, intrinsic slot, heap kind, component, or generated-code entry point.
+The component moves `abiVersion` to `m5-114`.
 
 Fixed and generated native differential evidence at seed `0x60007600` covers
 the ten methods over Number and BigInt kinds with `NaN`, signed-zero, and
 infinite elements, plain and observably converted fromIndex, separator, and
-locale inputs, and detach and shrink during the first callback or conversion,
-under both specialization policies with collection forced at every safepoint,
-a deliberate false-hint guard miss, and an independent model of every
-observation. The node reviews all 356 paths under its ten inventory roots.
+locale inputs, and detach and shrink during the first callback or conversion.
+It runs under both specialization policies, with collection forced at every
+safepoint, a deliberate false-hint guard miss, and an independent model of
+every observation. The node reviews all 356 paths under its ten inventory roots.
 
 M5c node `typed-array-tolocalestring-arguments` makes `toLocaleString` call
 every element method with no arguments, as ECMA-262 specifies, instead of
-forwarding the rooted outer locales and options; the stringifier now roots
-one fewer argument slot. The generated evidence compares Node.js and Deno with
-a labeled ECMA-402 model and native output with an ECMA-262 model, and slot
+forwarding the rooted outer locales and options. The stringifier now roots one
+fewer argument slot. The generated evidence compares Node.js and Deno with a
+labeled ECMA-402 model and native output with an ECMA-262 model. Slot
 `0x60007601` adds a dedicated element argument domain. The component's
 `abiVersion` is unchanged.
 
@@ -1881,75 +1904,88 @@ process-wide open-addressed hash table of immutable UTF-16 keys guarded by an
 atomic flag and never freed. `OseoContext` gains the `registered_symbols`
 open-addressed table of representatives keyed by registry entry, whose every
 slot the collector marks as a root, so each context keeps one Symbol per entry.
-Symbol identity is the entry rather than the heap value: the shared
+
+Symbol identity is the entry rather than the heap value. The shared
 `same_registered_symbol` predicate in *runtime\_internal.h* joins two
-representatives of one entry, and strict and loose equality in
+representatives of one entry. Strict and loose equality in
 *runtime\_primitive.c*, `oseo_internal_same_value` and
 `oseo_internal_same_value_zero` in *runtime\_descriptor.c*, and
-`oseo_internal_property_key_equal` in *runtime\_string.c* each consult it
-after their pointer test fails, which gives Map, Set, and every property
-operation the same rule. The predicate reads only the two heap headers and
-their entry pointers and stores nothing. `oseo_internal_local_symbol` keeps
-the storage side of the same rule: the property append paths in
-*runtime\_descriptor.c* and *runtime\_property.c*, `map_append_entry` in
-*runtime\_map.c*, and `set_append` in *runtime\_set.c* replace a registered
-symbol with the receiving context's own representative before they store it,
-so every key a lookup probes is a value the probing context owns and a stored
-key outlives the context that first registered it. A value position keeps
-whatever representative reached it: the collector traces more than forty value
-fields across twenty heap kinds, from an ordinary property value and an array
-element to a Map value, a WeakMap value, a settled promise's result, and a
-suspended generator's saved slot, and every one of them accepts an arbitrary
-value, so localizing at each store could not be complete. A representative
-therefore outlives the context that created it. The `retained` header flag in
-*runtime\_internal.h* names a representative and the description it holds,
-`oseo_internal_retire_registered_symbols` takes every flagged object out of a
-dying heap into a process-wide list that keeps it reachable, and
-`oseo_context_destroy` calls it before its final collection, so a store another
-context made stays readable and still names the same registry entry. Retiring
-costs one symbol and one string for each key the destroyed context registered,
-so the retained total grows with the number of destroyed contexts that used the
-registry, not with the number of keys: one context retains one pair per key it
-registered, and an embedder that creates and destroys contexts in a loop
-retains one pair per context and key. Bounding it by the entry count instead
-would need one process-owned representative per entry, which would replace the
-per-context representative this component's identity rule is built on, so the
-component keeps the cost. A retired object leaves with its mark set so no later
-collection traces it. A receiving context does
-still trace a foreign value while its own roots hold one as an argument, and
-only the owning heap's own sweep clears a mark on that heap, so
-`oseo_context_destroy` drops every mark through
+`oseo_internal_property_key_equal` in *runtime\_string.c* each consult it after
+their pointer test fails, so Map, Set, and every property operation use the
+same rule. The predicate reads only the two heap headers and their entry
+pointers and stores nothing.
+
+`oseo_internal_local_symbol` keeps the storage side of the same rule. The
+property append paths in *runtime\_descriptor.c* and *runtime\_property.c*,
+`map_append_entry` in *runtime\_map.c*, and `set_append` in *runtime\_set.c*
+replace a registered symbol with the receiving context's own representative
+before they store it. Every key a lookup probes is a value the probing context
+owns, and a stored key outlives the context that first registered it.
+
+A value position keeps whatever representative reached it. The collector traces
+more than forty value fields across twenty heap kinds, from an ordinary
+property value and an array element to a Map value, a WeakMap value, a settled
+promise's result, and a suspended generator's saved slot. Every one of them
+accepts an arbitrary value, so localizing at each store could not be complete.
+A representative therefore outlives the context that created it.
+
+The `retained` header flag in *runtime\_internal.h* names a representative and
+the description it holds. `oseo_internal_retire_registered_symbols` takes every
+flagged object out of a dying heap into a process-wide list that keeps it
+reachable, and `oseo_context_destroy` calls it before its final collection, so
+a store another context made stays readable and still names the same registry
+entry. A retired object leaves with its mark set so no later collection traces
+it.
+
+Retiring costs one symbol and one string for each key the destroyed context
+registered, so the retained total grows with the number of destroyed contexts
+that used the registry, not with the number of keys. One context retains one
+pair per key it registered; an embedder that creates and destroys contexts in a
+loop retains one pair per context and key. Bounding it by the entry count
+instead would need one process-owned representative per entry, which would
+replace the per-context representative this component's identity rule is built
+on, so the component keeps the cost.
+
+A receiving context does still trace a foreign value while its own roots hold
+one as an argument, and only the owning heap's own sweep clears a mark on that
+heap. `oseo_context_destroy` therefore drops every mark through
 `oseo_internal_clear_heap_marks` before that collection and frees the rest of
-the heap whatever another context marked. A build of the
-cluster that fails partway keeps the well-known symbols it already created,
-because materializing the constructor materializes `%Function.prototype%`,
-whose `[Symbol.hasInstance]` key no later build can rewrite; a retry reuses
-those symbols and creates only the ones still missing. The component takes six
-code IDs from the Symbol range and six intrinsic slots, adds two internal
-helpers of its own and one collector helper in *runtime\_memory.c*, and no heap
-kind, component, or generated-code entry point, and moves `abiVersion` to
-`m5-116`.
+the heap whatever another context marked.
+
+A build of the cluster that fails partway keeps the well-known symbols it
+already created, because materializing the constructor materializes
+`%Function.prototype%`, whose `[Symbol.hasInstance]` key no later build can
+rewrite. A retry reuses those symbols and creates only the ones still missing.
+
+The component takes six code IDs from the Symbol range and six intrinsic slots,
+adds two internal helpers of its own and one collector helper in
+*runtime\_memory.c*, and no heap kind, component, or generated-code entry
+point, and moves `abiVersion` to `m5-116`.
 
 ### TypedArray mutation evidence
 
 M5b node `typed-array-mutation` adds six mutation and copying methods to
-*runtime\_typed\_array.c*. The component gains three file-static helpers and
-no `oseo_internal_` entry: one resolves an element range's first Data Block
-byte, one copies a same-kind element prefix between two views, and one
-builds the same-kind result `with` and `toReversed` allocate through this
-realm's concrete constructor rather than SpeciesConstructor. Each method
-validates the receiver and snapshots the view length before converting an
-argument. `fill` then revalidates unconditionally and `copyWithin` and
-`slice` revalidate only when their clamped count is positive, so a detach
-throws a `TypeError` and a shrink clamps the write to the bytes the Data
-Block still holds; `with` instead answers IsValidIntegerIndex against the
-surviving view and throws a `RangeError`. `reverse`, `toReversed`, the
-same-kind branch of `slice`, and the surviving prefix of `with` exchange or
-copy raw bytes, which keeps a Float NaN payload that the number representation
-would canonicalize; only a cross-kind species result converts one element at a
-time, and only that loop allocates, so it re-reads both view records between
-elements. The six methods take six code IDs from the TypedArray range and add
-no intrinsic slot, heap kind, component, or generated-code entry point; the
+*runtime\_typed\_array.c*. The component gains three file-static helpers and no
+`oseo_internal_` entry: one resolves an element range's first Data Block byte,
+one copies a same-kind element prefix between two views, and one builds the
+same-kind result `with` and `toReversed` allocate through this realm's concrete
+constructor rather than SpeciesConstructor.
+
+Each method validates the receiver and snapshots the view length before
+converting an argument. `fill` then revalidates unconditionally, and
+`copyWithin` and `slice` revalidate only when their clamped count is positive,
+so a detach throws a `TypeError` and a shrink clamps the write to the bytes the
+Data Block still holds. `with` instead answers IsValidIntegerIndex against the
+surviving view and throws a `RangeError`.
+
+`reverse`, `toReversed`, the same-kind branch of `slice`, and the surviving
+prefix of `with` exchange or copy raw bytes, which keeps a Float NaN payload
+that the number representation would canonicalize. Only a cross-kind species
+result converts one element at a time, and only that loop allocates, so it
+re-reads both view records between elements.
+
+The six methods take six code IDs from the TypedArray range and add no
+intrinsic slot, heap kind, component, or generated-code entry point; the
 component moves `abiVersion` to `m5-117`.
 
 Fixed and generated native differential evidence at seed `0x60007900` covers
@@ -1966,24 +2002,27 @@ its six inventory roots.
 
 M5b node `typed-array-sort` adds `sort` and `toSorted` to
 *runtime\_typed\_array.c*. The component gains two file-static helpers and one
-shared method body with no `oseo_internal_` entry. The method body checks a
-supplied comparator for callability before it validates the receiver, captures
-the validated length and every element, and then runs a stable bottom-up merge
-sort over rooted Number or BigInt values. The default comparison is numeric,
-places `NaN` after other Numbers and negative zero before positive zero, and
-compares BigInts directly. A supplied comparator is called with `undefined` as
-`this`, and its result passes through ToNumber with `NaN` treated as equality;
-either abrupt completion stops before writeback.
+shared method body with no `oseo_internal_` entry.
+
+The method body checks a supplied comparator for callability before it
+validates the receiver, captures the validated length and every element, and
+then runs a stable bottom-up merge sort over rooted Number or BigInt values.
+The default comparison is numeric, places `NaN` after other Numbers and
+negative zero before positive zero, and compares BigInts directly. A supplied
+comparator is called with `undefined` as `this`, and its result passes through
+ToNumber with `NaN` treated as equality; either abrupt completion stops before
+writeback.
 
 `sort` writes the sorted snapshot back to the receiver and returns that same
-view, while `toSorted` allocates a same-element-kind result before collecting
-the source elements, ignores `constructor` and `Symbol.species`, writes the
-snapshot to the new view, and returns it. Comparator-driven detach, shrink, and
-grow therefore affect only the later in-place writes and the source
-observation, not the already captured list or a `toSorted` result. The two
-methods take two code IDs from the TypedArray range and add no intrinsic slot,
-heap kind, component, or generated-code entry point; the component moves
-`abiVersion` to `m5-121`.
+view. `toSorted` allocates a same-element-kind result before collecting the
+source elements, ignores `constructor` and `Symbol.species`, writes the
+snapshot to the new view, and returns it. Comparator-driven detach, shrink,
+and grow therefore affect only the later in-place writes and the source
+observation, not the already captured list or a `toSorted` result.
+
+The two methods take two code IDs from the TypedArray range and add no
+intrinsic slot, heap kind, component, or generated-code entry point; the
+component moves `abiVersion` to `m5-121`.
 
 Fixed and generated native differential evidence at seed `0x60007d00` covers
 Number and BigInt kinds, numeric default, ascending, descending, equal, `NaN`,
@@ -2002,19 +2041,20 @@ bodies, TypedArrayCreateFromConstructor, which TypedArraySpeciesCreate now
 calls instead of repeating Construct, ValidateTypedArray, and the
 minimum-length check, an IteratorToList helper that the iterable construction
 path shares, and a LengthOfArrayLike helper that the array-like construction
-path wraps with its allocation-size check. `from` validates its receiver and
-mapper before the `Symbol.iterator` lookup, collects an iterable source into
-a rooted argument list before construction, reacquires that list's view for
-each element because mapper calls and conversions can collect, and reads an
-array-like source one index at a time after construction. Both statics store
-through TypedArraySetElement, so a detached, shrunk, or grown result only
-changes which writes land.
+path wraps with its allocation-size check.
+
+`from` validates its receiver and mapper before the `Symbol.iterator` lookup.
+It collects an iterable source into a rooted argument list before
+construction, and reacquires that list's view for each element because mapper
+calls and conversions can collect. It reads an array-like source one index at
+a time after construction. Both statics store through TypedArraySetElement, so
+a detached, shrunk, or grown result only changes which writes land.
 
 The component also retires its two deferred-surface queries,
 `oseo_internal_typed_array_deferred_diagnostic` and
-`oseo_internal_typed_array_deferred_own_keys_diagnostic`, and the calls in
-*runtime\_property.c*, *runtime\_primitive.c*, *runtime\_descriptor.c*, and
-*runtime\_object\_builtin.c* that stopped lookup, `in`, own-property tests,
+`oseo_internal_typed_array_deferred_own_keys_diagnostic`. It also retires the
+calls in *runtime\_property.c*, *runtime\_primitive.c*, *runtime\_descriptor.c*,
+and *runtime\_object\_builtin.c* that stopped lookup, `in`, own-property tests,
 descriptor queries, deletion, and own-key walks at them. The methods take two
 code IDs from the TypedArray range and add no intrinsic slot, heap kind,
 component, or generated-code entry point; the component moves `abiVersion` to
@@ -2085,15 +2125,15 @@ The split moved function bodies without editing them. Comparing the
 token streams of every function before and after, the only differences
 are inserted line breaks and braces around single-statement `if` bodies
 that the 80-column rule required. External text symbols across the
-family grew from 42 to 53, which is exactly the eleven promoted helpers
-(`oseo_internal_ascii_string`, `oseo_internal_string_equal`,
+family grew from 42 to 53, which is exactly the eleven promoted helpers:
+`oseo_internal_ascii_string`, `oseo_internal_string_equal`,
 `oseo_internal_property_key_equal`, `oseo_internal_array_index`,
 `oseo_internal_string_own_property`,
 `oseo_internal_own_property_index`, `oseo_internal_remove_property`,
 `oseo_internal_grow_properties`,
 `oseo_internal_cell_backed_property`,
 `oseo_internal_require_property_key`, and
-`oseo_internal_set_array_length`); no public declaration in
+`oseo_internal_set_array_length`. No public declaration in
 *oseo\_runtime.h* was added, removed, or changed.
 
 `abiVersion` stays `m5-43`. It names the generated-code ABI contract
@@ -2102,11 +2142,8 @@ reuse key already hashes every asset's name, kind, and contents, so a
 source reorganization invalidates a cached archive without a version
 bump.
 
-On `linux-x86_64-gnu`, `mise run check`, `mise run test`,
-`mise run test:native`, `mise run test:test262`, and
-`mise run test:property:native` all passed, with the pinned test262
-subset reporting `tests=4861/4861 pass=2934`, unchanged from the
-ratchet baseline.
+On `linux-x86_64-gnu`, the pinned test262 subset reports
+`tests=4861/4861 pass=2934`, unchanged from the ratchet baseline.
 
 ### Evidence compared with the baseline
 
@@ -2264,7 +2301,7 @@ cross-responsibility dependencies that shape the internal header are:
  -  Promise job execution is entered from two scheduler paths: entry-task
     and event-loop checkpoints call `oseo_jobs_drain`, while a timer turn
     drains through `jobs_drain_until` together with the rejection
-    checkpoint; timers and `await` call back into promise construction and
+    checkpoint. Timers and `await` call back into promise construction and
     function dispatch.
  -  Function creation builds on ordinary objects, and generic dispatch is
     invoked from promises, timers, and the event loop through the

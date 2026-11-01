@@ -21,9 +21,10 @@ Allocate binding and function IDs monotonically from zero, including nested
 functions, parameters, local bindings, hidden cells, and class helpers. The
 case starts at the harness's exclusive binding and function limits. There is
 no relocation pass: `localBindingIds` and every reference acquire their final
-IDs when HIR is built. A harness's limits depend only on its own sources and
-policy. IDs are stable within that bundle and ABI, not across different
-bundles or compiler versions.
+IDs when HIR is built.
+
+A harness's limits depend only on its own sources and policy. IDs are stable
+within that bundle and ABI, not across different bundles or compiler versions.
 
 The case imports the harness's Script binding descriptors, including
 mutability and global-object ownership. Both units access the same cells.
@@ -41,8 +42,10 @@ capacities against the target's representable limits before C emission.
 
 JavaScript function IDs keep the backend's existing code-ID mapping. Harness
 IDs precede case IDs; runtime built-in IDs retain the runtime header's separate
-reserved space. Each unit owns its generic and specialized implementations and
-its generator/async resume dispatch. The launcher routes normal calls and
+reserved space.
+
+Each unit owns its generic and specialized implementations and its
+generator/async resume dispatch. The launcher routes normal calls and
 resumptions to the owning unit and delegates built-ins to the runtime. Each
 unit retains all of its own functions, regardless of the case's reachability.
 The Script entry sentinel `-1` is unit-local and is never a callable code ID.
@@ -51,18 +54,19 @@ The Script entry sentinel `-1` is unit-local and is never a callable code ID.
 Native linkage selected for stage 2
 -----------------------------------
 
-The launcher exports `const size_t oseo_fragment_binding_count`. The launcher
-uses this symbol when creating the shared environment. Inspection during stage
-2 corrected the earlier requirement that function prologues load it: the
-existing runtime environment clone already preserves capacity, so function
-prologues need no capacity argument. It is immutable for the lifetime of one
+The launcher exports `const size_t oseo_fragment_binding_count` and uses it
+when creating the shared environment. Function prologues do not load this
+symbol: the existing runtime environment clone already preserves capacity, so
+no capacity argument is needed. This value is immutable for the lifetime of one
 executable. Cross-unit LTO is disabled so this value cannot enter a cached
-harness object. Each unit exports an instantiation entry, an evaluation entry,
-and dispatch entries with distinct `oseo_harness_` and `oseo_case_` prefixes.
-Evaluation and instantiation accept `OseoContext *` and the rooted `OseoValue`
-environment, and return `OseoResult`. Dispatch entries retain the runtime's
-existing call arguments and additionally accept the already-decoded function
-code ID. Generator dispatch accepts that ID and the generator object.
+harness object.
+
+Each unit exports an instantiation entry, an evaluation entry, and dispatch
+entries with distinct `oseo_harness_` and `oseo_case_` prefixes. Evaluation and
+instantiation accept `OseoContext *` and the rooted `OseoValue` environment,
+and return `OseoResult`. Dispatch entries retain the runtime's existing call
+arguments and additionally accept the already-decoded function code ID.
+Generator dispatch accepts that ID and the generator object.
 
 The launcher routes IDs using the harness's exclusive function limit. Each
 unit's dispatcher owns its frame allocation and its own function root counts;
@@ -86,112 +90,133 @@ then all vars, with harness-before-case order within each kind. This preserves
 the whole-Script path's global property insertion order. Simple concatenation
 of the fragment tables would place harness vars before case functions, which
 changes `Object.keys(this)` and related observations. Lexical declarations
-remain in harness-then-case order. The launcher performs one
-GlobalDeclarationInstantiation before evaluating either unit.
-It checks lexical/object conflicts and restricted global properties, allocates
-uninitialized lexical cells, initializes var bindings, and installs hoisted
-functions. Initially, redeclarations across units make the case ineligible for
-reuse, even when a whole Script could accept them. Redeclarations within one
-fragment keep the existing frontend and resolver rules, including last-function
-selection.
+remain in harness-then-case order.
+
+The launcher performs one GlobalDeclarationInstantiation before evaluating
+either unit. It checks lexical/object conflicts and restricted global
+properties, allocates uninitialized lexical cells, initializes var bindings,
+and installs hoisted functions.
+
+Initially, redeclarations across units make the case ineligible for reuse, even
+when a whole Script could accept them. Redeclarations within one fragment keep
+the existing frontend and resolver rules, including last-function selection.
 
 The launcher owns top-level hoisted function installation and each fragment's
 hidden intrinsic-global-object initializer. Ownership is identified by HIR
 statement kind and the explicit intrinsic binding ID, never by source ranges.
+
 The launcher also creates each fragment's hidden missing-intrinsic cells, which
 stay uninitialized and report the unresolvable reference that names them, as
-the whole-Script prologue does. A fragment may have its own hidden cell for
-the same realm object; those cells hold the same object and occupy disjoint
-slots. This avoids making harness allocation depend on
-which intrinsics a case uses. The initializer metadata also identifies the
-frontend's synthetic var initialization by its global-object binding
-descriptors. Source-level var initializer assignments stay in evaluation order.
+the whole-Script prologue does. A fragment may have its own hidden cell for the
+same realm object; those cells hold the same object and occupy disjoint slots.
+This avoids making harness allocation depend on which intrinsics a case uses.
+
+The initializer metadata also identifies the frontend's synthetic var
+initialization by its global-object binding descriptors. Source-level var
+initializer assignments stay in evaluation order.
 
 After successful instantiation, execute harness evaluation then case
 evaluation, short-circuiting abrupt completions. The launcher retains the
-shared environment root across both calls. Each fragment entry and function
-owns its MIR value IDs, root frame, temporary slots, completion slots, local
-string arrays, regexp/template data, and property caches. Frame size depends
-only on that function or entry. Never concatenate the two Script MIR entries
-or size a harness frame from the case's maximum value ID.
+shared environment root across both calls.
 
-Shape IDs belong to the shared runtime context. Property caches are local to
-a unit/function and learn shapes from that context. Intrinsic enums continue
-to come from the common runtime header. No global string-ID or shape-ID
-relocation table crosses this boundary. One fresh process/context per case
-preserves the current static-cache lifetime contract.
+Each fragment entry and function owns its MIR value IDs, root frame, temporary
+slots, completion slots, local string arrays, regexp/template data, and
+property caches. Frame size depends only on that function or entry. Never
+concatenate the two Script MIR entries or size a harness frame from the case's
+maximum value ID.
+
+Shape IDs belong to the shared runtime context. Property caches are local to a
+unit/function and learn shapes from that context. Intrinsic enums continue to
+come from the common runtime header. No global string-ID or shape-ID relocation
+table crosses this boundary. One fresh process/context per case preserves the
+current static-cache lifetime contract.
 
 
 Admission and source locations
 ------------------------------
 
-The resolver records names resolved in the Script scope or beyond it,
-including nested closures, unresolved `typeof`, assignment/delete targets,
-and the special console/timer call paths. Local bindings and property keys
-are excluded. Compare all case global lexical and global-object declarations
-against these names and all harness Script declarations. Any overlap returns
-an explicit fallback result. This covers `let Object`, destructuring, class
-names, hoisted var declarations, and function replacements conservatively.
+The resolver records names resolved in the Script scope or beyond it, including
+nested closures, unresolved `typeof`, assignment/delete targets, and the
+special console/timer call paths. Local bindings and property keys are
+excluded. Compare all case global lexical and global-object declarations
+against these names and all harness Script declarations. Any overlap returns an
+explicit fallback result. This covers `let Object`, destructuring, class names,
+hoisted var declarations, and function replacements conservatively.
 
 An initializing `with` write that still reaches a hidden fallback cell in
-either fragment also requires fallback. Only a runtime-owned intrinsic or a
-standard global this profile has not admitted as a value keeps such a cell;
-every other unresolved name reaches the realm global object, which the
-launcher shares between both fragments, so its writes and `typeof` reads need
-no fallback. ECMA-262 models the remaining write as creating a real global
-binding, which the other fragment could not observe through a cell private to
-the writing fragment. This restriction preserves both directions of the
-dependency without adding body inputs to harness lowering.
+either fragment also requires fallback. Such a cell remains only for a
+runtime-owned intrinsic or for a standard global that this profile has not
+admitted as a value. Every other unresolved name reaches the realm global
+object, which the launcher shares between both fragments, so its writes and
+`typeof` reads need no fallback. ECMA-262 models the remaining write as
+creating a real global binding, which the other fragment could not observe
+through a cell private to the writing fragment. This restriction preserves both
+directions of the dependency without adding body inputs to harness lowering.
 
 Compilation failure does not establish eligibility for reuse. The runner sends
 parse failures, unsupported inputs, unknown metadata, and collisions to the
 unchanged whole-Script path with the exact original assembled source and source
 ID. That path owns TDZ behavior, early errors, and diagnostic locations. A case
-whose standalone directive prologue changes strictness also falls back. Module
-graphs and raw tests initially use the whole-program path. Module support needs
-separate linking and initialization evidence before admission.
+whose standalone directive prologue changes strictness also falls back.
 
-Stage 1 parses ordered harness sources joined by newlines under a fixed
-virtual source ID, with an optional leading strict directive. It parses the
-case separately under the same requested strictness. Locations are local to
-these compiler inputs. Stage 2 passes a logical source-map descriptor through
-the launcher: harness errors use the case's original assembled source ID and
-line mapping; case errors apply the harness-prefix offset. No case path may
-be baked into the harness object. The runner verifies that source boundaries,
-directive prologues, automatic semicolon insertion, and source text retained
-for functions match the runner's original assembly before admitting reuse.
-A source boundary that cannot be represented exactly falls back.
+Module graphs and raw tests initially use the whole-program path. Module
+support needs separate linking and initialization evidence before admission.
+
+Stage 1 parses ordered harness sources joined by newlines under a fixed virtual
+source ID, with an optional leading strict directive. It parses the case
+separately under the same requested strictness. Locations are local to these
+compiler inputs.
+
+Stage 2 passes a logical source-map descriptor through the launcher: harness
+errors use the case's original assembled source ID and line mapping; case
+errors apply the harness-prefix offset. No case path may be baked into the
+harness object. The runner verifies that source boundaries, directive
+prologues, automatic semicolon insertion, and source text retained for
+functions match the runner's original assembly before admitting reuse. A source
+boundary that cannot be represented exactly falls back.
 
 
 Object reuse and variants
 -------------------------
 
-The content-addressed key uses a canonical, length-delimited encoding of the
-ABI identifier; ordered harness names and exact source bytes, including
-repeated includes and async helpers; effective strictness; specialization and
-observation policy; frontend/compiler/backend identity; runtime ABI and all
-runtime/header bytes; complete target description; sanitizer requirements;
-compiler/toolchain identity and version; all compilation/link flags; admitted
-process environment; and canonical emitted harness C bytes. Compiler identity
-must cover local code changes, not merely the package release version.
-Cache metadata is separate from the reviewed manifest.
+The content-addressed key uses a canonical, length-delimited encoding of these
+fields:
+
+ -  the ABI identifier
+ -  ordered harness names and exact source bytes, including repeated includes
+    and async helpers
+ -  effective strictness
+ -  specialization and observation policy
+ -  frontend/compiler/backend identity
+ -  runtime ABI and all runtime/header bytes
+ -  complete target description
+ -  sanitizer requirements
+ -  compiler/toolchain identity and version
+ -  all compilation/link flags
+ -  admitted process environment
+ -  canonical emitted harness C bytes
+
+Compiler identity must cover local code changes, not merely the package
+release version. Cache metadata is separate from the reviewed manifest.
 
 Non-strict/enabled, non-strict/disabled, strict/enabled, and strict/disabled
 have separate keys and objects. Object reuse never removes an executed
 variant. Module fallback still executes its existing strict variants. A
 future module implementation may use two strict objects only after proving
-its environment contract; it cannot assume a Script object is interchangeable.
+its environment contract. It cannot assume a Script object is
+interchangeable.
 
 Both Zig and host-cc adapters compile relative `harness.c` in a normalized
 staging layout with fixed relative header paths. Apply compiler-supported
 file/debug prefix maps and a fixed debug compilation directory. Absolute input
 paths must not survive in debug records, sanitizer records, or macros. Prefix
-mapping alone is insufficient according to the prototype. Verify objects
-from two distinct absolute directories byte for byte, under every admitted
-variant and target/toolchain policy. Until proven, do not claim deterministic
-objects. Retain sanitizer instrumentation on both generated units and runtime.
-The host-cc adapter's instrumentation probe remains required; historical Zig
-flags alone do not prove ASan coverage.
+mapping alone is insufficient according to the prototype. Verify objects from
+two distinct absolute directories byte for byte, under every admitted variant
+and target/toolchain policy. Until proven, do not claim deterministic objects.
+
+Retain sanitizer instrumentation on both generated units and runtime. The
+host-cc adapter's instrumentation probe remains required. Historical Zig flags
+alone do not prove ASan coverage.
 
 
 Evidence and remaining stages
@@ -218,15 +243,15 @@ cache publication and corruption recovery, and key-change tests. Local shard
 measurements compare the same inputs with and without reuse; the full reviewed
 run compares every manifest field against main. CI wall time and CPU after
 merging remain to be measured on Linux and macOS. Local measurements belong in
-*PLAN-GATE.md* and do not establish CI savings. The prior
-765-to-511-minute macOS work projection and 102-to-106-minute wall-time floor
-are estimates, not stage 1 measurements.
+*PLAN-GATE.md* and do not establish CI savings. The prior 765-to-511-minute
+macOS work projection and 102-to-106-minute wall-time floor are estimates, not
+stage 1 measurements.
 
-The design study identifies whole-Script numbering as a reuse
-barrier. The prototype shows that stable IDs alone cannot preserve lexical
-shadowing and that equal C does not imply equal object bytes. The corpus scan
-found no declared-name collisions in 64,108 recorded variants, but does not
-prove dynamic-global equivalence or eliminate the fallback requirement.
+The design study identifies whole-Script numbering as a reuse barrier. The
+prototype shows that stable IDs alone cannot preserve lexical shadowing and
+that equal C does not imply equal object bytes. The corpus scan found no
+declared-name collisions in 64,108 recorded variants, but does not prove
+dynamic-global equivalence or eliminate the fallback requirement.
 
 
 Stage 1 whole-Script baseline
@@ -347,8 +372,6 @@ holds two root slots across phase calls; each phase retains its own budget.
 This changes resource accounting near the active-slot limit, so the runner must
 not treat ordinary execution equivalence as proof of identical resource
 thresholds.
-Recursive-call depth, abrupt completions, and forced collection are separate
-regression probes in *tests/harness-native.test.ts*.
 
 The stage 2 entry-frame probe measures a harness function called by the case.
 On Linux x86\_64, active root slots increased from 67 to 69. Measured native
@@ -356,8 +379,11 @@ frame-address depth increased from 2,432 to 2,592 bytes with Zig and from
 2,624 to 2,816 bytes with host Clang 22 under ASan/UBSan. The test instruments
 only its own generated C; equivalence tests use unmodified output. These
 measurements describe that probe and build policy, not universal overhead or
-identical resource thresholds. The call-depth-limit probe retains the same
-exit status and diagnostic bytes in both builds.
+identical resource thresholds.
+
+The call-depth-limit probe retains the same exit status and diagnostic bytes
+in both builds. Recursive-call depth, abrupt completions, and forced
+collection are separate regression probes in *tests/harness-native.test.ts*.
 
 
 Stage 3 runner behavior
@@ -367,14 +393,15 @@ The runner keeps the original assembled source as the fallback input and
 manifest hash input. An execution request also carries the original body,
 ordered harness sources, raw flag, and requested strictness. Admission checks
 both compiler fragment results and parsed top-level source boundaries before
-building any split artifact. Modules, raw inputs, strictness changes, boundary
-changes, and compiler fallback results take the whole-Script path.
-A conservative token check also falls back on `with`, including uses as a
-keyword-shaped property name. Body directive nodes that become expressions
-in the assembled Script fail the boundary check, even in an already strict
-variant. These conservative exclusions preserve the existing parse context.
-Native build failures are infrastructure failures; they do not trigger
-whole-Script fallback.
+building any split artifact.
+
+Modules, raw inputs, strictness changes, boundary changes, and compiler
+fallback results take the whole-Script path. A conservative token check also
+falls back on `with`, including uses as a keyword-shaped property name. Body
+directive nodes that become expressions in the assembled Script fail the
+boundary check, even in an already strict variant. These conservative
+exclusions preserve the existing parse context. Native build failures are
+infrastructure failures. They do not trigger whole-Script fallback.
 
 `OSEO_TEST262_HARNESS_REUSE=disabled` forces the existing whole-Script executor.
 Build-path counters live outside the reviewed manifest and distinguish attempts
@@ -382,14 +409,14 @@ from execution evidence. Every emitted harness is compared with the first C
 output for its bundle and policy, including across different bodies.
 
 The runner uses the host cache's exclusive object-key lock and atomic file
-publication. A runner-owned SHA-256 sidecar validates cached object bytes;
-a missing or invalid sidecar or an object digest mismatch causes a rebuild
-under the same lock. In-process promises
-coalesce concurrent preparation; rejected promises are evicted so later cases
-can retry preparation. The existing host cache directory is local to
-the CI job; no new cross-shard cache sharing is introduced. The cache key
-includes a content hash of package sources, manifests, and the dependency
-lockfile.
+publication. A runner-owned SHA-256 sidecar validates cached object bytes.
+A missing or invalid sidecar or an object digest mismatch causes a rebuild
+under the same lock. In-process promises coalesce concurrent preparation.
+Rejected promises are evicted so later cases can retry preparation.
+
+The existing host cache directory is local to the CI job. No new cross-shard
+cache sharing is introduced. The cache key includes a content hash of package
+sources, manifests, and the dependency lockfile.
 
 A programmatic CLI native-unit entry point reuses the existing runtime archive,
 target validation, process diagnostics, execution, and cleanup workflow. The
@@ -406,35 +433,37 @@ OSEO_TEST262_HARNESS_REUSE=disabled \
 The `test262-builds` JSON log reports attempts and variants counted as
 execution evidence by build path or fallback reason, plus harness C comparisons
 and object builds and disk-cache hits. An attempt counts as an execution only
-when the CLI reports that its compiled executable started, the same fact the
-runner uses for execution evidence; compile-stage rejections and toolchain or
+when the CLI reports that its compiled executable started. The runner uses the
+same fact for execution evidence. Compile-stage rejections and toolchain or
 host failures before that point are attempts only. These counters do not enter
 the manifest or alter any evidence class.
 
 On Linux, the host uses `$XDG_CACHE_HOME/oseo/harness-objects`, defaulting to
 `~/.cache/oseo/harness-objects`. On macOS it uses
-`~/Library/Caches/oseo/harness-objects`. The CI workflow does not restore or
-publish this namespace: shards in distinct jobs start independently. Workers
-inside one process share preparation promises; separate processes using the
-same directory share the host's renewable file lock. Removing the namespace
-between runs is safe. No age or size eviction policy is added.
+`~/Library/Caches/oseo/harness-objects`.
+
+The CI workflow does not restore or publish this namespace: shards in distinct
+jobs start independently. Workers inside one process share preparation
+promises. Separate processes using the same directory share the host's
+renewable file lock. Removing the namespace between runs is safe. No age or
+size eviction policy is added.
 
 Set `OSEO_TEST262_VERIFY_HARNESS_OBJECTS=1` for determinism evidence. Once per
 encountered bundle and policy, the runner rebuilds its object in a separate
 temporary directory and compares the bytes with the object used for linking.
 A mismatch fails the run. The `deterministicObjects` counter records completed
 comparisons. This extra compilation is disabled in ordinary runs and timing
-comparisons, and is required for final full-corpus verification.
+comparisons. It is required for final full-corpus verification.
 
 Line offsets count all ECMAScript line separators, including CRLF as one
 separator and lone CR, LF, U+2028, and U+2029. Counting only LF would preserve
-ordinary harness inputs but misreport body errors after other separators;
-runner regression tests compare those locations with whole-Script execution.
+ordinary harness inputs but misreport body errors after other separators.
+Runner regression tests compare those locations with whole-Script execution.
 
 The post-revert sanitizer repair guards function bodies with the shared
 runtime frame ceiling and applies the explicit host C callable-frame charge
 in both direct and dispatched calls. All 44 whole-Script digest records are
-regenerated for these C-only changes; HIR and MIR are unchanged.
+regenerated for these C-only changes. HIR and MIR are unchanged.
 
 
 Default derived constructor forwarding
@@ -446,12 +475,13 @@ of the 44 whole-Script records: *functions/function-prototype* and
 These fixtures contain implicit derived constructors. Removing their
 synthetic rest binding and iterator evaluation changes printed HIR, MIR
 and emitted C, including subsequent binding and root numbering.
-A clean source archive of base
-`1f3ade138ea7cbee80b2d62940e8f497db2bc1a2` reproduced all 44 old hashes;
-the other 40 outputs remain unchanged. This changes no runtime ABI.
+The other 40 outputs remain unchanged; a clean source archive of base
+`1f3ade138ea7cbee80b2d62940e8f497db2bc1a2` reproduced all 44 old hashes.
+This changes no runtime ABI.
+
 The comparison script and its output live in
 */data/m5c-derived-spread-20261031/compare-baseline.ts* and
-*baseline-compare.out*. These hashes measure code generation; the node's
+*baseline-compare.out*. These hashes measure code generation. The node's
 work note records its separate native execution evidence.
 
 M5c node `array-generated-property-cost-remediation` regenerates all 44

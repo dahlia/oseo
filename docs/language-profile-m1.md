@@ -49,24 +49,28 @@ The script may contain top-level function declarations, `const` declarations,
 and expression statements. A function body may contain `const` declarations,
 expression statements, `if` statements with an optional `else`, nested block
 statements, and `return` statements. A `const` declaration has one identifier
-binding and an initializer. Oseo preserves lexical scope, temporal dead zones,
-and the runtime error caused by reading an uninitialized binding on an executed
-control-flow path. Declared functions may read script-level lexical bindings;
-parameters and function-local bindings shadow those script bindings. A function
-call before a referenced script binding is initialized observes the same
-temporal-dead-zone error.
+binding and an initializer.
+
+Oseo preserves lexical scope, temporal dead zones, and the runtime error caused
+by reading an uninitialized binding on an executed control-flow path. Declared
+functions may read script-level lexical bindings; parameters and function-local
+bindings shadow those script bindings. A function call before a referenced
+script binding is initialized observes the same temporal-dead-zone error.
 
 Functions have plain identifier parameters. Missing arguments bind to
 `undefined`; extra arguments are evaluated and then ignored. A non-strict
 function may repeat a parameter name, and the last parameter position supplies
-the shared binding. Repeated top-level function declarations are permitted, and
-the last declaration with a given name supplies its body. Direct calls to a
-declared function may recurse. At most 256 declared-function calls may be
-active. A call that would exceed this deterministic limit fails with an owned
-`OSEO2001` diagnostic before entering another native stack frame. Optional
-markers, default values, destructuring, rest parameters, methods, generators,
-asynchronous functions, nested functions, closures, constructors, `this`, and
-`new.target` are outside the profile.
+the shared binding.
+
+Repeated top-level function declarations are permitted, and the last
+declaration with a given name supplies its body. Direct calls to a declared
+function may recurse. At most 256 declared-function calls may be active. A call
+that would exceed this deterministic limit fails with an owned `OSEO2001`
+diagnostic before entering another native stack frame.
+
+Optional markers, default values, destructuring, rest parameters, methods,
+generators, asynchronous functions, nested functions, closures, constructors,
+`this`, and `new.target` are outside the profile.
 
 The script and active declared functions may use at most 32,768 MIR root slots
 in total. A function entry that would exceed this deterministic native-frame
@@ -109,11 +113,9 @@ TypeScript annotation using `number`, `string`, `boolean`, `undefined`, `null`,
 `unknown`, or `any`. JSDoc `@param` and `@returns` annotations in `/** ... */`
 documentation comments are retained with their provenance. Tag-shaped text in
 ordinary line or block comments is ignored. M1 records these hints but does not
-specialize from them. Adding, removing, or falsifying a hint cannot change
-whether the program is accepted or how it behaves.
+specialize from them.
 
-M1 established the generic behavior without using hints. M2 may select the
-checked small-integer addition described in
+M2 may select the checked small-integer addition described in
 [*specialization-m2.md*](./specialization-m2.md). The generic profile remains
 the semantic authority: adding, removing, replacing, conflicting, or falsifying
 a hint cannot change source acceptance or observable behavior.
@@ -127,14 +129,17 @@ the TypeScript type checker.
 Features held back by prerequisites
 -----------------------------------
 
-Assignment and loops need mutation and loop-aware control-flow lowering.
-Function values and nested functions need closures and heap environments.
-Property access needs the generic object and prototype model. Loose equality
-needs the full abstract-equality conversion graph. `throw`, `try`, and `catch`
-need language-visible exception objects even though the native call ABI already
-represents abrupt completion. Modules need graph resolution, instantiation, and
-live bindings. Promises and asynchronous functions need a job queue. These
-features remain unsupported until their prerequisites enter a later plan.
+These features remain unsupported until their prerequisites enter a later
+plan:
+
+ -  Assignment and loops need mutation and loop-aware control-flow lowering.
+ -  Function values and nested functions need closures and heap environments.
+ -  Property access needs the generic object and prototype model.
+ -  Loose equality needs the full abstract-equality conversion graph.
+ -  `throw`, `try`, and `catch` need language-visible exception objects even
+    though the native call ABI already represents abrupt completion.
+ -  Modules need graph resolution, instantiation, and live bindings.
+ -  Promises and asynchronous functions need a job queue.
 
 
 Failure classes
@@ -214,12 +219,16 @@ Required M1 fixtures
 The M1 differential suite covers every accepted literal, conversion, operator,
 declaration, branch, call, and return rule above. It also includes negative
 fixtures for withheld feature classes and stable fixtures for owned diagnostic
-data. Number fixtures cover `NaN`, infinities, overflow to infinity, subnormal
+data.
+
+Number fixtures cover `NaN`, infinities, overflow to infinity, subnormal
 numbers, negative zero, fixed-to-exponential formatting boundaries, and numeric
 strings containing embedded null code units or noncanonical infinity spellings.
 Long binary, octal, and hexadecimal strings cover one correctly rounded
-conversion into binary64. Call fixtures cover recursion, missing and extra
-arguments, nested calls, argument ordering, and abrupt runtime propagation.
-Reference fixtures install the deterministic M1 `console.log` operation instead
-of comparing against each host's formatting behavior. MIR fixtures identify
-generic addition as an allocation and collection safepoint.
+conversion into binary64.
+
+Call fixtures cover recursion, missing and extra arguments, nested calls,
+argument ordering, and abrupt runtime propagation. Reference fixtures install
+the deterministic M1 `console.log` operation instead of comparing against each
+host's formatting behavior. MIR fixtures identify generic addition as an
+allocation and collection safepoint.
