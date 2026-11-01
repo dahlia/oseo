@@ -3,7 +3,7 @@ import { readFileSync } from "node:fs";
 import test from "node:test";
 
 import type { Test262Result } from "../packages/testkit/src/index.ts";
-import { stringify as stringifyYaml } from "yaml";
+import { parse as parseYaml, stringify as stringifyYaml } from "yaml";
 
 import {
   exclusionAuditDigest,
@@ -13,6 +13,7 @@ import {
   hasLookupCall,
   legacyCallerSelector,
   m5cAnnexDynamicResiduePaths,
+  m5cAnnexLookupClosedPaths,
   validateCurrentM5cExclusionAudit,
   validateM5cExclusionAudit,
 } from "../tools/m5c-exclusion-audit.ts";
@@ -170,6 +171,7 @@ test("accepted bounded rejection and tag debt are counted separately", () => {
   assert.deepEqual(validateM5cExclusionAudit(stringifyYaml(audit), inputs), {
     exclusions: 1,
     remediation: 0,
+    deferrals: 0,
     missingDynamicTags: 1,
   });
 });
@@ -200,6 +202,7 @@ test("exact parse-time dynamic import rejection accepts either owner", () => {
         {
           exclusions: remediation ? 0 : 1,
           remediation: remediation ? 1 : 0,
+          deferrals: 0,
           missingDynamicTags: 1,
         },
       );
@@ -248,6 +251,7 @@ test("dynamic import tag debt must match the reviewed dependencies", () => {
   assert.deepEqual(validateM5cExclusionAudit(stringifyYaml(audit), tagged), {
     exclusions: 1,
     remediation: 0,
+    deferrals: 0,
     missingDynamicTags: 0,
   });
   assert.throws(
@@ -299,7 +303,7 @@ test("reserved dynamic attributes require the bounded exclusion", () => {
         stringifyYaml(withReservationAssessment(audit, name)),
         reserved,
       ),
-      { exclusions: 1, remediation: 0, missingDynamicTags: 1 },
+      { exclusions: 1, remediation: 0, deferrals: 0, missingDynamicTags: 1 },
       name,
     );
   }
@@ -541,6 +545,75 @@ test("unresolved non-source coverage requires remediation ownership", () => {
   );
 });
 
+test("a deferral row needs the deferred owner and is counted apart", () => {
+  const { audit, inputs } = fixture(true);
+  audit.assessments.reviewed.disposition = "deferral";
+  assert.throws(
+    () => validateM5cExclusionAudit(stringifyYaml(audit), inputs),
+    /requires owner deferred for/u,
+  );
+  const deferred: M5cExclusionAuditInputs = {
+    ...inputs,
+    ledger: {
+      ...inputs.ledger,
+      entries: inputs.ledger.entries.map((entry) =>
+        Object.assign({}, entry, { owner: "deferred" }),
+      ),
+    },
+  };
+  assert.deepEqual(validateM5cExclusionAudit(stringifyYaml(audit), deferred), {
+    exclusions: 0,
+    remediation: 0,
+    deferrals: 1,
+    missingDynamicTags: 1,
+  });
+  audit.assessments.reviewed.disposition = "deferred";
+  assert.throws(
+    () => validateM5cExclusionAudit(stringifyYaml(audit), deferred),
+    /Audit needs a disposition/u,
+  );
+  audit.assessments.reviewed.disposition = "deferral";
+  audit.assessments.reviewed.normativeDependency = "source-evaluation-only";
+  assert.throws(
+    () => validateM5cExclusionAudit(stringifyYaml(audit), deferred),
+    /An authorized exclusion surface cannot be deferred/u,
+  );
+});
+
+test("a deferred path on a record surface cannot drop its audit row", () => {
+  const { audit, inputs } = fixture();
+  const deferred: M5cExclusionAuditInputs = {
+    ...inputs,
+    ledger: {
+      ...inputs.ledger,
+      entries: inputs.ledger.entries.map((entry) =>
+        Object.assign({}, entry, { owner: "deferred" }),
+      ),
+    },
+  };
+  const unaudited = stringifyYaml({ ...audit, paths: [] });
+  assert.throws(
+    () => validateM5cExclusionAudit(unaudited, deferred),
+    /Deferred path on a record surface needs its audit row/u,
+  );
+  assert.throws(
+    () =>
+      validateM5cExclusionAudit(unaudited, { ...deferred, sources: new Map() }),
+    /Deferred path lacks its observation or source/u,
+  );
+  const offSurface = {
+    ...observation,
+    detail: "error[OSEO1001]: ImportDeclaration is outside the M1 profile.",
+  };
+  assert.deepEqual(
+    validateM5cExclusionAudit(unaudited, {
+      ...deferred,
+      results: [{ ...result, observation: offSurface }],
+    }),
+    { exclusions: 0, remediation: 0, deferrals: 0, missingDynamicTags: 0 },
+  );
+});
+
 test("the Annex B residue selector bounds ADR 0013 over eval", () => {
   const { audit, inputs } = fixture();
   audit.assessments.reviewed.normativeDependency = "annex-b-only";
@@ -722,7 +795,7 @@ test("the run-time Function and eval boundaries are record surfaces", () => {
         ...inputs,
         results: [{ ...result, observation: runtime }],
       }),
-      { exclusions: 1, remediation: 0, missingDynamicTags: 1 },
+      { exclusions: 1, remediation: 0, deferrals: 0, missingDynamicTags: 1 },
       name,
     );
   }
@@ -750,6 +823,7 @@ test("promotion uses observation ownership and removes the exclusion", () => {
   assert.deepEqual(validateM5cExclusionAudit(stringifyYaml(audit), promoted), {
     exclusions: 0,
     remediation: 0,
+    deferrals: 0,
     missingDynamicTags: 0,
   });
 });
@@ -784,6 +858,7 @@ test("observed promotions close reserved dynamic attribute assessments", () => {
       {
         exclusions: 0,
         remediation: 0,
+        deferrals: 0,
         missingDynamicTags: 0,
       },
     );
@@ -851,7 +926,10 @@ test("reserved dynamic attributes reject an omitted promoted row", () => {
  * audit accepts for a non-excluded row; dynamic-tag debt applies only to the
  * dynamic-source owners, never to the Annex B ones.
  */
-function expectedAuditCounts(ledger: M5cClosureLedger) {
+function expectedAuditCounts(
+  ledger: M5cClosureLedger,
+  auditedPaths: ReadonlySet<string>,
+) {
   const exclusions = ledger.entries.filter((entry) =>
     entry.owner.startsWith("adr:"),
   );
@@ -866,6 +944,11 @@ function expectedAuditCounts(ledger: M5cClosureLedger) {
   return {
     exclusions: exclusions.length,
     remediation: remediation.length,
+    // Paths never proposed for exclusion carry no audit row, so only the
+    // audited deferred paths are counted.
+    deferrals: ledger.entries.filter(
+      (entry) => entry.owner === "deferred" && auditedPaths.has(entry.path),
+    ).length,
     missingDynamicTags: [...exclusions, ...remediation].filter(
       (entry) =>
         entry.owner !== annexOwner &&
@@ -886,9 +969,16 @@ test("checked-in audit counts match ledger owners after promotions", () => {
       "utf8",
     ),
   ).ledger;
+  // SAFETY: the audit checker above validates every row and its path.
+  const audit = parseYaml(
+    readFileSync(
+      new URL("../docs/m5c-closure/exclusion-audit.yaml", import.meta.url),
+      "utf8",
+    ),
+  ) as { paths: readonly { path: string }[] };
   assert.deepEqual(
     validateCurrentM5cExclusionAudit(),
-    expectedAuditCounts(ledger),
+    expectedAuditCounts(ledger, new Set(audit.paths.map((row) => row.path))),
   );
 });
 
@@ -1260,7 +1350,10 @@ test("ledger-side counts agree on a mixed legacy lookup row", () => {
   );
   assert.deepEqual(
     validateM5cExclusionAudit(stringifyYaml(audit), inputs),
-    expectedAuditCounts(inputs.ledger),
+    expectedAuditCounts(
+      inputs.ledger,
+      new Set(audit.paths.map((row) => row.path)),
+    ),
   );
 });
 
@@ -1329,6 +1422,116 @@ test("a legacy lookup rejection must name a method the source calls", () => {
   assert.throws(
     () => validateM5cExclusionAudit(stringifyYaml(audit), inputs),
     /legacy lookup rejection lacks its source call/u,
+  );
+});
+
+test("the legacy lookup closure selector bounds ADR 0013 exclusion", () => {
+  const { audit, inputs } = lookupFixture(
+    "__lookupGetter__",
+    lookupDiagnostic("__lookupGetter__"),
+  );
+  Reflect.deleteProperty(audit.assessments.reviewed, "remediationOwner");
+  audit.assessments.reviewed.disposition = "exclusion";
+  audit.assessments.reviewed.normativeDependency = "annex-b-only";
+  const owned = {
+    ...inputs,
+    ledger: {
+      ...inputs.ledger,
+      entries: inputs.ledger.entries.map((entry) =>
+        Object.assign({}, entry, { owner: annexOwner }),
+      ),
+    },
+  };
+  const selected = { ...owned, annexLookupClosedPaths: new Set([path]) };
+  assert.equal(
+    validateM5cExclusionAudit(stringifyYaml(audit), selected).exclusions,
+    1,
+  );
+  // Outside the selector, a lookup rejection cannot close its subject.
+  assert.throws(
+    () => validateM5cExclusionAudit(stringifyYaml(audit), owned),
+    /exact legacy lookup closure selector/u,
+  );
+  // Inside it, the row must stay a bound exclusion without an owner node.
+  const { replacementEvidence, ...unbound } = audit.assessments.reviewed;
+  assert.ok(replacementEvidence);
+  assert.throws(
+    () =>
+      validateM5cExclusionAudit(
+        stringifyYaml({ ...audit, assessments: { reviewed: unbound } }),
+        selected,
+      ),
+    /exact legacy lookup closure selector/u,
+  );
+  assert.throws(
+    () =>
+      validateM5cExclusionAudit(
+        stringifyYaml({
+          ...audit,
+          assessments: {
+            reviewed: {
+              ...audit.assessments.reviewed,
+              remediationOwner: lookupRemediationOwner,
+            },
+          },
+        }),
+        selected,
+      ),
+    /exact legacy lookup closure selector/u,
+  );
+  // A selected path keeps its remediation only by leaving the selector.
+  const remediation = lookupFixture(
+    "__lookupGetter__",
+    lookupDiagnostic("__lookupGetter__"),
+  );
+  assert.throws(
+    () =>
+      validateM5cExclusionAudit(stringifyYaml(remediation.audit), {
+        ...remediation.inputs,
+        annexLookupClosedPaths: new Set([path]),
+      }),
+    /exact legacy lookup closure selector/u,
+  );
+  // The selector admits only a lookup rejection.
+  const annexProto =
+    "error[OSEO1001]: The Object.prototype.__proto__ accessor is " +
+    "excluded by Annex B.";
+  const proto = lookupFixture("__lookupGetter__", annexProto);
+  Reflect.deleteProperty(proto.audit.assessments.reviewed, "remediationOwner");
+  proto.audit.assessments.reviewed.disposition = "exclusion";
+  proto.audit.assessments.reviewed.normativeDependency = "annex-b-only";
+  assert.throws(
+    () =>
+      validateM5cExclusionAudit(stringifyYaml(proto.audit), {
+        ...proto.inputs,
+        ledger: owned.ledger,
+        annexLookupClosedPaths: new Set([path]),
+      }),
+    /exact legacy lookup closure selector/u,
+  );
+  // A selector path cannot leave the audit.
+  assert.throws(
+    () =>
+      validateM5cExclusionAudit(stringifyYaml(audit), {
+        ...selected,
+        annexLookupClosedPaths: new Set([
+          path,
+          "test/language/expressions/class/elements/absent.js",
+        ]),
+      }),
+    /Legacy lookup closure selector lacks its audit row/u,
+  );
+});
+
+test("the checked-in legacy lookup closure names two class expressions", () => {
+  assert.deepEqual(
+    [...m5cAnnexLookupClosedPaths],
+    [
+      "test/language/expressions/class/elements/" +
+        "private-getter-is-not-a-own-property.js",
+      "test/language/expressions/class/elements/" +
+        "private-setter-is-not-a-own-property.js",
+    ],
   );
 });
 
@@ -1495,6 +1698,7 @@ test("the exact caller rejection uses only the ADR 0028 owner", () => {
   assert.deepEqual(validateM5cExclusionAudit(stringifyYaml(audit), inputs), {
     exclusions: 1,
     remediation: 0,
+    deferrals: 0,
     missingDynamicTags: 0,
   });
   assert.throws(
@@ -1598,7 +1802,7 @@ test("reviewed caller selector paths cannot leave the audit", () => {
         })),
       },
     }),
-    { exclusions: 0, remediation: 0, missingDynamicTags: 0 },
+    { exclusions: 0, remediation: 0, deferrals: 0, missingDynamicTags: 0 },
   );
   assert.deepEqual(
     validateM5cExclusionAudit(stringifyYaml(audit), {
@@ -1621,7 +1825,7 @@ test("reviewed caller selector paths cannot leave the audit", () => {
         ),
       },
     }),
-    { exclusions: 0, remediation: 0, missingDynamicTags: 0 },
+    { exclusions: 0, remediation: 0, deferrals: 0, missingDynamicTags: 0 },
   );
 });
 

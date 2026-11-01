@@ -4,22 +4,23 @@ Static-specifier import design
 Status and authority
 --------------------
 
-Design for review, written by the M5c `static-specifier-import-design` node.
-Item 3 of the 2026-11-01 maintainer answer approves a design review of the
-build-time-resolvable import track that alternative 3 of
+Reviewed post-M5 plan. This design covers the build-time-resolvable import
+track that alternative 3 of
 [ADR 0016](./adr/0016-dynamic-source-boundary.md) and
-[*PLAN-DYN.md*](../PLAN-DYN.md) anticipate. It requires an ADR 0016
-amendment and a reviewed plan before the track is accepted. It does not
-approve bounded general `eval` or `Function` construction.
+[*PLAN-DYN.md*](../PLAN-DYN.md) anticipate. The maintainer reviewed it on
+2026-11-01 and deferred the track past M5: M5 implements none of it, and
+*PLAN-DYN.md*, which links this document, owns the track. Bounded general
+`eval` and `Function` construction are not part of it.
 
 ADR 0016's accepted decision remains in force: every `import()` is rejected
-at parse time with `OSEO1001`. This document changes no compiler, runtime,
-runner, harness, manifest, ledger owner, or exclusion record. The ADR text
-below is a draft with status Proposed. It enters ADR 0016 only when the
-maintainer accepts it, because
+at parse time with `OSEO1001`. M5 defers the 20 pinned rows below by name
+under [ADR 0031](./adr/0031-m5-named-deferral.md) with *PLAN-DYN.md* as
+their target. The ADR text below keeps status Proposed and is not applied to
+ADR 0016, because
 [*docs/m5c-closure/exclusion-audit.yaml*](./m5c-closure/exclusion-audit.yaml)
 binds the accepted record by digest and every edit to that record needs a
-reviewed audit update.
+reviewed audit update. Accepting the track later needs the amendment and a
+plan that schedules the implementation units.
 
 The landed [build-time-resolvable proposal](./dynamic-import-staged-plan.md)
 remains the capability-level plan. This design keeps its finite-set rule and
@@ -408,7 +409,7 @@ the runtime ABI. The implementation unit that first changes it asks Root for
 an ABI identifier; this design reserves none.
 
 The staged proposal orders a capability baseline and retained build manifest
-schema before graph work. This design narrows that prerequisite for the M5c
+schema before graph work. This design narrows that prerequisite for this
 track. The build must retain a deterministic request record: source location,
 referrer, decoded literal, canonical target, and edge kind. Capability-aware
 runtime selection, component-level size baselines, and the full retained
@@ -485,8 +486,7 @@ the owning implementation node to fix, never a new exclusion.
 
 ### Rows this track cannot close
 
-Three rows stay with `node:dynamic-source-coverage-remediation` even after
-admission:
+Three rows stay unsupported even after admission:
 
  -  *usage-from-eval.js* (DS-8) calls `import()` inside direct eval code.
     Its recorded observation is already the run-time `OSEO1001` rejection
@@ -496,8 +496,7 @@ admission:
     G4 can witness those assertions for an import outside eval, but the
     referrer and the eval-to-ImportCall interaction belong to eval semantics.
     Closing it needs separate eval-context evidence under the ADR 0016
-    accounting rule of the 2026-10-28 decision. Otherwise it is a candidate for
-    a named deferral under item 4 of the 2026-11-01 answer.
+    accounting rule of the 2026-10-28 decision.
  -  *eval-rqstd-once.js* and *update-to-dynamic-import.js* reach
     `Function('return this;')()` in their fixtures. The runtime rejects that
     call with `OSEO1001` under ADR 0016, so the original observations stay
@@ -549,10 +548,11 @@ leaves the inventory denominator unchanged.
 Proposed ADR 0016 amendment
 ---------------------------
 
-Status of this text: **Proposed**, 2026-11-01. It is not accepted, and ADR
-0016's dynamic-import decision bullet stays in force until the maintainer
-accepts it. On acceptance, Root applies it to ADR 0016 together with the
-exclusion-audit record digest and quote updates.
+Status of this text: **Proposed**, 2026-11-01. The maintainer deferred the
+track past M5 without accepting this text, so it is not applied to ADR 0016
+and ADR 0016's dynamic-import decision bullet stays in force. If the
+post-M5 track is accepted, the change that applies the text to ADR 0016 also
+updates the exclusion audit's record digest and quotes.
 
 Proposed replacement for the second decision bullet:
 
@@ -604,8 +604,9 @@ Proposed changes elsewhere in ADR 0016:
 Implementation units
 --------------------
 
-These are proposed graph nodes, not created by this design. Each needs the
-amendment's acceptance and Root's explicit authorization first.
+These units are scheduled only by the post-M5 plan that inherits the
+track; M5 creates none of them. Each needs the amendment's acceptance and
+explicit authorization first.
 
 1.  **Runtime module evaluation driver.** Replace the compiled schedule with
     the driver for static graphs only. Gates: G13, G14's rooting fixtures,
@@ -625,9 +626,9 @@ amendment's acceptance and Root's explicit authorization first.
     review of every changed `dynamic-import` observation, and reassessment
     of reopened exclusions. Gate: zero semantic failures and Root's
     admission approval.
-5.  **Row accounting.** Move each of the 17 observation-closed rows to its
-    observation owner, and either close the three rows above with reviewed
-    evidence or list them for named deferral under item 4.
+5.  **Row accounting.** Move each of the 17 observation-closed rows from
+    its ADR 0031 deferral entry to its observation owner, and keep the three
+    rows above deferred until reviewed evidence closes them.
 
 Unit 1 can land before the others because it changes no admitted surface.
 Units 2 and 3 are probes until unit 4.

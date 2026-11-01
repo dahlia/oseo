@@ -337,4 +337,4 @@ dependencies:
   - dynamic-source-unknown-eval
   - static-specifier-import-design
 landed: false
-status: blocked
+status: ready

@@ -29,10 +29,14 @@ bounds a first string-literal subset and its implementation and evidence
 gates. It proposes an ADR 0016 amendment for maintainer acceptance; the
 accepted rejection remains in force.
 
-The M5c [static-specifier import design] refines that subset for review
-under the 2026-11-01 maintainer answer. It adds a runtime module evaluation
-driver shared with static imports, Script referrers, and a Proposed ADR 0016
-amendment; the accepted rejection still applies.
+The reviewed [static-specifier import design] is this plan's post-M5 plan
+for that subset. The maintainer deferred its implementation past M5. It adds
+a runtime module evaluation driver shared with static imports, Script
+referrers, and five implementation units, and maps 20 pinned test262 rows.
+M5 defers those rows by name under
+[ADR 0031](./docs/adr/0031-m5-named-deferral.md), with this plan as their
+target. Its ADR 0016 amendment stays Proposed inside the design, and the
+accepted rejection still applies.
 
 [build-time-resolvable proposal]: ./docs/dynamic-import-staged-plan.md
 [static-specifier import design]: ./docs/static-specifier-import-design.md

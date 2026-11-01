@@ -1,56 +1,69 @@
 Named deferral policy
 =====================
 
-This node drafts the policy that lets `m5-exit-audit` account for measured
-residue that neither reviewed evidence nor an approved track closes. It
-starts ready and unlanded at base
-`9f21b607aef9399cc2a1f61d382f535af5161a2e`, depending on landed
-`unsupported-ownership-audit`, and `m5-exit-audit` depends on it.
+This node sets the policy that lets `m5-exit-audit` account for measured
+residue that neither reviewed evidence nor an approved M5 track closes. It
+depends on landed `unsupported-ownership-audit`, and
+`m5c-deferral-ledger-checker` and `m5-exit-audit` depend on it.
 
 
-Authority
----------
+Decision
+--------
 
-The maintainer's answer of 2026-11-01, item 4, is
-*~/.local/state/oseo-m5c/decisions/answers/20261031T1409-umbrella-residual.md*.
-It replaces the exit condition that active remediation is empty with one
-that also admits an explicit named deferral. A deferral is a per-path list
-giving the reason, the remaining contract, and the target milestone, in the
-manner of the bounded exclusions under ADR 0019. It is never a silent
-exclusion or a scope cut. Before `m5-exit-audit` uses the list, Root mails
-the maintainer a summary of path count, per-family counts, and reasons, and
-proceeds when no objection arrives within the coordination wait period.
-ADR 0031 makes that summary give each distinct reason with its count and
-the target milestones as well.
+[ADR 0031](../adr/0031-m5-named-deferral.md) is accepted, dated
+2026-11-01, by maintainer decision. The decisions behind it are
+*~/.local/state/oseo-m5c/decisions/answers/20261031T1409-umbrella-residual.md*,
+item 4, and item 1 of *20261101-remaining-node-decisions.answer.md* in
+*~/.local/state/oseo-m5c/decisions/done/*.
+
+M5 may close with an explicit named deferral beside authorized exclusions.
+A deferral is a per-path entry giving the reason, the remaining contract,
+and the target milestone or deferred track, in the manner of the bounded
+exclusions under ADR 0019. It is never a silent exclusion or a scope cut.
 Public wording is “measured residue was deferred by name and M5 closed.”
 
-Items 1 to 3 of the same answer bound what counts as an approved track:
-literal host Script evidence for DS-10 and the eleven completion-value
-paths, the four exhaustive RegExp paths with their generated budget, and
-the design review of the static-specifier import track. General `eval` and
-`Function` construction are not approved and close only by evidence.
+A path may be deferred only when work the maintainer did not approve for M5
+or declined is its one remaining closure route: general `eval` and
+`Function` construction, or the static-specifier import track deferred past
+M5. A path that implementation inside M5 would close, such as a realm
+defect, a RegExp gap, or an iterator gap, stays with remediation. The
+approved M5 tracks are literal host Script evidence for DS-10 and the eleven
+completion-value paths, and the four exhaustive RegExp paths with their
+generated budget.
+
+Before `m5-exit-audit` uses the list, Root mails the maintainer the complete
+*docs/m5c-closure/deferrals.yaml*, attached or as a commit link, with a
+summary of the total path count, per-family counts, each distinct reason
+with its count, and the target milestones. The summary flags every entry
+outside the dynamic source family. The audit proceeds when no objection
+arrives within the coordination wait period.
+
+`targetMilestone` names either a numbered *ROADMAP.md* milestone after M5 or
+the plan of a track that *ROADMAP.md* lists as deferred, such as
+*PLAN-DYN.md*.
 
 
 Scope of this node
 ------------------
 
- -  Draft [ADR 0031](../adr/0031-m5-named-deferral.md) with status
-    `Proposed`, defining the deferral record.
- -  Update the exit criteria in [*PLAN-M5C.md*](../../PLAN-M5C.md) and the
-    `m5-exit-audit` delivers text to match the draft.
+ -  [ADR 0031](../adr/0031-m5-named-deferral.md) with status Accepted.
+ -  The exit criteria in [*PLAN-M5C.md*](../../PLAN-M5C.md),
+    [*PLAN-M5.md*](../../PLAN-M5.md), and [*ROADMAP.md*](../../ROADMAP.md),
+    and the `m5-exit-audit` delivers text, matched to the record.
  -  Move no ledger owner, add no deferral entry, and change neither
     *tools/m5c-closure-ledger.ts* nor *tools/m5c-exclusion-audit.ts*.
- -  Leave ADR 0013, ADR 0016, and ADR 0019 unchanged.
+ -  Leave ADR 0013, ADR 0016, and ADR 0019 unchanged. No closure or audit
+    record binds ADR 0031 by digest yet; the deferral file will.
 
-At this base the ledger holds 1,939 unsupported paths: 1,573 owned by
-accepted ADRs and 366 by remediation nodes. None is deferred, and this node
-does not estimate how many will be.
+At base `9f21b607aef9399cc2a1f61d382f535af5161a2e` the ledger held 1,939
+unsupported paths: 1,573 owned by accepted ADRs and 366 by remediation
+nodes. None is deferred, and this node does not estimate how many will be.
 
 
 New record rather than an ADR 0019 amendment
 --------------------------------------------
 
-The draft is a new record for three reasons.
+ADR 0031 is a new record for three reasons.
 
  -  A deferral is unfinished work by definition. ADR 0019 admits an
     unsupported result only under a record that explains why its exclusion
@@ -66,36 +79,16 @@ The draft is a new record for three reasons.
     condition and keeps that separation, so it supplements ADR 0019 rather
     than replacing its decision.
 
-If review prefers an amendment, the follow-up must refresh the ADR 0019
-digest and quotes in the exclusion audit in the same change.
 
+Checker follow-up
+-----------------
 
-Follow-up checker scope
------------------------
-
-Accepting ADR 0031 does not by itself let a path be deferred. A separate
-graph node, depending on this one and required by `m5-exit-audit`, owns
-these changes:
-
- -  a reviewed *docs/m5c-closure/deferrals.yaml* holding the ADR 0031 record
-    digest and one entry per deferred path, with the fields ADR 0031 lists;
- -  a `deferred` owner kind in *tools/m5c-closure-ledger.ts*, accepted only
-    for an `unsupported-profile-feature` path with a matching entry, and
-    reported in a separate header count so that `closedPaths`, authorized
-    exclusions, and deferrals stay distinct;
- -  a check that rejects an entry whose source or observation digest is
-    stale, whose path lacks the `deferred` owner, whose family or reason is
-    absent, or whose attempts name no reviewed evidence node and no track
-    decision;
- -  in *tools/m5c-exclusion-audit.ts*, a `deferral` disposition for audited
-    rows, which requires the `deferred` ledger owner and is never counted as
-    an exclusion; and
- -  `mise run check` coverage for the new file and a test for each
-    rejection.
-
-That node moves owners only for paths whose entries it adds after review.
-The summary mail precedes the terminal audit's use of the list, not the
-follow-up node's landing.
+The [`m5c-deferral-ledger-checker`](./m5c-deferral-ledger-checker.md) node
+owns the deferral file, the `deferred` ledger owner, the `deferral` audit
+disposition, the `targetMilestone` check, and their tests. Until it lands,
+no path can be deferred. It is high priority because it must land before
+the 2026-11-17 implementation deadline. The summary mail precedes the
+terminal audit's use of the list, not that node's landing.
 
 
 Checks and review

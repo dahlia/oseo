@@ -4,33 +4,33 @@ Private accessor lookup replacement evidence
 Scope and accounting
 --------------------
 
-This node supplies replacement evidence up to the separate maintainer
-coverage-accounting decision. The 2026-10-28 *m5c-scope-big-node-split*
-decision, item 3, permits Annex B mixed-coverage closure only after reviewed
-replacement observations cover every core subject and fresh audit records
-name them. Root's dispatch retains both existing owners pending that decision.
-ADR 0013's optional boundary, ADR 0016, and ADR 0019 are unchanged.
+Item 3 of the 2026-10-28 *m5c-scope-big-node-split* decision closes a mixed
+Annex B path under ADR 0013's optional Annex B boundary only when reviewed
+replacement observations cover every core subject and a fresh-digest audit
+record names them. The 2026-11-01 maintainer decision applies that rule to
+the two class expression paths below and to no other path. ADR 0013's
+optional boundary, ADR 0016, and ADR 0019 are unchanged.
 
-Exactly two admitted paths are owned here, under
-*test/language/expressions/class/elements/*:
+The two closed paths are under *test/language/expressions/class/elements/*:
 
  -  *private-getter-is-not-a-own-property.js*, recorded in
     *tests/test262/results/language/expressions/c5.yaml*;
  -  *private-setter-is-not-a-own-property.js*, recorded in
     *tests/test262/results/language/expressions/eb.yaml*.
 
-Both remain `unsupported-profile-feature`, dependency `classes`, and owner
-`node:class-private-accessor-lookup-coverage-remediation`. Their actual
-`OSEO1001` observations reject the optional `__lookupGetter__` or
-`__lookupSetter__` call, respectively, before the later core assertion.
-The `annex-b-legacy-lookup` audit assessment remains remediation. Original
-sources, assertions, source and observation digests, subset, result records,
-ledger, and batch 11's 1,199-path reservation are preserved.
+Both remain `unsupported-profile-feature` with dependency `classes`. Their
+actual `OSEO1001` observations reject the optional `__lookupGetter__` or
+`__lookupSetter__` call, respectively, before the later core assertion, and
+the replacement fixtures below witness every core subject. Their ledger owner
+is now `adr:0013-m5-edition-and-manifest`, and they are not counted as passes.
+Original sources, assertions, source and observation digests, subset, result
+records, and batch 11's 1,199-path reservation are preserved.
 
-Train B's statement-family getter and setter paths under
-*test/language/statements/class/elements/* are pending. At this base both
-are unreviewed and owned by `node:observation-batch-22b`. This worker does
-not take them over or claim reviewed replacement equivalence for them.
+The class declaration getter and setter paths of the same shape under
+*test/language/statements/class/elements/*, admitted by observation batch
+22b, keep this node's owner and the `annex-b-legacy-lookup` remediation
+assessment. The 2026-11-01 decision does not cover them, and this note
+claims no replacement equivalence for them.
 
 
 Replacement contract
@@ -89,6 +89,31 @@ No macOS execution, AArch64 cross-link, full repository test, extended
 property gate, or Test262 UPDATE is claimed by these focused runs.
 Internal review and Root's D3 judgment follow the committed source.
 
-Root owns D3, any UPDATE, maintainer accounting, outer review, candidate CI,
-publication, rebase, merge, and landed state. Replacement evidence alone
-neither closes nor excludes either path and never counts as upstream passes.
+Root owns D3, any UPDATE, outer review, candidate CI, publication, rebase,
+merge, and landed state. The decision also requires the closing commit to
+land through CI that includes macOS.
+
+
+Audit record
+------------
+
+*docs/m5c-closure/exclusion-audit.yaml* keeps both path rows with their
+source and observation digests and moves them to the
+`annex-b-legacy-lookup-class-expression` assessment, with
+`disposition: exclusion` and `normativeDependency: annex-b-only`. The
+assessment names both replacement fixtures and binds the digests of
+*tests/native/fixtures/classes.ts* and
+*tests/class-private-accessor-coverage-native.test.ts*. The exclusion audit
+checker admits an exclusion over a lookup rejection only for these two
+paths, listed in `m5cAnnexLookupClosedPaths`, and requires both rows. The
+ledger moves both paths to `adr:0013-m5-edition-and-manifest` through the
+ledger API and `mise run m5c:closure-ledger:update`.
+
+| Path                                                                 | Outcome | Assessment                               |
+| -------------------------------------------------------------------- | ------- | ---------------------------------------- |
+| *expressions/class/elements/private-getter-is-not-a-own-property.js* | closed  | `annex-b-legacy-lookup-class-expression` |
+| *expressions/class/elements/private-setter-is-not-a-own-property.js* | closed  | `annex-b-legacy-lookup-class-expression` |
+
+The evidence reopens on changed source, observation, or replacement
+evidence, on an amendment of ADR 0013's optional Annex B policy or ADR 0020,
+or on ADR 0019's reopening triggers.
