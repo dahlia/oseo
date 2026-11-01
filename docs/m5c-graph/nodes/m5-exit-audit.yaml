@@ -39,6 +39,7 @@ dependencies:
   - dynamic-source-construction-contracts
   - dynamic-source-coverage-remediation
   - dynamic-source-eval-arguments-accounting
+  - dynamic-source-eval-code-assessment
   - dynamic-source-eval-contract-accounting
   - dynamic-source-fixture-construction-evidence
   - dynamic-source-function-constructor-assessment

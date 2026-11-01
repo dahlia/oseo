@@ -1,0 +1,889 @@
+base: bc8e3a93ed3b6aa8daac70d08fd146f202755f99
+suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+pathSetDigest: be93020453d77af5bd6e7eca8b949f344f6a29d5235e3d641ffd4d0a2b1be143
+decision: "Root rulings of 2026-11-02 on the eval code disposition question"
+assessed: 48
+evalSemantics: 32
+staticEvidence: 16
+replacements:
+  - path: test/language/global-code/export.js
+    sourceDigest: "9f9954dd3dae59f94912f29716f8b9b040cee42342eae1cdcf978519c35\
+      ae9bc"
+    resultPartition: tests/test262/results/language/global-code/c0.yaml
+    resultDigest: "dea613977e65f47e379b5f4886bd9e436be72f458ca522552341fac76b4\
+      1215c"
+    classification: expected-negative
+  - path: test/language/global-code/import.js
+    sourceDigest: "c2d97e3b564156c04b17b44553bc0d51ce5dd0ae7bf1caa358a00730647\
+      cf7f5"
+    resultPartition: tests/test262/results/language/global-code/52.yaml
+    resultDigest: "d98511e2d6c0f2bd6e3555a9c6b58d7f5d91f7dd52151806bfb0386d7cf\
+      0c061"
+    classification: expected-negative
+  - path: test/language/global-code/new.target-arrow.js
+    sourceDigest: "5573dc91a5d86eafc54f379bbcd10ad733966ad364b3ccd37a523c7f52f\
+      53911"
+    resultPartition: tests/test262/results/language/global-code/0a.yaml
+    resultDigest: "797052de32878d241fcd1d42b4522afc34781eed53f80345d2618b6e0af\
+      9735a"
+    classification: expected-negative
+  - path: test/language/expressions/new.target/value-via-call.js
+    sourceDigest: "b4cc27c2f76f814b825c2bc572d6a337ec8168597120670b615eb82270a\
+      e0e2a"
+    resultPartition: tests/test262/results/language/expressions/72.yaml
+    resultDigest: "b7fc09e8d00cdd9238f039327de266c08f371d0ff2e50c9dc2668b5ce0c\
+      fbd98"
+    classification: pass
+  - path: test/language/expressions/new.target/value-via-new.js
+    sourceDigest: "2736e29450eb3ce303b7343c97539cca26842a29e92a8f59509fbcf6241\
+      13736"
+    resultPartition: tests/test262/results/language/expressions/81.yaml
+    resultDigest: "3911a5d61c7521021bfeafbbd01074c34b47f2425a84b34a762de0c0e72\
+      34b3a"
+    classification: pass
+  - path: test/language/expressions/assignment/S11.13.1_A6_T3.js
+    sourceDigest: "9d8da34aa6fe0f24e9c5a4df1aedf1e7ac3de694a69f385fd0cf2ba7bbf\
+      bf1da"
+    resultPartition: tests/test262/results/language/expressions/df.yaml
+    resultDigest: "6114cd5ddf57f229b15d82235ef507f75371ce11e8d2d3d3a2b741ec0a1\
+      3b20a"
+    classification: pass
+inlineWitness:
+  fixture: tests/native/fixtures/eval-code-inline-evidence.ts
+  test: tests/eval-code-inline-evidence.test.ts
+  groups:
+    - eval-code-inline-global-env-rec
+    - eval-code-inline-global-env-rec-catch
+    - eval-code-inline-global-env-rec-fun
+    - eval-code-inline-global-env-rec-with
+    - eval-code-inline-lex-env-heritage
+    - eval-code-inline-new.target-fn
+    - eval-code-inline-this-value-func-non-strict
+    - eval-code-inline-this-value-func-strict-caller
+    - eval-code-inline-this-value-func-strict-source
+paths:
+  - path: test/language/eval-code/direct/export.js
+    group: G2
+    subject: "An export declaration in eval code is a SyntaxError."
+    disposition: exclusion
+    assessment: ec-static-eval-code
+    sourceDigest: "648a257196bc895409842b12191cc0a8d9e10d28e66886afb8905941276\
+      1caca"
+    observationDigest: "f0d49686725a66f96bd1a20611e3ce21c8c56a80c60546d6b821ff\
+      28c3b1f5c9"
+    replacement:
+      - test/language/global-code/export.js
+    reason: "The static Script rejects the same declaration at parse with
+      SyntaxError. Eval code is always parsed with the Script goal, so the
+      module caller does not change the rule; only the conversion of that early
+      error into a run-time eval exception remains."
+  - path: test/language/eval-code/direct/global-env-rec-catch.js
+    group: G2
+    subject: "A var declared in a catch block is the function-local binding
+      that shadows the global at the eval site."
+    disposition: exclusion
+    assessment: ec-static-eval-code
+    sourceDigest: "ae81311388b1f824f81a19e6501d70513a13516949f4314978003f659f1\
+      ae7ba"
+    observationDigest: "acd5482cedeabfb3fd1d1090f57095d8e8d7c60b01d79d38079f54\
+      c5ba8582a3"
+    witness: eval-code-inline-global-env-rec-catch
+    reason: "The inline witness keeps every byte of the pinned original and
+      replaces each eval call by its evaluated expression, so the same
+      identifier, this or new.target resolution happens in the caller's
+      environment and the original assertion compares the same value. Each call
+      has a mutation that reads the wrong environment, rejected by the realm's
+      Test262Error. Only eval's selection of the caller context remains."
+  - path: test/language/eval-code/direct/global-env-rec-eval.js
+    group: G1
+    subject: "A direct eval nested in a direct eval reads the caller-local var
+      that the outer eval code assigned."
+    disposition: exclusion
+    assessment: eval-semantics
+    sourceDigest: "5beb33644639ab6b42b653da26cb3ecb654b0acb702dafc941b7bc4f1e2\
+      ec5ee"
+    observationDigest: "9f57b231750e4ea673488d081f2b5e0d08b252e928826410303004\
+      bff770e893"
+    precedent:
+      - test/language/expressions/object/scope-meth-body-lex-distinct.js
+      - test/language/eval-code/indirect/realm.js
+    reason: "Both reads and the assignment go through environments that
+      PerformEval selects for nested eval code; the outer eval's var
+      declaration also passes through EvalDeclarationInstantiation of the
+      caller's variable environment."
+  - path: test/language/eval-code/direct/global-env-rec-fun.js
+    group: G2
+    subject: "A nested function's local var shadows the outer function's and
+      the global binding at the eval site."
+    disposition: exclusion
+    assessment: ec-static-eval-code
+    sourceDigest: "627d9b0952d0503e0b2524167941faf63b4cc18a76c5f36eb0a8d61a342\
+      03895"
+    observationDigest: "78e117d5f617287be4d47896f4c841522ecb2448750cf6e31bf04a\
+      4ca320226b"
+    witness: eval-code-inline-global-env-rec-fun
+    reason: "The inline witness keeps every byte of the pinned original and
+      replaces each eval call by its evaluated expression, so the same
+      identifier, this or new.target resolution happens in the caller's
+      environment and the original assertion compares the same value. Each call
+      has a mutation that reads the wrong environment, rejected by the realm's
+      Test262Error. Only eval's selection of the caller context remains."
+  - path: test/language/eval-code/direct/global-env-rec-with.js
+    group: G2
+    subject: "A with object's property shadows the function-local var at the
+      eval site."
+    disposition: exclusion
+    assessment: ec-static-eval-code
+    sourceDigest: "4dd8f3e5db0a4b23abeff4f2695ca059cddd3d61a2a5b334ca8e389e6d5\
+      5f91c"
+    observationDigest: "96ec13317cc8757c8737626b1938bccd9f55dff84c249fd8e95108\
+      2156fa064c"
+    witness: eval-code-inline-global-env-rec-with
+    reason: "The inline witness keeps every byte of the pinned original and
+      replaces each eval call by its evaluated expression, so the same
+      identifier, this or new.target resolution happens in the caller's
+      environment and the original assertion compares the same value. Each call
+      has a mutation that reads the wrong environment, rejected by the realm's
+      Test262Error. Only eval's selection of the caller context remains."
+  - path: test/language/eval-code/direct/global-env-rec.js
+    group: G2
+    subject: "A function-local var shadows the global binding at the eval site."
+    disposition: exclusion
+    assessment: ec-static-eval-code
+    sourceDigest: "9c3fa52d4b9d6ebf0e509eb4d5026e38d50303cc5041f19af7bd2f4f02f\
+      73bbe"
+    observationDigest: "bac67c15d8e863bd9f8a3b762deb9a0aa40021f6b2e367bf1a5fe6\
+      dadc526b75"
+    witness: eval-code-inline-global-env-rec
+    reason: "The inline witness keeps every byte of the pinned original and
+      replaces each eval call by its evaluated expression, so the same
+      identifier, this or new.target resolution happens in the caller's
+      environment and the original assertion compares the same value. Each call
+      has a mutation that reads the wrong environment, rejected by the realm's
+      Test262Error. Only eval's selection of the caller context remains."
+  - path: test/language/eval-code/direct/import.js
+    group: G2
+    subject: "An import declaration in eval code is a SyntaxError."
+    disposition: exclusion
+    assessment: ec-static-eval-code
+    sourceDigest: "28c29caa8c8649579790526b511323df04837efad886d2f9d0ea75140dc\
+      5fa89"
+    observationDigest: "9451e2f2eb84c0b3ac2f87c4091c88d73152ea0687d782cf114132\
+      4fea9fd50f"
+    replacement:
+      - test/language/global-code/import.js
+    reason: "The static Script rejects the same declaration at parse with
+      SyntaxError. Eval code is always parsed with the Script goal, so the
+      module caller does not change the rule; only the conversion of that early
+      error into a run-time eval exception remains. The witness differs only in
+      its specifier quotes."
+  - path: test/language/eval-code/direct/lex-env-distinct-cls.js
+    group: G1
+    subject: "Eval lexical declarations are instantiated in a new declarative
+      environment: they neither collide with the caller's outside binding nor
+      remain after the call."
+    disposition: exclusion
+    assessment: eval-semantics
+    sourceDigest: "d3add354d50f23de1c67837ad3ff7e44cf22743640430e856a066e1c2ae\
+      1af0a"
+    observationDigest: "e961ce6393ec5f2f194d23d070aadd472c6a1c80fa8ad9d2a0189c\
+      bd4d776129"
+    precedent:
+      - test/language/eval-code/direct/var-env-global-lex-strict-source.js
+    reason: "The typeof and ReferenceError probes only show the eval binding is
+      gone afterward. The asserted subject is the declarative environment
+      PerformEval creates for eval code; no static declaration is instantiated
+      in it."
+  - path: test/language/eval-code/direct/lex-env-distinct-const.js
+    group: G1
+    subject: "Eval lexical declarations are instantiated in a new declarative
+      environment: they neither collide with the caller's outside binding nor
+      remain after the call."
+    disposition: exclusion
+    assessment: eval-semantics
+    sourceDigest: "b4ac312dc336570a229a29308b9f3fd8f34eb88067d4fa9ee461dca2ae7\
+      b3fa7"
+    observationDigest: "7ec787a9da34b186484148cda6c68e5098ea36840540cf0e506830\
+      b92695a770"
+    precedent:
+      - test/language/eval-code/direct/var-env-global-lex-strict-source.js
+    reason: "The typeof and ReferenceError probes only show the eval binding is
+      gone afterward. The asserted subject is the declarative environment
+      PerformEval creates for eval code; no static declaration is instantiated
+      in it."
+  - path: test/language/eval-code/direct/lex-env-distinct-let.js
+    group: G1
+    subject: "Eval lexical declarations are instantiated in a new declarative
+      environment: they neither collide with the caller's outside binding nor
+      remain after the call."
+    disposition: exclusion
+    assessment: eval-semantics
+    sourceDigest: "238f2b86a2f42693297832200aa73c33a9152cd4ce3288fc440ca2115b9\
+      84cdc"
+    observationDigest: "87b1ee9d6923d1385d2dd2b5280585d94e36ee11fc0d1e5419fff2\
+      670adc910b"
+    precedent:
+      - test/language/eval-code/direct/var-env-global-lex-strict-source.js
+    reason: "The typeof and ReferenceError probes only show the eval binding is
+      gone afterward. The asserted subject is the declarative environment
+      PerformEval creates for eval code; no static declaration is instantiated
+      in it."
+  - path: test/language/eval-code/direct/lex-env-heritage.js
+    group: G2
+    subject: "A block let shadows the outer let at a read inside the block, in
+      both caller modes."
+    disposition: exclusion
+    assessment: ec-static-eval-code
+    sourceDigest: "9a29cbfdc4aead7a86094c398bfd0c53805acd540c373942e4e0fa74d54\
+      6709b"
+    observationDigest: "d4d05e221665e0f7c9ee131794b496fcea50f41f554b6c67c0512a\
+      bf7062cf5e"
+    witness: eval-code-inline-lex-env-heritage
+    reason: "The inline witness keeps every byte of the pinned original and
+      replaces each eval call by its evaluated expression, so the same
+      identifier, this or new.target resolution happens in the caller's
+      environment and the original assertion compares the same value. Each call
+      has a mutation that reads the wrong environment, rejected by the realm's
+      Test262Error. Only eval's selection of the caller context remains."
+  - path: test/language/eval-code/direct/new.target-arrow.js
+    group: G2
+    subject: "new.target in code whose nearest non-arrow function is absent,
+      here an arrow at global level, is a SyntaxError."
+    disposition: exclusion
+    assessment: ec-static-eval-code
+    sourceDigest: "f4f87a8934f2abb35fc800c788c2f704a4c813ae02056855bb4ebea0847\
+      66a7b"
+    observationDigest: "11db557ef21c2e85cfa8bc1a7d9c009937d81b35bf66c4f89d4d48\
+      e28811fe35"
+    replacement:
+      - test/language/global-code/new.target-arrow.js
+    reason: "The static arrow at global level contains new.target and is
+      rejected at parse with SyntaxError, the rule the original's eval applies
+      through the arrow to the global this environment. Only the conversion
+      into a run-time SyntaxError from the call remains."
+  - path: test/language/eval-code/direct/new.target-fn.js
+    group: G2
+    subject: "new.target in a function is undefined on a call and the function
+      itself on construction."
+    disposition: exclusion
+    assessment: ec-static-eval-code
+    sourceDigest: "caf493999aba1d7f116bb61b6fa1c13ef1f494ec7e03f40a92c50fd323e\
+      6014f"
+    observationDigest: "aac6a9e4c7243a54b479ac2a08923acf1ec518f033911048046206\
+      b482c520bd"
+    replacement:
+      - test/language/expressions/new.target/value-via-call.js
+      - test/language/expressions/new.target/value-via-new.js
+    witness: eval-code-inline-new.target-fn
+    reason: "value-via-call.js and value-via-new.js compare the same two values
+      with assert.sameValue. The inline witness keeps the original and reads
+      new.target at the eval site; only eval's lookup of the function's this
+      environment remains."
+  - path: test/language/eval-code/direct/this-value-func-non-strict.js
+    group: G2
+    subject: "A non-strict function called without a receiver has the global
+      object as this."
+    disposition: exclusion
+    assessment: ec-static-eval-code
+    sourceDigest: "855f8ca14f893ecc8f3e014b76ce8f23bc1602ecf945446d4ac213f0771\
+      ea340"
+    observationDigest: "7baeea25394d745abc8b9513bc04161518425f7dae84789b90a998\
+      5a81c8baf0"
+    witness: eval-code-inline-this-value-func-non-strict
+    reason: "The inline witness keeps every byte of the pinned original and
+      replaces each eval call by its evaluated expression, so the same
+      identifier, this or new.target resolution happens in the caller's
+      environment and the original assertion compares the same value. Each call
+      has a mutation that reads the wrong environment, rejected by the realm's
+      Test262Error. Only eval's selection of the caller context remains."
+  - path: test/language/eval-code/direct/this-value-func-strict-caller.js
+    group: G2
+    subject: "A strict function called without a receiver has undefined as
+      this."
+    disposition: exclusion
+    assessment: ec-static-eval-code
+    sourceDigest: "838b126a6087648dafc87ac78e44d3546cc3658a90cd67632dfb583a64a\
+      4267a"
+    observationDigest: "a4dce2805a64af130374aea593d0e6d7d924c09fa2afb2d838a4d0\
+      a6019eb329"
+    witness: eval-code-inline-this-value-func-strict-caller
+    reason: "The inline witness keeps every byte of the pinned original and
+      replaces each eval call by its evaluated expression, so the same
+      identifier, this or new.target resolution happens in the caller's
+      environment and the original assertion compares the same value. Each call
+      has a mutation that reads the wrong environment, rejected by the realm's
+      Test262Error. Only eval's selection of the caller context remains."
+  - path: test/language/eval-code/direct/this-value-func-strict-source.js
+    group: G2
+    subject: "A non-strict function called without a receiver has the global
+      object as this, whatever the strictness of code reading it."
+    disposition: exclusion
+    assessment: ec-static-eval-code
+    sourceDigest: "7f05b94ebc81960a8bfc5f5da7b6fcee1896c44b85f736a6ebc19e014db\
+      64d0d"
+    observationDigest: "6114f732b425eaa71db7c7085984de844d851f2e87e62e282c9772\
+      f44101e48f"
+    witness: eval-code-inline-this-value-func-strict-source
+    reason: "The inline witness keeps every byte of the pinned original and
+      replaces each eval call by its evaluated expression, so the same
+      identifier, this or new.target resolution happens in the caller's
+      environment and the original assertion compares the same value. Each call
+      has a mutation that reads the wrong environment, rejected by the realm's
+      Test262Error. Only eval's selection of the caller context remains."
+  - path: test/language/eval-code/direct/var-env-func-init-global-new.js
+    group: G1
+    subject: "Eval declaration instantiation creates or redefines a writable,
+      enumerable, configurable global property and hoists the declaration
+      before the eval code runs."
+    disposition: exclusion
+    assessment: eval-semantics
+    sourceDigest: "d5081687f0d3ae270f2338e3d7f17d3873d6f4a1d61b462398c262dfb06\
+      bceba"
+    observationDigest: "d3658a993e0fd3b134c6b6fe8b86eba7a147079b7042ee44cd1441\
+      d0ffcc756a"
+    precedent:
+      - test/language/eval-code/direct/var-env-global-lex-strict-source.js
+    reason: "The configurable descriptor is the eval-specific argument of
+      CreateGlobalVarBinding and CreateGlobalFunctionBinding; a Script creates
+      the same property non-configurable. The siblings whose contract a Script
+      does reproduce are already accounted by ds-host-script-finite-evidence."
+  - path: "test/language/eval-code/direct/var-env-func-init-global-update-conf\
+      igurable.js"
+    group: G1
+    subject: "Eval declaration instantiation creates or redefines a writable,
+      enumerable, configurable global property and hoists the declaration
+      before the eval code runs."
+    disposition: exclusion
+    assessment: eval-semantics
+    sourceDigest: "b6506521c42d9bae24e95d58f9f22cb0f45817e741f460c0b290610dbf0\
+      947c4"
+    observationDigest: "02520bcca813d53ddd2d5b8653e1109470df3bdb27a6ce91a4d3c8\
+      fb1e1dc4b4"
+    precedent:
+      - test/language/eval-code/direct/var-env-global-lex-strict-source.js
+    reason: "The configurable descriptor is the eval-specific argument of
+      CreateGlobalVarBinding and CreateGlobalFunctionBinding; a Script creates
+      the same property non-configurable. The siblings whose contract a Script
+      does reproduce are already accounted by ds-host-script-finite-evidence."
+  - path: test/language/eval-code/direct/var-env-func-init-local-new-delete.js
+    group: G1
+    subject: "Non-strict direct eval declares in the calling function's
+      variable environment: a new binding is mutable and deletable, an existing
+      binding keeps its value or takes the function, and nothing reaches the
+      global object."
+    disposition: exclusion
+    assessment: eval-semantics
+    sourceDigest: "7323dcde9dbd0e76927a8d14256d154fd566aceb39681475e8f8255e01c\
+      61112"
+    observationDigest: "51db329864417f1d903b0b8ee243e5a99b596d39c1464c93a8b99d\
+      14bf8145de"
+    precedent:
+      - test/language/expressions/object/scope-meth-body-lex-distinct.js
+    reason: "Each assertion reads a binding that EvalDeclarationInstantiation
+      creates or updates in the caller's variable environment. No static
+      declaration creates a deletable function-scope binding or redeclares one
+      after the function's own instantiation."
+  - path: test/language/eval-code/direct/var-env-func-init-local-new.js
+    group: G1
+    subject: "Non-strict direct eval declares in the calling function's
+      variable environment: a new binding is mutable and deletable, an existing
+      binding keeps its value or takes the function, and nothing reaches the
+      global object."
+    disposition: exclusion
+    assessment: eval-semantics
+    sourceDigest: "467a0ed253dc12068b2d116ff3a63ea459a27b8d272c25ba1be36fb8a6a\
+      52543"
+    observationDigest: "ad5756e09972c833a1674919be2d6a5d9e9e427689011d203cc8f8\
+      5a52276a31"
+    precedent:
+      - test/language/expressions/object/scope-meth-body-lex-distinct.js
+    reason: "Each assertion reads a binding that EvalDeclarationInstantiation
+      creates or updates in the caller's variable environment. No static
+      declaration creates a deletable function-scope binding or redeclares one
+      after the function's own instantiation."
+  - path: test/language/eval-code/direct/var-env-func-init-local-update.js
+    group: G1
+    subject: "Non-strict direct eval declares in the calling function's
+      variable environment: a new binding is mutable and deletable, an existing
+      binding keeps its value or takes the function, and nothing reaches the
+      global object."
+    disposition: exclusion
+    assessment: eval-semantics
+    sourceDigest: "6a67b5d23f4a63997c90d2cac550a8413cf303dfa27759027fcc32a38e0\
+      d628a"
+    observationDigest: "56510f09616bcd27d3439236cf388262a2f80a0654b4f654b3b0af\
+      e3cbb13f49"
+    precedent:
+      - test/language/expressions/object/scope-meth-body-lex-distinct.js
+    reason: "Each assertion reads a binding that EvalDeclarationInstantiation
+      creates or updates in the caller's variable environment. No static
+      declaration creates a deletable function-scope binding or redeclares one
+      after the function's own instantiation."
+  - path: test/language/eval-code/direct/var-env-func-non-strict.js
+    group: G1
+    subject: "Non-strict direct eval declares in the calling function's
+      variable environment: a new binding is mutable and deletable, an existing
+      binding keeps its value or takes the function, and nothing reaches the
+      global object."
+    disposition: exclusion
+    assessment: eval-semantics
+    sourceDigest: "5081e1069727d8180c05579e4bc286c1156adff50fcdffd32bba30cefa9\
+      9ab6b"
+    observationDigest: "e27c0b540b1b0929ede4850ca82ffe432509f8e173f67c361aedf6\
+      12d756262e"
+    precedent:
+      - test/language/expressions/object/scope-meth-body-lex-distinct.js
+    reason: "Each assertion reads a binding that EvalDeclarationInstantiation
+      creates or updates in the caller's variable environment. No static
+      declaration creates a deletable function-scope binding or redeclares one
+      after the function's own instantiation."
+  - path: test/language/eval-code/direct/var-env-func-strict-caller-2.js
+    group: G1
+    subject: "Strict eval code instantiates its var and function declarations
+      in a new variable environment, so they reach neither the caller nor the
+      global object."
+    disposition: exclusion
+    assessment: eval-semantics
+    sourceDigest: "bad7744f1b6fe71ae566e8bdeda5ed9c0f20f70f56476f864a4ad5ae495\
+      4351d"
+    observationDigest: "493ff02809d02ec1e81f2e239aefda106030a5f99e0c5822e88609\
+      a9bbfd7c32"
+    precedent:
+      - test/language/eval-code/direct/var-env-lower-lex-strict-caller.js
+    reason: "The typeof, ReferenceError and value probes are ordinary reads of
+      an absent or unchanged binding. The asserted subject is the variable
+      environment PerformEval selects for strict eval code; a strict Script
+      declares the same names globally."
+  - path: test/language/eval-code/direct/var-env-func-strict-caller.js
+    group: G1
+    subject: "Strict eval code instantiates its var and function declarations
+      in a new variable environment, so they reach neither the caller nor the
+      global object."
+    disposition: exclusion
+    assessment: eval-semantics
+    sourceDigest: "3ce11a8b3785f7ae2b6d323d4f425fc32ff4971b2416b7802495e354633\
+      f6104"
+    observationDigest: "b9a99a6bf2172dc87a689990861632a5f19b3f9716be43f5335c4e\
+      d31f6d50a6"
+    precedent:
+      - test/language/eval-code/direct/var-env-lower-lex-strict-caller.js
+    reason: "The typeof, ReferenceError and value probes are ordinary reads of
+      an absent or unchanged binding. The asserted subject is the variable
+      environment PerformEval selects for strict eval code; a strict Script
+      declares the same names globally."
+  - path: test/language/eval-code/direct/var-env-func-strict-source.js
+    group: G1
+    subject: "Strict eval code instantiates its var and function declarations
+      in a new variable environment, so they reach neither the caller nor the
+      global object."
+    disposition: exclusion
+    assessment: eval-semantics
+    sourceDigest: "90ae7df56ca1325c782e0ab43d0d28d8c9bc1978f869b95836ed2ced36d\
+      f729c"
+    observationDigest: "130c3c49d315c631b4e97e5a2a331b8d989541653ec95f67e8416b\
+      130d3d5842"
+    precedent:
+      - test/language/eval-code/direct/var-env-lower-lex-strict-source.js
+    reason: "The typeof, ReferenceError and value probes are ordinary reads of
+      an absent or unchanged binding. The asserted subject is the variable
+      environment PerformEval selects for strict eval code; a strict Script
+      declares the same names globally."
+  - path: test/language/eval-code/direct/var-env-lower-lex-non-strict.js
+    group: G1
+    subject: "A non-strict direct eval var declaration that would hoist across
+      a caller block's let x throws SyntaxError at the call."
+    disposition: exclusion
+    assessment: eval-semantics
+    sourceDigest: "4dea4157a8ae965b1298592e3f2b556f38e983d8bd0cd594116c0289d14\
+      c59c2"
+    observationDigest: "02355de952ce86270a4d406db2fbd16414147b4a5ff7a111806294\
+      65a8ec60f8"
+    precedent:
+      - test/language/eval-code/direct/var-env-lower-lex-strict-caller.js
+      - test/language/eval-code/indirect/var-env-lower-lex-non-strict.js
+    reason: "The collision is checked by EvalDeclarationInstantiation against
+      the caller's lexical environments when the eval runs. The static early
+      error for the same names is a different operation, reported before any
+      code runs."
+  - path: test/language/eval-code/direct/var-env-var-init-global-new.js
+    group: G1
+    subject: "Eval declaration instantiation creates or redefines a writable,
+      enumerable, configurable global property and hoists the declaration
+      before the eval code runs."
+    disposition: exclusion
+    assessment: eval-semantics
+    sourceDigest: "2d10d05427cfabc80433e6739c61260f6410b604c451f805dc83ae337e0\
+      50762"
+    observationDigest: "7e8be85df8a0c40a3457ddf53c6d8e0209cf0c93ecbb60f8a772f9\
+      bd3a37a7e8"
+    precedent:
+      - test/language/eval-code/direct/var-env-global-lex-strict-source.js
+    reason: "The configurable descriptor is the eval-specific argument of
+      CreateGlobalVarBinding and CreateGlobalFunctionBinding; a Script creates
+      the same property non-configurable. The siblings whose contract a Script
+      does reproduce are already accounted by ds-host-script-finite-evidence."
+  - path: test/language/eval-code/direct/var-env-var-init-local-exstng.js
+    group: G1
+    subject: "Non-strict direct eval declares in the calling function's
+      variable environment: a new binding is mutable and deletable, an existing
+      binding keeps its value or takes the function, and nothing reaches the
+      global object."
+    disposition: exclusion
+    assessment: eval-semantics
+    sourceDigest: "755358d24f41151be3c082c9a69bc76961aaa6938bf843821222add0b10\
+      ba9d5"
+    observationDigest: "fd095acb5b55e5d351f6f3afdcc79a46eec872f21cb232ba7cf940\
+      5c1ac94780"
+    precedent:
+      - test/language/expressions/object/scope-meth-body-lex-distinct.js
+    reason: "Each assertion reads a binding that EvalDeclarationInstantiation
+      creates or updates in the caller's variable environment. No static
+      declaration creates a deletable function-scope binding or redeclares one
+      after the function's own instantiation."
+  - path: test/language/eval-code/direct/var-env-var-init-local-new-delete.js
+    group: G1
+    subject: "Non-strict direct eval declares in the calling function's
+      variable environment: a new binding is mutable and deletable, an existing
+      binding keeps its value or takes the function, and nothing reaches the
+      global object."
+    disposition: exclusion
+    assessment: eval-semantics
+    sourceDigest: "3b93c4b28506a169ee9bdc9c99ae6a0e0f1a398a737ff7bd8c9a3616cb6\
+      0e11f"
+    observationDigest: "c969f76b724c46921247699eda86d3e9de91e4931d377be54ae96d\
+      d45c90d865"
+    precedent:
+      - test/language/expressions/object/scope-meth-body-lex-distinct.js
+    reason: "Each assertion reads a binding that EvalDeclarationInstantiation
+      creates or updates in the caller's variable environment. No static
+      declaration creates a deletable function-scope binding or redeclares one
+      after the function's own instantiation."
+  - path: test/language/eval-code/direct/var-env-var-init-local-new.js
+    group: G1
+    subject: "Non-strict direct eval declares in the calling function's
+      variable environment: a new binding is mutable and deletable, an existing
+      binding keeps its value or takes the function, and nothing reaches the
+      global object."
+    disposition: exclusion
+    assessment: eval-semantics
+    sourceDigest: "c4a15286fe014009bd45f58dce2d29b9bad1ca7f38f6f300a2548d7a063\
+      9064d"
+    observationDigest: "d430730aff9f7632c39eeff5979094be96b5505c50cc5e144ee31a\
+      4e4e6bd8ed"
+    precedent:
+      - test/language/expressions/object/scope-meth-body-lex-distinct.js
+    reason: "Each assertion reads a binding that EvalDeclarationInstantiation
+      creates or updates in the caller's variable environment. No static
+      declaration creates a deletable function-scope binding or redeclares one
+      after the function's own instantiation."
+  - path: test/language/eval-code/direct/var-env-var-non-strict.js
+    group: G1
+    subject: "Non-strict direct eval declares in the calling function's
+      variable environment: a new binding is mutable and deletable, an existing
+      binding keeps its value or takes the function, and nothing reaches the
+      global object."
+    disposition: exclusion
+    assessment: eval-semantics
+    sourceDigest: "084d9ea898b8bb4bf524467a71537872bab95ef9fc7db93832e55869a6a\
+      d50b4"
+    observationDigest: "5bca7a2e84a3493aa7a67b02ac24effd5086a556dc1d6081d8658f\
+      01bb4c91e4"
+    precedent:
+      - test/language/expressions/object/scope-meth-body-lex-distinct.js
+    reason: "Each assertion reads a binding that EvalDeclarationInstantiation
+      creates or updates in the caller's variable environment. No static
+      declaration creates a deletable function-scope binding or redeclares one
+      after the function's own instantiation."
+  - path: test/language/eval-code/direct/var-env-var-strict-caller-2.js
+    group: G1
+    subject: "Strict eval code instantiates its var and function declarations
+      in a new variable environment, so they reach neither the caller nor the
+      global object."
+    disposition: exclusion
+    assessment: eval-semantics
+    sourceDigest: "0b21d5401be67f936bf9542b8026d4ece218372f7c764fa749075b7fc64\
+      84eaa"
+    observationDigest: "7f6fb54860c95cfc06365174dba8f7a12e4f49832994b47024dbcb\
+      16aac49074"
+    precedent:
+      - test/language/eval-code/direct/var-env-lower-lex-strict-caller.js
+    reason: "The typeof, ReferenceError and value probes are ordinary reads of
+      an absent or unchanged binding. The asserted subject is the variable
+      environment PerformEval selects for strict eval code; a strict Script
+      declares the same names globally."
+  - path: test/language/eval-code/direct/var-env-var-strict-caller-3.js
+    group: G1
+    subject: "Strict eval code instantiates its var and function declarations
+      in a new variable environment, so they reach neither the caller nor the
+      global object."
+    disposition: exclusion
+    assessment: eval-semantics
+    sourceDigest: "1c82495d34ac047a4e3778f481eb9094075c9142f82a52bfb5e9e67a62d\
+      f1baf"
+    observationDigest: "0fefed5cab42b8cba8c2bbf5a187f0532826c93e81826ade953b69\
+      7ed64eec17"
+    precedent:
+      - test/language/eval-code/direct/var-env-lower-lex-strict-caller.js
+    reason: "The typeof, ReferenceError and value probes are ordinary reads of
+      an absent or unchanged binding. The asserted subject is the variable
+      environment PerformEval selects for strict eval code; a strict Script
+      declares the same names globally."
+  - path: test/language/eval-code/direct/var-env-var-strict-caller.js
+    group: G1
+    subject: "Strict eval code instantiates its var and function declarations
+      in a new variable environment, so they reach neither the caller nor the
+      global object."
+    disposition: exclusion
+    assessment: eval-semantics
+    sourceDigest: "ecbd6ae9069bd2f195f8c8c5ce34cd0c6042f475633df8dd598adebfc03\
+      fbc24"
+    observationDigest: "b6cc9fbe91f36ce1142b8345991c60d65af73e8e33bbf1730bf85e\
+      119f7fa27a"
+    precedent:
+      - test/language/eval-code/direct/var-env-lower-lex-strict-caller.js
+    reason: "The typeof, ReferenceError and value probes are ordinary reads of
+      an absent or unchanged binding. The asserted subject is the variable
+      environment PerformEval selects for strict eval code; a strict Script
+      declares the same names globally."
+  - path: test/language/eval-code/direct/var-env-var-strict-source.js
+    group: G1
+    subject: "Strict eval code instantiates its var and function declarations
+      in a new variable environment, so they reach neither the caller nor the
+      global object."
+    disposition: exclusion
+    assessment: eval-semantics
+    sourceDigest: "6cc5462aa1cbb8408302536513bdb3079a7e7b1b9110cc2d2c8c305b3da\
+      03b7a"
+    observationDigest: "8ca1bfb38346439a7d8d164ca18652bdacc9f48a6aefec5655691a\
+      2f185a3a59"
+    precedent:
+      - test/language/eval-code/direct/var-env-lower-lex-strict-source.js
+    reason: "The typeof, ReferenceError and value probes are ordinary reads of
+      an absent or unchanged binding. The asserted subject is the variable
+      environment PerformEval selects for strict eval code; a strict Script
+      declares the same names globally."
+  - path: test/language/eval-code/indirect/export.js
+    group: G2
+    subject: "An export declaration in eval code is a SyntaxError."
+    disposition: exclusion
+    assessment: ec-static-eval-code
+    sourceDigest: "5c73daa134edc98a7c86e0c2b768b7c2bf9b7f128acbc5ac31e47ff0d95\
+      fd110"
+    observationDigest: "2c09b1273bde6c16815a5f68c8fa19da49805112b5d530828aeedf\
+      9f60443d2d"
+    replacement:
+      - test/language/global-code/export.js
+    reason: "The static Script rejects the same declaration at parse with
+      SyntaxError. Eval code is always parsed with the Script goal, so the
+      module caller does not change the rule; only the conversion of that early
+      error into a run-time eval exception remains."
+  - path: test/language/eval-code/indirect/global-env-rec-eval.js
+    group: G1
+    subject: "An indirect eval nested in a direct eval resolves the global
+      binding, not the caller-local var the outer eval code assigned."
+    disposition: exclusion
+    assessment: eval-semantics
+    sourceDigest: "c27b98ae622f2ab1cce22b893bf5fe4e158fb30b17cc12eb1f5e45d1fb0\
+      b8565"
+    observationDigest: "c4c5566a4e20d84117b9f32b0d84d09423d8b3bead731678998a29\
+      a5f8f037d3"
+    precedent:
+      - test/language/eval-code/indirect/realm.js
+      - test/language/expressions/object/scope-meth-body-lex-distinct.js
+    reason: "The outer direct eval declares _eval and assigns the shadowing var
+      in the caller's variable environment, and the asserted value is the one
+      the indirect PerformEval reads from the global environment."
+  - path: test/language/eval-code/indirect/import.js
+    group: G2
+    subject: "An import declaration in eval code is a SyntaxError."
+    disposition: exclusion
+    assessment: ec-static-eval-code
+    sourceDigest: "3c3de7291db32e85c746761a22a7af5b7077ebbcb50d7eb50cac6401ed5\
+      1a9b2"
+    observationDigest: "88c4c33ede5558a0efd1f35eac72cfe639554199c9ff6db8138c38\
+      e25d0eb130"
+    replacement:
+      - test/language/global-code/import.js
+    reason: "The static Script rejects the same declaration at parse with
+      SyntaxError. Eval code is always parsed with the Script goal, so the
+      module caller does not change the rule; only the conversion of that early
+      error into a run-time eval exception remains. The witness differs only in
+      its specifier quotes."
+  - path: test/language/eval-code/indirect/lex-env-distinct-cls.js
+    group: G1
+    subject: "Eval lexical declarations are instantiated in a new declarative
+      environment: they neither collide with the caller's outside binding nor
+      remain after the call."
+    disposition: exclusion
+    assessment: eval-semantics
+    sourceDigest: "2a04dc1d21ee7c0bcd7797cab22917551d9781bc39b1b105705a53399a7\
+      ec55d"
+    observationDigest: "2d594ff97e263f128e5d5931b45cf44256b969fc9fffe631f3e426\
+      134812f1d6"
+    precedent:
+      - test/language/eval-code/indirect/var-env-global-lex-strict.js
+    reason: "The typeof and ReferenceError probes only show the eval binding is
+      gone afterward. The asserted subject is the declarative environment
+      PerformEval creates for eval code; no static declaration is instantiated
+      in it."
+  - path: test/language/eval-code/indirect/lex-env-distinct-const.js
+    group: G1
+    subject: "Eval lexical declarations are instantiated in a new declarative
+      environment: they neither collide with the caller's outside binding nor
+      remain after the call."
+    disposition: exclusion
+    assessment: eval-semantics
+    sourceDigest: "fcde6ae4f756c301436b8f6ef186dc0c2845b38b53f58f61dd4a04c7880\
+      659e4"
+    observationDigest: "ea14aff0bc15e5f475d9f3571cf7ef16f0e8e3bf6bf934d2e1d0d3\
+      bbe4002020"
+    precedent:
+      - test/language/eval-code/indirect/var-env-global-lex-strict.js
+    reason: "The typeof and ReferenceError probes only show the eval binding is
+      gone afterward. The asserted subject is the declarative environment
+      PerformEval creates for eval code; no static declaration is instantiated
+      in it."
+  - path: test/language/eval-code/indirect/lex-env-distinct-let.js
+    group: G1
+    subject: "Eval lexical declarations are instantiated in a new declarative
+      environment: they neither collide with the caller's outside binding nor
+      remain after the call."
+    disposition: exclusion
+    assessment: eval-semantics
+    sourceDigest: "be3e210ca302b4cd58ad5b4cb10a73e37b6eed89e03e803c72b7c54c5dd\
+      85a1a"
+    observationDigest: "c4ab2fc9f42f891815d84975cfa7b4eac09bfd25a3ccd40bd9bc7c\
+      f08c508102"
+    precedent:
+      - test/language/eval-code/indirect/var-env-global-lex-strict.js
+    reason: "The typeof and ReferenceError probes only show the eval binding is
+      gone afterward. The asserted subject is the declarative environment
+      PerformEval creates for eval code; no static declaration is instantiated
+      in it."
+  - path: test/language/eval-code/indirect/var-env-func-init-global-new.js
+    group: G1
+    subject: "Eval declaration instantiation creates or redefines a writable,
+      enumerable, configurable global property and hoists the declaration
+      before the eval code runs."
+    disposition: exclusion
+    assessment: eval-semantics
+    sourceDigest: "faa3ab5d1486de56b9cfd843f95ef5dcfad2475a8a147677f6564e4935b\
+      9f676"
+    observationDigest: "698471791c1ed1a7aeb201cdbd14d70a29c50cfc7af72810054376\
+      a6928ae5a1"
+    precedent:
+      - test/language/eval-code/indirect/var-env-global-lex-strict.js
+    reason: "The configurable descriptor is the eval-specific argument of
+      CreateGlobalVarBinding and CreateGlobalFunctionBinding; a Script creates
+      the same property non-configurable. The siblings whose contract a Script
+      does reproduce are already accounted by ds-host-script-finite-evidence."
+  - path: "test/language/eval-code/indirect/var-env-func-init-global-update-co\
+      nfigurable.js"
+    group: G1
+    subject: "Eval declaration instantiation creates or redefines a writable,
+      enumerable, configurable global property and hoists the declaration
+      before the eval code runs."
+    disposition: exclusion
+    assessment: eval-semantics
+    sourceDigest: "b7fd1a2d4204aee259bea82a9ecd16f72966cf1c0281f5ad78bfb84dee9\
+      8e230"
+    observationDigest: "1cd2cfe8b6339af60a28d6ac28edcf4cbd15062c40bbf99807ade6\
+      520a7f7602"
+    precedent:
+      - test/language/eval-code/indirect/var-env-global-lex-strict.js
+    reason: "The configurable descriptor is the eval-specific argument of
+      CreateGlobalVarBinding and CreateGlobalFunctionBinding; a Script creates
+      the same property non-configurable. The siblings whose contract a Script
+      does reproduce are already accounted by ds-host-script-finite-evidence."
+  - path: test/language/eval-code/indirect/var-env-func-strict.js
+    group: G1
+    subject: "Strict eval code instantiates its var and function declarations
+      in a new variable environment, so they reach neither the caller nor the
+      global object."
+    disposition: exclusion
+    assessment: eval-semantics
+    sourceDigest: "59b478a652e9e7ea662f9d2d220f1ae5243b2d97283b6f8040e409e8d86\
+      7880f"
+    observationDigest: "21126f35a1836a44902960892a9190f0955c7e26bcf603b6f83cf9\
+      1dfc3a1ef2"
+    precedent:
+      - test/language/eval-code/indirect/var-env-global-lex-strict.js
+    reason: "The typeof, ReferenceError and value probes are ordinary reads of
+      an absent or unchanged binding. The asserted subject is the variable
+      environment PerformEval selects for strict eval code; a strict Script
+      declares the same names globally."
+  - path: test/language/eval-code/indirect/var-env-var-init-global-new.js
+    group: G1
+    subject: "Eval declaration instantiation creates or redefines a writable,
+      enumerable, configurable global property and hoists the declaration
+      before the eval code runs."
+    disposition: exclusion
+    assessment: eval-semantics
+    sourceDigest: "3a5ce18fff52bb66c638ab27e2c11e0c49abebe60b0ca9ba1faa9a089c9\
+      1fc63"
+    observationDigest: "93e3b59620f48429d8b435dd758c2f57b87dd989cf1f8e656e6d46\
+      2390e22e80"
+    precedent:
+      - test/language/eval-code/indirect/var-env-global-lex-strict.js
+    reason: "The configurable descriptor is the eval-specific argument of
+      CreateGlobalVarBinding and CreateGlobalFunctionBinding; a Script creates
+      the same property non-configurable. The siblings whose contract a Script
+      does reproduce are already accounted by ds-host-script-finite-evidence."
+  - path: test/language/eval-code/indirect/var-env-var-strict.js
+    group: G1
+    subject: "Strict eval code instantiates its var and function declarations
+      in a new variable environment, so they reach neither the caller nor the
+      global object."
+    disposition: exclusion
+    assessment: eval-semantics
+    sourceDigest: "14bef2f50d3c070b8e845fb951914393e51877051b4147c6ad2eae74279\
+      9c6ac"
+    observationDigest: "b5e9caa7565bd4b5257de151b82966e81e7562ac12af3c53fd0b82\
+      b32c2447c2"
+    precedent:
+      - test/language/eval-code/indirect/var-env-global-lex-strict.js
+    reason: "The typeof, ReferenceError and value probes are ordinary reads of
+      an absent or unchanged binding. The asserted subject is the variable
+      environment PerformEval selects for strict eval code; a strict Script
+      declares the same names globally."
+  - path: test/language/expressions/assignment/S11.13.1_A6_T1.js
+    group: G2
+    subject: "PutValue writes through the Reference resolved before the
+      right-hand side, to the outer declarative binding, even when evaluating
+      it adds a nearer binding; the outer x reads 1 and the nearer x reads
+      undefined."
+    disposition: exclusion
+    assessment: ec-static-eval-code
+    sourceDigest: "3237b19c38d727e37cb184fb0c760c8996622e4fd9e53c39ee8ae5305d0\
+      3b4d6"
+    observationDigest: "ecc5d0f47951110d25ee5a19dca34fa5c03ef5358346a0f24b1ddd\
+      f4126738a9"
+    replacement:
+      - test/language/expressions/assignment/S11.13.1_A6_T3.js
+    reason: "S11.13.1_A6_T3.js passes and asserts the same A6 contract: x
+      resolves to the function's declarative environment record, the right-hand
+      side then adds a nearer x by giving a with object the property, and
+      PutValue writes 1 to the outer x while the nearer binding keeps its own
+      value. Here the nearer binding is a var that direct eval instantiates in
+      the inner function, read back as innerX; only that eval var instantiation
+      remains."
+  - path: test/language/expressions/assignment/S11.13.1_A6_T2.js
+    group: G2
+    subject: "PutValue writes through the Reference resolved before the
+      right-hand side, to the outer declarative binding, even when evaluating
+      it adds a nearer binding; the outer x reads 1 and the nearer x reads 2."
+    disposition: exclusion
+    assessment: ec-static-eval-code
+    sourceDigest: "469ebce92c821387a71da2e244ff90aa94a94740b32233691b3aacc2510\
+      142c9"
+    observationDigest: "e8d10606327ae9aa0b80e79cfbcc6bccf2848ccffc4b99dfbc7f6e\
+      ef556ccce2"
+    replacement:
+      - test/language/expressions/assignment/S11.13.1_A6_T3.js
+    reason: "S11.13.1_A6_T3.js passes and asserts the same A6 contract: x
+      resolves to the function's declarative environment record, the right-hand
+      side then adds a nearer x by giving a with object the property, and
+      PutValue writes 1 to the outer x while the nearer binding keeps its own
+      value. Here the nearer binding is a var that direct eval instantiates in
+      the inner function, read back as innerX; only that eval var instantiation
+      remains."

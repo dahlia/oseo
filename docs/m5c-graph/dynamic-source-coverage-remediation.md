@@ -1,10 +1,10 @@
 B19/B20/B30 dynamic-source coverage remediation
 ===============================================
 
-The umbrella now owns 48 paths. The child sections below give each move. In
-bundle 3, the residual evidence candidate accounted for 17 of the 209 paths it
-owned then. The assessment keeps two of its 19 selected paths here; the other
-190 are outside that bounded child.
+The umbrella no longer owns any path. The child sections below give each move.
+In bundle 3, the residual evidence candidate accounted for 17 of the 209 paths
+it owned then. The assessment keeps two of its 19 selected paths here; the
+other 190 are outside that bounded child.
 
 At the earlier split checkpoint, the umbrella owned 757 paths: DS1 accounts for
 218, DS-3 for 11, DS2 for 76, DS4 for 40, DS-5 for 2, DS-6 for 42, and DS-7 for
@@ -742,3 +742,15 @@ rows also move to ADR 0016, without replacement evidence, because their only
 subject is EvalDeclarationInstantiation. The other 12 B26a/B26b/B27 scope rows
 are deferred under ADR 0031, because only a direct eval declaration shows the
 environment structure they probe.
+
+
+Eval code assessment child
+--------------------------
+
+The `dynamic-source-eval-code-assessment` child records the evidence
+attempt for exactly 48 umbrella paths that test eval code itself, as
+[*dynamic-source-eval-code-assessment.md*](./dynamic-source-eval-code-assessment.md)
+pins them. Root's 2026-11-02 rulings send 32 of them to the existing ADR 0016
+`eval-semantics` exclusion and close the other 16, including the two
+*S11.13.1\_A6* assignment rows, with static replacement evidence. No path is
+deferred.

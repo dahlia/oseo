@@ -1,0 +1,18 @@
+version: 1
+id: dynamic-source-eval-code-assessment
+title: Assess the direct and indirect eval code paths
+delivers: >-
+  Assesses exactly 48 umbrella paths that test eval code itself: its
+  variable and lexical environments, this and new.target, global
+  environment record effects, module syntax inside eval, and two
+  assignment rows whose RHS adds a binding through direct eval. Under
+  Root's 2026-11-02 rulings, 32 paths whose only subject is eval
+  environment selection or declaration instantiation take the existing
+  ADR 0016 eval-semantics exclusion, and the other 16, the two assignment
+  rows included, close under ADR 0016 with static replacement evidence.
+  No path is deferred. Scope and per-path outcomes are recorded in
+  docs/m5c-graph/dynamic-source-eval-code-assessment.md.
+dependencies:
+  - unsupported-ownership-audit
+landed: false
+status: ready
