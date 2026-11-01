@@ -24,7 +24,7 @@ summary:
   ready: 144
   blocked: 2
   parked: 0
-  landed: 140
+  landed: 141
 serializationPoints:
   - path: docs/m5c-graph/graph.yaml
     note: "Every landing updates node state and the evidence baseline. Merge
