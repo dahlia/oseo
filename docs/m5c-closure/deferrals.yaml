@@ -279,6 +279,32 @@ paths:
       0d61"
     observationDigest: "d5a5712a46d4202c67f5c47339edc6fb0ff4275f73a20a373a8c20e\
       ab22c1f07"
+  test/language/global-code/script-decl-lex-var-declared-via-eval.js:
+    family: run-time-source
+    section: sec-globaldeclarationinstantiation
+    remainingContract: After non-strict global direct eval declares var
+      test262Var and function test262Fn, later host Scripts declare let
+      test262Var = 1 and const test262Fn = 2 without SyntaxError, and the
+      global references read 1 and 2.
+    reason: Only non-strict direct eval creates configurable global var and
+      function bindings, which GlobalDeclarationInstantiation lets a lexical
+      declaration shadow. A host Script var or function is non-configurable,
+      so the later lexical declaration throws, and a configurable property
+      made by assignment is not a declared binding.
+    attempts:
+      nodes:
+        - dynamic-source-fixture-construction-evidence
+      decisions:
+        - "2026-11-01 umbrella-residual answer: bounded general eval and
+          Function construction are not approved for M5"
+        - "2026-11-01 umbrella-residual answer, item 1: the literal host
+          Script track was assessed and declares only non-configurable
+          global bindings"
+    targetMilestone: PLAN-DYN.md
+    sourceDigest: "ce9644b3e5a41836f50e358710331e62782ddab5d3f29481d79acfa00393\
+      352c"
+    observationDigest: "3a99f9aabc2dbdd31f3cffb4544dfa3dbb8e0f4598c3bfb8249045d\
+      c78cccb2c"
   test/language/module-code/top-level-await/await-dynamic-import-rejection.js:
     family: static-specifier-import
     section: sec-moduleevaluation

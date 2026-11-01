@@ -1,7 +1,7 @@
 B19/B20/B30 dynamic-source coverage remediation
 ===============================================
 
-The umbrella now owns 136 paths. The child sections below give each move. In
+The umbrella now owns 121 paths. The child sections below give each move. In
 bundle 3, the residual evidence candidate accounted for 17 of the 209 paths it
 owned then. The assessment keeps two of its 19 selected paths here; the other
 190 are outside that bounded child.
@@ -699,8 +699,9 @@ Root's 2026-11-01 classification adds
 had no recorded evidence attempt: the 11 compound assignment
 *S11.13.2\_A6.N\_T1* rows, *script-decl-lex-var-declared-via-eval.js*,
 and the three direct eval calls with spread arguments. Its pinned selector
-and routes are in that child's work note. Ownership moves only with
-reviewed closure, and the umbrella is blocked until the child lands.
+and routes are in that child's work note. The child moves 14 paths to ADR
+0016 and defers *script-decl-lex-var-declared-via-eval.js* under ADR 0031, so
+the umbrella owns 121. The umbrella is blocked until the child lands.
 
 
 Named deferral

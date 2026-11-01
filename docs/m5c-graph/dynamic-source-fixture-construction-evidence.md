@@ -6,10 +6,10 @@ This bounded child reviews exactly 15 umbrella paths at main
 [*dynamic-source-fixture-construction-evidence.paths.txt*](./dynamic-source-fixture-construction-evidence.paths.txt).
 Its SHA256 is
 `7f4a31855ea4dd5704cada2f761dd83a7c78a897b4d9bfbdae745b241c20ca3a`. Every path
-is owned by `dynamic-source-coverage-remediation` and, except the 11 compound
-assignment rows, audited under the `fixture-construction` assessment. Root's
-classification of 2026-11-01 found no recorded evidence attempt for them, so
-ADR 0031 cannot defer them yet. This node is that attempt.
+was owned by `dynamic-source-coverage-remediation` and audited under the
+`fixture-construction` assessment. Root's classification of 2026-11-01 found no
+recorded evidence attempt for them, so ADR 0031 could not defer them. This node
+is that attempt.
 
 
 Authority and ownership
@@ -24,40 +24,40 @@ The literal host Script track of
 `with` statements are both admitted inside M5.
 
 The node starts ready/unlanded, depending on landed
-`unsupported-ownership-audit`. The umbrella and `m5-exit-audit` depend on
-it. This graph commit moves no ledger owner. Root owns UPDATE, outer review,
-publication, push and landing. ADR 0013, 0016, 0019, 0029 and 0031 stay
-unchanged, and every inventory path and original assertion remains.
+`unsupported-ownership-audit`. The umbrella and `m5-exit-audit` depend on it.
+Root owns UPDATE, outer review, publication, push and landing. ADR 0013,
+0016, 0019, 0029 and 0031 stay unchanged, and every inventory path and
+original assertion remains.
 
 
-Closure routes
---------------
+Outcome
+-------
 
- -  Compound assignment reference base (11):
-    *S11.13.2\_A6.1\_T1* through *S11.13.2\_A6.11\_T1*. Each asserts that
-    `x op= (eval("var x = 2;"), 4)` keeps the reference resolved before the
-    right operand, so the outer `x` receives the result while the new local
-    `x` holds 2. Witness the same order with a sloppy `with` object that
-    gains `x` during the right operand, for every operator, and compare
-    both values strictly. Closed rows move to ADR 0016 under a bound
-    assessment.
- -  Global lexical over an eval var
-    (*global-code/script-decl-lex-var-declared-via-eval.js*). The assertion
-    depends on direct eval creating configurable global var and function
-    bindings. Assess whether a host Script pair or a static configurable
-    global property witnesses it; otherwise record the deferral.
+The [per-path assessment](./dynamic-source-fixture-construction-assessment.md)
+records each path's contract, witness and digests.
+
+ -  Compound assignment reference base (11): *S11.13.2\_A6.1\_T1* through
+    *S11.13.2\_A6.11\_T1* close under ADR 0016 with the new
+    `compound-reference-base-witness` assessment. A sloppy `with` object
+    that gains `x` during the right operand replaces the eval declaration,
+    and a native test checks both original assertions for every operator.
  -  Direct eval with spread arguments (3): *eval-spread.js*,
-    *eval-spread-empty-leading.js* and *eval-spread-empty-trailing.js*.
-    Assess whether the existing `eval-semantics` assessment of ADR 0016
-    covers them unchanged once the spread iteration they also count has a
-    static witness. If it would need new ADR text, ask Root.
+    *eval-spread-empty-leading.js* and *eval-spread-empty-trailing.js* close
+    under ADR 0016 with the existing `eval-semantics` assessment, unchanged.
+    Their spread iteration counts are witnessed by passing static paths.
+ -  Global lexical over an eval var (1):
+    *global-code/script-decl-lex-var-declared-via-eval.js* is deferred to
+    *PLAN-DYN.md*. Only non-strict direct eval creates the configurable var
+    and function bindings it observes; a host Script var is non-configurable
+    and makes the later lexical declaration throw.
+
+The umbrella's ownership drops by 15.
 
 
 Checks and review
 -----------------
 
-Graph tests and capacity-wrapped `mise run check` precede the graph-only
-commit. Evidence needs a focused native run of any new fixture, its
-non-native tests, and `mise run check`; no full or extended gate or UPDATE.
-Review uses scope `fixture-construction-evidence` with the pre-gate and
-internal reviewers.
+The evidence commit runs the focused native test, its source test, the graph
+test and capacity-wrapped `mise run check`; no full or extended gate or
+UPDATE. Review uses scope `fixture-construction-evidence` with the pre-gate
+and internal reviewers.
