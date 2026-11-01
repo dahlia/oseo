@@ -153,8 +153,9 @@ absent, or its attempts name neither a graph node nor a track decision. Its
 `targetMilestone` must be a numbered *ROADMAP.md* milestone after M5 or the
 plan file of a track that *ROADMAP.md* records as deferred, such as
 *PLAN-DYN.md*. An exclusion audit row with the `deferral` disposition
-requires the `deferred` owner and is counted neither as an exclusion nor as
-remediation.
+requires the `deferred` owner and the `not-demonstrated` assessment, and is
+counted neither as an exclusion nor as remediation. A deferred path may lack
+an audit row only when its rejection falls on no accepted record's surface.
 
 The checker accepts an `adr:` owner only for an unsupported path, only when
 the paragraph under the record's Status heading begins with `Accepted`, and

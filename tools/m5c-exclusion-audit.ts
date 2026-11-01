@@ -292,6 +292,70 @@ export function legacyCallerSelector(record: string): ReadonlySet<string> {
   return new Set(paths);
 }
 
+/** Record surfaces an unsupported observation falls on. */
+interface RecordSurfaces {
+  /** Process stderr, or the whole detail of a direct rejection. */
+  readonly accessorDetail: string;
+  readonly annexSurface: boolean;
+  readonly callerSurface: boolean;
+  readonly dynamicSurface: boolean;
+}
+
+/**
+ * Find the accepted record surfaces an observation's rejection falls on. The
+ * legacy lookup rejection is read from `accessorDetail` by the caller.
+ */
+function recordSurfaces(result: Test262Result, source: string): RecordSurfaces {
+  const detail = result.observation.detail ?? "";
+  // Process observations quote stderr separately. Text printed to stdout
+  // cannot authorize the new accessor surface. Direct diagnostic fixtures
+  // and non-process rejections have no such wrapper.
+  const stderrStart = detail.lastIndexOf('stderr="');
+  const accessorDetail = (
+    stderrStart < 0
+      ? detail
+      : detail.slice(
+          stderrStart + 'stderr="'.length,
+          detail.endsWith('"') ? -1 : undefined,
+        )
+  ).replace(/(?:\r?\n|\\n)+$/u, "");
+  const dynamicSurface =
+    detail.includes("error[OSEO1001]:") &&
+    ((detail.includes("Unknown binding 'eval'.") &&
+      hasEvalCall(source, result.case.mode)) ||
+      dynamicImportRejection.test(detail) ||
+      detail.includes("The Function constructor requires dynamic source") ||
+      // The run-time boundary of each realm's source-compiling
+      // constructors and of %eval% called with a String (ADR 0027).
+      [
+        "AsyncGeneratorFunction",
+        "AsyncFunction",
+        "GeneratorFunction",
+        "Function",
+        "eval",
+      ].some((name) =>
+        detail.includes(`${name} compiles source text at run time`),
+      ));
+  const annexSurface =
+    (detail.includes("error[OSEO1001]:") &&
+      detail.includes(
+        "A named backreference in a pattern that declares no group name " +
+          "is admitted only by Annex B",
+      )) ||
+    annexProtoRejection.test(accessorDetail);
+  // The frontmatter check runs before compilation, so caller must be the
+  // only unadmitted feature: another one would hide work behind this
+  // record. The observation digest binds the remaining fields.
+  const callerSurface =
+    detail === callerRejectionDetail &&
+    result.unsupportedFeatures.length === 1 &&
+    result.unsupportedFeatures[0] === "caller" &&
+    result.case.features.includes("caller") &&
+    result.case.flags.includes("noStrict") &&
+    hasCallerRead(source, result.case.mode);
+  return { accessorDetail, annexSurface, callerSurface, dynamicSurface };
+}
+
 /** Inputs are explicit so regression tests need no corpus execution. */
 export interface M5cExclusionAuditInputs {
   /** Exact separately accepted dynamic attribute reservation. */
@@ -521,54 +585,9 @@ export function validateM5cExclusionAudit(
     ) {
       throw new Error(`Audit observation changed: ${path}.`);
     }
-    const detail = result.observation.detail ?? "";
-    // Process observations quote stderr separately. Text printed to stdout
-    // cannot authorize the new accessor surface. Direct diagnostic fixtures
-    // and non-process rejections have no such wrapper.
-    const stderrStart = detail.lastIndexOf('stderr="');
-    const accessorDetail = (
-      stderrStart < 0
-        ? detail
-        : detail.slice(
-            stderrStart + 'stderr="'.length,
-            detail.endsWith('"') ? -1 : undefined,
-          )
-    ).replace(/(?:\r?\n|\\n)+$/u, "");
-    const dynamicSurface =
-      detail.includes("error[OSEO1001]:") &&
-      ((detail.includes("Unknown binding 'eval'.") &&
-        hasEvalCall(source, result.case.mode)) ||
-        dynamicImportRejection.test(detail) ||
-        detail.includes("The Function constructor requires dynamic source") ||
-        // The run-time boundary of each realm's source-compiling
-        // constructors and of %eval% called with a String (ADR 0027).
-        [
-          "AsyncGeneratorFunction",
-          "AsyncFunction",
-          "GeneratorFunction",
-          "Function",
-          "eval",
-        ].some((name) =>
-          detail.includes(`${name} compiles source text at run time`),
-        ));
-    const annexSurface =
-      (detail.includes("error[OSEO1001]:") &&
-        detail.includes(
-          "A named backreference in a pattern that declares no group name " +
-            "is admitted only by Annex B",
-        )) ||
-      annexProtoRejection.test(accessorDetail);
+    const { accessorDetail, annexSurface, callerSurface, dynamicSurface } =
+      recordSurfaces(result, source);
     const lookupMethod = annexLookupRejection.exec(accessorDetail)?.[1];
-    // The frontmatter check runs before compilation, so caller must be the
-    // only unadmitted feature: another one would hide work behind this
-    // record. The observation digest binds the remaining fields.
-    const callerSurface =
-      detail === callerRejectionDetail &&
-      result.unsupportedFeatures.length === 1 &&
-      result.unsupportedFeatures[0] === "caller" &&
-      result.case.features.includes("caller") &&
-      result.case.flags.includes("noStrict") &&
-      hasCallerRead(source, result.case.mode);
     // An ADR 0013 row may stand over the eval rejection only in the exact
     // residue selector, only as a bound annex-b-only exclusion, and every
     // selector path must be such a row.
@@ -715,6 +734,31 @@ export function validateM5cExclusionAudit(
       );
     }
   }
+  // ADR 0031 lets a deferral skip the audit only when no accepted record
+  // could exclude the path, so a deferred path whose rejection falls on a
+  // record surface keeps its row whatever its owner history.
+  for (const entry of inputs.ledger.entries) {
+    if (entry.owner !== deferredOwner || seen.has(entry.path)) continue;
+    const result = results.get(entry.path);
+    const source = inputs.sources.get(entry.path);
+    if (result == null || source == null) {
+      throw new Error(
+        `Deferred path lacks its observation or source: ${entry.path}.`,
+      );
+    }
+    const surfaces = recordSurfaces(result, source);
+    if (
+      surfaces.dynamicSurface ||
+      surfaces.annexSurface ||
+      surfaces.callerSurface ||
+      annexLookupRejection.test(surfaces.accessorDetail)
+    ) {
+      throw new Error(
+        `Deferred path on a record surface needs its audit row: ` +
+          `${entry.path}.`,
+      );
+    }
+  }
   // A reviewed selector path cannot leave the audit by changing its owner.
   for (const entry of inputs.ledger.entries) {
     if (
@@ -789,9 +833,18 @@ export function validateCurrentM5cExclusionAudit(): M5cExclusionAuditSummary {
   }
   if (!Array.isArray(audit.paths))
     throw new Error("Audit paths must be an array.");
-  for (const value of audit.paths) {
-    const row = parsedObject(value, "audit path");
-    const path = string(row.path, "audit path");
+  const ledger = parseM5cClosureLedger(
+    readFileSync(join(repositoryRoot, m5cClosureLedgerPath), "utf8"),
+  ).ledger;
+  const deferredPaths = ledger.entries
+    .filter((entry) => entry.owner === deferredOwner)
+    .map((entry) => entry.path);
+  for (const path of [
+    ...audit.paths.map((value) =>
+      string(parsedObject(value, "audit path").path, "audit path"),
+    ),
+    ...deferredPaths,
+  ]) {
     if (
       !/^test\/(?:built-ins|language)\/[A-Za-z0-9_./-]+\.js$/u.test(path) ||
       path.split("/").includes("..")
@@ -806,9 +859,7 @@ export function validateCurrentM5cExclusionAudit(): M5cExclusionAuditSummary {
     legacyCallerPaths: readLegacyCallerSelector(
       recordSources.get(callerRecordStem) ?? "",
     ),
-    ledger: parseM5cClosureLedger(
-      readFileSync(join(repositoryRoot, m5cClosureLedgerPath), "utf8"),
-    ).ledger,
+    ledger,
     results: readCurrentM5cManifest().results,
     records: recordSources,
     sources,

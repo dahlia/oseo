@@ -579,6 +579,40 @@ test("a deferral row needs the deferred owner and is counted apart", () => {
   );
 });
 
+test("a deferred path on a record surface cannot drop its audit row", () => {
+  const { audit, inputs } = fixture();
+  const deferred: M5cExclusionAuditInputs = {
+    ...inputs,
+    ledger: {
+      ...inputs.ledger,
+      entries: inputs.ledger.entries.map((entry) =>
+        Object.assign({}, entry, { owner: "deferred" }),
+      ),
+    },
+  };
+  const unaudited = stringifyYaml({ ...audit, paths: [] });
+  assert.throws(
+    () => validateM5cExclusionAudit(unaudited, deferred),
+    /Deferred path on a record surface needs its audit row/u,
+  );
+  assert.throws(
+    () =>
+      validateM5cExclusionAudit(unaudited, { ...deferred, sources: new Map() }),
+    /Deferred path lacks its observation or source/u,
+  );
+  const offSurface = {
+    ...observation,
+    detail: "error[OSEO1001]: ImportDeclaration is outside the M1 profile.",
+  };
+  assert.deepEqual(
+    validateM5cExclusionAudit(unaudited, {
+      ...deferred,
+      results: [{ ...result, observation: offSurface }],
+    }),
+    { exclusions: 0, remediation: 0, deferrals: 0, missingDynamicTags: 0 },
+  );
+});
+
 test("the Annex B residue selector bounds ADR 0013 over eval", () => {
   const { audit, inputs } = fixture();
   audit.assessments.reviewed.normativeDependency = "annex-b-only";
