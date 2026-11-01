@@ -1,7 +1,7 @@
 B19/B20/B30 dynamic-source coverage remediation
 ===============================================
 
-The umbrella now owns 87 paths. The child sections below give each move. In
+The umbrella now owns 63 paths. The child sections below give each move. In
 bundle 3, the residual evidence candidate accounted for 17 of the 209 paths it
 owned then. The assessment keeps two of its 19 selected paths here; the other
 190 are outside that bounded child.
@@ -717,3 +717,17 @@ selector and outcome rules are in that child's work note. Its assessment
 moves 13 paths to ADR 0016 and defers 36 under ADR 0031, so the umbrella
 owns 87 paths. The umbrella requires child landing plus zero directly owned
 paths before its own landing.
+
+
+Scope and eval arguments evidence
+---------------------------------
+
+The
+[`dynamic-source-scope-arguments-evidence`](./dynamic-source-scope-arguments-evidence.md)
+child gives 24 paths one outcome each. It moves the six ds9 arrow cells to ADR
+0016 with static native witnesses of their body bindings named `arguments` and
+of the parameter closure that reads past them. Six eval-declaration-only scope
+rows also move to ADR 0016, without replacement evidence, because their only
+subject is EvalDeclarationInstantiation. The other 12 B26a/B26b/B27 scope rows
+are deferred under ADR 0031, because only a direct eval declaration shows the
+environment structure they probe. With this move the umbrella owns 63 paths.

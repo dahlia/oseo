@@ -1,0 +1,18 @@
+version: 1
+id: dynamic-source-scope-arguments-evidence
+title: Close the function scope and eval arguments paths
+delivers: >-
+  Gives each of 24 umbrella paths exactly one outcome: 18 function,
+  generator, for, switch and variable scope paths from the
+  observation-train-b26a-b26b-b27 assessment and the six
+  ds9-eval-arguments-mixed arrow paths. A path closes under ADR 0016 when
+  a static witness observes the same operation and values as its core
+  assertion, or without replacement when its only subject is
+  EvalDeclarationInstantiation, and is deferred under ADR 0031 only when
+  a binding created by direct eval is the sole route. Paths and routes
+  are recorded in
+  docs/m5c-graph/dynamic-source-scope-arguments-evidence.md.
+dependencies:
+  - unsupported-ownership-audit
+landed: false
+status: ready
