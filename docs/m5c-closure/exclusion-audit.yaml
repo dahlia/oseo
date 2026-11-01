@@ -969,26 +969,28 @@ assessments:
   ec-static-eval-code:
     disposition: exclusion
     normativeDependency: source-evaluation-only
-    reason: "Root's 2026-11-02 ruling closes 14 eval code paths whose
+    reason: "Root's 2026-11-02 rulings close 16 eval code paths whose
       non-source subject static code observes with the same operation and the
       same compared values, as dynamic-source-eval-code-assessment.yaml maps
       path by path. global-code/export.js, import.js and new.target-arrow.js
       reject the same declarations at parse with SyntaxError; new.target
       value-via-call.js and value-via-new.js compare undefined and the
-      function. Nine pinned originals keep every byte with each eval call
-      replaced by its evaluated expression, so the same name, this or
-      new.target resolution happens in the caller; each call's
-      wrong-environment mutation is rejected by an independent Test262Error
-      verdict, and both native policies with forced GC and Node/Deno references
-      agree. Only eval context selection, eval code parsing, and the conversion
+      function; S11.13.1_A6_T3.js writes 1 through the outer declarative
+      Reference while a with object gains a nearer x during the right-hand
+      side. Nine pinned originals keep every byte with each eval call replaced
+      by its evaluated expression, so the same name, this or new.target
+      resolution happens in the caller; each call's wrong-environment mutation
+      is rejected by an independent Test262Error verdict, and both native
+      policies with forced GC and Node/Deno references agree. Only eval context
+      selection, eval code parsing, eval var instantiation, and the conversion
       of an early error into a run-time eval exception remain excluded under
       ADR 0016; accounting counts no path as pass. Reopen on changed source,
       observed rejection or replacement evidence, an accepted source admission,
       or any uncovered non-source assertion under ADR 0019."
     replacementEvidence:
       docs/m5c-graph/dynamic-source-eval-code-assessment.yaml:
-        "af0fc69f978acf750611527d65f1a84a\
-        f641615a6935f837967c88ee8a7bd081"
+        "afb36c7cbc4fd23bfe00cf15babf6b42\
+        e29ecdf24c114074c8655b690ec7f2a2"
       tests/native/fixtures/eval-code-inline-evidence.ts:
         "1d81b5ee9597f586cc4fe72991061fbd\
         bff15b2616d6cdf44cae419b94b38d9d"
@@ -1017,17 +1019,9 @@ assessments:
       tests/test262/results/language/expressions/81.yaml:
         "3911a5d61c7521021bfeafbbd01074c3\
         4b47f2425a84b34a762de0c0e7234b3a"
-  ec-declarative-lref-deferral:
-    disposition: deferral
-    normativeDependency: not-demonstrated
-    reason: "Deferred under ADR 0031; docs/m5c-closure/deferrals.yaml names
-      each path's remaining contract. S11.13.1_A6_T1 and S11.13.1_A6_T2 assert
-      that PutValue writes through the Reference resolved before the right-hand
-      side while a direct eval var declaration adds a nearer binding to a
-      function's declarative record. S11.13.1_A5_T1 to S11.13.1_A5_T3 already
-      pass for the object environment record variant; only direct eval adds a
-      declarative binding after instantiation, and direct eval is not approved
-      for M5."
+      tests/test262/results/language/expressions/df.yaml:
+        "6114cd5ddf57f229b15d82235ef507f7\
+        5371ce11e8d2d3d3a2b741ec0a13b20a"
   observation-train-dynamic-coverage:
     disposition: remediation
     normativeDependency: not-demonstrated
@@ -14535,7 +14529,7 @@ paths:
       Reference base value is an environment record and environment record
       kind is declarative environment record. PutValue(lref, rval) uses the
       initially created Reference even if a more local binding is available."
-    assessment: ec-declarative-lref-deferral
+    assessment: ec-static-eval-code
   - path: "test/language/expressions/assignment/S11.13.1_A6_T2.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "incidental-scaffolding"
@@ -14549,7 +14543,7 @@ paths:
       Reference base value is an environment record and environment record
       kind is declarative environment record. PutValue(lref, rval) uses the
       initially created Reference even if a more local binding is available."
-    assessment: ec-declarative-lref-deferral
+    assessment: ec-static-eval-code
   - path: "test/language/expressions/async-arrow-function/eval-\
       var-scope-syntax-err.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"

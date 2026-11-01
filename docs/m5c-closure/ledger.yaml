@@ -7,7 +7,7 @@ suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
 inventoryPaths: 41091
 closedPaths: 39179
 openPaths: 1912
-deferredPaths: 28
+deferredPaths: 26
 states:
   expected-negative: 4401
   harness-failure: 0
@@ -204,12 +204,12 @@ owners:
       2026-10-28 item 1 rule: its exhaustive literal property witnesses
       every selected code unit at build time and natively, and only eval
       of the literal text remains. Dynamic-source-eval-code-assessment
-      accounts for 46 eval code paths under Root's 2026-11-02 ruling: 32
-      under the eval-semantics assessment, whose only subject is eval
-      environment selection or declaration instantiation, and 14 whose
+      accounts for 48 eval code paths under Root's 2026-11-02 rulings:
+      32 under the eval-semantics assessment, whose only subject is eval
+      environment selection or declaration instantiation, and 16 whose
       non-source subjects static witnesses observe, as
       dynamic-source-eval-code-assessment.yaml maps them."
-    paths: 1762
+    paths: 1764
   adr:0028-legacy-function-caller-boundary:
     note: ADR 0028 authorizes "an M5 exclusion of the expectation that
       reading the `caller` property of a non-strict ordinary function
@@ -228,7 +228,7 @@ owners:
       the reason, the remaining contract, and the milestone after M5
       that inherits the path. They stay open and are counted neither as
       closed nor as excluded.
-    paths: 28
+    paths: 26
   node:class-private-accessor-lookup-coverage-remediation:
     note: Observation-batch-22b admits the two class declaration tests under
       test/language/statements/class/elements/ that call
@@ -381,10 +381,9 @@ owners:
       under ADR 0031: the 20 static-specifier import rows and six rows
       that only run-time eval or Function source observes, including
       both variable-environment probes.
-      Dynamic-source-eval-code-assessment moves 48 eval code paths out:
-      46 to ADR 0016 and the two S11.13.1_A6 assignment rows, whose
-      declarative-record contract only a direct eval var declaration
-      observes, to the deferred owner under ADR 0031."
+      Dynamic-source-eval-code-assessment moves 48 eval code paths,
+      including the two S11.13.1_A6 assignment rows that S11.13.1_A6_T3
+      witnesses, to ADR 0016."
     paths: 88
   observation:
     note: Closed by a reviewed pass or expected negative in the manifest.
@@ -19994,8 +19993,8 @@ paths:
   test/language/expressions/assignment/S11.13.1_A5_T1.js: [pass, observation]
   test/language/expressions/assignment/S11.13.1_A5_T2.js: [pass, observation]
   test/language/expressions/assignment/S11.13.1_A5_T3.js: [pass, observation]
-  test/language/expressions/assignment/S11.13.1_A6_T1.js: [unsupported-profile-feature, deferred, [dynamic-source, expression-operators, functions, var-bindings]]
-  test/language/expressions/assignment/S11.13.1_A6_T2.js: [unsupported-profile-feature, deferred, [dynamic-source, expression-operators, functions, var-bindings]]
+  test/language/expressions/assignment/S11.13.1_A6_T1.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [dynamic-source, expression-operators, functions, var-bindings]]
+  test/language/expressions/assignment/S11.13.1_A6_T2.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [dynamic-source, expression-operators, functions, var-bindings]]
   test/language/expressions/assignment/S11.13.1_A6_T3.js: [pass, observation]
   test/language/expressions/assignment/S11.13.1_A7_T4.js: [pass, observation]
   test/language/expressions/assignment/S8.12.4_A1.js: [pass, observation]

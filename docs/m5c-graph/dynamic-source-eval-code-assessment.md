@@ -16,22 +16,19 @@ Every path is `unsupported-profile-feature` with the umbrella owner and the
 them were already tried by
 [`dynamic-source-host-script-evidence`](./dynamic-source-host-script-evidence.md),
 whose kept table gives the reason a literal host Script cannot replace each
-eval call. This node does not repeat that attempt. The two assignment rows need
-no host Script attempt: a Script declares globally and cannot add a binding to
-a function's declarative record.
+eval call. This node does not repeat that attempt.
 
 
 Outcomes
 --------
 
-Root's ruling of 2026-11-02 on this node's disposition question fixes
-three groups.
+Root's rulings of 2026-11-02 on this node's disposition question fix two
+groups. No path is deferred.
 
 | Group | Paths | Outcome                                                      |
 | ----- | ----: | ------------------------------------------------------------ |
 | G1    |    32 | ADR 0016 `eval-semantics` exclusion, no replacement evidence |
-| G2    |    14 | ADR 0016 exclusion with static replacement evidence          |
-| G3    |     2 | ADR 0031 deferral, `run-time-source` family, *PLAN-DYN.md*   |
+| G2    |    16 | ADR 0016 exclusion with static replacement evidence          |
 
 G1 paths assert only eval environment selection or eval declaration
 instantiation. Their siblings, such as
@@ -45,10 +42,13 @@ G2 paths have a non-source subject that static code observes with the same
 operation and the same compared values. Only eval context selection or
 the conversion of an early error into a run-time eval exception remains.
 
-G3 paths assert ordinary assignment semantics: `PutValue` writes through
-the reference resolved before the right-hand side. A new binding in a
-declarative environment record during that evaluation exists only through
-a direct eval var declaration, which the maintainer did not approve for M5.
+The two assignment rows belong to G2. They assert ordinary assignment
+semantics: `PutValue` writes through the Reference resolved before the
+right-hand side, here to the outer function's declarative binding, even when
+evaluating the right-hand side adds a nearer binding. *S11.13.1\_A6\_T3.js*
+asserts the same contract with a `with` object that gains the nearer `x`,
+and it passes. ADR 0031 therefore admits no deferral, and only the
+instantiation of the nearer var by direct eval remains.
 
 
 Evidence
@@ -60,7 +60,7 @@ and observation digests, and reason. G1 rows name the sibling precedent already
 under `eval-semantics` or another ADR 0016 source-only assessment; G2 rows name
 their replacement.
 
-Six G2 originals use existing reviewed results. The four `export` and
+Eight G2 originals use existing reviewed results. The four `export` and
 `import` rows and *new.target-arrow.js* have expected-negative witnesses:
 *global-code/export.js*, *global-code/import.js* and
 *global-code/new.target-arrow.js* reject the same declarations at parse with
@@ -69,6 +69,9 @@ specifier quotes. For these five rows only eval code parsing and the
 conversion of an early error into a run-time eval exception stay excluded.
 *new.target/value-via-call.js* and *value-via-new.js* pass and compare
 `undefined` and the function, the two values *new.target-fn.js* asserts.
+*S11.13.1\_A6\_T3.js* passes and compares the outer `x` with 1 and the nearer
+binding with the value the right-hand side gave it, as *S11.13.1\_A6\_T1.js*
+and *S11.13.1\_A6\_T2.js* do with `undefined` and 2.
 
 Nine G2 originals, *new.target-fn.js* among them, use the inline witness in
 *tests/native/fixtures/eval-code-inline-evidence.ts*. It reads each pinned
@@ -87,14 +90,12 @@ specialization policies with forced collection.
 
 The exclusion audit gives G1 rows the `eval-semantics` assessment and G2
 rows the new `ec-static-eval-code` assessment, which binds the replacement
-evidence by digest. G3 rows take the `ec-declarative-lref-deferral`
-assessment and named entries in
-[*deferrals.yaml*](../m5c-closure/deferrals.yaml). The
-`observation-train-b06-b08-b14` assessment held only these 48 rows and is
-removed. Ledger owners move through the ledger API: 46 to
-`adr:0016-dynamic-source-boundary` and 2 to `deferred`. The umbrella keeps
+evidence by digest. The `observation-train-b06-b08-b14` assessment held
+only these 48 rows and is removed. All 48 ledger owners move through the
+ledger API to `adr:0016-dynamic-source-boundary`. The umbrella keeps
 88 paths. No subset row, tag, observation, or pass count changes, so no
 UPDATE is needed.
 
-ADR 0013, 0016, 0019, 0029, and 0031 are unchanged. Root owns publication
+ADR 0013, 0016, 0019, 0029, and 0031 are unchanged, and *deferrals.yaml* gains
+no entry. Root owns publication
 and landing.

@@ -1,11 +1,10 @@
 base: bc8e3a93ed3b6aa8daac70d08fd146f202755f99
 suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
 pathSetDigest: be93020453d77af5bd6e7eca8b949f344f6a29d5235e3d641ffd4d0a2b1be143
-decision: "Root ruling of 2026-11-02 on the eval code disposition question"
+decision: "Root rulings of 2026-11-02 on the eval code disposition question"
 assessed: 48
 evalSemantics: 32
-staticEvidence: 14
-deferred: 2
+staticEvidence: 16
 replacements:
   - path: test/language/global-code/export.js
     sourceDigest: "9f9954dd3dae59f94912f29716f8b9b040cee42342eae1cdcf978519c35\
@@ -41,6 +40,13 @@ replacements:
     resultPartition: tests/test262/results/language/expressions/81.yaml
     resultDigest: "3911a5d61c7521021bfeafbbd01074c34b47f2425a84b34a762de0c0e72\
       34b3a"
+    classification: pass
+  - path: test/language/expressions/assignment/S11.13.1_A6_T3.js
+    sourceDigest: "9d8da34aa6fe0f24e9c5a4df1aedf1e7ac3de694a69f385fd0cf2ba7bbf\
+      bf1da"
+    resultPartition: tests/test262/results/language/expressions/df.yaml
+    resultDigest: "6114cd5ddf57f229b15d82235ef507f75371ce11e8d2d3d3a2b741ec0a1\
+      3b20a"
     classification: pass
 inlineWitness:
   fixture: tests/native/fixtures/eval-code-inline-evidence.ts
@@ -841,46 +847,43 @@ paths:
       environment PerformEval selects for strict eval code; a strict Script
       declares the same names globally."
   - path: test/language/expressions/assignment/S11.13.1_A6_T1.js
-    group: G3
+    group: G2
     subject: "PutValue writes through the Reference resolved before the
-      right-hand side, even when evaluating it adds a nearer declarative
-      binding."
-    disposition: deferral
-    assessment: ec-declarative-lref-deferral
+      right-hand side, to the outer declarative binding, even when evaluating
+      it adds a nearer binding; the outer x reads 1 and the nearer x reads
+      undefined."
+    disposition: exclusion
+    assessment: ec-static-eval-code
     sourceDigest: "3237b19c38d727e37cb184fb0c760c8996622e4fd9e53c39ee8ae5305d0\
       3b4d6"
     observationDigest: "ecc5d0f47951110d25ee5a19dca34fa5c03ef5358346a0f24b1ddd\
       f4126738a9"
-    remainingContract: 'In a sloppy inner function, x = (eval("var x;"), 1)
-      writes 1 to the outer function''s x resolved before the right-hand side,
-      although the eval adds var x to the inner function''s variable
-      environment: the inner x then reads undefined and the outer x reads 1.'
-    reason: "S11.13.1_A5_T1, S11.13.1_A5_T2 and S11.13.1_A5_T3 pass for the
-      object environment record variant, where the right-hand side deletes the
-      with object's binding. A declarative environment record gains a binding
-      after its function is instantiated only through a direct eval var
-      declaration; a static var is instantiated before the assignment runs, and
-      a host Script declares globally, so no static or host Script witness
-      reproduces this variant."
+    replacement:
+      - test/language/expressions/assignment/S11.13.1_A6_T3.js
+    reason: "S11.13.1_A6_T3.js passes and asserts the same A6 contract: x
+      resolves to the function's declarative environment record, the right-hand
+      side then adds a nearer x by giving a with object the property, and
+      PutValue writes 1 to the outer x while the nearer binding keeps its own
+      value. Here the nearer binding is a var that direct eval instantiates in
+      the inner function, read back as innerX; only that eval var instantiation
+      remains."
   - path: test/language/expressions/assignment/S11.13.1_A6_T2.js
-    group: G3
+    group: G2
     subject: "PutValue writes through the Reference resolved before the
-      right-hand side, even when evaluating it adds a nearer declarative
-      binding."
-    disposition: deferral
-    assessment: ec-declarative-lref-deferral
+      right-hand side, to the outer declarative binding, even when evaluating
+      it adds a nearer binding; the outer x reads 1 and the nearer x reads 2."
+    disposition: exclusion
+    assessment: ec-static-eval-code
     sourceDigest: "469ebce92c821387a71da2e244ff90aa94a94740b32233691b3aacc2510\
       142c9"
     observationDigest: "e8d10606327ae9aa0b80e79cfbcc6bccf2848ccffc4b99dfbc7f6e\
       ef556ccce2"
-    remainingContract: 'In a sloppy inner function, x = (eval("var x = 2;"),
-      1) writes 1 to the outer function''s x resolved before the right-hand
-      side, although the eval adds var x = 2 to the inner function''s variable
-      environment: the inner x then reads 2 and the outer x reads 1.'
-    reason: "S11.13.1_A5_T1, S11.13.1_A5_T2 and S11.13.1_A5_T3 pass for the
-      object environment record variant, where the right-hand side deletes the
-      with object's binding. A declarative environment record gains a binding
-      after its function is instantiated only through a direct eval var
-      declaration; a static var is instantiated before the assignment runs, and
-      a host Script declares globally, so no static or host Script witness
-      reproduces this variant."
+    replacement:
+      - test/language/expressions/assignment/S11.13.1_A6_T3.js
+    reason: "S11.13.1_A6_T3.js passes and asserts the same A6 contract: x
+      resolves to the function's declarative environment record, the right-hand
+      side then adds a nearer x by giving a with object the property, and
+      PutValue writes 1 to the outer x while the nearer binding keeps its own
+      value. Here the nearer binding is a var that direct eval instantiates in
+      the inner function, read back as innerX; only that eval var instantiation
+      remains."
