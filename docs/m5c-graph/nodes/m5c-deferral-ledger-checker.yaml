@@ -11,5 +11,5 @@ delivers: >-
   docs/m5c-graph/m5c-deferral-ledger-checker.md.
 dependencies:
   - m5c-named-deferral-policy
-landed: false
-status: blocked
+landed: true
+status: ready

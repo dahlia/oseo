@@ -13,5 +13,5 @@ delivers: >-
   docs/m5c-graph/static-specifier-import-design.md.
 dependencies:
   - unsupported-ownership-audit
-landed: false
+landed: true
 status: ready

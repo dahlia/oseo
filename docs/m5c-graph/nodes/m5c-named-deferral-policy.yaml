@@ -12,5 +12,5 @@ delivers: >-
   recorded in docs/m5c-graph/m5c-named-deferral-policy.md.
 dependencies:
   - unsupported-ownership-audit
-landed: false
+landed: true
 status: ready
