@@ -69,15 +69,17 @@ export function macosJobs(): readonly MacosLaneJob[] {
           ? "own-key cases"
           : sourceId === "test_reflect_case"
             ? "reflect cases"
-            : sourceId === "test_native_support"
-              ? "native support"
-              : sourceId === "test_sanitizer_macos"
-                ? "host C sanitizers"
-                : sourceId === "test_test262"
-                  ? "test262"
-                  : sourceId === "test_native"
-                    ? "native"
-                    : "test",
+            : sourceId === "test_regexp_exhaustive_case"
+              ? "regexp exhaustive cases"
+              : sourceId === "test_native_support"
+                ? "native support"
+                : sourceId === "test_sanitizer_macos"
+                  ? "host C sanitizers"
+                  : sourceId === "test_test262"
+                    ? "test262"
+                    : sourceId === "test_native"
+                      ? "native"
+                      : "test",
     });
   }
   add(
@@ -183,6 +185,18 @@ export function macosJobs(): readonly MacosLaneJob[] {
       },
     );
   }
+  for (let caseShard = 1; caseShard <= 5; caseShard++) {
+    add(
+      "test_regexp_exhaustive_case",
+      String(caseShard),
+      `regexp exhaustive cases (macos-aarch64, ${caseShard}/5)`,
+      {
+        os: "macos-15",
+        target: "macos-aarch64",
+        caseShard,
+      },
+    );
+  }
   for (let caseShard = 1; caseShard <= 3; caseShard++) {
     add(
       "test_property_case",
@@ -222,6 +236,7 @@ function selfHostedEligible(job: MacosLaneJob): boolean {
       "test262",
       "own-key cases",
       "reflect cases",
+      "regexp exhaustive cases",
     ].includes(job.family)
   );
 }

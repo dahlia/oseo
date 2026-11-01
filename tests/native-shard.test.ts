@@ -80,10 +80,12 @@ test("case-sharded files leave both CI file partitions", async () => {
   const files = (await readdir(new URL("property/", import.meta.url)))
     .filter((path) => path.endsWith(".property.test.ts"))
     .map((path) => `tests/property/${path}`);
-  // Both files have dedicated case-shard jobs; see PLAN-GATE.md (U38).
+  // These files have dedicated case-shard jobs; see PLAN-GATE.md (U38)
+  // and docs/evidence/regexp-literal-exhaustive/README.md.
   assert.deepEqual(caseShardedNativeFiles.toSorted(), [
     "tests/property/m5-object-own-keys.property.test.ts",
     "tests/property/m5-reflect-namespace.property.test.ts",
+    "tests/property/m5-regexp-literal-exhaustive.property.test.ts",
   ]);
   for (const path of caseShardedNativeFiles) assert.ok(files.includes(path));
   for (const [platform, total] of [
@@ -181,8 +183,8 @@ test("Linux weights match the three-run median case sums", async () => {
   const { costs } = nativeShardModel("linux");
   // Added after the three source runs; they keep their earlier weights.
   // The module and with-var files use one candidate run each (see U6).
-  // Primitive with boxing, the non-blocking agent and exhaustive RegExp
-  // literals use later local Linux extended runs.
+  // Primitive with boxing and the non-blocking agent use later local Linux
+  // extended runs.
   const retained = [
     "tests/property/m5-host-script-bindings.property.test.ts",
     "tests/property/m5-module-namespace-uninitialized.property.test.ts",
@@ -191,7 +193,6 @@ test("Linux weights match the three-run median case sums", async () => {
     "tests/property/m5-with-var-loop-head.property.test.ts",
     "tests/property/m5-with-primitive-boxing.property.test.ts",
     "tests/property/m5-non-blocking-agent.property.test.ts",
-    "tests/property/m5-regexp-literal-exhaustive.property.test.ts",
   ];
   assert.deepEqual(
     rows.map((row) => row.split("\t")[0]).toSorted(),

@@ -22,6 +22,7 @@ export const ownKeyNativeFile =
 export const caseShardedNativeFiles: readonly string[] = [
   ownKeyNativeFile,
   "tests/property/m5-reflect-namespace.property.test.ts",
+  "tests/property/m5-regexp-literal-exhaustive.property.test.ts",
 ];
 
 /**

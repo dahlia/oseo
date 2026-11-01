@@ -418,9 +418,11 @@ a failure and retain it as an ordinary regression fixture before fixing the
 implementation.
 
 CI may set `OSEO_PROPERTY_CASE_SHARD=INDEX/TOTAL` for a dedicated property
-file. Two files have one:
+file. Three files have one:
 *tests/property/m5-object-own-keys.property.test.ts* and
 *tests/property/m5-reflect-namespace.property.test.ts*, each in three
+jobs per native host, and
+*tests/property/m5-regexp-literal-exhaustive.property.test.ts*, in five
 jobs per native host. `caseShardedNativeFiles` in *tools/native-shard.ts*
 is the list, and the file shards exclude every entry. The index is
 one-based. Every shard uses the same seed, replay path,
@@ -442,7 +444,9 @@ results and duration records, then fails if their duration sum on either
 host exceeds the original limit. The Reflect namespace shards do not: that
 file has three property domains and the recorder writes one record per job
 with an exclusive create, so three domains cannot each record without a
-record-format change. Its shards are still required by the aggregate.
+record-format change. Its shards are still required by the aggregate. The
+exhaustive RegExp literal shards record nothing for the same reason, with
+four properties, and the aggregate requires them too.
 An interrupted shard fails independently of any record. The case budget
 and generators do not change. A replay path disables the shard filter and
 keeps the original interrupt limit.
@@ -571,14 +575,15 @@ so every index of a total selects disjoint files from the same complete input
 set.
 
 CI now passes `--exclude-case-sharded` to those file shards and runs each
-file in `caseShardedNativeFiles` in three separate case-shard jobs on each
-native host, six jobs per file. Every one is required by the `native`
-aggregate. Linux file shards also pass `--exclude-dedicated-linux`, which
-removes `dedicatedLinuxNativeFiles` before partitioning. That list contains
+file in `caseShardedNativeFiles` in separate case-shard jobs on each native
+host: three per host for own-key and Reflect, five per host for exhaustive
+RegExp literals. Every one is required by the `native` aggregate. Linux file
+shards also pass `--exclude-dedicated-linux`, which removes
+`dedicatedLinuxNativeFiles` before partitioning. That list contains
 *tests/property/m5-array-constructor.property.test.ts*, run in one required
-Linux job with all 120 extended cases and its unchanged 1,800-second limit.
-The seven Linux file shards partition the remaining files. macOS extended
-file shards omit that flag and still run the Array file once.
+Linux job with all 120 extended cases and its unchanged 1,800-second limit. The
+seven Linux file shards partition the remaining files. macOS extended file
+shards omit that flag and still run the Array file once.
 
 The ordinary macOS Node.js gate uses a separate dedicated hosted
 `macos-latest` job for that same file. It runs all 12 cases with the original
