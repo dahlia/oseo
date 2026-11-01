@@ -72,6 +72,19 @@ const annexProtoRejection = new RegExp(
  */
 const lookupRemediationOwner =
   "node:class-private-accessor-lookup-coverage-remediation";
+/**
+ * Class expression paths whose only Annex B subject is the legacy lookup
+ * call. The maintainer decision of 2026-11-01 applied item 3 of the
+ * 2026-10-28 decision to exactly these two: the public-absence replacement
+ * fixtures witness every core subject. The class declaration paths of the
+ * same shape keep the lookup remediation owner. ADR 0013 is unchanged.
+ */
+export const m5cAnnexLookupClosedPaths: ReadonlySet<string> = new Set([
+  "test/language/expressions/class/elements/" +
+    "private-getter-is-not-a-own-property.js",
+  "test/language/expressions/class/elements/" +
+    "private-setter-is-not-a-own-property.js",
+]);
 const annexLookupRejection = new RegExp(
   "error\\[OSEO1001\\]: The Object\\.prototype\\." +
     "(__lookupGetter__|__lookupSetter__) method is excluded by the M5 " +
@@ -301,6 +314,11 @@ export interface M5cExclusionAuditInputs {
    * checked-in audit passes `m5cAnnexDynamicResiduePaths`.
    */
   readonly annexDynamicResiduePaths?: ReadonlySet<string>;
+  /**
+   * Exact ADR 0013 exclusions over a legacy lookup rejection; absent means
+   * none. The checked-in audit passes `m5cAnnexLookupClosedPaths`.
+   */
+  readonly annexLookupClosedPaths?: ReadonlySet<string>;
   readonly ledger: M5cClosureLedger;
   readonly results: readonly Test262Result[];
   readonly records: ReadonlyMap<string, string>;
@@ -590,12 +608,31 @@ export function validateM5cExclusionAudit(
     }
     if (missingTag) missingDynamicTags += 1;
     const annexRemediationOwner = assessment.remediationOwner;
+    // A legacy lookup row may be an exclusion only in the exact closure
+    // selector, only as a bound annex-b-only exclusion, and every selector
+    // path must be such a row.
+    const lookupClosed = inputs.annexLookupClosedPaths?.has(path) ?? false;
+    if (
+      lookupClosed !==
+      (lookupMethod != null &&
+        proposedOwner === annexOwner &&
+        excluded &&
+        assessment.normativeDependency === "annex-b-only" &&
+        assessment.replacementEvidence != null &&
+        annexRemediationOwner == null)
+    ) {
+      throw new Error(
+        `Audit needs the exact legacy lookup closure selector: ${path}.`,
+      );
+    }
     if (lookupMethod != null) {
-      // A rejected optional observer never closes its in-claim subject.
+      // Outside the selector, a rejected optional observer never closes its
+      // in-claim subject.
       if (
-        proposedOwner !== annexOwner ||
-        excluded ||
-        annexRemediationOwner !== lookupRemediationOwner
+        !lookupClosed &&
+        (proposedOwner !== annexOwner ||
+          excluded ||
+          annexRemediationOwner !== lookupRemediationOwner)
       ) {
         throw new Error(
           `Audit needs the legacy lookup remediation owner: ${path}.`,
@@ -716,6 +753,13 @@ export function validateM5cExclusionAudit(
       );
     }
   }
+  for (const closed of inputs.annexLookupClosedPaths ?? []) {
+    if (!seen.has(closed)) {
+      throw new Error(
+        `Legacy lookup closure selector lacks its audit row: ${closed}.`,
+      );
+    }
+  }
   for (const reserved of inputs.importAttributesDynamicPaths ?? []) {
     if (!seen.has(reserved)) {
       throw new Error(
@@ -781,6 +825,7 @@ export function validateCurrentM5cExclusionAudit(): M5cExclusionAuditSummary {
   }
   return validateM5cExclusionAudit(text, {
     annexDynamicResiduePaths: m5cAnnexDynamicResiduePaths,
+    annexLookupClosedPaths: m5cAnnexLookupClosedPaths,
     importAttributesDynamicPaths: readImportAttributesReservation(),
     legacyCallerPaths: readLegacyCallerSelector(
       recordSources.get(callerRecordStem) ?? "",

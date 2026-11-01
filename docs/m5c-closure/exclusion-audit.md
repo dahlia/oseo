@@ -202,18 +202,37 @@ by the M5 optional legacy accessor policy.
 The checker accepts either one only at the end of the process stderr, only
 when the reviewed source contains a call of the named method in call syntax
 (a direct, optional, or string-literal computed member call, as for `eval`),
-and only with
-`remediationOwner: node:class-private-accessor-lookup-coverage-remediation`,
-`disposition: remediation`, and the ADR 0013 proposed owner. That owner
-accepts no other rejection. A different code, method name, wording, or stdout
-text is outside the surface. The `__proto__` and RegExp split pairs are
-unchanged.
+and only with the ADR 0013 proposed owner. Outside the closure selector below,
+the row also needs
+`remediationOwner: node:class-private-accessor-lookup-coverage-remediation`
+and `disposition: remediation`. That owner accepts no other rejection. A
+different code, method name, wording, or stdout text is outside the surface.
+The `__proto__` and RegExp split pairs are unchanged.
 
-Observation batch 11 observed both paths at `e6db3a1c` with exactly these
-rejections and records them under the `annex-b-legacy-lookup` assessment, with
-`priorCohort: annex-b` and the remediation owner above. Their private getter
-and setter assertions are not excluded, and replacement evidence and the
-maintainer accounting decision belong to the coverage remediation node.
+Observation batch 11 observed the class expression paths
+*private-getter-is-not-a-own-property.js* and
+*private-setter-is-not-a-own-property.js* under
+*test/language/expressions/class/elements/* at `e6db3a1c` with exactly these
+rejections. The `class-private-getter-public-absence` and
+`class-private-setter-public-absence` fixtures in
+*../../tests/native/fixtures/classes.ts* keep every assertion of those sources
+except the lookup call, and
+*../../tests/class-private-accessor-coverage-native.test.ts* runs them natively
+under both specialization policies with collection at every safepoint. The
+2026-11-01 maintainer decision applies item 3 of the 2026-10-28 decision to
+these two paths and to no other. Their rows use the
+`annex-b-legacy-lookup-class-expression` assessment, which binds both evidence
+files and closes the paths as ADR 0013 exclusions with
+`normativeDependency: annex-b-only` and the `adr:0013-m5-edition-and-manifest`
+ledger owner. The checker admits such an exclusion over a lookup rejection only
+for the exact two-path selector `m5cAnnexLookupClosedPaths` in
+*../../tools/m5c-exclusion-audit.ts*, only with bound replacement evidence and
+no remediation owner, and requires both rows. ADR 0013 itself is unchanged.
+
+Observation batch 22b adds the class declaration paths of the same shape
+under *test/language/statements/class/elements/*. They keep the
+`annex-b-legacy-lookup` assessment and the remediation owner above; their
+private getter and setter assertions are not excluded.
 
 
 Legacy function caller reads
@@ -317,9 +336,9 @@ specialization policies with forced collection. The ledger moves the five
 paths to `adr:0013-m5-edition-and-manifest`. The earlier print-based
 replacement fixtures above stay but no longer close these paths. The three
 remediation nodes then own no path, and the paragraphs above that keep
-remediation for these paths describe the earlier state. The legacy accessor
-lookups and every other Annex B observer keep their owners. The per-path
-assertion tables are in
+remediation for these paths describe the earlier state. The class declaration
+legacy accessor lookups and every other Annex B observer keep their owners. The
+per-path assertion tables are in
 [typed-array-proto-coverage-remediation.md](../m5c-graph/typed-array-proto-coverage-remediation.md),
 [regexp-split-coverage-remediation.md](../m5c-graph/regexp-split-coverage-remediation.md),
 and

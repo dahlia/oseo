@@ -13,6 +13,7 @@ import {
   hasLookupCall,
   legacyCallerSelector,
   m5cAnnexDynamicResiduePaths,
+  m5cAnnexLookupClosedPaths,
   validateCurrentM5cExclusionAudit,
   validateM5cExclusionAudit,
 } from "../tools/m5c-exclusion-audit.ts";
@@ -1329,6 +1330,116 @@ test("a legacy lookup rejection must name a method the source calls", () => {
   assert.throws(
     () => validateM5cExclusionAudit(stringifyYaml(audit), inputs),
     /legacy lookup rejection lacks its source call/u,
+  );
+});
+
+test("the legacy lookup closure selector bounds ADR 0013 exclusion", () => {
+  const { audit, inputs } = lookupFixture(
+    "__lookupGetter__",
+    lookupDiagnostic("__lookupGetter__"),
+  );
+  Reflect.deleteProperty(audit.assessments.reviewed, "remediationOwner");
+  audit.assessments.reviewed.disposition = "exclusion";
+  audit.assessments.reviewed.normativeDependency = "annex-b-only";
+  const owned = {
+    ...inputs,
+    ledger: {
+      ...inputs.ledger,
+      entries: inputs.ledger.entries.map((entry) =>
+        Object.assign({}, entry, { owner: annexOwner }),
+      ),
+    },
+  };
+  const selected = { ...owned, annexLookupClosedPaths: new Set([path]) };
+  assert.equal(
+    validateM5cExclusionAudit(stringifyYaml(audit), selected).exclusions,
+    1,
+  );
+  // Outside the selector, a lookup rejection cannot close its subject.
+  assert.throws(
+    () => validateM5cExclusionAudit(stringifyYaml(audit), owned),
+    /exact legacy lookup closure selector/u,
+  );
+  // Inside it, the row must stay a bound exclusion without an owner node.
+  const { replacementEvidence, ...unbound } = audit.assessments.reviewed;
+  assert.ok(replacementEvidence);
+  assert.throws(
+    () =>
+      validateM5cExclusionAudit(
+        stringifyYaml({ ...audit, assessments: { reviewed: unbound } }),
+        selected,
+      ),
+    /exact legacy lookup closure selector/u,
+  );
+  assert.throws(
+    () =>
+      validateM5cExclusionAudit(
+        stringifyYaml({
+          ...audit,
+          assessments: {
+            reviewed: {
+              ...audit.assessments.reviewed,
+              remediationOwner: lookupRemediationOwner,
+            },
+          },
+        }),
+        selected,
+      ),
+    /exact legacy lookup closure selector/u,
+  );
+  // A selected path keeps its remediation only by leaving the selector.
+  const remediation = lookupFixture(
+    "__lookupGetter__",
+    lookupDiagnostic("__lookupGetter__"),
+  );
+  assert.throws(
+    () =>
+      validateM5cExclusionAudit(stringifyYaml(remediation.audit), {
+        ...remediation.inputs,
+        annexLookupClosedPaths: new Set([path]),
+      }),
+    /exact legacy lookup closure selector/u,
+  );
+  // The selector admits only a lookup rejection.
+  const annexProto =
+    "error[OSEO1001]: The Object.prototype.__proto__ accessor is " +
+    "excluded by Annex B.";
+  const proto = lookupFixture("__lookupGetter__", annexProto);
+  Reflect.deleteProperty(proto.audit.assessments.reviewed, "remediationOwner");
+  proto.audit.assessments.reviewed.disposition = "exclusion";
+  proto.audit.assessments.reviewed.normativeDependency = "annex-b-only";
+  assert.throws(
+    () =>
+      validateM5cExclusionAudit(stringifyYaml(proto.audit), {
+        ...proto.inputs,
+        ledger: owned.ledger,
+        annexLookupClosedPaths: new Set([path]),
+      }),
+    /exact legacy lookup closure selector/u,
+  );
+  // A selector path cannot leave the audit.
+  assert.throws(
+    () =>
+      validateM5cExclusionAudit(stringifyYaml(audit), {
+        ...selected,
+        annexLookupClosedPaths: new Set([
+          path,
+          "test/language/expressions/class/elements/absent.js",
+        ]),
+      }),
+    /Legacy lookup closure selector lacks its audit row/u,
+  );
+});
+
+test("the checked-in legacy lookup closure names two class expressions", () => {
+  assert.deepEqual(
+    [...m5cAnnexLookupClosedPaths],
+    [
+      "test/language/expressions/class/elements/" +
+        "private-getter-is-not-a-own-property.js",
+      "test/language/expressions/class/elements/" +
+        "private-setter-is-not-a-own-property.js",
+    ],
   );
 });
 

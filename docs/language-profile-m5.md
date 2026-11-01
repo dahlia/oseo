@@ -147,11 +147,8 @@ The batch 11 paths *private-getter-is-not-a-own-property.js* and
 *private-setter-is-not-a-own-property.js* under
 *test/language/expressions/class/elements/* call one of these methods before
 their core private accessor assertions.
-Observation batch 11 owns their first admission. Their observed unsupported
-results, reviewed exclusion-audit rows, and ledger owner
-`node:class-private-accessor-lookup-coverage-remediation` arrive with that
-batch; ADR 0013 accepts no new exclusion, and the private accessor subjects
-remain mixed coverage debt.
+Observation batch 11 owns their first admission and observes both as the
+owned `OSEO1001` lookup rejection.
 
 The private accessor coverage follow-up adds fixed
 `class-private-getter-public-absence` and
@@ -164,12 +161,16 @@ access, and a separate public `"#m"` property supply controls.
 *tests/class-private-accessor-coverage-native.test.ts* compares explicit
 expected output with Node.js and Deno references, then executes each fixture
 in strict and non-strict Scripts under both specialization policies with
-collection at every safepoint. This is replacement evidence for core
-private elements, not upstream pass evidence. Both original expression paths
-remain unsupported with their remediation owner until a separate maintainer
-coverage-accounting decision. The
+collection at every safepoint. The 2026-11-01 maintainer decision applies
+item 3 of the 2026-10-28 decision to the two expression paths and to no
+other, so their unsupported observations are ADR 0013 exclusions owned by
+`adr:0013-m5-edition-and-manifest`; they are not counted as passes. The two
+class declaration paths of the same shape under
+*test/language/statements/class/elements/* keep the
+`node:class-private-accessor-lookup-coverage-remediation` owner, and their
+private accessor subjects remain mixed coverage debt. The
 [work note](./m5c-graph/class-private-accessor-lookup-coverage-remediation.md)
-records the evidence and pending statement-family paths.
+records the evidence.
 
 M5c node `frontmatter-feature-tags` adds `super` to the reviewed feature
 list. The tag was the only unmet prerequisite of the four reviewed
