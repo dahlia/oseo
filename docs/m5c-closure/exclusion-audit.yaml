@@ -255,6 +255,42 @@ assessments:
       reopening is not proved, but unrelated coverage cannot
       be closed without reviewed replacement evidence or a
       maintainer accounting decision.
+  compound-reference-base-witness:
+    disposition: exclusion
+    normativeDependency: source-evaluation-only
+    reason: >-
+      Evidence for the 11 S11.13.2_A6.N_T1 compound assignment paths. Each
+      original declares a more local x through direct eval while the right
+      operand runs and asserts that the outer x receives the result while the
+      new binding holds 2. A sloppy with object that gains x during the right
+      operand replaces the eval declaration for every operator, keeping the
+      initial values, operands and results re-derived from the pinned sources.
+      Strict value and type checks cover the inner read, the outer result and
+      the untouched new binding. Two mutations per row, adding the binding
+      before the reference is resolved and never adding it, are rejected by
+      independent Test262Error verdicts. Both native policies with forced GC
+      observe the expected output. Node.js and Deno are not references: V8
+      writes the newer binding, the divergence the passing S11.13.1_A6_T3
+      exposes for plain assignment. Only the eval var declaration remains
+      excluded under ADR 0016; accounting counts no path as pass. Reopen on
+      changed source, observed rejection or replacement evidence, an accepted
+      source admission, or any uncovered non-source assertion under ADR 0019.
+    replacementEvidence:
+      docs/m5c-graph/dynamic-source-fixture-construction-assessment.md:
+        "a10e31e227b720dd22f70347ac142698107d50f0365a0fa6\
+        89446ee44f8dd85a"
+      tests/native/fixtures/compound-reference-base.ts:
+        "5e76424696454ae6172d498b911e2898204cafc862fe8bdb\
+        f77d68b58bf0757e"
+      tests/compound-reference-base-evidence.test.ts:
+        "d39fac459d66236eb9af9397591286932ea4c3bcc07acd0e\
+        2e2af2e41ee18044"
+      tests/compound-reference-base-source.test.ts:
+        "04f6a73154e06045f0a1be3ecbb42c574fe61299016a6ee5\
+        66771c0c8b44d5d6"
+      tests/test262/harness/base.js:
+        "50331feeca513cb2e2354e05e7c68f82d5aeccd9b766d6c8\
+        8438c5ef118075f6"
   regexp-roundtrip:
     disposition: remediation
     normativeDependency: not-demonstrated
@@ -295,6 +331,47 @@ assessments:
       catch parameter. Replacing eval with assignment does not distinguish
       those environments; only a run-time var declaration by direct eval
       does, and direct eval is not approved for M5."
+  global-lexical-configurable-var-witness:
+    disposition: exclusion
+    normativeDependency: source-evaluation-only
+    reason: >-
+      Evidence for script-decl-lex-var-declared-via-eval.js. Its non-strict
+      subject is GlobalDeclarationInstantiation letting a later Script's let
+      or const shadow a declared global var or function name whose property
+      is configurable. Global properties made by assignment, then a Script
+      var over each, keep configurable descriptors, which strict checks
+      confirm; the later let and const Scripts then read 1 and 2 as the
+      original asserts. A mutant whose var is declared without the
+      configurable property must throw its realm's SyntaxError. Node.js
+      observes the same output, and both native policies with forced GC
+      agree; Deno keeps the removed VarNames check. Only eval creating
+      configurable var and function bindings, and strict eval keeping them
+      local, remain excluded under ADR 0016; accounting counts no path as
+      pass. Reopen on changed source, observed rejection or replacement
+      evidence, an accepted source admission, or any uncovered non-source
+      assertion under ADR 0019.
+    replacementEvidence:
+      docs/m5c-graph/dynamic-source-fixture-construction-assessment.md:
+        "a10e31e227b720dd22f70347ac142698107d50f0365a0fa6\
+        89446ee44f8dd85a"
+      tests/native/fixtures/global-lexical-configurable-var.ts:
+        "db8f75afb722b38b2553bb286f4599b5bcb1ff00ffc4ca2b\
+        1367a370a1d9a88a"
+      tests/native/fixtures/compound-reference-base.ts:
+        "5e76424696454ae6172d498b911e2898204cafc862fe8bdb\
+        f77d68b58bf0757e"
+      tests/global-lexical-configurable-var-evidence.test.ts:
+        "73de4c7a393fa79caf2023904f1f926714aed314fe285288\
+        7504802204d7837c"
+      tests/global-lexical-configurable-var-source.test.ts:
+        "dfbde9b8ce31fc07a7fa172416a42a1adb090a8ac1160d22\
+        8be653e1d14d0ea4"
+      tests/native/host-script-reference.ts:
+        "d01339d26b85c0c7e315f453a831bd12a725261ce11635ba\
+        a6ea62c1b8cab262"
+      tests/test262/harness/base.js:
+        "50331feeca513cb2e2354e05e7c68f82d5aeccd9b766d6c8\
+        8438c5ef118075f6"
   annex-b-pattern:
     disposition: exclusion
     normativeDependency: annex-b-only
@@ -14856,7 +14933,7 @@ paths:
     missingDynamicTag: false
     section: "sec-function-calls-runtime-semantics-evaluation"
     subject: "Direct eval call with empty leading spread."
-    assessment: "fixture-construction"
+    assessment: "eval-semantics"
   - path: "test/language/expressions/call/eval-spread-empty-tra\
       iling.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -14868,7 +14945,7 @@ paths:
     missingDynamicTag: false
     section: "sec-function-calls-runtime-semantics-evaluation"
     subject: "Direct eval call with empty trailing spread."
-    assessment: "fixture-construction"
+    assessment: "eval-semantics"
   - path: "test/language/expressions/call/eval-spread-empty.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "incidental-scaffolding"
@@ -14890,7 +14967,7 @@ paths:
     missingDynamicTag: false
     section: "sec-function-calls-runtime-semantics-evaluation"
     subject: "Direct eval call with spread."
-    assessment: "fixture-construction"
+    assessment: "eval-semantics"
   - path: "test/language/expressions/call/eval-strictness-inher\
       it-non-strict.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -16671,7 +16748,7 @@ paths:
       environment record. PutValue(lref, v) uses the
       initially created Reference even if a more local
       binding is available. Check operator is "x ^= y".'
-    assessment: "fixture-construction"
+    assessment: "compound-reference-base-witness"
   - path: "test/language/expressions/compound-assignment/S11.13\
       .2_A6.11_T1.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -16688,7 +16765,7 @@ paths:
       environment record. PutValue(lref, v) uses the
       initially created Reference even if a more local
       binding is available. Check operator is "x |= y".'
-    assessment: "fixture-construction"
+    assessment: "compound-reference-base-witness"
   - path: "test/language/expressions/compound-assignment/S11.13\
       .2_A6.1_T1.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -16705,7 +16782,7 @@ paths:
       environment record. PutValue(lref, v) uses the
       initially created Reference even if a more local
       binding is available. Check operator is "x *= y".'
-    assessment: "fixture-construction"
+    assessment: "compound-reference-base-witness"
   - path: "test/language/expressions/compound-assignment/S11.13\
       .2_A6.2_T1.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -16722,7 +16799,7 @@ paths:
       environment record. PutValue(lref, v) uses the
       initially created Reference even if a more local
       binding is available. Check operator is "x /= y".'
-    assessment: "fixture-construction"
+    assessment: "compound-reference-base-witness"
   - path: "test/language/expressions/compound-assignment/S11.13\
       .2_A6.3_T1.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -16739,7 +16816,7 @@ paths:
       environment record. PutValue(lref, v) uses the
       initially created Reference even if a more local
       binding is available. Check operator is "x %= y".'
-    assessment: "fixture-construction"
+    assessment: "compound-reference-base-witness"
   - path: "test/language/expressions/compound-assignment/S11.13\
       .2_A6.4_T1.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -16756,7 +16833,7 @@ paths:
       environment record. PutValue(lref, v) uses the
       initially created Reference even if a more local
       binding is available. Check operator is "x += y".'
-    assessment: "fixture-construction"
+    assessment: "compound-reference-base-witness"
   - path: "test/language/expressions/compound-assignment/S11.13\
       .2_A6.5_T1.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -16773,7 +16850,7 @@ paths:
       environment record. PutValue(lref, v) uses the
       initially created Reference even if a more local
       binding is available. Check operator is "x -= y".'
-    assessment: "fixture-construction"
+    assessment: "compound-reference-base-witness"
   - path: "test/language/expressions/compound-assignment/S11.13\
       .2_A6.6_T1.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -16790,7 +16867,7 @@ paths:
       environment record. PutValue(lref, v) uses the
       initially created Reference even if a more local
       binding is available. Check operator is "x <<= y".'
-    assessment: "fixture-construction"
+    assessment: "compound-reference-base-witness"
   - path: "test/language/expressions/compound-assignment/S11.13\
       .2_A6.7_T1.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -16807,7 +16884,7 @@ paths:
       environment record. PutValue(lref, v) uses the
       initially created Reference even if a more local
       binding is available. Check operator is "x >>= y".'
-    assessment: "fixture-construction"
+    assessment: "compound-reference-base-witness"
   - path: "test/language/expressions/compound-assignment/S11.13\
       .2_A6.8_T1.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -16824,7 +16901,7 @@ paths:
       environment record. PutValue(lref, v) uses the
       initially created Reference even if a more local
       binding is available. Check operator is "x >>>= y".'
-    assessment: "fixture-construction"
+    assessment: "compound-reference-base-witness"
   - path: "test/language/expressions/compound-assignment/S11.13\
       .2_A6.9_T1.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -16841,7 +16918,7 @@ paths:
       environment record. PutValue(lref, v) uses the
       initially created Reference even if a more local
       binding is available. Check operator is "x &= y".'
-    assessment: "fixture-construction"
+    assessment: "compound-reference-base-witness"
   - path: "test/language/expressions/concatenation/S9.8_A1_T2.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "incidental-scaffolding"
@@ -25010,7 +25087,7 @@ paths:
       properties. The original assertions read the later let and
       const bindings through $262.evalScript; their declaration
       contract remains in-claim pending remediation."
-    assessment: fixture-construction
+    assessment: global-lexical-configurable-var-witness
   - path: "test/language/import/import-attributes/json-idempote\
       ncy.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"

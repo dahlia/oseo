@@ -211,8 +211,13 @@ owners:
       or Function source handling inside the existing eval-semantics and
       dynamic-construction surfaces, each with a sibling precedent named
       in dynamic-source-function-constructor-assessment.yaml. No pass is
-      added."
-    paths: 1741
+      added. The fixture-construction evidence child accounts for the 11
+      S11.13.2_A6.N_T1 rows with a native with object witness, script-
+      decl-lex-var-declared-via-eval.js with a literal host Script
+      witness over configurable var properties, and the three direct
+      eval spread rows under the unchanged eval-semantics assessment;
+      see dynamic- source-fixture-construction-assessment.md."
+    paths: 1756
   adr:0028-legacy-function-caller-boundary:
     note: ADR 0028 authorizes "an M5 exclusion of the expectation that
       reading the `caller` property of a non-strict ordinary function
@@ -390,8 +395,10 @@ owners:
       Dynamic-source-scope-arguments-evidence moves the six ds9 arrow
       cells to ADR 0016 with static native witnesses and six
       eval-declaration-only scope rows to ADR 0016 without replacement,
-      and defers the other 12 B26a/B26b/B27 scope rows under ADR 0031."
-    paths: 63
+      and defers the other 12 B26a/B26b/B27 scope rows under ADR 0031.
+      The fixture-construction evidence child moves its 15 paths to ADR
+      0016."
+    paths: 48
   observation:
     note: Closed by a reviewed pass or expected negative in the manifest.
       The owner changes only when a regenerated manifest changes the
@@ -21717,10 +21724,10 @@ paths:
   test/language/expressions/call/eval-first-arg.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [abrupt-completion, control-flow, dynamic-source, functions, var-bindings]]
   test/language/expressions/call/eval-no-args.js: [pass, observation]
   test/language/expressions/call/eval-realm-indirect.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [dynamic-source, expression-operators, functions, object-properties, var-bindings]]
-  test/language/expressions/call/eval-spread-empty-leading.js: [unsupported-profile-feature, node:dynamic-source-coverage-remediation, [dynamic-source, functions, iterator-protocol, symbols, var-bindings]]
-  test/language/expressions/call/eval-spread-empty-trailing.js: [unsupported-profile-feature, node:dynamic-source-coverage-remediation, [dynamic-source, functions, iterator-protocol, symbols, var-bindings]]
+  test/language/expressions/call/eval-spread-empty-leading.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [dynamic-source, functions, iterator-protocol, symbols, var-bindings]]
+  test/language/expressions/call/eval-spread-empty-trailing.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [dynamic-source, functions, iterator-protocol, symbols, var-bindings]]
   test/language/expressions/call/eval-spread-empty.js: [pass, observation]
-  test/language/expressions/call/eval-spread.js: [unsupported-profile-feature, node:dynamic-source-coverage-remediation, [control-flow, dynamic-source, functions, iterator-protocol, symbols, var-bindings]]
+  test/language/expressions/call/eval-spread.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [control-flow, dynamic-source, functions, iterator-protocol, symbols, var-bindings]]
   test/language/expressions/call/eval-strictness-inherit-non-strict.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [control-flow, dynamic-source, functions, var-bindings]]
   test/language/expressions/call/eval-strictness-inherit-strict.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [control-flow, dynamic-source, error-intrinsics, functions, var-bindings]]
   test/language/expressions/call/scope-lex-close.js: [pass, observation]
@@ -26140,17 +26147,17 @@ paths:
   test/language/expressions/compound-assignment/S11.13.2_A5.9_T1.js: [pass, observation]
   test/language/expressions/compound-assignment/S11.13.2_A5.9_T2.js: [pass, observation]
   test/language/expressions/compound-assignment/S11.13.2_A5.9_T3.js: [pass, observation]
-  test/language/expressions/compound-assignment/S11.13.2_A6.10_T1.js: [unsupported-profile-feature, node:dynamic-source-coverage-remediation, [abrupt-completion, control-flow, dynamic-source, expression-operators, functions, var-bindings]]
-  test/language/expressions/compound-assignment/S11.13.2_A6.11_T1.js: [unsupported-profile-feature, node:dynamic-source-coverage-remediation, [abrupt-completion, control-flow, dynamic-source, expression-operators, functions, var-bindings]]
-  test/language/expressions/compound-assignment/S11.13.2_A6.1_T1.js: [unsupported-profile-feature, node:dynamic-source-coverage-remediation, [abrupt-completion, control-flow, dynamic-source, expression-operators, functions, var-bindings]]
-  test/language/expressions/compound-assignment/S11.13.2_A6.2_T1.js: [unsupported-profile-feature, node:dynamic-source-coverage-remediation, [abrupt-completion, control-flow, dynamic-source, expression-operators, functions, var-bindings]]
-  test/language/expressions/compound-assignment/S11.13.2_A6.3_T1.js: [unsupported-profile-feature, node:dynamic-source-coverage-remediation, [abrupt-completion, control-flow, dynamic-source, expression-operators, functions, var-bindings]]
-  test/language/expressions/compound-assignment/S11.13.2_A6.4_T1.js: [unsupported-profile-feature, node:dynamic-source-coverage-remediation, [abrupt-completion, control-flow, dynamic-source, expression-operators, functions, var-bindings]]
-  test/language/expressions/compound-assignment/S11.13.2_A6.5_T1.js: [unsupported-profile-feature, node:dynamic-source-coverage-remediation, [abrupt-completion, control-flow, dynamic-source, expression-operators, functions, var-bindings]]
-  test/language/expressions/compound-assignment/S11.13.2_A6.6_T1.js: [unsupported-profile-feature, node:dynamic-source-coverage-remediation, [abrupt-completion, control-flow, dynamic-source, expression-operators, functions, var-bindings]]
-  test/language/expressions/compound-assignment/S11.13.2_A6.7_T1.js: [unsupported-profile-feature, node:dynamic-source-coverage-remediation, [abrupt-completion, control-flow, dynamic-source, expression-operators, functions, var-bindings]]
-  test/language/expressions/compound-assignment/S11.13.2_A6.8_T1.js: [unsupported-profile-feature, node:dynamic-source-coverage-remediation, [abrupt-completion, control-flow, dynamic-source, expression-operators, functions, var-bindings]]
-  test/language/expressions/compound-assignment/S11.13.2_A6.9_T1.js: [unsupported-profile-feature, node:dynamic-source-coverage-remediation, [abrupt-completion, control-flow, dynamic-source, expression-operators, functions, var-bindings]]
+  test/language/expressions/compound-assignment/S11.13.2_A6.10_T1.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [abrupt-completion, control-flow, dynamic-source, expression-operators, functions, var-bindings]]
+  test/language/expressions/compound-assignment/S11.13.2_A6.11_T1.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [abrupt-completion, control-flow, dynamic-source, expression-operators, functions, var-bindings]]
+  test/language/expressions/compound-assignment/S11.13.2_A6.1_T1.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [abrupt-completion, control-flow, dynamic-source, expression-operators, functions, var-bindings]]
+  test/language/expressions/compound-assignment/S11.13.2_A6.2_T1.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [abrupt-completion, control-flow, dynamic-source, expression-operators, functions, var-bindings]]
+  test/language/expressions/compound-assignment/S11.13.2_A6.3_T1.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [abrupt-completion, control-flow, dynamic-source, expression-operators, functions, var-bindings]]
+  test/language/expressions/compound-assignment/S11.13.2_A6.4_T1.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [abrupt-completion, control-flow, dynamic-source, expression-operators, functions, var-bindings]]
+  test/language/expressions/compound-assignment/S11.13.2_A6.5_T1.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [abrupt-completion, control-flow, dynamic-source, expression-operators, functions, var-bindings]]
+  test/language/expressions/compound-assignment/S11.13.2_A6.6_T1.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [abrupt-completion, control-flow, dynamic-source, expression-operators, functions, var-bindings]]
+  test/language/expressions/compound-assignment/S11.13.2_A6.7_T1.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [abrupt-completion, control-flow, dynamic-source, expression-operators, functions, var-bindings]]
+  test/language/expressions/compound-assignment/S11.13.2_A6.8_T1.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [abrupt-completion, control-flow, dynamic-source, expression-operators, functions, var-bindings]]
+  test/language/expressions/compound-assignment/S11.13.2_A6.9_T1.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [abrupt-completion, control-flow, dynamic-source, expression-operators, functions, var-bindings]]
   test/language/expressions/compound-assignment/S11.13.2_A7.10_T1.js: [pass, observation]
   test/language/expressions/compound-assignment/S11.13.2_A7.10_T2.js: [pass, observation]
   test/language/expressions/compound-assignment/S11.13.2_A7.10_T3.js: [pass, observation]
@@ -30534,7 +30541,7 @@ paths:
   test/language/global-code/script-decl-lex-deletion.js: [pass, observation]
   test/language/global-code/script-decl-lex-lex.js: [pass, observation]
   test/language/global-code/script-decl-lex-restricted-global.js: [pass, observation]
-  test/language/global-code/script-decl-lex-var-declared-via-eval.js: [unsupported-profile-feature, node:dynamic-source-coverage-remediation, [dynamic-source, lexical-bindings, var-bindings]]
+  test/language/global-code/script-decl-lex-var-declared-via-eval.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [dynamic-source, lexical-bindings, var-bindings]]
   test/language/global-code/script-decl-lex-var.js: [pass, observation]
   test/language/global-code/script-decl-lex.js: [pass, observation]
   test/language/global-code/script-decl-var-collision.js: [pass, observation]
