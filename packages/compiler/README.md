@@ -15,8 +15,8 @@ object, tuple, and array TypeScript annotations to those leaves without making
 compiler core depend on TypeScript syntax or type resolution.
 
 Internal ownership follows the compiler pipeline. *source.ts* and *syntax.ts*
-define frontend-neutral inputs, *modules.ts* owns graph construction and
-linking, and the _hir-\*.ts_ and _mir-\*.ts_ families separate representations,
+define frontend-neutral inputs. *modules.ts* owns graph construction and
+linking. The _hir-\*.ts_ and _mir-\*.ts_ families separate representations,
 construction, printing, and guarded specialization. *module-compile.ts* owns
 whole-graph asynchronous compilation, while *compile.ts* composes source
 compilation. *native.ts* contains replaceable backend, runtime, toolchain,
@@ -64,16 +64,16 @@ single-statement position is a source-located diagnostic, because the grammar
 admits a lexical declaration only where a StatementList is admitted.
 Standalone array binding declarations use compiler-owned recursive
 patterns rather than frontend AST nodes. MIR gives each pattern an explicit
-iterator done state, steps elisions and elements in order, drains rest into a
-rooted array, and enters conditional close blocks for abrupt or early normal
-completion. Nested patterns compose those cleanup regions from the inside out.
-Lexical leaves initialize predeclared cells, while hoisted `var` leaves use
-checked writes to existing function-scope cells.
+iterator done state and steps elisions and elements in order. It drains rest
+into a rooted array and enters conditional close blocks for abrupt or early
+normal completion. Nested patterns compose those cleanup regions from the
+inside out. Lexical leaves initialize predeclared cells, while hoisted `var`
+leaves use checked writes to existing function-scope cells.
 Object binding declarations share those recursive leaves. MIR checks
-`RequireObjectCoercible` before evaluating a computed property name, converts
-each key through `ToPropertyKey`, reads properties from left to right, applies
-defaults only to `undefined`, and enters nested array or object patterns without
-recovering frontend syntax.
+`RequireObjectCoercible` before evaluating a computed property name and
+converts each key through `ToPropertyKey`. It reads properties from left to
+right and applies defaults only to `undefined`. It enters nested array or
+object patterns without recovering frontend syntax.
 Catch parameters reuse those patterns after capturing the pending thrown value.
 MIR resets every catch cell before initialization, retains conditional iterator
 cleanup, and sends a pattern failure through the enclosing `finally` or abrupt
@@ -120,7 +120,7 @@ value. They apply numeric coercion and arithmetic by one before a checked
 write. Member steps convert the raw key independently for the read and write.
 Prefix forms return the assigned value, while postfix forms keep the coerced
 previous value rooted across the write. A nullish base fails before either key
-conversion. The path reuses existing MIR operations and the module continuation
+conversion. The path reuses existing MIR operations. The module continuation
 extractor can rebuild a member step around an admitted await in its object or
 key expression.
 Non-strict duplicate parameters share one binding while retaining every

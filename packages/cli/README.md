@@ -5,16 +5,18 @@ This package is Oseo's composition root. It provides deterministic `--dump-mir`
 and `--emit-c` modes and the asynchronous source-to-native execution workflow.
 Specialization is enabled by default. `--no-specialization` selects the same
 pipeline with the M1 generic graph and no guarded operations.
+
 The default source frontends receive the exact ECMA-262 Unicode property
 resolver from `@oseo/unicode` here. The Babel adapter and compiler core remain
 independent of the concrete pinned tables.
+
 Parser, profile, runtime, toolchain, and host failures remain owned diagnostics
 or captured native observations. Temporary-directory, runtime-asset, generated
 source, process-spawn, and cleanup failures are reported as `OSEO3001` without
 exposing a host stack. Once created, the native temporary directory is removed
-after both successful and failed workflows.
-Runtime assets are copied sequentially so every started read or write settles
-before temporary-directory cleanup begins.
+after both successful and failed workflows. Runtime assets are copied
+sequentially so every started read or write settles before
+temporary-directory cleanup begins.
 
 Native execution reuses a host-cached runtime archive when the host and
 toolchain expose that capability. A cache hit reads every reviewed runtime
@@ -24,11 +26,12 @@ links without compiling the runtime translation units again. The
 investigating suspected staleness. Concurrent cold executions serialize one
 archive build per key. Cache setup, lookup, lease, and publication failures are
 optional optimization failures, so execution continues with a temporary
-uncached build. Each execution captures one compiler environment snapshot and
-uses it for the identity probe, key, and build requests. A failed or empty
-identity observation is not retained. An unavailable snapshot, including under
-Deno without `--allow-env`, disables reuse but preserves ordinary native
-compilation.
+uncached build.
+
+Each execution captures one compiler environment snapshot and uses it for the
+identity probe, key, and build requests. A failed or empty identity observation
+is not retained. An unavailable snapshot, including under Deno without
+`--allow-env`, disables reuse but preserves ordinary native compilation.
 
 The command line is defined with [Optique]. Its parser requires exactly one
 source path, keeps `--dump-mir` and `--emit-c` mutually exclusive, and rejects
