@@ -18,44 +18,6 @@ states:
   unreviewed: 1916
   unsupported-profile-feature: 1912
 owners:
-  adr:0013-m5-edition-and-manifest:
-    note: "ADR 0013 excludes Annex B legacy web semantics and reports Annex
-      B behavior as unsupported when a test inside the boundary depends
-      on it; ADR 0019 accepts unsupported results that such a record
-      authorizes and bounds. Maintainer decision 2026-10-28 item 3
-      closes a mixed Annex B path only when reviewed replacement
-      observations cover every core subject. Five paths qualify: three
-      TypedArray paths whose only Annex B subject is an
-      Object.prototype.__proto__ read or write, replaced by
-      Object.getPrototypeOf or Object.setPrototypeOf,
-      String/prototype/split/separator-regexp.js, whose four Annex B
-      patterns stay rejected while its 33 core split patterns are
-      observed, and test/language/types/object/S8.6.2_A8.js, whose
-      __proto__ write on a non-extensible ordinary object is replaced by
-      Object.setPrototypeOf and Reflect.setPrototypeOf observing the
-      same OrdinarySetPrototypeOf refusal. The 2026-10-31 maintainer
-      decision applies that item 3 rule to the ordinary-object path and
-      extends it to no other path. exclusion-audit.yaml binds their
-      original source and observation digests and the annex-b-mixed-core
-      native evidence. Their unsupported results are not counted as
-      passes. Other Annex B observers keep their remediation owners. The
-      maintainer decision of 2026-11-01 applies the same rule to
-      S7.8.5_A1.4_T2 and S7.8.5_A2.4_T2, which observe the eval
-      rejection: the exhaustive literal property witnesses every core
-      subject, and only the U+200C and U+200D identity escapes need
-      Annex B. The same decision applies the rule to the class
-      expression paths private-getter-is-not-a-own-property.js and
-      private-setter-is-not-a-own-property.js, whose only Annex B
-      subject is the __lookupGetter__ or __lookupSetter__ call: the
-      class-private-getter-public-absence and
-      class-private-setter-public-absence native fixtures witness every
-      private accessor subject. The maintainer decision of 2026-11-02
-      applies the same rule to the class declaration paths of the same
-      name under test/language/statements/class/elements/, whose
-      class-declaration-private-getter-public-absence and
-      class-declaration-private-setter-public-absence fixtures witness
-      every private accessor subject; 11 paths."
-    paths: 11
   adr:0016-dynamic-source-boundary:
     note: "ADR 0016 excludes \"`eval` in call position, the `Function`
       constructor, `new Function`, and every constructor that compiles
@@ -256,13 +218,13 @@ owners:
   unit:annexb-date-methods:
     paths: 24
   unit:annexb-dynamic-source-accounting:
-    paths: 477
+    paths: 479
   unit:annexb-escape:
     paths: 35
   unit:annexb-function-declarations:
     paths: 313
   unit:annexb-object-accessors:
-    paths: 70
+    paths: 78
   unit:annexb-regexp-compile:
     paths: 24
   unit:annexb-statement-forms:
@@ -270,7 +232,7 @@ owners:
   unit:annexb-string-methods:
     paths: 105
   unit:annexb-syntax:
-    paths: 28
+    paths: 29
   unit:array-from-async:
     paths: 95
   unit:atomics-pause:
@@ -16705,7 +16667,7 @@ paths:
   test/built-ins/String/prototype/split/separator-override-valueof.js: [pass, observation]
   test/built-ins/String/prototype/split/separator-regexp-comma-instance-is-string-one-1-two-2-four-4.js: [pass, observation]
   test/built-ins/String/prototype/split/separator-regexp-limit-string-via-eval.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [dynamic-source, functions, object-properties, symbols]]
-  test/built-ins/String/prototype/split/separator-regexp.js: [unsupported-profile-feature, adr:0013-m5-edition-and-manifest, [functions, object-properties, symbols]]
+  test/built-ins/String/prototype/split/separator-regexp.js: [unsupported-profile-feature, unit:annexb-syntax, [functions, object-properties, symbols]]
   test/built-ins/String/prototype/split/separator-string-instance-is-empty-string-object.js: [pass, observation]
   test/built-ins/String/prototype/split/separator-tostring-error.js: [pass, observation]
   test/built-ins/String/prototype/split/separator-undef-limit-custom.js: [pass, observation]
@@ -17299,7 +17261,7 @@ paths:
   test/built-ins/TypedArray/of/prop-desc.js: [pass, observation]
   test/built-ins/TypedArray/of/resized-with-out-of-bounds-and-in-bounds-indices.js: [pass, observation]
   test/built-ins/TypedArray/of/this-is-not-constructor.js: [pass, observation]
-  test/built-ins/TypedArray/out-of-bounds-behaves-like-detached.js: [unsupported-profile-feature, adr:0013-m5-edition-and-manifest, [typed-array-statics]]
+  test/built-ins/TypedArray/out-of-bounds-behaves-like-detached.js: [unsupported-profile-feature, unit:annexb-object-accessors, [typed-array-statics]]
   test/built-ins/TypedArray/out-of-bounds-get-and-set.js: [pass, observation]
   test/built-ins/TypedArray/out-of-bounds-has.js: [pass, observation]
   test/built-ins/TypedArray/prototype.js: [pass, observation]
@@ -18224,7 +18186,7 @@ paths:
   test/built-ins/TypedArray/prototype/reduceRight/this-is-not-object.js: [pass, observation]
   test/built-ins/TypedArray/prototype/reduceRight/this-is-not-typedarray-instance.js: [pass, observation]
   test/built-ins/TypedArray/prototype/reduceRight/values-are-not-cached.js: [pass, observation]
-  test/built-ins/TypedArray/prototype/resizable-and-fixed-have-same-prototype.js: [unsupported-profile-feature, adr:0013-m5-edition-and-manifest, [typed-array-core]]
+  test/built-ins/TypedArray/prototype/resizable-and-fixed-have-same-prototype.js: [unsupported-profile-feature, unit:annexb-object-accessors, [typed-array-core]]
   test/built-ins/TypedArray/prototype/reverse/BigInt/detached-buffer.js: [pass, observation]
   test/built-ins/TypedArray/prototype/reverse/BigInt/get-length-uses-internal-arraylength.js: [pass, observation]
   test/built-ins/TypedArray/prototype/reverse/BigInt/preserves-non-numeric-properties.js: [pass, observation]
@@ -19010,7 +18972,7 @@ paths:
   test/built-ins/TypedArrayConstructors/ctors/no-args/undefined-newtarget-throws.js: [pass, observation]
   test/built-ins/TypedArrayConstructors/ctors/no-args/use-custom-proto-if-object.js: [pass, observation]
   test/built-ins/TypedArrayConstructors/ctors/no-args/use-default-proto-if-custom-proto-is-not-object.js: [pass, observation]
-  test/built-ins/TypedArrayConstructors/ctors/no-species.js: [unsupported-profile-feature, adr:0013-m5-edition-and-manifest, [array-buffer, object-properties, typed-array-constructors]]
+  test/built-ins/TypedArrayConstructors/ctors/no-species.js: [unsupported-profile-feature, unit:annexb-object-accessors, [array-buffer, object-properties, typed-array-constructors]]
   test/built-ins/TypedArrayConstructors/ctors/object-arg/as-array-returns.js: [pass, observation]
   test/built-ins/TypedArrayConstructors/ctors/object-arg/as-generator-iterable-returns.js: [pass, observation]
   test/built-ins/TypedArrayConstructors/ctors/object-arg/conversion-operation-consistent-nan.js: [pass, observation]
@@ -26602,7 +26564,7 @@ paths:
   test/language/expressions/class/elements/private-generator-method-name.js: [pass, observation]
   test/language/expressions/class/elements/private-getter-access-on-inner-arrow-function.js: [pass, observation]
   test/language/expressions/class/elements/private-getter-access-on-inner-function.js: [pass, observation]
-  test/language/expressions/class/elements/private-getter-is-not-a-own-property.js: [unsupported-profile-feature, adr:0013-m5-edition-and-manifest, [classes]]
+  test/language/expressions/class/elements/private-getter-is-not-a-own-property.js: [unsupported-profile-feature, unit:annexb-object-accessors, [classes]]
   test/language/expressions/class/elements/private-getter-on-nested-class.js: [pass, observation]
   test/language/expressions/class/elements/private-getter-shadowed-by-field-on-nested-class.js: [pass, observation]
   test/language/expressions/class/elements/private-getter-shadowed-by-getter-on-nested-class.js: [pass, observation]
@@ -26631,7 +26593,7 @@ paths:
   test/language/expressions/class/elements/private-methods/prod-private-method.js: [pass, observation]
   test/language/expressions/class/elements/private-setter-access-on-inner-arrow-function.js: [pass, observation]
   test/language/expressions/class/elements/private-setter-access-on-inner-function.js: [pass, observation]
-  test/language/expressions/class/elements/private-setter-is-not-a-own-property.js: [unsupported-profile-feature, adr:0013-m5-edition-and-manifest, [classes]]
+  test/language/expressions/class/elements/private-setter-is-not-a-own-property.js: [unsupported-profile-feature, unit:annexb-object-accessors, [classes]]
   test/language/expressions/class/elements/private-setter-on-nested-class.js: [pass, observation]
   test/language/expressions/class/elements/private-setter-shadowed-by-field-on-nested-class.js: [pass, observation]
   test/language/expressions/class/elements/private-setter-shadowed-by-getter-on-nested-class.js: [pass, observation]
@@ -32780,7 +32742,7 @@ paths:
   test/language/literals/regexp/S7.8.5_A1.3_T5.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [abrupt-completion, control-flow, dynamic-source, error-intrinsics, expression-operators, functions, lexical-grammar, object-properties, regular-expressions, symbols]]
   test/language/literals/regexp/S7.8.5_A1.3_T6.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [abrupt-completion, control-flow, dynamic-source, error-intrinsics, expression-operators, functions, lexical-grammar, object-properties, regular-expressions, symbols]]
   test/language/literals/regexp/S7.8.5_A1.4_T1.js: [pass, observation]
-  test/language/literals/regexp/S7.8.5_A1.4_T2.js: [unsupported-profile-feature, adr:0013-m5-edition-and-manifest, [abrupt-completion, control-flow, dynamic-source, error-intrinsics, expression-operators, functions, object-properties, regular-expressions, symbols, var-bindings]]
+  test/language/literals/regexp/S7.8.5_A1.4_T2.js: [unsupported-profile-feature, unit:annexb-dynamic-source-accounting, [abrupt-completion, control-flow, dynamic-source, error-intrinsics, expression-operators, functions, object-properties, regular-expressions, symbols, var-bindings]]
   test/language/literals/regexp/S7.8.5_A1.5_T1.js: [expected-negative, observation]
   test/language/literals/regexp/S7.8.5_A1.5_T2.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [abrupt-completion, control-flow, dynamic-source, error-intrinsics, expression-operators, functions, lexical-grammar, object-properties, regular-expressions, symbols]]
   test/language/literals/regexp/S7.8.5_A1.5_T3.js: [expected-negative, observation]
@@ -32798,7 +32760,7 @@ paths:
   test/language/literals/regexp/S7.8.5_A2.3_T5.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [abrupt-completion, control-flow, dynamic-source, error-intrinsics, expression-operators, functions, lexical-grammar, object-properties, regular-expressions, symbols]]
   test/language/literals/regexp/S7.8.5_A2.3_T6.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [abrupt-completion, control-flow, dynamic-source, error-intrinsics, expression-operators, functions, lexical-grammar, object-properties, regular-expressions, symbols]]
   test/language/literals/regexp/S7.8.5_A2.4_T1.js: [pass, observation]
-  test/language/literals/regexp/S7.8.5_A2.4_T2.js: [unsupported-profile-feature, adr:0013-m5-edition-and-manifest, [abrupt-completion, control-flow, dynamic-source, error-intrinsics, expression-operators, functions, object-properties, regular-expressions, symbols, var-bindings]]
+  test/language/literals/regexp/S7.8.5_A2.4_T2.js: [unsupported-profile-feature, unit:annexb-dynamic-source-accounting, [abrupt-completion, control-flow, dynamic-source, error-intrinsics, expression-operators, functions, object-properties, regular-expressions, symbols, var-bindings]]
   test/language/literals/regexp/S7.8.5_A2.5_T1.js: [expected-negative, observation]
   test/language/literals/regexp/S7.8.5_A2.5_T2.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [abrupt-completion, control-flow, dynamic-source, error-intrinsics, expression-operators, functions, lexical-grammar, object-properties, regular-expressions, symbols]]
   test/language/literals/regexp/S7.8.5_A2.5_T3.js: [expected-negative, observation]
@@ -37591,7 +37553,7 @@ paths:
   test/language/statements/class/elements/private-getter-brand-check-multiple-evaluations-of-class.js: [pass, observation]
   test/language/statements/class/elements/private-getter-brand-check-super-class.js: [pass, observation]
   test/language/statements/class/elements/private-getter-brand-check.js: [pass, observation]
-  test/language/statements/class/elements/private-getter-is-not-a-own-property.js: [unsupported-profile-feature, adr:0013-m5-edition-and-manifest, [classes, expression-operators, functions, lexical-bindings, object-properties]]
+  test/language/statements/class/elements/private-getter-is-not-a-own-property.js: [unsupported-profile-feature, unit:annexb-object-accessors, [classes, expression-operators, functions, lexical-bindings, object-properties]]
   test/language/statements/class/elements/private-getter-is-not-clobbered-by-computed-property.js: [pass, observation]
   test/language/statements/class/elements/private-getter-on-nested-class.js: [pass, observation]
   test/language/statements/class/elements/private-getter-shadowed-by-field-on-nested-class.js: [pass, observation]
@@ -37639,7 +37601,7 @@ paths:
   test/language/statements/class/elements/private-setter-brand-check-multiple-evaluations-of-class.js: [pass, observation]
   test/language/statements/class/elements/private-setter-brand-check-super-class.js: [pass, observation]
   test/language/statements/class/elements/private-setter-brand-check.js: [pass, observation]
-  test/language/statements/class/elements/private-setter-is-not-a-own-property.js: [unsupported-profile-feature, adr:0013-m5-edition-and-manifest, [classes, expression-operators, functions, lexical-bindings, object-properties]]
+  test/language/statements/class/elements/private-setter-is-not-a-own-property.js: [unsupported-profile-feature, unit:annexb-object-accessors, [classes, expression-operators, functions, lexical-bindings, object-properties]]
   test/language/statements/class/elements/private-setter-is-not-clobbered-by-computed-property.js: [pass, observation]
   test/language/statements/class/elements/private-setter-on-nested-class.js: [pass, observation]
   test/language/statements/class/elements/private-setter-shadowed-by-field-on-nested-class.js: [pass, observation]
@@ -43167,7 +43129,7 @@ paths:
   test/language/types/object/S8.6.2_A5_T4.js: [pass, observation]
   test/language/types/object/S8.6.2_A6.js: [pass, observation]
   test/language/types/object/S8.6.2_A7.js: [pass, observation]
-  test/language/types/object/S8.6.2_A8.js: [unsupported-profile-feature, adr:0013-m5-edition-and-manifest, [object-literals, object-properties, var-bindings]]
+  test/language/types/object/S8.6.2_A8.js: [unsupported-profile-feature, unit:annexb-object-accessors, [object-literals, object-properties, var-bindings]]
   test/language/types/object/S8.6_A2_T1.js: [pass, observation]
   test/language/types/object/S8.6_A2_T2.js: [pass, observation]
   test/language/types/object/S8.6_A3_T1.js: [pass, observation]

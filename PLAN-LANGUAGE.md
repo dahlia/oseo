@@ -334,18 +334,16 @@ admits its rows into *tests/test262/subset.yaml* with reviewed dependency tags
 in the change that implements them, and the full manifest update observes
 them. A row therefore runs only once its unit admits it, so the runner needs
 no Annex B gate. Feature-tagged rows still enter through the
-frontmatter rejection until their feature joins `supportedFeatures`.
+frontmatter rejection until their feature joins `supportedFeatures`. This
+departs from the Consequences text of ADR 0032, whose Status proposes it as an
+amendment pending the maintainer's acceptance.
 
-The 11 ADR 0013 Annex B rows keep the `adr:0013-m5-edition-and-manifest`
-owner and their exclusion audit rows, because their Annex B behavior stays
-unsupported until it is implemented. `annexb-syntax`,
-`annexb-object-accessors`, and `annexb-dynamic-source-accounting` move them
-with a reviewed exclusion audit change when they admit that behavior. The
-closed mode of the language claim audit rejects any remaining ADR 0013 owner,
-so `language-exit-audit` cannot pass while one of these rows keeps it.
-
-Both choices differ from the Consequences and Closure accounting text of ADR
-0032. Its Status records them, and they await the maintainer's confirmation.
+The 11 ADR 0013 Annex B rows moved to remediation owners, as ADR 0032's
+Closure accounting requires: one to `unit:annexb-syntax`, eight to
+`unit:annexb-object-accessors`, and two to
+`unit:annexb-dynamic-source-accounting`. Their exclusion audit assessments
+keep their reasons and replacement evidence with `disposition: remediation`,
+and the language claim audit counts them as remediation of those units.
 
 The unit froze the generated coverage section of the M5 exit report and
 replaced `check:m5-exit-audit` with `check:language-claim-audit`, which
@@ -415,8 +413,7 @@ Owns *test/annexB/language/comments/* (8), *test/annexB/language/literals/*
 (8), *test/annexB/language/expressions/template-literal/* (2), and the
 *test/annexB/built-ins/RegExp/* files and *named-groups/* rows that call no
 `eval` (10), plus *test/built-ins/String/prototype/split/separator-regexp.js*
-from ADR 0013, which it moves from the ADR 0013 owner with a reviewed
-exclusion audit change once its patterns are admitted.
+from ADR 0013, whose remediation it owns until its patterns are admitted.
 
 HTML-like comments already parse; the unit pins their Script-only behavior,
 including the multi-line comment and line-terminator cases. The main work is
@@ -467,9 +464,8 @@ Owns the 70 normative-optional paths ADR 0020 excluded: the five
 also takes eight ADR 0013 rows: three TypedArray rows that read or write
 `__proto__`, *test/language/types/object/S8.6.2\_A8.js*, and the four
 *private-getter-is-not-a-own-property.js* and
-*private-setter-is-not-a-own-property.js* rows. It moves those eight from the
-ADR 0013 owner with a reviewed exclusion audit change once the accessors are
-implemented.
+*private-setter-is-not-a-own-property.js* rows, whose remediation it owns
+until the accessors are implemented.
 
 The unit gives the existing `__proto__` accessor identities real bodies and
 installs the four legacy methods. It removes the OSEO1001 accessor diagnostics
@@ -523,8 +519,8 @@ Owns the 477 new rows that call `eval` or a `Function` constructor: the
 *test/annexB/language/eval-code/* rows, the six
 _test/annexB/built-ins/Function/createdynfn-\*.js_ rows, and
 *RegExp-leading-escape-BMP.js* and *RegExp-trailing-escape-BMP.js*. It also
-takes the two ADR 0013 rows *S7.8.5\_A1.4\_T2.js* and *S7.8.5\_A2.4\_T2.js*,
-moving them from the ADR 0013 owner with a reviewed exclusion audit change.
+owns the remediation of the two former ADR 0013 rows *S7.8.5\_A1.4\_T2.js* and
+*S7.8.5\_A2.4\_T2.js*, which it closes with a reviewed exclusion audit change.
 
 No implementation lands here. Each row receives a reviewed exclusion audit row
 under ADR 0016. A row whose non-source subject is Annex B behavior names the

@@ -220,11 +220,15 @@ Template identity across dynamic parses and variable-environment retention
 probes are possible reopening evidence for ADR 0016, not a decision to reopen
 or widen it.
 
-The ADR 0013 and ADR 0028 surfaces are bounded the same way. ADR 0013 owns
-a mixed Annex B path only when reviewed replacement evidence observes every
-core subject, under item 3 of the maintainer decision of 2026-10-28 and its
-later extensions to exact paths; the profile's Annex B paragraphs name them,
-and an `annex-b` assessment names its bounded owner. The check accepts the
+The ADR 0013 and ADR 0028 surfaces are bounded the same way. Under item 3 of
+the maintainer decision of 2026-10-28 and its later extensions to exact paths,
+ADR 0013 owned a mixed Annex B path only when reviewed replacement evidence
+observed every core subject; the profile's Annex B paragraphs name them, and an
+`annex-b` assessment names its bounded owner. ADR 0032 withdrew that
+authorization, so those 11 paths are now remediation rows owned by the
+*PLAN-LANGUAGE.md* units that implement their Annex B behavior, as
+[*exclusion-audit.md*](./exclusion-audit.md) describes, and the check rejects
+any ADR 0013 exclusion. The check accepts the
 owned `__lookupGetter__` or `__lookupSetter__` rejection only when the source
 calls the named method in call syntax. It accepts the ADR 0028 owner only
 for a selector path whose observation is the exact frontmatter rejection
@@ -491,9 +495,9 @@ it requires an owner for every unsupported path. It accepts a path that is in
 neither the reviewed subset nor the manifest only when the ledger holds it as
 unreviewed with a `unit:` owner, and it counts those paths and the
 remediation-owned ones per owner. With `--require-closed`, which
-`language-exit-audit` uses, both counts must be zero, as in the M5 audit, and
-no path may keep the ADR 0013 owner, whose Annex B authorization ADR 0032
-withdrew.
+`language-exit-audit` uses, both counts must be zero, as in the M5 audit. In
+either mode no path may keep the ADR 0013 owner, whose Annex B authorization
+ADR 0032 withdrew.
 `mise run report:language-coverage` prints the counts.
 
 The report describes Oseo's measured M5 profile. It does not call the result

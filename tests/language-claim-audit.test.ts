@@ -442,7 +442,7 @@ test("only a closed audit rejects remediation; both reject no owner", () => {
   );
 });
 
-test("a closed audit rejects the withdrawn ADR 0013 owner", () => {
+test("both audits reject the withdrawn ADR 0013 owner", () => {
   const annexRecord = "0013-m5-edition-and-manifest";
   const inputs = withOwner(excludedPath, `adr:${annexRecord}`);
   const annex: LanguageClaimAuditInputs = {
@@ -459,11 +459,12 @@ test("a closed audit rejects the withdrawn ADR 0013 owner", () => {
       ],
     ]),
   };
-  assert.equal(auditLanguageClaim(annex).excludedPaths, 1);
-  assert.throws(
-    () => auditLanguageClaim(annex, closed),
-    /0013-m5-edition-and-manifest still owns 1 paths, .* ADR 0032 withdrew/u,
-  );
+  for (const options of [undefined, closed]) {
+    assert.throws(
+      () => auditLanguageClaim(annex, options),
+      /0013-m5-edition-and-manifest still owns 1 paths, .* ADR 0032 withdrew/u,
+    );
+  }
 });
 
 test("every excluding record needs an audit and a reopening trigger", () => {
