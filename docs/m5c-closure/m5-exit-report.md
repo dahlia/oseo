@@ -94,6 +94,11 @@ inventory, reviewed subset, partitioned manifest, closure ledger, exclusion
 audit, and deferral list. `mise run check:m5-exit-audit`, part of
 `mise run check`, fails when the section above differs from that output.
 
+Compile time, code size, and execution measurements of the native fixtures
+are in the
+[*M5 performance and code-size report*](../evidence/m5-performance/README.md),
+which `mise run report:m5-performance:update` regenerates.
+
 
 Authorized exclusions
 ---------------------

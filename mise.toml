@@ -357,6 +357,17 @@ run = "node tools/m5-exit-audit.ts --print"
 description = "Regenerate the coverage section of the M5 exit report"
 run = "node tools/m5-exit-audit.ts --update"
 
+[tasks."report:m5-performance"]
+description = "Measure M5 native fixture performance and print the report"
+run = "node tools/m5-performance-report.ts --print"
+
+[tasks."report:m5-performance:update"]
+description = "Measure M5 native fixture performance and update its report"
+run = """
+node tools/m5-performance-report.ts --update
+oxfmt docs/evidence/m5-performance/measurements.json
+"""
+
 [tasks."m5c:closure-ledger:update"]
 description = "Regenerate the M5c closure ledger from the reviewed manifest"
 run = "node tools/m5c-closure-ledger.ts --update"
