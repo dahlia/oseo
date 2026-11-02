@@ -9,10 +9,11 @@ edition, the optional-section policy, and the compatibility manifest schema that
 measures every later M5 change.
 [ADR 0032](./0032-post-m5-edition-boundary.md) supersedes its candidate-edition
 and optional-section sections for the post-M5 claim; its manifest schema,
-classification values, and dependency-tag vocabulary rule stay in force. The
-11 Annex B paths this record owns keep it as their owner until the
-[*PLAN-LANGUAGE.md*](../../PLAN-LANGUAGE.md) units that implement their Annex
-B behavior move them.
+classification values, and dependency-tag vocabulary rule stay in force. ADR
+0032 withdraws this record's Annex B exclusion authorization, so the 11 Annex
+B paths it owned at the M5 exit are remediation rows of the
+[*PLAN-LANGUAGE.md*](../../PLAN-LANGUAGE.md) units that implement their
+behavior.
 
 
 Context
