@@ -128,16 +128,25 @@ static OseoResult module_execute_async(OseoContext *context, size_t index) {
     return result;
 }
 
+/* The outcome of entering one module in InnerModuleEvaluation. */
+typedef enum {
+    OSEO_MODULE_VISIT_ENTERED,
+    OSEO_MODULE_VISIT_SKIPPED,
+} OseoModuleVisit;
+
 /*
- * InnerModuleEvaluation. A THROW without a diagnostic is the abrupt
- * completion Evaluate records; one with a diagnostic ends the program.
+ * Steps 2 through 6 of InnerModuleEvaluation: a module already evaluated
+ * or on the stack is skipped, an errored one throws its recorded error,
+ * and a linked one is pushed with a fresh frame.
  */
-static OseoResult module_inner_evaluation(
+static OseoResult module_enter(
     OseoContext *context,
     size_t index,
-    size_t *dfs_index
+    size_t *dfs_index,
+    OseoModuleVisit *visit
 ) {
     OseoModuleRecord *record = module_record(context, index);
+    *visit = OSEO_MODULE_VISIT_SKIPPED;
     if (record->status == OSEO_MODULE_EVALUATING_ASYNC ||
         record->status == OSEO_MODULE_EVALUATED) {
         return record->errored
@@ -155,38 +164,44 @@ static OseoResult module_inner_evaluation(
     OseoModuleTable *table = module_table(context);
     table->stack[table->stack_count] = index;
     table->stack_count += 1u;
-    for (size_t position = 0u;
-         position < module_record(context, index)->requested_count;
-         position += 1u) {
-        size_t required = module_record(context, index)->requested[position];
-        OseoResult result =
-            module_inner_evaluation(context, required, dfs_index);
-        if (result.status != OSEO_STATUS_NORMAL) return result;
-        record = module_record(context, index);
-        OseoModuleRecord *required_record = module_record(context, required);
-        if (required_record->status == OSEO_MODULE_EVALUATING) {
-            if (required_record->dfs_ancestor_index <
-                record->dfs_ancestor_index) {
-                record->dfs_ancestor_index =
-                    required_record->dfs_ancestor_index;
-            }
-        } else {
-            required = module_cycle_root(context, required);
-            required_record = module_record(context, required);
-            if (required_record->errored) {
-                return module_throw(
-                    context,
-                    required_record->evaluation_error
-                );
-            }
+    table->frames[table->frame_count] =
+        (OseoModuleFrame){index, 0u, false};
+    table->frame_count += 1u;
+    *visit = OSEO_MODULE_VISIT_ENTERED;
+    return normal(oseo_undefined());
+}
+
+/* Step 7.b of InnerModuleEvaluation for one evaluated request. */
+static OseoResult module_after_request(
+    OseoContext *context,
+    size_t index,
+    size_t required
+) {
+    OseoModuleRecord *record = module_record(context, index);
+    OseoModuleRecord *required_record = module_record(context, required);
+    if (required_record->status == OSEO_MODULE_EVALUATING) {
+        if (required_record->dfs_ancestor_index <
+            record->dfs_ancestor_index) {
+            record->dfs_ancestor_index = required_record->dfs_ancestor_index;
         }
-        if (module_async_pending(required_record)) {
-            record->pending_async_dependencies += 1u;
-            result = module_add_async_parent(context, required, index);
-            if (result.status != OSEO_STATUS_NORMAL) return result;
+    } else {
+        required = module_cycle_root(context, required);
+        required_record = module_record(context, required);
+        if (required_record->errored) {
+            return module_throw(context, required_record->evaluation_error);
         }
     }
-    record = module_record(context, index);
+    if (module_async_pending(required_record)) {
+        record->pending_async_dependencies += 1u;
+        return module_add_async_parent(context, required, index);
+    }
+    return normal(oseo_undefined());
+}
+
+/* Steps 8 through 12 of InnerModuleEvaluation, after every request. */
+static OseoResult module_after_requests(OseoContext *context, size_t index) {
+    OseoModuleTable *table = module_table(context);
+    OseoModuleRecord *record = module_record(context, index);
     if (record->pending_async_dependencies > 0u ||
         record->has_top_level_await) {
         table->async_evaluation_count += 1u;
@@ -214,6 +229,49 @@ static OseoResult module_inner_evaluation(
         } while (member != index);
     }
     return normal(oseo_undefined());
+}
+
+/*
+ * InnerModuleEvaluation over an explicit frame stack, so graph depth never
+ * consumes native stack. Each frame names a module and its next request; a
+ * frame whose request entered a module resumes at step 7.b once that
+ * module's frame is gone. A THROW without a diagnostic is the abrupt
+ * completion Evaluate records; one with a diagnostic ends the program.
+ */
+static OseoResult module_inner_evaluation(
+    OseoContext *context,
+    size_t index,
+    size_t *dfs_index
+) {
+    OseoModuleTable *table = module_table(context);
+    table->frame_count = 0u;
+    OseoModuleVisit visit;
+    OseoResult result = module_enter(context, index, dfs_index, &visit);
+    while (result.status == OSEO_STATUS_NORMAL && table->frame_count > 0u) {
+        OseoModuleFrame *frame = &table->frames[table->frame_count - 1u];
+        size_t module = frame->module;
+        OseoModuleRecord *record = module_record(context, module);
+        if (frame->position == record->requested_count) {
+            table->frame_count -= 1u;
+            result = module_after_requests(context, module);
+            continue;
+        }
+        size_t required = record->requested[frame->position];
+        if (!frame->entered_request) {
+            result = module_enter(context, required, dfs_index, &visit);
+            if (result.status != OSEO_STATUS_NORMAL) break;
+            if (visit == OSEO_MODULE_VISIT_ENTERED) {
+                /* Resume this frame at step 7.b after the pushed one. */
+                frame->entered_request = true;
+                continue;
+            }
+        }
+        frame->entered_request = false;
+        frame->position += 1u;
+        result = module_after_request(context, module, required);
+    }
+    table->frame_count = 0u;
+    return result;
 }
 
 /* Settles a record's top-level capability when it has one. */
@@ -277,8 +335,13 @@ static OseoResult module_evaluate(OseoContext *context, size_t index) {
         }
         result = module_settle_capability(context, index, false);
     } else if (result.status == OSEO_STATUS_NORMAL &&
-               module_record(context, index)->async_evaluation_order ==
-                   OSEO_MODULE_ASYNC_UNSET) {
+               module_record(context, index)->status ==
+                   OSEO_MODULE_EVALUATED) {
+        /*
+         * A root that finished synchronously, or whose asynchronous
+         * evaluation completed before this capability existed, settles
+         * the new capability now; nothing else would.
+         */
         result = module_settle_capability(context, index, true);
     }
     if (result.status != OSEO_STATUS_NORMAL) return result;
@@ -290,13 +353,6 @@ typedef struct {
     size_t count;
     size_t capacity;
 } OseoModuleList;
-
-static bool module_list_contains(const OseoModuleList *list, size_t index) {
-    for (size_t position = 0u; position < list->count; position += 1u) {
-        if (list->items[position] == index) return true;
-    }
-    return false;
-}
 
 static bool module_list_append(OseoModuleList *list, size_t index) {
     if (list->count == list->capacity) {
@@ -311,60 +367,115 @@ static bool module_list_append(OseoModuleList *list, size_t index) {
     return true;
 }
 
-/* GatherAvailableAncestors. Returns false when the list cannot grow. */
+/*
+ * GatherAvailableAncestors over a worklist instead of recursion. The
+ * edition's recursion only decides which ancestors join the list, and
+ * the caller sorts the list by [[AsyncEvaluationOrder]], so visiting the
+ * same modules in worklist order yields the same sorted list. Returns
+ * false when a list cannot grow.
+ */
 static bool module_gather_available_ancestors(
     OseoContext *context,
     size_t index,
     OseoModuleList *list
 ) {
-    for (size_t position = 0u;
-         position < module_record(context, index)->async_parent_count;
-         position += 1u) {
-        size_t parent = module_record(context, index)->async_parents[position];
-        size_t root = module_cycle_root(context, parent);
-        if (module_list_contains(list, parent) ||
-            module_record(context, root)->errored) {
-            continue;
-        }
-        OseoModuleRecord *record = module_record(context, parent);
-        record->pending_async_dependencies -= 1u;
-        if (record->pending_async_dependencies == 0u) {
-            if (!module_list_append(list, parent)) return false;
-            if (!record->has_top_level_await &&
-                !module_gather_available_ancestors(context, parent, list)) {
-                return false;
+    OseoModuleList work = {NULL, 0u, 0u};
+    bool grown = module_list_append(&work, index);
+    while (grown && work.count > 0u) {
+        work.count -= 1u;
+        size_t module = work.items[work.count];
+        for (size_t position = 0u;
+             grown &&
+             position < module_record(context, module)->async_parent_count;
+             position += 1u) {
+            size_t parent =
+                module_record(context, module)->async_parents[position];
+            size_t root = module_cycle_root(context, parent);
+            if (module_record(context, parent)->gathered ||
+                module_record(context, root)->errored) {
+                continue;
+            }
+            OseoModuleRecord *record = module_record(context, parent);
+            record->pending_async_dependencies -= 1u;
+            if (record->pending_async_dependencies == 0u) {
+                grown = module_list_append(list, parent);
+                if (grown) record->gathered = true;
+                if (grown && !record->has_top_level_await) {
+                    grown = module_list_append(&work, parent);
+                }
             }
         }
     }
-    return true;
+    free(work.items);
+    for (size_t position = 0u; position < list->count; position += 1u) {
+        module_record(context, list->items[position])->gathered = false;
+    }
+    return grown;
 }
 
-/* AsyncModuleExecutionRejected. The error is rooted by the caller. */
+/*
+ * AsyncModuleExecutionRejected with an explicit stack of async-parent
+ * cursors. Each module records the error and rejects its capability when
+ * first reached, then its parents follow in list order before the next
+ * sibling, which is the edition's depth-first order of capability
+ * rejections. The error is rooted by the caller and then by each record.
+ */
 static OseoResult module_async_rejected(
     OseoContext *context,
     size_t index,
     OseoValue error
 ) {
-    OseoModuleRecord *record = module_record(context, index);
-    if (record->status == OSEO_MODULE_EVALUATED) {
-        return normal(oseo_undefined());
+    OseoModuleList modules = {NULL, 0u, 0u};
+    OseoModuleList positions = {NULL, 0u, 0u};
+    OseoResult result = normal(oseo_undefined());
+    size_t next = index;
+    bool reached = true;
+    while (result.status == OSEO_STATUS_NORMAL) {
+        if (reached) {
+            OseoModuleRecord *record = module_record(context, next);
+            if (record->status != OSEO_MODULE_EVALUATED) {
+                record->errored = true;
+                record->evaluation_error = error;
+                record->status = OSEO_MODULE_EVALUATED;
+                record->async_evaluation_order = OSEO_MODULE_ASYNC_DONE;
+                result = module_settle_capability(context, next, false);
+                if (result.status != OSEO_STATUS_NORMAL) break;
+                if (!module_list_append(&modules, next) ||
+                    !module_list_append(&positions, 0u)) {
+                    result = module_allocation_failure(context);
+                    break;
+                }
+            }
+            reached = false;
+        }
+        if (modules.count == 0u) break;
+        size_t top = modules.items[modules.count - 1u];
+        size_t *position = &positions.items[positions.count - 1u];
+        OseoModuleRecord *record = module_record(context, top);
+        if (*position == record->async_parent_count) {
+            modules.count -= 1u;
+            positions.count -= 1u;
+            continue;
+        }
+        next = record->async_parents[*position];
+        *position += 1u;
+        reached = true;
     }
-    record->errored = true;
-    record->evaluation_error = error;
-    record->status = OSEO_MODULE_EVALUATED;
-    record->async_evaluation_order = OSEO_MODULE_ASYNC_DONE;
-    OseoResult result = module_settle_capability(context, index, false);
-    for (size_t position = 0u;
-         result.status == OSEO_STATUS_NORMAL &&
-         position < module_record(context, index)->async_parent_count;
-         position += 1u) {
-        result = module_async_rejected(
-            context,
-            module_record(context, index)->async_parents[position],
-            module_record(context, index)->evaluation_error
-        );
-    }
+    free(modules.items);
+    free(positions.items);
     return result;
+}
+
+/* One gathered module and its [[AsyncEvaluationOrder]] for sorting. */
+typedef struct {
+    uint64_t order;
+    size_t index;
+} OseoModuleOrder;
+
+static int module_order_compare(const void *left, const void *right) {
+    uint64_t left_order = ((const OseoModuleOrder *)left)->order;
+    uint64_t right_order = ((const OseoModuleOrder *)right)->order;
+    return left_order < right_order ? -1 : left_order > right_order;
 }
 
 /* AsyncModuleExecutionFulfilled. */
@@ -386,22 +497,29 @@ static OseoResult module_async_fulfilled(OseoContext *context, size_t index) {
      * Sort by [[AsyncEvaluationOrder]]. Every listed record is still
      * pending, so its order is an integer and the orders are distinct.
      */
-    for (size_t position = 1u; position < list.count; position += 1u) {
-        size_t item = list.items[position];
-        uint64_t order = module_record(context, item)->async_evaluation_order;
-        size_t target = position;
-        while (target > 0u &&
-               module_record(context, list.items[target - 1u])
-                       ->async_evaluation_order > order) {
-            list.items[target] = list.items[target - 1u];
-            target -= 1u;
+    OseoModuleOrder *sorted = NULL;
+    if (list.count > 0u) {
+        sorted = malloc(list.count * sizeof(*sorted));
+        if (sorted == NULL) {
+            free(list.items);
+            return module_allocation_failure(context);
         }
-        list.items[target] = item;
+    }
+    for (size_t position = 0u; position < list.count; position += 1u) {
+        size_t item = list.items[position];
+        sorted[position] = (OseoModuleOrder){
+            module_record(context, item)->async_evaluation_order,
+            item,
+        };
+    }
+    free(list.items);
+    if (list.count > 1u) {
+        qsort(sorted, list.count, sizeof(*sorted), module_order_compare);
     }
     for (size_t position = 0u;
          result.status == OSEO_STATUS_NORMAL && position < list.count;
          position += 1u) {
-        size_t member = list.items[position];
+        size_t member = sorted[position].index;
         record = module_record(context, member);
         if (record->status == OSEO_MODULE_EVALUATED) continue;
         if (record->has_top_level_await) {
@@ -423,10 +541,22 @@ static OseoResult module_async_fulfilled(OseoContext *context, size_t index) {
             result = module_settle_capability(context, member, true);
         }
     }
-    free(list.items);
+    free(sorted);
     return result.status == OSEO_STATUS_NORMAL
         ? normal(oseo_undefined())
         : result;
+}
+
+OseoResult oseo_module_evaluate(OseoContext *context, size_t module_index) {
+    OseoModuleTable *table = module_table(context);
+    if (table == NULL || module_index >= table->count) {
+        return failure(
+            context,
+            "OSEO2001",
+            "The module evaluation names no module table entry."
+        );
+    }
+    return module_evaluate(context, module_index);
 }
 
 OseoResult oseo_internal_module_async_settled(
@@ -462,6 +592,7 @@ void oseo_internal_module_table_release(OseoContext *context) {
     }
     free(table->records);
     free(table->stack);
+    free(table->frames);
     free(table);
     context->module_table = NULL;
 }
@@ -519,7 +650,9 @@ OseoResult oseo_module_graph_evaluate(
     context->module_table = table;
     table->records = calloc(count, sizeof(*table->records));
     table->stack = calloc(count, sizeof(*table->stack));
-    if (table->records == NULL || table->stack == NULL) {
+    table->frames = calloc(count, sizeof(*table->frames));
+    if (table->records == NULL || table->stack == NULL ||
+        table->frames == NULL) {
         oseo_internal_module_table_release(context);
         return module_allocation_failure(context);
     }

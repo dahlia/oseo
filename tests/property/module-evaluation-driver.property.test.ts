@@ -368,7 +368,7 @@ function modelEvaluation(graph: GeneratedGraph): ModelOutcome {
   };
   try {
     inner(0, 0);
-    if (entry.asyncState === "unset") settle(capability, true, "");
+    if (entry.status === "evaluated") settle(capability, true, "");
   } catch (thrown) {
     if (!(thrown instanceof ModelThrow)) throw thrown;
     for (const member of stack) {
@@ -519,15 +519,16 @@ test(
               ],
         domain:
           "static module graphs of two to four modules (six when large) " +
-          "with up to three requests each, including self-requests and " +
-          "cycles, whose bodies await, start promise reaction chains, " +
-          "or throw before or after their first await",
+          "with up to three requests each, or four for the entry, which " +
+          "always requests module 1, including self-requests and cycles, " +
+          "whose bodies await, start promise reaction chains, or throw " +
+          "before or after their first await",
         numRuns: 6,
         profile: "Runtime module evaluation driver",
         seed: 0x6000_9600,
         sizeLimit:
-          "at most six modules, three requests per module, four steps " +
-          "per body, and three reactions per chain",
+          "at most six modules, three requests per module and four for " +
+          "the entry, four steps per body, and three reactions per chain",
         timeLimitMilliseconds: 180_000,
       },
     );

@@ -2145,6 +2145,8 @@ typedef struct {
     OseoValue evaluation_error;
     bool errored;
     bool has_top_level_await;
+    /* Set only while GatherAvailableAncestors lists this module. */
+    bool gathered;
     OseoModuleStatus status;
     size_t dfs_index;
     size_t dfs_ancestor_index;
@@ -2159,16 +2161,31 @@ typedef struct {
 } OseoModuleRecord;
 
 /*
+ * One InnerModuleEvaluation activation on the driver's explicit frame
+ * stack: the module, its next request position, and whether that request
+ * entered a module whose frame is above this one.
+ */
+typedef struct {
+    size_t module;
+    size_t position;
+    bool entered_request;
+} OseoModuleFrame;
+
+/*
  * The program's module table, installed once by the module graph's
- * top-level script. `stack` is the InnerModuleEvaluation stack, and
- * `async_evaluation_count` the agent's module async evaluation count,
- * which this runtime never resets.
+ * top-level script. `stack` is the InnerModuleEvaluation stack and
+ * `frames` its activations, each bounded by the module count because a
+ * module enters at most once per Evaluate. `async_evaluation_count` is
+ * the agent's module async evaluation count, which this runtime never
+ * resets.
  */
 typedef struct {
     OseoModuleRecord *records;
     size_t count;
     size_t *stack;
     size_t stack_count;
+    OseoModuleFrame *frames;
+    size_t frame_count;
     uint64_t async_evaluation_count;
 } OseoModuleTable;
 

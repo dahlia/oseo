@@ -5767,11 +5767,11 @@ assessments:
         "a5bacbbb7dee97f79d0bb04c3feef7bafa9a7d42168ca2b5\
         223440076d967076"
       packages/runtime-c/native/runtime_internal.h:
-        "e78b575df2e13c3f334f85df206a5d4f849297c4c7034c6d\
-        86e12085fa47ffce"
+        "0ddd21efd1b3be3ae3b452d716c87649ccb374d457b5c12e\
+        bde30f6703c006d3"
       packages/runtime-c/native/oseo_runtime.h:
-        "52eb839ba745972984e0808f6d53856e5783756722a3a63c\
-        bae379dfba571dc0"
+        "6025fcc647f14a7725283b3a3db4300e96645a2df7b6eb90\
+        f335a78bf85237f4"
       packages/runtime-c/native/runtime_core.c:
         "979d7a1a4c2c0d5883cd8514fc1ce8e352755bd005368936\
         f503bb59d036ea9d"

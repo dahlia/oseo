@@ -2316,6 +2316,11 @@ OseoResult oseo_module_graph_evaluate(
     size_t argument_count,
     const OseoValue *arguments
 );
+/*
+ * Performs Evaluate on one installed module table entry and returns its
+ * cycle root's top-level capability promise, creating it when absent.
+ */
+OseoResult oseo_module_evaluate(OseoContext *context, size_t module_index);
 
 OseoResult oseo_promise_resolve(
     OseoContext *context,

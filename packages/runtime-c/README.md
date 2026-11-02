@@ -1429,9 +1429,17 @@ its job in the evaluator's realm. A language throw from a synchronous evaluator
 becomes the recorded evaluation error; a runtime diagnostic still ends the
 program.
 
+`oseo_module_evaluate` performs Evaluate on one installed entry and returns its
+cycle root's top-level capability promise, creating it when absent. A
+capability created for a root that has already finished evaluating settles at
+once. The import operation will call it; *tests/runtime-module-driver.test.ts*
+drives it directly with C evaluators.
+
 The context owns the table for the life of the program. The collector traces
 every entry's evaluator, top-level capability, and evaluation error, so a
-cached error stays reachable. The DFS stack, async parent lists, and the sorted
+cached error stays reachable. InnerModuleEvaluation, ancestor gathering, and
+rejection propagation walk explicit stacks, so graph depth never consumes
+native stack. The DFS stack, its frames, async parent lists, and the sorted
 ancestor list hold only table indices in untraced memory.
 
 [ADR 0030]: https://github.com/dahlia/oseo/blob/main/docs/adr/0030-test262-unhandled-rejection-policy.md
