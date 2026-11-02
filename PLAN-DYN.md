@@ -39,6 +39,12 @@ M5 defers those rows by name under
 target. Inside the design, the ADR 0016 amendment stays Proposed, and the
 accepted rejection still applies.
 
+On 2026-11-02 the maintainer scheduled the design's implementation under
+[*PLAN-LANGUAGE.md*](./PLAN-LANGUAGE.md), as its four `import-*` units. That
+work accepts the ADR 0016 amendment. The deferral entries keep this plan as
+their target until their rows pass, and the three rows the design cannot close
+stay here. The remaining capability classes stay deferred.
+
 [build-time-resolvable proposal]: ./docs/dynamic-import-staged-plan.md
 [static-specifier import design]: ./docs/static-specifier-import-design.md
 
@@ -472,6 +478,43 @@ An external-toolchain prototype is evidence about that route, not a commitment
 to ship the external toolchain.
 
 
+Inherited residue
+-----------------
+
+[ADR 0031](./docs/adr/0031-m5-named-deferral.md) makes this plan the target of
+every M5 named deferral, and
+[*docs/m5c-closure/deferrals.yaml*](./docs/m5c-closure/deferrals.yaml) is the
+list. Its 54 `run-time-source` entries assert contracts that only run-time
+source compilation can observe, such as a declaration made by direct `eval` or
+the `Function` constructor's argument conversion. They stay here. The
+maintainer ranks that work low priority, and no unit is scheduled for it.
+
+Of the 20 `static-specifier-import` entries, the 17 that
+[*PLAN-LANGUAGE.md*](./PLAN-LANGUAGE.md) can close leave the list when they
+pass. *usage-from-eval.js*, *eval-rqstd-once.js*, and
+*update-to-dynamic-import.js* stay, because they need direct `eval` or the
+`Function` constructor.
+
+Five paths of the legacy `caller` selector in
+[ADR 0028](./docs/adr/0028-legacy-function-caller-boundary.md) also need
+dynamic source:
+
+ -  *test/built-ins/Function/15.3.5.4\_2-12gs.js*,
+    *15.3.5.4\_2-14gs.js*, and *15.3.5.4\_2-76gs.js* call `eval`;
+ -  *15.3.5.4\_2-77gs.js* and *15.3.5.4\_2-78gs.js* call `Function` or
+    `new Function`.
+
+When the `legacy-caller` unit of *PLAN-LANGUAGE.md* implements `caller`, the
+other 18 paths should pass and these five become ADR 0016 results. They are not
+named deferrals, but this plan inherits them as residue so that admitting
+`eval` or `Function` later re-observes them.
+
+Proposed [ADR 0032](./docs/adr/0032-post-m5-edition-boundary.md) would add
+about 477 *test/annexB/* paths that call `eval` or a `Function` constructor,
+almost all under *test/annexB/language/eval-code/*. They would enter as ADR
+0016 results and join the same residue.
+
+
 Entry criteria
 --------------
 
@@ -532,6 +575,10 @@ Delivery order
     strictness, private-environment, and localized-optimization rules pass.
 9.  Consider unrestricted source-loading dynamic import after the applicable
     M6 or M7 loader policy and every source-compilation criterion are complete.
+
+Item 3 is scheduled under [*PLAN-LANGUAGE.md*](./PLAN-LANGUAGE.md), with the
+static-specifier import design as its specification. The other items stay
+deferred.
 
 At each checkpoint, update the applicable decision, language profile,
 compatibility manifest, runtime ownership record, target evidence, and this
