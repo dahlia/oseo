@@ -258,7 +258,8 @@ Main-only reanchor preparation
 ------------------------------
 
 The earlier source-bound preparation and leading-run descriptions are
-historical evidence on R db4104; that original run failed later in B18.
+historical evidence on the leading run's source; that run failed later in
+B18.
 All original sources, negative phases, assertions and B18 reservations
 remain unchanged, with 304 active remediation owners and 17 existing ADR 0016
 assessment bindings. They grant no new exclusion or publication approval.
@@ -594,11 +595,9 @@ exact candidate/Main gates remain Root-owned pending work.
 Historical TCO source on the Array base
 ---------------------------------------
 
-Initial preparation composed TCO `145819bd` on Set candidate
-`a111c31eacb22f07ee514dab4372504b7470b161`, tree
-`072862e2760631542d41cf777d4e75c5d6014924`. That candidate failed CI:
-the prototype-root allocation injection still matched `3u` instead of
-Set's actual `4u`. Its provisional TCO child `54973309` remains preserved.
+Initial preparation composed TCO `145819bd` on a Set candidate that failed
+CI: the prototype-root allocation injection still matched `3u` instead of
+Set's actual `4u`.
 
 The complete owned TCO delta `9945b7b8` to `b1eaeff0` is now prepared on
 Array U`cccb7195c1eb01a3963ffa043bafe045c333ff73`, tree

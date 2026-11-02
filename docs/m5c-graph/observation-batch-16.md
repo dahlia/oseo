@@ -1,15 +1,11 @@
 Observation batch 16 admission preparation
 ==========================================
 
-This is a fixed Source4 preparation snapshot. Independent review, Root
-integration, D3, and the required later observation and publication gates
-remain pending. No node status or landed flag changes through this preparation.
-
-All 467 original paths (469 review units) are added together from the accepted
-leading results on R `db4104dce27cdadea7825f809c4def1987a43e0c`, tree
-`fef6a24456493d6a87a42751ebd2e90d7b2ad00f`. The batch completed. The overall
-leading run failed later in B18. No new observation, compiler emission, or
-native execution occurred in this preparation.
+Batch 16 admitted 467 original paths (469 review units) together. Their
+first records came from a leading observation run that completed this batch
+and failed later in batch 18. A later observation on Main replaced those
+records, and the reviewed manifest holds the current ones. The table gives
+the leading run's results for this batch:
 
 | Pass | Expected negative | Unsupported | Requests | Native executed |
 | ---: | ----------------: | ----------: | -------: | --------------: |
