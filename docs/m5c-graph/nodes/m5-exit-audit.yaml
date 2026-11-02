@@ -160,4 +160,4 @@ dependencies:
   - with-var-loop-head-resolution
   - yield-star-throw-callability
 landed: false
-status: blocked
+status: ready

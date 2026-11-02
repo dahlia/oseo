@@ -11,5 +11,5 @@ delivers: >-
   docs/m5c-graph/dynamic-source-function-constructor-assessment.md.
 dependencies:
   - unsupported-ownership-audit
-landed: false
+landed: true
 status: ready

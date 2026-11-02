@@ -345,5 +345,5 @@ dependencies:
   - dynamic-source-trainc-ordinary-evidence
   - dynamic-source-unknown-eval
   - static-specifier-import-design
-landed: false
-status: blocked
+landed: true
+status: ready

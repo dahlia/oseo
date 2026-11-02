@@ -14,5 +14,5 @@ delivers: >-
   docs/m5c-graph/dynamic-source-scope-arguments-evidence.md.
 dependencies:
   - unsupported-ownership-audit
-landed: false
+landed: true
 status: ready
