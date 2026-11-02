@@ -337,8 +337,13 @@ export function validateM5cDeferrals(
   };
 }
 
-/** Check the list against checked-in evidence and the pinned suite. */
-export function validateCurrentM5cDeferrals(): M5cDeferralSummary {
+/**
+ * Check the list against checked-in evidence and the pinned suite. A caller
+ * that has already read the reviewed manifest passes its results.
+ */
+export function validateCurrentM5cDeferrals(
+  results: readonly Test262Result[] = readCurrentM5cManifest().results,
+): M5cDeferralSummary {
   const text = readFileSync(join(repositoryRoot, m5cDeferralsPath), "utf8");
   const suite = dirname(
     fileURLToPath(import.meta.resolve("test262/package.json")),
@@ -368,7 +373,7 @@ export function validateCurrentM5cDeferrals(): M5cDeferralSummary {
       join(repositoryRoot, "docs/adr", `${m5cDeferralRecordStem}.md`),
       "utf8",
     ),
-    results: readCurrentM5cManifest().results,
+    results,
     roadmap: readFileSync(join(repositoryRoot, "ROADMAP.md"), "utf8"),
     sources,
   });

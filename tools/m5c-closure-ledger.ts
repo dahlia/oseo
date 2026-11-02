@@ -828,10 +828,12 @@ export function readCurrentM5cDeferralPaths(): ReadonlySet<string> {
   );
 }
 
-function readCurrentInputs(): CurrentInputs {
+function readCurrentInputs(
+  manifest: M5cLedgerManifestInput = readCurrentM5cManifest(),
+): CurrentInputs {
   return {
     inventoryText: readFileSync(join(repositoryRoot, m5cInventoryPath), "utf8"),
-    manifest: readCurrentM5cManifest(),
+    manifest,
     targets: {
       acceptedRecords: readCurrentAcceptedRecords(),
       deferredPaths: readCurrentM5cDeferralPaths(),
@@ -840,9 +842,15 @@ function readCurrentInputs(): CurrentInputs {
   };
 }
 
-/** Validate the checked-in ledger against checked-in evidence. */
-export function validateCurrentM5cClosureLedger(): M5cLedgerSummary {
-  const { inventoryText, manifest, targets } = readCurrentInputs();
+/**
+ * Validate the checked-in ledger against checked-in evidence. A caller that
+ * has already read the reviewed manifest passes it to avoid a second read.
+ */
+export function validateCurrentM5cClosureLedger(
+  currentManifest?: M5cLedgerManifestInput,
+): M5cLedgerSummary {
+  const { inventoryText, manifest, targets } =
+    readCurrentInputs(currentManifest);
   return validateM5cClosureLedger(
     readFileSync(join(repositoryRoot, m5cClosureLedgerPath), "utf8"),
     inventoryText,

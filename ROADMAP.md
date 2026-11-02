@@ -16,7 +16,9 @@ calendar dates.
 M5a and M5b are complete. The normative
 [*M5 language profile*](./docs/language-profile-m5.md) records all 149 admitted
 families and their evidence assessments. M5c remains open under
-[*PLAN-M5C.md*](./PLAN-M5C.md).
+[*PLAN-M5C.md*](./PLAN-M5C.md). The mechanical conditions of the M5 exit
+audit hold, and the [M5 exit report](./docs/m5c-closure/m5-exit-report.md)
+gives the coverage counts; the audit's landing gates remain.
 
 The macOS AArch64 native execution work accepted by
 [ADR 0014](./docs/adr/0014-native-target-support.md) is complete. Linux on AMD64
@@ -686,6 +688,10 @@ same record, because
 family unsupported inside the claimed edition. The label also requires the
 deferral list to be empty. Intermediate releases publish
 exact coverage and known gaps without using the label.
+
+`mise run check:m5-exit-audit` checks the inventory, manifest, exclusion, and
+deferral conditions above against the checked-in evidence, and the
+[M5 exit report](./docs/m5c-closure/m5-exit-report.md) states the result.
 
 
 M6: Minimum common web API

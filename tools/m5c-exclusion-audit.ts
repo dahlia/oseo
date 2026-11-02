@@ -840,8 +840,13 @@ export function validateM5cExclusionAudit(
   return { exclusions, remediation, deferrals, missingDynamicTags };
 }
 
-/** Check the audit against pinned source and checked-in observations. */
-export function validateCurrentM5cExclusionAudit(): M5cExclusionAuditSummary {
+/**
+ * Check the audit against pinned source and checked-in observations. A
+ * caller that has already read the reviewed manifest passes its results.
+ */
+export function validateCurrentM5cExclusionAudit(
+  results: readonly Test262Result[] = readCurrentM5cManifest().results,
+): M5cExclusionAuditSummary {
   const text = readFileSync(join(repositoryRoot, auditPath), "utf8");
   // SAFETY: parsedObject validates the document before its paths are read.
   const audit = parsedObject(parseYaml(text) as StructuredDataInput, "audit");
@@ -910,7 +915,7 @@ export function validateCurrentM5cExclusionAudit(): M5cExclusionAuditSummary {
       recordSources.get(callerRecordStem) ?? "",
     ),
     ledger,
-    results: readCurrentM5cManifest().results,
+    results,
     records: recordSources,
     sources,
     replacementEvidence,
