@@ -9,6 +9,7 @@ import {
   type StructuredDataInput,
   type StructuredDataRecord,
 } from "./structured-data.ts";
+import { readCurrentM5InventoryText } from "./m5c-graph.ts";
 import { isBoolean, isString } from "./value-kinds.ts";
 
 const repositoryRoot = resolve(fileURLToPath(import.meta.url), "../..");
@@ -19,7 +20,10 @@ export const workGraphPath = "docs/m5b-graph/graph.yaml";
 /** The directory holding one YAML record per work-graph node. */
 export const workGraphNodeDirectory = "docs/m5b-graph/nodes";
 
-/** The pinned applicable-test inventory a node's recorded counts must match. */
+/**
+ * The pinned applicable-test inventory a node's recorded counts must match,
+ * read through its M5 view: the closed M5b graph counts the M5 inventory.
+ */
 export const workGraphInventoryPath = "tests/test262/inventory.tsv";
 
 /** The upstream root every node's inventory selectors must partition. */
@@ -556,7 +560,7 @@ function readNodeSources(): readonly WorkGraphSource[] {
 /** Read and validate the current work graph's node records and inventories. */
 export function readCurrentWorkGraphNodes(): readonly WorkGraphNode[] {
   const includedPaths = parseIncludedInventoryPaths(
-    readFileSync(join(repositoryRoot, workGraphInventoryPath), "utf8"),
+    readCurrentM5InventoryText(),
   );
   const claimed = new Map<string, string>();
   return readNodeSources().map((source) =>
@@ -571,7 +575,7 @@ export function validateCurrentWorkGraph(): WorkGraphSummary {
     text: readFileSync(join(repositoryRoot, workGraphPath), "utf8"),
   };
   const includedPaths = parseIncludedInventoryPaths(
-    readFileSync(join(repositoryRoot, workGraphInventoryPath), "utf8"),
+    readCurrentM5InventoryText(),
   );
   return validateWorkGraph(graphSource, readNodeSources(), includedPaths);
 }

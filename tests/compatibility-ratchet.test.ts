@@ -207,6 +207,7 @@ test("accepts unchanged and monotonically growing compatibility", () => {
   assert.deepEqual(report.baseline, {
     admittedFamilies: 0,
     distinctPropertySeeds: 1,
+    inventory: 0,
     pass: 1,
     propertyCaseBudget: 10,
     propertyDomains: 1,
@@ -215,6 +216,70 @@ test("accepts unchanged and monotonically growing compatibility", () => {
   });
   assert.equal(report.current.pass, 2);
   assert.equal(report.current.propertyCaseBudget, 12);
+});
+
+function inventoryText(paths: readonly string[]): string {
+  return [
+    "# included: 2",
+    "path\tboundary\tbasis",
+    ...paths.map((path) => `${path}\tincluded\tedition-2026`),
+    "test/built-ins/Temporal/x.js\texcluded\tedition-2027:Temporal",
+    "",
+  ].join("\n");
+}
+
+test("rejects a path leaving the inventory without an override path", () => {
+  const withInventory = (paths: readonly string[]) =>
+    createCompatibilitySnapshot(
+      subset(
+        ["test/language/statements/a.js"],
+        new Map([["test/language/statements/a.js", "pass"]]),
+      ),
+      results([["test/language/statements/a.js", "pass"]]),
+      [],
+      [],
+      inventoryText(paths),
+    );
+  const grown = compareCompatibility(
+    withInventory(["test/language/statements/a.js"]),
+    withInventory([
+      "test/annexB/language/comments/a.js",
+      "test/language/statements/a.js",
+    ]),
+  );
+  assert.deepEqual(grown.unoverriddenViolations, []);
+  assert.equal(grown.baseline.inventory, 1);
+  assert.equal(grown.current.inventory, 2);
+  const shrunk = compareCompatibility(
+    withInventory([
+      "test/annexB/language/comments/a.js",
+      "test/language/statements/a.js",
+    ]),
+    withInventory(["test/language/statements/a.js"]),
+  );
+  assert.deepEqual(shrunk.unoverriddenViolations, [
+    {
+      from: "included",
+      invariant: "inventory-path",
+      scope: "test/annexB/language/comments/a.js",
+      to: "absent",
+    },
+  ]);
+  assert.throws(
+    () =>
+      compareCompatibility(
+        withInventory(["test/annexB/language/comments/a.js"]),
+        withInventory([]),
+        `
+overrides:
+  - invariant: inventory-path
+    path: test/annexB/language/comments/a.js
+    transition: { from: included, to: absent }
+    reason: Not allowed.
+`,
+      ),
+    /invalid invariant/u,
+  );
 });
 
 test("rejects removal of an admitted family without an override path", () => {

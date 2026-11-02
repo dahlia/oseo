@@ -29,6 +29,14 @@ Temporal, [*PLAN-INTL.md*](./PLAN-INTL.md) covers ECMA-402, and
 [*PLAN-ASYNCCTX.md*](./PLAN-ASYNCCTX.md) covers compatibility with Node.js
 `AsyncLocalStorage`.
 
+[ADR 0032](./docs/adr/0032-post-m5-edition-boundary.md) moved the measured
+claim to the ECMA-262 17th edition, ECMAScript 2026, plus explicit resource
+management, joint iteration, and `Atomics.pause` from ECMAScript 2027, and
+Annex B except `[[IsHTMLDDA]]`. The applicable inventory now has 43,007
+included paths at the same test262 revision. The
+[*ECMAScript 2026 language profile*](./docs/language-profile-es2026.md)
+records that measurement; the M5 profile and exit report keep the M5 result.
+
 The macOS AArch64 native execution work accepted by
 [ADR 0014](./docs/adr/0014-native-target-support.md) is complete. Linux on AMD64
 and macOS on AArch64 execute the same native semantic corpus, while AArch64
@@ -747,10 +755,12 @@ reports had to be reproducible from documented tasks, and `mise run check`,
 `mise run test`, and the extended property task had to pass from a clean
 checkout.
 
-M5 met these criteria. `mise run check:m5-exit-audit` checks the inventory,
-manifest, exclusion, and deferral conditions above against the checked-in
-evidence, and the [M5 exit report](./docs/m5c-closure/m5-exit-report.md)
-states the result and the gate runs.
+M5 met these criteria. When M5 closed, `mise run check:m5-exit-audit`
+checked the inventory, manifest, exclusion, and deferral conditions above
+against the checked-in evidence, and the
+[M5 exit report](./docs/m5c-closure/m5-exit-report.md) states the result and
+the gate runs. `mise run check:language-claim-audit` now applies the same
+conditions to the inventory of ADR 0032.
 
 
 M6: Minimum common web API

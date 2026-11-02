@@ -6,7 +6,11 @@ Status
 
 Accepted. This record defines how the pinned Test262 corpus is mapped to the
 ECMA-262 16th edition boundary and keeps that denominator separate from
-execution results.
+execution results. [ADR 0032](./0032-post-m5-edition-boundary.md) replaces its
+edition map and Annex B path rules; its inventory artifact, its separation
+from the result manifest, and its rejection rules stay in force. The rule
+below stays frozen in *tests/test262/inventory-policy-m5.yaml*, which derives
+the paths ADR 0032 added so that the M5 inventory remains reproducible.
 
 
 Context

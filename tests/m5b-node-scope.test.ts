@@ -41,6 +41,7 @@ function snapshot(entries: readonly EvidenceEntry[]): CompatibilitySnapshot {
     classifications,
     domains: new Map(),
     expectedClassifications: classifications,
+    inventoryPaths: paths,
     resultPaths: paths,
     subsetPaths: paths,
   };

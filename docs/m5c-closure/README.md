@@ -12,6 +12,14 @@ checks enforce. `mise run check` still validates every record, so the rules
 bind any later change to the reviewed manifest, the inventory, or an owning
 decision record.
 
+[ADR 0032](../adr/0032-post-m5-edition-boundary.md) moved the claim to
+ECMAScript 2026 and grew the inventory to 43,007 included paths. The ledger,
+exclusion audit, and deferral list now account for that inventory, and the
+[ECMAScript 2026 profile](../language-profile-es2026.md) describes the
+measurement. The closed M5b and M5c graphs and the observation batch plan
+stay records of the M5 inventory, as the [M5 inventory view](#m5-inventory-view)
+describes.
+
 
 Closure states
 --------------
@@ -39,16 +47,22 @@ qualifies only when work the maintainer did not approve for M5, or declined,
 is its one remaining closure route. A path that implementation inside M5
 would close stays with remediation.
 
+After ADR 0032, an included path may also be unreviewed with a work-unit
+owner, or unsupported under remediation by a work unit, until the
+*PLAN-LANGUAGE.md* track closes it.
+
 Coverage reports keep the reviewed count, inventory size, classifications,
-authorized-exclusion count, and deferral count separate. A percentage always
-uses the 41,091-path inventory as its denominator.
+authorized-exclusion count, and deferral count separate. A percentage of the
+M5 result uses the 41,091-path M5 inventory as its denominator; a percentage
+of the current claim uses the 43,007-path inventory.
 
 The closure records change none of the edition, optional-section policy,
 inventory policy, reviewed test262 revision, manifest schema, or
-classification vocabulary that
+classification vocabulary. [ADR 0032](../adr/0032-post-m5-edition-boundary.md)
+fixes the edition and inventory rule, and
 [ADR 0013](../adr/0013-m5-edition-and-manifest.md) and
-[ADR 0020](../adr/0020-m5-applicable-test-inventory.md) fix. They do not
-reopen the dynamic source boundary of
+[ADR 0020](../adr/0020-m5-applicable-test-inventory.md) fix the rest. They do
+not reopen the dynamic source boundary of
 [ADR 0016](../adr/0016-dynamic-source-boundary.md); dynamic source stays
 unsupported for M5 only through the authorization rule of
 [ADR 0019](../adr/0019-m5-claim-closure.md). No closure may weaken a gate,
@@ -96,6 +110,10 @@ The owner is the only per-path fact a change edits by hand:
     remediation owner or authorization, and the checker reports it as open;
  -  `node:<id>` names an M5c graph node: the remediation owner of a reviewed
     open path, or the node that will observe an unreviewed path;
+ -  `unit:<id>` names a work unit from the table in
+    [*PLAN-LANGUAGE.md*](../../PLAN-LANGUAGE.md): the unit that admits and
+    observes an unreviewed path, or the remediation owner of a reviewed open
+    path;
  -  `adr:<stem>` names the record *docs/adr/<stem>.md* as the authorization
     of an unsupported path's M5 exclusion; and
  -  `deferred` marks an unsupported path with an ADR 0031 entry in
@@ -116,7 +134,9 @@ Regeneration keeps an owner while its path keeps the same state and resets it
 to the default for the new state otherwise: `observation`, `unassigned`, or
 `node:observation-batch-plan`. A change that leaves a path unsupported for a
 different reason reassigns that path in the same change. A promotion to pass
-or expected negative takes the `observation` owner.
+or expected negative takes the `observation` owner. A change that adds
+inventory paths assigns each one a `unit:` owner, because the language claim
+audit accepts an unreviewed path only with one.
 
 
 Deferral list
@@ -433,16 +453,46 @@ whenever the reviewed manifest moves, so a clean checkout cannot describe one
 manifest while scheduling work from another.
 
 
+M5 inventory view
+-----------------
+
+*tests/test262/inventory-policy-m5.yaml* keeps the ADR 0020 rule that defined
+the M5 inventory. `mise run test262:inventory:update` classifies every
+candidate under that rule and the ADR 0032 rule in one frontmatter read and
+writes *tests/test262/inventory-m5-additions.txt*, the sorted 1,916 paths the
+second rule includes and the first does not. `check:test262-inventory`
+regenerates both files, and it rejects a path that the M5 rule included and
+the current rule excludes.
+
+The M5 inventory is the included set of *inventory.tsv* without the listed
+paths. `check:m5b-graph`, `check:m5c-graph`, and
+`check:m5c-observation-batches` read that view, so the closed graphs and the
+batch plan keep validating against the 41,091 paths they describe. A test
+pins the view to the inventory M5 closed against by its path count and
+digest.
+
+
 Exit audit
 ----------
 
-M5c completed when `m5-exit-audit` landed. `mise run check:m5-exit-audit`
-proves the inventory, manifest, failure, exclusion, and deferral conditions
-against the checked-in evidence, and the exit report lists what it checks and
+M5c completed when `m5-exit-audit` landed in commit
+`0423ae072a847e73a74f8dab4dcf81a2de59b38e`. Its `mise run check:m5-exit-audit`
+proved the inventory, manifest, failure, exclusion, and deferral conditions
+against the checked-in evidence, and the exit report lists what it checked and
 the two conditions outside it. No queue-empty or all-nodes-landed condition
 could substitute for that audit, because the remediation graph could still
-expand after a new observation. `mise run report:m5-coverage` reproduces the
-report's coverage section from checked-in inputs.
+expand after a new observation. That commit reproduces the report's coverage
+section with `mise run report:m5-coverage`; the report keeps the section as
+frozen text.
+
+`mise run check:language-claim-audit` replaced it for the expanded inventory.
+It keeps every consistency condition of the M5 audit and zero failures, and
+it requires an owner for every unsupported path. It accepts a path that is in
+neither the reviewed subset nor the manifest only when the ledger holds it as
+unreviewed with a `unit:` owner, and it counts those paths and the
+remediation-owned ones per owner. With `--require-closed`, which
+`language-exit-audit` uses, both counts must be zero, as in the M5 audit.
+`mise run report:language-coverage` prints the counts.
 
 The report describes Oseo's measured M5 profile. It does not call the result
 unqualified ECMA-262 conformance while ADR 0016 remains accepted or the

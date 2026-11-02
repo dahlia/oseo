@@ -23,7 +23,11 @@ the same change.
 
 Unlike the frozen M3 and M4 profiles, this document changed with every M5
 checkpoint. A group's status describes tested current behavior, never intended
-behavior.
+behavior. [ADR 0032](./adr/0032-post-m5-edition-boundary.md) moved the claim
+after M5; the
+[ECMAScript 2026 language profile](./language-profile-es2026.md) records the
+new boundary and its families, and this profile stays fixed as the record of
+the M5 claim.
 
 The normative family records described below inventory 149 admitted M5
 families and assess every evidence class.

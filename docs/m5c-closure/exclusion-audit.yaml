@@ -2,8 +2,8 @@ version: 1
 suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
 records:
   0013-m5-edition-and-manifest:
-    digest: "de1e9d092ccacbeaeb526e91a51933ffe64417878563696f0f\
-      0c4cf2e6d4242c"
+    digest: "f9e18bc874bacf97297148d80260fc2ff73c2f8d91e5f652c5\
+      32b77653599421"
     authorization:
       - Annex B legacy web semantics are excluded from the
         claim.

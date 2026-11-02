@@ -7,12 +7,13 @@ import type {
 } from "../packages/testkit/src/index.ts";
 
 import {
-  auditM5Exit,
-  renderM5CoverageReport,
-  replaceM5CoverageSection,
-  validateM5ExitReport,
-} from "../tools/m5-exit-audit.ts";
-import type { M5ExitAuditInputs } from "../tools/m5-exit-audit.ts";
+  auditLanguageClaim,
+  renderLanguageCoverageReport,
+} from "../tools/language-claim-audit.ts";
+import type {
+  LanguageClaimAuditInputs,
+  LanguageClaimAuditOptions,
+} from "../tools/language-claim-audit.ts";
 import type {
   M5cLedgerEntry,
   M5cLedgerState,
@@ -23,6 +24,9 @@ const passPath = "test/built-ins/A/pass.js";
 const negativePath = "test/language/B/negative.js";
 const excludedPath = "test/language/C/eval.js";
 const deferredPath = "test/language/D/deferred.js";
+const newPath = "test/annexB/E/new.js";
+const unitOwner = "unit:annexb-syntax";
+const closed: LanguageClaimAuditOptions = { requireClosed: true };
 const dynamicRecord = "0016-dynamic-source-boundary";
 const included = [passPath, negativePath, excludedPath, deferredPath];
 const classifications = new Map<string, Test262Classification>([
@@ -114,7 +118,7 @@ function deferralsText(entry = "remainingContract: The rest.\n"): string {
   ].join("\n");
 }
 
-function valid(): M5ExitAuditInputs {
+function valid(): LanguageClaimAuditInputs {
   return {
     deferralSummary: {
       families: new Map([["run-time-source", 1]]),
@@ -163,7 +167,7 @@ function valid(): M5ExitAuditInputs {
 
 function withLedger(
   change: (entries: M5cLedgerEntry[]) => M5cLedgerEntry[],
-): M5ExitAuditInputs {
+): LanguageClaimAuditInputs {
   const inputs = valid();
   return {
     ...inputs,
@@ -171,20 +175,23 @@ function withLedger(
   };
 }
 
-function withOwner(path: string, owner: string): M5ExitAuditInputs {
+function withOwner(path: string, owner: string): LanguageClaimAuditInputs {
   return withLedger((entries) =>
     entries.map((entry) => (entry.path === path ? { ...entry, owner } : entry)),
   );
 }
 
-function withState(path: string, state: M5cLedgerState): M5ExitAuditInputs {
+function withState(
+  path: string,
+  state: M5cLedgerState,
+): LanguageClaimAuditInputs {
   return withLedger((entries) =>
     entries.map((entry) => (entry.path === path ? { ...entry, state } : entry)),
   );
 }
 
 test("the audit counts every disposition separately", () => {
-  const report = auditM5Exit(valid());
+  const report = auditLanguageClaim(valid());
   assert.equal(report.suiteRevision, revision);
   assert.equal(report.inventoryPaths, 4);
   assert.equal(report.subsetPaths, 4);
@@ -209,7 +216,7 @@ test("the audit counts every disposition separately", () => {
 });
 
 test("the rendered report keeps exclusions and deferrals apart", () => {
-  const rendered = renderM5CoverageReport(auditM5Exit(valid()));
+  const rendered = renderLanguageCoverageReport(auditLanguageClaim(valid()));
   assert.match(rendered, /`abc123`/u);
   assert.match(
     rendered,
@@ -234,7 +241,7 @@ test("the rendered report keeps exclusions and deferrals apart", () => {
 
 test("the audit rejects an input at another revision", () => {
   const inputs = valid();
-  const cases: readonly [string, M5ExitAuditInputs][] = [
+  const cases: readonly [string, LanguageClaimAuditInputs][] = [
     [
       "reviewed manifest",
       { ...inputs, manifest: { ...inputs.manifest, suiteRevision: "def" } },
@@ -261,41 +268,88 @@ test("the audit rejects an input at another revision", () => {
   ];
   for (const [input, changed] of cases) {
     assert.throws(
-      () => auditM5Exit(changed),
+      () => auditLanguageClaim(changed),
       new RegExp(`${input} revision def differs`, "u"),
     );
   }
 });
 
-test("the audit rejects a manifest that omits an included path", () => {
+/** Inputs with one more included path that no subset or manifest covers. */
+function withUnreviewed(owner: string = unitOwner): LanguageClaimAuditInputs {
+  const inputs = valid();
+  const paths = [...included, newPath].toSorted();
+  return {
+    ...inputs,
+    inventoryText: inventoryText(paths),
+    ledger: {
+      ...inputs.ledger,
+      entries: [
+        ...ledgerEntries(),
+        { owner, path: newPath, prerequisites: [], state: "unreviewed" },
+      ],
+    },
+    ledgerSummary: { ...inputs.ledgerSummary, inventoryPaths: 5 },
+  };
+}
+
+test("an open audit counts a unit-owned unreviewed path", () => {
+  const report = auditLanguageClaim(withUnreviewed());
+  assert.equal(report.inventoryPaths, 5);
+  assert.equal(report.subsetPaths, 4);
+  assert.equal(report.unreviewedPaths, 1);
+  assert.deepEqual(report.openOwners, [
+    { owner: unitOwner, remediation: 0, unreviewed: 1 },
+  ]);
+  assert.match(
+    renderLanguageCoverageReport(report),
+    /\| `unit:annexb-syntax` +\| +1 \| +0 \|/u,
+  );
+  assert.throws(
+    () => auditLanguageClaim(withUnreviewed(), closed),
+    /records 1 unreviewed paths/u,
+  );
+});
+
+test("an unreviewed path needs a unit owner and no subset row", () => {
+  assert.throws(
+    () => auditLanguageClaim(withUnreviewed("node:observation-batch-plan")),
+    /unreviewed test\/annexB\/E\/new\.js needs a work-unit owner/u,
+  );
+  const inputs = withUnreviewed();
   assert.throws(
     () =>
-      auditM5Exit({
-        ...valid(),
-        manifest: manifest([passPath, negativePath, excludedPath]),
+      auditLanguageClaim({
+        ...inputs,
+        subset: {
+          ...inputs.subset,
+          tests: [
+            ...inputs.subset.tests,
+            { expectedClassification: "pass" as const, path: newPath },
+          ].toSorted((left, right) => (left.path < right.path ? -1 : 1)),
+        },
       }),
-    /manifest omits 1 paths, first test\/language\/D\/deferred\.js/u,
+    /new\.js to be pass but the manifest records undefined/u,
   );
 });
 
 test("the audit rejects a subset that differs from the inventory", () => {
   const inputs = valid();
   const tests = inputs.subset.tests;
-  const subset = (changed: typeof tests): M5ExitAuditInputs => ({
+  const subset = (changed: typeof tests): LanguageClaimAuditInputs => ({
     ...inputs,
     subset: { ...inputs.subset, tests: changed },
   });
   assert.throws(
-    () => auditM5Exit(subset(tests.slice(1))),
-    /subset omits 1 paths, first test\/built-ins\/A\/pass\.js/u,
+    () => auditLanguageClaim(subset(tests.slice(1))),
+    /subset omits 1 paths, first test\/built-ins\/A\/pass\.js that the/u,
   );
   assert.throws(
-    () => auditM5Exit(subset([...tests, tests[0]!])),
+    () => auditLanguageClaim(subset([...tests, tests[0]!])),
     /subset repeats path test\/built-ins\/A\/pass\.js/u,
   );
   assert.throws(
     () =>
-      auditM5Exit(
+      auditLanguageClaim(
         subset([
           ...tests,
           {
@@ -308,7 +362,7 @@ test("the audit rejects a subset that differs from the inventory", () => {
   );
   assert.throws(
     () =>
-      auditM5Exit(
+      auditLanguageClaim(
         subset([
           { expectedClassification: "semantic-failure", path: passPath },
           ...tests.slice(1),
@@ -320,16 +374,17 @@ test("the audit rejects a subset that differs from the inventory", () => {
 
 test("the audit requires every included path once in the ledger", () => {
   assert.throws(
-    () => auditM5Exit(withLedger((entries) => entries.slice(0, 3))),
+    () => auditLanguageClaim(withLedger((entries) => entries.slice(0, 3))),
     /ledger omits 1 paths, first test\/language\/D\/deferred\.js/u,
   );
   assert.throws(
-    () => auditM5Exit(withLedger((entries) => [...entries, entries[0]!])),
+    () =>
+      auditLanguageClaim(withLedger((entries) => [...entries, entries[0]!])),
     /ledger path is repeated or outside the included inventory/u,
   );
   assert.throws(
     () =>
-      auditM5Exit(
+      auditLanguageClaim(
         withLedger((entries) => [
           ...entries,
           { ...entries[0]!, path: "test/built-ins/Temporal/outside.js" },
@@ -339,37 +394,50 @@ test("the audit requires every included path once in the ledger", () => {
   );
 });
 
-test("the audit rejects failures and unreviewed paths", () => {
+test("the audit rejects failures in either mode", () => {
   for (const state of [
     "harness-failure",
     "infrastructure-failure",
     "semantic-failure",
-    "unreviewed",
   ] as const) {
-    assert.throws(
-      () => auditM5Exit(withState(passPath, state)),
-      new RegExp(`records 1 ${state} paths`, "u"),
-    );
+    for (const options of [undefined, closed]) {
+      assert.throws(
+        () => auditLanguageClaim(withState(passPath, state), options),
+        new RegExp(`records 1 ${state} paths`, "u"),
+      );
+    }
   }
 });
 
 test("the audit rejects a closed path with another owner", () => {
   assert.throws(
-    () => auditM5Exit(withOwner(passPath, "deferred")),
+    () => auditLanguageClaim(withOwner(passPath, "deferred")),
     /pass\.js is pass but owned by deferred/u,
   );
 });
 
-test("the audit rejects remediation-owned and unowned paths", () => {
+test("only a closed audit rejects remediation; both reject no owner", () => {
+  for (const owner of [unitOwner, "node:dynamic-source-coverage-remediation"]) {
+    const inputs = withOwner(excludedPath, owner);
+    const report = auditLanguageClaim({
+      ...inputs,
+      exclusionSummary: {
+        ...inputs.exclusionSummary,
+        exclusions: 0,
+        remediation: 1,
+      },
+    });
+    assert.equal(report.remediationPaths, 1);
+    assert.deepEqual(report.openOwners, [
+      { owner, remediation: 1, unreviewed: 0 },
+    ]);
+    assert.throws(
+      () => auditLanguageClaim(inputs, closed),
+      /remediation still owns 1 paths, first test\/language\/C\/eval\.js/u,
+    );
+  }
   assert.throws(
-    () =>
-      auditM5Exit(
-        withOwner(excludedPath, "node:dynamic-source-coverage-remediation"),
-      ),
-    /remediation still owns 1 paths, first test\/language\/C\/eval\.js/u,
-  );
-  assert.throws(
-    () => auditM5Exit(withOwner(excludedPath, "unassigned")),
+    () => auditLanguageClaim(withOwner(excludedPath, "unassigned")),
     /no owner covers 1 paths, first test\/language\/C\/eval\.js/u,
   );
 });
@@ -377,23 +445,28 @@ test("the audit rejects remediation-owned and unowned paths", () => {
 test("every excluding record needs an audit and a reopening trigger", () => {
   assert.throws(
     () =>
-      auditM5Exit(withOwner(excludedPath, "adr:0028-legacy-caller-boundary")),
+      auditLanguageClaim(
+        withOwner(excludedPath, "adr:0028-legacy-caller-boundary"),
+      ),
     /0028-legacy-caller-boundary excludes 1 paths but the exclusion audit/u,
   );
   for (const reopening of ["[]", '[" "]', '"Not a list."']) {
     assert.throws(
       () =>
-        auditM5Exit({ ...valid(), exclusionAuditText: auditText(reopening) }),
+        auditLanguageClaim({
+          ...valid(),
+          exclusionAuditText: auditText(reopening),
+        }),
       /record 0016-dynamic-source-boundary states no reopening trigger/u,
     );
   }
   assert.throws(
-    () => auditM5Exit({ ...valid(), records: new Map() }),
+    () => auditLanguageClaim({ ...valid(), records: new Map() }),
     /record 0016-dynamic-source-boundary has no text/u,
   );
   assert.throws(
     () =>
-      auditM5Exit({
+      auditLanguageClaim({
         ...valid(),
         records: new Map([[dynamicRecord, "Dynamic source\n==============\n"]]),
       }),
@@ -404,30 +477,44 @@ test("every excluding record needs an audit and a reopening trigger", () => {
 test("the exclusion audit counts must agree with the ledger", () => {
   const inputs = valid();
   for (const change of [
-    { remediation: 1 },
     { missingDynamicTags: 1 },
     { exclusions: 2 },
     { deferrals: 0 },
   ]) {
     assert.throws(
       () =>
-        auditM5Exit({
+        auditLanguageClaim({
           ...inputs,
           exclusionSummary: { ...inputs.exclusionSummary, ...change },
         }),
       /the exclusion audit counts/u,
     );
   }
+  assert.throws(
+    () =>
+      auditLanguageClaim(
+        {
+          ...inputs,
+          exclusionSummary: { ...inputs.exclusionSummary, remediation: 1 },
+        },
+        closed,
+      ),
+    /the exclusion audit counts/u,
+  );
 });
 
 test("every deferral needs its remaining contract and target", () => {
   assert.throws(
-    () => auditM5Exit({ ...valid(), deferralsText: deferralsText("x: y\n") }),
+    () =>
+      auditLanguageClaim({
+        ...valid(),
+        deferralsText: deferralsText("x: y\n"),
+      }),
     /deferred\.js remainingContract must be a nonempty string/u,
   );
   assert.throws(
     () =>
-      auditM5Exit({
+      auditLanguageClaim({
         ...valid(),
         deferralsText: deferralsText("remainingContract: The rest.\n").replace(
           "targetMilestone: PLAN-DYN.md",
@@ -440,7 +527,7 @@ test("every deferral needs its remaining contract and target", () => {
 
 test("the deferral counts must agree with the ledger", () => {
   const inputs = valid();
-  const cases: readonly M5ExitAuditInputs[] = [
+  const cases: readonly LanguageClaimAuditInputs[] = [
     { ...inputs, deferralSummary: { ...inputs.deferralSummary, paths: 2 } },
     {
       ...inputs,
@@ -472,7 +559,7 @@ test("the deferral counts must agree with the ledger", () => {
   ];
   for (const changed of cases) {
     assert.throws(
-      () => auditM5Exit(changed),
+      () => auditLanguageClaim(changed),
       /the deferral list names \d+ paths but the ledger defers 1/u,
     );
   }
@@ -482,46 +569,10 @@ test("the ledger summary must match its entries", () => {
   const inputs = valid();
   assert.throws(
     () =>
-      auditM5Exit({
+      auditLanguageClaim({
         ...inputs,
         ledgerSummary: { ...inputs.ledgerSummary, closedPaths: 3 },
       }),
     /ledger summary differs from its entries/u,
   );
-});
-
-test("the report document must hold the regenerated section", () => {
-  const rendered = renderM5CoverageReport(auditM5Exit(valid()));
-  const start =
-    "<!-- Generated by `mise run report:m5-coverage:update`; do not edit. -->";
-  const end = "<!-- End of generated coverage. -->";
-  const empty = `Report\n\n${start}\n\n${end}\n\nAfter.\n`;
-  const current = replaceM5CoverageSection(empty, rendered);
-  assert.equal(
-    current,
-    `Report\n\n${start}\n\n${rendered}\n\n${end}\n\nAfter.\n`,
-  );
-  validateM5ExitReport(current, rendered);
-  assert.throws(
-    () => validateM5ExitReport(empty, rendered),
-    /coverage section is stale/u,
-  );
-  assert.throws(
-    () =>
-      validateM5ExitReport(
-        current.replace(/(expected negative +\| +)2 \|/u, "$13 |"),
-        rendered,
-      ),
-    /coverage section is stale/u,
-  );
-  for (const broken of [
-    "Report\n",
-    `${end}\n${start}\n`,
-    `${current}${start}\n${end}\n`,
-  ]) {
-    assert.throws(
-      () => validateM5ExitReport(broken, rendered),
-      /needs exactly one generated coverage section/u,
-    );
-  }
 });

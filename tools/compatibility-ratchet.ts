@@ -26,6 +26,8 @@ const repositoryRoot = resolve(fileURLToPath(import.meta.url), "../..");
 /** The reviewed test262 path set and its expected classifications. */
 export const reviewedSubsetPath = "tests/test262/subset.yaml";
 const resultsPath = "tests/test262/results.yaml";
+/** The applicable-test inventory whose included paths never shrink. */
+export const inventoryPath = "tests/test262/inventory.tsv";
 /** The reviewed exceptions to monotonic compatibility measurement. */
 export const compatibilityRatchetOverridesPath =
   "tests/compatibility-ratchet-overrides.yaml";
@@ -47,6 +49,7 @@ export type CompatibilityClassification =
 
 export type RatchetInvariant =
   | "admitted-family"
+  | "inventory-path"
   | "manifest-path-set"
   | "pass-classification"
   | "pass-count"
@@ -89,12 +92,15 @@ export interface CompatibilitySnapshot extends ReviewedEvidenceSnapshot {
   readonly admittedFamilies: ReadonlySet<string>;
   readonly classifications: ReadonlyMap<string, CompatibilityClassification>;
   readonly domains: ReadonlyMap<string, GeneratedDomain>;
+  /** Included inventory paths; empty when the tree has no inventory. */
+  readonly inventoryPaths: ReadonlySet<string>;
   readonly resultPaths: ReadonlySet<string>;
 }
 
 export interface RatchetCounts {
   readonly admittedFamilies: number;
   readonly distinctPropertySeeds: number;
+  readonly inventory: number;
   readonly pass: number;
   readonly propertyCaseBudget: number;
   readonly propertyDomains: number;
@@ -113,7 +119,7 @@ export interface RatchetOverride {
   readonly from: number | string;
   readonly invariant: Exclude<
     RatchetInvariant,
-    "admitted-family" | "manifest-path-set"
+    "admitted-family" | "inventory-path" | "manifest-path-set"
   >;
   readonly reason: string;
   readonly scope: string;
@@ -758,12 +764,25 @@ export function validatePropertySeedRegistry(
   };
 }
 
+/** Read the included paths of an inventory, or none when it is absent. */
+export function includedInventoryPaths(
+  inventoryText: string | undefined,
+): ReadonlySet<string> {
+  const paths = new Set<string>();
+  for (const line of inventoryText?.split("\n") ?? []) {
+    const [path, boundary] = line.split("\t");
+    if (path != null && boundary === "included") paths.add(path);
+  }
+  return paths;
+}
+
 function createCompatibilitySnapshotFromSource(
   subsetText: string,
   resultManifest: ResultManifestSource,
   propertySources: readonly PropertySource[],
   allowLegacyGitBaseline: boolean,
   admittedFamilies: readonly string[],
+  inventoryText: string | undefined,
 ): CompatibilitySnapshot {
   const subset = createReviewedEvidenceSnapshot(subsetText);
   const classifications = parseResults(resultManifest, allowLegacyGitBaseline);
@@ -771,6 +790,7 @@ function createCompatibilitySnapshotFromSource(
     admittedFamilies: new Set(admittedFamilies),
     classifications,
     domains: parseGeneratedDomains(propertySources),
+    inventoryPaths: includedInventoryPaths(inventoryText),
     expectedClassifications: subset.expectedClassifications,
     resultPaths: new Set(classifications.keys()),
     subsetPaths: subset.subsetPaths,
@@ -782,6 +802,7 @@ export function createCompatibilitySnapshot(
   resultManifest: ResultManifestSource,
   propertySources: readonly PropertySource[],
   admittedFamilies: readonly string[] = [],
+  inventoryText?: string,
 ): CompatibilitySnapshot {
   return createCompatibilitySnapshotFromSource(
     subsetText,
@@ -789,6 +810,7 @@ export function createCompatibilitySnapshot(
     propertySources,
     false,
     admittedFamilies,
+    inventoryText,
   );
 }
 
@@ -798,6 +820,7 @@ export function createGitCompatibilitySnapshot(
   resultManifest: ResultManifestSource,
   propertySources: readonly PropertySource[],
   admittedFamilies: readonly string[] = [],
+  inventoryText?: string,
 ): CompatibilitySnapshot {
   return createCompatibilitySnapshotFromSource(
     subsetText,
@@ -805,6 +828,7 @@ export function createGitCompatibilitySnapshot(
     propertySources,
     true,
     admittedFamilies,
+    inventoryText,
   );
 }
 
@@ -818,6 +842,7 @@ function counts(snapshot: CompatibilitySnapshot): RatchetCounts {
   return {
     admittedFamilies: snapshot.admittedFamilies.size,
     distinctPropertySeeds: seeds.size,
+    inventory: snapshot.inventoryPaths.size,
     pass: [...snapshot.classifications.values()].filter(
       (value) => value === "pass",
     ).length,
@@ -849,6 +874,16 @@ function detectViolations(
         from: present,
         invariant: "admitted-family",
         scope: family,
+        to: absent,
+      });
+    }
+  }
+  for (const path of baseline.inventoryPaths) {
+    if (!current.inventoryPaths.has(path)) {
+      violations.push({
+        from: "included",
+        invariant: "inventory-path",
+        scope: path,
         to: absent,
       });
     }
@@ -1243,6 +1278,7 @@ function compatibilitySnapshotAtCommit(commit: string): CompatibilitySnapshot {
     },
     baselinePropertySources(commit),
     admittedFamilies,
+    optionalGitText(commit, inventoryPath),
   );
 }
 
@@ -1323,6 +1359,7 @@ function createCurrentCompatibilitySnapshot(
     },
     propertySources,
     currentEvidenceFamilyIds(),
+    readFileSync(join(repositoryRoot, inventoryPath), "utf8"),
   );
 }
 
@@ -1348,7 +1385,7 @@ export function selectCurrentBaselineIntent(
 function formatCounts(label: string, value: RatchetCounts): string {
   return (
     `${label} families=${value.admittedFamilies} pass=${value.pass} ` +
-    `subset=${value.subset} ` +
+    `inventory=${value.inventory} subset=${value.subset} ` +
     `results=${value.results} property-domains=${value.propertyDomains} ` +
     `property-seeds=${value.distinctPropertySeeds} ` +
     `property-case-budget=${value.propertyCaseBudget}`

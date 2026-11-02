@@ -7,6 +7,12 @@ Status
 Accepted. This record freezes the first M5 checkpoint: the candidate ECMA-262
 edition, the optional-section policy, and the compatibility manifest schema that
 measures every later M5 change.
+[ADR 0032](./0032-post-m5-edition-boundary.md) supersedes its candidate-edition
+and optional-section sections for the post-M5 claim; its manifest schema,
+classification values, and dependency-tag vocabulary rule stay in force. The
+11 Annex B paths this record owns keep it as their owner until the
+[*PLAN-LANGUAGE.md*](../../PLAN-LANGUAGE.md) units that implement their Annex
+B behavior move them.
 
 
 Context
