@@ -121,6 +121,12 @@ root shortcut, and defines a statically generated Optique command registry for
 every distribution channel. It reserves no milestone and changes no language
 semantics or compatibility counts.
 
+A package track is recorded in [*PLAN-PKG.md*](./PLAN-PKG.md). It resolves
+packages that npm, pnpm, or Yarn installed into *node\_modules* through
+*package.json* `exports` and `imports` into the closed module graph, before
+M7 adds Node.js APIs or CommonJS. It reserves no milestone and changes no
+language semantics; its results are per-package scenario records.
+
 
 Working rules
 -------------
@@ -143,8 +149,8 @@ Milestone work follows these rules:
  -  Performance measurements record generated code and allocation behavior
     before broad benchmark scores.
  -  Compatibility findings are classified as language, runtime API, module
-    resolution, package convention, native dependency, or external system
-    behavior.
+    resolution, package format or convention, native dependency, or external
+    system behavior.
 
 
 Milestone map
@@ -159,7 +165,7 @@ Milestone map
 | M4        | Modules, promises, asynchronous execution, and a native event loop |
 | M5        | Broad, measured ECMAScript compatibility                           |
 | M6        | Minimum common web API coverage and eventual WinterTC conformance  |
-| M7        | Selected Node.js APIs and practical package compatibility          |
+| M7        | Selected Node.js APIs, CommonJS, and the Node.js-dependent corpus  |
 | M8        | A self-hosting Oseo compiler                                       |
 
 
@@ -288,6 +294,33 @@ or the compiler's dependency direction. The command registry remains
 statically visible to Node.js, Deno, JSR publication, and the standalone CLI
 pipeline; feature-specific commands enter only after their owning plans supply
 the required semantics.
+
+
+Package track
+-------------
+
+Many npm packages that a server program uses are published as ECMAScript
+modules that depend on nothing outside the language and a few web globals.
+[*PLAN-PKG.md*](./PLAN-PKG.md) makes those packages importable
+by bare specifier from an installed *node\_modules* tree: it resolves
+*package.json* `exports` and `imports` with the `oseo` and `import`
+conditions, follows the static graph into dependencies, identifies modules
+by real path so pnpm layouts work, and attaches package provenance and a
+resolution trace to every failure. CommonJS, `node:*` modules, `Buffer`,
+`process`, and native addons stay in M7; the track detects and classifies
+them and runs nothing of them.
+
+This track is planned and its implementation has not started. Its corpus
+order comes from the audit in
+[*docs/evidence/package-audit/README.md*](./docs/evidence/package-audit/README.md):
+dependency-free parsers and routers first, then Hono's routers and helpers,
+then an in-memory Hono request once M6 supplies `Request`, `Response`, and
+`Headers` without network transport. A later unit lets a package offer
+TypeScript source through an `oseo` export condition.
+
+Installing packages remains the job of npm, pnpm, and Yarn. A native
+`oseo add` and `oseo remove` that install from npm and JSR into a project
+is a long-term idea and not part of any plan.
 
 
 Release and distribution track
@@ -752,7 +785,10 @@ runtime execution decision consumed by the WebAssembly API group.
 
 The order may change when standards tests expose shared prerequisites. Each API
 group gets a conformance matrix linking interfaces to specifications and the
-applicable web-platform tests.
+applicable web-platform tests. The in-memory `Headers`, `Request`, and
+`Response` objects may land before `fetch()` as a sub-checkpoint recorded in
+[*PLAN-M6.md*](./PLAN-M6.md), because the first Hono scenario of the package
+track needs them and no transport.
 
 ### Exit criteria
 
@@ -765,8 +801,8 @@ applicable web-platform tests.
     conformant. Earlier releases report partial API coverage.
 
 
-M7: Node.js and package compatibility
--------------------------------------
+M7: Node.js compatibility
+-------------------------
 
 M7 adds the parts of the Node.js ecosystem that measured package experiments
 show to be useful for Oseo's server-oriented audience. It does not add Node-API
@@ -774,7 +810,10 @@ native addons. File and subprocess I/O reuse the adapter and target capability
 model established under [*PLAN-NIO.md*](./PLAN-NIO.md). The selected
 `node:crypto` surface reuses the provider boundary under
 [*PLAN-CRYPTO.md*](./PLAN-CRYPTO.md) while retaining a separate compatibility
-manifest from the M6 Web Crypto claim.
+manifest from the M6 Web Crypto claim. [*PLAN-PKG.md*](./PLAN-PKG.md) owns
+*package.json* `exports` and `imports` resolution and the pure-ESM package
+corpus; M7 owns the corpus of packages that require Node.js APIs or
+CommonJS.
 
 ### Initial candidates
 
@@ -783,9 +822,8 @@ manifest from the M6 Web Crypto claim.
  -  `node:crypto` operations not already served by Web Crypto;
  -  `Buffer`;
  -  a bounded `process` global;
- -  *package.json* `exports` and `imports` resolution;
- -  npm package graph discovery;
- -  CommonJS loading and ECMAScript-module interoperation.
+ -  CommonJS loading and ECMAScript-module interoperation over the package
+    track's resolver.
 
 The exact surface is chosen from compatibility data. Oseo should not copy a
 Node.js API merely because it is easy to stub; incomplete APIs often make
@@ -795,7 +833,9 @@ package failures harder to diagnose.
 
  -  Every supported Node.js API has a documented compatibility surface and tests
     derived from public behavior.
- -  A curated package corpus builds and runs through reproducible scenarios.
+ -  A curated package corpus that depends on Node.js APIs or CommonJS builds
+    and runs through reproducible scenarios recorded the way the package
+    track records them.
  -  Failures caused by native addons are reported distinctly from resolution or
     API failures.
  -  The project publishes package-level results with exact versions and test
@@ -858,17 +898,28 @@ Continuous compatibility laboratory
 Real-package experiments should not wait until M7. A small compatibility
 laboratory runs alongside the engine roadmap. Early results
 are expected to fail. Their purpose is to replace guesses with a ranked blocker
-list.
+list. The laboratory serves every track that touches packages; the package
+track in [*PLAN-PKG.md*](./PLAN-PKG.md) is its first consumer, and
+*tools/package-audit.ts* selects candidates by inspecting published artifacts
+before any scenario runs.
 
 Each scenario records:
 
- -  package and version;
+ -  package and version, the install tool and its version, and the lockfile
+    digest of the install step;
  -  source entry point and expected behavior;
+ -  the active export conditions, the selected condition path, and the
+    package instances reached with their real paths;
+ -  the importer chain to the first failure;
  -  first unsupported language feature;
  -  missing web or Node.js API;
  -  module-resolution or package-format problem;
  -  native dependency, if any;
- -  result after each relevant milestone.
+ -  the execution target; and
+ -  result after each relevant milestone or checkpoint.
+
+Regions beyond the first failure are not counted as passing or as further
+confirmed blockers.
 
 The corpus should start with small dependency-free libraries, then add
 web-standard packages, framework kernels, and finally representative
@@ -1339,6 +1390,11 @@ The roadmap should be revised when evidence changes one of these assumptions:
     deployment cost even for programs that never use it.
     [*PLAN-DYN.md*](./PLAN-DYN.md) requires explicit capability derivation and
     compiler-absence evidence before such support enters the runtime.
+ -  A package resolver that selects a different file than Node.js would, or
+    merges two package instances into one, runs a different program without
+    failing. [*PLAN-PKG.md*](./PLAN-PKG.md) freezes condition order, package
+    scope, real-path identity, and instance separation in its opening
+    decision and records a resolution trace for every build.
 
 Changes to milestone order should update this document and name the new
 evidence. They should not silently relax the generic-fallback or hint-safety

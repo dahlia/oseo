@@ -46,7 +46,7 @@ For each candidate the tool:
     absent;
  -  classifies each file as ESM or CommonJS by extension and otherwise by
     the `type` field of the nearest enclosing *package.json*, so a nested
-    manifest such as yaml's *browser/package.json* counts;
+    manifest such as *browser/package.json* in `yaml` counts;
  -  parses every reached ESM file with `@babel/parser` and follows its
     static `import` and `export … from` specifiers transitively, including
     into dependencies and `#` imports, requiring an exact file for relative
@@ -129,7 +129,8 @@ History
 The first version of this audit was produced on 2026-11-02 during a survey of
 early package targets. The checked-in tool corrects three defects of that
 version: it reads the module format from the nearest *package.json* rather
-than the package root, which had classified yaml's ESM build as CommonJS; it
+than the package root, which had classified the ESM build of `yaml` as
+CommonJS; it
 detects `Function` constructor aliases and `(function).constructor`, which
 had let zod and eta pass as free of dynamic source; and it selects export
 conditions in manifest key order rather than in a fixed preference order.

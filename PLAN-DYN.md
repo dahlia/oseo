@@ -174,9 +174,11 @@ does not imply hotness profiling, speculative recompilation, on-stack
 replacement, or deoptimization. This plan also does not introduce a stable
 embedding API, plugin ABI, or Node-API compatibility.
 
-Source acquisition is separate from compilation. M6 owns web transport and
-M7 owns selected file, package, and module-resolution behavior. Admitting
-dynamic import does not silently grant filesystem or network access.
+Source acquisition is separate from compilation. M6 owns web transport,
+[*PLAN-PKG.md*](./PLAN-PKG.md) owns build-time package and module resolution
+over an installed tree, and M7 owns selected file behavior and CommonJS
+loading. Admitting dynamic import does not silently grant filesystem or
+network access.
 
 Runtime WebAssembly bytes are not ECMAScript source. Their execution strategy,
 feature matrix, and JavaScript API belong to
@@ -194,11 +196,11 @@ records the global-object and dynamic global-binding decision. It retains the
 current rejection until a feature-specific architecture decision satisfies
 the entry criteria below.
 
-M6 and M7 may supply host loaders and resolution policies for modules. A
-closed dynamic module set can be admitted without waiting for either milestone
-when its entire graph is build input. A loader that reads new source or
-artifacts uses only host capabilities already present in its selected runtime
-profile.
+[*PLAN-PKG.md*](./PLAN-PKG.md), M6, and M7 may supply host loaders and
+resolution policies for modules. A closed dynamic module set can be admitted
+without waiting for any of them when its entire graph is build input. A loader
+that reads new source or artifacts uses only host capabilities already present
+in its selected runtime profile.
 
 The static WebAssembly checkpoint is another closed-graph consumer, but it is
 not dynamic import. M6's WebAssembly API later accepts runtime bytes and follows
@@ -574,7 +576,8 @@ Delivery order
 8.  Admit direct `eval` only after lexical materialization, declaration,
     strictness, private-environment, and localized-optimization rules pass.
 9.  Consider unrestricted source-loading dynamic import after the applicable
-    M6 or M7 loader policy and every source-compilation criterion are complete.
+    [*PLAN-PKG.md*](./PLAN-PKG.md), M6, or M7 loader policy and every
+    source-compilation criterion are complete.
 
 Item 3 is scheduled under [*PLAN-LANGUAGE.md*](./PLAN-LANGUAGE.md), with the
 static-specifier import design as its specification. The other items stay

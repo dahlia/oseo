@@ -121,7 +121,13 @@ shared prerequisite; changing it updates this plan in the same change.
     name-resolution backends on Linux AMD64 and macOS AArch64, including the
     cancellation, buffer-lifetime, and fallback decisions under
     [*PLAN-NIO.md*](./PLAN-NIO.md); and the accepted TLS client and trust-store
-    decision described below.
+    decision described below. The in-memory objects form a sub-checkpoint
+    that may land first: `Headers`, `Request`, and `Response` constructed
+    and read by the program, with string and byte bodies, need groups 1
+    and 4 and no transport, and stream-backed bodies join when group 5
+    lands. The first Hono scenario of [*PLAN-PKG.md*](./PLAN-PKG.md)
+    consumes that sub-checkpoint. It does not complete group 6; `fetch()`
+    and the network, name-resolution, and TLS prerequisites do.
 7.  Web Crypto. `crypto.getRandomValues()`, `crypto.randomUUID()`, and
     `SubtleCrypto`. Prerequisites: binary data and a reviewed cryptography
     dependency decision. [*PLAN-CRYPTO.md*](./PLAN-CRYPTO.md) owns the frozen
@@ -156,9 +162,10 @@ integration to standardize timer edge behavior and add `AbortSignal.timeout()`
 and `performance.now()`; it does not first activate elapsed waiting.
 
 Groups 4 and 5 can implement their data and queuing semantics before a real
-network backend exists. Before group 6 begins, both supported execution targets
-need accepted and implemented socket and name-resolution capabilities with
-cancellation, buffer ownership, wakeup, and liveness behavior.
+network backend exists, and so can the in-memory HTTP objects of group 6.
+Before `fetch()` begins, both supported execution targets need accepted and
+implemented socket and name-resolution capabilities with cancellation, buffer
+ownership, wakeup, and liveness behavior.
 
 Sandboxed tests keep using the deterministic adapter and injected endpoints
 rather than public network access. The M6-owned HTTPS security decision below is
@@ -304,19 +311,22 @@ It does not depend on the earlier M6 API groups and does not complete group 8.
     default trust-store discovery, deterministic loopback HTTPS evidence, and
     AArch64 Linux compile-link evidence.
 7.  Accept the TLS client and trust-store decision from that target evidence.
-8.  Implement group 6 with deterministic transport and TLS completion
-    injection.
-9.  Freeze the Web Crypto edition, algorithm matrix, key formats, and
+8.  Implement the in-memory `Headers`, `Request`, and `Response`
+    sub-checkpoint of group 6. It may precede items 5 through 7 once the
+    groups it uses are in place.
+9.  Implement `fetch()` with deterministic transport and TLS completion
+    injection, completing group 6.
+10. Freeze the Web Crypto edition, algorithm matrix, key formats, and
     server-runtime deviations in the separate cryptography standards decision.
     Then complete the provider probes, accept the provider decision, build the
     validated target packs, and implement group 7 through
     [*PLAN-CRYPTO.md*](./PLAN-CRYPTO.md).
-10. Freeze the WebAssembly API matrix, resolve the runtime execution decision,
+11. Freeze the WebAssembly API matrix, resolve the runtime execution decision,
     and implement group 8 through [*PLAN-WASM.md*](./PLAN-WASM.md), reusing the
     static checkpoint where its semantics and artifacts match.
-11. Complete group 9, the deviation documentation, and the integration
+12. Complete group 9, the deviation documentation, and the integration
     audit.
-12. Publish the reproducible conformance evidence and, only when every
+13. Publish the reproducible conformance evidence and, only when every
     criterion below holds, the WinterTC conformance statement.
 
 Each checkpoint updates the standards manifest, the affected profile and

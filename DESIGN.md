@@ -724,8 +724,9 @@ language profile. Replaying earlier submissions is not a valid substitute
 because it would repeat visible effects and lose object identity.
 
 Package resolution is separate from module semantics. Early milestones use
-explicit files or URLs. *package.json* `exports` and `imports`, CommonJS, and
-the long tail of Node.js resolution belong to later compatibility work.
+explicit files or URLs. Resolving *package.json* `exports` and `imports` over
+an installed *node\_modules* tree belongs to [*PLAN-PKG.md*](./PLAN-PKG.md);
+CommonJS and the long tail of Node.js resolution belong to M7.
 
 
 Host boundary and event loop

@@ -252,6 +252,13 @@ this command graph without changing the `run` and `build` contracts.
 choices. The `build` command publishes output from the selected backend but
 does not select a new backend or make backend behavior part of command parsing.
 
+[*PLAN-PKG.md*](./PLAN-PKG.md) owns package resolution, its export
+conditions, and the package provenance that resolution diagnostics carry.
+This plan owns how the command line exposes them: an option that adds export
+conditions to the resolver's active set, which rejects `types`, and the
+printing of every graph diagnostic described below. Neither lands before the
+resolver unit that needs it.
+
 [*docs/cli.md*](./docs/cli.md) remains a guide to implemented behavior. It
 changes only when the corresponding command, tests, and packaging checks land.
 
@@ -276,6 +283,14 @@ reports an unreadable source instead of an unknown-command suggestion. This is
 the deliberate cost of preserving `oseo SOURCE`. The common *.js* and *.ts*
 paths remain visually distinct from command names. The explicit `run` form is
 available whenever intent needs to be stated.
+
+The implemented command prints only the first graph diagnostic. A package
+failure usually produces several related diagnostics, and the package
+provenance that [*PLAN-PKG.md*](./PLAN-PKG.md) attaches makes each one useful
+on its own. `run` and `build` therefore print every graph diagnostic in
+discovery order, each with its provenance notes, once that provenance exists.
+The first line of each diagnostic keeps its current rendering so existing
+tests and tooling still match it.
 
 Successful help, version, and completion requests exit with status `0`.
 Command-line parse errors and Oseo diagnostics exit with status `1`. A program
@@ -327,7 +342,10 @@ Delivery order
 5.  Split temporary execution from retained artifact publication. Move
     `--dump-mir` and `--emit-c` under `build`, and enforce the distinct target
     policies.
-6.  Update *docs/cli.md*, package documentation, examples, generation checks,
+6.  Print every graph diagnostic with its provenance notes and add the export
+    condition option, each in the change that lands the resolver unit of
+    [*PLAN-PKG.md*](./PLAN-PKG.md) it serves.
+7.  Update *docs/cli.md*, package documentation, examples, generation checks,
     and clean-package smoke tests in the implementation change that makes the
     new syntax available.
 
