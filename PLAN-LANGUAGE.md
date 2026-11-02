@@ -114,12 +114,14 @@ Claim boundary
 --------------
 
 The paths for this work lie outside the M5 inventory, so no unit can admit
-them until the boundary moves. Proposed
+them until the boundary moves. Accepted
 [ADR 0032](./docs/adr/0032-post-m5-edition-boundary.md) moves it. It measures
 ECMAScript 2026 plus explicit resource management, joint iteration, and
 `Atomics.pause`, includes Annex B except `[[IsHTMLDDA]]`, and keeps Temporal,
 ECMA-402, and proposals outside. ADR 0016 stays in force. The test262 revision
-does not change.
+stays pinned at `f2d1435644797268dca1f7988cad5a4e89ccd8d2` through
+`language-exit-audit`; tests added upstream since then are not part of this
+claim.
 
 At the pinned revision, the rule in ADR 0032 adds 1,916 included paths:
 
@@ -142,9 +144,8 @@ decide each row.
 The `caller` work and literal `import()` change rows already inside the
 inventory, so neither waits for ADR 0032.
 
-The track also needs three further records:
+The track also needs two further records:
 
- -  ADR 0032 itself, accepted before the `claim-boundary` unit lands;
  -  the ADR 0016 amendment proposed in the
     [static-specifier import design](./docs/static-specifier-import-design.md),
     accepted before `import-requests` starts admitting syntax; and
@@ -186,6 +187,10 @@ The successor to ADR 0028 fixes this contract. V8, as observed in Node.js
     whose value is read at access time. Clause 17.1's restrictions stay
     intact: built-in, strict, arrow, method, class, generator, and async
     functions get no own `caller`.
+ -  The same functions also get V8's own `arguments` property with the same
+    attributes. While the function is active, it reads as an arguments object
+    for the most recent activation; otherwise it is `null`. Oseo adds both
+    properties together so that own keys match the reference hosts.
  -  While the function is active, the value is the function whose code made the
     most recent call to it, which may be a non-strict async or generator
     function. Otherwise it is `null`.
@@ -328,8 +333,10 @@ ledger, and moves the 11 ADR 0013 Annex B rows to `annexb-syntax`,
 `annexb-object-accessors`, and `annexb-dynamic-source-accounting`. It freezes
 the generated section of the M5 exit report, as ADR 0032 decides, and points
 the exit audit, the compatibility ratchet, and the evidence-lane check at the
-expanded inventory. It decides where the new family records live: the M5
-profile index or a successor profile.
+expanded inventory. It starts the successor
+ECMAScript 2026 language profile, *docs/language-profile-es2026.md*, with its
+own family index for every new family; the M5 profile stays fixed as the record
+of the M5 claim.
 
 Done when the regenerated inventory has 43,007 included paths or the unit
 explains each difference, the reviewed subset and manifest cover all of them,
@@ -379,12 +386,13 @@ to ADR 0016 through reviewed exclusion audit rows. The 18 passes and the fixed
 fixtures are the replacement evidence for their `caller` subject.
 *PLAN-DYN.md* records them as residue.
 
-Own `caller` properties change the own keys of every non-strict function, so
-the unit re-observes the manifest and reviews every row that reflects on a
-function's properties. Fixed fixtures cover each bullet of the contract. A
-property suite generates call graphs mixing strict and non-strict functions,
-`call`, `apply`, `bind`, built-in callbacks, tail calls, recursion, and throws,
-and compares each `caller` read with an independent activation model.
+Own `caller` and `arguments` properties change the own keys of every non-strict
+function, so the unit re-observes the manifest and reviews every row that
+reflects on a function's properties. Fixed fixtures cover each bullet of the
+contract. A property suite generates call graphs mixing strict and non-strict
+functions, `call`, `apply`, `bind`, built-in callbacks, tail calls, recursion,
+and throws, and compares each `caller` read with an independent activation
+model.
 
 ### `annexb-syntax`
 
@@ -617,7 +625,8 @@ standards update and heavy gates on the new base.
     row's owner moves. The audit binds ADR texts by digest, so a unit that
     edits ADR 0013, 0016, or 0028 re-reviews the rows that cite it.
  -  The runtime ABI version in *packages/runtime-c/src/index.ts*, currently
-    `m5-147`, changes once per landing that alters the ABI.
+    `m5-147`, changes once per landing that alters the ABI. The series keeps
+    its `m5-` prefix, and the closure tools keep their `m5c` names.
  -  Runtime code ranges, property blocks, intrinsic indexes, and heap kinds
     are reserved per unit.
  -  The well-known symbol table changes only in `disposal-intrinsics`.
@@ -651,21 +660,3 @@ The plan is complete when:
     table above has fixed, differential, and standards evidence; and
  -  `mise run check`, `mise run test`, and `mise run test:property:extended`
     pass from a clean checkout.
-
-
-Open questions
---------------
-
- -  Should `legacy-caller` also add V8's own `arguments` property on
-    non-strict functions? The maintainer approved only `caller`, but V8
-    installs both, and own-key observations will differ from the reference
-    hosts if Oseo adds one without the other.
- -  Should the new families extend the M5 profile and its index, or start a
-    successor profile document? `claim-boundary` needs the answer.
- -  Should the closure tools keep their `m5c` names after they cover the
-    expanded inventory?
- -  Should a later change re-pin test262 before `language-exit-audit`, so the
-    claim covers tests added upstream for these features since July 2026?
-    ADR 0032 keeps the pin; a re-pin re-reviews every affected row.
- -  The runtime ABI string still carries the `m5` prefix. Should post-M5
-    landings start a new series?

@@ -4,13 +4,13 @@ ADR 0032: Post-M5 edition and optional-section boundary
 Status
 ------
 
-Proposed, 2026-11-02, for the `claim-boundary` unit of
-[*PLAN-LANGUAGE.md*](../../PLAN-LANGUAGE.md). Until it is accepted,
-[ADR 0013](./0013-m5-edition-and-manifest.md) and
-[ADR 0020](./0020-m5-applicable-test-inventory.md) stay in force unchanged and
-the inventory keeps its 41,091 included paths.
+Accepted by the maintainer on 2026-11-03, for the `claim-boundary` unit of
+[*PLAN-LANGUAGE.md*](../../PLAN-LANGUAGE.md). Until that unit lands its
+regenerated inventory, [ADR 0013](./0013-m5-edition-and-manifest.md) and
+[ADR 0020](./0020-m5-applicable-test-inventory.md) govern the checked-in
+inventory, which keeps its 41,091 included paths.
 
-When accepted, this record supersedes ADR 0013's candidate-edition and
+This record supersedes ADR 0013's candidate-edition and
 optional-section sections and replaces ADR 0020's edition map and Annex B path
 rules. ADR 0013's manifest schema, classification values, and dependency-tag
 vocabulary rule stay in force. So do ADR 0020's inventory artifact, its
