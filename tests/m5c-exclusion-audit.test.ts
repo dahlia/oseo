@@ -1523,13 +1523,17 @@ test("the legacy lookup closure selector bounds ADR 0013 exclusion", () => {
   );
 });
 
-test("the checked-in legacy lookup closure names two class expressions", () => {
+test("the checked-in legacy lookup closure names two class pairs", () => {
   assert.deepEqual(
     [...m5cAnnexLookupClosedPaths],
     [
       "test/language/expressions/class/elements/" +
         "private-getter-is-not-a-own-property.js",
       "test/language/expressions/class/elements/" +
+        "private-setter-is-not-a-own-property.js",
+      "test/language/statements/class/elements/" +
+        "private-getter-is-not-a-own-property.js",
+      "test/language/statements/class/elements/" +
         "private-setter-is-not-a-own-property.js",
     ],
   );

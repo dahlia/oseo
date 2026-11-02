@@ -809,8 +809,8 @@ Remaining work
 --------------
 
 No included path is unreviewed, and the ledger records no semantic, harness,
-or infrastructure failure. What remains is closing the last remediation
-owner and running the exit audit:
+or infrastructure failure. What remains is landing the last closure node and
+running the exit audit:
 
  -  `dynamic-source-coverage-remediation` has landed with no path left.
     Four child nodes gave its last 136 paths one outcome each: 88 close
@@ -819,11 +819,10 @@ owner and running the exit audit:
     umbrella's
     [work note](./docs/m5c-graph/dynamic-source-coverage-remediation.md)
     links each child.
- -  `node:class-private-accessor-lookup-coverage-remediation` still owns
-    the two class declaration paths that call `__lookupGetter__` or
-    `__lookupSetter__`. The 2026-11-01 maintainer decision moved only the
-    two class expression paths to ADR 0013; how to close the declaration pair
-    awaits a separate maintainer decision.
+ -  `class-declaration-private-accessor-closure` closes the two class
+    declaration paths that call `__lookupGetter__` or `__lookupSetter__`
+    under ADR 0013, on the conditions of the 2026-11-02 maintainer
+    decision. After it lands, no path keeps a remediation owner.
  -  Before the audit uses the deferral list, Root mails the maintainer the
     complete *docs/m5c-closure/deferrals.yaml* as [Gates](#gates) describes.
  -  `m5-exit-audit` lands last. It proves the conditions under
@@ -1012,6 +1011,15 @@ exclusion. The private accessor subjects remain mixed coverage debt, and ADR
 The 2026-11-01 maintainer decision closes exactly these two paths under ADR
 0013 on reviewed replacement evidence; see
 [the work note](docs/m5c-graph/class-private-accessor-lookup-coverage-remediation.md).
+
+Observation batch 22b admits the two class declaration paths of the same
+shape under *test/language/statements/class/elements/* with the same
+remediation owner. The 2026-11-02 maintainer decision closes exactly these
+two under ADR 0013 on the same conditions, through node
+`class-declaration-private-accessor-closure` and its class declaration
+replacement fixtures; see
+[its work note](docs/m5c-graph/class-declaration-private-accessor-closure.md).
+No path keeps the remediation owner.
 
 ### Incidental Annex B prototype write dependency
 

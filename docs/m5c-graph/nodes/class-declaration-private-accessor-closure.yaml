@@ -1,0 +1,19 @@
+version: 1
+id: class-declaration-private-accessor-closure
+title: Close the class declaration private accessor lookup paths
+delivers: "Closes exactly two class declaration paths under the ADR 0013
+  annex-b-only boundary, as the 2026-11-02 maintainer decision allows:
+  test/language/statements/class/elements/\
+  private-getter-is-not-a-own-property.js and
+  test/language/statements/class/elements/\
+  private-setter-is-not-a-own-property.js. Each keeps its source, actual
+  OSEO1001 legacy lookup observation, and digests. A new exclusion audit
+  record names class declaration replacement fixtures that witness every
+  private accessor subject, and the ledger moves both paths to
+  adr:0013-m5-edition-and-manifest. Do not count either path as a pass,
+  close any other path, implement Annex B, or widen ADR 0013. The closing
+  commit lands through CI that includes macOS."
+dependencies:
+  - class-private-accessor-lookup-coverage-remediation
+landed: true
+status: ready
