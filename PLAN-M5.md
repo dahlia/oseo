@@ -34,7 +34,9 @@ M5a and M5b are complete. The 149 indexed records in the normative
 [*M5 language profile*](./docs/language-profile-m5.md) are the source of truth
 for admitted families and their evidence assessments. M5c is the remaining
 checkpoint and follows [*PLAN-M5C.md*](./PLAN-M5C.md) and its checked-in work
-graph.
+graph. The mechanical conditions of its exit audit hold; the
+[M5 exit report](./docs/m5c-closure/m5-exit-report.md) gives the coverage
+counts, and the audit's landing gates remain.
 
 The M5c entry snapshot recorded 18,343 passes across 21,383 paths, 165 property
 domains, 165 seeds, and an ordinary case budget of 5,905. The checked-in
@@ -7959,6 +7961,10 @@ M5 is complete only when:
     documented tasks; and
  -  `mise run check`, `mise run test`, and the extended property task pass from
     a clean checkout.
+
+`mise run check:m5-exit-audit` proves the inventory, manifest, failure,
+exclusion, and deferral conditions against the checked-in evidence, and the
+[M5 exit report](./docs/m5c-closure/m5-exit-report.md) records the result.
 
 
 Static import attributes and JSON modules
