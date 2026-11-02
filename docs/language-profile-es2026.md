@@ -81,7 +81,9 @@ when its behavior lands, and the full manifest update observes them.
 requires zero semantic, harness, and infrastructure failures and an owner for
 every unsupported path, and it counts the open unreviewed and remediation
 paths of each unit. `language-exit-audit` runs it with `--require-closed`,
-which also requires both counts to be zero. `mise run report:language-coverage`
+which also requires both counts to be zero and rejects a path that still has
+the ADR 0013 owner, because ADR 0032 withdrew that record's Annex B
+authorization. `mise run report:language-coverage`
 prints the counts. The M5 denominator and this one stay separate: a percentage
 of this claim uses the 43,007 included paths.
 

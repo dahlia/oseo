@@ -43,6 +43,12 @@ const exclusionAuditPath = "docs/m5c-closure/exclusion-audit.yaml";
 const recordDirectory = "docs/adr";
 const recordOwnerPrefix = "adr:";
 const nodeOwnerPrefix = "node:";
+/**
+ * ADR 0032 withdrew this record's Annex B authorization. Its rows keep the
+ * owner only until their work units implement the behavior, so a closed
+ * claim may not rest on it.
+ */
+const withdrawnAnnexBOwner = "adr:0013-m5-edition-and-manifest";
 const failureStates: readonly M5cLedgerState[] = [
   "harness-failure",
   "infrastructure-failure",
@@ -345,6 +351,16 @@ export function auditLanguageClaim(
           ),
         ) +
         " that the ledger does not hold as unreviewed.",
+    );
+  }
+  const withdrawn = inputs.ledger.entries
+    .filter((entry) => entry.owner === withdrawnAnnexBOwner)
+    .map((entry) => entry.path);
+  if (options.requireClosed && withdrawn.length > 0) {
+    throw new Error(
+      `claim audit: ${withdrawnAnnexBOwner} still owns ` +
+        `${describePaths(withdrawn)}, but ADR 0032 withdrew its Annex B ` +
+        "authorization.",
     );
   }
   if (options.requireClosed && remediation.length > 0) {

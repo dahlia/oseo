@@ -491,7 +491,9 @@ it requires an owner for every unsupported path. It accepts a path that is in
 neither the reviewed subset nor the manifest only when the ledger holds it as
 unreviewed with a `unit:` owner, and it counts those paths and the
 remediation-owned ones per owner. With `--require-closed`, which
-`language-exit-audit` uses, both counts must be zero, as in the M5 audit.
+`language-exit-audit` uses, both counts must be zero, as in the M5 audit, and
+no path may keep the ADR 0013 owner, whose Annex B authorization ADR 0032
+withdrew.
 `mise run report:language-coverage` prints the counts.
 
 The report describes Oseo's measured M5 profile. It does not call the result
