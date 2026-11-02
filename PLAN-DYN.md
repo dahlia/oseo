@@ -4,11 +4,11 @@ Dynamic source and staged compilation plan
 Status
 ------
 
-Implementation status: planned, deferred. This plan defines the
-cross-milestone capability and packaging boundaries for dynamic import, late
-native artifacts, `eval`, and the `Function` constructor family. It does not
-reserve a numbered milestone, add a repository command, or admit any dynamic
-source form to the active M5 language profile.
+Implementation status: planned, deferred. This plan defines the cross-milestone
+capability and packaging boundaries for dynamic import, late native artifacts,
+`eval`, and the `Function` constructor family. It does not reserve a numbered
+milestone, add a repository command, or admit any dynamic source form to the
+active M5 language profile.
 
 [ADR 0016](./docs/adr/0016-dynamic-source-boundary.md) remains the current
 decision: M5 rejects `eval`, the `Function` constructor family, and dynamic
@@ -24,18 +24,18 @@ This plan is governed by [*WHITEPAPER.md*](./WHITEPAPER.md),
 accepted records under *docs/adr/*. Evidence that changes one of those
 contracts updates the affected document in the same change.
 
-The M5c [build-time-resolvable proposal]
-bounds a first string-literal subset and its implementation and evidence
-gates. It proposes an ADR 0016 amendment for maintainer acceptance; the
-accepted rejection remains in force.
+The M5c [build-time-resolvable proposal] bounds a first string-literal subset
+and its implementation and evidence gates. It proposes an ADR 0016 amendment
+for maintainer acceptance. The accepted rejection remains in force.
 
-The reviewed [static-specifier import design] is this plan's post-M5 plan
-for that subset. The maintainer deferred its implementation past M5. It adds
-a runtime module evaluation driver shared with static imports, Script
+The reviewed [static-specifier import design] is this plan's post-M5 plan for
+that subset. The maintainer deferred its implementation past M5. The design
+adds a runtime module evaluation driver shared with static imports, Script
 referrers, and five implementation units, and maps 20 pinned test262 rows.
+
 M5 defers those rows by name under
 [ADR 0031](./docs/adr/0031-m5-named-deferral.md), with this plan as their
-target. Its ADR 0016 amendment stays Proposed inside the design, and the
+target. Inside the design, the ADR 0016 amendment stays Proposed, and the
 accepted rejection still applies.
 
 [build-time-resolvable proposal]: ./docs/dynamic-import-staged-plan.md
@@ -45,12 +45,12 @@ accepted rejection still applies.
 Goal
 ----
 
-Oseo should keep a closed ahead-of-time binary as its smallest deployment
-unit. A program that needs only source known during its build carries the
-compiled generic and specialized code, runtime semantics, and host
-capabilities reachable from that program. It does not carry a source parser,
-compiler, native code generator, or incremental loader merely because another
-Oseo program might use them.
+Oseo should keep a closed ahead-of-time binary as its smallest deployment unit.
+A program that needs only source known during its build carries the compiled
+generic and specialized code, runtime semantics, and host capabilities
+reachable from that program. It does not carry a source parser, compiler,
+native code generator, or incremental loader merely because another Oseo
+program might use them.
 
 Programs that need a bounded dynamic module set, late native artifacts, or
 runtime source compilation add only the capability closure required by that
@@ -59,29 +59,29 @@ specialization, and uses no hidden interpreter, profiling tier, or
 deoptimization mechanism.
 
 The build records why each runtime component entered the result. It must be
-possible to prove both sides of the boundary: a compiler-enabled artifact has
-the compiler, loader, and lifetime support it needs, while a closed artifact
-contains no dormant route that can compile source at run time.
+possible to prove both sides of the boundary. A compiler-enabled artifact has
+the compiler, loader, and lifetime support it needs. A closed artifact contains
+no dormant route that can compile source at run time.
 
 
 Lineage and adaptation
 ----------------------
 
 SBCL and Chez Scheme show that dynamic evaluation does not require interpreted
-execution. [SBCL's executable-delivery documentation]
-states that a saved executable can retain the compiler and call `compile` or
-`load`. [Chez Scheme's implementation overview]
-states that source is compiled to machine code by default, that its compiler is
-included in the runtime by default, and that dynamically compiled code is
+execution. [SBCL's executable-delivery documentation] states that a saved
+executable can retain the compiler and call `compile` or `load`.
+[Chez Scheme's implementation overview] states that source is compiled to
+machine code by default. The overview also states that Chez's compiler is
+included in the runtime by default and that dynamically compiled code is
 garbage-collected. Chez also offers whole-program compilation for a program and
 the libraries it invokes.
 
 Those systems are evidence, not deployment templates. Oseo does not inherit
 their image, boot-file, language-environment, or artifact model. It adopts the
 narrower principles that dynamic source may still produce native code and that
-compiler availability is a deployment choice. The capability classes below
-make that choice explicit instead of treating the full development system as
-the minimum runtime.
+compiler availability is a deployment choice. The capability classes below make
+that choice explicit instead of treating the full development system as the
+minimum runtime.
 
 [SBCL's executable-delivery documentation]: https://sbcl.org/manual/index.html
 [Chez Scheme's implementation overview]: https://cisco.github.io/ChezScheme/
@@ -103,10 +103,10 @@ This remains Oseo's default deployment model. A language or host feature may
 still need generic runtime helpers, reflection, promises, or I/O; those costs
 do not imply dynamic source compilation.
 
-A statically imported *.wasm* module under
-[*PLAN-WASM.md*](./PLAN-WASM.md) remains closed source in this classification.
-Its build-side AOT compiler does not enter the produced executable, even though
-the executable retains WebAssembly instance state and wrappers.
+A statically imported *.wasm* module under [*PLAN-WASM.md*](./PLAN-WASM.md)
+remains closed source in this classification. Its build-side AOT compiler does
+not enter the produced executable, even though the executable retains
+WebAssembly instance state and wrappers.
 
 ### Closed dynamic module set
 
@@ -238,7 +238,7 @@ application profile may omit a feature only when that omission is part of its
 documented language and host contract.
 
 Each native result retains a machine-readable capability manifest. Its schema
-is decided before implementation, but it must be able to identify:
+is decided before implementation. The manifest must be able to identify:
 
  -  the language and host profiles;
  -  the canonical module-set digest and whether that set is closed;
@@ -250,10 +250,11 @@ is decided before implementation, but it must be able to identify:
 
 The initial runtime archive remains valid input while this work is deferred.
 Its component translation units are ownership boundaries, not yet a promise of
-minimum feature-level linking. Capability-aware packaging needs a measured
-baseline and must report component cycles that make a small program pull in an
-otherwise unrelated family. It must not depend on undocumented static-linker
-dead stripping.
+minimum feature-level linking.
+
+Capability-aware packaging needs a measured baseline and must report component
+cycles that make a small program pull in an otherwise unrelated family. It
+must not depend on undocumented static-linker dead stripping.
 
 
 Dynamic import contract
@@ -304,10 +305,11 @@ completion values, and host permission to compile strings.
 
 Direct `eval` is the last and widest unit. It can observe the caller's lexical,
 variable, private, and strictness state and can introduce declarations under
-edition-specific rules. Oseo cannot recover that state by deoptimizing a frame
-that discarded it. Before a function containing direct eval is compiled, its
-owned IR must choose an environment representation that remains valid if the
-call executes.
+edition-specific rules.
+
+Oseo cannot recover that state by deoptimizing a frame that discarded it.
+Before a function containing direct eval is compiled, its owned IR must choose
+an environment representation that remains valid if the call executes.
 
 The direct-eval decision must show how this cost stays local. A function that
 cannot perform direct eval should keep ordinary closed-world binding and
@@ -327,9 +329,10 @@ running process while parsing or compiling.
 The initial C11 backend does not settle the runtime compiler shape. Candidate
 probes may generate C and invoke an external toolchain, emit a loadable object
 through a future backend, or use another inspectable artifact boundary. No
-candidate becomes the deployment contract before measuring toolchain
-presence, temporary storage, startup latency, executable size, sandbox
-restrictions, and failure cleanup.
+candidate becomes the deployment contract before measuring toolchain presence,
+temporary storage, startup latency, executable size, sandbox restrictions, and
+failure cleanup.
+
 [*PLAN-BACKEND.md*](./PLAN-BACKEND.md) owns any conclusion about Oseo's general
 code-generation path. This plan owns whether a candidate artifact and compiler
 service satisfy dynamic-source capability, validation, and lifetime needs.
@@ -361,9 +364,11 @@ namespace still reaches the earlier artifact.
 
 The collector must trace artifact ownership through ordinary managed values or
 an explicit companion table. Raw instruction pointers are not treated as heap
-objects. Unloading begins only after no live value, native frame, pending job,
-diagnostic, or source record can reach the artifact, and target-specific
-instruction-cache or loader requirements have completed.
+objects.
+
+Unloading begins only after no live value, native frame, pending job,
+diagnostic, or source record can reach the artifact. Target-specific
+instruction-cache or loader requirements must also have completed.
 
 [*PLAN-GC.md*](./PLAN-GC.md) owns the tracing and accounting behavior used by
 that companion table. A moving collector may update managed owners, but it does
@@ -378,7 +383,7 @@ cannot leave a dangling stack or source reference.
 The late-artifact contract should be shared with
 [*PLAN-REPL.md*](./PLAN-REPL.md) where possible. A divergence must name the
 semantic reason, such as REPL redefinition state versus direct-eval lexical
-capture, rather than creating a second loader accidentally.
+capture, rather than accidentally creating a second loader.
 
 
 Target and security boundary
@@ -443,8 +448,8 @@ Probe plan
 ----------
 
 Probe work may begin before a dynamic feature is admitted. Every probe is
-internal, target-explicit, and named as planned rather than documented as an
-available repository command.
+internal and target-explicit. Its name identifies it as planned; the probe is
+not documented as an available repository command.
 
 The first probes measure:
 
@@ -527,24 +532,26 @@ Delivery order
 9.  Consider unrestricted source-loading dynamic import after the applicable
     M6 or M7 loader policy and every source-compilation criterion are complete.
 
-Every checkpoint updates the applicable decision, language profile,
+At each checkpoint, update the applicable decision, language profile,
 compatibility manifest, runtime ownership record, target evidence, and this
-plan. A probe that shows unacceptable size, latency, sandbox, or lifetime cost
-may keep a capability unsupported without weakening the closed-AOT path.
+plan.
+
+If a probe shows unacceptable size, latency, sandbox, or lifetime cost, a
+capability may remain unsupported. This does not weaken the closed-AOT path.
 
 
 Documentation changes
 ---------------------
 
-The first capability implementation documents commands only after they exist.
-It updates [*DESIGN.md*](./DESIGN.md) with the accepted requirement, artifact,
-and lifetime contracts and updates [*ROADMAP.md*](./ROADMAP.md) with the
+For the first capability implementation, document commands only after they
+exist. Update [*DESIGN.md*](./DESIGN.md) with the accepted requirement,
+artifact, and lifetime contracts, and [*ROADMAP.md*](./ROADMAP.md) with the
 current track status.
 
-Each admitted semantic unit updates the applicable language profile, test262
+For each admitted semantic unit, update the applicable language profile, test262
 manifest, ADR 0016, package documentation, and target capability evidence.
 Compiler-enabled distribution documentation states which artifacts contain the
-compiler and how a closed build proves that it does not.
+compiler and how a closed build proves that it contains no compiler.
 
 
 Exit criteria
@@ -563,10 +570,10 @@ complete when:
  -  late artifacts validate target, ABI, identities, metadata, and capability
     requirements before atomic publication;
  -  loaded code and metadata remain alive through every reachable closure,
-    frame, job, continuation, exception, module, and diagnostic, then reclaim
-    safely;
- -  a compiler-enabled profile carries its parser, compiler, loader, and
-    lifetime support without adding them to closed builds;
+    frame, job, continuation, exception, module, and diagnostic, then are
+    reclaimed safely;
+ -  a compiler-enabled profile includes its parser, compiler, loader, and
+    lifetime support, and closed builds do not include them;
  -  each admitted `Function` or eval unit implements its exact realm,
     strictness, environment, declaration, completion, and error behavior;
  -  targets that deny runtime code generation retain closed-AOT support and

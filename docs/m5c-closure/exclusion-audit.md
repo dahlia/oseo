@@ -14,17 +14,20 @@ Dynamic import in observation batches 30 through 32
 
 The maintainer decision of 2026-10-07 (option C, interim A) leaves dynamic
 import unsupported and ADR 0016 unchanged. The accounting node adds no new
-paths or semantic evidence. Its runner uses an explicit observe-only set
-containing just `dynamic-import`, without adding it to the checked-in supported
-feature list. Cases whose only unadmitted features are in that set reach
-observation; any other unadmitted feature still blocks them. Their
-classifications follow the actual observation, including pass for a feature tag
-unused by the source. The full manifest update re-observes already-reviewed
-paths. The fixed inventory has 630 paths with `dynamic-import` in frontmatter
-`features`, of which 629 were unreviewed at cohort verification. The batches
-observe their current behavior rather than infer it from this feature: another
-earlier rejection, a parse negative, or a feature that the source does not use
-must retain its actual observation.
+paths or semantic evidence.
+
+Its runner uses an explicit observe-only set containing just `dynamic-import`,
+without adding it to the checked-in supported feature list. Cases whose only
+unadmitted features are in that set reach observation; any other unadmitted
+feature still blocks them. Case classifications follow the actual observation,
+including pass for a feature tag unused by the source. The batches observe their
+current behavior rather than infer it from this feature. Another earlier
+rejection, a parse negative, or a feature that the source does not use must
+retain its actual observation.
+
+The full manifest update re-observes already-reviewed paths. The fixed inventory
+has 630 paths with `dynamic-import` in frontmatter `features`, of which 629 were
+unreviewed at cohort verification.
 
 The accepted dynamic import rejection is exactly:
 
@@ -53,8 +56,8 @@ ownership:
     exclusion covers only source evaluation. Record
     `priorCohort: source-subject`,
     `proposedOwner: adr:0016-dynamic-source-boundary`, and an assessment with
-    `disposition: exclusion` and `normativeDependency: source-evaluation-only`;
-    only then use that ADR ledger owner.
+    `disposition: exclusion` and `normativeDependency: source-evaluation-only`.
+    Only then use that ADR ledger owner.
  -  When `import()` is incidental scaffolding, or assertions leave another
     normative subject unresolved, use the ledger owner
     `node:dynamic-source-coverage-remediation`. Module evaluation order,
@@ -75,8 +78,8 @@ review. Keep the accepted ADR authorization and reopening evidence current. ADR
 Add the existing ADR 0013 `dynamic-source` dependency tag to reviewed subset
 entries alongside other prerequisites. Set `missingDynamicTag` to false when
 the observation's reviewed dependencies include it and true when they do not.
-The checker rejects a debt flag that disagrees with the reviewed dependencies;
-debt neither authorizes exclusion nor changes the observed classification.
+The checker rejects a debt flag that disagrees with the reviewed dependencies.
+Debt neither authorizes exclusion nor changes the observed classification.
 
 The separate `dynamic-import-staged-plan` node plans ADR 0016 alternative 3 for
 build-time-resolvable imports. Until a maintainer accepts a later decision, it
@@ -88,46 +91,49 @@ Incidental Annex B TypedArray prototype lookup
 
 The classification node owns exactly
 *test/built-ins/TypedArrayConstructors/ctors/no-species.js*. Its final
-prototype assertion reads the excluded Annex B accessor; the required
+prototype assertion reads the excluded Annex B accessor. The required
 TypedArray clone behavior does not depend normatively on that accessor.
+
 The exact owned rejection is:
 
 ~~~~ text
 error[OSEO1001]: The Object.prototype.__proto__ accessor is excluded by Annex B.
 ~~~~
 
-A different diagnostic code, accessor name, or message is outside this
-bounded addition. Ordinary properties named `__proto__`, null prototype
-objects, and proxy traps are not Annex B accessors.
+A different diagnostic code, accessor name, or message is outside this bounded
+addition. Ordinary properties named `__proto__`, null prototype objects, and
+proxy traps are not Annex B accessors.
 
 The mixed assessment originally named
 `remediationOwner: node:typed-array-proto-coverage-remediation` with
-`disposition: remediation` and `normativeDependency: not-demonstrated`,
-because ADR 0013 authorizes the accessor rejection, not exclusion of the
-whole path. The RegExp split assessment separately named its existing
-remediation owner. The `annex-b-ordinary-object-prototype` assessment
-originally named `node:ordinary-object-proto-coverage-remediation` for
+`disposition: remediation` and `normativeDependency: not-demonstrated`, because
+ADR 0013 authorizes the accessor rejection, not exclusion of the whole path.
+The RegExp split assessment separately named its existing remediation owner.
+The `annex-b-ordinary-object-prototype` assessment originally named
+`node:ordinary-object-proto-coverage-remediation` for
 *test/language/types/object/S8.6.2\_A8.js* with the same disposition and
-normative dependency. The checker accepts only these three bounded Annex B
-owners and requires each reviewed assessment to match its ledger owner. The
-closure section below supersedes those remediation dispositions.
+normative dependency.
+
+The checker accepts only these three bounded Annex B owners and requires each
+reviewed assessment to match its ledger owner. The closure section below
+supersedes those remediation dispositions.
 
 The new assessment binds the replacement source digest in
-`replacementEvidence`. The `typed-array-buffer-without-species-core` fixture
-in *../../tests/native/fixtures/typed-array-constructors.ts* preserves the
+`replacementEvidence`. The `typed-array-buffer-without-species-core` fixture in
+*../../tests/native/fixtures/typed-array-constructors.ts* preserves the
 original subclass, throwing constructor and species getter, TypedArray clone,
 and fresh-buffer prototype and constructor assertions. It observes the
-prototype through `Object.getPrototypeOf` instead of the excluded accessor
-and retains the original upstream path unchanged. Existing constructor
-properties supply generated constructor, clone, and buffer coverage.
-Replacement evidence supports the core contract; assigning an exclusion still
-requires the remediation node's maintainer accounting decision.
+prototype through `Object.getPrototypeOf` instead of the excluded accessor and
+retains the original upstream path unchanged. Existing constructor properties
+supply generated constructor, clone, and buffer coverage. Replacement evidence
+supports the core contract; assigning an exclusion still requires the
+remediation node's maintainer accounting decision.
 
 The ordinary-object assessment binds the
 `annex-b-core-ordinary-object-set-prototype` fixture, which witnesses every
 core subject of *S8.6.2\_A8.js*. The 2026-10-31 maintainer decision extends
-item 3 of the 2026-10-28 decision to this path and no other, so the
-assessment closes it under ADR 0013 with `disposition: exclusion` and
+item 3 of the 2026-10-28 decision to this path and no other, so the assessment
+closes it under ADR 0013 with `disposition: exclusion` and
 `normativeDependency: annex-b-only`. ADR 0013 itself is unchanged.
 
 
@@ -135,52 +141,50 @@ Dynamic import attributes and JSON identity
 -------------------------------------------
 
 The separately approved reservation in
-*../m5c-graph/import-attributes-dynamic-coverage.md* contains exactly 64
-pinned paths whose actual observation rejects `ImportExpression` before
-option evaluation, enumeration, abrupt completion, promises, or JSON
-identity assertions execute. The
-`import-attributes-dynamic-coverage-remediation` node first held them as
-remediation; Git history keeps that assessment. The reservation never widened
-the original 178-path `dynamic-source-coverage-remediation` cohort. Observation
-batches 11, 12, 13, and 05 later added 19, 23, 30, and 5 paths to that owner,
-whose current contract is 255 paths.
+*../m5c-graph/import-attributes-dynamic-coverage.md* contains exactly 64 pinned
+paths. The actual observation for each path rejects `ImportExpression` before
+option evaluation, enumeration, abrupt completion, promises, or JSON identity
+assertions execute. The `import-attributes-dynamic-coverage-remediation` node
+first held them as remediation; Git history keeps that assessment. The
+reservation never widened the original 178-path
+`dynamic-source-coverage-remediation` cohort. Observation batches 11, 12, 13,
+and 05 later added 19, 23, 30, and 5 paths to that owner, whose current
+contract is 255 paths.
 
-The maintainer accounting decision of 2026-10-22 accounts for the 64 paths
-under ADR 0016 instead. Their ledger owner is
-`adr:0016-dynamic-source-boundary`. Each row keeps its original normative
-subject, source digest, and observation digest, and uses one of three
-assessments with `disposition: exclusion` and
-`normativeDependency: source-evaluation-only`:
+The maintainer accounting decision of 2026-10-22 instead accounts for the 64
+paths under ADR 0016. Their ledger owner is `adr:0016-dynamic-source-boundary`.
+Each row keeps its original normative subject, source digest, and observation
+digest. Each row uses one of three assessments with `disposition: exclusion`
+and `normativeDependency: source-evaluation-only`:
 
  -  `import-call-attributes` covers the 60 ImportCall subjects with a
-    string-literal specifier: grammar parameter forwarding, options
-    evaluation and abrupt completions, the `with` lookup and enumeration,
-    rejection of invalid options, promise settlement, and trailing-comma
-    calls.
+    string-literal specifier. Coverage includes grammar parameter forwarding,
+    options evaluation and abrupt completions, the `with` lookup and
+    enumeration, rejection of invalid options, promise settlement, and
+    trailing-comma calls.
  -  `import-call-attributes-computed-specifier` covers
     *2nd-param-evaluation-sequence.js*, *2nd-param-trailing-comma-reject.js*,
-    and *trailing-comma-reject.js*, whose specifiers are computed at run
-    time. They stay outside even the build-time literal subset of
+    and *trailing-comma-reject.js*, whose specifiers are computed at run time.
+    They stay outside even the build-time literal subset of
     *../dynamic-import-staged-plan.md*.
  -  `json-module-dynamic-site-identity` covers *json-idempotency.js*. Its
-    static default imports and indirect static import do not depend on
-    dynamic import. The assessment binds the static JSON identity fixtures
-    and properties as `replacementEvidence` and excludes only the `import()`
-    site.
+    static default imports and indirect static import do not depend on dynamic
+    import. The assessment binds the static JSON identity fixtures and
+    properties as `replacementEvidence` and excludes only the `import()` site.
 
-The audit requires that bounded exclusion for every unsupported reserved
-path, with the upstream `import-attributes` feature and the exact accepted
+The audit requires that bounded exclusion for every unsupported reserved path,
+with the upstream `import-attributes` feature and the exact accepted
 `ImportExpression` rejection. It rejects a reserved row with any other
-disposition, owner, or diagnostic, and it rejects any row or ledger entry
-that still names `node:import-attributes-dynamic-coverage-remediation`. A
-reserved path that later passes or becomes an expected negative takes the
-observation owner and keeps its historical row. The check validates any
-assessment's `replacementEvidence` digests, not only the TypedArray owner's.
+disposition, owner, or diagnostic. It rejects any row or ledger entry that
+still names `node:import-attributes-dynamic-coverage-remediation`. A reserved
+path that later passes or becomes an expected negative takes the observation
+owner and keeps its historical row. The check validates any assessment's
+`replacementEvidence` digests, not only the TypedArray owner's.
 
 The exclusion reopens when an accepted ADR 0016 amendment admits any form of
-dynamic import, including the literal subset; a still unsupported path then
-needs a fresh assessment against the amended record. The decision approves
-no dynamic import implementation and no change to the staged proposal.
+dynamic import, including the literal subset. A still unsupported path then
+needs a fresh assessment against the amended record. The decision approves no
+dynamic import implementation and no change to the staged proposal.
 
 
 Incidental legacy accessor lookups
@@ -199,11 +203,11 @@ error[OSEO1001]: The Object.prototype.__lookupSetter__ method is excluded
 by the M5 optional legacy accessor policy.
 ~~~~
 
-The checker accepts either one only at the end of the process stderr, only
-when the reviewed source contains a call of the named method in call syntax
-(a direct, optional, or string-literal computed member call, as for `eval`),
-and only with the ADR 0013 proposed owner. Outside the closure selector below,
-the row also needs
+The checker accepts either one only at the end of the process stderr. It
+accepts it only when the reviewed source contains a call of the named method
+in call syntax (a direct, optional, or string-literal computed member call, as
+for `eval`), and only with the ADR 0013 proposed owner. Outside the closure
+selector below, the row also needs
 `remediationOwner: node:class-private-accessor-lookup-coverage-remediation`
 and `disposition: remediation`. That owner accepts no other rejection. A
 different code, method name, wording, or stdout text is outside the surface.
@@ -216,22 +220,23 @@ Observation batch 11 observed the class expression paths
 rejections. The `class-private-getter-public-absence` and
 `class-private-setter-public-absence` fixtures in
 *../../tests/native/fixtures/classes.ts* keep every assertion of those sources
-except the lookup call, and
+except the lookup call.
 *../../tests/class-private-accessor-coverage-native.test.ts* runs them natively
 under both specialization policies with collection at every safepoint. The
 2026-11-01 maintainer decision applies item 3 of the 2026-10-28 decision to
 these two paths and to no other. Their rows use the
-`annex-b-legacy-lookup-class-expression` assessment, which binds both evidence
+`annex-b-legacy-lookup-class-expression` assessment. It binds both evidence
 files and closes the paths as ADR 0013 exclusions with
 `normativeDependency: annex-b-only` and the `adr:0013-m5-edition-and-manifest`
 ledger owner. The checker admits such an exclusion over a lookup rejection only
 for the exact two-path selector `m5cAnnexLookupClosedPaths` in
-*../../tools/m5c-exclusion-audit.ts*, only with bound replacement evidence and
-no remediation owner, and requires both rows. ADR 0013 itself is unchanged.
+*../../tools/m5c-exclusion-audit.ts*. It admits that exclusion only with bound
+replacement evidence and no remediation owner, and it requires both rows. ADR
+0013 itself is unchanged.
 
-Observation batch 22b adds the class declaration paths of the same shape
-under *test/language/statements/class/elements/*. They keep the
-`annex-b-legacy-lookup` assessment and the remediation owner above; their
+Observation batch 22b adds the class declaration paths of the same shape under
+*test/language/statements/class/elements/*. They keep the
+`annex-b-legacy-lookup` assessment and the remediation owner above. Their
 private getter and setter assertions are not excluded.
 
 
@@ -239,12 +244,12 @@ Legacy function caller reads
 ----------------------------
 
 [ADR 0028](../adr/0028-legacy-function-caller-boundary.md) authorizes an M5
-exclusion of the optional expectation that reading a non-strict ordinary
-function's `caller` completes normally, for exactly the 23 paths in its
-Exact selector section. Those are all the paths at the pinned revision with
-the `caller` frontmatter feature. The checker parses that list from the
-accepted record and pins its digest, so adding, removing, or renaming a path
-needs a new reviewed scope decision as well as a tool change.
+exclusion for exactly the 23 paths in its Exact selector section. The
+exclusion covers the optional expectation that reading a non-strict ordinary
+function's `caller` completes normally. They are all the paths at the pinned
+revision with the `caller` frontmatter feature. The checker parses that list
+from the accepted record and pins its digest. Adding, removing, or renaming a
+path therefore needs a new reviewed scope decision as well as a tool change.
 
 The accepted rejection is the existing frontmatter check, recorded as
 `unsupported-profile-feature` with exactly this observation detail:
@@ -253,10 +258,10 @@ The accepted rejection is the existing frontmatter check, recorded as
 Not executed: the frontmatter needs an unsupported feature.
 ~~~~
 
-`caller` must be the only entry in `unsupportedFeatures`, the case must list
-`caller` in `features` and `noStrict` in `flags`, and the reviewed source must
-read a `caller` member in member syntax (`g.caller`,
-`arguments.callee.caller`, or a static computed or optional form). Another
+`caller` must be the only entry in `unsupportedFeatures`. The case must list
+`caller` in `features` and `noStrict` in `flags`. The reviewed source must read
+a `caller` member in member syntax, such as `g.caller`,
+`arguments.callee.caller`, or a static computed or optional form. Another
 unsupported feature, an include or capability rejection, a compile or run-time
 diagnostic, or text that only mentions `caller` is outside the surface.
 
@@ -264,30 +269,29 @@ Each selector path records `priorCohort: legacy-caller`,
 `proposedOwner: adr:0028-legacy-function-caller-boundary`, and the
 `legacy-caller` assessment with `disposition: exclusion` and
 `normativeDependency: legacy-caller-only`. The selector is exact in both
-directions: no other path can use that owner, cohort, or dependency, and no
+directions. No other path can use that owner, cohort, or dependency, and no
 selector path can name ADR 0016 or ADR 0013. The record has no remediation
-disposition. Once a selector path is reviewed it must keep an audit row,
-even if its ledger owner changes, and a promotion to pass or expected
-negative uses the observation owner.
+disposition. Once a selector path is reviewed, it must keep an audit row even
+if its ledger owner changes. A promotion to pass or expected negative uses the
+observation owner.
 
-The five paths that also call `eval` or a source-compiling `Function` form
-carry the `dynamic-source` dependency tag. ADR 0016 remains in force for
-those calls but owns none of these paths, and its audit surface is unchanged.
-Their `missingDynamicTag` is false, because the dynamic-source tag debt
-applies only to ADR 0016 rows. The %Function.prototype% accessors, the
-clause 17.1 restrictions, and the absence of an own `caller` property on
-arguments objects stay inside the claim with their own evidence or
-remediation owners.
+The five paths that also call `eval` or a source-compiling `Function` form carry
+the `dynamic-source` dependency tag. ADR 0016 remains in force for those calls
+but owns none of these paths, and its audit surface is unchanged. Their
+`missingDynamicTag` is false, because the dynamic-source tag debt applies only
+to ADR 0016 rows. The %Function.prototype% accessors, the clause 17.1
+restrictions, and the absence of an own `caller` property on arguments objects
+stay inside the claim with their own evidence or remediation owners.
 
 
 Resizable buffer harness observations
 -------------------------------------
 
-The complete update on clean source `2e3d973f` observes the RAB harness cohort.
-4 remaining rejections report `primitive-wrapper` and belong to
-`primitive-wrapper-objects`. The 2 mixed Annex B prototype subjects remain
-owned by `typed-array-proto-coverage-remediation`, with their original paths
-and assertions retained. The new assessments bind their actual rejection
+The RAB harness cohort on clean source `2e3d973f` has 4 remaining rejections.
+They report `primitive-wrapper` and belong to `primitive-wrapper-objects`. The 2
+mixed Annex B prototype subjects remain owned by
+`typed-array-proto-coverage-remediation`, with their original paths and
+assertions retained. The new assessments bind their actual rejection
 observations and the reviewed constructor/prototype and out-of-bounds native
 replacement evidence. They authorize no exclusion. WKI paths, dynamic-source
 ownership, import64, and Caller23 remain unchanged.
@@ -296,24 +300,26 @@ ownership, import64, and Caller23 remain unchanged.
 Observation batch 15
 --------------------
 
-Fresh accepted Source4 R observations add 24 source-bound path assessments. The
-16 direct-eval subjects test eval-created variable environments, binding
-conflicts, or lexical separation and retain only the existing bounded
-ADR 0016 authorization. Eight object-literal tests use eval as fixture
-construction; their getter, setter, descriptor, and duplicate-property
-subjects remain in-claim under dynamic-source-coverage-remediation. The
-derived owner total is 273; no tag creates an exclusion. Source and
-observation digests bind every assessment to the pinned source and fresh
-canonical record. Integrated formal review remains pending.
+The accepted Source4 R observations add 24 source-bound path assessments. The
+derived owner total is 273. No tag creates an exclusion.
+
+The 16 direct-eval subjects test eval-created variable environments, binding
+conflicts, or lexical separation. They retain only the existing bounded ADR
+0016 authorization. Eight object-literal tests use eval as fixture
+construction. Their getter, setter, descriptor, and duplicate-property subjects
+remain in-claim under dynamic-source-coverage-remediation.
+
+Source and observation digests bind every assessment to the pinned source and
+fresh canonical record. Integrated formal review remains pending.
 
 
 Annex B mixed-coverage closures
 -------------------------------
 
-Item 3 of the 2026-10-28 maintainer decision closes a mixed Annex B path
+Under item 3 of the 2026-10-28 maintainer decision, a mixed Annex B path closes
 under ADR 0013 only when reviewed replacement observations cover every core
-subject and a fresh-digest record names them. Five paths now meet that
-condition, and their assessments change to `disposition: exclusion` with
+subject and a fresh-digest record names them. Five paths meet that condition,
+and their assessments change to `disposition: exclusion` with
 `normativeDependency: annex-b-only`:
 
  -  `annex-b-typed-array-prototype`:
@@ -326,29 +332,32 @@ condition, and their assessments change to `disposition: exclusion` with
  -  `annex-b-ordinary-object-prototype`:
     *test/language/types/object/S8.6.2\_A8.js*.
 
-The fourth keeps the named backreference rejection; the other four keep the
-`Object.prototype.__proto__` rejection above. Each assessment binds
-*../../tests/native/fixtures/annex-b-mixed-core.ts* and
-*../../tests/annex-b-mixed-core-native.test.ts*. Those files check each core
-subject's value and type in the program, prove the comparator rejects
-near-miss values through an independent count, and run natively under both
-specialization policies with forced collection. The ledger moves the five
-paths to `adr:0013-m5-edition-and-manifest`. The earlier print-based
-replacement fixtures above stay but no longer close these paths. The three
-remediation nodes then own no path, and the paragraphs above that keep
-remediation for these paths describe the earlier state. The class declaration
-legacy accessor lookups and every other Annex B observer keep their owners. The
-per-path assertion tables are in
-[typed-array-proto-coverage-remediation.md](../m5c-graph/typed-array-proto-coverage-remediation.md),
-[regexp-split-coverage-remediation.md](../m5c-graph/regexp-split-coverage-remediation.md),
-and
-[ordinary-object-proto-coverage-remediation.md](../m5c-graph/ordinary-object-proto-coverage-remediation.md).
+The fourth path keeps the named backreference rejection; the other four keep
+the `Object.prototype.__proto__` rejection above.
 
-The fifth fixture in those files,
-`annex-b-core-ordinary-object-set-prototype`, covers every core subject of
-*S8.6.2\_A8.js*. The 2026-10-31 maintainer decision applies item 3's rule to
-this path and extends it to no other, so the `annex-b-ordinary-object-prototype`
-assessment closes it as an ADR 0013 exclusion with
-`disposition: exclusion`, `normativeDependency: annex-b-only`, and the
-`adr:0013-m5-edition-and-manifest` ledger owner. ADR 0013 itself is
-unchanged.
+Each assessment binds *../../tests/native/fixtures/annex-b-mixed-core.ts* and
+*../../tests/annex-b-mixed-core-native.test.ts*. Those files check each core
+subject's value and type in the program. They prove the comparator rejects
+near-miss values through an independent count, and they run natively under both
+specialization policies with forced collection.
+
+The ledger moves the five paths to `adr:0013-m5-edition-and-manifest`. The
+earlier print-based replacement fixtures above stay but no longer close these
+paths. The three remediation nodes own no path, and the paragraphs above that
+keep remediation for these paths describe the earlier state. The class
+declaration legacy accessor lookups and every other Annex B observer keep their
+owners.
+
+The per-path assertion tables are in
+[*typed-array-proto-coverage-remediation.md*](../m5c-graph/typed-array-proto-coverage-remediation.md),
+[*regexp-split-coverage-remediation.md*](../m5c-graph/regexp-split-coverage-remediation.md),
+and
+[*ordinary-object-proto-coverage-remediation.md*](../m5c-graph/ordinary-object-proto-coverage-remediation.md).
+
+The fifth fixture in those files, `annex-b-core-ordinary-object-set-prototype`,
+covers every core subject of *S8.6.2\_A8.js*. The 2026-10-31 maintainer
+decision applies item 3's rule to this path and extends it to no other. The
+`annex-b-ordinary-object-prototype` assessment therefore closes it as an ADR
+0013 exclusion with `disposition: exclusion`,
+`normativeDependency: annex-b-only`, and the `adr:0013-m5-edition-and-manifest`
+ledger owner. ADR 0013 itself is unchanged.
