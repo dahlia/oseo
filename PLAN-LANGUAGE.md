@@ -138,9 +138,10 @@ The inventory grew from 41,091 to 43,007 included paths. Of the 1,086
 *test/annexB/* files, 35 need IsHTMLDDA and 26 carry the `legacy-regexp`
 proposal flag; those 61 stay excluded. A source scan finds 477 of the included
 *test/annexB/* paths calling `eval` or a `Function` constructor, almost all
-under *test/annexB/language/eval-code/*. They are in the inventory and become
-ADR 0016 results. That count is a planning estimate; the reviewed observations
-decide each row.
+under *test/annexB/language/eval-code/*. They are in the inventory as
+unreviewed rows and become ADR 0016 results once
+`annexb-dynamic-source-accounting` admits them. That count is a planning
+estimate; the reviewed observations decide each row.
 
 The `caller` work and literal `import()` change rows already inside the
 inventory, so neither waits for ADR 0032.

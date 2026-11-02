@@ -268,8 +268,9 @@ dependency tags. No row runs before its unit admits it, so no runner gate
 records unadmitted *test/annexB/* rows.
 
 About 477 new rows become ADR 0016 results through reviewed exclusion audit
-rows, so the post-M5 report's ADR 0016 count grows by roughly that much beyond
-the 1,804 M5 exclusions. The M5 count does not change.
+rows once their unit admits them, so the post-M5 report's ADR 0016 count grows
+by roughly that much beyond the 1,804 M5 exclusions. The M5 count does not
+change.
 
 Applying this record changes ADR 0013's and ADR 0020's status lines. The
 exclusion audit binds ADR 0013 by digest, so that change re-reviews the audit
