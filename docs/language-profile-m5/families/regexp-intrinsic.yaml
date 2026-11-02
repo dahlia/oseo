@@ -48,7 +48,7 @@ scope:
     Unicode property escapes, and pattern extensions remain owned by later
     RegExp nodes."
 owners:
-  - PLAN-M5.md
+  - docs/language-profile-m5.md
   - PLAN-REGEXP.md
 evidence:
   differential:

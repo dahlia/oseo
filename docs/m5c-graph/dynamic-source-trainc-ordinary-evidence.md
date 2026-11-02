@@ -51,7 +51,7 @@ Closure routes and obligations
     evidence keep umbrella ownership with an exact per-path reason.
 
 Evidence follows the DS-1 through DS-7 accounting records and the
-*PLAN-M5.md* evidence contract: strict value and type checks inside the
+M5 profile evidence contract: strict value and type checks inside the
 program, a mutation check that does not reuse the comparator under test,
 both specialization policies, and forced collection where native.
 Closed paths move to ADR 0016 ownership only through the ledger

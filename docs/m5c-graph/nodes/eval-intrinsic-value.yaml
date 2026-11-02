@@ -62,7 +62,7 @@ delivers: "Originally owned 33 reviewed unsupported paths rejected with
   exclusion is added. This publication candidate prospectively marks this
   node landed; its transition takes effect only after exact candidate CI
   succeeds, an equal-tree merge, and successful main CI for that exact merge
-  commit, as PLAN-M5C.md requires.
+  commit, as the M5c landing gates require.
   The node also repairs every identifier read through a selected with
   Object Environment Record, for any name, not only eval. A value read, a
   typeof operand, and a call callee perform GetBindingValue (ECMA-262 2025
@@ -74,7 +74,7 @@ delivers: "Originally owned 33 reviewed unsupported paths rejected with
   selected object, key, value, and receiver stay rooted across the added
   test, and the all-miss fallback, with delete, and compound and update
   reads are unchanged. The Identifier reads through with environments
-  sections of PLAN-M5.md and the M5 profile specify it; the evidence is
+  sections of the M5 plan and the M5 profile specify it; the evidence is
   tests/native/fixtures/with-get-binding-value.ts under both
   specialization policies with forced collection, slot 0x60003d02 of
   tests/property/m5-global-object-record.property.test.ts, and parser

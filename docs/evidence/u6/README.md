@@ -1516,10 +1516,9 @@ drain.
 
 The Annex property walls were 35.376709 seconds under Node.js and 37.520988
 under Deno. Set property-file walls were 111.521138 and 131.585252. The fixed
-generic Set/Array driver walls were 1.903703 and 4.741917.
-[*docs/evidence/m5c-source-preparations/README.md*](../m5c-source-preparations/README.md)
-records all eight exact argv, counts and walls, with full raw evidence sealed
-under */data/m5c-set-integrity-native8-20261025/task\_af9240358454/*.
+generic Set/Array driver walls were 1.903703 and 4.741917. The full raw
+evidence, with all eight exact argv, counts and walls, is sealed under
+*/data/m5c-set-integrity-native8-20261025/task\_af9240358454/*.
 
 These ordinary command walls measure the expanded eab6 integrity source,
 separately from the earlier 1c96126b observations and source-only reference
@@ -1544,9 +1543,8 @@ Annex property measured 64.951403/62.961854 seconds and Set property measured
 14.573503/18.845015, general for-in measured 30.717361/33.836163 and
 object-pattern for-in measured 36.476596/39.730977. Each pair is Node.js/Deno.
 
-[*docs/evidence/m5c-source-preparations/README.md*](../m5c-source-preparations/README.md)
-records exact argv and the 28-plus-12 registration composition, preserved
-failed command and raw packets. The only intervening change enables the
+The 28 registrations ran on 46933fd3 and the 12 on 97f06518, and command 9
+failed on 46933fd3. The only intervening change enables the
 fixture's observation counter; all runtime/program/generator/flag inputs for
 the retained first eight commands are exact. Every measured command passed
 unchanged-source and natural owned-process/scope-drain checks. No

@@ -11,7 +11,7 @@ scope:
     namespace properties arguments, and abrupt completion that discards the
     fresh target."
 owners:
-  - PLAN-M5.md
+  - docs/language-profile-m5.md
 evidence:
   differential:
     status: covered

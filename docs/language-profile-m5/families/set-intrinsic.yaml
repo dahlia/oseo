@@ -12,7 +12,7 @@ scope:
     prototype APIs, %SetIteratorPrototype%, Symbol.iterator,
     Symbol.toStringTag, and Symbol.species."
 owners:
-  - PLAN-M5.md
+  - docs/language-profile-m5.md
 evidence:
   differential:
     status: covered

@@ -106,9 +106,9 @@ non-source normative-dependence trigger remain in force.
 This note records only DS-14's delta. Root owns shared umbrella totals,
 outer review, full exact-candidate CI, UPDATE scheduling, publication,
 landing, merge and push. The full ordinary and extended property suites on
-both supported native hosts remain required by *PLAN-M5C.md* before landing;
-this worker ran no full suite. Internal review artifacts and exact commit
-IDs are supplied in the worker report.
+both supported native hosts remained required by the M5c landing gates before
+landing; this worker ran no full suite. Internal review artifacts and exact
+commit IDs are supplied in the worker report.
 
 The dependency-tag self-audit leaves every row's tags untouched under the
 2026-10-29 rules: the source-construction prerequisite remains present,

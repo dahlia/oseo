@@ -62,7 +62,7 @@ scope:
     with active Host-node remediation under the ADR 0016 boundary.
     This Full supplies no candidate/Main gate or graph landing."
 owners:
-  - PLAN-M5C.md
+  - docs/language-profile-m5.md
 evidence:
   differential:
     status: covered

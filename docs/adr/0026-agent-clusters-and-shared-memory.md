@@ -265,5 +265,4 @@ Links
     boundary agent programs stay inside.
  -  [ADR 0025](./0025-native-clock-and-wakeup.md): the clock adapter agents
     wait and wake through.
- -  [*PLAN-M5.md*](../../PLAN-M5.md) and the
-    [*M5 language profile*](../language-profile-m5.md).
+ -  The [*M5 language profile*](../language-profile-m5.md).

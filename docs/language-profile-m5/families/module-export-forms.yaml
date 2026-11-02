@@ -45,7 +45,7 @@ scope:
     frame, including catch and loop heads. Module scheduling detects await
     in classic for declaration patterns as well as standalone patterns."
 owners:
-  - PLAN-M5C.md
+  - docs/language-profile-m5.md
   - docs/adr/0009-module-identity-and-linking.md
 evidence:
   differential:

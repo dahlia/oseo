@@ -17,7 +17,7 @@ scope:
     path stops at the unhandled-rejection checkpoint and stays unsupported
     under node unhandled-rejection-observation."
 owners:
-  - PLAN-M5.md
+  - docs/language-profile-m5.md
 evidence:
   differential:
     status: covered

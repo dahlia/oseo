@@ -1,8 +1,9 @@
 Contributing to Oseo
 ====================
 
-Thank you for helping build Oseo. The project has completed M4 and is expanding
-measured ECMAScript compatibility during M5. Interfaces and implementation
+Thank you for helping build Oseo. The project has completed M5, measured
+ECMAScript compatibility, and the post-M5 plans named in
+[*ROADMAP.md*](./ROADMAP.md) continue that work. Interfaces and implementation
 details will continue to change as standards, generated, and native target
 evidence replaces assumptions. Small, testable changes are especially valuable
 at this stage.
@@ -483,10 +484,6 @@ Before submitting a change, run:
 mise run check
 mise run test
 ~~~~
-
-An M5c landing meets the `mise run test` and extended property requirements
-with the CI run of its exact candidate commit instead, as the Gates section of
-[*PLAN-M5C.md*](./PLAN-M5C.md) describes. `mise run check` still runs locally.
 
 The `mise run test` gate already runs `test:node`, `test:deno`, `test:native`,
 and `test:test262`. It covers the native fixtures, the cross-target links,

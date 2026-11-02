@@ -225,7 +225,8 @@ Replacing the schedule changes static module behavior wherever the old schedule
 deviated from the edition. The first implementation unit therefore lands the
 driver for static graphs alone, before `import()` is admitted. That unit
 re-observes the full test262 corpus under `mise run test262:update`, and every
-changed static observation is explained under the PLAN-M5C rules before the
+changed static observation is explained under the measurement rules in
+*DESIGN.md* and the closure rules in *docs/m5c-closure/README.md* before the
 unit lands.
 
 

@@ -4,7 +4,7 @@ title: "Async generator intrinsics"
 scope:
   - "The admitted async generator and async iterator intrinsic chain."
 owners:
-  - PLAN-M5.md
+  - docs/language-profile-m5.md
 evidence:
   differential:
     status: covered

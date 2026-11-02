@@ -47,7 +47,8 @@ fallback, and target requirements are recorded in an architecture decision.
 
 This plan is governed by [*WHITEPAPER.md*](./WHITEPAPER.md),
 [*DESIGN.md*](./DESIGN.md), [*ROADMAP.md*](./ROADMAP.md),
-[*PLAN-GC.md*](./PLAN-GC.md), [*PLAN-M5.md*](./PLAN-M5.md),
+[*PLAN-GC.md*](./PLAN-GC.md),
+[*docs/language-profile-m5.md*](./docs/language-profile-m5.md),
 [*PLAN-M6.md*](./PLAN-M6.md),
 [*PLAN-PT.md*](./PLAN-PT.md), [ADR 0012](./docs/adr/0012-native-event-loop.md),
 and the target decisions under *docs/adr/*. Evidence from a probe must update
@@ -451,7 +452,9 @@ with the stable adapter ownership and selected system dependencies.
 [*ROADMAP.md*](./ROADMAP.md) records the native I/O track status without copying
 the per-platform decision table.
 
-[*PLAN-M5.md*](./PLAN-M5.md) records the real-time gate for `Date`, while
+The `Date` family of the
+[*M5 language profile*](./docs/language-profile-m5.md) records the real-time
+gate for `Date`, while
 [*PLAN-M6.md*](./PLAN-M6.md) records which monotonic-clock, socket, and
 name-resolution gates its API groups consume. M7 planning records file gates
 when that milestone receives an active plan. Contributor and package

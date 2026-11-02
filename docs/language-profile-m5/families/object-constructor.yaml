@@ -7,7 +7,7 @@ scope:
   - "Object.is, Object.getPrototypeOf, Object.setPrototypeOf, and their
     ToObject, SameValue, and prototype-mutation semantics."
 owners:
-  - PLAN-M5.md
+  - docs/language-profile-m5.md
 evidence:
   differential:
     status: covered

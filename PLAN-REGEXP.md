@@ -45,14 +45,13 @@ immutable artifact.
 Regular expressions are one M5 built-in family, but their implementation
 crosses the source frontend, compiler representations, generated C, runtime
 objects, Unicode data, string methods, and well-known symbol dispatch. Keeping
-that work in a dedicated plan lets [*PLAN-M5.md*](./PLAN-M5.md) retain its
-milestone-wide dependency order while this document owns the family-specific
-contracts.
+that work in a dedicated plan kept M5's milestone-wide dependency order
+separate from the family-specific contracts this document owns.
 
 This plan is governed by [*WHITEPAPER.md*](./WHITEPAPER.md),
 [*DESIGN.md*](./DESIGN.md), [*ROADMAP.md*](./ROADMAP.md),
-[*PLAN-BACKEND.md*](./PLAN-BACKEND.md), [*PLAN-M5.md*](./PLAN-M5.md),
-[*PLAN-GC.md*](./PLAN-GC.md), [*PLAN-PT.md*](./PLAN-PT.md),
+[*PLAN-BACKEND.md*](./PLAN-BACKEND.md), [*PLAN-GC.md*](./PLAN-GC.md),
+[*PLAN-PT.md*](./PLAN-PT.md),
 [ADR 0013](./docs/adr/0013-m5-edition-and-manifest.md), the active language
 profile, and accepted records under *docs/adr/*. Evidence that changes one of
 those contracts updates the affected document in the same change.

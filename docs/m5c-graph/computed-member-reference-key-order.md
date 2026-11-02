@@ -49,8 +49,8 @@ edition. A computed member Reference behaves as follows:
 
 The landed compound repair implements the base check as an assignment-target
 RequireObjectCoercible check that keeps a primitive base as the receiver,
-as *PLAN-M5.md* describes. Node.js and Deno convert an arithmetic
-member key a second time before the write; *PLAN-M5.md* records that as a
+as the M5 profile describes. Node.js and Deno convert an arithmetic
+member key a second time before the write; the M5 profile records that as a
 labeled reference divergence, not an oracle.
 
 
@@ -90,25 +90,25 @@ Known nonconformance on main
 ----------------------------
 
 This section rests on source reading of
-*packages/compiler/src/mir-build.ts* at `faa47159` and on *PLAN-M5.md*. No
+*packages/compiler/src/mir-build.ts* at `faa47159` and on the M5 plan. No
 native run tested these hypotheses.
 
  -  The generic computed `property-get` lowering converts the key before the
     read that applies ToObject, and inserts no base check first. This
-    matches the member-expression failure. *PLAN-M5.md* did not record it
+    matches the member-expression failure. The M5 plan did not record it
     before this node.
  -  Method lookup on a computed member converts the key before the lookup,
     in the same shape. No observed path covers it.
  -  Logical member assignment converts its key before a nullish base throws.
     That matches the three logical-assignment failures. It converts the key
-    again before a taken write. *PLAN-M5.md* records both as retained
+    again before a taken write. The M5 profile records both as retained
     behavior.
  -  Simple member assignment evaluates the right operand first, but then
-    converts the key before PutValue's ToObject check. *PLAN-M5.md* records
+    converts the key before PutValue's ToObject check. The M5 profile records
     this as retained behavior.
  -  Prefix and postfix update apply the base check before conversion, but
     convert an object key twice. `super[key]` compound assignment also
-    converts twice. *PLAN-M5.md* records both as retained behavior.
+    converts twice. The M5 profile records both as retained behavior.
  -  A for-in or for-of member head target converts its key before
     PutValue's base check, and a computed `super[key]` read, write, or
     destructuring target converts its key before a null home prototype
@@ -154,7 +154,7 @@ patch for the four observed paths. It covers:
  -  optional member chains, keeping their nullish short circuit.
 
 It keeps the arithmetic compound results and the separate optional-call
-receiver and eval admission work out of scope. The full *PLAN-M5.md*
+receiver and eval admission work out of scope. The full M5 profile
 evidence contract applies:
 
  -  focused examples over null, undefined, primitive, and object bases with
@@ -192,7 +192,7 @@ keeps its earlier lowering and diagnostic, as do global identifier
 references. The check adds no runtime export, backend operation, or ABI
 change. A nullish base with any other key therefore reports
 `TypeError: Cannot destructure a nullish value.` under both specialization
-policies. *PLAN-M5.md* records that diagnostic and the unchanged
+policies. The M5 profile records that diagnostic and the unchanged
 inherited-setter limit of primitive-base stores.
 
 Focused evidence on the candidate tree:

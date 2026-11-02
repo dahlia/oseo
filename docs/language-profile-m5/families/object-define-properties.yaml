@@ -9,7 +9,7 @@ scope:
     objects, String wrappers, symbol keys, and module namespace objects,
     including abrupt completion during collection and during application."
 owners:
-  - PLAN-M5.md
+  - docs/language-profile-m5.md
 evidence:
   differential:
     status: covered

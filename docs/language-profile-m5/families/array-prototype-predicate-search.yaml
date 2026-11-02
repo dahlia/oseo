@@ -20,7 +20,7 @@ scope:
     Reflect.construct. The subset lists array-find-from-last as a supported
     feature so the findLast and findLastIndex roots execute."
 owners:
-  - PLAN-M5.md
+  - docs/language-profile-m5.md
 evidence:
   differential:
     status: covered

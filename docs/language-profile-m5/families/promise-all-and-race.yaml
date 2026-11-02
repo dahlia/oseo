@@ -15,7 +15,7 @@ scope:
     with the original throw completion preserved and no close after an
     abrupt iterator step or a completed iterator."
 owners:
-  - PLAN-M5.md
+  - docs/language-profile-m5.md
 evidence:
   differential:
     status: covered

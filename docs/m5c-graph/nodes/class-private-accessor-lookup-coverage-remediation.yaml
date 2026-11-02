@@ -19,9 +19,9 @@ delivers: "Resolves exactly 4 mixed-coverage class paths. The two
   properties, absence under public-name membership, private getter access,
   and private setter effects without depending on legacy lookup. Distinguish
   the optional observer from the in-claim private accessor subject. Follow
-  the full applicable PLAN-M5.md evidence contract and update normative
+  the full applicable M5 profile evidence contract and update normative
   evidence, exclusion assessments, and derived ledger. Obtain the separate
-  PLAN-M5C.md maintainer coverage-accounting decision before terminal closure;
+  maintainer coverage-accounting decision before terminal closure;
   ownership alone and replacement fixtures alone cannot authorize an
   exclusion. Do not exclude private accessor semantics, delete upstream
   assertions, count replacements as upstream passes, implement Annex B, or

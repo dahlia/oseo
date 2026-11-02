@@ -4,7 +4,7 @@ title: "Loose equality"
 scope:
   - "Admitted IsLooselyEqual behavior for current value types."
 owners:
-  - PLAN-M5.md
+  - docs/language-profile-m5.md
 evidence:
   differential:
     status: covered

@@ -17,7 +17,7 @@ const id = "sample-family";
 const indexPath = `${evidenceIndexDirectory}/${id}.yaml`;
 const recordPath = `${evidenceRecordDirectory}/${id}.yaml`;
 const references = new Set([
-  "PLAN-M5.md",
+  "docs/language-profile-m5.md",
   "tests/native/fixtures/expressions.ts",
 ]);
 
@@ -57,7 +57,7 @@ function recordSource(
     text: JSON.stringify({
       evidence: coveredEvidence(),
       id,
-      owners: ["PLAN-M5.md"],
+      owners: ["docs/language-profile-m5.md"],
       scope: ["The sampled behavior."],
       title: "Sample family",
       version: 1,
@@ -223,7 +223,7 @@ test("rejects an absent required current-tree inventory", () => {
 
 test("extracts validated family IDs from old and current trees", () => {
   assert.deepEqual(
-    validatedEvidenceFamilyIdsFromTree(["PLAN-M5.md"], () => {
+    validatedEvidenceFamilyIdsFromTree(["docs/language-profile-m5.md"], () => {
       throw new Error("an old tree has no evidence source to read");
     }),
     [],
@@ -249,7 +249,11 @@ test("extracts validated family IDs from old and current trees", () => {
     { classes: 8, families: 1, omitted: 0 },
   );
   assert.throws(
-    () => validateRequiredEvidenceInventoryFromTree(["PLAN-M5.md"], () => ""),
+    () =>
+      validateRequiredEvidenceInventoryFromTree(
+        ["docs/language-profile-m5.md"],
+        () => "",
+      ),
     /must not be empty/u,
   );
 });

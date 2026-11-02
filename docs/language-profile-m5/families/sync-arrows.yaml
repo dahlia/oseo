@@ -4,7 +4,7 @@ title: "Synchronous arrow functions"
 scope:
   - "Synchronous arrows with lexical receivers and no construction."
 owners:
-  - PLAN-M5.md
+  - docs/language-profile-m5.md
 evidence:
   differential:
     status: covered

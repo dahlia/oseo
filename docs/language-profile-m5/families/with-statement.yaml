@@ -59,7 +59,7 @@ scope:
     retain the same wrapper. String indexed properties and length use the
     existing wrapper descriptors."
 owners:
-  - PLAN-M5.md
+  - docs/language-profile-m5.md
 evidence:
   differential:
     status: covered

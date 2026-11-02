@@ -18,11 +18,11 @@ the protected region. A `break` from a `switch` nested inside a `try`, or a
 `continue` targeting a loop that is itself inside that `try`, remains inside the
 region and must not execute `finally` early.
 
-The synchronous iterator consumer planned by [*PLAN-M5.md*](../../PLAN-M5.md)
-adds another cleanup with the same distinction. Same-loop `continue` and normal
-iteration keep the iterator open, while `break`, `return`, and transfers to an
-outer loop close it. Encoding that rule as special cases in the C backend would
-duplicate source semantics downstream of MIR.
+The synchronous iterator consumer planned for M5 adds another cleanup with the
+same distinction. Same-loop `continue` and normal iteration keep the iterator
+open, while `break`, `return`, and transfers to an outer loop close it.
+Encoding that rule as special cases in the C backend would duplicate source
+semantics downstream of MIR.
 
 
 Decision
@@ -84,7 +84,5 @@ Links
 -----
 
  -  [*DESIGN.md*](../../DESIGN.md) records the abrupt-completion invariant.
- -  [*PLAN-M5.md*](../../PLAN-M5.md) requires generic abrupt-completion order
-    before broader executable syntax.
  -  [ADR 0011](./0011-asynchronous-continuations.md) records the separate
     ownership of suspended execution state.

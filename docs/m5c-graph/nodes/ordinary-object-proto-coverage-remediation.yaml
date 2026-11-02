@@ -8,8 +8,8 @@ delivers: "Resolves exactly test/language/types/object/S8.6.2_A8.js,
   its original path and assertions, and preserve its core coverage that
   a non-extensible ordinary object keeps Object.prototype as its
   [[Prototype]] through an approved replacement observation with a
-  witness for every core subject. Follow the full PLAN-M5.md evidence
-  contract and obtain the maintainer accounting decision in PLAN-M5C.md
+  witness for every core subject. Follow the full M5 profile evidence
+  contract and obtain the maintainer accounting decision
   before assigning an exclusion. Update the exclusion audit, ledger, and
   applicable normative profile records, and regenerate the complete
   manifest if observation behavior changes. Do not admit Annex B, widen

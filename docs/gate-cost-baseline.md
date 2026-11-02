@@ -35,11 +35,12 @@ goal of about two hours per merge, without reducing coverage; see
 [Merge-wait goal and projection (U12)](../PLAN-GATE.md#merge-wait-goal-and-projection-u12)
 in [*PLAN-GATE.md*](../PLAN-GATE.md). The ceiling stays here as historical
 context for the measurements below. The target is the measured inventory of
-41,091 applicable paths recorded in [*PLAN-M5C.md*](../PLAN-M5C.md) and
-reported by `mise run check:test262-inventory`. Against that planning ceiling,
-neither current run fits even at its measured smaller workload. Scaling test262
-alone by path count would ignore fixed cost, classifications, runner spread,
-and the separately measured property bottleneck.
+41,091 applicable paths fixed by
+[ADR 0020](./adr/0020-m5-applicable-test-inventory.md) and reported by
+`mise run check:test262-inventory`. Against that planning ceiling, neither
+current run fits even at its measured smaller workload. Scaling test262 alone
+by path count would ignore fixed cost, classifications, runner spread, and the
+separately measured property bottleneck.
 
 [35456667007]: https://github.com/dahlia/oseo/actions/runs/35456667007
 [36243816479]: https://github.com/dahlia/oseo/actions/runs/36243816479

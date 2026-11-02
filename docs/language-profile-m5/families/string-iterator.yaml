@@ -15,7 +15,7 @@ scope:
     outside those roots move from unsupported-profile-feature to pass because
     their array-pattern heads are now admitted."
 owners:
-  - PLAN-M5.md
+  - docs/language-profile-m5.md
 evidence:
   differential:
     status: covered

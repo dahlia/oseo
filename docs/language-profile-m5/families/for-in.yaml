@@ -18,7 +18,7 @@ scope:
     Existing domains, seeds, budgets and assessments remain unchanged."
   - "Var identifier heads resolve the active with chain per iteration."
 owners:
-  - PLAN-M5.md
+  - docs/language-profile-m5.md
 evidence:
   differential:
     status: covered

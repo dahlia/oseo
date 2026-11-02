@@ -77,7 +77,7 @@ scope:
     `RegExp.escape`, the pattern grammar this edition still defers, and
     matcher backend selection remain owned by later RegExp nodes."
 owners:
-  - PLAN-M5.md
+  - docs/language-profile-m5.md
   - PLAN-REGEXP.md
 evidence:
   differential:

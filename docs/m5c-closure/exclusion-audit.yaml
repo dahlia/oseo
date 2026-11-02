@@ -2,8 +2,8 @@ version: 1
 suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
 records:
   0013-m5-edition-and-manifest:
-    digest: "3922cee52d1c86ce8b5f5c7d5f7969b7d5983863a9865f3588\
-      fd6663cace8bf0"
+    digest: "de1e9d092ccacbeaeb526e91a51933ffe64417878563696f0f\
+      0c4cf2e6d4242c"
     authorization:
       - Annex B legacy web semantics are excluded from the
         claim.
@@ -14,8 +14,8 @@ records:
         by a dependency inside the boundary reopens the
         optional-section policy.
   0016-dynamic-source-boundary:
-    digest: "0822a6b08675f8328af6cfe24cb657a57cfb713571d2139d64\
-      17018662d9bb83"
+    digest: "8f1dd9dc2943bb619e70124340fbc848d74a91466a8deb6fc8\
+      c69037214c49ec"
     authorization:
       - "`eval` in call position, the `Function`
         constructor, `new Function`, and every constructor
@@ -43,8 +43,8 @@ records:
         these features a conformance requirement that
         documented server-runtime deviations cannot cover.
   0019-m5-claim-closure:
-    digest: "dc1a9429af215b1a91f50ee5097da706f5e2089bf46c4184cf\
-      830b27f2b0e5d7"
+    digest: "993de967e51b1d22e588d6147db7b1b4786f530eaeb88d5646\
+      0d63c6a50cd947"
     authorization:
       - every result inside it is a pass, an expected
         negative, or an unsupported result covered by an
@@ -58,8 +58,8 @@ records:
         behavior other than source evaluation reopens the
         boundary rather than this record.
   0028-legacy-function-caller-boundary:
-    digest: "50e92d79e587a8ef27c5b641a0c8352ee02db689af822e3d62\
-      b89e832cf23338"
+    digest: "6435c36983878026eabda278fa4575d91a794165bfa27899b0\
+      3b39e77e0c26ae"
     authorization:
       - The optional legacy caller extension is outside the
         M5 profile.

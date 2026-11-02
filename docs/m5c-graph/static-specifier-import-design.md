@@ -66,8 +66,10 @@ Deliverables
  -  A link from [*PLAN-DYN.md*](../../PLAN-DYN.md) to that plan.
  -  The Proposed ADR 0016 amendment inside the design, unapplied. ADR 0016
     itself is unchanged.
- -  A *PLAN-M5C.md* section stating that the track is deferred and that its
-    20 rows go to ADR 0031 deferral.
+ -  A section of the M5c plan, now kept in
+    [*docs/m5c-closure/README.md*](../m5c-closure/README.md#dynamic-import),
+    stating that the track is deferred and that its 20 rows go to ADR 0031
+    deferral.
 
 The earlier [proposal](../dynamic-import-staged-plan.md) of the landed
 `dynamic-import-staged-plan` node remains the capability-level plan. This

@@ -187,12 +187,16 @@ track.
 Conditions outside the audit
 ----------------------------
 
-Two exit conditions in [*PLAN-M5C.md*](../../PLAN-M5C.md) are outside what the
-repository can check. Both held when the audit landed.
+Two exit conditions are outside what the repository can check. Both held
+when the audit landed.
 
-The maintainer received the complete deferral list with the summary that the
-plan's Gates section requires: on 2026-11-01, when it had 26 entries, and
-on 2026-11-02 with all 74 after the last remediation paths were assigned.
+The audit could use the deferral list only after the maintainer received
+the complete *deferrals.yaml* with a summary of its total path count,
+per-family counts, each distinct reason with its count, and target
+milestones, with every entry outside the dynamic source family flagged, and
+raised no objection within the coordination wait period. The maintainer
+received it on 2026-11-01, when it had 26 entries, and on
+2026-11-02 with all 74 after the last remediation paths were assigned.
 Every entry in both lists is in the dynamic source family. No objection
 arrived within the coordination wait period.
 
@@ -202,5 +206,5 @@ passed from a clean checkout of commit
 last landed implementation. The landing commit adds only the graph state and
 this text to that tree, and its candidate and main CI runs repeat the
 ordinary and extended gates on the exact commit. These gates also carry the
-semantic, property, sanitizer, and target criteria in
-[*PLAN-M5.md*](../../PLAN-M5.md).
+semantic, property, sanitizer, and target exit criteria that
+[*ROADMAP.md*](../../ROADMAP.md) lists for M5.

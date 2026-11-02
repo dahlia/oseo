@@ -4,7 +4,7 @@ title: "Pattern-position await"
 scope:
   - "Await in pattern targets, keys, and defaults in traced frames."
 owners:
-  - PLAN-M5.md
+  - docs/language-profile-m5.md
 evidence:
   differential:
     status: covered

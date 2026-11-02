@@ -4,10 +4,10 @@ ADR 0016: Dynamic source evaluation boundary
 Status
 ------
 
-Accepted. This record resolves the ahead-of-time challenge checkpoint
-required by [*PLAN-M5.md*](../../PLAN-M5.md): whether `eval`, the `Function`
-constructor family, and dynamic import enter the M5 language profile, and
-how their test262 observations are classified while they stay outside it.
+Accepted. This record resolves the M5 ahead-of-time challenge checkpoint:
+whether `eval`, the `Function` constructor family, and dynamic import enter the
+M5 language profile, and how their test262 observations are classified while
+they stay outside it.
 
 
 Context
@@ -21,12 +21,12 @@ an interpreter hidden in a runtime helper, and
 [ADR 0013](./0013-m5-edition-and-manifest.md) placed them inside the claim
 boundary as explicit gaps awaiting an owned decision.
 
-[*PLAN-M5.md*](../../PLAN-M5.md) requires any admitting decision to define
-when source becomes known; how bindings, strictness, realms, and module
-identity are preserved; whether produced artifacts remain bootstrap-runtime
-independent; how collection and code lifetime are rooted; which targets can
-execute the feature; and how test262 observations remain comparable. No
-current probe provides that evidence.
+[*DESIGN.md*](../../DESIGN.md#remaining-architecture-decisions) requires any
+admitting decision to define when source becomes known; how bindings,
+strictness, realms, and module identity are preserved; whether produced
+artifacts remain bootstrap-runtime independent; how collection and code lifetime
+are rooted; which targets can execute the feature; and how test262 observations
+remain comparable. No current probe provides that evidence.
 
 
 Required contract
@@ -96,10 +96,10 @@ Decision
  -  While this boundary stands, no Oseo release uses an unqualified
     ECMA-262 conformance label. Releases publish measured coverage with
     the dynamic source gap named, as the honest-reporting rule in
-    [*PLAN-M5.md*](../../PLAN-M5.md) already requires. Closing M5's
-    conformance claim therefore depends on a later decision that either
-    admits these features through staged compilation or revises the claim
-    boundary of [ADR 0013](./0013-m5-edition-and-manifest.md) with
+    [*DESIGN.md*](../../DESIGN.md#supported-semantics) already requires.
+    Closing M5's conformance claim therefore depends on a later decision that
+    either admits these features through staged compilation or revises the
+    claim boundary of [ADR 0013](./0013-m5-edition-and-manifest.md) with
     recorded rationale.
 
 
@@ -144,7 +144,7 @@ Links
  -  [ADR 0019](./0019-m5-claim-closure.md) removes M5 completion's dependence
     on the later decision this record requests, and moves the conformance label
     to its own gate. It does not supply that decision.
- -  [*PLAN-M5.md*](../../PLAN-M5.md) names the checkpoint this record
+ -  [*ROADMAP.md*](../../ROADMAP.md) names the M5 work stream this record
     resolves.
  -  [*DESIGN.md*](../../DESIGN.md) records the module and whole-program
     constraints that motivate the boundary.

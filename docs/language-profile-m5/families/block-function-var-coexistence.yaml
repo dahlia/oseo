@@ -4,7 +4,7 @@ title: "Block function and var coexistence"
 scope:
   - "A block function distinct from a same-name outer var binding."
 owners:
-  - PLAN-M5.md
+  - docs/language-profile-m5.md
 evidence:
   differential:
     status: covered

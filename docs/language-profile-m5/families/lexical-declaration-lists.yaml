@@ -4,7 +4,7 @@ title: "Lexical declaration lists"
 scope:
   - "Multi-declarator let and const lists in statement positions."
 owners:
-  - PLAN-M5.md
+  - docs/language-profile-m5.md
 evidence:
   differential:
     status: covered

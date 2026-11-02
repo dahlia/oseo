@@ -22,7 +22,7 @@ scope:
     including the decimal above the closest one at a power of two, whose
     round-trip interval reaches twice as far up as down."
 owners:
-  - PLAN-M5.md
+  - docs/language-profile-m5.md
 evidence:
   differential:
     status: covered

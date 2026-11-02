@@ -15,7 +15,7 @@ scope:
     intrinsic error reason, and the test262 host-binding and
     harness-definition capability classifications."
 owners:
-  - PLAN-M5.md
+  - docs/language-profile-m5.md
 evidence:
   differential:
     status: covered

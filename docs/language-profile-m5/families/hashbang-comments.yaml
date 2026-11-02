@@ -6,7 +6,7 @@ scope:
     line terminator or the end of input, and the early SyntaxError for
     #! anywhere else or spelled with an escape."
 owners:
-  - PLAN-M5.md
+  - docs/language-profile-m5.md
 evidence:
   differential:
     status: omitted

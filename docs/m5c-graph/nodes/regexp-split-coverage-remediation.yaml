@@ -5,7 +5,7 @@ delivers: "Resolves the one reviewed String/prototype/split/separator-regexp.js
   path whose Annex B-only named backreference rejection also prevents core
   RegExp split assertions from being observed. Retain the original path and
   assertions, review replacement evidence for core behavior, and obtain the
-  maintainer accounting decision in PLAN-M5C.md before assigning an exclusion;
+  maintainer accounting decision before assigning an exclusion;
   do not admit Annex B or widen ADR 0013."
 dependencies:
   - authorized-exclusion-audit

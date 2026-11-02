@@ -5,7 +5,7 @@ scope:
   - "Generator suspension, resumption, delegation, and throw repair."
   - "Active continuation dispatch owns the callable native-frame charge."
 owners:
-  - PLAN-M5.md
+  - docs/language-profile-m5.md
 evidence:
   differential:
     status: covered

@@ -11,7 +11,7 @@ scope:
     helpers, which prefer an exact string comparison and fall back to the
     source-grammar check with the upstream failure text."
 owners:
-  - PLAN-M5.md
+  - docs/language-profile-m5.md
 evidence:
   differential:
     status: covered

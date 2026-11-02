@@ -4,7 +4,7 @@ title: "Do-while statements"
 scope:
   - "Body-first do-while control flow."
 owners:
-  - PLAN-M5.md
+  - docs/language-profile-m5.md
 evidence:
   differential:
     status: covered

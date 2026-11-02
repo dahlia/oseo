@@ -4,7 +4,10 @@ import test from "node:test";
 import { parsedMapping } from "../tools/structured-data.ts";
 
 test("accepts shared structured-data subtrees", () => {
-  const shared = { references: ["PLAN-M5.md"], status: "covered" };
+  const shared = {
+    references: ["docs/language-profile-m5.md"],
+    status: "covered",
+  };
   const document = { fixed: shared, structural: shared };
 
   assert.equal(parsedMapping(document, "document"), document);

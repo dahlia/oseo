@@ -28,8 +28,9 @@ recorded as unsupported. Unreviewed paths have neither a pass nor a failure
 classification.
 
 *AGENTS.md* and *CLAUDE.md* both link to *CONTRIBUTING.md*. The applicable
-contracts are [*PLAN-M5C.md*](../../PLAN-M5C.md), the measurement contract in
-[*PLAN-M5.md*](../../PLAN-M5.md),
+contracts are the M5c closure rules in
+[*docs/m5c-closure/README.md*](../m5c-closure/README.md), the measurement
+contract in [*DESIGN.md*](../../DESIGN.md#testing-and-observability),
 [ADR 0013](../adr/0013-m5-edition-and-manifest.md),
 [ADR 0016](../adr/0016-dynamic-source-boundary.md),
 [ADR 0019](../adr/0019-m5-claim-closure.md), and
@@ -218,6 +219,6 @@ mise run check:compatibility-ratchet
 
 Run the ordinary `mise run check` and `mise run test` gates on the final tree.
 The cost estimates in the batch plan retain their named historical measurement
-from *PLAN-M5C.md* and *docs/gate-cost-baseline.md*. This audit changes no cost
-model or gate budget and adds no runtime or generator change requiring an
-extended property run.
+from *docs/m5c-closure/README.md* and *docs/gate-cost-baseline.md*. This audit
+changes no cost model or gate budget and adds no runtime or generator change
+requiring an extended property run.

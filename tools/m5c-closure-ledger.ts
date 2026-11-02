@@ -126,7 +126,8 @@ const entryPattern =
   /^ {2}(\S+): \[([a-z-]+), ([a-z0-9:-]+)(?:, \[([a-z0-9, -]*)\])?\]$/u;
 const preamble = [
   "# Derived M5c closure ledger. Regenerate with",
-  "# `mise run m5c:closure-ledger:update`; PLAN-M5C.md defines the layout.",
+  "# `mise run m5c:closure-ledger:update`; docs/m5c-closure/README.md",
+  "# defines the layout.",
   "# States and prerequisites come from the inventory and reviewed manifest.",
   "# Only owner assignments and owner notes are edited by M5c nodes.",
 ];

@@ -6,7 +6,7 @@ delivers: "Closes exactly 1 newly observed path,
   assignment target is not an IdentifierRef for NamedEvaluation, so
   (fn) = function () {} must leave the function name empty rather than fn.
   Repair this already-admitted static assignment behavior. Follow the full
-  PLAN-M5.md evidence contract: focused examples, generated properties or an
+  M5 profile evidence contract: focused examples, generated properties or an
   extension of existing assignment properties, forced-collection evidence,
   both specialization policies, and the normative family record and profile.
   Add a guard-miss test reaching a compiled generic fallback if the repair

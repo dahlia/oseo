@@ -4,7 +4,7 @@ title: "Var declarations"
 scope:
   - "Hoisted var declarations, redeclaration, and awaited writes."
 owners:
-  - PLAN-M5.md
+  - docs/language-profile-m5.md
 evidence:
   differential:
     status: covered

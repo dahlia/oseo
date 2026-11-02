@@ -4,7 +4,7 @@ title: "For-in object pattern heads"
 scope:
   - "Object binding and assignment pattern heads in for-in."
 owners:
-  - PLAN-M5.md
+  - docs/language-profile-m5.md
 evidence:
   differential:
     status: covered

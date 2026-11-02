@@ -20,7 +20,7 @@ scope:
     case. Measured by generic-string-coercion and reproducible on its parent
     commit."
 owners:
-  - PLAN-M5.md
+  - docs/language-profile-m5.md
 evidence:
   differential:
     status: covered

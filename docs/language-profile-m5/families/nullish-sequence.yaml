@@ -4,7 +4,7 @@ title: "Nullish and sequence expressions"
 scope:
   - "Nullish coalescing and comma sequence evaluation."
 owners:
-  - PLAN-M5.md
+  - docs/language-profile-m5.md
 evidence:
   differential:
     status: covered

@@ -6,9 +6,9 @@ Status
 
 Implementation status: active, initial adoption in progress. M4 landed the
 pinned runner, explicit replay configuration, deterministic module-graph
-properties, and bounded native asynchronous schedule properties. M5 expands
-these models into grammar-based compatibility work. This cross-milestone plan
-does not replace [*PLAN-M5.md*](./PLAN-M5.md).
+properties, and bounded native asynchronous schedule properties. M5 extended
+these models into grammar-based compatibility work under the property contract
+in [*DESIGN.md*](./DESIGN.md#testing-and-observability).
 
 This plan is governed by [*WHITEPAPER.md*](./WHITEPAPER.md),
 [*DESIGN.md*](./DESIGN.md), [*ROADMAP.md*](./ROADMAP.md),

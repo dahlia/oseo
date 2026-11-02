@@ -4,7 +4,7 @@ title: "Switch statements"
 scope:
   - "Switch clauses, fallthrough, scope, and clause functions."
 owners:
-  - PLAN-M5.md
+  - docs/language-profile-m5.md
 evidence:
   differential:
     status: covered

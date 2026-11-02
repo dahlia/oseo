@@ -64,7 +64,8 @@ primitive rejection in `iterator_from`, before its existing lookup path.
 Root authorized a bounded repair: allow strings through GetV and Call with
 the primitive receiver; other primitive receivers still throw TypeError.
 The existing intrinsic fixture and property now cover that repair without
-changing their seed, case budget or deadline. *PLAN-M5.md* names the details.
+changing their seed, case budget or deadline. The
+[*M5 language profile*](../language-profile-m5.md) names the details.
 
 Root also authorized a generic missing-include capability check. Before
 assembly, a non-raw case naming an include absent from the reviewed registry

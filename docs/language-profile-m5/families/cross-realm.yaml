@@ -28,7 +28,7 @@ scope:
     with dynamic-source coverage remediation, and one stays unsupported on
     iterator-helpers."
 owners:
-  - PLAN-M5C.md
+  - docs/language-profile-m5.md
   - docs/adr/0027-realms-beyond-the-initial-realm.md
 evidence:
   differential:

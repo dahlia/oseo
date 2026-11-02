@@ -116,7 +116,7 @@ retained `symbols` but omitted the paired property-read family. The complete
 1,440-row audit now checks this prerequisite consistently.
 
 This changes no executed variant, observation, classification or owner. R also
-refreshes the explicit current totals in *PLAN-M5.md* and
+refreshes the explicit current totals in the M5 plan and
 *docs/language-profile-m5.md*.
 
 

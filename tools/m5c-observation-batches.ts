@@ -125,7 +125,8 @@ export interface M5cRegenerationMeasurement {
 /**
  * The measured run this plan's costs derive from. Neither of the two full
  * runs on 2026-10-06 and 2026-10-07 had the host to itself; this is the
- * slower one, kept as the conservative figure. PLAN-M5C.md records both.
+ * slower one, kept as the conservative figure.
+ * *docs/m5c-closure/README.md* records both.
  * A new measurement replaces this record; the plan file then regenerates
  * every estimate.
  */
@@ -840,10 +841,11 @@ function costRecord(cost: M5cObservationCost): StructuredDataRecord {
 
 const fileHeader = [
   "# Derived M5c observation batch plan. Regenerate counts with",
-  "# `mise run m5c:observation-batches:update`; PLAN-M5C.md defines the",
-  "# selectors, prerequisite keys, review units, and the cost model.",
-  "# Selectors change only through `mise run m5c:observation-batches:plan`",
-  "# or a split of one batch that PLAN-M5C.md records.",
+  "# `mise run m5c:observation-batches:update`; docs/m5c-closure/README.md",
+  "# defines the selectors, prerequisite keys, review units, and the cost",
+  "# model. Selectors change only through",
+  "# `mise run m5c:observation-batches:plan` or a split of one batch that",
+  "# docs/m5c-closure/README.md records.",
 ];
 
 /** Serialize a plan in its canonical layout. */

@@ -6,7 +6,7 @@ scope:
   - "Var for-await-of identifier heads resolve the active with chain per
     iteration through the shared loop-head reference path."
 owners:
-  - PLAN-M5.md
+  - docs/language-profile-m5.md
 evidence:
   differential:
     status: covered

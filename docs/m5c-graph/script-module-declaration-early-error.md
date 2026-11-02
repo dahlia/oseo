@@ -95,4 +95,4 @@ Source-bound probes, the static audit and the implementation report live in
 are not fresh test262 observations. This source preparation changes no
 subset, manifest, closure ledger, exclusion audit, inventory policy, or graph
 status. Full UPDATE, independent review, exact-candidate CI, and landing
-remain separate coordinator-owned phases under *PLAN-M5C.md*.
+remain separate coordinator-owned phases of the M5c landing procedure.

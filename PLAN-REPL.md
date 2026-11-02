@@ -26,7 +26,8 @@ for M5.
 This plan is governed by [*WHITEPAPER.md*](./WHITEPAPER.md),
 [*DESIGN.md*](./DESIGN.md), [*ROADMAP.md*](./ROADMAP.md),
 [*PLAN-BACKEND.md*](./PLAN-BACKEND.md), [*PLAN-DYN.md*](./PLAN-DYN.md),
-[*PLAN-GC.md*](./PLAN-GC.md), [*PLAN-M5.md*](./PLAN-M5.md),
+[*PLAN-GC.md*](./PLAN-GC.md),
+[*docs/language-profile-m5.md*](./docs/language-profile-m5.md),
 [*PLAN-NIO.md*](./PLAN-NIO.md), [*PLAN-PT.md*](./PLAN-PT.md), and
 [ADR 0016](./docs/adr/0016-dynamic-source-boundary.md). Evidence from an
 interactive prototype must update the affected document or decision record

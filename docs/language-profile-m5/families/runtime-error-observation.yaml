@@ -72,7 +72,7 @@ scope:
     runtime negative whose thrown value is a `Test262Error` observable
     instead of an unsupported runtime observation."
 owners:
-  - PLAN-M5.md
+  - docs/language-profile-m5.md
 evidence:
   differential:
     status: covered

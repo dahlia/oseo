@@ -55,9 +55,10 @@ This plan is governed by [*WHITEPAPER.md*](./WHITEPAPER.md),
 [*DESIGN.md*](./DESIGN.md), [*ROADMAP.md*](./ROADMAP.md),
 [*CONTRIBUTING.md*](./CONTRIBUTING.md), and
 [ADR 0013](./docs/adr/0013-m5-edition-and-manifest.md). It does not restate
-the measurement contract in [*PLAN-M5.md*](./PLAN-M5.md) or the property and
-replay contract in [*PLAN-PT.md*](./PLAN-PT.md); it references them and names
-the checkpoints that extend them.
+the measurement contract in
+[*DESIGN.md*](./DESIGN.md#testing-and-observability) or the property and replay
+contract in [*PLAN-PT.md*](./PLAN-PT.md); it references them and names the
+checkpoints that extend them.
 
 
 Goal
@@ -258,7 +259,8 @@ sequential classifications and matched the checked-in canonical manifest byte
 for byte. The complete host facts and measurement table are recorded in
 [*docs/gate-cost-baseline.md*](./docs/gate-cost-baseline.md).
 
-Owner: the standards harness expansion in [*PLAN-M5.md*](./PLAN-M5.md).
+Owner: the standards harness rules in
+[*DESIGN.md*](./DESIGN.md#testing-and-observability).
 
 ### Compatibility ratchet check
 
@@ -334,8 +336,9 @@ property scan found 29 domains, 28 distinct seeds, and an aggregate ordinary
 case budget of 2,290. This checkpoint has no timing target; these measurements
 record the cost the next checkpoint inherits.
 
-Owner: the measurement contract in [*PLAN-M5.md*](./PLAN-M5.md) states the
-rule; this plan only carries the gate that enforces it.
+Owner: the measurement contract in
+[*DESIGN.md*](./DESIGN.md#testing-and-observability) states the rule; this plan
+only carries the gate that enforces it.
 
 ### Seed allocation registry
 
@@ -503,9 +506,9 @@ The compatibility snapshot now includes the indexed family IDs. Removing an
 admitted family produces an `admitted-family` monotonicity violation. That
 invariant is deliberately absent from the override vocabulary. A focused
 regression removes one of two baseline families and proves both the violation
-and the rejected override attempt. [*PLAN-M5.md*](./PLAN-M5.md) and
-[*ROADMAP.md*](./ROADMAP.md) now reference the normative records for current
-family status while retaining their unit-level evidence narratives as history.
+and the rejected override attempt. [*ROADMAP.md*](./ROADMAP.md) references
+the normative records for current family status while retaining its
+unit-level evidence narrative as history.
 
 The final checks ran on Linux 7.1.5-201.fc44.x86\_64 with an AMD Ryzen 7 7700X,
 8 cores and 16 threads. The host had 42 GiB of memory available, 1.4 GiB of
@@ -524,7 +527,8 @@ The compatibility snapshot remains exactly 2,934 passes across 4,861 paths.
 The property snapshot remains 57 domains, 57 distinct seeds, and an aggregate
 ordinary case budget of 2,686. No semantic output or manifest was regenerated.
 
-Owner: [*PLAN-M5.md*](./PLAN-M5.md) and the M5 language profile.
+Owner: the
+[*M5 language profile*](./docs/language-profile-m5.md).
 
 
 Measurement contract
@@ -668,10 +672,10 @@ shard.
 This projection extends the measured CI baseline in
 [*docs/gate-cost-baseline.md*](./docs/gate-cost-baseline.md) from its measured
 21,383 reviewed paths to the measured 41,091-path edition denominator that
-[*PLAN-M5C.md*](./PLAN-M5C.md) records and `mise run check:test262-inventory`
-reports. It contains no new measurement and triggered no CI run. Every figure
-is either quoted from that baseline as measured or derived from it by the model
-stated below, and each is labeled.
+[ADR 0020](./docs/adr/0020-m5-applicable-test-inventory.md) fixes and
+`mise run check:test262-inventory` reports. It contains no new measurement and
+triggered no CI run. Every figure is either quoted from that baseline as
+measured or derived from it by the model stated below, and each is labeled.
 
 The merge-wait goal in
 [Merge-wait goal and projection (U12)](#merge-wait-goal-and-projection-u12)

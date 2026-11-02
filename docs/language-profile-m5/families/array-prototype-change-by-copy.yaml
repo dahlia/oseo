@@ -14,7 +14,7 @@ scope:
     test/built-ins/Array/prototype/with/: 65 pass and three retain the
     separately owned Boolean intrinsic prerequisite."
 owners:
-  - PLAN-M5.md
+  - docs/language-profile-m5.md
 evidence:
   differential:
     status: covered

@@ -4,7 +4,7 @@ title: "Unary type, void, and remainder"
 scope:
   - "The typeof, void, and Number remainder operators."
 owners:
-  - PLAN-M5.md
+  - docs/language-profile-m5.md
 evidence:
   differential:
     status: covered

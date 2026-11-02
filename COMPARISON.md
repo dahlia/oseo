@@ -546,11 +546,14 @@ expressions, WebAssembly, TLS, streams, and package resolution each expose a
 large independent design problem.
 
 The present status should be read with that cost in mind. Oseo has completed
-its M4 closed module, promise, asynchronous continuation, timer, and scheduler
-work. M5 is active. The current
-[*PLAN-M5.md*](./PLAN-M5.md) reports 310 passes, 245 expected negatives, and
-126 unsupported profile features in its reviewed test262 subset, with no
-semantic or harness failures. Linux on AMD64 and macOS on AArch64 execute the
+M5, measured ECMAScript compatibility. The
+[M5 exit report](./docs/m5c-closure/m5-exit-report.md) reviews all 41,091
+applicable test262 paths of the ECMA-262 16th edition inventory: 34,778
+passes, 4,401 expected negatives, and 1,912 unsupported profile features, each
+covered by an authorized exclusion or a named deferral, with no semantic,
+harness, or infrastructure failures. Oseo does not claim unqualified ECMA-262
+conformance, because `eval`, the `Function` constructor, and dynamic import
+remain unsupported. Linux on AMD64 and macOS on AArch64 execute the
 native corpus; AArch64 Linux is a compile-link and inspection target.
 
 The Minimum common web API, real native I/O, selected Node.js compatibility,

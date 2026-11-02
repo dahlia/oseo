@@ -24,7 +24,7 @@ scope:
     historical String blockers. IH-B admits a reviewed temporalHelpers.js
     subset for its three Iterator.from paths."
 owners:
-  - PLAN-M5.md
+  - docs/language-profile-m5.md
 evidence:
   differential:
     status: covered

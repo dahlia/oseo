@@ -24,8 +24,7 @@ scope:
     names, null prototypes, proxy traps, reflection, and unrelated
     TypeErrors retain core behavior."
 owners:
-  - PLAN-M5.md
-  - PLAN-M5C.md
+  - docs/language-profile-m5.md
 evidence:
   differential:
     status: covered

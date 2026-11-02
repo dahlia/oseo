@@ -53,7 +53,7 @@ scope:
     the same divergence `new RegExp` already has and the pattern-grammar
     node owns it."
 owners:
-  - PLAN-M5.md
+  - docs/language-profile-m5.md
   - PLAN-REGEXP.md
 evidence:
   differential:

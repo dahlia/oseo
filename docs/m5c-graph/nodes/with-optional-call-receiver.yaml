@@ -20,7 +20,7 @@ delivers: "Repairs a native-confirmed defect in admitted optional calls through
   proper-tail-calls, whose unlanded execution contract runs these admitted
   tail calls. Preserve ordinary identifier calls, optional
   member calls, and lexical and global fallback behavior. Follow the
-  PLAN-M5.md semantic evidence contract with fixed native examples, an
+  M5 profile semantic evidence contract with fixed native examples, an
   independent generated oracle, both specialization policies, forced
   collection, structural evidence, and the optional-chaining and
   with-statement family records and profile. Extend existing generators

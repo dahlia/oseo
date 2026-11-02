@@ -20,7 +20,7 @@ scope:
     and the accepted full manifest UPDATE on U 6c0d46bd promotes exactly
     those three paths to pass with no demotions."
 owners:
-  - PLAN-M5.md
+  - docs/language-profile-m5.md
 evidence:
   differential:
     status: covered

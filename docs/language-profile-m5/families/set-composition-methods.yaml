@@ -15,7 +15,7 @@ scope:
     isDisjointFrom, receiver mutation during has calls, and the
     normal-completion iterator close when a keys walk stops early."
 owners:
-  - PLAN-M5.md
+  - docs/language-profile-m5.md
 evidence:
   differential:
     status: covered

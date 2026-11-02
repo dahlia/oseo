@@ -4,7 +4,7 @@ title: "Class static members"
 scope:
   - "Static methods and accessors on class constructors."
 owners:
-  - PLAN-M5.md
+  - docs/language-profile-m5.md
 evidence:
   differential:
     status: covered

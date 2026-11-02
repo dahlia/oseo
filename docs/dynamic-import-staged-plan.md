@@ -219,11 +219,11 @@ compatibility manifest; neither currently implements this proposed schema.
 
 Generated graphs need independent state and trace oracles, closure-preserving
 shrinks, seeds, replay inputs, ordinary budgets, and extended budgets as
-required by *PLAN-PT.md* and *PLAN-M5.md*. Cover aliases, lazy side effects,
-shared pending state, cycles, errors, namespaces, and collection at each
-request/evaluation safepoint. Retain source, graph, manifest, target, ABI,
-compiler options, specialization/collection modes, replay path, and actual
-failure observation.
+required by *PLAN-PT.md* and the property contract in *DESIGN.md*. Cover
+aliases, lazy side effects, shared pending state, cycles, errors, namespaces,
+and collection at each request/evaluation safepoint. Retain source, graph,
+manifest, target, ABI, compiler options, specialization/collection modes,
+replay path, and actual failure observation.
 
 Native execution evidence is required on Linux AMD64 and macOS AArch64;
 AArch64 Linux supplies compile-link and inspection evidence only. Include strict

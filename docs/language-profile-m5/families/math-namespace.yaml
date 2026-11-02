@@ -13,7 +13,7 @@ scope:
   - "The realm-owned Math.random source, meaning its [0, 1) range and the
     requirement that distinct realms draw distinct sequences."
 owners:
-  - PLAN-M5.md
+  - docs/language-profile-m5.md
 evidence:
   differential:
     status: covered

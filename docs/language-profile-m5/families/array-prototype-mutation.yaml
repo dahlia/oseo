@@ -22,7 +22,7 @@ scope:
     plus a deleteCount above the maximum safe integer clamped to the largest
     ordinary Array length before species construction."
 owners:
-  - PLAN-M5.md
+  - docs/language-profile-m5.md
 evidence:
   differential:
     status: covered

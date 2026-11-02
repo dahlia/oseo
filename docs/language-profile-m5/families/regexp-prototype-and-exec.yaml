@@ -75,7 +75,7 @@ scope:
     `RegExp.escape`, the regular expression string iterator, and
     ahead-of-time literal lowering remain owned by later RegExp nodes."
 owners:
-  - PLAN-M5.md
+  - docs/language-profile-m5.md
   - PLAN-REGEXP.md
 evidence:
   differential:

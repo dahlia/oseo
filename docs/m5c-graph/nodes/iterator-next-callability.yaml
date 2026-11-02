@@ -9,7 +9,7 @@ delivers: "Closes exactly 3 newly observed paths under
   IteratorStep that calls it. A yield in the assignment target must run
   before stepping, so generator return can close an iterator with no next
   method and observe its throwing or non-object return result. Repair this
-  already-admitted static iterator behavior. Follow the full PLAN-M5.md
+  already-admitted static iterator behavior. Follow the full M5 profile
   evidence contract: focused examples, generated properties or an extension
   of existing iterator properties, forced-collection evidence, both
   specialization policies, and the normative family record and profile.

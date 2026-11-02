@@ -18,7 +18,7 @@ scope:
     resizable-buffer harness support, and the dynamic ReferenceError an
     unreferenced callback binding requires."
 owners:
-  - PLAN-M5.md
+  - docs/language-profile-m5.md
 evidence:
   differential:
     status: covered

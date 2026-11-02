@@ -4,7 +4,7 @@ title: "Delete super properties"
 scope:
   - "Delete of static and computed super property references."
 owners:
-  - PLAN-M5.md
+  - docs/language-profile-m5.md
 evidence:
   differential:
     status: covered

@@ -8,7 +8,7 @@ delivers: "Closes exactly 1 newly observed path,
   currently runs after the source property Get and the default initializer;
   ECMA-262 KeyedBindingInitialization requires it before both. Repair this
   already-admitted static destructuring behavior, including observable with
-  environment lookup order. Follow the full PLAN-M5.md evidence contract:
+  environment lookup order. Follow the full M5 profile evidence contract:
   focused examples, a generated property or an extension of the existing
   destructuring property, forced-collection evidence, both specialization
   policies, and the normative family record and profile. Add a guard-miss

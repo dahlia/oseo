@@ -4,7 +4,7 @@ title: "Labeled statements"
 scope:
   - "Labeled break and continue with completion propagation."
 owners:
-  - PLAN-M5.md
+  - docs/language-profile-m5.md
 evidence:
   differential:
     status: covered

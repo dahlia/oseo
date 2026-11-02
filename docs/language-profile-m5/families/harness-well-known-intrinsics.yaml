@@ -21,7 +21,7 @@ scope:
     top-level this is undefined. No consumer of the include at the pinned
     upstream revision is either, and a source test checks every one."
 owners:
-  - PLAN-M5C.md
+  - docs/language-profile-m5.md
 evidence:
   differential:
     status: covered

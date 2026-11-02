@@ -14,7 +14,8 @@ named by the targeted standard edition.
 This plan is governed by [*WHITEPAPER.md*](./WHITEPAPER.md),
 [*DESIGN.md*](./DESIGN.md), [*ROADMAP.md*](./ROADMAP.md),
 [*PLAN-CRYPTO.md*](./PLAN-CRYPTO.md), [*PLAN-DYN.md*](./PLAN-DYN.md),
-[*PLAN-M5.md*](./PLAN-M5.md), [*PLAN-GC.md*](./PLAN-GC.md),
+[*docs/language-profile-m5.md*](./docs/language-profile-m5.md),
+[*PLAN-GC.md*](./PLAN-GC.md),
 [*PLAN-NIO.md*](./PLAN-NIO.md), [*PLAN-PT.md*](./PLAN-PT.md),
 [*PLAN-WASM.md*](./PLAN-WASM.md), the frozen language profiles, and accepted
 records under *docs/adr/*. The completed runtime componentization recorded in
@@ -338,9 +339,9 @@ M6 is complete only when:
     named by the standard, through the conformance label gate that
     [ADR 0019](./docs/adr/0019-m5-claim-closure.md) defines or a recorded
     boundary decision that demonstrates conformance to that exact requirement.
-    Completing [*PLAN-M5.md*](./PLAN-M5.md) is not sufficient by itself,
-    because M5 may complete with authorized unsupported results inside the
-    claimed edition;
+    Completing M5 is not sufficient by itself, because M5 closed with
+    authorized exclusions and named deferrals inside the claimed edition, as
+    the [M5 exit report](./docs/m5c-closure/m5-exit-report.md) records;
  -  every API group lives in an owned runtime component with complete
     tracing, rooting, forced-collection, and failure-injection coverage;
  -  the platform event adapter keeps deterministic test execution and records

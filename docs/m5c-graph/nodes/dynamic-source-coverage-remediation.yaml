@@ -99,7 +99,7 @@ delivers: "Resolves the 334 reviewed unsupported paths assigned to
   are constructible before their trailing zero-argument construction
   reports the ADR 0016 run-time rejection, so their IsConstructor
   subject stays inside the claim. Obtain the maintainer accounting
-  decision in PLAN-M5C.md, then review equivalent ahead-of-time
+  decision, then review equivalent ahead-of-time
   observation or replacement evidence per original path; preserve all
   paths and assertions, never emulate runtime eval or widen ADR 0016,
   and keep unresolved rows under remediation. Batch 16 preparation adds

@@ -7,7 +7,7 @@ scope:
     including receiver and operand conversion, Unicode case mapping, the
     ECMAScript whitespace set, normalization forms, and canonical equivalence."
 owners:
-  - PLAN-M5.md
+  - docs/language-profile-m5.md
 evidence:
   differential:
     status: covered

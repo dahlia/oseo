@@ -5,7 +5,7 @@ scope:
   - "The 13 edition well-known symbols and their stable identities."
   - "Their descriptions and Symbol constructor descriptors."
 owners:
-  - PLAN-M5.md
+  - docs/language-profile-m5.md
 evidence:
   differential:
     status: covered

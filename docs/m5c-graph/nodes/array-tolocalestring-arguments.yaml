@@ -6,7 +6,7 @@ delivers: "Closes exactly 1 path,
   whose observation fails the assertion that an element's toLocaleString
   receives no arguments when the array method receives no arguments. Repair
   the already-admitted Array behavior against the ADR 0013 ECMA-262 edition
-  and ECMA-402 boundary, follow the full PLAN-M5.md evidence contract, and
+  and ECMA-402 boundary, follow the full M5 profile evidence contract, and
   update the normative record and the profile's current two-undefined-argument
   forwarding account. Admit the path and regenerate the complete reviewed
   manifest and ledger."

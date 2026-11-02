@@ -12,20 +12,21 @@ TODOs.
 Status
 ------
 
-Implementation status: active. This is the living M5 profile required by
-[*PLAN-M5.md*](../PLAN-M5.md). It starts from the frozen
+Implementation status: complete. M5a, M5b, and M5c are complete, and the
+[M5 exit report](./m5c-closure/m5-exit-report.md) records how every path of
+the applicable-test inventory closed. This profile starts from the frozen
 [M3](./language-profile-m3.md) and [M4](./language-profile-m4.md) profiles and
 records how each dependency-indexed capability group stands against the claim
-boundary frozen in [ADR 0013](./adr/0013-m5-edition-and-manifest.md). Every M5
-checkpoint that admits or measures behavior updates this document in the same
-change.
+boundary frozen in [ADR 0013](./adr/0013-m5-edition-and-manifest.md). A change
+that admits or measures behavior inside that boundary updates this document in
+the same change.
 
-Unlike the frozen M3 and M4 profiles, this document changes throughout M5. A
-group's status describes tested current behavior, never intended behavior.
+Unlike the frozen M3 and M4 profiles, this document changed with every M5
+checkpoint. A group's status describes tested current behavior, never intended
+behavior.
 
-M5a is complete. The normative family records described below inventory 149
-admitted M5 families and assess every evidence class. M5 remains active through
-its M5b and M5c checkpoints.
+The normative family records described below inventory 149 admitted M5
+families and assess every evidence class.
 
 M5c node `import-attributes` admits static import and re-export attributes and
 default-only JSON modules. The file host accepts `type: "json"` for JSON
@@ -47,6 +48,14 @@ The JSON file loader removes leading U+FEFF characters before validation and
 hashes the original content. Interior U+FEFF data and JavaScript file text are
 preserved; custom loaders retain their own text policy. JSON entry modules
 remain unsupported and receive an entry-specific diagnostic.
+
+Request discovery groups bindings by their located source request, not by
+canonical URL. Each invalid request reports one diagnostic, distinct source
+sites report separate errors, and a cached loader failure is reported once.
+The generated valid graphs cover zero, one, and two leading BOMs and both
+observer-first and JSON-first request orders, and shrinking keeps the closed
+three-node cycle. The family reserves seeds `0x60008600` through
+`0x600086ff`.
 
 The pinned prerequisite selector contains 89 paths: 24 static subjects and 65
 dynamic-boundary subjects. Dynamic import and runtime options remain outside
@@ -127,7 +136,7 @@ data, accessor, and read-only properties, proxy `set` traps, null prototypes,
 typed-array numeric keys, and the object-literal prototype setter keep their
 behavior. At that checkpoint, a primitive base returned early; the guard
 covered only those two walks. The current
-[primitive receiver inherited Set contract](#primitive-receiver-inherited-set-preparation)
+[primitive receiver inherited Set contract](#primitive-receiver-inherited-set)
 supersedes that early return: wrapper lookup preserves the original primitive
 Receiver through inherited setter calls and Proxy Set dispatch. The current
 metadata contract linked above rejects invocation of an excluded setter body,
@@ -343,6 +352,13 @@ execution under both specialization policies, deliberate guard miss through a
 compiled generic fallback, forced collection, structural IR or generated-code
 checks, fixed or unit evidence, and applicable standards evidence. The records
 may not use `unassessed`.
+
+These classes are the M5 profile evidence contract that every semantic unit
+follows: focused examples, applicable generated and forced-collection
+evidence, generic fallback and specialization misses, reviewed test262
+observations, and the normative family record. Observation and audit work
+adds no runtime behavior and creates no evidence merely to resemble a
+semantic unit.
 
 `mise run check:evidence-lanes` validates the complete current-tree index and
 record set. The compatibility ratchet snapshots the stable IDs, so removing an
@@ -8795,9 +8811,17 @@ never selects a namespace import. Duplicate names, lone surrogates, and a
 string local name without `from` are early errors.
 
 A namespace lists its string keys in code-unit order, array-index names
-included. An ordinary object lists array-index keys first. The reviewed test262
-features `arbitrary-module-namespace-names` and
-`export-star-as-namespace-from-module` are admitted.
+included, so `"10"` and `"2"` follow `""` and precede ordinary names. An
+ordinary object lists array-index keys first. V8, and so both reference hosts,
+lists a namespace's array-index names first, so the native scenario checks
+*tests/fixtures/module-export-forms/key-order.mjs* against an explicit
+expectation. Its `Object.keys`, `Object.getOwnPropertyNames`,
+`Reflect.ownKeys`, Proxy, `Object.entries`, and `Object.assign` lines follow
+ECMA-262. Its for-in line fixes the order Oseo chooses, because ECMA-262 2025
+section 14.7.5.9 leaves the enumeration order of a module namespace exotic
+object unspecified. The reviewed test262 features
+`arbitrary-module-namespace-names` and `export-star-as-namespace-from-module`
+are admitted.
 
 M5c node `module-namespace-uninitialized-bindings` completes a namespace's
 `[[GetOwnProperty]]` for uninitialized exports. It reads each export through
@@ -8822,6 +8846,76 @@ binding or mapped arguments index instead of its binding cell.
 The generated domain in
 *tests/property/m5-module-namespace-uninitialized.property.test.ts* reserves
 seed block `0x60009000`.
+
+
+Iterator next callability timing
+--------------------------------
+
+M5c node `iterator-next-callability` repairs synchronous iterator
+acquisition. `GetIterator` captures the `next` value once, without testing
+its callability. A getter error remains an acquisition error, and the first
+call from `IteratorStep` owns a non-callable value's `TypeError`. Mutation
+after acquisition does not change the captured value.
+
+An array assignment target can yield before that first step. Returning or
+throwing into the suspended generator then closes the iterator without
+calling `next`, even when the recorded value is absent or non-callable.
+Closing keeps the `return` getter, method callability, object-result check,
+and completion precedence. Direct asynchronous iterator acquisition is
+outside this repair; the Async-from-Sync fallback uses the repaired
+synchronous helper. The runtime identity is `m5-131`, with no new entry
+point, public layout, heap kind, or code ID.
+
+The `iterator-next-callability` native fixture has 68 timing invocations,
+including four explicit `undefined` next cases, empty patterns, nested
+consumer cleanup, and matching immediate-consumer controls, and it forces
+collection under both specialization policies. A structural test checks the
+captured iterator state, suspension before stepping, the close operation's
+shared done state, and the return-resumption block.
+*m5-destructuring-assignment.property.test.ts* adds slots `0x60001001` and
+`0x60001002` with 16 ordinary cases each. Their independent ECMA-262 2025
+oracle models acquisition, stepping, closing, and error precedence. Six fixed
+native cases replace the `next` getter while the target is suspended and step
+the captured heap closure after forced collection.
+
+`Object.fromEntries` and Async-from-Sync `for-await-of` with a non-callable
+or throwing `next` use the specification's expected output directly. Their
+first-step failure does not close the iterator, while Node.js 24.21.0 and
+Deno 2.9.7 close it, so these four controls are not differential fixtures.
+The destructuring-assignment, sync-generators, and sync-iteration family
+records keep their identities and guard-fallback omissions; the semantic
+callability check is not an optimization guard.
+
+
+Hashbang comments
+-----------------
+
+M5c node `hashbang-comments` admits the test262 `hashbang` feature. ECMA-262
+2025 12.5 defines a HashbangComment as `#!` followed by
+SingleLineCommentChars, and the InputElementHashbangOrRegExp goal applies
+only at the start of a Script or Module. The comment ends at any of the four
+LineTerminator code points, a CRLF pair included, or at the end of input.
+
+Any preceding text is a SyntaxError, including WhiteSpace such as U+FEFF, a
+line terminator, a comment, a directive, a statement, or an earlier hashbang.
+So is `#!` inside a function body, block, class body, or expression, and
+neither character may be written with an escape. Parse failures report the
+source-located `OSEO0001` diagnostic at the misplaced `#`. A hashbang body
+such as `"use strict"` stays a comment, so the following Script still admits
+`with`. Hashbang text inside `eval` or `Function` source would be parsed only
+by a later dynamic parse, which ADR 0016 keeps outside the profile.
+
+The pinned Babel parser implements this grammar for both goals and records
+the comment as an interpreter directive that the converter never reads, so
+the comment adds no runtime value, safepoint, guard, or specialized path.
+*packages/parser-babel/tests/hashbang.test.ts* enumerates the finite boundary
+domain under Node.js and Deno: both goals, every line terminator and the end
+of input, comment bodies that would mean something outside a comment, sixteen
+classes of preceding text, five nested placements, and nine escape spellings.
+Owned syntax, HIR, and MIR for a hashbang Script equal those of the same
+source with `//` in place of `#!`, and the family record names that
+structural equivalence as the replacement for native, specialization, and
+collection evidence.
 
 
 Known gaps inside the claim
@@ -8867,8 +8961,8 @@ audit. The remaining gaps retain their existing owners.
     of the two operands' element counts rather than to their sum. `Map`
     storage shares the same shape.
 
-    Compaction that preserves open cursors is a measured storage checkpoint
-    that [*PLAN-M5.md*](../PLAN-M5.md) owns; the observable semantics are
+    Compaction that preserves open cursors would be a measured storage
+    change that no current plan schedules; the observable semantics are
     complete without it.
 
  -  The BigInt primitive, exact literals, `ToNumeric`, comparisons, operators,
@@ -9125,8 +9219,8 @@ audit. The remaining gaps retain their existing owners.
     `globalThis`. Its `assert.throwsAsync` reports a constructor mismatch
     without composing a message from the observed value, so a rejection whose
     `constructor` is missing or exotic cannot replace the mismatch report with
-    a thrown conversion. Owner: the standards harness expansion in
-    [*PLAN-M5.md*](../PLAN-M5.md).
+    a thrown conversion. Owner: the reviewed standards harness, under the
+    harness rules in [*DESIGN.md*](../DESIGN.md#testing-and-observability).
 
  -  The native host fails an executable with an unhandled rejection, as the
     M4 event-loop profile requires, while the upstream test262 host contract
@@ -9194,6 +9288,32 @@ upstream failure detail, because generic string coercion renders an ordinary
 object failure value. It guards that composition and falls back to the bare
 marker for a Symbol and for any object whose conversion completes abruptly,
 rather than replacing a case's failure report with a thrown conversion.
+
+Before assembly, the reviewed runner classifies a case that names an
+include without a reviewed copy as `unsupported-profile-feature` with the
+`harness-include` capability, rather than as a defect in an admitted
+harness; admitted includes and `raw` cases are unaffected. The runner records
+an `executed` fact only when the compiled executable starts. A run-time
+`OSEO1001` that stops a started program therefore keeps its variant as
+execution evidence, and the fragment executor counts the same fact;
+compile-stage rejections have none.
+
+A reviewed include keeps every upstream operation unless the profile cannot
+express it. The copy of *resizableArrayBufferUtils.js* declares
+`MyUint8Array`, `MyFloat32Array`, and `MyBigInt64Array` as `const` bindings of
+the same named class expressions, in the same order and with the same global
+heritage, instead of compiling them through the `Function` constructor in
+upstream's internal `subClass`. `subClass` itself is undefined, since it is
+outside the upstream `defines` and no pinned test calls it, and both
+`typeof Float16Array` probes stay verbatim. The *temporalHelpers.js* subset
+keeps only `observeMethod`, `propertyBagObserver`, `toPrimitiveObserver`, and
+the upstream `formatPropertyName` and `ASCII_IDENTIFIER` they log through.
+Because it still declares `TemporalHelpers`, the `harness-definition` check
+compares literal member keys of upstream object-literal definitions, and the
+object runs behind a proxy that prints a per-case marker before throwing on
+any observation of an omitted member; a marker, or a started program whose
+trap never armed, is a harness failure ahead of every other outcome.
+*tcoHelper.js* keeps `$MAX_ITERATIONS` at 100,000.
 
 A newly supported feature moves tests out of `unsupported-profile-feature`
 only after every applicable variant executes. A changed upstream revision is
@@ -9359,10 +9479,11 @@ with counting, throwing, or string keys, and logical, simple, and update
 controls with string keys. It has 20 ordinary cases and a 240-second
 interrupt limit. Shrinking keeps the strictness and each subject's operator,
 base, key, and bounded values. Native runs use both specialization policies
-with collection at every safepoint. Fixed cases in the same file cover every
-arithmetic operator over every base and key kind in both strictness modes,
-every control over every base, and the S11.13.2\_A7 T4 shape, a key whose
-conversions name different properties, through both `toString` and
+with collection at every safepoint. The fixed matrix lives in
+*m5-compound-member-fixed.property.test.ts* and covers every arithmetic
+operator over every base and key kind in both strictness modes and every
+control over every base. The original file keeps the S11.13.2\_A7 T4 shape, a
+key whose conversions name different properties, through both `toString` and
 `Symbol.toPrimitive`, plus a member compound assignment whose right operand
 awaits, which keeps the checked base and converted key across suspension. The
 `compound-assignments` native fixture now checks the nullish-base order for all
@@ -9376,10 +9497,12 @@ form and null, undefined, number, string, and object bases, and over
 `super` reads, `+=`, `||=`, and `++` with a null or ordinary home
 prototype, each with counting, throwing, string, or literal keys. It has 20
 ordinary cases and a 240-second interrupt limit, and its independent model
-labels both V8 discrepancies separately. Fixed cases run every form over
-every admitted base, key kind, and falsy, truthy, or null current value in
-both strictness modes, plus for-of and for-in heads around an iterator whose
-`return` is observed, and primitive receivers seen by a getter and a method.
+labels both V8 discrepancies separately. The fixed matrix lives in
+*m5-computed-member-fixed.property.test.ts* and runs every form over every
+admitted base, key kind, and falsy, truthy, or null current value in both
+strictness modes. The original file keeps for-of and for-in heads around an
+iterator whose `return` is observed, and primitive receivers seen by a getter
+and a method.
 The changing-key update subject of the `update-expressions` native fixture
 and the taken logical subject of `compound-assignments` moved there
 verbatim with fixed expected values, because both observed the V8 second
@@ -9810,214 +9933,191 @@ reference, and native execution, affected review, fresh full observations, and
 exact candidate/Main gates remain pending.
 
 
-Primitive receiver inherited Set preparation
---------------------------------------------
+Primitive receiver inherited Set
+--------------------------------
 
-The `primitive-receiver-inherited-set` source prepares wrapper lookup with the
-original primitive Receiver, following ECMA-262 2025 PutValue,
-OrdinarySetWithOwnDescriptor, and OrdinaryCallBindThis. String own restrictions
-precede inherited descriptors. Inherited callable setters and Proxy Set
-dispatch keep the primitive; data writes may still fail. Caller strictness
-affects a false Set result independently of setter strictness. The existing
-ordinary call boundary boxes sloppy this in the callee realm.
+M5c node `primitive-receiver-inherited-set` completes PutValue for a
+primitive base, following ECMA-262 2025 PutValue,
+OrdinarySetWithOwnDescriptor, and OrdinaryCallBindThis. `oseo_object_set`
+constructs a full intrinsic wrapper for lookup and passes the original
+primitive as Receiver to the existing receiver-carrying Set walk. String own
+index and length restrictions precede inherited descriptors. Inherited
+callable setters and Proxy Set dispatch receive the primitive, data writes
+may still fail, and a setter's abrupt completion propagates. Caller
+strictness affects a false Set result independently of setter strictness.
+
+A root frame keeps the original base, key, value, and wrapper live until a
+refusal has become a language error. Ordinary call entry still owns strict
+primitive `this` and sloppy boxing in the callee realm. No compiler guard,
+Reference lowering, runtime ABI, or object-receiver Set path changes. The
+generic store adds no guard, so the compound-assignment record keeps its
+guard-fallback omission and named replacement evidence.
+
+For-in enumeration acquires its receiver through the rooted ToObject helper
+after the unchanged nullish early return, so all five primitive kinds keep
+their actual prototype chain, including String own indices. The original
+primitive and its wrapper stay rooted until the enumeration owns its
+receiver and candidates. An allocation failure unwinds to the caller's root
+frame and realm and allows a successful retry, and a Proxy abrupt completion
+keeps its identity.
 
 *tests/primitive-receiver-inherited-set.test.ts* supplies pure reference and
-structural checks. The independent structured model and the source for later
-native evidence are in *tests/helpers/primitive-receiver-set.ts*,
-*tests/property/m5-primitive-receiver-inherited-set.property.test.ts*, and
-*tests/fixtures/primitive-receiver-inherited-set/allocation.c*.
+structural checks. The independent structured model is in
+*tests/helpers/primitive-receiver-set.ts*, the generated domain in
+*tests/property/m5-primitive-receiver-inherited-set.property.test.ts*, and the
+allocation fixture in
+*tests/fixtures/primitive-receiver-inherited-set/allocation.c*. Twenty-seven
+fixed native subjects cover strictness, descriptor and Proxy, key, and String
+boundaries independently of generated draws. The C fixture builds foreign
+ordinary setters without dynamic source and sweeps warmed allocation failures
+with root and realm restoration and retry.
+*tests/helpers/primitive-set-array-interop.ts* keeps the dense-apply
+interaction Script and its literal oracle, and *tests/helpers/annexb-for-in.ts*
+supplies ten fixed for-in programs with independent literal oracles for
+ordering, shadowing, deletion, accessor replacement, integrity levels, all
+five primitive kinds, and nullish and abrupt controls.
 
-Native seed `0x60008c00` has 12 ordinary cases and a 240-second deadline; each
-case retains all primitive kinds and two writes while shrinking. The separate
-pure sixteen-sample seed remains `0x60008b00`; the unpublished native default
-moved to avoid Main's Script/Module seed block. Forced collection and
-allocation-failure assertions are pending native execution.
-
-This preparation changes no covered evidence assessment, compatibility
-observation, reviewed selector, or exclusion. The wrapper family's earlier
-coverage does not establish this Set repair. See *PLAN-M5.md* for the
-implementation contract and Root-owned validation and publication gates.
+Native seed `0x60008c00` has 12 ordinary cases and a 240-second deadline.
+Each case retains all five primitive kinds, object and nullish controls, two
+writes, independent caller and setter strictness, string, symbol, index, and
+length keys, descriptor or Proxy outcomes, and up to two extra prototype
+levels while shrinking. Its model computes expected traces without executing
+the rendered source. A fresh core reflection subject derived from the same
+integer checks the reflected accessor identities below. The separate pure
+sixteen-sample suite keeps seed `0x60008b00`. Native runs use both
+specialization policies with collection forced at every safepoint and
+require positive collection counts.
 
 
 Omitted legacy accessor metadata boundary
 -----------------------------------------
 
-The __proto__ rejection diagnoses required legacy getter/setter behavior. Core
-descriptor queries expose distinct, stable native getter/setter identities
-owned by their realm's Object.prototype. Existing property-vector tracing keeps
-them live. Metadata, Function.toString, nonconstructability and Function
-prototype ownership follow the ordinary built-in contracts.
+The `__proto__` rejection diagnoses required legacy getter/setter behavior.
+Core descriptor queries expose distinct, stable native getter/setter
+identities owned by their realm's `Object.prototype`. Existing property-vector
+tracing keeps them live. Their names, lengths, Function prototype,
+nonconstructibility, and native `Function.prototype.toString` shape follow
+the ordinary built-in contracts, and they are distinct from
+`Object.getPrototypeOf` and `Object.setPrototypeOf`.
 
-They are distinct from Object.getPrototypeOf and Object.setPrototypeOf.
-Describing or copying an identity does not invoke its body. Actual calls,
-including forwarding through call/apply/bind and transparent Proxies, retain
-the source-located OSEO1001 boundary. Reference Node/Deno Annex behavior is not
-claimed equivalent.
+Describing, copying, or redefining an identity does not invoke its body.
+Actual calls, including forwarding through `call`, `apply`, `bind`, and
+transparent Proxies, retain the source-located `OSEO1001` boundary. Two
+private Object native code IDs dispatch only to that rejection. Partial
+definitions preserve the other identity, concrete user halves execute
+normally, and an explicit undefined half remains undefined. Core identity
+comparison governs descriptor round trips, integrity levels, and Proxy
+invariants.
 
-Partial definitions preserve the other identity. Concrete user halves execute
-normally, and explicit undefined halves remain undefined. Core identity
-comparison governs descriptor round trips, integrity and Proxy invariants.
-
-Successful deletion removes the property, and failed deletion changes nothing.
-Recreation uses new creation order. The earlier descriptor-query rejection
-contract conflicted with the existing intrinsic-walk pass. Positive reflection
-and negative excluded-call controls replace it. No Annex body, accepted
-exclusion, feature, public ABI shape or family count is added.
-
-The original Annex and primitive Set assertions, apart from the superseded
-descriptor-identity rejection oracle above, remain. An independent native probe
-found a freeze/seal hole. The initial Linux passes on `1c96126b` are not
-evidence for the expanded metadata source. At preparation, its fixed/generated
-programs and layout assertions had only source/reference evidence. Affected
-review and fresh full observations remain pending. *PLAN-M5.md* names the files
-and exact raw packets. No numeric GC/frame or macOS/sanitizer/candidate/Main
-success is claimed, and no covered assessment or compatibility classification
+The omitted accessor keeps private presence, configurability,
+enumerability, and initial creation order. Ordinary and Proxy integrity
+operations consume the same metadata: `preventExtensions` alone does not
+lock a configurable key, while sealing and freezing do. Successful deletion
+removes the property, and failed deletion changes nothing. Replacement keeps
+the initial position, while deletion followed by recreation appends a new
+ordinary key. A realm's metadata never changes another realm's intrinsic.
+Ordinary property storage replaces the initial metadata after Object
+bootstrap, and no public intrinsic slot, layout, entry point, or ABI version
 changes.
 
+Ordinary for-in enumeration inserts the omitted key into each level's
+candidate list at its creation position, including non-enumerable metadata
+needed for shadowing, so it agrees with `Object.keys` and Proxy enumeration
+when the key is made enumerable. The synthesized key is rooted across
+allocation.
 
-Set-only generic interaction preparation
-----------------------------------------
+The pinned Deno 2.9.7 reference reports the reflected accessors as
+JavaScript functions named `__proto__` with own `prototype` properties,
+constructible and with non-native `Function.prototype.toString` text. Tests
+label that host metadata separately from Node.js and from the normative
+contract, under which Oseo's identities are nonconstructible native functions
+named `get __proto__` and `set __proto__`. Neither reference is claimed to
+reject invoking the Annex B accessor body.
 
-The earlier generic Set interaction preparation used Array/F3 base `f032576f`.
-This standalone composition instead starts from successful Main
-`cf0902db05ee8a51a2801f5d70372bfc5ca37b48`, retaining its `m5-135` interface
-and ordinary call/GC/realm/backend source. The original fifth dense-apply
-Script and literal oracle move to
-*tests/helpers/primitive-set-array-interop.ts*.
-
-Its separate preparation file checks reference/MIR/C contracts. Its native
-driver retains both policies, positive forced-GC counters and balanced
-frame/call/root teardown. *PLAN-M5.md* names the exact contracts and paths.
-This preparation initially had no new native/layout or model review.
-
-The private metadata represents presence, attributes and accessor-half
-availability. Reflected legacy identities are core metadata. Only excluded
-behavior still requires OSEO1001.
-
-TCO remains deferred under D6.5. Its protocol-specific assertions and the
-complete original interaction module remain protected history. Their
-requirements are not claimed tested or satisfied on this generic runtime.
-
-Original Set domains, seeds, budgets, programs, independent oracles and
-applicable semantic assertions remain. Current reviewed classifications,
-profile-family count, owners, exclusions and graph status stay exact base.
-
-Focused Linux AMD64 results on exact `eab6f366` are recorded in *PLAN-M5C.md*,
-which binds the actual commands, walls and raw packet to `eab6`, not a later
-prose commit. All tracked source hashes/modes remained exact.
-
-The original Annex/Set properties retain 12 cases, their seeds and limits, both
-policies, forced collection and applicable guard/fallback assertions. Both
-allocation fixture registrations compiled the expanded layout assertions on the
-selected Linux ABI. The independent generic driver retained its seven callback
-assertions and balanced teardown. Numeric sizes/GC/frame counters and
-successful temporary C/MIR/binaries were not printed or retained.
-
-Affected review, fresh observations, macOS/sanitizer and exact candidate/Main
-gates remain pending; no compatibility or evidence-vocabulary change follows.
-
-The later for-in consumer correction prepares creation-ordered ordinary
-virtual-key enumeration, hidden-own-key shadowing and rooted ToObject
-reachability for all primitive kinds. Its new independent fixed/reference
-subjects, allocation/root/realm retry fixture and fresh third Annex property
-subject preserve the earlier programs/oracles, seeds, cases and limits.
-
-The changed implementation now has 40 required focused registrations with
-explicit source bindings. Only the C fixture observation flag changed between
-the two focused runs; all other 8,046 files/modes, including
-runtime/program/oracle/generator/flag inputs, remain exact. The original
-command 9 counter assertion failure remains recorded.
-
-Both hosts now have positive collection and balanced realm/root checks for the
-new both-policy forced-GC matrix and all five acquisition failure/retry sweeps.
-Numeric GC counts and sizeof values were not printed. *PLAN-M5C.md* records all
-commands, walls and source-bound packets.
-
-Affected review, fresh full observations, macOS/sanitizer, extended and exact
-candidate/Main gates remain pending. The required Array CI failure blocked that
-historical bundle; it is not a standalone Set prerequisite. No family
-assessment, vocabulary, admission or classification changes.
+The Annex B generated domain keeps its original arbitrary, seed, 12-case
+budget, and 180,000-millisecond interrupt. Each case runs the original
+program, then a fresh integrity subject and a fresh for-in subject derived
+from the same integer. Fixed controls cover the 22 integrity states of
+*tests/helpers/annexb-integrity.ts*, reflected identities, and realm
+isolation under both specialization policies and forced collection. No
+metadata specialization exists, and the generated false-hint, guard-miss,
+and disabled-policy assertions remain. No Annex B body, accepted exclusion,
+feature, or family is added.
 
 
-Historical TCO source on the Array base
----------------------------------------
+Proper tail calls
+-----------------
 
-Initial preparation on Set `a111c31e` is preserved as TCO `54973309`. That base
-failed CI because its native prototype-root injection locator still matched
-three slots after Set changed that root frame to four.
+M5c node `proper-tail-calls` implements ECMA-262 15.10. A call is a tail call
+exactly when IsInTailPosition holds. Its body must be strict source code of
+an ordinary, arrow, method, accessor, or class constructor function.
+Generator and async bodies, class field initializers, static blocks,
+parameter defaults, and Script or Module code have none. Within a body, a
+`return` qualifies only outside every try Block, every Catch with a Finally,
+and every for-of body, the statement contexts HasCallInTailPosition
+excludes. The expression rules then select the returned call itself, both
+conditional arms, the right operand of `&&`, `||`, and `??`, the last comma
+operand, an optional chain ending in a call, and tagged templates of either
+form.
 
-Current preparation carries the complete owned `9945b7b8` to `b1eaeff0` TCO
-delta onto Array U`cccb7195`, tree `89d907b342885089374ffadd53eff606d31e6131`.
-All thirteen Array paths, three runtime guard hunks, six coverage files and new
-worknote stay exact. Set's locator, state prose,
-Receiver/descriptor/identity/invariant rules remain inherited. All fifteen TCO
-product postimages stay exact `b1eaeff0`.
+A tail call records its callee, receiver, copied arguments, and running
+realm in the context and leaves its frame through the body's ordinary exit
+with `OSEO_STATUS_TAIL_CALL`. `oseo_call_function` performs recorded calls
+one rooted step at a time, so a chain of any length holds one step's native
+stack, call depth, frame budget, and roots. `Function.prototype.call`,
+`Function.prototype.apply`, and `Reflect.apply` record their final call as
+their PrepareForTailCall steps require. Bound function and Proxy [[Call]]
+forward the same way because neither creates an execution context. A
+derived constructor's tail call carries its `this` binding cell, so the
+constructor result rules apply to the chain's final value.
 
-At initial preparation, Main was `cf0902db`/54, Set55 was prospective and Array
-was unlanded. Root's then-running standalone Array Full excluded TCO. The later
-combined-source U`68e298a9` evidence is distinct. Prior TCO sources and reviews
-remain preserved, including the incomplete32 and known-Gate-only33 outcomes.
+`console.log`, `setTimeout`, and `clearTimeout` also run as recorded host
+steps in tail position. All arguments, including unused extras and spread
+iteration, evaluate before recording and releasing the frame. `clearTimeout`
+keeps its numeric-handle-only behavior and undefined result, and no user
+conversion runs.
 
-Generic/host-tail, bound/Proxy Call forwarding, pending roots, derived/realm
-rules and four owner-local counters keep the full `m5-137` unit. The two
-changed internal interfaces retain Set metadata and all post-call checks. Main
-chunk/include/static/source-coordinate and logical frame contracts stay. The
-existing fifth Set Script/oracle and all four TCO subjects remain; only its
-deferred no-tail assertions become exact positive protocol checks. Old Set
-Full, TCO checks/reviews and Array proofs keep their own sources.
+A call outside tail position keeps nesting its frame and the 256-call limit.
+A chain of wide frames can exhaust the active native frame budget first,
+which the host C compiler lane reaches sooner because it charges each slot
+past the 32-slot base eight times. Because forwarding no longer nests, a
+non-tail call through a bound function or Proxy uses one call level fewer for
+that wrapper. A strict chain of tail calls with no base case runs until it is
+stopped instead of reporting `OSEO2001`, as the specification requires.
+Runtime ABI `m5-136` reserved this contract, `m5-137` adds owner-local
+collector counts, and the environment bitmap source uses `m5-139`.
 
-Array's worknote describes its standalone source before this TCO overlay; its
-measurements and unchanged-compiler statements do not validate the combined
-implementation. Changed lookup/Set/coercion/truncation/pending-GC interfaces
-received bounded interaction review and current-source execution. No rejected
-Array packing, completion-layout, B8 or RegExp implementation is imported.
+The reviewed *tests/test262/harness/tcoHelper.js* keeps `$MAX_ITERATIONS` at
+100,000. The `tail-call-optimization` feature is admitted, and the two strict
+tagged-template paths *test/language/expressions/tagged-template/tco-call.js*
+and *tco-member.js* pass under both specialization policies. The
+[TCO evidence contract](evidence/proper-tail-calls-u68-20261027.md) records
+the evidence and its limits.
 
-The new family indexes retained fixed, generated, structural and native
-contracts. Historical Array-bound author execution on `353a9f17` is recorded in
-*PLAN-M5C.md*, with its framework, host, target and policy limits. It does not
-validate this current Array/TCO composition.
+Evidence lives in *tests/property/m5-proper-tail-calls.property.test.ts*
+(seeds `0x60008900` through `0x60008902`), *tests/proper-tail-calls.test.ts*,
+*tests/native/fixtures/proper-tail-calls.ts*,
+*tests/runtime-tail-calls.test.ts*, and the structural tests the family
+record indexes. The native non-tail tests and the non-tail property draws
+predict which resource guard a chain reaches, if any, with
+*tests/proper-tail-call-resources.ts*. It replays the chain's calls against
+the runtime's frame contract, the toolchain's `-D` overrides, and the slot
+counts the backend declares in the emitted dispatcher, so it checks the
+runtime's accounting rather than the compiler's slot allocation. A draw
+predicted to exhaust the budget must stop with exactly that guard's
+diagnostic; every other draw keeps the exact semantic comparison.
 
-The single source-admission entry for `tail-call-optimization` remains in the
-147-feature implementation. The original U68 full UPDATE observed 29,901 paths:
-25,604 pass, 2,802 expected negatives and 1,495 unsupported, with no semantic,
-harness or infrastructure failures. Its only promotions are the two owned
-strict tagged-template TCO subjects, using the unchanged 100,000-depth helper
-and both specialization policies. All other 29,899 result records stay
-byte-identical. See
-[*current U68 evidence*](evidence/proper-tail-calls-u68-20261027.md).
-
-Derived observation ownership replaces remediation only for those two passes;
-other owners, inventory, policy and exclusions stay exact. The standards
-assessment cites these actual observations. Admission data review,
-candidate/Main gates and adoption remain separate requirements; source
-admission alone supplies no candidate gate pass.
-
-Native935 remains historical `05c1f074` evidence; the old 39/60 interruption is
-failed incomplete evidence. All 33 other pinned TCO paths remain unreviewed
-under batch32, whose accepted source plan remains separate.
-
-
-TCO source preparation on the fixed Reg candidate
--------------------------------------------------
-
-Final bitmap source `f5bdd44d` is prepared on Reg publication candidate
-`98460f7c`, based on successful Main `d4d81be9`, under D10.4. Reg remains
-prospective and TCO remains unlanded. All compiler/runtime programs and
-generators retain f5, including ABI `m5-139`; the leaf proposal is absent. Only
-the original source feature admission is carried.
-
-At source preparation, Reg's complete observations, owners and per-path
-expectations stayed unchanged pending a new Full, including both unsupported
-TCO expectations. *PLAN-M5C.md* defines this preparation phase. The existing
-[TCO evidence contract](evidence/proper-tail-calls-u68-20261027.md) records f5
-author execution with exact sources and one-pair timing limits. Those checks
-and the historical U68 Full did not run on this composition.
-
-The later Full on accepted U`e2dba363` observed all 29,901 reviewed paths and
-promoted exactly *tco-call.js* and *tco-member.js* from unsupported to pass,
-with no demotion; the
-[evidence contract](evidence/proper-tail-calls-u68-20261027.md) records it.
-Affected reviews and publication remain Root-owned.
+The C backend enters a completion target only through a `resume-completion`
+switch, which names every block emitted for its body. Reachability defers
+completion targets until a `resume-completion` terminator is reachable in the
+same body, including generator entry and body partitions, so a body whose
+every `finally` leaves abruptly emits no label without a `goto`. The target
+block 0 that a `return`, `throw`, or normal completion saves is a sentinel
+that no dispatch names, so reachability never defers it. Blocks it drops had
+no incoming jump, and a function whose only dispatch lay in such dead code
+also loses that code, which can lower its declared frame slots.
+*tests/completion-target-labels.test.ts* checks the emitted labels and
+dispatch.
 
 
 Ahead-of-time host Script bindings
@@ -10307,7 +10407,7 @@ A focused 393-path precheck observes 389 passes and four unsupported
 results. Three await IH-B's *temporalHelpers.js* harness; the fourth reaches
 the existing source-constructor boundary. Missing includes are named
 `harness-include` capabilities before assembly, not admitted harnesses.
-[The IH-A work note](./docs/m5c-graph/iterator-helpers-tag-activation.md)
+[The IH-A work note](./m5c-graph/iterator-helpers-tag-activation.md)
 records the source-bound observations and accepted full UPDATE on U
 `a678c85e`. That Full confirms 389 promotions and four unsupported paths;
 the ledger assigns three to `temporal-helpers-harness` and one to

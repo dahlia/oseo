@@ -255,7 +255,7 @@ Links
     authorization this record supplies.
  -  [ADR 0020](./0020-m5-applicable-test-inventory.md) keeps these paths in
     the denominator.
- -  [*PLAN-M5C.md*](../../PLAN-M5C.md) and
+ -  [*docs/m5c-closure/README.md*](../m5c-closure/README.md) and
     [*docs/m5c-closure/exclusion-audit.md*](../m5c-closure/exclusion-audit.md)
     describe the ledger and audit procedure.
  -  [CreateIntrinsics],

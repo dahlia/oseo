@@ -14,7 +14,7 @@ scope:
     tag, and the own-property descriptors of the constructor, the
     prototype, and the realm global property."
 owners:
-  - PLAN-M5.md
+  - docs/language-profile-m5.md
 evidence:
   differential:
     status: covered

@@ -8,7 +8,7 @@ scope:
     throws TypeError, suppress key conversion, and close an array iterator.
     Generated and fixed cases distinguish this from V8's early conversion."
 owners:
-  - PLAN-M5.md
+  - docs/language-profile-m5.md
 evidence:
   differential:
     status: covered

@@ -47,8 +47,9 @@ Scope of this node
 ------------------
 
  -  [ADR 0031](../adr/0031-m5-named-deferral.md) with status Accepted.
- -  The exit criteria in [*PLAN-M5C.md*](../../PLAN-M5C.md),
-    [*PLAN-M5.md*](../../PLAN-M5.md), and [*ROADMAP.md*](../../ROADMAP.md), and
+ -  The M5c and M5 exit criteria, now kept in
+    [*docs/m5c-closure/README.md*](../m5c-closure/README.md) and
+    [*ROADMAP.md*](../../ROADMAP.md), and
     the text that `m5-exit-audit` delivers, matched to the record.
  -  Move no ledger owner, add no deferral entry, and change neither
     *tools/m5c-closure-ledger.ts* nor *tools/m5c-exclusion-audit.ts*.

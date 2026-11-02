@@ -45,7 +45,7 @@ scope:
     inventories. Cases needing an unavailable realm harness or another
     unadmitted prerequisite retain explicit unsupported classifications."
 owners:
-  - PLAN-M5.md
+  - docs/language-profile-m5.md
 evidence:
   differential:
     status: covered

@@ -5,7 +5,7 @@ scope:
   - "Extends, super construction, new.target, and derived returns."
   - "Default derived constructors forward arguments without Array iteration."
 owners:
-  - PLAN-M5.md
+  - docs/language-profile-m5.md
 evidence:
   differential:
     status: covered

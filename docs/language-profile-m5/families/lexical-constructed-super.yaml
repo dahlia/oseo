@@ -4,7 +4,7 @@ title: "Lexical and constructed super"
 scope:
   - "Lexical super capture, optional calls, and fresh construction."
 owners:
-  - PLAN-M5.md
+  - docs/language-profile-m5.md
 evidence:
   differential:
     status: covered

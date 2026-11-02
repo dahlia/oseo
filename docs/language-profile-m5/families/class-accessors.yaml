@@ -4,7 +4,7 @@ title: "Class prototype accessors"
 scope:
   - "Getter and setter elements on class prototypes."
 owners:
-  - PLAN-M5.md
+  - docs/language-profile-m5.md
 evidence:
   differential:
     status: covered

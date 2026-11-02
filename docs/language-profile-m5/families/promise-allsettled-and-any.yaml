@@ -12,7 +12,7 @@ scope:
     per-element resolve calls, iterator closing, subclass behavior, and abrupt
     completion shared with the other iterable promise combinators."
 owners:
-  - PLAN-M5.md
+  - docs/language-profile-m5.md
 evidence:
   differential:
     status: covered

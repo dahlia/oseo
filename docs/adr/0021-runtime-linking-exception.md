@@ -125,12 +125,13 @@ Documentation, tests, manifests, and build configuration are outside because
 they are never incorporated into a compiled program.
 
 If a built-in family is self-hosted in the compiled subset under the M8
-strategy, and its source or compiled form is incorporated into user programs,
-it joins the support surface. Neither [*ROADMAP.md*](../../ROADMAP.md) nor
-[*PLAN-M5.md*](../../PLAN-M5.md) commits every family to self-hosting; both
-say a family may weigh it. Neither records how self-hosted built-ins would be
-packaged, so whether they are embedded per program or linked from a shared
-artifact is undecided, and the surface cannot be sized ahead of that decision.
+strategy, and its source or compiled form is incorporated into user programs, it
+joins the support surface. Neither [*ROADMAP.md*](../../ROADMAP.md) nor
+[*DESIGN.md*](../../DESIGN.md#runtime-and-object-model) commits every family to
+self-hosting; both say a family may weigh it. Neither records how self-hosted
+built-ins would be packaged, so whether they are embedded per program or linked
+from a shared artifact is undecided, and the surface cannot be sized ahead of
+that decision.
 
 
 Open questions
@@ -214,8 +215,9 @@ Links
     toolchain boundary this record licenses.
  -  [*ROADMAP.md*](../../ROADMAP.md) records the M8 self-hosting strategy that
     may move code across the proposed boundary.
- -  [*PLAN-M5.md*](../../PLAN-M5.md) allows a built-in family to be
-    self-hosted in the compiled subset, keeping primitive operations native.
+ -  [*DESIGN.md*](../../DESIGN.md#runtime-and-object-model) allows a built-in
+    family to be self-hosted in the compiled subset, keeping primitive
+    operations native.
  -  [*CONTRIBUTING.md*](../../CONTRIBUTING.md) states the packaging rules the
     license metadata must satisfy.
  -  [*docs/runtime-support-surface.md*](../runtime-support-surface.md) is the

@@ -17,7 +17,7 @@ scope:
   - "RegExp objects, flags, pattern compilation, and the symbol methods
     themselves remain owned by the regexp nodes."
 owners:
-  - PLAN-M5.md
+  - docs/language-profile-m5.md
 evidence:
   differential:
     status: covered

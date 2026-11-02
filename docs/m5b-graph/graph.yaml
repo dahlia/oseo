@@ -215,8 +215,8 @@ backlog:
   - id: size-and-compile-time-report
     title: "Publish the reproducible size and compile-time report"
     delivers: "Adds the documented task that records compile time, generated C
-      size, executable size, and peak runtime allocation that PLAN-M5.md
-      requires and no current task produces."
+      size, executable size, and peak runtime allocation that the M5 exit
+      criteria require and no current task produces."
     independent: "It is a new tool and mise task that reads artifacts rather
       than changing them."
   - id: runtime-components-validator

@@ -19,7 +19,7 @@ This node owns exactly the three `iterator-helpers` paths that include
  -  *test/built-ins/Iterator/from/return-method-calls-base-return-method.js*
  -  *test/built-ins/Iterator/from/return-method-throws-for-invalid-this.js*
 
-*PLAN-M5.md* records the scoped classification in which they failed in the
+The M5 plan recorded the scoped classification in which they failed in the
 harness because the reviewed harness set does not supply that include.
 
 

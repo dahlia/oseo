@@ -4,7 +4,7 @@ title: "Static class fields"
 scope:
   - "Public and private static fields and initialization."
 owners:
-  - PLAN-M5.md
+  - docs/language-profile-m5.md
 evidence:
   differential:
     status: covered

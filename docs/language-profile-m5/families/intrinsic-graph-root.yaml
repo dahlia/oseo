@@ -5,7 +5,7 @@ scope:
   - "The single realm-owned table for intrinsic objects and functions."
   - "%Object.prototype%, %Function.prototype%, and admitted constructors."
 owners:
-  - PLAN-M5.md
+  - docs/language-profile-m5.md
 evidence:
   differential:
     status: covered

@@ -19,7 +19,7 @@ scope:
     TypedArray behavior. The four constructor-detection paths pass through
     the admitted Reflect.construct harness."
 owners:
-  - PLAN-M5.md
+  - docs/language-profile-m5.md
 evidence:
   differential:
     status: covered

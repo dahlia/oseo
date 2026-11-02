@@ -368,6 +368,25 @@ only after the corresponding generic behavior exists. Arrays, functions,
 closures, typed arrays, and other exotic objects build on the same collector
 and property model but may have distinct layouts.
 
+An intrinsic enters through a table or an owned runtime interface whose
+identity and attributes are testable. Generated C must not duplicate mutable
+singleton state, and a generic algorithm stays authoritative wherever a fast
+path cannot prove its preconditions. Large intrinsic tables and built-in
+families extend the runtime components recorded in
+[*docs/runtime-components.md*](./docs/runtime-components.md), and a large
+table or generated source expansion needs a size budget and a replacement
+boundary.
+
+The realm's global object is an ordinary object that owns the standard
+constructors as replaceable properties. Top-level Script `var` and function
+declarations become its properties, Script lexical declarations stay in a
+declarative record, and module bindings stay module-scoped. A known global
+keeps a property-backed cell, so compiled code reaches it directly, while an
+unresolved global reference falls back to a run-time lookup on the realm's
+global object. That fallback gives dynamically created global properties the
+required lookup path without giving up closed-world resolution of known
+names.
+
 
 Memory management
 -----------------
@@ -391,6 +410,13 @@ MIR must identify allocation and collection safepoints. Specialized raw values
 that denote heap objects must either be described to the collector or be boxed
 and rooted before a safepoint. Tests should be able to request collection at
 every safepoint.
+
+Each new heap kind defines its tracing before an allocation can collect it.
+Every raw pointer is reacquired from a rooted value after a safepoint.
+Resource limits produce owned diagnostics unless the selected edition requires
+a catchable language value. Semantic units supply their roots and heap
+layouts through the shared slot, descriptor, and root-liveness contracts
+rather than adding family-specific collection paths.
 
 A moving or generational collector is a later performance decision. Introducing
 one will require a separate decision record covering write barriers, interior
@@ -990,6 +1016,18 @@ same case directly. Interrupted or incomplete runs are failures, not shortened
 passes. M4 begins this infrastructure with `fast-check`; M5 extends the same
 models and replay contract into grammar-based differential generation.
 
+Grammar-based generators produce scope-correct programs in the active
+profile, without a second random-program framework. They retain structured
+inputs until printing and shrink without introducing dangling bindings or
+unsupported syntax. Controlled invalid mutations assert the exact diagnostic
+phase, code, and location. Every semantic family identifies its generated
+values and boundary classes, its independent reference or executable model,
+behavior-preserving transformations, forced-collection and failure-injection
+points, and direct seed and path replay. Bounded native properties stay in the
+ordinary gate. The extended tier runs larger programs and at least ten times
+the ordinary case budget, and any defect it finds leaves a minimized ordinary
+regression fixture.
+
 Each property source owns one non-overlapping, aligned seed block in the
 checked-in registry. The compatibility ratchet validates every ordinary seed
 against that ownership before comparing monotonic seed sets and case budgets.
@@ -1010,6 +1048,17 @@ The immutable fixture contract and ordered semantic families live under
 enumeration or import side effects, determines shard membership. Non-catalog
 module, diagnostic, runtime, and target inspections use shard-owned scenario
 modules under *tests/native/scenarios/*.
+
+Compile time, generated C size, executable size, peak runtime allocation, and
+selected workload latency guide ordering and specialization, but they never
+waive a semantic failure. Collector measurements distinguish requested,
+committed, live, auxiliary, and external bytes and record collection pauses
+under [*PLAN-GC.md*](./PLAN-GC.md), so one peak-allocation number cannot
+justify a collector or allocator change. Optimization work starts from a
+generic oracle, structural guard evidence, and a measured bottleneck, and it
+keeps disabled-policy and guard-miss tests. The
+[M5 performance and code-size report](./docs/evidence/m5-performance/README.md)
+records the current baseline.
 
 Test builds should expose counters for guard hits, guard misses, generic helper
 calls, allocations, and collections. These counters are diagnostics, not part of
@@ -1037,6 +1086,77 @@ the deterministic native scheduler through the explicit CLI module goal.
 The gate rejects semantic failures, harness failures, or changes from the
 reviewed classification instead of counting unsupported cases as passes.
 Summaries keep raw, path-group, and dependency-tag totals.
+
+The checked-in compatibility manifest is the source of truth for measured
+progress. Each result records the exact test262 revision, path, frontmatter,
+strictness mode, harness includes, requested phase, actual phase, target,
+specialization policy, and observation; module and asynchronous cases also
+record their graph and scheduler mode. Harness failures identify defects in
+the adapter or harness, and infrastructure failures identify host, process,
+toolchain, or temporary-storage failures. Unsupported, harness, and
+infrastructure results never increase the pass count. A newly supported
+feature moves tests out of unsupported only after every applicable variant
+executes, and a changed upstream revision is a reviewed manifest change, not
+an automatic percentage update.
+
+The reviewed subset and the partitioned result manifest describe the same set
+of paths. *results.yaml* indexes the sorted path-group partitions and carries
+their derived summary. Adding an entry to one side without regenerating the
+other is not a state the repository holds, even briefly, because the gate then
+fails while every count still looks healthy.
+
+Measured compatibility moves in one direction. A path recorded as a pass does
+not move to another classification, the reviewed subset does not lose a path,
+and a generated domain does not lose a seed or shrink its case budget. The
+language profile grows the same way within a release line: removing an
+admitted behavior requires evidence, a migration note, and an updated
+manifest. A change may still reverse a measurement when the evidence demands
+it, such as an upstream revision that withdraws a test or a defect that shows
+a recorded pass was wrong. It records the reversal and its reason in the same
+change. Reaching a green gate is not such a reason; weakening a measurement
+and improving an implementation look the same in a diff, and only the recorded
+reason separates them.
+
+`mise run test262:update --accept-promotions` accepts only a reviewed result
+whose prior expected classification was not `pass` and whose observation is
+now `pass`. It rewrites that path's expectation in *subset.yaml* and reports
+every rewritten path. A demotion, any other classification mismatch, and every
+semantic, harness, or infrastructure failure still abort the update. The
+compatibility ratchet stays the regression defense because it independently
+compares actual results and reviewed paths with the Git baseline. It is global
+and monotonic, and it rejects a lower pass count, a path leaving `pass`, or a
+removed subset path unless a separate, exact, reasoned override records the
+deliberate reversal.
+
+`mise run check:m5b-node-scope` adds an authorship axis for graph-scheduled
+work. When `OSEO_M5B_NODE` names a node, additions, removals, and
+classification changes outside that node's inventory roots fail, except two
+directional improvements: a reviewed path may move to `pass`, or from
+`unsupported-profile-feature` to `expected-negative` when the node removes the
+named unsupported boundary and makes the negative expectation observable. No
+other move between non-pass classifications is directional; it belongs to the
+path's owning node or needs a separately reviewed policy change. A node
+without an inventory block cannot change reviewed evidence. The check also
+rejects newly added ratchet overrides, while removing a stale override stays
+allowed. A run that names no node enforces nothing, so a coordinator merge,
+manifest regeneration, and CI cross node boundaries legitimately. Neither
+axis replaces the other.
+
+Coverage reports group results by syntax, abstract operation, intrinsic,
+built-in object, module behavior, and asynchronous behavior. Raw totals remain
+available so a large group cannot hide a regression in a smaller dependency,
+and known gaps link to the profile section, implementation issue, or
+architecture decision that owns them.
+
+The test262 adapter grows before the corresponding manifest. Required harness
+includes are implemented as reviewed source, not replaced with native
+shortcuts that bypass the behavior under test, and the adapter reports a
+module, asynchronous, agent, realm, or negative-phase capability as
+unavailable until the harness can observe it. Selected cases first cover one
+semantic dependency and its boundaries, and broader directories enter only
+after their shared prerequisite is implemented. A change to the reviewed set
+includes the manifest delta, unsupported reasons, runtime cost, and any newly
+required harness surface.
 
 ADR 0015 keeps `linux-x86_64-gnu` as the canonical manifest target. ADR 0014
 adds a digest-pinned parity record over the index and every ordered partition.
@@ -1068,7 +1188,21 @@ generic call result, and explicit root protocol. ADR 0016 keeps `eval`, the
 `Function` constructor, and dynamic import explicitly unsupported during M5
 and names staged compilation as the only design-compatible route to admitting
 them later. [*PLAN-DYN.md*](./PLAN-DYN.md) records the capability, packaging,
-artifact, and evidence gates for that future work. The following questions
+artifact, and evidence gates for that future work.
+
+`eval`, the `Function` constructor, dynamic import, realms, and source text
+created after linking can conflict with closed ahead-of-time compilation, and
+none of them enters through an interpreter hidden in a runtime helper. Before
+one is admitted, an architecture decision must define when source becomes
+known; how bindings, strictness, realms, and module identity are preserved;
+whether produced artifacts stay independent of the bootstrap runtime; how
+collection and code lifetime are rooted; which targets can execute the
+feature; and how test262 observations stay comparable. A measured
+incompatibility may remain explicitly unsupported, and a claim that an
+ahead-of-time constraint prevents is reported as incomplete.
+[*PLAN-REPL.md*](./PLAN-REPL.md) treats source accepted between interactive
+submissions as a tool-level compilation boundary; it admits no `eval` and
+does not change this standards classification. The following questions
 still need decision records before the affected implementation becomes a
 dependency of later milestones:
 

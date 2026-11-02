@@ -26,7 +26,7 @@ scope:
     ADR 0016. The 89-path prerequisite cohort has 24 static semantic paths
     and 65 dynamic-boundary candidates; these are separate support claims."
 owners:
-  - PLAN-M5C.md
+  - docs/language-profile-m5.md
   - docs/adr/0009-module-identity-and-linking.md
 evidence:
   differential:

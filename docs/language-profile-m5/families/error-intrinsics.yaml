@@ -4,7 +4,7 @@ title: "Error intrinsics"
 scope:
   - "Error and NativeError constructors and typed runtime errors."
 owners:
-  - PLAN-M5.md
+  - docs/language-profile-m5.md
 evidence:
   differential:
     status: covered

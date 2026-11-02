@@ -20,7 +20,7 @@ scope:
     it inspects its operand, including the abrupt completion a throwing
     conversion propagates."
 owners:
-  - PLAN-M5.md
+  - docs/language-profile-m5.md
 evidence:
   differential:
     status: covered

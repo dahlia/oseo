@@ -25,7 +25,7 @@ scope:
     RegExp replacement keep an explicit prerequisite boundary rather than
     receiving a literal approximation."
 owners:
-  - PLAN-M5.md
+  - docs/language-profile-m5.md
 evidence:
   differential:
     status: covered

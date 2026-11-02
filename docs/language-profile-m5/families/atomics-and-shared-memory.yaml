@@ -33,7 +33,7 @@ scope:
     deterministic scheduler record through the reviewed atomicsHelper.js
     harness; all 112 pass."
 owners:
-  - PLAN-M5.md
+  - docs/language-profile-m5.md
   - docs/adr/0026-agent-clusters-and-shared-memory.md
 evidence:
   differential:

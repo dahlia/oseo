@@ -17,8 +17,8 @@ ADR 0019 completes M5 when every result inside the applicable inventory is a
 pass, an expected negative, or an unsupported result covered by an accepted
 record that explicitly authorizes an M5 exclusion and bounds its surface.
 Such a record must explain why the exclusion is architectural rather than
-unfinished work. [*PLAN-M5C.md*](../../PLAN-M5C.md) adds that active
-remediation is empty at the exit audit.
+unfinished work. The M5c plan adds that active remediation is empty at the
+exit audit.
 
 The reviewed manifest at M5c bundle 5,
 `9f21b607aef9399cc2a1f61d382f535af5161a2e`, covers all 41,091 applicable
@@ -226,10 +226,10 @@ The unqualified ECMA-262 conformance label remains the separate gate of ADR
 Consequences
 ------------
 
-The M5c exit criteria in [*PLAN-M5C.md*](../../PLAN-M5C.md) and the M5 exit
-criteria in [*PLAN-M5.md*](../../PLAN-M5.md) and
-[*ROADMAP.md*](../../ROADMAP.md) name deferred results beside authorized
-exclusions.
+The M5c closure states in
+[*docs/m5c-closure/README.md*](../m5c-closure/README.md) and the M5 exit
+criteria in [*ROADMAP.md*](../../ROADMAP.md) name deferred results beside
+authorized exclusions.
 
 The graph node `m5c-deferral-ledger-checker` owns the checker change: the
 deferral file and its check, including the `targetMilestone` rule, the
@@ -275,7 +275,7 @@ Links
  -  [ADR 0019](./0019-m5-claim-closure.md) defines the completion condition
     and label gate this record supplements.
  -  [ADR 0020](./0020-m5-applicable-test-inventory.md) fixes the denominator.
- -  [*PLAN-M5C.md*](../../PLAN-M5C.md) holds the M5c exit criteria and the
-    closure ledger layout.
+ -  [*docs/m5c-closure/README.md*](../m5c-closure/README.md) describes the M5c
+    closure states and the closure ledger layout.
  -  [*PLAN-DYN.md*](../../PLAN-DYN.md) owns the deferred staged compilation
     track.

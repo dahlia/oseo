@@ -120,7 +120,7 @@ scope:
     prototype methods, and the `Boolean` intrinsic stay unadmitted, so
     reviewed cases that require one of them retain explicit boundaries."
 owners:
-  - PLAN-M5.md
+  - docs/language-profile-m5.md
 evidence:
   differential:
     status: covered

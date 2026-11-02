@@ -21,7 +21,7 @@ scope:
     five remain unsupported for cross-realm, Boolean-binding, or general
     BigInt primitive-wrapper prerequisites outside this node."
 owners:
-  - PLAN-M5.md
+  - docs/language-profile-m5.md
 evidence:
   differential:
     status: covered

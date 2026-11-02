@@ -28,8 +28,8 @@ intrinsic, collector, or later binary-data families cannot use.
 This plan is governed by [*WHITEPAPER.md*](./WHITEPAPER.md),
 [*DESIGN.md*](./DESIGN.md), [*ROADMAP.md*](./ROADMAP.md),
 [*PLAN-BACKEND.md*](./PLAN-BACKEND.md), [*PLAN-GC.md*](./PLAN-GC.md),
-[*PLAN-CRYPTO.md*](./PLAN-CRYPTO.md), [*PLAN-M5.md*](./PLAN-M5.md),
-[*PLAN-PT.md*](./PLAN-PT.md), [*PLAN-WASM.md*](./PLAN-WASM.md),
+[*PLAN-CRYPTO.md*](./PLAN-CRYPTO.md), [*PLAN-PT.md*](./PLAN-PT.md),
+[*PLAN-WASM.md*](./PLAN-WASM.md),
 [ADR 0004](./docs/adr/0004-generic-tagged-value.md),
 [ADR 0013](./docs/adr/0013-m5-edition-and-manifest.md), the active language
 profile, and accepted records under *docs/adr/*. Evidence that changes one of

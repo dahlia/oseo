@@ -7,7 +7,7 @@ scope:
   - "call, apply, bind, toString, Symbol.hasInstance dispatch, and standard
     length and name descriptors."
 owners:
-  - PLAN-M5.md
+  - docs/language-profile-m5.md
 evidence:
   differential:
     status: covered

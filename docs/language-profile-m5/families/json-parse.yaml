@@ -20,7 +20,7 @@ scope:
     reflection remains coherent once JSON exists. Its algorithm is admitted
     and evidenced by the separate json-stringify family."
 owners:
-  - PLAN-M5.md
+  - docs/language-profile-m5.md
 evidence:
   differential:
     status: covered

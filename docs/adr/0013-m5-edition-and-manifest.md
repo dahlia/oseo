@@ -4,10 +4,9 @@ ADR 0013: M5 candidate edition and compatibility manifest
 Status
 ------
 
-Accepted. This record freezes the first M5 checkpoint required by
-[*PLAN-M5.md*](../../PLAN-M5.md): the candidate ECMA-262 edition, the
-optional-section policy, and the compatibility manifest schema that measures
-every later M5 change.
+Accepted. This record freezes the first M5 checkpoint: the candidate ECMA-262
+edition, the optional-section policy, and the compatibility manifest schema that
+measures every later M5 change.
 
 
 Context
@@ -88,9 +87,9 @@ re-reviews every affected classification in the same change.
     resolved.
  -  `eval`, the `Function` constructor, and dynamic import remain inside the
     boundary. Each needs the ahead-of-time architecture decision required by
-    [*PLAN-M5.md*](../../PLAN-M5.md) before support lands. Until then they
-    are explicit unsupported results, and the conformance label stays
-    unused.
+    [*DESIGN.md*](../../DESIGN.md#remaining-architecture-decisions) before
+    support lands. Until then they are explicit unsupported results, and the
+    conformance label stays unused.
 
 ### Compatibility manifest schema
 
@@ -593,7 +592,7 @@ Alternatives considered
  -  A minimal manifest recording only path and pass or fail was rejected
     because it cannot prove which variant, target, or policy produced an
     observation, which the measurement contract in
-    [*PLAN-M5.md*](../../PLAN-M5.md) requires.
+    [*DESIGN.md*](../../DESIGN.md#testing-and-observability) requires.
  -  Postponing the decision was rejected because every subsequent M5 batch
     would create records in an unfixed format and need migration.
 
@@ -637,8 +636,8 @@ Failure modes and replacement triggers
 Links
 -----
 
- -  [*PLAN-M5.md*](../../PLAN-M5.md) defines the measurement contract this
-    record freezes.
+ -  [*DESIGN.md*](../../DESIGN.md#testing-and-observability) defines the
+    measurement contract this record freezes.
  -  [*language-profile-m5.md*](../language-profile-m5.md) tracks the profile
     against this boundary.
  -  [ADR 0020](./0020-m5-applicable-test-inventory.md) defines the reviewed

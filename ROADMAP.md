@@ -4,21 +4,30 @@ Oseo roadmap
 Status
 ------
 
-Oseo has completed M4: closed native module graphs, live bindings, promises,
-asynchronous continuations, top-level await, timers, and a deterministic native
-scheduler. M5 is in progress under [*PLAN-M5.md*](./PLAN-M5.md):
-[ADR 0013](./docs/adr/0013-m5-edition-and-manifest.md) freezes the candidate
-ECMA-262 16th edition boundary and manifest schema, the test262 harness
-executes module and asynchronous cases, and a dependency-indexed baseline
-manifest is published. This roadmap uses capability gates rather than
-calendar dates.
-
-M5a, M5b, and M5c are complete. The normative
+Oseo has completed M5, measured ECMAScript compatibility, on top of the M4
+closed native module graphs, live bindings, promises, asynchronous
+continuations, top-level await, timers, and deterministic native scheduler.
+All three M5 checkpoints are complete, and the `m5-exit-audit` node has
+landed. [ADR 0013](./docs/adr/0013-m5-edition-and-manifest.md) fixes the
+ECMA-262 16th edition boundary and manifest schema. The normative
 [*M5 language profile*](./docs/language-profile-m5.md) records all 149 admitted
-families and their evidence assessments. M5c closed under
-[*PLAN-M5C.md*](./PLAN-M5C.md) when its exit audit landed, and the
+families and their evidence assessments. The
 [M5 exit report](./docs/m5c-closure/m5-exit-report.md) gives the coverage
-counts and gate results.
+counts and gate results, the
+[M5 performance and code-size report](./docs/evidence/m5-performance/README.md)
+gives the measured baseline, and
+[*docs/m5c-closure/README.md*](./docs/m5c-closure/README.md) describes the
+closure records that `mise run check` still validates. This roadmap uses
+capability gates rather than calendar dates.
+
+Post-M5 ECMAScript work is planned in four documents.
+[*PLAN-LANGUAGE.md*](./PLAN-LANGUAGE.md) covers the remaining language
+compatibility: static-specifier `import()`, Annex B except `document.all`,
+the legacy `caller` extension, ECMAScript 2026 features, and ECMAScript 2027
+features except Temporal. [*PLAN-TEMPORAL.md*](./PLAN-TEMPORAL.md) covers
+Temporal, [*PLAN-INTL.md*](./PLAN-INTL.md) covers ECMA-402, and
+[*PLAN-ASYNCCTX.md*](./PLAN-ASYNCCTX.md) covers compatibility with Node.js
+`AsyncLocalStorage`.
 
 The macOS AArch64 native execution work accepted by
 [ADR 0014](./docs/adr/0014-native-target-support.md) is complete. Linux on AMD64
@@ -660,9 +669,11 @@ M5b added the intrinsic graph, the global object, and the built-in families,
 including the BigInt intrinsic owned by
 [*PLAN-BIGINT.md*](./PLAN-BIGINT.md), the regular expression family owned by
 [*PLAN-REGEXP.md*](./PLAN-REGEXP.md), and the `Date` family followed by the
-clock gate and Date integration in [*PLAN-NIO.md*](./PLAN-NIO.md). M5c now
-follows [*PLAN-M5C.md*](./PLAN-M5C.md) to close the remaining results in the
-inventory or cover them with a record that authorizes the exclusion.
+clock gate and Date integration in [*PLAN-NIO.md*](./PLAN-NIO.md). M5c then
+accounted for every remaining result in the inventory: each is closed by
+observation, covered by an accepted record that authorizes the exclusion, or
+named as a deferral, as
+[*docs/m5c-closure/README.md*](./docs/m5c-closure/README.md) describes.
 
 The reviewed evidence gates grow with the corpus these checkpoints admit.
 [*PLAN-GATE.md*](./PLAN-GATE.md) owns that cost and is a prerequisite of M5b
@@ -689,9 +700,24 @@ family unsupported inside the claimed edition. The label also requires the
 deferral list to be empty. Intermediate releases publish
 exact coverage and known gaps without using the label.
 
-`mise run check:m5-exit-audit` checks the inventory, manifest, exclusion, and
-deferral conditions above against the checked-in evidence, and the
-[M5 exit report](./docs/m5c-closure/m5-exit-report.md) states the result.
+M5 also required one named edition and optional-section policy to define the
+claim, and every admitted syntax and built-in to have generic semantics,
+negative cases, collector coverage, and source-located diagnostics. Module,
+promise, asynchronous, and scheduler tests had to exercise the expanded
+profile, and grammar-based properties had to shrink to valid replayable
+programs comparing Node.js, Deno, specialization policies, and collection
+modes. Every specialization had to keep a compiled generic fallback and
+deliberate guard-failure evidence. Strict warnings, sanitizers, Linux AMD64
+and macOS AArch64 execution, and AArch64 Linux compile-link checks had to pass
+across the complete native corpus. Capability, performance, and code-size
+reports had to be reproducible from documented tasks, and `mise run check`,
+`mise run test`, and the extended property task had to pass from a clean
+checkout.
+
+M5 met these criteria. `mise run check:m5-exit-audit` checks the inventory,
+manifest, exclusion, and deferral conditions above against the checked-in
+evidence, and the [M5 exit report](./docs/m5c-closure/m5-exit-report.md)
+states the result and the gate runs.
 
 
 M6: Minimum common web API
@@ -853,23 +879,19 @@ transitive requirements are understood.
 Initial work queue
 ------------------
 
-The compiler and runtime capability sequence is complete through M4. M5
-follows [*PLAN-M5.md*](./PLAN-M5.md). The first four steps are complete:
-the candidate edition boundary and manifest schema are frozen, the test262
-harness observes module and asynchronous execution, and the
-dependency-indexed baseline is published.
-[ADR 0020](./docs/adr/0020-m5-applicable-test-inventory.md) also checks in the
-41,091-path edition denominator without expanding the result manifest.
+The compiler and runtime capability sequence is complete through M5.
+[ADR 0020](./docs/adr/0020-m5-applicable-test-inventory.md) checks in the
+41,091-path edition denominator, and every path in it is closed, excluded under
+an accepted record, or deferred by name.
 [ADR 0016](./docs/adr/0016-dynamic-source-boundary.md) resolves the dynamic
 source challenge features through explicit unsupported classifications, while
 [*PLAN-DYN.md*](./PLAN-DYN.md) records the deferred capability and evidence
-track.
+track that inherits the deferred paths.
 
 The normative [*M5 language profile*](./docs/language-profile-m5.md), rather
 than this queue, records current admitted behavior and per-family evidence.
-The next M5 work closes or authorizes every inventory result under ADR 0019.
-[*PLAN-M5C.md*](./PLAN-M5C.md) and its machine-validated graph begin with an
-exact closure ledger, ownership audit, and bounded observation batches.
+The post-M5 language plans named under Status order the remaining ECMAScript
+work.
 
 
 M5 implementation history
@@ -1009,7 +1031,8 @@ The intrinsics stream provides the named error family as runtime-owned
 constructor values with typed catchable runtime errors. M5b node
 `error-aggregate-and-options` adds the runtime-owned `AggregateError`, its
 iterable-to-list `errors` property, and `cause` handling to every error
-constructor. [*PLAN-M5.md*](./PLAN-M5.md) records the exact admitted list.
+constructor. The [*M5 language profile*](./docs/language-profile-m5.md)
+records the exact admitted list.
 
 M5b node `well-known-symbols` adds the complete thirteen-entry well-known
 symbol table, fixing every entry's identity, description, and constructor

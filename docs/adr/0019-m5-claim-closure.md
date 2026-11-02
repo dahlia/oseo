@@ -11,11 +11,11 @@ unqualified ECMA-262 conformance label to a separate later gate.
 Context
 -------
 
-[*PLAN-M5.md*](../../PLAN-M5.md) states that M5 is complete only when no
-semantic failure, harness failure, or unsupported result remains inside the
-claim, including one caused only by a missing observation capability.
-[*ROADMAP.md*](../../ROADMAP.md) states that M5 is complete only when Oseo can
-make and substantiate an ECMA-262 conformance claim for a named edition.
+The M5 plan states that M5 is complete only when no semantic failure, harness
+failure, or unsupported result remains inside the claim, including one caused
+only by a missing observation capability. [*ROADMAP.md*](../../ROADMAP.md)
+states that M5 is complete only when Oseo can make and substantiate an ECMA-262
+conformance claim for a named edition.
 
 [ADR 0013](./0013-m5-edition-and-manifest.md) names that claim as the 16th
 edition, ECMAScript 2025. It excludes Annex B, ECMA-402, and the upstream
@@ -45,9 +45,9 @@ Required contract
 A resolution must give later milestones:
 
  -  an M5 completion condition that implementation work can actually reach;
- -  a conformance label whose eventual use stays honest, which ADR 0016 and
-    [*PLAN-M5.md*](../../PLAN-M5.md) already require by refusing an unqualified
-    label while known gaps stand;
+ -  a conformance label whose eventual use stays honest, which ADR 0016 and the
+    M5 plan already require by refusing an unqualified label while known gaps
+    stand;
  -  a stable denominator for coverage reporting, so a percentage means
     something across checkpoints;
  -  no reclassification of a deliberate architectural exclusion as a pass; and
@@ -148,10 +148,10 @@ checked-in inventory.
 Consequences
 ------------
 
-The M5 exit criteria in [*PLAN-M5.md*](../../PLAN-M5.md) and
-[*ROADMAP.md*](../../ROADMAP.md) change. The criterion that no unsupported
-result remains becomes the criterion that no unowned unsupported result
-remains, and the conformance-claim criterion moves to the new label gate.
+The M5 exit criteria in [*ROADMAP.md*](../../ROADMAP.md) change. The criterion
+that no unsupported result remains becomes the criterion that no unowned
+unsupported result remains, and the conformance-claim criterion moves to the
+new label gate.
 
 Producing the applicable-test inventory becomes explicit M5 work rather than
 an implicit prerequisite of the label. Because it is what makes the remaining
@@ -164,7 +164,7 @@ implementation time needed to close it.
 
 The project keeps its refusal to use an unqualified conformance label while
 the dynamic source family stands. That refusal is stated by ADR 0016 and
-[*PLAN-M5.md*](../../PLAN-M5.md), not by
+[*DESIGN.md*](../../DESIGN.md#supported-semantics), not by
 [*WHITEPAPER.md*](../../WHITEPAPER.md). Releases continue to publish measured
 coverage without the label, as ADR 0016 already specifies.
 
@@ -199,8 +199,8 @@ Links
     dynamic source boundary stays open.
  -  [ADR 0020](./0020-m5-applicable-test-inventory.md) defines the classifier
     and checked-in denominator required by this record.
- -  [*PLAN-M5.md*](../../PLAN-M5.md) and [*ROADMAP.md*](../../ROADMAP.md) hold
-    the exit criteria this record changes.
+ -  [*ROADMAP.md*](../../ROADMAP.md) holds the exit criteria this record
+    changes.
  -  [*PLAN-DYN.md*](../../PLAN-DYN.md) owns the deferred capability the label
     gate depends on.
  -  [*PLAN-GATE.md*](../../PLAN-GATE.md) owns the manifest record format the

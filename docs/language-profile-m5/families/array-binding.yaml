@@ -6,7 +6,7 @@ scope:
     inside with resolve before iterator stepping, default evaluation and
     rest collection, retaining the selected environment until PutValue."
 owners:
-  - PLAN-M5.md
+  - docs/language-profile-m5.md
 evidence:
   differential:
     status: covered

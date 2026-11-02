@@ -123,7 +123,8 @@ identifier resolved through `with`. It leaves the GetBindingValue order that
 `eval-intrinsic-value` establishes, nullish short-circuiting, argument
 evaluation order, and optional member calls unchanged.
 
-Its evidence follows the semantic contract in [*PLAN-M5.md*](../../PLAN-M5.md):
+Its evidence follows the M5 profile evidence contract in the
+[*M5 language profile*](../language-profile-m5.md#normative-family-records):
 
  -  fixed native examples under both specialization policies with forced
     collection, covering selected, inherited, `Symbol.unscopables`-blocked,

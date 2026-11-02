@@ -12,7 +12,7 @@ delivers: "Closes exactly two observation-batch-06 paths:
   dependency tags as ordinary in-claim coverage. Repair non-String
   direct-call dispatch without admitting String source evaluation or
   emulating eval; keep ADR 0013, ADR 0016 and ADR 0019 unchanged. Follow
-  PLAN-M5.md for focused, property, differential, forced-collection and
+  M5 profile for focused, property, differential, forced-collection and
   specialization-invariance evidence, with a guard-miss test reaching
   the generic fallback if a specialized path changes, and update the
   applicable normative family record. Re-observe both original paths

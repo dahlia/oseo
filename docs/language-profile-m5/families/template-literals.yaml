@@ -4,7 +4,7 @@ title: "Template literals"
 scope:
   - "Untagged template literals and substitution conversion."
 owners:
-  - PLAN-M5.md
+  - docs/language-profile-m5.md
 evidence:
   differential:
     status: covered

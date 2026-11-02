@@ -17,7 +17,7 @@ delivers: "Repairs compound member assignment base[prop] op= expr for exactly
   undefined, primitive, and object bases and with throwing and counting key
   conversions, plus simple assignment, logical assignment, and update
   expression controls that must keep their current results. Follow the full
-  applicable PLAN-M5.md evidence contract: differential and generated
+  applicable M5 profile evidence contract: differential and generated
   properties or an extension of existing assignment properties, both
   specialization policies, forced-collection evidence, and the normative
   family record and profile. Add a guard-miss test reaching a compiled

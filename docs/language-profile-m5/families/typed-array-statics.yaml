@@ -27,7 +27,7 @@ scope:
     out-of-bounds-behaves-like-detached.js remains unsupported as an ADR
     0013 exclusion whose core subjects have strict replacement evidence."
 owners:
-  - PLAN-M5.md
+  - docs/language-profile-m5.md
 evidence:
   differential:
     status: covered

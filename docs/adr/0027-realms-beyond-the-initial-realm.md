@@ -251,4 +251,5 @@ Links
     remediation owner for every unsupported path inside the claim.
  -  [ADR 0026](./0026-agent-clusters-and-shared-memory.md): the test262 host
     option and agent clusters this host object extends.
- -  [*PLAN-M5C.md*](../../PLAN-M5C.md): the M5c node this record serves.
+ -  [*cross-realm-host.yaml*](../m5c-graph/nodes/cross-realm-host.yaml): the
+    M5c node this record serves.

@@ -36,7 +36,7 @@ scope:
     Reflect.construct remains unadmitted, so reviewed cases requiring that
     separate namespace retain explicit boundaries."
 owners:
-  - PLAN-M5.md
+  - docs/language-profile-m5.md
   - PLAN-BIGINT.md
 evidence:
   differential:

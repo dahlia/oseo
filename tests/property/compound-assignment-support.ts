@@ -1372,7 +1372,8 @@ console.log("stored", holder.value);
  * logical member assignment whose current value is truthy writes nothing.
  * An inherited setter on a primitive's prototype chain stays outside this
  * case, because the native primitive-base store rejects before it looks
- * for one, which PLAN-M5.md records under Compound member key order.
+ * for one, which the M5 language profile records under Compound member key
+ * order.
  */
 export const primitiveReceiverSource = `"use strict";
 const seen = [];

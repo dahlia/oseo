@@ -23,7 +23,7 @@ scope:
     files and a fresh normal sanitizer self-probe passed. Original stdout,
     exposed-stderr, positive-GC and foreign allocation/root/realm/retry
     assertions passed; raw successful-case outputs/counter values were not
-    retained. PLAN-M5C.md records the exact scope and artifact provenance."
+    retained."
   - "The additional Set Array-ancestry fixed subject has focused Linux
     AMD64 evidence on combined source c4bcb412: all twelve Set registrations
     across Node.js/Deno and ordinary/host-cc passed, with the normal seven
@@ -33,8 +33,7 @@ scope:
     invocations plus four C registrations, separately from passing test
     counts. The shared focus used nine actual commands across two lock
     admissions after a preserved first-checkpoint supervisor failure.
-    Historical 43b84b70 evidence retains its own inputs and cardinality.
-    PLAN-M5C.md records provenance and the remaining integration gates."
+    Historical 43b84b70 evidence retains its own inputs and cardinality."
   - "Earlier wrapper references remain wrapper evidence. Standards and
     guard-fallback assessments here retain that wrapper scope; no inherited
     Set test262 observation or new guard is claimed. The generic Set store
@@ -53,7 +52,7 @@ scope:
     compiled the expanded layout assertions on the selected Linux ABI;
     numeric sizes/counters were not printed. Original 12-case properties,
     seeds/limits, both policies, forced GC and guard/fallback assertions
-    remain. PLAN-M5C.md records source-bound commands, walls and raw evidence.
+    remain.
     Original 7da preparation and historical 1c96126b passes keep their own
     source bindings. Later consumer corrections need affected review;
     macOS/sanitizer, fresh observations and candidate/Main gates remain.
@@ -80,7 +79,7 @@ scope:
     public ABI shapes remain. The original intrinsic-walk oracle stays pass;
     current canonical observations and family counts do not change."
 owners:
-  - PLAN-M5.md
+  - docs/language-profile-m5.md
 evidence:
   differential:
     status: covered

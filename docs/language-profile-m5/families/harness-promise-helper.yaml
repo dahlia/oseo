@@ -10,7 +10,7 @@ scope:
     properties, status and payload values, optional message prefixes, and
     the upstream failure text."
 owners:
-  - PLAN-M5.md
+  - docs/language-profile-m5.md
 evidence:
   differential:
     status: covered

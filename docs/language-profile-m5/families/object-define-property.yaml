@@ -7,7 +7,7 @@ scope:
   - "Definition on ordinary objects, arrays, functions, arguments objects,
     String wrappers, symbol keys, and module namespace objects."
 owners:
-  - PLAN-M5.md
+  - docs/language-profile-m5.md
 evidence:
   differential:
     status: covered

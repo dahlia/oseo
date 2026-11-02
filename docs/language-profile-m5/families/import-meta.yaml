@@ -18,7 +18,7 @@ scope:
     located at the offending token. eval and Function source text keeps
     its ADR 0016 boundary."
 owners:
-  - PLAN-M5.md
+  - docs/language-profile-m5.md
   - docs/adr/0009-module-identity-and-linking.md
 evidence:
   differential:

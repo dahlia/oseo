@@ -27,7 +27,8 @@ exist.
 
 This plan is governed by [*WHITEPAPER.md*](./WHITEPAPER.md),
 [*DESIGN.md*](./DESIGN.md), [*ROADMAP.md*](./ROADMAP.md),
-[*PLAN-BACKEND.md*](./PLAN-BACKEND.md), [*PLAN-M5.md*](./PLAN-M5.md),
+[*PLAN-BACKEND.md*](./PLAN-BACKEND.md),
+[*docs/language-profile-m5.md*](./docs/language-profile-m5.md),
 [*PLAN-M6.md*](./PLAN-M6.md), [*PLAN-NIO.md*](./PLAN-NIO.md),
 [*PLAN-PT.md*](./PLAN-PT.md), [*PLAN-WASM.md*](./PLAN-WASM.md),
 [ADR 0006](./docs/adr/0006-root-stack-and-safepoints.md), and

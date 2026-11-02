@@ -5,7 +5,7 @@ scope:
   - "Iterator acquisition, stepping, closing, and for-of."
   - "Var for-of identifier heads resolve the active with chain per iteration."
 owners:
-  - PLAN-M5.md
+  - docs/language-profile-m5.md
 evidence:
   differential:
     status: covered

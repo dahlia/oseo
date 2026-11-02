@@ -4,7 +4,7 @@ title: "Public instance fields"
 scope:
   - "Public instance fields, initialization, and inheritance."
 owners:
-  - PLAN-M5.md
+  - docs/language-profile-m5.md
 evidence:
   differential:
     status: covered

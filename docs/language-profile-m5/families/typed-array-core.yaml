@@ -26,7 +26,7 @@ scope:
     using the latter, 27 pass and one remains unsupported as an ADR 0013
     exclusion whose core subjects have strict replacement evidence."
 owners:
-  - PLAN-M5.md
+  - docs/language-profile-m5.md
 evidence:
   differential:
     status: covered

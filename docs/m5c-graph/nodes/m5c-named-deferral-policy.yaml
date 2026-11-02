@@ -3,7 +3,7 @@ id: m5c-named-deferral-policy
 title: Named deferral policy for measured M5 residue
 delivers: >-
   ADR 0031, accepted on 2026-11-01 by maintainer decision, and the
-  PLAN-M5C.md, PLAN-M5.md and ROADMAP.md exit criteria that let
+  M5c, M5 plan and ROADMAP.md exit criteria that let
   m5-exit-audit account for measured residue whose only closure route is
   work not approved for M5 or declined, as a per-path named deferral with a
   reason, remaining contract and target milestone or deferred track. Moves

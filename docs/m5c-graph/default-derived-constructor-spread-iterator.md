@@ -80,7 +80,7 @@ change. No test262 expectation changes with these fingerprints.
 
 Internal pass 1 completed both stages. DeepSeek identified the stale
 rest-and-spread description in the normative profile; Astra reported no
-blocking finding. The normative profile and matching *PLAN-M5.md* passage
+blocking finding. The normative profile and the matching M5 plan passage
 now describe direct forwarding. Affected checks and review follow these
 corrections; no admission or landing is claimed here.
 

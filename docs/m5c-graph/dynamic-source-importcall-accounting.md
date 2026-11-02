@@ -29,7 +29,9 @@ Of those, 382 lie under *test/language/expressions/dynamic-import/*:
 node are the paths outside *namespace/*. A candidate is selected only when a
 path-by-path reviewed assessment of its description, normative section, and
 assertions confirms that ImportCall is the normative subject and bounds the
-assertions to source evaluation, as the PLAN-M5C.md ImportCall rule requires.
+assertions to source evaluation, as the ImportCall rule in
+[*docs/m5c-closure/README.md*](../m5c-closure/README.md#dynamic-import)
+requires.
 A directory name, an `esid`, or a feature tag alone does not qualify.
 
 A candidate whose subject is module evaluation order, top-level await, a
@@ -43,7 +45,7 @@ Evidence obligations
 
  -  Each selected path moves to `adr:0016-dynamic-source-boundary` with a
     reviewed exclusion-audit record with fresh source and observation
-    digests, as ADR 0019 and PLAN-M5C.md require.
+    digests, as ADR 0019 and *docs/m5c-closure/README.md* require.
  -  Audit records and ledger owners only; no product change.
  -  Keep all 41,091 inventory paths and count none as a pass.
  -  The exclusion reopens when an accepted ADR 0016 amendment admits any form

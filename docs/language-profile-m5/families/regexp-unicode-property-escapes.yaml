@@ -39,7 +39,7 @@ scope:
     regexp-anchored-repeat-state-remediation. No matcher repair, exclusion
     or new semantic family is admitted."
 owners:
-  - PLAN-M5.md
+  - docs/language-profile-m5.md
   - PLAN-REGEXP.md
 evidence:
   differential:

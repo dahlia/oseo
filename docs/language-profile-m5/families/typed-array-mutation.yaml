@@ -24,7 +24,7 @@ scope:
     resizableArrayBufferUtils.js include is observed, and all ten paths
     using it pass in the current complete observations."
 owners:
-  - PLAN-M5.md
+  - docs/language-profile-m5.md
 evidence:
   differential:
     status: covered

@@ -4,7 +4,7 @@ title: "Arguments objects"
 scope:
   - "Mapped and unmapped arguments objects for admitted functions."
 owners:
-  - PLAN-M5.md
+  - docs/language-profile-m5.md
 evidence:
   differential:
     status: covered

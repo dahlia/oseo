@@ -1,8 +1,9 @@
 # Derived M5c observation batch plan. Regenerate counts with
-# `mise run m5c:observation-batches:update`; PLAN-M5C.md defines the
-# selectors, prerequisite keys, review units, and the cost model.
-# Selectors change only through `mise run m5c:observation-batches:plan`
-# or a split of one batch that PLAN-M5C.md records.
+# `mise run m5c:observation-batches:update`; docs/m5c-closure/README.md
+# defines the selectors, prerequisite keys, review units, and the cost
+# model. Selectors change only through
+# `mise run m5c:observation-batches:plan` or a split of one batch that
+# docs/m5c-closure/README.md records.
 version: 1
 suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
 unreviewedPaths: 0

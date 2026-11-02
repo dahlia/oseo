@@ -7,7 +7,7 @@ scope:
     ArraySpeciesCreate constructor and Symbol.species reads, custom and
     default species results, filter compaction, and map hole preservation."
 owners:
-  - PLAN-M5.md
+  - docs/language-profile-m5.md
 evidence:
   differential:
     status: covered

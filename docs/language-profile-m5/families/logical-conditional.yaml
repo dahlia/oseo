@@ -4,7 +4,7 @@ title: "Logical and conditional expressions"
 scope:
   - "Short-circuit AND, OR, and conditional expressions."
 owners:
-  - PLAN-M5.md
+  - docs/language-profile-m5.md
 evidence:
   differential:
     status: covered

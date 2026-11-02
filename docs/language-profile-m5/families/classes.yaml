@@ -17,7 +17,7 @@ scope:
     definitions, while frontend and invalid-generator evidence covers the
     rejection contract."
 owners:
-  - PLAN-M5.md
+  - docs/language-profile-m5.md
 evidence:
   differential:
     status: covered

@@ -30,7 +30,7 @@ scope:
     implicit global, and with fallback bindings follow the same rule, and the
     reference, evaluation order, and write are unchanged."
 owners:
-  - PLAN-M5.md
+  - docs/language-profile-m5.md
 evidence:
   differential:
     status: covered

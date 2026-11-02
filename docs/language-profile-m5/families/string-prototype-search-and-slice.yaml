@@ -6,7 +6,7 @@ scope:
     endsWith, slice, and substring, including receiver and operand conversion
     order, RegExp rejection, UTF-16 matching, and index clamping."
 owners:
-  - PLAN-M5.md
+  - docs/language-profile-m5.md
 evidence:
   differential:
     status: covered

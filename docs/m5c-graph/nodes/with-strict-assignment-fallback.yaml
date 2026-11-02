@@ -12,7 +12,7 @@ delivers: "Owns exactly 12 observed paths: the original
   through a with object environment whose binding was deleted during
   operand evaluation, for simple and compound assignment, reporting
   ReferenceError, or report that this needs a maintainer decision. Follow
-  the full PLAN-M5.md evidence contract: focused examples, generated
+  the full M5 profile evidence contract: focused examples, generated
   properties or an extension of existing with environment properties,
   forced-collection evidence, both specialization policies, and the
   normative family record and profile. Add a guard-miss test reaching a

@@ -15,7 +15,7 @@ scope:
     tokens, one cleanup job per registry scheduled by the event loop in
     collector queue order, and removal of records that were already queued."
 owners:
-  - PLAN-M5.md
+  - docs/language-profile-m5.md
   - PLAN-GC.md
 evidence:
   differential:

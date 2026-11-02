@@ -274,8 +274,7 @@ Links
     source results that remain inside this inventory.
  -  [ADR 0019](./0019-m5-claim-closure.md) makes this inventory the M5
     denominator and separates M5 completion from the conformance label.
- -  [*PLAN-M5.md*](../../PLAN-M5.md) and
-    [*ROADMAP.md*](../../ROADMAP.md) assign the inventory to M5a.
+ -  [*ROADMAP.md*](../../ROADMAP.md) assigns the inventory to M5a.
  -  [*PLAN-GATE.md*](../../PLAN-GATE.md) owns result-record partitioning.
  -  [*gate-cost-baseline.md*](../gate-cost-baseline.md) records the inventory
     validation cost.

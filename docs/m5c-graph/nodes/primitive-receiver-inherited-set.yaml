@@ -16,7 +16,7 @@ delivers: Repair the native primitive property store exposed by the strict
   existing Reference key-order and conversion-storage repair,
   primitive-wrapper admission scope, Annex B and dynamic-source boundaries.
   Retain the original raw failures as minimized ordinary regressions. Follow
-  the full PLAN-M5 semantic evidence contract with independent structured
+  the full M5 profile semantic evidence contract with independent structured
   properties, stable shrinking/replay, both specialization policies, forced
   collection with positive counters, rooted live values, structural evidence
   and applicable native/sanitizer lanes. Preserve old domains, seeds, budgets,

@@ -6,7 +6,7 @@ scope:
   - "Classic var heads inside with select the reference before initializer
     evaluation."
 owners:
-  - PLAN-M5.md
+  - docs/language-profile-m5.md
 evidence:
   differential:
     status: covered

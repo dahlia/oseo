@@ -16,7 +16,7 @@ scope:
     array and object patterns; the bare target and the shorthand property
     still name it."
 owners:
-  - PLAN-M5.md
+  - docs/language-profile-m5.md
 evidence:
   differential:
     status: covered

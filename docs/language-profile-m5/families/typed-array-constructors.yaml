@@ -26,8 +26,7 @@ scope:
     zero arguments and every object source read that prototype before any
     argument conversion, iteration, or element read."
 owners:
-  - PLAN-M5.md
-  - PLAN-M5C.md
+  - docs/language-profile-m5.md
 evidence:
   differential:
     status: covered

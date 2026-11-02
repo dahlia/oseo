@@ -52,7 +52,7 @@ scope:
     write could initialize a hidden fallback is rejected with a diagnostic
     located at the Script."
 owners:
-  - PLAN-M5.md
+  - docs/language-profile-m5.md
   - docs/adr/0029-ahead-of-time-host-script-bindings.md
 evidence:
   differential:

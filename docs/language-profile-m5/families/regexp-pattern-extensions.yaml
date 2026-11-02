@@ -40,7 +40,7 @@ scope:
     and a failed property-call shape guard reaches the ordinary generic
     call while collection is forced at every safepoint."
 owners:
-  - PLAN-M5.md
+  - docs/language-profile-m5.md
   - PLAN-REGEXP.md
 evidence:
   differential:

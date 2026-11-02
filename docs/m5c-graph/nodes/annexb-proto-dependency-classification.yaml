@@ -7,7 +7,7 @@ delivers: "Closes exactly 1 newly observed path,
   reflection but whose incidental Annex B __proto__ read fails semantically.
   Make a path whose only failing dependency is that excluded accessor
   observable as unsupported-profile-feature, with classification tests and
-  the full PLAN-M5.md evidence contract. Extend the Annex B surface predicate
+  the full M5 profile evidence contract. Extend the Annex B surface predicate
   in tools/m5c-exclusion-audit.ts to accept the accessor's owned OSEO1001
   rejection, and let each Annex B assessment name its bounded remediation
   owner instead of requiring the RegExp split owner. Add reviewed assessments

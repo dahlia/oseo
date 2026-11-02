@@ -8,7 +8,7 @@ scope:
     invariants for prototypes, extensibility, property descriptors, values,
     own keys, calls, and construction."
 owners:
-  - PLAN-M5.md
+  - docs/language-profile-m5.md
 evidence:
   differential:
     status: covered

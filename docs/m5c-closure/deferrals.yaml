@@ -5,7 +5,7 @@ version: 1
 suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
 record:
   stem: 0031-m5-named-deferral
-  digest: 51331092d466f571837f6bac614d16b595ae6bed8044c19a2f6a002f35b39f84
+  digest: 6207be56f7156f2a0dba3252344d655c9156032904316c8f7828622aa67f4284
 families:
   run-time-source:
     reason: The asserted core contract is observable only through run-time

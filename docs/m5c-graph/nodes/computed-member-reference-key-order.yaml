@@ -28,7 +28,7 @@ delivers: 'Repairs the generic computed member Reference as one semantic unit,
   forms are recorded in docs/m5c-graph/computed-member-reference-key-order.md.
   Follow the pinned algorithms, not the labeled V8 second-conversion divergence.
   Keep optional-call receiver debt and eval admission out of this node. Follow
-  the full applicable PLAN-M5.md evidence contract: focused examples with null,
+  the full applicable M5 profile evidence contract: focused examples with null,
   undefined, primitive, and object bases and counting, throwing, and string keys
   for every form, an independent generated model extending the existing
   assignment property generators without weakening earlier cases, seeds, or
