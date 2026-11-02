@@ -20,16 +20,16 @@ Authority and ownership
 The maintainer answer
 *~/.local/state/oseo-m5c/decisions/answers/20261031T1409-umbrella-residual.md*,
 item 3, approved a design review of the static-specifier import track that
-ADR 0016 alternative 3 and *PLAN-DYN.md* anticipate. After that review, item
-2 of *20261101-remaining-node-decisions.answer.md* in
+ADR 0016 alternative 3 and *PLAN-DYN.md* anticipate. Item 2 of
+*20261101-remaining-node-decisions.answer.md* in
 *~/.local/state/oseo-m5c/decisions/done/* keeps the design and does not
-implement the track in M5. Bounded general `eval` or `Function` construction is
-approved by neither.
+implement the track in M5. Bounded general `eval` or `Function` construction
+is approved by neither.
 
 The design is the reviewed post-M5 plan, linked from *PLAN-DYN.md*. Its
 ADR 0016 amendment stays Proposed inside the design and is not applied to
-ADR 0016, so the DS-1 reopening condition of the 2026-10-28 decision does
-not fire and no exclusion audit digest changes. The 20 rows go to
+ADR 0016, so the DS-1 reopening condition of the 2026-10-28 decision does not
+fire. No exclusion audit digest changes. The 20 rows go to
 [ADR 0031](../adr/0031-m5-named-deferral.md) deferral with *PLAN-DYN.md* as
 `targetMilestone`. Whether the M5 announcement needs a demonstration is
 decided separately at the D8 review on 2026-11-10.
@@ -41,19 +41,20 @@ import decision without its own eval-context evidence.
 
 The baselines differ. The 19 DS-12 rows record the parse-time `OSEO1001`
 rejection `ImportExpression is outside the M1 profile.` The DS-8 row records
-the run-time `OSEO1001` rejection of its direct eval call,
-`eval compiles source text at run time, which is outside the admitted profile.`,
-in *tests/test262/results/language/expressions/67.yaml*. The build never sees
-its ImportCall.
+the run-time `OSEO1001` rejection of its direct eval call in
+*tests/test262/results/language/expressions/67.yaml*:
+`eval compiles source text at run time, which is outside the admitted profile.`
+The build never sees its ImportCall.
 
 The node depends on landed `unsupported-ownership-audit`. The umbrella
 `dynamic-source-coverage-remediation` and `m5-exit-audit` depend on it.
-Every path keeps its ledger owner `node:dynamic-source-coverage-remediation`
-until an ADR 0031 entry defers it, which needs `m5c-deferral-ledger-checker`
-first.
-This node moves no ledger owner, admits no path, creates no exclusion, and
-changes no compiler, runtime, runner, harness, or manifest file. Root owns
-UPDATE, outer review, publication, push, and landing.
+
+Every path kept its ledger owner `node:dynamic-source-coverage-remediation`
+until an ADR 0031 entry deferred it, which needed `m5c-deferral-ledger-checker`
+first. All 20 now have the `deferred` owner with *PLAN-DYN.md* as
+`targetMilestone`. This node moves no ledger owner, admits no path, creates no
+exclusion, and changes no compiler, runtime, runner, harness, or manifest file.
+Root owns UPDATE, outer review, publication, push, and landing.
 
 
 Deliverables
@@ -80,5 +81,4 @@ Checks and review
 Documentation and graph checks only: `mise run check` behind the capacity
 prefix, the graph tests, and the fast non-native repository tests. No native,
 full, extended, or test262 gate runs, because nothing that executes changes.
-Reviews use the stable scope `static-import-design`: the pre gate with
-`opencode-kimi`, then the internal gate with `codex-astra`.
+The stable review scope is `static-import-design`.

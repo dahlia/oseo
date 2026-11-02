@@ -1,15 +1,15 @@
 Observation batch 16 admission preparation
 ==========================================
 
-This is a fixed Source4 preparation snapshot, pending independent review,
-Root integration, D3, required later observation and publication gates.
-No node status or landed flag changes through this preparation.
+This is a fixed Source4 preparation snapshot. Independent review, Root
+integration, D3, and the required later observation and publication gates
+remain pending. No node status or landed flag changes through this preparation.
 
 All 467 original paths (469 review units) are added together from the accepted
-leading results on R `db4104dce27cdadea7825f809c4def1987a43e0c`,
-tree `fef6a24456493d6a87a42751ebd2e90d7b2ad00f`.
-The overall leading run failed later in B18; this batch completed.
-No new observation, compiler emission or native execution ran here.
+leading results on R `db4104dce27cdadea7825f809c4def1987a43e0c`, tree
+`fef6a24456493d6a87a42751ebd2e90d7b2ad00f`. The batch completed. The overall
+leading run failed later in B18. No new observation, compiler emission, or
+native execution occurred in this preparation.
 
 | Pass | Expected negative | Unsupported | Requests | Native executed |
 | ---: | ----------------: | ----------: | -------: | --------------: |
@@ -26,30 +26,33 @@ The original captures and all request/result/stdout/stderr links are in:
 
 These are author execution/source evidence, not previous model review
 certificates. Source metadata, bodies, assertions, flags, negative phases,
-strictness and actual early exits remain unchanged. Unsupported reasons
-are the original OSEO1001 rejections; absent native execution is not a
-runtime result. Parse negatives expose no raw parser diagnostic here.
-The leading packet captured no emitted C/MIR, and none is claimed.
+strictness, and actual early exits remain unchanged. Unsupported reasons are
+the original OSEO1001 rejections; absent native execution is not a runtime
+result.
+
+Parse negatives expose no raw parser diagnostic here. The leading packet
+captured no emitted C/MIR, and none is claimed.
 
 Tags name the original subject and concrete non-harness prerequisites.
 Whitespace/keyword mentions alone do not justify lexical-grammar, and a
-failure-only assertion throw does not justify abrupt-completion coverage.
-Eval update/value reads and Function.prototype reads are not dynamic
-source compilation. All existing vocabulary and supportedFeatures stay
-unchanged. Full original bodies and source-string literals were inspected.
+failure-only assertion throw does not justify abrupt-completion coverage. Eval
+update/value reads and Function.prototype reads are not dynamic source
+compilation. All existing vocabulary and supportedFeatures stay unchanged. Full
+original bodies and source-string literals were inspected.
 
 
 Bounded unsupported ownership
 -----------------------------
 
-Existing ADR0016 dynamic-construction/eval-semantics assessments bind only
-source-subject originals below; ADR0019 mixed-core and reopening conditions
-remain unchanged. They are preparation decisions subject to independent
-review, not a newly accepted exemption. Mixed-core originals retain the
-existing remediation node, whose prepared scope is now exactly 290.
-The earlier 273 owners and contracts remain intact. No replacement evidence
-is represented as completed or equivalent. Every row below names its
-unchanged original source and actual deciding observation.
+Existing ADR0016 dynamic-construction/eval-semantics assessments bind only the
+source-subject originals below. ADR0019 mixed-core and reopening conditions
+remain unchanged. These are preparation decisions subject to independent
+review, not a newly accepted exemption.
+
+Mixed-core originals retain the existing remediation node, whose prepared scope
+is now exactly 290. The earlier 273 owners and contracts remain intact. No
+replacement evidence is represented as completed or equivalent. Every row below
+names its unchanged original source and actual deciding observation.
 
 | Original path                                                                | Source SHA-256                                                   | Prepared owner                           | Assessment                   |
 | ---------------------------------------------------------------------------- | ---------------------------------------------------------------- | ---------------------------------------- | ---------------------------- |
@@ -260,44 +263,45 @@ Main-only reanchor preparation
 The earlier source-bound preparation and leading-run descriptions are
 historical evidence on R db4104; that original run failed later in B18.
 All original sources, negative phases, assertions and B18 reservations
-remain unchanged, with304 active remediation owners and17 existing ADR0016
+remain unchanged, with 304 active remediation owners and 17 existing ADR 0016
 assessment bindings. They grant no new exclusion or publication approval.
 
 The subsequent Main-only execution used actual clean U
 `44d2c4f03d65f8742c043532a9bef909c852cce1`, tree
 `b83c495e945e76a508b76aef63e1e8859caeef8d`, with product code exact successful
-Main128d63. Its single stock scoped command was:
+Main `128d63`. Its single stock scoped command was:
 
 ~~~~ sh
 mise run test262:update:changed -- \
     --baseline 128d63fcec3a625eca799f5bd9df8b9267b8c6b2
 ~~~~
 
-It naturally completed0 on2026-10-25: all754 originals freshly observed,
-636passes,70expected negatives and48unsupported, pool8/retries0. The actual
-manifest update wrote0 partitions with6688 unchanged index/partition files;
-all29147 old Main records and all754 prepared values/tags remain exact.
-No expected value, owner, source or failure was normalized. Two naturally
-empty owned drains were15.106281s apart; source/dist/tool bindings held.
+It naturally completed with exit 0 on 2026-10-25: all 754 originals freshly
+observed, 636 passes, 70 expected negatives and 48 unsupported, pool 8, retries
+0. The actual manifest update wrote 0 partitions with 6,688 unchanged
+index/partition files; all 29,147 old Main records and all 754 prepared
+values/tags remain exact. No expected value, owner, source or failure was
+normalized. Two naturally empty owned drains were 15.106281 s apart;
+source/dist/tool bindings held.
 
 [Actual command output, argv, bindings and owned drains](/data/m5c-b16-b17-main-scoped-observation-20261025/task_3335cb68b22b/ctx_fb50e986ca95/)
 are the fresh execution evidence. This observation-provenance commit records
 the genuine zero record delta after that actual U; it does not relabel the
 older R as a new U/R. The original leading packet and B18's semantic failure
-plus264 unreached paths remain preserved separately. All336 B18 paths remain
-unreviewed. Root owns actual D3, affected internal/ outer review judgment,
-final owners/exclusions, candidate gates and publication; no node is marked
-landed or final gate claimed here.
+plus 264 unreached paths remain preserved separately. All 336 B18 paths remain
+unreviewed. Root owns actual D3, affected internal/outer review judgment, final
+owners/exclusions, candidate gates and publication; no node is marked landed or
+final gate claimed here.
 
 
 Dependency-tag metadata repair
 ------------------------------
 
-The audit for outer finding B16-B17-DEPENDENCY-COVERAGE-001 inspects all
-467 original batch bodies and frontmatter with the public metadata parser
-and an independent AST walk. It removes 16 abrupt-completion claims and
-one lexical-grammar claim across 17 paths. The corrected records retain
-47 abrupt-completion and 43 lexical-grammar tags in this batch.
+The audit for outer finding B16-B17-DEPENDENCY-COVERAGE-001 inspects all 467
+original batch bodies and frontmatter with the public metadata parser and an
+independent AST walk. It removes 16 abrupt-completion claims and one
+lexical-grammar claim across 17 paths. The corrected records retain 47
+abrupt-completion and 43 lexical-grammar tags in this batch.
 
 | Subject family                               | Changed paths |   Removed tag claims |
 | -------------------------------------------- | ------------: | -------------------: |
@@ -306,19 +310,20 @@ one lexical-grammar claim across 17 paths. The corrected records retain
 | Yield in an unexceptional try body           |             1 |  1 abrupt-completion |
 | Yield/relational-expression precedence       |             1 |    1 lexical-grammar |
 
-The two custom-iterator spread tests retain their exercised return
-completions. Template functions, methods and coercion hooks that return
-values also retain abrupt-completion. Deliberate throws, assert.throws
-callbacks, generator throw/close paths and negative contracts remain.
-In from-try.js, the two next calls never enter the rethrowing catch.
-In in-rltn-expr.js, the no-LineTerminator restriction appears only in the
+The two custom-iterator spread tests retain their exercised return completions.
+Template functions, methods and coercion hooks that return values also retain
+abrupt-completion. Deliberate throws, `assert.throws` callbacks, generator
+throw/close paths and negative contracts remain.
+
+In *from-try.js*, the two `next` calls never enter the rethrowing catch. In
+*in-rltn-expr.js*, the no-LineTerminator restriction appears only in the
 frontmatter grammar excerpt; the body tests expression precedence.
 
 The original three reported examples now omit abrupt-completion:
-call-spread-mult-empty.js and the template-literal cases
-middle-list-many-expr-primitive.js and middle-list-one-expr-member-expr.js.
-Their full bodies exercise successful construction, substitution and
-property reads. ReturnIfAbrupt prose supplies no additional coverage.
+*call-spread-mult-empty.js* and the template-literal cases
+*middle-list-many-expr-primitive.js* and *middle-list-one-expr-member-expr.js*.
+Their full bodies exercise successful construction, substitution and property
+reads. ReturnIfAbrupt prose supplies no additional coverage.
 
 [The per-path audit table](/data/m5c-b16-b17-dependency-tag-repair-20261025/task_6fb3f44dbafb/ctx_869904f6cbc9/AUDIT.tsv)
 records old/new tags, exact body-line evidence, negative phases and every
@@ -327,32 +332,38 @@ witness for each retained tag. The audit compares complete pinned bodies with
 the preserved source captures; it does not use comment keywords or failing
 assertion messages as semantic evidence.
 
-This repair is T, metadata derived from actual U44d2c4f and R2609fcd5.
-It creates no new native-observation R. Every classification, variant,
-sourceHash, diagnostic and output remains exact, as do the old 29,147
-records, all 48 new unsupported owners and existing ADR assessments.
-Ledger state and prerequisites are regenerated from the records; their
-bytes and the unreviewed batch counts remain unchanged. Supported features,
-source products, graph state and B18 reservations remain fixed.
-Root must judge D3 and authorize affected internal/outer review and any
-later observation. The outer finding remains pending that review.
+The repair is T, with metadata derived from actual U44d2c4f and R2609fcd5. It
+creates no new native-observation R.
+
+Every classification, variant, `sourceHash`, diagnostic and output remains
+exact, as do the old 29,147 records, all 48 new unsupported owners and existing
+ADR assessments. Ledger state and prerequisites are regenerated from the
+records; their bytes and the unreviewed batch counts remain unchanged.
+Supported features, source products, graph state and B18 reservations remain
+fixed.
+
+Root must judge D3 and authorize affected internal/outer review and any later
+observation. The outer finding remains pending that review.
 
 
 Fresh observation of the corrected tags
 ---------------------------------------
 
-Root's fresh D3 selected the 20 repaired entries. One stock scoped UPDATE
-ran on clean T `1a040fe26557e3ef68c5f75bb3456812130fc011`, using baseline
-R `2609fcd5e8dcff6365e4db15a155676192de4c79`. It completed naturally on
+Root's fresh D3 selected the 20 repaired entries. One stock scoped UPDATE ran
+on clean T `1a040fe26557e3ef68c5f75bb3456812130fc011`, using baseline R
+`2609fcd5e8dcff6365e4db15a155676192de4c79`. It completed naturally on
 2026-10-26 with 19 passes and one expected negative, pool 8 and zero retries.
-It wrote zero partitions and retained all 6,688 index/partition files.
-All other 29,881 records and every dependency, observation and owner remain
-exact T values. Two owned empty drains were 15.100685 seconds apart.
+
+The run wrote zero partitions and retained all 6,688 index/partition files. All
+other 29,881 records and every dependency, observation and owner remain exact T
+values. The two owned empty drains were 15.100685 seconds apart.
 
 [The actual scoped run and drain records](/data/m5c-b16-b17-dependency-tag-repair-20261025/task_6fb3f44dbafb/ctx_869904f6cbc9/update20/)
 record this execution. The resulting provenance commit R20 has sole parent T;
 original U44d2c4f/R2609 and the leading run's later B18 failure remain
-historical evidence. All 754 original paths still total 636 passes, 70 expected
-negatives and 48 unsupported results, with the same 31 active remediation and
-17 bounded ADR assignments. Affected internal/outer review and Root's final D3,
-candidate gates and publication remain pending.
+historical evidence.
+
+All 754 original paths still total 636 passes, 70 expected negatives and 48
+unsupported results, with the same 31 active remediation and 17 bounded ADR
+assignments. Affected internal/outer review and Root's final D3, candidate
+gates and publication remain pending.
