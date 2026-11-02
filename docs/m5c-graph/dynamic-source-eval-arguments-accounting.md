@@ -77,6 +77,10 @@ established for those contracts, so all six stay with the umbrella. A default
 closure that is never called is not a binding-lookup witness. No new native or
 fixture evidence is added.
 
+[*dynamic-source-scope-arguments-evidence.md*](./dynamic-source-scope-arguments-evidence.md)
+later adds static native witnesses for those contracts and accounts for all six
+under ADR 0016.
+
 The umbrella goes from 950 to 764 directly owned paths; ADR 0016 goes from
 677 to 863. All 41,091 inventory paths, 29,038 passes, 3,627 expected negatives
 and 1,684 unsupported observations remain. No subset, result or dependency tag

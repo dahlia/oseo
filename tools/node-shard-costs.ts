@@ -6,7 +6,7 @@
  * `9f21b607`, candidate run 41233967056 at `636157ef`, and main run
  * 41238903460 at `8770b2e4`. The largest is kept on purpose: the residual
  * evidence file took 1.36 times longer on one of those Linux runners than
- * on another, and the margin the shards keep is a slow runner's. Seven
+ * on another, and the margin the shards keep is a slow runner's. Eight
  * files postdate those runs and scale a serial local measurement on the
  * same host by the residual-evidence ratio: 2.574 on Linux and 1.974 on
  * macOS.
@@ -27,6 +27,7 @@ export const nodeShardCosts = {
     "tests/dynamic-source-realm-host-evidence.test.ts": 309,
     "tests/dynamic-source-residual-evidence.test.ts": 2055,
     "tests/dynamic-source-static-core.test.ts": 72,
+    "tests/function-constructor-evidence.test.ts": 143,
     "tests/harness-native.test.ts": 326,
     "tests/harness-resource.test.ts": 47,
     "tests/host-script-bindings.test.ts": 131,
@@ -139,6 +140,7 @@ export const nodeShardCosts = {
     "tests/dynamic-source-realm-host-evidence.test.ts": 301,
     "tests/dynamic-source-residual-evidence.test.ts": 1576,
     "tests/dynamic-source-static-core.test.ts": 91,
+    "tests/function-constructor-evidence.test.ts": 110,
     "tests/harness-native.test.ts": 332,
     "tests/harness-resource.test.ts": 42,
     "tests/host-script-bindings.test.ts": 117,

@@ -1,10 +1,10 @@
 B19/B20/B30 dynamic-source coverage remediation
 ===============================================
 
-The umbrella now owns 136 paths. The child sections below give each move. In
-bundle 3, the residual evidence candidate accounted for 17 of the 209 paths it
-owned then. The assessment keeps two of its 19 selected paths here; the other
-190 are outside that bounded child.
+The umbrella no longer owns any path. The child sections below give each move.
+In bundle 3, the residual evidence candidate accounted for 17 of the 209 paths
+it owned then. The assessment keeps two of its 19 selected paths here; the
+other 190 are outside that bounded child.
 
 At the earlier split checkpoint, the umbrella owned 757 paths: DS1 accounts for
 218, DS-3 for 11, DS2 for 76, DS4 for 40, DS-5 for 2, DS-6 for 42, and DS-7 for
@@ -691,6 +691,18 @@ owned paths before its own landing.
 The child accounts for all 98 under ADR 0016.
 
 
+Fixture-construction evidence child
+-----------------------------------
+
+Root's 2026-11-01 classification adds
+`dynamic-source-fixture-construction-evidence` for exactly 15 paths that
+had no recorded evidence attempt: the 11 compound assignment
+*S11.13.2\_A6.N\_T1* rows, *script-decl-lex-var-declared-via-eval.js*,
+and the three direct eval calls with spread arguments. Its pinned selector
+and routes are in that child's work note. The child moves all 15 paths to ADR
+0016. The umbrella is blocked until the child lands.
+
+
 Named deferral
 --------------
 
@@ -705,3 +717,40 @@ variable-environment probes, and *subclass-Function.js*.
 [*docs/m5c-closure/deferrals.yaml*](../m5c-closure/deferrals.yaml) gives each
 path's remaining contract and reason. With this move the umbrella owns 136
 paths.
+
+
+Function constructor assessment child
+-------------------------------------
+
+`dynamic-source-function-constructor-assessment` gives exactly 49 umbrella
+paths one reviewed outcome each: 27 Function constructor rows of
+observation batches 01 and 18 and 22 dynamic coverage train rows. Its pinned
+selector and outcome rules are in that child's work note. Its assessment
+moves 13 paths to ADR 0016 and defers 36 under ADR 0031. The umbrella requires
+child landing plus zero directly owned paths before its own landing.
+
+
+Scope and eval arguments evidence
+---------------------------------
+
+The
+[`dynamic-source-scope-arguments-evidence`](./dynamic-source-scope-arguments-evidence.md)
+child gives 24 paths one outcome each. It moves the six ds9 arrow cells to ADR
+0016 with static native witnesses of their body bindings named `arguments` and
+of the parameter closure that reads past them. Six eval-declaration-only scope
+rows also move to ADR 0016, without replacement evidence, because their only
+subject is EvalDeclarationInstantiation. The other 12 B26a/B26b/B27 scope rows
+are deferred under ADR 0031, because only a direct eval declaration shows the
+environment structure they probe.
+
+
+Eval code assessment child
+--------------------------
+
+The `dynamic-source-eval-code-assessment` child records the evidence
+attempt for exactly 48 umbrella paths that test eval code itself, as
+[*dynamic-source-eval-code-assessment.md*](./dynamic-source-eval-code-assessment.md)
+pins them. Root's 2026-11-02 rulings send 32 of them to the existing ADR 0016
+`eval-semantics` exclusion and close the other 16, including the two
+*S11.13.1\_A6* assignment rows, with static replacement evidence. No path is
+deferred.

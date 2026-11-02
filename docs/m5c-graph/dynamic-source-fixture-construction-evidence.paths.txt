@@ -1,0 +1,15 @@
+test/language/expressions/call/eval-spread-empty-leading.js
+test/language/expressions/call/eval-spread-empty-trailing.js
+test/language/expressions/call/eval-spread.js
+test/language/expressions/compound-assignment/S11.13.2_A6.10_T1.js
+test/language/expressions/compound-assignment/S11.13.2_A6.11_T1.js
+test/language/expressions/compound-assignment/S11.13.2_A6.1_T1.js
+test/language/expressions/compound-assignment/S11.13.2_A6.2_T1.js
+test/language/expressions/compound-assignment/S11.13.2_A6.3_T1.js
+test/language/expressions/compound-assignment/S11.13.2_A6.4_T1.js
+test/language/expressions/compound-assignment/S11.13.2_A6.5_T1.js
+test/language/expressions/compound-assignment/S11.13.2_A6.6_T1.js
+test/language/expressions/compound-assignment/S11.13.2_A6.7_T1.js
+test/language/expressions/compound-assignment/S11.13.2_A6.8_T1.js
+test/language/expressions/compound-assignment/S11.13.2_A6.9_T1.js
+test/language/global-code/script-decl-lex-var-declared-via-eval.js

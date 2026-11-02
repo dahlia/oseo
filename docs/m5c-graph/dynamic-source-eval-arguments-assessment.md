@@ -10,7 +10,9 @@ selector and SHA256 remain in the
 
 Each subject is an EvalDeclarationInstantiation subject unless its row
 explicitly retains an ordinary body binding contract. The six mixed arrow
-cells stay with the umbrella.
+cells stayed with the umbrella until
+[*dynamic-source-scope-arguments-evidence.md*](./dynamic-source-scope-arguments-evidence.md)
+added static witnesses for their body binding contracts.
 
 The other 186 cells have no independent non-source subject to replace: 184
 observe the eval declaration collision and its global non-leakage, and two
