@@ -90,6 +90,8 @@ arguments	shape	[object Arguments] | 0,length,callee,Symbol(Symbol.iterator) | t
 arguments	recursion	[0]
 arguments	bound with a leading argument	[7,8]
 arguments	through Function.prototype.call	[3,4]
+invariant	caller value stays the same	false
+invariant	arguments value stays the same	false
 caller	async function before await	af
 caller	promise job	null
 caller	async function after await	af
@@ -98,4 +100,5 @@ realm	caller in another realm	callsIt
 realm	callee in another realm	callsIt
 realm	caller read from another realm	readFrom
 realm	arguments object read from another realm	reader's realm
+realm	read by another realm's Reflect.get	prototype from the reading realm, Symbol.iterator from the function's realm, callsThrough
 realm	own keys in another realm	length,name,arguments,caller,prototype

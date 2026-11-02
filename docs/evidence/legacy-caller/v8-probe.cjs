@@ -188,6 +188,18 @@ report("arguments", "recursion", a10(1));
 function a11(a, b) { return A(a11.arguments); }
 report("arguments", "bound with a leading argument", a11.bind(null, 7)(8));
 report("arguments", "through Function.prototype.call", (function g() { return a11.call(null, 3, 4); })());
+// The essential-internal-method invariant that test262's
+// built-ins/Object/internals/DefineOwnProperty/consistent-value-function-*.js
+// check: a non-writable, non-configurable data property keeps its value.
+function inv1() { return Reflect.getOwnPropertyDescriptor(inv1, "caller"); }
+function inv1Caller() { return inv1(); }
+Reflect.defineProperty(inv1, "caller", { writable: false, configurable: false });
+report("invariant", "caller value stays the same",
+  Reflect.getOwnPropertyDescriptor(inv1, "caller").value === inv1Caller().value);
+function inv2() { return Reflect.getOwnPropertyDescriptor(inv2, "arguments"); }
+Reflect.defineProperty(inv2, "arguments", { writable: false, configurable: false });
+report("invariant", "arguments value stays the same",
+  Reflect.getOwnPropertyDescriptor(inv2, "arguments").value === inv2().value);
 Promise.all(pending).then(function () { return out.join("\n"); });
 `;
 
@@ -246,6 +258,25 @@ function selfCaller() { return selfCaller.caller; }
   lines.push(
     "realm\targuments object read from another realm\t" +
       argsFrom(foreign.readsArgumentsPrototype),
+  );
+  globalThis.otherRealm = vm.runInContext("this", other);
+  vm.runInThisContext(`
+function throughOtherBuiltIns(x) {
+  var read = otherRealm.Reflect.get(throughOtherBuiltIns, "arguments");
+  return [
+    Object.getPrototypeOf(read) === otherRealm.Object.prototype
+      ? "prototype from the reading realm" : "prototype from the function's realm",
+    read[Symbol.iterator] === Array.prototype.values
+      ? "Symbol.iterator from the function's realm" : "Symbol.iterator from the reading realm",
+    nameOfCaller(otherRealm.Reflect.get(throughOtherBuiltIns, "caller")),
+  ].join(", ");
+}
+function nameOfCaller(value) { return value === null ? "null" : value.name; }
+function callsThrough() { return throughOtherBuiltIns(1); }
+`);
+  lines.push(
+    "realm\tread by another realm's Reflect.get\t" +
+      vm.runInThisContext("callsThrough()"),
   );
   lines.push(
     "realm\town keys in another realm\t" +

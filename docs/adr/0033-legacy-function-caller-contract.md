@@ -10,6 +10,12 @@ Proposed for the `legacy-caller` unit of
 `caller` extension enters the profile, and ADR 0028's M5 exclusion ends when
 the unit lands its reviewed rows.
 
+Two observations made while implementing the draft put the decision itself in
+question, and the maintainer decides among the options under “Open decision”
+below. The current V8 in Deno 2.9.7 no longer has the extension. The V8 shape
+of the properties also breaks an invariant of the essential internal methods
+that two passing test262 rows check. Implementation is paused until then.
+
 
 Context
 -------
@@ -32,8 +38,12 @@ function reports. Without an own property, a read reaches the
 %Function.prototype%, and throws.
 
 Packages that use the extension were written against the engines that ship it.
-Node.js 24.21.0, one of the two reference hosts, is the reference wherever the
-edition leaves a choice. Deno 2.9.7 uses the same engine.
+Node.js 24.21.0, one of the two reference hosts, ships it and is the reference
+wherever the edition leaves a choice. The other reference host, Deno 2.9.7,
+runs V8 15.0, which no longer gives non-strict functions own `caller` or
+`arguments` properties: a read reaches a %Function.prototype% accessor and
+throws a `TypeError`, as in Oseo today. Node.js is therefore the only reference
+host for this extension, and differential tests compare against it alone.
 
 
 Required contract
@@ -88,7 +98,8 @@ function sits under the top level, and a second `vm` context stands in for a
 second realm. Its output under Node.js 24.21.0 is the checked-in
 [*v8-probe.txt*](../evidence/legacy-caller/v8-probe.txt), reproduced with
 `node docs/evidence/legacy-caller/v8-probe.cjs`. Each choice below cites the
-row group of that output.
+row group of that output. *deno-presence.js* in the same directory checks the
+Deno side, and its output is *deno-presence.txt*.
 
 
 Observed results
@@ -143,9 +154,46 @@ elements are the values the activation received, including bound leading
 arguments, except that an uncaptured simple parameter reassigned in an
 interpreter frame shows its new value (group `arguments`).
 
+The V8 shape breaks an invariant of the essential internal methods: a
+non-writable, non-configurable data property must report the same value on
+every later `[[GetOwnProperty]]`. After a program redefines `caller` or
+`arguments` with both attributes false, V8 still reports a different value once
+the function is active (group `invariant`). test262 checks this in
+*consistent-value-function-caller.js* and
+*consistent-value-function-arguments.js* under
+*test/built-ins/Object/internals/DefineOwnProperty/*. Both rows pass in Oseo
+today,
+because Oseo has no such own property; Node.js fails both, and so did a native
+build of the contract below.
+
 Across realms, a caller in another realm is reported, a read from another realm
-sees the same caller, and the `arguments` object belongs to the realm of the
-code that reads it (group `realm`).
+sees the same caller, and the `arguments` object's prototype belongs to the
+realm that performs the read. A read through another realm's `Reflect.get`
+gets that realm's %Object.prototype% but the `Symbol.iterator` value of the
+function's own realm (group `realm`).
+
+
+Open decision
+-------------
+
+The contract under “Decision” follows V8 and would turn the two invariant rows
+from passes into failures, which *PLAN-LANGUAGE.md*'s exit criteria forbid. The
+choices are:
+
+1.  **Keep ADR 0028.** Leave the extension out, as current V8 does, and keep
+    the 23 paths excluded.
+2.  **Make both own properties configurable.** Keep every other rule below.
+    A configurable property may change its value, so the invariant holds.
+    Deleting one removes it, and the inherited %ThrowTypeError% accessor
+    applies again; defining or freezing one turns it into an ordinary data
+    property that keeps the value it had at that moment. The two invariant
+    rows, the 18 `caller` rows, and the forbidden-extension rows pass. The
+    differences from V8 are the configurable attribute, a deletion that
+    succeeds, and a definition with another value that succeeds.
+3.  **Keep the V8 shape** and record the two invariant rows as accepted
+    failures under a new decision.
+4.  **Use own accessor properties** instead of data properties. The
+    invariant holds, but descriptors no longer match V8.
 
 
 Decision
@@ -210,11 +258,13 @@ has already released the strict caller's frame.
 ### The `arguments` value
 
 `arguments` of an inactive function is `null`. For an active one, each read
-creates a new arguments object in the running realm of the code that reads it.
-The object has the own keys, attributes, prototype, `Symbol.iterator`, and
-`callee` that V8 reports, with `callee` set to the function. Its elements are
-the argument values the most recent activation received, after bound leading
-arguments, and they are not mapped to parameters.
+creates a new arguments object. Its prototype is the %Object.prototype% of the
+running realm at the read, and its `Symbol.iterator` is the
+%Array.prototype.values% of the function's realm, as on V8. The object has the
+own keys, attributes, and `callee` that V8 reports, with `callee` set to the
+function. Its elements are the argument values the most recent activation
+received, after bound leading arguments, and they are not mapped to
+parameters.
 
 Oseo does not show a later assignment to a parameter. V8 shows one only for a
 simple parameter that stays in an interpreter register. The fixed fixtures
@@ -223,9 +273,9 @@ before reading `arguments`.
 
 ### Realms
 
-Realms do not change any answer. A caller in another realm is reported, a read
-from another realm sees the same answer, and only the `arguments` object's
-prototype and `Symbol.iterator` come from the reading realm.
+Realms do not change who is reported. A caller in another realm is reported,
+and a read from another realm sees the same answer. Only the `arguments`
+object depends on realms, as stated above.
 
 ### Policy invariance and cost
 

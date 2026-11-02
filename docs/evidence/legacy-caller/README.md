@@ -23,6 +23,31 @@ case, and the observed value, separated by tabs. Function values print as their
 names, and an anonymous arrow prints as `<anonymous>`. The ADR cites the
 groups.
 
+The `invariant` group repeats the check of test262's
+*consistent-value-function-caller.js* and
+*consistent-value-function-arguments.js*: after a program redefines the
+property with writable and configurable both false, a later read while the
+function is active must report the same value. Node.js 24.21.0 reports a
+different one for both.
+
 The probe samples built-in functions; it does not enumerate them. The
 `built-in` group shows the split that ADR 0033 declines to copy, not a complete
 list of V8's C++ built-ins.
+
+
+Deno
+----
+
+*deno-presence.js* checks whether Deno exposes the properties at all. Run it
+with the pinned Deno:
+
+~~~~ sh
+deno run docs/evidence/legacy-caller/deno-presence.js
+~~~~
+
+*deno-presence.txt* is its output under Deno 2.9.7, which runs V8 15.0. A
+non-strict function there has only `length`, `name`, and `prototype`, and
+reading `caller` while it is active throws a `TypeError`. Its
+%Function.prototype% getter and setter are also different functions, unlike
+the single %ThrowTypeError% that ECMA-262 requires. Deno is therefore not a
+reference for ADR 0033.

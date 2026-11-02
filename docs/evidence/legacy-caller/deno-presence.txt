@@ -1,0 +1,4 @@
+Deno 2.9.7, V8 15.0.245.2-rusty
+own keys	length,name,prototype
+caller read while active	throws TypeError
+prototype getter is the setter	false
