@@ -4,7 +4,7 @@ M5 plan for measured ECMAScript compatibility
 Status
 ------
 
-Implementation status: active at M5c. M4 established closed native module
+Implementation status: active. M4 established closed native module
 graphs, live bindings, promises, asynchronous continuations, top-level await,
 and a deterministic native scheduler. M5 expands that documented subset through
 measured compatibility work rather than treating ECMAScript as one feature.
@@ -30,11 +30,12 @@ language tests and 18,093 built-in tests are inside the 16th edition, while
 6,290 proposal, post-edition, or Annex B paths are outside it. The compact
 inventory remains separate from the result manifest.
 
-M5a and M5b are complete. The 149 indexed records in the normative
+M5a, M5b, and M5c are complete. The 149 indexed records in the normative
 [*M5 language profile*](./docs/language-profile-m5.md) are the source of truth
-for admitted families and their evidence assessments. M5c is the remaining
-checkpoint and follows [*PLAN-M5C.md*](./PLAN-M5C.md) and its checked-in work
-graph.
+for admitted families and their evidence assessments. M5c closed under
+[*PLAN-M5C.md*](./PLAN-M5C.md) when its exit audit landed; the
+[M5 exit report](./docs/m5c-closure/m5-exit-report.md) gives the coverage
+counts and gate results.
 
 The M5c entry snapshot recorded 18,343 passes across 21,383 paths, 165 property
 domains, 165 seeds, and an ordinary case budget of 5,905. The checked-in
@@ -7959,6 +7960,10 @@ M5 is complete only when:
     documented tasks; and
  -  `mise run check`, `mise run test`, and the extended property task pass from
     a clean checkout.
+
+`mise run check:m5-exit-audit` proves the inventory, manifest, failure,
+exclusion, and deferral conditions against the checked-in evidence, and the
+[M5 exit report](./docs/m5c-closure/m5-exit-report.md) records the result.
 
 
 Static import attributes and JSON modules

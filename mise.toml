@@ -46,6 +46,7 @@ depends = [
   "check:lines",
   "check:lint",
   "check:macos-lanes",
+  "check:m5-exit-audit",
   "check:m5b-graph",
   "check:m5b-node-scope",
   "check:m5c-closure-ledger",
@@ -123,6 +124,10 @@ run = "node tools/m5b-graph.ts"
 [tasks."check:m5b-node-scope"]
 description = "Keep reviewed evidence within the named M5b node scope"
 run = "node tools/m5b-node-scope.ts"
+
+[tasks."check:m5-exit-audit"]
+description = "Prove the mechanical M5 exit conditions and the coverage report"
+run = "node tools/m5-exit-audit.ts"
 
 [tasks."check:m5c-closure-ledger"]
 description = "Validate the derived M5c inventory closure ledger"
@@ -343,6 +348,14 @@ run = "node tools/test262.ts --reindex"
 [tasks."test262:inventory:update"]
 description = "Regenerate the pinned ECMA-262 applicable-test inventory"
 run = "node tools/test262-inventory.ts --update"
+
+[tasks."report:m5-coverage"]
+description = "Print the M5 coverage report from checked-in inputs"
+run = "node tools/m5-exit-audit.ts --print"
+
+[tasks."report:m5-coverage:update"]
+description = "Regenerate the coverage section of the M5 exit report"
+run = "node tools/m5-exit-audit.ts --update"
 
 [tasks."m5c:closure-ledger:update"]
 description = "Regenerate the M5c closure ledger from the reviewed manifest"
