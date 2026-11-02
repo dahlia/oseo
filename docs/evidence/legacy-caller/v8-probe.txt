@@ -1,0 +1,101 @@
+Node.js v24.21.0
+own	keys of a declaration	length,name,arguments,caller,prototype
+own	keys of an expression	length,name,arguments,caller,prototype
+own	keys after a new property	length,name,arguments,caller,prototype,extra
+own	caller descriptor	{"value":null,"writable":false,"enumerable":false,"configurable":false}
+own	arguments descriptor	{"value":null,"writable":false,"enumerable":false,"configurable":false}
+own	has own caller: strict function	false
+own	has own caller: arrow	false
+own	has own caller: method	false
+own	has own caller: getter	false
+own	has own caller: generator	false
+own	has own caller: async function	false
+own	has own caller: async generator	false
+own	has own caller: class	false
+own	has own caller: bound	false
+own	has own caller: built-in	false
+own	delete caller	false
+own	sloppy assignment	null
+own	strict assignment	throws TypeError
+own	define the current value	ok
+own	define another value	throws TypeError
+own	frozen after freeze	true
+caller	inactive	null
+caller	sloppy function	viaG
+caller	top-level Script	null
+caller	strict function	null
+caller	sloppy arrow	<anonymous>
+caller	sloppy method	m
+caller	class method	null
+caller	sloppy generator	gen
+caller	resumed generator	gen
+caller	constructor call	g
+caller	caller.caller	c0
+forward	Function.prototype.call	g
+forward	Function.prototype.apply	g
+forward	call.call	g
+forward	Reflect.apply	g
+forward	Reflect.construct	g
+forward	bound function	g
+forward	Proxy without a trap	g
+forward	Proxy apply trap	g
+forward	map through Reflect.apply	null
+implicit	valueOf from +	g
+implicit	toString from a template	g
+implicit	Symbol.toPrimitive from +	g
+implicit	valueOf from ==	g
+implicit	toString from a computed key	g
+implicit	for-of next	g
+implicit	Symbol.iterator from spread	g
+implicit	Symbol.hasInstance	g
+implicit	tagged template	g
+implicit	Proxy get trap from a member read	g
+implicit	accessor function from a member read	g
+built-in	Array.prototype.map	null
+built-in	Array.prototype.forEach	null
+built-in	Array.prototype.sort	null
+built-in	Array.from	null
+built-in	Array.prototype.join	null
+built-in	Map.prototype.forEach	null
+built-in	String.prototype.replace	null
+built-in	String()	null
+built-in	Number()	null
+built-in	Promise executor	null
+built-in	Object.keys trap	null
+built-in	Reflect.get accessor	null
+built-in	JSON.parse reviver	g
+built-in	JSON.stringify replacer	g
+built-in	Reflect.set accessor	g
+built-in	Object.defineProperty key	g
+built-in	Error message	g
+built-in	new Date	g
+built-in	BigInt()	g
+built-in	DisposableStack.prototype.dispose	g
+stack	recursion	rec
+stack	after a nested activation returns	outer
+stack	after a nested activation throws	outer
+stack	strict tail call	null
+arguments	inactive	null
+arguments	values	[1,2]
+arguments	fewer than the parameters	[1]
+arguments	more than the parameters	[1,2,3]
+arguments	after assigning an uncaptured parameter	[9,2]
+arguments	after assigning a captured parameter	[1,2]
+arguments	after assigning with arguments in the body	[1,2]
+arguments	after assigning with a non-simple list	[1,2]
+arguments	same object on two reads	false
+arguments	same object as the local arguments	false
+arguments	writing an element changes the parameter	false
+arguments	shape	[object Arguments] | 0,length,callee,Symbol(Symbol.iterator) | true | {"writable":true,"enumerable":false,"configurable":true} | {"value":1,"writable":true,"enumerable":false,"configurable":true} | {"value":1,"writable":true,"enumerable":true,"configurable":true} | true | true | true
+arguments	recursion	[0]
+arguments	bound with a leading argument	[7,8]
+arguments	through Function.prototype.call	[3,4]
+caller	async function before await	af
+caller	promise job	null
+caller	async function after await	af
+caller	async generator	ag
+realm	caller in another realm	callsIt
+realm	callee in another realm	callsIt
+realm	caller read from another realm	readFrom
+realm	arguments object read from another realm	reader's realm
+realm	own keys in another realm	length,name,arguments,caller,prototype
