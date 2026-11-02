@@ -535,6 +535,10 @@ export const emittedC = {
       ["result = oseo_console_log(context, "],
       [", "],
     ],
+    resultAssignOseoModuleGraphEvaluateContext: [
+      ["result = oseo_module_graph_evaluate(context, "],
+      [", "],
+    ],
     resultAssignOseoPromiseAsyncCallContext: [
       ["result = oseo_promise_async_call(context, "],
       [");"],

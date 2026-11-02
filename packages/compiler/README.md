@@ -51,8 +51,8 @@ Call and constructor argument spread accumulate ordinary and iterated values in
 a rooted private argument list after evaluating the target. Abrupt iterator
 work returns without `IteratorClose`; invocations without spread retain fixed
 positional lowering. Construction allocates its receiver after accumulation. A
-spread before a later top-level await point remains an explicit unsupported
-combination until continuation extraction can retain the list.
+spread before a later top-level await point keeps the list in the module
+evaluator's traced asynchronous frame.
 A `const` or `let` declaration list arrives as one owned `declaration-list`
 statement, and HIR construction expands its declarators into the statement
 list that contains the declaration. ECMAScript gives those declarators the
@@ -103,18 +103,17 @@ inside out, and imported and immutable leaves keep their ordinary errors.
 Inside an ordinary asynchronous or asynchronous generator body, a member
 object, a computed property name, and a default may each suspend at `await`,
 because the pattern lowers into the body's traced frame and every value it has
-already prepared lives in that frame's root slots. Module top level keeps a
-source-located rejection for the same positions, because its continuation
-extractor splits statements around whole `await` expressions rather than around
-the steps of a pattern.
+already prepared lives in that frame's root slots. A module evaluator with
+top-level await is such an asynchronous body, so module top level accepts the
+same positions.
 Compound assignment retains one identifier read or one member object,
 property-key expression, converted key, and property read before evaluating its
 right operand. The retained raw key value is converted again on the write path
 after the right operand. Binary forms reuse the corresponding MIR operator
 before a checked write. Logical forms lower through explicit branches, so the
 skipped path performs no right evaluation, second key conversion, or write.
-Await inside a compound assignment remains unsupported until module
-continuation extraction can preserve that retained current value.
+Inside an asynchronous body, including a module evaluator, an `await` in the
+right operand suspends with the retained current value in the traced frame.
 Update expressions retain a binding reference or one member object and raw key
 value. They apply numeric coercion and arithmetic by one before a checked
 write. Member steps convert the raw key independently for the read and write.
@@ -132,9 +131,14 @@ M4 adds owned module syntax, canonical graph discovery interfaces, static
 linking, strongly connected components, and whole-graph lowering. Imported and
 exported names share one traced cell identity, and namespace creation retains
 sorted live-cell mappings. MIR call targets also name promise operations,
-timers, and top-level await checkpoints without importing a concrete runtime or
-event loop into compiler core. Function creation retains ordinary, arrow,
-asynchronous, and asynchronous-arrow identity through HIR and MIR.
+timers, and the `module-evaluate` driver entry without importing a concrete
+runtime or event loop into compiler core. A module graph's script instantiates
+every environment, then passes the module table to `module-evaluate`: the
+entry index, the module count, and per module its evaluator, a top-level await
+flag, and its requested module indices in source order. The runtime driver owns
+every evaluation state field, so the build no longer fixes evaluation order.
+Function creation retains ordinary, arrow, asynchronous, and asynchronous-arrow
+identity through HIR and MIR.
 
 Graph discovery also follows the literal `import()` sites that a frontend
 reports in `importCalls`. Each target's static closure joins the graph after

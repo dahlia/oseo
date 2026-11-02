@@ -1562,6 +1562,14 @@ function emitCall(state: EmitState, operation: MirOperation): void {
         argumentsValue.count,
       ) + renderC(emittedC.common.callSuffix, argumentsValue.name),
     );
+  } else if (target.kind === "module-evaluate") {
+    line(
+      state,
+      renderC(
+        emittedC.call.resultAssignOseoModuleGraphEvaluateContext,
+        argumentsValue.count,
+      ) + renderC(emittedC.common.callSuffix, argumentsValue.name),
+    );
   } else if (target.kind === "promise-intrinsic") {
     if (target.method === "asyncCall") {
       const execution = emittedArgument(callArguments, argumentsValue, 0);

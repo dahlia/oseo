@@ -1406,4 +1406,32 @@ The agent cluster records the main context's policy at installation, and each
 child agent copies it before running its program. Timer and cleanup callback
 throws, host diagnostics, and a rejected entry completion are unchanged.
 
+ABI `m5-148` adds the runtime module evaluation driver in *runtime\_module.c*,
+the `module_table` field of `OseoContext`, and the generated-code entry
+`oseo_module_graph_evaluate`. A module graph's script calls that entry once,
+after it has instantiated every module environment. The arguments are the entry
+index, the module count, and per module its evaluator, a top-level await flag,
+its requested module count, and the requested module indices in source order.
+The entry returns the entry module's top-level capability promise, which the
+event loop treats as the entry task's completion.
+
+The driver implements Evaluate, InnerModuleEvaluation, ExecuteAsyncModule,
+GatherAvailableAncestors, AsyncModuleExecutionFulfilled, and
+AsyncModuleExecutionRejected of ECMA-262 16th edition clause 16.2.1.6. Each
+table entry keeps the Cyclic Module Record state: status, DFS and ancestor
+indices, cycle root, async evaluation order, pending dependency count, async
+parent list, top-level capability, and evaluation error. The module async
+evaluation count lives in the table and is never reset. An asynchronous
+evaluator's result promise is its ExecuteAsyncModule capability, and the
+driver attaches the fulfilled and rejected steps as an `OSEO_REACTION_MODULE`
+reaction. That reaction reads no `then`, creates no derived promise, and runs
+its job in the evaluator's realm. A language throw from a synchronous evaluator
+becomes the recorded evaluation error; a runtime diagnostic still ends the
+program.
+
+The context owns the table for the life of the program. The collector traces
+every entry's evaluator, top-level capability, and evaluation error, so a
+cached error stays reachable. The DFS stack, async parent lists, and the sorted
+ancestor list hold only table indices in untraced memory.
+
 [ADR 0030]: https://github.com/dahlia/oseo/blob/main/docs/adr/0030-test262-unhandled-rejection-policy.md

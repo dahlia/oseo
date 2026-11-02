@@ -700,6 +700,12 @@ struct OseoContext {
      * collection forgets the strings it frees.
      */
     void *string_table;
+    /*
+     * The module table a module graph's top-level script installs, NULL
+     * for a Script program. The private layout stays behind this public
+     * generated-code boundary; the collector traces every entry's values.
+     */
+    void *module_table;
     const char *source_id;
     size_t source_id_length;
     const char *error_code;
@@ -2294,6 +2300,18 @@ OseoResult oseo_greater_equal(
     OseoValue right
 );
 OseoResult oseo_console_log(
+    OseoContext *context,
+    size_t argument_count,
+    const OseoValue *arguments
+);
+/*
+ * Installs a module graph's table and performs Evaluate on its entry,
+ * returning the entry's top-level capability promise. The arguments are
+ * the entry index, the module count, and per module its evaluator, a
+ * top-level await flag of 0 or 1, its requested module count, and the
+ * requested module indices in source order.
+ */
+OseoResult oseo_module_graph_evaluate(
     OseoContext *context,
     size_t argument_count,
     const OseoValue *arguments

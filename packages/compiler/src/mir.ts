@@ -35,6 +35,7 @@ export type MirCallTarget =
       readonly kind: "timer-intrinsic";
       readonly method: "clearTimeout" | "setTimeout";
     }
+  | { readonly kind: "module-evaluate" }
   | { readonly functionId: number; readonly kind: "function" };
 
 /** Hint data copied into MIR without retaining a HIR or syntax object. */

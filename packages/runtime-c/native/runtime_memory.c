@@ -726,6 +726,15 @@ void oseo_collect(OseoContext *context) {
          index += 1u) {
         mark_value(kept_objects[index], &worklist);
     }
+    const OseoModuleTable *modules = context->module_table;
+    if (modules != NULL) {
+        for (size_t index = 0u; index < modules->count; index += 1u) {
+            const OseoModuleRecord *record = &modules->records[index];
+            mark_value(record->evaluator, &worklist);
+            mark_value(record->top_level_capability, &worklist);
+            mark_value(record->evaluation_error, &worklist);
+        }
+    }
     const OseoTailCall *tail_call = context->tail_call;
     if (tail_call != NULL && tail_call->pending) {
         mark_value(tail_call->callee, &worklist);

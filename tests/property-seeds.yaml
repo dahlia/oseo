@@ -600,6 +600,10 @@ families:
     owner: tests/property/m5-regexp-literal-exhaustive.property.test.ts
     start: 0x60009500
     end: 0x600095ff
+  - family: module-evaluation-driver
+    owner: tests/property/module-evaluation-driver.property.test.ts
+    start: 0x60009600
+    end: 0x600096ff
   - family: testkit-import-requests
     owner: packages/testkit/tests/import-requests.property.test.ts
     start: 0x60009700
