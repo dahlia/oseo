@@ -144,14 +144,16 @@ decide each row.
 The `caller` work and literal `import()` change rows already inside the
 inventory, so neither waits for ADR 0032.
 
-The track also needs two further records:
+The maintainer accepted the ADR 0016 amendment in the
+[static-specifier import design](./docs/static-specifier-import-design.md) on
+2026-11-03. `import-requests` applies its text to ADR 0016 in the change that
+starts admitting syntax, together with the exclusion audit's record digest and
+quotes. That change also reviews the two dynamic-import exclusion cohorts whose
+reopening trigger is an accepted amendment that admits dynamic import.
 
- -  the ADR 0016 amendment proposed in the
-    [static-specifier import design](./docs/static-specifier-import-design.md),
-    accepted before `import-requests` starts admitting syntax; and
- -  a successor to
-    [ADR 0028](./docs/adr/0028-legacy-function-caller-boundary.md) that defines
-    the `caller` contract below, accepted before `legacy-caller` lands.
+The track also needs one further record: a successor to
+[ADR 0028](./docs/adr/0028-legacy-function-caller-boundary.md) that defines the
+`caller` contract below, accepted before `legacy-caller` lands.
 
 
 Contracts shared by the units
@@ -246,7 +248,7 @@ inventory; “existing” counts rows already in it whose owner moves to the uni
 | ---------------------------------- | ------------------------------------- | ----------------------------------------------- |
 | `claim-boundary`                   | 1,916 new rows, until handed to units | ADR 0032 accepted                               |
 | `import-driver`                    | none; re-observes module rows         | none                                            |
-| `import-requests`                  | none                                  | ADR 0016 amendment accepted                     |
+| `import-requests`                  | none                                  | ADR 0016 amendment (accepted)                   |
 | `import-operation`                 | none                                  | `import-driver`, `import-requests`              |
 | `import-admission`                 | 20 existing deferrals                 | `import-operation`                              |
 | `legacy-caller`                    | 23 existing                           | successor to ADR 0028 accepted                  |
@@ -646,8 +648,8 @@ Exit criteria
 
 The plan is complete when:
 
- -  ADR 0032, the ADR 0016 amendment, and the successor to ADR 0028 are
-    accepted;
+ -  the ADR 0016 amendment is applied to ADR 0016 and the successor to ADR
+    0028 is accepted;
  -  the inventory contains 43,007 included paths at the pinned revision, or
     the accepted ADR 0032 explains a different count;
  -  every unit's owned paths are passes, expected negatives, or ADR 0016

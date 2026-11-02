@@ -26,8 +26,9 @@ accepted records under *docs/adr/*. Evidence that changes one of those
 contracts updates the affected document in the same change.
 
 The M5c [build-time-resolvable proposal] bounds a first string-literal subset
-and its implementation and evidence gates. It proposes an ADR 0016 amendment
-for maintainer acceptance. The accepted rejection remains in force.
+and its implementation and evidence gates. The reviewed design below narrows
+it, and its ADR 0016 amendment is accepted; the rejection remains in force
+until `import-requests` applies the amendment.
 
 The reviewed [static-specifier import design] is this plan's post-M5 plan for
 that subset. The maintainer deferred its implementation past M5. The design
@@ -36,14 +37,15 @@ referrers, and five implementation units, and maps 20 pinned test262 rows.
 
 M5 defers those rows by name under
 [ADR 0031](./docs/adr/0031-m5-named-deferral.md), with this plan as their
-target. Inside the design, the ADR 0016 amendment stays Proposed, and the
-accepted rejection still applies.
+target. The maintainer accepted the design's ADR 0016 amendment on
+2026-11-03; until `import-requests` applies it, the accepted rejection still
+applies.
 
 On 2026-11-02 the maintainer scheduled the design's implementation under
 [*PLAN-LANGUAGE.md*](./PLAN-LANGUAGE.md), as its four `import-*` units. That
-work accepts the ADR 0016 amendment. The deferral entries keep this plan as
-their target until their rows pass, and the three rows the design cannot close
-stay here. The remaining capability classes stay deferred.
+work applies the accepted ADR 0016 amendment. The deferral entries keep this
+plan as their target until their rows pass, and the three rows the design
+cannot close stay here. The remaining capability classes stay deferred.
 
 [build-time-resolvable proposal]: ./docs/dynamic-import-staged-plan.md
 [static-specifier import design]: ./docs/static-specifier-import-design.md

@@ -569,12 +569,12 @@ denominator unchanged.
 Proposed ADR 0016 amendment
 ---------------------------
 
-Status of this text: Proposed, 2026-11-01. The maintainer deferred the track
-past M5 without accepting this text. The text is therefore not applied to ADR
-0016, and ADR 0016's dynamic-import decision bullet stays in force.
-
-If the post-M5 track is accepted, the change that applies the text to ADR 0016
-also updates the exclusion audit's record digest and quotes.
+Status of this text: Accepted by the maintainer on 2026-11-03, for the
+`import-*` units of [*PLAN-LANGUAGE.md*](../PLAN-LANGUAGE.md). The text is not
+yet applied to ADR 0016, whose dynamic-import decision bullet stays in force
+until the `import-requests` unit applies it. That change also updates the
+exclusion audit's record digest and quotes, and reviews the exclusion cohorts
+whose reopening trigger is an accepted amendment that admits dynamic import.
 
 Proposed replacement for the second decision bullet:
 
