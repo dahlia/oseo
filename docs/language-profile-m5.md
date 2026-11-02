@@ -175,13 +175,20 @@ in strict and non-strict Scripts under both specialization policies with
 collection at every safepoint. The 2026-11-01 maintainer decision applies
 item 3 of the 2026-10-28 decision to the two expression paths and to no
 other, so their unsupported observations are ADR 0013 exclusions owned by
-`adr:0013-m5-edition-and-manifest`; they are not counted as passes. The two
-class declaration paths of the same shape under
-*test/language/statements/class/elements/* keep the
-`node:class-private-accessor-lookup-coverage-remediation` owner, and their
-private accessor subjects remain mixed coverage debt. The
+`adr:0013-m5-edition-and-manifest`; they are not counted as passes. The
 [work note](./m5c-graph/class-private-accessor-lookup-coverage-remediation.md)
 records the evidence.
+
+Observation batch 22b admits the two class declaration paths of the same
+names under *test/language/statements/class/elements/*. Their sources declare
+`class C` where the expression forms assign a class expression to `var C`.
+The `class-declaration-private-getter-public-absence` and
+`class-declaration-private-setter-public-absence` fixtures keep that
+declaration with the same checks, add that the declaration creates no global
+object property, and run in the same native test. The 2026-11-02 maintainer
+decision closes these two paths the same way and no other, so they are ADR
+0013 exclusions with the same owner and are not counted as passes; see the
+[class declaration work note](./m5c-graph/class-declaration-private-accessor-closure.md).
 
 M5c node `frontmatter-feature-tags` adds `super` to the reviewed feature
 list. The tag was the only unmet prerequisite of the four reviewed

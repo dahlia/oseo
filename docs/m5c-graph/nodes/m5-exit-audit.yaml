@@ -18,6 +18,7 @@ dependencies:
   - array-sort-stability
   - array-tolocalestring-arguments
   - authorized-exclusion-audit
+  - class-declaration-private-accessor-closure
   - class-duplicate-constructor-early-error
   - class-private-accessor-lookup-coverage-remediation
   - class-static-keyword-escape-early-error
@@ -160,4 +161,4 @@ dependencies:
   - with-var-loop-head-resolution
   - yield-star-throw-callability
 landed: false
-status: ready
+status: blocked
