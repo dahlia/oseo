@@ -15,5 +15,5 @@ delivers: "Closes exactly two class declaration paths under the ADR 0013
   commit lands through CI that includes macOS."
 dependencies:
   - class-private-accessor-lookup-coverage-remediation
-landed: false
+landed: true
 status: ready

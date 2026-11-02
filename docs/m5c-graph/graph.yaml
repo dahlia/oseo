@@ -21,10 +21,10 @@ baseline:
   unsupportedProfileFeatures: 1912
 summary:
   nodes: 153
-  ready: 152
-  blocked: 1
+  ready: 153
+  blocked: 0
   parked: 0
-  landed: 151
+  landed: 152
 serializationPoints:
   - path: docs/m5c-graph/graph.yaml
     note: "Every landing updates node state and the evidence baseline. Merge
