@@ -178,10 +178,24 @@ source or observation digest, an exclusion outside its record's bounded
 surface, and a deferral whose target is not a later milestone or a deferred
 track.
 
+
+Conditions outside the audit
+----------------------------
+
 Two exit conditions in [*PLAN-M5C.md*](../../PLAN-M5C.md) are outside what the
-repository can check. The maintainer must receive the complete deferral list
-with its summary and raise no objection before the audit relies on it. And
-`mise run check`, `mise run test`, and the extended property task must pass
-from a clean checkout of the landing commit; those gates also carry the
+repository can check. Both held when the audit landed.
+
+The maintainer received the complete deferral list with the summary that the
+plan's Gates section requires: on 2026-11-01, when it had 26 entries, and
+on 2026-11-02 with all 74 after the last remediation paths were assigned.
+Every entry in both lists is in the dynamic source family. No objection
+arrived within the coordination wait period.
+
+`mise run check`, `mise run test`, and `mise run test:property:extended`
+passed from a clean checkout of commit
+`138f194c3571cb7c0026d7eff545c46dc0187c6f`, which merges the audit into the
+last landed implementation. The landing commit adds only the graph state and
+this text to that tree, and its candidate and main CI runs repeat the
+ordinary and extended gates on the exact commit. These gates also carry the
 semantic, property, sanitizer, and target criteria in
 [*PLAN-M5.md*](../../PLAN-M5.md).

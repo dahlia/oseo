@@ -4,7 +4,7 @@ M5c inventory closure plan
 Status
 ------
 
-Implementation status: active. M5a fixed the applicable ECMA-262 16th edition
+Implementation status: complete. M5a fixed the applicable ECMA-262 16th edition
 inventory and M5b completed the built-in and intrinsic dependency graph. M5c
 closes every path in that inventory by observation, remediation, an
 explicitly authorized exclusion, or, under
@@ -20,11 +20,10 @@ presumed failures nor passes, and they were never planned as one
 implementation unit. Figures in this plan that describe the first ledger,
 ownership audit, and batch plan refer to that starting point.
 
-Every included path has since been reviewed, and the mechanical conditions
-of the M5 exit audit hold. The
-[M5 exit report](./docs/m5c-closure/m5-exit-report.md) gives the coverage
-counts, and [Remaining work](#remaining-work) lists what still stands between
-the graph and the landing of the audit.
+Every included path has since been reviewed, and `m5-exit-audit` has
+landed. The [M5 exit report](./docs/m5c-closure/m5-exit-report.md) gives the
+coverage counts and the exit gate results, and
+[Closure outcome](#closure-outcome) summarizes how the last paths closed.
 
 [*docs/m5c-graph/graph.yaml*](./docs/m5c-graph/graph.yaml) is the source of
 truth for M5c work. `mise run check:m5c-graph` derives the current baseline
@@ -365,8 +364,8 @@ report. Adding the tags is recommended; this audit does not retag them.
 
 Item 3 of the 2026-10-28 maintainer decision has since closed the mixed Annex
 B/core split path under ADR 0013 on reviewed replacement evidence. The
-dynamic-source remediation paths remain open, as
-[Remaining work](#remaining-work) describes.
+dynamic-source remediation paths closed or were deferred later, as
+[Closure outcome](#closure-outcome) describes.
 
 The `cross-realm-host` node implements realms beyond the initial realm and the
 `$262.createRealm` capability under
@@ -806,8 +805,8 @@ The terminal audit additionally proves:
     a clean checkout.
 
 
-Remaining work
---------------
+Closure outcome
+---------------
 
 No included path is unreviewed or failed, and no path keeps a remediation
 owner. `dynamic-source-coverage-remediation` has landed with no path left.
@@ -822,13 +821,12 @@ paths, the class declaration paths that call `__lookupGetter__` or
 `__lookupSetter__`, under ADR 0013 on the conditions of the 2026-11-02
 maintainer decision.
 
-`m5-exit-audit` lands last. Its `mise run check:m5-exit-audit` task proves
-every condition under [Gates](#gates) that the repository can check, and the
-[M5 exit report](./docs/m5c-closure/m5-exit-report.md) records the result.
-Two conditions stay outside it: the record that Root mailed the maintainer the
-complete *docs/m5c-closure/deferrals.yaml* as [Gates](#gates) describes and no
-objection arrived, and the clean-checkout runs of `mise run check`,
-`mise run test`, and the extended property task for the landing commit.
+`m5-exit-audit` landed last. Its `mise run check:m5-exit-audit` task proves
+every condition under [Gates](#gates) that the repository can check. The
+[M5 exit report](./docs/m5c-closure/m5-exit-report.md) records that result
+and the two conditions outside it: the maintainer's receipt of the complete
+*docs/m5c-closure/deferrals.yaml* without objection, and the clean-checkout
+gate runs.
 
 
 Exit and reporting

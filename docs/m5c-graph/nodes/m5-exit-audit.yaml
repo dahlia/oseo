@@ -160,5 +160,5 @@ dependencies:
   - with-strict-assignment-fallback
   - with-var-loop-head-resolution
   - yield-star-throw-callability
-landed: false
+landed: true
 status: ready
