@@ -200,18 +200,32 @@ assessments:
       core contract. Existing reviewed OSEO1001 observations and freshly
       recomputed pinned-source and observation digests bind every row.
       Ordinary arguments and parameter contracts remain inside the claim;
-      the six cells asserting ordinary body bindings stay in remediation.
+      the six cells asserting ordinary body bindings are accounted
+      separately under ds9-eval-arguments-mixed.
   ds9-eval-arguments-mixed:
-    disposition: remediation
-    normativeDependency: not-demonstrated
-    reason: >-
-      These six arrow cells also assert a function-valued, lexical or var
-      body binding named arguments; three call a default-parameter closure
-      to distinguish its captured binding from the body binding. Complete
-      static replacement evidence for those core contracts is not
-      established. The per-path audit in
-      docs/m5c-graph/dynamic-source-eval-arguments-assessment.md
-      retains each cell with dynamic-source-coverage-remediation.
+    disposition: exclusion
+    normativeDependency: source-evaluation-only
+    replacementEvidence:
+      docs/m5c-graph/dynamic-source-scope-arguments-assessment.yaml:
+        "7f0bec44449504e52505bd027cf4492a\
+        a052aa1035ce18716a2413b7aa68a620"
+      tests/scope-arguments-native.test.ts: "557add2d4107210fd3ab18027c4f7a18\
+        061bd830a74f565ae1f5e748762d7143"
+      tests/native/fixtures/scope-arguments-evidence.ts:
+        "ebb6c52f9eeb8b66f205ce4190a1720e\
+        e66f0cdd7023b086a77760ddf94c97da"
+    reason: Maintainer decision 2026-10-28 item 1 applies path by path as mapped
+      in docs/m5c-graph/dynamic-source-scope-arguments-evidence.md. Each of the
+      six arrow cells has a static native witness that keeps its
+      function-valued, lexical or var body binding named arguments, its counter
+      and its global non-leakage check; the three cells that call q() read
+      "param" from a binding outside both the parameter and body environments,
+      as the eval-created binding is. Only the eval declaration of arguments in
+      a parameter default remains, an EvalDeclarationInstantiation subject
+      inside ADR 0016. Original unsupported-profile-feature classifications and
+      all assertions remain unchanged; none counts as a pass. Reopen if original
+      or replacement evidence changes or ADR 0016 admits direct eval; all ADR
+      0016/0019 reopening triggers remain in force.
   dynamic-construction:
     disposition: exclusion
     normativeDependency: source-evaluation-only
@@ -241,6 +255,42 @@ assessments:
       reopening is not proved, but unrelated coverage cannot
       be closed without reviewed replacement evidence or a
       maintainer accounting decision.
+  compound-reference-base-witness:
+    disposition: exclusion
+    normativeDependency: source-evaluation-only
+    reason: >-
+      Evidence for the 11 S11.13.2_A6.N_T1 compound assignment paths. Each
+      original declares a more local x through direct eval while the right
+      operand runs and asserts that the outer x receives the result while the
+      new binding holds 2. A sloppy with object that gains x during the right
+      operand replaces the eval declaration for every operator, keeping the
+      initial values, operands and results re-derived from the pinned sources.
+      Strict value and type checks cover the inner read, the outer result and
+      the untouched new binding. Two mutations per row, adding the binding
+      before the reference is resolved and never adding it, are rejected by
+      independent Test262Error verdicts. Both native policies with forced GC
+      observe the expected output. Node.js and Deno are not references: V8
+      writes the newer binding, the divergence the passing S11.13.1_A6_T3
+      exposes for plain assignment. Only the eval var declaration remains
+      excluded under ADR 0016; accounting counts no path as pass. Reopen on
+      changed source, observed rejection or replacement evidence, an accepted
+      source admission, or any uncovered non-source assertion under ADR 0019.
+    replacementEvidence:
+      docs/m5c-graph/dynamic-source-fixture-construction-assessment.md:
+        "a10e31e227b720dd22f70347ac142698107d50f0365a0fa6\
+        89446ee44f8dd85a"
+      tests/native/fixtures/compound-reference-base.ts:
+        "5e76424696454ae6172d498b911e2898204cafc862fe8bdb\
+        f77d68b58bf0757e"
+      tests/compound-reference-base-evidence.test.ts:
+        "d39fac459d66236eb9af9397591286932ea4c3bcc07acd0e\
+        2e2af2e41ee18044"
+      tests/compound-reference-base-source.test.ts:
+        "04f6a73154e06045f0a1be3ecbb42c574fe61299016a6ee5\
+        66771c0c8b44d5d6"
+      tests/test262/harness/base.js:
+        "50331feeca513cb2e2354e05e7c68f82d5aeccd9b766d6c8\
+        8438c5ef118075f6"
   regexp-roundtrip:
     disposition: remediation
     normativeDependency: not-demonstrated
@@ -281,6 +331,47 @@ assessments:
       catch parameter. Replacing eval with assignment does not distinguish
       those environments; only a run-time var declaration by direct eval
       does, and direct eval is not approved for M5."
+  global-lexical-configurable-var-witness:
+    disposition: exclusion
+    normativeDependency: source-evaluation-only
+    reason: >-
+      Evidence for script-decl-lex-var-declared-via-eval.js. Its non-strict
+      subject is GlobalDeclarationInstantiation letting a later Script's let
+      or const shadow a declared global var or function name whose property
+      is configurable. Global properties made by assignment, then a Script
+      var over each, keep configurable descriptors, which strict checks
+      confirm; the later let and const Scripts then read 1 and 2 as the
+      original asserts. A mutant whose var is declared without the
+      configurable property must throw its realm's SyntaxError. Node.js
+      observes the same output, and both native policies with forced GC
+      agree; Deno keeps the removed VarNames check. Only eval creating
+      configurable var and function bindings, and strict eval keeping them
+      local, remain excluded under ADR 0016; accounting counts no path as
+      pass. Reopen on changed source, observed rejection or replacement
+      evidence, an accepted source admission, or any uncovered non-source
+      assertion under ADR 0019.
+    replacementEvidence:
+      docs/m5c-graph/dynamic-source-fixture-construction-assessment.md:
+        "a10e31e227b720dd22f70347ac142698107d50f0365a0fa6\
+        89446ee44f8dd85a"
+      tests/native/fixtures/global-lexical-configurable-var.ts:
+        "db8f75afb722b38b2553bb286f4599b5bcb1ff00ffc4ca2b\
+        1367a370a1d9a88a"
+      tests/native/fixtures/compound-reference-base.ts:
+        "5e76424696454ae6172d498b911e2898204cafc862fe8bdb\
+        f77d68b58bf0757e"
+      tests/global-lexical-configurable-var-evidence.test.ts:
+        "73de4c7a393fa79caf2023904f1f926714aed314fe285288\
+        7504802204d7837c"
+      tests/global-lexical-configurable-var-source.test.ts:
+        "dfbde9b8ce31fc07a7fa172416a42a1adb090a8ac1160d22\
+        8be653e1d14d0ea4"
+      tests/native/host-script-reference.ts:
+        "d01339d26b85c0c7e315f453a831bd12a725261ce11635ba\
+        a6ea62c1b8cab262"
+      tests/test262/harness/base.js:
+        "50331feeca513cb2e2354e05e7c68f82d5aeccd9b766d6c8\
+        8438c5ef118075f6"
   annex-b-pattern:
     disposition: exclusion
     normativeDependency: annex-b-only
@@ -966,17 +1057,62 @@ assessments:
       reviewed equivalent replacement evidence is asserted and no whole-path
       exclusion is authorized. The existing ADR 0016 boundary and ADR 0019
       reopening triggers remain unchanged.
-  observation-train-b06-b08-b14:
-    disposition: remediation
-    normativeDependency: not-demonstrated
-    reason: Root retains exactly 341 original B06/B08/B14 source-rejection
-      paths as active in-claim coverage remediation. Their original source
-      evaluation, completion, Reference, lexical, property and operator
-      contracts remain unresolved where rejection prevents observation.
-      This assessment supplies no equivalent replacement evidence and
-      authorizes no whole-path exclusion. The two direct non-String eval
-      identity paths have a separate bounded remediation owner. ADR 0013,
-      ADR 0016 and ADR 0019, including reopening triggers, remain unchanged.
+  ec-static-eval-code:
+    disposition: exclusion
+    normativeDependency: source-evaluation-only
+    reason: "Root's 2026-11-02 rulings close 16 eval code paths whose
+      non-source subject static code observes with the same operation and the
+      same compared values, as dynamic-source-eval-code-assessment.yaml maps
+      path by path. global-code/export.js, import.js and new.target-arrow.js
+      reject the same declarations at parse with SyntaxError; new.target
+      value-via-call.js and value-via-new.js compare undefined and the
+      function; S11.13.1_A6_T3.js writes 1 through the outer declarative
+      Reference while a with object gains a nearer x during the right-hand
+      side. Nine pinned originals keep every byte with each eval call replaced
+      by its evaluated expression, so the same name, this or new.target
+      resolution happens in the caller; each call's wrong-environment mutation
+      is rejected by an independent Test262Error verdict, and both native
+      policies with forced GC and Node/Deno references agree. Only eval context
+      selection, eval code parsing, eval var instantiation, and the conversion
+      of an early error into a run-time eval exception remain excluded under
+      ADR 0016; accounting counts no path as pass. Reopen on changed source,
+      observed rejection or replacement evidence, an accepted source admission,
+      or any uncovered non-source assertion under ADR 0019."
+    replacementEvidence:
+      docs/m5c-graph/dynamic-source-eval-code-assessment.yaml:
+        "afb36c7cbc4fd23bfe00cf15babf6b42\
+        e29ecdf24c114074c8655b690ec7f2a2"
+      tests/native/fixtures/eval-code-inline-evidence.ts:
+        "1d81b5ee9597f586cc4fe72991061fbd\
+        bff15b2616d6cdf44cae419b94b38d9d"
+      tests/eval-code-inline-evidence.test.ts:
+        "5a2a30605deda066547518c8b6a12ea7\
+        6cfda4bc216e1caa0c8bd1f3721f22e6"
+      tests/native/fixtures/host-script-evidence.ts:
+        "d804fcda15e50a5b2f9ecbaaa1679671\
+        0150e5cefb8d98fc213693f3ca618a0c"
+      tests/native/host-script-reference.ts: "d01339d26b85c0c7e315f453a831bd12\
+        a725261ce11635baa6ea62c1b8cab262"
+      tests/test262/harness/base.js: "50331feeca513cb2e2354e05e7c68f82\
+        d5aeccd9b766d6c88438c5ef118075f6"
+      tests/test262/results/language/global-code/c0.yaml:
+        "dea613977e65f47e379b5f4886bd9e43\
+        6be72f458ca522552341fac76b41215c"
+      tests/test262/results/language/global-code/52.yaml:
+        "d98511e2d6c0f2bd6e3555a9c6b58d7f\
+        5d91f7dd52151806bfb0386d7cf0c061"
+      tests/test262/results/language/global-code/0a.yaml:
+        "797052de32878d241fcd1d42b4522afc\
+        34781eed53f80345d2618b6e0af9735a"
+      tests/test262/results/language/expressions/72.yaml:
+        "b7fc09e8d00cdd9238f039327de266c0\
+        8f371d0ff2e50c9dc2668b5ce0cfbd98"
+      tests/test262/results/language/expressions/81.yaml:
+        "3911a5d61c7521021bfeafbbd01074c3\
+        4b47f2425a84b34a762de0c0e7234b3a"
+      tests/test262/results/language/expressions/df.yaml:
+        "6114cd5ddf57f229b15d82235ef507f7\
+        5371ce11e8d2d3d3a2b741ec0a13b20a"
   observation-train-dynamic-coverage:
     disposition: remediation
     normativeDependency: not-demonstrated
@@ -5625,17 +5761,37 @@ assessments:
         "3de085960212e3ddc5acc83e41ccf933ce09031ba9ed3cc3\
         b35ac9a8dce594b5"
   observation-train-b26a-b26b-b27:
-    disposition: remediation
+    disposition: deferral
     normativeDependency: not-demonstrated
-    reason: Retain the 143 original B26a/B26b/B27 dynamic-source
-      rejections as active coverage remediation. Source hashes and normalized
-      observation digests bind every assessment to its original subject. No
-      equivalent replacement or whole-path exclusion is claimed; ADR 0013,
-      ADR 0016 and ADR 0019 and their reopening triggers remain unchanged. The
-      bundle 4 UPDATE promoted S13.2.2_A13.js, and the train C ordinary
-      evidence node moved 26 Function-constructor paths to trainc assessments.
-      The train C host Script evidence node then accounted 98 paths under
-      ADR 0016.
+    reason: Deferred under ADR 0031; docs/m5c-closure/deferrals.yaml names each
+      path's remaining contract. The 12 remaining B26a/B26b/B27 rows observe the
+      variable environment structure of a for or switch statement or a parameter
+      list, which only a var that direct eval declares while that environment is
+      live can show. The per-path assessment in
+      docs/m5c-graph/dynamic-source-scope-arguments-assessment.yaml records why
+      no static or literal host Script witness reproduces them, as for the
+      deferred for-in, for-of, catch and eval-param-env rows, and direct eval is
+      not approved for M5. Six eval-declaration-only rows moved to
+      scope-eval-declaration-only. The bundle 4 UPDATE promoted S13.2.2_A13.js;
+      the train C evidence nodes moved the other 124 rows earlier. ADR 0016 and
+      ADR 0019 remain unchanged.
+  scope-eval-declaration-only:
+    disposition: exclusion
+    normativeDependency: source-evaluation-only
+    reason: "Six B26a/B26b/B27 rows observe only
+      EvalDeclarationInstantiation: variable/12.2.1-11.js and
+      function/S13.2.2_A14.js read or accept a binding eval code declares, and
+      the function and generator scope-body-lex-distinct.js and
+      eval-var-scope-syntax-err.js rows assert the SyntaxError its collision
+      with a lexical or parameter binding raises. Each has no independent
+      non-source subject, the shape of the ds9-eval-arguments-only cell that
+      docs/m5c-graph/dynamic-source-scope-arguments-assessment.yaml names as
+      the row's precedent, so no replacement evidence is needed or claimed.
+      Existing reviewed OSEO1001 observations and freshly recomputed
+      pinned-source and observation digests bind every row; none counts as a
+      pass. Reopen on changed source or observation, or an accepted ADR 0016
+      amendment admitting direct eval; ADR 0019 non-source reopening remains
+      in force."
   annex-b-ordinary-object-prototype:
     disposition: exclusion
     normativeDependency: annex-b-only
@@ -5769,6 +5925,71 @@ assessments:
       tests/test262/harness/base.js:
         "50331feeca513cb2e2354e05e7c68f82d5aeccd9b766d6c8\
         8438c5ef118075f6"
+  ds-fc-argument-conversion:
+    disposition: deferral
+    normativeDependency: not-demonstrated
+    reason: "Deferred under ADR 0031. These S15.3.2.1 rows assert the Function
+      constructor's ToString of non-String parameter or body arguments: user
+      toString calls, their order, their abrupt completions and the parse result
+      of the converted text. The runtime rejects Function before converting any
+      argument. The dynamic-construction exclusion covers construction from
+      String inputs and the resulting instance, and the 2026-11-01
+      umbrella-residual answer names Function argument conversion as a contract
+      to evidence or defer, so no ADR 0016 assessment excludes them.
+      docs/m5c-graph/dynamic-source-function-constructor-assessment.yaml and
+      deferrals.yaml record each row."
+  ds-fc-function-subclass:
+    disposition: deferral
+    normativeDependency: not-demonstrated
+    reason: Deferred under ADR 0031. Each row constructs a class that extends
+      Function or GeneratorFunction, whose super() reaches the source-compiling
+      constructor that the runtime rejects; no static allocation yields the
+      created function. The ReferenceError of a derived constructor that never
+      calls super() is ordinary and observed by the passing Array subclass row
+      named in
+      docs/m5c-graph/dynamic-source-function-constructor-assessment.yaml.
+  ds-fc-strict-hashbang:
+    disposition: deferral
+    normativeDependency: not-demonstrated
+    reason: "Deferred under ADR 0031. The strict variant's direct eval of a
+      no-newline #! inherits its caller's strictness. A literal host Script
+      cannot place a directive before #!, so only strict direct eval observes
+      the contract."
+  ds-fc-source-subjects:
+    disposition: exclusion
+    normativeDependency: source-evaluation-only
+    reason: "Maintainer decision 2026-10-28 item 1 applies. Four rows keep a
+      non-source assertion with a faithful witness named in
+      docs/m5c-graph/dynamic-source-function-constructor-assessment.yaml: native
+      fixtures that replace only each original's source-compiling call (a static
+      function for the String-only S15.3.2.1_A2_T6, a direct super read for
+      super-prop-method and a literal global host Script for scope-var-open),
+      and the passing tco-non-eval-function.js. The other nine assert only eval
+      or Function source handling inside the existing eval-semantics and
+      dynamic-construction surfaces, each with a named sibling precedent; the
+      passing statements/function/name.js observes the descriptor flags of
+      instance-name.js. Only source evaluation remains and no path becomes a
+      pass. Changed source, observation or replacement evidence, an accepted ADR
+      0016 amendment admitting the source form, or an uncovered non-source
+      assertion under ADR 0019 reopens these rows."
+    replacementEvidence:
+      docs/m5c-graph/dynamic-source-function-constructor-assessment.yaml:
+        "8b79de681e58659f7c9f49b5e5659030\
+        0a6723e28d355d779ac6f4d0b1a1aac3"
+      tests/native/fixtures/function-constructor-evidence.ts:
+        "1c1091c3741ae0a5e0a9e91186106423\
+        afd5f5c799576dc0d7274f7b9f2f1ca8"
+      tests/function-constructor-evidence.test.ts:
+        "a906752672a9c759ccb84f3d62290b70\
+        6744b01a707e9fe36c5d8cdf86dfcd00"
+      tests/test262/harness/base.js: "50331feeca513cb2e2354e05e7c68f82\
+        d5aeccd9b766d6c88438c5ef118075f6"
+      tests/test262/results/language/expressions/8f.yaml:
+        "cc77e765a6b00488f0f6e9c70bba5fae\
+        7ba463542d3c9733415fd46d9c8f34e2"
+      tests/test262/results/language/statements/db.yaml:
+        "5f2f4336fdbc7a0150887086415f06b8\
+        e1a041356c2afc4994a1274864ab7cdd"
 paths:
   - path: test/built-ins/AggregateError/newtarget-proto-fallback.js
     proposedOwner: adr:0016-dynamic-source-boundary
@@ -6801,7 +7022,7 @@ paths:
     missingDynamicTag: false
     section: 15.3.2.1_A1_T1
     subject: The body of the function is "{toString:function(){throw 7;}}"
-    assessment: observation-b01-b18-dynamic-source
+    assessment: ds-fc-argument-conversion
   - path: test/built-ins/Function/S15.3.2.1_A1_T10.js
     proposedOwner: adr:0016-dynamic-source-boundary
     priorCohort: incidental-scaffolding
@@ -6812,7 +7033,7 @@ paths:
     missingDynamicTag: false
     section: 15.3.2.1_A1_T10
     subject: Value of the function constructor argument is "null"
-    assessment: observation-b01-b18-dynamic-source
+    assessment: ds-fc-argument-conversion
   - path: test/built-ins/Function/S15.3.2.1_A1_T11.js
     proposedOwner: adr:0016-dynamic-source-boundary
     priorCohort: incidental-scaffolding
@@ -6823,7 +7044,7 @@ paths:
     missingDynamicTag: false
     section: 15.3.2.1_A1_T11
     subject: Value of the function constructor argument is "undefined"
-    assessment: observation-b01-b18-dynamic-source
+    assessment: ds-fc-argument-conversion
   - path: test/built-ins/Function/S15.3.2.1_A1_T12.js
     proposedOwner: adr:0016-dynamic-source-boundary
     priorCohort: incidental-scaffolding
@@ -6834,7 +7055,7 @@ paths:
     missingDynamicTag: false
     section: 15.3.2.1_A1_T12
     subject: Value of the function constructor argument is "void 0"
-    assessment: observation-b01-b18-dynamic-source
+    assessment: ds-fc-argument-conversion
   - path: test/built-ins/Function/S15.3.2.1_A1_T13.js
     proposedOwner: adr:0016-dynamic-source-boundary
     priorCohort: incidental-scaffolding
@@ -6845,7 +7066,7 @@ paths:
     missingDynamicTag: false
     section: 15.3.2.1_A1_T13
     subject: Value of the function constructor argument is "{}"
-    assessment: observation-b01-b18-dynamic-source
+    assessment: ds-fc-argument-conversion
   - path: test/built-ins/Function/S15.3.2.1_A1_T2.js
     proposedOwner: adr:0016-dynamic-source-boundary
     priorCohort: incidental-scaffolding
@@ -6857,7 +7078,7 @@ paths:
     section: 15.3.2.1_A1_T2
     subject: The body of the function is "{toString:function(){return
       "return 1;";}}"
-    assessment: observation-b01-b18-dynamic-source
+    assessment: ds-fc-argument-conversion
   - path: test/built-ins/Function/S15.3.2.1_A1_T3.js
     proposedOwner: adr:0016-dynamic-source-boundary
     priorCohort: incidental-scaffolding
@@ -6868,7 +7089,7 @@ paths:
     missingDynamicTag: false
     section: 15.3.2.1_A1_T3
     subject: Value of the function constructor argument is 1
-    assessment: observation-b01-b18-dynamic-source
+    assessment: ds-fc-argument-conversion
   - path: test/built-ins/Function/S15.3.2.1_A1_T4.js
     proposedOwner: adr:0016-dynamic-source-boundary
     priorCohort: incidental-scaffolding
@@ -6880,7 +7101,7 @@ paths:
     section: 15.3.2.1_A1_T4
     subject: Value of the function constructor argument is x, where x is
       specified with "undefined"
-    assessment: observation-b01-b18-dynamic-source
+    assessment: ds-fc-argument-conversion
   - path: test/built-ins/Function/S15.3.2.1_A1_T5.js
     proposedOwner: adr:0016-dynamic-source-boundary
     priorCohort: incidental-scaffolding
@@ -6892,7 +7113,7 @@ paths:
     section: 15.3.2.1_A1_T5
     subject: Value of the function constructor argument is "Object("return
       \'A\'")"
-    assessment: observation-b01-b18-dynamic-source
+    assessment: ds-fc-argument-conversion
   - path: test/built-ins/Function/S15.3.2.1_A1_T6.js
     proposedOwner: adr:0016-dynamic-source-boundary
     priorCohort: incidental-scaffolding
@@ -6915,7 +7136,7 @@ paths:
     missingDynamicTag: false
     section: 15.3.2.1_A1_T7
     subject: Value of the function constructor argument is "Object(1)"
-    assessment: observation-b01-b18-dynamic-source
+    assessment: ds-fc-argument-conversion
   - path: test/built-ins/Function/S15.3.2.1_A1_T8.js
     proposedOwner: adr:0016-dynamic-source-boundary
     priorCohort: incidental-scaffolding
@@ -6987,7 +7208,7 @@ paths:
     section: 15.3.2.1_A2_T4
     subject: Values of the function constructor arguments are "return"-s of
       various results
-    assessment: observation-b01-b18-dynamic-source
+    assessment: ds-fc-argument-conversion
   - path: test/built-ins/Function/S15.3.2.1_A2_T5.js
     proposedOwner: adr:0016-dynamic-source-boundary
     priorCohort: incidental-scaffolding
@@ -6999,7 +7220,7 @@ paths:
     section: 15.3.2.1_A2_T5
     subject: Values of the function constructor arguments are "return"-s of
       various results and a concotenation of strings
-    assessment: observation-b01-b18-dynamic-source
+    assessment: ds-fc-argument-conversion
   - path: test/built-ins/Function/S15.3.2.1_A2_T6.js
     proposedOwner: adr:0016-dynamic-source-boundary
     priorCohort: incidental-scaffolding
@@ -7011,7 +7232,7 @@ paths:
     section: 15.3.2.1_A2_T6
     subject: Values of the function constructor arguments are "return"-s of
       various results and a concotenation of strings
-    assessment: observation-b01-b18-dynamic-source
+    assessment: ds-fc-source-subjects
   - path: test/built-ins/Function/S15.3.2.1_A3_T1.js
     proposedOwner: adr:0016-dynamic-source-boundary
     priorCohort: incidental-scaffolding
@@ -7024,7 +7245,7 @@ paths:
     subject: Values of the function constructor arguments are
       "{toString:function(){throw 1;}}" and "{toString:function(){throw
       'body';}}"
-    assessment: observation-b01-b18-dynamic-source
+    assessment: ds-fc-argument-conversion
   - path: test/built-ins/Function/S15.3.2.1_A3_T10.js
     proposedOwner: adr:0016-dynamic-source-boundary
     priorCohort: incidental-scaffolding
@@ -7036,7 +7257,7 @@ paths:
     section: 15.3.2.1_A3_T10
     subject: Values of the function constructor arguments are
       "{toString:function(){return "z;x"}}" and "return this;"
-    assessment: observation-b01-b18-dynamic-source
+    assessment: ds-fc-argument-conversion
   - path: test/built-ins/Function/S15.3.2.1_A3_T11.js
     proposedOwner: adr:0016-dynamic-source-boundary
     priorCohort: incidental-scaffolding
@@ -7049,7 +7270,7 @@ paths:
     subject: >-
       Values of the function constructor arguments are
       "a,b,c" and "void 0"
-    assessment: observation-b01-b18-dynamic-source
+    assessment: ds-fc-argument-conversion
   - path: test/built-ins/Function/S15.3.2.1_A3_T12.js
     proposedOwner: adr:0016-dynamic-source-boundary
     priorCohort: incidental-scaffolding
@@ -7061,7 +7282,7 @@ paths:
     section: 15.3.2.1_A3_T12
     subject: Values of the function constructor arguments are "a,b,c" and
       "undefined"
-    assessment: observation-b01-b18-dynamic-source
+    assessment: ds-fc-argument-conversion
   - path: test/built-ins/Function/S15.3.2.1_A3_T13.js
     proposedOwner: adr:0016-dynamic-source-boundary
     priorCohort: incidental-scaffolding
@@ -7072,7 +7293,7 @@ paths:
     missingDynamicTag: false
     section: 15.3.2.1_A3_T13
     subject: Values of the function constructor arguments are "a,b,c" and "null"
-    assessment: observation-b01-b18-dynamic-source
+    assessment: ds-fc-argument-conversion
   - path: test/built-ins/Function/S15.3.2.1_A3_T14.js
     proposedOwner: adr:0016-dynamic-source-boundary
     priorCohort: incidental-scaffolding
@@ -7084,7 +7305,7 @@ paths:
     section: 15.3.2.1_A3_T14
     subject: Values of the function constructor arguments are "a,b,c" and an
       undefined variable
-    assessment: observation-b01-b18-dynamic-source
+    assessment: ds-fc-argument-conversion
   - path: test/built-ins/Function/S15.3.2.1_A3_T15.js
     proposedOwner: adr:0016-dynamic-source-boundary
     priorCohort: incidental-scaffolding
@@ -7108,7 +7329,7 @@ paths:
     section: 15.3.2.1_A3_T2
     subject: Values of the function constructor arguments are
       "{toString:function(){return 'a';}}" and "return a;"
-    assessment: observation-b01-b18-dynamic-source
+    assessment: ds-fc-argument-conversion
   - path: test/built-ins/Function/S15.3.2.1_A3_T3.js
     proposedOwner: adr:0016-dynamic-source-boundary
     priorCohort: incidental-scaffolding
@@ -7121,7 +7342,7 @@ paths:
     subject: Values of the function constructor arguments are
       "{toString:function(){p=1;return "a";}}" and
       "{toString:function(){throw "body";}}"
-    assessment: observation-b01-b18-dynamic-source
+    assessment: ds-fc-argument-conversion
   - path: test/built-ins/Function/S15.3.2.1_A3_T4.js
     proposedOwner: adr:0016-dynamic-source-boundary
     priorCohort: incidental-scaffolding
@@ -7133,7 +7354,7 @@ paths:
     section: 15.3.2.1_A3_T4
     subject: Values of the function constructor arguments are an undefined
       variable and "return 1.1;"
-    assessment: observation-b01-b18-dynamic-source
+    assessment: ds-fc-argument-conversion
   - path: test/built-ins/Function/S15.3.2.1_A3_T5.js
     proposedOwner: adr:0016-dynamic-source-boundary
     priorCohort: incidental-scaffolding
@@ -7145,7 +7366,7 @@ paths:
     section: 15.3.2.1_A3_T5
     subject: Values of the function constructor arguments are "void 0" and
       "return \"A\";"
-    assessment: observation-b01-b18-dynamic-source
+    assessment: ds-fc-argument-conversion
   - path: test/built-ins/Function/S15.3.2.1_A3_T6.js
     proposedOwner: adr:0016-dynamic-source-boundary
     priorCohort: incidental-scaffolding
@@ -7157,7 +7378,7 @@ paths:
     section: 15.3.2.1_A3_T6
     subject: Values of the function constructor arguments are "null" and
       "return true;"
-    assessment: observation-b01-b18-dynamic-source
+    assessment: ds-fc-argument-conversion
   - path: test/built-ins/Function/S15.3.2.1_A3_T7.js
     proposedOwner: adr:0016-dynamic-source-boundary
     priorCohort: incidental-scaffolding
@@ -7169,7 +7390,7 @@ paths:
     section: 15.3.2.1_A3_T7
     subject: Values of the function constructor arguments are "Object("a")"
       and "return a;"
-    assessment: observation-b01-b18-dynamic-source
+    assessment: ds-fc-argument-conversion
   - path: test/built-ins/Function/S15.3.2.1_A3_T8.js
     proposedOwner: adr:0016-dynamic-source-boundary
     priorCohort: incidental-scaffolding
@@ -7181,7 +7402,7 @@ paths:
     section: 15.3.2.1_A3_T8
     subject: Values of the function constructor arguments are "undefined"
       and "return this;"
-    assessment: observation-b01-b18-dynamic-source
+    assessment: ds-fc-argument-conversion
   - path: test/built-ins/Function/S15.3.2.1_A3_T9.js
     proposedOwner: adr:0016-dynamic-source-boundary
     priorCohort: incidental-scaffolding
@@ -7432,7 +7653,7 @@ paths:
     missingDynamicTag: false
     section: 19.2.1.1
     subject: Assignment of function `name` attribute
-    assessment: observation-b01-b18-dynamic-source
+    assessment: ds-fc-source-subjects
   - path: test/built-ins/Function/internals/Call/class-ctor-realm.js
     proposedOwner: adr:0016-dynamic-source-boundary
     priorCohort: incidental-scaffolding
@@ -9809,7 +10030,7 @@ paths:
     missingDynamicTag: false
     section: "ECMA-262 Hashbang Comments; PerformEval (Script goal)"
     subject: "Hashbang comments should not require a newline afterwards"
-    assessment: "observation-train-dynamic-coverage"
+    assessment: ds-fc-strict-hashbang
   - path: "test/language/comments/mongolian-vowel-separator-sin\
       gle-eval.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -11605,7 +11826,7 @@ paths:
     missingDynamicTag: false
     section: "sec-scripts"
     subject: "The `export` declaration may not appear within eval code"
-    assessment: "observation-train-b06-b08-b14"
+    assessment: ec-static-eval-code
   - path: "test/language/eval-code/direct/func-decl-a-following-parameter-is-na\
       med-arguments-declare-arguments-and-assign.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -12601,7 +12822,7 @@ paths:
     section: "Original es5id: 10.4.2-1-3"
     subject: "Direct call to eval has context set to local context (catch bl\
       ock)"
-    assessment: "observation-train-b06-b08-b14"
+    assessment: ec-static-eval-code
   - path: "test/language/eval-code/direct/global-env-rec-eval.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "source-subject"
@@ -12613,7 +12834,7 @@ paths:
     section: "Original es5id: 10.4.2-1-5"
     subject: "Direct call to eval has context set to local context (inside
       another eval)"
-    assessment: "observation-train-b06-b08-b14"
+    assessment: eval-semantics
   - path: "test/language/eval-code/direct/global-env-rec-fun.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "source-subject"
@@ -12625,7 +12846,7 @@ paths:
     section: "Original es5id: 10.4.2-1-2"
     subject: "Direct call to eval has context set to local context (nested f\
       unction)"
-    assessment: "observation-train-b06-b08-b14"
+    assessment: ec-static-eval-code
   - path: "test/language/eval-code/direct/global-env-rec-with.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "source-subject"
@@ -12636,7 +12857,7 @@ paths:
     missingDynamicTag: false
     section: "Original es5id: 10.4.2-1-4"
     subject: "Direct call to eval has context set to local context (with block)"
-    assessment: "observation-train-b06-b08-b14"
+    assessment: ec-static-eval-code
   - path: "test/language/eval-code/direct/global-env-rec.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "source-subject"
@@ -12647,7 +12868,7 @@ paths:
     missingDynamicTag: false
     section: "Original es5id: 10.4.2-1-1"
     subject: "Direct call to eval has context set to local context"
-    assessment: "observation-train-b06-b08-b14"
+    assessment: ec-static-eval-code
   - path: "test/language/eval-code/direct/import.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "source-subject"
@@ -12658,7 +12879,7 @@ paths:
     missingDynamicTag: false
     section: "sec-scripts"
     subject: "The `import` declaration may not appear within eval code"
-    assessment: "observation-train-b06-b08-b14"
+    assessment: ec-static-eval-code
   - path: "test/language/eval-code/direct/lex-env-distinct-cls.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "source-subject"
@@ -12670,7 +12891,7 @@ paths:
     section: "sec-performeval"
     subject: "Direct eval code creates a new declarative environment for
       lexically-scoped declarations (class)"
-    assessment: "observation-train-b06-b08-b14"
+    assessment: eval-semantics
   - path: "test/language/eval-code/direct/lex-env-distinct-const.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "source-subject"
@@ -12682,7 +12903,7 @@ paths:
     section: "sec-performeval"
     subject: "Direct eval code creates a new declarative environment for
       lexically-scoped declarations (const)"
-    assessment: "observation-train-b06-b08-b14"
+    assessment: eval-semantics
   - path: "test/language/eval-code/direct/lex-env-distinct-let.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "source-subject"
@@ -12694,7 +12915,7 @@ paths:
     section: "sec-performeval"
     subject: "Direct eval code creates a new declarative environment for
       lexically-scoped declarations (let)"
-    assessment: "observation-train-b06-b08-b14"
+    assessment: eval-semantics
   - path: "test/language/eval-code/direct/lex-env-heritage.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "source-subject"
@@ -12706,7 +12927,7 @@ paths:
     section: "sec-performeval"
     subject: "Direct eval code sets the new declarative environment's outer
       environment to that of the current context."
-    assessment: "observation-train-b06-b08-b14"
+    assessment: ec-static-eval-code
   - path: "test/language/eval-code/direct/lex-env-no-init-cls.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "source-subject"
@@ -12918,7 +13139,7 @@ paths:
     section: "sec-scripts-static-semantics-early-errors"
     subject: "A direct eval in the functon code of an ArrowFunction may not
       contain `new.target`"
-    assessment: "observation-train-b06-b08-b14"
+    assessment: ec-static-eval-code
   - path: "test/language/eval-code/direct/new.target-fn.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "source-subject"
@@ -12930,7 +13151,7 @@ paths:
     section: "sec-scripts-static-semantics-early-errors"
     subject: "A direct eval in the functon code of a non-ArrowFunction may
       contain `new.target`"
-    assessment: "observation-train-b06-b08-b14"
+    assessment: ec-static-eval-code
   - path: "test/language/eval-code/direct/new.target.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "source-subject"
@@ -13115,7 +13336,7 @@ paths:
     section: "sec-scripts-static-semantics-early-errors"
     subject: "A direct eval in the functon code of an ArrowFunction
       may not contain SuperCall"
-    assessment: "observation-train-dynamic-coverage"
+    assessment: ds-fc-source-subjects
   - path: "test/language/eval-code/direct/super-call-fn.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "source-subject"
@@ -13127,7 +13348,7 @@ paths:
     section: "sec-performeval"
     subject: "A direct eval in the functon code of a
       non-ArrowFunction may not contain SuperCall"
-    assessment: "observation-train-dynamic-coverage"
+    assessment: ds-fc-source-subjects
   - path: "test/language/eval-code/direct/super-call-method.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "source-subject"
@@ -13139,7 +13360,7 @@ paths:
     section: "sec-performeval"
     subject: "SuperCall may may only occur in eval code for direct
       eval within a constructor method"
-    assessment: "observation-train-dynamic-coverage"
+    assessment: ds-fc-source-subjects
   - path: "test/language/eval-code/direct/super-call.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "source-subject"
@@ -13162,7 +13383,7 @@ paths:
     section: "sec-scripts-static-semantics-early-errors"
     subject: "A direct eval in the functon code of an ArrowFunction
       may not contain SuperProperty"
-    assessment: "observation-train-dynamic-coverage"
+    assessment: ds-fc-source-subjects
   - path: "test/language/eval-code/direct/super-prop-dot-no-home.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "source-subject"
@@ -13174,7 +13395,7 @@ paths:
     section: "sec-performeval"
     subject: "SuperProperty may may only occur in eval code for
       direct eval within a method"
-    assessment: "observation-train-dynamic-coverage"
+    assessment: ds-fc-source-subjects
   - path: "test/language/eval-code/direct/super-prop-expr-no-home-n\
       o-eval.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -13187,7 +13408,7 @@ paths:
     section: "sec-performeval"
     subject: 'Expression is not evaluated prior to verification of
       "super" binding'
-    assessment: "observation-train-dynamic-coverage"
+    assessment: ds-fc-source-subjects
   - path: "test/language/eval-code/direct/super-prop-expr-no-home.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "source-subject"
@@ -13199,7 +13420,7 @@ paths:
     section: "sec-performeval"
     subject: "SuperProperty may may only occur in eval code for
       direct eval within a method"
-    assessment: "observation-train-dynamic-coverage"
+    assessment: ds-fc-source-subjects
   - path: "test/language/eval-code/direct/super-prop-method.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "source-subject"
@@ -13211,7 +13432,7 @@ paths:
     section: "sec-scripts-static-semantics-early-errors"
     subject: "A direct eval in the functon code of a
       non-ArrowFunction may contain SuperProperty"
-    assessment: "observation-train-dynamic-coverage"
+    assessment: ds-fc-source-subjects
   - path: "test/language/eval-code/direct/super-prop.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "source-subject"
@@ -13311,7 +13532,7 @@ paths:
     section: "sec-performeval"
     subject: "Direct eval code has the same `this` binding as the calling
       context (non-strict function scope)"
-    assessment: "observation-train-b06-b08-b14"
+    assessment: ec-static-eval-code
   - path: "test/language/eval-code/direct/this-value-func-strict-caller.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "source-subject"
@@ -13323,7 +13544,7 @@ paths:
     section: "sec-performeval"
     subject: "Direct eval code has the same `this` binding as the calling
       context (strict function scope)"
-    assessment: "observation-train-b06-b08-b14"
+    assessment: ec-static-eval-code
   - path: "test/language/eval-code/direct/this-value-func-strict-source.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "source-subject"
@@ -13335,7 +13556,7 @@ paths:
     section: "sec-performeval"
     subject: "Direct eval code has the same `this` binding as the calling
       context (strict function scope)"
-    assessment: "observation-train-b06-b08-b14"
+    assessment: ec-static-eval-code
   - path: "test/language/eval-code/direct/this-value-global.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "source-subject"
@@ -13358,7 +13579,7 @@ paths:
     missingDynamicTag: false
     section: "sec-evaldeclarationinstantiation"
     subject: "Initialization of new global property"
-    assessment: "observation-train-b06-b08-b14"
+    assessment: eval-semantics
   - path: "test/language/eval-code/direct/var-env-func-init-global-update-confi\
       gurable.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -13370,7 +13591,7 @@ paths:
     missingDynamicTag: false
     section: "sec-evaldeclarationinstantiation"
     subject: "Modification of previously-existing configurable global property"
-    assessment: "observation-train-b06-b08-b14"
+    assessment: eval-semantics
   - path: "test/language/eval-code/direct/var-env-func-init-global-update-non-c\
       onfigurable.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -13394,7 +13615,7 @@ paths:
     missingDynamicTag: false
     section: "sec-evaldeclarationinstantiation"
     subject: "Newly-created local binding may be deleted"
-    assessment: "observation-train-b06-b08-b14"
+    assessment: eval-semantics
   - path: "test/language/eval-code/direct/var-env-func-init-local-new.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "source-subject"
@@ -13405,7 +13626,7 @@ paths:
     missingDynamicTag: false
     section: "sec-evaldeclarationinstantiation"
     subject: "Initialization of new local binding"
-    assessment: "observation-train-b06-b08-b14"
+    assessment: eval-semantics
   - path: "test/language/eval-code/direct/var-env-func-init-local-update.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "source-subject"
@@ -13416,7 +13637,7 @@ paths:
     missingDynamicTag: false
     section: "sec-evaldeclarationinstantiation"
     subject: "Re-declaration of an existing local variable binding"
-    assessment: "observation-train-b06-b08-b14"
+    assessment: eval-semantics
   - path: "test/language/eval-code/direct/var-env-func-init-multi.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "source-subject"
@@ -13439,7 +13660,7 @@ paths:
     section: "sec-performeval"
     subject: "Non-stict mode direct eval code cannot instantiate functions in
       the variable environment of the caller"
-    assessment: "observation-train-b06-b08-b14"
+    assessment: eval-semantics
   - path: "test/language/eval-code/direct/var-env-func-strict-caller-2.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "source-subject"
@@ -13451,7 +13672,7 @@ paths:
     section: "Original es5id: 10.4.2.1-2-s"
     subject: "Strict Mode - Strict mode eval code cannot instantiate functions
       in the variable environment of the caller to eval"
-    assessment: "observation-train-b06-b08-b14"
+    assessment: eval-semantics
   - path: "test/language/eval-code/direct/var-env-func-strict-caller.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "source-subject"
@@ -13463,7 +13684,7 @@ paths:
     section: "Original es5id: 10.4.2-2-s"
     subject: "Strict Mode - Strict mode eval code cannot instantiate functions
       in the variable environment of the caller to eval"
-    assessment: "observation-train-b06-b08-b14"
+    assessment: eval-semantics
   - path: "test/language/eval-code/direct/var-env-func-strict-source.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "source-subject"
@@ -13475,7 +13696,7 @@ paths:
     section: "Original es5id: 10.4.2.1-4-s"
     subject: "Strict Mode - Strict mode eval code cannot instantiate functions
       in the variable environment of the caller to eval."
-    assessment: "observation-train-b06-b08-b14"
+    assessment: eval-semantics
   - path: "test/language/eval-code/direct/var-env-gloabl-lex-strict-caller.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "source-subject"
@@ -13519,7 +13740,7 @@ paths:
     missingDynamicTag: false
     section: "sec-evaldeclarationinstantiation"
     subject: "Variable collision with lexical binding in lower scope"
-    assessment: "observation-train-b06-b08-b14"
+    assessment: eval-semantics
   - path: "test/language/eval-code/direct/var-env-lower-lex-strict-caller.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "source-subject"
@@ -13563,7 +13784,7 @@ paths:
     missingDynamicTag: false
     section: "sec-evaldeclarationinstantiation"
     subject: "Initialization of new global property"
-    assessment: "observation-train-b06-b08-b14"
+    assessment: eval-semantics
   - path: "test/language/eval-code/direct/var-env-var-init-local-exstng.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "source-subject"
@@ -13575,7 +13796,7 @@ paths:
     section: "sec-evaldeclarationinstantiation"
     subject: "Re-declaration of an existing local variable binding has no ef\
       fect"
-    assessment: "observation-train-b06-b08-b14"
+    assessment: eval-semantics
   - path: "test/language/eval-code/direct/var-env-var-init-local-new-delete.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "source-subject"
@@ -13586,7 +13807,7 @@ paths:
     missingDynamicTag: false
     section: "sec-evaldeclarationinstantiation"
     subject: "Newly-created local binding may be deleted"
-    assessment: "observation-train-b06-b08-b14"
+    assessment: eval-semantics
   - path: "test/language/eval-code/direct/var-env-var-init-local-new.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "source-subject"
@@ -13597,7 +13818,7 @@ paths:
     missingDynamicTag: false
     section: "sec-evaldeclarationinstantiation"
     subject: "Initialization of new variable binding"
-    assessment: "observation-train-b06-b08-b14"
+    assessment: eval-semantics
   - path: "test/language/eval-code/direct/var-env-var-non-strict.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "source-subject"
@@ -13609,7 +13830,7 @@ paths:
     section: "Original es5id: 10.4.2-2-c-1"
     subject: "Direct val code in non-strict mode - can instantiate variable in
       calling context"
-    assessment: "observation-train-b06-b08-b14"
+    assessment: eval-semantics
   - path: "test/language/eval-code/direct/var-env-var-strict-caller-2.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "source-subject"
@@ -13622,7 +13843,7 @@ paths:
     subject: "Strict Mode - eval code cannot instantiate variable in the
       variable environment of the calling context that invoked the eval if the
       code of the calling context is strict code"
-    assessment: "observation-train-b06-b08-b14"
+    assessment: eval-semantics
   - path: "test/language/eval-code/direct/var-env-var-strict-caller-3.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "source-subject"
@@ -13634,7 +13855,7 @@ paths:
     section: "Original es5id: 10.4.2-3-c-3-s"
     subject: "Calling code in strict mode - eval cannot instantiate variable in
       the global context"
-    assessment: "observation-train-b06-b08-b14"
+    assessment: eval-semantics
   - path: "test/language/eval-code/direct/var-env-var-strict-caller.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "source-subject"
@@ -13646,7 +13867,7 @@ paths:
     section: "Original es5id: 10.4.2-3-c-2-s"
     subject: "Calling code in strict mode - eval cannot instantiate variable in
       the variable environment of the calling context"
-    assessment: "observation-train-b06-b08-b14"
+    assessment: eval-semantics
   - path: "test/language/eval-code/direct/var-env-var-strict-source.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "source-subject"
@@ -13658,7 +13879,7 @@ paths:
     section: "Original es5id: 10.4.2-3-c-1-s"
     subject: "Direct eval code in strict mode - cannot instantiate variable in
       the variable environment of the calling context"
-    assessment: "observation-train-b06-b08-b14"
+    assessment: eval-semantics
   - path: "test/language/eval-code/indirect/always-non-strict.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "source-subject"
@@ -13802,7 +14023,7 @@ paths:
     missingDynamicTag: false
     section: "sec-scripts"
     subject: "The `export` declaration may not appear within eval code"
-    assessment: "observation-train-b06-b08-b14"
+    assessment: ec-static-eval-code
   - path: "test/language/eval-code/indirect/global-env-rec-catch.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "source-subject"
@@ -13826,7 +14047,7 @@ paths:
     section: "Original es5id: 10.4.2-1-5"
     subject: "Indirect call to eval has context set to global context (inside
       another eval)"
-    assessment: "observation-train-b06-b08-b14"
+    assessment: eval-semantics
   - path: "test/language/eval-code/indirect/global-env-rec-fun.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "source-subject"
@@ -13872,7 +14093,7 @@ paths:
     missingDynamicTag: false
     section: "sec-scripts"
     subject: "The `import` declaration may not appear within eval code"
-    assessment: "observation-train-b06-b08-b14"
+    assessment: ec-static-eval-code
   - path: "test/language/eval-code/indirect/lex-env-distinct-cls.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "source-subject"
@@ -13884,7 +14105,7 @@ paths:
     section: "sec-performeval"
     subject: "Indirect eval code creates a new declarative environment for
       lexically-scoped declarations (class)"
-    assessment: "observation-train-b06-b08-b14"
+    assessment: eval-semantics
   - path: "test/language/eval-code/indirect/lex-env-distinct-const.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "source-subject"
@@ -13896,7 +14117,7 @@ paths:
     section: "sec-performeval"
     subject: "Indirect eval code creates a new declarative environment for
       lexically-scoped declarations (const)"
-    assessment: "observation-train-b06-b08-b14"
+    assessment: eval-semantics
   - path: "test/language/eval-code/indirect/lex-env-distinct-let.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "source-subject"
@@ -13908,7 +14129,7 @@ paths:
     section: "sec-performeval"
     subject: "Indirect eval code creates a new declarative environment for
       lexically-scoped declarations (let)"
-    assessment: "observation-train-b06-b08-b14"
+    assessment: eval-semantics
   - path: "test/language/eval-code/indirect/lex-env-heritage.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "source-subject"
@@ -14186,7 +14407,7 @@ paths:
     missingDynamicTag: false
     section: "sec-evaldeclarationinstantiation"
     subject: "Initialization of new global property"
-    assessment: "observation-train-b06-b08-b14"
+    assessment: eval-semantics
   - path: "test/language/eval-code/indirect/var-env-func-init-global-update-con\
       figurable.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -14198,7 +14419,7 @@ paths:
     missingDynamicTag: false
     section: "sec-evaldeclarationinstantiation"
     subject: "Modification of previously-existing configurable global property"
-    assessment: "observation-train-b06-b08-b14"
+    assessment: eval-semantics
   - path: "test/language/eval-code/indirect/var-env-func-init-global-update-non\
       -configurable.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -14246,7 +14467,7 @@ paths:
     section: "sec-performeval"
     subject: "Strict Mode - Strict mode eval code cannot instantiate functions
       in the variable environment of the caller to eval."
-    assessment: "observation-train-b06-b08-b14"
+    assessment: eval-semantics
   - path: "test/language/eval-code/indirect/var-env-global-lex-non-strict.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "source-subject"
@@ -14312,7 +14533,7 @@ paths:
     missingDynamicTag: false
     section: "sec-evaldeclarationinstantiation"
     subject: "Initialization of new global property"
-    assessment: "observation-train-b06-b08-b14"
+    assessment: eval-semantics
   - path: "test/language/eval-code/indirect/var-env-var-non-strict.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "source-subject"
@@ -14335,7 +14556,7 @@ paths:
     section: "Original es5id: 10.4.2.1_A1"
     subject: "Strict indirect eval should not leak top level declarations into
       the global scope"
-    assessment: "observation-train-b06-b08-b14"
+    assessment: eval-semantics
   - path: "test/language/expressions/addition/S11.6.1_A1.js"
     proposedOwner: adr:0016-dynamic-source-boundary
     priorCohort: incidental-scaffolding
@@ -14484,7 +14705,7 @@ paths:
       Reference base value is an environment record and environment record
       kind is declarative environment record. PutValue(lref, rval) uses the
       initially created Reference even if a more local binding is available."
-    assessment: "observation-train-b06-b08-b14"
+    assessment: ec-static-eval-code
   - path: "test/language/expressions/assignment/S11.13.1_A6_T2.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "incidental-scaffolding"
@@ -14498,7 +14719,7 @@ paths:
       Reference base value is an environment record and environment record
       kind is declarative environment record. PutValue(lref, rval) uses the
       initially created Reference even if a more local binding is available."
-    assessment: "observation-train-b06-b08-b14"
+    assessment: ec-static-eval-code
   - path: "test/language/expressions/async-arrow-function/eval-\
       var-scope-syntax-err.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -14757,7 +14978,7 @@ paths:
     missingDynamicTag: false
     section: "sec-function-calls-runtime-semantics-evaluation"
     subject: "Direct eval call with empty leading spread."
-    assessment: "fixture-construction"
+    assessment: "eval-semantics"
   - path: "test/language/expressions/call/eval-spread-empty-tra\
       iling.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -14769,7 +14990,7 @@ paths:
     missingDynamicTag: false
     section: "sec-function-calls-runtime-semantics-evaluation"
     subject: "Direct eval call with empty trailing spread."
-    assessment: "fixture-construction"
+    assessment: "eval-semantics"
   - path: "test/language/expressions/call/eval-spread-empty.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "incidental-scaffolding"
@@ -14791,7 +15012,7 @@ paths:
     missingDynamicTag: false
     section: "sec-function-calls-runtime-semantics-evaluation"
     subject: "Direct eval call with spread."
-    assessment: "fixture-construction"
+    assessment: "eval-semantics"
   - path: "test/language/expressions/call/eval-strictness-inher\
       it-non-strict.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -14830,7 +15051,7 @@ paths:
     section: "sec-function-calls-runtime-semantics-evaluation"
     subject: 'Tail-call with identifier named "eval" in function
       environment, local "eval" binding dynamically added.'
-    assessment: "observation-train-dynamic-coverage"
+    assessment: ds-fc-source-subjects
   - path: "test/language/expressions/class/elements/arrow-body-\
       derived-cls-direct-eval-contains-superproperty-1.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -16572,7 +16793,7 @@ paths:
       environment record. PutValue(lref, v) uses the
       initially created Reference even if a more local
       binding is available. Check operator is "x ^= y".'
-    assessment: "fixture-construction"
+    assessment: "compound-reference-base-witness"
   - path: "test/language/expressions/compound-assignment/S11.13\
       .2_A6.11_T1.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -16589,7 +16810,7 @@ paths:
       environment record. PutValue(lref, v) uses the
       initially created Reference even if a more local
       binding is available. Check operator is "x |= y".'
-    assessment: "fixture-construction"
+    assessment: "compound-reference-base-witness"
   - path: "test/language/expressions/compound-assignment/S11.13\
       .2_A6.1_T1.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -16606,7 +16827,7 @@ paths:
       environment record. PutValue(lref, v) uses the
       initially created Reference even if a more local
       binding is available. Check operator is "x *= y".'
-    assessment: "fixture-construction"
+    assessment: "compound-reference-base-witness"
   - path: "test/language/expressions/compound-assignment/S11.13\
       .2_A6.2_T1.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -16623,7 +16844,7 @@ paths:
       environment record. PutValue(lref, v) uses the
       initially created Reference even if a more local
       binding is available. Check operator is "x /= y".'
-    assessment: "fixture-construction"
+    assessment: "compound-reference-base-witness"
   - path: "test/language/expressions/compound-assignment/S11.13\
       .2_A6.3_T1.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -16640,7 +16861,7 @@ paths:
       environment record. PutValue(lref, v) uses the
       initially created Reference even if a more local
       binding is available. Check operator is "x %= y".'
-    assessment: "fixture-construction"
+    assessment: "compound-reference-base-witness"
   - path: "test/language/expressions/compound-assignment/S11.13\
       .2_A6.4_T1.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -16657,7 +16878,7 @@ paths:
       environment record. PutValue(lref, v) uses the
       initially created Reference even if a more local
       binding is available. Check operator is "x += y".'
-    assessment: "fixture-construction"
+    assessment: "compound-reference-base-witness"
   - path: "test/language/expressions/compound-assignment/S11.13\
       .2_A6.5_T1.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -16674,7 +16895,7 @@ paths:
       environment record. PutValue(lref, v) uses the
       initially created Reference even if a more local
       binding is available. Check operator is "x -= y".'
-    assessment: "fixture-construction"
+    assessment: "compound-reference-base-witness"
   - path: "test/language/expressions/compound-assignment/S11.13\
       .2_A6.6_T1.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -16691,7 +16912,7 @@ paths:
       environment record. PutValue(lref, v) uses the
       initially created Reference even if a more local
       binding is available. Check operator is "x <<= y".'
-    assessment: "fixture-construction"
+    assessment: "compound-reference-base-witness"
   - path: "test/language/expressions/compound-assignment/S11.13\
       .2_A6.7_T1.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -16708,7 +16929,7 @@ paths:
       environment record. PutValue(lref, v) uses the
       initially created Reference even if a more local
       binding is available. Check operator is "x >>= y".'
-    assessment: "fixture-construction"
+    assessment: "compound-reference-base-witness"
   - path: "test/language/expressions/compound-assignment/S11.13\
       .2_A6.8_T1.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -16725,7 +16946,7 @@ paths:
       environment record. PutValue(lref, v) uses the
       initially created Reference even if a more local
       binding is available. Check operator is "x >>>= y".'
-    assessment: "fixture-construction"
+    assessment: "compound-reference-base-witness"
   - path: "test/language/expressions/compound-assignment/S11.13\
       .2_A6.9_T1.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -16742,7 +16963,7 @@ paths:
       environment record. PutValue(lref, v) uses the
       initially created Reference even if a more local
       binding is available. Check operator is "x &= y".'
-    assessment: "fixture-construction"
+    assessment: "compound-reference-base-witness"
   - path: "test/language/expressions/concatenation/S9.8_A1_T2.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "incidental-scaffolding"
@@ -24911,7 +25132,7 @@ paths:
       properties. The original assertions read the later let and
       const bindings through $262.evalScript; their declaration
       contract remains in-claim pending remediation."
-    assessment: fixture-construction
+    assessment: global-lexical-configurable-var-witness
   - path: "test/language/import/import-attributes/json-idempote\
       ncy.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -27381,7 +27602,7 @@ paths:
       ClassDefinitionEvaluation"
     subject: "new SubFunction() instanceof Function (Subclass
       instanceof Heritage)"
-    assessment: "observation-train-dynamic-coverage"
+    assessment: ds-fc-function-subclass
   - path: "test/language/statements/class/subclass/builtin-objects/\
       Function/instance-length.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -27394,7 +27615,7 @@ paths:
     section: "19.2.4.1"
     subject: "Subclassed Function instances has length and name
       properties"
-    assessment: "observation-train-dynamic-coverage"
+    assessment: ds-fc-function-subclass
   - path: "test/language/statements/class/subclass/builtin-objects/\
       Function/instance-name.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -27407,7 +27628,7 @@ paths:
     section: "19.2.4.2"
     subject: "Subclassed Function instances has length and name
       properties"
-    assessment: "observation-train-dynamic-coverage"
+    assessment: ds-fc-function-subclass
   - path: "test/language/statements/class/subclass/builtin-objects/\
       Function/regular-subclassing.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -27419,7 +27640,7 @@ paths:
     missingDynamicTag: false
     section: "19.2.1"
     subject: "Subclassing Function"
-    assessment: "observation-train-dynamic-coverage"
+    assessment: ds-fc-function-subclass
   - path: "test/language/statements/class/subclass/builtin-objects/\
       Function/super-must-be-called.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -27432,7 +27653,7 @@ paths:
     section: "19.2.1"
     subject: "super must be called to initialize Function internal
       slots"
-    assessment: "observation-train-dynamic-coverage"
+    assessment: ds-fc-function-subclass
   - path: "test/language/statements/class/subclass/builtin-objects/\
       GeneratorFunction/instance-length.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -27444,7 +27665,7 @@ paths:
     missingDynamicTag: false
     section: "25.2.4.1"
     subject: "Subclassed GeneratorFunction instances `length` property"
-    assessment: "observation-train-dynamic-coverage"
+    assessment: ds-fc-function-subclass
   - path: "test/language/statements/class/subclass/builtin-objects/\
       GeneratorFunction/instance-name.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -27456,7 +27677,7 @@ paths:
     missingDynamicTag: false
     section: "25.2.4.2"
     subject: "Subclassed GeneratorFunction instances `name` property"
-    assessment: "observation-train-dynamic-coverage"
+    assessment: ds-fc-function-subclass
   - path: "test/language/statements/class/subclass/builtin-objects/\
       GeneratorFunction/instance-prototype.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -27469,7 +27690,7 @@ paths:
     section: "25.2.4.3"
     subject: "Subclassed GeneratorFunction instances `prototype`
       property"
-    assessment: "observation-train-dynamic-coverage"
+    assessment: ds-fc-function-subclass
   - path: "test/language/statements/class/subclass/builtin-objects/\
       GeneratorFunction/regular-subclassing.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -27481,7 +27702,7 @@ paths:
     missingDynamicTag: false
     section: "25.2.1"
     subject: "Subclassing GeneratorFunction"
-    assessment: "observation-train-dynamic-coverage"
+    assessment: ds-fc-function-subclass
   - path: "test/language/statements/class/subclass/builtin-objects/\
       GeneratorFunction/super-must-be-called.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -27494,7 +27715,7 @@ paths:
     section: "25.2.1"
     subject: "super must be called to initialize GeneratorFunction
       internal slots"
-    assessment: "observation-train-dynamic-coverage"
+    assessment: ds-fc-function-subclass
   - path: "test/language/statements/const/cptn-value.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "incidental-scaffolding"
@@ -28461,7 +28682,7 @@ paths:
     section: "Original es5id: 13.2.2_A14"
     subject: "Calling a function as a constructor after it has been declare\
       d by eval"
-    assessment: "observation-train-b26a-b26b-b27"
+    assessment: "scope-eval-declaration-only"
   - path: "test/language/statements/function/S13.2.2_A8_T3.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "incidental-scaffolding"
@@ -28508,7 +28729,7 @@ paths:
       nobject"
     subject: "sloppy direct eval in params introduces var (function declaration
       in sloppy code)"
-    assessment: "observation-train-b26a-b26b-b27"
+    assessment: "scope-eval-declaration-only"
   - path: "test/language/statements/function/name-eval-stricteval.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "source-subject"
@@ -28556,7 +28777,7 @@ paths:
     section: "sec-functiondeclarationinstantiation"
     subject: "Creation of new lexical environment (distinct from the variable
       environment) for the function body outside of strict mode"
-    assessment: "observation-train-b26a-b26b-b27"
+    assessment: "scope-eval-declaration-only"
   - path: "test/language/statements/function/scope-param-elem-var-close.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "source-subject"
@@ -28624,7 +28845,7 @@ paths:
       unctionobject"
     subject: "sloppy direct eval in params introduces var (generator function
       declaration in sloppy code)"
-    assessment: "observation-train-b26a-b26b-b27"
+    assessment: "scope-eval-declaration-only"
   - path: "test/language/statements/generators/scope-body-lex-distinct.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "source-subject"
@@ -28636,7 +28857,7 @@ paths:
     section: "sec-functiondeclarationinstantiation"
     subject: "Creation of new lexical environment (distinct from the variable
       environment) for the function body outside of strict mode"
-    assessment: "observation-train-b26a-b26b-b27"
+    assessment: "scope-eval-declaration-only"
   - path: "test/language/statements/generators/scope-param-elem-var-close.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "source-subject"
@@ -29289,7 +29510,7 @@ paths:
     missingDynamicTag: false
     section: "Original es5id: 12.2.1-11"
     subject: "arguments as var identifier in eval code is allowed"
-    assessment: "observation-train-b26a-b26b-b27"
+    assessment: "scope-eval-declaration-only"
   - path: "test/language/statements/variable/12.2.1-16-s.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "source-subject"
@@ -29617,7 +29838,7 @@ paths:
     section: "12.10.1-5-s"
     subject: "with statement allowed in nested Function even if its
       container Function is strict)"
-    assessment: "observation-train-dynamic-coverage"
+    assessment: ds-fc-source-subjects
   - path: "test/language/statements/with/12.10.1-8-s.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "incidental-scaffolding"
@@ -29797,7 +30018,7 @@ paths:
     missingDynamicTag: false
     section: "sec-with-statement-runtime-semantics-evaluation"
     subject: "Creation of new variable environment"
-    assessment: "observation-train-dynamic-coverage"
+    assessment: ds-fc-source-subjects
   - path: test/language/types/object/S8.6.2_A8.js
     proposedOwner: adr:0013-m5-edition-and-manifest
     priorCohort: annex-b

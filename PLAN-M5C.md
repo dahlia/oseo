@@ -810,19 +810,20 @@ Remaining work
 
 No included path is unreviewed, and the ledger records no semantic, harness,
 or infrastructure failure. What remains is closing the last remediation
-owners and running the exit audit:
+owner and running the exit audit:
 
- -  `dynamic-source-coverage-remediation` is the one unlanded work node. It
-    owns the in-claim subjects whose tests reach the ADR 0016 boundary only
-    as scaffolding, and needs either replacement evidence for each subject
-    or the maintainer accounting decision requested under
-    [Authorized exclusion audit](#authorized-exclusion-audit). Its
+ -  `dynamic-source-coverage-remediation` has landed with no path left.
+    Four child nodes gave its last 136 paths one outcome each: 88 close
+    under ADR 0016, by replacement evidence or an existing exclusion
+    assessment, and 48 defer under ADR 0031 as run-time-source paths. The
+    umbrella's
     [work note](./docs/m5c-graph/dynamic-source-coverage-remediation.md)
-    tracks the subjects.
+    links each child.
  -  `node:class-private-accessor-lookup-coverage-remediation` still owns
     the two class declaration paths that call `__lookupGetter__` or
     `__lookupSetter__`. The 2026-11-01 maintainer decision moved only the
-    two class expression paths to ADR 0013.
+    two class expression paths to ADR 0013; how to close the declaration pair
+    awaits a separate maintainer decision.
  -  Before the audit uses the deferral list, Root mails the maintainer the
     complete *docs/m5c-closure/deferrals.yaml* as [Gates](#gates) describes.
  -  `m5-exit-audit` lands last. It proves the conditions under

@@ -39,7 +39,10 @@ dependencies:
   - dynamic-source-construction-contracts
   - dynamic-source-coverage-remediation
   - dynamic-source-eval-arguments-accounting
+  - dynamic-source-eval-code-assessment
   - dynamic-source-eval-contract-accounting
+  - dynamic-source-fixture-construction-evidence
+  - dynamic-source-function-constructor-assessment
   - dynamic-source-host-script-evidence
   - dynamic-source-host-script-trainc-evidence
   - dynamic-source-importcall-accounting
@@ -56,6 +59,7 @@ dependencies:
   - dynamic-source-regexp-static-evidence
   - dynamic-source-residual-evidence
   - dynamic-source-retagging
+  - dynamic-source-scope-arguments-evidence
   - dynamic-source-static-core-evidence
   - dynamic-source-template-site-evidence
   - dynamic-source-trainc-ordinary-evidence
@@ -156,4 +160,4 @@ dependencies:
   - with-var-loop-head-resolution
   - yield-star-throw-callability
 landed: false
-status: blocked
+status: ready

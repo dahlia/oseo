@@ -1,0 +1,16 @@
+version: 1
+id: dynamic-source-fixture-construction-evidence
+title: Close the fixture-construction paths
+delivers: >-
+  Reviews exactly 15 umbrella paths: the 11 compound assignment
+  S11.13.2_A6.N_T1 rows, the global lexical declaration over an eval var,
+  and three direct eval calls with spread arguments. Witnesses the
+  reference-base order with a sloppy with object, assesses the host Script
+  and ADR 0016 eval-semantics routes for the other four, and records a
+  named deferral only where no static or host Script witness reaches the
+  contract. Scope, SHA256 and routes are recorded in
+  docs/m5c-graph/dynamic-source-fixture-construction-evidence.md.
+dependencies:
+  - unsupported-ownership-audit
+landed: true
+status: ready
