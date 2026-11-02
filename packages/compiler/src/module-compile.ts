@@ -21,7 +21,7 @@ import {
 } from "./hir-build.ts";
 import type { CompilerOptions, MirProgram } from "./mir.ts";
 import { buildMir } from "./mir-build.ts";
-import { linkModuleGraph } from "./modules.ts";
+import { linkModuleGraph, withReferrerChains } from "./modules.ts";
 import type {
   LinkedModule,
   LinkedModuleGraph,
@@ -1147,12 +1147,16 @@ export function compileModuleGraph(
   );
   if (importCalls.length > 0) {
     return {
-      diagnostics: importCalls.map((request) =>
-        sourceDiagnostic(
-          request.referrer.id,
-          request,
-          importCallProfileMessage,
-        ),
+      diagnostics: withReferrerChains(
+        graph,
+        importCalls.map((request) => ({
+          diagnostic: sourceDiagnostic(
+            request.referrer.id,
+            request,
+            importCallProfileMessage,
+          ),
+          referrer: request.referrer,
+        })),
       ),
       graph: linked.graph,
     };

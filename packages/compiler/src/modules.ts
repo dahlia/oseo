@@ -181,24 +181,39 @@ function graphOrigins(graph: ModuleGraph): ReadonlyMap<string, ModuleOrigin> {
 }
 
 /**
- * Add the importer chain to diagnostics located in a module that only
- * `import()` reaches. Other diagnostics are returned unchanged.
+ * Add the importer chain of each referrer to the diagnostic located in
+ * it, when that chain crosses an `import()` edge. Other diagnostics are
+ * returned unchanged.
  */
-function withImporterChains(
+export function withReferrerChains(
   graph: ModuleGraph,
-  diagnostics: readonly Diagnostic[],
+  located: readonly {
+    readonly diagnostic: Diagnostic;
+    readonly referrer: ModuleRequestReferrer;
+  }[],
 ): readonly Diagnostic[] {
   if (
     !(graph.requests ?? []).some((request) => request.edgeKind === "discovery")
   ) {
-    return diagnostics;
+    return located.map(({ diagnostic }) => diagnostic);
   }
   const origins = graphOrigins(graph);
-  return diagnostics.map((diagnostic) =>
-    withNotes(
+  return located.map(({ diagnostic, referrer }) =>
+    withNotes(diagnostic, importerChainNotes(origins, referrer)),
+  );
+}
+
+/** {@link withReferrerChains} for diagnostics located in modules. */
+function withImporterChains(
+  graph: ModuleGraph,
+  diagnostics: readonly Diagnostic[],
+): readonly Diagnostic[] {
+  return withReferrerChains(
+    graph,
+    diagnostics.map((diagnostic) => ({
       diagnostic,
-      importerChainNotes(origins, { id: diagnostic.sourceId, kind: "module" }),
-    ),
+      referrer: { id: diagnostic.sourceId, kind: "module" },
+    })),
   );
 }
 
@@ -252,21 +267,24 @@ async function discoverModules(
   ): readonly ResolvedSite[] => {
     const resolved: ResolvedSite[] = [];
     for (const site of sites) {
+      const notes = importerChainNotes(origins, referrer, site.edgeKind);
       const unsupportedAttribute = site.specifier.attributes?.find(
         (attribute) => attribute.key !== "type" || attribute.value !== "json",
       );
       if (unsupportedAttribute != null) {
         diagnostics.push(
-          linkDiagnostic(
-            referrer.id,
-            unsupportedAttribute,
-            "Unsupported static import attribute.",
+          withNotes(
+            linkDiagnostic(
+              referrer.id,
+              unsupportedAttribute,
+              "Unsupported static import attribute.",
+            ),
+            notes,
           ),
         );
         continue;
       }
       const result = resolver.resolve(referrer.id, site.specifier);
-      const notes = importerChainNotes(origins, referrer, site.edgeKind);
       diagnostics.push(
         ...result.diagnostics.map((diagnostic) => withNotes(diagnostic, notes)),
       );

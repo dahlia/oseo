@@ -435,3 +435,49 @@ test("static-only failures keep their diagnostics unchanged", async () => {
     assert.equal(diagnostic.notes, undefined);
   }
 });
+
+test("lazy attribute and profile refusals keep the chain", async () => {
+  const attribute = await graphOf({
+    "data.json": "{}",
+    "lazy.mjs": 'import "./data.json" with { unknown: "json" };',
+    "main.mjs": 'import("./lazy.mjs");',
+  });
+  assert.deepEqual(rows(attribute.diagnostics), [
+    {
+      code: "OSEO2001",
+      message: "Unsupported static import attribute.",
+      notes: ["requested by import() at file:///app/main.mjs:1:1"],
+      position: "file:///app/lazy.mjs:1:29",
+    },
+  ]);
+
+  const profile = await graphOf({
+    "deeper.mjs": "export {};",
+    "lazy.mjs": 'import("./deeper.mjs");',
+    "main.mjs": 'import "./static.mjs";\nimport("./lazy.mjs");',
+    "static.mjs": 'import("./deeper.mjs");',
+  });
+  assert.ok(profile.graph);
+  // A site in the entry's static closure has no chain to report; a site
+  // in a module that only import() reaches names how it was reached.
+  assert.deepEqual(rows(compileModuleGraph(profile.graph).diagnostics), [
+    {
+      code: "OSEO1001",
+      message: importCallProfileMessage,
+      notes: undefined,
+      position: "file:///app/main.mjs:2:1",
+    },
+    {
+      code: "OSEO1001",
+      message: importCallProfileMessage,
+      notes: undefined,
+      position: "file:///app/static.mjs:1:1",
+    },
+    {
+      code: "OSEO1001",
+      message: importCallProfileMessage,
+      notes: ["requested by import() at file:///app/main.mjs:2:1"],
+      position: "file:///app/lazy.mjs:1:1",
+    },
+  ]);
+});

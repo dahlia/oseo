@@ -420,12 +420,17 @@ function assertGraph(
       diagnostic.message,
       diagnostic.sourceId,
       diagnostic.byteRange.start,
+      diagnostic.notes != null,
     ]),
+    // Only a site in a module outside the entry's static closure was
+    // reached through an `import()` edge, so only it carries a chain.
     discovery.map((record) => [
       "OSEO1001",
       importCallProfileMessage,
       record.referrer.id,
       record.byteRange.start,
+      record.referrer.kind === "module" &&
+        !expected.staticOrder.includes(moduleIndex(record.referrer.id)),
     ]),
   );
   assert.equal(compiled.mir, undefined);
