@@ -14,6 +14,17 @@ candidate under both rules and lists the added paths in
 *tests/test262/inventory-m5-additions.txt*, so the 41,091-path M5 inventory
 and the closed M5 records stay checkable.
 
+The application differs from the Closure accounting and Consequences sections
+in two ways. Both rest on Root decisions of 2026-11-03 and await the
+maintainer's confirmation. First, the 1,916 new paths enter the inventory as
+unreviewed rows, each owned by its *PLAN-LANGUAGE.md* unit, and each unit
+admits its own rows into the reviewed subset. No row runs before its unit
+admits it, so there is no runner gate for unadmitted Annex B rows. Second, the
+11 Annex B rows that ADR 0013 owns keep that owner until their units implement
+the behavior. The `--require-closed` mode of the language claim audit rejects
+any remaining ADR 0013 owner, so the terminal audit cannot close the claim on
+those rows.
+
 This record supersedes ADR 0013's candidate-edition and
 optional-section sections and replaces ADR 0020's edition map and Annex B path
 rules. ADR 0013's manifest schema, classification values, and dependency-tag

@@ -333,14 +333,19 @@ the table above, and the per-unit counts equal that table. An owning unit
 admits its rows into *tests/test262/subset.yaml* with reviewed dependency tags
 in the change that implements them, and the full manifest update observes
 them. A row therefore runs only once its unit admits it, so the runner needs
-no Annex B gate. Feature-tagged rows still enter through the frontmatter
-rejection until their feature joins `supportedFeatures`.
+no Annex B gate. Feature-tagged rows still enter through the
+frontmatter rejection until their feature joins `supportedFeatures`.
 
 The 11 ADR 0013 Annex B rows keep the `adr:0013-m5-edition-and-manifest`
 owner and their exclusion audit rows, because their Annex B behavior stays
 unsupported until it is implemented. `annexb-syntax`,
 `annexb-object-accessors`, and `annexb-dynamic-source-accounting` move them
-with a reviewed exclusion audit change when they admit that behavior.
+with a reviewed exclusion audit change when they admit that behavior. The
+closed mode of the language claim audit rejects any remaining ADR 0013 owner,
+so `language-exit-audit` cannot pass while one of these rows keeps it.
+
+Both choices differ from the Consequences and Closure accounting text of ADR
+0032. Its Status records them, and they await the maintainer's confirmation.
 
 The unit froze the generated coverage section of the M5 exit report and
 replaced `check:m5-exit-audit` with `check:language-claim-audit`, which
