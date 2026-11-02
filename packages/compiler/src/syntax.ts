@@ -421,6 +421,7 @@ export type SyntaxExpression =
       readonly kind: "array";
     })
   | SyntaxTemplateObject
+  | SyntaxImportCall
   | (LocatedSyntax & {
       readonly kind: "binary";
       readonly left: SyntaxExpression;
@@ -1131,6 +1132,22 @@ export interface SyntaxGlobalLexicalName extends LocatedSyntax {
   readonly name: string;
 }
 
+/**
+ * One `import()` call in the static-specifier subset of the ADR 0016
+ * amendment: its only argument is one string literal, with no options
+ * argument and no phase. The range locates the whole call; `specifier`
+ * keeps the decoded literal with its own location, as a static import's
+ * specifier does.
+ *
+ * A frontend produces this node only when the caller enables
+ * static-specifier imports. Every other ImportCall form stays a profile
+ * diagnostic in the frontend.
+ */
+export interface SyntaxImportCall extends LocatedSyntax {
+  readonly kind: "import-call";
+  readonly specifier: SyntaxModuleSpecifier;
+}
+
 /** One owned M1 script, with no parser-specific values. */
 export interface SyntaxProgram extends LocatedSyntax {
   readonly body: readonly (SyntaxFunction | SyntaxStatement)[];
@@ -1154,6 +1171,11 @@ export interface SyntaxProgram extends LocatedSyntax {
    * leaves this absent: module code adds nothing to the global object.
    */
   readonly globalObjectNames?: readonly SyntaxGlobalObjectName[];
+  /**
+   * Every `import-call` node in the program, in source order. A frontend
+   * that does not produce `import-call` nodes leaves this absent.
+   */
+  readonly importCalls?: readonly SyntaxImportCall[];
   readonly kind: "program";
   readonly sourceId: string;
   readonly strict?: boolean;
@@ -1238,6 +1260,11 @@ export type SyntaxExportEntry =
 export interface SyntaxModule extends LocatedSyntax {
   readonly body: readonly (SyntaxFunction | SyntaxStatement)[];
   readonly exports: readonly SyntaxExportEntry[];
+  /**
+   * Every `import-call` node in the module, in source order. A frontend
+   * that does not produce `import-call` nodes leaves this absent.
+   */
+  readonly importCalls?: readonly SyntaxImportCall[];
   readonly imports: readonly SyntaxImportEntry[];
   readonly kind: "module";
   readonly sourceId: string;
@@ -1323,6 +1350,11 @@ export interface ModuleResolution extends ModuleDependency {}
 /** One uniquely identified node in a closed module graph. */
 interface ModuleGraphNodeBase {
   readonly canonicalId: string;
+  /**
+   * The index in {@link ModuleGraph.requests} of the request that first
+   * brought this module into the build. The entry has none.
+   */
+  readonly discoveredBy?: number;
   readonly dependencies: readonly ModuleDependency[];
   readonly resolutions: readonly ModuleResolution[];
   readonly sourceHash: string;
@@ -1333,15 +1365,92 @@ interface ModuleGraphNodeBase {
 export type ModuleGraphNode = ModuleGraphNodeBase &
   ({ readonly moduleKind?: "javascript" } | { readonly moduleKind: "json" });
 
+/**
+ * The source that contains a module request. A Script referrer is not a
+ * module record: a module whose canonical identity equals a Script's
+ * identity is a separate record with its own evaluation.
+ */
+export interface ModuleRequestReferrer {
+  readonly id: string;
+  readonly kind: "module" | "script";
+}
+
+/**
+ * One resolved request retained by the build, under the static-specifier
+ * import design. An `evaluation` edge is a static `import` or
+ * `export ... from` request; a `discovery` edge is an `import-call` site,
+ * which loads its target's closure into the build but never makes the
+ * target a startup dependency.
+ *
+ * `index` is the record's position in {@link ModuleGraph.requests}, the
+ * constant a compiled site names instead of looking up a specifier at
+ * run time. `location` covers the static specifier or the whole
+ * `import()` call; `specifier` keeps the decoded literal and its own
+ * location.
+ */
+export interface ModuleRequestRecord extends LocatedSyntax {
+  readonly byteRange: ByteRange;
+  readonly edgeKind: "discovery" | "evaluation";
+  readonly index: number;
+  readonly referrer: ModuleRequestReferrer;
+  readonly specifier: SyntaxModuleSpecifier;
+  readonly targetId: string;
+}
+
+/**
+ * A Script that may contain `import-call` sites, with the canonical
+ * identity its requests resolve against. The identity is explicit
+ * because a Script has no module record to supply one.
+ */
+export interface ScriptRequestReferrer {
+  readonly canonicalId: string;
+  readonly program: SyntaxProgram;
+}
+
+/** Optional referrers that graph discovery reads besides the entry. */
+export interface ModuleGraphOptions {
+  /**
+   * Scripts whose `import-call` sites join the build. Their requests are
+   * discovered after the entry's static closure and before any request
+   * that a module makes with `import()`.
+   */
+  readonly scripts?: readonly ScriptRequestReferrer[];
+}
+
 /** Deterministic closed graph rooted at one canonical entry. */
 export interface ModuleGraph {
   readonly entryId: string;
   readonly kind: "module-graph";
+  /**
+   * Every discovered module. The entry's static closure comes first, in
+   * the order it has always had; modules that only `import()` reaches
+   * follow in discovery order.
+   */
   readonly modules: readonly ModuleGraphNode[];
+  /**
+   * Every resolved request in a deterministic order: Script referrers in
+   * the order given, then modules in {@link modules} order, each in
+   * source order. Graphs built by hand may omit it; graph discovery
+   * always supplies it.
+   */
+  readonly requests?: readonly ModuleRequestRecord[];
 }
 
 /** Result of host-neutral module graph discovery. */
 export interface ModuleGraphResult {
   readonly diagnostics: readonly Diagnostic[];
   readonly graph?: ModuleGraph;
+}
+
+/** The modules and requests that Script referrers alone reach. */
+export interface ScriptRequestClosure {
+  readonly kind: "script-request-closure";
+  readonly modules: readonly ModuleGraphNode[];
+  readonly requests: readonly ModuleRequestRecord[];
+}
+
+/** Result of discovering the requests of Script referrers. */
+export interface ScriptRequestResult {
+  readonly closure?: ScriptRequestClosure;
+  readonly diagnostics: readonly Diagnostic[];
 }

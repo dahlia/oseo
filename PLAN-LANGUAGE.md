@@ -356,7 +356,16 @@ groups G1 through G14.
     It needs no amendment because it admits nothing.
  -  `import-requests` converts the admitted form, records Script referrers,
     discovery edges, and request records, and reports build diagnostics. The
-    profile still rejects `import()` until `import-admission`.
+    profile still rejects `import()` until `import-admission`. The frontend
+    conversion sits behind the Babel option `staticSpecifierImports`, which
+    the default frontends leave off, so no test262 observation changes. With
+    it on, `buildModuleGraph` and `buildScriptRequests` return the request
+    records, and `compileModuleGraph` rejects each `import()` site after
+    linking. *tests/import-requests.test.ts*,
+    *packages/parser-babel/tests/static-specifier-imports.test.ts*, and the
+    `testkit-import-requests` property family are the G11 and request-record
+    evidence. `import-admission` turns the option on in the default
+    components.
  -  `import-operation` implements EvaluateImportCall, ContinueDynamicImport,
     fresh capabilities, cached results, and asynchronous settlement on both
     execution targets.

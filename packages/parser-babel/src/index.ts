@@ -14,7 +14,7 @@ import { classStaticKeywordDiagnostics } from "./class-static-keyword.ts";
 import { program } from "./convert.ts";
 import { newImportCallDiagnostics } from "./import-call-early-errors.ts";
 import { createSourceIndex, diagnosticAt, errorOffset } from "./locations.ts";
-import { convertModule } from "./modules.ts";
+import { convertModule, withImportCalls } from "./modules.ts";
 import { scriptModuleDeclarations } from "./script-goal.ts";
 
 /** Configuration supplied by a composition root to both Babel frontends. */
@@ -97,6 +97,7 @@ export function createBabelFrontend(
           receiverStack: [],
           regexpExtensions: options.regexpExtensions,
           regexpUnicodeData: options.regexpUnicodeData,
+          staticSpecifierImports: options.staticSpecifierImports === true,
           strictStack: [],
           syntheticIndex: 0,
           thisModeStack: ["global"],
@@ -112,7 +113,7 @@ export function createBabelFrontend(
         return {
           diagnostics: [],
           parsed: true,
-          program: converted,
+          program: withImportCalls(context, converted),
           sourceId: input.sourceId,
         };
       } catch (error) {

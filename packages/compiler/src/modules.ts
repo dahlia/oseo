@@ -1,17 +1,23 @@
-import type { Diagnostic } from "./source.ts";
+import type { ByteRange, Diagnostic } from "./source.ts";
 import { jsonModuleSyntax } from "./module-json.ts";
 import type {
   LocatedSyntax,
   ModuleDependency,
   ModuleGraph,
   ModuleGraphNode,
+  ModuleGraphOptions,
   ModuleGraphResult,
   ModuleLoadReferrer,
   ModuleLoader,
   ModuleLoadResult,
   ModuleResolution,
+  ModuleRequestRecord,
+  ModuleRequestReferrer,
   ModuleResolver,
   ModuleSourceFrontend,
+  ScriptRequestReferrer,
+  ScriptRequestResult,
+  SyntaxImportCall,
   SyntaxImportEntry,
   SyntaxModule,
   SyntaxModuleSpecifier,
@@ -51,29 +57,255 @@ function moduleSpecifiers(
     });
 }
 
+/** One request site found while parsing a referrer, before resolution. */
+interface RequestSite {
+  readonly edgeKind: ModuleRequestRecord["edgeKind"];
+  readonly location: LocatedSyntax & { readonly byteRange: ByteRange };
+  readonly specifier: SyntaxModuleSpecifier;
+}
+
+/** The request that first brought a module into the build. */
+interface ModuleOrigin {
+  readonly edgeKind: ModuleRequestRecord["edgeKind"];
+  readonly location: LocatedSyntax;
+  readonly referrer: ModuleRequestReferrer;
+}
+
+/** A request site whose specifier resolved to a canonical target. */
+interface ResolvedSite extends RequestSite {
+  readonly canonicalId: string;
+}
+
+/** A resolved site waiting for its target to be visited. */
+interface PendingRequest {
+  readonly origin: ModuleOrigin;
+  readonly site: ResolvedSite;
+}
+
+function requestSites(
+  module: SyntaxModule | undefined,
+  importCalls: readonly SyntaxImportCall[] | undefined,
+): readonly RequestSite[] {
+  const sites: RequestSite[] = [];
+  if (module != null) {
+    for (const specifier of moduleSpecifiers(module)) {
+      sites.push({ edgeKind: "evaluation", location: specifier, specifier });
+    }
+  }
+  for (const call of importCalls ?? []) {
+    sites.push({
+      edgeKind: "discovery",
+      location: {
+        byteRange: call.byteRange ?? call.specifier.byteRange,
+        range: call.range,
+      },
+      specifier: call.specifier,
+    });
+  }
+  return sites.toSorted(
+    (left, right) =>
+      left.location.byteRange.start - right.location.byteRange.start,
+  );
+}
+
+/** A Script and a module may share an identity, so the key keeps both. */
+function referrerKey(referrer: ModuleRequestReferrer): string {
+  return `${referrer.kind}:${referrer.id}`;
+}
+
+function positionText(sourceId: string, location: LocatedSyntax): string {
+  const start = location.range.start;
+  return `${sourceId}:${start.line}:${start.column}`;
+}
+
 /**
- * Discover and parse one closed module graph without evaluating its modules.
+ * The importer chain of a module as diagnostic notes, nearest request
+ * first. The chain is reported only when it, or the failing request,
+ * crosses a discovery edge, so a static-only graph keeps the diagnostics
+ * it reported before `import()` discovery existed.
  */
-export async function buildModuleGraph(
+function importerChainNotes(
+  origins: ReadonlyMap<string, ModuleOrigin>,
+  referrer: ModuleRequestReferrer,
+  failing?: ModuleRequestRecord["edgeKind"],
+): readonly string[] | undefined {
+  const notes: string[] = [];
+  let crossesDiscovery = failing === "discovery";
+  const seen = new Set<string>();
+  // A Script is a root: a module with the same identity is a different
+  // record whose chain does not describe the Script.
+  let origin =
+    referrer.kind === "module" ? origins.get(referrer.id) : undefined;
+  while (origin != null && !seen.has(referrerKey(origin.referrer))) {
+    seen.add(referrerKey(origin.referrer));
+    if (origin.edgeKind === "discovery") crossesDiscovery = true;
+    const where = positionText(origin.referrer.id, origin.location);
+    const script = origin.referrer.kind === "script" ? " (Script)" : "";
+    notes.push(
+      origin.edgeKind === "discovery"
+        ? `requested by import() at ${where}${script}`
+        : `imported by a static request at ${where}${script}`,
+    );
+    origin =
+      origin.referrer.kind === "module"
+        ? origins.get(origin.referrer.id)
+        : undefined;
+  }
+  return crossesDiscovery && notes.length > 0 ? notes : undefined;
+}
+
+function withNotes(
+  diagnostic: Diagnostic,
+  notes: readonly string[] | undefined,
+): Diagnostic {
+  return notes == null
+    ? diagnostic
+    : { ...diagnostic, notes: [...(diagnostic.notes ?? []), ...notes] };
+}
+
+/** The origin of each module, recovered from a discovered graph. */
+function graphOrigins(graph: ModuleGraph): ReadonlyMap<string, ModuleOrigin> {
+  const origins = new Map<string, ModuleOrigin>();
+  const requests = graph.requests ?? [];
+  for (const module of graph.modules) {
+    const request =
+      module.discoveredBy == null ? undefined : requests[module.discoveredBy];
+    if (request == null) continue;
+    origins.set(module.canonicalId, {
+      edgeKind: request.edgeKind,
+      location: request,
+      referrer: request.referrer,
+    });
+  }
+  return origins;
+}
+
+/**
+ * Add the importer chain to diagnostics located in a module that only
+ * `import()` reaches. Other diagnostics are returned unchanged.
+ */
+function withImporterChains(
+  graph: ModuleGraph,
+  diagnostics: readonly Diagnostic[],
+): readonly Diagnostic[] {
+  if (
+    !(graph.requests ?? []).some((request) => request.edgeKind === "discovery")
+  ) {
+    return diagnostics;
+  }
+  const origins = graphOrigins(graph);
+  return diagnostics.map((diagnostic) =>
+    withNotes(
+      diagnostic,
+      importerChainNotes(origins, { id: diagnostic.sourceId, kind: "module" }),
+    ),
+  );
+}
+
+interface DiscoveryResult {
+  readonly diagnostics: readonly Diagnostic[];
+  readonly modules: readonly ModuleGraphNode[];
+  readonly requests: readonly ModuleRequestRecord[];
+}
+
+/**
+ * Discover, load, and parse every module the entry's static closure and
+ * the literal `import()` requests reach, without evaluating anything.
+ *
+ * The entry's static closure is visited first, depth first in source
+ * order, exactly as a graph without `import()` is. Script referrers'
+ * requests and every `import()` request found along the way join one
+ * first-in, first-out queue, and each dequeued target contributes its own
+ * static closure the same way. A module is parsed once however many
+ * requests reach it.
+ */
+function pendingRequest(
+  referrer: ModuleRequestReferrer,
+  site: ResolvedSite,
+): PendingRequest {
+  return {
+    origin: { edgeKind: site.edgeKind, location: site.location, referrer },
+    site,
+  };
+}
+
+async function discoverModules(
   frontend: ModuleSourceFrontend,
   loader: ModuleLoader,
   resolver: ModuleResolver,
-  entryId: string,
-): Promise<ModuleGraphResult> {
+  entryId: string | undefined,
+  scripts: readonly ScriptRequestReferrer[],
+): Promise<DiscoveryResult> {
   const diagnostics: Diagnostic[] = [];
   const modules: ModuleGraphNode[] = [];
   const discovered = new Set<string>();
   const loadedSources = new Map<string, ModuleLoadResult>();
+  const origins = new Map<string, ModuleOrigin>();
+  const originSites = new Map<string, ResolvedSite>();
+  const moduleSites = new Map<string, readonly ResolvedSite[]>();
+  const queue: PendingRequest[] = [];
+
+  /** Resolve a referrer's sites in source order, reporting failures. */
+  const resolveSites = (
+    referrer: ModuleRequestReferrer,
+    sites: readonly RequestSite[],
+  ): readonly ResolvedSite[] => {
+    const resolved: ResolvedSite[] = [];
+    for (const site of sites) {
+      const unsupportedAttribute = site.specifier.attributes?.find(
+        (attribute) => attribute.key !== "type" || attribute.value !== "json",
+      );
+      if (unsupportedAttribute != null) {
+        diagnostics.push(
+          linkDiagnostic(
+            referrer.id,
+            unsupportedAttribute,
+            "Unsupported static import attribute.",
+          ),
+        );
+        continue;
+      }
+      const result = resolver.resolve(referrer.id, site.specifier);
+      const notes = importerChainNotes(origins, referrer, site.edgeKind);
+      diagnostics.push(
+        ...result.diagnostics.map((diagnostic) => withNotes(diagnostic, notes)),
+      );
+      if (result.canonicalId == null || result.diagnostics.length > 0) {
+        continue;
+      }
+      resolved.push({ ...site, canonicalId: result.canonicalId });
+    }
+    return resolved;
+  };
 
   const visit = async (
     canonicalId: string,
-    referrer?: ModuleLoadReferrer,
+    request?: PendingRequest,
   ): Promise<void> => {
+    const referrer: ModuleLoadReferrer | undefined =
+      request == null
+        ? undefined
+        : {
+            importerId: request.origin.referrer.id,
+            specifier: request.site.specifier,
+          };
+    const failingNotes =
+      request == null
+        ? undefined
+        : importerChainNotes(
+            origins,
+            request.origin.referrer,
+            request.origin.edgeKind,
+          );
     let loaded = loadedSources.get(canonicalId);
     if (loaded == null) {
       loaded = await loader.load(canonicalId, referrer);
       loadedSources.set(canonicalId, loaded);
-      diagnostics.push(...loaded.diagnostics);
+      diagnostics.push(
+        ...loaded.diagnostics.map((diagnostic) =>
+          withNotes(diagnostic, failingNotes),
+        ),
+      );
     }
     if (loaded.source == null || loaded.diagnostics.length > 0) return;
     if (referrer == null && loaded.source.kind === "json") {
@@ -97,37 +329,51 @@ export async function buildModuleGraph(
       ) ?? false;
     if (requestedJson !== (loaded.source.kind === "json")) {
       diagnostics.push(
-        linkDiagnostic(
-          referrer?.importerId ?? canonicalId,
-          referrer?.specifier ?? {
-            range: {
-              start: { line: 1, column: 1 },
-              end: { line: 1, column: 1 },
+        withNotes(
+          linkDiagnostic(
+            referrer?.importerId ?? canonicalId,
+            referrer?.specifier ?? {
+              range: {
+                start: { line: 1, column: 1 },
+                end: { line: 1, column: 1 },
+              },
             },
-          },
-          "The module kind does not match its import attributes.",
+            "The module kind does not match its import attributes.",
+          ),
+          failingNotes,
         ),
       );
       return;
     }
     if (discovered.has(canonicalId)) return;
     discovered.add(canonicalId);
+    if (request != null) {
+      origins.set(canonicalId, request.origin);
+      originSites.set(canonicalId, request.site);
+    }
+    const moduleNotes = importerChainNotes(origins, {
+      id: canonicalId,
+      kind: "module",
+    });
     let parsed;
     if (loaded.source.kind === "json") {
       try {
         parsed = { diagnostics: [], module: jsonModuleSyntax(loaded.source) };
       } catch (error) {
-        const diagnostic = linkDiagnostic(
-          referrer?.importerId ?? canonicalId,
-          referrer?.specifier ?? {
-            range: {
-              start: { line: 1, column: 1 },
-              end: { line: 1, column: 1 },
+        const diagnostic = withNotes(
+          linkDiagnostic(
+            referrer?.importerId ?? canonicalId,
+            referrer?.specifier ?? {
+              range: {
+                start: { line: 1, column: 1 },
+                end: { line: 1, column: 1 },
+              },
             },
-          },
-          error instanceof SyntaxError
-            ? "Invalid JSON module source."
-            : "JSON module construction exceeds compiler limits.",
+            error instanceof SyntaxError
+              ? "Invalid JSON module source."
+              : "JSON module construction exceeds compiler limits.",
+          ),
+          failingNotes,
         );
         diagnostics.push(
           error instanceof SyntaxError
@@ -142,39 +388,35 @@ export async function buildModuleGraph(
         sourceId: canonicalId,
       });
     }
-    diagnostics.push(...parsed.diagnostics);
+    diagnostics.push(
+      ...parsed.diagnostics.map((diagnostic) =>
+        withNotes(diagnostic, moduleNotes),
+      ),
+    );
     if (parsed.module == null || parsed.diagnostics.length > 0) return;
+    const moduleReferrer: ModuleRequestReferrer = {
+      id: canonicalId,
+      kind: "module",
+    };
+    const sites = resolveSites(
+      moduleReferrer,
+      requestSites(parsed.module, parsed.module.importCalls),
+    );
+    moduleSites.set(canonicalId, sites);
     const dependencies: ModuleDependency[] = [];
     const resolutions: ModuleResolution[] = [];
     const dependencyIds = new Set<string>();
-    for (const specifier of moduleSpecifiers(parsed.module)) {
-      const unsupportedAttribute = specifier.attributes?.find(
-        (attribute) => attribute.key !== "type" || attribute.value !== "json",
-      );
-      if (unsupportedAttribute != null) {
-        diagnostics.push(
-          linkDiagnostic(
-            canonicalId,
-            unsupportedAttribute,
-            "Unsupported static import attribute.",
-          ),
-        );
-        continue;
-      }
-      const resolved = resolver.resolve(canonicalId, specifier);
-      diagnostics.push(...resolved.diagnostics);
-      if (resolved.canonicalId == null || resolved.diagnostics.length > 0) {
-        continue;
-      }
+    for (const site of sites) {
+      if (site.edgeKind !== "evaluation") continue;
       resolutions.push({
-        canonicalId: resolved.canonicalId,
-        specifier,
+        canonicalId: site.canonicalId,
+        specifier: site.specifier,
       });
-      if (!dependencyIds.has(resolved.canonicalId)) {
-        dependencyIds.add(resolved.canonicalId);
+      if (!dependencyIds.has(site.canonicalId)) {
+        dependencyIds.add(site.canonicalId);
         dependencies.push({
-          canonicalId: resolved.canonicalId,
-          specifier,
+          canonicalId: site.canonicalId,
+          specifier: site.specifier,
         });
       }
     }
@@ -186,21 +428,146 @@ export async function buildModuleGraph(
       syntax: parsed.module,
       moduleKind: loaded.source.kind ?? "javascript",
     });
-    for (const dependency of resolutions) {
+    for (const site of sites) {
+      const pending = pendingRequest(moduleReferrer, site);
+      if (site.edgeKind === "discovery") {
+        queue.push(pending);
+        continue;
+      }
       // eslint-disable-next-line no-await-in-loop -- Preserve source order.
-      await visit(dependency.canonicalId, {
-        importerId: canonicalId,
-        specifier: dependency.specifier,
-      });
+      await visit(site.canonicalId, pending);
     }
   };
 
-  await visit(entryId);
-  return diagnostics.length > 0
-    ? { diagnostics }
+  // Script requests resolve first, and their targets are visited after
+  // the entry's static closure and before any module's `import()` target.
+  const scriptSites = scripts.map((script) => {
+    const referrer: ModuleRequestReferrer = {
+      id: script.canonicalId,
+      kind: "script",
+    };
+    return {
+      referrer,
+      sites: resolveSites(
+        referrer,
+        requestSites(undefined, script.program.importCalls),
+      ),
+    };
+  });
+  if (entryId != null) await visit(entryId);
+  queue.unshift(
+    ...scriptSites.flatMap(({ referrer, sites }) =>
+      sites.map((site) => pendingRequest(referrer, site)),
+    ),
+  );
+  for (let index = 0; index < queue.length; index += 1) {
+    const pending = queue[index]!;
+    // eslint-disable-next-line no-await-in-loop -- Preserve discovery order.
+    await visit(pending.site.canonicalId, pending);
+  }
+
+  const requests: ModuleRequestRecord[] = [];
+  const siteIndices = new Map<ResolvedSite, number>();
+  const record = (
+    referrer: ModuleRequestReferrer,
+    sites: readonly ResolvedSite[],
+  ): void => {
+    for (const site of sites) {
+      siteIndices.set(site, requests.length);
+      requests.push({
+        byteRange: site.location.byteRange,
+        edgeKind: site.edgeKind,
+        index: requests.length,
+        range: site.location.range,
+        referrer,
+        specifier: site.specifier,
+        targetId: site.canonicalId,
+      });
+    }
+  };
+  for (const { referrer, sites } of scriptSites) record(referrer, sites);
+  for (const module of modules) {
+    record(
+      { id: module.canonicalId, kind: "module" },
+      moduleSites.get(module.canonicalId) ?? [],
+    );
+  }
+  const discoveredModules: ModuleGraphNode[] = [];
+  for (const module of modules) {
+    const site = originSites.get(module.canonicalId);
+    const discoveredBy = site == null ? undefined : siteIndices.get(site);
+    discoveredModules.push(
+      discoveredBy == null ? module : { ...module, discoveredBy },
+    );
+  }
+  return { diagnostics, modules: discoveredModules, requests };
+}
+
+/**
+ * Discover and parse one closed module graph without evaluating its modules.
+ *
+ * Literal `import()` sites, which a module frontend produces only when
+ * static-specifier imports are enabled, add discovery edges: their
+ * targets and those targets' closures join {@link ModuleGraph.modules},
+ * but never a module's `dependencies`. A target that cannot be resolved,
+ * loaded, or parsed fails discovery with its source location and its
+ * importer chain in the diagnostic notes.
+ */
+export async function buildModuleGraph(
+  frontend: ModuleSourceFrontend,
+  loader: ModuleLoader,
+  resolver: ModuleResolver,
+  entryId: string,
+  options: ModuleGraphOptions = {},
+): Promise<ModuleGraphResult> {
+  const result = await discoverModules(
+    frontend,
+    loader,
+    resolver,
+    entryId,
+    options.scripts ?? [],
+  );
+  return result.diagnostics.length > 0
+    ? { diagnostics: result.diagnostics }
     : {
-        diagnostics,
-        graph: { entryId, kind: "module-graph", modules },
+        diagnostics: result.diagnostics,
+        graph: {
+          entryId,
+          kind: "module-graph",
+          modules: result.modules,
+          requests: result.requests,
+        },
+      };
+}
+
+/**
+ * Discover the modules that Script referrers reach through `import()`,
+ * for a Script program with no module entry. Each Script resolves its
+ * requests against its own canonical identity, and a module with the same
+ * identity is a separate record.
+ */
+export async function buildScriptRequests(
+  frontend: ModuleSourceFrontend,
+  loader: ModuleLoader,
+  resolver: ModuleResolver,
+  scripts: readonly ScriptRequestReferrer[],
+): Promise<ScriptRequestResult> {
+  const result = await discoverModules(
+    frontend,
+    loader,
+    resolver,
+    undefined,
+    scripts,
+  );
+  return result.diagnostics.length > 0
+    ? { diagnostics: result.diagnostics }
+    : {
+        closure: {
+          kind: "script-request-closure",
+          modules: result.modules,
+          requests: result.requests,
+        },
+        diagnostics: result.diagnostics,
       };
 }
 
@@ -255,6 +622,11 @@ export interface LinkedModuleGraph {
   readonly cells: readonly LinkedModuleCell[];
   readonly components: readonly ModuleComponent[];
   readonly entryId: string;
+  /**
+   * Startup evaluation order. A discovered graph lists only the entry's
+   * static closure; modules that only `import()` reaches are linked but
+   * not scheduled.
+   */
   readonly evaluationOrder: readonly string[];
   readonly kind: "linked-module-graph";
   readonly modules: readonly LinkedModule[];
@@ -346,6 +718,12 @@ function moduleDepthFirstOrder(graph: ModuleGraph): readonly string[] {
     }
   };
   visit(graph.entryId);
+  // Graph discovery records its requests, and every module it finds
+  // outside the entry's static closure is one that only `import()`
+  // reaches. Such a module evaluates on request, never at startup. A
+  // hand-built graph without request records keeps ordering every
+  // module.
+  if (graph.requests != null) return order;
   for (const moduleId of [...nodes.keys()].toSorted(compareCodeUnits)) {
     visit(moduleId);
   }
@@ -372,58 +750,71 @@ function moduleComponents(graph: ModuleGraph): readonly ModuleComponent[] {
     stacked.add(moduleId);
   };
 
-  begin(graph.entryId);
-  const frames: { dependencyIndex: number; moduleId: string }[] = [
-    { dependencyIndex: 0, moduleId: graph.entryId },
-  ];
-  while (frames.length > 0) {
-    const frame = frames.at(-1)!;
-    const index = indices.get(frame.moduleId)!;
-    const dependencies = nodes.get(frame.moduleId)?.dependencies ?? [];
-    const dependency = dependencies[frame.dependencyIndex];
-    if (dependency != null) {
-      frame.dependencyIndex += 1;
-      if (!indices.has(dependency.canonicalId)) {
-        begin(dependency.canonicalId);
-        frames.push({
-          dependencyIndex: 0,
-          moduleId: dependency.canonicalId,
-        });
-      } else if (stacked.has(dependency.canonicalId)) {
+  const strongConnect = (root: string): void => {
+    begin(root);
+    const frames: { dependencyIndex: number; moduleId: string }[] = [
+      { dependencyIndex: 0, moduleId: root },
+    ];
+    while (frames.length > 0) {
+      const frame = frames.at(-1)!;
+      const index = indices.get(frame.moduleId)!;
+      const dependencies = nodes.get(frame.moduleId)?.dependencies ?? [];
+      const dependency = dependencies[frame.dependencyIndex];
+      if (dependency != null) {
+        frame.dependencyIndex += 1;
+        if (!indices.has(dependency.canonicalId)) {
+          begin(dependency.canonicalId);
+          frames.push({
+            dependencyIndex: 0,
+            moduleId: dependency.canonicalId,
+          });
+        } else if (stacked.has(dependency.canonicalId)) {
+          lowLinks.set(
+            frame.moduleId,
+            Math.min(
+              lowLinks.get(frame.moduleId) ?? index,
+              indices.get(dependency.canonicalId) ?? index,
+            ),
+          );
+        }
+        continue;
+      }
+      if (lowLinks.get(frame.moduleId) === index) {
+        const component: string[] = [];
+        for (;;) {
+          const member = stack.pop();
+          if (member == null) {
+            throw new Error("Module component stack underflow.");
+          }
+          stacked.delete(member);
+          component.push(member);
+          if (member === frame.moduleId) break;
+        }
+        found.push(component);
+      }
+      frames.pop();
+      const parent = frames.at(-1);
+      if (parent != null) {
         lowLinks.set(
-          frame.moduleId,
+          parent.moduleId,
           Math.min(
+            lowLinks.get(parent.moduleId) ?? index,
             lowLinks.get(frame.moduleId) ?? index,
-            indices.get(dependency.canonicalId) ?? index,
           ),
         );
       }
-      continue;
     }
-    if (lowLinks.get(frame.moduleId) === index) {
-      const component: string[] = [];
-      for (;;) {
-        const member = stack.pop();
-        if (member == null) {
-          throw new Error("Module component stack underflow.");
-        }
-        stacked.delete(member);
-        component.push(member);
-        if (member === frame.moduleId) break;
-      }
-      found.push(component);
-    }
-    frames.pop();
-    const parent = frames.at(-1);
-    if (parent != null) {
-      lowLinks.set(
-        parent.moduleId,
-        Math.min(
-          lowLinks.get(parent.moduleId) ?? index,
-          lowLinks.get(frame.moduleId) ?? index,
-        ),
-      );
-    }
+  };
+  // The entry's static closure comes first. Modules that only `import()`
+  // reaches are linked too, each from the first one not yet indexed, so
+  // their components follow the entry's in graph order.
+  const roots = [
+    graph.entryId,
+    ...graph.modules.map((module) => module.canonicalId),
+  ];
+  for (const root of roots) {
+    if (indices.has(root)) continue;
+    strongConnect(root);
   }
   const evaluationOrder = moduleDepthFirstOrder(graph);
   const evaluationIndex = new Map(
@@ -709,7 +1100,9 @@ export function linkModuleGraph(graph: ModuleGraph): ModuleLinkResult {
       }
     }
   }
-  if (diagnostics.length > 0) return { diagnostics };
+  if (diagnostics.length > 0) {
+    return { diagnostics: withImporterChains(graph, diagnostics) };
+  }
 
   const components = moduleComponents(graph);
   const componentByModule = new Map<string, number>();

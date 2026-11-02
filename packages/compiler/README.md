@@ -136,6 +136,18 @@ timers, and top-level await checkpoints without importing a concrete runtime or
 event loop into compiler core. Function creation retains ordinary, arrow,
 asynchronous, and asynchronous-arrow identity through HIR and MIR.
 
+Graph discovery also follows the literal `import()` sites that a frontend
+reports in `importCalls`. Each target's static closure joins the graph after
+the entry's static closure, but never a module's `dependencies`, so linking
+covers it while the startup evaluation order does not. `buildModuleGraph` and
+`buildScriptRequests` retain one `ModuleRequestRecord` per resolved request,
+with its referrer, location, decoded literal, canonical target, and
+`evaluation` or `discovery` edge kind, in a deterministic order. A Script
+referrer resolves against an explicit canonical identity and is never a module
+record. A failure reached through an `import()` edge carries its importer
+chain in the diagnostic notes. `compileModuleGraph` and HIR construction still
+reject every `import()` with the profile diagnostic.
+
 `compileSource` and `buildMir` accept an explicit enabled or disabled
 specialization policy. Enabled mode selects the M2 checked small-integer path
 only for the reviewed two-parameter return form. Its MIR retains hint

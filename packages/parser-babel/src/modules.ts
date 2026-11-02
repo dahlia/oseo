@@ -7,6 +7,7 @@ import type {
   SyntaxModuleSpecifier,
   SyntaxModule,
   SyntaxFunction,
+  SyntaxProgram,
   SyntaxStatement,
 } from "@oseo/compiler";
 import {
@@ -33,6 +34,7 @@ import {
   varScopedFunctionNames,
 } from "./convert.ts";
 import { newImportCallDiagnostics } from "./import-call-early-errors.ts";
+import { collectImportCalls } from "./import-calls.ts";
 import {
   createSourceIndex,
   diagnosticAt,
@@ -515,6 +517,7 @@ export function convertModule(
     receiverStack: [],
     regexpExtensions: options.regexpExtensions,
     regexpUnicodeData: options.regexpUnicodeData,
+    staticSpecifierImports: options.staticSpecifierImports === true,
     strictStack: [],
     syntheticIndex: 0,
     thisModeStack: ["module"],
@@ -528,10 +531,20 @@ export function convertModule(
       }
     : {
         diagnostics: [],
-        module: converted,
+        module: withImportCalls(context, converted),
         parsed: true,
         sourceId: input.sourceId,
       };
+}
+
+/** Attach the converted `import-call` sites, when there are any. */
+export function withImportCalls<Syntax extends SyntaxModule | SyntaxProgram>(
+  context: ConvertContext,
+  syntax: Syntax,
+): Syntax {
+  if (!context.staticSpecifierImports) return syntax;
+  const importCalls = collectImportCalls(syntax);
+  return importCalls.length === 0 ? syntax : { ...syntax, importCalls };
 }
 
 /** Babel implementation of the owned Oseo source-frontend boundary. */

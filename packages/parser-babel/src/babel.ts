@@ -80,6 +80,14 @@ export interface ReceiverContext {
 export interface ConvertOptions {
   readonly regexpExtensions?: RegExpPatternExtensions;
   readonly regexpUnicodeData?: RegExpMatcherUnicodeData;
+  /**
+   * Convert an `import()` call in the static-specifier subset to an
+   * `import-call` node instead of reporting it. The compiler still
+   * rejects every such node until the subset is admitted, so only graph
+   * discovery and its tests enable this. Every other ImportCall form
+   * keeps its profile diagnostic either way.
+   */
+  readonly staticSpecifierImports?: boolean;
 }
 
 export interface ConvertContext {
@@ -89,6 +97,7 @@ export interface ConvertContext {
   readonly receiverStack: ReceiverContext[];
   readonly regexpExtensions: RegExpPatternExtensions | undefined;
   readonly regexpUnicodeData: RegExpMatcherUnicodeData | undefined;
+  readonly staticSpecifierImports: boolean;
   readonly strictStack: boolean[];
   syntheticIndex: number;
   /**

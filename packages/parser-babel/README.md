@@ -26,6 +26,17 @@ are unsupported too. Admitted primitive annotations are unchanged.
 Dynamic `import()` keeps its `OSEO1001` rejection; `import.meta` remains an
 early error in Script and is admitted in Module code.
 
+Both factories also accept `staticSpecifierImports`. When it is true, an
+`import()` whose only argument is one string literal, optionally parenthesized
+and with the grammar's trailing comma, converts to an owned `import-call` node,
+and the Script or module lists every such node in `importCalls` in source
+order. An options argument, a phase form, and every other argument keep the
+exact `ImportExpression is outside the M1 profile.` diagnostic. The default
+frontends leave the option off, and the compiler still rejects each
+`import-call` node, as the
+[static-specifier import design](../../docs/static-specifier-import-design.md)
+requires until admission.
+
 Parenthesized call and assignment targets are normalized before
 classification. The compiler then resolves `console` and `Object` lexically
 before admitting host or reflection intrinsics.

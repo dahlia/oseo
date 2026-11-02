@@ -66,6 +66,14 @@ function includePropertiesWhen<const Properties extends object>(
   return properties() ?? {};
 }
 
+/**
+ * The OSEO1001 message of every ImportCall the profile rejects. The
+ * exclusion audit quotes this text, so it changes only with an audit
+ * update.
+ */
+export const importCallProfileMessage =
+  "ImportExpression is outside the M1 profile.";
+
 export function sourceDiagnostic(
   sourceId: string,
   node: LocatedSyntax,
@@ -1833,6 +1841,14 @@ function resolveExpression(
     return callee == null
       ? undefined
       : { ...expression, arguments: argumentsValue, callee };
+  }
+  if (expression.kind === "import-call") {
+    // The static-specifier subset is discovered and recorded, but the
+    // profile still rejects every ImportCall until its admission.
+    state.diagnostics.push(
+      sourceDiagnostic(state.sourceId, expression, importCallProfileMessage),
+    );
+    return undefined;
   }
   if (callsDynamicFunctionConstructor(expression.target, scopes, state)) {
     state.diagnostics.push(

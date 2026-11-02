@@ -15,6 +15,7 @@ import {
   hirBindingIdentifiers,
   hirBindingPatternHasAwait,
   hirExpressionHasAwait,
+  importCallProfileMessage,
   sourceDiagnostic,
   type SyntaxStatementItem,
 } from "./hir-build.ts";
@@ -1139,6 +1140,23 @@ export function compileModuleGraph(
 ): ModuleCompilationResult {
   const linked = linkModuleGraph(graph);
   if (linked.graph == null) return { diagnostics: linked.diagnostics };
+  // Discovery and linking cover every literal `import()` target, but the
+  // profile still rejects each ImportCall until its admission.
+  const importCalls = (graph.requests ?? []).filter(
+    (request) => request.edgeKind === "discovery",
+  );
+  if (importCalls.length > 0) {
+    return {
+      diagnostics: importCalls.map((request) =>
+        sourceDiagnostic(
+          request.referrer.id,
+          request,
+          importCallProfileMessage,
+        ),
+      ),
+      graph: linked.graph,
+    };
+  }
   const nodes = new Map(
     graph.modules.map((module) => [module.canonicalId, module]),
   );

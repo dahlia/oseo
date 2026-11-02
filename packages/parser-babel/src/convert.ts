@@ -49,6 +49,7 @@ import {
   type SuperPropertyContext,
 } from "./babel.ts";
 import { jsdocHints, typeHint } from "./hints.ts";
+import { staticImportSpecifier } from "./import-calls.ts";
 import { earlyError, location, sourceRange, unsupported } from "./locations.ts";
 import { regExpLiteral } from "./regexp-literal.ts";
 
@@ -1361,6 +1362,16 @@ export function expression(
     return callee == null
       ? undefined
       : { ...located, arguments: argumentValues, callee, kind: "new" };
+  }
+  if (value.type === "ImportExpression" && context.staticSpecifierImports) {
+    const literal = staticImportSpecifier(value);
+    if (literal != null && isString(literal.value)) {
+      return {
+        ...located,
+        kind: "import-call",
+        specifier: { ...location(context, literal), value: literal.value },
+      };
+    }
   }
   return unsupported(context, value);
 }
