@@ -9,14 +9,22 @@ inventory and M5b completed the built-in and intrinsic dependency graph. M5c
 closes every path in that inventory by observation, remediation, an
 explicitly authorized exclusion, or, under
 [ADR 0031](./docs/adr/0031-m5-named-deferral.md), a reviewed named deferral.
-It does not reopen M5b or turn the remaining
-19,708 unreviewed paths into one implementation unit.
+It does not reopen M5b.
 
-The checked-in starting point is 41,091 applicable paths at test262 revision
-`f2d1435644797268dca1f7988cad5a4e89ccd8d2`. The reviewed manifest covers
-21,383 paths: 18,343 passes, 1,560 expected negatives, and 1,480 unsupported
-profile features. Semantic, harness, and infrastructure failures are zero.
-The remaining 19,708 paths are unreviewed, not presumed failures or passes.
+M5c started from 41,091 applicable paths at test262 revision
+`f2d1435644797268dca1f7988cad5a4e89ccd8d2`. The reviewed manifest then
+covered 21,383 paths: 18,343 passes, 1,560 expected negatives, and 1,480
+unsupported profile features, with no semantic, harness, or infrastructure
+failures. The other 19,708 paths were unreviewed, which meant neither
+presumed failures nor passes, and they were never planned as one
+implementation unit. Figures in this plan that describe the first ledger,
+ownership audit, and batch plan refer to that starting point.
+
+Every included path has since been reviewed. The header of
+[*docs/m5c-closure/ledger.yaml*](./docs/m5c-closure/ledger.yaml) holds the
+current closed, open, and deferred counts, and
+[Remaining work](#remaining-work) lists what still stands between the graph
+and the exit audit.
 
 [*docs/m5c-graph/graph.yaml*](./docs/m5c-graph/graph.yaml) is the source of
 truth for M5c work. `mise run check:m5c-graph` derives the current baseline
@@ -51,8 +59,8 @@ silent exclusion or a scope cut: it is not an exclusion, a pass, or a
 closure, and a failure can never be deferred. A path qualifies only when
 work the maintainer did not approve for M5 or declined is its one remaining
 closure route; a path that implementation inside M5 would close stays with
-remediation. Until the `m5c-deferral-ledger-checker` node teaches the ledger
-checker its `deferred` owner, no path can be deferred.
+remediation. No path could be deferred until the `m5c-deferral-ledger-checker`
+node taught the ledger checker its `deferred` owner.
 
 Coverage reporting keeps the reviewed count, inventory size, classifications,
 authorized-exclusion count, and deferral count separate. A percentage always
@@ -233,15 +241,12 @@ of normative dependence or an exclusion authorization.
 
 ### Authorized exclusion audit
 
-The audit retains 56 of the 178 proposed exclusions, all under ADR 0016.
-It moves 121 paths to `node:dynamic-source-coverage-remediation` and the
-mixed Annex B/core split path to `node:regexp-split-coverage-remediation`,
-both on the `m5-exit-audit` dependency path. No observation, dependency tag,
-inventory entry, or ADR changes. The reviewed totals remain 21,383 paths,
-18,343 passes, 1,560 expected negatives, and 1,480 unsupported results against
-41,091 applicable paths. The ledger's `closedPaths` remains 19,903 because it
-counts only passes and expected negatives; authorized exclusions are reported
-separately.
+The audit retains 56 of the 178 proposed exclusions, all under ADR 0016. It
+moves 121 paths to `node:dynamic-source-coverage-remediation` and the mixed
+Annex B/core split path to `node:regexp-split-coverage-remediation`, both on
+the `m5-exit-audit` dependency path. No observation, dependency tag, inventory
+entry, or ADR changes. The ledger's `closedPaths` counts only passes and
+expected negatives; authorized exclusions are reported separately.
 
 [*docs/m5c-closure/exclusion-audit.yaml*](./docs/m5c-closure/exclusion-audit.yaml)
 records every proposed path's normalized observation digest, source digest,
@@ -250,23 +255,26 @@ assessments explain the same contract for each listed member. The record
 entries quote the authorization and applicable reopening triggers from accepted
 ADRs 0013, 0016, and 0019, and from ADR 0028 since the
 `function-caller-restrictions` node. ADR 0020 fixes the denominator and
-authorizes no new exclusion; ADR 0026 demonstrates ahead-of-time host
-adaptation without authorizing exclusions of other harness capabilities.
+authorizes no new exclusion. ADR 0026 shows ahead-of-time host adaptation
+without authorizing exclusions of other harness capabilities.
 
 `mise run check:m5c-exclusion-audit`, included by `mise run check`, rejects
 missing assessments for ADR owners, unaccepted or changed records, stale
 sources or rejection observations, absent quotes, unrelated diagnostics,
-value-only eval reads, and owners
-that differ from the assessment. A promotion to pass or expected negative
-uses the observation owner. New proposed exclusions require reviewed entries;
-the tool never assigns them from a directory or dependency tag. It checks
-the freshness and consistency of human judgments, not their normative truth.
+value-only eval reads, and owners that differ from the assessment.
+
+A promotion to pass or expected negative uses the observation owner. New
+proposed exclusions require reviewed entries; the tool never assigns them from
+a directory or dependency tag. It checks the freshness and consistency of human
+judgments, not their normative truth.
+
 The eval check parses actual call syntax, including optional and indirect
 calls; reference resolution and correspondence to the rejected identifier
 remain part of the human source assessment. Numeric locations in the outer
 stderr diagnostic are normalized because harness composition can move them.
-A changed message, capability, or source still needs a reviewed path update;
-use the exported `exclusionAuditDigest` and `exclusionObservationDigest`
+
+A changed message, capability, or source still needs a reviewed path update.
+Use the exported `exclusionAuditDigest` and `exclusionObservationDigest`
 helpers in *tools/m5c-exclusion-audit.ts* to compute its snapshots after
 review, without regenerating observations merely to refresh the audit.
 
@@ -282,69 +290,69 @@ review, without regenerating observations merely to refresh the audit.
 | Mixed static/dynamic function assertions                   |     3 | Remediation |
 | Mixed Annex B/core split assertions                        |     1 | Remediation |
 
-For each of the 111 incidental-scaffolding paths, the observed call lies
-inside ADR 0016's rejected surface, but the normative subject is not excluded.
-The test's use of `eval` or `Function` does not itself prove that a normative
+For each of the 111 incidental-scaffolding paths, the observed call lies inside
+ADR 0016's rejected surface, but the normative subject is not excluded. The
+test's use of `eval` or `Function` does not itself prove that a normative
 algorithm requires dynamic source for behavior other than source evaluation.
-The audit therefore does not assert that ADR 0019's reopening trigger has
-been met. It also cannot authorize excluding the unobserved in-claim subject
-without replacement evidence or a maintainer coverage-accounting decision.
-All 111 keep remediation ownership while that distinction is unresolved.
+The audit therefore does not assert that ADR 0019's reopening trigger has been
+met. It also cannot authorize excluding the unobserved in-claim subject without
+replacement evidence or a maintainer coverage-accounting decision. All 111 keep
+remediation ownership while that distinction is unresolved.
 
-The 16th-edition algorithms for
-[GetTemplateObject],
-[EscapeRegExpPattern],
-[CatchClauseEvaluation],
-and [Function.prototype.apply]
-define their own caching, escaping, environment, and call contracts without
-requiring an eval call. Their chosen test observers do use dynamic source.
-The audit maps six legacy initializer-rule frontmatter identifiers to
-`sec-performeval`, preserving the upstream identifier separately.
+The 16th-edition algorithms for [GetTemplateObject], [EscapeRegExpPattern],
+[CatchClauseEvaluation], and [Function.prototype.apply] define their own
+caching, escaping, environment, and call contracts without requiring an eval
+call. Their chosen test observers do use dynamic source. The audit maps six
+legacy initializer-rule frontmatter identifiers to `sec-performeval`,
+preserving the upstream identifier separately.
 
 Ten paths from the earlier 66-path source-subject cohort join them. Five
 _tagged-template/cache-\*.js_ cases observe template-site identity under
-dynamic parsing; two _scope-\*-var-none.js_ cases use eval-created `var`
+dynamic parsing, and two _scope-\*-var-none.js_ cases use eval-created `var`
 bindings to distinguish retained variable environments. Three constructor
 family cases also assert on statically declared functions:
 *AsyncFunction/instance-construct-throws.js*,
 *AsyncGeneratorFunction/has-instance.js*, and
-*GeneratorFunction/has-instance.js*. Their rejections are authorized, but
-template identity and environment retention remain in the claim. These are
-possible reopening evidence, not a decision to reopen or widen ADR 0016.
-Likewise, the five RegExp round trips need equivalent literal parsing and
-matching evidence, and the 13 completion probes need evidence of Completion
-Record values, not substitutions that merely return a function value. The Annex
-B split path likewise contains many core split assertions whose coverage cannot
-be excluded with the legacy pattern. ADR 0013's reopening trigger is not proved
-by a chosen optional input alone. The same conservative rule therefore retains
-this path under its separate remediation node. This node produces no
-replacement semantic evidence.
+*GeneratorFunction/has-instance.js*.
 
-The audit preserves the 120 paths without the `dynamic-source` dependency
-tag and names each in its path record. This is a reporting debt under ADR
-0016, not evidence that the rejection is unauthorized. The check reports
-their count separately so dependency-indexed summaries cannot silently stand
-in for the observed dynamic-source gap.
-Of these 120 paths, 29 retain exclusions and 91 move to remediation.
+Their rejections are authorized, but template identity and environment
+retention remain in the claim. These are possible reopening evidence, not a
+decision to reopen or widen ADR 0016.
+
+The five RegExp round trips need equivalent literal parsing and matching
+evidence, and the 13 completion probes need evidence of Completion Record
+values, not substitutions that merely return a function value. The Annex B
+split path contains many core split assertions whose coverage cannot be
+excluded with the legacy pattern. ADR 0013's reopening trigger is not proved by
+a chosen optional input alone, so the same conservative rule retains this path
+under its separate remediation node. This node produces no replacement semantic
+evidence.
+
+The audit preserves the 120 paths without the `dynamic-source` dependency tag
+and names each in its path record. This is a reporting debt under ADR 0016, not
+evidence that the rejection is unauthorized. The check reports their count
+separately so dependency-indexed summaries cannot silently stand in for the
+observed dynamic-source gap. Of these 120 paths, 29 retain exclusions and 91
+move to remediation.
 
 #### Maintainer decision requested
 
 Choose how the 121 dynamic-source remediation paths, including all 111
-incidental paths, and the one mixed Annex B/core split path
-may close. The recommended option keeps their remediation owners until
-reviewed equivalent ahead-of-time observation or existing replacement
-evidence proves each non-source contract. This preserves the bounded
-exclusion, costs follow-up evidence or harness work, and reports 56 authorized
-exclusions plus 1,424 unsupported remediation paths, including these 122.
-The original upstream paths and assertions remain visible; replacement
-evidence alone does not turn a recorded unsupported result into a pass.
+incidental paths, and the one mixed Annex B/core split path may close. The
+recommended option keeps their remediation owners until reviewed equivalent
+ahead-of-time observation or existing replacement evidence proves each
+non-source contract. This preserves the bounded exclusion, costs follow-up
+evidence or harness work, and reports 56 authorized exclusions plus 1,424
+unsupported remediation paths, including these 122. The original upstream paths
+and assertions remain visible; replacement evidence alone does not turn a
+recorded unsupported result into a pass.
 
 Alternatively, explicitly accept the original 178 paths as bounded
 compile-rejection exclusions, while continuing to report the 122 non-source
 coverage gaps separately. That avoids adapting source-evaluating tests, but
 does not substantiate their normative subjects and risks overstating closure
-unless the reporting contract names those gaps. It would report 178
-exclusions and 1,302 unsupported remediation paths, with unchanged manifest
+unless the reporting contract names those gaps. It would report 178 exclusions
+and 1,302 unsupported remediation paths, with unchanged manifest
 classifications and percentage. This worker does not make that accounting
 decision or accept a new exclusion.
 
@@ -355,29 +363,37 @@ changing support or ownership. Leaving the tags as found avoids a manifest
 update but requires the separate diagnostic-based count in every coverage
 report. Adding the tags is recommended; this audit does not retag them.
 
-The `cross-realm-host` node then implemented realms beyond the initial realm
-and the `$262.createRealm` capability under
+Item 3 of the 2026-10-28 maintainer decision has since closed the mixed Annex
+B/core split path under ADR 0013 on reviewed replacement evidence. The
+dynamic-source remediation paths remain open, as
+[Remaining work](#remaining-work) describes.
+
+The `cross-realm-host` node implements realms beyond the initial realm and the
+`$262.createRealm` capability under
 [ADR 0027](./docs/adr/0027-realms-beyond-the-initial-realm.md). Of its 84
-paths, 43 pass. 40 now reach the ADR 0016 boundary at run time, 30 by
-constructing another realm's `Function` and 10 by calling another realm's
-`%eval%` with a source string, each before any realm assertion runs. The
-exclusion audit reviewed each of them in
-*docs/m5c-closure/exclusion-audit.yaml*: 5 construct through another realm's
-`GeneratorFunction`, `AsyncFunction`, or `AsyncGeneratorFunction`, so their
-subject is dynamic construction and `adr:0016-dynamic-source-boundary` owns
-them; 34 use `Function` or `eval` only to obtain a function of another realm
-and one observes the template registry across realms, so those 35 belong to
-`node:dynamic-source-coverage-remediation`. One,
-*test/built-ins/Iterator/proto-from-ctor-realm.js*, still needs the unadmitted
-`iterator-helpers` feature and moves to `node:iterator-helpers`. By the
-selector above, 6 of the 40 have source evaluation as their subject: the
+paths, 43 pass. 40 reach the ADR 0016 boundary at run time: 30 by constructing
+another realm's `Function` and 10 by calling another realm's `%eval%` with a
+source string, each before any realm assertion runs.
+
+Of those 40, 5 construct through another realm's `GeneratorFunction`,
+`AsyncFunction`, or `AsyncGeneratorFunction`, so their subject is dynamic
+construction and `adr:0016-dynamic-source-boundary` owns them. 34 use
+`Function` or `eval` only to obtain a function of another realm, and one
+observes the template registry across realms, so those 35 belong to
+`node:dynamic-source-coverage-remediation`. The assignments are recorded in
+*docs/m5c-closure/exclusion-audit.yaml*.
+
+One, *test/built-ins/Iterator/proto-from-ctor-realm.js*, still needs the
+unadmitted `iterator-helpers` feature and moves to `node:iterator-helpers`.
+
+By the selector above, 6 of the 40 have source evaluation as their subject: the
 five under *test/built-ins/AsyncFunction/*,
 *test/built-ins/AsyncGeneratorFunction/*, and
 *test/built-ins/GeneratorFunction/*, and
-*test/language/expressions/async-generator/eval-body-proto-realm.js*; the
-last obtains its function through `eval` and is a fixture-construction case.
-The dynamic surface the audit recognizes now includes the run-time `Function`
-and `eval` diagnostics of ADR 0027.
+*test/language/expressions/async-generator/eval-body-proto-realm.js*; the last
+obtains its function through `eval` and is a fixture-construction case. The
+dynamic surface the audit recognizes includes the run-time `Function` and
+`eval` diagnostics of ADR 0027.
 
 [GetTemplateObject]: https://262.ecma-international.org/16.0/#sec-gettemplateobject
 [EscapeRegExpPattern]: https://262.ecma-international.org/16.0/#sec-escaperegexppattern
@@ -456,112 +472,16 @@ The `static-specifier-import-design` node pins 20 module-loading rows; its
 work note under *docs/m5c-graph/* holds the selector. Nineteen observe the
 parse-time `ImportExpression` rejection. *usage-from-eval.js* instead
 observes the run-time `OSEO1001` rejection of the direct eval call whose
-source contains its `import()`. Every pinned row keeps
-`node:dynamic-source-coverage-remediation` until it receives an ADR 0031
-deferral entry whose reason names the deferred track and whose
-`targetMilestone` is *PLAN-DYN.md*. Those entries need the
-`m5c-deferral-ledger-checker` node first.
+source contains its `import()`. Every pinned row kept
+`node:dynamic-source-coverage-remediation` until the
+`m5c-deferral-ledger-checker` node landed. Each now has an ADR 0031 deferral
+entry whose reason names the deferred track and whose `targetMilestone` is
+*PLAN-DYN.md*, and the `deferred` ledger owner.
 
 No implementation node for the track exists in this graph. The design's
 five implementation units become graph work only under the plan that
 inherits the track. Whether the M5 announcement needs a separate
 demonstration of the design is decided at the D8 review on 2026-11-10.
-
-
-Static import attributes and JSON modules
------------------------------------------
-
-The `import-attributes` node admits static `with` clauses and default-only
-JSON dependencies in the closed file graph. ADR 0009 records the bounded
-module-kind contract, per-request validation before deduplication, generic
-data construction, shared identity, and resolution/linking diagnostics.
-*tests/property/m5-import-attributes.property.test.ts* supplies generated
-valid graphs and invalid requests, independent observations under Node.js
-and Deno, both specialization policies, guard misses, and forced collection.
-
-Its exact pinned selector has 89 paths, comprising 24 static subjects and
-65 dynamic-boundary subjects. Dynamic runtime options remain outside ADR
-0016 admission. The separately approved 64-path reservation in
-*docs/m5c-graph/import-attributes-dynamic-coverage.md* belongs to
-`import-attributes-dynamic-coverage-remediation`. Under the maintainer
-accounting decision of 2026-10-22, that node accounts for the reservation as
-bounded ADR 0016 exclusions, because each subject is ImportCall syntax or
-evaluation, or the dynamic import site of JSON module identity, reachable only
-through `import()`; static JSON identity stays inside the claim. The paths stay
-in the inventory, never count as passes, and reopen when an accepted ADR 0016
-amendment admits any form of dynamic import. It does not widen the existing
-dynamic-source remediation reservation.
-
-
-Module export forms
--------------------
-
-The `module-export-forms` node admits `export var`, `export * as name`,
-and arbitrary module namespace names, which owned 28 reviewed paths: 15
-gated by `arbitrary-module-namespace-names`, 7 by
-`export-star-as-namespace-from-module`, and 6 whose fixtures used
-`export var` and reported `This export is unsupported.` Eleven of the 28
-are expected parse-phase negatives: two duplicate export names, six lone
-surrogates, one string local name without `from`, and two missing
-semicolons after a star export. They test early errors, not a missing
-capability. Five of the six lone-surrogate cases reject at the ill-formed
-string itself: *early-export-ill-formed-string.js* at its first export
-alias, `Moon as "\uD83C"` (`OSEO0001` at 96:17),
-*export-expname-unpaired-surrogate.js* at a local export alias,
-*export-expname-from-unpaired-surrogate.js* and
-*export-expname-from-as-unpaired-surrogate.js* at a re-export specifier name,
-and *export-expname-import-unpaired-surrogate.js* at an import specifier name.
-The sixth, *export-expname-from-star-unpaired-surrogate.js*, spells the star
-as the string `"*"`, which ExportFromClause does not accept. Its observed
-`OSEO0001` points at that quoted star, before the surrogate is read, so the
-case proves only that earlier syntax rejection; it is still a correct
-expected negative. The ill-formed name in `export * as "\uD83D" from` is
-covered instead by a structural case in
-*packages/parser-babel/tests/module-export-forms.test.ts*, beside a
-well-formed surrogate pair that parses as a namespace export name. The test
-source states that parser rule. The author's Node.js and Deno outputs list
-its nine cases passing but record no source commit, so they are not bound
-to a commit here; neither they nor the test source is a test262 observation
-or a native execution.
-ADR 0009 records the linking contract. Admitting `export var` required
-creating every module `var` cell while linking, because the previous
-evaluator-time initialization let a cyclic importer observe a temporal dead
-zone where ECMA-262 gives `undefined`. The 13 unreviewed paths that also
-need these features stay with `observation-batch-32`. The full manifest
-update that the coordinator's log records as reading the clean source
-`05ba44c9` observed the 11 negatives as expected negatives and the other 17
-paths as passes; its own run record names no commit. The full update at
-source `4c18c04b`, which corrected the runtime header comment and added the
-parser test cases, and whose pre-start record binds that clean commit and
-its tree, observed every record again and changed none.
-
-*packages/testkit/tests/module-graph.property.test.ts* checks generated
-graphs of local, indirect, namespace, and star exports with string names,
-including `"*"`, `"default"`, and the empty string, against an independent
-transcription of ResolveExport and GetExportedNames. Structural tests in
-*packages/parser-babel/tests/module-export-forms.test.ts* fix the module
-records, namespace identity, ambiguity, and link-time var initialization.
-The native module scenario in *tests/native/scenarios/shard-2.ts* compares
-*tests/fixtures/module-export-forms/* with Node.js and Deno under both
-specialization policies and forced collection.
-
-A namespace's [[OwnPropertyKeys]] returns its sorted export names, so the
-array-index names `"10"` and `"2"` follow `""` and precede ordinary names
-in code-unit order. The runtime own-key, CopyDataProperties, and for-in
-snapshots keep that order for a namespace and still move array-index keys
-first for every other object. V8, and so both reference hosts, lists a
-namespace's array-index names first, while Bun 1.4.3 (JavaScriptCore)
-follows ECMA-262. The scenario therefore checks
-*tests/fixtures/module-export-forms/key-order.mjs* against an explicit
-expectation rather than a reference host. Its `Object.keys`,
-`Object.getOwnPropertyNames`, `Reflect.ownKeys`, Proxy, `Object.entries`,
-and `Object.assign` lines are required by ECMA-262. Its for-in line is not:
-ECMA-262 2025 section 14.7.5.9 leaves the enumeration order of a module
-namespace exotic object unspecified, so that line fixes the order Oseo
-chooses, [[OwnPropertyKeys]] order, and V8's different order there is not
-a conformance failure. A spread or rest copy rebuilds an ordinary object,
-so only the `Object.assign` line observes copy order directly. The generated
-ResolveExport model also draws `"10"` and `"2"`.
 
 
 Work graph construction
@@ -639,7 +559,7 @@ for one prerequisite set, a prefix or listed set that selects nothing, a batch
 that selects a reviewed path, a batch without a graph node, a batch node
 missing a required dependency, and a ledger owner that differs from the batch.
 
-Three batches were later split so that each part reviews and lands on its
+Three batches are split so that each part reviews and lands on its
 own: `observation-batch-21` (2,408 paths) into `observation-batch-21a` through
 `observation-batch-21d`, `observation-batch-22` (1,219) into
 `observation-batch-22a` and `observation-batch-22b`, and `observation-batch-26`
@@ -662,11 +582,11 @@ template stays in one part. All paths are under *test/language/statements/*:
 | `observation-batch-26b` |   645 |   378 | *function/*, *generators/*                                            |
 
 A generated file combines one case file with one template, so a case read for
-templates in two parts counts as a review unit in both, as cases already did
-across batches before the split. The split adds five complete corpus gates to
-the remaining landings: the scoped schedule grows from 34.4 to 43.6 hours.
-Running `mise run m5c:observation-batches:plan` would renumber every batch and
-undo the split; `mise run m5c:observation-batches:update` keeps it.
+templates in two parts counts as a review unit in both. The split adds five
+complete corpus gates to the remaining landings: the scoped schedule grows
+from 34.4 to 43.6 hours. Running
+`mise run m5c:observation-batches:plan` would renumber every batch and undo
+the split; `mise run m5c:observation-batches:update` keeps it.
 
 Each path's facts come from its upstream source at the pinned revision and
 from checked-in review state, never from its directory name:
@@ -697,11 +617,13 @@ The prerequisite set of a path is the sorted set of its prerequisite nodes.
 Paths without a prerequisite are planned by locality. Each set with at least
 50 paths is planned separately. Every smaller set joins one tail batch that
 waits for all of their nodes, because a separate batch for each costs a full
-regeneration for a handful of paths. A selector lists prerequisite sets and
-path prefixes. A path belongs to the batch that lists its set and has the
-longest prefix the path starts with. The planner splits a prefix at its next
-`/`, `-`, `_`, or `.` only when its paths do not fit. It then packs adjacent
-results back together while they fit, so locality decides every boundary.
+regeneration for a handful of paths.
+
+A selector lists prerequisite sets and path prefixes. A path belongs to the
+batch that lists its set and has the longest prefix the path starts with. The
+planner splits a prefix at its next `/`, `-`, `_`, or `.` only when its paths
+do not fit. It then packs adjacent results back together while they fit, so
+locality decides every boundary.
 
 A batch fits when it has at most 3,000 paths and 500 review units. A
 handwritten test is one review unit. A generated test counts its generator
@@ -734,39 +656,35 @@ object without compiling source text.
 #### Regeneration cost
 
 Every batch landing runs the complete `test:test262` gate in `mise run test`,
-which observes the whole reviewed corpus as it stands at that landing, so the
-batch count still sets the M5c schedule. The manifest update itself no longer
-has to: a batch only adds entries to *tests/test262/subset.yaml*, which
-`mise run test262:update:changed` accepts as observation-neutral, so it
-observes just the batch's own paths and rewrites only the partitions they
-occupy. A prerequisite node that changes `supportedFeatures`, a harness file,
-or *tools/* still needs the complete `mise run test262:update`.
+which observes the whole reviewed corpus as it stands at that landing. The
+batch count therefore still sets the M5c schedule. The manifest update itself
+no longer has to: a batch only adds entries to *tests/test262/subset.yaml*,
+which `mise run test262:update:changed` accepts as observation-neutral. That
+command observes just the batch's own paths and rewrites only the partitions
+they occupy. A prerequisite node that changes `supportedFeatures`, a harness
+file, or *tools/* still needs the complete `mise run test262:update`.
 
-Two complete `test262:update` runs regenerated the current 21,383 paths with
-a pool of 8 workers on 16 logical cores, and the manifest came back unchanged
-both times. Neither had the host to itself:
+Two complete `test262:update` runs regenerated the 21,383 paths then reviewed
+with a pool of 8 workers on 16 logical cores, and the manifest was unchanged
+after both. Neither run had the host to itself. One took 2,922 seconds (48.7
+minutes), with another lane's gate overlapping its first nine minutes and a
+mean one-minute load average of 18.4. The other took 3,997 seconds (66.6
+minutes), with a mean load average of 31.9 from other sessions.
 
- -  on 2026-10-06 it took 2,922 seconds (48.7 minutes), while another lane's
-    gate overlapped the first nine minutes and the mean one-minute load
-    average was 18.4; and
- -  on 2026-10-07 it took 3,997 seconds (66.6 minutes), with a mean load
-    average of 31.9 from other sessions on the host.
-
-For reference, two `mise run test:test262` gates over the same 21,383 paths
-took 3,407 and 3,259 seconds. The cost model uses the slower 3,997-second
-update as its conservative figure for both kinds of complete run and divides
-it by the 72,749 native variants that run executed: 0.0549 seconds per
-variant. Each unreviewed path adds two variants per strictness mode, counted
-as if its prerequisites had landed, unless it is a parse or resolution
-negative. The 19,708 paths add 63,556 variants. The 43 paths that
-`cross-realm-host` moved to pass raised the current corpus to 72,921 executed
-variants, so one complete run over the 41,091-path corpus costs about 7,498
-seconds (125.0 minutes).
+Two `mise run test:test262` gates over the same 21,383 paths took 3,407 and
+3,259 seconds. The cost model uses the slower 3,997-second update as its
+conservative figure for both kinds of complete run. It executed 72,749 native
+variants, giving 0.0549 seconds per variant. Each unreviewed path adds two
+variants per strictness mode, counted as if its prerequisites had landed,
+unless it is a parse or resolution negative. The 19,708 paths add 63,556
+variants. The 43 paths that `cross-realm-host` moved to pass raised that corpus
+to 72,921 executed variants. One complete run over the 41,091-path corpus costs
+about 7,498 seconds (125.0 minutes).
 
 The plan records, for each batch, the seconds of its scoped update and of the
-complete corpus when it lands in plan order. A landing costs their sum; the
-schedule sums every landing, and the last column shows the same landings with
-the complete update instead of the scoped one:
+complete corpus when it lands in plan order. A landing costs their sum, and the
+schedule sums every landing. The last column shows the same landings with the
+complete update instead of the scoped one:
 
 | Limits (paths, units) | Batches | Largest batch (paths, units) | Scoped hours | Complete-update hours |
 | --------------------- | ------: | ---------------------------: | -----------: | --------------------: |
@@ -775,15 +693,15 @@ the complete update instead of the scoped one:
 | 4,000, 600            |      27 |                   3,422, 600 |         45.5 |                  89.0 |
 | 8,000, 1,200          |      15 |                 4,045, 1,175 |         26.3 |                  50.7 |
 
-The scoped update halves each landing, but each additional batch still adds
-one complete gate of about 1.1 to 2.1 hours. The chosen limits accept 7.2 more
+The scoped update halves each landing, but each additional batch still adds one
+complete gate of about 1.1 to 2.1 hours. The chosen limits accept 7.2 more
 hours than the 600-unit alternative to keep each batch within one reviewer's
-inspection. The 1,200-unit batches would halve the schedule again, but at 20
-to 40 hours of inspection one reviewer could not check their applicability
-and classifications. Prerequisite nodes add their own complete updates and
-gates outside these totals. The model is linear in executed variants;
-compile-stage rejections cost less than a full execution, and a corpus with
-more agent or module cases can cost more.
+inspection. The 1,200-unit batches would halve the schedule again, but at 20 to
+40 hours of inspection one reviewer could not check their applicability and
+classifications. Prerequisite nodes add their own complete updates and gates
+outside these totals. The model is linear in executed variants. Compile-stage
+rejections cost less than a full execution, and a corpus with more agent or
+module cases can cost more.
 
 These estimates count one scoped update and one complete corpus gate per
 landing. They exclude the candidate and main workflow runs of the landing
@@ -793,11 +711,11 @@ procedure under Gates and do not estimate elapsed time.
 
 The reviewed manifest partitions results by ADR 0013 group and a two-character
 hash key, so a group has up to 256 partition files. Path locality chooses the
-groups a batch touches, not its keys: any batch with more than about 200 paths
+groups a batch touches, not its keys. Any batch with more than about 200 paths
 in one group touches most of that group's keys. 19 of the 32 batches touch one
-group, and only the small prerequisite tail touches 13. The batches touch
-7,090 partition files in sum, between 54 and 326 each. Group-confined batches
-bound the files a scoped update rewrites to one group's partitions.
+group, and only the small prerequisite tail touches 13. The batches touch 7,090
+partition files in sum, between 54 and 326 each. Group-confined batches bound
+the files a scoped update rewrites to one group's partitions.
 
 
 Concurrency and serialization
@@ -807,76 +725,28 @@ Analysis, implementation, focused tests, and review may run in parallel for
 ready, unlanded nodes, regardless of their collision groups. The collision
 groups name publication files, not sources: of the 99 groups, 86 are
 *results.yaml*, 10 *exclusion-audit.yaml*, and 3 *ledger.yaml*. Applied to
-whole nodes they made every pair of the 53 ready nodes conflict, so only one
-node could progress at a time even though the longest dependency path among
+whole nodes, they made every pair of the 53 ready nodes conflict. Only one node
+could progress at a time, even though the longest dependency path among
 unlanded nodes is three nodes and no ready semantic node waits for another.
 
-They therefore serialize the publication phase only. One node at a time
-rebases onto main, regenerates the manifest when its observation inputs
-changed, updates the closure ledger, graph state, parity, and normative
-profile, passes its candidate verification, and merges. Two nodes that edit
-the same source file may still be prepared concurrently; the later one to
-publish rebases onto the earlier merge, and its review covers the
-overlapping files again.
+They therefore serialize the publication phase only. One node at a time rebases
+onto main and regenerates the manifest when its observation inputs changed.
+That node updates the closure ledger, graph state, parity, and normative
+profile, passes its candidate verification, and merges. Two nodes that edit the
+same source file may still be prepared concurrently. The later one to publish
+rebases onto the earlier merge, and its review covers the overlapping files
+again.
 
 Every semantic node retains the evidence contract from
 [*PLAN-M5.md*](./PLAN-M5.md): focused examples, applicable generated and
 forced-collection evidence, generic fallback and specialization misses,
-reviewed Test262 observations, and the normative family record. Observation
-and audit nodes add no runtime behavior and must not create evidence merely to
-look like semantic nodes.
+reviewed Test262 observations, and the normative family record. Observation and
+audit nodes add no runtime behavior and must not create evidence merely to look
+like semantic nodes.
 
 The graph baseline moves whenever the reviewed manifest moves. The same change
 updates the ledger and node state, so a clean checkout cannot describe one
 manifest while scheduling work from another.
-
-
-Source preparation after the four-source candidate
---------------------------------------------------
-
-The four-source candidate at `cbe81ee1` did not complete its gates. Root's
-D6 decision removes the proper-tail-call implementation from the next source
-preparation while retaining that candidate and its original source and
-observation refs. The Linux extended-property liveness failure and ordinary
-native fixture timeout remain unresolved; neither a semantic counterexample
-nor a runner flake was established. No test budget or timeout changes.
-
-Eval, RegExp, and computed Reference retain their source contracts and have
-no graph dependency on `proper-tail-calls`. Their source preparation restores
-successful Main `52a868c9`'s complete canonical observation set, subset,
-closure ledger, exclusion audit, and batch accounting. Its 28,311 reviewed
-paths contain 24,234 passes, 2,581 expected negatives, and 1,496 unsupported
-results. These are Main observations, not observations of the new source.
-All original owners remain, and a new full UPDATE is required. Root later
-authorized adding the ready `primitive-wrapper-objects` source as the fourth
-unit. Its 40 paths retain Main's unsupported observations and owners. The
-TCO-specific strict tail-forwarding registration stays only in the original
-Wrapper source; every earlier wrapper assertion and property budget remains.
-At that source preparation, all four source nodes remained unlanded. The
-optional-call receiver and primitive inherited-Set contracts stay on the exit
-path with their unmet prerequisites.
-
-The complete update on clean source `6e54c5d5` finished naturally with exit 0.
-It observed all 28,311 reviewed paths: 24,305 passes, 2,581 expected negatives,
-and 1,425 unsupported results, with no failure classifications. All 24,234
-successful Main passes remain passes. The 71 promotions comprise 26 Eval-value,
-five RegExp, and 40 Wrapper paths. Another 49 unsupported observations now
-reach the existing run-time Eval source-compilation boundary: 42 retain their
-bounded ADR 0016 ownership with refreshed observation digests, and seven
-private-class subjects move to `dynamic-source-coverage-remediation` under
-the existing fixture-construction assessment. That owner now has 265 paths;
-those private name and brand subjects remain inside the claim. That update
-added no exclusion, reviewed path, feature, inventory entry, or node landing;
-it retained the source preparation's graph state with 44 landed nodes.
-Post-observation review and exact candidate CI remain pending.
-
-This publication candidate prospectively marks `eval-intrinsic-value`,
-`regexp-pattern-extensions`, `computed-member-reference-key-order`, and
-`primitive-wrapper-objects` landed, bringing its graph to 48 landed nodes.
-Successful Main `52a868c9` still has 44 landed nodes. The four candidate
-transitions take effect only after exact candidate CI succeeds, an equal-tree
-merge, and successful main CI for that exact merge commit, as the Gates
-section below requires.
 
 
 Gates
@@ -891,21 +761,26 @@ For M5c landings, a successful run of the exact candidate commit satisfies the
 ordinary and extended test requirements in
 [*CONTRIBUTING.md*](./CONTRIBUTING.md). `mise run check` runs locally on the
 candidate after it is rebased onto main, so the ratchet compares it with the
-main head. The candidate is then pushed to a new branch, and every job of that
-workflow run must pass. The workflow runs the component suites of
-`mise run test` and both extended property tasks, partitioned across jobs on
-both native hosts, with the same case budgets and seeds as a local run, and
-adds the sanitizer lanes. Its sharded test262 jobs compare record values rather
-than manifest text, so the candidate's manifest is also checked for canonical
-text. The merge tree must equal the candidate tree. Graph state, including the
+main head.
+
+The candidate is then pushed to a new branch, and every job of that workflow
+run must pass. The workflow runs the component suites of `mise run test` and
+both extended property tasks, partitioned across jobs on both native hosts,
+with the same case budgets and seeds as a local run, and adds the sanitizer
+lanes. Its sharded test262 jobs compare record values rather than manifest
+text, so the candidate's manifest is also checked for canonical text.
+
+The merge tree must equal the candidate tree. Graph state, including the
 node's `landed` field and the expectations in *tests/m5c-graph.test.ts*, is
 part of the same candidate, which avoids an additional workflow run for a
 separate graph-state commit; the candidate and main runs are both still
-required. Graph transitions recorded in the candidate take effect for
-scheduling only after the main workflow succeeds for the exact merge commit.
-Until then, newly unblocked successors are not scheduled and the landing is not
-reported as complete. The terminal audit below still runs its gates locally
-from a clean checkout.
+required.
+
+Graph transitions recorded in the candidate take effect for scheduling only
+after the main workflow succeeds for the exact merge commit. Until then, newly
+unblocked successors are not scheduled and the landing is not reported as
+complete. The terminal audit below still runs its gates locally from a clean
+checkout.
 
 The terminal audit additionally proves:
 
@@ -930,6 +805,34 @@ The terminal audit additionally proves:
     a clean checkout.
 
 
+Remaining work
+--------------
+
+No included path is unreviewed, and the ledger records no semantic, harness,
+or infrastructure failure. What remains is closing the last remediation
+owners and running the exit audit:
+
+ -  `dynamic-source-coverage-remediation` is the one unlanded work node. It
+    owns the in-claim subjects whose tests reach the ADR 0016 boundary only
+    as scaffolding, and needs either replacement evidence for each subject
+    or the maintainer accounting decision requested under
+    [Authorized exclusion audit](#authorized-exclusion-audit). Its
+    [work note](./docs/m5c-graph/dynamic-source-coverage-remediation.md)
+    tracks the subjects.
+ -  `node:class-private-accessor-lookup-coverage-remediation` still owns
+    the two class declaration paths that call `__lookupGetter__` or
+    `__lookupSetter__`. The 2026-11-01 maintainer decision moved only the
+    two class expression paths to ADR 0013.
+ -  Before the audit uses the deferral list, Root mails the maintainer the
+    complete *docs/m5c-closure/deferrals.yaml* as [Gates](#gates) describes.
+ -  `m5-exit-audit` lands last. It proves the conditions under
+    [Gates](#gates) and records the report that
+    [Exit and reporting](#exit-and-reporting) describes.
+
+The ledger header, not this list, is authoritative for which owners still
+hold open paths.
+
+
 Exit and reporting
 ------------------
 
@@ -947,8 +850,106 @@ says that measured residue was deferred by name and M5 closed, and never
 reports a deferred path as passing, excluded, or closed.
 
 
-Incidental Annex B prototype dependency
----------------------------------------
+Node decisions
+--------------
+
+These sections record the contracts and ownership decisions of individual
+M5c nodes whose consequences outlast their landing: what each admits, which
+boundary it reports, and which paths stay open. Each node's work note under
+*docs/m5c-graph/* and its normative family record hold the evidence.
+
+### Static import attributes and JSON modules
+
+The `import-attributes` node admits static `with` clauses and default-only
+JSON dependencies in the closed file graph. ADR 0009 records the bounded
+module-kind contract, per-request validation before deduplication, generic
+data construction, shared identity, and resolution/linking diagnostics.
+*tests/property/m5-import-attributes.property.test.ts* supplies generated
+valid graphs and invalid requests, independent observations under Node.js
+and Deno, both specialization policies, guard misses, and forced collection.
+
+Its exact pinned selector has 89 paths, comprising 24 static subjects and
+65 dynamic-boundary subjects. Dynamic runtime options remain outside ADR
+0016 admission. The separately approved 64-path reservation in
+*docs/m5c-graph/import-attributes-dynamic-coverage.md* belongs to
+`import-attributes-dynamic-coverage-remediation`. Under the maintainer
+accounting decision of 2026-10-22, that node accounts for the reservation as
+bounded ADR 0016 exclusions, because each subject is ImportCall syntax or
+evaluation, or the dynamic import site of JSON module identity, reachable only
+through `import()`; static JSON identity stays inside the claim. The paths stay
+in the inventory, never count as passes, and reopen when an accepted ADR 0016
+amendment admits any form of dynamic import. It does not widen the existing
+dynamic-source remediation reservation.
+
+### Module export forms
+
+The `module-export-forms` node admits `export var`, `export * as name`,
+and arbitrary module namespace names, which owned 28 reviewed paths: 15
+gated by `arbitrary-module-namespace-names`, 7 by
+`export-star-as-namespace-from-module`, and 6 whose fixtures used
+`export var` and reported `This export is unsupported.` Eleven of the 28
+are expected parse-phase negatives: two duplicate export names, six lone
+surrogates, one string local name without `from`, and two missing
+semicolons after a star export. They test early errors, not a missing
+capability.
+
+Five of the six lone-surrogate cases reject at the ill-formed
+string itself: *early-export-ill-formed-string.js* at its first export
+alias, `Moon as "\uD83C"` (`OSEO0001` at 96:17),
+*export-expname-unpaired-surrogate.js* at a local export alias,
+*export-expname-from-unpaired-surrogate.js* and
+*export-expname-from-as-unpaired-surrogate.js* at a re-export specifier
+name, and *export-expname-import-unpaired-surrogate.js* at an import
+specifier name. The sixth, *export-expname-from-star-unpaired-surrogate.js*,
+spells the star as the string `"*"`, which ExportFromClause does not
+accept. Its observed `OSEO0001` points at that quoted star, before the
+surrogate is read, so the case proves only that earlier syntax rejection;
+it is still a correct expected negative.
+
+The ill-formed name in `export * as "\uD83D" from` is covered instead by a
+structural case in *packages/parser-babel/tests/module-export-forms.test.ts*,
+beside a well-formed surrogate pair that parses as a namespace export name.
+The test source states that parser rule; it is not a test262 observation
+or a native execution.
+
+ADR 0009 records the linking contract. Admitting `export var` required
+creating every module `var` cell while linking, because the previous
+evaluator-time initialization let a cyclic importer observe a temporal
+dead zone where ECMA-262 gives `undefined`. The 13 unreviewed paths that
+also need these features stay with `observation-batch-32`. The complete
+update observed all 28 paths: the 11 negatives as expected negatives and
+the other 17 as passes.
+
+*packages/testkit/tests/module-graph.property.test.ts* checks generated
+graphs of local, indirect, namespace, and star exports with string names,
+including `"*"`, `"default"`, and the empty string, against an independent
+transcription of ResolveExport and GetExportedNames. Structural tests in
+*packages/parser-babel/tests/module-export-forms.test.ts* fix the module
+records, namespace identity, ambiguity, and link-time var initialization.
+The native module scenario in *tests/native/scenarios/shard-2.ts* compares
+*tests/fixtures/module-export-forms/* with Node.js and Deno under both
+specialization policies and forced collection.
+
+A namespace's [[OwnPropertyKeys]] returns its sorted export names, so the
+array-index names `"10"` and `"2"` follow `""` and precede ordinary names
+in code-unit order. The runtime own-key, CopyDataProperties, and for-in
+snapshots keep that order for a namespace and still move array-index keys
+first for every other object. V8, and so both reference hosts, lists a
+namespace's array-index names first, while Bun 1.4.3 (JavaScriptCore)
+follows ECMA-262. The scenario therefore checks
+*tests/fixtures/module-export-forms/key-order.mjs* against an explicit
+expectation rather than a reference host.
+
+Its `Object.keys`, `Object.getOwnPropertyNames`, `Reflect.ownKeys`, Proxy,
+`Object.entries`, and `Object.assign` lines are required by ECMA-262. Its
+for-in line is not: ECMA-262 2025 section 14.7.5.9 leaves the enumeration
+order of a module namespace exotic object unspecified, so that line fixes
+the order Oseo chooses, [[OwnPropertyKeys]] order, and V8's different order
+there is not a conformance failure. A spread or rest copy rebuilds an
+ordinary object, so only the `Object.assign` line observes copy order
+directly. The generated ResolveExport model also draws `"10"` and `"2"`.
+
+### Incidental Annex B prototype dependency
 
 The `annexb-proto-dependency-classification` node admits exactly
 *test/built-ins/TypedArrayConstructors/ctors/no-species.js*. Core
@@ -960,25 +961,20 @@ abrupt completions retain their ordinary behavior; no Annex B accessor
 is installed. Runtime ABI `m5-129` records this diagnostic boundary.
 
 The reviewed path mixes core TypedArray assertions with an incidental
-Annex B read. Its ledger owner remains
+Annex B read. Its ledger owner was
 `node:typed-array-proto-coverage-remediation`, supported by the reviewed
 `typed-array-buffer-without-species-core` native fixture and existing
-constructor properties. The exclusion audit records their source digests
-and requires each mixed Annex B assessment to name its bounded owner.
-ADR 0013 accepts no new exclusion; a maintainer accounting decision is
-still required for that remediation.
+constructor properties. The exclusion audit records their source digests and
+requires each mixed Annex B assessment to name its bounded owner. Item 3 of the
+2026-10-28 maintainer decision later closed the path under ADR 0013 on that
+replacement evidence, as
+[*docs/m5c-closure/exclusion-audit.md*](./docs/m5c-closure/exclusion-audit.md)
+records; ADR 0013 itself is unchanged.
 
-That node's complete regeneration observed 25,348 paths: 21,667 passes,
-2,190 expected negatives, and 1,491 unsupported profile features, with no
-semantic, harness, or infrastructure failures. These totals are a historical
-snapshot of that landing, not the current manifest. The sole added record
-was the owned path, and every previously reviewed observation was
-unchanged. The graph baseline, closure ledger, and observation batches
-followed those canonical records. The node has since landed.
+The node has landed; the sole added record was the owned path, and every
+previously reviewed observation was unchanged.
 
-
-Incidental legacy accessor lookup dependency
---------------------------------------------
+### Incidental legacy accessor lookup dependency
 
 The `annexb-legacy-lookup-dependency-classification` node classifies the
 incidental lookup in exactly two paths under
@@ -987,107 +983,92 @@ incidental lookup in exactly two paths under
 *private-setter-is-not-a-own-property.js*. Each calls
 `this.__lookupGetter__("#m")` or `this.__lookupSetter__("#m")` before its core
 private getter read or private setter write. The 16th edition defines those
-methods in clause 20.1.3.9 as normative optional legacy behavior; ADR 0020 maps
+methods in clause 20.1.3.9 as normative optional legacy behavior. ADR 0020 maps
 that clause onto the ADR 0013 Annex B exclusion, and the inventory excludes
-their direct tests as `optional-section:annex-b`. Observation batch 11 observed
-both paths at `dad52f19` as semantic failures with the ordinary `OSEO2001`
-TypeError for calling `undefined`.
+their direct tests as `optional-section:annex-b`.
 
-A missing lookup of either exact name reaching an intrinsic
-`Object.prototype` now reports the owned `OSEO1001` rejection “The
+A missing lookup of either exact name reaching an intrinsic `Object.prototype`
+now reports the owned `OSEO1001` rejection “The
 Object.prototype.\_\_lookupGetter\_\_ method is excluded by the M5 optional
-legacy accessor policy.” or its Setter counterpart. User properties and
-methods with those names, non-callable shadows, null prototypes, proxy traps,
+legacy accessor policy.” or its Setter counterpart. User properties and methods
+with those names, non-callable shadows, null prototypes, proxy traps,
 reflection, `__defineGetter__`, `__defineSetter__`, and unrelated or private
 accessor TypeErrors keep their behavior. Runtime ABI `m5-130` records this
 boundary. The `__proto__` rejection, its audit surface, and its owner are
 unchanged.
 
-This node admits no path and writes no audit row or ledger owner. Batch 11
-retains its exact 1,199-path reservation and the first admission of both
-paths. After it observes them, their reviewed exclusion-audit rows and ledger
-entries use `node:class-private-accessor-lookup-coverage-remediation`; the
-exclusion audit accepts the new rejection only with that remediation owner,
-only when the source contains a call of the named method in call syntax,
-and never as an exclusion. The
-private accessor subjects remain mixed coverage debt, and ADR 0013 accepts no
-new exclusion.
-
-Observation batch 11 then observed both paths at `e6db3a1c` as
+This node admits no path and writes no audit row or ledger owner. Observation
+batch 11 keeps its exact 1,199-path reservation and admits the two paths as
 `unsupported-profile-feature` with the exact owned rejection at the end of
-stderr, and admits them with their unchanged `classes` dependency tag. Their
+stderr and their unchanged `classes` dependency tag. Their
 `annex-b-legacy-lookup` audit rows and ledger entries name the
-`node:class-private-accessor-lookup-coverage-remediation` owner. The
-2026-11-01 maintainer decision later closes exactly these two paths under
-ADR 0013 on reviewed replacement evidence; see
+`node:class-private-accessor-lookup-coverage-remediation` owner. The exclusion
+audit accepts the new rejection only with that remediation owner, only when the
+source contains a call of the named method in call syntax, and never as an
+exclusion. The private accessor subjects remain mixed coverage debt, and ADR
+0013 accepts no new exclusion.
+
+The 2026-11-01 maintainer decision closes exactly these two paths under ADR
+0013 on reviewed replacement evidence; see
 [the work note](docs/m5c-graph/class-private-accessor-lookup-coverage-remediation.md).
 
+### Incidental Annex B prototype write dependency
 
-Incidental Annex B prototype write dependency
----------------------------------------------
+The `__proto__` boundary above covered only the read. A write of `"__proto__"`
+that reaches the intrinsic `Object.prototype` without the key needs the same
+omitted normative-optional setter (16th edition 20.1.3.8.2); without a guard it
+silently creates an own data property instead, so a test can pass without the
+setup it intended. The `resizable-array-buffer-harness` node therefore enforces
+the existing ADR 0013 dependency rule for writes. It adds no exclusion and no
+policy waiver, and leaves the ADR 0013 vocabulary unchanged.
 
-The `__proto__` boundary above covered only the read. A write of
-`"__proto__"` that reaches the intrinsic `Object.prototype` without the key
-needs the same omitted normative-optional setter (16th edition 20.1.3.8.2);
-without a guard it silently creates an own data property instead, so a test
-can pass without the setup it intended. The `resizable-array-buffer-harness`
-node therefore enforces the existing ADR 0013 dependency rule for writes. It
-adds no exclusion and no policy waiver, and leaves the ADR 0013 vocabulary
-unchanged. Both of *runtime\_property.c*'s `[[Set]]` walks report the
-existing owned `OSEO1001` there, and runtime ABI `m5-134` records it. User
-properties, proxy `set` traps, null prototypes, typed-array numeric keys, and
-the object-literal prototype setter keep their behavior, and a primitive base
-keeps its existing early return. This is the boundary of those walks, not a
-complete Annex B detector.
+Both of *runtime\_property.c*'s `[[Set]]` walks report the existing owned
+`OSEO1001` there, and runtime ABI `m5-134` records it. User properties, proxy
+`set` traps, null prototypes, typed-array numeric keys, and the object-literal
+prototype setter keep their behavior, and a primitive base keeps its existing
+early return. This is the boundary of those walks, not a complete Annex B
+detector.
 
 *TypedArray/out-of-bounds-behaves-like-detached.js* is the one reviewed case
 that writes `__proto__`: `i8a.__proto__ = { 2: 'wrong value' }` is meant to
-give the view a prototype that answers index 2. The complete update recorded
-in `615d9d3b` observed it as a pass before this guard, with an own
-`"__proto__"` property and the view still inheriting from
+give the view a prototype that answers index 2. Before this guard it passed
+with an own `"__proto__"` property and the view still inheriting from
 `Int8Array.prototype`, so none of its assertions could show that an
 out-of-bounds read or `in` skips such a prototype. Its core subject remains
-active coverage debt, not an exclusion. The `typed-array-core` native fixture
-now supplies that subject with `Object.setPrototypeOf`: an index-bearing
-prototype that inherits from `Int8Array.prototype`, on a fixed-length and a
-length-tracking view, with prototype identity and an inherited label as
-witnesses, `Get` and `in` before shrinking, out of bounds, and after
-regrowing. Focused native runs at `3e42e4c3` passed:
-*tests/annexb-proto-boundary.test.ts* (all four tests, guarded and answered
-writes under both specialization policies) and the fixture through
-`mise run test:native --shard 77/282` (Node.js, Deno, and native outputs match;
-the AArch64 musl cross-link builds). The complete
-`mise run test262:update -- --accept-promotions` on the clean source
-`09745af3` ended with natural exit 0 and was recorded in `e7228e8f`.
-That earlier result is historical provenance; the current observations below
-come from the complete update on clean source `2e3d973f`, recorded in
-`fbdb0824`.
+active coverage debt, not an exclusion.
+
+The `typed-array-core` native fixture now supplies that subject with
+`Object.setPrototypeOf`: an index-bearing prototype that inherits from
+`Int8Array.prototype`, on a fixed-length and a length-tracking view, with
+prototype identity and an inherited label as witnesses, `Get` and `in` before
+shrinking, out of bounds, and after regrowing.
+*tests/annexb-proto-boundary.test.ts* passes all four tests (guarded and
+answered writes under both specialization policies), and the fixture passes
+through `mise run test:native --shard 77/282` with Node.js, Deno, and native
+outputs matching.
 
 The path is unsupported in the reviewed `main` manifest. A static scan of
-spelled `__proto__` keys finds no guard candidate among the `main` passes
-that mention it, but it cannot see computed keys, so the complete manifest
-update of this source must preserve every `main` pass. Commit `3e42e4c3`
-restores its subset expectation from `pass` to `unsupported-profile-feature`,
-because the reviewed runner refuses a pass-to-unsupported change as a demotion
-rather than recording it.
+spelled `__proto__` keys finds no guard candidate among the `main` passes that
+mention it, but it cannot see computed keys, so the complete manifest update of
+this source must preserve every `main` pass. Its subset expectation is
+`unsupported-profile-feature`, because the reviewed runner refuses a
+pass-to-unsupported change as a demotion rather than recording it.
 
-The complete update on clean source `2e3d973f` again observes the assignment's
-owned `OSEO1001` before any assertion. Its mixed Annex B subject remains
-coverage debt, with the `typed-array-core` fixture as replacement evidence. The
-audit binds the observed rejection and fixture, and the ledger assigns the path
-to `node:typed-array-proto-coverage-remediation`; no exclusion is recorded.
+The complete update observes the assignment's owned `OSEO1001` before any
+assertion. Its mixed Annex B subject remains coverage debt, with the
+`typed-array-core` fixture as replacement evidence. The audit binds the
+observed rejection and fixture. The ledger first assigned the path to
+`node:typed-array-proto-coverage-remediation`; item 3 of the 2026-10-28
+maintainer decision later closed it under ADR 0013 on that replacement evidence.
 
-
-Legacy function caller boundary
--------------------------------
+### Legacy function caller boundary
 
 The `function-caller-restrictions` node accounts for exactly the 23 paths
-with the `caller` frontmatter feature, all in the fixed inventory and
-previously selected by observation batch 32. They are `noStrict` tests that
-need a read of a non-strict ordinary function's `caller`, directly or as
-`arguments.callee.caller`, to complete normally. That is the optional legacy
-extension restricted by ECMA-262 clause 17.1, not the strict-function
-restriction the node's original premise described.
+with the `caller` frontmatter feature, all in the fixed inventory. They are
+`noStrict` tests that need a read of a non-strict ordinary function's
+`caller`, directly or as `arguments.callee.caller`, to complete normally.
+That is the optional legacy extension restricted by ECMA-262 clause 17.1,
+not the strict-function restriction the node's original premise described.
 
 The maintainer approved
 [ADR 0028](./docs/adr/0028-legacy-function-caller-boundary.md) on 2026-10-20.
@@ -1096,11 +1077,13 @@ M5 keeps the standard %ThrowTypeError% `caller` and `arguments` accessors on
 `caller` property. The record authorizes an M5 exclusion of the optional
 expectation for its exact selector only. The `caller` feature stays out of
 the checked-in `supportedFeatures`, so the paths keep their frontmatter
-rejection. The %Function.prototype% accessor descriptors, the clause 17.1
-restrictions on other function kinds and strict functions, and the absence of
-an own `caller` property on arguments objects stay inside the claim. So do
-the other 76 _test/built-ins/Function/15.3.5.4\_2-\*gs.js_ paths, which keep
-their observation batch.
+rejection.
+
+The %Function.prototype% accessor descriptors, the clause 17.1 restrictions
+on other function kinds and strict functions, and the absence of an own
+`caller` property on arguments objects stay inside the claim. So do the other
+76 _test/built-ins/Function/15.3.5.4\_2-\*gs.js_ paths, which keep their
+observation batch.
 
 The node adds the 23 paths to the reviewed subset as
 `unsupported-profile-feature` with existing ADR 0013 tags: `functions` on
@@ -1109,7 +1092,7 @@ source-compiling `Function` form, and `object-properties` on the two
 arguments tests. The dependency and classification vocabularies, the
 inventory policy, and the manifest schema are unchanged. Regeneration through
 the normal tools supplies the result records, the observation-batch counts,
-and the graph baseline. The node then assigns the ledger owner
+and the graph baseline. The node assigns the ledger owner
 `adr:0028-legacy-function-caller-boundary` with a note that bounds its
 surface. Coverage reports count these 23 exclusions separately from passes
 and from remediation-owned unsupported results, against the 41,091-path
@@ -1125,17 +1108,14 @@ five dynamic-source intersections do not broaden ADR 0016 and are not owned
 by it. A later observation that reaches their dynamic-source rejection, or
 that admits the `caller` feature, needs a new reviewed scope decision.
 
-
-Minor feature tag admission
----------------------------
+### Minor feature tag admission
 
 The `minor-feature-tag-admission` node admits the `json-superset`,
 `__proto__`, and `proxy-missing-checks` frontmatter features to the reviewed
 `supportedFeatures`. Exactly ten included paths of the fixed inventory carry
 one of them. All ten are unreviewed and owned by `node:observation-batch-32`.
 This node adds no subset row: batch 32 keeps their first admission, their
-observed classification, and any exclusion-audit row or ledger owner. No
-reviewed path carries any of the three tags.
+observed classification, and any exclusion-audit row or ledger owner.
 
 Each tag is admitted because the current profile already meets what its
 included paths require. Source analysis found no defect to repair, so the node
@@ -1182,6 +1162,7 @@ changes no compiler or runtime code:
 
 The node adds no generated domain, seed, or budget, because no runtime
 behavior changes. It extends fixed evidence of the existing families instead.
+
 The `proxy-exotic-object` native fixture triggers each of the three
 invariants beside an accepted control, counts the trap calls, and writes
 `"__proto__"` through a proxy parent with computed and static keys. The
@@ -1200,43 +1181,41 @@ complete update's actual records decide. The node's two direct dependents
 are `observation-batch-32` and `m5-exit-audit`. Landing this node alone does
 not unblock batch 32, which also waits for its other prerequisite nodes.
 
-
-Resizable buffer harness
-------------------------
+### Resizable buffer harness
 
 The `resizable-array-buffer-harness` node adds a reviewed
 *tests/test262/harness/resizableArrayBufferUtils.js* and registers it with
 the reviewed runner, which no longer lists that include as unavailable. The
-original harness admission changed no runtime, compiler, or feature list;
-the node's later `__proto__` write guard is described in the incidental
-Annex B prototype write dependency section.
+harness admission changed no runtime, compiler, or feature list; the node's
+later `__proto__` write guard is described under
+[Incidental Annex B prototype write dependency](#incidental-annex-b-prototype-write-dependency).
 
 With `well-known-intrinsics-harness`, which registers
 *wellKnownIntrinsicObjects.js*, the runner's list of unavailable harness
 includes becomes empty. The runner therefore no longer has that list or the
 branch that classified a case naming a listed include as unsupported with the
 `harness-include` capability. A case that names an include the reviewed
-harness does not implement still fails as a harness defect. The complete
-update at `edcf066b` observed the combined source. Three records pass: the
-arguments and caller property descriptions and the built-in function
-`toString` case. The three `is-a-constructor` records execute their
-`IsConstructor` assertion and then report the ADR 0016 run-time
-`OSEO1001` rejection from their trailing construction. They are
-remediation-owned active coverage debt, not exclusions.
+harness does not implement still fails as a harness defect.
 
-The earlier combined update recorded in `615d9d3b` observed 163 passes in
-this node's 168-path cohort. Five remained unsupported with their actual
-rejections and were assigned as active coverage debt:
+Three of the six records that include *wellKnownIntrinsicObjects.js* pass:
+the arguments and caller property descriptions and the built-in function
+`toString` case. The three `is-a-constructor` records execute their
+`IsConstructor` assertion and then report the ADR 0016 run-time `OSEO1001`
+rejection from their trailing construction. They are remediation-owned
+active coverage debt, not exclusions.
+
+The complete update that landed this node observed all 168 paths of its
+cohort: 162 pass and 6 remained unsupported, assigned as active coverage debt
+without exclusions:
 
  -  The grow and shrink _user-provided-tolocalestring-\*.js_ cases of
     `Array.prototype.toLocaleString` and `%TypedArray%.prototype.toLocaleString`
-    report the `primitive-wrapper` capability. Their replacement
+    reported the `primitive-wrapper` capability. Their replacement
     `Number.prototype.toLocaleString` and `BigInt.prototype.toLocaleString`
     call the saved original with a non-strict `this`, which boxes the element.
-    The first observed variant stops at that call, so their remaining
-    assertions did not run. The earlier update assigned these four to
-    `primitive-wrapper-objects`; the current complete update below confirms
-    those observations and ownership assignments.
+    The first observed variant stopped at that call, so their remaining
+    assertions did not run. These four went to `primitive-wrapper-objects`
+    and now pass.
  -  *TypedArray/prototype/resizable-and-fixed-have-same-prototype.js* reports
     the run-time `OSEO1001` rejection of the Annex B
     `Object.prototype.__proto__` accessor. The program runs both buffer
@@ -1244,30 +1223,21 @@ rejections and were assigned as active coverage debt:
     `ta_rab` over the resizable buffer and then `ta_ab` over the fixed-length
     buffer. It stops at the `ta_ab.__proto__` read, recorded at 275:20 as the
     first operand of the first prototype comparison, so no comparison
-    completes. Its core subject, that
-    fixed-length views over a resizable and a fixed-length buffer share the new
-    target's prototype, does not depend on Annex B.
-    That update assigned it to `typed-array-proto-coverage-remediation`
-    beside *no-species.js*
-    under a separate bounded audit assessment. Replacement evidence is the
-    `typed-array-constructors` native fixture's case for every constructor
-    the harness lists, including its three class subclasses, and the
-    construction order property's fixed-buffer and length-tracking
-    resizable-buffer cases. The native fixture covers the fixed-length view
-    pairs over both buffer kinds; the property covers complementary shapes.
-    The maintainer accounting decision is still required, and ADR 0013 is not
-    widened.
-
-The earlier complete update, on the clean source `09745af3` and recorded in
-`e7228e8f`, changed one of the 163 passes. Under the `__proto__` write guard
-of the incidental Annex B prototype write dependency section,
-*TypedArray/out-of-bounds-behaves-like-detached.js* was observed as
-`unsupported-profile-feature`. That update recorded 162 passes and six
-unsupported results among the 168. It assigned the sixth to
-`typed-array-proto-coverage-remediation` too. Those observations and ownership
-transfers are historical evidence. Clean source `2e3d973f` retained main data
-until the complete update below; its actual records and assignments are now
-recorded in `fbdb0824`.
+    completes. Its core subject, that fixed-length views over a resizable and
+    a fixed-length buffer share the new target's prototype, does not depend
+    on Annex B. It went to `typed-array-proto-coverage-remediation` beside
+    *no-species.js* under a separate bounded audit assessment. Replacement
+    evidence is the `typed-array-constructors` native fixture's case for
+    every constructor the harness lists, including its three class
+    subclasses, and the construction order property's fixed-buffer and
+    length-tracking resizable-buffer cases. The native fixture covers the
+    fixed-length view pairs over both buffer kinds; the property covers
+    complementary shapes. Item 3 of the 2026-10-28 maintainer decision later
+    closed the path under ADR 0013 on that evidence; ADR 0013 is not widened.
+ -  *TypedArray/out-of-bounds-behaves-like-detached.js* is unsupported under
+    the `__proto__` write guard, as
+    [Incidental Annex B prototype write dependency](#incidental-annex-b-prototype-write-dependency)
+    describes.
 
 The CLI's `executed` fact is shared infrastructure needed by this node's
 runtime `__proto__` boundaries. Only starting the compiled executable sets
@@ -1275,20 +1245,6 @@ it. The runner retains that variant as execution evidence when a run-time
 `OSEO1001` stops the program, and the fragment executor counts the same fact.
 Compile-stage rejections and failures before program start have no execution
 fact. This contract does not depend on the intrinsics harness.
-
-The complete `mise run test262:update -- --accept-promotions` on clean source
-`2e3d973f` ended with natural exit 0 and is recorded in `fbdb0824`.
-Its manifest records 28,311 reviewed
-cases: 24,231 passes, 2,581 expected negatives, and 1,499 unsupported profile
-features. It preserves every one of the 24,069 successful main passes and all
-28,311 reviewed paths in the 41,091-path inventory, with no semantic, harness,
-or infrastructure failures. Of the original 168 RAB paths, 162 pass and 6
-remain unsupported. The ledger assigns 4 of those to
-`primitive-wrapper-objects` and 2 to `typed-array-proto-coverage-remediation`
-as active coverage debt, without exclusions. The six WKI paths retain exactly
-main's harness-include observations and owners. The records, promotions, and
-derived counts come from this complete update, not an earlier combined-update
-snapshot.
 
 The copy keeps every upstream operation except how the three subclasses are
 made. Upstream's internal `subClass` compiles
@@ -1309,577 +1265,50 @@ same global heritage. This adaptation is bounded:
     runs them. The probes are not dropped to avoid the Float16Array gap.
 
 The upstream frontmatter of 188 pinned tests includes this file. Of the
-included inventory, 168 form this node's original reviewed cohort and 17 are
-unreviewed paths of `observation-batch-32`, which stay unreviewed here.
-Three more are under *test/staging/* and outside the inventory.
+included inventory, 168 form this node's original reviewed cohort and 17 were
+unreviewed paths reserved for `observation-batch-32`. Three more are under
+*test/staging/* and outside the inventory.
 
-The clean source `2e3d973f` used by the complete update contains
-`typed-array-feature-admission`, which admits the Float16Array global.
-Without that admission both probes would be the profile-syntax rejection
-for `typeof` of an unadmitted standard global; that update observed all
-168 paths with the admission present. This node does
-not touch the Float16Array source. A reference run under Node.js and Deno
-on hosts that define Float16Array is evidence that the copy is equivalent
-to upstream, not an Oseo observation. The classifications come only from
-that complete update.
+The source of that complete update contains `typed-array-feature-admission`,
+which admits the Float16Array global. Without that admission both probes
+would be the profile-syntax rejection for `typeof` of an unadmitted standard
+global. This node does not touch the Float16Array source. A reference run
+under Node.js and Deno on hosts that define Float16Array is evidence that the
+copy is equivalent to upstream, not an Oseo observation. The classifications
+come only from that complete update.
 
-
-Dynamic RegExp pattern extensions
----------------------------------
+### Dynamic RegExp pattern extensions
 
 The `regexp-pattern-extensions` node owns the five reviewed paths whose
-observation names the `regexp-pattern-extension` capability. None of them is
-a lexer, literal, flag, or harness gap: each stops at the runtime C
-validator, reached through RegExp construction at run time. Four are the
-*test/built-ins/RegExp/named-groups/* `*-property-names*.js` cases. Their
-literals already compile ahead of time, but `RegExp("(?<\\u0041>.)")`,
-`RegExp("(?<a\u{104A4}>.)", "u")`, and `new RegExp("(?<🦊>fox)")` need an
-escaped name decoded and a non-ASCII name classified, which the runtime
-refused for lack of identifier data. The fifth,
-*regexp-prototype-matchAll-v-u-flag.js* under
-*test/built-ins/String/prototype/matchAll/*, reaches `@@matchAll` species
-construction, which handed the literal `/\p{Script=Han}/gu` back to the
-dynamic compiler that deliberately has no property tables.
+observation names the `regexp-pattern-extension` capability. None of them is a
+lexer, literal, flag, or harness gap. Each stops at the runtime C validator,
+reached through RegExp construction at run time.
 
-The node links the pinned `ID_Start` and `ID_Continue` tables into the
-runtime and shares one RegExpIdentifierName decoder between the validator and
-the dynamic program builder, and it lets a copy of a branded RegExp borrow an
+Four are the *test/built-ins/RegExp/named-groups/* `*-property-names*.js`
+cases. Their literals already compile ahead of time, but
+`RegExp("(?<\\u0041>.)")`, `RegExp("(?<a\u{104A4}>.)", "u")`, and
+`new RegExp("(?<🦊>fox)")` need an escaped name decoded and a non-ASCII name
+classified, which the runtime refused for lack of identifier data.
+
+The fifth, *regexp-prototype-matchAll-v-u-flag.js* under
+*test/built-ins/String/prototype/matchAll/*, reaches `@@matchAll` species
+construction, which handed the literal `/\p{Script=Han}/gu` back to the dynamic
+compiler that deliberately has no property tables.
+
+The node links the pinned `ID_Start` and `ID_Continue` tables into the runtime
+and shares one RegExpIdentifierName decoder between the validator and the
+dynamic program builder. It lets a copy of a branded RegExp borrow an
 ahead-of-time program when the parse flags agree. The profile record in
 [*docs/language-profile-m5.md*](./docs/language-profile-m5.md) states both
-contracts. Runtime ABI `m5-135` records them. Dynamic Unicode properties,
-class sets, unlinked case folding, and the non-ASCII identity escape without
-`u` keep their located boundary, so the capability stays in the runner's
-vocabulary. No exclusion is proposed, and no dynamic source text is admitted
-beyond the pattern grammar RegExp construction already compiled.
-
-
-Observation batch 15 current-source preparation
------------------------------------------------
-
-The historical scoped UPDATE observed the 836 reserved paths (456 review
-units) from clean B15 input U,
-`ca53384ab035661df8fa8e611c9f1959da682caf`, with accepted Source4 R,
-`f2c306680af07fea8011e6737d5b21100d9654d0`, as its explicit baseline. It
-left U's tree unchanged, so the original B15 result R is also `ca53384a`.
-That execution recorded 661 passes, 151 expected negatives, and 24 unsupported
-profile features. The B15-only delta was later replayed as `0381835e` onto
-the corrected Source4 documentation at `e6994838`; that replay made no new
-observations.
-
-The reduced source preparation below retains those B15 records on green
-Main `de491133`, whose tree equals Source4 candidate `8387dc9a`. All prior
-28,311 records remain unchanged. The combined manifest totals are 29,147
-reviewed paths: 24,966 passes, 2,732 expected negatives, and 1,449 unsupported
-profile features, with 11,944
-inventory paths still unreviewed. The subset retains the original B15 U/R's
-pinned revision and 146 supported features. These totals are historical
-preparation accounting, not fresh observations of the combined source. They
-do not replace the successful Main baseline or land any node. The corrected
-classes dependencies and two async-only iterator-protocol removals come from
-the preserved B15 admission metadata at `29d5f8fd`. Its old failed-source
-observations are historical and were not reused.
-
-The unsupported rows retain source-bound assessments: 16 eval-semantic subjects
-retain the existing bounded ADR 0016 approval and resume conditions, while eight
-object-literal fixture subjects remain in-claim under dynamic source coverage
-remediation. Tags do not authorize exclusions. At that preparation point,
-B15 was ready and unlanded. The fresh combined observation and publication
-candidate accounting are recorded below; exact candidate and Main CI still
-control when the landing becomes effective.
-
-
-Generator continuation stack source preparation
------------------------------------------------
-
-The existing `generator-dispatch-stack-charge` node charges resumed bodies
-through the callable native-frame model in both standalone and fragment
-emission. The contract and focused regression evidence are recorded in
-[*PLAN-M5.md*](./PLAN-M5.md#generator-continuation-stack-accounting).
-Source preparation does not mark the node landed, admit test262 paths, or
-replace source reviews, the full UPDATE, and exact-candidate CI gates.
-
-
-Reduced three-unit source preparation on green Main
----------------------------------------------------
-
-The user-approved reduced preparation starts from successful Main
-`de491133b74b2f6893399cb32b7e05e21f6667c1`, tree
-`2281f0c3979e2d40aed08659ed8b576d8520aa28`. It retains observation-batch-15,
-script-module-declaration-early-error, and generator-dispatch-stack-charge
-from preserved reviewed source `eb045685` and equal-tree preparation
-`3bc6ab35`. The accepted B15 input is `0381835e`, Script is `a0cebe45`, and
-Generator is `04d7d7d4`. Their original commits, authors, review history, and
-observation refs remain preserved. The reviewed fragment baseline corrections
-at `d4467a6e` and later B15 and Script provenance corrections remain intact.
-The split itself has no new model review or review-retention verdict.
-
-The excluded `regexp-property-escape-harness` unit at `98c42049` contributes
-no helper, license, test, or family-evidence addition to this tree. Its 453
-existing Main paths remain reviewed unsupported under their original owner;
-none is removed from the subset, inventory, manifest, or closure ledger.
-The node remains ready and unlanded. The user requires Array performance to
-land before a later candidate containing that property harness is pushed.
-This source-only preparation introduces no Array node or graph dependency.
-
-Of the 29,147 adopted reviewed records, B15's 836 records and 24 bounded
-assessments retain the historical B15 observation input and result
-`ca53384ab035661df8fa8e611c9f1959da682caf`. The other 28,311 records come
-from Main: 24,305 passes, 2,581 expected negatives, and 1,425 unsupported
-profile features, all unchanged. These are historical preparation counts,
-not fresh observations of this implementation. The original full UPDATE on
-`57a2b491bd5619455363c7facfc7bfef98896520` was allowed to finish naturally
-in its separate worktree. At that preparation point, actual R adoption was
-pending, and R was not identified with U. Root subsequently made the actual
-D3 decision and completed the fresh full observation recorded below.
-
-At source preparation, Main's effective 48 landed flags remained unchanged,
-and all three selected nodes and the deferred property harness were
-unlanded. The split changed no runtime ABI, property budget, seed, deadline,
-shard total, toolchain pin, accepted exclusion, or additional admission.
-
-
-Reduced three-unit observation and publication candidate
---------------------------------------------------------
-
-Root applied D3 to original full input `57a2b491` and actual result
-`2626a059`, with reduced source `86c845d0` on green Main `de491133`.
-It required a full UPDATE because the removed harness license and
-*regExpUtils.js* are runner data. The original four-unit result remains
-preserved; none of its 450 deferred RegExp promotions was adopted.
-
-The new complete `mise run test262:update -- --accept-promotions` read
-clean input `86c845d00892d1101e0fb863d369c8104e16b30c`.
-It ran from 2026-10-24T08:14:16.805768Z to
-2026-10-24T09:26:03.185827Z, exiting naturally with zero retries in
-4306.380 seconds. Actual result
-`8ee78291a9a6f2a54bf90f3f0668fb3ad24c466f` is a distinct normal-hook
-observation commit. Its tree equals the input tree because all 6,484
-partitions, the index, parity, subset, and other tracked files are
-byte-identical. An empty result delta does not substitute for that run.
-
-The fresh manifest records 29,147 paths: 24,966 passes, 2,732 expected
-negatives, and 1,449 unsupported results, with no failures or promotions.
-All 28,311 old Main records and 24,305 Main passes remain exact. B15's
-836 records remain 661 passes, 151 expected negatives, and 24 unsupported
-results; all pinned source identities and 24 bounded audit rows are exact.
-The 453 deferred RegExp paths retain their original Main unsupported
-records. Inventory remains 41,091 paths, with 11,944 still unreviewed.
-No existing owner, exclusion, assessment, tag, seed, or budget was rewritten.
-
-Root retained the three source and classification review gates under
-D1.9: implementation, interfaces, contracts, and observed row meanings are
-unchanged from their accepted sources and preparation. No new model review
-or observation from the excluded helper is claimed. D3 on the actual
-input/result and clean result commit was neutral on green Main `de491133`.
-Full execution and canonical preservation evidence is retained under
-*/data/m5c-reduced-source3-full-update-20261024/*.
-
-The publication candidate marks observation-batch-15,
-script-module-declaration-early-error, and generator-dispatch-stack-charge
-landed together, and makes observation-batch-17 ready. Its graph has 88
-nodes, 85 ready, three blocked, none parked, and 51 landed marks. These
-marks become effective only after the exact candidate and matching Main
-workflows succeed; this record does not claim those CI results in advance.
-The property harness stays unlanded and subject to the user's Array
-performance publication prerequisite. This candidate adds no Array source,
-node, or exclusion and changes no test budgets, seeds, or shard totals.
-
-
-F3-only source preparation after the Array candidate failure
-------------------------------------------------------------
-
-D6.5 removes the failed Array node from the next publication source. This
-preparation starts at successful Main `f100ab8e` and restores only existing
-node `yield-star-throw-callability`: GetMethod of a noncallable delegate
-throw raises TypeError without reading return. Nullish/absent closing,
-callable dispatch, abrupt getters, result validation, roots and teardown
-retain their original contracts. The independent backend helper asserts
-public context balance and imports no Array completion layout or TCO code.
-
-The minimized regression and 88 boundary cases retain independent Node/Deno
-references, both native policies, forced collection, positive allocation and
-collection counters, and public context balance checks. The added delegated
-throw property uses the same checks with seed `0x60001b01`. The original
-throw-resumption domain uses default compiler options and the C backend,
-comparing native stdout with a constructed expected string. It retains seed
-`0x60001b00`; both domains retain 15 cases, 180-second deadlines and replay.
-All fourteen pinned B16 subjects remain whole and unadmitted. Their loop
-requires pass and four variants per subject through its original runner and
-collector settings. Their earlier diagnostic passes are distinct from the
-minimized counterexample and establish no new row.
-
-Main's inventory, subset, results, parity, ledger, owners and exclusions
-remain byte-identical. The source graph adds only F3 as ready/unlanded:
-89 nodes, 86 ready, three blocked and 51 landed. Final landed transitions
-and test expectations stay Root-owned. Array, Set, RegExp and TCO source
-and admission are not restored. No native, model or Full run is claimed;
-exact-source validation, D3, affected review and publication remain pending.
-
-
-Observation batch 16 source-bound preparation
----------------------------------------------
-
-This branch prepares 467 original rows from the accepted leading
-observation on Source4 R db4104, with 407 passes, 41 expected
-negatives and 19 unsupported results. No fresh execution or publication is
-claimed. The original path/variant/source identities, active mixed-core
-owners and bounded existing-record assessments are documented in
-[the batch preparation](./docs/m5c-graph/observation-batch-16.md).
-Independent review, Root integration/D3 and required later observation
-remain pending; B18 and its failed partial evidence are untouched.
-
-
-Observation batch 17 source-bound preparation
----------------------------------------------
-
-This branch prepares 287 original rows from the accepted leading
-observation on Source4 R db4104, with 229 passes, 29 expected
-negatives and 29 unsupported results. No fresh execution or publication is
-claimed. The original path/variant/source identities, active mixed-core
-owners and bounded existing-record assessments are documented in
-[the batch preparation](./docs/m5c-graph/observation-batch-17.md).
-Independent review, Root integration/D3 and required later observation
-remain pending; B18 and its failed partial evidence are untouched.
-
-
-Main-only reanchor preparation
-------------------------------
-
-The earlier source-bound preparation and leading-run descriptions are
-historical evidence on R db4104; that original run failed later in B18.
-All original sources, negative phases, assertions and B18 reservations
-remain unchanged, with304 active remediation owners and17 existing ADR0016
-assessment bindings. They grant no new exclusion or publication approval.
-
-The subsequent Main-only execution used actual clean U
-`44d2c4f03d65f8742c043532a9bef909c852cce1`, tree
-`b83c495e945e76a508b76aef63e1e8859caeef8d`, with product code exact successful
-Main128d63. Its single stock scoped command was:
-
-~~~~ sh
-mise run test262:update:changed -- \
-    --baseline 128d63fcec3a625eca799f5bd9df8b9267b8c6b2
-~~~~
-
-It naturally completed0 on2026-10-25: all754 originals freshly observed,
-636passes,70expected negatives and48unsupported, pool8/retries0. The actual
-manifest update wrote0 partitions with6688 unchanged index/partition files;
-all29147 old Main records and all754 prepared values/tags remain exact.
-No expected value, owner, source or failure was normalized. Two naturally
-empty owned drains were15.106281s apart; source/dist/tool bindings held.
-
-[Actual command output, argv, bindings and owned drains](/data/m5c-b16-b17-main-scoped-observation-20261025/task_3335cb68b22b/ctx_fb50e986ca95/)
-are the fresh execution evidence. This observation-provenance commit records
-the genuine zero record delta after that actual U; it does not relabel the
-older R as a new U/R. The original leading packet and B18's semantic failure
-plus264 unreached paths remain preserved separately. All336 B18 paths remain
-unreviewed. Root owns actual D3, affected internal/ outer review judgment,
-final owners/exclusions, candidate gates and publication; no node is marked
-landed or final gate claimed here.
-
-The following Set contracts are restored for the standalone source
-preparation on Main `cf0902db`. Every historical execution result remains
-bound to its named source; none validates this new composition. Fresh
-in-memory structural checks and CHECK/hooks are recorded in the source
-preparation report. Runtime, reference and native execution, affected review,
-fresh full observations and exact candidate/Main gates remain pending.
-
-Earlier Set focus remains source-bound: `43b84b70` supplied the initial
-Linux ordinary/host-cc and sanitizer evidence. Source `c4bcb412`, recorded
-by `f5eff4b9`, later passed nine whole Linux commands with 23 total
-registrations, including twelve Set registrations and seven sanitizer
-self tests. Its Set loops derive 344 JavaScript subject/policy invocations
-plus four C registrations, which are not framework test counts. The first
-supervisor failure and two lock admissions remain historical facts. Neither
-source validates the subsequent integrity, identity or Main composition.
-
-
-Primitive Set C2 Annex boundary repair
---------------------------------------
-
-Exact C2 ceca0314 failed one Mac Node registration with OSEO1001 at line
-130 of the unchanged preservedWrites Script, after successful deletion of a
-user-defined Object.prototype.__proto__ setter. The complete source matches
-independent Node and Deno Script references. This is a semantic candidate
-failure, not a deadline or runner-variation diagnosis.
-
-The first repair passed six complete Node/Deno focused commands on Linux
-AMD64, with 20 actual test registrations and natural drain. The original
-Script, deletion/realm controls and Set resource assertions remain intact.
-Those observations bind to 1c96126b. A later independent native review probe
-found an additional freeze/seal metadata defect, so the initial passes do
-not establish a clean or complete integrity correction.
-
-The current source correction represents private accessor metadata and
-unavailable getter/setter halves explicitly. Ordinary and Proxy own-key,
-descriptor and integrity paths share presence, attributes and creation order;
-core reflection exposes stable native identities while invocation of an
-excluded getter/setter body keeps the Annex dependency diagnostic.
-Real descriptors, failed deletion, user function identity, trap/abrupt order,
-realm isolation, primitive Receiver identity and strict/sloppy Set behavior
-retain their core contracts. *PLAN-M5.md* records the bounded representation,
-unchanged static layouts and logical policy functions, dynamic snapshot
-root counts and exact pending validation limits.
-
-The original arbitrary, seeds, cases, limits and assertions remain; the
-existing property adds a fresh bounded integrity subject without replacing
-its old program. No classification, exclusion, admission, owner, graph flag
-or result changes. Source-only reference checks do not replace focused
-native, affected review, fresh full observations or exact candidate/Main
-requirements. Root separately owns D6 composition and any later integration
-of this repair; Core Ucda contained none of this source.
-
-
-Set integrity native8 on the fixed no-TCO source
-------------------------------------------------
-
-After separate execution authorization, exact clean
-`eab6f36600fa8863d17a84533711392e07d9955f`, tree
-`2b70928606de831887956979f09e03d179da6db7`, ran these whole commands
-once, sequentially, on Linux AMD64. All naturally exited zero: 28 actual
-passing registrations, 14 per bootstrap host, with no skipped registrations.
-
-| Whole command                                                                      | Passed | Wall seconds |
-| ---------------------------------------------------------------------------------- | -----: | -----------: |
-| `node --test tests/annexb-proto-boundary.test.ts`                                  |      9 |    92.387790 |
-| `deno test -A tests/annexb-proto-boundary.test.ts`                                 |      9 |    67.327571 |
-| `node --test tests/property/m5-annexb-proto-boundary.property.test.ts`             |      1 |    35.376709 |
-| `deno test -A tests/property/m5-annexb-proto-boundary.property.test.ts`            |      1 |    37.520988 |
-| `node --test tests/property/m5-primitive-receiver-inherited-set.property.test.ts`  |      3 |   111.521138 |
-| `deno test -A tests/property/m5-primitive-receiver-inherited-set.property.test.ts` |      3 |   131.585252 |
-| `node --test tests/primitive-set-array-interop.test.ts`                            |      1 |     1.903703 |
-| `deno test -A tests/primitive-set-array-interop.test.ts`                           |      1 |     4.741917 |
-
-All 8,043 tracked hashes/modes and exact clean HEAD/tree were verified after
-each command, followed by natural owned PID/starttick and scope drain with
-two observations 15 seconds apart, without signals. Each installed heavy
-gate used a fresh capacity prefix with gates=1, choom1000, jobs1, the assigned
-Wrapper Zig cache and an external task TMPDIR. Full argv, raw outputs,
-framework counts, walls, source inventories and process/scope observations
-are sealed under
-*/data/m5c-set-integrity-native8-20261025/task\_af9240358454/*.
-
-Original domains, seeds, 12-case budgets, 180/240-second limits, both policies,
-forced collection, guard misses/fallbacks, diagnostic oracles and root/realm
-retry checks remain. The allocation registrations actually compiled the
-old-prefix and full old-property layout assertions on this Linux ABI. The
-generic driver passed its seven callback assertions and balanced teardown.
-Numeric successful-case counters/sizes and temporary C/MIR/binaries were not
-retained as output. Dynamic snapshot key/root counts and costs can differ.
-
-These are ordinary focused command walls, not extended case sums, macOS
-measurements, sanitizer proof or cost bounds. The 134-entry 409/296 fallbacks
-remain unmeasured estimates; no 900 entry or budget change follows. The
-native input remains eab6 even when later evidence documentation has a new
-commit identity. Affected review, fresh D3/full observations, outer/owner
-checks and exact candidate/Main gates remain pending under Root ownership.
-
-
-For-in virtual-key consumer correction
---------------------------------------
-
-The later for-in correction preserves the source-bound eab6 native8 facts
-above while preparing a changed implementation. Ordinary enumeration must
-include enumerable omitted metadata in creation order and retain hidden own
-metadata for shadowing; inherited primitive enumeration uses rooted ToObject.
-The new fixed programs, independent reference/emission test, allocation-failure
-fixture and third fresh Annex property subject are named in *PLAN-M5.md*.
-All old programs/oracles, arbitrary inputs, seeds, cases and hard limits stay.
-
-The required focused validation now has 40 actual passing registrations
-across two explicitly bound inputs. Whole commands 1-8 passed 28 on clean
-`46933fd3ec1a16362350ccc32b5dec27a2d1c496`, tree
-`5e37a71dee909cf911e50580f30ff09e81e28f98`. Command 9 then naturally
-failed its C fixture's positive collection assertion: the counter required
-observation to be enabled. That phase remains 29 passes/one failure;
-commands 10-14 never started there. Its raw output, failed C/binary and
-natural drain are retained unchanged.
-
-The fixture-only correction on clean
-`97f06518d12f5fb9c8af8b8037299c6197b55845`, tree
-`8f98244f38d468c0ea058c10ae9ed2c89144e24f`, adds only
-`context.observe_specialization = true;`. Every assertion, five-kind sweep,
-retry, realm/root check, teardown and default limit remains. All other
-8,046 tracked files/modes are exact, including runtime, test programs,
-oracles, generators and flags. Under the explicit unchanged-input evidence
-rule, commands 1-8 retain their 46933 binding; they were not rerun on 97.
-After separate execution GO, the six whole commands 9-14 passed 12 actual
-registrations on 97. No all-fourteen-on-97 result is claimed.
-
-| Ordinal | Whole command                                                                      | Source | Passed | Wall seconds |
-| ------- | ---------------------------------------------------------------------------------- | ------ | -----: | -----------: |
-| 1       | `node --test tests/annexb-proto-boundary.test.ts`                                  | 46933  |      9 |    99.520975 |
-| 2       | `deno test -A tests/annexb-proto-boundary.test.ts`                                 | 46933  |      9 |    87.007306 |
-| 3       | `node --test tests/property/m5-annexb-proto-boundary.property.test.ts`             | 46933  |      1 |    64.951403 |
-| 4       | `deno test -A tests/property/m5-annexb-proto-boundary.property.test.ts`            | 46933  |      1 |    62.961854 |
-| 5       | `node --test tests/property/m5-primitive-receiver-inherited-set.property.test.ts`  | 46933  |      3 |   153.286201 |
-| 6       | `deno test -A tests/property/m5-primitive-receiver-inherited-set.property.test.ts` | 46933  |      3 |   150.355762 |
-| 7       | `node --test tests/primitive-set-array-interop.test.ts`                            | 46933  |      1 |     2.106310 |
-| 8       | `deno test -A tests/primitive-set-array-interop.test.ts`                           | 46933  |      1 |     3.455743 |
-| 9       | `node --test tests/annexb-for-in.test.ts`                                          | 97f065 |      2 |    14.573503 |
-| 10      | `deno test -A tests/annexb-for-in.test.ts`                                         | 97f065 |      2 |    18.845015 |
-| 11      | `node --test tests/property/m5-for-in.property.test.ts`                            | 97f065 |      2 |    30.717361 |
-| 12      | `deno test -A tests/property/m5-for-in.property.test.ts`                           | 97f065 |      2 |    33.836163 |
-| 13      | `node --test tests/property/m5-for-in-object-pattern.property.test.ts`             | 97f065 |      2 |    36.476596 |
-| 14      | `deno test -A tests/property/m5-for-in-object-pattern.property.test.ts`            | 97f065 |      2 |    39.730977 |
-
-Each admitted command ran whole once with default limits, original seeds,
-cases, policies, forced-GC/assertion/oracle behavior and no filters, scaling
-or retry. Every source freeze covered 8,047 hashes/modes and exact clean
-HEAD/tree. Natural owned PID/starttick and scope drain passed after each
-return, with two observations 15 seconds apart and no signals. Every
-installed HEAVY gate used fresh local capacity/gates1, choom1000, jobs1,
-the Wrapper cache and an external task TMPDIR; no compiler probe or warmup.
-The positive collection assertion passed after the observation correction;
-no numeric successful-case counters or sizeof values were printed.
-
-The immutable source-bound packets are
-*/data/m5c-set-forin-native14-20261025/task\_af9240358454/* for the original
-28 passes and real command 9 failure,
-*/data/m5c-set-forin-observation-fix-20261025/task\_af9240358454/* for the
-one-line correction and normal hook, and
-*/data/m5c-set-forin-followup6-20261025/task\_af9240358454/* for the six
-follow-up passes. Their recursive SHA lists contain 133, 170 and 92 entries.
-The earlier eab6 packet remains historical evidence on its own input.
-
-These ordinary Linux walls are not extended case sums, macOS measurements,
-sanitizer proof, CI gates or scheduling bounds. Dynamic candidate/root
-allocations may differ despite unchanged static layouts. The 134-entry
-409/296 fallbacks remain unmeasured estimates; no weights, shards, budgets,
-Array/F3 contracts, owners or classification data change. Affected review,
-fresh observations and exact candidate/Main gates remain pending. The
-required Array CI failure blocked that historical bundle, not standalone
-Set preparation. Old PASS samples cannot establish a current deadline bound.
-
-
-Standalone Set source preparation on successful Main
-----------------------------------------------------
-
-This private source candidate starts from exact successful Main
-`cf0902db05ee8a51a2801f5d70372bfc5ca37b48`. It retains only the complete
-Set Receiver, descriptor/integrity, reflected-identity and for-in consumer
-unit from fixed source `2992ee7ca78516449e4f569a7f494ebbb6a1743d`.
-The two generic interop preparation/helper files use exact `b45d28ea`
-versions, preserving the original fifth Script/oracle without TCO assertions.
-Main's linear own-index lookup, array truncation, call/GC/realm and backend
-source, and public `m5-135` ABI remain. Both actual graph dependencies,
-computed-member-reference-key-order and primitive-wrapper-objects, are
-already landed; no unlanded Array or TCO prerequisite is introduced.
-
-Source preparation permits only focused pure structural/unit checks and
-normal CHECK/hooks. These do not execute the runtime, validate native
-layout/allocation/realm/GC assertions, or create observation evidence.
-Historical results above retain their exact inputs. Fresh source review,
-whole reference/native/sanitizer scopes, actual D3 and full UPDATE, and exact
-candidate/Main CI were Root-owned later stages at that initial preparation
-step. All inventory paths, reviewed observations, classifications, owners,
-exclusions, pins, budgets and graph state then remained exact Main; Set was
-ready and unlanded. Publication candidates mark landed prospectively; only
-successful equal-tree Main CI makes that state effective.
-
-
-Reg helper source preparation on fixed Set/Array/B
---------------------------------------------------
-
-This private Reg-only source starts from successful Array/B Main
-`d4d81be99c224af282f9e3da5945f6675958e4c5`, tree
-`7d8956d5748c925f2e143b937cb1cb82428cbeaf`. Its five Reg helper, BSD
-license and test blobs remain exact accepted source
-`78bdbd0fe1b05c5d28b0eaf1f7a74a441341d6bf`, which restored them from
-`2868cf66250c072e6f0d5072564b3e1ec64df2f4`. The JavaScript-only WKI scan
-retains the license in its filesystem inventory without parsing it as code.
-No compiler, runtime, Array, Set, TCO, scheduling, Unicode data or baseline
-change is imported from that old source.
-
-The helper keeps the original operations, 10,000-code-point chunks, data and
-assertions, aggregate matching and symbol fallback, UTF-16 behavior, abrupt
-effects and `lastIndex`. The pure suite retains all 441 supplied Unicode 17
-property sets and complements. The native suite retains all four whole
-registrations and 16 invocations; its presence is not a current execution.
-The original 44 whole-Script baseline remains blob
-`43a6e39af8dcd1695024e7d0a0b3e168d773ea19`. All Set/Array/B source and
-contracts, observations, subset expectations, ledger owners, feature pins,
-profile classes outside the Reg hunks, seeds and budgets stayed intact at
-that source preparation step.
-
-At that source preparation step, all 453 inherited helper-owned rows
-remained harness-definition unsupported:
-441 property-escape paths and 12 CharacterClassEscapes paths. The old Full
-on source `2868cf66`, result `f68583d5`, observed 450 promotions and three
-matcher-limit results under its different compiler/runtime. Those records,
-promotions and owner transfers are not copied here. New classifications and
-any exact remaining matcher ownership require Root's fresh actual Full and
-judgment; Array performance alone establishes no matcher repair or exclusion.
-The historical prospective matcher plan and its graph/test-count changes
-were deferred to Root's observation and ownership phase.
-
-Root confirmed Array Main `d4d81be9`, all 79 jobs and workflow success,
-with the exact candidate tree, before authorizing this port. Main's 90-node,
-56-landed graph and B's unchanged routing, aggregate, budgets and 137-file
-property inventory remain. No source, admission, observation or ownership
-from the separate TCO option enters this Reg-only preparation.
-
-All production packages, runner interfaces, toolchain and input data are
-compared with original accepted source `78bdbd0f`. Root owns D1.9 retention
-of that source's internal12, outer10 and author Native4/16 after the exact
-fidelity proof; no new model or Native is implied by a provenance port.
-At source preparation, Reg still required a fresh Full on its actual source.
-Old Full, review, Native and cost observations retain their original sources.
-Root owns review retention, later execution and publication.
-
-
-Reg helper fresh result and bounded matcher ownership
------------------------------------------------------
-
-The normal Full read clean Reg-only U
-`6e5ebf2effdcedc5f0205e1af22f71606d7b9726`, tree
-`1675bcb961d0a54b3dadeddd2d50cea307a42bac`, on successful Main
-`d4d81be99c224af282f9e3da5945f6675958e4c5`. The stock
-`mise run test262:update -- --accept-promotions` ran from
-2026-10-26T22:52:48.301365Z to 2026-10-27T00:42:18.272375Z and exited
-naturally zero after 6,569.970938 seconds. Root accepted the preserved raw
-outputs and two empty descendant drains before result preparation. The
-source-qualified packet is *FULL-RAW-REPORT.md* under
-[the source-bound packet](/data/m5c-regexp-source-finisher-20261027/task_b37691673a89/ctx_5a047fc6c8f8/solo-source-preparation/FULL-RAW-REPORT.md).
-
-Actual totals are 29,901 reviewed, 26,052 passes, 2,802 expected negatives
-and 1,047 unsupported, with no semantic, harness or infrastructure failure.
-Exactly 450 paths promoted: all 441 property escapes and nine
-CharacterClassEscapes, each with all four actual variants. All other 29,448
-complete records remain byte-identical to U, and all 11,190 unreviewed paths
-remain unobserved. The original three positive non-digit, non-whitespace
-and non-word CharacterClassEscapes subjects retain matcher-limit diagnostics.
-Each contains only the first deciding non-strict/disabled variant; no later
-strictness, policy or standard/Unicode-pattern result is inferred.
-
-Canonical ledger derivation makes the 450 passes ordinary observations.
-At result preparation, only the three remaining unsupported owners moved
-to the then-blocked, unlanded
-*regexp-anchored-repeat-state-remediation* node. Its linked worknote
-preserves the bounded historical plan and qualifies its static undo-trail
-lead against unchanged matcher sources. This adds no runtime repair,
-accepted exclusion or predicted promotion. That result-preparation graph
-had 56 landed, 91 nodes, 87 ready and four blocked.
-
-The preserved publication candidate `98460f7c` instead records 91 nodes,
-88 ready, three blocked and 57 prospective landed marks. It marks Reg
-landed prospectively and the remediation ready and unlanded. These marks
-are not evidence of successful exact merge/Main CI; Root owns effective
-landing and final publication state.
-
-This single Linux Full is neither a current hosted-CI cost measurement nor
-a macOS observation. The 1,803 actual Reg variants are 450 times four plus
-three deciding variants. The unchanged reviewed path order still partitions
-into eight Linux and twelve macOS test262 shards. Current per-shard duration,
-variance and Mac cost remain unknown until source-qualified candidate CI.
-The helper adds no property file or weight change; B's 79-job workflow,
-40 Mac jobs, 137 property files and all budgets remain unchanged. Actual
-result/ownership internal and outer review, D3, final CHECK/canonical and
-exact candidate/Main gates remain Root-owned pending work.
-
-
-Proper tail calls
------------------
+contracts. Runtime ABI `m5-135` records them.
+
+Dynamic Unicode properties, class sets, unlinked case folding, and the
+non-ASCII identity escape without `u` keep their located boundary, so the
+capability stays in the runner's vocabulary. No exclusion is proposed, and no
+dynamic source text is admitted beyond the pattern grammar RegExp construction
+already compiled.
+
+### Proper tail calls
 
 The `proper-tail-calls` node implements ECMA-262 15.10 rather than seeking an
 exclusion; no accepted record excludes it. A call is a tail call exactly when
@@ -1902,39 +1331,41 @@ depth, frame budget, and roots. `Function.prototype.call`,
 their PrepareForTailCall steps require. Bound function and Proxy [[Call]]
 forward the same way because neither creates an execution context. A derived
 constructor's tail call carries its `this` binding cell, so the constructor
-result rules apply to the chain's final value. `console.log`, `setTimeout`,
-and `clearTimeout` also run as recorded host steps in tail position. All
-arguments, including unused extras and spread iteration, evaluate before
-recording and releasing the frame. `clearTimeout` keeps its existing
-numeric-handle-only behavior and undefined result; no user conversion runs.
-PrepareForTailCall requires releasing transient resources before the target
-even when the target runs no user code or allocation.
+result rules apply to the chain's final value.
+
+`console.log`, `setTimeout`, and `clearTimeout` also run as recorded host steps
+in tail position. All arguments, including unused extras and spread iteration,
+evaluate before recording and releasing the frame. `clearTimeout` keeps its
+existing numeric-handle-only behavior and undefined result; no user conversion
+runs. PrepareForTailCall requires releasing transient resources before the
+target even when the target runs no user code or allocation.
 
 A call outside tail position keeps nesting its frame and the 256-call limit.
 A chain of wide frames can exhaust the active native frame budget first,
 which the host C compiler lane reaches sooner because it charges each slot
 past the 32-slot base eight times. Because forwarding no longer nests, a
-non-tail call through a bound function or Proxy now uses one call level fewer
-for that wrapper. A strict chain of tail calls with no base case now runs until
+non-tail call through a bound function or Proxy uses one call level fewer
+for that wrapper. A strict chain of tail calls with no base case runs until
 it is stopped instead of reporting `OSEO2001`, as the specification requires.
-Runtime ABI `m5-136` reserved this contract; U68 used `m5-137` for
-the additional owner-local collector counts. The later environment bitmap
-source uses `m5-139`, as recorded in the current preparation below.
+Runtime ABI `m5-136` reserved this contract. `m5-137` is used for the
+additional owner-local collector counts. The environment bitmap source uses
+`m5-139`.
 
-The source implements proper tail calls and restores the reviewed
+The source implements proper tail calls and restores the
 *tests/test262/harness/tcoHelper.js* that keeps `$MAX_ITERATIONS` at
-100,000. It owns the two reviewed tagged-template paths
+100,000. It owns the two tagged-template paths
 *test/language/expressions/tagged-template/tco-call.js* and *tco-member.js*;
-the full UPDATE on U`68e298a9` observed both as pass with the original
-100,000-depth helper and both specialization policies. The accepted
-`--accept-promotions` output changes exactly their two expectations and
-records. The single `tail-call-optimization` admission remains the 147th
-feature. The current-source evidence and its limits are recorded below;
-source admission alone supplies no candidate/Main gate pass. Earlier
-focused execution on `353a9f17` remains historical.
+both pass under both specialization policies. The `--accept-promotions`
+output changes exactly their two expectations and records. The single
+`tail-call-optimization` admission remains the 147th feature. The
+[TCO evidence contract](docs/evidence/proper-tail-calls-u68-20261027.md)
+records the current-source evidence and its limits, and
+[the source preparation records](#source-preparation-records) hold the earlier
+sources.
+
 The fixed inventory tags 35 paths with the feature, all applicable and none a
-negative test. The other 33 remain unreviewed and keep their
-`observation-batch-32` reservation, whose planning basis is unchanged.
+negative test. The other 33 were reserved for `observation-batch-32`.
+
 Evidence lives in *tests/property/m5-proper-tail-calls.property.test.ts*
 (seeds `0x60008900` through `0x60008902`), *tests/proper-tail-calls.test.ts*,
 *tests/native/fixtures/proper-tail-calls.ts*,
@@ -1949,271 +1380,26 @@ predicted to exhaust the budget must stop with exactly that guard's
 diagnostic; every other draw keeps the exact semantic comparison, and both
 references always match the semantic model.
 
-The non-tail property's catch-finally context exposed a C backend defect that
-predates this node: it reproduces at the parent commit and in non-strict code
-with no tail call. A completion target is entered only through a
-`resume-completion` switch, which names every block emitted for its body, but
-reachability followed completion targets unconditionally. A body whose every
-`finally` leaves abruptly, such as one whose catch always returns or one that a
-`break` or `continue` crosses before returning, therefore emitted a label with
-no `goto`, and both toolchains' `-Werror` rejected the program. Reachability now
-defers completion targets until a `resume-completion` terminator is reachable in
-the same body, including generator entry and body partitions. The target block 0
-that a `return`, `throw`, or normal completion saves is a sentinel that no
-dispatch names, so reachability never defers it: a generator, async, or async
-generator body that starts after a non-simple parameter prologue does not emit
-that prologue's blocks again. Blocks it drops had no incoming jump; a function
-whose only dispatch lay in such dead code also loses that code, which can lower
-its declared frame slots. *tests/completion-target-labels.test.ts* checks the
+A completion target is entered only through a
+`resume-completion` switch, which names every block emitted for its body.
+Reachability once followed completion targets unconditionally, so a body whose
+every `finally` leaves abruptly, such as one whose catch always returns or one
+that a `break` or `continue` crosses before returning, emitted a label with no
+`goto`, and both toolchains' `-Werror` rejected the program. The non-tail
+property exposed this C backend defect; it predates this node and reproduces in
+non-strict code with no tail call. Reachability defers completion targets until
+a `resume-completion` terminator is reachable in the same body, including
+generator entry and body partitions. The target block 0 that a `return`,
+`throw`, or normal completion saves is a sentinel that no dispatch names, so
+reachability never defers it: a generator, async, or async generator body that
+starts after a non-simple parameter prologue does not emit that prologue's
+blocks again. Blocks it drops had no incoming jump; a function whose only
+dispatch lay in such dead code also loses that code, which can lower its
+declared frame slots. *tests/completion-target-labels.test.ts* checks the
 emitted labels and the dispatch it keeps, and the *proper-tail-calls* native
 fixture and *tests/proper-tail-calls.test.ts* run the affected shapes.
 
-
-Historical TCO source on the Array base
----------------------------------------
-
-Initial preparation composed TCO `145819bd` on Set candidate
-`a111c31eacb22f07ee514dab4372504b7470b161`, tree
-`072862e2760631542d41cf777d4e75c5d6014924`. That candidate failed CI:
-the prototype-root allocation injection still matched `3u` instead of
-Set's actual `4u`. Its provisional TCO child `54973309` remains preserved.
-
-The complete owned TCO delta `9945b7b8` to `b1eaeff0` is now prepared on
-Array U`cccb7195c1eb01a3963ffa043bafe045c333ff73`, tree
-`89d907b342885089374ffadd53eff606d31e6131`. All thirteen Array paths remain
-exact, including three runtime hunks, six coverage files, graph contract
-and the final source-qualified worknote. Set's locator correction and both
-Root state-paragraph corrections remain. TCO `1a305507`/incomplete32 and
-`b1eaeff0`/normal33 keep their original targets and outcomes; neither is
-new-source execution or a complete admission gate.
-
-At initial preparation, successful effective Main was `cf0902db` with 54
-landed nodes. The base has prospective Set55; Array and TCO remain unlanded.
-Root's then-running standalone Array Full used immutable `cccb7195`,
-which excluded TCO and had 146 features. It is distinct from the later
-combined-source U`68e298a9` Full recorded below. All fifteen TCO production
-postimages stay exact
-`b1eaeff0`; thirteen product postimages
-remain exact `145819bd`/`baf6f7d7`. The header and Proxy merge only the TCO
-record declarations and two Call forwarding changes over Set's omitted
-accessor/signature/descriptor/identity/invariant state. Set/Get/descriptor
-traps retain post-call work; Construct is unchanged. GC `795d3c82` remains
-origin, not `baf6f7d7` or `833c99ef` ancestry; `ed7b5ddd` changed prose only.
-
-The original Main chunk/include/static/coordinate/frame contracts and both
-completion-reachability repairs remain. Complete Set Receiver/key/RHS/
-wrapper roots surround the setter's public call, which drains tail steps
-before returning normal; assignment returns its original RHS. The existing
-Set fifth Script/oracle retains all callbacks and source bytes, with exact
-positive tail/owner/host/fragment assertions replacing deferred no-tail
-checks. All four TCO programs, generator frame guards, policies and budgets
-remain. No old fifth-case replacement, rejected Array packing or B8/RegExp
-source is imported. The guarded Array lookup/insertion/truncation paths
-are preserved, including all generic fallbacks, coercion and rollback.
-
-Their interactions with apply argument-list roots, primitive Receiver/RHS,
-pending tail arguments, reentry and collector ownership received bounded
-D1.9 interaction review and the U`68e298a9` focused execution below. The Array
-worknote's compiler, Native and performance statements
-speak to its named standalone sources, including `cccb7195` before this TCO
-overlay. They are not new combined-source claims. Set U`071e447d`/R`868da1d6`,
-TCO `145819bd` checks, `b1eaeff0` reviews and frozen older Array proofs keep
-their exact sources. Pure checks, current-source Native, actual D3/Full/R,
-outer review and exact candidate/Main gates remain separate Root phases.
-
-The faithful helper keeps MAX\_ITERATIONS 100,000 with its original license.
-Only its runner entry and the one source feature admission return. The two
-reviewed subjects now have actual U`68e298a9` pass observations, with
-exactly their two expected classifications promoted by the original Full.
-The other 29,899 stored records remain byte-identical. The derived ledger
-moves these two paths to observation ownership; inventory, policy, ADRs
-and all other ownership assignments remain unchanged. The historical
-Array-bound author runs below do not validate this composition; the current
-U`68e298a9` evidence is separate and supplies no candidate/Main gate pass.
-The other 33 TCO paths remain unreviewed under batch32. The accepted B32
-source packet still covers 199 unreviewed
-paths/191 units; it grants no execution, admission or observation authority
-here.
-
-Historical internal24 Fable/outer14 Astra completed on `833c99ef`, retaining
-prior `05c1f074` scopes under D1.9. Native10's 76 passing registrations and
-935 hashes belong to `05c1f074`; matching donor/test bytes do not certify this
-new composition. Shared internal26 was a clean Set-profile review counted
-25/cap25, not new TCO execution or permission for another review. The old
-`1fd374f6`/CI40165660431 liveness interruption at 39/60 remains failed
-incomplete coverage, without a proven semantic counterexample, runner
-variance, new-source performance benefit or deadline margin.
-
-Root owns affected independent review and its permission, later source
-validation, actual D3, full observation, exact candidate/Main gates and
-adoption. The focused results below belong only to their fixed source; they
-are separate from restoration and this Main-specific composition.
-
-
-Historical focused TCO execution on Array 353a9f17
---------------------------------------------------
-
-Six serial command vectors completed naturally with exit zero on
-`353a9f17631b808a5131f49fcff0b16396aa72f4`, tree
-`3f35347e3c680523283a978e2658520340d6e9ab`. Product, test and stored
-observation inputs stayed unchanged across these runs. The table gives
-actual UTC start/end times on 2026-10-26 and whole-command wall seconds,
-including normal build dependencies where present. Counts are framework
-registrations and overlap between vectors; they are not unique program or
-standards-path totals. Each linked command record retains the exact argv;
-the adjacent raw output retains the original framework results.
-
-| Vector and command record                                                                                                                                          | Framework result           | UTC start → end                   |  Wall seconds | Raw output                                                                                                                                                                                                                                                                 |
-| ------------------------------------------------------------------------------------------------------------------------------------------------------------------ | -------------------------- | --------------------------------- | ------------: | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| [Runtime C, Node](/data/m5c-tco-on-array-source-preparation-20261026/task_5050fd25ca66/ctx_001ac7c9581a/runtime-c-native01/whole.json)                             | 3 passed                   | 06:42:46.034303 → 06:43:02.837694 |  16.803306844 | [stdout](/data/m5c-tco-on-array-source-preparation-20261026/task_5050fd25ca66/ctx_001ac7c9581a/runtime-c-native01/whole.stdout), [stderr](/data/m5c-tco-on-array-source-preparation-20261026/task_5050fd25ca66/ctx_001ac7c9581a/runtime-c-native01/whole.stderr)           |
-| [Seven files, Node/Zig](/data/m5c-tco-on-array-source-preparation-20261026/task_5050fd25ca66/ctx_001ac7c9581a/backend-native02-node/whole.json)                    | 27 passed                  | 07:01:43.038141 → 07:03:35.406845 | 112.368594562 | [stdout](/data/m5c-tco-on-array-source-preparation-20261026/task_5050fd25ca66/ctx_001ac7c9581a/backend-native02-node/whole.stdout), [stderr](/data/m5c-tco-on-array-source-preparation-20261026/task_5050fd25ca66/ctx_001ac7c9581a/backend-native02-node/whole.stderr)     |
-| [Seven files, Deno/Zig](/data/m5c-tco-on-array-source-preparation-20261026/task_5050fd25ca66/ctx_001ac7c9581a/backend-native03-deno/whole.json)                    | 27 passed                  | 07:06:02.940529 → 07:08:18.225431 | 135.284805903 | [stdout](/data/m5c-tco-on-array-source-preparation-20261026/task_5050fd25ca66/ctx_001ac7c9581a/backend-native03-deno/whole.stdout), [stderr](/data/m5c-tco-on-array-source-preparation-20261026/task_5050fd25ca66/ctx_001ac7c9581a/backend-native03-deno/whole.stderr)     |
-| [Sanitizer self then seven files, Node/host-cc](/data/m5c-tco-on-array-source-preparation-20261026/task_5050fd25ca66/ctx_001ac7c9581a/focused04-hostcc/whole.json) | 7 self + 27 focused passed | 07:24:18.929764 → 07:26:46.918346 | 147.988489038 | [stdout](/data/m5c-tco-on-array-source-preparation-20261026/task_5050fd25ca66/ctx_001ac7c9581a/focused04-hostcc/whole.stdout), [stderr](/data/m5c-tco-on-array-source-preparation-20261026/task_5050fd25ca66/ctx_001ac7c9581a/focused04-hostcc/whole.stderr)               |
-| [Ordinary TCO property, Node/Zig](/data/m5c-tco-on-array-source-preparation-20261026/task_5050fd25ca66/ctx_001ac7c9581a/focused05-property-node/whole.json)        | 4 passed                   | 07:32:43.187008 → 07:33:12.879089 |  29.692002525 | [stdout](/data/m5c-tco-on-array-source-preparation-20261026/task_5050fd25ca66/ctx_001ac7c9581a/focused05-property-node/whole.stdout), [stderr](/data/m5c-tco-on-array-source-preparation-20261026/task_5050fd25ca66/ctx_001ac7c9581a/focused05-property-node/whole.stderr) |
-| [Ordinary TCO property, Deno/Zig](/data/m5c-tco-on-array-source-preparation-20261026/task_5050fd25ca66/ctx_001ac7c9581a/focused06-property-deno/whole.json)        | 4 passed                   | 07:34:30.262674 → 07:35:02.645763 |  32.383001814 | [stdout](/data/m5c-tco-on-array-source-preparation-20261026/task_5050fd25ca66/ctx_001ac7c9581a/focused06-property-deno/whole.stdout), [stderr](/data/m5c-tco-on-array-source-preparation-20261026/task_5050fd25ca66/ctx_001ac7c9581a/focused06-property-deno/whole.stderr) |
-
-The runtime-C command used `mise run test:node --` with
-*tests/runtime-tail-calls.test.ts*, *tests/runtime-ephemeron.test.ts* and
-*tests/runtime-weak-collection.test.ts*. It compiled handwritten C fixtures
-for Linux AMD64 with the original ASan/UBSan flags and ordinary/forced-GC
-weak-record checks. Its two AArch64 Linux outputs were compile-link checks,
-not executions. It does not exercise backend-generated JavaScript bodies.
-
-The seven-file vectors retain this ordered whole-file input set:
-
-~~~~ text
-tests/proper-tail-calls.test.ts
-tests/test262-tail-call-optimization.test.ts
-tests/tco-generator-interop.test.ts
-tests/primitive-wrapper-objects.test.ts
-tests/materialized-body-native.test.ts
-tests/completion-target-native.test.ts
-tests/yield-star-throw-callability.test.ts
-~~~~
-
-The Node vector used `mise run test:node --`; Deno used `deno test -A`.
-The host-cc vector used the failclosed shell chain
-
-~~~~ sh
-mise run test:sanitizer:self &&
-  env OSEO_NATIVE_TOOLCHAIN=host-cc mise run test:node --
-~~~~
-
-with the same seven files. Its seven selftests include four genuine positive
-ASan/UBSan runtime/generated-C detections and three separate fake compiler
-selection controls. The focused host-cc run selected Clang and retained its
-normal sanitizer checks. All focused native execution targets Linux AMD64.
-The ordinary completion AArch64 cross-link remains a compile-link check;
-its existing host-cc guard omits that cross-link in the sanitizer vector.
-No macOS native execution is supplied by these runs.
-
-The whole files retain both specialization policies, their original forced
-collection and root/frame/balance/resource guards, all original upstream
-variants and materialized physical-unit assertions. Node versus Deno names
-the test framework. Under Deno, the TCO-subject, interop and F3 files select
-DenoHost; proper-tail, wrapper, materialized and completion files literally
-create NodeHost. Reference commands retain their original selection:
-`process.execPath` follows the framework executable, while explicit Node and
-Deno references keep their named executable. Framework counts establish no
-global equivalence between those host paths or other semantic families.
-
-The property vectors used `mise run test:node --` and `deno test -A` on the
-single *tests/property/m5-proper-tail-calls.property.test.ts* file. Each ran
-three native domains and one pure generator-contract registration. They
-retain the original 8/8/6 draws, seeds `0x60008900` through `0x60008902`,
-small size, 500-depth/6-extra-argument limits, shrinking/replay and 180-second
-per-domain interruption. Both policies and enabled forced collection remain
-active. No property override was set. The file literally creates NodeHost
-under both frameworks. These ordinary runs do not complete the historical
-failed extended 39/60 run, establish new scheduling weights or prove deadline
-margin. The frame ceiling, call limit and host-cc charge remain unchanged.
-
-At that historical checkpoint, focused execution included the two original
-pinned TCO subjects without changing their unsupported expectations or
-stored records. All 29,901 rows, parity, owners, the 147-feature source list
-and seeds/budgets remained unchanged. `TCO-ADMIT-GATE` remained open pending
-fresh Full observations, actual promotions/R and affected review.
-Full UPDATE on that old Array-bound source did not run.
-Native935 remains evidence on `05c1f074`; these results cannot be relabeled
-as evidence on a later Array source or a completed internal review gate.
-
-
-Historical U68 TCO observations on the Array source
----------------------------------------------------
-
-The current execution source is
-`68e298a9a96a6d22dc2e33b9e70b7c6a86720e41`, tree
-`dcca1b0bf57b63d0446fab54c676f42a2ca19739`, directly on Array U`cccb7195`.
-Six focused whole-command vectors completed naturally on that fixed source:
-runtime C 3 registrations; Node integration 27; Deno integration 27;
-sanitizer self 7 followed by host-cc integration 28; ordinary Node
-properties 5; ordinary Deno properties 5. These overlapping framework counts
-include the whole Array property where named; they are not unique programs.
-All original TCO and Array domains, cases, seeds, budgets, policies, source
-oracles and shrinking/replay controls remained unchanged.
-
-The original whole Full UPDATE then ran as Root's explicit D10.1 leading
-execution, while the admission data finding awaited actual observations.
-It completed naturally on Linux AMD64 with exit zero, pool eight and zero
-retries. It observed all 29,901 reviewed paths: 25,604 pass, 2,802 expected
-negatives, 1,495 unsupported, and zero semantic, harness or infrastructure
-failures. Only the two owned strict tagged-template subjects changed from
-unsupported to pass. Their recorded execution retains the original helper,
-both specialization policies and the pinned source revision. No reviewed
-path was removed; all other 29,899 result records are byte-identical.
-The five generated output changes are preserved as actual Full output,
-without regeneration or normalization by hand.
-
-[*Current U68 evidence*](docs/evidence/proper-tail-calls-u68-20261027.md)
-records the commands, source, raw locations, timing and limits. Actual Full
-observations resolve the prior stale-data condition; the admission data
-gate closes only after its result commit and required affected reviews.
-Candidate/Main gates and adoption remain separate Root work. No old Native
-proof, mixed Reg/TCO promotion, unreviewed batch32 subject, macOS execution
-or failed extended interruption is relabeled as current-source evidence.
-
-
-TCO source preparation on the fixed Reg candidate
--------------------------------------------------
-
-This D10.4 preparation stacks final bitmap source `f5bdd44d` on Reg
-publication candidate `98460f7c2b6605850c0889aea6efbe70dc24d27a`, tree
-`d6723be80209aca0fcf0606c5c3e5959f152ad0c`, based on successful Main
-`d4d81be99c224af282f9e3da5945f6675958e4c5`. Reg is prospective until
-Root verifies its exact candidate/merge Main CI; TCO stays unlanded.
-Compiler/runtime, tests, generators, the accepted native runner logger
-and ABI `m5-139` retain final f5 source. The separate leaf proposal is absent.
-
-The source admission adds only the original U`68e298a9`
-`tail-call-optimization` entry. Reg's 29,901 complete records, 450 observed
-promotions, three matcher-limit owners, 41,091 ledger paths and 11,190
-unreviewed reservations stayed exact at source preparation. Both TCO path
-expectations then remained unsupported until a new Full actually observed
-promotions. No historical
-R`7cb0ce0d` output or publication state is transplanted. The approved
-sanitizer property job backstop remains 60 minutes; ordinary fixture
-limits, seeds, budgets, depths and shard totals remain unchanged.
-
-The evidence contract records source-bound f5 author checks and their
-limits. They did not run on this composition. New implementation inputs
-require fresh Full observations under D3; Root owns the actual decision,
-execution, affected independent review and publication.
-
-After Root accepted the source review of U`e2dba363`, one unchanged
-`mise run test262:update -- --accept-promotions` ran on that clean source
-from 2026-10-27T04:28:26Z to 06:22:20Z and exited zero. It observed all
-29,901 reviewed paths: 26,054 pass, 2,802 expected negatives and 1,045
-unsupported, with zero retries. Exactly the two owned tagged-template paths
-were promoted from unsupported to pass, with no demotion. The result commit
-keeps that output unchanged and derives ledger ownership, batch counts and
-the graph baseline from it; the node stays unlanded pending affected review
-and exact candidate/Main gates. The
-[TCO evidence contract](docs/evidence/proper-tail-calls-u68-20261027.md)
-records the raw packet and limits.
-
-
-Iterator helpers tag activation preparation
--------------------------------------------
+### Iterator helpers tag activation
 
 IH-A adds only `iterator-helpers` to `supportedFeatures`. A generic runner
 check classifies an unadmitted include as `unsupported-profile-feature`
@@ -2223,25 +1409,17 @@ This follows ADR 0013's named-capability distinction between unavailable
 harness support and defects in an admitted harness. The include itself
 is not admitted.
 
-The first completed 393-row precheck found two semantic failures in
-`Iterator.from` for String primitives. Root authorized the bounded repair
-and its fixed/generated evidence, described in *PLAN-M5.md*. The next
-single precheck observed 389 passes and four unsupported results with
-pool eight, no retries and no failure classifications. The
-[IH-A work note](./docs/m5c-graph/iterator-helpers-tag-activation.md)
-records the exact paths, raw packets and remaining remediation boundaries.
+The first 393-row precheck found two semantic failures in `Iterator.from`
+for String primitives. *PLAN-M5.md* describes their bounded repair and its
+fixed and generated evidence. The complete update then promoted 389 paths
+with no demotions; promoted paths take the observation owner. The update
+assigned the three *temporalHelpers.js* paths to `temporal-helpers-harness`
+(IH-B), which later promoted them, and *Iterator/proto-from-ctor-realm.js* to
+`dynamic-source-coverage-remediation`. The
+[IH-A work note](./docs/m5c-graph/iterator-helpers-tag-activation.md) records
+the exact paths, raw packets and remaining remediation boundaries.
 
-Root accepted the full UPDATE on U `a678c85e`: 389 promotions, no
-demotions, 26,456 passes, 2,802 expected negatives and 643 unsupported
-paths across all 29,901 reviewed cases. The ledger assigns the three
-*temporalHelpers.js* paths to `temporal-helpers-harness` (IH-B) and
-*Iterator/proto-from-ctor-realm.js* to
-`dynamic-source-coverage-remediation`. All promoted paths belong to their
-observations. The graph remains unlanded pending the later gates.
-
-
-Temporal helpers harness
-------------------------
+### Temporal helpers harness
 
 IH-B admits a reviewed subset of *temporalHelpers.js* for the three
 *Iterator/from/* paths that include it. The copy keeps `observeMethod`,
@@ -2257,19 +1435,61 @@ the first, static prediction of omitted-member reads with a runtime trap:
 the object runs behind a proxy that prints a per-case secret marker before
 throwing on any observation of an omitted member, and the runner
 classifies any marker, or a started program whose trap never armed, as a
-harness failure ahead of every other outcome. No other
-reviewed include is affected. A focused precheck observed the three paths
-as pass before the full UPDATE.
+harness failure ahead of every other outcome. No other reviewed include is
+affected.
 
-Root accepted the full UPDATE on U `6c0d46bd`: all 29,901 reviewed paths
-were observed, yielding 26,459 passes, 2,802 expected negatives and 640
-unsupported paths. It records exactly three promotions, the three
-*Iterator/from/* paths from `unsupported-profile-feature` to pass, and no
-demotions or failure classifications. The ledger now assigns them to
-`observation`, so `temporal-helpers-harness` owns no path. Carried
-onto Main `915ec6df` without a new observation, the same records give
-26,957 passes, 3,242 expected negatives and 1,111 unsupported paths
-across 31,310 reviewed cases. The trap redesign changes *tools/*, so
-these records stand only until Root's next full UPDATE. The
-[IH-B work note](./docs/m5c-graph/temporal-helpers-harness.md) records
-the decision, its tests and the raw packets.
+The complete update promoted exactly the three *Iterator/from/* paths from
+`unsupported-profile-feature` to pass, with no demotions or failure
+classifications. The ledger assigns them to `observation`, so
+`temporal-helpers-harness` owns no path. The
+[IH-B work note](./docs/m5c-graph/temporal-helpers-harness.md) records the
+decision, its tests and the raw packets.
+
+
+Source preparation records
+--------------------------
+
+Several landings were prepared as composed sources, split after a candidate
+failed, or reobserved on a new base. Their exact commits, commands, wall
+times, and raw packet locations are in
+[*docs/evidence/m5c-source-preparations/README.md*](./docs/evidence/m5c-source-preparations/README.md).
+Every node they served has landed, and the reviewed manifest and closure ledger
+hold the observations that replaced them. The records, by node:
+
+ -  `eval-intrinsic-value`, `regexp-pattern-extensions`,
+    `computed-member-reference-key-order`, and `primitive-wrapper-objects`:
+    [the source after the four-source candidate](./docs/evidence/m5c-source-preparations/README.md#source-preparation-after-the-four-source-candidate),
+    which dropped the proper-tail-call source.
+ -  `observation-batch-15`, `script-module-declaration-early-error`, and
+    `generator-dispatch-stack-charge`:
+    [batch 15](./docs/evidence/m5c-source-preparations/README.md#observation-batch-15-current-source-preparation),
+    [the generator continuation stack](./docs/evidence/m5c-source-preparations/README.md#generator-continuation-stack-source-preparation),
+    [the reduced three-unit source](./docs/evidence/m5c-source-preparations/README.md#reduced-three-unit-source-preparation-on-green-main),
+    and
+    [its observation](./docs/evidence/m5c-source-preparations/README.md#reduced-three-unit-observation-and-publication-candidate).
+ -  `yield-star-throw-callability`:
+    [the F3-only source](./docs/evidence/m5c-source-preparations/README.md#f3-only-source-preparation-after-the-array-candidate-failure),
+    prepared without the failed Array node.
+ -  `observation-batch-16` and `observation-batch-17`:
+    [batch 16](./docs/evidence/m5c-source-preparations/README.md#observation-batch-16-source-bound-preparation),
+    [batch 17](./docs/evidence/m5c-source-preparations/README.md#observation-batch-17-source-bound-preparation),
+    and
+    [their reobservation on Main](./docs/evidence/m5c-source-preparations/README.md#main-only-reanchor-preparation).
+ -  `primitive-receiver-inherited-set`:
+    [the Annex boundary repair](./docs/evidence/m5c-source-preparations/README.md#primitive-set-c2-annex-boundary-repair),
+    [focused native runs](./docs/evidence/m5c-source-preparations/README.md#set-integrity-native8-on-the-fixed-no-tco-source),
+    [the for-in consumer correction](./docs/evidence/m5c-source-preparations/README.md#for-in-virtual-key-consumer-correction),
+    and
+    [the standalone source](./docs/evidence/m5c-source-preparations/README.md#standalone-set-source-preparation-on-successful-main).
+ -  `regexp-property-escape-harness`:
+    [the helper source](./docs/evidence/m5c-source-preparations/README.md#reg-helper-source-preparation-on-fixed-setarrayb)
+    and
+    [its result](./docs/evidence/m5c-source-preparations/README.md#reg-helper-fresh-result-and-bounded-matcher-ownership),
+    which moved three matcher-limit paths to
+    `regexp-anchored-repeat-state-remediation`.
+ -  `proper-tail-calls`:
+    [the Array-base source](./docs/evidence/m5c-source-preparations/README.md#historical-tco-source-on-the-array-base),
+    [its focused execution](./docs/evidence/m5c-source-preparations/README.md#historical-focused-tco-execution-on-array-353a9f17),
+    [the U68 observations](./docs/evidence/m5c-source-preparations/README.md#historical-u68-tco-observations-on-the-array-source),
+    and
+    [the source on the Reg candidate](./docs/evidence/m5c-source-preparations/README.md#tco-source-preparation-on-the-fixed-reg-candidate).

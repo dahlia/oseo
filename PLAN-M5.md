@@ -9524,7 +9524,8 @@ On Linux AMD64, exact source
 `2b70928606de831887956979f09e03d179da6db7`, passed eight whole
 Node.js/Deno commands once in order, with 28 actual registrations and
 natural owned-process/scope drain. The source remained unchanged throughout.
-*PLAN-M5C.md* records the commands, walls and raw evidence packet.
+[*docs/evidence/m5c-source-preparations/README.md*](./docs/evidence/m5c-source-preparations/README.md)
+records the commands, walls and raw evidence packet.
 
 Both hosts passed all nine fixed Annex registrations, the original
 12-case Annex property with its fresh integrity subject, all three Set
@@ -9581,7 +9582,9 @@ explicit source bindings. The first eight whole Node.js/Deno commands passed
 collection counter. All other 8,046 tracked files/modes, including runtime,
 programs, oracles, generators and command flags, remain exact. The original
 command 9 failure on 46933 remains recorded; no fourteen-command pass on one
-new source is claimed. *PLAN-M5C.md* binds all commands, walls and raw facts.
+new source is claimed.
+[*docs/evidence/m5c-source-preparations/README.md*](./docs/evidence/m5c-source-preparations/README.md)
+binds all commands, walls and raw facts.
 
 Both hosts passed the ten-state, both-policy forced-GC matrix and all five
 primitive acquisition allocation-failure sweeps, positive collection checks,
@@ -9699,12 +9702,13 @@ all other assignments and the 41,091-path inventory stay unchanged.
 records actual command/source/target limits. The admission data gate still
 requires its actual result commit and affected reviews; no candidate/Main
 pass follows from source preparation or focused Native. Historical author
-execution on Array `353a9f17` remains separately qualified in *PLAN-M5C.md*.
-The other 33 TCO paths retain their unreviewed batch32 reservations.
-Historical Native935 remains bound to `05c1f074`, not
-this composition. The old `1fd374f6` extended interruption at 39 of 60 liveness
-draws stays failed and incomplete. Source-qualified reviews, execution, actual
-D3/U/R and exact candidate/Main gates remain separate Root-owned work.
+execution on Array `353a9f17` remains separately qualified in
+[*docs/evidence/m5c-source-preparations/README.md*](./docs/evidence/m5c-source-preparations/README.md).
+The other 33 TCO paths retain their unreviewed batch32 reservations. Historical
+Native935 remains bound to `05c1f074`, not this composition. The old `1fd374f6`
+extended interruption at 39 of 60 liveness draws stays failed and incomplete.
+Source-qualified reviews, execution, actual D3/U/R and exact candidate/Main
+gates remain separate Root-owned work.
 
 
 TCO source preparation on the fixed Reg candidate
@@ -9722,7 +9726,8 @@ At source preparation, Reg's complete observations, owners, and per-path
 expectations stayed unchanged pending a new Full, including both unsupported
 TCO expectations.
 
-*PLAN-M5C.md* defines this preparation phase. The existing
+[*docs/evidence/m5c-source-preparations/README.md*](./docs/evidence/m5c-source-preparations/README.md)
+records this preparation phase. The existing
 [TCO evidence contract](docs/evidence/proper-tail-calls-u68-20261027.md)
 records f5 author execution with exact sources and one-pair timing limits.
 Those checks and the historical U68 Full did not run on this composition.
