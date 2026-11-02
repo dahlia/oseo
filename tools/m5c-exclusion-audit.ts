@@ -75,16 +75,21 @@ const annexProtoRejection = new RegExp(
 const lookupRemediationOwner =
   "node:class-private-accessor-lookup-coverage-remediation";
 /**
- * Class expression paths whose only Annex B subject is the legacy lookup
- * call. The maintainer decision of 2026-11-01 applied item 3 of the
- * 2026-10-28 decision to exactly these two: the public-absence replacement
- * fixtures witness every core subject. The class declaration paths of the
- * same shape keep the lookup remediation owner. ADR 0013 is unchanged.
+ * Class paths whose only Annex B subject is the legacy lookup call. The
+ * maintainer decision of 2026-11-01 applied item 3 of the 2026-10-28
+ * decision to exactly the two class expression paths, and the decision of
+ * 2026-11-02 to exactly the two class declaration paths of the same shape:
+ * the public-absence replacement fixtures of each form witness every core
+ * subject. ADR 0013 is unchanged.
  */
 export const m5cAnnexLookupClosedPaths: ReadonlySet<string> = new Set([
   "test/language/expressions/class/elements/" +
     "private-getter-is-not-a-own-property.js",
   "test/language/expressions/class/elements/" +
+    "private-setter-is-not-a-own-property.js",
+  "test/language/statements/class/elements/" +
+    "private-getter-is-not-a-own-property.js",
+  "test/language/statements/class/elements/" +
     "private-setter-is-not-a-own-property.js",
 ]);
 const annexLookupRejection = new RegExp(

@@ -224,15 +224,26 @@ these two paths and to no other. Their rows use the
 `annex-b-legacy-lookup-class-expression` assessment, which binds both evidence
 files and closes the paths as ADR 0013 exclusions with
 `normativeDependency: annex-b-only` and the `adr:0013-m5-edition-and-manifest`
-ledger owner. The checker admits such an exclusion over a lookup rejection only
-for the exact two-path selector `m5cAnnexLookupClosedPaths` in
-*../../tools/m5c-exclusion-audit.ts*, only with bound replacement evidence and
-no remediation owner, and requires both rows. ADR 0013 itself is unchanged.
+ledger owner.
 
-Observation batch 22b adds the class declaration paths of the same shape
-under *test/language/statements/class/elements/*. They keep the
-`annex-b-legacy-lookup` assessment and the remediation owner above; their
-private getter and setter assertions are not excluded.
+Observation batch 22b admits the class declaration paths of the same names
+under *test/language/statements/class/elements/*, which differ from the
+expression sources only in declaring `class C` instead of assigning a class
+expression to `var C`. The 2026-11-02 maintainer decision closes these two
+paths on the same conditions and no other. The
+`class-declaration-private-getter-public-absence` and
+`class-declaration-private-setter-public-absence` fixtures in the same file
+keep every assertion of those sources except the lookup call and also check
+that the declaration creates no global object property. The same native test
+runs them the same way. Their rows use the
+`annex-b-legacy-lookup-class-declaration` assessment, which binds the same
+two evidence files and closes the paths the same way.
+
+The checker admits an exclusion over a lookup rejection only for the exact
+four-path selector `m5cAnnexLookupClosedPaths` in
+*../../tools/m5c-exclusion-audit.ts*, only with bound replacement evidence and
+no remediation owner, and requires all four rows. No checked-in row now uses
+the remediation owner. ADR 0013 itself is unchanged.
 
 
 Legacy function caller reads

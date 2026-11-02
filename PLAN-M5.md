@@ -7764,10 +7764,17 @@ strict and non-strict Scripts under both specialization policies with
 collection at every safepoint. This is replacement evidence for core private
 elements, not upstream pass evidence.
 
-Both original expression paths remain unsupported with their remediation owner
-until a separate maintainer coverage-accounting decision. The
-[work note](./docs/m5c-graph/class-private-accessor-lookup-coverage-remediation.md)
-records the evidence and pending statement-family paths.
+The 2026-11-01 maintainer decision closes both expression paths as ADR 0013
+exclusions on this evidence; they stay unsupported and are not counted as
+passes. Observation batch 22b admits the class declaration paths of the same
+names under *test/language/statements/class/elements/*, and the 2026-11-02
+decision closes them the same way with
+`class-declaration-private-getter-public-absence` and
+`class-declaration-private-setter-public-absence`. The
+[expression work note](./docs/m5c-graph/class-private-accessor-lookup-coverage-remediation.md)
+and the
+[declaration work note](./docs/m5c-graph/class-declaration-private-accessor-closure.md)
+record the evidence.
 
 
 Ahead-of-time challenge boundary

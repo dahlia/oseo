@@ -11,10 +11,11 @@ scope:
   - "Installing a private getter or setter creates no public own property
     or public-name membership. Ordinary private reads and setter effects
     remain observable without legacy accessor lookup. The replacement
-    fixtures witness every core subject of the two class expression
-    paths, which the 2026-11-01 maintainer decision closes as ADR 0013
-    exclusions; they do not count those unsupported paths as passes or
-    cover the class declaration paths of the same shape."
+    fixtures of each class form witness every core subject of the two
+    class expression paths and the two class declaration paths of the
+    same names, which the 2026-11-01 and 2026-11-02 maintainer decisions
+    close as ADR 0013 exclusions; they do not count those unsupported
+    paths as passes."
 owners:
   - PLAN-M5.md
 evidence:

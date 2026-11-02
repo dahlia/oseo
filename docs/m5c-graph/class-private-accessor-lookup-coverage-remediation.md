@@ -28,9 +28,11 @@ records, and batch 11's 1,199-path reservation are preserved.
 
 The class declaration getter and setter paths of the same shape under
 *test/language/statements/class/elements/*, admitted by observation batch
-22b, keep this node's owner and the `annex-b-legacy-lookup` remediation
-assessment. The 2026-11-01 decision does not cover them, and this note
-claims no replacement equivalence for them.
+22b, are outside the 2026-11-01 decision. The 2026-11-02 decision closes
+them through
+[`class-declaration-private-accessor-closure`](./class-declaration-private-accessor-closure.md),
+which adds class declaration fixtures to the same evidence files. This node no
+longer owns any path.
 
 
 Replacement contract
@@ -104,10 +106,11 @@ source and observation digests and moves them to the
 assessment names both replacement fixtures and binds the digests of
 *tests/native/fixtures/classes.ts* and
 *tests/class-private-accessor-coverage-native.test.ts*. The exclusion audit
-checker admits an exclusion over a lookup rejection only for these two
-paths, listed in `m5cAnnexLookupClosedPaths`, and requires both rows. The
-ledger moves both paths to `adr:0013-m5-edition-and-manifest` through the
-ledger API and `mise run m5c:closure-ledger:update`.
+checker admits an exclusion over a lookup rejection only for the paths
+listed in `m5cAnnexLookupClosedPaths`, now these two and the two class
+declaration paths, and requires every listed row. The ledger moves both paths
+to `adr:0013-m5-edition-and-manifest` through the ledger API and
+`mise run m5c:closure-ledger:update`.
 
 | Path                                                                 | Outcome | Assessment                               |
 | -------------------------------------------------------------------- | ------- | ---------------------------------------- |

@@ -3185,6 +3185,75 @@ console.log("private setter core ok");
 `,
   },
   {
+    name: "class-declaration-private-getter-public-absence",
+    source: `
+// The class declaration form of the upstream test, without its optional
+// legacy observer.
+function same(actual, expected) {
+  if (!Object.is(actual, expected)) throw new Error("private getter coverage");
+}
+class C {
+  get #m() { return "Test262"; }
+  check() {
+    same(this.hasOwnProperty("#m"), false);
+    same("#m" in this, false);
+    same(Object.getOwnPropertyDescriptor(this, "#m"), undefined);
+    same(this.#m, "Test262");
+    same(this.hasOwnProperty("#m"), false);
+    same("#m" in this, false);
+    return 0;
+  }
+}
+// Unlike var C in the expression form, the declaration binds C lexically.
+same(Object.prototype.hasOwnProperty.call(globalThis, "C"), false);
+let c = new C();
+same(c.check(), 0);
+// A public string with the same spelling is a separate property.
+c["#m"] = "public";
+same(c.hasOwnProperty("#m"), true);
+same("#m" in c, true);
+same(c["#m"], "public");
+delete c["#m"];
+same(c.check(), 0);
+console.log("private getter core ok");
+`,
+  },
+  {
+    name: "class-declaration-private-setter-public-absence",
+    source: `
+// The class declaration form of the upstream test, without its optional
+// legacy observer.
+function same(actual, expected) {
+  if (!Object.is(actual, expected)) throw new Error("private setter coverage");
+}
+class C {
+  set #m(v) { this._v = v; }
+  check() {
+    same(this.hasOwnProperty("#m"), false);
+    same("#m" in this, false);
+    same(Object.getOwnPropertyDescriptor(this, "#m"), undefined);
+    this.#m = "Test262";
+    same(this._v, "Test262");
+    same(this.hasOwnProperty("#m"), false);
+    same("#m" in this, false);
+    return 0;
+  }
+}
+// Unlike var C in the expression form, the declaration binds C lexically.
+same(Object.prototype.hasOwnProperty.call(globalThis, "C"), false);
+let c = new C();
+same(c.check(), 0);
+// A public string with the same spelling is a separate property.
+c["#m"] = "public";
+same(c.hasOwnProperty("#m"), true);
+same("#m" in c, true);
+same(c["#m"], "public");
+delete c["#m"];
+same(c.check(), 0);
+console.log("private setter core ok");
+`,
+  },
+  {
     name: "class-private-accessors",
     source: `
 // A getter and a setter under one private name describe one element,

@@ -1024,10 +1024,12 @@ ADR 0013 on reviewed replacement evidence; see
 
 Observation batch 22b admits the two class declaration paths of the same
 shape under *test/language/statements/class/elements/* with the same
-remediation owner. The 2026-11-02 maintainer decision allows closing exactly
-these two under ADR 0013 on the same conditions, which node
-`class-declaration-private-accessor-closure` carries out; see
+remediation owner. The 2026-11-02 maintainer decision closes exactly these
+two under ADR 0013 on the same conditions, through node
+`class-declaration-private-accessor-closure` and its class declaration
+replacement fixtures; see
 [its work note](docs/m5c-graph/class-declaration-private-accessor-closure.md).
+No path keeps the remediation owner.
 
 
 Incidental Annex B prototype write dependency
