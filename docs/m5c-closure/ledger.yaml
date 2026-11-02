@@ -250,9 +250,11 @@ owners:
       private accessor assertions. Each observes the owned OSEO1001
       optional legacy accessor rejection (ECMA-262 20.1.3.9, ADR 0020
       onto ADR 0013). The audit records mixed remediation, not an
-      exclusion; their private getter and setter subjects remain open.
-      The two class expression paths of observation-batch-11 moved to
-      ADR 0013 under the 2026-11-01 maintainer decision.
+      exclusion; their private getter and setter subjects remain open
+      until node class-declaration-private-accessor-closure closes them
+      under ADR 0013, as the 2026-11-02 maintainer decision allows. The
+      two class expression paths of observation-batch-11 moved to ADR
+      0013 under the 2026-11-01 maintainer decision.
     paths: 2
   observation:
     note: Closed by a reviewed pass or expected negative in the manifest.

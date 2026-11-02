@@ -1022,6 +1022,13 @@ stderr, and admits them with their unchanged `classes` dependency tag. Their
 ADR 0013 on reviewed replacement evidence; see
 [the work note](docs/m5c-graph/class-private-accessor-lookup-coverage-remediation.md).
 
+Observation batch 22b admits the two class declaration paths of the same
+shape under *test/language/statements/class/elements/* with the same
+remediation owner. The 2026-11-02 maintainer decision allows closing exactly
+these two under ADR 0013 on the same conditions, which node
+`class-declaration-private-accessor-closure` carries out; see
+[its work note](docs/m5c-graph/class-declaration-private-accessor-closure.md).
+
 
 Incidental Annex B prototype write dependency
 ---------------------------------------------
