@@ -334,9 +334,8 @@ admits its rows into *tests/test262/subset.yaml* with reviewed dependency tags
 in the change that implements them, and the full manifest update observes
 them. A row therefore runs only once its unit admits it, so the runner needs
 no Annex B gate. Feature-tagged rows still enter through the
-frontmatter rejection until their feature joins `supportedFeatures`. This
-departs from the Consequences text of ADR 0032, whose Status proposes it as an
-amendment pending the maintainer's acceptance.
+frontmatter rejection until their feature joins `supportedFeatures`. The
+maintainer accepted this rule as an amendment to ADR 0032 on 2026-11-03.
 
 The 11 ADR 0013 Annex B rows moved to remediation owners, as ADR 0032's
 Closure accounting requires: one to `unit:annexb-syntax`, eight to

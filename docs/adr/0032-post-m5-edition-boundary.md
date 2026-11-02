@@ -18,14 +18,8 @@ Following Closure accounting, the 11 Annex B rows that ADR 0013 owned are
 remediation rows owned by the *PLAN-LANGUAGE.md* units that implement their
 behavior, and the language claim audit rejects any ADR 0013 exclusion.
 
-Amendment proposed 2026-11-03, pending maintainer acceptance: replace the
-Consequences sentences about the runner gate with this rule. The 1,916 new
-paths enter the inventory as unreviewed closure-ledger rows, each owned by its
-*PLAN-LANGUAGE.md* unit, and stay out of the reviewed subset and the manifest
-until that unit admits them with reviewed dependency tags. No row runs before
-its unit admits it, so no runner gate records unadmitted Annex B rows. The
-checked-in application follows this proposed rule; if the maintainer rejects
-it, the runner gate that Consequences describes replaces it.
+The maintainer accepted an amendment on 2026-11-03 that replaced the runner
+gate rule in Consequences with the unit admission rule stated there.
 
 This record supersedes ADR 0013's candidate-edition and
 optional-section sections and replaces ADR 0020's edition map and Annex B path
@@ -267,10 +261,11 @@ Consequences
 ------------
 
 The denominator grows by 1,916 paths. Feature-tagged rows enter through the
-existing frontmatter rejection. Most *test/annexB/* rows carry no flag, so the
-applying change adds a reviewed runner gate that records each unadmitted
-Annex B row as unsupported with a named capability instead of executing it.
-Each implementing unit in *PLAN-LANGUAGE.md* removes its part of that gate.
+existing frontmatter rejection. Each of the 1,916 new paths is an unreviewed
+closure-ledger row owned by its *PLAN-LANGUAGE.md* unit. It stays out of the
+reviewed subset and the manifest until that unit admits it with reviewed
+dependency tags. No row runs before its unit admits it, so no runner gate
+records unadmitted *test/annexB/* rows.
 
 About 477 new rows become ADR 0016 results through reviewed exclusion audit
 rows, so the post-M5 report's ADR 0016 count grows by roughly that much beyond
