@@ -756,11 +756,47 @@ export function readCurrentM5cManifest(): ReviewedTest262Manifest {
   );
 }
 
-/** Derive the current M5c baseline from checked-in evidence. */
+/**
+ * Restrict a manifest to the results of `paths` and recount the
+ * classification totals that {@link deriveM5cBaseline} compares. The view
+ * drops the group and dependency summaries, which no M5 record check reads
+ * from it. Post-M5 units admit rows outside the M5 inventory, and the closed
+ * M5 records must not see them.
+ */
+export function restrictManifestToPaths(
+  manifest: M5cManifestInput,
+  paths: ReadonlySet<string>,
+): M5cManifestInput {
+  const results = manifest.results.filter((result) =>
+    paths.has(result.case.path),
+  );
+  const counted = (classification: Test262Classification): number =>
+    results.filter((result) => result.classification === classification).length;
+  return {
+    results,
+    suiteRevision: manifest.suiteRevision,
+    summary: {
+      dependencies: [],
+      expectedNegatives: counted("expected-negative"),
+      groups: [],
+      harnessFailures: counted("harness-failure"),
+      infrastructureFailures: counted("infrastructure-failure"),
+      passes: counted("pass"),
+      semanticFailures: counted("semantic-failure"),
+      unsupportedProfileFeatures: counted("unsupported-profile-feature"),
+    },
+  };
+}
+
+/** Derive the current M5c baseline over the M5 inventory view. */
 export function deriveCurrentM5cBaseline(): M5cBaseline {
+  const inventoryText = readCurrentM5InventoryText();
   return deriveM5cBaseline(
-    readCurrentM5InventoryText(),
-    readCurrentM5cManifest(),
+    inventoryText,
+    restrictManifestToPaths(
+      readCurrentM5cManifest(),
+      new Set(parseM5cInventory(inventoryText).includedPaths),
+    ),
   );
 }
 

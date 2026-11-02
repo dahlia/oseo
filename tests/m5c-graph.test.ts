@@ -9,6 +9,8 @@ import {
   deriveM5cBaseline,
   m5cWorkGraphNodeDirectory,
   m5cWorkGraphPath,
+  restrictManifestToPaths,
+  restrictToM5Inventory,
   validateCurrentM5cWorkGraph,
   validateM5cWorkGraph,
 } from "../tools/m5c-graph.ts";
@@ -522,6 +524,39 @@ test("M5c baseline rejects reviewed paths outside the inventory", () => {
         summary: { ...manifestSummary, expectedNegatives: 0 },
       }),
     /outside the inventory/u,
+  );
+});
+
+test("the M5 views ignore a row admitted after ADR 0032", () => {
+  const added = "test/annexB/new.js";
+  const expanded = inventory
+    .replace("# included: 3", "# included: 4")
+    .replace(
+      "path\tboundary\tbasis\n",
+      `path\tboundary\tbasis\n${added}\tincluded\tannex-b\n`,
+    );
+  const admitted: M5cManifestInput = {
+    ...manifest,
+    results: [
+      ...manifest.results,
+      { case: { path: added }, classification: "unsupported-profile-feature" },
+    ],
+    summary: { ...manifestSummary, unsupportedProfileFeatures: 1 },
+  };
+  const m5Text = restrictToM5Inventory(expanded, `# list\n${added}\n`);
+  assert.equal(m5Text, inventory);
+  assert.throws(
+    () => deriveM5cBaseline(m5Text, admitted),
+    /outside the inventory: test\/annexB\/new\.js/u,
+  );
+  const m5Paths = new Set(["test/a.js", "test/b.js", "test/c.js"]);
+  assert.deepEqual(
+    deriveM5cBaseline(m5Text, restrictManifestToPaths(admitted, m5Paths)),
+    baseline,
+  );
+  assert.throws(
+    () => restrictToM5Inventory(expanded, "test/missing.js\n"),
+    /additions name paths outside the inventory/u,
   );
 });
 

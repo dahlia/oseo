@@ -1023,8 +1023,17 @@ export function readCurrentM5cObservationBasis(): M5cObservationBasis {
 export function readCurrentM5cObservationInputs(
   basis: M5cObservationBasis,
 ): M5cObservationInputs {
-  const manifest = readCurrentM5cManifest();
   const inventory = parseM5cInventory(readCurrentM5InventoryText());
+  // The plan describes the M5 inventory; rows that post-M5 units admit
+  // must not change its reviewed set or its executed-variant cost.
+  const m5Paths = new Set(inventory.includedPaths);
+  const fullManifest = readCurrentM5cManifest();
+  const manifest = {
+    ...fullManifest,
+    results: fullManifest.results.filter((result) =>
+      m5Paths.has(result.case.path),
+    ),
+  };
   const subset = parseReviewedSubset(
     readFileSync(join(repositoryRoot, subsetPath), "utf8"),
   );
