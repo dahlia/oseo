@@ -4,11 +4,22 @@ ADR 0032: Post-M5 edition and optional-section boundary
 Status
 ------
 
-Accepted by the maintainer on 2026-11-03, for the `claim-boundary` unit of
-[*PLAN-LANGUAGE.md*](../../PLAN-LANGUAGE.md). Until that unit lands its
-regenerated inventory, [ADR 0013](./0013-m5-edition-and-manifest.md) and
-[ADR 0020](./0020-m5-applicable-test-inventory.md) govern the checked-in
-inventory, which keeps its 41,091 included paths.
+Accepted by the maintainer on 2026-11-03 and applied by the `claim-boundary`
+unit of [*PLAN-LANGUAGE.md*](../../PLAN-LANGUAGE.md). The checked-in
+inventory follows this record and has 43,007 included paths. The rule of
+[ADR 0013](./0013-m5-edition-and-manifest.md) and
+[ADR 0020](./0020-m5-applicable-test-inventory.md) stays frozen in
+*tests/test262/inventory-policy-m5.yaml*; the inventory tool classifies every
+candidate under both rules and lists the added paths in
+*tests/test262/inventory-m5-additions.txt*, so the 41,091-path M5 inventory
+and the closed M5 records stay checkable.
+
+Following Closure accounting, the 11 Annex B rows that ADR 0013 owned are
+remediation rows owned by the *PLAN-LANGUAGE.md* units that implement their
+behavior, and the language claim audit rejects any ADR 0013 exclusion.
+
+The maintainer accepted an amendment on 2026-11-03 that replaced the runner
+gate rule in Consequences with the unit admission rule stated there.
 
 This record supersedes ADR 0013's candidate-edition and
 optional-section sections and replaces ADR 0020's edition map and Annex B path
@@ -250,14 +261,16 @@ Consequences
 ------------
 
 The denominator grows by 1,916 paths. Feature-tagged rows enter through the
-existing frontmatter rejection. Most *test/annexB/* rows carry no flag, so the
-applying change adds a reviewed runner gate that records each unadmitted
-Annex B row as unsupported with a named capability instead of executing it.
-Each implementing unit in *PLAN-LANGUAGE.md* removes its part of that gate.
+existing frontmatter rejection. Each of the 1,916 new paths is an unreviewed
+closure-ledger row owned by its *PLAN-LANGUAGE.md* unit. It stays out of the
+reviewed subset and the manifest until that unit admits it with reviewed
+dependency tags. No row runs before its unit admits it, so no runner gate
+records unadmitted *test/annexB/* rows.
 
 About 477 new rows become ADR 0016 results through reviewed exclusion audit
-rows, so the post-M5 report's ADR 0016 count grows by roughly that much beyond
-the 1,804 M5 exclusions. The M5 count does not change.
+rows once their unit admits them, so the post-M5 report's ADR 0016 count grows
+by roughly that much beyond the 1,804 M5 exclusions. The M5 count does not
+change.
 
 Applying this record changes ADR 0013's and ADR 0020's status lines. The
 exclusion audit binds ADR 0013 by digest, so that change re-reviews the audit

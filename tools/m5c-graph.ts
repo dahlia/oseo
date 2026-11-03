@@ -27,6 +27,10 @@ export const m5cWorkGraphNodeDirectory = "docs/m5c-graph/nodes";
 
 /** Checked-in applicable-test inventory. */
 export const m5cInventoryPath = "tests/test262/inventory.tsv";
+
+/** Derived list of the included paths ADR 0032 added after M5. */
+export const m5InventoryAdditionsPath =
+  "tests/test262/inventory-m5-additions.txt";
 const resultsPath = "tests/test262/results.yaml";
 const exitNodeId = "m5-exit-audit";
 const baselineKeys: readonly (keyof M5cBaseline)[] = [
@@ -242,6 +246,52 @@ export function parseM5cInventory(text: string): M5cInventorySnapshot {
     throw new Error("test262 inventory needs its column header.");
   }
   return { includedPaths, suiteRevision };
+}
+
+/**
+ * Restrict an inventory to the 41,091-path M5 inventory by dropping the rows
+ * of the paths ADR 0032 added. The closed M5 graphs and observation batches
+ * are validated against this view; `check:test262-inventory` proves the
+ * additions list against both inventory policies.
+ */
+export function restrictToM5Inventory(
+  inventoryText: string,
+  additionsText: string,
+): string {
+  const additions = new Set(
+    additionsText
+      .split("\n")
+      .filter((line) => line.length > 0 && !line.startsWith("#")),
+  );
+  const removed = new Set<string>();
+  const lines = inventoryText.split("\n").filter((line) => {
+    const [path, disposition] = line.split("\t");
+    if (path == null || !additions.has(path)) return true;
+    if (disposition !== "included") {
+      throw new Error(`M5 inventory addition ${path} is not included.`);
+    }
+    removed.add(path);
+    return false;
+  });
+  if (removed.size !== additions.size) {
+    throw new Error("M5 inventory additions name paths outside the inventory.");
+  }
+  return lines
+    .map((line) => {
+      const included = /^# included: ([0-9]+)$/u.exec(line)?.[1];
+      return included == null
+        ? line
+        : `# included: ${Number(included) - removed.size}`;
+    })
+    .join("\n");
+}
+
+/** Read the checked-in inventory restricted to the M5 inventory. */
+export function readCurrentM5InventoryText(): string {
+  return restrictToM5Inventory(
+    readFileSync(join(repositoryRoot, m5cInventoryPath), "utf8"),
+    readFileSync(join(repositoryRoot, m5InventoryAdditionsPath), "utf8"),
+  );
 }
 
 /** Derive the exact M5c baseline from the inventory and reviewed manifest. */
@@ -706,11 +756,47 @@ export function readCurrentM5cManifest(): ReviewedTest262Manifest {
   );
 }
 
-/** Derive the current M5c baseline from checked-in evidence. */
+/**
+ * Restrict a manifest to the results of `paths` and recount the
+ * classification totals that {@link deriveM5cBaseline} compares. The view
+ * drops the group and dependency summaries, which no M5 record check reads
+ * from it. Post-M5 units admit rows outside the M5 inventory, and the closed
+ * M5 records must not see them.
+ */
+export function restrictManifestToPaths(
+  manifest: M5cManifestInput,
+  paths: ReadonlySet<string>,
+): M5cManifestInput {
+  const results = manifest.results.filter((result) =>
+    paths.has(result.case.path),
+  );
+  const counted = (classification: Test262Classification): number =>
+    results.filter((result) => result.classification === classification).length;
+  return {
+    results,
+    suiteRevision: manifest.suiteRevision,
+    summary: {
+      dependencies: [],
+      expectedNegatives: counted("expected-negative"),
+      groups: [],
+      harnessFailures: counted("harness-failure"),
+      infrastructureFailures: counted("infrastructure-failure"),
+      passes: counted("pass"),
+      semanticFailures: counted("semantic-failure"),
+      unsupportedProfileFeatures: counted("unsupported-profile-feature"),
+    },
+  };
+}
+
+/** Derive the current M5c baseline over the M5 inventory view. */
 export function deriveCurrentM5cBaseline(): M5cBaseline {
+  const inventoryText = readCurrentM5InventoryText();
   return deriveM5cBaseline(
-    readFileSync(join(repositoryRoot, m5cInventoryPath), "utf8"),
-    readCurrentM5cManifest(),
+    inventoryText,
+    restrictManifestToPaths(
+      readCurrentM5cManifest(),
+      new Set(parseM5cInventory(inventoryText).includedPaths),
+    ),
   );
 }
 

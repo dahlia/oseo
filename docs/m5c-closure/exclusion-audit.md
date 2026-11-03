@@ -371,3 +371,31 @@ decision applies item 3's rule to this path and extends it to no other. The
 0013 exclusion with `disposition: exclusion`,
 `normativeDependency: annex-b-only`, and the `adr:0013-m5-edition-and-manifest`
 ledger owner. ADR 0013 itself is unchanged.
+
+
+Former ADR 0013 exclusions after ADR 0032
+-----------------------------------------
+
+[ADR 0032](../adr/0032-post-m5-edition-boundary.md) withdrew ADR 0013's Annex B
+authorization. The 11 paths that the sections above close as ADR 0013
+exclusions are now remediation rows. Their audit rows keep the
+`adr:0013-m5-edition-and-manifest` proposed owner, digests, reasons, and
+replacement evidence. Each of their eight assessments changes only to
+`disposition: remediation` with a `remediationOwner` naming the
+[*PLAN-LANGUAGE.md*](../../PLAN-LANGUAGE.md) unit that implements its Annex B
+behavior, and the ledger gives each path that owner:
+
+ -  `unit:annexb-syntax`: *String/prototype/split/separator-regexp.js*;
+ -  `unit:annexb-object-accessors`: the three TypedArray paths,
+    *S8.6.2\_A8.js*, and the four class element
+    *private-getter-is-not-a-own-property.js* and
+    *private-setter-is-not-a-own-property.js* paths;
+ -  `unit:annexb-dynamic-source-accounting`: *S7.8.5\_A1.4\_T2.js* and
+    *S7.8.5\_A2.4\_T2.js*.
+
+The check rejects any ADR 0013 exclusion. It accepts a `unit:` remediation
+owner only on an ADR 0013 row, and the closure ledger checks that the unit
+exists. The Annex B residue and legacy lookup closure selectors stay exact, but
+now require a bound `annex-b-only` row with a `unit:` owner instead of an
+exclusion. The paragraphs above that call these paths exclusions describe the
+M5 state, which the M5 exit report records.

@@ -17,6 +17,37 @@ const repositoryRoot = resolve(fileURLToPath(import.meta.url), "../..");
 export const evidenceIndexDirectory = "docs/language-profile-m5/index";
 export const evidenceRecordDirectory = "docs/language-profile-m5/families";
 
+/** Directories holding one profile's family index and records. */
+export interface EvidenceProfile {
+  readonly indexDirectory: string;
+  readonly recordDirectory: string;
+  /** Whether the profile must hold at least one family. */
+  readonly required: boolean;
+}
+
+/** The fixed M5 profile, whose records stay the record of the M5 claim. */
+export const m5EvidenceProfile: EvidenceProfile = {
+  indexDirectory: evidenceIndexDirectory,
+  recordDirectory: evidenceRecordDirectory,
+  required: true,
+};
+
+/**
+ * The ECMAScript 2026 profile of ADR 0032. Each post-M5 unit adds the record
+ * of its new family here, so the profile may still be empty.
+ */
+export const es2026EvidenceProfile: EvidenceProfile = {
+  indexDirectory: "docs/language-profile-es2026/index",
+  recordDirectory: "docs/language-profile-es2026/families",
+  required: false,
+};
+
+/** Every profile the evidence-lane check validates, in reading order. */
+export const evidenceProfiles: readonly EvidenceProfile[] = [
+  m5EvidenceProfile,
+  es2026EvidenceProfile,
+];
+
 export const evidenceClasses = [
   "differential",
   "fixed",
@@ -127,11 +158,12 @@ function expectedPath(directory: string, id: string): string {
   return `${directory}/${id}.yaml`;
 }
 
-/** Validate the complete indexed M5 per-family evidence record set. */
+/** Validate one profile's complete indexed per-family evidence record set. */
 export function validateEvidenceInventory(
   indexSources: readonly EvidenceSource[],
   recordSources: readonly EvidenceSource[],
   knownReferences: ReadonlySet<string>,
+  profile: EvidenceProfile = m5EvidenceProfile,
 ): EvidenceInventorySummary {
   const indexed = new Map<string, string>();
   for (const source of indexSources) {
@@ -142,14 +174,14 @@ export function validateEvidenceInventory(
       throw new Error(`${context} version must be 1.`);
     }
     const id = familyId(value.id, `${context} id`);
-    if (source.path !== expectedPath(evidenceIndexDirectory, id)) {
+    if (source.path !== expectedPath(profile.indexDirectory, id)) {
       throw new Error(`${context} filename does not match ID ${id}.`);
     }
     if (indexed.has(id)) {
       throw new Error(`evidence index repeats family ID ${id}.`);
     }
     const recordPath = stringValue(value.record, `${context} record`);
-    const expectedRecord = expectedPath(evidenceRecordDirectory, id);
+    const expectedRecord = expectedPath(profile.recordDirectory, id);
     if (recordPath !== expectedRecord) {
       throw new Error(`${context} must index ${expectedRecord}.`);
     }
@@ -170,7 +202,7 @@ export function validateEvidenceInventory(
       throw new Error(`${context} version must be 1.`);
     }
     const id = familyId(value.id, `${context} id`);
-    if (source.path !== expectedPath(evidenceRecordDirectory, id)) {
+    if (source.path !== expectedPath(profile.recordDirectory, id)) {
       throw new Error(`${context} filename does not match ID ${id}.`);
     }
     if (records.has(id)) {
@@ -241,6 +273,7 @@ export function validateRequiredEvidenceInventory(
   indexSources: readonly EvidenceSource[],
   recordSources: readonly EvidenceSource[],
   knownReferences: ReadonlySet<string>,
+  profile: EvidenceProfile = m5EvidenceProfile,
 ): EvidenceInventorySummary {
   if (indexSources.length === 0 && recordSources.length === 0) {
     throw new Error("current evidence inventory must not be empty.");
@@ -249,7 +282,53 @@ export function validateRequiredEvidenceInventory(
     indexSources,
     recordSources,
     knownReferences,
+    profile,
   );
+}
+
+/**
+ * Validate every profile's records against one reference set and reject a
+ * family ID that two profiles both record.
+ */
+function validateEvidenceProfiles(
+  sources: (profile: EvidenceProfile) => {
+    readonly indexSources: readonly EvidenceSource[];
+    readonly recordSources: readonly EvidenceSource[];
+  },
+  knownReferences: ReadonlySet<string>,
+  required: boolean,
+): ValidatedEvidenceTree {
+  const familyIds: string[] = [];
+  let families = 0;
+  let omitted = 0;
+  for (const profile of evidenceProfiles) {
+    const { indexSources, recordSources } = sources(profile);
+    if (indexSources.length === 0 && recordSources.length === 0) {
+      if (required && profile.required) {
+        throw new Error("current evidence inventory must not be empty.");
+      }
+      continue;
+    }
+    const summary = validateEvidenceInventory(
+      indexSources,
+      recordSources,
+      knownReferences,
+      profile,
+    );
+    families += summary.families;
+    omitted += summary.omitted;
+    for (const source of recordSources) {
+      const id = basename(source.path, ".yaml");
+      if (familyIds.includes(id)) {
+        throw new Error(`evidence profiles repeat family ID ${id}.`);
+      }
+      familyIds.push(id);
+    }
+  }
+  return {
+    familyIds,
+    summary: { classes: evidenceClasses.length, families, omitted },
+  };
 }
 
 interface ValidatedEvidenceTree {
@@ -274,22 +353,14 @@ function validateEvidenceTree(
         return { path, text: readSource(path) };
       });
   };
-  const indexSources = evidenceSources(evidenceIndexDirectory);
-  const recordSources = evidenceSources(evidenceRecordDirectory);
-  if (indexSources.length === 0 && recordSources.length === 0 && !required) {
-    return {
-      familyIds: [],
-      summary: { classes: evidenceClasses.length, families: 0, omitted: 0 },
-    };
-  }
-  const validate = required
-    ? validateRequiredEvidenceInventory
-    : validateEvidenceInventory;
-  const summary = validate(indexSources, recordSources, new Set(listedPaths));
-  return {
-    familyIds: recordSources.map((source) => basename(source.path, ".yaml")),
-    summary,
-  };
+  return validateEvidenceProfiles(
+    (profile) => ({
+      indexSources: evidenceSources(profile.indexDirectory),
+      recordSources: evidenceSources(profile.recordDirectory),
+    }),
+    new Set(listedPaths),
+    required,
+  );
 }
 
 /** Validate and return family IDs from one complete repository tree. */
@@ -362,26 +433,28 @@ function validateStagedEvidenceInventory(): ValidatedEvidenceTree {
 export function validateCurrentEvidenceInventory(
   preCommit: boolean = process.env.MISE_PRE_COMMIT === "1",
 ): EvidenceInventorySummary {
-  if (preCommit) return validateStagedEvidenceInventory().summary;
-  const indexSources = directorySources(evidenceIndexDirectory);
-  const recordSources = directorySources(evidenceRecordDirectory);
-  const summary = validateRequiredEvidenceInventory(
-    indexSources,
-    recordSources,
+  return validateCurrentEvidenceTree(preCommit).summary;
+}
+
+function validateCurrentEvidenceTree(
+  preCommit: boolean,
+): ValidatedEvidenceTree {
+  if (preCommit) return validateStagedEvidenceInventory();
+  return validateEvidenceProfiles(
+    (profile) => ({
+      indexSources: directorySources(profile.indexDirectory),
+      recordSources: directorySources(profile.recordDirectory),
+    }),
     repositoryFiles(),
+    true,
   );
-  return summary;
 }
 
 /** Return validated current-tree family IDs for compatibility snapshots. */
 export function currentEvidenceFamilyIds(
   preCommit: boolean = process.env.MISE_PRE_COMMIT === "1",
 ): readonly string[] {
-  if (preCommit) return validateStagedEvidenceInventory().familyIds;
-  validateCurrentEvidenceInventory(false);
-  return directorySources(evidenceRecordDirectory).map((source) =>
-    basename(source.path, ".yaml"),
-  );
+  return validateCurrentEvidenceTree(preCommit).familyIds;
 }
 
 const entry = process.argv[1];

@@ -2,8 +2,8 @@ version: 1
 suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
 records:
   0013-m5-edition-and-manifest:
-    digest: "de1e9d092ccacbeaeb526e91a51933ffe64417878563696f0f\
-      0c4cf2e6d4242c"
+    digest: "97565ecf67a759abb4614229502f342e7431026fd1938b2594\
+      5de4fb28b6994f"
     authorization:
       - Annex B legacy web semantics are excluded from the
         claim.
@@ -373,7 +373,8 @@ assessments:
         "50331feeca513cb2e2354e05e7c68f82d5aeccd9b766d6c8\
         8438c5ef118075f6"
   annex-b-pattern:
-    disposition: exclusion
+    disposition: remediation
+    remediationOwner: unit:annexb-syntax
     normativeDependency: annex-b-only
     reason: >-
       Maintainer decision 2026-10-28 item 3 closes this path under ADR 0013.
@@ -427,7 +428,8 @@ assessments:
       until replacement evidence or a maintainer accounting
       decision bounds it.
   annex-b-typed-array-prototype:
-    disposition: exclusion
+    disposition: remediation
+    remediationOwner: unit:annexb-object-accessors
     normativeDependency: annex-b-only
     reason: >-
       Maintainer decision 2026-10-28 item 3 closes this path under ADR 0013.
@@ -642,7 +644,8 @@ assessments:
       amendment that admits any form of dynamic import
       reopens it for reassessment.
   annex-b-legacy-lookup-class-declaration:
-    disposition: exclusion
+    disposition: remediation
+    remediationOwner: unit:annexb-object-accessors
     normativeDependency: annex-b-only
     reason: >-
       The 2026-11-02 maintainer decision closes these two class declaration
@@ -679,7 +682,8 @@ assessments:
         "e74c273c881242c06bf298817dbc5f41a743eb41e3a4a7369debb23b\
         b63a4a62"
   annex-b-legacy-lookup-class-expression:
-    disposition: exclusion
+    disposition: remediation
+    remediationOwner: unit:annexb-object-accessors
     normativeDependency: annex-b-only
     reason: >-
       The 2026-11-01 maintainer decision applies item 3 of the 2026-10-28
@@ -731,7 +735,8 @@ assessments:
       is scaffolding for the caller relationship and stays
       under ADR 0016, which owns none of these paths.
   annex-b-out-of-bounds-prototype-setup:
-    disposition: exclusion
+    disposition: remediation
+    remediationOwner: unit:annexb-object-accessors
     normativeDependency: annex-b-only
     reason: >-
       Maintainer decision 2026-10-28 item 3 closes this path under ADR 0013.
@@ -762,7 +767,8 @@ assessments:
         "d3cc3f6d101465c0c6fb93467428f149adb7593495c0f2d518ea8485\
         135151c5"
   annex-b-resizable-typed-array-prototype:
-    disposition: exclusion
+    disposition: remediation
+    remediationOwner: unit:annexb-object-accessors
     normativeDependency: annex-b-only
     reason: >-
       Maintainer decision 2026-10-28 item 3 closes this path under ADR 0013.
@@ -5625,7 +5631,8 @@ assessments:
         "0231397301b0298580bbe87634690f4f279ce3676410d5\
         50bb3ab68649f669fc"
   ds17-exhaustive-escaped-annex-b:
-    disposition: exclusion
+    disposition: remediation
+    remediationOwner: unit:annexb-dynamic-source-accounting
     normativeDependency: annex-b-only
     reason: >-
       The maintainer decision of 2026-11-01 applies item 3 of the 2026-10-28
@@ -5811,7 +5818,8 @@ assessments:
       amendment admitting direct eval; ADR 0019 non-source reopening remains
       in force."
   annex-b-ordinary-object-prototype:
-    disposition: exclusion
+    disposition: remediation
+    remediationOwner: unit:annexb-object-accessors
     normativeDependency: annex-b-only
     reason: >-
       The 2026-10-31 maintainer decision extends item 3 of the 2026-10-28

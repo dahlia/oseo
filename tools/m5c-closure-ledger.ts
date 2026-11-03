@@ -69,8 +69,12 @@ export const m5cUnreviewedDefaultNode = "observation-batch-plan";
 /** Directory of architecture decision records an owner may cite. */
 export const m5cDecisionRecordDirectory = "docs/adr";
 
+/** Plan whose work-unit table names every `unit:` owner. */
+export const languagePlanPath = "PLAN-LANGUAGE.md";
+
 const nodeOwnerPrefix = "node:";
 const recordOwnerPrefix = "adr:";
+const unitOwnerPrefix = "unit:";
 const recordStemPattern = /^[0-9]{4}(?:-[a-z0-9]+)+$/u;
 const ledgerVersion = 1;
 const closedStates: ReadonlySet<M5cLedgerState> = new Set([
@@ -140,6 +144,7 @@ export interface M5cLedgerEntry {
   readonly state: M5cLedgerState;
   /**
    * `observation`, `unassigned`, `node:<id>` naming a graph node,
+   * `unit:<id>` naming a *PLAN-LANGUAGE.md* work unit,
    * `adr:<stem>` naming the accepted record *docs/adr/<stem>.md* that
    * explicitly authorizes and bounds an M5 exclusion of an unsupported path,
    * or `deferred` for an unsupported path with an ADR 0031 deferral entry.
@@ -221,6 +226,11 @@ export interface M5cLedgerOwnerTargets {
   readonly deferredPaths?: ReadonlySet<string>;
   /** IDs of the checked-in M5c graph nodes. */
   readonly nodeIds: ReadonlySet<string>;
+  /**
+   * IDs of the *PLAN-LANGUAGE.md* work units. Absent means that no path may
+   * take a `unit:` owner.
+   */
+  readonly unitIds?: ReadonlySet<string>;
 }
 
 /** Checked-in inputs the current ledger is derived from. */
@@ -256,6 +266,13 @@ function ownerNode(owner: string): string | undefined {
     : undefined;
 }
 
+/** Name the owning work unit of a `unit:` owner, if any. */
+export function ownerUnit(owner: string): string | undefined {
+  return owner.startsWith(unitOwnerPrefix)
+    ? owner.slice(unitOwnerPrefix.length)
+    : undefined;
+}
+
 /** Name the authorizing record of an `adr:` owner, if any. */
 function authorizingRecord(owner: string): string | undefined {
   return owner.startsWith(recordOwnerPrefix)
@@ -275,7 +292,8 @@ function defaultOwner(state: M5cLedgerState): string {
 /**
  * Explain why an owner cannot own a path in a state, or return undefined.
  * Closed states belong to their observation, unreviewed paths to a graph
- * node, and reviewed open states to a node or explicitly to nobody yet. Only
+ * node or work unit, and reviewed open states to a node, a work unit, or
+ * explicitly to nobody yet. Only
  * an unsupported path may cite an authorizing record or be deferred: a
  * failure is a defect to repair, never an exclusion or a deferral.
  */
@@ -297,6 +315,11 @@ function ownerProblem(
   if (node != null && !targets.nodeIds.has(node)) {
     return `names unknown M5c graph node ${node}`;
   }
+  const unit = ownerUnit(owner);
+  if (unit != null && targets.unitIds?.has(unit) !== true) {
+    return `names unknown ${languagePlanPath} work unit ${unit}`;
+  }
+  const remediating = node != null || unit != null;
   const authorizing = authorizingRecord(owner);
   if (authorizing != null) {
     if (state !== "unsupported-profile-feature") {
@@ -313,16 +336,17 @@ function ownerProblem(
       : `must be ${m5cObservationOwner} for a ${state} path`;
   }
   if (state === "unreviewed") {
-    return node == null
-      ? "must name the M5c graph node that observes an unreviewed path"
-      : undefined;
+    return remediating
+      ? undefined
+      : "must name the graph node or work unit that observes an " +
+          "unreviewed path";
   }
   if (ownerAssignableStates.has(state)) {
-    if (node != null || owner === m5cUnassignedOwner) return undefined;
+    if (remediating || owner === m5cUnassignedOwner) return undefined;
     const forms =
       state === "unsupported-profile-feature"
-        ? "a node:, adr:, or deferred owner"
-        : "a node: owner";
+        ? "a node:, unit:, adr:, or deferred owner"
+        : "a node: or unit: owner";
     return `must be ${m5cUnassignedOwner} or ${forms} for a ${state} path`;
   }
   return `is not valid for state ${state}`;
@@ -776,6 +800,46 @@ export function readCurrentM5cNodeIds(): ReadonlySet<string> {
 }
 
 /**
+ * Read the unit IDs from the work-unit table of *PLAN-LANGUAGE.md*: the
+ * first table under the `Work units` heading, whose first column holds
+ * each ID in backticks.
+ */
+export function parseLanguageUnitIds(text: string): ReadonlySet<string> {
+  const lines = text.split("\n");
+  const heading = lines.findIndex(
+    (line, index) =>
+      line === "Work units" && /^-+$/u.test(lines[index + 1] ?? ""),
+  );
+  if (heading < 0) {
+    throw new Error(`${languagePlanPath} has no Work units section.`);
+  }
+  const ids: string[] = [];
+  let inTable = false;
+  for (const line of lines.slice(heading + 2)) {
+    if (line.startsWith("|")) {
+      inTable = true;
+      const id = /^\| `([a-z0-9]+(?:-[a-z0-9]+)*)` +\|/u.exec(line)?.[1];
+      if (id != null) ids.push(id);
+    } else if (inTable) {
+      break;
+    }
+  }
+  if (ids.length === 0 || new Set(ids).size !== ids.length) {
+    throw new Error(
+      `${languagePlanPath} work-unit table must name unique units.`,
+    );
+  }
+  return new Set(ids);
+}
+
+/** Read the work-unit IDs from the checked-in *PLAN-LANGUAGE.md*. */
+export function readCurrentLanguageUnitIds(): ReadonlySet<string> {
+  return parseLanguageUnitIds(
+    readFileSync(join(repositoryRoot, languagePlanPath), "utf8"),
+  );
+}
+
+/**
  * Report whether a decision record's status is accepted. The first line of
  * the paragraph under its Status heading must begin with `Accepted`, so a
  * proposed, deferred, or superseded record cannot authorize an exclusion.
@@ -839,6 +903,7 @@ function readCurrentInputs(
       acceptedRecords: readCurrentAcceptedRecords(),
       deferredPaths: readCurrentM5cDeferralPaths(),
       nodeIds: readCurrentM5cNodeIds(),
+      unitIds: readCurrentLanguageUnitIds(),
     },
   };
 }

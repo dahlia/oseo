@@ -515,9 +515,11 @@ named deferrals, but this plan inherits them as residue so that admitting
 
 Accepted [ADR 0032](./docs/adr/0032-post-m5-edition-boundary.md) adds about
 477 *test/annexB/* paths that call `eval` or a `Function` constructor, almost
-all under *test/annexB/language/eval-code/*. They enter as ADR 0016 results
-when the `claim-boundary` unit of [*PLAN-LANGUAGE.md*](./PLAN-LANGUAGE.md)
-lands, and join the same residue.
+all under *test/annexB/language/eval-code/*. They are unreviewed closure-ledger
+rows until the `annexb-dynamic-source-accounting` unit of
+[*PLAN-LANGUAGE.md*](./PLAN-LANGUAGE.md) admits and observes them. They become
+ADR 0016 results through that unit's reviewed exclusion audit rows and then
+join the same residue.
 
 
 Entry criteria

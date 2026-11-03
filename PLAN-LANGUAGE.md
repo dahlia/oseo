@@ -4,8 +4,9 @@ Post-M5 language compatibility plan
 Status
 ------
 
-Implementation status: planned, not started. This plan follows M5 directly and
-runs alongside M6. It has no milestone number. It schedules the language work
+Implementation status: in progress. The `claim-boundary` unit has applied ADR
+0032, and every other unit is open. This plan follows M5 directly and runs
+alongside M6. It has no milestone number. It schedules the language work
 the maintainer approved on 2026-11-02: build-time static-specifier `import()`,
 Annex B legacy web behavior except `document.all`, the legacy `caller`
 extension, the seven ECMAScript 2026 features, and the three ECMAScript 2027
@@ -113,9 +114,9 @@ in the same profile.
 Claim boundary
 --------------
 
-The paths for this work lie outside the M5 inventory, so no unit can admit
-them until the boundary moves. Accepted
-[ADR 0032](./docs/adr/0032-post-m5-edition-boundary.md) moves it. It measures
+The paths for this work lay outside the M5 inventory, so no unit could admit
+them until the boundary moved. Accepted
+[ADR 0032](./docs/adr/0032-post-m5-edition-boundary.md) moved it. It measures
 ECMAScript 2026 plus explicit resource management, joint iteration, and
 `Atomics.pause`, includes Annex B except `[[IsHTMLDDA]]`, and keeps Temporal,
 ECMA-402, and proposals outside. ADR 0016 stays in force. The test262 revision
@@ -123,7 +124,7 @@ stays pinned at `f2d1435644797268dca1f7988cad5a4e89ccd8d2` through
 `language-exit-audit`; tests added upstream since then are not part of this
 claim.
 
-At the pinned revision, the rule in ADR 0032 adds 1,916 included paths:
+At the pinned revision, the rule in ADR 0032 added 1,916 included paths:
 
 | Source                                            | Paths |
 | ------------------------------------------------- | ----: |
@@ -133,13 +134,14 @@ At the pinned revision, the rule in ADR 0032 adds 1,916 included paths:
 | *test/annexB/* without IsHTMLDDA or legacy-regexp | 1,025 |
 | Total                                             | 1,916 |
 
-The inventory grows from 41,091 to 43,007 included paths. Of the 1,086
+The inventory grew from 41,091 to 43,007 included paths. Of the 1,086
 *test/annexB/* files, 35 need IsHTMLDDA and 26 carry the `legacy-regexp`
 proposal flag; those 61 stay excluded. A source scan finds 477 of the included
 *test/annexB/* paths calling `eval` or a `Function` constructor, almost all
-under *test/annexB/language/eval-code/*. They enter the inventory and become
-ADR 0016 results. That count is a planning estimate; the reviewed observations
-decide each row.
+under *test/annexB/language/eval-code/*. They are in the inventory as
+unreviewed rows and become ADR 0016 results once
+`annexb-dynamic-source-accounting` admits them. That count is a planning
+estimate; the reviewed observations decide each row.
 
 The `caller` work and literal `import()` change rows already inside the
 inventory, so neither waits for ADR 0032.
@@ -244,35 +246,35 @@ Work units
 The table summarizes ownership. “New” counts paths that ADR 0032 adds to the
 inventory; “existing” counts rows already in it whose owner moves to the unit.
 
-| Unit                               | Owned paths                           | Requires                                        |
-| ---------------------------------- | ------------------------------------- | ----------------------------------------------- |
-| `claim-boundary`                   | 1,916 new rows, until handed to units | ADR 0032 accepted                               |
-| `import-driver`                    | none; re-observes module rows         | none                                            |
-| `import-requests`                  | none                                  | ADR 0016 amendment (accepted)                   |
-| `import-operation`                 | none                                  | `import-driver`, `import-requests`              |
-| `import-admission`                 | 20 existing deferrals                 | `import-operation`                              |
-| `legacy-caller`                    | 23 existing                           | successor to ADR 0028 accepted                  |
-| `annexb-syntax`                    | 28 new, 1 existing                    | `claim-boundary`                                |
-| `annexb-escape`                    | 35 new                                | `claim-boundary`                                |
-| `annexb-string-methods`            | 105 new                               | `claim-boundary`                                |
-| `annexb-date-methods`              | 24 new                                | `claim-boundary`                                |
-| `annexb-regexp-compile`            | 24 new                                | `annexb-syntax`                                 |
-| `annexb-object-accessors`          | 70 new, 8 existing                    | `claim-boundary`                                |
-| `annexb-function-declarations`     | 313 new                               | `claim-boundary`                                |
-| `annexb-statement-forms`           | 19 new                                | `claim-boundary`                                |
-| `annexb-dynamic-source-accounting` | 477 new, 2 existing                   | `annexb-syntax`, `annexb-function-declarations` |
-| `error-is-error`                   | 12 new                                | `claim-boundary`                                |
-| `math-sum-precise`                 | 10 new                                | `claim-boundary`                                |
-| `upsert`                           | 72 new                                | `claim-boundary`                                |
-| `array-from-async`                 | 95 new                                | `claim-boundary`                                |
-| `uint8array-base64`                | 68 new                                | `claim-boundary`                                |
-| `iterator-concat`                  | 32 new                                | `claim-boundary`                                |
-| `json-parse-source`                | 21 new                                | `claim-boundary`                                |
-| `disposal-intrinsics`              | 240 new                               | `claim-boundary`                                |
-| `using-declarations`               | 184 new                               | `disposal-intrinsics`                           |
-| `iterator-zip`                     | 82 new                                | `claim-boundary`                                |
-| `atomics-pause`                    | 5 new                                 | `claim-boundary`                                |
-| `language-exit-audit`              | none                                  | every other unit                                |
+| Unit                               | Owned paths                          | Requires                                        |
+| ---------------------------------- | ------------------------------------ | ----------------------------------------------- |
+| `claim-boundary`                   | none; handed 1,916 new rows to units | ADR 0032 accepted                               |
+| `import-driver`                    | none; re-observes module rows        | none                                            |
+| `import-requests`                  | none                                 | ADR 0016 amendment (accepted)                   |
+| `import-operation`                 | none                                 | `import-driver`, `import-requests`              |
+| `import-admission`                 | 20 existing deferrals                | `import-operation`                              |
+| `legacy-caller`                    | 23 existing                          | successor to ADR 0028 accepted                  |
+| `annexb-syntax`                    | 28 new, 1 existing                   | `claim-boundary`                                |
+| `annexb-escape`                    | 35 new                               | `claim-boundary`                                |
+| `annexb-string-methods`            | 105 new                              | `claim-boundary`                                |
+| `annexb-date-methods`              | 24 new                               | `claim-boundary`                                |
+| `annexb-regexp-compile`            | 24 new                               | `annexb-syntax`                                 |
+| `annexb-object-accessors`          | 70 new, 8 existing                   | `claim-boundary`                                |
+| `annexb-function-declarations`     | 313 new                              | `claim-boundary`                                |
+| `annexb-statement-forms`           | 19 new                               | `claim-boundary`                                |
+| `annexb-dynamic-source-accounting` | 477 new, 2 existing                  | `annexb-syntax`, `annexb-function-declarations` |
+| `error-is-error`                   | 12 new                               | `claim-boundary`                                |
+| `math-sum-precise`                 | 10 new                               | `claim-boundary`                                |
+| `upsert`                           | 72 new                               | `claim-boundary`                                |
+| `array-from-async`                 | 95 new                               | `claim-boundary`                                |
+| `uint8array-base64`                | 68 new                               | `claim-boundary`                                |
+| `iterator-concat`                  | 32 new                               | `claim-boundary`                                |
+| `json-parse-source`                | 21 new                               | `claim-boundary`                                |
+| `disposal-intrinsics`              | 240 new                              | `claim-boundary`                                |
+| `using-declarations`               | 184 new                              | `disposal-intrinsics`                           |
+| `iterator-zip`                     | 82 new                               | `claim-boundary`                                |
+| `atomics-pause`                    | 5 new                                | `claim-boundary`                                |
+| `language-exit-audit`              | none                                 | every other unit                                |
 
 The new-row counts add up to 1,916. Implementation may start before a unit's
 prerequisites land: fixtures, runtime components, and differential tests need
@@ -318,31 +320,40 @@ graph TD
 
 ### `claim-boundary`
 
-This is the first unit and the only one that changes the inventory. It applies
-ADR 0032 to *tests/test262/inventory-policy.yaml*, regenerates
-*tests/test262/inventory.tsv*, and adds every new path to the reviewed subset.
+This is the first unit and the only one that changes the inventory. It applied
+ADR 0032 to *tests/test262/inventory-policy.yaml* and regenerated
+*tests/test262/inventory.tsv* to 43,007 included paths of 48,467 candidates,
+exactly the counts ADR 0032 predicts. The ADR 0020 rule stays frozen in
+*tests/test262/inventory-policy-m5.yaml*, from which the inventory tool
+derives *tests/test262/inventory-m5-additions.txt*, the 1,916 added paths.
+The closed M5 graph checks read the inventory without them.
 
-Most new ES2026 and ES2027 rows carry a feature flag that is absent from
-`supportedFeatures`, so the existing frontmatter rejection records them as
-unsupported without running them. Most *test/annexB/* rows have no flag and
-would run, and many would fail. The unit adds a reviewed path-selector gate to
-the runner that records each unadmitted Annex B row as unsupported with a
-named capability, one per owning unit. A row that already passes, such as the
-HTML-like comment and catch redeclaration rows, may be admitted here.
+The new paths did not enter the reviewed subset or the manifest. Each is
+`unreviewed` in the closure ledger with a `unit:<id>` owner naming the unit in
+the table above, and the per-unit counts equal that table. An owning unit
+admits its rows into *tests/test262/subset.yaml* with reviewed dependency tags
+in the change that implements them, and the full manifest update observes
+them. A row therefore runs only once its unit admits it, so the runner needs
+no Annex B gate. Feature-tagged rows still enter through the
+frontmatter rejection until their feature joins `supportedFeatures`. The
+maintainer accepted this rule as an amendment to ADR 0032 on 2026-11-03.
 
-The unit also hands each new unsupported row to its owning unit in the closure
-ledger, and moves the 11 ADR 0013 Annex B rows to `annexb-syntax`,
-`annexb-object-accessors`, and `annexb-dynamic-source-accounting`. It freezes
-the generated section of the M5 exit report, as ADR 0032 decides, and points
-the exit audit, the compatibility ratchet, and the evidence-lane check at the
-expanded inventory. It starts the successor
-ECMAScript 2026 language profile, *docs/language-profile-es2026.md*, with its
-own family index for every new family; the M5 profile stays fixed as the record
-of the M5 claim.
+The 11 ADR 0013 Annex B rows moved to remediation owners, as ADR 0032's
+Closure accounting requires: one to `unit:annexb-syntax`, eight to
+`unit:annexb-object-accessors`, and two to
+`unit:annexb-dynamic-source-accounting`. Their exclusion audit assessments
+keep their reasons and replacement evidence with `disposition: remediation`,
+and the language claim audit counts them as remediation of those units.
 
-Done when the regenerated inventory has 43,007 included paths or the unit
-explains each difference, the reviewed subset and manifest cover all of them,
-no row is a failure, and every unsupported row has an owner.
+The unit froze the generated coverage section of the M5 exit report and
+replaced `check:m5-exit-audit` with `check:language-claim-audit`, which
+applies the ADR 0019 conditions to the expanded inventory and counts the open
+rows of each unit. The compatibility ratchet now rejects any path that leaves
+the included inventory. `check:evidence-lanes` also validates the family
+records of the successor
+[ECMAScript 2026 language profile](./docs/language-profile-es2026.md), whose
+family index lists the planned families by unit; the M5 profile stays fixed
+as the record of the M5 claim.
 
 ### Static-specifier `import()` units
 
@@ -415,7 +426,7 @@ Owns *test/annexB/language/comments/* (8), *test/annexB/language/literals/*
 (8), *test/annexB/language/expressions/template-literal/* (2), and the
 *test/annexB/built-ins/RegExp/* files and *named-groups/* rows that call no
 `eval` (10), plus *test/built-ins/String/prototype/split/separator-regexp.js*
-from ADR 0013.
+from ADR 0013, whose remediation it owns until its patterns are admitted.
 
 HTML-like comments already parse; the unit pins their Script-only behavior,
 including the multi-line comment and line-terminator cases. The main work is
@@ -466,7 +477,8 @@ Owns the 70 normative-optional paths ADR 0020 excluded: the five
 also takes eight ADR 0013 rows: three TypedArray rows that read or write
 `__proto__`, *test/language/types/object/S8.6.2\_A8.js*, and the four
 *private-getter-is-not-a-own-property.js* and
-*private-setter-is-not-a-own-property.js* rows.
+*private-setter-is-not-a-own-property.js* rows, whose remediation it owns
+until the accessors are implemented.
 
 The unit gives the existing `__proto__` accessor identities real bodies and
 installs the four legacy methods. It removes the OSEO1001 accessor diagnostics
@@ -520,7 +532,8 @@ Owns the 477 new rows that call `eval` or a `Function` constructor: the
 *test/annexB/language/eval-code/* rows, the six
 _test/annexB/built-ins/Function/createdynfn-\*.js_ rows, and
 *RegExp-leading-escape-BMP.js* and *RegExp-trailing-escape-BMP.js*. It also
-takes the two ADR 0013 rows *S7.8.5\_A1.4\_T2.js* and *S7.8.5\_A2.4\_T2.js*.
+owns the remediation of the two former ADR 0013 rows *S7.8.5\_A1.4\_T2.js* and
+*S7.8.5\_A2.4\_T2.js*, which it closes with a reviewed exclusion audit change.
 
 No implementation lands here. Each row receives a reviewed exclusion audit row
 under ADR 0016. A row whose non-source subject is Annex B behavior names the

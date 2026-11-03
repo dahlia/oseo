@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import { readFileSync } from "node:fs";
 import test from "node:test";
 
 import { parse as parseYaml } from "yaml";
@@ -6,6 +7,7 @@ import { parse as parseYaml } from "yaml";
 import {
   deriveM5cClosureLedger,
   isAcceptedDecisionRecord,
+  parseLanguageUnitIds,
   parseM5cClosureLedger,
   readCurrentAcceptedRecords,
   serializeM5cClosureLedger,
@@ -17,7 +19,11 @@ import type {
   M5cLedgerManifestInput,
   M5cLedgerOwnerTargets,
 } from "../tools/m5c-closure-ledger.ts";
-import { deriveCurrentM5cBaseline } from "../tools/m5c-graph.ts";
+import {
+  deriveM5cBaseline,
+  m5cInventoryPath,
+  readCurrentM5cManifest,
+} from "../tools/m5c-graph.ts";
 
 const revision = "abc123";
 const nodeIds: ReadonlySet<string> = new Set([
@@ -31,6 +37,7 @@ const recordOwner = `adr:${authorizingRecord}`;
 const targets: M5cLedgerOwnerTargets = {
   acceptedRecords: new Set([authorizingRecord]),
   nodeIds,
+  unitIds: new Set(["annexb-syntax"]),
 };
 const passPath = "test/built-ins/A/pass.js";
 const negativePath = "test/language/B/negative.js";
@@ -276,18 +283,71 @@ test("unsupported prerequisites come from the manifest", () => {
 test("owners must fit the path state", () => {
   const cases: readonly (readonly [string, string, RegExp])[] = [
     [passPath, "unassigned", /must be observation for a pass path/u],
-    [unreviewedPath, "unassigned", /must name the M5c graph node/u],
+    [unreviewedPath, "unassigned", /must name the graph node or work unit/u],
     [
       realmPath,
       "observation",
-      /must be unassigned or a node:, adr:, or deferred owner for a unsupp/u,
+      /must be unassigned or a node:, unit:, adr:, or deferred owner for a /u,
     ],
     [realmPath, "node:missing-node", /unknown M5c graph node missing-node/u],
+    [
+      unreviewedPath,
+      "unit:missing-unit",
+      /unknown PLAN-LANGUAGE\.md work unit missing-unit/u,
+    ],
   ];
   for (const [path, owner, message] of cases) {
     const text = serializeM5cClosureLedger(withOwner(path, owner));
     assert.throws(() => validate(text), message, `${path} ${owner}`);
   }
+});
+
+test("a work unit may own unreviewed and remediated paths", () => {
+  for (const path of [unreviewedPath, realmPath]) {
+    const summary = validate(
+      serializeM5cClosureLedger(withOwner(path, "unit:annexb-syntax")),
+    );
+    assert.equal(summary.owners.get("unit:annexb-syntax"), 1);
+  }
+  assert.throws(
+    () =>
+      validateM5cClosureLedger(
+        serializeM5cClosureLedger(
+          withOwner(unreviewedPath, "unit:annexb-syntax"),
+        ),
+        inventoryText,
+        manifest,
+        { acceptedRecords: targets.acceptedRecords, nodeIds },
+      ),
+    /unknown PLAN-LANGUAGE\.md work unit annexb-syntax/u,
+  );
+});
+
+test("work-unit IDs come from the PLAN-LANGUAGE.md unit table", () => {
+  const plan = [
+    "Intro",
+    "",
+    "Work units",
+    "----------",
+    "",
+    "| Unit | Owned paths |",
+    "| ---- | ----------- |",
+    "| `claim-boundary` | none |",
+    "| `annexb-syntax` | 28 new |",
+    "",
+    "| `not-a-unit` | later table |",
+    "",
+  ].join("\n");
+  assert.deepEqual(
+    [...parseLanguageUnitIds(plan)],
+    ["claim-boundary", "annexb-syntax"],
+  );
+  assert.throws(() => parseLanguageUnitIds("No units\n"), /no Work units/u);
+  assert.throws(
+    () =>
+      parseLanguageUnitIds(plan.replace("`annexb-syntax`", "`claim-boundary`")),
+    /must name unique units/u,
+  );
 });
 
 test("an accepted record with a note may authorize an exclusion", () => {
@@ -324,7 +384,7 @@ test("an authorizing owner must name an accepted record", () => {
     ],
     [
       "exclusion:realms",
-      /must be unassigned or a node:, adr:, or deferred owner/u,
+      /must be unassigned or a node:, unit:, adr:, or deferred owner/u,
     ],
   ];
   for (const [owner, message] of cases) {
@@ -380,7 +440,7 @@ test("only an unsupported path may cite an authorizing record", () => {
   );
   assert.throws(
     () => validate(observed, failed),
-    /must be unassigned or a node: owner for a semantic-failure path/u,
+    /must be unassigned or a node: or unit: owner for a semantic-failure path/u,
   );
 });
 
@@ -604,7 +664,10 @@ test("regeneration keeps valid owners and notes only", () => {
 
 test("the checked-in ledger matches the reviewed manifest", () => {
   const summary = validateCurrentM5cClosureLedger();
-  const baseline = deriveCurrentM5cBaseline();
+  const baseline = deriveM5cBaseline(
+    readFileSync(new URL(`../${m5cInventoryPath}`, import.meta.url), "utf8"),
+    readCurrentM5cManifest(),
+  );
   assert.equal(summary.inventoryPaths, baseline.inventoryPaths);
   assert.equal(summary.states.get("unreviewed"), baseline.unreviewedPaths);
   assert.equal(summary.states.get("pass"), baseline.passes);

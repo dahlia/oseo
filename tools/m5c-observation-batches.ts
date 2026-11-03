@@ -13,7 +13,7 @@ import {
 } from "./m5c-closure-ledger.ts";
 import type { M5cClosureLedger } from "./m5c-closure-ledger.ts";
 import {
-  m5cInventoryPath,
+  readCurrentM5InventoryText,
   m5cWorkGraphNodeDirectory,
   parseM5cInventory,
   readCurrentM5cManifest,
@@ -1023,10 +1023,17 @@ export function readCurrentM5cObservationBasis(): M5cObservationBasis {
 export function readCurrentM5cObservationInputs(
   basis: M5cObservationBasis,
 ): M5cObservationInputs {
-  const manifest = readCurrentM5cManifest();
-  const inventory = parseM5cInventory(
-    readFileSync(join(repositoryRoot, m5cInventoryPath), "utf8"),
-  );
+  const inventory = parseM5cInventory(readCurrentM5InventoryText());
+  // The plan describes the M5 inventory; rows that post-M5 units admit
+  // must not change its reviewed set or its executed-variant cost.
+  const m5Paths = new Set(inventory.includedPaths);
+  const fullManifest = readCurrentM5cManifest();
+  const manifest = {
+    ...fullManifest,
+    results: fullManifest.results.filter((result) =>
+      m5Paths.has(result.case.path),
+    ),
+  };
   const subset = parseReviewedSubset(
     readFileSync(join(repositoryRoot, subsetPath), "utf8"),
   );
@@ -1235,10 +1242,19 @@ export function validateCurrentM5cObservationPlan(): M5cObservationPlan {
         "`mise run m5c:observation-batches:update`.",
     );
   }
+  // The plan partitions the M5 inventory, so only its ledger entries count;
+  // the paths ADR 0032 added belong to PLAN-LANGUAGE.md work units.
+  const m5Paths = new Set(
+    parseM5cInventory(readCurrentM5InventoryText()).includedPaths,
+  );
+  const ledger = readLedger();
   validateM5cObservationOwnership(
     plan,
     assigned,
-    readLedger(),
+    {
+      ...ledger,
+      entries: ledger.entries.filter((entry) => m5Paths.has(entry.path)),
+    },
     readNodeDependencies,
   );
   return plan;

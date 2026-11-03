@@ -26,6 +26,8 @@ const path = "test/language/eval-code/example.js";
 const owner = "adr:0016-dynamic-source-boundary";
 const remediationOwner = "node:dynamic-source-coverage-remediation";
 const annexOwner = "adr:0013-m5-edition-and-manifest";
+/** Work unit that remediates a former ADR 0013 exclusion after ADR 0032. */
+const unitAnnexOwner = "unit:annexb-object-accessors";
 const annexRemediationOwner = "node:regexp-split-coverage-remediation";
 const protoRemediationOwner = "node:typed-array-proto-coverage-remediation";
 const ordinaryProtoRemediationOwner =
@@ -617,6 +619,8 @@ test("a deferred path on a record surface cannot drop its audit row", () => {
 test("the Annex B residue selector bounds ADR 0013 over eval", () => {
   const { audit, inputs } = fixture();
   audit.assessments.reviewed.normativeDependency = "annex-b-only";
+  audit.assessments.reviewed.disposition = "remediation";
+  audit.assessments.reviewed.remediationOwner = unitAnnexOwner;
   audit.paths[0]!.proposedOwner = annexOwner;
   audit.paths[0]!.missingDynamicTag = false;
   const owned = {
@@ -626,7 +630,7 @@ test("the Annex B residue selector bounds ADR 0013 over eval", () => {
       entries: [
         {
           path,
-          owner: annexOwner,
+          owner: unitAnnexOwner,
           prerequisites: result.dependencies,
           state: result.classification,
         },
@@ -635,15 +639,32 @@ test("the Annex B residue selector bounds ADR 0013 over eval", () => {
   };
   const selected = { ...owned, annexDynamicResiduePaths: new Set([path]) };
   assert.equal(
-    validateM5cExclusionAudit(stringifyYaml(audit), selected).exclusions,
+    validateM5cExclusionAudit(stringifyYaml(audit), selected).remediation,
     1,
   );
-  // Outside the selector, an eval rejection cannot authorize ADR 0013.
+  // Outside the selector, an eval rejection cannot stand under ADR 0013.
   assert.throws(
     () => validateM5cExclusionAudit(stringifyYaml(audit), owned),
     /exact Annex B residue selector/u,
   );
-  // Inside it, the row must stay a bound exclusion.
+  // ADR 0032 withdrew the exclusion the selector once bounded.
+  const { remediationOwner: unitOwner, ...excluded } =
+    audit.assessments.reviewed;
+  assert.equal(unitOwner, unitAnnexOwner);
+  assert.throws(
+    () =>
+      validateM5cExclusionAudit(
+        stringifyYaml({
+          ...audit,
+          assessments: {
+            reviewed: { ...excluded, disposition: "exclusion" },
+          },
+        }),
+        selected,
+      ),
+    /ADR 0032 withdrew the ADR 0013 Annex B exclusion/u,
+  );
+  // Inside it, the row must stay bound to its replacement evidence.
   const { replacementEvidence, ...unbound } = audit.assessments.reviewed;
   assert.ok(replacementEvidence);
   assert.throws(
@@ -939,7 +960,9 @@ function expectedAuditCounts(
       entry.owner === annexRemediationOwner ||
       entry.owner === protoRemediationOwner ||
       entry.owner === ordinaryProtoRemediationOwner ||
-      entry.owner === lookupRemediationOwner,
+      entry.owner === lookupRemediationOwner ||
+      // Former ADR 0013 rows; other unit-owned paths are unreviewed.
+      (entry.owner.startsWith("unit:") && auditedPaths.has(entry.path)),
   );
   return {
     exclusions: exclusions.length,
@@ -957,6 +980,7 @@ function expectedAuditCounts(
         entry.owner !== protoRemediationOwner &&
         entry.owner !== ordinaryProtoRemediationOwner &&
         entry.owner !== lookupRemediationOwner &&
+        !entry.owner.startsWith("unit:") &&
         !entry.prerequisites.includes("dynamic-source"),
     ).length,
   };
@@ -1099,6 +1123,49 @@ test("mixed Annex B/core coverage needs its own remediation owner", () => {
   assert.throws(
     () => validateM5cExclusionAudit(stringifyYaml(audit), annexInputs),
     /bounded surface differs from record/u,
+  );
+});
+
+test("a work unit remediates only a former ADR 0013 row", () => {
+  const detail =
+    "error[OSEO1001]: The Object.prototype.__proto__ accessor " +
+    "is excluded by Annex B.";
+  const { audit, inputs } = fixture(true);
+  audit.paths[0]!.proposedOwner = annexOwner;
+  audit.paths[0]!.missingDynamicTag = false;
+  audit.assessments.reviewed.remediationOwner = unitAnnexOwner;
+  const observed = { ...observation, detail };
+  audit.paths[0]!.observationDigest = exclusionObservationDigest(observed);
+  const unitLedger = {
+    ...inputs.ledger,
+    entries: inputs.ledger.entries.map((entry) =>
+      Object.assign({}, entry, { owner: unitAnnexOwner }),
+    ),
+  };
+  const annexInputs: M5cExclusionAuditInputs = {
+    ...inputs,
+    results: [{ ...result, observation: observed }],
+    ledger: unitLedger,
+  };
+  assert.deepEqual(
+    validateM5cExclusionAudit(stringifyYaml(audit), annexInputs),
+    {
+      exclusions: 0,
+      remediation: 1,
+      deferrals: 0,
+      missingDynamicTags: 0,
+    },
+  );
+  // An ADR 0016 row keeps its own remediation node.
+  const dynamic = fixture(true);
+  dynamic.audit.assessments.reviewed.remediationOwner = unitAnnexOwner;
+  assert.throws(
+    () =>
+      validateM5cExclusionAudit(stringifyYaml(dynamic.audit), {
+        ...dynamic.inputs,
+        ledger: unitLedger,
+      }),
+    /work-unit owner needs an ADR 0013 remediation row/u,
   );
 });
 
@@ -1328,7 +1395,7 @@ test("the exact legacy lookup rejection uses only its bounded owner", () => {
               ),
             },
           }),
-        /legacy lookup remediation owner/u,
+        /ADR 0032 withdrew the ADR 0013 Annex B exclusion/u,
       );
       audit.assessments.reviewed.disposition = "remediation";
       audit.assessments.reviewed.normativeDependency = "not-demonstrated";
@@ -1425,34 +1492,58 @@ test("a legacy lookup rejection must name a method the source calls", () => {
   );
 });
 
-test("the legacy lookup closure selector bounds ADR 0013 exclusion", () => {
+test("the legacy lookup closure selector bounds its unit owner", () => {
   const { audit, inputs } = lookupFixture(
     "__lookupGetter__",
     lookupDiagnostic("__lookupGetter__"),
   );
-  Reflect.deleteProperty(audit.assessments.reviewed, "remediationOwner");
-  audit.assessments.reviewed.disposition = "exclusion";
+  audit.assessments.reviewed.remediationOwner = unitAnnexOwner;
   audit.assessments.reviewed.normativeDependency = "annex-b-only";
   const owned = {
     ...inputs,
     ledger: {
       ...inputs.ledger,
       entries: inputs.ledger.entries.map((entry) =>
-        Object.assign({}, entry, { owner: annexOwner }),
+        Object.assign({}, entry, { owner: unitAnnexOwner }),
       ),
     },
   };
   const selected = { ...owned, annexLookupClosedPaths: new Set([path]) };
   assert.equal(
-    validateM5cExclusionAudit(stringifyYaml(audit), selected).exclusions,
+    validateM5cExclusionAudit(stringifyYaml(audit), selected).remediation,
     1,
   );
-  // Outside the selector, a lookup rejection cannot close its subject.
+  // Outside the selector, a lookup rejection keeps its remediation node.
   assert.throws(
     () => validateM5cExclusionAudit(stringifyYaml(audit), owned),
     /exact legacy lookup closure selector/u,
   );
-  // Inside it, the row must stay a bound exclusion without an owner node.
+  // ADR 0032 withdrew the exclusion the selector once bounded.
+  const { remediationOwner: unitOwner, ...excluded } =
+    audit.assessments.reviewed;
+  assert.equal(unitOwner, unitAnnexOwner);
+  assert.throws(
+    () =>
+      validateM5cExclusionAudit(
+        stringifyYaml({
+          ...audit,
+          assessments: {
+            reviewed: { ...excluded, disposition: "exclusion" },
+          },
+        }),
+        {
+          ...selected,
+          ledger: {
+            ...inputs.ledger,
+            entries: inputs.ledger.entries.map((entry) =>
+              Object.assign({}, entry, { owner: annexOwner }),
+            ),
+          },
+        },
+      ),
+    /ADR 0032 withdrew the ADR 0013 Annex B exclusion/u,
+  );
+  // Inside it, the row must stay bound and owned by its work unit.
   const { replacementEvidence, ...unbound } = audit.assessments.reviewed;
   assert.ok(replacementEvidence);
   assert.throws(
@@ -1497,8 +1588,7 @@ test("the legacy lookup closure selector bounds ADR 0013 exclusion", () => {
     "error[OSEO1001]: The Object.prototype.__proto__ accessor is " +
     "excluded by Annex B.";
   const proto = lookupFixture("__lookupGetter__", annexProto);
-  Reflect.deleteProperty(proto.audit.assessments.reviewed, "remediationOwner");
-  proto.audit.assessments.reviewed.disposition = "exclusion";
+  proto.audit.assessments.reviewed.remediationOwner = unitAnnexOwner;
   proto.audit.assessments.reviewed.normativeDependency = "annex-b-only";
   assert.throws(
     () =>

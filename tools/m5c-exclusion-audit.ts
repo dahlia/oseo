@@ -31,12 +31,16 @@ const annexOwner = "adr:0013-m5-edition-and-manifest";
 const remediationOwner = "node:dynamic-source-coverage-remediation";
 /** Ledger owner of a path named in the ADR 0031 deferral list. */
 const deferredOwner = "deferred";
+/** Prefix of a remediation owner naming a *PLAN-LANGUAGE.md* work unit. */
+const unitOwnerPrefix = "unit:";
 /**
  * Paths whose only Annex B dependence sits behind the eval rejection they
  * observe. The maintainer decision of 2026-11-01 applied item 3 of the
  * 2026-10-28 decision to exactly these two: their exhaustive replacement
  * evidence witnesses every core subject, and only the U+200C and U+200D
- * identity escapes still need Annex B. ADR 0013 itself is unchanged.
+ * identity escapes still need Annex B. ADR 0032 withdrew the ADR 0013
+ * authorization that excluded them, so each is now a work unit's
+ * remediation row.
  */
 export const m5cAnnexDynamicResiduePaths: ReadonlySet<string> = new Set([
   "test/language/literals/regexp/S7.8.5_A1.4_T2.js",
@@ -80,7 +84,8 @@ const lookupRemediationOwner =
  * decision to exactly the two class expression paths, and the decision of
  * 2026-11-02 to exactly the two class declaration paths of the same shape:
  * the public-absence replacement fixtures of each form witness every core
- * subject. ADR 0013 is unchanged.
+ * subject. ADR 0032 withdrew the ADR 0013 authorization that excluded
+ * them, so each is now a work unit's remediation row.
  */
 export const m5cAnnexLookupClosedPaths: ReadonlySet<string> = new Set([
   "test/language/expressions/class/elements/" +
@@ -381,13 +386,14 @@ export interface M5cExclusionAuditInputs {
   /** Exact ADR 0028 selector; absent means no path may use its owner. */
   readonly legacyCallerPaths?: ReadonlySet<string>;
   /**
-   * Exact ADR 0013 rows over an eval rejection; absent means none. The
-   * checked-in audit passes `m5cAnnexDynamicResiduePaths`.
+   * Exact unit-owned ADR 0013 rows over an eval rejection; absent means
+   * none. The checked-in audit passes `m5cAnnexDynamicResiduePaths`.
    */
   readonly annexDynamicResiduePaths?: ReadonlySet<string>;
   /**
-   * Exact ADR 0013 exclusions over a legacy lookup rejection; absent means
-   * none. The checked-in audit passes `m5cAnnexLookupClosedPaths`.
+   * Exact unit-owned ADR 0013 rows over a legacy lookup rejection whose
+   * replacement evidence covers every core subject; absent means none. The
+   * checked-in audit passes `m5cAnnexLookupClosedPaths`.
    */
   readonly annexLookupClosedPaths?: ReadonlySet<string>;
   readonly ledger: M5cClosureLedger;
@@ -589,6 +595,13 @@ export function validateM5cExclusionAudit(
     ) {
       throw new Error(`Audit bounded surface differs from record: ${path}.`);
     }
+    // ADR 0032 withdrew ADR 0013's Annex B authorization, so its rows are
+    // remediation until their work units implement the behavior.
+    if (excluded && proposedOwner === annexOwner) {
+      throw new Error(
+        `ADR 0032 withdrew the ADR 0013 Annex B exclusion: ${path}.`,
+      );
+    }
     // Promotions close a historical assessment without inventing a new one.
     if (entry.state === "pass" || entry.state === "expected-negative") {
       if (entry.owner !== "observation") {
@@ -612,15 +625,25 @@ export function validateM5cExclusionAudit(
       recordSurfaces(result, source);
     const lookupMethod = annexLookupRejection.exec(accessorDetail)?.[1];
     // An ADR 0013 row may stand over the eval rejection only in the exact
-    // residue selector, only as a bound annex-b-only exclusion, and every
-    // selector path must be such a row.
+    // residue selector, only as a bound annex-b-only row a work unit
+    // remediates, and every selector path must be such a row.
     const annexResidue = inputs.annexDynamicResiduePaths?.has(path) ?? false;
+    const unitOwned =
+      isString(assessment.remediationOwner) &&
+      assessment.remediationOwner.startsWith(unitOwnerPrefix);
+    // A work unit remediates only an ADR 0013 row; the ledger checks that
+    // the unit exists.
+    if (unitOwned && (proposedOwner !== annexOwner || excluded || deferred)) {
+      throw new Error(
+        `Audit work-unit owner needs an ADR 0013 remediation row: ${path}.`,
+      );
+    }
     if (
       annexResidue !==
       (proposedOwner === annexOwner &&
         dynamicSurface &&
         !annexSurface &&
-        excluded &&
+        unitOwned &&
         assessment.normativeDependency === "annex-b-only" &&
         assessment.replacementEvidence != null)
     ) {
@@ -647,18 +670,17 @@ export function validateM5cExclusionAudit(
     }
     if (missingTag) missingDynamicTags += 1;
     const annexRemediationOwner = assessment.remediationOwner;
-    // A legacy lookup row may be an exclusion only in the exact closure
-    // selector, only as a bound annex-b-only exclusion, and every selector
-    // path must be such a row.
+    // A legacy lookup row may name a work unit only in the exact closure
+    // selector, only as a bound annex-b-only row, and every selector path
+    // must be such a row.
     const lookupClosed = inputs.annexLookupClosedPaths?.has(path) ?? false;
     if (
       lookupClosed !==
       (lookupMethod != null &&
         proposedOwner === annexOwner &&
-        excluded &&
+        unitOwned &&
         assessment.normativeDependency === "annex-b-only" &&
-        assessment.replacementEvidence != null &&
-        annexRemediationOwner == null)
+        assessment.replacementEvidence != null)
     ) {
       throw new Error(
         `Audit needs the exact legacy lookup closure selector: ${path}.`,
@@ -670,7 +692,6 @@ export function validateM5cExclusionAudit(
       if (
         !lookupClosed &&
         (proposedOwner !== annexOwner ||
-          excluded ||
           annexRemediationOwner !== lookupRemediationOwner)
       ) {
         throw new Error(
@@ -692,6 +713,7 @@ export function validateM5cExclusionAudit(
       !deferred &&
       proposedOwner === annexOwner &&
       annexRemediationOwner !== lookupRemediationOwner &&
+      !unitOwned &&
       (!isString(annexRemediationOwner) ||
         !annexRemediationOwners.has(annexRemediationOwner))
     ) {

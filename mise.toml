@@ -42,11 +42,11 @@ depends = [
   "check:compatibility-ratchet",
   "check:evidence-lanes",
   "check:fmt",
+  "check:language-claim-audit",
   "check:test262-inventory",
   "check:lines",
   "check:lint",
   "check:macos-lanes",
-  "check:m5-exit-audit",
   "check:m5b-graph",
   "check:m5b-node-scope",
   "check:m5c-closure-ledger",
@@ -111,6 +111,10 @@ run = "mise fmt --check"
 [tasks."check:fmt:oxfmt"]
 run = "oxfmt --check ."
 
+[tasks."check:language-claim-audit"]
+description = "Prove the ADR 0032 claim accounting over the expanded inventory"
+run = "node tools/language-claim-audit.ts"
+
 [tasks."check:lines"]
 run = "node tools/check-lines.ts"
 
@@ -124,10 +128,6 @@ run = "node tools/m5b-graph.ts"
 [tasks."check:m5b-node-scope"]
 description = "Keep reviewed evidence within the named M5b node scope"
 run = "node tools/m5b-node-scope.ts"
-
-[tasks."check:m5-exit-audit"]
-description = "Prove the mechanical M5 exit conditions and the coverage report"
-run = "node tools/m5-exit-audit.ts"
 
 [tasks."check:m5c-closure-ledger"]
 description = "Validate the derived M5c inventory closure ledger"
@@ -349,13 +349,9 @@ run = "node tools/test262.ts --reindex"
 description = "Regenerate the pinned ECMA-262 applicable-test inventory"
 run = "node tools/test262-inventory.ts --update"
 
-[tasks."report:m5-coverage"]
-description = "Print the M5 coverage report from checked-in inputs"
-run = "node tools/m5-exit-audit.ts --print"
-
-[tasks."report:m5-coverage:update"]
-description = "Regenerate the coverage section of the M5 exit report"
-run = "node tools/m5-exit-audit.ts --update"
+[tasks."report:language-coverage"]
+description = "Print the post-M5 language coverage report"
+run = "node tools/language-claim-audit.ts --print"
 
 [tasks."report:m5-performance"]
 description = "Measure M5 native fixture performance and print the report"
