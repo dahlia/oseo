@@ -590,6 +590,8 @@ current *tests/test262/inventory.tsv*.
     correctly rounded exact sum, with the edition's `-0`, infinity, and NaN
     rules and an iterator that is closed on a non-Number value. A property
     test compares it with an exact BigInt rational sum.
+    The runtime, fixtures, and property suite are implemented; the rows wait
+    for `claim-boundary`.
  -  `upsert` owns `getOrInsert` and `getOrInsertComputed` on `Map` and
     `WeakMap` (72). `getOrInsertComputed` runs its callback once and then
     stores the result even if the callback inserted the key. The `WeakMap`

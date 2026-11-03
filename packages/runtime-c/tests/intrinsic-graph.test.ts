@@ -1131,6 +1131,7 @@ test("populates the realm-owned Math namespace object", () => {
     "tan",
     "tanh",
     "trunc",
+    "sumPrecise",
   ]) {
     assert.match(mathSource, new RegExp(`"${property}"`, "u"));
   }
@@ -2917,4 +2918,16 @@ test("installs Error.isError as one [[ErrorData]] query", () => {
     errorSource,
     /is_object\(argument\) && ordinary_object\(argument\)->error_data/u,
   );
+});
+
+test("sums Math.sumPrecise operands exactly before one rounding", () => {
+  const internalHeader = sources.get("runtime_internal.h") ?? "";
+  const mathSource = sources.get("runtime_math.c") ?? "";
+  // The function is appended, so the earlier code IDs keep their places.
+  assert.match(mathSource, /OSEO_MATH_SUM_PRECISE = 36,/u);
+  assert.match(internalHeader, /OSEO_MATH_FUNCTION_COUNT \(\(size_t\)37u\)/u);
+  // Enough limbs for 2**53 values below 2**1024 at 2**-1074 resolution.
+  assert.match(mathSource, /OSEO_SUM_PRECISE_LIMBS \(\(size_t\)35u\)/u);
+  // A non-Number closes the iterator before its TypeError propagates.
+  assert.match(mathSource, /oseo_iterator_close\(context, slots\[0\], true\)/u);
 });

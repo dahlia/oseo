@@ -628,3 +628,7 @@ families:
     owner: tests/property/es2026-error-is-error.property.test.ts
     start: 0x60009900
     end: 0x600099ff
+  - family: es2026-math-sum-precise
+    owner: tests/property/es2026-math-sum-precise.property.test.ts
+    start: 0x60009a00
+    end: 0x60009aff

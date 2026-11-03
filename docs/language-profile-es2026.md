@@ -310,3 +310,26 @@ differential against Node.js and Deno. The property suite also checks each
 generated subject against a model of which construction paths create the slot.
 The family record is
 [*error-is-error.yaml*](./language-profile-es2026/families/error-is-error.yaml).
+
+### `Math.sumPrecise`
+
+`Math.sumPrecise(items)` is a writable, non-enumerable, configurable function
+property of `Math` with length 1, appended after the earlier Math functions. It
+is not a constructor.
+
+It rejects `undefined` and `null` before reading an iterator, then iterates
+`items` and requires every value to be a Number. A non-Number value, including
+a BigInt or a Number object, closes the iterator and throws a `TypeError`, even
+after an earlier NaN has already fixed the result. The result follows the
+edition's state machine: no values or only `-0` values give `-0`, NaN or both
+infinities give NaN, one infinity gives that infinity, and otherwise the result
+is the exact sum of the finite values rounded once to the nearest Number with
+ties to even. An exact sum of zero is `+0`, and a sum at or beyond
+2<sup>1024</sup> − 2<sup>970</sup> in magnitude rounds to an infinity of its
+sign.
+
+The pinned Node.js does not expose the function, so Deno is the single
+reference host. The property suite checks every generated case against an
+independent BigInt model that sums each value's exact 2<sup>-1074</sup>
+multiple and rounds once. The family record is
+[*math-sum-precise.yaml*](./language-profile-es2026/families/math-sum-precise.yaml).

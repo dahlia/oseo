@@ -1,0 +1,58 @@
+version: 1
+id: math-sum-precise
+title: "Math.sumPrecise"
+scope:
+  - "The Math.sumPrecise function property, its descriptor, name, length,
+    and non-constructor status."
+  - "The exact sum of the finite values rounded once with ties to even,
+    including subnormal results, cancellation, and overflow to an
+    infinity at the binary64 rounding boundary."
+  - "The edition's -0, infinity, and NaN state machine, the rejection of
+    undefined and null before iteration, the TypeError for every
+    non-Number value, and the iterator close that precedes it."
+owners:
+  - docs/language-profile-es2026.md
+evidence:
+  differential:
+    status: covered
+    references:
+      - tests/native/fixtures/math-sum-precise.ts
+      - tests/property/es2026-math-sum-precise.property.test.ts
+  fixed:
+    status: covered
+    references:
+      - tests/native/fixtures/math-sum-precise.ts
+  forced-collection:
+    status: covered
+    references:
+      - tests/es2026-builtins-native.test.ts
+      - tests/native/fixtures/math-sum-precise.ts
+      - tests/property/es2026-math-sum-precise.property.test.ts
+  generated:
+    status: covered
+    references:
+      - tests/property/es2026-math-sum-precise.property.test.ts
+  guard-fallback:
+    status: covered
+    references:
+      - tests/es2026-builtins-native.test.ts
+      - tests/native/fixtures/math-sum-precise.ts
+      - tests/property/es2026-math-sum-precise.property.test.ts
+  specialization:
+    status: covered
+    references:
+      - tests/es2026-builtins-native.test.ts
+      - tests/native/fixtures/math-sum-precise.ts
+      - tests/property/es2026-math-sum-precise.property.test.ts
+  standards:
+    status: omitted
+    reason: "The 10 test/built-ins/Math/sumPrecise rows stay unreviewed in
+      the closure ledger until the unit admits them and the full test262
+      update observes them."
+    replacements:
+      - tests/native/fixtures/math-sum-precise.ts
+      - tests/property/es2026-math-sum-precise.property.test.ts
+  structural:
+    status: covered
+    references:
+      - packages/runtime-c/tests/intrinsic-graph.test.ts

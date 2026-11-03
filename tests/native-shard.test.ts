@@ -188,6 +188,7 @@ test("Linux weights match the three-run median case sums", async () => {
   // the Annex B escape, String, and Date files, and the ECMAScript 2026
   // built-in files use later local Linux extended runs.
   const retained = [
+    "tests/property/es2026-math-sum-precise.property.test.ts",
     "tests/property/es2026-error-is-error.property.test.ts",
     "tests/property/m5-host-script-bindings.property.test.ts",
     "tests/property/m5-module-namespace-uninitialized.property.test.ts",

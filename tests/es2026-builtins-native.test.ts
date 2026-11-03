@@ -29,9 +29,13 @@ import { nativeToolchain } from "./native-toolchain.ts";
 import { agentReferencePrelude } from "./native/agent-reference.ts";
 import type { Es2026Fixture } from "./native/es2026-fixture.ts";
 import { errorIsErrorFixtures } from "./native/fixtures/error-is-error.ts";
+import { mathSumPreciseFixtures } from "./native/fixtures/math-sum-precise.ts";
 import { realmReferencePrelude } from "./native/realm-reference.ts";
 
-const fixtures: readonly Es2026Fixture[] = [...errorIsErrorFixtures];
+const fixtures: readonly Es2026Fixture[] = [
+  ...errorIsErrorFixtures,
+  ...mathSumPreciseFixtures,
+];
 
 const host = createNodeHost();
 const nativeTarget = targetForExecutionHost(

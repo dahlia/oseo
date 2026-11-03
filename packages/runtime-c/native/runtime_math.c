@@ -6,7 +6,7 @@
 
 /*
  * The Math namespace object: the eight value properties of 21.3.1, the
- * thirty-six function properties of 21.3.2, and the realm's
+ * thirty-seven function properties of 21.3.2, and the realm's
  * pseudorandom source. Math is an ordinary object, not a function, so
  * it has neither [[Call]] nor [[Construct]] and its function properties
  * are ordinary built-in functions that are not constructors either.
@@ -55,6 +55,8 @@ typedef enum {
     OSEO_MATH_TAN = 33,
     OSEO_MATH_TANH = 34,
     OSEO_MATH_TRUNC = 35,
+    /* ECMAScript 2026 appends sumPrecise after the earlier functions. */
+    OSEO_MATH_SUM_PRECISE = 36,
 } OseoMathOperation;
 
 typedef struct {
@@ -72,6 +74,7 @@ static const OseoMathFunction math_functions[] = {
     {"max", 2u},      {"min", 2u},    {"pow", 2u},      {"random", 0u},
     {"round", 1u},    {"sign", 1u},   {"sin", 1u},      {"sinh", 1u},
     {"sqrt", 1u},     {"tan", 1u},    {"tanh", 1u},     {"trunc", 1u},
+    {"sumPrecise", 1u},
 };
 
 _Static_assert(
@@ -257,6 +260,7 @@ static bool math_is_unary(size_t operation) {
         case OSEO_MATH_MIN:
         case OSEO_MATH_POW:
         case OSEO_MATH_RANDOM:
+        case OSEO_MATH_SUM_PRECISE:
             return false;
         default:
             return true;
@@ -393,6 +397,264 @@ static OseoResult math_variadic(
     return result;
 }
 
+/*
+ * Math.sumPrecise accumulates every finite operand exactly. A binary64
+ * value is an integer multiple of 2**-1074 below 2**1024, so the sum of
+ * fewer than 2**53 of them is an integer multiple of 2**-1074 below
+ * 2**1077 in magnitude. The accumulator holds that integer in two's
+ * complement over enough 64-bit limbs for 2**2151 plus a sign bit, so
+ * no addition can overflow and the only rounding is the final one.
+ */
+#define OSEO_SUM_PRECISE_LIMBS ((size_t)35u)
+
+typedef struct {
+    uint64_t limbs[OSEO_SUM_PRECISE_LIMBS];
+} OseoExactSum;
+
+/* Add or subtract `magnitude * 2**shift` units of 2**-1074. */
+static void exact_sum_add(
+    OseoExactSum *sum,
+    uint64_t magnitude,
+    unsigned shift,
+    bool negative
+) {
+    size_t index = shift / 64u;
+    unsigned offset = shift % 64u;
+    uint64_t parts[2] = {
+        magnitude << offset,
+        offset == 0u ? 0u : magnitude >> (64u - offset),
+    };
+    uint64_t carry = 0u;
+    for (size_t limb = index; limb < OSEO_SUM_PRECISE_LIMBS; limb += 1u) {
+        bool in_parts = limb - index < 2u;
+        uint64_t part = in_parts ? parts[limb - index] : 0u;
+        if (!in_parts && carry == 0u) break;
+        uint64_t before = sum->limbs[limb];
+        if (negative) {
+            uint64_t after = before - part - carry;
+            carry = (before < part || before - part < carry) ? 1u : 0u;
+            sum->limbs[limb] = after;
+        } else {
+            uint64_t after = before + part + carry;
+            carry = (after < before || (carry != 0u && after == before))
+                ? 1u
+                : 0u;
+            sum->limbs[limb] = after;
+        }
+    }
+}
+
+static void exact_sum_add_number(OseoExactSum *sum, double value) {
+    uint64_t bits;
+    memcpy(&bits, &value, sizeof(bits));
+    uint64_t fraction = bits & ((UINT64_C(1) << 52) - 1u);
+    unsigned exponent = (unsigned)((bits >> 52) & 0x7ffu);
+    bool negative = (bits >> 63) != 0u;
+    if (exponent == 0u) {
+        exact_sum_add(sum, fraction, 0u, negative);
+    } else {
+        exact_sum_add(
+            sum,
+            fraction | (UINT64_C(1) << 52),
+            exponent - 1u,
+            negative
+        );
+    }
+}
+
+static bool exact_sum_bit(const OseoExactSum *sum, size_t bit) {
+    return ((sum->limbs[bit / 64u] >> (bit % 64u)) & 1u) != 0u;
+}
+
+/*
+ * Round the exact sum to the nearest Number with ties to even. A sum
+ * at or beyond 2**1024 - 2**970 rounds to an infinity, which is what
+ * the final scaling produces once the rounded significand reaches the
+ * binary64 overflow exponent. An exact zero is +0.
+ */
+static double exact_sum_value(OseoExactSum *sum) {
+    bool negative =
+        (sum->limbs[OSEO_SUM_PRECISE_LIMBS - 1u] >> 63) != 0u;
+    if (negative) {
+        uint64_t carry = 1u;
+        for (size_t limb = 0u; limb < OSEO_SUM_PRECISE_LIMBS; limb += 1u) {
+            uint64_t inverted = ~sum->limbs[limb];
+            sum->limbs[limb] = inverted + carry;
+            carry = carry != 0u && sum->limbs[limb] == 0u ? 1u : 0u;
+        }
+    }
+    size_t top = OSEO_SUM_PRECISE_LIMBS * 64u;
+    while (top > 0u && !exact_sum_bit(sum, top - 1u)) top -= 1u;
+    if (top == 0u) return 0.0;
+    double magnitude;
+    if (top <= 53u) {
+        /* Below 2**53 units the value is exact as a subnormal or the
+         * smallest normal binade. */
+        magnitude = ldexp((double)sum->limbs[0], -1074);
+    } else {
+        size_t shift = top - 53u;
+        uint64_t significand = 0u;
+        for (size_t bit = 0u; bit < 53u; bit += 1u) {
+            if (exact_sum_bit(sum, shift + bit)) {
+                significand |= UINT64_C(1) << bit;
+            }
+        }
+        bool round = exact_sum_bit(sum, shift - 1u);
+        bool sticky = false;
+        for (size_t limb = 0u; !sticky && limb * 64u < shift - 1u;
+             limb += 1u) {
+            size_t low = shift - 1u - limb * 64u;
+            uint64_t mask = low >= 64u
+                ? ~UINT64_C(0)
+                : (UINT64_C(1) << low) - 1u;
+            sticky = (sum->limbs[limb] & mask) != 0u;
+        }
+        if (round && (sticky || (significand & 1u) != 0u)) {
+            significand += 1u;
+            if (significand == UINT64_C(1) << 53) {
+                significand >>= 1;
+                shift += 1u;
+            }
+        }
+        /* The shift stays below 2,200, so the int conversion is exact. */
+        magnitude = ldexp((double)significand, (int)shift - 1074);
+    }
+    return negative ? -magnitude : magnitude;
+}
+
+/* IteratorClose(iterator, throw) for an error raised by this function. */
+static OseoResult sum_precise_close(
+    OseoContext *context,
+    OseoValue iterator,
+    OseoResult abrupt
+) {
+    if (abrupt.status != OSEO_STATUS_THROW || context->has_diagnostic) {
+        return abrupt;
+    }
+    OseoValue slots[2] = {iterator, abrupt.value};
+    OseoRootFrame frame = {NULL, slots, 2u};
+    oseo_roots_push(context, &frame);
+    oseo_context_clear_language_error(context);
+    OseoResult closed = oseo_iterator_close(context, slots[0], true);
+    OseoResult result = closed.status == OSEO_STATUS_NORMAL
+        ? (OseoResult){OSEO_STATUS_THROW, slots[1]}
+        : closed;
+    oseo_roots_pop(context, &frame);
+    return result;
+}
+
+typedef enum {
+    OSEO_SUM_MINUS_ZERO,
+    OSEO_SUM_FINITE,
+    OSEO_SUM_PLUS_INFINITY,
+    OSEO_SUM_MINUS_INFINITY,
+    OSEO_SUM_NOT_A_NUMBER,
+} OseoSumPreciseState;
+
+/*
+ * Math.sumPrecise, 21.3.2.34. The iterable is required to be neither
+ * undefined nor null before GetIterator, every value must already be a
+ * Number, and a non-Number closes the iterator before the TypeError
+ * propagates. NaN and opposite infinities make the result NaN, but the
+ * iteration still runs to completion so every later value is checked.
+ */
+static OseoResult math_sum_precise(
+    OseoContext *context,
+    size_t argument_count,
+    const OseoValue *arguments
+) {
+    OseoValue items =
+        argument_count > 0u ? arguments[0] : oseo_undefined();
+    uint64_t items_tag = tag_of(items);
+    if (items_tag == OSEO_TAG_UNDEFINED || items_tag == OSEO_TAG_NULL) {
+        return oseo_internal_throw_error(
+            context,
+            OSEO_ERROR_TYPE,
+            "Math.sumPrecise requires an iterable."
+        );
+    }
+    OseoValue slots[3] = {items, oseo_undefined(), oseo_undefined()};
+    OseoRootFrame frame = {NULL, slots, 3u};
+    oseo_roots_push(context, &frame);
+    OseoValue next_method = oseo_undefined();
+    OseoResult result = oseo_iterator_get(context, slots[0], &next_method);
+    slots[0] = result.value;
+    if (result.status == OSEO_STATUS_NORMAL) slots[1] = next_method;
+    OseoExactSum sum;
+    memset(&sum, 0, sizeof(sum));
+    OseoSumPreciseState state = OSEO_SUM_MINUS_ZERO;
+    uint64_t count = 0u;
+    bool done = false;
+    while (result.status == OSEO_STATUS_NORMAL && !done) {
+        result = oseo_iterator_next(
+            context,
+            slots[0],
+            slots[1],
+            &slots[2],
+            &done
+        );
+        if (result.status != OSEO_STATUS_NORMAL || done) break;
+        count += 1u;
+        if (count >= UINT64_C(9007199254740992)) {
+            result = sum_precise_close(
+                context,
+                slots[0],
+                oseo_internal_throw_error(
+                    context,
+                    OSEO_ERROR_RANGE,
+                    "Math.sumPrecise received too many values."
+                )
+            );
+            break;
+        }
+        if (!is_number(slots[2])) {
+            result = sum_precise_close(
+                context,
+                slots[0],
+                oseo_internal_throw_error(
+                    context,
+                    OSEO_ERROR_TYPE,
+                    "Math.sumPrecise values must be Numbers."
+                )
+            );
+            break;
+        }
+        double value = number_value(slots[2]);
+        if (state == OSEO_SUM_NOT_A_NUMBER) continue;
+        if (isnan(value)) {
+            state = OSEO_SUM_NOT_A_NUMBER;
+        } else if (isinf(value)) {
+            OseoSumPreciseState same = value > 0.0
+                ? OSEO_SUM_PLUS_INFINITY
+                : OSEO_SUM_MINUS_INFINITY;
+            OseoSumPreciseState opposite = value > 0.0
+                ? OSEO_SUM_MINUS_INFINITY
+                : OSEO_SUM_PLUS_INFINITY;
+            state = state == opposite ? OSEO_SUM_NOT_A_NUMBER : same;
+        } else if (!(value == 0.0 && signbit(value)) &&
+                   (state == OSEO_SUM_MINUS_ZERO ||
+                    state == OSEO_SUM_FINITE)) {
+            state = OSEO_SUM_FINITE;
+            exact_sum_add_number(&sum, value);
+        }
+    }
+    oseo_roots_pop(context, &frame);
+    if (result.status != OSEO_STATUS_NORMAL) return result;
+    switch (state) {
+        case OSEO_SUM_NOT_A_NUMBER:
+            return normal(oseo_number(NAN));
+        case OSEO_SUM_PLUS_INFINITY:
+            return normal(oseo_number((double)INFINITY));
+        case OSEO_SUM_MINUS_INFINITY:
+            return normal(oseo_number(-(double)INFINITY));
+        case OSEO_SUM_MINUS_ZERO:
+            return normal(oseo_number(-0.0));
+        case OSEO_SUM_FINITE:
+            break;
+    }
+    return normal(oseo_number(exact_sum_value(&sum)));
+}
+
 static OseoResult math_call(
     OseoContext *context,
     size_t operation,
@@ -401,6 +663,16 @@ static OseoResult math_call(
 ) {
     if (operation == OSEO_MATH_RANDOM) {
         return normal(oseo_number(math_random(context)));
+    }
+    if (operation == OSEO_MATH_SUM_PRECISE) {
+        if (argument_count > 0u && arguments == NULL) {
+            return failure(
+                context,
+                "OSEO2001",
+                "Math arguments are missing."
+            );
+        }
+        return math_sum_precise(context, argument_count, arguments);
     }
     if (operation == OSEO_MATH_HYPOT || operation == OSEO_MATH_MAX ||
         operation == OSEO_MATH_MIN) {

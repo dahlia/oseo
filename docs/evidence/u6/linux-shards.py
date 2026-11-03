@@ -31,6 +31,7 @@ EXCLUDED = {
 # ECMAScript 2026 built-in files each use a later local Linux extended
 # measurement, not a CI file-shard sum. See the U6 README.
 RETAINED = {
+    'tests/property/es2026-math-sum-precise.property.test.ts',
     'tests/property/es2026-error-is-error.property.test.ts',
     'tests/property/m5-host-script-bindings.property.test.ts',
     'tests/property/m5-module-namespace-uninitialized.property.test.ts',

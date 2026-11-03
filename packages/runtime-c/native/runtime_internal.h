@@ -736,7 +736,7 @@
  * the dispatch needs no separate table. The first and last IDs bound
  * the range the builder and the dispatcher both walk.
  */
-#define OSEO_MATH_FUNCTION_COUNT ((size_t)36u)
+#define OSEO_MATH_FUNCTION_COUNT ((size_t)37u)
 #define OSEO_MATH_FUNCTION_CODE_ID_LAST OSEO_MATH_CODE_ID_RANGE_LAST
 #define OSEO_MATH_FUNCTION_CODE_ID_FIRST \
     (OSEO_MATH_CODE_ID_RANGE_LAST - (OSEO_MATH_FUNCTION_COUNT - 1u))

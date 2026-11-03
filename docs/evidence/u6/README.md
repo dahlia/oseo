@@ -2162,11 +2162,12 @@ file-shard sums, run-to-run bounds or macOS measurements; Root may replace them
 with exact-candidate CI case sums. macOS gains no entry and keeps its
 unknown-file median fallback.
 
-| File                                                    | Case sum (ms) | Linux weight (s) |
-| ------------------------------------------------------- | ------------: | ---------------: |
-| *tests/property/es2026-error-is-error.property.test.ts* |    141262.474 |              142 |
+| File                                                      | Case sum (ms) | Linux weight (s) |
+| --------------------------------------------------------- | ------------: | ---------------: |
+| *tests/property/es2026-error-is-error.property.test.ts*   |    141262.474 |              142 |
+| *tests/property/es2026-math-sum-precise.property.test.ts* |    152227.392 |              153 |
 
 The TSV retains each file with `-` for all three historical source samples,
 and the extraction script and its unit test retain it explicitly. The
-Linux table has 153 entries, and its upper-median fallback moves from 435 to
+Linux table has 154 entries, and its upper-median fallback moves from 435 to
 434 seconds. macOS keeps 143 entries and its 296-second fallback.
