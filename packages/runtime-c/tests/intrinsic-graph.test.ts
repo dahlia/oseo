@@ -1154,14 +1154,21 @@ test("populates the realm-owned URI handling functions", () => {
     "DECODE_URI_COMPONENT",
     "ENCODE_URI",
     "ENCODE_URI_COMPONENT",
+    "ESCAPE",
+    "UNESCAPE",
   ]) {
     assert.match(header, new RegExp(`OSEO_INTRINSIC_${intrinsic}`, "u"));
   }
+  // The Annex B pair takes the two realm slots after Float16Array.
+  assert.match(header, /OSEO_INTRINSIC_ESCAPE = 273/u);
+  assert.match(header, /OSEO_INTRINSIC_UNESCAPE = 274/u);
   for (const property of [
     "decodeURI",
     "decodeURIComponent",
     "encodeURI",
     "encodeURIComponent",
+    "escape",
+    "unescape",
   ]) {
     assert.match(uriSource, new RegExp(`"${property}"`, "u"));
   }
@@ -1177,8 +1184,16 @@ test("populates the realm-owned URI handling functions", () => {
       "u",
     ),
   );
+  assert.match(
+    functionSource,
+    new RegExp(
+      "intrinsic == OSEO_INTRINSIC_UNESCAPE\\)[\\s\\S]{0,60}" +
+        "oseo_internal_uri_intrinsic",
+      "u",
+    ),
+  );
   // Each function is an ordinary built-in that is not a constructor, and
-  // the four share one dense code-ID range the dispatcher indexes.
+  // the six share one dense code-ID range the dispatcher indexes.
   assert.match(uriSource, /OSEO_FUNCTION_INTERNAL/u);
   assert.doesNotMatch(uriSource, /OSEO_FUNCTION_ORDINARY/u);
   assert.match(uriSource, /OSEO_URI_FUNCTION_CODE_ID_LAST - operation/u);
@@ -1887,7 +1902,7 @@ test("populates the realm-owned weak collection intrinsic cluster", () => {
     header,
     /OSEO_INTRINSIC_FINALIZATION_REGISTRY_UNREGISTER = 260/u,
   );
-  assert.match(header, /OSEO_INTRINSIC_COUNT = 273/u);
+  assert.match(header, /OSEO_INTRINSIC_COUNT = 275/u);
   for (const property of [
     "WeakMap",
     "WeakSet",
@@ -2700,7 +2715,7 @@ test("populates the single-agent shared memory clusters", () => {
   assert.match(header, /OSEO_INTRINSIC_SHARED_ARRAY_BUFFER = 240/u);
   assert.match(header, /OSEO_INTRINSIC_SHARED_ARRAY_BUFFER_SPECIES = 241/u);
   assert.match(header, /OSEO_INTRINSIC_ATOMICS = 242/u);
-  assert.match(header, /OSEO_INTRINSIC_COUNT = 273/u);
+  assert.match(header, /OSEO_INTRINSIC_COUNT = 275/u);
   // ValidateIntegerTypedArray rejects every floating element type,
   // including Float16, before any index conversion.
   assert.match(

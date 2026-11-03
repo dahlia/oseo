@@ -733,12 +733,13 @@
 #define OSEO_URI_CODE_ID_RANGE_LAST \
     OSEO_BUILTIN_CODE_RANGE_LAST(OSEO_URI_CODE_ID_RANGE_INDEX)
 /*
- * The four URI handling functions keep one dense order, so a code ID is
- * the range last minus that function's index in `uri_functions` and the
- * dispatch needs no separate table. The first and last IDs bound the
- * range the builder and the dispatcher both walk.
+ * The four URI handling functions and the two Annex B escape functions
+ * keep one dense order, so a code ID is the range last minus that
+ * function's index in `uri_functions` and the dispatch needs no separate
+ * table. The first and last IDs bound the range the builder and the
+ * dispatcher both walk.
  */
-#define OSEO_URI_FUNCTION_COUNT ((size_t)4u)
+#define OSEO_URI_FUNCTION_COUNT ((size_t)6u)
 #define OSEO_URI_FUNCTION_CODE_ID_LAST OSEO_URI_CODE_ID_RANGE_LAST
 #define OSEO_URI_FUNCTION_CODE_ID_FIRST \
     (OSEO_URI_CODE_ID_RANGE_LAST - (OSEO_URI_FUNCTION_COUNT - 1u))
@@ -4876,12 +4877,12 @@ OseoResult oseo_internal_install_math_global(
     OseoValue global
 );
 /*
- * One of the realm's four lazily created URI handling functions and the
- * global installation that binds all four as writable, non-enumerable,
- * configurable properties. `intrinsic` must be one of the four numbers
- * from OSEO_INTRINSIC_DECODE_URI through
- * OSEO_INTRINSIC_ENCODE_URI_COMPONENT, whose order is also the order the
- * component's own function table and code-ID range use.
+ * One of the realm's six lazily created global string functions and the
+ * global installation that binds all six as writable, non-enumerable,
+ * configurable properties. `intrinsic` must be one of the four URI
+ * handling function numbers from OSEO_INTRINSIC_DECODE_URI through
+ * OSEO_INTRINSIC_ENCODE_URI_COMPONENT, or OSEO_INTRINSIC_ESCAPE or
+ * OSEO_INTRINSIC_UNESCAPE for the Annex B pair.
  */
 OseoResult oseo_internal_uri_intrinsic(
     OseoContext *context,

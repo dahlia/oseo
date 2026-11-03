@@ -6231,9 +6231,9 @@ that is not itself an escape, a lone continuation octet, and a first octet
 with one or more than four leading one bits. A decoded code point above
 U+FFFF becomes the surrogate pair `UTF16EncodeCodePoint` produces.
 
-Annex B's `escape` and `unescape` stay outside the claim under
-[ADR 0013](./adr/0013-m5-edition-and-manifest.md) and remain ordinary
-unresolvable names.
+Annex B's `escape` and `unescape` stayed outside the M5 claim under
+[ADR 0013](./adr/0013-m5-edition-and-manifest.md). The post-M5
+`annexb-escape` unit adds them; see [Annex B built-ins](#annex-b-built-ins).
 
 The runtime gains one component, *runtime\_uri.c*, and one built-in code
 range whose four IDs count down from the range last in the order the
@@ -10481,3 +10481,50 @@ Parameter early errors and the ADR 0016 boundary remain. The thirteen owned
 test262 records retain their prior unsupported results until Root's actual full
 UPDATE; compilation alone supplies no promotion. See
 [the work note](./m5c-graph/module-top-level-await-patterns.md).
+
+
+Annex B built-ins
+-----------------
+
+This section records the Annex B B.2 built-ins of the post-M5 language plan
+until `claim-boundary` starts *docs/language-profile-es2026.md*, which then
+owns it. [ADR 0032](./adr/0032-post-m5-edition-boundary.md) brings them into
+the claim. The built-ins exist in every realm, including realms that
+`$262.createRealm` creates.
+
+### `escape` and `unescape`
+
+The `annexb-escape` unit installs `escape` and `unescape` of B.2.1 as global
+functions. Each is an ordinary built-in function with its specified name, a
+`length` of 1, `%Function.prototype%` as its `[[Prototype]]`, and no
+`prototype` property, and neither is a constructor. The global object binds
+both as writable, non-enumerable, configurable properties, and the compiler
+resolves them as property-owned replaceable intrinsics, the way it resolves
+the URI handling functions.
+
+Both functions convert their argument with `ToString` first. `escape` leaves
+the ASCII letters, digits, and `@*_+-./` unchanged, writes every other code
+unit below 256 as `%XX`, and writes every other code unit as `%uXXXX`, both
+with uppercase hexadecimal digits. It works on code units, so a lone
+surrogate is escaped rather than rejected. `unescape` replaces a `%uXXXX`
+form, tried first, or a `%XX` form, with the code unit its digits name in
+either letter case. A `%` that starts neither form stays in the result, so
+`unescape` never throws after its conversion.
+
+Both functions live in *runtime\_uri.c* beside the URI handling functions and
+share its code-ID range and host-memory string builder. The realm gains the
+intrinsic slots `OSEO_INTRINSIC_ESCAPE` and `OSEO_INTRINSIC_UNESCAPE`, and the
+runtime ABI moves to `m5-150`.
+
+The fixed fixture *tests/native/fixtures/annexb-escape.ts* is compared with
+Node.js and Deno under both specialization policies and forced collection. It
+covers metadata, every ASCII unit outside the unescaped set, the Latin-1 and
+`%u` boundaries, surrogates, each malformed `unescape` form, coercion and
+abrupt conversion, a global-object shape guard miss, and global replacement
+and deletion. *tests/property/m5-annexb-escape.property.test.ts*, seed block
+`0x60009d00`, generates arbitrary code-unit operands and `%XX` and `%uXXXX`
+forms with valid and invalid digits. It checks `escape` against an encoder
+computed from each unit's bits, `unescape` against an independent decoder, and
+the `unescape(escape(s))` round trip. The 35 test262 paths under
+*test/annexB/built-ins/escape/* and *unescape/* wait for `claim-boundary` and
+Root's full UPDATE.

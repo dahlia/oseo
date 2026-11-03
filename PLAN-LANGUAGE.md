@@ -95,7 +95,7 @@ A probe of the current build and the reviewed manifest shows this Annex B state:
 | `__lookupGetter__`, `__lookupSetter__`             | Not installed; a lookup reaching `Object.prototype` reports OSEO1001          |
 | `__defineGetter__`, `__defineSetter__`             | Not installed                                                                 |
 | Annex B RegExp pattern grammar                     | Reported as the OSEO1001 profile boundary, without `u` or `v`                 |
-| `escape`, `unescape`                               | Not installed; a reference is a `ReferenceError`                              |
+| `escape`, `unescape`                               | Installed by `annexb-escape`; test262 rows not yet admitted                   |
 | `substr`, HTML methods, `trimLeft`, `trimRight`    | Not installed; a call is a `TypeError`                                        |
 | `getYear`, `setYear`, `toGMTString`                | Not installed                                                                 |
 | `RegExp.prototype.compile`                         | Not installed                                                                 |
@@ -458,6 +458,10 @@ functions join the global object component. A property test generates strings
 of arbitrary code units and checks that `unescape(escape(s))` returns `s` and
 that every escape matches an independent encoder.
 
+Status: implemented, with fixed, differential, and generated evidence in the
+[profile section](./docs/language-profile-m5.md#escape-and-unescape). The 35
+rows wait for `claim-boundary` and Root's full UPDATE.
+
 ### `annexb-string-methods`
 
 Owns `substr` (15), the thirteen HTML methods from `anchor` through `sup`
@@ -667,7 +671,7 @@ standards update and heavy gates on the new base.
     row's owner moves. The audit binds ADR texts by digest, so a unit that
     edits ADR 0013, 0016, or 0028 re-reviews the rows that cite it.
  -  The runtime ABI version in *packages/runtime-c/src/index.ts*, currently
-    `m5-149`, changes once per landing that alters the ABI. The series keeps
+    `m5-150`, changes once per landing that alters the ABI. The series keeps
     its `m5-` prefix, and the closure tools keep their `m5c` names.
  -  Runtime code ranges, property blocks, intrinsic indexes, and heap kinds
     are reserved per unit.

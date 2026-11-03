@@ -2083,6 +2083,28 @@ The TSV retains this later file with `-` for all three historical source
 samples, and the extraction script and its unit test retain it explicitly.
 
 
+Annex B escape function local cost
+----------------------------------
+
+*tests/property/m5-annexb-escape.property.test.ts* also postdates the three
+Linux source runs. Its initial Linux weight comes from one local Linux AMD64
+extended run on the Zig lane with `OSEO_PROPERTY_RUN_SCALE=10` under a fresh
+capacity prefix, the run the `annexb-escape` lane needs anyway. Its seed
+`0x60009d00`, size and base limit were unchanged; no seed, size or time-scale
+override was set, so the run generated 120 cases.
+
+The single complete passing registration took 262268.952414 milliseconds, so
+its rounded-up Linux weight is 263 seconds. Other gates shared the host during
+part of the run, so the figure may be high. This is one local observation, not
+a CI file-shard sum, a run-to-run bound or a macOS measurement. Root may
+replace it with exact-candidate CI case sums. macOS gains no entry and keeps
+its unknown-file median fallback.
+
+The TSV retains this file with `-` for all three historical source samples, and
+the extraction script and its unit test retain it explicitly. Linux now has 150
+table entries, and the upper-median fallback stays at 442 seconds.
+
+
 Exhaustive RegExp literal local cost
 ------------------------------------
 

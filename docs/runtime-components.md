@@ -193,7 +193,9 @@ Ownership follows the plan's target layout:
  -  *runtime\_uri.c*: the four URI handling functions of 19.2.6, the Encode and
     Decode operations they share, the unescaped and preserved ASCII sets that
     separate the two pairs, the UTF-8 transformation both directions run, and
-    the `URIError` every malformed operand raises. It owns no string
+    the `URIError` every malformed operand raises. It also owns the Annex B
+    `escape` and `unescape` of B.2.1, which escape one code unit at a time
+    and never throw after their conversion. It owns no string
     representation of its own: `ToString`, the growable UTF-16 builder, and
     string allocation stay with *runtime\_primitive.c* and *runtime\_string.c*;
  -  *runtime\_reflect.c*: the `Reflect` namespace object of 28.1 and its

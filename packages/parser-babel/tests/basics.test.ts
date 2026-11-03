@@ -370,6 +370,31 @@ test("reads the four URI handling functions as global properties", () => {
   );
 });
 
+test("reads the Annex B escape functions as global properties", () => {
+  const result = compileSource(babelFrontend, {
+    source:
+      "console.log(typeof escape, typeof unescape, unescape(escape('a b')));",
+    sourceId: "annexb-escape.ts",
+  });
+  assert.deepEqual(result.diagnostics, []);
+  assert.ok(result.hir != null);
+  assert.ok(result.mir != null);
+  const hir = printHir(result.hir);
+  for (const name of ["escape", "unescape"]) {
+    assert.match(hir, new RegExp(`"${name}" in %b\\d+`, "u"));
+    assert.match(hir, new RegExp(`get %b\\d+\\(.*\\)\\["${name}"\\]`, "u"));
+  }
+  assert.match(printMir(result.mir), /read \*missing intrinsic:escape\*/u);
+
+  const deleted = compileSource(babelFrontend, {
+    source: "delete unescape;",
+    sourceId: "delete-unescape.ts",
+  });
+  assert.deepEqual(deleted.diagnostics, []);
+  assert.ok(deleted.hir != null);
+  assert.match(printHir(deleted.hir), /delete .*\["unescape"\]/u);
+});
+
 test("reads the four global numeric functions as global properties", () => {
   const result = compileSource(babelFrontend, {
     source:

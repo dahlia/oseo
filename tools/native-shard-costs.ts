@@ -17,7 +17,7 @@
  * Compound assignment's logged registrations are rebucketed into its
  * three split files. Host script bindings and proper tail calls postdate
  * these runs and retain their weights. The Linux upper-median fallback is
- * 443 seconds across 145 entries.
+ * 442 seconds across 150 entries.
  * docs/evidence/u6/linux-shard-weights.tsv retains each sum and old weight;
  * linux-shards.py reproduces them and the model. See the U6 README.
  *
@@ -131,6 +131,10 @@
  * not a CI file-shard sum or a matching-host macOS measurement. macOS
  * keeps the unknown-file median fallback. See U6 provenance.
  *
+ * The Annex B escape functions use one local Linux AMD64 extended
+ * registration the same way. macOS keeps the unknown-file median
+ * fallback. See U6 provenance.
+ *
  * Exhaustive RegExp literals are case-sharded, so this table weighs them
  * only for other wrapper invocations. The Linux entry is a derived
  * hosted extended sum from file shard 3/7 of candidate CI 41257794727 at
@@ -148,6 +152,7 @@ export const nativeShardCosts = {
     "tests/property/legacy-caller.property.test.ts": 71,
     "tests/property/m4-async.property.test.ts": 350,
     "tests/property/m5-aggregate-error.property.test.ts": 217,
+    "tests/property/m5-annexb-escape.property.test.ts": 263,
     "tests/property/m5-annexb-legacy-lookup-boundary.property.test.ts": 615,
     "tests/property/m5-annexb-proto-boundary.property.test.ts": 1447,
     "tests/property/m5-arguments-object.property.test.ts": 679,

@@ -6,13 +6,14 @@
  * The four URI handling functions of 19.2.6: encodeURI,
  * encodeURIComponent, decodeURI, and decodeURIComponent, together with
  * the Encode and Decode operations they share and the UTF-8
- * transformation both directions run. Each function is an ordinary
- * built-in function that is not a constructor, and the global object
- * binds each as a writable, non-enumerable, configurable property.
+ * transformation both directions run, and the Annex B escape and
+ * unescape functions of B.2.1. Each function is an ordinary built-in
+ * function that is not a constructor, and the global object binds each
+ * as a writable, non-enumerable, configurable property.
  */
 
 /*
- * One URI handling function. The array order is the order the global
+ * One global string function. The array order is the order the global
  * installation creates its properties in and the order the code IDs
  * count down from `OSEO_URI_FUNCTION_CODE_ID_LAST`, so an entry's index
  * is the only identity the builder and the dispatcher share.
@@ -22,6 +23,8 @@ typedef enum {
     OSEO_URI_DECODE_URI_COMPONENT = 1,
     OSEO_URI_ENCODE_URI = 2,
     OSEO_URI_ENCODE_URI_COMPONENT = 3,
+    OSEO_URI_ESCAPE = 4,
+    OSEO_URI_UNESCAPE = 5,
 } OseoUriOperation;
 
 typedef struct {
@@ -34,6 +37,8 @@ static const OseoUriFunction uri_functions[] = {
     {"decodeURIComponent", OSEO_INTRINSIC_DECODE_URI_COMPONENT},
     {"encodeURI", OSEO_INTRINSIC_ENCODE_URI},
     {"encodeURIComponent", OSEO_INTRINSIC_ENCODE_URI_COMPONENT},
+    {"escape", OSEO_INTRINSIC_ESCAPE},
+    {"unescape", OSEO_INTRINSIC_UNESCAPE},
 };
 
 _Static_assert(
@@ -365,7 +370,132 @@ static OseoResult uri_decode(
 }
 
 /*
- * One URI handling function call. Every operation converts its single
+ * The code units escape(string) leaves unescaped, B.2.1.1 step 4: the
+ * ASCII word characters and the six marks `@*+-./`. Unlike Encode, the
+ * set is fixed and every other code unit is escaped one unit at a time.
+ */
+static bool escape_unescaped(uint16_t unit) {
+    if (unit >= (uint16_t)'A' && unit <= (uint16_t)'Z') return true;
+    if (unit >= (uint16_t)'a' && unit <= (uint16_t)'z') return true;
+    if (unit >= (uint16_t)'0' && unit <= (uint16_t)'9') return true;
+    if (unit == (uint16_t)'_') return true;
+    return uri_member("@*+-./", unit);
+}
+
+/*
+ * escape(string), B.2.1.1, appended into `builder`. A code unit below
+ * 256 becomes `%XX` and every other unit `%uXXXX`, both with uppercase
+ * hexadecimal digits. Surrogates are code units like any other, so a
+ * lone surrogate is escaped rather than rejected.
+ */
+static OseoResult escape_string(
+    OseoContext *context,
+    OseoValue string_value,
+    OseoStringBuilder *builder
+) {
+    static const char hex_digits[] = "0123456789ABCDEF";
+    const OseoString *string = string_object(string_value);
+    OseoResult result = normal(oseo_undefined());
+    for (size_t index = 0u; index < string->length; index += 1u) {
+        uint16_t unit = string->units[index];
+        uint16_t escaped[6];
+        size_t count = 0u;
+        if (escape_unescaped(unit)) {
+            escaped[count++] = unit;
+        } else if (unit < 256u) {
+            escaped[count++] = (uint16_t)'%';
+            escaped[count++] = (uint16_t)hex_digits[unit >> 4u];
+            escaped[count++] = (uint16_t)hex_digits[unit & 0x0fu];
+        } else {
+            escaped[count++] = (uint16_t)'%';
+            escaped[count++] = (uint16_t)'u';
+            escaped[count++] = (uint16_t)hex_digits[unit >> 12u];
+            escaped[count++] = (uint16_t)hex_digits[(unit >> 8u) & 0x0fu];
+            escaped[count++] = (uint16_t)hex_digits[(unit >> 4u) & 0x0fu];
+            escaped[count++] = (uint16_t)hex_digits[unit & 0x0fu];
+        }
+        result = oseo_internal_string_builder_append(
+            context,
+            builder,
+            escaped,
+            count
+        );
+        if (result.status != OSEO_STATUS_NORMAL) return result;
+    }
+    return result;
+}
+
+/*
+ * The value of `count` hexadecimal digits starting at `position`, or
+ * false when one of them is not a hexadecimal digit. The caller has
+ * already checked that the units exist.
+ */
+static bool unescape_hex_value(
+    const uint16_t *units,
+    size_t position,
+    size_t count,
+    uint16_t *value
+) {
+    unsigned accumulated = 0u;
+    for (size_t index = 0u; index < count; index += 1u) {
+        unsigned digit = uri_hex_digit(units[position + index]);
+        if (digit > 15u) return false;
+        accumulated = accumulated * 16u + digit;
+    }
+    *value = (uint16_t)accumulated;
+    return true;
+}
+
+/*
+ * unescape(string), B.2.1.2, appended into `builder`. A `%uXXXX` form
+ * is tried before a `%XX` form at the same position, and a `%` that
+ * starts neither stays in the result unchanged, so unescape never
+ * throws after its conversion.
+ */
+static OseoResult unescape_string(
+    OseoContext *context,
+    OseoValue string_value,
+    OseoStringBuilder *builder
+) {
+    const OseoString *string = string_object(string_value);
+    size_t length = string->length;
+    OseoResult result = normal(oseo_undefined());
+    size_t index = 0u;
+    while (index < length) {
+        uint16_t unit = string->units[index];
+        size_t consumed = 1u;
+        if (unit == (uint16_t)'%') {
+            uint16_t value = 0u;
+            if (index + 6u <= length &&
+                string->units[index + 1u] == (uint16_t)'u' &&
+                unescape_hex_value(string->units, index + 2u, 4u, &value)) {
+                unit = value;
+                consumed = 6u;
+            } else if (index + 3u <= length &&
+                       unescape_hex_value(
+                           string->units,
+                           index + 1u,
+                           2u,
+                           &value
+                       )) {
+                unit = value;
+                consumed = 3u;
+            }
+        }
+        result = oseo_internal_string_builder_append(
+            context,
+            builder,
+            &unit,
+            1u
+        );
+        if (result.status != OSEO_STATUS_NORMAL) return result;
+        index += consumed;
+    }
+    return result;
+}
+
+/*
+ * One global string function call. Every operation converts its single
  * argument with ToString first, so an abrupt conversion is observed
  * before any escape sequence is inspected.
  */
@@ -387,7 +517,11 @@ static OseoResult uri_call(
     OseoResult result = oseo_internal_value_string(context, slots[0]);
     slots[0] = result.value;
     if (result.status == OSEO_STATUS_NORMAL) {
-        if (operation == OSEO_URI_ENCODE_URI ||
+        if (operation == OSEO_URI_ESCAPE) {
+            result = escape_string(context, slots[0], &builder);
+        } else if (operation == OSEO_URI_UNESCAPE) {
+            result = unescape_string(context, slots[0], &builder);
+        } else if (operation == OSEO_URI_ENCODE_URI ||
             operation == OSEO_URI_ENCODE_URI_COMPONENT) {
             result = uri_encode(
                 context,
@@ -431,19 +565,29 @@ OseoResult oseo_internal_uri_builtin_dispatch(
         code_id > OSEO_URI_FUNCTION_CODE_ID_LAST) {
         return oseo_unknown_function(context, code_id);
     }
+    size_t operation = OSEO_URI_FUNCTION_CODE_ID_LAST - code_id;
     if (tag_of(new_target) != OSEO_TAG_UNDEFINED) {
+        bool annex_b = operation == OSEO_URI_ESCAPE ||
+            operation == OSEO_URI_UNESCAPE;
         return oseo_internal_throw_error(
             context,
             OSEO_ERROR_TYPE,
-            "URI handling function is not a constructor."
+            annex_b
+                ? "Escape function is not a constructor."
+                : "URI handling function is not a constructor."
         );
     }
-    size_t operation = OSEO_URI_FUNCTION_CODE_ID_LAST - code_id;
     return uri_call(context, operation, argument_count, arguments);
 }
 
-/* The table index of one URI handling function intrinsic. */
+/*
+ * The table index of one global string function intrinsic. The URI four
+ * are dense from OSEO_INTRINSIC_DECODE_URI; the Annex B pair took the
+ * next free realm slots and follows them in the table.
+ */
 static size_t uri_operation(OseoIntrinsic intrinsic) {
+    if (intrinsic == OSEO_INTRINSIC_ESCAPE) return OSEO_URI_ESCAPE;
+    if (intrinsic == OSEO_INTRINSIC_UNESCAPE) return OSEO_URI_UNESCAPE;
     return (size_t)(intrinsic - OSEO_INTRINSIC_DECODE_URI);
 }
 

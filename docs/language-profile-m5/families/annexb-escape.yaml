@@ -1,0 +1,64 @@
+version: 1
+id: annexb-escape
+title: "Annex B escape and unescape"
+scope:
+  - "The realm-owned Annex B global functions escape and unescape of B.2.1,
+    their names, lengths, [[Prototype]], absent prototype property, and the
+    writable, non-enumerable, configurable global-object properties that
+    bind them in every realm."
+  - "escape, B.2.1.1: the unescaped ASCII letters, digits, and @*_+-./, the
+    uppercase %XX form for every other code unit below 256, and the
+    uppercase %uXXXX form for every other code unit, including lone
+    surrogates."
+  - "unescape, B.2.1.2: the %uXXXX form tried before the %XX form, digits of
+    either letter case, and every % that starts neither form kept
+    unchanged."
+  - "The single-argument ToString conversion each function performs first,
+    including the abrupt completion a throwing conversion propagates."
+owners:
+  - docs/language-profile-m5.md
+evidence:
+  differential:
+    status: covered
+    references:
+      - tests/native/fixtures/annexb-escape.ts
+      - tests/property/m5-annexb-escape.property.test.ts
+  fixed:
+    status: covered
+    references:
+      - tests/native/fixtures/annexb-escape.ts
+  forced-collection:
+    status: covered
+    references:
+      - tests/native.ts
+      - tests/native/fixtures/annexb-escape.ts
+      - tests/property/m5-annexb-escape.property.test.ts
+  generated:
+    status: covered
+    references:
+      - tests/property/m5-annexb-escape.property.test.ts
+  guard-fallback:
+    status: covered
+    references:
+      - tests/native.ts
+      - tests/native/fixtures/annexb-escape.ts
+      - tests/property/m5-annexb-escape.property.test.ts
+  specialization:
+    status: covered
+    references:
+      - tests/native.ts
+      - tests/native/fixtures/annexb-escape.ts
+      - tests/property/m5-annexb-escape.property.test.ts
+  standards:
+    status: omitted
+    reason: "The 35 test262 paths under test/annexB/built-ins/escape/ and
+      unescape/ lie outside the inventory until claim-boundary applies ADR
+      0032; Root admits them in its full UPDATE."
+    replacements:
+      - tests/native/fixtures/annexb-escape.ts
+      - tests/property/m5-annexb-escape.property.test.ts
+  structural:
+    status: covered
+    references:
+      - packages/parser-babel/tests/basics.test.ts
+      - packages/runtime-c/tests/intrinsic-graph.test.ts

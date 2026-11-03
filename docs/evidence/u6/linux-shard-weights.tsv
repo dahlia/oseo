@@ -2,6 +2,7 @@ file	oldSeconds	d4d81be9CaseMs	98460f7cCaseMs	6aab0fc8CaseMs	medianSecondsCeil
 tests/property/legacy-caller.property.test.ts	71	-	-	-	71
 tests/property/m4-async.property.test.ts	464	349949.419205	338314.359114	440202.889068	350
 tests/property/m5-aggregate-error.property.test.ts	265	216063.832474	201127.728356	281035.427786	217
+tests/property/m5-annexb-escape.property.test.ts	263	-	-	-	263
 tests/property/m5-annexb-legacy-lookup-boundary.property.test.ts	318	616027.718952	343317.847343	614422.669219	615
 tests/property/m5-annexb-proto-boundary.property.test.ts	-	1447980.133911	821021.599192	1446566.353864	1447
 tests/property/m5-arguments-object.property.test.ts	647	708103.071930	678695.036924	421222.533194	679

@@ -322,6 +322,7 @@ function isPropertyOwnedIntrinsicName(name: string): boolean {
     name === "decodeURIComponent" ||
     name === "encodeURI" ||
     name === "encodeURIComponent" ||
+    name === "escape" ||
     name === "eval" ||
     name === "globalThis" ||
     name === "isFinite" ||
@@ -335,6 +336,7 @@ function isPropertyOwnedIntrinsicName(name: string): boolean {
     name === "WeakRef" ||
     name === "WeakSet" ||
     name === "undefined" ||
+    name === "unescape" ||
     isTypedArrayIntrinsicName(name)
   );
 }

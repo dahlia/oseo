@@ -1120,6 +1120,9 @@ OseoResult oseo_intrinsic(OseoContext *context, OseoIntrinsic intrinsic) {
     } else if (intrinsic >= OSEO_INTRINSIC_DECODE_URI &&
                intrinsic <= OSEO_INTRINSIC_ENCODE_URI_COMPONENT) {
         materialized = oseo_internal_uri_intrinsic(context, intrinsic);
+    } else if (intrinsic == OSEO_INTRINSIC_ESCAPE ||
+               intrinsic == OSEO_INTRINSIC_UNESCAPE) {
+        materialized = oseo_internal_uri_intrinsic(context, intrinsic);
     } else if (intrinsic == OSEO_INTRINSIC_REFLECT) {
         materialized = oseo_internal_reflect_intrinsic(context);
     } else if (intrinsic == OSEO_INTRINSIC_PROXY) {

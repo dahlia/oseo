@@ -612,3 +612,7 @@ families:
     owner: tests/property/legacy-caller.property.test.ts
     start: 0x60009800
     end: 0x600098ff
+  - family: m5-annexb-escape
+    owner: tests/property/m5-annexb-escape.property.test.ts
+    start: 0x60009d00
+    end: 0x60009dff

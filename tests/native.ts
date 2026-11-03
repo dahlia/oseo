@@ -169,6 +169,8 @@ const { mathNamespaceFixtures } =
   await import("./native/fixtures/math-namespace.ts");
 const { uriHandlingFunctionFixtures } =
   await import("./native/fixtures/uri-handling-functions.ts");
+const { annexBEscapeFixtures } =
+  await import("./native/fixtures/annexb-escape.ts");
 const { globalNumericFunctionFixtures } =
   await import("./native/fixtures/global-numeric-functions.ts");
 const { reflectNamespaceFixtures } =
@@ -329,6 +331,7 @@ const fixtures: readonly Fixture[] = [
   ...numberPrototypeFixtures,
   ...mathNamespaceFixtures,
   ...uriHandlingFunctionFixtures,
+  ...annexBEscapeFixtures,
   ...globalNumericFunctionFixtures,
   ...reflectNamespaceFixtures,
   ...proxyExoticObjectFixtures,
@@ -1431,6 +1434,7 @@ for (const fixture of selectedFixtures) {
     fixture.name === "map-intrinsic" ||
     fixture.name === "math-namespace" ||
     fixture.name === "uri-handling-functions" ||
+    fixture.name === "annexb-escape" ||
     fixture.name === "global-numeric-functions" ||
     fixture.name === "reflect-namespace" ||
     fixture.name === "proxy-exotic-object" ||
@@ -1556,6 +1560,7 @@ for (const fixture of selectedFixtures) {
     fixture.name === "map-intrinsic" ||
     fixture.name === "math-namespace" ||
     fixture.name === "uri-handling-functions" ||
+    fixture.name === "annexb-escape" ||
     fixture.name === "global-numeric-functions" ||
     fixture.name === "reflect-namespace" ||
     fixture.name === "proxy-exotic-object" ||
@@ -2179,7 +2184,10 @@ for (const fixture of selectedFixtures) {
               assert.ok(native.counters.guardMisses > 0);
             }
           }
-          if (fixture.name === "uri-handling-functions") {
+          if (
+            fixture.name === "uri-handling-functions" ||
+            fixture.name === "annexb-escape"
+          ) {
             // Every escape sequence is staged in host memory while the
             // collector runs at every safepoint, and reading a global
             // URI function through the realm's global object misses its

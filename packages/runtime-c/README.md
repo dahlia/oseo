@@ -1463,5 +1463,12 @@ and a delete clears its bit. An active function's `arguments` is created at
 the sites that hand a value to code, because a property query does not
 allocate.
 
+ABI `m5-150` adds the Annex B global functions `escape` and `unescape` to
+*runtime\_uri.c*. They take the realm intrinsic slots `OSEO_INTRINSIC_ESCAPE`
+(273) and `OSEO_INTRINSIC_UNESCAPE` (274) and the two code IDs below the URI
+handling functions in the URI range. The global object binds both as writable,
+non-enumerable, configurable properties in every realm. The generated-code ABI
+gains no entry point.
+
 [ADR 0030]: https://github.com/dahlia/oseo/blob/main/docs/adr/0030-test262-unhandled-rejection-policy.md
 [ADR 0034]: https://github.com/dahlia/oseo/blob/main/docs/adr/0034-legacy-function-caller-contract.md
