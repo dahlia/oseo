@@ -4,9 +4,12 @@ A linking exception for the runtime surface
 Status
 ------
 
-Proposed. Two questions remain open below, and the maintainer decides
-acceptance after they are answered. This record does not assess the legal
-effect of any license text.
+Proposed, 2026-07-28, revised 2026-11-03. Three questions remain open below,
+and the maintainer decides acceptance after they are answered. This record
+does not assess the legal effect of any license text.
+
+Correspondence with the FSF licensing queue is under way. It is recorded below
+as evidence of the questions in play, not as an answer to any of them.
 
 
 Context
@@ -67,8 +70,8 @@ from fixed and interpolated fragments, such as the dispatch function around
 lines 2355 to 2403. A scan for lines beginning with a string or template
 literal finds 389, of which 277 precede the final boilerplate block. Not all
 of those lines are emitted C, and no counting rule in this record distinguishes
-them, which is why the decision below calls for an inventory rather than
-quoting a figure.
+them, which is why this record relies on an inventory rather than quoting a
+figure.
 
 `mise run check:packages` runs *tools/check-packages.ts* and then
 `deno publish --dry-run`. The former requires each package *LICENSE* to match
@@ -77,11 +80,49 @@ the repository *LICENSE* and inspects packed npm artifacts; it does not compare
 any relationship between the two manifest forms.
 
 The following are inferences and premises rather than observations. Plain GPL
-on linked support code would deter the server workloads Oseo targets. The
+on linked support code would deter adoption for the server workloads Oseo
+targets. The
 runtime grew because the admitted families of those two days need native
 support, though this record does not attribute the growth to any one family.
 Relicensing after outside contributions arrive would require agreement from
 those contributors.
+
+
+Correspondence
+--------------
+
+GNU RT ticket `#2446621` holds the exchange with the FSF Licensing and
+Compliance team, from the maintainer's question on 2026-07-28 to the
+maintainer's reply on 2026-11-03. The exchange is not publicly archived. The
+[licensing correspondence evidence](../evidence/licensing/README.md) lists each
+message, summarizes it, and explains why the originals stay outside the
+repository.
+
+Topham gave a tentative reading: if the GPLv3 compiler produces C, that C and
+its binary contain parts of the original ECMAScript, and no additional nonfree
+code enters compilation, then “an exception like the GCC one makes sense”.
+Topham added that “we would have to do more than remove the GCC-specific
+references”, that the text would need to describe what happens when the
+ECMAScript executes, and that the FSF might publish a new exception alongside
+the GCC and Autoconf ones. Siewicz then stated the boundary: “Unfortunately,
+the FSF cannot provide legal advice.” Siewicz offered to explain how the
+licenses are intended to apply and suggested consulting a lawyer. Rabkin asked
+why the maintainer raised an Eligible Compilation Process and whether “the GPL
+plugin mechanism” made the process ineligible.
+
+The 2026-11-03 reply answers the eligibility question. Oseo uses no GCC
+component: the
+frontend is Babel's parser, the compiler is Oseo's own, and the pinned `zig cc`
+driver compiles and links the result. The reply separates the four
+contributions to a generated program and asks two questions about the
+unmodified text. First, whether distributing generated C that includes the
+runtime header and Oseo-authored helper code falls under the additional
+permission even though that C still needs compilation. Second, whether runtime
+code supplied as source and compiled with the user's program is treated like
+a separately built library.
+
+Neither answer has arrived. Nothing in the exchange selects an exception,
+resolves whether it reaches source-supplied built-ins, or changes a license.
 
 
 Alternatives considered
@@ -144,14 +185,36 @@ defining an eligible compilation process and the target code that process
 produces, and the grant is conditioned on that eligibility. Whether Oseo's
 pipeline satisfies the condition has to be checked rather than assumed, because
 that pipeline runs a Babel frontend, an Oseo-owned backend, and a Zig-driven C
-toolchain. The Classpath Exception 2.0 is a single paragraph and far easier for
-a contributor to read, though its customary pairing is GPLv2. Both should be
-read before choosing.
+toolchain. The comparison also covers three further texts. The Classpath
+Exception 2.0 is one paragraph and easier for a contributor to read, though its
+customary pairing is GPLv2. The Autoconf Configure Script Exception 3.0
+addresses copied generator code in output, which is closer to Oseo's emitted C
+than the Classpath text is. LLVM's exception waives named Apache conditions for
+embedded object-form portions, but its permissive base conflicts with the
+copyleft requirement above. Topham's suggestion of a new FSF-published
+exception is not alternative 3 above, because it would be drafted and reviewed
+outside this project.
 
-**Self-hosted built-ins.** Whether an exception written for a linked native
-library reaches source compiled into the user's program is not obvious, and it
-matters more here than for GCC because the M8 strategy moves built-in
-implementations across that line deliberately.
+**Distribution of generated C.** Section 1 grants propagation of Target Code
+formed by combining the Runtime Library with Independent Modules, and section 0
+defines Target Code as output “in executable form or suitable for input to an
+assembler, loader, linker and/or execution phase.” It then excludes data used
+as a compiler intermediate representation. Generated C includes the runtime
+header and Oseo-authored helper code, and it still has to be compiled, so
+whether it is Target Code for this purpose is not settled. The answer decides
+whether the emitted C carries the exception notice or stays under plain GPL,
+and it is the first question in the 2026-11-03 reply.
+
+**Source-supplied built-ins.** Whether an exception written for a linked native
+library reaches runtime code supplied as source and compiled into the user's
+program is not obvious, and it matters more here than for GCC because the M8
+strategy may move built-in implementations across that line on purpose. The
+maintainer's reading is that such files would join the Runtime Library rather
+than act as Independent Modules, but section 0 excludes works “otherwise based
+on the Runtime Library” from that role, and none of the three FSF replies
+addresses how the exclusion applies when covered code and user code are
+compiled together.
+The 2026-11-03 reply asks this question directly.
 
 **The surface inventory (closed).** The checked-in
 [*runtime support surface inventory*](../runtime-support-surface.md) lists each
@@ -161,9 +224,10 @@ file-level treatment to npm and JSR SPDX expressions. The backend's fixed and
 interpolated C fragments now live in a data-only file, separate from lowering
 and composition logic.
 
-Before acceptance, a written answer to the first two questions should be on
-file from the FSF licensing team or another identified source, and the third
-should be resolved in the repository.
+Before acceptance, written answers to the exception, distribution, and
+source-supplied built-ins questions should be on file from the FSF licensing
+team or another identified source. The inventory question is settled in the
+repository.
 
 
 Consequences
@@ -171,17 +235,18 @@ Consequences
 
 If accepted, the work is larger than a manifest edit. An exception of this
 kind applies to the files that carry its notice, so every covered source and
-header needs one, the emitted C needs one in the generated program, and the
-exception text has to travel with both the published packages and the compiled
-artifacts. Package manifests gain SPDX expressions alongside that.
+header needs one, the exception text has to travel with both the published
+packages and the compiled artifacts, and the emitted C needs one in the
+generated program if the distribution question places it under the additional
+permission. Package manifests gain SPDX expressions alongside that.
 `mise run check:packages` would have to be extended to compare `license` fields
 across both manifest forms and to check that packed and emitted files carry the
 notice; it does none of that today.
 
-Splitting the emitted C out of *packages/backend-c/src/index.ts* would be a
-prerequisite rather than a follow-up, because the file cannot otherwise be
-given one treatment. That split is not small, and it touches the file the M5
-backend work changes most often.
+Splitting the emitted C out of *packages/backend-c/src/index.ts* was a
+prerequisite rather than a follow-up, because the file could not otherwise be
+given one treatment. That split has landed; the
+[inventory](../runtime-support-surface.md) records the data-only file.
 
 Contributors would gain a question they do not have now, which is which side a
 new file sits on. The rule above answers it for the cases named, and the
@@ -190,8 +255,8 @@ easier to apply and would have missed the C the backend emits, which is why
 this record does not propose one.
 
 Opening the repository to outside contributions is what makes this urgent.
-Agreement from contributors who have not yet arrived costs nothing to obtain
-today.
+Until outside contributions arrive, the maintainer can change the license
+without anyone else's agreement.
 
 
 Failure modes and replacement triggers
@@ -202,10 +267,13 @@ Failure modes and replacement triggers
  -  A compiled program that still carries an obligation to its author under the
     selected text invalidates this record.
  -  A file that the inventory and the rule together cannot classify means the
-    boundary has failed, and it should be replaced by a structural one after
-    the backend's emitted text moves out of the compiler packages.
+    boundary has failed, and the inventory should be replaced by a structural
+    boundary.
  -  A later decision to adopt a permissive base license for the whole project
     would supersede this record rather than amend it.
+ -  An answer placing generated C outside the additional permission reopens
+    how the backend's emitted fragments and the generated file reach users,
+    separately from how the executable does.
 
 
 Links
@@ -222,3 +290,15 @@ Links
     license metadata must satisfy.
  -  [*docs/runtime-support-surface.md*](../runtime-support-surface.md) is the
     checked-in support-surface inventory.
+ -  The exception texts compared above are the
+    [GCC Runtime Library Exception 3.1][RLE], the
+    [Classpath Exception][Classpath], the
+    [Autoconf Configure Script Exception][Autoconf], and the
+    [LLVM license][LLVM]. The [GCC exception FAQ][FAQ] states how the FSF
+    intends the GCC text to apply.
+
+[RLE]: https://www.gnu.org/licenses/gcc-exception-3.1.html
+[Classpath]: https://www.gnu.org/software/classpath/license.html
+[Autoconf]: https://www.gnu.org/licenses/autoconf-exception-3.0.html
+[LLVM]: https://llvm.org/LICENSE.txt
+[FAQ]: https://www.gnu.org/licenses/gcc-exception-3.1-faq.html
