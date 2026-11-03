@@ -580,24 +580,25 @@ current *tests/test262/inventory.tsv*.
  -  `error-is-error` owns `Error.isError` (12). It reports `[[ErrorData]]`,
     so it answers `true` for every native error type, `AggregateError`, and
     `SuppressedError` once that exists, and `false` for a proxy of an error.
-    The runtime, fixtures, and property suite are implemented; the rows wait
-    for `claim-boundary`. `SuppressedError` answers `true` as soon as
-    `disposal-intrinsics` sets the object header's `[[ErrorData]]` flag the
-    way the other error constructors do. *non-error-objects-other-realm.js*
-    calls the other realm's `Function` constructor, so it becomes an ADR 0016
-    result rather than a pass.
+    The runtime, fixtures, and property suite are implemented; the test262
+    rows stay unreviewed until the full test262 update observes them.
+    `SuppressedError` answers `true` as soon as `disposal-intrinsics` sets the
+    object header's `[[ErrorData]]` flag the way the other error constructors
+    do. *non-error-objects-other-realm.js* calls the other realm's `Function`
+    constructor, so it becomes an ADR 0016 result rather than a pass.
  -  `math-sum-precise` owns `Math.sumPrecise` (10). The result is the
     correctly rounded exact sum, with the edition's `-0`, infinity, and NaN
     rules and an iterator that is closed on a non-Number value. A property
     test compares it with an exact BigInt rational sum.
-    The runtime, fixtures, and property suite are implemented; the rows wait
-    for `claim-boundary`.
+    The runtime, fixtures, and property suite are implemented; the test262
+    rows stay unreviewed until the full test262 update observes them.
  -  `upsert` owns `getOrInsert` and `getOrInsertComputed` on `Map` and
     `WeakMap` (72). `getOrInsertComputed` runs its callback once and then
     stores the result even if the callback inserted the key. The `WeakMap`
     forms require CanBeHeldWeakly and use the existing ephemeron storage.
-    The runtime, fixtures, and property suite are implemented; the rows wait
-    for `claim-boundary`. Two `getOrInsertComputed` rows,
+    The runtime, fixtures, and property suite are implemented; the test262
+    rows stay unreviewed until the full test262 update observes them. Two
+    `getOrInsertComputed` rows,
     *different-types-function-callbackfn-does-not-throw.js* for `Map` and
     *adds-value-different-callbackfn.js* for `WeakMap`, call the `Function`
     constructor, so they become ADR 0016 results rather than passes.
@@ -614,8 +615,8 @@ current *tests/test262/inventory.tsv*.
  -  `iterator-concat` owns `Iterator.concat` (32). It reads every item's
     `Symbol.iterator` method when called, opens each item only when its turn
     comes, and forwards `return` to the active inner iterator.
-    The runtime, fixtures, and property suite are implemented; the rows wait
-    for `claim-boundary`.
+    The runtime, fixtures, and property suite are implemented; the test262
+    rows stay unreviewed until the full test262 update observes them.
  -  `json-parse-source` owns `JSON.rawJSON`, `JSON.isRawJSON`, and the
     reviver context argument (21). It changes the `json-parse` and
     `json-stringify` components: the reviver receives the source text of each
