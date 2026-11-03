@@ -5,7 +5,9 @@ Status
 ------
 
 Implementation status: in progress. The `claim-boundary` unit has applied ADR
-0032, and every other unit is open. This plan follows M5 directly and runs
+0032. The `legacy-caller`, `annexb-escape`, `annexb-string-methods`, and
+`annexb-date-methods` units are implemented and observed, and every other unit
+is open. This plan follows M5 directly and runs
 alongside M6. It has no milestone number. It schedules the language work
 the maintainer approved on 2026-11-02: build-time static-specifier `import()`,
 Annex B legacy web behavior except `document.all`, the legacy `caller`
@@ -95,9 +97,9 @@ A probe of the current build and the reviewed manifest shows this Annex B state:
 | `__lookupGetter__`, `__lookupSetter__`             | Not installed; a lookup reaching `Object.prototype` reports OSEO1001          |
 | `__defineGetter__`, `__defineSetter__`             | Not installed                                                                 |
 | Annex B RegExp pattern grammar                     | Reported as the OSEO1001 profile boundary, without `u` or `v`                 |
-| `escape`, `unescape`                               | Installed by `annexb-escape`; test262 rows not yet observed                   |
-| `substr`, HTML methods, `trimLeft`, `trimRight`    | Installed by `annexb-string-methods`; test262 rows not yet observed           |
-| `getYear`, `setYear`, `toGMTString`                | Installed by `annexb-date-methods`; test262 rows not yet observed             |
+| `escape`, `unescape`                               | Installed by `annexb-escape`; all 35 test262 rows pass                        |
+| `substr`, HTML methods, `trimLeft`, `trimRight`    | Installed by `annexb-string-methods`; all 105 test262 rows pass               |
+| `getYear`, `setYear`, `toGMTString`                | Installed by `annexb-date-methods`; all 24 test262 rows pass                  |
 | `RegExp.prototype.compile`                         | Not installed                                                                 |
 | Labelled function declarations                     | Rejected with OSEO1001                                                        |
 | Function declarations in `if` clauses              | Rejected with OSEO1001                                                        |
@@ -459,8 +461,8 @@ of arbitrary code units and checks that `unescape(escape(s))` returns `s` and
 that every escape matches an independent encoder.
 
 Status: implemented, with fixed, differential, and generated evidence in the
-[profile section](./docs/language-profile-es2026.md#escape-and-unescape). The
-35 rows wait for admission, expected to pass, in Root's full UPDATE.
+[profile section](./docs/language-profile-es2026.md#escape-and-unescape). All
+35 rows pass in the full test262 observation.
 
 ### `annexb-string-methods`
 
@@ -471,7 +473,7 @@ CreateHTML, including the quotation mark escaping of attribute values.
 
 Status: implemented, with fixed, differential, and generated evidence in the
 [profile section](./docs/language-profile-es2026.md#string-prototype-methods).
-The 105 rows wait for admission, expected to pass, in Root's full UPDATE.
+All 105 rows pass in the full test262 observation.
 
 ### `annexb-date-methods`
 
@@ -481,7 +483,9 @@ The methods use the realm's UTC local time zone that the M5 profile records.
 
 Status: implemented, with fixed, differential, and generated evidence in the
 [profile section](./docs/language-profile-es2026.md#date-prototype-methods).
-The 24 rows wait for admission, expected to pass, in Root's full UPDATE.
+All 24 rows pass in the full test262 observation. With them the manifest has
+41,255 reviewed rows: 34,960 passes and 1,894 unsupported results, and no other
+row changes.
 
 ### `annexb-regexp-compile`
 

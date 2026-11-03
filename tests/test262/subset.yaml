@@ -150,6 +150,520 @@ supportedFeatures:
   - well-formed-json-stringify
   - well-known-symbols
 tests:
+  - path: test/annexB/built-ins/Date/prototype/getYear/B.2.4.js
+    expectedClassification: pass
+    dependencies: [date, object-properties]
+  - path: test/annexB/built-ins/Date/prototype/getYear/length.js
+    expectedClassification: pass
+    dependencies: [date, object-properties]
+  - path: test/annexB/built-ins/Date/prototype/getYear/name.js
+    expectedClassification: pass
+    dependencies: [date, object-properties]
+  - path: test/annexB/built-ins/Date/prototype/getYear/nan.js
+    expectedClassification: pass
+    dependencies: [date]
+  - path: test/annexB/built-ins/Date/prototype/getYear/not-a-constructor.js
+    expectedClassification: pass
+    dependencies: [abrupt-completion, date, error-intrinsics, functions]
+  - path: test/annexB/built-ins/Date/prototype/getYear/return-value.js
+    expectedClassification: pass
+    dependencies: [date]
+  - path: test/annexB/built-ins/Date/prototype/getYear/this-not-date.js
+    expectedClassification: pass
+    dependencies: [abrupt-completion, date, error-intrinsics]
+  - path: test/annexB/built-ins/Date/prototype/setYear/B.2.5.js
+    expectedClassification: pass
+    dependencies: [date, object-properties]
+  - path: test/annexB/built-ins/Date/prototype/setYear/date-value-read-before-tonumber-when-date-is-invalid.js
+    expectedClassification: pass
+    dependencies: [date]
+  - path: test/annexB/built-ins/Date/prototype/setYear/date-value-read-before-tonumber-when-date-is-valid.js
+    expectedClassification: pass
+    dependencies: [date]
+  - path: test/annexB/built-ins/Date/prototype/setYear/length.js
+    expectedClassification: pass
+    dependencies: [date, object-properties]
+  - path: test/annexB/built-ins/Date/prototype/setYear/name.js
+    expectedClassification: pass
+    dependencies: [date, object-properties]
+  - path: test/annexB/built-ins/Date/prototype/setYear/not-a-constructor.js
+    expectedClassification: pass
+    dependencies: [abrupt-completion, date, error-intrinsics, functions]
+  - path: test/annexB/built-ins/Date/prototype/setYear/this-not-date.js
+    expectedClassification: pass
+    dependencies: [abrupt-completion, date, error-intrinsics]
+  - path: test/annexB/built-ins/Date/prototype/setYear/this-time-nan.js
+    expectedClassification: pass
+    dependencies: [date]
+  - path: test/annexB/built-ins/Date/prototype/setYear/this-time-valid.js
+    expectedClassification: pass
+    dependencies: [date]
+  - path: test/annexB/built-ins/Date/prototype/setYear/time-clip.js
+    expectedClassification: pass
+    dependencies: [date]
+  - path: test/annexB/built-ins/Date/prototype/setYear/year-nan.js
+    expectedClassification: pass
+    dependencies: [date]
+  - path: test/annexB/built-ins/Date/prototype/setYear/year-number-absolute.js
+    expectedClassification: pass
+    dependencies: [date]
+  - path: test/annexB/built-ins/Date/prototype/setYear/year-number-relative.js
+    expectedClassification: pass
+    dependencies: [date]
+  - path: test/annexB/built-ins/Date/prototype/setYear/year-to-number-err.js
+    expectedClassification: pass
+    dependencies: [abrupt-completion, date, error-intrinsics, symbols]
+  - path: test/annexB/built-ins/Date/prototype/toGMTString/not-a-constructor.js
+    expectedClassification: pass
+    dependencies: [abrupt-completion, date, error-intrinsics, functions]
+  - path: test/annexB/built-ins/Date/prototype/toGMTString/prop-desc.js
+    expectedClassification: pass
+    dependencies: [date, object-properties]
+  - path: test/annexB/built-ins/Date/prototype/toGMTString/value.js
+    expectedClassification: pass
+    dependencies: [date, object-properties]
+  - path: test/annexB/built-ins/String/prototype/anchor/B.2.3.2.js
+    expectedClassification: pass
+    dependencies: [abrupt-completion, error-intrinsics, object-properties]
+  - path: test/annexB/built-ins/String/prototype/anchor/attr-tostring-err.js
+    expectedClassification: pass
+    dependencies: [abrupt-completion, object-properties]
+  - path: test/annexB/built-ins/String/prototype/anchor/length.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/annexB/built-ins/String/prototype/anchor/name.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/annexB/built-ins/String/prototype/anchor/not-a-constructor.js
+    expectedClassification: pass
+    dependencies:
+      [abrupt-completion, error-intrinsics, functions, object-properties]
+  - path: test/annexB/built-ins/String/prototype/anchor/prop-desc.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/annexB/built-ins/String/prototype/anchor/this-val-tostring-err.js
+    expectedClassification: pass
+    dependencies: [abrupt-completion, object-properties]
+  - path: test/annexB/built-ins/String/prototype/big/B.2.3.3.js
+    expectedClassification: pass
+    dependencies: [abrupt-completion, error-intrinsics, object-properties]
+  - path: test/annexB/built-ins/String/prototype/big/length.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/annexB/built-ins/String/prototype/big/name.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/annexB/built-ins/String/prototype/big/not-a-constructor.js
+    expectedClassification: pass
+    dependencies:
+      [abrupt-completion, error-intrinsics, functions, object-properties]
+  - path: test/annexB/built-ins/String/prototype/big/prop-desc.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/annexB/built-ins/String/prototype/big/this-val-tostring-err.js
+    expectedClassification: pass
+    dependencies: [abrupt-completion, object-properties]
+  - path: test/annexB/built-ins/String/prototype/blink/B.2.3.4.js
+    expectedClassification: pass
+    dependencies: [abrupt-completion, error-intrinsics, object-properties]
+  - path: test/annexB/built-ins/String/prototype/blink/length.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/annexB/built-ins/String/prototype/blink/name.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/annexB/built-ins/String/prototype/blink/not-a-constructor.js
+    expectedClassification: pass
+    dependencies:
+      [abrupt-completion, error-intrinsics, functions, object-properties]
+  - path: test/annexB/built-ins/String/prototype/blink/prop-desc.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/annexB/built-ins/String/prototype/blink/this-val-tostring-err.js
+    expectedClassification: pass
+    dependencies: [abrupt-completion, object-properties]
+  - path: test/annexB/built-ins/String/prototype/bold/B.2.3.5.js
+    expectedClassification: pass
+    dependencies: [abrupt-completion, error-intrinsics, object-properties]
+  - path: test/annexB/built-ins/String/prototype/bold/length.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/annexB/built-ins/String/prototype/bold/name.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/annexB/built-ins/String/prototype/bold/not-a-constructor.js
+    expectedClassification: pass
+    dependencies:
+      [abrupt-completion, error-intrinsics, functions, object-properties]
+  - path: test/annexB/built-ins/String/prototype/bold/prop-desc.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/annexB/built-ins/String/prototype/bold/this-val-tostring-err.js
+    expectedClassification: pass
+    dependencies: [abrupt-completion, object-properties]
+  - path: test/annexB/built-ins/String/prototype/fixed/B.2.3.6.js
+    expectedClassification: pass
+    dependencies: [abrupt-completion, error-intrinsics, object-properties]
+  - path: test/annexB/built-ins/String/prototype/fixed/length.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/annexB/built-ins/String/prototype/fixed/name.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/annexB/built-ins/String/prototype/fixed/not-a-constructor.js
+    expectedClassification: pass
+    dependencies:
+      [abrupt-completion, error-intrinsics, functions, object-properties]
+  - path: test/annexB/built-ins/String/prototype/fixed/prop-desc.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/annexB/built-ins/String/prototype/fixed/this-val-tostring-err.js
+    expectedClassification: pass
+    dependencies: [abrupt-completion, object-properties]
+  - path: test/annexB/built-ins/String/prototype/fontcolor/B.2.3.7.js
+    expectedClassification: pass
+    dependencies: [abrupt-completion, error-intrinsics, object-properties]
+  - path: test/annexB/built-ins/String/prototype/fontcolor/attr-tostring-err.js
+    expectedClassification: pass
+    dependencies: [abrupt-completion, object-properties]
+  - path: test/annexB/built-ins/String/prototype/fontcolor/length.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/annexB/built-ins/String/prototype/fontcolor/name.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/annexB/built-ins/String/prototype/fontcolor/not-a-constructor.js
+    expectedClassification: pass
+    dependencies:
+      [abrupt-completion, error-intrinsics, functions, object-properties]
+  - path: test/annexB/built-ins/String/prototype/fontcolor/prop-desc.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/annexB/built-ins/String/prototype/fontcolor/this-val-tostring-err.js
+    expectedClassification: pass
+    dependencies: [abrupt-completion, object-properties]
+  - path: test/annexB/built-ins/String/prototype/fontsize/B.2.3.8.js
+    expectedClassification: pass
+    dependencies: [abrupt-completion, error-intrinsics, object-properties]
+  - path: test/annexB/built-ins/String/prototype/fontsize/attr-tostring-err.js
+    expectedClassification: pass
+    dependencies: [abrupt-completion, object-properties]
+  - path: test/annexB/built-ins/String/prototype/fontsize/length.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/annexB/built-ins/String/prototype/fontsize/name.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/annexB/built-ins/String/prototype/fontsize/not-a-constructor.js
+    expectedClassification: pass
+    dependencies:
+      [abrupt-completion, error-intrinsics, functions, object-properties]
+  - path: test/annexB/built-ins/String/prototype/fontsize/prop-desc.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/annexB/built-ins/String/prototype/fontsize/this-val-tostring-err.js
+    expectedClassification: pass
+    dependencies: [abrupt-completion, object-properties]
+  - path: test/annexB/built-ins/String/prototype/italics/B.2.3.9.js
+    expectedClassification: pass
+    dependencies: [abrupt-completion, error-intrinsics, object-properties]
+  - path: test/annexB/built-ins/String/prototype/italics/length.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/annexB/built-ins/String/prototype/italics/name.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/annexB/built-ins/String/prototype/italics/not-a-constructor.js
+    expectedClassification: pass
+    dependencies:
+      [abrupt-completion, error-intrinsics, functions, object-properties]
+  - path: test/annexB/built-ins/String/prototype/italics/prop-desc.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/annexB/built-ins/String/prototype/italics/this-val-tostring-err.js
+    expectedClassification: pass
+    dependencies: [abrupt-completion, object-properties]
+  - path: test/annexB/built-ins/String/prototype/link/B.2.3.10.js
+    expectedClassification: pass
+    dependencies: [abrupt-completion, error-intrinsics, object-properties]
+  - path: test/annexB/built-ins/String/prototype/link/attr-tostring-err.js
+    expectedClassification: pass
+    dependencies: [abrupt-completion, object-properties]
+  - path: test/annexB/built-ins/String/prototype/link/length.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/annexB/built-ins/String/prototype/link/name.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/annexB/built-ins/String/prototype/link/not-a-constructor.js
+    expectedClassification: pass
+    dependencies:
+      [abrupt-completion, error-intrinsics, functions, object-properties]
+  - path: test/annexB/built-ins/String/prototype/link/prop-desc.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/annexB/built-ins/String/prototype/link/this-val-tostring-err.js
+    expectedClassification: pass
+    dependencies: [abrupt-completion, object-properties]
+  - path: test/annexB/built-ins/String/prototype/small/B.2.3.11.js
+    expectedClassification: pass
+    dependencies: [abrupt-completion, error-intrinsics, object-properties]
+  - path: test/annexB/built-ins/String/prototype/small/length.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/annexB/built-ins/String/prototype/small/name.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/annexB/built-ins/String/prototype/small/not-a-constructor.js
+    expectedClassification: pass
+    dependencies:
+      [abrupt-completion, error-intrinsics, functions, object-properties]
+  - path: test/annexB/built-ins/String/prototype/small/prop-desc.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/annexB/built-ins/String/prototype/small/this-val-tostring-err.js
+    expectedClassification: pass
+    dependencies: [abrupt-completion, object-properties]
+  - path: test/annexB/built-ins/String/prototype/strike/B.2.3.12.js
+    expectedClassification: pass
+    dependencies: [abrupt-completion, error-intrinsics, object-properties]
+  - path: test/annexB/built-ins/String/prototype/strike/length.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/annexB/built-ins/String/prototype/strike/name.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/annexB/built-ins/String/prototype/strike/not-a-constructor.js
+    expectedClassification: pass
+    dependencies:
+      [abrupt-completion, error-intrinsics, functions, object-properties]
+  - path: test/annexB/built-ins/String/prototype/strike/prop-desc.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/annexB/built-ins/String/prototype/strike/this-val-tostring-err.js
+    expectedClassification: pass
+    dependencies: [abrupt-completion, object-properties]
+  - path: test/annexB/built-ins/String/prototype/sub/B.2.3.13.js
+    expectedClassification: pass
+    dependencies: [abrupt-completion, error-intrinsics, object-properties]
+  - path: test/annexB/built-ins/String/prototype/sub/length.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/annexB/built-ins/String/prototype/sub/name.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/annexB/built-ins/String/prototype/sub/not-a-constructor.js
+    expectedClassification: pass
+    dependencies:
+      [abrupt-completion, error-intrinsics, functions, object-properties]
+  - path: test/annexB/built-ins/String/prototype/sub/prop-desc.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/annexB/built-ins/String/prototype/sub/this-val-tostring-err.js
+    expectedClassification: pass
+    dependencies: [abrupt-completion, object-properties]
+  - path: test/annexB/built-ins/String/prototype/substr/B.2.3.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/annexB/built-ins/String/prototype/substr/length-falsey.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/annexB/built-ins/String/prototype/substr/length-negative.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/annexB/built-ins/String/prototype/substr/length-positive.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/annexB/built-ins/String/prototype/substr/length-to-int-err.js
+    expectedClassification: pass
+    dependencies:
+      [abrupt-completion, error-intrinsics, object-properties, symbols]
+  - path: test/annexB/built-ins/String/prototype/substr/length-undef.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/annexB/built-ins/String/prototype/substr/length.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/annexB/built-ins/String/prototype/substr/name.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/annexB/built-ins/String/prototype/substr/not-a-constructor.js
+    expectedClassification: pass
+    dependencies:
+      [abrupt-completion, error-intrinsics, functions, object-properties]
+  - path: test/annexB/built-ins/String/prototype/substr/start-and-length-as-numbers.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/annexB/built-ins/String/prototype/substr/start-negative.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/annexB/built-ins/String/prototype/substr/start-to-int-err.js
+    expectedClassification: pass
+    dependencies:
+      [abrupt-completion, error-intrinsics, object-properties, symbols]
+  - path: test/annexB/built-ins/String/prototype/substr/surrogate-pairs.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/annexB/built-ins/String/prototype/substr/this-non-obj-coerce.js
+    expectedClassification: pass
+    dependencies: [abrupt-completion, error-intrinsics, object-properties]
+  - path: test/annexB/built-ins/String/prototype/substr/this-to-str-err.js
+    expectedClassification: pass
+    dependencies: [abrupt-completion, object-properties]
+  - path: test/annexB/built-ins/String/prototype/sup/B.2.3.14.js
+    expectedClassification: pass
+    dependencies: [abrupt-completion, error-intrinsics, object-properties]
+  - path: test/annexB/built-ins/String/prototype/sup/length.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/annexB/built-ins/String/prototype/sup/name.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/annexB/built-ins/String/prototype/sup/not-a-constructor.js
+    expectedClassification: pass
+    dependencies:
+      [abrupt-completion, error-intrinsics, functions, object-properties]
+  - path: test/annexB/built-ins/String/prototype/sup/prop-desc.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/annexB/built-ins/String/prototype/sup/this-val-tostring-err.js
+    expectedClassification: pass
+    dependencies: [abrupt-completion, object-properties]
+  - path: test/annexB/built-ins/String/prototype/trimLeft/length.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/annexB/built-ins/String/prototype/trimLeft/name.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/annexB/built-ins/String/prototype/trimLeft/prop-desc.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/annexB/built-ins/String/prototype/trimLeft/reference-trimStart.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/annexB/built-ins/String/prototype/trimRight/length.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/annexB/built-ins/String/prototype/trimRight/name.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/annexB/built-ins/String/prototype/trimRight/prop-desc.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/annexB/built-ins/String/prototype/trimRight/reference-trimEnd.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/annexB/built-ins/escape/argument_bigint.js
+    expectedClassification: pass
+    dependencies: [bigint-primitive, object-properties]
+  - path: test/annexB/built-ins/escape/argument_types.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/annexB/built-ins/escape/empty-string.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/annexB/built-ins/escape/escape-above-astral.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/annexB/built-ins/escape/escape-above.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/annexB/built-ins/escape/escape-below.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/annexB/built-ins/escape/length.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/annexB/built-ins/escape/name.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/annexB/built-ins/escape/not-a-constructor.js
+    expectedClassification: pass
+    dependencies:
+      [abrupt-completion, error-intrinsics, functions, object-properties]
+  - path: test/annexB/built-ins/escape/prop-desc.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/annexB/built-ins/escape/to-primitive-err.js
+    expectedClassification: pass
+    dependencies:
+      [abrupt-completion, error-intrinsics, object-properties, symbols]
+  - path: test/annexB/built-ins/escape/to-primitive-observe.js
+    expectedClassification: pass
+    dependencies: [object-properties, symbols]
+  - path: test/annexB/built-ins/escape/to-string-err-symbol.js
+    expectedClassification: pass
+    dependencies:
+      [abrupt-completion, error-intrinsics, object-properties, symbols]
+  - path: test/annexB/built-ins/escape/to-string-err.js
+    expectedClassification: pass
+    dependencies: [abrupt-completion, object-properties]
+  - path: test/annexB/built-ins/escape/to-string-observe.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/annexB/built-ins/escape/unmodified.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/annexB/built-ins/unescape/argument_bigint.js
+    expectedClassification: pass
+    dependencies: [bigint-primitive, object-properties]
+  - path: test/annexB/built-ins/unescape/argument_types.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/annexB/built-ins/unescape/empty-string.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/annexB/built-ins/unescape/four-ignore-bad-u.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/annexB/built-ins/unescape/four-ignore-end-str.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/annexB/built-ins/unescape/four-ignore-non-hex.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/annexB/built-ins/unescape/four.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/annexB/built-ins/unescape/length.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/annexB/built-ins/unescape/name.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/annexB/built-ins/unescape/not-a-constructor.js
+    expectedClassification: pass
+    dependencies:
+      [abrupt-completion, error-intrinsics, functions, object-properties]
+  - path: test/annexB/built-ins/unescape/prop-desc.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/annexB/built-ins/unescape/to-primitive-err.js
+    expectedClassification: pass
+    dependencies:
+      [abrupt-completion, error-intrinsics, object-properties, symbols]
+  - path: test/annexB/built-ins/unescape/to-primitive-observe.js
+    expectedClassification: pass
+    dependencies: [object-properties, symbols]
+  - path: test/annexB/built-ins/unescape/to-string-err-symbol.js
+    expectedClassification: pass
+    dependencies:
+      [abrupt-completion, error-intrinsics, object-properties, symbols]
+  - path: test/annexB/built-ins/unescape/to-string-err.js
+    expectedClassification: pass
+    dependencies: [abrupt-completion, object-properties]
+  - path: test/annexB/built-ins/unescape/to-string-observe.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/annexB/built-ins/unescape/two-ignore-end-str.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/annexB/built-ins/unescape/two-ignore-non-hex.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/annexB/built-ins/unescape/two.js
+    expectedClassification: pass
+    dependencies: [object-properties]
   - path: test/built-ins/AggregateError/cause-property.js
     expectedClassification: pass
     dependencies: [error-intrinsics]

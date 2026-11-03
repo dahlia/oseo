@@ -151,9 +151,9 @@ Annex B built-ins
 The Annex B B.2 built-ins enter the claim through
 [ADR 0032](./adr/0032-post-m5-edition-boundary.md). They exist in every realm,
 including realms that `$262.createRealm` creates. Their family records are
-`annexb-escape`, `annexb-string-methods`, and `annexb-date-methods`. Each
-record's standards class stays omitted until a full UPDATE admits and observes
-its owned paths, which a focused precheck expects to pass.
+`annexb-escape`, `annexb-string-methods`, and `annexb-date-methods`. All 164
+owned test262 paths pass, and each record's standards class cites the results
+partitions that hold its rows.
 
 ### `escape` and `unescape`
 

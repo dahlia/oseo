@@ -1,4 +1,367 @@
 partitions:
+  - group: annexB/built-ins
+    key: "00"
+    path: results/annexB/built-ins/00.yaml
+  - group: annexB/built-ins
+    key: "01"
+    path: results/annexB/built-ins/01.yaml
+  - group: annexB/built-ins
+    key: "06"
+    path: results/annexB/built-ins/06.yaml
+  - group: annexB/built-ins
+    key: "07"
+    path: results/annexB/built-ins/07.yaml
+  - group: annexB/built-ins
+    key: "09"
+    path: results/annexB/built-ins/09.yaml
+  - group: annexB/built-ins
+    key: 0b
+    path: results/annexB/built-ins/0b.yaml
+  - group: annexB/built-ins
+    key: 0c
+    path: results/annexB/built-ins/0c.yaml
+  - group: annexB/built-ins
+    key: "10"
+    path: results/annexB/built-ins/10.yaml
+  - group: annexB/built-ins
+    key: "14"
+    path: results/annexB/built-ins/14.yaml
+  - group: annexB/built-ins
+    key: "15"
+    path: results/annexB/built-ins/15.yaml
+  - group: annexB/built-ins
+    key: "16"
+    path: results/annexB/built-ins/16.yaml
+  - group: annexB/built-ins
+    key: "17"
+    path: results/annexB/built-ins/17.yaml
+  - group: annexB/built-ins
+    key: "19"
+    path: results/annexB/built-ins/19.yaml
+  - group: annexB/built-ins
+    key: 1c
+    path: results/annexB/built-ins/1c.yaml
+  - group: annexB/built-ins
+    key: 1e
+    path: results/annexB/built-ins/1e.yaml
+  - group: annexB/built-ins
+    key: "20"
+    path: results/annexB/built-ins/20.yaml
+  - group: annexB/built-ins
+    key: "23"
+    path: results/annexB/built-ins/23.yaml
+  - group: annexB/built-ins
+    key: "24"
+    path: results/annexB/built-ins/24.yaml
+  - group: annexB/built-ins
+    key: "26"
+    path: results/annexB/built-ins/26.yaml
+  - group: annexB/built-ins
+    key: "29"
+    path: results/annexB/built-ins/29.yaml
+  - group: annexB/built-ins
+    key: 2b
+    path: results/annexB/built-ins/2b.yaml
+  - group: annexB/built-ins
+    key: 2c
+    path: results/annexB/built-ins/2c.yaml
+  - group: annexB/built-ins
+    key: 2f
+    path: results/annexB/built-ins/2f.yaml
+  - group: annexB/built-ins
+    key: "32"
+    path: results/annexB/built-ins/32.yaml
+  - group: annexB/built-ins
+    key: "34"
+    path: results/annexB/built-ins/34.yaml
+  - group: annexB/built-ins
+    key: "35"
+    path: results/annexB/built-ins/35.yaml
+  - group: annexB/built-ins
+    key: "38"
+    path: results/annexB/built-ins/38.yaml
+  - group: annexB/built-ins
+    key: 3c
+    path: results/annexB/built-ins/3c.yaml
+  - group: annexB/built-ins
+    key: 3d
+    path: results/annexB/built-ins/3d.yaml
+  - group: annexB/built-ins
+    key: 3e
+    path: results/annexB/built-ins/3e.yaml
+  - group: annexB/built-ins
+    key: "40"
+    path: results/annexB/built-ins/40.yaml
+  - group: annexB/built-ins
+    key: "41"
+    path: results/annexB/built-ins/41.yaml
+  - group: annexB/built-ins
+    key: "43"
+    path: results/annexB/built-ins/43.yaml
+  - group: annexB/built-ins
+    key: "45"
+    path: results/annexB/built-ins/45.yaml
+  - group: annexB/built-ins
+    key: "48"
+    path: results/annexB/built-ins/48.yaml
+  - group: annexB/built-ins
+    key: 4a
+    path: results/annexB/built-ins/4a.yaml
+  - group: annexB/built-ins
+    key: 4c
+    path: results/annexB/built-ins/4c.yaml
+  - group: annexB/built-ins
+    key: "50"
+    path: results/annexB/built-ins/50.yaml
+  - group: annexB/built-ins
+    key: "51"
+    path: results/annexB/built-ins/51.yaml
+  - group: annexB/built-ins
+    key: "53"
+    path: results/annexB/built-ins/53.yaml
+  - group: annexB/built-ins
+    key: "54"
+    path: results/annexB/built-ins/54.yaml
+  - group: annexB/built-ins
+    key: "55"
+    path: results/annexB/built-ins/55.yaml
+  - group: annexB/built-ins
+    key: "56"
+    path: results/annexB/built-ins/56.yaml
+  - group: annexB/built-ins
+    key: "58"
+    path: results/annexB/built-ins/58.yaml
+  - group: annexB/built-ins
+    key: 5a
+    path: results/annexB/built-ins/5a.yaml
+  - group: annexB/built-ins
+    key: "62"
+    path: results/annexB/built-ins/62.yaml
+  - group: annexB/built-ins
+    key: "63"
+    path: results/annexB/built-ins/63.yaml
+  - group: annexB/built-ins
+    key: "67"
+    path: results/annexB/built-ins/67.yaml
+  - group: annexB/built-ins
+    key: "68"
+    path: results/annexB/built-ins/68.yaml
+  - group: annexB/built-ins
+    key: "69"
+    path: results/annexB/built-ins/69.yaml
+  - group: annexB/built-ins
+    key: 6a
+    path: results/annexB/built-ins/6a.yaml
+  - group: annexB/built-ins
+    key: 6b
+    path: results/annexB/built-ins/6b.yaml
+  - group: annexB/built-ins
+    key: 6d
+    path: results/annexB/built-ins/6d.yaml
+  - group: annexB/built-ins
+    key: 6e
+    path: results/annexB/built-ins/6e.yaml
+  - group: annexB/built-ins
+    key: "70"
+    path: results/annexB/built-ins/70.yaml
+  - group: annexB/built-ins
+    key: "72"
+    path: results/annexB/built-ins/72.yaml
+  - group: annexB/built-ins
+    key: "73"
+    path: results/annexB/built-ins/73.yaml
+  - group: annexB/built-ins
+    key: "74"
+    path: results/annexB/built-ins/74.yaml
+  - group: annexB/built-ins
+    key: "76"
+    path: results/annexB/built-ins/76.yaml
+  - group: annexB/built-ins
+    key: 7f
+    path: results/annexB/built-ins/7f.yaml
+  - group: annexB/built-ins
+    key: "81"
+    path: results/annexB/built-ins/81.yaml
+  - group: annexB/built-ins
+    key: "82"
+    path: results/annexB/built-ins/82.yaml
+  - group: annexB/built-ins
+    key: "87"
+    path: results/annexB/built-ins/87.yaml
+  - group: annexB/built-ins
+    key: "88"
+    path: results/annexB/built-ins/88.yaml
+  - group: annexB/built-ins
+    key: 8b
+    path: results/annexB/built-ins/8b.yaml
+  - group: annexB/built-ins
+    key: 8c
+    path: results/annexB/built-ins/8c.yaml
+  - group: annexB/built-ins
+    key: 8d
+    path: results/annexB/built-ins/8d.yaml
+  - group: annexB/built-ins
+    key: 8f
+    path: results/annexB/built-ins/8f.yaml
+  - group: annexB/built-ins
+    key: "90"
+    path: results/annexB/built-ins/90.yaml
+  - group: annexB/built-ins
+    key: "91"
+    path: results/annexB/built-ins/91.yaml
+  - group: annexB/built-ins
+    key: "92"
+    path: results/annexB/built-ins/92.yaml
+  - group: annexB/built-ins
+    key: "93"
+    path: results/annexB/built-ins/93.yaml
+  - group: annexB/built-ins
+    key: "94"
+    path: results/annexB/built-ins/94.yaml
+  - group: annexB/built-ins
+    key: "95"
+    path: results/annexB/built-ins/95.yaml
+  - group: annexB/built-ins
+    key: "96"
+    path: results/annexB/built-ins/96.yaml
+  - group: annexB/built-ins
+    key: "98"
+    path: results/annexB/built-ins/98.yaml
+  - group: annexB/built-ins
+    key: 9b
+    path: results/annexB/built-ins/9b.yaml
+  - group: annexB/built-ins
+    key: 9c
+    path: results/annexB/built-ins/9c.yaml
+  - group: annexB/built-ins
+    key: 9d
+    path: results/annexB/built-ins/9d.yaml
+  - group: annexB/built-ins
+    key: 9e
+    path: results/annexB/built-ins/9e.yaml
+  - group: annexB/built-ins
+    key: a0
+    path: results/annexB/built-ins/a0.yaml
+  - group: annexB/built-ins
+    key: a4
+    path: results/annexB/built-ins/a4.yaml
+  - group: annexB/built-ins
+    key: a6
+    path: results/annexB/built-ins/a6.yaml
+  - group: annexB/built-ins
+    key: a7
+    path: results/annexB/built-ins/a7.yaml
+  - group: annexB/built-ins
+    key: ab
+    path: results/annexB/built-ins/ab.yaml
+  - group: annexB/built-ins
+    key: ae
+    path: results/annexB/built-ins/ae.yaml
+  - group: annexB/built-ins
+    key: b3
+    path: results/annexB/built-ins/b3.yaml
+  - group: annexB/built-ins
+    key: b6
+    path: results/annexB/built-ins/b6.yaml
+  - group: annexB/built-ins
+    key: b7
+    path: results/annexB/built-ins/b7.yaml
+  - group: annexB/built-ins
+    key: b8
+    path: results/annexB/built-ins/b8.yaml
+  - group: annexB/built-ins
+    key: bb
+    path: results/annexB/built-ins/bb.yaml
+  - group: annexB/built-ins
+    key: bd
+    path: results/annexB/built-ins/bd.yaml
+  - group: annexB/built-ins
+    key: c0
+    path: results/annexB/built-ins/c0.yaml
+  - group: annexB/built-ins
+    key: c2
+    path: results/annexB/built-ins/c2.yaml
+  - group: annexB/built-ins
+    key: c4
+    path: results/annexB/built-ins/c4.yaml
+  - group: annexB/built-ins
+    key: c7
+    path: results/annexB/built-ins/c7.yaml
+  - group: annexB/built-ins
+    key: ca
+    path: results/annexB/built-ins/ca.yaml
+  - group: annexB/built-ins
+    key: cd
+    path: results/annexB/built-ins/cd.yaml
+  - group: annexB/built-ins
+    key: d1
+    path: results/annexB/built-ins/d1.yaml
+  - group: annexB/built-ins
+    key: d4
+    path: results/annexB/built-ins/d4.yaml
+  - group: annexB/built-ins
+    key: d8
+    path: results/annexB/built-ins/d8.yaml
+  - group: annexB/built-ins
+    key: da
+    path: results/annexB/built-ins/da.yaml
+  - group: annexB/built-ins
+    key: db
+    path: results/annexB/built-ins/db.yaml
+  - group: annexB/built-ins
+    key: dd
+    path: results/annexB/built-ins/dd.yaml
+  - group: annexB/built-ins
+    key: de
+    path: results/annexB/built-ins/de.yaml
+  - group: annexB/built-ins
+    key: e3
+    path: results/annexB/built-ins/e3.yaml
+  - group: annexB/built-ins
+    key: e5
+    path: results/annexB/built-ins/e5.yaml
+  - group: annexB/built-ins
+    key: e7
+    path: results/annexB/built-ins/e7.yaml
+  - group: annexB/built-ins
+    key: e8
+    path: results/annexB/built-ins/e8.yaml
+  - group: annexB/built-ins
+    key: e9
+    path: results/annexB/built-ins/e9.yaml
+  - group: annexB/built-ins
+    key: ea
+    path: results/annexB/built-ins/ea.yaml
+  - group: annexB/built-ins
+    key: eb
+    path: results/annexB/built-ins/eb.yaml
+  - group: annexB/built-ins
+    key: f1
+    path: results/annexB/built-ins/f1.yaml
+  - group: annexB/built-ins
+    key: f2
+    path: results/annexB/built-ins/f2.yaml
+  - group: annexB/built-ins
+    key: f3
+    path: results/annexB/built-ins/f3.yaml
+  - group: annexB/built-ins
+    key: f4
+    path: results/annexB/built-ins/f4.yaml
+  - group: annexB/built-ins
+    key: f5
+    path: results/annexB/built-ins/f5.yaml
+  - group: annexB/built-ins
+    key: f7
+    path: results/annexB/built-ins/f7.yaml
+  - group: annexB/built-ins
+    key: fb
+    path: results/annexB/built-ins/fb.yaml
+  - group: annexB/built-ins
+    key: fc
+    path: results/annexB/built-ins/fc.yaml
+  - group: annexB/built-ins
+    key: ff
+    path: results/annexB/built-ins/ff.yaml
   - group: built-ins/AggregateError
     key: "09"
     path: results/built-ins/AggregateError/09.yaml
@@ -23470,7 +23833,7 @@ summary:
   expectedNegatives: 4401
   harnessFailures: 0
   infrastructureFailures: 0
-  passes: 34796
+  passes: 34960
   semanticFailures: 0
   unsupportedProfileFeatures: 1894
   dependencies:
@@ -23478,7 +23841,7 @@ summary:
       expectedNegatives: 27
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 4136
+      passes: 4198
       semanticFailures: 0
       unsupportedProfileFeatures: 675
     - dependency: array-buffer
@@ -23520,7 +23883,7 @@ summary:
       expectedNegatives: 39
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 520
+      passes: 522
       semanticFailures: 0
       unsupportedProfileFeatures: 0
     - dependency: classes
@@ -23548,7 +23911,7 @@ summary:
       expectedNegatives: 0
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 589
+      passes: 613
       semanticFailures: 0
       unsupportedProfileFeatures: 6
     - dependency: default-parameters
@@ -23576,7 +23939,7 @@ summary:
       expectedNegatives: 17
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 3002
+      passes: 3044
       semanticFailures: 0
       unsupportedProfileFeatures: 603
     - dependency: expression-operators
@@ -23590,7 +23953,7 @@ summary:
       expectedNegatives: 1387
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 17349
+      passes: 17368
       semanticFailures: 0
       unsupportedProfileFeatures: 1573
     - dependency: generators
@@ -23660,7 +24023,7 @@ summary:
       expectedNegatives: 610
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 22731
+      passes: 22879
       semanticFailures: 0
       unsupportedProfileFeatures: 993
     - dependency: promise-settlement
@@ -23723,7 +24086,7 @@ summary:
       expectedNegatives: 0
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 6387
+      passes: 6396
       semanticFailures: 0
       unsupportedProfileFeatures: 280
     - dependency: top-level-await
@@ -23797,6 +24160,13 @@ summary:
       semanticFailures: 0
       unsupportedProfileFeatures: 4
   groups:
+    - group: annexB/built-ins
+      expectedNegatives: 0
+      harnessFailures: 0
+      infrastructureFailures: 0
+      passes: 164
+      semanticFailures: 0
+      unsupportedProfileFeatures: 0
     - group: built-ins/AggregateError
       expectedNegatives: 0
       harnessFailures: 0

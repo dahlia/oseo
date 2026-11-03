@@ -49,14 +49,33 @@ evidence:
       - tests/native/fixtures/annexb-date-methods.ts
       - tests/property/m5-annexb-date-methods.property.test.ts
   standards:
-    status: omitted
-    reason: "The 24 test262 paths under test/annexB/built-ins/Date/prototype/
-      are unit:annexb-date-methods rows of the ADR 0032 inventory, expected to
-      pass. This class stays omitted until a full UPDATE admits and observes
-      them."
-    replacements:
-      - tests/native/fixtures/annexb-date-methods.ts
-      - tests/property/m5-annexb-date-methods.property.test.ts
+    status: covered
+    references:
+      - tests/test262/subset.yaml
+      - tests/test262/results.yaml
+      - tests/test262/results/annexB/built-ins/14.yaml
+      - tests/test262/results/annexB/built-ins/1c.yaml
+      - tests/test262/results/annexB/built-ins/20.yaml
+      - tests/test262/results/annexB/built-ins/24.yaml
+      - tests/test262/results/annexB/built-ins/29.yaml
+      - tests/test262/results/annexB/built-ins/2f.yaml
+      - tests/test262/results/annexB/built-ins/32.yaml
+      - tests/test262/results/annexB/built-ins/35.yaml
+      - tests/test262/results/annexB/built-ins/3c.yaml
+      - tests/test262/results/annexB/built-ins/45.yaml
+      - tests/test262/results/annexB/built-ins/67.yaml
+      - tests/test262/results/annexB/built-ins/6d.yaml
+      - tests/test262/results/annexB/built-ins/70.yaml
+      - tests/test262/results/annexB/built-ins/87.yaml
+      - tests/test262/results/annexB/built-ins/98.yaml
+      - tests/test262/results/annexB/built-ins/a0.yaml
+      - tests/test262/results/annexB/built-ins/ae.yaml
+      - tests/test262/results/annexB/built-ins/b3.yaml
+      - tests/test262/results/annexB/built-ins/b6.yaml
+      - tests/test262/results/annexB/built-ins/bd.yaml
+      - tests/test262/results/annexB/built-ins/d8.yaml
+      - tests/test262/results/annexB/built-ins/de.yaml
+      - tests/test262/results/annexB/built-ins/e9.yaml
   structural:
     status: covered
     references:
