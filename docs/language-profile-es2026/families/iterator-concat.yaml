@@ -1,0 +1,59 @@
+version: 1
+id: iterator-concat
+title: "Iterator.concat"
+scope:
+  - "The Iterator.concat function property, its descriptor, name, length,
+    and non-constructor status, and its %IteratorHelperPrototype% result."
+  - "Item validation and the single Symbol.iterator read at call time, lazy
+    opening in item order, the single next read per opened iterator, fresh
+    result objects, and the value read only from results that are not
+    done."
+  - "Completion without a close after a throw while opening or stepping,
+    return forwarding to the suspended inner iterator only, and the
+    running-generator TypeError for next and return."
+owners:
+  - docs/language-profile-es2026.md
+evidence:
+  differential:
+    status: covered
+    references:
+      - tests/native/fixtures/iterator-concat.ts
+      - tests/property/es2026-iterator-concat.property.test.ts
+  fixed:
+    status: covered
+    references:
+      - tests/native/fixtures/iterator-concat.ts
+  forced-collection:
+    status: covered
+    references:
+      - tests/es2026-builtins-native.test.ts
+      - tests/native/fixtures/iterator-concat.ts
+      - tests/property/es2026-iterator-concat.property.test.ts
+  generated:
+    status: covered
+    references:
+      - tests/property/es2026-iterator-concat.property.test.ts
+  guard-fallback:
+    status: covered
+    references:
+      - tests/es2026-builtins-native.test.ts
+      - tests/native/fixtures/iterator-concat.ts
+      - tests/property/es2026-iterator-concat.property.test.ts
+  specialization:
+    status: covered
+    references:
+      - tests/es2026-builtins-native.test.ts
+      - tests/native/fixtures/iterator-concat.ts
+      - tests/property/es2026-iterator-concat.property.test.ts
+  standards:
+    status: omitted
+    reason: "The 32 test/built-ins/Iterator/concat rows stay unreviewed
+      in the closure ledger until the unit admits them and the full test262
+      update observes them."
+    replacements:
+      - tests/native/fixtures/iterator-concat.ts
+      - tests/property/es2026-iterator-concat.property.test.ts
+  structural:
+    status: covered
+    references:
+      - packages/runtime-c/tests/intrinsic-graph.test.ts

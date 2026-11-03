@@ -614,6 +614,8 @@ current *tests/test262/inventory.tsv*.
  -  `iterator-concat` owns `Iterator.concat` (32). It reads every item's
     `Symbol.iterator` method when called, opens each item only when its turn
     comes, and forwards `return` to the active inner iterator.
+    The runtime, fixtures, and property suite are implemented; the rows wait
+    for `claim-boundary`.
  -  `json-parse-source` owns `JSON.rawJSON`, `JSON.isRawJSON`, and the
     reviver context argument (21). It changes the `json-parse` and
     `json-stringify` components: the reviver receives the source text of each

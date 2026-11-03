@@ -363,3 +363,29 @@ The pinned Node.js lacks these methods, so Deno is the single reference host.
 The property suite checks generated operation sequences against an
 independent model of the edition steps. The family record is
 [*upsert.yaml*](./language-profile-es2026/families/upsert.yaml).
+
+### `Iterator.concat`
+
+`Iterator.concat(...items)` is a writable, non-enumerable, configurable own
+function property of `%Iterator%` with length 0. It is not a constructor.
+
+When called it requires every item to be an object, reads each item's
+`Symbol.iterator` method exactly once, and rejects an `undefined`, `null`, or
+non-callable method with a `TypeError`. It opens nothing. The result inherits
+from `%IteratorHelperPrototype%`. Each `next` call forwards the active inner
+iterator's next value in a fresh result object. When that iterator is done, it
+opens the next item by calling its captured method with the item as the
+receiver and reading `next` once, and it reads `value` only from results that
+are not done. A non-object iterator or step result is a `TypeError`. Any throw
+while opening or stepping completes the result without closing anything.
+
+`return` before the first `next`, and after completion, closes nothing.
+`return` while a value is suspended closes only the forwarded inner iterator,
+with no arguments, and propagates a throw or a non-object result from its
+`return` method. Calling `next` or `return` while the result is running is a
+`TypeError`.
+
+The pinned Node.js lacks the function, so Deno is the single reference host.
+The property suite checks generated item lists and consumption schedules
+against an independent model of the closure. The family record is
+[*iterator-concat.yaml*](./language-profile-es2026/families/iterator-concat.yaml).

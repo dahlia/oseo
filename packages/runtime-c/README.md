@@ -1516,3 +1516,13 @@ before anything else. The computed forms call the callback with `undefined` as
 the receiver and the key as the one argument, only when the key is absent, and
 then look the key up again, so a record the callback created takes the computed
 value. The WeakMap forms store through the existing ephemeron table.
+
+ABI `m5-151` also adds `Iterator.concat` as an own function property of
+`%Iterator%` with the iterator component's next code ID and no intrinsic slot.
+Its result is an iterator helper of the new `OSEO_ITERATOR_HELPER_CONCAT` kind,
+so it inherits from `%IteratorHelperPrototype%` and reuses the helper's traced
+fields: an internal array of method and iterable pairs in `callback`, the pair
+count in `remaining`, the next pair in `counter`, and the forwarded iterator in
+the inner fields. It has no underlying iterator, so `return` before the first
+step closes nothing and `return` at a yield closes only the forwarded
+iterator. No heap kind or traced field is added.

@@ -1,0 +1,3 @@
+version: 1
+id: iterator-concat
+record: docs/language-profile-es2026/families/iterator-concat.yaml

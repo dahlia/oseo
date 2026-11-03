@@ -2950,3 +2950,23 @@ test("adds the upsert methods without intrinsic slots", () => {
   assert.match(mapSource, /index = map_entry_find\(map, slots\[2\]\);/u);
   assert.match(weakSource, /oseo_internal_ephemeron_set\(\n {12}context,/u);
 });
+
+test("runs Iterator.concat as an iterator helper without an underlying", () => {
+  const internalHeader = sources.get("runtime_internal.h") ?? "";
+  const iteratorSource = sources.get("runtime_iterator.c") ?? "";
+  // The helper kind reuses %IteratorHelperPrototype% and the helper's
+  // traced fields, so no heap kind or traced field is added.
+  assert.match(internalHeader, /OSEO_ITERATOR_HELPER_CONCAT = 5,/u);
+  assert.ok(
+    iteratorSource.includes(
+      "OSEO_ITERATOR_HELPER_CONCAT,\n            oseo_undefined(),\n" +
+        "            oseo_undefined(),",
+    ),
+  );
+  // return closes only the active inner iterator and never an
+  // underlying one, which concat does not have.
+  assert.match(
+    iteratorSource,
+    /if \(result\.status == OSEO_STATUS_NORMAL && !concat\) \{/u,
+  );
+});

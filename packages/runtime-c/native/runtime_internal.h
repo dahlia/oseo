@@ -206,6 +206,8 @@
     (OSEO_ITERATOR_CODE_ID_RANGE_LAST - 28u)
 #define OSEO_STRING_ITERATOR_NEXT_CODE_ID \
     (OSEO_ITERATOR_CODE_ID_RANGE_LAST - 29u)
+#define OSEO_ITERATOR_CONCAT_CODE_ID \
+    (OSEO_ITERATOR_CODE_ID_RANGE_LAST - 30u)
 
 #define OSEO_GENERATOR_CODE_ID_RANGE_INDEX ((size_t)4u)
 #define OSEO_GENERATOR_CODE_ID_RANGE_FIRST \
@@ -2370,6 +2372,13 @@ typedef enum {
     OSEO_ITERATOR_HELPER_TAKE = 2,
     OSEO_ITERATOR_HELPER_DROP = 3,
     OSEO_ITERATOR_HELPER_FLAT_MAP = 4,
+    /*
+     * Iterator.concat. It has no underlying iterator: `callback` holds
+     * an internal array of [[OpenMethod]] and [[Iterable]] pairs,
+     * `remaining` the pair count, `counter` the next pair to open, and
+     * the inner fields the iterator currently being forwarded.
+     */
+    OSEO_ITERATOR_HELPER_CONCAT = 5,
 } OseoIteratorHelperKind;
 
 /*

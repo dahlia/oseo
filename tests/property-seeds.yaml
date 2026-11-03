@@ -636,3 +636,7 @@ families:
     owner: tests/property/es2026-upsert.property.test.ts
     start: 0x60009b00
     end: 0x60009bff
+  - family: es2026-iterator-concat
+    owner: tests/property/es2026-iterator-concat.property.test.ts
+    start: 0x60009c00
+    end: 0x60009cff
