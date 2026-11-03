@@ -185,9 +185,10 @@ test("Linux weights match the three-run median case sums", async () => {
   // The module, with-var and module driver files use one candidate run
   // each (see U6).
   // Primitive with boxing, the non-blocking agent, the legacy caller suite,
-  // and the Annex B escape, String, and Date files use later local Linux
-  // extended runs.
+  // the Annex B escape, String, and Date files, and the ECMAScript 2026
+  // built-in files use later local Linux extended runs.
   const retained = [
+    "tests/property/es2026-error-is-error.property.test.ts",
     "tests/property/m5-host-script-bindings.property.test.ts",
     "tests/property/m5-module-namespace-uninitialized.property.test.ts",
     "tests/property/m5-module-prelude-script.property.test.ts",

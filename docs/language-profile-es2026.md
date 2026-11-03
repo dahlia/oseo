@@ -13,8 +13,10 @@ the [M5 exit report](./m5c-closure/m5-exit-report.md) keeps the M5 result.
 
 A change that admits or measures behavior inside this boundary updates this
 document in the same change. A family's status describes tested current
-behavior, never intended behavior. The Annex B built-in units hold the only
-family records so far; see [Annex B built-ins](#annex-b-built-ins).
+behavior, never intended behavior. The Annex B built-in units and the small
+ECMAScript 2026 built-in units hold the family records so far; see
+[Annex B built-ins](#annex-b-built-ins) and
+[Small ECMAScript 2026 built-in families](#small-ecmascript-2026-built-in-families).
 
 
 Claim boundary
@@ -275,3 +277,36 @@ Symbol and BigInt conversion, and a property-read guard miss.
 Gregorian calendar model. Its second test observes the read-before-conversion
 case natively. The 24 test262 paths are those under
 *test/annexB/built-ins/Date/prototype/*.
+
+
+Small ECMAScript 2026 built-in families
+---------------------------------------
+
+These families come from the `error-is-error`, `math-sum-precise`, `upsert`,
+and `iterator-concat` units. Their test262 rows stay `unreviewed` in the
+closure ledger until the unit admits them, so each record names its standards
+evidence as pending and lists the fixtures that cover the same behavior.
+
+### `Error.isError`
+
+`Error.isError(value)` is a writable, non-enumerable, configurable own property
+of `%Error%` with length 1. It is an ordinary built-in function and not a
+constructor. The other error constructors inherit it through their
+`[[Prototype]]`.
+
+It returns `true` exactly when `value` is an object with an `[[ErrorData]]`
+internal slot. The runtime sets that slot when an error constructor creates
+the object, whether through a call, `new`, `super()` in a subclass, or
+`Reflect.construct`, and on every error the runtime throws itself. It reads no
+property and runs no user code, so the answer for a given object never changes:
+replacing its prototype keeps the slot. A proxy has no slot of its own, so a
+proxy of an error answers `false` without consulting its target or handler, as
+does an object that only inherits from an error prototype. The error prototypes
+themselves are ordinary objects and answer `false`. Errors from another realm
+answer `true`.
+
+Both reference hosts implement it, so the fixtures and the property suite are
+differential against Node.js and Deno. The property suite also checks each
+generated subject against a model of which construction paths create the slot.
+The family record is
+[*error-is-error.yaml*](./language-profile-es2026/families/error-is-error.yaml).

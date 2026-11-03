@@ -580,6 +580,12 @@ current *tests/test262/inventory.tsv*.
  -  `error-is-error` owns `Error.isError` (12). It reports `[[ErrorData]]`,
     so it answers `true` for every native error type, `AggregateError`, and
     `SuppressedError` once that exists, and `false` for a proxy of an error.
+    The runtime, fixtures, and property suite are implemented; the rows wait
+    for `claim-boundary`. `SuppressedError` answers `true` as soon as
+    `disposal-intrinsics` sets the object header's `[[ErrorData]]` flag the
+    way the other error constructors do. *non-error-objects-other-realm.js*
+    calls the other realm's `Function` constructor, so it becomes an ADR 0016
+    result rather than a pass.
  -  `math-sum-precise` owns `Math.sumPrecise` (10). The result is the
     correctly rounded exact sum, with the edition's `-0`, infinity, and NaN
     rules and an iterator that is closed on a non-Number value. A property
@@ -683,7 +689,7 @@ standards update and heavy gates on the new base.
     row's owner moves. The audit binds ADR texts by digest, so a unit that
     edits ADR 0013, 0016, or 0028 re-reviews the rows that cite it.
  -  The runtime ABI version in *packages/runtime-c/src/index.ts*, currently
-    `m5-150`, changes once per landing that alters the ABI. The series keeps
+    `m5-151`, changes once per landing that alters the ABI. The series keeps
     its `m5-` prefix, and the closure tools keep their `m5c` names.
  -  Runtime code ranges, property blocks, intrinsic indexes, and heap kinds
     are reserved per unit.

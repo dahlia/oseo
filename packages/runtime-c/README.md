@@ -1486,3 +1486,13 @@ component, or generated-code entry point is added.
 
 [ADR 0030]: https://github.com/dahlia/oseo/blob/main/docs/adr/0030-test262-unhandled-rejection-policy.md
 [ADR 0034]: https://github.com/dahlia/oseo/blob/main/docs/adr/0034-legacy-function-caller-contract.md
+
+
+ECMAScript 2026 built-ins
+-------------------------
+
+ABI `m5-151` adds `Error.isError` as an own function property of `%Error%`
+with the error component's code ID below `Error.prototype.toString`. It returns
+the `[[ErrorData]]` flag of an object's header and `false` for every other
+value. It reads no property, so a proxy answers `false` without consulting its
+target or handler. The generated-code ABI gains no entry point.

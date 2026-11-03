@@ -2887,3 +2887,34 @@ test("shares Shared Data Blocks and waiters across an agent cluster", () => {
   assert.match(atomicsSource, /oseo_internal_agent_suspend\(/u);
   assert.match(atomicsSource, /oseo_internal_agent_yield\(context\)/u);
 });
+
+test("installs Error.isError as one [[ErrorData]] query", () => {
+  const internalHeader = sources.get("runtime_internal.h") ?? "";
+  const errorSource = sources.get("runtime_error.c") ?? "";
+  // The code ID sits below toString in the error range, so it cannot
+  // collide with a constructor kind.
+  assert.match(
+    internalHeader,
+    new RegExp(
+      String.raw`#define OSEO_ERROR_IS_ERROR_CODE_ID \\\n {4}` +
+        String.raw`\(OSEO_ERROR_CODE_ID_RANGE_LAST - OSEO_ERROR_KIND_COUNT` +
+        String.raw` - 1u\)`,
+      "u",
+    ),
+  );
+  // Only %Error% owns the function; the other constructors inherit it.
+  // toString's block precedes it with the same guard, so take the last.
+  const ownerGuard = errorSource.lastIndexOf(
+    "kind == OSEO_ERROR_ERROR) {\n        result = oseo_environment_create",
+  );
+  assert.ok(ownerGuard > 0);
+  assert.ok(
+    errorSource.indexOf("is_error_units", ownerGuard) - ownerGuard < 300,
+  );
+  // The answer reads the object header flag alone, so a proxy reports
+  // false without consulting its target or any handler trap.
+  assert.match(
+    errorSource,
+    /is_object\(argument\) && ordinary_object\(argument\)->error_data/u,
+  );
+});
