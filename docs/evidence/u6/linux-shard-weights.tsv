@@ -144,5 +144,6 @@ tests/property/m5-weak-collections.property.test.ts	591	428359.956699	415064.734
 tests/property/m5-well-known-symbols.property.test.ts	592	441463.378188	432485.370605	560361.571132	442
 tests/property/m5-with-primitive-boxing.property.test.ts	179	-	-	-	179
 tests/property/m5-with-var-loop-head.property.test.ts	465	-	-	-	465
+tests/property/module-evaluation-driver.property.test.ts	77	-	-	-	77
 tests/property/nio-clock-wakeup.property.test.ts	134	136256.414937	133015.472225	177115.582916	137
 tests/property/unicode-tables.property.test.ts	1	278.221585	176.836766	399.479566	1
