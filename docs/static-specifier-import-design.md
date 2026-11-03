@@ -11,16 +11,16 @@ alternative 3 of [ADR 0016](./adr/0016-dynamic-source-boundary.md) and
 *PLAN-DYN.md*, which links this document, owns the track. Bounded general
 `eval` and `Function` construction are not part of it.
 
-ADR 0016's accepted decision remains in force: every `import()` is rejected at
-parse time with `OSEO1001`. M5 defers the 20 pinned rows below by name under
+ADR 0016, as amended on 2026-11-03, selects the subset this design defines,
+and every `import()` stays rejected at parse time with `OSEO1001` until the
+admission recorded in [*PLAN-LANGUAGE.md*](../PLAN-LANGUAGE.md). M5 defers the
+20 pinned rows below by name under
 [ADR 0031](./adr/0031-m5-named-deferral.md) with *PLAN-DYN.md* as their target.
 
-The ADR text below keeps status Proposed and is not applied to ADR 0016,
-because
+The amendment text [below](#proposed-adr-0016-amendment) is applied to ADR
+0016.
 [*docs/m5c-closure/exclusion-audit.yaml*](./m5c-closure/exclusion-audit.yaml)
-binds the accepted record by digest. Every edit to that record needs a reviewed
-audit update. Accepting the track later needs the amendment and a plan that
-schedules the implementation units.
+binds that record by digest, so every edit to it needs a reviewed audit update.
 
 The landed [build-time-resolvable proposal](./dynamic-import-staged-plan.md)
 remains the capability-level plan. This design keeps its finite-set rule and
@@ -570,11 +570,10 @@ Proposed ADR 0016 amendment
 ---------------------------
 
 Status of this text: Accepted by the maintainer on 2026-11-03, for the
-`import-*` units of [*PLAN-LANGUAGE.md*](../PLAN-LANGUAGE.md). The text is not
-yet applied to ADR 0016, whose dynamic-import decision bullet stays in force
-until the `import-requests` unit applies it. That change also updates the
-exclusion audit's record digest and quotes, and reviews the exclusion cohorts
-whose reopening trigger is an accepted amendment that admits dynamic import.
+`import-*` units of [*PLAN-LANGUAGE.md*](../PLAN-LANGUAGE.md), and applied to
+ADR 0016 together with the exclusion audit's record digest and quotes. That
+change also reviews the exclusion cohorts whose reopening trigger is an
+accepted amendment that admits dynamic import.
 
 Proposed replacement for the second decision bullet:
 

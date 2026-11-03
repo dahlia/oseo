@@ -14,8 +14,8 @@ records:
         by a dependency inside the boundary reopens the
         optional-section policy.
   0016-dynamic-source-boundary:
-    digest: "8f1dd9dc2943bb619e70124340fbc848d74a91466a8deb6fc8\
-      c69037214c49ec"
+    digest: "7ad599b8ae6ab06d76dfa6ab2f265ccbfbf1727a037dd2a07d\
+      f801144ed08eca"
     authorization:
       - "`eval` in call position, the `Function`
         constructor, `new Function`, and every constructor
@@ -28,11 +28,18 @@ records:
         invocation, and reviewed subset entries name the gap
         with the `dynamic-source` dependency tag so coverage
         summaries can total it.
-      - Dynamic import remains rejected at parse time.
+      - Every other dynamic-import form, including computed
+        specifiers, options and import attributes, phase
+        imports, runtime source acquisition, and any import
+        inside eval or `Function` source, stays rejected
+        with the existing `OSEO1001` diagnostic.
+      - Implementation and admission require the design's
+        test groups, the repository gates, and explicit
+        admission approval; until those are recorded, every
+        `import()` remains rejected.
     reopening:
-      - Admitting the build-time-resolvable subset requires
-        a separate reviewed plan and an update to this
-        record, following alternative 3.
+      - package evidence needs computed specifiers or
+        attributes;
       - the compatibility laboratory shows that packages
         Oseo targets cannot run without `eval`, `Function`,
         or unrestricted dynamic import;
@@ -479,14 +486,19 @@ assessments:
       evaluation or its promise. The syntax cases assert
       nothing beyond a successful parse, except the two
       with-expression cases, which also check that the call
-      returns a promise. ADR 0016 keeps import(), part of
-      its dynamic source family, rejected at parse time. The
-      maintainer accounting decision of 2026-10-22 accepts
-      this bounded exclusion of these reserved paths. It
-      reopens when an accepted ADR 0016 amendment admits any
-      form of dynamic import, including the build-time
-      literal subset of docs/dynamic-import-staged-plan.md,
-      which admits no options.
+      returns a promise. ADR 0016, as amended on 2026-11-03,
+      admits only an ImportCall whose sole argument is a
+      string literal, with or without its trailing comma,
+      and no options. The 38 paths that pass an options
+      argument stay outside that subset, and alternative 4
+      keeps them rejected. The other 22 pass only a literal
+      and a trailing comma, so they fall inside it, but the
+      profile still rejects every import() at parse time
+      until import-admission. The maintainer accounting
+      decision of 2026-10-22 accepts this bounded exclusion
+      of these reserved paths. It reopens when
+      import-admission re-observes the 60 paths, and for the
+      options paths when package evidence needs attributes.
   import-call-attributes-computed-specifier:
     disposition: exclusion
     normativeDependency: source-evaluation-only
@@ -497,14 +509,15 @@ assessments:
       produced when ToString of an object specifier throws,
       with and without an options argument, each call
       followed by a trailing comma. Every assertion runs
-      through import(), which ADR 0016 keeps rejected at
-      parse time. The specifier is computed at run time, so
-      these paths stay outside even the build-time literal
-      subset of docs/dynamic-import-staged-plan.md. The
-      maintainer accounting decision of 2026-10-22 accepts
-      this bounded exclusion; an accepted ADR 0016 amendment
-      that admits any form of dynamic import reopens it for
-      reassessment.
+      through import(). The specifier is computed at run
+      time, so these paths stay outside the string-literal
+      subset that ADR 0016, as amended on 2026-11-03,
+      admits, and alternative 4 keeps them rejected at parse
+      time. The maintainer accounting decision of 2026-10-22
+      accepts this bounded exclusion. It reopens for
+      reassessment when import-admission re-observes these
+      paths or package evidence needs computed specifiers or
+      attributes.
   json-module-dynamic-site-identity:
     disposition: exclusion
     normativeDependency: source-evaluation-only
@@ -524,16 +537,18 @@ assessments:
       not depend on dynamic import. The bound fixture graph
       imports one JSON module through two static default
       imports and an indirect module, and the static JSON
-      identity properties assert both identities natively
-      and under Node.js and Deno. The only assertion that
+      identity properties assert both identities natively and
+      under Node.js and Deno. The only assertion that
       evidence cannot replace compares the import() site,
-      which runs only through ImportCall, and ADR 0016 keeps
-      import() rejected at parse time. The exclusion is
-      bounded to that dynamic site; static JSON module
-      identity stays inside the claim. The maintainer
-      accounting decision of 2026-10-22 accepts it, and an
-      accepted ADR 0016 amendment that admits any form of
-      dynamic import reopens it.
+      which runs only through an ImportCall with an options
+      argument. ADR 0016, as amended on 2026-11-03, admits no
+      options, so alternative 4 keeps that call rejected at
+      parse time. The exclusion is bounded to that dynamic
+      site; static JSON module identity stays inside the
+      claim. The maintainer accounting decision of 2026-10-22
+      accepts it. It reopens when import-admission
+      re-observes the path or package evidence needs
+      attributes.
   import-call-syntax:
     disposition: exclusion
     normativeDependency: source-evaluation-only
@@ -549,42 +564,50 @@ assessments:
       AssignmentExpression form whose call result no
       assertion observes, such as yield * inside a generator
       that is never called or unary operands whose returned
-      promises are discarded. Its assertions are a
-      successful parse, the promise that the call
-      returns, or the TypeError from calling or constructing
-      that promise; one export read only identifies the
-      module that fulfilled it. ADR 0016 keeps import()
-      rejected at parse time, and each path observes that
-      exact ImportExpression OSEO1001 rejection. The
-      maintainer decision of 2026-10-28, item 2, extends the
-      2026-10-22 accounting decision (option A) to these
-      paths after the per-path review in
+      promises are discarded. Its assertions are a successful
+      parse, the promise that the call returns, or the
+      TypeError from calling or constructing that promise;
+      one export read only identifies the module that
+      fulfilled it. Each path observes the exact
+      ImportExpression OSEO1001 rejection. The maintainer
+      decision of 2026-10-28, item 2, extends the 2026-10-22
+      accounting decision (option A) to these paths after the
+      per-path review in
       docs/m5c-graph/dynamic-source-importcall-accounting.md.
-      No path counts as a pass. An accepted ADR 0016
-      amendment that admits any form of dynamic import
-      reopens it for reassessment.
+      No path counts as a pass. ADR 0016, as amended on
+      2026-11-03, admits the calls of the 63 paths whose
+      every ImportCall passes one string literal, but the
+      profile still rejects every import() at parse time
+      until import-admission. The 21 paths that nest an ImportCall
+      as another's argument and the 2 that pass a unary or
+      yield * operand compute a specifier, so alternative 4
+      keeps them outside the subset. import-admission
+      re-observes all 86 paths, which reopens this
+      assessment.
   import-call-specifier:
     disposition: exclusion
     normativeDependency: source-evaluation-only
-    reason: The subject is how EvaluateImportCall evaluates
-      its specifier (sec-import-call-runtime-semantics-evaluation
-      or prod-ImportCall). The source passes an
-      AssignmentExpression form, an object or other value
-      whose ToString names the target, or a specifier whose
-      GetValue or ToString completes abruptly. Its
-      assertions are the synchronous abrupt completion, the
-      rejection of the returned promise, or the module that
-      the promise fulfills with; namespace export reads only
-      identify which module the specifier named. ADR 0016
-      keeps import() rejected at parse time, and each path
-      observes that exact ImportExpression OSEO1001
-      rejection. The maintainer decision of 2026-10-28, item
-      2, extends the 2026-10-22 accounting decision (option
-      A) to these paths after the per-path review in
-      docs/m5c-graph/dynamic-source-importcall-accounting.md.
-      No path counts as a pass. An accepted ADR 0016
-      amendment that admits any form of dynamic import
-      reopens it for reassessment.
+    reason: The subject is how EvaluateImportCall evaluates its
+      specifier (sec-import-call-runtime-semantics-evaluation or
+      prod-ImportCall). The source passes an AssignmentExpression
+      form, an object or other value whose ToString names the
+      target, or a specifier whose GetValue or ToString completes
+      abruptly. Its assertions are the synchronous abrupt
+      completion, the rejection of the returned promise, or the
+      module that the promise fulfills with; namespace export
+      reads only identify which module the specifier named. Each
+      path observes the exact ImportExpression OSEO1001
+      rejection. The maintainer decision of 2026-10-28, item 2,
+      extends the 2026-10-22 accounting decision (option A) to
+      these paths after the per-path review in
+      docs/m5c-graph/dynamic-source-importcall-accounting.md. No
+      path counts as a pass. Every path computes the specifier of
+      at least one ImportCall, so it stays outside the
+      string-literal subset that ADR 0016, as amended on
+      2026-11-03, admits, and alternative 4 keeps it rejected at
+      parse time. It reopens for reassessment when
+      import-admission re-observes these paths or package
+      evidence needs computed specifiers.
   ds8-await-import-call-syntax:
     disposition: exclusion
     normativeDependency: source-evaluation-only
@@ -597,10 +620,12 @@ assessments:
       the ImportCall subject rather than a directory, and the approved DS-8
       selector explicitly includes this grammar-only composition. The
       per-path assessment is in
-      docs/m5c-graph/dynamic-source-importcall-residual-accounting.md.
-      No independent non-source subject needs replacement and no pass is
-      counted. An accepted ADR 0016 amendment admitting any dynamic import
-      reopens it; ADR 0019 reopening remains in force.
+      docs/m5c-graph/dynamic-source-importcall-residual-accounting.md. No
+      independent non-source subject needs replacement and no pass is
+      counted. ADR 0016, as amended on 2026-11-03, admits this
+      string-literal ImportCall, but the profile still rejects it until
+      import-admission, whose re-observation of the path reopens it; ADR
+      0019 reopening remains in force.
   ds8-import-call-intrinsic-promise:
     disposition: exclusion
     normativeDependency: source-evaluation-only
@@ -612,37 +637,41 @@ assessments:
       result; no export, binding update or module evaluation order is read.
       The 2026-10-28 maintainer decision item 2 authorizes this ImportCall
       subject, assessed separately in
-      docs/m5c-graph/dynamic-source-importcall-residual-accounting.md.
-      There is no independent non-source subject needing replacement.
-      The existing exact ImportExpression OSEO1001 rejection is retained,
-      never counted as a pass. An accepted ADR 0016 amendment admitting any
-      dynamic import reopens it; ADR 0019 reopening remains in force.
+      docs/m5c-graph/dynamic-source-importcall-residual-accounting.md. There
+      is no independent non-source subject needing replacement. The existing
+      exact ImportExpression OSEO1001 rejection is retained, never counted
+      as a pass. ADR 0016, as amended on 2026-11-03, admits this
+      string-literal ImportCall, but the profile still rejects it until
+      import-admission, whose re-observation of the path reopens it; ADR
+      0019 reopening remains in force.
   import-call-promise:
     disposition: exclusion
     normativeDependency: source-evaluation-only
     reason: The subject is the promise that ImportCall returns
       and ContinueDynamicImport settles
       (sec-import-call-runtime-semantics-evaluation or
-      sec-finishdynamicimport). The source asserts that
-      each call returns a new %Promise%, that it fulfills
-      with the target namespace only after the target's
-      evaluation settles, or that it rejects when the host
-      load fails or the target's only statement throws.
-      Namespace export reads only identify the fulfilled
-      module, and for await or async generator plumbing only
-      consumes the settled promises. No assertion observes
-      module evaluation order, top-level await, namespace
-      object identity or binding updates, or JSON module
-      identity. ADR 0016 keeps import() rejected at parse
-      time, and each path observes that exact
-      ImportExpression OSEO1001 rejection. The maintainer
-      decision of 2026-10-28, item 2, extends the 2026-10-22
-      accounting decision (option A) to these paths after
-      the per-path review in
+      sec-finishdynamicimport). The source asserts that each
+      call returns a new %Promise%, that it fulfills with the
+      target namespace only after the target's evaluation
+      settles, or that it rejects when the host load fails or
+      the target's only statement throws. Namespace export
+      reads only identify the fulfilled module, and for await
+      or async generator plumbing only consumes the settled
+      promises. No assertion observes module evaluation order,
+      top-level await, namespace object identity or binding
+      updates, or JSON module identity. Each path observes the
+      exact ImportExpression OSEO1001 rejection. The
+      maintainer decision of 2026-10-28, item 2, extends the
+      2026-10-22 accounting decision (option A) to these paths
+      after the per-path review in
       docs/m5c-graph/dynamic-source-importcall-accounting.md.
-      No path counts as a pass. An accepted ADR 0016
-      amendment that admits any form of dynamic import
-      reopens it for reassessment.
+      No path counts as a pass. ADR 0016, as amended on
+      2026-11-03, admits the string-literal ImportCall every
+      path uses, but the profile still rejects every import()
+      at parse time until import-admission. That unit
+      re-observes each path, which reopens this assessment;
+      a literal target the build cannot load is
+      then a build diagnostic, not a rejected promise.
   annex-b-legacy-lookup-class-declaration:
     disposition: remediation
     remediationOwner: unit:annexb-object-accessors
@@ -1127,9 +1156,10 @@ assessments:
       namespace, so only its dynamic import() source-evaluation site
       remains. No remaining non-source assertion is excluded. Every
       original path, assertion and unsupported-profile-feature observation
-      remains; none counts as a pass. An accepted ADR 0016 amendment
-      admitting any form of dynamic import reopens every selected path for
-      reassessment."
+      remains; none counts as a pass. ADR 0016, as amended on 2026-11-03,
+      admits the string-literal ImportCall every selected path uses, but
+      the profile still rejects it until import-admission, whose
+      re-observation reopens every selected path for reassessment."
   observation-b01-b18-dynamic-source:
     disposition: remediation
     normativeDependency: not-demonstrated
@@ -2563,10 +2593,14 @@ assessments:
       forced collection and structural C evidence. Only dynamic source
       evaluation or construction remains. All original paths,
       unsupported observations and assertions remain visible; none
-      becomes a pass. Reopen for an ADR 0016 amendment admitting any
-      dynamic import or the relevant source construction, changed
-      replacement evidence, source or observation, or ADR 0019
-      non-source normative dependence."
+      becomes a pass. ADR 0016, as amended on 2026-11-03, admits the
+      string-literal ImportCall of 40 of these paths, but the profile
+      still rejects it until import-admission; the path whose specifier
+      is import.meta and the 10 paths without an ImportCall stay outside
+      that subset. Reopen when import-admission re-observes these paths,
+      for an ADR 0016 amendment admitting the relevant source
+      construction, changed replacement evidence, source or observation,
+      or ADR 0019 non-source normative dependence."
   "ds12-module-observable-residual":
     "disposition": "deferral"
     "normativeDependency": "not-demonstrated"
@@ -2576,8 +2610,10 @@ assessments:
       graph-start or exact TLA result, error and ordering observations that
       only an ImportCall site exposes. The per-path table records why static
       module evidence cannot witness them, and the static-specifier import
-      track that could admit those sites is not implemented in M5. ADR 0016
-      and ADR 0019 remain unchanged."
+      track that could admit those sites is not implemented in M5. ADR 0016,
+      as amended on 2026-11-03, selects that track's subset, but every
+      import() stays rejected until import-admission; ADR 0019 remains
+      unchanged."
 
   ds16-static-syntax:
     disposition: exclusion
@@ -3229,7 +3265,12 @@ assessments:
       target diagnostic. Only ImportCall source loading and conversion of
       that target error into a rejected promise remain; these are bounded
       by decision items 1 and 2, as Root confirmed on 2026-10-31. No
-      rejected promise is inferred from a compiler diagnostic."
+      rejected promise is inferred from a compiler diagnostic. ADR 0016,
+      as amended on 2026-11-03, admits these string-literal ImportCalls
+      and makes a target that fails to parse a build diagnostic, not a
+      language result; the profile still rejects every import() until
+      import-admission, whose re-observation of these paths reopens this
+      assessment."
   ds11-static-module-ambiguous:
     disposition: "exclusion"
     normativeDependency: "source-evaluation-only"
@@ -3247,7 +3288,11 @@ assessments:
       namespace-only control remains valid. Only ImportCall source loading
       and rejection routing remain under decision items 1 and 2; no
       runtime promise rejection is claimed for the static linker
-      diagnostic."
+      diagnostic. ADR 0016, as amended on 2026-11-03, admits these
+      string-literal ImportCalls and makes a target that fails to link a
+      build diagnostic, not a language result; the profile still rejects
+      every import() until import-admission, whose re-observation of these
+      paths reopens this assessment."
   ds11-static-module-circular:
     disposition: "exclusion"
     normativeDependency: "source-evaluation-only"
@@ -3264,7 +3309,12 @@ assessments:
       observe static SyntaxError before evaluation. A productive cycle
       links to one concrete cell. Only ImportCall source loading and
       rejection routing remain under decision items 1 and 2; no runtime
-      promise rejection is claimed for the static linker diagnostic."
+      promise rejection is claimed for the static linker diagnostic. ADR
+      0016, as amended on 2026-11-03, admits these string-literal
+      ImportCalls and makes a target that fails to link a build diagnostic,
+      not a language result; the profile still rejects every import() until
+      import-admission, whose re-observation of these paths reopens this
+      assessment."
   ds11-static-module-usage:
     disposition: "exclusion"
     normativeDependency: "source-evaluation-only"
@@ -3303,7 +3353,11 @@ assessments:
       grammar distinction. Promise.resolve supplies already-known static
       namespace data and implements no import operation. Only ImportCall
       source loading from Script and its promise fulfillment remain under
-      decision items 1 and 2."
+      decision items 1 and 2. ADR 0016, as amended on 2026-11-03, admits
+      these string-literal ImportCalls, including Script sites with a
+      build-side referrer identity, but the profile still rejects every
+      import() until import-admission, whose re-observation of these paths
+      reopens this assessment."
   ds14-intrinsic-constructability:
     disposition: exclusion
     normativeDependency: source-evaluation-only

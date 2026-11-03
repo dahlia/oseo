@@ -82,8 +82,12 @@ The checker rejects a debt flag that disagrees with the reviewed dependencies.
 Debt neither authorizes exclusion nor changes the observed classification.
 
 The separate `dynamic-import-staged-plan` node plans ADR 0016 alternative 3 for
-build-time-resolvable imports. Until a maintainer accepts a later decision, it
-supplies no admission or changed exclusion authority.
+build-time-resolvable imports. ADR 0016, as amended on 2026-11-03, selects
+alternative 3 for the subset of the
+[static-specifier import design](../static-specifier-import-design.md). The
+amendment grants no exclusion, and every `import()` stays rejected until
+`import-admission` re-observes the `dynamic-import` paths and reassesses the
+reopened exclusions.
 
 
 Incidental Annex B TypedArray prototype lookup

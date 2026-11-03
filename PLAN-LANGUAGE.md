@@ -151,10 +151,12 @@ inventory, so neither waits for ADR 0032.
 
 The maintainer accepted the ADR 0016 amendment in the
 [static-specifier import design](./docs/static-specifier-import-design.md) on
-2026-11-03. `import-requests` applies its text to ADR 0016 in the change that
-starts admitting syntax, together with the exclusion audit's record digest and
-quotes. That change also reviews the two dynamic-import exclusion cohorts whose
-reopening trigger is an accepted amendment that admits dynamic import.
+2026-11-03. ADR 0016 carries its text, and the exclusion audit's record digest
+and quotes follow it. The same change reviewed the dynamic-import exclusion
+cohorts whose reopening trigger was an accepted amendment admitting dynamic
+import. Each now reopens when `import-admission` re-observes its paths; paths
+with a computed specifier or an options argument stay outside the subset under
+alternative 4.
 
 The maintainer accepted
 [ADR 0034](./docs/adr/0034-legacy-function-caller-contract.md), the successor
