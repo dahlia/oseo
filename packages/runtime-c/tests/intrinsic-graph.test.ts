@@ -2931,3 +2931,22 @@ test("sums Math.sumPrecise operands exactly before one rounding", () => {
   // A non-Number closes the iterator before its TypeError propagates.
   assert.match(mathSource, /oseo_iterator_close\(context, slots\[0\], true\)/u);
 });
+
+test("adds the upsert methods without intrinsic slots", () => {
+  const mapSource = sources.get("runtime_map.c") ?? "";
+  const weakSource = sources.get("runtime_weak_collection.c") ?? "";
+  for (const name of ["getOrInsert", "getOrInsertComputed"]) {
+    assert.match(mapSource, new RegExp(`"${name}"`, "u"));
+    assert.match(weakSource, new RegExp(`"${name}"`, "u"));
+  }
+  // The intrinsic table keeps its size; the WeakMap method table marks
+  // the two methods with the count sentinel and the builder skips it.
+  assert.match(
+    weakSource,
+    /if \(entry->intrinsic != OSEO_INTRINSIC_COUNT\) \{/u,
+  );
+  // A computed insertion looks the key up again after the callback, so
+  // a record the callback created takes the computed value.
+  assert.match(mapSource, /index = map_entry_find\(map, slots\[2\]\);/u);
+  assert.match(weakSource, /oseo_internal_ephemeron_set\(\n {12}context,/u);
+});

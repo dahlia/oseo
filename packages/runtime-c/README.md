@@ -1505,3 +1505,14 @@ finite operand exactly in a 35-limb two's-complement integer of
 2<sup>1024</sup> − 2<sup>970</sup> becomes an infinity. NaN, opposite
 infinities, and the `-0` start state follow the edition's state machine. A
 non-Number value closes the iterator before its `TypeError` propagates.
+
+ABI `m5-151` also adds `getOrInsert` and `getOrInsertComputed` to
+`%Map.prototype%` and `%WeakMap.prototype%`, with the Map and weak collection
+components' next code IDs. The four functions own no intrinsic slot, so the
+intrinsic table keeps its size; the WeakMap method table marks them with the
+`OSEO_INTRINSIC_COUNT` sentinel. The Map forms canonicalize `-0` to `+0` before
+the lookup, and the WeakMap forms reject a key that CanBeHeldWeakly refuses
+before anything else. The computed forms call the callback with `undefined` as
+the receiver and the key as the one argument, only when the key is absent, and
+then look the key up again, so a record the callback created takes the computed
+value. The WeakMap forms store through the existing ephemeron table.

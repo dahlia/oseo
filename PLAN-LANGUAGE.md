@@ -596,6 +596,11 @@ current *tests/test262/inventory.tsv*.
     `WeakMap` (72). `getOrInsertComputed` runs its callback once and then
     stores the result even if the callback inserted the key. The `WeakMap`
     forms require CanBeHeldWeakly and use the existing ephemeron storage.
+    The runtime, fixtures, and property suite are implemented; the rows wait
+    for `claim-boundary`. Two `getOrInsertComputed` rows,
+    *different-types-function-callbackfn-does-not-throw.js* for `Map` and
+    *adds-value-different-callbackfn.js* for `WeakMap`, call the `Function`
+    constructor, so they become ADR 0016 results rather than passes.
  -  `array-from-async` owns `Array.fromAsync` (95). It covers async iterables,
     sync iterables through the async-from-sync wrapper, array-likes with an
     `await` per element, the optional mapper, and constructor receivers. A

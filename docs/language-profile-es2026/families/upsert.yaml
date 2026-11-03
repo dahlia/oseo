@@ -1,0 +1,62 @@
+version: 1
+id: upsert
+title: "Map and WeakMap upsert"
+scope:
+  - "Map.prototype.getOrInsert, Map.prototype.getOrInsertComputed,
+    WeakMap.prototype.getOrInsert, and
+    WeakMap.prototype.getOrInsertComputed, their descriptors, names,
+    lengths, non-constructor status, and receiver checks."
+  - "Key canonicalization of -0, SameValueZero lookup, insertion order,
+    and the single callback call with an undefined receiver and the
+    canonical key."
+  - "The lookup after the callback that lets a record the callback
+    created take the computed value, and the append after a callback
+    that deleted entries or cleared the map."
+  - "CanBeHeldWeakly rejection, callability rejection, and ephemeron
+    storage for the WeakMap forms."
+owners:
+  - docs/language-profile-es2026.md
+evidence:
+  differential:
+    status: covered
+    references:
+      - tests/native/fixtures/upsert.ts
+      - tests/property/es2026-upsert.property.test.ts
+  fixed:
+    status: covered
+    references:
+      - tests/native/fixtures/upsert.ts
+  forced-collection:
+    status: covered
+    references:
+      - tests/es2026-builtins-native.test.ts
+      - tests/native/fixtures/upsert.ts
+      - tests/property/es2026-upsert.property.test.ts
+  generated:
+    status: covered
+    references:
+      - tests/property/es2026-upsert.property.test.ts
+  guard-fallback:
+    status: covered
+    references:
+      - tests/es2026-builtins-native.test.ts
+      - tests/native/fixtures/upsert.ts
+      - tests/property/es2026-upsert.property.test.ts
+  specialization:
+    status: covered
+    references:
+      - tests/es2026-builtins-native.test.ts
+      - tests/native/fixtures/upsert.ts
+      - tests/property/es2026-upsert.property.test.ts
+  standards:
+    status: omitted
+    reason: "The 72 Map and WeakMap getOrInsert and getOrInsertComputed
+      rows stay unreviewed in the closure ledger until the unit admits
+      them and the full test262 update observes them."
+    replacements:
+      - tests/native/fixtures/upsert.ts
+      - tests/property/es2026-upsert.property.test.ts
+  structural:
+    status: covered
+    references:
+      - packages/runtime-c/tests/intrinsic-graph.test.ts

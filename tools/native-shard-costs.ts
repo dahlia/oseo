@@ -17,7 +17,7 @@
  * Compound assignment's logged registrations are rebucketed into its
  * three split files. Host script bindings and proper tail calls postdate
  * these runs and retain their weights. The Linux upper-median fallback is
- * 434 seconds across 154 entries.
+ * 429 seconds across 155 entries.
  * docs/evidence/u6/linux-shard-weights.tsv retains each sum and old weight;
  * linux-shards.py reproduces them and the model. See the U6 README.
  *
@@ -155,6 +155,7 @@ export const nativeShardCosts = {
   "linux-x86_64-gnu": {
     "tests/property/es2026-error-is-error.property.test.ts": 142,
     "tests/property/es2026-math-sum-precise.property.test.ts": 153,
+    "tests/property/es2026-upsert.property.test.ts": 248,
     "tests/property/legacy-caller.property.test.ts": 71,
     "tests/property/m4-async.property.test.ts": 350,
     "tests/property/m5-aggregate-error.property.test.ts": 217,

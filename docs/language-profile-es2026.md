@@ -333,3 +333,33 @@ reference host. The property suite checks every generated case against an
 independent BigInt model that sums each value's exact 2<sup>-1074</sup>
 multiple and rounds once. The family record is
 [*math-sum-precise.yaml*](./language-profile-es2026/families/math-sum-precise.yaml).
+
+### Map and WeakMap upsert
+
+`getOrInsert(key, value)` and `getOrInsertComputed(key, callbackfn)` are
+writable, non-enumerable, configurable function properties of
+`%Map.prototype%` and `%WeakMap.prototype%`, each with length 2. None is a
+constructor, and each rejects a receiver without the matching `[[MapData]]` or
+`[[WeakMapData]]` slot with a `TypeError`.
+
+The Map forms canonicalize `-0` to `+0` and find the key by SameValueZero.
+`getOrInsert` returns the existing value or appends the key with `value`.
+`getOrInsertComputed` first requires a callable `callbackfn`. When the key is
+absent it calls `callbackfn` once with `undefined` as the receiver and the
+canonical key as the only argument, then looks the key up again: if the
+callback inserted it, the computed value replaces the callback's value in
+place, and otherwise the key is appended, even after the callback deleted
+entries or cleared the map. A throwing callback stores no computed value and
+propagates its throw; any change the callback made to the map itself, including
+inserting the key, remains.
+
+The WeakMap forms first reject a key that CanBeHeldWeakly refuses, which
+includes every primitive other than an unregistered Symbol, and the computed
+form then rejects a non-callable `callbackfn`. They store through the existing
+ephemeron table, so a value stays reachable exactly as long as its key, and a
+callback that set the key itself sees its value replaced.
+
+The pinned Node.js lacks these methods, so Deno is the single reference host.
+The property suite checks generated operation sequences against an
+independent model of the edition steps. The family record is
+[*upsert.yaml*](./language-profile-es2026/families/upsert.yaml).

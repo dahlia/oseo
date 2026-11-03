@@ -2166,8 +2166,9 @@ unknown-file median fallback.
 | --------------------------------------------------------- | ------------: | ---------------: |
 | *tests/property/es2026-error-is-error.property.test.ts*   |    141262.474 |              142 |
 | *tests/property/es2026-math-sum-precise.property.test.ts* |    152227.392 |              153 |
+| *tests/property/es2026-upsert.property.test.ts*           |    247547.624 |              248 |
 
 The TSV retains each file with `-` for all three historical source samples,
 and the extraction script and its unit test retain it explicitly. The
-Linux table has 154 entries, and its upper-median fallback moves from 435 to
-434 seconds. macOS keeps 143 entries and its 296-second fallback.
+Linux table has 155 entries, and its upper-median fallback moves from 435 to
+429 seconds. macOS keeps 143 entries and its 296-second fallback.

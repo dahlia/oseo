@@ -632,3 +632,7 @@ families:
     owner: tests/property/es2026-math-sum-precise.property.test.ts
     start: 0x60009a00
     end: 0x60009aff
+  - family: es2026-upsert
+    owner: tests/property/es2026-upsert.property.test.ts
+    start: 0x60009b00
+    end: 0x60009bff

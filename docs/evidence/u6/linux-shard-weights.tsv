@@ -1,6 +1,7 @@
 file	oldSeconds	d4d81be9CaseMs	98460f7cCaseMs	6aab0fc8CaseMs	medianSecondsCeil
 tests/property/es2026-error-is-error.property.test.ts	142	-	-	-	142
 tests/property/es2026-math-sum-precise.property.test.ts	153	-	-	-	153
+tests/property/es2026-upsert.property.test.ts	248	-	-	-	248
 tests/property/legacy-caller.property.test.ts	71	-	-	-	71
 tests/property/m4-async.property.test.ts	464	349949.419205	338314.359114	440202.889068	350
 tests/property/m5-aggregate-error.property.test.ts	265	216063.832474	201127.728356	281035.427786	217
