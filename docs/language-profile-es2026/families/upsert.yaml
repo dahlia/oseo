@@ -49,13 +49,77 @@ evidence:
       - tests/native/fixtures/upsert.ts
       - tests/property/es2026-upsert.property.test.ts
   standards:
-    status: omitted
-    reason: "The 72 Map and WeakMap getOrInsert and getOrInsertComputed
-      rows stay unreviewed in the closure ledger until the unit admits
-      them and the full test262 update observes them."
-    replacements:
-      - tests/native/fixtures/upsert.ts
-      - tests/property/es2026-upsert.property.test.ts
+    status: covered
+    references:
+      - tests/test262/subset.yaml
+      - tests/test262/results.yaml
+      - tests/test262/results/built-ins/Map/02.yaml
+      - tests/test262/results/built-ins/Map/2c.yaml
+      - tests/test262/results/built-ins/Map/2e.yaml
+      - tests/test262/results/built-ins/Map/31.yaml
+      - tests/test262/results/built-ins/Map/3c.yaml
+      - tests/test262/results/built-ins/Map/3d.yaml
+      - tests/test262/results/built-ins/Map/46.yaml
+      - tests/test262/results/built-ins/Map/47.yaml
+      - tests/test262/results/built-ins/Map/53.yaml
+      - tests/test262/results/built-ins/Map/6f.yaml
+      - tests/test262/results/built-ins/Map/72.yaml
+      - tests/test262/results/built-ins/Map/74.yaml
+      - tests/test262/results/built-ins/Map/77.yaml
+      - tests/test262/results/built-ins/Map/7f.yaml
+      - tests/test262/results/built-ins/Map/84.yaml
+      - tests/test262/results/built-ins/Map/8a.yaml
+      - tests/test262/results/built-ins/Map/92.yaml
+      - tests/test262/results/built-ins/Map/93.yaml
+      - tests/test262/results/built-ins/Map/98.yaml
+      - tests/test262/results/built-ins/Map/9d.yaml
+      - tests/test262/results/built-ins/Map/9e.yaml
+      - tests/test262/results/built-ins/Map/a1.yaml
+      - tests/test262/results/built-ins/Map/b0.yaml
+      - tests/test262/results/built-ins/Map/b5.yaml
+      - tests/test262/results/built-ins/Map/c0.yaml
+      - tests/test262/results/built-ins/Map/c2.yaml
+      - tests/test262/results/built-ins/Map/cb.yaml
+      - tests/test262/results/built-ins/Map/d5.yaml
+      - tests/test262/results/built-ins/Map/e4.yaml
+      - tests/test262/results/built-ins/Map/ea.yaml
+      - tests/test262/results/built-ins/WeakMap/0a.yaml
+      - tests/test262/results/built-ins/WeakMap/1a.yaml
+      - tests/test262/results/built-ins/WeakMap/33.yaml
+      - tests/test262/results/built-ins/WeakMap/38.yaml
+      - tests/test262/results/built-ins/WeakMap/45.yaml
+      - tests/test262/results/built-ins/WeakMap/50.yaml
+      - tests/test262/results/built-ins/WeakMap/55.yaml
+      - tests/test262/results/built-ins/WeakMap/58.yaml
+      - tests/test262/results/built-ins/WeakMap/61.yaml
+      - tests/test262/results/built-ins/WeakMap/68.yaml
+      - tests/test262/results/built-ins/WeakMap/69.yaml
+      - tests/test262/results/built-ins/WeakMap/78.yaml
+      - tests/test262/results/built-ins/WeakMap/7a.yaml
+      - tests/test262/results/built-ins/WeakMap/88.yaml
+      - tests/test262/results/built-ins/WeakMap/89.yaml
+      - tests/test262/results/built-ins/WeakMap/8a.yaml
+      - tests/test262/results/built-ins/WeakMap/8f.yaml
+      - tests/test262/results/built-ins/WeakMap/92.yaml
+      - tests/test262/results/built-ins/WeakMap/9c.yaml
+      - tests/test262/results/built-ins/WeakMap/a9.yaml
+      - tests/test262/results/built-ins/WeakMap/aa.yaml
+      - tests/test262/results/built-ins/WeakMap/ae.yaml
+      - tests/test262/results/built-ins/WeakMap/b4.yaml
+      - tests/test262/results/built-ins/WeakMap/b8.yaml
+      - tests/test262/results/built-ins/WeakMap/bd.yaml
+      - tests/test262/results/built-ins/WeakMap/c3.yaml
+      - tests/test262/results/built-ins/WeakMap/cb.yaml
+      - tests/test262/results/built-ins/WeakMap/cd.yaml
+      - tests/test262/results/built-ins/WeakMap/ce.yaml
+      - tests/test262/results/built-ins/WeakMap/d1.yaml
+      - tests/test262/results/built-ins/WeakMap/d6.yaml
+      - tests/test262/results/built-ins/WeakMap/d8.yaml
+      - tests/test262/results/built-ins/WeakMap/df.yaml
+      - tests/test262/results/built-ins/WeakMap/e4.yaml
+      - tests/test262/results/built-ins/WeakMap/ec.yaml
+      - tests/test262/results/built-ins/WeakMap/fb.yaml
+      - docs/m5c-closure/exclusion-audit.yaml
   structural:
     status: covered
     references:

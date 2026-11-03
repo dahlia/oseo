@@ -72,11 +72,12 @@ derives it by classifying every candidate also under the frozen ADR 0020 rule
 in *tests/test262/inventory-policy-m5.yaml*, and it rejects a change that
 would drop an M5 path from the inventory.
 
-The added paths are not in the reviewed subset or the manifest. Each is
-`unreviewed` in the [closure ledger](./m5c-closure/README.md) with the
-`unit:<id>` owner of the *PLAN-LANGUAGE.md* unit that implements it. A unit
-admits its rows into *tests/test262/subset.yaml* with reviewed dependency tags
-when its behavior lands, and the full manifest update observes them.
+An added path enters the reviewed subset and the manifest only when its unit
+admits it. Until then it is `unreviewed` in the
+[closure ledger](./m5c-closure/README.md) with the `unit:<id>` owner of the
+*PLAN-LANGUAGE.md* unit that implements it. A unit admits its rows into
+*tests/test262/subset.yaml* with reviewed dependency tags when its behavior
+lands, and the full manifest update observes them.
 
 `mise run check:language-claim-audit` applies the closure conditions of
 [ADR 0019](./adr/0019-m5-claim-closure.md) to the expanded inventory. It
@@ -283,9 +284,12 @@ Small ECMAScript 2026 built-in families
 ---------------------------------------
 
 These families come from the `error-is-error`, `math-sum-precise`, `upsert`,
-and `iterator-concat` units. Their test262 rows stay `unreviewed` in the
-closure ledger until the unit admits them, so each record names its standards
-evidence as pending and lists the fixtures that cover the same behavior.
+and `iterator-concat` units. Of their 126 test262 paths, 123 pass. The other
+three build a value with the `Function` constructor and are ADR 0016
+exclusions: *non-error-objects-other-realm.js* for `Error.isError` and one
+`getOrInsertComputed` row each for `Map` and `WeakMap`. The fixtures cover
+their other assertions. Each record's standards class cites the results
+partitions that hold its rows.
 
 ### `Error.isError`
 

@@ -46,13 +46,41 @@ evidence:
       - tests/native/fixtures/iterator-concat.ts
       - tests/property/es2026-iterator-concat.property.test.ts
   standards:
-    status: omitted
-    reason: "The 32 test/built-ins/Iterator/concat rows stay unreviewed
-      in the closure ledger until the unit admits them and the full test262
-      update observes them."
-    replacements:
-      - tests/native/fixtures/iterator-concat.ts
-      - tests/property/es2026-iterator-concat.property.test.ts
+    status: covered
+    references:
+      - tests/test262/subset.yaml
+      - tests/test262/results.yaml
+      - tests/test262/results/built-ins/Iterator/07.yaml
+      - tests/test262/results/built-ins/Iterator/09.yaml
+      - tests/test262/results/built-ins/Iterator/10.yaml
+      - tests/test262/results/built-ins/Iterator/14.yaml
+      - tests/test262/results/built-ins/Iterator/15.yaml
+      - tests/test262/results/built-ins/Iterator/1d.yaml
+      - tests/test262/results/built-ins/Iterator/2e.yaml
+      - tests/test262/results/built-ins/Iterator/36.yaml
+      - tests/test262/results/built-ins/Iterator/3a.yaml
+      - tests/test262/results/built-ins/Iterator/3c.yaml
+      - tests/test262/results/built-ins/Iterator/64.yaml
+      - tests/test262/results/built-ins/Iterator/65.yaml
+      - tests/test262/results/built-ins/Iterator/66.yaml
+      - tests/test262/results/built-ins/Iterator/71.yaml
+      - tests/test262/results/built-ins/Iterator/73.yaml
+      - tests/test262/results/built-ins/Iterator/85.yaml
+      - tests/test262/results/built-ins/Iterator/88.yaml
+      - tests/test262/results/built-ins/Iterator/9f.yaml
+      - tests/test262/results/built-ins/Iterator/a1.yaml
+      - tests/test262/results/built-ins/Iterator/a6.yaml
+      - tests/test262/results/built-ins/Iterator/ac.yaml
+      - tests/test262/results/built-ins/Iterator/af.yaml
+      - tests/test262/results/built-ins/Iterator/b7.yaml
+      - tests/test262/results/built-ins/Iterator/c0.yaml
+      - tests/test262/results/built-ins/Iterator/c1.yaml
+      - tests/test262/results/built-ins/Iterator/d1.yaml
+      - tests/test262/results/built-ins/Iterator/da.yaml
+      - tests/test262/results/built-ins/Iterator/e5.yaml
+      - tests/test262/results/built-ins/Iterator/e6.yaml
+      - tests/test262/results/built-ins/Iterator/e7.yaml
+      - tests/test262/results/built-ins/Iterator/fa.yaml
   structural:
     status: covered
     references:

@@ -46,13 +46,23 @@ evidence:
       - tests/native/fixtures/error-is-error.ts
       - tests/property/es2026-error-is-error.property.test.ts
   standards:
-    status: omitted
-    reason: "The 12 test/built-ins/Error/isError rows stay unreviewed in
-      the closure ledger until the unit admits them and the full test262
-      update observes them."
-    replacements:
-      - tests/native/fixtures/error-is-error.ts
-      - tests/property/es2026-error-is-error.property.test.ts
+    status: covered
+    references:
+      - tests/test262/subset.yaml
+      - tests/test262/results.yaml
+      - tests/test262/results/built-ins/Error/11.yaml
+      - tests/test262/results/built-ins/Error/34.yaml
+      - tests/test262/results/built-ins/Error/48.yaml
+      - tests/test262/results/built-ins/Error/74.yaml
+      - tests/test262/results/built-ins/Error/87.yaml
+      - tests/test262/results/built-ins/Error/9e.yaml
+      - tests/test262/results/built-ins/Error/a2.yaml
+      - tests/test262/results/built-ins/Error/aa.yaml
+      - tests/test262/results/built-ins/Error/ac.yaml
+      - tests/test262/results/built-ins/Error/c0.yaml
+      - tests/test262/results/built-ins/Error/cd.yaml
+      - tests/test262/results/built-ins/Error/d3.yaml
+      - docs/m5c-closure/exclusion-audit.yaml
   structural:
     status: covered
     references:

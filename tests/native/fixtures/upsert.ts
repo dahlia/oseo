@@ -235,6 +235,32 @@ try {
 } catch (error) {
   console.log("weak throws", error instanceof RangeError);
 }
+// The upstream callable-kind rows without their new Function() callback:
+// an empty function expression stands in for it and returns undefined.
+function three() { return 3; }
+const callableKinds = [
+  function () { return 1; },
+  () => 2,
+  three,
+  function () {},
+  (function () { return 5; }).bind(computed),
+];
+const kindMap = new Map();
+const kindWeak = new WeakMap();
+const kindKeys = callableKinds.map(() => ({}));
+console.log(
+  "map callable kinds",
+  callableKinds.map((callback, index) =>
+    [kindMap.getOrInsertComputed(index, callback), kindMap.get(index),
+      kindMap.has(index)].join(":")).join(" "),
+);
+console.log(
+  "weak callable kinds",
+  callableKinds.map((callback, index) =>
+    [kindWeak.getOrInsertComputed(kindKeys[index], callback),
+      kindWeak.get(kindKeys[index]), kindWeak.has(kindKeys[index])]
+      .join(":")).join(" "),
+);
 let weakReceivers = "";
 const weakReceiverValues = [
   undefined, 1, {}, new Map(), new WeakSet(), WeakMap.prototype, [],

@@ -3,6 +3,36 @@ key: cb
 results:
   - case:
       async: false
+      features:
+        - arrow-function
+        - upsert
+        - WeakMap
+      flags: []
+      includes: []
+      mode: script
+      path: test/built-ins/WeakMap/prototype/getOrInsertComputed/adds-value-different-callbackfn.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - dynamic-source
+      - functions
+      - object-literals
+      - var-bindings
+      - weak-collections
+    observation:
+      detail: 'test/built-ins/WeakMap/prototype/getOrInsertComputed/adds-value-different-callbackfn.js
+        non-strict disabled failed (1): stdout=""
+        stderr="test/built-ins/WeakMap/prototype/getOrInsertComputed/adds-value-different-callbackfn.js:119:35:
+        error[OSEO1001]: The Function constructor requires dynamic
+        source and is unsupported in M5.\n"'
+      passed: false
+      unsupportedCapability: profile-syntax
+    unsupportedFeatures: []
+  - case:
+      async: false
       features: []
       flags: []
       includes: []

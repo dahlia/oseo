@@ -45,13 +45,19 @@ evidence:
       - tests/native/fixtures/math-sum-precise.ts
       - tests/property/es2026-math-sum-precise.property.test.ts
   standards:
-    status: omitted
-    reason: "The 10 test/built-ins/Math/sumPrecise rows stay unreviewed in
-      the closure ledger until the unit admits them and the full test262
-      update observes them."
-    replacements:
-      - tests/native/fixtures/math-sum-precise.ts
-      - tests/property/es2026-math-sum-precise.property.test.ts
+    status: covered
+    references:
+      - tests/test262/subset.yaml
+      - tests/test262/results.yaml
+      - tests/test262/results/built-ins/Math/3a.yaml
+      - tests/test262/results/built-ins/Math/4c.yaml
+      - tests/test262/results/built-ins/Math/51.yaml
+      - tests/test262/results/built-ins/Math/5e.yaml
+      - tests/test262/results/built-ins/Math/6d.yaml
+      - tests/test262/results/built-ins/Math/94.yaml
+      - tests/test262/results/built-ins/Math/c6.yaml
+      - tests/test262/results/built-ins/Math/e7.yaml
+      - tests/test262/results/built-ins/Math/ef.yaml
   structural:
     status: covered
     references:

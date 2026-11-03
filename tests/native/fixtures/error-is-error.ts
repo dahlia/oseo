@@ -189,6 +189,23 @@ console.log(
   Error.isError(other.Error.prototype),
   Error.isError(other.AggregateError.prototype),
 );
+// The upstream other-realm non-error rows without new other.Function(""):
+// other.Function.prototype and other.Object stand in as other-realm
+// function objects.
+console.log(
+  "other non-errors",
+  [
+    new other.Object(), new other.Array(), new other.RegExp("a"),
+    other.Function.prototype, other.Object,
+    other.Error, other.EvalError, other.RangeError, other.ReferenceError,
+    other.SyntaxError, other.TypeError, other.URIError,
+    other.AggregateError,
+  ].map((value) => Error.isError(value)).join(" "),
+  // Like the upstream test, check SuppressedError only where it exists;
+  // both branches print true when the row holds.
+  typeof other.SuppressedError === "undefined" ||
+    !Error.isError(other.SuppressedError),
+);
 `,
     test262Host: true,
   },
