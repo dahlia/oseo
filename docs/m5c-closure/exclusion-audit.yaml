@@ -5768,23 +5768,23 @@ assessments:
         "3b8a2f830428109db26f4a39770cc4bf0d859c34667339df\
         1d48df4e07607262"
       packages/runtime-c/native/runtime_function.c:
-        "0aba436f4c6143d47c771a311c152109b85cd3530344df28\
-        112eeb7a05970851"
+        "ed3b495ba7f7c4510619ac342909b34f39a35499a9341659\
+        07898beb15df942d"
       packages/runtime-c/native/runtime_memory.c:
-        "a5bacbbb7dee97f79d0bb04c3feef7bafa9a7d42168ca2b5\
-        223440076d967076"
+        "e72a8825962259d03d81348ee5cbee3184d7b0632018d4e6\
+        b5feac705067650d"
       packages/runtime-c/native/runtime_internal.h:
-        "0ddd21efd1b3be3ae3b452d716c87649ccb374d457b5c12e\
-        bde30f6703c006d3"
+        "e8b6e98c057e1e055a7ec4485529f22bf036153c99ff4099\
+        a42d473a2bf9e5a0"
       packages/runtime-c/native/oseo_runtime.h:
-        "6025fcc647f14a7725283b3a3db4300e96645a2df7b6eb90\
-        f335a78bf85237f4"
+        "568d05d04cc71eb6c454068f65f0b87c64ad1b2bb2402407\
+        63348b0758212528"
       packages/runtime-c/native/runtime_core.c:
-        "979d7a1a4c2c0d5883cd8514fc1ce8e352755bd005368936\
-        f503bb59d036ea9d"
+        "bcf729b61049bdd7486c230c5cb653edfaae769360bc4d3e\
+        e0c4f1eea10a663b"
       packages/runtime-c/src/index.ts:
-        "abe2707d6341eca5f8afea897160bb5e1faf7d0a75025405\
-        15a01581ce6195ec"
+        "92a2f24a155a769e4f5c36c593de3a9fe7012d51e3d04d7f\
+        9d888336186c6eb2"
   observation-train-b26a-b26b-b27:
     disposition: deferral
     normativeDependency: not-demonstrated

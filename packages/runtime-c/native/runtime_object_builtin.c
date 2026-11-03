@@ -64,6 +64,9 @@ static OseoResult own_property_query(
         omitted_accessors
     );
     if (!*found) return normal(oseo_undefined());
+    result = oseo_internal_legacy_value(context, object_value, key, *value);
+    if (result.status != OSEO_STATUS_NORMAL) return result;
+    *value = result.value;
     return oseo_internal_namespace_export_ready(
         context, object_value, *value);
 }
@@ -777,6 +780,26 @@ static OseoResult object_set_integrity_level(
     OseoResult result = oseo_roots_allocate(context, &frame, 3u);
     if (result.status != OSEO_STATUS_NORMAL) return result;
     frame.slots[0] = object_value;
+    /* SetIntegrityLevel redefines a live `arguments` or `caller` like
+     * any other own property, which fixes its present value. */
+    if (is_function(object_value) &&
+        function_object(object_value)->legacy_live != 0u) {
+        result = oseo_internal_legacy_function_keys(context);
+        for (size_t index = 0u;
+             result.status == OSEO_STATUS_NORMAL && index < 2u;
+             index += 1u) {
+            result = oseo_internal_legacy_materialize(
+                context,
+                frame.slots[0],
+                context->legacy_function_keys[index]
+            );
+        }
+        if (result.status != OSEO_STATUS_NORMAL) {
+            oseo_roots_release(context, &frame);
+            return result;
+        }
+        object = ordinary_object(frame.slots[0]);
+    }
     size_t property_count = object->property_count;
     bool omitted_proto = object->immutable_prototype &&
         !object->module_namespace && !object->annexb_proto_deleted;
@@ -916,6 +939,10 @@ static OseoResult object_test_integrity_level(
     }
     if (frozen && function_has_prototype_property(value) &&
         function_object(value)->prototype_writable) {
+        return normal(oseo_boolean(false));
+    }
+    /* A live `arguments` or `caller` is configurable (ADR 0034). */
+    if (is_function(value) && function_object(value)->legacy_live != 0u) {
         return normal(oseo_boolean(false));
     }
     if (object->virtual_string_iterator &&
@@ -2084,6 +2111,12 @@ OseoResult oseo_internal_define_converted_property(
             refusal
         );
     }
+    /* A live `arguments` or `caller` moves into the property vector with
+     * its present value first, which a descriptor without a value field
+     * then keeps (ADR 0034). */
+    OseoResult legacy =
+        oseo_internal_legacy_materialize(context, object_value, key);
+    if (legacy.status != OSEO_STATUS_NORMAL) return legacy;
     OseoValue current_value = oseo_undefined();
     OseoPropertyAttributes current_attributes = {false, false, false, false};
     OseoValue current_getter = oseo_undefined();
@@ -2408,6 +2441,24 @@ OseoResult oseo_object_builtin_get_own_property_descriptor(
  * the object, slot 2 holds whichever synthesized string key this object
  * needs, and the keys fill the `key_count` slots from index 3.
  */
+/*
+ * Writes `prototype`, preceded by `caller` while it is still live. A
+ * live `caller` always sits right in front of `prototype`; a live
+ * `arguments` is written separately at its own rank (ADR 0034).
+ */
+static size_t place_prototype_keys(
+    const OseoContext *context,
+    OseoRootFrame *frame,
+    size_t output,
+    uint8_t legacy_live
+) {
+    if ((legacy_live & OSEO_LEGACY_CALLER_LIVE) != 0u) {
+        frame->slots[3u + output++] = context->legacy_function_keys[1];
+    }
+    frame->slots[3u + output++] = frame->slots[2];
+    return output;
+}
+
 static OseoResult snapshot_own_keys(
     OseoContext *context,
     OseoRootFrame *frame,
@@ -2470,6 +2521,18 @@ static OseoResult snapshot_own_keys(
         frame->slots[3u + output] = frame->slots[2];
         output += 1u;
     }
+    uint8_t legacy_live = is_function(frame->slots[0])
+        ? function_object(frame->slots[0])->legacy_live
+        : 0u;
+    if (legacy_live != 0u) {
+        OseoResult keys = oseo_internal_legacy_function_keys(context);
+        if (keys.status != OSEO_STATUS_NORMAL) return keys;
+    }
+    bool pending_arguments =
+        (legacy_live & OSEO_LEGACY_ARGUMENTS_LIVE) != 0u;
+    size_t arguments_position = pending_arguments
+        ? function_object(frame->slots[0])->legacy_arguments_position
+        : 0u;
     /* No allocation happens through the remaining string-key pass, so
      * the property vector cannot move under this loop. */
     bool pending_prototype = virtual_prototype;
@@ -2488,9 +2551,13 @@ static OseoResult snapshot_own_keys(
         if (is_symbol(key) ||
             (index_keys_lead &&
              oseo_internal_array_index(key, &ignored))) continue;
+        if (pending_arguments && string_rank == arguments_position) {
+            frame->slots[3u + output++] = context->legacy_function_keys[0];
+            pending_arguments = false;
+        }
         if (pending_prototype && string_rank == prototype_position) {
-            frame->slots[3u + output] = frame->slots[2];
-            output += 1u;
+            output = place_prototype_keys(
+                context, frame, output, legacy_live);
             pending_prototype = false;
         }
         frame->slots[3u + output] = key;
@@ -2500,9 +2567,11 @@ static OseoResult snapshot_own_keys(
     if (pending_annexb) {
         frame->slots[3u + output++] = frame->slots[2];
     }
+    if (pending_arguments) {
+        frame->slots[3u + output++] = context->legacy_function_keys[0];
+    }
     if (pending_prototype) {
-        frame->slots[3u + output] = frame->slots[2];
-        output += 1u;
+        output = place_prototype_keys(context, frame, output, legacy_live);
     }
     if (virtual_string_iterator) {
         OseoResult key = oseo_internal_well_known_symbol(
@@ -2532,6 +2601,11 @@ static OseoResult snapshot_own_keys(
 static size_t own_key_count(OseoValue object_value) {
     size_t virtual_count = is_array(object_value) ||
         function_has_prototype_property(object_value) ? 1u : 0u;
+    if (is_function(object_value)) {
+        uint8_t live = function_object(object_value)->legacy_live;
+        if ((live & OSEO_LEGACY_ARGUMENTS_LIVE) != 0u) virtual_count += 1u;
+        if ((live & OSEO_LEGACY_CALLER_LIVE) != 0u) virtual_count += 1u;
+    }
     if (ordinary_object(object_value)->virtual_string_iterator) {
         virtual_count += 1u;
     }

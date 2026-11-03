@@ -200,6 +200,14 @@ static OseoResult target_own_property(
         if (read.status != OSEO_STATUS_NORMAL) return read;
         *value = read.value;
     }
+    /* An active function's legacy `arguments` is a new object, which a
+     * trap result can never match; the checks compare it at once. */
+    if (*found) {
+        OseoResult read =
+            oseo_internal_legacy_value(context, target, key, *value);
+        if (read.status != OSEO_STATUS_NORMAL) return read;
+        *value = read.value;
+    }
     return normal(oseo_undefined());
 }
 

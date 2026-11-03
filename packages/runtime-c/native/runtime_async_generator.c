@@ -451,7 +451,18 @@ static OseoResult drain_queue(
                 generator_state(frame.slots[0])->callee
             )
         );
+        /* A resumed body is the running function of the calls it makes
+         * (ADR 0034); its generator record roots the callee. */
+        OseoActivation activation;
+        oseo_internal_activation_push(
+            context,
+            &activation,
+            generator_state(frame.slots[0])->callee,
+            0u,
+            NULL
+        );
         result = context->generator_dispatcher(context, frame.slots[0]);
+        oseo_internal_activation_pop(context, &activation);
         oseo_internal_realm_leave(context, &realm_scope);
         oseo_call_leave(context);
         state = generator_state(frame.slots[0]);
@@ -728,7 +739,18 @@ resume_body:
                 generator_state(frame.slots[0])->callee
             )
         );
+        /* A resumed body is the running function of the calls it makes
+         * (ADR 0034); its generator record roots the callee. */
+        OseoActivation activation;
+        oseo_internal_activation_push(
+            context,
+            &activation,
+            generator_state(frame.slots[0])->callee,
+            0u,
+            NULL
+        );
         result = context->generator_dispatcher(context, frame.slots[0]);
+        oseo_internal_activation_pop(context, &activation);
         oseo_internal_realm_leave(context, &realm_scope);
         oseo_call_leave(context);
     }

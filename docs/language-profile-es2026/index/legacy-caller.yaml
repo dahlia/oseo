@@ -1,0 +1,3 @@
+version: 1
+id: legacy-caller
+record: docs/language-profile-es2026/families/legacy-caller.yaml

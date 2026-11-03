@@ -1464,6 +1464,9 @@ OseoResult oseo_function_create(
     /* MakeConstructor runs after SetFunctionLength and SetFunctionName,
      * so `prototype` follows the two properties defined just below. */
     function->prototype_key_position = 2u;
+    function->non_strict = false;
+    function->legacy_live = 0u;
+    function->legacy_arguments_position = 2u;
     result = oseo_internal_publish_heap(
         context,
         &function->ordinary.header,
@@ -1580,6 +1583,190 @@ OseoResult oseo_function_create(
     if (result.status == OSEO_STATUS_NORMAL) {
         result.value = frame.slots[2];
     }
+    oseo_roots_release(context, &frame);
+    return result;
+}
+
+OseoResult oseo_function_create_non_strict(
+    OseoContext *context,
+    size_t code_id,
+    OseoValue environment,
+    const uint16_t *name_units,
+    size_t name_length,
+    size_t parameter_count,
+    OseoFunctionKind function_kind,
+    OseoValue lexical_this,
+    OseoValue inferred_name,
+    OseoFunctionNamePrefix name_prefix
+) {
+    OseoResult result = oseo_function_create(
+        context,
+        code_id,
+        environment,
+        name_units,
+        name_length,
+        parameter_count,
+        function_kind,
+        lexical_this,
+        inferred_name,
+        name_prefix
+    );
+    if (result.status == OSEO_STATUS_NORMAL) {
+        OseoFunction *function = function_object(result.value);
+        function->non_strict = true;
+        if (function->function_kind == OSEO_FUNCTION_ORDINARY) {
+            function->legacy_live =
+                OSEO_LEGACY_ARGUMENTS_LIVE | OSEO_LEGACY_CALLER_LIVE;
+            function->legacy_arguments_position =
+                function->prototype_key_position;
+        }
+    }
+    return result;
+}
+
+OseoResult oseo_internal_legacy_function_keys(OseoContext *context) {
+    static const char *const names[2] = {"arguments", "caller"};
+    for (size_t index = 0u; index < 2u; index += 1u) {
+        if (tag_of(context->legacy_function_keys[index]) !=
+            OSEO_TAG_UNDEFINED) {
+            continue;
+        }
+        OseoResult key = oseo_internal_ascii_string(context, names[index]);
+        if (key.status != OSEO_STATUS_NORMAL) return key;
+        context->legacy_function_keys[index] = key.value;
+    }
+    return normal(oseo_undefined());
+}
+
+/* The most recent running activation of `function`, or NULL. */
+static const OseoActivation *latest_activation(
+    const OseoContext *context,
+    OseoValue function
+) {
+    for (const OseoActivation *activation = context->activation;
+         activation != NULL;
+         activation = activation->previous) {
+        if (activation->function == function) return activation;
+    }
+    return NULL;
+}
+
+/*
+ * The legacy `caller` answer for one activation: the function that made
+ * the call that started it, when that function is non-strict generated
+ * code, and null otherwise. The record linked below the activation was
+ * the running one when the call started, and stays linked as long as
+ * the activation does.
+ */
+static OseoValue activation_caller(const OseoActivation *activation) {
+    const OseoActivation *previous = activation->previous;
+    if (previous == NULL) return oseo_null();
+    OseoValue caller = tag_of(previous->function) == OSEO_TAG_UNDEFINED
+        ? previous->caller
+        : previous->function;
+    if (is_function(caller) && function_object(caller)->non_strict) {
+        return caller;
+    }
+    return oseo_null();
+}
+
+bool oseo_internal_legacy_descriptor(
+    const OseoContext *context,
+    OseoValue object_value,
+    OseoValue key,
+    OseoValue *value,
+    OseoPropertyAttributes *attributes
+) {
+    uint8_t live = oseo_internal_legacy_live_key(object_value, key);
+    if (live == 0u) return false;
+    bool caller = live == OSEO_LEGACY_CALLER_LIVE;
+    *attributes = (OseoPropertyAttributes){true, false, false, false};
+    const OseoActivation *activation =
+        latest_activation(context, object_value);
+    if (activation == NULL) {
+        *value = oseo_null();
+    } else if (caller) {
+        *value = activation_caller(activation);
+    } else {
+        *value = object_value;
+    }
+    return true;
+}
+
+bool oseo_internal_legacy_arguments_pending(
+    OseoValue object_value,
+    OseoValue key,
+    OseoValue value
+) {
+    return value == object_value &&
+        oseo_internal_legacy_live_key(object_value, key) ==
+            OSEO_LEGACY_ARGUMENTS_LIVE;
+}
+
+OseoResult oseo_internal_legacy_value(
+    OseoContext *context,
+    OseoValue object_value,
+    OseoValue key,
+    OseoValue value
+) {
+    if (!oseo_internal_legacy_arguments_pending(object_value, key, value)) {
+        return normal(value);
+    }
+    const OseoActivation *activation =
+        latest_activation(context, object_value);
+    if (activation == NULL) return normal(oseo_null());
+    /* A mapped-shape object with no mapped index: `callee` is the
+     * ordinary data property V8 reports, and no element aliases a
+     * parameter. The activation's arguments stay rooted by the frame
+     * that made its call. */
+    OseoResult result = oseo_mapped_arguments_create(
+        context,
+        oseo_undefined(),
+        object_value,
+        activation->argument_count,
+        activation->arguments,
+        NULL,
+        NULL,
+        0u
+    );
+    if (result.status != OSEO_STATUS_NORMAL) return result;
+    ordinary_object(result.value)->mapped_arguments = false;
+    if (function_object(object_value)->realm == context->realm_record) {
+        return result;
+    }
+    /* V8 takes the prototype from the running realm but the
+     * Symbol.iterator value from the function's own realm (ADR 0034). */
+    OseoRootFrame frame = {NULL, NULL, 0u};
+    OseoResult rooted = oseo_roots_allocate(context, &frame, 4u);
+    if (rooted.status != OSEO_STATUS_NORMAL) return rooted;
+    frame.slots[0] = result.value;
+    frame.slots[3] = object_value;
+    result = oseo_internal_well_known_symbol(context, OSEO_WELL_KNOWN_ITERATOR);
+    frame.slots[1] = result.value;
+    if (result.status == OSEO_STATUS_NORMAL) {
+        OseoRealmScope scope;
+        oseo_internal_realm_enter(
+            context,
+            &scope,
+            function_object(frame.slots[3])->realm
+        );
+        result = oseo_internal_iterator_method(
+            context,
+            OSEO_ARRAY_VALUES_CODE_ID
+        );
+        oseo_internal_realm_leave(context, &scope);
+        frame.slots[2] = result.value;
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = oseo_object_define(
+            context,
+            frame.slots[0],
+            frame.slots[1],
+            frame.slots[2],
+            (OseoPropertyAttributes){true, false, true, false}
+        );
+    }
+    if (result.status == OSEO_STATUS_NORMAL) result.value = frame.slots[0];
     oseo_roots_release(context, &frame);
     return result;
 }
@@ -2848,6 +3035,18 @@ static OseoResult call_bound_function(
 }
 
 /*
+ * Function.prototype.call, Function.prototype.apply, Reflect.apply, and
+ * Reflect.construct: the built-ins whose call counts as made by the code
+ * that called them.
+ */
+static bool forwarding_builtin(size_t code_id) {
+    return code_id == OSEO_FUNCTION_CALL_CODE_ID ||
+        code_id == OSEO_FUNCTION_APPLY_CODE_ID ||
+        code_id == OSEO_REFLECT_APPLY_CODE_ID ||
+        code_id == OSEO_REFLECT_CONSTRUCT_CODE_ID;
+}
+
+/*
  * The part of [[Call]] and [[Construct]] that runs once the callee's
  * realm, if it has one, is the running realm.
  */
@@ -2897,6 +3096,20 @@ static OseoResult call_in_running_realm(
     result = oseo_call_enter(context);
     if (result.status != OSEO_STATUS_NORMAL) return result;
     OseoBuiltinDispatcher dispatch = builtin_dispatcher(code_id);
+    /* The four forwarding built-ins record no activation, so the call
+     * they make counts as made by their own caller (ADR 0034). Every
+     * other built-in does, and reports null to the functions it calls. */
+    bool tracked = dispatch == NULL || !forwarding_builtin(code_id);
+    OseoActivation activation;
+    if (tracked) {
+        oseo_internal_activation_push(
+            context,
+            &activation,
+            callee,
+            argument_count,
+            arguments
+        );
+    }
     if (dispatch != NULL) {
         result = dispatch(
             context,
@@ -2946,6 +3159,7 @@ static OseoResult call_in_running_realm(
             );
         }
     }
+    if (tracked) oseo_internal_activation_pop(context, &activation);
     oseo_call_leave(context);
     return result;
 }
@@ -3021,6 +3235,7 @@ static OseoTailCall *tail_call_record(OseoContext *context) {
         record->realm_record = oseo_undefined();
         record->this_cell = oseo_undefined();
         record->constructor_realm = oseo_undefined();
+        record->caller = oseo_undefined();
         record->arguments = NULL;
         record->argument_count = 0u;
         record->argument_capacity = 0u;
@@ -3048,7 +3263,8 @@ static OseoResult record_tail_call(
     size_t argument_count,
     const OseoValue *arguments,
     bool derived,
-    OseoValue this_cell
+    OseoValue this_cell,
+    OseoValue caller
 ) {
     OseoTailCall *record = tail_call_record(context);
     if (record == NULL) {
@@ -3101,6 +3317,7 @@ static OseoResult record_tail_call(
         ? context->constructor_scope->realm_record
         : context->realm_record;
     record->argument_count = argument_count;
+    record->caller = caller;
     record->derived = derived;
     record->pending = true;
     return (OseoResult){OSEO_STATUS_TAIL_CALL, oseo_undefined()};
@@ -3113,6 +3330,7 @@ static void clear_tail_call(OseoTailCall *record) {
     record->realm_record = oseo_undefined();
     record->this_cell = oseo_undefined();
     record->constructor_realm = oseo_undefined();
+    record->caller = oseo_undefined();
     record->argument_count = 0u;
     record->pending = false;
     record->derived = false;
@@ -3133,7 +3351,8 @@ OseoResult oseo_internal_tail_call(
         argument_count,
         arguments,
         false,
-        oseo_undefined()
+        oseo_undefined(),
+        oseo_internal_activation_current_caller(context)
     );
 }
 
@@ -3172,6 +3391,7 @@ OseoResult oseo_tail_call(
         argument_count,
         arguments,
         false,
+        oseo_undefined(),
         oseo_undefined()
     );
 }
@@ -3190,6 +3410,7 @@ OseoResult oseo_tail_host_call(
         argument_count,
         arguments,
         false,
+        oseo_undefined(),
         oseo_undefined()
     );
 }
@@ -3209,7 +3430,8 @@ OseoResult oseo_tail_host_call_derived(
         argument_count,
         arguments,
         true,
-        this_cell
+        this_cell,
+        oseo_undefined()
     );
 }
 
@@ -3273,7 +3495,8 @@ OseoResult oseo_tail_call_derived(
         argument_count,
         arguments,
         true,
-        this_cell
+        this_cell,
+        oseo_undefined()
     );
 }
 
@@ -3319,6 +3542,18 @@ static OseoResult run_tail_calls(OseoContext *context) {
                 argument_count * sizeof(OseoValue)
             );
         }
+        /* The step's call counts as made by the function that owed it,
+         * not by the frame running this trampoline (ADR 0034). The
+         * boundary record keeps that function linked for the step. */
+        OseoActivation boundary;
+        oseo_internal_activation_push(
+            context,
+            &boundary,
+            oseo_undefined(),
+            0u,
+            NULL
+        );
+        boundary.caller = record->caller;
         clear_tail_call(record);
         OseoRealmScope scope;
         oseo_internal_realm_enter(context, &scope, frame.slots[2]);
@@ -3331,6 +3566,7 @@ static OseoResult run_tail_calls(OseoContext *context) {
             frame.slots + 3u
         );
         oseo_internal_realm_leave(context, &scope);
+        oseo_internal_activation_pop(context, &boundary);
         oseo_roots_release(context, &frame);
         if (result.status != OSEO_STATUS_TAIL_CALL) break;
         if (record->derived) {

@@ -51,3 +51,34 @@ reading `caller` while it is active throws a `TypeError`. Its
 %Function.prototype% getter and setter are also different functions, unlike
 the single %ThrowTypeError% that ECMA-262 requires. Deno is therefore not a
 reference for ADR 0034.
+
+
+Per-call cost
+-------------
+
+ADR 0034 caps activation tracking at no allocation per call and at most 5
+percent of a call-heavy benchmark's median run time. *cost/* holds the
+measurement. Each of the three programs makes 20 million calls: direct calls
+of a non-strict function, the same loop in strict code, and
+`Array.prototype.forEach` callbacks, which add a built-in activation per
+callback.
+
+*cost/build.sh* builds each program twice with `zig cc -O2` and no
+sanitizers: once against the runtime of the base commit, once against the
+working tree. *cost/time.py* runs the builds in alternating order and reports
+medians. *cost/results.json* is the output of 11 rounds on Linux AMD64 (AMD
+Ryzen 7 7700X, Zig 0.16.0, load average below 3 on 16 threads), against base
+`528688879`:
+
+| Program                | Base median, s | Current median, s | Change |
+| ---------------------- | -------------: | ----------------: | -----: |
+| *sloppy-calls.js*      |          7.385 |             7.360 | −0.3 % |
+| *strict-calls.js*      |          9.569 |             9.545 | −0.3 % |
+| *builtin-callbacks.js* |          6.617 |             6.815 | +3.0 % |
+
+All three stay inside the ceiling. The two direct-call programs differ by less
+than their round-to-round spread, so they show no measurable cost; the
+callback program pays for the extra built-in record. One host and one session
+estimate no variation across machines. *tests/legacy-caller.test.ts* checks
+the allocation half: a program's allocation count is the same for 10 and
+10,000 rounds of non-strict and built-in calls.

@@ -783,6 +783,10 @@ export const emittedC = {
       ["result = oseo_function_create(context, "],
       ["u, "],
     ],
+    resultAssignOseoFunctionCreateNonStrictContextU: [
+      ["result = oseo_function_create_non_strict(context, "],
+      ["u, "],
+    ],
     resultAssignOseoFunctionSetSource: [
       ["result = oseo_function_set_source(context, roots["],
       ["], "],

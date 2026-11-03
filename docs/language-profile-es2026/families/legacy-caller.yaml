@@ -1,0 +1,51 @@
+version: 1
+id: legacy-caller
+title: "Legacy function caller and arguments"
+scope:
+  - "The configurable own caller and arguments data properties of
+    non-strict function declarations and expressions that ADR 0034
+    defines, their own-key position, definition, freezing, and deletion."
+  - "Activation tracking through the generic call path, the forwarding
+    built-ins, bound functions, Proxy objects, tail calls, generator and
+    async resumption, exception unwinding, and realms."
+owners:
+  - docs/adr/0034-legacy-function-caller-contract.md
+evidence:
+  differential:
+    status: covered
+    references:
+      - tests/legacy-caller.test.ts
+      - tests/native/fixtures/legacy-caller.ts
+      - tests/property/legacy-caller.property.test.ts
+  fixed:
+    status: covered
+    references:
+      - tests/legacy-caller.test.ts
+  forced-collection:
+    status: covered
+    references:
+      - tests/legacy-caller.test.ts
+      - tests/property/legacy-caller.property.test.ts
+  generated:
+    status: covered
+    references:
+      - tests/property/legacy-caller.property.test.ts
+  guard-fallback:
+    status: covered
+    references:
+      - tests/legacy-caller.test.ts
+      - tests/native/fixtures/legacy-caller.ts
+  specialization:
+    status: covered
+    references:
+      - tests/legacy-caller.test.ts
+      - tests/property/legacy-caller.property.test.ts
+  standards:
+    status: covered
+    references:
+      - tests/test262/subset.yaml
+      - tests/test262/results.yaml
+  structural:
+    status: covered
+    references:
+      - tests/legacy-caller.test.ts

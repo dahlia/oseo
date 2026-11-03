@@ -1,0 +1,23 @@
+{
+  "sloppy-calls": {
+    "base_median_s": 7.3851,
+    "current_median_s": 7.3597,
+    "change_percent": -0.34,
+    "base_min_s": 7.2501,
+    "current_min_s": 7.2355
+  },
+  "strict-calls": {
+    "base_median_s": 9.5691,
+    "current_median_s": 9.5452,
+    "change_percent": -0.25,
+    "base_min_s": 9.3403,
+    "current_min_s": 9.1483
+  },
+  "builtin-callbacks": {
+    "base_median_s": 6.617,
+    "current_median_s": 6.815,
+    "change_percent": 2.99,
+    "base_min_s": 6.487,
+    "current_min_s": 6.5969
+  }
+}

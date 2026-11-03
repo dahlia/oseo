@@ -756,6 +756,9 @@
  * both walk.
  */
 #define OSEO_REFLECT_FUNCTION_COUNT ((size_t)13u)
+/* `reflect_functions` lists apply first and construct second. */
+#define OSEO_REFLECT_APPLY_CODE_ID OSEO_REFLECT_CODE_ID_RANGE_LAST
+#define OSEO_REFLECT_CONSTRUCT_CODE_ID (OSEO_REFLECT_CODE_ID_RANGE_LAST - 1u)
 #define OSEO_REFLECT_FUNCTION_CODE_ID_LAST OSEO_REFLECT_CODE_ID_RANGE_LAST
 #define OSEO_REFLECT_FUNCTION_CODE_ID_FIRST \
     (OSEO_REFLECT_CODE_ID_RANGE_LAST - (OSEO_REFLECT_FUNCTION_COUNT - 1u))
@@ -1740,7 +1743,32 @@ typedef struct {
      * `prototype` the way its later creation requires.
      */
     size_t prototype_key_position;
+    /*
+     * True when the function's code is non-strict, as only generated code
+     * creates it through oseo_function_create_non_strict. Such a function
+     * can be reported as a caller (ADR 0034); a built-in never is.
+     */
+    bool non_strict;
+    /*
+     * OSEO_LEGACY_ARGUMENTS_LIVE and OSEO_LEGACY_CALLER_LIVE: which of
+     * the function's own `arguments` and `caller` properties are still
+     * the synthetic live ones, kept outside the property vector. A
+     * [[DefineOwnProperty]] moves one into the vector with the value it
+     * has at that moment, and [[Delete]] removes it; either clears its
+     * bit (ADR 0034).
+     */
+    uint8_t legacy_live;
+    /*
+     * The string-key rank in front of which the live `arguments`
+     * appears in own-key order. It equals `prototype_key_position`
+     * until `caller` moves into the vector ahead of `prototype`, and
+     * deletion of an earlier key lowers both alike.
+     */
+    size_t legacy_arguments_position;
 } OseoFunction;
+
+#define OSEO_LEGACY_ARGUMENTS_LIVE ((uint8_t)1u)
+#define OSEO_LEGACY_CALLER_LIVE ((uint8_t)2u)
 
 typedef struct {
     OseoOrdinaryObject ordinary;
@@ -2626,6 +2654,44 @@ static inline bool function_has_prototype_property(OseoValue value) {
         kind == OSEO_FUNCTION_ASYNC_GENERATOR ||
         kind == OSEO_FUNCTION_CLASS;
 }
+
+/*
+ * True for a non-strict `function` declaration or expression that is
+ * neither async nor a generator: the functions created with own
+ * `caller` and `arguments` properties and reported as callers
+ * (ADR 0034). Every one also has `prototype`.
+ */
+static inline bool oseo_internal_has_legacy_caller(OseoValue value) {
+    if (!is_function(value)) return false;
+    const OseoFunction *function = function_object(value);
+    return function->non_strict &&
+        function->function_kind == OSEO_FUNCTION_ORDINARY;
+}
+
+/*
+ * The OSEO_LEGACY_*_LIVE bit for `key` when it names a still-live
+ * synthetic `arguments` or `caller` of `value`, and 0 otherwise. A
+ * property moved into the vector or deleted answers 0 and is then an
+ * ordinary property or absent.
+ */
+bool oseo_internal_string_is_ascii(OseoValue value, const char *text);
+static inline uint8_t oseo_internal_legacy_live_key(
+    OseoValue value,
+    OseoValue key
+) {
+    if (!is_function(value)) return 0u;
+    uint8_t live = function_object(value)->legacy_live;
+    if (live == 0u) return 0u;
+    if ((live & OSEO_LEGACY_CALLER_LIVE) != 0u &&
+        oseo_internal_string_is_ascii(key, "caller")) {
+        return OSEO_LEGACY_CALLER_LIVE;
+    }
+    if ((live & OSEO_LEGACY_ARGUMENTS_LIVE) != 0u &&
+        oseo_internal_string_is_ascii(key, "arguments")) {
+        return OSEO_LEGACY_ARGUMENTS_LIVE;
+    }
+    return 0u;
+}
 static inline bool is_generator(OseoValue value) {
     return tag_of(value) == OSEO_TAG_HEAP &&
         heap_object(value)->kind == OSEO_HEAP_OBJECT &&
@@ -2966,6 +3032,112 @@ void oseo_internal_realm_enter(
 );
 void oseo_internal_realm_leave(OseoContext *context, OseoRealmScope *scope);
 
+/*
+ * One running activation in the chain that `context->activation` heads
+ * (ADR 0034). `function` is the callee whose code runs, a built-in
+ * function included, or undefined for a boundary record: the tail call
+ * trampoline pushes one around each step so that the call it performs
+ * counts as made by `caller`, the function that owed it, or by no
+ * function when `caller` is undefined. `arguments` points at the
+ * `argument_count` values the callee received; they stay rooted by the
+ * frame that made the call for as long as the record is linked.
+ */
+struct OseoActivation {
+    OseoActivation *previous;
+    OseoValue function;
+    OseoValue caller;
+    const OseoValue *arguments;
+    size_t argument_count;
+};
+
+static inline void oseo_internal_activation_push(
+    OseoContext *context,
+    OseoActivation *activation,
+    OseoValue function,
+    size_t argument_count,
+    const OseoValue *arguments
+) {
+    activation->previous = context->activation;
+    activation->function = function;
+    activation->caller = oseo_undefined();
+    activation->arguments = arguments;
+    activation->argument_count = argument_count;
+    context->activation = activation;
+}
+
+static inline void oseo_internal_activation_pop(
+    OseoContext *context,
+    OseoActivation *activation
+) {
+    context->activation = activation->previous;
+}
+
+/*
+ * The function that counts as making a call started now: the running
+ * activation's function, a boundary record's `caller`, or undefined at
+ * top level.
+ */
+static inline OseoValue oseo_internal_activation_current_caller(
+    const OseoContext *context
+) {
+    const OseoActivation *top = context->activation;
+    if (top == NULL) return oseo_undefined();
+    return tag_of(top->function) == OSEO_TAG_UNDEFINED
+        ? top->caller
+        : top->function;
+}
+
+/*
+ * Answers [[GetOwnProperty]] for a still-live `caller` or `arguments`
+ * (oseo_internal_legacy_live_key), without allocating. Both are
+ * non-writable, non-enumerable, and configurable. `*value` is the
+ * `caller` value, or null for an inactive function's `arguments`; for an
+ * active function's `arguments` it is the function itself, which
+ * oseo_internal_legacy_arguments_pending recognizes and
+ * oseo_internal_legacy_value replaces before any code sees it.
+ */
+bool oseo_internal_legacy_descriptor(
+    const OseoContext *context,
+    OseoValue object_value,
+    OseoValue key,
+    OseoValue *value,
+    OseoPropertyAttributes *attributes
+);
+/*
+ * Moves a still-live `arguments` or `caller` of `object_value` into the
+ * property vector with the value it has now, so that the validation and
+ * update that follow treat it as the configurable, non-writable data
+ * property it is (ADR 0034). The new slot keeps the own-key position
+ * the live property had: in front of the string key at its rank. Any
+ * other key is left alone. Allocates; the caller roots both values.
+ */
+OseoResult oseo_internal_legacy_materialize(
+    OseoContext *context,
+    OseoValue object_value,
+    OseoValue key
+);
+/*
+ * Creates `context->legacy_function_keys` on first use: the `arguments`
+ * and `caller` key strings, in own-key order.
+ */
+OseoResult oseo_internal_legacy_function_keys(OseoContext *context);
+bool oseo_internal_legacy_arguments_pending(
+    OseoValue object_value,
+    OseoValue key,
+    OseoValue value
+);
+/*
+ * Replaces a pending `arguments` value with a new arguments object for
+ * the function's most recent activation, created in the running realm.
+ * Any other value is returned unchanged.
+ */
+OseoResult oseo_internal_legacy_value(
+    OseoContext *context,
+    OseoValue object_value,
+    OseoValue key,
+    OseoValue value
+);
+
 /* The matching realm scope roots this record until the call returns. */
 struct OseoConstructorScope {
     OseoValue realm_record;
@@ -2992,6 +3164,12 @@ typedef struct {
     OseoValue *arguments;
     size_t argument_count;
     size_t argument_capacity;
+    /*
+     * The function that counts as making the call (ADR 0034): undefined
+     * for a tail call in generated code, which is always strict, and the
+     * function that called a forwarding built-in for a runtime site.
+     */
+    OseoValue caller;
     unsigned host;
     bool pending;
     bool derived;

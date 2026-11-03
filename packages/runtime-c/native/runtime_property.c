@@ -178,7 +178,7 @@ static OseoResult object_get(
             if (oseo_internal_cell_backed_property(current, value)) {
                 return oseo_cell_get(context, value);
             }
-            return normal(value);
+            return oseo_internal_legacy_value(context, current, key, value);
         }
         /* Only a missing lookup at %Object.prototype% reaches the excluded
          * Annex B accessor. Own/inherited user properties, proxies, null

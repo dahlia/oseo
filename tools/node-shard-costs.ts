@@ -6,7 +6,7 @@
  * `9f21b607`, candidate run 41233967056 at `636157ef`, and main run
  * 41238903460 at `8770b2e4`. The largest is kept on purpose: the residual
  * evidence file took 1.36 times longer on one of those Linux runners than
- * on another, and the margin the shards keep is a slow runner's. Eight
+ * on another, and the margin the shards keep is a slow runner's. Nine
  * files postdate those runs and scale a serial local measurement on the
  * same host by the residual-evidence ratio: 2.574 on Linux and 1.974 on
  * macOS.
@@ -37,6 +37,7 @@ export const nodeShardCosts = {
     "tests/host-script-trainc-evidence-2.test.ts": 752,
     "tests/host-script-trainc-evidence-3.test.ts": 732,
     "tests/host-script-trainc-evidence-4.test.ts": 673,
+    "tests/legacy-caller.test.ts": 45,
     "tests/lexical-static-native.test.ts": 77,
     "tests/m5c-closure-ledger.test.ts": 58,
     "tests/m5c-exclusion-audit.test.ts": 31,
@@ -150,6 +151,7 @@ export const nodeShardCosts = {
     "tests/host-script-trainc-evidence-2.test.ts": 577,
     "tests/host-script-trainc-evidence-3.test.ts": 561,
     "tests/host-script-trainc-evidence-4.test.ts": 516,
+    "tests/legacy-caller.test.ts": 35,
     "tests/lexical-static-native.test.ts": 61,
     "tests/m5c-closure-ledger.test.ts": 50,
     "tests/m5c-graph.test.ts": 166,

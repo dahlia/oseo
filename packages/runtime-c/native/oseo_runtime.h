@@ -93,6 +93,7 @@ typedef struct OseoRootFrame OseoRootFrame;
 typedef struct OseoHeapObject OseoHeapObject;
 typedef struct OseoContext OseoContext;
 typedef struct OseoConstructorScope OseoConstructorScope;
+typedef struct OseoActivation OseoActivation;
 
 typedef OseoResult (*OseoFunctionDispatcher)(
     OseoContext *context,
@@ -622,6 +623,19 @@ struct OseoContext {
     OseoValue realm_record;
     /* Saved caller realm for result checks; the call scope owns its life. */
     OseoConstructorScope *constructor_scope;
+    /*
+     * The most recent function activation that is still running, or NULL
+     * at top level and in job dispatch. Each record lives in the frame of
+     * the call that started it, and the legacy `caller` and `arguments`
+     * properties of non-strict functions read the chain (ADR 0034).
+     */
+    OseoActivation *activation;
+    /*
+     * The `arguments` and `caller` key strings, created on the first own-key
+     * listing of a function that has them and rooted for the context's
+     * lifetime, so a listing never allocates them in its copying pass.
+     */
+    OseoValue legacy_function_keys[2];
     /*
      * The agent's well-known symbols are a separate edition-fixed table
      * that every realm of the context shares.
@@ -1190,6 +1204,24 @@ OseoResult oseo_global_function_initialize(
     OseoValue value
 );
 OseoResult oseo_function_create(
+    OseoContext *context,
+    size_t code_id,
+    OseoValue environment,
+    const uint16_t *name_units,
+    size_t name_length,
+    size_t parameter_count,
+    OseoFunctionKind function_kind,
+    OseoValue lexical_this,
+    OseoValue inferred_name,
+    OseoFunctionNamePrefix name_prefix
+);
+/*
+ * `oseo_function_create` for a function whose code is non-strict. Such a
+ * function can be reported as another function's legacy `caller`, and a
+ * non-strict OSEO_FUNCTION_ORDINARY function also gets the own `caller`
+ * and `arguments` properties that ADR 0034 defines.
+ */
+OseoResult oseo_function_create_non_strict(
     OseoContext *context,
     size_t code_id,
     OseoValue environment,

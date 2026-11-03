@@ -1442,4 +1442,26 @@ rejection propagation walk explicit stacks, so graph depth never consumes
 native stack. The DFS stack, its frames, async parent lists, and the sorted
 ancestor list hold only table indices in untraced memory.
 
+ABI `m5-151` adds the legacy `caller` and `arguments` properties of
+[ADR 0034]. Generated code creates a non-strict function through
+`oseo_function_create_non_strict`, which marks it non-strict; only a non-strict
+`function` that is neither async nor a generator gets the two properties.
+`OseoContext` gains `activation`, the head of a chain of `OseoActivation`
+records on the native stack, and `legacy_function_keys`, the two key strings.
+Every call through the generic call path links a record naming the callee and
+its received arguments, except `Function.prototype.call`, `apply`,
+`Reflect.apply`, and `Reflect.construct`, which stay transparent. The tail call
+trampoline links a boundary record per step, and each generator and async
+resumption links one for its function. The collector traces the chain.
+
+Both properties are non-writable, non-enumerable, and configurable, and stay
+outside the property vector while live: `OseoFunction.legacy_live` says which
+are, and `legacy_arguments_position` keeps the own-key rank of a live
+`arguments`. A definition, including one from `Object.freeze` or
+`Object.seal`, moves a live property into the vector with its present value,
+and a delete clears its bit. An active function's `arguments` is created at
+the sites that hand a value to code, because a property query does not
+allocate.
+
 [ADR 0030]: https://github.com/dahlia/oseo/blob/main/docs/adr/0030-test262-unhandled-rejection-policy.md
+[ADR 0034]: https://github.com/dahlia/oseo/blob/main/docs/adr/0034-legacy-function-caller-contract.md
