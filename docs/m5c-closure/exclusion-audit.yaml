@@ -759,6 +759,39 @@ assessments:
       or source-compiling constructors, or on changed source,
       observation, or replacement evidence. The rows keep the
       `legacy-caller` cohort of the ADR 0028 selector.
+  es2026-small-dynamic-source:
+    disposition: exclusion
+    normativeDependency: source-evaluation-only
+    replacementEvidence:
+      tests/es2026-builtins-native.test.ts: "39cdcd3a997797f478249948269b63550f\
+        fdb304e26b806008ceb6af2940fae5"
+      tests/native/fixtures/error-is-error.ts: "e004e4fe172da79b2bf1391518fd9b1\
+        4fac9a53f79f15596fb4f44ac14005a25"
+      tests/native/fixtures/upsert.ts: "76d260a8ef0748cfaf30cb3d3b93d78ac14b420\
+        16a784d335bacc5fc7f2a81d6"
+    reason: Each test builds one of its values with the `Function`
+      constructor, which ADR 0016 excludes. The OSEO1001 rejection
+      stops the Map and WeakMap tests at compile time and the
+      other-realm `Function` call at run time. The function is an ordinary
+      argument, not the subject. Error.isError must return false for
+      it as for any other non-error object, and
+      Map.prototype.getOrInsertComputed and
+      WeakMap.prototype.getOrInsertComputed must accept it as a
+      callable callback whose undefined result becomes the stored
+      value. The other assertions of each test run in the fixtures
+      without dynamic source. The error-is-error-cross-realm fixture
+      checks Error.isError on other-realm Object, Array, and RegExp
+      instances, on other-realm function objects in place of the
+      constructed function, and on every other-realm error
+      constructor. The upsert fixture inserts through both methods
+      with a function expression, an arrow, a declaration, a bound
+      function, and an empty function expression in place of `new
+      Function()`, and reads each stored value back. Both
+      specialization policies run natively with forced collection
+      against Node.js or Deno. Only the source construction remains
+      excluded. Reopen on an ADR 0016 amendment admitting
+      source-compiling constructors, or on changed source,
+      observation, or replacement evidence.
   annex-b-out-of-bounds-prototype-setup:
     disposition: remediation
     remediationOwner: unit:annexb-object-accessors
@@ -5799,8 +5832,8 @@ assessments:
         "e72a8825962259d03d81348ee5cbee3184d7b0632018d4e6\
         b5feac705067650d"
       packages/runtime-c/native/runtime_internal.h:
-        "a2a3c4208a5588557fe09d4e451a6b7dd1a861fc2c41585c\
-        e365c77efb010fca"
+        "d7f4789ec3733e21aa77cf9902717eb483bf93355b636bf3\
+        6faf79537caa6b01"
       packages/runtime-c/native/oseo_runtime.h:
         "c924d8b90f9aa9f55ec958b402588eca7f2d9b99853dbe2b\
         bdf6dc86e3ad000c"
@@ -5808,8 +5841,8 @@ assessments:
         "bcf729b61049bdd7486c230c5cb653edfaae769360bc4d3e\
         e0c4f1eea10a663b"
       packages/runtime-c/src/index.ts:
-        "9cc38dbaafb1a454d1f60d825158f25135841c72b0a56a18\
-        e2c33de41ce61d98"
+        "92a2f24a155a769e4f5c36c593de3a9fe7012d51e3d04d7f\
+        9d888336186c6eb2"
   observation-train-b26a-b26b-b27:
     disposition: deferral
     normativeDependency: not-demonstrated
@@ -6465,6 +6498,17 @@ paths:
     subject: Default [[Prototype]] value derived from realm of
       the newTarget
     assessment: ds19-13
+  - path: test/built-ins/Error/isError/non-error-objects-other-realm.js
+    proposedOwner: adr:0016-dynamic-source-boundary
+    priorCohort: incidental-scaffolding
+    sourceDigest: "3cd2d907491ebdec8e6dc02671cd71830cdb9a08b82b35f1d4bb0aeb7fe\
+      45b32"
+    observationDigest: "98549af5127b761768af87aa8ab4f3952b900500373805a3055d94\
+      58ae4e74e3"
+    missingDynamicTag: false
+    section: sec-error.iserror
+    subject: "Returns false on non-Error objects from a different realm"
+    assessment: es2026-small-dynamic-source
   - path: "test/built-ins/Error/proto-from-ctor-realm.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "incidental-scaffolding"
@@ -8902,6 +8946,18 @@ paths:
     subject: Default [[Prototype]] value derived from realm of
       the newTarget
     assessment: ds19-28
+  - path: "test/built-ins/Map/prototype/getOrInsertComputed/different-types-fun\
+      ction-callbackfn-does-not-throw.js"
+    proposedOwner: adr:0016-dynamic-source-boundary
+    priorCohort: incidental-scaffolding
+    sourceDigest: "71b17afc0288c28e262b468e0a15b4d75fcb4c5f8872ab4f39a602a6902\
+      87189"
+    observationDigest: "5d48628ac0464d6cc729560cc2ccc30dd4a4970e43e61cbd9d59d5\
+      cc929d70bd"
+    missingDynamicTag: false
+    section: sec-map.prototype.getorinsertcomputed
+    subject: "Does not throw if `callbackfn` is callable."
+    assessment: es2026-small-dynamic-source
   - path: "test/built-ins/NativeErrors/EvalError/proto-from-ctor-re\
       alm.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -9808,6 +9864,18 @@ paths:
     subject: Default [[Prototype]] value derived from realm of
       the newTarget
     assessment: ds19-62
+  - path: "test/built-ins/WeakMap/prototype/getOrInsertComputed/adds-value-diff\
+      erent-callbackfn.js"
+    proposedOwner: adr:0016-dynamic-source-boundary
+    priorCohort: incidental-scaffolding
+    sourceDigest: "a1d9bf27b36af3dd434ff7bd3cb2f9f5f51ea87b1b52f594e74d6291844\
+      e01f8"
+    observationDigest: "92fadbf61de121063251a2033fb160b24ee41f69900b897e028f39\
+      f1b85fcb2d"
+    missingDynamicTag: false
+    section: sec-weakmap.prototype.getorinsertcomputed
+    subject: "Does not throw if `callbackfn` is callable."
+    assessment: es2026-small-dynamic-source
   - path: test/built-ins/WeakRef/proto-from-ctor-realm.js
     proposedOwner: adr:0016-dynamic-source-boundary
     priorCohort: incidental-scaffolding

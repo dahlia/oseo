@@ -1486,3 +1486,43 @@ component, or generated-code entry point is added.
 
 [ADR 0030]: https://github.com/dahlia/oseo/blob/main/docs/adr/0030-test262-unhandled-rejection-policy.md
 [ADR 0034]: https://github.com/dahlia/oseo/blob/main/docs/adr/0034-legacy-function-caller-contract.md
+
+
+ECMAScript 2026 built-ins
+-------------------------
+
+ABI `m5-151` adds `Error.isError` as an own function property of `%Error%`
+with the error component's code ID below `Error.prototype.toString`. It returns
+the `[[ErrorData]]` flag of an object's header and `false` for every other
+value. It reads no property, so a proxy answers `false` without consulting its
+target or handler. The generated-code ABI gains no entry point.
+
+ABI `m5-151` also appends `Math.sumPrecise` to the Math code range, after
+`trunc`, so the earlier Math code IDs keep their values. It accumulates every
+finite operand exactly in a 35-limb two's-complement integer of
+2<sup>-1074</sup> units, enough for 2<sup>53</sup> operands below
+2<sup>1024</sup>, and rounds once with ties to even, so a sum at or beyond
+2<sup>1024</sup> − 2<sup>970</sup> becomes an infinity. NaN, opposite
+infinities, and the `-0` start state follow the edition's state machine. A
+non-Number value closes the iterator before its `TypeError` propagates.
+
+ABI `m5-151` also adds `getOrInsert` and `getOrInsertComputed` to
+`%Map.prototype%` and `%WeakMap.prototype%`, with the Map and weak collection
+components' next code IDs. The four functions own no intrinsic slot, so the
+intrinsic table keeps its size; the WeakMap method table marks them with the
+`OSEO_INTRINSIC_COUNT` sentinel. The Map forms canonicalize `-0` to `+0` before
+the lookup, and the WeakMap forms reject a key that CanBeHeldWeakly refuses
+before anything else. The computed forms call the callback with `undefined` as
+the receiver and the key as the one argument, only when the key is absent, and
+then look the key up again, so a record the callback created takes the computed
+value. The WeakMap forms store through the existing ephemeron table.
+
+ABI `m5-151` also adds `Iterator.concat` as an own function property of
+`%Iterator%` with the iterator component's next code ID and no intrinsic slot.
+Its result is an iterator helper of the new `OSEO_ITERATOR_HELPER_CONCAT` kind,
+so it inherits from `%IteratorHelperPrototype%` and reuses the helper's traced
+fields: an internal array of method and iterable pairs in `callback`, the pair
+count in `remaining`, the next pair in `counter`, and the forwarded iterator in
+the inner fields. It has no underlying iterator, so `return` before the first
+step closes nothing and `return` at a yield closes only the forwarded
+iterator. No heap kind or traced field is added.

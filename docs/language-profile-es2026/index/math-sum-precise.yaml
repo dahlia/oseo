@@ -1,0 +1,3 @@
+version: 1
+id: math-sum-precise
+record: docs/language-profile-es2026/families/math-sum-precise.yaml

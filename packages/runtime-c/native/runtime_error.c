@@ -27,6 +27,21 @@ OseoResult oseo_internal_error_builtin_dispatch(
     if (code_id == OSEO_ERROR_TO_STRING_CODE_ID) {
         return oseo_internal_error_to_string(context, receiver);
     }
+    if (code_id == OSEO_ERROR_IS_ERROR_CODE_ID) {
+        /*
+         * Error.isError, 20.5.2.1, reports [[ErrorData]] alone. Every
+         * object header carries the flag, so a proxy answers false
+         * whatever its target is, and an object that only inherits
+         * from an error prototype answers false too.
+         */
+        OseoValue argument =
+            argument_count > 0u && arguments != NULL
+                ? arguments[0]
+                : oseo_undefined();
+        return normal(oseo_boolean(
+            is_object(argument) && ordinary_object(argument)->error_data
+        ));
+    }
     return oseo_unknown_function(context, code_id);
 }
 
@@ -143,7 +158,7 @@ static OseoResult error_intrinsic_pair(
     }
     const OseoPropertyAttributes hidden = {true, false, true, false};
     OseoRootFrame frame = {NULL, NULL, 0u};
-    OseoResult result = oseo_roots_allocate(context, &frame, 4u);
+    OseoResult result = oseo_roots_allocate(context, &frame, 5u);
     if (result.status != OSEO_STATUS_NORMAL) return result;
     OseoValue parent = kind == OSEO_ERROR_ERROR
         ? context->realm->intrinsics[OSEO_INTRINSIC_OBJECT_PROTOTYPE]
@@ -256,6 +271,37 @@ static OseoResult error_intrinsic_pair(
             frame.slots[3],
             hidden
         );
+    }
+    if (result.status == OSEO_STATUS_NORMAL && kind == OSEO_ERROR_ERROR) {
+        result = oseo_environment_create(context, 0u);
+        frame.slots[2] = result.value;
+        if (result.status == OSEO_STATUS_NORMAL) {
+            static const uint16_t is_error_units[] = {
+                'i', 's', 'E', 'r', 'r', 'o', 'r',
+            };
+            result = oseo_function_create(
+                context,
+                OSEO_ERROR_IS_ERROR_CODE_ID,
+                frame.slots[2],
+                is_error_units,
+                sizeof(is_error_units) / sizeof(*is_error_units),
+                1u,
+                OSEO_FUNCTION_INTERNAL,
+                oseo_undefined(),
+                oseo_undefined(),
+                OSEO_FUNCTION_NAME_PREFIX_NONE
+            );
+            frame.slots[4] = result.value;
+        }
+        if (result.status == OSEO_STATUS_NORMAL) {
+            result = define_ascii_property(
+                context,
+                frame.slots[3],
+                "isError",
+                frame.slots[4],
+                hidden
+            );
+        }
     }
     if (result.status == OSEO_STATUS_NORMAL) {
         *prototype_cache = frame.slots[0];

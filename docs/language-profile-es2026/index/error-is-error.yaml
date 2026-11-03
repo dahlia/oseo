@@ -1,0 +1,3 @@
+version: 1
+id: error-is-error
+record: docs/language-profile-es2026/families/error-is-error.yaml

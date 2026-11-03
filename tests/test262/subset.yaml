@@ -19,6 +19,7 @@ supportedFeatures:
   - DataView.prototype.getUint16
   - DataView.prototype.getUint32
   - DataView.prototype.setUint8
+  - Error.isError
   - FinalizationRegistry
   - Float16Array
   - Float32Array
@@ -30,6 +31,7 @@ supportedFeatures:
   - json-modules
   - json-superset
   - Map
+  - Math.sumPrecise
   - Object.fromEntries
   - Object.hasOwn
   - Object.is
@@ -95,6 +97,7 @@ supportedFeatures:
   - hashbang
   - import.meta
   - iterator-helpers
+  - iterator-sequencing
   - let
   - logical-assignment-operators
   - new.target
@@ -147,6 +150,7 @@ supportedFeatures:
   - Uint8ClampedArray
   - Uint16Array
   - Uint32Array
+  - upsert
   - well-formed-json-stringify
   - well-known-symbols
 tests:
@@ -16052,6 +16056,57 @@ tests:
   - path: test/built-ins/Error/is-a-constructor.js
     expectedClassification: pass
     dependencies: [error-intrinsics, functions]
+  - path: test/built-ins/Error/isError/bigints.js
+    expectedClassification: pass
+    dependencies: [bigint-primitive, error-intrinsics]
+  - path: test/built-ins/Error/isError/error-subclass.js
+    expectedClassification: pass
+    dependencies: [classes, error-intrinsics, iterator-protocol, symbols]
+  - path: test/built-ins/Error/isError/errors-other-realm.js
+    expectedClassification: pass
+    dependencies:
+      [
+        error-intrinsics,
+        iterator-protocol,
+        object-properties,
+        symbols,
+        var-bindings,
+      ]
+  - path: test/built-ins/Error/isError/errors.js
+    expectedClassification: pass
+    dependencies: [error-intrinsics, iterator-protocol, symbols]
+  - path: test/built-ins/Error/isError/fake-errors.js
+    expectedClassification: pass
+    dependencies: [error-intrinsics, object-literals, symbols, var-bindings]
+  - path: test/built-ins/Error/isError/is-a-constructor.js
+    expectedClassification: pass
+    dependencies: [abrupt-completion, error-intrinsics, functions]
+  - path: test/built-ins/Error/isError/name.js
+    expectedClassification: pass
+    dependencies: [error-intrinsics, object-properties]
+  - path: test/built-ins/Error/isError/non-error-objects-other-realm.js
+    expectedClassification: unsupported-profile-feature
+    dependencies:
+      [
+        dynamic-source,
+        error-intrinsics,
+        object-properties,
+        regular-expressions,
+        var-bindings,
+      ]
+  - path: test/built-ins/Error/isError/non-error-objects.js
+    expectedClassification: pass
+    dependencies:
+      [error-intrinsics, functions, object-literals, regular-expressions]
+  - path: test/built-ins/Error/isError/primitives.js
+    expectedClassification: pass
+    dependencies: [error-intrinsics]
+  - path: test/built-ins/Error/isError/prop-desc.js
+    expectedClassification: pass
+    dependencies: [error-intrinsics, object-properties]
+  - path: test/built-ins/Error/isError/symbols.js
+    expectedClassification: pass
+    dependencies: [error-intrinsics, symbols]
   - path: test/built-ins/Error/length.js
     expectedClassification: pass
     dependencies: [error-intrinsics, functions, object-properties, var-bindings]
@@ -19033,6 +19088,272 @@ tests:
   - path: test/built-ins/Infinity/prop-desc.js
     expectedClassification: pass
     dependencies: [object-properties]
+  - path: test/built-ins/Iterator/concat/arguments-checked-in-order.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        error-intrinsics,
+        expression-operators,
+        functions,
+        iterator-protocol,
+        lexical-bindings,
+        object-literals,
+        object-properties,
+        symbols,
+      ]
+  - path: test/built-ins/Iterator/concat/fresh-iterator-result.js
+    expectedClassification: pass
+    dependencies:
+      [functions, iterator-protocol, lexical-bindings, object-literals, symbols]
+  - path: test/built-ins/Iterator/concat/get-iterator-method-only-once.js
+    expectedClassification: pass
+    dependencies:
+      [
+        classes,
+        expression-operators,
+        functions,
+        iterator-protocol,
+        lexical-bindings,
+        object-properties,
+        symbols,
+      ]
+  - path: test/built-ins/Iterator/concat/get-iterator-method-throws.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        iterator-protocol,
+        object-literals,
+        object-properties,
+        symbols,
+        var-bindings,
+      ]
+  - path: test/built-ins/Iterator/concat/get-value-after-done.js
+    expectedClassification: pass
+    dependencies:
+      [
+        expression-operators,
+        functions,
+        iterator-protocol,
+        lexical-bindings,
+        object-literals,
+        object-properties,
+        symbols,
+      ]
+  - path: test/built-ins/Iterator/concat/inner-iterator-created-in-order.js
+    expectedClassification: pass
+    dependencies:
+      [iterator-protocol, lexical-bindings, object-literals, symbols]
+  - path: test/built-ins/Iterator/concat/is-function.js
+    expectedClassification: pass
+    dependencies: [expression-operators, iterator-protocol]
+  - path: test/built-ins/Iterator/concat/iterable-primitive-wrapper-objects.js
+    expectedClassification: pass
+    dependencies:
+      [
+        bigint-primitive,
+        functions,
+        iterator-protocol,
+        lexical-bindings,
+        object-literals,
+        object-properties,
+        symbols,
+      ]
+  - path: test/built-ins/Iterator/concat/length.js
+    expectedClassification: pass
+    dependencies: [iterator-protocol, object-properties]
+  - path: test/built-ins/Iterator/concat/many-arguments.js
+    expectedClassification: pass
+    dependencies: [iterator-protocol, lexical-bindings, symbols]
+  - path: test/built-ins/Iterator/concat/name.js
+    expectedClassification: pass
+    dependencies: [iterator-protocol, object-properties]
+  - path: test/built-ins/Iterator/concat/next-method-called-with-zero-arguments.js
+    expectedClassification: pass
+    dependencies:
+      [
+        expression-operators,
+        functions,
+        iterator-protocol,
+        lexical-bindings,
+        object-literals,
+        symbols,
+      ]
+  - path: test/built-ins/Iterator/concat/next-method-returns-non-object.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        error-intrinsics,
+        functions,
+        iterator-protocol,
+        lexical-bindings,
+        object-literals,
+        symbols,
+      ]
+  - path: test/built-ins/Iterator/concat/next-method-returns-throwing-done.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        functions,
+        iterator-protocol,
+        lexical-bindings,
+        object-literals,
+        object-properties,
+        symbols,
+      ]
+  - path: test/built-ins/Iterator/concat/next-method-returns-throwing-value-done.js
+    expectedClassification: pass
+    dependencies:
+      [
+        functions,
+        iterator-protocol,
+        lexical-bindings,
+        object-literals,
+        object-properties,
+        symbols,
+      ]
+  - path: test/built-ins/Iterator/concat/next-method-returns-throwing-value.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        functions,
+        iterator-protocol,
+        lexical-bindings,
+        object-literals,
+        object-properties,
+        symbols,
+      ]
+  - path: test/built-ins/Iterator/concat/next-method-throws.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        functions,
+        iterator-protocol,
+        lexical-bindings,
+        object-literals,
+        symbols,
+      ]
+  - path: test/built-ins/Iterator/concat/non-constructible.js
+    expectedClassification: pass
+    dependencies:
+      [abrupt-completion, error-intrinsics, functions, iterator-protocol]
+  - path: test/built-ins/Iterator/concat/prop-desc.js
+    expectedClassification: pass
+    dependencies: [iterator-protocol, object-properties]
+  - path: test/built-ins/Iterator/concat/proto.js
+    expectedClassification: pass
+    dependencies: [iterator-protocol]
+  - path: test/built-ins/Iterator/concat/result-is-iterator.js
+    expectedClassification: pass
+    dependencies:
+      [
+        expression-operators,
+        functions,
+        iterator-protocol,
+        object-literals,
+        symbols,
+        var-bindings,
+      ]
+  - path: test/built-ins/Iterator/concat/return-is-forwarded.js
+    expectedClassification: pass
+    dependencies:
+      [
+        expression-operators,
+        functions,
+        iterator-protocol,
+        lexical-bindings,
+        object-literals,
+        symbols,
+      ]
+  - path: test/built-ins/Iterator/concat/return-is-not-forwarded-after-exhaustion.js
+    expectedClassification: pass
+    dependencies:
+      [functions, iterator-protocol, lexical-bindings, object-literals, symbols]
+  - path: test/built-ins/Iterator/concat/return-is-not-forwarded-before-initial-start.js
+    expectedClassification: pass
+    dependencies:
+      [functions, iterator-protocol, lexical-bindings, object-literals, symbols]
+  - path: test/built-ins/Iterator/concat/return-method-called-with-zero-arguments.js
+    expectedClassification: pass
+    dependencies:
+      [
+        expression-operators,
+        functions,
+        iterator-protocol,
+        lexical-bindings,
+        object-literals,
+        symbols,
+      ]
+  - path: test/built-ins/Iterator/concat/single-argument.js
+    expectedClassification: pass
+    dependencies: [iterator-protocol, lexical-bindings]
+  - path: test/built-ins/Iterator/concat/throws-typeerror-when-generator-is-running-next.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        error-intrinsics,
+        expression-operators,
+        functions,
+        iterator-protocol,
+        lexical-bindings,
+        object-literals,
+        symbols,
+      ]
+  - path: test/built-ins/Iterator/concat/throws-typeerror-when-generator-is-running-return.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        error-intrinsics,
+        expression-operators,
+        functions,
+        iterator-protocol,
+        lexical-bindings,
+        object-literals,
+        symbols,
+      ]
+  - path: test/built-ins/Iterator/concat/throws-typeerror-when-iterable-not-an-object.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        bigint-primitive,
+        error-intrinsics,
+        iterator-protocol,
+        symbols,
+      ]
+  - path: test/built-ins/Iterator/concat/throws-typeerror-when-iterator-method-not-callable.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        bigint-primitive,
+        error-intrinsics,
+        iterator-protocol,
+        object-literals,
+        symbols,
+      ]
+  - path: test/built-ins/Iterator/concat/throws-typeerror-when-iterator-not-an-object.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        bigint-primitive,
+        error-intrinsics,
+        functions,
+        iterator-protocol,
+        symbols,
+        var-bindings,
+      ]
+  - path: test/built-ins/Iterator/concat/zero-arguments.js
+    expectedClassification: pass
+    dependencies: [iterator-protocol, lexical-bindings]
   - path: test/built-ins/Iterator/constructor.js
     expectedClassification: pass
     dependencies: [iterator-protocol]
@@ -20994,6 +21315,208 @@ tests:
   - path: test/built-ins/Map/prototype/get/this-not-object-throw.js
     expectedClassification: pass
     dependencies: [iterator-protocol]
+  - path: test/built-ins/Map/prototype/getOrInsert/append-new-values-normalizes-zero-key.js
+    expectedClassification: pass
+    dependencies: [iterator-protocol, var-bindings]
+  - path: test/built-ins/Map/prototype/getOrInsert/append-new-values.js
+    expectedClassification: pass
+    dependencies:
+      [functions, iterator-protocol, object-literals, symbols, var-bindings]
+  - path: test/built-ins/Map/prototype/getOrInsert/append-value-if-key-is-not-present-different-key-types.js
+    expectedClassification: pass
+    dependencies: [iterator-protocol, object-literals, symbols, var-bindings]
+  - path: test/built-ins/Map/prototype/getOrInsert/does-not-have-mapdata-internal-slot-set.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        error-intrinsics,
+        functions,
+        iterator-protocol,
+        var-bindings,
+      ]
+  - path: test/built-ins/Map/prototype/getOrInsert/does-not-have-mapdata-internal-slot-weakmap.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        error-intrinsics,
+        functions,
+        iterator-protocol,
+        var-bindings,
+      ]
+  - path: test/built-ins/Map/prototype/getOrInsert/does-not-have-mapdata-internal-slot.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        error-intrinsics,
+        functions,
+        iterator-protocol,
+        object-literals,
+        var-bindings,
+      ]
+  - path: test/built-ins/Map/prototype/getOrInsert/getOrInsert.js
+    expectedClassification: pass
+    dependencies: [expression-operators, iterator-protocol, object-properties]
+  - path: test/built-ins/Map/prototype/getOrInsert/length.js
+    expectedClassification: pass
+    dependencies: [iterator-protocol, object-properties]
+  - path: test/built-ins/Map/prototype/getOrInsert/name.js
+    expectedClassification: pass
+    dependencies: [iterator-protocol, object-properties]
+  - path: test/built-ins/Map/prototype/getOrInsert/not-a-constructor.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        error-intrinsics,
+        functions,
+        iterator-protocol,
+        lexical-bindings,
+      ]
+  - path: test/built-ins/Map/prototype/getOrInsert/returns-value-if-key-is-not-present-different-key-types.js
+    expectedClassification: pass
+    dependencies: [iterator-protocol, object-literals, symbols, var-bindings]
+  - path: test/built-ins/Map/prototype/getOrInsert/returns-value-if-key-is-present-different-key-types.js
+    expectedClassification: pass
+    dependencies: [iterator-protocol, object-literals, symbols, var-bindings]
+  - path: test/built-ins/Map/prototype/getOrInsert/returns-value-normalized-zero-key.js
+    expectedClassification: pass
+    dependencies: [iterator-protocol, var-bindings]
+  - path: test/built-ins/Map/prototype/getOrInsert/this-not-object-throw.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        error-intrinsics,
+        functions,
+        iterator-protocol,
+        symbols,
+        var-bindings,
+      ]
+  - path: test/built-ins/Map/prototype/getOrInsertComputed/append-new-values-normalizes-zero-key.js
+    expectedClassification: pass
+    dependencies: [functions, iterator-protocol, var-bindings]
+  - path: test/built-ins/Map/prototype/getOrInsertComputed/append-new-values.js
+    expectedClassification: pass
+    dependencies:
+      [functions, iterator-protocol, object-literals, symbols, var-bindings]
+  - path: test/built-ins/Map/prototype/getOrInsertComputed/append-value-if-key-is-not-present-different-key-types.js
+    expectedClassification: pass
+    dependencies:
+      [functions, iterator-protocol, object-literals, symbols, var-bindings]
+  - path: test/built-ins/Map/prototype/getOrInsertComputed/callbackfn-throws.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        error-intrinsics,
+        functions,
+        iterator-protocol,
+        var-bindings,
+      ]
+  - path: test/built-ins/Map/prototype/getOrInsertComputed/canonical-key-passed-to-callback.js
+    expectedClassification: pass
+    dependencies: [functions, iterator-protocol, var-bindings]
+  - path: test/built-ins/Map/prototype/getOrInsertComputed/check-callback-fn-args.js
+    expectedClassification: pass
+    dependencies: [functions, iterator-protocol, rest-parameters, var-bindings]
+  - path: test/built-ins/Map/prototype/getOrInsertComputed/check-state-after-callback-fn-throws.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        error-intrinsics,
+        functions,
+        iterator-protocol,
+        var-bindings,
+      ]
+  - path: test/built-ins/Map/prototype/getOrInsertComputed/different-types-function-callbackfn-does-not-throw.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [dynamic-source, functions, iterator-protocol, var-bindings]
+  - path: test/built-ins/Map/prototype/getOrInsertComputed/does-not-evaluate-callbackfn-if-key-present.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        error-intrinsics,
+        expression-operators,
+        functions,
+        iterator-protocol,
+        symbols,
+        var-bindings,
+      ]
+  - path: test/built-ins/Map/prototype/getOrInsertComputed/does-not-have-mapdata-internal-slot-set.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        error-intrinsics,
+        functions,
+        iterator-protocol,
+        var-bindings,
+      ]
+  - path: test/built-ins/Map/prototype/getOrInsertComputed/does-not-have-mapdata-internal-slot-weakmap.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        error-intrinsics,
+        functions,
+        iterator-protocol,
+        var-bindings,
+      ]
+  - path: test/built-ins/Map/prototype/getOrInsertComputed/getOrInsertComputed.js
+    expectedClassification: pass
+    dependencies: [iterator-protocol, object-literals]
+  - path: test/built-ins/Map/prototype/getOrInsertComputed/not-a-constructor.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        error-intrinsics,
+        functions,
+        iterator-protocol,
+        var-bindings,
+      ]
+  - path: test/built-ins/Map/prototype/getOrInsertComputed/not-a-function-callbackfn-throws.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        error-intrinsics,
+        iterator-protocol,
+        object-literals,
+        symbols,
+        var-bindings,
+      ]
+  - path: test/built-ins/Map/prototype/getOrInsertComputed/overwrites-mutation-from-callbackfn.js
+    expectedClassification: pass
+    dependencies: [functions, iterator-protocol, var-bindings]
+  - path: test/built-ins/Map/prototype/getOrInsertComputed/returns-value-if-key-is-not-present-different-key-types.js
+    expectedClassification: pass
+    dependencies:
+      [functions, iterator-protocol, object-literals, symbols, var-bindings]
+  - path: test/built-ins/Map/prototype/getOrInsertComputed/returns-value-if-key-is-present-different-key-types.js
+    expectedClassification: pass
+    dependencies:
+      [functions, iterator-protocol, object-literals, symbols, var-bindings]
+  - path: test/built-ins/Map/prototype/getOrInsertComputed/returns-value-normalized-zero-key.js
+    expectedClassification: pass
+    dependencies: [functions, iterator-protocol, var-bindings]
+  - path: test/built-ins/Map/prototype/getOrInsertComputed/this-not-object-throw.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        bigint-primitive,
+        error-intrinsics,
+        functions,
+        iterator-protocol,
+        symbols,
+        var-bindings,
+      ]
   - path: test/built-ins/Map/prototype/has/does-not-have-mapdata-internal-slot-set.js
     expectedClassification: pass
     dependencies: [iterator-protocol]
@@ -22074,6 +22597,60 @@ tests:
   - path: test/built-ins/Math/sqrt/results.js
     expectedClassification: pass
     dependencies: [functions, lexical-bindings, object-properties]
+  - path: test/built-ins/Math/sumPrecise/length.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Math/sumPrecise/name.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Math/sumPrecise/not-a-constructor.js
+    expectedClassification: pass
+    dependencies:
+      [abrupt-completion, error-intrinsics, functions, object-properties]
+  - path: test/built-ins/Math/sumPrecise/prop-desc.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Math/sumPrecise/sum-is-NaN.js
+    expectedClassification: pass
+    dependencies: [iterator-protocol, object-properties, symbols]
+  - path: test/built-ins/Math/sumPrecise/sum-is-infinite.js
+    expectedClassification: pass
+    dependencies: [iterator-protocol, object-properties, symbols]
+  - path: test/built-ins/Math/sumPrecise/sum-is-minus-zero.js
+    expectedClassification: pass
+    dependencies: [iterator-protocol, object-properties, symbols]
+  - path: test/built-ins/Math/sumPrecise/sum.js
+    expectedClassification: pass
+    dependencies: [iterator-protocol, object-properties, symbols]
+  - path: test/built-ins/Math/sumPrecise/takes-iterable.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        error-intrinsics,
+        functions,
+        generators,
+        iterator-protocol,
+        object-literals,
+        object-properties,
+        symbols,
+        var-bindings,
+      ]
+  - path: test/built-ins/Math/sumPrecise/throws-on-non-number.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        bigint-primitive,
+        error-intrinsics,
+        expression-operators,
+        functions,
+        iterator-protocol,
+        object-literals,
+        object-properties,
+        symbols,
+        var-bindings,
+      ]
   - path: test/built-ins/Math/tan/S15.8.2.18_A1.js
     expectedClassification: pass
     dependencies: [object-properties]
@@ -60070,6 +60647,309 @@ tests:
   - path: test/built-ins/WeakMap/prototype/get/this-not-object-throw.js
     expectedClassification: pass
     dependencies: [weak-collections]
+  - path: test/built-ins/WeakMap/prototype/getOrInsert/adds-object-element.js
+    expectedClassification: pass
+    dependencies: [object-literals, var-bindings, weak-collections]
+  - path: test/built-ins/WeakMap/prototype/getOrInsert/adds-symbol-element.js
+    expectedClassification: pass
+    dependencies: [symbols, var-bindings, weak-collections]
+  - path: test/built-ins/WeakMap/prototype/getOrInsert/does-not-have-weakmapdata-internal-slot-array.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        error-intrinsics,
+        functions,
+        object-literals,
+        var-bindings,
+        weak-collections,
+      ]
+  - path: test/built-ins/WeakMap/prototype/getOrInsert/does-not-have-weakmapdata-internal-slot-map.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        error-intrinsics,
+        functions,
+        object-literals,
+        var-bindings,
+        weak-collections,
+      ]
+  - path: test/built-ins/WeakMap/prototype/getOrInsert/does-not-have-weakmapdata-internal-slot-object.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        error-intrinsics,
+        functions,
+        object-literals,
+        var-bindings,
+        weak-collections,
+      ]
+  - path: test/built-ins/WeakMap/prototype/getOrInsert/does-not-have-weakmapdata-internal-slot-set.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        error-intrinsics,
+        functions,
+        object-literals,
+        var-bindings,
+        weak-collections,
+      ]
+  - path: test/built-ins/WeakMap/prototype/getOrInsert/does-not-have-weakmapdata-internal-slot-weakmap-prototype.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        error-intrinsics,
+        functions,
+        object-literals,
+        var-bindings,
+        weak-collections,
+      ]
+  - path: test/built-ins/WeakMap/prototype/getOrInsert/getOrInsert.js
+    expectedClassification: pass
+    dependencies: [expression-operators, object-properties, weak-collections]
+  - path: test/built-ins/WeakMap/prototype/getOrInsert/length.js
+    expectedClassification: pass
+    dependencies: [object-properties, weak-collections]
+  - path: test/built-ins/WeakMap/prototype/getOrInsert/name.js
+    expectedClassification: pass
+    dependencies: [object-properties, weak-collections]
+  - path: test/built-ins/WeakMap/prototype/getOrInsert/not-a-constructor.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        error-intrinsics,
+        functions,
+        lexical-bindings,
+        object-literals,
+        weak-collections,
+      ]
+  - path: test/built-ins/WeakMap/prototype/getOrInsert/returns-value-if-key-is-not-present-object-key.js
+    expectedClassification: pass
+    dependencies: [object-literals, var-bindings, weak-collections]
+  - path: test/built-ins/WeakMap/prototype/getOrInsert/returns-value-if-key-is-not-present-symbol-key.js
+    expectedClassification: pass
+    dependencies: [symbols, var-bindings, weak-collections]
+  - path: test/built-ins/WeakMap/prototype/getOrInsert/returns-value-if-key-is-present-object-key.js
+    expectedClassification: pass
+    dependencies:
+      [
+        iterator-protocol,
+        object-literals,
+        symbols,
+        var-bindings,
+        weak-collections,
+      ]
+  - path: test/built-ins/WeakMap/prototype/getOrInsert/returns-value-if-key-is-present-symbol-key.js
+    expectedClassification: pass
+    dependencies: [iterator-protocol, symbols, var-bindings, weak-collections]
+  - path: test/built-ins/WeakMap/prototype/getOrInsert/this-not-object-throw.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        error-intrinsics,
+        functions,
+        object-literals,
+        symbols,
+        var-bindings,
+        weak-collections,
+      ]
+  - path: test/built-ins/WeakMap/prototype/getOrInsert/throw-if-key-cannot-be-held-weakly.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        error-intrinsics,
+        symbols,
+        var-bindings,
+        weak-collections,
+      ]
+  - path: test/built-ins/WeakMap/prototype/getOrInsertComputed/adds-object-element.js
+    expectedClassification: pass
+    dependencies: [functions, object-literals, var-bindings, weak-collections]
+  - path: test/built-ins/WeakMap/prototype/getOrInsertComputed/adds-symbol-element.js
+    expectedClassification: pass
+    dependencies: [functions, symbols, var-bindings, weak-collections]
+  - path: test/built-ins/WeakMap/prototype/getOrInsertComputed/adds-value-different-callbackfn.js
+    expectedClassification: unsupported-profile-feature
+    dependencies:
+      [
+        dynamic-source,
+        functions,
+        object-literals,
+        var-bindings,
+        weak-collections,
+      ]
+  - path: test/built-ins/WeakMap/prototype/getOrInsertComputed/callbackfn-throws.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        error-intrinsics,
+        functions,
+        object-literals,
+        var-bindings,
+        weak-collections,
+      ]
+  - path: test/built-ins/WeakMap/prototype/getOrInsertComputed/check-callback-fn-args.js
+    expectedClassification: pass
+    dependencies: [functions, symbols, var-bindings, weak-collections]
+  - path: test/built-ins/WeakMap/prototype/getOrInsertComputed/check-state-after-callback-fn-throws.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        error-intrinsics,
+        functions,
+        lexical-bindings,
+        object-literals,
+        symbols,
+        var-bindings,
+        weak-collections,
+      ]
+  - path: test/built-ins/WeakMap/prototype/getOrInsertComputed/does-not-evaluate-callbackfn-if-key-present.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        error-intrinsics,
+        expression-operators,
+        functions,
+        lexical-bindings,
+        object-literals,
+        weak-collections,
+      ]
+  - path: test/built-ins/WeakMap/prototype/getOrInsertComputed/does-not-have-weakmapdata-internal-slot-array.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        error-intrinsics,
+        functions,
+        object-literals,
+        var-bindings,
+        weak-collections,
+      ]
+  - path: test/built-ins/WeakMap/prototype/getOrInsertComputed/does-not-have-weakmapdata-internal-slot-map.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        error-intrinsics,
+        functions,
+        object-literals,
+        var-bindings,
+        weak-collections,
+      ]
+  - path: test/built-ins/WeakMap/prototype/getOrInsertComputed/does-not-have-weakmapdata-internal-slot-object.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        error-intrinsics,
+        functions,
+        object-literals,
+        var-bindings,
+        weak-collections,
+      ]
+  - path: test/built-ins/WeakMap/prototype/getOrInsertComputed/does-not-have-weakmapdata-internal-slot-set.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        error-intrinsics,
+        functions,
+        object-literals,
+        var-bindings,
+        weak-collections,
+      ]
+  - path: test/built-ins/WeakMap/prototype/getOrInsertComputed/does-not-have-weakmapdata-internal-slot-weakmap-prototype.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        error-intrinsics,
+        functions,
+        object-literals,
+        var-bindings,
+        weak-collections,
+      ]
+  - path: test/built-ins/WeakMap/prototype/getOrInsertComputed/getOrInsertComputed.js
+    expectedClassification: pass
+    dependencies: [object-literals, weak-collections]
+  - path: test/built-ins/WeakMap/prototype/getOrInsertComputed/not-a-constructor.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        error-intrinsics,
+        functions,
+        lexical-bindings,
+        object-literals,
+        weak-collections,
+      ]
+  - path: test/built-ins/WeakMap/prototype/getOrInsertComputed/not-a-function-callbackfn-throws.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        error-intrinsics,
+        object-literals,
+        symbols,
+        var-bindings,
+        weak-collections,
+      ]
+  - path: test/built-ins/WeakMap/prototype/getOrInsertComputed/overwrites-mutation-from-callbackfn.js
+    expectedClassification: pass
+    dependencies: [functions, object-literals, var-bindings, weak-collections]
+  - path: test/built-ins/WeakMap/prototype/getOrInsertComputed/returns-value-if-key-is-not-present-object-key.js
+    expectedClassification: pass
+    dependencies: [functions, object-literals, var-bindings, weak-collections]
+  - path: test/built-ins/WeakMap/prototype/getOrInsertComputed/returns-value-if-key-is-not-present-symbol-key.js
+    expectedClassification: pass
+    dependencies: [functions, symbols, var-bindings, weak-collections]
+  - path: test/built-ins/WeakMap/prototype/getOrInsertComputed/returns-value-if-key-is-present-object-key.js
+    expectedClassification: pass
+    dependencies:
+      [
+        functions,
+        iterator-protocol,
+        object-literals,
+        symbols,
+        var-bindings,
+        weak-collections,
+      ]
+  - path: test/built-ins/WeakMap/prototype/getOrInsertComputed/returns-value-if-key-is-present-symbol-key.js
+    expectedClassification: pass
+    dependencies:
+      [functions, iterator-protocol, symbols, var-bindings, weak-collections]
+  - path: test/built-ins/WeakMap/prototype/getOrInsertComputed/this-not-object-throw.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        error-intrinsics,
+        functions,
+        object-literals,
+        symbols,
+        var-bindings,
+        weak-collections,
+      ]
+  - path: test/built-ins/WeakMap/prototype/getOrInsertComputed/throw-if-key-cannot-be-held-weakly.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        error-intrinsics,
+        symbols,
+        var-bindings,
+        weak-collections,
+      ]
   - path: test/built-ins/WeakMap/prototype/has/does-not-have-weakmapdata-internal-slot-array.js
     expectedClassification: pass
     dependencies: [weak-collections]

@@ -1,0 +1,3 @@
+version: 1
+id: upsert
+record: docs/language-profile-es2026/families/upsert.yaml

@@ -429,6 +429,84 @@ static OseoResult weak_collection_store(
     return result.status == OSEO_STATUS_NORMAL ? normal(slots[0]) : result;
 }
 
+/*
+ * WeakMap.prototype.getOrInsert and getOrInsertComputed, ECMAScript
+ * 2026 24.3.3.3 and 24.3.3.4. Both reject a key that cannot be held
+ * weakly, so a registered symbol or a primitive never reaches the
+ * ephemeron table. The computed form checks callability next, runs the
+ * callback with undefined as its receiver only when the key is absent,
+ * and then stores the result even when the callback inserted the key
+ * itself, which is what the table's replacing set does.
+ */
+static OseoResult weak_map_get_or_insert(
+    OseoContext *context,
+    OseoValue receiver,
+    OseoValue key,
+    OseoValue operand,
+    bool computed
+) {
+    OseoResult checked = weak_collection_receiver(
+        context,
+        receiver,
+        true,
+        computed
+            ? "WeakMap.prototype.getOrInsertComputed receiver is not a "
+              "WeakMap."
+            : "WeakMap.prototype.getOrInsert receiver is not a WeakMap."
+    );
+    if (checked.status != OSEO_STATUS_NORMAL) return checked;
+    if (!can_be_held_weakly(key)) {
+        return oseo_internal_throw_error(
+            context,
+            OSEO_ERROR_TYPE,
+            "Invalid value used as a WeakMap key."
+        );
+    }
+    if (computed && !is_callable(operand)) {
+        return oseo_internal_throw_error(
+            context,
+            OSEO_ERROR_TYPE,
+            "WeakMap.prototype.getOrInsertComputed callback is not "
+            "callable."
+        );
+    }
+    OseoValue existing = oseo_undefined();
+    if (oseo_internal_ephemeron_get(
+            weak_collection_object(receiver)->table,
+            key,
+            &existing
+        )) {
+        return normal(existing);
+    }
+    /* 0 map, 1 callback or value, 2 key (the one call argument), 3 value. */
+    OseoValue slots[4] = {receiver, operand, key, operand};
+    OseoRootFrame frame = {NULL, slots, 4u};
+    oseo_roots_push(context, &frame);
+    OseoResult result = normal(oseo_undefined());
+    if (computed) {
+        result = oseo_call_function(
+            context,
+            slots[1],
+            oseo_undefined(),
+            1u,
+            &slots[2],
+            oseo_undefined()
+        );
+        slots[3] = result.value;
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = oseo_internal_ephemeron_set(
+            context,
+            weak_collection_object(slots[0])->table,
+            slots[2],
+            slots[3]
+        );
+    }
+    if (result.status == OSEO_STATUS_NORMAL) result = normal(slots[3]);
+    oseo_roots_pop(context, &frame);
+    return result;
+}
+
 static OseoResult weak_set_delete(
     OseoContext *context,
     OseoValue receiver,
@@ -797,6 +875,16 @@ OseoResult oseo_internal_weak_collection_builtin_dispatch(
             true
         );
     }
+    if (code_id == OSEO_WEAK_MAP_GET_OR_INSERT_CODE_ID ||
+        code_id == OSEO_WEAK_MAP_GET_OR_INSERT_COMPUTED_CODE_ID) {
+        return weak_map_get_or_insert(
+            context,
+            receiver,
+            first,
+            argument_at(argument_count, arguments, 1u),
+            code_id == OSEO_WEAK_MAP_GET_OR_INSERT_COMPUTED_CODE_ID
+        );
+    }
     if (code_id == OSEO_WEAK_SET_CONSTRUCTOR_CODE_ID) {
         return weak_collection_construct(context, false, first, new_target);
     }
@@ -930,6 +1018,19 @@ static const OseoWeakMethod weak_map_methods[] = {
     {OSEO_INTRINSIC_WEAK_MAP_GET, OSEO_WEAK_MAP_GET_CODE_ID, "get", 1u},
     {OSEO_INTRINSIC_WEAK_MAP_HAS, OSEO_WEAK_MAP_HAS_CODE_ID, "has", 1u},
     {OSEO_INTRINSIC_WEAK_MAP_SET, OSEO_WEAK_MAP_SET_CODE_ID, "set", 2u},
+    /* The ECMAScript 2026 upsert methods own no intrinsic slot. */
+    {
+        OSEO_INTRINSIC_COUNT,
+        OSEO_WEAK_MAP_GET_OR_INSERT_CODE_ID,
+        "getOrInsert",
+        2u,
+    },
+    {
+        OSEO_INTRINSIC_COUNT,
+        OSEO_WEAK_MAP_GET_OR_INSERT_COMPUTED_CODE_ID,
+        "getOrInsertComputed",
+        2u,
+    },
 };
 
 static const OseoWeakMethod weak_set_methods[] = {
@@ -1060,7 +1161,9 @@ static OseoResult weak_constructor_build(
         );
         slots[3] = result.value;
         if (result.status != OSEO_STATUS_NORMAL) break;
-        context->realm->intrinsics[entry->intrinsic] = slots[3];
+        if (entry->intrinsic != OSEO_INTRINSIC_COUNT) {
+            context->realm->intrinsics[entry->intrinsic] = slots[3];
+        }
         result = define_ascii_property(
             context,
             slots[1],

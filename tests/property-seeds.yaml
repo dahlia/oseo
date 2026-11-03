@@ -624,3 +624,19 @@ families:
     owner: tests/property/m5-annexb-date-methods.property.test.ts
     start: 0x60009f00
     end: 0x60009fff
+  - family: es2026-error-is-error
+    owner: tests/property/es2026-error-is-error.property.test.ts
+    start: 0x60009900
+    end: 0x600099ff
+  - family: es2026-math-sum-precise
+    owner: tests/property/es2026-math-sum-precise.property.test.ts
+    start: 0x60009a00
+    end: 0x60009aff
+  - family: es2026-upsert
+    owner: tests/property/es2026-upsert.property.test.ts
+    start: 0x60009b00
+    end: 0x60009bff
+  - family: es2026-iterator-concat
+    owner: tests/property/es2026-iterator-concat.property.test.ts
+    start: 0x60009c00
+    end: 0x60009cff

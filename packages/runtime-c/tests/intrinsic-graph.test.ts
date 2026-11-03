@@ -1131,6 +1131,7 @@ test("populates the realm-owned Math namespace object", () => {
     "tan",
     "tanh",
     "trunc",
+    "sumPrecise",
   ]) {
     assert.match(mathSource, new RegExp(`"${property}"`, "u"));
   }
@@ -2886,4 +2887,86 @@ test("shares Shared Data Blocks and waiters across an agent cluster", () => {
   assert.match(atomicsSource, /oseo_internal_agent_notify_one\(/u);
   assert.match(atomicsSource, /oseo_internal_agent_suspend\(/u);
   assert.match(atomicsSource, /oseo_internal_agent_yield\(context\)/u);
+});
+
+test("installs Error.isError as one [[ErrorData]] query", () => {
+  const internalHeader = sources.get("runtime_internal.h") ?? "";
+  const errorSource = sources.get("runtime_error.c") ?? "";
+  // The code ID sits below toString in the error range, so it cannot
+  // collide with a constructor kind.
+  assert.match(
+    internalHeader,
+    new RegExp(
+      String.raw`#define OSEO_ERROR_IS_ERROR_CODE_ID \\\n {4}` +
+        String.raw`\(OSEO_ERROR_CODE_ID_RANGE_LAST - OSEO_ERROR_KIND_COUNT` +
+        String.raw` - 1u\)`,
+      "u",
+    ),
+  );
+  // Only %Error% owns the function; the other constructors inherit it.
+  // toString's block precedes it with the same guard, so take the last.
+  const ownerGuard = errorSource.lastIndexOf(
+    "kind == OSEO_ERROR_ERROR) {\n        result = oseo_environment_create",
+  );
+  assert.ok(ownerGuard > 0);
+  assert.ok(
+    errorSource.indexOf("is_error_units", ownerGuard) - ownerGuard < 300,
+  );
+  // The answer reads the object header flag alone, so a proxy reports
+  // false without consulting its target or any handler trap.
+  assert.match(
+    errorSource,
+    /is_object\(argument\) && ordinary_object\(argument\)->error_data/u,
+  );
+});
+
+test("sums Math.sumPrecise operands exactly before one rounding", () => {
+  const internalHeader = sources.get("runtime_internal.h") ?? "";
+  const mathSource = sources.get("runtime_math.c") ?? "";
+  // The function is appended, so the earlier code IDs keep their places.
+  assert.match(mathSource, /OSEO_MATH_SUM_PRECISE = 36,/u);
+  assert.match(internalHeader, /OSEO_MATH_FUNCTION_COUNT \(\(size_t\)37u\)/u);
+  // Enough limbs for 2**53 values below 2**1024 at 2**-1074 resolution.
+  assert.match(mathSource, /OSEO_SUM_PRECISE_LIMBS \(\(size_t\)35u\)/u);
+  // A non-Number closes the iterator before its TypeError propagates.
+  assert.match(mathSource, /oseo_iterator_close\(context, slots\[0\], true\)/u);
+});
+
+test("adds the upsert methods without intrinsic slots", () => {
+  const mapSource = sources.get("runtime_map.c") ?? "";
+  const weakSource = sources.get("runtime_weak_collection.c") ?? "";
+  for (const name of ["getOrInsert", "getOrInsertComputed"]) {
+    assert.match(mapSource, new RegExp(`"${name}"`, "u"));
+    assert.match(weakSource, new RegExp(`"${name}"`, "u"));
+  }
+  // The intrinsic table keeps its size; the WeakMap method table marks
+  // the two methods with the count sentinel and the builder skips it.
+  assert.match(
+    weakSource,
+    /if \(entry->intrinsic != OSEO_INTRINSIC_COUNT\) \{/u,
+  );
+  // A computed insertion looks the key up again after the callback, so
+  // a record the callback created takes the computed value.
+  assert.match(mapSource, /index = map_entry_find\(map, slots\[2\]\);/u);
+  assert.match(weakSource, /oseo_internal_ephemeron_set\(\n {12}context,/u);
+});
+
+test("runs Iterator.concat as an iterator helper without an underlying", () => {
+  const internalHeader = sources.get("runtime_internal.h") ?? "";
+  const iteratorSource = sources.get("runtime_iterator.c") ?? "";
+  // The helper kind reuses %IteratorHelperPrototype% and the helper's
+  // traced fields, so no heap kind or traced field is added.
+  assert.match(internalHeader, /OSEO_ITERATOR_HELPER_CONCAT = 5,/u);
+  assert.ok(
+    iteratorSource.includes(
+      "OSEO_ITERATOR_HELPER_CONCAT,\n            oseo_undefined(),\n" +
+        "            oseo_undefined(),",
+    ),
+  );
+  // return closes only the active inner iterator and never an
+  // underlying one, which concat does not have.
+  assert.match(
+    iteratorSource,
+    /if \(result\.status == OSEO_STATUS_NORMAL && !concat\) \{/u,
+  );
 });

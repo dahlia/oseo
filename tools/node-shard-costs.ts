@@ -6,10 +6,10 @@
  * `9f21b607`, candidate run 41233967056 at `636157ef`, and main run
  * 41238903460 at `8770b2e4`. The largest is kept on purpose: the residual
  * evidence file took 1.36 times longer on one of those Linux runners than
- * on another, and the margin the shards keep is a slow runner's. Twelve
- * files postdate those runs and scale a serial local measurement on the
- * same host by the residual-evidence ratio: 2.574 on Linux and 1.974 on
- * macOS.
+ * on another, and the margin the shards keep is a slow runner's.
+ * Seventeen files postdate those runs and scale a serial local
+ * measurement on the same host by the residual-evidence ratio: 2.574 on
+ * Linux and 1.974 on macOS.
  * Files below 30 seconds have no entry and weigh the host fallback, the
  * median of every measured weight. These are concurrent test durations,
  * not file wall times. *docs/evidence/node-shards/README.md* records the
@@ -27,6 +27,7 @@ export const nodeShardCosts = {
     "tests/dynamic-source-realm-host-evidence.test.ts": 309,
     "tests/dynamic-source-residual-evidence.test.ts": 2055,
     "tests/dynamic-source-static-core.test.ts": 72,
+    "tests/es2026-builtins-native.test.ts": 34,
     "tests/function-constructor-evidence.test.ts": 143,
     "tests/harness-native.test.ts": 326,
     "tests/harness-resource.test.ts": 47,
@@ -45,6 +46,8 @@ export const nodeShardCosts = {
     "tests/m5c-observation-batches.test.ts": 34,
     "tests/native-io/clock-wakeup.test.ts": 174,
     "tests/primitive-wrapper-objects.test.ts": 214,
+    "tests/property/es2026-iterator-concat.property.test.ts": 38,
+    "tests/property/es2026-upsert.property.test.ts": 68,
     "tests/property/m5-annexb-date-methods.property.test.ts": 32,
     "tests/property/m5-annexb-escape.property.test.ts": 87,
     "tests/property/m5-annexb-legacy-lookup-boundary.property.test.ts": 33,
@@ -161,6 +164,7 @@ export const nodeShardCosts = {
     "tests/m5c-observation-batches.test.ts": 32,
     "tests/native-io/clock-wakeup.test.ts": 230,
     "tests/primitive-wrapper-objects.test.ts": 199,
+    "tests/property/es2026-upsert.property.test.ts": 52,
     "tests/property/m5-annexb-escape.property.test.ts": 67,
     "tests/property/m5-annexb-legacy-lookup-boundary.property.test.ts": 35,
     "tests/property/m5-annexb-proto-boundary.property.test.ts": 69,

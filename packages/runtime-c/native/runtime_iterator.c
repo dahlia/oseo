@@ -1,6 +1,7 @@
 #include "runtime_internal.h"
 
 #include <math.h>
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -20,6 +21,11 @@ static OseoResult iterator_prototype_accessor(
     OseoContext *context,
     size_t code_id,
     OseoValue receiver,
+    size_t argument_count,
+    const OseoValue *arguments
+);
+static OseoResult iterator_concat(
+    OseoContext *context,
     size_t argument_count,
     const OseoValue *arguments
 );
@@ -104,6 +110,9 @@ OseoResult oseo_internal_iterator_builtin_dispatch(
             ? arguments[0]
             : oseo_undefined();
         return iterator_from(context, value);
+    }
+    if (code_id == OSEO_ITERATOR_CONCAT_CODE_ID) {
+        return iterator_concat(context, argument_count, arguments);
     }
     if (code_id == OSEO_WRAP_FOR_VALID_ITERATOR_NEXT_CODE_ID) {
         return wrap_for_valid_iterator_next(context, receiver);
@@ -561,6 +570,30 @@ OseoResult oseo_internal_array_iterator_prototype(OseoContext *context) {
             frame.slots[2],
             frame.slots[3],
             context->realm->intrinsics[OSEO_INTRINSIC_ITERATOR_FROM]
+        );
+    }
+    /* Iterator.concat owns no intrinsic slot. */
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = create_iterator_builtin(
+            context,
+            OSEO_ITERATOR_CONCAT_CODE_ID,
+            "concat",
+            0u,
+            OSEO_FUNCTION_INTERNAL,
+            OSEO_FUNCTION_NAME_PREFIX_NONE
+        );
+        frame.slots[4] = result.value;
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = ascii_iterator_string(context, "concat");
+        frame.slots[3] = result.value;
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = define_iterator_data(
+            context,
+            frame.slots[2],
+            frame.slots[3],
+            frame.slots[4]
         );
     }
     if (result.status == OSEO_STATUS_NORMAL) {
@@ -1585,6 +1618,212 @@ static OseoResult iterator_helper_advance(
     return result;
 }
 
+/* Read one element of the internal Iterator.concat record array. Its
+ * elements are own data properties, so the read runs no user code. */
+static OseoResult concat_record(
+    OseoContext *context,
+    OseoValue records,
+    size_t index,
+    OseoValue *value
+) {
+    char digits[24];
+    (void)snprintf(digits, sizeof(digits), "%zu", index);
+    OseoValue slots[2] = {records, oseo_undefined()};
+    OseoRootFrame frame = {NULL, slots, 2u};
+    oseo_roots_push(context, &frame);
+    OseoResult result = ascii_iterator_string(context, digits);
+    slots[1] = result.value;
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = oseo_object_get(context, slots[0], slots[1]);
+        if (result.status == OSEO_STATUS_NORMAL) *value = result.value;
+    }
+    oseo_roots_pop(context, &frame);
+    return result;
+}
+
+/*
+ * Iterator.concat(...items), ECMAScript 2026 27.1.3.1. Every item must
+ * be an object whose Symbol.iterator method is read now, exactly once,
+ * and must be callable; nothing is opened until the result is stepped.
+ */
+static OseoResult iterator_concat(
+    OseoContext *context,
+    size_t argument_count,
+    const OseoValue *arguments
+) {
+    if (argument_count > 0u && arguments == NULL) {
+        return failure(
+            context,
+            "OSEO2001",
+            "Iterator.concat arguments are missing."
+        );
+    }
+    /* 0 records, 1 item, 2 method, 3 Symbol.iterator. */
+    OseoValue slots[4] = {
+        oseo_undefined(),
+        oseo_undefined(),
+        oseo_undefined(),
+        oseo_undefined(),
+    };
+    OseoRootFrame frame = {NULL, slots, 4u};
+    oseo_roots_push(context, &frame);
+    OseoResult result = oseo_array_create(context, 0u);
+    slots[0] = result.value;
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = oseo_internal_well_known_symbol(
+            context,
+            OSEO_WELL_KNOWN_ITERATOR
+        );
+        slots[3] = result.value;
+    }
+    for (size_t index = 0u;
+         result.status == OSEO_STATUS_NORMAL && index < argument_count;
+         index += 1u) {
+        slots[1] = arguments[index];
+        if (!is_object(slots[1])) {
+            result = iterator_type_error(
+                context,
+                "Iterator.concat requires every item to be an object."
+            );
+            break;
+        }
+        result = oseo_object_get(context, slots[1], slots[3]);
+        slots[2] = result.value;
+        if (result.status != OSEO_STATUS_NORMAL) break;
+        if (is_nullish(slots[2])) {
+            result = iterator_type_error(
+                context,
+                "Iterator.concat requires every item to be iterable."
+            );
+            break;
+        }
+        if (!is_callable(slots[2])) {
+            result = iterator_type_error(
+                context,
+                "The Symbol.iterator property is not callable."
+            );
+            break;
+        }
+        result = oseo_array_append(context, slots[0], slots[2]);
+        if (result.status == OSEO_STATUS_NORMAL) {
+            result = oseo_array_append(context, slots[0], slots[1]);
+        }
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = iterator_helper_create(
+            context,
+            OSEO_ITERATOR_HELPER_CONCAT,
+            oseo_undefined(),
+            oseo_undefined(),
+            slots[0],
+            (double)argument_count
+        );
+    }
+    oseo_roots_pop(context, &frame);
+    return result;
+}
+
+/*
+ * One resumption of the Iterator.concat closure. It forwards the active
+ * inner iterator's values and, once that iterator is done, opens the
+ * next item by calling its captured method on it and reading `next`
+ * once. A throw while stepping or opening propagates without a close,
+ * which is what IteratorStepValue and the open step specify.
+ */
+static OseoResult iterator_concat_advance(
+    OseoContext *context,
+    OseoValue helper_value,
+    OseoValue *yielded,
+    bool *closure_done
+) {
+    *closure_done = false;
+    /* 0 helper, 1 records, 2 stepped value or opened iterator,
+     * 3 method, 4 item. */
+    OseoValue slots[5] = {
+        helper_value,
+        oseo_undefined(),
+        oseo_undefined(),
+        oseo_undefined(),
+        oseo_undefined(),
+    };
+    OseoRootFrame frame = {NULL, slots, 5u};
+    oseo_roots_push(context, &frame);
+    OseoResult result = normal(oseo_undefined());
+    while (result.status == OSEO_STATUS_NORMAL) {
+        OseoIteratorHelper *helper = iterator_helper_object(slots[0]);
+        if (helper->inner_alive) {
+            bool inner_done = false;
+            result = helper_iterator_step(
+                context,
+                helper->inner_iterator,
+                helper->inner_next,
+                true,
+                &slots[2],
+                &inner_done
+            );
+            if (result.status != OSEO_STATUS_NORMAL) break;
+            if (!inner_done) {
+                *yielded = slots[2];
+                break;
+            }
+            helper = iterator_helper_object(slots[0]);
+            helper->inner_alive = false;
+            helper->inner_iterator = oseo_undefined();
+            helper->inner_next = oseo_undefined();
+            continue;
+        }
+        if (!(helper->counter < helper->remaining)) {
+            *closure_done = true;
+            break;
+        }
+        size_t pair = (size_t)helper->counter;
+        helper->counter += 1.0;
+        slots[1] = helper->callback;
+        result = concat_record(context, slots[1], pair * 2u, &slots[3]);
+        if (result.status == OSEO_STATUS_NORMAL) {
+            result = concat_record(
+                context,
+                slots[1],
+                pair * 2u + 1u,
+                &slots[4]
+            );
+        }
+        if (result.status == OSEO_STATUS_NORMAL) {
+            result = oseo_call_function(
+                context,
+                slots[3],
+                slots[4],
+                0u,
+                NULL,
+                oseo_undefined()
+            );
+            slots[2] = result.value;
+        }
+        if (result.status == OSEO_STATUS_NORMAL && !is_object(slots[2])) {
+            result = iterator_type_error(
+                context,
+                "The iterator method did not return an object."
+            );
+        }
+        if (result.status == OSEO_STATUS_NORMAL) {
+            OseoValue next_method = oseo_undefined();
+            result = helper_get_iterator_direct(
+                context,
+                slots[2],
+                &next_method
+            );
+            if (result.status == OSEO_STATUS_NORMAL) {
+                helper = iterator_helper_object(slots[0]);
+                helper->inner_iterator = slots[2];
+                helper->inner_next = next_method;
+                helper->inner_alive = true;
+            }
+        }
+    }
+    oseo_roots_pop(context, &frame);
+    return result;
+}
+
 /* GeneratorResume for a helper: %IteratorHelperPrototype%.next. */
 static OseoResult iterator_helper_resume(
     OseoContext *context,
@@ -1612,12 +1851,14 @@ static OseoResult iterator_helper_resume(
     OseoRootFrame frame = {NULL, slots, 2u};
     oseo_roots_push(context, &frame);
     bool closure_done = false;
-    OseoResult result = iterator_helper_advance(
-        context,
-        slots[0],
-        &slots[1],
-        &closure_done
-    );
+    OseoResult result = helper->kind == OSEO_ITERATOR_HELPER_CONCAT
+        ? iterator_concat_advance(context, slots[0], &slots[1], &closure_done)
+        : iterator_helper_advance(
+            context,
+            slots[0],
+            &slots[1],
+            &closure_done
+        );
     helper = iterator_helper_object(slots[0]);
     if (result.status != OSEO_STATUS_NORMAL || closure_done) {
         helper->state = OSEO_ITERATOR_HELPER_COMPLETED;
@@ -1670,8 +1911,12 @@ static OseoResult iterator_helper_return(
     }
     bool suspended_yield =
         helper->state == OSEO_ITERATOR_HELPER_SUSPENDED_YIELD;
+    /* Iterator.concat has no underlying iterator: before its first step
+     * it closes nothing, and at its yield it closes only the inner
+     * iterator it is forwarding. */
+    bool concat = helper->kind == OSEO_ITERATOR_HELPER_CONCAT;
     bool close_inner = suspended_yield &&
-        helper->kind == OSEO_ITERATOR_HELPER_FLAT_MAP &&
+        (helper->kind == OSEO_ITERATOR_HELPER_FLAT_MAP || concat) &&
         helper->inner_alive;
     /*
      * A helper that has never run completes before its close runs, which
@@ -1699,11 +1944,11 @@ static OseoResult iterator_helper_return(
     OseoResult result = normal(oseo_undefined());
     if (close_inner) {
         result = oseo_iterator_close(context, slots[2], false);
-        if (result.status != OSEO_STATUS_NORMAL) {
+        if (result.status != OSEO_STATUS_NORMAL && !concat) {
             result = helper_close_after_abrupt(context, slots[1], result);
         }
     }
-    if (result.status == OSEO_STATUS_NORMAL) {
+    if (result.status == OSEO_STATUS_NORMAL && !concat) {
         result = oseo_iterator_close(context, slots[1], false);
     }
     /* The resumed closure has finished, normally or abruptly, so the

@@ -13,8 +13,10 @@ the [M5 exit report](./m5c-closure/m5-exit-report.md) keeps the M5 result.
 
 A change that admits or measures behavior inside this boundary updates this
 document in the same change. A family's status describes tested current
-behavior, never intended behavior. The Annex B built-in units hold the only
-family records so far; see [Annex B built-ins](#annex-b-built-ins).
+behavior, never intended behavior. The Annex B built-in units and the small
+ECMAScript 2026 built-in units hold the family records so far; see
+[Annex B built-ins](#annex-b-built-ins) and
+[Small ECMAScript 2026 built-in families](#small-ecmascript-2026-built-in-families).
 
 
 Claim boundary
@@ -70,11 +72,12 @@ derives it by classifying every candidate also under the frozen ADR 0020 rule
 in *tests/test262/inventory-policy-m5.yaml*, and it rejects a change that
 would drop an M5 path from the inventory.
 
-The added paths are not in the reviewed subset or the manifest. Each is
-`unreviewed` in the [closure ledger](./m5c-closure/README.md) with the
-`unit:<id>` owner of the *PLAN-LANGUAGE.md* unit that implements it. A unit
-admits its rows into *tests/test262/subset.yaml* with reviewed dependency tags
-when its behavior lands, and the full manifest update observes them.
+An added path enters the reviewed subset and the manifest only when its unit
+admits it. Until then it is `unreviewed` in the
+[closure ledger](./m5c-closure/README.md) with the `unit:<id>` owner of the
+*PLAN-LANGUAGE.md* unit that implements it. A unit admits its rows into
+*tests/test262/subset.yaml* with reviewed dependency tags when its behavior
+lands, and the full manifest update observes them.
 
 `mise run check:language-claim-audit` applies the closure conditions of
 [ADR 0019](./adr/0019-m5-claim-closure.md) to the expanded inventory. It
@@ -275,3 +278,118 @@ Symbol and BigInt conversion, and a property-read guard miss.
 Gregorian calendar model. Its second test observes the read-before-conversion
 case natively. The 24 test262 paths are those under
 *test/annexB/built-ins/Date/prototype/*.
+
+
+Small ECMAScript 2026 built-in families
+---------------------------------------
+
+These families come from the `error-is-error`, `math-sum-precise`, `upsert`,
+and `iterator-concat` units. Of their 126 test262 paths, 123 pass. The other
+three build a value with the `Function` constructor and are ADR 0016
+exclusions: *non-error-objects-other-realm.js* for `Error.isError` and one
+`getOrInsertComputed` row each for `Map` and `WeakMap`. The fixtures cover
+their other assertions. Each record's standards class cites the results
+partitions that hold its rows.
+
+### `Error.isError`
+
+`Error.isError(value)` is a writable, non-enumerable, configurable own property
+of `%Error%` with length 1. It is an ordinary built-in function and not a
+constructor. The other error constructors inherit it through their
+`[[Prototype]]`.
+
+It returns `true` exactly when `value` is an object with an `[[ErrorData]]`
+internal slot. The runtime sets that slot when an error constructor creates
+the object, whether through a call, `new`, `super()` in a subclass, or
+`Reflect.construct`, and on every error the runtime throws itself. It reads no
+property and runs no user code, so the answer for a given object never changes:
+replacing its prototype keeps the slot. A proxy has no slot of its own, so a
+proxy of an error answers `false` without consulting its target or handler, as
+does an object that only inherits from an error prototype. The error prototypes
+themselves are ordinary objects and answer `false`. Errors from another realm
+answer `true`.
+
+Both reference hosts implement it, so the fixtures and the property suite are
+differential against Node.js and Deno. The property suite also checks each
+generated subject against a model of which construction paths create the slot.
+The family record is
+[*error-is-error.yaml*](./language-profile-es2026/families/error-is-error.yaml).
+
+### `Math.sumPrecise`
+
+`Math.sumPrecise(items)` is a writable, non-enumerable, configurable function
+property of `Math` with length 1, appended after the earlier Math functions. It
+is not a constructor.
+
+It rejects `undefined` and `null` before reading an iterator, then iterates
+`items` and requires every value to be a Number. A non-Number value, including
+a BigInt or a Number object, closes the iterator and throws a `TypeError`, even
+after an earlier NaN has already fixed the result. The result follows the
+edition's state machine: no values or only `-0` values give `-0`, NaN or both
+infinities give NaN, one infinity gives that infinity, and otherwise the result
+is the exact sum of the finite values rounded once to the nearest Number with
+ties to even. An exact sum of zero is `+0`, and a sum at or beyond
+2<sup>1024</sup> − 2<sup>970</sup> in magnitude rounds to an infinity of its
+sign.
+
+The pinned Node.js does not expose the function, so Deno is the single
+reference host. The property suite checks every generated case against an
+independent BigInt model that sums each value's exact 2<sup>-1074</sup>
+multiple and rounds once. The family record is
+[*math-sum-precise.yaml*](./language-profile-es2026/families/math-sum-precise.yaml).
+
+### Map and WeakMap upsert
+
+`getOrInsert(key, value)` and `getOrInsertComputed(key, callbackfn)` are
+writable, non-enumerable, configurable function properties of
+`%Map.prototype%` and `%WeakMap.prototype%`, each with length 2. None is a
+constructor, and each rejects a receiver without the matching `[[MapData]]` or
+`[[WeakMapData]]` slot with a `TypeError`.
+
+The Map forms canonicalize `-0` to `+0` and find the key by SameValueZero.
+`getOrInsert` returns the existing value or appends the key with `value`.
+`getOrInsertComputed` first requires a callable `callbackfn`. When the key is
+absent it calls `callbackfn` once with `undefined` as the receiver and the
+canonical key as the only argument, then looks the key up again: if the
+callback inserted it, the computed value replaces the callback's value in
+place, and otherwise the key is appended, even after the callback deleted
+entries or cleared the map. A throwing callback stores no computed value and
+propagates its throw; any change the callback made to the map itself, including
+inserting the key, remains.
+
+The WeakMap forms first reject a key that CanBeHeldWeakly refuses, which
+includes every primitive other than an unregistered Symbol, and the computed
+form then rejects a non-callable `callbackfn`. They store through the existing
+ephemeron table, so a value stays reachable exactly as long as its key, and a
+callback that set the key itself sees its value replaced.
+
+The pinned Node.js lacks these methods, so Deno is the single reference host.
+The property suite checks generated operation sequences against an
+independent model of the edition steps. The family record is
+[*upsert.yaml*](./language-profile-es2026/families/upsert.yaml).
+
+### `Iterator.concat`
+
+`Iterator.concat(...items)` is a writable, non-enumerable, configurable own
+function property of `%Iterator%` with length 0. It is not a constructor.
+
+When called it requires every item to be an object, reads each item's
+`Symbol.iterator` method exactly once, and rejects an `undefined`, `null`, or
+non-callable method with a `TypeError`. It opens nothing. The result inherits
+from `%IteratorHelperPrototype%`. Each `next` call forwards the active inner
+iterator's next value in a fresh result object. When that iterator is done, it
+opens the next item by calling its captured method with the item as the
+receiver and reading `next` once, and it reads `value` only from results that
+are not done. A non-object iterator or step result is a `TypeError`. Any throw
+while opening or stepping completes the result without closing anything.
+
+`return` before the first `next`, and after completion, closes nothing.
+`return` while a value is suspended closes only the forwarded inner iterator,
+with no arguments, and propagates a throw or a non-object result from its
+`return` method. Calling `next` or `return` while the result is running is a
+`TypeError`.
+
+The pinned Node.js lacks the function, so Deno is the single reference host.
+The property suite checks generated item lists and consumption schedules
+against an independent model of the closure. The family record is
+[*iterator-concat.yaml*](./language-profile-es2026/families/iterator-concat.yaml).

@@ -5,9 +5,10 @@ Status
 ------
 
 Implementation status: in progress. The `claim-boundary` unit has applied ADR
-0032. The `legacy-caller`, `annexb-escape`, `annexb-string-methods`, and
-`annexb-date-methods` units are implemented and observed, and every other unit
-is open. This plan follows M5 directly and runs
+0032. The `legacy-caller`, `annexb-escape`, `annexb-string-methods`,
+`annexb-date-methods`, `error-is-error`, `math-sum-precise`, `upsert`, and
+`iterator-concat` units are implemented and observed, and every other unit is
+open. This plan follows M5 directly and runs
 alongside M6. It has no milestone number. It schedules the language work
 the maintainer approved on 2026-11-02: build-time static-specifier `import()`,
 Annex B legacy web behavior except `document.all`, the legacy `caller`
@@ -432,9 +433,8 @@ Status: implemented. The runtime, its differential and fixed tests in
 suite are in place, and
 [*docs/evidence/legacy-caller/*](./docs/evidence/legacy-caller/) records the
 per-call cost. The full test262 observation changes only the 23 selector
-rows: 18 pass and five are ADR 0016 exclusions, so the manifest has 34,796
-passes and 1,894 unsupported results. No other row changes, including the
-rows that reflect on function own keys.
+rows: 18 pass and five are ADR 0016 exclusions. No other row changes,
+including the rows that reflect on function own keys.
 
 ### `annexb-syntax`
 
@@ -483,9 +483,7 @@ The methods use the realm's UTC local time zone that the M5 profile records.
 
 Status: implemented, with fixed, differential, and generated evidence in the
 [profile section](./docs/language-profile-es2026.md#date-prototype-methods).
-All 24 rows pass in the full test262 observation. With them the manifest has
-41,255 reviewed rows: 34,960 passes and 1,894 unsupported results, and no other
-row changes.
+All 24 rows pass in the full test262 observation, and no other row changes.
 
 ### `annexb-regexp-compile`
 
@@ -580,14 +578,30 @@ current *tests/test262/inventory.tsv*.
  -  `error-is-error` owns `Error.isError` (12). It reports `[[ErrorData]]`,
     so it answers `true` for every native error type, `AggregateError`, and
     `SuppressedError` once that exists, and `false` for a proxy of an error.
+    The runtime, fixtures, and property suite are implemented, and 11 of the
+    12 rows pass in the full test262 observation.
+    `SuppressedError` answers `true` as soon as `disposal-intrinsics` sets the
+    object header's `[[ErrorData]]` flag the way the other error constructors
+    do. *non-error-objects-other-realm.js* calls the other realm's `Function`
+    constructor, so it is an ADR 0016 exclusion; the exclusion audit's
+    `es2026-small-dynamic-source` assessment names the fixture that covers its
+    other assertions.
  -  `math-sum-precise` owns `Math.sumPrecise` (10). The result is the
     correctly rounded exact sum, with the edition's `-0`, infinity, and NaN
     rules and an iterator that is closed on a non-Number value. A property
     test compares it with an exact BigInt rational sum.
+    The runtime, fixtures, and property suite are implemented, and all 10 rows
+    pass in the full test262 observation.
  -  `upsert` owns `getOrInsert` and `getOrInsertComputed` on `Map` and
     `WeakMap` (72). `getOrInsertComputed` runs its callback once and then
     stores the result even if the callback inserted the key. The `WeakMap`
     forms require CanBeHeldWeakly and use the existing ephemeron storage.
+    The runtime, fixtures, and property suite are implemented, and 70 of the
+    72 rows pass in the full test262 observation. The other two
+    `getOrInsertComputed` rows,
+    *different-types-function-callbackfn-does-not-throw.js* for `Map` and
+    *adds-value-different-callbackfn.js* for `WeakMap`, call the `Function`
+    constructor, so they are ADR 0016 exclusions under the same assessment.
  -  `array-from-async` owns `Array.fromAsync` (95). It covers async iterables,
     sync iterables through the async-from-sync wrapper, array-likes with an
     `await` per element, the optional mapper, and constructor receivers. A
@@ -601,6 +615,10 @@ current *tests/test262/inventory.tsv*.
  -  `iterator-concat` owns `Iterator.concat` (32). It reads every item's
     `Symbol.iterator` method when called, opens each item only when its turn
     comes, and forwards `return` to the active inner iterator.
+    The runtime, fixtures, and property suite are implemented, and all 32 rows
+    pass in the full test262 observation. With the four units observed, the
+    manifest has 41,381 reviewed rows: 35,083 passes and 1,897 unsupported
+    results, and no earlier row changes.
  -  `json-parse-source` owns `JSON.rawJSON`, `JSON.isRawJSON`, and the
     reviver context argument (21). It changes the `json-parse` and
     `json-stringify` components: the reviver receives the source text of each
@@ -683,7 +701,7 @@ standards update and heavy gates on the new base.
     row's owner moves. The audit binds ADR texts by digest, so a unit that
     edits ADR 0013, 0016, or 0028 re-reviews the rows that cite it.
  -  The runtime ABI version in *packages/runtime-c/src/index.ts*, currently
-    `m5-150`, changes once per landing that alters the ABI. The series keeps
+    `m5-151`, changes once per landing that alters the ABI. The series keeps
     its `m5-` prefix, and the closure tools keep their `m5c` names.
  -  Runtime code ranges, property blocks, intrinsic indexes, and heap kinds
     are reserved per unit.

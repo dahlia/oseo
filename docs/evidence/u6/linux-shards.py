@@ -27,10 +27,14 @@ EXCLUDED = {
 # case sums from candidate CI 40869736577; with-var loop heads use
 # candidate CI 41059687055 and the module evaluation driver candidate CI
 # 41574039008. Primitive with boxing, the non-blocking agent, the legacy
-# caller suite, and the Annex B escape, String, and Date files each use a
-# later local Linux extended measurement, not a CI file-shard sum. See the
-# U6 README.
+# caller suite, the Annex B escape, String, and Date files, and the
+# ECMAScript 2026 built-in files each use a later local Linux extended
+# measurement, not a CI file-shard sum. See the U6 README.
 RETAINED = {
+    'tests/property/es2026-iterator-concat.property.test.ts',
+    'tests/property/es2026-upsert.property.test.ts',
+    'tests/property/es2026-math-sum-precise.property.test.ts',
+    'tests/property/es2026-error-is-error.property.test.ts',
     'tests/property/m5-host-script-bindings.property.test.ts',
     'tests/property/m5-module-namespace-uninitialized.property.test.ts',
     'tests/property/m5-module-prelude-script.property.test.ts',

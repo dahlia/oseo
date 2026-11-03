@@ -1,0 +1,64 @@
+version: 1
+id: math-sum-precise
+title: "Math.sumPrecise"
+scope:
+  - "The Math.sumPrecise function property, its descriptor, name, length,
+    and non-constructor status."
+  - "The exact sum of the finite values rounded once with ties to even,
+    including subnormal results, cancellation, and overflow to an
+    infinity at the binary64 rounding boundary."
+  - "The edition's -0, infinity, and NaN state machine, the rejection of
+    undefined and null before iteration, the TypeError for every
+    non-Number value, and the iterator close that precedes it."
+owners:
+  - docs/language-profile-es2026.md
+evidence:
+  differential:
+    status: covered
+    references:
+      - tests/native/fixtures/math-sum-precise.ts
+      - tests/property/es2026-math-sum-precise.property.test.ts
+  fixed:
+    status: covered
+    references:
+      - tests/native/fixtures/math-sum-precise.ts
+  forced-collection:
+    status: covered
+    references:
+      - tests/es2026-builtins-native.test.ts
+      - tests/native/fixtures/math-sum-precise.ts
+      - tests/property/es2026-math-sum-precise.property.test.ts
+  generated:
+    status: covered
+    references:
+      - tests/property/es2026-math-sum-precise.property.test.ts
+  guard-fallback:
+    status: covered
+    references:
+      - tests/es2026-builtins-native.test.ts
+      - tests/native/fixtures/math-sum-precise.ts
+      - tests/property/es2026-math-sum-precise.property.test.ts
+  specialization:
+    status: covered
+    references:
+      - tests/es2026-builtins-native.test.ts
+      - tests/native/fixtures/math-sum-precise.ts
+      - tests/property/es2026-math-sum-precise.property.test.ts
+  standards:
+    status: covered
+    references:
+      - tests/test262/subset.yaml
+      - tests/test262/results.yaml
+      - tests/test262/results/built-ins/Math/3a.yaml
+      - tests/test262/results/built-ins/Math/4c.yaml
+      - tests/test262/results/built-ins/Math/51.yaml
+      - tests/test262/results/built-ins/Math/5e.yaml
+      - tests/test262/results/built-ins/Math/6d.yaml
+      - tests/test262/results/built-ins/Math/94.yaml
+      - tests/test262/results/built-ins/Math/c6.yaml
+      - tests/test262/results/built-ins/Math/e7.yaml
+      - tests/test262/results/built-ins/Math/ef.yaml
+  structural:
+    status: covered
+    references:
+      - packages/runtime-c/tests/intrinsic-graph.test.ts

@@ -573,6 +573,97 @@ static OseoResult map_prototype_set(
     return normal(receiver);
 }
 
+/*
+ * Map.prototype.getOrInsert, ECMAScript 2026 24.1.3.7. An existing
+ * record keeps its value; otherwise the canonical key and the given
+ * value are appended, and either way the stored value is returned.
+ */
+static OseoResult map_prototype_get_or_insert(
+    OseoContext *context,
+    OseoValue receiver,
+    OseoValue key,
+    OseoValue value
+) {
+    if (!is_map(receiver)) {
+        return oseo_internal_throw_error(
+            context,
+            OSEO_ERROR_TYPE,
+            "Method Map.prototype.getOrInsert called on incompatible "
+            "receiver."
+        );
+    }
+    OseoValue normalized_key = map_normalize_key(key);
+    size_t index = map_entry_find(map_object(receiver), normalized_key);
+    if (index != SIZE_MAX) {
+        return normal(map_object(receiver)->entries[index].value);
+    }
+    OseoResult result =
+        map_append_entry(context, receiver, normalized_key, value);
+    if (result.status != OSEO_STATUS_NORMAL) return result;
+    return normal(value);
+}
+
+/*
+ * Map.prototype.getOrInsertComputed, ECMAScript 2026 24.1.3.8. The
+ * callback runs once, with undefined as its receiver and the canonical
+ * key as its argument, only when the key is absent. Because the
+ * callback may itself insert, delete, or clear, the key is looked up
+ * again afterwards: a record it inserted takes the computed value, and
+ * otherwise a fresh record is appended.
+ */
+static OseoResult map_prototype_get_or_insert_computed(
+    OseoContext *context,
+    OseoValue receiver,
+    OseoValue key,
+    OseoValue callback
+) {
+    if (!is_map(receiver)) {
+        return oseo_internal_throw_error(
+            context,
+            OSEO_ERROR_TYPE,
+            "Method Map.prototype.getOrInsertComputed called on "
+            "incompatible receiver."
+        );
+    }
+    if (!is_callable(callback)) {
+        return oseo_internal_throw_error(
+            context,
+            OSEO_ERROR_TYPE,
+            "Map.prototype.getOrInsertComputed callback is not callable."
+        );
+    }
+    OseoValue normalized_key = map_normalize_key(key);
+    size_t index = map_entry_find(map_object(receiver), normalized_key);
+    if (index != SIZE_MAX) {
+        return normal(map_object(receiver)->entries[index].value);
+    }
+    /* 0 map, 1 callback, 2 key (the one call argument), 3 value. */
+    OseoValue slots[4] = {receiver, callback, normalized_key, oseo_undefined()};
+    OseoRootFrame frame = {NULL, slots, 4u};
+    oseo_roots_push(context, &frame);
+    OseoResult result = oseo_call_function(
+        context,
+        slots[1],
+        oseo_undefined(),
+        1u,
+        &slots[2],
+        oseo_undefined()
+    );
+    if (result.status == OSEO_STATUS_NORMAL) {
+        slots[3] = result.value;
+        OseoMap *map = map_object(slots[0]);
+        index = map_entry_find(map, slots[2]);
+        if (index != SIZE_MAX) {
+            map->entries[index].value = slots[3];
+        } else {
+            result = map_append_entry(context, slots[0], slots[2], slots[3]);
+        }
+    }
+    if (result.status == OSEO_STATUS_NORMAL) result = normal(slots[3]);
+    oseo_roots_pop(context, &frame);
+    return result;
+}
+
 static OseoResult map_prototype_delete(
     OseoContext *context,
     OseoValue receiver,
@@ -1062,6 +1153,35 @@ static OseoResult map_intrinsic_build(OseoContext *context) {
             method
         );
     }
+    /* The ECMAScript 2026 upsert methods own no intrinsic slot. */
+    static const size_t upsert_codes[] = {
+        OSEO_MAP_GET_OR_INSERT_CODE_ID,
+        OSEO_MAP_GET_OR_INSERT_COMPUTED_CODE_ID,
+    };
+    static const char *const upsert_names[] = {
+        "getOrInsert", "getOrInsertComputed",
+    };
+    for (size_t index = 0u;
+         result.status == OSEO_STATUS_NORMAL && index < 2u;
+         index += 1u) {
+        result = create_map_builtin(
+            context,
+            upsert_codes[index],
+            upsert_names[index],
+            2u,
+            OSEO_FUNCTION_INTERNAL,
+            OSEO_FUNCTION_NAME_PREFIX_NONE
+        );
+        frame.slots[2] = result.value;
+        if (result.status != OSEO_STATUS_NORMAL) break;
+        result = define_map_property(
+            context,
+            frame.slots[1],
+            upsert_names[index],
+            frame.slots[2],
+            method
+        );
+    }
     /* entries and [Symbol.iterator] are the same function object. */
     if (result.status == OSEO_STATUS_NORMAL) {
         result = create_map_builtin(
@@ -1335,6 +1455,22 @@ OseoResult oseo_internal_map_builtin_dispatch(
     }
     if (code_id == OSEO_MAP_SET_CODE_ID) {
         return map_prototype_set(
+            context,
+            receiver,
+            argument_count > 0u ? arguments[0] : oseo_undefined(),
+            argument_count > 1u ? arguments[1] : oseo_undefined()
+        );
+    }
+    if (code_id == OSEO_MAP_GET_OR_INSERT_CODE_ID) {
+        return map_prototype_get_or_insert(
+            context,
+            receiver,
+            argument_count > 0u ? arguments[0] : oseo_undefined(),
+            argument_count > 1u ? arguments[1] : oseo_undefined()
+        );
+    }
+    if (code_id == OSEO_MAP_GET_OR_INSERT_COMPUTED_CODE_ID) {
+        return map_prototype_get_or_insert_computed(
             context,
             receiver,
             argument_count > 0u ? arguments[0] : oseo_undefined(),

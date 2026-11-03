@@ -2149,3 +2149,27 @@ the other case-sharded files. The regenerated Linux model keeps the
 443-second upper-median fallback, and its largest seven-shard load is 3036
 seconds. See
 [*exhaustive RegExp literal evidence*](../regexp-literal-exhaustive/README.md).
+
+
+ECMAScript 2026 built-in local costs
+------------------------------------
+
+The property files of the small ECMAScript 2026 built-in units postdate the
+three Linux source runs. Each Linux weight is one local Linux AMD64 extended
+run with `OSEO_PROPERTY_RUN_SCALE=10` and the file's checked-in seed, size and
+base limit, rounded up to whole seconds. These are local observations, not CI
+file-shard sums, run-to-run bounds or macOS measurements; Root may replace them
+with exact-candidate CI case sums. macOS gains no entry and keeps its
+unknown-file median fallback.
+
+| File                                                      | Case sum (ms) | Linux weight (s) |
+| --------------------------------------------------------- | ------------: | ---------------: |
+| *tests/property/es2026-error-is-error.property.test.ts*   |    141262.474 |              142 |
+| *tests/property/es2026-math-sum-precise.property.test.ts* |    152227.392 |              153 |
+| *tests/property/es2026-upsert.property.test.ts*           |    247547.624 |              248 |
+| *tests/property/es2026-iterator-concat.property.test.ts*  |    156441.062 |              157 |
+
+The TSV retains each file with `-` for all three historical source samples,
+and the extraction script and its unit test retain it explicitly. The
+Linux table has 156 entries, and its upper-median fallback moves from 435 to
+429 seconds. macOS keeps 143 entries and its 296-second fallback.
