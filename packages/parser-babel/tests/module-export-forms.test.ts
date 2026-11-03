@@ -305,7 +305,7 @@ test("creates a namespace that is only re-exported while linking", async () => {
     line.includes("*namespace:file:///app/dep.js* = module-namespace"),
   );
   const firstEvaluation = lines.findIndex((line) =>
-    line.includes("*module-promise:"),
+    line.includes("intrinsic module-evaluate"),
   );
   assert.ok(namespaceLine > 0, script);
   assert.ok(namespaceLine < firstEvaluation, script);
@@ -383,7 +383,7 @@ test("initializes module var cells while linking", async () => {
   const earlyInit = position(/^ {2}let %b\d+ early = undefined /u);
   const hiddenInit = position(/^ {2}let %b\d+ hidden = undefined /u);
   const functionInit = position(/^ {2}function-init %b\d+ peek /u);
-  const firstEvaluation = position(/\*module-promise:/u);
+  const firstEvaluation = position(/intrinsic module-evaluate/u);
   assert.ok(earlyInit >= 0, script);
   assert.ok(hiddenInit >= 0, script);
   assert.ok(earlyInit < functionInit && hiddenInit < functionInit, script);

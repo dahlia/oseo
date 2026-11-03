@@ -116,6 +116,11 @@
  * Linux job 124076306332 and macOS job 124076306487. The rounded
  * weights are 465 and 564 seconds; one run estimates no variation. See U6.
  *
+ * The module evaluation driver postdates the three Linux runs. Both hosts
+ * use one-run case sums from candidate CI 41574039008 at `68dbd8f9`:
+ * Linux job 125713436318 and macOS job 125713436252. The rounded weights
+ * are 77 and 72 seconds; one run estimates no variation. See U6.
+ *
  * Primitive with boxing uses one local Linux AMD64 extended registration
  * at the unchanged source seed and size. This is a local case duration,
  * not a CI file-shard sum or a matching-host macOS measurement. macOS
@@ -288,6 +293,7 @@ export const nativeShardCosts = {
     "tests/property/m5-well-known-symbols.property.test.ts": 442,
     "tests/property/m5-with-primitive-boxing.property.test.ts": 179,
     "tests/property/m5-with-var-loop-head.property.test.ts": 465,
+    "tests/property/module-evaluation-driver.property.test.ts": 77,
     "tests/property/nio-clock-wakeup.property.test.ts": 137,
     "tests/property/unicode-tables.property.test.ts": 1,
   },
@@ -449,6 +455,7 @@ export const nativeShardCosts = {
     "tests/property/m5-weak-collections.property.test.ts": 261,
     "tests/property/m5-well-known-symbols.property.test.ts": 529,
     "tests/property/m5-with-var-loop-head.property.test.ts": 564,
+    "tests/property/module-evaluation-driver.property.test.ts": 72,
     "tests/property/nio-clock-wakeup.property.test.ts": 119,
     "tests/property/unicode-tables.property.test.ts": 1,
   },

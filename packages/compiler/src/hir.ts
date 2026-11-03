@@ -530,6 +530,14 @@ export type HirCallTarget =
       readonly method: "clearTimeout" | "setTimeout";
     }
   | {
+      /**
+       * Installs the module table and evaluates the entry through the
+       * runtime module evaluation driver. Only a module graph's top-level
+       * script calls it.
+       */
+      readonly kind: "module-evaluate";
+    }
+  | {
       readonly callee: HirExpression;
       readonly kind: "dynamic";
     }

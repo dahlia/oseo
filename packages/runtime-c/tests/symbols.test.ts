@@ -102,6 +102,7 @@ test("keeps the reviewed ordered runtime asset list", () => {
       ["source", "runtime_bigint.c"],
       ["source", "runtime_primitive.c"],
       ["source", "runtime_promise.c"],
+      ["source", "runtime_module.c"],
       ["source", "runtime_event_loop.c"],
       ["source", "runtime_clock.c"],
       ["source", "runtime_clock_posix.c"],

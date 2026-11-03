@@ -2864,6 +2864,45 @@ static OseoResult promise_then_with_capability(
     return result;
 }
 
+OseoResult oseo_internal_promise_then_module(
+    OseoContext *context,
+    OseoValue promise_value,
+    OseoValue evaluator,
+    size_t module_index
+) {
+    if (!is_promise(promise_value)) {
+        return failure(
+            context,
+            "OSEO2001",
+            "The module evaluation result is not a promise."
+        );
+    }
+    OseoRootFrame frame = {NULL, NULL, 0u};
+    OseoResult result = oseo_roots_allocate(context, &frame, 3u);
+    if (result.status != OSEO_STATUS_NORMAL) return result;
+    frame.slots[0] = promise_value;
+    frame.slots[1] = evaluator;
+    result = reaction_create(
+        context,
+        frame.slots[1],
+        frame.slots[1],
+        oseo_undefined()
+    );
+    frame.slots[2] = result.value;
+    if (result.status == OSEO_STATUS_NORMAL) {
+        OseoPromiseReaction *reaction = reaction_object(frame.slots[2]);
+        reaction->kind = OSEO_REACTION_MODULE;
+        reaction->index = module_index;
+        result = promise_attach_reaction(
+            context,
+            frame.slots[0],
+            frame.slots[2]
+        );
+    }
+    oseo_roots_release(context, &frame);
+    return result;
+}
+
 OseoResult oseo_promise_then(
     OseoContext *context,
     OseoValue promise_value,
@@ -3018,6 +3057,22 @@ static OseoResult run_reaction_job(
         context->source_id_length = source->rejection_source_id_length;
         context->line = source->rejection_line;
         context->column = source->rejection_column;
+    }
+    if (reaction->kind == OSEO_REACTION_MODULE) {
+        result = oseo_internal_module_async_settled(
+            context,
+            reaction->index,
+            frame.slots[2],
+            fulfilled
+        );
+        if (!context->has_diagnostic) {
+            context->source_id = source_id;
+            context->source_id_length = source_id_length;
+            context->line = line;
+            context->column = column;
+        }
+        oseo_roots_release(context, &frame);
+        return result;
     }
     if (tag_of(frame.slots[0]) == OSEO_TAG_UNDEFINED) {
         result = capability_settle(

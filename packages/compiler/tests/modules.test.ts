@@ -660,12 +660,7 @@ test("lowers linked modules through shared live binding identities", () => {
   });
   assert.deepEqual(result.diagnostics, []);
   assert.ok(result.mir != null);
-  assert.deepEqual(
-    result.mir.globalBindings.filter(
-      (binding) => !binding.name.startsWith("*module-promise:"),
-    ),
-    [{ id: 0, name: "answer" }],
-  );
+  assert.deepEqual(result.mir.globalBindings, [{ id: 0, name: "answer" }]);
   const text = printMir(result.mir);
   assert.ok(text.indexOf("initialize answer") < text.indexOf("read value"));
   assert.match(text, /initialize %b0 answer/u);

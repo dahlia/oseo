@@ -1966,6 +1966,43 @@ The raw logs, job list, extraction script and SHA-256 sums are retained in
 [41059687055]: https://github.com/dahlia/oseo/actions/runs/41059687055
 
 
+Module evaluation driver candidate CI cost
+------------------------------------------
+
+*tests/property/module-evaluation-driver.property.test.ts* postdates the three
+Linux source runs and had no measured weight. Candidate [41574039008] at
+`68dbd8f99` passed its native file shards, but the Linux inventory check
+failed because the file lacked a weight.
+
+The run's own file-shard logs supply both host weights, extracted the same way
+as the with-var loop-head weights above. The file has one registration.
+
+| Host  | Job          | Shard | Cases | Case sum, ms | Weight, seconds |
+| ----- | ------------ | ----- | ----- | ------------ | --------------- |
+| Linux | 125713436318 | 3/7   | 1     | 76065.537591 | 77              |
+| macOS | 125713436252 | 10/12 | 1     | 71371.476750 | 72              |
+
+These are concurrent case durations from one run, not isolated latencies or
+estimates of run-to-run variation. The TSV records the Linux weight as a
+retained later file with `-` for all three source-run samples, and
+*linux-shards.py* and the unit test retain it explicitly.
+
+Linux now has 148 entries and macOS 143. Both upper-median fallbacks stay at
+443 and 296 seconds. No other weight, exclusion, width, or shard total changes.
+
+The raw logs and their SHA-256 sums are retained in
+*/data/post-m5-lang-20261103/import-driver-ci/weight-logs-41574039008/*:
+
+~~~~ text
+125713436318.log
+ff66c1e6fedaae84580499c5ea1068fd953fa48adf6203a7027fdb0b87ac24e2
+125713436252.log
+8ac31c406e9b73fdb48307da4c33cbbef549d37b50a534b2fb169c3b22a3a055
+~~~~
+
+[41574039008]: https://github.com/dahlia/oseo/actions/runs/41574039008
+
+
 Primitive with binding object local cost
 ----------------------------------------
 
