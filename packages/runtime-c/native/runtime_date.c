@@ -104,6 +104,8 @@ static const OseoDateMethodEntry date_methods[] = {
     {"toUTCString", 0u},
     {"valueOf", 0u},
     {"[Symbol.toPrimitive]", 1u},
+    {"getYear", 0u},
+    {"setYear", 1u},
 };
 
 _Static_assert(
@@ -620,6 +622,62 @@ static OseoResult date_set_fields(
     double updated = date_time_clip(
         setter.local ? date_utc_time(composed) : composed
     );
+    date_object(slots[0])->time_value = updated;
+    oseo_roots_pop(context, &frame);
+    return normal(oseo_number(updated));
+}
+
+/*
+ * Date.prototype.getYear(), B.2.3.1: YearFromTime(LocalTime(t)) minus
+ * 1900, or NaN for an invalid date.
+ */
+static OseoResult date_get_year(OseoContext *context, OseoValue receiver) {
+    double time_value = 0.0;
+    OseoResult required = date_receiver(context, receiver, &time_value);
+    if (required.status != OSEO_STATUS_NORMAL) return required;
+    if (isnan(time_value)) return normal(oseo_number((double)NAN));
+    OseoDateFields fields;
+    date_fields(date_local_time(time_value), &fields);
+    return normal(oseo_number((double)fields.year - 1900.0));
+}
+
+/*
+ * Date.prototype.setYear(year), B.2.3.2. The receiver's time value is
+ * read before ToNumber(year), like the other setters. An invalid date
+ * starts from +0, MakeFullYear maps 0 through 99 to 1900 through 1999,
+ * and the month, date, and time within the day come from LocalTime(t).
+ */
+static OseoResult date_set_year(
+    OseoContext *context,
+    OseoValue receiver,
+    size_t argument_count,
+    const OseoValue *arguments
+) {
+    double time_value = 0.0;
+    OseoResult required = date_receiver(context, receiver, &time_value);
+    if (required.status != OSEO_STATUS_NORMAL) return required;
+    OseoValue slots[1] = {receiver};
+    OseoRootFrame frame = {NULL, slots, 1u};
+    oseo_roots_push(context, &frame);
+    OseoResult result = oseo_internal_to_number(
+        context,
+        date_argument(argument_count, arguments, 0u)
+    );
+    if (result.status != OSEO_STATUS_NORMAL) {
+        oseo_roots_pop(context, &frame);
+        return result;
+    }
+    double year = date_make_full_year(number_value(result.value));
+    double base = isnan(time_value) ? 0.0 : date_local_time(time_value);
+    OseoDateFields fields;
+    date_fields(base, &fields);
+    double day = date_make_day(
+        year,
+        (double)fields.month,
+        (double)fields.day
+    );
+    double composed = date_make_date(day, date_time_within_day(base));
+    double updated = date_time_clip(date_utc_time(composed));
     date_object(slots[0])->time_value = updated;
     oseo_roots_pop(context, &frame);
     return normal(oseo_number(updated));
@@ -1550,6 +1608,12 @@ static OseoResult date_prototype_method(
     size_t argument_count,
     const OseoValue *arguments
 ) {
+    if (method == OSEO_DATE_GET_YEAR) {
+        return date_get_year(context, receiver);
+    }
+    if (method == OSEO_DATE_SET_YEAR) {
+        return date_set_year(context, receiver, argument_count, arguments);
+    }
     if (method <= OSEO_DATE_GET_UTC_SECONDS) {
         return date_get_field(context, receiver, method);
     }
@@ -1744,7 +1808,8 @@ static OseoResult date_intrinsic_build(OseoContext *context) {
     if (tag_of(*marker) != OSEO_TAG_UNDEFINED) return normal(*marker);
     size_t entry_allocations = context->allocations;
     OseoRootFrame frame = {NULL, NULL, 0u};
-    OseoResult result = oseo_roots_allocate(context, &frame, 4u);
+    /* Slot 4 keeps toUTCString for the Annex B toGMTString property. */
+    OseoResult result = oseo_roots_allocate(context, &frame, 5u);
     if (result.status != OSEO_STATUS_NORMAL) return result;
     *marker = oseo_uninitialized();
     result = oseo_internal_intrinsic(
@@ -1821,6 +1886,9 @@ static OseoResult date_intrinsic_build(OseoContext *context) {
         );
         frame.slots[2] = result.value;
         if (result.status != OSEO_STATUS_NORMAL) break;
+        if (index == (size_t)OSEO_DATE_TO_UTC_STRING) {
+            frame.slots[4] = frame.slots[2];
+        }
         if (index != (size_t)OSEO_DATE_TO_PRIMITIVE) {
             result = define_date_property(
                 context,
@@ -1843,6 +1911,19 @@ static OseoResult date_intrinsic_build(OseoContext *context) {
             frame.slots[3],
             frame.slots[2],
             (OseoPropertyAttributes){true, false, false, false}
+        );
+    }
+    /*
+     * B.2.3.3: the initial value of toGMTString is the toUTCString
+     * function object itself, so the property keeps that name.
+     */
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = define_date_property(
+            context,
+            frame.slots[0],
+            "toGMTString",
+            frame.slots[4],
+            method
         );
     }
     if (result.status != OSEO_STATUS_NORMAL) {

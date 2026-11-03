@@ -56,26 +56,34 @@ three sums, rounded up, so the margin below is a slow runner's. Files under 30
 seconds have no entry and weigh the host fallback, 18 seconds on both hosts,
 which is the median of every measured weight.
 
-Nine files postdate those runs. Serial local runs from 2026-11-01 to
+Twelve files postdate those runs. Serial local runs from 2026-11-01 to
 2026-11-03 of the residual evidence and those files, on one host, give the
 calibration:
 
-| File                                              | Local, s | Linux weight | macOS weight |
-| ------------------------------------------------- | -------: | -----------: | -----------: |
-| *tests/dynamic-source-residual-evidence.test.ts*  |    798.3 |   2,055 (CI) |   1,576 (CI) |
-| *tests/host-script-evidence.test.ts*              |    290.8 |          749 |          574 |
-| *tests/trainc-ordinary-evidence.test.ts*          |    155.2 |          400 |          307 |
-| *tests/unhandled-rejection-policy-native.test.ts* |      9.5 |     fallback |     fallback |
-| *tests/host-script-trainc-evidence-1.test.ts*     |    335.4 |          864 |          663 |
-| *tests/host-script-trainc-evidence-2.test.ts*     |    291.9 |          752 |          577 |
-| *tests/host-script-trainc-evidence-3.test.ts*     |    284.2 |          732 |          561 |
-| *tests/host-script-trainc-evidence-4.test.ts*     |    261.2 |          673 |          516 |
-| *tests/function-constructor-evidence.test.ts*     |     55.5 |          143 |          110 |
-| *tests/legacy-caller.test.ts*                     |     26.9 |           70 |           54 |
+| File                                                       | Local, s | Linux weight | macOS weight |
+| ---------------------------------------------------------- | -------: | -----------: | -----------: |
+| *tests/dynamic-source-residual-evidence.test.ts*           |    798.3 |   2,055 (CI) |   1,576 (CI) |
+| *tests/host-script-evidence.test.ts*                       |    290.8 |          749 |          574 |
+| *tests/trainc-ordinary-evidence.test.ts*                   |    155.2 |          400 |          307 |
+| *tests/unhandled-rejection-policy-native.test.ts*          |      9.5 |     fallback |     fallback |
+| *tests/host-script-trainc-evidence-1.test.ts*              |    335.4 |          864 |          663 |
+| *tests/host-script-trainc-evidence-2.test.ts*              |    291.9 |          752 |          577 |
+| *tests/host-script-trainc-evidence-3.test.ts*              |    284.2 |          732 |          561 |
+| *tests/host-script-trainc-evidence-4.test.ts*              |    261.2 |          673 |          516 |
+| *tests/function-constructor-evidence.test.ts*              |     55.5 |          143 |          110 |
+| *tests/legacy-caller.test.ts*                              |     26.9 |           70 |           54 |
+| *tests/property/m5-annexb-escape.property.test.ts*         |     33.7 |           87 |           67 |
+| *tests/property/m5-annexb-string-methods.property.test.ts* |     14.2 |           37 |     fallback |
+| *tests/property/m5-annexb-date-methods.property.test.ts*   |     12.2 |           32 |     fallback |
 
 The ratios are 2.574 for Linux and 1.974 for macOS, the residual file's
 largest CI sum over its local sum. The fastest Linux observation gives
 1.894, so the ratio spans the runner variation as well.
+
+The three Annex B property files' local figures are their ordinary suites'
+summed top-level test durations, taken with one file worker. The escape
+suite's first run, directly after a build, took 56.4 seconds; the table uses
+its second run, like the other two files' runs on the same warm cache.
 
 
 Model

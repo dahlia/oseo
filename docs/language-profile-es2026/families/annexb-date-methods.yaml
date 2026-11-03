@@ -1,0 +1,82 @@
+version: 1
+id: annexb-date-methods
+title: "Annex B Date.prototype methods"
+scope:
+  - "Date.prototype.getYear of B.2.3.1: YearFromTime(LocalTime(t)) minus
+    1900 under the realm's UTC local time zone, NaN for an invalid date,
+    and the TypeError for a receiver without [[DateValue]]."
+  - "Date.prototype.setYear of B.2.3.2: the receiver check and time-value
+    read before ToNumber(year), the +0 start for an invalid date,
+    MakeFullYear's 0 to 99 window, MakeDay, MakeDate, UTC, TimeClip, and
+    the stored and returned result."
+  - "Date.prototype.toGMTString of B.2.3.3 as the toUTCString function
+    object, in every realm."
+  - "The names, lengths, absent prototype properties, and writable,
+    non-enumerable, configurable descriptors of all three properties."
+owners:
+  - docs/language-profile-es2026.md
+evidence:
+  differential:
+    status: covered
+    references:
+      - tests/native/fixtures/annexb-date-methods.ts
+      - tests/property/m5-annexb-date-methods.property.test.ts
+  fixed:
+    status: covered
+    references:
+      - tests/native/fixtures/annexb-date-methods.ts
+      - tests/property/m5-annexb-date-methods.property.test.ts
+  forced-collection:
+    status: covered
+    references:
+      - tests/native.ts
+      - tests/native/fixtures/annexb-date-methods.ts
+      - tests/property/m5-annexb-date-methods.property.test.ts
+  generated:
+    status: covered
+    references:
+      - tests/property/m5-annexb-date-methods.property.test.ts
+  guard-fallback:
+    status: covered
+    references:
+      - tests/native.ts
+      - tests/native/fixtures/annexb-date-methods.ts
+      - tests/property/m5-annexb-date-methods.property.test.ts
+  specialization:
+    status: covered
+    references:
+      - tests/native.ts
+      - tests/native/fixtures/annexb-date-methods.ts
+      - tests/property/m5-annexb-date-methods.property.test.ts
+  standards:
+    status: covered
+    references:
+      - tests/test262/subset.yaml
+      - tests/test262/results.yaml
+      - tests/test262/results/annexB/built-ins/14.yaml
+      - tests/test262/results/annexB/built-ins/1c.yaml
+      - tests/test262/results/annexB/built-ins/20.yaml
+      - tests/test262/results/annexB/built-ins/24.yaml
+      - tests/test262/results/annexB/built-ins/29.yaml
+      - tests/test262/results/annexB/built-ins/2f.yaml
+      - tests/test262/results/annexB/built-ins/32.yaml
+      - tests/test262/results/annexB/built-ins/35.yaml
+      - tests/test262/results/annexB/built-ins/3c.yaml
+      - tests/test262/results/annexB/built-ins/45.yaml
+      - tests/test262/results/annexB/built-ins/67.yaml
+      - tests/test262/results/annexB/built-ins/6d.yaml
+      - tests/test262/results/annexB/built-ins/70.yaml
+      - tests/test262/results/annexB/built-ins/87.yaml
+      - tests/test262/results/annexB/built-ins/98.yaml
+      - tests/test262/results/annexB/built-ins/a0.yaml
+      - tests/test262/results/annexB/built-ins/ae.yaml
+      - tests/test262/results/annexB/built-ins/b3.yaml
+      - tests/test262/results/annexB/built-ins/b6.yaml
+      - tests/test262/results/annexB/built-ins/bd.yaml
+      - tests/test262/results/annexB/built-ins/d8.yaml
+      - tests/test262/results/annexB/built-ins/de.yaml
+      - tests/test262/results/annexB/built-ins/e9.yaml
+  structural:
+    status: covered
+    references:
+      - packages/runtime-c/tests/intrinsic-graph.test.ts

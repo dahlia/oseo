@@ -1,0 +1,94 @@
+version: 1
+id: annexb-escape
+title: "Annex B escape and unescape"
+scope:
+  - "The realm-owned Annex B global functions escape and unescape of B.2.1,
+    their names, lengths, [[Prototype]], absent prototype property, and the
+    writable, non-enumerable, configurable global-object properties that
+    bind them in every realm."
+  - "escape, B.2.1.1: the unescaped ASCII letters, digits, and @*_+-./, the
+    uppercase %XX form for every other code unit below 256, and the
+    uppercase %uXXXX form for every other code unit, including lone
+    surrogates."
+  - "unescape, B.2.1.2: the %uXXXX form tried before the %XX form, digits of
+    either letter case, and every % that starts neither form kept
+    unchanged."
+  - "The single-argument ToString conversion each function performs first,
+    including the abrupt completion a throwing conversion propagates."
+owners:
+  - docs/language-profile-es2026.md
+evidence:
+  differential:
+    status: covered
+    references:
+      - tests/native/fixtures/annexb-escape.ts
+      - tests/property/m5-annexb-escape.property.test.ts
+  fixed:
+    status: covered
+    references:
+      - tests/native/fixtures/annexb-escape.ts
+  forced-collection:
+    status: covered
+    references:
+      - tests/native.ts
+      - tests/native/fixtures/annexb-escape.ts
+      - tests/property/m5-annexb-escape.property.test.ts
+  generated:
+    status: covered
+    references:
+      - tests/property/m5-annexb-escape.property.test.ts
+  guard-fallback:
+    status: covered
+    references:
+      - tests/native.ts
+      - tests/native/fixtures/annexb-escape.ts
+      - tests/property/m5-annexb-escape.property.test.ts
+  specialization:
+    status: covered
+    references:
+      - tests/native.ts
+      - tests/native/fixtures/annexb-escape.ts
+      - tests/property/m5-annexb-escape.property.test.ts
+  standards:
+    status: covered
+    references:
+      - tests/test262/subset.yaml
+      - tests/test262/results.yaml
+      - tests/test262/results/annexB/built-ins/00.yaml
+      - tests/test262/results/annexB/built-ins/09.yaml
+      - tests/test262/results/annexB/built-ins/19.yaml
+      - tests/test262/results/annexB/built-ins/2b.yaml
+      - tests/test262/results/annexB/built-ins/2f.yaml
+      - tests/test262/results/annexB/built-ins/35.yaml
+      - tests/test262/results/annexB/built-ins/38.yaml
+      - tests/test262/results/annexB/built-ins/3e.yaml
+      - tests/test262/results/annexB/built-ins/40.yaml
+      - tests/test262/results/annexB/built-ins/48.yaml
+      - tests/test262/results/annexB/built-ins/4c.yaml
+      - tests/test262/results/annexB/built-ins/51.yaml
+      - tests/test262/results/annexB/built-ins/55.yaml
+      - tests/test262/results/annexB/built-ins/5a.yaml
+      - tests/test262/results/annexB/built-ins/68.yaml
+      - tests/test262/results/annexB/built-ins/69.yaml
+      - tests/test262/results/annexB/built-ins/6b.yaml
+      - tests/test262/results/annexB/built-ins/6e.yaml
+      - tests/test262/results/annexB/built-ins/72.yaml
+      - tests/test262/results/annexB/built-ins/73.yaml
+      - tests/test262/results/annexB/built-ins/8c.yaml
+      - tests/test262/results/annexB/built-ins/93.yaml
+      - tests/test262/results/annexB/built-ins/96.yaml
+      - tests/test262/results/annexB/built-ins/a4.yaml
+      - tests/test262/results/annexB/built-ins/b3.yaml
+      - tests/test262/results/annexB/built-ins/c0.yaml
+      - tests/test262/results/annexB/built-ins/cd.yaml
+      - tests/test262/results/annexB/built-ins/f1.yaml
+      - tests/test262/results/annexB/built-ins/f2.yaml
+      - tests/test262/results/annexB/built-ins/f5.yaml
+      - tests/test262/results/annexB/built-ins/f7.yaml
+      - tests/test262/results/annexB/built-ins/fc.yaml
+      - tests/test262/results/annexB/built-ins/ff.yaml
+  structural:
+    status: covered
+    references:
+      - packages/parser-babel/tests/basics.test.ts
+      - packages/runtime-c/tests/intrinsic-graph.test.ts

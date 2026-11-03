@@ -615,6 +615,18 @@
     (OSEO_STRING_CODE_ID_RANGE_LAST - 36u)
 #define OSEO_STRING_TO_WELL_FORMED_CODE_ID \
     (OSEO_STRING_CODE_ID_RANGE_LAST - 37u)
+/*
+ * The Annex B String.prototype methods of B.2.2. The thirteen HTML
+ * methods keep the dense order of `string_html_methods`, so a code ID
+ * is OSEO_STRING_HTML_CODE_ID_FIRST plus that method's table index.
+ */
+#define OSEO_STRING_SUBSTR_CODE_ID \
+    (OSEO_STRING_CODE_ID_RANGE_LAST - 38u)
+#define OSEO_STRING_HTML_METHOD_COUNT ((size_t)13u)
+#define OSEO_STRING_HTML_CODE_ID_FIRST \
+    (OSEO_STRING_CODE_ID_RANGE_LAST - 51u)
+#define OSEO_STRING_HTML_CODE_ID_LAST \
+    (OSEO_STRING_CODE_ID_RANGE_LAST - 39u)
 
 #define OSEO_MAP_CODE_ID_RANGE_INDEX ((size_t)13u)
 #define OSEO_MAP_CODE_ID_RANGE_FIRST \
@@ -733,12 +745,13 @@
 #define OSEO_URI_CODE_ID_RANGE_LAST \
     OSEO_BUILTIN_CODE_RANGE_LAST(OSEO_URI_CODE_ID_RANGE_INDEX)
 /*
- * The four URI handling functions keep one dense order, so a code ID is
- * the range last minus that function's index in `uri_functions` and the
- * dispatch needs no separate table. The first and last IDs bound the
- * range the builder and the dispatcher both walk.
+ * The four URI handling functions and the two Annex B escape functions
+ * keep one dense order, so a code ID is the range last minus that
+ * function's index in `uri_functions` and the dispatch needs no separate
+ * table. The first and last IDs bound the range the builder and the
+ * dispatcher both walk.
  */
-#define OSEO_URI_FUNCTION_COUNT ((size_t)4u)
+#define OSEO_URI_FUNCTION_COUNT ((size_t)6u)
 #define OSEO_URI_FUNCTION_CODE_ID_LAST OSEO_URI_CODE_ID_RANGE_LAST
 #define OSEO_URI_FUNCTION_CODE_ID_FIRST \
     (OSEO_URI_CODE_ID_RANGE_LAST - (OSEO_URI_FUNCTION_COUNT - 1u))
@@ -1943,8 +1956,9 @@ typedef struct {
  * prototype creates its properties in and the order the code IDs count
  * down from `OSEO_DATE_METHOD_CODE_ID_LAST`, so an entry's index is the
  * only identity the builder and the dispatcher share.
- * `[Symbol.toPrimitive]` is last because it is the one entry keyed by a
- * symbol rather than by its name.
+ * `[Symbol.toPrimitive]` follows the ECMA-262 21.4.4 methods because it
+ * is the one entry keyed by a symbol rather than by its name; the Annex B
+ * `getYear` and `setYear` come after it so no earlier code ID moves.
  */
 typedef enum {
     OSEO_DATE_GET_DATE = 0,
@@ -1991,7 +2005,10 @@ typedef enum {
     OSEO_DATE_TO_UTC_STRING = 41,
     OSEO_DATE_VALUE_OF = 42,
     OSEO_DATE_TO_PRIMITIVE = 43,
-    OSEO_DATE_METHOD_COUNT = 44,
+    /* The Annex B methods of B.2.3, after the symbol-keyed entry. */
+    OSEO_DATE_GET_YEAR = 44,
+    OSEO_DATE_SET_YEAR = 45,
+    OSEO_DATE_METHOD_COUNT = 46,
 } OseoDateMethod;
 
 /*
@@ -4876,12 +4893,12 @@ OseoResult oseo_internal_install_math_global(
     OseoValue global
 );
 /*
- * One of the realm's four lazily created URI handling functions and the
- * global installation that binds all four as writable, non-enumerable,
- * configurable properties. `intrinsic` must be one of the four numbers
- * from OSEO_INTRINSIC_DECODE_URI through
- * OSEO_INTRINSIC_ENCODE_URI_COMPONENT, whose order is also the order the
- * component's own function table and code-ID range use.
+ * One of the realm's six lazily created global string functions and the
+ * global installation that binds all six as writable, non-enumerable,
+ * configurable properties. `intrinsic` must be one of the four URI
+ * handling function numbers from OSEO_INTRINSIC_DECODE_URI through
+ * OSEO_INTRINSIC_ENCODE_URI_COMPONENT, or OSEO_INTRINSIC_ESCAPE or
+ * OSEO_INTRINSIC_UNESCAPE for the Annex B pair.
  */
 OseoResult oseo_internal_uri_intrinsic(
     OseoContext *context,

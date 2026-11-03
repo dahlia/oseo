@@ -184,8 +184,9 @@ test("Linux weights match the three-run median case sums", async () => {
   // Added after the three source runs; they keep their earlier weights.
   // The module, with-var and module driver files use one candidate run
   // each (see U6).
-  // Primitive with boxing, the non-blocking agent and the legacy caller
-  // suite use later local Linux extended runs.
+  // Primitive with boxing, the non-blocking agent, the legacy caller suite,
+  // and the Annex B escape, String, and Date files use later local Linux
+  // extended runs.
   const retained = [
     "tests/property/m5-host-script-bindings.property.test.ts",
     "tests/property/m5-module-namespace-uninitialized.property.test.ts",
@@ -196,6 +197,9 @@ test("Linux weights match the three-run median case sums", async () => {
     "tests/property/m5-non-blocking-agent.property.test.ts",
     "tests/property/module-evaluation-driver.property.test.ts",
     "tests/property/legacy-caller.property.test.ts",
+    "tests/property/m5-annexb-escape.property.test.ts",
+    "tests/property/m5-annexb-string-methods.property.test.ts",
+    "tests/property/m5-annexb-date-methods.property.test.ts",
   ];
   assert.deepEqual(
     rows.map((row) => row.split("\t")[0]).toSorted(),

@@ -93,7 +93,9 @@ Ownership follows the plan's target layout:
     provides the `String` constructor, %String.prototype%, the `fromCharCode`,
     `fromCodePoint`, and `raw` statics, the prototype case conversions, locale
     case forms, trimming methods, Unicode normalization, and deterministic
-    locale comparison. *runtime\_unicode\_tables.h* is its generated,
+    locale comparison, together with the Annex B `substr`, the thirteen HTML
+    methods and their shared CreateHTML, and the `trimLeft` and `trimRight`
+    aliases. *runtime\_unicode\_tables.h* is its generated,
     package-private view of the pinned Unicode data;
  -  *runtime\_string\_match.c*: the `String.prototype` `match`, `matchAll`,
     `search`, `split`, `replace`, and `replaceAll` well-known-symbol dispatch,
@@ -193,7 +195,9 @@ Ownership follows the plan's target layout:
  -  *runtime\_uri.c*: the four URI handling functions of 19.2.6, the Encode and
     Decode operations they share, the unescaped and preserved ASCII sets that
     separate the two pairs, the UTF-8 transformation both directions run, and
-    the `URIError` every malformed operand raises. It owns no string
+    the `URIError` every malformed operand raises. It also owns the Annex B
+    `escape` and `unescape` of B.2.1, which escape one code unit at a time
+    and never throw after their conversion. It owns no string
     representation of its own: `ToString`, the growable UTF-16 builder, and
     string allocation stay with *runtime\_primitive.c* and *runtime\_string.c*;
  -  *runtime\_reflect.c*: the `Reflect` namespace object of 28.1 and its
@@ -299,12 +303,14 @@ Ownership follows the plan's target layout:
     resizes, or releases a block;
  -  *runtime\_date.c*: the `%Date%` intrinsic with its call and construct
     behavior, the `now`, `parse`, and `UTC` statics, `%Date.prototype%` with
-    its forty-four own methods, and the time-value arithmetic of 21.4.1,
-    including the Date Time String Format parser and the `ToDateString`,
-    `toUTCString`, and `toISOString` writers. It reads no host clock: the
-    current time comes from the clock component's epoch real-time capability,
-    which never takes the monotonic origin. Its `LocalTZA` is the constant +0
-    because the clock adapter has no time-zone capability.
+    its forty-four own methods, the Annex B `getYear` and `setYear`, and the
+    `toGMTString` alias of `toUTCString`, and the time-value arithmetic of
+    21.4.1, including the Date Time String Format parser and the
+    `ToDateString`, `toUTCString`, and `toISOString` writers. It reads no
+    host clock: the current time comes from the clock component's epoch
+    real-time capability, which never takes the monotonic origin. Its
+    `LocalTZA` is the constant +0 because the clock adapter has no time-zone
+    capability.
 
 The iterator protocol operations `oseo_iterator_get`, `oseo_iterator_next`, and
 `oseo_iterator_close` are generated-code ABI entry points declared in

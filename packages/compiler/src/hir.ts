@@ -324,11 +324,11 @@ export function errorIntrinsicName(
 
 /**
  * Global names ECMA-262 clause 19 requires of every realm in ECMAScript
- * 2025, the candidate edition ADR 0013 pins, excluding the Annex B
- * additions the claim excludes. A conforming realm always resolves
- * these names, so a `typeof` of one can never take the unresolvable
- * reference's `"undefined"` answer; a name this profile has not
- * admitted as a value must be rejected instead of misreported.
+ * 2025, the candidate edition ADR 0013 pins, plus the Annex B `escape`
+ * and `unescape` that ADR 0032 brings into the claim. A conforming realm
+ * always resolves these names, so a `typeof` of one can never take the
+ * unresolvable reference's `"undefined"` answer; a name this profile has
+ * not admitted as a value must be rejected instead of misreported.
  */
 const standardGlobalNames: ReadonlySet<string> = new Set([
   "AggregateError",
@@ -383,6 +383,7 @@ const standardGlobalNames: ReadonlySet<string> = new Set([
   "decodeURIComponent",
   "encodeURI",
   "encodeURIComponent",
+  "escape",
   "eval",
   "globalThis",
   "isFinite",
@@ -390,6 +391,7 @@ const standardGlobalNames: ReadonlySet<string> = new Set([
   "parseFloat",
   "parseInt",
   "undefined",
+  "unescape",
 ]);
 
 /**
@@ -480,12 +482,14 @@ export function intrinsicGlobalKind(
     name === "decodeURIComponent" ||
     name === "encodeURI" ||
     name === "encodeURIComponent" ||
+    name === "escape" ||
     name === "eval" ||
     name === "globalThis" ||
     name === "isFinite" ||
     name === "isNaN" ||
     name === "parseFloat" ||
     name === "parseInt" ||
+    name === "unescape" ||
     isTypedArrayIntrinsicName(name) ||
     errorIntrinsicName(name) != null
   ) {

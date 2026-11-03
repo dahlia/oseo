@@ -6,7 +6,7 @@
  * `9f21b607`, candidate run 41233967056 at `636157ef`, and main run
  * 41238903460 at `8770b2e4`. The largest is kept on purpose: the residual
  * evidence file took 1.36 times longer on one of those Linux runners than
- * on another, and the margin the shards keep is a slow runner's. Nine
+ * on another, and the margin the shards keep is a slow runner's. Twelve
  * files postdate those runs and scale a serial local measurement on the
  * same host by the residual-evidence ratio: 2.574 on Linux and 1.974 on
  * macOS.
@@ -45,8 +45,11 @@ export const nodeShardCosts = {
     "tests/m5c-observation-batches.test.ts": 34,
     "tests/native-io/clock-wakeup.test.ts": 174,
     "tests/primitive-wrapper-objects.test.ts": 214,
+    "tests/property/m5-annexb-date-methods.property.test.ts": 32,
+    "tests/property/m5-annexb-escape.property.test.ts": 87,
     "tests/property/m5-annexb-legacy-lookup-boundary.property.test.ts": 33,
     "tests/property/m5-annexb-proto-boundary.property.test.ts": 83,
+    "tests/property/m5-annexb-string-methods.property.test.ts": 37,
     "tests/property/m5-arguments-object.property.test.ts": 37,
     "tests/property/m5-array-buffer.property.test.ts": 44,
     "tests/property/m5-array-constructor.property.test.ts": 112,
@@ -158,6 +161,7 @@ export const nodeShardCosts = {
     "tests/m5c-observation-batches.test.ts": 32,
     "tests/native-io/clock-wakeup.test.ts": 230,
     "tests/primitive-wrapper-objects.test.ts": 199,
+    "tests/property/m5-annexb-escape.property.test.ts": 67,
     "tests/property/m5-annexb-legacy-lookup-boundary.property.test.ts": 35,
     "tests/property/m5-annexb-proto-boundary.property.test.ts": 69,
     "tests/property/m5-arguments-object.property.test.ts": 42,

@@ -5,7 +5,9 @@ Status
 ------
 
 Implementation status: in progress. The `claim-boundary` unit has applied ADR
-0032, and every other unit is open. This plan follows M5 directly and runs
+0032. The `legacy-caller`, `annexb-escape`, `annexb-string-methods`, and
+`annexb-date-methods` units are implemented and observed, and every other unit
+is open. This plan follows M5 directly and runs
 alongside M6. It has no milestone number. It schedules the language work
 the maintainer approved on 2026-11-02: build-time static-specifier `import()`,
 Annex B legacy web behavior except `document.all`, the legacy `caller`
@@ -95,9 +97,9 @@ A probe of the current build and the reviewed manifest shows this Annex B state:
 | `__lookupGetter__`, `__lookupSetter__`             | Not installed; a lookup reaching `Object.prototype` reports OSEO1001          |
 | `__defineGetter__`, `__defineSetter__`             | Not installed                                                                 |
 | Annex B RegExp pattern grammar                     | Reported as the OSEO1001 profile boundary, without `u` or `v`                 |
-| `escape`, `unescape`                               | Not installed; a reference is a `ReferenceError`                              |
-| `substr`, HTML methods, `trimLeft`, `trimRight`    | Not installed; a call is a `TypeError`                                        |
-| `getYear`, `setYear`, `toGMTString`                | Not installed                                                                 |
+| `escape`, `unescape`                               | Installed by `annexb-escape`; all 35 test262 rows pass                        |
+| `substr`, HTML methods, `trimLeft`, `trimRight`    | Installed by `annexb-string-methods`; all 105 test262 rows pass               |
+| `getYear`, `setYear`, `toGMTString`                | Installed by `annexb-date-methods`; all 24 test262 rows pass                  |
 | `RegExp.prototype.compile`                         | Not installed                                                                 |
 | Labelled function declarations                     | Rejected with OSEO1001                                                        |
 | Function declarations in `if` clauses              | Rejected with OSEO1001                                                        |
@@ -458,6 +460,10 @@ functions join the global object component. A property test generates strings
 of arbitrary code units and checks that `unescape(escape(s))` returns `s` and
 that every escape matches an independent encoder.
 
+Status: implemented, with fixed, differential, and generated evidence in the
+[profile section](./docs/language-profile-es2026.md#escape-and-unescape). All
+35 rows pass in the full test262 observation.
+
 ### `annexb-string-methods`
 
 Owns `substr` (15), the thirteen HTML methods from `anchor` through `sup`
@@ -465,11 +471,21 @@ Owns `substr` (15), the thirteen HTML methods from `anchor` through `sup`
 *test/annexB/built-ins/String/prototype/*. The HTML methods share
 CreateHTML, including the quotation mark escaping of attribute values.
 
+Status: implemented, with fixed, differential, and generated evidence in the
+[profile section](./docs/language-profile-es2026.md#string-prototype-methods).
+All 105 rows pass in the full test262 observation.
+
 ### `annexb-date-methods`
 
 Owns *test/annexB/built-ins/Date/prototype/* (24): `getYear`, `setYear`, and
 `toGMTString`. `toGMTString` is the same function object as `toUTCString`.
 The methods use the realm's UTC local time zone that the M5 profile records.
+
+Status: implemented, with fixed, differential, and generated evidence in the
+[profile section](./docs/language-profile-es2026.md#date-prototype-methods).
+All 24 rows pass in the full test262 observation. With them the manifest has
+41,255 reviewed rows: 34,960 passes and 1,894 unsupported results, and no other
+row changes.
 
 ### `annexb-regexp-compile`
 
@@ -667,7 +683,7 @@ standards update and heavy gates on the new base.
     row's owner moves. The audit binds ADR texts by digest, so a unit that
     edits ADR 0013, 0016, or 0028 re-reviews the rows that cite it.
  -  The runtime ABI version in *packages/runtime-c/src/index.ts*, currently
-    `m5-149`, changes once per landing that alters the ABI. The series keeps
+    `m5-150`, changes once per landing that alters the ABI. The series keeps
     its `m5-` prefix, and the closure tools keep their `m5c` names.
  -  Runtime code ranges, property blocks, intrinsic indexes, and heap kinds
     are reserved per unit.

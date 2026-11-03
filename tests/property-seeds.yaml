@@ -612,3 +612,15 @@ families:
     owner: tests/property/legacy-caller.property.test.ts
     start: 0x60009800
     end: 0x600098ff
+  - family: m5-annexb-escape
+    owner: tests/property/m5-annexb-escape.property.test.ts
+    start: 0x60009d00
+    end: 0x60009dff
+  - family: m5-annexb-string-methods
+    owner: tests/property/m5-annexb-string-methods.property.test.ts
+    start: 0x60009e00
+    end: 0x60009eff
+  - family: m5-annexb-date-methods
+    owner: tests/property/m5-annexb-date-methods.property.test.ts
+    start: 0x60009f00
+    end: 0x60009fff

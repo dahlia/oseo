@@ -1463,5 +1463,26 @@ and a delete clears its bit. An active function's `arguments` is created at
 the sites that hand a value to code, because a property query does not
 allocate.
 
+ABI `m5-150` adds the Annex B global functions `escape` and `unescape` to
+*runtime\_uri.c*. They take the realm intrinsic slots `OSEO_INTRINSIC_ESCAPE`
+(273) and `OSEO_INTRINSIC_UNESCAPE` (274) and the two code IDs below the URI
+handling functions in the URI range. The global object binds both as writable,
+non-enumerable, configurable properties in every realm. The generated-code ABI
+gains no entry point.
+
+The same ABI adds the Annex B `String.prototype` methods to *runtime\_string.c*:
+`substr` and the thirteen HTML methods from `anchor` through `sup` take
+fourteen code IDs in the String range, and `trimLeft` and `trimRight` are
+further properties whose values are the existing `trimStart` and `trimEnd`
+functions. The node adds no intrinsic slot, heap kind, component, or
+generated-code entry point.
+
+The same ABI adds the Annex B `Date.prototype.getYear` and `setYear` to
+*runtime\_date.c* as the method table's entries 44 and 45, after
+`[Symbol.toPrimitive]`, so `OSEO_DATE_METHOD_COUNT` becomes 46 and the Date
+range uses two more code IDs. `toGMTString` is a further property whose value
+is the existing `toUTCString` function. No intrinsic slot, heap kind,
+component, or generated-code entry point is added.
+
 [ADR 0030]: https://github.com/dahlia/oseo/blob/main/docs/adr/0030-test262-unhandled-rejection-policy.md
 [ADR 0034]: https://github.com/dahlia/oseo/blob/main/docs/adr/0034-legacy-function-caller-contract.md
