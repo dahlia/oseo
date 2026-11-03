@@ -108,6 +108,12 @@ interface EmitState {
   readonly derivedThisBindingId?: number;
   readonly functionId: number;
   readonly functionFrameCosts: ReadonlyMap<number, number>;
+  /**
+   * Code ids of the functions whose code is non-strict. Creating one goes
+   * through `oseo_function_create_non_strict`, which ADR 0034's legacy
+   * `caller` and `arguments` properties depend on.
+   */
+  readonly nonStrictFunctionIds: ReadonlySet<number>;
   readonly lines: string[];
   readonly environmentSlot: number;
   /**
@@ -2370,7 +2376,10 @@ function emitFunctionCreate(state: EmitState, operation: MirOperation): void {
   line(
     state,
     renderC(
-      emittedC.functionCreate.resultAssignOseoFunctionCreateContextU,
+      state.nonStrictFunctionIds.has(operation.functionId)
+        ? emittedC.functionCreate
+            .resultAssignOseoFunctionCreateNonStrictContextU
+        : emittedC.functionCreate.resultAssignOseoFunctionCreateContextU,
       operation.functionId,
     ) +
       renderC(
@@ -4552,6 +4561,7 @@ function emitFunction(
   fragmentUnit?: "harness" | "case",
   scriptName = "script",
   units?: BodyUnits,
+  nonStrictIds: ReadonlySet<number> = new Set(),
 ): string {
   if (functionValue.blocks.length === 0) {
     throw new Error(`MIR function '${functionValue.name}' has no blocks.`);
@@ -4601,6 +4611,7 @@ function emitFunction(
       return { derivedThisBindingId: functionValue.derivedThisBindingId };
     }),
     functionFrameCosts,
+    nonStrictFunctionIds: nonStrictIds,
     environmentSlot,
     globalObjectBindingIds: new Set(
       globalObjectBindings.map((binding) => binding.id),
@@ -4768,6 +4779,14 @@ function emitFunction(
       frameCost,
       units,
     ),
+  );
+}
+
+function nonStrictFunctionIds(
+  functions: readonly MirFunction[],
+): ReadonlySet<number> {
+  return new Set(
+    functions.filter((fn) => fn.strict !== true).map((fn) => fn.id),
   );
 }
 
@@ -5091,6 +5110,7 @@ export const cBackend: NativeBackend = {
           undefined,
           "script",
           units,
+          nonStrictFunctionIds(originalFunctions),
         ),
       )
       .join(renderC(emittedC.common.newline));
@@ -5244,6 +5264,7 @@ function emitFragmentUnit(
   const counts = new Map(
     fragment.mir.functions.map((fn) => [fn.id, rootCount(fn)]),
   );
+  const nonStrict = nonStrictFunctionIds(fragment.mir.functions);
   const definitions = functions.map((fn) =>
     emitFunction(
       fn,
@@ -5254,6 +5275,9 @@ function emitFragmentUnit(
       [],
       globalObjects,
       unit,
+      undefined,
+      undefined,
+      nonStrict,
     ),
   );
   const entries = phases.map((phase, index) => {
@@ -5272,6 +5296,8 @@ function emitFragmentUnit(
         globalObjects,
         unit,
         name,
+        undefined,
+        nonStrict,
       ) +
       `
 OseoResult oseo_${unit}_${name}(OseoContext *context,

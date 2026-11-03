@@ -9,6 +9,10 @@ Accepted. The maintainer approved this boundary on 2026-10-20 for M5c node
 it authorizes a bounded M5 exclusion of an optional legacy caller expectation
 for an exact set of 23 test262 paths. It changes no runtime behavior.
 
+[ADR 0034](./0034-legacy-function-caller-contract.md), accepted on
+2026-11-03, supersedes this record. The exclusion below stays in force until
+the `legacy-caller` unit lands the reviewed rows that ADR 0034 accounts for.
+
 
 Context
 -------

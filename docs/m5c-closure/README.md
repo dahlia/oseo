@@ -233,8 +233,10 @@ owned `__lookupGetter__` or `__lookupSetter__` rejection only when the source
 calls the named method in call syntax. It accepts the ADR 0028 owner only
 for a selector path whose observation is the exact frontmatter rejection
 with `caller` as the only unsupported feature, whose case has the `noStrict`
-flag, and whose source reads a `caller` member. A selector path can use no
-other ADR owner, and every reviewed selector path needs its audit row. Its
+flag, and whose source reads a `caller` member. Until ADR 0034 admits
+`caller`, a selector path can use no other ADR owner; afterward, a selector
+path that has not closed needs the ADR 0016 owner and the dynamic-source
+rejection. Every reviewed selector path needs its audit row. Its
 dynamic-source intersections do not broaden ADR 0016, and a later
 observation that reaches their dynamic-source rejection, or that admits the
 `caller` feature, needs a new reviewed scope decision.

@@ -280,18 +280,27 @@ Each selector path records `priorCohort: legacy-caller`,
 `legacy-caller` assessment with `disposition: exclusion` and
 `normativeDependency: legacy-caller-only`. The selector is exact in both
 directions. No other path can use that owner, cohort, or dependency, and no
-selector path can name ADR 0016 or ADR 0013. The record has no remediation
-disposition. Once a selector path is reviewed, it must keep an audit row even
-if its ledger owner changes. A promotion to pass or expected negative uses the
-observation owner.
+selector path can name ADR 0013. The record has no remediation disposition.
+Once a selector path is reviewed, it must keep an audit row even if its ledger
+owner changes. A promotion to pass or expected negative uses the observation
+owner and keeps the row's ADR 0028 owner and assessment.
 
-The five paths that also call `eval` or a source-compiling `Function` form carry
-the `dynamic-source` dependency tag. ADR 0016 remains in force for those calls
-but owns none of these paths, and its audit surface is unchanged. Their
-`missingDynamicTag` is false, because the dynamic-source tag debt applies only
-to ADR 0016 rows. The %Function.prototype% accessors, the clause 17.1
-restrictions, and the absence of an own `caller` property on arguments objects
-stay inside the claim with their own evidence or remediation owners.
+[ADR 0034](../adr/0034-legacy-function-caller-contract.md) admits the `caller`
+feature, so the frontmatter check no longer rejects a selector path. While ADR
+0034 is accepted, the checker accepts a selector path that has not closed only
+as an ADR 0016 row. It keeps `priorCohort: legacy-caller` and needs
+`proposedOwner: adr:0016-dynamic-source-boundary`, an exclusion assessment with
+`normativeDependency: source-evaluation-only`, and the ADR 0016 rejection of an
+`eval` or `Function` call. Any other owner, dependency, or rejection fails, and
+the selector digest stays pinned.
+
+The 18 selector paths that call neither `eval` nor a `Function` constructor
+pass. The other five carry the `dynamic-source` dependency tag and fail on
+that call, so they are ADR 0016 rows under the `legacy-caller-dynamic-source`
+assessment, which binds the `caller` fixtures as replacement evidence. The
+%Function.prototype% accessors, the clause 17.1 restrictions, and the absence
+of an own `caller` property on arguments objects stay inside the claim with
+their own evidence or remediation owners.
 
 
 Resizable buffer harness observations

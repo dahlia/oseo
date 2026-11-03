@@ -56,8 +56,8 @@ three sums, rounded up, so the margin below is a slow runner's. Files under 30
 seconds have no entry and weigh the host fallback, 18 seconds on both hosts,
 which is the median of every measured weight.
 
-Eight files postdate those runs. Serial local runs on 2026-11-01 and
-2026-11-02 of the residual evidence and those files, on one host, give the
+Nine files postdate those runs. Serial local runs from 2026-11-01 to
+2026-11-03 of the residual evidence and those files, on one host, give the
 calibration:
 
 | File                                              | Local, s | Linux weight | macOS weight |
@@ -71,6 +71,7 @@ calibration:
 | *tests/host-script-trainc-evidence-3.test.ts*     |    284.2 |          732 |          561 |
 | *tests/host-script-trainc-evidence-4.test.ts*     |    261.2 |          673 |          516 |
 | *tests/function-constructor-evidence.test.ts*     |     55.5 |          143 |          110 |
+| *tests/legacy-caller.test.ts*                     |     26.9 |           70 |           54 |
 
 The ratios are 2.574 for Linux and 1.974 for macOS, the residual file's
 largest CI sum over its local sum. The fastest Linux observation gives

@@ -1923,6 +1923,125 @@ test("reviewed caller selector paths cannot leave the audit", () => {
   );
 });
 
+/** A selector path that fails on its `eval` call after ADR 0034. */
+function callerResidueFixture() {
+  const sourceText = 'function f() { return eval("g.caller"); }\n';
+  const { audit, inputs } = fixture(false, sourceText);
+  Object.assign(audit.paths[0]!, { priorCohort: "legacy-caller" });
+  return {
+    audit,
+    inputs: {
+      ...inputs,
+      legacyCallerAdmitted: true,
+      legacyCallerPaths: new Set([path]),
+    },
+  };
+}
+
+test("an admitted caller selector path that still fails is ADR 0016", () => {
+  const { audit, inputs } = callerResidueFixture();
+  assert.deepEqual(validateM5cExclusionAudit(stringifyYaml(audit), inputs), {
+    exclusions: 1,
+    remediation: 0,
+    deferrals: 0,
+    missingDynamicTags: 1,
+  });
+  assert.throws(
+    () =>
+      validateM5cExclusionAudit(stringifyYaml(audit), {
+        ...inputs,
+        legacyCallerAdmitted: false,
+      }),
+    /exact ADR 0028 selector/u,
+  );
+  for (const change of [
+    { proposedOwner: callerOwner },
+    { proposedOwner: annexOwner },
+    { priorCohort: "incidental-scaffolding" },
+  ]) {
+    const changed = callerResidueFixture().audit;
+    Object.assign(changed.paths[0]!, change);
+    assert.throws(
+      () => validateM5cExclusionAudit(stringifyYaml(changed), inputs),
+      /exact ADR 0028 selector/u,
+    );
+  }
+  for (const normativeDependency of [
+    "legacy-caller-only",
+    "not-demonstrated",
+  ]) {
+    const changed = callerResidueFixture().audit;
+    changed.assessments.reviewed = {
+      ...changed.assessments.reviewed,
+      normativeDependency,
+    };
+    assert.throws(
+      () => validateM5cExclusionAudit(stringifyYaml(changed), inputs),
+      /exact ADR 0028 selector/u,
+    );
+  }
+  // The ADR 0016 owner still needs the dynamic-source rejection.
+  const caller = callerFixture();
+  caller.audit.paths[0]!.proposedOwner = owner;
+  caller.audit.assessments.caller = {
+    disposition: "exclusion",
+    normativeDependency: "source-evaluation-only",
+    reason: "The caller rejection is not a dynamic-source rejection.",
+  };
+  assert.throws(
+    () =>
+      validateM5cExclusionAudit(stringifyYaml(caller.audit), {
+        ...caller.inputs,
+        legacyCallerAdmitted: true,
+        ledger: {
+          ...caller.inputs.ledger,
+          entries: caller.inputs.ledger.entries.map((entry) =>
+            Object.assign({}, entry, { owner }),
+          ),
+        },
+      }),
+    /outside the record surface/u,
+  );
+});
+
+test("an admitted caller selector path that passes keeps its row", () => {
+  const { audit, inputs } = callerFixture();
+  const passing = {
+    ...inputs,
+    legacyCallerAdmitted: true,
+    results: inputs.results.map((entry) =>
+      Object.assign({}, entry, {
+        classification: "pass",
+        observation: { passed: true },
+        unsupportedFeatures: [],
+      }),
+    ),
+    ledger: {
+      ...inputs.ledger,
+      entries: inputs.ledger.entries.map((entry) =>
+        Object.assign({}, entry, {
+          owner: "observation",
+          prerequisites: [],
+          state: "pass" as const,
+        }),
+      ),
+    },
+  };
+  assert.deepEqual(validateM5cExclusionAudit(stringifyYaml(audit), passing), {
+    exclusions: 0,
+    remediation: 0,
+    deferrals: 0,
+    missingDynamicTags: 0,
+  });
+  assert.throws(
+    () =>
+      validateM5cExclusionAudit(stringifyYaml({ ...audit, paths: [] }), {
+        ...passing,
+      }),
+    /selector path lacks its audit row/u,
+  );
+});
+
 test("caller member reads are recognized by syntax", () => {
   for (const text of [
     "g.caller;",

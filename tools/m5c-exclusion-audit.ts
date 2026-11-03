@@ -111,10 +111,13 @@ const dynamicImportRejection = new RegExp(
 /**
  * ADR 0028 excludes only the optional legacy caller expectation, only for
  * its exact selector, and only through the frontmatter rejection of the
- * `caller` feature. Its paths have no other ADR owner.
+ * `caller` feature. Its paths have no other ADR owner until ADR 0034 admits
+ * `caller`; a path that still fails after that is an ADR 0016 row.
  */
 const callerOwner = "adr:0028-legacy-function-caller-boundary";
 const callerRecordStem = "0028-legacy-function-caller-boundary";
+/** ADR 0034, which admits the `caller` feature that ADR 0028 excluded. */
+const callerContractStem = "0034-legacy-function-caller-contract";
 const callerRejectionDetail =
   "Not executed: the frontmatter needs an unsupported feature.";
 const recordStems = [
@@ -386,6 +389,11 @@ export interface M5cExclusionAuditInputs {
   /** Exact ADR 0028 selector; absent means no path may use its owner. */
   readonly legacyCallerPaths?: ReadonlySet<string>;
   /**
+   * Whether accepted ADR 0034 admits the `caller` feature. A selector path
+   * that still fails then needs the ADR 0016 owner; absent means false.
+   */
+  readonly legacyCallerAdmitted?: boolean;
+  /**
    * Exact unit-owned ADR 0013 rows over an eval rejection; absent means
    * none. The checked-in audit passes `m5cAnnexDynamicResiduePaths`.
    */
@@ -558,12 +566,24 @@ export function validateM5cExclusionAudit(
       throw new Error(`Audit cannot authorize this proposed record: ${path}.`);
     }
     // The selector is exact in both directions: its paths name only this
-    // record, and only its paths may name it.
+    // record, and only its paths may name it. Once ADR 0034 admits `caller`,
+    // a selector path that has not closed can fail only on the ADR 0016
+    // rejection of its `eval` or `Function` call, so it moves to that
+    // record and keeps its cohort.
     const callerPath = inputs.legacyCallerPaths?.has(path) ?? false;
+    const callerResidue =
+      callerPath &&
+      (inputs.legacyCallerAdmitted ?? false) &&
+      entry.state !== "pass" &&
+      entry.state !== "expected-negative";
+    const callerRow = callerPath && !callerResidue;
     if (
-      (proposedOwner === callerOwner) !== callerPath ||
+      (proposedOwner === callerOwner) !== callerRow ||
       (row.priorCohort === "legacy-caller") !== callerPath ||
-      (assessment.normativeDependency === "legacy-caller-only") !== callerPath
+      (assessment.normativeDependency === "legacy-caller-only") !== callerRow ||
+      (callerResidue &&
+        (proposedOwner !== dynamicOwner ||
+          assessment.normativeDependency !== "source-evaluation-only"))
     ) {
       throw new Error(`Audit needs the exact ADR 0028 selector: ${path}.`);
     }
@@ -935,6 +955,12 @@ export function validateCurrentM5cExclusionAudit(
     importAttributesDynamicPaths: readImportAttributesReservation(),
     legacyCallerPaths: readLegacyCallerSelector(
       recordSources.get(callerRecordStem) ?? "",
+    ),
+    legacyCallerAdmitted: isAcceptedDecisionRecord(
+      readFileSync(
+        join(repositoryRoot, "docs/adr", `${callerContractStem}.md`),
+        "utf8",
+      ),
     ),
     ledger,
     results,

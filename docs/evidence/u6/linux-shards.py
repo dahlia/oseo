@@ -26,9 +26,9 @@ EXCLUDED = {
 # table weights are retained unchanged. The two module files carry one-run
 # case sums from candidate CI 40869736577; with-var loop heads use
 # candidate CI 41059687055 and the module evaluation driver candidate CI
-# 41574039008. Primitive with boxing and the non-blocking
-# agent each use a later local Linux extended measurement, not a CI
-# file-shard sum. See the U6 README.
+# 41574039008. Primitive with boxing, the non-blocking agent and the
+# legacy caller suite each use a later local Linux extended measurement,
+# not a CI file-shard sum. See the U6 README.
 RETAINED = {
     'tests/property/m5-host-script-bindings.property.test.ts',
     'tests/property/m5-module-namespace-uninitialized.property.test.ts',
@@ -38,6 +38,7 @@ RETAINED = {
     'tests/property/m5-with-primitive-boxing.property.test.ts',
     'tests/property/m5-non-blocking-agent.property.test.ts',
     'tests/property/module-evaluation-driver.property.test.ts',
+    'tests/property/legacy-caller.property.test.ts',
 }
 # Logged files later split by test registration. Each logged title is
 # rebucketed to the current source that defines it.

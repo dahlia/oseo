@@ -77,6 +77,75 @@ static OseoProperty *append_property_slot(
     object->property_count += 1u;
     return &object->properties[insertion];
 }
+OseoResult oseo_internal_legacy_materialize(
+    OseoContext *context,
+    OseoValue object_value,
+    OseoValue key
+) {
+    uint8_t live = oseo_internal_legacy_live_key(object_value, key);
+    if (live == 0u) return normal(oseo_undefined());
+    OseoValue current = oseo_undefined();
+    OseoPropertyAttributes attributes = {false, false, false, false};
+    (void)oseo_internal_legacy_descriptor(
+        context, object_value, key, &current, &attributes);
+    OseoRootFrame frame = {NULL, NULL, 0u};
+    OseoResult result = oseo_roots_allocate(context, &frame, 3u);
+    if (result.status != OSEO_STATUS_NORMAL) return result;
+    frame.slots[0] = object_value;
+    frame.slots[1] = key;
+    result = oseo_internal_legacy_value(context, object_value, key, current);
+    if (result.status == OSEO_STATUS_NORMAL) {
+        frame.slots[2] = result.value;
+        result = oseo_internal_grow_properties(context, frame.slots[0]);
+    }
+    if (result.status != OSEO_STATUS_NORMAL) {
+        oseo_roots_release(context, &frame);
+        return result;
+    }
+    OseoFunction *function = function_object(frame.slots[0]);
+    OseoOrdinaryObject *object = ordinary_object(frame.slots[0]);
+    size_t target = live == OSEO_LEGACY_ARGUMENTS_LIVE
+        ? function->legacy_arguments_position
+        : function->prototype_key_position;
+    size_t insertion = object->property_count;
+    size_t rank = 0u;
+    for (size_t index = 0u; index < object->property_count; index += 1u) {
+        uint32_t ignored = 0u;
+        OseoValue scanned = object->properties[index].key;
+        if (is_symbol(scanned) ||
+            oseo_internal_array_index(scanned, &ignored)) continue;
+        if (rank == target) {
+            insertion = index;
+            break;
+        }
+        rank += 1u;
+    }
+    for (size_t index = object->property_count;
+         index > insertion;
+         index -= 1u) {
+        object->properties[index] = object->properties[index - 1u];
+    }
+    object->property_count += 1u;
+    OseoProperty *property = &object->properties[insertion];
+    property->attributes = (OseoPropertyAttributes){true, false, false, false};
+    property->key = frame.slots[1];
+    property->value = frame.slots[2];
+    property->omitted_accessors = 0u;
+    property->getter = oseo_undefined();
+    property->setter = oseo_undefined();
+    oseo_internal_note_property_inserted(object, insertion);
+    /* Both live keys sit in front of `prototype`, so the new slot always
+     * moves it one place later; a live `arguments` stays in front of a
+     * moved `caller` at its unchanged rank. */
+    function->prototype_key_position += 1u;
+    function->legacy_live &= (uint8_t)~live;
+    object->dictionary = true;
+    object->shape_id = context->next_shape_id;
+    context->next_shape_id += 1u;
+    oseo_roots_release(context, &frame);
+    return normal(oseo_undefined());
+}
+
 bool oseo_internal_same_value(OseoValue left, OseoValue right) {
     if (is_number(left) && is_number(right)) {
         double left_number = number_value(left);
@@ -172,6 +241,14 @@ bool oseo_internal_own_descriptor(
     if (omitted_accessors != NULL) *omitted_accessors = 0u;
     *getter = oseo_undefined();
     *setter = oseo_undefined();
+    /* Without the context, the legacy `caller` and `arguments` values
+     * are unknown; oseo_internal_own_property_descriptor answers them.
+     * Every context-free caller reads only presence and attributes. */
+    if (oseo_internal_legacy_live_key(object_value, key) != 0u) {
+        *value = oseo_null();
+        *attributes = (OseoPropertyAttributes){true, false, false, false};
+        return true;
+    }
     if (function_has_prototype_property(object_value) &&
         oseo_internal_string_is_ascii(key, "prototype")) {
         *value = function_object(object_value)->prototype_object;
@@ -232,6 +309,13 @@ bool oseo_internal_own_property_descriptor(
     OseoValue *setter,
     uint8_t *omitted_accessors
 ) {
+    if (oseo_internal_legacy_descriptor(
+            context, object_value, key, value, attributes)) {
+        if (omitted_accessors != NULL) *omitted_accessors = 0u;
+        *getter = oseo_undefined();
+        *setter = oseo_undefined();
+        return true;
+    }
     if (oseo_internal_own_descriptor(
             object_value,
             key,
@@ -312,6 +396,9 @@ static OseoResult define_data_property(
     if (typed_array_result.status != OSEO_STATUS_NORMAL || typed_array_key) {
         return typed_array_result;
     }
+    OseoResult legacy = oseo_internal_legacy_materialize(
+        context, object_value, key);
+    if (legacy.status != OSEO_STATUS_NORMAL) return legacy;
     if (function_has_prototype_property(object_value) &&
         oseo_internal_string_is_ascii(key, "prototype")) {
         if (attributes.configurable || attributes.enumerable) {
@@ -746,6 +833,9 @@ static OseoResult define_accessor_property(
             "Cannot redefine the prototype property.";
         return normal(object_value);
     }
+    OseoResult legacy = oseo_internal_legacy_materialize(
+        context, object_value, key);
+    if (legacy.status != OSEO_STATUS_NORMAL) return legacy;
     OseoOrdinaryObject *object = ordinary_object(object_value);
     OseoPropertyAttributes virtual_attributes = {false, false, false, false};
     bool replaces_virtual =
@@ -1012,6 +1102,16 @@ OseoResult oseo_object_delete(
             ? type_error(context, "Cannot delete the prototype property.")
             : normal(oseo_boolean(false));
     }
+    uint8_t legacy_live = oseo_internal_legacy_live_key(object_value, key);
+    if (legacy_live != 0u) {
+        /* A live `arguments` or `caller` is configurable (ADR 0034). */
+        function_object(object_value)->legacy_live &=
+            (uint8_t)~legacy_live;
+        ordinary_object(object_value)->dictionary = true;
+        ordinary_object(object_value)->shape_id = context->next_shape_id;
+        context->next_shape_id += 1u;
+        return normal(oseo_boolean(true));
+    }
     if (is_array(object_value) &&
         oseo_internal_string_is_ascii(key, "length")) {
         return strict
@@ -1083,6 +1183,10 @@ OseoResult oseo_object_delete(
         if (!is_symbol(key) && !oseo_internal_array_index(key, &ignored) &&
             rank < function->prototype_key_position) {
             function->prototype_key_position -= 1u;
+        }
+        if (!is_symbol(key) && !oseo_internal_array_index(key, &ignored) &&
+            rank < function->legacy_arguments_position) {
+            function->legacy_arguments_position -= 1u;
         }
     }
     (void)oseo_internal_remove_property(object, index);

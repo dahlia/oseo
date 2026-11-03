@@ -150,6 +150,29 @@ static OseoResult enumeration_keys(OseoContext *context, OseoValue level) {
                 );
             }
         }
+        /* The legacy `caller` and `arguments` of a non-strict function
+         * stay outside the property vector until a definition moves
+         * them into it (ADR 0034). */
+        uint8_t legacy_live = is_function(frame.slots[0])
+            ? function_object(frame.slots[0])->legacy_live
+            : 0u;
+        if (result.status == OSEO_STATUS_NORMAL && legacy_live != 0u) {
+            static const uint8_t bits[2] = {
+                OSEO_LEGACY_ARGUMENTS_LIVE,
+                OSEO_LEGACY_CALLER_LIVE,
+            };
+            result = oseo_internal_legacy_function_keys(context);
+            for (size_t index = 0u;
+                 result.status == OSEO_STATUS_NORMAL && index < 2u;
+                 index += 1u) {
+                if ((legacy_live & bits[index]) == 0u) continue;
+                result = oseo_argument_list_append(
+                    context,
+                    frame.slots[1],
+                    context->legacy_function_keys[index]
+                );
+            }
+        }
         OseoOrdinaryObject *initial = ordinary_object(frame.slots[0]);
         bool pending_annexb = initial->immutable_prototype &&
             !initial->module_namespace && !initial->annexb_proto_deleted;

@@ -2003,6 +2003,27 @@ ff66c1e6fedaae84580499c5ea1068fd953fa48adf6203a7027fdb0b87ac24e2
 [41574039008]: https://github.com/dahlia/oseo/actions/runs/41574039008
 
 
+Legacy caller local cost
+------------------------
+
+*tests/property/legacy-caller.property.test.ts* postdates the three Linux
+source runs. Its initial Linux weight comes from one local Linux AMD64
+extended run on the Zig lane with `OSEO_PROPERTY_RUN_SCALE=10`, at its
+unchanged seed `0x60009800`, size and base limit, with no seed, size or
+time-scale override. The file has one property registration, which took
+70889.526698 milliseconds, a rounded-up 71 seconds, including its Node.js
+and Deno reference runs.
+
+This is one local observation, not a CI file-shard sum, a run-to-run bound
+or a macOS measurement. Root may replace it with exact-candidate CI case
+sums. macOS gains no entry and keeps its unknown-file median fallback. The
+TSV retains the file with `-` for all three historical source samples, and
+the extraction script and its unit test retain it explicitly.
+
+Linux now has 149 entries, so its upper-median fallback moves from 443 to
+442 seconds. The macOS fallback stays at 296 seconds.
+
+
 Primitive with binding object local cost
 ----------------------------------------
 

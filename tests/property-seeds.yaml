@@ -608,3 +608,7 @@ families:
     owner: packages/testkit/tests/import-requests.property.test.ts
     start: 0x60009700
     end: 0x600097ff
+  - family: legacy-caller
+    owner: tests/property/legacy-caller.property.test.ts
+    start: 0x60009800
+    end: 0x600098ff

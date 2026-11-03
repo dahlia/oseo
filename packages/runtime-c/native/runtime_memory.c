@@ -704,6 +704,21 @@ void oseo_collect(OseoContext *context) {
     mark_value(context->pending_rejection_tail, &worklist);
     mark_realm(&context->initial_realm, &worklist);
     mark_value(context->realm_record, &worklist);
+    /* Each record's values are also rooted by the frame that made its
+     * call; tracing them keeps that an optimization, not a requirement. */
+    for (const OseoActivation *activation = context->activation;
+         activation != NULL;
+         activation = activation->previous) {
+        mark_value(activation->function, &worklist);
+        mark_value(activation->caller, &worklist);
+        for (size_t index = 0u;
+             index < activation->argument_count;
+             index += 1u) {
+            mark_value(activation->arguments[index], &worklist);
+        }
+    }
+    mark_value(context->legacy_function_keys[0], &worklist);
+    mark_value(context->legacy_function_keys[1], &worklist);
     for (size_t index = 0u;
          index < OSEO_WELL_KNOWN_SYMBOL_COUNT;
          index += 1u) {
@@ -742,6 +757,7 @@ void oseo_collect(OseoContext *context) {
         mark_value(tail_call->realm_record, &worklist);
         mark_value(tail_call->this_cell, &worklist);
         mark_value(tail_call->constructor_realm, &worklist);
+        mark_value(tail_call->caller, &worklist);
         for (size_t index = 0u;
              index < tail_call->argument_count;
              index += 1u) {

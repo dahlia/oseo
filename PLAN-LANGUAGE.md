@@ -153,9 +153,10 @@ starts admitting syntax, together with the exclusion audit's record digest and
 quotes. That change also reviews the two dynamic-import exclusion cohorts whose
 reopening trigger is an accepted amendment that admits dynamic import.
 
-The track also needs one further record: a successor to
-[ADR 0028](./docs/adr/0028-legacy-function-caller-boundary.md) that defines the
-`caller` contract below, accepted before `legacy-caller` lands.
+The maintainer accepted
+[ADR 0034](./docs/adr/0034-legacy-function-caller-contract.md), the successor
+to [ADR 0028](./docs/adr/0028-legacy-function-caller-boundary.md) that defines
+the `caller` contract below, on 2026-11-03.
 
 
 Contracts shared by the units
@@ -182,15 +183,18 @@ only its own rows, and explains every changed record.
 
 ### Legacy `caller`
 
-The successor to ADR 0028 fixes this contract. V8, as observed in Node.js
-24.21.0, is the reference wherever the edition leaves a choice.
+ADR 0034 fixes this contract. V8, as observed in Node.js 24.21.0, is the
+reference wherever the edition leaves a choice. Deno 2.9.7 reports the same
+values through %Function.prototype% getters, without own properties.
 
  -  A non-strict `function` declaration or expression that is neither async
-    nor a generator has an own `caller` property. V8 reports it as a data
-    property that is non-writable, non-enumerable, and non-configurable, and
-    whose value is read at access time. Clause 17.1's restrictions stay
-    intact: built-in, strict, arrow, method, class, generator, and async
-    functions get no own `caller`.
+    nor a generator has an own `caller` property. It is a data property that
+    is non-writable, non-enumerable, and configurable, and whose value is read
+    at access time. V8 makes it non-configurable, which breaks an
+    essential-method invariant that two passing test262 rows check. Deleting
+    it removes it, and a definition or freeze fixes the value it has at that
+    moment. Clause 17.1's restrictions stay intact: built-in, strict, arrow,
+    method, class, generator, and async functions get no own `caller`.
  -  The same functions also get V8's own `arguments` property with the same
     attributes. While the function is active, it reads as an arguments object
     for the most recent activation; otherwise it is `null`. Oseo adds both
@@ -201,9 +205,9 @@ The successor to ADR 0028 fixes this contract. V8, as observed in Node.js
  -  The value is never a strict function. A call from strict code, from a
     built-in such as `Array.prototype.map`, or from top-level Script or module
     code reports `null`.
- -  `Function.prototype.call` and `apply` report the function that invoked
-    them, not the built-in. A bound function reports the caller of the bound
-    function.
+ -  `Function.prototype.call`, `apply`, `Reflect.apply`, and
+    `Reflect.construct` report the function that invoked them, not the
+    built-in. A bound function reports the caller of the bound function.
  -  Recursion reports the caller of the most recent activation. Unwinding an
     exception restores the previous activation's answer.
  -  A strict tail call never changes the answer. If strict `g` tail-calls
@@ -213,8 +217,8 @@ The successor to ADR 0028 fixes this contract. V8, as observed in Node.js
     measures the per-call cost of tracking activations and keeps programs that
     never read `caller` within a recorded budget.
 
-How a caller in another realm is reported is observed on V8 and recorded by the
-successor record before implementation.
+A caller in another realm is reported as V8 reports it; ADR 0034 records the
+realm rule and the places where Oseo departs from V8.
 
 ### Explicit resource management
 
@@ -253,7 +257,7 @@ inventory; “existing” counts rows already in it whose owner moves to the uni
 | `import-requests`                  | none                                 | ADR 0016 amendment (accepted)                   |
 | `import-operation`                 | none                                 | `import-driver`, `import-requests`              |
 | `import-admission`                 | 20 existing deferrals                | `import-operation`                              |
-| `legacy-caller`                    | 23 existing                          | successor to ADR 0028 accepted                  |
+| `legacy-caller`                    | 23 existing                          | ADR 0034 (accepted)                             |
 | `annexb-syntax`                    | 28 new, 1 existing                   | `claim-boundary`                                |
 | `annexb-escape`                    | 35 new                               | `claim-boundary`                                |
 | `annexb-string-methods`            | 105 new                              | `claim-boundary`                                |
@@ -287,7 +291,7 @@ graph TD
   driver[import-driver] --> operation[import-operation]
   requests --> operation
   operation --> admission[import-admission]
-  adr28[ADR 0028 successor] --> caller[legacy-caller]
+  adr34[ADR 0034] --> caller[legacy-caller]
   boundary --> syntax[annexb-syntax]
   boundary --> escape[annexb-escape]
   boundary --> strings[annexb-string-methods]
@@ -397,9 +401,9 @@ the admitted subset.
 
 ### `legacy-caller`
 
-The unit implements the `caller` contract above and replaces ADR 0028 with its
-successor. It owns ADR 0028's 23-path selector. The 18 paths that use no dynamic
-source should pass. The other five call `eval` or a `Function` constructor:
+The unit implements the `caller` contract above and replaces ADR 0028 with
+ADR 0034. It owns ADR 0028's 23-path selector. The 18 paths that use no dynamic
+source pass. The other five call `eval` or a `Function` constructor:
 
  -  *test/built-ins/Function/15.3.5.4\_2-12gs.js* (`eval`)
  -  *test/built-ins/Function/15.3.5.4\_2-14gs.js* (`eval`)
@@ -408,7 +412,8 @@ source should pass. The other five call `eval` or a `Function` constructor:
  -  *test/built-ins/Function/15.3.5.4\_2-78gs.js* (`new Function`)
 
 They remain unsupported through the OSEO1001 rejection, and the unit gives them
-to ADR 0016 through reviewed exclusion audit rows. The 18 passes and the fixed
+to ADR 0016 through reviewed exclusion audit rows under the
+`legacy-caller-dynamic-source` assessment. The 18 passes and the fixed
 fixtures are the replacement evidence for their `caller` subject.
 *PLAN-DYN.md* records them as residue.
 
@@ -419,6 +424,15 @@ contract. A property suite generates call graphs mixing strict and non-strict
 functions, `call`, `apply`, `bind`, built-in callbacks, tail calls, recursion,
 and throws, and compares each `caller` read with an independent activation
 model.
+
+Status: implemented. The runtime, its differential and fixed tests in
+*tests/legacy-caller.test.ts*, and the generated *legacy-caller* property
+suite are in place, and
+[*docs/evidence/legacy-caller/*](./docs/evidence/legacy-caller/) records the
+per-call cost. The full test262 observation changes only the 23 selector
+rows: 18 pass and five are ADR 0016 exclusions, so the manifest has 34,796
+passes and 1,894 unsupported results. No other row changes, including the
+rows that reflect on function own keys.
 
 ### `annexb-syntax`
 
@@ -653,7 +667,7 @@ standards update and heavy gates on the new base.
     row's owner moves. The audit binds ADR texts by digest, so a unit that
     edits ADR 0013, 0016, or 0028 re-reviews the rows that cite it.
  -  The runtime ABI version in *packages/runtime-c/src/index.ts*, currently
-    `m5-148`, changes once per landing that alters the ABI. The series keeps
+    `m5-149`, changes once per landing that alters the ABI. The series keeps
     its `m5-` prefix, and the closure tools keep their `m5c` names.
  -  Runtime code ranges, property blocks, intrinsic indexes, and heap kinds
     are reserved per unit.

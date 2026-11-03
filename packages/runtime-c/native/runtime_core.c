@@ -106,6 +106,9 @@ void oseo_context_init(
     context->realm = &context->initial_realm;
     context->realm_record = oseo_undefined();
     context->constructor_scope = NULL;
+    context->activation = NULL;
+    context->legacy_function_keys[0] = oseo_undefined();
+    context->legacy_function_keys[1] = oseo_undefined();
     for (size_t index = 0u;
          index < OSEO_WELL_KNOWN_SYMBOL_COUNT;
          index += 1u) {
@@ -207,6 +210,9 @@ void oseo_context_destroy(OseoContext *context) {
     context->realm = &context->initial_realm;
     context->realm_record = oseo_undefined();
     context->constructor_scope = NULL;
+    context->activation = NULL;
+    context->legacy_function_keys[0] = oseo_undefined();
+    context->legacy_function_keys[1] = oseo_undefined();
     oseo_internal_realm_release(&context->initial_realm);
     for (size_t index = 0u;
          index < OSEO_WELL_KNOWN_SYMBOL_COUNT;
