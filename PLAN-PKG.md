@@ -126,8 +126,10 @@ Resolution contract
 The resolver follows the ECMAScript module resolution of Node.js 24 for the
 constructs it admits, so a package that works under Node.js with the same
 conditions resolves to the same files under Oseo. Differences are deliberate
-and listed here. The architecture decision that opens the track freezes this
-contract; the list below is its content.
+and listed here. Proposed
+[ADR 0033](./docs/adr/0033-installed-package-resolution.md) freezes this
+contract with its alternatives and revisit triggers; the list below is its
+content.
 
 ### Specifier classes
 
@@ -416,8 +418,9 @@ Relationship to other plans
     a release gate unless the maintainer names it one.
  -  [ADR 0009](./docs/adr/0009-module-identity-and-linking.md) already keeps
     the resolver and loader outside the compiler core as replaceable host
-    policy. The ADR that opens this track amends its identity rule to real
-    paths.
+    policy. Proposed
+    [ADR 0033](./docs/adr/0033-installed-package-resolution.md) amends its
+    identity rule to real paths.
 
 
 Verification
