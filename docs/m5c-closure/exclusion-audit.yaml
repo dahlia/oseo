@@ -58,8 +58,8 @@ records:
         behavior other than source evaluation reopens the
         boundary rather than this record.
   0028-legacy-function-caller-boundary:
-    digest: "6435c36983878026eabda278fa4575d91a794165bfa27899b0\
-      3b39e77e0c26ae"
+    digest: "166d3ebe9107395455d3c08fc0d2c6a0299acdf7f632ed8c8f\
+      b17ddc34fcca6b"
     authorization:
       - The optional legacy caller extension is outside the
         M5 profile.

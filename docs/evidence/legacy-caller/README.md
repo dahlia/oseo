@@ -2,7 +2,7 @@ Legacy `caller` evidence
 ========================
 
 This directory holds the evidence behind
-[ADR 0033](../../adr/0033-legacy-function-caller-contract.md), the contract for
+[ADR 0034](../../adr/0034-legacy-function-caller-contract.md), the contract for
 the own `caller` and `arguments` properties of non-strict functions.
 
 
@@ -31,7 +31,7 @@ function is active must report the same value. Node.js 24.21.0 reports a
 different one for both.
 
 The probe samples built-in functions; it does not enumerate them. The
-`built-in` group shows the split that ADR 0033 declines to copy, not a complete
+`built-in` group shows the split that ADR 0034 declines to copy, not a complete
 list of V8's C++ built-ins.
 
 
@@ -50,4 +50,4 @@ non-strict function there has only `length`, `name`, and `prototype`, and
 reading `caller` while it is active throws a `TypeError`. Its
 %Function.prototype% getter and setter are also different functions, unlike
 the single %ThrowTypeError% that ECMA-262 requires. Deno is therefore not a
-reference for ADR 0033.
+reference for ADR 0034.

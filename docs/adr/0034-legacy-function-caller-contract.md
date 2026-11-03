@@ -1,20 +1,14 @@
-ADR 0033: Legacy function caller contract
+ADR 0034: Legacy function caller contract
 =========================================
 
 Status
 ------
 
-Proposed for the `legacy-caller` unit of
-[*PLAN-LANGUAGE.md*](../../PLAN-LANGUAGE.md). Once accepted, it supersedes
+Accepted by the maintainer on 2026-11-03 for the `legacy-caller` unit of
+[*PLAN-LANGUAGE.md*](../../PLAN-LANGUAGE.md). It supersedes
 [ADR 0028](./0028-legacy-function-caller-boundary.md): the optional legacy
 `caller` extension enters the profile, and ADR 0028's M5 exclusion ends when
 the unit lands its reviewed rows.
-
-Two observations made while implementing the draft put the decision itself in
-question, and the maintainer decides among the options under “Open decision”
-below. The current V8 in Deno 2.9.7 no longer has the extension. The V8 shape
-of the properties also breaks an invariant of the essential internal methods
-that two passing test262 rows check. Implementation is paused until then.
 
 
 Context
@@ -87,6 +81,13 @@ Alternatives considered
     Rejected. A read can use a computed key, `Reflect.get`, or a descriptor,
     so no compile-time test finds every reader, and the callee's answer
     depends on every function that may call it.
+6.  **Copy V8's descriptors.** Rejected, with two other descriptor shapes.
+    V8's non-writable, non-configurable data properties break the invariant
+    described under “Observed results”. Keeping that shape and recording the
+    two invariant rows as accepted failures would contradict
+    *PLAN-LANGUAGE.md*'s exit criteria, and own accessor properties would
+    keep the invariant but match V8's descriptors no better than the
+    selected shape. The selected shape is configurable data properties.
 
 
 Probe evidence
@@ -161,10 +162,9 @@ every later `[[GetOwnProperty]]`. After a program redefines `caller` or
 the function is active (group `invariant`). test262 checks this in
 *consistent-value-function-caller.js* and
 *consistent-value-function-arguments.js* under
-*test/built-ins/Object/internals/DefineOwnProperty/*. Both rows pass in Oseo
-today,
-because Oseo has no such own property; Node.js fails both, and so did a native
-build of the contract below.
+*test/built-ins/Object/internals/DefineOwnProperty/*. Both rows passed in Oseo
+before this record, because Oseo had no such own property. Node.js fails both,
+and so did a native build of a draft that copied V8's descriptors.
 
 Across realms, a caller in another realm is reported, a read from another realm
 sees the same caller, and the `arguments` object's prototype belongs to the
@@ -173,52 +173,50 @@ gets that realm's %Object.prototype% but the `Symbol.iterator` value of the
 function's own realm (group `realm`).
 
 
-Open decision
--------------
-
-The contract under “Decision” follows V8 and would turn the two invariant rows
-from passes into failures, which *PLAN-LANGUAGE.md*'s exit criteria forbid. The
-choices are:
-
-1.  **Keep ADR 0028.** Leave the extension out, as current V8 does, and keep
-    the 23 paths excluded.
-2.  **Make both own properties configurable.** Keep every other rule below.
-    A configurable property may change its value, so the invariant holds.
-    Deleting one removes it, and the inherited %ThrowTypeError% accessor
-    applies again; defining or freezing one turns it into an ordinary data
-    property that keeps the value it had at that moment. The two invariant
-    rows, the 18 `caller` rows, and the forbidden-extension rows pass. The
-    differences from V8 are the configurable attribute, a deletion that
-    succeeds, and a definition with another value that succeeds.
-3.  **Keep the V8 shape** and record the two invariant rows as accepted
-    failures under a new decision.
-4.  **Use own accessor properties** instead of data properties. The
-    invariant holds, but descriptors no longer match V8.
-
-
 Decision
 --------
 
 ### Properties
 
-A function has own `caller` and `arguments` properties exactly when it is a
-non-strict `function` declaration or expression that is neither async nor a
-generator. Each is a data property with writable, enumerable, and configurable
-all false, whose value is computed when the property is read. They follow
-`length` and `name` and precede `prototype` in own-key order, as on V8, and
-stay there because none of the three can be deleted.
+A function is created with own `caller` and `arguments` properties exactly
+when it is a non-strict `function` declaration or expression that is neither
+async nor a generator. Each is a data property that is non-writable,
+non-enumerable, and configurable, and whose value is computed when the
+property is read; this record calls such a property live. They follow
+`length` and `name` and precede `prototype` in own-key order, as on V8.
 
 Every other function, including every built-in, bound, strict, arrow, method,
 accessor, generator, async, and class function, keeps inheriting the
 %ThrowTypeError% accessors of %Function.prototype%. Arguments objects keep
 having no own `caller`.
 
-Definitions follow ValidateAndApplyPropertyDescriptor against the value at the
-time of the definition. A definition that names the current `caller` value, or
-names no value, succeeds without effect. One that names another value, or that
-names any value for `arguments` while the function is active, throws a
-`TypeError` through `Object.defineProperty` and returns false through
-`Reflect.defineProperty`. Assignment and deletion follow the attributes.
+Because both properties are configurable, the essential-method invariant
+holds: no later `[[GetOwnProperty]]` is bound to repeat the value. A
+`[[DefineOwnProperty]]` of a live property, including the redefinitions that
+`Object.freeze` and `Object.seal` make, first turns it into an ordinary data
+property holding the value it has at that moment, then applies the descriptor
+as to any configurable property. The property keeps its own-key position. For
+an active function's `arguments`, the fixed value is a new arguments object
+created at the definition. Deleting a live property succeeds and removes it,
+after which a read reaches the inherited %ThrowTypeError% accessor again.
+Assignment follows the non-writable attribute: a non-strict one is ignored and
+a strict one throws a `TypeError`. A function that still has a live property
+is neither sealed nor frozen.
+
+### Differences from V8
+
+Oseo departs from Node.js 24.21.0 in three places, and the fixed programs in
+*tests/legacy-caller.test.ts* pin each of them:
+
+ -  `Object.getOwnPropertyDescriptor` reports `configurable: true` for both
+    properties, where V8 reports `false`. Deletion and definitions with
+    another value therefore succeed where V8 refuses them, and Proxy
+    invariant checks accept trap results that V8 rejects.
+ -  A built-in function that V8 writes in C++ reports `null` to the functions
+    it calls, where V8 reports the caller of the built-in (rule under
+    “Activations”).
+ -  `arguments` shows the received values, where V8's interpreter shows a
+    reassigned uncaptured parameter (rule under “The `arguments` value”).
 
 ### Activations
 
@@ -299,9 +297,10 @@ constructor keep their OSEO1001 rejection and move to
 [ADR 0016](./0016-dynamic-source-boundary.md) through reviewed exclusion audit
 rows. They are *test/built-ins/Function/15.3.5.4\_2-12gs.js*, *-14gs.js*, and
 *-76gs.js* for `eval`, and *-77gs.js* and *-78gs.js* for `Function` and
-`new Function`. The `caller` feature enters `supportedFeatures`. Every other
-row whose observation reflects a non-strict function's own keys or descriptors
-is re-observed and reviewed in the same change.
+`new Function`; [*PLAN-DYN.md*](../../PLAN-DYN.md) records them. The two
+invariant rows stay passes. The `caller` feature enters `supportedFeatures`.
+Every other row whose observation reflects a non-strict function's own keys or
+descriptors is re-observed and reviewed in the same change.
 
 
 Consequences
@@ -316,11 +315,12 @@ its function. The collector traces the activation records. The runtime ABI
 version changes, because generated code tells the runtime which functions are
 non-strict.
 
-The property sites that answer a function's `prototype` also answer `caller`
-and `arguments`. Because a property query does not allocate, the `arguments`
+The property sites that answer a function's `prototype` also answer a live
+`caller` and `arguments`, and each function records which of the two are
+still live. Because a property query does not allocate, the `arguments`
 object is created at the sites that hand a value to code: `[[Get]]`,
-`Object.getOwnPropertyDescriptor`, `Object.getOwnPropertyDescriptors`, and Proxy
-invariant checks.
+`Object.getOwnPropertyDescriptor`, `Object.getOwnPropertyDescriptors`, Proxy
+invariant checks, and the definitions that fix a live property's value.
 
 Every non-strict function gains two own keys, so manifest rows that list a
 function's own properties change. Software that relies on the extension can
