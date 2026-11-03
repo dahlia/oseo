@@ -5783,8 +5783,8 @@ assessments:
         "bcf729b61049bdd7486c230c5cb653edfaae769360bc4d3e\
         e0c4f1eea10a663b"
       packages/runtime-c/src/index.ts:
-        "92a2f24a155a769e4f5c36c593de3a9fe7012d51e3d04d7f\
-        9d888336186c6eb2"
+        "610261a183869debf2ccdfdb8d97fb58b154e2c1d8eecf7b\
+        3ffffc0ce2b72ae1"
   observation-train-b26a-b26b-b27:
     disposition: deferral
     normativeDependency: not-demonstrated

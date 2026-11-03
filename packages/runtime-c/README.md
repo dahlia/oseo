@@ -1442,7 +1442,7 @@ rejection propagation walk explicit stacks, so graph depth never consumes
 native stack. The DFS stack, its frames, async parent lists, and the sorted
 ancestor list hold only table indices in untraced memory.
 
-ABI `m5-151` adds the legacy `caller` and `arguments` properties of
+ABI `m5-149` adds the legacy `caller` and `arguments` properties of
 [ADR 0034]. Generated code creates a non-strict function through
 `oseo_function_create_non_strict`, which marks it non-strict; only a non-strict
 `function` that is neither async nor a generator gets the two properties.
