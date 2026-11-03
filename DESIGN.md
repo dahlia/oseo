@@ -516,9 +516,8 @@ without creating a cleanup region. Array accumulation never calls
 containing spread starts from an empty rooted array and appends values or holes
 through runtime operations that create own indexed properties without
 consulting the prototype. Literals without spread keep the fixed-length path.
-Because top-level await continuation extraction cannot yet retain an already
-accumulated prefix without observably iterating it again, a spread before a
-later top-level await point is a source-located unsupported combination.
+A spread before a later top-level await point keeps its accumulated prefix in
+the module evaluator's traced asynchronous frame.
 
 Standalone array binding declarations lower their recursive patterns
 through the same iterator operations. Each pattern owns a backend-local done
@@ -653,8 +652,8 @@ list. The call target and method receiver are resolved before accumulation, and
 arguments are appended from left to right. Abrupt acquisition, step, value, or
 append completion returns without `IteratorClose` or invoking the call. Calls
 without spread retain fixed positional lowering. A spread before a later
-top-level await point is rejected for the same continuation ownership reason as
-array spread. Construction allocates its receiver only after argument
+top-level await point keeps its argument list in the same traced frame as array
+spread. Construction allocates its receiver only after argument
 accumulation succeeds, and `Promise` construction borrows the same dynamic
 argument view while preserving its executor contract.
 
@@ -683,7 +682,7 @@ The compiler validates every request before deduplication.
 JSON grammar is checked during graph discovery. Generic data construction
 prepares each JSON value before any JavaScript evaluator starts. Synthetic
 linking initializes the default export cell to `undefined`, and the JSON
-module's scheduled evaluation publishes the prepared value, preserving aliases
+module's evaluator publishes the prepared value, preserving aliases
 and cycles without reading mutable realm JSON globals.
 ADR 0009 bounds this contract; dynamic import options remain outside it.
 
@@ -694,12 +693,20 @@ node and linking contract. [*PLAN-WASM.md*](./PLAN-WASM.md) separates that
 build-time AOT path from the runtime-byte JavaScript and web APIs required by
 M6.
 
-An evaluator with top-level await returns a promise backed by generated
-continuation closures. Evaluation starts every dependency-ready module in
-source order, so an independent sibling can run while another module is
-suspended. Importers wait for their asynchronous dependencies before their own
-evaluator runs. The entry task reports an owned diagnostic when no runtime-owned
-job or timer can make progress. Asynchronous module cycles remain outside M4.
+Module evaluation runs through one runtime driver, as unit 1 of the
+[static-specifier import design](./docs/static-specifier-import-design.md)
+specifies. The build emits a module table that holds each module's compiled
+evaluator, whether it has top-level await, and its static requested modules in
+source order. Startup performs the edition's Evaluate on the entry over that
+table: InnerModuleEvaluation runs synchronous modules in its depth-first walk,
+ExecuteAsyncModule starts each dependency-ready module with top-level await, and
+AsyncModuleExecutionFulfilled and AsyncModuleExecutionRejected settle importers
+in the order the edition fixes, including asynchronous cycles. The driver
+attaches its internal reactions directly and never reads `then` or the global
+`Promise`. An evaluator with top-level await is a compiled asynchronous function
+whose traced frame keeps every partly evaluated statement. The entry task
+reports an owned diagnostic when no runtime-owned job or timer can make
+progress.
 
 Dynamic import, `eval()`, and the `Function` constructor conflict with a purely
 ahead-of-time model because they can introduce new source after the native

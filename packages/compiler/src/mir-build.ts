@@ -5435,6 +5435,16 @@ function lowerExpression(
       method: expression.target.method,
     };
     detail = expression.target.method;
+  } else if (expression.target.kind === "module-evaluate") {
+    const lowered = lowerCallArguments(
+      expression.arguments,
+      expression.range,
+      builder,
+    );
+    callArguments = [...lowered.ids];
+    argumentListId = lowered.list;
+    callTarget = { kind: "module-evaluate" };
+    detail = "module_evaluate";
   } else if (expression.target.kind === "super") {
     return lowerSuperCall(
       expression,

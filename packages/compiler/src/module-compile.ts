@@ -1,12 +1,8 @@
 import type {
   Binding,
-  HirCallArgument,
   HirExpression,
   HirFunction,
   HirGlobalBinding,
-  HirObjectProperty,
-  HirObjectSpreadProperty,
-  HirParameter,
   HirProgram,
   HirStatement,
 } from "./hir.ts";
@@ -22,11 +18,7 @@ import {
 import type { CompilerOptions, MirProgram } from "./mir.ts";
 import { buildMir } from "./mir-build.ts";
 import { linkModuleGraph, withReferrerChains } from "./modules.ts";
-import type {
-  LinkedModule,
-  LinkedModuleGraph,
-  ModuleComponent,
-} from "./modules.ts";
+import type { LinkedModule, LinkedModuleGraph } from "./modules.ts";
 import type { Diagnostic, SourceRange } from "./source.ts";
 import type {
   LocatedSyntax,
@@ -301,10 +293,6 @@ function hirStatementAwaits(
   );
 }
 
-function hirStatementHasAwait(statement: HirStatement): boolean {
-  return hirStatementAwaits(statement, false);
-}
-
 function hirStatementIsAsynchronous(statement: HirStatement): boolean {
   return hirStatementAwaits(statement, true);
 }
@@ -313,27 +301,6 @@ function hirStatementsAreAsynchronous(
   statements: readonly HirStatement[],
 ): boolean {
   return statements.some(hirStatementIsAsynchronous);
-}
-
-function moduleComponentRoot(
-  component: ModuleComponent,
-  evaluationIndices: ReadonlyMap<string, number>,
-): string {
-  let previousIndex = -1;
-  for (const moduleId of component.moduleIds) {
-    const index = evaluationIndices.get(moduleId);
-    if (index == null || index <= previousIndex) {
-      throw new Error(
-        `Module component '${component.id}' is not in evaluation order.`,
-      );
-    }
-    previousIndex = index;
-  }
-  const root = component.moduleIds.at(-1);
-  if (root == null) {
-    throw new Error(`Module component '${component.id}' has no root.`);
-  }
-  return root;
 }
 
 function collectHirBindings(
@@ -441,457 +408,6 @@ function collectHirBindings(
   return bindings;
 }
 
-interface ModuleAwaitPoint {
-  readonly argument: HirExpression;
-  readonly prefix: readonly HirStatement[];
-  readonly range: SourceRange;
-  resume(value: HirExpression): HirStatement;
-}
-
-interface ModuleAsyncLoweringState {
-  awaitCount: number;
-  readonly diagnostics: Diagnostic[];
-  readonly framed: boolean;
-  readonly functions: HirFunction[];
-  readonly globalBindings: HirGlobalBinding[];
-  nextBindingId: number;
-  nextFunctionId: number;
-  readonly sourceId: string;
-}
-
-const maximumModuleContinuationCount = 256;
-
-interface ModuleExpressionParts {
-  readonly children: readonly HirExpression[];
-  rebuild(children: readonly HirExpression[]): HirExpression;
-}
-
-function hirArgumentExpressions(
-  argumentsValue: readonly HirCallArgument[],
-): readonly HirExpression[] {
-  return argumentsValue.map((argument) =>
-    argument.kind === "spread" ? argument.argument : argument,
-  );
-}
-
-function rebuildHirArguments(
-  original: readonly HirCallArgument[],
-  rebuilt: readonly HirExpression[],
-): readonly HirCallArgument[] {
-  return original.map((argument, index) =>
-    argument.kind === "spread"
-      ? { ...argument, argument: rebuilt[index]! }
-      : rebuilt[index]!,
-  );
-}
-
-/**
- * Maps each object literal property to the index of its first flattened
- * child, since a spread contributes one child and every other property kind
- * contributes a key and a value.
- */
-function objectPropertyChildOffsets(
-  properties: readonly HirObjectProperty[],
-): readonly number[] {
-  const offsets: number[] = [];
-  let cursor = 0;
-  for (const property of properties) {
-    offsets.push(cursor);
-    cursor += property.kind === "spread" ? 1 : 2;
-  }
-  return offsets;
-}
-
-function moduleExpressionParts(
-  expression: HirExpression,
-): ModuleExpressionParts | undefined {
-  if (expression.kind === "delete-value") {
-    return {
-      children: [expression.argument],
-      rebuild: ([argument]) => ({ ...expression, argument: argument! }),
-    };
-  }
-  if (expression.kind === "await") {
-    return {
-      children: [expression.argument],
-      rebuild: ([argument]) => ({ ...expression, argument: argument! }),
-    };
-  }
-  if (
-    expression.kind === "binding-set" ||
-    expression.kind === "binding-update"
-  ) {
-    return {
-      children: [expression.value],
-      rebuild: ([value]) => ({ ...expression, value: value! }),
-    };
-  }
-  if (expression.kind === "destructuring-set") {
-    return {
-      children: [expression.value],
-      rebuild: ([value]) => ({ ...expression, value: value! }),
-    };
-  }
-  if (expression.kind === "array") {
-    const indices = expression.elements.flatMap((element, index) =>
-      element == null ? [] : [index],
-    );
-    return {
-      children: indices.map((index) => {
-        const element = expression.elements[index]!;
-        return element.kind === "spread" ? element.argument : element;
-      }),
-      rebuild: (children) => ({
-        ...expression,
-        elements: expression.elements.map((element, index) => {
-          const childIndex = indices.indexOf(index);
-          if (childIndex < 0 || element == null) return element;
-          const child = children[childIndex]!;
-          return element.kind === "spread"
-            ? { ...element, argument: child }
-            : child;
-        }),
-      }),
-    };
-  }
-  if (expression.kind === "binary") {
-    return {
-      children: [expression.left, expression.right],
-      rebuild: ([left, right]) => ({
-        ...expression,
-        left: left!,
-        right: right!,
-      }),
-    };
-  }
-  if (expression.kind === "call") {
-    const argumentChildren = hirArgumentExpressions(expression.arguments);
-    const rebuildArguments = (argumentsValue: readonly HirExpression[]) =>
-      rebuildHirArguments(expression.arguments, argumentsValue);
-    if (expression.target.kind === "dynamic") {
-      return {
-        children: [expression.target.callee, ...argumentChildren],
-        rebuild: ([callee, ...argumentsValue]) => ({
-          ...expression,
-          arguments: rebuildArguments(argumentsValue),
-          target: { callee: callee!, kind: "dynamic" },
-        }),
-      };
-    }
-    if (expression.target.kind === "method") {
-      return {
-        children: [
-          expression.target.object,
-          expression.target.key,
-          ...argumentChildren,
-        ],
-        rebuild: ([object, key, ...argumentsValue]) => ({
-          ...expression,
-          arguments: rebuildArguments(argumentsValue),
-          target: { key: key!, kind: "method", object: object! },
-        }),
-      };
-    }
-    return {
-      children: argumentChildren,
-      rebuild: (argumentsValue) => ({
-        ...expression,
-        arguments: rebuildArguments(argumentsValue),
-      }),
-    };
-  }
-  if (expression.kind === "new") {
-    const argumentChildren = hirArgumentExpressions(expression.arguments);
-    return {
-      children: [expression.callee, ...argumentChildren],
-      rebuild: ([callee, ...argumentsValue]) => ({
-        ...expression,
-        arguments: rebuildHirArguments(expression.arguments, argumentsValue),
-        callee: callee!,
-      }),
-    };
-  }
-  if (expression.kind === "object") {
-    const offsets = objectPropertyChildOffsets(expression.properties);
-    const children = expression.properties.flatMap((property) =>
-      property.kind === "spread"
-        ? [property.argument]
-        : [property.key, property.value],
-    );
-    return {
-      children,
-      rebuild: (rebuilt) => ({
-        ...expression,
-        properties: expression.properties.map((property, index) => {
-          const offset = offsets[index]!;
-          return property.kind === "spread"
-            ? { ...property, argument: rebuilt[offset] ?? property.argument }
-            : {
-                ...property,
-                key: rebuilt[offset] ?? property.key,
-                value: rebuilt[offset + 1] ?? property.value,
-              };
-        }),
-      }),
-    };
-  }
-  if (
-    expression.kind === "property-delete" ||
-    expression.kind === "property-get" ||
-    expression.kind === "property-step"
-  ) {
-    return {
-      children: [expression.object, expression.key],
-      rebuild: ([object, key]) => ({
-        ...expression,
-        key: key!,
-        object: object!,
-      }),
-    };
-  }
-  if (
-    expression.kind === "property-set" ||
-    expression.kind === "property-update"
-  ) {
-    return {
-      children: [expression.object, expression.key, expression.value],
-      rebuild: ([object, key, value]) => ({
-        ...expression,
-        key: key!,
-        object: object!,
-        value: value!,
-      }),
-    };
-  }
-  if (expression.kind === "unary") {
-    return {
-      children: [expression.argument],
-      rebuild: ([argument]) => ({ ...expression, argument: argument! }),
-    };
-  }
-  return undefined;
-}
-
-interface ExtractedModuleAwait {
-  readonly argument: HirExpression;
-  readonly prefix: readonly HirStatement[];
-  rebuild(value: HirExpression): HirExpression;
-}
-
-function stabilizeModuleExpression(
-  expression: HirExpression,
-  state: ModuleAsyncLoweringState,
-): readonly [HirStatement, HirExpression] {
-  const bindingId = state.nextBindingId;
-  state.nextBindingId += 1;
-  const name = `*module-temp:${bindingId}*`;
-  state.globalBindings.push({ id: bindingId, name });
-  return [
-    {
-      bindingId,
-      hint: undefined,
-      initializer: expression,
-      kind: "const",
-      name,
-      range: expression.range,
-    },
-    { bindingId, kind: "binding", name, range: expression.range },
-  ];
-}
-
-function extractModuleAwait(
-  expression: HirExpression,
-  state: ModuleAsyncLoweringState,
-): ExtractedModuleAwait | undefined {
-  if (
-    expression.kind === "optional-chain" &&
-    hirExpressionHasAwait(expression)
-  ) {
-    state.diagnostics.push(
-      sourceDiagnostic(
-        state.sourceId,
-        expression,
-        "Await inside an optional chain is unsupported.",
-      ),
-    );
-    return undefined;
-  }
-  if (
-    (expression.kind === "binding-update" ||
-      expression.kind === "property-update") &&
-    hirExpressionHasAwait(expression)
-  ) {
-    state.diagnostics.push(
-      sourceDiagnostic(
-        state.sourceId,
-        expression,
-        "Await inside a compound assignment is unsupported.",
-      ),
-    );
-    return undefined;
-  }
-  if (
-    expression.kind === "await" &&
-    !hirExpressionHasAwait(expression.argument)
-  ) {
-    return {
-      argument: expression.argument,
-      prefix: [],
-      rebuild: (value) => value,
-    };
-  }
-  const parts = moduleExpressionParts(expression);
-  if (parts == null) return undefined;
-  const childIndex = parts.children.findIndex(hirExpressionHasAwait);
-  if (childIndex < 0) return undefined;
-  if (expression.kind === "array") {
-    const preceding = expression.elements
-      .filter((element) => element != null)
-      .slice(0, childIndex)
-      .find((element) => element.kind === "spread");
-    if (preceding != null) {
-      state.diagnostics.push(
-        sourceDiagnostic(
-          state.sourceId,
-          preceding,
-          "Array spread before a top-level await point is unsupported.",
-        ),
-      );
-      return undefined;
-    }
-  }
-  if (expression.kind === "call") {
-    const targetChildren =
-      expression.target.kind === "dynamic"
-        ? 1
-        : expression.target.kind === "method"
-          ? 2
-          : 0;
-    const argumentIndex = childIndex - targetChildren;
-    const preceding =
-      argumentIndex < 0
-        ? undefined
-        : expression.arguments
-            .slice(0, argumentIndex)
-            .find((argument) => argument.kind === "spread");
-    if (preceding != null) {
-      state.diagnostics.push(
-        sourceDiagnostic(
-          state.sourceId,
-          preceding,
-          "Call argument spread before a top-level await point is " +
-            "unsupported.",
-        ),
-      );
-      return undefined;
-    }
-  }
-  if (expression.kind === "object") {
-    const offsets = objectPropertyChildOffsets(expression.properties);
-    const preceding = expression.properties.find(
-      (property, index): property is HirObjectSpreadProperty =>
-        property.kind === "spread" && offsets[index]! < childIndex,
-    );
-    if (preceding != null) {
-      state.diagnostics.push(
-        sourceDiagnostic(
-          state.sourceId,
-          preceding,
-          "Object spread before a top-level await point is unsupported.",
-        ),
-      );
-      return undefined;
-    }
-  }
-  if (expression.kind === "new") {
-    const argumentIndex = childIndex - 1;
-    const preceding =
-      argumentIndex < 0
-        ? undefined
-        : expression.arguments
-            .slice(0, argumentIndex)
-            .find((argument) => argument.kind === "spread");
-    if (preceding != null) {
-      state.diagnostics.push(
-        sourceDiagnostic(
-          state.sourceId,
-          preceding,
-          "Constructor argument spread before a top-level await point is " +
-            "unsupported.",
-        ),
-      );
-      return undefined;
-    }
-  }
-  const prefix: HirStatement[] = [];
-  const children = [...parts.children];
-  for (let index = 0; index < childIndex; index += 1) {
-    const [statement, binding] = stabilizeModuleExpression(
-      children[index]!,
-      state,
-    );
-    prefix.push(statement);
-    children[index] = binding;
-  }
-  const extracted = extractModuleAwait(children[childIndex]!, state);
-  if (extracted == null) return undefined;
-  prefix.push(...extracted.prefix);
-  return {
-    argument: extracted.argument,
-    prefix,
-    rebuild: (value) => {
-      const rebuilt = [...children];
-      rebuilt[childIndex] = extracted.rebuild(value);
-      return parts.rebuild(rebuilt);
-    },
-  };
-}
-
-function moduleAwaitPoint(
-  statement: HirStatement,
-  state: ModuleAsyncLoweringState,
-): ModuleAwaitPoint | undefined {
-  const expression =
-    statement.kind === "expression" || statement.kind === "throw"
-      ? statement.expression
-      : statement.kind === "binding-init" ||
-          statement.kind === "const" ||
-          statement.kind === "let" ||
-          statement.kind === "binding-pattern"
-        ? statement.initializer
-        : undefined;
-  if (expression == null) return undefined;
-  const extracted = extractModuleAwait(expression, state);
-  if (extracted == null) return undefined;
-  return {
-    argument: extracted.argument,
-    prefix: extracted.prefix,
-    range: expression.range,
-    resume: (value) => {
-      const resumed = extracted.rebuild(value);
-      if (
-        statement.kind === "binding-init" ||
-        statement.kind === "const" ||
-        statement.kind === "let"
-      ) {
-        return {
-          ...statement,
-          initializer: resumed,
-          kind: "binding-init",
-        };
-      }
-      if (statement.kind === "binding-pattern") {
-        return {
-          ...statement,
-          initializer: resumed,
-          mode: statement.declarationKind === "var" ? "write" : "initialize",
-        };
-      }
-      return { ...statement, expression: resumed };
-    },
-  };
-}
-
 /** The link-time initializer of one module's namespace object cell. */
 function moduleNamespaceInitializer(
   target: LinkedModule,
@@ -919,6 +435,10 @@ function moduleUndefined(range: SourceRange): HirExpression {
   return { kind: "undefined", range };
 }
 
+function moduleNumber(value: number, range: SourceRange): HirExpression {
+  return { kind: "number", range, value };
+}
+
 function moduleFunctionExpression(functionValue: HirFunction): HirExpression {
   return {
     functionId: functionValue.id,
@@ -934,127 +454,6 @@ function moduleFunctionExpression(functionValue: HirFunction): HirExpression {
       };
     }),
   };
-}
-
-function modulePromiseCall(
-  method: "all" | "asyncCall" | "awaitThen" | "resolve",
-  argumentsValue: readonly HirExpression[],
-  range: SourceRange,
-): HirExpression {
-  return {
-    arguments: argumentsValue,
-    kind: "call",
-    range,
-    target: { kind: "promise-intrinsic", method },
-  };
-}
-
-function lowerModuleEvaluationBody(
-  statements: readonly HirStatement[],
-  range: SourceRange,
-  state: ModuleAsyncLoweringState,
-): readonly HirStatement[] | undefined {
-  if (state.framed) {
-    return [
-      ...statements,
-      {
-        expression: moduleUndefined(range),
-        kind: "return",
-        range,
-      },
-    ];
-  }
-  const body: HirStatement[] = [];
-  for (const [index, statement] of statements.entries()) {
-    const diagnosticCount = state.diagnostics.length;
-    const point = moduleAwaitPoint(statement, state);
-    if (point == null) {
-      if (state.diagnostics.length > diagnosticCount) return undefined;
-      if (hirStatementHasAwait(statement)) {
-        state.diagnostics.push(
-          sourceDiagnostic(
-            state.sourceId,
-            statement,
-            "Top-level await in this control-flow position is outside M4.",
-          ),
-        );
-        return undefined;
-      }
-      body.push(statement);
-      continue;
-    }
-    state.awaitCount += 1;
-    if (state.awaitCount > maximumModuleContinuationCount) {
-      state.diagnostics.push(
-        sourceDiagnostic(
-          state.sourceId,
-          statement,
-          `A module may contain at most ` +
-            `${maximumModuleContinuationCount} top-level await points.`,
-        ),
-      );
-      return undefined;
-    }
-    const bindingId = state.nextBindingId;
-    state.nextBindingId += 1;
-    const functionId = state.nextFunctionId;
-    state.nextFunctionId += 1;
-    const name = `*module-await:${functionId}*`;
-    const parameter: HirParameter = {
-      bindingId,
-      hints: [],
-      name,
-      range: point.range,
-    };
-    const awaitedValue: HirExpression = {
-      bindingId,
-      kind: "binding",
-      name,
-      range: point.range,
-    };
-    const suffix = lowerModuleEvaluationBody(
-      [point.resume(awaitedValue), ...statements.slice(index + 1)],
-      range,
-      state,
-    );
-    if (suffix == null) return undefined;
-    const continuation: HirFunction = {
-      body: suffix,
-      functionLength: 1,
-      functionKind: "arrow",
-      id: functionId,
-      kind: "hir-function",
-      localBindingIds: [bindingId],
-      name,
-      parameters: [parameter],
-      range: point.range,
-      returnHints: [],
-      strict: true,
-    };
-    state.functions.push(continuation);
-    body.push(...point.prefix);
-    const resolved = modulePromiseCall(
-      "resolve",
-      [point.argument],
-      point.range,
-    );
-    body.push({
-      expression: modulePromiseCall(
-        "awaitThen",
-        [resolved, moduleFunctionExpression(continuation)],
-        point.range,
-      ),
-      kind: "return",
-      range: point.range,
-    });
-    return body;
-  }
-  body.push({
-    expression: moduleUndefined(range),
-    kind: "return",
-    range,
-  });
-  return body;
 }
 
 /**
@@ -1388,205 +787,66 @@ export function compileModuleGraph(
     functions.push(...retainModuleSource(result.program.functions, moduleId));
   }
 
-  const directlyAsync = new Set(
-    linked.graph.evaluationOrder.filter((moduleId) =>
-      hirStatementsAreAsynchronous(moduleBodies.get(moduleId) ?? []),
-    ),
-  );
-  const evaluationIndices = new Map(
+  // The module table lists modules in static evaluation order. Each entry
+  // passes the evaluator, a top-level await flag, and the requested
+  // modules in source order; the runtime driver keeps every other
+  // Cyclic Module Record field.
+  const moduleIndices = new Map(
     linked.graph.evaluationOrder.map((moduleId, index) => [moduleId, index]),
   );
-  const componentByModule = new Map(
-    linked.graph.components.flatMap((component) =>
-      component.moduleIds.map((moduleId) => [moduleId, component] as const),
-    ),
-  );
-  const componentRoots = new Map(
-    linked.graph.components.map((component) => [
-      component.id,
-      moduleComponentRoot(component, evaluationIndices),
-    ]),
-  );
-  const pendingAsync = new Set<string>();
-  for (const moduleId of linked.graph.evaluationOrder) {
-    const node = nodes.get(moduleId);
-    const component = componentByModule.get(moduleId);
-    const moduleIndex = evaluationIndices.get(moduleId);
-    if (node == null || component == null || moduleIndex == null) {
-      throw new Error(`Module async state '${moduleId}' is unavailable.`);
-    }
-    const waitsForPendingDependency = node.dependencies.some((dependency) => {
-      const dependencyId = dependency.canonicalId;
-      const dependencyComponent = componentByModule.get(dependencyId);
-      const dependencyIndex = evaluationIndices.get(dependencyId);
-      if (dependencyComponent == null || dependencyIndex == null) {
-        throw new Error(`Module dependency '${dependencyId}' is unavailable.`);
-      }
-      if (dependencyComponent.id === component.id) {
-        return dependencyIndex < moduleIndex && pendingAsync.has(dependencyId);
-      }
-      const cycleRoot = dependencyComponent.cyclic
-        ? componentRoots.get(dependencyComponent.id)
-        : dependencyId;
-      return cycleRoot != null && pendingAsync.has(cycleRoot);
-    });
-    if (directlyAsync.has(moduleId) || waitsForPendingDependency) {
-      pendingAsync.add(moduleId);
-    }
+  const entryIndex = moduleIndices.get(graph.entryId);
+  if (entryIndex == null) {
+    throw new Error("The module entry has no evaluation index.");
   }
-  const evaluators = new Map<string, HirFunction>();
+  const tableArguments: HirExpression[] = [];
   for (const moduleId of linked.graph.evaluationOrder) {
     const node = nodes.get(moduleId);
     const moduleBody = moduleBodies.get(moduleId);
     if (node == null || moduleBody == null) {
       throw new Error(`Module evaluation '${moduleId}' is unavailable.`);
     }
-    const evaluatorId = nextFunctionId;
-    nextFunctionId += 1;
-    const state: ModuleAsyncLoweringState = {
-      awaitCount: 0,
-      diagnostics: [],
-      framed: directlyAsync.has(moduleId),
-      functions,
-      globalBindings,
-      nextBindingId,
-      nextFunctionId,
-      sourceId: moduleId,
-    };
-    const evaluatorBody = lowerModuleEvaluationBody(
-      moduleBody,
-      retainModuleSource(node.syntax.range, moduleId),
-      state,
-    );
-    nextBindingId = state.nextBindingId;
-    nextFunctionId = state.nextFunctionId;
-    if (evaluatorBody == null) {
-      return { diagnostics: state.diagnostics, graph: linked.graph };
-    }
+    const range = retainModuleSource(node.syntax.range, moduleId);
+    // Asynchronous module evaluators use the same traced frames as async
+    // functions, including suspension inside binding and assignment
+    // steps.
+    const hasTopLevelAwait = hirStatementsAreAsynchronous(moduleBody);
     const evaluator: HirFunction = {
-      body: evaluatorBody,
+      body: [
+        ...moduleBody,
+        { expression: moduleUndefined(range), kind: "return", range },
+      ],
       functionLength: 0,
-      functionKind: directlyAsync.has(moduleId) ? "async-arrow" : "arrow",
-      id: evaluatorId,
+      functionKind: hasTopLevelAwait ? "async-arrow" : "arrow",
+      id: nextFunctionId,
       kind: "hir-function",
       localBindingIds: [],
       name: `*module:${moduleId}*`,
       parameters: [],
-      range: retainModuleSource(node.syntax.range, moduleId),
+      range,
       returnHints: [],
       strict: true,
     };
-    evaluators.set(moduleId, evaluator);
+    nextFunctionId += 1;
     functions.push(evaluator);
-  }
-
-  const moduleInitializers: HirStatement[] = [];
-  const promiseBindings = new Map<string, number>();
-  for (const moduleId of linked.graph.evaluationOrder) {
-    const node = nodes.get(moduleId);
-    const evaluator = evaluators.get(moduleId);
-    if (node == null || evaluator == null) {
-      throw new Error(`Module scheduler '${moduleId}' is unavailable.`);
-    }
-    const range = retainModuleSource(node.syntax.range, moduleId);
-    const evaluatorExpression = moduleFunctionExpression(evaluator);
-    const moduleComponent = componentByModule.get(moduleId);
-    const moduleIndex = evaluationIndices.get(moduleId);
-    if (moduleComponent == null || moduleIndex == null) {
-      throw new Error(`Module schedule '${moduleId}' is unavailable.`);
-    }
-    const asyncDependencies = [
-      ...new Set(
-        node.dependencies
-          .map((dependency) => dependency.canonicalId)
-          .flatMap((dependencyId) => {
-            const dependencyComponent = componentByModule.get(dependencyId);
-            const dependencyIndex = evaluationIndices.get(dependencyId);
-            if (dependencyComponent == null || dependencyIndex == null) {
-              throw new Error(
-                `Module dependency '${dependencyId}' is unavailable.`,
-              );
-            }
-            if (dependencyComponent.id === moduleComponent.id) {
-              return dependencyIndex < moduleIndex &&
-                pendingAsync.has(dependencyId)
-                ? [dependencyId]
-                : [];
-            }
-            const cycleRoot = dependencyComponent.cyclic
-              ? componentRoots.get(dependencyComponent.id)
-              : dependencyId;
-            if (cycleRoot == null) {
-              throw new Error(
-                `Module cycle root '${dependencyId}' is unavailable.`,
-              );
-            }
-            return pendingAsync.has(cycleRoot) ? [cycleRoot] : [];
-          }),
-      ),
-    ];
-    let initializer: HirExpression;
-    if (asyncDependencies.length > 0) {
-      const dependencies = asyncDependencies.map((dependencyId) => {
-        const bindingId = promiseBindings.get(dependencyId);
-        if (bindingId == null) {
-          throw new Error(`Module promise '${dependencyId}' is unavailable.`);
-        }
-        return {
-          bindingId,
-          kind: "binding",
-          name: `*module-promise:${dependencyId}*`,
-          range,
-        } satisfies HirExpression;
-      });
-      const awaited =
-        dependencies.length === 1
-          ? dependencies[0]!
-          : modulePromiseCall(
-              "all",
-              [{ elements: dependencies, kind: "array", range }],
-              range,
-            );
-      initializer = modulePromiseCall(
-        "awaitThen",
-        [awaited, evaluatorExpression],
-        range,
-      );
-    } else if (directlyAsync.has(moduleId)) {
-      initializer = {
-        arguments: [],
-        kind: "call",
-        range,
-        target: { callee: evaluatorExpression, kind: "dynamic" },
-      };
-    } else {
-      const result: HirExpression = {
-        arguments: [],
-        kind: "call",
-        range,
-        target: { callee: evaluatorExpression, kind: "dynamic" },
-      };
-      initializer = modulePromiseCall("resolve", [result], range);
-    }
-    const bindingId = nextBindingId;
-    nextBindingId += 1;
-    promiseBindings.set(moduleId, bindingId);
-    moduleInitializers.push({
-      bindingId,
-      hint: undefined,
-      initializer,
-      kind: "const",
-      name: `*module-promise:${moduleId}*`,
-      range,
+    const requested = node.dependencies.map((dependency) => {
+      const index = moduleIndices.get(dependency.canonicalId);
+      if (index == null) {
+        throw new Error(
+          `Module dependency '${dependency.canonicalId}' is unavailable.`,
+        );
+      }
+      return index;
     });
+    tableArguments.push(
+      moduleFunctionExpression(evaluator),
+      moduleNumber(hasTopLevelAwait ? 1 : 0, range),
+      moduleNumber(requested.length, range),
+      ...requested.map((index) => moduleNumber(index, range)),
+    );
   }
 
   const entry = nodes.get(graph.entryId);
   if (entry == null) throw new Error("The module entry is unavailable.");
-  const entryPromiseId = promiseBindings.get(graph.entryId);
-  if (entryPromiseId == null) {
-    throw new Error("The entry module promise is unavailable.");
-  }
   const entryRange = retainModuleSource(entry.syntax.range, graph.entryId);
   const preludeHir = resolvedPrelude?.hir;
   const hir: HirProgram = {
@@ -1602,13 +862,18 @@ export function compileModuleGraph(
       ...jsonInitializers,
       ...varInitializers,
       ...functionInitializers,
-      ...moduleInitializers,
+      // Evaluate the entry through the runtime driver. The returned
+      // top-level capability promise is the entry task's completion.
       {
         expression: {
-          bindingId: entryPromiseId,
-          kind: "binding",
-          name: `*module-promise:${graph.entryId}*`,
+          arguments: [
+            moduleNumber(entryIndex, entryRange),
+            moduleNumber(linked.graph.evaluationOrder.length, entryRange),
+            ...tableArguments,
+          ],
+          kind: "call",
           range: entryRange,
+          target: { kind: "module-evaluate" },
         },
         kind: "return",
         range: entryRange,

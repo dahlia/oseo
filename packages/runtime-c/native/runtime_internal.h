@@ -2091,6 +2091,12 @@ typedef enum {
     OSEO_REACTION_RACE = 2,
     OSEO_REACTION_ALL_SETTLED = 3,
     OSEO_REACTION_ANY = 4,
+    /*
+     * The fulfilled and rejected steps ExecuteAsyncModule attaches to an
+     * asynchronous module's evaluation promise; `index` names the module
+     * table entry and both handler slots hold its evaluator.
+     */
+    OSEO_REACTION_MODULE = 5,
 } OseoReactionKind;
 
 typedef struct {
@@ -2111,6 +2117,77 @@ typedef struct {
     size_t remaining;
     bool settled;
 } OseoPromiseAggregate;
+
+/* The Cyclic Module Record [[Status]] values after linking. */
+typedef enum {
+    OSEO_MODULE_LINKED = 0,
+    OSEO_MODULE_EVALUATING = 1,
+    OSEO_MODULE_EVALUATING_ASYNC = 2,
+    OSEO_MODULE_EVALUATED = 3,
+} OseoModuleStatus;
+
+/* An empty [[CycleRoot]] or DFS index. */
+#define OSEO_MODULE_NONE SIZE_MAX
+/* The unset and done values of [[AsyncEvaluationOrder]]. */
+#define OSEO_MODULE_ASYNC_UNSET 0u
+#define OSEO_MODULE_ASYNC_DONE UINT64_MAX
+
+/*
+ * One module table entry: the build's compiled evaluator, top-level
+ * await flag, and static requested modules in source order, followed by
+ * the evaluation state of a Cyclic Module Record. Module indices name
+ * entries of the same table. The three values are traced through the
+ * context, which keeps the table for the life of the program.
+ */
+typedef struct {
+    OseoValue evaluator;
+    OseoValue top_level_capability;
+    OseoValue evaluation_error;
+    bool errored;
+    bool has_top_level_await;
+    /* Set only while GatherAvailableAncestors lists this module. */
+    bool gathered;
+    OseoModuleStatus status;
+    size_t dfs_index;
+    size_t dfs_ancestor_index;
+    size_t cycle_root;
+    uint64_t async_evaluation_order;
+    size_t pending_async_dependencies;
+    size_t *async_parents;
+    size_t async_parent_count;
+    size_t async_parent_capacity;
+    size_t *requested;
+    size_t requested_count;
+} OseoModuleRecord;
+
+/*
+ * One InnerModuleEvaluation activation on the driver's explicit frame
+ * stack: the module, its next request position, and whether that request
+ * entered a module whose frame is above this one.
+ */
+typedef struct {
+    size_t module;
+    size_t position;
+    bool entered_request;
+} OseoModuleFrame;
+
+/*
+ * The program's module table, installed once by the module graph's
+ * top-level script. `stack` is the InnerModuleEvaluation stack and
+ * `frames` its activations, each bounded by the module count because a
+ * module enters at most once per Evaluate. `async_evaluation_count` is
+ * the agent's module async evaluation count, which this runtime never
+ * resets.
+ */
+typedef struct {
+    OseoModuleRecord *records;
+    size_t count;
+    size_t *stack;
+    size_t stack_count;
+    OseoModuleFrame *frames;
+    size_t frame_count;
+    uint64_t async_evaluation_count;
+} OseoModuleTable;
 
 typedef enum {
     OSEO_JOB_REACTION = 1,
@@ -4246,6 +4323,28 @@ OseoResult oseo_internal_to_array_length(
     OseoValue value,
     uint32_t *requested
 );
+/*
+ * PerformPromiseThen with the module driver's internal reaction, which
+ * reads no `then` property and creates no derived promise.
+ */
+OseoResult oseo_internal_promise_then_module(
+    OseoContext *context,
+    OseoValue promise,
+    OseoValue evaluator,
+    size_t module_index
+);
+/*
+ * Runs AsyncModuleExecutionFulfilled or AsyncModuleExecutionRejected for
+ * one module table entry from its reaction job.
+ */
+OseoResult oseo_internal_module_async_settled(
+    OseoContext *context,
+    size_t module_index,
+    OseoValue argument,
+    bool fulfilled
+);
+/* Frees the module table; the final collection then frees its values. */
+void oseo_internal_module_table_release(OseoContext *context);
 OseoResult oseo_internal_promise_aggregate_settle(
     OseoContext *context,
     OseoValue reaction_value,
