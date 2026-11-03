@@ -10568,3 +10568,48 @@ property-read guard miss.
 markup characters, whitespace, and surrogates and checks `substr`, CreateHTML,
 and both trim aliases against independent models. The 105 test262 paths wait for
 `claim-boundary` and Root's full UPDATE.
+
+### `Date.prototype` methods
+
+The `annexb-date-methods` unit installs `getYear` and `setYear` of B.2.3.1 and
+B.2.3.2 on `%Date.prototype%` as ordinary built-in methods, writable,
+non-enumerable, and configurable, with `length` 0 and 1. `toGMTString` is a
+further property whose value is the `toUTCString` function object, so its
+`name` stays `toUTCString`. All three throw a `TypeError` for a receiver
+without `[[DateValue]]`, before any argument conversion.
+
+`getYear` returns `YearFromTime(LocalTime(t))` minus 1900, or NaN for an
+invalid date. `setYear` reads the receiver's time value, then converts its
+argument with `ToNumber`. An invalid date starts from +0. `MakeFullYear` maps
+an integer part from 0 through 99 to 1900 through 1999 and keeps every other
+year, and the month, date, and time within the day come from the time value
+read first. A NaN year stores and returns NaN, and a result outside the
+time-value range clips to NaN. The local time zone is the realm's UTC zone, so
+`LocalTime` and `UTC` add nothing.
+
+B.2.3.2 uses the time value read before `ToNumber(year)`, so a conversion that
+stores a new time value into the same Date does not change the result. The
+test262 files `date-value-read-before-tonumber-when-date-is-valid.js` and
+`date-value-read-before-tonumber-when-date-is-invalid.js` under
+*test/annexB/built-ins/Date/prototype/setYear/* pin that order. Node.js 24.21.0
+and Deno 2.9.7 both reread the slot after the conversion, so this case has a
+written expectation and a native-only observation, as the other Date setters
+do.
+
+The methods live in *runtime\_date.c*: `getYear` and `setYear` are entries 44
+and 45 of its method table, after `[Symbol.toPrimitive]`, and take two more
+Date-range code IDs under the same runtime ABI `m5-150`. The fixed fixture
+*tests/native/fixtures/annexb-date-methods.ts* is compared with Node.js and
+Deno, running in UTC, under both specialization policies and forced
+collection. It covers metadata and the alias identity, `getYear` across 1900,
+2000, both ends of the time-value range and NaN, `setYear` over the 0 to 99
+window, its edges, fractions, negative and out-of-range years, a leap day, an
+invalid start, NaN and infinite years, coerced operands, eight non-Date
+receivers for all three methods, receiver-before-conversion order, abrupt,
+Symbol and BigInt conversion, and a property-read guard miss.
+*tests/property/m5-annexb-date-methods.property.test.ts*, seed block
+`0x60009f00`, generates receiver time values and year operands and checks
+`getYear`, `setYear`, and `toGMTString` against an independent proleptic
+Gregorian calendar model. Its second test observes the read-before-conversion
+case natively. The 24 test262 paths wait for `claim-boundary` and Root's full
+UPDATE.

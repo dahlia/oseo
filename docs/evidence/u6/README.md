@@ -2083,8 +2083,8 @@ The TSV retains this later file with `-` for all three historical source
 samples, and the extraction script and its unit test retain it explicitly.
 
 
-Annex B escape and String local costs
--------------------------------------
+Annex B built-in local costs
+----------------------------
 
 *tests/property/m5-annexb-escape.property.test.ts* also postdates the three
 Linux source runs. Its initial Linux weight comes from one local Linux AMD64
@@ -2109,8 +2109,16 @@ provenance: one local Linux AMD64 extended run of its unchanged seed
 120 cases. The single passing registration took 218909.589814 milliseconds, so
 its rounded-up Linux weight is 219 seconds. macOS keeps the unknown-file median
 fallback, and the TSV, extraction script and unit test retain the file the same
-way. Linux now has 151 table entries, and the upper-median fallback falls from
-442 to 435 seconds.
+way. That brings Linux to 151 table entries and moves the upper-median fallback
+from 442 to 435 seconds.
+
+*tests/property/m5-annexb-date-methods.property.test.ts* follows the same
+procedure for its unchanged seed `0x60009f00`. Its generated registration took
+142525.86723 milliseconds over 120 cases and its fixed read-before-conversion
+registration 1139.418859 milliseconds, so the per-file case sum is
+143665.286089 milliseconds and the rounded-up Linux weight is 144 seconds.
+Linux now has 152 table entries, and the upper-median fallback stays at 435
+seconds.
 
 
 Exhaustive RegExp literal local cost

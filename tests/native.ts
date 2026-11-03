@@ -173,6 +173,8 @@ const { annexBEscapeFixtures } =
   await import("./native/fixtures/annexb-escape.ts");
 const { annexBStringMethodFixtures } =
   await import("./native/fixtures/annexb-string-methods.ts");
+const { annexBDateMethodFixtures } =
+  await import("./native/fixtures/annexb-date-methods.ts");
 const { globalNumericFunctionFixtures } =
   await import("./native/fixtures/global-numeric-functions.ts");
 const { reflectNamespaceFixtures } =
@@ -335,6 +337,7 @@ const fixtures: readonly Fixture[] = [
   ...uriHandlingFunctionFixtures,
   ...annexBEscapeFixtures,
   ...annexBStringMethodFixtures,
+  ...annexBDateMethodFixtures,
   ...globalNumericFunctionFixtures,
   ...reflectNamespaceFixtures,
   ...proxyExoticObjectFixtures,
@@ -1439,6 +1442,7 @@ for (const fixture of selectedFixtures) {
     fixture.name === "uri-handling-functions" ||
     fixture.name === "annexb-escape" ||
     fixture.name === "annexb-string-methods" ||
+    fixture.name === "annexb-date-methods" ||
     fixture.name === "global-numeric-functions" ||
     fixture.name === "reflect-namespace" ||
     fixture.name === "proxy-exotic-object" ||
@@ -1566,6 +1570,7 @@ for (const fixture of selectedFixtures) {
     fixture.name === "uri-handling-functions" ||
     fixture.name === "annexb-escape" ||
     fixture.name === "annexb-string-methods" ||
+    fixture.name === "annexb-date-methods" ||
     fixture.name === "global-numeric-functions" ||
     fixture.name === "reflect-namespace" ||
     fixture.name === "proxy-exotic-object" ||
@@ -2206,6 +2211,15 @@ for (const fixture of selectedFixtures) {
             // Every HTML result is staged in host memory while the
             // collector runs at every safepoint, and the fixture's two
             // receiver shapes miss the property-read guard once.
+            assert.ok(native.counters.collections > 0);
+            if (mode === "enabled") {
+              assert.ok(native.counters.guardMisses > 0);
+            }
+          }
+          if (fixture.name === "annexb-date-methods") {
+            // Every Date setter result is stored while the collector runs
+            // at every safepoint, and the fixture's two holder shapes miss
+            // the property-read guard once.
             assert.ok(native.counters.collections > 0);
             if (mode === "enabled") {
               assert.ok(native.counters.guardMisses > 0);

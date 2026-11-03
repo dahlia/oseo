@@ -1956,8 +1956,9 @@ typedef struct {
  * prototype creates its properties in and the order the code IDs count
  * down from `OSEO_DATE_METHOD_CODE_ID_LAST`, so an entry's index is the
  * only identity the builder and the dispatcher share.
- * `[Symbol.toPrimitive]` is last because it is the one entry keyed by a
- * symbol rather than by its name.
+ * `[Symbol.toPrimitive]` follows the ECMA-262 21.4.4 methods because it
+ * is the one entry keyed by a symbol rather than by its name; the Annex B
+ * `getYear` and `setYear` come after it so no earlier code ID moves.
  */
 typedef enum {
     OSEO_DATE_GET_DATE = 0,
@@ -2004,7 +2005,10 @@ typedef enum {
     OSEO_DATE_TO_UTC_STRING = 41,
     OSEO_DATE_VALUE_OF = 42,
     OSEO_DATE_TO_PRIMITIVE = 43,
-    OSEO_DATE_METHOD_COUNT = 44,
+    /* The Annex B methods of B.2.3, after the symbol-keyed entry. */
+    OSEO_DATE_GET_YEAR = 44,
+    OSEO_DATE_SET_YEAR = 45,
+    OSEO_DATE_METHOD_COUNT = 46,
 } OseoDateMethod;
 
 /*

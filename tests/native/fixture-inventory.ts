@@ -136,6 +136,8 @@ const { uriHandlingFunctionFixtures } =
 const { annexBEscapeFixtures } = await import("./fixtures/annexb-escape.ts");
 const { annexBStringMethodFixtures } =
   await import("./fixtures/annexb-string-methods.ts");
+const { annexBDateMethodFixtures } =
+  await import("./fixtures/annexb-date-methods.ts");
 const { globalNumericFunctionFixtures } =
   await import("./fixtures/global-numeric-functions.ts");
 const { reflectNamespaceFixtures } =
@@ -383,6 +385,10 @@ export const nativeFixtureGroups: readonly NativeFixtureGroup[] = [
   {
     module: "annexb-string-methods.ts",
     fixtures: annexBStringMethodFixtures,
+  },
+  {
+    module: "annexb-date-methods.ts",
+    fixtures: annexBDateMethodFixtures,
   },
   {
     module: "global-numeric-functions.ts",

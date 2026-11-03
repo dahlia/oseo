@@ -303,12 +303,14 @@ Ownership follows the plan's target layout:
     resizes, or releases a block;
  -  *runtime\_date.c*: the `%Date%` intrinsic with its call and construct
     behavior, the `now`, `parse`, and `UTC` statics, `%Date.prototype%` with
-    its forty-four own methods, and the time-value arithmetic of 21.4.1,
-    including the Date Time String Format parser and the `ToDateString`,
-    `toUTCString`, and `toISOString` writers. It reads no host clock: the
-    current time comes from the clock component's epoch real-time capability,
-    which never takes the monotonic origin. Its `LocalTZA` is the constant +0
-    because the clock adapter has no time-zone capability.
+    its forty-four own methods, the Annex B `getYear` and `setYear`, and the
+    `toGMTString` alias of `toUTCString`, and the time-value arithmetic of
+    21.4.1, including the Date Time String Format parser and the
+    `ToDateString`, `toUTCString`, and `toISOString` writers. It reads no
+    host clock: the current time comes from the clock component's epoch
+    real-time capability, which never takes the monotonic origin. Its
+    `LocalTZA` is the constant +0 because the clock adapter has no time-zone
+    capability.
 
 The iterator protocol operations `oseo_iterator_get`, `oseo_iterator_next`, and
 `oseo_iterator_close` are generated-code ABI entry points declared in

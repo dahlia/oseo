@@ -97,7 +97,7 @@ A probe of the current build and the reviewed manifest shows this Annex B state:
 | Annex B RegExp pattern grammar                     | Reported as the OSEO1001 profile boundary, without `u` or `v`                 |
 | `escape`, `unescape`                               | Installed by `annexb-escape`; test262 rows not yet admitted                   |
 | `substr`, HTML methods, `trimLeft`, `trimRight`    | Installed by `annexb-string-methods`; test262 rows not yet admitted           |
-| `getYear`, `setYear`, `toGMTString`                | Not installed                                                                 |
+| `getYear`, `setYear`, `toGMTString`                | Installed by `annexb-date-methods`; test262 rows not yet admitted             |
 | `RegExp.prototype.compile`                         | Not installed                                                                 |
 | Labelled function declarations                     | Rejected with OSEO1001                                                        |
 | Function declarations in `if` clauses              | Rejected with OSEO1001                                                        |
@@ -478,6 +478,10 @@ Status: implemented, with fixed, differential, and generated evidence in the
 Owns *test/annexB/built-ins/Date/prototype/* (24): `getYear`, `setYear`, and
 `toGMTString`. `toGMTString` is the same function object as `toUTCString`.
 The methods use the realm's UTC local time zone that the M5 profile records.
+
+Status: implemented, with fixed, differential, and generated evidence in the
+[profile section](./docs/language-profile-m5.md#date-prototype-methods). The
+24 rows wait for `claim-boundary` and Root's full UPDATE.
 
 ### `annexb-regexp-compile`
 

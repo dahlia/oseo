@@ -2577,12 +2577,19 @@ test("populates the realm-owned Date intrinsic cluster", () => {
     "toUTCString",
     "valueOf",
     "[Symbol.toPrimitive]",
+    // Annex B B.2.3.
+    "getYear",
+    "setYear",
+    "toGMTString",
   ]) {
     assert.ok(
       dateSource.includes(`"${property}"`),
       `${property} needs an own-property definition`,
     );
   }
+  // toGMTString names the toUTCString function rather than one of its own.
+  assert.match(internalHeader, /OSEO_DATE_METHOD_COUNT = 46/u);
+  assert.match(dateSource, /"toGMTString",\s*frame\.slots\[4\]/u);
   assert.match(dateSource, /OSEO_FUNCTION_ORDINARY/u);
   assert.match(
     dateSource,
