@@ -1470,5 +1470,12 @@ handling functions in the URI range. The global object binds both as writable,
 non-enumerable, configurable properties in every realm. The generated-code ABI
 gains no entry point.
 
+The same ABI adds the Annex B `String.prototype` methods to *runtime\_string.c*:
+`substr` and the thirteen HTML methods from `anchor` through `sup` take
+fourteen code IDs in the String range, and `trimLeft` and `trimRight` are
+further properties whose values are the existing `trimStart` and `trimEnd`
+functions. The node adds no intrinsic slot, heap kind, component, or
+generated-code entry point.
+
 [ADR 0030]: https://github.com/dahlia/oseo/blob/main/docs/adr/0030-test262-unhandled-rejection-policy.md
 [ADR 0034]: https://github.com/dahlia/oseo/blob/main/docs/adr/0034-legacy-function-caller-contract.md

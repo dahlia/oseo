@@ -616,3 +616,7 @@ families:
     owner: tests/property/m5-annexb-escape.property.test.ts
     start: 0x60009d00
     end: 0x60009dff
+  - family: m5-annexb-string-methods
+    owner: tests/property/m5-annexb-string-methods.property.test.ts
+    start: 0x60009e00
+    end: 0x60009eff

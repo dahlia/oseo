@@ -96,7 +96,7 @@ A probe of the current build and the reviewed manifest shows this Annex B state:
 | `__defineGetter__`, `__defineSetter__`             | Not installed                                                                 |
 | Annex B RegExp pattern grammar                     | Reported as the OSEO1001 profile boundary, without `u` or `v`                 |
 | `escape`, `unescape`                               | Installed by `annexb-escape`; test262 rows not yet admitted                   |
-| `substr`, HTML methods, `trimLeft`, `trimRight`    | Not installed; a call is a `TypeError`                                        |
+| `substr`, HTML methods, `trimLeft`, `trimRight`    | Installed by `annexb-string-methods`; test262 rows not yet admitted           |
 | `getYear`, `setYear`, `toGMTString`                | Not installed                                                                 |
 | `RegExp.prototype.compile`                         | Not installed                                                                 |
 | Labelled function declarations                     | Rejected with OSEO1001                                                        |
@@ -468,6 +468,10 @@ Owns `substr` (15), the thirteen HTML methods from `anchor` through `sup`
 (82), and `trimLeft` and `trimRight` (8) under
 *test/annexB/built-ins/String/prototype/*. The HTML methods share
 CreateHTML, including the quotation mark escaping of attribute values.
+
+Status: implemented, with fixed, differential, and generated evidence in the
+[profile section](./docs/language-profile-m5.md#string-prototype-methods). The
+105 rows wait for `claim-boundary` and Root's full UPDATE.
 
 ### `annexb-date-methods`
 

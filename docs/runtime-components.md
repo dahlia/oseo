@@ -93,7 +93,9 @@ Ownership follows the plan's target layout:
     provides the `String` constructor, %String.prototype%, the `fromCharCode`,
     `fromCodePoint`, and `raw` statics, the prototype case conversions, locale
     case forms, trimming methods, Unicode normalization, and deterministic
-    locale comparison. *runtime\_unicode\_tables.h* is its generated,
+    locale comparison, together with the Annex B `substr`, the thirteen HTML
+    methods and their shared CreateHTML, and the `trimLeft` and `trimRight`
+    aliases. *runtime\_unicode\_tables.h* is its generated,
     package-private view of the pinned Unicode data;
  -  *runtime\_string\_match.c*: the `String.prototype` `match`, `matchAll`,
     `search`, `split`, `replace`, and `replaceAll` well-known-symbol dispatch,

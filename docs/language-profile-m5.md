@@ -10528,3 +10528,43 @@ computed from each unit's bits, `unescape` against an independent decoder, and
 the `unescape(escape(s))` round trip. The 35 test262 paths under
 *test/annexB/built-ins/escape/* and *unescape/* wait for `claim-boundary` and
 Root's full UPDATE.
+
+### `String.prototype` methods
+
+The `annexb-string-methods` unit installs `substr` of B.2.2.1 and the thirteen
+HTML methods of B.2.2.2 through B.2.2.14 on `%String.prototype%` as ordinary
+built-in methods, writable, non-enumerable, and configurable, none of them a
+constructor. `substr` has a `length` of 2; `anchor`, `fontcolor`, `fontsize`,
+and `link` have 1; the other nine have 0. `trimLeft` and `trimRight` are
+further properties whose values are the `trimStart` and `trimEnd` function
+objects, so their `name` stays `trimStart` and `trimEnd`.
+
+Every method throws a `TypeError` for an `undefined` or `null` receiver and
+converts any other receiver with `ToString`. `substr` then converts its start
+and, when present, its length with `ToIntegerOrInfinity`. A negative start
+counts from the end and is clamped at 0, the length is clamped to what
+remains, and an absent or `undefined` length takes the rest.
+
+The HTML methods share CreateHTML. It writes `<tag`, then for the four methods
+with an attribute (`name`, `color`, `size`, `href`) a space, the attribute
+name, and the attribute value in quotation marks, then `>`, the receiver
+string, and `</tag>`. The attribute value is converted with `ToString` after
+the receiver, and each quotation mark in it becomes `&quot;`; no other
+character is escaped. The tags are `a`, `big`, `blink`, `b`, `tt`, `font`,
+`i`, `small`, `strike`, `sub`, and `sup`.
+
+The methods live in *runtime\_string.c* and take fourteen code IDs in the String
+range, under the same runtime ABI `m5-150` as `escape`. The fixed fixture
+*tests/native/fixtures/annexb-string-methods.ts* is compared with Node.js and
+Deno under both specialization policies and forced collection. It covers
+metadata and the alias identities, trimming of eight whitespace and line
+terminator units and the U+180E exclusion, `substr` over integer, fractional,
+NaN, infinite, signed-zero and string operands, each HTML method with escaped
+and coerced attribute values, primitive and object receivers, conversion order,
+nullish and Symbol operands, abrupt conversion, replacement of a method, and a
+property-read guard miss.
+*tests/property/m5-annexb-string-methods.property.test.ts*, seed block
+`0x60009e00`, generates receivers and attribute values with quotation marks,
+markup characters, whitespace, and surrogates and checks `substr`, CreateHTML,
+and both trim aliases against independent models. The 105 test262 paths wait for
+`claim-boundary` and Root's full UPDATE.

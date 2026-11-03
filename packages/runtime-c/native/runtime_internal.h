@@ -615,6 +615,18 @@
     (OSEO_STRING_CODE_ID_RANGE_LAST - 36u)
 #define OSEO_STRING_TO_WELL_FORMED_CODE_ID \
     (OSEO_STRING_CODE_ID_RANGE_LAST - 37u)
+/*
+ * The Annex B String.prototype methods of B.2.2. The thirteen HTML
+ * methods keep the dense order of `string_html_methods`, so a code ID
+ * is OSEO_STRING_HTML_CODE_ID_FIRST plus that method's table index.
+ */
+#define OSEO_STRING_SUBSTR_CODE_ID \
+    (OSEO_STRING_CODE_ID_RANGE_LAST - 38u)
+#define OSEO_STRING_HTML_METHOD_COUNT ((size_t)13u)
+#define OSEO_STRING_HTML_CODE_ID_FIRST \
+    (OSEO_STRING_CODE_ID_RANGE_LAST - 51u)
+#define OSEO_STRING_HTML_CODE_ID_LAST \
+    (OSEO_STRING_CODE_ID_RANGE_LAST - 39u)
 
 #define OSEO_MAP_CODE_ID_RANGE_INDEX ((size_t)13u)
 #define OSEO_MAP_CODE_ID_RANGE_FIRST \

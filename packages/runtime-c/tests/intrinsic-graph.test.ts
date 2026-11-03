@@ -2085,9 +2085,36 @@ test("populates the realm-owned String intrinsic cluster", () => {
     "trimEnd",
     "trimStart",
     "valueOf",
+    // Annex B B.2.2.
+    "substr",
+    "anchor",
+    "big",
+    "blink",
+    "bold",
+    "fixed",
+    "fontcolor",
+    "fontsize",
+    "italics",
+    "link",
+    "small",
+    "strike",
+    "sub",
+    "sup",
+    "trimLeft",
+    "trimRight",
   ]) {
     assert.match(stringSource, new RegExp(`"${property}"`, "u"));
   }
+  // trimLeft and trimRight name the trimStart and trimEnd functions
+  // rather than two functions of their own, and the HTML methods share
+  // one dense code-ID run.
+  assert.match(internalHeader, /OSEO_STRING_SUBSTR_CODE_ID/u);
+  assert.match(
+    internalHeader,
+    /OSEO_STRING_HTML_METHOD_COUNT \(\(size_t\)13u\)/u,
+  );
+  assert.match(stringSource, /"trimLeft",\s*frame\.slots\[3\]/u);
+  assert.match(stringSource, /"trimRight",\s*frame\.slots\[4\]/u);
   assert.match(stringSource, /static OseoResult normalize_order\(/u);
   assert.match(stringSource, /size_t counts\[256\] = \{0u\}/u);
   assert.doesNotMatch(stringSource, /normalize_append_ordered/u);

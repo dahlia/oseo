@@ -1,0 +1,62 @@
+version: 1
+id: annexb-string-methods
+title: "Annex B String.prototype methods"
+scope:
+  - "String.prototype.substr of B.2.2.1: RequireObjectCoercible and
+    ToString of the receiver, ToIntegerOrInfinity of start and length in
+    that order, the end-relative start, and the clamped length."
+  - "The thirteen HTML methods of B.2.2.2 through B.2.2.14 and their shared
+    CreateHTML: each tag, the four attribute names, the attribute value's
+    ToString after the receiver's, and the &quot; escaping of quotation
+    marks."
+  - "String.prototype.trimLeft and trimRight of B.2.2.15 and B.2.2.16 as
+    the trimStart and trimEnd function objects, in every realm."
+  - "The names, lengths, absent prototype properties, and writable,
+    non-enumerable, configurable descriptors of all sixteen properties."
+owners:
+  - docs/language-profile-m5.md
+evidence:
+  differential:
+    status: covered
+    references:
+      - tests/native/fixtures/annexb-string-methods.ts
+      - tests/property/m5-annexb-string-methods.property.test.ts
+  fixed:
+    status: covered
+    references:
+      - tests/native/fixtures/annexb-string-methods.ts
+  forced-collection:
+    status: covered
+    references:
+      - tests/native.ts
+      - tests/native/fixtures/annexb-string-methods.ts
+      - tests/property/m5-annexb-string-methods.property.test.ts
+  generated:
+    status: covered
+    references:
+      - tests/property/m5-annexb-string-methods.property.test.ts
+  guard-fallback:
+    status: covered
+    references:
+      - tests/native.ts
+      - tests/native/fixtures/annexb-string-methods.ts
+      - tests/property/m5-annexb-string-methods.property.test.ts
+  specialization:
+    status: covered
+    references:
+      - tests/native.ts
+      - tests/native/fixtures/annexb-string-methods.ts
+      - tests/property/m5-annexb-string-methods.property.test.ts
+  standards:
+    status: omitted
+    reason: "The 105 test262 paths for substr, the HTML methods, trimLeft,
+      and trimRight under test/annexB/built-ins/String/prototype/ lie
+      outside the inventory until claim-boundary applies ADR 0032; Root
+      admits them in its full UPDATE."
+    replacements:
+      - tests/native/fixtures/annexb-string-methods.ts
+      - tests/property/m5-annexb-string-methods.property.test.ts
+  structural:
+    status: covered
+    references:
+      - packages/runtime-c/tests/intrinsic-graph.test.ts

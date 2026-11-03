@@ -1783,6 +1783,203 @@ static OseoResult string_slice(
     return result;
 }
 
+/*
+ * String.prototype.substr(start, length), B.2.2.1. The start is relative
+ * to the end when negative, the length is clamped to what remains, and
+ * an absent length takes the rest of the string. Both conversions run
+ * after the receiver's ToString, start before length.
+ */
+static OseoResult string_substr(
+    OseoContext *context,
+    OseoValue receiver,
+    size_t argument_count,
+    const OseoValue *arguments
+) {
+    OseoRootFrame frame = {NULL, NULL, 0u};
+    OseoResult result = oseo_roots_allocate(context, &frame, 4u);
+    if (result.status != OSEO_STATUS_NORMAL) return result;
+    frame.slots[0] = receiver;
+    frame.slots[1] = string_builtin_argument(argument_count, arguments, 0u);
+    frame.slots[2] = string_builtin_argument(argument_count, arguments, 1u);
+    result = string_method_subject(context, frame.slots[0]);
+    frame.slots[3] = result.value;
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = string_integer_or_infinity(context, frame.slots[1]);
+    }
+    double start = result.status == OSEO_STATUS_NORMAL
+        ? number_value(result.value)
+        : 0.0;
+    double length = 0.0;
+    if (result.status == OSEO_STATUS_NORMAL &&
+        tag_of(frame.slots[2]) == OSEO_TAG_UNDEFINED) {
+        length = (double)string_object(frame.slots[3])->length;
+    } else if (result.status == OSEO_STATUS_NORMAL) {
+        result = string_integer_or_infinity(context, frame.slots[2]);
+        if (result.status == OSEO_STATUS_NORMAL) {
+            length = number_value(result.value);
+        }
+    }
+    if (result.status != OSEO_STATUS_NORMAL) {
+        oseo_roots_release(context, &frame);
+        return result;
+    }
+    const OseoString *subject = string_object(frame.slots[3]);
+    size_t from = string_relative_position(start, subject->length);
+    size_t count = string_clamped_position(length, subject->length - from);
+    result = oseo_internal_allocate_string(
+        context,
+        subject->units + from,
+        count
+    );
+    oseo_roots_release(context, &frame);
+    return result;
+}
+
+/*
+ * One Annex B HTML method of B.2.2.2 through B.2.2.14: the tag it wraps
+ * the string in and the attribute it writes, or an empty attribute for
+ * the eight methods that take no argument.
+ */
+typedef struct {
+    const char *name;
+    const char *tag;
+    const char *attribute;
+} OseoStringHtmlMethod;
+
+static const OseoStringHtmlMethod string_html_methods[] = {
+    {"anchor", "a", "name"},
+    {"big", "big", ""},
+    {"blink", "blink", ""},
+    {"bold", "b", ""},
+    {"fixed", "tt", ""},
+    {"fontcolor", "font", "color"},
+    {"fontsize", "font", "size"},
+    {"italics", "i", ""},
+    {"link", "a", "href"},
+    {"small", "small", ""},
+    {"strike", "strike", ""},
+    {"sub", "sub", ""},
+    {"sup", "sup", ""},
+};
+
+_Static_assert(
+    sizeof(string_html_methods) / sizeof(string_html_methods[0]) ==
+        OSEO_STRING_HTML_METHOD_COUNT,
+    "The HTML method table must match its reviewed code-ID range."
+);
+
+/* Append the ASCII text `text` to `builder`. */
+static OseoResult string_builder_append_ascii(
+    OseoContext *context,
+    OseoStringBuilder *builder,
+    const char *text
+) {
+    OseoResult result = normal(oseo_undefined());
+    for (const char *unit = text;
+         result.status == OSEO_STATUS_NORMAL && *unit != '\0';
+         unit += 1) {
+        result = string_builder_append_unit(
+            context,
+            builder,
+            (uint16_t)(unsigned char)*unit
+        );
+    }
+    return result;
+}
+
+/*
+ * CreateHTML(string, tag, attribute, value), B.2.2.2.1. The receiver's
+ * ToString runs before the attribute value's, and every quotation mark
+ * in the attribute value becomes `&quot;`; no other unit is escaped.
+ */
+static OseoResult string_create_html(
+    OseoContext *context,
+    const OseoStringHtmlMethod *method,
+    OseoValue receiver,
+    size_t argument_count,
+    const OseoValue *arguments
+) {
+    OseoValue slots[3] = {
+        receiver,
+        string_builtin_argument(argument_count, arguments, 0u),
+        oseo_undefined(),
+    };
+    OseoRootFrame frame = {NULL, slots, 3u};
+    oseo_roots_push(context, &frame);
+    OseoStringBuilder builder = {NULL, 0u, 0u};
+    bool attributed = method->attribute[0] != '\0';
+    OseoResult result = string_method_subject(context, slots[0]);
+    slots[0] = result.value;
+    if (result.status == OSEO_STATUS_NORMAL && attributed) {
+        result = oseo_internal_value_string(context, slots[1]);
+        slots[2] = result.value;
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = string_builder_append_ascii(context, &builder, "<");
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = string_builder_append_ascii(context, &builder, method->tag);
+    }
+    if (result.status == OSEO_STATUS_NORMAL && attributed) {
+        result = string_builder_append_ascii(context, &builder, " ");
+        if (result.status == OSEO_STATUS_NORMAL) {
+            result = string_builder_append_ascii(
+                context,
+                &builder,
+                method->attribute
+            );
+        }
+        if (result.status == OSEO_STATUS_NORMAL) {
+            result = string_builder_append_ascii(context, &builder, "=\"");
+        }
+        const OseoString *value = result.status == OSEO_STATUS_NORMAL
+            ? string_object(slots[2])
+            : NULL;
+        for (size_t index = 0u;
+             result.status == OSEO_STATUS_NORMAL && index < value->length;
+             index += 1u) {
+            uint16_t unit = value->units[index];
+            result = unit == (uint16_t)'"'
+                ? string_builder_append_ascii(context, &builder, "&quot;")
+                : string_builder_append_unit(context, &builder, unit);
+        }
+        if (result.status == OSEO_STATUS_NORMAL) {
+            result = string_builder_append_ascii(context, &builder, "\"");
+        }
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = string_builder_append_ascii(context, &builder, ">");
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        const OseoString *subject = string_object(slots[0]);
+        result = oseo_internal_string_builder_append(
+            context,
+            &builder,
+            subject->units,
+            subject->length
+        );
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = string_builder_append_ascii(context, &builder, "</");
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = string_builder_append_ascii(context, &builder, method->tag);
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = string_builder_append_ascii(context, &builder, ">");
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = oseo_internal_allocate_string(
+            context,
+            builder.units,
+            builder.length
+        );
+    }
+    oseo_internal_string_builder_release(&builder);
+    oseo_roots_pop(context, &frame);
+    return result;
+}
+
 static OseoResult string_from_char_code(
     OseoContext *context,
     size_t argument_count,
@@ -2120,6 +2317,19 @@ OseoResult oseo_internal_string_builtin_dispatch(
             arguments
         );
     }
+    if (code_id == OSEO_STRING_SUBSTR_CODE_ID) {
+        return string_substr(context, receiver, argument_count, arguments);
+    }
+    if (code_id >= OSEO_STRING_HTML_CODE_ID_FIRST &&
+        code_id <= OSEO_STRING_HTML_CODE_ID_LAST) {
+        return string_create_html(
+            context,
+            &string_html_methods[code_id - OSEO_STRING_HTML_CODE_ID_FIRST],
+            receiver,
+            argument_count,
+            arguments
+        );
+    }
     if (code_id == OSEO_STRING_LOWERCASE_CODE_ID ||
         code_id == OSEO_STRING_UPPERCASE_CODE_ID) {
         return string_convert_case(
@@ -2287,7 +2497,11 @@ OseoResult oseo_internal_string_intrinsic(OseoContext *context) {
     }
     size_t entry_allocations = context->allocations;
     OseoRootFrame frame = {NULL, NULL, 0u};
-    OseoResult result = oseo_roots_allocate(context, &frame, 3u);
+    /*
+     * Slots 3 and 4 keep trimStart and trimEnd so that the Annex B
+     * trimLeft and trimRight properties can name the same functions.
+     */
+    OseoResult result = oseo_roots_allocate(context, &frame, 5u);
     if (result.status != OSEO_STATUS_NORMAL) return result;
     result = oseo_internal_intrinsic(
         context,
@@ -2371,6 +2585,20 @@ OseoResult oseo_internal_string_intrinsic(OseoContext *context) {
         OSEO_STRING_PAD_END_CODE_ID,
         OSEO_STRING_IS_WELL_FORMED_CODE_ID,
         OSEO_STRING_TO_WELL_FORMED_CODE_ID,
+        OSEO_STRING_SUBSTR_CODE_ID,
+        OSEO_STRING_HTML_CODE_ID_FIRST + 0u,
+        OSEO_STRING_HTML_CODE_ID_FIRST + 1u,
+        OSEO_STRING_HTML_CODE_ID_FIRST + 2u,
+        OSEO_STRING_HTML_CODE_ID_FIRST + 3u,
+        OSEO_STRING_HTML_CODE_ID_FIRST + 4u,
+        OSEO_STRING_HTML_CODE_ID_FIRST + 5u,
+        OSEO_STRING_HTML_CODE_ID_FIRST + 6u,
+        OSEO_STRING_HTML_CODE_ID_FIRST + 7u,
+        OSEO_STRING_HTML_CODE_ID_FIRST + 8u,
+        OSEO_STRING_HTML_CODE_ID_FIRST + 9u,
+        OSEO_STRING_HTML_CODE_ID_FIRST + 10u,
+        OSEO_STRING_HTML_CODE_ID_FIRST + 11u,
+        OSEO_STRING_HTML_CODE_ID_FIRST + 12u,
     };
     static const char *const access_names[] = {
         "at",
@@ -2407,6 +2635,20 @@ OseoResult oseo_internal_string_intrinsic(OseoContext *context) {
         "padEnd",
         "isWellFormed",
         "toWellFormed",
+        "substr",
+        "anchor",
+        "big",
+        "blink",
+        "bold",
+        "fixed",
+        "fontcolor",
+        "fontsize",
+        "italics",
+        "link",
+        "small",
+        "strike",
+        "sub",
+        "sup",
     };
     static const size_t access_lengths[] = {
         1u, 1u, 1u, 1u, 0u, 0u, 1u,
@@ -2414,7 +2656,15 @@ OseoResult oseo_internal_string_intrinsic(OseoContext *context) {
         1u, 1u, 1u, 2u, 2u, 2u,
         1u, 0u, 0u, 0u, 0u, 0u, 0u, 0u, 0u,
         1u, 1u, 1u, 0u, 0u,
+        2u, 1u, 0u, 0u, 0u, 0u, 1u, 1u, 0u, 1u, 0u, 0u, 0u, 0u,
     };
+    _Static_assert(
+        sizeof(access_codes) / sizeof(access_codes[0]) ==
+                sizeof(access_names) / sizeof(access_names[0]) &&
+            sizeof(access_codes) / sizeof(access_codes[0]) ==
+                sizeof(access_lengths) / sizeof(access_lengths[0]),
+        "Every String.prototype method needs a name and a length."
+    );
     for (size_t index = 0u;
          result.status == OSEO_STATUS_NORMAL &&
              index < sizeof(access_codes) / sizeof(access_codes[0]);
@@ -2436,6 +2686,34 @@ OseoResult oseo_internal_string_intrinsic(OseoContext *context) {
                 (OseoPropertyAttributes){true, false, true, false}
             );
         }
+        if (access_codes[index] == OSEO_STRING_TRIM_START_CODE_ID) {
+            frame.slots[3] = frame.slots[1];
+        } else if (access_codes[index] == OSEO_STRING_TRIM_END_CODE_ID) {
+            frame.slots[4] = frame.slots[1];
+        }
+    }
+    /*
+     * B.2.2.15 and B.2.2.16: the initial values of trimLeft and trimRight
+     * are the trimStart and trimEnd function objects themselves, so the
+     * aliases keep those names.
+     */
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = define_string_property(
+            context,
+            frame.slots[0],
+            "trimLeft",
+            frame.slots[3],
+            (OseoPropertyAttributes){true, false, true, false}
+        );
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = define_string_property(
+            context,
+            frame.slots[0],
+            "trimRight",
+            frame.slots[4],
+            (OseoPropertyAttributes){true, false, true, false}
+        );
     }
     if (result.status == OSEO_STATUS_NORMAL) {
         result = oseo_internal_iterator_method(
