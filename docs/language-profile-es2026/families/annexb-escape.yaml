@@ -16,7 +16,7 @@ scope:
   - "The single-argument ToString conversion each function performs first,
     including the abrupt completion a throwing conversion propagates."
 owners:
-  - docs/language-profile-m5.md
+  - docs/language-profile-es2026.md
 evidence:
   differential:
     status: covered
@@ -52,8 +52,9 @@ evidence:
   standards:
     status: omitted
     reason: "The 35 test262 paths under test/annexB/built-ins/escape/ and
-      unescape/ lie outside the inventory until claim-boundary applies ADR
-      0032; Root admits them in its full UPDATE."
+      unescape/ are unit:annexb-escape rows of the ADR 0032 inventory, expected
+      to pass. This class stays omitted until a full UPDATE admits and observes
+      them."
     replacements:
       - tests/native/fixtures/annexb-escape.ts
       - tests/property/m5-annexb-escape.property.test.ts

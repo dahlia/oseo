@@ -14,7 +14,7 @@ scope:
   - "The names, lengths, absent prototype properties, and writable,
     non-enumerable, configurable descriptors of all three properties."
 owners:
-  - docs/language-profile-m5.md
+  - docs/language-profile-es2026.md
 evidence:
   differential:
     status: covered
@@ -51,8 +51,9 @@ evidence:
   standards:
     status: omitted
     reason: "The 24 test262 paths under test/annexB/built-ins/Date/prototype/
-      lie outside the inventory until claim-boundary applies ADR 0032; Root
-      admits them in its full UPDATE."
+      are unit:annexb-date-methods rows of the ADR 0032 inventory, expected to
+      pass. This class stays omitted until a full UPDATE admits and observes
+      them."
     replacements:
       - tests/native/fixtures/annexb-date-methods.ts
       - tests/property/m5-annexb-date-methods.property.test.ts

@@ -95,9 +95,9 @@ A probe of the current build and the reviewed manifest shows this Annex B state:
 | `__lookupGetter__`, `__lookupSetter__`             | Not installed; a lookup reaching `Object.prototype` reports OSEO1001          |
 | `__defineGetter__`, `__defineSetter__`             | Not installed                                                                 |
 | Annex B RegExp pattern grammar                     | Reported as the OSEO1001 profile boundary, without `u` or `v`                 |
-| `escape`, `unescape`                               | Installed by `annexb-escape`; test262 rows not yet admitted                   |
-| `substr`, HTML methods, `trimLeft`, `trimRight`    | Installed by `annexb-string-methods`; test262 rows not yet admitted           |
-| `getYear`, `setYear`, `toGMTString`                | Installed by `annexb-date-methods`; test262 rows not yet admitted             |
+| `escape`, `unescape`                               | Installed by `annexb-escape`; test262 rows not yet observed                   |
+| `substr`, HTML methods, `trimLeft`, `trimRight`    | Installed by `annexb-string-methods`; test262 rows not yet observed           |
+| `getYear`, `setYear`, `toGMTString`                | Installed by `annexb-date-methods`; test262 rows not yet observed             |
 | `RegExp.prototype.compile`                         | Not installed                                                                 |
 | Labelled function declarations                     | Rejected with OSEO1001                                                        |
 | Function declarations in `if` clauses              | Rejected with OSEO1001                                                        |
@@ -459,8 +459,8 @@ of arbitrary code units and checks that `unescape(escape(s))` returns `s` and
 that every escape matches an independent encoder.
 
 Status: implemented, with fixed, differential, and generated evidence in the
-[profile section](./docs/language-profile-m5.md#escape-and-unescape). The 35
-rows wait for `claim-boundary` and Root's full UPDATE.
+[profile section](./docs/language-profile-es2026.md#escape-and-unescape). The
+35 rows wait for admission, expected to pass, in Root's full UPDATE.
 
 ### `annexb-string-methods`
 
@@ -470,8 +470,8 @@ Owns `substr` (15), the thirteen HTML methods from `anchor` through `sup`
 CreateHTML, including the quotation mark escaping of attribute values.
 
 Status: implemented, with fixed, differential, and generated evidence in the
-[profile section](./docs/language-profile-m5.md#string-prototype-methods). The
-105 rows wait for `claim-boundary` and Root's full UPDATE.
+[profile section](./docs/language-profile-es2026.md#string-prototype-methods).
+The 105 rows wait for admission, expected to pass, in Root's full UPDATE.
 
 ### `annexb-date-methods`
 
@@ -480,8 +480,8 @@ Owns *test/annexB/built-ins/Date/prototype/* (24): `getYear`, `setYear`, and
 The methods use the realm's UTC local time zone that the M5 profile records.
 
 Status: implemented, with fixed, differential, and generated evidence in the
-[profile section](./docs/language-profile-m5.md#date-prototype-methods). The
-24 rows wait for `claim-boundary` and Root's full UPDATE.
+[profile section](./docs/language-profile-es2026.md#date-prototype-methods).
+The 24 rows wait for admission, expected to pass, in Root's full UPDATE.
 
 ### `annexb-regexp-compile`
 
