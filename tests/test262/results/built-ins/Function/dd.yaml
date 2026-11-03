@@ -18,10 +18,14 @@ results:
       - dynamic-source
       - functions
     observation:
-      detail: "Not executed: the frontmatter needs an unsupported feature."
+      detail: 'test/built-ins/Function/15.3.5.4_2-78gs.js non-strict disabled
+        failed (1): stdout=""
+        stderr="test/built-ins/Function/15.3.5.4_2-78gs.js:94:10:
+        error[OSEO1001]: The Function constructor requires dynamic
+        source and is unsupported in M5.\n"'
       passed: false
-    unsupportedFeatures:
-      - caller
+      unsupportedCapability: profile-syntax
+    unsupportedFeatures: []
   - case:
       async: false
       features: []

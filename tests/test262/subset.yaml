@@ -16663,7 +16663,7 @@ tests:
         var-bindings,
       ]
   - path: test/built-ins/Function/15.3.5.4_2-75gs.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [functions]
   - path: test/built-ins/Function/15.3.5.4_2-76gs.js
     expectedClassification: unsupported-profile-feature
@@ -16675,7 +16675,7 @@ tests:
     expectedClassification: unsupported-profile-feature
     dependencies: [dynamic-source, functions]
   - path: test/built-ins/Function/15.3.5.4_2-79gs.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [functions]
   - path: test/built-ins/Function/15.3.5.4_2-7gs.js
     expectedClassification: unsupported-profile-feature
@@ -16689,34 +16689,34 @@ tests:
         var-bindings,
       ]
   - path: test/built-ins/Function/15.3.5.4_2-80gs.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [functions]
   - path: test/built-ins/Function/15.3.5.4_2-81gs.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [functions]
   - path: test/built-ins/Function/15.3.5.4_2-82gs.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [functions]
   - path: test/built-ins/Function/15.3.5.4_2-83gs.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [functions]
   - path: test/built-ins/Function/15.3.5.4_2-84gs.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [functions]
   - path: test/built-ins/Function/15.3.5.4_2-85gs.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [functions]
   - path: test/built-ins/Function/15.3.5.4_2-86gs.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [functions]
   - path: test/built-ins/Function/15.3.5.4_2-87gs.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [functions]
   - path: test/built-ins/Function/15.3.5.4_2-88gs.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [functions]
   - path: test/built-ins/Function/15.3.5.4_2-89gs.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [functions]
   - path: test/built-ins/Function/15.3.5.4_2-8gs.js
     expectedClassification: unsupported-profile-feature
@@ -16731,16 +16731,16 @@ tests:
         var-bindings,
       ]
   - path: test/built-ins/Function/15.3.5.4_2-90gs.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [functions]
   - path: test/built-ins/Function/15.3.5.4_2-91gs.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [functions]
   - path: test/built-ins/Function/15.3.5.4_2-92gs.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [functions]
   - path: test/built-ins/Function/15.3.5.4_2-93gs.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [functions]
   - path: test/built-ins/Function/15.3.5.4_2-94gs.js
     expectedClassification: pass
@@ -61165,10 +61165,10 @@ tests:
     expectedClassification: pass
     dependencies: [functions, object-properties]
   - path: test/language/arguments-object/10.6-13-a-2.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [functions, object-properties]
   - path: test/language/arguments-object/10.6-13-a-3.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [functions, object-properties]
   - path: test/language/arguments-object/10.6-13-c-1-s.js
     expectedClassification: pass

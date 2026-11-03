@@ -45,6 +45,24 @@ evidence:
     references:
       - tests/test262/subset.yaml
       - tests/test262/results.yaml
+      - tests/test262/results/built-ins/Function/06.yaml
+      - tests/test262/results/built-ins/Function/25.yaml
+      - tests/test262/results/built-ins/Function/38.yaml
+      - tests/test262/results/built-ins/Function/48.yaml
+      - tests/test262/results/built-ins/Function/60.yaml
+      - tests/test262/results/built-ins/Function/6a.yaml
+      - tests/test262/results/built-ins/Function/76.yaml
+      - tests/test262/results/built-ins/Function/80.yaml
+      - tests/test262/results/built-ins/Function/9a.yaml
+      - tests/test262/results/built-ins/Function/b1.yaml
+      - tests/test262/results/built-ins/Function/c4.yaml
+      - tests/test262/results/built-ins/Function/d0.yaml
+      - tests/test262/results/built-ins/Function/d3.yaml
+      - tests/test262/results/built-ins/Function/d8.yaml
+      - tests/test262/results/built-ins/Function/da.yaml
+      - tests/test262/results/built-ins/Function/f3.yaml
+      - tests/test262/results/language/arguments-object/2a.yaml
+      - tests/test262/results/language/arguments-object/57.yaml
   structural:
     status: covered
     references:

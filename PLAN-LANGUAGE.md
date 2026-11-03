@@ -403,7 +403,7 @@ the admitted subset.
 
 The unit implements the `caller` contract above and replaces ADR 0028 with
 ADR 0034. It owns ADR 0028's 23-path selector. The 18 paths that use no dynamic
-source should pass. The other five call `eval` or a `Function` constructor:
+source pass. The other five call `eval` or a `Function` constructor:
 
  -  *test/built-ins/Function/15.3.5.4\_2-12gs.js* (`eval`)
  -  *test/built-ins/Function/15.3.5.4\_2-14gs.js* (`eval`)
@@ -412,7 +412,8 @@ source should pass. The other five call `eval` or a `Function` constructor:
  -  *test/built-ins/Function/15.3.5.4\_2-78gs.js* (`new Function`)
 
 They remain unsupported through the OSEO1001 rejection, and the unit gives them
-to ADR 0016 through reviewed exclusion audit rows. The 18 passes and the fixed
+to ADR 0016 through reviewed exclusion audit rows under the
+`legacy-caller-dynamic-source` assessment. The 18 passes and the fixed
 fixtures are the replacement evidence for their `caller` subject.
 *PLAN-DYN.md* records them as residue.
 
@@ -424,13 +425,14 @@ functions, `call`, `apply`, `bind`, built-in callbacks, tail calls, recursion,
 and throws, and compares each `caller` read with an independent activation
 model.
 
-Status: the runtime, its differential and fixed tests in
+Status: implemented. The runtime, its differential and fixed tests in
 *tests/legacy-caller.test.ts*, and the generated *legacy-caller* property
-suite are implemented, and
+suite are in place, and
 [*docs/evidence/legacy-caller/*](./docs/evidence/legacy-caller/) records the
-per-call cost. The full test262 UPDATE, the audit rows that move the five
-dynamic-source paths, and the review of changed function rows remain before
-it lands.
+per-call cost. The full test262 observation changes only the 23 selector
+rows: 18 pass and five are ADR 0016 exclusions, so the manifest has 34,796
+passes and 1,894 unsupported results. No other row changes, including the
+rows that reflect on function own keys.
 
 ### `annexb-syntax`
 

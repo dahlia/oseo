@@ -722,18 +722,43 @@ assessments:
     normativeDependency: legacy-caller-only
     reason: The test calls a non-strict ordinary function and
       requires a read of its `caller` property, or of
-      `arguments.callee.caller`, to complete normally. The
-      16th edition requires no such own property; without
-      one, the read reaches the %ThrowTypeError% accessor
-      that AddRestrictedFunctionProperties installs on
-      %Function.prototype% and throws. ADR 0028 excludes
-      only that optional expectation for its exact selector.
-      The prototype accessors, the clause 17.1 restrictions,
-      and the absence of an own `caller` on arguments
-      objects stay inside the claim with their own evidence
-      or remediation owners. Any `eval` or `Function` call
-      is scaffolding for the caller relationship and stays
-      under ADR 0016, which owns none of these paths.
+      `arguments.callee.caller`, to complete normally. ADR 0028
+      excluded that optional expectation for its exact selector
+      while the read reached the %ThrowTypeError% accessor on
+      %Function.prototype%. ADR 0034 replaces that boundary. A
+      non-strict function declaration or expression has an own
+      configurable `caller` data property, and the manifest
+      admits the `caller` feature. The 18 selector paths that
+      call neither `eval` nor a `Function` constructor pass and
+      close by observation; their rows keep this assessment and
+      the ADR 0028 proposed owner as the review that preceded
+      ADR 0034. The other five selector paths use the
+      `legacy-caller-dynamic-source` assessment.
+  legacy-caller-dynamic-source:
+    disposition: exclusion
+    normativeDependency: source-evaluation-only
+    replacementEvidence:
+      tests/legacy-caller.test.ts: "6a9f2438eb23b8cce0072755b46913e896a2726f\
+        bb33ed33188f607fba2a34aa"
+      tests/native/fixtures/legacy-caller.ts:
+        "637ea934eab9113c5ebc0465c786e4284143175\
+        699ea34ce832004c190e4bf34"
+    reason: The test reaches its read of a non-strict function's
+      `caller` through code that `eval`, indirect `eval`, the
+      `Function` constructor, or `new Function` compiles. Since
+      ADR 0034 admits the `caller` feature, the frontmatter no
+      longer rejects the case, and compilation stops at the
+      OSEO1001 rejection of that call, which ADR 0016 excludes.
+      The `caller` subject has its own evidence. The 18 other
+      ADR 0028 selector paths pass, and the fixed and
+      differential programs in tests/legacy-caller.test.ts and
+      tests/native/fixtures/legacy-caller.ts observe the value
+      for strict and non-strict callers without dynamic source.
+      Only the source evaluation or construction remains
+      excluded. Reopen on an ADR 0016 amendment admitting `eval`
+      or source-compiling constructors, or on changed source,
+      observation, or replacement evidence. The rows keep the
+      `legacy-caller` cohort of the ADR 0028 selector.
   annex-b-out-of-bounds-prototype-setup:
     disposition: remediation
     remediationOwner: unit:annexb-object-accessors
@@ -1187,8 +1212,8 @@ assessments:
         "7daca0f723233a013ca9dd47aa3cd087\
         ec6afcc6ad4fe277fb01319099ab1f4c"
       tests/test262/results/built-ins/Function/60.yaml:
-        "61360d9403ef33cfed1930f726d4ae4a\
-        1894174f82f511f71bbaf953cac30b75"
+        "87a55b53b3961bdd4ea22b74b9cb1b76\
+        e69537f17a2e9d7095ecd4ef1db81093"
       tests/test262/results/built-ins/Function/95.yaml:
         "a31c652194e5d268668d15044e81a4ae\
         2199910c89042dfe3ef71056f12b3593"
@@ -3835,9 +3860,9 @@ assessments:
       TypeError from gNonStrict.caller || gNonStrict.caller.throwTypeError
       beneath a strict caller. The ds22-sloppy-caller-read fixed fixture retains
       this exact expression and the strict-to-sloppy call, directly and through
-      a sloppy wrapper. Oseo inherits the mandatory ThrowTypeError accessor
-      rather than exposing a strict caller; the expression therefore throws the
-      exact TypeError without a legacy caller extension. The
+      a sloppy wrapper. Under ADR 0034 the non-strict function's own caller
+      property reads null because its caller is strict, so the expression reads
+      throwTypeError from null and throws the exact TypeError. The
       ds22-caller-accessors fixture observes the inherited restriction
       separately. Only source evaluation/construction of the original wrapper or
       reader remains; no assertion requires a normally completing legacy caller
@@ -6654,17 +6679,17 @@ paths:
       strict function (eval used within strict mode)
     assessment: ds22-strict-caller-core
   - path: test/built-ins/Function/15.3.5.4_2-12gs.js
-    proposedOwner: adr:0028-legacy-function-caller-boundary
+    proposedOwner: adr:0016-dynamic-source-boundary
     priorCohort: legacy-caller
     sourceDigest: "632ac7bd8f22855dcee5d592cff09c3f82eab43c23a2\
       315f03609ca5f672fd22"
-    observationDigest: "3bda488ea766d849865209317f23bf836cb18ca\
-      66b3f8e3747a37f45020b9970"
+    observationDigest: "d5a2e4efadd5add9b7ccbe9a23bc93b2c0519556\
+      6ef4389f4c5ee0aab9f52403"
     missingDynamicTag: false
     section: sec-forbidden-extensions
     subject: Legacy caller read of a non-strict function from
       strict code (eval includes strict directive prologue)
-    assessment: legacy-caller
+    assessment: legacy-caller-dynamic-source
   - path: test/built-ins/Function/15.3.5.4_2-13gs.js
     proposedOwner: adr:0016-dynamic-source-boundary
     priorCohort: incidental-scaffolding
@@ -6678,18 +6703,18 @@ paths:
       from strict function (indirect eval used within strict mode)
     assessment: ds22-strict-caller-core
   - path: test/built-ins/Function/15.3.5.4_2-14gs.js
-    proposedOwner: adr:0028-legacy-function-caller-boundary
+    proposedOwner: adr:0016-dynamic-source-boundary
     priorCohort: legacy-caller
     sourceDigest: "b4f4a348c131786262f7478d148411c7f25e4c25a09b\
       473b30f80395db6d723e"
-    observationDigest: "3bda488ea766d849865209317f23bf836cb18ca\
-      66b3f8e3747a37f45020b9970"
+    observationDigest: "298ecf713701638437ff7d47b3d9db7671795bdf\
+      5b69be99bf3086f934d6e4b7"
     missingDynamicTag: false
     section: sec-forbidden-extensions
     subject: Legacy caller read of a non-strict function from
       strict code (indirect eval includes strict directive
       prologue)
-    assessment: legacy-caller
+    assessment: legacy-caller-dynamic-source
   - path: test/built-ins/Function/15.3.5.4_2-57gs.js
     proposedOwner: adr:0016-dynamic-source-boundary
     priorCohort: incidental-scaffolding
@@ -6743,43 +6768,43 @@ paths:
       declaration
     assessment: legacy-caller
   - path: test/built-ins/Function/15.3.5.4_2-76gs.js
-    proposedOwner: adr:0028-legacy-function-caller-boundary
+    proposedOwner: adr:0016-dynamic-source-boundary
     priorCohort: legacy-caller
     sourceDigest: "1fa88b8b73c2654090331f897221dc945c0475a23a50\
       453f869eeda861c8eca7"
-    observationDigest: "3bda488ea766d849865209317f23bf836cb18ca\
-      66b3f8e3747a37f45020b9970"
+    observationDigest: "1b0f204fb22a4fc7d054f6ce0a1d89432dfbe3eb\
+      6accf23022c488205e6912fa"
     missingDynamicTag: false
     section: sec-forbidden-extensions
     subject: Legacy caller read of a non-strict function through
       a non-strict function called by strict eval
-    assessment: legacy-caller
+    assessment: legacy-caller-dynamic-source
   - path: test/built-ins/Function/15.3.5.4_2-77gs.js
-    proposedOwner: adr:0028-legacy-function-caller-boundary
+    proposedOwner: adr:0016-dynamic-source-boundary
     priorCohort: legacy-caller
     sourceDigest: "06cf9ab8b27c0db1953dde1c5cda0c1e1afdbf38faca\
       dccda4e2842e4d8dfae2"
-    observationDigest: "3bda488ea766d849865209317f23bf836cb18ca\
-      66b3f8e3747a37f45020b9970"
+    observationDigest: "c83ac70681af08d86d5dfa7e9a5273482b9bca83\
+      21cb55903ea8ce9f71b3a061"
     missingDynamicTag: false
     section: sec-forbidden-extensions
     subject: Legacy caller read of a non-strict function through
       a non-strict function called by strict Function
       constructor
-    assessment: legacy-caller
+    assessment: legacy-caller-dynamic-source
   - path: test/built-ins/Function/15.3.5.4_2-78gs.js
-    proposedOwner: adr:0028-legacy-function-caller-boundary
+    proposedOwner: adr:0016-dynamic-source-boundary
     priorCohort: legacy-caller
     sourceDigest: "9ee2fc634d8cb800564d33bdeebb0e2fb0a2499df2d2\
       4bc950dcedff2a7d0ad5"
-    observationDigest: "3bda488ea766d849865209317f23bf836cb18ca\
-      66b3f8e3747a37f45020b9970"
+    observationDigest: "33bfed4ae2f617469b75e65cdd18b4a76c361e9f\
+      3b7405dfed058cb3bd860ba4"
     missingDynamicTag: false
     section: sec-forbidden-extensions
     subject: Legacy caller read of a non-strict function through
       a non-strict function called by strict new'ed Function
       constructor
-    assessment: legacy-caller
+    assessment: legacy-caller-dynamic-source
   - path: test/built-ins/Function/15.3.5.4_2-79gs.js
     proposedOwner: adr:0028-legacy-function-caller-boundary
     priorCohort: legacy-caller

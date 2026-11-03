@@ -508,10 +508,11 @@ dynamic source:
  -  *15.3.5.4\_2-77gs.js* and *15.3.5.4\_2-78gs.js* call `Function` or
     `new Function`.
 
-When the `legacy-caller` unit of *PLAN-LANGUAGE.md* implements `caller`, the
-other 18 paths should pass and these five become ADR 0016 results. They are not
-named deferrals, but this plan inherits them as residue so that admitting
-`eval` or `Function` later re-observes them.
+Since the `legacy-caller` unit of *PLAN-LANGUAGE.md* implemented `caller`
+under [ADR 0034](./docs/adr/0034-legacy-function-caller-contract.md), the
+other 18 paths pass and these five are ADR 0016 results. They are not named
+deferrals, but this plan inherits them as residue so that admitting `eval` or
+`Function` later re-observes them.
 
 Accepted [ADR 0032](./docs/adr/0032-post-m5-edition-boundary.md) adds about
 477 *test/annexB/* paths that call `eval` or a `Function` constructor, almost
