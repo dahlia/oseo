@@ -71,7 +71,7 @@ calibration:
 | *tests/host-script-trainc-evidence-3.test.ts*     |    284.2 |          732 |          561 |
 | *tests/host-script-trainc-evidence-4.test.ts*     |    261.2 |          673 |          516 |
 | *tests/function-constructor-evidence.test.ts*     |     55.5 |          143 |          110 |
-| *tests/legacy-caller.test.ts*                     |     17.2 |           45 |           35 |
+| *tests/legacy-caller.test.ts*                     |     26.9 |           70 |           54 |
 
 The ratios are 2.574 for Linux and 1.974 for macOS, the residual file's
 largest CI sum over its local sum. The fastest Linux observation gives

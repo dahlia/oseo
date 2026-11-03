@@ -184,8 +184,8 @@ only its own rows, and explains every changed record.
 ### Legacy `caller`
 
 ADR 0034 fixes this contract. V8, as observed in Node.js 24.21.0, is the
-reference wherever the edition leaves a choice; Deno 2.9.7 no longer has the
-extension.
+reference wherever the edition leaves a choice. Deno 2.9.7 reports the same
+values through %Function.prototype% getters, without own properties.
 
  -  A non-strict `function` declaration or expression that is neither async
     nor a generator has an own `caller` property. It is a data property that

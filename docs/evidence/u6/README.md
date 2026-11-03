@@ -2011,7 +2011,8 @@ source runs. Its initial Linux weight comes from one local Linux AMD64
 extended run on the Zig lane with `OSEO_PROPERTY_RUN_SCALE=10`, at its
 unchanged seed `0x60009800`, size and base limit, with no seed, size or
 time-scale override. The file has one property registration, which took
-69691.127145 milliseconds, a rounded-up 70 seconds.
+70889.526698 milliseconds, a rounded-up 71 seconds, including its Node.js
+and Deno reference runs.
 
 This is one local observation, not a CI file-shard sum, a run-to-run bound
 or a macOS measurement. Root may replace it with exact-candidate CI case

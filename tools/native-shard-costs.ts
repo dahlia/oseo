@@ -123,7 +123,7 @@
  *
  * The legacy caller property suite postdates the three Linux runs. Linux
  * uses one local Linux AMD64 extended registration at its unchanged seed
- * and size, 70 seconds; it is a local case duration, not a CI file-shard
+ * and size, 71 seconds; it is a local case duration, not a CI file-shard
  * sum. macOS keeps the unknown-file median fallback. See U6.
  *
  * Primitive with boxing uses one local Linux AMD64 extended registration
@@ -145,7 +145,7 @@
  */
 export const nativeShardCosts = {
   "linux-x86_64-gnu": {
-    "tests/property/legacy-caller.property.test.ts": 70,
+    "tests/property/legacy-caller.property.test.ts": 71,
     "tests/property/m4-async.property.test.ts": 350,
     "tests/property/m5-aggregate-error.property.test.ts": 217,
     "tests/property/m5-annexb-legacy-lookup-boundary.property.test.ts": 615,

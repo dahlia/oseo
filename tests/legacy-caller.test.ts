@@ -1,7 +1,7 @@
 /* eslint-disable no-await-in-loop -- Native observations are isolated. */
 
 import assert from "node:assert/strict";
-import { mkdtemp, rm, writeFile } from "node:fs/promises";
+import { mkdtemp, realpath, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import process from "node:process";
@@ -29,12 +29,14 @@ import { realmReferencePrelude } from "./native/realm-reference.ts";
 
 /*
  * ADR 0034's legacy `caller` and `arguments` properties. The differential
- * fixtures compare Oseo with Node.js alone: Deno 2.9.7 runs a V8 that no
- * longer has the extension (docs/evidence/legacy-caller/). Each fixture
- * runs under both specialization policies with collection forced at every
- * safepoint, and also links for linux-aarch64-musl. The fixed programs pin
- * what the references cannot show: top-level answers, which Node.js hides
- * behind its CommonJS wrapper, and the two places ADR 0034 departs from V8.
+ * fixtures compare Oseo with Node.js, and the ones that print only values
+ * with Deno too: Deno 2.9.7 reports the same values through
+ * %Function.prototype% getters but has no own properties
+ * (docs/evidence/legacy-caller/). Each fixture runs under both
+ * specialization policies with collection forced at every safepoint, and
+ * also links for linux-aarch64-musl. The fixed programs pin what the
+ * references cannot show: top-level answers, which Node.js hides behind its
+ * CommonJS wrapper, and the three places ADR 0034 departs from V8.
  */
 const host = createNodeHost();
 const nativeTarget = targetForExecutionHost(
@@ -69,8 +71,19 @@ async function withForcedCollection<T>(run: () => Promise<T>): Promise<T> {
   }
 }
 
-async function nodeReference(fixture: Fixture) {
-  const directory = await mkdtemp(join(tmpdir(), "oseo-legacy-caller-"));
+/** Fixtures that print no own key or descriptor of a non-strict function. */
+const denoComparable = new Set([
+  "legacy-caller-identity",
+  "legacy-caller-stack",
+  "legacy-caller-specialization",
+]);
+
+async function references(fixture: Fixture) {
+  // Deno refuses a temporary path reached through a symbolic link, as
+  // macOS's is.
+  const directory = await realpath(
+    await mkdtemp(join(tmpdir(), "oseo-legacy-caller-")),
+  );
   try {
     const path = join(directory, `${fixture.name}.mjs`);
     await writeFile(
@@ -81,13 +94,18 @@ async function nodeReference(fixture: Fixture) {
           : "") +
         `new Function(${JSON.stringify(fixture.source)})();\n`,
     );
-    const result = await host.run({
-      args: [path],
-      command: process.execPath,
-      cwd: directory,
-    });
-    assert.equal(result.exitStatus, 0, result.stderr);
-    return result;
+    const observations = [];
+    for (const [command, args] of [
+      [process.execPath, [path]],
+      ...(denoComparable.has(fixture.name)
+        ? [["deno", ["run", "--quiet", path]] as const]
+        : []),
+    ] as const) {
+      const result = await host.run({ args, command, cwd: directory });
+      assert.equal(result.exitStatus, 0, result.stderr);
+      observations.push(result);
+    }
+    return observations;
   } finally {
     await rm(directory, { force: true, recursive: true });
   }
@@ -132,10 +150,10 @@ test("creates only non-strict code through the non-strict entry", () => {
 
 for (const fixture of legacyCallerFixtures) {
   test(
-    `matches Node.js: ${fixture.name}`,
+    `matches the references: ${fixture.name}`,
     { skip, timeout: 900_000 },
     async () => {
-      const reference = await nodeReference(fixture);
+      const observations = await references(fixture);
       for (const specialization of ["disabled", "enabled"] as const) {
         const compiled = compile(
           fixture.source,
@@ -156,7 +174,7 @@ for (const fixture of legacyCallerFixtures) {
               toolchain: nativeToolchain,
             },
             (native) => {
-              assertMatchingObservations([reference, native]);
+              assertMatchingObservations([...observations, native]);
               assert.ok(native.counters != null);
               assert.ok(native.counters.collections > 0, specialization);
               if (

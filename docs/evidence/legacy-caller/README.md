@@ -38,19 +38,24 @@ list of V8's C++ built-ins.
 Deno
 ----
 
-*deno-presence.js* checks whether Deno exposes the properties at all. Run it
-with the pinned Deno:
+*deno-presence.js* checks how Deno exposes the properties. `deno run`
+evaluates the file as a module, so the probe builds its functions with
+`new Function` to keep them non-strict. Run it with the pinned Deno:
 
 ~~~~ sh
 deno run docs/evidence/legacy-caller/deno-presence.js
 ~~~~
 
 *deno-presence.txt* is its output under Deno 2.9.7, which runs V8 15.0. A
-non-strict function there has only `length`, `name`, and `prototype`, and
-reading `caller` while it is active throws a `TypeError`. Its
-%Function.prototype% getter and setter are also different functions, unlike
-the single %ThrowTypeError% that ECMA-262 requires. Deno is therefore not a
-reference for ADR 0034.
+non-strict function there has only `length`, `name`, and `prototype` as own
+keys, but reading `caller` or `arguments` still works: the getters on
+%Function.prototype% answer for a non-strict function, reporting the same
+caller and the same received arguments as Node.js, and they throw a
+`TypeError` for a strict one. These are no longer the single %ThrowTypeError%
+that ECMA-262 installs there; the getter and setter are different functions.
+
+Deno is therefore a reference for the values ADR 0034 reports, but not for
+own keys, descriptors, definition, or deletion, which Node.js alone shows.
 
 
 Per-call cost

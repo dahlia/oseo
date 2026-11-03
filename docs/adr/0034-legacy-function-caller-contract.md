@@ -35,9 +35,11 @@ Packages that use the extension were written against the engines that ship it.
 Node.js 24.21.0, one of the two reference hosts, ships it and is the reference
 wherever the edition leaves a choice. The other reference host, Deno 2.9.7,
 runs V8 15.0, which no longer gives non-strict functions own `caller` or
-`arguments` properties: a read reaches a %Function.prototype% accessor and
-throws a `TypeError`, as in Oseo today. Node.js is therefore the only reference
-host for this extension, and differential tests compare against it alone.
+`arguments` properties. Its %Function.prototype% getters answer for a
+non-strict function instead, with the same caller and arguments values as
+Node.js, and throw a `TypeError` for a strict one. Deno is therefore a second
+reference for the values, and Node.js the only one for own keys, descriptors,
+definition, and deletion.
 
 
 Required contract

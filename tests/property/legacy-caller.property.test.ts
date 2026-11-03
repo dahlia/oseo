@@ -1,6 +1,7 @@
 /* eslint-disable no-await-in-loop -- Native observations are isolated. */
 
 import assert from "node:assert/strict";
+import { realpath } from "node:fs/promises";
 import process from "node:process";
 import test from "node:test";
 
@@ -34,9 +35,9 @@ const { assertAsyncProperty } = await import(
  * marked mutating also define, freeze, and delete the two properties,
  * which ADR 0034 makes configurable unlike V8. The oracle below runs the
  * same graph over an explicit activation stack. Both native specialization
- * policies must print what it predicts, and so must Node.js, the only
- * reference host that ships the extension, for every graph that does not
- * mutate.
+ * policies must print what it predicts, and so must Node.js and Deno for
+ * every graph that does not mutate. Deno has no own properties and V8's
+ * are not configurable, so neither host can check a mutating graph.
  */
 type FunctionKind = "arrow" | "sloppy" | "strict";
 
@@ -357,9 +358,16 @@ const nativeTarget = targetForExecutionHost(
   },
 );
 
-async function nodeReference(source: string) {
-  const directory = await host.makeTemporaryDirectory(
-    "oseo-legacy-caller-property-",
+/**
+ * Node.js and Deno observations of one program. Deno 2.9.7 answers the
+ * values through %Function.prototype% getters, so a graph that does not
+ * mutate the properties prints the same text on both hosts.
+ */
+async function references(source: string) {
+  // Deno refuses a temporary path reached through a symbolic link, as
+  // macOS's is.
+  const directory = await realpath(
+    await host.makeTemporaryDirectory("oseo-legacy-caller-property-"),
   );
   const sourcePath = `${directory}/case.cjs`;
   let succeeded = false;
@@ -370,13 +378,20 @@ async function nodeReference(source: string) {
       sourcePath,
       `require("node:vm").runInThisContext(${JSON.stringify(source)});\n`,
     );
-    const observation = await host.run({
-      args: [sourcePath],
-      command: process.execPath,
-      cwd: directory,
-    });
+    const observations = [
+      await host.run({
+        args: [sourcePath],
+        command: process.execPath,
+        cwd: directory,
+      }),
+      await host.run({
+        args: ["run", "--quiet", sourcePath],
+        command: "deno",
+        cwd: directory,
+      }),
+    ];
     succeeded = true;
-    return observation;
+    return observations;
   } finally {
     if (succeeded) await host.remove(directory);
   }
@@ -447,7 +462,7 @@ test(
         if (!graph.mutating) {
           assertMatchingObservations([
             expectedObservation,
-            await nodeReference(source),
+            ...(await references(source)),
           ]);
         }
         for (const specialization of ["disabled", "enabled"] as const) {
