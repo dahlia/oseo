@@ -56,7 +56,7 @@ three sums, rounded up, so the margin below is a slow runner's. Files under 30
 seconds have no entry and weigh the host fallback, 18 seconds on both hosts,
 which is the median of every measured weight.
 
-Twelve files postdate those runs. Serial local runs from 2026-11-01 to
+Seventeen files postdate those runs. Serial local runs from 2026-11-01 to
 2026-11-03 of the residual evidence and those files, on one host, give the
 calibration:
 
@@ -75,6 +75,11 @@ calibration:
 | *tests/property/m5-annexb-escape.property.test.ts*         |     33.7 |           87 |           67 |
 | *tests/property/m5-annexb-string-methods.property.test.ts* |     14.2 |           37 |     fallback |
 | *tests/property/m5-annexb-date-methods.property.test.ts*   |     12.2 |           32 |     fallback |
+| *tests/es2026-builtins-native.test.ts*                     |     13.0 |           34 |     fallback |
+| *tests/property/es2026-error-is-error.property.test.ts*    |     11.5 |     fallback |     fallback |
+| *tests/property/es2026-math-sum-precise.property.test.ts*  |      9.5 |     fallback |     fallback |
+| *tests/property/es2026-upsert.property.test.ts*            |     26.1 |           68 |           52 |
+| *tests/property/es2026-iterator-concat.property.test.ts*   |     14.5 |           38 |     fallback |
 
 The ratios are 2.574 for Linux and 1.974 for macOS, the residual file's
 largest CI sum over its local sum. The fastest Linux observation gives
