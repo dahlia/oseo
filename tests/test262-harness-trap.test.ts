@@ -148,11 +148,11 @@ function assertHarnessFailure(result: Test262Result, pattern: RegExp): void {
  * the static member guard this trap replaces.
  */
 const trappedBodies: readonly (readonly [string, string?])[] = [
-  ["TemporalHelpers.observeProperty([], {}, 'x', 1);"],
+  ["TemporalHelpers.substituteMethod({}, 'x', []);"],
   ["TemporalHelpers['assertDuration'];"],
   ["TemporalHelpers?.ISO;"],
   ["const key = 'ISO';\nTemporalHelpers[key];"],
-  ["const { observeProperty } = TemporalHelpers;"],
+  ["const { substituteMethod } = TemporalHelpers;"],
   ["'ISO' in TemporalHelpers;"],
   ["Object.getOwnPropertyDescriptor(TemporalHelpers, 'ISO');"],
   ["Object.keys(TemporalHelpers);"],
@@ -167,11 +167,8 @@ const trappedBodies: readonly (readonly [string, string?])[] = [
   ["Reflect.get(TemporalHelpers, 'ISO');"],
   // The outer review's two bypasses: an object environment that lacks the
   // name, and a Script var that shares the harness binding.
-  [
-    "with ({}) { TemporalHelpers.observeProperty([], {}, 'x', 1); }",
-    "noStrict",
-  ],
-  ["var TemporalHelpers;\nTemporalHelpers.observeProperty([], {}, 'x', 1);"],
+  ["with ({}) { TemporalHelpers.substituteMethod({}, 'x', []); }", "noStrict"],
+  ["var TemporalHelpers;\nTemporalHelpers.substituteMethod({}, 'x', []);"],
   ["if (true) { var TemporalHelpers; }\nTemporalHelpers.ISO;"],
   ["{ var TemporalHelpers; TemporalHelpers.ISO; }"],
   ["for (var TemporalHelpers in {}) {}\nTemporalHelpers.ISO;"],
@@ -185,10 +182,10 @@ const trappedBodies: readonly (readonly [string, string?])[] = [
   ["Function('return TemporalHelpers.ISO')();"],
   ["const o = { get h() { return TemporalHelpers; } };\no.h.ISO;"],
   // Inherited and replaced members that return the object itself.
-  ["TemporalHelpers.valueOf().observeProperty([], {}, 'x', 1);"],
+  ["TemporalHelpers.valueOf().substituteMethod({}, 'x', []);"],
   [
     "TemporalHelpers.observeMethod = Object.prototype.valueOf;\n" +
-      "TemporalHelpers.observeMethod().observeProperty([], {}, 'x', 1);",
+      "TemporalHelpers.observeMethod().substituteMethod({}, 'x', []);",
   ],
   // A computed class key sees the this around the class.
   ["class C { [this['Temporal' + 'Helpers'].ISO]() {} }", "noStrict"],

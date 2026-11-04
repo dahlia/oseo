@@ -648,3 +648,11 @@ families:
     owner: tests/property/es2026-iterator-zip.property.test.ts
     start: 0x6000ab00
     end: 0x6000abff
+  - family: es2026-array-from-async
+    owner: tests/property/es2026-array-from-async.property.test.ts
+    start: 0x6000a500
+    end: 0x6000a5ff
+  - family: es2026-json-parse-source
+    owner: tests/property/es2026-json-parse-source.property.test.ts
+    start: 0x6000a600
+    end: 0x6000a6ff

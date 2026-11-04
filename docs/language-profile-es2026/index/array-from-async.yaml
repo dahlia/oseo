@@ -1,0 +1,3 @@
+version: 1
+id: array-from-async
+record: docs/language-profile-es2026/families/array-from-async.yaml

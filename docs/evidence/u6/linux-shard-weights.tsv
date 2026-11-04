@@ -1,7 +1,9 @@
 file	oldSeconds	d4d81be9CaseMs	98460f7cCaseMs	6aab0fc8CaseMs	medianSecondsCeil
+tests/property/es2026-array-from-async.property.test.ts	470	-	-	-	470
 tests/property/es2026-error-is-error.property.test.ts	142	-	-	-	142
 tests/property/es2026-iterator-concat.property.test.ts	157	-	-	-	157
 tests/property/es2026-iterator-zip.property.test.ts	240	-	-	-	240
+tests/property/es2026-json-parse-source.property.test.ts	793	-	-	-	793
 tests/property/es2026-math-sum-precise.property.test.ts	153	-	-	-	153
 tests/property/es2026-upsert.property.test.ts	248	-	-	-	248
 tests/property/legacy-caller.property.test.ts	71	-	-	-	71

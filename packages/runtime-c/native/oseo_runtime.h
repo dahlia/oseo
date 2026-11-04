@@ -2076,8 +2076,10 @@ OseoResult oseo_async_iterator_close(
 /*
  * Start and finish AsyncIteratorClose around a traced-frame suspension.
  * `needs_await` is false when no asynchronous return result exists.
- * The saved throw mode preserves an in-flight throw, while
- * `skip_validation` records result validation already owned by a wrapper.
+ * The saved throw mode preserves an in-flight throw. `skip_validation`
+ * is always false: a wrapped synchronous iterator resolves its promise
+ * with a result object whose inherited `then` may fulfill it with a
+ * primitive, so every awaited close result is validated.
  */
 OseoResult oseo_async_iterator_close_start(
     OseoContext *context,

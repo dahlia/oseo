@@ -1526,3 +1526,36 @@ the key array of `zipKeyed`. A zip helper has no underlying iterator, so its
 `zipKeyed` walk reads `[[GetOwnProperty]]` through the new
 `oseo_internal_own_property_enumerable`, which answers for proxies and
 ordinary objects alike. No heap kind or traced field is added.
+
+ABI `m5-154` adds `Array.fromAsync` as an own function property of `%Array%`,
+defined after `from`, with the array component's code ID 41 below the range
+top and no intrinsic slot. It runs the edition's closure as a state machine
+over one 13-slot environment record that holds the result promise, the
+receiver, the mapper and its `thisArg`, the iterator record or array-like
+object, the target, the index and length, the suspended phase, the pending
+close error, and the two reactions. Every Await performs PromiseResolve with
+`%Promise%` and attaches those reactions, code IDs 42 and 43, which resume the
+closure in a promise job. Because a function captures a copy of its creation
+environment, each reaction's environment is a one-slot holder that refers to
+the shared record. A synchronous iterable goes through the internal
+Async-from-Sync wrapper, which `oseo_internal_async_from_sync_wrap` now exposes
+to the array component. No heap kind or traced field is added, and the
+generated-code ABI gains no entry point.
+
+ABI `m5-153` adds `JSON.rawJSON` and `JSON.isRawJSON` as own function
+properties of the JSON namespace, defined after `stringify`, with the JSON
+component's code IDs 2 and 3 below the range top and no intrinsic slot.
+`[[IsRawJSON]]` is a new `raw_json` flag in the heap object header, which
+`oseo_internal_publish_heap` clears for every heap object, so the answer needs
+no lookup and holds across realms. `JSON.rawJSON` sets it on a frozen
+null-prototype object with one `rawJSON` property, and `JSON.stringify` emits
+that property's text unchanged once `toJSON` and the replacer have run.
+
+With a callable reviver, the `JSON.parse` parser also builds a JSON Parse
+Record for every value: a four-slot environment that holds the value, the
+code-unit offsets of its source text, and its children, an internal array for
+an array and a null-prototype map from member name to record for an object.
+Internalization passes a fresh context object as the reviver's third argument
+and gives it a `source` property only for a primitive whose holder still has
+the parsed value. No heap kind or traced field is added, and the
+generated-code ABI gains no entry point.

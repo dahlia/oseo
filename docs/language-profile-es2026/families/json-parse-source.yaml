@@ -1,0 +1,76 @@
+version: 1
+id: json-parse-source
+title: "JSON.rawJSON, JSON.isRawJSON, and reviver source text"
+scope:
+  - "The JSON.rawJSON and JSON.isRawJSON function properties, their
+    descriptors, names, lengths, and non-constructor status."
+  - "JSON.rawJSON text validation, its frozen null-prototype result with
+    [[IsRawJSON]], JSON.isRawJSON over every value kind, and the raw text
+    JSON.stringify emits after toJSON and the replacer."
+  - "The context argument JSON.parse passes a callable reviver, its source
+    property for primitives that still hold their parsed value, and its
+    absence for containers and for added or replaced values."
+owners:
+  - docs/language-profile-es2026.md
+evidence:
+  differential:
+    status: covered
+    references:
+      - tests/native/fixtures/json-source.ts
+      - tests/property/es2026-json-parse-source.property.test.ts
+  fixed:
+    status: covered
+    references:
+      - tests/native/fixtures/json-source.ts
+  forced-collection:
+    status: covered
+    references:
+      - tests/json-parse-source-native.test.ts
+      - tests/native/fixtures/json-source.ts
+      - tests/property/es2026-json-parse-source.property.test.ts
+  generated:
+    status: covered
+    references:
+      - tests/property/es2026-json-parse-source.property.test.ts
+  guard-fallback:
+    status: covered
+    references:
+      - tests/json-parse-source-native.test.ts
+      - tests/native/fixtures/json-source.ts
+      - tests/property/es2026-json-parse-source.property.test.ts
+  specialization:
+    status: covered
+    references:
+      - tests/json-parse-source-native.test.ts
+      - tests/native/fixtures/json-source.ts
+      - tests/property/es2026-json-parse-source.property.test.ts
+  standards:
+    status: covered
+    references:
+      - tests/test262/subset.yaml
+      - tests/test262/results.yaml
+      - tests/test262/results/built-ins/JSON/02.yaml
+      - tests/test262/results/built-ins/JSON/0b.yaml
+      - tests/test262/results/built-ins/JSON/15.yaml
+      - tests/test262/results/built-ins/JSON/24.yaml
+      - tests/test262/results/built-ins/JSON/30.yaml
+      - tests/test262/results/built-ins/JSON/39.yaml
+      - tests/test262/results/built-ins/JSON/3b.yaml
+      - tests/test262/results/built-ins/JSON/41.yaml
+      - tests/test262/results/built-ins/JSON/48.yaml
+      - tests/test262/results/built-ins/JSON/4e.yaml
+      - tests/test262/results/built-ins/JSON/6c.yaml
+      - tests/test262/results/built-ins/JSON/6f.yaml
+      - tests/test262/results/built-ins/JSON/9b.yaml
+      - tests/test262/results/built-ins/JSON/a3.yaml
+      - tests/test262/results/built-ins/JSON/cd.yaml
+      - tests/test262/results/built-ins/JSON/ce.yaml
+      - tests/test262/results/built-ins/JSON/d1.yaml
+      - tests/test262/results/built-ins/JSON/d6.yaml
+      - tests/test262/results/built-ins/JSON/dd.yaml
+      - tests/test262/results/built-ins/JSON/ec.yaml
+      - tests/test262/results/built-ins/JSON/ff.yaml
+  structural:
+    status: covered
+    references:
+      - packages/runtime-c/tests/intrinsic-graph.test.ts

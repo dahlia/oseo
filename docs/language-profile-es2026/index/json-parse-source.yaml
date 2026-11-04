@@ -1,0 +1,3 @@
+version: 1
+id: json-parse-source
+record: docs/language-profile-es2026/families/json-parse-source.yaml

@@ -63,12 +63,12 @@ const cases = {
   ],
   "with fallback": [
     `flags: [noStrict]\n${negative}`,
-    "with ({}) { TemporalHelpers.observeProperty([], {}, 'x', 1); }\n",
+    "with ({}) { TemporalHelpers.substituteMethod({}, 'x', []); }\n",
     "harness-failure",
   ],
   "Script var": [
     negative,
-    "var TemporalHelpers;\nTemporalHelpers.observeProperty([], {}, 'x', 1);\n",
+    "var TemporalHelpers;\nTemporalHelpers.substituteMethod({}, 'x', []);\n",
     "harness-failure",
   ],
   "caught trap": [

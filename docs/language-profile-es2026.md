@@ -14,11 +14,13 @@ the [M5 exit report](./m5c-closure/m5-exit-report.md) keeps the M5 result.
 A change that admits or measures behavior inside this boundary updates this
 document in the same change. A family's status describes tested current
 behavior, never intended behavior. The Annex B built-in units, the Annex B
-Object accessors, the small ECMAScript 2026 built-in units, and `iterator-zip`
-hold the family records so far; see [Annex B built-ins](#annex-b-built-ins),
+Object accessors, the small ECMAScript 2026 built-in units, `iterator-zip`,
+`array-from-async`, and `json-parse-source` hold the family records so far; see
+[Annex B built-ins](#annex-b-built-ins),
 [Annex B Object accessors](#annex-b-object-accessors),
 [Small ECMAScript 2026 built-in families](#small-ecmascript-2026-built-in-families),
-and [Joint iteration](#joint-iteration).
+[Joint iteration](#joint-iteration), [`Array.fromAsync`](#arrayfromasync), and
+[JSON source text](#json-source-text).
 
 
 Claim boundary
@@ -538,3 +540,93 @@ the probe of that state runs on Deno alone. The property suite,
 and checks the native result against a second model of the closure and the
 reference model on Node.js. The family record is
 [*iterator-zip.yaml*](./language-profile-es2026/families/iterator-zip.yaml).
+
+
+`Array.fromAsync`
+-----------------
+
+`Array.fromAsync(asyncItems [, mapfn [, thisArg]])` is a writable,
+non-enumerable, configurable own function property of `%Array%` with length 1.
+It is not a constructor. It always returns a new `%Promise%`: the edition runs
+its closure through AsyncFunctionStart, so the steps before the first Await
+run during the call and every abrupt completion, including a non-callable
+`mapfn` or an `undefined` or `null` input, rejects that promise instead of
+throwing.
+
+The closure reads `Symbol.asyncIterator`, then `Symbol.iterator` only when the
+first is absent, and calls the method it found. An async iterator's values are
+not awaited. A synchronous iterator goes through the Async-from-Sync wrapper,
+so each value is awaited and a rejected value closes the iterator. A value
+with neither method is an array-like object: its length is read once, and
+each element is read and awaited in index order. A mapper result is awaited
+too. A constructor receiver is constructed with no arguments for an iterable
+and with the length for an array-like; any other receiver gets an ordinary
+array. Elements are defined with CreateDataPropertyOrThrow, and the length is
+set at the end.
+
+A failure of the mapper, of the Await on its result, or of an element
+definition closes an iterator and awaits its `return` result, and the
+original error rejects the promise whatever `return` does. A synchronous
+iterator with no `return` still closes through the wrapper, whose promise
+resolves with a `{ value: undefined, done: true }` object, so an inherited
+`then` is read and a callable one decides when the close settles. A failure of
+the iterator itself, of its result object, or of the final length Set
+propagates without a close.
+
+Node.js and Deno are both reference hosts, and the fixtures match them turn
+for turn except where V8 departs from the edition. V8 reads a synchronous
+iterator's `next` twice, closes that iterator a second time when a value
+rejects, closes an async iterator after a failure of its own step or of the
+final length Set, and never settles the promise when the close's `return`
+lookup or call throws or its result rejects. The `array-from-async-edition`
+fixture checks those cases against the edition's steps, and the property suite
+compares them with its model alone.
+
+The property suite generates async iterables, synchronous iterables, and
+array-likes of numbers, promises, thenables, and rejected promises, with
+failing `next` steps, six mapper kinds, and three receivers, and compares the
+settled result and the order of observable steps with an independent model of
+the closure. All 95 test262 paths pass, and the family record's standards
+class cites the results partitions that hold them. Seven of them need
+`TemporalHelpers.observeProperty`, which the reviewed *temporalHelpers.js*
+keeps for them. The family record is
+[*array-from-async.yaml*](./language-profile-es2026/families/array-from-async.yaml).
+
+
+JSON source text
+----------------
+
+`JSON.rawJSON` and `JSON.isRawJSON` are writable, non-enumerable, configurable
+own function properties of the JSON namespace with length 1, defined after
+`stringify`. Neither is a constructor.
+
+`JSON.rawJSON(text)` converts its argument with ToString and requires one JSON
+null, boolean, number, or string with no leading or trailing tab, line feed,
+carriage return, or space. An empty text, an array or object, or any other
+text throws a `SyntaxError`. The result is a frozen object with a `null`
+prototype, the `[[IsRawJSON]]` internal slot, and one enumerable `rawJSON`
+property that holds the text. `JSON.isRawJSON(value)` answers whether its
+argument has that slot, so a proxy of a raw JSON object, an object that
+inherits from one, and a lookalike object answer `false`. `JSON.stringify`
+emits a raw JSON object's text unchanged wherever the value reaches
+serialization after `toJSON` and the replacer, which lets a BigInt or an exact
+decimal reach the output.
+
+With a callable reviver, `JSON.parse` passes a third argument, a fresh
+ordinary object. For a primitive whose holder property still has the parsed
+value, that object has a `source` property with the exact source text of the
+value; for every other call it has no own property. A value a reviver added,
+or replaced by a different value, gets no source, and a replaced container's
+children get none either. For a repeated member name the record of the last
+member applies, as its value does.
+
+Both Node.js and Deno implement these functions and the context argument, and
+the fixtures match them byte for byte. The property suite generates nested
+JSON texts with exact number and string literals, repeated member names,
+whitespace, and sibling replacements, and compares the reviver's calls, the
+revived value, and a `JSON.rawJSON` round trip of every literal with an
+independent model of InternalizeJSONProperty and with both hosts. All 21
+test262 paths of the unit pass, and the family record's standards class cites
+the results partitions that hold them; the other 144 *test/built-ins/JSON/*
+paths still pass. The family record is
+[*json-parse-source.yaml*](./language-profile-es2026/families/json-parse-source.yaml).

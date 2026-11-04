@@ -6228,6 +6228,9 @@ partitions:
     key: ff
     path: results/built-ins/Iterator/ff.yaml
   - group: built-ins/JSON
+    key: "02"
+    path: results/built-ins/JSON/02.yaml
+  - group: built-ins/JSON
     key: "05"
     path: results/built-ins/JSON/05.yaml
   - group: built-ins/JSON
@@ -6239,6 +6242,9 @@ partitions:
   - group: built-ins/JSON
     key: 0a
     path: results/built-ins/JSON/0a.yaml
+  - group: built-ins/JSON
+    key: 0b
+    path: results/built-ins/JSON/0b.yaml
   - group: built-ins/JSON
     key: 0c
     path: results/built-ins/JSON/0c.yaml
@@ -6267,6 +6273,9 @@ partitions:
     key: "23"
     path: results/built-ins/JSON/23.yaml
   - group: built-ins/JSON
+    key: "24"
+    path: results/built-ins/JSON/24.yaml
+  - group: built-ins/JSON
     key: "25"
     path: results/built-ins/JSON/25.yaml
   - group: built-ins/JSON
@@ -6285,11 +6294,17 @@ partitions:
     key: 2d
     path: results/built-ins/JSON/2d.yaml
   - group: built-ins/JSON
+    key: "30"
+    path: results/built-ins/JSON/30.yaml
+  - group: built-ins/JSON
     key: "32"
     path: results/built-ins/JSON/32.yaml
   - group: built-ins/JSON
     key: "37"
     path: results/built-ins/JSON/37.yaml
+  - group: built-ins/JSON
+    key: "39"
+    path: results/built-ins/JSON/39.yaml
   - group: built-ins/JSON
     key: 3a
     path: results/built-ins/JSON/3a.yaml
@@ -6303,6 +6318,9 @@ partitions:
     key: 3e
     path: results/built-ins/JSON/3e.yaml
   - group: built-ins/JSON
+    key: "41"
+    path: results/built-ins/JSON/41.yaml
+  - group: built-ins/JSON
     key: "42"
     path: results/built-ins/JSON/42.yaml
   - group: built-ins/JSON
@@ -6312,11 +6330,17 @@ partitions:
     key: "45"
     path: results/built-ins/JSON/45.yaml
   - group: built-ins/JSON
+    key: "48"
+    path: results/built-ins/JSON/48.yaml
+  - group: built-ins/JSON
     key: "49"
     path: results/built-ins/JSON/49.yaml
   - group: built-ins/JSON
     key: 4c
     path: results/built-ins/JSON/4c.yaml
+  - group: built-ins/JSON
+    key: 4e
+    path: results/built-ins/JSON/4e.yaml
   - group: built-ins/JSON
     key: 4f
     path: results/built-ins/JSON/4f.yaml
@@ -6459,6 +6483,9 @@ partitions:
     key: a1
     path: results/built-ins/JSON/a1.yaml
   - group: built-ins/JSON
+    key: a3
+    path: results/built-ins/JSON/a3.yaml
+  - group: built-ins/JSON
     key: a4
     path: results/built-ins/JSON/a4.yaml
   - group: built-ins/JSON
@@ -6525,6 +6552,9 @@ partitions:
     key: cc
     path: results/built-ins/JSON/cc.yaml
   - group: built-ins/JSON
+    key: cd
+    path: results/built-ins/JSON/cd.yaml
+  - group: built-ins/JSON
     key: ce
     path: results/built-ins/JSON/ce.yaml
   - group: built-ins/JSON
@@ -6546,6 +6576,9 @@ partitions:
     key: dc
     path: results/built-ins/JSON/dc.yaml
   - group: built-ins/JSON
+    key: dd
+    path: results/built-ins/JSON/dd.yaml
+  - group: built-ins/JSON
     key: e0
     path: results/built-ins/JSON/e0.yaml
   - group: built-ins/JSON
@@ -6563,6 +6596,9 @@ partitions:
   - group: built-ins/JSON
     key: eb
     path: results/built-ins/JSON/eb.yaml
+  - group: built-ins/JSON
+    key: ec
+    path: results/built-ins/JSON/ec.yaml
   - group: built-ins/JSON
     key: f1
     path: results/built-ins/JSON/f1.yaml
@@ -24055,7 +24091,7 @@ summary:
   expectedNegatives: 4401
   harnessFailures: 0
   infrastructureFailures: 0
-  passes: 35243
+  passes: 35359
   semanticFailures: 0
   unsupportedProfileFeatures: 1889
   dependencies:
@@ -24063,7 +24099,7 @@ summary:
       expectedNegatives: 27
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 4321
+      passes: 4358
       semanticFailures: 0
       unsupportedProfileFeatures: 675
     - dependency: array-buffer
@@ -24077,14 +24113,14 @@ summary:
       expectedNegatives: 501
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 2479
+      passes: 2501
       semanticFailures: 0
       unsupportedProfileFeatures: 295
     - dependency: async-iteration
       expectedNegatives: 545
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 4312
+      passes: 4330
       semanticFailures: 0
       unsupportedProfileFeatures: 50
     - dependency: atomics-and-shared-memory
@@ -24105,21 +24141,21 @@ summary:
       expectedNegatives: 39
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 539
+      passes: 547
       semanticFailures: 0
       unsupportedProfileFeatures: 0
     - dependency: classes
       expectedNegatives: 1364
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 7501
+      passes: 7502
       semanticFailures: 0
       unsupportedProfileFeatures: 255
     - dependency: control-flow
       expectedNegatives: 670
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 3733
+      passes: 3736
       semanticFailures: 0
       unsupportedProfileFeatures: 338
     - dependency: data-view
@@ -24147,7 +24183,7 @@ summary:
       expectedNegatives: 830
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 8611
+      passes: 8614
       semanticFailures: 0
       unsupportedProfileFeatures: 27
     - dependency: dynamic-source
@@ -24161,56 +24197,56 @@ summary:
       expectedNegatives: 17
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 3138
+      passes: 3157
       semanticFailures: 0
       unsupportedProfileFeatures: 604
     - dependency: expression-operators
       expectedNegatives: 642
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 10903
+      passes: 10918
       semanticFailures: 0
       unsupportedProfileFeatures: 762
     - dependency: functions
       expectedNegatives: 1387
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 17517
+      passes: 17590
       semanticFailures: 0
       unsupportedProfileFeatures: 1573
     - dependency: generators
       expectedNegatives: 436
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 4211
+      passes: 4224
       semanticFailures: 0
       unsupportedProfileFeatures: 180
     - dependency: iterator-protocol
       expectedNegatives: 94
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 7733
+      passes: 7823
       semanticFailures: 0
       unsupportedProfileFeatures: 46
     - dependency: json-parse
       expectedNegatives: 0
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 72
+      passes: 93
       semanticFailures: 0
       unsupportedProfileFeatures: 0
     - dependency: json-stringify
       expectedNegatives: 0
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 72
+      passes: 75
       semanticFailures: 0
       unsupportedProfileFeatures: 0
     - dependency: lexical-bindings
       expectedNegatives: 383
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 2583
+      passes: 2669
       semanticFailures: 0
       unsupportedProfileFeatures: 430
     - dependency: lexical-grammar
@@ -24231,28 +24267,28 @@ summary:
       expectedNegatives: 209
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 5941
+      passes: 6006
       semanticFailures: 0
       unsupportedProfileFeatures: 178
     - dependency: object-own-keys
       expectedNegatives: 6
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 506
+      passes: 511
       semanticFailures: 0
       unsupportedProfileFeatures: 9
     - dependency: object-properties
       expectedNegatives: 610
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 23004
+      passes: 23027
       semanticFailures: 0
       unsupportedProfileFeatures: 990
     - dependency: promise-settlement
       expectedNegatives: 93
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 4040
+      passes: 4130
       semanticFailures: 0
       unsupportedProfileFeatures: 411
     - dependency: property-enumeration
@@ -24266,14 +24302,14 @@ summary:
       expectedNegatives: 0
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 384
+      passes: 385
       semanticFailures: 0
       unsupportedProfileFeatures: 8
     - dependency: reflect-namespace
       expectedNegatives: 0
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 392
+      passes: 393
       semanticFailures: 0
       unsupportedProfileFeatures: 64
     - dependency: regular-expressions
@@ -24287,7 +24323,7 @@ summary:
       expectedNegatives: 76
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 15
+      passes: 16
       semanticFailures: 0
       unsupportedProfileFeatures: 14
     - dependency: set-composition-methods
@@ -24308,7 +24344,7 @@ summary:
       expectedNegatives: 0
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 6490
+      passes: 6582
       semanticFailures: 0
       unsupportedProfileFeatures: 280
     - dependency: top-level-await
@@ -24400,7 +24436,7 @@ summary:
       expectedNegatives: 0
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 2981
+      passes: 3076
       semanticFailures: 0
       unsupportedProfileFeatures: 5
     - group: built-ins/ArrayBuffer
@@ -24540,7 +24576,7 @@ summary:
       expectedNegatives: 0
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 144
+      passes: 165
       semanticFailures: 0
       unsupportedProfileFeatures: 0
     - group: built-ins/Map

@@ -1,0 +1,138 @@
+version: 1
+id: array-from-async
+title: "Array.fromAsync"
+scope:
+  - "The Array.fromAsync function property, its descriptor, name, length,
+    and non-constructor status, and the %Promise% it returns for every
+    input, including a rejection for each abrupt completion."
+  - "The Symbol.asyncIterator and Symbol.iterator reads, async iterables
+    with values that are not awaited, sync iterables through the
+    Async-from-Sync wrapper, and array-likes with one length read and an
+    Await per element, the mapper and its thisArg, and constructor and
+    other receivers."
+  - "The order of observable steps and the turns each Await takes, the
+    closes after a mapper, mapped-value, or definition failure with the
+    Await on the return result, and propagation without a close for
+    failures of the iterator itself and of the final length Set."
+owners:
+  - docs/language-profile-es2026.md
+evidence:
+  differential:
+    status: covered
+    references:
+      - tests/native/fixtures/array-from-async.ts
+      - tests/property/es2026-array-from-async.property.test.ts
+  fixed:
+    status: covered
+    references:
+      - tests/native/fixtures/array-from-async.ts
+  forced-collection:
+    status: covered
+    references:
+      - tests/array-from-async-native.test.ts
+      - tests/native/fixtures/array-from-async.ts
+      - tests/property/es2026-array-from-async.property.test.ts
+  generated:
+    status: covered
+    references:
+      - tests/property/es2026-array-from-async.property.test.ts
+  guard-fallback:
+    status: covered
+    references:
+      - tests/array-from-async-native.test.ts
+      - tests/native/fixtures/array-from-async.ts
+      - tests/property/es2026-array-from-async.property.test.ts
+  specialization:
+    status: covered
+    references:
+      - tests/array-from-async-native.test.ts
+      - tests/native/fixtures/array-from-async.ts
+      - tests/property/es2026-array-from-async.property.test.ts
+  standards:
+    status: covered
+    references:
+      - tests/test262/subset.yaml
+      - tests/test262/results.yaml
+      - tests/test262/results/built-ins/Array/03.yaml
+      - tests/test262/results/built-ins/Array/06.yaml
+      - tests/test262/results/built-ins/Array/09.yaml
+      - tests/test262/results/built-ins/Array/0a.yaml
+      - tests/test262/results/built-ins/Array/0f.yaml
+      - tests/test262/results/built-ins/Array/10.yaml
+      - tests/test262/results/built-ins/Array/11.yaml
+      - tests/test262/results/built-ins/Array/12.yaml
+      - tests/test262/results/built-ins/Array/15.yaml
+      - tests/test262/results/built-ins/Array/17.yaml
+      - tests/test262/results/built-ins/Array/19.yaml
+      - tests/test262/results/built-ins/Array/1a.yaml
+      - tests/test262/results/built-ins/Array/1b.yaml
+      - tests/test262/results/built-ins/Array/1c.yaml
+      - tests/test262/results/built-ins/Array/1e.yaml
+      - tests/test262/results/built-ins/Array/22.yaml
+      - tests/test262/results/built-ins/Array/28.yaml
+      - tests/test262/results/built-ins/Array/2c.yaml
+      - tests/test262/results/built-ins/Array/2e.yaml
+      - tests/test262/results/built-ins/Array/31.yaml
+      - tests/test262/results/built-ins/Array/32.yaml
+      - tests/test262/results/built-ins/Array/33.yaml
+      - tests/test262/results/built-ins/Array/35.yaml
+      - tests/test262/results/built-ins/Array/38.yaml
+      - tests/test262/results/built-ins/Array/39.yaml
+      - tests/test262/results/built-ins/Array/40.yaml
+      - tests/test262/results/built-ins/Array/44.yaml
+      - tests/test262/results/built-ins/Array/45.yaml
+      - tests/test262/results/built-ins/Array/46.yaml
+      - tests/test262/results/built-ins/Array/48.yaml
+      - tests/test262/results/built-ins/Array/5f.yaml
+      - tests/test262/results/built-ins/Array/60.yaml
+      - tests/test262/results/built-ins/Array/62.yaml
+      - tests/test262/results/built-ins/Array/64.yaml
+      - tests/test262/results/built-ins/Array/6a.yaml
+      - tests/test262/results/built-ins/Array/6d.yaml
+      - tests/test262/results/built-ins/Array/6e.yaml
+      - tests/test262/results/built-ins/Array/6f.yaml
+      - tests/test262/results/built-ins/Array/74.yaml
+      - tests/test262/results/built-ins/Array/77.yaml
+      - tests/test262/results/built-ins/Array/7d.yaml
+      - tests/test262/results/built-ins/Array/82.yaml
+      - tests/test262/results/built-ins/Array/89.yaml
+      - tests/test262/results/built-ins/Array/8a.yaml
+      - tests/test262/results/built-ins/Array/8c.yaml
+      - tests/test262/results/built-ins/Array/8d.yaml
+      - tests/test262/results/built-ins/Array/91.yaml
+      - tests/test262/results/built-ins/Array/92.yaml
+      - tests/test262/results/built-ins/Array/93.yaml
+      - tests/test262/results/built-ins/Array/95.yaml
+      - tests/test262/results/built-ins/Array/9c.yaml
+      - tests/test262/results/built-ins/Array/9e.yaml
+      - tests/test262/results/built-ins/Array/a1.yaml
+      - tests/test262/results/built-ins/Array/a3.yaml
+      - tests/test262/results/built-ins/Array/a7.yaml
+      - tests/test262/results/built-ins/Array/a9.yaml
+      - tests/test262/results/built-ins/Array/ae.yaml
+      - tests/test262/results/built-ins/Array/bb.yaml
+      - tests/test262/results/built-ins/Array/be.yaml
+      - tests/test262/results/built-ins/Array/c0.yaml
+      - tests/test262/results/built-ins/Array/c5.yaml
+      - tests/test262/results/built-ins/Array/c9.yaml
+      - tests/test262/results/built-ins/Array/cb.yaml
+      - tests/test262/results/built-ins/Array/cc.yaml
+      - tests/test262/results/built-ins/Array/cd.yaml
+      - tests/test262/results/built-ins/Array/cf.yaml
+      - tests/test262/results/built-ins/Array/d0.yaml
+      - tests/test262/results/built-ins/Array/d8.yaml
+      - tests/test262/results/built-ins/Array/de.yaml
+      - tests/test262/results/built-ins/Array/e3.yaml
+      - tests/test262/results/built-ins/Array/e8.yaml
+      - tests/test262/results/built-ins/Array/ec.yaml
+      - tests/test262/results/built-ins/Array/f1.yaml
+      - tests/test262/results/built-ins/Array/f3.yaml
+      - tests/test262/results/built-ins/Array/f4.yaml
+      - tests/test262/results/built-ins/Array/f5.yaml
+      - tests/test262/results/built-ins/Array/f7.yaml
+      - tests/test262/results/built-ins/Array/fa.yaml
+      - tests/test262/results/built-ins/Array/fc.yaml
+  structural:
+    status: covered
+    references:
+      - packages/runtime-c/tests/intrinsic-graph.test.ts

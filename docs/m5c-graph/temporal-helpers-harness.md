@@ -49,15 +49,17 @@ case, the unchanged file emits about 3.4 MB of C per variant against about
 inputs and their measured sizes.
 
 *tests/test262/harness/temporalHelpers.js* keeps `observeMethod`,
-`propertyBagObserver`, the `toPrimitiveObserver` that `propertyBagObserver`
-returns for primitive property values, and the upstream `formatPropertyName`
-function and `ASCII_IDENTIFIER` pattern they log through. Each kept
-operation is unchanged apart from formatter spacing. Upstream's
+`observeProperty`, `propertyBagObserver`, the `toPrimitiveObserver` that
+`propertyBagObserver` returns for primitive property values, and the upstream
+`formatPropertyName` function and `ASCII_IDENTIFIER` pattern they log through.
+This node kept the first three observers; the post-M5 `array-from-async` unit
+restored `observeProperty`, which seven *Array/fromAsync/* paths call. Each
+kept operation is unchanged apart from formatter spacing. Upstream's
 `SKIP_SYMBOL` serves only omitted members and is not reproduced. The copy
-reads no global outside `Number`, `Proxy`, `Reflect`, `String`, `Symbol`
-and `undefined`, plus each function's implicit `arguments`, so it admits no
-Temporal or Intl behavior. `supportedFeatures` is unchanged and `Temporal`
-remains unsupported.
+reads no global outside `Number`, `Object`, `Proxy`, `Reflect`, `String`,
+`Symbol` and `undefined`, plus each function's implicit `arguments`, so it
+admits no Temporal or Intl behavior. `supportedFeatures` is unchanged and
+`Temporal` remains unsupported.
 
 The existing `harness-definition` check compares only top-level `defines`
 names, and the subset still declares `TemporalHelpers`. The runner also
@@ -68,19 +70,20 @@ next to its `defines`. When a reviewed copy keeps fewer keys, the object
 runs behind the omitted-member trap described under “Runtime trap” below.
 
 A sweep over every reviewed include found exactly one affected object,
-`TemporalHelpers`, with 43 omitted members, and exactly the three paths in
-the selection rule load it.
+`TemporalHelpers`, and exactly the three paths in the selection rule load it.
+It had 43 omitted members then and has 42 since `observeProperty` was
+restored.
 
 Within the pinned suite, the only other *temporalHelpers.js* includes
-outside the Temporal and Intl directories are nine unreviewed
-*Array/fromAsync/* paths. Seven of them call the omitted `observeProperty`
-and would be harness failures if a later node reviewed them.
+outside the Temporal and Intl directories are nine *Array/fromAsync/*
+paths. Seven of them call `observeProperty`, which the copy keeps for them.
 
 *tests/test262-runner.test.ts* runs the reviewed and upstream files in
 fresh realms. It compares one probe's complete call log and results over
 every `formatPropertyName` key branch, primitive, object, function and
-undefined property values, `skipToPrimitive`, all four traps and
-`observeMethod` with and without an object name. It also pins the kept
+undefined property values, `skipToPrimitive`, all four traps,
+`observeMethod` with and without an object name, and `observeProperty`'s
+accessor logs. It also pins the kept
 member list and the reviewed copy's unresolved globals. A further test
 covers the literal-key parser; the trap's tests are listed below. The
 missing-include regression uses *testIntl.js* as its unadmitted example.

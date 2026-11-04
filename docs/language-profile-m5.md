@@ -314,16 +314,18 @@ evidence includes the executed variants and target, dependency tags are
 reviewed, and summaries include raw, path-group, and dependency totals.
 Unsupported, harness, and infrastructure results never increase the pass count.
 
-The current manifest contains 41,533 reviewed cases: 35,243 passes, 4,401
+The current manifest contains 41,649 reviewed cases: 35,359 passes, 4,401
 expected negatives, and 1,889 unsupported profile features. It records no
-semantic, harness, or infrastructure failures. The 442 cases beyond the M5
+semantic, harness, or infrastructure failures. The 558 cases beyond the M5
 inventory are rows of the
 [ECMAScript 2026 profile](./language-profile-es2026.md): 164 for the
 [Annex B built-ins](./language-profile-es2026.md#annex-b-built-ins), 70 for the
 [Annex B Object accessors](./language-profile-es2026.md#annex-b-object-accessors),
 126 for the
 [small built-in families](./language-profile-es2026.md#small-ecmascript-2026-built-in-families),
-and 82 for [joint iteration](./language-profile-es2026.md#joint-iteration).
+82 for [joint iteration](./language-profile-es2026.md#joint-iteration), 95 for
+[`Array.fromAsync`](./language-profile-es2026.md#arrayfromasync), and 21 for
+[JSON source text](./language-profile-es2026.md#json-source-text).
 
 The batch 16/17 dependency audit corrects 21 tag claims on 20 of the 754 new
 paths. Dependency totals are now 48 abrupt-completion, 559 functions, 404
@@ -9329,7 +9331,8 @@ upstream's internal `subClass`. `subClass` itself is undefined, since it is
 outside the upstream `defines` and no pinned test calls it, and both
 `typeof Float16Array` probes stay verbatim. The *temporalHelpers.js* subset
 keeps only `observeMethod`, `propertyBagObserver`, `toPrimitiveObserver`, and
-the upstream `formatPropertyName` and `ASCII_IDENTIFIER` they log through.
+the upstream `formatPropertyName` and `ASCII_IDENTIFIER` they log through; the
+post-M5 `array-from-async` unit added `observeProperty`.
 Because it still declares `TemporalHelpers`, the `harness-definition` check
 compares literal member keys of upstream object-literal definitions, and the
 object runs behind a proxy that prints a per-case marker before throwing on
@@ -10437,11 +10440,12 @@ the ledger assigns three to `temporal-helpers-harness` and one to
 
 M5c IH-B admits a reviewed *temporalHelpers.js* subset that keeps only the
 generic `observeMethod`, `propertyBagObserver`, and `toPrimitiveObserver`
-helpers. Any observation of an omitted `TemporalHelpers` member trips a
-runtime trap whose marker makes the case a harness failure. No case code
-can turn the trap into a pass or an expected negative; the work note
-records the one window an external signal could still open. Its focused
-precheck observes the three *Iterator/from/* paths as pass;
+helpers; the post-M5 `array-from-async` unit added `observeProperty`. Any
+observation of an omitted `TemporalHelpers` member trips a runtime trap whose
+marker makes the case a harness failure. No case code can turn the trap into a
+pass or an expected negative; the work note records the one window an external
+signal could still open. Its focused precheck observes the three
+*Iterator/from/* paths as pass;
 [its work note](./m5c-graph/temporal-helpers-harness.md) records the decision
 and evidence.
 

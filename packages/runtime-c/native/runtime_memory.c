@@ -851,6 +851,7 @@ OseoResult oseo_internal_publish_heap(
     object->kind = kind;
     object->marked = false;
     object->retained = false;
+    object->raw_json = false;
     context->objects = object;
     if (count != NULL) *count += 1u;
     if (context->observe_specialization &&
