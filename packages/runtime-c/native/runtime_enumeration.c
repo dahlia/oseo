@@ -173,28 +173,8 @@ static OseoResult enumeration_keys(OseoContext *context, OseoValue level) {
                 );
             }
         }
-        OseoOrdinaryObject *initial = ordinary_object(frame.slots[0]);
-        bool pending_annexb = initial->immutable_prototype &&
-            !initial->module_namespace && !initial->annexb_proto_deleted;
-        size_t annexb_position = pending_annexb
-            ? initial->annexb_proto_position : 0u;
         for (size_t index = 0u; result.status == OSEO_STATUS_NORMAL; ) {
             OseoOrdinaryObject *object = ordinary_object(frame.slots[0]);
-            /* Include non-enumerable metadata too: it must shadow an
-             * inherited key just like a stored own descriptor. Allocation
-             * may collect, so keep the synthesized key in the root frame
-             * and reacquire the object before reading its property vector. */
-            if (pending_annexb && (index >= annexb_position ||
-                    index >= object->property_count)) {
-                result = oseo_internal_ascii_string(context, "__proto__");
-                frame.slots[2] = result.value;
-                if (result.status == OSEO_STATUS_NORMAL) {
-                    result = oseo_argument_list_append(
-                        context, frame.slots[1], frame.slots[2]);
-                }
-                pending_annexb = false;
-                continue;
-            }
             if (index >= object->property_count) break;
             OseoValue key = object->properties[index].key;
             index += 1u;
@@ -321,7 +301,7 @@ static OseoResult enumeration_own_key(
     if (is_proxy(level)) {
         OseoResult result = oseo_internal_proxy_get_own_property(
             context, level, key, found, &value, &attributes,
-            &getter, &setter, NULL);
+            &getter, &setter);
         if (result.status != OSEO_STATUS_NORMAL || !*found) return result;
     } else if (!oseo_internal_own_descriptor(
             level,
@@ -329,8 +309,7 @@ static OseoResult enumeration_own_key(
             &value,
             &attributes,
             &getter,
-            &setter,
-            NULL
+            &setter
         )) return normal(oseo_undefined());
     else {
         OseoResult ready = oseo_internal_namespace_export_ready(

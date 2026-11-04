@@ -17,7 +17,7 @@
  * Compound assignment's logged registrations are rebucketed into its
  * three split files. Host script bindings and proper tail calls postdate
  * these runs and retain their weights. The Linux upper-median fallback is
- * 423 seconds across 157 entries.
+ * 429 seconds across 158 entries.
  * docs/evidence/u6/linux-shard-weights.tsv retains each sum and old weight;
  * linux-shards.py reproduces them and the model. See the U6 README.
  *
@@ -148,8 +148,9 @@
  * measurement. See U6 provenance.
  *
  * The ECMAScript 2026 built-in files use one local Linux AMD64 extended
- * registration each, not CI file-shard sums. macOS keeps the unknown-file
- * median fallback. See U6 provenance.
+ * registration each, and the Annex B Object accessor file sums the two
+ * registrations of one local extended run; none are CI file-shard sums.
+ * macOS keeps the unknown-file median fallback. See U6 provenance.
  */
 export const nativeShardCosts = {
   "linux-x86_64-gnu": {
@@ -162,6 +163,7 @@ export const nativeShardCosts = {
     "tests/property/m4-async.property.test.ts": 350,
     "tests/property/m5-aggregate-error.property.test.ts": 217,
     "tests/property/m5-annexb-date-methods.property.test.ts": 144,
+    "tests/property/m5-annexb-object-accessors.property.test.ts": 464,
     "tests/property/m5-annexb-escape.property.test.ts": 263,
     "tests/property/m5-annexb-legacy-lookup-boundary.property.test.ts": 615,
     "tests/property/m5-annexb-proto-boundary.property.test.ts": 1447,

@@ -36,7 +36,7 @@ const { assertAsyncProperty } = await import(
   ["../../packages/testkit/tests/", "property-support.ts"].join("")
 );
 
-/** Every generated program retains all ordinary lookup boundary classes. */
+/** Every generated program covers own, inherited, and intrinsic lookups. */
 interface ProtoCase {
   readonly hint: "absent" | "false" | "truthful";
   readonly value: number;
@@ -86,6 +86,15 @@ const abrupt = { get __proto__() { throw new RangeError("owned"); } };
 try { read(abrupt); } catch (error) {
   console.log("abrupt", error instanceof RangeError, error.message);
 }
+const base = { tag: ${input.value} };
+console.log("intrinsic read", read({}) === Object.prototype,
+  read(Object.create(base)) === base, read(${input.value}) ===
+  Number.prototype);
+const moved = {};
+moved.__proto__ = base;
+moved.__proto__ = ${input.value};
+console.log("intrinsic write", Object.getPrototypeOf(moved) === base,
+  Object.hasOwn(moved, "__proto__"), read(moved) === base);
 let userStore = "none";
 Object.defineProperty(Object.prototype, "__proto__", {
   set: function (value) {
@@ -137,6 +146,8 @@ function expected(input: ProtoCase): string {
     "symbol undefined",
     "nullish true",
     "abrupt true owned",
+    "intrinsic read true true true",
+    "intrinsic write true false true",
     `user intrinsic number:${input.value + 4}`,
     "deleted intrinsic true undefined undefined",
     `after delete own ${input.value + 5} true`,
@@ -151,12 +162,14 @@ function expected(input: ProtoCase): string {
   ].join("\n");
 }
 
+// The title is the U6 shard-log key (docs/evidence/u6/linux-shards.py), so
+// it keeps its pre-implementation wording.
 test(
   "generated ordinary __proto__ reads preserve the core lookup model",
   { skip: nativeTarget == null ? "requires a supported native host" : false },
   async () => {
     await assertAsyncProperty(
-      "ordinary keys named __proto__ stay outside the Annex B rejection",
+      "own keys named __proto__ shadow the intrinsic accessor",
       fc.asyncProperty(cases, async (input) => {
         const source = sourceFor(input);
         const oracle = { exitStatus: 0, stderr: "", stdout: expected(input) };
@@ -164,16 +177,13 @@ test(
         try {
           const path = `${directory}/case.js`;
           await host.writeTextFile(path, source);
+          // Node.js alone: Deno 2.9.7 replaces the intrinsic accessor with
+          // a shim that never changes a prototype.
           assertMatchingObservations([
             oracle,
             await host.run({
               command: process.execPath,
               args: [path],
-              cwd: directory,
-            }),
-            await host.run({
-              command: "deno",
-              args: ["run", "--quiet", path],
               cwd: directory,
             }),
           ]);
@@ -378,7 +388,7 @@ test(
           "own data/getters, inherited data, null prototypes, proxies, " +
           "near-miss keys, symbols, nullish and abrupt receivers",
         numRuns: 12,
-        profile: "M5 Annex B prototype accessor boundary",
+        profile: "Annex B prototype accessor",
         seed: 0x6000_8500,
         sizeLimit:
           "original observations/deletion and integrity program, " +

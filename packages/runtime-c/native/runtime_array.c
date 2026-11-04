@@ -2455,7 +2455,6 @@ OseoResult oseo_array_append(
     property->attributes = (OseoPropertyAttributes){true, true, true, false};
     property->key = key.value;
     property->value = value;
-    property->omitted_accessors = 0u;
     property->getter = oseo_undefined();
     property->setter = oseo_undefined();
     array->property_count += 1u;

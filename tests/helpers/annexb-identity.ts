@@ -1,4 +1,4 @@
-/** Core reflection only; the excluded accessor bodies are never invoked. */
+/** Reflection and descriptor round trips of the accessor identities. */
 export function annexbIdentityProgram(value: number): string {
   return `
 (function () {

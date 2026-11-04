@@ -13,9 +13,10 @@ the [M5 exit report](./m5c-closure/m5-exit-report.md) keeps the M5 result.
 
 A change that admits or measures behavior inside this boundary updates this
 document in the same change. A family's status describes tested current
-behavior, never intended behavior. The Annex B built-in units and the small
-ECMAScript 2026 built-in units and `iterator-zip` hold the family records so
-far; see [Annex B built-ins](#annex-b-built-ins),
+behavior, never intended behavior. The Annex B built-in units, the Annex B
+Object accessors, the small ECMAScript 2026 built-in units, and `iterator-zip`
+hold the family records so far; see [Annex B built-ins](#annex-b-built-ins),
+[Annex B Object accessors](#annex-b-object-accessors),
 [Small ECMAScript 2026 built-in families](#small-ecmascript-2026-built-in-families),
 and [Joint iteration](#joint-iteration).
 
@@ -279,6 +280,81 @@ Symbol and BigInt conversion, and a property-read guard miss.
 Gregorian calendar model. Its second test observes the read-before-conversion
 case natively. The 24 test262 paths are those under
 *test/annexB/built-ins/Date/prototype/*.
+
+
+Annex B Object accessors
+------------------------
+
+The `annexb-object-accessors` family record covers the normative-optional
+accessor and methods of ECMA-262 20.1.3.8 through 20.1.3.12, which
+[ADR 0020](./adr/0020-m5-applicable-test-inventory.md) excluded
+from the M5 claim. They exist in every realm. `%Object.prototype%` creates them
+after its seven core properties, in clause order: `__proto__`,
+`__defineGetter__`, `__defineSetter__`, `__lookupGetter__`, and
+`__lookupSetter__`. The accessor is non-enumerable and configurable, with
+functions named `get __proto__` and `set __proto__`; the methods are writable,
+non-enumerable, and configurable, with lengths 2, 2, 1, and 1. None of the six
+functions is a constructor or has a `prototype` property.
+
+The getter returns `[[GetPrototypeOf]]` of `ToObject(this)`, so a primitive
+reads its wrapper prototype. The setter throws a `TypeError` for a nullish
+receiver, returns without effect for a primitive receiver or a value that is
+neither an object nor `null`, and throws a `TypeError` when `[[SetPrototypeOf]]`
+refuses: a cycle, a non-extensible object, the immutable `%Object.prototype%`,
+or a Proxy trap that returns false. The accessor is an ordinary property, so
+every `[[Get]]` and `[[Set]]` caller reaches it: member access, `Reflect.get`
+and `Reflect.set` with a receiver, `super` property reads and assignment, a
+Proxy without the matching trap, and `Object.assign`. An own or inherited
+property named `__proto__` shadows it, deleting it removes it, and descriptor
+round trips, integrity levels, and for-in treat it like any other accessor. The
+object-literal `__proto__: value` form, computed and shorthand keys, object
+spread, and `JSON.parse` keep their own semantics.
+
+`__defineGetter__` and `__defineSetter__` take `ToObject(this)`, throw a
+`TypeError` for a non-callable function before converting the key, and then
+call DefinePropertyOrThrow with an enumerable, configurable accessor half, so
+an existing other half survives and a Proxy sees its `defineProperty` trap.
+`__lookupGetter__` and `__lookupSetter__` walk `[[GetOwnProperty]]` and
+`[[GetPrototypeOf]]` from `ToObject(this)`, so Proxy traps run in that order,
+and the first own property found answers: its half for an accessor, `undefined`
+for a data property.
+
+Node.js 24.21.0 is the only reference for the accessor. Deno 2.9.7 replaces it
+with a shim that warns and never changes a prototype, and reports JavaScript
+functions named `__proto__`; *tests/helpers/annexb-identity.ts* keeps that
+metadata separate. Both hosts are references for the four methods. The fixed
+fixtures *tests/native/fixtures/annexb-object-accessors.ts*, run by
+*tests/annexb-object-accessors-native.test.ts*, cover the accessor's receivers,
+values, refusals, callers, literal forms, typed arrays, enumeration, and
+forwarding; its redefinition, deletion, freezing, and cross-realm halves; and
+the methods' metadata, conversion order, refusals, keys, chains, primitives,
+and Proxy traps. *tests/annexb-proto-boundary.test.ts* and
+*tests/annexb-legacy-lookup-boundary.test.ts* compare the accessor's and
+methods' read, write, forwarding, integrity, and realm cases with the
+references. All run under both specialization policies with collection forced
+at every safepoint, and the fixtures warm a property read so the enabled policy
+reaches the generic fallback through a guard miss.
+
+*tests/property/m5-annexb-object-accessors.property.test.ts*, seed block
+`0x6000a400`, generates sequences of `__proto__` writes, strict writes,
+`Reflect.set` calls, setter calls, and reads over ordinary, null-prototype,
+non-extensible, Proxy, and `%Object.prototype%` targets, and sequences of legacy
+definitions and lookups over ordinary, inheriting, non-extensible,
+non-configurable, and Proxy targets. An independent model of the clauses
+checks each, together with the references. The earlier suites at
+`0x60008500`, `0x60008800`, and `0x60008801` keep their domains and budgets with
+oracles of the implemented behavior: own keys that shadow the accessor beside
+intrinsic reads and writes, lookup chains that may end at the real method, and
+chains over the intrinsic that find accessor halves the program defines.
+
+The 70 owned test262 paths are those under the five
+*test/built-ins/Object/prototype/* directories named for the accessor and the
+methods, and *test/built-ins/WeakRef/prototype/constructor.js*. The family also
+takes eight ADR 0013 rows: three TypedArray rows that read or write
+`__proto__`, *test/language/types/object/S8.6.2\_A8.js*, and the four
+*private-getter-is-not-a-own-property.js* and
+*private-setter-is-not-a-own-property.js* rows. The rows stay unreviewed until
+Root's full UPDATE admits them.
 
 
 Small ECMAScript 2026 built-in families

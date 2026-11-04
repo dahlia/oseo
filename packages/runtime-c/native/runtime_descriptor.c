@@ -54,11 +54,9 @@ static OseoResult define_typed_array_key(
  * redefinition recover the usual append-at-creation behavior. */
 static OseoProperty *append_property_slot(
     OseoOrdinaryObject *object,
-    bool replaces_virtual,
-    bool replaces_proto
+    bool replaces_virtual
 ) {
-    size_t insertion = replaces_proto
-        ? object->annexb_proto_position : object->property_count;
+    size_t insertion = object->property_count;
     if (replaces_virtual) {
         for (size_t index = 0u;
              index < object->property_count;
@@ -130,7 +128,6 @@ OseoResult oseo_internal_legacy_materialize(
     property->attributes = (OseoPropertyAttributes){true, false, false, false};
     property->key = frame.slots[1];
     property->value = frame.slots[2];
-    property->omitted_accessors = 0u;
     property->getter = oseo_undefined();
     property->setter = oseo_undefined();
     oseo_internal_note_property_inserted(object, insertion);
@@ -204,41 +201,14 @@ bool oseo_internal_virtual_string_iterator_descriptor(
     return true;
 }
 
-OseoResult oseo_internal_omitted_proto_error(OseoContext *context) {
-    return failure(context, "OSEO1001",
-        "The Object.prototype.__proto__ accessor is excluded by Annex B.");
-}
-
-bool oseo_internal_virtual_annexb_proto_descriptor(
-    OseoValue object_value,
-    OseoValue key,
-    OseoPropertyAttributes *attributes
-) {
-    if (!is_object(object_value)) return false;
-    OseoOrdinaryObject *object = ordinary_object(object_value);
-    if (!object->immutable_prototype || object->module_namespace ||
-        object->annexb_proto_deleted ||
-        !oseo_internal_string_is_ascii(key, "__proto__") ||
-        oseo_internal_own_property_index(object, key) != SIZE_MAX) return false;
-    *attributes = (OseoPropertyAttributes){
-        object->annexb_proto_configurable,
-        object->annexb_proto_enumerable,
-        false,
-        true,
-    };
-    return true;
-}
-
 bool oseo_internal_own_descriptor(
     OseoValue object_value,
     OseoValue key,
     OseoValue *value,
     OseoPropertyAttributes *attributes,
     OseoValue *getter,
-    OseoValue *setter,
-    uint8_t *omitted_accessors
+    OseoValue *setter
 ) {
-    if (omitted_accessors != NULL) *omitted_accessors = 0u;
     *getter = oseo_undefined();
     *setter = oseo_undefined();
     /* Without the context, the legacy `caller` and `arguments` values
@@ -274,21 +244,9 @@ bool oseo_internal_own_descriptor(
     }
     OseoOrdinaryObject *object = ordinary_object(object_value);
     size_t index = oseo_internal_own_property_index(object, key);
-    if (index == SIZE_MAX) {
-        if (!oseo_internal_virtual_annexb_proto_descriptor(
-                object_value, key, attributes)) return false;
-        *value = oseo_undefined();
-        if (omitted_accessors != NULL) {
-            *omitted_accessors = OSEO_OMITTED_GETTER | OSEO_OMITTED_SETTER;
-        }
-        return true;
-    }
+    if (index == SIZE_MAX) return false;
     OseoProperty *property = &object->properties[index];
     *attributes = property->attributes;
-    if (omitted_accessors != NULL) {
-        *omitted_accessors = property->attributes.accessor
-            ? property->omitted_accessors : 0u;
-    }
     if (property->attributes.accessor) {
         *value = oseo_undefined();
         *getter = property->getter;
@@ -306,12 +264,10 @@ bool oseo_internal_own_property_descriptor(
     OseoValue *value,
     OseoPropertyAttributes *attributes,
     OseoValue *getter,
-    OseoValue *setter,
-    uint8_t *omitted_accessors
+    OseoValue *setter
 ) {
     if (oseo_internal_legacy_descriptor(
             context, object_value, key, value, attributes)) {
-        if (omitted_accessors != NULL) *omitted_accessors = 0u;
         *getter = oseo_undefined();
         *setter = oseo_undefined();
         return true;
@@ -322,8 +278,7 @@ bool oseo_internal_own_property_descriptor(
             value,
             attributes,
             getter,
-            setter,
-            omitted_accessors
+            setter
         )) {
         return true;
     }
@@ -427,12 +382,6 @@ static OseoResult define_data_property(
             key,
             &virtual_attributes
         );
-    bool replaces_proto = oseo_internal_virtual_annexb_proto_descriptor(
-        object_value, key, &virtual_attributes);
-    if (replaces_proto && !virtual_attributes.configurable) {
-        *refusal = "Cannot redefine a non-configurable property.";
-        return normal(object_value);
-    }
     if (replaces_virtual) {
         /* During intrinsic bootstrap the virtual property models an
          * undefined value. The successful String initializer replaces it
@@ -618,7 +567,6 @@ static OseoResult define_data_property(
         }
         property->attributes = attributes;
         property->value = value;
-        property->omitted_accessors = 0u;
         property->getter = oseo_undefined();
         property->setter = oseo_undefined();
         object->dictionary = true;
@@ -627,7 +575,7 @@ static OseoResult define_data_property(
         if (extends_array) object->array_length = defined_index + 1u;
         return normal(object_value);
     }
-    if (!object->extensible && !replaces_virtual && !replaces_proto) {
+    if (!object->extensible && !replaces_virtual) {
         *refusal =
             "Cannot define a property on a non-extensible object.";
         return normal(object_value);
@@ -643,13 +591,10 @@ static OseoResult define_data_property(
     if (grown.status != OSEO_STATUS_NORMAL) return grown;
     object = ordinary_object(object_value);
     if (replaces_virtual) object->virtual_string_iterator = false;
-    OseoProperty *property = append_property_slot(
-        object, replaces_virtual, replaces_proto);
-    if (replaces_proto) object->annexb_proto_deleted = true;
+    OseoProperty *property = append_property_slot(object, replaces_virtual);
     property->attributes = attributes;
     property->key = key;
     property->value = value;
-    property->omitted_accessors = 0u;
     property->getter = oseo_undefined();
     property->setter = oseo_undefined();
     oseo_internal_note_property_inserted(
@@ -683,7 +628,6 @@ OseoResult oseo_internal_append_own_property(
     property->attributes = attributes;
     property->key = key;
     property->value = value;
-    property->omitted_accessors = 0u;
     property->getter = oseo_undefined();
     property->setter = oseo_undefined();
     object->property_count += 1u;
@@ -845,29 +789,6 @@ static OseoResult define_accessor_property(
             key,
             &virtual_attributes
         );
-    bool replaces_proto = oseo_internal_virtual_annexb_proto_descriptor(
-        object_value, key, &virtual_attributes);
-    if (replaces_proto) {
-        if (!virtual_attributes.configurable &&
-            (attributes.configurable ||
-             attributes.enumerable != virtual_attributes.enumerable ||
-             (has_getter && tag_of(getter) == OSEO_TAG_UNDEFINED) ||
-             (has_setter && tag_of(setter) == OSEO_TAG_UNDEFINED))) {
-            *refusal = "Cannot redefine a non-configurable property.";
-            return normal(object_value);
-        }
-        if (!virtual_attributes.configurable && (has_getter || has_setter)) {
-            return oseo_internal_omitted_proto_error(context);
-        }
-        if (!has_getter && !has_setter) {
-            object->annexb_proto_configurable = attributes.configurable;
-            object->annexb_proto_enumerable = attributes.enumerable;
-            object->dictionary = true;
-            object->shape_id = context->next_shape_id;
-            context->next_shape_id += 1u;
-            return normal(object_value);
-        }
-    }
     if (replaces_virtual) {
         if (!virtual_attributes.configurable) {
             *refusal =
@@ -893,10 +814,6 @@ static OseoResult define_accessor_property(
     size_t index = oseo_internal_own_property_index(object, key);
     OseoValue new_getter = has_getter ? getter : oseo_undefined();
     OseoValue new_setter = has_setter ? setter : oseo_undefined();
-    uint8_t new_omitted = replaces_proto
-        ? OSEO_OMITTED_GETTER | OSEO_OMITTED_SETTER : 0u;
-    if (has_getter) new_omitted &= (uint8_t)~OSEO_OMITTED_GETTER;
-    if (has_setter) new_omitted &= (uint8_t)~OSEO_OMITTED_SETTER;
     if (index != SIZE_MAX) {
         OseoProperty *property = &object->properties[index];
         OseoValue existing_getter = property->attributes.accessor
@@ -905,36 +822,19 @@ static OseoResult define_accessor_property(
             ? property->setter : oseo_undefined();
         if (!has_getter) new_getter = existing_getter;
         if (!has_setter) new_setter = existing_setter;
-        new_omitted = property->omitted_accessors;
-        if (has_getter) new_omitted &= (uint8_t)~OSEO_OMITTED_GETTER;
-        if (has_setter) new_omitted &= (uint8_t)~OSEO_OMITTED_SETTER;
-        bool omitted_getter =
-            (property->omitted_accessors & OSEO_OMITTED_GETTER) != 0u;
-        bool omitted_setter =
-            (property->omitted_accessors & OSEO_OMITTED_SETTER) != 0u;
         if (!property->attributes.configurable &&
             (!property->attributes.accessor ||
              attributes.configurable ||
              attributes.enumerable != property->attributes.enumerable ||
              (has_getter &&
-              (omitted_getter
-                ? tag_of(new_getter) == OSEO_TAG_UNDEFINED
-                : !oseo_internal_same_value(existing_getter, new_getter))) ||
+              !oseo_internal_same_value(existing_getter, new_getter)) ||
              (has_setter &&
-              (omitted_setter
-                ? tag_of(new_setter) == OSEO_TAG_UNDEFINED
-                : !oseo_internal_same_value(existing_setter, new_setter))))) {
+              !oseo_internal_same_value(existing_setter, new_setter)))) {
             *refusal =
                 "Cannot redefine a non-configurable property.";
             return normal(object_value);
         }
-        if (!property->attributes.configurable &&
-            ((has_getter && omitted_getter) ||
-             (has_setter && omitted_setter))) {
-            return oseo_internal_omitted_proto_error(context);
-        }
         property->attributes = attributes;
-        property->omitted_accessors = new_omitted;
         property->value = oseo_undefined();
         property->getter = new_getter;
         property->setter = new_setter;
@@ -944,7 +844,7 @@ static OseoResult define_accessor_property(
         if (extends_array) object->array_length = defined_index + 1u;
         return normal(object_value);
     }
-    if (!object->extensible && !replaces_virtual && !replaces_proto) {
+    if (!object->extensible && !replaces_virtual) {
         *refusal =
             "Cannot define a property on a non-extensible object.";
         return normal(object_value);
@@ -960,11 +860,8 @@ static OseoResult define_accessor_property(
     if (grown.status != OSEO_STATUS_NORMAL) return grown;
     object = ordinary_object(object_value);
     if (replaces_virtual) object->virtual_string_iterator = false;
-    OseoProperty *property = append_property_slot(
-        object, replaces_virtual, replaces_proto);
-    if (replaces_proto) object->annexb_proto_deleted = true;
+    OseoProperty *property = append_property_slot(object, replaces_virtual);
     property->attributes = attributes;
-    property->omitted_accessors = new_omitted;
     property->key = key;
     property->value = oseo_undefined();
     property->getter = new_getter;
@@ -1119,30 +1016,12 @@ OseoResult oseo_object_delete(
             : normal(oseo_boolean(false));
     }
     OseoOrdinaryObject *object = ordinary_object(object_value);
-    bool excluded_proto = object->immutable_prototype &&
-        !object->module_namespace &&
-        oseo_internal_string_is_ascii(key, "__proto__");
     bool string_iterator =
         object_value ==
             context->realm->intrinsics[OSEO_INTRINSIC_STRING_PROTOTYPE] &&
         key == context->well_known_symbols[OSEO_WELL_KNOWN_ITERATOR];
     size_t index = oseo_internal_own_property_index(object, key);
     if (index == SIZE_MAX) {
-        if (excluded_proto && !object->annexb_proto_deleted) {
-            if (!object->annexb_proto_configurable) {
-                return strict
-                    ? type_error(context,
-                        "Cannot delete a non-configurable property.")
-                    : normal(oseo_boolean(false));
-            }
-            /* The omitted configurable accessor does not reappear after
-             * successful ordinary deletion. Invalidate missing-key guards
-             * just as deletion of the virtual String iterator does. */
-            object->annexb_proto_deleted = true;
-            object->dictionary = true;
-            object->shape_id = context->next_shape_id;
-            context->next_shape_id += 1u;
-        }
         if (string_iterator && object->virtual_string_iterator) {
             if (!object->virtual_string_iterator_configurable) {
                 return strict
@@ -1190,7 +1069,6 @@ OseoResult oseo_object_delete(
         }
     }
     (void)oseo_internal_remove_property(object, index);
-    if (excluded_proto) object->annexb_proto_deleted = true;
     if (string_iterator) object->virtual_string_iterator = false;
     object->dictionary = true;
     object->shape_id = context->next_shape_id;

@@ -1055,8 +1055,7 @@ static OseoResult iterator_setter(
             &ignored,
             &attributes,
             &getter,
-            &setter,
-            NULL
+            &setter
         );
         if (own) {
             result = oseo_internal_namespace_export_ready(

@@ -151,14 +151,10 @@ static OseoResult object_get(
         OseoPropertyAttributes attributes = {false, false, false, false};
         OseoValue getter = oseo_undefined();
         OseoValue setter = oseo_undefined();
-        uint8_t omitted_accessors = 0u;
         if (oseo_internal_own_property_descriptor(
             context, current, key, &value, &attributes,
-            &getter, &setter, &omitted_accessors)) {
+            &getter, &setter)) {
             if (attributes.accessor) {
-                if ((omitted_accessors & OSEO_OMITTED_GETTER) != 0u) {
-                    return oseo_internal_omitted_proto_error(context);
-                }
                 if (!is_callable(getter)) return normal(oseo_undefined());
                 OseoRootFrame frame = {NULL, NULL, 0u};
                 OseoResult result = oseo_roots_allocate(context, &frame, 1u);
@@ -179,44 +175,6 @@ static OseoResult object_get(
                 return oseo_cell_get(context, value);
             }
             return oseo_internal_legacy_value(context, current, key, value);
-        }
-        /* Only a missing lookup at %Object.prototype% reaches the excluded
-         * Annex B accessor. Own/inherited user properties, proxies, null
-         * prototypes, and nullish receiver errors keep their ordinary path.
-         * The immutable-prototype brand also identifies another realm's
-         * %Object.prototype%; module namespaces are a separate exotic. */
-        if (object->immutable_prototype && !object->module_namespace &&
-            !object->annexb_proto_deleted &&
-            oseo_internal_string_is_ascii(key, "__proto__")) {
-            return failure(
-                context,
-                "OSEO1001",
-                "The Object.prototype.__proto__ accessor is excluded "
-                "by Annex B."
-            );
-        }
-        /* ECMA-262 16th edition 20.1.3.9 makes the legacy lookup methods
-         * normative optional; ADR 0020 maps that clause onto the ADR 0013
-         * Annex B exclusion. Only the same missing lookup at an intrinsic
-         * %Object.prototype% would observe the omitted method, so user
-         * properties, proxies, and null prototypes keep the core path. */
-        if (object->immutable_prototype && !object->module_namespace) {
-            if (oseo_internal_string_is_ascii(key, "__lookupGetter__")) {
-                return failure(
-                    context,
-                    "OSEO1001",
-                    "The Object.prototype.__lookupGetter__ method is "
-                    "excluded by the M5 optional legacy accessor policy."
-                );
-            }
-            if (oseo_internal_string_is_ascii(key, "__lookupSetter__")) {
-                return failure(
-                    context,
-                    "OSEO1001",
-                    "The Object.prototype.__lookupSetter__ method is "
-                    "excluded by the M5 optional legacy accessor policy."
-                );
-            }
         }
         current = object->prototype;
     }
@@ -293,8 +251,7 @@ OseoResult oseo_object_has_own(
             &value,
             &attributes,
             &getter,
-            &setter,
-            NULL
+            &setter
         );
         if (result.status != OSEO_STATUS_NORMAL) return result;
         return normal(oseo_boolean(found));
@@ -306,8 +263,7 @@ OseoResult oseo_object_has_own(
         &value,
         &attributes,
         &getter,
-        &setter,
-        NULL
+        &setter
     );
     if (!exists) return normal(oseo_boolean(false));
     OseoResult ready = oseo_internal_namespace_export_ready(
@@ -474,14 +430,10 @@ OseoResult oseo_object_set(
         OseoPropertyAttributes attributes = {false, false, false, false};
         OseoValue getter = oseo_undefined();
         OseoValue setter = oseo_undefined();
-        uint8_t omitted_accessors = 0u;
         if (oseo_internal_own_property_descriptor(
             context, current, key, &own_value, &attributes, &getter,
-            &setter, &omitted_accessors)) {
+            &setter)) {
             if (attributes.accessor) {
-                if ((omitted_accessors & OSEO_OMITTED_SETTER) != 0u) {
-                    return oseo_internal_omitted_proto_error(context);
-                }
                 if (!is_callable(setter)) {
                     if (strict) {
                         return type_error(
@@ -560,20 +512,6 @@ OseoResult oseo_object_set(
             }
             break;
         }
-        /* Mirror object_get: only a missing "__proto__" write reaching
-         * an intrinsic %Object.prototype% would run the excluded Annex B
-         * setter. Own or inherited user properties, proxies, null
-         * prototypes, and typed-array numeric keys were answered above. */
-        if (owner->immutable_prototype && !owner->module_namespace &&
-            !owner->annexb_proto_deleted &&
-            oseo_internal_string_is_ascii(key, "__proto__")) {
-            return failure(
-                context,
-                "OSEO1001",
-                "The Object.prototype.__proto__ accessor is excluded "
-                "by Annex B."
-            );
-        }
         current = owner->prototype;
     }
     if (!receiver->extensible) {
@@ -608,7 +546,6 @@ OseoResult oseo_object_set(
     property->attributes = (OseoPropertyAttributes){true, true, true, false};
     property->key = key;
     property->value = value;
-    property->omitted_accessors = 0u;
     property->getter = oseo_undefined();
     property->setter = oseo_undefined();
     object->property_count += 1u;
@@ -670,14 +607,10 @@ OseoResult oseo_internal_set_with_receiver(
         OseoPropertyAttributes attributes = {false, false, false, false};
         OseoValue getter = oseo_undefined();
         OseoValue setter = oseo_undefined();
-        uint8_t omitted_accessors = 0u;
         if (oseo_internal_own_property_descriptor(
             context, current, key, &own_value, &attributes, &getter,
-            &setter, &omitted_accessors)) {
+            &setter)) {
             if (attributes.accessor) {
-                if ((omitted_accessors & OSEO_OMITTED_SETTER) != 0u) {
-                    return oseo_internal_omitted_proto_error(context);
-                }
                 if (!is_callable(setter)) {
                     *refusal = "Cannot set a property that has only a getter.";
                     return normal(value);
@@ -705,21 +638,6 @@ OseoResult oseo_internal_set_with_receiver(
             }
             break;
         }
-        /* Mirror object_get: only a missing "__proto__" write reaching
-         * an intrinsic %Object.prototype% would run the excluded Annex B
-         * setter. Own or inherited user properties, proxies, null
-         * prototypes, and typed-array numeric keys were answered above. */
-        if (ordinary_object(current)->immutable_prototype &&
-            !ordinary_object(current)->module_namespace &&
-            !ordinary_object(current)->annexb_proto_deleted &&
-            oseo_internal_string_is_ascii(key, "__proto__")) {
-            return failure(
-                context,
-                "OSEO1001",
-                "The Object.prototype.__proto__ accessor is excluded "
-                "by Annex B."
-            );
-        }
         current = ordinary_object(current)->prototype;
     }
     if (!is_object(receiver)) {
@@ -740,8 +658,7 @@ OseoResult oseo_internal_set_with_receiver(
             &receiver_value,
             &receiver_attributes,
             &receiver_getter,
-            &receiver_setter,
-            NULL
+            &receiver_setter
         )
         : normal(oseo_boolean(
             (receiver_found = oseo_internal_own_property_descriptor(
@@ -751,8 +668,7 @@ OseoResult oseo_internal_set_with_receiver(
                 &receiver_value,
                 &receiver_attributes,
                 &receiver_getter,
-                &receiver_setter,
-                NULL
+                &receiver_setter
             ))
         ));
     if (receiver_result.status == OSEO_STATUS_NORMAL && receiver_found) {

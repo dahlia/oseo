@@ -30,7 +30,7 @@ export interface AnnexbIntegrityCase {
   readonly value: number;
 }
 
-/** Render core metadata operations without invoking the omitted accessor. */
+/** Render integrity operations over the intrinsic accessor property. */
 export function annexbIntegrityProgram(input: AnnexbIntegrityCase): string {
   const { scenario, value } = input;
   const prefix = `

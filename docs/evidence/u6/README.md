@@ -2175,3 +2175,12 @@ The TSV retains each file with `-` for all three historical source samples,
 and the extraction script and its unit test retain it explicitly. The
 Linux table has 157 entries, and its upper-median fallback moves from 435 to
 423 seconds. macOS keeps 143 entries and its 296-second fallback.
+
+*tests/property/m5-annexb-object-accessors.property.test.ts* follows the same
+procedure for its seeds `0x6000a400` and `0x6000a401`, 120 cases each. Its two
+registrations took 193648.525883 and 269441.795338 milliseconds, so the case
+sum is 463090.321221 milliseconds and the rounded-up Linux weight is 464
+seconds. Other lanes' gates kept the host's load average above its 16 cores
+during the run, so the figure may be high. The TSV, extraction script and unit
+test retain the file the same way, Linux now has 158 entries with the
+429-second fallback, and macOS keeps its fallback.

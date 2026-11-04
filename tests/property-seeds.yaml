@@ -624,6 +624,10 @@ families:
     owner: tests/property/m5-annexb-date-methods.property.test.ts
     start: 0x60009f00
     end: 0x60009fff
+  - family: m5-annexb-object-accessors
+    owner: tests/property/m5-annexb-object-accessors.property.test.ts
+    start: 0x6000a400
+    end: 0x6000a4ff
   - family: es2026-error-is-error
     owner: tests/property/es2026-error-is-error.property.test.ts
     start: 0x60009900

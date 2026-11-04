@@ -27,9 +27,9 @@ EXCLUDED = {
 # case sums from candidate CI 40869736577; with-var loop heads use
 # candidate CI 41059687055 and the module evaluation driver candidate CI
 # 41574039008. Primitive with boxing, the non-blocking agent, the legacy
-# caller suite, the Annex B escape, String, and Date files, and the
-# ECMAScript 2026 built-in files each use a later local Linux extended
-# measurement, not a CI file-shard sum. See the U6 README.
+# caller suite, the Annex B escape, String, Date, and Object accessor
+# files, and the ECMAScript 2026 built-in files each use a later local
+# Linux extended measurement, not a CI file-shard sum. See the U6 README.
 RETAINED = {
     'tests/property/es2026-iterator-zip.property.test.ts',
     'tests/property/es2026-iterator-concat.property.test.ts',
@@ -48,6 +48,7 @@ RETAINED = {
     'tests/property/m5-annexb-escape.property.test.ts',
     'tests/property/m5-annexb-string-methods.property.test.ts',
     'tests/property/m5-annexb-date-methods.property.test.ts',
+    'tests/property/m5-annexb-object-accessors.property.test.ts',
 }
 # Logged files later split by test registration. Each logged title is
 # rebucketed to the current source that defines it.

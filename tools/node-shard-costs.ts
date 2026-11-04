@@ -7,9 +7,10 @@
  * 41238903460 at `8770b2e4`. The largest is kept on purpose: the residual
  * evidence file took 1.36 times longer on one of those Linux runners than
  * on another, and the margin the shards keep is a slow runner's.
- * Eighteen files postdate those runs and scale a serial local
- * measurement on the same host by the residual-evidence ratio: 2.574 on
- * Linux and 1.974 on macOS.
+ * Twenty-two files postdate those runs and scale a local measurement on
+ * the same host by the residual-evidence ratio: 2.574 on Linux and 1.974
+ * on macOS. The measurements are serial except the Object accessor
+ * property file and the legacy lookup test, which ran side by side.
  * Files below 30 seconds have no entry and weigh the host fallback, the
  * median of every measured weight. These are concurrent test durations,
  * not file wall times. *docs/evidence/node-shards/README.md* records the
@@ -19,8 +20,9 @@ export const nodeShardCosts = {
   "linux-x86_64-gnu": {
     "packages/runtime-c/tests/dense-index.test.ts": 42,
     "tests/annex-b-mixed-core-native.test.ts": 49,
-    "tests/annexb-legacy-lookup-boundary.test.ts": 44,
-    "tests/annexb-proto-boundary.test.ts": 127,
+    "tests/annexb-legacy-lookup-boundary.test.ts": 97,
+    "tests/annexb-object-accessors-native.test.ts": 80,
+    "tests/annexb-proto-boundary.test.ts": 349,
     "tests/callable-object-evidence.test.ts": 41,
     "tests/completion-records.test.ts": 1335,
     "tests/ds12-module-observables-native.test.ts": 72,
@@ -52,6 +54,7 @@ export const nodeShardCosts = {
     "tests/property/m5-annexb-date-methods.property.test.ts": 32,
     "tests/property/m5-annexb-escape.property.test.ts": 87,
     "tests/property/m5-annexb-legacy-lookup-boundary.property.test.ts": 33,
+    "tests/property/m5-annexb-object-accessors.property.test.ts": 98,
     "tests/property/m5-annexb-proto-boundary.property.test.ts": 83,
     "tests/property/m5-annexb-string-methods.property.test.ts": 37,
     "tests/property/m5-arguments-object.property.test.ts": 37,
@@ -140,8 +143,9 @@ export const nodeShardCosts = {
   "macos-aarch64": {
     "packages/runtime-c/tests/dense-index.test.ts": 54,
     "tests/annex-b-mixed-core-native.test.ts": 61,
-    "tests/annexb-legacy-lookup-boundary.test.ts": 72,
-    "tests/annexb-proto-boundary.test.ts": 179,
+    "tests/annexb-legacy-lookup-boundary.test.ts": 74,
+    "tests/annexb-object-accessors-native.test.ts": 61,
+    "tests/annexb-proto-boundary.test.ts": 268,
     "tests/callable-object-evidence.test.ts": 40,
     "tests/completion-records.test.ts": 906,
     "tests/ds12-module-observables-native.test.ts": 68,
@@ -170,6 +174,7 @@ export const nodeShardCosts = {
     "tests/property/es2026-upsert.property.test.ts": 52,
     "tests/property/m5-annexb-escape.property.test.ts": 67,
     "tests/property/m5-annexb-legacy-lookup-boundary.property.test.ts": 35,
+    "tests/property/m5-annexb-object-accessors.property.test.ts": 75,
     "tests/property/m5-annexb-proto-boundary.property.test.ts": 69,
     "tests/property/m5-arguments-object.property.test.ts": 42,
     "tests/property/m5-array-buffer.property.test.ts": 37,

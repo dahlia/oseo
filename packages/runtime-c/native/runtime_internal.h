@@ -447,11 +447,20 @@
     (OSEO_OBJECT_CODE_ID_RANGE_LAST - 30u)
 #define OSEO_OBJECT_VALUES_CODE_ID \
     (OSEO_OBJECT_CODE_ID_RANGE_LAST - 31u)
-/* Reflectable identities only; their excluded Annex B bodies never run. */
-#define OSEO_OBJECT_OMITTED_PROTO_GET_CODE_ID \
+/* The Object.prototype.__proto__ accessor halves and the four legacy
+ * accessor methods of ECMA-262 20.1.3.8 through 20.1.3.12. */
+#define OSEO_OBJECT_PROTO_GET_CODE_ID \
     (OSEO_OBJECT_CODE_ID_RANGE_LAST - 32u)
-#define OSEO_OBJECT_OMITTED_PROTO_SET_CODE_ID \
+#define OSEO_OBJECT_PROTO_SET_CODE_ID \
     (OSEO_OBJECT_CODE_ID_RANGE_LAST - 33u)
+#define OSEO_OBJECT_DEFINE_GETTER_CODE_ID \
+    (OSEO_OBJECT_CODE_ID_RANGE_LAST - 34u)
+#define OSEO_OBJECT_DEFINE_SETTER_CODE_ID \
+    (OSEO_OBJECT_CODE_ID_RANGE_LAST - 35u)
+#define OSEO_OBJECT_LOOKUP_GETTER_CODE_ID \
+    (OSEO_OBJECT_CODE_ID_RANGE_LAST - 36u)
+#define OSEO_OBJECT_LOOKUP_SETTER_CODE_ID \
+    (OSEO_OBJECT_CODE_ID_RANGE_LAST - 37u)
 
 #define OSEO_NUMBER_CODE_ID_RANGE_INDEX ((size_t)10u)
 #define OSEO_NUMBER_CODE_ID_RANGE_FIRST \
@@ -1361,25 +1370,12 @@ typedef struct {
     size_t index;
 } OseoEnumeration;
 
-/* Private identity availability, never a JavaScript value or callable.
- * An omitted half is present but its function identity/behavior is unavailable.
- * Metadata consumers may inspect attributes; value consumers must diagnose
- * OSEO1001 before reading or exposing a half marked here. */
-enum {
-    OSEO_OMITTED_GETTER = 1u,
-    OSEO_OMITTED_SETTER = 2u,
-};
-
 typedef struct {
     OseoPropertyAttributes attributes;
-    /* Fits existing descriptor padding; concrete descriptor halves are zero. */
-    uint8_t omitted_accessors;
     OseoValue key;
     /* Unused, and left undefined, when attributes.accessor is true. */
     OseoValue value;
-    /* [[Get]] and [[Set]], each undefined when absent. A corresponding
-     * omitted_accessors bit means NO identity is stored: the scratch slot
-     * must not be exposed as an undefined getter/setter. Unused, and left
+    /* [[Get]] and [[Set]], each undefined when absent. Unused, and left
      * undefined, when attributes.accessor is false. */
     OseoValue getter;
     OseoValue setter;
@@ -1547,16 +1543,6 @@ typedef struct {
      * which carry it through `module_namespace` above.
      */
     bool immutable_prototype;
-    /* The omitted legacy accessor is only an exclusion dependency until
-     * ordinary deletion removes it. This state belongs to each intrinsic
-     * object, survives user redefinition, and installs no Annex B accessor. */
-    bool annexb_proto_deleted;
-    bool annexb_proto_configurable;
-    bool annexb_proto_enumerable;
-    /* Original vector insertion position, at most the seven bootstrap keys.
-     * Successful removal of an earlier stored key decrements this position.
-     * User additions follow it; deletion/recreation uses ordinary new order. */
-    uint8_t annexb_proto_position;
     /*
      * The realm's global this value, whose var-scoped Script bindings
      * are own properties storing the binding cell instead of the value.
@@ -4197,26 +4183,14 @@ OseoResult oseo_internal_bigint_from_uint64(
     uint64_t magnitude,
     bool negative
 );
-/* True only for the original omitted own accessor metadata, before a
- * stored replacement or deletion retires it. No getter/setter value exists. */
-bool oseo_internal_virtual_annexb_proto_descriptor(
-    OseoValue object_value,
-    OseoValue key,
-    OseoPropertyAttributes *attributes
-);
-/* Shared dependency diagnostic for unavailable accessor values/identities. */
-OseoResult oseo_internal_omitted_proto_error(OseoContext *context);
 /*
  * Reads the own property descriptor named by key, including the
  * synthetic `prototype` and array `length` descriptors. A module
  * namespace export returns its stored cell, while namespace metadata
  * returns its plain value. *value is the data value, or undefined for
  * an accessor property; *getter and *setter are each undefined unless
- * the property is an accessor with that slot present. omitted_accessors
- * identifies present Annex accessor halves whose identity is unavailable;
- * their getter/setter scratch outputs are NOT undefined property identities.
- * A NULL mask is permitted only for metadata-only consumers that never read
- * or expose getter/setter identities. Concrete values stay caller-rooted.
+ * the property is an accessor with that slot present. Concrete values stay
+ * caller-rooted.
  */
 bool oseo_internal_own_descriptor(
     OseoValue object_value,
@@ -4224,8 +4198,7 @@ bool oseo_internal_own_descriptor(
     OseoValue *value,
     OseoPropertyAttributes *attributes,
     OseoValue *getter,
-    OseoValue *setter,
-    uint8_t *omitted_accessors
+    OseoValue *setter
 );
 /*
  * Reads the bootstrap descriptor state of %String.prototype%'s iterator.
@@ -4255,8 +4228,7 @@ bool oseo_internal_own_property_descriptor(
     OseoValue *value,
     OseoPropertyAttributes *attributes,
     OseoValue *getter,
-    OseoValue *setter,
-    uint8_t *omitted_accessors
+    OseoValue *setter
 );
 /*
  * The binding read a module namespace's [[GetOwnProperty]] (10.4.6.5)
@@ -4433,8 +4405,7 @@ OseoResult oseo_internal_proxy_get_own_property(
     OseoValue *value,
     OseoPropertyAttributes *attributes,
     OseoValue *getter,
-    OseoValue *setter,
-    uint8_t *omitted_accessors
+    OseoValue *setter
 );
 OseoResult oseo_internal_proxy_define_own_property(
     OseoContext *context,

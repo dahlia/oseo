@@ -56,31 +56,35 @@ three sums, rounded up, so the margin below is a slow runner's. Files under 30
 seconds have no entry and weigh the host fallback, 18 seconds on both hosts,
 which is the median of every measured weight.
 
-Eighteen files postdate those runs. Serial local runs from 2026-11-01 to
+Twenty-two files postdate those runs. Local runs from 2026-11-01 to
 2026-11-04 of the residual evidence and those files, on one host, give the
 calibration:
 
-| File                                                       | Local, s | Linux weight | macOS weight |
-| ---------------------------------------------------------- | -------: | -----------: | -----------: |
-| *tests/dynamic-source-residual-evidence.test.ts*           |    798.3 |   2,055 (CI) |   1,576 (CI) |
-| *tests/host-script-evidence.test.ts*                       |    290.8 |          749 |          574 |
-| *tests/trainc-ordinary-evidence.test.ts*                   |    155.2 |          400 |          307 |
-| *tests/unhandled-rejection-policy-native.test.ts*          |      9.5 |     fallback |     fallback |
-| *tests/host-script-trainc-evidence-1.test.ts*              |    335.4 |          864 |          663 |
-| *tests/host-script-trainc-evidence-2.test.ts*              |    291.9 |          752 |          577 |
-| *tests/host-script-trainc-evidence-3.test.ts*              |    284.2 |          732 |          561 |
-| *tests/host-script-trainc-evidence-4.test.ts*              |    261.2 |          673 |          516 |
-| *tests/function-constructor-evidence.test.ts*              |     55.5 |          143 |          110 |
-| *tests/legacy-caller.test.ts*                              |     26.9 |           70 |           54 |
-| *tests/property/m5-annexb-escape.property.test.ts*         |     33.7 |           87 |           67 |
-| *tests/property/m5-annexb-string-methods.property.test.ts* |     14.2 |           37 |     fallback |
-| *tests/property/m5-annexb-date-methods.property.test.ts*   |     12.2 |           32 |     fallback |
-| *tests/es2026-builtins-native.test.ts*                     |     37.8 |           98 |           75 |
-| *tests/property/es2026-error-is-error.property.test.ts*    |     11.5 |     fallback |     fallback |
-| *tests/property/es2026-math-sum-precise.property.test.ts*  |      9.5 |     fallback |     fallback |
-| *tests/property/es2026-upsert.property.test.ts*            |     26.1 |           68 |           52 |
-| *tests/property/es2026-iterator-concat.property.test.ts*   |     14.5 |           38 |     fallback |
-| *tests/property/es2026-iterator-zip.property.test.ts*      |     22.9 |           60 |           46 |
+| File                                                         | Local, s | Linux weight | macOS weight |
+| ------------------------------------------------------------ | -------: | -----------: | -----------: |
+| *tests/dynamic-source-residual-evidence.test.ts*             |    798.3 |   2,055 (CI) |   1,576 (CI) |
+| *tests/host-script-evidence.test.ts*                         |    290.8 |          749 |          574 |
+| *tests/trainc-ordinary-evidence.test.ts*                     |    155.2 |          400 |          307 |
+| *tests/unhandled-rejection-policy-native.test.ts*            |      9.5 |     fallback |     fallback |
+| *tests/host-script-trainc-evidence-1.test.ts*                |    335.4 |          864 |          663 |
+| *tests/host-script-trainc-evidence-2.test.ts*                |    291.9 |          752 |          577 |
+| *tests/host-script-trainc-evidence-3.test.ts*                |    284.2 |          732 |          561 |
+| *tests/host-script-trainc-evidence-4.test.ts*                |    261.2 |          673 |          516 |
+| *tests/function-constructor-evidence.test.ts*                |     55.5 |          143 |          110 |
+| *tests/legacy-caller.test.ts*                                |     26.9 |           70 |           54 |
+| *tests/property/m5-annexb-escape.property.test.ts*           |     33.7 |           87 |           67 |
+| *tests/property/m5-annexb-string-methods.property.test.ts*   |     14.2 |           37 |     fallback |
+| *tests/property/m5-annexb-date-methods.property.test.ts*     |     12.2 |           32 |     fallback |
+| *tests/es2026-builtins-native.test.ts*                       |     37.8 |           98 |           75 |
+| *tests/property/es2026-error-is-error.property.test.ts*      |     11.5 |     fallback |     fallback |
+| *tests/property/es2026-math-sum-precise.property.test.ts*    |      9.5 |     fallback |     fallback |
+| *tests/property/es2026-upsert.property.test.ts*              |     26.1 |           68 |           52 |
+| *tests/property/es2026-iterator-concat.property.test.ts*     |     14.5 |           38 |     fallback |
+| *tests/property/es2026-iterator-zip.property.test.ts*        |     22.9 |           60 |           46 |
+| *tests/annexb-object-accessors-native.test.ts*               |     30.8 |           80 |           61 |
+| *tests/property/m5-annexb-object-accessors.property.test.ts* |     38.0 |           98 |           75 |
+| *tests/annexb-proto-boundary.test.ts*                        |    135.5 |          349 |          268 |
+| *tests/annexb-legacy-lookup-boundary.test.ts*                |     37.3 |           97 |           74 |
 
 The ratios are 2.574 for Linux and 1.974 for macOS, the residual file's
 largest CI sum over its local sum. The fastest Linux observation gives
@@ -94,6 +98,14 @@ seconds in that run against 13.0 before, so the host was slower that day and
 the entry errs high. The escape
 suite's first run, directly after a build, took 56.4 seconds; the table uses
 its second run, like the other two files' runs on the same warm cache.
+
+The four Annex B Object accessor files were measured on 2026-11-04 while other
+lanes kept the host's load average between 31 and 62 on 16 cores, so they may
+be high. The property file and the lookup test ran as two file workers side by
+side; the other two ran alone. *tests/annexb-proto-boundary.test.ts* and
+*tests/annexb-legacy-lookup-boundary.test.ts* replace their earlier CI weights
+because the unit rewrote both files to compare the implemented behavior with
+the references.
 
 
 Model

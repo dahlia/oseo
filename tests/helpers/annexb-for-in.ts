@@ -18,7 +18,7 @@ export interface AnnexbForInCase {
   readonly value: number;
 }
 
-/** Render one isolated Script, including no read of the omitted accessor. */
+/** Render one isolated Script that enumerates the accessor property. */
 export function annexbForInProgram(input: AnnexbForInCase): string {
   const prefix = `
 const P = Object.prototype, K = "__proto__";
