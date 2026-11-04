@@ -640,3 +640,7 @@ families:
     owner: tests/property/es2026-iterator-concat.property.test.ts
     start: 0x60009c00
     end: 0x60009cff
+  - family: es2026-iterator-zip
+    owner: tests/property/es2026-iterator-zip.property.test.ts
+    start: 0x6000ab00
+    end: 0x6000abff

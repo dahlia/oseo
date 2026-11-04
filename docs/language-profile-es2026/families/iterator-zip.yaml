@@ -1,0 +1,70 @@
+version: 1
+id: iterator-zip
+title: "Iterator.zip and Iterator.zipKeyed"
+scope:
+  - "The Iterator.zip and Iterator.zipKeyed function properties, their
+    descriptors, names, lengths, and non-constructor status, and their
+    %IteratorHelperPrototype% results."
+  - "Option validation and read order, the shortest, longest, and strict
+    modes, padding from an iterable or by key, the zipKeyed own-key walk
+    that skips absent, non-enumerable, and undefined entries, and fresh
+    array or null-prototype result objects."
+  - "IteratorCloseAll from the last open iterator to the first after every
+    abrupt setup step, a step that throws, a shortest or strict finish, and
+    return before the first step or at a yield, with the first close error
+    replacing a return completion and later ones suppressed; and the
+    running-generator TypeError for next and return."
+owners:
+  - docs/language-profile-es2026.md
+evidence:
+  differential:
+    status: omitted
+    reason: "Neither pinned reference host implements Iterator.zip or
+      Iterator.zipKeyed. The fixtures instead run on Node.js and Deno over an
+      independent model written from the joint iteration specification
+      text, except the re-entrant close probe, which runs on Deno alone
+      because Node.js 24.21.0 completes a helper before a return at a yield
+      closes. The property suite runs that model on Node.js and also checks
+      a second model of the closure."
+    replacements:
+      - tests/native/iterator-zip-model.ts
+      - tests/native/fixtures/iterator-zip.ts
+      - tests/property/es2026-iterator-zip.property.test.ts
+  fixed:
+    status: covered
+    references:
+      - tests/native/fixtures/iterator-zip.ts
+  forced-collection:
+    status: covered
+    references:
+      - tests/es2026-builtins-native.test.ts
+      - tests/native/fixtures/iterator-zip.ts
+      - tests/property/es2026-iterator-zip.property.test.ts
+  generated:
+    status: covered
+    references:
+      - tests/property/es2026-iterator-zip.property.test.ts
+  guard-fallback:
+    status: covered
+    references:
+      - tests/es2026-builtins-native.test.ts
+      - tests/native/fixtures/iterator-zip.ts
+      - tests/property/es2026-iterator-zip.property.test.ts
+  specialization:
+    status: covered
+    references:
+      - tests/es2026-builtins-native.test.ts
+      - tests/native/fixtures/iterator-zip.ts
+      - tests/property/es2026-iterator-zip.property.test.ts
+  standards:
+    status: omitted
+    reason: "The 82 test/built-ins/Iterator/zip and zipKeyed rows stay
+      unreviewed in the closure ledger until the unit admits them and the
+      full test262 update observes them."
+    replacements:
+      - tests/native/fixtures/iterator-zip.ts
+      - tests/property/es2026-iterator-zip.property.test.ts
+  structural:
+    status: covered
+    references:
+      - packages/runtime-c/tests/intrinsic-graph.test.ts

@@ -1526,3 +1526,16 @@ count in `remaining`, the next pair in `counter`, and the forwarded iterator in
 the inner fields. It has no underlying iterator, so `return` before the first
 step closes nothing and `return` at a yield closes only the forwarded
 iterator. No heap kind or traced field is added.
+
+ABI `m5-152` adds `Iterator.zip` and `Iterator.zipKeyed` as own function
+properties of `%Iterator%` with the iterator component's next two code IDs and
+no intrinsic slot. Their results are iterator helpers of the new
+`OSEO_ITERATOR_HELPER_ZIP` kind and reuse the helper's traced fields:
+`callback` holds an internal array with one iterator, `next` method, and
+padding triple per input, where a null iterator has left the open set;
+`remaining` holds the input count, `counter` the mode, and `underlying_next`
+the key array of `zipKeyed`. A zip helper has no underlying iterator, so its
+`return` closes the open inputs from the last to the first instead. The
+`zipKeyed` walk reads `[[GetOwnProperty]]` through the new
+`oseo_internal_own_property_enumerable`, which answers for proxies and
+ordinary objects alike. No heap kind or traced field is added.

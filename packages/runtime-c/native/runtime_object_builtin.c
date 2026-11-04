@@ -2638,6 +2638,46 @@ static OseoResult object_close_after_abrupt(
     return result;
 }
 
+OseoResult oseo_internal_own_property_enumerable(
+    OseoContext *context,
+    OseoValue object_value,
+    OseoValue key,
+    bool *enumerable
+) {
+    *enumerable = false;
+    OseoValue value = oseo_undefined();
+    OseoValue getter = oseo_undefined();
+    OseoValue setter = oseo_undefined();
+    OseoPropertyAttributes attributes = {false, false, false, false};
+    bool exists = false;
+    OseoResult result = is_proxy(object_value)
+        ? oseo_internal_proxy_get_own_property(
+            context,
+            object_value,
+            key,
+            &exists,
+            &value,
+            &attributes,
+            &getter,
+            &setter,
+            NULL
+        )
+        : own_property_query(
+            context,
+            object_value,
+            key,
+            &exists,
+            &value,
+            &attributes,
+            &getter,
+            &setter,
+            NULL
+        );
+    if (result.status != OSEO_STATUS_NORMAL) return result;
+    *enumerable = exists && attributes.enumerable;
+    return normal(oseo_undefined());
+}
+
 OseoResult oseo_internal_own_key_array(
     OseoContext *context,
     OseoValue object_value,

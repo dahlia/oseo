@@ -792,8 +792,8 @@ assessments:
     disposition: exclusion
     normativeDependency: source-evaluation-only
     replacementEvidence:
-      tests/es2026-builtins-native.test.ts: "39cdcd3a997797f478249948269b63550f\
-        fdb304e26b806008ceb6af2940fae5"
+      tests/es2026-builtins-native.test.ts: "ab69ca90335f086800e1eb6523bc83b32b\
+        9514e83f7c89b2a748fafe120afe2b"
       tests/native/fixtures/error-is-error.ts: "e004e4fe172da79b2bf1391518fd9b1\
         4fac9a53f79f15596fb4f44ac14005a25"
       tests/native/fixtures/upsert.ts: "76d260a8ef0748cfaf30cb3d3b93d78ac14b420\
@@ -5886,8 +5886,8 @@ assessments:
         "e72a8825962259d03d81348ee5cbee3184d7b0632018d4e6\
         b5feac705067650d"
       packages/runtime-c/native/runtime_internal.h:
-        "d7f4789ec3733e21aa77cf9902717eb483bf93355b636bf3\
-        6faf79537caa6b01"
+        "ae7ba67bd3905a07aa6b63b64eef1581785c829e038f5941\
+        6cf348ec275f4b76"
       packages/runtime-c/native/oseo_runtime.h:
         "c924d8b90f9aa9f55ec958b402588eca7f2d9b99853dbe2b\
         bdf6dc86e3ad000c"
@@ -5895,8 +5895,8 @@ assessments:
         "bcf729b61049bdd7486c230c5cb653edfaae769360bc4d3e\
         e0c4f1eea10a663b"
       packages/runtime-c/src/index.ts:
-        "92a2f24a155a769e4f5c36c593de3a9fe7012d51e3d04d7f\
-        9d888336186c6eb2"
+        "522dfbc9276ec0ddd963dd9f03993a334de0af7b9f80adca\
+        67a6bb5ac1258425"
   observation-train-b26a-b26b-b27:
     disposition: deferral
     normativeDependency: not-demonstrated

@@ -7,13 +7,13 @@ Status
 Implementation status: in progress. The `claim-boundary` unit has applied ADR
 0032. The `legacy-caller`, `annexb-escape`, `annexb-string-methods`,
 `annexb-date-methods`, `error-is-error`, `math-sum-precise`, `upsert`, and
-`iterator-concat` units are implemented and observed, and every other unit is
-open. This plan follows M5 directly and runs
-alongside M6. It has no milestone number. It schedules the language work
-the maintainer approved on 2026-11-02: build-time static-specifier `import()`,
-Annex B legacy web behavior except `document.all`, the legacy `caller`
-extension, the seven ECMAScript 2026 features, and the three ECMAScript 2027
-features other than Temporal.
+`iterator-concat` units are implemented and observed, `iterator-zip` is
+implemented and waits for its observation, and every other unit is open. This
+plan follows M5 directly and runs alongside M6. It has no milestone number. It
+schedules the language work the maintainer approved on 2026-11-02: build-time
+static-specifier `import()`, Annex B legacy web behavior except `document.all`,
+the legacy `caller` extension, the seven ECMAScript 2026 features, and the
+three ECMAScript 2027 features other than Temporal.
 
 The plan is written for parallel implementation. Each work unit below owns an
 exact set of test262 paths, names its prerequisites, and lists the shared files
@@ -646,7 +646,9 @@ current *tests/test262/inventory.tsv*.
  -  `iterator-zip` owns `Iterator.zip` and `Iterator.zipKeyed` (82), with the
     `shortest`, `longest`, and `strict` modes and padding. Neither reference
     host implements them, so a model written from the specification replaces
-    differential evidence.
+    differential evidence. The runtime, fixtures, and property suite are
+    implemented, and the reviewed harness carries *iteratorZipUtils.js*; the
+    rows stay unreviewed until the full test262 update.
  -  `atomics-pause` owns `Atomics.pause` (5). It validates the optional
     iteration count and returns `undefined`. Whether it emits a processor
     pause hint is a target choice recorded in the target description.
@@ -703,7 +705,7 @@ standards update and heavy gates on the new base.
     row's owner moves. The audit binds ADR texts by digest, so a unit that
     edits ADR 0013, 0016, or 0028 re-reviews the rows that cite it.
  -  The runtime ABI version in *packages/runtime-c/src/index.ts*, currently
-    `m5-151`, changes once per landing that alters the ABI. The series keeps
+    `m5-152`, changes once per landing that alters the ABI. The series keeps
     its `m5-` prefix, and the closure tools keep their `m5c` names.
  -  Runtime code ranges, property blocks, intrinsic indexes, and heap kinds
     are reserved per unit.

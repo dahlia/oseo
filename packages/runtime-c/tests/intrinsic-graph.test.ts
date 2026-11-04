@@ -2970,3 +2970,33 @@ test("runs Iterator.concat as an iterator helper without an underlying", () => {
     /if \(result\.status == OSEO_STATUS_NORMAL && !concat\) \{/u,
   );
 });
+
+test("runs Iterator.zip as an iterator helper over a record array", () => {
+  const internalHeader = sources.get("runtime_internal.h") ?? "";
+  const iteratorSource = sources.get("runtime_iterator.c") ?? "";
+  // zip and zipKeyed take the next two iterator code IDs and no
+  // intrinsic slot, and their helper kind reuses the helper's traced
+  // fields, so no heap kind or traced field is added.
+  assert.match(internalHeader, /OSEO_ITERATOR_HELPER_ZIP = 6,/u);
+  assert.ok(
+    internalHeader.includes(
+      "#define OSEO_ITERATOR_ZIP_KEYED_CODE_ID \\\n" +
+        "    (OSEO_ITERATOR_CODE_ID_RANGE_LAST - 32u)",
+    ),
+  );
+  assert.ok(
+    iteratorSource.includes(
+      "OSEO_ITERATOR_HELPER_ZIP,\n            oseo_undefined(),\n" +
+        "            slots[4],\n            slots[3],",
+    ),
+  );
+  // return closes the open iterators through IteratorCloseAll, never an
+  // underlying iterator, which a zip helper does not have.
+  assert.ok(
+    iteratorSource.includes(
+      "if (helper->kind == OSEO_ITERATOR_HELPER_ZIP) {\n" +
+        "        return iterator_zip_return(context, receiver, " +
+        "suspended_yield);",
+    ),
+  );
+});

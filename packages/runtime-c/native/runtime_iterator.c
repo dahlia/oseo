@@ -29,6 +29,12 @@ static OseoResult iterator_concat(
     size_t argument_count,
     const OseoValue *arguments
 );
+static OseoResult iterator_zip(
+    OseoContext *context,
+    size_t argument_count,
+    const OseoValue *arguments,
+    bool keyed
+);
 static OseoResult iterator_helper_method(
     OseoContext *context,
     size_t code_id,
@@ -113,6 +119,15 @@ OseoResult oseo_internal_iterator_builtin_dispatch(
     }
     if (code_id == OSEO_ITERATOR_CONCAT_CODE_ID) {
         return iterator_concat(context, argument_count, arguments);
+    }
+    if (code_id == OSEO_ITERATOR_ZIP_CODE_ID ||
+        code_id == OSEO_ITERATOR_ZIP_KEYED_CODE_ID) {
+        return iterator_zip(
+            context,
+            argument_count,
+            arguments,
+            code_id == OSEO_ITERATOR_ZIP_KEYED_CODE_ID
+        );
     }
     if (code_id == OSEO_WRAP_FOR_VALID_ITERATOR_NEXT_CODE_ID) {
         return wrap_for_valid_iterator_next(context, receiver);
@@ -595,6 +610,37 @@ OseoResult oseo_internal_array_iterator_prototype(OseoContext *context) {
             frame.slots[3],
             frame.slots[4]
         );
+    }
+    /* Iterator.zip and Iterator.zipKeyed own no intrinsic slot either. */
+    static const size_t zip_codes[] = {
+        OSEO_ITERATOR_ZIP_CODE_ID,
+        OSEO_ITERATOR_ZIP_KEYED_CODE_ID,
+    };
+    static const char *const zip_names[] = {"zip", "zipKeyed"};
+    for (size_t index = 0u;
+         result.status == OSEO_STATUS_NORMAL && index < 2u;
+         index += 1u) {
+        result = create_iterator_builtin(
+            context,
+            zip_codes[index],
+            zip_names[index],
+            1u,
+            OSEO_FUNCTION_INTERNAL,
+            OSEO_FUNCTION_NAME_PREFIX_NONE
+        );
+        frame.slots[4] = result.value;
+        if (result.status == OSEO_STATUS_NORMAL) {
+            result = ascii_iterator_string(context, zip_names[index]);
+            frame.slots[3] = result.value;
+        }
+        if (result.status == OSEO_STATUS_NORMAL) {
+            result = define_iterator_data(
+                context,
+                frame.slots[2],
+                frame.slots[3],
+                frame.slots[4]
+            );
+        }
     }
     if (result.status == OSEO_STATUS_NORMAL) {
         result = oseo_internal_iterator_method(
@@ -1190,24 +1236,23 @@ static OseoResult helper_get_iterator_direct(
 
 /*
  * GetIteratorFlattenable(value, REJECT-PRIMITIVES), which is what
- * flatMap applies to each mapped value. A primitive, a String included,
- * is rejected rather than iterated; a nullish `Symbol.iterator` leaves
- * the object itself as the iterator; and any other non-callable value
- * there is a TypeError.
+ * flatMap applies to each mapped value and Iterator.zip and
+ * Iterator.zipKeyed apply to each input. A primitive, a String included,
+ * is rejected with `primitive_error` rather than iterated; a nullish
+ * `Symbol.iterator` leaves the object itself as the iterator; and any
+ * other non-callable value there is a TypeError.
  */
 static OseoResult helper_get_iterator_flattenable(
     OseoContext *context,
     OseoValue value,
+    const char *primitive_error,
     OseoValue *iterator,
     OseoValue *next_method
 ) {
     *iterator = oseo_undefined();
     *next_method = oseo_undefined();
     if (!is_object(value)) {
-        return iterator_type_error(
-            context,
-            "flatMap requires each mapped value to be an object."
-        );
+        return iterator_type_error(context, primitive_error);
     }
     OseoValue slots[2] = {value, oseo_undefined()};
     OseoRootFrame frame = {NULL, slots, 2u};
@@ -1602,6 +1647,7 @@ static OseoResult iterator_helper_advance(
         result = helper_get_iterator_flattenable(
             context,
             slots[3],
+            "flatMap requires each mapped value to be an object.",
             &inner_iterator,
             &inner_next
         );
@@ -1618,9 +1664,10 @@ static OseoResult iterator_helper_advance(
     return result;
 }
 
-/* Read one element of the internal Iterator.concat record array. Its
- * elements are own data properties, so the read runs no user code. */
-static OseoResult concat_record(
+/* Read one element of an internal Iterator.concat or Iterator.zip record
+ * array. Its elements are own data properties, so the read runs no user
+ * code. */
+static OseoResult helper_record(
     OseoContext *context,
     OseoValue records,
     size_t index,
@@ -1779,9 +1826,9 @@ static OseoResult iterator_concat_advance(
         size_t pair = (size_t)helper->counter;
         helper->counter += 1.0;
         slots[1] = helper->callback;
-        result = concat_record(context, slots[1], pair * 2u, &slots[3]);
+        result = helper_record(context, slots[1], pair * 2u, &slots[3]);
         if (result.status == OSEO_STATUS_NORMAL) {
-            result = concat_record(
+            result = helper_record(
                 context,
                 slots[1],
                 pair * 2u + 1u,
@@ -1824,6 +1871,788 @@ static OseoResult iterator_concat_advance(
     return result;
 }
 
+/*
+ * Iterator.zip and Iterator.zipKeyed, from the joint iteration proposal
+ * that ADR 0032 admits. Both build the iterator list IteratorZip steps,
+ * and they differ only in how the list and the padding are collected
+ * and in the shape of each result. The record array keeps three
+ * elements per iterator: the iterator, which is null once it has left
+ * openIters, its captured `next` method, and its padding value.
+ */
+typedef enum {
+    ZIP_MODE_SHORTEST = 0,
+    ZIP_MODE_LONGEST = 1,
+    ZIP_MODE_STRICT = 2,
+} ZipMode;
+
+#define ZIP_RECORD_WIDTH ((size_t)3u)
+
+/* Replace one element of an internal record array. The element is an
+ * own writable data property, so the write runs no user code. */
+static OseoResult helper_record_set(
+    OseoContext *context,
+    OseoValue records,
+    size_t index,
+    OseoValue value
+) {
+    char digits[24];
+    (void)snprintf(digits, sizeof(digits), "%zu", index);
+    OseoValue slots[3] = {records, oseo_undefined(), value};
+    OseoRootFrame frame = {NULL, slots, 3u};
+    oseo_roots_push(context, &frame);
+    OseoResult result = ascii_iterator_string(context, digits);
+    slots[1] = result.value;
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = oseo_object_set(context, slots[0], slots[1], slots[2], true);
+    }
+    oseo_roots_pop(context, &frame);
+    return result;
+}
+
+/* Remove the iterator at `index` from openIters. */
+static OseoResult zip_remove(
+    OseoContext *context,
+    OseoValue records,
+    size_t index
+) {
+    return helper_record_set(
+        context,
+        records,
+        index * ZIP_RECORD_WIDTH,
+        oseo_null()
+    );
+}
+
+/*
+ * IteratorCloseAll(openIters, completion) over the first `count`
+ * records, from the last to the first, skipping every iterator that has
+ * left openIters. A throw completion closes each iterator with its own
+ * errors suppressed and is returned unchanged. A normal `completion`
+ * stands for a return completion: the first close that throws, or whose
+ * `return` result is not an object, replaces it with that throw, and
+ * the remaining iterators then close with their errors suppressed.
+ */
+static OseoResult zip_close_all(
+    OseoContext *context,
+    OseoValue records,
+    size_t count,
+    OseoResult completion
+) {
+    if (completion.status != OSEO_STATUS_NORMAL &&
+        (completion.status != OSEO_STATUS_THROW || context->has_diagnostic)) {
+        return completion;
+    }
+    bool throwing = completion.status == OSEO_STATUS_THROW;
+    /* 0 records, 1 iterator, 2 thrown value. */
+    OseoValue slots[3] = {
+        records,
+        oseo_undefined(),
+        throwing ? completion.value : oseo_undefined(),
+    };
+    OseoRootFrame frame = {NULL, slots, 3u};
+    oseo_roots_push(context, &frame);
+    if (throwing) oseo_context_clear_language_error(context);
+    OseoResult result = normal(oseo_undefined());
+    for (size_t index = count; index > 0u; index -= 1u) {
+        result = helper_record(
+            context,
+            slots[0],
+            (index - 1u) * ZIP_RECORD_WIDTH,
+            &slots[1]
+        );
+        if (result.status != OSEO_STATUS_NORMAL) break;
+        if (!is_object(slots[1])) continue;
+        result = oseo_iterator_close(context, slots[1], throwing);
+        if (result.status != OSEO_STATUS_NORMAL) {
+            if (result.status != OSEO_STATUS_THROW || context->has_diagnostic) {
+                break;
+            }
+            throwing = true;
+            slots[2] = result.value;
+            oseo_context_clear_language_error(context);
+            result = normal(oseo_undefined());
+        }
+    }
+    if (result.status == OSEO_STATUS_NORMAL && throwing) {
+        result = (OseoResult){OSEO_STATUS_THROW, slots[2]};
+    }
+    oseo_roots_pop(context, &frame);
+    return result;
+}
+
+/*
+ * GetIterator(value, SYNC) as a captured record: the Symbol.iterator
+ * method must be present and callable, and the iterator it returns must
+ * be an object whose `next` is read once.
+ */
+static OseoResult zip_get_iterator(
+    OseoContext *context,
+    OseoValue value,
+    const char *missing_error,
+    OseoValue *iterator,
+    OseoValue *next_method
+) {
+    *iterator = oseo_undefined();
+    *next_method = oseo_undefined();
+    OseoValue slots[2] = {value, oseo_undefined()};
+    OseoRootFrame frame = {NULL, slots, 2u};
+    oseo_roots_push(context, &frame);
+    OseoResult result = oseo_internal_well_known_symbol(
+        context,
+        OSEO_WELL_KNOWN_ITERATOR
+    );
+    slots[1] = result.value;
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = oseo_object_get(context, slots[0], slots[1]);
+        slots[1] = result.value;
+    }
+    if (result.status == OSEO_STATUS_NORMAL && is_nullish(slots[1])) {
+        result = iterator_type_error(context, missing_error);
+    } else if (result.status == OSEO_STATUS_NORMAL && !is_callable(slots[1])) {
+        result = iterator_type_error(
+            context,
+            "The Symbol.iterator property is not callable."
+        );
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = oseo_call_function(
+            context,
+            slots[1],
+            slots[0],
+            0u,
+            NULL,
+            oseo_undefined()
+        );
+        slots[1] = result.value;
+    }
+    if (result.status == OSEO_STATUS_NORMAL && !is_object(slots[1])) {
+        result = iterator_type_error(
+            context,
+            "The iterator method did not return an object."
+        );
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        OseoValue captured = oseo_undefined();
+        result = helper_get_iterator_direct(context, slots[1], &captured);
+        if (result.status == OSEO_STATUS_NORMAL) {
+            *iterator = slots[1];
+            *next_method = captured;
+        }
+    }
+    oseo_roots_pop(context, &frame);
+    return result;
+}
+
+/*
+ * GetOptionsObject and the `mode` and `padding` reads. The mode must be
+ * undefined or one of the three mode strings exactly, with no
+ * conversion, and `padding` is read only in "longest" mode, where it
+ * must be undefined or an object.
+ */
+static OseoResult zip_read_options(
+    OseoContext *context,
+    OseoValue options,
+    bool keyed,
+    ZipMode *mode,
+    OseoValue *padding
+) {
+    *mode = ZIP_MODE_SHORTEST;
+    *padding = oseo_undefined();
+    if (tag_of(options) == OSEO_TAG_UNDEFINED) {
+        return normal(oseo_undefined());
+    }
+    if (!is_object(options)) {
+        return iterator_type_error(
+            context,
+            keyed
+                ? "Iterator.zipKeyed options must be an object."
+                : "Iterator.zip options must be an object."
+        );
+    }
+    OseoValue slots[2] = {options, oseo_undefined()};
+    OseoRootFrame frame = {NULL, slots, 2u};
+    oseo_roots_push(context, &frame);
+    OseoResult result = ascii_iterator_string(context, "mode");
+    slots[1] = result.value;
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = oseo_object_get(context, slots[0], slots[1]);
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        OseoValue value = result.value;
+        if (tag_of(value) == OSEO_TAG_UNDEFINED ||
+            oseo_internal_string_is_ascii(value, "shortest")) {
+            *mode = ZIP_MODE_SHORTEST;
+        } else if (oseo_internal_string_is_ascii(value, "longest")) {
+            *mode = ZIP_MODE_LONGEST;
+        } else if (oseo_internal_string_is_ascii(value, "strict")) {
+            *mode = ZIP_MODE_STRICT;
+        } else {
+            result = iterator_type_error(
+                context,
+                "The mode option must be \"shortest\", \"longest\", or "
+                "\"strict\"."
+            );
+        }
+    }
+    if (result.status == OSEO_STATUS_NORMAL && *mode == ZIP_MODE_LONGEST) {
+        result = ascii_iterator_string(context, "padding");
+        slots[1] = result.value;
+        if (result.status == OSEO_STATUS_NORMAL) {
+            result = oseo_object_get(context, slots[0], slots[1]);
+        }
+        if (result.status == OSEO_STATUS_NORMAL &&
+            tag_of(result.value) != OSEO_TAG_UNDEFINED &&
+            !is_object(result.value)) {
+            result = iterator_type_error(
+                context,
+                "The padding option must be an object."
+            );
+        }
+        if (result.status == OSEO_STATUS_NORMAL) *padding = result.value;
+    }
+    oseo_roots_pop(context, &frame);
+    if (result.status != OSEO_STATUS_NORMAL) return result;
+    return normal(oseo_undefined());
+}
+
+/* Append one iterator to the record array, with undefined padding. */
+static OseoResult zip_append_record(
+    OseoContext *context,
+    OseoValue records,
+    OseoValue iterator,
+    OseoValue next_method
+) {
+    OseoValue slots[3] = {records, iterator, next_method};
+    OseoRootFrame frame = {NULL, slots, 3u};
+    oseo_roots_push(context, &frame);
+    OseoResult result = oseo_array_append(context, slots[0], slots[1]);
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = oseo_array_append(context, slots[0], slots[2]);
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = oseo_array_append(context, slots[0], oseo_undefined());
+    }
+    oseo_roots_pop(context, &frame);
+    return result;
+}
+
+/*
+ * Iterator.zip(iterables, options) and Iterator.zipKeyed(iterables,
+ * options). The options are read first. zip then steps the iterables
+ * iterator and opens each value with GetIteratorFlattenable; zipKeyed
+ * walks the own keys of `iterables`, skipping keys whose property is
+ * absent or not enumerable and values that are undefined. In "longest"
+ * mode the padding comes from a padding iterator, closed if it is not
+ * exhausted, or from a property read per key. Every abrupt completion
+ * after the first iterator opens closes the opened iterators, last
+ * first, and a failed open in zip also closes the iterables iterator.
+ */
+static OseoResult iterator_zip(
+    OseoContext *context,
+    size_t argument_count,
+    const OseoValue *arguments,
+    bool keyed
+) {
+    if (argument_count > 0u && arguments == NULL) {
+        return failure(
+            context,
+            "OSEO2001",
+            "Iterator.zip arguments are missing."
+        );
+    }
+    OseoValue iterables = argument_count > 0u
+        ? arguments[0]
+        : oseo_undefined();
+    if (!is_object(iterables)) {
+        return iterator_type_error(
+            context,
+            keyed
+                ? "Iterator.zipKeyed requires an object of iterables."
+                : "Iterator.zip requires an iterable of iterables."
+        );
+    }
+    /*
+     * 0 iterables, 1 options, 2 padding option, 3 records, 4 keys,
+     * 5 iterables or padding iterator, 6 its next method, 7 key,
+     * 8 value, 9 opened iterator, 10 its next method, 11 own keys.
+     */
+    OseoValue slots[12];
+    for (size_t index = 0u; index < 12u; index += 1u) {
+        slots[index] = oseo_undefined();
+    }
+    slots[0] = iterables;
+    slots[1] = argument_count > 1u ? arguments[1] : oseo_undefined();
+    OseoRootFrame frame = {NULL, slots, 12u};
+    oseo_roots_push(context, &frame);
+    ZipMode mode = ZIP_MODE_SHORTEST;
+    OseoResult result = zip_read_options(
+        context,
+        slots[1],
+        keyed,
+        &mode,
+        &slots[2]
+    );
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = oseo_array_create(context, 0u);
+        slots[3] = result.value;
+    }
+    if (result.status == OSEO_STATUS_NORMAL && keyed) {
+        result = oseo_array_create(context, 0u);
+        slots[4] = result.value;
+    }
+    size_t count = 0u;
+    if (result.status == OSEO_STATUS_NORMAL && !keyed) {
+        result = zip_get_iterator(
+            context,
+            slots[0],
+            "Iterator.zip requires an iterable of iterables.",
+            &slots[5],
+            &slots[6]
+        );
+        while (result.status == OSEO_STATUS_NORMAL) {
+            bool done = false;
+            result = helper_iterator_step(
+                context,
+                slots[5],
+                slots[6],
+                true,
+                &slots[8],
+                &done
+            );
+            if (result.status != OSEO_STATUS_NORMAL) {
+                result = zip_close_all(context, slots[3], count, result);
+                break;
+            }
+            if (done) break;
+            result = helper_get_iterator_flattenable(
+                context,
+                slots[8],
+                "Iterator.zip requires every iterable to be an object.",
+                &slots[9],
+                &slots[10]
+            );
+            if (result.status != OSEO_STATUS_NORMAL) {
+                result = zip_close_all(context, slots[3], count, result);
+                result = helper_close_after_abrupt(context, slots[5], result);
+                break;
+            }
+            result = zip_append_record(context, slots[3], slots[9], slots[10]);
+            if (result.status == OSEO_STATUS_NORMAL) count += 1u;
+        }
+    }
+    if (result.status == OSEO_STATUS_NORMAL && keyed) {
+        result = oseo_internal_own_key_array(
+            context,
+            slots[0],
+            OSEO_OWN_KEY_ALL
+        );
+        slots[11] = result.value;
+        size_t key_count = result.status == OSEO_STATUS_NORMAL
+            ? (size_t)ordinary_object(slots[11])->array_length
+            : 0u;
+        for (size_t index = 0u;
+             result.status == OSEO_STATUS_NORMAL && index < key_count;
+             index += 1u) {
+            result = helper_record(context, slots[11], index, &slots[7]);
+            if (result.status != OSEO_STATUS_NORMAL) break;
+            bool enumerable = false;
+            result = oseo_internal_own_property_enumerable(
+                context,
+                slots[0],
+                slots[7],
+                &enumerable
+            );
+            if (result.status == OSEO_STATUS_NORMAL && enumerable) {
+                result = oseo_object_get(context, slots[0], slots[7]);
+                slots[8] = result.value;
+                if (result.status == OSEO_STATUS_NORMAL &&
+                    tag_of(slots[8]) != OSEO_TAG_UNDEFINED) {
+                    result = helper_get_iterator_flattenable(
+                        context,
+                        slots[8],
+                        "Iterator.zipKeyed requires every iterable to be an "
+                        "object.",
+                        &slots[9],
+                        &slots[10]
+                    );
+                    if (result.status == OSEO_STATUS_NORMAL) {
+                        result = oseo_array_append(context, slots[4], slots[7]);
+                    }
+                    if (result.status == OSEO_STATUS_NORMAL) {
+                        result = zip_append_record(
+                            context,
+                            slots[3],
+                            slots[9],
+                            slots[10]
+                        );
+                    }
+                    if (result.status == OSEO_STATUS_NORMAL) count += 1u;
+                }
+            }
+            if (result.status != OSEO_STATUS_NORMAL) {
+                result = zip_close_all(context, slots[3], count, result);
+            }
+        }
+    }
+    if (result.status == OSEO_STATUS_NORMAL &&
+        mode == ZIP_MODE_LONGEST &&
+        tag_of(slots[2]) != OSEO_TAG_UNDEFINED) {
+        if (keyed) {
+            for (size_t index = 0u;
+                 result.status == OSEO_STATUS_NORMAL && index < count;
+                 index += 1u) {
+                result = helper_record(context, slots[4], index, &slots[7]);
+                if (result.status == OSEO_STATUS_NORMAL) {
+                    result = oseo_object_get(context, slots[2], slots[7]);
+                    slots[8] = result.value;
+                }
+                if (result.status == OSEO_STATUS_NORMAL) {
+                    result = helper_record_set(
+                        context,
+                        slots[3],
+                        index * ZIP_RECORD_WIDTH + 2u,
+                        slots[8]
+                    );
+                }
+                if (result.status != OSEO_STATUS_NORMAL) {
+                    result = zip_close_all(context, slots[3], count, result);
+                }
+            }
+        } else {
+            result = zip_get_iterator(
+                context,
+                slots[2],
+                "The padding option must be iterable.",
+                &slots[5],
+                &slots[6]
+            );
+            bool using_iterator = result.status == OSEO_STATUS_NORMAL;
+            for (size_t index = 0u;
+                 result.status == OSEO_STATUS_NORMAL && using_iterator &&
+                 index < count;
+                 index += 1u) {
+                bool done = false;
+                result = helper_iterator_step(
+                    context,
+                    slots[5],
+                    slots[6],
+                    true,
+                    &slots[8],
+                    &done
+                );
+                if (result.status == OSEO_STATUS_NORMAL && done) {
+                    using_iterator = false;
+                } else if (result.status == OSEO_STATUS_NORMAL) {
+                    result = helper_record_set(
+                        context,
+                        slots[3],
+                        index * ZIP_RECORD_WIDTH + 2u,
+                        slots[8]
+                    );
+                }
+            }
+            if (result.status == OSEO_STATUS_NORMAL && using_iterator) {
+                result = oseo_iterator_close(context, slots[5], false);
+            }
+            if (result.status != OSEO_STATUS_NORMAL) {
+                result = zip_close_all(context, slots[3], count, result);
+            }
+        }
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = iterator_helper_create(
+            context,
+            OSEO_ITERATOR_HELPER_ZIP,
+            oseo_undefined(),
+            slots[4],
+            slots[3],
+            (double)count
+        );
+        if (result.status == OSEO_STATUS_NORMAL) {
+            iterator_helper_object(result.value)->counter = (double)mode;
+        }
+    }
+    oseo_roots_pop(context, &frame);
+    return result;
+}
+
+/*
+ * The strict-mode check after the first iterator is done: every other
+ * iterator is stepped once, without reading `value`, and must be done
+ * too. A throw or a step that is not done closes what is still open.
+ */
+static OseoResult zip_strict_finish(
+    OseoContext *context,
+    OseoValue records,
+    size_t count
+) {
+    /* 0 records, 1 iterator, 2 next method, 3 ignored value. */
+    OseoValue slots[4] = {
+        records,
+        oseo_undefined(),
+        oseo_undefined(),
+        oseo_undefined(),
+    };
+    OseoRootFrame frame = {NULL, slots, 4u};
+    oseo_roots_push(context, &frame);
+    OseoResult result = normal(oseo_undefined());
+    for (size_t index = 1u;
+         result.status == OSEO_STATUS_NORMAL && index < count;
+         index += 1u) {
+        result = helper_record(
+            context,
+            slots[0],
+            index * ZIP_RECORD_WIDTH,
+            &slots[1]
+        );
+        if (result.status == OSEO_STATUS_NORMAL) {
+            result = helper_record(
+                context,
+                slots[0],
+                index * ZIP_RECORD_WIDTH + 1u,
+                &slots[2]
+            );
+        }
+        if (result.status != OSEO_STATUS_NORMAL) break;
+        bool done = false;
+        result = helper_iterator_step(
+            context,
+            slots[1],
+            slots[2],
+            false,
+            &slots[3],
+            &done
+        );
+        if (result.status != OSEO_STATUS_NORMAL) {
+            if (result.status != OSEO_STATUS_THROW || context->has_diagnostic) {
+                break;
+            }
+            slots[3] = result.value;
+            result = zip_remove(context, slots[0], index);
+            if (result.status == OSEO_STATUS_NORMAL) {
+                result = zip_close_all(
+                    context,
+                    slots[0],
+                    count,
+                    (OseoResult){OSEO_STATUS_THROW, slots[3]}
+                );
+            }
+            break;
+        }
+        if (done) {
+            result = zip_remove(context, slots[0], index);
+            continue;
+        }
+        result = zip_close_all(
+            context,
+            slots[0],
+            count,
+            iterator_type_error(
+                context,
+                "Strict mode requires iterators of equal length."
+            )
+        );
+    }
+    oseo_roots_pop(context, &frame);
+    return result;
+}
+
+/*
+ * One resumption of the IteratorZip closure. It steps every iterator
+ * still in the list in order and yields a fresh array, or for zipKeyed
+ * a fresh null-prototype object, of the values. An iterator that throws
+ * leaves openIters and the others close. One that is done ends a
+ * "shortest" zip, closing the rest; ends a "strict" zip, which then
+ * requires the rest to be done at the same step; or, in "longest" mode,
+ * leaves the list and contributes its padding until no iterator is left.
+ */
+static OseoResult iterator_zip_advance(
+    OseoContext *context,
+    OseoValue helper_value,
+    OseoValue *yielded,
+    bool *closure_done
+) {
+    *closure_done = false;
+    OseoIteratorHelper *helper = iterator_helper_object(helper_value);
+    size_t count = (size_t)helper->remaining;
+    ZipMode mode = (ZipMode)helper->counter;
+    if (count == 0u) {
+        *closure_done = true;
+        return normal(oseo_undefined());
+    }
+    /* 0 helper, 1 records, 2 keys, 3 results, 4 iterator, 5 next method,
+     * 6 value, 7 key. */
+    OseoValue slots[8] = {
+        helper_value,
+        helper->callback,
+        helper->underlying_next,
+        oseo_undefined(),
+        oseo_undefined(),
+        oseo_undefined(),
+        oseo_undefined(),
+        oseo_undefined(),
+    };
+    OseoRootFrame frame = {NULL, slots, 8u};
+    oseo_roots_push(context, &frame);
+    bool keyed = is_object(slots[2]);
+    OseoResult result = keyed
+        ? oseo_object_create(context, oseo_null())
+        : oseo_array_create(context, 0u);
+    slots[3] = result.value;
+    for (size_t index = 0u;
+         result.status == OSEO_STATUS_NORMAL && index < count;
+         index += 1u) {
+        size_t record = index * ZIP_RECORD_WIDTH;
+        result = helper_record(context, slots[1], record, &slots[4]);
+        if (result.status != OSEO_STATUS_NORMAL) break;
+        if (!is_object(slots[4])) {
+            /* Only a "longest" zip keeps a finished iterator's slot. */
+            result = helper_record(context, slots[1], record + 2u, &slots[6]);
+        } else {
+            result = helper_record(context, slots[1], record + 1u, &slots[5]);
+            bool done = false;
+            if (result.status == OSEO_STATUS_NORMAL) {
+                result = helper_iterator_step(
+                    context,
+                    slots[4],
+                    slots[5],
+                    true,
+                    &slots[6],
+                    &done
+                );
+                if (result.status == OSEO_STATUS_THROW &&
+                    !context->has_diagnostic) {
+                    slots[6] = result.value;
+                    result = zip_remove(context, slots[1], index);
+                    if (result.status == OSEO_STATUS_NORMAL) {
+                        result = zip_close_all(
+                            context,
+                            slots[1],
+                            count,
+                            (OseoResult){OSEO_STATUS_THROW, slots[6]}
+                        );
+                    }
+                    break;
+                }
+            }
+            if (result.status != OSEO_STATUS_NORMAL) break;
+            if (done) {
+                result = zip_remove(context, slots[1], index);
+                if (result.status != OSEO_STATUS_NORMAL) break;
+                if (mode == ZIP_MODE_SHORTEST) {
+                    result = zip_close_all(
+                        context,
+                        slots[1],
+                        count,
+                        normal(oseo_undefined())
+                    );
+                    *closure_done = result.status == OSEO_STATUS_NORMAL;
+                    break;
+                }
+                if (mode == ZIP_MODE_STRICT) {
+                    result = index != 0u
+                        ? zip_close_all(
+                            context,
+                            slots[1],
+                            count,
+                            iterator_type_error(
+                                context,
+                                "Strict mode requires iterators of equal "
+                                "length."
+                            )
+                        )
+                        : zip_strict_finish(context, slots[1], count);
+                    *closure_done = result.status == OSEO_STATUS_NORMAL;
+                    break;
+                }
+                bool any_open = false;
+                for (size_t other = 0u;
+                     result.status == OSEO_STATUS_NORMAL && other < count &&
+                     !any_open;
+                     other += 1u) {
+                    result = helper_record(
+                        context,
+                        slots[1],
+                        other * ZIP_RECORD_WIDTH,
+                        &slots[5]
+                    );
+                    any_open = is_object(slots[5]);
+                }
+                if (result.status != OSEO_STATUS_NORMAL) break;
+                if (!any_open) {
+                    *closure_done = true;
+                    break;
+                }
+                result = helper_record(
+                    context,
+                    slots[1],
+                    record + 2u,
+                    &slots[6]
+                );
+            }
+        }
+        if (result.status != OSEO_STATUS_NORMAL) break;
+        if (keyed) {
+            result = helper_record(context, slots[2], index, &slots[7]);
+            if (result.status == OSEO_STATUS_NORMAL) {
+                result = oseo_object_define(
+                    context,
+                    slots[3],
+                    slots[7],
+                    slots[6],
+                    (OseoPropertyAttributes){true, true, true, false}
+                );
+            }
+        } else {
+            result = oseo_array_append(context, slots[3], slots[6]);
+        }
+    }
+    if (result.status == OSEO_STATUS_NORMAL && !*closure_done) {
+        *yielded = slots[3];
+    }
+    oseo_roots_pop(context, &frame);
+    return result;
+}
+
+/*
+ * %IteratorHelperPrototype%.return for a zip helper. Before the first
+ * step it completes and then closes every iterator; at a yield it closes
+ * the iterators still in openIters while it is executing. Either way the
+ * close is IteratorCloseAll with a return completion.
+ */
+static OseoResult iterator_zip_return(
+    OseoContext *context,
+    OseoValue receiver,
+    bool suspended_yield
+) {
+    OseoIteratorHelper *helper = iterator_helper_object(receiver);
+    helper->state = suspended_yield
+        ? OSEO_ITERATOR_HELPER_EXECUTING
+        : OSEO_ITERATOR_HELPER_COMPLETED;
+    size_t count = (size_t)helper->remaining;
+    OseoValue slots[2] = {receiver, helper->callback};
+    helper->callback = oseo_undefined();
+    helper->underlying_next = oseo_undefined();
+    OseoRootFrame frame = {NULL, slots, 2u};
+    oseo_roots_push(context, &frame);
+    OseoResult result = zip_close_all(
+        context,
+        slots[1],
+        count,
+        normal(oseo_undefined())
+    );
+    iterator_helper_object(slots[0])->state = OSEO_ITERATOR_HELPER_COMPLETED;
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = oseo_internal_iterator_result(
+            context,
+            oseo_undefined(),
+            true
+        );
+    }
+    oseo_roots_pop(context, &frame);
+    return result;
+}
+
 /* GeneratorResume for a helper: %IteratorHelperPrototype%.next. */
 static OseoResult iterator_helper_resume(
     OseoContext *context,
@@ -1853,6 +2682,8 @@ static OseoResult iterator_helper_resume(
     bool closure_done = false;
     OseoResult result = helper->kind == OSEO_ITERATOR_HELPER_CONCAT
         ? iterator_concat_advance(context, slots[0], &slots[1], &closure_done)
+        : helper->kind == OSEO_ITERATOR_HELPER_ZIP
+        ? iterator_zip_advance(context, slots[0], &slots[1], &closure_done)
         : iterator_helper_advance(
             context,
             slots[0],
@@ -1863,6 +2694,9 @@ static OseoResult iterator_helper_resume(
     if (result.status != OSEO_STATUS_NORMAL || closure_done) {
         helper->state = OSEO_ITERATOR_HELPER_COMPLETED;
         helper->callback = oseo_undefined();
+        if (helper->kind == OSEO_ITERATOR_HELPER_ZIP) {
+            helper->underlying_next = oseo_undefined();
+        }
         helper->inner_alive = false;
         helper->inner_iterator = oseo_undefined();
         helper->inner_next = oseo_undefined();
@@ -1911,6 +2745,9 @@ static OseoResult iterator_helper_return(
     }
     bool suspended_yield =
         helper->state == OSEO_ITERATOR_HELPER_SUSPENDED_YIELD;
+    if (helper->kind == OSEO_ITERATOR_HELPER_ZIP) {
+        return iterator_zip_return(context, receiver, suspended_yield);
+    }
     /* Iterator.concat has no underlying iterator: before its first step
      * it closes nothing, and at its yield it closes only the inner
      * iterator it is forwarding. */
