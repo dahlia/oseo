@@ -12,6 +12,7 @@ import {
   caseShardedNativeFiles,
   dedicatedLinuxNativeFiles,
   dedicatedMacosNodeFiles,
+  dedicatedNodeFiles,
   nativeShardModel,
   nativeTestArguments,
   selectNativeTestShard,
@@ -123,6 +124,13 @@ test("Linux jobs cover the real property inventory exactly once", async () => {
   assert.deepEqual(dedicatedLinuxNativeFiles, [array]);
   assert.deepEqual(dedicatedMacosNodeFiles, [array]);
   assert.notStrictEqual(dedicatedMacosNodeFiles, dedicatedLinuxNativeFiles);
+  // The ordinary Node rule leaves extended placement alone: the exhaustive
+  // RegExp file stays in its extended case shards.
+  const exhaustive =
+    "tests/property/m5-regexp-literal-exhaustive.property.test.ts";
+  assert.deepEqual(dedicatedNodeFiles, [exhaustive]);
+  assert.ok(caseShardedNativeFiles.includes(exhaustive));
+  assert.ok(!dedicatedLinuxNativeFiles.includes(exhaustive));
   const linux = Array.from({ length: 7 }, (_, index) =>
     nativeTestArguments(
       [

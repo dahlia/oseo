@@ -90,8 +90,9 @@ jobs:
       - run: mise run test:${{ matrix.runtime }}
 
   # macOS. The wrapper reproduces Node's default discovery, removes the
-  # dedicated Array file, and assigns the rest to six shards by measured
-  # file weights; see docs/evidence/node-shards/README.md.
+  # dedicated Array and exhaustive RegExp literal files, and assigns the
+  # rest to six shards by measured file weights; see
+  # docs/evidence/node-shards/README.md.
   test_node_shard_linux:
     name: >-
       test (ubuntu-latest, node,
@@ -123,6 +124,26 @@ jobs:
       - run: >-
           mise run test:node:shard
           --shard=${{ matrix.shard }}/${{ matrix.total }}
+
+  # The Linux counterpart of test_regexp_exhaustive_macos: one file
+  # worker, every ordinary case and limit, no time scaling.
+  test_regexp_exhaustive_linux:
+    name: RegExp literals exhaustive (ubuntu-latest, node)
+    if: ${{ !cancelled() }}
+    needs:
+      - mac_ready
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: jdx/mise-action@v4
+        with:
+          install: true
+      - uses: ./.github/actions/runtime-archive-cache
+      - run: >-
+          mise run test:node --test-concurrency=1
+          tests/property/m5-regexp-literal-exhaustive.property.test.ts
 
   test_native:
     name: native (${{ matrix.platform.target }}, ${{ matrix.shard }}/3)
@@ -664,8 +685,10 @@ jobs:
       - test_reflect_case
       - test_regexp_exhaustive_case
       - test_array_constructor
+      - test_regexp_exhaustive_linux
       - test_test262
       - test_array_constructor_macos_macos_node
+      - test_regexp_exhaustive_macos_macos_node
       - test_native_macos_1
       - test_native_macos_2
       - test_native_macos_3
@@ -773,6 +796,55 @@ jobs:
         run: node tools/selfhosted-mac/availability.ts
 
   # macOS lane 1, longest jobs first.
+  test_regexp_exhaustive_macos_macos_node:
+    name: RegExp literals exhaustive (macos-latest, node)
+    runs-on: macos-latest
+    if: ${{ !cancelled() }}
+    needs: mac_ready
+    steps:
+      - name: Record macOS host version
+        run: sw_vers -productVersion
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: jdx/mise-action@v4
+        with:
+          install: true
+      - uses: ./.github/actions/runtime-archive-cache
+      - run: >-
+          mise run test:node --test-concurrency=1
+          tests/property/m5-regexp-literal-exhaustive.property.test.ts
+
+  # Linux. The same wrapper assigns Node's discovery, without the dedicated
+  # exhaustive RegExp literal file, to four shards by measured file
+  # weights. Positional --test-shard left late-sorted heavy files as tails:
+  # run 41238903460 ended shard 2/2 at 56.0 minutes while 1/2 took 37.4.
+  # The weights, the model and its modeled maxima are in
+  # docs/evidence/node-shards/README.md.
+
+  test_node_shard_macos_4:
+    name: test (macos-latest, node, 4/6)
+    runs-on: macos-latest
+    if: ${{ !cancelled() }}
+    needs: test_regexp_exhaustive_macos_macos_node
+    steps:
+      - name: Record macOS host version
+        run: sw_vers -productVersion
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: jdx/mise-action@v4
+        with:
+          install: true
+      - uses: ./.github/actions/runtime-archive-cache
+      - run: >-
+          mise run test:node:shard
+          --shard=4/6
+
+  # Hosted macos-latest, like the ordinary Node shards. No time scaling.
+  # The generator places this on one of the same five hosted capacity lanes.
+
+  # macOS lane 2, longest jobs first.
   test_sanitizer_macos_macos_property:
     name: host C sanitizers (macOS, property)
     runs-on: macos-15
@@ -872,7 +944,7 @@ jobs:
           path: ${{ runner.temp }}/oseo-native-*
           if-no-files-found: warn
 
-  # macOS lane 2, longest jobs first.
+  # macOS lane 3, longest jobs first.
   test_sanitizer_macos_macos_native_1:
     name: host C sanitizers (macOS, native, 1/2)
     runs-on: macos-15
@@ -972,7 +1044,7 @@ jobs:
           path: ${{ runner.temp }}/oseo-native-*
           if-no-files-found: warn
 
-  # macOS lane 3, longest jobs first.
+  # macOS lane 4, longest jobs first.
   test_node_shard_macos_1:
     name: test (macos-latest, node, 1/6)
     runs-on: macos-latest
@@ -995,123 +1067,11 @@ jobs:
   # Hosted macos-latest, like the ordinary Node shards. No time scaling.
   # The generator places this on one of the same five hosted capacity lanes.
 
-  test_node_shard_macos_6:
-    name: test (macos-latest, node, 6/6)
-    runs-on: macos-latest
-    if: ${{ !cancelled() }}
-    needs: test_node_shard_macos_1
-    steps:
-      - name: Record macOS host version
-        run: sw_vers -productVersion
-      - uses: actions/checkout@v7
-        with:
-          persist-credentials: false
-      - uses: jdx/mise-action@v4
-        with:
-          install: true
-      - uses: ./.github/actions/runtime-archive-cache
-      - run: >-
-          mise run test:node:shard
-          --shard=6/6
-
-  # Hosted macos-latest, like the ordinary Node shards. No time scaling.
-  # The generator places this on one of the same five hosted capacity lanes.
-
-  # macOS lane 4, longest jobs first.
-  test_node_shard_macos_5:
-    name: test (macos-latest, node, 5/6)
-    runs-on: macos-latest
-    if: ${{ !cancelled() }}
-    needs: mac_ready
-    steps:
-      - name: Record macOS host version
-        run: sw_vers -productVersion
-      - uses: actions/checkout@v7
-        with:
-          persist-credentials: false
-      - uses: jdx/mise-action@v4
-        with:
-          install: true
-      - uses: ./.github/actions/runtime-archive-cache
-      - run: >-
-          mise run test:node:shard
-          --shard=5/6
-
-  # Hosted macos-latest, like the ordinary Node shards. No time scaling.
-  # The generator places this on one of the same five hosted capacity lanes.
-
-  test_node_shard_macos_4:
-    name: test (macos-latest, node, 4/6)
-    runs-on: macos-latest
-    if: ${{ !cancelled() }}
-    needs: test_node_shard_macos_5
-    steps:
-      - name: Record macOS host version
-        run: sw_vers -productVersion
-      - uses: actions/checkout@v7
-        with:
-          persist-credentials: false
-      - uses: jdx/mise-action@v4
-        with:
-          install: true
-      - uses: ./.github/actions/runtime-archive-cache
-      - run: >-
-          mise run test:node:shard
-          --shard=4/6
-
-  # Hosted macos-latest, like the ordinary Node shards. No time scaling.
-  # The generator places this on one of the same five hosted capacity lanes.
-
-  test_macos_deno:
-    name: test (macos-latest, deno)
-    runs-on: macos-latest
-    if: ${{ !cancelled() }}
-    needs: test_node_shard_macos_4
-    steps:
-      - name: Record macOS host version
-        run: sw_vers -productVersion
-      - uses: actions/checkout@v7
-        with:
-          persist-credentials: false
-      - uses: jdx/mise-action@v4
-        with:
-          install: true
-      - uses: ./.github/actions/runtime-archive-cache
-        if: runner.os != 'Windows'
-      - run: mise run test:deno
-
-  # macOS. The wrapper reproduces Node's default discovery, removes the
-  # dedicated Array file, and assigns the rest to six shards by measured
-  # file weights; see docs/evidence/node-shards/README.md.
-
-  # macOS lane 5, longest jobs first.
-  test_node_shard_macos_2:
-    name: test (macos-latest, node, 2/6)
-    runs-on: macos-latest
-    if: ${{ !cancelled() }}
-    needs: mac_ready
-    steps:
-      - name: Record macOS host version
-        run: sw_vers -productVersion
-      - uses: actions/checkout@v7
-        with:
-          persist-credentials: false
-      - uses: jdx/mise-action@v4
-        with:
-          install: true
-      - uses: ./.github/actions/runtime-archive-cache
-      - run: >-
-          mise run test:node:shard
-          --shard=2/6
-
-  # Hosted macos-latest, like the ordinary Node shards. No time scaling.
-  # The generator places this on one of the same five hosted capacity lanes.
-
   test_node_shard_macos_3:
     name: test (macos-latest, node, 3/6)
     runs-on: macos-latest
     if: ${{ !cancelled() }}
-    needs: test_node_shard_macos_2
+    needs: test_node_shard_macos_1
     steps:
       - name: Record macOS host version
         run: sw_vers -productVersion
@@ -1148,11 +1108,101 @@ jobs:
           mise run test:node --test-concurrency=1
           tests/property/m5-array-constructor.property.test.ts
 
-  # Linux. The same wrapper assigns Node's whole discovery to four shards
-  # by measured file weights. Positional --test-shard left late-sorted
-  # heavy files as tails: run 41238903460 ended shard 2/2 at 56.0 minutes
-  # while 1/2 took 37.4. The weights, the model and its modeled maxima are
-  # in docs/evidence/node-shards/README.md.
+  # Each property of this file runs near its 600-second interrupt even
+  # alone, so it leaves the ordinary shards on both hosts; see
+  # docs/evidence/regexp-exhaustive-node/README.md. Hosted macos-latest,
+  # one file worker, no time scaling. The generator places this on one of
+  # the same five hosted capacity lanes.
+
+  test_macos_deno:
+    name: test (macos-latest, deno)
+    runs-on: macos-latest
+    if: ${{ !cancelled() }}
+    needs: test_array_constructor_macos_macos_node
+    steps:
+      - name: Record macOS host version
+        run: sw_vers -productVersion
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: jdx/mise-action@v4
+        with:
+          install: true
+      - uses: ./.github/actions/runtime-archive-cache
+        if: runner.os != 'Windows'
+      - run: mise run test:deno
+
+  # macOS. The wrapper reproduces Node's default discovery, removes the
+  # dedicated Array and exhaustive RegExp literal files, and assigns the
+  # rest to six shards by measured file weights; see
+  # docs/evidence/node-shards/README.md.
+
+  # macOS lane 5, longest jobs first.
+  test_node_shard_macos_5:
+    name: test (macos-latest, node, 5/6)
+    runs-on: macos-latest
+    if: ${{ !cancelled() }}
+    needs: mac_ready
+    steps:
+      - name: Record macOS host version
+        run: sw_vers -productVersion
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: jdx/mise-action@v4
+        with:
+          install: true
+      - uses: ./.github/actions/runtime-archive-cache
+      - run: >-
+          mise run test:node:shard
+          --shard=5/6
+
+  # Hosted macos-latest, like the ordinary Node shards. No time scaling.
+  # The generator places this on one of the same five hosted capacity lanes.
+
+  test_node_shard_macos_2:
+    name: test (macos-latest, node, 2/6)
+    runs-on: macos-latest
+    if: ${{ !cancelled() }}
+    needs: test_node_shard_macos_5
+    steps:
+      - name: Record macOS host version
+        run: sw_vers -productVersion
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: jdx/mise-action@v4
+        with:
+          install: true
+      - uses: ./.github/actions/runtime-archive-cache
+      - run: >-
+          mise run test:node:shard
+          --shard=2/6
+
+  # Hosted macos-latest, like the ordinary Node shards. No time scaling.
+  # The generator places this on one of the same five hosted capacity lanes.
+
+  test_node_shard_macos_6:
+    name: test (macos-latest, node, 6/6)
+    runs-on: macos-latest
+    if: ${{ !cancelled() }}
+    needs: test_node_shard_macos_2
+    steps:
+      - name: Record macOS host version
+        run: sw_vers -productVersion
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: jdx/mise-action@v4
+        with:
+          install: true
+      - uses: ./.github/actions/runtime-archive-cache
+      - run: >-
+          mise run test:node:shard
+          --shard=6/6
+
+  # Hosted macos-latest, like the ordinary Node shards. No time scaling.
+  # The generator places this on one of the same five hosted capacity lanes.
 
   # macOS lane 6, longest jobs first.
   test_property_case_macos_2:

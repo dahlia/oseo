@@ -1,6 +1,6 @@
 import { globSync } from "node:fs";
 import { sep } from "node:path";
-import { dedicatedMacosNodeFiles } from "./native-shard.ts";
+import { dedicatedMacosNodeFiles, dedicatedNodeFiles } from "./native-shard.ts";
 import {
   nodeShardCosts,
   nodeShardFallbackSeconds,
@@ -109,8 +109,18 @@ export function nodeShardInventory(
   cwd: string,
   platform: string,
 ): readonly string[] {
-  const dedicated = platform === "darwin" ? dedicatedMacosNodeFiles : [];
+  const dedicated = dedicatedNodeFilesFor(platform);
   return discoverNodeTests(cwd).filter((file) => !dedicated.includes(file));
+}
+
+/**
+ * The files that run in a host's dedicated ordinary Node jobs instead of
+ * its shards: the files dedicated on both hosts, plus the macOS-only ones.
+ */
+export function dedicatedNodeFilesFor(platform: string): readonly string[] {
+  return platform === "darwin"
+    ? [...dedicatedMacosNodeFiles, ...dedicatedNodeFiles]
+    : dedicatedNodeFiles;
 }
 
 /** Node's arguments for one shard: the selected files, run unsharded. */

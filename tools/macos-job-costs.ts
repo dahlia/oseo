@@ -145,6 +145,9 @@ export const macosJobCosts: MacosJobCosts = {
   // Scheduling allowance only: unchanged 180-second interrupt plus setup.
   // Dedicated hosted macOS execution has not yet been measured.
   "Array constructor (macos-latest, node)": 240,
+  // Scheduling allowance only: four unchanged 600-second interrupts plus
+  // setup; see docs/evidence/regexp-exhaustive-node/README.md.
+  "RegExp literals exhaustive (macos-latest, node)": 2460,
   // Derived, not observed: modeled walls of the six weighted shards; see
   // docs/evidence/node-shards/README.md.
   "test (macos-latest, node, 1/6)": 1622, // derived

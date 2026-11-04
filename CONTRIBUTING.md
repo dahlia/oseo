@@ -634,12 +634,23 @@ existing five hosted macOS lanes; `native` requires its result even if an
 earlier lane job fails. See
 [*macOS Array placement evidence*](docs/evidence/array-macos/README.md).
 
+`dedicatedNodeFiles` lists the ordinary Node files with a dedicated job on
+both Linux and macOS. It contains only
+*tests/property/m5-regexp-literal-exhaustive.property.test.ts*, whose
+properties each run near their 600-second interrupt beside other file workers.
+The hosted `ubuntu-latest` and `macos-latest` jobs run all four properties with
+one file worker, the original seeds and limits, and no time scaling. The lane
+generator places the macOS job on a hosted lane as it does the Array job, and
+`native` requires both. See
+[*ordinary exhaustive RegExp placement*](docs/evidence/regexp-exhaustive-node/README.md).
+
 The ordinary Node.js gate runs in four Linux and six macOS shards through
 `mise run test:node:shard --shard INDEX/TOTAL`; Windows still runs it unsharded
 through `mise run test:node`. *tools/node-shard.ts* reproduces Node 24's
-default discovery, removes `dedicatedMacosNodeFiles` on macOS only, and passes
-each shard's files to Node without `--test-shard`. The shards on each host,
-with the dedicated macOS job, execute the inventory exactly once.
+default discovery, removes `dedicatedNodeFiles` on both hosts and
+`dedicatedMacosNodeFiles` on macOS, and passes each shard's files to Node
+without `--test-shard`. The shards on each host, with that host's dedicated
+jobs, execute the inventory exactly once.
 
 Files are assigned by the weights in *tools/node-shard-costs.ts*: heaviest
 first, ties in path order, each to the shard whose modeled run ends earliest
