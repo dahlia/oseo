@@ -24,6 +24,11 @@ export interface ExecutionHostDescription {
 export interface TargetDescription {
   readonly abi?: NativeAbi;
   readonly architecture: NativeArchitecture;
+  /**
+   * The processor hint the runtime's `Atomics.pause` executes once per
+   * call: the x86-64 PAUSE instruction or the AArch64 YIELD instruction.
+   */
+  readonly atomicsPauseHint: "aarch64-yield" | "x86-pause";
   readonly cStandard: "c11";
   readonly executableFormat: "elf" | "mach-o";
   readonly name: TargetName;
@@ -255,6 +260,7 @@ export function describeTarget(name: TargetName): TargetDescription {
     return {
       abi: "gnu",
       architecture: "x86_64",
+      atomicsPauseHint: "x86-pause",
       cStandard: "c11",
       executableFormat: "elf",
       name,
@@ -265,6 +271,7 @@ export function describeTarget(name: TargetName): TargetDescription {
   if (name === "macos-aarch64") {
     return {
       architecture: "aarch64",
+      atomicsPauseHint: "aarch64-yield",
       cStandard: "c11",
       executableFormat: "mach-o",
       name,
@@ -276,6 +283,7 @@ export function describeTarget(name: TargetName): TargetDescription {
     return {
       abi: "musl",
       architecture: "aarch64",
+      atomicsPauseHint: "aarch64-yield",
       cStandard: "c11",
       executableFormat: "elf",
       name,

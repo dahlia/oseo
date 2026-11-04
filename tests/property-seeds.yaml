@@ -656,3 +656,7 @@ families:
     owner: tests/property/es2026-json-parse-source.property.test.ts
     start: 0x6000a600
     end: 0x6000a6ff
+  - family: es2026-uint8array-base64
+    owner: tests/property/es2026-uint8array-base64.property.test.ts
+    start: 0x6000a700
+    end: 0x6000a7ff

@@ -1,0 +1,121 @@
+version: 1
+id: uint8array-base64
+title: "Uint8Array base64 and hex"
+scope:
+  - "Uint8Array.fromBase64, Uint8Array.fromHex, and
+    Uint8Array.prototype.toBase64, setFromBase64, toHex, and setFromHex,
+    their descriptors, names, lengths, property order, non-constructor
+    status, and Uint8Array receiver checks."
+  - "String inputs without coercion, GetOptionsObject, the alphabet,
+    lastChunkHandling, and omitPadding options read once in order without
+    coercion, and the bounds check after the option reads."
+  - "FromBase64 with both alphabets, ASCII whitespace, padding, the three
+    lastChunkHandling modes, the stop at a full target, partial writes
+    before a SyntaxError, and the read and written result; FromHex and
+    its odd-length rejection."
+  - "Detached buffers, length-tracking and fixed views of resizable
+    buffers, out-of-bounds views, subarrays, and SharedArrayBuffer
+    targets."
+owners:
+  - docs/language-profile-es2026.md
+evidence:
+  differential:
+    status: covered
+    references:
+      - tests/native/fixtures/uint8array-base64.ts
+      - tests/native/uint8array-base64-model.ts
+      - tests/property/es2026-uint8array-base64.property.test.ts
+  fixed:
+    status: covered
+    references:
+      - tests/native/fixtures/uint8array-base64.ts
+  forced-collection:
+    status: covered
+    references:
+      - tests/uint8array-base64-native.test.ts
+      - tests/native/fixtures/uint8array-base64.ts
+      - tests/property/es2026-uint8array-base64.property.test.ts
+  generated:
+    status: covered
+    references:
+      - tests/property/es2026-uint8array-base64.property.test.ts
+  guard-fallback:
+    status: covered
+    references:
+      - tests/uint8array-base64-native.test.ts
+      - tests/native/fixtures/uint8array-base64.ts
+      - tests/property/es2026-uint8array-base64.property.test.ts
+  specialization:
+    status: covered
+    references:
+      - tests/uint8array-base64-native.test.ts
+      - tests/native/fixtures/uint8array-base64.ts
+      - tests/property/es2026-uint8array-base64.property.test.ts
+  standards:
+    status: covered
+    references:
+      - tests/test262/subset.yaml
+      - tests/test262/results.yaml
+      - tests/test262/results/built-ins/Uint8Array/02.yaml
+      - tests/test262/results/built-ins/Uint8Array/08.yaml
+      - tests/test262/results/built-ins/Uint8Array/09.yaml
+      - tests/test262/results/built-ins/Uint8Array/0c.yaml
+      - tests/test262/results/built-ins/Uint8Array/0d.yaml
+      - tests/test262/results/built-ins/Uint8Array/0e.yaml
+      - tests/test262/results/built-ins/Uint8Array/11.yaml
+      - tests/test262/results/built-ins/Uint8Array/18.yaml
+      - tests/test262/results/built-ins/Uint8Array/1a.yaml
+      - tests/test262/results/built-ins/Uint8Array/23.yaml
+      - tests/test262/results/built-ins/Uint8Array/28.yaml
+      - tests/test262/results/built-ins/Uint8Array/2c.yaml
+      - tests/test262/results/built-ins/Uint8Array/32.yaml
+      - tests/test262/results/built-ins/Uint8Array/34.yaml
+      - tests/test262/results/built-ins/Uint8Array/37.yaml
+      - tests/test262/results/built-ins/Uint8Array/39.yaml
+      - tests/test262/results/built-ins/Uint8Array/3f.yaml
+      - tests/test262/results/built-ins/Uint8Array/45.yaml
+      - tests/test262/results/built-ins/Uint8Array/47.yaml
+      - tests/test262/results/built-ins/Uint8Array/48.yaml
+      - tests/test262/results/built-ins/Uint8Array/4c.yaml
+      - tests/test262/results/built-ins/Uint8Array/50.yaml
+      - tests/test262/results/built-ins/Uint8Array/58.yaml
+      - tests/test262/results/built-ins/Uint8Array/59.yaml
+      - tests/test262/results/built-ins/Uint8Array/5e.yaml
+      - tests/test262/results/built-ins/Uint8Array/5f.yaml
+      - tests/test262/results/built-ins/Uint8Array/60.yaml
+      - tests/test262/results/built-ins/Uint8Array/61.yaml
+      - tests/test262/results/built-ins/Uint8Array/68.yaml
+      - tests/test262/results/built-ins/Uint8Array/69.yaml
+      - tests/test262/results/built-ins/Uint8Array/6b.yaml
+      - tests/test262/results/built-ins/Uint8Array/6c.yaml
+      - tests/test262/results/built-ins/Uint8Array/77.yaml
+      - tests/test262/results/built-ins/Uint8Array/7a.yaml
+      - tests/test262/results/built-ins/Uint8Array/80.yaml
+      - tests/test262/results/built-ins/Uint8Array/83.yaml
+      - tests/test262/results/built-ins/Uint8Array/87.yaml
+      - tests/test262/results/built-ins/Uint8Array/91.yaml
+      - tests/test262/results/built-ins/Uint8Array/96.yaml
+      - tests/test262/results/built-ins/Uint8Array/9d.yaml
+      - tests/test262/results/built-ins/Uint8Array/9f.yaml
+      - tests/test262/results/built-ins/Uint8Array/a8.yaml
+      - tests/test262/results/built-ins/Uint8Array/b2.yaml
+      - tests/test262/results/built-ins/Uint8Array/b4.yaml
+      - tests/test262/results/built-ins/Uint8Array/b9.yaml
+      - tests/test262/results/built-ins/Uint8Array/c1.yaml
+      - tests/test262/results/built-ins/Uint8Array/c6.yaml
+      - tests/test262/results/built-ins/Uint8Array/c7.yaml
+      - tests/test262/results/built-ins/Uint8Array/cb.yaml
+      - tests/test262/results/built-ins/Uint8Array/cf.yaml
+      - tests/test262/results/built-ins/Uint8Array/d4.yaml
+      - tests/test262/results/built-ins/Uint8Array/d6.yaml
+      - tests/test262/results/built-ins/Uint8Array/d7.yaml
+      - tests/test262/results/built-ins/Uint8Array/dc.yaml
+      - tests/test262/results/built-ins/Uint8Array/dd.yaml
+      - tests/test262/results/built-ins/Uint8Array/e3.yaml
+      - tests/test262/results/built-ins/Uint8Array/ef.yaml
+      - tests/test262/results/built-ins/Uint8Array/f2.yaml
+      - tests/test262/results/built-ins/Uint8Array/fa.yaml
+  structural:
+    status: covered
+    references:
+      - packages/runtime-c/tests/intrinsic-graph.test.ts

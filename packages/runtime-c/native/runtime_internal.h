@@ -976,6 +976,19 @@
     (OSEO_TYPED_ARRAY_CODE_ID_RANGE_LAST - 49u)
 #define OSEO_FLOAT16_ARRAY_CONSTRUCTOR_CODE_ID \
     (OSEO_TYPED_ARRAY_CODE_ID_RANGE_LAST - 50u)
+/* The Uint8Array base64 and hex functions, in creation order. */
+#define OSEO_UINT8_ARRAY_FROM_BASE64_CODE_ID \
+    (OSEO_TYPED_ARRAY_CODE_ID_RANGE_LAST - 51u)
+#define OSEO_UINT8_ARRAY_FROM_HEX_CODE_ID \
+    (OSEO_TYPED_ARRAY_CODE_ID_RANGE_LAST - 52u)
+#define OSEO_UINT8_ARRAY_TO_BASE64_CODE_ID \
+    (OSEO_TYPED_ARRAY_CODE_ID_RANGE_LAST - 53u)
+#define OSEO_UINT8_ARRAY_SET_FROM_BASE64_CODE_ID \
+    (OSEO_TYPED_ARRAY_CODE_ID_RANGE_LAST - 54u)
+#define OSEO_UINT8_ARRAY_TO_HEX_CODE_ID \
+    (OSEO_TYPED_ARRAY_CODE_ID_RANGE_LAST - 55u)
+#define OSEO_UINT8_ARRAY_SET_FROM_HEX_CODE_ID \
+    (OSEO_TYPED_ARRAY_CODE_ID_RANGE_LAST - 56u)
 
 #define OSEO_ATOMICS_CODE_ID_RANGE_INDEX ((size_t)25u)
 #define OSEO_ATOMICS_CODE_ID_RANGE_FIRST \
@@ -983,7 +996,7 @@
 #define OSEO_ATOMICS_CODE_ID_RANGE_LAST \
     OSEO_BUILTIN_CODE_RANGE_LAST(OSEO_ATOMICS_CODE_ID_RANGE_INDEX)
 /*
- * The thirteen Atomics functions count down from the range end in
+ * The fourteen Atomics functions count down from the range end in
  * `OseoAtomicsOperation` order, so an operation's index is the only
  * identity the builder and the dispatcher share.
  */
@@ -2295,7 +2308,11 @@ typedef struct {
     bool canceled;
 } OseoTimer;
 
-/* The thirteen Atomics functions, in code-ID and creation order. */
+/*
+ * The fourteen Atomics functions, in code-ID and creation order. `pause`
+ * was admitted after the other thirteen, so it takes the next value and
+ * the existing code IDs stay stable.
+ */
 typedef enum {
     OSEO_ATOMICS_ADD = 0,
     OSEO_ATOMICS_AND = 1,
@@ -2310,7 +2327,8 @@ typedef enum {
     OSEO_ATOMICS_WAIT = 10,
     OSEO_ATOMICS_WAIT_ASYNC = 11,
     OSEO_ATOMICS_XOR = 12,
-    OSEO_ATOMICS_OPERATION_COUNT = 13,
+    OSEO_ATOMICS_PAUSE = 13,
+    OSEO_ATOMICS_OPERATION_COUNT = 14,
 } OseoAtomicsOperation;
 
 /*

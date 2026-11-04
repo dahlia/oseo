@@ -2646,6 +2646,9 @@ partitions:
     key: e9
     path: results/built-ins/Atomics/e9.yaml
   - group: built-ins/Atomics
+    key: eb
+    path: results/built-ins/Atomics/eb.yaml
+  - group: built-ins/Atomics
     key: ec
     path: results/built-ins/Atomics/ec.yaml
   - group: built-ins/Atomics
@@ -15083,6 +15086,183 @@ partitions:
   - group: built-ins/TypedArrayConstructors
     key: ff
     path: results/built-ins/TypedArrayConstructors/ff.yaml
+  - group: built-ins/Uint8Array
+    key: "02"
+    path: results/built-ins/Uint8Array/02.yaml
+  - group: built-ins/Uint8Array
+    key: "08"
+    path: results/built-ins/Uint8Array/08.yaml
+  - group: built-ins/Uint8Array
+    key: "09"
+    path: results/built-ins/Uint8Array/09.yaml
+  - group: built-ins/Uint8Array
+    key: 0c
+    path: results/built-ins/Uint8Array/0c.yaml
+  - group: built-ins/Uint8Array
+    key: 0d
+    path: results/built-ins/Uint8Array/0d.yaml
+  - group: built-ins/Uint8Array
+    key: 0e
+    path: results/built-ins/Uint8Array/0e.yaml
+  - group: built-ins/Uint8Array
+    key: "11"
+    path: results/built-ins/Uint8Array/11.yaml
+  - group: built-ins/Uint8Array
+    key: "18"
+    path: results/built-ins/Uint8Array/18.yaml
+  - group: built-ins/Uint8Array
+    key: 1a
+    path: results/built-ins/Uint8Array/1a.yaml
+  - group: built-ins/Uint8Array
+    key: "23"
+    path: results/built-ins/Uint8Array/23.yaml
+  - group: built-ins/Uint8Array
+    key: "28"
+    path: results/built-ins/Uint8Array/28.yaml
+  - group: built-ins/Uint8Array
+    key: 2c
+    path: results/built-ins/Uint8Array/2c.yaml
+  - group: built-ins/Uint8Array
+    key: "32"
+    path: results/built-ins/Uint8Array/32.yaml
+  - group: built-ins/Uint8Array
+    key: "34"
+    path: results/built-ins/Uint8Array/34.yaml
+  - group: built-ins/Uint8Array
+    key: "37"
+    path: results/built-ins/Uint8Array/37.yaml
+  - group: built-ins/Uint8Array
+    key: "39"
+    path: results/built-ins/Uint8Array/39.yaml
+  - group: built-ins/Uint8Array
+    key: 3f
+    path: results/built-ins/Uint8Array/3f.yaml
+  - group: built-ins/Uint8Array
+    key: "45"
+    path: results/built-ins/Uint8Array/45.yaml
+  - group: built-ins/Uint8Array
+    key: "47"
+    path: results/built-ins/Uint8Array/47.yaml
+  - group: built-ins/Uint8Array
+    key: "48"
+    path: results/built-ins/Uint8Array/48.yaml
+  - group: built-ins/Uint8Array
+    key: 4c
+    path: results/built-ins/Uint8Array/4c.yaml
+  - group: built-ins/Uint8Array
+    key: "50"
+    path: results/built-ins/Uint8Array/50.yaml
+  - group: built-ins/Uint8Array
+    key: "58"
+    path: results/built-ins/Uint8Array/58.yaml
+  - group: built-ins/Uint8Array
+    key: "59"
+    path: results/built-ins/Uint8Array/59.yaml
+  - group: built-ins/Uint8Array
+    key: 5e
+    path: results/built-ins/Uint8Array/5e.yaml
+  - group: built-ins/Uint8Array
+    key: 5f
+    path: results/built-ins/Uint8Array/5f.yaml
+  - group: built-ins/Uint8Array
+    key: "60"
+    path: results/built-ins/Uint8Array/60.yaml
+  - group: built-ins/Uint8Array
+    key: "61"
+    path: results/built-ins/Uint8Array/61.yaml
+  - group: built-ins/Uint8Array
+    key: "68"
+    path: results/built-ins/Uint8Array/68.yaml
+  - group: built-ins/Uint8Array
+    key: "69"
+    path: results/built-ins/Uint8Array/69.yaml
+  - group: built-ins/Uint8Array
+    key: 6b
+    path: results/built-ins/Uint8Array/6b.yaml
+  - group: built-ins/Uint8Array
+    key: 6c
+    path: results/built-ins/Uint8Array/6c.yaml
+  - group: built-ins/Uint8Array
+    key: "77"
+    path: results/built-ins/Uint8Array/77.yaml
+  - group: built-ins/Uint8Array
+    key: 7a
+    path: results/built-ins/Uint8Array/7a.yaml
+  - group: built-ins/Uint8Array
+    key: "80"
+    path: results/built-ins/Uint8Array/80.yaml
+  - group: built-ins/Uint8Array
+    key: "83"
+    path: results/built-ins/Uint8Array/83.yaml
+  - group: built-ins/Uint8Array
+    key: "87"
+    path: results/built-ins/Uint8Array/87.yaml
+  - group: built-ins/Uint8Array
+    key: "91"
+    path: results/built-ins/Uint8Array/91.yaml
+  - group: built-ins/Uint8Array
+    key: "96"
+    path: results/built-ins/Uint8Array/96.yaml
+  - group: built-ins/Uint8Array
+    key: 9d
+    path: results/built-ins/Uint8Array/9d.yaml
+  - group: built-ins/Uint8Array
+    key: 9f
+    path: results/built-ins/Uint8Array/9f.yaml
+  - group: built-ins/Uint8Array
+    key: a8
+    path: results/built-ins/Uint8Array/a8.yaml
+  - group: built-ins/Uint8Array
+    key: b2
+    path: results/built-ins/Uint8Array/b2.yaml
+  - group: built-ins/Uint8Array
+    key: b4
+    path: results/built-ins/Uint8Array/b4.yaml
+  - group: built-ins/Uint8Array
+    key: b9
+    path: results/built-ins/Uint8Array/b9.yaml
+  - group: built-ins/Uint8Array
+    key: c1
+    path: results/built-ins/Uint8Array/c1.yaml
+  - group: built-ins/Uint8Array
+    key: c6
+    path: results/built-ins/Uint8Array/c6.yaml
+  - group: built-ins/Uint8Array
+    key: c7
+    path: results/built-ins/Uint8Array/c7.yaml
+  - group: built-ins/Uint8Array
+    key: cb
+    path: results/built-ins/Uint8Array/cb.yaml
+  - group: built-ins/Uint8Array
+    key: cf
+    path: results/built-ins/Uint8Array/cf.yaml
+  - group: built-ins/Uint8Array
+    key: d4
+    path: results/built-ins/Uint8Array/d4.yaml
+  - group: built-ins/Uint8Array
+    key: d6
+    path: results/built-ins/Uint8Array/d6.yaml
+  - group: built-ins/Uint8Array
+    key: d7
+    path: results/built-ins/Uint8Array/d7.yaml
+  - group: built-ins/Uint8Array
+    key: dc
+    path: results/built-ins/Uint8Array/dc.yaml
+  - group: built-ins/Uint8Array
+    key: dd
+    path: results/built-ins/Uint8Array/dd.yaml
+  - group: built-ins/Uint8Array
+    key: e3
+    path: results/built-ins/Uint8Array/e3.yaml
+  - group: built-ins/Uint8Array
+    key: ef
+    path: results/built-ins/Uint8Array/ef.yaml
+  - group: built-ins/Uint8Array
+    key: f2
+    path: results/built-ins/Uint8Array/f2.yaml
+  - group: built-ins/Uint8Array
+    key: fa
+    path: results/built-ins/Uint8Array/fa.yaml
   - group: built-ins/WeakMap
     key: "00"
     path: results/built-ins/WeakMap/00.yaml
@@ -24091,7 +24271,7 @@ summary:
   expectedNegatives: 4401
   harnessFailures: 0
   infrastructureFailures: 0
-  passes: 35359
+  passes: 35432
   semanticFailures: 0
   unsupportedProfileFeatures: 1889
   dependencies:
@@ -24099,14 +24279,14 @@ summary:
       expectedNegatives: 27
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 4358
+      passes: 4393
       semanticFailures: 0
       unsupportedProfileFeatures: 675
     - dependency: array-buffer
       expectedNegatives: 0
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 922
+      passes: 929
       semanticFailures: 0
       unsupportedProfileFeatures: 5
     - dependency: async-functions
@@ -24134,7 +24314,7 @@ summary:
       expectedNegatives: 0
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 533
+      passes: 538
       semanticFailures: 0
       unsupportedProfileFeatures: 3
     - dependency: bigint-primitive
@@ -24148,7 +24328,7 @@ summary:
       expectedNegatives: 1364
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 7502
+      passes: 7504
       semanticFailures: 0
       unsupportedProfileFeatures: 255
     - dependency: control-flow
@@ -24197,21 +24377,21 @@ summary:
       expectedNegatives: 17
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 3157
+      passes: 3192
       semanticFailures: 0
       unsupportedProfileFeatures: 604
     - dependency: expression-operators
       expectedNegatives: 642
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 10918
+      passes: 10923
       semanticFailures: 0
       unsupportedProfileFeatures: 762
     - dependency: functions
       expectedNegatives: 1387
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 17590
+      passes: 17604
       semanticFailures: 0
       unsupportedProfileFeatures: 1573
     - dependency: generators
@@ -24225,7 +24405,7 @@ summary:
       expectedNegatives: 94
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 7823
+      passes: 7844
       semanticFailures: 0
       unsupportedProfileFeatures: 46
     - dependency: json-parse
@@ -24267,7 +24447,7 @@ summary:
       expectedNegatives: 209
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 6006
+      passes: 6027
       semanticFailures: 0
       unsupportedProfileFeatures: 178
     - dependency: object-own-keys
@@ -24281,7 +24461,7 @@ summary:
       expectedNegatives: 610
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 23027
+      passes: 23060
       semanticFailures: 0
       unsupportedProfileFeatures: 990
     - dependency: promise-settlement
@@ -24344,7 +24524,7 @@ summary:
       expectedNegatives: 0
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 6582
+      passes: 6603
       semanticFailures: 0
       unsupportedProfileFeatures: 280
     - dependency: top-level-await
@@ -24358,14 +24538,14 @@ summary:
       expectedNegatives: 0
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 439
+      passes: 482
       semanticFailures: 0
       unsupportedProfileFeatures: 12
     - dependency: typed-array-core
       expectedNegatives: 0
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 780
+      passes: 848
       semanticFailures: 0
       unsupportedProfileFeatures: 0
     - dependency: typed-array-iterative
@@ -24407,7 +24587,7 @@ summary:
       expectedNegatives: 230
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 11390
+      passes: 11431
       semanticFailures: 0
       unsupportedProfileFeatures: 777
     - dependency: weak-collections
@@ -24492,7 +24672,7 @@ summary:
       expectedNegatives: 0
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 375
+      passes: 380
       semanticFailures: 0
       unsupportedProfileFeatures: 0
     - group: built-ins/BigInt
@@ -24726,6 +24906,13 @@ summary:
       passes: 724
       semanticFailures: 0
       unsupportedProfileFeatures: 12
+    - group: built-ins/Uint8Array
+      expectedNegatives: 0
+      harnessFailures: 0
+      infrastructureFailures: 0
+      passes: 68
+      semanticFailures: 0
+      unsupportedProfileFeatures: 0
     - group: built-ins/WeakMap
       expectedNegatives: 0
       harnessFailures: 0

@@ -3538,6 +3538,696 @@ static OseoResult typed_array_static_of(
     return result;
 }
 
+/*
+ * The base64 and hex methods of Uint8Array (ECMA-262 2026 23.3.2 and
+ * 23.3.3.12 to 23.3.3.15). Decoding and encoding read and write only
+ * work buffers, which never collect, so no user code and no collection
+ * runs between the bounds check and the copy into a view's Data Block.
+ */
+
+static OseoResult define_typed_array_property(
+    OseoContext *context,
+    OseoValue object,
+    const char *name,
+    OseoValue value,
+    OseoPropertyAttributes attributes
+);
+
+typedef enum {
+    BASE64_LAST_CHUNK_LOOSE = 0,
+    BASE64_LAST_CHUNK_STRICT = 1,
+    BASE64_LAST_CHUNK_STOP_BEFORE_PARTIAL = 2,
+} Base64LastChunkHandling;
+
+/* The [[Read]], [[Bytes]] length, and [[Error]] fields of a decode. */
+typedef struct {
+    size_t read;
+    size_t written;
+    bool error;
+} Base64DecodeResult;
+
+static bool base64_is_uint8_array(OseoValue value) {
+    return is_typed_array(value) &&
+        typed_array_object(value)->element_kind == OSEO_TYPED_ARRAY_UINT8;
+}
+
+/* ValidateUint8Array. */
+static OseoResult base64_validate_receiver(
+    OseoContext *context,
+    OseoValue value
+) {
+    if (base64_is_uint8_array(value)) return normal(value);
+    return oseo_internal_throw_error(
+        context,
+        OSEO_ERROR_TYPE,
+        "The receiver is not a Uint8Array."
+    );
+}
+
+/*
+ * GetOptionsObject. An undefined argument stands for an empty object with
+ * a null prototype, which no option read can observe, so nothing is
+ * allocated for it.
+ */
+static OseoResult base64_options(OseoContext *context, OseoValue options) {
+    if (tag_of(options) == OSEO_TAG_UNDEFINED || is_object(options)) {
+        return normal(options);
+    }
+    return oseo_internal_throw_error(
+        context,
+        OSEO_ERROR_TYPE,
+        "The options argument must be an object or undefined."
+    );
+}
+
+static bool base64_string_is(OseoValue value, const char *text) {
+    if (!is_string(value)) return false;
+    const OseoString *string = string_object(value);
+    size_t length = strlen(text);
+    if (string->length != length) return false;
+    for (size_t index = 0u; index < length; index += 1u) {
+        if (string->units[index] != (uint16_t)(unsigned char)text[index]) {
+            return false;
+        }
+    }
+    return true;
+}
+
+/* Get(options, name), or undefined for absent options. */
+static OseoResult base64_option(
+    OseoContext *context,
+    OseoValue options,
+    const char *name
+) {
+    if (!is_object(options)) return normal(oseo_undefined());
+    OseoValue slots[2] = {options, oseo_undefined()};
+    OseoRootFrame frame = {NULL, slots, 2u};
+    oseo_roots_push(context, &frame);
+    OseoResult result = oseo_internal_ascii_string(context, name);
+    slots[1] = result.value;
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = oseo_object_get(context, slots[0], slots[1]);
+    }
+    oseo_roots_pop(context, &frame);
+    return result;
+}
+
+/* The `alphabet` option: a String, never coerced. */
+static OseoResult base64_alphabet(
+    OseoContext *context,
+    OseoValue options,
+    bool *url
+) {
+    OseoResult result = base64_option(context, options, "alphabet");
+    if (result.status != OSEO_STATUS_NORMAL) return result;
+    if (tag_of(result.value) == OSEO_TAG_UNDEFINED ||
+        base64_string_is(result.value, "base64")) {
+        *url = false;
+        return result;
+    }
+    if (base64_string_is(result.value, "base64url")) {
+        *url = true;
+        return result;
+    }
+    return oseo_internal_throw_error(
+        context,
+        OSEO_ERROR_TYPE,
+        "The alphabet option must be \"base64\" or \"base64url\"."
+    );
+}
+
+/* The `lastChunkHandling` option: a String, never coerced. */
+static OseoResult base64_last_chunk_handling(
+    OseoContext *context,
+    OseoValue options,
+    Base64LastChunkHandling *handling
+) {
+    OseoResult result = base64_option(context, options, "lastChunkHandling");
+    if (result.status != OSEO_STATUS_NORMAL) return result;
+    if (tag_of(result.value) == OSEO_TAG_UNDEFINED ||
+        base64_string_is(result.value, "loose")) {
+        *handling = BASE64_LAST_CHUNK_LOOSE;
+        return result;
+    }
+    if (base64_string_is(result.value, "strict")) {
+        *handling = BASE64_LAST_CHUNK_STRICT;
+        return result;
+    }
+    if (base64_string_is(result.value, "stop-before-partial")) {
+        *handling = BASE64_LAST_CHUNK_STOP_BEFORE_PARTIAL;
+        return result;
+    }
+    return oseo_internal_throw_error(
+        context,
+        OSEO_ERROR_TYPE,
+        "The lastChunkHandling option must be \"loose\", \"strict\", or "
+        "\"stop-before-partial\"."
+    );
+}
+
+static OseoResult base64_require_string(
+    OseoContext *context,
+    OseoValue value
+) {
+    if (is_string(value)) return normal(value);
+    return oseo_internal_throw_error(
+        context,
+        OSEO_ERROR_TYPE,
+        "The input must be a String."
+    );
+}
+
+/* Tab, line feed, form feed, carriage return, and space. */
+static size_t base64_skip_whitespace(
+    const uint16_t *units,
+    size_t length,
+    size_t index
+) {
+    while (index < length) {
+        uint16_t unit = units[index];
+        if (unit != 0x09u && unit != 0x0au && unit != 0x0cu &&
+            unit != 0x0du && unit != 0x20u) {
+            break;
+        }
+        index += 1u;
+    }
+    return index;
+}
+
+/* The standard alphabet's 6-bit value of a code unit, or -1. */
+static int base64_digit(uint16_t unit) {
+    if (unit >= 'A' && unit <= 'Z') return (int)(unit - 'A');
+    if (unit >= 'a' && unit <= 'z') return (int)(unit - 'a') + 26;
+    if (unit >= '0' && unit <= '9') return (int)(unit - '0') + 52;
+    if (unit == '+') return 62;
+    if (unit == '/') return 63;
+    return -1;
+}
+
+/*
+ * DecodeBase64Chunk for a chunk of two to four digits. It appends one
+ * byte fewer than the digit count and answers false only when
+ * `throw_on_extra_bits` is set and the padding bits are not zero.
+ */
+static bool base64_decode_chunk(
+    const uint8_t *digits,
+    size_t digit_count,
+    bool throw_on_extra_bits,
+    uint8_t *output
+) {
+    uint32_t bits = 0u;
+    for (size_t index = 0u; index < 4u; index += 1u) {
+        bits = (bits << 6u) | (index < digit_count ? digits[index] : 0u);
+    }
+    uint8_t bytes[3] = {
+        (uint8_t)(bits >> 16u),
+        (uint8_t)(bits >> 8u),
+        (uint8_t)bits,
+    };
+    size_t produced = digit_count - 1u;
+    if (throw_on_extra_bits && produced < 3u && bytes[produced] != 0u) {
+        return false;
+    }
+    memcpy(output, bytes, produced);
+    return true;
+}
+
+/*
+ * FromBase64 over `units`. `bytes` holds at least `max_length` bytes or
+ * the most the input can decode to, whichever is smaller.
+ */
+static void base64_decode(
+    const uint16_t *units,
+    size_t length,
+    bool url,
+    Base64LastChunkHandling handling,
+    size_t max_length,
+    uint8_t *bytes,
+    Base64DecodeResult *decoded
+) {
+    decoded->read = 0u;
+    decoded->written = 0u;
+    decoded->error = false;
+    if (max_length == 0u) return;
+    uint8_t chunk[4];
+    size_t chunk_length = 0u;
+    size_t index = 0u;
+    while (true) {
+        index = base64_skip_whitespace(units, length, index);
+        if (index == length) {
+            if (chunk_length > 0u) {
+                if (handling == BASE64_LAST_CHUNK_STOP_BEFORE_PARTIAL) return;
+                if (handling == BASE64_LAST_CHUNK_STRICT ||
+                    chunk_length == 1u) {
+                    decoded->error = true;
+                    return;
+                }
+                base64_decode_chunk(
+                    chunk,
+                    chunk_length,
+                    false,
+                    bytes + decoded->written
+                );
+                decoded->written += chunk_length - 1u;
+            }
+            decoded->read = length;
+            return;
+        }
+        uint16_t unit = units[index];
+        index += 1u;
+        if (unit == '=') {
+            if (chunk_length < 2u) {
+                decoded->error = true;
+                return;
+            }
+            index = base64_skip_whitespace(units, length, index);
+            if (chunk_length == 2u) {
+                if (index == length) {
+                    if (handling != BASE64_LAST_CHUNK_STOP_BEFORE_PARTIAL) {
+                        decoded->error = true;
+                    }
+                    return;
+                }
+                if (units[index] == '=') {
+                    index = base64_skip_whitespace(units, length, index + 1u);
+                }
+            }
+            if (index < length ||
+                !base64_decode_chunk(
+                    chunk,
+                    chunk_length,
+                    handling == BASE64_LAST_CHUNK_STRICT,
+                    bytes + decoded->written
+                )) {
+                decoded->error = true;
+                return;
+            }
+            decoded->written += chunk_length - 1u;
+            decoded->read = length;
+            return;
+        }
+        if (url) {
+            if (unit == '+' || unit == '/') {
+                decoded->error = true;
+                return;
+            }
+            if (unit == '-') unit = '+';
+            else if (unit == '_') unit = '/';
+        }
+        int digit = base64_digit(unit);
+        if (digit < 0) {
+            decoded->error = true;
+            return;
+        }
+        size_t remaining = max_length - decoded->written;
+        if ((remaining == 1u && chunk_length == 2u) ||
+            (remaining == 2u && chunk_length == 3u)) {
+            return;
+        }
+        chunk[chunk_length] = (uint8_t)digit;
+        chunk_length += 1u;
+        if (chunk_length == 4u) {
+            base64_decode_chunk(chunk, 4u, false, bytes + decoded->written);
+            decoded->written += 3u;
+            chunk_length = 0u;
+            decoded->read = index;
+            if (decoded->written == max_length) return;
+        }
+    }
+}
+
+static int base64_hex_digit(uint16_t unit) {
+    if (unit >= '0' && unit <= '9') return (int)(unit - '0');
+    if (unit >= 'a' && unit <= 'f') return (int)(unit - 'a') + 10;
+    if (unit >= 'A' && unit <= 'F') return (int)(unit - 'A') + 10;
+    return -1;
+}
+
+/* FromHex over `units`; `bytes` holds at least min(max_length, length/2). */
+static void base64_hex_decode(
+    const uint16_t *units,
+    size_t length,
+    size_t max_length,
+    uint8_t *bytes,
+    Base64DecodeResult *decoded
+) {
+    decoded->read = 0u;
+    decoded->written = 0u;
+    decoded->error = length % 2u != 0u;
+    if (decoded->error) return;
+    while (decoded->read < length && decoded->written < max_length) {
+        int high = base64_hex_digit(units[decoded->read]);
+        int low = base64_hex_digit(units[decoded->read + 1u]);
+        if (high < 0 || low < 0) {
+            decoded->error = true;
+            return;
+        }
+        decoded->read += 2u;
+        bytes[decoded->written] = (uint8_t)((high << 4) | low);
+        decoded->written += 1u;
+    }
+}
+
+/*
+ * Decodes the rooted String `string` into a fresh work buffer, which the
+ * caller frees. `max_length` bounds the output; SIZE_MAX stands for the
+ * edition's 2**53 - 1, which no String can reach.
+ */
+static OseoResult base64_decode_string(
+    OseoContext *context,
+    OseoValue string,
+    bool hex,
+    bool url,
+    Base64LastChunkHandling handling,
+    size_t max_length,
+    uint8_t **bytes,
+    Base64DecodeResult *decoded
+) {
+    const OseoString *text = string_object(string);
+    size_t capacity = hex ? text->length / 2u : text->length / 4u * 3u + 2u;
+    if (capacity > max_length) capacity = max_length;
+    *bytes = oseo_internal_allocate_work_bytes(
+        context,
+        capacity == 0u ? 1u : capacity
+    );
+    if (*bytes == NULL) {
+        return failure(context, "OSEO2001", "Decode buffer allocation failed.");
+    }
+    if (hex) {
+        base64_hex_decode(
+            text->units,
+            text->length,
+            max_length,
+            *bytes,
+            decoded
+        );
+    } else {
+        base64_decode(
+            text->units,
+            text->length,
+            url,
+            handling,
+            max_length,
+            *bytes,
+            decoded
+        );
+    }
+    return normal(oseo_undefined());
+}
+
+static OseoResult base64_syntax_error(OseoContext *context, bool hex) {
+    return oseo_internal_throw_error(
+        context,
+        OSEO_ERROR_SYNTAX,
+        hex ? "The hex string is malformed." : "The base64 string is malformed."
+    );
+}
+
+/* Uint8Array.fromBase64 and Uint8Array.fromHex. */
+static OseoResult base64_from_string(
+    OseoContext *context,
+    size_t argument_count,
+    const OseoValue *arguments,
+    bool hex
+) {
+    OseoValue slots[3] = {
+        typed_array_argument(argument_count, arguments, 0u),
+        typed_array_argument(argument_count, arguments, 1u),
+        oseo_undefined(),
+    };
+    OseoRootFrame frame = {NULL, slots, 3u};
+    oseo_roots_push(context, &frame);
+    bool url = false;
+    Base64LastChunkHandling handling = BASE64_LAST_CHUNK_LOOSE;
+    OseoResult result = base64_require_string(context, slots[0]);
+    if (result.status == OSEO_STATUS_NORMAL && !hex) {
+        result = base64_options(context, slots[1]);
+        if (result.status == OSEO_STATUS_NORMAL) {
+            result = base64_alphabet(context, slots[1], &url);
+        }
+        if (result.status == OSEO_STATUS_NORMAL) {
+            result = base64_last_chunk_handling(context, slots[1], &handling);
+        }
+    }
+    uint8_t *bytes = NULL;
+    Base64DecodeResult decoded = {0u, 0u, false};
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = base64_decode_string(
+            context,
+            slots[0],
+            hex,
+            url,
+            handling,
+            SIZE_MAX,
+            &bytes,
+            &decoded
+        );
+    }
+    if (result.status == OSEO_STATUS_NORMAL && decoded.error) {
+        result = base64_syntax_error(context, hex);
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = oseo_internal_intrinsic(context, OSEO_INTRINSIC_UINT8_ARRAY);
+        slots[2] = result.value;
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = typed_array_allocate_object(
+            context,
+            OSEO_TYPED_ARRAY_UINT8,
+            slots[2]
+        );
+        slots[2] = result.value;
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = typed_array_allocate_buffer(
+            context,
+            slots[2],
+            decoded.written
+        );
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        if (decoded.written > 0u) {
+            memcpy(
+                typed_array_element_bytes(typed_array_object(slots[2]), 0u),
+                bytes,
+                decoded.written
+            );
+        }
+        result = normal(slots[2]);
+    }
+    free(bytes);
+    oseo_roots_pop(context, &frame);
+    return result;
+}
+
+/* Uint8Array.prototype.setFromBase64 and setFromHex. */
+static OseoResult base64_set_from_string(
+    OseoContext *context,
+    OseoValue receiver,
+    size_t argument_count,
+    const OseoValue *arguments,
+    bool hex
+) {
+    OseoValue slots[4] = {
+        receiver,
+        typed_array_argument(argument_count, arguments, 0u),
+        typed_array_argument(argument_count, arguments, 1u),
+        oseo_undefined(),
+    };
+    OseoRootFrame frame = {NULL, slots, 4u};
+    oseo_roots_push(context, &frame);
+    bool url = false;
+    Base64LastChunkHandling handling = BASE64_LAST_CHUNK_LOOSE;
+    OseoResult result = base64_validate_receiver(context, slots[0]);
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = base64_require_string(context, slots[1]);
+    }
+    if (result.status == OSEO_STATUS_NORMAL && !hex) {
+        result = base64_options(context, slots[2]);
+        if (result.status == OSEO_STATUS_NORMAL) {
+            result = base64_alphabet(context, slots[2], &url);
+        }
+        if (result.status == OSEO_STATUS_NORMAL) {
+            result = base64_last_chunk_handling(context, slots[2], &handling);
+        }
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = typed_array_validate(context, slots[0]);
+    }
+    uint8_t *bytes = NULL;
+    Base64DecodeResult decoded = {0u, 0u, false};
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = base64_decode_string(
+            context,
+            slots[1],
+            hex,
+            url,
+            handling,
+            typed_array_length(typed_array_object(slots[0])),
+            &bytes,
+            &decoded
+        );
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        /* Decoding ran no user code, so the view is still in bounds. */
+        if (decoded.written > 0u) {
+            memcpy(
+                typed_array_element_bytes(typed_array_object(slots[0]), 0u),
+                bytes,
+                decoded.written
+            );
+        }
+        if (decoded.error) result = base64_syntax_error(context, hex);
+    }
+    free(bytes);
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = oseo_internal_intrinsic(
+            context,
+            OSEO_INTRINSIC_OBJECT_PROTOTYPE
+        );
+        slots[3] = result.value;
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = oseo_object_create(context, slots[3]);
+        slots[3] = result.value;
+    }
+    const OseoPropertyAttributes data = {true, true, true, false};
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = define_typed_array_property(
+            context,
+            slots[3],
+            "read",
+            oseo_number((double)decoded.read),
+            data
+        );
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = define_typed_array_property(
+            context,
+            slots[3],
+            "written",
+            oseo_number((double)decoded.written),
+            data
+        );
+    }
+    if (result.status == OSEO_STATUS_NORMAL) result = normal(slots[3]);
+    oseo_roots_pop(context, &frame);
+    return result;
+}
+
+/* Uint8Array.prototype.toBase64 and toHex. */
+static OseoResult base64_to_string(
+    OseoContext *context,
+    OseoValue receiver,
+    size_t argument_count,
+    const OseoValue *arguments,
+    bool hex
+) {
+    OseoValue slots[2] = {
+        receiver,
+        typed_array_argument(argument_count, arguments, 0u),
+    };
+    OseoRootFrame frame = {NULL, slots, 2u};
+    oseo_roots_push(context, &frame);
+    bool url = false;
+    bool omit_padding = false;
+    OseoResult result = base64_validate_receiver(context, slots[0]);
+    if (result.status == OSEO_STATUS_NORMAL && !hex) {
+        result = base64_options(context, slots[1]);
+        if (result.status == OSEO_STATUS_NORMAL) {
+            result = base64_alphabet(context, slots[1], &url);
+        }
+        if (result.status == OSEO_STATUS_NORMAL) {
+            result = base64_option(context, slots[1], "omitPadding");
+        }
+        if (result.status == OSEO_STATUS_NORMAL) {
+            omit_padding = oseo_to_boolean(result.value);
+        }
+    }
+    /* GetUint8ArrayBytes: the bounds check follows every option read. */
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = typed_array_validate(context, slots[0]);
+    }
+    size_t count = 0u;
+    size_t length = 0u;
+    if (result.status == OSEO_STATUS_NORMAL) {
+        count = typed_array_length(typed_array_object(slots[0]));
+        size_t whole = count / 3u;
+        size_t rest = count % 3u;
+        bool fits = hex ? count <= SIZE_MAX / 2u : whole <= SIZE_MAX / 4u - 1u;
+        if (!fits) {
+            result = oseo_internal_throw_error(
+                context,
+                OSEO_ERROR_RANGE,
+                "The encoded string is too long."
+            );
+        } else if (hex) {
+            length = count * 2u;
+        } else {
+            length = whole * 4u +
+                (rest == 0u ? 0u : omit_padding ? rest + 1u : 4u);
+        }
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = oseo_internal_validate_string_length(context, length);
+    }
+    uint16_t *units = NULL;
+    if (result.status == OSEO_STATUS_NORMAL) {
+        units = oseo_internal_allocate_work_bytes(
+            context,
+            length == 0u ? 1u : length * sizeof(uint16_t)
+        );
+        if (units == NULL) {
+            result = failure(
+                context,
+                "OSEO2001",
+                "String allocation failed."
+            );
+        }
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        static const char hex_digits[] = "0123456789abcdef";
+        static const char standard[] =
+            "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
+        static const char url_safe[] =
+            "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_";
+        const char *alphabet = url ? url_safe : standard;
+        const uint8_t *bytes = count == 0u
+            ? NULL
+            : typed_array_element_bytes(typed_array_object(slots[0]), 0u);
+        size_t output = 0u;
+        if (hex) {
+            for (size_t index = 0u; index < count; index += 1u) {
+                units[output] = (uint16_t)hex_digits[bytes[index] >> 4u];
+                units[output + 1u] = (uint16_t)hex_digits[bytes[index] & 15u];
+                output += 2u;
+            }
+        } else {
+            for (size_t index = 0u; index < count; index += 3u) {
+                size_t available = count - index < 3u ? count - index : 3u;
+                uint32_t bits = (uint32_t)bytes[index] << 16u;
+                if (available > 1u) bits |= (uint32_t)bytes[index + 1u] << 8u;
+                if (available > 2u) bits |= bytes[index + 2u];
+                for (size_t digit = 0u; digit < 4u; digit += 1u) {
+                    if (digit <= available) {
+                        units[output] = (uint16_t)alphabet[
+                            (bits >> (18u - 6u * digit)) & 63u
+                        ];
+                        output += 1u;
+                    } else if (!omit_padding) {
+                        units[output] = (uint16_t)'=';
+                        output += 1u;
+                    }
+                }
+            }
+        }
+        result = oseo_internal_allocate_string(context, units, length);
+    }
+    free(units);
+    oseo_roots_pop(context, &frame);
+    return result;
+}
+
 OseoResult oseo_internal_typed_array_builtin_dispatch(
     OseoContext *context,
     size_t code_id,
@@ -3689,6 +4379,35 @@ OseoResult oseo_internal_typed_array_builtin_dispatch(
             code_id == OSEO_TYPED_ARRAY_TO_SORTED_CODE_ID
         );
     }
+    if (code_id == OSEO_UINT8_ARRAY_FROM_BASE64_CODE_ID ||
+        code_id == OSEO_UINT8_ARRAY_FROM_HEX_CODE_ID) {
+        return base64_from_string(
+            context,
+            argument_count,
+            arguments,
+            code_id == OSEO_UINT8_ARRAY_FROM_HEX_CODE_ID
+        );
+    }
+    if (code_id == OSEO_UINT8_ARRAY_SET_FROM_BASE64_CODE_ID ||
+        code_id == OSEO_UINT8_ARRAY_SET_FROM_HEX_CODE_ID) {
+        return base64_set_from_string(
+            context,
+            receiver,
+            argument_count,
+            arguments,
+            code_id == OSEO_UINT8_ARRAY_SET_FROM_HEX_CODE_ID
+        );
+    }
+    if (code_id == OSEO_UINT8_ARRAY_TO_BASE64_CODE_ID ||
+        code_id == OSEO_UINT8_ARRAY_TO_HEX_CODE_ID) {
+        return base64_to_string(
+            context,
+            receiver,
+            argument_count,
+            arguments,
+            code_id == OSEO_UINT8_ARRAY_TO_HEX_CODE_ID
+        );
+    }
     if (code_id == OSEO_TYPED_ARRAY_CONSTRUCTOR_CODE_ID) {
         return oseo_internal_throw_error(
             context,
@@ -3764,6 +4483,64 @@ static OseoResult define_typed_array_property(
             slots[1],
             attributes
         );
+    }
+    oseo_roots_pop(context, &frame);
+    return result;
+}
+
+/*
+ * Installs fromBase64 and fromHex on %Uint8Array% and toBase64,
+ * setFromBase64, toHex, and setFromHex on %Uint8Array.prototype%, in the
+ * edition's order.
+ */
+static OseoResult base64_install(
+    OseoContext *context,
+    OseoValue prototype,
+    OseoValue constructor
+) {
+    static const size_t codes[] = {
+        OSEO_UINT8_ARRAY_FROM_BASE64_CODE_ID,
+        OSEO_UINT8_ARRAY_FROM_HEX_CODE_ID,
+        OSEO_UINT8_ARRAY_TO_BASE64_CODE_ID,
+        OSEO_UINT8_ARRAY_SET_FROM_BASE64_CODE_ID,
+        OSEO_UINT8_ARRAY_TO_HEX_CODE_ID,
+        OSEO_UINT8_ARRAY_SET_FROM_HEX_CODE_ID,
+    };
+    static const char *const names[] = {
+        "fromBase64",
+        "fromHex",
+        "toBase64",
+        "setFromBase64",
+        "toHex",
+        "setFromHex",
+    };
+    static const size_t lengths[] = {1u, 1u, 0u, 1u, 0u, 1u};
+    OseoValue slots[3] = {prototype, constructor, oseo_undefined()};
+    OseoRootFrame frame = {NULL, slots, 3u};
+    oseo_roots_push(context, &frame);
+    const OseoPropertyAttributes method = {true, false, true, false};
+    OseoResult result = normal(oseo_undefined());
+    for (size_t index = 0u;
+         result.status == OSEO_STATUS_NORMAL && index < 6u;
+         index += 1u) {
+        result = create_typed_array_builtin(
+            context,
+            codes[index],
+            names[index],
+            lengths[index],
+            OSEO_FUNCTION_INTERNAL,
+            OSEO_FUNCTION_NAME_PREFIX_NONE
+        );
+        slots[2] = result.value;
+        if (result.status == OSEO_STATUS_NORMAL) {
+            result = define_typed_array_property(
+                context,
+                index < 2u ? slots[1] : slots[0],
+                names[index],
+                slots[2],
+                method
+            );
+        }
     }
     oseo_roots_pop(context, &frame);
     return result;
@@ -4275,6 +5052,10 @@ static OseoResult typed_array_intrinsic_build(OseoContext *context) {
                 oseo_number((double)typed_array_bytes[index]),
                 constant
             );
+        }
+        if (result.status == OSEO_STATUS_NORMAL &&
+            index == OSEO_TYPED_ARRAY_UINT8) {
+            result = base64_install(context, frame.slots[3], frame.slots[4]);
         }
     }
     if (result.status != OSEO_STATUS_NORMAL) {

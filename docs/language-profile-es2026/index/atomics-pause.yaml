@@ -1,0 +1,3 @@
+version: 1
+id: atomics-pause
+record: docs/language-profile-es2026/families/atomics-pause.yaml

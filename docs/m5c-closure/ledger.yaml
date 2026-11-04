@@ -6,16 +6,16 @@
 version: 1
 suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
 inventoryPaths: 43007
-closedPaths: 39760
-openPaths: 3247
+closedPaths: 39833
+openPaths: 3174
 deferredPaths: 74
 states:
   expected-negative: 4401
   harness-failure: 0
   infrastructure-failure: 0
-  pass: 35359
+  pass: 35432
   semantic-failure: 0
-  unreviewed: 1358
+  unreviewed: 1285
   unsupported-profile-feature: 1889
 owners:
   adr:0016-dynamic-source-boundary:
@@ -206,7 +206,7 @@ owners:
     note: Closed by a reviewed pass or expected negative in the manifest.
       The owner changes only when a regenerated manifest changes the
       state.
-    paths: 39760
+    paths: 39833
   unit:annexb-dynamic-source-accounting:
     paths: 479
   unit:annexb-function-declarations:
@@ -217,12 +217,8 @@ owners:
     paths: 19
   unit:annexb-syntax:
     paths: 29
-  unit:atomics-pause:
-    paths: 5
   unit:disposal-intrinsics:
     paths: 240
-  unit:uint8array-base64:
-    paths: 68
   unit:using-declarations:
     paths: 184
 paths:
@@ -4969,11 +4965,11 @@ paths:
   test/built-ins/Atomics/or/not-a-constructor.js: [pass, observation]
   test/built-ins/Atomics/or/validate-arraytype-before-index-coercion.js: [pass, observation]
   test/built-ins/Atomics/or/validate-arraytype-before-value-coercion.js: [pass, observation]
-  test/built-ins/Atomics/pause/descriptor.js: [unreviewed, unit:atomics-pause]
-  test/built-ins/Atomics/pause/length.js: [unreviewed, unit:atomics-pause]
-  test/built-ins/Atomics/pause/name.js: [unreviewed, unit:atomics-pause]
-  test/built-ins/Atomics/pause/not-a-constructor.js: [unreviewed, unit:atomics-pause]
-  test/built-ins/Atomics/pause/returns-undefined.js: [unreviewed, unit:atomics-pause]
+  test/built-ins/Atomics/pause/descriptor.js: [pass, observation]
+  test/built-ins/Atomics/pause/length.js: [pass, observation]
+  test/built-ins/Atomics/pause/name.js: [pass, observation]
+  test/built-ins/Atomics/pause/not-a-constructor.js: [pass, observation]
+  test/built-ins/Atomics/pause/returns-undefined.js: [pass, observation]
   test/built-ins/Atomics/prop-desc.js: [pass, observation]
   test/built-ins/Atomics/proto.js: [pass, observation]
   test/built-ins/Atomics/store/bad-range.js: [pass, observation]
@@ -19369,74 +19365,74 @@ paths:
   test/built-ins/TypedArrayConstructors/prototype/toString/inherited.js: [pass, observation]
   test/built-ins/TypedArrayConstructors/prototype/values/bigint-inherited.js: [pass, observation]
   test/built-ins/TypedArrayConstructors/prototype/values/inherited.js: [pass, observation]
-  test/built-ins/Uint8Array/fromBase64/alphabet.js: [unreviewed, unit:uint8array-base64]
-  test/built-ins/Uint8Array/fromBase64/descriptor.js: [unreviewed, unit:uint8array-base64]
-  test/built-ins/Uint8Array/fromBase64/ignores-receiver.js: [unreviewed, unit:uint8array-base64]
-  test/built-ins/Uint8Array/fromBase64/illegal-characters.js: [unreviewed, unit:uint8array-base64]
-  test/built-ins/Uint8Array/fromBase64/last-chunk-handling.js: [unreviewed, unit:uint8array-base64]
-  test/built-ins/Uint8Array/fromBase64/last-chunk-invalid.js: [unreviewed, unit:uint8array-base64]
-  test/built-ins/Uint8Array/fromBase64/length.js: [unreviewed, unit:uint8array-base64]
-  test/built-ins/Uint8Array/fromBase64/name.js: [unreviewed, unit:uint8array-base64]
-  test/built-ins/Uint8Array/fromBase64/nonconstructor.js: [unreviewed, unit:uint8array-base64]
-  test/built-ins/Uint8Array/fromBase64/option-coercion.js: [unreviewed, unit:uint8array-base64]
-  test/built-ins/Uint8Array/fromBase64/results.js: [unreviewed, unit:uint8array-base64]
-  test/built-ins/Uint8Array/fromBase64/string-coercion.js: [unreviewed, unit:uint8array-base64]
-  test/built-ins/Uint8Array/fromBase64/whitespace.js: [unreviewed, unit:uint8array-base64]
-  test/built-ins/Uint8Array/fromHex/descriptor.js: [unreviewed, unit:uint8array-base64]
-  test/built-ins/Uint8Array/fromHex/ignores-receiver.js: [unreviewed, unit:uint8array-base64]
-  test/built-ins/Uint8Array/fromHex/illegal-characters.js: [unreviewed, unit:uint8array-base64]
-  test/built-ins/Uint8Array/fromHex/length.js: [unreviewed, unit:uint8array-base64]
-  test/built-ins/Uint8Array/fromHex/name.js: [unreviewed, unit:uint8array-base64]
-  test/built-ins/Uint8Array/fromHex/nonconstructor.js: [unreviewed, unit:uint8array-base64]
-  test/built-ins/Uint8Array/fromHex/odd-length-input.js: [unreviewed, unit:uint8array-base64]
-  test/built-ins/Uint8Array/fromHex/results.js: [unreviewed, unit:uint8array-base64]
-  test/built-ins/Uint8Array/fromHex/string-coercion.js: [unreviewed, unit:uint8array-base64]
-  test/built-ins/Uint8Array/prototype/setFromBase64/alphabet.js: [unreviewed, unit:uint8array-base64]
-  test/built-ins/Uint8Array/prototype/setFromBase64/descriptor.js: [unreviewed, unit:uint8array-base64]
-  test/built-ins/Uint8Array/prototype/setFromBase64/detached-buffer.js: [unreviewed, unit:uint8array-base64]
-  test/built-ins/Uint8Array/prototype/setFromBase64/illegal-characters.js: [unreviewed, unit:uint8array-base64]
-  test/built-ins/Uint8Array/prototype/setFromBase64/last-chunk-handling.js: [unreviewed, unit:uint8array-base64]
-  test/built-ins/Uint8Array/prototype/setFromBase64/length.js: [unreviewed, unit:uint8array-base64]
-  test/built-ins/Uint8Array/prototype/setFromBase64/name.js: [unreviewed, unit:uint8array-base64]
-  test/built-ins/Uint8Array/prototype/setFromBase64/nonconstructor.js: [unreviewed, unit:uint8array-base64]
-  test/built-ins/Uint8Array/prototype/setFromBase64/option-coercion.js: [unreviewed, unit:uint8array-base64]
-  test/built-ins/Uint8Array/prototype/setFromBase64/results.js: [unreviewed, unit:uint8array-base64]
-  test/built-ins/Uint8Array/prototype/setFromBase64/string-coercion.js: [unreviewed, unit:uint8array-base64]
-  test/built-ins/Uint8Array/prototype/setFromBase64/subarray.js: [unreviewed, unit:uint8array-base64]
-  test/built-ins/Uint8Array/prototype/setFromBase64/target-size.js: [unreviewed, unit:uint8array-base64]
-  test/built-ins/Uint8Array/prototype/setFromBase64/trailing-garbage-empty.js: [unreviewed, unit:uint8array-base64]
-  test/built-ins/Uint8Array/prototype/setFromBase64/trailing-garbage.js: [unreviewed, unit:uint8array-base64]
-  test/built-ins/Uint8Array/prototype/setFromBase64/whitespace.js: [unreviewed, unit:uint8array-base64]
-  test/built-ins/Uint8Array/prototype/setFromBase64/writes-up-to-error.js: [unreviewed, unit:uint8array-base64]
-  test/built-ins/Uint8Array/prototype/setFromHex/descriptor.js: [unreviewed, unit:uint8array-base64]
-  test/built-ins/Uint8Array/prototype/setFromHex/detached-buffer.js: [unreviewed, unit:uint8array-base64]
-  test/built-ins/Uint8Array/prototype/setFromHex/illegal-characters.js: [unreviewed, unit:uint8array-base64]
-  test/built-ins/Uint8Array/prototype/setFromHex/length.js: [unreviewed, unit:uint8array-base64]
-  test/built-ins/Uint8Array/prototype/setFromHex/name.js: [unreviewed, unit:uint8array-base64]
-  test/built-ins/Uint8Array/prototype/setFromHex/nonconstructor.js: [unreviewed, unit:uint8array-base64]
-  test/built-ins/Uint8Array/prototype/setFromHex/results.js: [unreviewed, unit:uint8array-base64]
-  test/built-ins/Uint8Array/prototype/setFromHex/string-coercion.js: [unreviewed, unit:uint8array-base64]
-  test/built-ins/Uint8Array/prototype/setFromHex/subarray.js: [unreviewed, unit:uint8array-base64]
-  test/built-ins/Uint8Array/prototype/setFromHex/target-size.js: [unreviewed, unit:uint8array-base64]
-  test/built-ins/Uint8Array/prototype/setFromHex/throws-when-string-length-is-odd.js: [unreviewed, unit:uint8array-base64]
-  test/built-ins/Uint8Array/prototype/setFromHex/writes-up-to-error.js: [unreviewed, unit:uint8array-base64]
-  test/built-ins/Uint8Array/prototype/toBase64/alphabet.js: [unreviewed, unit:uint8array-base64]
-  test/built-ins/Uint8Array/prototype/toBase64/descriptor.js: [unreviewed, unit:uint8array-base64]
-  test/built-ins/Uint8Array/prototype/toBase64/detached-buffer.js: [unreviewed, unit:uint8array-base64]
-  test/built-ins/Uint8Array/prototype/toBase64/length.js: [unreviewed, unit:uint8array-base64]
-  test/built-ins/Uint8Array/prototype/toBase64/name.js: [unreviewed, unit:uint8array-base64]
-  test/built-ins/Uint8Array/prototype/toBase64/nonconstructor.js: [unreviewed, unit:uint8array-base64]
-  test/built-ins/Uint8Array/prototype/toBase64/omit-padding.js: [unreviewed, unit:uint8array-base64]
-  test/built-ins/Uint8Array/prototype/toBase64/option-coercion.js: [unreviewed, unit:uint8array-base64]
-  test/built-ins/Uint8Array/prototype/toBase64/receiver-not-uint8array.js: [unreviewed, unit:uint8array-base64]
-  test/built-ins/Uint8Array/prototype/toBase64/results.js: [unreviewed, unit:uint8array-base64]
-  test/built-ins/Uint8Array/prototype/toHex/descriptor.js: [unreviewed, unit:uint8array-base64]
-  test/built-ins/Uint8Array/prototype/toHex/detached-buffer.js: [unreviewed, unit:uint8array-base64]
-  test/built-ins/Uint8Array/prototype/toHex/length.js: [unreviewed, unit:uint8array-base64]
-  test/built-ins/Uint8Array/prototype/toHex/name.js: [unreviewed, unit:uint8array-base64]
-  test/built-ins/Uint8Array/prototype/toHex/nonconstructor.js: [unreviewed, unit:uint8array-base64]
-  test/built-ins/Uint8Array/prototype/toHex/receiver-not-uint8array.js: [unreviewed, unit:uint8array-base64]
-  test/built-ins/Uint8Array/prototype/toHex/results.js: [unreviewed, unit:uint8array-base64]
+  test/built-ins/Uint8Array/fromBase64/alphabet.js: [pass, observation]
+  test/built-ins/Uint8Array/fromBase64/descriptor.js: [pass, observation]
+  test/built-ins/Uint8Array/fromBase64/ignores-receiver.js: [pass, observation]
+  test/built-ins/Uint8Array/fromBase64/illegal-characters.js: [pass, observation]
+  test/built-ins/Uint8Array/fromBase64/last-chunk-handling.js: [pass, observation]
+  test/built-ins/Uint8Array/fromBase64/last-chunk-invalid.js: [pass, observation]
+  test/built-ins/Uint8Array/fromBase64/length.js: [pass, observation]
+  test/built-ins/Uint8Array/fromBase64/name.js: [pass, observation]
+  test/built-ins/Uint8Array/fromBase64/nonconstructor.js: [pass, observation]
+  test/built-ins/Uint8Array/fromBase64/option-coercion.js: [pass, observation]
+  test/built-ins/Uint8Array/fromBase64/results.js: [pass, observation]
+  test/built-ins/Uint8Array/fromBase64/string-coercion.js: [pass, observation]
+  test/built-ins/Uint8Array/fromBase64/whitespace.js: [pass, observation]
+  test/built-ins/Uint8Array/fromHex/descriptor.js: [pass, observation]
+  test/built-ins/Uint8Array/fromHex/ignores-receiver.js: [pass, observation]
+  test/built-ins/Uint8Array/fromHex/illegal-characters.js: [pass, observation]
+  test/built-ins/Uint8Array/fromHex/length.js: [pass, observation]
+  test/built-ins/Uint8Array/fromHex/name.js: [pass, observation]
+  test/built-ins/Uint8Array/fromHex/nonconstructor.js: [pass, observation]
+  test/built-ins/Uint8Array/fromHex/odd-length-input.js: [pass, observation]
+  test/built-ins/Uint8Array/fromHex/results.js: [pass, observation]
+  test/built-ins/Uint8Array/fromHex/string-coercion.js: [pass, observation]
+  test/built-ins/Uint8Array/prototype/setFromBase64/alphabet.js: [pass, observation]
+  test/built-ins/Uint8Array/prototype/setFromBase64/descriptor.js: [pass, observation]
+  test/built-ins/Uint8Array/prototype/setFromBase64/detached-buffer.js: [pass, observation]
+  test/built-ins/Uint8Array/prototype/setFromBase64/illegal-characters.js: [pass, observation]
+  test/built-ins/Uint8Array/prototype/setFromBase64/last-chunk-handling.js: [pass, observation]
+  test/built-ins/Uint8Array/prototype/setFromBase64/length.js: [pass, observation]
+  test/built-ins/Uint8Array/prototype/setFromBase64/name.js: [pass, observation]
+  test/built-ins/Uint8Array/prototype/setFromBase64/nonconstructor.js: [pass, observation]
+  test/built-ins/Uint8Array/prototype/setFromBase64/option-coercion.js: [pass, observation]
+  test/built-ins/Uint8Array/prototype/setFromBase64/results.js: [pass, observation]
+  test/built-ins/Uint8Array/prototype/setFromBase64/string-coercion.js: [pass, observation]
+  test/built-ins/Uint8Array/prototype/setFromBase64/subarray.js: [pass, observation]
+  test/built-ins/Uint8Array/prototype/setFromBase64/target-size.js: [pass, observation]
+  test/built-ins/Uint8Array/prototype/setFromBase64/trailing-garbage-empty.js: [pass, observation]
+  test/built-ins/Uint8Array/prototype/setFromBase64/trailing-garbage.js: [pass, observation]
+  test/built-ins/Uint8Array/prototype/setFromBase64/whitespace.js: [pass, observation]
+  test/built-ins/Uint8Array/prototype/setFromBase64/writes-up-to-error.js: [pass, observation]
+  test/built-ins/Uint8Array/prototype/setFromHex/descriptor.js: [pass, observation]
+  test/built-ins/Uint8Array/prototype/setFromHex/detached-buffer.js: [pass, observation]
+  test/built-ins/Uint8Array/prototype/setFromHex/illegal-characters.js: [pass, observation]
+  test/built-ins/Uint8Array/prototype/setFromHex/length.js: [pass, observation]
+  test/built-ins/Uint8Array/prototype/setFromHex/name.js: [pass, observation]
+  test/built-ins/Uint8Array/prototype/setFromHex/nonconstructor.js: [pass, observation]
+  test/built-ins/Uint8Array/prototype/setFromHex/results.js: [pass, observation]
+  test/built-ins/Uint8Array/prototype/setFromHex/string-coercion.js: [pass, observation]
+  test/built-ins/Uint8Array/prototype/setFromHex/subarray.js: [pass, observation]
+  test/built-ins/Uint8Array/prototype/setFromHex/target-size.js: [pass, observation]
+  test/built-ins/Uint8Array/prototype/setFromHex/throws-when-string-length-is-odd.js: [pass, observation]
+  test/built-ins/Uint8Array/prototype/setFromHex/writes-up-to-error.js: [pass, observation]
+  test/built-ins/Uint8Array/prototype/toBase64/alphabet.js: [pass, observation]
+  test/built-ins/Uint8Array/prototype/toBase64/descriptor.js: [pass, observation]
+  test/built-ins/Uint8Array/prototype/toBase64/detached-buffer.js: [pass, observation]
+  test/built-ins/Uint8Array/prototype/toBase64/length.js: [pass, observation]
+  test/built-ins/Uint8Array/prototype/toBase64/name.js: [pass, observation]
+  test/built-ins/Uint8Array/prototype/toBase64/nonconstructor.js: [pass, observation]
+  test/built-ins/Uint8Array/prototype/toBase64/omit-padding.js: [pass, observation]
+  test/built-ins/Uint8Array/prototype/toBase64/option-coercion.js: [pass, observation]
+  test/built-ins/Uint8Array/prototype/toBase64/receiver-not-uint8array.js: [pass, observation]
+  test/built-ins/Uint8Array/prototype/toBase64/results.js: [pass, observation]
+  test/built-ins/Uint8Array/prototype/toHex/descriptor.js: [pass, observation]
+  test/built-ins/Uint8Array/prototype/toHex/detached-buffer.js: [pass, observation]
+  test/built-ins/Uint8Array/prototype/toHex/length.js: [pass, observation]
+  test/built-ins/Uint8Array/prototype/toHex/name.js: [pass, observation]
+  test/built-ins/Uint8Array/prototype/toHex/nonconstructor.js: [pass, observation]
+  test/built-ins/Uint8Array/prototype/toHex/receiver-not-uint8array.js: [pass, observation]
+  test/built-ins/Uint8Array/prototype/toHex/results.js: [pass, observation]
   test/built-ins/WeakMap/constructor.js: [pass, observation]
   test/built-ins/WeakMap/empty-iterable.js: [pass, observation]
   test/built-ins/WeakMap/get-set-method-failure.js: [pass, observation]

@@ -1,0 +1,3 @@
+version: 1
+id: uint8array-base64
+record: docs/language-profile-es2026/families/uint8array-base64.yaml

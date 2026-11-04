@@ -137,6 +137,7 @@ export async function createHarnessObjectKey(
         input.target.architecture,
         input.target.operatingSystem,
         input.target.abi ?? null,
+        input.target.atomicsPauseHint,
         input.target.cStandard,
         input.target.executableFormat,
         input.target.sanitizers,

@@ -1,0 +1,60 @@
+version: 1
+id: atomics-pause
+title: "Atomics.pause"
+scope:
+  - "The Atomics.pause function property, its descriptor, name, length,
+    and non-constructor status."
+  - "Validation of the optional iteration count without coercion, the
+    undefined result, and the ignored receiver and extra arguments."
+  - "The per-target processor hint that the target description records
+    as atomicsPauseHint."
+owners:
+  - docs/language-profile-es2026.md
+evidence:
+  differential:
+    status: covered
+    references:
+      - tests/native/fixtures/atomics-pause.ts
+  fixed:
+    status: covered
+    references:
+      - tests/native/fixtures/atomics-pause.ts
+  forced-collection:
+    status: covered
+    references:
+      - tests/atomics-pause-native.test.ts
+      - tests/native/fixtures/atomics-pause.ts
+  generated:
+    status: omitted
+    reason: "The only input is the count, and its domain is one predicate,
+      undefined or an integral Number, whose classes the fixed fixture
+      enumerates: integral values of both signs and beyond 2**53, the
+      non-finite and fractional Numbers, and every non-Number type with
+      and without coercion hooks."
+    replacements:
+      - tests/native/fixtures/atomics-pause.ts
+  guard-fallback:
+    status: covered
+    references:
+      - tests/atomics-pause-native.test.ts
+      - tests/native/fixtures/atomics-pause.ts
+  specialization:
+    status: covered
+    references:
+      - tests/atomics-pause-native.test.ts
+      - tests/native/fixtures/atomics-pause.ts
+  standards:
+    status: covered
+    references:
+      - tests/test262/subset.yaml
+      - tests/test262/results.yaml
+      - tests/test262/results/built-ins/Atomics/1b.yaml
+      - tests/test262/results/built-ins/Atomics/50.yaml
+      - tests/test262/results/built-ins/Atomics/a1.yaml
+      - tests/test262/results/built-ins/Atomics/ba.yaml
+      - tests/test262/results/built-ins/Atomics/eb.yaml
+  structural:
+    status: covered
+    references:
+      - tests/atomics-pause-native.test.ts
+      - packages/compiler/tests/source.test.ts

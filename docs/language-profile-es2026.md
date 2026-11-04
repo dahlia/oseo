@@ -630,3 +630,107 @@ test262 paths of the unit pass, and the family record's standards class cites
 the results partitions that hold them; the other 144 *test/built-ins/JSON/*
 paths still pass. The family record is
 [*json-parse-source.yaml*](./language-profile-es2026/families/json-parse-source.yaml).
+
+
+Uint8Array base64 and hex
+-------------------------
+
+The `uint8array-base64` unit adds six functions. `Uint8Array.fromBase64` and
+`Uint8Array.fromHex` are own properties of `%Uint8Array%`, and `toBase64`,
+`setFromBase64`, `toHex`, and `setFromHex` are own properties of
+`%Uint8Array.prototype%`, in that order. Each is writable, non-enumerable, and
+configurable, is not a constructor, and has length 1, except `toBase64` and
+`toHex`, which have length 0. No other typed array constructor or prototype
+has them.
+
+The prototype methods require a `Uint8Array` receiver and throw a `TypeError`
+for any other value, including the other typed arrays, before they read an
+argument. The input of the decoding functions must be a String; it is never
+coerced. The options argument must be `undefined` or an object. `alphabet`
+must be `undefined`, `"base64"`, or `"base64url"`, and `lastChunkHandling`
+must be `undefined`, `"loose"`, `"strict"`, or `"stop-before-partial"`; any
+other value, including a String object, is a `TypeError` and is never
+coerced. Each option is read once, in the edition's order, and `omitPadding`
+goes through ToBoolean.
+
+`toBase64` and `toHex` check that the receiver's buffer is attached and the
+view in bounds only after every option read, so a getter that detaches the
+buffer or shrinks a resizable buffer makes them throw a `TypeError`, and a
+getter that writes an element changes the encoded text. A length-tracking view
+of a resizable buffer encodes its current length. `toHex` writes lowercase
+digits.
+
+`fromBase64` follows the edition's FromBase64 operation. It skips ASCII
+whitespace (tab, line feed, form feed, carriage return, and space) anywhere,
+rejects any other character outside the chosen alphabet, and decodes four
+digits at a time. With `"loose"`, the default, a final chunk of two or three
+digits decodes without padding and ignores nonzero padding bits. `"strict"`
+requires padding and zero padding bits. `"stop-before-partial"` leaves a final
+partial chunk undecoded instead of failing. A malformed input is a
+`SyntaxError`. The result is a fresh `%Uint8Array%` over a fixed-length
+buffer, whatever the receiver. `fromHex` accepts an even number of
+hexadecimal digits in either case.
+
+`setFromBase64` and `setFromHex` decode into the receiver and return a fresh
+object with `read` and `written` properties. They check the receiver's bounds
+after the option reads and decode at most its length in bytes. Once the
+target is full at a chunk boundary, decoding stops and the rest of the input
+is not examined. A base64 chunk that would not fit is left unread. When the
+input is malformed, the bytes decoded before the error are written and then
+the `SyntaxError` is thrown. A hex input of odd length throws before anything
+is written.
+
+The pinned Node.js lacks these functions, so Deno is the reference host. Deno
+2.9.7 does not stop once `setFromBase64` fills its target: it keeps checking
+the remaining input and throws on a character that the edition never reads,
+which the pinned *setFromBase64/trailing-garbage.js* row rejects. An
+independent model written from the edition, in
+*tests/native/uint8array-base64-model.ts*, is therefore a second reference.
+The fixtures compare native output with the model in Node.js and with Deno,
+except for one fixture of filled targets that only the model judges. The
+property suite generates byte sequences, edited encodings, and plain, offset,
+length-tracking, detached, and shrunk targets, checks round trips and partial
+decodes against the model, and compares with Deno where Deno follows the
+edition. The family record is
+[*uint8array-base64.yaml*](./language-profile-es2026/families/uint8array-base64.yaml).
+
+Of the 70 *test/built-ins/Uint8Array/* rows for these functions, the unit owns
+68, and all 68 pass; the family record's standards class cites the results
+partitions that hold them. The two
+*throws-when-target-is-backed-by-immutable-arraybuffer.js* rows need immutable
+`ArrayBuffer`, a proposal, and stay excluded.
+
+
+`Atomics.pause`
+---------------
+
+The `atomics-pause` unit adds `Atomics.pause`, one of the three ECMAScript 2027
+features in the claim. It is a writable, non-enumerable, configurable own
+property of the `Atomics` namespace with length 0, follows the thirteen
+earlier Atomics functions in creation order, and is not a constructor.
+
+`Atomics.pause(N)` accepts an `undefined` or absent count and any integral
+Number, including `-0`, negative integers, and integers beyond 2<sup>53</sup>.
+Any other count is a `TypeError` without coercion: NaN, the infinities,
+fractions, Strings, BigInts, Number objects, and objects with `valueOf` or
+`Symbol.toPrimitive`, which are never called. It ignores its receiver and any
+further arguments and returns `undefined`.
+
+The edition lets an implementation signal the processor that the caller is
+spinning and leaves the form of that signal to it. Oseo executes one
+processor hint per call whatever the count, so a large count never stalls the
+agent. The hint is a target choice that each target description records as
+`atomicsPauseHint`: `x86-pause`, the PAUSE instruction, for
+`linux-x86_64-gnu`, and `aarch64-yield`, the YIELD instruction, for
+`macos-aarch64` and `linux-aarch64-musl`. The runtime refuses to build for an
+architecture without a recorded hint. The hint is not observable from a
+program, so tests check the choice structurally.
+
+Both reference hosts expose the function, so the fixture is differential
+against Node.js and Deno. The count domain is one predicate that the fixture
+covers class by class, so the unit adds no property suite. The family record
+is
+[*atomics-pause.yaml*](./language-profile-es2026/families/atomics-pause.yaml).
+The unit owns the five *test/built-ins/Atomics/pause/* rows, and all five
+pass; the family record's standards class cites the results partitions that
+hold them.

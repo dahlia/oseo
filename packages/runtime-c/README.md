@@ -1559,3 +1559,22 @@ Internalization passes a fresh context object as the reviver's third argument
 and gives it a `source` property only for a primitive whose holder still has
 the parsed value. No heap kind or traced field is added, and the
 generated-code ABI gains no entry point.
+
+ABI `m5-155` adds the Uint8Array base64 and hex functions. `fromBase64` and
+`fromHex` are own properties of `%Uint8Array%`, and `toBase64`,
+`setFromBase64`, `toHex`, and `setFromHex` of `%Uint8Array.prototype%`. They
+take the six typed array code IDs after Float16Array's constructor and own no
+intrinsic slot. The typed array component installs them only while it builds
+the `Uint8Array` pair. Decoding and encoding run over work buffers, which
+never collect, so no user code or collection runs between a view's bounds
+check and the copy into its Data Block. `setFromBase64` and `setFromHex`
+write the bytes decoded before a malformed character and then throw the
+`SyntaxError`. No heap kind or traced field is added, and the generated-code
+ABI gains no entry point.
+
+ABI `m5-155` also appends `Atomics.pause` to the Atomics code range, after
+`xor`, so the earlier Atomics code IDs keep their values. It accepts an
+undefined count or an integral Number without coercion, executes one processor
+hint, and returns `undefined`. The hint is PAUSE on x86-64 and YIELD on
+AArch64, the choice each compiler target description records as
+`atomicsPauseHint`; the runtime fails to build for any other architecture.
