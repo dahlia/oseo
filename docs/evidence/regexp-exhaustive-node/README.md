@@ -52,9 +52,11 @@ On hosted Linux the file alone ran a plain sweep in at most 317.5 seconds,
 No hosted macOS run has measured the file alone. The three fastest shared
 macOS observations, from runs [41728591316], [41398158326], and [41597847447],
 took 176.2 to 230.8 seconds for A1.1 and 148.7 to 171.8 for A2.1; the other
-ten took 388.2 to 600.0 for A1.1. A shared observation is an upper bound on an
-uncontended sweep on the same kind of runner, so about 230 seconds, 38% of the
-interrupt, is the best available estimate for the dedicated job.
+ten took 388.2 to 600.0 for A1.1. Other file workers can only add time to a
+sweep, so the fastest shared observations approximate an uncontended one;
+runners of the same label still differ in speed, so this is not a bound. About
+230 seconds, 38% of the interrupt, is the best available estimate for the
+dedicated job.
 
 [41280117339]: https://github.com/dahlia/oseo/actions/runs/41280117339
 [41398158326]: https://github.com/dahlia/oseo/actions/runs/41398158326
@@ -106,8 +108,9 @@ candidate run's dedicated macOS job is the one to confirm it.
 
 The macOS lane entry in *tools/macos-job-costs.ts* is a 2,460-second
 scheduling allowance: four 600-second interrupts and one minute of setup. It
-bounds the job, since a property that reaches its interrupt fails, and it is
-not a timing estimate.
+is neither a timing estimate nor a bound. The interrupts limit only the four
+native properties, and the job has no `timeout-minutes` of its own, so setup,
+the package build, and the file's other tests run outside it.
 
 
 Scheduling and coverage
