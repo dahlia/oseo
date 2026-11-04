@@ -5886,8 +5886,8 @@ assessments:
         "c3224b78249259023673ba72328a4763cf33df392dd4a9ea\
         3b4ffbd76626b935"
       packages/runtime-c/native/runtime_internal.h:
-        "6f65a62f4384803b213afcf6db2c52380b3b299e5d4bf912\
-        fc92e3e54b1713c0"
+        "f168073d2dada4df679c4cc771e31b764f309a1d6d9c9cb7\
+        1303565b40814912"
       packages/runtime-c/native/oseo_runtime.h:
         "fb66a45c57bc3c74288f77ea5897d76db81bebf99ac09629\
         9ac21ca9f9b60d12"
@@ -5895,8 +5895,8 @@ assessments:
         "bcf729b61049bdd7486c230c5cb653edfaae769360bc4d3e\
         e0c4f1eea10a663b"
       packages/runtime-c/src/index.ts:
-        "9ea2780cb54e7bbe1ce4c99c8502cc7d84d87485bbabc0ba\
-        ec14ce938da3b2bf"
+        "d65c569280bb56920c934908c1280e5edd983f3519460239\
+        9993cdee7ca65b9b"
   observation-train-b26a-b26b-b27:
     disposition: deferral
     normativeDependency: not-demonstrated

@@ -56,7 +56,7 @@ three sums, rounded up, so the margin below is a slow runner's. Files under 30
 seconds have no entry and weigh the host fallback, 18 seconds on both hosts,
 which is the median of every measured weight.
 
-Twenty-six files postdate those runs. Local runs from 2026-11-01 to
+Twenty-eight files postdate those runs. Local runs from 2026-11-01 to
 2026-11-04 of the residual evidence and those files, on one host, give the
 calibration:
 
@@ -89,6 +89,8 @@ calibration:
 | *tests/property/es2026-array-from-async.property.test.ts*    |     34.1 |           88 |           68 |
 | *tests/json-parse-source-native.test.ts*                     |     44.5 |          115 |           88 |
 | *tests/property/es2026-json-parse-source.property.test.ts*   |     58.2 |          150 |          115 |
+| *tests/uint8array-base64-native.test.ts*                     |     18.4 |           48 |           37 |
+| *tests/property/es2026-uint8array-base64.property.test.ts*   |     18.0 |           47 |           36 |
 
 The ratios are 2.574 for Linux and 1.974 for macOS, the residual file's
 largest CI sum over its local sum. The fastest Linux observation gives

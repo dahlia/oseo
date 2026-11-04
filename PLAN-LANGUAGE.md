@@ -630,6 +630,10 @@ current *tests/test262/inventory.tsv*.
     `lastChunkHandling`, and `omitPadding`, over detached and resizable
     buffers. Round-trip and partial-decode properties use an independent
     codec. Two more rows also need immutable `ArrayBuffer` and stay excluded.
+    The runtime, fixtures, and property suite are implemented; the rows wait
+    for the full test262 update. Deno 2.9.7 keeps decoding after
+    `setFromBase64` fills its target, which the edition forbids, so an
+    independent model is the reference for those cases.
  -  `iterator-concat` owns `Iterator.concat` (32). It reads every item's
     `Symbol.iterator` method when called, opens each item only when its turn
     comes, and forwards `return` to the active inner iterator.
@@ -723,7 +727,7 @@ standards update and heavy gates on the new base.
     row's owner moves. The audit binds ADR texts by digest, so a unit that
     edits ADR 0013, 0016, or 0028 re-reviews the rows that cite it.
  -  The runtime ABI version in *packages/runtime-c/src/index.ts*, currently
-    `m5-154`, changes once per landing that alters the ABI. The series keeps
+    `m5-155`, changes once per landing that alters the ABI. The series keeps
     its `m5-` prefix, and the closure tools keep their `m5c` names.
  -  Runtime code ranges, property blocks, intrinsic indexes, and heap kinds
     are reserved per unit.

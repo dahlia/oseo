@@ -7,7 +7,7 @@
  * 41238903460 at `8770b2e4`. The largest is kept on purpose: the residual
  * evidence file took 1.36 times longer on one of those Linux runners than
  * on another, and the margin the shards keep is a slow runner's.
- * Twenty-two files postdate those runs and scale a local measurement on
+ * Twenty-four files postdate those runs and scale a local measurement on
  * the same host by the residual-evidence ratio: 2.574 on Linux and 1.974
  * on macOS. The measurements are serial except the Object accessor
  * property file and the legacy lookup test, which ran side by side.
@@ -54,6 +54,7 @@ export const nodeShardCosts = {
     "tests/property/es2026-iterator-concat.property.test.ts": 38,
     "tests/property/es2026-iterator-zip.property.test.ts": 60,
     "tests/property/es2026-json-parse-source.property.test.ts": 150,
+    "tests/property/es2026-uint8array-base64.property.test.ts": 47,
     "tests/property/es2026-upsert.property.test.ts": 68,
     "tests/property/m5-annexb-date-methods.property.test.ts": 32,
     "tests/property/m5-annexb-escape.property.test.ts": 87,
@@ -142,6 +143,7 @@ export const nodeShardCosts = {
     "tests/test262-regexp-utils-native.test.ts": 95,
     "tests/test262-runner.test.ts": 67,
     "tests/trainc-ordinary-evidence.test.ts": 400,
+    "tests/uint8array-base64-native.test.ts": 48,
     "tests/unicode-class-frame-native.test.ts": 698,
   },
   "macos-aarch64": {
@@ -179,6 +181,7 @@ export const nodeShardCosts = {
     "tests/property/es2026-array-from-async.property.test.ts": 68,
     "tests/property/es2026-iterator-zip.property.test.ts": 46,
     "tests/property/es2026-json-parse-source.property.test.ts": 115,
+    "tests/property/es2026-uint8array-base64.property.test.ts": 36,
     "tests/property/es2026-upsert.property.test.ts": 52,
     "tests/property/m5-annexb-escape.property.test.ts": 67,
     "tests/property/m5-annexb-legacy-lookup-boundary.property.test.ts": 35,
@@ -261,6 +264,7 @@ export const nodeShardCosts = {
     "tests/test262-runner.test.ts": 35,
     "tests/test262-well-known-intrinsics.test.ts": 42,
     "tests/trainc-ordinary-evidence.test.ts": 307,
+    "tests/uint8array-base64-native.test.ts": 37,
     "tests/unicode-class-frame-native.test.ts": 1040,
     "tests/with-primitive-boxing.test.ts": 38,
     "tests/with-var-loop-head.test.ts": 35,

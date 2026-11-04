@@ -2172,6 +2172,7 @@ unknown-file median fallback.
 | *tests/property/es2026-iterator-zip.property.test.ts*      |    239268.559 |              240 |
 | *tests/property/es2026-array-from-async.property.test.ts*  |    469795.392 |              470 |
 | *tests/property/es2026-json-parse-source.property.test.ts* |    792835.142 |              793 |
+| *tests/property/es2026-uint8array-base64.property.test.ts* |    279028.764 |              280 |
 
 The TSV retains each file with `-` for all three historical source samples,
 and the extraction script and its unit test retain it explicitly. The
@@ -2192,3 +2193,8 @@ test retain the file the same way, Linux now has 158 entries with the
 from the local extended runs in the table above. The TSV, extraction script and
 unit test retain them the same way. Linux now has 160 entries, and its fallback
 moves from 429 to 434 seconds.
+
+*tests/property/es2026-uint8array-base64.property.test.ts* takes its weight
+from the local extended run in the table above, and the TSV, extraction script
+and unit test retain it the same way. Linux now has 161 entries, and its
+fallback moves from 434 to 429 seconds.

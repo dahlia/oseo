@@ -3087,3 +3087,40 @@ test("marks raw JSON objects in the heap header", () => {
   // A parse record is built only for a callable reviver.
   assert.ok(jsonSource.includes("reviving ? &frame.slots[5] : NULL"));
 });
+
+test("installs the Uint8Array base64 methods only on Uint8Array", () => {
+  const internalHeader = sources.get("runtime_internal.h") ?? "";
+  const typedSource = sources.get("runtime_typed_array.c") ?? "";
+  // The six functions follow Float16Array's constructor in the typed
+  // array code range, so earlier code IDs keep their values.
+  const names = [
+    "FROM_BASE64",
+    "FROM_HEX",
+    "TO_BASE64",
+    "SET_FROM_BASE64",
+    "TO_HEX",
+    "SET_FROM_HEX",
+  ];
+  for (const [index, name] of names.entries()) {
+    assert.match(
+      internalHeader,
+      new RegExp(
+        `OSEO_UINT8_ARRAY_${name}_CODE_ID \\\\\\n` +
+          ` {4}\\(OSEO_TYPED_ARRAY_CODE_ID_RANGE_LAST - ${51 + index}u\\)`,
+        "u",
+      ),
+    );
+  }
+  // Only the Uint8Array constructor and prototype receive them, and they
+  // own no intrinsic slot.
+  assert.match(
+    typedSource,
+    /index == OSEO_TYPED_ARRAY_UINT8\) \{\n {12}result = base64_install\(/u,
+  );
+  assert.doesNotMatch(internalHeader, /OSEO_INTRINSIC_UINT8_ARRAY_FROM/u);
+  // setFromBase64 copies the decoded prefix before a SyntaxError.
+  assert.match(
+    typedSource,
+    /if \(decoded\.error\) result = base64_syntax_error\(context, hex\);/u,
+  );
+});

@@ -5,6 +5,7 @@ tests/property/es2026-iterator-concat.property.test.ts	157	-	-	-	157
 tests/property/es2026-iterator-zip.property.test.ts	240	-	-	-	240
 tests/property/es2026-json-parse-source.property.test.ts	793	-	-	-	793
 tests/property/es2026-math-sum-precise.property.test.ts	153	-	-	-	153
+tests/property/es2026-uint8array-base64.property.test.ts	280	-	-	-	280
 tests/property/es2026-upsert.property.test.ts	248	-	-	-	248
 tests/property/legacy-caller.property.test.ts	71	-	-	-	71
 tests/property/m4-async.property.test.ts	464	349949.419205	338314.359114	440202.889068	350
