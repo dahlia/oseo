@@ -13,11 +13,13 @@
  * and a TypeError from the `lastIndex` reset after it has changed.
  *
  * After each operation the program prints the receiver's source, flags,
- * and `lastIndex` and an execution of it, beside the same execution of a
- * fresh RegExp built from that source and flags, so a stale compiled
- * artifact shows up as a difference. Node.js and Deno are the oracle, and
- * the native program runs under both specialization policies with
- * collection forced at every safepoint.
+ * and `lastIndex` and an execution of a fresh RegExp built from that
+ * source and flags, then executes the receiver itself on the same input,
+ * so a stale compiled artifact shows up as a difference between the two.
+ * That execution reads and may advance or reset `lastIndex`, or throw on a
+ * locked one, as the next operation then observes. Node.js and Deno are
+ * the oracle, and the native program runs under both specialization
+ * policies with collection forced at every safepoint.
  */
 
 import assert from "node:assert/strict";
@@ -191,6 +193,12 @@ function programSource(testCase: CompileCase): string {
       `console.log(${index}, JSON.stringify(receiver.source), ` +
         "receiver.flags, receiver.lastIndex, " +
         'show(fresh(receiver), "aab-k<n>ba"));',
+      "try {",
+      `  console.log(${index}, "receiver", ` +
+        'show(receiver, "aab-k<n>ba"), receiver.lastIndex);',
+      "} catch (error) {",
+      `  console.log(${index}, "receiver", error.constructor.name);`,
+      "}",
     );
   }
   return lines.join("\n");
