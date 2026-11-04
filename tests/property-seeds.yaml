@@ -652,3 +652,7 @@ families:
     owner: tests/property/es2026-array-from-async.property.test.ts
     start: 0x6000a500
     end: 0x6000a5ff
+  - family: es2026-json-parse-source
+    owner: tests/property/es2026-json-parse-source.property.test.ts
+    start: 0x6000a600
+    end: 0x6000a6ff

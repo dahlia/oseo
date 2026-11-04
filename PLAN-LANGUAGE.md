@@ -8,13 +8,13 @@ Implementation status: in progress. The `claim-boundary` unit has applied ADR
 0032. The `legacy-caller`, `annexb-escape`, `annexb-string-methods`,
 `annexb-date-methods`, `error-is-error`, `math-sum-precise`, `upsert`,
 `iterator-concat`, `iterator-zip`, and `annexb-object-accessors` units are
-implemented and observed. `array-from-async` is implemented and awaits
-observation, and every other unit is open. This plan follows M5 directly and
-runs alongside M6. It has no milestone number. It schedules the language work
-the maintainer approved on 2026-11-02: build-time static-specifier `import()`,
-Annex B legacy web behavior except `document.all`, the legacy `caller`
-extension, the seven ECMAScript 2026 features, and the three ECMAScript 2027
-features other than Temporal.
+implemented and observed. `array-from-async` and `json-parse-source` are
+implemented and await observation, and every other unit is open. This plan
+follows M5 directly and runs alongside M6. It has no milestone number. It
+schedules the language work the maintainer approved on 2026-11-02: build-time
+static-specifier `import()`, Annex B legacy web behavior except `document.all`,
+the legacy `caller` extension, the seven ECMAScript 2026 features, and the
+three ECMAScript 2027 features other than Temporal.
 
 The plan is written for parallel implementation. Each work unit below owns an
 exact set of test262 paths, names its prerequisites, and lists the shared files
@@ -641,6 +641,8 @@ current *tests/test262/inventory.tsv*.
     `json-stringify` components: the reviver receives the source text of each
     primitive value, and `JSON.stringify` emits a raw JSON object's text
     unchanged.
+    The runtime, fixtures, and property suite are implemented, and all 21
+    rows pass in a local observation with the reviewed harness copies.
 
 ### ECMAScript 2027 units
 

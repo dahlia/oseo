@@ -5883,11 +5883,11 @@ assessments:
         "02308ac96777d9a655bd91511d8b5d3bea6a90172e877dec\
         51a16d9e8b1fb56d"
       packages/runtime-c/native/runtime_memory.c:
-        "e72a8825962259d03d81348ee5cbee3184d7b0632018d4e6\
-        b5feac705067650d"
+        "c3224b78249259023673ba72328a4763cf33df392dd4a9ea\
+        3b4ffbd76626b935"
       packages/runtime-c/native/runtime_internal.h:
-        "8a11b57624d0e7eaadbe2ee423480a9d4f450679fee183f2\
-        64480b1c5784187d"
+        "6f65a62f4384803b213afcf6db2c52380b3b299e5d4bf912\
+        fc92e3e54b1713c0"
       packages/runtime-c/native/oseo_runtime.h:
         "c924d8b90f9aa9f55ec958b402588eca7f2d9b99853dbe2b\
         bdf6dc86e3ad000c"

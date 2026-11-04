@@ -14,12 +14,13 @@ the [M5 exit report](./m5c-closure/m5-exit-report.md) keeps the M5 result.
 A change that admits or measures behavior inside this boundary updates this
 document in the same change. A family's status describes tested current
 behavior, never intended behavior. The Annex B built-in units, the Annex B
-Object accessors, the small ECMAScript 2026 built-in units, `iterator-zip`, and
-`array-from-async` hold the family records so far; see
+Object accessors, the small ECMAScript 2026 built-in units, `iterator-zip`,
+`array-from-async`, and `json-parse-source` hold the family records so far; see
 [Annex B built-ins](#annex-b-built-ins),
 [Annex B Object accessors](#annex-b-object-accessors),
 [Small ECMAScript 2026 built-in families](#small-ecmascript-2026-built-in-families),
-[Joint iteration](#joint-iteration), and [`Array.fromAsync`](#arrayfromasync).
+[Joint iteration](#joint-iteration), [`Array.fromAsync`](#arrayfromasync), and
+[JSON source text](#json-source-text).
 
 
 Claim boundary
@@ -586,3 +587,41 @@ the closure. All 95 test262 paths pass in a local observation with the
 reviewed harness copies; seven of them need `TemporalHelpers.observeProperty`,
 which the reviewed *temporalHelpers.js* keeps for them. The family record is
 [*array-from-async.yaml*](./language-profile-es2026/families/array-from-async.yaml).
+
+
+JSON source text
+----------------
+
+`JSON.rawJSON` and `JSON.isRawJSON` are writable, non-enumerable, configurable
+own function properties of the JSON namespace with length 1, defined after
+`stringify`. Neither is a constructor.
+
+`JSON.rawJSON(text)` converts its argument with ToString and requires one JSON
+null, boolean, number, or string with no leading or trailing tab, line feed,
+carriage return, or space. An empty text, an array or object, or any other
+text throws a `SyntaxError`. The result is a frozen object with a `null`
+prototype, the `[[IsRawJSON]]` internal slot, and one enumerable `rawJSON`
+property that holds the text. `JSON.isRawJSON(value)` answers whether its
+argument has that slot, so a proxy of a raw JSON object, an object that
+inherits from one, and a lookalike object answer `false`. `JSON.stringify`
+emits a raw JSON object's text unchanged wherever the value reaches
+serialization after `toJSON` and the replacer, which lets a BigInt or an exact
+decimal reach the output.
+
+With a callable reviver, `JSON.parse` passes a third argument, a fresh
+ordinary object. For a primitive whose holder property still has the parsed
+value, that object has a `source` property with the exact source text of the
+value; for every other call it has no own property. A value a reviver added,
+or replaced by a different value, gets no source, and a replaced container's
+children get none either. For a repeated member name the record of the last
+member applies, as its value does.
+
+Both Node.js and Deno implement these functions and the context argument, and
+the fixtures match them byte for byte. The property suite generates nested
+JSON texts with exact number and string literals, repeated member names,
+whitespace, and sibling replacements, and compares the reviver's calls, the
+revived value, and a `JSON.rawJSON` round trip of every literal with an
+independent model of InternalizeJSONProperty and with both hosts. All 21
+test262 paths of the unit pass in a local observation, and so do the other 144
+*test/built-ins/JSON/* paths. The family record is
+[*json-parse-source.yaml*](./language-profile-es2026/families/json-parse-source.yaml).

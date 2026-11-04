@@ -3053,3 +3053,37 @@ test("runs Array.fromAsync over one shared state record", () => {
     ),
   );
 });
+
+test("marks raw JSON objects in the heap header", () => {
+  const internalHeader = sources.get("runtime_internal.h") ?? "";
+  const memorySource = sources.get("runtime_memory.c") ?? "";
+  const jsonSource = sources.get("runtime_json.c") ?? "";
+  // [[IsRawJSON]] is a header flag that every published heap object
+  // starts without, so JSON.isRawJSON reads it for any object and realm.
+  assert.match(
+    internalHeader,
+    /bool retained;\n(?:.*\n)*? {4}bool raw_json;\n\};/u,
+  );
+  assert.ok(
+    memorySource.includes(
+      "object->retained = false;\n    object->raw_json = false;",
+    ),
+  );
+  assert.ok(
+    jsonSource.includes("heap_object(frame.slots[1])->raw_json = true;"),
+  );
+  // The two functions take the JSON range's next code IDs and no slot.
+  for (const [name, offset] of [
+    ["OSEO_JSON_RAW_JSON_CODE_ID", 2],
+    ["OSEO_JSON_IS_RAW_JSON_CODE_ID", 3],
+  ] as const) {
+    assert.ok(
+      internalHeader.includes(
+        `#define ${name} (OSEO_JSON_CODE_ID_RANGE_LAST - ${offset}u)`,
+      ),
+      name,
+    );
+  }
+  // A parse record is built only for a callable reviver.
+  assert.ok(jsonSource.includes("reviving ? &frame.slots[5] : NULL"));
+});

@@ -15,7 +15,59 @@ typedef struct {
     OseoContext *context;
     OseoValue text;
     size_t cursor;
+    /* Build a JSON Parse Record for every value, for a callable reviver. */
+    bool records;
 } OseoJsonParser;
+
+/*
+ * A JSON Parse Record is a four-slot environment: the parsed value, the
+ * start and end code-unit offsets of its source text, and its child
+ * records. An array's children are an internal array of records in
+ * element order. An object's children are a null-prototype object that
+ * maps each member name to its record, so a later duplicate name
+ * replaces the earlier record, as the last such member also gives the
+ * property its value. A primitive has no children.
+ */
+enum {
+    JSON_RECORD_VALUE = 0u,
+    JSON_RECORD_START,
+    JSON_RECORD_END,
+    JSON_RECORD_CHILDREN,
+    JSON_RECORD_SLOT_COUNT,
+};
+
+static OseoResult json_record_create(
+    OseoContext *context,
+    OseoValue value,
+    size_t start,
+    size_t end,
+    OseoValue children
+) {
+    OseoValue slots[3] = {value, children, oseo_undefined()};
+    OseoRootFrame frame = {NULL, slots, 3u};
+    oseo_roots_push(context, &frame);
+    OseoResult result = oseo_environment_create(
+        context,
+        JSON_RECORD_SLOT_COUNT
+    );
+    slots[2] = result.value;
+    if (result.status == OSEO_STATUS_NORMAL) {
+        (void)oseo_environment_set(
+            context, slots[2], JSON_RECORD_VALUE, slots[0]);
+        (void)oseo_environment_set(
+            context, slots[2], JSON_RECORD_START, oseo_number((double)start));
+        (void)oseo_environment_set(
+            context, slots[2], JSON_RECORD_END, oseo_number((double)end));
+        (void)oseo_environment_set(
+            context, slots[2], JSON_RECORD_CHILDREN, slots[1]);
+    }
+    oseo_roots_pop(context, &frame);
+    return result;
+}
+
+static OseoValue json_record_slot(OseoValue record, size_t index) {
+    return environment_object(record)->slots[index];
+}
 
 static OseoResult json_syntax_error(OseoJsonParser *parser) {
     return oseo_internal_throw_error(
@@ -255,7 +307,11 @@ static OseoResult json_parse_number(OseoJsonParser *parser) {
     return normal(oseo_number(number));
 }
 
-static OseoResult json_parse_value(OseoJsonParser *parser, size_t depth);
+static OseoResult json_parse_value(
+    OseoJsonParser *parser,
+    size_t depth,
+    OseoValue *record
+);
 
 static OseoResult json_index_key(OseoContext *context, size_t index) {
     char text[32];
@@ -263,25 +319,69 @@ static OseoResult json_index_key(OseoContext *context, size_t index) {
     return oseo_internal_ascii_string(context, text);
 }
 
-static OseoResult json_parse_array(OseoJsonParser *parser, size_t depth) {
+/* Stores a container's record once its closing token is consumed. */
+static OseoResult json_container_record(
+    OseoJsonParser *parser,
+    OseoResult result,
+    OseoValue value,
+    size_t start,
+    OseoValue children,
+    OseoValue *record
+) {
+    if (result.status != OSEO_STATUS_NORMAL || !parser->records) {
+        return result;
+    }
+    OseoResult created = json_record_create(
+        parser->context,
+        value,
+        start,
+        parser->cursor,
+        children
+    );
+    if (created.status != OSEO_STATUS_NORMAL) return created;
+    *record = created.value;
+    return result;
+}
+
+static OseoResult json_parse_array(
+    OseoJsonParser *parser,
+    size_t depth,
+    OseoValue *record
+) {
+    size_t start = parser->cursor;
     parser->cursor += 1u;
     OseoRootFrame frame = {NULL, NULL, 0u};
-    OseoResult result = oseo_roots_allocate(parser->context, &frame, 3u);
+    OseoResult result = oseo_roots_allocate(parser->context, &frame, 5u);
     if (result.status != OSEO_STATUS_NORMAL) return result;
+    /* 3: the children array, 4: the current element's record. */
     result = oseo_array_create(parser->context, 0u);
     frame.slots[0] = result.value;
+    if (result.status == OSEO_STATUS_NORMAL && parser->records) {
+        result = oseo_array_create(parser->context, 0u);
+        frame.slots[3] = result.value;
+    }
     json_skip_whitespace(parser);
     if (result.status == OSEO_STATUS_NORMAL &&
         json_consume(parser, UINT16_C(']'))) {
         result.value = frame.slots[0];
+        result = json_container_record(
+            parser, result, frame.slots[0], start, frame.slots[3], record);
         oseo_roots_release(parser->context, &frame);
         return result;
     }
     size_t index = 0u;
     while (result.status == OSEO_STATUS_NORMAL) {
-        result = json_parse_value(parser, depth + 1u);
+        result = json_parse_value(parser, depth + 1u, &frame.slots[4]);
         frame.slots[1] = result.value;
         if (result.status != OSEO_STATUS_NORMAL) break;
+        if (parser->records) {
+            result = oseo_array_append(
+                parser->context,
+                frame.slots[3],
+                frame.slots[4]
+            );
+            if (result.status != OSEO_STATUS_NORMAL) break;
+        }
         result = json_index_key(parser->context, index);
         frame.slots[2] = result.value;
         if (result.status != OSEO_STATUS_NORMAL) break;
@@ -303,21 +403,35 @@ static OseoResult json_parse_array(OseoJsonParser *parser, size_t depth) {
         json_skip_whitespace(parser);
     }
     if (result.status == OSEO_STATUS_NORMAL) result.value = frame.slots[0];
+    result = json_container_record(
+        parser, result, frame.slots[0], start, frame.slots[3], record);
     oseo_roots_release(parser->context, &frame);
     return result;
 }
 
-static OseoResult json_parse_object(OseoJsonParser *parser, size_t depth) {
+static OseoResult json_parse_object(
+    OseoJsonParser *parser,
+    size_t depth,
+    OseoValue *record
+) {
+    size_t start = parser->cursor;
     parser->cursor += 1u;
     OseoRootFrame frame = {NULL, NULL, 0u};
-    OseoResult result = oseo_roots_allocate(parser->context, &frame, 3u);
+    OseoResult result = oseo_roots_allocate(parser->context, &frame, 5u);
     if (result.status != OSEO_STATUS_NORMAL) return result;
+    /* 3: the member-name map of records, 4: the current record. */
     result = oseo_object_literal_create(parser->context);
     frame.slots[0] = result.value;
+    if (result.status == OSEO_STATUS_NORMAL && parser->records) {
+        result = oseo_object_create(parser->context, oseo_null());
+        frame.slots[3] = result.value;
+    }
     json_skip_whitespace(parser);
     if (result.status == OSEO_STATUS_NORMAL &&
         json_consume(parser, UINT16_C('}'))) {
         result.value = frame.slots[0];
+        result = json_container_record(
+            parser, result, frame.slots[0], start, frame.slots[3], record);
         oseo_roots_release(parser->context, &frame);
         return result;
     }
@@ -331,7 +445,7 @@ static OseoResult json_parse_object(OseoJsonParser *parser, size_t depth) {
             break;
         }
         json_skip_whitespace(parser);
-        result = json_parse_value(parser, depth + 1u);
+        result = json_parse_value(parser, depth + 1u, &frame.slots[4]);
         frame.slots[2] = result.value;
         if (result.status != OSEO_STATUS_NORMAL) break;
         result = oseo_object_define(
@@ -342,6 +456,16 @@ static OseoResult json_parse_object(OseoJsonParser *parser, size_t depth) {
             (OseoPropertyAttributes){true, true, true, false}
         );
         if (result.status != OSEO_STATUS_NORMAL) break;
+        if (parser->records) {
+            result = oseo_object_define(
+                parser->context,
+                frame.slots[3],
+                frame.slots[1],
+                frame.slots[4],
+                (OseoPropertyAttributes){true, true, true, false}
+            );
+            if (result.status != OSEO_STATUS_NORMAL) break;
+        }
         json_skip_whitespace(parser);
         if (json_consume(parser, UINT16_C('}'))) break;
         if (!json_consume(parser, UINT16_C(','))) {
@@ -351,11 +475,23 @@ static OseoResult json_parse_object(OseoJsonParser *parser, size_t depth) {
         json_skip_whitespace(parser);
     }
     if (result.status == OSEO_STATUS_NORMAL) result.value = frame.slots[0];
+    result = json_container_record(
+        parser, result, frame.slots[0], start, frame.slots[3], record);
     oseo_roots_release(parser->context, &frame);
     return result;
 }
 
-static OseoResult json_parse_value(OseoJsonParser *parser, size_t depth) {
+static OseoResult json_parse_primitive(OseoJsonParser *parser);
+
+/*
+ * Parses one value. With records requested, `record` receives its JSON
+ * Parse Record; it must be a rooted slot.
+ */
+static OseoResult json_parse_value(
+    OseoJsonParser *parser,
+    size_t depth,
+    OseoValue *record
+) {
     if (depth >= OSEO_MAX_CALL_DEPTH) {
         return oseo_internal_throw_error(
             parser->context,
@@ -367,9 +503,38 @@ static OseoResult json_parse_value(OseoJsonParser *parser, size_t depth) {
     OseoString *text = json_text(parser);
     if (parser->cursor >= text->length) return json_syntax_error(parser);
     uint16_t unit = text->units[parser->cursor];
+    if (unit == UINT16_C('[')) return json_parse_array(parser, depth, record);
+    if (unit == UINT16_C('{')) {
+        return json_parse_object(parser, depth, record);
+    }
+    size_t start = parser->cursor;
+    OseoResult result = json_parse_primitive(parser);
+    if (result.status != OSEO_STATUS_NORMAL || !parser->records) {
+        return result;
+    }
+    OseoValue slots[1] = {result.value};
+    OseoRootFrame frame = {NULL, slots, 1u};
+    oseo_roots_push(parser->context, &frame);
+    OseoResult created = json_record_create(
+        parser->context,
+        slots[0],
+        start,
+        parser->cursor,
+        oseo_undefined()
+    );
+    if (created.status == OSEO_STATUS_NORMAL) {
+        *record = created.value;
+        created.value = slots[0];
+    }
+    oseo_roots_pop(parser->context, &frame);
+    return created;
+}
+
+/* A string, number, or literal name at the cursor. */
+static OseoResult json_parse_primitive(OseoJsonParser *parser) {
+    OseoString *text = json_text(parser);
+    uint16_t unit = text->units[parser->cursor];
     if (unit == UINT16_C('"')) return json_parse_string(parser);
-    if (unit == UINT16_C('[')) return json_parse_array(parser, depth);
-    if (unit == UINT16_C('{')) return json_parse_object(parser, depth);
     if (unit == UINT16_C('-') || json_decimal_digit(unit)) {
         return json_parse_number(parser);
     }
@@ -383,9 +548,13 @@ static OseoResult json_parse_value(OseoJsonParser *parser, size_t depth) {
     return json_syntax_error(parser);
 }
 
-static OseoResult json_parse_text(OseoContext *context, OseoValue text) {
-    OseoJsonParser parser = {context, text, 0u};
-    OseoResult result = json_parse_value(&parser, 0u);
+static OseoResult json_parse_text(
+    OseoContext *context,
+    OseoValue text,
+    OseoValue *record
+) {
+    OseoJsonParser parser = {context, text, 0u, record != NULL};
+    OseoResult result = json_parse_value(&parser, 0u, record);
     if (result.status != OSEO_STATUS_NORMAL) return result;
     json_skip_whitespace(&parser);
     if (parser.cursor != json_text(&parser)->length) {
@@ -505,11 +674,39 @@ static OseoResult json_own_enumerable(
     return result;
 }
 
+/*
+ * The record of one child of a container whose own record still
+ * describes it: element `index` of an array's children or the member
+ * `key` of an object's map. A child added after parsing has none.
+ */
+static OseoResult json_child_record(
+    OseoContext *context,
+    OseoValue children,
+    OseoValue key,
+    size_t index,
+    bool array
+) {
+    if (!is_object(children)) return normal(oseo_undefined());
+    if (array && index >= ordinary_object(children)->array_length) {
+        return normal(oseo_undefined());
+    }
+    /* Both maps are internal own data properties, so no user code runs. */
+    return oseo_object_get(context, children, key);
+}
+
+/*
+ * InternalizeJSONProperty with a JSON Parse Record. The record applies
+ * only while the holder's property still has the parsed value: then a
+ * primitive's context gets its `source` text and a container's children
+ * keep their records. A value a reviver replaced has neither.
+ */
 static OseoResult json_internalize(
     OseoContext *context,
     OseoValue holder,
     OseoValue name,
     OseoValue reviver,
+    OseoValue record,
+    OseoValue source,
     size_t depth
 ) {
     if (depth >= OSEO_MAX_CALL_DEPTH) {
@@ -520,13 +717,57 @@ static OseoResult json_internalize(
         );
     }
     OseoRootFrame frame = {NULL, NULL, 0u};
-    OseoResult result = oseo_roots_allocate(context, &frame, 9u);
+    OseoResult result = oseo_roots_allocate(context, &frame, 14u);
     if (result.status != OSEO_STATUS_NORMAL) return result;
+    /* 9: the record, 10: the source text, 11: the children, 12: the
+     * reviver's context object, 13: a child record. */
     frame.slots[0] = holder;
     frame.slots[1] = name;
     frame.slots[2] = reviver;
+    frame.slots[9] = record;
+    frame.slots[10] = source;
     result = oseo_object_get(context, frame.slots[0], frame.slots[1]);
     frame.slots[3] = result.value;
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = oseo_object_literal_create(context);
+        frame.slots[12] = result.value;
+    }
+    if (result.status == OSEO_STATUS_NORMAL &&
+        is_environment(frame.slots[9]) &&
+        oseo_internal_same_value(
+            json_record_slot(frame.slots[9], JSON_RECORD_VALUE),
+            frame.slots[3]
+        )) {
+        frame.slots[11] = json_record_slot(
+            frame.slots[9],
+            JSON_RECORD_CHILDREN
+        );
+        if (!is_object(frame.slots[3])) {
+            size_t start = (size_t)number_value(
+                json_record_slot(frame.slots[9], JSON_RECORD_START));
+            size_t end = (size_t)number_value(
+                json_record_slot(frame.slots[9], JSON_RECORD_END));
+            result = oseo_string_from_units(
+                context,
+                string_object(frame.slots[10])->units + start,
+                end - start
+            );
+            frame.slots[13] = result.value;
+            if (result.status == OSEO_STATUS_NORMAL) {
+                result = oseo_internal_ascii_string(context, "source");
+                frame.slots[6] = result.value;
+            }
+            if (result.status == OSEO_STATUS_NORMAL) {
+                result = oseo_object_define(
+                    context,
+                    frame.slots[12],
+                    frame.slots[6],
+                    frame.slots[13],
+                    (OseoPropertyAttributes){true, true, true, false}
+                );
+            }
+        }
+    }
     if (result.status == OSEO_STATUS_NORMAL && is_object(frame.slots[3])) {
         result = oseo_internal_is_array(context, frame.slots[3]);
         bool array = result.status == OSEO_STATUS_NORMAL &&
@@ -540,11 +781,22 @@ static OseoResult json_internalize(
                 result = json_index_key(context, index);
                 frame.slots[6] = result.value;
                 if (result.status != OSEO_STATUS_NORMAL) break;
+                result = json_child_record(
+                    context,
+                    frame.slots[11],
+                    frame.slots[6],
+                    index,
+                    true
+                );
+                frame.slots[13] = result.value;
+                if (result.status != OSEO_STATUS_NORMAL) break;
                 result = json_internalize(
                     context,
                     frame.slots[3],
                     frame.slots[6],
                     frame.slots[2],
+                    frame.slots[13],
+                    frame.slots[10],
                     depth + 1u
                 );
                 frame.slots[7] = result.value;
@@ -635,11 +887,22 @@ static OseoResult json_internalize(
                     break;
                 }
                 frame.slots[6] = keys[index];
+                result = json_child_record(
+                    context,
+                    frame.slots[11],
+                    frame.slots[6],
+                    0u,
+                    false
+                );
+                frame.slots[13] = result.value;
+                if (result.status != OSEO_STATUS_NORMAL) break;
                 result = json_internalize(
                     context,
                     frame.slots[3],
                     frame.slots[6],
                     frame.slots[2],
+                    frame.slots[13],
+                    frame.slots[10],
                     depth + 1u
                 );
                 frame.slots[7] = result.value;
@@ -663,13 +926,15 @@ static OseoResult json_internalize(
         }
     }
     if (result.status == OSEO_STATUS_NORMAL) {
+        /* name, value, and context occupy slots 7 to 9. */
         frame.slots[7] = frame.slots[1];
         frame.slots[8] = frame.slots[3];
+        frame.slots[9] = frame.slots[12];
         result = oseo_call_function(
             context,
             frame.slots[2],
             frame.slots[0],
-            2u,
+            3u,
             &frame.slots[7],
             oseo_undefined()
         );
@@ -692,17 +957,26 @@ static OseoResult json_parse(
     const OseoValue *arguments
 ) {
     OseoRootFrame frame = {NULL, NULL, 0u};
-    OseoResult result = oseo_roots_allocate(context, &frame, 5u);
+    OseoResult result = oseo_roots_allocate(context, &frame, 7u);
     if (result.status != OSEO_STATUS_NORMAL) return result;
+    /* 5: the root's JSON Parse Record, 6: the source text. */
     frame.slots[0] = json_argument(argument_count, arguments, 0u);
     frame.slots[1] = json_argument(argument_count, arguments, 1u);
+    /* IsCallable runs no user code, so asking it before parsing decides
+     * whether the parser builds records without changing any order. */
+    bool reviving = is_callable(frame.slots[1]);
     result = oseo_to_string(context, frame.slots[0]);
     frame.slots[2] = result.value;
+    frame.slots[6] = result.value;
     if (result.status == OSEO_STATUS_NORMAL) {
-        result = json_parse_text(context, frame.slots[2]);
+        result = json_parse_text(
+            context,
+            frame.slots[2],
+            reviving ? &frame.slots[5] : NULL
+        );
         frame.slots[3] = result.value;
     }
-    if (result.status == OSEO_STATUS_NORMAL && is_callable(frame.slots[1])) {
+    if (result.status == OSEO_STATUS_NORMAL && reviving) {
         result = oseo_object_literal_create(context);
         frame.slots[4] = result.value;
         if (result.status == OSEO_STATUS_NORMAL) {
@@ -724,6 +998,8 @@ static OseoResult json_parse(
                 frame.slots[4],
                 frame.slots[2],
                 frame.slots[1],
+                frame.slots[5],
+                frame.slots[6],
                 0u
             );
         }
@@ -1107,6 +1383,25 @@ static OseoResult json_serialize_property(OseoJsonStringifier *stringifier,
         frame.slots[2] = result.value;
     }
     if (result.status == OSEO_STATUS_NORMAL && is_object(frame.slots[2]) &&
+        heap_object(frame.slots[2])->raw_json) {
+        /* A raw JSON object's frozen own `rawJSON` text is emitted as is;
+         * reading it runs no user code. */
+        result = oseo_internal_ascii_string(stringifier->context, "rawJSON");
+        frame.slots[3] = result.value;
+        if (result.status == OSEO_STATUS_NORMAL) {
+            result = oseo_object_get(
+                stringifier->context, frame.slots[2], frame.slots[3]);
+            frame.slots[3] = result.value;
+        }
+        if (result.status == OSEO_STATUS_NORMAL) {
+            OseoString *text = string_object(frame.slots[3]);
+            result = json_append_units(stringifier, text->units, text->length);
+            *serialized = result.status == OSEO_STATUS_NORMAL;
+        }
+        oseo_roots_release(stringifier->context, &frame);
+        return result;
+    }
+    if (result.status == OSEO_STATUS_NORMAL && is_object(frame.slots[2]) &&
         !is_proxy(frame.slots[2]) &&
         heap_object(frame.slots[2])->kind == OSEO_HEAP_OBJECT) {
         OseoOrdinaryObject *wrapper = ordinary_object(frame.slots[2]);
@@ -1334,6 +1629,72 @@ static OseoResult json_stringify(OseoContext *context,
     return result;
 }
 
+static bool json_raw_edge(uint16_t unit) {
+    return unit == UINT16_C(0x09) || unit == UINT16_C(0x0a) ||
+        unit == UINT16_C(0x0d) || unit == UINT16_C(0x20);
+}
+
+/*
+ * JSON.rawJSON(text): the text must be one JSON null, boolean, number,
+ * or string with no surrounding whitespace. The result is a frozen
+ * null-prototype object with [[IsRawJSON]] and one `rawJSON` property.
+ */
+static OseoResult json_raw_json(
+    OseoContext *context,
+    size_t argument_count,
+    const OseoValue *arguments
+) {
+    OseoRootFrame frame = {NULL, NULL, 0u};
+    OseoResult result = oseo_roots_allocate(context, &frame, 3u);
+    if (result.status != OSEO_STATUS_NORMAL) return result;
+    result = oseo_to_string(
+        context,
+        json_argument(argument_count, arguments, 0u)
+    );
+    frame.slots[0] = result.value;
+    if (result.status == OSEO_STATUS_NORMAL) {
+        OseoString *text = string_object(frame.slots[0]);
+        if (text->length == 0u || json_raw_edge(text->units[0]) ||
+            json_raw_edge(text->units[text->length - 1u]) ||
+            text->units[0] == UINT16_C('[') ||
+            text->units[0] == UINT16_C('{')) {
+            result = oseo_internal_throw_error(
+                context,
+                OSEO_ERROR_SYNTAX,
+                "Invalid raw JSON text."
+            );
+        }
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = json_parse_text(context, frame.slots[0], NULL);
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = oseo_object_create(context, oseo_null());
+        frame.slots[1] = result.value;
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = oseo_internal_ascii_string(context, "rawJSON");
+        frame.slots[2] = result.value;
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        /* CreateDataPropertyOrThrow and then SetIntegrityLevel frozen. */
+        result = oseo_object_define(
+            context,
+            frame.slots[1],
+            frame.slots[2],
+            frame.slots[0],
+            (OseoPropertyAttributes){false, true, false, false}
+        );
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        ordinary_object(frame.slots[1])->extensible = false;
+        heap_object(frame.slots[1])->raw_json = true;
+        result = normal(frame.slots[1]);
+    }
+    oseo_roots_release(context, &frame);
+    return result;
+}
+
 OseoResult oseo_internal_json_builtin_dispatch(OseoContext *context,
                                                size_t code_id,
                                                OseoValue callee,
@@ -1352,6 +1713,21 @@ OseoResult oseo_internal_json_builtin_dispatch(OseoContext *context,
         return json_stringify(context, argument_count, arguments);
     }
     (void)receiver;
+    if (code_id == OSEO_JSON_RAW_JSON_CODE_ID ||
+        code_id == OSEO_JSON_IS_RAW_JSON_CODE_ID) {
+        if (tag_of(new_target) != OSEO_TAG_UNDEFINED) {
+            return oseo_internal_throw_error(
+                context,
+                OSEO_ERROR_TYPE,
+                "JSON built-in is not a constructor.");
+        }
+        if (code_id == OSEO_JSON_RAW_JSON_CODE_ID) {
+            return json_raw_json(context, argument_count, arguments);
+        }
+        OseoValue value = json_argument(argument_count, arguments, 0u);
+        return normal(oseo_boolean(
+            is_object(value) && heap_object(value)->raw_json));
+    }
     if (code_id != OSEO_JSON_PARSE_CODE_ID) {
         return oseo_unknown_function(context, code_id);
     }
@@ -1414,6 +1790,55 @@ static OseoResult json_stringify_function(OseoContext *context) {
     return result;
 }
 
+/* JSON.rawJSON and JSON.isRawJSON own no intrinsic slot. */
+static OseoResult json_define_method(
+    OseoContext *context,
+    OseoValue namespace_object,
+    size_t code_id,
+    const char *name
+) {
+    size_t name_length = strlen(name);
+    uint16_t units[16];
+    for (size_t index = 0u; index < name_length; index += 1u) {
+        units[index] = (uint16_t)(unsigned char)name[index];
+    }
+    OseoValue slots[3] = {namespace_object, oseo_undefined(), oseo_undefined()};
+    OseoRootFrame frame = {NULL, slots, 3u};
+    oseo_roots_push(context, &frame);
+    OseoResult result = oseo_environment_create(context, 0u);
+    slots[1] = result.value;
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = oseo_function_create(
+            context,
+            code_id,
+            slots[1],
+            units,
+            name_length,
+            1u,
+            OSEO_FUNCTION_INTERNAL,
+            oseo_undefined(),
+            oseo_undefined(),
+            OSEO_FUNCTION_NAME_PREFIX_NONE
+        );
+        slots[1] = result.value;
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = oseo_internal_ascii_string(context, name);
+        slots[2] = result.value;
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = oseo_object_define(
+            context,
+            slots[0],
+            slots[2],
+            slots[1],
+            (OseoPropertyAttributes){true, false, true, false}
+        );
+    }
+    oseo_roots_pop(context, &frame);
+    return result;
+}
+
 OseoResult oseo_internal_json_intrinsic(OseoContext *context) {
     OseoValue *slot = &context->realm->intrinsics[OSEO_INTRINSIC_JSON];
     if (is_object(*slot)) return normal(*slot);
@@ -1464,6 +1889,22 @@ OseoResult oseo_internal_json_intrinsic(OseoContext *context) {
             frame.slots[2],
             frame.slots[1],
             (OseoPropertyAttributes){true, false, true, false}
+        );
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = json_define_method(
+            context,
+            frame.slots[0],
+            OSEO_JSON_RAW_JSON_CODE_ID,
+            "rawJSON"
+        );
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = json_define_method(
+            context,
+            frame.slots[0],
+            OSEO_JSON_IS_RAW_JSON_CODE_ID,
+            "isRawJSON"
         );
     }
     if (result.status == OSEO_STATUS_NORMAL) {

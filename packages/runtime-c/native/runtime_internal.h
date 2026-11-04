@@ -839,6 +839,8 @@
     OSEO_BUILTIN_CODE_RANGE_LAST(OSEO_JSON_CODE_ID_RANGE_INDEX)
 #define OSEO_JSON_PARSE_CODE_ID OSEO_JSON_CODE_ID_RANGE_LAST
 #define OSEO_JSON_STRINGIFY_CODE_ID (OSEO_JSON_CODE_ID_RANGE_LAST - 1u)
+#define OSEO_JSON_RAW_JSON_CODE_ID (OSEO_JSON_CODE_ID_RANGE_LAST - 2u)
+#define OSEO_JSON_IS_RAW_JSON_CODE_ID (OSEO_JSON_CODE_ID_RANGE_LAST - 3u)
 
 #define OSEO_SET_CODE_ID_RANGE_INDEX ((size_t)23u)
 #define OSEO_SET_CODE_ID_RANGE_FIRST \
@@ -1169,6 +1171,13 @@ struct OseoHeapObject {
      * keep the object and its own sweep may clear the mark like any other.
      */
     bool retained;
+    /*
+     * [[IsRawJSON]]: set only on the frozen null-prototype object that
+     * JSON.rawJSON creates, which JSON.stringify emits as its `rawJSON`
+     * text. The flag is in the header so every object, whatever its kind
+     * or realm, answers JSON.isRawJSON without a lookup.
+     */
+    bool raw_json;
 };
 
 /* Active native array stringification across user-code re-entry. */

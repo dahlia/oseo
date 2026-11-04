@@ -1,0 +1,58 @@
+version: 1
+id: json-parse-source
+title: "JSON.rawJSON, JSON.isRawJSON, and reviver source text"
+scope:
+  - "The JSON.rawJSON and JSON.isRawJSON function properties, their
+    descriptors, names, lengths, and non-constructor status."
+  - "JSON.rawJSON text validation, its frozen null-prototype result with
+    [[IsRawJSON]], JSON.isRawJSON over every value kind, and the raw text
+    JSON.stringify emits after toJSON and the replacer."
+  - "The context argument JSON.parse passes a callable reviver, its source
+    property for primitives that still hold their parsed value, and its
+    absence for containers and for added or replaced values."
+owners:
+  - docs/language-profile-es2026.md
+evidence:
+  differential:
+    status: covered
+    references:
+      - tests/native/fixtures/json-source.ts
+      - tests/property/es2026-json-parse-source.property.test.ts
+  fixed:
+    status: covered
+    references:
+      - tests/native/fixtures/json-source.ts
+  forced-collection:
+    status: covered
+    references:
+      - tests/json-parse-source-native.test.ts
+      - tests/native/fixtures/json-source.ts
+      - tests/property/es2026-json-parse-source.property.test.ts
+  generated:
+    status: covered
+    references:
+      - tests/property/es2026-json-parse-source.property.test.ts
+  guard-fallback:
+    status: covered
+    references:
+      - tests/json-parse-source-native.test.ts
+      - tests/native/fixtures/json-source.ts
+      - tests/property/es2026-json-parse-source.property.test.ts
+  specialization:
+    status: covered
+    references:
+      - tests/json-parse-source-native.test.ts
+      - tests/native/fixtures/json-source.ts
+      - tests/property/es2026-json-parse-source.property.test.ts
+  standards:
+    status: omitted
+    reason: "The 21 test/built-ins/JSON rows of the unit stay unreviewed in
+      the closure ledger until the unit admits them and the full test262
+      update observes them."
+    replacements:
+      - tests/native/fixtures/json-source.ts
+      - tests/property/es2026-json-parse-source.property.test.ts
+  structural:
+    status: covered
+    references:
+      - packages/runtime-c/tests/intrinsic-graph.test.ts
