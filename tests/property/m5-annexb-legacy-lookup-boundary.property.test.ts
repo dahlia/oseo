@@ -20,7 +20,6 @@ import {
   assertMatchingObservations,
   withNativeFixture,
 } from "../../packages/testkit/src/index.ts";
-import { runNativeCli } from "../native-cli.ts";
 import { nativeToolchain } from "../native-toolchain.ts";
 
 const { assertAsyncProperty } = await import(
@@ -33,7 +32,7 @@ type Hint = "absent" | "false" | "truthful";
 /** One prototype-chain level, listed from the outermost to the receiver. */
 type Level = "empty" | "getter" | "method" | "noncallable";
 
-/** A chain whose ordinary lookup never reaches the omitted method. */
+/** A chain whose lookup may stop at a user level or reach the method. */
 interface ShadowCase {
   readonly hint: Hint;
   readonly levels: readonly Level[];
@@ -42,7 +41,7 @@ interface ShadowCase {
   readonly value: number;
 }
 
-/** A chain of empty levels over an intrinsic %Object.prototype%. */
+/** A chain of data-only levels over an intrinsic %Object.prototype%. */
 interface BoundaryCase {
   readonly depth: number;
   readonly hint: Hint;
@@ -61,29 +60,19 @@ const hints: fc.Arbitrary<Hint> = fc.constantFrom(
 );
 
 /**
- * Generates admitted chains directly: a chain of empty levels over the
- * intrinsic prototype would reach the profile boundary, so the outermost
- * level becomes a user method instead of filtering the case away.
+ * A chain of empty levels over the intrinsic prototype reaches the
+ * legacy method itself, which finds no accessor named `k`.
  */
-const shadowCases: fc.Arbitrary<ShadowCase> = fc
-  .record({
-    hint: hints,
-    levels: fc.array(
-      fc.constantFrom<Level>("empty", "getter", "method", "noncallable"),
-      { minLength: 1, maxLength: 3 },
-    ),
-    method: methods,
-    root: fc.constantFrom<ShadowCase["root"]>("intrinsic", "null", "proxy"),
-    value: fc.integer({ min: -20, max: 20 }),
-  })
-  .map((input) =>
-    input.root === "intrinsic" &&
-    input.levels.every((level) => level === "empty")
-      ? Object.assign({}, input, {
-          levels: ["method" as const, ...input.levels.slice(1)],
-        })
-      : input,
-  );
+const shadowCases: fc.Arbitrary<ShadowCase> = fc.record({
+  hint: hints,
+  levels: fc.array(
+    fc.constantFrom<Level>("empty", "getter", "method", "noncallable"),
+    { minLength: 1, maxLength: 3 },
+  ),
+  method: methods,
+  root: fc.constantFrom<ShadowCase["root"]>("intrinsic", "null", "proxy"),
+  value: fc.integer({ min: -20, max: 20 }),
+});
 const boundaryCases: fc.Arbitrary<BoundaryCase> = fc.record({
   depth: fc.integer({ min: 0, max: 3 }),
   hint: hints,
@@ -151,9 +140,18 @@ console.log(Object.prototype.hasOwnProperty.call(receiver, "${input.method}"));
 `;
 }
 
-/** Independent lookup model: the innermost non-empty level decides. */
+/**
+ * Independent lookup model: the innermost non-empty level decides, and an
+ * all-empty chain over the intrinsic calls the real method, which finds
+ * no `k` and returns undefined.
+ */
 function shadowExpected(input: ShadowCase): string {
-  let result = input.root === "proxy" ? "proxy k true true" : "TypeError";
+  let result =
+    input.root === "proxy"
+      ? "proxy k true true"
+      : input.root === "intrinsic"
+        ? "undefined"
+        : "TypeError";
   for (const [index, level] of input.levels.entries()) {
     if (level === "method") result = `L${index} k true`;
     else if (level === "getter") result = `G${index} k true`;
@@ -163,7 +161,14 @@ function shadowExpected(input: ShadowCase): string {
   return ["warm w", result, String(own), ""].join("\n");
 }
 
-function boundarySource(input: BoundaryCase): readonly [string, number] {
+/**
+ * A chain of `depth` levels over an object that inherits from the
+ * intrinsic and holds two accessor halves the program defines with the
+ * matching legacy method. Every even level holds a data property, so the
+ * first level's `other0` shadows the accessor of that name.
+ */
+function boundarySource(input: BoundaryCase): string {
+  const half = input.method === "__lookupGetter__" ? "Getter" : "Setter";
   const warm = [
     `const first = { ${input.method}(k) { return "warm " + k; } };`,
     "console.log(read(first).call(first, 1));",
@@ -175,30 +180,43 @@ function boundarySource(input: BoundaryCase): readonly [string, number] {
     { length: input.depth },
     (_, index) =>
       "current = Object.create(current);" +
-      (index % 2 === 0 ? ` current.other${index} = ${index};` : ""),
+      // Definition, not assignment: the inherited accessor half would
+      // turn an assignment into a setter call or a silent no-op.
+      (index % 2 === 0
+        ? ` Object.defineProperty(current, "other${index}", ` +
+          `{ value: ${index} });`
+        : ""),
   );
-  const lines = [
+  return [
     "",
     hintLine(input.hint),
     `function read(value) { return value.${input.method}; }`,
     ...warm,
-    "let current = Object.prototype;",
+    "function half() { return 1; }",
+    "let current = {};",
+    `current.__define${half}__("k", half);`,
+    `current.__define${half}__("other0", half);`,
     ...levels,
     'console.log("before");',
-    "read(current);",
+    'console.log(read(current).call(current, "k") === half);',
+    'console.log(read(current).call(current, "other0") === half);',
+    'console.log(read(current).call(current, "missing"));',
     'console.log("after");',
     "",
-  ];
-  // The rejected read is the member expression inside read().
-  const line = lines.findIndex((text) => text.startsWith("function read"));
-  return [lines.join("\n"), line + 1];
+  ].join("\n");
 }
 
+/** Independent model of the boundary domain's output. */
 function boundaryStdout(input: BoundaryCase): string {
   return [
     "warm 1",
     ...(input.warm > 1 ? ["inherited 2"] : []),
     "before",
+    "true",
+    // A first level's data property other0 shadows the accessor.
+    String(input.depth === 0),
+    "undefined",
+    "after",
     "",
   ].join("\n");
 }
@@ -222,12 +240,14 @@ function compiled(source: string, specialization: "disabled" | "enabled") {
   return output.mir;
 }
 
+// The title is the U6 shard-log key (docs/evidence/u6/linux-shards.py), so
+// it keeps its pre-implementation wording.
 test(
   "generated shadowed legacy lookup chains preserve the core lookup model",
   { skip: nativeTarget == null ? "requires a supported native host" : false },
   async () => {
     await assertAsyncProperty(
-      "user methods, getters, null roots, and proxies precede the boundary",
+      "user methods, getters, null roots, proxies, and the real method",
       fc.asyncProperty(shadowCases, async (input) => {
         const source = shadowSource(input);
         const oracle = {
@@ -285,7 +305,7 @@ test(
         context: [`target=${nativeTarget?.name ?? "unsupported"}`],
         domain: "annexb-legacy-lookup-shadowed-chains",
         numRuns: 12,
-        profile: "M5 optional legacy lookup boundary",
+        profile: "Annex B legacy accessor lookups",
         seed: 0x6000_8800,
         sizeLimit: "one to three chain levels and three observations",
         timeLimitMilliseconds: 180_000,
@@ -294,43 +314,61 @@ test(
   },
 );
 
+// The title is the U6 shard-log key (docs/evidence/u6/linux-shards.py), so
+// it keeps its pre-implementation wording.
 test(
   "generated chains reaching the intrinsic report the owned rejection",
   { skip: nativeTarget == null ? "requires a supported native host" : false },
   async () => {
     await assertAsyncProperty(
-      "a missing read over intrinsic Object.prototype rejects at its line",
+      "a read over intrinsic Object.prototype finds the real method",
       fc.asyncProperty(boundaryCases, async (input) => {
-        const [source, line] = boundarySource(input);
-        const sourceId = "generated-lookup.js";
-        // The runtime reports no counters after an uncatchable diagnostic,
-        // so this domain pins the exact output and the specialized read
-        // shape; the shadowed domain measures misses through the same read.
+        const source = boundarySource(input);
+        const oracle = {
+          exitStatus: 0,
+          stderr: "",
+          stdout: boundaryStdout(input),
+        };
+        const directory = await host.makeTemporaryDirectory("oseo-lookup-");
+        try {
+          const path = `${directory}/case.js`;
+          await host.writeTextFile(path, source);
+          assertMatchingObservations([
+            oracle,
+            await host.run({
+              command: process.execPath,
+              args: [path],
+              cwd: directory,
+            }),
+            await host.run({
+              command: "deno",
+              args: ["run", "--quiet", path],
+              cwd: directory,
+            }),
+          ]);
+        } finally {
+          await host.remove(directory);
+        }
         for (const specialization of ["disabled", "enabled"] as const) {
-          compiled(source, specialization);
           process.env.OSEO_GC_EVERY_SAFEPOINT = "1";
           try {
-            const native = await runNativeCli(
+            await withNativeFixture(
               {
-                args: [
-                  ...(specialization === "disabled"
-                    ? ["--no-specialization"]
-                    : []),
-                  sourceId,
-                ],
-                source,
-                sourceId,
-                version: "0.1.0",
+                backend: cBackend,
+                host,
+                input: compiled(source, specialization),
+                operation: "execute",
+                runtime: cRuntimeProvider,
+                target: nativeTarget ?? describeTarget("linux-x86_64-gnu"),
+                toolchain: nativeToolchain,
               },
-              host,
-            );
-            assert.equal(native.exitStatus, 1);
-            assert.equal(native.stdout, boundaryStdout(input));
-            assert.equal(
-              native.stderr,
-              `${sourceId}:${line}:31: error[OSEO1001]: The ` +
-                `Object.prototype.${input.method} method is excluded by ` +
-                "the M5 optional legacy accessor policy.\n",
+              (native) => {
+                assertMatchingObservations([oracle, native]);
+                assert.ok((native.counters?.collections ?? 0) > 0);
+                if (specialization === "enabled") {
+                  assert.ok((native.counters?.guardMisses ?? 0) > 0);
+                }
+              },
             );
           } finally {
             delete process.env.OSEO_GC_EVERY_SAFEPOINT;
@@ -341,9 +379,10 @@ test(
         context: [`target=${nativeTarget?.name ?? "unsupported"}`],
         domain: "annexb-legacy-lookup-intrinsic-boundary",
         numRuns: 8,
-        profile: "M5 optional legacy lookup boundary",
+        profile: "Annex B legacy accessor lookups",
         seed: 0x6000_8801,
-        sizeLimit: "one or two warm reads and up to three empty levels",
+        sizeLimit:
+          "one or two warm reads, up to three levels, and three lookups",
         timeLimitMilliseconds: 180_000,
       },
     );

@@ -124,7 +124,9 @@ Ownership follows the plan's target layout:
     `ToPropertyDescriptor` field reads, `CopyDataProperties`, own-key ordering,
     and the `Object.create`, `Object.defineProperty`,
     `Object.defineProperties`, `Object.getOwnPropertyDescriptor`,
-    `Object.keys`, and `Object.setPrototypeOf` entry points;
+    `Object.keys`, and `Object.setPrototypeOf` entry points, and the Annex B
+    `__proto__` accessor and four legacy accessor methods of
+    `%Object.prototype%`;
  -  *runtime\_number.c*: the `Number` constructor, branded wrapper state,
     numeric constants, predicate statics, parser statics, the standard global
     constructor property, the global `isFinite`, `isNaN`, `parseFloat`, and
@@ -1650,14 +1652,10 @@ constructor code table. *runtime\_function.c* routes the appended slots
 to the cluster, and *runtime\_atomics.c* rejects the kind in
 ValidateIntegerTypedArray. No heap kind or entry point is added.
 
-The `resizable-array-buffer-harness` node moves `abiVersion` to `m5-134`.
-*runtime\_property.c*'s ordinary assignment walk in `oseo_object_set` and
-receiver walk in `oseo_internal_set_with_receiver` report the owned
-`OSEO1001` for a `"__proto__"` write that reaches an intrinsic
-`%Object.prototype%` without finding the key. This mirrors the read in
-`object_get`. Every earlier answer on either walk is unchanged, and a
-primitive base still returns before walking. No code ID, intrinsic, heap
-kind, or entry point is added.
+The `resizable-array-buffer-harness` node moved `abiVersion` to `m5-134` for
+a `"__proto__"` write guard in *runtime\_property.c* that
+`annexb-object-accessors` removed in `m5-153`; both walks now reach the
+ordinary setter.
 
 ### Clock and wakeup evidence
 

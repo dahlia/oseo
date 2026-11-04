@@ -6,11 +6,11 @@ Status
 
 Implementation status: in progress. The `claim-boundary` unit has applied ADR
 0032. The `legacy-caller`, `annexb-escape`, `annexb-string-methods`,
-`annexb-date-methods`, `error-is-error`, `math-sum-precise`, `upsert`, and
-`iterator-concat`, and `iterator-zip` units are implemented and observed, and
-every other unit is open. This
-plan follows M5 directly and runs alongside M6. It has no milestone number. It
-schedules the language work the maintainer approved on 2026-11-02: build-time
+`annexb-date-methods`, `error-is-error`, `math-sum-precise`, `upsert`,
+`iterator-concat`, `iterator-zip`, and `annexb-object-accessors` units are
+implemented and observed, and every other unit is open. This plan follows M5
+directly and runs alongside M6. It has no milestone number. It schedules the
+language work the maintainer approved on 2026-11-02: build-time
 static-specifier `import()`, Annex B legacy web behavior except `document.all`,
 the legacy `caller` extension, the seven ECMAScript 2026 features, and the
 three ECMAScript 2027 features other than Temporal.
@@ -93,10 +93,10 @@ A probe of the current build and the reviewed manifest shows this Annex B state:
 | Legacy octal literals, `\8`, `\9`, octal escapes   | Core grammar in the inventory; non-strict rows pass                           |
 | `__proto__: value` in object initializers          | Core syntax, admitted by M5a Unit 8.1c                                        |
 | `var` redeclaring a simple catch parameter         | Admitted by M5a Unit 8.5c, including `for (var e of ...)`                     |
-| `WeakRef.prototype.constructor`                    | Installed; its path is excluded from the inventory                            |
-| `Object.prototype.__proto__` accessor              | Distinct getter and setter identities exist; invoking either reports OSEO1001 |
-| `__lookupGetter__`, `__lookupSetter__`             | Not installed; a lookup reaching `Object.prototype` reports OSEO1001          |
-| `__defineGetter__`, `__defineSetter__`             | Not installed                                                                 |
+| `WeakRef.prototype.constructor`                    | Installed; its test262 row passes                                             |
+| `Object.prototype.__proto__` accessor              | Installed by `annexb-object-accessors`; its test262 rows pass                 |
+| `__lookupGetter__`, `__lookupSetter__`             | Installed by `annexb-object-accessors`; its test262 rows pass                 |
+| `__defineGetter__`, `__defineSetter__`             | Installed by `annexb-object-accessors`; its test262 rows pass                 |
 | Annex B RegExp pattern grammar                     | Reported as the OSEO1001 profile boundary, without `u` or `v`                 |
 | `escape`, `unescape`                               | Installed by `annexb-escape`; all 35 test262 rows pass                        |
 | `substr`, HTML methods, `trimLeft`, `trimRight`    | Installed by `annexb-string-methods`; all 105 test262 rows pass               |
@@ -108,8 +108,10 @@ A probe of the current build and the reviewed manifest shows this Annex B state:
 | `for (var x = init in obj)`                        | Rejected with OSEO1001                                                        |
 | Function call assignment targets as runtime errors | Not implemented                                                               |
 
-The `__proto__` boundary is documented in the
-[omitted legacy accessor metadata contract](./docs/language-profile-m5.md#omitted-legacy-accessor-metadata-boundary).
+The M5 `__proto__` boundary is documented in the
+[omitted legacy accessor metadata contract](./docs/language-profile-m5.md#omitted-legacy-accessor-metadata-boundary),
+and the implemented accessor in the
+[ES2026 profile](./docs/language-profile-es2026.md#annex-b-object-accessors).
 The block-level function boundary is documented beside M5a Units 8.5d and 8.5e
 in the same profile.
 
@@ -520,6 +522,14 @@ behavior. The existing property seeds `0x60008500`, `0x60008800`, and
 `0x60008801` are re-registered for the new oracle or replaced with recorded
 rationale.
 
+Status: implemented, with fixed, differential, and generated evidence in the
+[profile section](./docs/language-profile-es2026.md#annex-b-object-accessors).
+The three earlier seeds keep their domains with oracles of the implemented
+behavior, and the new suite uses `0x6000a400` and `0x6000a401`. All 70 owned
+rows pass in the full test262 observation, and so do the eight ADR 0013 rows,
+which close by observation. The manifest has 41,533 reviewed rows: 35,243
+passes and 1,889 unsupported results, and no other row changes.
+
 ### `annexb-function-declarations`
 
 Owns *test/annexB/language/function-code/* (159),
@@ -646,9 +656,7 @@ current *tests/test262/inventory.tsv*.
     host implements them, so a model written from the specification replaces
     differential evidence. The runtime, fixtures, and property suite are
     implemented, and the reviewed harness carries *iteratorZipUtils.js*. All
-    82 rows pass in the full test262 observation, so the manifest has 41,463
-    reviewed rows: 35,165 passes and 1,897 unsupported results, and no
-    earlier row changes.
+    82 rows pass in the full test262 observation, and no earlier row changes.
  -  `atomics-pause` owns `Atomics.pause` (5). It validates the optional
     iteration count and returns `undefined`. Whether it emits a processor
     pause hint is a target choice recorded in the target description.
@@ -705,7 +713,7 @@ standards update and heavy gates on the new base.
     row's owner moves. The audit binds ADR texts by digest, so a unit that
     edits ADR 0013, 0016, or 0028 re-reviews the rows that cite it.
  -  The runtime ABI version in *packages/runtime-c/src/index.ts*, currently
-    `m5-152`, changes once per landing that alters the ABI. The series keeps
+    `m5-153`, changes once per landing that alters the ABI. The series keeps
     its `m5-` prefix, and the closure tools keep their `m5c` names.
  -  Runtime code ranges, property blocks, intrinsic indexes, and heap kinds
     are reserved per unit.

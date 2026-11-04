@@ -14,7 +14,7 @@ import {
 
 const host = createNodeHost();
 
-test("excluded reflection retains labeled reference metadata", async () => {
+test("accessor reflection retains labeled reference metadata", async () => {
   const directory = await host.makeTemporaryDirectory("oseo-identity-pure-");
   try {
     const path = join(directory, "case.js");

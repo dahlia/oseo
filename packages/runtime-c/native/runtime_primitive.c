@@ -771,8 +771,7 @@ static bool conversion_property_exists(
                 &property_value,
                 &attributes,
                 &ignored_getter,
-                &ignored_setter,
-                NULL
+                &ignored_setter
             )) {
             return true;
         }
@@ -1955,7 +1954,7 @@ OseoResult oseo_has_property(
         OseoValue ignored_setter = oseo_undefined();
         if (oseo_internal_own_property_descriptor(
             context, current, property, &value, &attributes,
-            &ignored_getter, &ignored_setter, NULL)) {
+            &ignored_getter, &ignored_setter)) {
             return normal(oseo_boolean(true));
         }
         OseoResult prototype = oseo_internal_get_prototype(context, current);

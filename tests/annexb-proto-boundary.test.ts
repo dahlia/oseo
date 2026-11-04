@@ -1,5 +1,13 @@
 /* eslint-disable no-await-in-loop -- Native observations are isolated. */
 
+/*
+ * The Object.prototype.__proto__ accessor of ECMA-262 20.1.3.8. Each
+ * program runs natively under both specialization policies with collection
+ * forced at every safepoint. Node.js is the reference: Deno 2.9.7 replaces
+ * the accessor with a shim that never changes a prototype, so it only
+ * checks the identity metadata it reports separately.
+ */
+
 import assert from "node:assert/strict";
 import process from "node:process";
 import { readFile } from "node:fs/promises";
@@ -9,6 +17,8 @@ import test from "node:test";
 import { targetForExecutionHost } from "../packages/compiler/src/index.ts";
 import { createNodeHost } from "../packages/host/src/index.ts";
 import { runNativeCli } from "./native-cli.ts";
+import { agentReferencePrelude } from "./native/agent-reference.ts";
+import { realmReferencePrelude } from "./native/realm-reference.ts";
 import {
   annexbIntegrityExpected,
   annexbIntegrityProgram,
@@ -29,8 +39,83 @@ const nativeTarget = targetForExecutionHost(
   },
 );
 
+/** The Node.js output of one Script, with a reference `$262` on request. */
+async function nodeReference(
+  source: string,
+  test262Host: boolean,
+): Promise<string> {
+  const directory = await host.makeTemporaryDirectory("oseo-proto-ref-");
+  try {
+    const path = join(directory, "case.js");
+    await host.writeTextFile(
+      path,
+      (test262Host ? agentReferencePrelude + realmReferencePrelude : "") +
+        source,
+    );
+    const observed = await host.run({
+      command: process.execPath,
+      args: [path],
+      cwd: directory,
+    });
+    assert.equal(observed.exitStatus, 0, observed.stderr);
+    assert.equal(observed.stderr, "");
+    return observed.stdout;
+  } finally {
+    await host.remove(directory);
+  }
+}
+
+/**
+ * Runs one Script natively under both policies with forced collection and
+ * requires Node.js's output, and `expected` too when the test pins it.
+ */
+async function differential(
+  source: string,
+  sourceId: string,
+  options: { readonly expected?: string; readonly test262Host?: boolean } = {},
+): Promise<void> {
+  const test262Host = options.test262Host === true;
+  const reference = await nodeReference(source, test262Host);
+  if (options.expected != null) assert.equal(reference, options.expected);
+  for (const specialization of ["disabled", "enabled"] as const) {
+    process.env.OSEO_GC_EVERY_SAFEPOINT = "1";
+    try {
+      const native = await runNativeCli(
+        {
+          args: [
+            ...(test262Host ? ["--test262-host"] : []),
+            ...(specialization === "disabled" ? ["--no-specialization"] : []),
+            sourceId,
+          ],
+          source,
+          sourceId,
+          version: "0.1.0",
+        },
+        host,
+      );
+      assert.equal(native.stderr, "", `${specialization}: ${source}`);
+      assert.equal(native.exitStatus, 0, source);
+      assert.equal(native.stdout, reference, `${specialization}: ${source}`);
+    } finally {
+      delete process.env.OSEO_GC_EVERY_SAFEPOINT;
+    }
+  }
+}
+
+/** Names the prototypes a read in these programs can return. */
+const describe = `
+function describe(value) {
+  if (value === null) return "null";
+  if (value === Object.prototype) return "Object.prototype";
+  if (value === Uint8Array.prototype) return "Uint8Array.prototype";
+  if (value === parent) return "parent";
+  return typeof value;
+}
+const parent = { tag: "parent" };
+`;
+
 test(
-  "unrelated abrupt completions are never relabeled as Annex B",
+  "unrelated abrupt completions keep their own errors",
   { skip: nativeTarget == null ? "requires a supported native host" : false },
   async () => {
     for (const source of [
@@ -61,12 +146,8 @@ test(
     }
   },
 );
-const diagnostic =
-  "error[OSEO1001]: The Object.prototype.__proto__ " +
-  "accessor is excluded by Annex B.";
-
 test(
-  "only the excluded accessor read reports the owned unsupported diagnostic",
+  "accessor reads reach the getter on every path",
   { skip: nativeTarget == null ? "requires a supported native host" : false },
   async () => {
     for (const expression of [
@@ -74,8 +155,11 @@ test(
       '({})["__proto__"]',
       "new Uint8Array(new ArrayBuffer(0)).__proto__",
       'Reflect.get({}, "__proto__")',
+      'Reflect.get(Object.prototype, "__proto__", Object.create(parent))',
       "new Proxy({}, {}).__proto__",
+      "new Proxy(Object.create(parent), {}).__proto__",
       "Object.prototype.__proto__",
+      "(1).__proto__.__proto__",
       "(() => { /** @param {number} value */ " +
         "function read(value) { return value.__proto__; } " +
         'read({ ["__proto__"]: 1 }); return read({}); })()',
@@ -83,102 +167,67 @@ test(
         "return new Reader().read(); })()",
       "$262.createRealm().global.Object.prototype.__proto__",
     ]) {
-      for (const specialization of ["disabled", "enabled"] as const) {
-        process.env.OSEO_GC_EVERY_SAFEPOINT = "1";
-        try {
-          const sourceId = "annexb-proto.js";
-          const native = await runNativeCli(
-            {
-              args: [
-                "--test262-host",
-                ...(specialization === "disabled"
-                  ? ["--no-specialization"]
-                  : []),
-                sourceId,
-              ],
-              source:
-                `console.log("before");\n${expression};\n` +
-                'console.log("after");\n',
-              sourceId,
-              version: "0.1.0",
-            },
-            host,
-          );
-          assert.equal(native.exitStatus, 1, expression);
-          assert.equal(native.stdout, "before\n", expression);
-          assert.ok(
-            native.stderr.includes(`annexb-proto.js:2:`),
-            native.stderr,
-          );
-          assert.ok(native.stderr.includes(diagnostic), native.stderr);
-          assert.doesNotMatch(native.stderr, /OSEO2001/u);
-        } finally {
-          delete process.env.OSEO_GC_EVERY_SAFEPOINT;
-        }
-      }
+      await differential(
+        `${describe}console.log("before");\n` +
+          `console.log(describe(${expression}));\nconsole.log("after");\n`,
+        "annexb-proto.js",
+        { test262Host: expression.includes("$262") },
+      );
     }
   },
 );
 
 test(
-  "only a write needing the excluded setter reports the diagnostic",
+  "accessor writes reach the setter on every path",
   { skip: nativeTarget == null ? "requires a supported native host" : false },
   async () => {
-    for (const statement of [
-      "({}).__proto__ = {}",
-      '(() => { "use strict"; ({}).__proto__ = {}; })()',
-      '({})["__proto__"] = 1',
-      "Object.create({}).__proto__ = 1",
-      "new Uint8Array(new ArrayBuffer(0)).__proto__ = {}",
-      'Reflect.set({}, "__proto__", {})',
-      'Reflect.set({}, "__proto__", {}, Object.create(null))',
-      "new Proxy({}, {}).__proto__ = {}",
-      'Object.assign({}, { ["__proto__"]: 1 })',
-      "Object.prototype.__proto__ = {}",
-      "(() => { class Writer { write() { super.__proto__ = {}; } } " +
-        "new Writer().write(); })()",
-      "$262.createRealm().global.Object.prototype.__proto__ = {}",
-    ]) {
-      for (const specialization of ["disabled", "enabled"] as const) {
-        process.env.OSEO_GC_EVERY_SAFEPOINT = "1";
-        try {
-          const sourceId = "annexb-proto-write.js";
-          const native = await runNativeCli(
-            {
-              args: [
-                "--test262-host",
-                ...(specialization === "disabled"
-                  ? ["--no-specialization"]
-                  : []),
-                sourceId,
-              ],
-              source:
-                `console.log("before");\n${statement};\n` +
-                'console.log("after");\n',
-              sourceId,
-              version: "0.1.0",
-            },
-            host,
-          );
-          assert.equal(native.exitStatus, 1, statement);
-          assert.equal(native.stdout, "before\n", statement);
-          assert.ok(
-            native.stderr.includes("annexb-proto-write.js:2:"),
-            native.stderr,
-          );
-          assert.ok(native.stderr.includes(diagnostic), native.stderr);
-          assert.doesNotMatch(native.stderr, /OSEO2001/u);
-        } finally {
-          delete process.env.OSEO_GC_EVERY_SAFEPOINT;
-        }
-      }
+    for (const [statement, target] of [
+      ["const o = {}; o.__proto__ = parent;", "o"],
+      ['const o = {}; (() => { "use strict"; o.__proto__ = parent; })();', "o"],
+      ['const o = {}; o["__proto__"] = parent;', "o"],
+      ["const o = Object.create({}); o.__proto__ = parent;", "o"],
+      [
+        "const o = Object.create({}); o.__proto__ = 1;",
+        "Object.getPrototypeOf(o)",
+      ],
+      [
+        "const o = new Uint8Array(new ArrayBuffer(0)); o.__proto__ = parent;",
+        "o",
+      ],
+      ['const o = {}; Reflect.set({}, "__proto__", parent, o);', "o"],
+      [
+        'const o = Object.create(null); Reflect.set({}, "__proto__", ' +
+          "parent, o);",
+        "o",
+      ],
+      ["const o = new Proxy({}, {}); o.__proto__ = parent;", "o"],
+      ['const o = Object.assign({}, { ["__proto__"]: parent });', "o"],
+      ["Object.prototype.__proto__ = null; const o = Object.prototype;", "o"],
+      [
+        "class Writer { write() { super.__proto__ = parent; } } " +
+          "const o = new Writer(); o.write();",
+        "o",
+      ],
+      [
+        "const other = $262.createRealm().global; const o = {}; " +
+          "other.Object.prototype.__lookupSetter__('__proto__').call(o, " +
+          "parent);",
+        "o",
+      ],
+    ] as const) {
+      const shown = target === "o" ? "Object.getPrototypeOf(o)" : target;
+      await differential(
+        `${describe}${statement}\nconsole.log(describe(${shown}), ` +
+          'Object.hasOwn(o, "__proto__"));\n',
+        "annexb-proto-write.js",
+        { test262Host: statement.includes("$262") },
+      );
     }
   },
 );
 
-// Every write here is answered before its walk reaches an intrinsic
-// %Object.prototype% that lacks the key, so the excluded setter never runs
-// and a reference host prints the same lines with or without it.
+// Every write here is answered before its walk reaches the intrinsic
+// accessor, so the setter never runs.
 const preservedWrites = `const log = [];
 const ownData = { ["__proto__"]: 1 };
 ownData.__proto__ = 2;
@@ -332,27 +381,12 @@ typed-array numeric key 19
 `;
 
 test(
-  "writes answered before the excluded setter keep their behavior",
+  "writes answered before the intrinsic setter keep their behavior",
   { skip: nativeTarget == null ? "requires a supported native host" : false },
   async () => {
-    for (const specialization of ["disabled", "enabled"] as const) {
-      const sourceId = "annexb-proto-write-preserved.js";
-      const native = await runNativeCli(
-        {
-          args: [
-            ...(specialization === "disabled" ? ["--no-specialization"] : []),
-            sourceId,
-          ],
-          source: preservedWrites,
-          sourceId,
-          version: "0.1.0",
-        },
-        host,
-      );
-      assert.equal(native.exitStatus, 0, native.stderr);
-      assert.equal(native.stdout, preservedOutput);
-      assert.equal(native.stderr, "");
-    }
+    await differential(preservedWrites, "annexb-proto-write-preserved.js", {
+      expected: preservedOutput,
+    });
   },
 );
 
@@ -433,81 +467,33 @@ const deletedIntrinsicExpected =
   "failed delete false TypeError 31\n";
 
 test(
-  "deleted excluded dependencies keep ordinary Get and Set semantics",
+  "a replaced or deleted intrinsic accessor leaves ordinary Get and Set",
   { skip: nativeTarget == null ? "requires a supported native host" : false },
   async () => {
-    for (const specialization of ["disabled", "enabled"] as const) {
-      process.env.OSEO_GC_EVERY_SAFEPOINT = "1";
-      try {
-        const sourceId = "annexb-proto-deleted.js";
-        const native = await runNativeCli(
-          {
-            args: [
-              ...(specialization === "disabled" ? ["--no-specialization"] : []),
-              sourceId,
-            ],
-            source: deletedIntrinsicWrites,
-            sourceId,
-            version: "0.1.0",
-          },
-          host,
-        );
-        assert.equal(native.exitStatus, 0, native.stderr);
-        assert.equal(native.stdout, deletedIntrinsicExpected);
-        assert.equal(native.stderr, "");
-      } finally {
-        delete process.env.OSEO_GC_EVERY_SAFEPOINT;
-      }
-    }
+    await differential(deletedIntrinsicWrites, "annexb-proto-deleted.js", {
+      expected: deletedIntrinsicExpected,
+    });
   },
 );
 
 test(
-  "excluded dependency deletion belongs to its intrinsic realm",
+  "accessor deletion belongs to its intrinsic realm",
   { skip: nativeTarget == null ? "requires a supported native host" : false },
   async () => {
-    for (const specialization of ["disabled", "enabled"] as const) {
-      const flags = [
-        "--test262-host",
-        ...(specialization === "disabled" ? ["--no-specialization"] : []),
-      ];
-      process.env.OSEO_GC_EVERY_SAFEPOINT = "1";
-      try {
-        const sourceId = "annexb-proto-realm-delete.js";
-        const positive = await runNativeCli(
-          {
-            args: [...flags, sourceId],
-            source:
-              "const other = $262.createRealm().global;\n" +
-              "delete other.Object.prototype.__proto__;\n" +
-              'console.log("deleted", ' +
-              "Object.create(other.Object.prototype).__proto__);\n",
-            sourceId,
-            version: "0.1.0",
-          },
-          host,
-        );
-        assert.equal(positive.exitStatus, 0, positive.stderr);
-        assert.equal(positive.stdout, "deleted undefined\n");
-        assert.equal(positive.stderr, "");
-        for (const source of [
-          "delete Object.prototype.__proto__;\n" +
-            "$262.createRealm().global.Object.prototype.__proto__;\n",
-          "const other = $262.createRealm().global;\n" +
-            "delete other.Object.prototype.__proto__;\n({}).__proto__;\n",
-        ]) {
-          const negative = await runNativeCli(
-            { args: [...flags, sourceId], source, sourceId, version: "0.1.0" },
-            host,
-          );
-          assert.equal(negative.exitStatus, 1);
-          assert.ok(negative.stderr.includes(diagnostic), negative.stderr);
-          assert.doesNotMatch(negative.stderr, /OSEO2001/u);
-        }
-      } finally {
-        delete process.env.OSEO_GC_EVERY_SAFEPOINT;
-      }
-    }
+    await differential(
+      `${describe}const other = $262.createRealm().global;
+delete other.Object.prototype.__proto__;
+console.log("foreign deleted",
+  Object.create(other.Object.prototype).__proto__,
+  describe(({}).__proto__));
+delete Object.prototype.__proto__;
+const fresh = $262.createRealm().global;
+console.log("local deleted", ({}).__proto__,
+  new fresh.Object().__proto__ === fresh.Object.prototype);
+`,
+      "annexb-proto-realm-delete.js",
+      { test262Host: true },
+    );
   },
 );
 
@@ -547,118 +533,73 @@ test(
 );
 
 test(
-  "invoking an excluded accessor retains the Annex dependency diagnostic",
+  "forwarded and copied accessor halves run their bodies",
   { skip: nativeTarget == null ? "requires a supported native host" : false },
   async () => {
-    const prefix = 'const P = Object.prototype; const K = "__proto__";\n';
+    const prefix =
+      `${describe}const P = Object.prototype; const K = "__proto__";\n` +
+      "const d = Object.getOwnPropertyDescriptor(P, K);\n" +
+      "const o = Object.create(parent);\n";
     for (const source of [
-      "Object.getOwnPropertyDescriptor(P, K).get();",
-      "Object.getOwnPropertyDescriptor(P, K).set({});",
-      "Object.getOwnPropertyDescriptor(P, K).get.call({});",
-      "Object.getOwnPropertyDescriptor(P, K).set.call({}, {});",
-      "Object.getOwnPropertyDescriptor(P, K).get.apply({});",
-      "Object.getOwnPropertyDescriptor(P, K).set.apply({}, [{}]);",
-      "Object.getOwnPropertyDescriptor(P, K).get.bind(null)();",
-      "Object.getOwnPropertyDescriptor(P, K).set.bind({})({});",
-      "Reflect.apply(Object.getOwnPropertyDescriptor(P, K).get, {}, []);",
-      "new Proxy(Object.getOwnPropertyDescriptor(P, K).get, {})();",
-      "new Proxy(Object.getOwnPropertyDescriptor(P, K).set, {})({});",
-      "const d = Object.getOwnPropertyDescriptor(P, K); const copy = {};" +
-        "Object.defineProperty(copy, 'x', d); copy.x;",
-      "const descriptor = Object.getOwnPropertyDescriptor(P, K);" +
-        "delete P.__proto__; Object.defineProperty(P, K, descriptor);" +
-        "({}).__proto__;",
+      "console.log(describe(d.get.call(o)));",
+      "console.log(d.set.call(o, null), Object.getPrototypeOf(o));",
+      "console.log(describe(d.get.apply(o)));",
+      "console.log(d.set.apply(o, [null]), Object.getPrototypeOf(o));",
+      "console.log(describe(d.get.bind(o)()));",
+      "d.set.bind(o)(P); console.log(describe(Object.getPrototypeOf(o)));",
+      "console.log(describe(Reflect.apply(d.get, o, [])));",
+      "console.log(describe(new Proxy(d.get, {}).call(o)));",
+      "new Proxy(d.set, {}).call(o, P);" +
+        "console.log(describe(Object.getPrototypeOf(o)));",
+      "for (const fn of [d.get, d.set]) { try { fn(); } catch (error) " +
+        "{ console.log(error.constructor === TypeError); } }",
+      "const copy = Object.create(parent);" +
+        "Object.defineProperty(copy, 'x', d); console.log(describe(copy.x));",
+      "delete P.__proto__; Object.defineProperty(P, K, d);" +
+        "console.log(describe(o.__proto__), Reflect.ownKeys(P).at(-1));",
       "Object.defineProperty(P, K, { get: function () { return 1; } });" +
-        "(1).__proto__ = 2;",
-      "Object.freeze(P); ({}).__proto__;",
-      "Object.freeze(new Proxy(P, {})); ({}).__proto__;",
+        "console.log(o.__proto__, (1).__proto__ = 2);",
+      "Object.freeze(P); console.log(describe(o.__proto__));" +
+        "o.__proto__ = null; console.log(Object.getPrototypeOf(o));",
+      "Object.freeze(new Proxy(P, {})); console.log(Object.isFrozen(P)," +
+        "describe(({}).__proto__));",
       "Object.freeze(new Proxy(P, {" +
         "getOwnPropertyDescriptor(t, k) {" +
         "return Reflect.getOwnPropertyDescriptor(t, k); }}));" +
-        "({}).__proto__;",
+        "console.log(Object.isFrozen(P), describe(({}).__proto__));",
     ]) {
-      for (const specialization of ["disabled", "enabled"] as const) {
-        process.env.OSEO_GC_EVERY_SAFEPOINT = "1";
-        try {
-          const sourceId = "annexb-opaque-identity.js";
-          const observed = await runNativeCli(
-            {
-              args: [
-                ...(specialization === "disabled"
-                  ? ["--no-specialization"]
-                  : []),
-                sourceId,
-              ],
-              source: prefix + source,
-              sourceId,
-              version: "0.1.0",
-            },
-            host,
-          );
-          assert.equal(observed.exitStatus, 1);
-          assert.ok(observed.stderr.includes(diagnostic), observed.stderr);
-          assert.doesNotMatch(observed.stderr, /OSEO2001/u);
-        } finally {
-          delete process.env.OSEO_GC_EVERY_SAFEPOINT;
-        }
-      }
+      await differential(prefix + source + "\n", "annexb-accessor-body.js");
     }
   },
 );
 
 test(
-  "integrity metadata and opaque halves stay local to their intrinsic realm",
+  "integrity changes stay local to their intrinsic realm",
   { skip: nativeTarget == null ? "requires a supported native host" : false },
   async () => {
-    const source = `
-const other = $262.createRealm().global;
+    await differential(
+      `const other = $262.createRealm().global;
 Object.freeze(other.Object.prototype);
 console.log("foreign", Reflect.deleteProperty(other.Object.prototype,
   "__proto__"), Object.isFrozen(other.Object.prototype));
 console.log("local", delete Object.prototype.__proto__,
   Object.hasOwn(Object.prototype, "__proto__"), typeof ({}).__proto__);
-`;
-    for (const specialization of ["disabled", "enabled"] as const) {
-      process.env.OSEO_GC_EVERY_SAFEPOINT = "1";
-      try {
-        const sourceId = "annexb-integrity-realm.js";
-        const args = [
-          "--test262-host",
-          ...(specialization === "disabled" ? ["--no-specialization"] : []),
-          sourceId,
-        ];
-        const observed = await runNativeCli(
-          { args, source, sourceId, version: "0.1.0" },
-          host,
-        );
-        assert.equal(observed.exitStatus, 0, observed.stderr);
-        assert.equal(
-          observed.stdout,
-          "foreign false true\nlocal true false undefined\n",
-        );
-        assert.equal(observed.stderr, "");
-        const untouched = await runNativeCli(
-          {
-            args,
-            source:
-              source + "Object.create(other.Object.prototype).__proto__;\n",
-            sourceId,
-            version: "0.1.0",
-          },
-          host,
-        );
-        assert.equal(untouched.exitStatus, 1);
-        assert.ok(untouched.stderr.includes(diagnostic), untouched.stderr);
-        assert.doesNotMatch(untouched.stderr, /OSEO2001/u);
-      } finally {
-        delete process.env.OSEO_GC_EVERY_SAFEPOINT;
-      }
-    }
+console.log("foreign read", Object.create(other.Object.prototype).__proto__
+  === other.Object.prototype);
+`,
+      "annexb-integrity-realm.js",
+      {
+        expected:
+          "foreign false true\nlocal true false undefined\n" +
+          "foreign read true\n",
+        test262Host: true,
+      },
+    );
   },
 );
 
 test(
-  "excluded accessor identities retain core metadata and native grammar",
+  "accessor identities retain core metadata and native grammar",
   { skip: nativeTarget == null ? "requires a supported native host" : false },
   async (t) => {
     const base = await readFile(
@@ -735,7 +676,7 @@ test(
 );
 
 test(
-  "excluded accessor identities belong to their realm across collection",
+  "accessor identities belong to their realm across collection",
   { skip: nativeTarget == null ? "requires a supported native host" : false },
   async (t) => {
     const source = `

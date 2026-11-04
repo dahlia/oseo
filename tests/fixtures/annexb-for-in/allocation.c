@@ -16,12 +16,11 @@ static void prepare_enumerable_proto(OseoContext *context, OseoValue *roots) {
     roots[2] = require_normal(oseo_internal_ascii_string(context, "__proto__"));
     OseoValue value = oseo_undefined();
     OseoPropertyAttributes attributes = {false, false, false, false};
-    uint8_t omitted = 0u;
     bool found = oseo_internal_own_descriptor(
-        roots[0], roots[2], &value, &attributes, &roots[3], &roots[4], &omitted
+        roots[0], roots[2], &value, &attributes, &roots[3], &roots[4]
     );
     assert(found);
-    assert(attributes.accessor && attributes.configurable && omitted == 0u);
+    assert(attributes.accessor && attributes.configurable);
     assert(is_callable(roots[3]) && is_callable(roots[4]));
     attributes.enumerable = true;
     (void)require_normal(oseo_object_define_accessor(
@@ -30,10 +29,10 @@ static void prepare_enumerable_proto(OseoContext *context, OseoValue *roots) {
     OseoValue getter = oseo_undefined();
     OseoValue setter = oseo_undefined();
     found = oseo_internal_own_descriptor(
-        roots[0], roots[2], &value, &attributes, &getter, &setter, &omitted
+        roots[0], roots[2], &value, &attributes, &getter, &setter
     );
     assert(found);
-    assert(attributes.enumerable && omitted == 0u);
+    assert(attributes.enumerable);
     assert(getter == roots[3] && setter == roots[4]);
     roots[2] = oseo_undefined();
     roots[3] = oseo_undefined();

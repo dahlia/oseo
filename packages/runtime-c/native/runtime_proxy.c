@@ -160,14 +160,12 @@ static OseoResult target_own_property(
     OseoValue *value,
     OseoPropertyAttributes *attributes,
     OseoValue *getter,
-    OseoValue *setter,
-    uint8_t *omitted_accessors
+    OseoValue *setter
 ) {
-    if (omitted_accessors != NULL) *omitted_accessors = 0u;
     if (is_proxy(target)) {
         return oseo_internal_proxy_get_own_property(
             context, target, key, found, value, attributes,
-            getter, setter, omitted_accessors);
+            getter, setter);
     }
     if (is_typed_array(target)) {
         bool numeric = false;
@@ -188,8 +186,7 @@ static OseoResult target_own_property(
         }
     }
     *found = oseo_internal_own_property_descriptor(
-        context, target, key, value, attributes, getter, setter,
-        omitted_accessors);
+        context, target, key, value, attributes, getter, setter);
     /* A trap result, invariant check, or forwarded descriptor sees the
      * property's value, never the binding cell that a namespace export,
      * global binding, or mapped arguments index stores. Reading the
@@ -254,7 +251,6 @@ OseoResult oseo_internal_proxy_get(
     OseoValue getter = oseo_undefined();
     OseoValue setter = oseo_undefined();
     bool found = false;
-    uint8_t omitted_accessors = 0u;
     if (result.status == OSEO_STATUS_NORMAL) {
         result = target_own_property(
             context,
@@ -264,8 +260,7 @@ OseoResult oseo_internal_proxy_get(
             &target_value,
             &attributes,
             &getter,
-            &setter,
-            &omitted_accessors);
+            &setter);
     }
     if (result.status == OSEO_STATUS_NORMAL && found &&
         !attributes.configurable) {
@@ -274,7 +269,6 @@ OseoResult oseo_internal_proxy_get(
             result = type_error(
                 context, "Proxy get trap violated an invariant.");
         } else if (attributes.accessor &&
-                   (omitted_accessors & OSEO_OMITTED_GETTER) == 0u &&
                    tag_of(getter) == OSEO_TAG_UNDEFINED &&
                    tag_of(slots[4]) != OSEO_TAG_UNDEFINED) {
             result = type_error(
@@ -327,7 +321,6 @@ OseoResult oseo_internal_proxy_set(
     OseoValue getter = oseo_undefined();
     OseoValue setter = oseo_undefined();
     bool found = false;
-    uint8_t omitted_accessors = 0u;
     if (accepted) {
         result = target_own_property(
             context,
@@ -337,8 +330,7 @@ OseoResult oseo_internal_proxy_set(
             &target_value,
             &attributes,
             &getter,
-            &setter,
-            &omitted_accessors);
+            &setter);
     }
     if (result.status == OSEO_STATUS_NORMAL && accepted && found &&
         !attributes.configurable) {
@@ -347,7 +339,6 @@ OseoResult oseo_internal_proxy_set(
             result = type_error(
                 context, "Proxy set trap violated an invariant.");
         } else if (attributes.accessor &&
-                   (omitted_accessors & OSEO_OMITTED_SETTER) == 0u &&
                    tag_of(setter) == OSEO_TAG_UNDEFINED) {
             result = type_error(
                 context, "Proxy set trap violated an invariant.");
@@ -399,8 +390,7 @@ OseoResult oseo_internal_proxy_has(
             &target_value,
             &attributes,
             &getter,
-            &setter,
-            NULL
+            &setter
         );
     }
     if (result.status == OSEO_STATUS_NORMAL && found) {
@@ -618,13 +608,7 @@ OseoResult oseo_internal_prevent_extensions_reported(
     return proxy_complete(context, &frame, result);
 }
 
-enum {
-    DESCRIPTOR_INCOMPATIBLE,
-    DESCRIPTOR_COMPATIBLE,
-    DESCRIPTOR_NEEDS_IDENTITY,
-};
-
-static int compatible_descriptor(
+static bool compatible_descriptor(
     const OseoConvertedDescriptor *descriptor,
     OseoValue value,
     OseoValue getter,
@@ -634,8 +618,7 @@ static int compatible_descriptor(
     OseoPropertyAttributes current,
     OseoValue current_getter,
     OseoValue current_setter,
-    bool extensible,
-    uint8_t omitted_accessors
+    bool extensible
 ) {
     if (!current_exists) return extensible;
     if (current.configurable) return true;
@@ -647,25 +630,11 @@ static int compatible_descriptor(
     if ((descriptor_accessor && !current.accessor) ||
         (descriptor_data && current.accessor)) return false;
     if (current.accessor) {
-        bool needs_identity = false;
-        if (descriptor->has_getter) {
-            if ((omitted_accessors & OSEO_OMITTED_GETTER) != 0u) {
-                if (tag_of(getter) == OSEO_TAG_UNDEFINED) return false;
-                needs_identity = true;
-            } else if (!oseo_internal_same_value(getter, current_getter)) {
-                return false;
-            }
-        }
-        if (descriptor->has_setter) {
-            if ((omitted_accessors & OSEO_OMITTED_SETTER) != 0u) {
-                if (tag_of(setter) == OSEO_TAG_UNDEFINED) return false;
-                needs_identity = true;
-            } else if (!oseo_internal_same_value(setter, current_setter)) {
-                return false;
-            }
-        }
-        return needs_identity ? DESCRIPTOR_NEEDS_IDENTITY
-            : DESCRIPTOR_COMPATIBLE;
+        if (descriptor->has_getter &&
+            !oseo_internal_same_value(getter, current_getter)) return false;
+        if (descriptor->has_setter &&
+            !oseo_internal_same_value(setter, current_setter)) return false;
+        return true;
     }
     if (!current.writable) {
         if (descriptor->has_writable && descriptor->writable) return false;
@@ -683,11 +652,9 @@ OseoResult oseo_internal_proxy_get_own_property(
     OseoValue *value,
     OseoPropertyAttributes *attributes,
     OseoValue *getter,
-    OseoValue *setter,
-    uint8_t *omitted_accessors
+    OseoValue *setter
 ) {
     *found = false;
-    if (omitted_accessors != NULL) *omitted_accessors = 0u;
     OseoResult entry = oseo_call_enter(context);
     if (entry.status != OSEO_STATUS_NORMAL) return entry;
     OseoValue slots[6] = {
@@ -708,8 +675,7 @@ OseoResult oseo_internal_proxy_get_own_property(
             value,
             attributes,
             getter,
-            setter,
-            omitted_accessors);
+            setter);
         return proxy_complete(context, &frame, result);
     }
     OseoValue trap_arguments[2] = {
@@ -728,12 +694,11 @@ OseoResult oseo_internal_proxy_get_own_property(
     }
     /* Identity is compared only for non-configurable immutable halves.
      * Those values stay owned by the rooted target; configurable snapshots
-     * need attributes only. Omitted halves contain no heap identity. */
+     * need attributes only. */
     bool target_found = false;
     OseoValue target_value = oseo_undefined();
     OseoValue target_getter = oseo_undefined();
     OseoValue target_setter = oseo_undefined();
-    uint8_t target_omitted = 0u;
     OseoPropertyAttributes target_attributes = {false, false, false, false};
     if (result.status == OSEO_STATUS_NORMAL) {
         result = target_own_property(
@@ -744,8 +709,7 @@ OseoResult oseo_internal_proxy_get_own_property(
             &target_value,
             &target_attributes,
             &target_getter,
-            &target_setter,
-            &target_omitted);
+            &target_setter);
     }
     OseoResult extensible = normal(oseo_boolean(false));
     if (result.status == OSEO_STATUS_NORMAL &&
@@ -806,7 +770,7 @@ OseoResult oseo_internal_proxy_get_own_property(
         }
     }
     if (result.status == OSEO_STATUS_NORMAL) {
-        int compatible = compatible_descriptor(
+        bool compatible = compatible_descriptor(
             &descriptor,
             slots[3],
             slots[4],
@@ -816,10 +780,8 @@ OseoResult oseo_internal_proxy_get_own_property(
             target_attributes,
             target_getter,
             target_setter,
-            oseo_to_boolean(extensible.value), target_omitted);
-        if (compatible == DESCRIPTOR_NEEDS_IDENTITY) {
-            result = oseo_internal_omitted_proto_error(context);
-        } else if (compatible == DESCRIPTOR_INCOMPATIBLE) {
+            oseo_to_boolean(extensible.value));
+        if (!compatible) {
             result = type_error(context,
                 "Proxy getOwnPropertyDescriptor trap violated an invariant.");
         }
@@ -965,12 +927,11 @@ OseoResult oseo_internal_proxy_define_own_property(
     }
     /* Identity is compared only for non-configurable immutable halves.
      * Those values stay owned by the rooted target; configurable snapshots
-     * need attributes only. Omitted halves contain no heap identity. */
+     * need attributes only. */
     bool target_found = false;
     OseoValue target_value = oseo_undefined();
     OseoValue target_getter = oseo_undefined();
     OseoValue target_setter = oseo_undefined();
-    uint8_t target_omitted = 0u;
     OseoPropertyAttributes target_attributes = {false, false, false, false};
     if (result.status == OSEO_STATUS_NORMAL && accepted) {
         result = target_own_property(
@@ -981,8 +942,7 @@ OseoResult oseo_internal_proxy_define_own_property(
             &target_value,
             &target_attributes,
             &target_getter,
-            &target_setter,
-            &target_omitted);
+            &target_setter);
     }
     OseoResult extensible = normal(oseo_boolean(false));
     if (result.status == OSEO_STATUS_NORMAL && accepted) {
@@ -991,7 +951,7 @@ OseoResult oseo_internal_proxy_define_own_property(
         if (extensible.status != OSEO_STATUS_NORMAL) result = extensible;
     }
     if (result.status == OSEO_STATUS_NORMAL && accepted) {
-        int compatible = compatible_descriptor(
+        bool compatible = compatible_descriptor(
             descriptor,
             slots[2],
             slots[3],
@@ -1001,10 +961,8 @@ OseoResult oseo_internal_proxy_define_own_property(
             target_attributes,
             target_getter,
             target_setter,
-            oseo_to_boolean(extensible.value), target_omitted);
-        if (compatible == DESCRIPTOR_NEEDS_IDENTITY) {
-            result = oseo_internal_omitted_proto_error(context);
-        } else if (compatible == DESCRIPTOR_INCOMPATIBLE) {
+            oseo_to_boolean(extensible.value));
+        if (!compatible) {
             result = type_error(context,
                 "Proxy defineProperty trap violated an invariant.");
         }
@@ -1066,8 +1024,7 @@ OseoResult oseo_internal_proxy_delete(
             &target_value,
             &target_attributes,
             &getter,
-            &setter,
-            NULL
+            &setter
         );
     }
     if (result.status == OSEO_STATUS_NORMAL && accepted && target_found) {
@@ -1253,8 +1210,7 @@ OseoResult oseo_internal_proxy_own_keys(
             &value,
             &attributes,
             &getter,
-            &setter,
-            NULL
+            &setter
         );
         if (result.status == OSEO_STATUS_NORMAL && found &&
             (!attributes.configurable || !oseo_to_boolean(extensible.value)) &&

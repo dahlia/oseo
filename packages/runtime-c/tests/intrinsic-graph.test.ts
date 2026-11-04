@@ -114,8 +114,20 @@ test("populates the realm-owned Object prototype", () => {
     "toLocaleString",
     "toString",
     "valueOf",
+    // ECMA-262 20.1.3.8 through 20.1.3.12, normative optional.
+    "__proto__",
+    "__defineGetter__",
+    "__defineSetter__",
+    "__lookupGetter__",
+    "__lookupSetter__",
   ]) {
     assert.match(objectBuiltins, new RegExp(`"${property}"`, "u"));
+  }
+  // The accessor halves run real bodies; no omitted-accessor state remains.
+  assert.match(objectBuiltins, /OSEO_OBJECT_PROTO_GET_CODE_ID\) \{/u);
+  assert.match(objectBuiltins, /OSEO_OBJECT_PROTO_SET_CODE_ID\) \{/u);
+  for (const source of sources.values()) {
+    assert.doesNotMatch(source, /omitted_accessors|annexb_proto_/u);
   }
   assert.match(
     objectBuiltins,

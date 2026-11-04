@@ -1,0 +1,149 @@
+version: 1
+id: annexb-object-accessors
+title: "Annex B Object accessors"
+scope:
+  - "The Object.prototype.__proto__ accessor of 20.1.3.8: the getter's
+    ToObject and [[GetPrototypeOf]], and the setter's
+    RequireObjectCoercible, its silent return for a primitive receiver or a
+    prototype that is neither an object nor null, and the TypeError when
+    [[SetPrototypeOf]] refuses, in every realm."
+  - "Every caller that reaches the accessor as an ordinary property:
+    [[Get]] and [[Set]] walks, Reflect.get and Reflect.set with a receiver,
+    super property reads and assignment, Proxy forwarding without traps,
+    Object.assign, and Function.prototype.call, apply, and bind."
+  - "Object.prototype.__defineGetter__ and __defineSetter__ of 20.1.3.9
+    and 20.1.3.10: ToObject, the callability check before ToPropertyKey,
+    and DefinePropertyOrThrow of an enumerable, configurable accessor half."
+  - "Object.prototype.__lookupGetter__ and __lookupSetter__ of 20.1.3.11
+    and 20.1.3.12: the [[GetOwnProperty]] and [[GetPrototypeOf]] walk,
+    including Proxy traps, and undefined for a data property or a missing
+    key."
+  - "The names, lengths, non-constructibility, absent prototype
+    properties, and descriptors of the six functions, their creation order
+    after the seven core Object.prototype properties, and descriptor round
+    trips, deletion, redefinition, integrity levels, and for-in over the
+    accessor property."
+owners:
+  - docs/language-profile-es2026.md
+evidence:
+  differential:
+    status: covered
+    references:
+      - tests/annexb-object-accessors-native.test.ts
+      - tests/native/fixtures/annexb-object-accessors.ts
+      - tests/annexb-proto-boundary.test.ts
+      - tests/annexb-legacy-lookup-boundary.test.ts
+      - tests/property/m5-annexb-object-accessors.property.test.ts
+      - tests/property/m5-annexb-proto-boundary.property.test.ts
+      - tests/property/m5-annexb-legacy-lookup-boundary.property.test.ts
+  fixed:
+    status: covered
+    references:
+      - tests/native/fixtures/annexb-object-accessors.ts
+      - tests/annexb-proto-boundary.test.ts
+      - tests/annexb-legacy-lookup-boundary.test.ts
+      - tests/annexb-identity-preparation.test.ts
+  forced-collection:
+    status: covered
+    references:
+      - tests/annexb-object-accessors-native.test.ts
+      - tests/annexb-proto-boundary.test.ts
+      - tests/annexb-legacy-lookup-boundary.test.ts
+      - tests/property/m5-annexb-object-accessors.property.test.ts
+  generated:
+    status: covered
+    references:
+      - tests/property/m5-annexb-object-accessors.property.test.ts
+      - tests/property/m5-annexb-proto-boundary.property.test.ts
+      - tests/property/m5-annexb-legacy-lookup-boundary.property.test.ts
+  guard-fallback:
+    status: covered
+    references:
+      - tests/annexb-object-accessors-native.test.ts
+      - tests/property/m5-annexb-object-accessors.property.test.ts
+      - tests/property/m5-annexb-legacy-lookup-boundary.property.test.ts
+  specialization:
+    status: covered
+    references:
+      - tests/annexb-object-accessors-native.test.ts
+      - tests/property/m5-annexb-object-accessors.property.test.ts
+      - tests/property/m5-annexb-proto-boundary.property.test.ts
+  standards:
+    status: covered
+    references:
+      - tests/test262/subset.yaml
+      - tests/test262/results.yaml
+      - tests/test262/results/built-ins/Object/08.yaml
+      - tests/test262/results/built-ins/Object/09.yaml
+      - tests/test262/results/built-ins/Object/0a.yaml
+      - tests/test262/results/built-ins/Object/0b.yaml
+      - tests/test262/results/built-ins/Object/10.yaml
+      - tests/test262/results/built-ins/Object/12.yaml
+      - tests/test262/results/built-ins/Object/15.yaml
+      - tests/test262/results/built-ins/Object/16.yaml
+      - tests/test262/results/built-ins/Object/17.yaml
+      - tests/test262/results/built-ins/Object/19.yaml
+      - tests/test262/results/built-ins/Object/1a.yaml
+      - tests/test262/results/built-ins/Object/20.yaml
+      - tests/test262/results/built-ins/Object/22.yaml
+      - tests/test262/results/built-ins/Object/23.yaml
+      - tests/test262/results/built-ins/Object/25.yaml
+      - tests/test262/results/built-ins/Object/27.yaml
+      - tests/test262/results/built-ins/Object/34.yaml
+      - tests/test262/results/built-ins/Object/35.yaml
+      - tests/test262/results/built-ins/Object/36.yaml
+      - tests/test262/results/built-ins/Object/3b.yaml
+      - tests/test262/results/built-ins/Object/3f.yaml
+      - tests/test262/results/built-ins/Object/45.yaml
+      - tests/test262/results/built-ins/Object/47.yaml
+      - tests/test262/results/built-ins/Object/4c.yaml
+      - tests/test262/results/built-ins/Object/54.yaml
+      - tests/test262/results/built-ins/Object/55.yaml
+      - tests/test262/results/built-ins/Object/5d.yaml
+      - tests/test262/results/built-ins/Object/62.yaml
+      - tests/test262/results/built-ins/Object/69.yaml
+      - tests/test262/results/built-ins/Object/6a.yaml
+      - tests/test262/results/built-ins/Object/70.yaml
+      - tests/test262/results/built-ins/Object/72.yaml
+      - tests/test262/results/built-ins/Object/73.yaml
+      - tests/test262/results/built-ins/Object/75.yaml
+      - tests/test262/results/built-ins/Object/7b.yaml
+      - tests/test262/results/built-ins/Object/7c.yaml
+      - tests/test262/results/built-ins/Object/8a.yaml
+      - tests/test262/results/built-ins/Object/93.yaml
+      - tests/test262/results/built-ins/Object/97.yaml
+      - tests/test262/results/built-ins/Object/9d.yaml
+      - tests/test262/results/built-ins/Object/a7.yaml
+      - tests/test262/results/built-ins/Object/a8.yaml
+      - tests/test262/results/built-ins/Object/af.yaml
+      - tests/test262/results/built-ins/Object/b4.yaml
+      - tests/test262/results/built-ins/Object/b5.yaml
+      - tests/test262/results/built-ins/Object/be.yaml
+      - tests/test262/results/built-ins/Object/c1.yaml
+      - tests/test262/results/built-ins/Object/c6.yaml
+      - tests/test262/results/built-ins/Object/d3.yaml
+      - tests/test262/results/built-ins/Object/d7.yaml
+      - tests/test262/results/built-ins/Object/d9.yaml
+      - tests/test262/results/built-ins/Object/da.yaml
+      - tests/test262/results/built-ins/Object/db.yaml
+      - tests/test262/results/built-ins/Object/dc.yaml
+      - tests/test262/results/built-ins/Object/e3.yaml
+      - tests/test262/results/built-ins/Object/e5.yaml
+      - tests/test262/results/built-ins/Object/ec.yaml
+      - tests/test262/results/built-ins/Object/f2.yaml
+      - tests/test262/results/built-ins/Object/f5.yaml
+      - tests/test262/results/built-ins/Object/fc.yaml
+      - tests/test262/results/built-ins/Object/ff.yaml
+      - tests/test262/results/built-ins/TypedArray/75.yaml
+      - tests/test262/results/built-ins/TypedArray/8b.yaml
+      - tests/test262/results/built-ins/TypedArrayConstructors/d8.yaml
+      - tests/test262/results/built-ins/WeakRef/d2.yaml
+      - tests/test262/results/language/expressions/c5.yaml
+      - tests/test262/results/language/expressions/eb.yaml
+      - tests/test262/results/language/statements/1e.yaml
+      - tests/test262/results/language/statements/c2.yaml
+      - tests/test262/results/language/types/ad.yaml
+  structural:
+    status: covered
+    references:
+      - packages/runtime-c/tests/intrinsic-graph.test.ts

@@ -1,23 +1,6 @@
 @oseo/runtime-c
 ===============
 
-A missing property read that reaches an intrinsic `Object.prototype` reports
-`OSEO1001` for the excluded Annex B `__proto__` accessor. The diagnostic
-applies after ordinary descriptors and proxy dispatch, including another
-realm's prototype. Own and inherited user properties named `__proto__`, null
-prototype objects, and nullish receiver errors retain their core behavior.
-No legacy accessor is installed. Writes and reflection retain their existing
-contracts.
-
-A missing `__lookupGetter__` or `__lookupSetter__` read that reaches an
-intrinsic `Object.prototype` reports `OSEO1001` for the omitted normative
-optional legacy method. The method is specified in ECMA-262 16th edition
-clause 20.1.3.9, which ADR 0020 maps onto the ADR 0013 Annex B exclusion. The
-diagnostic follows the same ordinary descriptor and proxy dispatch. It also
-applies to another realm's prototype. User properties and methods with those
-names, null prototype objects, symbols, and nullish receiver errors retain
-their core behavior. No legacy method is installed.
-
 Historical Zig 0.16.0 runs did not provide ASan coverage. The separate Linux
 host C sanitizer lane now verifies instrumentation; its measured scope is
 recorded in the [activity audit]. That evidence does not retroactively
@@ -1190,18 +1173,6 @@ internally. The cluster's in-progress marker is the last constructor it builds,
 now Float16Array. `Atomics` rejects the new kind. No entry point, public
 layout, or heap kind is added.
 
-The `m5-134` ABI adds the write half of the Annex B `__proto__` boundary. A
-`[[Set]]` of `"__proto__"` whose walk reaches an intrinsic
-`%Object.prototype%`, in any realm, without finding an own property there or
-earlier reports the same owned `OSEO1001` diagnostic as the missing read,
-because only the omitted normative-optional setter could handle that write.
-Both walks, the ordinary assignment walk and the receiver walk that
-`Reflect.set` and `super` assignment use, apply it. Own and inherited user
-properties, proxy traps, null prototypes, module namespaces, typed-array
-numeric keys, and the object-literal prototype setter keep their behavior, and
-a primitive base keeps its existing early return. No entry point, public
-layout, heap kind, intrinsic slot, or built-in code ID is added.
-
 The `m5-135` ABI admits Unicode group names in dynamically constructed
 patterns. *runtime\_unicode\_tables.h* gains the pinned `ID_Start` and
 `ID_Continue` inversion lists, which *runtime\_string.c* exposes as two
@@ -1482,6 +1453,22 @@ The same ABI adds the Annex B `Date.prototype.getYear` and `setYear` to
 `[Symbol.toPrimitive]`, so `OSEO_DATE_METHOD_COUNT` becomes 46 and the Date
 range uses two more code IDs. `toGMTString` is a further property whose value
 is the existing `toUTCString` function. No intrinsic slot, heap kind,
+component, or generated-code entry point is added.
+
+ABI `m5-153` gives the `Object.prototype.__proto__` accessor its bodies and
+installs `__defineGetter__`, `__defineSetter__`, `__lookupGetter__`, and
+`__lookupSetter__` in every realm. *runtime\_object\_builtin.c* creates them
+after the seven core `Object.prototype` properties, in clause order, with the
+Object range's code IDs 32 through 37 below its last ID. The getter is
+ToObject followed by [[GetPrototypeOf]]; the setter ignores a primitive
+receiver or a prototype that is neither an object nor `null`, and throws a
+`TypeError` when [[SetPrototypeOf]] refuses. The define methods call
+DefinePropertyOrThrow with an enumerable, configurable accessor half, and the
+lookup methods walk [[GetOwnProperty]] and [[GetPrototypeOf]], so Proxy traps
+run on both. The accessor is an ordinary property-vector entry: [[Get]],
+[[Set]], `Reflect.set`, `super` assignment, Proxy forwarding, and
+`Object.assign` call it like any other accessor, and descriptors, integrity
+levels, deletion, and for-in treat it as one. No intrinsic slot, heap kind,
 component, or generated-code entry point is added.
 
 [ADR 0030]: https://github.com/dahlia/oseo/blob/main/docs/adr/0030-test262-unhandled-rejection-policy.md

@@ -60,7 +60,9 @@ supportedFeatures:
   - WeakMap
   - WeakRef
   - WeakSet
+  - __getter__
   - __proto__
+  - __setter__
   - align-detached-buffer-semantics-with-web-reality
   - arbitrary-module-namespace-names
   - array-find-from-last
@@ -33995,6 +33997,455 @@ tests:
   - path: test/built-ins/Object/prototype/S15.2.4_A4.js
     expectedClassification: pass
     dependencies: [object-properties]
+  - path: test/built-ins/Object/prototype/__defineGetter__/define-abrupt.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        functions,
+        object-literals,
+        object-properties,
+        proxy-exotic-object,
+        var-bindings,
+      ]
+  - path: test/built-ins/Object/prototype/__defineGetter__/define-existing.js
+    expectedClassification: pass
+    dependencies: [object-literals, object-properties, var-bindings]
+  - path: test/built-ins/Object/prototype/__defineGetter__/define-new.js
+    expectedClassification: pass
+    dependencies: [object-literals, object-properties, var-bindings]
+  - path: test/built-ins/Object/prototype/__defineGetter__/define-non-configurable.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        error-intrinsics,
+        expression-operators,
+        object-literals,
+        object-properties,
+        var-bindings,
+      ]
+  - path: test/built-ins/Object/prototype/__defineGetter__/define-non-extensible.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        error-intrinsics,
+        object-literals,
+        object-properties,
+        var-bindings,
+      ]
+  - path: test/built-ins/Object/prototype/__defineGetter__/getter-non-callable.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        error-intrinsics,
+        expression-operators,
+        object-literals,
+        object-properties,
+        symbols,
+        var-bindings,
+      ]
+  - path: test/built-ins/Object/prototype/__defineGetter__/key-invalid.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        functions,
+        object-literals,
+        object-properties,
+        var-bindings,
+      ]
+  - path: test/built-ins/Object/prototype/__defineGetter__/length.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/prototype/__defineGetter__/name.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/prototype/__defineGetter__/prop-desc.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/prototype/__defineGetter__/this-non-obj.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        error-intrinsics,
+        expression-operators,
+        functions,
+        object-literals,
+        object-properties,
+        var-bindings,
+      ]
+  - path: test/built-ins/Object/prototype/__defineSetter__/define-abrupt.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        functions,
+        object-literals,
+        object-properties,
+        proxy-exotic-object,
+        var-bindings,
+      ]
+  - path: test/built-ins/Object/prototype/__defineSetter__/define-existing.js
+    expectedClassification: pass
+    dependencies: [object-literals, object-properties, var-bindings]
+  - path: test/built-ins/Object/prototype/__defineSetter__/define-new.js
+    expectedClassification: pass
+    dependencies: [object-literals, object-properties, var-bindings]
+  - path: test/built-ins/Object/prototype/__defineSetter__/define-non-configurable.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        error-intrinsics,
+        expression-operators,
+        object-literals,
+        object-properties,
+        var-bindings,
+      ]
+  - path: test/built-ins/Object/prototype/__defineSetter__/define-non-extensible.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        error-intrinsics,
+        object-literals,
+        object-properties,
+        var-bindings,
+      ]
+  - path: test/built-ins/Object/prototype/__defineSetter__/key-invalid.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        functions,
+        object-literals,
+        object-properties,
+        var-bindings,
+      ]
+  - path: test/built-ins/Object/prototype/__defineSetter__/length.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/prototype/__defineSetter__/name.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/prototype/__defineSetter__/prop-desc.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/prototype/__defineSetter__/setter-non-callable.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        error-intrinsics,
+        expression-operators,
+        object-literals,
+        object-properties,
+        symbols,
+        var-bindings,
+      ]
+  - path: test/built-ins/Object/prototype/__defineSetter__/this-non-obj.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        error-intrinsics,
+        expression-operators,
+        functions,
+        object-literals,
+        object-properties,
+        var-bindings,
+      ]
+  - path: test/built-ins/Object/prototype/__lookupGetter__/key-invalid.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        functions,
+        object-literals,
+        object-properties,
+        var-bindings,
+      ]
+  - path: test/built-ins/Object/prototype/__lookupGetter__/length.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/prototype/__lookupGetter__/lookup-not-found.js
+    expectedClassification: pass
+    dependencies: [object-literals, object-properties, var-bindings]
+  - path: test/built-ins/Object/prototype/__lookupGetter__/lookup-own-acsr-w-getter.js
+    expectedClassification: pass
+    dependencies: [object-literals, object-properties, var-bindings]
+  - path: test/built-ins/Object/prototype/__lookupGetter__/lookup-own-acsr-wo-getter.js
+    expectedClassification: pass
+    dependencies: [object-literals, object-properties, var-bindings]
+  - path: test/built-ins/Object/prototype/__lookupGetter__/lookup-own-data.js
+    expectedClassification: pass
+    dependencies: [object-literals, object-properties, var-bindings]
+  - path: test/built-ins/Object/prototype/__lookupGetter__/lookup-own-get-err.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        functions,
+        object-literals,
+        object-properties,
+        proxy-exotic-object,
+        var-bindings,
+      ]
+  - path: test/built-ins/Object/prototype/__lookupGetter__/lookup-own-proto-err.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        functions,
+        object-literals,
+        object-properties,
+        proxy-exotic-object,
+        var-bindings,
+      ]
+  - path: test/built-ins/Object/prototype/__lookupGetter__/lookup-proto-acsr-w-getter.js
+    expectedClassification: pass
+    dependencies: [object-literals, object-properties, var-bindings]
+  - path: test/built-ins/Object/prototype/__lookupGetter__/lookup-proto-acsr-wo-getter.js
+    expectedClassification: pass
+    dependencies: [object-literals, object-properties, var-bindings]
+  - path: test/built-ins/Object/prototype/__lookupGetter__/lookup-proto-data.js
+    expectedClassification: pass
+    dependencies: [object-literals, object-properties, var-bindings]
+  - path: test/built-ins/Object/prototype/__lookupGetter__/lookup-proto-get-err.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        functions,
+        object-literals,
+        object-properties,
+        proxy-exotic-object,
+        var-bindings,
+      ]
+  - path: test/built-ins/Object/prototype/__lookupGetter__/lookup-proto-proto-err.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        functions,
+        object-literals,
+        object-properties,
+        proxy-exotic-object,
+        var-bindings,
+      ]
+  - path: test/built-ins/Object/prototype/__lookupGetter__/name.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/prototype/__lookupGetter__/prop-desc.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/prototype/__lookupGetter__/this-non-obj.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        error-intrinsics,
+        expression-operators,
+        functions,
+        object-literals,
+        object-properties,
+        var-bindings,
+      ]
+  - path: test/built-ins/Object/prototype/__lookupSetter__/key-invalid.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        functions,
+        object-literals,
+        object-properties,
+        var-bindings,
+      ]
+  - path: test/built-ins/Object/prototype/__lookupSetter__/length.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/prototype/__lookupSetter__/lookup-not-found.js
+    expectedClassification: pass
+    dependencies: [object-literals, object-properties, var-bindings]
+  - path: test/built-ins/Object/prototype/__lookupSetter__/lookup-own-acsr-w-setter.js
+    expectedClassification: pass
+    dependencies: [object-literals, object-properties, var-bindings]
+  - path: test/built-ins/Object/prototype/__lookupSetter__/lookup-own-acsr-wo-setter.js
+    expectedClassification: pass
+    dependencies: [object-literals, object-properties, var-bindings]
+  - path: test/built-ins/Object/prototype/__lookupSetter__/lookup-own-data.js
+    expectedClassification: pass
+    dependencies: [object-literals, object-properties, var-bindings]
+  - path: test/built-ins/Object/prototype/__lookupSetter__/lookup-own-get-err.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        functions,
+        object-literals,
+        object-properties,
+        proxy-exotic-object,
+        var-bindings,
+      ]
+  - path: test/built-ins/Object/prototype/__lookupSetter__/lookup-own-proto-err.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        functions,
+        object-literals,
+        object-properties,
+        proxy-exotic-object,
+        var-bindings,
+      ]
+  - path: test/built-ins/Object/prototype/__lookupSetter__/lookup-proto-acsr-w-setter.js
+    expectedClassification: pass
+    dependencies: [object-literals, object-properties, var-bindings]
+  - path: test/built-ins/Object/prototype/__lookupSetter__/lookup-proto-acsr-wo-setter.js
+    expectedClassification: pass
+    dependencies: [object-literals, object-properties, var-bindings]
+  - path: test/built-ins/Object/prototype/__lookupSetter__/lookup-proto-data.js
+    expectedClassification: pass
+    dependencies: [object-literals, object-properties, var-bindings]
+  - path: test/built-ins/Object/prototype/__lookupSetter__/lookup-proto-get-err.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        functions,
+        object-literals,
+        object-properties,
+        proxy-exotic-object,
+        var-bindings,
+      ]
+  - path: test/built-ins/Object/prototype/__lookupSetter__/lookup-proto-proto-err.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        functions,
+        object-literals,
+        object-properties,
+        proxy-exotic-object,
+        var-bindings,
+      ]
+  - path: test/built-ins/Object/prototype/__lookupSetter__/name.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/prototype/__lookupSetter__/prop-desc.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/Object/prototype/__lookupSetter__/this-non-obj.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        error-intrinsics,
+        expression-operators,
+        functions,
+        object-literals,
+        object-properties,
+        var-bindings,
+      ]
+  - path: test/built-ins/Object/prototype/__proto__/get-abrupt.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        functions,
+        object-literals,
+        object-properties,
+        proxy-exotic-object,
+        var-bindings,
+      ]
+  - path: test/built-ins/Object/prototype/__proto__/get-fn-name.js
+    expectedClassification: pass
+    dependencies: [object-properties, var-bindings]
+  - path: test/built-ins/Object/prototype/__proto__/get-ordinary-obj.js
+    expectedClassification: pass
+    dependencies: [functions, object-literals, object-properties, var-bindings]
+  - path: test/built-ins/Object/prototype/__proto__/get-to-obj-abrupt.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        error-intrinsics,
+        expression-operators,
+        functions,
+        object-properties,
+        var-bindings,
+      ]
+  - path: test/built-ins/Object/prototype/__proto__/prop-desc.js
+    expectedClassification: pass
+    dependencies: [expression-operators, object-properties, var-bindings]
+  - path: test/built-ins/Object/prototype/__proto__/set-abrupt.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        functions,
+        object-literals,
+        object-properties,
+        proxy-exotic-object,
+        var-bindings,
+      ]
+  - path: test/built-ins/Object/prototype/__proto__/set-cycle-shadowed.js
+    expectedClassification: pass
+    dependencies:
+      [object-literals, object-properties, proxy-exotic-object, var-bindings]
+  - path: test/built-ins/Object/prototype/__proto__/set-cycle.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        error-intrinsics,
+        object-literals,
+        object-properties,
+        var-bindings,
+      ]
+  - path: test/built-ins/Object/prototype/__proto__/set-fn-name.js
+    expectedClassification: pass
+    dependencies: [object-properties, var-bindings]
+  - path: test/built-ins/Object/prototype/__proto__/set-immutable.js
+    expectedClassification: pass
+    dependencies:
+      [abrupt-completion, error-intrinsics, object-literals, object-properties]
+  - path: test/built-ins/Object/prototype/__proto__/set-invalid-value.js
+    expectedClassification: pass
+    dependencies:
+      [functions, object-literals, object-properties, symbols, var-bindings]
+  - path: test/built-ins/Object/prototype/__proto__/set-non-extensible.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        error-intrinsics,
+        object-literals,
+        object-properties,
+        var-bindings,
+      ]
+  - path: test/built-ins/Object/prototype/__proto__/set-non-obj-coercible.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        error-intrinsics,
+        expression-operators,
+        functions,
+        object-properties,
+        var-bindings,
+      ]
+  - path: test/built-ins/Object/prototype/__proto__/set-non-object.js
+    expectedClassification: pass
+    dependencies:
+      [functions, object-literals, object-properties, symbols, var-bindings]
+  - path: test/built-ins/Object/prototype/__proto__/set-ordinary-obj.js
+    expectedClassification: pass
+    dependencies: [functions, object-literals, object-properties, var-bindings]
   - path: test/built-ins/Object/prototype/constructor/S15.2.4.1_A1_T1.js
     expectedClassification: pass
     dependencies: [object-properties]
@@ -50252,7 +50703,7 @@ tests:
     expectedClassification: pass
     dependencies: [typed-array-statics]
   - path: test/built-ins/TypedArray/out-of-bounds-behaves-like-detached.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [typed-array-statics]
   - path: test/built-ins/TypedArray/out-of-bounds-get-and-set.js
     expectedClassification: pass
@@ -53027,7 +53478,7 @@ tests:
     expectedClassification: pass
     dependencies: [typed-array-iterative]
   - path: test/built-ins/TypedArray/prototype/resizable-and-fixed-have-same-prototype.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [typed-array-core]
   - path: test/built-ins/TypedArray/prototype/reverse/BigInt/detached-buffer.js
     expectedClassification: pass
@@ -57162,7 +57613,7 @@ tests:
         var-bindings,
       ]
   - path: test/built-ins/TypedArrayConstructors/ctors/no-species.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [array-buffer, object-properties, typed-array-constructors]
   - path: test/built-ins/TypedArrayConstructors/ctors/object-arg/as-array-returns.js
     expectedClassification: pass
@@ -61875,6 +62326,9 @@ tests:
   - path: test/built-ins/WeakRef/prototype/Symbol.toStringTag.js
     expectedClassification: pass
     dependencies: [weak-collections]
+  - path: test/built-ins/WeakRef/prototype/constructor.js
+    expectedClassification: pass
+    dependencies: [object-properties, weak-collections]
   - path: test/built-ins/WeakRef/prototype/deref/custom-this.js
     expectedClassification: pass
     dependencies: [weak-collections]
@@ -115699,7 +116153,7 @@ tests:
     expectedClassification: pass
     dependencies: [classes, object-properties]
   - path: test/language/expressions/class/elements/private-getter-is-not-a-own-property.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [classes]
   - path: test/language/expressions/class/elements/private-getter-on-nested-class.js
     expectedClassification: pass
@@ -115786,7 +116240,7 @@ tests:
     expectedClassification: pass
     dependencies: [classes, object-properties]
   - path: test/language/expressions/class/elements/private-setter-is-not-a-own-property.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [classes]
   - path: test/language/expressions/class/elements/private-setter-on-nested-class.js
     expectedClassification: pass
@@ -206379,7 +206833,7 @@ tests:
     expectedClassification: pass
     dependencies: [classes, object-properties]
   - path: test/language/statements/class/elements/private-getter-is-not-a-own-property.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies:
       [
         classes,
@@ -206623,7 +207077,7 @@ tests:
     expectedClassification: pass
     dependencies: [classes, object-properties]
   - path: test/language/statements/class/elements/private-setter-is-not-a-own-property.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies:
       [
         classes,
@@ -261500,7 +261954,7 @@ tests:
       - functions
       - var-bindings
   - path: test/language/types/object/S8.6.2_A8.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-literals, object-properties, var-bindings]
   - path: test/language/types/object/S8.6_A2_T1.js
     expectedClassification: pass

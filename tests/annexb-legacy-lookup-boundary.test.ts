@@ -1,12 +1,15 @@
 /* eslint-disable no-await-in-loop -- Native observations are isolated. */
 
 import assert from "node:assert/strict";
+import { join } from "node:path";
 import process from "node:process";
 import test from "node:test";
 
 import { targetForExecutionHost } from "../packages/compiler/src/index.ts";
 import { createNodeHost } from "../packages/host/src/index.ts";
 import { runNativeCli } from "./native-cli.ts";
+import { agentReferencePrelude } from "./native/agent-reference.ts";
+import { realmReferencePrelude } from "./native/realm-reference.ts";
 
 const host = createNodeHost();
 const nativeTarget = targetForExecutionHost(
@@ -16,14 +19,6 @@ const nativeTarget = targetForExecutionHost(
   },
 );
 const methods = ["__lookupGetter__", "__lookupSetter__"] as const;
-
-/** The exact owned rejection for one optional legacy lookup method. */
-function diagnostic(method: (typeof methods)[number]): string {
-  return (
-    `error[OSEO1001]: The Object.prototype.${method} method is excluded ` +
-    "by the M5 optional legacy accessor policy."
-  );
-}
 
 /** Runs one script natively with forced collection at every safepoint. */
 async function observe(
@@ -51,46 +46,76 @@ async function observe(
   }
 }
 
+/**
+ * Requires the native output of one Script under both policies to match
+ * Node.js and Deno, which both implement the four legacy methods.
+ */
+async function differential(
+  source: string,
+  sourceId: string,
+  test262Host = false,
+): Promise<void> {
+  const directory = await host.makeTemporaryDirectory("oseo-lookup-ref-");
+  let reference = "";
+  try {
+    const path = join(directory, "case.js");
+    await host.writeTextFile(
+      path,
+      (test262Host ? agentReferencePrelude + realmReferencePrelude : "") +
+        source,
+    );
+    const outputs: string[] = [];
+    for (const [command, args] of [
+      [process.execPath, [path]],
+      ["deno", ["run", "--quiet", path]],
+    ] as const) {
+      const observed = await host.run({ command, args, cwd: directory });
+      assert.equal(observed.exitStatus, 0, observed.stderr);
+      assert.equal(observed.stderr, "");
+      outputs.push(observed.stdout);
+    }
+    assert.equal(outputs[1], outputs[0], source);
+    reference = outputs[0]!;
+  } finally {
+    await host.remove(directory);
+  }
+  for (const specialization of ["disabled", "enabled"] as const) {
+    const native = await observe(source, sourceId, specialization);
+    assert.equal(native.stderr, "", `${specialization}: ${source}`);
+    assert.equal(native.exitStatus, 0, source);
+    assert.equal(native.stdout, reference, `${specialization}: ${source}`);
+  }
+}
+
 test(
-  "only a missing intrinsic legacy lookup reports the owned diagnostic",
+  "lookups reaching the intrinsic find the legacy methods",
   { skip: nativeTarget == null ? "requires a supported native host" : false },
   async () => {
     for (const method of methods) {
       for (const expression of [
         `({}).${method}("x")`,
-        `({})["${method}"]`,
-        `Reflect.get({}, "${method}")`,
+        `({})["${method}"] === Object.prototype.${method}`,
+        `Reflect.get({}, "${method}") === Object.prototype.${method}`,
         `new Proxy({}, {}).${method}("x")`,
         `Object.create(Object.create({})).${method}("x")`,
-        `Object.prototype.${method}`,
-        // The upstream shape: a class instance reads the method on `this`.
+        `typeof Object.prototype.${method}`,
+        // The upstream shape: a private accessor is no own property.
         `(() => { class C { get #m() { return 1; } set #m(v) {} ` +
           `check() { return this.${method}("#m"); } } ` +
           "return new C().check(); })()",
-        // A shadowed call precedes the missing one. Member calls are not
-        // shape-specialized, so this pins only the ordinary later miss.
         "(() => { /** @param {object} value */ " +
           `function read(value) { return value.${method}("k"); } ` +
           `read({ ${method}() { return 1; } }); return read({}); })()`,
         `(() => { class Reader { read() { return super.${method}("k"); } } ` +
           "return new Reader().read(); })()",
-        `$262.createRealm().global.Object.prototype.${method}`,
+        `typeof $262.createRealm().global.Object.prototype.${method}`,
       ]) {
-        for (const specialization of ["disabled", "enabled"] as const) {
-          const sourceId = "annexb-legacy-lookup.js";
-          const native = await observe(
-            `console.log("before");\n${expression};\n` +
-              'console.log("after");\n',
-            sourceId,
-            specialization,
-          );
-          assert.equal(native.exitStatus, 1, expression);
-          assert.equal(native.stdout, "before\n", expression);
-          assert.ok(native.stderr.includes(`${sourceId}:2:`), native.stderr);
-          assert.ok(native.stderr.includes(diagnostic(method)), native.stderr);
-          assert.doesNotMatch(native.stderr, /OSEO2001/u);
-          assert.doesNotMatch(native.stderr, /__proto__/u);
-        }
+        await differential(
+          `console.log("before");\nconsole.log(${expression});\n` +
+            'console.log("after");\n',
+          "annexb-legacy-lookup.js",
+          expression.includes("$262"),
+        );
       }
     }
   },
@@ -121,8 +146,11 @@ test(
       ],
       ['new Proxy({}, { get() { return 1; } }).__lookupGetter__("x");', "Type"],
       ['({}).__lookupGetterX__("x");', "Type"],
-      ['({}).__defineGetter__("x", function () { return 1; });', "Type"],
-      ['({}).__defineSetter__("x", function (v) {});', "Type"],
+      ['({}).__defineGetter__("x", 1);', "Type"],
+      [
+        'Object.preventExtensions({}).__defineSetter__("x", function (v) {});',
+        "Type",
+      ],
       ['({})[Symbol("__lookupGetter__")]("x");', "Type"],
       // A brand check on a foreign object.
       [
@@ -165,9 +193,6 @@ test(
   "same-name user methods and core reflection keep ordinary results",
   { skip: nativeTarget == null ? "requires a supported native host" : false },
   async () => {
-    // Reflection observes the omitted optional methods as absent. Reference
-    // hosts implement 20.1.3.9, so this is a profile result, not a
-    // differential claim.
     const source = `
 const own = { __lookupGetter__(key) { return "own " + key; } };
 console.log(own.__lookupGetter__("a"));
@@ -193,34 +218,15 @@ console.log(
   "__lookupGetter__" in {},
   ({}).hasOwnProperty("__lookupSetter__"),
 );
-console.log(
-  Object.getOwnPropertyDescriptor(Object.prototype, "__lookupGetter__"),
-);
+const descriptor =
+  Object.getOwnPropertyDescriptor(Object.prototype, "__lookupGetter__");
+console.log(typeof descriptor.value, descriptor.writable,
+  descriptor.enumerable, descriptor.configurable);
 console.log(Reflect.has(Object.prototype, "__lookupSetter__"));
 console.log(
   Object.getOwnPropertyNames(Object.prototype).includes("__lookupGetter__"),
 );
 `;
-    for (const specialization of ["disabled", "enabled"] as const) {
-      const native = await observe(source, "lookup-shadows.js", specialization);
-      assert.equal(native.stderr, "");
-      assert.equal(native.exitStatus, 0);
-      assert.equal(
-        native.stdout,
-        [
-          "own a",
-          "inherited b true",
-          "method #m",
-          "getter c",
-          "__lookupGetter__",
-          "undefined",
-          "false false",
-          "undefined",
-          "false",
-          "false",
-          "",
-        ].join("\n"),
-      );
-    }
+    await differential(source, "lookup-shadows.js");
   },
 );

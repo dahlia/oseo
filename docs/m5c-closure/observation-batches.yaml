@@ -166,10 +166,10 @@ regeneration:
     wallSeconds: 3997
     workers: 8
   secondsPerVariant: 0.0549
-  currentExecutedVariants: 136782
-  currentSeconds: 7515
-  finalExecutedVariants: 136782
-  finalSeconds: 7515
+  currentExecutedVariants: 136806
+  currentSeconds: 7516
+  finalExecutedVariants: 136806
+  finalSeconds: 7516
   plan:
     batches: 0
     largestPaths: 0
