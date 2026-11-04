@@ -7,8 +7,8 @@ Status
 Implementation status: in progress. The `claim-boundary` unit has applied ADR
 0032. The `legacy-caller`, `annexb-escape`, `annexb-string-methods`,
 `annexb-date-methods`, `error-is-error`, `math-sum-precise`, `upsert`, and
-`iterator-concat` units are implemented and observed, `iterator-zip` is
-implemented and waits for its observation, and every other unit is open. This
+`iterator-concat`, and `iterator-zip` units are implemented and observed, and
+every other unit is open. This
 plan follows M5 directly and runs alongside M6. It has no milestone number. It
 schedules the language work the maintainer approved on 2026-11-02: build-time
 static-specifier `import()`, Annex B legacy web behavior except `document.all`,
@@ -618,9 +618,7 @@ current *tests/test262/inventory.tsv*.
     `Symbol.iterator` method when called, opens each item only when its turn
     comes, and forwards `return` to the active inner iterator.
     The runtime, fixtures, and property suite are implemented, and all 32 rows
-    pass in the full test262 observation. With the four units observed, the
-    manifest has 41,381 reviewed rows: 35,083 passes and 1,897 unsupported
-    results, and no earlier row changes.
+    pass in the full test262 observation, and no earlier row changes.
  -  `json-parse-source` owns `JSON.rawJSON`, `JSON.isRawJSON`, and the
     reviver context argument (21). It changes the `json-parse` and
     `json-stringify` components: the reviver receives the source text of each
@@ -647,8 +645,10 @@ current *tests/test262/inventory.tsv*.
     `shortest`, `longest`, and `strict` modes and padding. Neither reference
     host implements them, so a model written from the specification replaces
     differential evidence. The runtime, fixtures, and property suite are
-    implemented, and the reviewed harness carries *iteratorZipUtils.js*; the
-    rows stay unreviewed until the full test262 update.
+    implemented, and the reviewed harness carries *iteratorZipUtils.js*. All
+    82 rows pass in the full test262 observation, so the manifest has 41,463
+    reviewed rows: 35,165 passes and 1,897 unsupported results, and no
+    earlier row changes.
  -  `atomics-pause` owns `Atomics.pause` (5). It validates the optional
     iteration count and returns `undefined`. Whether it emits a processor
     pause hint is a target choice recorded in the target description.

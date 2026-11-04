@@ -400,10 +400,9 @@ Joint iteration
 ---------------
 
 The `iterator-zip` unit implements `Iterator.zip` and `Iterator.zipKeyed` from
-the joint iteration feature. Its 82 test262 rows stay `unreviewed` in the
-closure ledger until the unit admits them, so the record names its standards
-evidence as pending and lists the fixtures that cover the same behavior. Six
-of those rows include *iteratorZipUtils.js*, which the reviewed harness now
+the joint iteration feature. All 82 of its test262 rows pass, and the family
+record's standards class cites the results partitions that hold them. Six of
+those rows include *iteratorZipUtils.js*, which the reviewed harness now
 carries unchanged from the pinned revision.
 
 ### `Iterator.zip` and `Iterator.zipKeyed`
