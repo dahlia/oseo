@@ -1108,9 +1108,9 @@ jobs:
           mise run test:node --test-concurrency=1
           tests/property/m5-array-constructor.property.test.ts
 
-  # Each property of this file runs near its 600-second interrupt even
-  # alone, so it leaves the ordinary shards on both hosts; see
-  # docs/evidence/regexp-exhaustive-node/README.md. Hosted macos-latest,
+  # Beside other file workers this file's plain properties reached their
+  # 600-second interrupt, so it leaves the ordinary shards on both hosts;
+  # see docs/evidence/regexp-exhaustive-node/README.md. Hosted macos-latest,
   # one file worker, no time scaling. The generator places this on one of
   # the same five hosted capacity lanes.
 

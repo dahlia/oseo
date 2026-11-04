@@ -44,9 +44,9 @@ export const dedicatedMacosNodeFiles: readonly string[] = [
 
 /**
  * Ordinary Node files with one dedicated job on each of Linux and macOS.
- * Each property in these files runs near its unchanged interrupt even
- * alone, so a shared shard's other file workers can push it past the
- * limit. The dedicated jobs keep every ordinary case, seed, and limit.
+ * Beside a shared shard's other file workers, properties in these files
+ * reached their unchanged interrupt. The dedicated jobs run them with one
+ * file worker and keep every ordinary case, seed, and limit.
  */
 export const dedicatedNodeFiles: readonly string[] = [
   "tests/property/m5-regexp-literal-exhaustive.property.test.ts",

@@ -636,8 +636,8 @@ earlier lane job fails. See
 
 `dedicatedNodeFiles` lists the ordinary Node files with a dedicated job on
 both Linux and macOS. It contains only
-*tests/property/m5-regexp-literal-exhaustive.property.test.ts*, whose
-properties each run near their 600-second interrupt beside other file workers.
+*tests/property/m5-regexp-literal-exhaustive.property.test.ts*, whose plain
+properties reached their 600-second interrupt beside other file workers.
 The hosted `ubuntu-latest` and `macos-latest` jobs run all four properties with
 one file worker, the original seeds and limits, and no time scaling. The lane
 generator places the macOS job on a hosted lane as it does the Array job, and
