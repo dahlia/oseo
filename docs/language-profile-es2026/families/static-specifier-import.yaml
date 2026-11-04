@@ -1,0 +1,82 @@
+version: 1
+id: static-specifier-import
+title: "Static-specifier import()"
+scope:
+  - "An ImportCall whose only argument is one string literal, at any site
+    in a module or in a Script with a build-side referrer identity, as
+    the amended ADR 0016 admits: build-time resolution of the target's
+    closure, a fresh %Promise% capability per call, synchronous host
+    load completion, and evaluation through the runtime module driver."
+  - "Single evaluation per canonical identity, shared namespace objects,
+    cached evaluation errors and cycle-root error identity, joined
+    pending evaluations, and the edition's fulfillment and rejection
+    order. Computed specifiers, options, phase imports, and import() in
+    eval or Function source stay OSEO1001 profile diagnostics, and a
+    target the build cannot resolve, load, parse, link, or compile is a
+    build refusal reported as a subset boundary."
+owners:
+  - docs/adr/0016-dynamic-source-boundary.md
+  - docs/static-specifier-import-design.md
+evidence:
+  differential:
+    status: covered
+    references:
+      - tests/import-operation-native.test.ts
+      - tests/property/import-operation.property.test.ts
+  fixed:
+    status: covered
+    references:
+      - tests/import-operation-native.test.ts
+      - tests/import-operation.test.ts
+      - tests/import-requests.test.ts
+  forced-collection:
+    status: covered
+    references:
+      - tests/import-operation-native.test.ts
+      - tests/property/import-operation.property.test.ts
+  generated:
+    status: covered
+    references:
+      - tests/property/import-operation.property.test.ts
+      - packages/testkit/tests/import-requests.property.test.ts
+  guard-fallback:
+    status: omitted
+    reason: "ImportCall lowers only to the generic runtime import operation
+      and adds no specialized path, hint, or guard."
+    replacements:
+      - tests/import-operation.test.ts
+  specialization:
+    status: covered
+    references:
+      - tests/import-operation-native.test.ts
+      - tests/import-operation.test.ts
+  standards:
+    status: covered
+    references:
+      - tests/test262/subset.yaml
+      - tests/test262/results.yaml
+      - tests/test262/results/language/expressions/44.yaml
+      - tests/test262/results/language/expressions/5d.yaml
+      - tests/test262/results/language/expressions/67.yaml
+      - tests/test262/results/language/expressions/6a.yaml
+      - tests/test262/results/language/expressions/7a.yaml
+      - tests/test262/results/language/expressions/7b.yaml
+      - tests/test262/results/language/expressions/81.yaml
+      - tests/test262/results/language/expressions/84.yaml
+      - tests/test262/results/language/expressions/8c.yaml
+      - tests/test262/results/language/expressions/e6.yaml
+      - tests/test262/results/language/module-code/21.yaml
+      - tests/test262/results/language/module-code/24.yaml
+      - tests/test262/results/language/module-code/2d.yaml
+      - tests/test262/results/language/module-code/37.yaml
+      - tests/test262/results/language/module-code/74.yaml
+      - tests/test262/results/language/module-code/9a.yaml
+      - tests/test262/results/language/module-code/a2.yaml
+      - tests/test262/results/language/module-code/ab.yaml
+      - tests/test262/results/language/module-code/d3.yaml
+      - tests/test262/results/language/module-code/e6.yaml
+  structural:
+    status: covered
+    references:
+      - tests/import-operation-native.test.ts
+      - tests/import-operation.test.ts

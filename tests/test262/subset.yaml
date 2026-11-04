@@ -92,6 +92,7 @@ supportedFeatures:
   - default-parameters
   - destructuring-assignment
   - destructuring-binding
+  - dynamic-import
   - error-cause
   - explicit-resource-management
   - exponentiation

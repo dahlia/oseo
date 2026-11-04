@@ -25,7 +25,9 @@ import {
 import type { CliResult } from "../packages/cli/src/index.ts";
 import {
   buildModuleGraph,
+  buildScriptRequests,
   compileModuleGraph,
+  linkModuleGraph,
   compileSource,
   renderDiagnostic,
   targetForExecutionHost,
@@ -1046,9 +1048,67 @@ interface EntryGraphResult {
   /** The entry's upstream test path, matching recorded diagnostics. */
   readonly entryDisplayId: string;
   readonly graphDiagnostics: readonly Diagnostic[];
+  /**
+   * The first diagnostic refuses the static-specifier `import()` subset
+   * during the build; it is a subset boundary, never a language result.
+   */
+  readonly importBoundary?: true;
   readonly nodes?: readonly Test262ModuleGraphNode[];
   /** Canonical graph identities mapped to their portable recorded IDs. */
   readonly sourceIds?: ReadonlyMap<string, string>;
+}
+
+/**
+ * The capability a case reports when the build refuses one of its
+ * literal `import()` requests: a target that cannot be resolved, loaded,
+ * parsed, linked, or compiled. The amended ADR 0016 makes that a build
+ * failure of the admitted subset, so it never satisfies an expected
+ * negative or counts as a runtime rejection.
+ */
+const importBuildCapability = "static-specifier-import-build";
+
+/**
+ * Whether a canonical build diagnostic refuses an `import()` request. It
+ * was reached through an `import()` edge, which the importer chain in its
+ * notes records, or it locates an `import()` call of its own source.
+ */
+async function isImportBuildRefusal(
+  diagnostic: Diagnostic,
+  sources: ReadonlyMap<string, string>,
+  script?: string,
+): Promise<boolean> {
+  if (
+    (diagnostic.notes ?? []).some((note) =>
+      note.startsWith("requested by import() at "),
+    )
+  ) {
+    return true;
+  }
+  let source = sources.get(diagnostic.sourceId);
+  if (source == null) {
+    try {
+      source = await readFile(fileURLToPath(diagnostic.sourceId), "utf8");
+    } catch {
+      return false;
+    }
+  }
+  const calls =
+    diagnostic.sourceId === script
+      ? defaultComponents.frontend.parse({
+          source,
+          sourceId: diagnostic.sourceId,
+        }).program?.importCalls
+      : defaultComponents.moduleFrontend.parseModule({
+          source,
+          sourceId: diagnostic.sourceId,
+        }).module?.importCalls;
+  const start = diagnostic.byteRange.start;
+  return (calls ?? []).some(
+    (call) =>
+      call.byteRange != null &&
+      call.byteRange.start <= start &&
+      start < call.byteRange.end,
+  );
 }
 
 function relativeModuleId(
@@ -1121,11 +1181,19 @@ async function buildEntryGraph(
     fileModuleResolver,
     entryId,
   );
+  const entrySources = new Map([[entryId, source]]);
+  const boundary = async (
+    diagnostic: Diagnostic | undefined,
+  ): Promise<{ readonly importBoundary?: true }> =>
+    diagnostic != null && (await isImportBuildRefusal(diagnostic, entrySources))
+      ? { importBoundary: true }
+      : {};
   if (result.graph == null) {
     return {
       compileDiagnostics: [],
       entryDisplayId,
       graphDiagnostics: result.diagnostics.map(displayDiagnostic),
+      ...(await boundary(result.diagnostics[0])),
     };
   }
   const sourceIds = new Map(
@@ -1171,7 +1239,83 @@ async function buildEntryGraph(
     compileDiagnostics: compiled.diagnostics.map(displayDiagnostic),
     entryDisplayId,
     graphDiagnostics: result.diagnostics.map(displayDiagnostic),
+    ...(await boundary(compiled.diagnostics[0])),
     nodes,
+    sourceIds,
+  };
+}
+
+/** A Script referrer's `import()` closure, as the runner records it. */
+interface ScriptReferrerGraph {
+  /** Display diagnostics of the refused requests, if any. */
+  readonly diagnostics: readonly Diagnostic[];
+  /** Canonical identities mapped to their portable recorded IDs. */
+  readonly sourceIds: ReadonlyMap<string, string>;
+}
+
+/**
+ * Discover the modules a Script case's literal `import()` calls reach,
+ * resolved against the case's own file as the native build resolves
+ * them. Returns undefined when the case makes no such call. Every
+ * discovery diagnostic refuses a request, because a Script has no static
+ * module graph of its own.
+ */
+async function buildScriptReferrerGraph(
+  source: string,
+  sourcePath: string,
+  displayId: string,
+  rootPath: string,
+): Promise<ScriptReferrerGraph | undefined> {
+  if (moduleHost.canonicalizeFile == null) {
+    throw new Error("The module host cannot canonicalize files.");
+  }
+  const scriptId = await moduleHost.canonicalizeFile(sourcePath);
+  const parsed = defaultComponents.frontend.parse({
+    source,
+    sourceId: scriptId,
+  });
+  if (
+    parsed.program == null ||
+    (parsed.program.importCalls ?? []).length === 0
+  ) {
+    return undefined;
+  }
+  const rootUrl = await moduleHost.canonicalizeFile(rootPath);
+  const result = await buildScriptRequests(
+    defaultComponents.moduleFrontend,
+    createFileModuleLoader(moduleHost),
+    fileModuleResolver,
+    [{ canonicalId: scriptId, program: parsed.program }],
+  );
+  // Linking is part of the build, so a link failure refuses the request
+  // before any variant runs, as discovery failures do.
+  const linked =
+    result.closure == null
+      ? []
+      : linkModuleGraph({
+          entryId: "",
+          kind: "module-graph",
+          modules: result.closure.modules,
+          requests: result.closure.requests,
+        }).diagnostics;
+  const sourceIds = new Map([[scriptId, displayId]]);
+  for (const module of result.closure?.modules ?? []) {
+    sourceIds.set(
+      module.canonicalId,
+      relativeModuleId(module.canonicalId, scriptId, displayId, rootUrl),
+    );
+  }
+  const display = (diagnostic: Diagnostic): Diagnostic => ({
+    ...diagnostic,
+    sourceId: relativeModuleId(
+      diagnostic.sourceId,
+      scriptId,
+      displayId,
+      rootUrl,
+    ),
+  });
+  return {
+    diagnostics: [...result.diagnostics, ...linked].map(display),
     sourceIds,
   };
 }
@@ -1241,6 +1385,30 @@ function unsupportedModuleCapability(
 }
 
 /**
+ * A build refusal of an `import()` request: an unsupported specifier form
+ * keeps its resolution-profile capability, and every other refusal is
+ * the subset boundary. No native variant ran, so no execution evidence.
+ */
+function importBoundaryResult(
+  testCase: Test262Case,
+  diagnostic: Diagnostic,
+  supportedFeatures: ReadonlySet<string>,
+  dependencies: readonly string[],
+): Test262Result {
+  return classifyTest262(
+    testCase,
+    {
+      detail: diagnosticDetail(diagnostic),
+      passed: false,
+      unsupportedCapability:
+        unsupportedModuleCapability(diagnostic) ?? importBuildCapability,
+    },
+    supportedFeatures,
+    { dependencies },
+  );
+}
+
+/**
  * A diagnostic in the harness Script is a harness failure, never evidence
  * of the case's own parse, resolution, or profile outcome, so it cannot
  * satisfy an expected negative or report an unsupported capability.
@@ -1301,6 +1469,14 @@ async function moduleNegativeResult(
       harnessFailure,
       supportedFeatures,
       evidence,
+    );
+  }
+  if (diagnostic != null && graph.importBoundary === true) {
+    return importBoundaryResult(
+      testCase,
+      diagnostic,
+      supportedFeatures,
+      evidence.dependencies,
     );
   }
   if (diagnostic == null) {
@@ -1603,6 +1779,14 @@ async function executedResult(
         dependencies,
       });
     }
+    if (diagnostic != null && graph.importBoundary === true) {
+      return importBoundaryResult(
+        testCase,
+        diagnostic,
+        supportedFeatures,
+        dependencies,
+      );
+    }
     if (diagnostic != null) {
       const unsupportedCapability = unsupportedModuleCapability(diagnostic);
       const failedPhase = moduleFailurePhase(diagnostic, graph.entryDisplayId);
@@ -1627,6 +1811,25 @@ async function executedResult(
         },
         supportedFeatures,
         { dependencies },
+      );
+    }
+  } else if (sourcePath != null && rootPath != null) {
+    // A Script case resolves its literal import() calls against its own
+    // file, and a refused request stops the build before any variant.
+    const referrer = await buildScriptReferrerGraph(
+      source,
+      sourcePath,
+      testCase.path,
+      rootPath,
+    );
+    moduleSourceIds = referrer?.sourceIds;
+    const diagnostic = referrer?.diagnostics[0];
+    if (diagnostic != null) {
+      return importBoundaryResult(
+        testCase,
+        diagnostic,
+        supportedFeatures,
+        dependencies,
       );
     }
   }
@@ -1978,13 +2181,6 @@ export interface Test262CaseLocation {
   readonly sourcePath: string;
 }
 
-/**
- * ADR 0016 and the 2026-10-07 maintainer decision require observations of
- * dynamic import's existing rejection, without admitting the feature.
- * Only these frontmatter gaps may reach the compiler for observation.
- */
-const observeOnlyFeatures: ReadonlySet<string> = new Set(["dynamic-import"]);
-
 /** Execute and classify one parsed upstream case. */
 export async function executeTest262Case(
   source: string,
@@ -1997,20 +2193,11 @@ export async function executeTest262Case(
 ): Promise<Test262Result> {
   const evidence: Test262Evidence = { dependencies };
   const unsupported = parsed.case.features.some(
-    (feature) =>
-      !supportedFeatures.has(feature) && !observeOnlyFeatures.has(feature),
+    (feature) => !supportedFeatures.has(feature),
   );
   if (unsupported) {
     return unsupportedResult(parsed.case, supportedFeatures, evidence);
   }
-  // Classification follows the observation for this bounded cohort. The
-  // checked-in supportedFeatures list stays unchanged; a tagged case without
-  // import() can pass, while an actual import rejection stays unsupported.
-  const observedFeatures = parsed.case.features.some((feature) =>
-    observeOnlyFeatures.has(feature),
-  )
-    ? new Set([...supportedFeatures, ...observeOnlyFeatures])
-    : supportedFeatures;
   const structuralCapability = unsupportedStructuralCapability(
     source,
     parsed,
@@ -2024,7 +2211,7 @@ export async function executeTest262Case(
         passed: false,
         unsupportedCapability: structuralCapability.capability,
       },
-      observedFeatures,
+      supportedFeatures,
       evidence,
     );
   }
@@ -2037,7 +2224,7 @@ export async function executeTest262Case(
           failureKind: "harness",
           passed: false,
         },
-        observedFeatures,
+        supportedFeatures,
         evidence,
       );
     }
@@ -2048,7 +2235,7 @@ export async function executeTest262Case(
       return await moduleNegativeResult(
         source,
         parsed,
-        observedFeatures,
+        supportedFeatures,
         evidence,
         harnesses,
         location.sourcePath,
@@ -2058,7 +2245,7 @@ export async function executeTest262Case(
     return await executedResult(
       source,
       parsed,
-      observedFeatures,
+      supportedFeatures,
       harnesses,
       executor,
       dependencies,
@@ -2067,12 +2254,17 @@ export async function executeTest262Case(
     );
   }
   if (parsed.case.expectedFailurePhase === "parse") {
-    return parseNegativeResult(source, parsed.case, observedFeatures, evidence);
+    return parseNegativeResult(
+      source,
+      parsed.case,
+      supportedFeatures,
+      evidence,
+    );
   }
   return await executedResult(
     source,
     parsed,
-    observedFeatures,
+    supportedFeatures,
     harnesses,
     executor,
     dependencies,
@@ -2282,10 +2474,9 @@ async function loadNativeExecution(): Promise<NativeExecution> {
       };
     }),
     async execute(request: Test262ExecutionRequest): Promise<CliResult> {
-      const entry =
-        request.mode === "module" && request.sourcePath != null
-          ? request.sourcePath
-          : request.sourceId;
+      // A Script resolves its import() calls against its own file, so it
+      // gets the upstream path as well; diagnostics keep `sourceId`.
+      const entry = request.sourcePath ?? request.sourceId;
       const args = [
         ...(request.mode === "module" ? ["--module"] : []),
         ...(request.script == null

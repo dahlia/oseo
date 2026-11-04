@@ -2388,3 +2388,56 @@ test(receiverTitle, async () => {
   assert.equal(first.stdout, "42\n");
   assert.equal(fixture.plans.length, 2);
 });
+
+test("a script entry resolves import() against its own path", async () => {
+  const reads: string[] = [];
+  const host: CompilerHost = {
+    canonicalizeFile(path) {
+      return Promise.resolve(new URL(`file://${path}`).href);
+    },
+    makeTemporaryDirectory() {
+      return Promise.reject(new Error("unexpected temporary directory"));
+    },
+    readTextFile(location) {
+      const path = String(location);
+      reads.push(path);
+      return path === "file:///work/lazy.mjs"
+        ? Promise.resolve("export const lazy = 1;")
+        : Promise.reject(new Error(`unexpected read ${path}`));
+    },
+    remove() {
+      return Promise.reject(new Error("unexpected remove"));
+    },
+    run() {
+      return Promise.reject(new Error("unexpected process"));
+    },
+    writeTextFile() {
+      return Promise.reject(new Error("unexpected write"));
+    },
+  };
+  const result = await runNativeCli(
+    {
+      args: ["--dump-mir", "/work/script.js"],
+      source: 'var p = import("./lazy.mjs");',
+      version: "0.0.0",
+    },
+    host,
+  );
+  assert.equal(result.stderr, "");
+  assert.equal(result.exitStatus, 0);
+  assert.match(result.stdout, /call module_import /u);
+  assert.match(result.stdout, /\*module:file:\/\/\/work\/lazy\.mjs\*/u);
+  assert.deepEqual(reads, ["file:///work/lazy.mjs"]);
+
+  // A computed specifier stays outside the admitted subset.
+  const computed = await runNativeCli(
+    {
+      args: ["--dump-mir", "/work/script.js"],
+      source: 'var name = "./lazy.mjs";\nimport(name);',
+      version: "0.0.0",
+    },
+    host,
+  );
+  assert.equal(computed.exitStatus, 1);
+  assert.match(computed.stderr, /OSEO1001.*ImportExpression/u);
+});

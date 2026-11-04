@@ -11,9 +11,10 @@ alternative 3 of [ADR 0016](./adr/0016-dynamic-source-boundary.md) and
 *PLAN-DYN.md*, which links this document, owns the track. Bounded general
 `eval` and `Function` construction are not part of it.
 
-ADR 0016, as amended on 2026-11-03, selects the subset this design defines,
-and every `import()` stays rejected at parse time with `OSEO1001` until the
-admission recorded in [*PLAN-LANGUAGE.md*](../PLAN-LANGUAGE.md). M5 defers the
+ADR 0016, as amended on 2026-11-03, selects the subset this design defines.
+The `import-*` units of [*PLAN-LANGUAGE.md*](../PLAN-LANGUAGE.md) implement
+it, and the default frontends now admit the literal form; every other
+`import()` stays rejected at parse time with `OSEO1001`. M5 defers the
 20 pinned rows below by name under
 [ADR 0031](./adr/0031-m5-named-deferral.md) with *PLAN-DYN.md* as their target.
 

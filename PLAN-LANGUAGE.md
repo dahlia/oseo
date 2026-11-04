@@ -411,7 +411,14 @@ groups G1 through G14.
     reassesses the ADR 0016 exclusions the design reopens. It moves the 17
     closable deferral rows to observation owners. *usage-from-eval.js*,
     *eval-rqstd-once.js*, and *update-to-dynamic-import.js* stay deferred to
-    *PLAN-DYN.md*.
+    *PLAN-DYN.md*. Status: the default CLI frontends turn
+    `staticSpecifierImports` on, a Script resolves its requests against its
+    own file, `dynamic-import` is a supported feature, and the
+    `static-specifier-import` family record is indexed. The runner reports a
+    refused request as the `static-specifier-import-build` capability, never
+    as an expected negative. The full UPDATE, the review of changed
+    observations, the exclusion reassessment, and the deferral moves
+    remain.
 
 Done when the 17 rows pass, every changed `dynamic-import` observation is
 reviewed, no static module row regresses, and the amended ADR 0016 describes

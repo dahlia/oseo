@@ -1823,15 +1823,15 @@ test("classifies unsupported features without native execution", async () => {
   assert.equal(result.classification, "unsupported-profile-feature");
 });
 
-test("observes dynamic import without feature admission", async () => {
-  const source = '/*---\nfeatures: [dynamic-import]\n---*/\nimport("x");';
+test("an unsupported import() form keeps its profile diagnostic", async () => {
+  const source =
+    '/*---\nfeatures: [dynamic-import]\n---*/\nvar name = "x";\nimport(name);';
   const parsed = parseTest262Case(source, "test/import.js", revision);
-  const supported = new Set<string>();
   let executions = 0;
   const result = await executeTest262Case(
     source,
     parsed,
-    supported,
+    new Set(["dynamic-import"]),
     harnesses,
     {
       async execute() {
@@ -1840,7 +1840,7 @@ test("observes dynamic import without feature admission", async () => {
           exitStatus: 1,
           stdout: "",
           stderr:
-            "test/import.js:1:1: error[OSEO1001]: " +
+            "test/import.js:2:1: error[OSEO1001]: " +
             "ImportExpression is outside the M1 profile.\n",
         };
       },
@@ -1848,22 +1848,24 @@ test("observes dynamic import without feature admission", async () => {
     ["dynamic-source"],
   );
   assert.ok(executions > 0);
-  assert.equal(supported.has("dynamic-import"), false);
   assert.equal(result.classification, "unsupported-profile-feature");
   assert.equal(result.observation.unsupportedCapability, "profile-syntax");
   assert.match(result.observation.detail!, /ImportExpression/u);
   assert.deepEqual(result.unsupportedFeatures, []);
 });
 
-test("another unadmitted feature still blocks observe-only cases", async () => {
+test("dynamic import is an admitted feature", async () => {
+  const subset = parseReviewedSubset(
+    await readFile(new URL("./test262/subset.yaml", import.meta.url), "utf8"),
+  );
+  assert.ok(subset.supportedFeatures.includes("dynamic-import"));
   const source =
-    "/*---\nfeatures: [dynamic-import, unsupported-example]\n---*/\n" +
-    'import("x");';
+    "/*---\nfeatures: [dynamic-import, unsupported-example]\n---*/\n1;";
   const parsed = parseTest262Case(source, "test/import.js", revision);
   const result = await executeTest262Case(
     source,
     parsed,
-    new Set(),
+    new Set(["dynamic-import"]),
     harnesses,
     {
       async execute() {
@@ -1871,38 +1873,7 @@ test("another unadmitted feature still blocks observe-only cases", async () => {
       },
     },
   );
-  assert.equal(result.classification, "unsupported-profile-feature");
-  assert.equal(
-    result.observation.detail,
-    "Not executed: the frontmatter needs an unsupported feature.",
-  );
-  assert.deepEqual(result.unsupportedFeatures, [
-    "dynamic-import",
-    "unsupported-example",
-  ]);
-});
-
-test("an observe-only feature tag without import syntax can pass", async () => {
-  const source = "/*---\nfeatures: [dynamic-import]\n---*/\n1;";
-  const parsed = parseTest262Case(source, "test/tag-only.js", revision);
-  let executions = 0;
-  const result = await executeTest262Case(
-    source,
-    parsed,
-    new Set(),
-    harnesses,
-    {
-      async execute() {
-        executions += 1;
-        return successfulResult();
-      },
-    },
-  );
-  assert.ok(executions > 0);
-  assert.equal(result.classification, "pass");
-  assert.equal(result.observation.passed, true);
-  assert.deepEqual(result.case.features, ["dynamic-import"]);
-  assert.deepEqual(result.unsupportedFeatures, []);
+  assert.deepEqual(result.unsupportedFeatures, ["unsupported-example"]);
 });
 
 test("admitted super tag exposes the global-code parse negatives", async () => {
