@@ -5797,8 +5797,8 @@ assessments:
       non-source reopening remains in force.
     replacementEvidence:
       tests/property/m5-regexp-literal-exhaustive.property.test.ts:
-        "dc5d57c80836fbb5fdb9819437162df84daa08e227274e\
-        56d52207efbbd06289"
+        "6dd754a9d822d4aa377f9df36e6a9d5dc799565988c567\
+        711dc32eb52bc80e72"
   ds17-exhaustive-escaped-annex-b:
     disposition: remediation
     remediationOwner: unit:annexb-dynamic-source-accounting
@@ -5819,8 +5819,8 @@ assessments:
       0013's optional Annex B policy, or on ADR 0019's reopening triggers.
     replacementEvidence:
       tests/property/m5-regexp-literal-exhaustive.property.test.ts:
-        "dc5d57c80836fbb5fdb9819437162df84daa08e227274e\
-        56d52207efbbd06289"
+        "6dd754a9d822d4aa377f9df36e6a9d5dc799565988c567\
+        711dc32eb52bc80e72"
   residual-exact-completion:
     disposition: exclusion
     normativeDependency: source-evaluation-only
