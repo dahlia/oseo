@@ -1,0 +1,62 @@
+version: 1
+id: disposal-intrinsics
+title: "Explicit resource management built-ins"
+scope:
+  - "SuppressedError: its global binding, constructor shape, [[ErrorData]],
+    message conversion before the error and suppressed properties, the
+    absent cause, and the new-target prototype with its realm fallback."
+  - "Symbol.dispose and Symbol.asyncDispose as the fourteenth and fifteenth
+    well-known symbols, shared by every realm, and the dispose methods of
+    %Iterator.prototype% and %AsyncIteratorPrototype%."
+  - "DisposableStack and AsyncDisposableStack: constructors, prototype
+    members and descriptors, receiver and disposed-state checks, use,
+    adopt, defer, move, the disposed getter, and DisposeResources in
+    reverse order with the SuppressedError chain, including the
+    asynchronous awaits, the null-resource await, and the Symbol.dispose
+    fallback whose result is discarded."
+owners:
+  - docs/language-profile-es2026.md
+evidence:
+  differential:
+    status: covered
+    references:
+      - tests/native/fixtures/disposal-intrinsics.ts
+      - tests/property/es2027-disposal-intrinsics.property.test.ts
+  fixed:
+    status: covered
+    references:
+      - tests/native/fixtures/disposal-intrinsics.ts
+  forced-collection:
+    status: covered
+    references:
+      - tests/disposal-intrinsics-native.test.ts
+      - tests/native/fixtures/disposal-intrinsics.ts
+      - tests/property/es2027-disposal-intrinsics.property.test.ts
+  generated:
+    status: covered
+    references:
+      - tests/property/es2027-disposal-intrinsics.property.test.ts
+  guard-fallback:
+    status: covered
+    references:
+      - tests/disposal-intrinsics-native.test.ts
+      - tests/native/fixtures/disposal-intrinsics.ts
+      - tests/property/es2027-disposal-intrinsics.property.test.ts
+  specialization:
+    status: covered
+    references:
+      - tests/disposal-intrinsics-native.test.ts
+      - tests/native/fixtures/disposal-intrinsics.ts
+      - tests/property/es2027-disposal-intrinsics.property.test.ts
+  standards:
+    status: omitted
+    reason: "The 240 explicit resource management rows under test/built-ins/
+      stay unreviewed in the closure ledger until the unit admits them and
+      the full test262 update observes them."
+    replacements:
+      - tests/native/fixtures/disposal-intrinsics.ts
+      - tests/property/es2027-disposal-intrinsics.property.test.ts
+  structural:
+    status: covered
+    references:
+      - packages/runtime-c/tests/intrinsic-graph.test.ts

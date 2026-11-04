@@ -686,6 +686,8 @@ static OseoResult symbol_intrinsic_create(OseoContext *context) {
         "toPrimitive",
         "toStringTag",
         "unscopables",
+        "asyncDispose",
+        "dispose",
     };
     static const char *const well_known_descriptions[
         OSEO_WELL_KNOWN_SYMBOL_COUNT
@@ -703,6 +705,8 @@ static OseoResult symbol_intrinsic_create(OseoContext *context) {
         "Symbol.toPrimitive",
         "Symbol.toStringTag",
         "Symbol.unscopables",
+        "Symbol.asyncDispose",
+        "Symbol.dispose",
     };
     OseoValue *marker = &context->realm->intrinsics[
         OSEO_INTRINSIC_SYMBOL_DESCRIPTION_GETTER

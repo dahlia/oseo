@@ -7,7 +7,7 @@
  * 41238903460 at `8770b2e4`. The largest is kept on purpose: the residual
  * evidence file took 1.36 times longer on one of those Linux runners than
  * on another, and the margin the shards keep is a slow runner's.
- * Twenty-seven files postdate those runs and scale a local measurement on
+ * Twenty-nine files postdate those runs and scale a local measurement on
  * the same host by the residual-evidence ratio: 2.574 on Linux and 1.974
  * on macOS. The measurements are serial except the Object accessor
  * property file and the legacy lookup test, which ran side by side.
@@ -30,6 +30,7 @@ export const nodeShardCosts = {
     "tests/ds12-module-observables-native.test.ts": 72,
     "tests/dynamic-source-realm-host-evidence.test.ts": 309,
     "tests/dynamic-source-residual-evidence.test.ts": 2055,
+    "tests/disposal-intrinsics-native.test.ts": 57,
     "tests/dynamic-source-static-core.test.ts": 72,
     "tests/es2026-builtins-native.test.ts": 98,
     "tests/function-constructor-evidence.test.ts": 143,
@@ -58,6 +59,7 @@ export const nodeShardCosts = {
     "tests/property/es2026-json-parse-source.property.test.ts": 150,
     "tests/property/es2026-uint8array-base64.property.test.ts": 47,
     "tests/property/es2026-upsert.property.test.ts": 68,
+    "tests/property/es2027-disposal-intrinsics.property.test.ts": 55,
     "tests/property/m5-annexb-date-methods.property.test.ts": 32,
     "tests/property/m5-annexb-escape.property.test.ts": 87,
     "tests/property/m5-annexb-legacy-lookup-boundary.property.test.ts": 33,
@@ -158,6 +160,7 @@ export const nodeShardCosts = {
     "tests/array-from-async-native.test.ts": 40,
     "tests/callable-object-evidence.test.ts": 40,
     "tests/completion-records.test.ts": 906,
+    "tests/disposal-intrinsics-native.test.ts": 43,
     "tests/ds12-module-observables-native.test.ts": 68,
     "tests/dynamic-source-realm-host-evidence.test.ts": 301,
     "tests/dynamic-source-residual-evidence.test.ts": 1576,
@@ -187,6 +190,7 @@ export const nodeShardCosts = {
     "tests/property/es2026-json-parse-source.property.test.ts": 115,
     "tests/property/es2026-uint8array-base64.property.test.ts": 36,
     "tests/property/es2026-upsert.property.test.ts": 52,
+    "tests/property/es2027-disposal-intrinsics.property.test.ts": 42,
     "tests/property/m5-annexb-escape.property.test.ts": 67,
     "tests/property/m5-annexb-legacy-lookup-boundary.property.test.ts": 35,
     "tests/property/m5-annexb-object-accessors.property.test.ts": 75,

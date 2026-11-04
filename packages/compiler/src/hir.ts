@@ -325,7 +325,8 @@ export function errorIntrinsicName(
 /**
  * Global names ECMA-262 clause 19 requires of every realm in ECMAScript
  * 2025, the candidate edition ADR 0013 pins, plus the Annex B `escape`
- * and `unescape` that ADR 0032 brings into the claim. A conforming realm
+ * and `unescape` that ADR 0032 brings into the claim and the three
+ * explicit resource management constructors. A conforming realm
  * always resolves these names, so a `typeof` of one can never take the
  * unresolvable reference's `"undefined"` answer; a name this profile has
  * not admitted as a value must be rejected instead of misreported.
@@ -334,6 +335,7 @@ const standardGlobalNames: ReadonlySet<string> = new Set([
   "AggregateError",
   "Array",
   "ArrayBuffer",
+  "AsyncDisposableStack",
   "Atomics",
   "BigInt",
   "BigInt64Array",
@@ -341,6 +343,7 @@ const standardGlobalNames: ReadonlySet<string> = new Set([
   "Boolean",
   "DataView",
   "Date",
+  "DisposableStack",
   "Error",
   "EvalError",
   "FinalizationRegistry",
@@ -368,6 +371,7 @@ const standardGlobalNames: ReadonlySet<string> = new Set([
   "Set",
   "SharedArrayBuffer",
   "String",
+  "SuppressedError",
   "Symbol",
   "SyntaxError",
   "TypeError",
@@ -457,8 +461,10 @@ export function intrinsicGlobalKind(
     name === "Atomics" ||
     name === "BigInt" ||
     name === "Boolean" ||
+    name === "AsyncDisposableStack" ||
     name === "DataView" ||
     name === "Date" ||
+    name === "DisposableStack" ||
     name === "Function" ||
     name === "Iterator" ||
     name === "JSON" ||
@@ -473,6 +479,7 @@ export function intrinsicGlobalKind(
     name === "String" ||
     name === "Set" ||
     name === "SharedArrayBuffer" ||
+    name === "SuppressedError" ||
     name === "Symbol" ||
     name === "FinalizationRegistry" ||
     name === "WeakMap" ||

@@ -565,6 +565,22 @@ static OseoResult async_generator_intrinsics(OseoContext *context) {
         );
     }
     if (result.status == OSEO_STATUS_NORMAL) {
+        result = oseo_internal_iterator_dispose_function(
+            context,
+            OSEO_ASYNC_ITERATOR_ASYNC_DISPOSE_CODE_ID
+        );
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        const OseoPropertyAttributes method = {true, false, true, false};
+        result = define_symbol_property(
+            context,
+            frame.slots[0],
+            OSEO_WELL_KNOWN_ASYNC_DISPOSE,
+            result.value,
+            method
+        );
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
         result = oseo_object_create(context, frame.slots[0]);
         frame.slots[1] = result.value;
     }

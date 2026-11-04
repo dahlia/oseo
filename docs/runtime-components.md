@@ -34,7 +34,7 @@ The runtime input now lists forty-six reviewed assets in this order:
 *runtime\_number.c*, *runtime\_boolean.c*, *runtime\_array\_buffer.c*,
 *runtime\_set.c*,
 *runtime\_typed\_array.c*, *runtime\_weak\_collection.c*,
-*runtime\_arguments.c*,
+*runtime\_disposal.c*, *runtime\_arguments.c*,
 *runtime\_enumeration.c*, *runtime\_function.c*, *runtime\_error.c*,
 *runtime\_symbol.c*, *runtime\_iterator.c*, *runtime\_generator.c*,
 *runtime\_async\_generator.c*, *runtime\_bigint.c*,
@@ -240,6 +240,10 @@ Ownership follows the plan's target layout:
     `FinalizationRegistry` constructors and prototypes, CanBeHeldWeakly, the
     job-scoped KeptAlive set, and the cleanup job step that calls a registry's
     callback for each of its queued records;
+ -  *runtime\_disposal.c*: `DisposableStack`, `AsyncDisposableStack`, the
+    DisposeCapability record they share with `using` scopes, both forms of
+    DisposeResources, and the dispose methods of `%Iterator.prototype%` and
+    `%AsyncIteratorPrototype%`;
  -  *runtime\_arguments.c*: the unmapped arguments object 10.2.4 creates, the
     mapped object 10.4.4 creates from a simple parameter list, the `@@iterator`
     both shapes define, and the realm's single `%ThrowTypeError%` intrinsic

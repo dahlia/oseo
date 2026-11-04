@@ -15,13 +15,15 @@ A change that admits or measures behavior inside this boundary updates this
 document in the same change. A family's status describes tested current
 behavior, never intended behavior. The Annex B built-in units, the Annex B
 Object accessors, the Annex B language units, the small ECMAScript 2026
-built-in units, `iterator-zip`, `array-from-async`, and `json-parse-source`
-hold the family records so far; see [Annex B built-ins](#annex-b-built-ins),
+built-in units, `iterator-zip`, `array-from-async`, `json-parse-source`, and
+`disposal-intrinsics` hold the family records so far; see
+[Annex B built-ins](#annex-b-built-ins),
 [Annex B Object accessors](#annex-b-object-accessors),
 [Annex B language semantics](#annex-b-language-semantics),
 [Small ECMAScript 2026 built-in families](#small-ecmascript-2026-built-in-families),
-[Joint iteration](#joint-iteration), [`Array.fromAsync`](#arrayfromasync), and
-[JSON source text](#json-source-text).
+[Joint iteration](#joint-iteration), [`Array.fromAsync`](#arrayfromasync),
+[JSON source text](#json-source-text), and
+[Explicit resource management](#explicit-resource-management).
 
 
 Claim boundary
@@ -856,3 +858,64 @@ is
 The unit owns the five *test/built-ins/Atomics/pause/* rows, and all five
 pass; the family record's standards class cites the results partitions that
 hold them.
+
+
+Explicit resource management
+----------------------------
+
+The `disposal-intrinsics` unit adds the built-ins of the ECMAScript 2027
+explicit resource management feature. Its 240 test262 paths under
+*test/built-ins/* stay `unreviewed` in the closure ledger until the unit admits
+them, so the record names its standards evidence as pending. In a focused
+observation, 236 pass. The other four construct a new target with the
+`Function` constructor, three of them of another realm, and are ADR 0016
+results: *proto-from-ctor-realm.js* for each of the three constructors and
+*SuppressedError/newtarget-proto-fallback.js*. The cross-realm fixture covers
+their other assertions with a bound function of the other realm.
+
+### Built-ins
+
+`SuppressedError(error, suppressed, message)` is a global constructor with
+length 3 whose `[[Prototype]]` is `%Error%`. It creates an object with
+`[[ErrorData]]`, so `Error.isError` answers `true`. A defined `message` is
+converted to a string first; then `error` and `suppressed` become writable,
+non-enumerable, configurable own properties. It reads no options and installs
+no `cause`.
+
+`Symbol.dispose` and `Symbol.asyncDispose` are well-known symbols shared by
+every realm, so the table M5 fixed at thirteen entries now has fifteen.
+`%Iterator.prototype%[Symbol.dispose]` calls the receiver's `return` method, if
+it has one, and returns `undefined`. The asynchronous form,
+`%AsyncIteratorPrototype%[Symbol.asyncDispose]`, calls `return` with no
+arguments, passes its result
+through `PromiseResolve`, and returns a promise for `undefined`; every abrupt
+step rejects that promise instead of throwing. The pinned Node.js passes one
+`undefined` argument to `return`; Oseo follows the pinned test262, which
+expects none, and the fixtures do not observe the argument count.
+
+`DisposableStack` and `AsyncDisposableStack` require `new` and take their
+prototype from the new target, falling back to the new target's realm. `use`,
+`adopt`, `defer`, and `move` throw a `ReferenceError` once the stack is
+disposed, and every member throws a `TypeError` on a receiver of the other
+kind. `use` reads the dispose method once, when the resource is added; a
+synchronous stack ignores `null` and `undefined`, while an asynchronous stack
+records them so that disposal still awaits once. An asynchronous stack falls
+back to `Symbol.dispose` and discards that method's result. `move` returns a
+stack of the running realm's intrinsic prototype that owns every resource and
+leaves the receiver disposed and empty.
+
+Disposal visits the resources in reverse order. A failure replaces the stored
+completion: the first one directly, each later one with a `SuppressedError`
+whose `error` is the new failure and whose `suppressed` is the earlier
+completion. `disposeAsync` awaits each asynchronous result, awaits once before
+a synchronous resource that follows a `null` one, and settles its promise with
+the final completion; a second call returns a promise already fulfilled.
+
+Both reference hosts implement the feature. The fixtures compare with Node.js
+and Deno, and the property suite compares with Node.js. The fixtures avoid
+three V8 details: the own `stack` property of every error, the order of some
+own keys, and the `message` V8 gives the `SuppressedError` that disposal
+creates, which the edition does not define. The property suite also checks
+generated stacks against an independent model of the disposal order and the
+`SuppressedError` chain. The family record is
+[*disposal-intrinsics.yaml*](./language-profile-es2026/families/disposal-intrinsics.yaml).

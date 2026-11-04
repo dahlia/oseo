@@ -10,7 +10,8 @@ Implementation status: in progress. The `claim-boundary` unit has applied ADR
 `iterator-concat`, `iterator-zip`, `annexb-object-accessors`,
 `array-from-async`, `json-parse-source`, `uint8array-base64`,
 `atomics-pause`, `annexb-function-declarations`, and `annexb-statement-forms`
-units are implemented and observed. Every other unit is open.
+units are implemented and observed. The `disposal-intrinsics` unit is
+implemented and awaits its standards update. Every other unit is open.
 This plan follows M5 directly and runs alongside M6. It has no milestone
 number. It schedules the language work the maintainer approved on 2026-11-02:
 build-time static-specifier `import()`, Annex B legacy web behavior except
@@ -670,6 +671,11 @@ current *tests/test262/inventory.tsv*.
     dispose methods of `%Iterator.prototype%` and `%AsyncIteratorPrototype%`.
     Adding two well-known symbols changes the well-known symbol table that M5b
     fixed at thirteen entries.
+    The runtime, fixtures, and property suite are implemented, and 236 of the
+    240 rows pass in a focused observation. The other four construct a new
+    target with the `Function` constructor and are ADR 0016 results: each
+    constructor's *proto-from-ctor-realm.js* and
+    *SuppressedError/newtarget-proto-fallback.js*.
  -  `using-declarations` owns the 184 *test/language/statements/* rows for
     `using` and `await using`, including `for`, `for-of`, `for-await-of`,
     and `switch` heads and module top level. It lowers each declaration
@@ -744,7 +750,7 @@ standards update and heavy gates on the new base.
     row's owner moves. The audit binds ADR texts by digest, so a unit that
     edits ADR 0013, 0016, or 0028 re-reviews the rows that cite it.
  -  The runtime ABI version in *packages/runtime-c/src/index.ts*, currently
-    `m5-156`, changes once per landing that alters the ABI. The series keeps
+    `m5-157`, changes once per landing that alters the ABI. The series keeps
     its `m5-` prefix, and the closure tools keep their `m5c` names.
  -  Runtime code ranges, property blocks, intrinsic indexes, and heap kinds
     are reserved per unit.

@@ -664,6 +664,29 @@ OseoResult oseo_internal_array_iterator_prototype(OseoContext *context) {
             frame.slots[4]
         );
     }
+    /* %Iterator.prototype%[@@dispose] closes through `return`. */
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = oseo_internal_iterator_dispose_function(
+            context,
+            OSEO_ITERATOR_DISPOSE_CODE_ID
+        );
+        frame.slots[4] = result.value;
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = oseo_internal_well_known_symbol(
+            context,
+            OSEO_WELL_KNOWN_DISPOSE
+        );
+        frame.slots[5] = result.value;
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = define_iterator_data(
+            context,
+            frame.slots[1],
+            frame.slots[5],
+            frame.slots[4]
+        );
+    }
     if (result.status == OSEO_STATUS_NORMAL) {
         result = ascii_iterator_string(context, "constructor");
         frame.slots[3] = result.value;

@@ -108,7 +108,7 @@
  * Error constructor code IDs occupy one contiguous block indexed by
  * OseoErrorKind from the top of the error component's range.
  */
-#define OSEO_ERROR_KIND_COUNT ((size_t)8u)
+#define OSEO_ERROR_KIND_COUNT ((size_t)9u)
 #define OSEO_ERROR_CONSTRUCT_LAST_CODE_ID OSEO_ERROR_CODE_ID_RANGE_LAST
 #define OSEO_ERROR_CONSTRUCT_FIRST_CODE_ID \
     (OSEO_ERROR_CODE_ID_RANGE_LAST - (OSEO_ERROR_KIND_COUNT - 1u))
@@ -1087,6 +1087,59 @@
 #define OSEO_HOST_EVAL_SCRIPT_CODE_ID (OSEO_REALM_CODE_ID_RANGE_LAST - 2u)
 #define OSEO_HOST_PRINT_CODE_ID (OSEO_REALM_CODE_ID_RANGE_LAST - 3u)
 
+/*
+ * The explicit resource management component: %DisposableStack%,
+ * %AsyncDisposableStack%, and their methods, the dispose methods of
+ * %Iterator.prototype% and %AsyncIteratorPrototype%, and the internal
+ * reactions that resume an asynchronous disposal after each Await.
+ */
+#define OSEO_DISPOSAL_CODE_ID_RANGE_INDEX ((size_t)30u)
+#define OSEO_DISPOSAL_CODE_ID_RANGE_FIRST \
+    OSEO_BUILTIN_CODE_RANGE_FIRST(OSEO_DISPOSAL_CODE_ID_RANGE_INDEX)
+#define OSEO_DISPOSAL_CODE_ID_RANGE_LAST \
+    OSEO_BUILTIN_CODE_RANGE_LAST(OSEO_DISPOSAL_CODE_ID_RANGE_INDEX)
+#define OSEO_DISPOSABLE_STACK_CONSTRUCTOR_CODE_ID \
+    OSEO_DISPOSAL_CODE_ID_RANGE_LAST
+#define OSEO_DISPOSABLE_STACK_ADOPT_CODE_ID \
+    (OSEO_DISPOSAL_CODE_ID_RANGE_LAST - 1u)
+#define OSEO_DISPOSABLE_STACK_DEFER_CODE_ID \
+    (OSEO_DISPOSAL_CODE_ID_RANGE_LAST - 2u)
+#define OSEO_DISPOSABLE_STACK_DISPOSE_CODE_ID \
+    (OSEO_DISPOSAL_CODE_ID_RANGE_LAST - 3u)
+#define OSEO_DISPOSABLE_STACK_DISPOSED_CODE_ID \
+    (OSEO_DISPOSAL_CODE_ID_RANGE_LAST - 4u)
+#define OSEO_DISPOSABLE_STACK_MOVE_CODE_ID \
+    (OSEO_DISPOSAL_CODE_ID_RANGE_LAST - 5u)
+#define OSEO_DISPOSABLE_STACK_USE_CODE_ID \
+    (OSEO_DISPOSAL_CODE_ID_RANGE_LAST - 6u)
+#define OSEO_ASYNC_DISPOSABLE_STACK_CONSTRUCTOR_CODE_ID \
+    (OSEO_DISPOSAL_CODE_ID_RANGE_LAST - 7u)
+#define OSEO_ASYNC_DISPOSABLE_STACK_ADOPT_CODE_ID \
+    (OSEO_DISPOSAL_CODE_ID_RANGE_LAST - 8u)
+#define OSEO_ASYNC_DISPOSABLE_STACK_DEFER_CODE_ID \
+    (OSEO_DISPOSAL_CODE_ID_RANGE_LAST - 9u)
+#define OSEO_ASYNC_DISPOSABLE_STACK_DISPOSE_ASYNC_CODE_ID \
+    (OSEO_DISPOSAL_CODE_ID_RANGE_LAST - 10u)
+#define OSEO_ASYNC_DISPOSABLE_STACK_DISPOSED_CODE_ID \
+    (OSEO_DISPOSAL_CODE_ID_RANGE_LAST - 11u)
+#define OSEO_ASYNC_DISPOSABLE_STACK_MOVE_CODE_ID \
+    (OSEO_DISPOSAL_CODE_ID_RANGE_LAST - 12u)
+#define OSEO_ASYNC_DISPOSABLE_STACK_USE_CODE_ID \
+    (OSEO_DISPOSAL_CODE_ID_RANGE_LAST - 13u)
+#define OSEO_ITERATOR_DISPOSE_CODE_ID \
+    (OSEO_DISPOSAL_CODE_ID_RANGE_LAST - 14u)
+#define OSEO_ASYNC_ITERATOR_ASYNC_DISPOSE_CODE_ID \
+    (OSEO_DISPOSAL_CODE_ID_RANGE_LAST - 15u)
+/* The fulfillment reaction %AsyncIteratorPrototype%[@@asyncDispose]
+ * attaches to the `return` result, which discards that result. */
+#define OSEO_ASYNC_ITERATOR_DISPOSE_UNWRAP_CODE_ID \
+    (OSEO_DISPOSAL_CODE_ID_RANGE_LAST - 16u)
+/* The two reactions that resume one asynchronous DisposeResources. */
+#define OSEO_ASYNC_DISPOSE_FULFILLED_CODE_ID \
+    (OSEO_DISPOSAL_CODE_ID_RANGE_LAST - 17u)
+#define OSEO_ASYNC_DISPOSE_REJECTED_CODE_ID \
+    (OSEO_DISPOSAL_CODE_ID_RANGE_LAST - 18u)
+
 /* Well-known symbol table indexes shared with the public context. */
 #define OSEO_WELL_KNOWN_ASYNC_ITERATOR ((size_t)0u)
 #define OSEO_WELL_KNOWN_HAS_INSTANCE ((size_t)1u)
@@ -1101,7 +1154,11 @@
 #define OSEO_WELL_KNOWN_TO_PRIMITIVE ((size_t)10u)
 #define OSEO_WELL_KNOWN_TO_STRING_TAG ((size_t)11u)
 #define OSEO_WELL_KNOWN_UNSCOPABLES ((size_t)12u)
-#define OSEO_WELL_KNOWN_SYMBOL_COUNT ((size_t)13u)
+/* The explicit resource management symbols follow the thirteen older
+ * entries, so the earlier indexes keep their places. */
+#define OSEO_WELL_KNOWN_ASYNC_DISPOSE ((size_t)13u)
+#define OSEO_WELL_KNOWN_DISPOSE ((size_t)14u)
+#define OSEO_WELL_KNOWN_SYMBOL_COUNT ((size_t)15u)
 
 /*
  * The preferred-type hint passed to the generic ToPrimitive. It is the
@@ -1155,6 +1212,7 @@ typedef enum {
     OSEO_HEAP_WEAK_REF = 38,
     OSEO_HEAP_FINALIZATION_REGISTRY_OBJECT = 39,
     OSEO_HEAP_REALM = 40,
+    OSEO_HEAP_DISPOSABLE_STACK = 41,
 } OseoHeapKind;
 
 typedef struct {
@@ -2157,6 +2215,59 @@ typedef struct {
     OseoValue reference;
 } OseoWeakRef;
 
+/*
+ * A DisposableStack or AsyncDisposableStack, or the dispose capability of
+ * one `using` scope. `resources` holds `resource_count` traced values,
+ * three per DisposableResource in the order they were added: the
+ * resource value, its dispose method (undefined for the null resource of
+ * an asynchronous hint), and a Number of OSEO_DISPOSE_* flags. The host
+ * buffer belongs to this record alone; `move` hands it to a new stack and
+ * leaves this one empty.
+ *
+ * The remaining fields are one DisposeResources in progress. `has_error`
+ * and the traced `error` are its completion. An asynchronous run also
+ * keeps the resources still to visit (`cursor`), the needsAwait and
+ * hasAwaited flags, what its pending Await is for (`phase`), the traced
+ * promise it settles when it finishes (undefined for a `using` scope),
+ * and the two traced reactions that resume it.
+ */
+typedef struct {
+    OseoOrdinaryObject ordinary;
+    OseoValue *resources;
+    size_t resource_count;
+    size_t resource_capacity;
+    bool async;
+    bool disposed;
+    /* A `using` scope's capability, which no source value can reach. */
+    bool capability_only;
+    bool has_error;
+    bool needs_await;
+    bool has_awaited;
+    int phase;
+    size_t cursor;
+    OseoValue error;
+    OseoValue promise;
+    OseoValue on_fulfilled;
+    OseoValue on_rejected;
+} OseoDisposableStack;
+
+/* The pending Await settles a dispose method's result. */
+#define OSEO_DISPOSE_PHASE_RESULT 0
+/* The pending Await(undefined) precedes a synchronous resource. */
+#define OSEO_DISPOSE_PHASE_TICK 1
+/* The pending Await(undefined) ends the run. */
+#define OSEO_DISPOSE_PHASE_FINAL 2
+/* The run has finished and its completion waits in the record. */
+#define OSEO_DISPOSE_PHASE_DONE 3
+
+/* The resource was added with the async-dispose hint. */
+#define OSEO_DISPOSE_ASYNC_HINT 1
+/* `adopt`: the method is called with undefined and the value argument. */
+#define OSEO_DISPOSE_ADOPTED 2
+/* An async-dispose hint fell back to @@dispose, so the method's result is
+ * discarded and replaced by a promise for undefined. */
+#define OSEO_DISPOSE_SYNC_FALLBACK 4
+
 typedef struct {
     OseoOrdinaryObject ordinary;
     OseoValue registry;
@@ -2880,6 +2991,13 @@ static inline bool is_weak_ref(OseoValue value) {
 static inline OseoWeakRef *weak_ref_object(OseoValue value) {
     return (OseoWeakRef *)heap_object(value);
 }
+static inline bool is_disposable_stack(OseoValue value) {
+    return tag_of(value) == OSEO_TAG_HEAP &&
+        heap_object(value)->kind == OSEO_HEAP_DISPOSABLE_STACK;
+}
+static inline OseoDisposableStack *disposable_stack_object(OseoValue value) {
+    return (OseoDisposableStack *)heap_object(value);
+}
 static inline bool is_realm_record(OseoValue value) {
     return tag_of(value) == OSEO_TAG_HEAP &&
         heap_object(value)->kind == OSEO_HEAP_REALM;
@@ -2907,7 +3025,8 @@ static inline bool is_object(OseoValue value) {
         kind == OSEO_HEAP_SET || kind == OSEO_HEAP_SET_ITERATOR ||
         kind == OSEO_HEAP_TYPED_ARRAY || kind == OSEO_HEAP_WEAK_MAP ||
         kind == OSEO_HEAP_WEAK_SET || kind == OSEO_HEAP_WEAK_REF ||
-        kind == OSEO_HEAP_FINALIZATION_REGISTRY_OBJECT;
+        kind == OSEO_HEAP_FINALIZATION_REGISTRY_OBJECT ||
+        kind == OSEO_HEAP_DISPOSABLE_STACK;
 }
 static inline bool is_enumeration(OseoValue value) {
     return tag_of(value) == OSEO_TAG_HEAP &&
@@ -3703,6 +3822,81 @@ OseoResult oseo_internal_weak_collection_intrinsic(OseoContext *context);
 OseoResult oseo_internal_install_weak_collection_globals(
     OseoContext *context,
     OseoValue global
+);
+OseoResult oseo_internal_disposal_builtin_dispatch(
+    OseoContext *context,
+    size_t code_id,
+    OseoValue callee,
+    OseoValue receiver,
+    size_t argument_count,
+    const OseoValue *arguments,
+    OseoValue new_target
+);
+/*
+ * Materializes %DisposableStack%, %AsyncDisposableStack%, and their
+ * prototypes as one realm-owned cluster, and binds both constructors as
+ * writable, non-enumerable, configurable global properties.
+ */
+OseoResult oseo_internal_disposal_intrinsic(OseoContext *context);
+OseoResult oseo_internal_install_disposal_globals(
+    OseoContext *context,
+    OseoValue global
+);
+/*
+ * Creates %Iterator.prototype%[@@dispose] (OSEO_ITERATOR_DISPOSE_CODE_ID)
+ * or %AsyncIteratorPrototype%[@@asyncDispose]
+ * (OSEO_ASYNC_ITERATOR_ASYNC_DISPOSE_CODE_ID) for the prototype builder
+ * that installs it.
+ */
+OseoResult oseo_internal_iterator_dispose_function(
+    OseoContext *context,
+    size_t code_id
+);
+/*
+ * Creates a SuppressedError of the running realm with own `error` and
+ * `suppressed` properties and no `message`, as DisposeResources does.
+ */
+/*
+ * The DisposeCapability operations `using` declarations share with the
+ * stacks. `create` makes an unexposed, empty capability; `add` performs
+ * AddDisposableResource without a method and returns the value; `dispose`
+ * runs DisposeResources synchronously from the given completion and
+ * returns its result. `dispose_async` starts the asynchronous form and
+ * settles `promise` when it ends, or, with an undefined `promise`, leaves
+ * the final completion for `completion` once `done` answers true.
+ */
+OseoResult oseo_internal_dispose_capability_create(
+    OseoContext *context,
+    bool async
+);
+OseoResult oseo_internal_dispose_capability_add(
+    OseoContext *context,
+    OseoValue capability,
+    OseoValue value,
+    bool async
+);
+OseoResult oseo_internal_dispose_capability_dispose(
+    OseoContext *context,
+    OseoValue capability,
+    bool has_completion,
+    OseoValue completion
+);
+OseoResult oseo_internal_dispose_capability_dispose_async(
+    OseoContext *context,
+    OseoValue capability,
+    OseoValue promise,
+    bool has_completion,
+    OseoValue completion
+);
+bool oseo_internal_dispose_capability_done(OseoValue capability);
+OseoResult oseo_internal_dispose_capability_completion(
+    OseoContext *context,
+    OseoValue capability
+);
+OseoResult oseo_internal_suppressed_error_create(
+    OseoContext *context,
+    OseoValue error,
+    OseoValue suppressed
 );
 /*
  * AddToKeptObjects. The value stays a strong root until the next

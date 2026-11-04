@@ -1915,7 +1915,7 @@ test("populates the realm-owned weak collection intrinsic cluster", () => {
     header,
     /OSEO_INTRINSIC_FINALIZATION_REGISTRY_UNREGISTER = 260/u,
   );
-  assert.match(header, /OSEO_INTRINSIC_COUNT = 275/u);
+  assert.match(header, /OSEO_INTRINSIC_COUNT = 281/u);
   for (const property of [
     "WeakMap",
     "WeakSet",
@@ -2762,7 +2762,7 @@ test("populates the single-agent shared memory clusters", () => {
   assert.match(header, /OSEO_INTRINSIC_SHARED_ARRAY_BUFFER = 240/u);
   assert.match(header, /OSEO_INTRINSIC_SHARED_ARRAY_BUFFER_SPECIES = 241/u);
   assert.match(header, /OSEO_INTRINSIC_ATOMICS = 242/u);
-  assert.match(header, /OSEO_INTRINSIC_COUNT = 275/u);
+  assert.match(header, /OSEO_INTRINSIC_COUNT = 281/u);
   // ValidateIntegerTypedArray rejects every floating element type,
   // including Float16, before any index conversion.
   assert.match(
@@ -3127,4 +3127,78 @@ test("installs the Uint8Array base64 methods only on Uint8Array", () => {
     typedSource,
     /if \(decoded\.error\) result = base64_syntax_error\(context, hex\);/u,
   );
+});
+
+test("populates the explicit resource management intrinsics", () => {
+  const header = sources.get("oseo_runtime.h") ?? "";
+  const internalHeader = sources.get("runtime_internal.h") ?? "";
+  const disposalSource = sources.get("runtime_disposal.c") ?? "";
+  const errorSource = sources.get("runtime_error.c") ?? "";
+  const symbolSource = sources.get("runtime_symbol.c") ?? "";
+  const functionSource = sources.get("runtime_function.c") ?? "";
+  const memorySource = sources.get("runtime_memory.c") ?? "";
+  // SuppressedError is the ninth error kind, and the six new realm
+  // slots follow the Annex B pair.
+  assert.match(header, /OSEO_ERROR_SUPPRESSED = 8,/u);
+  assert.match(internalHeader, /OSEO_ERROR_KIND_COUNT \(\(size_t\)9u\)/u);
+  assert.match(header, /OSEO_INTRINSIC_SUPPRESSED_ERROR_PROTOTYPE = 275/u);
+  assert.match(header, /OSEO_INTRINSIC_SUPPRESSED_ERROR = 276/u);
+  assert.match(header, /OSEO_INTRINSIC_DISPOSABLE_STACK_PROTOTYPE = 277/u);
+  assert.match(header, /OSEO_INTRINSIC_DISPOSABLE_STACK = 278/u);
+  assert.match(
+    header,
+    /OSEO_INTRINSIC_ASYNC_DISPOSABLE_STACK_PROTOTYPE = 279/u,
+  );
+  assert.match(header, /OSEO_INTRINSIC_ASYNC_DISPOSABLE_STACK = 280/u);
+  assert.match(errorSource, /"SuppressedError",\n\};/u);
+  assert.match(
+    functionSource,
+    new RegExp(
+      String.raw`intrinsic == OSEO_INTRINSIC_SUPPRESSED_ERROR\)` +
+        String.raw`[\s\S]{0,40}oseo_error_intrinsic`,
+      "u",
+    ),
+  );
+  // The two symbols are appended, so the thirteen older indexes keep
+  // their places, and the context table grows with them.
+  assert.match(
+    internalHeader,
+    /OSEO_WELL_KNOWN_ASYNC_DISPOSE \(\(size_t\)13u\)/u,
+  );
+  assert.match(internalHeader, /OSEO_WELL_KNOWN_DISPOSE \(\(size_t\)14u\)/u);
+  assert.match(
+    internalHeader,
+    /OSEO_WELL_KNOWN_SYMBOL_COUNT \(\(size_t\)15u\)/u,
+  );
+  assert.match(header, /OseoValue well_known_symbols\[15\];/u);
+  assert.match(symbolSource, /"asyncDispose",\n {8}"dispose",\n {4}\};/u);
+  assert.match(
+    symbolSource,
+    /"Symbol.asyncDispose",\n {8}"Symbol.dispose",\n {4}\};/u,
+  );
+  // Both stacks share one heap kind whose resource buffer and driver
+  // values the collector traces.
+  assert.match(internalHeader, /OSEO_HEAP_DISPOSABLE_STACK = 41,/u);
+  for (const field of ["error", "promise", "on_fulfilled", "on_rejected"]) {
+    assert.match(memorySource, new RegExp(`mark_value\\(stack->${field}`, "u"));
+  }
+  assert.match(memorySource, /mark_value\(stack->resources\[index\]/u);
+  assert.match(
+    memorySource,
+    /free\(\(\(OseoDisposableStack \*\)object\)->resources\)/u,
+  );
+  for (const name of [
+    "adopt",
+    "defer",
+    "dispose",
+    "disposeAsync",
+    "move",
+    "use",
+  ]) {
+    assert.match(disposalSource, new RegExp(`"${name}", [012]u\\}`, "u"));
+  }
+  assert.match(disposalSource, /"\[Symbol.dispose\]"/u);
+  assert.match(disposalSource, /"\[Symbol.asyncDispose\]"/u);
+  assert.match(disposalSource, /"DisposableStack",/u);
+  assert.match(disposalSource, /"AsyncDisposableStack",/u);
 });

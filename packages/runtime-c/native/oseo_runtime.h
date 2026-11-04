@@ -158,6 +158,7 @@ typedef enum {
     OSEO_ERROR_TYPE = 5,
     OSEO_ERROR_URI = 6,
     OSEO_ERROR_AGGREGATE = 7,
+    OSEO_ERROR_SUPPRESSED = 8,
 } OseoErrorKind;
 
 /*
@@ -441,7 +442,13 @@ typedef enum {
     OSEO_INTRINSIC_FLOAT16_ARRAY = 272,
     OSEO_INTRINSIC_ESCAPE = 273,
     OSEO_INTRINSIC_UNESCAPE = 274,
-    OSEO_INTRINSIC_COUNT = 275,
+    OSEO_INTRINSIC_SUPPRESSED_ERROR_PROTOTYPE = 275,
+    OSEO_INTRINSIC_SUPPRESSED_ERROR = 276,
+    OSEO_INTRINSIC_DISPOSABLE_STACK_PROTOTYPE = 277,
+    OSEO_INTRINSIC_DISPOSABLE_STACK = 278,
+    OSEO_INTRINSIC_ASYNC_DISPOSABLE_STACK_PROTOTYPE = 279,
+    OSEO_INTRINSIC_ASYNC_DISPOSABLE_STACK = 280,
+    OSEO_INTRINSIC_COUNT = 281,
 } OseoIntrinsic;
 
 typedef struct {
@@ -642,7 +649,7 @@ struct OseoContext {
      * The agent's well-known symbols are a separate edition-fixed table
      * that every realm of the context shares.
      */
-    OseoValue well_known_symbols[13];
+    OseoValue well_known_symbols[15];
     /*
      * The agent's representatives of GlobalSymbolRegistry entries. The
      * registry itself is process-wide; this open-addressed table, whose

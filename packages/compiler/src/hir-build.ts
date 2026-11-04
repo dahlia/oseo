@@ -291,11 +291,13 @@ function isPropertyOwnedIntrinsicName(name: string): boolean {
     name === "AggregateError" ||
     name === "Array" ||
     name === "ArrayBuffer" ||
+    name === "AsyncDisposableStack" ||
     name === "Atomics" ||
     name === "BigInt" ||
     name === "Boolean" ||
     name === "DataView" ||
     name === "Date" ||
+    name === "DisposableStack" ||
     name === "Error" ||
     name === "EvalError" ||
     name === "Function" ||
@@ -314,6 +316,7 @@ function isPropertyOwnedIntrinsicName(name: string): boolean {
     name === "RangeError" ||
     name === "ReferenceError" ||
     name === "String" ||
+    name === "SuppressedError" ||
     name === "Symbol" ||
     name === "SyntaxError" ||
     name === "TypeError" ||

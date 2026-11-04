@@ -17,7 +17,7 @@
  * Compound assignment's logged registrations are rebucketed into its
  * three split files. Host script bindings and proper tail calls postdate
  * these runs and retain their weights. The Linux upper-median fallback is
- * 429 seconds across 162 entries.
+ * 423 seconds across 163 entries.
  * docs/evidence/u6/linux-shard-weights.tsv retains each sum and old weight;
  * linux-shards.py reproduces them and the model. See the U6 README.
  *
@@ -147,8 +147,9 @@
  * seconds scaled by the AOT literal file's 353/608 host ratio, not a
  * measurement. See U6 provenance.
  *
- * The ECMAScript 2026 built-in files and the Annex B function declaration
- * file use one local Linux AMD64 extended registration each, and the Annex B
+ * The ECMAScript 2026 built-in files, the Annex B function declaration
+ * file, and the explicit resource management stack file use one local Linux
+ * AMD64 extended registration each, and the Annex B
  * Object accessor file sums the two registrations of one local extended run;
  * none are CI file-shard sums. macOS keeps the unknown-file median fallback.
  * See U6 provenance.
@@ -164,6 +165,7 @@ export const nativeShardCosts = {
     "tests/property/es2026-math-sum-precise.property.test.ts": 153,
     "tests/property/es2026-uint8array-base64.property.test.ts": 280,
     "tests/property/es2026-upsert.property.test.ts": 248,
+    "tests/property/es2027-disposal-intrinsics.property.test.ts": 281,
     "tests/property/legacy-caller.property.test.ts": 71,
     "tests/property/m4-async.property.test.ts": 350,
     "tests/property/m5-aggregate-error.property.test.ts": 217,
