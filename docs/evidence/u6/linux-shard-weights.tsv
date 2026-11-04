@@ -10,6 +10,7 @@ tests/property/es2026-uint8array-base64.property.test.ts	280	-	-	-	280
 tests/property/es2026-upsert.property.test.ts	248	-	-	-	248
 tests/property/es2027-disposal-intrinsics.property.test.ts	281	-	-	-	281
 tests/property/es2027-using-declarations.property.test.ts	521	-	-	-	521
+tests/property/import-operation.property.test.ts	222	-	-	-	222
 tests/property/legacy-caller.property.test.ts	71	-	-	-	71
 tests/property/m4-async.property.test.ts	464	349949.419205	338314.359114	440202.889068	350
 tests/property/m5-aggregate-error.property.test.ts	265	216063.832474	201127.728356	281035.427786	217

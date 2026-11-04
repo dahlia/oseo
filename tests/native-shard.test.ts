@@ -217,6 +217,7 @@ test("Linux weights match the three-run median case sums", async () => {
     "tests/property/m5-non-blocking-agent.property.test.ts",
     "tests/property/module-evaluation-driver.property.test.ts",
     "tests/property/legacy-caller.property.test.ts",
+    "tests/property/import-operation.property.test.ts",
     "tests/property/m5-annexb-escape.property.test.ts",
     "tests/property/m5-annexb-string-methods.property.test.ts",
     "tests/property/m5-annexb-date-methods.property.test.ts",

@@ -56,7 +56,7 @@ three sums, rounded up, so the margin below is a slow runner's. Files under 30
 seconds have no entry and weigh the host fallback, 18 seconds on both hosts,
 which is the median of every measured weight.
 
-Thirty-eight files postdate those runs. Local runs from 2026-11-01 to
+Forty files postdate those runs. Local runs from 2026-11-01 to
 2026-11-04 of the residual evidence and those files, on one host, give the
 calibration:
 
@@ -99,6 +99,8 @@ calibration:
 | *tests/annexb-syntax-native.test.ts*                         |     33.7 |           87 |           67 |
 | *tests/property/m5-annexb-regexp-syntax.property.test.ts*    |     32.6 |           84 |           65 |
 | *tests/property/m5-annexb-regexp-compile.property.test.ts*   |     29.3 |           76 |           58 |
+| *tests/import-operation-native.test.ts*                      |     51.3 |          133 |          102 |
+| *tests/property/import-operation.property.test.ts*           |     17.8 |           46 |           36 |
 
 The ratios are 2.574 for Linux and 1.974 for macOS, the residual file's
 largest CI sum over its local sum. The fastest Linux observation gives

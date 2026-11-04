@@ -7,10 +7,13 @@
  * 41238903460 at `8770b2e4`. The largest is kept on purpose: the residual
  * evidence file took 1.36 times longer on one of those Linux runners than
  * on another, and the margin the shards keep is a slow runner's.
- * Thirty-four files postdate those runs and scale a local measurement on
+ * Thirty-six files postdate those runs and scale a local measurement on
  * the same host by the residual-evidence ratio: 2.574 on Linux and 1.974
  * on macOS. The measurements are serial except the Object accessor
  * property file and the legacy lookup test, which ran side by side.
+ * Nineteen files postdate those runs and scale a serial local
+ * measurement on the same host by the residual-evidence ratio: 2.574 on
+ * Linux and 1.974 on macOS.
  * Files below 30 seconds have no entry and weigh the host fallback, the
  * median of every measured weight. These are concurrent test durations,
  * not file wall times. *docs/evidence/node-shards/README.md* records the
@@ -45,6 +48,7 @@ export const nodeShardCosts = {
     "tests/host-script-trainc-evidence-3.test.ts": 732,
     "tests/host-script-trainc-evidence-4.test.ts": 673,
     "tests/json-parse-source-native.test.ts": 115,
+    "tests/import-operation-native.test.ts": 133,
     "tests/legacy-caller.test.ts": 70,
     "tests/lexical-static-native.test.ts": 77,
     "tests/m5c-closure-ledger.test.ts": 58,
@@ -62,6 +66,7 @@ export const nodeShardCosts = {
     "tests/property/es2026-upsert.property.test.ts": 68,
     "tests/property/es2027-disposal-intrinsics.property.test.ts": 55,
     "tests/property/es2027-using-declarations.property.test.ts": 104,
+    "tests/property/import-operation.property.test.ts": 46,
     "tests/property/m5-annexb-date-methods.property.test.ts": 32,
     "tests/property/m5-annexb-escape.property.test.ts": 87,
     "tests/property/m5-annexb-legacy-lookup-boundary.property.test.ts": 33,
@@ -183,6 +188,7 @@ export const nodeShardCosts = {
     "tests/host-script-trainc-evidence-3.test.ts": 561,
     "tests/host-script-trainc-evidence-4.test.ts": 516,
     "tests/json-parse-source-native.test.ts": 88,
+    "tests/import-operation-native.test.ts": 102,
     "tests/legacy-caller.test.ts": 54,
     "tests/lexical-static-native.test.ts": 61,
     "tests/m5c-closure-ledger.test.ts": 50,
@@ -198,6 +204,7 @@ export const nodeShardCosts = {
     "tests/property/es2026-upsert.property.test.ts": 52,
     "tests/property/es2027-disposal-intrinsics.property.test.ts": 42,
     "tests/property/es2027-using-declarations.property.test.ts": 80,
+    "tests/property/import-operation.property.test.ts": 36,
     "tests/property/m5-annexb-escape.property.test.ts": 67,
     "tests/property/m5-annexb-legacy-lookup-boundary.property.test.ts": 35,
     "tests/property/m5-annexb-object-accessors.property.test.ts": 75,
