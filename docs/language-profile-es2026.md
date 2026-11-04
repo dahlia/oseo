@@ -566,9 +566,12 @@ set at the end.
 
 A failure of the mapper, of the Await on its result, or of an element
 definition closes an iterator and awaits its `return` result, and the
-original error rejects the promise whatever `return` does. A failure of the
-iterator itself, of its result object, or of the final length Set propagates
-without a close.
+original error rejects the promise whatever `return` does. A synchronous
+iterator with no `return` still closes through the wrapper, whose promise
+resolves with a `{ value: undefined, done: true }` object, so an inherited
+`then` is read and a callable one decides when the close settles. A failure of
+the iterator itself, of its result object, or of the final length Set
+propagates without a close.
 
 Node.js and Deno are both reference hosts, and the fixtures match them turn
 for turn except where V8 departs from the edition. V8 reads a synchronous

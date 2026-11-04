@@ -725,6 +725,138 @@ function hinted(left, right) {
 console.log("hint", hinted(1, 2), hinted("1", 2));
 `,
   },
+  /*
+   * A synchronous source with no `return`. Its Async-from-Sync close
+   * still resolves a promise with a { value: undefined, done: true }
+   * object, so an inherited `then` is read and, when callable, adopts
+   * that close. The `for await` closes reach the same runtime helper.
+   */
+  {
+    name: "array-from-async-sync-close-result",
+    source: `
+const log = [];
+let tick = 0;
+function ticker(turns) {
+  let promise = Promise.resolve();
+  for (let turn = 0; turn < turns; turn = turn + 1) {
+    promise = promise.then(() => {
+      tick = tick + 1;
+      log.push("t" + tick);
+    });
+  }
+  return promise;
+}
+let mode = "absent";
+Object.defineProperty(Object.prototype, "then", {
+  configurable: true,
+  get() {
+    // Only a close result: done with no value.
+    if (this.done !== true || this.value !== undefined) return undefined;
+    log.push("then-get");
+    if (mode === "absent") return undefined;
+    return function (resolve) {
+      log.push("then-call");
+      resolve(mode === "object" ? { adopted: true } : 5);
+    };
+  },
+});
+function source() {
+  return {
+    [Symbol.iterator]() {
+      return {
+        next() {
+          log.push("next");
+          return { done: false, value: 1 };
+        },
+      };
+    },
+  };
+}
+function flush(label) {
+  console.log(label, log.join(" "));
+  log.length = 0;
+  tick = 0;
+}
+async function fromAsync(label) {
+  ticker(6);
+  await Array.fromAsync(source(), () => {
+    throw 7;
+  }).then(
+    (value) => log.push("fulfilled:" + value.length),
+    (error) => log.push("rejected:" + error),
+  );
+  await ticker(6);
+  flush(label);
+}
+async function breakOut(label) {
+  ticker(6);
+  try {
+    for await (const value of source()) {
+      log.push("body:" + value);
+      break;
+    }
+    log.push("after");
+  } catch (error) {
+    log.push("caught:" + error.constructor.name);
+  }
+  await ticker(6);
+  flush(label);
+}
+async function throwOut(label) {
+  ticker(6);
+  try {
+    for await (const value of source()) throw value + 8;
+  } catch (error) {
+    log.push("caught:" + error);
+  }
+  await ticker(6);
+  flush(label);
+}
+async function* generator() {
+  for await (const value of source()) {
+    log.push("body:" + value);
+    return value;
+  }
+}
+async function returnOut(label) {
+  ticker(6);
+  try {
+    const step = await generator().next();
+    log.push("step:" + step.value + ":" + step.done);
+  } catch (error) {
+    log.push("caught:" + error.constructor.name);
+  }
+  await ticker(6);
+  flush(label);
+}
+async function main() {
+  for (const kind of ["absent", "object", "primitive"]) {
+    mode = kind;
+    await fromAsync("fromAsync/" + kind);
+    await breakOut("break/" + kind);
+    await throwOut("throw/" + kind);
+    await returnOut("return/" + kind);
+  }
+  delete Object.prototype.then;
+  guard();
+}
+main();
+
+function guard() {
+  let turn = 0;
+  while (turn < 2) {
+    console.log("guard", typeof Array.fromAsync, Array.fromAsync.length);
+    if (turn === 0) Array.marker = turn;
+    turn = turn + 1;
+  }
+  console.log("hint", hinted(1, 2), hinted("1", 2));
+}
+/** @param {number} left @param {number} right */
+function hinted(left, right) {
+  return left + right;
+}
+`,
+  },
   /* Long inputs under collection, receivers, and a replaced property. */
   {
     name: "array-from-async-stress",

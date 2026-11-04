@@ -4650,6 +4650,12 @@ OseoResult oseo_async_iterator_next(
  * iterator with no `return` completes immediately. The internal
  * Async-from-Sync wrapper instead always returns a promise, converting its
  * synchronous abrupt paths into rejection before generated code awaits it.
+ * When the synchronous iterator has no `return`, that promise is resolved
+ * with a fresh { value: undefined, done: true } object, so the promise
+ * resolve function reads its `then` and assimilates a thenable as
+ * AsyncFromSyncIteratorPrototype.return specifies. The awaited value is
+ * therefore validated like any other close result: an inherited `then`
+ * can fulfill it with a primitive. `skip_validation` stays false.
  */
 OseoResult oseo_async_iterator_close_start(
     OseoContext *context,
@@ -4662,7 +4668,6 @@ OseoResult oseo_async_iterator_close_start(
     *needs_await = false;
     if (!is_object(iterator)) return normal(oseo_undefined());
     bool from_sync = is_async_from_sync_iterator(iterator);
-    if (from_sync) *skip_validation = oseo_boolean(true);
     OseoValue slots[3] = {
         from_sync ? ordinary_object(iterator)->async_sync_iterator : iterator,
         oseo_undefined(),
@@ -4678,7 +4683,15 @@ OseoResult oseo_async_iterator_close_start(
     }
     if (result.status == OSEO_STATUS_NORMAL && is_nullish(slots[1])) {
         if (from_sync) {
-            result = oseo_promise_resolve(context, oseo_undefined());
+            result = oseo_internal_iterator_result(
+                context,
+                oseo_undefined(),
+                true
+            );
+            slots[2] = result.value;
+            if (result.status == OSEO_STATUS_NORMAL) {
+                result = oseo_promise_resolve(context, slots[2]);
+            }
             *needs_await = result.status == OSEO_STATUS_NORMAL;
         }
     } else if (result.status == OSEO_STATUS_NORMAL &&
@@ -4754,12 +4767,12 @@ OseoResult oseo_async_iterator_close_result(
 /*
  * AsyncIteratorClose: call a callable return method and await its
  * result, which must be an object. A wrapped synchronous iterator instead
- * runs AsyncFromSyncIteratorPrototype.return, which requires an object
- * result and reads and awaits its `done` and `value`, and reports a
- * completed iterator result when the synchronous iterator declares no
- * `return` at all. Every wrapper path therefore reaches an Await. As in
- * the synchronous close, an in-flight error keeps the original completion,
- * which is why the result check runs after that precedence.
+ * awaits the promise AsyncFromSyncIteratorPrototype.return produces,
+ * which oseo_async_iterator_close_start builds with the real promise
+ * steps, so a thenable result object is assimilated here exactly as in a
+ * suspended close. As in the synchronous close, an in-flight error keeps
+ * the original completion, which is why the result check runs after that
+ * precedence.
  */
 OseoResult oseo_async_iterator_close(
     OseoContext *context,
@@ -4768,72 +4781,60 @@ OseoResult oseo_async_iterator_close(
 ) {
     if (!is_object(iterator)) return normal(oseo_undefined());
     bool from_sync = is_async_from_sync_iterator(iterator);
-    OseoValue slots[3] = {
-        from_sync ? ordinary_object(iterator)->async_sync_iterator : iterator,
-        oseo_undefined(),
-        oseo_undefined(),
-    };
+    OseoValue slots[3] = {iterator, oseo_undefined(), oseo_undefined()};
     OseoRootFrame frame = {NULL, slots, 3u};
     oseo_roots_push(context, &frame);
-    OseoResult result = ascii_iterator_string(context, "return");
-    slots[2] = result.value;
-    if (result.status == OSEO_STATUS_NORMAL) {
-        result = oseo_object_get(context, slots[0], slots[2]);
-        slots[1] = result.value;
-    }
-    if (result.status == OSEO_STATUS_NORMAL && is_nullish(slots[1])) {
-        if (!from_sync) {
+    OseoResult result;
+    if (from_sync) {
+        /* The wrapper converts every abrupt step into a rejection of the
+         * promise it returns, so only a host diagnostic arrives here
+         * without one. */
+        OseoValue skip_validation = oseo_undefined();
+        bool needs_await = false;
+        result = oseo_async_iterator_close_start(
+            context,
+            slots[0],
+            false,
+            &skip_validation,
+            &needs_await
+        );
+        if (result.status == OSEO_STATUS_NORMAL && needs_await) {
+            result = oseo_internal_await_step(context, result.value);
+        }
+        slots[2] = result.value;
+    } else {
+        result = ascii_iterator_string(context, "return");
+        slots[2] = result.value;
+        if (result.status == OSEO_STATUS_NORMAL) {
+            result = oseo_object_get(context, slots[0], slots[2]);
+            slots[1] = result.value;
+        }
+        if (result.status == OSEO_STATUS_NORMAL && is_nullish(slots[1])) {
             oseo_roots_pop(context, &frame);
             return normal(oseo_undefined());
         }
-    } else if (result.status == OSEO_STATUS_NORMAL &&
-               !is_callable(slots[1])) {
-        result = oseo_internal_throw_error(
-            context,
-            OSEO_ERROR_TYPE,
-            "The iterator return method is not callable."
-        );
-    } else if (result.status == OSEO_STATUS_NORMAL) {
-        result = oseo_call_function(
-            context,
-            slots[1],
-            slots[0],
-            0u,
-            NULL,
-            oseo_undefined()
-        );
-        slots[2] = result.value;
-        if (!from_sync) {
+        if (result.status == OSEO_STATUS_NORMAL && !is_callable(slots[1])) {
+            result = oseo_internal_throw_error(
+                context,
+                OSEO_ERROR_TYPE,
+                "The iterator return method is not callable."
+            );
+        } else if (result.status == OSEO_STATUS_NORMAL) {
+            result = oseo_call_function(
+                context,
+                slots[1],
+                slots[0],
+                0u,
+                NULL,
+                oseo_undefined()
+            );
+            slots[2] = result.value;
             if (result.status == OSEO_STATUS_NORMAL) {
                 result = oseo_internal_await_step(context, slots[2]);
                 slots[2] = result.value;
             }
-        } else if (result.status == OSEO_STATUS_NORMAL &&
-                   !is_object(slots[2])) {
-            result = oseo_internal_throw_error(
-                context,
-                OSEO_ERROR_TYPE,
-                "The iterator return result is not an object."
-            );
-        } else if (result.status == OSEO_STATUS_NORMAL) {
-            OseoValue stepped = oseo_undefined();
-            bool done = true;
-            result = async_from_sync_continuation(
-                context,
-                slots[0],
-                slots[2],
-                false,
-                &stepped,
-                &done
-            );
         }
     }
-    /*
-     * AsyncIteratorClose awaits the wrapper's promise, which is a turn of
-     * its own: the continuation's await of the stepped value settles that
-     * promise rather than consuming this one.
-     */
-    if (from_sync) result = await_wrapper_promise(context, result);
     if (from_error) {
         // The in-flight error stays authoritative, so the result check
         // below never runs and only a host diagnostic propagates.
@@ -4845,10 +4846,7 @@ OseoResult oseo_async_iterator_close(
         oseo_roots_pop(context, &frame);
         return normal(oseo_undefined());
     }
-    /* A wrapped iterator resolves to a fresh iterator result object, so
-     * only a native asynchronous iterator can report a non-object here. */
-    if (result.status == OSEO_STATUS_NORMAL && !from_sync &&
-        !is_object(slots[2])) {
+    if (result.status == OSEO_STATUS_NORMAL && !is_object(slots[2])) {
         result = oseo_internal_throw_error(
             context,
             OSEO_ERROR_TYPE,
