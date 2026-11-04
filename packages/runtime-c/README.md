@@ -1382,7 +1382,8 @@ the `module_table` field of `OseoContext`, and the generated-code entry
 `oseo_module_graph_evaluate`. A module graph's script calls that entry once,
 after it has instantiated every module environment. The arguments are the entry
 index, the module count, and per module its evaluator, a top-level await flag,
-its requested module count, and the requested module indices in source order.
+its namespace from ABI `m5-152` on, its requested module count, and the
+requested module indices in source order.
 The entry returns the entry module's top-level capability promise, which the
 event loop treats as the entry task's completion.
 
@@ -1403,15 +1404,34 @@ program.
 `oseo_module_evaluate` performs Evaluate on one installed entry and returns its
 cycle root's top-level capability promise, creating it when absent. A
 capability created for a root that has already finished evaluating settles at
-once. The import operation will call it; *tests/runtime-module-driver.test.ts*
-drives it directly with C evaluators.
+once. *tests/runtime-module-driver.test.ts* drives it directly with C
+evaluators.
+
+ABI `m5-152` adds static-specifier `import()`. Each table entry gains a
+namespace argument after the top-level await flag: the module's namespace
+object, or `undefined` for a module no `import()` names. An entry index equal
+to the module count installs the table without evaluating any module, for a
+Script whose `import()` calls are its only requests. The generated-code entry
+`oseo_module_import` takes one argument, the target's table index, and
+performs EvaluateImportCall. It returns a new promise from the current realm's
+intrinsic `%Promise%` and queues ContinueDynamicImport's first step at once,
+because the host completes HostLoadImportedModule synchronously from the
+table. That step, an `OSEO_REACTION_IMPORT_EVALUATE` reaction job, runs
+Evaluate on the target and attaches an `OSEO_REACTION_IMPORT_SETTLE` reaction
+to the returned promise. The second step resolves the call's promise with the
+namespace through ordinary promise resolution, so an exported `then` is
+honored, or rejects it with the evaluation error. Both reactions carry the
+call's promise in `capability` and the table index in `index`, and run in the
+target evaluator's realm. Evaluate reached from a job that a running
+evaluator drains, as an asynchronous iteration step in synchronous code does,
+reports an `OSEO2001` diagnostic instead of entering the driver twice.
 
 The context owns the table for the life of the program. The collector traces
-every entry's evaluator, top-level capability, and evaluation error, so a
-cached error stays reachable. InnerModuleEvaluation, ancestor gathering, and
-rejection propagation walk explicit stacks, so graph depth never consumes
-native stack. The DFS stack, its frames, async parent lists, and the sorted
-ancestor list hold only table indices in untraced memory.
+every entry's evaluator, namespace, top-level capability, and evaluation
+error, so a cached error stays reachable. InnerModuleEvaluation, ancestor
+gathering, and rejection propagation walk explicit stacks, so graph depth never
+consumes native stack. The DFS stack, its frames, async parent lists, and the
+sorted ancestor list hold only table indices in untraced memory.
 
 ABI `m5-149` adds the legacy `caller` and `arguments` properties of
 [ADR 0034]. Generated code creates a non-strict function through

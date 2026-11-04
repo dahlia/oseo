@@ -2404,10 +2404,24 @@ OseoResult oseo_console_log(
  * Installs a module graph's table and performs Evaluate on its entry,
  * returning the entry's top-level capability promise. The arguments are
  * the entry index, the module count, and per module its evaluator, a
- * top-level await flag of 0 or 1, its requested module count, and the
- * requested module indices in source order.
+ * top-level await flag of 0 or 1, its namespace object or undefined, its
+ * requested module count, and the requested module indices in source
+ * order. An entry index equal to the module count installs the table
+ * without evaluating any module and returns undefined, for a Script
+ * whose `import()` calls are the only requests.
  */
 OseoResult oseo_module_graph_evaluate(
+    OseoContext *context,
+    size_t argument_count,
+    const OseoValue *arguments
+);
+/*
+ * EvaluateImportCall for one static-specifier `import()` whose target is
+ * the module table entry named by the single argument. Returns a new
+ * promise from the current realm's intrinsic %Promise%; the target is
+ * linked and evaluated only in a later job.
+ */
+OseoResult oseo_module_import(
     OseoContext *context,
     size_t argument_count,
     const OseoValue *arguments

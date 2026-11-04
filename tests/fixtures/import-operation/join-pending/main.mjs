@@ -1,0 +1,10 @@
+const order = [];
+const first = import("./waiting.mjs").then(() => order.push("first"));
+const empty = import("./empty.mjs").then(() => order.push("empty"));
+const second = import("./waiting.mjs").then(() => order.push("second"));
+await Promise.all([first, empty, second]);
+console.log("joined order", order.join(","));
+const later = await import("./waiting.mjs");
+console.log("re-entry after completion", later.done);
+const grandparent = await import("./grandparent.mjs");
+console.log("finished subgraph does not hang", grandparent.depth);

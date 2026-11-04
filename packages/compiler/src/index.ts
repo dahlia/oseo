@@ -157,6 +157,7 @@ export { printMir } from "./mir-print.ts";
 export type { CompilationResult } from "./module-compile.ts";
 export type { ModuleCompilationResult } from "./module-compile.ts";
 export { compileModuleGraph } from "./module-compile.ts";
+export type { ScriptModuleRequests } from "./module-compile.ts";
 export { compileSource } from "./compile.ts";
 export type { NativeArchitecture } from "./native.ts";
 export type { NativeOperatingSystem } from "./native.ts";

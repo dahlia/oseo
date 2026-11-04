@@ -399,7 +399,13 @@ groups G1 through G14.
     components.
  -  `import-operation` implements EvaluateImportCall, ContinueDynamicImport,
     fresh capabilities, cached results, and asynchronous settlement on both
-    execution targets.
+    execution targets. Status: implemented behind the same option.
+    `compileModuleGraph` lowers each site to the runtime import operation,
+    and `compileSource` compiles a Script referrer with its request closure.
+    The fixed fixtures in *tests/import-operation-native.test.ts*, the
+    generated `import-operation` property family, and the edition model in
+    *tests/import-operation-model.ts* are the evidence for G1 through G10,
+    G12, and G14.
  -  `import-admission` adds runner support for Script referrers and fixtures,
     changes `supportedFeatures`, re-observes all 630 `dynamic-import` rows, and
     reassesses the ADR 0016 exclusions the design reopens. It moves the 17
@@ -781,7 +787,7 @@ standards update and heavy gates on the new base.
     row's owner moves. The audit binds ADR texts by digest, so a unit that
     edits ADR 0013, 0016, or 0028 re-reviews the rows that cite it.
  -  The runtime ABI version in *packages/runtime-c/src/index.ts*, currently
-    `m5-158`, changes once per landing that alters the ABI. The series keeps
+    `m5-159`, changes once per landing that alters the ABI. The series keeps
     its `m5-` prefix, and the closure tools keep their `m5c` names.
  -  Runtime code ranges, property blocks, intrinsic indexes, and heap kinds
     are reserved per unit.

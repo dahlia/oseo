@@ -308,13 +308,27 @@ static OseoResult module_evaluate(OseoContext *context, size_t index) {
     if (is_promise(record->top_level_capability)) {
         return normal(record->top_level_capability);
     }
+    OseoModuleTable *table = module_table(context);
+    if (table->evaluating) {
+        /*
+         * Only a job drained inside a running evaluator, as an
+         * asynchronous iteration step in synchronous code does, can
+         * reach Evaluate while another Evaluate is on the stack.
+         */
+        return failure(
+            context,
+            "OSEO2001",
+            "A module evaluation started inside another module evaluation."
+        );
+    }
     OseoResult result = oseo_internal_promise_create(context);
     if (result.status != OSEO_STATUS_NORMAL) return result;
     module_record(context, index)->top_level_capability = result.value;
-    OseoModuleTable *table = module_table(context);
     table->stack_count = 0u;
     size_t dfs_index = 0u;
+    table->evaluating = true;
     result = module_inner_evaluation(context, index, &dfs_index);
+    table->evaluating = false;
     if (result.status == OSEO_STATUS_THROW && !context->has_diagnostic) {
         OseoValue error = result.value;
         oseo_context_clear_language_error(context);
@@ -642,7 +656,7 @@ OseoResult oseo_module_graph_evaluate(
             arguments, argument_count, &position, SIZE_MAX, &entry) ||
         !module_table_index(
             arguments, argument_count, &position, argument_count, &count) ||
-        count == 0u || entry >= count) {
+        count == 0u || entry > count) {
         return failure(context, "OSEO2001", "The module table is malformed.");
     }
     OseoModuleTable *table = calloc(1u, sizeof(*table));
@@ -660,6 +674,7 @@ OseoResult oseo_module_graph_evaluate(
     for (size_t index = 0u; index < count; index += 1u) {
         OseoModuleRecord *record = &table->records[index];
         record->evaluator = oseo_undefined();
+        record->namespace_object = oseo_undefined();
         record->top_level_capability = oseo_undefined();
         record->evaluation_error = oseo_undefined();
         record->status = OSEO_MODULE_LINKED;
@@ -680,7 +695,14 @@ OseoResult oseo_module_graph_evaluate(
         size_t requested_count = 0u;
         if (!module_table_index(
                 arguments, argument_count, &position, 2u, &flag) ||
-            !module_table_index(
+            position >= argument_count ||
+            (tag_of(arguments[position]) != OSEO_TAG_UNDEFINED &&
+             !is_object(arguments[position]))) {
+            return module_table_invalid(context);
+        }
+        record->namespace_object = arguments[position];
+        position += 1u;
+        if (!module_table_index(
                 arguments,
                 argument_count,
                 &position,
@@ -712,5 +734,124 @@ OseoResult oseo_module_graph_evaluate(
         }
     }
     if (position != argument_count) return module_table_invalid(context);
+    if (entry == count) return normal(oseo_undefined());
     return module_evaluate(context, entry);
+}
+
+/* The module table entry an `import()` names, or a failure. */
+static OseoResult module_import_target(
+    OseoContext *context,
+    size_t module_index,
+    OseoModuleRecord **record
+) {
+    OseoModuleTable *table = module_table(context);
+    if (table == NULL || module_index >= table->count ||
+        !is_object(table->records[module_index].namespace_object)) {
+        return failure(
+            context,
+            "OSEO2001",
+            "The import() call names no module table entry."
+        );
+    }
+    *record = &table->records[module_index];
+    return normal(oseo_undefined());
+}
+
+/*
+ * EvaluateImportCall with the build-time request. The specifier literal
+ * has no conversion hooks, and the host completes HostLoadImportedModule
+ * synchronously from the table, so ContinueDynamicImport runs at once:
+ * LoadRequestedModules is already fulfilled, and its reaction job is
+ * queued before the call returns the new promise.
+ */
+OseoResult oseo_module_import(
+    OseoContext *context,
+    size_t argument_count,
+    const OseoValue *arguments
+) {
+    OseoModuleTable *table = module_table(context);
+    size_t position = 0u;
+    size_t index = 0u;
+    if (table == NULL || argument_count != 1u ||
+        !module_table_index(
+            arguments, argument_count, &position, table->count, &index)) {
+        return failure(
+            context,
+            "OSEO2001",
+            "The import() call names no module table entry."
+        );
+    }
+    OseoModuleRecord *record = NULL;
+    OseoResult result = module_import_target(context, index, &record);
+    if (result.status != OSEO_STATUS_NORMAL) return result;
+    OseoRootFrame frame = {NULL, NULL, 0u};
+    result = oseo_roots_allocate(context, &frame, 1u);
+    if (result.status != OSEO_STATUS_NORMAL) return result;
+    result = oseo_internal_promise_create(context);
+    frame.slots[0] = result.value;
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = oseo_internal_promise_then_import(
+            context,
+            oseo_undefined(),
+            frame.slots[0],
+            module_record(context, index)->evaluator,
+            index,
+            OSEO_REACTION_IMPORT_EVALUATE
+        );
+    }
+    if (result.status == OSEO_STATUS_NORMAL) result.value = frame.slots[0];
+    oseo_roots_release(context, &frame);
+    return result;
+}
+
+/*
+ * The two reaction steps of ContinueDynamicImport. Link has no work,
+ * because the build linked and instantiated every module. Evaluate's
+ * promise then settles the call's promise: fulfillment resolves it with
+ * the namespace through ordinary promise resolution, so an exported
+ * `then` is honored, and rejection passes the evaluation error on.
+ */
+OseoResult oseo_internal_module_import_step(
+    OseoContext *context,
+    OseoReactionKind kind,
+    size_t module_index,
+    OseoValue capability,
+    OseoValue argument,
+    bool fulfilled
+) {
+    OseoModuleRecord *record = NULL;
+    OseoResult result = module_import_target(context, module_index, &record);
+    if (result.status != OSEO_STATUS_NORMAL) return result;
+    OseoValue slots[2] = {capability, argument};
+    OseoRootFrame frame = {NULL, slots, 2u};
+    oseo_roots_push(context, &frame);
+    if (kind == OSEO_REACTION_IMPORT_EVALUATE) {
+        result = module_evaluate(context, module_index);
+        if (result.status == OSEO_STATUS_NORMAL) {
+            result = oseo_internal_promise_then_import(
+                context,
+                result.value,
+                frame.slots[0],
+                module_record(context, module_index)->evaluator,
+                module_index,
+                OSEO_REACTION_IMPORT_SETTLE
+            );
+        }
+    } else if (fulfilled) {
+        result = oseo_promise_resolve_into(
+            context,
+            frame.slots[0],
+            module_record(context, module_index)->namespace_object
+        );
+    } else {
+        result = oseo_promise_reject_into(
+            context,
+            frame.slots[0],
+            frame.slots[1]
+        );
+    }
+    oseo_roots_pop(context, &frame);
+    return result.status == OSEO_STATUS_NORMAL
+        ? normal(oseo_undefined())
+        : result;
 }

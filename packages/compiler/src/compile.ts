@@ -3,7 +3,11 @@ import { compileHostScripts } from "./host-scripts.ts";
 import { buildSeededHir } from "./hir-build.ts";
 import type { CompilerOptions, MirAgentTemplate, MirProgram } from "./mir.ts";
 import { buildMir } from "./mir-build.ts";
-import type { CompilationResult } from "./module-compile.ts";
+import {
+  buildScriptGraphHir,
+  type CompilationResult,
+  type ScriptModuleRequests,
+} from "./module-compile.ts";
 import type { SourceInput } from "./source.ts";
 import type { SourceFrontend } from "./syntax.ts";
 /**
@@ -11,21 +15,31 @@ import type { SourceFrontend } from "./syntax.ts";
  * the test262 host option, the result also carries one agent program for
  * each `$262.agent.start` template, and the main program's table names
  * them in the same order.
+ *
+ * `requests` names the modules a Script's `import()` calls reach, as
+ * `buildScriptRequests` discovered them for the same Script under
+ * its canonical identity. Without it, every `import()` keeps its profile
+ * diagnostic.
  */
 export function compileSource(
   frontend: SourceFrontend,
   input: SourceInput,
   options: CompilerOptions = {},
+  requests?: ScriptModuleRequests,
 ): CompilationResult {
   const frontendResult = frontend.parse(input);
   if (frontendResult.program == null) {
     return { diagnostics: frontendResult.diagnostics };
   }
   const host = options.test262Host === true;
-  const hirResult = buildSeededHir(
-    frontendResult.program,
-    host ? { collectAgentTemplates: true, hostScriptBindings: true } : {},
-  );
+  const seed = host
+    ? { collectAgentTemplates: true, hostScriptBindings: true }
+    : {};
+  // A Script with `import()` calls carries the modules they reach.
+  const hirResult =
+    requests == null
+      ? buildSeededHir(frontendResult.program, seed)
+      : buildScriptGraphHir(frontendResult.program, requests, seed);
   if (hirResult.program == null) {
     return {
       diagnostics: hirResult.diagnostics,

@@ -1870,12 +1870,23 @@ function resolveExpression(
       : { ...expression, arguments: argumentsValue, callee };
   }
   if (expression.kind === "import-call") {
-    // The static-specifier subset is discovered and recorded, but the
-    // profile still rejects every ImportCall until its admission.
-    state.diagnostics.push(
-      sourceDiagnostic(state.sourceId, expression, importCallProfileMessage),
-    );
-    return undefined;
+    // Only a module graph compilation names each site's build-time
+    // target; every other compilation keeps the profile diagnostic.
+    const start = expression.byteRange?.start;
+    const target =
+      start == null ? undefined : state.importCallTargets?.get(start);
+    if (target == null) {
+      state.diagnostics.push(
+        sourceDiagnostic(state.sourceId, expression, importCallProfileMessage),
+      );
+      return undefined;
+    }
+    return {
+      arguments: [{ kind: "number", range: expression.range, value: target }],
+      kind: "call",
+      range: expression.range,
+      target: { kind: "module-import" },
+    };
   }
   if (callsDynamicFunctionConstructor(expression.target, scopes, state)) {
     state.diagnostics.push(
@@ -4926,6 +4937,12 @@ interface HirSeed extends HirHostOptions {
    * declaration of the same name freely replaces.
    */
   readonly moduleBody?: boolean;
+  /**
+   * The module table index of each admitted `import()` site in this
+   * source, keyed by the call's start byte. Sites outside the map keep
+   * the profile diagnostic.
+   */
+  readonly importCallTargets?: ReadonlyMap<number, number>;
   readonly nextBindingId?: number;
   readonly nextFunctionId?: number;
 }
@@ -4963,6 +4980,7 @@ export function buildSeededHir(
             ]),
           ),
     agentTemplates: seed.collectAgentTemplates === true ? new Map() : undefined,
+    importCallTargets: seed.importCallTargets,
     intrinsicGlobalObjectBinding: undefined,
     intrinsicReadFallbacks: new Map(),
     labels: [],

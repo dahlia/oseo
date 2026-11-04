@@ -185,7 +185,7 @@ function graphOrigins(graph: ModuleGraph): ReadonlyMap<string, ModuleOrigin> {
  * it, when that chain crosses an `import()` edge. Other diagnostics are
  * returned unchanged.
  */
-export function withReferrerChains(
+function withReferrerChains(
   graph: ModuleGraph,
   located: readonly {
     readonly diagnostic: Diagnostic;
@@ -735,7 +735,8 @@ function moduleDepthFirstOrder(graph: ModuleGraph): readonly string[] {
       frames.pop();
     }
   };
-  visit(graph.entryId);
+  // A Script's request closure has no entry module.
+  if (nodes.has(graph.entryId)) visit(graph.entryId);
   // Graph discovery records its requests, and every module it finds
   // outside the entry's static closure is one that only `import()`
   // reaches. Such a module evaluates on request, never at startup. A
@@ -1122,6 +1123,11 @@ export function linkModuleGraph(graph: ModuleGraph): ModuleLinkResult {
     return { diagnostics: withImporterChains(graph, diagnostics) };
   }
 
+  // Every `import()` target resolves with its one namespace object, so
+  // the target gets the namespace cell an `import * as` would share.
+  for (const request of graph.requests ?? []) {
+    if (request.edgeKind === "discovery") namespaceCellFor(request.targetId);
+  }
   const components = moduleComponents(graph);
   const componentByModule = new Map<string, number>();
   for (const component of components) {

@@ -553,6 +553,15 @@ export type HirCallTarget =
       readonly kind: "module-evaluate";
     }
   | {
+      /**
+       * EvaluateImportCall for one static-specifier `import()`. The only
+       * argument is the constant module table index of the build-time
+       * target; the call returns a new promise and evaluates nothing
+       * before a later job.
+       */
+      readonly kind: "module-import";
+    }
+  | {
       readonly callee: HirExpression;
       readonly kind: "dynamic";
     }
@@ -1522,6 +1531,12 @@ export interface ResolveState {
    * exists. Reading one preserves the ReferenceError of an unresolvable name.
    */
   readonly intrinsicReadFallbacks: Map<string, Binding>;
+  /**
+   * The module table index of each admitted `import()` site in this
+   * source, keyed by the call's start byte. A site absent here keeps the
+   * profile diagnostic.
+   */
+  readonly importCallTargets?: ReadonlyMap<number, number> | undefined;
   /** Active labels of the function being resolved; loops accept continue. */
   readonly labels: { readonly loop: boolean; readonly name: string }[];
   /** True while resolving one module's body rather than a Script. */

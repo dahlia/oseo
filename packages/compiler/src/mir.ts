@@ -36,6 +36,7 @@ export type MirCallTarget =
       readonly method: "clearTimeout" | "setTimeout";
     }
   | { readonly kind: "module-evaluate" }
+  | { readonly kind: "module-import" }
   | { readonly functionId: number; readonly kind: "function" };
 
 /** Hint data copied into MIR without retaining a HIR or syntax object. */

@@ -2903,6 +2903,58 @@ OseoResult oseo_internal_promise_then_module(
     return result;
 }
 
+OseoResult oseo_internal_promise_then_import(
+    OseoContext *context,
+    OseoValue promise_value,
+    OseoValue capability,
+    OseoValue evaluator,
+    size_t module_index,
+    OseoReactionKind kind
+) {
+    bool queued_now = tag_of(promise_value) == OSEO_TAG_UNDEFINED;
+    if (!queued_now && !is_promise(promise_value)) {
+        return failure(
+            context,
+            "OSEO2001",
+            "The module evaluation result is not a promise."
+        );
+    }
+    OseoRootFrame frame = {NULL, NULL, 0u};
+    OseoResult result = oseo_roots_allocate(context, &frame, 4u);
+    if (result.status != OSEO_STATUS_NORMAL) return result;
+    frame.slots[0] = promise_value;
+    frame.slots[1] = evaluator;
+    frame.slots[2] = capability;
+    result = reaction_create(
+        context,
+        frame.slots[1],
+        frame.slots[1],
+        frame.slots[2]
+    );
+    frame.slots[3] = result.value;
+    if (result.status == OSEO_STATUS_NORMAL) {
+        OseoPromiseReaction *reaction = reaction_object(frame.slots[3]);
+        reaction->kind = kind;
+        reaction->index = module_index;
+        result = queued_now
+            ? enqueue_job(
+                  context,
+                  OSEO_JOB_REACTION,
+                  frame.slots[3],
+                  oseo_undefined(),
+                  oseo_undefined(),
+                  true
+              )
+            : promise_attach_reaction(
+                  context,
+                  frame.slots[0],
+                  frame.slots[3]
+              );
+    }
+    oseo_roots_release(context, &frame);
+    return result;
+}
+
 OseoResult oseo_promise_then(
     OseoContext *context,
     OseoValue promise_value,
@@ -3058,13 +3110,24 @@ static OseoResult run_reaction_job(
         context->line = source->rejection_line;
         context->column = source->rejection_column;
     }
-    if (reaction->kind == OSEO_REACTION_MODULE) {
-        result = oseo_internal_module_async_settled(
-            context,
-            reaction->index,
-            frame.slots[2],
-            fulfilled
-        );
+    if (reaction->kind == OSEO_REACTION_MODULE ||
+        reaction->kind == OSEO_REACTION_IMPORT_EVALUATE ||
+        reaction->kind == OSEO_REACTION_IMPORT_SETTLE) {
+        result = reaction->kind == OSEO_REACTION_MODULE
+            ? oseo_internal_module_async_settled(
+                  context,
+                  reaction->index,
+                  frame.slots[2],
+                  fulfilled
+              )
+            : oseo_internal_module_import_step(
+                  context,
+                  reaction->kind,
+                  reaction->index,
+                  frame.slots[1],
+                  frame.slots[2],
+                  fulfilled
+              );
         if (!context->has_diagnostic) {
             context->source_id = source_id;
             context->source_id_length = source_id_length;

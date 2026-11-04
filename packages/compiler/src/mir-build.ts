@@ -5448,7 +5448,10 @@ function lowerExpression(
       method: expression.target.method,
     };
     detail = expression.target.method;
-  } else if (expression.target.kind === "module-evaluate") {
+  } else if (
+    expression.target.kind === "module-evaluate" ||
+    expression.target.kind === "module-import"
+  ) {
     const lowered = lowerCallArguments(
       expression.arguments,
       expression.range,
@@ -5456,8 +5459,11 @@ function lowerExpression(
     );
     callArguments = [...lowered.ids];
     argumentListId = lowered.list;
-    callTarget = { kind: "module-evaluate" };
-    detail = "module_evaluate";
+    callTarget = { kind: expression.target.kind };
+    detail =
+      expression.target.kind === "module-import"
+        ? "module_import"
+        : "module_evaluate";
   } else if (expression.target.kind === "super") {
     return lowerSuperCall(
       expression,
