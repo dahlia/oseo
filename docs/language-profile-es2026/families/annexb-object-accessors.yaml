@@ -69,15 +69,80 @@ evidence:
       - tests/property/m5-annexb-object-accessors.property.test.ts
       - tests/property/m5-annexb-proto-boundary.property.test.ts
   standards:
-    status: omitted
-    reason: "The 70 owned test262 paths under the five
-      test/built-ins/Object/prototype/ accessor directories and
-      test/built-ins/WeakRef/prototype/constructor.js, and the eight
-      ADR 0013 rows this unit remediates, stay unreviewed until Root admits
-      them in its full UPDATE."
-    replacements:
-      - tests/native/fixtures/annexb-object-accessors.ts
-      - tests/property/m5-annexb-object-accessors.property.test.ts
+    status: covered
+    references:
+      - tests/test262/subset.yaml
+      - tests/test262/results.yaml
+      - tests/test262/results/built-ins/Object/08.yaml
+      - tests/test262/results/built-ins/Object/09.yaml
+      - tests/test262/results/built-ins/Object/0a.yaml
+      - tests/test262/results/built-ins/Object/0b.yaml
+      - tests/test262/results/built-ins/Object/10.yaml
+      - tests/test262/results/built-ins/Object/12.yaml
+      - tests/test262/results/built-ins/Object/15.yaml
+      - tests/test262/results/built-ins/Object/16.yaml
+      - tests/test262/results/built-ins/Object/17.yaml
+      - tests/test262/results/built-ins/Object/19.yaml
+      - tests/test262/results/built-ins/Object/1a.yaml
+      - tests/test262/results/built-ins/Object/20.yaml
+      - tests/test262/results/built-ins/Object/22.yaml
+      - tests/test262/results/built-ins/Object/23.yaml
+      - tests/test262/results/built-ins/Object/25.yaml
+      - tests/test262/results/built-ins/Object/27.yaml
+      - tests/test262/results/built-ins/Object/34.yaml
+      - tests/test262/results/built-ins/Object/35.yaml
+      - tests/test262/results/built-ins/Object/36.yaml
+      - tests/test262/results/built-ins/Object/3b.yaml
+      - tests/test262/results/built-ins/Object/3f.yaml
+      - tests/test262/results/built-ins/Object/45.yaml
+      - tests/test262/results/built-ins/Object/47.yaml
+      - tests/test262/results/built-ins/Object/4c.yaml
+      - tests/test262/results/built-ins/Object/54.yaml
+      - tests/test262/results/built-ins/Object/55.yaml
+      - tests/test262/results/built-ins/Object/5d.yaml
+      - tests/test262/results/built-ins/Object/62.yaml
+      - tests/test262/results/built-ins/Object/69.yaml
+      - tests/test262/results/built-ins/Object/6a.yaml
+      - tests/test262/results/built-ins/Object/70.yaml
+      - tests/test262/results/built-ins/Object/72.yaml
+      - tests/test262/results/built-ins/Object/73.yaml
+      - tests/test262/results/built-ins/Object/75.yaml
+      - tests/test262/results/built-ins/Object/7b.yaml
+      - tests/test262/results/built-ins/Object/7c.yaml
+      - tests/test262/results/built-ins/Object/8a.yaml
+      - tests/test262/results/built-ins/Object/93.yaml
+      - tests/test262/results/built-ins/Object/97.yaml
+      - tests/test262/results/built-ins/Object/9d.yaml
+      - tests/test262/results/built-ins/Object/a7.yaml
+      - tests/test262/results/built-ins/Object/a8.yaml
+      - tests/test262/results/built-ins/Object/af.yaml
+      - tests/test262/results/built-ins/Object/b4.yaml
+      - tests/test262/results/built-ins/Object/b5.yaml
+      - tests/test262/results/built-ins/Object/be.yaml
+      - tests/test262/results/built-ins/Object/c1.yaml
+      - tests/test262/results/built-ins/Object/c6.yaml
+      - tests/test262/results/built-ins/Object/d3.yaml
+      - tests/test262/results/built-ins/Object/d7.yaml
+      - tests/test262/results/built-ins/Object/d9.yaml
+      - tests/test262/results/built-ins/Object/da.yaml
+      - tests/test262/results/built-ins/Object/db.yaml
+      - tests/test262/results/built-ins/Object/dc.yaml
+      - tests/test262/results/built-ins/Object/e3.yaml
+      - tests/test262/results/built-ins/Object/e5.yaml
+      - tests/test262/results/built-ins/Object/ec.yaml
+      - tests/test262/results/built-ins/Object/f2.yaml
+      - tests/test262/results/built-ins/Object/f5.yaml
+      - tests/test262/results/built-ins/Object/fc.yaml
+      - tests/test262/results/built-ins/Object/ff.yaml
+      - tests/test262/results/built-ins/TypedArray/75.yaml
+      - tests/test262/results/built-ins/TypedArray/8b.yaml
+      - tests/test262/results/built-ins/TypedArrayConstructors/d8.yaml
+      - tests/test262/results/built-ins/WeakRef/d2.yaml
+      - tests/test262/results/language/expressions/c5.yaml
+      - tests/test262/results/language/expressions/eb.yaml
+      - tests/test262/results/language/statements/1e.yaml
+      - tests/test262/results/language/statements/c2.yaml
+      - tests/test262/results/language/types/ad.yaml
   structural:
     status: covered
     references:

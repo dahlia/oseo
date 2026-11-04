@@ -6,15 +6,14 @@ Status
 
 Implementation status: in progress. The `claim-boundary` unit has applied ADR
 0032. The `legacy-caller`, `annexb-escape`, `annexb-string-methods`,
-`annexb-date-methods`, `error-is-error`, `math-sum-precise`, `upsert`, and
-`iterator-concat`, and `iterator-zip` units are implemented and observed. The
-`annexb-object-accessors` unit is implemented and awaits Root's full test262
-observation, and every other unit is open. This plan follows M5 directly and
-runs alongside M6. It has no milestone number. It schedules the language work
-the maintainer approved on 2026-11-02: build-time static-specifier `import()`,
-Annex B legacy web behavior except `document.all`, the legacy `caller`
-extension, the seven ECMAScript 2026 features, and the three ECMAScript 2027
-features other than Temporal.
+`annexb-date-methods`, `error-is-error`, `math-sum-precise`, `upsert`,
+`iterator-concat`, `iterator-zip`, and `annexb-object-accessors` units are
+implemented and observed, and every other unit is open. This plan follows M5
+directly and runs alongside M6. It has no milestone number. It schedules the
+language work the maintainer approved on 2026-11-02: build-time
+static-specifier `import()`, Annex B legacy web behavior except `document.all`,
+the legacy `caller` extension, the seven ECMAScript 2026 features, and the
+three ECMAScript 2027 features other than Temporal.
 
 The plan is written for parallel implementation. Each work unit below owns an
 exact set of test262 paths, names its prerequisites, and lists the shared files
@@ -94,10 +93,10 @@ A probe of the current build and the reviewed manifest shows this Annex B state:
 | Legacy octal literals, `\8`, `\9`, octal escapes   | Core grammar in the inventory; non-strict rows pass                           |
 | `__proto__: value` in object initializers          | Core syntax, admitted by M5a Unit 8.1c                                        |
 | `var` redeclaring a simple catch parameter         | Admitted by M5a Unit 8.5c, including `for (var e of ...)`                     |
-| `WeakRef.prototype.constructor`                    | Installed; its row awaits the `annexb-object-accessors` observation           |
-| `Object.prototype.__proto__` accessor              | Installed by `annexb-object-accessors`; awaits the test262 observation        |
-| `__lookupGetter__`, `__lookupSetter__`             | Installed by `annexb-object-accessors`; awaits the test262 observation        |
-| `__defineGetter__`, `__defineSetter__`             | Installed by `annexb-object-accessors`; awaits the test262 observation        |
+| `WeakRef.prototype.constructor`                    | Installed; its test262 row passes                                             |
+| `Object.prototype.__proto__` accessor              | Installed by `annexb-object-accessors`; its test262 rows pass                 |
+| `__lookupGetter__`, `__lookupSetter__`             | Installed by `annexb-object-accessors`; its test262 rows pass                 |
+| `__defineGetter__`, `__defineSetter__`             | Installed by `annexb-object-accessors`; its test262 rows pass                 |
 | Annex B RegExp pattern grammar                     | Reported as the OSEO1001 profile boundary, without `u` or `v`                 |
 | `escape`, `unescape`                               | Installed by `annexb-escape`; all 35 test262 rows pass                        |
 | `substr`, HTML methods, `trimLeft`, `trimRight`    | Installed by `annexb-string-methods`; all 105 test262 rows pass               |
@@ -526,8 +525,10 @@ rationale.
 Status: implemented, with fixed, differential, and generated evidence in the
 [profile section](./docs/language-profile-es2026.md#annex-b-object-accessors).
 The three earlier seeds keep their domains with oracles of the implemented
-behavior, and the new suite uses `0x6000a400` and `0x6000a401`. The owned and
-ADR 0013 rows wait for Root's full UPDATE.
+behavior, and the new suite uses `0x6000a400` and `0x6000a401`. All 70 owned
+rows pass in the full test262 observation, and so do the eight ADR 0013 rows,
+which close by observation. The manifest has 41,533 reviewed rows: 35,243
+passes and 1,889 unsupported results, and no other row changes.
 
 ### `annexb-function-declarations`
 
@@ -655,9 +656,7 @@ current *tests/test262/inventory.tsv*.
     host implements them, so a model written from the specification replaces
     differential evidence. The runtime, fixtures, and property suite are
     implemented, and the reviewed harness carries *iteratorZipUtils.js*. All
-    82 rows pass in the full test262 observation, so the manifest has 41,463
-    reviewed rows: 35,165 passes and 1,897 unsupported results, and no
-    earlier row changes.
+    82 rows pass in the full test262 observation, and no earlier row changes.
  -  `atomics-pause` owns `Atomics.pause` (5). It validates the optional
     iteration count and returns `undefined`. Whether it emits a processor
     pause hint is a target choice recorded in the target description.

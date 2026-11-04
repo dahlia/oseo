@@ -76,6 +76,16 @@ differential, specialization, guard-fallback, collection, and standards
 evidence in *tests/property/m5-import-attributes.property.test.ts* and
 *tests/fixtures/import-attributes/*.
 
+The `__proto__` accessor and the four legacy accessor methods stayed outside
+the M5 claim: ADR 0020 excluded their normative-optional clauses and mapped
+them onto the ADR 0013 Annex B exclusion. The boundary paragraphs below and
+the [metadata contract](#omitted-legacy-accessor-metadata-boundary) record that
+M5 behavior. The post-M5 `annexb-object-accessors` unit installs the accessor
+and the methods; see
+[Annex B Object accessors](./language-profile-es2026.md#annex-b-object-accessors).
+Under it, the eight ADR 0013 rows that read or write the accessor or call a
+legacy lookup method pass, including *no-species.js* and *S8.6.2\_A8.js*.
+
 The M5c node `annexb-proto-dependency-classification` originally made a missing
 `__proto__` lookup reaching an intrinsic `Object.prototype` observable as
 `OSEO1001`, without installing an accessor; the immutable-prototype brand
@@ -304,13 +314,14 @@ evidence includes the executed variants and target, dependency tags are
 reviewed, and summaries include raw, path-group, and dependency totals.
 Unsupported, harness, and infrastructure results never increase the pass count.
 
-The current manifest contains 41,463 reviewed cases: 35,165 passes, 4,401
-expected negatives, and 1,897 unsupported profile features. It records no
-semantic, harness, or infrastructure failures. The 372 cases beyond the M5
+The current manifest contains 41,533 reviewed cases: 35,243 passes, 4,401
+expected negatives, and 1,889 unsupported profile features. It records no
+semantic, harness, or infrastructure failures. The 442 cases beyond the M5
 inventory are rows of the
 [ECMAScript 2026 profile](./language-profile-es2026.md): 164 for the
-[Annex B built-ins](./language-profile-es2026.md#annex-b-built-ins), 126 for
-the
+[Annex B built-ins](./language-profile-es2026.md#annex-b-built-ins), 70 for the
+[Annex B Object accessors](./language-profile-es2026.md#annex-b-object-accessors),
+126 for the
 [small built-in families](./language-profile-es2026.md#small-ecmascript-2026-built-in-families),
 and 82 for [joint iteration](./language-profile-es2026.md#joint-iteration).
 

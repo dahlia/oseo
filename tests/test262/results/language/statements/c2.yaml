@@ -589,7 +589,7 @@ results:
         - non-strict
         - strict
       suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
-    classification: unsupported-profile-feature
+    classification: pass
     dependencies:
       - classes
       - expression-operators
@@ -603,14 +603,14 @@ results:
       variants:
         - specialization: disabled
           strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
     observation:
-      detail: 'test/language/statements/class/elements/private-getter-is-not-a-own-property.js
-        non-strict disabled failed (1): stdout=""
-        stderr="test/language/statements/class/elements/private-getter-is-not-a-own-property.js:111:22:
-        error[OSEO1001]: The Object.prototype.__lookupGetter__ method is
-        excluded by the M5 optional legacy accessor policy.\n"'
-      passed: false
-      unsupportedCapability: profile-syntax
+      passed: true
     unsupportedFeatures: []
   - case:
       async: false

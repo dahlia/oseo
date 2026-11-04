@@ -86,8 +86,10 @@ lands, and the full manifest update observes them.
 requires zero semantic, harness, and infrastructure failures and an owner for
 every unsupported path, and it counts the open unreviewed and remediation
 paths of each unit. It rejects a path that still has the ADR 0013 owner,
-because ADR 0032 withdrew that record's Annex B authorization; the 11 former
-ADR 0013 rows count as remediation of their units. `language-exit-audit` runs
+because ADR 0032 withdrew that record's Annex B authorization. The 11 former
+ADR 0013 rows became remediation of their units; the eight that
+`annexb-object-accessors` took now pass, and the other three still count as
+remediation. `language-exit-audit` runs
 it with `--require-closed`, which also requires both counts to be zero.
 `mise run report:language-coverage` prints the counts. The M5 denominator and
 this one stay separate: a percentage of this claim uses the 43,007 included
@@ -353,8 +355,12 @@ methods, and *test/built-ins/WeakRef/prototype/constructor.js*. The family also
 takes eight ADR 0013 rows: three TypedArray rows that read or write
 `__proto__`, *test/language/types/object/S8.6.2\_A8.js*, and the four
 *private-getter-is-not-a-own-property.js* and
-*private-setter-is-not-a-own-property.js* rows. The rows stay unreviewed until
-Root's full UPDATE admits them.
+*private-setter-is-not-a-own-property.js* rows. All 78 rows pass and close by
+observation, and the family record's standards class cites the 70 results
+partitions that hold them. The two TypedArray rows include
+*resizableArrayBufferUtils.js*. They pass because the reviewed harness copy in
+*tests/test262/harness/* writes its three subclasses as class expressions
+instead of compiling them through the `Function` constructor.
 
 
 Small ECMAScript 2026 built-in families
