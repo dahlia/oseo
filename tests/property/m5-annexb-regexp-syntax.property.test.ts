@@ -90,6 +90,12 @@ const annexBTokens = [
   "[\\d-a]",
   "[a-\\w]",
   "[\\s-\\D]",
+  // Class fragments that join into chained ranges and unions.
+  "[\\d-",
+  "[a-",
+  "-]",
+  "a-z]",
+  "-\\w]",
   "[\\c1\\c_]",
   "[\\c]",
   "[\\\\c-f]",

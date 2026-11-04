@@ -563,6 +563,11 @@ test("reads Annex B text through the edition's legacy productions", () => {
         "char u+0032 2; char u+007d }; char u+007d }; char u+005d ]",
     ],
     ["[a-\\d]", "class; char u+0061 a; char u+002d -; class-escape digit"],
+    [
+      "[\\d--a]",
+      "class; class-escape digit; char u+002d -; char u+002d -; " +
+        "char u+0061 a",
+    ],
     ["[\\1-\\7]", "class; range u+0001 .. u+0007"],
     ["[\\B\\p]", "class; char u+0042 B; char u+0070 p"],
     [

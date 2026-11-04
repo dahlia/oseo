@@ -839,7 +839,8 @@ static OseoRegExpValidation regexp_character_class(
             }
             cursor = escaped;
         }
-        if (unit == '-' && have_previous &&
+        // A dash that ends a pending range is that range's second atom.
+        if (unit == '-' && have_previous && !range &&
             cursor + 1u < source->length &&
             source->units[cursor + 1u] != ']') {
             if (!previous_single && unicode) return OSEO_REGEXP_INVALID;

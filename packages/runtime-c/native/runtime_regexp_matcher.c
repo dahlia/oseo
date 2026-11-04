@@ -1684,6 +1684,46 @@ static uint32_t parse_character_class(OseoRegExpCompiler *compiler) {
         if (!parse_class_atom(compiler, &first)) return 0u;
         if (first.is_set) {
             if (!union_class_escape(compiler, &first)) return 0u;
+            /*
+             * Annex B's CharacterRangeOrUnion with a class escape first:
+             * the dash and the atom after it belong to this union, so
+             * neither may start another range. Validation refused this
+             * text under `u` and `v`.
+             */
+            if (unit_at(compiler, compiler->index) == '-' &&
+                compiler->index + 1u < compiler->source->length &&
+                unit_at(compiler, compiler->index + 1u) != ']') {
+                compiler->index += 1u;
+                OseoRegExpClassAtom second;
+                if (!parse_class_atom(compiler, &second)) return 0u;
+                if (second.is_set) {
+                    if (!union_class_escape(compiler, &second)) return 0u;
+                    second.code_point = '-';
+                }
+                if (!buffer_push(
+                        compiler->context,
+                        &compiler->class_ranges,
+                        '-'
+                    ) ||
+                    !buffer_push(
+                        compiler->context,
+                        &compiler->class_ranges,
+                        '-' + 1u
+                    ) ||
+                    !buffer_push(
+                        compiler->context,
+                        &compiler->class_ranges,
+                        second.code_point
+                    ) ||
+                    !buffer_push(
+                        compiler->context,
+                        &compiler->class_ranges,
+                        second.code_point + 1u
+                    )) {
+                    compiler_fail(compiler, OSEO_REGEXP_ALLOCATION_FAILURE);
+                    return 0u;
+                }
+            }
             continue;
         }
         uint32_t start = first.code_point;
@@ -1697,9 +1737,8 @@ static uint32_t parse_character_class(OseoRegExpCompiler *compiler) {
             if (second.is_set && !compiler->unicode) {
                 /*
                  * Annex B's CharacterRangeOrUnion: the first atom, the
-                 * dash, and the class escape. A class escape first never
-                 * reaches here, because its own iteration adds it and
-                 * leaves the dash to the next one.
+                 * dash, and the class escape. A class escape first is
+                 * handled where it is parsed, with its own dash.
                  */
                 if (!buffer_push(
                         compiler->context,

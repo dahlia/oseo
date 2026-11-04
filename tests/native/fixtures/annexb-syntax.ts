@@ -30,6 +30,12 @@ const annexBPatterns: readonly (readonly [string, string, string])[] = [
   ["[\\d-a]+", "", "x1-a2"],
   ["[a-\\D]+", "", "1a-b"],
   ["[\\s-\\d]+", "", "x 1-"],
+  // A class escape range takes its dash and second atom, so neither
+  // starts another range.
+  ["[\\d--a]+", "", "/-a5"],
+  ["[\\d-a-z]+", "", "b5a-z"],
+  ["[\\d-z-a]+", "", "b-za5"],
+  ["[a-\\d-z]+", "", "q-za5"],
   ["[\\12-\\14]+", "", "line1\n\n\v\fx"],
   ["[\\B\\p\\k\\8]+", "", "Bpk8"],
   ["(?=(a))*a", "", "a"],
