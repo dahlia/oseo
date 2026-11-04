@@ -51,30 +51,15 @@ evidence:
       - tests/import-operation-native.test.ts
       - tests/import-operation.test.ts
   standards:
-    status: covered
-    references:
+    status: omitted
+    reason: "The checked-in test262 results predate admission and still
+      record the parse-time ImportExpression rejection. The full UPDATE
+      that re-observes the 630 dynamic-import rows replaces this with
+      the observed result partitions; until then the fixed fixtures,
+      which retain the assertions of the 20 pinned rows, stand in."
+    replacements:
+      - tests/import-operation-native.test.ts
       - tests/test262/subset.yaml
-      - tests/test262/results.yaml
-      - tests/test262/results/language/expressions/44.yaml
-      - tests/test262/results/language/expressions/5d.yaml
-      - tests/test262/results/language/expressions/67.yaml
-      - tests/test262/results/language/expressions/6a.yaml
-      - tests/test262/results/language/expressions/7a.yaml
-      - tests/test262/results/language/expressions/7b.yaml
-      - tests/test262/results/language/expressions/81.yaml
-      - tests/test262/results/language/expressions/84.yaml
-      - tests/test262/results/language/expressions/8c.yaml
-      - tests/test262/results/language/expressions/e6.yaml
-      - tests/test262/results/language/module-code/21.yaml
-      - tests/test262/results/language/module-code/24.yaml
-      - tests/test262/results/language/module-code/2d.yaml
-      - tests/test262/results/language/module-code/37.yaml
-      - tests/test262/results/language/module-code/74.yaml
-      - tests/test262/results/language/module-code/9a.yaml
-      - tests/test262/results/language/module-code/a2.yaml
-      - tests/test262/results/language/module-code/ab.yaml
-      - tests/test262/results/language/module-code/d3.yaml
-      - tests/test262/results/language/module-code/e6.yaml
   structural:
     status: covered
     references:

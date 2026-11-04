@@ -1069,6 +1069,57 @@ interface EntryGraphResult {
 const importBuildCapability = "static-specifier-import-build";
 
 /**
+ * Whether any module the entry reaches through static imports or literal
+ * `import()` calls makes such a call. The walk reads sources itself and
+ * skips any it cannot load or parse, because a failed build reports no
+ * graph to inspect.
+ */
+async function graphHasImportCall(
+  entryId: string,
+  entrySource: string,
+): Promise<boolean> {
+  const seen = new Set([entryId]);
+  const work = [entryId];
+  while (work.length > 0) {
+    const moduleId = work.pop()!;
+    let source = entrySource;
+    if (moduleId !== entryId) {
+      try {
+        // eslint-disable-next-line no-await-in-loop -- One module at a time.
+        source = await readFile(fileURLToPath(moduleId), "utf8");
+      } catch {
+        continue;
+      }
+    }
+    const module = defaultComponents.moduleFrontend.parseModule({
+      source,
+      sourceId: moduleId,
+    }).module;
+    if (module == null) continue;
+    if ((module.importCalls ?? []).length > 0) return true;
+    const specifiers = [
+      ...module.imports.map((entry) => entry.specifier),
+      ...module.exports.flatMap((entry) =>
+        "specifier" in entry && entry.specifier != null
+          ? [entry.specifier]
+          : [],
+      ),
+    ];
+    for (const specifier of specifiers) {
+      const target = fileModuleResolver.resolve(
+        moduleId,
+        specifier,
+      ).canonicalId;
+      if (target != null && !seen.has(target)) {
+        seen.add(target);
+        work.push(target);
+      }
+    }
+  }
+  return false;
+}
+
+/**
  * Whether a canonical build diagnostic refuses an `import()` request. It
  * was reached through an `import()` edge, which the importer chain in its
  * notes records, or it locates an `import()` call of its own source.
@@ -1183,19 +1234,32 @@ async function buildEntryGraph(
     entryId,
   );
   const entrySources = new Map([[entryId, source]]);
-  // Any refused import() request makes the whole build a subset
-  // boundary, even after an ordinary static failure, so the case can
-  // never count as an expected negative while a request was refused.
+  // A failed build of a graph with any literal import() request is a
+  // subset boundary, even after an ordinary static failure or for a
+  // target that a static import shares, so such a case never counts as
+  // an expected negative. An OSEO1001 profile rejection, such as a
+  // target that calls the Function constructor, keeps its ADR 0016
+  // classification, and a harness failure stays a harness failure.
   const boundary = async (
     diagnostics: readonly Diagnostic[],
   ): Promise<{ readonly importBoundary?: Diagnostic }> => {
+    const first = diagnostics[0];
+    if (
+      first == null ||
+      first.code === "OSEO1001" ||
+      first.sourceId === test262ModuleHarnessSourceId
+    ) {
+      return {};
+    }
     for (const diagnostic of diagnostics) {
       // eslint-disable-next-line no-await-in-loop -- Stop at the first.
       if (await isImportBuildRefusal(diagnostic, entrySources)) {
         return { importBoundary: displayDiagnostic(diagnostic) };
       }
     }
-    return {};
+    return (await graphHasImportCall(entryId, source))
+      ? { importBoundary: displayDiagnostic(first) }
+      : {};
   };
   if (result.graph == null) {
     return {
@@ -1323,8 +1387,24 @@ async function buildScriptReferrerGraph(
       rootUrl,
     ),
   });
+  // Lowering the modules is the build's last step. A failure in a
+  // module refuses the request too, except an OSEO1001 profile rejection,
+  // which the native build reports with its ADR 0016 classification; the
+  // Script's own diagnostics are left to the native build as well.
+  const lowered =
+    result.closure == null || result.diagnostics.length > 0 || linked.length > 0
+      ? []
+      : compileSource(
+          defaultComponents.frontend,
+          { source, sourceId: scriptId },
+          { specialization: "disabled" },
+          { canonicalId: scriptId, closure: result.closure },
+        ).diagnostics.filter(
+          (diagnostic) =>
+            diagnostic.sourceId !== scriptId && diagnostic.code !== "OSEO1001",
+        );
   return {
-    diagnostics: [...result.diagnostics, ...linked].map(display),
+    diagnostics: [...result.diagnostics, ...linked, ...lowered].map(display),
     sourceIds,
   };
 }
