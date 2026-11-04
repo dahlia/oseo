@@ -2154,11 +2154,11 @@ seconds. See
 ECMAScript 2026 built-in local costs
 ------------------------------------
 
-The property files of the small ECMAScript 2026 built-in units and of
-`iterator-zip` postdate the
-three Linux source runs. Each Linux weight is one local Linux AMD64 extended
-run with `OSEO_PROPERTY_RUN_SCALE=10` and the file's checked-in seed, size and
-base limit, rounded up to whole seconds. These are local observations, not CI
+The property files of the small ECMAScript 2026 built-in units, of
+`iterator-zip`, and of `array-from-async` postdate the three Linux source runs.
+Each Linux weight is one local Linux AMD64 extended run with
+`OSEO_PROPERTY_RUN_SCALE=10` and the file's checked-in seed, size and base
+limit, rounded up to whole seconds. These are local observations, not CI
 file-shard sums, run-to-run bounds or macOS measurements; Root may replace them
 with exact-candidate CI case sums. macOS gains no entry and keeps its
 unknown-file median fallback.
@@ -2170,6 +2170,7 @@ unknown-file median fallback.
 | *tests/property/es2026-upsert.property.test.ts*           |    247547.624 |              248 |
 | *tests/property/es2026-iterator-concat.property.test.ts*  |    156441.062 |              157 |
 | *tests/property/es2026-iterator-zip.property.test.ts*     |    239268.559 |              240 |
+| *tests/property/es2026-array-from-async.property.test.ts* |    469795.392 |              470 |
 
 The TSV retains each file with `-` for all three historical source samples,
 and the extraction script and its unit test retain it explicitly. The
@@ -2184,3 +2185,8 @@ seconds. Other lanes' gates kept the host's load average above its 16 cores
 during the run, so the figure may be high. The TSV, extraction script and unit
 test retain the file the same way, Linux now has 158 entries with the
 429-second fallback, and macOS keeps its fallback.
+
+*tests/property/es2026-array-from-async.property.test.ts* takes its weight from
+the local extended run in the table above. The TSV, extraction script and unit
+test retain it the same way, Linux now has 159 entries, and the fallback stays
+429 seconds.

@@ -349,6 +349,15 @@
     (OSEO_ARRAY_CODE_ID_RANGE_LAST - 39u)
 #define OSEO_ARRAY_WITH_CODE_ID \
     (OSEO_ARRAY_CODE_ID_RANGE_LAST - 40u)
+#define OSEO_ARRAY_FROM_ASYNC_CODE_ID \
+    (OSEO_ARRAY_CODE_ID_RANGE_LAST - 41u)
+/* The two reactions every Await of one Array.fromAsync call installs.
+ * Both share that call's state environment and resume its closure with
+ * the settled value. */
+#define OSEO_ARRAY_FROM_ASYNC_FULFILL_CODE_ID \
+    (OSEO_ARRAY_CODE_ID_RANGE_LAST - 42u)
+#define OSEO_ARRAY_FROM_ASYNC_REJECT_CODE_ID \
+    (OSEO_ARRAY_CODE_ID_RANGE_LAST - 43u)
 
 #define OSEO_ARGUMENTS_CODE_ID_RANGE_INDEX ((size_t)7u)
 #define OSEO_ARGUMENTS_CODE_ID_RANGE_FIRST \
@@ -5148,6 +5157,16 @@ OseoResult oseo_internal_async_from_sync_rejected(
     OseoContext *context,
     OseoValue callee,
     OseoValue reason
+);
+/*
+ * CreateAsyncFromSyncIterator over an acquired synchronous iterator. The
+ * result is the internal wrapper record that oseo_async_iterator_next_start
+ * and oseo_async_iterator_close_start recognize; its next method is the
+ * synchronous iterator's own.
+ */
+OseoResult oseo_internal_async_from_sync_wrap(
+    OseoContext *context,
+    OseoValue sync_iterator
 );
 /*
  * The realm's single %ThrowTypeError% intrinsic, created on first use

@@ -197,6 +197,7 @@ test("Linux weights match the three-run median case sums", async () => {
   // ECMAScript 2026 built-in files use later local Linux extended runs.
   const retained = [
     "tests/property/es2026-iterator-zip.property.test.ts",
+    "tests/property/es2026-array-from-async.property.test.ts",
     "tests/property/es2026-iterator-concat.property.test.ts",
     "tests/property/es2026-upsert.property.test.ts",
     "tests/property/es2026-math-sum-precise.property.test.ts",

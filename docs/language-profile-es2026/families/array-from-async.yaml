@@ -1,0 +1,62 @@
+version: 1
+id: array-from-async
+title: "Array.fromAsync"
+scope:
+  - "The Array.fromAsync function property, its descriptor, name, length,
+    and non-constructor status, and the %Promise% it returns for every
+    input, including a rejection for each abrupt completion."
+  - "The Symbol.asyncIterator and Symbol.iterator reads, async iterables
+    with values that are not awaited, sync iterables through the
+    Async-from-Sync wrapper, and array-likes with one length read and an
+    Await per element, the mapper and its thisArg, and constructor and
+    other receivers."
+  - "The order of observable steps and the turns each Await takes, the
+    closes after a mapper, mapped-value, or definition failure with the
+    Await on the return result, and propagation without a close for
+    failures of the iterator itself and of the final length Set."
+owners:
+  - docs/language-profile-es2026.md
+evidence:
+  differential:
+    status: covered
+    references:
+      - tests/native/fixtures/array-from-async.ts
+      - tests/property/es2026-array-from-async.property.test.ts
+  fixed:
+    status: covered
+    references:
+      - tests/native/fixtures/array-from-async.ts
+  forced-collection:
+    status: covered
+    references:
+      - tests/array-from-async-native.test.ts
+      - tests/native/fixtures/array-from-async.ts
+      - tests/property/es2026-array-from-async.property.test.ts
+  generated:
+    status: covered
+    references:
+      - tests/property/es2026-array-from-async.property.test.ts
+  guard-fallback:
+    status: covered
+    references:
+      - tests/array-from-async-native.test.ts
+      - tests/native/fixtures/array-from-async.ts
+      - tests/property/es2026-array-from-async.property.test.ts
+  specialization:
+    status: covered
+    references:
+      - tests/array-from-async-native.test.ts
+      - tests/native/fixtures/array-from-async.ts
+      - tests/property/es2026-array-from-async.property.test.ts
+  standards:
+    status: omitted
+    reason: "The 95 test/built-ins/Array/fromAsync rows stay unreviewed in
+      the closure ledger until the unit admits them and the full test262
+      update observes them."
+    replacements:
+      - tests/native/fixtures/array-from-async.ts
+      - tests/property/es2026-array-from-async.property.test.ts
+  structural:
+    status: covered
+    references:
+      - packages/runtime-c/tests/intrinsic-graph.test.ts

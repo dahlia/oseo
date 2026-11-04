@@ -3012,3 +3012,44 @@ test("runs Iterator.zip as an iterator helper over a record array", () => {
     ),
   );
 });
+
+test("runs Array.fromAsync over one shared state record", () => {
+  const internalHeader = sources.get("runtime_internal.h") ?? "";
+  const arraySource = sources.get("runtime_array.c") ?? "";
+  // The function and its two reactions take the array range's next code
+  // IDs and no intrinsic slot.
+  for (const [name, offset] of [
+    ["OSEO_ARRAY_FROM_ASYNC_CODE_ID", 41],
+    ["OSEO_ARRAY_FROM_ASYNC_FULFILL_CODE_ID", 42],
+    ["OSEO_ARRAY_FROM_ASYNC_REJECT_CODE_ID", 43],
+  ] as const) {
+    assert.ok(
+      internalHeader.includes(
+        `#define ${name} \\\n` +
+          `    (OSEO_ARRAY_CODE_ID_RANGE_LAST - ${offset}u)`,
+      ),
+      name,
+    );
+  }
+  assert.doesNotMatch(internalHeader, /OSEO_INTRINSIC_ARRAY_FROM_ASYNC/u);
+  // A reaction captures a copy of its environment, so it holds the state
+  // record through a one-slot holder rather than the record itself.
+  assert.ok(
+    arraySource.includes(
+      "result = oseo_environment_create(context, 1u);\n" +
+        "    slots[1] = result.value;",
+    ),
+  );
+  assert.ok(
+    arraySource.includes("environment_object(slots[0])->slot_count == 1u"),
+  );
+  // Every Await resolves through %Promise% before attaching the reactions.
+  assert.ok(
+    arraySource.includes(
+      "OseoResult result = oseo_promise_resolve(context, slots[1]);\n" +
+        "    slots[1] = result.value;\n" +
+        "    if (result.status == OSEO_STATUS_NORMAL) {\n" +
+        "        result = oseo_promise_then(",
+    ),
+  );
+});

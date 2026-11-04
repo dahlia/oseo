@@ -1526,3 +1526,18 @@ the key array of `zipKeyed`. A zip helper has no underlying iterator, so its
 `zipKeyed` walk reads `[[GetOwnProperty]]` through the new
 `oseo_internal_own_property_enumerable`, which answers for proxies and
 ordinary objects alike. No heap kind or traced field is added.
+
+ABI `m5-154` adds `Array.fromAsync` as an own function property of `%Array%`,
+defined after `from`, with the array component's code ID 41 below the range
+top and no intrinsic slot. It runs the edition's closure as a state machine
+over one 13-slot environment record that holds the result promise, the
+receiver, the mapper and its `thisArg`, the iterator record or array-like
+object, the target, the index and length, the suspended phase, the pending
+close error, and the two reactions. Every Await performs PromiseResolve with
+`%Promise%` and attaches those reactions, code IDs 42 and 43, which resume the
+closure in a promise job. Because a function captures a copy of its creation
+environment, each reaction's environment is a one-slot holder that refers to
+the shared record. A synchronous iterable goes through the internal
+Async-from-Sync wrapper, which `oseo_internal_async_from_sync_wrap` now exposes
+to the array component. No heap kind or traced field is added, and the
+generated-code ABI gains no entry point.

@@ -23,6 +23,18 @@ static OseoResult array_of(
     size_t argument_count,
     const OseoValue *arguments
 );
+static OseoResult array_from_async(
+    OseoContext *context,
+    OseoValue receiver,
+    size_t argument_count,
+    const OseoValue *arguments
+);
+static OseoResult array_from_async_settled(
+    OseoContext *context,
+    OseoValue callee,
+    bool rejected,
+    OseoValue value
+);
 static OseoResult array_iteration(
     OseoContext *context,
     OseoValue receiver,
@@ -200,6 +212,23 @@ OseoResult oseo_internal_array_builtin_dispatch(
     }
     if (code_id == OSEO_ARRAY_FROM_CODE_ID) {
         return array_from(context, receiver, argument_count, arguments);
+    }
+    if (code_id == OSEO_ARRAY_FROM_ASYNC_CODE_ID) {
+        return array_from_async(
+            context,
+            receiver,
+            argument_count,
+            arguments
+        );
+    }
+    if (code_id == OSEO_ARRAY_FROM_ASYNC_FULFILL_CODE_ID ||
+        code_id == OSEO_ARRAY_FROM_ASYNC_REJECT_CODE_ID) {
+        return array_from_async_settled(
+            context,
+            callee,
+            code_id == OSEO_ARRAY_FROM_ASYNC_REJECT_CODE_ID,
+            argument_count > 0u ? arguments[0] : oseo_undefined()
+        );
     }
     if (code_id == OSEO_ARRAY_IS_ARRAY_CODE_ID) {
         OseoValue value = argument_count == 0u
@@ -2255,6 +2284,838 @@ static OseoResult array_from(
     return result;
 }
 
+/*
+ * Array.fromAsync runs its specification closure as a state machine. One
+ * environment record holds everything the closure captures or keeps
+ * across an Await, and two internal reaction functions over that record
+ * resume it with the settled value. Each Await performs PromiseResolve
+ * with %Promise% and attaches those reactions, so a native promise's
+ * `constructor` and a thenable's `then` are read where the closure
+ * awaits, and every resumption is one promise job.
+ */
+enum {
+    FROM_ASYNC_PROMISE = 0u,
+    FROM_ASYNC_CONSTRUCTOR,
+    FROM_ASYNC_MAPPER,
+    FROM_ASYNC_THIS_ARG,
+    /* The iterator record's [[Iterator]], or the array-like object. */
+    FROM_ASYNC_SOURCE,
+    /* The iterator record's [[NextMethod]]; undefined for an array-like. */
+    FROM_ASYNC_NEXT,
+    FROM_ASYNC_TARGET,
+    FROM_ASYNC_INDEX,
+    FROM_ASYNC_LENGTH,
+    FROM_ASYNC_PHASE,
+    FROM_ASYNC_FULFILL,
+    FROM_ASYNC_REJECT,
+    /* The abrupt completion AsyncIteratorClose returns once it settles. */
+    FROM_ASYNC_ERROR,
+    FROM_ASYNC_SLOT_COUNT,
+};
+
+/* The Await a suspended closure resumes from. */
+typedef enum {
+    FROM_ASYNC_AWAIT_NEXT = 0,
+    FROM_ASYNC_AWAIT_ITERATOR_MAPPED = 1,
+    FROM_ASYNC_AWAIT_ELEMENT = 2,
+    FROM_ASYNC_AWAIT_ELEMENT_MAPPED = 3,
+    FROM_ASYNC_AWAIT_CLOSE = 4,
+} FromAsyncPhase;
+
+/* The closure step that runs next. */
+typedef enum {
+    FROM_ASYNC_ITERATOR_STEP,
+    FROM_ASYNC_ITERATOR_RESULT,
+    FROM_ASYNC_ITERATOR_DEFINE,
+    FROM_ASYNC_ELEMENT_STEP,
+    FROM_ASYNC_ELEMENT_VALUE,
+    FROM_ASYNC_ELEMENT_DEFINE,
+    FROM_ASYNC_CLOSE,
+    FROM_ASYNC_RESOLVE,
+    FROM_ASYNC_REJECT_PROMISE,
+    FROM_ASYNC_SUSPENDED,
+} FromAsyncAction;
+
+static OseoValue from_async_slot(OseoValue state, size_t index) {
+    return environment_object(state)->slots[index];
+}
+
+static double from_async_number(OseoValue state, size_t index) {
+    return number_value(from_async_slot(state, index));
+}
+
+/* Stores into a slot index the record was created with, which
+ * oseo_environment_set accepts without allocating. */
+static void from_async_store(
+    OseoContext *context,
+    OseoValue state,
+    size_t index,
+    OseoValue value
+) {
+    (void)oseo_environment_set(context, state, index, value);
+}
+
+/*
+ * Await(value) for the closure: PromiseResolve(%Promise%, value) and the
+ * two reactions. The promise `then` derives is never observed, so it is
+ * marked handled. A throw from PromiseResolve is the Await's own abrupt
+ * completion, which the caller routes as the closure step requires.
+ */
+static OseoResult from_async_await(
+    OseoContext *context,
+    OseoValue state,
+    OseoValue value,
+    FromAsyncPhase phase
+) {
+    OseoValue slots[2] = {state, value};
+    OseoRootFrame frame = {NULL, slots, 2u};
+    oseo_roots_push(context, &frame);
+    from_async_store(
+        context,
+        slots[0],
+        FROM_ASYNC_PHASE,
+        oseo_number((double)phase)
+    );
+    OseoResult result = oseo_promise_resolve(context, slots[1]);
+    slots[1] = result.value;
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = oseo_promise_then(
+            context,
+            slots[1],
+            from_async_slot(slots[0], FROM_ASYNC_FULFILL),
+            from_async_slot(slots[0], FROM_ASYNC_REJECT)
+        );
+    }
+    if (result.status == OSEO_STATUS_NORMAL && is_promise(result.value)) {
+        OseoPromise *derived = promise_object(result.value);
+        derived->handled = true;
+        derived->pending_report = false;
+    }
+    oseo_roots_pop(context, &frame);
+    return result;
+}
+
+/* GetMethod(value, key) for one well-known symbol. */
+static OseoResult from_async_get_method(
+    OseoContext *context,
+    OseoValue value,
+    size_t symbol,
+    const char *message
+) {
+    OseoValue slots[2] = {value, oseo_undefined()};
+    OseoRootFrame frame = {NULL, slots, 2u};
+    oseo_roots_push(context, &frame);
+    OseoResult result = oseo_internal_well_known_symbol(context, symbol);
+    slots[1] = result.value;
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = oseo_object_get(context, slots[0], slots[1]);
+    }
+    if (result.status == OSEO_STATUS_NORMAL && is_nullish(result.value)) {
+        result = normal(oseo_undefined());
+    } else if (result.status == OSEO_STATUS_NORMAL &&
+               !is_callable(result.value)) {
+        result = type_error(context, message);
+    }
+    oseo_roots_pop(context, &frame);
+    return result;
+}
+
+/*
+ * Converts a caught language throw into the value the closure carries.
+ * A host diagnostic stays terminal and is returned to the caller.
+ */
+static bool from_async_caught(
+    OseoContext *context,
+    OseoResult result,
+    OseoValue *value
+) {
+    if (result.status != OSEO_STATUS_THROW || context->has_diagnostic) {
+        return false;
+    }
+    oseo_context_clear_language_error(context);
+    *value = result.value;
+    return true;
+}
+
+/*
+ * Runs the closure from `action` until it awaits or completes. `value`
+ * is the settled value or completion the action consumes. A language
+ * throw becomes the promise's rejection, or first closes the iterator
+ * where the closure uses IfAbruptCloseAsyncIterator or AsyncIteratorClose.
+ * Only a host diagnostic is returned as a throw.
+ */
+static OseoResult from_async_run(
+    OseoContext *context,
+    OseoValue state,
+    FromAsyncAction action,
+    OseoValue value
+) {
+    OseoRootFrame frame = {NULL, NULL, 0u};
+    OseoResult result = oseo_roots_allocate(context, &frame, 5u);
+    if (result.status != OSEO_STATUS_NORMAL) return result;
+    /* 0: state, 1: the value an action consumes, 2: a property key,
+     * 3 and 4: a mapper's two arguments. */
+    frame.slots[0] = state;
+    frame.slots[1] = value;
+    while (action != FROM_ASYNC_SUSPENDED) {
+        double index = from_async_number(frame.slots[0], FROM_ASYNC_INDEX);
+        bool mapping = tag_of(
+            from_async_slot(frame.slots[0], FROM_ASYNC_MAPPER)
+        ) != OSEO_TAG_UNDEFINED;
+        FromAsyncAction on_throw = FROM_ASYNC_REJECT_PROMISE;
+        switch (action) {
+        case FROM_ASYNC_ITERATOR_STEP:
+            if (index >= 9007199254740991.0) {
+                result = type_error(
+                    context,
+                    "Array.fromAsync has too many values."
+                );
+                on_throw = FROM_ASYNC_CLOSE;
+                break;
+            }
+            result = oseo_async_iterator_next_start(
+                context,
+                from_async_slot(frame.slots[0], FROM_ASYNC_SOURCE),
+                from_async_slot(frame.slots[0], FROM_ASYNC_NEXT)
+            );
+            if (result.status == OSEO_STATUS_NORMAL) {
+                result = from_async_await(
+                    context,
+                    frame.slots[0],
+                    result.value,
+                    FROM_ASYNC_AWAIT_NEXT
+                );
+            }
+            if (result.status == OSEO_STATUS_NORMAL) {
+                action = FROM_ASYNC_SUSPENDED;
+            }
+            break;
+        case FROM_ASYNC_ITERATOR_RESULT:
+            if (!is_object(frame.slots[1])) {
+                result = type_error(
+                    context,
+                    "The async iterator result is not an object."
+                );
+                break;
+            }
+            result = oseo_internal_ascii_string(context, "done");
+            frame.slots[2] = result.value;
+            if (result.status == OSEO_STATUS_NORMAL) {
+                result = oseo_object_get(
+                    context,
+                    frame.slots[1],
+                    frame.slots[2]
+                );
+            }
+            if (result.status == OSEO_STATUS_NORMAL &&
+                oseo_to_boolean(result.value)) {
+                result = array_set_length(
+                    context,
+                    from_async_slot(frame.slots[0], FROM_ASYNC_TARGET),
+                    index
+                );
+                if (result.status == OSEO_STATUS_NORMAL) {
+                    action = FROM_ASYNC_RESOLVE;
+                }
+                break;
+            }
+            if (result.status == OSEO_STATUS_NORMAL) {
+                result = oseo_internal_ascii_string(context, "value");
+                frame.slots[2] = result.value;
+            }
+            if (result.status == OSEO_STATUS_NORMAL) {
+                result = oseo_object_get(
+                    context,
+                    frame.slots[1],
+                    frame.slots[2]
+                );
+                frame.slots[1] = result.value;
+            }
+            if (result.status != OSEO_STATUS_NORMAL) break;
+            if (!mapping) {
+                action = FROM_ASYNC_ITERATOR_DEFINE;
+                break;
+            }
+            on_throw = FROM_ASYNC_CLOSE;
+            frame.slots[3] = frame.slots[1];
+            frame.slots[4] = oseo_number(index);
+            result = oseo_call_function(
+                context,
+                from_async_slot(frame.slots[0], FROM_ASYNC_MAPPER),
+                from_async_slot(frame.slots[0], FROM_ASYNC_THIS_ARG),
+                2u,
+                &frame.slots[3],
+                oseo_undefined()
+            );
+            if (result.status == OSEO_STATUS_NORMAL) {
+                result = from_async_await(
+                    context,
+                    frame.slots[0],
+                    result.value,
+                    FROM_ASYNC_AWAIT_ITERATOR_MAPPED
+                );
+            }
+            if (result.status == OSEO_STATUS_NORMAL) {
+                action = FROM_ASYNC_SUSPENDED;
+            }
+            break;
+        case FROM_ASYNC_ITERATOR_DEFINE:
+        case FROM_ASYNC_ELEMENT_DEFINE:
+            result = create_index_property(
+                context,
+                from_async_slot(frame.slots[0], FROM_ASYNC_TARGET),
+                index,
+                frame.slots[1]
+            );
+            if (action == FROM_ASYNC_ITERATOR_DEFINE) {
+                on_throw = FROM_ASYNC_CLOSE;
+            }
+            if (result.status == OSEO_STATUS_NORMAL) {
+                from_async_store(
+                    context,
+                    frame.slots[0],
+                    FROM_ASYNC_INDEX,
+                    oseo_number(index + 1.0)
+                );
+                action = action == FROM_ASYNC_ITERATOR_DEFINE
+                    ? FROM_ASYNC_ITERATOR_STEP
+                    : FROM_ASYNC_ELEMENT_STEP;
+            }
+            break;
+        case FROM_ASYNC_ELEMENT_STEP:
+            if (index >= from_async_number(
+                    frame.slots[0],
+                    FROM_ASYNC_LENGTH
+                )) {
+                result = array_set_length(
+                    context,
+                    from_async_slot(frame.slots[0], FROM_ASYNC_TARGET),
+                    index
+                );
+                if (result.status == OSEO_STATUS_NORMAL) {
+                    action = FROM_ASYNC_RESOLVE;
+                }
+                break;
+            }
+            result = oseo_property_key(context, oseo_number(index));
+            frame.slots[2] = result.value;
+            if (result.status == OSEO_STATUS_NORMAL) {
+                result = oseo_object_get(
+                    context,
+                    from_async_slot(frame.slots[0], FROM_ASYNC_SOURCE),
+                    frame.slots[2]
+                );
+            }
+            if (result.status == OSEO_STATUS_NORMAL) {
+                result = from_async_await(
+                    context,
+                    frame.slots[0],
+                    result.value,
+                    FROM_ASYNC_AWAIT_ELEMENT
+                );
+            }
+            if (result.status == OSEO_STATUS_NORMAL) {
+                action = FROM_ASYNC_SUSPENDED;
+            }
+            break;
+        case FROM_ASYNC_ELEMENT_VALUE:
+            if (!mapping) {
+                action = FROM_ASYNC_ELEMENT_DEFINE;
+                break;
+            }
+            frame.slots[3] = frame.slots[1];
+            frame.slots[4] = oseo_number(index);
+            result = oseo_call_function(
+                context,
+                from_async_slot(frame.slots[0], FROM_ASYNC_MAPPER),
+                from_async_slot(frame.slots[0], FROM_ASYNC_THIS_ARG),
+                2u,
+                &frame.slots[3],
+                oseo_undefined()
+            );
+            if (result.status == OSEO_STATUS_NORMAL) {
+                result = from_async_await(
+                    context,
+                    frame.slots[0],
+                    result.value,
+                    FROM_ASYNC_AWAIT_ELEMENT_MAPPED
+                );
+            }
+            if (result.status == OSEO_STATUS_NORMAL) {
+                action = FROM_ASYNC_SUSPENDED;
+            }
+            break;
+        case FROM_ASYNC_CLOSE: {
+            /* AsyncIteratorClose with a throw completion: the original
+             * error wins over every close-time failure, but a `return`
+             * result is still awaited before the promise rejects. */
+            from_async_store(
+                context,
+                frame.slots[0],
+                FROM_ASYNC_ERROR,
+                frame.slots[1]
+            );
+            OseoValue skip_validation = oseo_undefined();
+            bool needs_await = false;
+            result = oseo_async_iterator_close_start(
+                context,
+                from_async_slot(frame.slots[0], FROM_ASYNC_SOURCE),
+                true,
+                &skip_validation,
+                &needs_await
+            );
+            if (result.status == OSEO_STATUS_NORMAL && needs_await) {
+                result = from_async_await(
+                    context,
+                    frame.slots[0],
+                    result.value,
+                    FROM_ASYNC_AWAIT_CLOSE
+                );
+                if (result.status == OSEO_STATUS_NORMAL) {
+                    action = FROM_ASYNC_SUSPENDED;
+                }
+            }
+            if (action != FROM_ASYNC_SUSPENDED &&
+                (result.status == OSEO_STATUS_NORMAL ||
+                 !context->has_diagnostic)) {
+                if (result.status != OSEO_STATUS_NORMAL) {
+                    oseo_context_clear_language_error(context);
+                }
+                result = normal(oseo_undefined());
+                frame.slots[1] = from_async_slot(
+                    frame.slots[0],
+                    FROM_ASYNC_ERROR
+                );
+                action = FROM_ASYNC_REJECT_PROMISE;
+            }
+            break;
+        }
+        case FROM_ASYNC_RESOLVE:
+            result = oseo_promise_resolve_into(
+                context,
+                from_async_slot(frame.slots[0], FROM_ASYNC_PROMISE),
+                from_async_slot(frame.slots[0], FROM_ASYNC_TARGET)
+            );
+            if (result.status == OSEO_STATUS_NORMAL) {
+                action = FROM_ASYNC_SUSPENDED;
+            }
+            break;
+        case FROM_ASYNC_REJECT_PROMISE:
+            result = oseo_promise_reject_into(
+                context,
+                from_async_slot(frame.slots[0], FROM_ASYNC_PROMISE),
+                frame.slots[1]
+            );
+            if (result.status == OSEO_STATUS_NORMAL) {
+                action = FROM_ASYNC_SUSPENDED;
+            }
+            break;
+        case FROM_ASYNC_SUSPENDED:
+            break;
+        }
+        if (result.status != OSEO_STATUS_NORMAL) {
+            if (!from_async_caught(context, result, &frame.slots[1])) break;
+            /* A failure to settle the promise itself cannot be reported
+             * through that promise. */
+            if (action == FROM_ASYNC_RESOLVE ||
+                action == FROM_ASYNC_REJECT_PROMISE) {
+                break;
+            }
+            result = normal(oseo_undefined());
+            action = on_throw;
+        }
+    }
+    if (result.status == OSEO_STATUS_NORMAL) result = normal(oseo_undefined());
+    oseo_roots_release(context, &frame);
+    return result;
+}
+
+/*
+ * The fulfillment and rejection reactions of one Await. The phase the
+ * closure suspended in decides which step consumes the settled value.
+ */
+static OseoResult array_from_async_settled(
+    OseoContext *context,
+    OseoValue callee,
+    bool rejected,
+    OseoValue value
+) {
+    OseoValue slots[2] = {callee, value};
+    OseoRootFrame frame = {NULL, slots, 2u};
+    oseo_roots_push(context, &frame);
+    OseoResult result = oseo_function_environment(context, slots[0]);
+    slots[0] = result.value;
+    if (result.status == OSEO_STATUS_NORMAL &&
+        is_environment(slots[0]) &&
+        environment_object(slots[0])->slot_count == 1u) {
+        slots[0] = from_async_slot(slots[0], 0u);
+    }
+    if (result.status == OSEO_STATUS_NORMAL &&
+        (!is_environment(slots[0]) ||
+         environment_object(slots[0])->slot_count != FROM_ASYNC_SLOT_COUNT)) {
+        result = failure(
+            context,
+            "OSEO2001",
+            "Invalid Array.fromAsync state."
+        );
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        FromAsyncPhase phase = (FromAsyncPhase)from_async_number(
+            slots[0],
+            FROM_ASYNC_PHASE
+        );
+        FromAsyncAction action = FROM_ASYNC_REJECT_PROMISE;
+        switch (phase) {
+        case FROM_ASYNC_AWAIT_NEXT:
+            action = rejected
+                ? FROM_ASYNC_REJECT_PROMISE
+                : FROM_ASYNC_ITERATOR_RESULT;
+            break;
+        case FROM_ASYNC_AWAIT_ITERATOR_MAPPED:
+            action = rejected ? FROM_ASYNC_CLOSE : FROM_ASYNC_ITERATOR_DEFINE;
+            break;
+        case FROM_ASYNC_AWAIT_ELEMENT:
+            action = rejected
+                ? FROM_ASYNC_REJECT_PROMISE
+                : FROM_ASYNC_ELEMENT_VALUE;
+            break;
+        case FROM_ASYNC_AWAIT_ELEMENT_MAPPED:
+            action = rejected
+                ? FROM_ASYNC_REJECT_PROMISE
+                : FROM_ASYNC_ELEMENT_DEFINE;
+            break;
+        case FROM_ASYNC_AWAIT_CLOSE:
+            /* Whatever `return` settled to, the closure rejects with the
+             * error that started the close. */
+            slots[1] = from_async_slot(slots[0], FROM_ASYNC_ERROR);
+            action = FROM_ASYNC_REJECT_PROMISE;
+            break;
+        }
+        result = from_async_run(context, slots[0], action, slots[1]);
+    }
+    oseo_roots_pop(context, &frame);
+    return result;
+}
+
+/*
+ * One reaction over the call's state. A function captures a copy of the
+ * environment it is created with, so the reaction's environment is a
+ * one-slot holder that refers to the shared state record.
+ */
+static OseoResult from_async_reaction_create(
+    OseoContext *context,
+    OseoValue state,
+    size_t code_id
+) {
+    OseoValue slots[2] = {state, oseo_undefined()};
+    OseoRootFrame frame = {NULL, slots, 2u};
+    oseo_roots_push(context, &frame);
+    OseoResult result = oseo_environment_create(context, 1u);
+    slots[1] = result.value;
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = oseo_environment_set(context, slots[1], 0u, slots[0]);
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = oseo_function_create(
+            context,
+            code_id,
+            slots[1],
+            NULL,
+            0u,
+            1u,
+            OSEO_FUNCTION_INTERNAL,
+            oseo_undefined(),
+            oseo_undefined(),
+            OSEO_FUNCTION_NAME_PREFIX_NONE
+        );
+    }
+    oseo_roots_pop(context, &frame);
+    return result;
+}
+
+/*
+ * The closure's steps before its first Await: validate the mapper, pick
+ * the async iterator, the sync iterator through the Async-from-Sync
+ * wrapper, or the array-like path, and create the target. Returns the
+ * first action, with any language throw left for the caller to reject.
+ */
+static OseoResult from_async_open(
+    OseoContext *context,
+    OseoValue state,
+    OseoValue items,
+    FromAsyncAction *action
+) {
+    OseoRootFrame frame = {NULL, NULL, 0u};
+    OseoResult result = oseo_roots_allocate(context, &frame, 5u);
+    if (result.status != OSEO_STATUS_NORMAL) return result;
+    /* 0: state, 1: items, 2: method, 3: iterator, 4: scratch. */
+    frame.slots[0] = state;
+    frame.slots[1] = items;
+    OseoValue mapper = from_async_slot(frame.slots[0], FROM_ASYNC_MAPPER);
+    if (tag_of(mapper) != OSEO_TAG_UNDEFINED && !is_callable(mapper)) {
+        result = type_error(context, "Array.fromAsync mapfn is not callable.");
+    }
+    bool sync = false;
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = from_async_get_method(
+            context,
+            frame.slots[1],
+            OSEO_WELL_KNOWN_ASYNC_ITERATOR,
+            "The Symbol.asyncIterator method is not callable."
+        );
+        frame.slots[2] = result.value;
+    }
+    if (result.status == OSEO_STATUS_NORMAL &&
+        tag_of(frame.slots[2]) == OSEO_TAG_UNDEFINED) {
+        sync = true;
+        result = from_async_get_method(
+            context,
+            frame.slots[1],
+            OSEO_WELL_KNOWN_ITERATOR,
+            "The Symbol.iterator method is not callable."
+        );
+        frame.slots[2] = result.value;
+    }
+    bool iterating = result.status == OSEO_STATUS_NORMAL &&
+        tag_of(frame.slots[2]) != OSEO_TAG_UNDEFINED;
+    if (iterating) {
+        /* GetIteratorFromMethod reads `next` without checking it; a
+         * non-callable `next` throws when the first step calls it. */
+        result = oseo_call_function(
+            context,
+            frame.slots[2],
+            frame.slots[1],
+            0u,
+            NULL,
+            oseo_undefined()
+        );
+        frame.slots[3] = result.value;
+        if (result.status == OSEO_STATUS_NORMAL &&
+            !is_object(frame.slots[3])) {
+            result = type_error(context, "The iterator is not an object.");
+        }
+        if (result.status == OSEO_STATUS_NORMAL) {
+            result = oseo_internal_ascii_string(context, "next");
+            frame.slots[4] = result.value;
+        }
+        if (result.status == OSEO_STATUS_NORMAL) {
+            result = oseo_object_get(
+                context,
+                frame.slots[3],
+                frame.slots[4]
+            );
+            frame.slots[4] = result.value;
+        }
+        if (result.status == OSEO_STATUS_NORMAL && sync) {
+            result = oseo_internal_async_from_sync_wrap(
+                context,
+                frame.slots[3]
+            );
+            frame.slots[3] = result.value;
+        }
+        if (result.status == OSEO_STATUS_NORMAL) {
+            from_async_store(
+                context,
+                frame.slots[0],
+                FROM_ASYNC_SOURCE,
+                frame.slots[3]
+            );
+            from_async_store(
+                context,
+                frame.slots[0],
+                FROM_ASYNC_NEXT,
+                frame.slots[4]
+            );
+            frame.slots[2] = from_async_slot(
+                frame.slots[0],
+                FROM_ASYNC_CONSTRUCTOR
+            );
+            result = function_is_constructible(frame.slots[2])
+                ? construct_function(context, frame.slots[2], 0u, NULL)
+                : oseo_array_create(context, 0u);
+        }
+        *action = FROM_ASYNC_ITERATOR_STEP;
+    } else if (result.status == OSEO_STATUS_NORMAL) {
+        /* Neither method exists, so the value is treated as array-like.
+         * GetMethod already rejected undefined and null. */
+        result = oseo_internal_to_object(context, frame.slots[1]);
+        frame.slots[1] = result.value;
+        double length = 0.0;
+        if (result.status == OSEO_STATUS_NORMAL) {
+            result = array_like_length(context, frame.slots[1], &length);
+        }
+        if (result.status == OSEO_STATUS_NORMAL) {
+            from_async_store(
+                context,
+                frame.slots[0],
+                FROM_ASYNC_SOURCE,
+                frame.slots[1]
+            );
+            from_async_store(
+                context,
+                frame.slots[0],
+                FROM_ASYNC_LENGTH,
+                oseo_number(length)
+            );
+            frame.slots[2] = from_async_slot(
+                frame.slots[0],
+                FROM_ASYNC_CONSTRUCTOR
+            );
+            frame.slots[4] = oseo_number(length);
+            if (function_is_constructible(frame.slots[2])) {
+                result = construct_function(
+                    context,
+                    frame.slots[2],
+                    1u,
+                    &frame.slots[4]
+                );
+            } else if (length > (double)UINT32_MAX) {
+                result = oseo_internal_throw_error(
+                    context,
+                    OSEO_ERROR_RANGE,
+                    "Invalid array length."
+                );
+            } else {
+                result = oseo_array_create(context, (size_t)length);
+            }
+        }
+        *action = FROM_ASYNC_ELEMENT_STEP;
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        from_async_store(
+            context,
+            frame.slots[0],
+            FROM_ASYNC_TARGET,
+            result.value
+        );
+    }
+    oseo_roots_release(context, &frame);
+    return result;
+}
+
+/*
+ * Array.fromAsync(asyncItems [, mapfn [, thisArg]]): AsyncFunctionStart
+ * runs the closure synchronously up to its first Await, so every abrupt
+ * completion, including a non-callable mapfn, rejects the returned
+ * promise instead of throwing to the caller.
+ */
+static OseoResult array_from_async(
+    OseoContext *context,
+    OseoValue receiver,
+    size_t argument_count,
+    const OseoValue *arguments
+) {
+    if (argument_count > 0u && arguments == NULL) {
+        return failure(
+            context,
+            "OSEO2001",
+            "Array.fromAsync arguments are missing."
+        );
+    }
+    OseoRootFrame frame = {NULL, NULL, 0u};
+    OseoResult result = oseo_roots_allocate(context, &frame, 4u);
+    if (result.status != OSEO_STATUS_NORMAL) return result;
+    /* 0: promise, 1: state, 2: items, 3: scratch. */
+    frame.slots[2] = builtin_argument(argument_count, arguments, 0u);
+    result = oseo_internal_promise_create(context);
+    frame.slots[0] = result.value;
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = oseo_environment_create(context, FROM_ASYNC_SLOT_COUNT);
+        frame.slots[1] = result.value;
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        for (size_t index = 0u; index < FROM_ASYNC_SLOT_COUNT; index += 1u) {
+            from_async_store(
+                context,
+                frame.slots[1],
+                index,
+                oseo_undefined()
+            );
+        }
+        from_async_store(
+            context,
+            frame.slots[1],
+            FROM_ASYNC_PROMISE,
+            frame.slots[0]
+        );
+        from_async_store(
+            context,
+            frame.slots[1],
+            FROM_ASYNC_CONSTRUCTOR,
+            receiver
+        );
+        from_async_store(
+            context,
+            frame.slots[1],
+            FROM_ASYNC_MAPPER,
+            builtin_argument(argument_count, arguments, 1u)
+        );
+        from_async_store(
+            context,
+            frame.slots[1],
+            FROM_ASYNC_THIS_ARG,
+            builtin_argument(argument_count, arguments, 2u)
+        );
+        from_async_store(
+            context,
+            frame.slots[1],
+            FROM_ASYNC_INDEX,
+            oseo_number(0.0)
+        );
+        result = from_async_reaction_create(
+            context,
+            frame.slots[1],
+            OSEO_ARRAY_FROM_ASYNC_FULFILL_CODE_ID
+        );
+        frame.slots[3] = result.value;
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        from_async_store(
+            context,
+            frame.slots[1],
+            FROM_ASYNC_FULFILL,
+            frame.slots[3]
+        );
+        result = from_async_reaction_create(
+            context,
+            frame.slots[1],
+            OSEO_ARRAY_FROM_ASYNC_REJECT_CODE_ID
+        );
+        frame.slots[3] = result.value;
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        from_async_store(
+            context,
+            frame.slots[1],
+            FROM_ASYNC_REJECT,
+            frame.slots[3]
+        );
+        FromAsyncAction action = FROM_ASYNC_REJECT_PROMISE;
+        result = from_async_open(
+            context,
+            frame.slots[1],
+            frame.slots[2],
+            &action
+        );
+        frame.slots[3] = oseo_undefined();
+        if (from_async_caught(context, result, &frame.slots[3])) {
+            action = FROM_ASYNC_REJECT_PROMISE;
+            result = normal(oseo_undefined());
+        }
+        if (result.status == OSEO_STATUS_NORMAL) {
+            result = from_async_run(
+                context,
+                frame.slots[1],
+                action,
+                frame.slots[3]
+            );
+        }
+    }
+    if (result.status == OSEO_STATUS_NORMAL) result.value = frame.slots[0];
+    oseo_roots_release(context, &frame);
+    return result;
+}
+
 static OseoResult array_of(
     OseoContext *context,
     OseoValue receiver,
@@ -2675,6 +3536,31 @@ OseoResult oseo_internal_array_intrinsic(OseoContext *context) {
                 context->realm->intrinsics[static_intrinsics[index]],
                 method
             );
+        }
+        /* Array.fromAsync follows `from` and owns no intrinsic slot. */
+        if (result.status == OSEO_STATUS_NORMAL && index == 0u) {
+            result = array_builtin_function(
+                context,
+                OSEO_ARRAY_FROM_ASYNC_CODE_ID,
+                "fromAsync",
+                1u,
+                OSEO_FUNCTION_INTERNAL,
+                OSEO_FUNCTION_NAME_PREFIX_NONE
+            );
+            frame.slots[2] = result.value;
+            if (result.status == OSEO_STATUS_NORMAL) {
+                result = oseo_internal_ascii_string(context, "fromAsync");
+                frame.slots[3] = result.value;
+            }
+            if (result.status == OSEO_STATUS_NORMAL) {
+                result = oseo_object_define(
+                    context,
+                    frame.slots[1],
+                    frame.slots[3],
+                    frame.slots[2],
+                    method
+                );
+            }
         }
     }
     if (result.status == OSEO_STATUS_NORMAL) {

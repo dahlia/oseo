@@ -14,11 +14,12 @@ the [M5 exit report](./m5c-closure/m5-exit-report.md) keeps the M5 result.
 A change that admits or measures behavior inside this boundary updates this
 document in the same change. A family's status describes tested current
 behavior, never intended behavior. The Annex B built-in units, the Annex B
-Object accessors, the small ECMAScript 2026 built-in units, and `iterator-zip`
-hold the family records so far; see [Annex B built-ins](#annex-b-built-ins),
+Object accessors, the small ECMAScript 2026 built-in units, `iterator-zip`, and
+`array-from-async` hold the family records so far; see
+[Annex B built-ins](#annex-b-built-ins),
 [Annex B Object accessors](#annex-b-object-accessors),
 [Small ECMAScript 2026 built-in families](#small-ecmascript-2026-built-in-families),
-and [Joint iteration](#joint-iteration).
+[Joint iteration](#joint-iteration), and [`Array.fromAsync`](#arrayfromasync).
 
 
 Claim boundary
@@ -538,3 +539,51 @@ the probe of that state runs on Deno alone. The property suite,
 and checks the native result against a second model of the closure and the
 reference model on Node.js. The family record is
 [*iterator-zip.yaml*](./language-profile-es2026/families/iterator-zip.yaml).
+
+
+`Array.fromAsync`
+-----------------
+
+`Array.fromAsync(asyncItems [, mapfn [, thisArg]])` is a writable,
+non-enumerable, configurable own function property of `%Array%` with length 1.
+It is not a constructor. It always returns a new `%Promise%`: the edition runs
+its closure through AsyncFunctionStart, so the steps before the first Await
+run during the call and every abrupt completion, including a non-callable
+`mapfn` or an `undefined` or `null` input, rejects that promise instead of
+throwing.
+
+The closure reads `Symbol.asyncIterator`, then `Symbol.iterator` only when the
+first is absent, and calls the method it found. An async iterator's values are
+not awaited. A synchronous iterator goes through the Async-from-Sync wrapper,
+so each value is awaited and a rejected value closes the iterator. A value
+with neither method is an array-like object: its length is read once, and
+each element is read and awaited in index order. A mapper result is awaited
+too. A constructor receiver is constructed with no arguments for an iterable
+and with the length for an array-like; any other receiver gets an ordinary
+array. Elements are defined with CreateDataPropertyOrThrow, and the length is
+set at the end.
+
+A failure of the mapper, of the Await on its result, or of an element
+definition closes an iterator and awaits its `return` result, and the
+original error rejects the promise whatever `return` does. A failure of the
+iterator itself, of its result object, or of the final length Set propagates
+without a close.
+
+Node.js and Deno are both reference hosts, and the fixtures match them turn
+for turn except where V8 departs from the edition. V8 reads a synchronous
+iterator's `next` twice, closes that iterator a second time when a value
+rejects, closes an async iterator after a failure of its own step or of the
+final length Set, and never settles the promise when the close's `return`
+lookup or call throws or its result rejects. The `array-from-async-edition`
+fixture checks those cases against the edition's steps, and the property suite
+compares them with its model alone.
+
+The property suite generates async iterables, synchronous iterables, and
+array-likes of numbers, promises, thenables, and rejected promises, with
+failing `next` steps, six mapper kinds, and three receivers, and compares the
+settled result and the order of observable steps with an independent model of
+the closure. Of the 95 test262 paths, 88 pass in a local observation with the
+reviewed harness copies. The other seven call `TemporalHelpers.observeProperty`,
+which the reviewed *temporalHelpers.js* omits; they pass with the upstream
+member. The family record is
+[*array-from-async.yaml*](./language-profile-es2026/families/array-from-async.yaml).

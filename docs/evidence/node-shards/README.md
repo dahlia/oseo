@@ -56,7 +56,7 @@ three sums, rounded up, so the margin below is a slow runner's. Files under 30
 seconds have no entry and weigh the host fallback, 18 seconds on both hosts,
 which is the median of every measured weight.
 
-Twenty-two files postdate those runs. Local runs from 2026-11-01 to
+Twenty-four files postdate those runs. Local runs from 2026-11-01 to
 2026-11-04 of the residual evidence and those files, on one host, give the
 calibration:
 
@@ -85,6 +85,8 @@ calibration:
 | *tests/property/m5-annexb-object-accessors.property.test.ts* |     38.0 |           98 |           75 |
 | *tests/annexb-proto-boundary.test.ts*                        |    135.5 |          349 |          268 |
 | *tests/annexb-legacy-lookup-boundary.test.ts*                |     37.3 |           97 |           74 |
+| *tests/array-from-async-native.test.ts*                      |     20.2 |           53 |           40 |
+| *tests/property/es2026-array-from-async.property.test.ts*    |     34.1 |           88 |           68 |
 
 The ratios are 2.574 for Linux and 1.974 for macOS, the residual file's
 largest CI sum over its local sum. The fastest Linux observation gives

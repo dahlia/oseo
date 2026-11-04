@@ -32,6 +32,7 @@ EXCLUDED = {
 # Linux extended measurement, not a CI file-shard sum. See the U6 README.
 RETAINED = {
     'tests/property/es2026-iterator-zip.property.test.ts',
+    'tests/property/es2026-array-from-async.property.test.ts',
     'tests/property/es2026-iterator-concat.property.test.ts',
     'tests/property/es2026-upsert.property.test.ts',
     'tests/property/es2026-math-sum-precise.property.test.ts',

@@ -3957,6 +3957,13 @@ static OseoResult async_from_sync_create(
     return result;
 }
 
+OseoResult oseo_internal_async_from_sync_wrap(
+    OseoContext *context,
+    OseoValue sync_iterator
+) {
+    return async_from_sync_create(context, sync_iterator);
+}
+
 /*
  * GetIterator(iterable, async): read the Symbol.asyncIterator method and
  * call it, then capture the resulting iterator's next method once. A
