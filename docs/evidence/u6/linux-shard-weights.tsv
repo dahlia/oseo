@@ -18,6 +18,7 @@ tests/property/m5-annexb-escape.property.test.ts	263	-	-	-	263
 tests/property/m5-annexb-legacy-lookup-boundary.property.test.ts	318	616027.718952	343317.847343	614422.669219	615
 tests/property/m5-annexb-object-accessors.property.test.ts	464	-	-	-	464
 tests/property/m5-annexb-proto-boundary.property.test.ts	-	1447980.133911	821021.599192	1446566.353864	1447
+tests/property/m5-annexb-regexp-compile.property.test.ts	608	-	-	-	608
 tests/property/m5-annexb-regexp-syntax.property.test.ts	415	-	-	-	415
 tests/property/m5-annexb-string-methods.property.test.ts	219	-	-	-	219
 tests/property/m5-arguments-object.property.test.ts	647	708103.071930	678695.036924	421222.533194	679

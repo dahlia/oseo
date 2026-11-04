@@ -1,0 +1,3 @@
+version: 1
+id: annexb-regexp-compile
+record: docs/language-profile-es2026/families/annexb-regexp-compile.yaml

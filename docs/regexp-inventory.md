@@ -201,8 +201,8 @@ Pattern grammar acceptance
 The owned parser implements the main-body pattern grammar and, for a
 pattern without `u` or `v`, the grammar of Annex B's Regular Expressions
 Patterns section. The runtime's own validator and pattern compiler, which
-serve the `RegExp` constructor and the String methods that create a RegExp,
-follow the same grammar. Without those flags each of these is
+serve the `RegExp` constructor, the String methods that create a RegExp, and
+`compile`, follow the same grammar. Without those flags each of these is
 accepted with its Annex B reading:
 
  -  an identity escape over any character but `c`, such as `\a`, `\_`, or

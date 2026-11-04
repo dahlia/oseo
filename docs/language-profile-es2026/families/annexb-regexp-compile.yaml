@@ -1,0 +1,59 @@
+version: 1
+id: annexb-regexp-compile
+title: "Annex B RegExp.prototype.compile"
+scope:
+  - "RegExp.prototype.compile of B.2.4.1: the receiver check, the TypeError
+    for a RegExp pattern with flags, the copy of a RegExp pattern's
+    original source and flags, and RegExpInitialize of the receiver in
+    place with the constructor's conversion order and validation."
+  - "The lastIndex reset after reinitialization and its TypeError on a
+    non-writable lastIndex, with the receiver already holding the new
+    pattern, and a SyntaxError that leaves the receiver unchanged."
+  - "Literal, constructed, and subclass receivers, recompilation from user
+    code that @@split and exec run, and the name, length, and writable,
+    non-enumerable, configurable descriptor of the method."
+owners:
+  - docs/language-profile-es2026.md
+evidence:
+  differential:
+    status: covered
+    references:
+      - tests/annexb-syntax-native.test.ts
+      - tests/native/fixtures/annexb-regexp-compile.ts
+      - tests/property/m5-annexb-regexp-compile.property.test.ts
+  fixed:
+    status: covered
+    references:
+      - tests/native/fixtures/annexb-regexp-compile.ts
+  forced-collection:
+    status: covered
+    references:
+      - tests/annexb-syntax-native.test.ts
+      - tests/property/m5-annexb-regexp-compile.property.test.ts
+  generated:
+    status: covered
+    references:
+      - tests/property/m5-annexb-regexp-compile.property.test.ts
+  guard-fallback:
+    status: covered
+    references:
+      - tests/annexb-syntax-native.test.ts
+      - tests/native/fixtures/annexb-regexp-compile.ts
+  specialization:
+    status: covered
+    references:
+      - tests/annexb-syntax-native.test.ts
+      - tests/property/m5-annexb-regexp-compile.property.test.ts
+  standards:
+    status: omitted
+    reason: "The 24 test262 paths under
+      test/annexB/built-ins/RegExp/prototype/compile/, flags/, and
+      Symbol.split/ stay unreviewed until Root admits them in its full
+      UPDATE."
+    replacements:
+      - tests/native/fixtures/annexb-regexp-compile.ts
+      - tests/property/m5-annexb-regexp-compile.property.test.ts
+  structural:
+    status: covered
+    references:
+      - packages/runtime-c/tests/intrinsic-graph.test.ts

@@ -11,8 +11,8 @@ Implementation status: in progress. The `claim-boundary` unit has applied ADR
 `array-from-async`, `json-parse-source`, `uint8array-base64`,
 `atomics-pause`, `annexb-function-declarations`, `annexb-statement-forms`,
 `disposal-intrinsics`, and `using-declarations` units are implemented and
-observed. The `annexb-syntax` unit is implemented and waits for Root's full
-observation. Every other unit is open.
+observed. The `annexb-syntax` and `annexb-regexp-compile` units are
+implemented and wait for Root's full observation. Every other unit is open.
 This plan follows M5 directly and runs alongside M6. It has no milestone
 number. It schedules the language work the maintainer approved on 2026-11-02:
 build-time static-specifier `import()`, Annex B legacy web behavior except
@@ -91,26 +91,26 @@ These are presence checks, not conformance results.
 
 A probe of the current build and the reviewed manifest shows this Annex B state:
 
-| Annex B behavior                                   | Current state                                                                 |
-| -------------------------------------------------- | ----------------------------------------------------------------------------- |
-| HTML-like comments in Script code                  | Pinned by `annexb-syntax`: Script only; modules report OSEO0001               |
-| Legacy octal literals, `\8`, `\9`, octal escapes   | Core grammar in the inventory; non-strict rows pass                           |
-| `__proto__: value` in object initializers          | Core syntax, admitted by M5a Unit 8.1c                                        |
-| `var` redeclaring a simple catch parameter         | Admitted by M5a Unit 8.5c, including `for (var e of ...)`                     |
-| `WeakRef.prototype.constructor`                    | Installed; its test262 row passes                                             |
-| `Object.prototype.__proto__` accessor              | Installed by `annexb-object-accessors`; its test262 rows pass                 |
-| `__lookupGetter__`, `__lookupSetter__`             | Installed by `annexb-object-accessors`; its test262 rows pass                 |
-| `__defineGetter__`, `__defineSetter__`             | Installed by `annexb-object-accessors`; its test262 rows pass                 |
-| Annex B RegExp pattern grammar                     | Implemented by `annexb-syntax` for literals and run-time patterns             |
-| `escape`, `unescape`                               | Installed by `annexb-escape`; all 35 test262 rows pass                        |
-| `substr`, HTML methods, `trimLeft`, `trimRight`    | Installed by `annexb-string-methods`; all 105 test262 rows pass               |
-| `getYear`, `setYear`, `toGMTString`                | Installed by `annexb-date-methods`; all 24 test262 rows pass                  |
-| `RegExp.prototype.compile`                         | Not installed                                                                 |
-| Labelled function declarations                     | Implemented by `annexb-function-declarations`; its test262 row passes         |
-| Function declarations in `if` clauses              | Implemented by `annexb-function-declarations`; its test262 rows pass          |
-| Block-level function web legacy semantics          | Implemented by `annexb-function-declarations`; its test262 rows pass          |
-| `for (var x = init in obj)`                        | Implemented by `annexb-statement-forms`; its test262 rows pass                |
-| Function call assignment targets as runtime errors | Implemented by `annexb-statement-forms`; its test262 rows pass                |
+| Annex B behavior                                   | Current state                                                         |
+| -------------------------------------------------- | --------------------------------------------------------------------- |
+| HTML-like comments in Script code                  | Pinned by `annexb-syntax`: Script only; modules report OSEO0001       |
+| Legacy octal literals, `\8`, `\9`, octal escapes   | Core grammar in the inventory; non-strict rows pass                   |
+| `__proto__: value` in object initializers          | Core syntax, admitted by M5a Unit 8.1c                                |
+| `var` redeclaring a simple catch parameter         | Admitted by M5a Unit 8.5c, including `for (var e of ...)`             |
+| `WeakRef.prototype.constructor`                    | Installed; its test262 row passes                                     |
+| `Object.prototype.__proto__` accessor              | Installed by `annexb-object-accessors`; its test262 rows pass         |
+| `__lookupGetter__`, `__lookupSetter__`             | Installed by `annexb-object-accessors`; its test262 rows pass         |
+| `__defineGetter__`, `__defineSetter__`             | Installed by `annexb-object-accessors`; its test262 rows pass         |
+| Annex B RegExp pattern grammar                     | Implemented by `annexb-syntax` for literals and run-time patterns     |
+| `escape`, `unescape`                               | Installed by `annexb-escape`; all 35 test262 rows pass                |
+| `substr`, HTML methods, `trimLeft`, `trimRight`    | Installed by `annexb-string-methods`; all 105 test262 rows pass       |
+| `getYear`, `setYear`, `toGMTString`                | Installed by `annexb-date-methods`; all 24 test262 rows pass          |
+| `RegExp.prototype.compile`                         | Installed by `annexb-regexp-compile`                                  |
+| Labelled function declarations                     | Implemented by `annexb-function-declarations`; its test262 row passes |
+| Function declarations in `if` clauses              | Implemented by `annexb-function-declarations`; its test262 rows pass  |
+| Block-level function web legacy semantics          | Implemented by `annexb-function-declarations`; its test262 rows pass  |
+| `for (var x = init in obj)`                        | Implemented by `annexb-statement-forms`; its test262 rows pass        |
+| Function call assignment targets as runtime errors | Implemented by `annexb-statement-forms`; its test262 rows pass        |
 
 The M5 `__proto__` boundary is documented in the
 [omitted legacy accessor metadata contract](./docs/language-profile-m5.md#omitted-legacy-accessor-metadata-boundary),
@@ -463,7 +463,7 @@ OSEO1001 profile boundary that the M5 profile describes for literals and for
 as its oracle selector, now with an Annex B mode.
 
 Status: implemented, with fixed, differential, and generated evidence in the
-[profile section](./docs/language-profile-es2026.md#annex-b-syntax).
+[profile section](./docs/language-profile-es2026.md#annex-b-syntax-and-compile).
 A focused run of the owned paths passes or expects a negative result for
 every one, including *separator-regexp.js*, except the two `eval` rows
 `RegExp-leading-escape-BMP.js` and `RegExp-trailing-escape-BMP.js`; the rows
@@ -511,6 +511,10 @@ needs the `annexb-syntax` grammar. Its effect on `lastIndex`, on an object
 whose `lastIndex` is non-writable, and on a subclass instance follows the
 edition. A compiled artifact may be shared only while the source and flags it
 was built from still match.
+
+Status: implemented, with fixed, differential, and generated evidence in the
+[profile section](./docs/language-profile-es2026.md#regexpprototypecompile).
+The rows wait for Root's full observation.
 
 ### `annexb-object-accessors`
 
@@ -765,7 +769,7 @@ standards update and heavy gates on the new base.
     row's owner moves. The audit binds ADR texts by digest, so a unit that
     edits ADR 0013, 0016, or 0028 re-reviews the rows that cite it.
  -  The runtime ABI version in *packages/runtime-c/src/index.ts*, currently
-    `m5-157`, changes once per landing that alters the ABI. The series keeps
+    `m5-158`, changes once per landing that alters the ABI. The series keeps
     its `m5-` prefix, and the closure tools keep their `m5c` names.
  -  Runtime code ranges, property blocks, intrinsic indexes, and heap kinds
     are reserved per unit.

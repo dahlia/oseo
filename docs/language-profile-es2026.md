@@ -14,13 +14,14 @@ the [M5 exit report](./m5c-closure/m5-exit-report.md) keeps the M5 result.
 A change that admits or measures behavior inside this boundary updates this
 document in the same change. A family's status describes tested current
 behavior, never intended behavior. The Annex B built-in units, the Annex B
-Object accessors, the Annex B language units, the Annex B syntax unit, the
-small ECMAScript 2026 built-in units, `iterator-zip`, `array-from-async`,
-`json-parse-source`, and the two explicit resource management units hold the
-family records so far; see [Annex B built-ins](#annex-b-built-ins),
+Object accessors, the Annex B language units, the Annex B syntax and
+`RegExp.prototype.compile` units, the small ECMAScript 2026 built-in units,
+`iterator-zip`, `array-from-async`, `json-parse-source`, and the two explicit
+resource management units hold the family records so far; see
+[Annex B built-ins](#annex-b-built-ins),
 [Annex B Object accessors](#annex-b-object-accessors),
 [Annex B language semantics](#annex-b-language-semantics),
-[Annex B syntax](#annex-b-syntax),
+[Annex B syntax and `compile`](#annex-b-syntax-and-compile),
 [Small ECMAScript 2026 built-in families](#small-ecmascript-2026-built-in-families),
 [Joint iteration](#joint-iteration), [`Array.fromAsync`](#arrayfromasync),
 [JSON source text](#json-source-text), and
@@ -490,15 +491,16 @@ domain beyond their fixed shapes, so their record omits the generated class.
 declarations receive a copy and which forms stay early errors.
 
 
-Annex B syntax
---------------
+Annex B syntax and `compile`
+----------------------------
 
-The `annexb-syntax` unit adds the Annex B language syntax that has no family
-elsewhere. Its family record is `annexb-syntax`. Its test262 rows stay
-unreviewed until Root admits them; a focused run of the owned paths passes or
-expects a negative result for every one except the two
-`RegExp-leading-escape-BMP.js` and `RegExp-trailing-escape-BMP.js` rows, which
-call `eval` and belong to ADR 0016.
+The `annexb-syntax` and `annexb-regexp-compile` units add the Annex B
+language syntax that has no family elsewhere and the one Annex B
+`RegExp.prototype` method. Their family records are `annexb-syntax` and
+`annexb-regexp-compile`. Their test262 rows stay unreviewed until Root admits
+them; a focused run of the owned paths passes or expects a negative result
+for every one except the two `RegExp-leading-escape-BMP.js` and
+`RegExp-trailing-escape-BMP.js` rows, which call `eval` and belong to ADR 0016.
 
 ### HTML-like comments
 
@@ -516,8 +518,8 @@ A pattern without `u` or `v` follows the grammar of B.1.2 in both places that
 compile patterns: the build-time parser in *regexp-parse.ts*, whose artifact
 the C backend writes as matcher data for a literal, and the runtime's own
 validator and program compiler in *runtime\_regexp.c* and
-*runtime\_regexp\_matcher.c*, which serve the `RegExp` constructor and the
-String methods that create a RegExp. Under `u` and `v` nothing
+*runtime\_regexp\_matcher.c*, which serve the `RegExp` constructor, the
+String methods that create a RegExp, and `compile`. Under `u` and `v` nothing
 changes, so every Annex B form there is still the edition's early error.
 
 | Text                                  | Reading without `u` or `v`                                      |
@@ -570,6 +572,41 @@ with the host's under every flag set, and seed `0x6000a001` runs batches of the
 same patterns natively as literals and through the runtime compiler. The
 exhaustive literal suite now accepts all 65,521 selected code units of each
 escaped domain and checks the core grammar's 50,784 rejections separately.
+
+### `RegExp.prototype.compile`
+
+`compile` of B.2.4.1 is a writable, non-enumerable, configurable method with
+`length` 2 and no `prototype`, installed after `toString` in every realm. It
+throws a `TypeError` for a receiver without `[[RegExpMatcher]]`, and for a
+RegExp pattern with flags other than `undefined`. A RegExp pattern supplies
+its original source and flags; any other pattern and flags are converted
+with `ToString`, pattern first, exactly as the constructor converts them. The
+receiver keeps its identity: RegExpInitialize replaces only its matcher, and
+an invalid pattern or flag text throws a `SyntaxError` with the receiver
+unchanged. The `lastIndex` reset that follows throws a `TypeError` on a
+non-writable `lastIndex`, after the receiver already holds the new pattern.
+
+A RegExp pattern passes its matcher as the origin, so an equal parse borrows
+that program, the same rule the constructor uses; a compiled artifact is
+never shared once its source or parse flags differ. Recompiling a literal
+changes only that object, and the next evaluation of the literal still
+allocates a fresh RegExp over the build-time artifact. Built-in execution
+reads the matcher after it converts `lastIndex`, so a `valueOf` that calls
+`compile` runs the new pattern, as do the `@@split` cases that recompile from
+a `Symbol.match` getter or the limit conversion.
+
+The method takes code ID `OSEO_REGEXP_COMPILE_CODE_ID`, the RegExp range last
+minus 21, below the symbol-method block. It adds no intrinsic slot, heap
+kind, or entry point, and the runtime ABI moves to `m5-158`. The fixed fixture
+*tests/native/fixtures/annexb-regexp-compile.ts* covers the descriptor,
+receivers, argument checks, conversion order and abrupt conversion, invalid
+patterns and flags, the non-writable and frozen cases, subclass and literal
+receivers, the Annex B grammar through `compile`, the recompiling `@@split`
+and `exec` cases, flag order, and a shape guard miss.
+*tests/property/m5-annexb-regexp-compile.property.test.ts*, seed block
+`0x6000a100`, generates sequences of `compile` calls, `lastIndex` writes and
+locks, and executions on literal, constructed, and subclass receivers and
+compares each state and match with a fresh RegExp and with both hosts.
 
 
 Small ECMAScript 2026 built-in families

@@ -1,7 +1,8 @@
 /* eslint-disable no-await-in-loop -- Native builds run serially. */
 
 /*
- * Fixed native fixtures of the annexb-syntax unit. They run here rather
+ * Fixed native fixtures of the annexb-syntax and annexb-regexp-compile
+ * units. They run here rather
  * than in tests/native.ts because the M5c exclusion audit binds that file
  * by digest. Each fixture runs as a Script in both strictness modes under
  * both specialization policies, with collection forced at every safepoint,
@@ -27,6 +28,7 @@ import {
   withNativeFixture,
 } from "../packages/testkit/src/index.ts";
 import { nativeToolchain } from "./native-toolchain.ts";
+import * as compileFixtures from "./native/fixtures/annexb-regexp-compile.ts";
 import {
   annexBSyntaxFixtures,
   moduleRejectedComments,
@@ -45,7 +47,12 @@ const nativeTarget = targetForExecutionHost(
 );
 const skip = nativeTarget == null ? "requires a supported native host" : false;
 
-for (const fixture of annexBSyntaxFixtures) {
+const fixtures = [
+  ...annexBSyntaxFixtures,
+  ...compileFixtures.annexBRegExpCompileFixtures,
+];
+
+for (const fixture of fixtures) {
   test(`Annex B syntax fixture ${fixture.name}`, { skip }, async () => {
     const references = await hostScriptReferences(host, fixture.source);
     assertMatchingObservations(references);
@@ -85,11 +92,12 @@ for (const fixture of annexBSyntaxFixtures) {
               assertMatchingObservations([reference, native]);
               assert.ok(native.counters != null);
               assert.ok(native.counters.collections > 0);
-              // The dynamic fixture's reader sees a RegExp and then a
-              // plain object, so its guard misses at least once.
+              // The dynamic and compile fixtures' reader sees a RegExp and
+              // then a plain object, so its guard misses at least once.
               if (
                 specialization === "enabled" &&
-                fixture.name === "annexb-regexp-dynamic"
+                fixture.name !== "annexb-regexp-literals" &&
+                fixture.name !== "annexb-html-comments"
               ) {
                 assert.match(mir, /guard-shape/u);
                 assert.ok(native.counters.guardMisses > 0);

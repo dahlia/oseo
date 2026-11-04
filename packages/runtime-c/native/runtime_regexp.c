@@ -2046,6 +2046,70 @@ static OseoResult regexp_set_last_index(
     return result;
 }
 
+/*
+ * RegExp.prototype.compile (B.2.4.1) reinitializes the receiver in place.
+ *
+ * A RegExp pattern supplies its [[OriginalSource]] and [[OriginalFlags]]
+ * and its matcher as the origin, so an equal parse borrows that program
+ * rather than compiling it again; any other pattern goes through the same
+ * conversion and validation as the constructor. RegExpInitialize replaces
+ * the matcher only once the new pattern is valid, and the `lastIndex`
+ * write that follows it throws when the property is not writable, after
+ * the receiver already holds the new pattern.
+ */
+static OseoResult regexp_prototype_compile(
+    OseoContext *context,
+    OseoValue receiver,
+    size_t argument_count,
+    const OseoValue *arguments
+) {
+    if (!is_regexp(receiver)) {
+        return oseo_internal_throw_error(
+            context,
+            OSEO_ERROR_TYPE,
+            "RegExp.prototype.compile requires a RegExp receiver."
+        );
+    }
+    OseoValue slots[4] = {
+        receiver,
+        argument_count == 0u ? oseo_undefined() : arguments[0],
+        argument_count < 2u ? oseo_undefined() : arguments[1],
+        oseo_undefined(),
+    };
+    OseoRootFrame frame = {NULL, slots, 4u};
+    oseo_roots_push(context, &frame);
+    OseoResult result = normal(oseo_undefined());
+    if (is_regexp(frame.slots[1])) {
+        if (tag_of(frame.slots[2]) != OSEO_TAG_UNDEFINED) {
+            result = oseo_internal_throw_error(
+                context,
+                OSEO_ERROR_TYPE,
+                "RegExp.prototype.compile takes no flags with a RegExp."
+            );
+        } else {
+            OseoValue matcher = regexp_object(frame.slots[1])->matcher;
+            frame.slots[3] = matcher;
+            frame.slots[2] = regexp_matcher_object(matcher)->flags;
+            frame.slots[1] = regexp_matcher_object(matcher)->source;
+        }
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = regexp_initialize(
+            context,
+            frame.slots[0],
+            frame.slots[1],
+            frame.slots[2],
+            frame.slots[3]
+        );
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = regexp_set_last_index(context, frame.slots[0], 0.0);
+    }
+    if (result.status == OSEO_STATUS_NORMAL) result = normal(frame.slots[0]);
+    oseo_roots_pop(context, &frame);
+    return result;
+}
+
 /* CreateDataPropertyOrThrow for one owned result-object property. */
 static OseoResult regexp_create_data_property(
     OseoContext *context,
@@ -3024,6 +3088,14 @@ OseoResult oseo_internal_regexp_builtin_dispatch(
     if (code_id == OSEO_REGEXP_TO_STRING_CODE_ID) {
         return regexp_prototype_to_string(context, receiver);
     }
+    if (code_id == OSEO_REGEXP_COMPILE_CODE_ID) {
+        return regexp_prototype_compile(
+            context,
+            receiver,
+            argument_count,
+            arguments
+        );
+    }
     if (code_id == OSEO_REGEXP_FLAGS_CODE_ID) {
         return regexp_prototype_flags(context, receiver);
     }
@@ -3198,15 +3270,17 @@ static OseoResult regexp_intrinsic_build(OseoContext *context) {
         "exec",
         "test",
         "toString",
+        "compile",
     };
-    static const size_t prototype_method_lengths[] = {1u, 1u, 0u};
+    static const size_t prototype_method_lengths[] = {1u, 1u, 0u, 2u};
     static const size_t prototype_method_codes[] = {
         OSEO_REGEXP_EXEC_CODE_ID,
         OSEO_REGEXP_TEST_CODE_ID,
         OSEO_REGEXP_TO_STRING_CODE_ID,
+        OSEO_REGEXP_COMPILE_CODE_ID,
     };
     for (size_t index = 0u;
-         result.status == OSEO_STATUS_NORMAL && index < 3u;
+         result.status == OSEO_STATUS_NORMAL && index < 4u;
          index += 1u) {
         result = create_regexp_builtin(
             context,

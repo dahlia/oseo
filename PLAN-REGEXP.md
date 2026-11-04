@@ -99,9 +99,9 @@ the candidate edition and Oseo owns every mismatch at a tested boundary.
 
 Annex B was outside the M5 candidate claim, so its pattern grammar and
 `RegExp.prototype.compile` did not enter through this plan. ADR 0032 brought
-them into the post-M5 claim, and the `annexb-syntax` unit of
-[*PLAN-LANGUAGE.md*](./PLAN-LANGUAGE.md) implements the pattern grammar over
-the components this plan owns. ECMA-402 locale behavior,
+them into the post-M5 claim, and the `annexb-syntax` and
+`annexb-regexp-compile` units of [*PLAN-LANGUAGE.md*](./PLAN-LANGUAGE.md)
+implement them over the components this plan owns. ECMA-402 locale behavior,
 host regular expression extensions, and a public embedding API are out of
 scope.
 
