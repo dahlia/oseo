@@ -52,13 +52,69 @@ evidence:
       - tests/native/fixtures/uint8array-base64.ts
       - tests/property/es2026-uint8array-base64.property.test.ts
   standards:
-    status: omitted
-    reason: "The 68 owned test/built-ins/Uint8Array rows stay unreviewed in
-      the closure ledger until the unit admits them and the full test262
-      update observes them."
-    replacements:
-      - tests/native/fixtures/uint8array-base64.ts
-      - tests/property/es2026-uint8array-base64.property.test.ts
+    status: covered
+    references:
+      - tests/test262/subset.yaml
+      - tests/test262/results.yaml
+      - tests/test262/results/built-ins/Uint8Array/02.yaml
+      - tests/test262/results/built-ins/Uint8Array/08.yaml
+      - tests/test262/results/built-ins/Uint8Array/09.yaml
+      - tests/test262/results/built-ins/Uint8Array/0c.yaml
+      - tests/test262/results/built-ins/Uint8Array/0d.yaml
+      - tests/test262/results/built-ins/Uint8Array/0e.yaml
+      - tests/test262/results/built-ins/Uint8Array/11.yaml
+      - tests/test262/results/built-ins/Uint8Array/18.yaml
+      - tests/test262/results/built-ins/Uint8Array/1a.yaml
+      - tests/test262/results/built-ins/Uint8Array/23.yaml
+      - tests/test262/results/built-ins/Uint8Array/28.yaml
+      - tests/test262/results/built-ins/Uint8Array/2c.yaml
+      - tests/test262/results/built-ins/Uint8Array/32.yaml
+      - tests/test262/results/built-ins/Uint8Array/34.yaml
+      - tests/test262/results/built-ins/Uint8Array/37.yaml
+      - tests/test262/results/built-ins/Uint8Array/39.yaml
+      - tests/test262/results/built-ins/Uint8Array/3f.yaml
+      - tests/test262/results/built-ins/Uint8Array/45.yaml
+      - tests/test262/results/built-ins/Uint8Array/47.yaml
+      - tests/test262/results/built-ins/Uint8Array/48.yaml
+      - tests/test262/results/built-ins/Uint8Array/4c.yaml
+      - tests/test262/results/built-ins/Uint8Array/50.yaml
+      - tests/test262/results/built-ins/Uint8Array/58.yaml
+      - tests/test262/results/built-ins/Uint8Array/59.yaml
+      - tests/test262/results/built-ins/Uint8Array/5e.yaml
+      - tests/test262/results/built-ins/Uint8Array/5f.yaml
+      - tests/test262/results/built-ins/Uint8Array/60.yaml
+      - tests/test262/results/built-ins/Uint8Array/61.yaml
+      - tests/test262/results/built-ins/Uint8Array/68.yaml
+      - tests/test262/results/built-ins/Uint8Array/69.yaml
+      - tests/test262/results/built-ins/Uint8Array/6b.yaml
+      - tests/test262/results/built-ins/Uint8Array/6c.yaml
+      - tests/test262/results/built-ins/Uint8Array/77.yaml
+      - tests/test262/results/built-ins/Uint8Array/7a.yaml
+      - tests/test262/results/built-ins/Uint8Array/80.yaml
+      - tests/test262/results/built-ins/Uint8Array/83.yaml
+      - tests/test262/results/built-ins/Uint8Array/87.yaml
+      - tests/test262/results/built-ins/Uint8Array/91.yaml
+      - tests/test262/results/built-ins/Uint8Array/96.yaml
+      - tests/test262/results/built-ins/Uint8Array/9d.yaml
+      - tests/test262/results/built-ins/Uint8Array/9f.yaml
+      - tests/test262/results/built-ins/Uint8Array/a8.yaml
+      - tests/test262/results/built-ins/Uint8Array/b2.yaml
+      - tests/test262/results/built-ins/Uint8Array/b4.yaml
+      - tests/test262/results/built-ins/Uint8Array/b9.yaml
+      - tests/test262/results/built-ins/Uint8Array/c1.yaml
+      - tests/test262/results/built-ins/Uint8Array/c6.yaml
+      - tests/test262/results/built-ins/Uint8Array/c7.yaml
+      - tests/test262/results/built-ins/Uint8Array/cb.yaml
+      - tests/test262/results/built-ins/Uint8Array/cf.yaml
+      - tests/test262/results/built-ins/Uint8Array/d4.yaml
+      - tests/test262/results/built-ins/Uint8Array/d6.yaml
+      - tests/test262/results/built-ins/Uint8Array/d7.yaml
+      - tests/test262/results/built-ins/Uint8Array/dc.yaml
+      - tests/test262/results/built-ins/Uint8Array/dd.yaml
+      - tests/test262/results/built-ins/Uint8Array/e3.yaml
+      - tests/test262/results/built-ins/Uint8Array/ef.yaml
+      - tests/test262/results/built-ins/Uint8Array/f2.yaml
+      - tests/test262/results/built-ins/Uint8Array/fa.yaml
   structural:
     status: covered
     references:

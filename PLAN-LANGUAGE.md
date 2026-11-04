@@ -8,8 +8,9 @@ Implementation status: in progress. The `claim-boundary` unit has applied ADR
 0032. The `legacy-caller`, `annexb-escape`, `annexb-string-methods`,
 `annexb-date-methods`, `error-is-error`, `math-sum-precise`, `upsert`,
 `iterator-concat`, `iterator-zip`, `annexb-object-accessors`,
-`array-from-async`, and `json-parse-source` units are implemented and
-observed, and every other unit is open. This plan
+`array-from-async`, `json-parse-source`, `uint8array-base64`, and
+`atomics-pause` units are implemented and observed, and every other unit is
+open. This plan
 follows M5 directly and runs alongside M6. It has no milestone number. It
 schedules the language work the maintainer approved on 2026-11-02: build-time
 static-specifier `import()`, Annex B legacy web behavior except `document.all`,
@@ -630,8 +631,8 @@ current *tests/test262/inventory.tsv*.
     `lastChunkHandling`, and `omitPadding`, over detached and resizable
     buffers. Round-trip and partial-decode properties use an independent
     codec. Two more rows also need immutable `ArrayBuffer` and stay excluded.
-    The runtime, fixtures, and property suite are implemented; the rows wait
-    for the full test262 update. Deno 2.9.7 keeps decoding after
+    The runtime, fixtures, and property suite are implemented, and all 68
+    rows pass in the full test262 observation. Deno 2.9.7 keeps decoding after
     `setFromBase64` fills its target, which the edition forbids, so an
     independent model is the reference for those cases.
  -  `iterator-concat` owns `Iterator.concat` (32). It reads every item's
@@ -645,9 +646,7 @@ current *tests/test262/inventory.tsv*.
     primitive value, and `JSON.stringify` emits a raw JSON object's text
     unchanged.
     The runtime, fixtures, and property suite are implemented, and all 21
-    rows pass in the full test262 observation. With both units observed, the
-    manifest has 41,649 reviewed rows: 35,359 passes and 1,889 unsupported
-    results, and no earlier row changes.
+    rows pass in the full test262 observation, and no earlier row changes.
 
 ### ECMAScript 2027 units
 
@@ -674,10 +673,12 @@ current *tests/test262/inventory.tsv*.
  -  `atomics-pause` owns `Atomics.pause` (5). It validates the optional
     iteration count and returns `undefined`. Whether it emits a processor
     pause hint is a target choice recorded in the target description.
-    The runtime and fixture are implemented; the rows wait for the full
-    test262 update. Each call executes one hint, PAUSE on x86-64 and YIELD
-    on AArch64, which the target descriptions record as
-    `atomicsPauseHint`.
+    The runtime and fixture are implemented, and all five rows pass in the
+    full test262 observation. Each call executes one hint, PAUSE on x86-64
+    and YIELD on AArch64, which the target descriptions record as
+    `atomicsPauseHint`. With this unit and `uint8array-base64` observed, the
+    manifest has 41,722 reviewed rows: 35,432 passes and 1,889 unsupported
+    results, and no earlier row changes.
 
 ### `language-exit-audit`
 

@@ -314,9 +314,9 @@ evidence includes the executed variants and target, dependency tags are
 reviewed, and summaries include raw, path-group, and dependency totals.
 Unsupported, harness, and infrastructure results never increase the pass count.
 
-The current manifest contains 41,649 reviewed cases: 35,359 passes, 4,401
+The current manifest contains 41,722 reviewed cases: 35,432 passes, 4,401
 expected negatives, and 1,889 unsupported profile features. It records no
-semantic, harness, or infrastructure failures. The 558 cases beyond the M5
+semantic, harness, or infrastructure failures. The 631 cases beyond the M5
 inventory are rows of the
 [ECMAScript 2026 profile](./language-profile-es2026.md): 164 for the
 [Annex B built-ins](./language-profile-es2026.md#annex-b-built-ins), 70 for the
@@ -324,8 +324,10 @@ inventory are rows of the
 126 for the
 [small built-in families](./language-profile-es2026.md#small-ecmascript-2026-built-in-families),
 82 for [joint iteration](./language-profile-es2026.md#joint-iteration), 95 for
-[`Array.fromAsync`](./language-profile-es2026.md#arrayfromasync), and 21 for
-[JSON source text](./language-profile-es2026.md#json-source-text).
+[`Array.fromAsync`](./language-profile-es2026.md#arrayfromasync), 21 for
+[JSON source text](./language-profile-es2026.md#json-source-text), 68 for
+[Uint8Array base64 and hex](./language-profile-es2026.md#uint8array-base64-and-hex),
+and 5 for [`Atomics.pause`](./language-profile-es2026.md#atomicspause).
 
 The batch 16/17 dependency audit corrects 21 tag claims on 20 of the 754 new
 paths. Dependency totals are now 48 abrupt-completion, 559 functions, 404

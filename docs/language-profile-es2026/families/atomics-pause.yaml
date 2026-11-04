@@ -44,12 +44,15 @@ evidence:
       - tests/atomics-pause-native.test.ts
       - tests/native/fixtures/atomics-pause.ts
   standards:
-    status: omitted
-    reason: "The five test/built-ins/Atomics/pause rows stay unreviewed in
-      the closure ledger until the unit admits them and the full test262
-      update observes them."
-    replacements:
-      - tests/native/fixtures/atomics-pause.ts
+    status: covered
+    references:
+      - tests/test262/subset.yaml
+      - tests/test262/results.yaml
+      - tests/test262/results/built-ins/Atomics/1b.yaml
+      - tests/test262/results/built-ins/Atomics/50.yaml
+      - tests/test262/results/built-ins/Atomics/a1.yaml
+      - tests/test262/results/built-ins/Atomics/ba.yaml
+      - tests/test262/results/built-ins/Atomics/eb.yaml
   structural:
     status: covered
     references:

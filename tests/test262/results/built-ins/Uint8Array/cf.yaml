@@ -1,0 +1,43 @@
+group: built-ins/Uint8Array
+key: cf
+results:
+  - case:
+      async: false
+      features:
+        - uint8array-base64
+        - TypedArray
+      flags: []
+      includes:
+        - compareArray.js
+      mode: script
+      path: test/built-ins/Uint8Array/prototype/setFromBase64/target-size.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - iterator-protocol
+      - object-literals
+      - symbols
+      - typed-array-constructors
+      - typed-array-core
+      - var-bindings
+    execution:
+      harnessIncludes:
+        - base.js
+        - compareArray.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      passed: true
+    unsupportedFeatures: []
+suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2

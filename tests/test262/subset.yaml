@@ -9,6 +9,7 @@ supportedFeatures:
   - Array.prototype.values
   - ArrayBuffer
   - Atomics
+  - Atomics.pause
   - Atomics.waitAsync
   - BigInt
   - DataView
@@ -152,6 +153,7 @@ supportedFeatures:
   - TypedArray.prototype.at
   - u180e
   - Uint8Array
+  - uint8array-base64
   - Uint8ClampedArray
   - Uint16Array
   - Uint32Array
@@ -12532,6 +12534,22 @@ tests:
     expectedClassification: pass
     dependencies: [atomics-single-agent]
   - path: test/built-ins/Atomics/or/validate-arraytype-before-value-coercion.js
+    expectedClassification: pass
+    dependencies: [atomics-single-agent]
+  - path: test/built-ins/Atomics/pause/descriptor.js
+    expectedClassification: pass
+    dependencies: [atomics-single-agent, object-properties]
+  - path: test/built-ins/Atomics/pause/length.js
+    expectedClassification: pass
+    dependencies: [atomics-single-agent, object-properties]
+  - path: test/built-ins/Atomics/pause/name.js
+    expectedClassification: pass
+    dependencies: [atomics-single-agent, object-properties]
+  - path: test/built-ins/Atomics/pause/not-a-constructor.js
+    expectedClassification: pass
+    dependencies:
+      [abrupt-completion, atomics-single-agent, error-intrinsics, functions]
+  - path: test/built-ins/Atomics/pause/returns-undefined.js
     expectedClassification: pass
     dependencies: [atomics-single-agent]
   - path: test/built-ins/Atomics/prop-desc.js
@@ -62775,6 +62793,574 @@ tests:
   - path: test/built-ins/TypedArrayConstructors/prototype/values/inherited.js
     expectedClassification: pass
     dependencies: [functions, object-properties, typed-array-core]
+  - path: test/built-ins/Uint8Array/fromBase64/alphabet.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        error-intrinsics,
+        object-literals,
+        typed-array-constructors,
+        typed-array-core,
+      ]
+  - path: test/built-ins/Uint8Array/fromBase64/descriptor.js
+    expectedClassification: pass
+    dependencies: [object-properties, typed-array-core]
+  - path: test/built-ins/Uint8Array/fromBase64/ignores-receiver.js
+    expectedClassification: pass
+    dependencies:
+      [
+        classes,
+        object-properties,
+        typed-array-constructors,
+        typed-array-core,
+        var-bindings,
+      ]
+  - path: test/built-ins/Uint8Array/fromBase64/illegal-characters.js
+    expectedClassification: pass
+    dependencies:
+      [abrupt-completion, error-intrinsics, typed-array-core, var-bindings]
+  - path: test/built-ins/Uint8Array/fromBase64/last-chunk-handling.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        error-intrinsics,
+        object-literals,
+        typed-array-constructors,
+        typed-array-core,
+      ]
+  - path: test/built-ins/Uint8Array/fromBase64/last-chunk-invalid.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        error-intrinsics,
+        object-literals,
+        typed-array-constructors,
+        typed-array-core,
+        var-bindings,
+      ]
+  - path: test/built-ins/Uint8Array/fromBase64/length.js
+    expectedClassification: pass
+    dependencies: [object-properties, typed-array-core]
+  - path: test/built-ins/Uint8Array/fromBase64/name.js
+    expectedClassification: pass
+    dependencies: [object-properties, typed-array-core]
+  - path: test/built-ins/Uint8Array/fromBase64/nonconstructor.js
+    expectedClassification: pass
+    dependencies:
+      [abrupt-completion, error-intrinsics, functions, typed-array-core]
+  - path: test/built-ins/Uint8Array/fromBase64/option-coercion.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        error-intrinsics,
+        expression-operators,
+        functions,
+        object-literals,
+        object-properties,
+        typed-array-constructors,
+        typed-array-core,
+        var-bindings,
+      ]
+  - path: test/built-ins/Uint8Array/fromBase64/results.js
+    expectedClassification: pass
+    dependencies:
+      [
+        array-buffer,
+        object-properties,
+        typed-array-constructors,
+        typed-array-core,
+        var-bindings,
+      ]
+  - path: test/built-ins/Uint8Array/fromBase64/string-coercion.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        error-intrinsics,
+        object-literals,
+        object-properties,
+        typed-array-core,
+        var-bindings,
+      ]
+  - path: test/built-ins/Uint8Array/fromBase64/whitespace.js
+    expectedClassification: pass
+    dependencies:
+      [array-buffer, typed-array-constructors, typed-array-core, var-bindings]
+  - path: test/built-ins/Uint8Array/fromHex/descriptor.js
+    expectedClassification: pass
+    dependencies: [object-properties, typed-array-core]
+  - path: test/built-ins/Uint8Array/fromHex/ignores-receiver.js
+    expectedClassification: pass
+    dependencies:
+      [
+        classes,
+        object-properties,
+        typed-array-constructors,
+        typed-array-core,
+        var-bindings,
+      ]
+  - path: test/built-ins/Uint8Array/fromHex/illegal-characters.js
+    expectedClassification: pass
+    dependencies:
+      [abrupt-completion, error-intrinsics, typed-array-core, var-bindings]
+  - path: test/built-ins/Uint8Array/fromHex/length.js
+    expectedClassification: pass
+    dependencies: [object-properties, typed-array-core]
+  - path: test/built-ins/Uint8Array/fromHex/name.js
+    expectedClassification: pass
+    dependencies: [object-properties, typed-array-core]
+  - path: test/built-ins/Uint8Array/fromHex/nonconstructor.js
+    expectedClassification: pass
+    dependencies:
+      [abrupt-completion, error-intrinsics, functions, typed-array-core]
+  - path: test/built-ins/Uint8Array/fromHex/odd-length-input.js
+    expectedClassification: pass
+    dependencies: [abrupt-completion, error-intrinsics, typed-array-core]
+  - path: test/built-ins/Uint8Array/fromHex/results.js
+    expectedClassification: pass
+    dependencies:
+      [
+        array-buffer,
+        object-properties,
+        typed-array-constructors,
+        typed-array-core,
+        var-bindings,
+      ]
+  - path: test/built-ins/Uint8Array/fromHex/string-coercion.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        error-intrinsics,
+        object-literals,
+        typed-array-core,
+        var-bindings,
+      ]
+  - path: test/built-ins/Uint8Array/prototype/setFromBase64/alphabet.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        error-intrinsics,
+        iterator-protocol,
+        object-literals,
+        symbols,
+        typed-array-constructors,
+        typed-array-core,
+        var-bindings,
+      ]
+  - path: test/built-ins/Uint8Array/prototype/setFromBase64/descriptor.js
+    expectedClassification: pass
+    dependencies: [object-properties, typed-array-core]
+  - path: test/built-ins/Uint8Array/prototype/setFromBase64/detached-buffer.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        array-buffer,
+        error-intrinsics,
+        expression-operators,
+        functions,
+        iterator-protocol,
+        object-literals,
+        object-properties,
+        symbols,
+        typed-array-constructors,
+        typed-array-core,
+        var-bindings,
+      ]
+  - path: test/built-ins/Uint8Array/prototype/setFromBase64/illegal-characters.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        error-intrinsics,
+        iterator-protocol,
+        symbols,
+        typed-array-constructors,
+        typed-array-core,
+        var-bindings,
+      ]
+  - path: test/built-ins/Uint8Array/prototype/setFromBase64/last-chunk-handling.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        error-intrinsics,
+        iterator-protocol,
+        object-literals,
+        symbols,
+        typed-array-constructors,
+        typed-array-core,
+        var-bindings,
+      ]
+  - path: test/built-ins/Uint8Array/prototype/setFromBase64/length.js
+    expectedClassification: pass
+    dependencies: [object-properties, typed-array-core]
+  - path: test/built-ins/Uint8Array/prototype/setFromBase64/name.js
+    expectedClassification: pass
+    dependencies: [object-properties, typed-array-core]
+  - path: test/built-ins/Uint8Array/prototype/setFromBase64/nonconstructor.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        error-intrinsics,
+        functions,
+        typed-array-constructors,
+        typed-array-core,
+        var-bindings,
+      ]
+  - path: test/built-ins/Uint8Array/prototype/setFromBase64/option-coercion.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        error-intrinsics,
+        expression-operators,
+        functions,
+        iterator-protocol,
+        object-literals,
+        object-properties,
+        symbols,
+        typed-array-constructors,
+        typed-array-core,
+        var-bindings,
+      ]
+  - path: test/built-ins/Uint8Array/prototype/setFromBase64/results.js
+    expectedClassification: pass
+    dependencies:
+      [
+        iterator-protocol,
+        symbols,
+        typed-array-constructors,
+        typed-array-core,
+        var-bindings,
+      ]
+  - path: test/built-ins/Uint8Array/prototype/setFromBase64/string-coercion.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        error-intrinsics,
+        object-literals,
+        object-properties,
+        typed-array-constructors,
+        typed-array-core,
+        var-bindings,
+      ]
+  - path: test/built-ins/Uint8Array/prototype/setFromBase64/subarray.js
+    expectedClassification: pass
+    dependencies:
+      [
+        iterator-protocol,
+        symbols,
+        typed-array-constructors,
+        typed-array-core,
+        var-bindings,
+      ]
+  - path: test/built-ins/Uint8Array/prototype/setFromBase64/target-size.js
+    expectedClassification: pass
+    dependencies:
+      [
+        iterator-protocol,
+        object-literals,
+        symbols,
+        typed-array-constructors,
+        typed-array-core,
+        var-bindings,
+      ]
+  - path: test/built-ins/Uint8Array/prototype/setFromBase64/trailing-garbage-empty.js
+    expectedClassification: pass
+    dependencies:
+      [
+        object-literals,
+        typed-array-constructors,
+        typed-array-core,
+        var-bindings,
+      ]
+  - path: test/built-ins/Uint8Array/prototype/setFromBase64/trailing-garbage.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        error-intrinsics,
+        object-literals,
+        typed-array-constructors,
+        typed-array-core,
+        var-bindings,
+      ]
+  - path: test/built-ins/Uint8Array/prototype/setFromBase64/whitespace.js
+    expectedClassification: pass
+    dependencies:
+      [
+        iterator-protocol,
+        symbols,
+        typed-array-constructors,
+        typed-array-core,
+        var-bindings,
+      ]
+  - path: test/built-ins/Uint8Array/prototype/setFromBase64/writes-up-to-error.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        error-intrinsics,
+        iterator-protocol,
+        object-literals,
+        symbols,
+        typed-array-constructors,
+        typed-array-core,
+        var-bindings,
+      ]
+  - path: test/built-ins/Uint8Array/prototype/setFromHex/descriptor.js
+    expectedClassification: pass
+    dependencies: [object-properties, typed-array-core]
+  - path: test/built-ins/Uint8Array/prototype/setFromHex/detached-buffer.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        array-buffer,
+        error-intrinsics,
+        iterator-protocol,
+        symbols,
+        typed-array-constructors,
+        typed-array-core,
+        var-bindings,
+      ]
+  - path: test/built-ins/Uint8Array/prototype/setFromHex/illegal-characters.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        error-intrinsics,
+        iterator-protocol,
+        symbols,
+        typed-array-constructors,
+        typed-array-core,
+        var-bindings,
+      ]
+  - path: test/built-ins/Uint8Array/prototype/setFromHex/length.js
+    expectedClassification: pass
+    dependencies: [object-properties, typed-array-core]
+  - path: test/built-ins/Uint8Array/prototype/setFromHex/name.js
+    expectedClassification: pass
+    dependencies: [object-properties, typed-array-core]
+  - path: test/built-ins/Uint8Array/prototype/setFromHex/nonconstructor.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        error-intrinsics,
+        functions,
+        typed-array-constructors,
+        typed-array-core,
+        var-bindings,
+      ]
+  - path: test/built-ins/Uint8Array/prototype/setFromHex/results.js
+    expectedClassification: pass
+    dependencies:
+      [
+        iterator-protocol,
+        symbols,
+        typed-array-constructors,
+        typed-array-core,
+        var-bindings,
+      ]
+  - path: test/built-ins/Uint8Array/prototype/setFromHex/string-coercion.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        error-intrinsics,
+        object-literals,
+        typed-array-constructors,
+        typed-array-core,
+        var-bindings,
+      ]
+  - path: test/built-ins/Uint8Array/prototype/setFromHex/subarray.js
+    expectedClassification: pass
+    dependencies:
+      [
+        iterator-protocol,
+        symbols,
+        typed-array-constructors,
+        typed-array-core,
+        var-bindings,
+      ]
+  - path: test/built-ins/Uint8Array/prototype/setFromHex/target-size.js
+    expectedClassification: pass
+    dependencies:
+      [
+        iterator-protocol,
+        symbols,
+        typed-array-constructors,
+        typed-array-core,
+        var-bindings,
+      ]
+  - path: test/built-ins/Uint8Array/prototype/setFromHex/throws-when-string-length-is-odd.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        error-intrinsics,
+        typed-array-constructors,
+        typed-array-core,
+        var-bindings,
+      ]
+  - path: test/built-ins/Uint8Array/prototype/setFromHex/writes-up-to-error.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        error-intrinsics,
+        iterator-protocol,
+        symbols,
+        typed-array-constructors,
+        typed-array-core,
+        var-bindings,
+      ]
+  - path: test/built-ins/Uint8Array/prototype/toBase64/alphabet.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        error-intrinsics,
+        iterator-protocol,
+        object-literals,
+        symbols,
+        typed-array-constructors,
+        typed-array-core,
+      ]
+  - path: test/built-ins/Uint8Array/prototype/toBase64/descriptor.js
+    expectedClassification: pass
+    dependencies: [object-properties, typed-array-core]
+  - path: test/built-ins/Uint8Array/prototype/toBase64/detached-buffer.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        array-buffer,
+        error-intrinsics,
+        expression-operators,
+        functions,
+        object-literals,
+        object-properties,
+        typed-array-constructors,
+        typed-array-core,
+        var-bindings,
+      ]
+  - path: test/built-ins/Uint8Array/prototype/toBase64/length.js
+    expectedClassification: pass
+    dependencies: [object-properties, typed-array-core]
+  - path: test/built-ins/Uint8Array/prototype/toBase64/name.js
+    expectedClassification: pass
+    dependencies: [object-properties, typed-array-core]
+  - path: test/built-ins/Uint8Array/prototype/toBase64/nonconstructor.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        error-intrinsics,
+        functions,
+        typed-array-constructors,
+        typed-array-core,
+        var-bindings,
+      ]
+  - path: test/built-ins/Uint8Array/prototype/toBase64/omit-padding.js
+    expectedClassification: pass
+    dependencies:
+      [
+        iterator-protocol,
+        object-literals,
+        symbols,
+        typed-array-constructors,
+        typed-array-core,
+      ]
+  - path: test/built-ins/Uint8Array/prototype/toBase64/option-coercion.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        error-intrinsics,
+        expression-operators,
+        functions,
+        iterator-protocol,
+        object-literals,
+        object-properties,
+        symbols,
+        typed-array-constructors,
+        typed-array-core,
+        var-bindings,
+      ]
+  - path: test/built-ins/Uint8Array/prototype/toBase64/receiver-not-uint8array.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        error-intrinsics,
+        functions,
+        object-literals,
+        object-properties,
+        typed-array-constructors,
+        typed-array-core,
+        var-bindings,
+      ]
+  - path: test/built-ins/Uint8Array/prototype/toBase64/results.js
+    expectedClassification: pass
+    dependencies:
+      [iterator-protocol, symbols, typed-array-constructors, typed-array-core]
+  - path: test/built-ins/Uint8Array/prototype/toHex/descriptor.js
+    expectedClassification: pass
+    dependencies: [object-properties, typed-array-core]
+  - path: test/built-ins/Uint8Array/prototype/toHex/detached-buffer.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        array-buffer,
+        error-intrinsics,
+        typed-array-constructors,
+        typed-array-core,
+        var-bindings,
+      ]
+  - path: test/built-ins/Uint8Array/prototype/toHex/length.js
+    expectedClassification: pass
+    dependencies: [object-properties, typed-array-core]
+  - path: test/built-ins/Uint8Array/prototype/toHex/name.js
+    expectedClassification: pass
+    dependencies: [object-properties, typed-array-core]
+  - path: test/built-ins/Uint8Array/prototype/toHex/nonconstructor.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        error-intrinsics,
+        functions,
+        typed-array-constructors,
+        typed-array-core,
+        var-bindings,
+      ]
+  - path: test/built-ins/Uint8Array/prototype/toHex/receiver-not-uint8array.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        error-intrinsics,
+        functions,
+        typed-array-constructors,
+        typed-array-core,
+        var-bindings,
+      ]
+  - path: test/built-ins/Uint8Array/prototype/toHex/results.js
+    expectedClassification: pass
+    dependencies:
+      [iterator-protocol, symbols, typed-array-constructors, typed-array-core]
   - path: test/built-ins/WeakMap/constructor.js
     expectedClassification: pass
     dependencies: [weak-collections]

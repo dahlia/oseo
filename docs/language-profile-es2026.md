@@ -695,8 +695,10 @@ edition. The family record is
 [*uint8array-base64.yaml*](./language-profile-es2026/families/uint8array-base64.yaml).
 
 Of the 70 *test/built-ins/Uint8Array/* rows for these functions, the unit owns
-68. The two *throws-when-target-is-backed-by-immutable-arraybuffer.js* rows
-need immutable `ArrayBuffer`, a proposal, and stay excluded.
+68, and all 68 pass; the family record's standards class cites the results
+partitions that hold them. The two
+*throws-when-target-is-backed-by-immutable-arraybuffer.js* rows need immutable
+`ArrayBuffer`, a proposal, and stay excluded.
 
 
 `Atomics.pause`
@@ -729,4 +731,6 @@ against Node.js and Deno. The count domain is one predicate that the fixture
 covers class by class, so the unit adds no property suite. The family record
 is
 [*atomics-pause.yaml*](./language-profile-es2026/families/atomics-pause.yaml).
-The unit owns the five *test/built-ins/Atomics/pause/* rows.
+The unit owns the five *test/built-ins/Atomics/pause/* rows, and all five
+pass; the family record's standards class cites the results partitions that
+hold them.
