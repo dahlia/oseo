@@ -185,11 +185,13 @@ The train C host Script evidence runs its 34 fixtures in four files of 13,
 above, so no placement could bring its job under 40 minutes. Each piece
 carries its scaled weight from the table above.
 
-*tests/property/m5-regexp-literal-exhaustive.property.test.ts* is on the
-tree without a weight and weighs the fallback. Its lane's handoff estimates
-248 seconds locally. At that estimate the chosen totals model at most 35.2
-minutes on Linux and 29.3 on macOS unweighted, and 35.3 and 28.9 with a
-scaled weight, so the fallback does not push a shard past the limit.
+*tests/property/m5-regexp-literal-exhaustive.property.test.ts* no longer
+runs in these shards. It entered them without a weight, at a local estimate
+of 248 seconds. Beside other file workers CI measured 543 to 1,071 seconds
+for its four properties on Linux and 386 to 1,649 on macOS, and both attempts
+of one macOS shard interrupted a property at its limit. `dedicatedNodeFiles`
+now removes it on both hosts, and it runs in one dedicated job per host; see
+[*ordinary exhaustive RegExp placement*](../regexp-exhaustive-node/README.md).
 
 Capacity remains a concern. The train C pieces add 2,317 weighted seconds
 to the three hosted macOS lanes that carry Node shards, which would put the

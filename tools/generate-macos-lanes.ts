@@ -105,6 +105,13 @@ export function macosJobs(): readonly MacosLaneJob[] {
     {},
     "macos-latest",
   );
+  add(
+    "test_regexp_exhaustive_macos",
+    "node",
+    "RegExp literals exhaustive (macos-latest, node)",
+    {},
+    "macos-latest",
+  );
   for (let shard = 1; shard <= 3; shard++) {
     add("test_native", String(shard), `native (macos-aarch64, ${shard}/3)`, {
       platform: { os: "macos-15", target: "macos-aarch64" },
@@ -812,7 +819,8 @@ export function generateMacosWorkflow(
     if (
       id === "test_sanitizer_macos" ||
       id === "test_node_shard" ||
-      id === "test_array_constructor_macos"
+      id === "test_array_constructor_macos" ||
+      id === "test_regexp_exhaustive_macos"
     )
       linux = "";
     else {
@@ -839,7 +847,9 @@ export function generateMacosWorkflow(
   const required = [
     ...nativeIds.filter(
       (id) =>
-        id !== "test_array_constructor_macos" && id !== "test_sanitizer_macos",
+        id !== "test_array_constructor_macos" &&
+        id !== "test_regexp_exhaustive_macos" &&
+        id !== "test_sanitizer_macos",
     ),
     ...macosJobs()
       .filter(

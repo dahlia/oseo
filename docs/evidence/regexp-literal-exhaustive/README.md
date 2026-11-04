@@ -107,8 +107,10 @@ only other wrapper invocations.
 The five Linux shards raise the run's hosted Ubuntu jobs from 35 to 40, the
 count that U48 in *PLAN-GATE.md* reduced because some of them waited for a slot.
 
-The file adds about four minutes of local Zig work to one ordinary Node.js
-shard on each host. No ordinary shard runs near a limit.
+The ordinary Node.js gate runs the file in one dedicated job per host, outside
+the weighted shards, because its plain properties came near their interrupt
+beside other file workers; see
+[*ordinary exhaustive RegExp placement*](../regexp-exhaustive-node/README.md).
 
 The shared sanitizer property jobs were near their limits. The Linux shards
 have a 60-minute timeout and shard 2 took 32 to 43 minutes; the unsharded macOS

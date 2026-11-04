@@ -288,9 +288,13 @@ test("every check name and concurrency policy is preserved", () => {
         (_, index) => `host C sanitizers (Linux, ${index + 1}/3)`,
       ),
       // The ordinary Node.js suite is partitioned by measured file
-      // weights, after excluding the dedicated Array file on macOS. See
-      // PLAN-GATE.md (U32, U46) and docs/evidence/node-shards/README.md.
+      // weights, after excluding the dedicated Array file on macOS and the
+      // dedicated exhaustive RegExp literal file on both hosts. See
+      // PLAN-GATE.md (U32, U46), docs/evidence/node-shards/README.md, and
+      // docs/evidence/regexp-exhaustive-node/README.md.
       "Array constructor (macos-latest, node)",
+      "RegExp literals exhaustive (macos-latest, node)",
+      "RegExp literals exhaustive (ubuntu-latest, node)",
       ...Array.from(
         { length: 6 },
         (_, index) => `test (macos-latest, node, ${index + 1}/6)`,
@@ -334,7 +338,7 @@ test("every check name and concurrency policy is preserved", () => {
       ),
     ].toSorted(),
   );
-  assert.equal(names(after).length, 96);
+  assert.equal(names(after).length, 98);
   const { jobs: _beforeJobs, ...beforeHeader } = before;
   const { jobs: _afterJobs, ...afterHeader } = after;
   assert.deepEqual(afterHeader, beforeHeader);
@@ -386,8 +390,8 @@ test("every macOS job occurs exactly once in five LPT chains", () => {
   const lanes = macosLanes();
   assert.equal(lanes.length, 5);
   const jobs = lanes.flat();
-  assert.equal(jobs.length, 50);
-  assert.equal(new Set(jobs.map((job) => job.id)).size, 50);
+  assert.equal(jobs.length, 51);
+  assert.equal(new Set(jobs.map((job) => job.id)).size, 51);
   assert.deepEqual(
     jobs.map((job) => job.name).toSorted(),
     macosJobs()
@@ -430,12 +434,15 @@ test("every macOS job occurs exactly once in five LPT chains", () => {
   // Node shards replaced four stale positional entries with modeled walls;
   // see docs/evidence/node-shards/README.md. The five exhaustive RegExp
   // literal case shards raised this from 14184 with derived hosted
-  // entries; see docs/evidence/regexp-literal-exhaustive/README.md.
+  // entries; see docs/evidence/regexp-literal-exhaustive/README.md. The
+  // dedicated ordinary exhaustive RegExp literal job raised it from 15794
+  // with a 2460-second allowance; see
+  // docs/evidence/regexp-exhaustive-node/README.md.
   assert.equal(
     Math.max(
       ...lanes.map((lane) => lane.reduce((sum, job) => sum + job.seconds, 0)),
     ),
-    15794,
+    16094,
   );
 });
 
@@ -728,7 +735,9 @@ test("native aggregate explicitly requires all native and test262 jobs", () => {
   const expected = [
     ...nativeIds.filter(
       (id) =>
-        id !== "test_array_constructor_macos" && id !== "test_sanitizer_macos",
+        id !== "test_array_constructor_macos" &&
+        id !== "test_regexp_exhaustive_macos" &&
+        id !== "test_sanitizer_macos",
     ),
     ...macosJobs()
       .filter(
@@ -763,7 +772,11 @@ test("native aggregate explicitly requires all native and test262 jobs", () => {
   for (let shard = 1; shard <= 5; shard++) {
     assert.ok(needs.includes(`test_regexp_exhaustive_case_macos_${shard}`));
   }
-  assert.equal(expected.length, 51);
+  // Both dedicated ordinary exhaustive RegExp literal jobs are required.
+  assert.ok(needs.includes("test_regexp_exhaustive_linux"));
+  assert.ok(needs.includes("test_regexp_exhaustive_macos_macos_node"));
+  assert.ok(!needs.includes("test_regexp_exhaustive_macos"));
+  assert.equal(expected.length, 53);
   assert.deepEqual(aggregate.steps[0]!.env, {
     RESULTS: "${{ toJSON(needs.*.result) }}",
   });
@@ -779,7 +792,9 @@ test("native aggregate explicitly requires all native and test262 jobs", () => {
           ...process.env,
           RESULTS: JSON.stringify(
             needs.map((id) =>
-              id === "test_array_constructor_macos_macos_node"
+              id === "test_array_constructor_macos_macos_node" ||
+              id === "test_regexp_exhaustive_macos_macos_node" ||
+              id === "test_regexp_exhaustive_linux"
                 ? verdict
                 : "success",
             ),
@@ -818,7 +833,7 @@ test("aggregate follows additional dependencies in the source template", () => {
   const needs = workflow.jobs.native!.needs;
   assert.ok(needs != null && !isString(needs));
   assert.ok(needs.includes("test_sanitizer"));
-  assert.equal(needs.length, 52);
+  assert.equal(needs.length, 54);
 });
 
 test("committed workflow matches generator output exactly", () => {
@@ -856,8 +871,8 @@ test("lane-count preview leaves the committed workflow alone", () => {
 test("one extra lane retains every job and aggregate dependency", () => {
   const lanes = macosLanes(1);
   assert.equal(lanes.length, 6);
-  assert.equal(lanes.flat().length, 50);
-  assert.equal(new Set(lanes.flat().map((job) => job.id)).size, 50);
+  assert.equal(lanes.flat().length, 51);
+  assert.equal(new Set(lanes.flat().map((job) => job.id)).size, 51);
   assert.ok(lanes[5]!.length > 0);
   assert.deepEqual(
     lanes[5]!
@@ -1264,8 +1279,9 @@ test("own-key cases lead the Mac lane with measured Mac seconds", () => {
   // The dedicated ordinary Array allowance also loads a hosted lane.
   // The six weighted Node shards' modeled walls raised this from 8909,
   // because the heavier hosted lanes leave more work to the Mac lane.
-  // The exhaustive RegExp literal case shards raised it from 9485.
-  assert.equal(Math.round(modeled), 11051);
+  // The exhaustive RegExp literal case shards raised it from 9485, and
+  // the dedicated ordinary exhaustive RegExp literal allowance from 11051.
+  assert.equal(Math.round(modeled), 11364);
 });
 
 test("hosted lanes take the jobs no Mac lane can run first", () => {
@@ -1282,7 +1298,7 @@ test("hosted lanes take the jobs no Mac lane can run first", () => {
     );
   }
   const ineligible = macosJobs().filter((job) => !macLaneEligible(job));
-  assert.equal(ineligible.length, 12);
+  assert.equal(ineligible.length, 13);
   for (const job of ineligible) {
     const lane = hosted.find((candidate) =>
       candidate.some((placed) => placed.id === job.id),
@@ -1460,8 +1476,8 @@ test("availability decides the second machine's lanes too", async () => {
 test("three Mac lanes keep every job and the own-key lane", () => {
   const lanes = macosLanes(3);
   assert.equal(lanes.length, 8);
-  assert.equal(lanes.flat().length, 50);
-  assert.equal(new Set(lanes.flat().map((job) => job.id)).size, 50);
+  assert.equal(lanes.flat().length, 51);
+  assert.equal(new Set(lanes.flat().map((job) => job.id)).size, 51);
   for (const lane of lanes.slice(5)) assert.ok(lane.length > 0);
   assert.deepEqual(
     lanes
@@ -1544,8 +1560,8 @@ test("eight Mac lanes route each label with its own hosted fallback", () => {
   ]);
   const lanes = macosLanes(8);
   assert.equal(lanes.length, 13);
-  assert.equal(lanes.flat().length, 50);
-  assert.equal(new Set(lanes.flat().map((job) => job.id)).size, 50);
+  assert.equal(lanes.flat().length, 51);
+  assert.equal(new Set(lanes.flat().map((job) => job.id)).size, 51);
   for (const lane of lanes.slice(5)) assert.ok(lane.length > 0);
   // One readiness output, so one runner class, for the shared deadline.
   assert.deepEqual(
@@ -2956,6 +2972,67 @@ test("ordinary macOS Array keeps one hosted lane and deadline", () => {
       commands.includes(
         `mise run test:node:shard --shard=${shard.matrix.shard}/6`,
       ),
+    );
+  }
+});
+
+test("ordinary exhaustive RegExp literals keep one job per host", () => {
+  const source = readFileSync(
+    "tests/property/m5-regexp-literal-exhaustive.property.test.ts",
+    "utf8",
+  );
+  // Every ordinary case, seed, and limit stays as the file defines it.
+  assert.equal(numberFrom(source, /numRuns: ([\d_]+)/gu), 1);
+  assert.equal(
+    numberFrom(source, /timeLimitMilliseconds: ([\d_]+)/gu),
+    600_000,
+  );
+  assert.deepEqual(
+    [...source.matchAll(/seed: (0x[\da-f_]+)/gu)].map((match) => match[1]),
+    ["0x6000_9500", "0x6000_9501", "0x6000_9502", "0x6000_9503"],
+  );
+  const command =
+    "mise run test:node --test-concurrency=1 " +
+    "tests/property/m5-regexp-literal-exhaustive.property.test.ts";
+  const linux = after.jobs.test_regexp_exhaustive_linux!;
+  assert.equal(linux["runs-on"], "ubuntu-latest");
+  assert.equal(linux.env, undefined);
+  assert.equal(linux.strategy, undefined);
+  assert.deepEqual(
+    linux.steps.filter((step) => step.run).map((step) => step.run),
+    [command],
+  );
+  const planned = macosJobs().find(
+    (job) => job.sourceId === "test_regexp_exhaustive_macos",
+  );
+  assert.ok(planned);
+  const job = after.jobs[planned.id]!;
+  assert.equal(job["runs-on"], "macos-latest");
+  assert.equal(job.env, undefined);
+  assert.deepEqual(
+    job.steps.filter((step) => step.run).map((step) => step.run),
+    ["sw_vers -productVersion", command],
+  );
+  assert.equal(after.jobs.test_regexp_exhaustive_macos, undefined);
+  const needs = after.jobs.native!.needs;
+  assert.ok(Array.isArray(needs));
+  assert.ok(needs.includes(planned.id));
+  assert.ok(needs.includes("test_regexp_exhaustive_linux"));
+  // The ordinary macOS job stays on a hosted lane, as the shards do.
+  for (const count of [0, 4, configuredSelfHostedLanes]) {
+    const lanes = macosLanes(count);
+    assert.equal(
+      lanes
+        .slice(0, 5)
+        .flat()
+        .filter((entry) => entry.id === planned.id).length,
+      1,
+    );
+    assert.ok(
+      !lanes
+        .slice(5)
+        .flat()
+        .some((entry) => entry.id === planned.id),
     );
   }
 });

@@ -43,6 +43,16 @@ export const dedicatedMacosNodeFiles: readonly string[] = [
 ];
 
 /**
+ * Ordinary Node files with one dedicated job on each of Linux and macOS.
+ * Beside a shared shard's other file workers, properties in these files
+ * reached their unchanged interrupt. The dedicated jobs run them with one
+ * file worker and keep every ordinary case, seed, and limit.
+ */
+export const dedicatedNodeFiles: readonly string[] = [
+  "tests/property/m5-regexp-literal-exhaustive.property.test.ts",
+];
+
+/**
  * Ordinary property files with dedicated host C sanitizer jobs on both
  * hosts. Each one compiles enough native code under ASan and UBSan that it
  * would move a shared sanitizer property job toward its limit, so the shared

@@ -5,8 +5,12 @@ import { tmpdir } from "node:os";
 import { dirname, join } from "node:path";
 import { test } from "node:test";
 import { fileURLToPath } from "node:url";
-import { dedicatedMacosNodeFiles } from "../tools/native-shard.ts";
 import {
+  dedicatedMacosNodeFiles,
+  dedicatedNodeFiles,
+} from "../tools/native-shard.ts";
+import {
+  dedicatedNodeFilesFor,
   discoverNodeTests,
   modeledNodeShardSeconds,
   nodeShardInventory,
@@ -60,6 +64,7 @@ test("Node shards plus dedicated files equal Node discovery", () => {
       "nested/example_test.ts",
       "nested/example-test.ts",
       ...dedicatedMacosNodeFiles,
+      ...dedicatedNodeFiles,
     ];
     writeFileSync(join(cwd, "package.json"), '{"type":"module"}');
     for (const file of [
@@ -82,7 +87,7 @@ test("Node shards plus dedicated files equal Node discovery", () => {
     assert.deepEqual(discoverNodeTests(cwd), files.toSorted());
     for (const platform of ["linux", "darwin"]) {
       const total = totalFor(platform);
-      const dedicated = platform === "darwin" ? dedicatedMacosNodeFiles : [];
+      const dedicated = dedicatedNodeFilesFor(platform);
       const selected = Array.from({ length: total }, (_, index) =>
         nodeTestShardArguments(cwd, { index: index + 1, total }, platform),
       ).flatMap((args) => {
@@ -123,20 +128,30 @@ test("real Node inventory runs exactly once per host", () => {
   assert.deepEqual(dedicatedMacosNodeFiles, [
     "tests/property/m5-array-constructor.property.test.ts",
   ]);
-  assert.deepEqual(nodeShardInventory(process.cwd(), "linux"), all);
+  assert.deepEqual(dedicatedNodeFiles, [
+    "tests/property/m5-regexp-literal-exhaustive.property.test.ts",
+  ]);
+  assert.deepEqual(dedicatedNodeFilesFor("linux"), dedicatedNodeFiles);
+  assert.deepEqual(dedicatedNodeFilesFor("darwin"), [
+    ...dedicatedMacosNodeFiles,
+    ...dedicatedNodeFiles,
+  ]);
   for (const platform of ["linux", "darwin"]) {
     const inventory = nodeShardInventory(process.cwd(), platform);
+    const dedicated = dedicatedNodeFilesFor(platform);
+    // Each dedicated file exists and leaves the shards' inventory.
+    for (const file of dedicated) {
+      assert.ok(all.includes(file), file);
+      assert.ok(!inventory.includes(file), file);
+    }
     const selected = shards(inventory, platform).flat();
     assert.equal(new Set(selected).size, selected.length);
     assert.deepEqual(selected.toSorted(), inventory);
+    // The shards plus the host's dedicated jobs run every file once.
+    const covered = [...selected, ...dedicated];
+    assert.equal(new Set(covered).size, covered.length, platform);
+    assert.deepEqual(covered.toSorted(), all, platform);
   }
-  assert.deepEqual(
-    [
-      ...nodeShardInventory(process.cwd(), "darwin"),
-      ...dedicatedMacosNodeFiles,
-    ].toSorted(),
-    all,
-  );
 });
 
 test("every weighted file exists and every shard keeps its margin", () => {

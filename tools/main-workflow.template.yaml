@@ -85,8 +85,9 @@ jobs:
       - run: mise run test:${{ matrix.runtime }}
 
   # macOS. The wrapper reproduces Node's default discovery, removes the
-  # dedicated Array file, and assigns the rest to six shards by measured
-  # file weights; see docs/evidence/node-shards/README.md.
+  # dedicated Array and exhaustive RegExp literal files, and assigns the
+  # rest to six shards by measured file weights; see
+  # docs/evidence/node-shards/README.md.
   test_node_shard:
     name: >-
       test (macos-latest, node,
@@ -137,11 +138,32 @@ jobs:
           mise run test:node --test-concurrency=1
           tests/property/m5-array-constructor.property.test.ts
 
-  # Linux. The same wrapper assigns Node's whole discovery to four shards
-  # by measured file weights. Positional --test-shard left late-sorted
-  # heavy files as tails: run 41238903460 ended shard 2/2 at 56.0 minutes
-  # while 1/2 took 37.4. The weights, the model and its modeled maxima are
-  # in docs/evidence/node-shards/README.md.
+  # Beside other file workers this file's plain properties reached their
+  # 600-second interrupt, so it leaves the ordinary shards on both hosts;
+  # see docs/evidence/regexp-exhaustive-node/README.md. Hosted macos-latest,
+  # one file worker, no time scaling. The generator places this on one of
+  # the same five hosted capacity lanes.
+  test_regexp_exhaustive_macos:
+    name: RegExp literals exhaustive (macos-latest, node)
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: jdx/mise-action@v4
+        with:
+          install: true
+      - uses: ./.github/actions/runtime-archive-cache
+      - run: >-
+          mise run test:node --test-concurrency=1
+          tests/property/m5-regexp-literal-exhaustive.property.test.ts
+
+  # Linux. The same wrapper assigns Node's discovery, without the dedicated
+  # exhaustive RegExp literal file, to four shards by measured file
+  # weights. Positional --test-shard left late-sorted heavy files as tails:
+  # run 41238903460 ended shard 2/2 at 56.0 minutes while 1/2 took 37.4.
+  # The weights, the model and its modeled maxima are in
+  # docs/evidence/node-shards/README.md.
   test_node_shard_linux:
     name: >-
       test (ubuntu-latest, node,
@@ -170,6 +192,23 @@ jobs:
       - run: >-
           mise run test:node:shard
           --shard=${{ matrix.shard }}/${{ matrix.total }}
+
+  # The Linux counterpart of test_regexp_exhaustive_macos: one file
+  # worker, every ordinary case and limit, no time scaling.
+  test_regexp_exhaustive_linux:
+    name: RegExp literals exhaustive (ubuntu-latest, node)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: jdx/mise-action@v4
+        with:
+          install: true
+      - uses: ./.github/actions/runtime-archive-cache
+      - run: >-
+          mise run test:node --test-concurrency=1
+          tests/property/m5-regexp-literal-exhaustive.property.test.ts
 
   test_native:
     name: native (${{ matrix.platform.target }}, ${{ matrix.shard }}/3)
@@ -904,6 +943,8 @@ jobs:
       - test_regexp_exhaustive_case
       - test_array_constructor
       - test_array_constructor_macos
+      - test_regexp_exhaustive_linux
+      - test_regexp_exhaustive_macos
       - test_test262
     runs-on: ubuntu-latest
     steps:
@@ -913,4 +954,6 @@ jobs:
           test "${{ needs.test_native_support.result }}" = success
           test "${{ needs.test_array_constructor.result }}" = success
           test "${{ needs.test_array_constructor_macos.result }}" = success
+          test "${{ needs.test_regexp_exhaustive_linux.result }}" = success
+          test "${{ needs.test_regexp_exhaustive_macos.result }}" = success
           test "${{ needs.test_test262.result }}" = success
