@@ -586,9 +586,10 @@ The property suite generates async iterables, synchronous iterables, and
 array-likes of numbers, promises, thenables, and rejected promises, with
 failing `next` steps, six mapper kinds, and three receivers, and compares the
 settled result and the order of observable steps with an independent model of
-the closure. All 95 test262 paths pass in a local observation with the
-reviewed harness copies; seven of them need `TemporalHelpers.observeProperty`,
-which the reviewed *temporalHelpers.js* keeps for them. The family record is
+the closure. All 95 test262 paths pass, and the family record's standards
+class cites the results partitions that hold them. Seven of them need
+`TemporalHelpers.observeProperty`, which the reviewed *temporalHelpers.js*
+keeps for them. The family record is
 [*array-from-async.yaml*](./language-profile-es2026/families/array-from-async.yaml).
 
 
@@ -625,6 +626,7 @@ JSON texts with exact number and string literals, repeated member names,
 whitespace, and sibling replacements, and compares the reviver's calls, the
 revived value, and a `JSON.rawJSON` round trip of every literal with an
 independent model of InternalizeJSONProperty and with both hosts. All 21
-test262 paths of the unit pass in a local observation, and so do the other 144
-*test/built-ins/JSON/* paths. The family record is
+test262 paths of the unit pass, and the family record's standards class cites
+the results partitions that hold them; the other 144 *test/built-ins/JSON/*
+paths still pass. The family record is
 [*json-parse-source.yaml*](./language-profile-es2026/families/json-parse-source.yaml).

@@ -36,6 +36,42 @@ results:
       passed: true
     unsupportedFeatures: []
   - case:
+      async: true
+      features:
+        - Array.fromAsync
+      flags:
+        - async
+        - noStrict
+      includes:
+        - asyncHelpers.js
+      mode: script
+      path: test/built-ins/Array/fromAsync/thisarg-omitted-sloppy.js
+      strictness:
+        - non-strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - async-functions
+      - functions
+      - iterator-protocol
+      - promise-settlement
+      - symbols
+    execution:
+      harnessIncludes:
+        - base.js
+        - doneprintHandle.js
+        - asyncHelpers.js
+      scheduler: deterministic-logical-clock
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+    observation:
+      passed: true
+    unsupportedFeatures: []
+  - case:
       async: false
       features: []
       flags: []

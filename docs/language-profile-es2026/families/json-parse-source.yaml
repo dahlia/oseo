@@ -45,13 +45,31 @@ evidence:
       - tests/native/fixtures/json-source.ts
       - tests/property/es2026-json-parse-source.property.test.ts
   standards:
-    status: omitted
-    reason: "The 21 test/built-ins/JSON rows of the unit stay unreviewed in
-      the closure ledger until the unit admits them and the full test262
-      update observes them."
-    replacements:
-      - tests/native/fixtures/json-source.ts
-      - tests/property/es2026-json-parse-source.property.test.ts
+    status: covered
+    references:
+      - tests/test262/subset.yaml
+      - tests/test262/results.yaml
+      - tests/test262/results/built-ins/JSON/02.yaml
+      - tests/test262/results/built-ins/JSON/0b.yaml
+      - tests/test262/results/built-ins/JSON/15.yaml
+      - tests/test262/results/built-ins/JSON/24.yaml
+      - tests/test262/results/built-ins/JSON/30.yaml
+      - tests/test262/results/built-ins/JSON/39.yaml
+      - tests/test262/results/built-ins/JSON/3b.yaml
+      - tests/test262/results/built-ins/JSON/41.yaml
+      - tests/test262/results/built-ins/JSON/48.yaml
+      - tests/test262/results/built-ins/JSON/4e.yaml
+      - tests/test262/results/built-ins/JSON/6c.yaml
+      - tests/test262/results/built-ins/JSON/6f.yaml
+      - tests/test262/results/built-ins/JSON/9b.yaml
+      - tests/test262/results/built-ins/JSON/a3.yaml
+      - tests/test262/results/built-ins/JSON/cd.yaml
+      - tests/test262/results/built-ins/JSON/ce.yaml
+      - tests/test262/results/built-ins/JSON/d1.yaml
+      - tests/test262/results/built-ins/JSON/d6.yaml
+      - tests/test262/results/built-ins/JSON/dd.yaml
+      - tests/test262/results/built-ins/JSON/ec.yaml
+      - tests/test262/results/built-ins/JSON/ff.yaml
   structural:
     status: covered
     references:

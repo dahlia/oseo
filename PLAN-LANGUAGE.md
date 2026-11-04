@@ -7,9 +7,9 @@ Status
 Implementation status: in progress. The `claim-boundary` unit has applied ADR
 0032. The `legacy-caller`, `annexb-escape`, `annexb-string-methods`,
 `annexb-date-methods`, `error-is-error`, `math-sum-precise`, `upsert`,
-`iterator-concat`, `iterator-zip`, and `annexb-object-accessors` units are
-implemented and observed. `array-from-async` and `json-parse-source` are
-implemented and await observation, and every other unit is open. This plan
+`iterator-concat`, `iterator-zip`, `annexb-object-accessors`,
+`array-from-async`, and `json-parse-source` units are implemented and
+observed, and every other unit is open. This plan
 follows M5 directly and runs alongside M6. It has no milestone number. It
 schedules the language work the maintainer approved on 2026-11-02: build-time
 static-specifier `import()`, Annex B legacy web behavior except `document.all`,
@@ -528,8 +528,7 @@ Status: implemented, with fixed, differential, and generated evidence in the
 The three earlier seeds keep their domains with oracles of the implemented
 behavior, and the new suite uses `0x6000a400` and `0x6000a401`. All 70 owned
 rows pass in the full test262 observation, and so do the eight ADR 0013 rows,
-which close by observation. The manifest has 41,533 reviewed rows: 35,243
-passes and 1,889 unsupported results, and no other row changes.
+which close by observation, and no other row changes.
 
 ### `annexb-function-declarations`
 
@@ -621,11 +620,11 @@ current *tests/test262/inventory.tsv*.
     property test generates sources and schedules and compares the settled
     array and the order of observable steps with a reference model.
     The runtime, fixtures, and property suite are implemented, and all 95
-    rows pass in a local observation with the reviewed harness copies, whose
-    *temporalHelpers.js* now keeps `TemporalHelpers.observeProperty` for
-    seven of them. V8 departs from the edition in four
-    places that the family record names, so a fixture and the property
-    suite check those against the edition's steps instead of the hosts.
+    rows pass in the full test262 observation with the reviewed harness
+    copies, whose *temporalHelpers.js* now keeps
+    `TemporalHelpers.observeProperty` for seven of them. V8 departs from the
+    edition in four places that the family record names, so a fixture and the
+    property suite check those against the edition's steps instead of the hosts.
  -  `uint8array-base64` owns `toBase64`, `toHex`, `fromBase64`, `fromHex`,
     `setFromBase64`, and `setFromHex` (68). The options cover both alphabets,
     `lastChunkHandling`, and `omitPadding`, over detached and resizable
@@ -642,7 +641,9 @@ current *tests/test262/inventory.tsv*.
     primitive value, and `JSON.stringify` emits a raw JSON object's text
     unchanged.
     The runtime, fixtures, and property suite are implemented, and all 21
-    rows pass in a local observation with the reviewed harness copies.
+    rows pass in the full test262 observation. With both units observed, the
+    manifest has 41,649 reviewed rows: 35,359 passes and 1,889 unsupported
+    results, and no earlier row changes.
 
 ### ECMAScript 2027 units
 
