@@ -2732,6 +2732,7 @@ static void test_realm_random_sequences(void) {
             NULL,
             NULL,
             NULL,
+            NULL,
             NULL
         ));
         roots[2] = make_text(&context, "Math");
@@ -2817,6 +2818,7 @@ static void test_math_intrinsic_api(bool install_global) {
             NULL,
             NULL,
             0u,
+            NULL,
             NULL,
             NULL,
             NULL,
@@ -2910,7 +2912,8 @@ static void test_global_object_bindings(
             declaration_lines,
             declaration_columns,
             binding_ids,
-            functions
+            functions,
+            NULL
         )
     );
     assert(roots[2] == require_normal(oseo_this_value(context,
@@ -2967,7 +2970,8 @@ static void test_global_object_bindings(
         declaration_lines,
         declaration_columns,
         binding_ids,
-        redeclared_function
+        redeclared_function,
+        NULL
     ));
     assert(!oseo_property_cache_matches(roots[2], &cache));
     roots[6] = require_normal(oseo_environment_get(context, roots[5], 0u));
@@ -3134,6 +3138,7 @@ static void test_global_object_bindings(
         NULL,
         NULL,
         NULL,
+        NULL,
         NULL
     ).status == OSEO_STATUS_THROW);
     assert(oseo_global_object_create(
@@ -3150,7 +3155,8 @@ static void test_global_object_bindings(
         declaration_line,
         declaration_column,
         first_binding,
-        function_declaration
+        function_declaration,
+        NULL
     ).status == OSEO_STATUS_THROW);
     (void)require_normal(oseo_global_object_create(
         context,
@@ -3166,7 +3172,8 @@ static void test_global_object_bindings(
         declaration_line,
         declaration_column,
         first_binding,
-        var_declaration
+        var_declaration,
+        NULL
     ));
     roots[5] = require_normal(oseo_environment_get(context, roots[4], 0u));
     (void)require_normal(oseo_global_binding_set(
@@ -3199,7 +3206,8 @@ static void test_global_object_bindings(
         declaration_line,
         declaration_column,
         first_binding,
-        var_declaration
+        var_declaration,
+        NULL
     ));
     roots[5] = require_normal(oseo_environment_get(context, roots[4], 0u));
     assert(require_normal(oseo_cell_get(context, roots[5])) == roots[6]);
@@ -3232,7 +3240,8 @@ static void test_global_object_bindings(
         declaration_line,
         declaration_column,
         first_binding,
-        var_declaration
+        var_declaration,
+        NULL
     ).status == OSEO_STATUS_THROW);
     roots[3] = make_text(context, "blocked");
     assert(require_normal(oseo_object_has_own(
@@ -3252,7 +3261,8 @@ static void test_global_object_bindings(
         declaration_line,
         declaration_column,
         first_binding,
-        var_declaration
+        var_declaration,
+        NULL
     ));
 }
 
