@@ -902,7 +902,11 @@ synchronous stack ignores `null` and `undefined`, while an asynchronous stack
 records them so that disposal still awaits once. An asynchronous stack falls
 back to `Symbol.dispose` and discards that method's result. `move` returns a
 stack of the running realm's intrinsic prototype that owns every resource and
-leaves the receiver disposed and empty.
+leaves the receiver disposed and empty. `use` captures the stack's
+DisposeCapability before it reads the dispose method, so a `Symbol.dispose`
+getter that calls `move` adds its resource to the moved stack. The pinned
+Node.js and Deno add it to the disposed source instead, so that fixture
+compares with the edition's output rather than the hosts.
 
 Disposal visits the resources in reverse order. A failure replaces the stored
 completion: the first one directly, each later one with a `SuppressedError`

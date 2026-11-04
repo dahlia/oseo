@@ -27,11 +27,13 @@ import {
 } from "../packages/testkit/src/index.ts";
 import { nativeToolchain } from "./native-toolchain.ts";
 import { agentReferencePrelude } from "./native/agent-reference.ts";
-import type { Es2026Fixture } from "./native/es2026-fixture.ts";
-import { disposalFixtures } from "./native/fixtures/disposal-intrinsics.ts";
+import {
+  type DisposalFixture,
+  disposalFixtures,
+} from "./native/fixtures/disposal-intrinsics.ts";
 import { realmReferencePrelude } from "./native/realm-reference.ts";
 
-const fixtures: readonly Es2026Fixture[] = disposalFixtures;
+const fixtures: readonly DisposalFixture[] = disposalFixtures;
 
 const host = createNodeHost();
 const nativeTarget = targetForExecutionHost(
@@ -63,7 +65,7 @@ interface Observation {
 }
 
 async function references(
-  fixture: Es2026Fixture,
+  fixture: DisposalFixture,
 ): Promise<readonly Observation[]> {
   const directory = await host.makeTemporaryDirectory("oseo-disposal-");
   const path = `${directory}/${fixture.name}.ts`;
@@ -107,7 +109,10 @@ async function references(
 
 for (const fixture of fixtures) {
   test(`disposal-intrinsics fixture ${fixture.name}`, { skip }, async () => {
-    const observed = await references(fixture);
+    const observed =
+      fixture.expected == null
+        ? await references(fixture)
+        : [{ exitStatus: 0, stderr: "", stdout: fixture.expected }];
     assertMatchingObservations(observed);
     const reference = observed[0]!;
     const test262Host = fixture.test262Host === true;

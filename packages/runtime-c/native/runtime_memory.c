@@ -314,6 +314,7 @@ static void trace_object(
             );
         } else if (object->kind == OSEO_HEAP_DISPOSABLE_STACK) {
             OseoDisposableStack *stack = (OseoDisposableStack *)object;
+            mark_value(stack->capability, worklist);
             mark_value(stack->error, worklist);
             mark_value(stack->promise, worklist);
             mark_value(stack->on_fulfilled, worklist);

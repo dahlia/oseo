@@ -1,5 +1,14 @@
 import type { Es2026Fixture } from "../es2026-fixture.ts";
 
+/** A fixture that may replace the reference hosts with fixed output. */
+export interface DisposalFixture extends Es2026Fixture {
+  /**
+   * The output the edition requires, compared instead of the hosts. The
+   * pinned Node.js and Deno both disagree with it.
+   */
+  readonly expected?: string;
+}
+
 // V8 gives every error an own "stack" property and orders some own keys
 // differently, so the fixtures print sorted keys without "stack".
 const ownKeys = `
@@ -19,7 +28,7 @@ function ownKeys(value) {
  * and %AsyncIteratorPrototype%. Both pinned reference hosts expose them,
  * so every fixture compares with Node.js and Deno.
  */
-export const disposalFixtures: readonly Es2026Fixture[] = [
+export const disposalFixtures: readonly DisposalFixture[] = [
   {
     guardHits: true,
     name: "disposal-suppressed-error",
@@ -697,5 +706,44 @@ try {
 }
 `,
     test262Host: true,
+  },
+  {
+    // AddDisposableResource captures the stack's DisposeCapability before
+    // GetDisposeMethod runs the getter, so a `move` inside the getter
+    // hands the new stack the record the resource is then added to. The
+    // pinned V8 hosts add it to the disposed source instead.
+    expected: [
+      "sync moved false",
+      "sync disposed true",
+      "async moved false",
+      "async disposed true",
+      "",
+    ].join("\n"),
+    name: "disposal-capability-identity",
+    source: `
+async function main() {
+  let moved;
+  const source = new DisposableStack();
+  source.use({
+    get [Symbol.dispose]() {
+      moved = source.move();
+      return () => console.log("sync disposed", source.disposed);
+    },
+  });
+  console.log("sync moved", moved.disposed);
+  moved.dispose();
+  let movedAsync;
+  const asyncSource = new AsyncDisposableStack();
+  asyncSource.use({
+    get [Symbol.asyncDispose]() {
+      movedAsync = asyncSource.move();
+      return async () => console.log("async disposed", asyncSource.disposed);
+    },
+  });
+  console.log("async moved", movedAsync.disposed);
+  await movedAsync.disposeAsync();
+}
+main();
+`,
   },
 ];

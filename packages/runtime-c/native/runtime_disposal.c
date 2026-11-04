@@ -110,6 +110,7 @@ static OseoResult stack_allocate(
     stack->async = async;
     stack->disposed = false;
     stack->capability_only = false;
+    stack->capability = oseo_undefined();
     stack->promise = oseo_undefined();
     stack->error = oseo_undefined();
     stack->on_fulfilled = oseo_undefined();
@@ -136,6 +137,30 @@ OseoResult oseo_internal_dispose_capability_create(
     OseoResult result = stack_allocate(context, &prototype, async);
     if (result.status == OSEO_STATUS_NORMAL) {
         disposable_stack_object(result.value)->capability_only = true;
+    }
+    oseo_roots_pop(context, &frame);
+    return result;
+}
+
+/*
+ * Allocates one stack whose prototype is rooted in `*prototype`, with a
+ * fresh, empty capability record of its own.
+ */
+static OseoResult stack_create(
+    OseoContext *context,
+    const OseoValue *prototype,
+    bool async
+) {
+    OseoValue capability = oseo_undefined();
+    OseoRootFrame frame = {NULL, &capability, 1u};
+    oseo_roots_push(context, &frame);
+    OseoResult result = oseo_internal_dispose_capability_create(context, async);
+    capability = result.value;
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = stack_allocate(context, prototype, async);
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        disposable_stack_object(result.value)->capability = capability;
     }
     oseo_roots_pop(context, &frame);
     return result;
@@ -176,10 +201,15 @@ static OseoResult stack_construct(
         frame.slots[1] = result.value;
     }
     if (result.status == OSEO_STATUS_NORMAL) {
-        result = stack_allocate(context, &frame.slots[1], async);
+        result = stack_create(context, &frame.slots[1], async);
     }
     oseo_roots_release(context, &frame);
     return result;
+}
+
+/* The capability record a constructed stack currently owns. */
+static OseoValue stack_capability(OseoValue stack) {
+    return disposable_stack_object(stack)->capability;
 }
 
 /* RequireInternalSlot for [[DisposableState]] or [[AsyncDisposableState]]. */
@@ -758,7 +788,7 @@ static OseoResult stack_dispose(OseoContext *context, OseoValue receiver) {
     stack->disposed = true;
     return oseo_internal_dispose_capability_dispose(
         context,
-        receiver,
+        stack->capability,
         false,
         oseo_undefined()
     );
@@ -785,7 +815,7 @@ static OseoResult stack_dispose_async(
         disposable_stack_object(slots[0])->disposed = true;
         result = oseo_internal_dispose_capability_dispose_async(
             context,
-            slots[0],
+            stack_capability(slots[0]),
             slots[1],
             false,
             oseo_undefined()
@@ -831,9 +861,11 @@ static OseoResult stack_use(
 ) {
     OseoResult result = pending_receiver(context, receiver, async);
     if (result.status != OSEO_STATUS_NORMAL) return result;
+    /* The capability is captured before the dispose method's getter
+     * runs, so a `move` inside that getter still sees the resource. */
     result = oseo_internal_dispose_capability_add(
         context,
-        receiver,
+        stack_capability(receiver),
         value,
         async
     );
@@ -854,7 +886,13 @@ static OseoResult stack_adopt(
         return type_error(context, "The onDispose callback is not callable.");
     }
     int flags = OSEO_DISPOSE_ADOPTED | (async ? OSEO_DISPOSE_ASYNC_HINT : 0);
-    result = stack_push(context, receiver, value, on_dispose, flags);
+    result = stack_push(
+        context,
+        stack_capability(receiver),
+        value,
+        on_dispose,
+        flags
+    );
     if (result.status == OSEO_STATUS_NORMAL) result.value = value;
     return result;
 }
@@ -872,7 +910,7 @@ static OseoResult stack_defer(
     }
     return stack_push(
         context,
-        receiver,
+        stack_capability(receiver),
         oseo_undefined(),
         on_dispose,
         async ? OSEO_DISPOSE_ASYNC_HINT : 0
@@ -881,8 +919,8 @@ static OseoResult stack_defer(
 
 /*
  * `move` creates the new stack from the intrinsic constructor of the
- * running realm, hands it the whole resource list, and leaves the
- * receiver disposed and empty.
+ * running realm, hands it the receiver's capability record, and leaves
+ * the receiver disposed with a fresh, empty one.
  */
 static OseoResult stack_move(
     OseoContext *context,
@@ -902,17 +940,14 @@ static OseoResult stack_move(
     );
     slots[1] = result.value;
     if (result.status == OSEO_STATUS_NORMAL) {
-        result = stack_allocate(context, &slots[1], async);
+        result = stack_create(context, &slots[1], async);
     }
     if (result.status == OSEO_STATUS_NORMAL) {
         OseoDisposableStack *source = disposable_stack_object(slots[0]);
         OseoDisposableStack *target = disposable_stack_object(result.value);
-        target->resources = source->resources;
-        target->resource_count = source->resource_count;
-        target->resource_capacity = source->resource_capacity;
-        source->resources = NULL;
-        source->resource_count = 0u;
-        source->resource_capacity = 0u;
+        OseoValue fresh = target->capability;
+        target->capability = source->capability;
+        source->capability = fresh;
         source->disposed = true;
     }
     oseo_roots_pop(context, &frame);

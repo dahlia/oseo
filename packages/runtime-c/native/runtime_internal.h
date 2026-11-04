@@ -2216,8 +2216,13 @@ typedef struct {
 } OseoWeakRef;
 
 /*
- * A DisposableStack or AsyncDisposableStack, or the dispose capability of
- * one `using` scope. `resources` holds `resource_count` traced values,
+ * A DisposableStack or AsyncDisposableStack, or a DisposeCapability. A
+ * stack's traced `capability` is the separate capability record it adds
+ * to and disposes, so a method that captured it keeps adding to the same
+ * record even after `move` hands that record to another stack; a
+ * capability record, whether a stack's or a `using` scope's, has
+ * `capability_only` set and no capability of its own. A capability's
+ * `resources` holds `resource_count` traced values,
  * three per DisposableResource in the order they were added: the
  * resource value, its dispose method (undefined for the null resource of
  * an asynchronous hint), and a Number of OSEO_DISPOSE_* flags. The host
@@ -2238,13 +2243,14 @@ typedef struct {
     size_t resource_capacity;
     bool async;
     bool disposed;
-    /* A `using` scope's capability, which no source value can reach. */
+    /* A capability record, which no source value can reach. */
     bool capability_only;
     bool has_error;
     bool needs_await;
     bool has_awaited;
     int phase;
     size_t cursor;
+    OseoValue capability;
     OseoValue error;
     OseoValue promise;
     OseoValue on_fulfilled;

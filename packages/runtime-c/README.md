@@ -1605,15 +1605,19 @@ takes the error range's ninth constructor place, which moves the
 
 *runtime\_disposal.c* owns the new code range 30. `DisposableStack` and
 `AsyncDisposableStack` take realm slots 277 through 280 and share one heap
-kind, `OSEO_HEAP_DISPOSABLE_STACK` (41). Its record holds the
-DisposeCapability as a host buffer of traced triples (value, method, and a
-flags Number for the hint, `adopt`, and the `Symbol.dispose` fallback of an
-asynchronous hint), plus one DisposeResources in progress: the completion,
-and for the asynchronous form the cursor, the needsAwait and hasAwaited flags,
-the purpose of the pending Await, the promise to settle, and the two internal
-reactions that resume it. The collector traces the triples and the four value
-fields. `move` hands the buffer to a new stack created from the running
-realm's intrinsic prototype. `%Iterator.prototype%[@@dispose]` and
+kind, `OSEO_HEAP_DISPOSABLE_STACK` (41). A stack points at a separate
+capability record of the same kind, which holds the DisposeCapability as a
+host buffer of traced triples (value, method, and a flags Number for the hint,
+`adopt`, and the `Symbol.dispose` fallback of an asynchronous hint), plus one
+DisposeResources in progress: the completion, and for the asynchronous form
+the cursor, the needsAwait and hasAwaited flags, the purpose of the pending
+Await, the promise to settle, and the two internal reactions that resume it.
+The collector traces the capability pointer, the triples, and the four value
+fields. `use` captures the capability record before it reads the dispose
+method, and `move` gives that record to a new stack created from the running
+realm's intrinsic prototype and the receiver a fresh one, so a getter that
+moves the stack still adds its resource to the moved stack.
+`%Iterator.prototype%[@@dispose]` and
 `%AsyncIteratorPrototype%[@@asyncDispose]` own no intrinsic slot; the second
 calls `return` with no arguments, as the pinned test262 requires, where the
 pinned Node.js passes `undefined`.
