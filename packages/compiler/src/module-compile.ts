@@ -525,11 +525,11 @@ function withInitializingDiagnostic(
 function resolveModulePrelude(
   prelude: SyntaxProgram,
   nextBindingId: number,
-  importCallTargets: ReadonlyMap<number, number>,
 ): ModulePreludeResolution {
+  // The prelude runs before the module table exists, so an `import()` in
+  // it names no target and keeps the profile diagnostic.
   const resolved = buildSeededHir(prelude, {
     fragmentMetadata: true,
-    importCallTargets,
     nextBindingId,
   });
   const failed = {
@@ -937,7 +937,9 @@ function compileModuleTable(
  * Link and lower a closed module graph to shared-cell scheduled MIR.
  * A `prelude` Script runs to completion in the same realm before any
  * module links or evaluates; modules resolve its global declarations as
- * names of their outer global environment.
+ * names of their outer global environment. The table does not exist
+ * while the prelude runs, so an `import()` in it keeps the profile
+ * diagnostic.
  *
  * The table holds every discovered module. A literal `import()` site
  * lowers to the runtime import operation with its target's constant
@@ -963,11 +965,7 @@ export function compileModuleGraph(
   let nextFunctionId = 0;
   let resolvedPrelude: ModulePrelude | undefined;
   if (prelude != null) {
-    const result = resolveModulePrelude(
-      prelude,
-      nextBindingId,
-      importCallTargetsFor(graph, moduleIndices, prelude.sourceId, "script"),
-    );
+    const result = resolveModulePrelude(prelude, nextBindingId);
     if (result.prelude == null) {
       return { diagnostics: result.diagnostics, graph: linked.graph };
     }
@@ -1085,6 +1083,8 @@ export function buildScriptGraphHir(
     };
   }
   const tableOrder = moduleTableOrder(linked.graph);
+  // A Script whose closure is empty has no table to install.
+  if (tableOrder.length === 0) return buildSeededHir(script, seed);
   const moduleIndices = new Map(
     tableOrder.map((moduleId, index) => [moduleId, index]),
   );

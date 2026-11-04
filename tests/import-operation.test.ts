@@ -195,3 +195,54 @@ test("a site without a recorded target keeps the profile diagnostic", () => {
     [["OSEO1001", importCallProfileMessage]],
   );
 });
+
+test("a prelude import() keeps the profile diagnostic", async () => {
+  const graph = await buildModuleGraph(
+    moduleFrontend,
+    memoryLoader({
+      "lazy.mjs": "export {};",
+      "main.mjs": "export {};",
+    }),
+    fileModuleResolver,
+    "file:///app/main.mjs",
+  );
+  assert.ok(graph.graph);
+  const prelude = scriptFrontend.parse({
+    source: 'import("./lazy.mjs");',
+    sourceId: "file:///app/prelude.js",
+  });
+  assert.ok(prelude.program);
+  const compiled = compileModuleGraph(graph.graph, {}, prelude.program);
+  assert.deepEqual(
+    compiled.diagnostics.map((diagnostic) => [
+      diagnostic.code,
+      diagnostic.message,
+      diagnostic.sourceId,
+    ]),
+    [["OSEO1001", importCallProfileMessage, "file:///app/prelude.js"]],
+  );
+});
+
+test("a Script with an empty request closure installs no table", async () => {
+  const source = 'console.log("plain");';
+  const canonicalId = "file:///app/plain.js";
+  const parsed = scriptFrontend.parse({ source, sourceId: canonicalId });
+  assert.ok(parsed.program);
+  const requests = await buildScriptRequests(
+    moduleFrontend,
+    memoryLoader({}),
+    fileModuleResolver,
+    [{ canonicalId, program: parsed.program }],
+  );
+  assert.ok(requests.closure);
+  assert.equal(requests.closure.modules.length, 0);
+  const compiled = compileSource(
+    scriptFrontend,
+    { source, sourceId: canonicalId },
+    {},
+    { canonicalId, closure: requests.closure },
+  );
+  assert.deepEqual(compiled.diagnostics, []);
+  assert.ok(compiled.mir);
+  assert.doesNotMatch(printMir(compiled.mir), /module_evaluate/u);
+});
