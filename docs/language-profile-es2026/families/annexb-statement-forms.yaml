@@ -44,14 +44,29 @@ evidence:
     references:
       - tests/annexb-function-declarations-native.test.ts
   standards:
-    status: omitted
-    reason: "The 19 owned test262 paths under test/annexB/language/
-      statements/for-in/, statements/try/, and expressions/
-      assignmenttargettype/ are not yet admitted to the reviewed subset; the
-      full test262 update admits them and replaces this entry with their
-      result partitions."
-    replacements:
-      - tests/annexb-function-declarations-native.test.ts
+    status: covered
+    references:
+      - tests/test262/subset.yaml
+      - tests/test262/results.yaml
+      - tests/test262/results/annexB/language/02.yaml
+      - tests/test262/results/annexB/language/03.yaml
+      - tests/test262/results/annexB/language/09.yaml
+      - tests/test262/results/annexB/language/0b.yaml
+      - tests/test262/results/annexB/language/2e.yaml
+      - tests/test262/results/annexB/language/31.yaml
+      - tests/test262/results/annexB/language/43.yaml
+      - tests/test262/results/annexB/language/5d.yaml
+      - tests/test262/results/annexB/language/60.yaml
+      - tests/test262/results/annexB/language/71.yaml
+      - tests/test262/results/annexB/language/8d.yaml
+      - tests/test262/results/annexB/language/98.yaml
+      - tests/test262/results/annexB/language/a4.yaml
+      - tests/test262/results/annexB/language/b8.yaml
+      - tests/test262/results/annexB/language/c2.yaml
+      - tests/test262/results/annexB/language/cb.yaml
+      - tests/test262/results/annexB/language/db.yaml
+      - tests/test262/results/annexB/language/f5.yaml
+      - tests/test262/results/annexB/language/ff.yaml
   structural:
     status: covered
     references:

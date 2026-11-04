@@ -8,10 +8,9 @@ Implementation status: in progress. The `claim-boundary` unit has applied ADR
 0032. The `legacy-caller`, `annexb-escape`, `annexb-string-methods`,
 `annexb-date-methods`, `error-is-error`, `math-sum-precise`, `upsert`,
 `iterator-concat`, `iterator-zip`, `annexb-object-accessors`,
-`array-from-async`, `json-parse-source`, `uint8array-base64`, and
-`atomics-pause` units are implemented and observed. The
-`annexb-function-declarations` and `annexb-statement-forms` units are
-implemented, and their rows wait for admission. Every other unit is open.
+`array-from-async`, `json-parse-source`, `uint8array-base64`,
+`atomics-pause`, `annexb-function-declarations`, and `annexb-statement-forms`
+units are implemented and observed. Every other unit is open.
 This plan follows M5 directly and runs alongside M6. It has no milestone
 number. It schedules the language work the maintainer approved on 2026-11-02:
 build-time static-specifier `import()`, Annex B legacy web behavior except
@@ -105,11 +104,11 @@ A probe of the current build and the reviewed manifest shows this Annex B state:
 | `substr`, HTML methods, `trimLeft`, `trimRight`    | Installed by `annexb-string-methods`; all 105 test262 rows pass               |
 | `getYear`, `setYear`, `toGMTString`                | Installed by `annexb-date-methods`; all 24 test262 rows pass                  |
 | `RegExp.prototype.compile`                         | Not installed                                                                 |
-| Labelled function declarations                     | Implemented by `annexb-function-declarations`; rows not yet admitted          |
-| Function declarations in `if` clauses              | Implemented by `annexb-function-declarations`; rows not yet admitted          |
-| Block-level function web legacy semantics          | Implemented by `annexb-function-declarations`; rows not yet admitted          |
-| `for (var x = init in obj)`                        | Implemented by `annexb-statement-forms`; rows not yet admitted                |
-| Function call assignment targets as runtime errors | Implemented by `annexb-statement-forms`; rows not yet admitted                |
+| Labelled function declarations                     | Implemented by `annexb-function-declarations`; its test262 row passes         |
+| Function declarations in `if` clauses              | Implemented by `annexb-function-declarations`; its test262 rows pass          |
+| Block-level function web legacy semantics          | Implemented by `annexb-function-declarations`; its test262 rows pass          |
+| `for (var x = init in obj)`                        | Implemented by `annexb-statement-forms`; its test262 rows pass                |
+| Function call assignment targets as runtime errors | Implemented by `annexb-statement-forms`; its test262 rows pass                |
 
 The M5 `__proto__` boundary is documented in the
 [omitted legacy accessor metadata contract](./docs/language-profile-m5.md#omitted-legacy-accessor-metadata-boundary),
@@ -559,8 +558,9 @@ independent model of the Annex B rules under both specialization policies.
 
 Status: implemented, with fixed, differential, and generated evidence in the
 [profile section](./docs/language-profile-es2026.md#annex-b-language-semantics).
-All 313 rows pass in a focused observation and wait for the full test262
-update to admit them.
+All 313 rows pass in the full test262 observation, including the 17
+`$262.evalScript` rows, which pass as ADR 0029 host Scripts and need no ADR
+0016 exclusion.
 
 ### `annexb-statement-forms`
 
@@ -574,9 +574,12 @@ the right operand. The catch rows already behave as specified and need only
 admission.
 
 Status: implemented, with fixed and differential evidence in the
-[profile section](./docs/language-profile-es2026.md#statement-forms). All 19
-rows pass in a focused observation and wait for the full test262 update to
-admit them.
+[profile section](./docs/language-profile-es2026.md#statement-forms). In the
+full test262 observation, 13 rows pass and the six `for-in` rows that expect a
+parse-time `SyntaxError` report it. With this unit and
+`annexb-function-declarations` observed, the manifest has 42,054 reviewed
+rows: 35,758 passes, 4,407 expected negatives, and 1,889 unsupported results,
+and no earlier row changes.
 
 ### `annexb-dynamic-source-accounting`
 
@@ -687,9 +690,7 @@ current *tests/test262/inventory.tsv*.
     The runtime and fixture are implemented, and all five rows pass in the
     full test262 observation. Each call executes one hint, PAUSE on x86-64
     and YIELD on AArch64, which the target descriptions record as
-    `atomicsPauseHint`. With this unit and `uint8array-base64` observed, the
-    manifest has 41,722 reviewed rows: 35,432 passes and 1,889 unsupported
-    results, and no earlier row changes.
+    `atomicsPauseHint`. No earlier row changes.
 
 ### `language-exit-audit`
 

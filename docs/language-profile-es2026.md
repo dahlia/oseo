@@ -374,9 +374,9 @@ the Annex B rules that change non-strict code: B.3.1 through B.3.5 for
 function declarations and the `for-in` initializer, and the run-time error for
 a call used as an assignment target. Strict code and modules keep every early
 error they reported before. Their family records are
-`annexb-function-declarations` and `annexb-statement-forms`. Their 332
-test262 paths are not yet admitted, so each record's standards class names the
-replacement evidence below until the full test262 update admits them.
+`annexb-function-declarations` and `annexb-statement-forms`. Of their 332
+test262 rows, 326 pass and six report the parse-time `SyntaxError` they expect;
+each record's standards class cites the results partitions that hold its rows.
 
 ### Function declarations
 
