@@ -620,10 +620,10 @@ current *tests/test262/inventory.tsv*.
     `await` per element, the optional mapper, and constructor receivers. A
     property test generates sources and schedules and compares the settled
     array and the order of observable steps with a reference model.
-    The runtime, fixtures, and property suite are implemented. In a local
-    observation with the reviewed harness copies, 88 of the 95 rows pass;
-    the other seven call `TemporalHelpers.observeProperty`, which the
-    reviewed *temporalHelpers.js* omits. V8 departs from the edition in four
+    The runtime, fixtures, and property suite are implemented, and all 95
+    rows pass in a local observation with the reviewed harness copies, whose
+    *temporalHelpers.js* now keeps `TemporalHelpers.observeProperty` for
+    seven of them. V8 departs from the edition in four
     places that the family record names, so a fixture and the property
     suite check those against the edition's steps instead of the hosts.
  -  `uint8array-base64` owns `toBase64`, `toHex`, `fromBase64`, `fromHex`,

@@ -582,8 +582,7 @@ The property suite generates async iterables, synchronous iterables, and
 array-likes of numbers, promises, thenables, and rejected promises, with
 failing `next` steps, six mapper kinds, and three receivers, and compares the
 settled result and the order of observable steps with an independent model of
-the closure. Of the 95 test262 paths, 88 pass in a local observation with the
-reviewed harness copies. The other seven call `TemporalHelpers.observeProperty`,
-which the reviewed *temporalHelpers.js* omits; they pass with the upstream
-member. The family record is
+the closure. All 95 test262 paths pass in a local observation with the
+reviewed harness copies; seven of them need `TemporalHelpers.observeProperty`,
+which the reviewed *temporalHelpers.js* keeps for them. The family record is
 [*array-from-async.yaml*](./language-profile-es2026/families/array-from-async.yaml).

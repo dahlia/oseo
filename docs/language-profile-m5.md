@@ -9329,7 +9329,8 @@ upstream's internal `subClass`. `subClass` itself is undefined, since it is
 outside the upstream `defines` and no pinned test calls it, and both
 `typeof Float16Array` probes stay verbatim. The *temporalHelpers.js* subset
 keeps only `observeMethod`, `propertyBagObserver`, `toPrimitiveObserver`, and
-the upstream `formatPropertyName` and `ASCII_IDENTIFIER` they log through.
+the upstream `formatPropertyName` and `ASCII_IDENTIFIER` they log through; the
+post-M5 `array-from-async` unit added `observeProperty`.
 Because it still declares `TemporalHelpers`, the `harness-definition` check
 compares literal member keys of upstream object-literal definitions, and the
 object runs behind a proxy that prints a per-case marker before throwing on
@@ -10437,11 +10438,12 @@ the ledger assigns three to `temporal-helpers-harness` and one to
 
 M5c IH-B admits a reviewed *temporalHelpers.js* subset that keeps only the
 generic `observeMethod`, `propertyBagObserver`, and `toPrimitiveObserver`
-helpers. Any observation of an omitted `TemporalHelpers` member trips a
-runtime trap whose marker makes the case a harness failure. No case code
-can turn the trap into a pass or an expected negative; the work note
-records the one window an external signal could still open. Its focused
-precheck observes the three *Iterator/from/* paths as pass;
+helpers; the post-M5 `array-from-async` unit added `observeProperty`. Any
+observation of an omitted `TemporalHelpers` member trips a runtime trap whose
+marker makes the case a harness failure. No case code can turn the trap into a
+pass or an expected negative; the work note records the one window an external
+signal could still open. Its focused precheck observes the three
+*Iterator/from/* paths as pass;
 [its work note](./m5c-graph/temporal-helpers-harness.md) records the decision
 and evidence.
 

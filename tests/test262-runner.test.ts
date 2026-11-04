@@ -2152,7 +2152,8 @@ function probeTemporalHelpersHarness(harness: string, probe: string): string {
 test("temporal helpers harness keeps the upstream observers", async () => {
   const { reviewed, upstream } = await temporalHelpersHarnesses();
   // Every key branch of formatPropertyName, primitive and object values,
-  // skipToPrimitive, each trap, and observeMethod's receiver and arguments.
+  // skipToPrimitive, each trap, observeMethod's receiver and arguments, and
+  // observeProperty's accessors with and without an object name.
   const probe = `(() => {
     const calls = [];
     const local = Symbol("local");
@@ -2185,27 +2186,36 @@ test("temporal helpers harness keeps the upstream observers", async () => {
     TemporalHelpers.observeMethod(calls, target, "add", "target");
     TemporalHelpers.observeMethod(calls, target, "add");
     reads.push(target.add(3, 4));
+    const observed = {};
+    TemporalHelpers.observeProperty(calls, observed, "plain", 8, "observed");
+    TemporalHelpers.observeProperty(calls, observed, local, 9);
+    TemporalHelpers.observeProperty(calls, observed, 2, 10, "observed");
+    observed.plain = 0;
+    reads.push(observed.plain, observed[local], observed[2],
+      Object.getOwnPropertyDescriptor(observed, "plain").enumerable);
     return JSON.stringify({ calls, reads });
   })()`;
   const observed = probeTemporalHelpersHarness(reviewed, probe);
   assert.equal(observed, probeTemporalHelpersHarness(upstream, probe));
   assert.match(observed, /get bag\[Symbol\.for\('registered'\)\]/u);
   assert.match(observed, /call target\.add/u);
-  // The reviewed object keeps exactly the three generic observers, and the
+  // The reviewed object keeps exactly the four generic observers, and the
   // copy reads no global outside the standard ones they need.
   assert.deepEqual(parseHarnessObjectMembers(reviewed).get("TemporalHelpers"), [
+    "observeProperty",
     "observeMethod",
     "propertyBagObserver",
     "toPrimitiveObserver",
   ]);
   const upstreamMembers =
     parseHarnessObjectMembers(upstream).get("TemporalHelpers") ?? [];
-  assert.ok(upstreamMembers.includes("observeProperty"));
+  assert.ok(upstreamMembers.includes("substituteMethod"));
   assert.ok(upstreamMembers.includes("assertDuration"));
   assert.deepEqual(
     [...unresolvedReferenceNames(reviewed, "script")].toSorted(),
     [
       "Number",
+      "Object",
       "Proxy",
       "Reflect",
       "String",

@@ -3,11 +3,12 @@
 // A reviewed subset of the upstream Temporal test helpers. Outside the
 // Temporal and Intl directories, the pinned suite includes this harness
 // only for its generic observers: the reviewed Iterator.from cases call
-// TemporalHelpers.propertyBagObserver and TemporalHelpers.observeMethod.
-// This copy keeps those two helpers, the toPrimitiveObserver helper that
-// propertyBagObserver returns for primitive property values, and the
-// upstream formatPropertyName function and ASCII_IDENTIFIER pattern they
-// log through. Each kept operation is unchanged; the repository formatter
+// TemporalHelpers.propertyBagObserver and TemporalHelpers.observeMethod,
+// and the Array.fromAsync cases call those and
+// TemporalHelpers.observeProperty. This copy keeps those three helpers,
+// the toPrimitiveObserver helper that propertyBagObserver returns for
+// primitive property values, and the upstream formatPropertyName function
+// and ASCII_IDENTIFIER pattern they log through. Each kept operation is unchanged; the repository formatter
 // owns every JavaScript file here, so spacing differs from upstream.
 //
 // Every other TemporalHelpers member is omitted. Most construct, compare,
@@ -55,6 +56,24 @@ function formatPropertyName(propertyKey, objectName = "") {
 }
 
 var TemporalHelpers = {
+  /*
+   * observeProperty(calls, object, propertyName, value):
+   *
+   * Defines an own property @object.@propertyName with value @value, that
+   * will log any calls to its accessors to the array @calls.
+   */
+  observeProperty(calls, object, propertyName, value, objectName = "") {
+    Object.defineProperty(object, propertyName, {
+      get() {
+        calls.push(`get ${formatPropertyName(propertyName, objectName)}`);
+        return value;
+      },
+      set() {
+        calls.push(`set ${formatPropertyName(propertyName, objectName)}`);
+      },
+    });
+  },
+
   /*
    * observeMethod(calls, object, propertyName, value):
    *
