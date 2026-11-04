@@ -96,23 +96,17 @@ for (const fixture of annexBMixedCoreFixtures) {
 }
 
 // The four omitted patterns are the Annex B forms of separator-regexp.js.
-// The profile rejects each at build time; the other 33 compile in the fixture.
-for (const [pattern, message] of [
-  ["\\k<x>", /named backreference .* only by Annex B/u],
-  ["\\XA0", /identity escape is admitted only by Annex B/u],
-  ["\\x", /incomplete hexadecimal escape is admitted only by Annex B/u],
-  ["\\X", /identity escape is admitted only by Annex B/u],
-] as const) {
-  test(`split regexp Annex B form stays rejected: /${pattern}/`, () => {
+// The annexb-syntax unit admits Annex B's pattern grammar, so each now
+// compiles at build time; tests/annexb-syntax-native.test.ts runs them.
+for (const pattern of ["\\k<x>", "\\XA0", "\\x", "\\X"] as const) {
+  test(`split regexp Annex B form compiles: /${pattern}/`, () => {
     for (const strict of [false, true]) {
       const result = compileSource(frontend, {
         source: `${strict ? '"use strict";\n' : ""}"x".split(/${pattern}/);`,
         sourceId: "annex-b-split-pattern.js",
       });
-      assert.equal(result.mir, undefined);
-      assert.ok(result.diagnostics.length > 0);
-      assert.ok(result.diagnostics.every((d) => d.code === "OSEO1001"));
-      assert.ok(result.diagnostics.some((d) => message.test(d.message)));
+      assert.deepEqual(result.diagnostics, []);
+      assert.ok(result.mir != null);
     }
   });
 }

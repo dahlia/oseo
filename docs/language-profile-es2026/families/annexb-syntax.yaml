@@ -1,0 +1,69 @@
+version: 1
+id: annexb-syntax
+title: "Annex B HTML-like comments and regular expression patterns"
+scope:
+  - "The HTML-like comments of B.1.1 in the Script goal: <!-- anywhere,
+    --> at the start of the source, after a line terminator with only
+    white space and comments before it, and after a multi-line comment
+    holding a line terminator, with Module code keeping the core early
+    errors."
+  - "The regular expression pattern grammar of B.1.2 without u and v, in
+    the build-time pattern parser and generated matcher data and in the
+    runtime's own validator and pattern compiler: identity escapes over
+    every character but c, legacy octal escapes, decimal escapes past the
+    capture count, incomplete hexadecimal and Unicode escapes, \\c without
+    a letter, braces and brackets that start nothing, class escapes as
+    range bounds, and quantified lookaheads."
+  - "The core grammar's early errors under u and v and the errors Annex B
+    shares, which stay SyntaxErrors in literals, in the RegExp constructor,
+    and in the String methods that reach it."
+owners:
+  - docs/language-profile-es2026.md
+evidence:
+  differential:
+    status: covered
+    references:
+      - tests/annexb-syntax-native.test.ts
+      - tests/native/fixtures/annexb-syntax.ts
+      - tests/property/m5-annexb-regexp-syntax.property.test.ts
+      - tests/property/m5-regexp-pattern.property.test.ts
+  fixed:
+    status: covered
+    references:
+      - tests/native/fixtures/annexb-syntax.ts
+      - packages/compiler/tests/regexp.test.ts
+  forced-collection:
+    status: covered
+    references:
+      - tests/annexb-syntax-native.test.ts
+      - tests/property/m5-annexb-regexp-syntax.property.test.ts
+  generated:
+    status: covered
+    references:
+      - tests/property/m5-annexb-regexp-syntax.property.test.ts
+      - tests/property/m5-regexp-pattern.property.test.ts
+      - tests/property/m5-regexp-literal-exhaustive.property.test.ts
+  guard-fallback:
+    status: covered
+    references:
+      - tests/annexb-syntax-native.test.ts
+      - tests/native/fixtures/annexb-syntax.ts
+  specialization:
+    status: covered
+    references:
+      - tests/annexb-syntax-native.test.ts
+      - tests/property/m5-annexb-regexp-syntax.property.test.ts
+  standards:
+    status: omitted
+    reason: "The 28 test262 paths under test/annexB/language/comments/,
+      literals/, expressions/template-literal/, and the eval-free files of
+      test/annexB/built-ins/RegExp/ and its named-groups/, and
+      test/built-ins/String/prototype/split/separator-regexp.js, stay
+      unreviewed until Root admits them in its full UPDATE."
+    replacements:
+      - tests/native/fixtures/annexb-syntax.ts
+      - tests/property/m5-annexb-regexp-syntax.property.test.ts
+  structural:
+    status: covered
+    references:
+      - packages/compiler/tests/regexp.test.ts

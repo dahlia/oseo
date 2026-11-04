@@ -12,15 +12,17 @@
  * with the original's expected spelling.
  *
  * The escaped originals also accept a SyntaxError when the code unit is not
- * `$`, ZWNJ or ZWJ and `var _X` parses. A pattern without `u` reaches Annex
- * B's identity escape there, which ADR 0013 excludes, so the build reports
- * those literals as unsupported with the Annex B message. That is the core
- * grammar's SyntaxError outcome, and the build-time domain checks it against
- * the repository's `ID_Continue` table and the core escapes independently of
- * the parser's own classifier. ZWNJ and ZWJ are the exception: Unicode 15.1
- * made them `ID_Continue`, so the core grammar rejects their escapes too,
- * while the originals exempt them from the fallback. Those two assertions
- * depend on Annex B, and the domain pins exactly that residue.
+ * `$`, ZWNJ or ZWJ and `var _X` parses, which is the core grammar's outcome
+ * for an identity escape over an `ID_Continue` character. The build follows
+ * Annex B's pattern grammar, whose identity escape admits every code unit
+ * but `c`, so it accepts every selected literal and never takes that
+ * fallback. That includes `\c`, which Annex B reads as a backslash
+ * followed by a `c` while its `source` keeps the original spelling. The
+ * build-time domain checks the acceptance against the core grammar's own
+ * partition, computed from the repository's
+ * `ID_Continue` table and the core escapes independently of the parser,
+ * and requires the core-only parse to reject exactly that partition with
+ * the Annex B message.
  *
  * The generated part is the native layout of one complete sweep: the
  * rotation that decides which code units share a program, the size of the
@@ -40,9 +42,13 @@ import { defaultComponents } from "../../packages/cli/src/index.ts";
 import {
   compileSource,
   describeTarget,
+  parseRegExpPattern,
   targetForExecutionHost,
 } from "../../packages/compiler/src/index.ts";
-import type { MirProgram } from "../../packages/compiler/src/index.ts";
+import type {
+  MirProgram,
+  RegExpPatternExtensions,
+} from "../../packages/compiler/src/index.ts";
 import { createNodeHost } from "../../packages/host/src/index.ts";
 import { cRuntimeProvider } from "../../packages/runtime-c/src/index.ts";
 import {
@@ -88,8 +94,10 @@ const nativeTarget = targetForExecutionHost(
   },
 );
 
-// The accepted counts pin the build's partition of the escaped domains:
-// 65,521 selected code units less the 50,784 that only Annex B admits.
+// Annex B's grammar accepts every selected code unit in every domain. The
+// core grammar alone would accept 14,737 of each escaped domain: 65,521
+// less the 50,784 that only Annex B admits.
+const coreEscapedAccepted = 14_737;
 const firstPlain: LiteralDomain = {
   accepted: 65_521,
   escaped: false,
@@ -97,7 +105,7 @@ const firstPlain: LiteralDomain = {
   prefix: "",
 };
 const firstEscaped: LiteralDomain = {
-  accepted: 14_737,
+  accepted: 65_521,
   escaped: true,
   path: "test/language/literals/regexp/S7.8.5_A1.4_T2.js",
   prefix: "\\",
@@ -109,7 +117,7 @@ const subsequentPlain: LiteralDomain = {
   prefix: "nnnn",
 };
 const subsequentEscaped: LiteralDomain = {
-  accepted: 14_737,
+  accepted: 65_521,
   escaped: true,
   path: "test/language/literals/regexp/S7.8.5_A2.4_T2.js",
   prefix: "a\\",
@@ -174,74 +182,75 @@ function regexpLiterals(mir: MirProgram) {
   );
 }
 
-/**
- * How the build treats one original evaluation.
- *
- * `annex-b-only` is a rejection the original does not tolerate: the code
- * unit is one the original exempts from its UnicodeIDContinue fallback, so
- * only Annex B's identity escape satisfies that assertion.
- */
-type LiteralOutcome = "accepted" | "annex-b-only" | "core-syntax-error";
+/** The identifier classifier a build gives the pattern parser. */
+const coreExtensions: RegExpPatternExtensions = {
+  admitted: [],
+  identifierPart: (codePoint) =>
+    idContinue != null && codePointSetHas(idContinue, codePoint),
+};
 
 /**
- * Compile one original evaluation as a build-time literal and classify it,
- * asserting every original assertion that the outcome reaches.
+ * Compile one original evaluation as a build-time literal and check the
+ * `source` the original compares. Annex B's grammar accepts every selected
+ * code unit, so every evaluation reaches that comparison.
  */
-function literalOutcome(
+function assertLiteralAccepted(
   domain: LiteralDomain,
   unit: number,
   strict: boolean,
-): LiteralOutcome {
+): void {
   const text = literalText(domain, unit);
   const label = `${domain.path} code unit ${unit.toString(16)}`;
   const result = compileSource(defaultComponents.frontend, {
     source: `${strictnessPrefix(strict)}/${text}/`,
     sourceId: "regexp-literal-exhaustive.js",
   });
-  if (result.mir != null) {
-    assert.deepEqual(result.diagnostics, [], label);
-    const literals = regexpLiterals(result.mir);
-    assert.equal(literals.length, 1, label);
-    assert.equal(literals[0]?.regexpProgram?.source, text, label);
-    assert.equal(literals[0]?.regexpProgram?.flags.text, "", label);
-    return "accepted";
-  }
-  // The plain originals have no fallback branch.
-  assert.ok(domain.escaped, `${label} was rejected`);
-  assert.ok(result.diagnostics.length > 0, label);
-  for (const diagnostic of result.diagnostics) {
-    assert.equal(diagnostic.code, "OSEO1001", label);
-    assert.match(diagnostic.message, /admitted only by Annex B/u, label);
-  }
-  if (identifierPartNotUnicodeIDContinue.has(unit)) return "annex-b-only";
-  // The original's `eval("var _" + String.fromCharCode(cu))` check.
-  const declaration = compileSource(defaultComponents.frontend, {
-    source: `${strictnessPrefix(strict)}var _${String.fromCharCode(unit)}`,
-    sourceId: "regexp-literal-exhaustive-identifier.js",
-  });
-  assert.deepEqual(declaration.diagnostics, [], `${label} var _X`);
-  assert.ok(declaration.mir != null, `${label} var _X`);
-  return "core-syntax-error";
+  assert.deepEqual(result.diagnostics, [], label);
+  assert.ok(result.mir != null, label);
+  const literals = regexpLiterals(result.mir);
+  assert.equal(literals.length, 1, label);
+  assert.equal(literals[0]?.regexpProgram?.source, text, label);
+  assert.equal(literals[0]?.regexpProgram?.flags.text, "", label);
 }
 
-/** One original's selected code units grouped by build outcome. */
+/**
+ * Whether the core grammar alone rejects one original's pattern. Every such
+ * rejection must name the construct only Annex B admits.
+ */
+function coreRejects(domain: LiteralDomain, unit: number): boolean {
+  const label = `${domain.path} code unit ${unit.toString(16)}`;
+  const result = parseRegExpPattern({
+    annexB: false,
+    extensions: coreExtensions,
+    flags: "",
+    source: literalText(domain, unit),
+  });
+  if (result.parsed) return false;
+  assert.ok(result.errors.length > 0, label);
+  for (const error of result.errors) {
+    assert.equal(error.kind, "unsupported", label);
+    assert.match(error.message, /admitted only by Annex B/u, label);
+  }
+  return true;
+}
+
+/** One original's selected code units and the core grammar's rejections. */
 interface DomainOutcomes {
   readonly accepted: readonly number[];
-  readonly annexBOnly: readonly number[];
+  readonly coreRejected: readonly number[];
 }
 
 /** Classify every selected code unit in both strictness modes. */
 function classifyDomain(domain: LiteralDomain): DomainOutcomes {
   const accepted: number[] = [];
-  const annexBOnly: number[] = [];
+  const coreRejected: number[] = [];
   for (const unit of selectedCodeUnits) {
-    const sloppy = literalOutcome(domain, unit, false);
-    const strict = literalOutcome(domain, unit, true);
-    assert.equal(strict, sloppy, `${domain.path} ${unit.toString(16)}`);
-    if (sloppy === "accepted") accepted.push(unit);
-    else if (sloppy === "annex-b-only") annexBOnly.push(unit);
+    assertLiteralAccepted(domain, unit, false);
+    assertLiteralAccepted(domain, unit, true);
+    accepted.push(unit);
+    if (coreRejects(domain, unit)) coreRejected.push(unit);
   }
-  return { accepted, annexBOnly };
+  return { accepted, coreRejected };
 }
 
 const outcomesByPath = new Map<string, DomainOutcomes>();
@@ -391,14 +400,22 @@ test("the originals' loops select 65,521 BMP code units", () => {
 
 for (const domain of domains) {
   test(`every selected literal of ${domain.path} keeps its outcome`, () => {
-    const { accepted, annexBOnly } = outcomesFor(domain);
+    const { accepted, coreRejected } = outcomesFor(domain);
     assert.equal(accepted.length, domain.accepted);
+    assert.equal(
+      coreRejected.length,
+      domain.escaped ? domain.accepted - coreEscapedAccepted : 0,
+    );
     // Unicode 15.1 moved ZWNJ and ZWJ into ID_Continue, so the core grammar
-    // rejects their identity escapes while the originals still exempt them
-    // from the fallback. Only Annex B meets those two assertions.
-    assert.deepEqual(annexBOnly, domain.escaped ? [0x200c, 0x200d] : []);
-    assert.ok(accepted.includes(0x0024));
-    const acceptedSet = new Set(accepted);
+    // rejects their identity escapes while the originals exempt them from
+    // the fallback. Those two assertions hold only through Annex B.
+    assert.deepEqual(
+      coreRejected.filter((unit) =>
+        identifierPartNotUnicodeIDContinue.has(unit),
+      ),
+      domain.escaped ? [0x200c, 0x200d] : [],
+    );
+    const coreRejectedSet = new Set(coreRejected);
     for (const unit of selectedCodeUnits) {
       // Independent of the parser's classifier: the core grammar rejects
       // exactly the ID_Continue characters that are not core escapes.
@@ -408,8 +425,8 @@ for (const domain of domains) {
         codePointSetHas(idContinue, unit) &&
         !coreEscapeCharacters.has(unit);
       assert.equal(
-        acceptedSet.has(unit),
-        !coreSyntaxError,
+        coreRejectedSet.has(unit),
+        coreSyntaxError,
         `${domain.path} code unit ${unit.toString(16)}`,
       );
     }
@@ -559,6 +576,9 @@ test(
         ...sweepOptions,
         context: propertyContext(firstEscaped),
         domain:
+          // The registered domain text predates Annex B's grammar, when
+          // the build accepted 14,737 of these literals; it now accepts
+          // all 65,521, as the outcome test above checks.
           "all 14,737 /\\X/ literals S7.8.5_A1.4_T2 selects and the build " +
           "accepts, each evaluated once natively with its source compared " +
           "in the program; one generated rotation, function size of 64, " +
@@ -604,6 +624,8 @@ test(
         ...sweepOptions,
         context: propertyContext(subsequentEscaped),
         domain:
+          // The registered domain text predates Annex B's grammar; see
+          // the A1.4 domain above.
           "all 14,737 /a\\X/ literals S7.8.5_A2.4_T2 selects and the " +
           "build accepts, each evaluated once natively with its source " +
           "compared in the program; one generated rotation, function size " +

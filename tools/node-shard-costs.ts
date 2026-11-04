@@ -7,7 +7,7 @@
  * 41238903460 at `8770b2e4`. The largest is kept on purpose: the residual
  * evidence file took 1.36 times longer on one of those Linux runners than
  * on another, and the margin the shards keep is a slow runner's.
- * Thirty-one files postdate those runs and scale a local measurement on
+ * Thirty-three files postdate those runs and scale a local measurement on
  * the same host by the residual-evidence ratio: 2.574 on Linux and 1.974
  * on macOS. The measurements are serial except the Object accessor
  * property file and the legacy lookup test, which ran side by side.
@@ -24,6 +24,7 @@ export const nodeShardCosts = {
     "tests/annexb-legacy-lookup-boundary.test.ts": 97,
     "tests/annexb-object-accessors-native.test.ts": 80,
     "tests/annexb-proto-boundary.test.ts": 349,
+    "tests/annexb-syntax-native.test.ts": 53,
     "tests/array-from-async-native.test.ts": 53,
     "tests/callable-object-evidence.test.ts": 41,
     "tests/completion-records.test.ts": 1335,
@@ -66,6 +67,7 @@ export const nodeShardCosts = {
     "tests/property/m5-annexb-legacy-lookup-boundary.property.test.ts": 33,
     "tests/property/m5-annexb-object-accessors.property.test.ts": 98,
     "tests/property/m5-annexb-proto-boundary.property.test.ts": 83,
+    "tests/property/m5-annexb-regexp-syntax.property.test.ts": 84,
     "tests/property/m5-annexb-string-methods.property.test.ts": 37,
     "tests/property/m5-arguments-object.property.test.ts": 37,
     "tests/property/m5-array-buffer.property.test.ts": 44,
@@ -159,6 +161,7 @@ export const nodeShardCosts = {
     "tests/annexb-legacy-lookup-boundary.test.ts": 74,
     "tests/annexb-object-accessors-native.test.ts": 61,
     "tests/annexb-proto-boundary.test.ts": 268,
+    "tests/annexb-syntax-native.test.ts": 41,
     "tests/array-from-async-native.test.ts": 40,
     "tests/callable-object-evidence.test.ts": 40,
     "tests/completion-records.test.ts": 906,
@@ -198,6 +201,7 @@ export const nodeShardCosts = {
     "tests/property/m5-annexb-legacy-lookup-boundary.property.test.ts": 35,
     "tests/property/m5-annexb-object-accessors.property.test.ts": 75,
     "tests/property/m5-annexb-proto-boundary.property.test.ts": 69,
+    "tests/property/m5-annexb-regexp-syntax.property.test.ts": 65,
     "tests/property/m5-arguments-object.property.test.ts": 42,
     "tests/property/m5-array-buffer.property.test.ts": 37,
     "tests/property/m5-array-prototype-copying.property.test.ts": 68,

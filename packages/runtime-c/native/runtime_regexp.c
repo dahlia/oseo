@@ -451,6 +451,35 @@ static bool regexp_named_capture_exists(
     return false;
 }
 
+/*
+ * The last unit of the LegacyOctalEscapeSequence whose first digit is at
+ * `start`. Three digits are taken only when the first is at most 3, so
+ * the value stays at most 0o377.
+ */
+static size_t regexp_legacy_octal_end(const OseoString *source, size_t start) {
+    size_t end = start;
+    if (end + 1u < source->length &&
+        source->units[end + 1u] >= '0' && source->units[end + 1u] <= '7') {
+        end += 1u;
+        if (source->units[start] <= '3' && end + 1u < source->length &&
+            source->units[end + 1u] >= '0' &&
+            source->units[end + 1u] <= '7') {
+            end += 1u;
+        }
+    }
+    return end;
+}
+
+/*
+ * Validate one escape at the backslash `*index` and leave `*index` on its
+ * last unit.
+ *
+ * Without `u` or `v` the pattern follows Annex B's grammar, so most text
+ * that is an error in the core grammar is an identity escape, a legacy
+ * octal escape, or a decimal escape read past the capture count. A `\c`
+ * without a letter outside a class is the backslash alone: `*index` stays
+ * on it and the `c` is the next atom.
+ */
 static OseoRegExpValidation regexp_escape(
     const OseoString *source,
     size_t *index,
@@ -464,6 +493,12 @@ static OseoRegExpValidation regexp_escape(
     uint16_t unit = source->units[cursor];
     bool unicode = (flag_mask &
         (OSEO_REGEXP_FLAG_U | OSEO_REGEXP_FLAG_V)) != 0u;
+    bool annex_b = !unicode;
+    if (annex_b && (unit == 'p' || unit == 'P' || unit == 'q' ||
+                    (character_class && unit == 'B'))) {
+        *index = cursor;
+        return OSEO_REGEXP_VALID;
+    }
     if (character_class && unit == 'B') {
         return OSEO_REGEXP_INVALID;
     }
@@ -504,8 +539,7 @@ static OseoRegExpValidation regexp_escape(
     }
     if (unit == 'u') {
         if (cursor + 1u < source->length &&
-            source->units[cursor + 1u] == '{') {
-            if (!unicode) return OSEO_REGEXP_INVALID;
+            source->units[cursor + 1u] == '{' && unicode) {
             size_t digit = cursor + 2u;
             size_t count = 0u;
             uint32_t value = 0u;
@@ -534,11 +568,14 @@ static OseoRegExpValidation regexp_escape(
             *index = digit;
             return OSEO_REGEXP_VALID;
         }
-        if (cursor + 4u >= source->length) return OSEO_REGEXP_INVALID;
-        for (size_t offset = 1u; offset <= 4u; offset += 1u) {
-            if (!regexp_hex_digit(source->units[cursor + offset])) {
-                return OSEO_REGEXP_INVALID;
-            }
+        bool complete = cursor + 4u < source->length;
+        for (size_t offset = 1u; complete && offset <= 4u; offset += 1u) {
+            complete = regexp_hex_digit(source->units[cursor + offset]);
+        }
+        if (!complete) {
+            if (!annex_b) return OSEO_REGEXP_INVALID;
+            *index = cursor;
+            return OSEO_REGEXP_VALID;
         }
         *index = cursor + 4u;
         return OSEO_REGEXP_VALID;
@@ -547,17 +584,27 @@ static OseoRegExpValidation regexp_escape(
         if (cursor + 2u >= source->length ||
             !regexp_hex_digit(source->units[cursor + 1u]) ||
             !regexp_hex_digit(source->units[cursor + 2u])) {
-            return OSEO_REGEXP_INVALID;
+            if (!annex_b) return OSEO_REGEXP_INVALID;
+            *index = cursor;
+            return OSEO_REGEXP_VALID;
         }
         *index = cursor + 2u;
         return OSEO_REGEXP_VALID;
     }
     if (unit == 'c') {
-        if (cursor + 1u >= source->length ||
-            !regexp_ascii_alpha(source->units[cursor + 1u])) {
-            return OSEO_REGEXP_INVALID;
+        uint16_t letter = cursor + 1u < source->length
+            ? source->units[cursor + 1u]
+            : 0u;
+        if (regexp_ascii_alpha(letter) ||
+            (annex_b && character_class &&
+             (regexp_ascii_digit(letter) || letter == '_'))) {
+            *index = cursor + 1u;
+            return OSEO_REGEXP_VALID;
         }
-        *index = cursor + 1u;
+        return annex_b ? OSEO_REGEXP_VALID : OSEO_REGEXP_INVALID;
+    }
+    if (unit == 'k' && annex_b && named_captures->bucket_count == 0u) {
+        *index = cursor;
         return OSEO_REGEXP_VALID;
     }
     if (unit == 'k') {
@@ -577,6 +624,28 @@ static OseoRegExpValidation regexp_escape(
             return OSEO_REGEXP_INVALID;
         }
         *index = end;
+        return OSEO_REGEXP_VALID;
+    }
+    if (regexp_ascii_digit(unit) && annex_b) {
+        if (!character_class && unit != '0') {
+            size_t value = 0u;
+            size_t end = cursor;
+            while (end < source->length &&
+                   regexp_ascii_digit(source->units[end])) {
+                if (value <= capture_count) {
+                    value = value * 10u +
+                        (size_t)(source->units[end] - '0');
+                }
+                end += 1u;
+            }
+            if (value <= capture_count) {
+                *index = end - 1u;
+                return OSEO_REGEXP_VALID;
+            }
+        }
+        *index = unit >= '8'
+            ? cursor
+            : regexp_legacy_octal_end(source, cursor);
         return OSEO_REGEXP_VALID;
     }
     if (regexp_ascii_digit(unit)) {
@@ -618,11 +687,11 @@ static OseoRegExpValidation regexp_escape(
         *index = cursor;
         return OSEO_REGEXP_VALID;
     }
-    if (!unicode && unit > 0x7fu) return OSEO_REGEXP_UNSUPPORTED;
-    if (unicode || regexp_ascii_alpha(unit) || regexp_ascii_digit(unit) ||
-        unit == '_' || unit == '$') {
-        return OSEO_REGEXP_INVALID;
-    }
+    if (unicode) return OSEO_REGEXP_INVALID;
+    /*
+     * Annex B's identity escape admits every source character but `c`,
+     * and `k` once the pattern declares a group name, both decided above.
+     */
     *index = cursor;
     return OSEO_REGEXP_VALID;
 }
@@ -684,7 +753,26 @@ static OseoRegExpValidation regexp_character_class(
             uint16_t escape = source->units[escape_start + 1u];
             single = escape != 'd' && escape != 'D' && escape != 's' &&
                 escape != 'S' && escape != 'w' && escape != 'W';
-            if (escape == 'c') {
+            if (escaped == escape_start) {
+                // Annex B's `\c` without a control letter: the backslash.
+                point = '\\';
+            } else if (escaped == escape_start + 1u &&
+                       (escape == 'x' || escape == 'u' ||
+                        regexp_ascii_digit(escape))) {
+                // An incomplete escape read as an identity escape, or a
+                // one-digit legacy octal escape.
+                point = regexp_ascii_digit(escape) && escape < '8'
+                    ? (uint32_t)(escape - '0')
+                    : escape;
+            } else if (regexp_ascii_digit(escape)) {
+                point = 0u;
+                for (size_t offset = escape_start + 1u;
+                     offset <= escaped;
+                     offset += 1u) {
+                    point = point * 8u +
+                        (uint32_t)(source->units[offset] - '0');
+                }
+            } else if (escape == 'c') {
                 point = source->units[escape_start + 2u] & 0x1fu;
             } else if (escape == 'x') {
                 point = 0u;
@@ -754,14 +842,25 @@ static OseoRegExpValidation regexp_character_class(
         if (unit == '-' && have_previous &&
             cursor + 1u < source->length &&
             source->units[cursor + 1u] != ']') {
-            if (!previous_single) return OSEO_REGEXP_INVALID;
+            if (!previous_single && unicode) return OSEO_REGEXP_INVALID;
             range = true;
             continue;
         }
         if (range) {
-            if (!single) return OSEO_REGEXP_INVALID;
-            if (single && previous > point) return OSEO_REGEXP_INVALID;
+            /*
+             * Annex B's CharacterRangeOrUnion makes a range with a class
+             * escape at either end the union of both and the dash.
+             */
+            if (previous_single && single && previous > point) {
+                return OSEO_REGEXP_INVALID;
+            }
+            if ((!previous_single || !single) && unicode) {
+                return OSEO_REGEXP_INVALID;
+            }
             range = false;
+            // A completed range is no ClassAtom a following dash extends.
+            have_previous = false;
+            continue;
         }
         have_previous = true;
         previous_single = single;
@@ -894,6 +993,32 @@ static OseoRegExpValidation regexp_braced_quantifier(
     return OSEO_REGEXP_VALID;
 }
 
+/*
+ * Whether the `{` at `index` starts a braced quantifier's syntax, whatever
+ * its bounds. Annex B reads any other `{` as a pattern character, while a
+ * quantifier with nothing to repeat stays an early error.
+ */
+static bool regexp_braced_quantifier_follows(
+    const OseoString *source,
+    size_t index
+) {
+    size_t cursor = index + 1u;
+    size_t digits = cursor;
+    while (cursor < source->length &&
+           regexp_ascii_digit(source->units[cursor])) {
+        cursor += 1u;
+    }
+    if (cursor == digits || cursor >= source->length) return false;
+    if (source->units[cursor] == ',') {
+        cursor += 1u;
+        while (cursor < source->length &&
+               regexp_ascii_digit(source->units[cursor])) {
+            cursor += 1u;
+        }
+    }
+    return cursor < source->length && source->units[cursor] == '}';
+}
+
 static OseoRegExpValidation regexp_validate_pattern(
     const OseoString *source,
     uint16_t flag_mask,
@@ -903,6 +1028,8 @@ static OseoRegExpValidation regexp_validate_pattern(
     if (source->length > OSEO_REGEXP_PATTERN_LENGTH_LIMIT) {
         return OSEO_REGEXP_LIMIT;
     }
+    bool unicode = (flag_mask &
+        (OSEO_REGEXP_FLAG_U | OSEO_REGEXP_FLAG_V)) != 0u;
     bool group_quantifiable[OSEO_REGEXP_NESTING_LIMIT];
     size_t depth = 0u;
     bool can_quantify = false;
@@ -956,7 +1083,8 @@ static OseoRegExpValidation regexp_validate_pattern(
                 if (kind == ':') {
                     index += 2u;
                 } else if (kind == '=' || kind == '!') {
-                    group_can_quantify = false;
+                    // Annex B quantifies a lookahead as an atom.
+                    group_can_quantify = !unicode;
                     index += 2u;
                 } else if (kind == '<') {
                     if (index + 3u >= source->length) {
@@ -1044,6 +1172,12 @@ static OseoRegExpValidation regexp_validate_pattern(
             quantified = true;
             continue;
         }
+        if (unit == '{' && !unicode &&
+            !regexp_braced_quantifier_follows(source, index)) {
+            // Annex B's ExtendedPatternCharacter.
+            can_quantify = true;
+            continue;
+        }
         if (unit == '{') {
             if (!can_quantify) return OSEO_REGEXP_INVALID;
             OseoRegExpValidation status = regexp_braced_quantifier(
@@ -1055,7 +1189,9 @@ static OseoRegExpValidation regexp_validate_pattern(
             quantified = true;
             continue;
         }
-        if (unit == ']' || unit == '}') return OSEO_REGEXP_INVALID;
+        if ((unit == ']' || unit == '}') && unicode) {
+            return OSEO_REGEXP_INVALID;
+        }
         can_quantify = true;
     }
     if (depth != 0u) return OSEO_REGEXP_INVALID;

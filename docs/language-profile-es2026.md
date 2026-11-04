@@ -14,12 +14,13 @@ the [M5 exit report](./m5c-closure/m5-exit-report.md) keeps the M5 result.
 A change that admits or measures behavior inside this boundary updates this
 document in the same change. A family's status describes tested current
 behavior, never intended behavior. The Annex B built-in units, the Annex B
-Object accessors, the Annex B language units, the small ECMAScript 2026
-built-in units, `iterator-zip`, `array-from-async`, `json-parse-source`, and
-the two explicit resource management units hold the family records so far; see
-[Annex B built-ins](#annex-b-built-ins),
+Object accessors, the Annex B language units, the Annex B syntax unit, the
+small ECMAScript 2026 built-in units, `iterator-zip`, `array-from-async`,
+`json-parse-source`, and the two explicit resource management units hold the
+family records so far; see [Annex B built-ins](#annex-b-built-ins),
 [Annex B Object accessors](#annex-b-object-accessors),
 [Annex B language semantics](#annex-b-language-semantics),
+[Annex B syntax](#annex-b-syntax),
 [Small ECMAScript 2026 built-in families](#small-ecmascript-2026-built-in-families),
 [Joint iteration](#joint-iteration), [`Array.fromAsync`](#arrayfromasync),
 [JSON source text](#json-source-text), and
@@ -487,6 +488,88 @@ generator avoids the V8 departures. The statement forms have no generated
 domain beyond their fixed shapes, so their record omits the generated class.
 *packages/parser-babel/tests/annexb-functions.test.ts* checks which
 declarations receive a copy and which forms stay early errors.
+
+
+Annex B syntax
+--------------
+
+The `annexb-syntax` unit adds the Annex B language syntax that has no family
+elsewhere. Its family record is `annexb-syntax`. Its test262 rows stay
+unreviewed until Root admits them; a focused run of the owned paths passes or
+expects a negative result for every one except the two
+`RegExp-leading-escape-BMP.js` and `RegExp-trailing-escape-BMP.js` rows, which
+call `eval` and belong to ADR 0016.
+
+### HTML-like comments
+
+The parser already accepted the B.1.1 comments in Script code and rejected
+them in Module code, and both goals keep that behavior. `<!--` starts a
+single-line comment anywhere. `-->` starts one at the start of the source,
+after a line terminator with only white space and comments before it on its
+line, and after a multi-line comment that contains a line terminator,
+U+2028 and U+2029 included. Anywhere else `-->` is a decrement followed by a
+greater-than comparison. A Module that uses either form reports `OSEO0001`.
+
+### Regular expression patterns
+
+A pattern without `u` or `v` follows the grammar of B.1.2 in both places that
+compile patterns: the build-time parser in *regexp-parse.ts*, whose artifact
+the C backend writes as matcher data for a literal, and the runtime's own
+validator and program compiler in *runtime\_regexp.c* and
+*runtime\_regexp\_matcher.c*, which serve the `RegExp` constructor and the
+String methods that create a RegExp. Under `u` and `v` nothing
+changes, so every Annex B form there is still the edition's early error.
+
+| Text                                  | Reading without `u` or `v`                                      |
+| ------------------------------------- | --------------------------------------------------------------- |
+| `\a`, `\_`, `\p`, `\é`                | Identity escape; every character but `c` qualifies              |
+| `\k` when no group name is declared   | Identity escape of `k`, so `\k<x>` matches `k<x>`               |
+| `\01`, `\477`, `\08`                  | Legacy octal escape, at most `\377`, and the digits it leaves   |
+| `\N` above the capture count          | Legacy octal escape, or an identity escape of `8` or `9`        |
+| `\x`, `\x4`, `\u`, `\u12`, `\u{2}`    | Identity escape of `x` or `u`; `\u{2}` repeats `u` twice        |
+| `\c` without an ASCII letter          | A backslash, with `c` the next atom                             |
+| `[\c1]`, `[\c_]`                      | A control escape of a digit or `_` inside a class               |
+| `]`, `}`, and `{` that starts nothing | A pattern character; `{1}` with nothing to repeat stays invalid |
+| `[\d-a]`, `[a-\w]`                    | The union of both ends and `-`                                  |
+| `(?=a)*`, `(?!b){2}`                  | A quantified lookahead                                          |
+
+A decimal escape is a backreference only when its value is at most the number
+of left-capturing parentheses in the whole pattern, which both parsers count
+before parsing. The build-time parser represents a quantified lookahead as a
+quantified non-capturing group around it, which is the matcher the edition
+gives that production, so neither matcher needed a new repetition form. An
+identity escape no longer asks whether its character continues an
+identifier, so a dynamic pattern such as `new RegExp("\\é")` compiles rather
+than reporting the `OSEO2001` boundary it reported for want of Unicode data.
+The text Annex B shares as an error stays one: a quantified lookbehind, edge
+assertion, or word boundary, an out-of-order range, a quantifier with nothing
+to repeat or with reversed bounds, and `\k` that names no group in a pattern
+that declares one.
+
+`parseRegExpPattern` takes `annexB: false` to parse the core grammar alone.
+Without `u` or `v` that mode reports every construct only Annex B admits as an
+`unsupported` error naming Annex B, which is what lets the generated invalid
+domain at seed `0x60004a01` keep its reported kind as the oracle selector: an
+`invalid` rejection must agree with Annex B's parse and with the host, and an
+`unsupported` one must be accepted by both. The runtime validator also stopped
+treating a `-` after a completed range as the start of another range, so
+`[a-c-b]` is valid in every mode, as it is in the edition.
+
+The fixed fixtures in *tests/native/fixtures/annexb-syntax.ts* run each
+reading above as a literal and through the constructor and String methods,
+pin the early errors, and include the four Annex B patterns of
+*test/built-ins/String/prototype/split/separator-regexp.js*, the ADR 0013 row
+this unit remediates; that row passes in the focused run. The fixtures run as
+Scripts in both strictness modes under both specialization policies and
+forced collection against Node.js and Deno, and the dynamic fixture's reader
+misses its shape guard.
+*tests/property/m5-annexb-regexp-syntax.property.test.ts*, seed block
+`0x6000a000`, generates token sequences of Annex B and core text. Seed
+`0x6000a000` compares the build-time parser's acceptance and matcher results
+with the host's under every flag set, and seed `0x6000a001` runs batches of the
+same patterns natively as literals and through the runtime compiler. The
+exhaustive literal suite now accepts all 65,521 selected code units of each
+escaped domain and checks the core grammar's 50,784 rejections separately.
 
 
 Small ECMAScript 2026 built-in families

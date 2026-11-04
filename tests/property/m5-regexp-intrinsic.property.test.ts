@@ -96,6 +96,20 @@ const unicodeValidPattern = fc.oneof(
   ),
 );
 
+/*
+ * Patterns only Annex B admits, valid without `u` and `v` alone. The two
+ * non-ASCII identity escapes stay out of ignore-case cases for the same
+ * reason the unicode-mode extras do.
+ */
+const annexBPattern = fc.constantFrom(
+  "[\\B]",
+  "[\\d-a]",
+  "[(?<a>]\\k<a>",
+  "(a)[\\1]",
+  "\\c1(?=b)*\\x4]{\\8",
+);
+const annexBNonAsciiPattern = fc.constantFrom("\\é", "[\\é]");
+
 const validFlags = fc
   .subarray(["d", "g", "i", "m", "s", "y"], {
     maxLength: 6,
@@ -121,28 +135,14 @@ const validCase = fc.boolean().chain((explicitFlags) =>
           ? classFreePattern
           : explicitFlags && flags.includes("u") && !flags.includes("i")
             ? unicodeValidPattern
-            : validPattern,
+            : flags.includes("u")
+              ? validPattern
+              : flags.includes("i")
+                ? fc.oneof(validPattern, annexBPattern)
+                : fc.oneof(validPattern, annexBPattern, annexBNonAsciiPattern),
     }),
   ),
 );
-
-/*
- * Rejections only Annex B admits.
- *
- * The host implements Annex B, so it accepts every pattern here and can
- * never confirm the rejection. The dynamic constructor still throws the
- * `SyntaxError` the edition requires for a pattern it cannot compile,
- * while the build-time parser reports this claim's own profile boundary,
- * which is the difference `parserExpected` records.
- */
-const annexBRejection = fc
-  .constantFrom("[\\B]", "[\\d-a]", "[(?<a>]\\k<a>", "(a)[\\1]")
-  .map((pattern) => ({
-    differential: false,
-    flags: "",
-    parserExpected: "unsupported" as const,
-    pattern,
-  }));
 
 const editionRejection = fc
   .oneof(
@@ -202,15 +202,13 @@ const editionRejection = fc
     pattern: testCase.pattern,
   }));
 
-const invalidCase = fc
-  .oneof(annexBRejection, editionRejection)
-  .map((testCase) => ({
-    differential: testCase.differential,
-    expected: "invalid" as const,
-    flags: testCase.flags,
-    parserExpected: testCase.parserExpected,
-    pattern: testCase.pattern,
-  }));
+const invalidCase = editionRejection.map((testCase) => ({
+  differential: testCase.differential,
+  expected: "invalid" as const,
+  flags: testCase.flags,
+  parserExpected: testCase.parserExpected,
+  pattern: testCase.pattern,
+}));
 
 const rejectedCase: fc.Arbitrary<InvalidCase> = fc.oneof(
   invalidCase,
@@ -218,16 +216,16 @@ const rejectedCase: fc.Arbitrary<InvalidCase> = fc.oneof(
     {
       differential: false,
       expected: "unsupported" as const,
-      flags: "",
+      flags: "u",
       parserExpected: "unsupported" as const,
-      pattern: "\\é",
+      pattern: "\\p{L}",
     },
     {
       differential: false,
       expected: "unsupported" as const,
-      flags: "",
+      flags: "v",
       parserExpected: "unsupported" as const,
-      pattern: "[\\é]",
+      pattern: "[a]",
     },
   ),
 );

@@ -17,7 +17,7 @@
  * Compound assignment's logged registrations are rebucketed into its
  * three split files. Host script bindings and proper tail calls postdate
  * these runs and retain their weights. The Linux upper-median fallback is
- * 429 seconds across 164 entries.
+ * 423 seconds across 165 entries.
  * docs/evidence/u6/linux-shard-weights.tsv retains each sum and old weight;
  * linux-shards.py reproduces them and the model. See the U6 README.
  *
@@ -175,6 +175,7 @@ export const nativeShardCosts = {
     "tests/property/m5-annexb-escape.property.test.ts": 263,
     "tests/property/m5-annexb-legacy-lookup-boundary.property.test.ts": 615,
     "tests/property/m5-annexb-proto-boundary.property.test.ts": 1447,
+    "tests/property/m5-annexb-regexp-syntax.property.test.ts": 415,
     "tests/property/m5-annexb-string-methods.property.test.ts": 219,
     "tests/property/m5-arguments-object.property.test.ts": 679,
     "tests/property/m5-array-binding.property.test.ts": 232,

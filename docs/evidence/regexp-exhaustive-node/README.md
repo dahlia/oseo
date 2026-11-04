@@ -67,9 +67,10 @@ dedicated job.
 Annex B escaped domains
 -----------------------
 
-The two escaped domains, A1.4 and A2.4, accept 14,737 literals today. Once the
-`annexb-syntax` unit accepts Annex B identity escapes, they accept all 65,521,
-as the plain domains do. Their seeds and budgets do not change.
+The two escaped domains, A1.4 and A2.4, accepted 14,737 literals before the
+`annexb-syntax` unit. That unit accepts Annex B identity escapes, so they now
+accept all 65,521, as the plain domains do. Their seeds and budgets did not
+change.
 
 That unit measured the file locally with `--test-concurrency=1` on one Linux
 AMD64 host, alternating its base and its change. The host carried a load
@@ -195,11 +196,11 @@ Setup to the first test took 31 to 33 seconds in the ordinary shards of run
 [41692393326]; the file's build-time properties took 17 to 35 seconds in the
 observations above.
 
-| Host  | Basis                                  | Today, minutes | With Annex B escapes, minutes | Slowest property, share of interrupt |
-| ----- | -------------------------------------- | -------------: | ----------------------------: | -----------------------------------: |
-| Linux | case-shard median sweep                |             12 |                            21 |                43%, 54% with escapes |
-| Linux | case-shard maximum sweep               |             14 |                            25 |                53%, 67% with escapes |
-| macOS | fastest shared sweeps, A1.1 at 230.8 s |             10 |                            18 |                38%, 48% with escapes |
+| Host  | Basis                                  | Before, minutes | With Annex B escapes, minutes | Slowest property, share of interrupt |
+| ----- | -------------------------------------- | --------------: | ----------------------------: | -----------------------------------: |
+| Linux | case-shard median sweep                |              12 |                            21 |                43%, 54% with escapes |
+| Linux | case-shard maximum sweep               |              14 |                            25 |                53%, 67% with escapes |
+| macOS | fastest shared sweeps, A1.1 at 230.8 s |              10 |                            18 |                38%, 48% with escapes |
 
 The Linux margin rests on 60 measured standalone jobs. The macOS estimate
 rests on three shared observations and is not yet a measurement: the first

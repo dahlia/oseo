@@ -11,7 +11,8 @@ Implementation status: in progress. The `claim-boundary` unit has applied ADR
 `array-from-async`, `json-parse-source`, `uint8array-base64`,
 `atomics-pause`, `annexb-function-declarations`, `annexb-statement-forms`,
 `disposal-intrinsics`, and `using-declarations` units are implemented and
-observed. Every other unit is open.
+observed. The `annexb-syntax` unit is implemented and waits for Root's full
+observation. Every other unit is open.
 This plan follows M5 directly and runs alongside M6. It has no milestone
 number. It schedules the language work the maintainer approved on 2026-11-02:
 build-time static-specifier `import()`, Annex B legacy web behavior except
@@ -92,7 +93,7 @@ A probe of the current build and the reviewed manifest shows this Annex B state:
 
 | Annex B behavior                                   | Current state                                                                 |
 | -------------------------------------------------- | ----------------------------------------------------------------------------- |
-| HTML-like comments in Script code                  | Accepted by the parser and compiled; rejected in modules; no reviewed row yet |
+| HTML-like comments in Script code                  | Pinned by `annexb-syntax`: Script only; modules report OSEO0001               |
 | Legacy octal literals, `\8`, `\9`, octal escapes   | Core grammar in the inventory; non-strict rows pass                           |
 | `__proto__: value` in object initializers          | Core syntax, admitted by M5a Unit 8.1c                                        |
 | `var` redeclaring a simple catch parameter         | Admitted by M5a Unit 8.5c, including `for (var e of ...)`                     |
@@ -100,7 +101,7 @@ A probe of the current build and the reviewed manifest shows this Annex B state:
 | `Object.prototype.__proto__` accessor              | Installed by `annexb-object-accessors`; its test262 rows pass                 |
 | `__lookupGetter__`, `__lookupSetter__`             | Installed by `annexb-object-accessors`; its test262 rows pass                 |
 | `__defineGetter__`, `__defineSetter__`             | Installed by `annexb-object-accessors`; its test262 rows pass                 |
-| Annex B RegExp pattern grammar                     | Reported as the OSEO1001 profile boundary, without `u` or `v`                 |
+| Annex B RegExp pattern grammar                     | Implemented by `annexb-syntax` for literals and run-time patterns             |
 | `escape`, `unescape`                               | Installed by `annexb-escape`; all 35 test262 rows pass                        |
 | `substr`, HTML methods, `trimLeft`, `trimRight`    | Installed by `annexb-string-methods`; all 105 test262 rows pass               |
 | `getYear`, `setYear`, `toGMTString`                | Installed by `annexb-date-methods`; all 24 test262 rows pass                  |
@@ -460,6 +461,13 @@ that [*PLAN-REGEXP.md*](./PLAN-REGEXP.md) owns. The grammar replaces the
 OSEO1001 profile boundary that the M5 profile describes for literals and for
 `String` operands. The generated invalid-pattern domain keeps the reported kind
 as its oracle selector, now with an Annex B mode.
+
+Status: implemented, with fixed, differential, and generated evidence in the
+[profile section](./docs/language-profile-es2026.md#annex-b-syntax).
+A focused run of the owned paths passes or expects a negative result for
+every one, including *separator-regexp.js*, except the two `eval` rows
+`RegExp-leading-escape-BMP.js` and `RegExp-trailing-escape-BMP.js`; the rows
+wait for Root's full observation.
 
 ### `annexb-escape`
 

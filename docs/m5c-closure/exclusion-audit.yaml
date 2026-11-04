@@ -408,8 +408,8 @@ assessments:
         "45e4571f2e9f7556a21c4555d86720fd37a674479b9af0c291714648\
         071a28cd"
       tests/annex-b-mixed-core-native.test.ts:
-        "d3cc3f6d101465c0c6fb93467428f149adb7593495c0f2d518ea8485\
-        135151c5"
+        "ddc15ccc41702279c065d280cccfb666cf03069a9a16862282f9e4d7\
+        e2a58bfc"
   mixed-static-functions:
     disposition: remediation
     normativeDependency: not-demonstrated
@@ -463,8 +463,8 @@ assessments:
         "45e4571f2e9f7556a21c4555d86720fd37a674479b9af0c291714648\
         071a28cd"
       tests/annex-b-mixed-core-native.test.ts:
-        "d3cc3f6d101465c0c6fb93467428f149adb7593495c0f2d518ea8485\
-        135151c5"
+        "ddc15ccc41702279c065d280cccfb666cf03069a9a16862282f9e4d7\
+        e2a58bfc"
   import-call-attributes:
     disposition: exclusion
     normativeDependency: source-evaluation-only
@@ -908,8 +908,8 @@ assessments:
         "45e4571f2e9f7556a21c4555d86720fd37a674479b9af0c291714648\
         071a28cd"
       tests/annex-b-mixed-core-native.test.ts:
-        "d3cc3f6d101465c0c6fb93467428f149adb7593495c0f2d518ea8485\
-        135151c5"
+        "ddc15ccc41702279c065d280cccfb666cf03069a9a16862282f9e4d7\
+        e2a58bfc"
   annex-b-resizable-typed-array-prototype:
     disposition: remediation
     remediationOwner: unit:annexb-object-accessors
@@ -938,8 +938,8 @@ assessments:
         "45e4571f2e9f7556a21c4555d86720fd37a674479b9af0c291714648\
         071a28cd"
       tests/annex-b-mixed-core-native.test.ts:
-        "d3cc3f6d101465c0c6fb93467428f149adb7593495c0f2d518ea8485\
-        135151c5"
+        "ddc15ccc41702279c065d280cccfb666cf03069a9a16862282f9e4d7\
+        e2a58bfc"
   static-this-and-call-context:
     disposition: remediation
     normativeDependency: not-demonstrated
@@ -5797,8 +5797,8 @@ assessments:
       non-source reopening remains in force.
     replacementEvidence:
       tests/property/m5-regexp-literal-exhaustive.property.test.ts:
-        "f38be1815ac5f1f7a45fb0663a8d885b62127b64c41054\
-        d964a0b4bb580f62fb"
+        "dc5d57c80836fbb5fdb9819437162df84daa08e227274e\
+        56d52207efbbd06289"
   ds17-exhaustive-escaped-annex-b:
     disposition: remediation
     remediationOwner: unit:annexb-dynamic-source-accounting
@@ -5819,8 +5819,8 @@ assessments:
       0013's optional Annex B policy, or on ADR 0019's reopening triggers.
     replacementEvidence:
       tests/property/m5-regexp-literal-exhaustive.property.test.ts:
-        "f38be1815ac5f1f7a45fb0663a8d885b62127b64c41054\
-        d964a0b4bb580f62fb"
+        "dc5d57c80836fbb5fdb9819437162df84daa08e227274e\
+        56d52207efbbd06289"
   residual-exact-completion:
     disposition: exclusion
     normativeDependency: source-evaluation-only
@@ -6022,8 +6022,8 @@ assessments:
         "45e4571f2e9f7556a21c4555d86720fd37a674479b9af0c291714648\
         071a28cd"
       tests/annex-b-mixed-core-native.test.ts:
-        "d3cc3f6d101465c0c6fb93467428f149adb7593495c0f2d518ea8485\
-        135151c5"
+        "ddc15ccc41702279c065d280cccfb666cf03069a9a16862282f9e4d7\
+        e2a58bfc"
   ds-host-script-finite-evidence:
     disposition: exclusion
     normativeDependency: source-evaluation-only

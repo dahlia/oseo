@@ -33,6 +33,7 @@ function rejected(
   source: string,
   flags = "",
   options: {
+    readonly annexB?: boolean;
     readonly extensions?: RegExpPatternExtensions;
     readonly limits?: RegExpPatternLimits;
   } = {},
@@ -434,11 +435,10 @@ test("reports each early error with its exact message and span", () => {
 });
 
 /*
- * Annex B is outside the candidate claim, so a construct only Annex B
- * admits is rejected in every mode. Which rejection it is depends on the
- * flag set: `u` and `v` never admitted the construct, so the edition
- * itself requires the early error, while without them the text is one a
- * web browser accepts and the rejection is this profile's own boundary.
+ * A construct only Annex B admits is accepted without `u` or `v` and is
+ * the edition's own early error under them. A parse that asks for the
+ * core grammar alone still rejects it without those flags, as an
+ * `unsupported` construct that names Annex B rather than as a defect.
  */
 test("separates an Annex B boundary from an edition early error", () => {
   const cases: readonly (readonly [string, string, string])[] = [
@@ -457,12 +457,13 @@ test("separates an Annex B boundary from an edition early error", () => {
     ["\\k<n>", "This named backreference names no capturing group.", "A named"],
   ];
   for (const [source, editionMessage, subject] of cases) {
-    const boundary = rejected(source, "");
+    accepted(source);
+    const boundary = rejected(source, "", { annexB: false });
     assert.equal(boundary.kind, "unsupported", source);
     assert.ok(boundary.message.startsWith(subject), source);
     assert.equal(
       boundary.message.endsWith(
-        "is admitted only by Annex B, which is outside the profile.",
+        "is admitted only by Annex B, which this parse excludes.",
       ),
       true,
       source,
@@ -502,7 +503,9 @@ test("finds a group specifier without mistaking text for one", () => {
     "\\k<n>".repeat(64),
   ];
   for (const source of references) {
-    const error = rejected(source, "");
+    // Annex B reads every one of these `\k` as an identity escape.
+    accepted(source);
+    const error = rejected(source, "", { annexB: false });
     assert.equal(error.kind, "unsupported", source);
     assert.ok(error.message.includes("Annex B"), source);
   }
@@ -514,8 +517,62 @@ test("finds a group specifier without mistaking text for one", () => {
     "(?<a>x)\\k<@>",
   ];
   for (const source of declared) {
-    const error = rejected(source, "");
-    assert.equal(error.kind, "invalid", source);
+    assert.equal(rejected(source, "").kind, "invalid", source);
+    assert.equal(rejected(source, "", { annexB: false }).kind, "invalid");
+  }
+});
+
+/** The printed model of one pattern without `u` or `v`, below its root. */
+function annexBModel(source: string): string {
+  return printRegExpPattern(accepted(source))
+    .split("\n")
+    .slice(4)
+    .map((line) => line.trim())
+    .filter((line) => line.length > 0)
+    .join("; ");
+}
+
+/*
+ * Each reading is the one Annex B's Regular Expressions Patterns section
+ * gives the text: the longest legacy octal escape the lookahead rules
+ * allow, a decimal escape past the capture count as octal or identity,
+ * `\c` without a letter as a backslash, a brace that starts no quantifier
+ * as a character, a class escape range bound as a union with the dash,
+ * and a quantified lookahead as a repeated group around it.
+ */
+test("reads Annex B text through the edition's legacy productions", () => {
+  const cases: readonly (readonly [string, string])[] = [
+    ["\\477", "char u+0027 '; char u+0037 7"],
+    ["\\08", "char u+0000; char u+0038 8"],
+    ["\\8", "char u+0038 8"],
+    ["\\10", "char u+0008"],
+    [
+      "(a)\\1\\2",
+      "capture 1; disjunction; alternative; char u+0061 a; " +
+        "backreference 1; char u+0002",
+    ],
+    ["\\c1", "char u+005c \\; char u+0063 c; char u+0031 1"],
+    ["[\\c1\\c_]", "class; char u+0011; char u+001f"],
+    ["[\\c]", "class; char u+005c \\; char u+0063 c"],
+    ["\\x4", "char u+0078 x; char u+0034 4"],
+    ["\\u{2}", "repeat 2..2 greedy; char u+0075 u"],
+    ["\\k<a>", "char u+006b k; char u+003c <; char u+0061 a; char u+003e >"],
+    [
+      "a{,2}}]",
+      "char u+0061 a; char u+007b {; char u+002c ,; " +
+        "char u+0032 2; char u+007d }; char u+007d }; char u+005d ]",
+    ],
+    ["[a-\\d]", "class; char u+0061 a; char u+002d -; class-escape digit"],
+    ["[\\1-\\7]", "class; range u+0001 .. u+0007"],
+    ["[\\B\\p]", "class; char u+0042 B; char u+0070 p"],
+    [
+      "(?!a){2}",
+      "repeat 2..2 greedy; group; disjunction; alternative; " +
+        "look ahead negative; disjunction; alternative; char u+0061 a",
+    ],
+  ];
+  for (const [source, model] of cases) {
+    assert.equal(annexBModel(source), model, source);
   }
 });
 
@@ -863,12 +920,18 @@ test("accepts an escaped and a written group name as one name", () => {
   assert.deepEqual(pattern.groupNames, ["ab"]);
 });
 
+/*
+ * Only the core grammar asks whether an escaped character continues an
+ * identifier. Annex B's identity escape admits every character but `c`,
+ * so it needs no Unicode data.
+ */
 test("rejects identity escapes outside ASCII without a classifier", () => {
   for (const [source, span] of [
     ["\\é", { end: 2, start: 0 }],
     ["[\\é]", { end: 3, start: 1 }],
   ] as const) {
-    const error = rejected(source, "");
+    accepted(source);
+    const error = rejected(source, "", { annexB: false });
     assert.equal(error.kind, "unsupported", source);
     assert.deepEqual(error.span, span, source);
     assert.equal(

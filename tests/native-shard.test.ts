@@ -221,6 +221,7 @@ test("Linux weights match the three-run median case sums", async () => {
     "tests/property/m5-annexb-string-methods.property.test.ts",
     "tests/property/m5-annexb-date-methods.property.test.ts",
     "tests/property/m5-annexb-object-accessors.property.test.ts",
+    "tests/property/m5-annexb-regexp-syntax.property.test.ts",
   ];
   assert.deepEqual(
     rows.map((row) => row.split("\t")[0]).toSorted(),
