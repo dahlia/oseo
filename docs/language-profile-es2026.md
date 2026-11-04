@@ -697,3 +697,36 @@ edition. The family record is
 Of the 70 *test/built-ins/Uint8Array/* rows for these functions, the unit owns
 68. The two *throws-when-target-is-backed-by-immutable-arraybuffer.js* rows
 need immutable `ArrayBuffer`, a proposal, and stay excluded.
+
+
+`Atomics.pause`
+---------------
+
+The `atomics-pause` unit adds `Atomics.pause`, one of the three ECMAScript 2027
+features in the claim. It is a writable, non-enumerable, configurable own
+property of the `Atomics` namespace with length 0, follows the thirteen
+earlier Atomics functions in creation order, and is not a constructor.
+
+`Atomics.pause(N)` accepts an `undefined` or absent count and any integral
+Number, including `-0`, negative integers, and integers beyond 2<sup>53</sup>.
+Any other count is a `TypeError` without coercion: NaN, the infinities,
+fractions, Strings, BigInts, Number objects, and objects with `valueOf` or
+`Symbol.toPrimitive`, which are never called. It ignores its receiver and any
+further arguments and returns `undefined`.
+
+The edition lets an implementation signal the processor that the caller is
+spinning and leaves the form of that signal to it. Oseo executes one
+processor hint per call whatever the count, so a large count never stalls the
+agent. The hint is a target choice that each target description records as
+`atomicsPauseHint`: `x86-pause`, the PAUSE instruction, for
+`linux-x86_64-gnu`, and `aarch64-yield`, the YIELD instruction, for
+`macos-aarch64` and `linux-aarch64-musl`. The runtime refuses to build for an
+architecture without a recorded hint. The hint is not observable from a
+program, so tests check the choice structurally.
+
+Both reference hosts expose the function, so the fixture is differential
+against Node.js and Deno. The count domain is one predicate that the fixture
+covers class by class, so the unit adds no property suite. The family record
+is
+[*atomics-pause.yaml*](./language-profile-es2026/families/atomics-pause.yaml).
+The unit owns the five *test/built-ins/Atomics/pause/* rows.

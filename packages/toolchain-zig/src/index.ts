@@ -238,6 +238,7 @@ function archiveKeyRecord(input: RuntimeArchiveKeyInput) {
     target: {
       abi: input.target.abi ?? null,
       architecture: input.target.architecture,
+      atomicsPauseHint: input.target.atomicsPauseHint,
       cStandard: input.target.cStandard,
       executableFormat: input.target.executableFormat,
       name: input.target.name,

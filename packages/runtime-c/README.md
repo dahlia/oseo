@@ -1571,3 +1571,10 @@ check and the copy into its Data Block. `setFromBase64` and `setFromHex`
 write the bytes decoded before a malformed character and then throw the
 `SyntaxError`. No heap kind or traced field is added, and the generated-code
 ABI gains no entry point.
+
+ABI `m5-152` also appends `Atomics.pause` to the Atomics code range, after
+`xor`, so the earlier Atomics code IDs keep their values. It accepts an
+undefined count or an integral Number without coercion, executes one processor
+hint, and returns `undefined`. The hint is PAUSE on x86-64 and YIELD on
+AArch64, the choice each compiler target description records as
+`atomicsPauseHint`; the runtime fails to build for any other architecture.

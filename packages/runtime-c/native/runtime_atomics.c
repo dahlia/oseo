@@ -47,6 +47,7 @@ static const OseoAtomicsFunction
         {"wait", 4u},
         {"waitAsync", 4u},
         {"xor", 3u},
+        {"pause", 0u},
     };
 
 #define ATOMICS_TWO_TO_32 4294967296.0
@@ -1024,6 +1025,47 @@ static OseoResult atomics_wait(
     return result;
 }
 
+/*
+ * The processor hint that Atomics.pause executes: PAUSE on x86-64 and
+ * YIELD on AArch64. The compiler's target descriptions record the same
+ * choice as `atomicsPauseHint`, and any other architecture fails to build
+ * rather than silently dropping the hint.
+ */
+static void atomics_pause_hint(void) {
+#if defined(__x86_64__)
+    __asm__ __volatile__("pause");
+#elif defined(__aarch64__)
+    __asm__ __volatile__("yield");
+#else
+#error "Atomics.pause has no processor hint for this target."
+#endif
+}
+
+/*
+ * Atomics.pause(N). N must be undefined or an integral Number, and it is
+ * never coerced. The call executes the processor hint once, whatever the
+ * count, so a large count cannot stall the agent, and returns undefined.
+ */
+static OseoResult atomics_pause(
+    OseoContext *context,
+    size_t argument_count,
+    const OseoValue *arguments
+) {
+    OseoValue count = atomics_argument(argument_count, arguments, 0u);
+    if (tag_of(count) != OSEO_TAG_UNDEFINED) {
+        double number = is_number(count) ? number_value(count) : NAN;
+        if (!isfinite(number) || trunc(number) != number) {
+            return oseo_internal_throw_error(
+                context,
+                OSEO_ERROR_TYPE,
+                "Atomics.pause requires an integral Number or undefined."
+            );
+        }
+    }
+    atomics_pause_hint();
+    return normal(oseo_undefined());
+}
+
 OseoResult oseo_internal_atomics_builtin_dispatch(
     OseoContext *context,
     size_t code_id,
@@ -1060,6 +1102,8 @@ OseoResult oseo_internal_atomics_builtin_dispatch(
             return atomics_wait(context, false, argument_count, arguments);
         case OSEO_ATOMICS_WAIT_ASYNC:
             return atomics_wait(context, true, argument_count, arguments);
+        case OSEO_ATOMICS_PAUSE:
+            return atomics_pause(context, argument_count, arguments);
         default:
             return atomics_read_modify_write(
                 context,

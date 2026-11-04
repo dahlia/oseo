@@ -996,7 +996,7 @@
 #define OSEO_ATOMICS_CODE_ID_RANGE_LAST \
     OSEO_BUILTIN_CODE_RANGE_LAST(OSEO_ATOMICS_CODE_ID_RANGE_INDEX)
 /*
- * The thirteen Atomics functions count down from the range end in
+ * The fourteen Atomics functions count down from the range end in
  * `OseoAtomicsOperation` order, so an operation's index is the only
  * identity the builder and the dispatcher share.
  */
@@ -2308,7 +2308,11 @@ typedef struct {
     bool canceled;
 } OseoTimer;
 
-/* The thirteen Atomics functions, in code-ID and creation order. */
+/*
+ * The fourteen Atomics functions, in code-ID and creation order. `pause`
+ * was admitted after the other thirteen, so it takes the next value and
+ * the existing code IDs stay stable.
+ */
 typedef enum {
     OSEO_ATOMICS_ADD = 0,
     OSEO_ATOMICS_AND = 1,
@@ -2323,7 +2327,8 @@ typedef enum {
     OSEO_ATOMICS_WAIT = 10,
     OSEO_ATOMICS_WAIT_ASYNC = 11,
     OSEO_ATOMICS_XOR = 12,
-    OSEO_ATOMICS_OPERATION_COUNT = 13,
+    OSEO_ATOMICS_PAUSE = 13,
+    OSEO_ATOMICS_OPERATION_COUNT = 14,
 } OseoAtomicsOperation;
 
 /*

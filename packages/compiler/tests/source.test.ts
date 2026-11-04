@@ -61,6 +61,19 @@ test("requires explicit native and cross targets", () => {
   assert.equal(describeTarget("linux-x86_64-gnu").abi, "gnu");
   assert.equal(describeTarget("linux-aarch64-musl").abi, "musl");
   assert.equal(describeTarget("macos-aarch64").abi, undefined);
+  // Atomics.pause executes the target's processor hint (see runtime-c).
+  assert.equal(
+    describeTarget("linux-x86_64-gnu").atomicsPauseHint,
+    "x86-pause",
+  );
+  assert.equal(
+    describeTarget("macos-aarch64").atomicsPauseHint,
+    "aarch64-yield",
+  );
+  assert.equal(
+    describeTarget("linux-aarch64-musl").atomicsPauseHint,
+    "aarch64-yield",
+  );
   assert.ok(canExecuteTarget(linuxHost, describeTarget("linux-x86_64-gnu")));
   assert.ok(canExecuteTarget(macHost, describeTarget("macos-aarch64")));
   assert.ok(!canExecuteTarget(macHost, describeTarget("linux-aarch64-musl")));

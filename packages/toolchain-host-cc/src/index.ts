@@ -71,6 +71,7 @@ export function createHostCcToolchain(options: HostCcOptions): NativeToolchain {
       "architecture",
       "operatingSystem",
       "abi",
+      "atomicsPauseHint",
       "cStandard",
       "executableFormat",
     ] as const;

@@ -1,0 +1,57 @@
+version: 1
+id: atomics-pause
+title: "Atomics.pause"
+scope:
+  - "The Atomics.pause function property, its descriptor, name, length,
+    and non-constructor status."
+  - "Validation of the optional iteration count without coercion, the
+    undefined result, and the ignored receiver and extra arguments."
+  - "The per-target processor hint that the target description records
+    as atomicsPauseHint."
+owners:
+  - docs/language-profile-es2026.md
+evidence:
+  differential:
+    status: covered
+    references:
+      - tests/native/fixtures/atomics-pause.ts
+  fixed:
+    status: covered
+    references:
+      - tests/native/fixtures/atomics-pause.ts
+  forced-collection:
+    status: covered
+    references:
+      - tests/atomics-pause-native.test.ts
+      - tests/native/fixtures/atomics-pause.ts
+  generated:
+    status: omitted
+    reason: "The only input is the count, and its domain is one predicate,
+      undefined or an integral Number, whose classes the fixed fixture
+      enumerates: integral values of both signs and beyond 2**53, the
+      non-finite and fractional Numbers, and every non-Number type with
+      and without coercion hooks."
+    replacements:
+      - tests/native/fixtures/atomics-pause.ts
+  guard-fallback:
+    status: covered
+    references:
+      - tests/atomics-pause-native.test.ts
+      - tests/native/fixtures/atomics-pause.ts
+  specialization:
+    status: covered
+    references:
+      - tests/atomics-pause-native.test.ts
+      - tests/native/fixtures/atomics-pause.ts
+  standards:
+    status: omitted
+    reason: "The five test/built-ins/Atomics/pause rows stay unreviewed in
+      the closure ledger until the unit admits them and the full test262
+      update observes them."
+    replacements:
+      - tests/native/fixtures/atomics-pause.ts
+  structural:
+    status: covered
+    references:
+      - tests/atomics-pause-native.test.ts
+      - packages/compiler/tests/source.test.ts

@@ -24,13 +24,13 @@ process, target, and host contracts. *index.ts* is the unchanged public export
 and composition surface. Package-private modules are not package export paths.
 
 Native target descriptions contain immutable artifact facts, including the
-architecture, operating system, ABI, executable format, C standard, and
-sanitizer policy. Stable Oseo target IDs use operating-system, architecture,
-and optional ABI order. Concrete toolchain spellings do not enter the compiler
-core. Execution-host descriptions are separate capabilities.
-`targetForExecutionHost` selects the one supported target for a normalized
-host, while `canExecuteTarget` rejects mismatched pairs before process
-execution.
+architecture, operating system, ABI, executable format, C standard,
+sanitizer policy, and the processor hint that `Atomics.pause` executes. Stable
+Oseo target IDs use operating-system, architecture, and optional ABI order.
+Concrete toolchain spellings do not enter the compiler core. Execution-host
+descriptions are separate capabilities. `targetForExecutionHost` selects the
+one supported target for a normalized host, while `canExecuteTarget` rejects
+mismatched pairs before process execution.
 
 MIR is self-contained: constants, lexical binding reads and writes, MIR-owned
 parameters, rest markers, and hints, operators, call targets, control-flow

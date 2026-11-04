@@ -674,6 +674,10 @@ current *tests/test262/inventory.tsv*.
  -  `atomics-pause` owns `Atomics.pause` (5). It validates the optional
     iteration count and returns `undefined`. Whether it emits a processor
     pause hint is a target choice recorded in the target description.
+    The runtime and fixture are implemented; the rows wait for the full
+    test262 update. Each call executes one hint, PAUSE on x86-64 and YIELD
+    on AArch64, which the target descriptions record as
+    `atomicsPauseHint`.
 
 ### `language-exit-audit`
 

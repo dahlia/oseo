@@ -1941,6 +1941,18 @@ test("a prepared native runtime is refused for different inputs", async () => {
     otherSanitizers,
     "native target",
   );
+  // The same target name with a different Atomics.pause hint is refused.
+  const otherHint = preparedRuntimeFixture("runtime asset");
+  await refused(
+    {
+      ...prepared,
+      host: otherHint.host,
+      toolchain: otherHint.toolchain,
+      target: { ...target, atomicsPauseHint: "aarch64-yield" },
+    },
+    otherHint,
+    "native target",
+  );
   // Emptying the caller's sanitizer array after preparation cannot make a
   // prepared runtime derived from an unsanitized target look canonical.
   const mutated = preparedRuntimeFixture("runtime asset");

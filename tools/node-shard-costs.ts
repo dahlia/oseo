@@ -7,7 +7,7 @@
  * 41238903460 at `8770b2e4`. The largest is kept on purpose: the residual
  * evidence file took 1.36 times longer on one of those Linux runners than
  * on another, and the margin the shards keep is a slow runner's.
- * Twenty-four files postdate those runs and scale a local measurement on
+ * Twenty-five files postdate those runs and scale a local measurement on
  * the same host by the residual-evidence ratio: 2.574 on Linux and 1.974
  * on macOS. The measurements are serial except the Object accessor
  * property file and the legacy lookup test, which ran side by side.

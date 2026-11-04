@@ -828,6 +828,7 @@ function sameTargetDescription(
   return (
     left.abi === right.abi &&
     left.architecture === right.architecture &&
+    left.atomicsPauseHint === right.atomicsPauseHint &&
     left.cStandard === right.cStandard &&
     left.executableFormat === right.executableFormat &&
     left.name === right.name &&

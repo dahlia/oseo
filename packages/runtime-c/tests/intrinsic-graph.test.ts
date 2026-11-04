@@ -2814,9 +2814,13 @@ test("populates the single-agent shared memory clusters", () => {
     "wait",
     "waitAsync",
     "xor",
+    "pause",
   ]) {
     assert.match(atomicsSource, new RegExp(`\\{"${name}", \\du\\}`, "u"));
   }
+  // pause is appended after xor, so the earlier code IDs keep their values.
+  assert.match(internalHeader, /OSEO_ATOMICS_PAUSE = 13,/u);
+  assert.match(internalHeader, /OSEO_ATOMICS_OPERATION_COUNT = 14,/u);
   assert.match(atomicsSource, /"Atomics"/u);
   assert.match(atomicsSource, /OSEO_WELL_KNOWN_TO_STRING_TAG/u);
   // Every access revalidates after the argument conversions, and a same
