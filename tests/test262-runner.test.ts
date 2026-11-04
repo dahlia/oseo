@@ -1876,6 +1876,43 @@ test("dynamic import is an admitted feature", async () => {
   assert.deepEqual(result.unsupportedFeatures, ["unsupported-example"]);
 });
 
+test("a refused import() request is never an expected negative", async () => {
+  const directory = await mkdtemp(join(tmpdir(), "oseo-test262-import-"));
+  try {
+    const source =
+      "/*---\nflags: [module]\nnegative:\n  phase: resolution\n" +
+      "  type: SyntaxError\nfeatures: [dynamic-import]\n---*/\n" +
+      'import "./missing-static.mjs";\nimport("./missing-dynamic.mjs");\n';
+    const sourcePath = join(directory, "case.js");
+    await writeFile(sourcePath, source);
+    const parsed = parseTest262Case(source, "case.js", revision);
+    const result = await executeTest262Case(
+      source,
+      parsed,
+      new Set(["dynamic-import"]),
+      harnesses,
+      {
+        async execute() {
+          return assert.fail("a refused build runs no variant");
+        },
+      },
+      [],
+      { rootPath: directory, sourcePath },
+    );
+    // The static failure comes first, but the refused request still
+    // makes the build a subset boundary.
+    assert.equal(result.classification, "unsupported-profile-feature");
+    assert.equal(
+      result.observation.unsupportedCapability,
+      "static-specifier-import-build",
+    );
+    const detail = result.observation.detail!;
+    assert.match(detail, /^case\.js:9:8: error\[OSEO3001\]/u);
+  } finally {
+    await rm(directory, { force: true, recursive: true });
+  }
+});
+
 test("admitted super tag exposes the global-code parse negatives", async () => {
   const subset = parseReviewedSubset(
     await readFile(new URL("./test262/subset.yaml", import.meta.url), "utf8"),

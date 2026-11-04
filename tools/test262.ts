@@ -1049,10 +1049,11 @@ interface EntryGraphResult {
   readonly entryDisplayId: string;
   readonly graphDiagnostics: readonly Diagnostic[];
   /**
-   * The first diagnostic refuses the static-specifier `import()` subset
-   * during the build; it is a subset boundary, never a language result.
+   * A diagnostic that refuses a static-specifier `import()` request
+   * during the build, as recorded. The build is then a subset boundary,
+   * never a language result.
    */
-  readonly importBoundary?: true;
+  readonly importBoundary?: Diagnostic;
   readonly nodes?: readonly Test262ModuleGraphNode[];
   /** Canonical graph identities mapped to their portable recorded IDs. */
   readonly sourceIds?: ReadonlyMap<string, string>;
@@ -1182,18 +1183,26 @@ async function buildEntryGraph(
     entryId,
   );
   const entrySources = new Map([[entryId, source]]);
+  // Any refused import() request makes the whole build a subset
+  // boundary, even after an ordinary static failure, so the case can
+  // never count as an expected negative while a request was refused.
   const boundary = async (
-    diagnostic: Diagnostic | undefined,
-  ): Promise<{ readonly importBoundary?: true }> =>
-    diagnostic != null && (await isImportBuildRefusal(diagnostic, entrySources))
-      ? { importBoundary: true }
-      : {};
+    diagnostics: readonly Diagnostic[],
+  ): Promise<{ readonly importBoundary?: Diagnostic }> => {
+    for (const diagnostic of diagnostics) {
+      // eslint-disable-next-line no-await-in-loop -- Stop at the first.
+      if (await isImportBuildRefusal(diagnostic, entrySources)) {
+        return { importBoundary: displayDiagnostic(diagnostic) };
+      }
+    }
+    return {};
+  };
   if (result.graph == null) {
     return {
       compileDiagnostics: [],
       entryDisplayId,
       graphDiagnostics: result.diagnostics.map(displayDiagnostic),
-      ...(await boundary(result.diagnostics[0])),
+      ...(await boundary(result.diagnostics)),
     };
   }
   const sourceIds = new Map(
@@ -1239,7 +1248,7 @@ async function buildEntryGraph(
     compileDiagnostics: compiled.diagnostics.map(displayDiagnostic),
     entryDisplayId,
     graphDiagnostics: result.diagnostics.map(displayDiagnostic),
-    ...(await boundary(compiled.diagnostics[0])),
+    ...(await boundary(compiled.diagnostics)),
     nodes,
     sourceIds,
   };
@@ -1471,10 +1480,10 @@ async function moduleNegativeResult(
       evidence,
     );
   }
-  if (diagnostic != null && graph.importBoundary === true) {
+  if (graph.importBoundary != null) {
     return importBoundaryResult(
       testCase,
-      diagnostic,
+      graph.importBoundary,
       supportedFeatures,
       evidence.dependencies,
     );
@@ -1779,10 +1788,10 @@ async function executedResult(
         dependencies,
       });
     }
-    if (diagnostic != null && graph.importBoundary === true) {
+    if (graph.importBoundary != null) {
       return importBoundaryResult(
         testCase,
-        diagnostic,
+        graph.importBoundary,
         supportedFeatures,
         dependencies,
       );
