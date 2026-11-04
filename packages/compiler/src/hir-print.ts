@@ -503,6 +503,11 @@ function printHirBindingPattern(pattern: HirBindingPattern): string {
   return `[${elements.join(", ")}]`;
 }
 
+/** The source keyword of one disposal hint. */
+function disposalText(disposal: "async" | "sync"): string {
+  return disposal === "async" ? "await using" : "using";
+}
+
 function appendHirStatement(
   lines: string[],
   statement: HirStatement,
@@ -514,8 +519,12 @@ function appendHirStatement(
     statement.kind === "const" ||
     statement.kind === "let"
   ) {
+    const kind =
+      statement.kind === "const" && statement.disposal != null
+        ? disposalText(statement.disposal)
+        : statement.kind;
     lines.push(
-      `${indent}${statement.kind} %b${statement.bindingId} ${statement.name}` +
+      `${indent}${kind} %b${statement.bindingId} ${statement.name}` +
         `${hintText(statement.hint == null ? [] : [statement.hint])} = ` +
         `${printHirExpression(statement.initializer)}${location}`,
     );
@@ -598,8 +607,12 @@ function appendHirStatement(
                 declaration.kind === "binding"
                   ? `%b${declaration.bindingId} ${declaration.name}`
                   : printHirBindingPattern(declaration.pattern);
+              const kind =
+                declaration.kind === "binding" && declaration.disposal != null
+                  ? disposalText(declaration.disposal)
+                  : declaration.declarationKind;
               return (
-                `${declaration.declarationKind} ${target} = ` +
+                `${kind} ${target} = ` +
                 printHirExpression(declaration.initializer)
               );
             })
@@ -612,8 +625,11 @@ function appendHirStatement(
   } else if (statement.kind === "for-of") {
     const target =
       statement.target.kind === "declaration"
-        ? `${statement.target.declarationKind} ` +
-          `%b${statement.target.bindingId} ${statement.target.name}`
+        ? `${
+            statement.target.disposal == null
+              ? statement.target.declarationKind
+              : disposalText(statement.target.disposal)
+          } %b${statement.target.bindingId} ${statement.target.name}`
         : statement.target.kind === "pattern-declaration"
           ? `${statement.target.declarationKind} ` +
             printHirBindingPattern(statement.target.pattern)

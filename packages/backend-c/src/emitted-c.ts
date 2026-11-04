@@ -424,6 +424,36 @@ export const emittedC = {
       [";"],
     ],
   },
+  disposalOperation: {
+    resultAssignScopeCreate: [
+      ["result = oseo_dispose_scope_create(context, "],
+      [");"],
+    ],
+    resultAssignScopeAdd: [
+      ["result = oseo_dispose_scope_add(context, roots["],
+      ["], roots["],
+      ["], "],
+      [");"],
+    ],
+    resultAssignScopeCompletion: [
+      ["result = oseo_dispose_scope_"],
+      ["(context, roots["],
+      ["], completion["],
+      ["u].kind == 2, roots["],
+      ["]);"],
+    ],
+    resultAssignScopeQuery: [
+      ["result = oseo_dispose_scope_"],
+      ["(context, roots["],
+      ["]);"],
+    ],
+    resultAssignScopeContinue: [
+      ["result = oseo_dispose_scope_continue(context, roots["],
+      ["], "],
+      [", roots["],
+      ["]);"],
+    ],
+  },
   iteratorOperation: {
     asyncPrefix: [["async_"]],
     resultAssignOseoIteratorGetContext: [

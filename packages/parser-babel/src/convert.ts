@@ -2116,6 +2116,7 @@ function lexicalDeclarator(
   declarationKind: "const" | "let",
   declaration: BabelNode,
   located: { readonly byteRange: ByteRange; readonly range: SourceRange },
+  disposal?: "async" | "sync",
 ): SyntaxLexicalDeclarator | undefined {
   const identifier = node(declaration.id);
   const initializerNode = node(declaration.init);
@@ -2163,6 +2164,9 @@ function lexicalDeclarator(
   if (initializer == null) return undefined;
   const hint = typeHint(context, identifier.typeAnnotation);
   if (context.diagnostics.length > 0) return undefined;
+  if (disposal != null) {
+    return { ...located, disposal, hint, initializer, kind: "const", name };
+  }
   return { ...located, hint, initializer, kind: declarationKind, name };
 }
 
@@ -2244,6 +2248,21 @@ function callTargetLoop(
       range: located.range,
     },
   };
+}
+
+/*
+ * The disposal hint of a `using` (`"sync"`) or `await using` (`"async"`)
+ * declaration kind, or undefined for every other kind. Babel has already
+ * applied their early errors: an initializer and a plain identifier for
+ * every binding, no Script or bare case-clause position, no `for-in`
+ * head, and `await using` only where `await` is allowed.
+ */
+export function disposalKind(
+  declaration: BabelNode,
+): "async" | "sync" | undefined {
+  if (declaration.kind === "using") return "sync";
+  if (declaration.kind === "await using") return "async";
+  return undefined;
 }
 
 export function statement(
@@ -2344,11 +2363,19 @@ export function statement(
       if (single != null) return single;
       return { ...located, body: assignments, kind: "block" };
     }
-    if (value.kind !== "const" && value.kind !== "let") {
+    const disposal = disposalKind(value);
+    let declarationKind: "const" | "let" | undefined;
+    if (value.kind === "const" || value.kind === "let") {
+      declarationKind = value.kind;
+    } else if (disposal != null) {
+      declarationKind = "const";
+    }
+    if (declarationKind == null) {
       return unsupported(
         context,
         value,
-        "Only const, let, and var declarations are supported.",
+        "Only const, let, var, using, and await using declarations are " +
+          "supported.",
       );
     }
     const declarations = nodes(value.declarations);
@@ -2360,15 +2387,22 @@ export function statement(
       const declaration = declarations[0];
       return declaration == null
         ? unsupported(context, value)
-        : lexicalDeclarator(context, value.kind, declaration, located);
+        : lexicalDeclarator(
+            context,
+            declarationKind,
+            declaration,
+            located,
+            disposal,
+          );
     }
     const declarators: SyntaxLexicalDeclarator[] = [];
     for (const declaration of declarations) {
       const declarator = lexicalDeclarator(
         context,
-        value.kind,
+        declarationKind,
         declaration,
         location(context, declaration),
+        disposal,
       );
       if (declarator == null) return undefined;
       declarators.push(declarator);
@@ -2710,11 +2744,18 @@ export function statement(
           "Ambient declarations are erased by TypeScript and unsupported.",
         );
       }
-      if (left.kind !== "const" && left.kind !== "let" && left.kind !== "var") {
+      const disposal = disposalKind(left);
+      let declarationKind: "const" | "let" | "var" | undefined;
+      if (left.kind === "const" || left.kind === "let" || left.kind === "var") {
+        declarationKind = left.kind;
+      } else if (disposal != null) {
+        declarationKind = "const";
+      }
+      if (declarationKind == null) {
         return unsupported(
           context,
           left,
-          "A for-of declaration uses const, let, or var.",
+          "A for-of declaration uses const, let, var, using, or await using.",
         );
       }
       const declarations = nodes(left.declarations);
@@ -2736,7 +2777,11 @@ export function statement(
       if (rejectedThisBindingName(context, identifier, name)) return undefined;
       if (name != null) {
         target = {
-          declarationKind: left.kind,
+          declarationKind,
+          ...includePropertiesWhen(() => {
+            if (disposal == null) return undefined;
+            return { disposal };
+          }),
           hint: typeHint(context, identifier.typeAnnotation),
           kind: "declaration",
           name,
@@ -2749,7 +2794,7 @@ export function statement(
         const pattern = bindingPattern(context, identifier);
         if (pattern == null) return undefined;
         target = {
-          declarationKind: left.kind,
+          declarationKind,
           kind: "pattern-declaration",
           pattern,
           range: location(context, declaration).range,
@@ -2843,15 +2888,23 @@ export function statement(
           "Ambient declarations are erased by TypeScript and unsupported.",
         );
       }
+      const disposal = disposalKind(initNode);
+      let declarationKind: "const" | "let" | "var" | undefined;
       if (
-        initNode.kind !== "const" &&
-        initNode.kind !== "let" &&
-        initNode.kind !== "var"
+        initNode.kind === "const" ||
+        initNode.kind === "let" ||
+        initNode.kind === "var"
       ) {
+        declarationKind = initNode.kind;
+      } else if (disposal != null) {
+        declarationKind = "const";
+      }
+      if (declarationKind == null) {
         return unsupported(
           context,
           initNode,
-          "Only const, let, and var declarations are supported.",
+          "Only const, let, var, using, and await using declarations are " +
+            "supported.",
         );
       }
       declarations = [];
@@ -2859,7 +2912,7 @@ export function statement(
         const identifier = node(declarator.id);
         if (identifier == null) return unsupported(context, declarator);
         const initializerNode = node(declarator.init);
-        if (initNode.kind === "const" && initializerNode == null) {
+        if (declarationKind === "const" && initializerNode == null) {
           return unsupported(
             context,
             declarator,
@@ -2879,7 +2932,11 @@ export function statement(
               : expression(context, initializerNode);
           if (initializer == null) return undefined;
           declarations.push({
-            declarationKind: initNode.kind,
+            declarationKind,
+            ...includePropertiesWhen(() => {
+              if (disposal == null) return undefined;
+              return { disposal };
+            }),
             hint: typeHint(context, identifier.typeAnnotation),
             initializer,
             kind: "binding",
@@ -2909,7 +2966,7 @@ export function statement(
         const initializer = expression(context, initializerNode);
         if (pattern == null || initializer == null) return undefined;
         declarations.push({
-          declarationKind: initNode.kind,
+          declarationKind,
           initializer,
           kind: "pattern",
           pattern,
@@ -3134,7 +3191,9 @@ export function gatherLexicalNames(
     const declaration = unwrapExportDeclaration(value);
     if (
       declaration.type === "VariableDeclaration" &&
-      (declaration.kind === "const" || declaration.kind === "let")
+      (declaration.kind === "const" ||
+        declaration.kind === "let" ||
+        disposalKind(declaration) != null)
     ) {
       for (const declarator of nodes(declaration.declarations)) {
         const pattern = node(declarator.id);

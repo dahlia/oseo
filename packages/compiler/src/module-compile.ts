@@ -169,6 +169,22 @@ function retainModuleSource<T>(value: T, sourceId: string): T {
   ) as T;
 }
 
+/** Whether one statement itself declares an `await using` binding. */
+function hirStatementDisposesAsynchronously(statement: HirStatement): boolean {
+  if (statement.kind === "const") return statement.disposal === "async";
+  if (statement.kind === "for") {
+    return (statement.declarations ?? []).some(
+      (declaration) =>
+        declaration.kind === "binding" && declaration.disposal === "async",
+    );
+  }
+  return (
+    statement.kind === "for-of" &&
+    statement.target.kind === "declaration" &&
+    statement.target.disposal === "async"
+  );
+}
+
 /**
  * Whether one statement contains an await the module continuation
  * transform can extract. A `for await` head awaits every iteration step
@@ -190,6 +206,12 @@ function hirStatementAwaits(
     statement.kind === "for-of" &&
     statement.awaited === true
   ) {
+    return true;
+  }
+  // An `await using` scope awaits during its disposal, at the scope's
+  // exit rather than at an extractable expression, so like a `for await`
+  // head it only makes evaluation asynchronous.
+  if (awaitedIteration && hirStatementDisposesAsynchronously(statement)) {
     return true;
   }
   if (statement.kind === "block") {

@@ -2036,6 +2036,53 @@ OseoResult oseo_iterator_close(
     bool from_error
 );
 /*
+ * The DisposeCapability of one `using` or `await using` scope (ADR 0017
+ * cleanup region). `create` makes an empty capability, and `add` performs
+ * AddDisposableResource for one declared value and returns that value.
+ * `dispose` runs DisposeResources synchronously from the pending
+ * completion, given whether it is a throw and its value; it throws only
+ * when a dispose method failed, with that error or a SuppressedError
+ * chain, and otherwise lets the region resume its own completion.
+ *
+ * The asynchronous form runs in the generated frame (ADR 0011). `begin`
+ * starts DisposeResources and stops at its first Await; while `awaiting`
+ * answers true, generated code awaits `await_value` and passes the
+ * settlement to `continue`, which runs to the next Await or the end.
+ * `result` then reports the final completion the way `dispose` does. A
+ * scope that holds no resource finishes inside `begin` without awaiting.
+ */
+OseoResult oseo_dispose_scope_create(OseoContext *context, bool async);
+OseoResult oseo_dispose_scope_add(
+    OseoContext *context,
+    OseoValue scope,
+    OseoValue value,
+    bool async
+);
+OseoResult oseo_dispose_scope_dispose(
+    OseoContext *context,
+    OseoValue scope,
+    bool throwing,
+    OseoValue completion
+);
+OseoResult oseo_dispose_scope_begin(
+    OseoContext *context,
+    OseoValue scope,
+    bool throwing,
+    OseoValue completion
+);
+OseoResult oseo_dispose_scope_awaiting(OseoContext *context, OseoValue scope);
+OseoResult oseo_dispose_scope_await_value(
+    OseoContext *context,
+    OseoValue scope
+);
+OseoResult oseo_dispose_scope_continue(
+    OseoContext *context,
+    OseoValue scope,
+    bool fulfilled,
+    OseoValue value
+);
+OseoResult oseo_dispose_scope_result(OseoContext *context, OseoValue scope);
+/*
  * Acquire an asynchronous iterator through Symbol.asyncIterator, or wrap
  * a synchronous iterator when that method is absent. On success, direct
  * async acquisition captures a callable next_method. The sync fallback

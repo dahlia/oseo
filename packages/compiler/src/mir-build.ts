@@ -6508,8 +6508,23 @@ function lowerForOfStatement(
     });
   }
   builder.current = bodyBlock;
-  lowerForHeadTarget(statement.target, value, builder);
-  const terminated = lowerStatementBody(statement.body, builder);
+  const target = statement.target;
+  const disposal = target.kind === "declaration" ? target.disposal : undefined;
+  // A `using` head gives every iteration its own capability, disposed
+  // when the iteration's body completes and before an abrupt completion
+  // reaches the iterator close above it. Same-loop `continue` targets
+  // the step block outside this region, so it disposes without closing.
+  const terminated =
+    disposal == null
+      ? (() => {
+          lowerForHeadTarget(target, value, builder);
+          return lowerStatementBody(statement.body, builder);
+        })()
+      : lowerDisposalRegion(disposal, target.range, builder, () => {
+          lowerDisposalAdd(disposal, value, target.range, builder);
+          lowerForHeadTarget(target, value, builder);
+          return lowerStatementBody(statement.body, builder);
+        });
   builder.labels.length -= claimed.length;
   builder.loops.pop();
   builder.abruptTargets.pop();
@@ -7421,7 +7436,265 @@ function forDeclarationBindings(
   ];
 }
 
+/**
+ * The disposal hint of the `using` scope a statement list opens, or
+ * undefined when the list declares no `using` binding directly. One
+ * `await using` makes the whole scope asynchronous; a scope of only
+ * synchronous resources never awaits, so it keeps the synchronous form.
+ */
+function statementsDisposal(
+  statements: readonly HirStatement[],
+): "async" | "sync" | undefined {
+  let hint: "async" | "sync" | undefined;
+  for (const statement of statements) {
+    if (statement.kind !== "const" || statement.disposal == null) continue;
+    if (statement.disposal === "async") return "async";
+    hint = "sync";
+  }
+  return hint;
+}
+
+/** One runtime operation of a `using` scope, rooted and status-checked. */
+function lowerDisposalOperation(
+  builder: MirBuilder,
+  kind: MirOperation["kind"],
+  detail: string,
+  argumentsValue: readonly number[],
+  range: SourceRange,
+  extra: Partial<MirOperation> = {},
+): number {
+  appendMirMetadata(builder, "safepoint", detail, argumentsValue, range);
+  const id = builder.nextValue;
+  builder.nextValue += 1;
+  builder.current.operations.push({
+    arguments: argumentsValue,
+    detail,
+    id,
+    kind,
+    range,
+    ...extra,
+  });
+  appendMirMetadata(
+    builder,
+    "check-status",
+    "normal -> continue, abrupt -> override completion",
+    [id],
+    range,
+  );
+  recordRoot(builder, id, range);
+  return id;
+}
+
+/**
+ * AddDisposableResource for one `using` or `await using` binding, before
+ * InitializeBinding stores `value`. A throw stays inside the scope's own
+ * region, so the resources already added are still disposed.
+ */
+function lowerDisposalAdd(
+  hint: "async" | "sync",
+  value: number,
+  range: SourceRange,
+  builder: MirBuilder,
+): void {
+  const scope = builder.disposalScopes.at(-1);
+  if (scope == null) {
+    throw new Error("A using declaration has no enclosing using scope.");
+  }
+  lowerDisposalOperation(
+    builder,
+    "dispose-scope-add",
+    "AddDisposableResource",
+    [scope, value],
+    range,
+    hint === "async" ? { disposalAsync: true } : {},
+  );
+}
+
+/**
+ * The asynchronous DisposeResources of an `await using` scope, run from
+ * its cleanup block. The runtime stops at each Await and generated code
+ * performs it in this frame, so the pending completion stays in its
+ * saved slot while the frame is suspended (ADR 0011). A scope that added
+ * no resource finishes inside `begin` and never suspends.
+ */
+function lowerAwaitedDisposal(
+  scope: number,
+  completionSlot: number,
+  range: SourceRange,
+  builder: MirBuilder,
+): void {
+  if (!builder.asyncFunction && !builder.asyncGenerator) {
+    throw new Error("An await using scope needs an asynchronous body.");
+  }
+  lowerDisposalOperation(
+    builder,
+    "dispose-scope-begin",
+    "start DisposeResources",
+    [scope],
+    range,
+    { completionSlot },
+  );
+  const testBlock = createMirBlock(builder);
+  const awaitBlock = createMirBlock(builder);
+  const fulfilledBlock = createMirBlock(builder);
+  const rejectedBlock = createMirBlock(builder);
+  const doneBlock = createMirBlock(builder);
+  builder.current.terminator = { kind: "jump", target: testBlock.id };
+  builder.current = testBlock;
+  const awaiting = lowerDisposalOperation(
+    builder,
+    "dispose-scope-awaiting",
+    "DisposeResources awaits",
+    [scope],
+    range,
+  );
+  builder.current.terminator = {
+    kind: "branch",
+    test: awaiting,
+    whenFalse: doneBlock.id,
+    whenTrue: awaitBlock.id,
+  };
+  builder.current = awaitBlock;
+  const awaited = lowerDisposalOperation(
+    builder,
+    "dispose-scope-await-value",
+    "DisposeResources Await operand",
+    [scope],
+    range,
+  );
+  appendMirMetadata(
+    builder,
+    "safepoint",
+    "await DisposeResources",
+    [awaited],
+    range,
+  );
+  const settled = builder.nextValue;
+  builder.nextValue += 1;
+  builder.current.terminator = {
+    awaited: true,
+    kind: "generator-yield",
+    resume: fulfilledBlock.id,
+    sent: settled,
+    throwResume: rejectedBlock.id,
+    value: awaited,
+  };
+  for (const [block, rejected] of [
+    [fulfilledBlock, false],
+    [rejectedBlock, true],
+  ] as const) {
+    builder.current = block;
+    recordRoot(builder, settled, range);
+    lowerDisposalOperation(
+      builder,
+      "dispose-scope-continue",
+      rejected ? "DisposeResources after rejection" : "DisposeResources",
+      [scope, settled],
+      range,
+      rejected ? { disposalRejected: true } : {},
+    );
+    builder.current.terminator = { kind: "jump", target: testBlock.id };
+  }
+  builder.current = doneBlock;
+  lowerDisposalOperation(
+    builder,
+    "dispose-scope-result",
+    "DisposeResources completion",
+    [scope],
+    range,
+  );
+}
+
+/**
+ * Lowers one `using` scope as an ADR 0017 cleanup region. The scope's
+ * capability is created on entry; `lowerBody` lowers what the scope
+ * protects and returns whether it terminated. Every transfer that
+ * leaves the region enters the cleanup block, which runs
+ * DisposeResources from the saved completion and then resumes it, while
+ * a transfer that stays inside bypasses it. A disposal failure becomes
+ * the region's throw, which the cleanup forwards outward.
+ */
+function lowerDisposalRegion(
+  hint: "async" | "sync",
+  range: SourceRange,
+  builder: MirBuilder,
+  lowerBody: () => boolean,
+): boolean {
+  const scope = lowerDisposalOperation(
+    builder,
+    "dispose-scope-create",
+    "using scope DisposeCapability",
+    [],
+    range,
+    hint === "async" ? { disposalAsync: true } : {},
+  );
+  const cleanupBlock = createMirBlock(builder);
+  const afterBlock = createMirBlock(builder);
+  const outerAbrupt = builder.abruptTargets.at(-1);
+  const cleanupTarget = controlTarget(builder, cleanupBlock.id);
+  builder.finalizers.push(cleanupTarget);
+  builder.abruptTargets.push(cleanupTarget);
+  builder.disposalScopes.push(scope);
+  const terminated = lowerBody();
+  builder.disposalScopes.pop();
+  builder.abruptTargets.pop();
+  builder.finalizers.pop();
+  if (!terminated) {
+    setCompletion(
+      builder,
+      "normal",
+      cleanupBlock.id,
+      range,
+      undefined,
+      controlTarget(builder, afterBlock.id),
+    );
+    builder.current.terminator = { kind: "jump", target: cleanupBlock.id };
+  }
+  builder.current = cleanupBlock;
+  const outerFinalizer = builder.finalizers.at(-1);
+  if (hint === "async") {
+    lowerAwaitedDisposal(scope, cleanupBlock.id, range, builder);
+  } else {
+    lowerDisposalOperation(
+      builder,
+      "dispose-scope-dispose",
+      "DisposeResources",
+      [scope],
+      range,
+      { completionSlot: cleanupBlock.id },
+    );
+  }
+  builder.current.terminator = {
+    completionSlot: cleanupBlock.id,
+    kind: "resume-completion",
+    ...includePropertiesWhen(() => {
+      if (outerAbrupt == null) return undefined;
+      return { outerAbrupt };
+    }),
+    ...includePropertiesWhen(() => {
+      if (outerFinalizer == null) return undefined;
+      return { outerFinalizer };
+    }),
+  };
+  builder.current = afterBlock;
+  return false;
+}
+
 function lowerStatements(
+  statements: readonly HirStatement[],
+  builder: MirBuilder,
+): boolean {
+  const hint = statementsDisposal(statements);
+  if (hint == null) return lowerStatementSequence(statements, builder);
+  const first = statements.find(
+    (statement) => statement.kind === "const" && statement.disposal != null,
+  );
+  return lowerDisposalRegion(hint, first!.range, builder, () =>
+    lowerStatementSequence(statements, builder),
+  );
+}
+
+function lowerStatementSequence(
   statements: readonly HirStatement[],
   builder: MirBuilder,
 ): boolean {
@@ -7435,6 +7708,9 @@ function lowerStatements(
       statement.kind === "let"
     ) {
       const value = lowerExpression(statement.initializer, builder);
+      if (statement.kind === "const" && statement.disposal != null) {
+        lowerDisposalAdd(statement.disposal, value, statement.range, builder);
+      }
       const id = builder.nextValue;
       builder.nextValue += 1;
       builder.current.operations.push({
@@ -7793,135 +8069,18 @@ function lowerStatements(
     } else if (statement.kind === "for-in") {
       lowerForInStatement(statement, builder);
     } else if (statement.kind === "for") {
-      const declarations = statement.declarations ?? [];
-      // CreatePerIterationEnvironment: each iteration reads the current
-      // values, gives every let-bound for-head name a fresh cell, and
-      // re-initializes it, so closures capture one environment per
-      // iteration. A const head has no per-iteration bindings.
-      const perIteration = declarations.flatMap((declaration) =>
-        declaration.declarationKind === "let"
-          ? forDeclarationBindings(declaration)
-          : [],
-      );
-      const copyEnvironment = (): void => {
-        for (const binding of perIteration) {
-          const value = lowerExpression(
-            {
-              bindingId: binding.bindingId,
-              kind: "binding",
-              name: binding.name,
-              range: binding.range,
-            },
-            builder,
-          );
-          resetBinding(binding.bindingId, binding.name, binding.range, builder);
-          lowerBindingTarget(binding, value, "initialize", builder);
-        }
-      };
-      for (const declaration of declarations) {
-        if (declaration.declarationKind === "var") continue;
-        for (const binding of forDeclarationBindings(declaration)) {
-          resetBinding(binding.bindingId, binding.name, binding.range, builder);
-        }
-      }
-      for (const declaration of declarations) {
-        const mode =
-          declaration.declarationKind === "var" ? "write" : "initialize";
-        // A host Script's global `var` name is one property leaf, whose
-        // reference resolves before its initializer runs.
-        const reference =
-          declaration.kind === "pattern"
-            ? lowerBindingReference(declaration.pattern, mode, builder)
-            : undefined;
-        const value = lowerExpression(declaration.initializer, builder);
-        if (declaration.kind === "binding") {
-          lowerBindingTarget(
-            forDeclarationBindings(declaration)[0]!,
-            value,
-            mode,
-            builder,
-          );
-        } else {
-          lowerBindingTarget(
-            declaration.pattern,
-            value,
-            mode,
-            builder,
-            reference,
-          );
-        }
-      }
-      if (statement.init != null) lowerExpression(statement.init, builder);
-      if (perIteration.length > 0) copyEnvironment();
-      const conditionBlock = createMirBlock(builder);
-      const bodyBlock = createMirBlock(builder);
-      const updateBlock = createMirBlock(builder);
-      const exitBlock = createMirBlock(builder);
-      builder.current.terminator = {
-        kind: "jump",
-        target: conditionBlock.id,
-      };
-      builder.current = conditionBlock;
-      let test: number;
-      if (statement.test == null) {
-        test = builder.nextValue;
-        builder.nextValue += 1;
-        builder.current.operations.push({
-          arguments: [],
-          constant: { kind: "boolean", value: true },
-          detail: "true",
-          id: test,
-          kind: "constant",
-          range: statement.range,
-        });
+      const hint = forStatementDisposal(statement);
+      if (hint == null) {
+        lowerForStatement(statement, builder);
       } else {
-        test = lowerExpression(statement.test, builder);
-      }
-      builder.current.terminator = {
-        kind: "branch",
-        test,
-        whenFalse: exitBlock.id,
-        whenTrue: bodyBlock.id,
-      };
-      builder.loops.push({
-        breakTarget: controlTarget(builder, exitBlock.id),
-        continueTarget: controlTarget(builder, updateBlock.id),
-      });
-      const claimed = builder.pendingLabels.splice(0);
-      for (const name of claimed) {
-        builder.labels.push({
-          breakTarget: controlTarget(builder, exitBlock.id),
-          continueTarget: controlTarget(builder, updateBlock.id),
-          name,
+        // The loop environment's capability holds the head's resources
+        // for the whole loop; ForLoopEvaluation disposes them once, when
+        // the loop completes.
+        lowerDisposalRegion(hint, statement.range, builder, () => {
+          lowerForStatement(statement, builder);
+          return false;
         });
       }
-      builder.current = bodyBlock;
-      const terminated = lowerStatementBody(statement.body, builder);
-      builder.loops.pop();
-      builder.labels.length -= claimed.length;
-      if (!terminated) {
-        builder.current.terminator = {
-          kind: "jump",
-          target: updateBlock.id,
-        };
-      }
-      builder.current = updateBlock;
-      if (perIteration.length > 0) copyEnvironment();
-      if (statement.update != null) {
-        lowerExpression(statement.update, builder);
-      }
-      builder.current.terminator = {
-        kind: "jump",
-        target: conditionBlock.id,
-      };
-      builder.current = exitBlock;
-      appendMirMetadata(
-        builder,
-        "join",
-        `for bb${conditionBlock.id}`,
-        [],
-        statement.range,
-      );
     } else if (statement.kind === "do-while") {
       const bodyBlock = createMirBlock(builder);
       const conditionBlock = createMirBlock(builder);
@@ -8021,6 +8180,153 @@ function lowerStatements(
     }
   }
   return false;
+}
+
+/** The disposal hint of a classic for head of `using` declarations. */
+function forStatementDisposal(
+  statement: HirStatement & { readonly kind: "for" },
+): "async" | "sync" | undefined {
+  let hint: "async" | "sync" | undefined;
+  for (const declaration of statement.declarations ?? []) {
+    if (declaration.kind !== "binding" || declaration.disposal == null) {
+      continue;
+    }
+    if (declaration.disposal === "async") return "async";
+    hint = "sync";
+  }
+  return hint;
+}
+
+/** One classic for statement, after its head bindings are scoped. */
+function lowerForStatement(
+  statement: HirStatement & { readonly kind: "for" },
+  builder: MirBuilder,
+): void {
+  const declarations = statement.declarations ?? [];
+  // CreatePerIterationEnvironment: each iteration reads the current
+  // values, gives every let-bound for-head name a fresh cell, and
+  // re-initializes it, so closures capture one environment per
+  // iteration. A const head has no per-iteration bindings.
+  const perIteration = declarations.flatMap((declaration) =>
+    declaration.declarationKind === "let"
+      ? forDeclarationBindings(declaration)
+      : [],
+  );
+  const copyEnvironment = (): void => {
+    for (const binding of perIteration) {
+      const value = lowerExpression(
+        {
+          bindingId: binding.bindingId,
+          kind: "binding",
+          name: binding.name,
+          range: binding.range,
+        },
+        builder,
+      );
+      resetBinding(binding.bindingId, binding.name, binding.range, builder);
+      lowerBindingTarget(binding, value, "initialize", builder);
+    }
+  };
+  for (const declaration of declarations) {
+    if (declaration.declarationKind === "var") continue;
+    for (const binding of forDeclarationBindings(declaration)) {
+      resetBinding(binding.bindingId, binding.name, binding.range, builder);
+    }
+  }
+  for (const declaration of declarations) {
+    const mode = declaration.declarationKind === "var" ? "write" : "initialize";
+    // A host Script's global `var` name is one property leaf, whose
+    // reference resolves before its initializer runs.
+    const reference =
+      declaration.kind === "pattern"
+        ? lowerBindingReference(declaration.pattern, mode, builder)
+        : undefined;
+    const value = lowerExpression(declaration.initializer, builder);
+    if (declaration.kind === "binding" && declaration.disposal != null) {
+      lowerDisposalAdd(declaration.disposal, value, declaration.range, builder);
+    }
+    if (declaration.kind === "binding") {
+      lowerBindingTarget(
+        forDeclarationBindings(declaration)[0]!,
+        value,
+        mode,
+        builder,
+      );
+    } else {
+      lowerBindingTarget(declaration.pattern, value, mode, builder, reference);
+    }
+  }
+  if (statement.init != null) lowerExpression(statement.init, builder);
+  if (perIteration.length > 0) copyEnvironment();
+  const conditionBlock = createMirBlock(builder);
+  const bodyBlock = createMirBlock(builder);
+  const updateBlock = createMirBlock(builder);
+  const exitBlock = createMirBlock(builder);
+  builder.current.terminator = {
+    kind: "jump",
+    target: conditionBlock.id,
+  };
+  builder.current = conditionBlock;
+  let test: number;
+  if (statement.test == null) {
+    test = builder.nextValue;
+    builder.nextValue += 1;
+    builder.current.operations.push({
+      arguments: [],
+      constant: { kind: "boolean", value: true },
+      detail: "true",
+      id: test,
+      kind: "constant",
+      range: statement.range,
+    });
+  } else {
+    test = lowerExpression(statement.test, builder);
+  }
+  builder.current.terminator = {
+    kind: "branch",
+    test,
+    whenFalse: exitBlock.id,
+    whenTrue: bodyBlock.id,
+  };
+  builder.loops.push({
+    breakTarget: controlTarget(builder, exitBlock.id),
+    continueTarget: controlTarget(builder, updateBlock.id),
+  });
+  const claimed = builder.pendingLabels.splice(0);
+  for (const name of claimed) {
+    builder.labels.push({
+      breakTarget: controlTarget(builder, exitBlock.id),
+      continueTarget: controlTarget(builder, updateBlock.id),
+      name,
+    });
+  }
+  builder.current = bodyBlock;
+  const terminated = lowerStatementBody(statement.body, builder);
+  builder.loops.pop();
+  builder.labels.length -= claimed.length;
+  if (!terminated) {
+    builder.current.terminator = {
+      kind: "jump",
+      target: updateBlock.id,
+    };
+  }
+  builder.current = updateBlock;
+  if (perIteration.length > 0) copyEnvironment();
+  if (statement.update != null) {
+    lowerExpression(statement.update, builder);
+  }
+  builder.current.terminator = {
+    kind: "jump",
+    target: conditionBlock.id,
+  };
+  builder.current = exitBlock;
+  appendMirMetadata(
+    builder,
+    "join",
+    `for bb${conditionBlock.id}`,
+    [],
+    statement.range,
+  );
 }
 
 function lowerSyntheticUndefined(
@@ -8228,6 +8534,7 @@ function buildMirFunction(
     initializesInstanceElements,
     nextValue: 0,
     pendingLabels: [],
+    disposalScopes: [],
     pendingTailCalls: new Set<HirExpression>(),
     specialization,
     strictCode: strict,

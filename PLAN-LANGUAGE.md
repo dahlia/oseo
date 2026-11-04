@@ -10,8 +10,9 @@ Implementation status: in progress. The `claim-boundary` unit has applied ADR
 `iterator-concat`, `iterator-zip`, `annexb-object-accessors`,
 `array-from-async`, `json-parse-source`, `uint8array-base64`,
 `atomics-pause`, `annexb-function-declarations`, and `annexb-statement-forms`
-units are implemented and observed. The `disposal-intrinsics` unit is
-implemented and awaits its standards update. Every other unit is open.
+units are implemented and observed. The `disposal-intrinsics` and
+`using-declarations` units are implemented and await their standards update.
+Every other unit is open.
 This plan follows M5 directly and runs alongside M6. It has no milestone
 number. It schedules the language work the maintainer approved on 2026-11-02:
 build-time static-specifier `import()`, Annex B legacy web behavior except
@@ -242,8 +243,9 @@ with a `SuppressedError` that keeps the earlier error as `suppressed`.
 live in the suspended frame of
 [ADR 0011](./docs/adr/0011-asynchronous-continuations.md), not only in the
 completion slots ADR 0017 describes. That is one of ADR 0017's replacement
-triggers. If the current representation cannot hold it, the `using-declarations`
-unit amends ADR 0017 before landing.
+triggers. The current representation holds it: a suspended frame keeps its
+completion records and their values, so the `using-declarations` unit needed no
+amendment.
 
 ### Static-specifier `import()`
 
@@ -684,6 +686,11 @@ current *tests/test262/inventory.tsv*.
     OSEO1001. A property suite generates nested scopes, transfers, throwing
     and async disposers, and checks disposal order and the `SuppressedError`
     chain against a model.
+    The lowering, fixtures, and property suite are implemented, and 181 of
+    the 184 rows pass or are expected negatives in a focused observation;
+    the other three call `eval` and are ADR 0016 results. `await using`
+    keeps its pending completion in the ADR 0011 frame's completion slots,
+    which already survive suspension, so ADR 0017 needs no amendment.
  -  `iterator-zip` owns `Iterator.zip` and `Iterator.zipKeyed` (82), with the
     `shortest`, `longest`, and `strict` modes and padding. Neither reference
     host implements them, so a model written from the specification replaces

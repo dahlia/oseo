@@ -2156,7 +2156,8 @@ ECMAScript 2026 built-in local costs
 
 The property files of the small ECMAScript 2026 built-in units, of
 `iterator-zip`, `array-from-async`, `json-parse-source`,
-`annexb-function-declarations`, and `disposal-intrinsics` postdate the three
+`annexb-function-declarations`, `disposal-intrinsics`, and
+`using-declarations` postdate the three
 Linux source runs. Each Linux weight is one local Linux AMD64 extended run with
 `OSEO_PROPERTY_RUN_SCALE=10` and the file's checked-in seed, size and base
 limit, rounded up to whole seconds. These are local observations, not CI
@@ -2176,6 +2177,7 @@ unknown-file median fallback.
 | *tests/property/es2026-uint8array-base64.property.test.ts*     |    279028.764 |              280 |
 | *tests/property/annexb-function-declarations.property.test.ts* |    299979.122 |              300 |
 | *tests/property/es2027-disposal-intrinsics.property.test.ts*   |    280971.763 |              281 |
+| *tests/property/es2027-using-declarations.property.test.ts*    |    520171.312 |              521 |
 
 The TSV retains each file with `-` for all three historical source samples,
 and the extraction script and its unit test retain it explicitly. The
@@ -2211,3 +2213,8 @@ fallback stays at 429 seconds.
 from the local extended run in the table above, and the TSV, extraction script
 and unit test retain it the same way. Linux now has 163 entries, and its
 fallback moves from 429 to 423 seconds.
+
+*tests/property/es2027-using-declarations.property.test.ts* takes its weight
+from the local extended run in the table above, and the TSV, extraction script
+and unit test retain it the same way. Linux now has 164 entries, and its
+fallback moves back from 423 to 429 seconds.

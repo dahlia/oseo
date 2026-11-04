@@ -211,6 +211,8 @@ export interface HirSwitchCase {
 export interface HirForBindingDeclaration {
   readonly bindingId: number;
   readonly declarationKind: "const" | "let" | "var";
+  /** Present on a `using` or `await using` head; see the const statement. */
+  readonly disposal?: "async" | "sync";
   readonly hint: Hint | undefined;
   readonly initializer: HirExpression;
   readonly kind: "binding";
@@ -236,6 +238,8 @@ export type HirForOfTarget =
   | {
       readonly bindingId: number;
       readonly declarationKind: "const" | "let" | "var";
+      /** Present on a `using` or `await using` head. */
+      readonly disposal?: "async" | "sync";
       readonly hint: Hint | undefined;
       readonly kind: "declaration";
       readonly mutable: boolean;
@@ -1201,6 +1205,12 @@ export type HirStatement =
       readonly bindingId: number;
       readonly hint: Hint | undefined;
       readonly initializer: HirExpression;
+      /**
+       * Present on a `using` (`"sync"`) or `await using` (`"async"`)
+       * declaration, which binds like `const` and also adds its value to
+       * the enclosing scope's DisposeCapability.
+       */
+      readonly disposal?: "async" | "sync";
       readonly kind: "const";
       readonly name: string;
     })

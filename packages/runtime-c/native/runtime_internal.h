@@ -2234,7 +2234,9 @@ typedef struct {
  * keeps the resources still to visit (`cursor`), the needsAwait and
  * hasAwaited flags, what its pending Await is for (`phase`), the traced
  * promise it settles when it finishes (undefined for a `using` scope),
- * and the two traced reactions that resume it.
+ * and the two traced reactions that resume it. A `using` scope's run
+ * instead stops at each Await with the traced `await_value`, which
+ * generated code awaits in its own suspended frame before continuing.
  */
 typedef struct {
     OseoOrdinaryObject ordinary;
@@ -2246,12 +2248,18 @@ typedef struct {
     /* A capability record, which no source value can reach. */
     bool capability_only;
     bool has_error;
+    /* A dispose method's failure replaced the completion the run began
+     * with, so generated code must throw the stored error itself. */
+    bool error_changed;
     bool needs_await;
     bool has_awaited;
+    /* A `using` scope's run stopped at an Await of `await_value`. */
+    bool awaiting;
     int phase;
     size_t cursor;
     OseoValue capability;
     OseoValue error;
+    OseoValue await_value;
     OseoValue promise;
     OseoValue on_fulfilled;
     OseoValue on_rejected;

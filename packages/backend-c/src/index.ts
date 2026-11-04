@@ -1543,6 +1543,91 @@ function emitIteratorOperation(
   line(state, renderC(emittedC.common.rootAssignResultValue, operation.id));
 }
 
+/*
+ * The runtime calls of one `using` scope. The completion-reading forms
+ * pass whether the cleanup's saved completion is a throw and its value.
+ */
+function emitDisposalOperation(
+  state: EmitState,
+  operation: MirOperation,
+): void {
+  location(state, operation.range);
+  state.usesAbrupt = true;
+  const flag = (value: boolean): string =>
+    renderC(value ? emittedC.common.trueValue : emittedC.common.falseValue);
+  const scope = (): number => operationArgument(operation, 0);
+  if (operation.kind === "dispose-scope-create") {
+    line(
+      state,
+      renderC(
+        emittedC.disposalOperation.resultAssignScopeCreate,
+        flag(operation.disposalAsync === true),
+      ),
+    );
+  } else if (operation.kind === "dispose-scope-add") {
+    line(
+      state,
+      renderC(
+        emittedC.disposalOperation.resultAssignScopeAdd,
+        scope(),
+        operationArgument(operation, 1),
+        flag(operation.disposalAsync === true),
+      ),
+    );
+  } else if (
+    operation.kind === "dispose-scope-dispose" ||
+    operation.kind === "dispose-scope-begin"
+  ) {
+    const slot = operation.completionSlot;
+    if (slot == null) {
+      throw new Error(`MIR ${operation.kind} %${operation.id} has no slot.`);
+    }
+    state.usesCompletion = true;
+    line(
+      state,
+      renderC(
+        emittedC.disposalOperation.resultAssignScopeCompletion,
+        operation.kind === "dispose-scope-dispose" ? "dispose" : "begin",
+        scope(),
+        slot,
+        state.completionSlotStart + slot,
+      ),
+    );
+  } else if (operation.kind === "dispose-scope-continue") {
+    line(
+      state,
+      renderC(
+        emittedC.disposalOperation.resultAssignScopeContinue,
+        scope(),
+        flag(operation.disposalRejected !== true),
+        operationArgument(operation, 1),
+      ),
+    );
+  } else {
+    const names = {
+      "dispose-scope-await-value": "await_value",
+      "dispose-scope-awaiting": "awaiting",
+      "dispose-scope-result": "result",
+    } as const;
+    if (
+      operation.kind !== "dispose-scope-await-value" &&
+      operation.kind !== "dispose-scope-awaiting" &&
+      operation.kind !== "dispose-scope-result"
+    ) {
+      throw new Error(`MIR ${operation.kind} is not a using scope call.`);
+    }
+    line(
+      state,
+      renderC(
+        emittedC.disposalOperation.resultAssignScopeQuery,
+        names[operation.kind],
+        scope(),
+      ),
+    );
+  }
+  line(state, renderC(emittedC.common.rootAssignResultValue, operation.id));
+}
+
 function emitCall(state: EmitState, operation: MirOperation): void {
   const target = operation.target;
   if (target == null) {
@@ -3243,6 +3328,8 @@ function emitOperation(state: EmitState, operation: MirOperation): void {
     operation.kind === "iterator-close-start"
   ) {
     emitIteratorOperation(state, operation);
+  } else if (operation.kind.startsWith("dispose-scope-")) {
+    emitDisposalOperation(state, operation);
   } else if (operation.kind === "load-fixed-slot") {
     emitLoadFixedSlot(state, operation);
   } else if (operation.kind === "update-property-cache") {
@@ -3725,6 +3812,9 @@ function completionSlotCount(blocks: readonly MirBlock[]): number {
           (operation.kind === "iterator-close" &&
             operation.completionSlot != null) ||
           (operation.kind === "iterator-close-start" &&
+            operation.completionSlot != null) ||
+          ((operation.kind === "dispose-scope-dispose" ||
+            operation.kind === "dispose-scope-begin") &&
             operation.completionSlot != null) ||
           (operation.kind === "check-status" && operation.abruptTarget != null),
       ),

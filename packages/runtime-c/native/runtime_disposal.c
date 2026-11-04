@@ -117,6 +117,9 @@ static OseoResult stack_allocate(
     stack->on_rejected = oseo_undefined();
     stack->cursor = 0u;
     stack->has_error = false;
+    stack->error_changed = false;
+    stack->awaiting = false;
+    stack->await_value = oseo_undefined();
     stack->needs_await = false;
     stack->has_awaited = false;
     stack->phase = OSEO_DISPOSE_PHASE_RESULT;
@@ -420,6 +423,7 @@ static OseoResult record_error(
 ) {
     oseo_context_clear_language_error(context);
     OseoDisposableStack *stack = disposable_stack_object(stack_value);
+    stack->error_changed = true;
     if (!stack->has_error) {
         stack->has_error = true;
         stack->error = error;
@@ -530,6 +534,14 @@ static OseoResult dispose_await(
     OseoValue stack_value,
     OseoValue value
 ) {
+    OseoDisposableStack *scope = disposable_stack_object(stack_value);
+    if (!is_promise(scope->promise)) {
+        /* A `using` scope's run has no promise of its own: generated
+         * code performs this Await in its own frame. */
+        scope->await_value = value;
+        scope->awaiting = true;
+        return normal(oseo_undefined());
+    }
     OseoValue slots[2] = {stack_value, value};
     OseoRootFrame frame = {NULL, slots, 2u};
     oseo_roots_push(context, &frame);
@@ -655,6 +667,35 @@ static OseoResult async_dispose_run(
     return result;
 }
 
+/*
+ * Continues an asynchronous DisposeResources once its pending Await has
+ * settled. Only a dispose method's result can reject; the two Await
+ * (undefined) steps always fulfill.
+ */
+static OseoResult async_dispose_settled(
+    OseoContext *context,
+    OseoValue stack_value,
+    bool fulfilled,
+    OseoValue value
+) {
+    OseoValue slots[1] = {stack_value};
+    OseoRootFrame frame = {NULL, slots, 1u};
+    oseo_roots_push(context, &frame);
+    OseoDisposableStack *stack = disposable_stack_object(slots[0]);
+    int phase = stack->phase;
+    OseoResult result = normal(oseo_undefined());
+    if (!fulfilled && phase == OSEO_DISPOSE_PHASE_RESULT) {
+        result = record_error(context, slots[0], value);
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = phase == OSEO_DISPOSE_PHASE_FINAL
+            ? async_dispose_finish(context, slots[0])
+            : async_dispose_run(context, slots[0]);
+    }
+    oseo_roots_pop(context, &frame);
+    return result;
+}
+
 /* One of the two reactions that resume an asynchronous disposal. */
 static OseoResult async_dispose_resume(
     OseoContext *context,
@@ -678,16 +719,7 @@ static OseoResult async_dispose_resume(
         );
     }
     if (result.status == OSEO_STATUS_NORMAL) {
-        OseoDisposableStack *stack = disposable_stack_object(slots[0]);
-        int phase = stack->phase;
-        if (!fulfilled && phase == OSEO_DISPOSE_PHASE_RESULT) {
-            result = record_error(context, slots[0], slots[1]);
-        }
-        if (result.status == OSEO_STATUS_NORMAL) {
-            result = phase == OSEO_DISPOSE_PHASE_FINAL
-                ? async_dispose_finish(context, slots[0])
-                : async_dispose_run(context, slots[0]);
-        }
+        result = async_dispose_settled(context, slots[0], fulfilled, slots[1]);
     }
     oseo_roots_pop(context, &frame);
     return result.status == OSEO_STATUS_NORMAL
@@ -1463,4 +1495,146 @@ OseoResult oseo_internal_install_disposal_globals(
     }
     oseo_roots_pop(context, &frame);
     return result.status == OSEO_STATUS_NORMAL ? normal(slots[0]) : result;
+}
+
+/*
+ * The generated-code operations of a `using` scope. Generated code
+ * creates one capability per scope, adds each declared value, and runs
+ * DisposeResources when the scope's cleanup region is entered, passing
+ * whether the pending completion is a throw and its value. A dispose
+ * result is a throw only when a dispose method failed; otherwise the
+ * cleanup resumes its pending completion, so an incoming throw keeps its
+ * diagnostic location.
+ */
+static OseoResult require_scope(OseoContext *context, OseoValue scope) {
+    if (is_disposable_stack(scope) &&
+        disposable_stack_object(scope)->capability_only) {
+        return normal(scope);
+    }
+    return failure(context, "OSEO2001", "Invalid using scope.");
+}
+
+/* The final completion of a scope's run: a throw only if it changed. */
+static OseoResult scope_completion(OseoContext *context, OseoValue scope) {
+    OseoDisposableStack *stack = disposable_stack_object(scope);
+    bool changed = stack->error_changed;
+    stack->error_changed = false;
+    OseoResult result = stored_completion(context, scope);
+    if (result.status == OSEO_STATUS_THROW && !changed) {
+        return normal(oseo_undefined());
+    }
+    return result;
+}
+
+OseoResult oseo_dispose_scope_create(OseoContext *context, bool async) {
+    return oseo_internal_dispose_capability_create(context, async);
+}
+
+OseoResult oseo_dispose_scope_add(
+    OseoContext *context,
+    OseoValue scope,
+    OseoValue value,
+    bool async
+) {
+    OseoResult result = require_scope(context, scope);
+    if (result.status != OSEO_STATUS_NORMAL) return result;
+    result = oseo_internal_dispose_capability_add(context, scope, value, async);
+    if (result.status == OSEO_STATUS_NORMAL) result.value = value;
+    return result;
+}
+
+OseoResult oseo_dispose_scope_dispose(
+    OseoContext *context,
+    OseoValue scope,
+    bool throwing,
+    OseoValue completion
+) {
+    OseoResult result = require_scope(context, scope);
+    if (result.status != OSEO_STATUS_NORMAL) return result;
+    OseoValue slots[1] = {scope};
+    OseoRootFrame frame = {NULL, slots, 1u};
+    oseo_roots_push(context, &frame);
+    disposable_stack_object(slots[0])->error_changed = false;
+    result = oseo_internal_dispose_capability_dispose(
+        context,
+        slots[0],
+        throwing,
+        completion
+    );
+    if (language_throw(context, result) &&
+        !disposable_stack_object(slots[0])->error_changed) {
+        oseo_context_clear_language_error(context);
+        result = normal(oseo_undefined());
+    }
+    disposable_stack_object(slots[0])->error_changed = false;
+    oseo_roots_pop(context, &frame);
+    return result;
+}
+
+OseoResult oseo_dispose_scope_begin(
+    OseoContext *context,
+    OseoValue scope,
+    bool throwing,
+    OseoValue completion
+) {
+    OseoResult result = require_scope(context, scope);
+    if (result.status != OSEO_STATUS_NORMAL) return result;
+    OseoDisposableStack *stack = disposable_stack_object(scope);
+    stack->error_changed = false;
+    stack->awaiting = false;
+    stack->await_value = oseo_undefined();
+    return oseo_internal_dispose_capability_dispose_async(
+        context,
+        scope,
+        oseo_undefined(),
+        throwing,
+        completion
+    );
+}
+
+OseoResult oseo_dispose_scope_awaiting(OseoContext *context, OseoValue scope) {
+    OseoResult result = require_scope(context, scope);
+    if (result.status != OSEO_STATUS_NORMAL) return result;
+    return normal(oseo_boolean(disposable_stack_object(scope)->awaiting));
+}
+
+OseoResult oseo_dispose_scope_await_value(
+    OseoContext *context,
+    OseoValue scope
+) {
+    OseoResult result = require_scope(context, scope);
+    if (result.status != OSEO_STATUS_NORMAL) return result;
+    OseoDisposableStack *stack = disposable_stack_object(scope);
+    OseoValue value = stack->await_value;
+    stack->await_value = oseo_undefined();
+    stack->awaiting = false;
+    return normal(value);
+}
+
+OseoResult oseo_dispose_scope_continue(
+    OseoContext *context,
+    OseoValue scope,
+    bool fulfilled,
+    OseoValue value
+) {
+    OseoResult result = require_scope(context, scope);
+    if (result.status != OSEO_STATUS_NORMAL) return result;
+    if (!fulfilled) oseo_context_clear_language_error(context);
+    result = async_dispose_settled(context, scope, fulfilled, value);
+    return result.status == OSEO_STATUS_NORMAL
+        ? normal(oseo_undefined())
+        : result;
+}
+
+OseoResult oseo_dispose_scope_result(OseoContext *context, OseoValue scope) {
+    OseoResult result = require_scope(context, scope);
+    if (result.status != OSEO_STATUS_NORMAL) return result;
+    if (disposable_stack_object(scope)->phase != OSEO_DISPOSE_PHASE_DONE) {
+        return failure(
+            context,
+            "OSEO2001",
+            "The using scope's disposal has not finished."
+        );
+    }
+    return scope_completion(context, scope);
 }

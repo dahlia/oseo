@@ -1621,3 +1621,17 @@ moves the stack still adds its resource to the moved stack.
 `%AsyncIteratorPrototype%[@@asyncDispose]` own no intrinsic slot; the second
 calls `return` with no arguments, as the pinned test262 requires, where the
 pinned Node.js passes `undefined`.
+
+ABI `m5-157` also adds the generated-code operations of `using` and
+`await using` scopes, `oseo_dispose_scope_create`, `_add`, `_dispose`,
+`_begin`, `_awaiting`, `_await_value`, `_continue`, and `_result`. A scope's
+capability is a record of the disposable stack heap kind that no source value
+reaches.
+The synchronous `dispose` runs DisposeResources from the cleanup region's
+saved completion. The asynchronous form keeps the same record state, but its
+run stops at every Await and leaves the operand in a traced field; generated
+code awaits it in its own suspended frame and passes the settlement back, so
+each Await happens in the frame exactly where the edition places it and an
+empty scope finishes without one. Both forms report a throw only when a
+dispose method failed, so an incoming throw is resumed with its own
+diagnostic location.

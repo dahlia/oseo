@@ -4366,6 +4366,10 @@ function resolveStatement(
           declarations.push({
             bindingId: binding.id,
             declarationKind: declaration.declarationKind,
+            ...includePropertiesWhen(() => {
+              if (declaration.disposal == null) return undefined;
+              return { disposal: declaration.disposal };
+            }),
             hint: declaration.hint,
             initializer: inferFunctionName(initializer, declaration.name),
             kind: "binding",

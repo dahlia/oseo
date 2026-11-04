@@ -1,0 +1,67 @@
+version: 1
+id: using-declarations
+title: "using and await using declarations"
+scope:
+  - "using and await using declarations in blocks, function and static
+    block bodies, switch clause blocks, and module top level, their const
+    binding, TDZ, and NamedEvaluation, and AddDisposableResource before
+    InitializeBinding."
+  - "Disposal of a scope's resources in reverse order when it completes,
+    for every transfer that leaves it (normal, break, continue, return,
+    throw, and generator return) and none that stays inside, with the
+    SuppressedError chain and a failure while adding."
+  - "using heads of classic for statements, disposed once when the loop
+    completes, and of for-of and for-await-of statements, disposed per
+    iteration before the iterator is closed."
+  - "await using: the Await of each asynchronous result in the suspended
+    frame, the single Await for null resources, no Await for a scope that
+    added nothing, the Symbol.dispose fallback, and asynchronous module
+    evaluation."
+owners:
+  - docs/language-profile-es2026.md
+evidence:
+  differential:
+    status: covered
+    references:
+      - tests/native/fixtures/using-declarations.ts
+      - tests/fixtures/using-module/main.mjs
+      - tests/property/es2027-using-declarations.property.test.ts
+  fixed:
+    status: covered
+    references:
+      - tests/native/fixtures/using-declarations.ts
+      - tests/fixtures/using-module/main.mjs
+      - packages/parser-babel/tests/statements.test.ts
+  forced-collection:
+    status: covered
+    references:
+      - tests/using-declarations-native.test.ts
+      - tests/property/es2027-using-declarations.property.test.ts
+  generated:
+    status: covered
+    references:
+      - tests/property/es2027-using-declarations.property.test.ts
+  guard-fallback:
+    status: covered
+    references:
+      - tests/using-declarations-native.test.ts
+      - tests/native/fixtures/using-declarations.ts
+      - tests/property/es2027-using-declarations.property.test.ts
+  specialization:
+    status: covered
+    references:
+      - tests/using-declarations-native.test.ts
+      - tests/property/es2027-using-declarations.property.test.ts
+  standards:
+    status: omitted
+    reason: "The 184 explicit resource management rows under
+      test/language/statements/ stay unreviewed in the closure ledger
+      until the unit admits them and the full test262 update observes
+      them."
+    replacements:
+      - tests/native/fixtures/using-declarations.ts
+      - tests/property/es2027-using-declarations.property.test.ts
+  structural:
+    status: covered
+    references:
+      - packages/parser-babel/tests/statements.test.ts

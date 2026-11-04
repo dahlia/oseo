@@ -2019,3 +2019,60 @@ test("strict optional with calls return their tail call directly", () => {
     }
   }
 });
+
+test("converts using declarations to disposing const bindings", () => {
+  const result = compileSource(babelFrontend, {
+    source:
+      "async function f(r) {\n" +
+      "  { using a = r, b = r; }\n" +
+      "  await using c = r;\n" +
+      "  for (using d of [r]) {}\n" +
+      "  for (await using e of [r]) {}\n" +
+      "  for (using g = r; ; ) break;\n" +
+      "}\n",
+    sourceId: "using.js",
+  });
+  assert.deepEqual(result.diagnostics, []);
+  assert.ok(result.hir != null && result.mir != null);
+  const hir = printHir(result.hir);
+  assert.match(hir, /using %b\d+ a = /u);
+  assert.match(hir, /using %b\d+ b = /u);
+  assert.match(hir, /await using %b\d+ c = /u);
+  assert.match(hir, /for \(using %b\d+ d of /u);
+  assert.match(hir, /for \(await using %b\d+ e of /u);
+  assert.match(hir, /for \(using %b\d+ g = /u);
+  const mir = printMir(result.mir);
+  for (const operation of [
+    "dispose-scope-create",
+    "dispose-scope-add",
+    "dispose-scope-dispose",
+    "dispose-scope-begin",
+    "dispose-scope-awaiting",
+    "dispose-scope-await-value",
+    "dispose-scope-continue",
+    "dispose-scope-result",
+  ]) {
+    assert.match(mir, new RegExp(operation, "u"));
+  }
+});
+
+test("keeps using early errors as parse failures", () => {
+  for (const source of [
+    "using x = null;\n",
+    "{ using x; }\n",
+    "{ using {x} = {}; }\n",
+    "for (using x in {}) {}\n",
+    "function f() { await using x = null; }\n",
+    "switch (0) { case 0: using x = null; }\n",
+  ]) {
+    const result = compileSource(babelFrontend, {
+      source,
+      sourceId: "using-error.js",
+    });
+    assert.ok(result.diagnostics.length > 0, source);
+    assert.ok(
+      result.diagnostics.every((diagnostic) => diagnostic.code === "OSEO0001"),
+      source,
+    );
+  }
+});

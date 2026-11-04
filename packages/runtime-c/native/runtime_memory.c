@@ -316,6 +316,7 @@ static void trace_object(
             OseoDisposableStack *stack = (OseoDisposableStack *)object;
             mark_value(stack->capability, worklist);
             mark_value(stack->error, worklist);
+            mark_value(stack->await_value, worklist);
             mark_value(stack->promise, worklist);
             mark_value(stack->on_fulfilled, worklist);
             mark_value(stack->on_rejected, worklist);

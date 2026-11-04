@@ -16,7 +16,7 @@ document in the same change. A family's status describes tested current
 behavior, never intended behavior. The Annex B built-in units, the Annex B
 Object accessors, the Annex B language units, the small ECMAScript 2026
 built-in units, `iterator-zip`, `array-from-async`, `json-parse-source`, and
-`disposal-intrinsics` hold the family records so far; see
+the two explicit resource management units hold the family records so far; see
 [Annex B built-ins](#annex-b-built-ins),
 [Annex B Object accessors](#annex-b-object-accessors),
 [Annex B language semantics](#annex-b-language-semantics),
@@ -864,10 +864,11 @@ Explicit resource management
 ----------------------------
 
 The `disposal-intrinsics` unit adds the built-ins of the ECMAScript 2027
-explicit resource management feature. Its 240 test262 paths under
-*test/built-ins/* stay `unreviewed` in the closure ledger until the unit admits
-them, so the record names its standards evidence as pending. In a focused
-observation, 236 pass. The other four construct a new target with the
+explicit resource management feature, and the `using-declarations` unit adds
+`using` and `await using`; see [Declarations](#declarations). Its 240 test262
+paths under *test/built-ins/* stay `unreviewed` in the closure ledger until the
+unit admits them, so the record names its standards evidence as pending. In a
+focused observation, 236 pass. The other four construct a new target with the
 `Function` constructor, three of them of another realm, and are ADR 0016
 results: *proto-from-ctor-realm.js* for each of the three constructors and
 *SuppressedError/newtarget-proto-fallback.js*. The cross-realm fixture covers
@@ -923,3 +924,50 @@ creates, which the edition does not define. The property suite also checks
 generated stacks against an independent model of the disposal order and the
 `SuppressedError` chain. The family record is
 [*disposal-intrinsics.yaml*](./language-profile-es2026/families/disposal-intrinsics.yaml).
+
+### Declarations
+
+A `using` or `await using` declaration binds like `const`: the binding is
+immutable, has a TDZ, and names an anonymous function initializer. Before it
+initializes the binding, the declaration adds the value to its scope's
+DisposeCapability, so a value that is neither an object, `null`, nor
+`undefined`, or that has no callable dispose method, throws there and the
+binding stays uninitialized. `await using` looks for `Symbol.asyncDispose`
+first and falls back to `Symbol.dispose`. The early errors are the Babel
+parser's: an initializer and a plain identifier are required, and neither form
+may appear at the top level of a Script, directly in a case clause, or as a
+`for-in` head, nor `await using` outside an asynchronous function or a module.
+
+Every scope that declares one is an
+[ADR 0017](./adr/0017-structured-cleanup-regions.md) cleanup region: a block,
+a function or static block body, a module's top level, the loop environment of
+a classic `for` head, and each iteration of a `for-of` or `for await` head.
+Each transfer that leaves the region, including a generator's `return`,
+disposes the scope's resources in reverse order and then resumes, while a
+transfer that stays inside does not. A per-iteration region sits inside the
+loop's iterator close, so a same-loop `continue` disposes without closing the
+iterator, and a `break` disposes and then closes it. Failures fold into the
+pending completion as the built-ins' `SuppressedError` chain does.
+
+`await using` performs each Await of DisposeResources in its own suspended
+frame, as an `await` expression does, so a block whose `await using` ran
+continues in a later microtask, while a block that added nothing continues in
+the same one. The pending completion stays in the frame's completion slots
+across the suspension, which
+[ADR 0011](./adr/0011-asynchronous-continuations.md) already traces, so ADR
+0017 needs no amendment. A module with a top-level `await using` evaluates
+asynchronously.
+
+In a focused observation, 181 of the 184 test262 paths under
+*test/language/statements/* pass or are expected negatives. The other three
+call `eval` and are ADR 0016 results: *using/cptn-value.js* and the two
+*not-allowed-at-top-level-of-eval.js* syntax rows.
+
+The fixtures compare with Node.js and Deno, except one: the pinned Deno rejects
+`using` in a classic `for` head as a syntax error, so that fixture compares
+with Node.js alone. The module fixture runs top-level `using` and `await using`
+across an import. The property suite generates nested scopes of synchronous,
+asynchronous, fallback, and `null` resources, loop heads, and abrupt exits,
+and checks the disposal order and the final completion against an independent
+model and Node.js. The family record is
+[*using-declarations.yaml*](./language-profile-es2026/families/using-declarations.yaml).
