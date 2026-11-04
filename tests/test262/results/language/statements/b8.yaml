@@ -624,6 +624,32 @@ results:
       expectedErrorType: SyntaxError
       expectedFailurePhase: parse
       features:
+        - async-iteration
+        - explicit-resource-management
+      flags: []
+      includes: []
+      mode: script
+      path: test/language/statements/for-await-of/head-await-using-init.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: expected-negative
+    dependencies:
+      - async-functions
+      - async-iteration
+      - control-flow
+      - lexical-bindings
+    observation:
+      errorType: SyntaxError
+      failedPhase: parse
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      expectedErrorType: SyntaxError
+      expectedFailurePhase: parse
+      features:
         - async-functions
       flags: []
       includes: []
@@ -669,6 +695,51 @@ results:
     execution:
       harnessIncludes:
         - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: true
+      features:
+        - explicit-resource-management
+      flags:
+        - async
+      includes:
+        - asyncHelpers.js
+      mode: script
+      path: test/language/statements/for-of/head-await-using-bound-names-fordecl-tdz.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - abrupt-completion
+      - async-functions
+      - control-flow
+      - error-intrinsics
+      - functions
+      - iterator-protocol
+      - lexical-bindings
+      - object-literals
+      - promise-settlement
+      - symbols
+    execution:
+      harnessIncludes:
+        - base.js
+        - doneprintHandle.js
+        - asyncHelpers.js
+      scheduler: deterministic-logical-clock
       target: linux-x86_64-gnu
       variants:
         - specialization: disabled

@@ -1,0 +1,187 @@
+// Fixed non-source witnesses for the seven explicit resource management
+// rows that ADR 0016 excludes, derived from pinned Test262. Each section
+// keeps the original assertions and replaces only the source-compiling
+// call: `new other.Function()` and `new Function()` become a literal
+// function, and each `eval` becomes a literal ADR 0029 host Script.
+
+// Replacement for test/built-ins/DisposableStack/proto-from-ctor-realm.js
+// Copyright (C) 2023 Ron Buckton. All rights reserved.
+// This code is governed by the BSD license found in the LICENSE file.
+(function () {
+var other = $262.createRealm().global;
+var newTarget = other.$262.evalScript("(function(){})");
+var stack;
+
+newTarget.prototype = undefined;
+stack = Reflect.construct(DisposableStack, [], newTarget);
+assert.sameValue(Object.getPrototypeOf(stack), other.DisposableStack.prototype, 'newTarget.prototype is undefined');
+
+newTarget.prototype = null;
+stack = Reflect.construct(DisposableStack, [], newTarget);
+assert.sameValue(Object.getPrototypeOf(stack), other.DisposableStack.prototype, 'newTarget.prototype is null');
+
+newTarget.prototype = true;
+stack = Reflect.construct(DisposableStack, [], newTarget);
+assert.sameValue(Object.getPrototypeOf(stack), other.DisposableStack.prototype, 'newTarget.prototype is a Boolean');
+
+newTarget.prototype = '';
+stack = Reflect.construct(DisposableStack, [], newTarget);
+assert.sameValue(Object.getPrototypeOf(stack), other.DisposableStack.prototype, 'newTarget.prototype is a String');
+
+newTarget.prototype = Symbol();
+stack = Reflect.construct(DisposableStack, [], newTarget);
+assert.sameValue(Object.getPrototypeOf(stack), other.DisposableStack.prototype, 'newTarget.prototype is a Symbol');
+
+newTarget.prototype = 1;
+stack = Reflect.construct(DisposableStack, [], newTarget);
+assert.sameValue(Object.getPrototypeOf(stack), other.DisposableStack.prototype, 'newTarget.prototype is a Number');
+})();
+
+// Replacement for test/built-ins/AsyncDisposableStack/proto-from-ctor-realm.js
+// Copyright (C) 2023 Ron Buckton. All rights reserved.
+// This code is governed by the BSD license found in the LICENSE file.
+(function () {
+var other = $262.createRealm().global;
+var newTarget = other.$262.evalScript("(function(){})");
+var stack;
+
+newTarget.prototype = undefined;
+stack = Reflect.construct(AsyncDisposableStack, [], newTarget);
+assert.sameValue(Object.getPrototypeOf(stack), other.AsyncDisposableStack.prototype, 'newTarget.prototype is undefined');
+
+newTarget.prototype = null;
+stack = Reflect.construct(AsyncDisposableStack, [], newTarget);
+assert.sameValue(Object.getPrototypeOf(stack), other.AsyncDisposableStack.prototype, 'newTarget.prototype is null');
+
+newTarget.prototype = true;
+stack = Reflect.construct(AsyncDisposableStack, [], newTarget);
+assert.sameValue(Object.getPrototypeOf(stack), other.AsyncDisposableStack.prototype, 'newTarget.prototype is a Boolean');
+
+newTarget.prototype = '';
+stack = Reflect.construct(AsyncDisposableStack, [], newTarget);
+assert.sameValue(Object.getPrototypeOf(stack), other.AsyncDisposableStack.prototype, 'newTarget.prototype is a String');
+
+newTarget.prototype = Symbol();
+stack = Reflect.construct(AsyncDisposableStack, [], newTarget);
+assert.sameValue(Object.getPrototypeOf(stack), other.AsyncDisposableStack.prototype, 'newTarget.prototype is a Symbol');
+
+newTarget.prototype = 1;
+stack = Reflect.construct(AsyncDisposableStack, [], newTarget);
+assert.sameValue(Object.getPrototypeOf(stack), other.AsyncDisposableStack.prototype, 'newTarget.prototype is a Number');
+})();
+
+// Replacement for test/built-ins/SuppressedError/proto-from-ctor-realm.js
+// Copyright (C) 2023 Ron Buckton. All rights reserved.
+// This code is governed by the BSD license found in the LICENSE file.
+(function () {
+var other = $262.createRealm().global;
+var newTarget = other.$262.evalScript("(function(){})");
+var err;
+
+newTarget.prototype = undefined;
+err = Reflect.construct(SuppressedError, [[]], newTarget);
+assert.sameValue(Object.getPrototypeOf(err), other.SuppressedError.prototype, 'newTarget.prototype is undefined');
+
+newTarget.prototype = null;
+err = Reflect.construct(SuppressedError, [[]], newTarget);
+assert.sameValue(Object.getPrototypeOf(err), other.SuppressedError.prototype, 'newTarget.prototype is null');
+
+newTarget.prototype = true;
+err = Reflect.construct(SuppressedError, [[]], newTarget);
+assert.sameValue(Object.getPrototypeOf(err), other.SuppressedError.prototype, 'newTarget.prototype is a Boolean');
+
+newTarget.prototype = '';
+err = Reflect.construct(SuppressedError, [[]], newTarget);
+assert.sameValue(Object.getPrototypeOf(err), other.SuppressedError.prototype, 'newTarget.prototype is a String');
+
+newTarget.prototype = Symbol();
+err = Reflect.construct(SuppressedError, [[]], newTarget);
+assert.sameValue(Object.getPrototypeOf(err), other.SuppressedError.prototype, 'newTarget.prototype is a Symbol');
+
+newTarget.prototype = 0;
+err = Reflect.construct(SuppressedError, [[]], newTarget);
+assert.sameValue(Object.getPrototypeOf(err), other.SuppressedError.prototype, 'newTarget.prototype is a Number');
+})();
+
+// Replacement for test/built-ins/SuppressedError/newtarget-proto-fallback.js
+// Copyright (C) 2023 Ron Buckton. All rights reserved.
+// This code is governed by the BSD license found in the LICENSE file.
+(function () {
+const values = [
+  undefined,
+  null,
+  42,
+  false,
+  true,
+  Symbol(),
+  'string',
+  SuppressedError.prototype,
+];
+
+const NewTarget = function () {};
+
+for (const value of values) {
+  const NewTargetProxy = new Proxy(NewTarget, {
+    get(t, p) {
+      if (p === 'prototype') {
+        return value;
+      }
+      return t[p];
+    }
+  });
+
+  const error = Reflect.construct(SuppressedError, [], NewTargetProxy);
+  assert.sameValue(Object.getPrototypeOf(error), SuppressedError.prototype);
+}
+})();
+
+// Replacement for test/language/statements/using/cptn-value.js
+// Copyright (C) 2023 Ron Buckton. All rights reserved.
+// This code is governed by the BSD license found in the LICENSE file.
+(function () {
+assert.sameValue(
+  $262.evalScript('{using test262id1 = null;}'), undefined, 'Single declaration'
+);
+assert.sameValue(
+  $262.evalScript('{using test262id2 = null, test262id3 = null;}'),
+  undefined,
+  'Multiple declarations'
+);
+
+assert.sameValue($262.evalScript('4; {using test262id5 = null;}'), 4);
+assert.sameValue($262.evalScript('6; {using test262id7 = null, test262id8 = null;}'), 6);
+})();
+
+// Replacement for
+// test/language/statements/using/syntax/using-not-allowed-at-top-level-of-eval.js
+// Copyright (C) 2023 Ron Buckton. All rights reserved.
+// This code is governed by the BSD license found in the LICENSE file.
+(function () {
+assert.throws(SyntaxError, function() {
+  $262.evalScript('using x = null;')
+});
+})();
+
+// Replacement for
+// test/language/statements/await-using/syntax/await-using-not-allowed-at-top-level-of-eval.js
+// Copyright (C) 2023 Ron Buckton. All rights reserved.
+// This code is governed by the BSD license found in the LICENSE file.
+// The original runs under asyncTest; the rejection is checked here and the
+// completion line waits for it.
+var awaitUsing = (async function () {
+  try {
+    await (async function () {
+      $262.evalScript('await using x = null;')
+    })();
+  } catch (error) {
+    assert.sameValue(error.constructor, SyntaxError, 'rejects with SyntaxError');
+    return;
+  }
+  throw new Test262Error('Expected a SyntaxError rejection');
+})();
+
+awaitUsing.then(function () {
+  console.log("disposal dynamic source complete");
+}, function (error) {
+  console.log("disposal dynamic source failed: " + error);
+});

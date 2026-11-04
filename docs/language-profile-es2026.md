@@ -865,14 +865,16 @@ Explicit resource management
 
 The `disposal-intrinsics` unit adds the built-ins of the ECMAScript 2027
 explicit resource management feature, and the `using-declarations` unit adds
-`using` and `await using`; see [Declarations](#declarations). Its 240 test262
-paths under *test/built-ins/* stay `unreviewed` in the closure ledger until the
-unit admits them, so the record names its standards evidence as pending. In a
-focused observation, 236 pass. The other four construct a new target with the
-`Function` constructor, three of them of another realm, and are ADR 0016
-results: *proto-from-ctor-realm.js* for each of the three constructors and
-*SuppressedError/newtarget-proto-fallback.js*. The cross-realm fixture covers
-their other assertions with a bound function of the other realm.
+`using` and `await using`; see [Declarations](#declarations). Of its 240
+test262 rows under *test/built-ins/*, 236 pass in the full test262 observation.
+The other four construct a new target with the `Function` constructor, three
+of them of another realm, and are ADR 0016 exclusions:
+*proto-from-ctor-realm.js* for each of the three constructors and
+*SuppressedError/newtarget-proto-fallback.js*. The witness in
+*tests/disposal-dynamic-source-native.test.ts* runs their other assertions
+with a literal function in place of the constructed one, and the M5c
+exclusion audit binds it. The record's standards class cites the results
+partitions that hold the rows.
 
 ### Built-ins
 
@@ -958,10 +960,12 @@ across the suspension, which
 0017 needs no amendment. A module with a top-level `await using` evaluates
 asynchronously.
 
-In a focused observation, 181 of the 184 test262 paths under
-*test/language/statements/* pass or are expected negatives. The other three
-call `eval` and are ADR 0016 results: *using/cptn-value.js* and the two
-*not-allowed-at-top-level-of-eval.js* syntax rows.
+In the full test262 observation, 118 of the 184 rows under
+*test/language/statements/* pass and 63 report the `SyntaxError` they expect.
+The other three call `eval` and are ADR 0016 exclusions: *using/cptn-value.js*
+and the two *not-allowed-at-top-level-of-eval.js* syntax rows. The same
+witness evaluates their source text as literal ADR 0029 host Scripts, and the
+record's standards class cites the results partitions that hold the rows.
 
 The fixtures compare with Node.js and Deno, except one: the pinned Deno rejects
 `using` in a classic `for` head as a syntax error, so that fixture compares

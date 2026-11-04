@@ -9,10 +9,9 @@ Implementation status: in progress. The `claim-boundary` unit has applied ADR
 `annexb-date-methods`, `error-is-error`, `math-sum-precise`, `upsert`,
 `iterator-concat`, `iterator-zip`, `annexb-object-accessors`,
 `array-from-async`, `json-parse-source`, `uint8array-base64`,
-`atomics-pause`, `annexb-function-declarations`, and `annexb-statement-forms`
-units are implemented and observed. The `disposal-intrinsics` and
-`using-declarations` units are implemented and await their standards update.
-Every other unit is open.
+`atomics-pause`, `annexb-function-declarations`, `annexb-statement-forms`,
+`disposal-intrinsics`, and `using-declarations` units are implemented and
+observed. Every other unit is open.
 This plan follows M5 directly and runs alongside M6. It has no milestone
 number. It schedules the language work the maintainer approved on 2026-11-02:
 build-time static-specifier `import()`, Annex B legacy web behavior except
@@ -579,10 +578,7 @@ admission.
 Status: implemented, with fixed and differential evidence in the
 [profile section](./docs/language-profile-es2026.md#statement-forms). In the
 full test262 observation, 13 rows pass and the six `for-in` rows that expect a
-parse-time `SyntaxError` report it. With this unit and
-`annexb-function-declarations` observed, the manifest has 42,054 reviewed
-rows: 35,758 passes, 4,407 expected negatives, and 1,889 unsupported results,
-and no earlier row changes.
+parse-time `SyntaxError` report it, and no earlier row changes.
 
 ### `annexb-dynamic-source-accounting`
 
@@ -674,9 +670,9 @@ current *tests/test262/inventory.tsv*.
     Adding two well-known symbols changes the well-known symbol table that M5b
     fixed at thirteen entries.
     The runtime, fixtures, and property suite are implemented, and 236 of the
-    240 rows pass in a focused observation. The other four construct a new
-    target with the `Function` constructor and are ADR 0016 results: each
-    constructor's *proto-from-ctor-realm.js* and
+    240 rows pass in the full test262 observation. The other four construct a
+    new target with the `Function` constructor and are ADR 0016 exclusions in
+    the M5c exclusion audit: each constructor's *proto-from-ctor-realm.js* and
     *SuppressedError/newtarget-proto-fallback.js*.
  -  `using-declarations` owns the 184 *test/language/statements/* rows for
     `using` and `await using`, including `for`, `for-of`, `for-await-of`,
@@ -686,9 +682,13 @@ current *tests/test262/inventory.tsv*.
     OSEO1001. A property suite generates nested scopes, transfers, throwing
     and async disposers, and checks disposal order and the `SuppressedError`
     chain against a model.
-    The lowering, fixtures, and property suite are implemented, and 181 of
-    the 184 rows pass or are expected negatives in a focused observation;
-    the other three call `eval` and are ADR 0016 results. `await using`
+    The lowering, fixtures, and property suite are implemented. In the full
+    test262 observation, 118 of the 184 rows pass and 63 report the
+    `SyntaxError` they expect; the other three call `eval` and are ADR 0016
+    exclusions in the M5c exclusion audit. With this unit and
+    `disposal-intrinsics` observed, the manifest has 42,478 reviewed rows:
+    36,112 passes, 4,470 expected negatives, and 1,896 unsupported results,
+    and no earlier row changes. `await using`
     keeps its pending completion in the ADR 0011 frame's completion slots,
     which already survive suspension, so ADR 0017 needs no amendment.
  -  `iterator-zip` owns `Iterator.zip` and `Iterator.zipKeyed` (82), with the

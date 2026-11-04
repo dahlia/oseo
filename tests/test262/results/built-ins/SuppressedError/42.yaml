@@ -1,0 +1,38 @@
+group: built-ins/SuppressedError
+key: "42"
+results:
+  - case:
+      async: false
+      features:
+        - explicit-resource-management
+        - Symbol
+      flags: []
+      includes: []
+      mode: script
+      path: test/built-ins/SuppressedError/newtarget-proto-fallback.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - dynamic-source
+      - error-intrinsics
+      - functions
+      - iterator-protocol
+      - lexical-bindings
+      - object-literals
+      - object-properties
+      - proxy-exotic-object
+      - reflect-namespace
+      - symbols
+    observation:
+      detail: 'test/built-ins/SuppressedError/newtarget-proto-fallback.js
+        non-strict disabled failed (1): stdout=""
+        stderr="test/built-ins/SuppressedError/newtarget-proto-fallback.js:119:19:
+        error[OSEO1001]: The Function constructor requires dynamic
+        source and is unsupported in M5.\n"'
+      passed: false
+      unsupportedCapability: profile-syntax
+    unsupportedFeatures: []
+suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2

@@ -1268,6 +1268,46 @@ results:
   - case:
       async: false
       features:
+        - explicit-resource-management
+      flags:
+        - module
+      includes: []
+      mode: module
+      path: test/language/statements/for-of/head-await-using-fresh-binding-per-iteration.js
+      strictness:
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - async-functions
+      - control-flow
+      - expression-operators
+      - functions
+      - iterator-protocol
+      - lexical-bindings
+      - object-literals
+      - promise-settlement
+      - symbols
+    execution:
+      harnessIncludes:
+        - base.js
+      moduleGraph:
+        - dependencies: []
+          id: test/language/statements/for-of/head-await-using-fresh-binding-per-iteration.js
+          sourceHash: fnv1a64:a057beaf500c75a6
+      scheduler: deterministic-logical-clock
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
         - Symbol.iterator
         - destructuring-binding
       flags:

@@ -104,6 +104,42 @@ results:
   - case:
       async: true
       features:
+        - explicit-resource-management
+      flags:
+        - async
+      includes:
+        - asyncHelpers.js
+      mode: script
+      path: test/language/statements/await-using/await-using-allows-undefined-initializer.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - lexical-bindings
+    execution:
+      harnessIncludes:
+        - base.js
+        - doneprintHandle.js
+        - asyncHelpers.js
+      scheduler: deterministic-logical-clock
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: true
+      features:
         - Symbol.iterator
         - Symbol.asyncIterator
         - async-iteration
@@ -1162,6 +1198,29 @@ results:
           strictness: strict
     observation:
       passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
+      expectedErrorType: SyntaxError
+      expectedFailurePhase: parse
+      features:
+        - explicit-resource-management
+      flags: []
+      includes: []
+      mode: script
+      path: test/language/statements/for-of/head-using-bound-names-in-stmt.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: expected-negative
+    dependencies:
+      - control-flow
+      - lexical-bindings
+    observation:
+      errorType: SyntaxError
+      failedPhase: parse
+      passed: false
     unsupportedFeatures: []
   - case:
       async: false

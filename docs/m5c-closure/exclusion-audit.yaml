@@ -821,6 +821,63 @@ assessments:
       excluded. Reopen on an ADR 0016 amendment admitting
       source-compiling constructors, or on changed source,
       observation, or replacement evidence.
+  disposal-intrinsics-dynamic-source:
+    disposition: exclusion
+    normativeDependency: source-evaluation-only
+    replacementEvidence:
+      tests/disposal-dynamic-source-native.test.ts:
+        "b961ef58efe4803e1aa14d203e555c092e04e0763249c197\
+        ace5b32b9d49cdc6"
+      tests/fixtures/disposal-dynamic-source/witnesses.js.txt:
+        "001c9c9143606e23ca65c2efca3539bb8b75cf9dd3cfa1cc\
+        4d8e6616bce5a438"
+    reason: >-
+      Each test builds its NewTarget with the `Function`
+      constructor, which ADR 0016 excludes. OSEO1001 rejects the call
+      at compile time in newtarget-proto-fallback.js and at run time
+      for the other-realm `Function` of the three
+      proto-from-ctor-realm.js rows. The constructed function is only a
+      NewTarget; the subject is GetPrototypeFromConstructor in the
+      DisposableStack, AsyncDisposableStack, and SuppressedError
+      constructors. The disposal-dynamic-source witness keeps every
+      original assertion. The three proto-from-ctor-realm sections take
+      an other-realm function from a literal ADR 0029 host Script and
+      check all six non-object prototype values against the other
+      realm's prototype. The newtarget-proto-fallback section wraps a
+      function expression in the original Proxy and checks all eight
+      values. Both specialization policies run natively with forced
+      collection and match Node.js and Deno. Only the source
+      construction remains excluded. Reopen on an ADR 0016 amendment
+      admitting source-compiling constructors, or on changed source,
+      observation, or replacement evidence.
+  using-declarations-dynamic-source:
+    disposition: exclusion
+    normativeDependency: source-evaluation-only
+    replacementEvidence:
+      tests/disposal-dynamic-source-native.test.ts:
+        "b961ef58efe4803e1aa14d203e555c092e04e0763249c197\
+        ace5b32b9d49cdc6"
+      tests/fixtures/disposal-dynamic-source/witnesses.js.txt:
+        "001c9c9143606e23ca65c2efca3539bb8b75cf9dd3cfa1cc\
+        4d8e6616bce5a438"
+    reason: >-
+      Each test passes `using` or `await using` source to direct
+      `eval`, which ADR 0016 excludes, and the runtime rejects each
+      call with OSEO1001. cptn-value.js observes the empty completion of a
+      UsingDeclaration through the block completion value. The two
+      syntax tests observe the early error for a declaration at the top
+      level of Script-goal code. The disposal-dynamic-source witness
+      evaluates the same source text as literal ADR 0029 host Scripts:
+      the four cptn-value Scripts return undefined, undefined, 4, and 6,
+      the `using` Script throws SyntaxError, and the `await using`
+      Script rejects its async caller with SyntaxError. The observed
+      expected negatives using-not-allowed-at-top-level-of-script.js
+      and await-using-not-allowed-at-top-level-of-script.js report the
+      same early error for a whole Script. Both specialization policies
+      run natively with forced collection and match Node.js and Deno.
+      Only source evaluation by `eval` remains excluded. Reopen on an
+      ADR 0016 amendment admitting `eval`, or on changed source,
+      observation, or replacement evidence.
   annex-b-out-of-bounds-prototype-setup:
     disposition: remediation
     remediationOwner: unit:annexb-object-accessors
@@ -6126,8 +6183,8 @@ assessments:
         "cc77e765a6b00488f0f6e9c70bba5fae\
         7ba463542d3c9733415fd46d9c8f34e2"
       tests/test262/results/language/statements/db.yaml:
-        "5f2f4336fdbc7a0150887086415f06b8\
-        e1a041356c2afc4994a1274864ab7cdd"
+        "04f80f4dbec0ec779db49966a0e43de6\
+        4f9b6ceb86ffa5ead79e9a842b344dc9"
 paths:
   - path: test/built-ins/AggregateError/newtarget-proto-fallback.js
     proposedOwner: adr:0016-dynamic-source-boundary
@@ -6225,6 +6282,17 @@ paths:
     subject: Default [[Prototype]] value derived from realm of
       the newTarget
     assessment: ds19-07
+  - path: "test/built-ins/AsyncDisposableStack/proto-from-ctor-realm.js"
+    proposedOwner: adr:0016-dynamic-source-boundary
+    priorCohort: incidental-scaffolding
+    sourceDigest: "dcb3053025e9d3ff41431f17c167dac439a5d7cca2e9652354ba8ea88403\
+      6f2a"
+    observationDigest: "73e73b6054ab0ac10d6ca175eb97f3401fafed6287b7dc3671009b2\
+      64f912c92"
+    missingDynamicTag: false
+    section: sec-asyncdisposablestack
+    subject: "Default [[Prototype]] value derived from realm of the newTarget"
+    assessment: disposal-intrinsics-dynamic-source
   - path: test/built-ins/AsyncFunction/AsyncFunction-construct.js
     proposedOwner: adr:0016-dynamic-source-boundary
     priorCohort: source-subject
@@ -6552,6 +6620,17 @@ paths:
     subject: Default [[Prototype]] value derived from realm of
       the newTarget
     assessment: ds19-13
+  - path: "test/built-ins/DisposableStack/proto-from-ctor-realm.js"
+    proposedOwner: adr:0016-dynamic-source-boundary
+    priorCohort: incidental-scaffolding
+    sourceDigest: "400c945a6c05c6c757eb28f0e70c5876e6b0efee34a8c0373197b083edba\
+      f06b"
+    observationDigest: "dc7857985b50d1e65e0e25cd3dd680d6f1075d18e195f8a637cc9b9\
+      54f6eaca7"
+    missingDynamicTag: false
+    section: sec-disposablestack
+    subject: "Default [[Prototype]] value derived from realm of the newTarget"
+    assessment: disposal-intrinsics-dynamic-source
   - path: test/built-ins/Error/isError/non-error-objects-other-realm.js
     proposedOwner: adr:0016-dynamic-source-boundary
     priorCohort: incidental-scaffolding
@@ -9700,6 +9779,29 @@ paths:
     section: sec-string.prototype.touppercase
     subject: Checking by using eval
     assessment: "ds7-64"
+  - path: "test/built-ins/SuppressedError/newtarget-proto-fallback.js"
+    proposedOwner: adr:0016-dynamic-source-boundary
+    priorCohort: incidental-scaffolding
+    sourceDigest: "2b7668fd462c19956e0d2ff305846a9715afde6554796b63404d22c5c369\
+      53e8"
+    observationDigest: "90d7f7bac0217dc2f07b1d86e3627cb7797f1b755bce99b8788c719\
+      ca7cf147b"
+    missingDynamicTag: false
+    section: sec-suppressederror-constructor
+    subject: "Fallback to the NewTarget's [[Prototype]] if the prototype
+      property is not an object"
+    assessment: disposal-intrinsics-dynamic-source
+  - path: "test/built-ins/SuppressedError/proto-from-ctor-realm.js"
+    proposedOwner: adr:0016-dynamic-source-boundary
+    priorCohort: incidental-scaffolding
+    sourceDigest: "4bbb9708109776a50ee2409f9d07e083b4ce9590709fb6a331d494dc6ffe\
+      1325"
+    observationDigest: "eb6c982acb484cc08cc7881da20be1584eba8944b6fa4d607c4dd3b\
+      3bfdde286"
+    missingDynamicTag: false
+    section: sec-suppressederror-constructor
+    subject: "Default [[Prototype]] value derived from realm of the NewTarget."
+    assessment: disposal-intrinsics-dynamic-source
   - path: test/built-ins/ThrowTypeError/distinct-cross-realm.js
     proposedOwner: adr:0016-dynamic-source-boundary
     priorCohort: incidental-scaffolding
@@ -26466,6 +26568,20 @@ paths:
     subject: sloppy direct eval in params introduces var (async
       generator function declaration in sloppy code)
     assessment: eval-semantics
+  - path: "test/language/statements/await-using/syntax/await-using-not-allowed-\
+      at-top-level-of-eval.js"
+    proposedOwner: adr:0016-dynamic-source-boundary
+    priorCohort: source-subject
+    sourceDigest: "bf70399a03f3fc28aea4e845052e30ae8cc786bd86bf6b39c00cff0fa48e\
+      c0bf"
+    observationDigest: "f06ce43831c8d500233151024a532b23d3b6c4b0224585989b364b6\
+      76dc09ba9"
+    missingDynamicTag: false
+    section: "sec-let-const-using-and-await-using-declarations-static-semanti\
+      cs-early-errors"
+    subject: "await using declarations not allowed at the top level of eval.
+      Note that Eval parses text using the Script goal."
+    assessment: using-declarations-dynamic-source
   - path: test/language/statements/break/S12.8_A7.js
     proposedOwner: adr:0016-dynamic-source-boundary
     priorCohort: source-subject
@@ -29661,6 +29777,31 @@ paths:
     subject: Retainment of existing variable environment for
       `catch` parameter
     assessment: variable-environment
+  - path: "test/language/statements/using/cptn-value.js"
+    proposedOwner: adr:0016-dynamic-source-boundary
+    priorCohort: incidental-scaffolding
+    sourceDigest: "0df6b3b20fd2978de7ee4b395c76766f562c5818e477efee313ac91558b3\
+      3596"
+    observationDigest: "3ccdc2be01d65a7411df8754daa954d6ebcb0216890ff8eb72fb981\
+      9b258711f"
+    missingDynamicTag: false
+    section: sec-let-and-const-declarations-runtime-semantics-evaluation
+    subject: "Returns an empty completion"
+    assessment: using-declarations-dynamic-source
+  - path: "test/language/statements/using/syntax/using-not-allowed-at-top-level\
+      -of-eval.js"
+    proposedOwner: adr:0016-dynamic-source-boundary
+    priorCohort: source-subject
+    sourceDigest: "0995eaac2a591bbc087218dd27b2e7b9dd608fb1a3b0f2cb378f48099c30\
+      8066"
+    observationDigest: "825480c0561a07f59698f6abce9cfbd1d0601972e03ae25a90fbeb7\
+      9671f8a7b"
+    missingDynamicTag: false
+    section: "sec-let-const-using-and-await-using-declarations-static-semanti\
+      cs-early-errors"
+    subject: "using declarations not allowed at the top level of eval. Note
+      that Eval parses text using the Script goal."
+    assessment: using-declarations-dynamic-source
   - path: "test/language/statements/variable/12.2.1-10-s.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "source-subject"

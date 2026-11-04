@@ -2309,6 +2309,264 @@ partitions:
   - group: built-ins/ArrayIteratorPrototype
     key: f6
     path: results/built-ins/ArrayIteratorPrototype/f6.yaml
+  - group: built-ins/AsyncDisposableStack
+    key: "04"
+    path: results/built-ins/AsyncDisposableStack/04.yaml
+  - group: built-ins/AsyncDisposableStack
+    key: "06"
+    path: results/built-ins/AsyncDisposableStack/06.yaml
+  - group: built-ins/AsyncDisposableStack
+    key: 0d
+    path: results/built-ins/AsyncDisposableStack/0d.yaml
+  - group: built-ins/AsyncDisposableStack
+    key: "13"
+    path: results/built-ins/AsyncDisposableStack/13.yaml
+  - group: built-ins/AsyncDisposableStack
+    key: "15"
+    path: results/built-ins/AsyncDisposableStack/15.yaml
+  - group: built-ins/AsyncDisposableStack
+    key: "18"
+    path: results/built-ins/AsyncDisposableStack/18.yaml
+  - group: built-ins/AsyncDisposableStack
+    key: 1b
+    path: results/built-ins/AsyncDisposableStack/1b.yaml
+  - group: built-ins/AsyncDisposableStack
+    key: 1e
+    path: results/built-ins/AsyncDisposableStack/1e.yaml
+  - group: built-ins/AsyncDisposableStack
+    key: "20"
+    path: results/built-ins/AsyncDisposableStack/20.yaml
+  - group: built-ins/AsyncDisposableStack
+    key: "22"
+    path: results/built-ins/AsyncDisposableStack/22.yaml
+  - group: built-ins/AsyncDisposableStack
+    key: "24"
+    path: results/built-ins/AsyncDisposableStack/24.yaml
+  - group: built-ins/AsyncDisposableStack
+    key: "27"
+    path: results/built-ins/AsyncDisposableStack/27.yaml
+  - group: built-ins/AsyncDisposableStack
+    key: 2d
+    path: results/built-ins/AsyncDisposableStack/2d.yaml
+  - group: built-ins/AsyncDisposableStack
+    key: "32"
+    path: results/built-ins/AsyncDisposableStack/32.yaml
+  - group: built-ins/AsyncDisposableStack
+    key: "33"
+    path: results/built-ins/AsyncDisposableStack/33.yaml
+  - group: built-ins/AsyncDisposableStack
+    key: "37"
+    path: results/built-ins/AsyncDisposableStack/37.yaml
+  - group: built-ins/AsyncDisposableStack
+    key: "38"
+    path: results/built-ins/AsyncDisposableStack/38.yaml
+  - group: built-ins/AsyncDisposableStack
+    key: "46"
+    path: results/built-ins/AsyncDisposableStack/46.yaml
+  - group: built-ins/AsyncDisposableStack
+    key: "49"
+    path: results/built-ins/AsyncDisposableStack/49.yaml
+  - group: built-ins/AsyncDisposableStack
+    key: 4d
+    path: results/built-ins/AsyncDisposableStack/4d.yaml
+  - group: built-ins/AsyncDisposableStack
+    key: 4f
+    path: results/built-ins/AsyncDisposableStack/4f.yaml
+  - group: built-ins/AsyncDisposableStack
+    key: "50"
+    path: results/built-ins/AsyncDisposableStack/50.yaml
+  - group: built-ins/AsyncDisposableStack
+    key: "51"
+    path: results/built-ins/AsyncDisposableStack/51.yaml
+  - group: built-ins/AsyncDisposableStack
+    key: "56"
+    path: results/built-ins/AsyncDisposableStack/56.yaml
+  - group: built-ins/AsyncDisposableStack
+    key: "57"
+    path: results/built-ins/AsyncDisposableStack/57.yaml
+  - group: built-ins/AsyncDisposableStack
+    key: "58"
+    path: results/built-ins/AsyncDisposableStack/58.yaml
+  - group: built-ins/AsyncDisposableStack
+    key: "59"
+    path: results/built-ins/AsyncDisposableStack/59.yaml
+  - group: built-ins/AsyncDisposableStack
+    key: 5e
+    path: results/built-ins/AsyncDisposableStack/5e.yaml
+  - group: built-ins/AsyncDisposableStack
+    key: "60"
+    path: results/built-ins/AsyncDisposableStack/60.yaml
+  - group: built-ins/AsyncDisposableStack
+    key: "64"
+    path: results/built-ins/AsyncDisposableStack/64.yaml
+  - group: built-ins/AsyncDisposableStack
+    key: "66"
+    path: results/built-ins/AsyncDisposableStack/66.yaml
+  - group: built-ins/AsyncDisposableStack
+    key: "67"
+    path: results/built-ins/AsyncDisposableStack/67.yaml
+  - group: built-ins/AsyncDisposableStack
+    key: "68"
+    path: results/built-ins/AsyncDisposableStack/68.yaml
+  - group: built-ins/AsyncDisposableStack
+    key: "69"
+    path: results/built-ins/AsyncDisposableStack/69.yaml
+  - group: built-ins/AsyncDisposableStack
+    key: 6a
+    path: results/built-ins/AsyncDisposableStack/6a.yaml
+  - group: built-ins/AsyncDisposableStack
+    key: 6d
+    path: results/built-ins/AsyncDisposableStack/6d.yaml
+  - group: built-ins/AsyncDisposableStack
+    key: 6e
+    path: results/built-ins/AsyncDisposableStack/6e.yaml
+  - group: built-ins/AsyncDisposableStack
+    key: "71"
+    path: results/built-ins/AsyncDisposableStack/71.yaml
+  - group: built-ins/AsyncDisposableStack
+    key: "72"
+    path: results/built-ins/AsyncDisposableStack/72.yaml
+  - group: built-ins/AsyncDisposableStack
+    key: "76"
+    path: results/built-ins/AsyncDisposableStack/76.yaml
+  - group: built-ins/AsyncDisposableStack
+    key: "77"
+    path: results/built-ins/AsyncDisposableStack/77.yaml
+  - group: built-ins/AsyncDisposableStack
+    key: 7a
+    path: results/built-ins/AsyncDisposableStack/7a.yaml
+  - group: built-ins/AsyncDisposableStack
+    key: 7f
+    path: results/built-ins/AsyncDisposableStack/7f.yaml
+  - group: built-ins/AsyncDisposableStack
+    key: "80"
+    path: results/built-ins/AsyncDisposableStack/80.yaml
+  - group: built-ins/AsyncDisposableStack
+    key: "81"
+    path: results/built-ins/AsyncDisposableStack/81.yaml
+  - group: built-ins/AsyncDisposableStack
+    key: "85"
+    path: results/built-ins/AsyncDisposableStack/85.yaml
+  - group: built-ins/AsyncDisposableStack
+    key: "89"
+    path: results/built-ins/AsyncDisposableStack/89.yaml
+  - group: built-ins/AsyncDisposableStack
+    key: 8a
+    path: results/built-ins/AsyncDisposableStack/8a.yaml
+  - group: built-ins/AsyncDisposableStack
+    key: 8d
+    path: results/built-ins/AsyncDisposableStack/8d.yaml
+  - group: built-ins/AsyncDisposableStack
+    key: "94"
+    path: results/built-ins/AsyncDisposableStack/94.yaml
+  - group: built-ins/AsyncDisposableStack
+    key: "97"
+    path: results/built-ins/AsyncDisposableStack/97.yaml
+  - group: built-ins/AsyncDisposableStack
+    key: "98"
+    path: results/built-ins/AsyncDisposableStack/98.yaml
+  - group: built-ins/AsyncDisposableStack
+    key: a1
+    path: results/built-ins/AsyncDisposableStack/a1.yaml
+  - group: built-ins/AsyncDisposableStack
+    key: a5
+    path: results/built-ins/AsyncDisposableStack/a5.yaml
+  - group: built-ins/AsyncDisposableStack
+    key: a6
+    path: results/built-ins/AsyncDisposableStack/a6.yaml
+  - group: built-ins/AsyncDisposableStack
+    key: a9
+    path: results/built-ins/AsyncDisposableStack/a9.yaml
+  - group: built-ins/AsyncDisposableStack
+    key: ac
+    path: results/built-ins/AsyncDisposableStack/ac.yaml
+  - group: built-ins/AsyncDisposableStack
+    key: b6
+    path: results/built-ins/AsyncDisposableStack/b6.yaml
+  - group: built-ins/AsyncDisposableStack
+    key: b7
+    path: results/built-ins/AsyncDisposableStack/b7.yaml
+  - group: built-ins/AsyncDisposableStack
+    key: ba
+    path: results/built-ins/AsyncDisposableStack/ba.yaml
+  - group: built-ins/AsyncDisposableStack
+    key: c1
+    path: results/built-ins/AsyncDisposableStack/c1.yaml
+  - group: built-ins/AsyncDisposableStack
+    key: c4
+    path: results/built-ins/AsyncDisposableStack/c4.yaml
+  - group: built-ins/AsyncDisposableStack
+    key: c5
+    path: results/built-ins/AsyncDisposableStack/c5.yaml
+  - group: built-ins/AsyncDisposableStack
+    key: c6
+    path: results/built-ins/AsyncDisposableStack/c6.yaml
+  - group: built-ins/AsyncDisposableStack
+    key: c9
+    path: results/built-ins/AsyncDisposableStack/c9.yaml
+  - group: built-ins/AsyncDisposableStack
+    key: ca
+    path: results/built-ins/AsyncDisposableStack/ca.yaml
+  - group: built-ins/AsyncDisposableStack
+    key: cd
+    path: results/built-ins/AsyncDisposableStack/cd.yaml
+  - group: built-ins/AsyncDisposableStack
+    key: d1
+    path: results/built-ins/AsyncDisposableStack/d1.yaml
+  - group: built-ins/AsyncDisposableStack
+    key: d3
+    path: results/built-ins/AsyncDisposableStack/d3.yaml
+  - group: built-ins/AsyncDisposableStack
+    key: d9
+    path: results/built-ins/AsyncDisposableStack/d9.yaml
+  - group: built-ins/AsyncDisposableStack
+    key: db
+    path: results/built-ins/AsyncDisposableStack/db.yaml
+  - group: built-ins/AsyncDisposableStack
+    key: dd
+    path: results/built-ins/AsyncDisposableStack/dd.yaml
+  - group: built-ins/AsyncDisposableStack
+    key: de
+    path: results/built-ins/AsyncDisposableStack/de.yaml
+  - group: built-ins/AsyncDisposableStack
+    key: df
+    path: results/built-ins/AsyncDisposableStack/df.yaml
+  - group: built-ins/AsyncDisposableStack
+    key: e2
+    path: results/built-ins/AsyncDisposableStack/e2.yaml
+  - group: built-ins/AsyncDisposableStack
+    key: e4
+    path: results/built-ins/AsyncDisposableStack/e4.yaml
+  - group: built-ins/AsyncDisposableStack
+    key: e6
+    path: results/built-ins/AsyncDisposableStack/e6.yaml
+  - group: built-ins/AsyncDisposableStack
+    key: e7
+    path: results/built-ins/AsyncDisposableStack/e7.yaml
+  - group: built-ins/AsyncDisposableStack
+    key: eb
+    path: results/built-ins/AsyncDisposableStack/eb.yaml
+  - group: built-ins/AsyncDisposableStack
+    key: ec
+    path: results/built-ins/AsyncDisposableStack/ec.yaml
+  - group: built-ins/AsyncDisposableStack
+    key: ed
+    path: results/built-ins/AsyncDisposableStack/ed.yaml
+  - group: built-ins/AsyncDisposableStack
+    key: ee
+    path: results/built-ins/AsyncDisposableStack/ee.yaml
+  - group: built-ins/AsyncDisposableStack
+    key: f5
+    path: results/built-ins/AsyncDisposableStack/f5.yaml
+  - group: built-ins/AsyncDisposableStack
+    key: f6
+    path: results/built-ins/AsyncDisposableStack/f6.yaml
+  - group: built-ins/AsyncDisposableStack
+    key: fb
+    path: results/built-ins/AsyncDisposableStack/fb.yaml
+  - group: built-ins/AsyncDisposableStack
+    key: ff
+    path: results/built-ins/AsyncDisposableStack/ff.yaml
   - group: built-ins/AsyncFromSyncIteratorPrototype
     key: "02"
     path: results/built-ins/AsyncFromSyncIteratorPrototype/02.yaml
@@ -2670,14 +2928,41 @@ partitions:
     key: 0d
     path: results/built-ins/AsyncIteratorPrototype/0d.yaml
   - group: built-ins/AsyncIteratorPrototype
+    key: "23"
+    path: results/built-ins/AsyncIteratorPrototype/23.yaml
+  - group: built-ins/AsyncIteratorPrototype
+    key: 2b
+    path: results/built-ins/AsyncIteratorPrototype/2b.yaml
+  - group: built-ins/AsyncIteratorPrototype
+    key: 3b
+    path: results/built-ins/AsyncIteratorPrototype/3b.yaml
+  - group: built-ins/AsyncIteratorPrototype
     key: "52"
     path: results/built-ins/AsyncIteratorPrototype/52.yaml
+  - group: built-ins/AsyncIteratorPrototype
+    key: "63"
+    path: results/built-ins/AsyncIteratorPrototype/63.yaml
+  - group: built-ins/AsyncIteratorPrototype
+    key: 9b
+    path: results/built-ins/AsyncIteratorPrototype/9b.yaml
+  - group: built-ins/AsyncIteratorPrototype
+    key: ad
+    path: results/built-ins/AsyncIteratorPrototype/ad.yaml
   - group: built-ins/AsyncIteratorPrototype
     key: b2
     path: results/built-ins/AsyncIteratorPrototype/b2.yaml
   - group: built-ins/AsyncIteratorPrototype
+    key: db
+    path: results/built-ins/AsyncIteratorPrototype/db.yaml
+  - group: built-ins/AsyncIteratorPrototype
+    key: e7
+    path: results/built-ins/AsyncIteratorPrototype/e7.yaml
+  - group: built-ins/AsyncIteratorPrototype
     key: ec
     path: results/built-ins/AsyncIteratorPrototype/ec.yaml
+  - group: built-ins/AsyncIteratorPrototype
+    key: ee
+    path: results/built-ins/AsyncIteratorPrototype/ee.yaml
   - group: built-ins/Atomics
     key: "00"
     path: results/built-ins/Atomics/00.yaml
@@ -4991,6 +5276,234 @@ partitions:
   - group: built-ins/Date
     key: ff
     path: results/built-ins/Date/ff.yaml
+  - group: built-ins/DisposableStack
+    key: "01"
+    path: results/built-ins/DisposableStack/01.yaml
+  - group: built-ins/DisposableStack
+    key: "04"
+    path: results/built-ins/DisposableStack/04.yaml
+  - group: built-ins/DisposableStack
+    key: "08"
+    path: results/built-ins/DisposableStack/08.yaml
+  - group: built-ins/DisposableStack
+    key: 0a
+    path: results/built-ins/DisposableStack/0a.yaml
+  - group: built-ins/DisposableStack
+    key: 0d
+    path: results/built-ins/DisposableStack/0d.yaml
+  - group: built-ins/DisposableStack
+    key: "10"
+    path: results/built-ins/DisposableStack/10.yaml
+  - group: built-ins/DisposableStack
+    key: "14"
+    path: results/built-ins/DisposableStack/14.yaml
+  - group: built-ins/DisposableStack
+    key: 1e
+    path: results/built-ins/DisposableStack/1e.yaml
+  - group: built-ins/DisposableStack
+    key: 1f
+    path: results/built-ins/DisposableStack/1f.yaml
+  - group: built-ins/DisposableStack
+    key: "23"
+    path: results/built-ins/DisposableStack/23.yaml
+  - group: built-ins/DisposableStack
+    key: "24"
+    path: results/built-ins/DisposableStack/24.yaml
+  - group: built-ins/DisposableStack
+    key: "25"
+    path: results/built-ins/DisposableStack/25.yaml
+  - group: built-ins/DisposableStack
+    key: "26"
+    path: results/built-ins/DisposableStack/26.yaml
+  - group: built-ins/DisposableStack
+    key: "29"
+    path: results/built-ins/DisposableStack/29.yaml
+  - group: built-ins/DisposableStack
+    key: 2a
+    path: results/built-ins/DisposableStack/2a.yaml
+  - group: built-ins/DisposableStack
+    key: 2b
+    path: results/built-ins/DisposableStack/2b.yaml
+  - group: built-ins/DisposableStack
+    key: 2f
+    path: results/built-ins/DisposableStack/2f.yaml
+  - group: built-ins/DisposableStack
+    key: "30"
+    path: results/built-ins/DisposableStack/30.yaml
+  - group: built-ins/DisposableStack
+    key: "33"
+    path: results/built-ins/DisposableStack/33.yaml
+  - group: built-ins/DisposableStack
+    key: "35"
+    path: results/built-ins/DisposableStack/35.yaml
+  - group: built-ins/DisposableStack
+    key: 3a
+    path: results/built-ins/DisposableStack/3a.yaml
+  - group: built-ins/DisposableStack
+    key: "49"
+    path: results/built-ins/DisposableStack/49.yaml
+  - group: built-ins/DisposableStack
+    key: 4a
+    path: results/built-ins/DisposableStack/4a.yaml
+  - group: built-ins/DisposableStack
+    key: 4b
+    path: results/built-ins/DisposableStack/4b.yaml
+  - group: built-ins/DisposableStack
+    key: 4c
+    path: results/built-ins/DisposableStack/4c.yaml
+  - group: built-ins/DisposableStack
+    key: 4d
+    path: results/built-ins/DisposableStack/4d.yaml
+  - group: built-ins/DisposableStack
+    key: "52"
+    path: results/built-ins/DisposableStack/52.yaml
+  - group: built-ins/DisposableStack
+    key: 5d
+    path: results/built-ins/DisposableStack/5d.yaml
+  - group: built-ins/DisposableStack
+    key: 5f
+    path: results/built-ins/DisposableStack/5f.yaml
+  - group: built-ins/DisposableStack
+    key: "61"
+    path: results/built-ins/DisposableStack/61.yaml
+  - group: built-ins/DisposableStack
+    key: "64"
+    path: results/built-ins/DisposableStack/64.yaml
+  - group: built-ins/DisposableStack
+    key: "65"
+    path: results/built-ins/DisposableStack/65.yaml
+  - group: built-ins/DisposableStack
+    key: 6b
+    path: results/built-ins/DisposableStack/6b.yaml
+  - group: built-ins/DisposableStack
+    key: 6e
+    path: results/built-ins/DisposableStack/6e.yaml
+  - group: built-ins/DisposableStack
+    key: "71"
+    path: results/built-ins/DisposableStack/71.yaml
+  - group: built-ins/DisposableStack
+    key: "73"
+    path: results/built-ins/DisposableStack/73.yaml
+  - group: built-ins/DisposableStack
+    key: "74"
+    path: results/built-ins/DisposableStack/74.yaml
+  - group: built-ins/DisposableStack
+    key: "76"
+    path: results/built-ins/DisposableStack/76.yaml
+  - group: built-ins/DisposableStack
+    key: "78"
+    path: results/built-ins/DisposableStack/78.yaml
+  - group: built-ins/DisposableStack
+    key: 7e
+    path: results/built-ins/DisposableStack/7e.yaml
+  - group: built-ins/DisposableStack
+    key: "82"
+    path: results/built-ins/DisposableStack/82.yaml
+  - group: built-ins/DisposableStack
+    key: "85"
+    path: results/built-ins/DisposableStack/85.yaml
+  - group: built-ins/DisposableStack
+    key: "87"
+    path: results/built-ins/DisposableStack/87.yaml
+  - group: built-ins/DisposableStack
+    key: 8a
+    path: results/built-ins/DisposableStack/8a.yaml
+  - group: built-ins/DisposableStack
+    key: 8b
+    path: results/built-ins/DisposableStack/8b.yaml
+  - group: built-ins/DisposableStack
+    key: "92"
+    path: results/built-ins/DisposableStack/92.yaml
+  - group: built-ins/DisposableStack
+    key: "95"
+    path: results/built-ins/DisposableStack/95.yaml
+  - group: built-ins/DisposableStack
+    key: 9f
+    path: results/built-ins/DisposableStack/9f.yaml
+  - group: built-ins/DisposableStack
+    key: a2
+    path: results/built-ins/DisposableStack/a2.yaml
+  - group: built-ins/DisposableStack
+    key: a4
+    path: results/built-ins/DisposableStack/a4.yaml
+  - group: built-ins/DisposableStack
+    key: a5
+    path: results/built-ins/DisposableStack/a5.yaml
+  - group: built-ins/DisposableStack
+    key: a7
+    path: results/built-ins/DisposableStack/a7.yaml
+  - group: built-ins/DisposableStack
+    key: aa
+    path: results/built-ins/DisposableStack/aa.yaml
+  - group: built-ins/DisposableStack
+    key: b4
+    path: results/built-ins/DisposableStack/b4.yaml
+  - group: built-ins/DisposableStack
+    key: b7
+    path: results/built-ins/DisposableStack/b7.yaml
+  - group: built-ins/DisposableStack
+    key: bb
+    path: results/built-ins/DisposableStack/bb.yaml
+  - group: built-ins/DisposableStack
+    key: bc
+    path: results/built-ins/DisposableStack/bc.yaml
+  - group: built-ins/DisposableStack
+    key: bd
+    path: results/built-ins/DisposableStack/bd.yaml
+  - group: built-ins/DisposableStack
+    key: bf
+    path: results/built-ins/DisposableStack/bf.yaml
+  - group: built-ins/DisposableStack
+    key: c0
+    path: results/built-ins/DisposableStack/c0.yaml
+  - group: built-ins/DisposableStack
+    key: c1
+    path: results/built-ins/DisposableStack/c1.yaml
+  - group: built-ins/DisposableStack
+    key: cc
+    path: results/built-ins/DisposableStack/cc.yaml
+  - group: built-ins/DisposableStack
+    key: d0
+    path: results/built-ins/DisposableStack/d0.yaml
+  - group: built-ins/DisposableStack
+    key: db
+    path: results/built-ins/DisposableStack/db.yaml
+  - group: built-ins/DisposableStack
+    key: e0
+    path: results/built-ins/DisposableStack/e0.yaml
+  - group: built-ins/DisposableStack
+    key: e1
+    path: results/built-ins/DisposableStack/e1.yaml
+  - group: built-ins/DisposableStack
+    key: e2
+    path: results/built-ins/DisposableStack/e2.yaml
+  - group: built-ins/DisposableStack
+    key: e6
+    path: results/built-ins/DisposableStack/e6.yaml
+  - group: built-ins/DisposableStack
+    key: ea
+    path: results/built-ins/DisposableStack/ea.yaml
+  - group: built-ins/DisposableStack
+    key: ee
+    path: results/built-ins/DisposableStack/ee.yaml
+  - group: built-ins/DisposableStack
+    key: ef
+    path: results/built-ins/DisposableStack/ef.yaml
+  - group: built-ins/DisposableStack
+    key: f0
+    path: results/built-ins/DisposableStack/f0.yaml
+  - group: built-ins/DisposableStack
+    key: f5
+    path: results/built-ins/DisposableStack/f5.yaml
+  - group: built-ins/DisposableStack
+    key: f6
+    path: results/built-ins/DisposableStack/f6.yaml
+  - group: built-ins/DisposableStack
+    key: fa
+    path: results/built-ins/DisposableStack/fa.yaml
+  - group: built-ins/DisposableStack
+    key: fb
+    path: results/built-ins/DisposableStack/fb.yaml
   - group: built-ins/Error
     key: "02"
     path: results/built-ins/Error/02.yaml
@@ -6342,6 +6855,9 @@ partitions:
     key: "41"
     path: results/built-ins/Iterator/41.yaml
   - group: built-ins/Iterator
+    key: "42"
+    path: results/built-ins/Iterator/42.yaml
+  - group: built-ins/Iterator
     key: "43"
     path: results/built-ins/Iterator/43.yaml
   - group: built-ins/Iterator
@@ -6431,6 +6947,9 @@ partitions:
   - group: built-ins/Iterator
     key: "69"
     path: results/built-ins/Iterator/69.yaml
+  - group: built-ins/Iterator
+    key: 6a
+    path: results/built-ins/Iterator/6a.yaml
   - group: built-ins/Iterator
     key: 6b
     path: results/built-ins/Iterator/6b.yaml
@@ -6584,6 +7103,9 @@ partitions:
   - group: built-ins/Iterator
     key: a2
     path: results/built-ins/Iterator/a2.yaml
+  - group: built-ins/Iterator
+    key: a3
+    path: results/built-ins/Iterator/a3.yaml
   - group: built-ins/Iterator
     key: a4
     path: results/built-ins/Iterator/a4.yaml
@@ -13916,6 +14438,69 @@ partitions:
   - group: built-ins/StringIteratorPrototype
     key: fb
     path: results/built-ins/StringIteratorPrototype/fb.yaml
+  - group: built-ins/SuppressedError
+    key: "07"
+    path: results/built-ins/SuppressedError/07.yaml
+  - group: built-ins/SuppressedError
+    key: 0e
+    path: results/built-ins/SuppressedError/0e.yaml
+  - group: built-ins/SuppressedError
+    key: "18"
+    path: results/built-ins/SuppressedError/18.yaml
+  - group: built-ins/SuppressedError
+    key: "22"
+    path: results/built-ins/SuppressedError/22.yaml
+  - group: built-ins/SuppressedError
+    key: 2b
+    path: results/built-ins/SuppressedError/2b.yaml
+  - group: built-ins/SuppressedError
+    key: "38"
+    path: results/built-ins/SuppressedError/38.yaml
+  - group: built-ins/SuppressedError
+    key: "42"
+    path: results/built-ins/SuppressedError/42.yaml
+  - group: built-ins/SuppressedError
+    key: "44"
+    path: results/built-ins/SuppressedError/44.yaml
+  - group: built-ins/SuppressedError
+    key: "49"
+    path: results/built-ins/SuppressedError/49.yaml
+  - group: built-ins/SuppressedError
+    key: 5e
+    path: results/built-ins/SuppressedError/5e.yaml
+  - group: built-ins/SuppressedError
+    key: 7f
+    path: results/built-ins/SuppressedError/7f.yaml
+  - group: built-ins/SuppressedError
+    key: 8d
+    path: results/built-ins/SuppressedError/8d.yaml
+  - group: built-ins/SuppressedError
+    key: a0
+    path: results/built-ins/SuppressedError/a0.yaml
+  - group: built-ins/SuppressedError
+    key: a3
+    path: results/built-ins/SuppressedError/a3.yaml
+  - group: built-ins/SuppressedError
+    key: b2
+    path: results/built-ins/SuppressedError/b2.yaml
+  - group: built-ins/SuppressedError
+    key: cb
+    path: results/built-ins/SuppressedError/cb.yaml
+  - group: built-ins/SuppressedError
+    key: ce
+    path: results/built-ins/SuppressedError/ce.yaml
+  - group: built-ins/SuppressedError
+    key: d7
+    path: results/built-ins/SuppressedError/d7.yaml
+  - group: built-ins/SuppressedError
+    key: f0
+    path: results/built-ins/SuppressedError/f0.yaml
+  - group: built-ins/SuppressedError
+    key: f4
+    path: results/built-ins/SuppressedError/f4.yaml
+  - group: built-ins/SuppressedError
+    key: f6
+    path: results/built-ins/SuppressedError/f6.yaml
   - group: built-ins/Symbol
     key: "01"
     path: results/built-ins/Symbol/01.yaml
@@ -13928,6 +14513,9 @@ partitions:
   - group: built-ins/Symbol
     key: 0d
     path: results/built-ins/Symbol/0d.yaml
+  - group: built-ins/Symbol
+    key: "10"
+    path: results/built-ins/Symbol/10.yaml
   - group: built-ins/Symbol
     key: "12"
     path: results/built-ins/Symbol/12.yaml
@@ -13949,6 +14537,9 @@ partitions:
   - group: built-ins/Symbol
     key: "30"
     path: results/built-ins/Symbol/30.yaml
+  - group: built-ins/Symbol
+    key: "31"
+    path: results/built-ins/Symbol/31.yaml
   - group: built-ins/Symbol
     key: "35"
     path: results/built-ins/Symbol/35.yaml
@@ -13997,6 +14588,9 @@ partitions:
   - group: built-ins/Symbol
     key: "56"
     path: results/built-ins/Symbol/56.yaml
+  - group: built-ins/Symbol
+    key: "57"
+    path: results/built-ins/Symbol/57.yaml
   - group: built-ins/Symbol
     key: "58"
     path: results/built-ins/Symbol/58.yaml
@@ -14067,6 +14661,9 @@ partitions:
     key: 9d
     path: results/built-ins/Symbol/9d.yaml
   - group: built-ins/Symbol
+    key: a3
+    path: results/built-ins/Symbol/a3.yaml
+  - group: built-ins/Symbol
     key: aa
     path: results/built-ins/Symbol/aa.yaml
   - group: built-ins/Symbol
@@ -14117,6 +14714,9 @@ partitions:
   - group: built-ins/Symbol
     key: e1
     path: results/built-ins/Symbol/e1.yaml
+  - group: built-ins/Symbol
+    key: e3
+    path: results/built-ins/Symbol/e3.yaml
   - group: built-ins/Symbol
     key: e4
     path: results/built-ins/Symbol/e4.yaml
@@ -24868,20 +25468,20 @@ partitions:
     path: results/language/white-space/f9.yaml
 suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
 summary:
-  expectedNegatives: 4407
+  expectedNegatives: 4470
   harnessFailures: 0
   infrastructureFailures: 0
-  passes: 35758
+  passes: 36112
   semanticFailures: 0
-  unsupportedProfileFeatures: 1889
+  unsupportedProfileFeatures: 1896
   dependencies:
     - dependency: abrupt-completion
       expectedNegatives: 27
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 4526
+      passes: 4639
       semanticFailures: 0
-      unsupportedProfileFeatures: 675
+      unsupportedProfileFeatures: 677
     - dependency: array-buffer
       expectedNegatives: 0
       harnessFailures: 0
@@ -24890,17 +25490,17 @@ summary:
       semanticFailures: 0
       unsupportedProfileFeatures: 5
     - dependency: async-functions
-      expectedNegatives: 501
+      expectedNegatives: 530
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 2501
+      passes: 2592
       semanticFailures: 0
       unsupportedProfileFeatures: 295
     - dependency: async-iteration
-      expectedNegatives: 545
+      expectedNegatives: 547
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 4330
+      passes: 4342
       semanticFailures: 0
       unsupportedProfileFeatures: 50
     - dependency: atomics-and-shared-memory
@@ -24925,17 +25525,17 @@ summary:
       semanticFailures: 0
       unsupportedProfileFeatures: 0
     - dependency: classes
-      expectedNegatives: 1364
+      expectedNegatives: 1365
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 7504
+      passes: 7517
       semanticFailures: 0
       unsupportedProfileFeatures: 255
     - dependency: control-flow
-      expectedNegatives: 676
+      expectedNegatives: 718
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 4027
+      passes: 4053
       semanticFailures: 0
       unsupportedProfileFeatures: 338
     - dependency: data-view
@@ -24960,7 +25560,7 @@ summary:
       semanticFailures: 0
       unsupportedProfileFeatures: 231
     - dependency: destructuring-bindings
-      expectedNegatives: 832
+      expectedNegatives: 840
       harnessFailures: 0
       infrastructureFailures: 0
       passes: 8630
@@ -24972,42 +25572,42 @@ summary:
       infrastructureFailures: 0
       passes: 53
       semanticFailures: 0
-      unsupportedProfileFeatures: 1888
+      unsupportedProfileFeatures: 1895
     - dependency: error-intrinsics
-      expectedNegatives: 17
+      expectedNegatives: 19
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 3304
+      passes: 3424
       semanticFailures: 0
-      unsupportedProfileFeatures: 604
+      unsupportedProfileFeatures: 608
     - dependency: expression-operators
       expectedNegatives: 642
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 11106
+      passes: 11176
       semanticFailures: 0
       unsupportedProfileFeatures: 762
     - dependency: functions
-      expectedNegatives: 1387
+      expectedNegatives: 1389
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 17925
+      passes: 18079
       semanticFailures: 0
-      unsupportedProfileFeatures: 1573
+      unsupportedProfileFeatures: 1575
     - dependency: generators
       expectedNegatives: 436
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 4224
+      passes: 4232
       semanticFailures: 0
       unsupportedProfileFeatures: 180
     - dependency: iterator-protocol
       expectedNegatives: 94
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 7863
+      passes: 7892
       semanticFailures: 0
-      unsupportedProfileFeatures: 46
+      unsupportedProfileFeatures: 47
     - dependency: json-parse
       expectedNegatives: 0
       harnessFailures: 0
@@ -25023,12 +25623,12 @@ summary:
       semanticFailures: 0
       unsupportedProfileFeatures: 0
     - dependency: lexical-bindings
-      expectedNegatives: 385
+      expectedNegatives: 448
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 2981
+      passes: 3124
       semanticFailures: 0
-      unsupportedProfileFeatures: 430
+      unsupportedProfileFeatures: 434
     - dependency: lexical-grammar
       expectedNegatives: 547
       harnessFailures: 0
@@ -25047,30 +25647,30 @@ summary:
       expectedNegatives: 209
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 6077
+      passes: 6213
       semanticFailures: 0
-      unsupportedProfileFeatures: 178
+      unsupportedProfileFeatures: 179
     - dependency: object-own-keys
       expectedNegatives: 6
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 511
+      passes: 512
       semanticFailures: 0
       unsupportedProfileFeatures: 9
     - dependency: object-properties
       expectedNegatives: 610
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 23085
+      passes: 23216
       semanticFailures: 0
-      unsupportedProfileFeatures: 990
+      unsupportedProfileFeatures: 994
     - dependency: promise-settlement
       expectedNegatives: 93
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 4130
+      passes: 4242
       semanticFailures: 0
-      unsupportedProfileFeatures: 411
+      unsupportedProfileFeatures: 412
     - dependency: property-enumeration
       expectedNegatives: 68
       harnessFailures: 0
@@ -25082,16 +25682,16 @@ summary:
       expectedNegatives: 0
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 385
+      passes: 386
       semanticFailures: 0
-      unsupportedProfileFeatures: 8
+      unsupportedProfileFeatures: 9
     - dependency: reflect-namespace
       expectedNegatives: 0
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 393
+      passes: 400
       semanticFailures: 0
-      unsupportedProfileFeatures: 64
+      unsupportedProfileFeatures: 68
     - dependency: regular-expressions
       expectedNegatives: 192
       harnessFailures: 0
@@ -25121,12 +25721,12 @@ summary:
       semanticFailures: 0
       unsupportedProfileFeatures: 1
     - dependency: symbols
-      expectedNegatives: 0
+      expectedNegatives: 1
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 6623
+      passes: 6792
       semanticFailures: 0
-      unsupportedProfileFeatures: 280
+      unsupportedProfileFeatures: 284
     - dependency: top-level-await
       expectedNegatives: 11
       harnessFailures: 0
@@ -25184,12 +25784,12 @@ summary:
       semanticFailures: 0
       unsupportedProfileFeatures: 0
     - dependency: var-bindings
-      expectedNegatives: 233
+      expectedNegatives: 235
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 11747
+      passes: 11954
       semanticFailures: 0
-      unsupportedProfileFeatures: 777
+      unsupportedProfileFeatures: 780
     - dependency: weak-collections
       expectedNegatives: 0
       harnessFailures: 0
@@ -25240,6 +25840,13 @@ summary:
       passes: 27
       semanticFailures: 0
       unsupportedProfileFeatures: 0
+    - group: built-ins/AsyncDisposableStack
+      expectedNegatives: 0
+      harnessFailures: 0
+      infrastructureFailures: 0
+      passes: 103
+      semanticFailures: 0
+      unsupportedProfileFeatures: 1
     - group: built-ins/AsyncFromSyncIteratorPrototype
       expectedNegatives: 0
       harnessFailures: 0
@@ -25272,7 +25879,7 @@ summary:
       expectedNegatives: 0
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 4
+      passes: 13
       semanticFailures: 0
       unsupportedProfileFeatures: 0
     - group: built-ins/Atomics
@@ -25310,6 +25917,13 @@ summary:
       passes: 583
       semanticFailures: 0
       unsupportedProfileFeatures: 3
+    - group: built-ins/DisposableStack
+      expectedNegatives: 0
+      harnessFailures: 0
+      infrastructureFailures: 0
+      passes: 92
+      semanticFailures: 0
+      unsupportedProfileFeatures: 1
     - group: built-ins/Error
       expectedNegatives: 0
       harnessFailures: 0
@@ -25356,7 +25970,7 @@ summary:
       expectedNegatives: 0
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 507
+      passes: 513
       semanticFailures: 0
       unsupportedProfileFeatures: 1
     - group: built-ins/JSON
@@ -25485,11 +26099,18 @@ summary:
       passes: 7
       semanticFailures: 0
       unsupportedProfileFeatures: 0
+    - group: built-ins/SuppressedError
+      expectedNegatives: 0
+      harnessFailures: 0
+      infrastructureFailures: 0
+      passes: 20
+      semanticFailures: 0
+      unsupportedProfileFeatures: 2
     - group: built-ins/Symbol
       expectedNegatives: 0
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 92
+      passes: 98
       semanticFailures: 0
       unsupportedProfileFeatures: 0
     - group: built-ins/ThrowTypeError
@@ -25794,12 +26415,12 @@ summary:
       semanticFailures: 0
       unsupportedProfileFeatures: 40
     - group: language/statements
-      expectedNegatives: 1455
+      expectedNegatives: 1518
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 7370
+      passes: 7488
       semanticFailures: 0
-      unsupportedProfileFeatures: 312
+      unsupportedProfileFeatures: 315
     - group: language/types
       expectedNegatives: 11
       harnessFailures: 0
