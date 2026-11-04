@@ -208,6 +208,10 @@
     (OSEO_ITERATOR_CODE_ID_RANGE_LAST - 29u)
 #define OSEO_ITERATOR_CONCAT_CODE_ID \
     (OSEO_ITERATOR_CODE_ID_RANGE_LAST - 30u)
+#define OSEO_ITERATOR_ZIP_CODE_ID \
+    (OSEO_ITERATOR_CODE_ID_RANGE_LAST - 31u)
+#define OSEO_ITERATOR_ZIP_KEYED_CODE_ID \
+    (OSEO_ITERATOR_CODE_ID_RANGE_LAST - 32u)
 
 #define OSEO_GENERATOR_CODE_ID_RANGE_INDEX ((size_t)4u)
 #define OSEO_GENERATOR_CODE_ID_RANGE_FIRST \
@@ -2379,6 +2383,15 @@ typedef enum {
      * the inner fields the iterator currently being forwarded.
      */
     OSEO_ITERATOR_HELPER_CONCAT = 5,
+    /*
+     * Iterator.zip and Iterator.zipKeyed. They have no single
+     * underlying iterator: `callback` holds an internal array of
+     * iterator, next method, and padding triples, where a null iterator
+     * has left [[UnderlyingIterators]]; `remaining` is the iterator
+     * count; `counter` the mode; and `underlying_next` the internal key
+     * array of zipKeyed, or undefined for zip.
+     */
+    OSEO_ITERATOR_HELPER_ZIP = 6,
 } OseoIteratorHelperKind;
 
 /*
@@ -4858,6 +4871,17 @@ OseoResult oseo_internal_own_key_array(
     OseoContext *context,
     OseoValue object_value,
     OseoOwnKeyFilter filter
+);
+
+/*
+ * Whether an object's [[GetOwnProperty]](key), a Proxy trap included,
+ * finds an enumerable property. The descriptor's value is not kept.
+ */
+OseoResult oseo_internal_own_property_enumerable(
+    OseoContext *context,
+    OseoValue object_value,
+    OseoValue key,
+    bool *enumerable
 );
 
 /*

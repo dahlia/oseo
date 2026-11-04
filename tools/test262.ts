@@ -140,6 +140,10 @@ const promiseHarnessPath = join(
   repositoryRoot,
   "tests/test262/harness/promiseHelper.js",
 );
+const iteratorZipUtilsHarnessPath = join(
+  repositoryRoot,
+  "tests/test262/harness/iteratorZipUtils.js",
+);
 const proxyTrapsHarnessPath = join(
   repositoryRoot,
   "tests/test262/harness/proxyTrapsHelper.js",
@@ -2208,6 +2212,10 @@ async function readReviewedHarnesses(): Promise<Test262Harnesses> {
       ],
       ["fnGlobalObject.js", await readFile(fnGlobalObjectHarnessPath, "utf8")],
       ["isConstructor.js", await readFile(isConstructorHarnessPath, "utf8")],
+      [
+        "iteratorZipUtils.js",
+        await readFile(iteratorZipUtilsHarnessPath, "utf8"),
+      ],
       ["nans.js", await readFile(nansHarnessPath, "utf8")],
       [
         "nativeFunctionMatcher.js",

@@ -56,8 +56,8 @@ three sums, rounded up, so the margin below is a slow runner's. Files under 30
 seconds have no entry and weigh the host fallback, 18 seconds on both hosts,
 which is the median of every measured weight.
 
-Seventeen files postdate those runs. Serial local runs from 2026-11-01 to
-2026-11-03 of the residual evidence and those files, on one host, give the
+Eighteen files postdate those runs. Serial local runs from 2026-11-01 to
+2026-11-04 of the residual evidence and those files, on one host, give the
 calibration:
 
 | File                                                       | Local, s | Linux weight | macOS weight |
@@ -75,18 +75,23 @@ calibration:
 | *tests/property/m5-annexb-escape.property.test.ts*         |     33.7 |           87 |           67 |
 | *tests/property/m5-annexb-string-methods.property.test.ts* |     14.2 |           37 |     fallback |
 | *tests/property/m5-annexb-date-methods.property.test.ts*   |     12.2 |           32 |     fallback |
-| *tests/es2026-builtins-native.test.ts*                     |     13.0 |           34 |     fallback |
+| *tests/es2026-builtins-native.test.ts*                     |     37.8 |           98 |           75 |
 | *tests/property/es2026-error-is-error.property.test.ts*    |     11.5 |     fallback |     fallback |
 | *tests/property/es2026-math-sum-precise.property.test.ts*  |      9.5 |     fallback |     fallback |
 | *tests/property/es2026-upsert.property.test.ts*            |     26.1 |           68 |           52 |
 | *tests/property/es2026-iterator-concat.property.test.ts*   |     14.5 |           38 |     fallback |
+| *tests/property/es2026-iterator-zip.property.test.ts*      |     22.9 |           60 |           46 |
 
 The ratios are 2.574 for Linux and 1.974 for macOS, the residual file's
 largest CI sum over its local sum. The fastest Linux observation gives
 1.894, so the ratio spans the runner variation as well.
 
 The three Annex B property files' local figures are their ordinary suites'
-summed top-level test durations, taken with one file worker. The escape
+summed top-level test durations, taken with one file worker. The
+*tests/es2026-builtins-native.test.ts* figure is a 2026-11-04 rerun with the
+four Iterator.zip fixtures; its five earlier fixtures took 22.4 of the 37.8
+seconds in that run against 13.0 before, so the host was slower that day and
+the entry errs high. The escape
 suite's first run, directly after a build, took 56.4 seconds; the table uses
 its second run, like the other two files' runs on the same warm cache.
 

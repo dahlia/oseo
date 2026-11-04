@@ -1,11 +1,12 @@
 /* eslint-disable no-await-in-loop -- Native builds run serially. */
 
 /*
- * Fixed native fixtures of the small ECMAScript 2026 built-in units. They
- * run here rather than in tests/native.ts because the M5c exclusion audit
- * binds that file by digest. Each fixture compiles under both
- * specialization policies with collection forced at every safepoint and
- * must match its reference hosts byte for byte.
+ * Fixed native fixtures of the small ECMAScript 2026 built-in units and
+ * Iterator.zip. They run here rather than in tests/native.ts because the
+ * M5c exclusion audit binds that file by digest. Each fixture compiles
+ * under both specialization policies with collection forced at every
+ * safepoint and must match its reference hosts byte for byte; a fixture
+ * with a reference model matches that model on both hosts instead.
  */
 
 import assert from "node:assert/strict";
@@ -30,6 +31,7 @@ import { agentReferencePrelude } from "./native/agent-reference.ts";
 import type { Es2026Fixture } from "./native/es2026-fixture.ts";
 import { errorIsErrorFixtures } from "./native/fixtures/error-is-error.ts";
 import { iteratorConcatFixtures } from "./native/fixtures/iterator-concat.ts";
+import { iteratorZipFixtures } from "./native/fixtures/iterator-zip.ts";
 import { mathSumPreciseFixtures } from "./native/fixtures/math-sum-precise.ts";
 import { upsertFixtures } from "./native/fixtures/upsert.ts";
 import { realmReferencePrelude } from "./native/realm-reference.ts";
@@ -39,6 +41,7 @@ const fixtures: readonly Es2026Fixture[] = [
   ...mathSumPreciseFixtures,
   ...upsertFixtures,
   ...iteratorConcatFixtures,
+  ...iteratorZipFixtures,
 ];
 
 const host = createNodeHost();
@@ -85,6 +88,7 @@ async function references(
         (fixture.test262Host === true
           ? agentReferencePrelude + realmReferencePrelude
           : "") +
+        (fixture.referenceModel ?? "") +
         source,
     );
     const observations: Observation[] = [];

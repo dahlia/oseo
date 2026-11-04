@@ -2154,7 +2154,8 @@ seconds. See
 ECMAScript 2026 built-in local costs
 ------------------------------------
 
-The property files of the small ECMAScript 2026 built-in units postdate the
+The property files of the small ECMAScript 2026 built-in units and of
+`iterator-zip` postdate the
 three Linux source runs. Each Linux weight is one local Linux AMD64 extended
 run with `OSEO_PROPERTY_RUN_SCALE=10` and the file's checked-in seed, size and
 base limit, rounded up to whole seconds. These are local observations, not CI
@@ -2168,8 +2169,9 @@ unknown-file median fallback.
 | *tests/property/es2026-math-sum-precise.property.test.ts* |    152227.392 |              153 |
 | *tests/property/es2026-upsert.property.test.ts*           |    247547.624 |              248 |
 | *tests/property/es2026-iterator-concat.property.test.ts*  |    156441.062 |              157 |
+| *tests/property/es2026-iterator-zip.property.test.ts*     |    239268.559 |              240 |
 
 The TSV retains each file with `-` for all three historical source samples,
 and the extraction script and its unit test retain it explicitly. The
-Linux table has 156 entries, and its upper-median fallback moves from 435 to
-429 seconds. macOS keeps 143 entries and its 296-second fallback.
+Linux table has 157 entries, and its upper-median fallback moves from 435 to
+423 seconds. macOS keeps 143 entries and its 296-second fallback.

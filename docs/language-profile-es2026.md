@@ -14,9 +14,10 @@ the [M5 exit report](./m5c-closure/m5-exit-report.md) keeps the M5 result.
 A change that admits or measures behavior inside this boundary updates this
 document in the same change. A family's status describes tested current
 behavior, never intended behavior. The Annex B built-in units and the small
-ECMAScript 2026 built-in units hold the family records so far; see
-[Annex B built-ins](#annex-b-built-ins) and
-[Small ECMAScript 2026 built-in families](#small-ecmascript-2026-built-in-families).
+ECMAScript 2026 built-in units and `iterator-zip` hold the family records so
+far; see [Annex B built-ins](#annex-b-built-ins),
+[Small ECMAScript 2026 built-in families](#small-ecmascript-2026-built-in-families),
+and [Joint iteration](#joint-iteration).
 
 
 Claim boundary
@@ -393,3 +394,65 @@ The pinned Node.js lacks the function, so Deno is the single reference host.
 The property suite checks generated item lists and consumption schedules
 against an independent model of the closure. The family record is
 [*iterator-concat.yaml*](./language-profile-es2026/families/iterator-concat.yaml).
+
+
+Joint iteration
+---------------
+
+The `iterator-zip` unit implements `Iterator.zip` and `Iterator.zipKeyed` from
+the joint iteration feature. All 82 of its test262 rows pass, and the family
+record's standards class cites the results partitions that hold them. Six of
+those rows include *iteratorZipUtils.js*, which the reviewed harness now
+carries unchanged from the pinned revision.
+
+### `Iterator.zip` and `Iterator.zipKeyed`
+
+Both are writable, non-enumerable, configurable own function properties of
+`%Iterator%` with length 1, and neither is a constructor. Each takes an object
+of iterables and an optional options object. A non-object `iterables` is a
+`TypeError` before the options are read.
+
+The options must be `undefined` or an object. `mode` must be `undefined`,
+`"shortest"`, `"longest"`, or `"strict"`, with no conversion, so a String
+object is rejected. Only `"longest"` reads `padding`, which must then be
+`undefined` or an object. The options are read before any iterable is opened.
+
+`Iterator.zip` opens `iterables` with `Symbol.iterator`, steps it to the end,
+and opens each value with GetIteratorFlattenable: the value must be an object,
+a nullish `Symbol.iterator` uses the object itself as the iterator, and `next`
+is read once. A primitive, a string included, is a `TypeError`. Its padding is
+the first values of the padding iterable, which is closed if it has more, and
+`undefined` past its end. `Iterator.zipKeyed` instead walks the own keys of
+`iterables`, symbols included, through `[[OwnPropertyKeys]]` and
+`[[GetOwnProperty]]`. It skips a key whose property is absent or not
+enumerable and a value that is `undefined`, and reads its padding by key.
+
+Each `next` steps every remaining iterator in order and yields a fresh array,
+or for `zipKeyed` a fresh null-prototype object with one writable, enumerable,
+configurable property per key. When an iterator is done, `"shortest"`
+finishes. `"strict"` finishes only if that is the first iterator and stepping
+each other one once, without reading `value`, finds it done too; otherwise it
+throws a `TypeError`. `"longest"` drops the iterator, uses its padding from
+then on, and finishes when none remains.
+
+Every finish and every abrupt completion closes the iterators that are still
+open, from the last to the first. That covers a throw while collecting the
+iterators or the padding, where a failed open in `zip` also closes `iterables`
+last, a throw from a step, and `return` before the first `next` or at a
+yield. When the completion is a return, the first `return` method that throws
+or answers a non-object replaces it with that error, and the remaining
+iterators still close with their errors suppressed. Calling `next` or `return`
+while the result is running is a `TypeError`, including from a `return` method
+that a `return` at a yield calls.
+
+Neither pinned reference host implements these functions. The fixtures run on
+Node.js and Deno over an independent model written from the specification
+text, *tests/native/iterator-zip-model.ts*, which installs both functions and
+builds each result on `Iterator.prototype.map`. Node.js 24.21.0 marks a helper
+completed before a `return` at a yield closes, unlike GeneratorResumeAbrupt, so
+the probe of that state runs on Deno alone. The property suite,
+*tests/property/es2026-iterator-zip.property.test.ts* with seed block
+`0x6000ab00`, generates inputs, modes, padding, and consumption schedules,
+and checks the native result against a second model of the closure and the
+reference model on Node.js. The family record is
+[*iterator-zip.yaml*](./language-profile-es2026/families/iterator-zip.yaml).
