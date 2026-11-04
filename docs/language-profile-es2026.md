@@ -14,10 +14,11 @@ the [M5 exit report](./m5c-closure/m5-exit-report.md) keeps the M5 result.
 A change that admits or measures behavior inside this boundary updates this
 document in the same change. A family's status describes tested current
 behavior, never intended behavior. The Annex B built-in units, the Annex B
-Object accessors, the small ECMAScript 2026 built-in units, `iterator-zip`,
-`array-from-async`, and `json-parse-source` hold the family records so far; see
-[Annex B built-ins](#annex-b-built-ins),
+Object accessors, the Annex B language units, the small ECMAScript 2026
+built-in units, `iterator-zip`, `array-from-async`, and `json-parse-source`
+hold the family records so far; see [Annex B built-ins](#annex-b-built-ins),
 [Annex B Object accessors](#annex-b-object-accessors),
+[Annex B language semantics](#annex-b-language-semantics),
 [Small ECMAScript 2026 built-in families](#small-ecmascript-2026-built-in-families),
 [Joint iteration](#joint-iteration), [`Array.fromAsync`](#arrayfromasync), and
 [JSON source text](#json-source-text).
@@ -363,6 +364,127 @@ partitions that hold them. The two TypedArray rows include
 *resizableArrayBufferUtils.js*. They pass because the reviewed harness copy in
 *tests/test262/harness/* writes its three subclasses as class expressions
 instead of compiling them through the `Function` constructor.
+
+
+Annex B language semantics
+--------------------------
+
+The `annexb-function-declarations` and `annexb-statement-forms` units implement
+the Annex B rules that change non-strict code: B.3.1 through B.3.5 for
+function declarations and the `for-in` initializer, and the run-time error for
+a call used as an assignment target. Strict code and modules keep every early
+error they reported before. Their family records are
+`annexb-function-declarations` and `annexb-statement-forms`. Their 332
+test262 paths are not yet admitted, so each record's standards class names the
+replacement evidence below until the full test262 update admits them.
+
+### Function declarations
+
+The frontend rewrites the two Annex B declaration positions into forms the
+rest of the compiler already handles. `if (x) function f() {}` becomes a Block
+holding the declaration, as B.3.3 specifies. A labelled function declaration
+becomes the declaration itself, which is safe because no `break` or
+`continue` can name a label across a function boundary. A labelled
+declaration at a function body's or Script's top level is therefore an ordinary
+var-scoped function. One inside a Block stays lexical and gets no var-scoped
+copy, since B.3.2 applies only to a declaration directly in a Block or clause
+statement list. Babel reports every strict form and every labelled function
+in a statement position.
+
+B.3.2 gives a qualifying block-level function a var-scoped binding of the same
+name, initialized to `undefined` at the start of the function or Script, and
+copies the Block's binding into it when the declaration is evaluated. A
+declaration qualifies when it is an ordinary function declaration, the code
+is non-strict, its name is not a parameter or the `arguments` of a function
+that needs its arguments object, and a `var` of its name at that position
+would raise no early error. The frontend checks that last condition against
+the same lexical frames `var` hoisting checks: enclosing Blocks and CaseBlocks
+with their function declarations, `for` heads with `let` or `const`, the
+function body's or Script's top-level lexical declarations, and destructured
+catch parameters. A simple catch parameter does not block it, as B.3.4
+requires. The declaration's own statement list counts too, minus the
+declaration itself, so two same-name functions in one Block both stay
+block-scoped. The copy is a new statement that follows the declaration. HIR
+writes the var-scoped binding found in the function body's scope, the
+parameter environment's body Block, or the Script scope directly, past any
+catch parameter or `with` object in between.
+
+B.3.2.4 and B.3.2.5 also admit duplicate function names in one Block or
+CaseBlock of non-strict code when every declaration is an ordinary function
+declaration; the last one initializes the binding. A block-level function named
+`arguments` inside an arrow function that has no `arguments` binding of its
+own reports OSEO1001. The edition creates that binding only when the copy runs,
+and the ahead-of-time compiler has no form for a binding that appears during
+execution.
+
+In Script code, B.3.2.2 adds the qualifying names that no top-level `var` or
+function declares to the global-object entries of
+GlobalDeclarationInstantiation, ahead of the function and `var` entries.
+`oseo_global_object_create` takes a new `web_legacy_functions` table that marks
+them. Such an entry never throws: the runtime skips it when an earlier Script's
+lexical declaration holds the name, or when the global object is not extensible
+and lacks the property, and otherwise binds it the way it binds a `var`. A
+skipped entry's cell stays detached from the global object. Host Script
+references resolve the name through the realm, so the copy written to that cell
+is never observed. The runtime ABI moves to `m5-156` for the new parameter.
+
+V8 departs from the edition in five places these units follow the edition
+for. It hoists both of two same-name functions in one Block, hoists a
+labelled function inside a Block, lets an inner Block's function replace an
+outer Block's function of the same name, overwrites the arguments object with
+a block-level function named `arguments`, and reports a SyntaxError for a
+host Script whose block-level function shares a name with an earlier Script's
+`let`. In a `vm` context it also makes the global property configurable when
+the copy runs, and enumerable for an intrinsic such as `parseInt`. test262
+checks the nested-Block, `arguments`, and attribute cases.
+
+### Statement forms
+
+B.3.5 admits one initializer in a non-strict `for (var x = init in obj)` head
+whose binding is a plain identifier. The frontend emits the initializer as an
+assignment to the hoisted `var` binding ahead of the loop, so it runs once,
+before the subject is evaluated, and names an anonymous function or class
+after the binding. A label on the statement moves onto the loop, so
+`continue label` still reaches it.
+
+A function call used as the target of `=`, a compound assignment, `++`, `--`,
+or a `for-in` or `for-of` head in non-strict code throws a ReferenceError at
+run time instead of failing to parse. Babel still rejects the strict forms
+and the logical assignment and destructuring forms. The new
+`invalid-assignment-target` expression evaluates the call, then throws a
+ReferenceError built from the realm's own constructor, so the right operand,
+the old value's conversion, and the store never run. A loop head instead binds
+each value to a fresh synthetic binding and makes the call and the throw the
+first statement of the body. The order is the one ForIn/OfBodyEvaluation
+gives, and the abrupt body closes a `for-of` iterator. The five
+*test/annexB/language/statements/try/* rows already passed and need only
+admission.
+
+### Evidence
+
+*tests/annexb-function-declarations-native.test.ts* runs the fixtures in
+*tests/native/fixtures/annexb-functions.ts* under both
+specialization policies, with collection at every safepoint and a
+property-read guard miss into the generic path. Eight fixtures are compared
+with Node.js and Deno running them as Scripts. They cover the copy in function
+code, every `if` and `switch` clause form, each skip rule, labelled
+declarations, global properties and existing global names, host Scripts, the
+`for-in` initializer, and every call target form, including the evaluation
+order and the iterator close. The ninth holds the V8 departures above and is
+compared with output written from the edition.
+
+*tests/property/annexb-function-declarations.property.test.ts*, seed block
+`0x6000a200`, generates function and Script code that places a declaration
+in a Block, an `if` clause, or a `switch` clause under up to three Blocks,
+`try`, catch clauses, `for` heads, labels, lexical Blocks, and `with`
+statements, with parameters, top-level `var`, `let`, and function
+declarations, and strict bodies. It compares the native values of the name
+before and after the declaration, and the global property, with an independent
+model of the skip rules, and with V8 running the program as a Script; the
+generator avoids the V8 departures. The statement forms have no generated
+domain beyond their fixed shapes, so their record omits the generated class.
+*packages/parser-babel/tests/annexb-functions.test.ts* checks which
+declarations receive a copy and which forms stay early errors.
 
 
 Small ECMAScript 2026 built-in families

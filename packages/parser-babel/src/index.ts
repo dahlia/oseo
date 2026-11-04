@@ -10,6 +10,7 @@ import {
   type ConvertOptions,
   type ParserError,
 } from "./babel.ts";
+import { normalizeAnnexBFunctionStatements } from "./annexb-functions.ts";
 import { classStaticKeywordDiagnostics } from "./class-static-keyword.ts";
 import { program } from "./convert.ts";
 import { newImportCallDiagnostics } from "./import-call-early-errors.ts";
@@ -90,6 +91,7 @@ export function createBabelFrontend(
             sourceId: input.sourceId,
           };
         }
+        normalizeAnnexBFunctionStatements(file);
         const context: ConvertContext = {
           diagnostics: [],
           input,

@@ -4061,6 +4061,7 @@ function emitGlobalObject(
   const nullPointer = renderC(emittedC.common.nullPointer);
   let globalBindingIds = nullPointer;
   let functionDeclarations = nullPointer;
+  let webLegacyFunctions = nullPointer;
   if (bindings.length > 0) {
     const prefix = renderC(emittedC.globalObject.prefix);
     globalBindingIds = `${prefix}_bindings`;
@@ -4087,6 +4088,23 @@ function emitGlobalObject(
             .join(renderC(emittedC.common.commaSpace)),
         ),
     );
+    // Annex B.3.2.2 names are skipped, not rejected, when a lexical
+    // declaration or CanDeclareGlobalVar forbids their var binding.
+    if (bindings.some((binding) => binding.declaration === "annexb")) {
+      webLegacyFunctions = `${prefix}_web_legacy`;
+      line(
+        state,
+        `static const bool ${webLegacyFunctions}[] = ` +
+          renderC(
+            emittedC.common.bracedInitializer,
+            bindings
+              .map((binding) =>
+                binding.declaration === "annexb" ? "true" : "false",
+              )
+              .join(renderC(emittedC.common.commaSpace)),
+          ),
+      );
+    }
   }
   line(
     state,
@@ -4096,7 +4114,7 @@ function emitGlobalObject(
       `${lexical.columns}, ${bindings.length}u, ${bindingNames.names}, ` +
       `${bindingNames.lengths}, ${bindingNames.lines}, ` +
       `${bindingNames.columns}, ${globalBindingIds}, ` +
-      `${functionDeclarations});`,
+      `${functionDeclarations}, ${webLegacyFunctions});`,
   );
   line(state, renderC(emittedC.common.gotoAbruptUnlessNormal));
   if (hostScript && lexicalNames.length > 0) {
@@ -5403,19 +5421,21 @@ export function emitScriptFragments(
       range: remap(entry.range, offsets[index]!),
     })),
   );
-  // Whole-Script instantiation creates every function property before vars.
-  // Concatenating the already partitioned tables would interleave these kinds.
-  const objectBindings = (["function", "var"] as const).flatMap((kind) =>
-    fragments.flatMap((fragment, index) =>
-      fragment.mir.globalObjectBindings
-        .filter((entry) => entry.declaration === kind)
-        .map((entry) => ({
-          id: entry.id,
-          name: entry.name,
-          declaration: entry.declaration,
-          range: remap(entry.range, offsets[index]!),
-        })),
-    ),
+  // Whole-Script instantiation binds the Annex B.3.2.2 names first, then
+  // every function property, then the vars. Concatenating the already
+  // partitioned tables would interleave these kinds.
+  const objectBindings = (["annexb", "function", "var"] as const).flatMap(
+    (kind) =>
+      fragments.flatMap((fragment, index) =>
+        fragment.mir.globalObjectBindings
+          .filter((entry) => entry.declaration === kind)
+          .map((entry) => ({
+            id: entry.id,
+            name: entry.name,
+            declaration: entry.declaration,
+            range: remap(entry.range, offsets[index]!),
+          })),
+      ),
   );
   const lines: string[] = [];
   emitGlobalObject({ lines, environmentSlot: 0 }, lexical, objectBindings);

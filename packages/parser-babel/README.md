@@ -155,6 +155,20 @@ The existing var-scoped hoisting pass already treats a switch's case bodies as
 one lexical frame that includes function names, so the same
 disjoint-coexistence rule applies.
 
+Non-strict code also gets the Annex B forms. Before conversion,
+*annexb-functions.ts* wraps an `if` clause's function declaration in a Block
+and replaces a labelled function declaration with the declaration itself.
+When a block-level function would raise no early error as a `var` of its
+name, is not a parameter, and is not the `arguments` of a function that needs
+its arguments object, the body's hoisted bindings gain that name and the
+declaration is followed by an `annexb-function-copy` statement. A Script adds
+such a name to its global object entries as `annexb`. A
+`for (var x = init in obj)` initializer becomes an assignment ahead of the
+loop, and a call used as an assignment target becomes an
+`invalid-assignment-target` expression that throws after the call. The
+[ECMAScript 2026 profile](../../docs/language-profile-es2026.md#annex-b-language-semantics)
+gives the rules.
+
 Standalone destructuring assignment reuses them when every leaf and rest
 target is an existing identifier or a static or computed member reference.
 Synchronous `for-of` assignment heads reuse that assignment target

@@ -70,9 +70,11 @@ function fragment(
   nextFunctionId: number,
   options: CompilerOptions,
 ): ScriptFragment {
+  // An Annex B.3.2.2 name is initialized to undefined during instantiation,
+  // as a var is, so its initializer belongs to the launcher too.
   const varIds = new Set(
     hir.globalObjectBindings
-      ?.filter((binding) => binding.declaration === "var")
+      ?.filter((binding) => binding.declaration !== "function")
       .map((binding) => binding.id),
   );
   return {

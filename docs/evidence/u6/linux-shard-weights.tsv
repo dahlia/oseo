@@ -1,4 +1,5 @@
 file	oldSeconds	d4d81be9CaseMs	98460f7cCaseMs	6aab0fc8CaseMs	medianSecondsCeil
+tests/property/annexb-function-declarations.property.test.ts	300	-	-	-	300
 tests/property/es2026-array-from-async.property.test.ts	470	-	-	-	470
 tests/property/es2026-error-is-error.property.test.ts	142	-	-	-	142
 tests/property/es2026-iterator-concat.property.test.ts	157	-	-	-	157

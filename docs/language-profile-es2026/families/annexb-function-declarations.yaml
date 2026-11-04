@@ -1,0 +1,60 @@
+version: 1
+id: annexb-function-declarations
+title: "Annex B function declarations"
+scope:
+  - "Labelled function declarations of B.3.1 and if-clause function
+    declarations of B.3.3 in non-strict code, with every strict and
+    statement-position form kept an early error."
+  - "The B.3.2.1 var-scoped binding and evaluation copy of a qualifying
+    block-level function in function code, and its skip rules for
+    parameters, the needed arguments object, and every early-error conflict a
+    var of the name would raise."
+  - "The B.3.2.2 global-object binding of a qualifying block-level function
+    in Script code, skipped without an error when a lexical declaration or
+    CanDeclareGlobalVar forbids it."
+  - "Duplicate ordinary function declarations in one Block or CaseBlock of
+    non-strict code, B.3.2.4 and B.3.2.5."
+owners:
+  - docs/language-profile-es2026.md
+evidence:
+  differential:
+    status: covered
+    references:
+      - tests/annexb-function-declarations-native.test.ts
+      - tests/property/annexb-function-declarations.property.test.ts
+  fixed:
+    status: covered
+    references:
+      - tests/native/fixtures/annexb-functions.ts
+  forced-collection:
+    status: covered
+    references:
+      - tests/annexb-function-declarations-native.test.ts
+      - tests/property/annexb-function-declarations.property.test.ts
+  generated:
+    status: covered
+    references:
+      - tests/property/annexb-function-declarations.property.test.ts
+  guard-fallback:
+    status: covered
+    references:
+      - tests/annexb-function-declarations-native.test.ts
+  specialization:
+    status: covered
+    references:
+      - tests/annexb-function-declarations-native.test.ts
+      - tests/property/annexb-function-declarations.property.test.ts
+  standards:
+    status: omitted
+    reason: "The 313 owned test262 paths under test/annexB/language/
+      function-code/, global-code/, and statements/labeled/ are not yet
+      admitted to the reviewed subset; the full test262 update admits them and
+      replaces this entry with their result partitions."
+    replacements:
+      - tests/annexb-function-declarations-native.test.ts
+      - tests/property/annexb-function-declarations.property.test.ts
+  structural:
+    status: covered
+    references:
+      - packages/parser-babel/tests/annexb-functions.test.ts
+      - packages/compiler/tests/hir.test.ts

@@ -660,3 +660,7 @@ families:
     owner: tests/property/es2026-uint8array-base64.property.test.ts
     start: 0x6000a700
     end: 0x6000a7ff
+  - family: annexb-function-declarations
+    owner: tests/property/annexb-function-declarations.property.test.ts
+    start: 0x6000a200
+    end: 0x6000a2ff

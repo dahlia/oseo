@@ -901,6 +901,13 @@ export type HirExpression =
       readonly kind: "error-intrinsic";
     })
   | (LocatedSyntax & {
+      /** The call whose result cannot be assigned, evaluated first. */
+      readonly call: HirExpression;
+      /** The ReferenceError constructed and thrown after the call. */
+      readonly error: HirExpression;
+      readonly kind: "invalid-assignment-target";
+    })
+  | (LocatedSyntax & {
       readonly kind: "function-intrinsic";
     })
   | (LocatedSyntax & {
@@ -1370,7 +1377,7 @@ export interface HirGlobalLexicalName {
  * CreateGlobalFunctionBinding when the name already has a property.
  */
 export interface HirGlobalObjectBinding extends HirGlobalBinding {
-  readonly declaration: "function" | "var";
+  readonly declaration: "annexb" | "function" | "var";
   readonly range: SourceRange;
 }
 
@@ -1437,6 +1444,12 @@ export interface Binding {
   readonly mutable: boolean;
   readonly name: string;
   readonly pendingDeclaration?: boolean;
+  /**
+   * True for an ordinary, non-async, non-generator function declaration
+   * in non-strict code. Annex B.3.2.4 and B.3.2.5 admit a duplicate name
+   * in one Block or CaseBlock only when every declaration of it is one.
+   */
+  readonly webLegacyFunction?: true;
 }
 
 export interface ResolveState {
@@ -1534,6 +1547,13 @@ export interface ResolveState {
   readonly withFallbacks: Map<string, Binding>[];
   /** Empty scope markers mapped to their hidden object binding identity. */
   readonly withScopes: Map<Map<string, Binding>, number>;
+  /**
+   * The scope that holds the var-scoped bindings of the function body or
+   * Script being resolved: the body's top-level scope, the synthetic
+   * Block of a body with a parameter environment, or the Script scope.
+   * An Annex B.3.2 copy writes its binding there directly.
+   */
+  varScope?: ReadonlyMap<string, Binding> | undefined;
   /**
    * The derived constructor `this` binding in scope, if any. It reaches
    * every arrow function nested in that constructor and stops at the next

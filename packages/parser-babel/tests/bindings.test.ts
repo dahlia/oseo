@@ -426,34 +426,36 @@ for (const [name, header] of parameterEnvironmentBodyForms) {
   });
 }
 
-test("rejects a duplicate block function in a parameterized body", () => {
+test("admits a sloppy duplicate block function with parameters", () => {
+  // Annex B.3.2.4 admits the duplicate in non-strict code; the later
+  // declaration initializes the Block's one binding.
   const result = compileSource(babelFrontend, {
-    source: "function outer(x = 0) { { function f() {} function f() {} } }",
+    source:
+      "function outer(x = 0) {\n" +
+      "  { function f() { return 1; } function f() { return 2; } }\n" +
+      "}\n",
     sourceId: "parameter-environment-block-duplicate.ts",
   });
-  assert.equal(result.diagnostics[0]?.code, "OSEO1001");
-  assert.match(
-    result.diagnostics[0]?.message ?? "",
-    /Duplicate declaration 'f'/u,
-  );
+  assert.deepEqual(result.diagnostics, []);
+  assert.ok(result.hir != null);
+  assert.match(printHir(result.hir), /return 2/u);
+  assert.doesNotMatch(printHir(result.hir), /return 1/u);
 });
 
-test("rejects a duplicate switch function in a parameterized body", () => {
+test("admits a sloppy duplicate switch function with parameters", () => {
   const result = compileSource(babelFrontend, {
     source:
       "function outer(x = 0) {\n" +
       "  switch (x) {\n" +
-      "    case 1: function f() {} break;\n" +
-      "    default: function f() {}\n" +
+      "    case 1: function f() { return 1; } break;\n" +
+      "    default: function f() { return 2; }\n" +
       "  }\n" +
       "}\n",
     sourceId: "parameter-environment-switch-duplicate.ts",
   });
-  assert.equal(result.diagnostics[0]?.code, "OSEO1001");
-  assert.match(
-    result.diagnostics[0]?.message ?? "",
-    /Duplicate declaration 'f'/u,
-  );
+  assert.deepEqual(result.diagnostics, []);
+  assert.ok(result.hir != null);
+  assert.match(printHir(result.hir), /return 2/u);
 });
 
 test("keeps block-scoped let clear of later var declarations", () => {

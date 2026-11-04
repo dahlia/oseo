@@ -56,7 +56,7 @@ three sums, rounded up, so the margin below is a slow runner's. Files under 30
 seconds have no entry and weigh the host fallback, 18 seconds on both hosts,
 which is the median of every measured weight.
 
-Twenty-nine files postdate those runs. Local runs from 2026-11-01 to
+Thirty-one files postdate those runs. Local runs from 2026-11-01 to
 2026-11-04 of the residual evidence and those files, on one host, give the
 calibration:
 

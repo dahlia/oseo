@@ -414,6 +414,12 @@ function printHirExpression(expression: HirExpression): string {
     const star = expression.delegate === true ? "*" : "";
     return `yield${star} ${printHirExpression(expression.argument)}`;
   }
+  if (expression.kind === "invalid-assignment-target") {
+    return (
+      `invalid-assignment-target ${printHirExpression(expression.call)} ` +
+      `throw ${printHirExpression(expression.error)}`
+    );
+  }
   if (expression.kind === "new") {
     return (
       `new ${printHirExpression(expression.callee)}(` +

@@ -4407,6 +4407,19 @@ function lowerExpression(
     builder.current = resume;
     return recordRoot(builder, sent, expression.range);
   }
+  if (expression.kind === "invalid-assignment-target") {
+    // The call runs, then the ReferenceError replaces the assignment. The
+    // continuation block has no predecessor, so the backend never emits
+    // it; it only gives the enclosing lowering a current block.
+    lowerExpression(expression.call, builder);
+    const error = lowerExpression(expression.error, builder);
+    lowerThrowValue(error, expression.range, builder);
+    builder.current = createMirBlock(builder);
+    return lowerExpression(
+      { kind: "undefined", range: expression.range },
+      builder,
+    );
+  }
   if (expression.kind === "error-intrinsic") {
     appendMirMetadata(
       builder,

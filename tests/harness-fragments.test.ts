@@ -442,3 +442,50 @@ test("launcher global property order matches whole Script", () => {
   );
   assert.deepEqual(names, ["hf", "c", "h", "b"]);
 });
+
+test("launcher binds Annex B global function names like whole Script", () => {
+  const source = "var h = 1; function hf() {}";
+  const bodySource = "{ function f() {} } function c() {} var b = 2;";
+  const prepared = compileHarnessFragment(babelFrontend, [
+    { sourceId: "h.js", source },
+  ]);
+  assert.equal(prepared.kind, "compiled");
+  if (prepared.kind !== "compiled") return;
+  const compiled = compileBodyFragment(babelFrontend, prepared.harness, {
+    sourceId: "case.js",
+    source: bodySource,
+  });
+  assert.equal(compiled.kind, "compiled");
+  if (compiled.kind !== "compiled") return;
+  const whole = compileSource(babelFrontend, {
+    sourceId: "case.js",
+    source: source + "\n" + bodySource,
+  });
+  assert.ok(whole.mir);
+  const c = emitScriptFragments(prepared.harness, compiled.body, {
+    sourceId: "case.js",
+    harnessLineOffset: 0,
+    bodyLineOffset: 1,
+  }).launcher.source;
+  const names = [
+    ...c.matchAll(/global_object_units_\d+\[\] = \{([\d, ]+)\};/gu),
+  ].map((match) => String.fromCharCode(...match[1]!.split(",").map(Number)));
+  assert.deepEqual(
+    names,
+    whole.mir.globalObjectBindings.map((entry) => entry.name),
+  );
+  assert.deepEqual(names, ["f", "hf", "c", "h", "b"]);
+  assert.match(c, /_web_legacy\[\] = \{true, false, false, false, false\};/u);
+  // The undefined initializer of the Annex B name runs at instantiation,
+  // before the harness evaluates, as the var initializers do.
+  const annexb = compiled.body.hir.globalObjectBindings?.find(
+    (entry) => entry.declaration === "annexb",
+  );
+  assert.ok(annexb);
+  assert.ok(
+    compiled.body.launcherInitializers.some((index) => {
+      const statement = compiled.body.hir.body[index]!;
+      return statement.kind === "let" && statement.bindingId === annexb.id;
+    }),
+  );
+});

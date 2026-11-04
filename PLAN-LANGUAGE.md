@@ -9,13 +9,14 @@ Implementation status: in progress. The `claim-boundary` unit has applied ADR
 `annexb-date-methods`, `error-is-error`, `math-sum-precise`, `upsert`,
 `iterator-concat`, `iterator-zip`, `annexb-object-accessors`,
 `array-from-async`, `json-parse-source`, `uint8array-base64`, and
-`atomics-pause` units are implemented and observed, and every other unit is
-open. This plan
-follows M5 directly and runs alongside M6. It has no milestone number. It
-schedules the language work the maintainer approved on 2026-11-02: build-time
-static-specifier `import()`, Annex B legacy web behavior except `document.all`,
-the legacy `caller` extension, the seven ECMAScript 2026 features, and the
-three ECMAScript 2027 features other than Temporal.
+`atomics-pause` units are implemented and observed. The
+`annexb-function-declarations` and `annexb-statement-forms` units are
+implemented, and their rows wait for admission. Every other unit is open.
+This plan follows M5 directly and runs alongside M6. It has no milestone
+number. It schedules the language work the maintainer approved on 2026-11-02:
+build-time static-specifier `import()`, Annex B legacy web behavior except
+`document.all`, the legacy `caller` extension, the seven ECMAScript 2026
+features, and the three ECMAScript 2027 features other than Temporal.
 
 The plan is written for parallel implementation. Each work unit below owns an
 exact set of test262 paths, names its prerequisites, and lists the shared files
@@ -104,11 +105,11 @@ A probe of the current build and the reviewed manifest shows this Annex B state:
 | `substr`, HTML methods, `trimLeft`, `trimRight`    | Installed by `annexb-string-methods`; all 105 test262 rows pass               |
 | `getYear`, `setYear`, `toGMTString`                | Installed by `annexb-date-methods`; all 24 test262 rows pass                  |
 | `RegExp.prototype.compile`                         | Not installed                                                                 |
-| Labelled function declarations                     | Rejected with OSEO1001                                                        |
-| Function declarations in `if` clauses              | Rejected with OSEO1001                                                        |
-| Block-level function web legacy semantics          | Not implemented; duplicate block functions are early errors                   |
-| `for (var x = init in obj)`                        | Rejected with OSEO1001                                                        |
-| Function call assignment targets as runtime errors | Not implemented                                                               |
+| Labelled function declarations                     | Implemented by `annexb-function-declarations`; rows not yet admitted          |
+| Function declarations in `if` clauses              | Implemented by `annexb-function-declarations`; rows not yet admitted          |
+| Block-level function web legacy semantics          | Implemented by `annexb-function-declarations`; rows not yet admitted          |
+| `for (var x = init in obj)`                        | Implemented by `annexb-statement-forms`; rows not yet admitted                |
+| Function call assignment targets as runtime errors | Implemented by `annexb-statement-forms`; rows not yet admitted                |
 
 The M5 `__proto__` boundary is documented in the
 [omitted legacy accessor metadata contract](./docs/language-profile-m5.md#omitted-legacy-accessor-metadata-boundary),
@@ -556,6 +557,11 @@ A property suite generates nested blocks, `if` clauses, labels, parameters, and
 `var` and `let` conflicts, and compares the observable bindings with an
 independent model of the Annex B rules under both specialization policies.
 
+Status: implemented, with fixed, differential, and generated evidence in the
+[profile section](./docs/language-profile-es2026.md#annex-b-language-semantics).
+All 313 rows pass in a focused observation and wait for the full test262
+update to admit them.
+
 ### `annexb-statement-forms`
 
 Owns *test/annexB/language/statements/for-in/* (7),
@@ -566,6 +572,11 @@ enumeration, and the run-time `ReferenceError` for a function call used as an
 assignment target, which non-strict code throws after the call and before
 the right operand. The catch rows already behave as specified and need only
 admission.
+
+Status: implemented, with fixed and differential evidence in the
+[profile section](./docs/language-profile-es2026.md#statement-forms). All 19
+rows pass in a focused observation and wait for the full test262 update to
+admit them.
 
 ### `annexb-dynamic-source-accounting`
 
@@ -732,7 +743,7 @@ standards update and heavy gates on the new base.
     row's owner moves. The audit binds ADR texts by digest, so a unit that
     edits ADR 0013, 0016, or 0028 re-reviews the rows that cite it.
  -  The runtime ABI version in *packages/runtime-c/src/index.ts*, currently
-    `m5-155`, changes once per landing that alters the ABI. The series keeps
+    `m5-156`, changes once per landing that alters the ABI. The series keeps
     its `m5-` prefix, and the closure tools keep their `m5c` names.
  -  Runtime code ranges, property blocks, intrinsic indexes, and heap kinds
     are reserved per unit.
