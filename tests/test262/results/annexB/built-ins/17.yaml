@@ -5,6 +5,31 @@ results:
       async: false
       features: []
       flags: []
+      includes: []
+      mode: script
+      path: test/annexB/built-ins/Function/createdynfn-html-close-comment-body.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - dynamic-source
+      - functions
+      - lexical-grammar
+    observation:
+      detail: 'test/annexB/built-ins/Function/createdynfn-html-close-comment-body.js
+        non-strict disabled failed (1): stdout=""
+        stderr="test/annexB/built-ins/Function/createdynfn-html-close-comment-body.js:95:1:
+        error[OSEO1001]: The Function constructor requires dynamic
+        source and is unsupported in M5.\n"'
+      passed: false
+      unsupportedCapability: profile-syntax
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features: []
+      flags: []
       includes:
         - propertyHelper.js
       mode: script

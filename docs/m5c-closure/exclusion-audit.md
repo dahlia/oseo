@@ -428,35 +428,42 @@ Former ADR 0013 exclusions after ADR 0032
 -----------------------------------------
 
 [ADR 0032](../adr/0032-post-m5-edition-boundary.md) withdrew ADR 0013's Annex B
-authorization. The 11 paths that the sections above close as ADR 0013
-exclusions are now remediation rows. Their audit rows keep the
+authorization, so the 11 paths that the sections above close as ADR 0013
+exclusions became remediation rows. Nine of them keep the
 `adr:0013-m5-edition-and-manifest` proposed owner, digests, reasons, and
-replacement evidence. Each of their eight assessments changes only to
+replacement evidence. Each of their seven assessments changes only to
 `disposition: remediation` with a `remediationOwner` naming the
-[*PLAN-LANGUAGE.md*](../../PLAN-LANGUAGE.md) unit that implements its Annex B
-behavior, and the ledger gives each path that owner:
+[*PLAN-LANGUAGE.md*](../../PLAN-LANGUAGE.md) unit that implemented its Annex B
+behavior:
 
  -  `unit:annexb-syntax`: *String/prototype/split/separator-regexp.js*;
  -  `unit:annexb-object-accessors`: the three TypedArray paths,
     *S8.6.2\_A8.js*, and the four class element
     *private-getter-is-not-a-own-property.js* and
-    *private-setter-is-not-a-own-property.js* paths;
- -  `unit:annexb-dynamic-source-accounting`: *S7.8.5\_A1.4\_T2.js* and
-    *S7.8.5\_A2.4\_T2.js*.
+    *private-setter-is-not-a-own-property.js* paths.
+
+All nine now pass. The closure ledger gives them the `observation` owner,
+which the check requires of a closed audit path, and their audit rows and
+assessments stay unchanged as the record of the remediation.
+
+*S7.8.5\_A1.4\_T2.js* and *S7.8.5\_A2.4\_T2.js* were remediation rows of
+`unit:annexb-dynamic-source-accounting` and are now ADR 0016 exclusions. Their
+originals accept a `SyntaxError` only for an `ID_Continue` code unit, and
+Annex B's identity escape admits all 65,521 units each selects, so that
+fallback is never reached. The exhaustive literal property compiles and runs
+every literal natively, and only `eval` of the literal text remains. The
+`ds17-exhaustive-escaped-annex-b` assessment is therefore an exclusion with
+`normativeDependency: source-evaluation-only`, no `remediationOwner`, and the
+same replacement evidence. Both audit rows and ledger entries name
+`adr:0016-dynamic-source-boundary`.
 
 The check rejects any ADR 0013 exclusion. It accepts a `unit:` remediation
 owner only on an ADR 0013 row, and the closure ledger checks that the unit
-exists. The Annex B residue and legacy lookup closure selectors stay exact, but
-now require a bound `annex-b-only` row with a `unit:` owner instead of an
-exclusion. The paragraphs above that call these paths exclusions describe the
-M5 state, which the M5 exit report records.
-
-The eight `unit:annexb-object-accessors` paths and
-*String/prototype/split/separator-regexp.js* now pass. The closure ledger gives
-them the `observation` owner, which the check requires of a closed audit path,
-and their audit rows and assessments stay unchanged as the record of the
-remediation. The two `unit:annexb-dynamic-source-accounting` paths keep their
-unit owner.
+exists. An ADR 0013 row cannot stand over an `eval` rejection. The legacy
+lookup closure selector stays exact, but now requires a bound `annex-b-only`
+row with a `unit:` owner instead of an exclusion. The paragraphs above that
+call these paths ADR 0013 exclusions describe the M5 state, which the M5 exit
+report records.
 
 The check reads upstream sources under *test/annexB/* as well as
 *test/built-ins/* and *test/language/*, still rejecting `..` segments and files
@@ -466,3 +473,42 @@ and *RegExp-trailing-escape-BMP.js* build the same escaped literals as
 fallback. Each is an ADR 0016 exclusion under `annexb-escaped-literal-eval`,
 which binds the exhaustive literal property as replacement evidence, so only
 the `eval` call remains.
+
+
+Annex B dynamic-source rows
+---------------------------
+
+The 475 rows that `annexb-dynamic-source-accounting` admits are ADR 0016
+exclusions: 469 under *test/annexB/language/eval-code/* report the run-time
+`OSEO1001` rejection of `eval`, and the six
+_test/annexB/built-ins/Function/createdynfn-\*.js_ rows report the `OSEO1001`
+rejection of the `Function` constructor. Each row records
+`priorCohort: source-subject` and an assessment with `disposition: exclusion`
+and `normativeDependency: source-evaluation-only`.
+
+| Assessment                                      | Rows | Non-source subject                                       |
+| ----------------------------------------------- | ---: | -------------------------------------------------------- |
+| `annexb-eval-func-block-functions`              |  136 | B.3.2.1 block-level functions in function code           |
+| `annexb-eval-func-parameter-no-skip`            |    8 | A block-level function named like a parameter            |
+| `annexb-eval-global-block-functions`            |  256 | B.3.2.2 block-level functions at global level            |
+| `annexb-eval-global-init-configurable`          |   16 | The initial global binding and its attributes            |
+| `annexb-eval-global-existing-property`          |   48 | A block-level function over an existing global property  |
+| `annexb-eval-global-nostrict-visibility`        |    3 | The name of a Block or CaseClause function after the run |
+| `annexb-eval-global-lexical-no-collision`       |    1 | A later Script's `let` over a configurable function      |
+| `annexb-eval-catch-parameter-var-redeclaration` |    1 | B.3.4 `var` redeclaration of a catch parameter           |
+| `annexb-function-constructor-html-comments`     |    6 | B.1.1 HTML-like comments                                 |
+
+The eval assessments read B.3.2.3 and the B.3.4 change to
+EvalDeclarationInstantiation as eval var instantiation, which
+`ec-static-eval-code` leaves under ADR 0016. That reading carries four
+assertions no static code can reach: parameter names being ignored,
+`configurable: true` on a new global binding, a binding with no `VarNames`
+entry, and var-scoped function declarations over a catch parameter.
+
+Replacement evidence binds the `annexb-function-declarations` and
+`annexb-syntax` family records, fixtures, and tests by digest. The passing
+test262 analog rows are upstream files the digests cannot bind, so each reason
+names them by path pattern.
+*eval-code/direct/func-\<template\>-eval-func-\<case\>.js* maps to
+*function-code/\<template\>-func-\<case\>.js*, and the global rows of both
+*direct/* and *indirect/* map to *global-code/* the same way.

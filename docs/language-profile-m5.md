@@ -314,9 +314,9 @@ evidence includes the executed variants and target, dependency tags are
 reviewed, and summaries include raw, path-group, and dependency totals.
 Unsupported, harness, and infrastructure results never increase the pass count.
 
-The current manifest contains 42,532 reviewed cases: 36,408 passes, 4,480
-expected negatives, and 1,644 unsupported profile features. It records no
-semantic, harness, or infrastructure failures. The 1,441 cases beyond the M5
+The current manifest contains 43,007 reviewed cases: 36,408 passes, 4,480
+expected negatives, and 2,119 unsupported profile features. It records no
+semantic, harness, or infrastructure failures. The 1,916 cases beyond the M5
 inventory are rows of the
 [ECMAScript 2026 profile](./language-profile-es2026.md): 164 for the
 [Annex B built-ins](./language-profile-es2026.md#annex-b-built-ins), 70 for the
@@ -331,8 +331,11 @@ inventory are rows of the
 [Annex B language semantics](./language-profile-es2026.md#annex-b-language-semantics),
 424 for
 [explicit resource management](./language-profile-es2026.md#explicit-resource-management),
-and 54 for
-[Annex B syntax and `compile`](./language-profile-es2026.md#annex-b-syntax-and-compile).
+54 for
+[Annex B syntax and `compile`](./language-profile-es2026.md#annex-b-syntax-and-compile),
+and 475 for the
+[Annex B dynamic-source rows](./m5c-closure/exclusion-audit.md#annex-b-dynamic-source-rows),
+which are ADR 0016 exclusions.
 
 The batch 16/17 dependency audit corrects 21 tag claims on 20 of the 754 new
 paths. Dependency totals are now 48 abrupt-completion, 559 functions, 404

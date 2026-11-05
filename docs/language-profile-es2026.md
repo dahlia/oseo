@@ -158,8 +158,9 @@ unreviewed.
 | Total                              |                                                              |     1,916 |
 
 The ledger owner of each row is `unit:` followed by the unit name in the first
-column. `annexb-dynamic-source-accounting` adds no family: its rows become
-ADR 0016 results through reviewed exclusion audit rows.
+column. `annexb-dynamic-source-accounting` adds no family: its rows are
+ADR 0016 exclusions with
+[reviewed exclusion audit rows](./m5c-closure/exclusion-audit.md#annex-b-dynamic-source-rows).
 
 
 Annex B built-ins

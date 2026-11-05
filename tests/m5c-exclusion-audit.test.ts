@@ -14,7 +14,6 @@ import {
   isAuditableUpstreamPath,
   legacyCallerSelector,
   literalImportCalls,
-  m5cAnnexDynamicResiduePaths,
   m5cAnnexLookupClosedPaths,
   validateCurrentM5cExclusionAudit,
   validateM5cExclusionAudit,
@@ -618,92 +617,85 @@ test("a deferred path on a record surface cannot drop its audit row", () => {
   );
 });
 
-test("the Annex B residue selector bounds ADR 0013 over eval", () => {
+test("an eval rejection cannot stand under ADR 0013", () => {
   const { audit, inputs } = fixture();
   audit.assessments.reviewed.normativeDependency = "annex-b-only";
   audit.assessments.reviewed.disposition = "remediation";
   audit.assessments.reviewed.remediationOwner = unitAnnexOwner;
   audit.paths[0]!.proposedOwner = annexOwner;
   audit.paths[0]!.missingDynamicTag = false;
-  const owned = {
-    ...inputs,
-    ledger: {
-      ...inputs.ledger,
-      entries: [
-        {
-          path,
-          owner: unitAnnexOwner,
-          prerequisites: result.dependencies,
-          state: result.classification,
+  assert.ok(audit.assessments.reviewed.replacementEvidence);
+  assert.throws(
+    () =>
+      validateM5cExclusionAudit(stringifyYaml(audit), {
+        ...inputs,
+        ledger: {
+          ...inputs.ledger,
+          entries: [
+            {
+              path,
+              owner: unitAnnexOwner,
+              prerequisites: result.dependencies,
+              state: result.classification,
+            },
+          ],
         },
-      ],
-    },
-  };
-  const selected = { ...owned, annexDynamicResiduePaths: new Set([path]) };
-  assert.equal(
-    validateM5cExclusionAudit(stringifyYaml(audit), selected).remediation,
-    1,
-  );
-  // Outside the selector, an eval rejection cannot stand under ADR 0013.
-  assert.throws(
-    () => validateM5cExclusionAudit(stringifyYaml(audit), owned),
-    /exact Annex B residue selector/u,
-  );
-  // ADR 0032 withdrew the exclusion the selector once bounded.
-  const { remediationOwner: unitOwner, ...excluded } =
-    audit.assessments.reviewed;
-  assert.equal(unitOwner, unitAnnexOwner);
-  assert.throws(
-    () =>
-      validateM5cExclusionAudit(
-        stringifyYaml({
-          ...audit,
-          assessments: {
-            reviewed: { ...excluded, disposition: "exclusion" },
-          },
-        }),
-        selected,
-      ),
-    /ADR 0032 withdrew the ADR 0013 Annex B exclusion/u,
-  );
-  // Inside it, the row must stay bound to its replacement evidence.
-  const { replacementEvidence, ...unbound } = audit.assessments.reviewed;
-  assert.ok(replacementEvidence);
-  assert.throws(
-    () =>
-      validateM5cExclusionAudit(
-        stringifyYaml({ ...audit, assessments: { reviewed: unbound } }),
-        selected,
-      ),
-    /exact Annex B residue selector/u,
-  );
-  audit.assessments.reviewed.disposition = "remediation";
-  audit.assessments.reviewed.normativeDependency = "not-demonstrated";
-  assert.throws(
-    () => validateM5cExclusionAudit(stringifyYaml(audit), selected),
-    /exact Annex B residue selector/u,
-  );
-  // A selector path cannot leave the audit.
-  assert.throws(
-    () =>
-      validateM5cExclusionAudit(stringifyYaml(fixture().audit), {
-        ...fixture().inputs,
-        annexDynamicResiduePaths: new Set([
-          "test/language/literals/regexp/absent.js",
-        ]),
       }),
-    /Annex B residue selector lacks its audit row/u,
+    /outside the record surface/u,
   );
 });
 
-test("the checked-in Annex B residue selector names the two escapes", () => {
-  assert.deepEqual(
-    [...m5cAnnexDynamicResiduePaths],
-    [
-      "test/language/literals/regexp/S7.8.5_A1.4_T2.js",
-      "test/language/literals/regexp/S7.8.5_A2.4_T2.js",
-    ],
-  );
+test("the escaped Annex B literal rows are ADR 0016 exclusions", () => {
+  const escaped = [
+    "test/language/literals/regexp/S7.8.5_A1.4_T2.js",
+    "test/language/literals/regexp/S7.8.5_A2.4_T2.js",
+  ];
+  // SAFETY: the audit checker validates every row, assessment, and path.
+  const audit = parseYaml(
+    readFileSync(
+      new URL("../docs/m5c-closure/exclusion-audit.yaml", import.meta.url),
+      "utf8",
+    ),
+  ) as {
+    readonly assessments: Readonly<
+      Record<
+        string,
+        {
+          readonly disposition: string;
+          readonly normativeDependency: string;
+          readonly remediationOwner?: string;
+          readonly replacementEvidence?: Readonly<Record<string, string>>;
+        }
+      >
+    >;
+    readonly paths: readonly {
+      readonly path: string;
+      readonly proposedOwner: string;
+    }[];
+  };
+  const ledger = parseM5cClosureLedger(
+    readFileSync(
+      new URL("../docs/m5c-closure/ledger.yaml", import.meta.url),
+      "utf8",
+    ),
+  ).ledger;
+  for (const escapedPath of escaped) {
+    assert.equal(
+      audit.paths.find((row) => row.path === escapedPath)?.proposedOwner,
+      owner,
+    );
+    assert.equal(
+      ledger.entries.find((entry) => entry.path === escapedPath)?.owner,
+      owner,
+    );
+  }
+  const assessment = audit.assessments["ds17-exhaustive-escaped-annex-b"];
+  assert.equal(assessment?.disposition, "exclusion");
+  assert.equal(assessment?.normativeDependency, "source-evaluation-only");
+  assert.equal(assessment?.remediationOwner, undefined);
+  assert.deepEqual(Object.keys(assessment?.replacementEvidence ?? {}), [
+    "tests/property/m5-regexp-literal-exhaustive.property.test.ts",
+  ]);
 });
 
 test("withdrawn records and stale source, observation, or tags fail", () => {
