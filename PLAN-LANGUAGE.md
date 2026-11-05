@@ -429,22 +429,20 @@ results. The rows whose fixture calls the `Function` constructor, 18
 `ds12-static-module-observables` assessment, whose native witnesses replace
 their live binding updates.
 
-The other 87 unsupported rows fail at build time, and this unit owns them
-until a follow-up widens the record surfaces of *tools/m5c-exclusion-audit.ts*.
-In 64 *catch/* rows the target cannot be linked, loaded, or parsed:
-*instn-iee-err-circular*, *instn-iee-err-ambiguous-import*,
-*file-does-not-exist*, and *eval-script-code-target*, 16 each. ADR 0016 is
-their intended owner, because the amended record links the whole closure at
-build time, so link and load errors are build failures; the
-`ds11-static-module-*` and `import-call-promise` assessments keep the evidence
-for them. In 23 rows the resolution profile rejects the specifier with
-OSEO3001: 22 `import('')` rows and *await-expr-dyn-import.js*, which imports
-`'foo'`. They are meant to become *PLAN-DYN.md* deferrals, because compiling an
-unresolvable specifier to a run-time rejection is the remaining work. A
-deferral also needs an audit row, and the audit accepts an ADR 0016 or deferral
-row only over an OSEO1001 rejection, so neither assignment loads without a
-*tools/* change. The follow-up is the one
-that widens the audit path rule for `annexb-dynamic-source-accounting`.
+The other 87 unsupported rows fail at build time. In 64 *catch/* rows the
+target cannot be linked, loaded, or parsed: *instn-iee-err-circular*,
+*instn-iee-err-ambiguous-import*, *file-does-not-exist*, and
+*eval-script-code-target*, 16 each. They are ADR 0016 exclusions, because the
+amended record links the whole closure at build time, so link and load errors
+are build failures; the `ds11-static-module-*` and `import-call-promise`
+assessments keep the evidence for them. In 23 rows the resolution profile
+rejects the specifier with OSEO3001: 22 `import('')` rows and
+*await-expr-dyn-import.js*, which imports `'foo'`. They are *PLAN-DYN.md*
+deferrals, because compiling an unresolvable specifier to a run-time rejection
+is the remaining work. The exclusion audit accepts each group only over its own
+build diagnostics, tied to a literal `import()` call, as
+[its procedure](./docs/m5c-closure/exclusion-audit.md#literal-import-build-failures)
+describes.
 
 Done when the 17 rows pass, every changed `dynamic-import` observation is
 reviewed, no static module row regresses, and the amended ADR 0016 describes
@@ -509,7 +507,9 @@ unsupported to pass, the only earlier row that changes. Its exclusion audit row
 and `annex-b-pattern` assessment stay as the record of the remediation, as the
 `annexb-object-accessors` rows do. The two `eval` rows
 *RegExp-leading-escape-BMP.js* and *RegExp-trailing-escape-BMP.js* are
-observed as unsupported and stay with `annexb-dynamic-source-accounting`.
+observed as unsupported and are ADR 0016 exclusions, as
+[`annexb-dynamic-source-accounting`](#annexb-dynamic-source-accounting)
+describes.
 
 ### `annexb-escape`
 
@@ -651,14 +651,14 @@ under ADR 0016. A row whose non-source subject is Annex B behavior names the
 is why this unit follows them. A row whose non-source subject no evidence
 covers stays with remediation and blocks `language-exit-audit`.
 
-The exclusion audit check reads only paths under *test/built-ins/* and
-*test/language/*, so this unit also widens that path rule in
-*tools/m5c-exclusion-audit.ts* to *test/annexB/* rows and observes the result
-in its own full update. *RegExp-leading-escape-BMP.js* and
-*RegExp-trailing-escape-BMP.js* are already observed as unsupported and keep
-this unit as their ledger owner until then. The same change widens the record
-surfaces for the 87 build-time rows that `import-admission` owns, as
-[that unit's status](#static-specifier-import-units) describes.
+The exclusion audit check reads paths under *test/annexB/* as well as
+*test/built-ins/* and *test/language/*. *RegExp-leading-escape-BMP.js* and
+*RegExp-trailing-escape-BMP.js* are already observed. They are ADR 0016
+exclusions under the `annexb-escaped-literal-eval` assessment: the
+[exhaustive literal property](./docs/evidence/regexp-literal-exhaustive/)
+compiles every escaped literal they build under the Annex B pattern grammar and
+runs it natively, so only the `eval` call remains. The
+other 475 rows wait for this unit's own full update.
 
 ### ECMAScript 2026 units
 

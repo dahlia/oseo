@@ -90,11 +90,42 @@ amendment grants no exclusion. `import-admission` re-observed the
 pass or report an expected negative keep their audit rows and assessments as
 the record, with the `observation` ledger owner. The 18 rows whose fixture
 calls the `Function` constructor stay ADR 0016 exclusions under
-`ds12-static-module-observables`. The 87 rows that fail at build time with
-`OSEO0001`, `OSEO2001`, or `OSEO3001` left the audit, because the check
-accepts an ADR 0016 or deferral row only over an `OSEO1001` rejection; they
-have the `unit:import-admission` owner until a follow-up widens the record
-surfaces, as [*PLAN-LANGUAGE.md*](../../PLAN-LANGUAGE.md) describes.
+`ds12-static-module-observables`. The 87 rows that fail at build time fall on
+the two surfaces of the next section.
+
+
+Literal `import()` build failures
+---------------------------------
+
+ADR 0016, as amended, requires the closure of an admitted `import()` to
+resolve, load, parse, and link before native generation, and makes a failure a
+build diagnostic, not a language result. The runner then reports one diagnostic
+line as the whole observation detail. The check accepts two classes of that
+line, and only for a case that has the `dynamic-import` feature and no other
+unadmitted one, and whose source passes one string literal to an `import()`
+call with no options.
+
+ -  An ADR 0016 exclusion, under the `static-specifier-import-build`
+    capability: `OSEO0001` `Source could not be parsed.`, `OSEO2001`
+    `Export 'x' is ambiguous.`, or `OSEO2001` `Module has no export 'x'.`
+    located in the file a literal call names relative to the case, or
+    `OSEO3001` `The module source could not be read.` located at the specifier
+    of a literal call in the case. The 64 *catch/* rows of
+    [*PLAN-LANGUAGE.md*](../../PLAN-LANGUAGE.md#static-specifier-import-units)
+    are these exclusions under `ds11-static-module-goal`,
+    `ds11-static-module-ambiguous`, `ds11-static-module-circular`, and
+    `import-call-promise`.
+ -  A *PLAN-DYN.md* deferral, under the `module-resolution-profile`
+    capability: `OSEO3001` `Unsupported module specifier '…'.` located at the
+    specifier of a literal call in the case whose value is the quoted text. The
+    23 rows that import `''` or `'foo'` are these deferrals under
+    `literal-import-resolution-deferral` and the `unresolvable-literal-import`
+    family of [*deferrals.yaml*](./deferrals.yaml).
+
+Locations are one-based, as the diagnostics print them. Any other code,
+message, location, capability, or detail text is outside both surfaces. A
+build failure is only an exclusion and a refused specifier only a deferral,
+and a deferred path on either surface keeps its audit row.
 
 
 Incidental Annex B TypedArray prototype lookup
@@ -426,3 +457,12 @@ them the `observation` owner, which the check requires of a closed audit path,
 and their audit rows and assessments stay unchanged as the record of the
 remediation. The two `unit:annexb-dynamic-source-accounting` paths keep their
 unit owner.
+
+The check reads upstream sources under *test/annexB/* as well as
+*test/built-ins/* and *test/language/*, still rejecting `..` segments and files
+other than `.js`. *test/annexB/built-ins/RegExp/RegExp-leading-escape-BMP.js*
+and *RegExp-trailing-escape-BMP.js* build the same escaped literals as
+*S7.8.5\_A1.4\_T2.js* and *S7.8.5\_A2.4\_T2.js* but have no `SyntaxError`
+fallback. Each is an ADR 0016 exclusion under `annexb-escaped-literal-eval`,
+which binds the exhaustive literal property as replacement evidence, so only
+the `eval` call remains.

@@ -505,8 +505,8 @@ language syntax that has no family elsewhere and the one Annex B
 expect, and all 24 `annexb-regexp-compile` rows pass. Each record's standards
 class cites the results partitions that hold its rows. The two
 *RegExp-leading-escape-BMP.js* and *RegExp-trailing-escape-BMP.js* rows call
-`eval` and are observed as unsupported; `annexb-dynamic-source-accounting`
-owns their ADR 0016 accounting.
+`eval` and are observed as unsupported. They are ADR 0016 exclusions, because
+the exhaustive literal property observes every escaped literal they build.
 
 ### HTML-like comments
 

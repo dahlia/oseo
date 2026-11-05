@@ -11,7 +11,9 @@ import {
   hasCallerRead,
   hasEvalCall,
   hasLookupCall,
+  isAuditableUpstreamPath,
   legacyCallerSelector,
+  literalImportCalls,
   m5cAnnexDynamicResiduePaths,
   m5cAnnexLookupClosedPaths,
   validateCurrentM5cExclusionAudit,
@@ -819,6 +821,294 @@ test("the run-time Function and eval boundaries are record surfaces", () => {
       { exclusions: 1, remediation: 0, deferrals: 0, missingDynamicTags: 1 },
       name,
     );
+  }
+});
+
+const importPath = "test/language/expressions/dynamic-import/catch/example.js";
+const importTarget =
+  "test/language/expressions/dynamic-import/catch/target_FIXTURE.js";
+/** The literal argument sits at line 2, column 8 of this source. */
+const importSource = "// a\nimport('./target_FIXTURE.js');\n";
+
+type ImportDisposition = "deferral" | "exclusion" | "remediation";
+
+/**
+ * Re-key the fixture onto a literal import() path whose observation is one
+ * build diagnostic, as the runner reports it, with the given disposition and
+ * the ledger owner that disposition requires.
+ */
+function importFixture({
+  capability = "static-specifier-import-build",
+  detail,
+  disposition = "exclusion",
+  features = ["dynamic-import"],
+  sourceText = importSource,
+  unsupportedFeatures = [],
+}: {
+  readonly capability?: string;
+  readonly detail: string;
+  readonly disposition?: ImportDisposition;
+  readonly features?: readonly string[];
+  readonly sourceText?: string;
+  readonly unsupportedFeatures?: readonly string[];
+}) {
+  const remediation = disposition === "remediation";
+  const observed = {
+    passed: false,
+    detail,
+    unsupportedCapability: capability,
+  };
+  const { audit, inputs } = fixture(remediation, sourceText, observed);
+  audit.paths[0]!.path = importPath;
+  audit.assessments.reviewed.disposition = disposition;
+  if (disposition === "deferral") {
+    audit.assessments.reviewed.normativeDependency = "not-demonstrated";
+  }
+  const owners = {
+    deferral: "deferred",
+    exclusion: owner,
+    remediation: remediationOwner,
+  } satisfies Record<ImportDisposition, string>;
+  const imported: M5cExclusionAuditInputs = {
+    ...inputs,
+    ledger: {
+      ...inputs.ledger,
+      entries: inputs.ledger.entries.map((entry) =>
+        Object.assign({}, entry, {
+          path: importPath,
+          owner: owners[disposition],
+        }),
+      ),
+    },
+    results: [
+      {
+        ...result,
+        case: { ...result.case, path: importPath, features: [...features] },
+        observation: observed,
+        unsupportedFeatures: [...unsupportedFeatures],
+      },
+    ],
+    sources: new Map([[importPath, sourceText]]),
+  };
+  return { audit, inputs: imported };
+}
+
+const importTargetDetails = [
+  `${importTarget}:7:22: error[OSEO0001]: Source could not be parsed.`,
+  `${importTarget}:4:10: error[OSEO2001]: Export 'x' is ambiguous.`,
+  `${importTarget}:4:10: error[OSEO2001]: Module has no export 'x'.`,
+];
+/** One diagnostic line at the literal argument, line 2, column 8. */
+const callDiagnostic = (code: string, message: string): string =>
+  `${importPath}:2:8: error[${code}]: ${message}`;
+/** One diagnostic line in a target fixture at line 4, column 10. */
+const targetDiagnostic = (code: string, message: string): string =>
+  `${importTarget}:4:10: error[${code}]: ${message}`;
+const importLoadDetail = callDiagnostic(
+  "OSEO3001",
+  "The module source could not be read.",
+);
+const importResolutionSource = "// a\nimport('');\n";
+const importResolutionDetail = callDiagnostic(
+  "OSEO3001",
+  "Unsupported module specifier ''.",
+);
+
+test("literal import() calls are read from call syntax", () => {
+  assert.deepEqual(literalImportCalls(importSource, "script"), [
+    { specifier: "./target_FIXTURE.js", line: 2, column: 8 },
+  ]);
+  assert.deepEqual(literalImportCalls("await import('foo');", "module"), [
+    { specifier: "foo", line: 1, column: 14 },
+  ]);
+  for (const code of [
+    "import(specifier);",
+    "import(`./a.js`);",
+    "import('./a.js', { with: {} });",
+    "import('./a' + '.js');",
+    "const text = \"import('./a.js')\";",
+    "// import('./a.js')",
+  ]) {
+    assert.deepEqual(literalImportCalls(code, "script"), [], code);
+  }
+});
+
+test("build failures of a literal import() target are ADR 0016 rows", () => {
+  for (const detail of [...importTargetDetails, importLoadDetail]) {
+    const { audit, inputs } = importFixture({ detail });
+    assert.deepEqual(
+      validateM5cExclusionAudit(stringifyYaml(audit), inputs),
+      { exclusions: 1, remediation: 0, deferrals: 0, missingDynamicTags: 1 },
+      detail,
+    );
+  }
+});
+
+test("near-miss import() build diagnostics stay off the surface", () => {
+  const cases: readonly Parameters<typeof importFixture>[0][] = [
+    // Codes and messages outside the observed build failure classes.
+    { detail: targetDiagnostic("OSEO2002", "Export 'x' is ambiguous.") },
+    { detail: targetDiagnostic("OSEO1001", "Module has no export 'x'.") },
+    { detail: targetDiagnostic("OSEO2001", "Export x is ambiguous.") },
+    { detail: targetDiagnostic("OSEO3001", "Source could not be parsed.") },
+    {
+      detail: importLoadDetail.replace(
+        "The module source could not",
+        "The module could not",
+      ),
+    },
+    // A target failure outside the file a literal import() names.
+    { detail: importTargetDetails[0]!.replace("target_", "other_") },
+    { detail: `${importPath}:2:8: error[OSEO2001]: Module has no export 'x'.` },
+    // A load failure away from the literal argument.
+    { detail: importLoadDetail.replace(":2:8:", ":2:1:") },
+    { detail: importLoadDetail.replace(importPath, importTarget) },
+    // Wrapped, extended, or multi-line details.
+    { detail: `${importLoadDetail}\n` },
+    { detail: `${importLoadDetail} Extra text.` },
+    { detail: `failed (1): stdout="" stderr="${importLoadDetail}\\n"` },
+    { detail: `${importTargetDetails[1]}\n${importLoadDetail}` },
+    // The source must make the literal call; the case must use the feature.
+    { detail: importLoadDetail, sourceText: "// a\nimport(target);\n" },
+    {
+      detail: importTargetDetails[2]!,
+      sourceText: "// a\nimport('./target_FIXTURE.js', {});\n",
+    },
+    { detail: importLoadDetail, features: [] },
+    { detail: importLoadDetail, unsupportedFeatures: ["import-defer"] },
+    // The capability names the build stage that refused the program.
+    { detail: importLoadDetail, capability: "profile-syntax" },
+    { detail: importLoadDetail, capability: "module-resolution-profile" },
+  ];
+  for (const options of cases) {
+    const { audit, inputs } = importFixture(options);
+    assert.throws(
+      () => validateM5cExclusionAudit(stringifyYaml(audit), inputs),
+      /outside the record surface/u,
+      JSON.stringify(options),
+    );
+  }
+});
+
+test("an import() build failure is only an exclusion", () => {
+  for (const disposition of ["deferral", "remediation"] as const) {
+    const { audit, inputs } = importFixture({
+      detail: importTargetDetails[1]!,
+      disposition,
+    });
+    assert.throws(
+      () => validateM5cExclusionAudit(stringifyYaml(audit), inputs),
+      /outside the record surface/u,
+      disposition,
+    );
+  }
+});
+
+test("a refused literal specifier is only a deferral", () => {
+  const resolution = {
+    capability: "module-resolution-profile",
+    detail: importResolutionDetail,
+    sourceText: importResolutionSource,
+  };
+  const { audit, inputs } = importFixture({
+    ...resolution,
+    disposition: "deferral",
+  });
+  assert.deepEqual(validateM5cExclusionAudit(stringifyYaml(audit), inputs), {
+    exclusions: 0,
+    remediation: 0,
+    deferrals: 1,
+    missingDynamicTags: 1,
+  });
+  for (const disposition of ["exclusion", "remediation"] as const) {
+    const other = importFixture({ ...resolution, disposition });
+    assert.throws(
+      () => validateM5cExclusionAudit(stringifyYaml(other.audit), other.inputs),
+      /outside the record surface/u,
+      disposition,
+    );
+  }
+});
+
+test("near-miss specifier refusals stay off the deferral surface", () => {
+  const cases: readonly Parameters<typeof importFixture>[0][] = [
+    // The quoted specifier must be the literal at the reported call.
+    { detail: importResolutionDetail.replace("''", "'foo'") },
+    { detail: importResolutionDetail, sourceText: "// a\nimport('foo');\n" },
+    { detail: importResolutionDetail.replace(":2:8:", ":1:1:") },
+    { detail: importResolutionDetail.replace(importPath, importTarget) },
+    { detail: importResolutionDetail, sourceText: "// a\nimport(x);\n" },
+    // Other codes, messages, and capabilities.
+    { detail: importResolutionDetail.replace("OSEO3001", "OSEO3002") },
+    { detail: importResolutionDetail.replace("Unsupported", "Unknown") },
+    { detail: importResolutionDetail, capability: "profile-syntax" },
+    {
+      detail: importResolutionDetail,
+      capability: "static-specifier-import-build",
+    },
+    { detail: `${importResolutionDetail}\n` },
+    { detail: importResolutionDetail, features: [] },
+  ];
+  for (const options of cases) {
+    const { audit, inputs } = importFixture({
+      capability: "module-resolution-profile",
+      sourceText: importResolutionSource,
+      ...options,
+      disposition: "deferral",
+    });
+    assert.throws(
+      () => validateM5cExclusionAudit(stringifyYaml(audit), inputs),
+      /outside the record surface/u,
+      JSON.stringify(options),
+    );
+  }
+});
+
+test("a deferred import() path on a surface keeps its audit row", () => {
+  for (const options of [
+    {
+      capability: "module-resolution-profile",
+      detail: importResolutionDetail,
+      sourceText: importResolutionSource,
+    },
+    { detail: importLoadDetail },
+  ]) {
+    const { audit, inputs } = importFixture({
+      ...options,
+      disposition: "deferral",
+    });
+    assert.throws(
+      () =>
+        validateM5cExclusionAudit(
+          stringifyYaml({ ...audit, paths: [] }),
+          inputs,
+        ),
+      /Deferred path on a record surface needs its audit row/u,
+      options.detail,
+    );
+  }
+});
+
+test("the audit reads test262 files under annexB, built-ins, language", () => {
+  for (const auditable of [
+    "test/annexB/built-ins/RegExp/RegExp-leading-escape-BMP.js",
+    "test/built-ins/Function/S15.3.2.1_A1_T1.js",
+    "test/language/eval-code/direct/var-env-lower-lex-catch-non-strict.js",
+  ]) {
+    assert.equal(isAuditableUpstreamPath(auditable), true, auditable);
+  }
+  for (const outside of [
+    "test/annexB/built-ins/RegExp/../../../harness/assert.js",
+    "test/annexB/built-ins/RegExp/README.md",
+    "test/annexB/built-ins/RegExp/example.mjs",
+    "test/annexb/built-ins/RegExp/example.js",
+    "test/staging/example.js",
+    "test/intl402/example.js",
+    "harness/assert.js",
+    "test/annexB/built-ins/RegExp/a b.js",
+    "/test/annexB/example.js",
+  ]) {
+    assert.equal(isAuditableUpstreamPath(outside), false, outside);
   }
 });
 

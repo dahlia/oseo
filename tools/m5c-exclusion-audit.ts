@@ -1,6 +1,6 @@
 import { createHash } from "node:crypto";
 import { readFileSync } from "node:fs";
-import { dirname, join, resolve } from "node:path";
+import { dirname, join, posix, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
 import { parse as parseBabel } from "@babel/parser";
@@ -22,7 +22,7 @@ import type {
   StructuredDataRecord,
 } from "./structured-data.ts";
 import { parsedObject } from "./structured-data.ts";
-import { isObject, isString } from "./value-kinds.ts";
+import { isNumber, isObject, isString } from "./value-kinds.ts";
 
 const repositoryRoot = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const auditPath = "docs/m5c-closure/exclusion-audit.yaml";
@@ -108,6 +108,31 @@ const dynamicImportRejection = new RegExp(
     "(?=$|\\r?\\n|\\\\n)",
   "u",
 );
+/**
+ * ADR 0016, as amended for the static-specifier subset, makes a failure to
+ * resolve, load, parse, or link the closure of a literal `import()` a build
+ * diagnostic. The runner reports one such diagnostic as the whole detail,
+ * located in the referrer or in a file it imports.
+ */
+const literalImportDiagnostic = new RegExp(
+  "^(test/[A-Za-z0-9_./-]+\\.js):([1-9][0-9]*):([1-9][0-9]*): " +
+    "error\\[(OSEO[0-9]{4})\\]: ([^\\n]*)$",
+  "u",
+);
+/** Build failures of an admitted target that ADR 0016 accounts for. */
+const importTargetFailures: readonly (readonly [string, RegExp])[] = [
+  ["OSEO0001", /^Source could not be parsed\.$/u],
+  ["OSEO2001", /^Export '[^'\\]+' is ambiguous\.$/u],
+  ["OSEO2001", /^Module has no export '[^'\\]+'\.$/u],
+];
+/** A literal target that cannot be read fails at its own call site. */
+const importLoadFailure = /^The module source could not be read\.$/u;
+/**
+ * The resolution profile's refusal of a literal specifier, which *PLAN-DYN.md*
+ * inherits as a deferral: compiling it to a run-time rejection is unbuilt.
+ */
+const importResolutionFailure = /^Unsupported module specifier '(.*)'\.$/u;
+
 /**
  * ADR 0028 excludes only the optional legacy caller expectation, only for
  * its exact selector, and only through the frontmatter rejection of the
@@ -212,6 +237,73 @@ export function hasEvalCall(
     pending.push(...Object.values(node));
   }
   return false;
+}
+
+/** A Babel source position: one-based line, zero-based column. */
+interface SourcePosition {
+  readonly line: number;
+  readonly column: number;
+}
+
+/** Read the start position Babel records in a node's `loc`. */
+function sourceStart(value: StructuredDataInput): SourcePosition | undefined {
+  if (!isObject(value) || Array.isArray(value)) return undefined;
+  // SAFETY: only the two numeric fields below are read, each checked.
+  const start = (value as StructuredDataRecord).start;
+  if (!isObject(start) || Array.isArray(start)) return undefined;
+  // SAFETY: as above.
+  const { line, column } = start as StructuredDataRecord;
+  return isNumber(line) && isNumber(column) ? { line, column } : undefined;
+}
+
+/** One `import()` call whose only argument is a string literal. */
+export interface LiteralImportCall {
+  readonly specifier: string;
+  /** One-based line of the specifier literal, as diagnostics report it. */
+  readonly line: number;
+  /** One-based column of the specifier literal. */
+  readonly column: number;
+}
+
+/**
+ * List the `import()` calls of the static-specifier subset that ADR 0016
+ * admits: one string literal argument and no options. Like hasEvalCall this
+ * reads call syntax, not text in a string or comment.
+ */
+export function literalImportCalls(
+  source: string,
+  mode: Test262Result["case"]["mode"],
+): readonly LiteralImportCall[] {
+  const tree = syntaxNode(parseBabel(source, { sourceType: mode }));
+  const calls: LiteralImportCall[] = [];
+  const pending: StructuredDataInput[] = [tree];
+  while (pending.length > 0) {
+    const value = pending.pop();
+    if (Array.isArray(value)) {
+      pending.push(...value);
+      continue;
+    }
+    const node = syntaxNode(value);
+    if (node == null) continue;
+    const argument = syntaxNode(node.source);
+    const start = sourceStart(argument?.loc);
+    if (
+      node.type === "ImportExpression" &&
+      node.options == null &&
+      node.phase == null &&
+      argument?.type === "StringLiteral" &&
+      isString(argument.value) &&
+      start != null
+    ) {
+      calls.push({
+        specifier: argument.value,
+        line: start.line,
+        column: start.column + 1,
+      });
+    }
+    pending.push(...Object.values(node));
+  }
+  return calls;
 }
 
 /**
@@ -325,6 +417,76 @@ interface RecordSurfaces {
   readonly annexSurface: boolean;
   readonly callerSurface: boolean;
   readonly dynamicSurface: boolean;
+  /** A build failure of a literal `import()` target; ADR 0016 excludes it. */
+  readonly importBuildSurface: boolean;
+  /** A refused literal specifier; only a *PLAN-DYN.md* deferral takes it. */
+  readonly importResolutionSurface: boolean;
+}
+
+/** Which literal import() surface, if any, an observation falls on. */
+interface LiteralImportSurfaces {
+  /** A build failure of a literal `import()` target. */
+  readonly build: boolean;
+  /** A literal specifier the resolution profile refuses. */
+  readonly resolution: boolean;
+}
+
+/**
+ * Bind a build diagnostic of the static-specifier subset to the literal
+ * `import()` call that caused it. A target failure must sit in the file a
+ * literal call names, and a load or resolution failure at the specifier of
+ * such a call, whose text a resolution failure quotes. Any other code,
+ * message, location, or capability stays outside both surfaces.
+ */
+function literalImportSurfaces(
+  result: Test262Result,
+  source: string,
+): LiteralImportSurfaces {
+  const outside: LiteralImportSurfaces = { build: false, resolution: false };
+  const capability = result.observation.unsupportedCapability;
+  const match = literalImportDiagnostic.exec(result.observation.detail ?? "");
+  if (
+    match == null ||
+    (capability !== "static-specifier-import-build" &&
+      capability !== "module-resolution-profile") ||
+    !result.case.features.includes("dynamic-import") ||
+    result.unsupportedFeatures.length > 0
+  ) {
+    return outside;
+  }
+  const [, file = "", line = "", column = "", code = "", message = ""] = match;
+  const calls = literalImportCalls(source, result.case.mode);
+  const atCall = (call: LiteralImportCall): boolean =>
+    file === result.case.path &&
+    call.line === Number(line) &&
+    call.column === Number(column);
+  if (capability === "module-resolution-profile") {
+    const refused = importResolutionFailure.exec(message)?.[1];
+    return {
+      build: false,
+      resolution:
+        code === "OSEO3001" &&
+        calls.some((call) => atCall(call) && call.specifier === refused),
+    };
+  }
+  if (code === "OSEO3001" && importLoadFailure.test(message)) {
+    return { build: calls.some(atCall), resolution: false };
+  }
+  const directory = posix.dirname(result.case.path);
+  return {
+    build:
+      file !== result.case.path &&
+      importTargetFailures.some(
+        ([failure, text]) => failure === code && text.test(message),
+      ) &&
+      calls.some(
+        (call) =>
+          (call.specifier.startsWith("./") ||
+            call.specifier.startsWith("../")) &&
+          posix.join(directory, call.specifier) === file,
+      ),
+    resolution: false,
+  };
 }
 
 /**
@@ -379,7 +541,15 @@ function recordSurfaces(result: Test262Result, source: string): RecordSurfaces {
     result.case.features.includes("caller") &&
     result.case.flags.includes("noStrict") &&
     hasCallerRead(source, result.case.mode);
-  return { accessorDetail, annexSurface, callerSurface, dynamicSurface };
+  const imports = literalImportSurfaces(result, source);
+  return {
+    accessorDetail,
+    annexSurface,
+    callerSurface,
+    dynamicSurface,
+    importBuildSurface: imports.build,
+    importResolutionSurface: imports.resolution,
+  };
 }
 
 /** Inputs are explicit so regression tests need no corpus execution. */
@@ -641,8 +811,14 @@ export function validateM5cExclusionAudit(
     ) {
       throw new Error(`Audit observation changed: ${path}.`);
     }
-    const { accessorDetail, annexSurface, callerSurface, dynamicSurface } =
-      recordSurfaces(result, source);
+    const {
+      accessorDetail,
+      annexSurface,
+      callerSurface,
+      dynamicSurface,
+      importBuildSurface,
+      importResolutionSurface,
+    } = recordSurfaces(result, source);
     const lookupMethod = annexLookupRejection.exec(accessorDetail)?.[1];
     // An ADR 0013 row may stand over the eval rejection only in the exact
     // residue selector, only as a bound annex-b-only row a work unit
@@ -671,9 +847,14 @@ export function validateM5cExclusionAudit(
         `Audit needs the exact Annex B residue selector: ${path}.`,
       );
     }
+    // A build failure of a literal import() is an ADR 0016 exclusion and a
+    // refused literal specifier only a deferral; neither surface admits the
+    // other disposition.
     if (
       proposedOwner === dynamicOwner
-        ? !dynamicSurface
+        ? !dynamicSurface &&
+          !(importBuildSurface && excluded) &&
+          !(importResolutionSurface && deferred)
         : proposedOwner === callerOwner
           ? !callerSurface
           : !annexSurface && lookupMethod == null && !annexResidue
@@ -833,6 +1014,8 @@ export function validateM5cExclusionAudit(
     const surfaces = recordSurfaces(result, source);
     if (
       surfaces.dynamicSurface ||
+      surfaces.importBuildSurface ||
+      surfaces.importResolutionSurface ||
       surfaces.annexSurface ||
       surfaces.callerSurface ||
       annexLookupRejection.test(surfaces.accessorDetail)
@@ -880,6 +1063,17 @@ export function validateM5cExclusionAudit(
     }
   }
   return { exclusions, remediation, deferrals, missingDynamicTags };
+}
+
+/**
+ * Name a test262 file the audit may read: a `.js` path under *test/annexB/*,
+ * *test/built-ins/*, or *test/language/*, with no `..` segment.
+ */
+export function isAuditableUpstreamPath(path: string): boolean {
+  return (
+    /^test\/(?:annexB|built-ins|language)\/[A-Za-z0-9_./-]+\.js$/u.test(path) &&
+    !path.split("/").includes("..")
+  );
 }
 
 /**
@@ -941,10 +1135,7 @@ export function validateCurrentM5cExclusionAudit(
     ),
     ...deferredPaths,
   ]) {
-    if (
-      !/^test\/(?:built-ins|language)\/[A-Za-z0-9_./-]+\.js$/u.test(path) ||
-      path.split("/").includes("..")
-    ) {
+    if (!isAuditableUpstreamPath(path)) {
       throw new Error(`Audit path is not an upstream test: ${path}.`);
     }
     sources.set(path, readFileSync(join(suite, path), "utf8"));
