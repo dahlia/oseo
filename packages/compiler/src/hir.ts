@@ -211,6 +211,8 @@ export interface HirSwitchCase {
 export interface HirForBindingDeclaration {
   readonly bindingId: number;
   readonly declarationKind: "const" | "let" | "var";
+  /** Present on a `using` or `await using` head; see the const statement. */
+  readonly disposal?: "async" | "sync";
   readonly hint: Hint | undefined;
   readonly initializer: HirExpression;
   readonly kind: "binding";
@@ -236,6 +238,8 @@ export type HirForOfTarget =
   | {
       readonly bindingId: number;
       readonly declarationKind: "const" | "let" | "var";
+      /** Present on a `using` or `await using` head. */
+      readonly disposal?: "async" | "sync";
       readonly hint: Hint | undefined;
       readonly kind: "declaration";
       readonly mutable: boolean;
@@ -325,7 +329,8 @@ export function errorIntrinsicName(
 /**
  * Global names ECMA-262 clause 19 requires of every realm in ECMAScript
  * 2025, the candidate edition ADR 0013 pins, plus the Annex B `escape`
- * and `unescape` that ADR 0032 brings into the claim. A conforming realm
+ * and `unescape` that ADR 0032 brings into the claim and the three
+ * explicit resource management constructors. A conforming realm
  * always resolves these names, so a `typeof` of one can never take the
  * unresolvable reference's `"undefined"` answer; a name this profile has
  * not admitted as a value must be rejected instead of misreported.
@@ -334,6 +339,7 @@ const standardGlobalNames: ReadonlySet<string> = new Set([
   "AggregateError",
   "Array",
   "ArrayBuffer",
+  "AsyncDisposableStack",
   "Atomics",
   "BigInt",
   "BigInt64Array",
@@ -341,6 +347,7 @@ const standardGlobalNames: ReadonlySet<string> = new Set([
   "Boolean",
   "DataView",
   "Date",
+  "DisposableStack",
   "Error",
   "EvalError",
   "FinalizationRegistry",
@@ -368,6 +375,7 @@ const standardGlobalNames: ReadonlySet<string> = new Set([
   "Set",
   "SharedArrayBuffer",
   "String",
+  "SuppressedError",
   "Symbol",
   "SyntaxError",
   "TypeError",
@@ -457,8 +465,10 @@ export function intrinsicGlobalKind(
     name === "Atomics" ||
     name === "BigInt" ||
     name === "Boolean" ||
+    name === "AsyncDisposableStack" ||
     name === "DataView" ||
     name === "Date" ||
+    name === "DisposableStack" ||
     name === "Function" ||
     name === "Iterator" ||
     name === "JSON" ||
@@ -473,6 +483,7 @@ export function intrinsicGlobalKind(
     name === "String" ||
     name === "Set" ||
     name === "SharedArrayBuffer" ||
+    name === "SuppressedError" ||
     name === "Symbol" ||
     name === "FinalizationRegistry" ||
     name === "WeakMap" ||
@@ -1194,6 +1205,12 @@ export type HirStatement =
       readonly bindingId: number;
       readonly hint: Hint | undefined;
       readonly initializer: HirExpression;
+      /**
+       * Present on a `using` (`"sync"`) or `await using` (`"async"`)
+       * declaration, which binds like `const` and also adds its value to
+       * the enclosing scope's DisposeCapability.
+       */
+      readonly disposal?: "async" | "sync";
       readonly kind: "const";
       readonly name: string;
     })

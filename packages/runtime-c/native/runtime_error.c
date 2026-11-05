@@ -60,6 +60,7 @@ static const char *const error_names[OSEO_ERROR_KIND_COUNT] = {
     "TypeError",
     "URIError",
     "AggregateError",
+    "SuppressedError",
 };
 
 static const OseoIntrinsic error_prototype_intrinsics[
@@ -73,6 +74,7 @@ static const OseoIntrinsic error_prototype_intrinsics[
     OSEO_INTRINSIC_TYPE_ERROR_PROTOTYPE,
     OSEO_INTRINSIC_URI_ERROR_PROTOTYPE,
     OSEO_INTRINSIC_AGGREGATE_ERROR_PROTOTYPE,
+    OSEO_INTRINSIC_SUPPRESSED_ERROR_PROTOTYPE,
 };
 
 static const OseoIntrinsic error_constructor_intrinsics[
@@ -86,6 +88,7 @@ static const OseoIntrinsic error_constructor_intrinsics[
     OSEO_INTRINSIC_TYPE_ERROR,
     OSEO_INTRINSIC_URI_ERROR,
     OSEO_INTRINSIC_AGGREGATE_ERROR,
+    OSEO_INTRINSIC_SUPPRESSED_ERROR,
 };
 
 static OseoResult ascii_runtime_string(
@@ -248,7 +251,9 @@ static OseoResult error_intrinsic_pair(
             frame.slots[2],
             name_units,
             name_length,
-            kind == OSEO_ERROR_AGGREGATE ? 2u : 1u,
+            kind == OSEO_ERROR_AGGREGATE
+                ? 2u
+                : kind == OSEO_ERROR_SUPPRESSED ? 3u : 1u,
             OSEO_FUNCTION_ORDINARY,
             oseo_undefined(),
             oseo_undefined(),
@@ -414,17 +419,25 @@ OseoResult oseo_internal_error_construct(
     OseoResult result = oseo_roots_allocate(context, &frame, 8u);
     if (result.status != OSEO_STATUS_NORMAL) return result;
     bool aggregate = kind == OSEO_ERROR_AGGREGATE;
-    frame.slots[0] = aggregate && argument_count > 0u
+    /* SuppressedError(error, suppressed, message), 20.5.7.1, takes no
+     * options argument and so installs no `cause`. */
+    bool suppressed = kind == OSEO_ERROR_SUPPRESSED;
+    frame.slots[0] = (aggregate || suppressed) && argument_count > 0u
         ? arguments[0]
         : oseo_undefined();
-    size_t message_index = aggregate ? 1u : 0u;
+    size_t message_index = aggregate ? 1u : suppressed ? 2u : 0u;
     size_t options_index = aggregate ? 2u : 1u;
     frame.slots[1] = argument_count > message_index
         ? arguments[message_index]
         : oseo_undefined();
-    frame.slots[2] = argument_count > options_index
+    frame.slots[2] = argument_count > options_index && !suppressed
         ? arguments[options_index]
         : oseo_undefined();
+    if (suppressed) {
+        frame.slots[6] = argument_count > 1u
+            ? arguments[1]
+            : oseo_undefined();
+    }
     /* OrdinaryCreateFromConstructor takes the prototype from the new
      * target, so `class E extends Error {}` gives its instances
      * `E.prototype`. A plain call supplies no new target, and `new Error`
@@ -467,11 +480,29 @@ OseoResult oseo_internal_error_construct(
             );
         }
     }
-    if (result.status == OSEO_STATUS_NORMAL) {
+    if (result.status == OSEO_STATUS_NORMAL && !suppressed) {
         result = install_error_cause(
             context,
             frame.slots[3],
             frame.slots[2]
+        );
+    }
+    if (result.status == OSEO_STATUS_NORMAL && suppressed) {
+        result = define_ascii_property(
+            context,
+            frame.slots[3],
+            "error",
+            frame.slots[0],
+            hidden
+        );
+    }
+    if (result.status == OSEO_STATUS_NORMAL && suppressed) {
+        result = define_ascii_property(
+            context,
+            frame.slots[3],
+            "suppressed",
+            frame.slots[6],
+            hidden
         );
     }
     if (result.status == OSEO_STATUS_NORMAL && aggregate) {
@@ -516,6 +547,47 @@ OseoResult oseo_internal_error_construct(
         result.value = frame.slots[3];
     }
     oseo_roots_release(context, &frame);
+    return result;
+}
+
+OseoResult oseo_internal_suppressed_error_create(
+    OseoContext *context,
+    OseoValue error,
+    OseoValue suppressed
+) {
+    const OseoPropertyAttributes hidden = {true, false, true, false};
+    OseoValue slots[3] = {error, suppressed, oseo_undefined()};
+    OseoRootFrame frame = {NULL, slots, 3u};
+    oseo_roots_push(context, &frame);
+    OseoResult result = oseo_internal_error_prototype(
+        context,
+        OSEO_ERROR_SUPPRESSED
+    );
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = oseo_object_create(context, result.value);
+        slots[2] = result.value;
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        ordinary_object(slots[2])->error_data = true;
+        result = define_ascii_property(
+            context,
+            slots[2],
+            "error",
+            slots[0],
+            hidden
+        );
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = define_ascii_property(
+            context,
+            slots[2],
+            "suppressed",
+            slots[1],
+            hidden
+        );
+    }
+    if (result.status == OSEO_STATUS_NORMAL) result.value = slots[2];
+    oseo_roots_pop(context, &frame);
     return result;
 }
 

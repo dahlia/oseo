@@ -203,6 +203,9 @@ static const OseoBuiltinDispatchRange builtin_dispatch_ranges[] = {
     {OSEO_REALM_CODE_ID_RANGE_FIRST,
      OSEO_REALM_CODE_ID_RANGE_LAST,
      oseo_internal_realm_builtin_dispatch},
+    {OSEO_DISPOSAL_CODE_ID_RANGE_FIRST,
+     OSEO_DISPOSAL_CODE_ID_RANGE_LAST,
+     oseo_internal_disposal_builtin_dispatch},
 };
 
 static OseoBuiltinDispatcher builtin_dispatcher(size_t code_id) {
@@ -1188,6 +1191,16 @@ OseoResult oseo_intrinsic(OseoContext *context, OseoIntrinsic intrinsic) {
         OseoErrorKind kind =
             (OseoErrorKind)(intrinsic - OSEO_INTRINSIC_ERROR);
         materialized = oseo_error_intrinsic(context, kind);
+    } else if (intrinsic == OSEO_INTRINSIC_SUPPRESSED_ERROR_PROTOTYPE) {
+        materialized = oseo_internal_error_prototype(
+            context,
+            OSEO_ERROR_SUPPRESSED
+        );
+    } else if (intrinsic == OSEO_INTRINSIC_SUPPRESSED_ERROR) {
+        materialized = oseo_error_intrinsic(context, OSEO_ERROR_SUPPRESSED);
+    } else if (intrinsic >= OSEO_INTRINSIC_DISPOSABLE_STACK_PROTOTYPE &&
+               intrinsic <= OSEO_INTRINSIC_ASYNC_DISPOSABLE_STACK) {
+        materialized = oseo_internal_disposal_intrinsic(context);
     } else if (intrinsic == OSEO_INTRINSIC_EVAL) {
         materialized = oseo_internal_eval_intrinsic(context);
     } else if (intrinsic == OSEO_INTRINSIC_THROW_TYPE_ERROR) {

@@ -785,6 +785,8 @@ export interface SyntaxSwitchCase {
 /** One identifier binding declared by a classic for statement head. */
 export interface SyntaxForBindingDeclaration {
   readonly declarationKind: "const" | "let" | "var";
+  /** Present on a `using` or `await using` head; see the const statement. */
+  readonly disposal?: "async" | "sync";
   readonly hint: Hint | undefined;
   readonly initializer: SyntaxExpression;
   readonly kind: "binding";
@@ -810,6 +812,8 @@ export type SyntaxForDeclaration =
 export type SyntaxForOfTarget =
   | {
       readonly declarationKind: "const" | "let" | "var";
+      /** Present on a `using` or `await using` head. */
+      readonly disposal?: "async" | "sync";
       readonly hint: Hint | undefined;
       readonly kind: "declaration";
       readonly name: string;
@@ -894,6 +898,12 @@ export type SyntaxLexicalDeclarator =
   | (LocatedSyntax & {
       readonly hint: Hint | undefined;
       readonly initializer: SyntaxExpression;
+      /**
+       * Present on a `using` (`"sync"`) or `await using` (`"async"`)
+       * declaration, which binds like `const` and also adds its value to
+       * the enclosing scope's DisposeCapability.
+       */
+      readonly disposal?: "async" | "sync";
       readonly kind: "const";
       readonly name: string;
     })
@@ -1030,6 +1040,12 @@ export type SyntaxStatement =
   | (LocatedSyntax & {
       readonly hint: Hint | undefined;
       readonly initializer: SyntaxExpression;
+      /**
+       * Present on a `using` (`"sync"`) or `await using` (`"async"`)
+       * declaration, which binds like `const` and also adds its value to
+       * the enclosing scope's DisposeCapability.
+       */
+      readonly disposal?: "async" | "sync";
       readonly kind: "const";
       readonly name: string;
     })

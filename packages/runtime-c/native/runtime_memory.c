@@ -170,7 +170,8 @@ static void trace_object(
                object->kind == OSEO_HEAP_WEAK_MAP ||
                object->kind == OSEO_HEAP_WEAK_SET ||
                object->kind == OSEO_HEAP_WEAK_REF ||
-               object->kind == OSEO_HEAP_FINALIZATION_REGISTRY_OBJECT) {
+               object->kind == OSEO_HEAP_FINALIZATION_REGISTRY_OBJECT ||
+               object->kind == OSEO_HEAP_DISPOSABLE_STACK) {
         OseoOrdinaryObject *ordinary = (OseoOrdinaryObject *)object;
         mark_value(ordinary->prototype, worklist);
         if (ordinary->primitive_data) {
@@ -311,6 +312,19 @@ static void trace_object(
                 ((OseoFinalizationRegistryObject *)object)->registry,
                 worklist
             );
+        } else if (object->kind == OSEO_HEAP_DISPOSABLE_STACK) {
+            OseoDisposableStack *stack = (OseoDisposableStack *)object;
+            mark_value(stack->capability, worklist);
+            mark_value(stack->error, worklist);
+            mark_value(stack->await_value, worklist);
+            mark_value(stack->promise, worklist);
+            mark_value(stack->on_fulfilled, worklist);
+            mark_value(stack->on_rejected, worklist);
+            for (size_t index = 0u;
+                 index < stack->resource_count;
+                 index += 1u) {
+                mark_value(stack->resources[index], worklist);
+            }
         }
     } else if (object->kind == OSEO_HEAP_PROMISE_REACTION) {
         OseoPromiseReaction *reaction = (OseoPromiseReaction *)object;
@@ -613,7 +627,8 @@ static void destroy_heap_object(OseoHeapObject *object) {
         object->kind == OSEO_HEAP_WEAK_MAP ||
         object->kind == OSEO_HEAP_WEAK_SET ||
         object->kind == OSEO_HEAP_WEAK_REF ||
-        object->kind == OSEO_HEAP_FINALIZATION_REGISTRY_OBJECT) {
+        object->kind == OSEO_HEAP_FINALIZATION_REGISTRY_OBJECT ||
+        object->kind == OSEO_HEAP_DISPOSABLE_STACK) {
         OseoOrdinaryObject *ordinary = (OseoOrdinaryObject *)object;
         free(ordinary->properties);
         free(ordinary->private_elements);
@@ -629,6 +644,8 @@ static void destroy_heap_object(OseoHeapObject *object) {
             free(((OseoMap *)object)->entries);
         } else if (object->kind == OSEO_HEAP_SET) {
             free(((OseoSet *)object)->elements);
+        } else if (object->kind == OSEO_HEAP_DISPOSABLE_STACK) {
+            free(((OseoDisposableStack *)object)->resources);
         }
     } else if (object->kind == OSEO_HEAP_REALM) {
         oseo_internal_realm_release(&((OseoRealmRecord *)object)->realm);

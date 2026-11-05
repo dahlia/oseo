@@ -158,6 +158,7 @@ typedef enum {
     OSEO_ERROR_TYPE = 5,
     OSEO_ERROR_URI = 6,
     OSEO_ERROR_AGGREGATE = 7,
+    OSEO_ERROR_SUPPRESSED = 8,
 } OseoErrorKind;
 
 /*
@@ -441,7 +442,13 @@ typedef enum {
     OSEO_INTRINSIC_FLOAT16_ARRAY = 272,
     OSEO_INTRINSIC_ESCAPE = 273,
     OSEO_INTRINSIC_UNESCAPE = 274,
-    OSEO_INTRINSIC_COUNT = 275,
+    OSEO_INTRINSIC_SUPPRESSED_ERROR_PROTOTYPE = 275,
+    OSEO_INTRINSIC_SUPPRESSED_ERROR = 276,
+    OSEO_INTRINSIC_DISPOSABLE_STACK_PROTOTYPE = 277,
+    OSEO_INTRINSIC_DISPOSABLE_STACK = 278,
+    OSEO_INTRINSIC_ASYNC_DISPOSABLE_STACK_PROTOTYPE = 279,
+    OSEO_INTRINSIC_ASYNC_DISPOSABLE_STACK = 280,
+    OSEO_INTRINSIC_COUNT = 281,
 } OseoIntrinsic;
 
 typedef struct {
@@ -642,7 +649,7 @@ struct OseoContext {
      * The agent's well-known symbols are a separate edition-fixed table
      * that every realm of the context shares.
      */
-    OseoValue well_known_symbols[13];
+    OseoValue well_known_symbols[15];
     /*
      * The agent's representatives of GlobalSymbolRegistry entries. The
      * registry itself is process-wide; this open-addressed table, whose
@@ -2028,6 +2035,53 @@ OseoResult oseo_iterator_close(
     OseoValue iterator,
     bool from_error
 );
+/*
+ * The DisposeCapability of one `using` or `await using` scope (ADR 0017
+ * cleanup region). `create` makes an empty capability, and `add` performs
+ * AddDisposableResource for one declared value and returns that value.
+ * `dispose` runs DisposeResources synchronously from the pending
+ * completion, given whether it is a throw and its value; it throws only
+ * when a dispose method failed, with that error or a SuppressedError
+ * chain, and otherwise lets the region resume its own completion.
+ *
+ * The asynchronous form runs in the generated frame (ADR 0011). `begin`
+ * starts DisposeResources and stops at its first Await; while `awaiting`
+ * answers true, generated code awaits `await_value` and passes the
+ * settlement to `continue`, which runs to the next Await or the end.
+ * `result` then reports the final completion the way `dispose` does. A
+ * scope that holds no resource finishes inside `begin` without awaiting.
+ */
+OseoResult oseo_dispose_scope_create(OseoContext *context, bool async);
+OseoResult oseo_dispose_scope_add(
+    OseoContext *context,
+    OseoValue scope,
+    OseoValue value,
+    bool async
+);
+OseoResult oseo_dispose_scope_dispose(
+    OseoContext *context,
+    OseoValue scope,
+    bool throwing,
+    OseoValue completion
+);
+OseoResult oseo_dispose_scope_begin(
+    OseoContext *context,
+    OseoValue scope,
+    bool throwing,
+    OseoValue completion
+);
+OseoResult oseo_dispose_scope_awaiting(OseoContext *context, OseoValue scope);
+OseoResult oseo_dispose_scope_await_value(
+    OseoContext *context,
+    OseoValue scope
+);
+OseoResult oseo_dispose_scope_continue(
+    OseoContext *context,
+    OseoValue scope,
+    bool fulfilled,
+    OseoValue value
+);
+OseoResult oseo_dispose_scope_result(OseoContext *context, OseoValue scope);
 /*
  * Acquire an asynchronous iterator through Symbol.asyncIterator, or wrap
  * a synchronous iterator when that method is absent. On success, direct

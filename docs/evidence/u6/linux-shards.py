@@ -28,8 +28,9 @@ EXCLUDED = {
 # candidate CI 41059687055 and the module evaluation driver candidate CI
 # 41574039008. Primitive with boxing, the non-blocking agent, the legacy
 # caller suite, the Annex B escape, String, Date, Object accessor, and
-# function declaration files, and the ECMAScript 2026 built-in files each
-# use a later local Linux extended measurement, not a CI file-shard sum.
+# function declaration files, the ECMAScript 2026 built-in files, and the
+# two explicit resource management files each use a later local Linux
+# extended measurement, not a CI file-shard sum.
 # See the U6 README.
 RETAINED = {
     'tests/property/es2026-iterator-zip.property.test.ts',
@@ -37,6 +38,8 @@ RETAINED = {
     'tests/property/es2026-array-from-async.property.test.ts',
     'tests/property/es2026-uint8array-base64.property.test.ts',
     'tests/property/annexb-function-declarations.property.test.ts',
+    'tests/property/es2027-using-declarations.property.test.ts',
+    'tests/property/es2027-disposal-intrinsics.property.test.ts',
     'tests/property/es2026-iterator-concat.property.test.ts',
     'tests/property/es2026-upsert.property.test.ts',
     'tests/property/es2026-math-sum-precise.property.test.ts',

@@ -291,11 +291,13 @@ function isPropertyOwnedIntrinsicName(name: string): boolean {
     name === "AggregateError" ||
     name === "Array" ||
     name === "ArrayBuffer" ||
+    name === "AsyncDisposableStack" ||
     name === "Atomics" ||
     name === "BigInt" ||
     name === "Boolean" ||
     name === "DataView" ||
     name === "Date" ||
+    name === "DisposableStack" ||
     name === "Error" ||
     name === "EvalError" ||
     name === "Function" ||
@@ -314,6 +316,7 @@ function isPropertyOwnedIntrinsicName(name: string): boolean {
     name === "RangeError" ||
     name === "ReferenceError" ||
     name === "String" ||
+    name === "SuppressedError" ||
     name === "Symbol" ||
     name === "SyntaxError" ||
     name === "TypeError" ||
@@ -4363,6 +4366,10 @@ function resolveStatement(
           declarations.push({
             bindingId: binding.id,
             declarationKind: declaration.declarationKind,
+            ...includePropertiesWhen(() => {
+              if (declaration.disposal == null) return undefined;
+              return { disposal: declaration.disposal };
+            }),
             hint: declaration.hint,
             initializer: inferFunctionName(initializer, declaration.name),
             kind: "binding",

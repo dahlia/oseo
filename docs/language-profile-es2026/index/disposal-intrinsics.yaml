@@ -1,0 +1,3 @@
+version: 1
+id: disposal-intrinsics
+record: docs/language-profile-es2026/families/disposal-intrinsics.yaml

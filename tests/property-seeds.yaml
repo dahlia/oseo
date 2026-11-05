@@ -664,3 +664,11 @@ families:
     owner: tests/property/annexb-function-declarations.property.test.ts
     start: 0x6000a200
     end: 0x6000a2ff
+  - family: es2027-disposal-intrinsics
+    owner: tests/property/es2027-disposal-intrinsics.property.test.ts
+    start: 0x6000a900
+    end: 0x6000a9ff
+  - family: es2027-using-declarations
+    owner: tests/property/es2027-using-declarations.property.test.ts
+    start: 0x6000aa00
+    end: 0x6000aaff

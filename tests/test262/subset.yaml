@@ -93,6 +93,7 @@ supportedFeatures:
   - destructuring-assignment
   - destructuring-binding
   - error-cause
+  - explicit-resource-management
   - exponentiation
   - export-star-as-namespace-from-module
   - for-in-order
@@ -14462,6 +14463,652 @@ tests:
   - path: test/built-ins/ArrayIteratorPrototype/next/property-descriptor.js
     expectedClassification: pass
     dependencies: [functions, iterator-protocol, object-properties, symbols]
+  - path: test/built-ins/AsyncDisposableStack/constructor.js
+    expectedClassification: pass
+    dependencies: [expression-operators]
+  - path: test/built-ins/AsyncDisposableStack/instance-extensible.js
+    expectedClassification: pass
+    dependencies: [object-properties, var-bindings]
+  - path: test/built-ins/AsyncDisposableStack/is-a-constructor.js
+    expectedClassification: pass
+    dependencies: [functions]
+  - path: test/built-ins/AsyncDisposableStack/length.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/AsyncDisposableStack/name.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/AsyncDisposableStack/newtarget-prototype-is-not-object.js
+    expectedClassification: pass
+    dependencies:
+      [functions, object-properties, reflect-namespace, symbols, var-bindings]
+  - path: test/built-ins/AsyncDisposableStack/prop-desc.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/AsyncDisposableStack/proto-from-ctor-realm.js
+    expectedClassification: unsupported-profile-feature
+    dependencies:
+      [
+        dynamic-source,
+        object-properties,
+        reflect-namespace,
+        symbols,
+        var-bindings,
+      ]
+  - path: test/built-ins/AsyncDisposableStack/proto.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/AsyncDisposableStack/prototype-from-newtarget-abrupt.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        expression-operators,
+        functions,
+        object-literals,
+        object-properties,
+        reflect-namespace,
+        var-bindings,
+      ]
+  - path: test/built-ins/AsyncDisposableStack/prototype-from-newtarget-custom.js
+    expectedClassification: pass
+    dependencies:
+      [
+        functions,
+        object-literals,
+        object-properties,
+        reflect-namespace,
+        var-bindings,
+      ]
+  - path: test/built-ins/AsyncDisposableStack/prototype-from-newtarget.js
+    expectedClassification: pass
+    dependencies: [object-properties, var-bindings]
+  - path: test/built-ins/AsyncDisposableStack/prototype/Symbol.asyncDispose.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/AsyncDisposableStack/prototype/Symbol.toStringTag.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/AsyncDisposableStack/prototype/adopt/adds-value-onDisposeAsync.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        functions,
+        object-literals,
+        promise-settlement,
+        var-bindings,
+      ]
+  - path: test/built-ins/AsyncDisposableStack/prototype/adopt/allows-any-value.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        functions,
+        object-literals,
+        promise-settlement,
+        symbols,
+        var-bindings,
+      ]
+  - path: test/built-ins/AsyncDisposableStack/prototype/adopt/length.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/AsyncDisposableStack/prototype/adopt/name.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/AsyncDisposableStack/prototype/adopt/not-a-constructor.js
+    expectedClassification: pass
+    dependencies:
+      [abrupt-completion, error-intrinsics, functions, lexical-bindings]
+  - path: test/built-ins/AsyncDisposableStack/prototype/adopt/prop-desc.js
+    expectedClassification: pass
+    dependencies: [expression-operators, object-properties]
+  - path: test/built-ins/AsyncDisposableStack/prototype/adopt/puts-value-onDisposeAsync-on-top-of-stack.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        functions,
+        object-literals,
+        promise-settlement,
+        var-bindings,
+      ]
+  - path: test/built-ins/AsyncDisposableStack/prototype/adopt/returns-value.js
+    expectedClassification: pass
+    dependencies: [async-functions, functions, object-literals, var-bindings]
+  - path: test/built-ins/AsyncDisposableStack/prototype/adopt/this-does-not-have-internal-asyncdisposablestate-throws.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        error-intrinsics,
+        expression-operators,
+        functions,
+        object-literals,
+        var-bindings,
+      ]
+  - path: test/built-ins/AsyncDisposableStack/prototype/adopt/this-not-object-throws.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        error-intrinsics,
+        expression-operators,
+        functions,
+        symbols,
+        var-bindings,
+      ]
+  - path: test/built-ins/AsyncDisposableStack/prototype/adopt/throws-if-disposed.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        async-functions,
+        error-intrinsics,
+        functions,
+        promise-settlement,
+        var-bindings,
+      ]
+  - path: test/built-ins/AsyncDisposableStack/prototype/adopt/throws-if-onDisposeAsync-not-callable.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        error-intrinsics,
+        object-literals,
+        symbols,
+        var-bindings,
+      ]
+  - path: test/built-ins/AsyncDisposableStack/prototype/constructor.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/AsyncDisposableStack/prototype/defer/adds-onDisposeAsync.js
+    expectedClassification: pass
+    dependencies: [async-functions, functions, promise-settlement, var-bindings]
+  - path: test/built-ins/AsyncDisposableStack/prototype/defer/length.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/AsyncDisposableStack/prototype/defer/name.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/AsyncDisposableStack/prototype/defer/not-a-constructor.js
+    expectedClassification: pass
+    dependencies:
+      [abrupt-completion, error-intrinsics, functions, lexical-bindings]
+  - path: test/built-ins/AsyncDisposableStack/prototype/defer/prop-desc.js
+    expectedClassification: pass
+    dependencies: [expression-operators, object-properties]
+  - path: test/built-ins/AsyncDisposableStack/prototype/defer/puts-onDisposeAsync-on-top-of-stack.js
+    expectedClassification: pass
+    dependencies: [async-functions, functions, promise-settlement, var-bindings]
+  - path: test/built-ins/AsyncDisposableStack/prototype/defer/returns-undefined.js
+    expectedClassification: pass
+    dependencies: [functions, var-bindings]
+  - path: test/built-ins/AsyncDisposableStack/prototype/defer/this-does-not-have-internal-asyncdisposablestate-throws.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        error-intrinsics,
+        expression-operators,
+        functions,
+        object-literals,
+        var-bindings,
+      ]
+  - path: test/built-ins/AsyncDisposableStack/prototype/defer/this-not-object-throws.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        error-intrinsics,
+        expression-operators,
+        functions,
+        symbols,
+        var-bindings,
+      ]
+  - path: test/built-ins/AsyncDisposableStack/prototype/defer/throws-if-disposed.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        async-functions,
+        error-intrinsics,
+        functions,
+        promise-settlement,
+        var-bindings,
+      ]
+  - path: test/built-ins/AsyncDisposableStack/prototype/defer/throws-if-onDisposeAsync-not-callable.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        error-intrinsics,
+        object-literals,
+        symbols,
+        var-bindings,
+      ]
+  - path: test/built-ins/AsyncDisposableStack/prototype/disposeAsync/Symbol.asyncDispose-method-not-async.js
+    expectedClassification: pass
+    dependencies: [object-literals, promise-settlement, symbols, var-bindings]
+  - path: test/built-ins/AsyncDisposableStack/prototype/disposeAsync/disposes-resources-in-reverse-order.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        functions,
+        object-literals,
+        promise-settlement,
+        symbols,
+        var-bindings,
+      ]
+  - path: test/built-ins/AsyncDisposableStack/prototype/disposeAsync/does-not-reinvoke-disposers-if-already-disposed.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        expression-operators,
+        functions,
+        object-literals,
+        promise-settlement,
+        symbols,
+        var-bindings,
+      ]
+  - path: test/built-ins/AsyncDisposableStack/prototype/disposeAsync/does-not-reinvoke-disposers-if-dispose-already-started.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        expression-operators,
+        functions,
+        iterator-protocol,
+        object-literals,
+        promise-settlement,
+        symbols,
+        var-bindings,
+      ]
+  - path: test/built-ins/AsyncDisposableStack/prototype/disposeAsync/does-not-reject-if-already-disposed.js
+    expectedClassification: pass
+    dependencies: [promise-settlement, var-bindings]
+  - path: test/built-ins/AsyncDisposableStack/prototype/disposeAsync/explicit-await-for-null.js
+    expectedClassification: pass
+    dependencies:
+      [functions, iterator-protocol, promise-settlement, symbols, var-bindings]
+  - path: test/built-ins/AsyncDisposableStack/prototype/disposeAsync/explicit-await-for-undefined.js
+    expectedClassification: pass
+    dependencies:
+      [functions, iterator-protocol, promise-settlement, symbols, var-bindings]
+  - path: test/built-ins/AsyncDisposableStack/prototype/disposeAsync/explicit-await-skipped-when-empty.js
+    expectedClassification: pass
+    dependencies:
+      [functions, iterator-protocol, promise-settlement, symbols, var-bindings]
+  - path: test/built-ins/AsyncDisposableStack/prototype/disposeAsync/length.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/AsyncDisposableStack/prototype/disposeAsync/name.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/AsyncDisposableStack/prototype/disposeAsync/not-a-constructor.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        error-intrinsics,
+        functions,
+        lexical-bindings,
+        promise-settlement,
+      ]
+  - path: test/built-ins/AsyncDisposableStack/prototype/disposeAsync/prop-desc.js
+    expectedClassification: pass
+    dependencies: [expression-operators, object-properties]
+  - path: test/built-ins/AsyncDisposableStack/prototype/disposeAsync/rejects-with-error-as-is-if-only-one-error-during-disposal.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        async-functions,
+        classes,
+        functions,
+        promise-settlement,
+        var-bindings,
+      ]
+  - path: test/built-ins/AsyncDisposableStack/prototype/disposeAsync/rejects-with-suppressederror-if-multiple-errors-during-disposal.js
+    expectedClassification: pass
+    dependencies:
+      [classes, functions, object-properties, promise-settlement, var-bindings]
+  - path: test/built-ins/AsyncDisposableStack/prototype/disposeAsync/resolves-to-undefined.js
+    expectedClassification: pass
+    dependencies: [async-functions, functions, promise-settlement, var-bindings]
+  - path: test/built-ins/AsyncDisposableStack/prototype/disposeAsync/returns-promise.js
+    expectedClassification: pass
+    dependencies: [object-properties, promise-settlement, var-bindings]
+  - path: test/built-ins/AsyncDisposableStack/prototype/disposeAsync/sets-state-to-disposed.js
+    expectedClassification: pass
+    dependencies: [promise-settlement, var-bindings]
+  - path: test/built-ins/AsyncDisposableStack/prototype/disposeAsync/this-does-not-have-internal-asyncdisposablestate-rejects.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        error-intrinsics,
+        expression-operators,
+        functions,
+        object-literals,
+        promise-settlement,
+        var-bindings,
+      ]
+  - path: test/built-ins/AsyncDisposableStack/prototype/disposeAsync/this-not-object-rejects.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        error-intrinsics,
+        expression-operators,
+        functions,
+        promise-settlement,
+        symbols,
+        var-bindings,
+      ]
+  - path: test/built-ins/AsyncDisposableStack/prototype/disposed/does-not-have-asyncdisposablestate-internal-slot.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        error-intrinsics,
+        functions,
+        object-properties,
+        var-bindings,
+      ]
+  - path: test/built-ins/AsyncDisposableStack/prototype/disposed/getter.js
+    expectedClassification: pass
+    dependencies: [expression-operators, object-properties, var-bindings]
+  - path: test/built-ins/AsyncDisposableStack/prototype/disposed/length.js
+    expectedClassification: pass
+    dependencies: [object-properties, var-bindings]
+  - path: test/built-ins/AsyncDisposableStack/prototype/disposed/name.js
+    expectedClassification: pass
+    dependencies: [object-properties, var-bindings]
+  - path: test/built-ins/AsyncDisposableStack/prototype/disposed/returns-false-when-not-disposed.js
+    expectedClassification: pass
+    dependencies: [var-bindings]
+  - path: test/built-ins/AsyncDisposableStack/prototype/disposed/returns-true-when-disposed.js
+    expectedClassification: pass
+    dependencies: [promise-settlement, var-bindings]
+  - path: test/built-ins/AsyncDisposableStack/prototype/disposed/this-not-object-throw.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        error-intrinsics,
+        functions,
+        object-properties,
+        symbols,
+        var-bindings,
+      ]
+  - path: test/built-ins/AsyncDisposableStack/prototype/move/does-not-dispose-resources.js
+    expectedClassification: pass
+    dependencies: [functions, var-bindings]
+  - path: test/built-ins/AsyncDisposableStack/prototype/move/length.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/AsyncDisposableStack/prototype/move/name.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/AsyncDisposableStack/prototype/move/not-a-constructor.js
+    expectedClassification: pass
+    dependencies:
+      [abrupt-completion, error-intrinsics, functions, lexical-bindings]
+  - path: test/built-ins/AsyncDisposableStack/prototype/move/prop-desc.js
+    expectedClassification: pass
+    dependencies: [expression-operators, object-properties]
+  - path: test/built-ins/AsyncDisposableStack/prototype/move/returns-new-asyncdisposablestack-that-contains-moved-resources.js
+    expectedClassification: pass
+    dependencies: [async-functions, functions, promise-settlement, var-bindings]
+  - path: test/built-ins/AsyncDisposableStack/prototype/move/returns-new-asyncdisposablestack-that-is-still-pending.js
+    expectedClassification: pass
+    dependencies: [var-bindings]
+  - path: test/built-ins/AsyncDisposableStack/prototype/move/returns-new-asyncdisposablestack.js
+    expectedClassification: pass
+    dependencies: [expression-operators, var-bindings]
+  - path: test/built-ins/AsyncDisposableStack/prototype/move/sets-state-to-disposed.js
+    expectedClassification: pass
+    dependencies: [var-bindings]
+  - path: test/built-ins/AsyncDisposableStack/prototype/move/still-returns-new-asyncdisposablestack-when-subclassed.js
+    expectedClassification: pass
+    dependencies: [classes, expression-operators, var-bindings]
+  - path: test/built-ins/AsyncDisposableStack/prototype/move/this-does-not-have-internal-asyncdisposablestate-throws.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        error-intrinsics,
+        expression-operators,
+        functions,
+        object-literals,
+        var-bindings,
+      ]
+  - path: test/built-ins/AsyncDisposableStack/prototype/move/this-not-object-throws.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        error-intrinsics,
+        expression-operators,
+        functions,
+        symbols,
+        var-bindings,
+      ]
+  - path: test/built-ins/AsyncDisposableStack/prototype/move/throws-if-disposed.js
+    expectedClassification: pass
+    dependencies:
+      [abrupt-completion, error-intrinsics, promise-settlement, var-bindings]
+  - path: test/built-ins/AsyncDisposableStack/prototype/prop-desc.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/AsyncDisposableStack/prototype/proto.js
+    expectedClassification: pass
+    dependencies: [object-properties, var-bindings]
+  - path: test/built-ins/AsyncDisposableStack/prototype/use/Symbol.asyncDispose-getter.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        functions,
+        object-literals,
+        object-properties,
+        promise-settlement,
+        symbols,
+        var-bindings,
+      ]
+  - path: test/built-ins/AsyncDisposableStack/prototype/use/Symbol.dispose-getter.js
+    expectedClassification: pass
+    dependencies:
+      [
+        functions,
+        object-literals,
+        object-properties,
+        promise-settlement,
+        symbols,
+        var-bindings,
+      ]
+  - path: test/built-ins/AsyncDisposableStack/prototype/use/adds-async-disposable-value.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        object-literals,
+        promise-settlement,
+        symbols,
+        var-bindings,
+      ]
+  - path: test/built-ins/AsyncDisposableStack/prototype/use/adds-sync-disposable-value.js
+    expectedClassification: pass
+    dependencies: [object-literals, promise-settlement, symbols, var-bindings]
+  - path: test/built-ins/AsyncDisposableStack/prototype/use/allows-null-value.js
+    expectedClassification: pass
+    dependencies: [promise-settlement, var-bindings]
+  - path: test/built-ins/AsyncDisposableStack/prototype/use/allows-undefined-value.js
+    expectedClassification: pass
+    dependencies: [promise-settlement, var-bindings]
+  - path: test/built-ins/AsyncDisposableStack/prototype/use/gets-value-Symbol.asyncDispose-property-once.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        expression-operators,
+        functions,
+        object-literals,
+        object-properties,
+        promise-settlement,
+        symbols,
+        var-bindings,
+      ]
+  - path: test/built-ins/AsyncDisposableStack/prototype/use/gets-value-Symbol.dispose-property-after-trying-Symbol.asyncDispose.js
+    expectedClassification: pass
+    dependencies:
+      [
+        functions,
+        object-literals,
+        object-properties,
+        promise-settlement,
+        symbols,
+        var-bindings,
+      ]
+  - path: test/built-ins/AsyncDisposableStack/prototype/use/gets-value-Symbol.dispose-property-once.js
+    expectedClassification: pass
+    dependencies:
+      [
+        expression-operators,
+        functions,
+        object-literals,
+        object-properties,
+        promise-settlement,
+        symbols,
+        var-bindings,
+      ]
+  - path: test/built-ins/AsyncDisposableStack/prototype/use/length.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/AsyncDisposableStack/prototype/use/name.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/AsyncDisposableStack/prototype/use/not-a-constructor.js
+    expectedClassification: pass
+    dependencies:
+      [abrupt-completion, error-intrinsics, functions, lexical-bindings]
+  - path: test/built-ins/AsyncDisposableStack/prototype/use/prop-desc.js
+    expectedClassification: pass
+    dependencies: [expression-operators, object-properties]
+  - path: test/built-ins/AsyncDisposableStack/prototype/use/puts-value-on-top-of-stack.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        object-literals,
+        promise-settlement,
+        symbols,
+        var-bindings,
+      ]
+  - path: test/built-ins/AsyncDisposableStack/prototype/use/returns-value.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        object-literals,
+        promise-settlement,
+        symbols,
+        var-bindings,
+      ]
+  - path: test/built-ins/AsyncDisposableStack/prototype/use/this-does-not-have-internal-asyncdisposablestate-throws.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        error-intrinsics,
+        expression-operators,
+        functions,
+        object-literals,
+        var-bindings,
+      ]
+  - path: test/built-ins/AsyncDisposableStack/prototype/use/this-not-object-throws.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        error-intrinsics,
+        expression-operators,
+        functions,
+        symbols,
+        var-bindings,
+      ]
+  - path: test/built-ins/AsyncDisposableStack/prototype/use/throws-if-disposed.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        async-functions,
+        error-intrinsics,
+        functions,
+        object-literals,
+        promise-settlement,
+        symbols,
+        var-bindings,
+      ]
+  - path: test/built-ins/AsyncDisposableStack/prototype/use/throws-if-value-Symbol.asyncDispose-property-is-null-or-undefined.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        error-intrinsics,
+        object-literals,
+        symbols,
+        var-bindings,
+      ]
+  - path: test/built-ins/AsyncDisposableStack/prototype/use/throws-if-value-Symbol.asyncDispose-property-not-callable.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        error-intrinsics,
+        object-literals,
+        symbols,
+        var-bindings,
+      ]
+  - path: test/built-ins/AsyncDisposableStack/prototype/use/throws-if-value-Symbol.dispose-property-is-null-or-undefined.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        error-intrinsics,
+        object-literals,
+        symbols,
+        var-bindings,
+      ]
+  - path: test/built-ins/AsyncDisposableStack/prototype/use/throws-if-value-Symbol.dispose-property-not-callable.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        error-intrinsics,
+        object-literals,
+        symbols,
+        var-bindings,
+      ]
+  - path: test/built-ins/AsyncDisposableStack/prototype/use/throws-if-value-missing-Symbol.asyncDispose-and-Symbol.dispose.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        error-intrinsics,
+        object-literals,
+        symbols,
+        var-bindings,
+      ]
+  - path: test/built-ins/AsyncDisposableStack/prototype/use/throws-if-value-not-object.js
+    expectedClassification: pass
+    dependencies: [abrupt-completion, error-intrinsics, symbols, var-bindings]
+  - path: test/built-ins/AsyncDisposableStack/undefined-newtarget-throws.js
+    expectedClassification: pass
+    dependencies: [abrupt-completion, error-intrinsics]
   - path: test/built-ins/AsyncFromSyncIteratorPrototype/next/absent-value-not-passed.js
     expectedClassification: pass
     dependencies: [async-iteration, iterator-protocol]
@@ -14930,6 +15577,120 @@ tests:
   - path: test/built-ins/AsyncGeneratorPrototype/throw/throw-suspendedYield.js
     expectedClassification: pass
     dependencies: [async-iteration]
+  - path: test/built-ins/AsyncIteratorPrototype/Symbol.asyncDispose/invokes-return.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        functions,
+        iterator-protocol,
+        lexical-bindings,
+        object-properties,
+        promise-settlement,
+        symbols,
+        var-bindings,
+      ]
+  - path: test/built-ins/AsyncIteratorPrototype/Symbol.asyncDispose/is-function.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-iteration,
+        expression-operators,
+        iterator-protocol,
+        lexical-bindings,
+        object-properties,
+        symbols,
+      ]
+  - path: test/built-ins/AsyncIteratorPrototype/Symbol.asyncDispose/length.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-iteration,
+        iterator-protocol,
+        lexical-bindings,
+        object-properties,
+        symbols,
+      ]
+  - path: test/built-ins/AsyncIteratorPrototype/Symbol.asyncDispose/name.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-iteration,
+        iterator-protocol,
+        lexical-bindings,
+        object-properties,
+        symbols,
+      ]
+  - path: test/built-ins/AsyncIteratorPrototype/Symbol.asyncDispose/prop-desc.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-iteration,
+        iterator-protocol,
+        lexical-bindings,
+        object-properties,
+        symbols,
+      ]
+  - path: test/built-ins/AsyncIteratorPrototype/Symbol.asyncDispose/return-val.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-iteration,
+        expression-operators,
+        iterator-protocol,
+        lexical-bindings,
+        object-properties,
+        symbols,
+      ]
+  - path: test/built-ins/AsyncIteratorPrototype/Symbol.asyncDispose/throw-rejected-return.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        async-iteration,
+        expression-operators,
+        functions,
+        iterator-protocol,
+        lexical-bindings,
+        object-literals,
+        object-properties,
+        promise-settlement,
+        symbols,
+        var-bindings,
+      ]
+  - path: test/built-ins/AsyncIteratorPrototype/Symbol.asyncDispose/throw-return-getter.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        async-iteration,
+        expression-operators,
+        functions,
+        iterator-protocol,
+        lexical-bindings,
+        object-literals,
+        object-properties,
+        promise-settlement,
+        symbols,
+        var-bindings,
+      ]
+  - path: test/built-ins/AsyncIteratorPrototype/Symbol.asyncDispose/throw-return.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        async-iteration,
+        expression-operators,
+        functions,
+        iterator-protocol,
+        lexical-bindings,
+        object-literals,
+        object-properties,
+        promise-settlement,
+        symbols,
+        var-bindings,
+      ]
   - path: test/built-ins/AsyncIteratorPrototype/Symbol.asyncIterator/length.js
     expectedClassification: pass
     dependencies: [async-iteration, iterator-protocol]
@@ -19879,6 +20640,469 @@ tests:
   - path: test/built-ins/Date/year-zero.js
     expectedClassification: pass
     dependencies: [date]
+  - path: test/built-ins/DisposableStack/constructor.js
+    expectedClassification: pass
+    dependencies: [expression-operators]
+  - path: test/built-ins/DisposableStack/instance-extensible.js
+    expectedClassification: pass
+    dependencies: [object-properties, var-bindings]
+  - path: test/built-ins/DisposableStack/is-a-constructor.js
+    expectedClassification: pass
+    dependencies: [functions]
+  - path: test/built-ins/DisposableStack/length.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/DisposableStack/name.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/DisposableStack/newtarget-prototype-is-not-object.js
+    expectedClassification: pass
+    dependencies:
+      [functions, object-properties, reflect-namespace, symbols, var-bindings]
+  - path: test/built-ins/DisposableStack/prop-desc.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/DisposableStack/proto-from-ctor-realm.js
+    expectedClassification: unsupported-profile-feature
+    dependencies:
+      [
+        dynamic-source,
+        object-properties,
+        reflect-namespace,
+        symbols,
+        var-bindings,
+      ]
+  - path: test/built-ins/DisposableStack/proto.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/built-ins/DisposableStack/prototype-from-newtarget-abrupt.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        expression-operators,
+        functions,
+        object-literals,
+        object-properties,
+        reflect-namespace,
+        var-bindings,
+      ]
+  - path: test/built-ins/DisposableStack/prototype-from-newtarget-custom.js
+    expectedClassification: pass
+    dependencies:
+      [
+        functions,
+        object-literals,
+        object-properties,
+        reflect-namespace,
+        var-bindings,
+      ]
+  - path: test/built-ins/DisposableStack/prototype-from-newtarget.js
+    expectedClassification: pass
+    dependencies: [object-properties, var-bindings]
+  - path: test/built-ins/DisposableStack/prototype/Symbol.dispose.js
+    expectedClassification: pass
+    dependencies: [object-properties, symbols]
+  - path: test/built-ins/DisposableStack/prototype/Symbol.toStringTag.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/DisposableStack/prototype/adopt/adds-value-onDispose.js
+    expectedClassification: pass
+    dependencies: [functions, object-literals, var-bindings]
+  - path: test/built-ins/DisposableStack/prototype/adopt/allows-any-value.js
+    expectedClassification: pass
+    dependencies: [functions, object-literals, symbols, var-bindings]
+  - path: test/built-ins/DisposableStack/prototype/adopt/length.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/DisposableStack/prototype/adopt/name.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/DisposableStack/prototype/adopt/not-a-constructor.js
+    expectedClassification: pass
+    dependencies:
+      [abrupt-completion, error-intrinsics, functions, lexical-bindings]
+  - path: test/built-ins/DisposableStack/prototype/adopt/prop-desc.js
+    expectedClassification: pass
+    dependencies: [expression-operators, object-properties]
+  - path: test/built-ins/DisposableStack/prototype/adopt/puts-value-onDispose-on-top-of-stack.js
+    expectedClassification: pass
+    dependencies: [functions, object-literals, var-bindings]
+  - path: test/built-ins/DisposableStack/prototype/adopt/returns-value.js
+    expectedClassification: pass
+    dependencies: [functions, object-literals, var-bindings]
+  - path: test/built-ins/DisposableStack/prototype/adopt/this-does-not-have-internal-disposablestate-throws.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        error-intrinsics,
+        expression-operators,
+        functions,
+        object-literals,
+        var-bindings,
+      ]
+  - path: test/built-ins/DisposableStack/prototype/adopt/this-not-object-throws.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        error-intrinsics,
+        expression-operators,
+        functions,
+        symbols,
+        var-bindings,
+      ]
+  - path: test/built-ins/DisposableStack/prototype/adopt/throws-if-disposed.js
+    expectedClassification: pass
+    dependencies: [abrupt-completion, error-intrinsics, functions, var-bindings]
+  - path: test/built-ins/DisposableStack/prototype/adopt/throws-if-onDispose-not-callable.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        error-intrinsics,
+        object-literals,
+        symbols,
+        var-bindings,
+      ]
+  - path: test/built-ins/DisposableStack/prototype/constructor.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/DisposableStack/prototype/defer/adds-onDispose.js
+    expectedClassification: pass
+    dependencies: [functions, var-bindings]
+  - path: test/built-ins/DisposableStack/prototype/defer/length.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/DisposableStack/prototype/defer/name.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/DisposableStack/prototype/defer/not-a-constructor.js
+    expectedClassification: pass
+    dependencies:
+      [abrupt-completion, error-intrinsics, functions, lexical-bindings]
+  - path: test/built-ins/DisposableStack/prototype/defer/prop-desc.js
+    expectedClassification: pass
+    dependencies: [expression-operators, object-properties]
+  - path: test/built-ins/DisposableStack/prototype/defer/puts-onDispose-on-top-of-stack.js
+    expectedClassification: pass
+    dependencies: [functions, var-bindings]
+  - path: test/built-ins/DisposableStack/prototype/defer/returns-undefined.js
+    expectedClassification: pass
+    dependencies: [functions, var-bindings]
+  - path: test/built-ins/DisposableStack/prototype/defer/this-does-not-have-internal-disposablestate-throws.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        error-intrinsics,
+        expression-operators,
+        functions,
+        object-literals,
+        var-bindings,
+      ]
+  - path: test/built-ins/DisposableStack/prototype/defer/this-not-object-throws.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        error-intrinsics,
+        expression-operators,
+        functions,
+        symbols,
+        var-bindings,
+      ]
+  - path: test/built-ins/DisposableStack/prototype/defer/throws-if-disposed.js
+    expectedClassification: pass
+    dependencies: [abrupt-completion, error-intrinsics, functions, var-bindings]
+  - path: test/built-ins/DisposableStack/prototype/defer/throws-if-onDispose-not-callable.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        error-intrinsics,
+        object-literals,
+        symbols,
+        var-bindings,
+      ]
+  - path: test/built-ins/DisposableStack/prototype/dispose/disposes-resources-in-reverse-order.js
+    expectedClassification: pass
+    dependencies: [functions, object-literals, symbols, var-bindings]
+  - path: test/built-ins/DisposableStack/prototype/dispose/does-not-reinvoke-disposers-if-already-disposed.js
+    expectedClassification: pass
+    dependencies:
+      [expression-operators, functions, object-literals, symbols, var-bindings]
+  - path: test/built-ins/DisposableStack/prototype/dispose/does-not-throw-if-already-disposed.js
+    expectedClassification: pass
+    dependencies: [var-bindings]
+  - path: test/built-ins/DisposableStack/prototype/dispose/length.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/DisposableStack/prototype/dispose/name.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/DisposableStack/prototype/dispose/not-a-constructor.js
+    expectedClassification: pass
+    dependencies:
+      [abrupt-completion, error-intrinsics, functions, lexical-bindings]
+  - path: test/built-ins/DisposableStack/prototype/dispose/prop-desc.js
+    expectedClassification: pass
+    dependencies: [expression-operators, object-properties]
+  - path: test/built-ins/DisposableStack/prototype/dispose/returns-undefined.js
+    expectedClassification: pass
+    dependencies: [var-bindings]
+  - path: test/built-ins/DisposableStack/prototype/dispose/sets-state-to-disposed.js
+    expectedClassification: pass
+    dependencies: [var-bindings]
+  - path: test/built-ins/DisposableStack/prototype/dispose/this-does-not-have-internal-disposablestate-throws.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        error-intrinsics,
+        expression-operators,
+        functions,
+        object-literals,
+        var-bindings,
+      ]
+  - path: test/built-ins/DisposableStack/prototype/dispose/this-not-object-throws.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        error-intrinsics,
+        expression-operators,
+        functions,
+        symbols,
+        var-bindings,
+      ]
+  - path: test/built-ins/DisposableStack/prototype/dispose/throws-error-as-is-if-only-one-error-during-disposal.js
+    expectedClassification: pass
+    dependencies: [abrupt-completion, classes, functions, var-bindings]
+  - path: test/built-ins/DisposableStack/prototype/dispose/throws-suppressederror-if-multiple-errors-during-disposal.js
+    expectedClassification: pass
+    dependencies: [classes, expression-operators, functions, var-bindings]
+  - path: test/built-ins/DisposableStack/prototype/disposed/does-not-have-disposablestate-internal-slot.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        error-intrinsics,
+        functions,
+        object-properties,
+        var-bindings,
+      ]
+  - path: test/built-ins/DisposableStack/prototype/disposed/getter.js
+    expectedClassification: pass
+    dependencies: [expression-operators, object-properties, var-bindings]
+  - path: test/built-ins/DisposableStack/prototype/disposed/length.js
+    expectedClassification: pass
+    dependencies: [object-properties, var-bindings]
+  - path: test/built-ins/DisposableStack/prototype/disposed/name.js
+    expectedClassification: pass
+    dependencies: [object-properties, var-bindings]
+  - path: test/built-ins/DisposableStack/prototype/disposed/returns-false-when-not-disposed.js
+    expectedClassification: pass
+    dependencies: [var-bindings]
+  - path: test/built-ins/DisposableStack/prototype/disposed/returns-true-when-disposed.js
+    expectedClassification: pass
+    dependencies: [var-bindings]
+  - path: test/built-ins/DisposableStack/prototype/disposed/this-not-object-throw.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        error-intrinsics,
+        functions,
+        object-properties,
+        symbols,
+        var-bindings,
+      ]
+  - path: test/built-ins/DisposableStack/prototype/move/does-not-dispose-resources.js
+    expectedClassification: pass
+    dependencies: [functions, var-bindings]
+  - path: test/built-ins/DisposableStack/prototype/move/length.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/DisposableStack/prototype/move/name.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/DisposableStack/prototype/move/not-a-constructor.js
+    expectedClassification: pass
+    dependencies:
+      [abrupt-completion, error-intrinsics, functions, lexical-bindings]
+  - path: test/built-ins/DisposableStack/prototype/move/prop-desc.js
+    expectedClassification: pass
+    dependencies: [expression-operators, object-properties]
+  - path: test/built-ins/DisposableStack/prototype/move/returns-new-disposablestack-that-contains-moved-resources.js
+    expectedClassification: pass
+    dependencies: [functions, var-bindings]
+  - path: test/built-ins/DisposableStack/prototype/move/returns-new-disposablestack-that-is-still-pending.js
+    expectedClassification: pass
+    dependencies: [var-bindings]
+  - path: test/built-ins/DisposableStack/prototype/move/returns-new-disposablestack.js
+    expectedClassification: pass
+    dependencies: [expression-operators, var-bindings]
+  - path: test/built-ins/DisposableStack/prototype/move/sets-state-to-disposed.js
+    expectedClassification: pass
+    dependencies: [var-bindings]
+  - path: test/built-ins/DisposableStack/prototype/move/still-returns-new-disposablestack-when-subclassed.js
+    expectedClassification: pass
+    dependencies: [classes, expression-operators, var-bindings]
+  - path: test/built-ins/DisposableStack/prototype/move/this-does-not-have-internal-disposablestate-throws.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        error-intrinsics,
+        expression-operators,
+        functions,
+        object-literals,
+        var-bindings,
+      ]
+  - path: test/built-ins/DisposableStack/prototype/move/this-not-object-throws.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        error-intrinsics,
+        expression-operators,
+        functions,
+        symbols,
+        var-bindings,
+      ]
+  - path: test/built-ins/DisposableStack/prototype/move/throws-if-disposed.js
+    expectedClassification: pass
+    dependencies: [abrupt-completion, error-intrinsics, var-bindings]
+  - path: test/built-ins/DisposableStack/prototype/prop-desc.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/DisposableStack/prototype/proto.js
+    expectedClassification: pass
+    dependencies: [object-properties, var-bindings]
+  - path: test/built-ins/DisposableStack/prototype/use/Symbol.dispose-getter.js
+    expectedClassification: pass
+    dependencies:
+      [functions, object-literals, object-properties, symbols, var-bindings]
+  - path: test/built-ins/DisposableStack/prototype/use/adds-value.js
+    expectedClassification: pass
+    dependencies: [object-literals, symbols, var-bindings]
+  - path: test/built-ins/DisposableStack/prototype/use/allows-null-value.js
+    expectedClassification: pass
+    dependencies: [var-bindings]
+  - path: test/built-ins/DisposableStack/prototype/use/allows-undefined-value.js
+    expectedClassification: pass
+    dependencies: [var-bindings]
+  - path: test/built-ins/DisposableStack/prototype/use/gets-value-Symbol.dispose-property-once.js
+    expectedClassification: pass
+    dependencies:
+      [
+        expression-operators,
+        functions,
+        object-literals,
+        object-properties,
+        symbols,
+        var-bindings,
+      ]
+  - path: test/built-ins/DisposableStack/prototype/use/length.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/DisposableStack/prototype/use/name.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/built-ins/DisposableStack/prototype/use/not-a-constructor.js
+    expectedClassification: pass
+    dependencies:
+      [abrupt-completion, error-intrinsics, functions, lexical-bindings]
+  - path: test/built-ins/DisposableStack/prototype/use/prop-desc.js
+    expectedClassification: pass
+    dependencies: [expression-operators, object-properties]
+  - path: test/built-ins/DisposableStack/prototype/use/puts-value-on-top-of-stack.js
+    expectedClassification: pass
+    dependencies: [object-literals, symbols, var-bindings]
+  - path: test/built-ins/DisposableStack/prototype/use/returns-value.js
+    expectedClassification: pass
+    dependencies: [object-literals, symbols, var-bindings]
+  - path: test/built-ins/DisposableStack/prototype/use/this-does-not-have-internal-disposablestate-throws.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        error-intrinsics,
+        expression-operators,
+        functions,
+        object-literals,
+        var-bindings,
+      ]
+  - path: test/built-ins/DisposableStack/prototype/use/this-not-object-throws.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        error-intrinsics,
+        expression-operators,
+        functions,
+        symbols,
+        var-bindings,
+      ]
+  - path: test/built-ins/DisposableStack/prototype/use/throws-if-disposed.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        error-intrinsics,
+        functions,
+        object-literals,
+        symbols,
+        var-bindings,
+      ]
+  - path: test/built-ins/DisposableStack/prototype/use/throws-if-value-Symbol.dispose-property-is-null.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        error-intrinsics,
+        object-literals,
+        symbols,
+        var-bindings,
+      ]
+  - path: test/built-ins/DisposableStack/prototype/use/throws-if-value-Symbol.dispose-property-is-undefined.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        error-intrinsics,
+        object-literals,
+        symbols,
+        var-bindings,
+      ]
+  - path: test/built-ins/DisposableStack/prototype/use/throws-if-value-Symbol.dispose-property-not-callable.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        error-intrinsics,
+        object-literals,
+        symbols,
+        var-bindings,
+      ]
+  - path: test/built-ins/DisposableStack/prototype/use/throws-if-value-missing-Symbol.dispose.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        error-intrinsics,
+        object-literals,
+        symbols,
+        var-bindings,
+      ]
+  - path: test/built-ins/DisposableStack/prototype/use/throws-if-value-not-object.js
+    expectedClassification: pass
+    dependencies: [abrupt-completion, error-intrinsics, symbols, var-bindings]
+  - path: test/built-ins/DisposableStack/undefined-newtarget-throws.js
+    expectedClassification: pass
+    dependencies: [abrupt-completion, error-intrinsics]
   - path: test/built-ins/Error/cause_abrupt.js
     expectedClassification: pass
     dependencies:
@@ -23299,6 +24523,43 @@ tests:
   - path: test/built-ins/Iterator/proto.js
     expectedClassification: pass
     dependencies: [iterator-protocol]
+  - path: test/built-ins/Iterator/prototype/Symbol.dispose/invokes-return.js
+    expectedClassification: pass
+    dependencies:
+      [
+        functions,
+        iterator-protocol,
+        lexical-bindings,
+        object-properties,
+        symbols,
+        var-bindings,
+      ]
+  - path: test/built-ins/Iterator/prototype/Symbol.dispose/is-function.js
+    expectedClassification: pass
+    dependencies:
+      [
+        expression-operators,
+        iterator-protocol,
+        lexical-bindings,
+        object-properties,
+        symbols,
+      ]
+  - path: test/built-ins/Iterator/prototype/Symbol.dispose/length.js
+    expectedClassification: pass
+    dependencies:
+      [iterator-protocol, lexical-bindings, object-properties, symbols]
+  - path: test/built-ins/Iterator/prototype/Symbol.dispose/name.js
+    expectedClassification: pass
+    dependencies:
+      [iterator-protocol, lexical-bindings, object-properties, symbols]
+  - path: test/built-ins/Iterator/prototype/Symbol.dispose/prop-desc.js
+    expectedClassification: pass
+    dependencies:
+      [iterator-protocol, lexical-bindings, object-properties, symbols]
+  - path: test/built-ins/Iterator/prototype/Symbol.dispose/return-val.js
+    expectedClassification: pass
+    dependencies:
+      [iterator-protocol, lexical-bindings, object-properties, symbols]
   - path: test/built-ins/Iterator/prototype/Symbol.iterator/is-function.js
     expectedClassification: pass
     dependencies: [iterator-protocol]
@@ -54260,6 +55521,141 @@ tests:
   - path: test/built-ins/StringIteratorPrototype/next/next-missing-internal-slots.js
     expectedClassification: pass
     dependencies: [abrupt-completion, iterator-protocol, symbols]
+  - path: test/built-ins/SuppressedError/is-a-constructor.js
+    expectedClassification: pass
+    dependencies: [error-intrinsics, functions]
+  - path: test/built-ins/SuppressedError/length.js
+    expectedClassification: pass
+    dependencies: [error-intrinsics, object-properties]
+  - path: test/built-ins/SuppressedError/message-method-prop-cast.js
+    expectedClassification: pass
+    dependencies:
+      [
+        error-intrinsics,
+        functions,
+        object-literals,
+        object-properties,
+        var-bindings,
+      ]
+  - path: test/built-ins/SuppressedError/message-method-prop.js
+    expectedClassification: pass
+    dependencies: [error-intrinsics, object-properties, var-bindings]
+  - path: test/built-ins/SuppressedError/message-tostring-abrupt-symbol.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        error-intrinsics,
+        functions,
+        object-literals,
+        symbols,
+        var-bindings,
+      ]
+  - path: test/built-ins/SuppressedError/message-tostring-abrupt.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        error-intrinsics,
+        functions,
+        object-literals,
+        symbols,
+        var-bindings,
+      ]
+  - path: test/built-ins/SuppressedError/message-undefined-no-prop.js
+    expectedClassification: pass
+    dependencies: [error-intrinsics, functions, var-bindings]
+  - path: test/built-ins/SuppressedError/name.js
+    expectedClassification: pass
+    dependencies: [error-intrinsics, object-properties]
+  - path: test/built-ins/SuppressedError/newtarget-is-undefined.js
+    expectedClassification: pass
+    dependencies:
+      [error-intrinsics, expression-operators, object-properties, var-bindings]
+  - path: test/built-ins/SuppressedError/newtarget-proto-custom.js
+    expectedClassification: pass
+    dependencies:
+      [
+        error-intrinsics,
+        functions,
+        object-literals,
+        object-properties,
+        proxy-exotic-object,
+        reflect-namespace,
+        var-bindings,
+      ]
+  - path: test/built-ins/SuppressedError/newtarget-proto-fallback.js
+    expectedClassification: unsupported-profile-feature
+    dependencies:
+      [
+        dynamic-source,
+        error-intrinsics,
+        functions,
+        iterator-protocol,
+        lexical-bindings,
+        object-literals,
+        object-properties,
+        proxy-exotic-object,
+        reflect-namespace,
+        symbols,
+      ]
+  - path: test/built-ins/SuppressedError/newtarget-proto.js
+    expectedClassification: pass
+    dependencies: [error-intrinsics, object-properties, var-bindings]
+  - path: test/built-ins/SuppressedError/order-of-args-evaluation.js
+    expectedClassification: pass
+    dependencies:
+      [
+        error-intrinsics,
+        functions,
+        lexical-bindings,
+        object-literals,
+        object-own-keys,
+      ]
+  - path: test/built-ins/SuppressedError/prop-desc.js
+    expectedClassification: pass
+    dependencies: [error-intrinsics, expression-operators, object-properties]
+  - path: test/built-ins/SuppressedError/proto-from-ctor-realm.js
+    expectedClassification: unsupported-profile-feature
+    dependencies:
+      [
+        dynamic-source,
+        error-intrinsics,
+        object-properties,
+        reflect-namespace,
+        symbols,
+        var-bindings,
+      ]
+  - path: test/built-ins/SuppressedError/proto.js
+    expectedClassification: pass
+    dependencies: [error-intrinsics, object-properties, var-bindings]
+  - path: test/built-ins/SuppressedError/prototype/constructor.js
+    expectedClassification: pass
+    dependencies: [error-intrinsics, object-properties]
+  - path: test/built-ins/SuppressedError/prototype/errors-absent-on-prototype.js
+    expectedClassification: pass
+    dependencies: [error-intrinsics]
+  - path: test/built-ins/SuppressedError/prototype/message.js
+    expectedClassification: pass
+    dependencies: [error-intrinsics, object-properties]
+  - path: test/built-ins/SuppressedError/prototype/name.js
+    expectedClassification: pass
+    dependencies: [error-intrinsics, object-properties]
+  - path: test/built-ins/SuppressedError/prototype/prop-desc.js
+    expectedClassification: pass
+    dependencies: [error-intrinsics, expression-operators, object-properties]
+  - path: test/built-ins/SuppressedError/prototype/proto.js
+    expectedClassification: pass
+    dependencies: [error-intrinsics, object-properties, var-bindings]
+  - path: test/built-ins/Symbol/asyncDispose/cross-realm.js
+    expectedClassification: pass
+    dependencies: [object-properties, symbols, var-bindings]
+  - path: test/built-ins/Symbol/asyncDispose/no-key.js
+    expectedClassification: pass
+    dependencies: [symbols]
+  - path: test/built-ins/Symbol/asyncDispose/prop-desc.js
+    expectedClassification: pass
+    dependencies: [expression-operators, object-properties, symbols]
   - path: test/built-ins/Symbol/asyncIterator/cross-realm.js
     expectedClassification: pass
     dependencies: [async-iteration, symbols]
@@ -54281,6 +55677,15 @@ tests:
   - path: test/built-ins/Symbol/desc-to-string.js
     expectedClassification: pass
     dependencies: [symbols]
+  - path: test/built-ins/Symbol/dispose/cross-realm.js
+    expectedClassification: pass
+    dependencies: [object-properties, symbols, var-bindings]
+  - path: test/built-ins/Symbol/dispose/no-key.js
+    expectedClassification: pass
+    dependencies: [symbols]
+  - path: test/built-ins/Symbol/dispose/prop-desc.js
+    expectedClassification: pass
+    dependencies: [expression-operators, object-properties, symbols]
   - path: test/built-ins/Symbol/for/create-value.js
     expectedClassification: pass
     dependencies: [symbols]
@@ -169400,6 +170805,864 @@ tests:
   - path: test/language/statements/async-generator/yield-star-throw-notdone-iter-value-throws.js
     expectedClassification: pass
     dependencies: [async-iteration, iterator-protocol]
+  - path: test/language/statements/await-using/Symbol.asyncDispose-getter.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        functions,
+        lexical-bindings,
+        object-literals,
+        object-properties,
+        promise-settlement,
+        symbols,
+        var-bindings,
+      ]
+  - path: test/language/statements/await-using/Symbol.asyncDispose-method-called-with-correct-this.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        lexical-bindings,
+        object-literals,
+        promise-settlement,
+        symbols,
+        var-bindings,
+      ]
+  - path: test/language/statements/await-using/Symbol.asyncDispose-method-not-async.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        lexical-bindings,
+        object-literals,
+        promise-settlement,
+        symbols,
+        var-bindings,
+      ]
+  - path: test/language/statements/await-using/Symbol.dispose-getter.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        functions,
+        lexical-bindings,
+        object-literals,
+        object-properties,
+        promise-settlement,
+        symbols,
+        var-bindings,
+      ]
+  - path: test/language/statements/await-using/Symbol.dispose-method-called-with-correct-this.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        lexical-bindings,
+        object-literals,
+        promise-settlement,
+        symbols,
+        var-bindings,
+      ]
+  - path: test/language/statements/await-using/await-using-Symbol.asyncDispose-allows-non-promise-return-value.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        lexical-bindings,
+        object-literals,
+        promise-settlement,
+        symbols,
+        var-bindings,
+      ]
+  - path: test/language/statements/await-using/await-using-Symbol.asyncDispose-allows-promiselike-return-value.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        functions,
+        lexical-bindings,
+        object-literals,
+        promise-settlement,
+        symbols,
+        var-bindings,
+      ]
+  - path: test/language/statements/await-using/await-using-allows-null-initializer.js
+    expectedClassification: pass
+    dependencies: [async-functions, lexical-bindings, promise-settlement]
+  - path: test/language/statements/await-using/await-using-allows-undefined-initializer.js
+    expectedClassification: pass
+    dependencies: [lexical-bindings]
+  - path: test/language/statements/await-using/await-using-does-not-imply-await-if-not-evaluated.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        control-flow,
+        functions,
+        lexical-bindings,
+        object-literals,
+        promise-settlement,
+        var-bindings,
+      ]
+  - path: test/language/statements/await-using/await-using-implies-await-if-evaluated.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        functions,
+        lexical-bindings,
+        promise-settlement,
+        var-bindings,
+      ]
+  - path: test/language/statements/await-using/block-local-closure-get-before-initialization.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        async-functions,
+        error-intrinsics,
+        functions,
+        lexical-bindings,
+        promise-settlement,
+      ]
+  - path: test/language/statements/await-using/block-local-use-before-initialization-in-declaration-statement.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        async-functions,
+        error-intrinsics,
+        lexical-bindings,
+        promise-settlement,
+        symbols,
+      ]
+  - path: test/language/statements/await-using/block-local-use-before-initialization-in-prior-statement.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        async-functions,
+        error-intrinsics,
+        lexical-bindings,
+        promise-settlement,
+      ]
+  - path: test/language/statements/await-using/fn-name-arrow.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        functions,
+        lexical-bindings,
+        object-properties,
+        promise-settlement,
+        symbols,
+      ]
+  - path: test/language/statements/await-using/fn-name-class.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        classes,
+        functions,
+        lexical-bindings,
+        object-properties,
+        promise-settlement,
+        symbols,
+      ]
+  - path: test/language/statements/await-using/fn-name-cover.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        functions,
+        lexical-bindings,
+        object-properties,
+        promise-settlement,
+        symbols,
+      ]
+  - path: test/language/statements/await-using/fn-name-fn.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        functions,
+        lexical-bindings,
+        object-properties,
+        promise-settlement,
+        symbols,
+      ]
+  - path: test/language/statements/await-using/fn-name-gen.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        functions,
+        generators,
+        lexical-bindings,
+        object-properties,
+        promise-settlement,
+        symbols,
+      ]
+  - path: test/language/statements/await-using/function-local-closure-get-before-initialization.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        async-functions,
+        error-intrinsics,
+        functions,
+        lexical-bindings,
+        promise-settlement,
+      ]
+  - path: test/language/statements/await-using/function-local-use-before-initialization-in-declaration-statement.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        async-functions,
+        error-intrinsics,
+        lexical-bindings,
+        promise-settlement,
+        symbols,
+      ]
+  - path: test/language/statements/await-using/function-local-use-before-initialization-in-prior-statement.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        async-functions,
+        error-intrinsics,
+        lexical-bindings,
+        promise-settlement,
+      ]
+  - path: test/language/statements/await-using/gets-initializer-Symbol.asyncDispose-property-once.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        expression-operators,
+        functions,
+        lexical-bindings,
+        object-literals,
+        object-properties,
+        promise-settlement,
+        symbols,
+        var-bindings,
+      ]
+  - path: test/language/statements/await-using/gets-initializer-Symbol.dispose-after-Symbol.asyncDispose-is-null.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        functions,
+        lexical-bindings,
+        object-literals,
+        object-properties,
+        promise-settlement,
+        symbols,
+        var-bindings,
+      ]
+  - path: test/language/statements/await-using/gets-initializer-Symbol.dispose-after-Symbol.asyncDispose-is-undefined.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        functions,
+        lexical-bindings,
+        object-literals,
+        object-properties,
+        promise-settlement,
+        symbols,
+        var-bindings,
+      ]
+  - path: test/language/statements/await-using/gets-initializer-Symbol.dispose-property-once.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        expression-operators,
+        functions,
+        lexical-bindings,
+        object-literals,
+        object-properties,
+        promise-settlement,
+        symbols,
+        var-bindings,
+      ]
+  - path: test/language/statements/await-using/gets-initializer-does-not-read-Symbol.dispose-if-Symbol.asyncDispose-exists.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        functions,
+        lexical-bindings,
+        object-literals,
+        object-properties,
+        promise-settlement,
+        symbols,
+        var-bindings,
+      ]
+  - path: test/language/statements/await-using/global-closure-get-before-initialization.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        async-functions,
+        error-intrinsics,
+        functions,
+        lexical-bindings,
+        promise-settlement,
+      ]
+  - path: test/language/statements/await-using/global-use-before-initialization-in-declaration-statement.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        async-functions,
+        error-intrinsics,
+        lexical-bindings,
+        promise-settlement,
+        symbols,
+      ]
+  - path: test/language/statements/await-using/global-use-before-initialization-in-prior-statement.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        async-functions,
+        error-intrinsics,
+        lexical-bindings,
+        promise-settlement,
+      ]
+  - path: test/language/statements/await-using/initializer-Symbol.asyncDispose-called-at-end-of-asyncfunctionbody.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        functions,
+        lexical-bindings,
+        object-literals,
+        promise-settlement,
+        symbols,
+        var-bindings,
+      ]
+  - path: test/language/statements/await-using/initializer-Symbol.asyncDispose-called-at-end-of-asyncgeneratorbody.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        functions,
+        generators,
+        lexical-bindings,
+        object-literals,
+        promise-settlement,
+        symbols,
+        var-bindings,
+      ]
+  - path: test/language/statements/await-using/initializer-Symbol.asyncDispose-called-at-end-of-block.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        lexical-bindings,
+        object-literals,
+        promise-settlement,
+        symbols,
+        var-bindings,
+      ]
+  - path: test/language/statements/await-using/initializer-Symbol.asyncDispose-called-at-end-of-each-iteration-of-forofstatement.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        control-flow,
+        functions,
+        generators,
+        iterator-protocol,
+        lexical-bindings,
+        object-literals,
+        promise-settlement,
+        symbols,
+        var-bindings,
+      ]
+  - path: test/language/statements/await-using/initializer-Symbol.asyncDispose-called-at-end-of-forstatement.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        control-flow,
+        lexical-bindings,
+        object-literals,
+        promise-settlement,
+        symbols,
+        var-bindings,
+      ]
+  - path: test/language/statements/await-using/initializer-Symbol.asyncDispose-called-if-subsequent-initializer-throws-in-forstatement-head.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        async-functions,
+        control-flow,
+        error-intrinsics,
+        expression-operators,
+        functions,
+        lexical-bindings,
+        object-literals,
+        promise-settlement,
+        symbols,
+        var-bindings,
+      ]
+  - path: test/language/statements/await-using/initializer-Symbol.asyncDispose-called-if-subsequent-initializer-throws.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        async-functions,
+        error-intrinsics,
+        functions,
+        lexical-bindings,
+        object-literals,
+        promise-settlement,
+        symbols,
+        var-bindings,
+      ]
+  - path: test/language/statements/await-using/initializer-Symbol.dispose-called-at-end-of-asyncfunctionbody.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        functions,
+        lexical-bindings,
+        object-literals,
+        promise-settlement,
+        symbols,
+        var-bindings,
+      ]
+  - path: test/language/statements/await-using/initializer-Symbol.dispose-called-at-end-of-asyncgeneratorbody.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        functions,
+        generators,
+        lexical-bindings,
+        object-literals,
+        promise-settlement,
+        symbols,
+        var-bindings,
+      ]
+  - path: test/language/statements/await-using/initializer-Symbol.dispose-called-at-end-of-block.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        lexical-bindings,
+        object-literals,
+        promise-settlement,
+        symbols,
+        var-bindings,
+      ]
+  - path: test/language/statements/await-using/initializer-Symbol.dispose-called-at-end-of-each-iteration-of-forofstatement.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        control-flow,
+        functions,
+        generators,
+        iterator-protocol,
+        lexical-bindings,
+        object-literals,
+        promise-settlement,
+        symbols,
+        var-bindings,
+      ]
+  - path: test/language/statements/await-using/initializer-Symbol.dispose-called-at-end-of-forstatement.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        control-flow,
+        lexical-bindings,
+        object-literals,
+        promise-settlement,
+        symbols,
+        var-bindings,
+      ]
+  - path: test/language/statements/await-using/initializer-Symbol.dispose-called-if-subsequent-initializer-throws-in-forstatement-head.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        async-functions,
+        control-flow,
+        error-intrinsics,
+        expression-operators,
+        functions,
+        lexical-bindings,
+        object-literals,
+        promise-settlement,
+        symbols,
+        var-bindings,
+      ]
+  - path: test/language/statements/await-using/initializer-Symbol.dispose-called-if-subsequent-initializer-throws.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        async-functions,
+        error-intrinsics,
+        functions,
+        lexical-bindings,
+        object-literals,
+        promise-settlement,
+        symbols,
+        var-bindings,
+      ]
+  - path: test/language/statements/await-using/multiple-resources-disposed-in-reverse-order.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        lexical-bindings,
+        object-literals,
+        promise-settlement,
+        symbols,
+        var-bindings,
+      ]
+  - path: test/language/statements/await-using/puts-initializer-on-top-of-disposableresourcestack-multiple-bindings.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        lexical-bindings,
+        object-literals,
+        promise-settlement,
+        symbols,
+        var-bindings,
+      ]
+  - path: test/language/statements/await-using/puts-initializer-on-top-of-disposableresourcestack-subsequent-usings.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        lexical-bindings,
+        object-literals,
+        promise-settlement,
+        symbols,
+        var-bindings,
+      ]
+  - path: test/language/statements/await-using/redeclaration-error-from-within-strict-mode-function-await-using.js
+    expectedClassification: expected-negative
+    dependencies: [async-functions, functions, lexical-bindings, var-bindings]
+  - path: test/language/statements/await-using/syntax/await-using-allowed-at-top-level-of-module.js
+    expectedClassification: pass
+    dependencies: [async-functions, lexical-bindings, promise-settlement]
+  - path: test/language/statements/await-using/syntax/await-using-allows-bindingidentifier.js
+    expectedClassification: pass
+    dependencies: [async-functions, lexical-bindings, promise-settlement]
+  - path: test/language/statements/await-using/syntax/await-using-allows-multiple-bindings.js
+    expectedClassification: pass
+    dependencies:
+      [async-functions, functions, lexical-bindings, promise-settlement]
+  - path: test/language/statements/await-using/syntax/await-using-declaring-let-split-across-two-lines.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        expression-operators,
+        lexical-bindings,
+        promise-settlement,
+        var-bindings,
+      ]
+  - path: test/language/statements/await-using/syntax/await-using-invalid-arraybindingpattern-after-bindingidentifier.js
+    expectedClassification: expected-negative
+    dependencies: [async-functions, destructuring-bindings, lexical-bindings]
+  - path: test/language/statements/await-using/syntax/await-using-invalid-arraybindingpattern-does-not-break-element-access.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        lexical-bindings,
+        object-properties,
+        promise-settlement,
+        var-bindings,
+      ]
+  - path: test/language/statements/await-using/syntax/await-using-invalid-arraybindingpattern.js
+    expectedClassification: expected-negative
+    dependencies: [async-functions, destructuring-bindings, lexical-bindings]
+  - path: test/language/statements/await-using/syntax/await-using-invalid-assignment-next-expression-for.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        async-functions,
+        control-flow,
+        error-intrinsics,
+        functions,
+        lexical-bindings,
+        object-literals,
+        promise-settlement,
+        symbols,
+      ]
+  - path: test/language/statements/await-using/syntax/await-using-invalid-assignment-statement-body-for-of.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        async-functions,
+        control-flow,
+        error-intrinsics,
+        functions,
+        iterator-protocol,
+        lexical-bindings,
+        object-literals,
+        promise-settlement,
+        symbols,
+      ]
+  - path: test/language/statements/await-using/syntax/await-using-invalid-for-in.js
+    expectedClassification: expected-negative
+    dependencies: [async-functions, control-flow, lexical-bindings]
+  - path: test/language/statements/await-using/syntax/await-using-invalid-objectbindingpattern-after-bindingidentifier.js
+    expectedClassification: expected-negative
+    dependencies: [async-functions, destructuring-bindings, lexical-bindings]
+  - path: test/language/statements/await-using/syntax/await-using-invalid-objectbindingpattern.js
+    expectedClassification: expected-negative
+    dependencies: [async-functions, destructuring-bindings, lexical-bindings]
+  - path: test/language/statements/await-using/syntax/await-using-invalid-switchstatement-caseclause.js
+    expectedClassification: expected-negative
+    dependencies: [async-functions, control-flow, lexical-bindings]
+  - path: test/language/statements/await-using/syntax/await-using-invalid-switchstatement-defaultclause.js
+    expectedClassification: expected-negative
+    dependencies: [async-functions, control-flow, lexical-bindings]
+  - path: test/language/statements/await-using/syntax/await-using-not-allowed-at-top-level-of-eval.js
+    expectedClassification: unsupported-profile-feature
+    dependencies:
+      [
+        abrupt-completion,
+        dynamic-source,
+        error-intrinsics,
+        lexical-bindings,
+        promise-settlement,
+      ]
+  - path: test/language/statements/await-using/syntax/await-using-not-allowed-at-top-level-of-script.js
+    expectedClassification: expected-negative
+    dependencies: [lexical-bindings]
+  - path: test/language/statements/await-using/syntax/await-using-outer-inner-using-bindings.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        control-flow,
+        lexical-bindings,
+        object-literals,
+        promise-settlement,
+        symbols,
+        var-bindings,
+      ]
+  - path: test/language/statements/await-using/syntax/await-using-valid-for-await-using-of-of.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        control-flow,
+        functions,
+        iterator-protocol,
+        lexical-bindings,
+        promise-settlement,
+        symbols,
+      ]
+  - path: test/language/statements/await-using/syntax/await-using.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        control-flow,
+        lexical-bindings,
+        object-literals,
+        promise-settlement,
+        symbols,
+      ]
+  - path: test/language/statements/await-using/syntax/block-scope-syntax-await-using-declarations-mixed-with-without-initializer.js
+    expectedClassification: expected-negative
+    dependencies: [async-functions, lexical-bindings]
+  - path: test/language/statements/await-using/syntax/block-scope-syntax-await-using-declarations-mixed-without-with-initializer.js
+    expectedClassification: expected-negative
+    dependencies: [async-functions, lexical-bindings]
+  - path: test/language/statements/await-using/syntax/block-scope-syntax-await-using-declarations-without-initializer.js
+    expectedClassification: expected-negative
+    dependencies: [async-functions, lexical-bindings]
+  - path: test/language/statements/await-using/syntax/with-initializer-case-expression-statement-list.js
+    expectedClassification: expected-negative
+    dependencies: [async-functions, control-flow, lexical-bindings]
+  - path: test/language/statements/await-using/syntax/with-initializer-default-statement-list.js
+    expectedClassification: expected-negative
+    dependencies: [async-functions, control-flow, lexical-bindings]
+  - path: test/language/statements/await-using/syntax/with-initializer-do-statement-while-expression.js
+    expectedClassification: expected-negative
+    dependencies: [async-functions, control-flow, lexical-bindings]
+  - path: test/language/statements/await-using/syntax/with-initializer-for-statement.js
+    expectedClassification: expected-negative
+    dependencies: [async-functions, control-flow, lexical-bindings]
+  - path: test/language/statements/await-using/syntax/with-initializer-if-expression-statement-else-statement.js
+    expectedClassification: expected-negative
+    dependencies: [async-functions, control-flow, lexical-bindings]
+  - path: test/language/statements/await-using/syntax/with-initializer-if-expression-statement.js
+    expectedClassification: expected-negative
+    dependencies: [async-functions, control-flow, lexical-bindings]
+  - path: test/language/statements/await-using/syntax/with-initializer-label-statement.js
+    expectedClassification: expected-negative
+    dependencies: [async-functions, control-flow, lexical-bindings]
+  - path: test/language/statements/await-using/syntax/with-initializer-while-expression-statement.js
+    expectedClassification: expected-negative
+    dependencies: [async-functions, control-flow, lexical-bindings]
+  - path: test/language/statements/await-using/syntax/without-initializer-do-statement-while-expression.js
+    expectedClassification: expected-negative
+    dependencies: [async-functions, control-flow, lexical-bindings]
+  - path: test/language/statements/await-using/syntax/without-initializer-for-statement.js
+    expectedClassification: expected-negative
+    dependencies: [async-functions, control-flow, lexical-bindings]
+  - path: test/language/statements/await-using/syntax/without-initializer-if-expression-statement-else-statement.js
+    expectedClassification: expected-negative
+    dependencies: [async-functions, control-flow, lexical-bindings]
+  - path: test/language/statements/await-using/syntax/without-initializer-if-expression-statement.js
+    expectedClassification: expected-negative
+    dependencies: [async-functions, control-flow, lexical-bindings]
+  - path: test/language/statements/await-using/syntax/without-initializer-label-statement.js
+    expectedClassification: expected-negative
+    dependencies: [async-functions, control-flow, lexical-bindings]
+  - path: test/language/statements/await-using/syntax/without-initializer-while-expression-statement.js
+    expectedClassification: expected-negative
+    dependencies: [async-functions, control-flow, lexical-bindings]
+  - path: test/language/statements/await-using/throws-error-as-is-if-only-one-error-during-disposal.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        async-functions,
+        classes,
+        functions,
+        lexical-bindings,
+        object-literals,
+        promise-settlement,
+        symbols,
+      ]
+  - path: test/language/statements/await-using/throws-if-initializer-Symbol.asyncDispose-property-is-null.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        async-functions,
+        error-intrinsics,
+        lexical-bindings,
+        object-literals,
+        promise-settlement,
+        symbols,
+      ]
+  - path: test/language/statements/await-using/throws-if-initializer-Symbol.asyncDispose-property-is-undefined.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        async-functions,
+        error-intrinsics,
+        lexical-bindings,
+        object-literals,
+        promise-settlement,
+        symbols,
+      ]
+  - path: test/language/statements/await-using/throws-if-initializer-Symbol.asyncDispose-property-not-callable.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        async-functions,
+        error-intrinsics,
+        lexical-bindings,
+        object-literals,
+        promise-settlement,
+        symbols,
+        var-bindings,
+      ]
+  - path: test/language/statements/await-using/throws-if-initializer-Symbol.dispose-property-is-null.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        async-functions,
+        error-intrinsics,
+        lexical-bindings,
+        object-literals,
+        promise-settlement,
+        symbols,
+      ]
+  - path: test/language/statements/await-using/throws-if-initializer-Symbol.dispose-property-is-undefined.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        async-functions,
+        error-intrinsics,
+        lexical-bindings,
+        object-literals,
+        promise-settlement,
+        symbols,
+      ]
+  - path: test/language/statements/await-using/throws-if-initializer-Symbol.dispose-property-not-callable.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        async-functions,
+        error-intrinsics,
+        lexical-bindings,
+        object-literals,
+        promise-settlement,
+        symbols,
+        var-bindings,
+      ]
+  - path: test/language/statements/await-using/throws-if-initializer-missing-both-Symbol.asyncDispose-and-Symbol.dispose.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        async-functions,
+        error-intrinsics,
+        lexical-bindings,
+        object-literals,
+        promise-settlement,
+        symbols,
+      ]
+  - path: test/language/statements/await-using/throws-if-initializer-not-object.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        async-functions,
+        error-intrinsics,
+        lexical-bindings,
+        promise-settlement,
+        symbols,
+        var-bindings,
+      ]
+  - path: test/language/statements/await-using/throws-suppressederror-if-multiple-errors-during-disposal.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        async-functions,
+        classes,
+        control-flow,
+        expression-operators,
+        lexical-bindings,
+        object-literals,
+        promise-settlement,
+        symbols,
+      ]
   - path: test/language/statements/block/12.1-1.js
     expectedClassification: expected-negative
     dependencies: [control-flow]
@@ -239339,6 +241602,10 @@ tests:
         iterator-protocol,
         promise-settlement,
       ]
+  - path: test/language/statements/for-await-of/head-await-using-init.js
+    expectedClassification: expected-negative
+    dependencies:
+      [async-functions, async-iteration, control-flow, lexical-bindings]
   - path: test/language/statements/for-await-of/head-const-init.js
     expectedClassification: expected-negative
     dependencies:
@@ -239371,6 +241638,10 @@ tests:
         iterator-protocol,
         promise-settlement,
       ]
+  - path: test/language/statements/for-await-of/head-using-init.js
+    expectedClassification: expected-negative
+    dependencies:
+      [async-functions, async-iteration, control-flow, lexical-bindings]
   - path: test/language/statements/for-await-of/head-var-init.js
     expectedClassification: expected-negative
     dependencies:
@@ -247938,6 +250209,44 @@ tests:
         symbols,
         var-bindings,
       ]
+  - path: test/language/statements/for-of/head-await-using-bound-names-fordecl-tdz.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        async-functions,
+        control-flow,
+        error-intrinsics,
+        functions,
+        iterator-protocol,
+        lexical-bindings,
+        object-literals,
+        promise-settlement,
+        symbols,
+      ]
+  - path: test/language/statements/for-of/head-await-using-bound-names-in-stmt.js
+    expectedClassification: expected-negative
+    dependencies: [control-flow, lexical-bindings]
+  - path: test/language/statements/for-of/head-await-using-bound-names-let.js
+    expectedClassification: expected-negative
+    dependencies: [async-functions, control-flow, lexical-bindings]
+  - path: test/language/statements/for-of/head-await-using-fresh-binding-per-iteration.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        control-flow,
+        expression-operators,
+        functions,
+        iterator-protocol,
+        lexical-bindings,
+        object-literals,
+        promise-settlement,
+        symbols,
+      ]
+  - path: test/language/statements/for-of/head-await-using-init.js
+    expectedClassification: expected-negative
+    dependencies: [async-functions, control-flow, lexical-bindings]
   - path: test/language/statements/for-of/head-const-bound-names-dup.js
     expectedClassification: expected-negative
     dependencies: [control-flow, destructuring-bindings, lexical-bindings]
@@ -248098,6 +250407,39 @@ tests:
   - path: test/language/statements/for-of/head-lhs-non-asnmt-trgt.js
     expectedClassification: expected-negative
     dependencies: [control-flow]
+  - path: test/language/statements/for-of/head-using-bound-names-fordecl-tdz.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        control-flow,
+        error-intrinsics,
+        iterator-protocol,
+        lexical-bindings,
+        object-literals,
+        symbols,
+      ]
+  - path: test/language/statements/for-of/head-using-bound-names-in-stmt.js
+    expectedClassification: expected-negative
+    dependencies: [control-flow, lexical-bindings]
+  - path: test/language/statements/for-of/head-using-bound-names-let.js
+    expectedClassification: expected-negative
+    dependencies: [control-flow, lexical-bindings]
+  - path: test/language/statements/for-of/head-using-fresh-binding-per-iteration.js
+    expectedClassification: pass
+    dependencies:
+      [
+        control-flow,
+        expression-operators,
+        functions,
+        iterator-protocol,
+        lexical-bindings,
+        object-literals,
+        symbols,
+      ]
+  - path: test/language/statements/for-of/head-using-init.js
+    expectedClassification: expected-negative
+    dependencies: [control-flow, lexical-bindings]
   - path: test/language/statements/for-of/head-var-bound-names-dup.js
     expectedClassification: pass
     dependencies:
@@ -263276,6 +265618,387 @@ tests:
   - path: test/language/statements/try/tco-finally.js
     expectedClassification: pass
     dependencies: [control-flow, expression-operators, functions, var-bindings]
+  - path: test/language/statements/using/Symbol.dispose-getter.js
+    expectedClassification: pass
+    dependencies:
+      [
+        functions,
+        lexical-bindings,
+        object-literals,
+        object-properties,
+        symbols,
+        var-bindings,
+      ]
+  - path: test/language/statements/using/Symbol.dispose-method-called-with-correct-this.js
+    expectedClassification: pass
+    dependencies: [lexical-bindings, object-literals, symbols, var-bindings]
+  - path: test/language/statements/using/block-local-closure-get-before-initialization.js
+    expectedClassification: pass
+    dependencies:
+      [abrupt-completion, error-intrinsics, functions, lexical-bindings]
+  - path: test/language/statements/using/block-local-use-before-initialization-in-declaration-statement.js
+    expectedClassification: pass
+    dependencies:
+      [abrupt-completion, error-intrinsics, lexical-bindings, symbols]
+  - path: test/language/statements/using/block-local-use-before-initialization-in-prior-statement.js
+    expectedClassification: pass
+    dependencies: [abrupt-completion, error-intrinsics, lexical-bindings]
+  - path: test/language/statements/using/cptn-value.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [dynamic-source, functions, lexical-bindings]
+  - path: test/language/statements/using/fn-name-arrow.js
+    expectedClassification: pass
+    dependencies: [functions, lexical-bindings, object-properties, symbols]
+  - path: test/language/statements/using/fn-name-class.js
+    expectedClassification: pass
+    dependencies:
+      [classes, functions, lexical-bindings, object-properties, symbols]
+  - path: test/language/statements/using/fn-name-cover.js
+    expectedClassification: pass
+    dependencies: [functions, lexical-bindings, object-properties, symbols]
+  - path: test/language/statements/using/fn-name-fn.js
+    expectedClassification: pass
+    dependencies: [functions, lexical-bindings, object-properties, symbols]
+  - path: test/language/statements/using/fn-name-gen.js
+    expectedClassification: pass
+    dependencies:
+      [functions, generators, lexical-bindings, object-properties, symbols]
+  - path: test/language/statements/using/function-local-closure-get-before-initialization.js
+    expectedClassification: pass
+    dependencies:
+      [abrupt-completion, error-intrinsics, functions, lexical-bindings]
+  - path: test/language/statements/using/function-local-use-before-initialization-in-declaration-statement.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        error-intrinsics,
+        functions,
+        lexical-bindings,
+        symbols,
+      ]
+  - path: test/language/statements/using/function-local-use-before-initialization-in-prior-statement.js
+    expectedClassification: pass
+    dependencies:
+      [abrupt-completion, error-intrinsics, functions, lexical-bindings]
+  - path: test/language/statements/using/gets-initializer-Symbol.dispose-property-once.js
+    expectedClassification: pass
+    dependencies:
+      [
+        expression-operators,
+        functions,
+        lexical-bindings,
+        object-literals,
+        object-properties,
+        symbols,
+        var-bindings,
+      ]
+  - path: test/language/statements/using/global-closure-get-before-initialization.js
+    expectedClassification: pass
+    dependencies:
+      [abrupt-completion, error-intrinsics, functions, lexical-bindings]
+  - path: test/language/statements/using/global-use-before-initialization-in-declaration-statement.js
+    expectedClassification: expected-negative
+    dependencies: [error-intrinsics, lexical-bindings, symbols]
+  - path: test/language/statements/using/global-use-before-initialization-in-prior-statement.js
+    expectedClassification: expected-negative
+    dependencies: [error-intrinsics, lexical-bindings]
+  - path: test/language/statements/using/initializer-disposed-at-end-of-asyncfunctionbody.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        functions,
+        lexical-bindings,
+        object-literals,
+        promise-settlement,
+        symbols,
+        var-bindings,
+      ]
+  - path: test/language/statements/using/initializer-disposed-at-end-of-asyncgeneratorbody.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        functions,
+        generators,
+        lexical-bindings,
+        object-literals,
+        promise-settlement,
+        symbols,
+        var-bindings,
+      ]
+  - path: test/language/statements/using/initializer-disposed-at-end-of-block.js
+    expectedClassification: pass
+    dependencies: [lexical-bindings, object-literals, symbols, var-bindings]
+  - path: test/language/statements/using/initializer-disposed-at-end-of-forstatement.js
+    expectedClassification: pass
+    dependencies:
+      [control-flow, lexical-bindings, object-literals, symbols, var-bindings]
+  - path: test/language/statements/using/initializer-disposed-at-end-of-functionbody.js
+    expectedClassification: pass
+    dependencies:
+      [functions, lexical-bindings, object-literals, symbols, var-bindings]
+  - path: test/language/statements/using/initializer-disposed-at-end-of-generatorbody.js
+    expectedClassification: pass
+    dependencies:
+      [
+        functions,
+        generators,
+        lexical-bindings,
+        object-literals,
+        symbols,
+        var-bindings,
+      ]
+  - path: test/language/statements/using/initializer-disposed-if-subsequent-initializer-throws-in-forstatement-head.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        control-flow,
+        error-intrinsics,
+        expression-operators,
+        functions,
+        lexical-bindings,
+        object-literals,
+        symbols,
+        var-bindings,
+      ]
+  - path: test/language/statements/using/initializer-disposed-if-subsequent-initializer-throws.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        error-intrinsics,
+        functions,
+        lexical-bindings,
+        object-literals,
+        symbols,
+        var-bindings,
+      ]
+  - path: test/language/statements/using/multiple-resources-disposed-in-reverse-order.js
+    expectedClassification: pass
+    dependencies: [lexical-bindings, object-literals, symbols, var-bindings]
+  - path: test/language/statements/using/puts-initializer-on-top-of-disposableresourcestack-multiple-bindings.js
+    expectedClassification: pass
+    dependencies: [lexical-bindings, object-literals, symbols, var-bindings]
+  - path: test/language/statements/using/puts-initializer-on-top-of-disposableresourcestack-subsequent-usings.js
+    expectedClassification: pass
+    dependencies: [lexical-bindings, object-literals, symbols, var-bindings]
+  - path: test/language/statements/using/redeclaration-error-from-within-strict-mode-function-using.js
+    expectedClassification: expected-negative
+    dependencies: [functions, lexical-bindings, var-bindings]
+  - path: test/language/statements/using/static-init-await-binding-invalid.js
+    expectedClassification: expected-negative
+    dependencies: [classes, lexical-bindings]
+  - path: test/language/statements/using/static-init-await-binding-valid.js
+    expectedClassification: pass
+    dependencies: [classes, lexical-bindings]
+  - path: test/language/statements/using/syntax/block-scope-syntax-using-declarations-mixed-with-without-initializer.js
+    expectedClassification: expected-negative
+    dependencies: [lexical-bindings]
+  - path: test/language/statements/using/syntax/block-scope-syntax-using-declarations-mixed-without-with-initializer.js
+    expectedClassification: expected-negative
+    dependencies: [lexical-bindings]
+  - path: test/language/statements/using/syntax/block-scope-syntax-using-declarations-without-initializer.js
+    expectedClassification: expected-negative
+    dependencies: [lexical-bindings]
+  - path: test/language/statements/using/syntax/using-allowed-at-top-level-of-module.js
+    expectedClassification: pass
+    dependencies: [lexical-bindings]
+  - path: test/language/statements/using/syntax/using-allows-bindingidentifier.js
+    expectedClassification: pass
+    dependencies: [lexical-bindings]
+  - path: test/language/statements/using/syntax/using-allows-multiple-bindings.js
+    expectedClassification: pass
+    dependencies: [lexical-bindings]
+  - path: test/language/statements/using/syntax/using-declaring-let-split-across-two-lines.js
+    expectedClassification: pass
+    dependencies: [expression-operators, lexical-bindings, var-bindings]
+  - path: test/language/statements/using/syntax/using-for-statement.js
+    expectedClassification: pass
+    dependencies: [control-flow, lexical-bindings]
+  - path: test/language/statements/using/syntax/using-for-using-of-of.js
+    expectedClassification: pass
+    dependencies:
+      [control-flow, iterator-protocol, lexical-bindings, symbols, var-bindings]
+  - path: test/language/statements/using/syntax/using-invalid-arraybindingpattern-after-bindingidentifier.js
+    expectedClassification: expected-negative
+    dependencies: [destructuring-bindings, lexical-bindings]
+  - path: test/language/statements/using/syntax/using-invalid-arraybindingpattern-does-not-break-element-access.js
+    expectedClassification: pass
+    dependencies: [object-properties, var-bindings]
+  - path: test/language/statements/using/syntax/using-invalid-arraybindingpattern.js
+    expectedClassification: expected-negative
+    dependencies: [destructuring-bindings, lexical-bindings]
+  - path: test/language/statements/using/syntax/using-invalid-assignment-next-expression-for.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        control-flow,
+        error-intrinsics,
+        lexical-bindings,
+        object-literals,
+        symbols,
+      ]
+  - path: test/language/statements/using/syntax/using-invalid-assignment-statement-body-for-of.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        control-flow,
+        error-intrinsics,
+        iterator-protocol,
+        lexical-bindings,
+        object-literals,
+        symbols,
+      ]
+  - path: test/language/statements/using/syntax/using-invalid-for-in.js
+    expectedClassification: expected-negative
+    dependencies: [control-flow, lexical-bindings]
+  - path: test/language/statements/using/syntax/using-invalid-objectbindingpattern-after-bindingidentifier.js
+    expectedClassification: expected-negative
+    dependencies: [destructuring-bindings, lexical-bindings]
+  - path: test/language/statements/using/syntax/using-invalid-objectbindingpattern.js
+    expectedClassification: expected-negative
+    dependencies: [destructuring-bindings, lexical-bindings]
+  - path: test/language/statements/using/syntax/using-invalid-switchstatement-caseclause.js
+    expectedClassification: expected-negative
+    dependencies: [control-flow, lexical-bindings]
+  - path: test/language/statements/using/syntax/using-invalid-switchstatement-defaultclause.js
+    expectedClassification: expected-negative
+    dependencies: [control-flow, lexical-bindings]
+  - path: test/language/statements/using/syntax/using-not-allowed-at-top-level-of-eval.js
+    expectedClassification: unsupported-profile-feature
+    dependencies:
+      [abrupt-completion, dynamic-source, error-intrinsics, lexical-bindings]
+  - path: test/language/statements/using/syntax/using-not-allowed-at-top-level-of-script.js
+    expectedClassification: expected-negative
+    dependencies: [lexical-bindings]
+  - path: test/language/statements/using/syntax/using-outer-inner-using-bindings.js
+    expectedClassification: pass
+    dependencies:
+      [control-flow, lexical-bindings, object-literals, symbols, var-bindings]
+  - path: test/language/statements/using/syntax/using.js
+    expectedClassification: pass
+    dependencies: [control-flow, lexical-bindings, object-literals, symbols]
+  - path: test/language/statements/using/syntax/with-initializer-case-expression-statement-list.js
+    expectedClassification: expected-negative
+    dependencies: [control-flow, lexical-bindings]
+  - path: test/language/statements/using/syntax/with-initializer-default-statement-list.js
+    expectedClassification: expected-negative
+    dependencies: [control-flow, lexical-bindings]
+  - path: test/language/statements/using/syntax/with-initializer-do-statement-while-expression.js
+    expectedClassification: expected-negative
+    dependencies: [control-flow, lexical-bindings]
+  - path: test/language/statements/using/syntax/with-initializer-for-statement.js
+    expectedClassification: expected-negative
+    dependencies: [control-flow, lexical-bindings]
+  - path: test/language/statements/using/syntax/with-initializer-if-expression-statement-else-statement.js
+    expectedClassification: expected-negative
+    dependencies: [control-flow, lexical-bindings]
+  - path: test/language/statements/using/syntax/with-initializer-if-expression-statement.js
+    expectedClassification: expected-negative
+    dependencies: [control-flow, lexical-bindings]
+  - path: test/language/statements/using/syntax/with-initializer-label-statement.js
+    expectedClassification: expected-negative
+    dependencies: [control-flow, lexical-bindings]
+  - path: test/language/statements/using/syntax/with-initializer-while-expression-statement.js
+    expectedClassification: expected-negative
+    dependencies: [control-flow, lexical-bindings]
+  - path: test/language/statements/using/syntax/without-initializer-do-statement-while-expression.js
+    expectedClassification: expected-negative
+    dependencies: [control-flow, lexical-bindings]
+  - path: test/language/statements/using/syntax/without-initializer-for-statement.js
+    expectedClassification: expected-negative
+    dependencies: [control-flow, lexical-bindings]
+  - path: test/language/statements/using/syntax/without-initializer-if-expression-statement-else-statement.js
+    expectedClassification: expected-negative
+    dependencies: [control-flow, lexical-bindings]
+  - path: test/language/statements/using/syntax/without-initializer-if-expression-statement.js
+    expectedClassification: expected-negative
+    dependencies: [control-flow, lexical-bindings]
+  - path: test/language/statements/using/syntax/without-initializer-label-statement.js
+    expectedClassification: expected-negative
+    dependencies: [control-flow, lexical-bindings]
+  - path: test/language/statements/using/syntax/without-initializer-while-expression-statement.js
+    expectedClassification: expected-negative
+    dependencies: [control-flow, lexical-bindings]
+  - path: test/language/statements/using/throws-error-as-is-if-only-one-error-during-disposal.js
+    expectedClassification: pass
+    dependencies:
+      [abrupt-completion, classes, lexical-bindings, object-literals, symbols]
+  - path: test/language/statements/using/throws-if-initializer-Symbol.dispose-property-is-null.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        error-intrinsics,
+        lexical-bindings,
+        object-literals,
+        symbols,
+      ]
+  - path: test/language/statements/using/throws-if-initializer-Symbol.dispose-property-is-undefined.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        error-intrinsics,
+        lexical-bindings,
+        object-literals,
+        symbols,
+      ]
+  - path: test/language/statements/using/throws-if-initializer-Symbol.dispose-property-not-callable.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        error-intrinsics,
+        lexical-bindings,
+        object-literals,
+        symbols,
+        var-bindings,
+      ]
+  - path: test/language/statements/using/throws-if-initializer-missing-Symbol.dispose.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        error-intrinsics,
+        lexical-bindings,
+        object-literals,
+        symbols,
+      ]
+  - path: test/language/statements/using/throws-if-initializer-not-object.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        error-intrinsics,
+        lexical-bindings,
+        symbols,
+        var-bindings,
+      ]
+  - path: test/language/statements/using/throws-suppressederror-if-multiple-errors-during-disposal.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        classes,
+        control-flow,
+        expression-operators,
+        lexical-bindings,
+        object-literals,
+        symbols,
+      ]
+  - path: test/language/statements/using/using-allows-null-initializer.js
+    expectedClassification: pass
+    dependencies: [lexical-bindings]
+  - path: test/language/statements/using/using-allows-undefined-initializer.js
+    expectedClassification: pass
+    dependencies: [lexical-bindings]
   - path: test/language/statements/variable/12.2.1-10-s.js
     expectedClassification: unsupported-profile-feature
     dependencies:

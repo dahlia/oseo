@@ -1,0 +1,3 @@
+version: 1
+id: using-declarations
+record: docs/language-profile-es2026/families/using-declarations.yaml

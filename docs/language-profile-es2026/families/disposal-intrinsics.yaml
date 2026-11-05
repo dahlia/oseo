@@ -1,0 +1,264 @@
+version: 1
+id: disposal-intrinsics
+title: "Explicit resource management built-ins"
+scope:
+  - "SuppressedError: its global binding, constructor shape, [[ErrorData]],
+    message conversion before the error and suppressed properties, the
+    absent cause, and the new-target prototype with its realm fallback."
+  - "Symbol.dispose and Symbol.asyncDispose as the fourteenth and fifteenth
+    well-known symbols, shared by every realm, and the dispose methods of
+    %Iterator.prototype% and %AsyncIteratorPrototype%."
+  - "DisposableStack and AsyncDisposableStack: constructors, prototype
+    members and descriptors, receiver and disposed-state checks, use,
+    adopt, defer, move, the disposed getter, and DisposeResources in
+    reverse order with the SuppressedError chain, including the
+    asynchronous awaits, the null-resource await, and the Symbol.dispose
+    fallback whose result is discarded."
+owners:
+  - docs/language-profile-es2026.md
+evidence:
+  differential:
+    status: covered
+    references:
+      - tests/native/fixtures/disposal-intrinsics.ts
+      - tests/property/es2027-disposal-intrinsics.property.test.ts
+  fixed:
+    status: covered
+    references:
+      - tests/native/fixtures/disposal-intrinsics.ts
+  forced-collection:
+    status: covered
+    references:
+      - tests/disposal-intrinsics-native.test.ts
+      - tests/native/fixtures/disposal-intrinsics.ts
+      - tests/property/es2027-disposal-intrinsics.property.test.ts
+  generated:
+    status: covered
+    references:
+      - tests/property/es2027-disposal-intrinsics.property.test.ts
+  guard-fallback:
+    status: covered
+    references:
+      - tests/disposal-intrinsics-native.test.ts
+      - tests/native/fixtures/disposal-intrinsics.ts
+      - tests/property/es2027-disposal-intrinsics.property.test.ts
+  specialization:
+    status: covered
+    references:
+      - tests/disposal-intrinsics-native.test.ts
+      - tests/native/fixtures/disposal-intrinsics.ts
+      - tests/property/es2027-disposal-intrinsics.property.test.ts
+  standards:
+    status: covered
+    references:
+      - tests/test262/subset.yaml
+      - tests/test262/results.yaml
+      - tests/test262/results/built-ins/AsyncDisposableStack/04.yaml
+      - tests/test262/results/built-ins/AsyncDisposableStack/06.yaml
+      - tests/test262/results/built-ins/AsyncDisposableStack/0d.yaml
+      - tests/test262/results/built-ins/AsyncDisposableStack/13.yaml
+      - tests/test262/results/built-ins/AsyncDisposableStack/15.yaml
+      - tests/test262/results/built-ins/AsyncDisposableStack/18.yaml
+      - tests/test262/results/built-ins/AsyncDisposableStack/1b.yaml
+      - tests/test262/results/built-ins/AsyncDisposableStack/1e.yaml
+      - tests/test262/results/built-ins/AsyncDisposableStack/20.yaml
+      - tests/test262/results/built-ins/AsyncDisposableStack/22.yaml
+      - tests/test262/results/built-ins/AsyncDisposableStack/24.yaml
+      - tests/test262/results/built-ins/AsyncDisposableStack/27.yaml
+      - tests/test262/results/built-ins/AsyncDisposableStack/2d.yaml
+      - tests/test262/results/built-ins/AsyncDisposableStack/32.yaml
+      - tests/test262/results/built-ins/AsyncDisposableStack/33.yaml
+      - tests/test262/results/built-ins/AsyncDisposableStack/37.yaml
+      - tests/test262/results/built-ins/AsyncDisposableStack/38.yaml
+      - tests/test262/results/built-ins/AsyncDisposableStack/46.yaml
+      - tests/test262/results/built-ins/AsyncDisposableStack/49.yaml
+      - tests/test262/results/built-ins/AsyncDisposableStack/4d.yaml
+      - tests/test262/results/built-ins/AsyncDisposableStack/4f.yaml
+      - tests/test262/results/built-ins/AsyncDisposableStack/50.yaml
+      - tests/test262/results/built-ins/AsyncDisposableStack/51.yaml
+      - tests/test262/results/built-ins/AsyncDisposableStack/56.yaml
+      - tests/test262/results/built-ins/AsyncDisposableStack/57.yaml
+      - tests/test262/results/built-ins/AsyncDisposableStack/58.yaml
+      - tests/test262/results/built-ins/AsyncDisposableStack/59.yaml
+      - tests/test262/results/built-ins/AsyncDisposableStack/5e.yaml
+      - tests/test262/results/built-ins/AsyncDisposableStack/60.yaml
+      - tests/test262/results/built-ins/AsyncDisposableStack/64.yaml
+      - tests/test262/results/built-ins/AsyncDisposableStack/66.yaml
+      - tests/test262/results/built-ins/AsyncDisposableStack/67.yaml
+      - tests/test262/results/built-ins/AsyncDisposableStack/68.yaml
+      - tests/test262/results/built-ins/AsyncDisposableStack/69.yaml
+      - tests/test262/results/built-ins/AsyncDisposableStack/6a.yaml
+      - tests/test262/results/built-ins/AsyncDisposableStack/6d.yaml
+      - tests/test262/results/built-ins/AsyncDisposableStack/6e.yaml
+      - tests/test262/results/built-ins/AsyncDisposableStack/71.yaml
+      - tests/test262/results/built-ins/AsyncDisposableStack/72.yaml
+      - tests/test262/results/built-ins/AsyncDisposableStack/76.yaml
+      - tests/test262/results/built-ins/AsyncDisposableStack/77.yaml
+      - tests/test262/results/built-ins/AsyncDisposableStack/7a.yaml
+      - tests/test262/results/built-ins/AsyncDisposableStack/7f.yaml
+      - tests/test262/results/built-ins/AsyncDisposableStack/80.yaml
+      - tests/test262/results/built-ins/AsyncDisposableStack/81.yaml
+      - tests/test262/results/built-ins/AsyncDisposableStack/85.yaml
+      - tests/test262/results/built-ins/AsyncDisposableStack/89.yaml
+      - tests/test262/results/built-ins/AsyncDisposableStack/8a.yaml
+      - tests/test262/results/built-ins/AsyncDisposableStack/8d.yaml
+      - tests/test262/results/built-ins/AsyncDisposableStack/94.yaml
+      - tests/test262/results/built-ins/AsyncDisposableStack/97.yaml
+      - tests/test262/results/built-ins/AsyncDisposableStack/98.yaml
+      - tests/test262/results/built-ins/AsyncDisposableStack/a1.yaml
+      - tests/test262/results/built-ins/AsyncDisposableStack/a5.yaml
+      - tests/test262/results/built-ins/AsyncDisposableStack/a6.yaml
+      - tests/test262/results/built-ins/AsyncDisposableStack/a9.yaml
+      - tests/test262/results/built-ins/AsyncDisposableStack/ac.yaml
+      - tests/test262/results/built-ins/AsyncDisposableStack/b6.yaml
+      - tests/test262/results/built-ins/AsyncDisposableStack/b7.yaml
+      - tests/test262/results/built-ins/AsyncDisposableStack/ba.yaml
+      - tests/test262/results/built-ins/AsyncDisposableStack/c1.yaml
+      - tests/test262/results/built-ins/AsyncDisposableStack/c4.yaml
+      - tests/test262/results/built-ins/AsyncDisposableStack/c5.yaml
+      - tests/test262/results/built-ins/AsyncDisposableStack/c6.yaml
+      - tests/test262/results/built-ins/AsyncDisposableStack/c9.yaml
+      - tests/test262/results/built-ins/AsyncDisposableStack/ca.yaml
+      - tests/test262/results/built-ins/AsyncDisposableStack/cd.yaml
+      - tests/test262/results/built-ins/AsyncDisposableStack/d1.yaml
+      - tests/test262/results/built-ins/AsyncDisposableStack/d3.yaml
+      - tests/test262/results/built-ins/AsyncDisposableStack/d9.yaml
+      - tests/test262/results/built-ins/AsyncDisposableStack/db.yaml
+      - tests/test262/results/built-ins/AsyncDisposableStack/dd.yaml
+      - tests/test262/results/built-ins/AsyncDisposableStack/de.yaml
+      - tests/test262/results/built-ins/AsyncDisposableStack/df.yaml
+      - tests/test262/results/built-ins/AsyncDisposableStack/e2.yaml
+      - tests/test262/results/built-ins/AsyncDisposableStack/e4.yaml
+      - tests/test262/results/built-ins/AsyncDisposableStack/e6.yaml
+      - tests/test262/results/built-ins/AsyncDisposableStack/e7.yaml
+      - tests/test262/results/built-ins/AsyncDisposableStack/eb.yaml
+      - tests/test262/results/built-ins/AsyncDisposableStack/ec.yaml
+      - tests/test262/results/built-ins/AsyncDisposableStack/ed.yaml
+      - tests/test262/results/built-ins/AsyncDisposableStack/ee.yaml
+      - tests/test262/results/built-ins/AsyncDisposableStack/f5.yaml
+      - tests/test262/results/built-ins/AsyncDisposableStack/f6.yaml
+      - tests/test262/results/built-ins/AsyncDisposableStack/fb.yaml
+      - tests/test262/results/built-ins/AsyncDisposableStack/ff.yaml
+      - tests/test262/results/built-ins/AsyncIteratorPrototype/23.yaml
+      - tests/test262/results/built-ins/AsyncIteratorPrototype/2b.yaml
+      - tests/test262/results/built-ins/AsyncIteratorPrototype/3b.yaml
+      - tests/test262/results/built-ins/AsyncIteratorPrototype/63.yaml
+      - tests/test262/results/built-ins/AsyncIteratorPrototype/9b.yaml
+      - tests/test262/results/built-ins/AsyncIteratorPrototype/ad.yaml
+      - tests/test262/results/built-ins/AsyncIteratorPrototype/db.yaml
+      - tests/test262/results/built-ins/AsyncIteratorPrototype/e7.yaml
+      - tests/test262/results/built-ins/AsyncIteratorPrototype/ee.yaml
+      - tests/test262/results/built-ins/DisposableStack/01.yaml
+      - tests/test262/results/built-ins/DisposableStack/04.yaml
+      - tests/test262/results/built-ins/DisposableStack/08.yaml
+      - tests/test262/results/built-ins/DisposableStack/0a.yaml
+      - tests/test262/results/built-ins/DisposableStack/0d.yaml
+      - tests/test262/results/built-ins/DisposableStack/10.yaml
+      - tests/test262/results/built-ins/DisposableStack/14.yaml
+      - tests/test262/results/built-ins/DisposableStack/1e.yaml
+      - tests/test262/results/built-ins/DisposableStack/1f.yaml
+      - tests/test262/results/built-ins/DisposableStack/23.yaml
+      - tests/test262/results/built-ins/DisposableStack/24.yaml
+      - tests/test262/results/built-ins/DisposableStack/25.yaml
+      - tests/test262/results/built-ins/DisposableStack/26.yaml
+      - tests/test262/results/built-ins/DisposableStack/29.yaml
+      - tests/test262/results/built-ins/DisposableStack/2a.yaml
+      - tests/test262/results/built-ins/DisposableStack/2b.yaml
+      - tests/test262/results/built-ins/DisposableStack/2f.yaml
+      - tests/test262/results/built-ins/DisposableStack/30.yaml
+      - tests/test262/results/built-ins/DisposableStack/33.yaml
+      - tests/test262/results/built-ins/DisposableStack/35.yaml
+      - tests/test262/results/built-ins/DisposableStack/3a.yaml
+      - tests/test262/results/built-ins/DisposableStack/49.yaml
+      - tests/test262/results/built-ins/DisposableStack/4a.yaml
+      - tests/test262/results/built-ins/DisposableStack/4b.yaml
+      - tests/test262/results/built-ins/DisposableStack/4c.yaml
+      - tests/test262/results/built-ins/DisposableStack/4d.yaml
+      - tests/test262/results/built-ins/DisposableStack/52.yaml
+      - tests/test262/results/built-ins/DisposableStack/5d.yaml
+      - tests/test262/results/built-ins/DisposableStack/5f.yaml
+      - tests/test262/results/built-ins/DisposableStack/61.yaml
+      - tests/test262/results/built-ins/DisposableStack/64.yaml
+      - tests/test262/results/built-ins/DisposableStack/65.yaml
+      - tests/test262/results/built-ins/DisposableStack/6b.yaml
+      - tests/test262/results/built-ins/DisposableStack/6e.yaml
+      - tests/test262/results/built-ins/DisposableStack/71.yaml
+      - tests/test262/results/built-ins/DisposableStack/73.yaml
+      - tests/test262/results/built-ins/DisposableStack/74.yaml
+      - tests/test262/results/built-ins/DisposableStack/76.yaml
+      - tests/test262/results/built-ins/DisposableStack/78.yaml
+      - tests/test262/results/built-ins/DisposableStack/7e.yaml
+      - tests/test262/results/built-ins/DisposableStack/82.yaml
+      - tests/test262/results/built-ins/DisposableStack/85.yaml
+      - tests/test262/results/built-ins/DisposableStack/87.yaml
+      - tests/test262/results/built-ins/DisposableStack/8a.yaml
+      - tests/test262/results/built-ins/DisposableStack/8b.yaml
+      - tests/test262/results/built-ins/DisposableStack/92.yaml
+      - tests/test262/results/built-ins/DisposableStack/95.yaml
+      - tests/test262/results/built-ins/DisposableStack/9f.yaml
+      - tests/test262/results/built-ins/DisposableStack/a2.yaml
+      - tests/test262/results/built-ins/DisposableStack/a4.yaml
+      - tests/test262/results/built-ins/DisposableStack/a5.yaml
+      - tests/test262/results/built-ins/DisposableStack/a7.yaml
+      - tests/test262/results/built-ins/DisposableStack/aa.yaml
+      - tests/test262/results/built-ins/DisposableStack/b4.yaml
+      - tests/test262/results/built-ins/DisposableStack/b7.yaml
+      - tests/test262/results/built-ins/DisposableStack/bb.yaml
+      - tests/test262/results/built-ins/DisposableStack/bc.yaml
+      - tests/test262/results/built-ins/DisposableStack/bd.yaml
+      - tests/test262/results/built-ins/DisposableStack/bf.yaml
+      - tests/test262/results/built-ins/DisposableStack/c0.yaml
+      - tests/test262/results/built-ins/DisposableStack/c1.yaml
+      - tests/test262/results/built-ins/DisposableStack/cc.yaml
+      - tests/test262/results/built-ins/DisposableStack/d0.yaml
+      - tests/test262/results/built-ins/DisposableStack/db.yaml
+      - tests/test262/results/built-ins/DisposableStack/e0.yaml
+      - tests/test262/results/built-ins/DisposableStack/e1.yaml
+      - tests/test262/results/built-ins/DisposableStack/e2.yaml
+      - tests/test262/results/built-ins/DisposableStack/e6.yaml
+      - tests/test262/results/built-ins/DisposableStack/ea.yaml
+      - tests/test262/results/built-ins/DisposableStack/ee.yaml
+      - tests/test262/results/built-ins/DisposableStack/ef.yaml
+      - tests/test262/results/built-ins/DisposableStack/f0.yaml
+      - tests/test262/results/built-ins/DisposableStack/f5.yaml
+      - tests/test262/results/built-ins/DisposableStack/f6.yaml
+      - tests/test262/results/built-ins/DisposableStack/fa.yaml
+      - tests/test262/results/built-ins/DisposableStack/fb.yaml
+      - tests/test262/results/built-ins/Iterator/23.yaml
+      - tests/test262/results/built-ins/Iterator/36.yaml
+      - tests/test262/results/built-ins/Iterator/42.yaml
+      - tests/test262/results/built-ins/Iterator/6a.yaml
+      - tests/test262/results/built-ins/Iterator/a3.yaml
+      - tests/test262/results/built-ins/Iterator/ce.yaml
+      - tests/test262/results/built-ins/SuppressedError/07.yaml
+      - tests/test262/results/built-ins/SuppressedError/0e.yaml
+      - tests/test262/results/built-ins/SuppressedError/18.yaml
+      - tests/test262/results/built-ins/SuppressedError/22.yaml
+      - tests/test262/results/built-ins/SuppressedError/2b.yaml
+      - tests/test262/results/built-ins/SuppressedError/38.yaml
+      - tests/test262/results/built-ins/SuppressedError/42.yaml
+      - tests/test262/results/built-ins/SuppressedError/44.yaml
+      - tests/test262/results/built-ins/SuppressedError/49.yaml
+      - tests/test262/results/built-ins/SuppressedError/5e.yaml
+      - tests/test262/results/built-ins/SuppressedError/7f.yaml
+      - tests/test262/results/built-ins/SuppressedError/8d.yaml
+      - tests/test262/results/built-ins/SuppressedError/a0.yaml
+      - tests/test262/results/built-ins/SuppressedError/a3.yaml
+      - tests/test262/results/built-ins/SuppressedError/b2.yaml
+      - tests/test262/results/built-ins/SuppressedError/cb.yaml
+      - tests/test262/results/built-ins/SuppressedError/ce.yaml
+      - tests/test262/results/built-ins/SuppressedError/d7.yaml
+      - tests/test262/results/built-ins/SuppressedError/f0.yaml
+      - tests/test262/results/built-ins/SuppressedError/f4.yaml
+      - tests/test262/results/built-ins/SuppressedError/f6.yaml
+      - tests/test262/results/built-ins/Symbol/10.yaml
+      - tests/test262/results/built-ins/Symbol/31.yaml
+      - tests/test262/results/built-ins/Symbol/57.yaml
+      - tests/test262/results/built-ins/Symbol/a3.yaml
+      - tests/test262/results/built-ins/Symbol/d6.yaml
+      - tests/test262/results/built-ins/Symbol/e3.yaml
+      - docs/m5c-closure/exclusion-audit.yaml
+  structural:
+    status: covered
+    references:
+      - packages/runtime-c/tests/intrinsic-graph.test.ts

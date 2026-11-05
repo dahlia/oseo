@@ -468,6 +468,12 @@ static OseoResult global_this_object(OseoContext *context) {
             frame.slots[0]
         );
     }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = oseo_internal_install_disposal_globals(
+            context,
+            frame.slots[0]
+        );
+    }
     static const char *const intrinsic_names[] = {
         "Function",
         "Symbol",
@@ -479,6 +485,7 @@ static OseoResult global_this_object(OseoContext *context) {
         "TypeError",
         "URIError",
         "AggregateError",
+        "SuppressedError",
         "Iterator",
         "eval",
     };
@@ -493,6 +500,7 @@ static OseoResult global_this_object(OseoContext *context) {
         OSEO_INTRINSIC_TYPE_ERROR,
         OSEO_INTRINSIC_URI_ERROR,
         OSEO_INTRINSIC_AGGREGATE_ERROR,
+        OSEO_INTRINSIC_SUPPRESSED_ERROR,
         OSEO_INTRINSIC_ITERATOR,
         OSEO_INTRINSIC_EVAL,
     };

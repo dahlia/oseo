@@ -1592,3 +1592,46 @@ detached from the global object when an earlier Script's lexical declaration
 holds the name, or when the object is not extensible and lacks the property;
 otherwise it binds the entry the way it binds a `var`. Unmarked entries behave
 as before.
+
+ABI `m5-157` adds the explicit resource management built-ins. The well-known
+symbol table grows from thirteen to fifteen entries: `Symbol.asyncDispose` at
+index 13 and `Symbol.dispose` at index 14, after the older entries, so their
+indexes do not move. `SuppressedError` is the ninth error kind
+(`OSEO_ERROR_SUPPRESSED`), with realm slots 275 and 276; its construct code ID
+takes the error range's ninth constructor place, which moves the
+`Error.prototype.toString` and `Error.isError` code IDs down by one. It sets
+`[[ErrorData]]`, defines `message` only for a defined argument, and installs no
+`cause`.
+
+*runtime\_disposal.c* owns the new code range 30. `DisposableStack` and
+`AsyncDisposableStack` take realm slots 277 through 280 and share one heap
+kind, `OSEO_HEAP_DISPOSABLE_STACK` (41). A stack points at a separate
+capability record of the same kind, which holds the DisposeCapability as a
+host buffer of traced triples (value, method, and a flags Number for the hint,
+`adopt`, and the `Symbol.dispose` fallback of an asynchronous hint), plus one
+DisposeResources in progress: the completion, and for the asynchronous form
+the cursor, the needsAwait and hasAwaited flags, the purpose of the pending
+Await, the promise to settle, and the two internal reactions that resume it.
+The collector traces the capability pointer, the triples, and the four value
+fields. `use` captures the capability record before it reads the dispose
+method, and `move` gives that record to a new stack created from the running
+realm's intrinsic prototype and the receiver a fresh one, so a getter that
+moves the stack still adds its resource to the moved stack.
+`%Iterator.prototype%[@@dispose]` and
+`%AsyncIteratorPrototype%[@@asyncDispose]` own no intrinsic slot; the second
+calls `return` with no arguments, as the pinned test262 requires, where the
+pinned Node.js passes `undefined`.
+
+ABI `m5-157` also adds the generated-code operations of `using` and
+`await using` scopes, `oseo_dispose_scope_create`, `_add`, `_dispose`,
+`_begin`, `_awaiting`, `_await_value`, `_continue`, and `_result`. A scope's
+capability is a record of the disposable stack heap kind that no source value
+reaches.
+The synchronous `dispose` runs DisposeResources from the cleanup region's
+saved completion. The asynchronous form keeps the same record state, but its
+run stops at every Await and leaves the operand in a traced field; generated
+code awaits it in its own suspended frame and passes the settlement back, so
+each Await happens in the frame exactly where the edition places it and an
+empty scope finishes without one. Both forms report a throw only when a
+dispose method failed, so an incoming throw is resumed with its own
+diagnostic location.

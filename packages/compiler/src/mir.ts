@@ -213,6 +213,14 @@ export interface MirOperation {
     | "construct-receiver"
     | "derived-return"
     | "delete-object-coercible"
+    | "dispose-scope-add"
+    | "dispose-scope-await-value"
+    | "dispose-scope-awaiting"
+    | "dispose-scope-begin"
+    | "dispose-scope-continue"
+    | "dispose-scope-create"
+    | "dispose-scope-dispose"
+    | "dispose-scope-result"
     | "error-intrinsic"
     | "symbol-intrinsic"
     | "function-intrinsic"
@@ -339,6 +347,14 @@ export interface MirOperation {
    * so the synchronous protocol keeps its unconditional lowering.
    */
   readonly iteratorAsync?: true;
+  /**
+   * A `dispose-scope-create` or `dispose-scope-add` of an `await using`
+   * declaration, whose capability or resource carries the async-dispose
+   * hint; the synchronous hint leaves it absent.
+   */
+  readonly disposalAsync?: true;
+  /** A `dispose-scope-continue` after its Await rejected. */
+  readonly disposalRejected?: true;
   readonly iteratorNextMethodResult?: number;
   readonly iteratorDoneState?: number;
   /** Skip outer AsyncIteratorClose result validation owned by a wrapper. */
@@ -620,6 +636,12 @@ export interface MirBuilder {
   /** Labels waiting for the next loop lowering to claim their targets. */
   readonly pendingLabels: string[];
   readonly finalizers: MirControlTarget[];
+  /**
+   * The capability values of the `using` scopes being lowered, innermost
+   * last. A `using` or `await using` declaration adds its value to the
+   * innermost one.
+   */
+  readonly disposalScopes: number[];
   /**
    * True while lowering an asynchronous generator body, whose `await`
    * operands and `yield` operands both suspend rather than drain the
