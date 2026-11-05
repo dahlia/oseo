@@ -1,0 +1,74 @@
+version: 1
+id: annexb-statement-forms
+title: "Annex B statement forms"
+scope:
+  - "The B.3.5 initializer of a non-strict for (var x = init in obj) head,
+    evaluated once before the subject, with NamedEvaluation and labels that
+    still name the loop."
+  - "The run-time ReferenceError for a function call used as the target of
+    an assignment, a compound assignment, an update, or a for-in or for-of
+    head in non-strict code, thrown after the call and before the right
+    operand, the conversion, or the store."
+  - "The catch parameter redeclaration rows of B.3.4, which the M5 profile
+    already implements."
+owners:
+  - docs/language-profile-es2026.md
+evidence:
+  differential:
+    status: covered
+    references:
+      - tests/annexb-function-declarations-native.test.ts
+  fixed:
+    status: covered
+    references:
+      - tests/native/fixtures/annexb-functions.ts
+  forced-collection:
+    status: covered
+    references:
+      - tests/annexb-function-declarations-native.test.ts
+  generated:
+    status: omitted
+    reason: "Each form has a fixed shape: one initializer position and six
+      call target positions. The fixtures cover every position, the
+      evaluation order, and the iterator close, so a generator would only
+      vary the operand values."
+    replacements:
+      - tests/native/fixtures/annexb-functions.ts
+      - packages/parser-babel/tests/annexb-functions.test.ts
+  guard-fallback:
+    status: covered
+    references:
+      - tests/annexb-function-declarations-native.test.ts
+  specialization:
+    status: covered
+    references:
+      - tests/annexb-function-declarations-native.test.ts
+  standards:
+    status: covered
+    references:
+      - tests/test262/subset.yaml
+      - tests/test262/results.yaml
+      - tests/test262/results/annexB/language/02.yaml
+      - tests/test262/results/annexB/language/03.yaml
+      - tests/test262/results/annexB/language/09.yaml
+      - tests/test262/results/annexB/language/0b.yaml
+      - tests/test262/results/annexB/language/2e.yaml
+      - tests/test262/results/annexB/language/31.yaml
+      - tests/test262/results/annexB/language/43.yaml
+      - tests/test262/results/annexB/language/5d.yaml
+      - tests/test262/results/annexB/language/60.yaml
+      - tests/test262/results/annexB/language/71.yaml
+      - tests/test262/results/annexB/language/8d.yaml
+      - tests/test262/results/annexB/language/98.yaml
+      - tests/test262/results/annexB/language/a4.yaml
+      - tests/test262/results/annexB/language/b8.yaml
+      - tests/test262/results/annexB/language/c2.yaml
+      - tests/test262/results/annexB/language/cb.yaml
+      - tests/test262/results/annexB/language/db.yaml
+      - tests/test262/results/annexB/language/f5.yaml
+      - tests/test262/results/annexB/language/ff.yaml
+  structural:
+    status: covered
+    references:
+      - packages/parser-babel/tests/annexb-functions.test.ts
+      - packages/parser-babel/tests/for-in.test.ts

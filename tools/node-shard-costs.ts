@@ -7,7 +7,7 @@
  * 41238903460 at `8770b2e4`. The largest is kept on purpose: the residual
  * evidence file took 1.36 times longer on one of those Linux runners than
  * on another, and the margin the shards keep is a slow runner's.
- * Twenty-five files postdate those runs and scale a local measurement on
+ * Twenty-seven files postdate those runs and scale a local measurement on
  * the same host by the residual-evidence ratio: 2.574 on Linux and 1.974
  * on macOS. The measurements are serial except the Object accessor
  * property file and the legacy lookup test, which ran side by side.
@@ -20,6 +20,7 @@ export const nodeShardCosts = {
   "linux-x86_64-gnu": {
     "packages/runtime-c/tests/dense-index.test.ts": 42,
     "tests/annex-b-mixed-core-native.test.ts": 49,
+    "tests/annexb-function-declarations-native.test.ts": 56,
     "tests/annexb-legacy-lookup-boundary.test.ts": 97,
     "tests/annexb-object-accessors-native.test.ts": 80,
     "tests/annexb-proto-boundary.test.ts": 349,
@@ -50,6 +51,7 @@ export const nodeShardCosts = {
     "tests/m5c-observation-batches.test.ts": 34,
     "tests/native-io/clock-wakeup.test.ts": 174,
     "tests/primitive-wrapper-objects.test.ts": 214,
+    "tests/property/annexb-function-declarations.property.test.ts": 75,
     "tests/property/es2026-array-from-async.property.test.ts": 88,
     "tests/property/es2026-iterator-concat.property.test.ts": 38,
     "tests/property/es2026-iterator-zip.property.test.ts": 60,
@@ -149,6 +151,7 @@ export const nodeShardCosts = {
   "macos-aarch64": {
     "packages/runtime-c/tests/dense-index.test.ts": 54,
     "tests/annex-b-mixed-core-native.test.ts": 61,
+    "tests/annexb-function-declarations-native.test.ts": 43,
     "tests/annexb-legacy-lookup-boundary.test.ts": 74,
     "tests/annexb-object-accessors-native.test.ts": 61,
     "tests/annexb-proto-boundary.test.ts": 268,
@@ -178,6 +181,7 @@ export const nodeShardCosts = {
     "tests/m5c-observation-batches.test.ts": 32,
     "tests/native-io/clock-wakeup.test.ts": 230,
     "tests/primitive-wrapper-objects.test.ts": 199,
+    "tests/property/annexb-function-declarations.property.test.ts": 57,
     "tests/property/es2026-array-from-async.property.test.ts": 68,
     "tests/property/es2026-iterator-zip.property.test.ts": 46,
     "tests/property/es2026-json-parse-source.property.test.ts": 115,

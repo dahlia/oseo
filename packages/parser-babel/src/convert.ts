@@ -48,6 +48,7 @@ import {
   type ReceiverKind,
   type SuperPropertyContext,
 } from "./babel.ts";
+import { isLabelledFunctionDeclaration } from "./annexb-functions.ts";
 import { jsdocHints, typeHint } from "./hints.ts";
 import { staticImportSpecifier } from "./import-calls.ts";
 import { earlyError, location, sourceRange, unsupported } from "./locations.ts";
@@ -966,6 +967,12 @@ export function expression(
     const left = unparenthesizedExpression(value.left);
     const right = node(value.right);
     if (left == null || right == null) return unsupported(context, value);
+    if (callAssignmentTarget(context, left)) {
+      const call = expression(context, left);
+      return call == null
+        ? undefined
+        : { ...located, call, kind: "invalid-assignment-target" };
+    }
     const parenthesizedTarget = includePropertiesWhen(() => {
       if (node(value.left)?.type !== "ParenthesizedExpression") {
         return undefined;
@@ -1058,6 +1065,12 @@ export function expression(
   if (value.type === "UpdateExpression") {
     const argument = unparenthesizedExpression(value.argument);
     if (argument == null) return unsupported(context, value);
+    if (callAssignmentTarget(context, argument)) {
+      const call = expression(context, argument);
+      return call == null
+        ? undefined
+        : { ...located, call, kind: "invalid-assignment-target" };
+    }
     const operator = value.operator;
     if (operator !== "++" && operator !== "--") {
       return unsupported(context, value, "This update is unsupported.");
@@ -2153,6 +2166,86 @@ function lexicalDeclarator(
   return { ...located, hint, initializer, kind: declarationKind, name };
 }
 
+/**
+ * The blocks that carry a B.3.5 `for (var x = init in obj)` initializer
+ * ahead of its loop, so a label applied to the statement can move onto
+ * the loop itself.
+ */
+const initializedForIn = new WeakMap<
+  SyntaxStatement,
+  { readonly initializer: SyntaxStatement; readonly loop: SyntaxStatement }
+>();
+
+/**
+ * True for a function call that non-strict code uses as an assignment
+ * target. Babel reports the strict form and every destructuring or
+ * logical assignment form as an early error, so only the runtime error
+ * forms of the edition's web compatibility rule reach this check.
+ */
+function callAssignmentTarget(
+  context: ConvertContext,
+  target: BabelNode,
+): boolean {
+  return (
+    target.type === "CallExpression" &&
+    target.optional !== true &&
+    context.strictStack.at(-1) !== true
+  );
+}
+
+/**
+ * The target and body of a non-strict `for-in` or `for-of` loop whose
+ * head is a function call, or undefined for any other head. Each
+ * iteration evaluates the call and then throws the ReferenceError that
+ * PutValue owes a non-reference. The loop therefore stores the next
+ * value in a fresh synthetic binding and makes the call and the throw
+ * the first statement of the body. The order is the same, and the
+ * abrupt body closes a for-of iterator the way a failed PutValue does.
+ * False means a nested conversion already reported a diagnostic.
+ */
+function callTargetLoop(
+  context: ConvertContext,
+  left: BabelNode,
+  bodyNode: BabelNode,
+  functionBody: boolean,
+):
+  | { readonly body: SyntaxStatement; readonly target: SyntaxForOfTarget }
+  | false
+  | undefined {
+  const call = unparenthesizedExpression(left) ?? left;
+  if (!callAssignmentTarget(context, call)) return undefined;
+  const converted = expression(context, call);
+  const body = statement(context, bodyNode, functionBody);
+  if (converted == null || body == null) return false;
+  const located = location(context, left);
+  return {
+    body: {
+      ...location(context, bodyNode),
+      body: [
+        {
+          ...located,
+          emptyCompletion: true,
+          expression: {
+            ...located,
+            call: converted,
+            kind: "invalid-assignment-target",
+          },
+          kind: "expression",
+        },
+        body,
+      ],
+      kind: "block",
+    },
+    target: {
+      declarationKind: "let",
+      hint: undefined,
+      kind: "declaration",
+      name: syntheticName(context, "call-target"),
+      range: located.range,
+    },
+  };
+}
+
 export function statement(
   context: ConvertContext,
   value: BabelNode,
@@ -2311,9 +2404,28 @@ export function statement(
       return unsupported(context, value);
     }
     const body = statement(context, bodyNode, functionBody);
-    return body == null
-      ? undefined
-      : { ...located, body, kind: "labeled", label };
+    if (body == null) return undefined;
+    // A label names the loop, so a for-in initializer stays outside it.
+    const initialized = initializedForIn.get(body);
+    if (initialized != null) {
+      const loop: SyntaxStatement = {
+        ...located,
+        body: initialized.loop,
+        kind: "labeled",
+        label,
+      };
+      const block: SyntaxStatement = {
+        ...located,
+        body: [initialized.initializer, loop],
+        kind: "block",
+      };
+      initializedForIn.set(block, {
+        initializer: initialized.initializer,
+        loop,
+      });
+      return block;
+    }
+    return { ...located, body, kind: "labeled", label };
   }
   if (value.type === "WhileStatement") {
     const testNode = node(value.test);
@@ -2359,10 +2471,10 @@ export function statement(
       for (const child of nodes(caseNode.consequent)) {
         const converted =
           child.type === "FunctionDeclaration"
-            ? functionDeclaration(context, child, true)
+            ? blockFunctionDeclaration(context, child)
             : statement(context, child, functionBody);
         if (converted == null) return undefined;
-        body.push(converted);
+        body.push(...(Array.isArray(converted) ? converted : [converted]));
       }
       cases.push({
         body,
@@ -2382,6 +2494,15 @@ export function statement(
     if (left == null || subjectNode == null || bodyNode == null) {
       return unsupported(context, value);
     }
+    const callHead = callTargetLoop(context, left, bodyNode, functionBody);
+    if (callHead === false) return undefined;
+    if (callHead != null) {
+      const subject = expression(context, subjectNode);
+      return subject == null
+        ? undefined
+        : { ...located, ...callHead, kind: "for-in", subject };
+    }
+    let forInInitializer: SyntaxStatement | undefined;
     let target: SyntaxForInTarget | undefined;
     if (left.type === "VariableDeclaration") {
       if (left.declare === true) {
@@ -2402,14 +2523,39 @@ export function statement(
       const declaration = declarations[0];
       const identifier = declaration == null ? undefined : node(declaration.id);
       const name = identifier == null ? undefined : identifierName(identifier);
+      // B.3.5 admits one initializer, on a non-strict `var` head that
+      // binds a plain identifier. Babel rejects every other initialized
+      // head as an early error.
+      const initializerNode =
+        declaration == null ? undefined : node(declaration.init);
+      if (
+        declaration != null &&
+        initializerNode != null &&
+        name != null &&
+        left.kind === "var" &&
+        context.strictStack.at(-1) !== true
+      ) {
+        const converted = expression(context, initializerNode);
+        if (converted == null) return undefined;
+        const declaratorRange = location(context, declaration);
+        forInInitializer = {
+          ...declaratorRange,
+          emptyCompletion: true,
+          expression: {
+            ...declaratorRange,
+            kind: "binding-set",
+            name,
+            value: converted,
+          },
+          kind: "expression",
+        };
+      }
       if (
         declarations.length !== 1 ||
         declaration == null ||
         identifier == null ||
-        declaration.init != null
+        (declaration.init != null && forInInitializer == null)
       ) {
-        // A head initializer is Annex B's legacy VarDeclaration form,
-        // which this profile does not implement.
         return unsupported(
           context,
           left,
@@ -2510,9 +2656,23 @@ export function statement(
     }
     const subject = expression(context, subjectNode);
     const body = statement(context, bodyNode, functionBody);
-    return subject == null || body == null
-      ? undefined
-      : { ...located, body, kind: "for-in", subject, target };
+    if (subject == null || body == null) return undefined;
+    const loop: SyntaxStatement = {
+      ...located,
+      body,
+      kind: "for-in",
+      subject,
+      target,
+    };
+    if (forInInitializer == null) return loop;
+    // The initializer runs once, before the subject is evaluated.
+    const block: SyntaxStatement = {
+      ...located,
+      body: [forInInitializer, loop],
+      kind: "block",
+    };
+    initializedForIn.set(block, { initializer: forInInitializer, loop });
+    return block;
   }
   if (value.type === "ForOfStatement") {
     // `for await` is a parse error outside an async function or a module
@@ -2523,6 +2683,23 @@ export function statement(
     const bodyNode = node(value.body);
     if (left == null || rightNode == null || bodyNode == null) {
       return unsupported(context, value);
+    }
+    const callHead = callTargetLoop(context, left, bodyNode, functionBody);
+    if (callHead === false) return undefined;
+    if (callHead != null) {
+      const iterable = expression(context, rightNode);
+      return iterable == null
+        ? undefined
+        : {
+            ...located,
+            ...includePropertiesWhen(() => {
+              if (!awaited) return undefined;
+              return { awaited: true as const };
+            }),
+            ...callHead,
+            iterable,
+            kind: "for-of",
+          };
     }
     let target: SyntaxForOfTarget | undefined;
     if (left.type === "VariableDeclaration") {
@@ -2856,10 +3033,10 @@ export function statement(
     for (const child of nodes(value.body)) {
       const converted =
         child.type === "FunctionDeclaration"
-          ? functionDeclaration(context, child, true)
+          ? blockFunctionDeclaration(context, child)
           : statement(context, child, functionBody);
       if (converted == null) return undefined;
-      body.push(converted);
+      body.push(...(Array.isArray(converted) ? converted : [converted]));
     }
     return { ...located, body, kind: "block" };
   }
@@ -3212,6 +3389,186 @@ export function collectVarStatement(
 }
 
 /**
+ * The block-level function declarations of one function body or Script
+ * that Annex B.3.2 also binds in the var scope, keyed by name and valued
+ * by the first such declaration.
+ *
+ * A declaration qualifies when it is an ordinary function declaration
+ * directly in a Block, CaseClause, or DefaultClause statement list, its
+ * name is not in `excludedNames`, and replacing it with `var` of its name
+ * would raise no early error. The early errors are the ones
+ * `collectVarStatement` reports for a real `var`: a lexical declaration
+ * of the name in an enclosing Block, CaseBlock, or loop head, in the var
+ * scope's own top level, or a destructured catch parameter. The
+ * declaration's own statement list counts too, minus the declaration
+ * itself, so a second same-name function in one Block blocks both.
+ * Every qualifying declaration is recorded in `annexBFunctionCopies`
+ * for the copy its evaluation performs.
+ */
+export function annexBFunctionNames(
+  values: readonly BabelNode[],
+  rootLexical: ReadonlySet<string>,
+  excludedNames: ReadonlySet<string>,
+): ReadonlyMap<string, BabelNode> {
+  const names = new Map<string, BabelNode>();
+  const visitList = (
+    items: readonly BabelNode[],
+    frames: readonly ReadonlySet<string>[],
+    catchNames: ReadonlySet<string>,
+  ): void => {
+    for (const item of items) {
+      if (item.type !== "FunctionDeclaration") continue;
+      const identifier = node(item.id);
+      const name = identifier == null ? undefined : identifierName(identifier);
+      if (
+        name == null ||
+        item.generator === true ||
+        item.async === true ||
+        isLabelledFunctionDeclaration(item) ||
+        excludedNames.has(name) ||
+        catchNames.has(name) ||
+        frames.some((frame) => frame.has(name)) ||
+        gatherLexicalNames(
+          items.filter((other) => other !== item),
+          true,
+        ).has(name)
+      ) {
+        continue;
+      }
+      annexBFunctionCopies.add(item);
+      if (!names.has(name)) names.set(name, item);
+    }
+    const listFrames = [...frames, gatherLexicalNames(items, true)];
+    for (const item of items) visit(item, listFrames, catchNames);
+  };
+  const visit = (
+    value: BabelNode,
+    frames: readonly ReadonlySet<string>[],
+    catchNames: ReadonlySet<string>,
+  ): void => {
+    switch (value.type) {
+      case "BlockStatement":
+        visitList(nodes(value.body), frames, catchNames);
+        return;
+      case "SwitchStatement":
+        visitList(
+          nodes(value.cases).flatMap((caseNode) => nodes(caseNode.consequent)),
+          frames,
+          catchNames,
+        );
+        return;
+      case "IfStatement":
+        for (const branch of [node(value.consequent), node(value.alternate)]) {
+          if (branch != null) visit(branch, frames, catchNames);
+        }
+        return;
+      case "WhileStatement":
+      case "DoWhileStatement":
+      case "LabeledStatement":
+      case "WithStatement": {
+        const body = node(value.body);
+        if (body != null) visit(body, frames, catchNames);
+        return;
+      }
+      case "ForStatement":
+      case "ForInStatement":
+      case "ForOfStatement": {
+        const head = node(
+          value.type === "ForStatement" ? value.init : value.left,
+        );
+        const body = node(value.body);
+        if (body == null) return;
+        visit(
+          body,
+          head?.type === "VariableDeclaration" && head.kind !== "var"
+            ? [...frames, gatherLexicalNames([head], false)]
+            : frames,
+          catchNames,
+        );
+        return;
+      }
+      case "TryStatement": {
+        const block = node(value.block);
+        if (block != null) visit(block, frames, catchNames);
+        const handler = node(value.handler);
+        const handlerBody = node(handler?.body);
+        if (handler != null && handlerBody != null) {
+          const parameter = node(handler.param);
+          visit(
+            handlerBody,
+            frames,
+            parameter == null || parameter.type === "Identifier"
+              ? catchNames
+              : new Set([...catchNames, ...rawPatternNames(parameter)]),
+          );
+        }
+        const finalizer = node(value.finalizer);
+        if (finalizer != null) visit(finalizer, frames, catchNames);
+        return;
+      }
+      default:
+        return;
+    }
+  };
+  for (const value of values) visit(value, [rootLexical], new Set());
+  return names;
+}
+
+/**
+ * Whether one function body or Script declares `name` with `var`. The
+ * probe discards its diagnostics, because the hoisting pass that follows
+ * reports the same ones.
+ */
+function declaresVarName(
+  context: ConvertContext,
+  values: readonly BabelNode[],
+  name: string,
+): boolean {
+  const probe: ConvertContext = { ...context, diagnostics: [] };
+  const collected = new Map<string, HoistedVar>();
+  const rootLexical = gatherLexicalNames(values, false);
+  for (const value of values) {
+    collectVarStatement(
+      probe,
+      unwrapExportDeclaration(value),
+      [rootLexical],
+      new Set<string>(),
+      collected,
+    );
+  }
+  return collected.has(name);
+}
+
+/**
+ * The block-level function declarations whose evaluation also copies the
+ * block binding's value to the var-scoped binding of the same name.
+ */
+const annexBFunctionCopies = new WeakSet<BabelNode>();
+
+/**
+ * Convert one function declaration of a Block or switch clause, followed
+ * by the Annex B.3.2 copy its evaluation performs when it qualifies.
+ */
+function blockFunctionDeclaration(
+  context: ConvertContext,
+  value: BabelNode,
+): (SyntaxFunction | SyntaxStatement)[] | undefined {
+  const converted = functionDeclaration(context, value, true);
+  if (converted == null) return undefined;
+  if (!annexBFunctionCopies.has(value) || converted.name == null) {
+    return [converted];
+  }
+  return [
+    converted,
+    {
+      ...location(context, value),
+      kind: "annexb-function-copy",
+      name: converted.bindingName ?? converted.name,
+    },
+  ];
+}
+
+/**
  * Hoist the function-scoped var declarations of one function, script, or
  * module body into initialized bindings. In-place var statements become
  * ordinary assignments, so the pair preserves var semantics for the
@@ -3238,6 +3595,7 @@ export function hoistedVarDeclarations(
   values: readonly BabelNode[],
   skipNames: ReadonlySet<string>,
   copiedNames: ReadonlyMap<string, string> = new Map<string, string>(),
+  annexBNames: ReadonlyMap<string, BabelNode> = new Map<string, BabelNode>(),
 ): SyntaxStatement[] | undefined {
   const collected = new Map<string, HoistedVar>();
   const rootLexical = gatherLexicalNames(values, false);
@@ -3251,6 +3609,16 @@ export function hoistedVarDeclarations(
     ),
   );
   if (!complete) return undefined;
+  // B.3.2 initializes a block-level function's var binding to undefined
+  // when no var, parameter, or top-level function already declares it.
+  for (const [name, declaration] of annexBNames) {
+    if (collected.has(name)) continue;
+    collected.set(name, {
+      ...location(context, declaration),
+      declarator: declaration,
+      hint: undefined,
+    });
+  }
   const hoisted: SyntaxStatement[] = [];
   for (const [name, info] of collected) {
     if (skipNames.has(name)) continue;
@@ -3638,11 +4006,52 @@ export function functionDeclaration(
     }
     if (implicitArgumentsBinding) skippedHoistedNames.add("arguments");
   }
+  // B.3.2.1 skips a name in parameterNames, to which step 22 appends
+  // `arguments` whenever the function needs its arguments object. An
+  // arrow never does, so a block-level `arguments` declaration there
+  // would create the var binding only when the copy runs; that
+  // dynamically created binding has no ahead-of-time form.
+  const topLevelFunctionNames = varScopedFunctionNames(children);
+  const rootLexicalNames = gatherLexicalNames(children, false);
+  const argumentsObjectNeeded =
+    implicitArgumentsBinding &&
+    (parameterExpressions ||
+      (!topLevelFunctionNames.has("arguments") &&
+        !rootLexicalNames.has("arguments")));
+  const annexBNames = strict
+    ? new Map<string, BabelNode>()
+    : annexBFunctionNames(
+        children,
+        rootLexicalNames,
+        new Set([
+          ...parameterNames,
+          ...(argumentsObjectNeeded ? ["arguments"] : []),
+        ]),
+      );
+  const arrowArguments = annexBNames.get("arguments");
+  if (
+    value.type === "ArrowFunctionExpression" &&
+    arrowArguments != null &&
+    !topLevelFunctionNames.has("arguments") &&
+    !declaresVarName(context, children, "arguments")
+  ) {
+    context.receiverStack.pop();
+    context.thisModeStack.pop();
+    context.strictStack.pop();
+    return unsupported(
+      context,
+      arrowArguments,
+      "A block-level function named 'arguments' in an arrow function " +
+        "without its own 'arguments' binding is outside the admitted " +
+        "profile.",
+    );
+  }
   const hoisted = hoistedVarDeclarations(
     context,
     children,
     skippedHoistedNames,
     copiedParameterNames,
+    annexBNames,
   );
   if (hoisted == null) {
     context.receiverStack.pop();
@@ -4129,7 +4538,7 @@ export function classExpression(
  */
 function globalObjectName(
   located: { readonly byteRange?: ByteRange; readonly range: SourceRange },
-  declaration: "function" | "var",
+  declaration: SyntaxGlobalObjectName["declaration"],
   name: string,
 ): SyntaxGlobalObjectName {
   const range = located.range;
@@ -4196,16 +4605,41 @@ export function program(
     context.strictStack.pop();
     return undefined;
   }
+  const annexBNames = strict
+    ? new Map<string, BabelNode>()
+    : annexBFunctionNames(items, gatherLexicalNames(items, false), new Set());
+  const hoistedNames = new Set(
+    hoisted.flatMap((declaration) =>
+      declaration.kind === "let" ? [declaration.name] : [],
+    ),
+  );
+  const annexBOnlyNames = [...annexBNames].filter(
+    ([name]) => !functionNames.has(name) && !hoistedNames.has(name),
+  );
   // GlobalDeclarationInstantiation creates one global-object property
   // for every var-scoped top-level name: the function declarations in
   // source order, then the hoisted `var` names a function declaration
-  // does not already own. Hoisting reuses the lexical statement form for
-  // a var binding, so the two lists rather than the statement kind
-  // decide which names the global object binds. Each entry keeps the
-  // location of the declaration that creates the property, which is the
-  // function declaration itself or the statement the var name hoisted
-  // to.
+  // does not already own. B.3.2.2 inserts its block-level function names
+  // before both, and the runtime skips such a name when a lexical
+  // declaration or CanDeclareGlobalVar forbids it rather than throwing.
+  // Hoisting reuses the lexical statement form for a var binding, so the
+  // lists rather than the statement kind decide which names the global
+  // object binds. Each entry keeps the location of the declaration that
+  // creates the property, which is the function declaration itself or
+  // the statement the var name hoisted to.
   const globalObjectNames: SyntaxGlobalObjectName[] = [];
+  for (const [name, declaration] of annexBOnlyNames) {
+    const located = location(context, declaration);
+    globalObjectNames.push(globalObjectName(located, "annexb", name));
+    hoisted.push({
+      byteRange: { end: 0, start: 0 },
+      hint: undefined,
+      initializer: undefinedExpression(located.range),
+      kind: "let",
+      name,
+      range: located.range,
+    });
+  }
   for (const [name, declaration] of functionDeclarations) {
     globalObjectNames.push(
       globalObjectName(location(context, declaration), "function", name),
@@ -4213,6 +4647,12 @@ export function program(
   }
   for (const declaration of hoisted) {
     if (declaration.kind !== "let") continue;
+    if (
+      annexBNames.has(declaration.name) &&
+      !hoistedNames.has(declaration.name)
+    ) {
+      continue;
+    }
     globalObjectNames.push(
       globalObjectName(declaration, "var", declaration.name),
     );

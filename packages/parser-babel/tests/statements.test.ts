@@ -228,9 +228,10 @@ const rejectedSwitchFunctionConflicts = [
     "OSEO0001",
   ],
   [
-    "two ordinary switch clause functions sharing a name",
-    "switch (1) { case 1: function f() {} default: function f() {} }",
-    "OSEO1001",
+    "two strict switch clause functions sharing a name",
+    '"use strict"; switch (1) {' +
+      " case 1: function f() {} default: function f() {} }",
+    "OSEO0001",
   ],
 ] as const;
 
@@ -311,7 +312,10 @@ test("converts for-in array pattern heads to owned syntax", () => {
 });
 
 const unsupportedForForms = [
-  ["for-in head initializer", "for (var key = 1 in {}) break;"],
+  [
+    "strict for-in head initializer",
+    '"use strict"; for (var key = 1 in {}) break;',
+  ],
   ["for const without initializer", "for (const item; ;) break;"],
 ] as const;
 

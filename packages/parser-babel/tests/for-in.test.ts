@@ -236,10 +236,6 @@ test("binds a label to the for-in statement's own transfers", () => {
 
 test("keeps every for-in head this unit does not admit rejected", () => {
   const cases: readonly (readonly [string, RegExp])[] = [
-    [
-      "for (var a = 1 in {}) {}",
-      /for-in declaration needs one uninitialized binding/u,
-    ],
     ["for (console in {}) {}", /Unknown binding 'console'/u],
     [
       "function outer() {\n" +

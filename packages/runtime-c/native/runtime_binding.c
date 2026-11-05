@@ -599,7 +599,8 @@ OseoResult oseo_global_object_create(
     const size_t *binding_lines,
     const size_t *binding_columns,
     const size_t *binding_ids,
-    const bool *function_declarations
+    const bool *function_declarations,
+    const bool *web_legacy_functions
 ) {
     if ((lexical_count > 0u &&
          (lexical_names == NULL || lexical_name_lengths == NULL ||
@@ -664,10 +665,15 @@ OseoResult oseo_global_object_create(
         }
     }
     /* CanDeclareGlobalFunction and CanDeclareGlobalVar validate the whole
-     * declaration set before CreateGlobal*Binding mutates any property. */
+     * declaration set before CreateGlobal*Binding mutates any property.
+     * An Annex B.3.2.2 name is never rejected; creation decides whether
+     * it is bound. */
     for (size_t index = 0u;
          result.status == OSEO_STATUS_NORMAL && index < binding_count;
          index += 1u) {
+        if (web_legacy_functions != NULL && web_legacy_functions[index]) {
+            continue;
+        }
         oseo_context_location(
             context,
             binding_lines[index],
@@ -753,6 +759,22 @@ OseoResult oseo_global_object_create(
             &getter,
             &setter
         );
+        if (web_legacy_functions != NULL && web_legacy_functions[index]) {
+            /* B.3.2.2 binds the name only when HasLexicalDeclaration is
+             * false and CanDeclareGlobalVar is true. Otherwise the cell
+             * stays detached: host Script references resolve the name
+             * through the realm, so the copy its evaluation writes there
+             * is never observed. */
+            OseoValue lexicals = context->realm->global_lexicals;
+            bool lexical = is_object(lexicals) &&
+                oseo_internal_own_property_index(
+                    ordinary_object(lexicals), frame.slots[1]
+                ) != SIZE_MAX;
+            if (lexical ||
+                (!exists && !ordinary_object(frame.slots[0])->extensible)) {
+                continue;
+            }
+        }
         if (!exists) {
             result = oseo_object_define(
                 context,

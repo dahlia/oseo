@@ -1,0 +1,249 @@
+version: 1
+id: annexb-function-declarations
+title: "Annex B function declarations"
+scope:
+  - "Labelled function declarations of B.3.1 and if-clause function
+    declarations of B.3.3 in non-strict code, with every strict and
+    statement-position form kept an early error."
+  - "The B.3.2.1 var-scoped binding and evaluation copy of a qualifying
+    block-level function in function code, and its skip rules for
+    parameters, the needed arguments object, and every early-error conflict a
+    var of the name would raise."
+  - "The B.3.2.2 global-object binding of a qualifying block-level function
+    in Script code, skipped without an error when a lexical declaration or
+    CanDeclareGlobalVar forbids it."
+  - "Duplicate ordinary function declarations in one Block or CaseBlock of
+    non-strict code, B.3.2.4 and B.3.2.5."
+owners:
+  - docs/language-profile-es2026.md
+evidence:
+  differential:
+    status: covered
+    references:
+      - tests/annexb-function-declarations-native.test.ts
+      - tests/property/annexb-function-declarations.property.test.ts
+  fixed:
+    status: covered
+    references:
+      - tests/native/fixtures/annexb-functions.ts
+  forced-collection:
+    status: covered
+    references:
+      - tests/annexb-function-declarations-native.test.ts
+      - tests/property/annexb-function-declarations.property.test.ts
+  generated:
+    status: covered
+    references:
+      - tests/property/annexb-function-declarations.property.test.ts
+  guard-fallback:
+    status: covered
+    references:
+      - tests/annexb-function-declarations-native.test.ts
+  specialization:
+    status: covered
+    references:
+      - tests/annexb-function-declarations-native.test.ts
+      - tests/property/annexb-function-declarations.property.test.ts
+  standards:
+    status: covered
+    references:
+      - tests/test262/subset.yaml
+      - tests/test262/results.yaml
+      - tests/test262/results/annexB/language/00.yaml
+      - tests/test262/results/annexB/language/01.yaml
+      - tests/test262/results/annexB/language/03.yaml
+      - tests/test262/results/annexB/language/06.yaml
+      - tests/test262/results/annexB/language/08.yaml
+      - tests/test262/results/annexB/language/09.yaml
+      - tests/test262/results/annexB/language/0a.yaml
+      - tests/test262/results/annexB/language/0b.yaml
+      - tests/test262/results/annexB/language/0c.yaml
+      - tests/test262/results/annexB/language/0d.yaml
+      - tests/test262/results/annexB/language/0e.yaml
+      - tests/test262/results/annexB/language/0f.yaml
+      - tests/test262/results/annexB/language/12.yaml
+      - tests/test262/results/annexB/language/13.yaml
+      - tests/test262/results/annexB/language/14.yaml
+      - tests/test262/results/annexB/language/15.yaml
+      - tests/test262/results/annexB/language/18.yaml
+      - tests/test262/results/annexB/language/19.yaml
+      - tests/test262/results/annexB/language/1a.yaml
+      - tests/test262/results/annexB/language/1c.yaml
+      - tests/test262/results/annexB/language/1d.yaml
+      - tests/test262/results/annexB/language/1e.yaml
+      - tests/test262/results/annexB/language/1f.yaml
+      - tests/test262/results/annexB/language/20.yaml
+      - tests/test262/results/annexB/language/21.yaml
+      - tests/test262/results/annexB/language/24.yaml
+      - tests/test262/results/annexB/language/25.yaml
+      - tests/test262/results/annexB/language/26.yaml
+      - tests/test262/results/annexB/language/27.yaml
+      - tests/test262/results/annexB/language/28.yaml
+      - tests/test262/results/annexB/language/29.yaml
+      - tests/test262/results/annexB/language/2b.yaml
+      - tests/test262/results/annexB/language/2c.yaml
+      - tests/test262/results/annexB/language/2d.yaml
+      - tests/test262/results/annexB/language/2e.yaml
+      - tests/test262/results/annexB/language/31.yaml
+      - tests/test262/results/annexB/language/32.yaml
+      - tests/test262/results/annexB/language/35.yaml
+      - tests/test262/results/annexB/language/36.yaml
+      - tests/test262/results/annexB/language/38.yaml
+      - tests/test262/results/annexB/language/39.yaml
+      - tests/test262/results/annexB/language/3a.yaml
+      - tests/test262/results/annexB/language/3b.yaml
+      - tests/test262/results/annexB/language/3c.yaml
+      - tests/test262/results/annexB/language/3e.yaml
+      - tests/test262/results/annexB/language/3f.yaml
+      - tests/test262/results/annexB/language/40.yaml
+      - tests/test262/results/annexB/language/41.yaml
+      - tests/test262/results/annexB/language/42.yaml
+      - tests/test262/results/annexB/language/43.yaml
+      - tests/test262/results/annexB/language/45.yaml
+      - tests/test262/results/annexB/language/46.yaml
+      - tests/test262/results/annexB/language/48.yaml
+      - tests/test262/results/annexB/language/49.yaml
+      - tests/test262/results/annexB/language/4c.yaml
+      - tests/test262/results/annexB/language/4d.yaml
+      - tests/test262/results/annexB/language/4e.yaml
+      - tests/test262/results/annexB/language/4f.yaml
+      - tests/test262/results/annexB/language/51.yaml
+      - tests/test262/results/annexB/language/52.yaml
+      - tests/test262/results/annexB/language/53.yaml
+      - tests/test262/results/annexB/language/54.yaml
+      - tests/test262/results/annexB/language/55.yaml
+      - tests/test262/results/annexB/language/56.yaml
+      - tests/test262/results/annexB/language/59.yaml
+      - tests/test262/results/annexB/language/5a.yaml
+      - tests/test262/results/annexB/language/5b.yaml
+      - tests/test262/results/annexB/language/5c.yaml
+      - tests/test262/results/annexB/language/5d.yaml
+      - tests/test262/results/annexB/language/5f.yaml
+      - tests/test262/results/annexB/language/61.yaml
+      - tests/test262/results/annexB/language/63.yaml
+      - tests/test262/results/annexB/language/65.yaml
+      - tests/test262/results/annexB/language/66.yaml
+      - tests/test262/results/annexB/language/68.yaml
+      - tests/test262/results/annexB/language/69.yaml
+      - tests/test262/results/annexB/language/6a.yaml
+      - tests/test262/results/annexB/language/6b.yaml
+      - tests/test262/results/annexB/language/6c.yaml
+      - tests/test262/results/annexB/language/6d.yaml
+      - tests/test262/results/annexB/language/6e.yaml
+      - tests/test262/results/annexB/language/70.yaml
+      - tests/test262/results/annexB/language/71.yaml
+      - tests/test262/results/annexB/language/73.yaml
+      - tests/test262/results/annexB/language/74.yaml
+      - tests/test262/results/annexB/language/76.yaml
+      - tests/test262/results/annexB/language/77.yaml
+      - tests/test262/results/annexB/language/78.yaml
+      - tests/test262/results/annexB/language/79.yaml
+      - tests/test262/results/annexB/language/7a.yaml
+      - tests/test262/results/annexB/language/7b.yaml
+      - tests/test262/results/annexB/language/7c.yaml
+      - tests/test262/results/annexB/language/7d.yaml
+      - tests/test262/results/annexB/language/7e.yaml
+      - tests/test262/results/annexB/language/80.yaml
+      - tests/test262/results/annexB/language/82.yaml
+      - tests/test262/results/annexB/language/83.yaml
+      - tests/test262/results/annexB/language/85.yaml
+      - tests/test262/results/annexB/language/86.yaml
+      - tests/test262/results/annexB/language/87.yaml
+      - tests/test262/results/annexB/language/88.yaml
+      - tests/test262/results/annexB/language/89.yaml
+      - tests/test262/results/annexB/language/8e.yaml
+      - tests/test262/results/annexB/language/91.yaml
+      - tests/test262/results/annexB/language/93.yaml
+      - tests/test262/results/annexB/language/94.yaml
+      - tests/test262/results/annexB/language/95.yaml
+      - tests/test262/results/annexB/language/97.yaml
+      - tests/test262/results/annexB/language/99.yaml
+      - tests/test262/results/annexB/language/9a.yaml
+      - tests/test262/results/annexB/language/9b.yaml
+      - tests/test262/results/annexB/language/9d.yaml
+      - tests/test262/results/annexB/language/9e.yaml
+      - tests/test262/results/annexB/language/9f.yaml
+      - tests/test262/results/annexB/language/a1.yaml
+      - tests/test262/results/annexB/language/a2.yaml
+      - tests/test262/results/annexB/language/a3.yaml
+      - tests/test262/results/annexB/language/a5.yaml
+      - tests/test262/results/annexB/language/a6.yaml
+      - tests/test262/results/annexB/language/a7.yaml
+      - tests/test262/results/annexB/language/aa.yaml
+      - tests/test262/results/annexB/language/ab.yaml
+      - tests/test262/results/annexB/language/ac.yaml
+      - tests/test262/results/annexB/language/ad.yaml
+      - tests/test262/results/annexB/language/ae.yaml
+      - tests/test262/results/annexB/language/af.yaml
+      - tests/test262/results/annexB/language/b0.yaml
+      - tests/test262/results/annexB/language/b1.yaml
+      - tests/test262/results/annexB/language/b2.yaml
+      - tests/test262/results/annexB/language/b4.yaml
+      - tests/test262/results/annexB/language/b6.yaml
+      - tests/test262/results/annexB/language/b7.yaml
+      - tests/test262/results/annexB/language/b9.yaml
+      - tests/test262/results/annexB/language/bb.yaml
+      - tests/test262/results/annexB/language/bc.yaml
+      - tests/test262/results/annexB/language/bd.yaml
+      - tests/test262/results/annexB/language/be.yaml
+      - tests/test262/results/annexB/language/bf.yaml
+      - tests/test262/results/annexB/language/c0.yaml
+      - tests/test262/results/annexB/language/c1.yaml
+      - tests/test262/results/annexB/language/c2.yaml
+      - tests/test262/results/annexB/language/c4.yaml
+      - tests/test262/results/annexB/language/c5.yaml
+      - tests/test262/results/annexB/language/c7.yaml
+      - tests/test262/results/annexB/language/c8.yaml
+      - tests/test262/results/annexB/language/c9.yaml
+      - tests/test262/results/annexB/language/ca.yaml
+      - tests/test262/results/annexB/language/cb.yaml
+      - tests/test262/results/annexB/language/cc.yaml
+      - tests/test262/results/annexB/language/cd.yaml
+      - tests/test262/results/annexB/language/ce.yaml
+      - tests/test262/results/annexB/language/cf.yaml
+      - tests/test262/results/annexB/language/d1.yaml
+      - tests/test262/results/annexB/language/d2.yaml
+      - tests/test262/results/annexB/language/d3.yaml
+      - tests/test262/results/annexB/language/d4.yaml
+      - tests/test262/results/annexB/language/d5.yaml
+      - tests/test262/results/annexB/language/d6.yaml
+      - tests/test262/results/annexB/language/d7.yaml
+      - tests/test262/results/annexB/language/d8.yaml
+      - tests/test262/results/annexB/language/d9.yaml
+      - tests/test262/results/annexB/language/da.yaml
+      - tests/test262/results/annexB/language/db.yaml
+      - tests/test262/results/annexB/language/dc.yaml
+      - tests/test262/results/annexB/language/dd.yaml
+      - tests/test262/results/annexB/language/df.yaml
+      - tests/test262/results/annexB/language/e0.yaml
+      - tests/test262/results/annexB/language/e1.yaml
+      - tests/test262/results/annexB/language/e2.yaml
+      - tests/test262/results/annexB/language/e3.yaml
+      - tests/test262/results/annexB/language/e4.yaml
+      - tests/test262/results/annexB/language/e6.yaml
+      - tests/test262/results/annexB/language/e8.yaml
+      - tests/test262/results/annexB/language/ea.yaml
+      - tests/test262/results/annexB/language/eb.yaml
+      - tests/test262/results/annexB/language/ec.yaml
+      - tests/test262/results/annexB/language/ed.yaml
+      - tests/test262/results/annexB/language/ee.yaml
+      - tests/test262/results/annexB/language/ef.yaml
+      - tests/test262/results/annexB/language/f0.yaml
+      - tests/test262/results/annexB/language/f1.yaml
+      - tests/test262/results/annexB/language/f2.yaml
+      - tests/test262/results/annexB/language/f3.yaml
+      - tests/test262/results/annexB/language/f4.yaml
+      - tests/test262/results/annexB/language/f5.yaml
+      - tests/test262/results/annexB/language/f6.yaml
+      - tests/test262/results/annexB/language/f7.yaml
+      - tests/test262/results/annexB/language/f8.yaml
+      - tests/test262/results/annexB/language/f9.yaml
+      - tests/test262/results/annexB/language/fa.yaml
+      - tests/test262/results/annexB/language/fb.yaml
+      - tests/test262/results/annexB/language/fc.yaml
+      - tests/test262/results/annexB/language/fe.yaml
+  structural:
+    status: covered
+    references:
+      - packages/parser-babel/tests/annexb-functions.test.ts
+      - packages/compiler/tests/hir.test.ts

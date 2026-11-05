@@ -1144,9 +1144,14 @@ OseoResult oseo_module_namespace_create(
  * and the cells must already exist. Module code never calls this; it adds no
  * global object property. The line and column tables locate the matching
  * declarations so a failed global-record check reports the declaration it
- * rejected. Successive calls do not retain the Global Environment Record's
- * [[VarNames]] or declarative names, so multi-Script realm sequencing remains
- * outside this ABI. The realm also installs every admitted intrinsic global,
+ * rejected. An entry that `web_legacy_functions` marks, which may be NULL
+ * when none is, is an Annex B.3.2.2 block-level function name: it skips the
+ * checks that reject a declaration, and creation leaves its cell detached
+ * from the global object when a lexical binding holds the name or the
+ * object is not extensible and lacks the property. Successive calls do not
+ * retain the Global Environment Record's [[VarNames]] or declarative names,
+ * so multi-Script realm sequencing remains outside this ABI. The realm also
+ * installs every admitted intrinsic global,
  * the standard `Infinity`, `NaN`, and `undefined` value properties, and the
  * writable, non-enumerable, configurable `globalThis` property that binds
  * the global object to itself.
@@ -1165,7 +1170,8 @@ OseoResult oseo_global_object_create(
     const size_t *binding_lines,
     const size_t *binding_columns,
     const size_t *binding_ids,
-    const bool *function_declarations
+    const bool *function_declarations,
+    const bool *web_legacy_functions
 );
 /*
  * SetMutableBinding for a binding the global object also exposes as a

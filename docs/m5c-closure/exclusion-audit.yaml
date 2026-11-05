@@ -5889,14 +5889,14 @@ assessments:
         "1998691b5e79709d011c1f63bb26c823c086b974727e8b92\
         3752451f0e00e05b"
       packages/runtime-c/native/oseo_runtime.h:
-        "fb66a45c57bc3c74288f77ea5897d76db81bebf99ac09629\
-        9ac21ca9f9b60d12"
+        "cabdb5c5bb93bc11a0e80f6c9f8b020843582fc75e880806\
+        0d49934b150deb5f"
       packages/runtime-c/native/runtime_core.c:
         "bcf729b61049bdd7486c230c5cb653edfaae769360bc4d3e\
         e0c4f1eea10a663b"
       packages/runtime-c/src/index.ts:
-        "d65c569280bb56920c934908c1280e5edd983f3519460239\
-        9993cdee7ca65b9b"
+        "7fd6ba9c93b1f8f15e7bbff338d3c4d2ef0a9cc92964cdaf\
+        5f6b77c96cd8e1f1"
   observation-train-b26a-b26b-b27:
     disposition: deferral
     normativeDependency: not-demonstrated

@@ -1,0 +1,3 @@
+version: 1
+id: annexb-function-declarations
+record: docs/language-profile-es2026/families/annexb-function-declarations.yaml

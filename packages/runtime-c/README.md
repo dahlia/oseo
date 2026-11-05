@@ -1578,3 +1578,17 @@ undefined count or an integral Number without coercion, executes one processor
 hint, and returns `undefined`. The hint is PAUSE on x86-64 and YIELD on
 AArch64, the choice each compiler target description records as
 `atomicsPauseHint`; the runtime fails to build for any other architecture.
+
+
+Annex B block-level functions
+-----------------------------
+
+ABI `m5-156` adds a final `web_legacy_functions` parameter to
+`oseo_global_object_create`. It is `NULL` when no entry needs it, or a table
+parallel to the binding names that marks the block-level function names
+Annex B.3.2.2 binds as vars. A marked entry skips the checks that reject a
+declaration with a `TypeError` or `SyntaxError`. Creation leaves its cell
+detached from the global object when an earlier Script's lexical declaration
+holds the name, or when the object is not extensible and lacks the property;
+otherwise it binds the entry the way it binds a `var`. Unmarked entries behave
+as before.

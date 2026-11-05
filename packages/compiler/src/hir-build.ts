@@ -1065,6 +1065,28 @@ function resolveExpression(
   scopes: readonly Map<string, Binding>[],
   state: ResolveState,
 ): HirExpression | undefined {
+  if (expression.kind === "invalid-assignment-target") {
+    const call = resolveExpression(expression.call, scopes, state);
+    if (call == null) return undefined;
+    const range = expression.range;
+    return {
+      ...includePropertiesWhen(() => {
+        if (expression.byteRange == null) return undefined;
+        return { byteRange: expression.byteRange };
+      }),
+      call,
+      error: {
+        arguments: [
+          { kind: "string", range, value: "Invalid assignment target." },
+        ],
+        callee: { errorName: "ReferenceError", kind: "error-intrinsic", range },
+        kind: "new",
+        range,
+      },
+      kind: "invalid-assignment-target",
+      range,
+    };
+  }
   if (expression.kind === "delete") {
     if (expression.argument.kind === "identifier") {
       return resolveIdentifierDelete(
@@ -2228,12 +2250,11 @@ function mixedDeclarationList(
  * kind or the code's strictness, because its LexicallyDeclaredNames
  * excludes function and var bindings entirely. A Block, CaseBlock, or
  * module top level's FunctionDeclarations are LexicallyDeclaredNames
- * instead, and ECMA-262 exempts a duplicate entry there only for a host
- * that implements Annex B.3.2 (Block-Level Function Declarations Web
- * Legacy Compatibility Semantics), which this closed ahead-of-time
- * profile does not, so every duplicate function name there is always an
- * early error, regardless of a matching ordinary kind or the code's
- * strictness.
+ * instead. Annex B.3.2.4 and B.3.2.5 exempt a duplicate entry there only
+ * in non-strict code and only when every declaration of the name is an
+ * ordinary function declaration; the last one initializes the shared
+ * binding. Every other duplicate stays an early error, which keeps the
+ * rule for strict code and modules.
  */
 function predeclareBindings(
   statements: readonly SyntaxStatementItem[],
@@ -2311,18 +2332,24 @@ function predeclareBindings(
     // freely replaces it, because the LexicallyDeclaredNames of a
     // ScriptBody or FunctionBody excludes function and var bindings
     // entirely. A Block or CaseBlock's FunctionDeclarations are
-    // LexicallyDeclaredNames instead, and ECMA-262 exempts a duplicate
-    // entry there only when the host supports Block-Level Function
-    // Declarations Web Legacy Compatibility Semantics (Annex B.3.2),
-    // which this profile's closed ahead-of-time runtime does not
-    // implement, so a Block or CaseBlock never admits a duplicate
-    // function name, regardless of its kind or the code's strictness.
+    // LexicallyDeclaredNames instead, and Annex B.3.2.4 and B.3.2.5
+    // exempt a duplicate entry there only in non-strict code when both
+    // declarations are ordinary function declarations.
     const duplicateFunctions =
       statement.kind === "function" && previous?.functionId != null;
+    const webLegacyFunction =
+      statement.kind === "function" &&
+      !state.strict &&
+      (statement.functionKind ?? "ordinary") === "ordinary";
     if (
       previous != null &&
       previous.pendingDeclaration !== true &&
-      !(duplicateFunctions && !lexicalScope)
+      !(duplicateFunctions && !lexicalScope) &&
+      !(
+        duplicateFunctions &&
+        webLegacyFunction &&
+        previous.webLegacyFunction === true
+      )
     ) {
       state.diagnostics.push(
         sourceDiagnostic(
@@ -2372,6 +2399,10 @@ function predeclareBindings(
         id: bindingId,
         mutable: true,
         name,
+        ...includePropertiesWhen(() => {
+          if (!webLegacyFunction) return undefined;
+          return { webLegacyFunction: true as const };
+        }),
       });
       state.functionInfo.set(statement, {
         bindingId,
@@ -2621,6 +2652,8 @@ function resolveFunction(
   );
   // Labels never cross a function boundary.
   const outerLabels = state.labels.splice(0);
+  const outerVarScope = state.varScope;
+  state.varScope = bodyScope;
   const body = resolveStatementList(
     functionValue.body,
     [
@@ -2638,6 +2671,7 @@ function resolveFunction(
     bodyScope,
   );
   state.labels.push(...outerLabels);
+  state.varScope = outerVarScope;
   state.thisBinding = outerThisBinding;
   state.strict = outerStrict;
   const bodyBindingIds = declaredHirBindingIds(body);
@@ -2775,6 +2809,9 @@ export function hirExpressionHasAwait(expression: HirExpression): boolean {
   if (expression.kind === "await") return true;
   if (expression.kind === "delete-value") {
     return hirExpressionHasAwait(expression.argument);
+  }
+  if (expression.kind === "invalid-assignment-target") {
+    return hirExpressionHasAwait(expression.call);
   }
   if (
     expression.kind === "binding-set" ||
@@ -3882,6 +3919,49 @@ function resolveForInTarget(
     : { ...locatedOf(target), kind: "private", object, privateName };
 }
 
+/**
+ * Resolve the Annex B.3.2 evaluation of a qualifying block-level
+ * function declaration. The value comes from the binding of the Block or
+ * CaseBlock that directly contains the declaration, which is the
+ * innermost scope here. The write goes to the var-scoped binding the
+ * frontend hoisted, found in the var scope itself rather than through
+ * name resolution: B.3.2 writes the VariableEnvironment directly, past
+ * any catch parameter or `with` object between the two. A global
+ * binding's write takes the global object's SetMutableBinding path.
+ */
+function resolveAnnexBFunctionCopy(
+  statement: Extract<SyntaxStatement, { kind: "annexb-function-copy" }>,
+  scopes: readonly Map<string, Binding>[],
+  state: ResolveState,
+): HirStatement {
+  const source = scopes.at(-1)?.get(statement.name);
+  const target = state.varScope?.get(statement.name);
+  if (source?.functionId == null || target == null) {
+    throw new Error(
+      `Annex B function copy '${statement.name}' has no block or var binding.`,
+    );
+  }
+  state.referencedBindingIds.add(source.id);
+  state.referencedBindingIds.add(target.id);
+  return {
+    ...includePropertiesWhen(() => {
+      if (statement.byteRange == null) return undefined;
+      return { byteRange: statement.byteRange };
+    }),
+    emptyCompletion: true,
+    expression: {
+      bindingId: target.id,
+      kind: "binding-set",
+      mutable: true,
+      name: statement.name,
+      range: statement.range,
+      value: bindingExpression(source, statement.range),
+    },
+    kind: "expression",
+    range: statement.range,
+  };
+}
+
 function resolveStatement(
   statement: SyntaxStatement,
   scopes: readonly Map<string, Binding>[],
@@ -4097,6 +4177,26 @@ function resolveStatement(
     return statement;
   }
   if (statement.kind === "block") {
+    if (statement.parameterEnvironmentBody === true) {
+      // The synthetic Block of a body with a parameter environment holds
+      // that body's var-scoped bindings.
+      const local = new Map<string, Binding>();
+      predeclareBindings(statement.body, local, state, false);
+      const outerVarScope = state.varScope;
+      state.varScope = local;
+      const body = resolveStatementList(
+        statement.body,
+        scopes,
+        state,
+        functionBody,
+        local,
+        false,
+        loopDepth,
+        breakDepth,
+      );
+      state.varScope = outerVarScope;
+      return { ...statement, body };
+    }
     return {
       ...statement,
       body: resolveStatementList(
@@ -4105,11 +4205,14 @@ function resolveStatement(
         state,
         functionBody,
         undefined,
-        statement.parameterEnvironmentBody !== true,
+        true,
         loopDepth,
         breakDepth,
       ),
     };
+  }
+  if (statement.kind === "annexb-function-copy") {
+    return resolveAnnexBFunctionCopy(statement, scopes, state);
   }
   if (statement.kind === "while") {
     const test = resolveExpression(statement.test, scopes, state);
@@ -4861,6 +4964,7 @@ export function buildSeededHir(
     nextFunctionId: seed.nextFunctionId ?? 0,
     sourceId: program.sourceId,
     strict: program.strict === true,
+    varScope: scriptScope,
     withFallbacks: [],
     withInitializingFallbackNames: new Set(),
     referencedBindingIds: new Set(),

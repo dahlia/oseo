@@ -381,6 +381,17 @@ export type SyntaxExpression =
       readonly kind: "yield";
     })
   | (LocatedSyntax & {
+      /**
+       * A function call used as the target of `=`, a compound
+       * assignment, `++`, `--`, or a `for-in` or `for-of` head in
+       * non-strict code. Annex B replaces the early error with a
+       * ReferenceError that is thrown after the call returns and before
+       * the right operand or any conversion runs.
+       */
+      readonly call: SyntaxExpression;
+      readonly kind: "invalid-assignment-target";
+    })
+  | (LocatedSyntax & {
       readonly kind: "binding-set";
       readonly name: string;
       /**
@@ -935,6 +946,18 @@ export type SyntaxStatement =
       readonly kind: "declaration-list";
     })
   | (LocatedSyntax & {
+      /**
+       * The Annex B.3.2 evaluation of a block-level function declaration
+       * that qualifies for web legacy semantics: the value of the
+       * enclosing Block's binding of `name` is written to the var-scoped
+       * binding of the same name, bypassing every scope in between. It
+       * follows the declaration in its statement list and has an empty
+       * completion.
+       */
+      readonly kind: "annexb-function-copy";
+      readonly name: string;
+    })
+  | (LocatedSyntax & {
       readonly kind: "break";
       readonly label?: string;
     })
@@ -1118,12 +1141,17 @@ export interface SyntaxFunction extends LocatedSyntax {
  * CreateGlobalVarBinding keeps the existing property untouched, while
  * CreateGlobalFunctionBinding redefines a configurable one.
  *
+ * An `annexb` entry is a block-level function name that Annex B.3.2.2
+ * binds as a var: CreateGlobalVarBinding applies only when no lexical
+ * declaration holds the name and CanDeclareGlobalVar allows it, and
+ * otherwise the name is skipped without an error.
+ *
  * The range locates the declaration that creates the property, so a
  * later stage can name it in a diagnostic without searching the body
  * for a statement that happens to share the name.
  */
 export interface SyntaxGlobalObjectName extends LocatedSyntax {
-  readonly declaration: "function" | "var";
+  readonly declaration: "annexb" | "function" | "var";
   readonly name: string;
 }
 

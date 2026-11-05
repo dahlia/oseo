@@ -193,13 +193,15 @@ test("Linux weights match the three-run median case sums", async () => {
   // The module, with-var and module driver files use one candidate run
   // each (see U6).
   // Primitive with boxing, the non-blocking agent, the legacy caller suite,
-  // the Annex B escape, String, Date, and Object accessor files, and the
-  // ECMAScript 2026 built-in files use later local Linux extended runs.
+  // the Annex B escape, String, Date, Object accessor, and function
+  // declaration files, and the ECMAScript 2026 built-in files use later local
+  // Linux extended runs.
   const retained = [
     "tests/property/es2026-iterator-zip.property.test.ts",
     "tests/property/es2026-json-parse-source.property.test.ts",
     "tests/property/es2026-array-from-async.property.test.ts",
     "tests/property/es2026-uint8array-base64.property.test.ts",
+    "tests/property/annexb-function-declarations.property.test.ts",
     "tests/property/es2026-iterator-concat.property.test.ts",
     "tests/property/es2026-upsert.property.test.ts",
     "tests/property/es2026-math-sum-precise.property.test.ts",

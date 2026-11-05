@@ -163,15 +163,16 @@ const strictGlobalDeclarationExpectation =
 
 /**
  * A block-level function declaration in sloppy-mode Script and ordinary
- * function code. Both reference hosts apply Annex B's web legacy
- * compatibility semantics to this exact shape in sloppy mode, copying the
- * block's function value out to an outer var-scoped binding of the same
- * name, so this source is compared with fixed ECMA-262 expectations
- * instead of a host observation. The strict-mode and module forms of this
- * construct have no such divergence and are covered by the
- * block-function-var-coexistence native fixture and the
- * block-function-var-module fixture, which do compare against Node.js and
- * Deno.
+ * function code. Annex B.3.2 copies the block's function value out to the
+ * outer var-scoped binding of the same name when the declaration is
+ * evaluated, so the outer reads after the block see the function. Node.js
+ * and Deno produce the same text when this source runs as a sloppy Script
+ * and each function value is printed through `String`. The expectation is
+ * fixed because their console prints a function as `[Function: name]`
+ * instead of its source text. The strict-mode and module forms keep the
+ * block binding separate and are covered by the
+ * block-function-var-coexistence and block-function-var-module native
+ * fixtures, which compare against Node.js and Deno.
  */
 const blockFunctionVarSource = `
 var scriptValue = "script outer";
@@ -199,19 +200,20 @@ console.log("ordinary", ordinaryValues[0], ordinaryValues[1]);
 
 const blockFunctionVarExpectation =
   "script block script block\n" +
-  "script outer script outer function\n" +
+  'script outer function scriptValue() { return "script block"; } ' +
+  "function\n" +
   "ordinary block ordinary block\n" +
-  "ordinary ordinary outer function\n";
+  'ordinary function value() { return "ordinary block"; } function\n';
 
 /**
  * A switch-clause function declaration in sloppy-mode Script and ordinary
- * function code. Annex B.3.2's web legacy compatibility semantics reach a
- * CaseClause exactly as they reach a Block, so both reference hosts copy
- * the CaseBlock function's value out to an outer var-scoped binding of the
- * same name in sloppy mode; this source is compared with fixed ECMA-262
- * expectations instead of a host observation. The strict-mode and module
- * forms of this construct have no such divergence and are covered by the
- * switch-function-declarations native fixture, which does compare against
+ * function code. Annex B.3.2 reaches a CaseClause exactly as it reaches a
+ * Block, so evaluating the declaration copies the CaseBlock function's
+ * value out to the outer var-scoped binding of the same name. The
+ * expectation is fixed for the same reason as the block form's, and
+ * Node.js and Deno agree with it under the same sloppy Script observation.
+ * The strict-mode and module forms are covered by the
+ * switch-function-declarations native fixture, which compares against
  * Node.js and Deno.
  */
 const switchFunctionVarSource = `
@@ -244,9 +246,10 @@ console.log("ordinary", ordinaryValues[0], ordinaryValues[1]);
 
 const switchFunctionVarExpectation =
   "switch case switch case\n" +
-  "script outer script outer function\n" +
+  'script outer function switchValue() { return "switch case"; } ' +
+  "function\n" +
   "ordinary case ordinary case\n" +
-  "ordinary ordinary outer function\n";
+  'ordinary function value() { return "ordinary case"; } function\n';
 
 export async function runNativeScenario1(
   context: NativeScenarioContext,

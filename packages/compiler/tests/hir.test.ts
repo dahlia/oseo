@@ -1457,13 +1457,11 @@ test("hoists a switch clause function into one CaseBlock instantiation", () => {
   assert.equal(statement.cases[0]?.body.length, 0);
 });
 
-test("rejects every duplicate function name in a switch clause", () => {
-  // ECMA-262 exempts a duplicate LexicallyDeclaredNames entry from a
-  // CaseBlock's early error only when the host supports Block-Level
-  // Function Declarations Web Legacy Compatibility Semantics (Annex
-  // B.3.2), which this closed ahead-of-time profile does not implement.
-  // A CaseBlock therefore rejects a duplicate function name outright,
-  // regardless of matching kind or strictness, unlike a Script or
+test("admits duplicate switch functions only as Annex B allows", () => {
+  // Annex B.3.2.5 exempts a duplicate LexicallyDeclaredNames entry from
+  // a CaseBlock's early error only in non-strict code and only when
+  // every declaration of the name is an ordinary function declaration.
+  // Every other duplicate stays an early error, unlike a Script or
   // FunctionBody's own unconditional top-level exemption.
   const declaration = (functionKind: "generator" | "ordinary") => ({
     body: [],
@@ -1505,6 +1503,11 @@ test("rejects every duplicate function name in a switch clause", () => {
         strict,
       });
       const label = `${kinds.join("+")} ${strict}`;
+      if (!strict && kinds[1] === "ordinary") {
+        assert.deepEqual(result.diagnostics, [], label);
+        assert.ok(result.program != null, label);
+        continue;
+      }
       assert.equal(result.program, undefined, label);
       assert.equal(result.diagnostics.length, 1, label);
       assert.equal(result.diagnostics[0]?.code, "OSEO1001", label);
@@ -1568,7 +1571,7 @@ test("keeps a parameter-environment body wrapper var-like", () => {
   // FunctionBody's var-like redeclaration policy, so
   // `parameterEnvironmentBody` marks the wrapper and the duplicate below
   // stays admitted, unlike the identical duplicate inside a genuine
-  // nested block.
+  // nested block of strict code, where Annex B.3.2.4 does not apply.
   const declaration = (value: number) => ({
     body: [
       {
@@ -1624,6 +1627,7 @@ test("keeps a parameter-environment body wrapper var-like", () => {
         parameters: [],
         range,
         returnHints: [],
+        strict: true,
       },
     ],
     kind: "program",

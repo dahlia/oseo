@@ -141,7 +141,7 @@ export interface MirGlobalLexicalName {
  * already names an intrinsic global property.
  */
 export interface MirGlobalObjectBinding extends MirGlobalBinding {
-  readonly declaration: "function" | "var";
+  readonly declaration: "annexb" | "function" | "var";
   readonly range: SourceRange;
 }
 
