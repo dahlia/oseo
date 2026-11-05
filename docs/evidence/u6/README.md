@@ -2218,3 +2218,15 @@ fallback moves from 429 to 423 seconds.
 from the local extended run in the table above, and the TSV, extraction script
 and unit test retain it the same way. Linux now has 164 entries, and its
 fallback moves back from 423 to 429 seconds.
+
+The two Annex B RegExp property files take their Linux weights the same way,
+from one local extended run each on a shared host under heavy load from other
+lanes, so the weights are overestimates.
+
+| File                                                       | Case sum (ms) | Linux weight (s) |
+| ---------------------------------------------------------- | ------------: | ---------------: |
+| *tests/property/m5-annexb-regexp-syntax.property.test.ts*  |    414379.420 |              415 |
+| *tests/property/m5-annexb-regexp-compile.property.test.ts* |    607052.890 |              608 |
+
+The TSV, extraction script and unit test retain both the same way. Linux now
+has 166 entries, and its fallback stays at 429 seconds.

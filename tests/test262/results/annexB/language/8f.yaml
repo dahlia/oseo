@@ -1,0 +1,35 @@
+group: annexB/language
+key: 8f
+results:
+  - case:
+      async: false
+      expectedErrorType: EvalError
+      expectedFailurePhase: runtime
+      features: []
+      flags:
+        - raw
+      includes: []
+      mode: script
+      path: test/annexB/language/comments/single-line-html-close-first-line-3.js
+      strictness:
+        - non-strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: expected-negative
+    dependencies:
+      - abrupt-completion
+      - error-intrinsics
+      - lexical-grammar
+    execution:
+      harnessIncludes: []
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+    observation:
+      errorType: EvalError
+      failedPhase: runtime
+      passed: false
+    unsupportedFeatures: []
+suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2

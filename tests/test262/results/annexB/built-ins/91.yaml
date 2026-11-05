@@ -7,6 +7,41 @@ results:
       flags: []
       includes: []
       mode: script
+      path: test/annexB/built-ins/RegExp/RegExp-trailing-escape-BMP.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - dynamic-source
+      - expression-operators
+      - functions
+      - object-properties
+      - regular-expressions
+      - var-bindings
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+    observation:
+      detail: 'test/annexB/built-ins/RegExp/RegExp-trailing-escape-BMP.js
+        non-strict disabled failed (1): stdout=""
+        stderr="test/annexB/built-ins/RegExp/RegExp-trailing-escape-BMP.js:101:19:
+        error[OSEO1001]: eval compiles source text at run time, which is
+        outside the admitted profile.\n"'
+      passed: false
+      unsupportedCapability: profile-syntax
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features: []
+      flags: []
+      includes: []
+      mode: script
       path: test/annexB/built-ins/String/prototype/anchor/this-val-tostring-err.js
       strictness:
         - non-strict

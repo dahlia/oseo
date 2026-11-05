@@ -97,10 +97,13 @@ semantic unit required by the active profile is ready. An external library may
 serve as an implementation component only if its observable behavior can meet
 the candidate edition and Oseo owns every mismatch at a tested boundary.
 
-Annex B is outside the candidate claim. The legacy
-`RegExp.prototype.compile` surface therefore does not enter through this plan.
-ECMA-402 locale behavior, host regular expression extensions, and a public
-embedding API are also out of scope.
+Annex B was outside the M5 candidate claim, so its pattern grammar and
+`RegExp.prototype.compile` did not enter through this plan. ADR 0032 brought
+them into the post-M5 claim, and the `annexb-syntax` and
+`annexb-regexp-compile` units of [*PLAN-LANGUAGE.md*](./PLAN-LANGUAGE.md)
+implement them over the components this plan owns. ECMA-402 locale behavior,
+host regular expression extensions, and a public embedding API are out of
+scope.
 
 
 Entry evidence
@@ -153,12 +156,10 @@ pattern reports `OSEO0001` at the offending text inside the literal, and a
 valid one is compiled to its immutable matcher artifact at the same point.
 A pattern whose artifact the build cannot produce, because it reaches an
 owned limit or needs a Unicode fact the composition root did not supply,
-reports the profile boundary at the offending text instead. A construct
-only Annex B admits reports that boundary too, and only without `u` or
-`v`, because those flag sets never admitted it and their rejection is the
-early error the edition itself requires. That keeps ADR 0013's rule that a
-reviewed case depending on Annex B stays unsupported rather than becoming
-a failure.
+reports the profile boundary at the offending text instead. Without `u`
+or `v` the parser follows Annex B's pattern grammar, which the
+`annexb-syntax` unit added; under them every construct only Annex B admits
+is the early error the edition itself requires.
 
 Each evaluation allocates a distinct initialized `RegExp` object. Repeated
 evaluation of one source occurrence and evaluation of two equal occurrences
@@ -198,9 +199,9 @@ modifiers with located `unsupported` errors rather than early errors.
 
 Unicode property escapes are admitted through the parser's named extension
 point when the frontend's exact resolver finds their property set in the
-pinned tables. An invalid name is an early error at the escape. Annex B is
-outside the claim, so a construct only Annex B admits is rejected without the
-`u` flag too, which *docs/regexp-inventory.md* lists exactly.
+pinned tables. An invalid name is an early error at the escape. Without `u`
+or `v` the parser and the runtime pattern compiler follow Annex B's grammar,
+which *docs/regexp-inventory.md* lists exactly.
 
 The initial inventory includes:
 
@@ -678,11 +679,12 @@ exact error kind, section, and span. Its mutations cover escapes, class
 ranges, quantifier bounds, a quantifier without an atom, group names,
 numbered and named references, a property escape without a resolver, an
 unadmitted class set, a repeated flag, an undefined flag, and incompatible
-`u` and `v` flags. The host is a one-directional oracle: it implements
-Annex B and this grammar does not. Host agreement is therefore required for
-a flag error and for a pattern error under a unicode-mode flag, and never
-for an unadmitted construct, which is valid ECMAScript this unit refuses on
-purpose.
+`u` and `v` flags. Each mutation is parsed twice. The core grammar alone
+reports a construct only Annex B admits as `unsupported`, and Annex B's
+grammar, which the build uses, must then accept it as the host does. Every
+`invalid` rejection must be the same under both and must be one the host
+reports too. Under `u` or `v` an `unsupported` rejection is a construct the
+unit refuses on purpose, such as an unadmitted property escape.
 
 The Unicode property checkpoint adds three generated domains in reserved seed
 block `0x60004e00` through `0x60004eff`. Seed `0x60004e00` compares every
@@ -850,8 +852,9 @@ Delivery order
     `0x60005b00` through `0x60005b02`, runtime ABI `oseo-runtime-m5-87`,
     and the *runtime\_regexp\_symbol.c* component. Routing the String
     methods makes the deferred pattern grammar reachable from a `String`
-    operand, so a construct only Annex B admits is now a `SyntaxError`
-    there as it already was for `new RegExp`; item 3 owns that gap.
+    operand, so a construct only Annex B admits was a `SyntaxError` there
+    as it was for `new RegExp`, until `annexb-syntax` admitted Annex B's
+    grammar in both.
 7.  Compile literal patterns during the build, emit immutable descriptors, and
     allocate a fresh wrapper at each evaluation. Compare this path with the
     generic matcher under both specialization policies and forced collection.

@@ -672,3 +672,11 @@ families:
     owner: tests/property/es2027-using-declarations.property.test.ts
     start: 0x6000aa00
     end: 0x6000aaff
+  - family: m5-annexb-regexp-syntax
+    owner: tests/property/m5-annexb-regexp-syntax.property.test.ts
+    start: 0x6000a000
+    end: 0x6000a0ff
+  - family: m5-annexb-regexp-compile
+    owner: tests/property/m5-annexb-regexp-compile.property.test.ts
+    start: 0x6000a100
+    end: 0x6000a1ff

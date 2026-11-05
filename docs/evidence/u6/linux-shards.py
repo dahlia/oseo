@@ -57,6 +57,8 @@ RETAINED = {
     'tests/property/m5-annexb-string-methods.property.test.ts',
     'tests/property/m5-annexb-date-methods.property.test.ts',
     'tests/property/m5-annexb-object-accessors.property.test.ts',
+    'tests/property/m5-annexb-regexp-compile.property.test.ts',
+    'tests/property/m5-annexb-regexp-syntax.property.test.ts',
 }
 # Logged files later split by test registration. Each logged title is
 # rebucketed to the current source that defines it.

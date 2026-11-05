@@ -6,6 +6,9 @@ partitions:
     key: "01"
     path: results/annexB/built-ins/01.yaml
   - group: annexB/built-ins
+    key: "04"
+    path: results/annexB/built-ins/04.yaml
+  - group: annexB/built-ins
     key: "06"
     path: results/annexB/built-ins/06.yaml
   - group: annexB/built-ins
@@ -21,8 +24,14 @@ partitions:
     key: 0c
     path: results/annexB/built-ins/0c.yaml
   - group: annexB/built-ins
+    key: 0f
+    path: results/annexB/built-ins/0f.yaml
+  - group: annexB/built-ins
     key: "10"
     path: results/annexB/built-ins/10.yaml
+  - group: annexB/built-ins
+    key: "13"
+    path: results/annexB/built-ins/13.yaml
   - group: annexB/built-ins
     key: "14"
     path: results/annexB/built-ins/14.yaml
@@ -42,6 +51,9 @@ partitions:
     key: 1c
     path: results/annexB/built-ins/1c.yaml
   - group: annexB/built-ins
+    key: 1d
+    path: results/annexB/built-ins/1d.yaml
+  - group: annexB/built-ins
     key: 1e
     path: results/annexB/built-ins/1e.yaml
   - group: annexB/built-ins
@@ -59,6 +71,9 @@ partitions:
   - group: annexB/built-ins
     key: "29"
     path: results/annexB/built-ins/29.yaml
+  - group: annexB/built-ins
+    key: 2a
+    path: results/annexB/built-ins/2a.yaml
   - group: annexB/built-ins
     key: 2b
     path: results/annexB/built-ins/2b.yaml
@@ -90,6 +105,9 @@ partitions:
     key: 3e
     path: results/annexB/built-ins/3e.yaml
   - group: annexB/built-ins
+    key: 3f
+    path: results/annexB/built-ins/3f.yaml
+  - group: annexB/built-ins
     key: "40"
     path: results/annexB/built-ins/40.yaml
   - group: annexB/built-ins
@@ -102,6 +120,9 @@ partitions:
     key: "45"
     path: results/annexB/built-ins/45.yaml
   - group: annexB/built-ins
+    key: "47"
+    path: results/annexB/built-ins/47.yaml
+  - group: annexB/built-ins
     key: "48"
     path: results/annexB/built-ins/48.yaml
   - group: annexB/built-ins
@@ -111,11 +132,17 @@ partitions:
     key: 4c
     path: results/annexB/built-ins/4c.yaml
   - group: annexB/built-ins
+    key: 4d
+    path: results/annexB/built-ins/4d.yaml
+  - group: annexB/built-ins
     key: "50"
     path: results/annexB/built-ins/50.yaml
   - group: annexB/built-ins
     key: "51"
     path: results/annexB/built-ins/51.yaml
+  - group: annexB/built-ins
+    key: "52"
+    path: results/annexB/built-ins/52.yaml
   - group: annexB/built-ins
     key: "53"
     path: results/annexB/built-ins/53.yaml
@@ -185,6 +212,9 @@ partitions:
   - group: annexB/built-ins
     key: "82"
     path: results/annexB/built-ins/82.yaml
+  - group: annexB/built-ins
+    key: "86"
+    path: results/annexB/built-ins/86.yaml
   - group: annexB/built-ins
     key: "87"
     path: results/annexB/built-ins/87.yaml
@@ -270,6 +300,9 @@ partitions:
     key: b8
     path: results/annexB/built-ins/b8.yaml
   - group: annexB/built-ins
+    key: ba
+    path: results/annexB/built-ins/ba.yaml
+  - group: annexB/built-ins
     key: bb
     path: results/annexB/built-ins/bb.yaml
   - group: annexB/built-ins
@@ -278,6 +311,9 @@ partitions:
   - group: annexB/built-ins
     key: c0
     path: results/annexB/built-ins/c0.yaml
+  - group: annexB/built-ins
+    key: c1
+    path: results/annexB/built-ins/c1.yaml
   - group: annexB/built-ins
     key: c2
     path: results/annexB/built-ins/c2.yaml
@@ -291,11 +327,20 @@ partitions:
     key: ca
     path: results/annexB/built-ins/ca.yaml
   - group: annexB/built-ins
+    key: cc
+    path: results/annexB/built-ins/cc.yaml
+  - group: annexB/built-ins
     key: cd
     path: results/annexB/built-ins/cd.yaml
   - group: annexB/built-ins
+    key: cf
+    path: results/annexB/built-ins/cf.yaml
+  - group: annexB/built-ins
     key: d1
     path: results/annexB/built-ins/d1.yaml
+  - group: annexB/built-ins
+    key: d3
+    path: results/annexB/built-ins/d3.yaml
   - group: annexB/built-ins
     key: d4
     path: results/annexB/built-ins/d4.yaml
@@ -314,6 +359,9 @@ partitions:
   - group: annexB/built-ins
     key: de
     path: results/annexB/built-ins/de.yaml
+  - group: annexB/built-ins
+    key: e1
+    path: results/annexB/built-ins/e1.yaml
   - group: annexB/built-ins
     key: e3
     path: results/annexB/built-ins/e3.yaml
@@ -359,6 +407,9 @@ partitions:
   - group: annexB/built-ins
     key: fc
     path: results/annexB/built-ins/fc.yaml
+  - group: annexB/built-ins
+    key: fe
+    path: results/annexB/built-ins/fe.yaml
   - group: annexB/built-ins
     key: ff
     path: results/annexB/built-ins/ff.yaml
@@ -497,6 +548,9 @@ partitions:
   - group: annexB/language
     key: 3c
     path: results/annexB/language/3c.yaml
+  - group: annexB/language
+    key: 3d
+    path: results/annexB/language/3d.yaml
   - group: annexB/language
     key: 3e
     path: results/annexB/language/3e.yaml
@@ -651,6 +705,9 @@ partitions:
     key: 7e
     path: results/annexB/language/7e.yaml
   - group: annexB/language
+    key: 7f
+    path: results/annexB/language/7f.yaml
+  - group: annexB/language
     key: "80"
     path: results/annexB/language/80.yaml
   - group: annexB/language
@@ -681,6 +738,9 @@ partitions:
     key: 8e
     path: results/annexB/language/8e.yaml
   - group: annexB/language
+    key: 8f
+    path: results/annexB/language/8f.yaml
+  - group: annexB/language
     key: "91"
     path: results/annexB/language/91.yaml
   - group: annexB/language
@@ -707,6 +767,9 @@ partitions:
   - group: annexB/language
     key: 9b
     path: results/annexB/language/9b.yaml
+  - group: annexB/language
+    key: 9c
+    path: results/annexB/language/9c.yaml
   - group: annexB/language
     key: 9d
     path: results/annexB/language/9d.yaml
@@ -779,6 +842,9 @@ partitions:
   - group: annexB/language
     key: b9
     path: results/annexB/language/b9.yaml
+  - group: annexB/language
+    key: ba
+    path: results/annexB/language/ba.yaml
   - group: annexB/language
     key: bb
     path: results/annexB/language/bb.yaml
@@ -25468,18 +25534,18 @@ partitions:
     path: results/language/white-space/f9.yaml
 suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
 summary:
-  expectedNegatives: 4470
+  expectedNegatives: 4479
   harnessFailures: 0
   infrastructureFailures: 0
-  passes: 36112
+  passes: 36156
   semanticFailures: 0
-  unsupportedProfileFeatures: 1896
+  unsupportedProfileFeatures: 1897
   dependencies:
     - dependency: abrupt-completion
-      expectedNegatives: 27
+      expectedNegatives: 35
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 4639
+      passes: 4649
       semanticFailures: 0
       unsupportedProfileFeatures: 677
     - dependency: array-buffer
@@ -25532,7 +25598,7 @@ summary:
       semanticFailures: 0
       unsupportedProfileFeatures: 255
     - dependency: control-flow
-      expectedNegatives: 718
+      expectedNegatives: 723
       harnessFailures: 0
       infrastructureFailures: 0
       passes: 4053
@@ -25572,40 +25638,40 @@ summary:
       infrastructureFailures: 0
       passes: 53
       semanticFailures: 0
-      unsupportedProfileFeatures: 1895
+      unsupportedProfileFeatures: 1897
     - dependency: error-intrinsics
-      expectedNegatives: 19
+      expectedNegatives: 22
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 3424
+      passes: 3434
       semanticFailures: 0
       unsupportedProfileFeatures: 608
     - dependency: expression-operators
-      expectedNegatives: 642
+      expectedNegatives: 647
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 11176
+      passes: 11182
       semanticFailures: 0
-      unsupportedProfileFeatures: 762
+      unsupportedProfileFeatures: 764
     - dependency: functions
       expectedNegatives: 1389
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 18079
+      passes: 18102
       semanticFailures: 0
-      unsupportedProfileFeatures: 1575
+      unsupportedProfileFeatures: 1576
     - dependency: generators
       expectedNegatives: 436
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 4232
+      passes: 4234
       semanticFailures: 0
       unsupportedProfileFeatures: 180
     - dependency: iterator-protocol
       expectedNegatives: 94
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 7892
+      passes: 7894
       semanticFailures: 0
       unsupportedProfileFeatures: 47
     - dependency: json-parse
@@ -25626,14 +25692,14 @@ summary:
       expectedNegatives: 448
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 3124
+      passes: 3129
       semanticFailures: 0
       unsupportedProfileFeatures: 434
     - dependency: lexical-grammar
-      expectedNegatives: 547
+      expectedNegatives: 556
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 1059
+      passes: 1060
       semanticFailures: 0
       unsupportedProfileFeatures: 85
     - dependency: module-linking
@@ -25647,7 +25713,7 @@ summary:
       expectedNegatives: 209
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 6213
+      passes: 6221
       semanticFailures: 0
       unsupportedProfileFeatures: 179
     - dependency: object-own-keys
@@ -25658,12 +25724,12 @@ summary:
       semanticFailures: 0
       unsupportedProfileFeatures: 9
     - dependency: object-properties
-      expectedNegatives: 610
+      expectedNegatives: 611
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 23216
+      passes: 23259
       semanticFailures: 0
-      unsupportedProfileFeatures: 994
+      unsupportedProfileFeatures: 995
     - dependency: promise-settlement
       expectedNegatives: 93
       harnessFailures: 0
@@ -25696,9 +25762,9 @@ summary:
       expectedNegatives: 192
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 604
+      passes: 638
       semanticFailures: 0
-      unsupportedProfileFeatures: 34
+      unsupportedProfileFeatures: 36
     - dependency: rest-parameters
       expectedNegatives: 76
       harnessFailures: 0
@@ -25724,9 +25790,9 @@ summary:
       expectedNegatives: 1
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 6792
+      passes: 6801
       semanticFailures: 0
-      unsupportedProfileFeatures: 284
+      unsupportedProfileFeatures: 283
     - dependency: top-level-await
       expectedNegatives: 11
       harnessFailures: 0
@@ -25784,12 +25850,12 @@ summary:
       semanticFailures: 0
       unsupportedProfileFeatures: 0
     - dependency: var-bindings
-      expectedNegatives: 235
+      expectedNegatives: 240
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 11954
+      passes: 11985
       semanticFailures: 0
-      unsupportedProfileFeatures: 780
+      unsupportedProfileFeatures: 782
     - dependency: weak-collections
       expectedNegatives: 0
       harnessFailures: 0
@@ -25802,14 +25868,14 @@ summary:
       expectedNegatives: 0
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 164
+      passes: 198
       semanticFailures: 0
-      unsupportedProfileFeatures: 0
+      unsupportedProfileFeatures: 2
     - group: annexB/language
-      expectedNegatives: 6
+      expectedNegatives: 15
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 326
+      passes: 335
       semanticFailures: 0
       unsupportedProfileFeatures: 0
     - group: built-ins/AggregateError
@@ -26089,9 +26155,9 @@ summary:
       expectedNegatives: 0
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 1206
+      passes: 1207
       semanticFailures: 0
-      unsupportedProfileFeatures: 17
+      unsupportedProfileFeatures: 16
     - group: built-ins/StringIteratorPrototype
       expectedNegatives: 0
       harnessFailures: 0

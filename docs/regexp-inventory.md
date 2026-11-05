@@ -8,10 +8,11 @@ prototype surface, the well-known symbol hooks, the Unicode inputs, and the
 diagnostics Oseo reports today. It records what exists, not what is
 planned, and it is updated by the unit that changes one of those facts.
 
-The edition boundary is ECMAScript 2025, fixed by
-[ADR 0013](./adr/0013-m5-edition-and-manifest.md). Annex B is outside that
-claim; the pattern-grammar section below turns this into a
-concrete acceptance rule.
+The M5 edition boundary is ECMAScript 2025, fixed by
+[ADR 0013](./adr/0013-m5-edition-and-manifest.md), with Annex B outside it.
+[ADR 0032](./adr/0032-post-m5-edition-boundary.md) brings Annex B into the
+post-M5 claim, and the pattern-grammar section below records how the parser
+and the runtime pattern compiler follow its grammar.
 
 
 Clause inventory
@@ -174,7 +175,6 @@ literal:
 | Condition                         | Code       | Location                              |
 | --------------------------------- | ---------- | ------------------------------------- |
 | Invalid pattern or flag text      | `OSEO0001` | the offending text inside the literal |
-| A construct only Annex B admits   | `OSEO1001` | the construct inside the literal      |
 | A construct a later node admits   | `OSEO1001` | the construct inside the literal      |
 | An owned parser or matcher limit  | `OSEO1001` | the construct that reaches the limit  |
 | A Unicode fact that is not linked | `OSEO1001` | the construct that needs it           |
@@ -198,57 +198,46 @@ ignore-case pattern, a `\s` escape, or a property escape.
 Pattern grammar acceptance
 --------------------------
 
-The owned parser implements the main-body pattern grammar. Annex B is
-outside the candidate claim, so a pattern that only Annex B admits is
-rejected in every mode rather than accepted without the `u` flag. That is
-a deliberate, measured divergence from a web browser:
+The owned parser implements the main-body pattern grammar and, for a
+pattern without `u` or `v`, the grammar of Annex B's Regular Expressions
+Patterns section. The runtime's own validator and pattern compiler, which
+serve the `RegExp` constructor, the String methods that create a RegExp, and
+`compile`, follow the same grammar. Without those flags each of these is
+accepted with its Annex B reading:
 
- -  an identity escape over an `ID_Continue` character, such as `\a`
-    or `\_`;
- -  a legacy octal escape, such as `\01`;
- -  a control escape without an ASCII letter, such as `\c`;
+ -  an identity escape over any character but `c`, such as `\a`, `\_`, or
+    `\é`;
+ -  a legacy octal escape, such as `\01` or `\477`;
+ -  a decimal escape above the pattern's capture count, read as a legacy
+    octal escape or, for `\8` and `\9`, an identity escape;
+ -  a control escape without an ASCII letter, read as a backslash followed
+    by `c`, and `\c` with a digit or `_` inside a class;
  -  an incomplete hexadecimal or Unicode escape, such as `\x` or `\u`,
-    including `\u{...}` without `u` or `v`;
+    including `\u{...}`;
  -  a quantified lookahead, such as `(?=a)*`;
  -  an unescaped `]` or `}`, and a `{` that starts no quantifier;
- -  a class-escape bound character class range, such as `[\d-a]`;
- -  a backreference that names no group; and
- -  a named backreference in a pattern that declares no group name, such
-    as `\k<x>`, `\k`, or `\ka`.
+ -  a class escape as a range bound, such as `[\d-a]`, read as the union of
+    both ends and `-`; and
+ -  `\k` in a pattern that declares no group name, such as `\k<x>`, `\k`,
+    or `\ka`.
 
-Which diagnostic a rejection reports follows from that list. Under `u` and
-`v` Annex B never applied, so the rejection is the early error the edition
-itself requires and reports `OSEO0001`. Without them the text is one a web
-browser accepts, so the rejection is this claim's own boundary and reports
-`OSEO1001` naming Annex B. The generated invalid domain at seed
-`0x60004a01` asserts that split. It uses the reported kind to decide when
-the host engines are a sound oracle: they agree with every `OSEO0001`
-rejection and with none of the Annex B ones.
+Under `u` and `v` each of these stays the edition's own early error and
+reports `OSEO0001`. A rejection Annex B shares is an early error in every
+mode: a quantified lookbehind, edge assertion, or word boundary, an
+out-of-order class range such as `[z-a]`, an unmatched `)`, a malformed
+group name such as `(?<>x)`, a quantifier with nothing to repeat such as
+`{1}`, a named backreference in a pattern that does declare a group name,
+and `\k` inside a class when that pattern declares a group name.
 
-A rejection Annex B shares stays an early error in both modes. A
-quantified lookbehind, edge assertion, or word boundary, an out-of-order
-class range such as `[z-a]`, an unmatched `)`, a malformed group name such
-as `(?<>x)`, a named backreference in a pattern that does declare a group
-name, and `\k` inside a class when that pattern declares a group name are
-all rejected by a web browser too.
+`parseRegExpPattern` still takes `annexB: false` for the core grammar alone.
+That mode reports each construct above as an `unsupported` error naming
+Annex B when the pattern has neither flag, which the generated invalid domain
+at seed `0x60004a01` uses as its oracle selector: the host and Annex B's
+parse must agree with every `invalid` rejection, and both must accept every
+Annex B one.
 
-The parser reports the first defect it reaches, so the split is exact for
-a pattern whose only defect is the reported construct. A pattern that is
-also malformed for a reason Annex B shares, such as `/a(]/`, reports the
-Annex B boundary it reaches first even though a web browser rejects that
-pattern for its unterminated group. The one-directional oracle condition
-holds without that qualification: a sweep of 74,052 short patterns over
-the grammar's own alphabet found no pattern this parser calls invalid that
-a web browser accepts.
-
-The inventory's candidate roots are *test/built-ins/* and *test/language/*,
-so *test/annexB/* is outside it entirely. The `u-invalid-` and
-`unicode_restricted_` cases inside the boundary assert exactly the
-rejections above. Whether an included path also requires accepting one of
-these constructs without `u` is measured for the 625 paths under
-*test/built-ins/RegExp/CharacterClassEscapes/* and
-*test/built-ins/RegExp/property-escapes/*. None requires that Annex B
-acceptance. The next node that reviews another RegExp directory owns the
-same measurement for its paths. A path that needs Annex B acceptance
-classifies as an unsupported profile feature rather than silently widening
-the grammar.
+The `u-invalid-` and `unicode_restricted_` cases under *test/built-ins/*
+assert the unicode-mode rejections above. The Annex B rows under
+*test/annexB/built-ins/RegExp/* and *test/annexB/language/literals/regexp/*
+belong to the `annexb-syntax` unit of
+[*PLAN-LANGUAGE.md*](../PLAN-LANGUAGE.md).

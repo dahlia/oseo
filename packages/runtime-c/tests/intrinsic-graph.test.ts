@@ -3202,3 +3202,29 @@ test("populates the explicit resource management intrinsics", () => {
   assert.match(disposalSource, /"DisposableStack",/u);
   assert.match(disposalSource, /"AsyncDisposableStack",/u);
 });
+
+test("installs RegExp.prototype.compile without an intrinsic slot", () => {
+  const internalHeader = sources.get("runtime_internal.h") ?? "";
+  const regexpSource = sources.get("runtime_regexp.c") ?? "";
+  // The code ID sits below the symbol-method block, so the range test that
+  // routes that block to runtime_regexp_symbol.c never reaches it.
+  assert.match(
+    internalHeader,
+    new RegExp(
+      "#define OSEO_REGEXP_COMPILE_CODE_ID " +
+        "\\(OSEO_REGEXP_CODE_ID_RANGE_LAST - 21u\\)",
+      "u",
+    ),
+  );
+  assert.match(regexpSource, /"compile",\n {4}\};/u);
+  assert.match(
+    regexpSource,
+    /static const size_t prototype_method_lengths\[\] = \{1u, 1u, 0u, 2u\};/u,
+  );
+  // The receiver keeps its identity: RegExpInitialize replaces only its
+  // matcher, and the lastIndex reset runs on the same object afterwards.
+  assert.match(
+    regexpSource,
+    /result = regexp_set_last_index\(context, frame\.slots\[0\], 0\.0\);/u,
+  );
+});

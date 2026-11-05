@@ -446,14 +446,6 @@ for (const deferredRegExp of [
       "new RegExp({ [Symbol.match]: true, source: /\\p{L}/u.source, " +
       'flags: "u" });',
   },
-  {
-    name: "deferred-regexp-nonascii-identity.ts",
-    source: 'new RegExp("\\\\é");',
-  },
-  {
-    name: "deferred-regexp-nonascii-class-identity.ts",
-    source: 'new RegExp("[\\\\é]");',
-  },
 ]) {
   nativeProgress(`cli ${deferredRegExp.name} policy=enabled begin`);
   const deferred = await runNativeCli(
@@ -627,27 +619,6 @@ ${shadowedRegExpPlaceholder.expression};
   assert.equal(native.stderr, "");
 }
 
-nativeProgress(`cli regexp-core-class-backreference.ts policy=enabled begin`);
-const coreClassBackreference = await runNativeCli(
-  {
-    args: ["regexp-core-class-backreference.ts"],
-    source: `
-try {
-  new RegExp("(a)[\\\\1]");
-} catch (error) {
-  console.log(error instanceof SyntaxError);
-}
-`,
-    sourceId: "regexp-core-class-backreference.ts",
-    version: "0.1.0",
-  },
-  host,
-);
-nativeProgress(`cli regexp-core-class-backreference.ts policy=enabled end`);
-assert.equal(coreClassBackreference.exitStatus, 0);
-assert.equal(coreClassBackreference.stdout, "true\n");
-assert.equal(coreClassBackreference.stderr, "");
-
 // RegExp.prototype[Symbol.replace] keeps its next source position as the
 // unclamped position plus match length, so a match object built by user
 // code that reports a `0` longer than the remaining subject makes the
@@ -684,23 +655,42 @@ assert.equal(replaceSourcePosition.exitStatus, 0, replaceSourcePosition.stderr);
 assert.equal(replaceSourcePosition.stdout, "<R>\n3\n");
 assert.equal(replaceSourcePosition.stderr, "");
 
-// A String operand whose text uses an Annex B pattern construct now
-// reaches the dynamic validator through RegExpCreate, so it reports that
-// grammar's SyntaxError rather than the retired String-only fallback's
-// profile boundary. The reference hosts implement Annex B and accept both
-// patterns, so this observation cannot be a differential fixture.
+// Annex B's pattern grammar accepts each of these escapes without the u
+// flag: a non-ASCII identity escape, inside and outside a class, a class
+// escape that names no capture as a legacy octal escape, and an incomplete
+// \x or \u escape as its literal letters. A String operand to
+// String.prototype.match reaches the same grammar through RegExpCreate.
+// The u flag keeps the core grammar, so each pattern then throws a
+// SyntaxError. Both reference hosts implement Annex B and must agree.
 for (const annexBPattern of [
-  { name: "annex-b-short-hex.ts", units: "92, 120, 49" },
-  { name: "annex-b-bad-unicode.ts", units: "92, 117, 49, 50, 122, 52" },
+  { name: "annex-b-nonascii-identity.ts", pattern: "\\é", subject: "é" },
+  {
+    name: "annex-b-nonascii-class-identity.ts",
+    pattern: "[\\é]",
+    subject: "é",
+  },
+  {
+    name: "annex-b-class-octal.ts",
+    pattern: "(a)[\\1]",
+    subject: "a\u0001",
+  },
+  { name: "annex-b-short-hex.ts", pattern: "\\x1", subject: "x1" },
+  { name: "annex-b-bad-unicode.ts", pattern: "\\u12z4", subject: "u12z4" },
 ]) {
+  const pattern = JSON.stringify(annexBPattern.pattern);
+  const subject = JSON.stringify(annexBPattern.subject);
   const source =
-    "try {\n" +
-    `  "x".match(String.fromCharCode(${annexBPattern.units}));\n` +
-    "} catch (error) {\n" +
-    "  console.log(error instanceof SyntaxError);\n" +
+    `console.log(String(${subject}.match(${pattern})));\n` +
+    'for (const flags of ["", "u"]) {\n' +
+    "  try {\n" +
+    `    const r = new RegExp(${pattern}, flags);\n` +
+    `    console.log(flags, r.source, r.test(${subject}));\n` +
+    "  } catch (error) {\n" +
+    "    console.log(flags, error instanceof SyntaxError);\n" +
+    "  }\n" +
     "}\n";
   nativeProgress(`cli ${annexBPattern.name} policy=enabled begin`);
-  const rejected = await runNativeCli(
+  const native = await runNativeCli(
     {
       args: [annexBPattern.name],
       source,
@@ -710,9 +700,13 @@ for (const annexBPattern of [
     host,
   );
   nativeProgress(`cli ${annexBPattern.name} policy=enabled end`);
-  assert.equal(rejected.exitStatus, 0, rejected.stderr);
-  assert.equal(rejected.stdout, "true\n");
-  assert.equal(rejected.stderr, "");
+  const [node, deno] = await hostScriptReferences(host, source);
+  assert(node != null && deno != null);
+  assert.equal(node.exitStatus, 0, node.stderr);
+  assert.equal(deno.stdout, node.stdout);
+  assert.equal(native.exitStatus, 0, native.stderr);
+  assert.equal(native.stdout, node.stdout);
+  assert.equal(native.stderr, "");
 }
 
 // ADR 0023's portable baseline admits magnitudes through 65,536 bits, and

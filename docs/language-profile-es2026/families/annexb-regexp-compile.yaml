@@ -1,0 +1,78 @@
+version: 1
+id: annexb-regexp-compile
+title: "Annex B RegExp.prototype.compile"
+scope:
+  - "RegExp.prototype.compile of B.2.4.1: the receiver check, the TypeError
+    for a RegExp pattern with flags, the copy of a RegExp pattern's
+    original source and flags, and RegExpInitialize of the receiver in
+    place with the constructor's conversion order and validation."
+  - "The lastIndex reset after reinitialization and its TypeError on a
+    non-writable lastIndex, with the receiver already holding the new
+    pattern, and a SyntaxError that leaves the receiver unchanged."
+  - "Literal, constructed, and subclass receivers, recompilation from user
+    code that @@split and exec run, and the name, length, and writable,
+    non-enumerable, configurable descriptor of the method."
+owners:
+  - docs/language-profile-es2026.md
+evidence:
+  differential:
+    status: covered
+    references:
+      - tests/annexb-syntax-native.test.ts
+      - tests/native/fixtures/annexb-regexp-compile.ts
+      - tests/property/m5-annexb-regexp-compile.property.test.ts
+  fixed:
+    status: covered
+    references:
+      - tests/native/fixtures/annexb-regexp-compile.ts
+  forced-collection:
+    status: covered
+    references:
+      - tests/annexb-syntax-native.test.ts
+      - tests/property/m5-annexb-regexp-compile.property.test.ts
+  generated:
+    status: covered
+    references:
+      - tests/property/m5-annexb-regexp-compile.property.test.ts
+  guard-fallback:
+    status: covered
+    references:
+      - tests/annexb-syntax-native.test.ts
+      - tests/native/fixtures/annexb-regexp-compile.ts
+  specialization:
+    status: covered
+    references:
+      - tests/annexb-syntax-native.test.ts
+      - tests/property/m5-annexb-regexp-compile.property.test.ts
+  standards:
+    status: covered
+    references:
+      - tests/test262/subset.yaml
+      - tests/test262/results.yaml
+      - tests/test262/results/annexB/built-ins/04.yaml
+      - tests/test262/results/annexB/built-ins/0f.yaml
+      - tests/test262/results/annexB/built-ins/13.yaml
+      - tests/test262/results/annexB/built-ins/19.yaml
+      - tests/test262/results/annexB/built-ins/24.yaml
+      - tests/test262/results/annexB/built-ins/2a.yaml
+      - tests/test262/results/annexB/built-ins/3c.yaml
+      - tests/test262/results/annexB/built-ins/3f.yaml
+      - tests/test262/results/annexB/built-ins/51.yaml
+      - tests/test262/results/annexB/built-ins/52.yaml
+      - tests/test262/results/annexB/built-ins/6e.yaml
+      - tests/test262/results/annexB/built-ins/86.yaml
+      - tests/test262/results/annexB/built-ins/94.yaml
+      - tests/test262/results/annexB/built-ins/9e.yaml
+      - tests/test262/results/annexB/built-ins/a4.yaml
+      - tests/test262/results/annexB/built-ins/a7.yaml
+      - tests/test262/results/annexB/built-ins/ba.yaml
+      - tests/test262/results/annexB/built-ins/c1.yaml
+      - tests/test262/results/annexB/built-ins/cc.yaml
+      - tests/test262/results/annexB/built-ins/d3.yaml
+      - tests/test262/results/annexB/built-ins/d4.yaml
+      - tests/test262/results/annexB/built-ins/e5.yaml
+      - tests/test262/results/annexB/built-ins/f5.yaml
+  structural:
+    status: covered
+    references:
+      - packages/runtime-c/tests/intrinsic-graph.test.ts

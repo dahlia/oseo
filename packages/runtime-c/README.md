@@ -1471,6 +1471,22 @@ run on both. The accessor is an ordinary property-vector entry: [[Get]],
 levels, deletion, and for-in treat it as one. No intrinsic slot, heap kind,
 component, or generated-code entry point is added.
 
+Without an ABI change, the dynamic pattern validator in *runtime\_regexp.c* and
+the program compiler in *runtime\_regexp\_matcher.c* follow Annex B's pattern
+grammar for a pattern without `u` or `v`, as the build-time parser does. Both
+read a decimal escape against the capture count of the whole pattern, and
+a quantified lookahead repeats through the ordinary quantifier prologue. An
+identity escape no longer consults `ID_Continue`, so a non-ASCII identity
+escape compiles instead of returning `OSEO2001`. The validator also stopped
+reading a `-` after a completed class range as the start of another range.
+
+ABI `m5-158` adds `RegExp.prototype.compile` of Annex B. It takes
+`OSEO_REGEXP_COMPILE_CODE_ID`, the RegExp range last minus 21, below the
+symbol-method block. It reinitializes the receiver through the constructor's
+RegExpInitialize, borrowing the program of a RegExp pattern whose parse flags
+agree, and then sets `lastIndex` to 0. It adds no intrinsic slot, heap kind,
+component, or generated-code entry point.
+
 [ADR 0030]: https://github.com/dahlia/oseo/blob/main/docs/adr/0030-test262-unhandled-rejection-policy.md
 [ADR 0034]: https://github.com/dahlia/oseo/blob/main/docs/adr/0034-legacy-function-caller-contract.md
 

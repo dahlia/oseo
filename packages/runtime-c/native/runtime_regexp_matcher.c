@@ -387,6 +387,11 @@ typedef struct {
     size_t index;
     uint16_t flag_mask;
     bool unicode;
+    /*
+     * Whether a `\k` reads a group name, which Annex B decides once for
+     * the whole pattern: only a pattern that declares a group name does.
+     */
+    bool named_groups;
     bool ignore_case;
     bool multiline;
     bool dot_all;
@@ -1264,6 +1269,7 @@ static bool collect_captures(OseoRegExpCompiler *compiler) {
         if (assigned >= compiler->capture_count) return false;
         OseoRegExpCapture *record = &compiler->captures[assigned];
         record->named = named;
+        if (named) compiler->named_groups = true;
         record->name_offset = 0u;
         record->name_length = 0u;
         if (named) {
@@ -1331,6 +1337,12 @@ static bool parse_escape(
             return true;
         case 'B':
             compiler->index += 1u;
+            if (in_class) {
+                // Annex B's identity escape; validation refused it in
+                // a unicode-mode class.
+                result->code_point = 'B';
+                return true;
+            }
             result->kind = OSEO_REGEXP_ESCAPE_BOUNDARY;
             result->negated = true;
             return true;
@@ -1357,15 +1369,24 @@ static bool parse_escape(
         case 'p':
         case 'P':
         case 'q':
+            if (!compiler->unicode) break;
             compiler_fail(compiler, OSEO_REGEXP_UNSUPPORTED);
             return false;
         default:
             break;
     }
-    if (unit == 'c' && ascii_alpha(unit_at(compiler, compiler->index + 1u))) {
-        result->code_point =
-            (uint32_t)(unit_at(compiler, compiler->index + 1u) & 0x1fu);
-        compiler->index += 2u;
+    if (unit == 'c') {
+        uint16_t letter = unit_at(compiler, compiler->index + 1u);
+        if (ascii_alpha(letter) ||
+            (in_class && !compiler->unicode &&
+             (ascii_digit(letter) || letter == '_'))) {
+            result->code_point = (uint32_t)(letter & 0x1fu);
+            compiler->index += 2u;
+            return true;
+        }
+        // Annex B: the backslash alone, with the `c` left for the next
+        // atom. Validation refused this text under `u` and `v`.
+        result->code_point = '\\';
         return true;
     }
     if (unit == 'x') {
@@ -1373,11 +1394,33 @@ static bool parse_escape(
         uint32_t low = 0u;
         if (!hex_digit(unit_at(compiler, compiler->index + 1u), &high) ||
             !hex_digit(unit_at(compiler, compiler->index + 2u), &low)) {
-            compiler_fail(compiler, OSEO_REGEXP_INVALID);
-            return false;
+            // Annex B's identity escape over the incomplete `x`.
+            compiler->index += 1u;
+            result->code_point = 'x';
+            return true;
         }
         result->code_point = high * 16u + low;
         compiler->index += 3u;
+        return true;
+    }
+    if (unit == 'u' && !compiler->unicode) {
+        uint32_t value = 0u;
+        for (size_t offset = 1u; offset <= 4u; offset += 1u) {
+            uint32_t digit = 0u;
+            if (!hex_digit(
+                    unit_at(compiler, compiler->index + offset),
+                    &digit
+                )) {
+                // Annex B's identity escape over the incomplete `u`,
+                // including the braced form without `u` or `v`.
+                compiler->index += 1u;
+                result->code_point = 'u';
+                return true;
+            }
+            value = value * 16u + digit;
+        }
+        compiler->index += 5u;
+        result->code_point = value;
         return true;
     }
     if (unit == 'u') {
@@ -1437,6 +1480,12 @@ static bool parse_escape(
         result->code_point = value;
         return true;
     }
+    if (unit == 'k' && !in_class && !compiler->unicode &&
+        !compiler->named_groups) {
+        compiler->index += 1u;
+        result->code_point = 'k';
+        return true;
+    }
     if (unit == 'k' && !in_class) {
         size_t end = 0u;
         size_t length = 0u;
@@ -1459,6 +1508,50 @@ static bool parse_escape(
         result->kind = OSEO_REGEXP_ESCAPE_BACKREFERENCE;
         result->capture = capture;
         result->named = true;
+        return true;
+    }
+    if (ascii_digit(unit) && !compiler->unicode) {
+        /*
+         * Annex B: a DecimalEscape names a group only up to the capture
+         * count. Otherwise it is an identity escape over 8 or 9, or a
+         * legacy octal escape, and the digits it leaves are characters.
+         */
+        size_t start = compiler->index;
+        if (!in_class && unit != '0') {
+            size_t value = 0u;
+            size_t end = start;
+            while (end < compiler->source->length &&
+                   ascii_digit(unit_at(compiler, end))) {
+                if (value <= compiler->capture_count) {
+                    value = value * 10u +
+                        (size_t)(unit_at(compiler, end) - '0');
+                }
+                end += 1u;
+            }
+            if (value <= compiler->capture_count) {
+                compiler->index = end;
+                result->kind = OSEO_REGEXP_ESCAPE_BACKREFERENCE;
+                result->capture = value;
+                return true;
+            }
+        }
+        compiler->index += 1u;
+        if (unit >= '8') {
+            result->code_point = unit;
+            return true;
+        }
+        uint32_t value = (uint32_t)(unit - '0');
+        uint16_t next = unit_at(compiler, compiler->index);
+        if (next >= '0' && next <= '7') {
+            value = value * 8u + (uint32_t)(next - '0');
+            compiler->index += 1u;
+            next = unit_at(compiler, compiler->index);
+            if (unit <= '3' && next >= '0' && next <= '7') {
+                value = value * 8u + (uint32_t)(next - '0');
+                compiler->index += 1u;
+            }
+        }
+        result->code_point = value;
         return true;
     }
     if (ascii_digit(unit)) {
@@ -1529,6 +1622,49 @@ static bool parse_class_atom(
 }
 
 /*
+ * Add one class escape's set to the class being built in `work[0]`,
+ * using `work[1]` and `work[2]` as scratch.
+ */
+static bool union_class_escape(
+    OseoRegExpCompiler *compiler,
+    const OseoRegExpClassAtom *atom
+) {
+    OseoRegExpBuffer *accumulator = &compiler->work[0];
+    if (!class_escape_set(compiler, atom->class_escape, &compiler->work[1])) {
+        return false;
+    }
+    if (atom->negated) {
+        if (!compiler_allocate(
+                compiler,
+                set_complement(
+                    compiler->context,
+                    compiler->work[1].values,
+                    compiler->work[1].count,
+                    &compiler->work[2]
+                )
+            )) {
+            return false;
+        }
+        buffer_swap(&compiler->work[1], &compiler->work[2]);
+    }
+    if (!compiler_allocate(
+            compiler,
+            set_union(
+                compiler->context,
+                accumulator->values,
+                accumulator->count,
+                compiler->work[1].values,
+                compiler->work[1].count,
+                &compiler->work[2]
+            )
+        )) {
+        return false;
+    }
+    buffer_swap(accumulator, &compiler->work[2]);
+    return true;
+}
+
+/*
  * Compile one character class into an interned set.
  *
  * Closing comes before negation because `CharacterSetMatcher` inverts a
@@ -1547,41 +1683,47 @@ static uint32_t parse_character_class(OseoRegExpCompiler *compiler) {
         OseoRegExpClassAtom first;
         if (!parse_class_atom(compiler, &first)) return 0u;
         if (first.is_set) {
-            if (!class_escape_set(
-                    compiler,
-                    first.class_escape,
-                    &compiler->work[1]
-                )) {
-                return 0u;
-            }
-            if (first.negated) {
-                if (!compiler_allocate(
-                        compiler,
-                        set_complement(
-                            compiler->context,
-                            compiler->work[1].values,
-                            compiler->work[1].count,
-                            &compiler->work[2]
-                        )
+            if (!union_class_escape(compiler, &first)) return 0u;
+            /*
+             * Annex B's CharacterRangeOrUnion with a class escape first:
+             * the dash and the atom after it belong to this union, so
+             * neither may start another range. Validation refused this
+             * text under `u` and `v`.
+             */
+            if (unit_at(compiler, compiler->index) == '-' &&
+                compiler->index + 1u < compiler->source->length &&
+                unit_at(compiler, compiler->index + 1u) != ']') {
+                compiler->index += 1u;
+                OseoRegExpClassAtom second;
+                if (!parse_class_atom(compiler, &second)) return 0u;
+                if (second.is_set) {
+                    if (!union_class_escape(compiler, &second)) return 0u;
+                    second.code_point = '-';
+                }
+                if (!buffer_push(
+                        compiler->context,
+                        &compiler->class_ranges,
+                        '-'
+                    ) ||
+                    !buffer_push(
+                        compiler->context,
+                        &compiler->class_ranges,
+                        '-' + 1u
+                    ) ||
+                    !buffer_push(
+                        compiler->context,
+                        &compiler->class_ranges,
+                        second.code_point
+                    ) ||
+                    !buffer_push(
+                        compiler->context,
+                        &compiler->class_ranges,
+                        second.code_point + 1u
                     )) {
+                    compiler_fail(compiler, OSEO_REGEXP_ALLOCATION_FAILURE);
                     return 0u;
                 }
-                buffer_swap(&compiler->work[1], &compiler->work[2]);
             }
-            if (!compiler_allocate(
-                    compiler,
-                    set_union(
-                        compiler->context,
-                        accumulator->values,
-                        accumulator->count,
-                        compiler->work[1].values,
-                        compiler->work[1].count,
-                        &compiler->work[2]
-                    )
-                )) {
-                return 0u;
-            }
-            buffer_swap(accumulator, &compiler->work[2]);
             continue;
         }
         uint32_t start = first.code_point;
@@ -1592,6 +1734,38 @@ static uint32_t parse_character_class(OseoRegExpCompiler *compiler) {
             compiler->index += 1u;
             OseoRegExpClassAtom second;
             if (!parse_class_atom(compiler, &second)) return 0u;
+            if (second.is_set && !compiler->unicode) {
+                /*
+                 * Annex B's CharacterRangeOrUnion: the first atom, the
+                 * dash, and the class escape. A class escape first is
+                 * handled where it is parsed, with its own dash.
+                 */
+                if (!buffer_push(
+                        compiler->context,
+                        &compiler->class_ranges,
+                        start
+                    ) ||
+                    !buffer_push(
+                        compiler->context,
+                        &compiler->class_ranges,
+                        start + 1u
+                    ) ||
+                    !buffer_push(
+                        compiler->context,
+                        &compiler->class_ranges,
+                        '-'
+                    ) ||
+                    !buffer_push(
+                        compiler->context,
+                        &compiler->class_ranges,
+                        '-' + 1u
+                    )) {
+                    compiler_fail(compiler, OSEO_REGEXP_ALLOCATION_FAILURE);
+                    return 0u;
+                }
+                if (!union_class_escape(compiler, &second)) return 0u;
+                continue;
+            }
             if (second.is_set || second.code_point < start) {
                 compiler_fail(compiler, OSEO_REGEXP_INVALID);
                 return 0u;
@@ -1998,8 +2172,10 @@ static void parse_lookaround(
 /*
  * Read the quantifier that follows an atom, if any.
  *
- * A validated pattern only reaches `{` where a braced quantifier is
- * well formed, so the decimal bounds below need no separate rejection.
+ * Validation has already checked the bounds of every `{` that spells a
+ * quantifier. Any other `{` is Annex B's pattern character, which this
+ * leaves for the next term, so a brace without a lower bound or without
+ * its closing brace is no quantifier here.
  */
 static bool parse_quantifier(
     OseoRegExpCompiler *compiler,
@@ -2027,6 +2203,7 @@ static bool parse_quantifier(
                 (uint64_t)(compiler->source->units[cursor] - '0');
             cursor += 1u;
         }
+        if (cursor == compiler->index + 1u) return false;
         uint64_t high = low;
         if (cursor < compiler->source->length &&
             compiler->source->units[cursor] == ',') {
@@ -2162,8 +2339,34 @@ static void parse_term(OseoRegExpCompiler *compiler, bool backward) {
     }
     if (unit == '(' && unit_at(compiler, compiler->index + 1u) == '?') {
         uint16_t kind = unit_at(compiler, compiler->index + 2u);
-        if (kind == '=' || kind == '!') {
+        if ((kind == '=' || kind == '!') && compiler->unicode) {
             parse_lookaround(compiler, false, kind == '!');
+            return;
+        }
+        if (kind == '=' || kind == '!') {
+            /*
+             * Annex B's QuantifiableAssertion repeats like an atom whose
+             * matcher is the lookahead, captures inside it included.
+             */
+            size_t atom_start = compiler->instruction_count;
+            size_t capture_before = compiler->next_capture;
+            parse_lookaround(compiler, false, kind == '!');
+            if (!compiler_ok(compiler)) return;
+            uint64_t minimum = 0u;
+            uint64_t maximum = 0u;
+            bool greedy = true;
+            if (!parse_quantifier(compiler, &minimum, &maximum, &greedy)) {
+                return;
+            }
+            build_quantified(
+                compiler,
+                atom_start,
+                capture_before,
+                compiler->next_capture,
+                minimum,
+                maximum,
+                greedy
+            );
             return;
         }
         if (kind == '<') {

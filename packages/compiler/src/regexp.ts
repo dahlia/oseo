@@ -371,6 +371,14 @@ export const defaultRegExpPatternLimits: RegExpPatternLimits = {
 
 /** Optional components shared by every pattern parse entry point. */
 export interface RegExpPatternOptions {
+  /**
+   * Whether a pattern without `u` or `v` follows the grammar of Annex B's
+   * Regular Expressions Patterns section, as the edition requires of a web
+   * browser host. It is on unless a caller asks for the core grammar
+   * alone, which then reports every construct only Annex B admits as an
+   * `unsupported` error. Under `u` or `v` the option changes nothing.
+   */
+  readonly annexB?: boolean;
   readonly extensions?: RegExpPatternExtensions;
   readonly limits?: RegExpPatternLimits;
 }

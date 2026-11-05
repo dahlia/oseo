@@ -6,12 +6,12 @@ import type { Fixture } from "../fixture.ts";
  * that now reach them through RegExpCreate and Invoke.
  *
  * Every observation is printed rather than asserted so the reference
- * hosts decide it. Two observations stay out of this fixture because the
- * pinned hosts disagree about them: a `@@replace` receiver whose `exec`
- * is an ordinary function and whose `lastIndex` never advances, where the
+ * hosts decide it. One observation stays out of this fixture because the
+ * pinned hosts disagree about it: a `@@replace` receiver whose `exec` is
+ * an ordinary function and whose `lastIndex` never advances, where the
  * pinned Node.js host stops after one execution while Deno and the
- * edition continue, and an Annex B pattern reaching the dynamic
- * validator, which both hosts accept and this runtime rejects.
+ * edition continue. Annex B patterns reaching the dynamic validator
+ * through these methods are covered by tests/native/fixtures/annexb-syntax.ts.
  */
 export const regexpSymbolMethodsFixtures: readonly Fixture[] = [
   {

@@ -43,10 +43,13 @@ const { assertProperty, propertySize } = await import(
  * matching, so no observation here compares match state; that comparison
  * belongs to the generic matcher unit.
  *
- * The host is a one-directional oracle. Annex B is outside the candidate
- * claim, so a pattern without the `u` flag may be rejected here and
- * accepted by the host; the invalid domain therefore requires the host to
- * agree only under `u`, where Annex B adds nothing.
+ * The invalid domain parses every mutation twice. With the core grammar
+ * alone, a construct only Annex B admits is an `unsupported` rejection
+ * that the host, which implements Annex B, never confirms. With Annex B's
+ * grammar, which the frontend and runtime use, the host is an oracle in
+ * both directions: a pattern without `u` or `v` that the core grammar
+ * leaves unsupported is accepted by both, and every invalid one is
+ * rejected by both.
  */
 
 const size = propertySize();
@@ -915,7 +918,11 @@ test("one mutation of a generated pattern fails at the exact phase", () => {
         const [mutated, flags] = mutation.apply(source, model.flags);
         const expected = mutation.expect(source, model.flags);
         const label = `${mutation.label} /${mutated}/${flags}`;
-        const result = parseRegExpPattern({ flags, source: mutated });
+        const result = parseRegExpPattern({
+          annexB: false,
+          flags,
+          source: mutated,
+        });
         assert.equal(result.parsed, false, label);
         const error = result.errors[0];
         assert.ok(error != null, label);
@@ -923,15 +930,26 @@ test("one mutation of a generated pattern fails at the exact phase", () => {
         assert.equal(error.section, expected.section, label);
         assert.deepEqual(error.span, expected.span, label);
         /*
-         * The taxonomy carries host agreement now. An invalid rejection is
-         * the early error the edition itself requires, so every conforming
-         * implementation reports it. An unsupported one is either text
-         * only Annex B admits, which the host accepts, or a construct this
-         * unit refuses on purpose.
+         * The core taxonomy selects the Annex B oracle. An invalid
+         * rejection is the early error the edition itself requires, so
+         * Annex B's grammar reports it unchanged and the host rejects it.
+         * Without `u` or `v` an unsupported one is text only Annex B
+         * admits, so Annex B's grammar and the host both accept it. Under
+         * `u` or `v` it is a construct this unit refuses on purpose.
          */
-        const hostAgrees = expected.kind === "invalid";
-        if (!hostAgrees) return;
-        assert.throws(() => new RegExp(mutated, flags), SyntaxError, label);
+        const annexB = parseRegExpPattern({ flags, source: mutated });
+        if (expected.kind === "invalid") {
+          assert.deepEqual(annexB.errors[0], error, label);
+          assert.throws(() => new RegExp(mutated, flags), SyntaxError, label);
+          return;
+        }
+        if (unicodeMode(flags)) {
+          assert.deepEqual(annexB.errors[0], error, label);
+          return;
+        }
+        assert.deepEqual(annexB.errors, [], label);
+        assert.equal(annexB.parsed, true, label);
+        assert.doesNotThrow(() => new RegExp(mutated, flags), label);
       },
     ),
     {

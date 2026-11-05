@@ -751,6 +751,8 @@
 #define OSEO_REGEXP_REPLACE_CODE_ID \
     (OSEO_REGEXP_CODE_ID_RANGE_LAST - 19u)
 #define OSEO_REGEXP_ESCAPE_CODE_ID (OSEO_REGEXP_CODE_ID_RANGE_LAST - 20u)
+/* Annex B's RegExp.prototype.compile, below the symbol-method block. */
+#define OSEO_REGEXP_COMPILE_CODE_ID (OSEO_REGEXP_CODE_ID_RANGE_LAST - 21u)
 
 #define OSEO_MATH_CODE_ID_RANGE_INDEX ((size_t)17u)
 #define OSEO_MATH_CODE_ID_RANGE_FIRST \

@@ -12,11 +12,12 @@ Domain and budget
 
 Each original selects 65,521 BMP code units. Build-time tests compile each unit
 as a literal in both strictness modes, taking about 2 seconds per plain domain
-and 4 per escaped domain. The plain domains accept all 65,521. The escaped
-domains accept 14,737 and reject 50,784 as Annex B only.
+and 4 per escaped domain. Every domain accepts all 65,521, because the build
+follows Annex B's pattern grammar; the build-time tests also check that the
+core grammar alone would reject 50,784 of each escaped domain.
 
 Four native properties, one per original, execute every accepted literal once:
-160,516 literals in 40 programs of at most 4,096. A run is one complete sweep,
+262,084 literals in 64 programs of at most 4,096. A run is one complete sweep,
 so `numRuns` is 1. The generated layout is the rotation of the sweep, the
 function size, and the specialization phase. The specialization phase
 alternates policies by program. The family reserves seed block `0x60009500` to
@@ -29,6 +30,18 @@ through the existing `OSEO_PROPERTY_TIME_SCALE`: 3 on Linux and 6 on macOS, as
 
 Measurements
 ------------
+
+Until the `annexb-syntax` unit, each escaped domain accepted 14,737 literals
+and the measurements below are of that domain. Each escaped property now runs
+4.45 times as many literals, as many as a plain one, through the same
+per-literal path. One ordinary run after the change on a 16-thread Linux AMD64
+host shared with other lanes, at a load average near 90, took 357.9, 533.8,
+501.5, and 432.9 seconds in path order; the baseline run on the same host at
+lower load took 65.5, 14.4, 65.2, and 13.9. The load makes the two runs
+incomparable in absolute terms, but within the second run each escaped
+property took about as long as a plain one, so the per-literal cost did not
+change and the shard budgets below need the escaped properties re-measured at
+plain-domain cost.
 
 The runs in the first table used one 16-thread Linux AMD64 host under the
 heavy-lock capacity prefix, with only this file running. The durations for the

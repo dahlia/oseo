@@ -67,9 +67,10 @@ dedicated job.
 Annex B escaped domains
 -----------------------
 
-The two escaped domains, A1.4 and A2.4, accept 14,737 literals today. Once the
-`annexb-syntax` unit accepts Annex B identity escapes, they accept all 65,521,
-as the plain domains do. Their seeds and budgets do not change.
+The two escaped domains, A1.4 and A2.4, accepted 14,737 literals before the
+`annexb-syntax` unit. That unit accepts Annex B identity escapes, so they now
+accept all 65,521, as the plain domains do. Their seeds and budgets did not
+change.
 
 That unit measured the file locally with `--test-concurrency=1` on one Linux
 AMD64 host, alternating its base and its change. The host carried a load
@@ -87,6 +88,21 @@ An earlier run of the base on the same host took 65.5, 14.4, 65.2, and 13.9
 seconds. In the paired runs an escaped domain took 0.64 to 1.26
 times as long as the plain domain of the same pass. The estimates below
 therefore treat an escaped sweep as up to 1.26 times a plain one.
+
+With the concurrent program builds described below, the change was measured
+again on the same host while it ran nothing else. Each pass was
+`node --test --test-concurrency=1` on the file under `taskset -c 0-2`, with
+warm Zig and runtime archive caches. The host's load average was 0.6 when the
+first pass started:
+
+| Pass |  A1.1 | A1.4 | A2.1 | A2.4 | File wall |
+| ---: | ----: | ---: | ---: | ---: | --------: |
+|    1 | 100.9 | 99.1 | 94.7 | 99.3 |       402 |
+|    2 |  97.9 | 98.8 | 96.0 | 98.0 |       399 |
+
+The escaped sweeps now take as long as the plain ones. Before the change, the
+concurrent escaped sweeps took 25.2 to 25.4 seconds on 3 CPUs; the plain sweeps
+did not move.
 
 
 Where a sweep spends its time
@@ -160,10 +176,12 @@ On 3 CPUs the plain sweeps ran 2.1 to 2.3 times faster in both pairs, not
 three times. The test process's own work, about half a second of MIR
 compilation and C emission per program, and Zig's per-build overhead share
 the same three CPUs. The escaped sweeps have four programs, the last one
-partial, so they finish in two rounds and ran 1.9 to 2.0 times faster. Once
-the `annexb-syntax` unit makes those domains 16 programs, their sweeps should
-scale like the plain ones. On 16 CPUs, where Zig already runs eight children,
-the plain sweeps ran 1.1 to 1.5 times faster.
+partial, so they finish in two rounds and ran 1.9 to 2.0 times faster. With
+the `annexb-syntax` unit those domains have 16 programs, and their 3-CPU sweeps
+take as long as the plain ones, as the
+[Annex B escaped domains](#annex-b-escaped-domains) section records. On 16
+CPUs, where Zig already runs eight children, the plain sweeps ran 1.1 to 1.5
+times faster.
 
 Each clang process peaked at about 280 MB on Linux, so three concurrent
 builds on a 3-vCPU, 7 GB macOS runner should stay near 1 GB of compiler
@@ -189,21 +207,31 @@ time rather than removing it, and it is not part of this change.
 Expected job durations
 ----------------------
 
-These estimates predate the concurrent program builds above.
+The table below predates the concurrent program builds above.
 
 Setup to the first test took 31 to 33 seconds in the ordinary shards of run
 [41692393326]; the file's build-time properties took 17 to 35 seconds in the
 observations above.
 
-| Host  | Basis                                  | Today, minutes | With Annex B escapes, minutes | Slowest property, share of interrupt |
-| ----- | -------------------------------------- | -------------: | ----------------------------: | -----------------------------------: |
-| Linux | case-shard median sweep                |             12 |                            21 |                43%, 54% with escapes |
-| Linux | case-shard maximum sweep               |             14 |                            25 |                53%, 67% with escapes |
-| macOS | fastest shared sweeps, A1.1 at 230.8 s |             10 |                            18 |                38%, 48% with escapes |
+| Host  | Basis                                  | Before, minutes | With Annex B escapes, minutes | Slowest property, share of interrupt |
+| ----- | -------------------------------------- | --------------: | ----------------------------: | -----------------------------------: |
+| Linux | case-shard median sweep                |              12 |                            21 |                43%, 54% with escapes |
+| Linux | case-shard maximum sweep               |              14 |                            25 |                53%, 67% with escapes |
+| macOS | fastest shared sweeps, A1.1 at 230.8 s |              10 |                            18 |                38%, 48% with escapes |
 
 The Linux margin rests on 60 measured standalone jobs. The macOS estimate
 rests on three shared observations and is not yet a measurement: the first
 candidate run's dedicated macOS job is the one to confirm it.
+
+With the concurrent builds and Annex B escapes, the 3-CPU Linux runs put all
+four sweeps at about 100 seconds. On a hosted macOS runner, A2.1 is expected at
+about 120 to 200 seconds, as derived in the
+[concurrent program builds](#concurrent-program-builds) section, and A1.4 and
+A2.4 should take about as long, because each now builds 16 programs, as A2.1
+does. A1.1 adds the cold-cache cost, for about 320 to 430 seconds. The four
+properties together would then take about 11 to 17 minutes, each within its
+600-second interrupt. These are derivations from Linux measurements, not macOS
+observations.
 
 The macOS lane entry in *tools/macos-job-costs.ts* is a 2,460-second
 scheduling allowance: four 600-second interrupts and one minute of setup. It

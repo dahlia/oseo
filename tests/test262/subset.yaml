@@ -234,6 +234,252 @@ tests:
   - path: test/annexB/built-ins/Date/prototype/toGMTString/value.js
     expectedClassification: pass
     dependencies: [date, object-properties]
+  - path: test/annexB/built-ins/RegExp/RegExp-control-escape-russian-letter.js
+    expectedClassification: pass
+    dependencies:
+      [
+        expression-operators,
+        functions,
+        generators,
+        iterator-protocol,
+        lexical-bindings,
+        object-properties,
+        regular-expressions,
+        symbols,
+        var-bindings,
+      ]
+  - path: test/annexB/built-ins/RegExp/RegExp-decimal-escape-class-range.js
+    expectedClassification: pass
+    dependencies:
+      [functions, object-properties, regular-expressions, var-bindings]
+  - path: test/annexB/built-ins/RegExp/RegExp-decimal-escape-not-capturing.js
+    expectedClassification: pass
+    dependencies:
+      [functions, object-properties, regular-expressions, var-bindings]
+  - path: test/annexB/built-ins/RegExp/RegExp-invalid-control-escape-character-class-range.js
+    expectedClassification: pass
+    dependencies:
+      [functions, lexical-bindings, object-properties, regular-expressions]
+  - path: test/annexB/built-ins/RegExp/RegExp-invalid-control-escape-character-class.js
+    expectedClassification: pass
+    dependencies:
+      [
+        expression-operators,
+        functions,
+        generators,
+        iterator-protocol,
+        lexical-bindings,
+        object-properties,
+        regular-expressions,
+        symbols,
+        var-bindings,
+      ]
+  - path: test/annexB/built-ins/RegExp/RegExp-leading-escape-BMP.js
+    expectedClassification: unsupported-profile-feature
+    dependencies:
+      [
+        dynamic-source,
+        expression-operators,
+        functions,
+        object-properties,
+        regular-expressions,
+        var-bindings,
+      ]
+  - path: test/annexB/built-ins/RegExp/RegExp-leading-escape.js
+    expectedClassification: pass
+    dependencies: [object-properties, regular-expressions]
+  - path: test/annexB/built-ins/RegExp/RegExp-trailing-escape-BMP.js
+    expectedClassification: unsupported-profile-feature
+    dependencies:
+      [
+        dynamic-source,
+        expression-operators,
+        functions,
+        object-properties,
+        regular-expressions,
+        var-bindings,
+      ]
+  - path: test/annexB/built-ins/RegExp/RegExp-trailing-escape.js
+    expectedClassification: pass
+    dependencies: [object-properties, regular-expressions]
+  - path: test/annexB/built-ins/RegExp/incomplete_hex_unicode_escape.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, regular-expressions]
+  - path: test/annexB/built-ins/RegExp/named-groups/non-unicode-malformed-lookbehind.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, regular-expressions]
+  - path: test/annexB/built-ins/RegExp/named-groups/non-unicode-malformed.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, regular-expressions, symbols]
+  - path: test/annexB/built-ins/RegExp/prototype/Symbol.split/Symbol.match-getter-recompiles-source.js
+    expectedClassification: pass
+    dependencies:
+      [
+        functions,
+        object-literals,
+        object-properties,
+        regular-expressions,
+        symbols,
+        var-bindings,
+      ]
+  - path: test/annexB/built-ins/RegExp/prototype/Symbol.split/toint32-limit-recompiles-source.js
+    expectedClassification: pass
+    dependencies:
+      [
+        functions,
+        object-literals,
+        object-properties,
+        regular-expressions,
+        symbols,
+        var-bindings,
+      ]
+  - path: test/annexB/built-ins/RegExp/prototype/compile/B.RegExp.prototype.compile.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/annexB/built-ins/RegExp/prototype/compile/duplicate-named-capturing-groups-syntax.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        error-intrinsics,
+        lexical-bindings,
+        object-properties,
+        regular-expressions,
+      ]
+  - path: test/annexB/built-ins/RegExp/prototype/compile/flags-string-invalid.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        error-intrinsics,
+        object-properties,
+        regular-expressions,
+        var-bindings,
+      ]
+  - path: test/annexB/built-ins/RegExp/prototype/compile/flags-to-string-err.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        error-intrinsics,
+        functions,
+        object-literals,
+        object-properties,
+        symbols,
+        var-bindings,
+      ]
+  - path: test/annexB/built-ins/RegExp/prototype/compile/flags-to-string.js
+    expectedClassification: pass
+    dependencies: [object-properties, regular-expressions, var-bindings]
+  - path: test/annexB/built-ins/RegExp/prototype/compile/flags-undefined.js
+    expectedClassification: pass
+    dependencies: [object-properties, regular-expressions, var-bindings]
+  - path: test/annexB/built-ins/RegExp/prototype/compile/length.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/annexB/built-ins/RegExp/prototype/compile/name.js
+    expectedClassification: pass
+    dependencies: [object-properties]
+  - path: test/annexB/built-ins/RegExp/prototype/compile/pattern-regexp-distinct.js
+    expectedClassification: pass
+    dependencies: [object-properties, regular-expressions, var-bindings]
+  - path: test/annexB/built-ins/RegExp/prototype/compile/pattern-regexp-flags-defined.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        error-intrinsics,
+        expression-operators,
+        object-literals,
+        object-properties,
+        var-bindings,
+      ]
+  - path: test/annexB/built-ins/RegExp/prototype/compile/pattern-regexp-immutable-lastindex.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        error-intrinsics,
+        object-literals,
+        object-properties,
+        regular-expressions,
+        var-bindings,
+      ]
+  - path: test/annexB/built-ins/RegExp/prototype/compile/pattern-regexp-props.js
+    expectedClassification: pass
+    dependencies:
+      [object-literals, object-properties, regular-expressions, var-bindings]
+  - path: test/annexB/built-ins/RegExp/prototype/compile/pattern-regexp-same.js
+    expectedClassification: pass
+    dependencies: [object-properties, regular-expressions, var-bindings]
+  - path: test/annexB/built-ins/RegExp/prototype/compile/pattern-string-invalid-u.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        error-intrinsics,
+        object-properties,
+        regular-expressions,
+        var-bindings,
+      ]
+  - path: test/annexB/built-ins/RegExp/prototype/compile/pattern-string-invalid.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        error-intrinsics,
+        object-properties,
+        regular-expressions,
+        var-bindings,
+      ]
+  - path: test/annexB/built-ins/RegExp/prototype/compile/pattern-string-u.js
+    expectedClassification: pass
+    dependencies: [object-properties, regular-expressions, var-bindings]
+  - path: test/annexB/built-ins/RegExp/prototype/compile/pattern-string.js
+    expectedClassification: pass
+    dependencies: [object-properties, regular-expressions, var-bindings]
+  - path: test/annexB/built-ins/RegExp/prototype/compile/pattern-to-string-err.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        error-intrinsics,
+        functions,
+        object-literals,
+        object-properties,
+        symbols,
+        var-bindings,
+      ]
+  - path: test/annexB/built-ins/RegExp/prototype/compile/pattern-undefined.js
+    expectedClassification: pass
+    dependencies: [object-properties, regular-expressions, var-bindings]
+  - path: test/annexB/built-ins/RegExp/prototype/compile/this-not-object.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        error-intrinsics,
+        expression-operators,
+        functions,
+        object-properties,
+        symbols,
+        var-bindings,
+      ]
+  - path: test/annexB/built-ins/RegExp/prototype/compile/this-obj-not-regexp.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        error-intrinsics,
+        expression-operators,
+        functions,
+        object-literals,
+        object-properties,
+        var-bindings,
+      ]
+  - path: test/annexB/built-ins/RegExp/prototype/flags/order-after-compile.js
+    expectedClassification: pass
+    dependencies: [lexical-bindings, object-properties, regular-expressions]
   - path: test/annexB/built-ins/String/prototype/anchor/B.2.3.2.js
     expectedClassification: pass
     dependencies: [abrupt-completion, error-intrinsics, object-properties]
@@ -676,6 +922,65 @@ tests:
   - path: test/annexB/built-ins/unescape/two.js
     expectedClassification: pass
     dependencies: [object-properties]
+  - path: test/annexB/language/comments/multi-line-html-close.js
+    expectedClassification: expected-negative
+    dependencies:
+      [
+        abrupt-completion,
+        control-flow,
+        expression-operators,
+        lexical-grammar,
+        var-bindings,
+      ]
+  - path: test/annexB/language/comments/single-line-html-close-asi.js
+    expectedClassification: expected-negative
+    dependencies:
+      [
+        abrupt-completion,
+        control-flow,
+        lexical-grammar,
+        object-properties,
+        var-bindings,
+      ]
+  - path: test/annexB/language/comments/single-line-html-close-first-line-1.js
+    expectedClassification: expected-negative
+    dependencies: [abrupt-completion, error-intrinsics, lexical-grammar]
+  - path: test/annexB/language/comments/single-line-html-close-first-line-2.js
+    expectedClassification: expected-negative
+    dependencies: [abrupt-completion, error-intrinsics, lexical-grammar]
+  - path: test/annexB/language/comments/single-line-html-close-first-line-3.js
+    expectedClassification: expected-negative
+    dependencies: [abrupt-completion, error-intrinsics, lexical-grammar]
+  - path: test/annexB/language/comments/single-line-html-close-unicode-separators.js
+    expectedClassification: expected-negative
+    dependencies:
+      [
+        abrupt-completion,
+        control-flow,
+        expression-operators,
+        lexical-grammar,
+        var-bindings,
+      ]
+  - path: test/annexB/language/comments/single-line-html-close.js
+    expectedClassification: expected-negative
+    dependencies:
+      [
+        abrupt-completion,
+        control-flow,
+        expression-operators,
+        lexical-grammar,
+        var-bindings,
+      ]
+  - path: test/annexB/language/comments/single-line-html-open.js
+    expectedClassification: expected-negative
+    dependencies:
+      [
+        abrupt-completion,
+        control-flow,
+        expression-operators,
+        lexical-grammar,
+        var-bindings,
+      ]
   - path: test/annexB/language/expressions/assignmenttargettype/callexpression-as-for-in-lhs.js
     expectedClassification: pass
     dependencies:
@@ -726,6 +1031,12 @@ tests:
         property-enumeration,
         symbols,
       ]
+  - path: test/annexB/language/expressions/template-literal/legacy-octal-escape-sequence-non-strict.js
+    expectedClassification: pass
+    dependencies: [expression-operators, lexical-grammar]
+  - path: test/annexB/language/expressions/template-literal/legacy-octal-escape-sequence-strict.js
+    expectedClassification: expected-negative
+    dependencies: [expression-operators, lexical-grammar]
   - path: test/annexB/language/function-code/block-decl-func-block-scoping.js
     expectedClassification: pass
     dependencies: [functions, lexical-bindings, var-bindings]
@@ -3468,6 +3779,38 @@ tests:
         lexical-bindings,
         var-bindings,
       ]
+  - path: test/annexB/language/literals/regexp/class-escape.js
+    expectedClassification: pass
+    dependencies:
+      [functions, object-properties, regular-expressions, var-bindings]
+  - path: test/annexB/language/literals/regexp/extended-pattern-char.js
+    expectedClassification: pass
+    dependencies:
+      [functions, object-properties, regular-expressions, var-bindings]
+  - path: test/annexB/language/literals/regexp/identity-escape.js
+    expectedClassification: pass
+    dependencies:
+      [functions, object-properties, regular-expressions, var-bindings]
+  - path: test/annexB/language/literals/regexp/legacy-octal-escape.js
+    expectedClassification: pass
+    dependencies:
+      [functions, object-properties, regular-expressions, var-bindings]
+  - path: test/annexB/language/literals/regexp/non-empty-class-ranges-no-dash.js
+    expectedClassification: pass
+    dependencies:
+      [functions, object-properties, regular-expressions, var-bindings]
+  - path: test/annexB/language/literals/regexp/non-empty-class-ranges.js
+    expectedClassification: pass
+    dependencies:
+      [functions, object-properties, regular-expressions, var-bindings]
+  - path: test/annexB/language/literals/regexp/quantifiable-assertion-followed-by.js
+    expectedClassification: pass
+    dependencies:
+      [functions, object-properties, regular-expressions, var-bindings]
+  - path: test/annexB/language/literals/regexp/quantifiable-assertion-not-followed-by.js
+    expectedClassification: pass
+    dependencies:
+      [functions, object-properties, regular-expressions, var-bindings]
   - path: test/annexB/language/statements/for-in/bare-initializer.js
     expectedClassification: expected-negative
     dependencies: [control-flow]
@@ -54250,7 +54593,7 @@ tests:
     expectedClassification: unsupported-profile-feature
     dependencies: [dynamic-source, functions, object-properties, symbols]
   - path: test/built-ins/String/prototype/split/separator-regexp.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [functions, object-properties, symbols]
   - path: test/built-ins/String/prototype/split/separator-string-instance-is-empty-string-object.js
     expectedClassification: pass

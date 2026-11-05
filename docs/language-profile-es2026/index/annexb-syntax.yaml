@@ -1,0 +1,3 @@
+version: 1
+id: annexb-syntax
+record: docs/language-profile-es2026/families/annexb-syntax.yaml

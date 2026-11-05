@@ -56,7 +56,7 @@ three sums, rounded up, so the margin below is a slow runner's. Files under 30
 seconds have no entry and weigh the host fallback, 18 seconds on both hosts,
 which is the median of every measured weight.
 
-Thirty-five files postdate those runs. Local runs from 2026-11-01 to
+Thirty-eight files postdate those runs. Local runs from 2026-11-01 to
 2026-11-04 of the residual evidence and those files, on one host, give the
 calibration:
 
@@ -96,6 +96,9 @@ calibration:
 | *tests/property/es2027-disposal-intrinsics.property.test.ts* |     21.3 |           55 |           42 |
 | *tests/using-declarations-native.test.ts*                    |     28.7 |           74 |           57 |
 | *tests/property/es2027-using-declarations.property.test.ts*  |     40.2 |          104 |           80 |
+| *tests/annexb-syntax-native.test.ts*                         |     33.7 |           87 |           67 |
+| *tests/property/m5-annexb-regexp-syntax.property.test.ts*    |     32.6 |           84 |           65 |
+| *tests/property/m5-annexb-regexp-compile.property.test.ts*   |     29.3 |           76 |           58 |
 
 The ratios are 2.574 for Linux and 1.974 for macOS, the residual file's
 largest CI sum over its local sum. The fastest Linux observation gives

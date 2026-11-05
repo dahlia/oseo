@@ -16,6 +16,7 @@ import {
   type RegExpErrorSection,
   type RegExpExtensionPoint,
   type RegExpFlags,
+  type RegExpLookaround,
   type RegExpModifierFlag,
   type RegExpPattern,
   type RegExpPatternError,
@@ -83,7 +84,7 @@ function readClassSetCharacterEscape(state: ParseState, start: number): number {
     state.index += 1;
     return character.codePointAt(0) ?? 0;
   }
-  return readCharacterEscape(state, start);
+  return readCharacterEscape(state, start, true);
 }
 
 const noExtensions: RegExpPatternExtensions = { admitted: [] };
@@ -130,7 +131,19 @@ interface NamedReferenceRecord {
 }
 
 interface ParseState {
+  /**
+   * Whether this parse follows Annex B's pattern grammar: the caller left
+   * it on and the flag set has neither `u` nor `v`.
+   */
+  readonly annexB: boolean;
   readonly backreferences: BackreferenceRecord[];
+  /**
+   * The left-capturing parentheses in the whole pattern text, which
+   * Annex B compares a decimal escape against before it has parsed the
+   * groups the escape may name. Zero outside Annex B, where validation
+   * decides every reference after the parse.
+   */
+  readonly captureCount: number;
   readonly captures: RegExpCapture[];
   readonly extensions: RegExpPatternExtensions;
   readonly flags: RegExpFlags;
@@ -175,18 +188,17 @@ function fail(
 }
 
 /**
- * Describe a construct that only Annex B admits.
+ * Describe a construct that only Annex B admits, for a parse that reached
+ * it without Annex B's grammar.
  *
- * ADR 0013 places Annex B outside the candidate claim, so the construct is
- * rejected in every mode. Under `u` or `v` Annex B never applied, so the
- * rejection is the early error the edition itself requires and reports as
- * invalid text. Without them the text is one a web browser accepts, so the
- * rejection is this claim's own boundary rather than a defect, and it
- * reports the profile code instead. Measurement then records an excluded
- * optional section where it would otherwise record a parse failure.
+ * Under `u` or `v` Annex B never applied, so the rejection is the early
+ * error the edition itself requires and reports as invalid text. Without
+ * them the text is one a web browser accepts, and only a caller that asked
+ * for the core grammar alone gets here, so the rejection names Annex B as
+ * an `unsupported` construct rather than as a defect.
  */
 function annexBMessage(subject: string): string {
-  const tail = "is admitted only by Annex B, which is outside the profile.";
+  const tail = "is admitted only by Annex B, which this parse excludes.";
   return `${subject} ${tail}`;
 }
 
@@ -371,10 +383,12 @@ function readUnicodeEscape(
   if (value < 0) {
     // A group name always uses the unicode form, so only a character
     // escape in a pattern without `u` or `v` reaches Annex B's identity
-    // escape here.
+    // escape here. It names the `u` alone and leaves what follows to the
+    // next term, which is how `\u{2}` repeats a `u` without the flag.
     const location = { end: state.index, start };
     const message = "A Unicode escape needs four hexadecimal digits.";
     if (unicodeSyntax) fail("invalid", message, location);
+    if (state.annexB) return 0x75;
     refuseAnnexB(state, message, "An incomplete Unicode escape", location);
   }
   if (
@@ -394,14 +408,47 @@ function readUnicodeEscape(
   return value;
 }
 
+/** Whether one character is an OctalDigit. */
+function isOctalDigit(character: string | undefined): boolean {
+  return character != null && character >= "0" && character <= "7";
+}
+
+/**
+ * Read one LegacyOctalEscapeSequence at its first digit.
+ *
+ * The grammar takes three digits only when the first is at most 3, so the
+ * value never exceeds 0o377, and it takes the longest sequence its
+ * lookahead restrictions allow: `\47` is one escape and `\477` is that
+ * escape followed by a `7`.
+ */
+function readLegacyOctalEscape(state: ParseState): number {
+  const first = at(state, 0) ?? "0";
+  let value = Number(first);
+  state.index += 1;
+  if (!isOctalDigit(at(state, 0))) return value;
+  value = value * 8 + Number(at(state, 0));
+  state.index += 1;
+  if (first > "3" || !isOctalDigit(at(state, 0))) return value;
+  value = value * 8 + Number(at(state, 0));
+  state.index += 1;
+  return value;
+}
+
 /**
  * Read one character escape after its backslash and return a code point.
  *
- * Annex B is outside the candidate claim, so a legacy octal escape and an
- * identity escape over an identifier character are rejected in every
- * mode rather than accepted for a pattern without the `u` flag.
+ * Without Annex B's grammar, a legacy octal escape and an identity escape
+ * over an identifier character are rejected rather than accepted for a
+ * pattern without `u` or `v`. With it, `inClass` decides how `\c` without
+ * an ASCII letter reads: a class admits a decimal digit or `_` as its
+ * control letter, and otherwise the backslash is a character of its own
+ * and the `c` stays for the next atom.
  */
-function readCharacterEscape(state: ParseState, start: number): number {
+function readCharacterEscape(
+  state: ParseState,
+  start: number,
+  inClass: boolean,
+): number {
   const character = at(state, 0);
   if (character == null) {
     fail("invalid", "A pattern cannot end with a backslash.", {
@@ -420,6 +467,13 @@ function readCharacterEscape(state: ParseState, start: number): number {
       letter == null ||
       !((letter >= "a" && letter <= "z") || (letter >= "A" && letter <= "Z"))
     ) {
+      if (state.annexB) {
+        if (inClass && (isDecimalDigit(letter) || letter === "_")) {
+          state.index += 2;
+          return (letter?.charCodeAt(0) ?? 0) % 32;
+        }
+        return 0x5c;
+      }
       refuseAnnexB(
         state,
         "A control escape needs an ASCII letter.",
@@ -429,6 +483,9 @@ function readCharacterEscape(state: ParseState, start: number): number {
     }
     state.index += 2;
     return letter.charCodeAt(0) % 32;
+  }
+  if (state.annexB && isOctalDigit(character)) {
+    return readLegacyOctalEscape(state);
   }
   if (character === "0") {
     if (isDecimalDigit(at(state, 1))) {
@@ -446,6 +503,7 @@ function readCharacterEscape(state: ParseState, start: number): number {
     state.index += 1;
     const value = readHexValue(state, 2);
     if (value < 0) {
+      if (state.annexB) return 0x78;
       refuseAnnexB(
         state,
         "A hexadecimal escape needs two hexadecimal digits.",
@@ -474,6 +532,9 @@ function readCharacterEscape(state: ParseState, start: number): number {
   if (escaped.value === 0x6b && state.groupNameDeclared) {
     fail("invalid", "This identity escape is not allowed.", location);
   }
+  // Annex B's identity escape admits every source character but `c`, and
+  // `k` once the pattern declares a group name, both decided above.
+  if (state.annexB) return escaped.value;
   if (
     identifierProperty(
       state,
@@ -647,6 +708,45 @@ function readUnicodePropertyEscape(
     fail("invalid", "This Unicode property is not defined.", location);
   }
   return escape;
+}
+
+/**
+ * Count the left-capturing parentheses in a pattern text.
+ *
+ * This is CountLeftCapturingParensWithin over the whole pattern, which
+ * Annex B needs before the parse reaches the groups. The scan skips an
+ * escape and the inside of a character class, and it counts `(?<` only
+ * when a group name rather than a lookbehind introducer follows. A text
+ * the parse later rejects may count differently, but then no reading of
+ * its escapes is ever returned.
+ */
+function countCapturingGroups(source: string): number {
+  let count = 0;
+  let insideClass = false;
+  for (let index = 0; index < source.length; index += 1) {
+    const character = source[index];
+    if (character === "\\") {
+      index += 1;
+      continue;
+    }
+    if (insideClass) {
+      if (character === "]") insideClass = false;
+      continue;
+    }
+    if (character === "[") {
+      insideClass = true;
+      continue;
+    }
+    if (character !== "(") continue;
+    if (source[index + 1] !== "?") {
+      count += 1;
+      continue;
+    }
+    if (source[index + 2] !== "<") continue;
+    const next = source[index + 3];
+    if (next !== "=" && next !== "!") count += 1;
+  }
+  return count;
 }
 
 /**
@@ -1050,10 +1150,21 @@ function parseCharacterClass(
     if (eat(state, "]")) break;
     const first = parseClassAtom(state);
     if (at(state, 0) === "-" && at(state, 1) !== "]" && at(state, 1) != null) {
+      const dash = state.index;
       state.index += 1;
       const second = parseClassAtom(state);
       const low = classItemValue(first);
       const high = classItemValue(second);
+      if ((low == null || high == null) && state.annexB) {
+        // Annex B's CharacterRangeOrUnion: a class escape at either end
+        // makes the three atoms a union that includes the dash itself.
+        items.push(
+          first,
+          { kind: "character", span: span(dash, dash + 1), value: 0x2d },
+          second,
+        );
+        continue;
+      }
       if (low == null || high == null) {
         refuseAnnexB(
           state,
@@ -1107,8 +1218,28 @@ function parseClassAtom(state: ParseState): RegExpClassItem {
 function parseAtomEscape(state: ParseState, start: number): RegExpAtom {
   const character = at(state, 0);
   if (character != null && character >= "1" && character <= "9") {
+    const digitStart = state.index;
     const digits = readDecimalDigits(state);
     const location = span(start, state.index);
+    if (state.annexB && Number(digits) > state.captureCount) {
+      /*
+       * Annex B admits a DecimalEscape only up to the pattern's capture
+       * count. Past it the same text is a legacy octal escape, or an
+       * identity escape when it starts with 8 or 9, and the digits that
+       * escape does not take are pattern characters.
+       */
+      state.index = digitStart;
+      if (character >= "8") {
+        state.index += 1;
+        return {
+          kind: "character",
+          span: span(start, state.index),
+          value: character.charCodeAt(0),
+        };
+      }
+      const value = readLegacyOctalEscape(state);
+      return { kind: "character", span: span(start, state.index), value };
+    }
     /*
      * A pattern cannot declare more groups than its own text is long, so
      * an index too large to represent exactly still names no group. The
@@ -1129,6 +1260,13 @@ function parseAtomEscape(state: ParseState, start: number): RegExpAtom {
      * looked at.
      */
     if (!state.unicodeMode && !state.groupNameDeclared) {
+      if (state.annexB) {
+        return {
+          kind: "character",
+          span: span(start, state.index),
+          value: 0x6b,
+        };
+      }
       fail(
         "unsupported",
         annexBMessage(
@@ -1151,7 +1289,7 @@ function parseAtomEscape(state: ParseState, start: number): RegExpAtom {
   return {
     kind: "character",
     span: span(start, state.index),
-    value: readCharacterEscape(state, start),
+    value: readCharacterEscape(state, start, false),
   };
 }
 
@@ -1287,6 +1425,7 @@ function parseAtom(state: ParseState): RegExpAtom {
         start,
       });
     }
+    if (state.annexB) return readCharacter(state);
     refuseAnnexB(
       state,
       "An unescaped brace is not a pattern character.",
@@ -1294,7 +1433,7 @@ function parseAtom(state: ParseState): RegExpAtom {
       { end: start + 1, start },
     );
   }
-  if (character === "]" || character === "}") {
+  if ((character === "]" || character === "}") && !state.annexB) {
     refuseAnnexB(
       state,
       "This character must be escaped.",
@@ -1416,6 +1555,9 @@ function parseQuantifier(state: ParseState): RegExpQuantifier | undefined {
     const braced = readBracedQuantifier(state);
     if (braced == null) {
       state.index = start;
+      // Annex B reads the brace as an ExtendedPatternCharacter that the
+      // next term consumes, so the atom before it stays unquantified.
+      if (state.annexB) return undefined;
       refuseAnnexB(
         state,
         "An unescaped brace is not a pattern character.",
@@ -1435,7 +1577,7 @@ function parseQuantifier(state: ParseState): RegExpQuantifier | undefined {
   };
 }
 
-function parseLookaround(state: ParseState): RegExpTerm | undefined {
+function parseLookaround(state: ParseState): RegExpLookaround | undefined {
   const start = state.index;
   const behind = state.source.startsWith("(?<=", start)
     ? false
@@ -1464,7 +1606,12 @@ function parseLookaround(state: ParseState): RegExpTerm | undefined {
 function parseTerm(state: ParseState): RegExpTerm {
   const start = state.index;
   const lookaround = parseLookaround(state);
-  if (lookaround != null) return rejectQuantifier(state, lookaround);
+  if (lookaround != null) {
+    if (state.annexB && lookaround.direction === "ahead") {
+      return quantifyLookahead(state, lookaround);
+    }
+    return rejectQuantifier(state, lookaround);
+  }
   const character = at(state, 0);
   if (character === "^" || character === "$") {
     state.index += 1;
@@ -1495,13 +1642,46 @@ function parseTerm(state: ParseState): RegExpTerm {
 }
 
 /**
- * Reject a quantifier applied to an assertion. The candidate edition
- * admits a quantified assertion only through Annex B, which is outside
- * the claim, so the quantifier is an error rather than a repetition.
+ * Read Annex B's QuantifiableAssertion Quantifier.
  *
- * Annex B quantifies a lookahead alone. An edge assertion, a word
- * boundary, and a lookbehind are unquantifiable in every mode, so only a
- * lookahead reports this claim's own boundary.
+ * The edition gives a quantified lookahead the semantics of a quantified
+ * atom whose matcher is the assertion, which is exactly a non-capturing
+ * group around it. The group therefore stands in for the lookahead as the
+ * repeated atom, with the lookahead's span, so the matcher and the C
+ * backend need no separate repetition form.
+ */
+function quantifyLookahead(
+  state: ParseState,
+  lookahead: RegExpLookaround,
+): RegExpTerm {
+  const quantifier = parseQuantifier(state);
+  if (quantifier == null) return lookahead;
+  const location = lookahead.span;
+  return {
+    atom: {
+      body: {
+        alternatives: [
+          { kind: "alternative", span: location, terms: [lookahead] },
+        ],
+        kind: "disjunction",
+        span: location,
+      },
+      kind: "group",
+      span: location,
+    },
+    kind: "quantified",
+    quantifier,
+    span: span(location.start, state.index),
+  };
+}
+
+/**
+ * Reject a quantifier applied to an assertion. The edition admits a
+ * quantified assertion only through Annex B, and Annex B quantifies a
+ * lookahead alone, which `quantifyLookahead` reads. An edge assertion, a
+ * word boundary, and a lookbehind are unquantifiable in every mode, so
+ * only a lookahead in a parse without Annex B's grammar reports the
+ * `unsupported` kind.
  */
 function rejectQuantifier(state: ParseState, term: RegExpTerm): RegExpTerm {
   const character = at(state, 0);
@@ -1784,8 +1964,12 @@ export function parseRegExpPattern(
       });
     }
     const flags = parseFlags(input.flags);
+    const unicodeMode = regExpUnicodeMode(flags);
+    const annexB = input.annexB !== false && !unicodeMode;
     const state: ParseState = {
+      annexB,
       backreferences: [],
+      captureCount: annexB ? countCapturingGroups(input.source) : 0,
       captures: [],
       depth: 0,
       disjunctionCount: 0,
@@ -1799,7 +1983,7 @@ export function parseRegExpPattern(
       namedReferences: [],
       path: [],
       source: input.source,
-      unicodeMode: regExpUnicodeMode(flags),
+      unicodeMode,
     };
     const body = parseDisjunction(state);
     if (!done(state)) {
