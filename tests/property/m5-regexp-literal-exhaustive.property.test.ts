@@ -461,15 +461,55 @@ function sweepProperty(domain: LiteralDomain) {
       programs.flat().toSorted((left, right) => left - right),
       accepted,
     );
-    for (const [index, units] of programs.entries()) {
-      await assertNativeProgram(
+    await forEachProgram(programs, (units, index) =>
+      assertNativeProgram(
         domain,
         units,
         testCase,
         (index + testCase.phase) % 2 === 0 ? "disabled" : "enabled",
-      );
-    }
+      ),
+    );
   });
+}
+
+// Zig 0.16 runs fewer concurrent clang processes than the host has cores:
+// one on three CPUs, the size of a hosted macOS runner, so one build of a
+// program's 14 compilation units is serial there. Overlapping three
+// programs' builds keeps those cores busy; each program is still built,
+// executed and checked on its own.
+const programConcurrency = 3;
+
+/**
+ * Check every program, at most `programConcurrency` at once, and report the
+ * failure of the earliest program in sweep order.
+ *
+ * Programs start in sweep order, so every program before a failing one has
+ * started by the time it fails. After the first failure no new program
+ * starts, and the sweep waits for those in flight before rethrowing, so a
+ * failed sweep leaves no build running.
+ */
+async function forEachProgram(
+  programs: readonly (readonly number[])[],
+  check: (units: readonly number[], index: number) => Promise<void>,
+): Promise<void> {
+  const failures: { readonly error: unknown; readonly index: number }[] = [];
+  let next = 0;
+  async function worker(): Promise<void> {
+    while (next < programs.length && failures.length === 0) {
+      const index = next;
+      next += 1;
+      try {
+        await check(programs[index]!, index);
+      } catch (error) {
+        failures.push({ error, index });
+      }
+    }
+  }
+  await Promise.all(Array.from({ length: programConcurrency }, () => worker()));
+  if (failures.length > 0) {
+    throw failures.toSorted((left, right) => left.index - right.index)[0]!
+      .error;
+  }
 }
 
 function sizeLimit(domain: LiteralDomain): string {

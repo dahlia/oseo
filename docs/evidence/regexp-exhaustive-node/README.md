@@ -89,8 +89,107 @@ times as long as the plain domain of the same pass. The estimates below
 therefore treat an escaped sweep as up to 1.26 times a plain one.
 
 
+Where a sweep spends its time
+-----------------------------
+
+Nearly all of a sweep is the native build. One 4,096-literal program of A1.1,
+profiled on a 16-core Linux AMD64 host with warm caches, took 0.15 seconds to
+compile to MIR, 0.35 to emit 13.4 MB of C, 3.4 to 3.6 for the single `zig cc`
+invocation, and 0.025 to execute. The reference run and the MIR checks took
+about 10 milliseconds. The build's 14 compilation units each include the whole
+emitted file: the shared unit compiles in 0.14 seconds and each body unit in
+about 1.1, so a build costs about 15 CPU-seconds serially and 23 when Zig runs
+units in parallel.
+
+Zig 0.16 does not run one clang process per core. Pinning the same build to *n*
+CPUs with `taskset` and counting `zig cc`'s child processes gave at most one
+child on 3 CPUs, two on 4, four on 6, and eight on 16. `zig cc` has no option
+or environment variable that raises the count. On 3 CPUs, a build took 14.5
+seconds of wall time for 14.5 CPU-seconds, so it was serial. Hosted
+`macos-latest` runners have 3 vCPUs, so each program there presumably builds
+its units one at a time, while hosted 4-vCPU Linux runners get two. This was
+measured on Linux only; no macOS host was available to count children.
+
+The first native property also pays for cold caches. On 3 CPUs, a first
+program whose Zig cache and runtime archive cache were both empty spent 40.4
+seconds in its build steps, against 13.7 with only the archive missing. The
+difference is Zig building its own target libraries. Hosted runners start with
+an empty Zig cache, and the runtime archive cache misses whenever the runtime
+changes, as it did on macOS in main run [41913235211]. The cost falls on A1.1,
+which explains part of A1.1's lead over A2.1 on the same domain size:
+
+| Run [41913235211]                                  |               A1.1 |  A1.4 |  A2.1 | A2.4 |
+| -------------------------------------------------- | -----------------: | ----: | ----: | ---: |
+| `RegExp literals exhaustive (ubuntu-latest, node)` |              321.4 |  61.0 | 259.1 | 60.1 |
+| `RegExp literals exhaustive (macos-latest, node)`  | 600.0, interrupted | 116.9 | 405.1 | 88.8 |
+
+[41913235211]: https://github.com/dahlia/oseo/actions/runs/41913235211
+
+
+Concurrent program builds
+-------------------------
+
+Each property now builds and checks up to three of its programs at once
+(`programConcurrency` in the test file). The program set, the rotation, the
+function size, each program's specialization policy, and each program's
+assertions are unchanged. Programs start in sweep order. After a failure no
+new program starts; the sweep waits for those already running and reports the
+earliest failing program in sweep order. Every program before the failing one
+has started by then, so this is the same program a serial sweep would report.
+
+The table pairs the base and this change on one 16-thread Linux AMD64 host,
+alternating trees: four 3-CPU runs, then four 16-CPU runs. Each run was
+`node --test --test-concurrency=1` on the file in its own systemd scope, with
+`taskset -c 0-2` for the 3-CPU rows. The Zig cache and the runtime archive
+cache were warm. Foreign CPU is the host's busy CPU time outside the run's
+scope, as a median of 5-second samples; the second 3-CPU pair shared the host
+with other work.
+
+| CPUs | Pair | Sweep      |  A1.1 | A1.4 |  A2.1 | A2.4 | Foreign CPUs |
+| ---: | ---: | ---------- | ----: | ---: | ----: | ---: | -----------: |
+|    3 |    1 | Serial     | 226.2 | 50.5 | 218.0 | 50.6 |         0.65 |
+|    3 |    1 | Concurrent |  99.2 | 25.4 |  96.6 | 25.2 |         0.85 |
+|    3 |    2 | Serial     | 269.4 | 56.7 | 244.0 | 56.7 |         2.84 |
+|    3 |    2 | Concurrent | 131.1 | 30.2 | 116.0 | 30.6 |         3.84 |
+|   16 |    1 | Serial     |  66.2 | 14.5 |  62.1 | 15.0 |         3.02 |
+|   16 |    1 | Concurrent |  51.5 | 13.5 |  56.3 | 13.6 |         4.06 |
+|   16 |    2 | Serial     |  80.2 | 14.9 |  66.0 | 15.0 |         3.88 |
+|   16 |    2 | Concurrent |  52.9 | 12.6 |  49.4 | 11.8 |         3.51 |
+
+On 3 CPUs the plain sweeps ran 2.1 to 2.3 times faster in both pairs, not
+three times. The test process's own work, about half a second of MIR
+compilation and C emission per program, and Zig's per-build overhead share
+the same three CPUs. The escaped sweeps have four programs, the last one
+partial, so they finish in two rounds and ran 1.9 to 2.0 times faster. Once
+the `annexb-syntax` unit makes those domains 16 programs, their sweeps should
+scale like the plain ones. On 16 CPUs, where Zig already runs eight children,
+the plain sweeps ran 1.1 to 1.5 times faster.
+
+Each clang process peaked at about 280 MB on Linux, so three concurrent
+builds on a 3-vCPU, 7 GB macOS runner should stay near 1 GB of compiler
+memory.
+
+The macOS figures remain a derivation until a hosted run measures them. If a
+hosted macOS build is serial as on 3 Linux CPUs, and the sweep speeds up as
+it did there, A2.1 should drop from 273 to 414 seconds to about 120 to 200.
+A1.1 also pays the cold-cache cost, which concurrency does not reduce. On 3
+Linux CPUs that cost was about 27 seconds. Hosted macOS runs have put A1.1 up
+to about 200 seconds above A2.1, and at least 195 in run [41913235211], where
+A1.1 was interrupted. If that whole gap is cold-cache cost, A1.1 takes about
+320 to 400 seconds, and up to about 430 with the `annexb-syntax` unit's 7%
+growth. That is 72% of the interrupt, just past the 70% that leaves 30%
+headroom. If the gap is mostly runner variance, A1.1 lands near A2.1.
+
+If a candidate run shows A1.1 above 420 seconds, building a small native
+program in a test before the properties would move the cold-cache cost out of
+A1.1's interrupt, leaving A1.1 near A2.1. That changes no limit, but it moves
+time rather than removing it, and it is not part of this change.
+
+
 Expected job durations
 ----------------------
+
+These estimates predate the concurrent program builds above.
 
 Setup to the first test took 31 to 33 seconds in the ordinary shards of run
 [41692393326]; the file's build-time properties took 17 to 35 seconds in the
