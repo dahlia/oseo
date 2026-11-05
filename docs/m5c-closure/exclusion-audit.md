@@ -428,35 +428,42 @@ Former ADR 0013 exclusions after ADR 0032
 -----------------------------------------
 
 [ADR 0032](../adr/0032-post-m5-edition-boundary.md) withdrew ADR 0013's Annex B
-authorization. The 11 paths that the sections above close as ADR 0013
-exclusions are now remediation rows. Their audit rows keep the
+authorization, so the 11 paths that the sections above close as ADR 0013
+exclusions became remediation rows. Nine of them keep the
 `adr:0013-m5-edition-and-manifest` proposed owner, digests, reasons, and
-replacement evidence. Each of their eight assessments changes only to
+replacement evidence. Each of their seven assessments changes only to
 `disposition: remediation` with a `remediationOwner` naming the
-[*PLAN-LANGUAGE.md*](../../PLAN-LANGUAGE.md) unit that implements its Annex B
-behavior, and the ledger gives each path that owner:
+[*PLAN-LANGUAGE.md*](../../PLAN-LANGUAGE.md) unit that implemented its Annex B
+behavior:
 
  -  `unit:annexb-syntax`: *String/prototype/split/separator-regexp.js*;
  -  `unit:annexb-object-accessors`: the three TypedArray paths,
     *S8.6.2\_A8.js*, and the four class element
     *private-getter-is-not-a-own-property.js* and
-    *private-setter-is-not-a-own-property.js* paths;
- -  `unit:annexb-dynamic-source-accounting`: *S7.8.5\_A1.4\_T2.js* and
-    *S7.8.5\_A2.4\_T2.js*.
+    *private-setter-is-not-a-own-property.js* paths.
+
+All nine now pass. The closure ledger gives them the `observation` owner,
+which the check requires of a closed audit path, and their audit rows and
+assessments stay unchanged as the record of the remediation.
+
+*S7.8.5\_A1.4\_T2.js* and *S7.8.5\_A2.4\_T2.js* were remediation rows of
+`unit:annexb-dynamic-source-accounting` and are now ADR 0016 exclusions. Their
+originals accept a `SyntaxError` only for an `ID_Continue` code unit, and
+Annex B's identity escape admits all 65,521 units each selects, so that
+fallback is never reached. The exhaustive literal property compiles and runs
+every literal natively, and only `eval` of the literal text remains. The
+`ds17-exhaustive-escaped-annex-b` assessment is therefore an exclusion with
+`normativeDependency: source-evaluation-only`, no `remediationOwner`, and the
+same replacement evidence. Both audit rows and ledger entries name
+`adr:0016-dynamic-source-boundary`.
 
 The check rejects any ADR 0013 exclusion. It accepts a `unit:` remediation
 owner only on an ADR 0013 row, and the closure ledger checks that the unit
-exists. The Annex B residue and legacy lookup closure selectors stay exact, but
-now require a bound `annex-b-only` row with a `unit:` owner instead of an
-exclusion. The paragraphs above that call these paths exclusions describe the
-M5 state, which the M5 exit report records.
-
-The eight `unit:annexb-object-accessors` paths and
-*String/prototype/split/separator-regexp.js* now pass. The closure ledger gives
-them the `observation` owner, which the check requires of a closed audit path,
-and their audit rows and assessments stay unchanged as the record of the
-remediation. The two `unit:annexb-dynamic-source-accounting` paths keep their
-unit owner.
+exists. An ADR 0013 row cannot stand over an `eval` rejection. The legacy
+lookup closure selector stays exact, but now requires a bound `annex-b-only`
+row with a `unit:` owner instead of an exclusion. The paragraphs above that
+call these paths ADR 0013 exclusions describe the M5 state, which the M5 exit
+report records.
 
 The check reads upstream sources under *test/annexB/* as well as
 *test/built-ins/* and *test/language/*, still rejecting `..` segments and files

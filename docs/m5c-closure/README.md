@@ -225,8 +225,9 @@ the maintainer decision of 2026-10-28 and its later extensions to exact paths,
 ADR 0013 owned a mixed Annex B path only when reviewed replacement evidence
 observed every core subject; the profile's Annex B paragraphs name them, and an
 `annex-b` assessment names its bounded owner. ADR 0032 withdrew that
-authorization, so those 11 paths are now remediation rows owned by the
-*PLAN-LANGUAGE.md* units that implement their Annex B behavior, as
+authorization, so those 11 paths became remediation rows owned by the
+*PLAN-LANGUAGE.md* units that implement their Annex B behavior. Nine now pass
+and two are ADR 0016 exclusions, as
 [*exclusion-audit.md*](./exclusion-audit.md) describes, and the check rejects
 any ADR 0013 exclusion. The check accepts the
 owned `__lookupGetter__` or `__lookupSetter__` rejection only when the source

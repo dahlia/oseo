@@ -359,8 +359,11 @@ The 11 ADR 0013 Annex B rows moved to remediation owners, as ADR 0032's
 Closure accounting requires: one to `unit:annexb-syntax`, eight to
 `unit:annexb-object-accessors`, and two to
 `unit:annexb-dynamic-source-accounting`. Their exclusion audit assessments
-keep their reasons and replacement evidence with `disposition: remediation`,
-and the language claim audit counts them as remediation of those units.
+kept their reasons and replacement evidence with `disposition: remediation`.
+The nine rows of the first two units now pass with the `observation` owner.
+The last two are ADR 0016 exclusions, as
+[`annexb-dynamic-source-accounting`](#annexb-dynamic-source-accounting)
+records.
 
 The unit froze the generated coverage section of the M5 exit report and
 replaced `check:m5-exit-audit` with `check:language-claim-audit`, which
@@ -641,9 +644,14 @@ parse-time `SyntaxError` report it, and no earlier row changes.
 Owns the 477 new rows that call `eval` or a `Function` constructor: the
 *test/annexB/language/eval-code/* rows, the six
 _test/annexB/built-ins/Function/createdynfn-\*.js_ rows, and
-*RegExp-leading-escape-BMP.js* and *RegExp-trailing-escape-BMP.js*. It also
-owns the remediation of the two former ADR 0013 rows *S7.8.5\_A1.4\_T2.js* and
-*S7.8.5\_A2.4\_T2.js*, which it closes with a reviewed exclusion audit change.
+*RegExp-leading-escape-BMP.js* and *RegExp-trailing-escape-BMP.js*. It closed
+the remediation of the two former ADR 0013 rows *S7.8.5\_A1.4\_T2.js* and
+*S7.8.5\_A2.4\_T2.js* with a reviewed exclusion audit change. Annex B's
+identity escape admits every code unit they select, so their `SyntaxError`
+fallback is never reached and only `eval` of the literal text remains. Both
+are ADR 0016 exclusions with the `adr:0016-dynamic-source-boundary` owner
+under the `ds17-exhaustive-escaped-annex-b` assessment, which binds the
+exhaustive literal property.
 
 No implementation lands here. Each row receives a reviewed exclusion audit row
 under ADR 0016. A row whose non-source subject is Annex B behavior names the

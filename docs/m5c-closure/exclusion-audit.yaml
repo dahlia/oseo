@@ -5808,24 +5808,25 @@ assessments:
         "bd4b60db4432b86e026eb918760d66b4813e89aa4c24ee\
         6042127c1acb24d7f1"
   ds17-exhaustive-escaped-annex-b:
-    disposition: remediation
-    remediationOwner: unit:annexb-dynamic-source-accounting
-    normativeDependency: annex-b-only
+    disposition: exclusion
+    normativeDependency: source-evaluation-only
     reason: >-
       The maintainer decision of 2026-11-01 applies item 3 of the 2026-10-28
-      decision to S7.8.5_A1.4_T2 and S7.8.5_A2.4_T2 and closes both under ADR
-      0013, which is unchanged. Each selects 65,521 escaped code units. The
-      exhaustive literal property compiles all 65,521 with exact source at build
-      time under Annex B's pattern grammar and runs each natively. It also
-      checks that the core grammar alone rejects 50,784 of them with the Annex B
-      OSEO1001 diagnostic: 50,782 whose code unit is ID_Continue and passes the
-      original's var _X check, which is the original's SyntaxError fallback, and
-      U+200C and U+200D. Only those two need Annex B: Unicode 15.1 made them
-      ID_Continue, so the core grammar rejects their identity escapes, while the
-      originals exempt them from the fallback. No core subject remains; the eval
-      rejection the paths observe stays recorded. Reopen on changed source,
-      observation, or replacement evidence, on an amendment of ADR 0013's
-      optional Annex B policy, or on ADR 0019's reopening triggers.
+      decision to S7.8.5_A1.4_T2 and S7.8.5_A2.4_T2. Each evaluates /\X/ or
+      /a\X/ through eval for 65,521 escaped code units and accepts a
+      SyntaxError only for an ID_Continue unit that passes the original's var
+      _X check. Annex B's identity escape now admits all 65,521 units, so that
+      fallback is never reached and every executed assertion compares source
+      with the spelling. The exhaustive literal property compiles all 65,521
+      with exact source at build time under Annex B's pattern grammar in both
+      strictness modes and runs each natively. It also checks that the core
+      grammar alone rejects 50,784 of them with the Annex B OSEO1001
+      diagnostic: the 50,782 that take the original's fallback, and U+200C and
+      U+200D, which Unicode 15.1 made ID_Continue and the originals exempt.
+      Only eval of the literal text remains, and the paths observe its
+      run-time OSEO1001 rejection. Reopen on changed source, observation, or
+      replacement evidence, on an amendment of ADR 0013's optional Annex B
+      policy, or on ADR 0019's reopening triggers.
     replacementEvidence:
       tests/property/m5-regexp-literal-exhaustive.property.test.ts:
         "bd4b60db4432b86e026eb918760d66b4813e89aa4c24ee\
@@ -25655,7 +25656,7 @@ paths:
       tested through evaluated source"
     assessment: ds17-static-literal-grammar
   - path: "test/language/literals/regexp/S7.8.5_A1.4_T2.js"
-    proposedOwner: "adr:0013-m5-edition-and-manifest"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "incidental-scaffolding"
     sourceDigest: "0de2b7c36d7aeacf749dc1942f2a60301095339842cb3d924d6\
       7d0a55fe96b59"
@@ -25773,7 +25774,7 @@ paths:
       evaluated"
     assessment: ds17-static-literal-grammar
   - path: "test/language/literals/regexp/S7.8.5_A2.4_T2.js"
-    proposedOwner: "adr:0013-m5-edition-and-manifest"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "incidental-scaffolding"
     sourceDigest: "a81734f3c0609fa8fb61345a8f917fc6aa6f9ab9dacd82430aa\
       d254a6a23ee4d"
