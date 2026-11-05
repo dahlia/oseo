@@ -501,12 +501,11 @@ that remain, *usage-from-eval.js*, *eval-rqstd-once.js*, and
 *update-to-dynamic-import.js*, need direct `eval` or the `Function`
 constructor.
 
-The 23 literal `import()` rows whose specifier the resolution profile rejects
-at build time, 22 `import('')` rows and *await-expr-dyn-import.js* with
-`'foo'`, are meant to become deferrals to this plan. Compiling an unresolvable
-specifier to a run-time rejection is the remaining work. Until the exclusion
-audit accepts that diagnostic, `import-admission` owns them; its status in
-*PLAN-LANGUAGE.md* explains why.
+The 23 `unresolvable-literal-import` entries are literal `import()` rows whose
+specifier the resolution profile rejects at build time: 22 `import('')` rows
+and *await-expr-dyn-import.js* with `'foo'`. Compiling an unresolvable
+specifier to a run-time rejection of the returned promise is the remaining
+work.
 
 Five paths of the legacy `caller` selector in
 [ADR 0028](./docs/adr/0028-legacy-function-caller-boundary.md) also need
