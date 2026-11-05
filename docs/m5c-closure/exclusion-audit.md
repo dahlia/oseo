@@ -473,3 +473,42 @@ and *RegExp-trailing-escape-BMP.js* build the same escaped literals as
 fallback. Each is an ADR 0016 exclusion under `annexb-escaped-literal-eval`,
 which binds the exhaustive literal property as replacement evidence, so only
 the `eval` call remains.
+
+
+Annex B dynamic-source rows
+---------------------------
+
+The 475 rows that `annexb-dynamic-source-accounting` admits are ADR 0016
+exclusions: 469 under *test/annexB/language/eval-code/* report the run-time
+`OSEO1001` rejection of `eval`, and the six
+_test/annexB/built-ins/Function/createdynfn-\*.js_ rows report the `OSEO1001`
+rejection of the `Function` constructor. Each row records
+`priorCohort: source-subject` and an assessment with `disposition: exclusion`
+and `normativeDependency: source-evaluation-only`.
+
+| Assessment                                      | Rows | Non-source subject                                       |
+| ----------------------------------------------- | ---: | -------------------------------------------------------- |
+| `annexb-eval-func-block-functions`              |  136 | B.3.2.1 block-level functions in function code           |
+| `annexb-eval-func-parameter-no-skip`            |    8 | A block-level function named like a parameter            |
+| `annexb-eval-global-block-functions`            |  256 | B.3.2.2 block-level functions at global level            |
+| `annexb-eval-global-init-configurable`          |   16 | The initial global binding and its attributes            |
+| `annexb-eval-global-existing-property`          |   48 | A block-level function over an existing global property  |
+| `annexb-eval-global-nostrict-visibility`        |    3 | The name of a Block or CaseClause function after the run |
+| `annexb-eval-global-lexical-no-collision`       |    1 | A later Script's `let` over a configurable function      |
+| `annexb-eval-catch-parameter-var-redeclaration` |    1 | B.3.4 `var` redeclaration of a catch parameter           |
+| `annexb-function-constructor-html-comments`     |    6 | B.1.1 HTML-like comments                                 |
+
+The eval assessments read B.3.2.3 and the B.3.4 change to
+EvalDeclarationInstantiation as eval var instantiation, which
+`ec-static-eval-code` leaves under ADR 0016. That reading carries four
+assertions no static code can reach: parameter names being ignored,
+`configurable: true` on a new global binding, a binding with no `VarNames`
+entry, and var-scoped function declarations over a catch parameter.
+
+Replacement evidence binds the `annexb-function-declarations` and
+`annexb-syntax` family records, fixtures, and tests by digest. The passing
+test262 analog rows are upstream files the digests cannot bind, so each reason
+names them by path pattern.
+*eval-code/direct/func-\<template\>-eval-func-\<case\>.js* maps to
+*function-code/\<template\>-func-\<case\>.js*, and the global rows of both
+*direct/* and *indirect/* map to *global-code/* the same way.

@@ -9,6 +9,40 @@ results:
         - noStrict
       includes: []
       mode: script
+      path: test/annexB/language/eval-code/direct/global-block-decl-eval-global-block-scoping.js
+      strictness:
+        - non-strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - dynamic-source
+      - functions
+      - lexical-bindings
+      - var-bindings
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+    observation:
+      detail: 'test/annexB/language/eval-code/direct/global-block-decl-eval-global-block-scoping.js
+        non-strict disabled failed (1): stdout=""
+        stderr="test/annexB/language/eval-code/direct/global-block-decl-eval-global-block-scoping.js:103:1:
+        error[OSEO1001]: eval compiles source text at run time, which is
+        outside the admitted profile.\n"'
+      passed: false
+      unsupportedCapability: profile-syntax
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features: []
+      flags:
+        - generated
+        - noStrict
+      includes: []
+      mode: script
       path: test/annexB/language/function-code/if-decl-else-decl-a-func-existing-block-fn-update.js
       strictness:
         - non-strict

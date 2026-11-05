@@ -11,12 +11,12 @@ Implementation status: in progress. The `claim-boundary` unit has applied ADR
 `array-from-async`, `json-parse-source`, `uint8array-base64`,
 `atomics-pause`, `annexb-function-declarations`, `annexb-statement-forms`,
 `disposal-intrinsics`, `using-declarations`, `annexb-syntax`,
-`annexb-regexp-compile`, `import-operation`, and `import-admission` units are
-implemented and observed. Every other unit is open.
-This plan follows M5 directly and runs alongside M6. It has no milestone
-number. It schedules the language work the maintainer approved on 2026-11-02:
-build-time static-specifier `import()`, Annex B legacy web behavior except
-`document.all`, the legacy `caller` extension, the seven ECMAScript 2026
+`annexb-regexp-compile`, `import-operation`, `import-admission`, and
+`annexb-dynamic-source-accounting` units are implemented and observed. Every
+other unit is open. This plan follows M5 directly and runs alongside M6. It has
+no milestone number. It schedules the language work the maintainer approved on
+2026-11-02: build-time static-specifier `import()`, Annex B legacy web behavior
+except `document.all`, the legacy `caller` extension, the seven ECMAScript 2026
 features, and the three ECMAScript 2027 features other than Temporal.
 
 The plan is written for parallel implementation. Each work unit below owns an
@@ -147,10 +147,9 @@ The inventory grew from 41,091 to 43,007 included paths. Of the 1,086
 *test/annexB/* files, 35 need IsHTMLDDA and 26 carry the `legacy-regexp`
 proposal flag; those 61 stay excluded. A source scan finds 477 of the included
 *test/annexB/* paths calling `eval` or a `Function` constructor, almost all
-under *test/annexB/language/eval-code/*. They are in the inventory as
-unreviewed rows and become ADR 0016 results once
-`annexb-dynamic-source-accounting` admits them. That count is a planning
-estimate; the reviewed observations decide each row.
+under *test/annexB/language/eval-code/*. All 477 are ADR 0016 exclusions, as
+[`annexb-dynamic-source-accounting`](#annexb-dynamic-source-accounting)
+records.
 
 The `caller` work and literal `import()` change rows already inside the
 inventory, so neither waits for ADR 0032.
@@ -425,10 +424,10 @@ groups G1 through G14.
 In the full test262 observation, 252 rows move from unsupported to pass and
 *await-dynamic-import-rejection.js* becomes an expected negative; no row outside
 the `dynamic-import` and module-code rows changes. The 17 closable deferral
-rows are among them and now have observation owners. The manifest has 42,532
-reviewed rows: 36,408 passes, 4,480 expected negatives, and 1,644 unsupported
-results. The rows whose fixture calls the `Function` constructor, 18
-*eval-gtbndng-indirect-update* usage rows, keep ADR 0016 under the
+rows are among them and now have observation owners. That observation left
+42,532 reviewed rows: 36,408 passes, 4,480 expected negatives, and 1,644
+unsupported results. The rows whose fixture calls the `Function` constructor,
+18 *eval-gtbndng-indirect-update* usage rows, keep ADR 0016 under the
 `ds12-static-module-observables` assessment, whose native witnesses replace
 their live binding updates.
 
@@ -653,11 +652,11 @@ are ADR 0016 exclusions with the `adr:0016-dynamic-source-boundary` owner
 under the `ds17-exhaustive-escaped-annex-b` assessment, which binds the
 exhaustive literal property.
 
-No implementation lands here. Each row receives a reviewed exclusion audit row
-under ADR 0016. A row whose non-source subject is Annex B behavior names the
+No implementation lands here. Each row has a reviewed exclusion audit row under
+ADR 0016. A row whose non-source subject is Annex B behavior names the
 `annexb-syntax` or `annexb-function-declarations` evidence that covers it, which
-is why this unit follows them. A row whose non-source subject no evidence
-covers stays with remediation and blocks `language-exit-audit`.
+is why this unit follows them. Evidence covers every such subject, so no row
+stays with remediation.
 
 The exclusion audit check reads paths under *test/annexB/* as well as
 *test/built-ins/* and *test/language/*. *RegExp-leading-escape-BMP.js* and
@@ -665,8 +664,17 @@ The exclusion audit check reads paths under *test/annexB/* as well as
 exclusions under the `annexb-escaped-literal-eval` assessment: the
 [exhaustive literal property](./docs/evidence/regexp-literal-exhaustive/)
 compiles every escaped literal they build under the Annex B pattern grammar and
-runs it natively, so only the `eval` call remains. The
-other 475 rows wait for this unit's own full update.
+runs it natively, so only the `eval` call remains.
+
+Status: implemented and observed. In the full test262 observation, the other
+475 rows, 469 under *test/annexB/language/eval-code/* and the six
+_createdynfn-\*.js_ rows, all report `unsupported-profile-feature` through the
+`OSEO1001` rejection, and no earlier row changes. The manifest grows from 42,532
+to 43,007 reviewed rows, with unsupported results rising from 1,644 to 2,119.
+Nine assessments, which
+[*exclusion-audit.md*](./docs/m5c-closure/exclusion-audit.md#annex-b-dynamic-source-rows)
+lists, bind them. The ledger has no unreviewed row left, and this unit owns no
+row.
 
 ### ECMAScript 2026 units
 
