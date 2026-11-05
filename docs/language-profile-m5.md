@@ -314,9 +314,9 @@ evidence includes the executed variants and target, dependency tags are
 reviewed, and summaries include raw, path-group, and dependency totals.
 Unsupported, harness, and infrastructure results never increase the pass count.
 
-The current manifest contains 42,478 reviewed cases: 36,112 passes, 4,470
-expected negatives, and 1,896 unsupported profile features. It records no
-semantic, harness, or infrastructure failures. The 1,387 cases beyond the M5
+The current manifest contains 42,532 reviewed cases: 36,156 passes, 4,479
+expected negatives, and 1,897 unsupported profile features. It records no
+semantic, harness, or infrastructure failures. The 1,441 cases beyond the M5
 inventory are rows of the
 [ECMAScript 2026 profile](./language-profile-es2026.md): 164 for the
 [Annex B built-ins](./language-profile-es2026.md#annex-b-built-ins), 70 for the
@@ -329,8 +329,10 @@ inventory are rows of the
 [Uint8Array base64 and hex](./language-profile-es2026.md#uint8array-base64-and-hex),
 5 for [`Atomics.pause`](./language-profile-es2026.md#atomicspause), 332 for the
 [Annex B language semantics](./language-profile-es2026.md#annex-b-language-semantics),
-and 424 for
-[explicit resource management](./language-profile-es2026.md#explicit-resource-management).
+424 for
+[explicit resource management](./language-profile-es2026.md#explicit-resource-management),
+and 54 for
+[Annex B syntax and `compile`](./language-profile-es2026.md#annex-b-syntax-and-compile).
 
 The batch 16/17 dependency audit corrects 21 tag claims on 20 of the 754 new
 paths. Dependency totals are now 48 abrupt-completion, 559 functions, 404
@@ -5175,11 +5177,13 @@ declare a group name, or `\k` inside a class when that pattern declares a group
 name, stays an early error in both modes. That split makes the reported kind
 the record of whether a host engine agrees. The generated invalid pattern
 domain uses that record to decide when the reference hosts are a sound oracle,
-instead of asking whether a unicode-mode flag is set. It also keeps
+instead of asking whether a unicode-mode flag is set. Under M5 it also kept
 *test/built-ins/String/prototype/split/separator-regexp.js* classified as
 unsupported: four of its thirty-seven literals, `/\XA0/`, `/\X/`, `/\x/`, and
-`/\k<x>/`, parse only under Annex B, and the case now reports that boundary
-instead of turning into a parse rejection.
+`/\k<x>/`, parse only under Annex B, and the case reported that boundary
+instead of turning into a parse rejection. The post-M5 `annexb-syntax` unit
+admits the Annex B pattern grammar, and the case now passes; see
+[Annex B syntax and `compile`](./language-profile-es2026.md#annex-b-syntax-and-compile).
 
 The manifest holds 13,872 paths, 10,013 passes, 1,506 expected negatives, and
 2,353 unsupported profile features, with no semantic, harness, or

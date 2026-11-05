@@ -54,15 +54,40 @@ evidence:
       - tests/annexb-syntax-native.test.ts
       - tests/property/m5-annexb-regexp-syntax.property.test.ts
   standards:
-    status: omitted
-    reason: "The 28 test262 paths under test/annexB/language/comments/,
-      literals/, expressions/template-literal/, and the eval-free files of
-      test/annexB/built-ins/RegExp/ and its named-groups/, and
-      test/built-ins/String/prototype/split/separator-regexp.js, stay
-      unreviewed until Root admits them in its full UPDATE."
-    replacements:
-      - tests/native/fixtures/annexb-syntax.ts
-      - tests/property/m5-annexb-regexp-syntax.property.test.ts
+    status: covered
+    references:
+      - tests/test262/subset.yaml
+      - tests/test262/results.yaml
+      - tests/test262/results/annexB/built-ins/15.yaml
+      - tests/test262/results/annexB/built-ins/1d.yaml
+      - tests/test262/results/annexB/built-ins/47.yaml
+      - tests/test262/results/annexB/built-ins/53.yaml
+      - tests/test262/results/annexB/built-ins/c2.yaml
+      - tests/test262/results/annexB/built-ins/cf.yaml
+      - tests/test262/results/annexB/built-ins/d8.yaml
+      - tests/test262/results/annexB/built-ins/dd.yaml
+      - tests/test262/results/annexB/built-ins/e1.yaml
+      - tests/test262/results/annexB/built-ins/fe.yaml
+      - tests/test262/results/annexB/language/03.yaml
+      - tests/test262/results/annexB/language/1f.yaml
+      - tests/test262/results/annexB/language/20.yaml
+      - tests/test262/results/annexB/language/3d.yaml
+      - tests/test262/results/annexB/language/40.yaml
+      - tests/test262/results/annexB/language/4d.yaml
+      - tests/test262/results/annexB/language/70.yaml
+      - tests/test262/results/annexB/language/7f.yaml
+      - tests/test262/results/annexB/language/8f.yaml
+      - tests/test262/results/annexB/language/9c.yaml
+      - tests/test262/results/annexB/language/a5.yaml
+      - tests/test262/results/annexB/language/ba.yaml
+      - tests/test262/results/annexB/language/cd.yaml
+      - tests/test262/results/annexB/language/cf.yaml
+      - tests/test262/results/annexB/language/d8.yaml
+      - tests/test262/results/annexB/language/e6.yaml
+      - tests/test262/results/annexB/language/f8.yaml
+      - tests/test262/results/annexB/language/fe.yaml
+      - tests/test262/results/built-ins/String/79.yaml
+      - docs/m5c-closure/exclusion-audit.yaml
   structural:
     status: covered
     references:

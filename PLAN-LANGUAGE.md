@@ -10,9 +10,9 @@ Implementation status: in progress. The `claim-boundary` unit has applied ADR
 `iterator-concat`, `iterator-zip`, `annexb-object-accessors`,
 `array-from-async`, `json-parse-source`, `uint8array-base64`,
 `atomics-pause`, `annexb-function-declarations`, `annexb-statement-forms`,
-`disposal-intrinsics`, and `using-declarations` units are implemented and
-observed. The `annexb-syntax` and `annexb-regexp-compile` units are
-implemented and wait for Root's full observation. Every other unit is open.
+`disposal-intrinsics`, `using-declarations`, `annexb-syntax`, and
+`annexb-regexp-compile` units are implemented and observed. Every other unit is
+open.
 This plan follows M5 directly and runs alongside M6. It has no milestone
 number. It schedules the language work the maintainer approved on 2026-11-02:
 build-time static-specifier `import()`, Annex B legacy web behavior except
@@ -464,10 +464,13 @@ as its oracle selector, now with an Annex B mode.
 
 Status: implemented, with fixed, differential, and generated evidence in the
 [profile section](./docs/language-profile-es2026.md#annex-b-syntax-and-compile).
-A focused run of the owned paths passes or expects a negative result for
-every one, including *separator-regexp.js*, except the two `eval` rows
-`RegExp-leading-escape-BMP.js` and `RegExp-trailing-escape-BMP.js`; the rows
-wait for Root's full observation.
+In the full test262 observation, 19 of the 28 new rows pass and the other nine
+report the `SyntaxError` they expect. *separator-regexp.js* moves from
+unsupported to pass, the only earlier row that changes. Its exclusion audit row
+and `annex-b-pattern` assessment stay as the record of the remediation, as the
+`annexb-object-accessors` rows do. The two `eval` rows
+*RegExp-leading-escape-BMP.js* and *RegExp-trailing-escape-BMP.js* are
+observed as unsupported and stay with `annexb-dynamic-source-accounting`.
 
 ### `annexb-escape`
 
@@ -514,7 +517,9 @@ was built from still match.
 
 Status: implemented, with fixed, differential, and generated evidence in the
 [profile section](./docs/language-profile-es2026.md#regexpprototypecompile).
-The rows wait for Root's full observation.
+All 24 rows pass in the full test262 observation. With this unit and
+`annexb-syntax` observed, the manifest has 42,532 reviewed rows: 36,156
+passes, 4,479 expected negatives, and 1,897 unsupported results.
 
 ### `annexb-object-accessors`
 
@@ -606,6 +611,13 @@ under ADR 0016. A row whose non-source subject is Annex B behavior names the
 `annexb-syntax` or `annexb-function-declarations` evidence that covers it, which
 is why this unit follows them. A row whose non-source subject no evidence
 covers stays with remediation and blocks `language-exit-audit`.
+
+The exclusion audit check reads only paths under *test/built-ins/* and
+*test/language/*, so this unit also widens that path rule in
+*tools/m5c-exclusion-audit.ts* to *test/annexB/* rows and observes the result
+in its own full update. *RegExp-leading-escape-BMP.js* and
+*RegExp-trailing-escape-BMP.js* are already observed as unsupported and keep
+this unit as their ledger owner until then.
 
 ### ECMAScript 2026 units
 

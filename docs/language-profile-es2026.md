@@ -497,10 +497,13 @@ Annex B syntax and `compile`
 The `annexb-syntax` and `annexb-regexp-compile` units add the Annex B
 language syntax that has no family elsewhere and the one Annex B
 `RegExp.prototype` method. Their family records are `annexb-syntax` and
-`annexb-regexp-compile`. Their test262 rows stay unreviewed until Root admits
-them; a focused run of the owned paths passes or expects a negative result
-for every one except the two `RegExp-leading-escape-BMP.js` and
-`RegExp-trailing-escape-BMP.js` rows, which call `eval` and belong to ADR 0016.
+`annexb-regexp-compile`. In the full test262 observation, 19 of the 28 new
+`annexb-syntax` rows pass, the other nine report the `SyntaxError` they
+expect, and all 24 `annexb-regexp-compile` rows pass. Each record's standards
+class cites the results partitions that hold its rows. The two
+*RegExp-leading-escape-BMP.js* and *RegExp-trailing-escape-BMP.js* rows call
+`eval` and are observed as unsupported; `annexb-dynamic-source-accounting`
+owns their ADR 0016 accounting.
 
 ### HTML-like comments
 
@@ -561,7 +564,8 @@ The fixed fixtures in *tests/native/fixtures/annexb-syntax.ts* run each
 reading above as a literal and through the constructor and String methods,
 pin the early errors, and include the four Annex B patterns of
 *test/built-ins/String/prototype/split/separator-regexp.js*, the ADR 0013 row
-this unit remediates; that row passes in the focused run. The fixtures run as
+this unit remediates; that row now passes. Its exclusion audit row stays as
+the record of the remediation. The fixtures run as
 Scripts in both strictness modes under both specialization policies and
 forced collection against Node.js and Deno, and the dynamic fixture's reader
 misses its shape guard.

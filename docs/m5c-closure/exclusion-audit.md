@@ -413,7 +413,9 @@ now require a bound `annex-b-only` row with a `unit:` owner instead of an
 exclusion. The paragraphs above that call these paths exclusions describe the
 M5 state, which the M5 exit report records.
 
-The eight `unit:annexb-object-accessors` paths now pass. The closure ledger
-gives them the `observation` owner, which the check requires of a closed audit
-path, and their audit rows and assessments stay unchanged as the record of the
-remediation. The other three paths keep their unit owners.
+The eight `unit:annexb-object-accessors` paths and
+*String/prototype/split/separator-regexp.js* now pass. The closure ledger gives
+them the `observation` owner, which the check requires of a closed audit path,
+and their audit rows and assessments stay unchanged as the record of the
+remediation. The two `unit:annexb-dynamic-source-accounting` paths keep their
+unit owner.

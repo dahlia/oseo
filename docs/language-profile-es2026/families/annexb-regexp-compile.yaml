@@ -45,14 +45,33 @@ evidence:
       - tests/annexb-syntax-native.test.ts
       - tests/property/m5-annexb-regexp-compile.property.test.ts
   standards:
-    status: omitted
-    reason: "The 24 test262 paths under
-      test/annexB/built-ins/RegExp/prototype/compile/, flags/, and
-      Symbol.split/ stay unreviewed until Root admits them in its full
-      UPDATE."
-    replacements:
-      - tests/native/fixtures/annexb-regexp-compile.ts
-      - tests/property/m5-annexb-regexp-compile.property.test.ts
+    status: covered
+    references:
+      - tests/test262/subset.yaml
+      - tests/test262/results.yaml
+      - tests/test262/results/annexB/built-ins/04.yaml
+      - tests/test262/results/annexB/built-ins/0f.yaml
+      - tests/test262/results/annexB/built-ins/13.yaml
+      - tests/test262/results/annexB/built-ins/19.yaml
+      - tests/test262/results/annexB/built-ins/24.yaml
+      - tests/test262/results/annexB/built-ins/2a.yaml
+      - tests/test262/results/annexB/built-ins/3c.yaml
+      - tests/test262/results/annexB/built-ins/3f.yaml
+      - tests/test262/results/annexB/built-ins/51.yaml
+      - tests/test262/results/annexB/built-ins/52.yaml
+      - tests/test262/results/annexB/built-ins/6e.yaml
+      - tests/test262/results/annexB/built-ins/86.yaml
+      - tests/test262/results/annexB/built-ins/94.yaml
+      - tests/test262/results/annexB/built-ins/9e.yaml
+      - tests/test262/results/annexB/built-ins/a4.yaml
+      - tests/test262/results/annexB/built-ins/a7.yaml
+      - tests/test262/results/annexB/built-ins/ba.yaml
+      - tests/test262/results/annexB/built-ins/c1.yaml
+      - tests/test262/results/annexB/built-ins/cc.yaml
+      - tests/test262/results/annexB/built-ins/d3.yaml
+      - tests/test262/results/annexB/built-ins/d4.yaml
+      - tests/test262/results/annexB/built-ins/e5.yaml
+      - tests/test262/results/annexB/built-ins/f5.yaml
   structural:
     status: covered
     references:
