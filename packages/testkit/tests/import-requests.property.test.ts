@@ -6,6 +6,7 @@ import {
   compileModuleGraph,
   importCallProfileMessage,
   linkModuleGraph,
+  printMir,
 } from "@oseo/compiler";
 import type {
   Diagnostic,
@@ -15,6 +16,7 @@ import type {
   SyntaxImportEntry,
   SyntaxModule,
   SyntaxModuleSpecifier,
+  SyntaxStatement,
 } from "@oseo/compiler";
 import fc from "fast-check";
 
@@ -67,9 +69,21 @@ function specifierAt(value: string, offset: number): SyntaxModuleSpecifier {
 }
 
 /**
+ * An expression statement that evaluates one `import()` site, so the
+ * site reaches HIR construction as well as request discovery.
+ */
+function importCallStatement(call: SyntaxImportCall): SyntaxStatement {
+  const statement = { expression: call, kind: "expression" as const, range };
+  return call.byteRange == null
+    ? statement
+    : { ...statement, byteRange: call.byteRange };
+}
+
+/**
  * Hand-built module syntax with each request at its own byte offset, so
  * source order is the generated order. Static requests become
- * side-effect-only imports and dynamic ones `import-call` sites.
+ * side-effect-only imports and dynamic ones `import-call` sites that the
+ * body also evaluates.
  */
 function moduleSyntax(
   index: number,
@@ -101,7 +115,7 @@ function moduleSyntax(
     }
   }
   const module: SyntaxModule = {
-    body: [],
+    body: importCalls.map(importCallStatement),
     exports: [],
     imports,
     kind: "module",
@@ -129,7 +143,7 @@ function scriptReferrer(
   return {
     canonicalId: moduleId(program.script.identity),
     program: {
-      body: [],
+      body: importCalls.map(importCallStatement),
       importCalls,
       kind: "program",
       range,
@@ -409,31 +423,80 @@ function assertGraph(
     new Set(linked.graph?.evaluationOrder),
     new Set(expected.staticOrder.map((index) => moduleId(index))),
   );
-  const discovery = requests.filter(
-    (record) => record.edgeKind === "discovery",
-  );
-  if (discovery.length === 0) return;
+  // The module table lists the static evaluation order, then every
+  // module only `import()` edges reach, in discovery order.
+  const scheduled = linked.graph?.evaluationOrder ?? [];
+  const table = [...scheduled, ...ids.filter((id) => !scheduled.includes(id))];
   const compiled = compileModuleGraph(graph);
+  assert.deepEqual(compiled.diagnostics, []);
+  assert.ok(compiled.mir);
+  // Each module's `import()` sites lower, in source order, to the runtime
+  // import operation with their target's constant table index. A module
+  // without sites contributes no call.
+  const expectedCalls = ids
+    .map((id) =>
+      (program.modules[moduleIndex(id)] ?? [])
+        .filter((request) => request.dynamic)
+        .map((request) => table.indexOf(moduleId(request.target))),
+    )
+    .filter((calls) => calls.length > 0);
   assert.deepEqual(
-    compiled.diagnostics.map((diagnostic) => [
+    sortedCalls(moduleImportCalls(printMir(compiled.mir))),
+    sortedCalls(expectedCalls),
+  );
+  const script = scriptReferrer(program);
+  if (script == null || script.program.importCalls?.length === 0) return;
+  // A prelude Script runs before the module table exists, so each of its
+  // `import()` sites keeps the profile refusal without a chain.
+  const refused = compileModuleGraph(graph, {}, script.program);
+  assert.deepEqual(
+    refused.diagnostics.map((diagnostic) => [
       diagnostic.code,
       diagnostic.message,
       diagnostic.sourceId,
       diagnostic.byteRange.start,
       diagnostic.notes != null,
     ]),
-    // Only a site in a module outside the entry's static closure was
-    // reached through an `import()` edge, so only it carries a chain.
-    discovery.map((record) => [
+    (program.script?.requests ?? []).map((_, position) => [
       "OSEO1001",
       importCallProfileMessage,
-      record.referrer.id,
-      record.byteRange.start,
-      record.referrer.kind === "module" &&
-        !expected.staticOrder.includes(moduleIndex(record.referrer.id)),
+      script.canonicalId,
+      position * 40,
+      false,
     ]),
   );
-  assert.equal(compiled.mir, undefined);
+  assert.equal(refused.mir, undefined);
+}
+
+/**
+ * The constant arguments of every `module_import` call, one list per
+ * printed MIR function that makes any. Value IDs restart in every
+ * function, so each function's constants are read alone.
+ */
+function moduleImportCalls(mir: string): readonly (readonly number[])[] {
+  return mir
+    .split(/^(?=function )/mu)
+    .map((block) => {
+      const constants = new Map(
+        [...block.matchAll(/^\s+%(\d+) = constant (\d+) /gmu)].map((match) => [
+          match[1]!,
+          Number(match[2]),
+        ]),
+      );
+      return [...block.matchAll(/= call module_import %(\d+) /gu)].map(
+        (match) => {
+          const value = constants.get(match[1]!);
+          assert.ok(value != null, `no constant for %${match[1]}`);
+          return value;
+        },
+      );
+    })
+    .filter((calls) => calls.length > 0);
+}
+
+/** Per-function call lists in a canonical order, for comparison. */
+function sortedCalls(calls: readonly (readonly number[])[]): readonly string[] {
+  return calls.map((list) => list.join(",")).toSorted();
 }
 
 test("generated import() graphs keep deterministic requests", async () => {
