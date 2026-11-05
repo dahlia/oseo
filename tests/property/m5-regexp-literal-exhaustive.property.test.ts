@@ -576,14 +576,10 @@ test(
         ...sweepOptions,
         context: propertyContext(firstEscaped),
         domain:
-          // This domain runs all 65,521 selected literals since the build
-          // follows Annex B's grammar. The text still says 14,737, the
-          // count before that change, because the compatibility ratchet
-          // binds the registered domain string.
-          "all 14,737 /\\X/ literals S7.8.5_A1.4_T2 selects and the build " +
-          "accepts, each evaluated once natively with its source compared " +
-          "in the program; one generated rotation, function size of 64, " +
-          "128 or 256, and specialization phase alternating by program",
+          "all 65,521 /\\X/ literals S7.8.5_A1.4_T2 selects, each evaluated " +
+          "once natively with its source compared in the program; one " +
+          "generated rotation, function size of 64, 128 or 256, and " +
+          "specialization phase alternating by program",
         seed: 0x6000_9501,
         sizeLimit: sizeLimit(firstEscaped),
       },
@@ -625,13 +621,10 @@ test(
         ...sweepOptions,
         context: propertyContext(subsequentEscaped),
         domain:
-          // This domain also runs all 65,521 selected literals; the text
-          // keeps the ratchet-bound count from before Annex B's grammar.
-          "all 14,737 /a\\X/ literals S7.8.5_A2.4_T2 selects and the " +
-          "build accepts, each evaluated once natively with its source " +
-          "compared in the program; one generated rotation, function size " +
-          "of 64, 128 or 256, and specialization phase alternating by " +
-          "program",
+          "all 65,521 /a\\X/ literals S7.8.5_A2.4_T2 selects, each " +
+          "evaluated once natively with its source compared in the " +
+          "program; one generated rotation, function size of 64, 128 or " +
+          "256, and specialization phase alternating by program",
         seed: 0x6000_9503,
         sizeLimit: sizeLimit(subsequentEscaped),
       },

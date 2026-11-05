@@ -661,3 +661,71 @@ overrides:
     transition:
       from: 12
       to: absent
+  - invariant: property-seed
+    domain:
+      all 14,737 /\X/ literals S7.8.5_A1.4_T2 selects and the build accepts,
+      each evaluated once natively with its source compared in the program; one
+      generated rotation, function size of 64, 128 or 256, and specialization
+      phase alternating by program
+    reason: Renames the 0x60009501 domain key so that it states the executed
+      count. The first-position escaped sweep of S7.8.5_A1.4_T2 runs all 65,521
+      selected literals since the build follows Annex B's grammar, but its key
+      still said 14,737. The new key is "all 65,521 /\X/ literals S7.8.5_A1.4_T2
+      selects, each evaluated once natively with its source compared in the
+      program; one generated rotation, function size of 64, 128 or 256, and
+      specialization phase alternating by program". Seed 0x60009501 and the
+      1-case budget are unchanged.
+    transition:
+      from: 1610650881
+      to: absent
+  - invariant: property-case-budget
+    domain:
+      all 14,737 /\X/ literals S7.8.5_A1.4_T2 selects and the build accepts,
+      each evaluated once natively with its source compared in the program; one
+      generated rotation, function size of 64, 128 or 256, and specialization
+      phase alternating by program
+    reason: Renames the 0x60009501 domain key so that it states the executed
+      count. The first-position escaped sweep of S7.8.5_A1.4_T2 runs all 65,521
+      selected literals since the build follows Annex B's grammar, but its key
+      still said 14,737. The new key is "all 65,521 /\X/ literals S7.8.5_A1.4_T2
+      selects, each evaluated once natively with its source compared in the
+      program; one generated rotation, function size of 64, 128 or 256, and
+      specialization phase alternating by program". Seed 0x60009501 and the
+      1-case budget are unchanged.
+    transition:
+      from: 1
+      to: absent
+  - invariant: property-seed
+    domain:
+      all 14,737 /a\X/ literals S7.8.5_A2.4_T2 selects and the build accepts,
+      each evaluated once natively with its source compared in the program; one
+      generated rotation, function size of 64, 128 or 256, and specialization
+      phase alternating by program
+    reason: Renames the 0x60009503 domain key so that it states the executed
+      count. The subsequent-position escaped sweep of S7.8.5_A2.4_T2 runs all
+      65,521 selected literals since the build follows Annex B's grammar, but
+      its key still said 14,737. The new key is "all 65,521 /a\X/ literals
+      S7.8.5_A2.4_T2 selects, each evaluated once natively with its source
+      compared in the program; one generated rotation, function size of 64, 128
+      or 256, and specialization phase alternating by program". Seed 0x60009503
+      and the 1-case budget are unchanged.
+    transition:
+      from: 1610650883
+      to: absent
+  - invariant: property-case-budget
+    domain:
+      all 14,737 /a\X/ literals S7.8.5_A2.4_T2 selects and the build accepts,
+      each evaluated once natively with its source compared in the program; one
+      generated rotation, function size of 64, 128 or 256, and specialization
+      phase alternating by program
+    reason: Renames the 0x60009503 domain key so that it states the executed
+      count. The subsequent-position escaped sweep of S7.8.5_A2.4_T2 runs all
+      65,521 selected literals since the build follows Annex B's grammar, but
+      its key still said 14,737. The new key is "all 65,521 /a\X/ literals
+      S7.8.5_A2.4_T2 selects, each evaluated once natively with its source
+      compared in the program; one generated rotation, function size of 64, 128
+      or 256, and specialization phase alternating by program". Seed 0x60009503
+      and the 1-case budget are unchanged.
+    transition:
+      from: 1
+      to: absent
