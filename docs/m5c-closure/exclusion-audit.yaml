@@ -1661,8 +1661,8 @@ assessments:
       tests/native/fixtures/bindings.ts:
         "f3e20be237b2b772c59670f481af8147bfa59312098aa503\
         e3817879ab0fb31b"
-      tests/native.ts: "0e1a69753e2871fb54a1e8c358af78a7bbefa3e58cc70d62\
-        1a889ae961f5ade6"
+      tests/native.ts: "c228e1fe41cd8629ea034c0a73ee7be901da3982d3d78afe\
+        09290dbefc523f4f"
     reason: Maintainer decision 2026-10-28 item 1 applies to the single path in
       dynamic-source-template-site-evidence.paths.txt. The
       template-site-identity native fixture observes both same-site equalities
@@ -3425,8 +3425,8 @@ assessments:
       tests/callable-object-evidence.test.ts:
         "d2b814666e5645565ca2001f0419b931cd2949624777047f562d\
         a479c71be70d"
-      tests/native.ts: "0e1a69753e2871fb54a1e8c358af78a7bbefa3e58cc70d621a88\
-        9ae961f5ade6"
+      tests/native.ts: "c228e1fe41cd8629ea034c0a73ee7be901da3982d3d78afe0929\
+        0dbefc523f4f"
       docs/m5c-graph/dynamic-source-callable-object-assessment.md:
         "b4eb5774379e97332ac56111eb4fadf83a6e39b66f84b22bff74\
         10ffca7eaf37"
@@ -3457,8 +3457,8 @@ assessments:
       tests/callable-object-evidence.test.ts:
         "d2b814666e5645565ca2001f0419b931cd2949624777047f562d\
         a479c71be70d"
-      tests/native.ts: "0e1a69753e2871fb54a1e8c358af78a7bbefa3e58cc70d621a88\
-        9ae961f5ade6"
+      tests/native.ts: "c228e1fe41cd8629ea034c0a73ee7be901da3982d3d78afe0929\
+        0dbefc523f4f"
       docs/m5c-graph/dynamic-source-callable-object-assessment.md:
         "b4eb5774379e97332ac56111eb4fadf83a6e39b66f84b22bff74\
         10ffca7eaf37"
@@ -3486,8 +3486,8 @@ assessments:
       tests/callable-object-evidence.test.ts:
         "d2b814666e5645565ca2001f0419b931cd2949624777047f562d\
         a479c71be70d"
-      tests/native.ts: "0e1a69753e2871fb54a1e8c358af78a7bbefa3e58cc70d621a88\
-        9ae961f5ade6"
+      tests/native.ts: "c228e1fe41cd8629ea034c0a73ee7be901da3982d3d78afe0929\
+        0dbefc523f4f"
       docs/m5c-graph/dynamic-source-callable-object-assessment.md:
         "b4eb5774379e97332ac56111eb4fadf83a6e39b66f84b22bff74\
         10ffca7eaf37"
@@ -3530,8 +3530,8 @@ assessments:
       tests/callable-object-evidence.test.ts:
         "d2b814666e5645565ca2001f0419b931cd2949624777047f562d\
         a479c71be70d"
-      tests/native.ts: "0e1a69753e2871fb54a1e8c358af78a7bbefa3e58cc70d621a88\
-        9ae961f5ade6"
+      tests/native.ts: "c228e1fe41cd8629ea034c0a73ee7be901da3982d3d78afe0929\
+        0dbefc523f4f"
       docs/m5c-graph/dynamic-source-callable-object-assessment.md:
         "b4eb5774379e97332ac56111eb4fadf83a6e39b66f84b22bff74\
         10ffca7eaf37"
@@ -3558,8 +3558,8 @@ assessments:
       tests/callable-object-evidence.test.ts:
         "d2b814666e5645565ca2001f0419b931cd2949624777047f562d\
         a479c71be70d"
-      tests/native.ts: "0e1a69753e2871fb54a1e8c358af78a7bbefa3e58cc70d621a88\
-        9ae961f5ade6"
+      tests/native.ts: "c228e1fe41cd8629ea034c0a73ee7be901da3982d3d78afe0929\
+        0dbefc523f4f"
       docs/m5c-graph/dynamic-source-callable-object-assessment.md:
         "b4eb5774379e97332ac56111eb4fadf83a6e39b66f84b22bff74\
         10ffca7eaf37"
@@ -3590,8 +3590,8 @@ assessments:
       tests/callable-object-evidence.test.ts:
         "d2b814666e5645565ca2001f0419b931cd2949624777047f562d\
         a479c71be70d"
-      tests/native.ts: "0e1a69753e2871fb54a1e8c358af78a7bbefa3e58cc70d621a88\
-        9ae961f5ade6"
+      tests/native.ts: "c228e1fe41cd8629ea034c0a73ee7be901da3982d3d78afe0929\
+        0dbefc523f4f"
       docs/m5c-graph/dynamic-source-callable-object-assessment.md:
         "b4eb5774379e97332ac56111eb4fadf83a6e39b66f84b22bff74\
         10ffca7eaf37"
@@ -3620,8 +3620,8 @@ assessments:
       tests/callable-object-evidence.test.ts:
         "d2b814666e5645565ca2001f0419b931cd2949624777047f562d\
         a479c71be70d"
-      tests/native.ts: "0e1a69753e2871fb54a1e8c358af78a7bbefa3e58cc70d621a88\
-        9ae961f5ade6"
+      tests/native.ts: "c228e1fe41cd8629ea034c0a73ee7be901da3982d3d78afe0929\
+        0dbefc523f4f"
       docs/m5c-graph/dynamic-source-callable-object-assessment.md:
         "b4eb5774379e97332ac56111eb4fadf83a6e39b66f84b22bff74\
         10ffca7eaf37"
@@ -3659,8 +3659,8 @@ assessments:
       tests/callable-object-evidence.test.ts:
         "d2b814666e5645565ca2001f0419b931cd2949624777047f562d\
         a479c71be70d"
-      tests/native.ts: "0e1a69753e2871fb54a1e8c358af78a7bbefa3e58cc70d621a88\
-        9ae961f5ade6"
+      tests/native.ts: "c228e1fe41cd8629ea034c0a73ee7be901da3982d3d78afe0929\
+        0dbefc523f4f"
       docs/m5c-graph/dynamic-source-callable-object-assessment.md:
         "b4eb5774379e97332ac56111eb4fadf83a6e39b66f84b22bff74\
         10ffca7eaf37"
@@ -3687,8 +3687,8 @@ assessments:
       tests/callable-object-evidence.test.ts:
         "d2b814666e5645565ca2001f0419b931cd2949624777047f562d\
         a479c71be70d"
-      tests/native.ts: "0e1a69753e2871fb54a1e8c358af78a7bbefa3e58cc70d621a88\
-        9ae961f5ade6"
+      tests/native.ts: "c228e1fe41cd8629ea034c0a73ee7be901da3982d3d78afe0929\
+        0dbefc523f4f"
       docs/m5c-graph/dynamic-source-callable-object-assessment.md:
         "b4eb5774379e97332ac56111eb4fadf83a6e39b66f84b22bff74\
         10ffca7eaf37"
@@ -3719,8 +3719,8 @@ assessments:
       tests/callable-object-evidence.test.ts:
         "d2b814666e5645565ca2001f0419b931cd2949624777047f562d\
         a479c71be70d"
-      tests/native.ts: "0e1a69753e2871fb54a1e8c358af78a7bbefa3e58cc70d621a88\
-        9ae961f5ade6"
+      tests/native.ts: "c228e1fe41cd8629ea034c0a73ee7be901da3982d3d78afe0929\
+        0dbefc523f4f"
       docs/m5c-graph/dynamic-source-callable-object-assessment.md:
         "b4eb5774379e97332ac56111eb4fadf83a6e39b66f84b22bff74\
         10ffca7eaf37"
@@ -3750,8 +3750,8 @@ assessments:
       tests/callable-object-evidence.test.ts:
         "d2b814666e5645565ca2001f0419b931cd2949624777047f562d\
         a479c71be70d"
-      tests/native.ts: "0e1a69753e2871fb54a1e8c358af78a7bbefa3e58cc70d621a88\
-        9ae961f5ade6"
+      tests/native.ts: "c228e1fe41cd8629ea034c0a73ee7be901da3982d3d78afe0929\
+        0dbefc523f4f"
       docs/m5c-graph/dynamic-source-callable-object-assessment.md:
         "b4eb5774379e97332ac56111eb4fadf83a6e39b66f84b22bff74\
         10ffca7eaf37"
@@ -3790,8 +3790,8 @@ assessments:
       tests/callable-object-evidence.test.ts:
         "d2b814666e5645565ca2001f0419b931cd2949624777047f562d\
         a479c71be70d"
-      tests/native.ts: "0e1a69753e2871fb54a1e8c358af78a7bbefa3e58cc70d621a88\
-        9ae961f5ade6"
+      tests/native.ts: "c228e1fe41cd8629ea034c0a73ee7be901da3982d3d78afe0929\
+        0dbefc523f4f"
       docs/m5c-graph/dynamic-source-callable-object-assessment.md:
         "b4eb5774379e97332ac56111eb4fadf83a6e39b66f84b22bff74\
         10ffca7eaf37"
@@ -3820,8 +3820,8 @@ assessments:
       tests/callable-object-evidence.test.ts:
         "d2b814666e5645565ca2001f0419b931cd2949624777047f562d\
         a479c71be70d"
-      tests/native.ts: "0e1a69753e2871fb54a1e8c358af78a7bbefa3e58cc70d621a88\
-        9ae961f5ade6"
+      tests/native.ts: "c228e1fe41cd8629ea034c0a73ee7be901da3982d3d78afe0929\
+        0dbefc523f4f"
       docs/m5c-graph/dynamic-source-callable-object-assessment.md:
         "b4eb5774379e97332ac56111eb4fadf83a6e39b66f84b22bff74\
         10ffca7eaf37"
@@ -3848,8 +3848,8 @@ assessments:
       tests/callable-object-evidence.test.ts:
         "d2b814666e5645565ca2001f0419b931cd2949624777047f562d\
         a479c71be70d"
-      tests/native.ts: "0e1a69753e2871fb54a1e8c358af78a7bbefa3e58cc70d621a88\
-        9ae961f5ade6"
+      tests/native.ts: "c228e1fe41cd8629ea034c0a73ee7be901da3982d3d78afe0929\
+        0dbefc523f4f"
       docs/m5c-graph/dynamic-source-callable-object-assessment.md:
         "b4eb5774379e97332ac56111eb4fadf83a6e39b66f84b22bff74\
         10ffca7eaf37"
@@ -3877,8 +3877,8 @@ assessments:
       tests/callable-object-evidence.test.ts:
         "d2b814666e5645565ca2001f0419b931cd2949624777047f562d\
         a479c71be70d"
-      tests/native.ts: "0e1a69753e2871fb54a1e8c358af78a7bbefa3e58cc70d621a88\
-        9ae961f5ade6"
+      tests/native.ts: "c228e1fe41cd8629ea034c0a73ee7be901da3982d3d78afe0929\
+        0dbefc523f4f"
       docs/m5c-graph/dynamic-source-callable-object-assessment.md:
         "b4eb5774379e97332ac56111eb4fadf83a6e39b66f84b22bff74\
         10ffca7eaf37"
@@ -3909,8 +3909,8 @@ assessments:
       tests/callable-object-evidence.test.ts:
         "d2b814666e5645565ca2001f0419b931cd2949624777047f562d\
         a479c71be70d"
-      tests/native.ts: "0e1a69753e2871fb54a1e8c358af78a7bbefa3e58cc70d621a88\
-        9ae961f5ade6"
+      tests/native.ts: "c228e1fe41cd8629ea034c0a73ee7be901da3982d3d78afe0929\
+        0dbefc523f4f"
       docs/m5c-graph/dynamic-source-callable-object-assessment.md:
         "b4eb5774379e97332ac56111eb4fadf83a6e39b66f84b22bff74\
         10ffca7eaf37"
@@ -4036,8 +4036,8 @@ assessments:
     replacementEvidence:
       tests/native/fixtures/binding-reference-evidence.ts: "148176601d5cac6e8f\
         b67444ac68efeadc9df8aacb596b23dbf158c2b48f1bba"
-      tests/native.ts: "0e1a69753e2871fb54a1e8c358af78a7bbefa3e58cc70d621a889a\
-        e961f5ade6"
+      tests/native.ts: "c228e1fe41cd8629ea034c0a73ee7be901da3982d3d78afe09290d\
+        befc523f4f"
   ds18-static-class-fields:
     disposition: exclusion
     normativeDependency: source-evaluation-only
@@ -4058,8 +4058,8 @@ assessments:
     replacementEvidence:
       tests/native/fixtures/binding-reference-evidence.ts: "148176601d5cac6e8f\
         b67444ac68efeadc9df8aacb596b23dbf158c2b48f1bba"
-      tests/native.ts: "0e1a69753e2871fb54a1e8c358af78a7bbefa3e58cc70d621a889a\
-        e961f5ade6"
+      tests/native.ts: "c228e1fe41cd8629ea034c0a73ee7be901da3982d3d78afe09290d\
+        befc523f4f"
   ds18-unresolvable-compound:
     disposition: exclusion
     normativeDependency: source-evaluation-only
@@ -4080,8 +4080,8 @@ assessments:
     replacementEvidence:
       tests/native/fixtures/binding-reference-evidence.ts: "148176601d5cac6e8f\
         b67444ac68efeadc9df8aacb596b23dbf158c2b48f1bba"
-      tests/native.ts: "0e1a69753e2871fb54a1e8c358af78a7bbefa3e58cc70d621a889a\
-        e961f5ade6"
+      tests/native.ts: "c228e1fe41cd8629ea034c0a73ee7be901da3982d3d78afe09290d\
+        befc523f4f"
   ds21-finite-completion-records:
     disposition: exclusion
     normativeDependency: source-evaluation-only
@@ -4112,8 +4112,8 @@ assessments:
       tests/completion-records.test.ts:
         "f053d02bcd11af6604c78d907e709ee0155fe6c33c4a551b\
         79de0cc09474b624"
-      tests/native.ts: "0e1a69753e2871fb54a1e8c358af78a7bbefa3e58cc70d62\
-        1a889ae961f5ade6"
+      tests/native.ts: "c228e1fe41cd8629ea034c0a73ee7be901da3982d3d78afe\
+        09290dbefc523f4f"
       tests/test262/harness/base.js:
         "50331feeca513cb2e2354e05e7c68f82d5aeccd9b766d6c8\
         8438c5ef118075f6"
@@ -5698,8 +5698,8 @@ assessments:
         90f24966b2f41a0ebe9cabe4a5454e61063d6b54"
       tests/native/fixtures/construction-static-contracts.ts: "784b3e71396e5\
         f40e33a5b3cbe52a3ec28b59cdba905431d1e8e0c1d929ae6b6"
-      tests/native.ts: "0e1a69753e2871fb54a1e8c358af78a7bbefa3e58cc70d621a88\
-        9ae961f5ade6"
+      tests/native.ts: "c228e1fe41cd8629ea034c0a73ee7be901da3982d3d78afe0929\
+        0dbefc523f4f"
     reason: >-
       Maintainer decision 2026-10-28 item 1 applies only to the 24 exclusion
       rows in docs/m5c-graph/dynamic-source-construction-assessment.yaml.
@@ -5855,8 +5855,8 @@ assessments:
       tests/dynamic-source-residual-source.test.ts:
         "f124147bde0d8023f6be413421e40d6cf3d09ec2a2e5abf9\
         119442a0bb1d515c"
-      tests/native.ts: "0e1a69753e2871fb54a1e8c358af78a7bbefa3e58cc70d62\
-        1a889ae961f5ade6"
+      tests/native.ts: "c228e1fe41cd8629ea034c0a73ee7be901da3982d3d78afe\
+        09290dbefc523f4f"
       tests/test262/harness/base.js:
         "50331feeca513cb2e2354e05e7c68f82d5aeccd9b766d6c8\
         8438c5ef118075f6"
@@ -5891,8 +5891,8 @@ assessments:
       tests/dynamic-source-residual-source.test.ts:
         "f124147bde0d8023f6be413421e40d6cf3d09ec2a2e5abf9\
         119442a0bb1d515c"
-      tests/native.ts: "0e1a69753e2871fb54a1e8c358af78a7bbefa3e58cc70d62\
-        1a889ae961f5ade6"
+      tests/native.ts: "c228e1fe41cd8629ea034c0a73ee7be901da3982d3d78afe\
+        09290dbefc523f4f"
       tests/test262/harness/base.js:
         "50331feeca513cb2e2354e05e7c68f82d5aeccd9b766d6c8\
         8438c5ef118075f6"
