@@ -157,7 +157,7 @@ static OseoValue install(
 ) {
     size_t argument_count = 2u;
     for (size_t index = 0u; index < count; index += 1u) {
-        argument_count += 3u + modules[index].request_count;
+        argument_count += 4u + modules[index].request_count;
     }
     OseoResult result = oseo_roots_allocate(context, frame, argument_count);
     assert(result.status == OSEO_STATUS_NORMAL);
@@ -168,6 +168,7 @@ static OseoValue install(
     for (size_t index = 0u; index < count; index += 1u) {
         arguments[position++] = function(context, modules[index].code_id);
         arguments[position++] = oseo_number(modules[index].asynchronous);
+        arguments[position++] = oseo_undefined();
         arguments[position++] =
             oseo_number((double)modules[index].request_count);
         for (size_t request = 0u;

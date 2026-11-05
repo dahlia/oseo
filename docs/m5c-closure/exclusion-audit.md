@@ -85,9 +85,16 @@ The separate `dynamic-import-staged-plan` node plans ADR 0016 alternative 3 for
 build-time-resolvable imports. ADR 0016, as amended on 2026-11-03, selects
 alternative 3 for the subset of the
 [static-specifier import design](../static-specifier-import-design.md). The
-amendment grants no exclusion, and every `import()` stays rejected until
-`import-admission` re-observes the `dynamic-import` paths and reassesses the
-reopened exclusions.
+amendment grants no exclusion. `import-admission` re-observed the
+`dynamic-import` paths and reassessed the reopened exclusions. Rows that now
+pass or report an expected negative keep their audit rows and assessments as
+the record, with the `observation` ledger owner. The 18 rows whose fixture
+calls the `Function` constructor stay ADR 0016 exclusions under
+`ds12-static-module-observables`. The 87 rows that fail at build time with
+`OSEO0001`, `OSEO2001`, or `OSEO3001` left the audit, because the check
+accepts an ADR 0016 or deferral row only over an `OSEO1001` rejection; they
+have the `unit:import-admission` owner until a follow-up widens the record
+surfaces, as [*PLAN-LANGUAGE.md*](../../PLAN-LANGUAGE.md) describes.
 
 
 Incidental Annex B TypedArray prototype lookup

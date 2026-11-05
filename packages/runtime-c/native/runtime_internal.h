@@ -2301,6 +2301,16 @@ typedef enum {
      * table entry and both handler slots hold its evaluator.
      */
     OSEO_REACTION_MODULE = 5,
+    /*
+     * The two steps of ContinueDynamicImport for one `import()` call.
+     * `capability` holds the call's promise and `index` the target's
+     * module table entry; both handler slots hold the target's evaluator,
+     * which only supplies the job's realm. The first step runs Link and
+     * Evaluate; the second settles the call's promise from the evaluation
+     * promise it was attached to.
+     */
+    OSEO_REACTION_IMPORT_EVALUATE = 6,
+    OSEO_REACTION_IMPORT_SETTLE = 7,
 } OseoReactionKind;
 
 typedef struct {
@@ -2338,13 +2348,15 @@ typedef enum {
 
 /*
  * One module table entry: the build's compiled evaluator, top-level
- * await flag, and static requested modules in source order, followed by
- * the evaluation state of a Cyclic Module Record. Module indices name
- * entries of the same table. The three values are traced through the
- * context, which keeps the table for the life of the program.
+ * await flag, namespace object, and static requested modules in source
+ * order, followed by the evaluation state of a Cyclic Module Record.
+ * Module indices name entries of the same table. The four values are
+ * traced through the context, which keeps the table for the life of the
+ * program. The namespace is undefined for a module no `import()` names.
  */
 typedef struct {
     OseoValue evaluator;
+    OseoValue namespace_object;
     OseoValue top_level_capability;
     OseoValue evaluation_error;
     bool errored;
@@ -2391,6 +2403,8 @@ typedef struct {
     OseoModuleFrame *frames;
     size_t frame_count;
     uint64_t async_evaluation_count;
+    /* True while Evaluate walks the graph and runs evaluators. */
+    bool evaluating;
 } OseoModuleTable;
 
 typedef enum {
@@ -4783,6 +4797,28 @@ OseoResult oseo_internal_promise_then_module(
 OseoResult oseo_internal_module_async_settled(
     OseoContext *context,
     size_t module_index,
+    OseoValue argument,
+    bool fulfilled
+);
+/*
+ * PerformPromiseThen with one step of ContinueDynamicImport. An undefined
+ * `promise` stands for the already fulfilled LoadRequestedModules promise,
+ * so the reaction job is queued at once.
+ */
+OseoResult oseo_internal_promise_then_import(
+    OseoContext *context,
+    OseoValue promise,
+    OseoValue capability,
+    OseoValue evaluator,
+    size_t module_index,
+    OseoReactionKind kind
+);
+/* Runs one ContinueDynamicImport step from its reaction job. */
+OseoResult oseo_internal_module_import_step(
+    OseoContext *context,
+    OseoReactionKind kind,
+    size_t module_index,
+    OseoValue capability,
     OseoValue argument,
     bool fulfilled
 );

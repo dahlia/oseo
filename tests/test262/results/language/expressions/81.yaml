@@ -701,12 +701,11 @@ results:
       - object-properties
       - promise-settlement
     observation:
-      detail: 'test/language/expressions/dynamic-import/catch/nested-async-arrow-function-await-file-does-not-exist.js
-        non-strict disabled failed (1): stdout=""
-        stderr="test/language/expressions/dynamic-import/catch/nested-async-arrow-function-await-file-does-not-exist.js:133:9:
-        error[OSEO1001]: ImportExpression is outside the M1 profile.\n"'
+      detail: "test/language/expressions/dynamic-import/catch/nested-async-ar\
+        row-function-await-file-does-not-exist.js:30:16:
+        error[OSEO3001]: The module source could not be read."
       passed: false
-      unsupportedCapability: profile-syntax
+      unsupportedCapability: static-specifier-import-build
     unsupportedFeatures: []
   - case:
       async: true
@@ -722,7 +721,7 @@ results:
         - non-strict
         - strict
       suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
-    classification: unsupported-profile-feature
+    classification: pass
     dependencies:
       - abrupt-completion
       - dynamic-source
@@ -731,13 +730,23 @@ results:
       - module-linking
       - object-properties
       - promise-settlement
+    execution:
+      harnessIncludes:
+        - base.js
+        - doneprintHandle.js
+      scheduler: deterministic-logical-clock
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
     observation:
-      detail: 'test/language/expressions/dynamic-import/catch/nested-block-import-catch-eval-rqstd-abrupt-urierror.js
-        non-strict disabled failed (1): stdout=""
-        stderr="test/language/expressions/dynamic-import/catch/nested-block-import-catch-eval-rqstd-abrupt-urierror.js:136:3:
-        error[OSEO1001]: ImportExpression is outside the M1 profile.\n"'
-      passed: false
-      unsupportedCapability: profile-syntax
+      passed: true
     unsupportedFeatures: []
   - case:
       async: true
@@ -763,11 +772,10 @@ results:
       - object-properties
       - promise-settlement
     observation:
-      detail: "test/language/expressions/dynamic-import/catch/top-level-impor\
-        t-catch-eval-script-code-target.js:34:1: error[OSEO1001]:
-        ImportExpression is outside the M1 profile."
+      detail: "test/language/expressions/dynamic-import/catch/script-code_FIX\
+        TURE.js:7:22: error[OSEO0001]: Source could not be parsed."
       passed: false
-      unsupportedCapability: profile-syntax
+      unsupportedCapability: static-specifier-import-build
     unsupportedFeatures: []
   - case:
       async: true
@@ -782,7 +790,7 @@ results:
         - non-strict
         - strict
       suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
-    classification: unsupported-profile-feature
+    classification: pass
     dependencies:
       - destructuring-bindings
       - dynamic-source
@@ -792,13 +800,23 @@ results:
       - object-properties
       - promise-settlement
       - symbols
+    execution:
+      harnessIncludes:
+        - base.js
+        - doneprintHandle.js
+      scheduler: deterministic-logical-clock
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
     observation:
-      detail: 'test/language/expressions/dynamic-import/reuse-namespace-object-from-script.js
-        non-strict disabled failed (1): stdout=""
-        stderr="test/language/expressions/dynamic-import/reuse-namespace-object-from-script.js:135:5:
-        error[OSEO1001]: ImportExpression is outside the M1 profile.\n"'
-      passed: false
-      unsupportedCapability: profile-syntax
+      passed: true
     unsupportedFeatures: []
   - case:
       async: false

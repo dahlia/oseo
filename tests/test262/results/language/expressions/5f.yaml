@@ -1149,7 +1149,7 @@ results:
         - non-strict
         - strict
       suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
-    classification: unsupported-profile-feature
+    classification: pass
     dependencies:
       - async-functions
       - dynamic-source
@@ -1159,13 +1159,23 @@ results:
       - object-properties
       - promise-settlement
       - var-bindings
+    execution:
+      harnessIncludes:
+        - base.js
+        - doneprintHandle.js
+      scheduler: deterministic-logical-clock
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
     observation:
-      detail: 'test/language/expressions/dynamic-import/namespace/await-ns-get-str-not-found.js
-        non-strict disabled failed (1): stdout=""
-        stderr="test/language/expressions/dynamic-import/namespace/await-ns-get-str-not-found.js:185:22:
-        error[OSEO1001]: ImportExpression is outside the M1 profile.\n"'
-      passed: false
-      unsupportedCapability: profile-syntax
+      passed: true
     unsupportedFeatures: []
   - case:
       async: false
@@ -1180,19 +1190,27 @@ results:
         - non-strict
         - strict
       suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
-    classification: unsupported-profile-feature
+    classification: pass
     dependencies:
       - async-functions
       - dynamic-source
       - functions
       - var-bindings
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
     observation:
-      detail: 'test/language/expressions/dynamic-import/syntax/valid/nested-async-arrow-function-await-script-code-valid.js
-        non-strict disabled failed (1): stdout=""
-        stderr="test/language/expressions/dynamic-import/syntax/valid/nested-async-arrow-function-await-script-code-valid.js:105:9:
-        error[OSEO1001]: ImportExpression is outside the M1 profile.\n"'
-      passed: false
-      unsupportedCapability: profile-syntax
+      passed: true
     unsupportedFeatures: []
   - case:
       async: false
@@ -1271,8 +1289,9 @@ results:
     observation:
       detail: 'test/language/expressions/dynamic-import/usage/nested-if-import-then-eval-gtbndng-indirect-update.js
         non-strict disabled failed (1): stdout=""
-        stderr="test/language/expressions/dynamic-import/usage/nested-if-import-then-eval-gtbndng-indirect-update.js:160:3:
-        error[OSEO1001]: ImportExpression is outside the M1 profile.\n"'
+        stderr="test/language/expressions/dynamic-import/usage/eval-gtbndng-indirect-update_FIXTURE.js:7:1:
+        error[OSEO1001]: The Function constructor requires dynamic
+        source and is unsupported in M5.\n"'
       passed: false
       unsupportedCapability: profile-syntax
     unsupportedFeatures: []

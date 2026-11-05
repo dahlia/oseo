@@ -763,6 +763,7 @@ void oseo_collect(OseoContext *context) {
         for (size_t index = 0u; index < modules->count; index += 1u) {
             const OseoModuleRecord *record = &modules->records[index];
             mark_value(record->evaluator, &worklist);
+            mark_value(record->namespace_object, &worklist);
             mark_value(record->top_level_capability, &worklist);
             mark_value(record->evaluation_error, &worklist);
         }

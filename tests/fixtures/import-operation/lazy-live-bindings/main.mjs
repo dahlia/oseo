@@ -1,0 +1,13 @@
+console.log("entry starts");
+const first = import("./lazy.mjs");
+console.log("request made");
+const namespace = await first;
+console.log("value", namespace.value);
+namespace.increment();
+console.log("live value", namespace.value);
+const sameModule = await import("./lazy.mjs");
+sameModule.increment();
+console.log("shared value", namespace.value, sameModule.value);
+const { value: snapshot } = namespace;
+namespace.increment();
+console.log("snapshot and live", snapshot, namespace.value);

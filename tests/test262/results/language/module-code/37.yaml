@@ -16,7 +16,7 @@ results:
       strictness:
         - strict
       suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
-    classification: unsupported-profile-feature
+    classification: pass
     dependencies:
       - dynamic-source
       - functions
@@ -27,12 +27,46 @@ results:
       - promise-settlement
       - symbols
       - top-level-await
+    execution:
+      harnessIncludes:
+        - base.js
+        - doneprintHandle.js
+        - compareArray.js
+      moduleGraph:
+        - dependencies:
+            - test/language/module-code/top-level-await/fulfillment-order_setup_FIXTURE.js
+          id: test/language/module-code/top-level-await/fulfillment-order.js
+          sourceHash: fnv1a64:b8392528717418aa
+        - dependencies: []
+          id: test/language/module-code/top-level-await/fulfillment-order_setup_FIXTURE.js
+          sourceHash: fnv1a64:1c9f853f57e36a15
+        - dependencies:
+            - test/language/module-code/top-level-await/fulfillment-order_a-sentinel_FIXTURE.js
+            - test/language/module-code/top-level-await/fulfillment-order_b_FIXTURE.js
+          id: test/language/module-code/top-level-await/fulfillment-order_a_FIXTURE.js
+          sourceHash: fnv1a64:f483cd9e14319001
+        - dependencies:
+            - test/language/module-code/top-level-await/fulfillment-order_setup_FIXTURE.js
+          id: test/language/module-code/top-level-await/fulfillment-order_a-sentinel_FIXTURE.js
+          sourceHash: fnv1a64:f5d6773bcc77841a
+        - dependencies:
+            - test/language/module-code/top-level-await/fulfillment-order_b-sentinel_FIXTURE.js
+            - test/language/module-code/top-level-await/fulfillment-order_setup_FIXTURE.js
+          id: test/language/module-code/top-level-await/fulfillment-order_b_FIXTURE.js
+          sourceHash: fnv1a64:0473deb91247a008
+        - dependencies:
+            - test/language/module-code/top-level-await/fulfillment-order_setup_FIXTURE.js
+          id: test/language/module-code/top-level-await/fulfillment-order_b-sentinel_FIXTURE.js
+          sourceHash: fnv1a64:a7cbb87e6386779a
+      scheduler: deterministic-logical-clock
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
     observation:
-      detail: "test/language/module-code/top-level-await/fulfillment-order.js\
-        :43:31: error[OSEO1001]: ImportExpression is outside the M1
-        profile."
-      passed: false
-      unsupportedCapability: profile-syntax
+      passed: true
     unsupportedFeatures: []
   - case:
       async: false

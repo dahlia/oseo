@@ -66,10 +66,10 @@ results:
       - top-level-await
     observation:
       detail: "test/language/module-code/top-level-await/syntax/await-expr-dy\
-        n-import.js:37:9: error[OSEO1001]: ImportExpression is outside
-        the M1 profile."
+        n-import.js:37:16: error[OSEO3001]: Unsupported module specifier
+        'foo'."
       passed: false
-      unsupportedCapability: profile-syntax
+      unsupportedCapability: module-resolution-profile
     unsupportedFeatures: []
   - case:
       async: false

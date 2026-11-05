@@ -680,3 +680,7 @@ families:
     owner: tests/property/m5-annexb-regexp-compile.property.test.ts
     start: 0x6000a100
     end: 0x6000a1ff
+  - family: import-operation
+    owner: tests/property/import-operation.property.test.ts
+    start: 0x6000ac00
+    end: 0x6000acff

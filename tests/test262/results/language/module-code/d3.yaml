@@ -37,17 +37,40 @@ results:
       strictness:
         - strict
       suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
-    classification: unsupported-profile-feature
+    classification: pass
     dependencies:
       - dynamic-source
       - module-linking
       - promise-settlement
       - top-level-await
+    execution:
+      harnessIncludes:
+        - base.js
+        - doneprintHandle.js
+      moduleGraph:
+        - dependencies:
+            - test/language/module-code/top-level-await/module-graphs-parent-tla_FIXTURE.js
+          id: test/language/module-code/top-level-await/module-graphs-does-not-hang.js
+          sourceHash: fnv1a64:9f9f60e8a024be93
+        - dependencies:
+            - test/language/module-code/top-level-await/tla_FIXTURE.js
+          id: test/language/module-code/top-level-await/module-graphs-parent-tla_FIXTURE.js
+          sourceHash: fnv1a64:45b445f173436d28
+        - dependencies: []
+          id: test/language/module-code/top-level-await/tla_FIXTURE.js
+          sourceHash: fnv1a64:9cb9847771344309
+        - dependencies:
+            - test/language/module-code/top-level-await/module-graphs-parent-tla_FIXTURE.js
+          id: test/language/module-code/top-level-await/module-graphs-grandparent-tla_FIXTURE.js
+          sourceHash: fnv1a64:cf01100c7c6e5e8f
+      scheduler: deterministic-logical-clock
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
     observation:
-      detail: "test/language/module-code/top-level-await/module-graphs-does-n\
-        ot-hang.js:11:7: error[OSEO1001]: ImportExpression is outside
-        the M1 profile."
-      passed: false
-      unsupportedCapability: profile-syntax
+      passed: true
     unsupportedFeatures: []
 suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2

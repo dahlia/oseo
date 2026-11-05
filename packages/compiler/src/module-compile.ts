@@ -8,21 +8,22 @@ import type {
 } from "./hir.ts";
 import {
   buildSeededHir,
+  type HirHostOptions,
   hirBindingIdentifiers,
   hirBindingPatternHasAwait,
   hirExpressionHasAwait,
-  importCallProfileMessage,
   sourceDiagnostic,
   type SyntaxStatementItem,
 } from "./hir-build.ts";
 import type { CompilerOptions, MirProgram } from "./mir.ts";
 import { buildMir } from "./mir-build.ts";
-import { linkModuleGraph, withReferrerChains } from "./modules.ts";
+import { linkModuleGraph } from "./modules.ts";
 import type { LinkedModule, LinkedModuleGraph } from "./modules.ts";
 import type { Diagnostic, SourceRange } from "./source.ts";
 import type {
   LocatedSyntax,
   ModuleGraph,
+  ScriptRequestClosure,
   SyntaxExpression,
   SyntaxModule,
   SyntaxProgram,
@@ -498,6 +499,24 @@ interface ModulePreludeResolution {
 }
 
 /**
+ * A module reading a name that a Script's `with` statement may initialize
+ * could not observe the hidden fallback cell the Script writes.
+ */
+function withInitializingDiagnostic(
+  script: SyntaxProgram,
+  names: readonly string[],
+  role: string,
+): Diagnostic {
+  return sourceDiagnostic(
+    script.sourceId,
+    script,
+    `A ${role}Script whose with statement may initialize ` +
+      `${names.toSorted().join(", ")} is unsupported before ` +
+      "a module graph.",
+  );
+}
+
+/**
  * Resolve the prelude Script after the graph's cells, so its IDs never
  * collide with a module binding. A top-level `with` assignment that may
  * write a hidden fallback cell is rejected, because a module reading the
@@ -507,6 +526,8 @@ function resolveModulePrelude(
   prelude: SyntaxProgram,
   nextBindingId: number,
 ): ModulePreludeResolution {
+  // The prelude runs before the module table exists, so an `import()` in
+  // it names no target and keeps the profile diagnostic.
   const resolved = buildSeededHir(prelude, {
     fragmentMetadata: true,
     nextBindingId,
@@ -524,13 +545,7 @@ function resolveModulePrelude(
     return {
       ...failed,
       diagnostics: [
-        sourceDiagnostic(
-          prelude.sourceId,
-          prelude,
-          "A prelude Script whose with statement may initialize " +
-            `${initializing.toSorted().join(", ")} is unsupported before ` +
-            "a module graph.",
-        ),
+        withInitializingDiagnostic(prelude, initializing, "prelude "),
       ],
     };
   }
@@ -549,46 +564,83 @@ function resolveModulePrelude(
 }
 
 /**
- * Link and lower a closed module graph to shared-cell scheduled MIR.
- * A `prelude` Script runs to completion in the same realm before any
- * module links or evaluates; modules resolve its global declarations as
- * names of their outer global environment.
+ * The module table order: the entry's static closure in startup
+ * evaluation order, then every module that only `import()` reaches, in
+ * discovery order. Startup never evaluates the latter; the driver
+ * evaluates each on its first request.
  */
-export function compileModuleGraph(
+function moduleTableOrder(linked: LinkedModuleGraph): readonly string[] {
+  const scheduled = new Set(linked.evaluationOrder);
+  return [
+    ...linked.evaluationOrder,
+    ...linked.modules
+      .map((module) => module.canonicalId)
+      .filter((moduleId) => !scheduled.has(moduleId)),
+  ];
+}
+
+/**
+ * The module table index of every `import()` site one referrer makes,
+ * keyed by the call's start byte, as the HIR builder expects.
+ */
+function importCallTargetsFor(
   graph: ModuleGraph,
-  options: CompilerOptions = {},
-  prelude?: SyntaxProgram,
-): ModuleCompilationResult {
-  const linked = linkModuleGraph(graph);
-  if (linked.graph == null) return { diagnostics: linked.diagnostics };
-  // Discovery and linking cover every literal `import()` target, but the
-  // profile still rejects each ImportCall until its admission.
-  const importCalls = (graph.requests ?? []).filter(
-    (request) => request.edgeKind === "discovery",
-  );
-  if (importCalls.length > 0) {
-    return {
-      diagnostics: withReferrerChains(
-        graph,
-        importCalls.map((request) => ({
-          diagnostic: sourceDiagnostic(
-            request.referrer.id,
-            request,
-            importCallProfileMessage,
-          ),
-          referrer: request.referrer,
-        })),
-      ),
-      graph: linked.graph,
-    };
+  moduleIndices: ReadonlyMap<string, number>,
+  referrerId: string,
+  referrerKind: "module" | "script",
+): ReadonlyMap<number, number> {
+  const targets = new Map<number, number>();
+  for (const request of graph.requests ?? []) {
+    if (
+      request.edgeKind !== "discovery" ||
+      request.referrer.id !== referrerId ||
+      request.referrer.kind !== referrerKind
+    ) {
+      continue;
+    }
+    const index = moduleIndices.get(request.targetId);
+    if (index == null) {
+      throw new Error(`Import target '${request.targetId}' is unavailable.`);
+    }
+    targets.set(request.byteRange.start, index);
   }
+  return targets;
+}
+
+/** The instantiated module environments and the table that names them. */
+interface ModuleTableParts {
+  readonly functions: readonly HirFunction[];
+  readonly globalBindings: readonly HirGlobalBinding[];
+  /**
+   * Statements that instantiate every module environment, which run no
+   * user code, in the order a program must run them.
+   */
+  readonly instantiation: readonly HirStatement[];
+  readonly nextBindingId: number;
+  readonly nextFunctionId: number;
+  /** Per module: evaluator, await flag, namespace, and requests. */
+  readonly tableArguments: readonly HirExpression[];
+}
+
+/**
+ * Resolve every module body of a linked graph and build its table. The
+ * `outer` Script's global declarations enclose each module environment.
+ */
+function compileModuleTable(
+  graph: ModuleGraph,
+  linked: LinkedModuleGraph,
+  tableOrder: readonly string[],
+  moduleIndices: ReadonlyMap<string, number>,
+  ids: { readonly nextBindingId: number; readonly nextFunctionId: number },
+  outer: ModulePrelude | undefined,
+): ModuleTableParts | { readonly diagnostics: readonly Diagnostic[] } {
   const nodes = new Map(
     graph.modules.map((module) => [module.canonicalId, module]),
   );
   const linkedModules = new Map(
-    linked.graph.modules.map((module) => [module.canonicalId, module]),
+    linked.modules.map((module) => [module.canonicalId, module]),
   );
-  const cells = new Map(linked.graph.cells.map((cell) => [cell.id, cell]));
+  const cells = new Map(linked.cells.map((cell) => [cell.id, cell]));
   const functionInitializers: HirStatement[] = [];
   const functions: HirFunction[] = [];
   const globalBindings: HirGlobalBinding[] = [];
@@ -597,22 +649,11 @@ export function compileModuleGraph(
   const jsonInitializers: HirStatement[] = [];
   const moduleBodies = new Map<string, readonly HirStatement[]>();
   const varInitializers: HirStatement[] = [];
-  let nextBindingId = linked.graph.cells.length;
-  let nextFunctionId = 0;
-  let resolvedPrelude: ModulePrelude | undefined;
-  if (prelude != null) {
-    const result = resolveModulePrelude(prelude, nextBindingId);
-    if (result.prelude == null) {
-      return { diagnostics: result.diagnostics, graph: linked.graph };
-    }
-    resolvedPrelude = result.prelude;
-    nextBindingId = result.nextBindingId;
-    nextFunctionId = result.nextFunctionId;
-  }
+  let { nextBindingId, nextFunctionId } = ids;
   const namespaceBindings = new Map<string, number>();
   const namespaceInitializers: HirStatement[] = [];
 
-  for (const module of linked.graph.modules) {
+  for (const module of linked.modules) {
     for (const imported of module.imports) {
       const targetId = imported.namespaceModuleId;
       if (targetId == null || namespaceBindings.has(targetId)) continue;
@@ -633,7 +674,7 @@ export function compileModuleGraph(
     }
   }
   // An `export * as` entry can name a namespace that no module imports.
-  for (const target of linked.graph.modules) {
+  for (const target of linked.modules) {
     const bindingId = target.namespaceCellId;
     if (bindingId == null || namespaceBindings.has(target.canonicalId)) {
       continue;
@@ -654,7 +695,7 @@ export function compileModuleGraph(
     );
   }
 
-  for (const moduleId of linked.graph.evaluationOrder) {
+  for (const moduleId of tableOrder) {
     const node = nodes.get(moduleId);
     const linkedModule = linkedModules.get(moduleId);
     if (node == null || linkedModule == null) {
@@ -696,7 +737,6 @@ export function compileModuleGraph(
               `Duplicate declaration '${cell.localName}'.`,
             ),
           ],
-          graph: linked.graph,
         };
       }
       bindings.set(cell.localName, {
@@ -718,21 +758,25 @@ export function compileModuleGraph(
       },
       {
         bindings,
-        globalObjectBindingIds: resolvedPrelude?.globalObjectBindingIds ?? [],
+        globalObjectBindingIds: outer?.globalObjectBindingIds ?? [],
+        importCallTargets: importCallTargetsFor(
+          graph,
+          moduleIndices,
+          moduleId,
+          "module",
+        ),
         moduleBody: true,
         nextBindingId,
         nextFunctionId,
         ...includePropertiesWhen(() => {
-          if (resolvedPrelude == null) return undefined;
-          return { outerBindings: resolvedPrelude.bindings };
+          if (outer == null) return undefined;
+          return { outerBindings: outer.bindings };
         }),
       },
     );
     nextBindingId = result.nextBindingId;
     nextFunctionId = result.nextFunctionId;
-    if (result.program == null) {
-      return { diagnostics: result.diagnostics, graph: linked.graph };
-    }
+    if (result.program == null) return { diagnostics: result.diagnostics };
     const moduleBody = retainModuleSource(result.program.body, moduleId);
     globalBindings.push(...(result.program.globalBindings ?? []));
     globalBindings.push(...collectHirBindings(moduleBody));
@@ -809,19 +853,12 @@ export function compileModuleGraph(
     functions.push(...retainModuleSource(result.program.functions, moduleId));
   }
 
-  // The module table lists modules in static evaluation order. Each entry
-  // passes the evaluator, a top-level await flag, and the requested
-  // modules in source order; the runtime driver keeps every other
-  // Cyclic Module Record field.
-  const moduleIndices = new Map(
-    linked.graph.evaluationOrder.map((moduleId, index) => [moduleId, index]),
-  );
-  const entryIndex = moduleIndices.get(graph.entryId);
-  if (entryIndex == null) {
-    throw new Error("The module entry has no evaluation index.");
-  }
+  // Each table entry passes the evaluator, a top-level await flag, the
+  // namespace object an `import()` resolves with, and the requested
+  // modules in source order; the runtime driver keeps every other Cyclic
+  // Module Record field.
   const tableArguments: HirExpression[] = [];
-  for (const moduleId of linked.graph.evaluationOrder) {
+  for (const moduleId of tableOrder) {
     const node = nodes.get(moduleId);
     const moduleBody = moduleBodies.get(moduleId);
     if (node == null || moduleBody == null) {
@@ -859,22 +896,27 @@ export function compileModuleGraph(
       }
       return index;
     });
+    const namespaceBinding = namespaceBindings.get(moduleId);
     tableArguments.push(
       moduleFunctionExpression(evaluator),
       moduleNumber(hasTopLevelAwait ? 1 : 0, range),
+      namespaceBinding == null
+        ? moduleUndefined(range)
+        : {
+            bindingId: namespaceBinding,
+            kind: "binding",
+            name: `*namespace:${moduleId}*`,
+            range,
+          },
       moduleNumber(requested.length, range),
       ...requested.map((index) => moduleNumber(index, range)),
     );
   }
 
-  const entry = nodes.get(graph.entryId);
-  if (entry == null) throw new Error("The module entry is unavailable.");
-  const entryRange = retainModuleSource(entry.syntax.range, graph.entryId);
-  const preludeHir = resolvedPrelude?.hir;
-  const hir: HirProgram = {
-    body: [
-      // The prelude Script completes before any module environment exists.
-      ...(preludeHir?.body ?? []),
+  return {
+    functions,
+    globalBindings,
+    instantiation: [
       ...intrinsicInitializers,
       // Each module's import.meta object exists before any function
       // initializer, so a hoisted function that a cyclic dependency calls
@@ -884,14 +926,84 @@ export function compileModuleGraph(
       ...jsonInitializers,
       ...varInitializers,
       ...functionInitializers,
+    ],
+    nextBindingId,
+    nextFunctionId,
+    tableArguments,
+  };
+}
+
+/**
+ * Link and lower a closed module graph to shared-cell scheduled MIR.
+ * A `prelude` Script runs to completion in the same realm before any
+ * module links or evaluates; modules resolve its global declarations as
+ * names of their outer global environment. The table does not exist
+ * while the prelude runs, so an `import()` in it keeps the profile
+ * diagnostic.
+ *
+ * The table holds every discovered module. A literal `import()` site
+ * lowers to the runtime import operation with its target's constant
+ * table index; modules that only such sites reach are linked and
+ * instantiated at startup but evaluate only on request.
+ */
+export function compileModuleGraph(
+  graph: ModuleGraph,
+  options: CompilerOptions = {},
+  prelude?: SyntaxProgram,
+): ModuleCompilationResult {
+  const linked = linkModuleGraph(graph);
+  if (linked.graph == null) return { diagnostics: linked.diagnostics };
+  const tableOrder = moduleTableOrder(linked.graph);
+  const moduleIndices = new Map(
+    tableOrder.map((moduleId, index) => [moduleId, index]),
+  );
+  const entryIndex = moduleIndices.get(graph.entryId);
+  if (entryIndex == null) {
+    throw new Error("The module entry has no evaluation index.");
+  }
+  let nextBindingId = linked.graph.cells.length;
+  let nextFunctionId = 0;
+  let resolvedPrelude: ModulePrelude | undefined;
+  if (prelude != null) {
+    const result = resolveModulePrelude(prelude, nextBindingId);
+    if (result.prelude == null) {
+      return { diagnostics: result.diagnostics, graph: linked.graph };
+    }
+    resolvedPrelude = result.prelude;
+    nextBindingId = result.nextBindingId;
+    nextFunctionId = result.nextFunctionId;
+  }
+  const parts = compileModuleTable(
+    graph,
+    linked.graph,
+    tableOrder,
+    moduleIndices,
+    { nextBindingId, nextFunctionId },
+    resolvedPrelude,
+  );
+  if ("diagnostics" in parts) {
+    return { diagnostics: parts.diagnostics, graph: linked.graph };
+  }
+
+  const entry = graph.modules.find(
+    (module) => module.canonicalId === graph.entryId,
+  );
+  if (entry == null) throw new Error("The module entry is unavailable.");
+  const entryRange = retainModuleSource(entry.syntax.range, graph.entryId);
+  const preludeHir = resolvedPrelude?.hir;
+  const hir: HirProgram = {
+    body: [
+      // The prelude Script completes before any module environment exists.
+      ...(preludeHir?.body ?? []),
+      ...parts.instantiation,
       // Evaluate the entry through the runtime driver. The returned
       // top-level capability promise is the entry task's completion.
       {
         expression: {
           arguments: [
             moduleNumber(entryIndex, entryRange),
-            moduleNumber(linked.graph.evaluationOrder.length, entryRange),
-            ...tableArguments,
+            moduleNumber(tableOrder.length, entryRange),
+            ...parts.tableArguments,
           ],
           kind: "call",
           range: entryRange,
@@ -901,8 +1013,11 @@ export function compileModuleGraph(
         range: entryRange,
       },
     ],
-    functions: [...(preludeHir?.functions ?? []), ...functions],
-    globalBindings: [...(preludeHir?.globalBindings ?? []), ...globalBindings],
+    functions: [...(preludeHir?.functions ?? []), ...parts.functions],
+    globalBindings: [
+      ...(preludeHir?.globalBindings ?? []),
+      ...parts.globalBindings,
+    ],
     ...includePropertiesWhen(() => {
       if (preludeHir == null) return undefined;
       return {
@@ -922,5 +1037,135 @@ export function compileModuleGraph(
     graph: linked.graph,
     hir,
     mir: buildMir(hir, options),
+  };
+}
+
+/** The modules a Script's `import()` calls reach, keyed for its build. */
+export interface ScriptModuleRequests {
+  /** The canonical identity the Script's requests resolved against. */
+  readonly canonicalId: string;
+  readonly closure: ScriptRequestClosure;
+}
+
+/** A Script's HIR with every module it requests instantiated first. */
+export interface ScriptGraphHirResult {
+  readonly diagnostics: readonly Diagnostic[];
+  readonly nextBindingId: number;
+  readonly nextFunctionId: number;
+  readonly program?: HirProgram;
+}
+
+/**
+ * Resolve a Script whose `import()` calls name modules of `requests`.
+ * The program instantiates every module environment and installs the
+ * module table without evaluating any module, then runs the Script; each
+ * module evaluates on its first request. The modules resolve the
+ * Script's global declarations as names of their outer environment.
+ */
+export function buildScriptGraphHir(
+  script: SyntaxProgram,
+  requests: ScriptModuleRequests,
+  seed: HirHostOptions = {},
+): ScriptGraphHirResult {
+  // A Script graph has no entry module, so startup schedules nothing.
+  const graph: ModuleGraph = {
+    entryId: "",
+    kind: "module-graph",
+    modules: requests.closure.modules,
+    requests: requests.closure.requests,
+  };
+  const linked = linkModuleGraph(graph);
+  if (linked.graph == null) {
+    return {
+      diagnostics: linked.diagnostics,
+      nextBindingId: 0,
+      nextFunctionId: 0,
+    };
+  }
+  const tableOrder = moduleTableOrder(linked.graph);
+  // A Script whose closure is empty has no table to install.
+  if (tableOrder.length === 0) return buildSeededHir(script, seed);
+  const moduleIndices = new Map(
+    tableOrder.map((moduleId, index) => [moduleId, index]),
+  );
+  const resolved = buildSeededHir(script, {
+    ...seed,
+    fragmentMetadata: true,
+    importCallTargets: importCallTargetsFor(
+      graph,
+      moduleIndices,
+      requests.canonicalId,
+      "script",
+    ),
+    nextBindingId: linked.graph.cells.length,
+  });
+  if (resolved.program == null || resolved.scriptBindings == null) {
+    return resolved;
+  }
+  const initializing = resolved.initializingWithNames ?? [];
+  if (initializing.length > 0) {
+    return {
+      diagnostics: [withInitializingDiagnostic(script, initializing, "")],
+      nextBindingId: resolved.nextBindingId,
+      nextFunctionId: resolved.nextFunctionId,
+    };
+  }
+  const parts = compileModuleTable(
+    graph,
+    linked.graph,
+    tableOrder,
+    moduleIndices,
+    {
+      nextBindingId: resolved.nextBindingId,
+      nextFunctionId: resolved.nextFunctionId,
+    },
+    {
+      bindings: resolved.scriptBindings,
+      globalObjectBindingIds: (resolved.program.globalObjectBindings ?? []).map(
+        (binding) => binding.id,
+      ),
+      hir: resolved.program,
+    },
+  );
+  if ("diagnostics" in parts) {
+    return {
+      diagnostics: parts.diagnostics,
+      nextBindingId: resolved.nextBindingId,
+      nextFunctionId: resolved.nextFunctionId,
+    };
+  }
+  const range = script.range;
+  return {
+    diagnostics: [],
+    nextBindingId: parts.nextBindingId,
+    nextFunctionId: parts.nextFunctionId,
+    program: {
+      ...resolved.program,
+      body: [
+        // Instantiation runs no user code, and installing the table
+        // evaluates nothing, so both may precede the Script.
+        ...parts.instantiation,
+        {
+          expression: {
+            arguments: [
+              moduleNumber(tableOrder.length, range),
+              moduleNumber(tableOrder.length, range),
+              ...parts.tableArguments,
+            ],
+            kind: "call",
+            range,
+            target: { kind: "module-evaluate" },
+          },
+          kind: "expression",
+          range,
+        },
+        ...resolved.program.body,
+      ],
+      functions: [...resolved.program.functions, ...parts.functions],
+      globalBindings: [
+        ...(resolved.program.globalBindings ?? []),
+        ...parts.globalBindings,
+      ],
+    },
   };
 }

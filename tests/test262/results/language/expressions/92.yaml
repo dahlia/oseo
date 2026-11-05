@@ -833,7 +833,7 @@ results:
       strictness:
         - strict
       suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
-    classification: unsupported-profile-feature
+    classification: pass
     dependencies:
       - dynamic-source
       - expression-operators
@@ -843,12 +843,30 @@ results:
       - object-properties
       - promise-settlement
       - var-bindings
+    execution:
+      harnessIncludes:
+        - base.js
+        - doneprintHandle.js
+      moduleGraph:
+        - dependencies: []
+          id: test/language/expressions/dynamic-import/namespace/promise-then-ns-get-nested-namespace-dflt-indirect.js
+          sourceHash: fnv1a64:1a781d18d8a7d194
+        - dependencies:
+            - test/language/expressions/dynamic-import/namespace/get-nested-namespace-dflt-skip-named-end_FIXTURE.js
+          id: test/language/expressions/dynamic-import/namespace/get-nested-namespace-dflt-skip-named_FIXTURE.js
+          sourceHash: fnv1a64:42850d9be1498ec3
+        - dependencies: []
+          id: test/language/expressions/dynamic-import/namespace/get-nested-namespace-dflt-skip-named-end_FIXTURE.js
+          sourceHash: fnv1a64:322e8cb5b5a097bb
+      scheduler: deterministic-logical-clock
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
     observation:
-      detail: "test/language/expressions/dynamic-import/namespace/promise-the\
-        n-ns-get-nested-namespace-dflt-indirect.js:96:1:
-        error[OSEO1001]: ImportExpression is outside the M1 profile."
-      passed: false
-      unsupportedCapability: profile-syntax
+      passed: true
     unsupportedFeatures: []
   - case:
       async: true
@@ -864,7 +882,7 @@ results:
         - non-strict
         - strict
       suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
-    classification: unsupported-profile-feature
+    classification: pass
     dependencies:
       - dynamic-source
       - functions
@@ -872,13 +890,23 @@ results:
       - object-properties
       - promise-settlement
       - reflect-namespace
+    execution:
+      harnessIncludes:
+        - base.js
+        - doneprintHandle.js
+      scheduler: deterministic-logical-clock
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
     observation:
-      detail: 'test/language/expressions/dynamic-import/namespace/promise-then-ns-prevent-extensions-object.js
-        non-strict disabled failed (1): stdout=""
-        stderr="test/language/expressions/dynamic-import/namespace/promise-then-ns-prevent-extensions-object.js:177:1:
-        error[OSEO1001]: ImportExpression is outside the M1 profile.\n"'
-      passed: false
-      unsupportedCapability: profile-syntax
+      passed: true
     unsupportedFeatures: []
   - case:
       async: false
@@ -943,20 +971,28 @@ results:
         - non-strict
         - strict
       suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
-    classification: unsupported-profile-feature
+    classification: pass
     dependencies:
       - async-functions
       - dynamic-source
       - functions
       - generators
       - var-bindings
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
     observation:
-      detail: 'test/language/expressions/dynamic-import/syntax/valid/nested-async-gen-await-script-code-valid.js
-        non-strict disabled failed (1): stdout=""
-        stderr="test/language/expressions/dynamic-import/syntax/valid/nested-async-gen-await-script-code-valid.js:105:9:
-        error[OSEO1001]: ImportExpression is outside the M1 profile.\n"'
-      passed: false
-      unsupportedCapability: profile-syntax
+      passed: true
     unsupportedFeatures: []
   - case:
       async: false

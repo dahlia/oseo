@@ -204,8 +204,14 @@ only module-specific syntax is top-level `await`; goal-symbol sniffing
 cannot distinguish every such source from a script.
 
 Relative `./` and `../` imports resolve against the entry's canonical
-`file:` URL. Bare specifiers, *package.json* resolution, and dynamic import
-remain unsupported.
+`file:` URL. Bare specifiers and *package.json* resolution remain
+unsupported.
+
+`import()` with one string literal argument resolves during the build, in a
+module and in a script entry alike; a script resolves it against its own
+path. Each target and its closure join the executable and evaluate on their
+first request. A target that cannot be resolved, loaded, parsed, or linked
+fails the build. Every other `import()` form is rejected.
 
 `--script SCRIPT` evaluates one Script in the same realm before the module
 graph links, as a test harness runs before a module test. Its `var`,

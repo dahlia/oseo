@@ -15,7 +15,7 @@ results:
       strictness:
         - strict
       suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
-    classification: unsupported-profile-feature
+    classification: pass
     dependencies:
       - abrupt-completion
       - dynamic-source
@@ -27,12 +27,26 @@ results:
       - promise-settlement
       - symbols
       - top-level-await
+    execution:
+      harnessIncludes:
+        - base.js
+        - doneprintHandle.js
+      moduleGraph:
+        - dependencies: []
+          id: test/language/module-code/top-level-await/dynamic-import-rejection.js
+          sourceHash: fnv1a64:1543b6e01d0afbfb
+        - dependencies: []
+          id: test/language/module-code/top-level-await/module-import-rejection_FIXTURE.js
+          sourceHash: fnv1a64:92c982808798571b
+      scheduler: deterministic-logical-clock
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
     observation:
-      detail: "test/language/module-code/top-level-await/dynamic-import-rejec\
-        tion.js:48:1: error[OSEO1001]: ImportExpression is outside the
-        M1 profile."
-      passed: false
-      unsupportedCapability: profile-syntax
+      passed: true
     unsupportedFeatures: []
   - case:
       async: false

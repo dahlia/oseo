@@ -10,9 +10,9 @@ Implementation status: in progress. The `claim-boundary` unit has applied ADR
 `iterator-concat`, `iterator-zip`, `annexb-object-accessors`,
 `array-from-async`, `json-parse-source`, `uint8array-base64`,
 `atomics-pause`, `annexb-function-declarations`, `annexb-statement-forms`,
-`disposal-intrinsics`, `using-declarations`, `annexb-syntax`, and
-`annexb-regexp-compile` units are implemented and observed. Every other unit is
-open.
+`disposal-intrinsics`, `using-declarations`, `annexb-syntax`,
+`annexb-regexp-compile`, `import-operation`, and `import-admission` units are
+implemented and observed. Every other unit is open.
 This plan follows M5 directly and runs alongside M6. It has no milestone
 number. It schedules the language work the maintainer approved on 2026-11-02:
 build-time static-specifier `import()`, Annex B legacy web behavior except
@@ -160,8 +160,9 @@ The maintainer accepted the ADR 0016 amendment in the
 2026-11-03. ADR 0016 carries its text, and the exclusion audit's record digest
 and quotes follow it. The same change reviewed the dynamic-import exclusion
 cohorts whose reopening trigger was an accepted amendment admitting dynamic
-import. Each now reopens when `import-admission` re-observes its paths; paths
-with a computed specifier or an options argument stay outside the subset under
+import. `import-admission` re-observed their paths, and the
+[unit's status](#static-specifier-import-units) gives the result; paths with a
+computed specifier or an options argument stay outside the subset under
 alternative 4.
 
 The maintainer accepted
@@ -268,7 +269,7 @@ inventory; “existing” counts rows already in it whose owner moves to the uni
 | `import-driver`                    | none; re-observes module rows        | none                                            |
 | `import-requests`                  | none                                 | ADR 0016 amendment (accepted)                   |
 | `import-operation`                 | none                                 | `import-driver`, `import-requests`              |
-| `import-admission`                 | 20 existing deferrals                | `import-operation`                              |
+| `import-admission`                 | 20 existing deferrals, 87 existing   | `import-operation`                              |
 | `legacy-caller`                    | 23 existing                          | ADR 0034 (accepted)                             |
 | `annexb-syntax`                    | 28 new, 1 existing                   | `claim-boundary`                                |
 | `annexb-escape`                    | 35 new                               | `claim-boundary`                                |
@@ -399,13 +400,51 @@ groups G1 through G14.
     components.
  -  `import-operation` implements EvaluateImportCall, ContinueDynamicImport,
     fresh capabilities, cached results, and asynchronous settlement on both
-    execution targets.
+    execution targets. Status: implemented behind the same option.
+    `compileModuleGraph` lowers each site to the runtime import operation,
+    and `compileSource` compiles a Script referrer with its request closure.
+    The fixed fixtures in *tests/import-operation-native.test.ts*, the
+    generated `import-operation` property family, and the edition model in
+    *tests/import-operation-model.ts* are the evidence for G1 through G10,
+    G12, and G14.
  -  `import-admission` adds runner support for Script referrers and fixtures,
     changes `supportedFeatures`, re-observes all 630 `dynamic-import` rows, and
     reassesses the ADR 0016 exclusions the design reopens. It moves the 17
     closable deferral rows to observation owners. *usage-from-eval.js*,
     *eval-rqstd-once.js*, and *update-to-dynamic-import.js* stay deferred to
-    *PLAN-DYN.md*.
+    *PLAN-DYN.md*. Status: implemented and observed. The default CLI
+    frontends turn `staticSpecifierImports` on, a Script resolves its
+    requests against its own file, and `dynamic-import` is a supported
+    feature. The runner reports a refused request as the
+    `static-specifier-import-build` capability, never as an expected
+    negative.
+
+In the full test262 observation, 252 rows move from unsupported to pass and
+*await-dynamic-import-rejection.js* becomes an expected negative; no row outside
+the `dynamic-import` and module-code rows changes. The 17 closable deferral
+rows are among them and now have observation owners. The manifest has 42,532
+reviewed rows: 36,408 passes, 4,480 expected negatives, and 1,644 unsupported
+results. The rows whose fixture calls the `Function` constructor, 18
+*eval-gtbndng-indirect-update* usage rows, keep ADR 0016 under the
+`ds12-static-module-observables` assessment, whose native witnesses replace
+their live binding updates.
+
+The other 87 unsupported rows fail at build time, and this unit owns them
+until a follow-up widens the record surfaces of *tools/m5c-exclusion-audit.ts*.
+In 64 *catch/* rows the target cannot be linked, loaded, or parsed:
+*instn-iee-err-circular*, *instn-iee-err-ambiguous-import*,
+*file-does-not-exist*, and *eval-script-code-target*, 16 each. ADR 0016 is
+their intended owner, because the amended record links the whole closure at
+build time, so link and load errors are build failures; the
+`ds11-static-module-*` and `import-call-promise` assessments keep the evidence
+for them. In 23 rows the resolution profile rejects the specifier with
+OSEO3001: 22 `import('')` rows and *await-expr-dyn-import.js*, which imports
+`'foo'`. They are meant to become *PLAN-DYN.md* deferrals, because compiling an
+unresolvable specifier to a run-time rejection is the remaining work. A
+deferral also needs an audit row, and the audit accepts an ADR 0016 or deferral
+row only over an OSEO1001 rejection, so neither assignment loads without a
+*tools/* change. The follow-up is the one
+that widens the audit path rule for `annexb-dynamic-source-accounting`.
 
 Done when the 17 rows pass, every changed `dynamic-import` observation is
 reviewed, no static module row regresses, and the amended ADR 0016 describes
@@ -617,7 +656,9 @@ The exclusion audit check reads only paths under *test/built-ins/* and
 *tools/m5c-exclusion-audit.ts* to *test/annexB/* rows and observes the result
 in its own full update. *RegExp-leading-escape-BMP.js* and
 *RegExp-trailing-escape-BMP.js* are already observed as unsupported and keep
-this unit as their ledger owner until then.
+this unit as their ledger owner until then. The same change widens the record
+surfaces for the 87 build-time rows that `import-admission` owns, as
+[that unit's status](#static-specifier-import-units) describes.
 
 ### ECMAScript 2026 units
 
@@ -781,7 +822,7 @@ standards update and heavy gates on the new base.
     row's owner moves. The audit binds ADR texts by digest, so a unit that
     edits ADR 0013, 0016, or 0028 re-reviews the rows that cite it.
  -  The runtime ABI version in *packages/runtime-c/src/index.ts*, currently
-    `m5-158`, changes once per landing that alters the ABI. The series keeps
+    `m5-159`, changes once per landing that alters the ABI. The series keeps
     its `m5-` prefix, and the closure tools keep their `m5c` names.
  -  Runtime code ranges, property blocks, intrinsic indexes, and heap kinds
     are reserved per unit.

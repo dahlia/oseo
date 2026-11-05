@@ -834,11 +834,10 @@ results:
       - object-properties
       - promise-settlement
     observation:
-      detail: "test/language/expressions/dynamic-import/catch/nested-async-fu\
-        nction-await-eval-script-code-target.js:35:9: error[OSEO1001]:
-        ImportExpression is outside the M1 profile."
+      detail: "test/language/expressions/dynamic-import/catch/script-code_FIX\
+        TURE.js:7:22: error[OSEO0001]: Source could not be parsed."
       passed: false
-      unsupportedCapability: profile-syntax
+      unsupportedCapability: static-specifier-import-build
     unsupportedFeatures: []
   - case:
       async: true
@@ -867,12 +866,11 @@ results:
       - object-properties
       - promise-settlement
     observation:
-      detail: 'test/language/expressions/dynamic-import/catch/nested-while-import-catch-instn-iee-err-ambiguous-import.js
-        non-strict disabled failed (1): stdout=""
-        stderr="test/language/expressions/dynamic-import/catch/nested-while-import-catch-instn-iee-err-ambiguous-import.js:159:3:
-        error[OSEO1001]: ImportExpression is outside the M1 profile.\n"'
+      detail: "test/language/expressions/dynamic-import/catch/instn-iee-err-a\
+        mbiguous-export_FIXTURE.js:4:10: error[OSEO2001]: Export 'x' is
+        ambiguous."
       passed: false
-      unsupportedCapability: profile-syntax
+      unsupportedCapability: static-specifier-import-build
     unsupportedFeatures: []
   - case:
       async: true

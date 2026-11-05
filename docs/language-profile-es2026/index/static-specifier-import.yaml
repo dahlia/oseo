@@ -1,0 +1,3 @@
+version: 1
+id: static-specifier-import
+record: docs/language-profile-es2026/families/static-specifier-import.yaml

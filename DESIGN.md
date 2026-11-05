@@ -708,6 +708,17 @@ whose traced frame keeps every partly evaluated statement. The entry task
 reports an owned diagnostic when no runtime-owned job or timer can make
 progress.
 
+The same table serves literal `import()`, as unit 3 of that design specifies.
+It also lists every module that only `import()` reaches, linked and
+instantiated at startup, and each target's namespace object. A call site
+passes its target's constant table index to the runtime's EvaluateImportCall,
+which returns a new promise from the realm's intrinsic `%Promise%` and queues
+ContinueDynamicImport at once because the host load completes synchronously
+from the table. A later job runs Evaluate on the target, and the call's
+promise settles with the shared namespace or the cached evaluation error.
+The default frontends turn `staticSpecifierImports` on, so the profile admits
+that form; a Script resolves its requests against its own file.
+
 Dynamic import, `eval()`, and the `Function` constructor conflict with a purely
 ahead-of-time model because they can introduce new source after the native
 binary has been built.
@@ -715,8 +726,9 @@ binary has been built.
 the language profile with owned diagnostics and honest manifest
 classifications. Supporting any of them requires an explicit design that
 does not quietly introduce an interpreter or JIT tier. Staged compilation
-is the recorded candidate for `eval`; build-time-resolvable dynamic
-import remains a deferred admission.
+is the recorded candidate for `eval`. Build-time-resolvable dynamic import is
+admitted only for one string literal argument, as described above; every
+other form stays rejected.
 [*PLAN-DYN.md*](./PLAN-DYN.md) scopes the capability derivation, optional
 runtime composition, artifact loading, and evidence required by either route.
 

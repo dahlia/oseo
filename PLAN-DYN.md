@@ -27,8 +27,9 @@ contracts updates the affected document in the same change.
 
 The M5c [build-time-resolvable proposal] bounds a first string-literal subset
 and its implementation and evidence gates. The reviewed design below narrows
-it, and its accepted ADR 0016 amendment is applied. Every `import()` stays
-rejected until `import-admission`.
+it, and its accepted ADR 0016 amendment is applied. Since `import-admission`,
+the default build admits `import()` with one string literal argument; every
+other form stays rejected.
 
 The reviewed [static-specifier import design] is this plan's post-M5 plan for
 that subset. The maintainer deferred its implementation past M5. The design
@@ -41,10 +42,10 @@ target. The maintainer accepted the design's ADR 0016 amendment on
 2026-11-03.
 
 On 2026-11-02 the maintainer scheduled the design's implementation under
-[*PLAN-LANGUAGE.md*](./PLAN-LANGUAGE.md), as its four `import-*` units. The
-deferral entries keep this plan as their target until their rows pass, and the
-three rows the design cannot close stay here. The remaining capability classes
-stay deferred.
+[*PLAN-LANGUAGE.md*](./PLAN-LANGUAGE.md), as its four `import-*` units, which
+are implemented and observed. The 17 rows they could close pass or report
+their expected negative, and the three rows the design cannot close stay here.
+The remaining capability classes stay deferred.
 
 [build-time-resolvable proposal]: ./docs/dynamic-import-staged-plan.md
 [static-specifier import design]: ./docs/static-specifier-import-design.md
@@ -492,11 +493,20 @@ source compilation can observe, such as a declaration made by direct `eval` or
 the `Function` constructor's argument conversion. They stay here. The
 maintainer ranks that work low priority, and no unit is scheduled for it.
 
-Of the 20 `static-specifier-import` entries, the 17 that
-[*PLAN-LANGUAGE.md*](./PLAN-LANGUAGE.md) can close leave the list when they
-pass. *usage-from-eval.js*, *eval-rqstd-once.js*, and
-*update-to-dynamic-import.js* stay, because they need direct `eval` or the
-`Function` constructor.
+The 17 `static-specifier-import` entries that
+[*PLAN-LANGUAGE.md*](./PLAN-LANGUAGE.md) could close left the list when its
+`import-admission` unit observed them: 16 pass and
+*await-dynamic-import-rejection.js* reports its expected negative. The three
+that remain, *usage-from-eval.js*, *eval-rqstd-once.js*, and
+*update-to-dynamic-import.js*, need direct `eval` or the `Function`
+constructor.
+
+The 23 literal `import()` rows whose specifier the resolution profile rejects
+at build time, 22 `import('')` rows and *await-expr-dyn-import.js* with
+`'foo'`, are meant to become deferrals to this plan. Compiling an unresolvable
+specifier to a run-time rejection is the remaining work. Until the exclusion
+audit accepts that diagnostic, `import-admission` owns them; its status in
+*PLAN-LANGUAGE.md* explains why.
 
 Five paths of the legacy `caller` selector in
 [ADR 0028](./docs/adr/0028-legacy-function-caller-boundary.md) also need

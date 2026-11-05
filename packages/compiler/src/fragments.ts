@@ -59,7 +59,8 @@ export type BodyFragmentResult =
         | "shadowing"
         | "strictness"
         | "metadata"
-        | "global-effects";
+        | "global-effects"
+        | "requests";
       readonly names: readonly string[];
       readonly diagnostics: readonly Diagnostic[];
     };
@@ -195,6 +196,16 @@ export function compileBodyFragment(
       reason: "diagnostic",
       names: [],
       diagnostics: parsed.diagnostics,
+    };
+  }
+  // A body with `import()` calls needs its request closure, which only
+  // the whole Script build discovers against the Script's identity.
+  if ((parsed.program.importCalls?.length ?? 0) > 0) {
+    return {
+      kind: "fallback",
+      reason: "requests",
+      names: [],
+      diagnostics: [],
     };
   }
   if ((parsed.program.strict === true) !== harness.strict) {

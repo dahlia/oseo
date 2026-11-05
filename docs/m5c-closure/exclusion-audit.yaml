@@ -468,56 +468,45 @@ assessments:
   import-call-attributes:
     disposition: exclusion
     normativeDependency: source-evaluation-only
-    reason: The subject is ImportCall itself under
-      sec-import-call-runtime-semantics-evaluation, with a
-      string-literal specifier. The source asserts how
-      ImportCall forwards the Yield, Await, and In
-      parameters to its arguments, how EvaluateImportCall
-      treats the options argument (abrupt return and throw
-      completions, the with getter,
-      EnumerableOwnPropertyNames enumeration, rejection of
-      non-object options and non-string values, and promise
-      settlement), or that an ImportCall with a trailing
-      comma is valid syntax in a given context. Twenty of
-      those generated syntax cases place the call in a
-      function that is never called, so only the parse is at
-      issue; the others also evaluate the call. Each
-      assertion of the runtime cases observes an ImportCall
-      evaluation or its promise. The syntax cases assert
-      nothing beyond a successful parse, except the two
-      with-expression cases, which also check that the call
-      returns a promise. ADR 0016, as amended on 2026-11-03,
-      admits only an ImportCall whose sole argument is a
-      string literal, with or without its trailing comma,
-      and no options. The 38 paths that pass an options
-      argument stay outside that subset, and alternative 4
-      keeps them rejected. The other 22 pass only a literal
-      and a trailing comma, so they fall inside it, but the
-      profile still rejects every import() at parse time
-      until import-admission. The maintainer accounting
-      decision of 2026-10-22 accepts this bounded exclusion
-      of these reserved paths. It reopens when
-      import-admission re-observes the 60 paths, and for the
-      options paths when package evidence needs attributes.
+    reason: >-
+      The subject is ImportCall itself under
+      sec-import-call-runtime-semantics-evaluation, with a string-literal
+      specifier. The source asserts how ImportCall forwards the Yield, Await,
+      and In parameters to its arguments, how EvaluateImportCall treats the
+      options argument (abrupt return and throw completions, the with getter,
+      EnumerableOwnPropertyNames enumeration, rejection of non-object options
+      and non-string values, and promise settlement), or that an ImportCall
+      with a trailing comma is valid syntax in a given context. Twenty of
+      those generated syntax cases place the call in a function that is never
+      called, so only the parse is at issue; the others also evaluate the
+      call. Each assertion of the runtime cases observes an ImportCall
+      evaluation or its promise. The syntax cases assert nothing beyond a
+      successful parse, except the two with-expression cases, which also check
+      that the call returns a promise. ADR 0016, as amended on 2026-11-03,
+      admits only an ImportCall whose sole argument is a string literal, with
+      or without its trailing comma, and no options. The 22 paths that pass
+      only a literal and a trailing comma fall inside it, and since
+      import-admission they pass with observation owners. The 38 paths that
+      pass an options argument stay outside that subset, and alternative 4
+      keeps them rejected at parse time. The maintainer accounting decision of
+      2026-10-22 accepts this bounded exclusion of these reserved paths. It
+      reopens when package evidence needs attributes.
   import-call-attributes-computed-specifier:
     disposition: exclusion
     normativeDependency: source-evaluation-only
-    reason: The subject is ImportCall itself under
-      sec-import-call-runtime-semantics-evaluation. The
-      source asserts the order in which the specifier and
-      options arguments are evaluated, or the rejection
-      produced when ToString of an object specifier throws,
-      with and without an options argument, each call
-      followed by a trailing comma. Every assertion runs
-      through import(). The specifier is computed at run
-      time, so these paths stay outside the string-literal
-      subset that ADR 0016, as amended on 2026-11-03,
-      admits, and alternative 4 keeps them rejected at parse
-      time. The maintainer accounting decision of 2026-10-22
-      accepts this bounded exclusion. It reopens for
-      reassessment when import-admission re-observes these
-      paths or package evidence needs computed specifiers or
-      attributes.
+    reason: >-
+      The subject is ImportCall itself under
+      sec-import-call-runtime-semantics-evaluation. The source asserts the
+      order in which the specifier and options arguments are evaluated, or the
+      rejection produced when ToString of an object specifier throws, with and
+      without an options argument, each call followed by a trailing comma.
+      Every assertion runs through import(). The specifier is computed at run
+      time, so these paths stay outside the string-literal subset that ADR
+      0016, as amended on 2026-11-03, admits, and alternative 4 keeps them
+      rejected at parse time. The maintainer accounting decision of 2026-10-22
+      accepts this bounded exclusion. import-admission re-observed the three
+      paths, and each keeps that rejection. It reopens for reassessment when
+      package evidence needs computed specifiers or attributes.
   json-module-dynamic-site-identity:
     disposition: exclusion
     normativeDependency: source-evaluation-only
@@ -531,147 +520,140 @@ assessments:
       tests/property/m5-import-attributes.property.test.ts:
         "36ae672a0e4761633f067e97d8e8110e9596eb4495c8c1b1d3\
         80b659839248f8"
-    reason: The subject is that every import site of one JSON
-      module receives the same object, and the import sites
-      include a dynamic import() call. Its static sites do
-      not depend on dynamic import. The bound fixture graph
-      imports one JSON module through two static default
-      imports and an indirect module, and the static JSON
-      identity properties assert both identities natively and
-      under Node.js and Deno. The only assertion that
-      evidence cannot replace compares the import() site,
-      which runs only through an ImportCall with an options
-      argument. ADR 0016, as amended on 2026-11-03, admits no
-      options, so alternative 4 keeps that call rejected at
-      parse time. The exclusion is bounded to that dynamic
-      site; static JSON module identity stays inside the
-      claim. The maintainer accounting decision of 2026-10-22
-      accepts it. It reopens when import-admission
-      re-observes the path or package evidence needs
+    reason: >-
+      The subject is that every import site of one JSON module receives the
+      same object, and the import sites include a dynamic import() call. Its
+      static sites do not depend on dynamic import. The bound fixture graph
+      imports one JSON module through two static default imports and an
+      indirect module, and the static JSON identity properties assert both
+      identities natively and under Node.js and Deno. The only assertion that
+      evidence cannot replace compares the import() site, which runs only
+      through an ImportCall with an options argument. ADR 0016, as amended on
+      2026-11-03, admits no options, so alternative 4 keeps that call rejected
+      at parse time. The exclusion is bounded to that dynamic site; static
+      JSON module identity stays inside the claim. The maintainer accounting
+      decision of 2026-10-22 accepts it. import-admission re-observed the
+      path, which keeps that rejection. It reopens when package evidence needs
       attributes.
   import-call-syntax:
     disposition: exclusion
     normativeDependency: source-evaluation-only
-    reason: The subject is the ImportCall production itself
-      (prod-ImportCall or
-      sec-import-call-runtime-semantics-evaluation). The
-      source places an ImportCall in a statement, function,
-      arrow, async, generator, block, loop, with, or Script
-      context; nests it as another ImportCall's argument; or
-      uses it as a CallExpression followed by Arguments, a
-      TemplateLiteral, a computed member access, or a
-      parenthesized NewExpression operand; or passes an
-      AssignmentExpression form whose call result no
-      assertion observes, such as yield * inside a generator
-      that is never called or unary operands whose returned
-      promises are discarded. Its assertions are a successful
-      parse, the promise that the call returns, or the
-      TypeError from calling or constructing that promise;
-      one export read only identifies the module that
-      fulfilled it. Each path observes the exact
-      ImportExpression OSEO1001 rejection. The maintainer
-      decision of 2026-10-28, item 2, extends the 2026-10-22
-      accounting decision (option A) to these paths after the
-      per-path review in
-      docs/m5c-graph/dynamic-source-importcall-accounting.md.
-      No path counts as a pass. ADR 0016, as amended on
-      2026-11-03, admits the calls of the 63 paths whose
-      every ImportCall passes one string literal, but the
-      profile still rejects every import() at parse time
-      until import-admission. The 21 paths that nest an ImportCall
-      as another's argument and the 2 that pass a unary or
-      yield * operand compute a specifier, so alternative 4
-      keeps them outside the subset. import-admission
-      re-observes all 86 paths, which reopens this
-      assessment.
+    reason: >-
+      The subject is the ImportCall production itself (prod-ImportCall or
+      sec-import-call-runtime-semantics-evaluation). The source places an
+      ImportCall in a statement, function, arrow, async, generator, block,
+      loop, with, or Script context; nests it as another ImportCall's
+      argument; or uses it as a CallExpression followed by Arguments, a
+      TemplateLiteral, a computed member access, or a parenthesized
+      NewExpression operand; or passes an AssignmentExpression form whose call
+      result no assertion observes, such as yield * inside a generator that is
+      never called or unary operands whose returned promises are discarded.
+      Its assertions are a successful parse, the promise that the call
+      returns, or the TypeError from calling or constructing that promise; one
+      export read only identifies the module that fulfilled it. Each remaining
+      path observes the exact ImportExpression OSEO1001 rejection. The
+      maintainer decision of 2026-10-28, item 2, extends the 2026-10-22
+      accounting decision (option A) to these paths after the per-path review
+      in docs/m5c-graph/dynamic-source-importcall-accounting.md. No rejected
+      path counts as a pass. ADR 0016, as amended on 2026-11-03, admits the
+      calls of the 63 paths whose every ImportCall passes one string literal.
+      import-admission re-observed all 86 paths. Of those 63, 41 now pass with
+      observation owners, and the other 22 import the empty string and stop at
+      the build-time OSEO3001 resolution diagnostic, so they left this
+      assessment for the unit:import-admission ledger owner. The 21 paths that
+      nest an ImportCall as another's argument and the 2 that pass a unary or
+      yield * operand compute a specifier, so alternative 4 keeps them outside
+      the subset, and this assessment covers those 23.
   import-call-specifier:
     disposition: exclusion
     normativeDependency: source-evaluation-only
-    reason: The subject is how EvaluateImportCall evaluates its
-      specifier (sec-import-call-runtime-semantics-evaluation or
-      prod-ImportCall). The source passes an AssignmentExpression
-      form, an object or other value whose ToString names the
-      target, or a specifier whose GetValue or ToString completes
-      abruptly. Its assertions are the synchronous abrupt
-      completion, the rejection of the returned promise, or the
-      module that the promise fulfills with; namespace export
-      reads only identify which module the specifier named. Each
-      path observes the exact ImportExpression OSEO1001
-      rejection. The maintainer decision of 2026-10-28, item 2,
-      extends the 2026-10-22 accounting decision (option A) to
-      these paths after the per-path review in
-      docs/m5c-graph/dynamic-source-importcall-accounting.md. No
-      path counts as a pass. Every path computes the specifier of
-      at least one ImportCall, so it stays outside the
-      string-literal subset that ADR 0016, as amended on
-      2026-11-03, admits, and alternative 4 keeps it rejected at
-      parse time. It reopens for reassessment when
-      import-admission re-observes these paths or package
-      evidence needs computed specifiers.
+    reason: >-
+      The subject is how EvaluateImportCall evaluates its specifier
+      (sec-import-call-runtime-semantics-evaluation or prod-ImportCall). The
+      source passes an AssignmentExpression form, an object or other value
+      whose ToString names the target, or a specifier whose GetValue or
+      ToString completes abruptly. Its assertions are the synchronous abrupt
+      completion, the rejection of the returned promise, or the module that
+      the promise fulfills with; namespace export reads only identify which
+      module the specifier named. Each path observes the exact
+      ImportExpression OSEO1001 rejection. The maintainer decision of
+      2026-10-28, item 2, extends the 2026-10-22 accounting decision (option
+      A) to these paths after the per-path review in
+      docs/m5c-graph/dynamic-source-importcall-accounting.md. No path counts
+      as a pass. Every path computes the specifier of at least one ImportCall,
+      so it stays outside the string-literal subset that ADR 0016, as amended
+      on 2026-11-03, admits, and alternative 4 keeps it rejected at parse
+      time. import-admission re-observed the 60 paths, and each keeps that
+      rejection. It reopens for reassessment when package evidence needs
+      computed specifiers.
   ds8-await-import-call-syntax:
     disposition: exclusion
     normativeDependency: source-evaluation-only
-    reason: await-expr-dyn-import.js checks only the grammar composition
-      await ImportCall at module top level (prod-AwaitExpression). Its
-      try/catch ignores every import load error; no value, module order,
-      scheduling or settlement result is asserted. Only the ImportCall
-      grammar site remains, with the exact ImportExpression OSEO1001
-      rejection. Root confirmed on 2026-10-31 that decision item 2 follows
-      the ImportCall subject rather than a directory, and the approved DS-8
-      selector explicitly includes this grammar-only composition. The
-      per-path assessment is in
+    reason: >-
+      await-expr-dyn-import.js checks only the grammar composition await
+      ImportCall at module top level (prod-AwaitExpression). Its try/catch
+      ignores every import load error; no value, module order, scheduling or
+      settlement result is asserted. Only the ImportCall grammar site
+      remained, with the exact ImportExpression OSEO1001 rejection. Root
+      confirmed on 2026-10-31 that decision item 2 follows the ImportCall
+      subject rather than a directory, and the approved DS-8 selector
+      explicitly includes this grammar-only composition. The per-path
+      assessment is in
       docs/m5c-graph/dynamic-source-importcall-residual-accounting.md. No
-      independent non-source subject needs replacement and no pass is
-      counted. ADR 0016, as amended on 2026-11-03, admits this
-      string-literal ImportCall, but the profile still rejects it until
-      import-admission, whose re-observation of the path reopens it; ADR
-      0019 reopening remains in force.
+      independent non-source subject needs replacement and no pass is counted.
+      ADR 0016, as amended on 2026-11-03, admits this string-literal
+      ImportCall. import-admission re-observed the path, and its bare
+      specifier 'foo' now stops at the build-time OSEO3001 resolution
+      diagnostic, which the exclusion audit does not accept on a record. The
+      path left this assessment for the unit:import-admission ledger owner
+      until it becomes a PLAN-DYN.md deferral, so the assessment covers no
+      path. ADR 0019 reopening remains in force.
   ds8-import-call-intrinsic-promise:
     disposition: exclusion
     normativeDependency: source-evaluation-only
-    reason: returns-promise.js asserts EvaluateImportCall creates its result
-      with intrinsic %Promise% even after the global Promise binding is
-      replaced by a throwing function. It checks the original constructor,
-      prototype and inherited then/catch/finally methods, including absence
-      of own method properties. All eight assertions concern the ImportCall
-      result; no export, binding update or module evaluation order is read.
-      The 2026-10-28 maintainer decision item 2 authorizes this ImportCall
+    reason: >-
+      returns-promise.js asserts EvaluateImportCall creates its result with
+      intrinsic %Promise% even after the global Promise binding is replaced by
+      a throwing function. It checks the original constructor, prototype and
+      inherited then/catch/finally methods, including absence of own method
+      properties. All eight assertions concern the ImportCall result; no
+      export, binding update or module evaluation order is read. The
+      2026-10-28 maintainer decision item 2 authorizes this ImportCall
       subject, assessed separately in
       docs/m5c-graph/dynamic-source-importcall-residual-accounting.md. There
-      is no independent non-source subject needing replacement. The existing
-      exact ImportExpression OSEO1001 rejection is retained, never counted
-      as a pass. ADR 0016, as amended on 2026-11-03, admits this
-      string-literal ImportCall, but the profile still rejects it until
-      import-admission, whose re-observation of the path reopens it; ADR
-      0019 reopening remains in force.
+      is no independent non-source subject needing replacement. Until
+      import-admission the exact ImportExpression OSEO1001 rejection was
+      retained, never counted as a pass. ADR 0016, as amended on 2026-11-03,
+      admits this string-literal ImportCall, and since import-admission the
+      path passes with an observation owner. ADR 0019 reopening remains in
+      force.
   import-call-promise:
     disposition: exclusion
     normativeDependency: source-evaluation-only
-    reason: The subject is the promise that ImportCall returns
-      and ContinueDynamicImport settles
+    reason: >-
+      The subject is the promise that ImportCall returns and
+      ContinueDynamicImport settles
       (sec-import-call-runtime-semantics-evaluation or
-      sec-finishdynamicimport). The source asserts that each
-      call returns a new %Promise%, that it fulfills with the
-      target namespace only after the target's evaluation
-      settles, or that it rejects when the host load fails or
-      the target's only statement throws. Namespace export
-      reads only identify the fulfilled module, and for await
-      or async generator plumbing only consumes the settled
-      promises. No assertion observes module evaluation order,
-      top-level await, namespace object identity or binding
-      updates, or JSON module identity. Each path observes the
-      exact ImportExpression OSEO1001 rejection. The
-      maintainer decision of 2026-10-28, item 2, extends the
-      2026-10-22 accounting decision (option A) to these paths
-      after the per-path review in
-      docs/m5c-graph/dynamic-source-importcall-accounting.md.
-      No path counts as a pass. ADR 0016, as amended on
-      2026-11-03, admits the string-literal ImportCall every
-      path uses, but the profile still rejects every import()
-      at parse time until import-admission. That unit
-      re-observes each path, which reopens this assessment;
-      a literal target the build cannot load is
-      then a build diagnostic, not a rejected promise.
+      sec-finishdynamicimport). The source asserts that each call returns a
+      new %Promise%, that it fulfills with the target namespace only after the
+      target's evaluation settles, or that it rejects when the host load fails
+      or the target's only statement throws. Namespace export reads only
+      identify the fulfilled module, and for await or async generator plumbing
+      only consumes the settled promises. No assertion observes module
+      evaluation order, top-level await, namespace object identity or binding
+      updates, or JSON module identity. Each path observed the exact
+      ImportExpression OSEO1001 rejection. The maintainer decision of
+      2026-10-28, item 2, extends the 2026-10-22 accounting decision (option
+      A) to these paths after the per-path review in
+      docs/m5c-graph/dynamic-source-importcall-accounting.md. No rejected path
+      counted as a pass. ADR 0016, as amended on 2026-11-03, admits the
+      string-literal ImportCall every path uses. import-admission re-observed
+      all 72 paths, and 56 now pass with observation owners. In the 16
+      file-does-not-exist paths the build cannot load the literal target,
+      which is a build diagnostic, not a rejected promise. The exclusion audit
+      accepts only OSEO1001 rejections on ADR 0016, so those paths left this
+      assessment for the unit:import-admission ledger owner, and it covers no
+      unsupported path.
   annex-b-legacy-lookup-class-declaration:
     disposition: remediation
     remediationOwner: unit:annexb-object-accessors
@@ -1109,8 +1091,8 @@ assessments:
         "381e6f0d04f09098fcde8077500f7e68\
         9982ee3261129c784287e9958e20652d"
       tests/test262/results/language/module-code/24.yaml:
-        "977d455b32ce0ce11cf00af713d072d0\
-        8557db6bcd5d846f6650700724cfe7df"
+        "a58f753413713885212bdca761937307\
+        4bf7e2e73a17c7d5a66432e7eb1b68f6"
       tests/test262/results/language/module-code/29.yaml:
         "0e97c744cac68bba81e49827805f8535\
         16fecd18107e5dd147d81dfc595a8bdf"
@@ -1186,37 +1168,36 @@ assessments:
       tests/test262/results/language/module-code/ff.yaml:
         "5213678b9be7a75cc5fd5d5da721b9e6\
         ffa058daa59c0f4dce7f5827d4df7e33"
-    reason: "The maintainer decision of 2026-10-28, item 1, authorizes
-      accounting only after replacement observations cover every
-      non-source subject. The per-path table in
-      docs/m5c-graph/dynamic-source-module-semantics-assessment.yaml names
-      the reviewed passing static-import test262 counterpart and its
-      checked-in observation for each of these 76 paths: 47
-      namespace-object cases, 11 default-export initialization cases, and
-      18 live-default-binding cases. The table binds the pinned
-      replacement sources, including their static fixture graph; the
-      result partitions bound here retain their pass observations. The
-      namespace counterparts preserve the asserted exotic-object
-      operations and export categories; differing literal sentinel values
-      do not change that contract. Default-export counterparts preserve
-      initialization, name inference and name methods; the named generator
-      uses a different return-value sentinel for the same binding
+    reason: >-
+      The maintainer decision of 2026-10-28, item 1, authorizes accounting
+      only after replacement observations cover every non-source subject. The
+      per-path table in
+      docs/m5c-graph/dynamic-source-module-semantics-assessment.yaml names the
+      reviewed passing static-import test262 counterpart and its checked-in
+      observation for each of these 76 paths: 47 namespace-object cases, 11
+      default-export initialization cases, and 18 live-default-binding cases.
+      The table binds the pinned replacement sources, including their static
+      fixture graph; the result partitions bound here retain their pass
+      observations. The namespace counterparts preserve the asserted
+      exotic-object operations and export categories; differing literal
+      sentinel values do not change that contract. Default-export counterparts
+      preserve initialization, name inference and name methods; the named
+      generator uses a different return-value sentinel for the same binding
       observation. The live-default static test observes a direct default
       binding returning 1 then becoming 2. The additional bound
-      module-default-namespace-update fixture imports a namespace
-      statically and observes namespace.default() returning 1 followed by
-      namespace.default yielding 2. Its bound native integration test
-      passed with stdout 1 and 2 on separate lines under Node.js, Deno and
-      both native specialization modes on Linux AMD64, as the table
-      records. This replaces the namespace live-value assertion separately
-      from direct binding reads. Await/then only acquires the tested
-      namespace, so only its dynamic import() source-evaluation site
-      remains. No remaining non-source assertion is excluded. Every
-      original path, assertion and unsupported-profile-feature observation
-      remains; none counts as a pass. ADR 0016, as amended on 2026-11-03,
-      admits the string-literal ImportCall every selected path uses, but
-      the profile still rejects it until import-admission, whose
-      re-observation reopens every selected path for reassessment."
+      module-default-namespace-update fixture imports a namespace statically
+      and observes namespace.default() returning 1 followed by
+      namespace.default yielding 2. Its bound native integration test passed
+      with stdout 1 and 2 on separate lines under Node.js, Deno and both
+      native specialization modes on Linux AMD64, as the table records. This
+      replaces the namespace live-value assertion separately from direct
+      binding reads. Await/then only acquires the tested namespace, so only
+      its dynamic import() source-evaluation site remains. No remaining
+      non-source assertion is excluded. ADR 0016, as amended on 2026-11-03,
+      admits the string-literal ImportCall every selected path uses.
+      import-admission re-observed all 76 paths, and each now passes with an
+      observation owner, so the assessment records the accounting that
+      preceded the admission.
   observation-b01-b18-dynamic-source:
     disposition: remediation
     normativeDependency: not-demonstrated
@@ -1277,11 +1258,11 @@ assessments:
         "b7fc09e8d00cdd9238f039327de266c0\
         8f371d0ff2e50c9dc2668b5ce0cfbd98"
       tests/test262/results/language/expressions/81.yaml:
-        "3911a5d61c7521021bfeafbbd01074c3\
-        4b47f2425a84b34a762de0c0e7234b3a"
+        "be31f8aa3bd7ca9f15055f9fb01d70e2\
+        c7e4e8af92ae10035440073a17b94bae"
       tests/test262/results/language/expressions/df.yaml:
-        "6114cd5ddf57f229b15d82235ef507f7\
-        5371ce11e8d2d3d3a2b741ec0a13b20a"
+        "b756da96a32043450e45d6fa0709c15f\
+        22f1ffb3bc2112e5619e05e198cc8cad"
   observation-train-dynamic-coverage:
     disposition: remediation
     normativeDependency: not-demonstrated
@@ -1350,8 +1331,8 @@ assessments:
         "c60c130164b2ca664afa8d347851358d\
         161b039039f0fb9b4590fb4c755492d3"
       tests/test262/results/language/expressions/04.yaml:
-        "9bd3ff7aa96d2d09bb142a59dd6af4be\
-        fff8aaf12755df41259fc356e2c532e8"
+        "33b41305f04b8824ad5901717d142d9e\
+        45b6f79205968e052988ea69781f2382"
       tests/test262/results/language/expressions/4f.yaml:
         "85e62caf61f9f00043786fb875bdb841\
         2f2a04d9bdf63dbfcad726939bb2e783"
@@ -1374,8 +1355,8 @@ assessments:
         "9a2636d75c0fd49dfef96b771b76d7ab81dabcddc1e49391e992c8ef95a0\
         ec70"
       tests/test262/results/language/expressions/b3.yaml:
-        "f76f880129cbb4fe225a66f0c1610155b93c99acd08714c2bea8c3d71b3a\
-        f9e8"
+        "eca74f297b4ac4af09575574614e1a8e7e4b8e4028f3aa5ca3c71f679aa6\
+        d2ae"
     reason: Maintainer decision 2026-10-28 item 1 applies only to the two U+180E
       probes listed in
       docs/m5c-graph/dynamic-source-lexical-completion-assessment.yaml. The
@@ -1397,32 +1378,32 @@ assessments:
         "7ffba07fed2249ff66a82f8a14d81f21\
         1926186b0428f1809a6f0f364bab220b"
       tests/test262/results/language/expressions/11.yaml:
-        "f6339dea2e410c9b1ccc72280d1473dc\
-        a7dfad36f0314ee54e77c00119c15ca1"
+        "59cd70af7d7f20be83837d35a3e58824\
+        e0710c7001a153fcedef6d3c0bfdf8b1"
       tests/test262/results/language/expressions/66.yaml:
-        "03c18f614ac7e6303c6b13ce46c4b5bd\
-        57b6c059fa7b91ae6a51d0d8c80537eb"
+        "698d5cd7619d2fe7bbdccc851dd52508\
+        a2cc84b8dd107bb23695864d1cbf2656"
       tests/test262/results/language/expressions/84.yaml:
-        "bc9838bb3b7cc7e0fa971818b4a2f764\
-        06bb2cdfed7c7225249a81a1c136b5d2"
+        "afeabac3927a01aaeb5e7ca1540ea806\
+        204d657332a49a5a0a0f0d3a2e31f789"
       tests/test262/results/language/expressions/26.yaml:
-        "0111f2de0f4d98d672e1e42968790ff1\
-        72978fab86fc9727fd8a965b7909cf80"
+        "e6337908f13985cabc3ae1e84716b44a\
+        c7bace9e2e9045f1683b94f536a1876f"
       tests/test262/results/language/expressions/1d.yaml:
-        "d34ab11dcead983a3e753c85146d456b\
-        b637338e7e6cb5acc80c87736722d07e"
+        "b4323759c251b407132b6cee15949dbe\
+        3079377c96e064ac00b63492f46a3c46"
       tests/test262/results/language/expressions/2c.yaml:
-        "58b93c3e6377e81f026350a9e65e733a\
-        e541aebaf30e454ae6243cdf45b08db1"
+        "ebe782ffc30ed9cf704df21de8dc906f\
+        9f256cd0530330e02364144fe766f6e9"
       tests/test262/results/language/expressions/3a.yaml:
-        "73885edb2c48f2a280d0a1ecf778d82f\
-        6b84d1e3a68620ca4aeb7df5cc0426f5"
+        "553a17e08d83f059f4f15c29faaf19a8\
+        30920c1561beafe1cf2a2515d656928d"
       tests/test262/results/language/expressions/d4.yaml:
-        "890fd5381ec41c730d17a9dc250e8e55\
-        38728477a7d0d2eb6cebe6cb27a8633b"
+        "1ae01fb39ca0659fc007f56019a24bf7\
+        e8d271020222b1d2e730de65e24ec277"
       tests/test262/results/language/expressions/4c.yaml:
-        "123def8f3c6ef6c07fe56ab78c2610ac\
-        85d04865cb312f11fef4494818252587"
+        "dc95206e906135e7a44138b7c69ed9d2\
+        507dea4bad2d17f431f93862f6c73bec"
       tests/test262/results/language/expressions/08.yaml:
         "3ed40ed274bca1ae97dc8fc0980a4542\
         53a6995a6a06ceff6e6470e3d21f5d86"
@@ -1430,20 +1411,20 @@ assessments:
         "ed5f2313b3f0892025a3c4cc7c13e46b\
         760205b397655e8c6dd3f34040a2e2b6"
       tests/test262/results/language/expressions/83.yaml:
-        "9be86c520998126ca682a75b191007b1\
-        26a04007b07e21a53dc37b647e69263b"
+        "bec103a22f50fd821c91b1786898abf2\
+        732efa9559cced666b7b2f3fc5fe01ec"
       tests/test262/results/language/expressions/fb.yaml:
-        "43939432170cbb892ee7e9e642df8d15\
-        fbf6dcb2e6088db7c383dd935c6ca64a"
+        "83f932ca78be7d63e573713f51adadaa\
+        6c922b09eeb83046cd09d08206a9614f"
       tests/test262/results/language/expressions/ba.yaml:
-        "b1e9a6150b0231146a839b78f1c09616\
-        0a3413c9d952265edc9346eea1e93b6b"
+        "0feed6590d8b0b3add04143d96a79c60\
+        4d0551566d5c0fbd55de2d9b93d8a4b8"
       tests/test262/results/language/expressions/c8.yaml:
-        "9232c1d5e2cfd95fc215c0d9d0845fe6\
-        c652a338787252f43982f276ea23802c"
+        "1355837682c945de2d696f3e88391814\
+        af81fd20b8715935f0c569e1e432f300"
       tests/test262/results/language/expressions/86.yaml:
-        "501e9943e7f056df1b92e048b99b99bd\
-        2da82b5fc1597f85028ae781fc8c2b7b"
+        "38928f6f5281301cc8ff37fae2efdfcb\
+        41b03833cd1e838781fd032fba2052bc"
       tests/test262/results/language/function-code/58.yaml:
         "01d9f92a14b036c802c86ca406b2f6f5\
         d41178d42be7bd42ccf4c87261cc95de"
@@ -1484,8 +1465,8 @@ assessments:
       remains in force."
     replacementEvidence:
       tests/test262/results/language/expressions/3f.yaml:
-        "361cc35d4d063401f9da3f3e2bf19cf51e083a5f8bd38e5a\
-        2d760deaa2123b18"
+        "24cb9dee31fe70d545971bcaf3a50298ba20f640de548cb6\
+        bf791e98ca9b1144"
   ds7-36:
     disposition: exclusion
     normativeDependency: source-evaluation-only
@@ -1501,8 +1482,8 @@ assessments:
       remains in force."
     replacementEvidence:
       tests/test262/results/language/expressions/3f.yaml:
-        "361cc35d4d063401f9da3f3e2bf19cf51e083a5f8bd38e5a\
-        2d760deaa2123b18"
+        "24cb9dee31fe70d545971bcaf3a50298ba20f640de548cb6\
+        bf791e98ca9b1144"
   ds7-38:
     disposition: exclusion
     normativeDependency: source-evaluation-only
@@ -1518,8 +1499,8 @@ assessments:
       force."
     replacementEvidence:
       tests/test262/results/language/expressions/0a.yaml:
-        "e8e61e7ca496ffd14b2f09a1f3aff90c6db2c30688e9357a\
-        fb5d17610f67c013"
+        "97a234d397072a4501c3ef2440cbb3a597d708b6936c9f58\
+        b55ba83939533d3b"
   ds7-39:
     disposition: exclusion
     normativeDependency: source-evaluation-only
@@ -1537,8 +1518,8 @@ assessments:
       remains in force."
     replacementEvidence:
       tests/test262/results/language/expressions/3f.yaml:
-        "361cc35d4d063401f9da3f3e2bf19cf51e083a5f8bd38e5a\
-        2d760deaa2123b18"
+        "24cb9dee31fe70d545971bcaf3a50298ba20f640de548cb6\
+        bf791e98ca9b1144"
   ds7-61:
     disposition: exclusion
     normativeDependency: source-evaluation-only
@@ -2634,43 +2615,47 @@ assessments:
         tbndng-indirect-update.mjs"
       : "a1e15cd9b7077541d15fe54649c4829f\
         9320169179bb16ecfcfa52c8e605b6bf"
-    "reason": "The 2026-10-28 maintainer decision item 1 applies to
-      exactly the 51 exclusions in
-      dynamic-source-module-observable-contracts-assessment.yaml. Its
-      per-path rows retain every non-source assertion and name static
-      witnesses. Namespace operations use Script observers with the
-      original strictness; live binding updates retain the global
-      updater, aliases and enclosing syntax; graph witnesses preserve
-      all original static edges; primitive conversion retains both
-      fallback directions. ImportMeta source-goal probes separately
-      reject Script and admit Module; the specifier witness retains the
-      conditional null-prototype conversion error and item 2 covers only
-      ImportCall promise identity and rejection conversion. The fixed
-      native groups require Node.js, Deno and both native policies with
+    "reason": >-
+      The 2026-10-28 maintainer decision item 1 applies to exactly the 51
+      exclusions in
+      dynamic-source-module-observable-contracts-assessment.yaml. Its per-path
+      rows retain every non-source assertion and name static witnesses.
+      Namespace operations use Script observers with the original strictness;
+      live binding updates retain the global updater, aliases and enclosing
+      syntax; graph witnesses preserve all original static edges; primitive
+      conversion retains both fallback directions. ImportMeta source-goal
+      probes separately reject Script and admit Module; the specifier witness
+      retains the conditional null-prototype conversion error and item 2
+      covers only ImportCall promise identity and rejection conversion. The
+      fixed native groups require Node.js, Deno and both native policies with
       forced collection and structural C evidence. Only dynamic source
-      evaluation or construction remains. All original paths,
-      unsupported observations and assertions remain visible; none
-      becomes a pass. ADR 0016, as amended on 2026-11-03, admits the
-      string-literal ImportCall of 40 of these paths, but the profile
-      still rejects it until import-admission; the path whose specifier
-      is import.meta and the 10 paths without an ImportCall stay outside
-      that subset. Reopen when import-admission re-observes these paths,
-      for an ADR 0016 amendment admitting the relevant source
-      construction, changed replacement evidence, source or observation,
-      or ADR 0019 non-source normative dependence."
+      evaluation or construction remains. All original paths and assertions
+      remain visible, and no rejected path becomes a pass. ADR 0016, as
+      amended on 2026-11-03, admits the string-literal ImportCall of 40 of
+      these paths, and import-admission re-observed all 51. Twenty-two of the
+      40 now pass with observation owners. The other 18 are the
+      eval-gtbndng-indirect-update usage paths, whose fixture calls the
+      Function constructor; they now stop at that OSEO1001 Function rejection
+      instead of the ImportExpression one, and their bound native witnesses
+      still replace the live binding updates. The path whose specifier is
+      import.meta and the 10 paths without an ImportCall stay outside the
+      subset. Reopen for an ADR 0016 amendment admitting the relevant source
+      construction, changed replacement evidence, source or observation, or
+      ADR 0019 non-source normative dependence.
   "ds12-module-observable-residual":
     "disposition": "deferral"
     "normativeDependency": "not-demonstrated"
-    "reason": "Deferred under ADR 0031; docs/m5c-closure/deferrals.yaml
-      names each path's remaining contract. Exactly 19 DS-12 paths retain
-      repeated-load identity, cached error, deferred evaluation, staggered
-      graph-start or exact TLA result, error and ordering observations that
-      only an ImportCall site exposes. The per-path table records why static
-      module evidence cannot witness them, and the static-specifier import
-      track that could admit those sites is not implemented in M5. ADR 0016,
-      as amended on 2026-11-03, selects that track's subset, but every
-      import() stays rejected until import-admission; ADR 0019 remains
-      unchanged."
+    "reason": >-
+      Deferred under ADR 0031; docs/m5c-closure/deferrals.yaml names each
+      path's remaining contract. Exactly 19 DS-12 paths retain repeated-load
+      identity, cached error, deferred evaluation, staggered graph-start or
+      exact TLA result, error and ordering observations that only an
+      ImportCall site exposes. import-admission closed 17 of them: 16 pass and
+      await-dynamic-import-rejection.js reports its expected negative. The
+      other two, eval-rqstd-once.js and update-to-dynamic-import.js, admit
+      their literal ImportCall sites but stop at the Function constructor call
+      in their fixtures; the per-path table records why static module evidence
+      cannot witness them. ADR 0019 remains unchanged.
 
   ds16-static-syntax:
     disposition: exclusion
@@ -3315,19 +3300,22 @@ assessments:
       tests/module-goal-validation-source.test.ts:
         "8339a1e8ab6dd61e2d07440cc7c74e2e\
         1ddbc2b79bd9aad35c61a28989c21261"
-    reason: "The same var/function collision is accepted as sloppy and
-      strict Script and rejected by Module parsing, both directly and
-      through a static dependency. Node.js and Deno observe static
-      SyntaxError before evaluation. Oseo preserves a located OSEO0001
-      target diagnostic. Only ImportCall source loading and conversion of
-      that target error into a rejected promise remain; these are bounded
-      by decision items 1 and 2, as Root confirmed on 2026-10-31. No
-      rejected promise is inferred from a compiler diagnostic. ADR 0016,
-      as amended on 2026-11-03, admits these string-literal ImportCalls
-      and makes a target that fails to parse a build diagnostic, not a
-      language result; the profile still rejects every import() until
-      import-admission, whose re-observation of these paths reopens this
-      assessment."
+    reason: >-
+      The same var/function collision is accepted as sloppy and strict Script
+      and rejected by Module parsing, both directly and through a static
+      dependency. Node.js and Deno observe static SyntaxError before
+      evaluation. Oseo preserves a located OSEO0001 target diagnostic. Only
+      ImportCall source loading and conversion of that target error into a
+      rejected promise remain; these are bounded by decision items 1 and 2, as
+      Root confirmed on 2026-10-31. No rejected promise is inferred from a
+      compiler diagnostic. ADR 0016, as amended on 2026-11-03, admits these
+      string-literal ImportCalls and makes a target that fails to parse a
+      build diagnostic, not a language result; import-admission re-observed
+      the 16 paths, and each stops at that OSEO0001 build diagnostic. The
+      exclusion audit accepts only OSEO1001 rejections on ADR 0016, so the
+      paths left this assessment for the unit:import-admission ledger owner;
+      the follow-up that widens the audit's record surfaces returns them to it
+      with the bound evidence.
   ds11-static-module-ambiguous:
     disposition: "exclusion"
     normativeDependency: "source-evaluation-only"
@@ -3338,18 +3326,21 @@ assessments:
       tests/module-goal-validation-source.test.ts:
         "8339a1e8ab6dd61e2d07440cc7c74e2e\
         1ddbc2b79bd9aad35c61a28989c21261"
-    reason: "The same indirect re-export requests x from two distinct
-      star-export sources. All modules parse; Oseo linking rejects the
-      ambiguous resolution under both policies before MIR, and Node.js and
-      Deno observe static SyntaxError before evaluation. The
-      namespace-only control remains valid. Only ImportCall source loading
-      and rejection routing remain under decision items 1 and 2; no
-      runtime promise rejection is claimed for the static linker
-      diagnostic. ADR 0016, as amended on 2026-11-03, admits these
-      string-literal ImportCalls and makes a target that fails to link a
-      build diagnostic, not a language result; the profile still rejects
-      every import() until import-admission, whose re-observation of these
-      paths reopens this assessment."
+    reason: >-
+      The same indirect re-export requests x from two distinct star-export
+      sources. All modules parse; Oseo linking rejects the ambiguous
+      resolution under both policies before MIR, and Node.js and Deno observe
+      static SyntaxError before evaluation. The namespace-only control remains
+      valid. Only ImportCall source loading and rejection routing remain under
+      decision items 1 and 2; no runtime promise rejection is claimed for the
+      static linker diagnostic. ADR 0016, as amended on 2026-11-03, admits
+      these string-literal ImportCalls and makes a target that fails to link a
+      build diagnostic, not a language result; import-admission re-observed
+      the 16 paths, and each stops at the OSEO2001 ambiguous-export build
+      diagnostic. The exclusion audit accepts only OSEO1001 rejections on ADR
+      0016, so the paths left this assessment for the unit:import-admission
+      ledger owner; the follow-up that widens the audit's record surfaces
+      returns them to it with the bound evidence.
   ds11-static-module-circular:
     disposition: "exclusion"
     normativeDependency: "source-evaluation-only"
@@ -3360,18 +3351,21 @@ assessments:
       tests/module-goal-validation-source.test.ts:
         "8339a1e8ab6dd61e2d07440cc7c74e2e\
         1ddbc2b79bd9aad35c61a28989c21261"
-    reason: "The same two-module indirect re-export cycle has no concrete x
-      binding. All modules parse; Oseo linking rejects that unresolved
-      resolution under both policies before MIR, and Node.js and Deno
-      observe static SyntaxError before evaluation. A productive cycle
-      links to one concrete cell. Only ImportCall source loading and
-      rejection routing remain under decision items 1 and 2; no runtime
-      promise rejection is claimed for the static linker diagnostic. ADR
-      0016, as amended on 2026-11-03, admits these string-literal
-      ImportCalls and makes a target that fails to link a build diagnostic,
-      not a language result; the profile still rejects every import() until
-      import-admission, whose re-observation of these paths reopens this
-      assessment."
+    reason: >-
+      The same two-module indirect re-export cycle has no concrete x binding.
+      All modules parse; Oseo linking rejects that unresolved resolution under
+      both policies before MIR, and Node.js and Deno observe static
+      SyntaxError before evaluation. A productive cycle links to one concrete
+      cell. Only ImportCall source loading and rejection routing remain under
+      decision items 1 and 2; no runtime promise rejection is claimed for the
+      static linker diagnostic. ADR 0016, as amended on 2026-11-03, admits
+      these string-literal ImportCalls and makes a target that fails to link a
+      build diagnostic, not a language result; import-admission re-observed
+      the 16 paths, and each stops at the OSEO2001 missing-export build
+      diagnostic. The exclusion audit accepts only OSEO1001 rejections on ADR
+      0016, so the paths left this assessment for the unit:import-admission
+      ledger owner; the follow-up that widens the audit's record surfaces
+      returns them to it with the bound evidence.
   ds11-static-module-usage:
     disposition: "exclusion"
     normativeDependency: "source-evaluation-only"
@@ -3394,27 +3388,26 @@ assessments:
       tests/fixtures/module-goal-validation/prelude.js:
         "85383879a2786c478abf619fe3e7dfee\
         c8638dc13b0426e2726d55c2049a84d8"
-    reason: "The fixture strictly compares all three namespace values and
-      types against the finite nonzero numeric and string expectations,
-      preserving SameValue for this domain before printing success. A
-      string y mutation produces 18 failure markers and fails the positive
-      oracle in Node.js, Deno and both native policies with forced
-      collection. The static target retains default 42, named x Test262
-      and alias z 42; the fixture observes all three namespace reads in
-      each of the 18 original usage contexts, including the
-      async-generator call count. Structural checks bind one target and
-      its three export cells. The native test runs that graph after the
-      Script-valid var/function prelude under both policies with forced
-      collection, and compares positive module observations with Node.js
-      and Deno. Separate Script/Module parsing checks retain the caller
-      grammar distinction. Promise.resolve supplies already-known static
-      namespace data and implements no import operation. Only ImportCall
-      source loading from Script and its promise fulfillment remain under
-      decision items 1 and 2. ADR 0016, as amended on 2026-11-03, admits
-      these string-literal ImportCalls, including Script sites with a
-      build-side referrer identity, but the profile still rejects every
-      import() until import-admission, whose re-observation of these paths
-      reopens this assessment."
+    reason: >-
+      The fixture strictly compares all three namespace values and types
+      against the finite nonzero numeric and string expectations, preserving
+      SameValue for this domain before printing success. A string y mutation
+      produces 18 failure markers and fails the positive oracle in Node.js,
+      Deno and both native policies with forced collection. The static target
+      retains default 42, named x Test262 and alias z 42; the fixture observes
+      all three namespace reads in each of the 18 original usage contexts,
+      including the async-generator call count. Structural checks bind one
+      target and its three export cells. The native test runs that graph after
+      the Script-valid var/function prelude under both policies with forced
+      collection, and compares positive module observations with Node.js and
+      Deno. Separate Script/Module parsing checks retain the caller grammar
+      distinction. Promise.resolve supplies already-known static namespace
+      data and implements no import operation. Only ImportCall source loading
+      from Script and its promise fulfillment remain under decision items 1
+      and 2. ADR 0016, as amended on 2026-11-03, admits these string-literal
+      ImportCalls, including Script sites with a build-side referrer identity.
+      import-admission re-observed the 18 paths, and each now passes with an
+      observation owner.
   ds14-intrinsic-constructability:
     disposition: exclusion
     normativeDependency: source-evaluation-only
@@ -5940,20 +5933,20 @@ assessments:
         "5161606474c6d7ba062dc80b319a42cbb81f0a6f9affbf68\
         24365920ff7156af"
       packages/runtime-c/native/runtime_memory.c:
-        "f6aca652d133b8c328a9b3bddd70fec1ce18071dd118384b\
-        5b21b5a2f7b43205"
+        "e152eceff3ee63d56e9d666db1832401f3b8fe2ae555b52e\
+        8e63c9bcbcddc430"
       packages/runtime-c/native/runtime_internal.h:
-        "7d30747267902cd53eccb4075cefc6d9289303e287cd1f1f\
-        8782aa6e8876bc48"
+        "1cadd409546c9eb6de77376b71b8c6e7ca9b68502d6d72db\
+        2761078d55afe6c6"
       packages/runtime-c/native/oseo_runtime.h:
-        "dca99a6b3cae61531c4974889762d8fa16e322097db366a3\
-        f272b3f0da0a5851"
+        "58c4b22f617313b648cb05875b41ec6bf1dd316cf207c0a7\
+        d26b91084213d7bf"
       packages/runtime-c/native/runtime_core.c:
         "bcf729b61049bdd7486c230c5cb653edfaae769360bc4d3e\
         e0c4f1eea10a663b"
       packages/runtime-c/src/index.ts:
-        "dd7b05b82f6671cb62d5cc3843766d11ecad95f5fd470548\
-        42459adecbdf339b"
+        "73778eec90f684c0a095999f6ab8f312f3e5f94f44086523\
+        38db2233fcd1b7b6"
   observation-train-b26a-b26b-b27:
     disposition: deferral
     normativeDependency: not-demonstrated
@@ -6180,8 +6173,8 @@ assessments:
       tests/test262/harness/base.js: "50331feeca513cb2e2354e05e7c68f82\
         d5aeccd9b766d6c88438c5ef118075f6"
       tests/test262/results/language/expressions/8f.yaml:
-        "cc77e765a6b00488f0f6e9c70bba5fae\
-        7ba463542d3c9733415fd46d9c8f34e2"
+        "e8e64ad54c6324855d672f884ee44c74\
+        49c0fea3dcd86ae2da2fd5a794d31db8"
       tests/test262/results/language/statements/db.yaml:
         "04f80f4dbec0ec779db49966a0e43de6\
         4f9b6ceb86ffa5ead79e9a842b344dc9"
@@ -17748,58 +17741,6 @@ paths:
       evaluation (nested arrow)"
     assessment: "import-call-promise"
   - path: "test/language/expressions/dynamic-import/catch/nested-arrow-import-c\
-      atch-eval-script-code-target.js"
-    proposedOwner: "adr:0016-dynamic-source-boundary"
-    priorCohort: "source-subject"
-    sourceDigest: "85df298bd88365a90b053a310d941fbb5090be6396c05bebda9\
-      c48e760f06cc1"
-    observationDigest: "b8dbf532eae3d30f0b8789985a92cfdeb367\
-      c58a70c36c8aebd3dfdbbd3342bc"
-    missingDynamicTag: false
-    section: "sec-import-call-runtime-semantics-evaluation"
-    subject: "import() from a module code can load a file with script code, but
-      the target is resolved into a Module Record (nested arrow)"
-    assessment: ds11-static-module-goal
-  - path: "test/language/expressions/dynamic-import/catch/nested-arrow-import-c\
-      atch-file-does-not-exist.js"
-    proposedOwner: "adr:0016-dynamic-source-boundary"
-    priorCohort: "source-subject"
-    sourceDigest: "d459a33db5087e2451b5a57aa5188029f57bbb7cb7b6cf648f6\
-      c8bc28b22d837"
-    observationDigest: "1e158edf66c04591d1d4af00acb928fb455e\
-      c230598b228c02192891a72b966d"
-    missingDynamicTag: false
-    section: "sec-import-call-runtime-semantics-evaluation"
-    subject: "Non existent file can't resolve to a Script or Module Record
-      (nested arrow)"
-    assessment: "import-call-promise"
-  - path: "test/language/expressions/dynamic-import/catch/nested-arrow-import-c\
-      atch-instn-iee-err-ambiguous-import.js"
-    proposedOwner: "adr:0016-dynamic-source-boundary"
-    priorCohort: "source-subject"
-    sourceDigest: "78bb58dd76c22b63872e65d93333a4151420ad6cb652f0087ba\
-      c05f322646796"
-    observationDigest: "1e8c3deeebceacc839ba69e0d487d5405d26\
-      581a191097155d1dbe9c62a4251c"
-    missingDynamicTag: false
-    section: "sec-import-call-runtime-semantics-evaluation"
-    subject: "IndirectExportEntries validation - ambiguous imported bindings
-      (nested arrow)"
-    assessment: ds11-static-module-ambiguous
-  - path: "test/language/expressions/dynamic-import/catch/nested-arrow-import-c\
-      atch-instn-iee-err-circular.js"
-    proposedOwner: "adr:0016-dynamic-source-boundary"
-    priorCohort: "source-subject"
-    sourceDigest: "babfba6d401c132973e7a9de2590b350d9264e9843fa09f4fad\
-      a6a62dc441c54"
-    observationDigest: "bf51d1d931389c3ded11dfbcff15ad77dbf3\
-      0e43ad63bbf9b5ac4b2465f6298c"
-    missingDynamicTag: false
-    section: "sec-import-call-runtime-semantics-evaluation"
-    subject: "IndirectExportEntries validation - circular imported bindings
-      (nested arrow)"
-    assessment: ds11-static-module-circular
-  - path: "test/language/expressions/dynamic-import/catch/nested-arrow-import-c\
       atch-specifier-tostring-abrupt-rejects.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "source-subject"
@@ -17838,59 +17779,6 @@ paths:
     subject: "Abrupt completion during module evaluation precludes further
       evaluation (nested in async arrow function, awaited)"
     assessment: "import-call-promise"
-  - path: "test/language/expressions/dynamic-import/catch/nested-async-arrow-fu\
-      nction-await-eval-script-code-target.js"
-    proposedOwner: "adr:0016-dynamic-source-boundary"
-    priorCohort: "source-subject"
-    sourceDigest: "b8316a8b356c182f9b4d442d8c72847400ee77bd06883821162\
-      9de946da9b44a"
-    observationDigest: "3ac6106c684fd37c28034824721ecf306e13\
-      cbca8731630a61f09436f31b2d4a"
-    missingDynamicTag: false
-    section: "sec-import-call-runtime-semantics-evaluation"
-    subject: "import() from a module code can load a file with script code, but
-      the target is resolved into a Module Record (nested in async arrow
-      function, awaited)"
-    assessment: ds11-static-module-goal
-  - path: "test/language/expressions/dynamic-import/catch/nested-async-arrow-fu\
-      nction-await-file-does-not-exist.js"
-    proposedOwner: "adr:0016-dynamic-source-boundary"
-    priorCohort: "source-subject"
-    sourceDigest: "ef3c95fb319df621f408343f886e02626595f2004f2caa17f0a\
-      1c2c0ea5fec62"
-    observationDigest: "2e340ac197d2a5d55f4614cd6ff1affa8b0e\
-      a1aafe847a23e7eb4f4a9975e567"
-    missingDynamicTag: false
-    section: "sec-import-call-runtime-semantics-evaluation"
-    subject: "Non existent file can't resolve to a Script or Module Record
-      (nested in async arrow function, awaited)"
-    assessment: "import-call-promise"
-  - path: "test/language/expressions/dynamic-import/catch/nested-async-arrow-fu\
-      nction-await-instn-iee-err-ambiguous-import.js"
-    proposedOwner: "adr:0016-dynamic-source-boundary"
-    priorCohort: "source-subject"
-    sourceDigest: "eeec8cff049c42c2a48aeb60712c4f3983a7d0eb08342a24b35\
-      3176bb7df2d04"
-    observationDigest: "3468d28159ce70b57d9b683e4e3808b11f70\
-      85ab4a2de35d46bc2a08ad6da707"
-    missingDynamicTag: false
-    section: "sec-import-call-runtime-semantics-evaluation"
-    subject: "IndirectExportEntries validation - ambiguous imported bindings
-      (nested in async arrow function, awaited)"
-    assessment: ds11-static-module-ambiguous
-  - path: "test/language/expressions/dynamic-import/catch/nested-async-arrow-fu\
-      nction-await-instn-iee-err-circular.js"
-    proposedOwner: "adr:0016-dynamic-source-boundary"
-    priorCohort: "source-subject"
-    sourceDigest: "ca918951773c2b1c17048f0249b4aadc791197bafa8d1920193\
-      e0b2783d6d7a9"
-    observationDigest: "eb50329eedf7e17d7d03fc7804691056de11\
-      f59ae12938062558d93dc5d8289a"
-    missingDynamicTag: false
-    section: "sec-import-call-runtime-semantics-evaluation"
-    subject: "IndirectExportEntries validation - circular imported bindings
-      (nested in async arrow function, awaited)"
-    assessment: ds11-static-module-circular
   - path: "test/language/expressions/dynamic-import/catch/nested-async-arrow-fu\
       nction-await-specifier-tostring-abrupt-rejects.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -17931,59 +17819,6 @@ paths:
       evaluation (nested in async arrow function, returned)"
     assessment: "import-call-promise"
   - path: "test/language/expressions/dynamic-import/catch/nested-async-arrow-fu\
-      nction-return-await-eval-script-code-target.js"
-    proposedOwner: "adr:0016-dynamic-source-boundary"
-    priorCohort: "source-subject"
-    sourceDigest: "2e5c3c92757234a154bee374ce24b514d180a8c8a579b763d68\
-      969884f3edc65"
-    observationDigest: "3a68701f3fddd6cc75cd8091a42ab51b3184\
-      ee693bcd7d7a9e0212b396aa0e5a"
-    missingDynamicTag: false
-    section: "sec-import-call-runtime-semantics-evaluation"
-    subject: "import() from a module code can load a file with script code, but
-      the target is resolved into a Module Record (nested in async arrow
-      function, returned)"
-    assessment: ds11-static-module-goal
-  - path: "test/language/expressions/dynamic-import/catch/nested-async-arrow-fu\
-      nction-return-await-file-does-not-exist.js"
-    proposedOwner: "adr:0016-dynamic-source-boundary"
-    priorCohort: "source-subject"
-    sourceDigest: "74262c90e4885e62e4222b1dca7f199c107895e64a645ec84be\
-      2bc5a2058ea88"
-    observationDigest: "6a61ffbc9517f93b9b6863d414160e287786\
-      0b8c5fffcb985ffe45194b6ed6c9"
-    missingDynamicTag: false
-    section: "sec-import-call-runtime-semantics-evaluation"
-    subject: "Non existent file can't resolve to a Script or Module Record
-      (nested in async arrow function, returned)"
-    assessment: "import-call-promise"
-  - path: "test/language/expressions/dynamic-import/catch/nested-async-arrow-fu\
-      nction-return-await-instn-iee-err-ambiguous-import.js"
-    proposedOwner: "adr:0016-dynamic-source-boundary"
-    priorCohort: "source-subject"
-    sourceDigest: "91b3ca6e6def575f98f4cb760bcae48a1c94236615b08c628d1\
-      05957b3906a34"
-    observationDigest: "52cf588bff7cf18fe204a54071fc4ffb65c1\
-      bec86e6cdd0843a70404b16af52a"
-    missingDynamicTag: false
-    section: "sec-import-call-runtime-semantics-evaluation"
-    subject: "IndirectExportEntries validation - ambiguous imported bindings
-      (nested in async arrow function, returned)"
-    assessment: ds11-static-module-ambiguous
-  - path: "test/language/expressions/dynamic-import/catch/nested-async-arrow-fu\
-      nction-return-await-instn-iee-err-circular.js"
-    proposedOwner: "adr:0016-dynamic-source-boundary"
-    priorCohort: "source-subject"
-    sourceDigest: "ca3940ca0c0947498d65de70cdba53745142a08306f58f00c29\
-      3017597419a25"
-    observationDigest: "796b235fe533755acfb370253604bac5ab26\
-      7ff6152fd7c86deaf3d25d544e41"
-    missingDynamicTag: false
-    section: "sec-import-call-runtime-semantics-evaluation"
-    subject: "IndirectExportEntries validation - circular imported bindings
-      (nested in async arrow function, returned)"
-    assessment: ds11-static-module-circular
-  - path: "test/language/expressions/dynamic-import/catch/nested-async-arrow-fu\
       nction-return-await-specifier-tostring-abrupt-rejects.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "source-subject"
@@ -18022,59 +17857,6 @@ paths:
     subject: "Abrupt completion during module evaluation precludes further
       evaluation (nested in async function, awaited)"
     assessment: "import-call-promise"
-  - path: "test/language/expressions/dynamic-import/catch/nested-async-function\
-      -await-eval-script-code-target.js"
-    proposedOwner: "adr:0016-dynamic-source-boundary"
-    priorCohort: "source-subject"
-    sourceDigest: "4b170f520bf502b0b1d42ccfaa1a302b8a7946cf157c5c6d71b\
-      8cb53a5cfeb90"
-    observationDigest: "80e18867808fa6f2e1f5ff7f543efdc40887\
-      d2f7a804422c5e3ea17368bdc860"
-    missingDynamicTag: false
-    section: "sec-import-call-runtime-semantics-evaluation"
-    subject: "import() from a module code can load a file with script code, but
-      the target is resolved into a Module Record (nested in async function,
-      awaited)"
-    assessment: ds11-static-module-goal
-  - path: "test/language/expressions/dynamic-import/catch/nested-async-function\
-      -await-file-does-not-exist.js"
-    proposedOwner: "adr:0016-dynamic-source-boundary"
-    priorCohort: "source-subject"
-    sourceDigest: "b49b526241a0ad6caa293f9d86dd4da7a2dbc78b70d7ccbf071\
-      d6d36b29a7980"
-    observationDigest: "26f3b49316dbc4b0008732d25ba63d015ae4\
-      03f59a65651e262a79ad347d6596"
-    missingDynamicTag: false
-    section: "sec-import-call-runtime-semantics-evaluation"
-    subject: "Non existent file can't resolve to a Script or Module Record
-      (nested in async function, awaited)"
-    assessment: "import-call-promise"
-  - path: "test/language/expressions/dynamic-import/catch/nested-async-function\
-      -await-instn-iee-err-ambiguous-import.js"
-    proposedOwner: "adr:0016-dynamic-source-boundary"
-    priorCohort: "source-subject"
-    sourceDigest: "281eca55f7165083f37d9982b9b8e7bc7ab0e7b25a4d6299ded\
-      6b455567d86a5"
-    observationDigest: "ff8c90c9822728e8572c5ed9ae26dbce57f8\
-      fb2667ad580a81cea828989e0e72"
-    missingDynamicTag: false
-    section: "sec-import-call-runtime-semantics-evaluation"
-    subject: "IndirectExportEntries validation - ambiguous imported bindings
-      (nested in async function, awaited)"
-    assessment: ds11-static-module-ambiguous
-  - path: "test/language/expressions/dynamic-import/catch/nested-async-function\
-      -await-instn-iee-err-circular.js"
-    proposedOwner: "adr:0016-dynamic-source-boundary"
-    priorCohort: "source-subject"
-    sourceDigest: "5878ef23e126fb2c764e38e154370dfb3915fb4e4cdad89f64d\
-      dbef2966f7f6f"
-    observationDigest: "99587a042a424b24e07172e75ed1dd0eac4c\
-      ab2fe36ba5842a43924532739afb"
-    missingDynamicTag: false
-    section: "sec-import-call-runtime-semantics-evaluation"
-    subject: "IndirectExportEntries validation - circular imported bindings
-      (nested in async function, awaited)"
-    assessment: ds11-static-module-circular
   - path: "test/language/expressions/dynamic-import/catch/nested-async-function\
       -await-specifier-tostring-abrupt-rejects.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -18115,58 +17897,6 @@ paths:
       evaluation (nested in async function)"
     assessment: "import-call-promise"
   - path: "test/language/expressions/dynamic-import/catch/nested-async-function\
-      -eval-script-code-target.js"
-    proposedOwner: "adr:0016-dynamic-source-boundary"
-    priorCohort: "source-subject"
-    sourceDigest: "665d1112d5ac0b967016dc3aef3fe9411fbd718762de004ea62\
-      088f7678c1101"
-    observationDigest: "fd592171816b651b9790df1db652788b2e16\
-      8f71b959da25ec2e90e1c71dad02"
-    missingDynamicTag: false
-    section: "sec-import-call-runtime-semantics-evaluation"
-    subject: "import() from a module code can load a file with script code, but
-      the target is resolved into a Module Record (nested in async function)"
-    assessment: ds11-static-module-goal
-  - path: "test/language/expressions/dynamic-import/catch/nested-async-function\
-      -file-does-not-exist.js"
-    proposedOwner: "adr:0016-dynamic-source-boundary"
-    priorCohort: "source-subject"
-    sourceDigest: "d102dcfb048ee915106f31e2b02ed8578365344d92d61dfcc64\
-      1beeb665f83a1"
-    observationDigest: "a5d379c0b56ed2531667151b8ebc7022608e\
-      1ac4325495aea5b2fdc333afad04"
-    missingDynamicTag: false
-    section: "sec-import-call-runtime-semantics-evaluation"
-    subject: "Non existent file can't resolve to a Script or Module Record
-      (nested in async function)"
-    assessment: "import-call-promise"
-  - path: "test/language/expressions/dynamic-import/catch/nested-async-function\
-      -instn-iee-err-ambiguous-import.js"
-    proposedOwner: "adr:0016-dynamic-source-boundary"
-    priorCohort: "source-subject"
-    sourceDigest: "02d1044cf554b789a630c557893fa8a455ca900d68111e394d6\
-      76ba1174637ef"
-    observationDigest: "7acec944037d5711b0b2297e62df451f7a6c\
-      b0b49cc2e3a553a5557e1c28bdd2"
-    missingDynamicTag: false
-    section: "sec-import-call-runtime-semantics-evaluation"
-    subject: "IndirectExportEntries validation - ambiguous imported bindings
-      (nested in async function)"
-    assessment: ds11-static-module-ambiguous
-  - path: "test/language/expressions/dynamic-import/catch/nested-async-function\
-      -instn-iee-err-circular.js"
-    proposedOwner: "adr:0016-dynamic-source-boundary"
-    priorCohort: "source-subject"
-    sourceDigest: "faa3bb803d94bd14c46c14face0f581d2926cc6ed8496c2d9e7\
-      06b2d57caa595"
-    observationDigest: "a85c631211d3678de02b03989c5205992b40\
-      f953d5978c3a003d4fa2e4f96d9d"
-    missingDynamicTag: false
-    section: "sec-import-call-runtime-semantics-evaluation"
-    subject: "IndirectExportEntries validation - circular imported bindings
-      (nested in async function)"
-    assessment: ds11-static-module-circular
-  - path: "test/language/expressions/dynamic-import/catch/nested-async-function\
       -return-await-eval-rqstd-abrupt-typeerror.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "source-subject"
@@ -18192,59 +17922,6 @@ paths:
     subject: "Abrupt completion during module evaluation precludes further
       evaluation (nested in async function, returns awaited)"
     assessment: "import-call-promise"
-  - path: "test/language/expressions/dynamic-import/catch/nested-async-function\
-      -return-await-eval-script-code-target.js"
-    proposedOwner: "adr:0016-dynamic-source-boundary"
-    priorCohort: "source-subject"
-    sourceDigest: "ed4bd78012074d0d9d1f63b0ad7918b9a8f45cc413996b04003\
-      d95ba45265794"
-    observationDigest: "2b88f207f22f5f3aa6241c989e027d43795c\
-      ba16d6f936425160909b6a163778"
-    missingDynamicTag: false
-    section: "sec-import-call-runtime-semantics-evaluation"
-    subject: "import() from a module code can load a file with script code, but
-      the target is resolved into a Module Record (nested in async function,
-      returns awaited)"
-    assessment: ds11-static-module-goal
-  - path: "test/language/expressions/dynamic-import/catch/nested-async-function\
-      -return-await-file-does-not-exist.js"
-    proposedOwner: "adr:0016-dynamic-source-boundary"
-    priorCohort: "source-subject"
-    sourceDigest: "1ef1ab46a1bdc8ee0712e49f8b595ccc05127e6b9a8b2a09290\
-      0077da641e958"
-    observationDigest: "4c156efb864489d2fdb22a3b4425b3c06006\
-      5f18d1c5c7cbbcb9f5d96a02a9f0"
-    missingDynamicTag: false
-    section: "sec-import-call-runtime-semantics-evaluation"
-    subject: "Non existent file can't resolve to a Script or Module Record
-      (nested in async function, returns awaited)"
-    assessment: "import-call-promise"
-  - path: "test/language/expressions/dynamic-import/catch/nested-async-function\
-      -return-await-instn-iee-err-ambiguous-import.js"
-    proposedOwner: "adr:0016-dynamic-source-boundary"
-    priorCohort: "source-subject"
-    sourceDigest: "0b03fa1d0cf7e07ae76af5844e1d8be336166cb51e9de219edb\
-      b7ec25a497151"
-    observationDigest: "31ed67f8f1cea51a1bf8a55a4cd76fbd0268\
-      ccd480320d2765249c599b32747e"
-    missingDynamicTag: false
-    section: "sec-import-call-runtime-semantics-evaluation"
-    subject: "IndirectExportEntries validation - ambiguous imported bindings
-      (nested in async function, returns awaited)"
-    assessment: ds11-static-module-ambiguous
-  - path: "test/language/expressions/dynamic-import/catch/nested-async-function\
-      -return-await-instn-iee-err-circular.js"
-    proposedOwner: "adr:0016-dynamic-source-boundary"
-    priorCohort: "source-subject"
-    sourceDigest: "f69daf13000ab653ae758841931dab1d18050afaa698d35429f\
-      11c4b623b3713"
-    observationDigest: "44009473a69250a76f5951ffbef92fd071a7\
-      95d56eb841594a12879f6f35056d"
-    missingDynamicTag: false
-    section: "sec-import-call-runtime-semantics-evaluation"
-    subject: "IndirectExportEntries validation - circular imported bindings
-      (nested in async function, returns awaited)"
-    assessment: ds11-static-module-circular
   - path: "test/language/expressions/dynamic-import/catch/nested-async-function\
       -return-await-specifier-tostring-abrupt-rejects.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -18298,59 +17975,6 @@ paths:
       evaluation (nested in async generator, awaited)"
     assessment: "import-call-promise"
   - path: "test/language/expressions/dynamic-import/catch/nested-async-gen-awai\
-      t-eval-script-code-target.js"
-    proposedOwner: "adr:0016-dynamic-source-boundary"
-    priorCohort: "source-subject"
-    sourceDigest: "6dd3415f549055e3e6b76887e405488e450d8ae211028d31dd2\
-      e2ed9c29eb323"
-    observationDigest: "17e8ca33641d5e372606710a5d3ec28c4eb4\
-      a348b26c01f9eb25cfdd55ecd7da"
-    missingDynamicTag: false
-    section: "sec-import-call-runtime-semantics-evaluation"
-    subject: "import() from a module code can load a file with script code, but
-      the target is resolved into a Module Record (nested in async generator,
-      awaited)"
-    assessment: ds11-static-module-goal
-  - path: "test/language/expressions/dynamic-import/catch/nested-async-gen-awai\
-      t-file-does-not-exist.js"
-    proposedOwner: "adr:0016-dynamic-source-boundary"
-    priorCohort: "source-subject"
-    sourceDigest: "86af9884ec000360c43b6be9bd296e0052dbd622db427869b54\
-      69e79b7cc9724"
-    observationDigest: "3db14f4d244bf72e5e7008edce83588d2baa\
-      1f62b43b51ee31bc0105502e136c"
-    missingDynamicTag: false
-    section: "sec-import-call-runtime-semantics-evaluation"
-    subject: "Non existent file can't resolve to a Script or Module Record
-      (nested in async generator, awaited)"
-    assessment: "import-call-promise"
-  - path: "test/language/expressions/dynamic-import/catch/nested-async-gen-awai\
-      t-instn-iee-err-ambiguous-import.js"
-    proposedOwner: "adr:0016-dynamic-source-boundary"
-    priorCohort: "source-subject"
-    sourceDigest: "d0af1d7b0e26616fbdb30812e9e586a33eb0789cb40625a473a\
-      0cbc1892f312e"
-    observationDigest: "b5efb81156e6284648c81f2f62420825117e\
-      a40947c810a80a69e062e669bc3f"
-    missingDynamicTag: false
-    section: "sec-import-call-runtime-semantics-evaluation"
-    subject: "IndirectExportEntries validation - ambiguous imported bindings
-      (nested in async generator, awaited)"
-    assessment: ds11-static-module-ambiguous
-  - path: "test/language/expressions/dynamic-import/catch/nested-async-gen-awai\
-      t-instn-iee-err-circular.js"
-    proposedOwner: "adr:0016-dynamic-source-boundary"
-    priorCohort: "source-subject"
-    sourceDigest: "758e79fbffca697b3668762cf274cd624f599c85f9b736af173\
-      e7cd7ab3e791b"
-    observationDigest: "2ce50f5b28a217a9f211c42d2f8217210d2f\
-      10e0919299aafb7599314d119e43"
-    missingDynamicTag: false
-    section: "sec-import-call-runtime-semantics-evaluation"
-    subject: "IndirectExportEntries validation - circular imported bindings
-      (nested in async generator, awaited)"
-    assessment: ds11-static-module-circular
-  - path: "test/language/expressions/dynamic-import/catch/nested-async-gen-awai\
       t-specifier-tostring-abrupt-rejects.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "source-subject"
@@ -18389,59 +18013,6 @@ paths:
     subject: "Abrupt completion during module evaluation precludes further
       evaluation (nested in async generator, returns awaited)"
     assessment: "import-call-promise"
-  - path: "test/language/expressions/dynamic-import/catch/nested-async-gen-retu\
-      rn-await-eval-script-code-target.js"
-    proposedOwner: "adr:0016-dynamic-source-boundary"
-    priorCohort: "source-subject"
-    sourceDigest: "faaf8341e48319a18310d4cab66e030ec38e62908911ff1ffe8\
-      1f6e94e7a3146"
-    observationDigest: "89082cf03df26e95ad0d07a94201c1b95401\
-      a34d84dcbbd8fc56f2de6aad3407"
-    missingDynamicTag: false
-    section: "sec-import-call-runtime-semantics-evaluation"
-    subject: "import() from a module code can load a file with script code, but
-      the target is resolved into a Module Record (nested in async generator,
-      returns awaited)"
-    assessment: ds11-static-module-goal
-  - path: "test/language/expressions/dynamic-import/catch/nested-async-gen-retu\
-      rn-await-file-does-not-exist.js"
-    proposedOwner: "adr:0016-dynamic-source-boundary"
-    priorCohort: "source-subject"
-    sourceDigest: "4ffb317e6daac3ec4012f90caec97aa4a79f2df4314d42265a9\
-      9b7121283fec5"
-    observationDigest: "481ffeca10369591008d007c7c3e12bdf7d5\
-      6dc09b6ee3958abcb28ce84a33ee"
-    missingDynamicTag: false
-    section: "sec-import-call-runtime-semantics-evaluation"
-    subject: "Non existent file can't resolve to a Script or Module Record
-      (nested in async generator, returns awaited)"
-    assessment: "import-call-promise"
-  - path: "test/language/expressions/dynamic-import/catch/nested-async-gen-retu\
-      rn-await-instn-iee-err-ambiguous-import.js"
-    proposedOwner: "adr:0016-dynamic-source-boundary"
-    priorCohort: "source-subject"
-    sourceDigest: "edaf826a6dc889c720e364707cb49f128333825715e01fa0303\
-      15dca06535ce6"
-    observationDigest: "1ff81670d3e21e29c25dc6494758bc2b4b92\
-      42ba6def83ad3e5c069237901d96"
-    missingDynamicTag: false
-    section: "sec-import-call-runtime-semantics-evaluation"
-    subject: "IndirectExportEntries validation - ambiguous imported bindings
-      (nested in async generator, returns awaited)"
-    assessment: ds11-static-module-ambiguous
-  - path: "test/language/expressions/dynamic-import/catch/nested-async-gen-retu\
-      rn-await-instn-iee-err-circular.js"
-    proposedOwner: "adr:0016-dynamic-source-boundary"
-    priorCohort: "source-subject"
-    sourceDigest: "effc28c6c369c787215e870bd4f9e62d353601958523633887d\
-      29e7323ed61c1"
-    observationDigest: "f04c76004242925111c77cf2713a560c7aa9\
-      7e5e9bb58f9e7dd8f1b990e5aa3e"
-    missingDynamicTag: false
-    section: "sec-import-call-runtime-semantics-evaluation"
-    subject: "IndirectExportEntries validation - circular imported bindings
-      (nested in async generator, returns awaited)"
-    assessment: ds11-static-module-circular
   - path: "test/language/expressions/dynamic-import/catch/nested-async-gen-retu\
       rn-await-specifier-tostring-abrupt-rejects.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -18482,58 +18053,6 @@ paths:
       evaluation (nested block)"
     assessment: "import-call-promise"
   - path: "test/language/expressions/dynamic-import/catch/nested-block-import-c\
-      atch-eval-script-code-target.js"
-    proposedOwner: "adr:0016-dynamic-source-boundary"
-    priorCohort: "source-subject"
-    sourceDigest: "bde7dfc2dcd5c86989b7e0521474a67faa533f018f7138a51cd\
-      993e0bf01de57"
-    observationDigest: "b1a44bfa92abbc4c69c1f68491828147e768\
-      16a84e56792fa845971df6bfbeb5"
-    missingDynamicTag: false
-    section: "sec-import-call-runtime-semantics-evaluation"
-    subject: "import() from a module code can load a file with script code, but
-      the target is resolved into a Module Record (nested block)"
-    assessment: ds11-static-module-goal
-  - path: "test/language/expressions/dynamic-import/catch/nested-block-import-c\
-      atch-file-does-not-exist.js"
-    proposedOwner: "adr:0016-dynamic-source-boundary"
-    priorCohort: "source-subject"
-    sourceDigest: "415a4dc9f9d9b5b1e5b72ef1362052de62c13849ae8d4207973\
-      74017910bdc03"
-    observationDigest: "d94bf5a32447fcdfa805276208bcf332c4ae\
-      b7fa75f2e0166284cc52734688cf"
-    missingDynamicTag: false
-    section: "sec-import-call-runtime-semantics-evaluation"
-    subject: "Non existent file can't resolve to a Script or Module Record
-      (nested block)"
-    assessment: "import-call-promise"
-  - path: "test/language/expressions/dynamic-import/catch/nested-block-import-c\
-      atch-instn-iee-err-ambiguous-import.js"
-    proposedOwner: "adr:0016-dynamic-source-boundary"
-    priorCohort: "source-subject"
-    sourceDigest: "5400b931f1f0dd6d7f80b63cab7638bf7aed3421b00d9f5a7b0\
-      a5c650efe84a2"
-    observationDigest: "14eee6a52dbd5ded677528d84b4e22ebf163\
-      0e5d82a507c2a5aceab0c8145e37"
-    missingDynamicTag: false
-    section: "sec-import-call-runtime-semantics-evaluation"
-    subject: "IndirectExportEntries validation - ambiguous imported bindings
-      (nested block)"
-    assessment: ds11-static-module-ambiguous
-  - path: "test/language/expressions/dynamic-import/catch/nested-block-import-c\
-      atch-instn-iee-err-circular.js"
-    proposedOwner: "adr:0016-dynamic-source-boundary"
-    priorCohort: "source-subject"
-    sourceDigest: "a75b3a55977b05a11e2c199a4813343ec5f612e81eb6e4cb169\
-      627a3e820ad3d"
-    observationDigest: "c624f40378adebc958b1ac733df4dc43945d\
-      8c518a39d425efc9bca839f6fbbb"
-    missingDynamicTag: false
-    section: "sec-import-call-runtime-semantics-evaluation"
-    subject: "IndirectExportEntries validation - circular imported bindings
-      (nested block)"
-    assessment: ds11-static-module-circular
-  - path: "test/language/expressions/dynamic-import/catch/nested-block-import-c\
       atch-specifier-tostring-abrupt-rejects.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "source-subject"
@@ -18573,58 +18092,6 @@ paths:
       evaluation (nested block syntax)"
     assessment: "import-call-promise"
   - path: "test/language/expressions/dynamic-import/catch/nested-block-labeled-\
-      eval-script-code-target.js"
-    proposedOwner: "adr:0016-dynamic-source-boundary"
-    priorCohort: "source-subject"
-    sourceDigest: "8d401876cfe70670a3d12c79caf5aa418c449301a128ef32f45\
-      1362c59ab94fd"
-    observationDigest: "43cebbde86a27b758d7273db59425308510e\
-      db17b8f3b08d582ce775dc8e4900"
-    missingDynamicTag: false
-    section: "sec-import-call-runtime-semantics-evaluation"
-    subject: "import() from a module code can load a file with script code, but
-      the target is resolved into a Module Record (nested block syntax)"
-    assessment: ds11-static-module-goal
-  - path: "test/language/expressions/dynamic-import/catch/nested-block-labeled-\
-      file-does-not-exist.js"
-    proposedOwner: "adr:0016-dynamic-source-boundary"
-    priorCohort: "source-subject"
-    sourceDigest: "ca5edab1b1f4010246ad4f2e497df2c60df3b4c748124c9cd5c\
-      f72d1d815ff23"
-    observationDigest: "630d2d379b5af1128efaecc83c2461a122db\
-      8cefa664ecc2c3e2eb3451785059"
-    missingDynamicTag: false
-    section: "sec-import-call-runtime-semantics-evaluation"
-    subject: "Non existent file can't resolve to a Script or Module Record
-      (nested block syntax)"
-    assessment: "import-call-promise"
-  - path: "test/language/expressions/dynamic-import/catch/nested-block-labeled-\
-      instn-iee-err-ambiguous-import.js"
-    proposedOwner: "adr:0016-dynamic-source-boundary"
-    priorCohort: "source-subject"
-    sourceDigest: "678b74d77c92786fe4feb52be8fda1a14f5e66bfcc66ef2be92\
-      3986848bf786d"
-    observationDigest: "e34d51a2e42557eb31c9d5e8036f91895817\
-      8a81ff39d9366086d4333f7cda59"
-    missingDynamicTag: false
-    section: "sec-import-call-runtime-semantics-evaluation"
-    subject: "IndirectExportEntries validation - ambiguous imported bindings
-      (nested block syntax)"
-    assessment: ds11-static-module-ambiguous
-  - path: "test/language/expressions/dynamic-import/catch/nested-block-labeled-\
-      instn-iee-err-circular.js"
-    proposedOwner: "adr:0016-dynamic-source-boundary"
-    priorCohort: "source-subject"
-    sourceDigest: "755f101399c67d2f9ea4da665c06df3076f9f157a2fa374677f\
-      7da3800ce6fd2"
-    observationDigest: "c9e0bad5cdbb6584812488e83a1b2c0049c8\
-      62dd6a4405a98a5cc4f1bb568a87"
-    missingDynamicTag: false
-    section: "sec-import-call-runtime-semantics-evaluation"
-    subject: "IndirectExportEntries validation - circular imported bindings
-      (nested block syntax)"
-    assessment: ds11-static-module-circular
-  - path: "test/language/expressions/dynamic-import/catch/nested-block-labeled-\
       specifier-tostring-abrupt-rejects.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "source-subject"
@@ -18663,58 +18130,6 @@ paths:
     subject: "Abrupt completion during module evaluation precludes further
       evaluation (nested do while syntax)"
     assessment: "import-call-promise"
-  - path: "test/language/expressions/dynamic-import/catch/nested-do-while-eval-\
-      script-code-target.js"
-    proposedOwner: "adr:0016-dynamic-source-boundary"
-    priorCohort: "source-subject"
-    sourceDigest: "b72ba7a1336a88977d7f5fc979510e227a640cf05ffe2f1a7b5\
-      33dbb2eb7b338"
-    observationDigest: "90f8f12e976d1449a1d3eff25a8567523915\
-      b290d8cd48da68e6f336c85da2c0"
-    missingDynamicTag: false
-    section: "sec-import-call-runtime-semantics-evaluation"
-    subject: "import() from a module code can load a file with script code, but
-      the target is resolved into a Module Record (nested do while syntax)"
-    assessment: ds11-static-module-goal
-  - path: "test/language/expressions/dynamic-import/catch/nested-do-while-file-\
-      does-not-exist.js"
-    proposedOwner: "adr:0016-dynamic-source-boundary"
-    priorCohort: "source-subject"
-    sourceDigest: "8b2ee7aeffa7d9302ae114624cd5507ac4eb311d701acbb7f33\
-      b2b01e68466cc"
-    observationDigest: "c87f80e496c67d2cc7d078e2846135c61370\
-      85fc5c04e141e58a09b75f412e54"
-    missingDynamicTag: false
-    section: "sec-import-call-runtime-semantics-evaluation"
-    subject: "Non existent file can't resolve to a Script or Module Record
-      (nested do while syntax)"
-    assessment: "import-call-promise"
-  - path: "test/language/expressions/dynamic-import/catch/nested-do-while-instn\
-      -iee-err-ambiguous-import.js"
-    proposedOwner: "adr:0016-dynamic-source-boundary"
-    priorCohort: "source-subject"
-    sourceDigest: "d51c1a6d82eae0e18611ff9df3228f7cdf77b720436c72f097f\
-      f700ee8e53823"
-    observationDigest: "74deae3093c0e21b044099bd5acf705d99a0\
-      49ccce63bf4b5b8e9c61c34a5db7"
-    missingDynamicTag: false
-    section: "sec-import-call-runtime-semantics-evaluation"
-    subject: "IndirectExportEntries validation - ambiguous imported bindings
-      (nested do while syntax)"
-    assessment: ds11-static-module-ambiguous
-  - path: "test/language/expressions/dynamic-import/catch/nested-do-while-instn\
-      -iee-err-circular.js"
-    proposedOwner: "adr:0016-dynamic-source-boundary"
-    priorCohort: "source-subject"
-    sourceDigest: "a14fe97658fbe424163ea0e9209f5af6b6a60bd4b22be7aa098\
-      34154608f8642"
-    observationDigest: "34368aea29538a667f64319c9dc5582db978\
-      9dc354c698c41c2916278b4bd6d8"
-    missingDynamicTag: false
-    section: "sec-import-call-runtime-semantics-evaluation"
-    subject: "IndirectExportEntries validation - circular imported bindings
-      (nested do while syntax)"
-    assessment: ds11-static-module-circular
   - path: "test/language/expressions/dynamic-import/catch/nested-do-while-speci\
       fier-tostring-abrupt-rejects.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -18755,58 +18170,6 @@ paths:
       evaluation (nested else)"
     assessment: "import-call-promise"
   - path: "test/language/expressions/dynamic-import/catch/nested-else-import-ca\
-      tch-eval-script-code-target.js"
-    proposedOwner: "adr:0016-dynamic-source-boundary"
-    priorCohort: "source-subject"
-    sourceDigest: "f5b1a771a8d9e7f5a0a36c2218dd99d7f61363c71fd134645a8\
-      16a5db35d8077"
-    observationDigest: "23d38b3829bcefc1b245bbe115de2c6cb121\
-      74fb0d5f0a2b644f9f7e98f8fe3e"
-    missingDynamicTag: false
-    section: "sec-import-call-runtime-semantics-evaluation"
-    subject: "import() from a module code can load a file with script code, but
-      the target is resolved into a Module Record (nested else)"
-    assessment: ds11-static-module-goal
-  - path: "test/language/expressions/dynamic-import/catch/nested-else-import-ca\
-      tch-file-does-not-exist.js"
-    proposedOwner: "adr:0016-dynamic-source-boundary"
-    priorCohort: "source-subject"
-    sourceDigest: "6e7e5aa7e65d6b46591bae9f55eda79d5a1b22ecac6142a9ad0\
-      17f0dc3056a00"
-    observationDigest: "4861160f1db54473ed41aa2d1bfcf3b1ccb9\
-      72062b352cde9f04617ff57dd243"
-    missingDynamicTag: false
-    section: "sec-import-call-runtime-semantics-evaluation"
-    subject: "Non existent file can't resolve to a Script or Module Record
-      (nested else)"
-    assessment: "import-call-promise"
-  - path: "test/language/expressions/dynamic-import/catch/nested-else-import-ca\
-      tch-instn-iee-err-ambiguous-import.js"
-    proposedOwner: "adr:0016-dynamic-source-boundary"
-    priorCohort: "source-subject"
-    sourceDigest: "7e4c55da0a7b8a6250df14380aefc5a9d4e8d680af94f3ca262\
-      1670457807a7b"
-    observationDigest: "5a90afeec8f5264ed968bdf13b86c29c5059\
-      cedbfc7b87db8e499cd38e7b0590"
-    missingDynamicTag: false
-    section: "sec-import-call-runtime-semantics-evaluation"
-    subject: "IndirectExportEntries validation - ambiguous imported bindings
-      (nested else)"
-    assessment: ds11-static-module-ambiguous
-  - path: "test/language/expressions/dynamic-import/catch/nested-else-import-ca\
-      tch-instn-iee-err-circular.js"
-    proposedOwner: "adr:0016-dynamic-source-boundary"
-    priorCohort: "source-subject"
-    sourceDigest: "28d93b1653c3a30bbe1a43e8d6dc59689bf2f2ca351d2a953c8\
-      f7937ef6ccf2b"
-    observationDigest: "3324b1ea2431d90894e5e7e75f187dd86098\
-      ba5b9cb57a8b0488b3e08e34be82"
-    missingDynamicTag: false
-    section: "sec-import-call-runtime-semantics-evaluation"
-    subject: "IndirectExportEntries validation - circular imported bindings
-      (nested else)"
-    assessment: ds11-static-module-circular
-  - path: "test/language/expressions/dynamic-import/catch/nested-else-import-ca\
       tch-specifier-tostring-abrupt-rejects.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "source-subject"
@@ -18844,58 +18207,6 @@ paths:
     subject: "Abrupt completion during module evaluation precludes further
       evaluation (nested function)"
     assessment: "import-call-promise"
-  - path: "test/language/expressions/dynamic-import/catch/nested-function-impor\
-      t-catch-eval-script-code-target.js"
-    proposedOwner: "adr:0016-dynamic-source-boundary"
-    priorCohort: "source-subject"
-    sourceDigest: "4b23050514782ae86fc00791617097b64f8483d259b21b3189f\
-      976f50c025772"
-    observationDigest: "7ffb9971a29178f8209be936525d7749b1c4\
-      3552c5dc8eabdc9d170f60eace44"
-    missingDynamicTag: false
-    section: "sec-import-call-runtime-semantics-evaluation"
-    subject: "import() from a module code can load a file with script code, but
-      the target is resolved into a Module Record (nested function)"
-    assessment: ds11-static-module-goal
-  - path: "test/language/expressions/dynamic-import/catch/nested-function-impor\
-      t-catch-file-does-not-exist.js"
-    proposedOwner: "adr:0016-dynamic-source-boundary"
-    priorCohort: "source-subject"
-    sourceDigest: "56128ebddcac59d9b29dac9bd9628ceba395dc9d8a7b8d4d362\
-      4977105e5db06"
-    observationDigest: "f2700d1d6642582f85767411417b4a1bf64d\
-      f0b2d1c8f79c61b3b805342c9fa6"
-    missingDynamicTag: false
-    section: "sec-import-call-runtime-semantics-evaluation"
-    subject: "Non existent file can't resolve to a Script or Module Record
-      (nested function)"
-    assessment: "import-call-promise"
-  - path: "test/language/expressions/dynamic-import/catch/nested-function-impor\
-      t-catch-instn-iee-err-ambiguous-import.js"
-    proposedOwner: "adr:0016-dynamic-source-boundary"
-    priorCohort: "source-subject"
-    sourceDigest: "f1c2d7f986a74b264469ca6b8580c8c76fe080207e09ca58f7e\
-      c94bfdfa03f9a"
-    observationDigest: "18e886417b5c86367b32fa038ed4a82c8039\
-      300e25e9f2cf2f86e681ebbde86d"
-    missingDynamicTag: false
-    section: "sec-import-call-runtime-semantics-evaluation"
-    subject: "IndirectExportEntries validation - ambiguous imported bindings
-      (nested function)"
-    assessment: ds11-static-module-ambiguous
-  - path: "test/language/expressions/dynamic-import/catch/nested-function-impor\
-      t-catch-instn-iee-err-circular.js"
-    proposedOwner: "adr:0016-dynamic-source-boundary"
-    priorCohort: "source-subject"
-    sourceDigest: "9d723e3e7a08b6d4b3cdb28ec7c4d043d3ad7b6e26569b05d73\
-      cd799ba29efec"
-    observationDigest: "abf2d3a4919819b68fc14955d8ce503e44d6\
-      0ab943fded8ee1d2d2efd1656572"
-    missingDynamicTag: false
-    section: "sec-import-call-runtime-semantics-evaluation"
-    subject: "IndirectExportEntries validation - circular imported bindings
-      (nested function)"
-    assessment: ds11-static-module-circular
   - path: "test/language/expressions/dynamic-import/catch/nested-function-impor\
       t-catch-specifier-tostring-abrupt-rejects.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -18936,58 +18247,6 @@ paths:
       evaluation (nested if)"
     assessment: "import-call-promise"
   - path: "test/language/expressions/dynamic-import/catch/nested-if-import-catc\
-      h-eval-script-code-target.js"
-    proposedOwner: "adr:0016-dynamic-source-boundary"
-    priorCohort: "source-subject"
-    sourceDigest: "2f05d1644f9989cbcfdba1bb61be498164583cb4dfb65b81a1a\
-      aec9caf7bbc6b"
-    observationDigest: "a16af6b898bd302503b8a7221226cb7b17fa\
-      9add3ea4e93ea5d3a7dd3ddefd48"
-    missingDynamicTag: false
-    section: "sec-import-call-runtime-semantics-evaluation"
-    subject: "import() from a module code can load a file with script code, but
-      the target is resolved into a Module Record (nested if)"
-    assessment: ds11-static-module-goal
-  - path: "test/language/expressions/dynamic-import/catch/nested-if-import-catc\
-      h-file-does-not-exist.js"
-    proposedOwner: "adr:0016-dynamic-source-boundary"
-    priorCohort: "source-subject"
-    sourceDigest: "86e5b560aebb4ef9e5107f04a70449f7b3d644e46020ab0149a\
-      7b74e62d2ea13"
-    observationDigest: "a7fdfbd29ce460aea4579f20c06ddd1b6092\
-      10a9b8b18a815b106b8cb42b5004"
-    missingDynamicTag: false
-    section: "sec-import-call-runtime-semantics-evaluation"
-    subject: "Non existent file can't resolve to a Script or Module Record
-      (nested if)"
-    assessment: "import-call-promise"
-  - path: "test/language/expressions/dynamic-import/catch/nested-if-import-catc\
-      h-instn-iee-err-ambiguous-import.js"
-    proposedOwner: "adr:0016-dynamic-source-boundary"
-    priorCohort: "source-subject"
-    sourceDigest: "7b9d7a7588c1189e68ee2cec6851bdcd1afa1e5e7123871def6\
-      c945b4df9aafc"
-    observationDigest: "6ef23d8d7e859a4fec42b39e1cf2707f75f2\
-      257d636f4d8f0891195f17772c04"
-    missingDynamicTag: false
-    section: "sec-import-call-runtime-semantics-evaluation"
-    subject: "IndirectExportEntries validation - ambiguous imported bindings
-      (nested if)"
-    assessment: ds11-static-module-ambiguous
-  - path: "test/language/expressions/dynamic-import/catch/nested-if-import-catc\
-      h-instn-iee-err-circular.js"
-    proposedOwner: "adr:0016-dynamic-source-boundary"
-    priorCohort: "source-subject"
-    sourceDigest: "ec0e1969ff1394f9bfa789947922169558d39eab2369d88fbb9\
-      4f17699128ac3"
-    observationDigest: "028e03f544c4b16a530d670ce2594e711c3d\
-      fb3d25d8be75eb9b5233cb06a328"
-    missingDynamicTag: false
-    section: "sec-import-call-runtime-semantics-evaluation"
-    subject: "IndirectExportEntries validation - circular imported bindings
-      (nested if)"
-    assessment: ds11-static-module-circular
-  - path: "test/language/expressions/dynamic-import/catch/nested-if-import-catc\
       h-specifier-tostring-abrupt-rejects.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "source-subject"
@@ -19025,58 +18284,6 @@ paths:
     subject: "Abrupt completion during module evaluation precludes further
       evaluation (nested while)"
     assessment: "import-call-promise"
-  - path: "test/language/expressions/dynamic-import/catch/nested-while-import-c\
-      atch-eval-script-code-target.js"
-    proposedOwner: "adr:0016-dynamic-source-boundary"
-    priorCohort: "source-subject"
-    sourceDigest: "007026493b355eaf6bfea86485571f569c8f7ef0cb427cf1845\
-      eb0666a175508"
-    observationDigest: "c5b5d762c62c4fbb4bc93e77899a1987ac87\
-      cd16eb1239dde4314dea460da8c6"
-    missingDynamicTag: false
-    section: "sec-import-call-runtime-semantics-evaluation"
-    subject: "import() from a module code can load a file with script code, but
-      the target is resolved into a Module Record (nested while)"
-    assessment: ds11-static-module-goal
-  - path: "test/language/expressions/dynamic-import/catch/nested-while-import-c\
-      atch-file-does-not-exist.js"
-    proposedOwner: "adr:0016-dynamic-source-boundary"
-    priorCohort: "source-subject"
-    sourceDigest: "3caf4d2dff370beda2c0e7f49bfab6b896eb9b0c6d49033414f\
-      3723e38f229be"
-    observationDigest: "8325b27a492f396e62d205f45897ea54f2ae\
-      2b16944fab8687a4d670de47548d"
-    missingDynamicTag: false
-    section: "sec-import-call-runtime-semantics-evaluation"
-    subject: "Non existent file can't resolve to a Script or Module Record
-      (nested while)"
-    assessment: "import-call-promise"
-  - path: "test/language/expressions/dynamic-import/catch/nested-while-import-c\
-      atch-instn-iee-err-ambiguous-import.js"
-    proposedOwner: "adr:0016-dynamic-source-boundary"
-    priorCohort: "source-subject"
-    sourceDigest: "bba55ad931102207de2f8293c908cab0bdc61aa5b03caa2bba7\
-      0ea04384eb04f"
-    observationDigest: "cc57a5ce0de57874937b5f110ad2de6d4473\
-      f28c4e6e0574dca3cb2a7d90a4f9"
-    missingDynamicTag: false
-    section: "sec-import-call-runtime-semantics-evaluation"
-    subject: "IndirectExportEntries validation - ambiguous imported bindings
-      (nested while)"
-    assessment: ds11-static-module-ambiguous
-  - path: "test/language/expressions/dynamic-import/catch/nested-while-import-c\
-      atch-instn-iee-err-circular.js"
-    proposedOwner: "adr:0016-dynamic-source-boundary"
-    priorCohort: "source-subject"
-    sourceDigest: "4eb0bb6a811ccf3ab4efbd7b35d9390ecd96950b260a33123b0\
-      90d3f69cecafe"
-    observationDigest: "7628d94656aabc8c529bfc03e2d8c8ab78db\
-      5a88a455f592106dd840e813e745"
-    missingDynamicTag: false
-    section: "sec-import-call-runtime-semantics-evaluation"
-    subject: "IndirectExportEntries validation - circular imported bindings
-      (nested while)"
-    assessment: ds11-static-module-circular
   - path: "test/language/expressions/dynamic-import/catch/nested-while-import-c\
       atch-specifier-tostring-abrupt-rejects.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -19116,58 +18323,6 @@ paths:
     subject: "Abrupt completion during module evaluation precludes further
       evaluation (top level)"
     assessment: "import-call-promise"
-  - path: "test/language/expressions/dynamic-import/catch/top-level-import-catc\
-      h-eval-script-code-target.js"
-    proposedOwner: "adr:0016-dynamic-source-boundary"
-    priorCohort: "source-subject"
-    sourceDigest: "d805f6f065fe0a6503081bdac19d0bbacc02d2c9376c54931f3\
-      5e0c2617a0ba3"
-    observationDigest: "145146f1638122fe3c64f9955be3d5c86ce2\
-      ff18a2d5c6d84f7ea3037bff26b5"
-    missingDynamicTag: false
-    section: "sec-import-call-runtime-semantics-evaluation"
-    subject: "import() from a module code can load a file with script code, but
-      the target is resolved into a Module Record (top level)"
-    assessment: ds11-static-module-goal
-  - path: "test/language/expressions/dynamic-import/catch/top-level-import-catc\
-      h-file-does-not-exist.js"
-    proposedOwner: "adr:0016-dynamic-source-boundary"
-    priorCohort: "source-subject"
-    sourceDigest: "da4d4db00afa88dc9da64cb5ca1b0e966108bdaadf9ee992a69\
-      9ee14286f7d4a"
-    observationDigest: "25c1ae29b56a5eacba3cf704cc5857df2452\
-      ece8d00d1faacbf83a160c3f4c7f"
-    missingDynamicTag: false
-    section: "sec-import-call-runtime-semantics-evaluation"
-    subject: "Non existent file can't resolve to a Script or Module Record (top
-      level)"
-    assessment: "import-call-promise"
-  - path: "test/language/expressions/dynamic-import/catch/top-level-import-catc\
-      h-instn-iee-err-ambiguous-import.js"
-    proposedOwner: "adr:0016-dynamic-source-boundary"
-    priorCohort: "source-subject"
-    sourceDigest: "190cb4d849419a5c5fdc76de9c27f548262909cc0ad57b79764\
-      4a7d6347653d6"
-    observationDigest: "bd4cd02ad3027070dd76e4c7a4e9ad29d4f3\
-      68c7c78834e5b7abc70480db6fd4"
-    missingDynamicTag: false
-    section: "sec-import-call-runtime-semantics-evaluation"
-    subject: "IndirectExportEntries validation - ambiguous imported bindings
-      (top level)"
-    assessment: ds11-static-module-ambiguous
-  - path: "test/language/expressions/dynamic-import/catch/top-level-import-catc\
-      h-instn-iee-err-circular.js"
-    proposedOwner: "adr:0016-dynamic-source-boundary"
-    priorCohort: "source-subject"
-    sourceDigest: "fa1f220f0670c55e91c2ed71d008a95819c8b60bcd086689d87\
-      ac4a6aac7d2df"
-    observationDigest: "281d444210872faa69df2040dd8b9c586d56\
-      7982f0af9857d81db08d48c9552a"
-    missingDynamicTag: false
-    section: "sec-import-call-runtime-semantics-evaluation"
-    subject: "IndirectExportEntries validation - circular imported bindings (top
-      level)"
-    assessment: ds11-static-module-circular
   - path: "test/language/expressions/dynamic-import/catch/top-level-import-catc\
       h-specifier-tostring-abrupt-rejects.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -19345,8 +18500,8 @@ paths:
     priorCohort: "incidental-scaffolding"
     sourceDigest: "b0ddc2e3390304f469e8e6348c28ee7407a00a62356c9889\
       fdf9439c8152f881"
-    observationDigest: "f688097e98d5b6dbd988b1f72c81e79c2877292f6b5\
-      3a6d5b73882673d9a4ef0"
+    observationDigest: "238d033beab7a1c86ef9dde33f900146723930310b7\
+      d8637d963e56a0035c6cd"
     missingDynamicTag: false
     section: "sec-moduleevaluation"
     subject: "Requested modules are evaluated exactly once"
@@ -20686,18 +19841,6 @@ paths:
     subject: "ImportCall is a CallExpression and can be used before a template
       literal"
     assessment: "import-call-syntax"
-  - path: "test/language/expressions/dynamic-import/syntax/valid/nested-arrow-a\
-      ssignment-expression-empty-str-is-valid-assign-expr.js"
-    proposedOwner: "adr:0016-dynamic-source-boundary"
-    priorCohort: "source-subject"
-    sourceDigest: "88d8654632859f8fbdde73cb7b45186eb1882d38925873e2458\
-      aefb7dd0c494d"
-    observationDigest: "1455e07043bac81ea3a34b3d3ea4496f0f68\
-      79e6010f45826717d3646b78717e"
-    missingDynamicTag: false
-    section: "sec-import-call-runtime-semantics-evaluation"
-    subject: "Calling import('') (nested arrow syntax)"
-    assessment: "import-call-syntax"
   - path: "test/language/expressions/dynamic-import/syntax/vali\
       d/nested-arrow-assignment-expression-import-attribute\
       s-trailing-comma-first.js"
@@ -20751,18 +19894,6 @@ paths:
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "import() can be used in script code (nested arrow syntax)"
     assessment: "import-call-syntax"
-  - path: "test/language/expressions/dynamic-import/syntax/valid/nested-arrow-e\
-      mpty-str-is-valid-assign-expr.js"
-    proposedOwner: "adr:0016-dynamic-source-boundary"
-    priorCohort: "source-subject"
-    sourceDigest: "8da9d35589c2368c7508357ef6656a58736b9f76fd5d4f26747\
-      96e2d0b9489b9"
-    observationDigest: "9de0108a4a70ee42720d39377b4f214cd98c\
-      2e95fafd08f2f94cae890a3b80c3"
-    missingDynamicTag: false
-    section: "sec-import-call-runtime-semantics-evaluation"
-    subject: "Calling import('') (nested arrow syntax)"
-    assessment: "import-call-syntax"
   - path: "test/language/expressions/dynamic-import/syntax/vali\
       d/nested-arrow-import-attributes-trailing-comma-first\
       .js"
@@ -20815,18 +19946,6 @@ paths:
     missingDynamicTag: false
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "import() can be used in script code (nested arrow syntax)"
-    assessment: "import-call-syntax"
-  - path: "test/language/expressions/dynamic-import/syntax/valid/nested-async-a\
-      rrow-function-await-empty-str-is-valid-assign-expr.js"
-    proposedOwner: "adr:0016-dynamic-source-boundary"
-    priorCohort: "source-subject"
-    sourceDigest: "34af6ded5b3fc3bc05bd77f6985a939d57806e458de887eea22\
-      510b0e5216588"
-    observationDigest: "bf306d785e49558503e024c3217c17ebc5c3\
-      f3bff8a7f1be2ca9918a05cc9463"
-    missingDynamicTag: false
-    section: "sec-import-call-runtime-semantics-evaluation"
-    subject: "Calling import('') (nested in async arrow function)"
     assessment: "import-call-syntax"
   - path: "test/language/expressions/dynamic-import/syntax/vali\
       d/nested-async-arrow-function-await-import-attributes\
@@ -20882,18 +20001,6 @@ paths:
     subject: "import() can be used in script code (nested in async arr\
       ow function)"
     assessment: "import-call-syntax"
-  - path: "test/language/expressions/dynamic-import/syntax/valid/nested-async-a\
-      rrow-function-return-await-empty-str-is-valid-assign-expr.js"
-    proposedOwner: "adr:0016-dynamic-source-boundary"
-    priorCohort: "source-subject"
-    sourceDigest: "5d62a716926a3f2d8ab50a8059a42cdc3135c0f91345984fb95\
-      5d6842dfc91e8"
-    observationDigest: "35054a15110b030fca9ac4690f27e4e9b9dd\
-      abe7c764d6e4a915c4bc67b13b1e"
-    missingDynamicTag: false
-    section: "sec-import-call-runtime-semantics-evaluation"
-    subject: "Calling import('') (nested in async arrow function, returned)"
-    assessment: "import-call-syntax"
   - path: "test/language/expressions/dynamic-import/syntax/vali\
       d/nested-async-arrow-function-return-await-import-att\
       ributes-trailing-comma-first.js"
@@ -20948,18 +20055,6 @@ paths:
     subject: "import() can be used in script code (nested in async arrow
       function, returned)"
     assessment: "import-call-syntax"
-  - path: "test/language/expressions/dynamic-import/syntax/valid/nested-async-f\
-      unction-await-empty-str-is-valid-assign-expr.js"
-    proposedOwner: "adr:0016-dynamic-source-boundary"
-    priorCohort: "source-subject"
-    sourceDigest: "78a543f7c074dc38aec7410ce0b3f56ba25344ea12f144126c5\
-      94de47b4ccbb8"
-    observationDigest: "d048848f74ac00db48a13d58e48a2a460c5a\
-      193e38e72c5593a8a9f3922ec602"
-    missingDynamicTag: false
-    section: "sec-import-call-runtime-semantics-evaluation"
-    subject: "Calling import('') (nested arrow syntax)"
-    assessment: "import-call-syntax"
   - path: "test/language/expressions/dynamic-import/syntax/vali\
       d/nested-async-function-await-import-attributes-trail\
       ing-comma-first.js"
@@ -21013,18 +20108,6 @@ paths:
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "import() can be used in script code (nested arrow syntax)"
     assessment: "import-call-syntax"
-  - path: "test/language/expressions/dynamic-import/syntax/valid/nested-async-f\
-      unction-empty-str-is-valid-assign-expr.js"
-    proposedOwner: "adr:0016-dynamic-source-boundary"
-    priorCohort: "source-subject"
-    sourceDigest: "85c4f0eb982fcec851cbed18e1143befc3177687e818fa491d8\
-      c056eb5f1f4fd"
-    observationDigest: "9cda9a3bb5f570732b075b5524c80ca0902a\
-      53d4908ac1a70b585e1f7e00e049"
-    missingDynamicTag: false
-    section: "sec-import-call-runtime-semantics-evaluation"
-    subject: "Calling import('') (nested arrow syntax)"
-    assessment: "import-call-syntax"
   - path: "test/language/expressions/dynamic-import/syntax/vali\
       d/nested-async-function-import-attributes-trailing-co\
       mma-first.js"
@@ -21065,18 +20148,6 @@ paths:
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "ImportCall is a CallExpression can be nested in other import calls
       (nested arrow syntax)"
-    assessment: "import-call-syntax"
-  - path: "test/language/expressions/dynamic-import/syntax/valid/nested-async-f\
-      unction-return-await-empty-str-is-valid-assign-expr.js"
-    proposedOwner: "adr:0016-dynamic-source-boundary"
-    priorCohort: "source-subject"
-    sourceDigest: "7eda816c13db2553f49b7338fe0b350d917c660383024966b1c\
-      3f794c1edb1dc"
-    observationDigest: "dac4efae4fedb3e4ffefa26379d679f12edc\
-      1bacc940d2ef852a1de586ee5b37"
-    missingDynamicTag: false
-    section: "sec-import-call-runtime-semantics-evaluation"
-    subject: "Calling import('') (nested arrow syntax)"
     assessment: "import-call-syntax"
   - path: "test/language/expressions/dynamic-import/syntax/vali\
       d/nested-async-function-return-await-import-attribute\
@@ -21143,18 +20214,6 @@ paths:
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "import() can be used in script code (nested arrow syntax)"
     assessment: "import-call-syntax"
-  - path: "test/language/expressions/dynamic-import/syntax/valid/nested-async-g\
-      en-await-empty-str-is-valid-assign-expr.js"
-    proposedOwner: "adr:0016-dynamic-source-boundary"
-    priorCohort: "source-subject"
-    sourceDigest: "6c9245b0fcfbb7aacea7e650823dc3a785b87ab433de9f7ed69\
-      7b7a74055d9ae"
-    observationDigest: "6d920ca4566b88d3f14986c2e8969d8af421\
-      c1ed2c9265bf4d43f6432e70ee33"
-    missingDynamicTag: false
-    section: "sec-import-call-runtime-semantics-evaluation"
-    subject: "Calling import('') (nested in async generator, awaited)"
-    assessment: "import-call-syntax"
   - path: "test/language/expressions/dynamic-import/syntax/vali\
       d/nested-async-gen-await-import-attributes-trailing-c\
       omma-first.js"
@@ -21209,18 +20268,6 @@ paths:
     subject: "import() can be used in script code (nested in async generator,
       awaited)"
     assessment: "import-call-syntax"
-  - path: "test/language/expressions/dynamic-import/syntax/valid/nested-block-e\
-      mpty-str-is-valid-assign-expr.js"
-    proposedOwner: "adr:0016-dynamic-source-boundary"
-    priorCohort: "source-subject"
-    sourceDigest: "f0761897cf2cefbec2d772b112efa71ec94858b7f442ddb3f0b\
-      74a37b5ae0f44"
-    observationDigest: "cd781841ebac974e05c159ed41353cb19821\
-      38006789761928bc4c327c4a7a3d"
-    missingDynamicTag: false
-    section: "sec-import-call-runtime-semantics-evaluation"
-    subject: "Calling import('') (nested block syntax)"
-    assessment: "import-call-syntax"
   - path: "test/language/expressions/dynamic-import/syntax/vali\
       d/nested-block-import-attributes-trailing-comma-first\
       .js"
@@ -21249,18 +20296,6 @@ paths:
     subject: "ImportCall trailing comma following second
       parameter (nested block syntax)"
     assessment: "import-call-attributes"
-  - path: "test/language/expressions/dynamic-import/syntax/valid/nested-block-l\
-      abeled-empty-str-is-valid-assign-expr.js"
-    proposedOwner: "adr:0016-dynamic-source-boundary"
-    priorCohort: "source-subject"
-    sourceDigest: "cfc7e838db3c5fd50583167c3f4ecd819dbbe0343c8a9ccd643\
-      07dd57e70b0a6"
-    observationDigest: "f2f7d82a4cab32ef46ea1fc8b13b99e6e237\
-      7432ecc5f14cf1d63ae8972e1bc9"
-    missingDynamicTag: false
-    section: "sec-import-call-runtime-semantics-evaluation"
-    subject: "Calling import('') (nested block syntax)"
-    assessment: "import-call-syntax"
   - path: "test/language/expressions/dynamic-import/syntax/vali\
       d/nested-block-labeled-import-attributes-trailing-com\
       ma-first.js"
@@ -21339,18 +20374,6 @@ paths:
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "import() can be used in script code (nested block syntax)"
     assessment: "import-call-syntax"
-  - path: "test/language/expressions/dynamic-import/syntax/valid/nested-do-whil\
-      e-empty-str-is-valid-assign-expr.js"
-    proposedOwner: "adr:0016-dynamic-source-boundary"
-    priorCohort: "source-subject"
-    sourceDigest: "8952e1ad828c5531b5b127231c0287dae5c693d0cd80bcf9ebf\
-      7514e5d406d2d"
-    observationDigest: "9b777768d47f4f21ad07eaad1434c2fb5e0b\
-      13ca82ed11062959ca8f80ab49e3"
-    missingDynamicTag: false
-    section: "sec-import-call-runtime-semantics-evaluation"
-    subject: "Calling import('') (nested do while syntax)"
-    assessment: "import-call-syntax"
   - path: "test/language/expressions/dynamic-import/syntax/vali\
       d/nested-do-while-import-attributes-trailing-comma-fi\
       rst.js"
@@ -21403,18 +20426,6 @@ paths:
     missingDynamicTag: false
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "import() can be used in script code (nested do while syntax)"
-    assessment: "import-call-syntax"
-  - path: "test/language/expressions/dynamic-import/syntax/valid/nested-else-br\
-      aceless-empty-str-is-valid-assign-expr.js"
-    proposedOwner: "adr:0016-dynamic-source-boundary"
-    priorCohort: "source-subject"
-    sourceDigest: "35a91ebae832a48466b06c65a6ce6fe87a7f444da1bbddf070b\
-      4df9bc82d3c4d"
-    observationDigest: "56dbbbdb9fb72d17916e1445b2dad06eec59\
-      7fbc57960f471500d8f72cdb05a4"
-    missingDynamicTag: false
-    section: "sec-import-call-runtime-semantics-evaluation"
-    subject: "Calling import('') (nested else syntax)"
     assessment: "import-call-syntax"
   - path: "test/language/expressions/dynamic-import/syntax/vali\
       d/nested-else-braceless-import-attributes-trailing-co\
@@ -21469,18 +20480,6 @@ paths:
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "import() can be used in script code (nested else syntax)"
     assessment: "import-call-syntax"
-  - path: "test/language/expressions/dynamic-import/syntax/valid/nested-else-em\
-      pty-str-is-valid-assign-expr.js"
-    proposedOwner: "adr:0016-dynamic-source-boundary"
-    priorCohort: "source-subject"
-    sourceDigest: "21c1c182fac7e557cbc46c6cd1e0e4c1caba03250a9a32644d4\
-      875bbc50a46b7"
-    observationDigest: "5e427e0eb948343ae667a87743a503311a06\
-      f5e03b57548eccba7ef97bfd6a27"
-    missingDynamicTag: false
-    section: "sec-import-call-runtime-semantics-evaluation"
-    subject: "Calling import('') (nested else syntax)"
-    assessment: "import-call-syntax"
   - path: "test/language/expressions/dynamic-import/syntax/vali\
       d/nested-else-import-attributes-trailing-comma-first.\
       js"
@@ -21534,18 +20533,6 @@ paths:
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "import() can be used in script code (nested else syntax)"
     assessment: "import-call-syntax"
-  - path: "test/language/expressions/dynamic-import/syntax/valid/nested-functio\
-      n-empty-str-is-valid-assign-expr.js"
-    proposedOwner: "adr:0016-dynamic-source-boundary"
-    priorCohort: "source-subject"
-    sourceDigest: "98e713332752154db86ea27047d04980c15d9225d0b53316ef5\
-      b967ab8b27ae3"
-    observationDigest: "eca026eea9eaa967b1847829864a08a00964\
-      76629d5c595bad8e9d881368d159"
-    missingDynamicTag: false
-    section: "sec-import-call-runtime-semantics-evaluation"
-    subject: "Calling import('') (nested function syntax)"
-    assessment: "import-call-syntax"
   - path: "test/language/expressions/dynamic-import/syntax/vali\
       d/nested-function-import-attributes-trailing-comma-fi\
       rst.js"
@@ -21586,18 +20573,6 @@ paths:
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "ImportCall is a CallExpression can be nested in other import calls
       (nested function syntax)"
-    assessment: "import-call-syntax"
-  - path: "test/language/expressions/dynamic-import/syntax/valid/nested-functio\
-      n-return-empty-str-is-valid-assign-expr.js"
-    proposedOwner: "adr:0016-dynamic-source-boundary"
-    priorCohort: "source-subject"
-    sourceDigest: "d6b379b74bbd87a7134e65592807549848727068bb6a09872f3\
-      e0f97a8439523"
-    observationDigest: "8d7652ff97af2534279b23a82cc57e2c77df\
-      78709dfe6c67e86d531e6bf71c37"
-    missingDynamicTag: false
-    section: "sec-import-call-runtime-semantics-evaluation"
-    subject: "Calling import('') (nested function syntax)"
     assessment: "import-call-syntax"
   - path: "test/language/expressions/dynamic-import/syntax/vali\
       d/nested-function-return-import-attributes-trailing-c\
@@ -21664,18 +20639,6 @@ paths:
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "import() can be used in script code (nested function syntax)"
     assessment: "import-call-syntax"
-  - path: "test/language/expressions/dynamic-import/syntax/valid/nested-if-brac\
-      eless-empty-str-is-valid-assign-expr.js"
-    proposedOwner: "adr:0016-dynamic-source-boundary"
-    priorCohort: "source-subject"
-    sourceDigest: "581c2f0a96c66067032d19e82acace11082e11f5bcd64412c77\
-      73d0042c3be04"
-    observationDigest: "15d948ef03fa2eccb730212c09463676f612\
-      41838a6f2565a6f0e6842ec09843"
-    missingDynamicTag: false
-    section: "sec-import-call-runtime-semantics-evaluation"
-    subject: "Calling import('') (nested if syntax)"
-    assessment: "import-call-syntax"
   - path: "test/language/expressions/dynamic-import/syntax/vali\
       d/nested-if-braceless-import-attributes-trailing-comm\
       a-first.js"
@@ -21729,18 +20692,6 @@ paths:
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "import() can be used in script code (nested if syntax)"
     assessment: "import-call-syntax"
-  - path: "test/language/expressions/dynamic-import/syntax/valid/nested-if-empt\
-      y-str-is-valid-assign-expr.js"
-    proposedOwner: "adr:0016-dynamic-source-boundary"
-    priorCohort: "source-subject"
-    sourceDigest: "163495e1de2382312bbbff62dada2c16cc820b786a3b0fc8aeb\
-      c71de5c79efd5"
-    observationDigest: "214e6c3fd24aa759be48094c80f4fab739b1\
-      f326eb9ce7d1668f8743872fe7f3"
-    missingDynamicTag: false
-    section: "sec-import-call-runtime-semantics-evaluation"
-    subject: "Calling import('') (nested if syntax)"
-    assessment: "import-call-syntax"
   - path: "test/language/expressions/dynamic-import/syntax/vali\
       d/nested-if-import-attributes-trailing-comma-first.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -21792,18 +20743,6 @@ paths:
     missingDynamicTag: false
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "import() can be used in script code (nested if syntax)"
-    assessment: "import-call-syntax"
-  - path: "test/language/expressions/dynamic-import/syntax/valid/nested-while-e\
-      mpty-str-is-valid-assign-expr.js"
-    proposedOwner: "adr:0016-dynamic-source-boundary"
-    priorCohort: "source-subject"
-    sourceDigest: "d58fc23c3f0fd5f94c2dc0b0342a4298394d4b21092467912f0\
-      c011f7292735f"
-    observationDigest: "2e867a7259bbf99ee60c7d5ae85b2eb2a36e\
-      eea8380f5e1b4743803ccaf24c14"
-    missingDynamicTag: false
-    section: "sec-import-call-runtime-semantics-evaluation"
-    subject: "Calling import('') (nested while syntax)"
     assessment: "import-call-syntax"
   - path: "test/language/expressions/dynamic-import/syntax/vali\
       d/nested-while-import-attributes-trailing-comma-first\
@@ -21857,31 +20796,6 @@ paths:
     missingDynamicTag: false
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "import() can be used in script code (nested while syntax)"
-    assessment: "import-call-syntax"
-  - path: "test/language/expressions/dynamic-import/syntax/valid/nested-with-em\
-      pty-str-is-valid-assign-expr.js"
-    proposedOwner: "adr:0016-dynamic-source-boundary"
-    priorCohort: "source-subject"
-    sourceDigest: "b48dc0f25b2f8949d1455a06b7d3fa03586f95749116d4f39fb\
-      db312ca8fd01b"
-    observationDigest: "4b12470d0c61038f5516d5a79e3ce7796a5f\
-      79a8da94bca635707387d29e283a"
-    missingDynamicTag: false
-    section: "sec-import-call-runtime-semantics-evaluation"
-    subject: "Calling import('') (nested with syntax)"
-    assessment: "import-call-syntax"
-  - path: "test/language/expressions/dynamic-import/syntax/valid/nested-with-ex\
-      pression-empty-str-is-valid-assign-expr.js"
-    proposedOwner: "adr:0016-dynamic-source-boundary"
-    priorCohort: "source-subject"
-    sourceDigest: "b7c95bc1d7e084f6ccfad96d963bc6c9b3abc2f3920f55dbab3\
-      62f5340f5b8c5"
-    observationDigest: "4c5bc5a6373b94f210faa3ea612b0a32daa2\
-      35f93ab1d7ada2de9e8b42468a21"
-    missingDynamicTag: false
-    section: "sec-import-call-runtime-semantics-evaluation"
-    subject: "Calling import('') (nested with syntax in the expressio\
-      n position)"
     assessment: "import-call-syntax"
   - path: "test/language/expressions/dynamic-import/syntax/vali\
       d/nested-with-expression-import-attributes-trailing-c\
@@ -21992,32 +20906,6 @@ paths:
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "import() can be used in script code (nested with syntax)"
     assessment: "import-call-syntax"
-  - path: "test/language/expressions/dynamic-import/syntax/valid/new-covered-ex\
-      pression-is-valid.js"
-    proposedOwner: "adr:0016-dynamic-source-boundary"
-    priorCohort: "source-subject"
-    sourceDigest: "d56a222e2ac0cb546eeeb3da69ba8494786f031d3d29d32cf34\
-      1e5a72478e370"
-    observationDigest: "857e3117fea47516600e7b9b1a7fe76c6cdf\
-      855bb327dcfba7858b2066f28d8e"
-    missingDynamicTag: false
-    section: "prod-ImportCall"
-    subject: "ImportCall is a CallExpression and Expression, so it can be
-      wrapped for new expressions, while the same production is not possible
-      without the parentheses wrapping."
-    assessment: "import-call-syntax"
-  - path: "test/language/expressions/dynamic-import/syntax/valid/top-level-empt\
-      y-str-is-valid-assign-expr.js"
-    proposedOwner: "adr:0016-dynamic-source-boundary"
-    priorCohort: "source-subject"
-    sourceDigest: "fa2edf62bc74e3bb8f25236b685c70e180a1c7a469bb56d7f5a\
-      03bda922650b3"
-    observationDigest: "311e019b8008cb9a9afe6c2ffb1fbf046e52\
-      ecd74abd05e852c26a941e35b20c"
-    missingDynamicTag: false
-    section: "sec-import-call-runtime-semantics-evaluation"
-    subject: "Calling import('') (top level syntax)"
-    assessment: "import-call-syntax"
   - path: "test/language/expressions/dynamic-import/syntax/vali\
       d/top-level-import-attributes-trailing-comma-first.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -22075,8 +20963,8 @@ paths:
     priorCohort: "source-subject"
     sourceDigest: "e5f73c261c7bb18b9167a694c7fa6402217420cca1ddc609ef2\
       cef4cf7daeef0"
-    observationDigest: "e43e6825846a29632a9667bf151eb89860a8\
-      7b75fc0bf5e38547f1c6553b1719"
+    observationDigest: "f80405b2f2c65f19ca0c08a8e1fb77d694e3\
+      f1a41a9cd5b69116db1ab48a4ed4"
     missingDynamicTag: false
     section: "sec-finishdynamicimport"
     subject: "Resolve imports after a binding update"
@@ -22111,8 +20999,8 @@ paths:
     priorCohort: "incidental-scaffolding"
     sourceDigest: "a5306473292a9e64aca98b3ea0c7dd0c02390114711c1acd\
       6c7e791041918f9f"
-    observationDigest: "78efab8ad24bbb6c249d93df921f4402c3792559293\
-      57501ddf20485e3f8ec41"
+    observationDigest: "75801745a50653e86fb3b0d618c28e6cd8aaff1e7aa\
+      071d560298d2d3eb01110"
     missingDynamicTag: false
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "Modifications to named bindings that occur after
@@ -22188,8 +21076,8 @@ paths:
     priorCohort: "incidental-scaffolding"
     sourceDigest: "b5b616a9ae3f1062bf7cb43dad89632db468b772867cac68\
       3ad4faf41d38fa90"
-    observationDigest: "7f66f68a81919b85053ae3f8e4589c1320c02c9bffa\
-      7a44adae4c295944b4ab7"
+    observationDigest: "62efce40e380cf2a485bbe59a2b6d5d8bbca8b2299e\
+      9aa79622a2ca448a4b4f1"
     missingDynamicTag: false
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "Modifications to named bindings that occur after
@@ -22266,8 +21154,8 @@ paths:
     priorCohort: "incidental-scaffolding"
     sourceDigest: "391beff946bdebdbfcf818a1990a0325b175fd2cb814ee85\
       92626344c9a5058e"
-    observationDigest: "e8299ed375d8b67651a86811c381e03f27d30475ed8\
-      c82d7f17de2319f2bf45d"
+    observationDigest: "93c081a1a69eb72b052a084c64931846a9bf7e04d6c\
+      1e8711060bb56ecf3d120"
     missingDynamicTag: false
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "Modifications to named bindings that occur after
@@ -22347,8 +21235,8 @@ paths:
     priorCohort: "incidental-scaffolding"
     sourceDigest: "fcaeba2d4fa0a77c229cc34a2b9d5672f80e2bb9d3d0edb7\
       1003f0aaac571435"
-    observationDigest: "ec5af8852abced9f2635bbb5238fb8823b5fa474866\
-      eb44606578ca0d1c010e9"
+    observationDigest: "aed1a769147c1120b6f60081e9533b7a3f385b2e536\
+      888025a98f55c4851c5ff"
     missingDynamicTag: false
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "Modifications to named bindings that occur after
@@ -22427,8 +21315,8 @@ paths:
     priorCohort: "incidental-scaffolding"
     sourceDigest: "65a9370ac498901dee8e1c47b55c754bdc372bc148e9e8ff\
       3cb84a32a64a48e1"
-    observationDigest: "cac460eeee1e29e6ee35c1bd259b738d0086de5c9bb\
-      cfbfa7294fe7591badd80"
+    observationDigest: "6b4b694fd1d072b04ea2d87c7e019df515683fb5b41\
+      f20a30b9c68898621b703"
     missingDynamicTag: false
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "Modifications to named bindings that occur after
@@ -22506,8 +21394,8 @@ paths:
     priorCohort: "incidental-scaffolding"
     sourceDigest: "fae80388d419927da213c75b0112609febcb3fb033e9b42a\
       977b82339c53c2f2"
-    observationDigest: "d7a303be8fb6d18270a789648e44b6e69fc50eaf69f\
-      71648a2b19eb2928d3092"
+    observationDigest: "00f56a204f8120f2a6bd45568cf9a987d93f613da8f\
+      537159a5c7e14305731f0"
     missingDynamicTag: false
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "Modifications to named bindings that occur after
@@ -22560,8 +21448,8 @@ paths:
     priorCohort: "incidental-scaffolding"
     sourceDigest: "c597f91d86f6ba0fd8e77ef2ba72fb1154bf3bcc9b8b7e82\
       963b1f0ef85cf470"
-    observationDigest: "13147552f465bd71c14dc8a05aae90fc88c15442893\
-      cd7f45f0b9b0d7e818419"
+    observationDigest: "3ad7aef92b6a441dbec847caf045b6ac9a9f9b29ab4\
+      d849538223d6451f151c2"
     missingDynamicTag: false
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "Modifications to named bindings that occur after
@@ -22665,8 +21553,8 @@ paths:
     priorCohort: "incidental-scaffolding"
     sourceDigest: "68e4fd6fc6f93ef4417c498d95addc5555ee44d2bd858a89\
       7a7128b663792e46"
-    observationDigest: "e48fc50366f774cb3d962a8662d675d13baaa529c5d\
-      e4bd34d0cb6923f79df04"
+    observationDigest: "fc10c87deeaac64a3199aae5a7d138bd05c853d12a9\
+      1ba9323b4325b7d791bf4"
     missingDynamicTag: false
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "Modifications to named bindings that occur after
@@ -22744,8 +21632,8 @@ paths:
     priorCohort: "incidental-scaffolding"
     sourceDigest: "44c0d4998986fcb66ddbef6ea457b2ed205cd74609b941d6\
       da11c762ee8ac00b"
-    observationDigest: "31a34bc007115439ad5b2eaf609c2b2f00f1d95c5ed\
-      9ee3c92b9dae16271cd19"
+    observationDigest: "cd4768d83062cc7c346f3eee03e12b0d3d1ba4c12a5\
+      5083cf9626255bb421ea8"
     missingDynamicTag: false
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "Modifications to named bindings that occur after
@@ -22823,8 +21711,8 @@ paths:
     priorCohort: "incidental-scaffolding"
     sourceDigest: "6101c6392ae9f0db51643449d289706704c0a40c7027b256\
       f6c6068489ffe5fb"
-    observationDigest: "edba9b80921ca3f53caabe694ca06411fb48e827222\
-      18a7081d3efc992ae08c2"
+    observationDigest: "f9aa0acaa7c63bd94c8055e8e1b42b7ca6e5de989c3\
+      b982f1a46c9b180e82bfb"
     missingDynamicTag: false
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "Modifications to named bindings that occur after
@@ -22900,8 +21788,8 @@ paths:
     priorCohort: "incidental-scaffolding"
     sourceDigest: "bdd16ed959c226e62149f45449e175e8254c5ed3bb8eefee\
       8cf3bf581352efe9"
-    observationDigest: "ceac0882b0c1642640cf18b1a336d171bdd71fd3892\
-      b8217f06b1401569e9214"
+    observationDigest: "bb2ed2ca7c7207cdbb1623706735a7bfabd3af376d4\
+      89c9a8df3c21fb5dd08ac"
     missingDynamicTag: false
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "Modifications to named bindings that occur after
@@ -22978,8 +21866,8 @@ paths:
     priorCohort: "incidental-scaffolding"
     sourceDigest: "241406f84ef566474546360fb6a05af8c16e4e0a7f419209\
       bda10f0f6e1b0f02"
-    observationDigest: "2e99e817e947e891f7bc6f7fb2b4e457327d18e930f\
-      939638deef5c389aae926"
+    observationDigest: "63857cdbeac63e5aa1f010dcc1d8db30e1a65186ae1\
+      4619c37a1ab1bc4fcb31c"
     missingDynamicTag: false
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "Modifications to named bindings that occur after
@@ -23055,8 +21943,8 @@ paths:
     priorCohort: "incidental-scaffolding"
     sourceDigest: "18a5b4d3b20cd2600f62f888813d9bff85f49ef855db8fd2\
       ebcd7f69896d483e"
-    observationDigest: "3b138f85ef969f9988a09277890be86c051aca7780c\
-      62503a98483cdeb5f88d9"
+    observationDigest: "f88ab0e99afb0d9b2389227d712a4ff895862266353\
+      28e5d582a8570699d0e0c"
     missingDynamicTag: false
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "Modifications to named bindings that occur after
@@ -23132,8 +22020,8 @@ paths:
     priorCohort: "incidental-scaffolding"
     sourceDigest: "510397d103996e346146e97e7b5358dc39f72d77dc612737\
       d686a5d82cbde495"
-    observationDigest: "2069e713a87de6c2f60957d0300db86f263709c9bc6\
-      307fe51f9640b9416cc5b"
+    observationDigest: "e69e002065a81ab1e7780026a16802b9dc5a6128b2a\
+      0793a869576293c0562a6"
     missingDynamicTag: false
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "Modifications to named bindings that occur after
@@ -23209,8 +22097,8 @@ paths:
     priorCohort: "incidental-scaffolding"
     sourceDigest: "0049f0646309d418b6e903e915ca5e50c12d9ffbd96fbff0\
       c4736221fa1e4a7e"
-    observationDigest: "15891ff19ba19381c797b00e20a128848f06618ae3d\
-      d31de72169cd53fe072c4"
+    observationDigest: "626ed3492a488ae2884629dda86fd0c0dcd4f47b5f7\
+      7fc3b37fab8fab9386cd0"
     missingDynamicTag: false
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "Modifications to named bindings that occur after
@@ -23286,8 +22174,8 @@ paths:
     priorCohort: "incidental-scaffolding"
     sourceDigest: "4fb0e60deb925e95d863e2e56b87bd18a1e005a21003af0d\
       f4c300b164246ac3"
-    observationDigest: "3d62062b7ec8aee8cab2989d4678eaeda570505a7f2\
-      773ba49d37a465444db77"
+    observationDigest: "05fe7a2359a3152d95607973e65751da5f8c687b332\
+      53cb7913b995b9da55cad"
     missingDynamicTag: false
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "Modifications to named bindings that occur after
@@ -23363,8 +22251,8 @@ paths:
     priorCohort: "incidental-scaffolding"
     sourceDigest: "3b3af03c9335e712c76409e351dd58382fa5424d2512d5d6\
       afdcc0f31de1999a"
-    observationDigest: "c6a1f8db43b9240fa7e84f72be958c3201f161ce782\
-      1a40402158191552e8e0f"
+    observationDigest: "539ad9de2bf6cd649cd28849e4418db8bee8dca2d97\
+      3c9b2f32024243c5f2245"
     missingDynamicTag: false
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "Modifications to named bindings that occur after
@@ -23440,8 +22328,8 @@ paths:
     priorCohort: "incidental-scaffolding"
     sourceDigest: "97daf29ac044e23578dfeae882c2d9e8b3adabdaebe63bfb\
       0c723da7253b482f"
-    observationDigest: "5bd1c206f25dbd5581bb12451e1ec15fad308b3e064\
-      5fdadee99ddc7feef7a20"
+    observationDigest: "c90bd68faaa37f92b4c45a503fd21c943d6b509d07e\
+      5c982399e62539263b8b1"
     missingDynamicTag: false
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "Modifications to named bindings that occur after
@@ -25998,18 +24886,6 @@ paths:
     subject: "When an async module rejects, the promises relative to itself and
       its ancestors are resolved in leaf-to-root order"
     assessment: "ds12-module-observable-residual"
-  - path: "test/language/module-code/top-level-await/syntax/await-expr-dyn-impo\
-      rt.js"
-    proposedOwner: "adr:0016-dynamic-source-boundary"
-    priorCohort: "incidental-scaffolding"
-    sourceDigest: "8e9d4ba922a9e4a13a0f44326611742a1a8709f2b3e02bae9ea\
-      433ec301d3122"
-    observationDigest: "b07b156aad6c07ff1ae1d0f7dc1773fbbbbc\
-      c2cb474bf4cba3c48f32bbce36c8"
-    missingDynamicTag: false
-    section: "prod-AwaitExpression"
-    subject: "Valid syntax for top level await. AwaitExpression ImportCall"
-    assessment: ds8-await-import-call-syntax
   - path: "test/language/module-code/top-level-await/unobservable-global-async-\
       evaluation-count-reset.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"

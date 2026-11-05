@@ -64,7 +64,7 @@ results:
       strictness:
         - strict
       suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
-    classification: unsupported-profile-feature
+    classification: pass
     dependencies:
       - dynamic-source
       - expression-operators
@@ -76,11 +76,49 @@ results:
       - promise-settlement
       - symbols
       - top-level-await
+    execution:
+      harnessIncludes:
+        - base.js
+        - doneprintHandle.js
+        - compareArray.js
+      moduleGraph:
+        - dependencies:
+            - test/language/module-code/top-level-await/unobservable-global-async-evaluation-count-reset-setup_FIXTURE.js
+          id: test/language/module-code/top-level-await/unobservable-global-async-evaluation-count-reset.js
+          sourceHash: fnv1a64:56956c1fc66d21d6
+        - dependencies: []
+          id: test/language/module-code/top-level-await/unobservable-global-async-evaluation-count-reset-setup_FIXTURE.js
+          sourceHash: fnv1a64:0b3fe43f9804b99a
+        - dependencies:
+            - test/language/module-code/top-level-await/unobservable-global-async-evaluation-count-reset-setup_FIXTURE.js
+            - test/language/module-code/top-level-await/unobservable-global-async-evaluation-count-reset-b_FIXTURE.js
+          id: test/language/module-code/top-level-await/unobservable-global-async-evaluation-count-reset-a_FIXTURE.js
+          sourceHash: fnv1a64:64cb892cabbeb445
+        - dependencies:
+            - test/language/module-code/top-level-await/unobservable-global-async-evaluation-count-reset-setup_FIXTURE.js
+          id: test/language/module-code/top-level-await/unobservable-global-async-evaluation-count-reset-b_FIXTURE.js
+          sourceHash: fnv1a64:3030244ec78d6a13
+        - dependencies: []
+          id: test/language/module-code/top-level-await/unobservable-global-async-evaluation-count-reset-c_FIXTURE.js
+          sourceHash: fnv1a64:e91cb76196756785
+        - dependencies:
+            - test/language/module-code/top-level-await/unobservable-global-async-evaluation-count-reset-setup_FIXTURE.js
+            - test/language/module-code/top-level-await/unobservable-global-async-evaluation-count-reset-e_FIXTURE.js
+            - test/language/module-code/top-level-await/unobservable-global-async-evaluation-count-reset-b_FIXTURE.js
+          id: test/language/module-code/top-level-await/unobservable-global-async-evaluation-count-reset-d_FIXTURE.js
+          sourceHash: fnv1a64:8a0e8d1b2976c78e
+        - dependencies:
+            - test/language/module-code/top-level-await/unobservable-global-async-evaluation-count-reset-setup_FIXTURE.js
+          id: test/language/module-code/top-level-await/unobservable-global-async-evaluation-count-reset-e_FIXTURE.js
+          sourceHash: fnv1a64:9c3f67d01a4013d5
+      scheduler: deterministic-logical-clock
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
     observation:
-      detail: "test/language/module-code/top-level-await/unobservable-global-\
-        async-evaluation-count-reset.js:69:12: error[OSEO1001]:
-        ImportExpression is outside the M1 profile."
-      passed: false
-      unsupportedCapability: profile-syntax
+      passed: true
     unsupportedFeatures: []
 suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2

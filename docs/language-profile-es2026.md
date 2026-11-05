@@ -16,8 +16,9 @@ document in the same change. A family's status describes tested current
 behavior, never intended behavior. The Annex B built-in units, the Annex B
 Object accessors, the Annex B language units, the Annex B syntax and
 `RegExp.prototype.compile` units, the small ECMAScript 2026 built-in units,
-`iterator-zip`, `array-from-async`, `json-parse-source`, and the two explicit
-resource management units hold the family records so far; see
+`iterator-zip`, `array-from-async`, `json-parse-source`, the two explicit
+resource management units, and the static-specifier `import()` admission hold
+the family records so far; see
 [Annex B built-ins](#annex-b-built-ins),
 [Annex B Object accessors](#annex-b-object-accessors),
 [Annex B language semantics](#annex-b-language-semantics),
@@ -42,10 +43,11 @@ hooks that Annex B lets a web browser replace.
 Temporal, ECMA-402, and proposal-stage features stay outside, owned by
 [*PLAN-TEMPORAL.md*](../PLAN-TEMPORAL.md), [*PLAN-INTL.md*](../PLAN-INTL.md),
 and the proposal rule of the inventory. `eval`, the `Function` constructor
-family, and dynamic import stay inside the claim, and
-[ADR 0016](./adr/0016-dynamic-source-boundary.md) still keeps them outside the
-profile. Realms, agents, shared memory, and host hooks keep the treatment of
-[ADR 0013](./adr/0013-m5-edition-and-manifest.md).
+family, and dynamic import stay inside the claim.
+[ADR 0016](./adr/0016-dynamic-source-boundary.md) admits only `import()` with
+one string literal argument, resolved during the build, and keeps every other
+form outside the profile. Realms, agents, shared memory, and host hooks keep
+the treatment of [ADR 0013](./adr/0013-m5-edition-and-manifest.md).
 
 *tests/test262/inventory-policy.yaml* records the pinned sources. The edition
 is the `es2026` tag of tc39/ecma262 at commit
@@ -132,6 +134,7 @@ unreviewed.
 
 | Unit                               | Behavior                                                     | New paths |
 | ---------------------------------- | ------------------------------------------------------------ | --------: |
+| `import-admission`                 | Static-specifier `import()`                                  |         0 |
 | `annexb-syntax`                    | HTML-like comments, legacy literals, Annex B pattern grammar |        28 |
 | `annexb-escape`                    | `escape` and `unescape`                                      |        35 |
 | `annexb-string-methods`            | `substr`, HTML methods, `trimLeft`, `trimRight`              |       105 |

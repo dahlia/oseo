@@ -2230,3 +2230,11 @@ lanes, so the weights are overestimates.
 
 The TSV, extraction script and unit test retain both the same way. Linux now
 has 166 entries, and its fallback stays at 429 seconds.
+
+*tests/property/import-operation.property.test.ts* takes its Linux weight
+from one local Linux AMD64 extended run with `OSEO_PROPERTY_RUN_SCALE=10`,
+`OSEO_PROPERTY_SIZE=large`, and the extended seed: a case sum of
+221,319.356 ms, so 222 seconds. macOS keeps its unknown-file median
+fallback. The TSV, extraction script and unit test retain the file the same
+way. Linux now has 167 entries, and its fallback moves from 429 to 423
+seconds.

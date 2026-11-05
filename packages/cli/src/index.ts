@@ -16,6 +16,7 @@ import type {
   RuntimeAsset,
   RuntimeInput,
   RuntimeInputProvider,
+  ScriptModuleRequests,
   SourceFrontend,
   SyntaxProgram,
   TargetDescription,
@@ -24,6 +25,7 @@ import type {
 } from "@oseo/compiler";
 import {
   buildModuleGraph,
+  buildScriptRequests,
   canExecuteTarget,
   compileModuleGraph,
   compileSource,
@@ -260,13 +262,17 @@ const regexpExtensions: RegExpPatternExtensions = {
       ecma262UnicodeStringPropertySet(escape.property) != null),
 };
 
+// Both frontends convert the static-specifier `import()` subset of the
+// amended ADR 0016; every other ImportCall stays a profile diagnostic.
 const babelFrontend = createBabelFrontend({
   regexpExtensions,
   regexpUnicodeData: unicodeMatcherData,
+  staticSpecifierImports: true,
 });
 const babelModuleFrontend = createBabelModuleFrontend({
   regexpExtensions,
   regexpUnicodeData: unicodeMatcherData,
+  staticSpecifierImports: true,
 });
 
 /** The concrete adapters composed by the default Oseo command line. */
@@ -358,6 +364,7 @@ function compileCliSource(
   test262Host: boolean,
   mainAgentCanBlock: boolean,
   unhandledRejectionPolicy: UnhandledRejectionPolicy,
+  requests?: ScriptModuleRequests,
 ): CliResult {
   const compiled = compileSource(
     defaultComponents.frontend,
@@ -371,6 +378,7 @@ function compileCliSource(
       test262Host,
       unhandledRejectionPolicy,
     },
+    requests,
   );
   const diagnostic = compiled.diagnostics[0];
   if (diagnostic != null) return diagnosticResult(diagnostic);
@@ -502,6 +510,62 @@ async function compileCliModuleGraph(
     };
   }
   return { mir: compiled.mir };
+}
+
+/**
+ * Discover the modules a Script's literal `import()` calls reach. The
+ * Script resolves them against the canonical identity of its own path,
+ * as a module would, but it is never a module record itself. A Script
+ * without such a call, or one that does not parse, needs no discovery;
+ * compilation reports its diagnostics.
+ */
+async function discoverCliScriptRequests(
+  host: CompilerHost,
+  sourcePath: string,
+  source: string,
+  sourceId: string,
+): Promise<
+  | { readonly diagnostic: Diagnostic }
+  | { readonly requests?: ScriptModuleRequests }
+> {
+  const parsed = defaultComponents.frontend.parse({ source, sourceId });
+  if (
+    parsed.program == null ||
+    (parsed.program.importCalls ?? []).length === 0
+  ) {
+    return {};
+  }
+  let canonicalId: string;
+  try {
+    canonicalId =
+      host.canonicalizeFile == null
+        ? new URL(sourcePath).href
+        : await host.canonicalizeFile(sourcePath);
+  } catch {
+    return {
+      diagnostic: hostDiagnostic(
+        sourceId,
+        "The Script path could not be canonicalized for its import() calls.",
+      ),
+    };
+  }
+  const result = await buildScriptRequests(
+    defaultComponents.moduleFrontend,
+    createFileModuleLoader(host),
+    fileModuleResolver,
+    [{ canonicalId, program: parsed.program }],
+  );
+  const diagnostic = result.diagnostics[0];
+  if (diagnostic != null) return { diagnostic };
+  if (result.closure == null) {
+    return {
+      diagnostic: hostDiagnostic(
+        sourceId,
+        "The import() closure is unavailable.",
+      ),
+    };
+  }
+  return { requests: { canonicalId, closure: result.closure } };
 }
 
 function hasModuleExtension(path: string): boolean {
@@ -1651,17 +1715,28 @@ export async function runNativeCli(
     if (parsed.value.mode !== "execute") {
       return emitCliMir(parsed.value.mode, mir);
     }
-  } else if (parsed.value.mode !== "execute") {
-    return compileCliSource(
-      parsed.value.mode,
+  } else {
+    const discovered = await discoverCliScriptRequests(
+      host,
+      parsed.value.sourceId,
       source,
       sourceId,
-      parsed.value.specialization,
-      parsed.value.test262Host,
-      !parsed.value.test262NonBlocking,
-      parsed.value.unhandledRejectionPolicy,
     );
-  } else {
+    if ("diagnostic" in discovered) {
+      return diagnosticResult(discovered.diagnostic);
+    }
+    if (parsed.value.mode !== "execute") {
+      return compileCliSource(
+        parsed.value.mode,
+        source,
+        sourceId,
+        parsed.value.specialization,
+        parsed.value.test262Host,
+        !parsed.value.test262NonBlocking,
+        parsed.value.unhandledRejectionPolicy,
+        discovered.requests,
+      );
+    }
     const compiled = compileSource(
       defaultComponents.frontend,
       {
@@ -1674,6 +1749,7 @@ export async function runNativeCli(
         test262Host: parsed.value.test262Host,
         unhandledRejectionPolicy: parsed.value.unhandledRejectionPolicy,
       },
+      discovered.requests,
     );
     const diagnostic = compiled.diagnostics[0];
     if (diagnostic != null) return diagnosticResult(diagnostic);

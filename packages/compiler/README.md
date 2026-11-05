@@ -135,8 +135,9 @@ timers, and the `module-evaluate` driver entry without importing a concrete
 runtime or event loop into compiler core. A module graph's script instantiates
 every environment, then passes the module table to `module-evaluate`: the
 entry index, the module count, and per module its evaluator, a top-level await
-flag, and its requested module indices in source order. The runtime driver owns
-every evaluation state field, so the build no longer fixes evaluation order.
+flag, its namespace or `undefined`, and its requested module indices in source
+order. The runtime driver owns every evaluation state field, so the build no
+longer fixes evaluation order.
 Function creation retains ordinary, arrow, asynchronous, and asynchronous-arrow
 identity through HIR and MIR.
 
@@ -149,8 +150,21 @@ with its referrer, location, decoded literal, canonical target, and
 `evaluation` or `discovery` edge kind, in a deterministic order. A Script
 referrer resolves against an explicit canonical identity and is never a module
 record. A failure reached through an `import()` edge carries its importer
-chain in the diagnostic notes. `compileModuleGraph` and HIR construction still
-reject every `import()` with the profile diagnostic.
+chain in the diagnostic notes.
+
+`compileModuleGraph` lists every discovered module in the table: the entry's
+static closure in startup order, then the modules only `import()` reaches,
+which are linked and instantiated at startup but evaluate only on request.
+Each `import()` target has a namespace cell. HIR construction lowers a site to
+the `module-import` call target with the target's constant table index as its
+only argument, so no specifier is looked up at run time; a site whose target
+the build did not record keeps the profile diagnostic. A Script referrer
+compiles through `compileSource` with a fourth argument naming its canonical
+identity and the closure `buildScriptRequests` found. Its program instantiates
+the modules, installs the table without evaluating any of them, and then runs
+the Script; the modules read the Script's global declarations as their outer
+scope. The default frontends still leave `staticSpecifierImports` off, so
+ordinary compilation reports every `import()` at parse time.
 
 `compileSource` and `buildMir` accept an explicit enabled or disabled
 specialization policy. Enabled mode selects the M2 checked small-integer path

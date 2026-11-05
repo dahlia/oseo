@@ -990,12 +990,11 @@ results:
       - object-properties
       - promise-settlement
     observation:
-      detail: 'test/language/expressions/dynamic-import/catch/nested-arrow-import-catch-instn-iee-err-ambiguous-import.js
-        non-strict disabled failed (1): stdout=""
-        stderr="test/language/expressions/dynamic-import/catch/nested-arrow-import-catch-instn-iee-err-ambiguous-import.js:157:3:
-        error[OSEO1001]: ImportExpression is outside the M1 profile.\n"'
+      detail: "test/language/expressions/dynamic-import/catch/instn-iee-err-a\
+        mbiguous-export_FIXTURE.js:4:10: error[OSEO2001]: Export 'x' is
+        ambiguous."
       passed: false
-      unsupportedCapability: profile-syntax
+      unsupportedCapability: static-specifier-import-build
     unsupportedFeatures: []
   - case:
       async: false
@@ -1090,12 +1089,11 @@ results:
       - control-flow
       - dynamic-source
     observation:
-      detail: 'test/language/expressions/dynamic-import/syntax/valid/nested-if-braceless-empty-str-is-valid-assign-expr.js
-        non-strict disabled failed (1): stdout=""
-        stderr="test/language/expressions/dynamic-import/syntax/valid/nested-if-braceless-empty-str-is-valid-assign-expr.js:100:11:
-        error[OSEO1001]: ImportExpression is outside the M1 profile.\n"'
+      detail: "test/language/expressions/dynamic-import/syntax/valid/nested-i\
+        f-braceless-empty-str-is-valid-assign-expr.js:25:18:
+        error[OSEO3001]: Unsupported module specifier ''."
       passed: false
-      unsupportedCapability: profile-syntax
+      unsupportedCapability: module-resolution-profile
     unsupportedFeatures: []
   - case:
       async: false

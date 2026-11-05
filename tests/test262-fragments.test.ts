@@ -91,6 +91,7 @@ test("runner fallback retains the exact whole input", async () => {
       reason: "boundary",
     },
     { source: "let = ;", harness: "var x;", reason: "diagnostic" },
+    { source: 'import("./x.js");', harness: "var x;", reason: "requests" },
   ];
   for (const entry of cases) {
     const fragment = {

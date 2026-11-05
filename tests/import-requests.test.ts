@@ -8,6 +8,7 @@ import {
   compileSource,
   importCallProfileMessage,
   linkModuleGraph,
+  printMir,
   type Diagnostic,
   type ModuleGraphOptions,
   type ModuleLoader,
@@ -194,30 +195,20 @@ test("discovery records every request without new startup edges", async () => {
   assert.equal(linked.graph?.modules.length, 4);
 });
 
-test("the profile still rejects each discovered import() site", async () => {
+test("compilation lowers each discovered import() site", async () => {
   const result = await graphOf(files);
   assert.ok(result.graph);
   const compiled = compileModuleGraph(result.graph);
-  assert.equal(compiled.mir, undefined);
-  assert.deepEqual(
-    compiled.diagnostics.map((diagnostic) => [
-      diagnostic.code,
-      diagnostic.message,
-      diagnostic.sourceId,
-      diagnostic.range.start,
-    ]),
-    [
-      ["file:///app/main.mjs", { column: 14, line: 2 }],
-      ["file:///app/main.mjs", { column: 15, line: 3 }],
-      ["file:///app/main.mjs", { column: 15, line: 4 }],
-      ["file:///app/lazy.mjs", { column: 28, line: 2 }],
-    ].map(([sourceId, start]) => [
-      "OSEO1001",
-      importCallProfileMessage,
-      sourceId,
-      start,
-    ]),
+  assert.deepEqual(compiled.diagnostics, []);
+  assert.ok(compiled.mir);
+  // Each site names its target's constant table index. The table lists
+  // the static closure first, then the modules only import() reaches.
+  assert.equal(
+    printMir(compiled.mir).match(/= call module_import %\d+ /gu)?.length,
+    4,
   );
+  // A Script compiled without its request closure keeps the profile
+  // diagnostic, because no module table names the site's target.
   const script = compileSource(scriptFrontend, {
     source: 'var p;\np = import("./a.js");',
     sourceId: "file:///app/script.js",
@@ -451,33 +442,19 @@ test("lazy attribute and profile refusals keep the chain", async () => {
     },
   ]);
 
+  // A form outside the subset in a module that only import() reaches is
+  // a frontend refusal that names how the module was reached.
   const profile = await graphOf({
-    "deeper.mjs": "export {};",
-    "lazy.mjs": 'import("./deeper.mjs");',
+    "lazy.mjs": "const name = './deeper.mjs';\nimport(name);",
     "main.mjs": 'import "./static.mjs";\nimport("./lazy.mjs");',
-    "static.mjs": 'import("./deeper.mjs");',
+    "static.mjs": "export {};",
   });
-  assert.ok(profile.graph);
-  // A site in the entry's static closure has no chain to report; a site
-  // in a module that only import() reaches names how it was reached.
-  assert.deepEqual(rows(compileModuleGraph(profile.graph).diagnostics), [
-    {
-      code: "OSEO1001",
-      message: importCallProfileMessage,
-      notes: undefined,
-      position: "file:///app/main.mjs:2:1",
-    },
-    {
-      code: "OSEO1001",
-      message: importCallProfileMessage,
-      notes: undefined,
-      position: "file:///app/static.mjs:1:1",
-    },
+  assert.deepEqual(rows(profile.diagnostics), [
     {
       code: "OSEO1001",
       message: importCallProfileMessage,
       notes: ["requested by import() at file:///app/main.mjs:2:1"],
-      position: "file:///app/lazy.mjs:1:1",
+      position: "file:///app/lazy.mjs:2:1",
     },
   ]);
 });
