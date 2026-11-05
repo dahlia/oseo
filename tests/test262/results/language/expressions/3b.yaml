@@ -1171,12 +1171,11 @@ results:
       - functions
       - lexical-bindings
     observation:
-      detail: 'test/language/expressions/dynamic-import/syntax/valid/nested-arrow-assignment-expression-empty-str-is-valid-assign-expr.js
-        non-strict disabled failed (1): stdout=""
-        stderr="test/language/expressions/dynamic-import/syntax/valid/nested-arrow-assignment-expression-empty-str-is-valid-assign-expr.js:100:15:
-        error[OSEO1001]: ImportExpression is outside the M1 profile.\n"'
+      detail: "test/language/expressions/dynamic-import/syntax/valid/nested-a\
+        rrow-assignment-expression-empty-str-is-valid-assign-expr.js:25\
+        :22: error[OSEO3001]: Unsupported module specifier ''."
       passed: false
-      unsupportedCapability: profile-syntax
+      unsupportedCapability: module-resolution-profile
     unsupportedFeatures: []
   - case:
       async: false
@@ -1197,12 +1196,11 @@ results:
       - dynamic-source
       - functions
     observation:
-      detail: 'test/language/expressions/dynamic-import/syntax/valid/nested-async-function-await-empty-str-is-valid-assign-expr.js
-        non-strict disabled failed (1): stdout=""
-        stderr="test/language/expressions/dynamic-import/syntax/valid/nested-async-function-await-empty-str-is-valid-assign-expr.js:101:9:
-        error[OSEO1001]: ImportExpression is outside the M1 profile.\n"'
+      detail: "test/language/expressions/dynamic-import/syntax/valid/nested-a\
+        sync-function-await-empty-str-is-valid-assign-expr.js:26:16:
+        error[OSEO3001]: Unsupported module specifier ''."
       passed: false
-      unsupportedCapability: profile-syntax
+      unsupportedCapability: module-resolution-profile
     unsupportedFeatures: []
   - case:
       async: false

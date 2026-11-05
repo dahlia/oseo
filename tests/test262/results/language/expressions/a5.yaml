@@ -988,12 +988,11 @@ results:
       - object-properties
       - promise-settlement
     observation:
-      detail: 'test/language/expressions/dynamic-import/catch/nested-async-function-file-does-not-exist.js
-        non-strict disabled failed (1): stdout=""
-        stderr="test/language/expressions/dynamic-import/catch/nested-async-function-file-does-not-exist.js:133:3:
-        error[OSEO1001]: ImportExpression is outside the M1 profile.\n"'
+      detail: "test/language/expressions/dynamic-import/catch/nested-async-fu\
+        nction-file-does-not-exist.js:30:10: error[OSEO3001]: The module
+        source could not be read."
       passed: false
-      unsupportedCapability: profile-syntax
+      unsupportedCapability: static-specifier-import-build
     unsupportedFeatures: []
   - case:
       async: false
@@ -1062,12 +1061,11 @@ results:
       - dynamic-source
       - functions
     observation:
-      detail: 'test/language/expressions/dynamic-import/syntax/valid/nested-async-arrow-function-return-await-empty-str-is-valid-assign-expr.js
-        non-strict disabled failed (1): stdout=""
-        stderr="test/language/expressions/dynamic-import/syntax/valid/nested-async-arrow-function-return-await-empty-str-is-valid-assign-expr.js:100:20:
-        error[OSEO1001]: ImportExpression is outside the M1 profile.\n"'
+      detail: "test/language/expressions/dynamic-import/syntax/valid/nested-a\
+        sync-arrow-function-return-await-empty-str-is-valid-assign-expr\
+        .js:25:27: error[OSEO3001]: Unsupported module specifier ''."
       passed: false
-      unsupportedCapability: profile-syntax
+      unsupportedCapability: module-resolution-profile
     unsupportedFeatures: []
   - case:
       async: false
@@ -1086,12 +1084,11 @@ results:
     dependencies:
       - dynamic-source
     observation:
-      detail: 'test/language/expressions/dynamic-import/syntax/valid/nested-block-empty-str-is-valid-assign-expr.js
-        non-strict disabled failed (1): stdout=""
-        stderr="test/language/expressions/dynamic-import/syntax/valid/nested-block-empty-str-is-valid-assign-expr.js:101:3:
-        error[OSEO1001]: ImportExpression is outside the M1 profile.\n"'
+      detail: "test/language/expressions/dynamic-import/syntax/valid/nested-b\
+        lock-empty-str-is-valid-assign-expr.js:26:10: error[OSEO3001]:
+        Unsupported module specifier ''."
       passed: false
-      unsupportedCapability: profile-syntax
+      unsupportedCapability: module-resolution-profile
     unsupportedFeatures: []
   - case:
       async: false
@@ -1135,7 +1132,7 @@ results:
         - non-strict
         - strict
       suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
-    classification: unsupported-profile-feature
+    classification: pass
     dependencies:
       - dynamic-source
       - functions
@@ -1143,13 +1140,23 @@ results:
       - object-properties
       - promise-settlement
       - var-bindings
+    execution:
+      harnessIncludes:
+        - base.js
+        - doneprintHandle.js
+      scheduler: deterministic-logical-clock
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
     observation:
-      detail: 'test/language/expressions/dynamic-import/usage/nested-block-import-then-eval-script-code-host-resolves-module-code.js
-        non-strict disabled failed (1): stdout=""
-        stderr="test/language/expressions/dynamic-import/usage/nested-block-import-then-eval-script-code-host-resolves-module-code.js:133:3:
-        error[OSEO1001]: ImportExpression is outside the M1 profile.\n"'
-      passed: false
-      unsupportedCapability: profile-syntax
+      passed: true
     unsupportedFeatures: []
   - case:
       async: false

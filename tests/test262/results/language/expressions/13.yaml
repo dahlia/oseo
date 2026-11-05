@@ -976,8 +976,9 @@ results:
     observation:
       detail: 'test/language/expressions/dynamic-import/usage/nested-if-braceless-eval-gtbndng-indirect-update.js
         non-strict disabled failed (1): stdout=""
-        stderr="test/language/expressions/dynamic-import/usage/nested-if-braceless-eval-gtbndng-indirect-update.js:159:11:
-        error[OSEO1001]: ImportExpression is outside the M1 profile.\n"'
+        stderr="test/language/expressions/dynamic-import/usage/eval-gtbndng-indirect-update_FIXTURE.js:7:1:
+        error[OSEO1001]: The Function constructor requires dynamic
+        source and is unsupported in M5.\n"'
       passed: false
       unsupportedCapability: profile-syntax
     unsupportedFeatures: []

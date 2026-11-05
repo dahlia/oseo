@@ -1276,12 +1276,11 @@ results:
       - object-properties
       - promise-settlement
     observation:
-      detail: 'test/language/expressions/dynamic-import/catch/nested-async-function-return-await-instn-iee-err-ambiguous-import.js
-        non-strict disabled failed (1): stdout=""
-        stderr="test/language/expressions/dynamic-import/catch/nested-async-function-return-await-instn-iee-err-ambiguous-import.js:157:16:
-        error[OSEO1001]: ImportExpression is outside the M1 profile.\n"'
+      detail: "test/language/expressions/dynamic-import/catch/instn-iee-err-a\
+        mbiguous-export_FIXTURE.js:4:10: error[OSEO2001]: Export 'x' is
+        ambiguous."
       passed: false
-      unsupportedCapability: profile-syntax
+      unsupportedCapability: static-specifier-import-build
     unsupportedFeatures: []
   - case:
       async: false

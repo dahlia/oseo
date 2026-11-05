@@ -973,11 +973,10 @@ results:
       - object-properties
       - promise-settlement
     observation:
-      detail: "test/language/expressions/dynamic-import/catch/nested-arrow-im\
-        port-catch-eval-script-code-target.js:35:3: error[OSEO1001]:
-        ImportExpression is outside the M1 profile."
+      detail: "test/language/expressions/dynamic-import/catch/script-code_FIX\
+        TURE.js:7:22: error[OSEO0001]: Source could not be parsed."
       passed: false
-      unsupportedCapability: profile-syntax
+      unsupportedCapability: static-specifier-import-build
     unsupportedFeatures: []
   - case:
       async: false

@@ -984,12 +984,11 @@ results:
       - object-properties
       - promise-settlement
     observation:
-      detail: 'test/language/expressions/dynamic-import/catch/nested-block-labeled-instn-iee-err-ambiguous-import.js
-        non-strict disabled failed (1): stdout=""
-        stderr="test/language/expressions/dynamic-import/catch/nested-block-labeled-instn-iee-err-ambiguous-import.js:157:3:
-        error[OSEO1001]: ImportExpression is outside the M1 profile.\n"'
+      detail: "test/language/expressions/dynamic-import/catch/instn-iee-err-a\
+        mbiguous-export_FIXTURE.js:4:10: error[OSEO2001]: Export 'x' is
+        ambiguous."
       passed: false
-      unsupportedCapability: profile-syntax
+      unsupportedCapability: static-specifier-import-build
     unsupportedFeatures: []
   - case:
       async: true
@@ -1049,8 +1048,9 @@ results:
     observation:
       detail: 'test/language/expressions/dynamic-import/usage/nested-block-import-then-eval-gtbndng-indirect-update.js
         non-strict disabled failed (1): stdout=""
-        stderr="test/language/expressions/dynamic-import/usage/nested-block-import-then-eval-gtbndng-indirect-update.js:160:3:
-        error[OSEO1001]: ImportExpression is outside the M1 profile.\n"'
+        stderr="test/language/expressions/dynamic-import/usage/eval-gtbndng-indirect-update_FIXTURE.js:7:1:
+        error[OSEO1001]: The Function constructor requires dynamic
+        source and is unsupported in M5.\n"'
       passed: false
       unsupportedCapability: profile-syntax
     unsupportedFeatures: []

@@ -719,7 +719,7 @@ results:
       strictness:
         - strict
       suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
-    classification: unsupported-profile-feature
+    classification: pass
     dependencies:
       - classes
       - dynamic-source
@@ -728,12 +728,23 @@ results:
       - module-linking
       - object-properties
       - promise-settlement
+    execution:
+      harnessIncludes:
+        - base.js
+        - doneprintHandle.js
+      moduleGraph:
+        - dependencies: []
+          id: test/language/expressions/dynamic-import/eval-export-dflt-cls-anon.js
+          sourceHash: fnv1a64:c4b85fa08dc61ade
+      scheduler: deterministic-logical-clock
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
     observation:
-      detail: "test/language/expressions/dynamic-import/eval-export-dflt-cls-\
-        anon.js:32:1: error[OSEO1001]: ImportExpression is outside the
-        M1 profile."
-      passed: false
-      unsupportedCapability: profile-syntax
+      passed: true
     unsupportedFeatures: []
   - case:
       async: true
@@ -748,7 +759,7 @@ results:
       strictness:
         - strict
       suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
-    classification: unsupported-profile-feature
+    classification: pass
     dependencies:
       - dynamic-source
       - expression-operators
@@ -758,12 +769,23 @@ results:
       - object-properties
       - promise-settlement
       - var-bindings
+    execution:
+      harnessIncludes:
+        - base.js
+        - doneprintHandle.js
+      moduleGraph:
+        - dependencies: []
+          id: test/language/expressions/dynamic-import/eval-export-dflt-expr-in.js
+          sourceHash: fnv1a64:4fd8b6d854036b67
+      scheduler: deterministic-logical-clock
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
     observation:
-      detail: "test/language/expressions/dynamic-import/eval-export-dflt-expr\
-        -in.js:26:1: error[OSEO1001]: ImportExpression is outside the M1
-        profile."
-      passed: false
-      unsupportedCapability: profile-syntax
+      passed: true
     unsupportedFeatures: []
   - case:
       async: true

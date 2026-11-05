@@ -314,8 +314,8 @@ evidence includes the executed variants and target, dependency tags are
 reviewed, and summaries include raw, path-group, and dependency totals.
 Unsupported, harness, and infrastructure results never increase the pass count.
 
-The current manifest contains 42,532 reviewed cases: 36,156 passes, 4,479
-expected negatives, and 1,897 unsupported profile features. It records no
+The current manifest contains 42,532 reviewed cases: 36,408 passes, 4,480
+expected negatives, and 1,644 unsupported profile features. It records no
 semantic, harness, or infrastructure failures. The 1,441 cases beyond the M5
 inventory are rows of the
 [ECMAScript 2026 profile](./language-profile-es2026.md): 164 for the
