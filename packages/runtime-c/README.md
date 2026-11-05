@@ -1382,7 +1382,7 @@ the `module_table` field of `OseoContext`, and the generated-code entry
 `oseo_module_graph_evaluate`. A module graph's script calls that entry once,
 after it has instantiated every module environment. The arguments are the entry
 index, the module count, and per module its evaluator, a top-level await flag,
-its namespace from ABI `m5-152` on, its requested module count, and the
+its namespace from ABI `m5-159` on, its requested module count, and the
 requested module indices in source order.
 The entry returns the entry module's top-level capability promise, which the
 event loop treats as the entry task's completion.
@@ -1407,7 +1407,7 @@ capability created for a root that has already finished evaluating settles at
 once. *tests/runtime-module-driver.test.ts* drives it directly with C
 evaluators.
 
-ABI `m5-152` adds static-specifier `import()`. Each table entry gains a
+ABI `m5-159` adds static-specifier `import()`. Each table entry gains a
 namespace argument after the top-level await flag: the module's namespace
 object, or `undefined` for a module no `import()` names. An entry index equal
 to the module count installs the table without evaluating any module, for a
@@ -1578,7 +1578,7 @@ Async-from-Sync wrapper, which `oseo_internal_async_from_sync_wrap` now exposes
 to the array component. No heap kind or traced field is added, and the
 generated-code ABI gains no entry point.
 
-ABI `m5-153` adds `JSON.rawJSON` and `JSON.isRawJSON` as own function
+ABI `m5-154` adds `JSON.rawJSON` and `JSON.isRawJSON` as own function
 properties of the JSON namespace, defined after `stringify`, with the JSON
 component's code IDs 2 and 3 below the range top and no intrinsic slot.
 `[[IsRawJSON]]` is a new `raw_json` flag in the heap object header, which
