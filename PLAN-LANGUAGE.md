@@ -439,16 +439,18 @@ amended record links the whole closure at build time, so link and load errors
 are build failures; the `ds11-static-module-*` and `import-call-promise`
 assessments keep the evidence for them. In 23 rows the resolution profile
 rejects the specifier with OSEO3001: 22 `import('')` rows and
-*await-expr-dyn-import.js*, which imports `'foo'`. They are *PLAN-DYN.md*
-deferrals, because compiling an unresolvable specifier to a run-time rejection
-is the remaining work. The exclusion audit accepts each group only over its own
-build diagnostics, tied to a literal `import()` call, as
+*await-expr-dyn-import.js*, which imports `'foo'`. They are ADR 0016 exclusions
+too, under the `literal-import-resolution-refusal` assessment, because each
+request must resolve during the build and a failure is a build diagnostic. The
+exclusion audit accepts both groups only over those build diagnostics, tied to
+a literal `import()` call, as
 [its procedure](./docs/m5c-closure/exclusion-audit.md#literal-import-build-failures)
 describes.
 
-Done when the 17 rows pass, every changed `dynamic-import` observation is
-reviewed, no static module row regresses, and the amended ADR 0016 describes
-the admitted subset.
+Done when 16 of the 17 rows pass, *await-dynamic-import-rejection.js* reports
+its expected negative, every changed `dynamic-import` observation is reviewed,
+no static module row regresses, and the amended ADR 0016 describes the admitted
+subset.
 
 ### `legacy-caller`
 
@@ -865,8 +867,10 @@ The plan is complete when:
     the accepted ADR 0032 explains a different count;
  -  every unit's owned paths are passes, expected negatives, or ADR 0016
     results with reviewed audit rows, and no remediation owner remains;
- -  the 17 closable `static-specifier-import` rows and the 18 non-dynamic
-    `caller` rows pass, and the remaining deferrals still name *PLAN-DYN.md*;
+ -  16 of the 17 closable `static-specifier-import` rows pass and
+    *await-dynamic-import-rejection.js* reports its expected negative, the 18
+    non-dynamic `caller` rows pass, and the remaining deferrals still name
+    *PLAN-DYN.md*;
  -  no previously passing row regresses, and the compatibility ratchet
     accepts the result;
  -  every new family has a complete record and every Annex B behavior in the

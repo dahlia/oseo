@@ -320,6 +320,19 @@ test("a Script referrer resolves against its own identity", async () => {
   );
 });
 
+test("the empty specifier fails the build", async () => {
+  const result = await graphOf({ "main.mjs": 'import("");' });
+  assert.equal(result.graph, undefined);
+  assert.deepEqual(rows(result.diagnostics), [
+    {
+      code: "OSEO3001",
+      message: "Unsupported module specifier ''.",
+      notes: undefined,
+      position: "file:///app/main.mjs:1:8",
+    },
+  ]);
+});
+
 test("an unresolvable or unreadable target fails the build", async () => {
   const result = await graphOf({
     "main.mjs": 'import("bare");\nimport("./lazy.mjs");',
