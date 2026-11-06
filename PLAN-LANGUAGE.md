@@ -94,7 +94,7 @@ A probe of the current build and the reviewed manifest shows this Annex B state:
 | Annex B behavior                                   | Current state                                                         |
 | -------------------------------------------------- | --------------------------------------------------------------------- |
 | HTML-like comments in Script code                  | Pinned by `annexb-syntax`: Script only; modules report OSEO0001       |
-| Legacy octal literals, `\8`, `\9`, octal escapes   | Core grammar in the inventory; non-strict rows pass                   |
+| Legacy octal literals, `\8`, `\9`, octal escapes   | Pinned by `annexb-syntax`: sloppy Script only, as in both hosts       |
 | `__proto__: value` in object initializers          | Core syntax, admitted by M5a Unit 8.1c                                |
 | `var` redeclaring a simple catch parameter         | Admitted by M5a Unit 8.5c, including `for (var e of ...)`             |
 | `WeakRef.prototype.constructor`                    | Installed; its test262 row passes                                     |

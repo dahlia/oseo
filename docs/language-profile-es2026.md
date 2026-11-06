@@ -519,6 +519,24 @@ line, and after a multi-line comment that contains a line terminator,
 U+2028 and U+2029 included. Anywhere else `-->` is a decrement followed by a
 greater-than comparison. A Module that uses either form reports `OSEO0001`.
 
+### Legacy numeric and string literals
+
+The edition's lexical grammar keeps four legacy forms for sloppy Script code:
+`010`, `08`, the octal string escapes through `\377`, and the string escapes
+`\8` and `\9`. The parser already implemented them, so this family adds no
+behavior. Strict Script code and Module code report each form as `OSEO0001`,
+including a legacy escape in a directive before `"use strict"`. An untagged
+template rejects these escapes in every goal, and a tagged template gives them
+an undefined cooked string and keeps their raw text.
+
+The `annexb-legacy-literals` fixture in *tests/native.ts* runs as a sloppy
+Script under both specialization policies and forced collection against
+Node.js and Deno. It prints all 512 three-digit escapes, every shorter escape
+cut off by `8` or `9`, and the integers through `0377` with and without
+padding, and checks a hand-written table of values apart from the hosts.
+*tests/annexb-legacy-literals.test.ts* gives each early error one verdict per
+goal from the compiler and from both hosts.
+
 ### Regular expression patterns
 
 A pattern without `u` or `v` follows the grammar of B.1.2 in both places that
