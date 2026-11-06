@@ -41,9 +41,8 @@ M5 defers those rows by name under
 target. The maintainer accepted the design's ADR 0016 amendment on
 2026-11-03.
 
-On 2026-11-02 the maintainer scheduled the design's implementation under
-[*PLAN-LANGUAGE.md*](./PLAN-LANGUAGE.md), as its four `import-*` units, which
-are implemented and observed. The 17 rows they could close pass or report
+The implemented literal-import subset follows the
+[static-specifier import design]. The 17 rows it can close pass or report
 their expected negative, and the three rows the design cannot close stay here.
 The remaining capability classes stay deferred.
 
@@ -493,13 +492,11 @@ source compilation can observe, such as a declaration made by direct `eval` or
 the `Function` constructor's argument conversion. They stay here. The
 maintainer ranks that work low priority, and no unit is scheduled for it.
 
-The 17 `static-specifier-import` entries that
-[*PLAN-LANGUAGE.md*](./PLAN-LANGUAGE.md) could close left the list when its
-`import-admission` unit observed them: 16 pass and
-*await-dynamic-import-rejection.js* reports its expected negative. The three
-that remain, *usage-from-eval.js*, *eval-rqstd-once.js*, and
-*update-to-dynamic-import.js*, need direct `eval` or the `Function`
-constructor.
+The 17 closed `static-specifier-import` observations are recorded in the
+[static-specifier import design](./docs/static-specifier-import-design.md#test262-and-closure-consequences):
+16 pass and *await-dynamic-import-rejection.js* reports its expected negative.
+The three that remain, *usage-from-eval.js*, *eval-rqstd-once.js*, and
+*update-to-dynamic-import.js*, need direct `eval` or the `Function` constructor.
 
 The 23 literal `import()` rows whose specifier the resolution profile refuses
 at build time, 22 `import('')` rows and *await-expr-dyn-import.js* with `'foo'`,
@@ -517,19 +514,17 @@ dynamic source:
  -  *15.3.5.4\_2-77gs.js* and *15.3.5.4\_2-78gs.js* call `Function` or
     `new Function`.
 
-Since the `legacy-caller` unit of *PLAN-LANGUAGE.md* implemented `caller`
-under [ADR 0034](./docs/adr/0034-legacy-function-caller-contract.md), the
+Under [ADR 0034](./docs/adr/0034-legacy-function-caller-contract.md), the
 other 18 paths pass and these five are ADR 0016 results. They are not named
 deferrals, but this plan inherits them as residue so that admitting `eval` or
 `Function` later re-observes them.
 
-Accepted [ADR 0032](./docs/adr/0032-post-m5-edition-boundary.md) adds about
-477 *test/annexB/* paths that call `eval` or a `Function` constructor, almost
-all under *test/annexB/language/eval-code/*. They are unreviewed closure-ledger
-rows until the `annexb-dynamic-source-accounting` unit of
-[*PLAN-LANGUAGE.md*](./PLAN-LANGUAGE.md) admits and observes them. They become
-ADR 0016 results through that unit's reviewed exclusion audit rows and then
-join the same residue.
+The [ADR 0032](./docs/adr/0032-post-m5-edition-boundary.md) additions include
+477 reviewed ADR 0016 exclusions for *test/annexB/* paths that call `eval` or
+a `Function` constructor, almost all under *test/annexB/language/eval-code/*.
+The
+[exclusion audit](./docs/m5c-closure/exclusion-audit.md#annex-b-dynamic-source-rows)
+records these paths, which join the same residue.
 
 
 Entry criteria
@@ -594,9 +589,8 @@ Delivery order
     [*PLAN-PKG.md*](./PLAN-PKG.md), M6, or M7 loader policy and every
     source-compilation criterion are complete.
 
-Item 3 is scheduled under [*PLAN-LANGUAGE.md*](./PLAN-LANGUAGE.md), with the
-static-specifier import design as its specification. The other items stay
-deferred.
+Item 3 is implemented only for the literal subset specified by the
+[static-specifier import design]. All other capability classes stay deferred.
 
 At each checkpoint, update the applicable decision, language profile,
 compatibility manifest, runtime ownership record, target evidence, and this

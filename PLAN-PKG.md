@@ -13,11 +13,12 @@ compile it into the closed module graph, before `node:*` modules, `Buffer`,
 prerequisite of the other as a whole; a scenario records the capabilities it
 needs from each.
 
-The track has no milestone number and runs alongside M6 and
-[*PLAN-LANGUAGE.md*](./PLAN-LANGUAGE.md). It adds no installer, package
-manager, or repository command. The implemented resolver remains the one that
-[*docs/cli.md*](./docs/cli.md) describes until a tested implementation and its
-documentation land together.
+The track has no milestone number and runs alongside M6. It extends the
+resolver used by the
+[*static-specifier import design*](./docs/static-specifier-import-design.md).
+It adds no installer, package manager, or repository command. The implemented
+resolver remains the one that [*docs/cli.md*](./docs/cli.md) describes until a
+tested implementation and its documentation land together.
 
 This plan is governed by [*WHITEPAPER.md*](./WHITEPAPER.md),
 [*DESIGN.md*](./DESIGN.md), [*ROADMAP.md*](./ROADMAP.md),
@@ -408,10 +409,10 @@ Relationship to other plans
     package corpus that depends on them. The resolver, trace, and
     classification built here are what M7's corpus runs through.
  -  [*PLAN-DYN.md*](./PLAN-DYN.md) owns dynamic import. Its
-    build-time-resolvable subset, scheduled under
-    [*PLAN-LANGUAGE.md*](./PLAN-LANGUAGE.md), turns a literal `import()`
-    into a static edge that this resolver serves. Nothing here admits
-    source loading after start.
+    implemented build-time-resolvable subset in the
+    [static-specifier import design](./docs/static-specifier-import-design.md)
+    turns a literal `import()` into a static edge that this resolver serves.
+    Nothing here admits source loading after start.
  -  [*PLAN-CLI.md*](./PLAN-CLI.md) owns the command-line surface for extra
     conditions and the printing of every graph diagnostic.
  -  [*PLAN-RELEASE.md*](./PLAN-RELEASE.md) is unaffected. This track is not

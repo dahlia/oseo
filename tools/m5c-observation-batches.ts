@@ -1242,8 +1242,8 @@ export function validateCurrentM5cObservationPlan(): M5cObservationPlan {
         "`mise run m5c:observation-batches:update`.",
     );
   }
-  // The plan partitions the M5 inventory, so only its ledger entries count;
-  // the paths ADR 0032 added belong to PLAN-LANGUAGE.md work units.
+  // The plan partitions the frozen M5 inventory, so only its ledger entries
+  // count. The paths ADR 0032 added lie outside that inventory.
   const m5Paths = new Set(
     parseM5cInventory(readCurrentM5InventoryText()).includedPaths,
   );

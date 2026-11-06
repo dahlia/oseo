@@ -7,7 +7,7 @@ import { parse as parseYaml } from "yaml";
 import {
   deriveM5cClosureLedger,
   isAcceptedDecisionRecord,
-  parseLanguageUnitIds,
+  languageUnitIds,
   parseM5cClosureLedger,
   readCurrentAcceptedRecords,
   serializeM5cClosureLedger,
@@ -293,7 +293,7 @@ test("owners must fit the path state", () => {
     [
       unreviewedPath,
       "unit:missing-unit",
-      /unknown PLAN-LANGUAGE\.md work unit missing-unit/u,
+      /unknown language work unit missing-unit/u,
     ],
   ];
   for (const [path, owner, message] of cases) {
@@ -319,35 +319,42 @@ test("a work unit may own unreviewed and remediated paths", () => {
         manifest,
         { acceptedRecords: targets.acceptedRecords, nodeIds },
       ),
-    /unknown PLAN-LANGUAGE\.md work unit annexb-syntax/u,
+    /unknown language work unit annexb-syntax/u,
   );
 });
 
-test("work-unit IDs come from the PLAN-LANGUAGE.md unit table", () => {
-  const plan = [
-    "Intro",
-    "",
-    "Work units",
-    "----------",
-    "",
-    "| Unit | Owned paths |",
-    "| ---- | ----------- |",
-    "| `claim-boundary` | none |",
-    "| `annexb-syntax` | 28 new |",
-    "",
-    "| `not-a-unit` | later table |",
-    "",
-  ].join("\n");
-  assert.deepEqual(
-    [...parseLanguageUnitIds(plan)],
-    ["claim-boundary", "annexb-syntax"],
-  );
-  assert.throws(() => parseLanguageUnitIds("No units\n"), /no Work units/u);
-  assert.throws(
-    () =>
-      parseLanguageUnitIds(plan.replace("`annexb-syntax`", "`claim-boundary`")),
-    /must name unique units/u,
-  );
+test("language work-unit IDs preserve the accepted owner vocabulary", () => {
+  assert.deepEqual(languageUnitIds, [
+    "claim-boundary",
+    "import-driver",
+    "import-requests",
+    "import-operation",
+    "import-admission",
+    "legacy-caller",
+    "annexb-syntax",
+    "annexb-escape",
+    "annexb-string-methods",
+    "annexb-date-methods",
+    "annexb-regexp-compile",
+    "annexb-object-accessors",
+    "annexb-function-declarations",
+    "annexb-statement-forms",
+    "annexb-dynamic-source-accounting",
+    "error-is-error",
+    "math-sum-precise",
+    "upsert",
+    "array-from-async",
+    "uint8array-base64",
+    "iterator-concat",
+    "json-parse-source",
+    "disposal-intrinsics",
+    "using-declarations",
+    "iterator-zip",
+    "atomics-pause",
+    "language-exit-audit",
+  ]);
+  assert.equal(new Set(languageUnitIds).size, 27);
+  assert.ok(Object.isFrozen(languageUnitIds));
 });
 
 test("an accepted record with a note may authorize an exclusion", () => {

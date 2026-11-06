@@ -4,8 +4,7 @@ ADR 0032: Post-M5 edition and optional-section boundary
 Status
 ------
 
-Accepted by the maintainer on 2026-11-03 and applied by the `claim-boundary`
-unit of [*PLAN-LANGUAGE.md*](../../PLAN-LANGUAGE.md). The checked-in
+Accepted by the maintainer on 2026-11-03. The checked-in
 inventory follows this record and has 43,007 included paths. The rule of
 [ADR 0013](./0013-m5-edition-and-manifest.md) and
 [ADR 0020](./0020-m5-applicable-test-inventory.md) stays frozen in
@@ -14,9 +13,10 @@ candidate under both rules and lists the added paths in
 *tests/test262/inventory-m5-additions.txt*, so the 41,091-path M5 inventory
 and the closed M5 records stay checkable.
 
-Following Closure accounting, the 11 Annex B rows that ADR 0013 owned are
-remediation rows owned by the *PLAN-LANGUAGE.md* units that implement their
-behavior, and the language claim audit rejects any ADR 0013 exclusion.
+The
+[exclusion audit](../m5c-closure/exclusion-audit.md#former-adr-0013-exclusions-after-adr-0032)
+accounts for the 11 former ADR 0013 rows: nine pass and two have ADR 0016
+exclusions. The language claim audit rejects any ADR 0013 exclusion.
 
 The maintainer accepted an amendment on 2026-11-03 that replaced the runner
 gate rule in Consequences with the unit admission rule stated there.
@@ -261,9 +261,10 @@ Consequences
 ------------
 
 The denominator grows by 1,916 paths. Feature-tagged rows enter through the
-existing frontmatter rejection. Each of the 1,916 new paths is an unreviewed
-closure-ledger row owned by its *PLAN-LANGUAGE.md* unit. It stays out of the
-reviewed subset and the manifest until that unit admits it with reviewed
+existing frontmatter rejection. Before admission, each added path has an
+unreviewed closure-ledger row owned by its language work unit, under the
+[closure ledger rules](../m5c-closure/README.md#closure-ledger). It stays out
+of the reviewed subset and the manifest until that unit admits it with reviewed
 dependency tags. No row runs before its unit admits it, so no runner gate
 records unadmitted *test/annexB/* rows.
 
@@ -317,7 +318,8 @@ Links
  -  [ADR 0028](./0028-legacy-function-caller-boundary.md) is superseded
     separately by the `legacy-caller` unit.
  -  [ADR 0031](./0031-m5-named-deferral.md) keeps the M5 deferral list.
- -  [*PLAN-LANGUAGE.md*](../../PLAN-LANGUAGE.md) schedules the implementation.
+ -  [The ECMAScript 2026 profile](../language-profile-es2026.md) records the
+    admitted behavior and evidence.
  -  [*PLAN-TEMPORAL.md*](../../PLAN-TEMPORAL.md) and
     [*PLAN-INTL.md*](../../PLAN-INTL.md) own the tracks that stay outside.
  -  [*M5 exit report*](../m5c-closure/m5-exit-report.md) records the M5 result.

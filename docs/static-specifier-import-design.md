@@ -4,22 +4,21 @@ Static-specifier import design
 Status and authority
 --------------------
 
-The maintainer reviewed this post-M5 plan on 2026-11-01 and deferred the track
-past M5. This design covers the build-time-resolvable import track that
-alternative 3 of [ADR 0016](./adr/0016-dynamic-source-boundary.md) and
-[*PLAN-DYN.md*](../PLAN-DYN.md) anticipate. M5 implements none of it, and
-*PLAN-DYN.md*, which links this document, owns the track. Bounded general
-`eval` and `Function` construction are not part of it.
+This design defines the implemented build-time-resolvable import subset
+selected by alternative 3 of
+[ADR 0016](./adr/0016-dynamic-source-boundary.md).
+[*PLAN-DYN.md*](../PLAN-DYN.md) owns the broader dynamic-source track.
+Bounded general `eval` and `Function` construction are not part of this design.
 
 ADR 0016, as amended on 2026-11-03, selects the subset this design defines.
-The `import-*` units of [*PLAN-LANGUAGE.md*](../PLAN-LANGUAGE.md) implement
-it, and the default frontends now admit the literal form; every other
-`import()` stays rejected at parse time with `OSEO1001`. M5 deferred the
-20 pinned rows below by name under
+The default frontends implement this design and admit the literal form;
+every other `import()` stays rejected at parse time with `OSEO1001`. M5
+deferred the 20 pinned rows below by name under
 [ADR 0031](./adr/0031-m5-named-deferral.md) with *PLAN-DYN.md* as their target.
-The units are implemented and observed: 16 of those rows pass,
-*await-dynamic-import-rejection.js* reports its expected negative, and the
-three that need `eval` or the `Function` constructor stay deferred.
+The [language exit report](./m5c-closure/language-exit-report.md) records
+closure: 16 of those rows pass, *await-dynamic-import-rejection.js* reports its
+expected negative, and the three that need `eval` or the `Function` constructor
+stay deferred.
 
 The amendment text [below](#proposed-adr-0016-amendment) is applied to ADR
 0016.
@@ -580,8 +579,7 @@ before admission, under the `OSEO1001` rejection.
 Proposed ADR 0016 amendment
 ---------------------------
 
-Status of this text: Accepted by the maintainer on 2026-11-03, for the
-`import-*` units of [*PLAN-LANGUAGE.md*](../PLAN-LANGUAGE.md), and applied to
+Status of this text: Accepted by the maintainer on 2026-11-03 and applied to
 ADR 0016 together with the exclusion audit's record digest and quotes. That
 change also reviews the exclusion cohorts whose reopening trigger is an
 accepted amendment that admits dynamic import.

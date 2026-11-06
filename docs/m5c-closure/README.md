@@ -18,7 +18,8 @@ exclusion audit, and deferral list now account for that inventory, and the
 [ECMAScript 2026 profile](../language-profile-es2026.md) describes the
 measurement. The closed M5b and M5c graphs and the observation batch plan
 stay records of the M5 inventory, as the [M5 inventory view](#m5-inventory-view)
-describes.
+describes. Closure tools and commands keep their `m5c` names under the
+expanded claim.
 
 
 Closure states
@@ -47,9 +48,8 @@ qualifies only when work the maintainer did not approve for M5, or declined,
 is its one remaining closure route. A path that implementation inside M5
 would close stays with remediation.
 
-After ADR 0032, an included path may also be unreviewed with a work-unit
-owner, or unsupported under remediation by a work unit, until the
-*PLAN-LANGUAGE.md* track closes it.
+All ADR 0032 additions are reviewed, and no path currently has a work-unit
+owner, as the [language exit report](./language-exit-report.md) records.
 
 Coverage reports keep the reviewed count, inventory size, classifications,
 authorized-exclusion count, and deferral count separate. A percentage of the
@@ -110,10 +110,11 @@ The owner is the only per-path fact a change edits by hand:
     remediation owner or authorization, and the checker reports it as open;
  -  `node:<id>` names an M5c graph node: the remediation owner of a reviewed
     open path, or the node that will observe an unreviewed path;
- -  `unit:<id>` names a work unit from the table in
-    [*PLAN-LANGUAGE.md*](../../PLAN-LANGUAGE.md): the unit that admits and
-    observes an unreviewed path, or the remediation owner of a reviewed open
-    path;
+ -  `unit:<id>` names a language work unit from the fixed `languageUnitIds`
+    vocabulary in
+    [*tools/m5c-closure-ledger.ts*](../../tools/m5c-closure-ledger.ts): the
+    unit that admits and observes an unreviewed path, or the remediation owner
+    of a reviewed open path;
  -  `adr:<stem>` names the record *docs/adr/<stem>.md* as the authorization
     of an unsupported path's M5 exclusion; and
  -  `deferred` marks an unsupported path with an ADR 0031 entry in
@@ -134,9 +135,15 @@ Regeneration keeps an owner while its path keeps the same state and resets it
 to the default for the new state otherwise: `observation`, `unassigned`, or
 `node:observation-batch-plan`. A change that leaves a path unsupported for a
 different reason reassigns that path in the same change. A promotion to pass
-or expected negative takes the `observation` owner. A change that adds
-inventory paths assigns each one a `unit:` owner, because the language claim
-audit accepts an unreviewed path only with one.
+or expected negative takes the `observation` owner.
+
+For the ADR 0032 additions, each added path has an explicit `unit:` owner
+before review and enters the subset and manifest with reviewed dependency
+tags. No added path runs before admission, as
+[ADR 0032's accepted admission rule](../adr/0032-post-m5-edition-boundary.md#consequences)
+requires. The fixed `languageUnitIds` set is the accepted owner vocabulary; the
+language claim audit accepts an unreviewed path only with a unit owner. Future
+inventory expansion needs its own reviewed ownership and admission decision.
 
 
 Deferral list
@@ -225,10 +232,8 @@ the maintainer decision of 2026-10-28 and its later extensions to exact paths,
 ADR 0013 owned a mixed Annex B path only when reviewed replacement evidence
 observed every core subject; the profile's Annex B paragraphs name them, and an
 `annex-b` assessment names its bounded owner. ADR 0032 withdrew that
-authorization, so those 11 paths became remediation rows owned by the
-*PLAN-LANGUAGE.md* units that implement their Annex B behavior. Nine now pass
-and two are ADR 0016 exclusions, as
-[*exclusion-audit.md*](./exclusion-audit.md) describes, and the check rejects
+authorization. Nine of those 11 paths now pass and two are ADR 0016 exclusions,
+as [*exclusion-audit.md*](./exclusion-audit.md) describes, and the check rejects
 any ADR 0013 exclusion. The check accepts the
 owned `__lookupGetter__` or `__lookupSetter__` rejection only when the source
 calls the named method in call syntax. It accepts the ADR 0028 owner only

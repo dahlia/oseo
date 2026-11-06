@@ -4,13 +4,11 @@ ECMAScript 2026 language profile
 Status
 ------
 
-Implementation status: all units are implemented and observed, and the plan is
-complete, as the
+The language compatibility work is implemented and observed, as the
 [language exit report](./m5c-closure/language-exit-report.md) records. This
 profile succeeds the [M5 language profile](./language-profile-m5.md) for the
 claim that [ADR 0032](./adr/0032-post-m5-edition-boundary.md) defines.
-[*PLAN-LANGUAGE.md*](../PLAN-LANGUAGE.md) defines the implemented scope. The 21
-indexed family records assess every evidence class.
+The 21 indexed family records assess every evidence class.
 
 A change that admits or measures behavior inside this boundary updates this
 document in the same change. A family's status describes tested current
@@ -114,9 +112,9 @@ violation without an override path.
 Family index
 ------------
 
-Each unit adds the index and record files of its families in the change that
-admits its rows. Until then a family has no record and its paths stay
-unreviewed.
+The table identifies implemented families and their evidence records, together
+with the non-family dynamic-source accounting row. It does not describe
+current ledger ownership: all paths are reviewed, and none has a unit owner.
 
 | Unit                               | Behavior                                                     | New paths |
 | ---------------------------------- | ------------------------------------------------------------ | --------: |
@@ -143,10 +141,39 @@ unreviewed.
 | `atomics-pause`                    | `Atomics.pause`                                              |         5 |
 | Total                              |                                                              |     1,916 |
 
-The ledger owner of each row is `unit:` followed by the unit name in the first
-column. `annexb-dynamic-source-accounting` adds no family: its rows are
+`annexb-dynamic-source-accounting` adds no family: its rows are
 ADR 0016 exclusions with
 [reviewed exclusion audit rows](./m5c-closure/exclusion-audit.md#annex-b-dynamic-source-rows).
+
+
+Annex B coverage
+----------------
+
+The current profile includes these behaviors under
+[ADR 0032](./adr/0032-post-m5-edition-boundary.md). The M5 profile remains the
+normative owner of its existing semantics; the links distinguish those
+contracts from the additions described here.
+
+| Behavior                                                       | Contract                                                                                                                                                                  |
+| -------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| HTML-like Script comments                                      | [HTML-like comments](#html-like-comments)                                                                                                                                 |
+| Legacy octal literals, identity and octal escapes              | [Legacy numeric and string literals](#legacy-numeric-and-string-literals)                                                                                                 |
+| Object-literal `__proto__` setter                              | [*object-literal-prototype-setters.yaml*](./language-profile-m5/families/object-literal-prototype-setters.yaml)                                                           |
+| Simple catch parameter `var` redeclaration, including `for-of` | [*catch-var-coexistence.yaml*](./language-profile-m5/families/catch-var-coexistence.yaml); [Annex B additions](#statement-forms)                                          |
+| `WeakRef.prototype.constructor`                                | [*weak-collections.yaml*](./language-profile-m5/families/weak-collections.yaml); [normative-optional admission](#claim-boundary)                                          |
+| `Object.prototype.__proto__` accessor                          | [Annex B Object accessors](#annex-b-object-accessors), superseding the [M5 omitted-accessor boundary](./language-profile-m5.md#omitted-legacy-accessor-metadata-boundary) |
+| `__lookupGetter__` and `__lookupSetter__`                      | [Annex B Object accessors](#annex-b-object-accessors)                                                                                                                     |
+| `__defineGetter__` and `__defineSetter__`                      | [Annex B Object accessors](#annex-b-object-accessors)                                                                                                                     |
+| Annex B RegExp patterns                                        | [Regular expression patterns](#regular-expression-patterns)                                                                                                               |
+| `escape` and `unescape`                                        | [`escape` and `unescape`](#escape-and-unescape)                                                                                                                           |
+| `substr`, HTML methods, trim aliases                           | [`String.prototype` methods](#stringprototype-methods)                                                                                                                    |
+| `getYear`, `setYear`, `toGMTString`                            | [`Date.prototype` methods](#dateprototype-methods)                                                                                                                        |
+| `RegExp.prototype.compile`                                     | [`RegExp.prototype.compile`](#regexpprototypecompile)                                                                                                                     |
+| Labeled functions                                              | [Function declarations](#function-declarations)                                                                                                                           |
+| Functions in `if` clauses                                      | [Function declarations](#function-declarations)                                                                                                                           |
+| Block functions                                                | [Function declarations](#function-declarations); [M5 block-level function boundary](./language-profile-m5.md)                                                             |
+| `for-in` `var` initializers                                    | [Statement forms](#statement-forms)                                                                                                                                       |
+| Call assignment targets                                        | [Statement forms](#statement-forms)                                                                                                                                       |
 
 
 Annex B built-ins

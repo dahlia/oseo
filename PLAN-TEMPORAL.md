@@ -11,7 +11,8 @@ adds no repository command. Temporal stays outside the measured claim: proposed
 [ADR 0020](./docs/adr/0020-m5-applicable-test-inventory.md) did for M5.
 
 This plan is governed by [*DESIGN.md*](./DESIGN.md),
-[*ROADMAP.md*](./ROADMAP.md), [*PLAN-LANGUAGE.md*](./PLAN-LANGUAGE.md),
+[*ROADMAP.md*](./ROADMAP.md),
+[*docs/language-profile-es2026.md*](./docs/language-profile-es2026.md#claim-boundary),
 [*PLAN-INTL.md*](./PLAN-INTL.md), [*PLAN-NIO.md*](./PLAN-NIO.md),
 [*PLAN-BIGINT.md*](./PLAN-BIGINT.md), [*PLAN-DYN.md*](./PLAN-DYN.md),
 [*PLAN-GC.md*](./PLAN-GC.md), [*PLAN-PT.md*](./PLAN-PT.md),
@@ -134,11 +135,11 @@ Units 3 and 4 have no dependency on each other. Unit 6 needs units 3 through 5.
 Unit 7 can start after unit 1.
 
 Every unit follows the evidence rules in
-[*PLAN-LANGUAGE.md*](./PLAN-LANGUAGE.md). Property tests carry most of the
-weight: date arithmetic against an independent days-from-civil model, round
-trips through string forms, rounding against exact rational arithmetic, and
-zone transitions against the source data. Each property family reserves its
-own seed block.
+[*CONTRIBUTING.md*](./CONTRIBUTING.md#semantic-family-evidence). Property tests
+carry most of the weight: date arithmetic against an independent
+days-from-civil model, round trips through string forms, rounding against exact
+rational arithmetic, and zone transitions against the source data. Each
+property family reserves its own seed block.
 
 
 Entering the inventory

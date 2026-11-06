@@ -334,6 +334,9 @@ collection, strings, objects, host hooks, and diagnostics needed by generated
 code. It is a private ABI during early development. Native-addon compatibility
 does not constrain it.
 
+Increment `abiVersion` in *packages/runtime-c/src/index.ts* once per landing
+that changes the runtime ABI. Keep the `m5-` prefix.
+
 The C runtime is not the intended home of every standard built-in. Once the
 language profile can express them, built-in families may be self-hosted in
 the compiled TypeScript subset and compiled by Oseo, with only primitive

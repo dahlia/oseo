@@ -263,6 +263,13 @@ external compiler strings. A concrete toolchain adapter owns that mapping.
 Keep `NativeOperatingSystem` limited to operating-system facts. Unknown values
 belong to host detection rather than build targets.
 
+### Shared runtime identifiers
+
+Reserve disjoint runtime code ranges, property blocks, intrinsic indexes, and
+heap kinds before composing independent changes. Coordinate additions to the
+shared well-known symbol table as well. Follow the component ownership rules
+in [*docs/runtime-components.md*](./docs/runtime-components.md).
+
 
 Semantics and optimization
 --------------------------
@@ -296,13 +303,6 @@ crosses a boundary. Depending on the work, this may include:
  -  `mise run check:m5b-node-scope` for directional reviewed-evidence
     improvements made by an explicitly named M5b node, including an observed
     negative whose unsupported prerequisite the node removed.
-
-Every admitted M5 semantic family has one normative record indexed by
-*docs/language-profile-m5/index/*. The record assesses the fixed vocabulary in
-the M5 profile. A covered class names existing evidence. An omitted class gives
-a reason and names existing replacement evidence for the same contract. New
-families may not use `unassessed`, and `mise run check:evidence-lanes` rejects
-an incomplete or stale record set.
 
 Tests shared by Node.js and Deno must import `test` from `node:test` and
 `assert` from `node:assert/strict` directly. Register tests in files that both
@@ -382,6 +382,38 @@ Add guarded and unguarded examples and a non-building counterexample to
 *tests/native-host-guards.test.ts*, then run the check over the whole tree.
 Imported wrappers must be listed explicitly; calls through arbitrary object
 aliases and dynamically computed API names are not resolved.
+
+### Semantic-family evidence
+
+Every admitted semantic family has one normative record indexed by
+*docs/language-profile-m5/index/* or *docs/language-profile-es2026/index/*.
+The [M5 profile](docs/language-profile-m5.md#normative-family-records) and
+[ECMAScript 2026 profile](docs/language-profile-es2026.md#normative-family-records)
+define the shared evidence vocabulary. A covered class names existing evidence.
+An omitted class gives a reason and names existing replacement evidence for the
+same contract. New families may not use `unassessed`, and
+`mise run check:evidence-lanes` rejects an incomplete or stale record set.
+
+Register fixed native fixtures through *tests/native.ts*, including both
+forced-collection selections. Differential tests compare native output with
+Node.js and Deno where both expose the feature. When only one host exposes it,
+use that host and document the single reference in the family record; this
+includes features available only in Deno. When neither host exposes it, use
+an independent model. Every new heap kind or traced field must execute under
+collection at every safepoint. Follow the
+[property-based test rules](#property-based-tests) for useful generated domains
+and the [specialization rules](#semantics-and-optimization) for deliberate
+guard misses that reach the compiled generic fallback.
+
+Review every changed observation record and explain changes outside the new
+family, especially own-key and descriptor observations after built-in metadata
+changes. Follow [Scoped manifest regeneration](#scoped-manifest-regeneration)
+for whole-manifest observation requirements.
+
+Add a new dependency tag to *packages/testkit/src/index.ts* together with the
+vocabulary amendment required by
+[ADR 0013](docs/adr/0013-m5-edition-and-manifest.md#decision) in the same
+change.
 
 ### Property-based tests
 
@@ -662,8 +694,11 @@ measured weights. *tests/node-shard.test.ts* requires every modeled shard to
 finish within 40 minutes including setup.
 
 A new test file that runs for minutes on CI must add its weight on both hosts
-in the same change, or the placement treats it as light. Weights are the
-largest of three CI observations of a file's summed top-level test durations.
+in the same change, or the placement treats it as light. Add applicable native
+weights to *tools/native-shard-costs.ts* as well as the ordinary Node.js weights
+to *tools/node-shard-costs.ts*, using each table's measurement method. Node.js
+weights are the largest of three CI observations of a file's summed top-level
+test durations.
 Refresh them when the file set or relative costs change, as
 [*Node shard evidence*](docs/evidence/node-shards/README.md) describes.
 
