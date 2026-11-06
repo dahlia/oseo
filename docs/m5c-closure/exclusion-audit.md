@@ -91,7 +91,7 @@ pass or report an expected negative keep their audit rows and assessments as
 the record, with the `observation` ledger owner. The 18 rows whose fixture
 calls the `Function` constructor stay ADR 0016 exclusions under
 `ds12-static-module-observables`. The 87 rows that fail at build time fall on
-the two surfaces of the next section.
+the build surface of the next section.
 
 
 Literal `import()` build failures
@@ -100,32 +100,31 @@ Literal `import()` build failures
 ADR 0016, as amended, requires the closure of an admitted `import()` to
 resolve, load, parse, and link before native generation, and makes a failure a
 build diagnostic, not a language result. The runner then reports one diagnostic
-line as the whole observation detail. The check accepts two classes of that
-line, and only for a case that has the `dynamic-import` feature and no other
-unadmitted one, and whose source passes one string literal to an `import()`
-call with no options.
+line as the whole observation detail. The check accepts two capabilities of that
+line as ADR 0016 exclusions, and only for a case that has the `dynamic-import`
+feature and no other unadmitted one, and whose source passes one string literal
+to an `import()` call with no options.
 
- -  An ADR 0016 exclusion, under the `static-specifier-import-build`
-    capability: `OSEO0001` `Source could not be parsed.`, `OSEO2001`
-    `Export 'x' is ambiguous.`, or `OSEO2001` `Module has no export 'x'.`
-    located in the file a literal call names relative to the case, or
-    `OSEO3001` `The module source could not be read.` located at the specifier
-    of a literal call in the case. The 64 *catch/* rows of
+ -  Under the `static-specifier-import-build` capability: `OSEO0001`
+    `Source could not be parsed.`, `OSEO2001` `Export 'x' is ambiguous.`, or
+    `OSEO2001` `Module has no export 'x'.` located in the file a literal call
+    names relative to the case, or `OSEO3001`
+    `The module source could not be read.` located at the specifier of a
+    literal call in the case. The 64 *catch/* rows of
     [*PLAN-LANGUAGE.md*](../../PLAN-LANGUAGE.md#static-specifier-import-units)
     are these exclusions under `ds11-static-module-goal`,
     `ds11-static-module-ambiguous`, `ds11-static-module-circular`, and
     `import-call-promise`.
- -  A *PLAN-DYN.md* deferral, under the `module-resolution-profile`
-    capability: `OSEO3001` `Unsupported module specifier '…'.` located at the
-    specifier of a literal call in the case whose value is the quoted text. The
-    23 rows that import `''` or `'foo'` are these deferrals under
-    `literal-import-resolution-deferral` and the `unresolvable-literal-import`
-    family of [*deferrals.yaml*](./deferrals.yaml).
+ -  Under the `module-resolution-profile` capability: `OSEO3001`
+    `Unsupported module specifier '…'.` located at the specifier of a literal
+    call in the case whose value is the quoted text. The 23 rows that import
+    `''` or `'foo'` are these exclusions under
+    `literal-import-resolution-refusal`.
 
 Locations are one-based, as the diagnostics print them. Any other code,
-message, location, capability, or detail text is outside both surfaces. A
-build failure is only an exclusion and a refused specifier only a deferral,
-and a deferred path on either surface keeps its audit row.
+message, location, capability, or detail text is outside the surface. A row on
+the surface is only an exclusion, and a deferred path on it still needs its
+audit row, so the check refuses to defer it.
 
 
 Incidental Annex B TypedArray prototype lookup

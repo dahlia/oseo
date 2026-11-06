@@ -564,8 +564,8 @@ assessments:
       the 63 paths whose every ImportCall passes one string literal.
       import-admission re-observed all 86 paths. Of those 63, 41 now pass with
       observation owners, and the other 22 import the empty string and stop at
-      the build-time OSEO3001 resolution diagnostic, so they are PLAN-DYN.md
-      deferrals under literal-import-resolution-deferral. The 21 paths that nest
+      the build-time OSEO3001 resolution diagnostic, so they are ADR 0016
+      exclusions under literal-import-resolution-refusal. The 21 paths that nest
       an ImportCall as another's argument and the 2 that pass a unary or yield *
       operand compute a specifier, so alternative 4 keeps them outside the
       subset, and this assessment covers those 23.
@@ -607,26 +607,31 @@ assessments:
       independent non-source subject needs replacement and no pass is counted.
       ADR 0016, as amended on 2026-11-03, admits this string-literal ImportCall.
       import-admission re-observed the path, and its bare specifier 'foo' now
-      stops at the build-time OSEO3001 resolution diagnostic, so the path is a
-      PLAN-DYN.md deferral under literal-import-resolution-deferral and this
+      stops at the build-time OSEO3001 resolution diagnostic, so the path is an
+      ADR 0016 exclusion under literal-import-resolution-refusal and this
       assessment covers no path. ADR 0019 reopening remains in force.
-  literal-import-resolution-deferral:
-    disposition: deferral
-    normativeDependency: not-demonstrated
+  literal-import-resolution-refusal:
+    disposition: exclusion
+    normativeDependency: source-evaluation-only
     reason: >-
       Each path passes one string literal to ImportCall: the empty string in 22
       paths and 'foo' in await-expr-dyn-import.js. Their assertions are that the
       call parses in its context, that constructing its promise throws
       TypeError, or that a try/catch absorbs a load failure; none reads the
-      target. ADR 0016, as amended on 2026-11-03, admits these calls, but the
-      build-time resolution profile refuses both specifiers with OSEO3001, so no
-      assertion runs. The language reports a specifier that cannot load only
-      through the returned promise, and Oseo cannot yet compile a refused
-      literal specifier to that rejection, so the subject is not shown to depend
-      on source evaluation alone. Under the maintainer default of 2026-11-05
-      (option A) the paths are ADR 0031 deferrals to PLAN-DYN.md, which owns
-      that work. The audit accepts this deferral only over the OSEO3001 refusal
-      of the quoted specifier at a literal ImportCall in the path itself.
+      target. ADR 0016, as amended on 2026-11-03, requires each such request to
+      resolve during the build: "a failure is a build diagnostic, not a language
+      result", and build-time refusals of the subset are reported as subset
+      boundaries. The resolution profile refuses both specifiers with OSEO3001,
+      so the build stops before any assertion runs. No pass and no rejected
+      promise is inferred from that diagnostic. In
+      tests/import-requests.test.ts, "the empty specifier fails the build"
+      witnesses the refusal of '', and "an unresolvable or unreadable target
+      fails the build" witnesses it for a bare specifier. The maintainer default
+      of 2026-11-06 (option A) makes the paths ADR 0016 exclusions, because ADR
+      0032 lets the ADR 0031 deferral list gain no entry. The audit accepts this
+      exclusion only over the OSEO3001 refusal of the quoted specifier at a
+      literal ImportCall in the path itself. Rejecting a refused literal
+      specifier at run time would reopen ADR 0016.
   ds8-import-call-intrinsic-promise:
     disposition: exclusion
     normativeDependency: source-evaluation-only
@@ -27475,7 +27480,7 @@ paths:
     missingDynamicTag: false
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "Calling import('') (nested arrow syntax)"
-    assessment: literal-import-resolution-deferral
+    assessment: literal-import-resolution-refusal
   - path: "test/language/expressions/dynamic-import/syntax/vali\
       d/nested-arrow-assignment-expression-import-attribute\
       s-trailing-comma-first.js"
@@ -27540,7 +27545,7 @@ paths:
     missingDynamicTag: false
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "Calling import('') (nested arrow syntax)"
-    assessment: literal-import-resolution-deferral
+    assessment: literal-import-resolution-refusal
   - path: "test/language/expressions/dynamic-import/syntax/vali\
       d/nested-arrow-import-attributes-trailing-comma-first\
       .js"
@@ -27605,7 +27610,7 @@ paths:
     missingDynamicTag: false
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "Calling import('') (nested in async arrow function)"
-    assessment: literal-import-resolution-deferral
+    assessment: literal-import-resolution-refusal
   - path: "test/language/expressions/dynamic-import/syntax/vali\
       d/nested-async-arrow-function-await-import-attributes\
       -trailing-comma-first.js"
@@ -27671,7 +27676,7 @@ paths:
     missingDynamicTag: false
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "Calling import('') (nested in async arrow function, returned)"
-    assessment: literal-import-resolution-deferral
+    assessment: literal-import-resolution-refusal
   - path: "test/language/expressions/dynamic-import/syntax/vali\
       d/nested-async-arrow-function-return-await-import-att\
       ributes-trailing-comma-first.js"
@@ -27737,7 +27742,7 @@ paths:
     missingDynamicTag: false
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "Calling import('') (nested arrow syntax)"
-    assessment: literal-import-resolution-deferral
+    assessment: literal-import-resolution-refusal
   - path: "test/language/expressions/dynamic-import/syntax/vali\
       d/nested-async-function-await-import-attributes-trail\
       ing-comma-first.js"
@@ -27802,7 +27807,7 @@ paths:
     missingDynamicTag: false
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "Calling import('') (nested arrow syntax)"
-    assessment: literal-import-resolution-deferral
+    assessment: literal-import-resolution-refusal
   - path: "test/language/expressions/dynamic-import/syntax/vali\
       d/nested-async-function-import-attributes-trailing-co\
       mma-first.js"
@@ -27855,7 +27860,7 @@ paths:
     missingDynamicTag: false
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "Calling import('') (nested arrow syntax)"
-    assessment: literal-import-resolution-deferral
+    assessment: literal-import-resolution-refusal
   - path: "test/language/expressions/dynamic-import/syntax/vali\
       d/nested-async-function-return-await-import-attribute\
       s-trailing-comma-first.js"
@@ -27932,7 +27937,7 @@ paths:
     missingDynamicTag: false
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "Calling import('') (nested in async generator, awaited)"
-    assessment: literal-import-resolution-deferral
+    assessment: literal-import-resolution-refusal
   - path: "test/language/expressions/dynamic-import/syntax/vali\
       d/nested-async-gen-await-import-attributes-trailing-c\
       omma-first.js"
@@ -27998,7 +28003,7 @@ paths:
     missingDynamicTag: false
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "Calling import('') (nested block syntax)"
-    assessment: literal-import-resolution-deferral
+    assessment: literal-import-resolution-refusal
   - path: "test/language/expressions/dynamic-import/syntax/vali\
       d/nested-block-import-attributes-trailing-comma-first\
       .js"
@@ -28038,7 +28043,7 @@ paths:
     missingDynamicTag: false
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "Calling import('') (nested block syntax)"
-    assessment: literal-import-resolution-deferral
+    assessment: literal-import-resolution-refusal
   - path: "test/language/expressions/dynamic-import/syntax/vali\
       d/nested-block-labeled-import-attributes-trailing-com\
       ma-first.js"
@@ -28128,7 +28133,7 @@ paths:
     missingDynamicTag: false
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "Calling import('') (nested do while syntax)"
-    assessment: literal-import-resolution-deferral
+    assessment: literal-import-resolution-refusal
   - path: "test/language/expressions/dynamic-import/syntax/vali\
       d/nested-do-while-import-attributes-trailing-comma-fi\
       rst.js"
@@ -28193,7 +28198,7 @@ paths:
     missingDynamicTag: false
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "Calling import('') (nested else syntax)"
-    assessment: literal-import-resolution-deferral
+    assessment: literal-import-resolution-refusal
   - path: "test/language/expressions/dynamic-import/syntax/vali\
       d/nested-else-braceless-import-attributes-trailing-co\
       mma-first.js"
@@ -28258,7 +28263,7 @@ paths:
     missingDynamicTag: false
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "Calling import('') (nested else syntax)"
-    assessment: literal-import-resolution-deferral
+    assessment: literal-import-resolution-refusal
   - path: "test/language/expressions/dynamic-import/syntax/vali\
       d/nested-else-import-attributes-trailing-comma-first.\
       js"
@@ -28323,7 +28328,7 @@ paths:
     missingDynamicTag: false
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "Calling import('') (nested function syntax)"
-    assessment: literal-import-resolution-deferral
+    assessment: literal-import-resolution-refusal
   - path: "test/language/expressions/dynamic-import/syntax/vali\
       d/nested-function-import-attributes-trailing-comma-fi\
       rst.js"
@@ -28376,7 +28381,7 @@ paths:
     missingDynamicTag: false
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "Calling import('') (nested function syntax)"
-    assessment: literal-import-resolution-deferral
+    assessment: literal-import-resolution-refusal
   - path: "test/language/expressions/dynamic-import/syntax/vali\
       d/nested-function-return-import-attributes-trailing-c\
       omma-first.js"
@@ -28453,7 +28458,7 @@ paths:
     missingDynamicTag: false
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "Calling import('') (nested if syntax)"
-    assessment: literal-import-resolution-deferral
+    assessment: literal-import-resolution-refusal
   - path: "test/language/expressions/dynamic-import/syntax/vali\
       d/nested-if-braceless-import-attributes-trailing-comm\
       a-first.js"
@@ -28518,7 +28523,7 @@ paths:
     missingDynamicTag: false
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "Calling import('') (nested if syntax)"
-    assessment: literal-import-resolution-deferral
+    assessment: literal-import-resolution-refusal
   - path: "test/language/expressions/dynamic-import/syntax/vali\
       d/nested-if-import-attributes-trailing-comma-first.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -28582,7 +28587,7 @@ paths:
     missingDynamicTag: false
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "Calling import('') (nested while syntax)"
-    assessment: literal-import-resolution-deferral
+    assessment: literal-import-resolution-refusal
   - path: "test/language/expressions/dynamic-import/syntax/vali\
       d/nested-while-import-attributes-trailing-comma-first\
       .js"
@@ -28647,7 +28652,7 @@ paths:
     missingDynamicTag: false
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "Calling import('') (nested with syntax)"
-    assessment: literal-import-resolution-deferral
+    assessment: literal-import-resolution-refusal
   - path: "test/language/expressions/dynamic-import/syntax/valid/nested-with-ex\
       pression-empty-str-is-valid-assign-expr.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -28660,7 +28665,7 @@ paths:
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "Calling import('') (nested with syntax in the expression
       position)"
-    assessment: literal-import-resolution-deferral
+    assessment: literal-import-resolution-refusal
   - path: "test/language/expressions/dynamic-import/syntax/vali\
       d/nested-with-expression-import-attributes-trailing-c\
       omma-first.js"
@@ -28783,7 +28788,7 @@ paths:
     subject: "ImportCall is a CallExpression and Expression, so it can be
       wrapped for new expressions, while the same production is not possible
       without the parentheses wrapping."
-    assessment: literal-import-resolution-deferral
+    assessment: literal-import-resolution-refusal
   - path: "test/language/expressions/dynamic-import/syntax/valid/top-level-empt\
       y-str-is-valid-assign-expr.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -28795,7 +28800,7 @@ paths:
     missingDynamicTag: false
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "Calling import('') (top level syntax)"
-    assessment: literal-import-resolution-deferral
+    assessment: literal-import-resolution-refusal
   - path: "test/language/expressions/dynamic-import/syntax/vali\
       d/top-level-import-attributes-trailing-comma-first.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -32787,7 +32792,7 @@ paths:
     missingDynamicTag: false
     section: "prod-AwaitExpression"
     subject: "Valid syntax for top level await. AwaitExpression ImportCall"
-    assessment: literal-import-resolution-deferral
+    assessment: literal-import-resolution-refusal
   - path: "test/language/module-code/top-level-await/unobservable-global-async-\
       evaluation-count-reset.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"

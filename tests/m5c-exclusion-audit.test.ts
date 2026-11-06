@@ -996,23 +996,29 @@ test("an import() build failure is only an exclusion", () => {
   }
 });
 
-test("a refused literal specifier is only a deferral", () => {
+test("a refused literal specifier is only an exclusion", () => {
   const resolution = {
     capability: "module-resolution-profile",
     detail: importResolutionDetail,
     sourceText: importResolutionSource,
   };
-  const { audit, inputs } = importFixture({
-    ...resolution,
-    disposition: "deferral",
-  });
-  assert.deepEqual(validateM5cExclusionAudit(stringifyYaml(audit), inputs), {
-    exclusions: 0,
-    remediation: 0,
-    deferrals: 1,
-    missingDynamicTags: 1,
-  });
-  for (const disposition of ["exclusion", "remediation"] as const) {
+  for (const refusal of [
+    resolution,
+    {
+      ...resolution,
+      detail: importResolutionDetail.replace("''", "'foo'"),
+      sourceText: "// a\nimport('foo');\n",
+    },
+  ]) {
+    const { audit, inputs } = importFixture(refusal);
+    assert.deepEqual(validateM5cExclusionAudit(stringifyYaml(audit), inputs), {
+      exclusions: 1,
+      remediation: 0,
+      deferrals: 0,
+      missingDynamicTags: 1,
+    });
+  }
+  for (const disposition of ["deferral", "remediation"] as const) {
     const other = importFixture({ ...resolution, disposition });
     assert.throws(
       () => validateM5cExclusionAudit(stringifyYaml(other.audit), other.inputs),
@@ -1022,7 +1028,7 @@ test("a refused literal specifier is only a deferral", () => {
   }
 });
 
-test("near-miss specifier refusals stay off the deferral surface", () => {
+test("near-miss specifier refusals stay off the build surface", () => {
   const cases: readonly Parameters<typeof importFixture>[0][] = [
     // The quoted specifier must be the literal at the reported call.
     { detail: importResolutionDetail.replace("''", "'foo'") },
@@ -1046,7 +1052,6 @@ test("near-miss specifier refusals stay off the deferral surface", () => {
       capability: "module-resolution-profile",
       sourceText: importResolutionSource,
       ...options,
-      disposition: "deferral",
     });
     assert.throws(
       () => validateM5cExclusionAudit(stringifyYaml(audit), inputs),

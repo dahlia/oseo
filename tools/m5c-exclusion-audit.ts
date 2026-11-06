@@ -115,8 +115,8 @@ const importTargetFailures: readonly (readonly [string, RegExp])[] = [
 /** A literal target that cannot be read fails at its own call site. */
 const importLoadFailure = /^The module source could not be read\.$/u;
 /**
- * The resolution profile's refusal of a literal specifier, which *PLAN-DYN.md*
- * inherits as a deferral: compiling it to a run-time rejection is unbuilt.
+ * The resolution profile's refusal of a literal specifier. ADR 0016 requires
+ * the request to resolve during the build, so this too is a build diagnostic.
  */
 const importResolutionFailure = /^Unsupported module specifier '(.*)'\.$/u;
 
@@ -404,18 +404,8 @@ interface RecordSurfaces {
   readonly annexSurface: boolean;
   readonly callerSurface: boolean;
   readonly dynamicSurface: boolean;
-  /** A build failure of a literal `import()` target; ADR 0016 excludes it. */
+  /** A build failure of a literal `import()`; ADR 0016 excludes it. */
   readonly importBuildSurface: boolean;
-  /** A refused literal specifier; only a *PLAN-DYN.md* deferral takes it. */
-  readonly importResolutionSurface: boolean;
-}
-
-/** Which literal import() surface, if any, an observation falls on. */
-interface LiteralImportSurfaces {
-  /** A build failure of a literal `import()` target. */
-  readonly build: boolean;
-  /** A literal specifier the resolution profile refuses. */
-  readonly resolution: boolean;
 }
 
 /**
@@ -423,13 +413,12 @@ interface LiteralImportSurfaces {
  * `import()` call that caused it. A target failure must sit in the file a
  * literal call names, and a load or resolution failure at the specifier of
  * such a call, whose text a resolution failure quotes. Any other code,
- * message, location, or capability stays outside both surfaces.
+ * message, location, or capability stays outside the surface.
  */
-function literalImportSurfaces(
+function literalImportBuildSurface(
   result: Test262Result,
   source: string,
-): LiteralImportSurfaces {
-  const outside: LiteralImportSurfaces = { build: false, resolution: false };
+): boolean {
   const capability = result.observation.unsupportedCapability;
   const match = literalImportDiagnostic.exec(result.observation.detail ?? "");
   if (
@@ -439,7 +428,7 @@ function literalImportSurfaces(
     !result.case.features.includes("dynamic-import") ||
     result.unsupportedFeatures.length > 0
   ) {
-    return outside;
+    return false;
   }
   const [, file = "", line = "", column = "", code = "", message = ""] = match;
   const calls = literalImportCalls(source, result.case.mode);
@@ -449,31 +438,26 @@ function literalImportSurfaces(
     call.column === Number(column);
   if (capability === "module-resolution-profile") {
     const refused = importResolutionFailure.exec(message)?.[1];
-    return {
-      build: false,
-      resolution:
-        code === "OSEO3001" &&
-        calls.some((call) => atCall(call) && call.specifier === refused),
-    };
+    return (
+      code === "OSEO3001" &&
+      calls.some((call) => atCall(call) && call.specifier === refused)
+    );
   }
   if (code === "OSEO3001" && importLoadFailure.test(message)) {
-    return { build: calls.some(atCall), resolution: false };
+    return calls.some(atCall);
   }
   const directory = posix.dirname(result.case.path);
-  return {
-    build:
-      file !== result.case.path &&
-      importTargetFailures.some(
-        ([failure, text]) => failure === code && text.test(message),
-      ) &&
-      calls.some(
-        (call) =>
-          (call.specifier.startsWith("./") ||
-            call.specifier.startsWith("../")) &&
-          posix.join(directory, call.specifier) === file,
-      ),
-    resolution: false,
-  };
+  return (
+    file !== result.case.path &&
+    importTargetFailures.some(
+      ([failure, text]) => failure === code && text.test(message),
+    ) &&
+    calls.some(
+      (call) =>
+        (call.specifier.startsWith("./") || call.specifier.startsWith("../")) &&
+        posix.join(directory, call.specifier) === file,
+    )
+  );
 }
 
 /**
@@ -528,14 +512,12 @@ function recordSurfaces(result: Test262Result, source: string): RecordSurfaces {
     result.case.features.includes("caller") &&
     result.case.flags.includes("noStrict") &&
     hasCallerRead(source, result.case.mode);
-  const imports = literalImportSurfaces(result, source);
   return {
     accessorDetail,
     annexSurface,
     callerSurface,
     dynamicSurface,
-    importBuildSurface: imports.build,
-    importResolutionSurface: imports.resolution,
+    importBuildSurface: literalImportBuildSurface(result, source),
   };
 }
 
@@ -799,7 +781,6 @@ export function validateM5cExclusionAudit(
       callerSurface,
       dynamicSurface,
       importBuildSurface,
-      importResolutionSurface,
     } = recordSurfaces(result, source);
     const lookupMethod = annexLookupRejection.exec(accessorDetail)?.[1];
     const unitOwned =
@@ -812,14 +793,10 @@ export function validateM5cExclusionAudit(
         `Audit work-unit owner needs an ADR 0013 remediation row: ${path}.`,
       );
     }
-    // A build failure of a literal import() is an ADR 0016 exclusion and a
-    // refused literal specifier only a deferral; neither surface admits the
-    // other disposition.
+    // A build failure of a literal import() is only an ADR 0016 exclusion.
     if (
       proposedOwner === dynamicOwner
-        ? !dynamicSurface &&
-          !(importBuildSurface && excluded) &&
-          !(importResolutionSurface && deferred)
+        ? !dynamicSurface && !(importBuildSurface && excluded)
         : proposedOwner === callerOwner
           ? !callerSurface
           : !annexSurface && lookupMethod == null
@@ -980,7 +957,6 @@ export function validateM5cExclusionAudit(
     if (
       surfaces.dynamicSurface ||
       surfaces.importBuildSurface ||
-      surfaces.importResolutionSurface ||
       surfaces.annexSurface ||
       surfaces.callerSurface ||
       annexLookupRejection.test(surfaces.accessorDetail)

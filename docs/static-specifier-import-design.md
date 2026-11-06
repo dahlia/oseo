@@ -569,6 +569,13 @@ form needs a fresh assessment against the amended record. Its owner follows the
 new observation. The amendment grants no new exclusion and leaves the inventory
 denominator unchanged.
 
+A literal path that stops at a build diagnostic keeps ADR 0016 as its owner,
+because the request must resolve during the build. That covers the 64 *catch/*
+rows whose target cannot be linked, loaded, or parsed, and the 23 rows whose
+specifier the resolution profile refuses with `OSEO3001`: 22 import `''` and
+*await-expr-dyn-import.js* imports `'foo'`. Each was an ADR 0016 exclusion
+before admission, under the `OSEO1001` rejection.
+
 
 Proposed ADR 0016 amendment
 ---------------------------
