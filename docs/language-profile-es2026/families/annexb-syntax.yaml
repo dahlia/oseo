@@ -1,12 +1,17 @@
 version: 1
 id: annexb-syntax
-title: "Annex B HTML-like comments and regular expression patterns"
+title: "Annex B HTML-like comments, legacy literals, and pattern grammar"
 scope:
   - "The HTML-like comments of B.1.1 in the Script goal: <!-- anywhere,
     --> at the start of the source, after a line terminator with only
     white space and comments before it, and after a multi-line comment
     holding a line terminator, with Module code keeping the core early
     errors."
+  - "The legacy literals the lexical grammar keeps for sloppy Script code:
+    LegacyOctalIntegerLiteral, NonOctalDecimalIntegerLiteral,
+    LegacyOctalEscapeSequence, and NonOctalDecimalEscapeSequence, with
+    strict code, Module code, and untagged templates rejecting each of
+    them as an early error."
   - "The regular expression pattern grammar of B.1.2 without u and v, in
     the build-time pattern parser and generated matcher data and in the
     runtime's own validator and pattern compiler: identity escapes over
@@ -23,19 +28,25 @@ evidence:
   differential:
     status: covered
     references:
+      - tests/annexb-legacy-literals.test.ts
       - tests/annexb-syntax-native.test.ts
+      - tests/native.ts
+      - tests/native/fixtures/annexb-legacy-literals.ts
       - tests/native/fixtures/annexb-syntax.ts
       - tests/property/m5-annexb-regexp-syntax.property.test.ts
       - tests/property/m5-regexp-pattern.property.test.ts
   fixed:
     status: covered
     references:
+      - tests/annexb-legacy-literals.test.ts
+      - tests/native/fixtures/annexb-legacy-literals.ts
       - tests/native/fixtures/annexb-syntax.ts
       - packages/compiler/tests/regexp.test.ts
   forced-collection:
     status: covered
     references:
       - tests/annexb-syntax-native.test.ts
+      - tests/native.ts
       - tests/property/m5-annexb-regexp-syntax.property.test.ts
   generated:
     status: covered
@@ -52,6 +63,7 @@ evidence:
     status: covered
     references:
       - tests/annexb-syntax-native.test.ts
+      - tests/native.ts
       - tests/property/m5-annexb-regexp-syntax.property.test.ts
   standards:
     status: covered
@@ -87,6 +99,34 @@ evidence:
       - tests/test262/results/annexB/language/f8.yaml
       - tests/test262/results/annexB/language/fe.yaml
       - tests/test262/results/built-ins/String/79.yaml
+      - tests/test262/results/language/expressions/01.yaml
+      - tests/test262/results/language/expressions/24.yaml
+      - tests/test262/results/language/expressions/46.yaml
+      - tests/test262/results/language/literals/0d.yaml
+      - tests/test262/results/language/literals/2f.yaml
+      - tests/test262/results/language/literals/32.yaml
+      - tests/test262/results/language/literals/36.yaml
+      - tests/test262/results/language/literals/38.yaml
+      - tests/test262/results/language/literals/39.yaml
+      - tests/test262/results/language/literals/44.yaml
+      - tests/test262/results/language/literals/4f.yaml
+      - tests/test262/results/language/literals/52.yaml
+      - tests/test262/results/language/literals/69.yaml
+      - tests/test262/results/language/literals/72.yaml
+      - tests/test262/results/language/literals/7c.yaml
+      - tests/test262/results/language/literals/8d.yaml
+      - tests/test262/results/language/literals/9e.yaml
+      - tests/test262/results/language/literals/a2.yaml
+      - tests/test262/results/language/literals/bb.yaml
+      - tests/test262/results/language/literals/c2.yaml
+      - tests/test262/results/language/literals/ca.yaml
+      - tests/test262/results/language/literals/cf.yaml
+      - tests/test262/results/language/literals/d0.yaml
+      - tests/test262/results/language/literals/d7.yaml
+      - tests/test262/results/language/literals/da.yaml
+      - tests/test262/results/language/literals/e7.yaml
+      - tests/test262/results/language/literals/f4.yaml
+      - tests/test262/results/language/literals/fd.yaml
       - docs/m5c-closure/exclusion-audit.yaml
   structural:
     status: covered

@@ -138,6 +138,8 @@ const { annexBStringMethodFixtures } =
   await import("./fixtures/annexb-string-methods.ts");
 const { annexBDateMethodFixtures } =
   await import("./fixtures/annexb-date-methods.ts");
+const { annexBLegacyLiteralFixtures } =
+  await import("./fixtures/annexb-legacy-literals.ts");
 const { globalNumericFunctionFixtures } =
   await import("./fixtures/global-numeric-functions.ts");
 const { reflectNamespaceFixtures } =
@@ -389,6 +391,10 @@ export const nativeFixtureGroups: readonly NativeFixtureGroup[] = [
   {
     module: "annexb-date-methods.ts",
     fixtures: annexBDateMethodFixtures,
+  },
+  {
+    module: "annexb-legacy-literals.ts",
+    fixtures: annexBLegacyLiteralFixtures,
   },
   {
     module: "global-numeric-functions.ts",
