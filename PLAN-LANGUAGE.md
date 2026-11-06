@@ -4,25 +4,17 @@ Post-M5 language compatibility plan
 Status
 ------
 
-Implementation status: in progress. The `claim-boundary` unit has applied ADR
-0032. The `legacy-caller`, `annexb-escape`, `annexb-string-methods`,
-`annexb-date-methods`, `error-is-error`, `math-sum-precise`, `upsert`,
-`iterator-concat`, `iterator-zip`, `annexb-object-accessors`,
-`array-from-async`, `json-parse-source`, `uint8array-base64`,
-`atomics-pause`, `annexb-function-declarations`, `annexb-statement-forms`,
-`disposal-intrinsics`, `using-declarations`, `annexb-syntax`,
-`annexb-regexp-compile`, `import-operation`, `import-admission`, and
-`annexb-dynamic-source-accounting` units are implemented and observed. Every
-other unit is open. This plan follows M5 directly and runs alongside M6. It has
-no milestone number. It schedules the language work the maintainer approved on
-2026-11-02: build-time static-specifier `import()`, Annex B legacy web behavior
-except `document.all`, the legacy `caller` extension, the seven ECMAScript 2026
-features, and the three ECMAScript 2027 features other than Temporal.
+Implementation status: complete. All units are implemented and observed, and
+the [language exit report](./docs/m5c-closure/language-exit-report.md) shows
+that the exit criteria hold. No path
+remains unreviewed or owned by a work unit or remediation. The report separates
+the 57 named deferrals inherited by *PLAN-DYN.md* from ADR 0016 exclusions.
 
-The plan is written for parallel implementation. Each work unit below owns an
-exact set of test262 paths, names its prerequisites, and lists the shared files
-it must serialize with other units. Units may run in separate worktrees at the
-same time; they land one at a time.
+This plan covers build-time static-specifier `import()`, Annex B legacy web
+behavior except `document.all`, the legacy `caller` extension, the seven
+ECMAScript 2026 features, and three ECMAScript 2027 features other than
+Temporal. It follows M5 directly, runs alongside M6, and has no milestone
+number. The unit boundaries below define the implemented scope and its evidence.
 
 This plan is governed by [*WHITEPAPER.md*](./WHITEPAPER.md),
 [*DESIGN.md*](./DESIGN.md), [*ROADMAP.md*](./ROADMAP.md),
@@ -344,35 +336,19 @@ exactly the counts ADR 0032 predicts. The ADR 0020 rule stays frozen in
 derives *tests/test262/inventory-m5-additions.txt*, the 1,916 added paths.
 The closed M5 graph checks read the inventory without them.
 
-The new paths did not enter the reviewed subset or the manifest. Each is
-`unreviewed` in the closure ledger with a `unit:<id>` owner naming the unit in
-the table above, and the per-unit counts equal that table. An owning unit
-admits its rows into *tests/test262/subset.yaml* with reviewed dependency tags
-in the change that implements them, and the full manifest update observes
-them. A row therefore runs only once its unit admits it, so the runner needs
-no Annex B gate. Feature-tagged rows still enter through the
-frontmatter rejection until their feature joins `supportedFeatures`. The
-maintainer accepted this rule as an amendment to ADR 0032 on 2026-11-03.
-
-The 11 ADR 0013 Annex B rows moved to remediation owners, as ADR 0032's
-Closure accounting requires: one to `unit:annexb-syntax`, eight to
-`unit:annexb-object-accessors`, and two to
-`unit:annexb-dynamic-source-accounting`. Their exclusion audit assessments
-kept their reasons and replacement evidence with `disposition: remediation`.
-The nine rows of the first two units now pass with the `observation` owner.
-The last two are ADR 0016 exclusions, as
+All 1,916 added paths are admitted in *tests/test262/subset.yaml* with
+reviewed dependency tags and observed in the manifest. No path retains a
+`unit:<id>` owner. Of the 11 former ADR 0013 Annex B rows, nine pass with
+`observation` owners and two have reviewed ADR 0016 exclusions, as
 [`annexb-dynamic-source-accounting`](#annexb-dynamic-source-accounting)
 records.
 
-The unit froze the generated coverage section of the M5 exit report and
-replaced `check:m5-exit-audit` with `check:language-claim-audit`, which
-applies the ADR 0019 conditions to the expanded inventory and counts the open
-rows of each unit. The compatibility ratchet now rejects any path that leaves
-the included inventory. `check:evidence-lanes` also validates the family
-records of the successor
-[ECMAScript 2026 language profile](./docs/language-profile-es2026.md), whose
-family index lists the planned families by unit; the M5 profile stays fixed
-as the record of the M5 claim.
+`check:language-claim-audit --require-closed` applies the ADR 0019 terminal
+conditions to the expanded inventory. The compatibility ratchet rejects any
+included path that leaves the inventory. `check:evidence-lanes` validates the
+21 complete family records of the
+[ECMAScript 2026 language profile](./docs/language-profile-es2026.md).
+The M5 profile and exit report retain the separate M5 measurement.
 
 ### Static-specifier `import()` units
 
@@ -386,23 +362,19 @@ groups G1 through G14.
     It needs no amendment because it admits nothing. Status: the driver, its
     fixed fixtures in *tests/module-evaluation-driver-native.test.ts*, and the
     generated *module-evaluation-driver* property suite are implemented. The
-    full test262 UPDATE and the review of changed static observations remain
-    before it lands.
+    reviewed manifest observes the static module rows with this driver.
  -  `import-requests` converts the admitted form, records Script referrers,
     discovery edges, and request records, and reports build diagnostics. The
-    profile still rejects `import()` until `import-admission`. The frontend
-    conversion sits behind the Babel option `staticSpecifierImports`, which
-    the default frontends leave off, so no test262 observation changes. With
-    it on, `buildModuleGraph` and `buildScriptRequests` return the request
-    records, and `compileModuleGraph` rejects each `import()` site after
-    linking. *tests/import-requests.test.ts*,
+    default frontends enable the Babel option `staticSpecifierImports`.
+    `buildModuleGraph` and `buildScriptRequests` return the request records,
+    and `compileModuleGraph` lowers each admitted site after linking.
+    *tests/import-requests.test.ts*,
     *packages/parser-babel/tests/static-specifier-imports.test.ts*, and the
-    `testkit-import-requests` property family are the G11 and request-record
-    evidence. `import-admission` turns the option on in the default
-    components.
+    `testkit-import-requests` property family provide G11 and request-record
+    evidence. Status: implemented and observed.
  -  `import-operation` implements EvaluateImportCall, ContinueDynamicImport,
     fresh capabilities, cached results, and asynchronous settlement on both
-    execution targets. Status: implemented behind the same option.
+    execution targets. Status: implemented and observed.
     `compileModuleGraph` lowers each site to the runtime import operation,
     and `compileSource` compiles a Script referrer with its request closure.
     The fixed fixtures in *tests/import-operation-native.test.ts*, the
@@ -424,12 +396,10 @@ groups G1 through G14.
 In the full test262 observation, 252 rows move from unsupported to pass and
 *await-dynamic-import-rejection.js* becomes an expected negative; no row outside
 the `dynamic-import` and module-code rows changes. The 17 closable deferral
-rows are among them and now have observation owners. That observation left
-42,532 reviewed rows: 36,408 passes, 4,480 expected negatives, and 1,644
-unsupported results. The rows whose fixture calls the `Function` constructor,
-18 *eval-gtbndng-indirect-update* usage rows, keep ADR 0016 under the
-`ds12-static-module-observables` assessment, whose native witnesses replace
-their live binding updates.
+rows are among them and now have observation owners. The rows whose fixture
+calls the `Function` constructor, 18 *eval-gtbndng-indirect-update* usage rows,
+keep ADR 0016 under the `ds12-static-module-observables` assessment, whose
+native witnesses replace their live binding updates.
 
 The other 87 unsupported rows fail at build time. In 64 *catch/* rows the
 target cannot be linked, loaded, or parsed: *instn-iee-err-circular*,
@@ -560,9 +530,9 @@ was built from still match.
 
 Status: implemented, with fixed, differential, and generated evidence in the
 [profile section](./docs/language-profile-es2026.md#regexpprototypecompile).
-All 24 rows pass in the full test262 observation. With this unit and
-`annexb-syntax` observed, the manifest has 42,532 reviewed rows: 36,156
-passes, 4,479 expected negatives, and 1,897 unsupported results.
+All 24 rows pass in the full test262 observation. The
+[language exit report](./docs/m5c-closure/language-exit-report.md) records the
+complete manifest counts.
 
 ### `annexb-object-accessors`
 
@@ -671,9 +641,7 @@ runs it natively, so only the `eval` call remains.
 Status: implemented and observed. In the full test262 observation, the other
 475 rows, 469 under *test/annexB/language/eval-code/* and the six
 _createdynfn-\*.js_ rows, all report `unsupported-profile-feature` through the
-`OSEO1001` rejection, and no earlier row changes. The manifest grows from 42,532
-to 43,007 reviewed rows, with unsupported results rising from 1,644 to 2,119.
-Nine assessments, which
+`OSEO1001` rejection, and no earlier row changes. Nine assessments, which
 [*exclusion-audit.md*](./docs/m5c-closure/exclusion-audit.md#annex-b-dynamic-source-rows)
 lists, bind them. The ledger has no unreviewed row left, and this unit owns no
 row.
@@ -761,19 +729,15 @@ current *tests/test262/inventory.tsv*.
     `using` and `await using`, including `for`, `for-of`, `for-await-of`,
     and `switch` heads and module top level. It lowers each declaration
     through the cleanup contract above. The pinned `@babel/parser` 8.0.4
-    already parses the syntax; the converter currently rejects it with
-    OSEO1001. A property suite generates nested scopes, transfers, throwing
-    and async disposers, and checks disposal order and the `SuppressedError`
-    chain against a model.
-    The lowering, fixtures, and property suite are implemented. In the full
-    test262 observation, 118 of the 184 rows pass and 63 report the
-    `SyntaxError` they expect; the other three call `eval` and are ADR 0016
-    exclusions in the M5c exclusion audit. With this unit and
-    `disposal-intrinsics` observed, the manifest has 42,478 reviewed rows:
-    36,112 passes, 4,470 expected negatives, and 1,896 unsupported results,
-    and no earlier row changes. `await using`
-    keeps its pending completion in the ADR 0011 frame's completion slots,
-    which already survive suspension, so ADR 0017 needs no amendment.
+    parses the syntax, and the converter admits it. A property suite generates
+    nested scopes, transfers, throwing and async disposers, and checks disposal
+    order and the `SuppressedError` chain against a model. The lowering,
+    fixtures, and property suite are implemented. In the full test262
+    observation, 118 of the 184 rows pass and 63 report the `SyntaxError` they
+    expect; the other three call `eval` and are ADR 0016 exclusions in the M5c
+    exclusion audit. `await using` keeps its pending completion in the ADR 0011
+    frame's completion slots, which already survive suspension, so ADR 0017
+    needs no amendment.
  -  `iterator-zip` owns `Iterator.zip` and `Iterator.zipKeyed` (82), with the
     `shortest`, `longest`, and `strict` modes and padding. Neither reference
     host implements them, so a model written from the specification replaces
@@ -790,9 +754,10 @@ current *tests/test262/inventory.tsv*.
 
 ### `language-exit-audit`
 
-This unit runs after every other unit. It confirms that the expanded inventory
-meets ADR 0032's closure condition, publishes a coverage report like the M5
-exit report, and updates *ROADMAP.md*, the profile, and this plan's status.
+The [language exit report](./docs/m5c-closure/language-exit-report.md)
+records the terminal accounting of the expanded inventory under ADR 0032.
+Every path is reviewed and has an observation, exclusion, or named-deferral
+owner, and the clean-checkout gates pass on the last implementation landing.
 
 
 Evidence each unit supplies

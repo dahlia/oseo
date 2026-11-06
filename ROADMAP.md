@@ -20,8 +20,8 @@ gives the measured baseline, and
 closure records that `mise run check` still validates. This roadmap uses
 capability gates rather than calendar dates.
 
-Post-M5 ECMAScript work is planned in four documents.
-[*PLAN-LANGUAGE.md*](./PLAN-LANGUAGE.md) covers the remaining language
+Four plans define the post-M5 ECMAScript tracks.
+[*PLAN-LANGUAGE.md*](./PLAN-LANGUAGE.md) covers language
 compatibility: static-specifier `import()`, Annex B except `document.all`,
 the legacy `caller` extension, ECMAScript 2026 features, and ECMAScript 2027
 features except Temporal. [*PLAN-TEMPORAL.md*](./PLAN-TEMPORAL.md) covers
@@ -35,7 +35,11 @@ management, joint iteration, and `Atomics.pause` from ECMAScript 2027, and
 Annex B except `[[IsHTMLDDA]]`. The applicable inventory now has 43,007
 included paths at the same test262 revision. The
 [*ECMAScript 2026 language profile*](./docs/language-profile-es2026.md)
-records that measurement; the M5 profile and exit report keep the M5 result.
+records that measurement. The language plan is complete: all its units are
+implemented and observed, as the
+[language exit report](./docs/m5c-closure/language-exit-report.md) records.
+No inventory path remains unreviewed or owned by remediation. The M5 profile
+and exit report keep the separate M5 result.
 
 The macOS AArch64 native execution work accepted by
 [ADR 0014](./docs/adr/0014-native-target-support.md) is complete. Linux on AMD64

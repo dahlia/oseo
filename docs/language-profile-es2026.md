@@ -4,29 +4,19 @@ ECMAScript 2026 language profile
 Status
 ------
 
-Implementation status: started. This profile succeeds the
-[M5 language profile](./language-profile-m5.md) for the claim that
-[ADR 0032](./adr/0032-post-m5-edition-boundary.md) defines.
-[*PLAN-LANGUAGE.md*](../PLAN-LANGUAGE.md) schedules the work. The M5 profile
-stays fixed as the record of the M5 claim and its 41,091-path inventory, and
-the [M5 exit report](./m5c-closure/m5-exit-report.md) keeps the M5 result.
+Implementation status: all units are implemented and observed, and the plan is
+complete, as the
+[language exit report](./m5c-closure/language-exit-report.md) records. This
+profile succeeds the [M5 language profile](./language-profile-m5.md) for the
+claim that [ADR 0032](./adr/0032-post-m5-edition-boundary.md) defines.
+[*PLAN-LANGUAGE.md*](../PLAN-LANGUAGE.md) defines the implemented scope. The 21
+indexed family records assess every evidence class.
 
 A change that admits or measures behavior inside this boundary updates this
 document in the same change. A family's status describes tested current
-behavior, never intended behavior. The Annex B built-in units, the Annex B
-Object accessors, the Annex B language units, the Annex B syntax and
-`RegExp.prototype.compile` units, the small ECMAScript 2026 built-in units,
-`iterator-zip`, `array-from-async`, `json-parse-source`, the two explicit
-resource management units, and the static-specifier `import()` admission hold
-the family records so far; see
-[Annex B built-ins](#annex-b-built-ins),
-[Annex B Object accessors](#annex-b-object-accessors),
-[Annex B language semantics](#annex-b-language-semantics),
-[Annex B syntax and `compile`](#annex-b-syntax-and-compile),
-[Small ECMAScript 2026 built-in families](#small-ecmascript-2026-built-in-families),
-[Joint iteration](#joint-iteration), [`Array.fromAsync`](#arrayfromasync),
-[JSON source text](#json-source-text), and
-[Explicit resource management](#explicit-resource-management).
+behavior, never intended behavior. The M5 profile and
+[M5 exit report](./m5c-closure/m5-exit-report.md) retain the separate
+41,091-path M5 measurement.
 
 
 Claim boundary
@@ -83,26 +73,22 @@ derives it by classifying every candidate also under the frozen ADR 0020 rule
 in *tests/test262/inventory-policy-m5.yaml*, and it rejects a change that
 would drop an M5 path from the inventory.
 
-An added path enters the reviewed subset and the manifest only when its unit
-admits it. Until then it is `unreviewed` in the
-[closure ledger](./m5c-closure/README.md) with the `unit:<id>` owner of the
-*PLAN-LANGUAGE.md* unit that implements it. A unit admits its rows into
-*tests/test262/subset.yaml* with reviewed dependency tags when its behavior
-lands, and the full manifest update observes them.
+All 43,007 included paths are reviewed in *tests/test262/subset.yaml* and
+*tests/test262/results.yaml*: 36,408 passes, 4,480 expected negatives, and
+2,119 unsupported results. The [closure ledger](./m5c-closure/README.md)
+has no unreviewed or remediation-owned path. The unsupported results comprise
+2,062 reviewed ADR 0016 exclusions and 57 named deferrals, all inherited by
+*PLAN-DYN.md*. The nine former ADR 0013 rows covered by `annexb-syntax` and
+`annexb-object-accessors` pass; the other two have ADR 0016 exclusions.
 
-`mise run check:language-claim-audit` applies the closure conditions of
-[ADR 0019](./adr/0019-m5-claim-closure.md) to the expanded inventory. It
-requires zero semantic, harness, and infrastructure failures and an owner for
-every unsupported path, and it counts the open unreviewed and remediation
-paths of each unit. It rejects a path that still has the ADR 0013 owner,
-because ADR 0032 withdrew that record's Annex B authorization. The 11 former
-ADR 0013 rows became remediation of their units; the eight that
-`annexb-object-accessors` took now pass, and the other three still count as
-remediation. `language-exit-audit` runs
-it with `--require-closed`, which also requires both counts to be zero.
-`mise run report:language-coverage` prints the counts. The M5 denominator and
-this one stay separate: a percentage of this claim uses the 43,007 included
-paths.
+`mise run check:language-claim-audit --require-closed` applies the terminal
+closure conditions of [ADR 0019](./adr/0019-m5-claim-closure.md) to this
+inventory. It requires zero semantic, harness, and infrastructure failures,
+no unreviewed or remediation-owned path, and a reviewed exclusion or deferral
+owner for every unsupported path. It rejects the withdrawn ADR 0013 owner.
+`mise run report:language-coverage` prints the counts reproduced in the
+[language exit report](./m5c-closure/language-exit-report.md). A percentage of
+this claim uses 43,007 included paths; the M5 denominator stays separate.
 
 
 Normative family records

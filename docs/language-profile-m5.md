@@ -26,8 +26,11 @@ checkpoint. A group's status describes tested current behavior, never intended
 behavior. [ADR 0032](./adr/0032-post-m5-edition-boundary.md) moved the claim
 after M5; the
 [ECMAScript 2026 language profile](./language-profile-es2026.md) records the
-new boundary and its families, and this profile stays fixed as the record of
-the M5 claim.
+new boundary and its families. All successor-plan units are implemented and
+observed, and the
+[language exit report](./m5c-closure/language-exit-report.md) records the
+completed plan. This profile
+stays fixed as the record of the M5 claim.
 
 The normative family records described below inventory 149 admitted M5
 families and assess every evidence class.
