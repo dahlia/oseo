@@ -239,5 +239,5 @@ Annex B one.
 The `u-invalid-` and `unicode_restricted_` cases under *test/built-ins/*
 assert the unicode-mode rejections above. The Annex B rows under
 *test/annexB/built-ins/RegExp/* and *test/annexB/language/literals/regexp/*
-belong to the `annexb-syntax` unit of
-[*PLAN-LANGUAGE.md*](../PLAN-LANGUAGE.md).
+are covered by the implemented Annex B grammar in the
+[ECMAScript 2026 profile](./language-profile-es2026.md#annex-b-syntax-and-compile).

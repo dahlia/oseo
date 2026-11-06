@@ -4,11 +4,9 @@ ADR 0034: Legacy function caller contract
 Status
 ------
 
-Accepted by the maintainer on 2026-11-03 for the `legacy-caller` unit of
-[*PLAN-LANGUAGE.md*](../../PLAN-LANGUAGE.md). It supersedes
+Accepted by the maintainer on 2026-11-03. It supersedes
 [ADR 0028](./0028-legacy-function-caller-boundary.md): the optional legacy
-`caller` extension enters the profile, and ADR 0028's M5 exclusion ends when
-the unit lands its reviewed rows.
+`caller` extension enters the profile, and ADR 0028's M5 exclusion has ended.
 
 
 Context
@@ -87,9 +85,10 @@ Alternatives considered
     V8's non-writable, non-configurable data properties break the invariant
     described under “Observed results”. Keeping that shape and recording the
     two invariant rows as accepted failures would contradict
-    *PLAN-LANGUAGE.md*'s exit criteria, and own accessor properties would
-    keep the invariant but match V8's descriptors no better than the
-    selected shape. The selected shape is configurable data properties.
+    [ADR 0032's zero-failure closure rule](./0032-post-m5-edition-boundary.md#closure-accounting),
+    and own accessor properties would keep the invariant but match V8's
+    descriptors no better than the selected shape. The selected shape is
+    configurable data properties.
 
 
 Probe evidence
@@ -354,7 +353,8 @@ Links
     that the realm rule covers.
  -  [ADR 0032](./0032-post-m5-edition-boundary.md) is the post-M5 claim
     boundary.
- -  [*PLAN-LANGUAGE.md*](../../PLAN-LANGUAGE.md) schedules the unit.
+ -  The [language exit report](../m5c-closure/language-exit-report.md) records
+    the completed language work.
  -  [Forbidden extensions] and [AddRestrictedFunctionProperties] are the
     normative sources.
 

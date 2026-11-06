@@ -12,7 +12,8 @@ measured claim under
 [ADR 0032](./docs/adr/0032-post-m5-edition-boundary.md).
 
 This plan is governed by [*DESIGN.md*](./DESIGN.md),
-[*ROADMAP.md*](./ROADMAP.md), [*PLAN-LANGUAGE.md*](./PLAN-LANGUAGE.md),
+[*ROADMAP.md*](./ROADMAP.md),
+[*docs/language-profile-es2026.md*](./docs/language-profile-es2026.md#claim-boundary),
 [*PLAN-TEMPORAL.md*](./PLAN-TEMPORAL.md), [*PLAN-DYN.md*](./PLAN-DYN.md),
 [*PLAN-GC.md*](./PLAN-GC.md), [*PLAN-PT.md*](./PLAN-PT.md), and the
 [*M5 language profile*](./docs/language-profile-m5.md).

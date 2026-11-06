@@ -31,7 +31,7 @@ const annexOwner = "adr:0013-m5-edition-and-manifest";
 const remediationOwner = "node:dynamic-source-coverage-remediation";
 /** Ledger owner of a path named in the ADR 0031 deferral list. */
 const deferredOwner = "deferred";
-/** Prefix of a remediation owner naming a *PLAN-LANGUAGE.md* work unit. */
+/** Prefix of a language work-unit remediation owner. */
 const unitOwnerPrefix = "unit:";
 const importAttributesOwner =
   "node:import-attributes-dynamic-coverage-remediation";

@@ -61,11 +61,10 @@ reading `type` from the package root instead of the nearest *package.json*
 classified the ESM build of `yaml` as CommonJS; and a `Function` alias such as
 `const F = Function` escaped the dynamic-source check in `zod` 4 and `eta`.
 
-The reviewed static-specifier import design under
-[*PLAN-DYN.md*](../../PLAN-DYN.md), now scheduled in
-[*PLAN-LANGUAGE.md*](../../PLAN-LANGUAGE.md), turns a literal `import()` into
-a static edge served by the same injected resolver and loader. Those edges
-will carry bare specifiers as soon as this resolver exists.
+The [static-specifier import design](../static-specifier-import-design.md)
+turns a literal `import()` into a static edge served by the same injected
+resolver and loader. Those edges will carry bare specifiers as soon as this
+resolver exists.
 
 
 Required contract

@@ -111,7 +111,7 @@ to an `import()` call with no options.
     names relative to the case, or `OSEO3001`
     `The module source could not be read.` located at the specifier of a
     literal call in the case. The 64 *catch/* rows of
-    [*PLAN-LANGUAGE.md*](../../PLAN-LANGUAGE.md#static-specifier-import-units)
+    [the static-specifier import design](../static-specifier-import-design.md#test262-and-closure-consequences)
     are these exclusions under `ds11-static-module-goal`,
     `ds11-static-module-ambiguous`, `ds11-static-module-circular`, and
     `import-call-promise`.
@@ -431,9 +431,10 @@ authorization, so the 11 paths that the sections above close as ADR 0013
 exclusions became remediation rows. Nine of them keep the
 `adr:0013-m5-edition-and-manifest` proposed owner, digests, reasons, and
 replacement evidence. Each of their seven assessments changes only to
-`disposition: remediation` with a `remediationOwner` naming the
-[*PLAN-LANGUAGE.md*](../../PLAN-LANGUAGE.md) unit that implemented its Annex B
-behavior:
+`disposition: remediation` with a `remediationOwner` from the
+[closure ledger's unit vocabulary](./README.md#closure-ledger), identifying
+the implemented
+[Annex B behavior](../language-profile-es2026.md#annex-b-coverage):
 
  -  `unit:annexb-syntax`: *String/prototype/split/separator-regexp.js*;
  -  `unit:annexb-object-accessors`: the three TypedArray paths,

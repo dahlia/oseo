@@ -10,10 +10,9 @@ M5 language profile, and how their test262 observations are classified while
 they stay outside it.
 
 Amended on 2026-11-03, when the maintainer accepted the amendment in the
-[static-specifier import design](../static-specifier-import-design.md) for the
-`import-*` units of [*PLAN-LANGUAGE.md*](../../PLAN-LANGUAGE.md). The amendment
-selects alternative 3 for one bounded subset of dynamic import and changes
-nothing else this record decides.
+[static-specifier import design](../static-specifier-import-design.md). The
+amendment selects alternative 3 for one bounded subset of dynamic import and
+changes nothing else this record decides.
 
 
 Context
@@ -208,8 +207,6 @@ Links
  -  [*PLAN-DYN.md*](../../PLAN-DYN.md) defines the deferred capability,
     packaging, artifact, and evidence track without changing this decision.
  -  The [static-specifier import design](../static-specifier-import-design.md)
-    specifies the subset that alternative 3 admits, and
-    [*PLAN-LANGUAGE.md*](../../PLAN-LANGUAGE.md) schedules its
-    implementation units.
+    specifies the subset that alternative 3 admits.
  -  [*PLAN-REPL.md*](../../PLAN-REPL.md) keeps future tool-level interactive
     compilation separate from language-level dynamic source evaluation.

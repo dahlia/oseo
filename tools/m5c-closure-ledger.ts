@@ -69,8 +69,36 @@ export const m5cUnreviewedDefaultNode = "observation-batch-plan";
 /** Directory of architecture decision records an owner may cite. */
 export const m5cDecisionRecordDirectory = "docs/adr";
 
-/** Plan whose work-unit table names every `unit:` owner. */
-export const languagePlanPath = "PLAN-LANGUAGE.md";
+/** Accepted language work-unit IDs for `unit:` owners under ADR 0032. */
+export const languageUnitIds: readonly string[] = Object.freeze([
+  "claim-boundary",
+  "import-driver",
+  "import-requests",
+  "import-operation",
+  "import-admission",
+  "legacy-caller",
+  "annexb-syntax",
+  "annexb-escape",
+  "annexb-string-methods",
+  "annexb-date-methods",
+  "annexb-regexp-compile",
+  "annexb-object-accessors",
+  "annexb-function-declarations",
+  "annexb-statement-forms",
+  "annexb-dynamic-source-accounting",
+  "error-is-error",
+  "math-sum-precise",
+  "upsert",
+  "array-from-async",
+  "uint8array-base64",
+  "iterator-concat",
+  "json-parse-source",
+  "disposal-intrinsics",
+  "using-declarations",
+  "iterator-zip",
+  "atomics-pause",
+  "language-exit-audit",
+]);
 
 const nodeOwnerPrefix = "node:";
 const recordOwnerPrefix = "adr:";
@@ -144,7 +172,7 @@ export interface M5cLedgerEntry {
   readonly state: M5cLedgerState;
   /**
    * `observation`, `unassigned`, `node:<id>` naming a graph node,
-   * `unit:<id>` naming a *PLAN-LANGUAGE.md* work unit,
+   * `unit:<id>` naming a language work unit in `languageUnitIds`,
    * `adr:<stem>` naming the accepted record *docs/adr/<stem>.md* that
    * explicitly authorizes and bounds an M5 exclusion of an unsupported path,
    * or `deferred` for an unsupported path with an ADR 0031 deferral entry.
@@ -212,7 +240,7 @@ interface ParsedLedger {
 }
 
 /**
- * Targets an owner may name. Both sets come from checked-in files, so an
+ * Targets an owner may name. Targets come from checked-in evidence, so an
  * owner that names a removed node or a record that is no longer accepted
  * fails validation instead of silently keeping its paths.
  */
@@ -227,8 +255,8 @@ export interface M5cLedgerOwnerTargets {
   /** IDs of the checked-in M5c graph nodes. */
   readonly nodeIds: ReadonlySet<string>;
   /**
-   * IDs of the *PLAN-LANGUAGE.md* work units. Absent means that no path may
-   * take a `unit:` owner.
+   * IDs from the closed ADR 0032 vocabulary in `languageUnitIds`. Absent
+   * means that no path may take a `unit:` owner.
    */
   readonly unitIds?: ReadonlySet<string>;
 }
@@ -317,7 +345,7 @@ function ownerProblem(
   }
   const unit = ownerUnit(owner);
   if (unit != null && targets.unitIds?.has(unit) !== true) {
-    return `names unknown ${languagePlanPath} work unit ${unit}`;
+    return `names unknown language work unit ${unit}`;
   }
   const remediating = node != null || unit != null;
   const authorizing = authorizingRecord(owner);
@@ -800,46 +828,6 @@ export function readCurrentM5cNodeIds(): ReadonlySet<string> {
 }
 
 /**
- * Read the unit IDs from the work-unit table of *PLAN-LANGUAGE.md*: the
- * first table under the `Work units` heading, whose first column holds
- * each ID in backticks.
- */
-export function parseLanguageUnitIds(text: string): ReadonlySet<string> {
-  const lines = text.split("\n");
-  const heading = lines.findIndex(
-    (line, index) =>
-      line === "Work units" && /^-+$/u.test(lines[index + 1] ?? ""),
-  );
-  if (heading < 0) {
-    throw new Error(`${languagePlanPath} has no Work units section.`);
-  }
-  const ids: string[] = [];
-  let inTable = false;
-  for (const line of lines.slice(heading + 2)) {
-    if (line.startsWith("|")) {
-      inTable = true;
-      const id = /^\| `([a-z0-9]+(?:-[a-z0-9]+)*)` +\|/u.exec(line)?.[1];
-      if (id != null) ids.push(id);
-    } else if (inTable) {
-      break;
-    }
-  }
-  if (ids.length === 0 || new Set(ids).size !== ids.length) {
-    throw new Error(
-      `${languagePlanPath} work-unit table must name unique units.`,
-    );
-  }
-  return new Set(ids);
-}
-
-/** Read the work-unit IDs from the checked-in *PLAN-LANGUAGE.md*. */
-export function readCurrentLanguageUnitIds(): ReadonlySet<string> {
-  return parseLanguageUnitIds(
-    readFileSync(join(repositoryRoot, languagePlanPath), "utf8"),
-  );
-}
-
-/**
  * Report whether a decision record's status is accepted. The first line of
  * the paragraph under its Status heading must begin with `Accepted`, so a
  * proposed, deferred, or superseded record cannot authorize an exclusion.
@@ -903,7 +891,7 @@ function readCurrentInputs(
       acceptedRecords: readCurrentAcceptedRecords(),
       deferredPaths: readCurrentM5cDeferralPaths(),
       nodeIds: readCurrentM5cNodeIds(),
-      unitIds: readCurrentLanguageUnitIds(),
+      unitIds: new Set(languageUnitIds),
     },
   };
 }

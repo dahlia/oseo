@@ -1,13 +1,12 @@
 Language exit report
 ====================
 
-All *PLAN-LANGUAGE.md* units are implemented and observed. The plan is
-complete. This report measures
+The post-M5 language compatibility work is complete. This report measures
 Oseo's profile under [ADR 0032](../adr/0032-post-m5-edition-boundary.md):
 ECMAScript 2026 plus explicit resource management, joint iteration, and
 `Atomics.pause` from ECMAScript 2027, with Annex B except `[[IsHTMLDDA]]`.
 The [language profile](../language-profile-es2026.md) defines its behavior
-and evidence; [*PLAN-LANGUAGE.md*](../../PLAN-LANGUAGE.md) defines its scope.
+and evidence.
 
 Every included path is reviewed. None is a semantic, harness, or infrastructure
 failure, and no work unit or remediation owner retains a path. Measured residue

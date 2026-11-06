@@ -97,13 +97,12 @@ semantic unit required by the active profile is ready. An external library may
 serve as an implementation component only if its observable behavior can meet
 the candidate edition and Oseo owns every mismatch at a tested boundary.
 
-Annex B was outside the M5 candidate claim, so its pattern grammar and
-`RegExp.prototype.compile` did not enter through this plan. ADR 0032 brought
-them into the post-M5 claim, and the `annexb-syntax` and
-`annexb-regexp-compile` units of [*PLAN-LANGUAGE.md*](./PLAN-LANGUAGE.md)
-implement them over the components this plan owns. ECMA-402 locale behavior,
-host regular expression extensions, and a public embedding API are out of
-scope.
+The
+[ECMAScript 2026 profile](./docs/language-profile-es2026.md#annex-b-syntax-and-compile)
+includes Annex B pattern grammar and `RegExp.prototype.compile` under ADR 0032,
+implemented over the components this plan owns. Annex B remains outside the
+separate M5 claim. ECMA-402 locale behavior, host regular expression
+extensions, and a public embedding API are out of scope.
 
 
 Entry evidence
