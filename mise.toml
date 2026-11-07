@@ -12,6 +12,8 @@ postinstall = "mise run install-hooks"
 # The mise registry has no jactionlint entry yet, so name the backend.
 "ubi:jdx/jactionlint" = "2.1.0"
 pnpm = "12.18.0"
+bun = "1.4.4"
+"npm:postject" = "1.0.0-alpha.6"
 deno = "2.9.7"
 node = "24.21.0"
 oxfmt = "0.70.0"
@@ -64,6 +66,7 @@ depends = [
   "check:native-host-guards",
   "check:native-toolchains",
   "check:packages",
+  "check:perf",
   "check:selfhosted-mac-shell",
   "check:types",
   "check:unicode-tables",
@@ -500,6 +503,14 @@ node --test tests/macos-lanes.test.ts tests/node-shard.test.ts \
 [tasks."check:selfhosted-mac-shell"]
 description = "Lint dedicated Mac setup scripts"
 run = "shellcheck tools/selfhosted-mac/*.sh"
+
+[tasks."perf:prepare"]
+description = "Prepare the comparison matrix without building or measuring"
+run = "node tools/perf/prepare.ts"
+
+[tasks."check:perf"]
+description = "Validate benchmark self-checks and evidence contracts"
+run = "node --test tests/perf-harness.test.ts"
 
 [tasks."generate:commands"]
 description = "Generate the static CLI command registry"
