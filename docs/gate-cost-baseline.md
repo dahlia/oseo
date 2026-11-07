@@ -843,6 +843,10 @@ branch CI experiment. The coordinator directed an audit-only commit if local
 store restore was not clearly cheaper than the install's download part. No
 install or build is skipped, and no coverage changes.
 
+The current toolchain uses pnpm through mise, as recorded in
+[ADR 0035](./adr/0035-pnpm-workspace.md). The aube commands and timings in
+this audit remain historical observations.
+
 #### Existing CI step decomposition
 
 Sources are runs 36243816479, 36261458909 and 36312192623, fetched with
@@ -870,8 +874,8 @@ restore, so its column must not be added to those substeps again.
 | 36312192623 | Linux | 1.85            | 61.20              | 2.95                          |
 
 Mise-action is the largest setup step, but its name hides the dependency
-install. The `[deps.aube]` provider runs that install when the postinstall hook
-invokes `mise run install-hooks`. Its `cache` input already defaults to `true`,
+install. The `[deps.aube]` provider ran that install when the postinstall hook
+invoked `mise run install-hooks`. Its `cache` input already defaults to `true`,
 as the run logs confirm. The action restores its mise data directory, including
 installed tools. The source inspected was the action revision reported by run
 36312192623, [`c2a87611`]. Its default key includes platform/image and
@@ -1111,10 +1115,10 @@ The runtime-archive composite action first runs `mise run build`, including
 for Deno jobs on non-Windows hosts. Each later independent task invocation
 with `depends = ["build"]` runs it again. Within a single mise dependency
 DAG, shared dependencies run once; this audit does not count them twice.
-The build is `aube exec -- tsdown --workspace`, with `clean: true`, validating
-ESM, declarations, publint, and attw. No build source input is intentionally
-changed between these invocations. Native compiler choice affects native
-execution, not this npm build command.
+The current build is `pnpm exec tsdown --workspace`, with `clean: true`,
+validating ESM, declarations, publint, and attw. No build source input is
+intentionally changed between these invocations. Native compiler choice affects
+native execution, not this npm build command.
 
 Each row below identifies the source job by its workflow name. Columns are
 derived per-job sums of measured runner-log timestamp intervals from each
@@ -1231,13 +1235,13 @@ size and case budgets never substitute for ordinary ones (U7).
 Every family has these shared steps; this classification applies to each
 named instance in the step inventory:
 
-| Step/component                                                                    | Classification                                            | Source evidence and disposition                                                                                                                                                                                                                                     |
-| --------------------------------------------------------------------------------- | --------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Checkout, job initialization, mise installation/dependencies, post-action cleanup | Unclear as standalone coverage; operational prerequisites | The workflow installs the pinned macOS tool binaries and workspace dependencies. These steps establish no independent language verdict and stay with each macOS gate.                                                                                               |
-| Cache-action `mise run build` and each task's `build` dependency                  | Host-independent, equivalent Linux configuration          | *mise.toml* runs `aube exec -- tsdown --workspace`; package configs validate ESM/declarations/publint/attw, not generated native programs. Linux runs the same build, but each macOS consumer needs its artifacts. Reuse is U3's scope, not a removable macOS test. |
-| Cache-key computation                                                             | macOS-specific preparation, retained                      | *tests/ci-runtime-archive-cache.ts* selects the actual execution host/target and compiler identity; Zig and host-cc keys differ. It prepares the archive for that native target, not a Linux-equivalent assertion.                                                  |
-| Cache restore, exact-hit rejection/removal, post-cache save                       | Unclear as standalone coverage; retained infrastructure   | The composite action restores the complete key's archive and removes prefix matches. A hit is an archive observation, not a measurement of Zig cold/warm state.                                                                                                     |
-| Conditional failure/cancellation artifact upload                                  | macOS-specific diagnostic preservation, retained          | Native, support, test262 and sanitizer jobs upload that runner's native temporary artifacts. Removing this loses failure evidence from the actual native host.                                                                                                      |
+| Step/component                                                                    | Classification                                            | Source evidence and disposition                                                                                                                                                                                                                                  |
+| --------------------------------------------------------------------------------- | --------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Checkout, job initialization, mise installation/dependencies, post-action cleanup | Unclear as standalone coverage; operational prerequisites | The workflow installs the pinned macOS tool binaries and workspace dependencies. These steps establish no independent language verdict and stay with each macOS gate.                                                                                            |
+| Cache-action `mise run build` and each task's `build` dependency                  | Host-independent, equivalent Linux configuration          | *mise.toml* runs `pnpm exec tsdown --workspace`; package configs validate ESM/declarations/publint/attw, not generated native programs. Linux runs the same build, but each macOS consumer needs its artifacts. Reuse is U3's scope, not a removable macOS test. |
+| Cache-key computation                                                             | macOS-specific preparation, retained                      | *tests/ci-runtime-archive-cache.ts* selects the actual execution host/target and compiler identity; Zig and host-cc keys differ. It prepares the archive for that native target, not a Linux-equivalent assertion.                                               |
+| Cache restore, exact-hit rejection/removal, post-cache save                       | Unclear as standalone coverage; retained infrastructure   | The composite action restores the complete key's archive and removes prefix matches. A hit is an archive observation, not a measurement of Zig cold/warm state.                                                                                                  |
+| Conditional failure/cancellation artifact upload                                  | macOS-specific diagnostic preservation, retained          | Native, support, test262 and sanitizer jobs upload that runner's native temporary artifacts. Removing this loses failure evidence from the actual native host.                                                                                                   |
 
 Job-specific steps/components follow. Setup costs are not attributed to pure
 case durations, and target-dependent work is never moved by file-name alone.
@@ -1915,17 +1919,17 @@ the figure that would justify revisiting U4, and revisiting it would need the
 per-object saving confirmed on a runner first.
 
 A cross-job cache does not hit on every run. The harness object key covers
-*aube-lock.yaml*, every TypeScript source and manifest of the compiler,
+*pnpm-lock.yaml*, every TypeScript source and manifest of the compiler,
 backend, parser, CLI, and Unicode packages, the runtime assets in
 *packages/runtime-c/*, the reviewed harness sources in *tests/test262/harness/*,
 the target, the toolchain identity from `zig env`, and the compile flags. Over
-the 79 first-parent steps on main ending at `e76e235b`, a measured 51 leave
-every one of those inputs unchanged and 28 change at least one, a derived 64.6
-percent. That is a historical input-stability proportion, not an observed cache
-hit rate, and using it as one assumes the next run's key matches the previous
-run's published entry. Every branch that changes the compiler misses until
-its own first run publishes, and a GitHub Actions cache written on a branch is
-not visible to other branches.
+the 79 first-parent steps on main ending at `e76e235b`, measured with the
+previous package-manager lockfile, 51 leave every one of those inputs unchanged
+and 28 change at least one, a derived 64.6 percent. That is a historical
+input-stability proportion, not an observed cache hit rate, and using it as one
+assumes the next run's key matches the previous run's published entry. Every
+branch that changes the compiler misses until its own first run publishes, and
+a GitHub Actions cache written on a branch is not visible to other branches.
 
 Object bytes were measured on the same shard; the transfer cost around them is
 an estimate built from other caches. The 96 objects occupy a measured 239.4

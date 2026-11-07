@@ -95,16 +95,17 @@ checkout. A command described in a design or plan document may not exist until
 its implementation lands. Do not add instructions that present planned commands
 as already available.
 
-The mise aube dependency provider checks *package.json* and *aube-lock.yaml*
-before every `mise run`. It performs a frozen install only when the inputs have
-changed or *node\_modules/* is missing. Run `mise deps` to synchronize
-dependencies without starting a repository task. Do not add task-level install
-dependencies that duplicate this provider.
+The mise pnpm dependency provider checks the root and package manifests,
+*pnpm-workspace.yaml*, and *pnpm-lock.yaml* before every `mise run`. It
+performs a frozen install only when the inputs have changed or *node\_modules/*
+is missing. Run `mise deps` to synchronize dependencies without starting a
+repository task. Do not add task-level install dependencies that duplicate this
+provider.
 
 The workspace uses this toolchain:
 
  -  [jactionlint] for GitHub Actions workflow validation;
- -  [aube] for JavaScript package installation and
+ -  [pnpm] for JavaScript package installation and
     workspace management;
  -  [Oxfmt] for JavaScript, TypeScript, and data-file formatting;
  -  [Oxlint] for JavaScript and TypeScript linting;
@@ -117,9 +118,9 @@ The workspace uses this toolchain:
 
 Standalone repository-wide tools must be pinned through mise and exposed
 through mise tasks. Node.js-hosted tools that load workspace packages belong in
-the aube workspace manifest and must run through `aube exec` from a mise task.
+the pnpm workspace manifest and must run through `pnpm exec` from a mise task.
 Oxlint follows the latter rule because its local JavaScript plugin requires the
-Node.js wrapper. Package build and test dependencies also belong in aube
+Node.js wrapper. Package build and test dependencies also belong in pnpm
 workspace manifests.
 
 Oxfmt owns JavaScript, TypeScript, and supported data files. Hongdown owns
@@ -134,18 +135,39 @@ Using Zig as a C toolchain does not make Zig the runtime implementation
 language. The C runtime and the native backend remain replaceable architectural
 components.
 
-When aube workspace files exist, do not introduce npm or pnpm lockfiles or use
-a different package manager to modify dependency state. Do not hand-edit
-generated lockfiles.
+Use pnpm workspace files and *pnpm-lock.yaml* for dependency state. Do not
+introduce npm, Yarn, or aube lockfiles or use another package manager to
+modify dependencies. Do not hand-edit generated lockfiles.
 
 [mise]: https://mise.jdx.dev/
 [jactionlint]: https://github.com/jdx/jactionlint
-[aube]: https://aube.jdx.dev/
+[pnpm]: https://pnpm.io/
 [Oxfmt]: https://oxc.rs/docs/guide/usage/formatter
 [Oxlint]: https://oxc.rs/docs/guide/usage/linter
 [ShellCheck]: https://www.shellcheck.net/
 [TypeScript]: https://www.typescriptlang.org/
 [tsdown]: https://tsdown.dev/
+
+### Dependency Agent Skills
+
+The CLI uses Optique 1.2.13, which ships its `optique` Agent Skill. During
+installation, pnpm links that approved skill into *.agents/skills/* and
+*.claude/skills/* during installation. These generated directories are ignored
+by Git. The other pinned direct dependencies do not currently ship skills.
+
+`mise deps` installs dependencies and their approved skills when dependency
+inputs change. To refresh missing skill links when the dependency inputs have
+not changed, run:
+
+~~~~ sh
+mise exec -- pnpm install --frozen-lockfile
+~~~~
+
+Review a dependency's skills before approving them with `pnpm approve`.
+Approvals and destination directories are stored in *pnpm-workspace.yaml*.
+The Optique approval names only `optique`, so a skill added in a later release
+requires its own review. Keep generated links and pnpm's per-directory ignore
+files out of commits.
 
 
 Repository layout and package boundaries

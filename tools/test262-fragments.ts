@@ -97,7 +97,7 @@ export function withHarnessIntegrity(host: CompilerHost): CompilerHost {
 
 async function packageIdentity(names: readonly string[]): Promise<string> {
   const hash = createHash("sha256");
-  hash.update(await readFile(new URL("../aube-lock.yaml", import.meta.url)));
+  hash.update(await readFile(new URL("../pnpm-lock.yaml", import.meta.url)));
   for (const name of names) {
     const root = new URL(`../packages/${name}/`, import.meta.url);
     hash.update(

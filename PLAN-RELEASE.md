@@ -11,7 +11,7 @@ milestone, or change any language semantics or compatibility count.
 
 No release exists yet, and none of the channels below is a commitment to
 publish before the release gate in this plan is satisfied. Repository
-development keeps using mise and the aube workspace; nothing here changes the
+development keeps using mise and the pnpm workspace; nothing here changes the
 contributor workflow.
 
 This plan is governed by [*WHITEPAPER.md*](./WHITEPAPER.md),

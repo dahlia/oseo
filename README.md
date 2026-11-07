@@ -61,6 +61,9 @@ Getting started
 ---------------
 
 Oseo uses [mise] as the entry point for development tools and repository tasks.
+The mise setup installs the pinned pnpm release and synchronizes workspace
+dependencies with a frozen lockfile. See [*CONTRIBUTING.md*](./CONTRIBUTING.md)
+for the toolchain rules and dependency skills.
 
 ~~~~ sh
 mise install

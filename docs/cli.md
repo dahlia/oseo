@@ -14,7 +14,7 @@ this command line.
 Run the CLI from a checkout
 ---------------------------
 
-Oseo uses mise to install its development tools and aube to synchronize the
+Oseo uses mise to install its development tools and pnpm to synchronize the
 workspace. Build the packages before invoking the executable from a repository
 checkout:
 

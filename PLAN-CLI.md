@@ -159,10 +159,9 @@ ambiguity without preserving a released contract.
 Command modules and discovery
 -----------------------------
 
-The first implementation unit upgrades the CLI to a stable Optique release that
-includes `@optique/discover`, at least version 1.2.0. Direct Optique
-dependencies move together so parser, runner, and discovery behavior come from
-one compatible release line.
+The CLI uses Optique 1.2.13. The first implementation unit adds
+`@optique/discover` from that release line. Direct Optique dependencies stay
+on one version so parser, runner, and discovery behavior remain compatible.
 
 Each user command is a module whose default export is created with
 `defineCommand()`. Its parser, help metadata, and thin handler stay together.
@@ -336,8 +335,8 @@ Delivery order
     plan or an architecture decision.
 3.  Add failing Node.js and Deno tests for the planned root, `run`, `build`,
     help, completion, output-mode, and target behaviors.
-4.  Upgrade Optique and introduce the static generated registry. Move command
-    parsing and dispatch into typed command modules while preserving the
+4.  Add Optique discovery and introduce the static generated registry. Move
+    command parsing and dispatch into typed command modules while preserving the
     host-injected workflow boundary.
 5.  Split temporary execution from retained artifact publication. Move
     `--dump-mir` and `--emit-c` under `build`, and enforce the distinct target

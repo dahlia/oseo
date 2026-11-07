@@ -11,20 +11,26 @@ postinstall = "mise run install-hooks"
 "aqua:nushell/nushell" = "0.116.0"
 # The mise registry has no jactionlint entry yet, so name the backend.
 "ubi:jdx/jactionlint" = "2.1.0"
-aube = "2.5.0"
+pnpm = "12.18.0"
 deno = "2.9.7"
 node = "24.21.0"
 oxfmt = "0.70.0"
 shellcheck = "0.11.0"
 zig = "0.16.0"
 
-[deps.aube]
+[deps.pnpm]
 auto = true
-run = "aube install --frozen-lockfile"
+sources = [
+  "package.json",
+  "packages/*/package.json",
+  "pnpm-lock.yaml",
+  "pnpm-workspace.yaml",
+]
+run = "pnpm install --frozen-lockfile"
 
 [tasks.build]
 description = "Build every npm package as validated ESM"
-run = "aube exec -- tsdown --workspace"
+run = "pnpm exec tsdown --workspace"
 
 [tasks.bump-versions]
 description = "Atomically set the lockstep package version"
@@ -119,7 +125,7 @@ run = "node tools/language-claim-audit.ts"
 run = "node tools/check-lines.ts"
 
 [tasks."check:lint"]
-run = "aube exec -- oxlint ."
+run = "pnpm exec oxlint ."
 
 [tasks."check:m5b-graph"]
 description = "Validate the checked-in M5b work graph"
@@ -170,9 +176,9 @@ run = "node tools/test262-inventory.ts"
 [tasks."check:types"]
 depends = ["build"]
 run = '''
-aube exec -- tsc --version
-aube exec -- tsc --project tsconfig.json
-aube exec -- tsc --project tools/oxlint/tsconfig.json
+pnpm exec tsc --version
+pnpm exec tsc --project tsconfig.json
+pnpm exec tsc --project tools/oxlint/tsconfig.json
 '''
 
 [tasks."check:unicode-tables"]

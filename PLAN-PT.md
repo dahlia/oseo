@@ -119,7 +119,7 @@ Tool choice
 -----------
 
 Use [`fast-check`] as the generation, shrinking, replay, and property runner.
-Pin one stable release through aube in the root development dependencies. Do
+Pin one stable release through pnpm in the root development dependencies. Do
 not use an experimental build or introduce another package manager lockfile.
 
 `fast-check` remains test infrastructure. Compiler core, frontend, backend,
@@ -1059,7 +1059,7 @@ behavior rather than intended coverage.
 Delivery order
 --------------
 
-1.  Pin `fast-check` through aube and prove one unchanged *.test.ts* property
+1.  Pin `fast-check` through pnpm and prove one unchanged *.test.ts* property
     under Node.js and Deno. Add shared configuration with explicit seeds,
     complete failure reporting, and incomplete-run failure behavior.
 2.  Add value, hint, and small closed-program models for the M2 and M3 profile.
