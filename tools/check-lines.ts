@@ -4,7 +4,7 @@ import { readFile, readdir } from "node:fs/promises";
 import { extname, join, relative } from "node:path";
 
 const ignoredDirectories = new Set([".git", "dist", "node_modules"]);
-const ignoredFiles = new Set(["aube-lock.yaml"]);
+const ignoredFiles = new Set(["pnpm-lock.yaml"]);
 const ignoredPathPrefixes = ["tools/oxlint/anti-slop/"];
 const maintainedExtensions = new Set([
   ".c",

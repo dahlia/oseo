@@ -32,7 +32,7 @@
     }
   },
   "dependencies": {
-    "@optique/core": "1.1.1",
+    "@optique/core": "1.2.13",
     "@oseo/backend-c": "workspace:*",
     "@oseo/compiler": "workspace:*",
     "@oseo/host": "workspace:*",

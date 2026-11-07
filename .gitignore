@@ -7,3 +7,7 @@ artifacts/
 *.a
 *.s
 *.out
+
+# Dependency skills are linked by pnpm install.
+.agents/skills/
+.claude/skills/

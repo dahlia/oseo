@@ -12,7 +12,7 @@ import {
   writeFile,
 } from "node:fs/promises";
 import { tmpdir } from "node:os";
-import { join } from "node:path";
+import { join, resolve as resolvePath } from "node:path";
 
 import { cRuntimeProvider } from "../packages/runtime-c/src/index.ts";
 import { isString } from "./value-kinds.ts";
@@ -250,12 +250,18 @@ async function main(): Promise<void> {
     for (const directory of packageDirectories) {
       const stage = await stagePackage(root, directory, destination);
       const result = await run(
-        "aube",
-        ["pack", "-C", stage, "--json", "--pack-destination", destination],
-        root,
+        "pnpm",
+        [
+          "--ignore-workspace",
+          "pack",
+          "--json",
+          "--pack-destination",
+          destination,
+        ],
+        stage,
       );
-      // SAFETY: npm pack --json returns an array of pack result records.
-      const packed = (JSON.parse(result.stdout) as readonly PackResult[])[0];
+      // SAFETY: pnpm pack --json returns one pack result record.
+      const packed = JSON.parse(result.stdout) as PackResult;
       if (packed == null)
         throw new Error(`${directory} did not produce a pack.`);
       const files = new Set(packed.files.map((file) => file.path));
@@ -281,7 +287,11 @@ async function main(): Promise<void> {
       }
       const manifestBytes = await run(
         "tar",
-        ["-xOzf", packed.filename, "package/package.json"],
+        [
+          "-xOzf",
+          resolvePath(destination, packed.filename),
+          "package/package.json",
+        ],
         root,
       );
       // SAFETY: npm exposes the packed package.json bytes at this exact path.

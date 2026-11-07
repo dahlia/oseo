@@ -1,0 +1,13 @@
+packages:
+  - "packages/*"
+
+verifyDepsBeforeRun: error
+
+permissions:
+  "@optique/core":
+    skills: [optique]
+
+skills:
+  dirs:
+    - .agents/skills
+    - .claude/skills

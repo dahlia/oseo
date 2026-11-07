@@ -4,7 +4,9 @@ Initial platform and tool versions
 Status
 ------
 
-Accepted. The execution-target portion is superseded by
+Accepted. The package-manager choice is superseded by
+[ADR 0035](./0035-pnpm-workspace.md). The execution-target portion is
+superseded by
 [ADR 0014](./0014-native-target-support.md). The recorded host and tool pins
 have since moved in [*mise.toml*](../../mise.toml); a superseding record that
 names the current pins and their evidence is pending in

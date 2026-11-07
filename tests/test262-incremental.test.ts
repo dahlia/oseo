@@ -736,7 +736,7 @@ test("the static guard admits only observation-neutral differences", () => {
     "packages/compiler/src/index.ts",
     "tools/test262.ts",
     "tests/test262/harness/base.js",
-    "aube-lock.yaml",
+    "pnpm-lock.yaml",
     "package.json",
     "mise.toml",
     "tests/native-toolchain.ts",

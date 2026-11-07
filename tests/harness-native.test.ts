@@ -32,7 +32,7 @@ import { nativeToolchain, hostCcLane } from "./native-toolchain.ts";
 async function identity(directory: URL): Promise<string> {
   const hash = createHash("sha256");
   hash.update(await readFile(new URL("../package.json", directory)));
-  hash.update(await readFile(new URL("../aube-lock.yaml", import.meta.url)));
+  hash.update(await readFile(new URL("../pnpm-lock.yaml", import.meta.url)));
   for (const name of (await readdir(directory)).toSorted()) {
     if (!name.endsWith(".ts")) continue;
     hash.update(name).update(await readFile(new URL(name, directory)));
