@@ -50,10 +50,11 @@ rejected; a type-reference spread inside a destructuring annotation, such as
 `[number, ...Array<string>]`, is accepted and left unhinted. Most TypeScript
 programs written for another runtime therefore fail before compilation.
 
-Every executable built for Linux AMD64 or macOS AArch64 links
-AddressSanitizer and UndefinedBehaviorSanitizer, because `describeTarget()`
-in *packages/compiler/src/native.ts* fixes them for both execution targets,
-and the generated C receives no optimization flag. There is no optimized
+Every executable built for Linux AMD64 or macOS AArch64 is a checking
+build. `describeTarget()` in *packages/compiler/src/native.ts* requests
+AddressSanitizer and UndefinedBehaviorSanitizer for both execution targets,
+the generated C receives no optimization flag, and without one `zig cc`
+compiles in its debug mode. There is no optimized
 build configuration.
 
 The CLI compiles a source, runs the result from a temporary directory, and
@@ -206,17 +207,18 @@ semantics change.
 Decisions to record
 -------------------
 
-The preview needs three decisions before the units that depend on them:
+The preview needs three decisions before the units that depend on them.
+Each has an accepted record:
 
- -  the retained-executable destination and replacement contract that
-    [*PLAN-CLI.md*](./PLAN-CLI.md) requires before `build` lands;
- -  the optimized build configuration: its compiler and linker options, how
-    it is selected, and which gates run it. ADR 0014 records address and
-    undefined-behavior sanitizers as per-target facts of both execution
-    targets, so this decision amends that record or supersedes the
-    sanitizer column with a new ADR; and
- -  an ADR for the process subset, its Node.js deviations, and its relation
-    to M7.
+ -  [ADR 0036](./docs/adr/0036-optimized-native-build-configuration.md)
+    defines the `checked` and `optimized` build configurations, their
+    compiler options, how they are selected, and which gates run them. It
+    amends the sanitizer column of ADR 0014;
+ -  [ADR 0037](./docs/adr/0037-retained-native-executables.md) defines the
+    retained-executable destination and replacement contract that
+    [*PLAN-CLI.md*](./PLAN-CLI.md) requires before `build` lands; and
+ -  [ADR 0038](./docs/adr/0038-process-input-and-exit-subset.md) defines the
+    process subset, its Node.js deviations, and its relation to M7.
 
 The erasable TypeScript boundary changes the source-language profile, not
 the ECMAScript claim. The [M1 language profile](./docs/language-profile-m1.md)

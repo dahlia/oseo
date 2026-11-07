@@ -60,11 +60,14 @@ The frontend reads the primitive annotations `any`, `bigint`, `boolean`,
 JSDoc tags, and primitive members of inline object, tuple, and array
 annotations on destructuring patterns. Only the M2 addition consumes hints.
 
-Both execution targets build every executable with AddressSanitizer and
-UndefinedBehaviorSanitizer, which `describeTarget()` fixes. The runtime
-archive is compiled with `-O2`, and the generated C receives no optimization
-flag. Link-time optimization is disabled with `-fno-lto` when prebuilt
-objects or additional generated sources are linked.
+Both execution targets build every executable as a checking build:
+`describeTarget()` requests AddressSanitizer and UndefinedBehaviorSanitizer,
+although the pinned Zig passes only the latter, as the
+[sanitizer activity audit](./docs/sanitizer-activity.md) records. The
+runtime archive is compiled with `-O2`, and the generated C receives no
+optimization flag, which leaves `zig cc` in its debug mode. Link-time
+optimization is disabled with `-fno-lto` when prebuilt objects or additional
+generated sources are linked.
 
 The
 [M5 performance and code-size report](./docs/evidence/m5-performance/README.md)
@@ -98,15 +101,15 @@ Checkpoints
 
 ### Measurement
 
-Measuring speed needs an optimized build first. This checkpoint adds a build
-configuration without sanitizers and with optimized generated C, selected
-explicitly. Because
-[ADR 0014](./docs/adr/0014-native-target-support.md) fixes both sanitizers
-for both execution targets, the configuration needs an amendment of that
-record or a new ADR. The sanitized
-configuration stays the default for the test gates. The corpus runs the
-optimized configuration, and the existing native gates run it too, so that
-the two configurations cannot diverge in behavior unnoticed.
+Measuring speed needs an optimized build first. This checkpoint implements
+the `optimized` configuration that
+[ADR 0036](./docs/adr/0036-optimized-native-build-configuration.md) defines:
+`-O2` generated C and runtime with no sanitizers, selected explicitly, beside
+the `checked` configuration that stays the default for `oseo run` and the
+test gates. The corpus runs `optimized`. The native fixture corpus runs both
+configurations on every pull request, and the test262 and native property
+suites run `optimized` in a scheduled job and at each checkpoint's exit, so
+that the two configurations cannot diverge in behavior unnoticed.
 
 A benchmark corpus and harness come next. The corpus uses well-known
 kernels whose licenses allow redistribution, for example Richards,
