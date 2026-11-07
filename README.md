@@ -32,10 +32,12 @@ annotations at the syntax level and never depends on `tsc`.
 Current status
 --------------
 
-Oseo is early and under active development. It has completed milestone M4,
-which brought native module graphs, promises, asynchronous execution, and a
-native event loop. Work is now in M5, broadening measured ECMAScript
-compatibility.
+Oseo is early and under active development. It has completed milestone M5,
+which measured ECMAScript compatibility on top of M4's native module graphs,
+promises, asynchronous execution, and native event loop. The post-M5 language
+work then moved the measurement to ECMAScript 2026 with Annex B, as the
+[ECMAScript 2026 language profile](./docs/language-profile-es2026.md) records.
+[*ROADMAP.md*](./ROADMAP.md) names the plans that continue from there.
 
 Oseo currently supports an explicit language profile rather than the whole of
 ECMA-262, and it does not yet claim conformance to any edition. Releases

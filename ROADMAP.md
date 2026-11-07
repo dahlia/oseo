@@ -137,6 +137,21 @@ packages that npm, pnpm, or Yarn installed into *node\_modules* through
 M7 adds Node.js APIs or CommonJS. It reserves no milestone and changes no
 language semantics; its results are per-package scenario records.
 
+A technical preview checkpoint is recorded in
+[*PLAN-PREVIEW.md*](./PLAN-PREVIEW.md). Before M6 begins, it admits erasable
+TypeScript syntax, retains optimized native executables through `oseo build`,
+gives programs a small Node.js-compatible process subset for arguments,
+input, and exit status as the first part of M7's `process` surface, and
+publishes demonstration programs with measured comparisons. It reserves no
+milestone and decides no release.
+
+A performance track is recorded in [*PLAN-PERF.md*](./PLAN-PERF.md). It starts
+with an optimized build configuration and a benchmark corpus and harness
+measured against Node.js, Deno, and Bun, then reduces generic-path costs and
+extends guarded property, call, and numeric specialization in an order
+determined by the measurements. It reserves no milestone and changes no
+language semantics.
+
 
 Working rules
 -------------
