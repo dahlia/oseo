@@ -1,0 +1,12 @@
+[Thread debugging using libthread_db enabled]
+Using host libthread_db library "/lib64/libthread_db.so.1".
+0x0000000001062012 in builtin_dispatcher (code_id=<optimized out>) at runtime_function.c:217
+
+Thread 1 (Thread 0x7f939ecf1b80 (LWP 802818) "fixture-linux-x"):
+#0  0x0000000001062012 in builtin_dispatcher (code_id=<optimized out>) at runtime_function.c:217
+#1  call_in_running_realm (context=context@entry=0x7ffc6fe37520, callee=callee@entry=9222527612398369424, receiver=receiver@entry=9221683186994511872, argument_count=argument_count@entry=2, arguments=arguments@entry=0x1c32b188, new_target=new_target@entry=9221683186994511872) at runtime_function.c:3114
+#2  0x0000000001061d46 in call_once (context=context@entry=0x7ffc6fe37520, callee=callee@entry=9222527612398369424, receiver=receiver@entry=9221683186994511872, argument_count=argument_count@entry=2, arguments=arguments@entry=0x1c32b188, new_target=9221683186994511872) at runtime_function.c:3232
+#3  0x000000000106060e in oseo_call_function (context=context@entry=0x7ffc6fe37520, callee=9221683186994511872, callee@entry=9222527612398369424, receiver=17757040, receiver@entry=9221683186994511872, argument_count=9221683186994511872, argument_count@entry=2, arguments=arguments@entry=0x1c32b188, new_target=9221683186994511872) at runtime_function.c:3625
+#4  0x000000000104b4f8 in oseo_function_script (context=0x7ffc6fe37520, receiver=<optimized out>, argument_count=0, arguments=0x0, new_target=<optimized out>, callee=<optimized out>) at /home/dahlia/.local/state/oseo-preview/lanes/perf-profiling/capture-ci-20261109/linux-smoke-g/build/generated.c:312
+#5  main () at /home/dahlia/.local/state/oseo-preview/lanes/perf-profiling/capture-ci-20261109/linux-smoke-g/build/generated.c:391
+[Inferior 1 (process 802818) detached]

@@ -1,0 +1,11 @@
+[Thread debugging using libthread_db enabled]
+Using host libthread_db library "/lib64/libthread_db.so.1".
+0x00007f27f33f8f5b in _int_malloc () from /lib64/libc.so.6
+
+Thread 1 (Thread 0x7f27f3371b80 (LWP 691992) "fixture-linux-x"):
+#0  0x00007f27f33f8f5b in _int_malloc () from /lib64/libc.so.6
+#1  0x00007f27f33f94cf in __libc_malloc2 () from /lib64/libc.so.6
+#2  0x000000000108ae57 in oseo_cell_create (context=0x46ccd030, context@entry=0x7fff73d361a0, value=9222809086901354496) at runtime_binding.c:123
+#3  0x000000000104b170 in oseo_function_script (context=0x7fff73d361a0, receiver=<optimized out>, argument_count=0, arguments=0x0, new_target=<optimized out>, callee=<optimized out>) at /home/dahlia/.local/state/oseo-preview/lanes/perf-profiling/capture-ci-20261109/linux-smoke-a/build/generated.c:247
+#4  main () at /home/dahlia/.local/state/oseo-preview/lanes/perf-profiling/capture-ci-20261109/linux-smoke-a/build/generated.c:391
+[Inferior 1 (process 691992) detached]

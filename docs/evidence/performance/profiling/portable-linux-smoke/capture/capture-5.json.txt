@@ -1,0 +1,33 @@
+{
+  "argv": [
+    "/usr/libexec/gdb",
+    "--nx",
+    "--nh",
+    "--batch",
+    "-iex",
+    "set auto-load off",
+    "-iex",
+    "set debuginfod enabled off",
+    "-p",
+    "802818",
+    "-ex",
+    "thread apply all bt 16",
+    "-ex",
+    "detach"
+  ],
+  "cwd": "/home/dahlia/orca/workspaces/oseo/perf-profiling",
+  "env": {
+    "PATH": "/home/dahlia/.cabal/bin:/home/dahlia/.bun/bin:/home/dahlia/.local/share/pnpm:/home/dahlia/.local/share/mise/installs/aqua-dahlia-hongdown/0.5.3:/home/dahlia/.local/share/mise/installs/aqua-nushell-nushell/0.116.0/.mise-bins:/home/dahlia/.local/share/mise/installs/ubi-jdx-jactionlint/2.1.0:/home/dahlia/.local/share/mise/installs/pnpm/12.18.0:/home/dahlia/.local/share/mise/installs/deno/2.9.7/bin:/home/dahlia/.local/share/mise/installs/deno/2.9.7/.deno/bin:/home/dahlia/.local/share/mise/installs/node/24.21.0/bin:/home/dahlia/.local/share/mise/installs/oxfmt/0.70.0/node_modules/.bin:/home/dahlia/.local/share/mise/installs/shellcheck/0.11.0/shellcheck-v0.11.0:/home/dahlia/.local/share/mise/installs/zig/0.16.0/bin:/home/dahlia/.local/share/mise/installs/python/latest/bin:/home/dahlia/.local/share/mise/installs/bun/latest/bin:/home/dahlia/.local/share/mise/installs/github-dahlia-dojang/latest:/home/dahlia/.local/share/mise/installs/claude-code/latest:/home/dahlia/.local/share/mise/installs/codex/latest/bin:/home/dahlia/.local/share/mise/installs/opencode/latest/node_modules/.bin:/home/dahlia/.local/share/mise/installs/antigravity-cli/latest:/home/dahlia/.local/share/mise/installs/npm-fedify-cli/latest/node_modules/.bin:/home/dahlia/.local/share/mise/installs/aws/latest/.mise-bins:/home/dahlia/.local/share/mise/installs/github-steipete-codex-bar/latest:/home/dahlia/.local/share/mise/installs/pypi-matrix-mcp/latest/bin:/home/dahlia/.local/share/mise/shims:/home/dahlia/.ghcup/bin:/home/dahlia/.local/bin:/home/dahlia/bin:/home/dahlia/.config/orca/codex-accounts/0be9f85b-a42b-4ef8-ae43-7b936f40efa7/home/tmp/arg0-linux/codex-arg0fuEOem:/home/dahlia/.config/orca/linux-orca-cli-shim:/home/dahlia/.cargo/bin:/usr/local/bin:/usr/bin:/home/dahlia/.dotnet/tools:/home/dahlia/.fzf/bin:/home/dahlia/.volta/bin:/home/dahlia/.asdf/shims:/home/dahlia/.fnm/aliases/default/bin:/home/dahlia/.yarn/bin:/opt/homebrew/bin:/opt/homebrew/sbin:/usr/local/sbin:/snap/bin:/home/linuxbrew/.linuxbrew/bin:/nix/var/nix/profiles/default/bin:/home/dahlia/.nix-profile/bin:/home/dahlia/.opencode/bin:/home/dahlia/.vite-plus/bin"
+  },
+  "startedUtc": "2026-11-08T21:20:34.806Z",
+  "finishedUtc": "2026-11-08T21:20:34.905Z",
+  "pid": 802901,
+  "status": 0,
+  "signal": null,
+  "error": null,
+  "timedOut": false,
+  "stdout": "capture-5.stdout",
+  "stderr": "capture-5.stderr",
+  "cleanup": [],
+  "groupGone": true
+}
