@@ -1,0 +1,58 @@
+name: Set up mise
+description: Verify mise restores and retry official downloads
+inputs:
+  install:
+    description: Whether to install project tools
+    default: "true"
+  install_args:
+    description: Arguments passed unchanged to upstream mise install
+    default: ""
+runs:
+  using: composite
+  steps:
+    - id: policy
+      uses: ./.github/actions/mise-policy
+      with:
+        install-args: ${{ inputs.install_args }}
+        config-hash: >-
+          ${{ hashFiles(
+            '**/mise.toml', '**/mise.lock',
+            '**/mise.*.toml', '**/mise.*.lock',
+            '**/.mise.toml', '**/.mise.lock',
+            '**/.mise.*.toml', '**/.mise.*.lock',
+            '**/.tool-versions',
+            '**/.config/mise.toml', '**/.config/mise.lock',
+            '**/.config/mise.*.toml', '**/.config/mise.*.lock',
+            '**/.config/mise/config.toml', '**/.config/mise/config.lock',
+            '**/.config/mise/config.*.toml',
+            '**/.config/mise/config.*.lock',
+            '**/.mise/config.toml', '**/.mise/config.lock',
+            '**/.mise/config.*.toml', '**/.mise/config.*.lock',
+            '**/mise/config.toml', '**/mise/config.lock',
+            '**/mise/config.*.toml', '**/mise/config.*.lock') }}
+    - id: cache
+      uses: actions/cache/restore@v5
+      with:
+        path: ${{ steps.policy.outputs.data-dir }}
+        key: ${{ steps.policy.outputs.cache-key }}
+    - uses: ./.github/actions/mise-policy
+      with:
+        phase: restore
+        directory: ${{ steps.policy.outputs.data-dir }}
+        cache-hit: ${{ steps.cache.outputs.cache-hit }}
+        sha256: ${{ steps.policy.outputs.sha256 }}
+    - uses: jdx/mise-action@v4
+      with:
+        version: ${{ steps.policy.outputs.version }}
+        mise_dir: ${{ steps.policy.outputs.data-dir }}
+        cache: "false"
+        install: ${{ inputs.install }}
+        install_args: ${{ inputs.install_args }}
+      env:
+        CURL_HOME: ${{ steps.policy.outputs.curl-home }}
+    - uses: actions/cache/save@v5
+      if: >-
+        steps.cache.outputs.cache-hit != 'true' && inputs.install == 'true'
+      with:
+        path: ${{ steps.policy.outputs.data-dir }}
+        key: ${{ steps.policy.outputs.cache-key }}

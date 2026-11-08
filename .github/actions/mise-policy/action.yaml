@@ -1,0 +1,35 @@
+name: Resolve mise release
+description: Resolve the official release and check restored binary bytes
+inputs:
+  phase:
+    description: Resolve metadata or check the restored cache
+    default: prepare
+  sha256:
+    description: Expected raw binary SHA256 when checking a restore
+    default: ""
+  directory:
+    description: Job-local mise data directory when checking a restore
+    default: ""
+  cache-hit:
+    description: Whether the cache service returned the exact key
+    default: "false"
+  config-hash:
+    description: Hash of the same configuration files as upstream setup
+    default: ""
+  install-args:
+    description: Upstream tool selection to include in cache identity
+    default: ""
+outputs:
+  version:
+    description: Current official release
+  sha256:
+    description: Verified raw binary SHA256 for this runner
+  curl-home:
+    description: Directory containing the bounded curl retry policy
+  data-dir:
+    description: Job-local mise data directory
+  cache-key:
+    description: Exact release, platform, image and configuration identity
+runs:
+  using: node24
+  main: index.mjs
