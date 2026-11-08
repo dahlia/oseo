@@ -1,9 +1,12 @@
 import { lstatSync, readFileSync } from "node:fs";
 
+import { isString } from "../value-kinds.ts";
+
 import { digest, kernels } from "./corpus.ts";
 import type { Method, PerfHost } from "./plan.ts";
 import { validateMethod } from "./plan.ts";
 import type { Counters } from "./observation.ts";
+import { validateCounters } from "./observation.ts";
 import type { HostMetadata } from "./prepare.ts";
 import type { Sample } from "./sampling.ts";
 
@@ -19,6 +22,21 @@ export function artifact(path: string): Artifact {
   const stat = lstatSync(path);
   if (!stat.isFile()) throw new Error(`Not a regular artifact: ${path}`);
   return { path, bytes: stat.size, sha256: digest(readFileSync(path)) };
+}
+
+/** Validate metadata without requiring local access to another host's files. */
+function validateArtifact(value: Artifact, role: string): void {
+  if (
+    value == null ||
+    !isString(value.path) ||
+    value.path.trim().length === 0 ||
+    !Number.isSafeInteger(value.bytes) ||
+    value.bytes < 1 ||
+    !isString(value.sha256) ||
+    !/^[a-f0-9]{64}$/iu.test(value.sha256)
+  ) {
+    throw new Error(`Invalid artifact: ${role}`);
+  }
 }
 
 /** A counter build has its own artifact and never supplies latency samples. */
@@ -89,9 +107,10 @@ function validNumbers(values: readonly number[], count: number): boolean {
 export function validateEvidence(evidence: Evidence): void {
   validateMethod(evidence.method);
   if (
+    evidence.schema !== 1 ||
     evidence.phase !== "measured" ||
     evidence.buildConfiguration !== "optimized" ||
-    evidence.observeSpecialization ||
+    evidence.observeSpecialization !== false ||
     evidence.sanitizers.length !== 0
   ) {
     throw new Error("Evidence must use uninstrumented optimized builds.");
@@ -114,6 +133,7 @@ export function validateEvidence(evidence: Evidence): void {
   }
   const count = evidence.method.repetitions;
   for (const kernel of evidence.kernels) {
+    validateArtifact(kernel.source, "source");
     const ids = kernel.variants.map((variant) => variant.id).toSorted();
     if (ids.join() !== requiredVariants.toSorted().join()) {
       throw new Error(`Incomplete variant matrix: ${kernel.id}`);
@@ -129,11 +149,24 @@ export function validateEvidence(evidence: Evidence): void {
       ) {
         throw new Error(`Invalid artifact roles: ${variant.id}`);
       }
+      if (variant.executable != null) {
+        validateArtifact(variant.executable, "executable");
+      }
+      for (const source of variant.generatedC ?? []) {
+        validateArtifact(source, "generatedC");
+      }
+      if (variant.counterBuild != null) {
+        validateArtifact(variant.counterBuild.executable, "counter-build");
+        if (variant.counterBuild.observeSpecialization !== true) {
+          throw new Error("Counter evidence requires an observed build.");
+        }
+        validateCounters(variant.counterBuild.counters);
+      }
       if (
         native &&
         (variant.generatedC!.length === 0 ||
-          variant.counterBuild!.executable.sha256 ===
-            variant.executable!.sha256)
+          variant.counterBuild!.executable.sha256.toLowerCase() ===
+            variant.executable!.sha256.toLowerCase())
       ) {
         throw new Error(
           "Separate observed executable and generated C required.",

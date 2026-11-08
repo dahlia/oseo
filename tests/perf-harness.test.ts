@@ -20,7 +20,7 @@ import {
   parseRss,
   rssCommand,
 } from "../tools/perf/observation.ts";
-import type { Execution } from "../tools/perf/observation.ts";
+import type { Counters, Execution } from "../tools/perf/observation.ts";
 import {
   distribution,
   observeKernel,
@@ -37,6 +37,7 @@ import {
 } from "../tools/perf/evidence.ts";
 import type {
   Artifact,
+  CounterEvidence,
   Evidence,
   KernelEvidence,
 } from "../tools/perf/evidence.ts";
@@ -315,18 +316,18 @@ function evidence(): Evidence {
     },
     kernels: kernels.map((item) => ({
       id: item.id,
-      source: file,
+      source: { ...file },
       variants: variants(item, "/fake", host.target, "/node").map((form) => ({
         id: form.id,
-        executable: form.executable == null ? null : file,
-        generatedC: form.generatedC == null ? null : [file],
+        executable: form.executable == null ? null : { ...file },
+        generatedC: form.generatedC == null ? null : [{ ...file }],
         counterBuild:
           form.specialization == null
             ? null
             : {
                 executable: { ...file, sha256: "b".repeat(64) },
                 observeSpecialization: true,
-                counters,
+                counters: { ...counters },
               },
         startupMs: Array.from({ length: 15 }, () => 1),
         peakRssBytes: Array.from({ length: 15 }, () => 1024),
@@ -397,4 +398,187 @@ test("publication rejects incomplete evidence and a lone native host", () => {
       }),
     /Separate observed executable/u,
   );
+});
+
+function damagedEvidence(change: (record: Evidence) => void): Evidence {
+  const record = structuredClone(evidence());
+  change(record);
+  return record;
+}
+
+function damageField<Value>(
+  target: Artifact | CounterEvidence | Counters | Evidence,
+  key: string,
+  value: Value,
+): void {
+  if (value === undefined) {
+    Reflect.deleteProperty(target, key);
+  } else {
+    Object.defineProperty(target, key, { value, configurable: true });
+  }
+}
+
+test("publication validates persisted observed counters", () => {
+  for (const flag of [false, undefined, null, 1, "true"]) {
+    const record = damagedEvidence((item) => {
+      damageField(
+        item.kernels[0]!.variants[0]!.counterBuild!,
+        "observeSpecialization",
+        flag,
+      );
+    });
+    assert.throws(() => validateEvidence(record), {
+      message: "Counter evidence requires an observed build.",
+    });
+  }
+  for (const value of [undefined, null, false, []]) {
+    const record = damagedEvidence((item) => {
+      damageField(
+        item.kernels[0]!.variants[0]!.counterBuild!,
+        "counters",
+        value,
+      );
+    });
+    assert.throws(() => validateEvidence(record), {
+      message: "Performance counters must be a object.",
+    });
+  }
+  const empty = damagedEvidence((item) => {
+    damageField(item.kernels[0]!.variants[0]!.counterBuild!, "counters", {});
+  });
+  assert.throws(() => validateEvidence(empty), {
+    message: "Invalid counter: guardHits",
+  });
+  for (const key of Object.keys(counters)) {
+    for (const value of [
+      undefined,
+      -1,
+      0.5,
+      NaN,
+      Infinity,
+      -Infinity,
+      Number.MAX_SAFE_INTEGER + 1,
+      "1",
+      null,
+      false,
+    ]) {
+      const record = damagedEvidence((item) => {
+        damageField(
+          item.kernels[0]!.variants[0]!.counterBuild!.counters,
+          key,
+          value,
+        );
+      });
+      assert.throws(() => validateEvidence(record), {
+        message: `Invalid counter: ${key}`,
+      });
+    }
+  }
+});
+
+test("publication validates all artifact roles without local files", () => {
+  const roles = [
+    "source",
+    "executable",
+    "generatedC",
+    "counter-build",
+  ] as const;
+  for (const role of roles) {
+    for (const [key, values] of [
+      [
+        "bytes",
+        [
+          undefined,
+          -1,
+          0,
+          0.5,
+          NaN,
+          Infinity,
+          -Infinity,
+          Number.MAX_SAFE_INTEGER + 1,
+          "1",
+          null,
+        ],
+      ],
+      [
+        "sha256",
+        [
+          undefined,
+          "",
+          "different",
+          "a".repeat(63),
+          "a".repeat(65),
+          "g".repeat(64),
+          "a".repeat(64) + "\n",
+          null,
+          1,
+        ],
+      ],
+      ["path", [undefined, "", "  ", null, 1]],
+    ] as const) {
+      for (const value of values) {
+        const record = damagedEvidence((item) => {
+          const first = item.kernels[0]!;
+          const native = first.variants[0]!;
+          const target =
+            role === "source"
+              ? first.source
+              : role === "executable"
+                ? native.executable!
+                : role === "generatedC"
+                  ? native.generatedC![0]!
+                  : native.counterBuild!.executable;
+          damageField(target, key, value);
+        });
+        assert.throws(() => validateEvidence(record), {
+          message: `Invalid artifact: ${role}`,
+        });
+      }
+    }
+  }
+  const remote = damagedEvidence((item) => {
+    damageField(
+      item.kernels[0]!.source,
+      "path",
+      "https://artifacts.example/source.js",
+    );
+    damageField(item.kernels[0]!.source, "bytes", 1);
+    damageField(item.kernels[0]!.source, "sha256", "A".repeat(64));
+  });
+  validateEvidence(remote);
+});
+
+test("publication compares canonical observed and timed digests", () => {
+  const record = damagedEvidence((item) => {
+    damageField(
+      item.kernels[0]!.variants[0]!.counterBuild!.executable,
+      "sha256",
+      "A".repeat(64),
+    );
+  });
+  assert.throws(() => validateEvidence(record), {
+    message: "Separate observed executable and generated C required.",
+  });
+  assert.throws(
+    () =>
+      requireBothHosts([
+        record,
+        { ...evidence(), host: { ...host, target: "macos-aarch64" } },
+      ]),
+    { message: "Separate observed executable and generated C required." },
+  );
+});
+
+test("publication requires the existing schema and explicit timed flag", () => {
+  for (const [key, values] of [
+    ["schema", [undefined, 0, 2, "1"]],
+    ["observeSpecialization", [undefined, null, 0, "", true]],
+  ] as const) {
+    for (const value of values) {
+      const record = damagedEvidence((item) => damageField(item, key, value));
+      assert.throws(() => validateEvidence(record), {
+        message: "Evidence must use uninstrumented optimized builds.",
+      });
+    }
+  }
 });

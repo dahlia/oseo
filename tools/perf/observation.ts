@@ -4,6 +4,7 @@ import { performance } from "node:perf_hooks";
 import type { Command, PerfHost } from "./plan.ts";
 import { isNumber } from "../value-kinds.ts";
 import { parsedObject } from "../structured-data.ts";
+import type { StructuredDataInput } from "../structured-data.ts";
 
 /** A subprocess failure cannot be mistaken for a valid timing sample. */
 export interface Execution {
@@ -52,13 +53,17 @@ export type Counters = Readonly<Record<(typeof counterKeys)[number], number>>;
 export function parseCounters(stderr: string): Counters {
   const lines = stderr.split("\n").filter((line) => line.startsWith(prefix));
   if (lines.length !== 1) throw new Error("Expected one observation record.");
-  const parsed = parsedObject(
-    JSON.parse(lines[0]!.slice(prefix.length)),
-    "Performance counters",
-  );
+  return validateCounters(JSON.parse(lines[0]!.slice(prefix.length)));
+}
+
+/** Apply the same counter contract to stderr and persisted metadata. */
+export function validateCounters(
+  value: StructuredDataInput<Counters>,
+): Counters {
+  const parsed = parsedObject(value, "Performance counters");
   for (const key of counterKeys) {
-    const value = parsed[key];
-    if (!isNumber(value) || !Number.isSafeInteger(value) || value < 0) {
+    const counter = parsed[key];
+    if (!isNumber(counter) || !Number.isSafeInteger(counter) || counter < 0) {
       throw new Error(`Invalid counter: ${key}`);
     }
   }
