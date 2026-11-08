@@ -25,7 +25,7 @@ mise run build
 node packages/cli/dist/main.js --help
 ~~~~
 
-The packaged `@oseo/cli` command installs an executable named `oseo`. The
+The `@oseo/cli` package installs an executable named `oseo`. The
 remaining examples use that shorter name. In a development checkout, replace
 `oseo` with `node packages/cli/dist/main.js`.
 
@@ -38,43 +38,83 @@ Command syntax
 --------------
 
 ~~~~ text
-oseo [--module] [--script SCRIPT] [--no-specialization] [--target TARGET]
-  [--no-runtime-archive-reuse] [--build-config checked|optimized] SOURCE
-oseo [--dump-mir | --emit-c] [--module] [--script SCRIPT]
-  [--no-specialization] SOURCE
+oseo [RUN_OPTIONS] SOURCE
+oseo run [RUN_OPTIONS] SOURCE
+oseo build [BUILD_OPTIONS] SOURCE
 oseo --help
 oseo --version
 ~~~~
 
 `SOURCE` is the path of one JavaScript or TypeScript script or module entry.
 Oseo reads the file from that path; standard input and `-` are not supported.
-Options may appear before or after the source path.
+Options may appear before or after the source path. `run` compiles and
+executes a temporary program; the root shortcut uses the same workflow.
+`build` retains an executable without starting it.
+
+Command names are reserved in the shortcut form before `--`, even after a
+run option. Use `./build`, `run build`, or `-- build` for a source named
+*build*. For example, `oseo --module -- build` treats *build* as the module
+source.
 
 | Option                       | Behavior                                     |
 | ---------------------------- | -------------------------------------------- |
 | `--dump-mir`                 | Print Oseo's textual MIR without compiling C |
 | `--emit-c`                   | Print the generated C11 translation unit     |
+| `-o PATH`, `--output PATH`   | Retain a native executable at PATH           |
+| `--build-config CONFIG`      | Select checked or optimized native output    |
 | `--module`                   | Compile the source as an ECMAScript module   |
 | `--script SCRIPT`            | Evaluate a Script before the module entry    |
 | `--no-specialization`        | Compile only the generic native path         |
 | `--no-runtime-archive-reuse` | Rebuild the C runtime archive for this run   |
-| `--build-config CONFIG`      | Choose `checked` (default) or `optimized`    |
-| `--target TARGET`            | Select an explicit native execution target   |
+| `--target TARGET`            | Select an explicit native target             |
 | `--help`                     | Print help generated from the CLI grammar    |
 | `--version`                  | Print the lockstep Oseo package version      |
 
-`--dump-mir` and `--emit-c` are mutually exclusive. Unknown options,
+`--dump-mir` and `--emit-c` belong only to `build` and are mutually
+exclusive. Their old root placements are parse errors. Text modes reject
+`--output`, `--target`, `--build-config`, and `--no-runtime-archive-reuse`.
+
+`--build-config checked|optimized` selects the native configuration. `run`
+defaults to `checked`; `build` defaults to `optimized`. Unknown options,
 duplicate options, a missing source path, and extra positional arguments are
 rejected before Oseo reads or compiles the source file.
 
-Native builds default to `checked`, which keeps the target's sanitizer
-requests. `--build-config optimized` compiles generated C and the runtime
+The `checked` configuration keeps the target's sanitizer requests. `--build-config optimized` compiles generated C and the runtime
 with `-O2` and disables sanitizers. Both configurations disable floating-point
 contraction and preserve JavaScript behavior. The MIR and C text modes reject
 `--build-config` because their output is configuration-neutral. Runtime archives
 and harness objects have separate cache identities for each configuration.
 [ADR 0036](./adr/0036-optimized-native-build-configuration.md) defines the
 compiler options and verification gates.
+
+
+Retain a native executable
+--------------------------
+
+~~~~ sh
+oseo build src/hello.ts
+oseo build src/hello.ts -o artifacts/hello
+oseo build src/hello.ts --target linux-aarch64-musl
+~~~~
+
+The default destination is *./hello* in the caller's working directory.
+An explicit target appends its ID, as in *./hello-linux-aarch64-musl*.
+`--output PATH` (or `-o PATH`) selects another destination. Its parent must
+already exist. Successful builds print nothing and never start the artifact.
+
+An existing destination must be a regular ELF or Mach-O file. Directories,
+symlinks, other files, and any source in the build graph are refused with
+`OSEO3001`. There is no force option. The destination is inspected before
+native compilation and again at publication; an intervening replacement is
+refused by device and inode.
+
+Publication copies unchanged linker bytes and permissions into a sibling
+file, then links or renames it into place. Failures before publication leave
+the previous destination unchanged and remove the sibling file; cleanup
+failures are reported after the original failure. Filesystems without hard
+links use the fallback and race boundary recorded in
+[ADR 0037](./adr/0037-retained-native-executables.md). Publication is atomic
+for readers but does not promise crash durability.
 
 
 Compile and run a script
@@ -119,10 +159,10 @@ The option applies only to native execution. `--dump-mir` and `--emit-c`
 reject it because neither mode starts the native toolchain.
 
 Native execution selects `linux-x86_64-gnu` on Linux AMD64 and
-`macos-aarch64` on macOS AArch64. Both targets use address and
-undefined-behavior sanitization. `linux-aarch64-musl` remains a compile-link
-and inspection target in repository tasks, not an execution target on either
-primary host.
+`macos-aarch64` on macOS AArch64. The default checked configuration requests
+address and undefined-behavior sanitization. `linux-aarch64-musl` remains a
+compile-link and inspection target accepted by `build`, not an execution target
+on either primary host.
 
 These names are stable Oseo target IDs in operating-system, architecture, and
 optional ABI order. They are not Zig target strings. Every Zig request names
@@ -148,7 +188,7 @@ Use `--dump-mir` to inspect the Oseo-owned middle-level intermediate
 representation:
 
 ~~~~ sh
-oseo --dump-mir add.ts
+oseo build --dump-mir add.ts
 ~~~~
 
 The output records the specialization policy, basic blocks, values,
@@ -167,13 +207,13 @@ Emit C11
 Use `--emit-c` to print the generated C translation unit:
 
 ~~~~ sh
-oseo --emit-c add.ts
+oseo build --emit-c add.ts
 ~~~~
 
 Redirect the output when a separate file is more convenient:
 
 ~~~~ sh
-oseo --emit-c add.ts > generated.c
+oseo build --emit-c add.ts > generated.c
 ~~~~
 
 The generated unit calls private functions supplied by Oseo's C runtime. It is
@@ -193,8 +233,8 @@ Use `--no-specialization` to select the generic graph explicitly:
 
 ~~~~ sh
 oseo --no-specialization add.ts
-oseo --no-specialization --dump-mir add.ts
-oseo --no-specialization --emit-c add.ts
+oseo build --no-specialization --dump-mir add.ts
+oseo build --no-specialization --emit-c add.ts
 ~~~~
 
 The option may change MIR, generated C, and native code shape. It must not

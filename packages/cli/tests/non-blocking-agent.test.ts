@@ -20,6 +20,7 @@ test("main-agent policy reaches MIR and generated host setup", () => {
       );
       const emitted = runCli({
         args: [
+          "build",
           "--test262-host",
           ...(mainAgentCanBlock ? [] : ["--test262-non-blocking"]),
           ...(specialization === "disabled" ? ["--no-specialization"] : []),
@@ -45,7 +46,7 @@ test("non-blocking CLI policy requires the Script host", () => {
     ["--test262-host", "--test262-non-blocking", "--module", "policy.js"],
   ]) {
     const result = runCli({
-      args: ["--emit-c", ...args],
+      args: ["build", "--emit-c", ...args],
       source: "Atomics.wait;",
       version: "0.1.0",
     });

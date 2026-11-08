@@ -33,6 +33,7 @@
   },
   "dependencies": {
     "@optique/core": "1.2.13",
+    "@optique/discover": "1.2.13",
     "@oseo/backend-c": "workspace:*",
     "@oseo/compiler": "workspace:*",
     "@oseo/host": "workspace:*",

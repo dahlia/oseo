@@ -720,7 +720,7 @@ test("owned cases compile with the reviewed include", async () => {
     assert.ok(parsed.case.includes.includes(include), path);
     for (const mode of parsed.case.strictness) {
       const result = runCli({
-        args: ["--dump-mir", path],
+        args: ["build", "--dump-mir", path],
         source: assembleTest262Source(
           source,
           mode,

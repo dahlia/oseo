@@ -1,8 +1,10 @@
 @oseo/cli
 =========
 
-This package is Oseo's composition root. It provides deterministic `--dump-mir`
-and `--emit-c` modes and the asynchronous source-to-native execution workflow.
+This package is Oseo's composition root. `oseo run SOURCE` and its
+`oseo SOURCE` shortcut compile and execute a temporary native program.
+`oseo build SOURCE` retains a native executable without starting it, or prints
+compiler output with `--dump-mir` or `--emit-c`.
 Specialization is enabled by default. `--no-specialization` selects the same
 pipeline with the M1 generic graph and no guarded operations.
 
@@ -47,15 +49,33 @@ used to read the source file.
 
 Native execution selects `linux-x86_64-gnu` on Linux AMD64 and
 `macos-aarch64` on macOS AArch64. `--target` makes that choice explicit and is
-valid only for native execution. Unsupported or mismatched host-target pairs
-fail before compilation rather than producing or starting an incompatible
-artifact.
-The option accepts stable OS-first Oseo target IDs. The Zig adapter maps them
-to Zig's architecture-first strings when it creates compiler requests.
+valid for native `run` and `build`. `build` also accepts cross-targets and
+does not apply the execution-host compatibility check. For `run` and the
+shortcut, unsupported or mismatched host-target pairs fail before compilation
+rather than producing or starting an incompatible artifact. The option accepts
+stable OS-first Oseo target IDs. The Zig adapter maps them to Zig's
+architecture-first strings when it creates compiler requests.
 
 An entry with imports, exports, or top-level await enters the module-graph
 workflow. Top-level await does not need an otherwise unused module declaration.
 The produced executable drains runtime-owned promise jobs and timer tasks; it
 does not embed the Node.js or Deno host used to compile it.
 
+`run` defaults to the `checked` build configuration and `build` to `optimized`.
+Both accept `--build-config checked|optimized`. Text modes reject that option,
+`--target`, `--output`, and `--no-runtime-archive-reuse`.
+
+Retained output defaults to the entry's filename without its last extension in
+the current working directory, with a target suffix when `--target` is
+explicit. `-o` or `--output` selects another path. [ADR 0037] defines
+replacement, source-graph protection, permission copying, and atomic
+publication.
+
+Typed command modules under *src/commands/* share parsers and a host-injected
+handler. The checked-in *src/commands.generated.ts* registry contains static
+imports for package and standalone builds; startup never scans directories.
+`mise run generate:commands` regenerates it and `mise run check:commands`
+refuses stale output. Help/completion command expansion remains separate work.
+
 [Optique]: https://optique.dev/
+[ADR 0037]: ../../docs/adr/0037-retained-native-executables.md

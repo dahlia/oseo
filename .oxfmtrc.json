@@ -3,6 +3,7 @@
   "ignorePatterns": [
     "**/*.md",
     "pnpm-lock.yaml",
+    "packages/cli/src/commands.generated.ts",
     "artifacts/**",
     "docs/m5c-closure/ledger.yaml",
     "mise.toml",

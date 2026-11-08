@@ -30,7 +30,7 @@ console.log(read(), other());
   assert.equal(lexicals[0]?.name, "value");
   assert.equal(lexicals[0]?.mutable, true);
   const emitted = runCli({
-    args: ["--test262-host", "--emit-c", "host.js"],
+    args: ["build", "--test262-host", "--emit-c", "host.js"],
     source,
     sourceId: "host.js",
     version: "0.1.0",

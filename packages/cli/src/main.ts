@@ -3,7 +3,11 @@
 import process from "node:process";
 import { readFile } from "node:fs/promises";
 
-import { runNativeCli } from "./index.ts";
+import { message } from "@optique/core/message";
+import { runProgram } from "@optique/discover";
+import commands from "./commands.generated.ts";
+import { executeCliInvocation } from "./index.ts";
+import type { CliCommandContext } from "./options.ts";
 
 interface PackageManifest {
   readonly version: string;
@@ -13,11 +17,31 @@ interface PackageManifest {
 const manifest = JSON.parse(
   await readFile(new URL("../package.json", import.meta.url), "utf8"),
 ) as PackageManifest;
-const result = await runNativeCli({
+await runProgram<CliCommandContext>({
   args: process.argv.slice(2),
-  version: manifest.version,
+  commands,
+  metadata: {
+    brief: message`Compile JavaScript source to a native executable.`,
+    name: "oseo",
+    version: manifest.version,
+  },
+  help: "option",
+  completion: false,
+  hooks: {
+    beforeEach() {
+      return {
+        resource: {
+          async invoke(value) {
+            const result = await executeCliInvocation(value, {
+              args: [],
+              version: manifest.version,
+            });
+            if (result.stdout !== "") process.stdout.write(result.stdout);
+            if (result.stderr !== "") process.stderr.write(result.stderr);
+            process.exitCode = result.exitStatus;
+          },
+        },
+      };
+    },
+  },
 });
-
-if (result.stdout !== "") process.stdout.write(result.stdout);
-if (result.stderr !== "") process.stderr.write(result.stderr);
-process.exitCode = result.exitStatus;
