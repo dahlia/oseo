@@ -34,6 +34,11 @@ run = "pnpm install --frozen-lockfile"
 description = "Build every npm package as validated ESM"
 run = "pnpm exec tsdown --workspace"
 
+[tasks."perf:profile:discover"]
+description = "Record read-only profiler tool discovery (not acceptance)"
+usage = 'arg "<directory>" help="New evidence directory; parent must exist"'
+run = 'node tools/perf-profile.ts discover "${usage_directory?}"'
+
 [tasks.bump-versions]
 description = "Atomically set the lockstep package version"
 usage = 'arg "<version>" help="Strict SemVer for every @oseo package"'

@@ -1,0 +1,40 @@
+{
+  "cwd": "/home/dahlia/orca/workspaces/oseo/perf-profiling",
+  "argv": [
+    "choom",
+    "-n",
+    "1000",
+    "--",
+    "systemd-run",
+    "--user",
+    "--scope",
+    "--quiet",
+    "-p",
+    "MemoryMax=104G",
+    "python3",
+    "-B",
+    "/home/dahlia/.local/state/oseo-preview/lanes/perf-profiling/acceptance-20261109/long-smoke/gdb-smoke.py"
+  ],
+  "capacity": {
+    "profile": "generous",
+    "reason": "desktop-idle",
+    "gates": "1",
+    "lanes": "6",
+    "nice": "0",
+    "cpuquota": "none",
+    "memorymax": "104G",
+    "idle_minutes": "10733",
+    "hour": "3",
+    "mem_available_gib": "68",
+    "guard": "none",
+    "measure": "yes",
+    "prefix": "systemd-run --user --scope --quiet -p MemoryMax=104G"
+  },
+  "lightCheck": false,
+  "heavyLock": true,
+  "startedAt": "2026-11-08T18:06:34.256090+00:00",
+  "measure": false,
+  "naturalExit": 0,
+  "finishedAt": "2026-11-08T18:06:37.841134+00:00",
+  "wallSeconds": 3.5849284569267184
+}

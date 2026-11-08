@@ -1,0 +1,9 @@
+[Thread debugging using libthread_db enabled]
+Using host libthread_db library "/lib64/libthread_db.so.1".
+0x000000000104b5e4 in oseo_function_script (context=0x7ffff8826460, receiver=<optimized out>, argument_count=0, arguments=0x0, new_target=<optimized out>, callee=<optimized out>) at /home/dahlia/.local/state/oseo-preview/lanes/perf-profiling/acceptance-20261109/tmp/oseo-native-jfuVss/generated.c:330
+330	        result = oseo_environment_set(context, roots[45], 5u, roots[34]);
+
+Thread 1 (Thread 0x7f08f7626b80 (LWP 3809013) "fixture-linux-x"):
+#0  0x000000000104b5e4 in oseo_function_script (context=0x7ffff8826460, receiver=<optimized out>, argument_count=0, arguments=0x0, new_target=<optimized out>, callee=<optimized out>) at /home/dahlia/.local/state/oseo-preview/lanes/perf-profiling/acceptance-20261109/tmp/oseo-native-jfuVss/generated.c:330
+#1  main () at /home/dahlia/.local/state/oseo-preview/lanes/perf-profiling/acceptance-20261109/tmp/oseo-native-jfuVss/generated.c:391
+[Inferior 1 (process 3809013) detached]

@@ -85,6 +85,18 @@ jobs:
       - uses: ./.github/actions/setup-mise
         with:
           install: true
+      - if: matrix.os == 'macos-latest'
+        name: Discover profiling tools (read-only)
+        run: >-
+          node tools/perf-profile.ts discover
+          "${{ runner.temp }}/oseo-profiler-discovery"
+      - name: Retain profiling tool discovery
+        if: always() && runner.os == 'macOS'
+        uses: actions/upload-artifact@v7
+        with:
+          name: profiler-tool-discovery-macos-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/oseo-profiler-discovery
+          if-no-files-found: error
       - uses: ./.github/actions/runtime-archive-cache
         if: runner.os != 'Windows'
       - run: mise run test:${{ matrix.runtime }}
@@ -1276,6 +1288,17 @@ jobs:
       - uses: ./.github/actions/setup-mise
         with:
           install: true
+      - name: Discover profiling tools (read-only)
+        run: >-
+          node tools/perf-profile.ts discover
+          "${{ runner.temp }}/oseo-profiler-discovery"
+      - name: Retain profiling tool discovery
+        if: always() && runner.os == 'macOS'
+        uses: actions/upload-artifact@v7
+        with:
+          name: profiler-tool-discovery-macos-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/oseo-profiler-discovery
+          if-no-files-found: error
       - uses: ./.github/actions/runtime-archive-cache
         if: runner.os != 'Windows'
       - run: mise run test:deno

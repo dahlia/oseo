@@ -1,0 +1,82 @@
+{
+  "kind": "profiling-tool-discovery",
+  "acceptance": "unverified",
+  "platform": "linux",
+  "architecture": "x64",
+  "cwd": "/home/dahlia/orca/workspaces/oseo/perf-profiling",
+  "developerDirectory": null,
+  "commands": [
+    {
+      "argv": [
+        "/usr/bin/uname",
+        "-a"
+      ],
+      "toolPath": "/usr/bin/uname",
+      "startedUtc": "2026-11-08T18:09:39.171Z",
+      "finishedUtc": "2026-11-08T18:09:39.174Z",
+      "status": 0,
+      "signal": null,
+      "error": null,
+      "stdout": "0.stdout",
+      "stderr": "0.stderr",
+      "stdoutBase64": "TGludXggZG9yaWtvbSA3LjIuMTEtMjAwLmZjNDQueDg2XzY0ICMxIFNNUCBQUkVFTVBUX0RZTkFNSUMgVGh1IE9jdCAxNSAxNTo1ODo1OCBVVEMgMjAyNiB4ODZfNjQgR05VL0xpbnV4Cg==",
+      "stderrBase64": ""
+    },
+    {
+      "argv": [
+        "perf",
+        "--version"
+      ],
+      "toolPath": null,
+      "startedUtc": "2026-11-08T18:09:39.174Z",
+      "finishedUtc": "2026-11-08T18:09:39.176Z",
+      "status": null,
+      "signal": null,
+      "error": "spawnSync perf ENOENT",
+      "stdout": "1.stdout",
+      "stderr": "1.stderr",
+      "stdoutBase64": "",
+      "stderrBase64": ""
+    },
+    {
+      "argv": [
+        "/usr/libexec/gdb",
+        "--version"
+      ],
+      "toolPath": "/usr/libexec/gdb",
+      "startedUtc": "2026-11-08T18:09:39.176Z",
+      "finishedUtc": "2026-11-08T18:09:39.232Z",
+      "status": 0,
+      "signal": null,
+      "error": null,
+      "stdout": "2.stdout",
+      "stderr": "2.stderr",
+      "stdoutBase64": "R05VIGdkYiAoRmVkb3JhIExpbnV4KSAxNy4yLTQuZmM0NApDb3B5cmlnaHQgKEMpIDIwMjUgRnJlZSBTb2Z0d2FyZSBGb3VuZGF0aW9uLCBJbmMuCkxpY2Vuc2UgR1BMdjMrOiBHTlUgR1BMIHZlcnNpb24gMyBvciBsYXRlciA8aHR0cDovL2dudS5vcmcvbGljZW5zZXMvZ3BsLmh0bWw+ClRoaXMgaXMgZnJlZSBzb2Z0d2FyZTogeW91IGFyZSBmcmVlIHRvIGNoYW5nZSBhbmQgcmVkaXN0cmlidXRlIGl0LgpUaGVyZSBpcyBOTyBXQVJSQU5UWSwgdG8gdGhlIGV4dGVudCBwZXJtaXR0ZWQgYnkgbGF3Lgo=",
+      "stderrBase64": ""
+    },
+    {
+      "argv": [
+        "/usr/libexec/gdb",
+        "--nx",
+        "--nh",
+        "--batch",
+        "-iex",
+        "set auto-load off",
+        "-ex",
+        "show configuration",
+        "-ex",
+        "python import gdb; print(gdb.VERSION)"
+      ],
+      "toolPath": "/usr/libexec/gdb",
+      "startedUtc": "2026-11-08T18:09:39.232Z",
+      "finishedUtc": "2026-11-08T18:09:39.290Z",
+      "status": 0,
+      "signal": null,
+      "error": null,
+      "stdout": "3.stdout",
+      "stderr": "3.stderr",
+      "stdoutBase64": "VGhpcyBHREIgd2FzIGNvbmZpZ3VyZWQgYXMgZm9sbG93czoKICAgY29uZmlndXJlIC0taG9zdD14ODZfNjQtcmVkaGF0LWxpbnV4LWdudSAtLXRhcmdldD14ODZfNjQtcmVkaGF0LWxpbnV4LWdudQoJICAgICAtLWVuYWJsZS10YXJnZXRzPWFhcmNoNjQtbGludXgtZ251LHBvd2VycGMtbGludXgtZ251LHJpc2N2NjQtbGludXgtZ251LHMzOTAtbGludXgtZ251LHg4Nl82NC1yZWRoYXQtbGludXgtZ251LGFybS1saW51eC1nbnUKCSAgICAgLS13aXRoLWF1dG8tbG9hZC1kaXI9JGRlYnVnZGlyOiRkYXRhZGlyL2F1dG8tbG9hZAoJICAgICAtLXdpdGgtYXV0by1sb2FkLXNhZmUtcGF0aD0kZGVidWdkaXI6JGRhdGFkaXIvYXV0by1sb2FkCgkgICAgIC0td2l0aC1leHBhdAoJICAgICAtLXdpdGgtZ2RiLWRhdGFkaXI9L3Vzci9zaGFyZS9nZGIKCSAgICAgLS13aXRoLWppdC1yZWFkZXItZGlyPS91c3IvbGliNjQvZ2RiCgkgICAgIC0td2l0aG91dC1saWJ1bndpbmQtaWE2NAoJICAgICAtLXdpdGgtbHptYQoJICAgICAtLXdpdGgtYmFiZWx0cmFjZQoJICAgICAtLXdpdGgtaW50ZWwtcHQKCSAgICAgLS13aXRoLXh4aGFzaAoJICAgICAtLXdpdGgtcHl0aG9uPS91c3IKCSAgICAgLS13aXRoLXB5dGhvbi1saWJkaXI9L3Vzci9saWIKCSAgICAgLS13aXRoLWRlYnVnaW5mb2QKCSAgICAgLS13aXRoLWN1cnNlcwoJICAgICAtLXdpdGhvdXQtZ3VpbGUKCSAgICAgLS13aXRob3V0LWFtZC1kYmdhcGkKCSAgICAgLS1lbmFibGUtc291cmNlLWhpZ2hsaWdodAoJICAgICAtLWVuYWJsZS10aHJlYWRpbmcKCSAgICAgLS1lbmFibGUtdHVpCgkgICAgIC0td2l0aC1zeXN0ZW0tcmVhZGxpbmUKCSAgICAgLS13aXRoLXNlcGFyYXRlLWRlYnVnLWRpcj0vdXNyL2xpYi9kZWJ1ZwoJICAgICAtLXdpdGgtc3lzdGVtLWdkYmluaXQ9L2V0Yy9nZGJpbml0CgooIlJlbG9jYXRhYmxlIiBtZWFucyB0aGUgZGlyZWN0b3J5IGNhbiBiZSBtb3ZlZCB3aXRoIHRoZSBHREIgaW5zdGFsbGF0aW9uCnRyZWUsIGFuZCBHREIgd2lsbCBzdGlsbCBmaW5kIGl0LikKCkdOVSBSZWFkbGluZSBsaWJyYXJ5IHZlcnNpb246IDguMwkoc3lzdGVtKQoxNy4yLTQuZmM0NAo=",
+      "stderrBase64": ""
+    }
+  ]
+}

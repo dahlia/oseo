@@ -1,0 +1,12 @@
+[Thread debugging using libthread_db enabled]
+Using host libthread_db library "/lib64/libthread_db.so.1".
+0x00000000010719ca in to_primitive_value (context=context@entry=0x7ffff8826460, value=<optimized out>, hint=hint@entry=OSEO_TO_PRIMITIVE_NUMBER, previous=previous@entry=0x0) at runtime_primitive.c:1228
+
+Thread 1 (Thread 0x7f08f7626b80 (LWP 3809013) "fixture-linux-x"):
+#0  0x00000000010719ca in to_primitive_value (context=context@entry=0x7ffff8826460, value=<optimized out>, hint=hint@entry=OSEO_TO_PRIMITIVE_NUMBER, previous=previous@entry=0x0) at runtime_primitive.c:1228
+#1  0x0000000001073800 in oseo_to_numeric (context=0x7ffff8826460, value=9221401712017801223) at runtime_primitive.c:1498
+#2  numeric_binary (context=context@entry=0x7ffff8826460, left=<optimized out>, right=<optimized out>, operator=operator@entry=37 '%') at runtime_primitive.c:1315
+#3  0x0000000001073aff in oseo_remainder (context=context@entry=0x7ffff8826460, left=9221401712017801223, right=9221401712017801223) at runtime_primitive.c:1490
+#4  0x000000000104b291 in oseo_function_script (context=0x7ffff8826460, receiver=<optimized out>, argument_count=0, arguments=0x0, new_target=<optimized out>, callee=<optimized out>) at /home/dahlia/.local/state/oseo-preview/lanes/perf-profiling/acceptance-20261109/tmp/oseo-native-jfuVss/generated.c:270
+#5  main () at /home/dahlia/.local/state/oseo-preview/lanes/perf-profiling/acceptance-20261109/tmp/oseo-native-jfuVss/generated.c:391
+[Inferior 1 (process 3809013) detached]

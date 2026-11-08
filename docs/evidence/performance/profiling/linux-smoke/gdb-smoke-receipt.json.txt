@@ -1,0 +1,141 @@
+{
+  "kind": "method-acceptance-smoke",
+  "performanceEvidence": false,
+  "timedArtifactId": null,
+  "artifact": "/home/dahlia/.local/state/oseo-preview/lanes/perf-profiling/acceptance-20261109/tmp/oseo-native-NgJ0Zg/fixture-linux-x86_64-gnu",
+  "sha256Before": "c7ff72bfefbd3542d1392f5b3af8664493e6990623fd2e4f207ec11bf22ba932",
+  "sha256After": "c7ff72bfefbd3542d1392f5b3af8664493e6990623fd2e4f207ec11bf22ba932",
+  "pid": 3685113,
+  "argv": [
+    "/home/dahlia/.local/state/oseo-preview/lanes/perf-profiling/acceptance-20261109/tmp/oseo-native-NgJ0Zg/fixture-linux-x86_64-gnu"
+  ],
+  "cwd": "/home/dahlia/orca/workspaces/oseo/perf-profiling",
+  "stdin": "empty",
+  "environment": "inherited from run-gate; no extra program env",
+  "startedUtc": "2026-11-08T17:54:44.941167+00:00",
+  "finishedUtc": "2026-11-08T17:54:45.482830+00:00",
+  "status": 0,
+  "outputMatchesBuildCorrectness": true,
+  "captures": [
+    {
+      "argv": [
+        "gdb",
+        "--nx",
+        "--nh",
+        "--batch",
+        "-iex",
+        "set auto-load off",
+        "-iex",
+        "set debuginfod enabled off",
+        "-p",
+        "3685113",
+        "-ex",
+        "thread apply all bt 16",
+        "-ex",
+        "detach"
+      ],
+      "startedUtc": "2026-11-08T17:54:44.991660+00:00",
+      "finishedUtc": "2026-11-08T17:54:45.114552+00:00",
+      "status": 0,
+      "error": null,
+      "stdout": "gdb-0.stdout",
+      "stderr": "gdb-0.stderr"
+    },
+    {
+      "argv": [
+        "gdb",
+        "--nx",
+        "--nh",
+        "--batch",
+        "-iex",
+        "set auto-load off",
+        "-iex",
+        "set debuginfod enabled off",
+        "-p",
+        "3685113",
+        "-ex",
+        "thread apply all bt 16",
+        "-ex",
+        "detach"
+      ],
+      "startedUtc": "2026-11-08T17:54:45.114571+00:00",
+      "finishedUtc": "2026-11-08T17:54:45.212518+00:00",
+      "status": 0,
+      "error": null,
+      "stdout": "gdb-1.stdout",
+      "stderr": "gdb-1.stderr"
+    },
+    {
+      "argv": [
+        "gdb",
+        "--nx",
+        "--nh",
+        "--batch",
+        "-iex",
+        "set auto-load off",
+        "-iex",
+        "set debuginfod enabled off",
+        "-p",
+        "3685113",
+        "-ex",
+        "thread apply all bt 16",
+        "-ex",
+        "detach"
+      ],
+      "startedUtc": "2026-11-08T17:54:45.212533+00:00",
+      "finishedUtc": "2026-11-08T17:54:45.310751+00:00",
+      "status": 0,
+      "error": null,
+      "stdout": "gdb-2.stdout",
+      "stderr": "gdb-2.stderr"
+    },
+    {
+      "argv": [
+        "gdb",
+        "--nx",
+        "--nh",
+        "--batch",
+        "-iex",
+        "set auto-load off",
+        "-iex",
+        "set debuginfod enabled off",
+        "-p",
+        "3685113",
+        "-ex",
+        "thread apply all bt 16",
+        "-ex",
+        "detach"
+      ],
+      "startedUtc": "2026-11-08T17:54:45.310770+00:00",
+      "finishedUtc": "2026-11-08T17:54:45.412844+00:00",
+      "status": 0,
+      "error": null,
+      "stdout": "gdb-3.stdout",
+      "stderr": "gdb-3.stderr"
+    },
+    {
+      "argv": [
+        "gdb",
+        "--nx",
+        "--nh",
+        "--batch",
+        "-iex",
+        "set auto-load off",
+        "-iex",
+        "set debuginfod enabled off",
+        "-p",
+        "3685113",
+        "-ex",
+        "thread apply all bt 16",
+        "-ex",
+        "detach"
+      ],
+      "startedUtc": "2026-11-08T17:54:45.412872+00:00",
+      "finishedUtc": "2026-11-08T17:54:45.478984+00:00",
+      "status": 1,
+      "error": null,
+      "stdout": "gdb-4.stdout",
+      "stderr": "gdb-4.stderr"
+    }
+  ]
+}
