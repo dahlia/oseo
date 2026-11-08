@@ -4,6 +4,7 @@ import type {
   ExecutionHostDescription,
   MirProgram,
   NativeBackend,
+  NativeBuildConfiguration,
   NativeToolchain,
   ProcessEnvironment,
   ProcessObservation,
@@ -28,7 +29,9 @@ export {
 
 /** Complete observation retained for one native fixture build and run. */
 export interface NativeFixtureObservation extends ProcessObservation {
+  readonly buildConfiguration: NativeBuildConfiguration;
   readonly compilerInvocation: readonly string[];
+  readonly executablePath: string;
   readonly counters?: RuntimeObservationCounters;
   readonly emittedC: string;
   readonly executionHost?: ExecutionHostDescription;
@@ -50,6 +53,7 @@ export interface RuntimeObservationCounters {
 
 /** Injected components and options for one native fixture. */
 export interface NativeFixtureOptions {
+  readonly buildConfiguration?: NativeBuildConfiguration;
   /**
    * Agent programs of a test262 host program, each emitted as a unit of
    * its own and linked beside `input`.
@@ -364,6 +368,10 @@ export async function withNativeFixture<T>(
   options: NativeFixtureOptions,
   inspect: (observation: NativeFixtureObservation) => T | PromiseLike<T>,
 ): Promise<T> {
+  const buildConfiguration =
+    options.buildConfiguration ??
+    options.toolchain.buildConfiguration ??
+    "checked";
   if (options.operation === "execute") {
     if (options.host.executionHost == null) {
       throw new Error(
@@ -478,6 +486,7 @@ export async function withNativeFixture<T>(
           toolchainEnvironment,
         );
         const key = await reuse.createKey({
+          buildConfiguration,
           runtimeAbiVersion: runtimeInput.abiVersion,
           runtimeAssets: loadedAssets.map((entry) => ({
             contents: entry.contents,
@@ -522,6 +531,7 @@ export async function withNativeFixture<T>(
     }
 
     const plan = options.toolchain.createBuildPlan({
+      buildConfiguration,
       ...includePropertiesWhen(() => {
         if (toolchainEnvironment == null) return undefined;
         return {
@@ -592,6 +602,8 @@ export async function withNativeFixture<T>(
       throw new Error("Native fixture did not report runtime observations.");
     }
     const completeObservation: NativeFixtureObservation = {
+      buildConfiguration,
+      executablePath: plan.executablePath,
       ...separated.observation,
       compilerInvocation,
       ...includePropertiesWhen(() => {
@@ -615,6 +627,7 @@ export async function withNativeFixture<T>(
     return result;
   } catch (error) {
     const metadata = {
+      buildConfiguration,
       toolchainIdentity: options.toolchain.identity,
       compilerInvocation,
       emittedC,
@@ -636,9 +649,13 @@ export async function withNativeFixture<T>(
         { cause: metadataError },
       );
     }
-    throw new Error(`Native artifacts retained at ${directory}`, {
-      cause: error,
-    });
+    throw new Error(
+      `Native artifacts retained at ${directory} ` +
+        `(build-config=${buildConfiguration})`,
+      {
+        cause: error,
+      },
+    );
   } finally {
     await releaseCacheLock(cacheLock);
     if (succeeded && options.keepArtifacts !== true) {

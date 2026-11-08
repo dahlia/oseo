@@ -1,6 +1,6 @@
 /**
- * Except for the explicitly unmeasured Array scheduling allowance and the
- * entries marked `derived` below, each
+ * Except for the unmeasured Array and optimized scheduling allowances and
+ * the entries marked `derived` below, each
  * entry is the median, rounded to whole seconds, of the job's measured
  * hosted `macos-15` or `macos-latest` walls (`started_at` to
  * `completed_at`). The lane generator sorts hosted jobs by these weights
@@ -111,6 +111,10 @@ interface MacosJobCosts {
 
 /** Measured hosted medians used only for lane assignment. */
 export const macosJobCosts: MacosJobCosts = {
+  // Unmeasured optimized allowances: twice the checked hosted shard walls.
+  "native optimized (macos-aarch64, 1/3)": 2472,
+  "native optimized (macos-aarch64, 2/3)": 2324,
+  "native optimized (macos-aarch64, 3/3)": 2320,
   "host C sanitizers (macOS, property)": 2452, // 18
   // Planning allowance, not a hosted wall: twice the 873-second local Linux
   // clang run plus setup; see docs/evidence/regexp-literal-exhaustive.

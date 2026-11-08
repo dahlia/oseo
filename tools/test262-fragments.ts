@@ -219,6 +219,7 @@ export function createTest262FragmentExecutor(
     return {
       prepared,
       common: {
+        buildConfiguration: prepared.buildConfiguration,
         target: prepared.target,
         toolchainEnvironment: prepared.toolchainEnvironment,
         toolchainIdentity: prepared.toolchainIdentity,

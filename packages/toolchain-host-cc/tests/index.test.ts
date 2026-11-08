@@ -201,3 +201,60 @@ test(
     );
   },
 );
+
+test(
+  "rejects optimized before inspecting build inputs",
+  { skip: !supported },
+  async () => {
+    const adapter = createHostCcToolchain(options);
+    assert.throws(
+      () =>
+        adapter.createBuildPlan({
+          ...input,
+          buildConfiguration: "optimized",
+          runtimeSourcePaths: [],
+        }),
+      /only the checked build configuration/u,
+    );
+    assert.throws(
+      () =>
+        adapter.harnessObjectReuse!.createBuildRequest({
+          buildConfiguration: "optimized",
+          workingDirectory: "/work",
+          target,
+          environment: { variables: { CPATH: "/unexpected" } },
+        }),
+      /only the checked build configuration/u,
+    );
+    await assert.rejects(
+      adapter.runtimeArchiveReuse!.createKey({
+        buildConfiguration: "optimized",
+        runtimeAbiVersion: "fixture",
+        runtimeAssets: [],
+        target,
+        toolchainEnvironment: { variables: {} },
+        toolchainIdentity: options.identity,
+      }),
+      /only the checked build configuration/u,
+    );
+  },
+);
+
+test(
+  "omitted checked uses the same runtime archive key",
+  { skip: !supported },
+  async () => {
+    const reuse = createHostCcToolchain(options).runtimeArchiveReuse!;
+    const keyInput = {
+      runtimeAbiVersion: "fixture",
+      runtimeAssets: [],
+      target,
+      toolchainEnvironment: { variables: {} },
+      toolchainIdentity: options.identity,
+    };
+    assert.equal(
+      await reuse.createKey(keyInput),
+      await reuse.createKey({ ...keyInput, buildConfiguration: "checked" }),
+    );
+  },
+);

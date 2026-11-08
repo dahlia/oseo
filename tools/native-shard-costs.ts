@@ -224,6 +224,8 @@ export const nativeShardCosts = {
     "tests/property/m5-delete-super.property.test.ts": 355,
     "tests/property/m5-delete.property.test.ts": 285,
     "tests/property/m5-destructuring-assignment.property.test.ts": 2185,
+    // Historical direct-compile cost; configuration now uses the adapter.
+    // Unmeasured scheduling allowance pending matching-host candidate CI.
     "tests/property/m5-ephemeron-tracing.property.test.ts": 42,
     "tests/property/m5-export-default-class.property.test.ts": 48,
     "tests/property/m5-for-await-of.property.test.ts": 1336,
@@ -383,6 +385,8 @@ export const nativeShardCosts = {
     "tests/property/m5-delete.property.test.ts": 211,
     // CI run 39473400560 case sum: 605.363979249 s, rounded up.
     "tests/property/m5-destructuring-assignment.property.test.ts": 606,
+    // Historical direct-compile cost; configuration now uses the adapter.
+    // Unmeasured scheduling allowance pending matching-host candidate CI.
     "tests/property/m5-ephemeron-tracing.property.test.ts": 20,
     "tests/property/m5-export-default-class.property.test.ts": 35,
     "tests/property/m5-for-await-of.property.test.ts": 419,
@@ -539,3 +543,11 @@ export const ownKeyCaseShardCosts: CaseShardCosts = caseShardCosts(
 export const reflectCaseShardCosts: CaseShardCosts = caseShardCosts(
   "tests/property/m5-reflect-namespace.property.test.ts",
 );
+
+/**
+ * Optimized property scheduling has no matching-host measurements yet.
+ * Reuse the checked ordering as a planning estimate; this is not an
+ * optimized duration measurement. Candidate CI must refresh these weights.
+ */
+export const optimizedNativeShardCosts: typeof nativeShardCosts =
+  nativeShardCosts;

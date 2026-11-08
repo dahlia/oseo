@@ -185,6 +185,7 @@ test("records complete failed build observations", async () => {
     withNativeFixture(
       {
         ...options,
+        buildConfiguration: "optimized",
         toolchain: {
           ...options.toolchain,
           identity: "/usr/bin/clang\nclang 22",
@@ -200,12 +201,14 @@ test("records complete failed build observations", async () => {
   assert.ok(bytes != null);
   // SAFETY: compileNativeTest writes this metadata using the asserted schema.
   const metadata = JSON.parse(bytes) as {
+    readonly buildConfiguration: string;
     readonly toolchainIdentity: string;
     readonly compilerInvocation: readonly string[];
     readonly steps: readonly {
       readonly observation?: ProcessObservation;
     }[];
   };
+  assert.equal(metadata.buildConfiguration, "optimized");
   assert.equal(metadata.toolchainIdentity, "/usr/bin/clang\nclang 22");
   assert.deepEqual(metadata.compilerInvocation, [
     "zig compile.c",

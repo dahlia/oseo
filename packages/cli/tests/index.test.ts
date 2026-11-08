@@ -1966,6 +1966,7 @@ test("a prepared native runtime is refused for different inputs", async () => {
   assert.deepEqual(fromMutable.target.sanitizers, target.sanitizers);
   await refused(
     {
+      buildConfiguration: fromMutable.buildConfiguration,
       archiveKey: fromMutable.archiveKey,
       assetDigest: fromMutable.assetDigest,
       assets: fromMutable.assets,
@@ -2440,4 +2441,72 @@ test("a script entry resolves import() against its own path", async () => {
   );
   assert.equal(computed.exitStatus, 1);
   assert.match(computed.stderr, /OSEO1001.*ImportExpression/u);
+});
+
+test("rejects invalid or text-mode build configuration", async () => {
+  const host = preparedRuntimeFixture("runtime asset").host;
+  let reads = 0;
+  const countingHost = {
+    ...host,
+    readTextFile: async () => {
+      reads++;
+      return "";
+    },
+  };
+  const results = await Promise.all(
+    [
+      ["--emit-c", "--build-config", "optimized", "case.js"],
+      ["--dump-mir", "--build-config", "checked", "case.js"],
+      ["--build-config", "fast", "case.js"],
+      ["--build-config", "checked", "--build-config", "optimized", "case.js"],
+    ].map((args) => runNativeCli({ args, version: "0.0.0" }, countingHost)),
+  );
+  assert.ok(results.every((result) => result.exitStatus === 1));
+  assert.equal(reads, 0);
+});
+
+test("validates and forwards native build configuration", async () => {
+  const fixture = preparedRuntimeFixture("runtime asset");
+  const prepared = await prepareNativeRuntime(
+    fixture.host,
+    fixture.toolchain,
+    describeTarget("linux-x86_64-gnu"),
+    undefined,
+    "optimized",
+  );
+  assert.equal(prepared.buildConfiguration, "optimized");
+  await assert.rejects(
+    runNativeUnits(
+      preparedRuntimeUnits,
+      "case.js",
+      fixture.host,
+      fixture.toolchain,
+      "enabled",
+      prepared,
+    ),
+    /different native build configuration/u,
+  );
+  assert.equal(fixture.plans.length, 0);
+  const run = await runNativeUnits(
+    preparedRuntimeUnits,
+    "case.js",
+    fixture.host,
+    fixture.toolchain,
+    "enabled",
+    prepared,
+    "optimized",
+  );
+  assert.equal(run.exitStatus, 0);
+  assert.equal(fixture.plans.at(-1)!.buildConfiguration, "optimized");
+  const cli = await runNativeCli(
+    {
+      args: ["--build-config", "optimized", "case.js"],
+      source: "console.log(42);",
+      version: "0.0.0",
+    },
+    fixture.host,
+    fixture.toolchain,
+  );
+  assert.equal(cli.exitStatus, 0);
+  assert.equal(fixture.plans.at(-1)!.buildConfiguration, "optimized");
 });

@@ -640,3 +640,222 @@ test("probes and builds through a pinned executable", () => {
     "/opt/zig/zig",
   );
 });
+
+for (const name of [
+  "linux-x86_64-gnu",
+  "macos-aarch64",
+  "linux-aarch64-musl",
+] as const) {
+  test(`optimized ${name} flags cover every source and harness object`, () => {
+    const target = describeTarget(name);
+    const plan = zigToolchain.createBuildPlan({
+      buildConfiguration: "optimized",
+      generatedSourcePath: "/work/main.c",
+      additionalGeneratedSourcePaths: ["/work/agent.c"],
+      prebuiltObjectPaths: ["/cache/harness.o"],
+      runtimeDirectory: "/runtime",
+      runtimeSourcePaths: ["/runtime/a.c", "/runtime/b.c"],
+      target,
+      workingDirectory: "/work",
+    });
+    assert.equal(plan.buildConfiguration, "optimized");
+    const harness = zigToolchain.harnessObjectReuse!.createBuildRequest({
+      buildConfiguration: "optimized",
+      workingDirectory: "/work",
+      target,
+      environment: { variables: {} },
+    });
+    for (const request of [
+      ...plan.requests.filter((r) => r.args[0] === "cc"),
+      harness,
+    ]) {
+      for (const flag of ["-O2", "-fno-sanitize=all", "-ffp-contract=off"]) {
+        assert.ok(request.args.includes(flag));
+      }
+      for (const flag of [
+        "-g",
+        "-O3",
+        "-flto",
+        "-s",
+        "-ffast-math",
+        "-fno-strict-aliasing",
+        "-fwrapv",
+      ]) {
+        assert.ok(!request.args.includes(flag));
+      }
+      assert.ok(request.args.every((arg) => !arg.startsWith("-fsanitize=")));
+    }
+    assert.ok(plan.requests.at(-1)!.args.includes("-fno-lto"));
+    const checked = zigToolchain.createBuildPlan({
+      generatedSourcePath: "/work/main.c",
+      runtimeDirectory: "/runtime",
+      runtimeSourcePaths: ["/runtime/a.c"],
+      target,
+      workingDirectory: "/work",
+    });
+    assert.equal(checked.buildConfiguration, "checked");
+    assert.ok(
+      checked.requests
+        .filter((r) => r.args[0] === "cc")
+        .every((r) => r.args.includes("-ffp-contract=off")),
+    );
+    assert.ok(!checked.requests.at(-1)!.args.includes("-O2"));
+  });
+}
+
+test("configuration separates runtime and harness cache keys", async () => {
+  const input = {
+    runtimeAbiVersion: "fixture",
+    runtimeAssets: [],
+    target: describeTarget("linux-x86_64-gnu"),
+    toolchainEnvironment: { variables: {} },
+    toolchainIdentity: "zig 0.16.0",
+  };
+  const reuse = zigToolchain.runtimeArchiveReuse!;
+  assert.equal(
+    await reuse.createKey(input),
+    await reuse.createKey({ ...input, buildConfiguration: "checked" }),
+  );
+  assert.notEqual(
+    await reuse.createKey(input),
+    await reuse.createKey({ ...input, buildConfiguration: "optimized" }),
+  );
+  const harness = {
+    ...input,
+    fragmentAbiVersion: "fixture",
+    harnessSources: [],
+    strict: false,
+    specialization: "enabled" as const,
+    observeSpecialization: false,
+    frontendIdentity: "frontend",
+    compilerIdentity: "compiler",
+    backendIdentity: "backend",
+    generatedSource: "int harness(void) { return 0; }",
+  };
+  const objects = zigToolchain.harnessObjectReuse!;
+  assert.equal(
+    await objects.createKey(harness),
+    await objects.createKey({ ...harness, buildConfiguration: "checked" }),
+  );
+  assert.notEqual(
+    await objects.createKey(harness),
+    await objects.createKey({ ...harness, buildConfiguration: "optimized" }),
+  );
+});
+
+test(
+  "optimized executable has no sanitizer symbols and preserves rounding",
+  {
+    skip: !(
+      (process.platform === "linux" && process.arch === "x64") ||
+      (process.platform === "darwin" && process.arch === "arm64")
+    ),
+  },
+  async () => {
+    const directory = await mkdtemp(join(tmpdir(), "oseo-optimized-symbols-"));
+    try {
+      await writeFile(
+        join(directory, "runtime.c"),
+        "double multiply_add(double a, double b, double c) {\n" +
+          "  return a * b + c;\n}\n",
+      );
+      await writeFile(
+        join(directory, "main.c"),
+        [
+          "#include <stdio.h>",
+          "double multiply_add(double, double, double);",
+          "int main(void) {",
+          "  volatile double a = 1.0000000000000002;",
+          "  volatile double b = 0.9999999999999998;",
+          '  printf("%.0f\\n", multiply_add(a, b, -1.0));',
+          "  return 0;",
+          "}",
+        ].join("\n") + "\n",
+      );
+      const plan = zigToolchain.createBuildPlan({
+        buildConfiguration: "optimized",
+        generatedSourcePath: join(directory, "main.c"),
+        runtimeSourcePaths: [join(directory, "runtime.c")],
+        runtimeDirectory: directory,
+        workingDirectory: directory,
+        target: describeTarget(
+          process.platform === "darwin" ? "macos-aarch64" : "linux-x86_64-gnu",
+        ),
+      });
+      for (const request of plan.requests) {
+        const built = spawnSync(request.command, request.args, {
+          cwd: request.cwd,
+          encoding: "utf8",
+        });
+        assert.equal(built.status, 0, built.stderr);
+      }
+      const executable = await readFile(plan.executablePath);
+      const markers = [
+        ...executable
+          .toString("latin1")
+          .matchAll(
+            /_?__(?:asan|ubsan|tsan|msan|sanitizer)_[A-Za-z0-9_.$]+(?=\0)/g,
+          ),
+      ].map((match) => match[0]);
+      assert.deepEqual(markers, []);
+      const result = spawnSync(plan.executablePath, [], { encoding: "utf8" });
+      assert.equal(result.status, 0, result.stderr);
+      assert.equal(result.stdout, "0\n");
+    } finally {
+      await rm(directory, { recursive: true, force: true });
+    }
+  },
+);
+
+for (const target of ["macos-aarch64", "linux-aarch64-musl"] as const) {
+  test(`keeps AArch64 multiply-add separate (${target})`, async () => {
+    const directory = await mkdtemp(join(tmpdir(), "oseo-optimized-fp-"));
+    try {
+      const sourcePath = join(directory, "rounding.c");
+      await writeFile(
+        sourcePath,
+        "double multiply_add(double a, double b, double c) {\n" +
+          "  return a * b + c;\n}\n",
+      );
+      const plan = zigToolchain.createBuildPlan({
+        buildConfiguration: "optimized",
+        generatedSourcePath: join(directory, "entry.c"),
+        runtimeSourcePaths: [sourcePath],
+        runtimeDirectory: directory,
+        workingDirectory: directory,
+        target: describeTarget(target),
+      });
+      const request = plan.requests.find((step) => step.args.includes("-c"));
+      assert.ok(request != null);
+      const args = [...request.args];
+      args[args.indexOf("-c")] = "-S";
+      const assemblyPath = join(directory, "rounding.s");
+      args[args.lastIndexOf("-o") + 1] = assemblyPath;
+      // Zig 0.16 adds -c to -S jobs. Only this probe permits that driver's
+      // redundant-argument warning; actual builds keep every warning fatal.
+      args.push("-Wno-error=unused-command-line-argument");
+      const compiled = spawnSync(request.command, args, {
+        cwd: request.cwd,
+        encoding: "utf8",
+      });
+      assert.equal(compiled.status, 0, compiled.stderr);
+      const driverWarning =
+        "zig: warning: argument unused during compilation: '-c' " +
+        "[-Wunused-command-line-argument]";
+      assert.ok(
+        compiled.stderr.trim() === "" ||
+          compiled.stderr.trim() === driverWarning,
+        compiled.stderr,
+      );
+      const assembly = await readFile(assemblyPath, "utf8");
+      assert.match(assembly, /\bfmul\s/u);
+      assert.match(assembly, /\bfadd\s/u);
+      assert.doesNotMatch(
+        assembly,
+        /\b(?:f(?:n?madd|n?msub|mla|mls)|vf(?:n?madd|n?msub))[a-z0-9.]*\s/u,
+      );
+    } finally {
+      await rm(directory, { recursive: true, force: true });
+    }
+  });
+}

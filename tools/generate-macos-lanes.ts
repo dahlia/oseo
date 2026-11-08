@@ -77,7 +77,8 @@ export function macosJobs(): readonly MacosLaneJob[] {
                   ? "host C sanitizers"
                   : sourceId === "test_test262"
                     ? "test262"
-                    : sourceId === "test_native"
+                    : sourceId === "test_native" ||
+                        sourceId === "test_native_optimized"
                       ? "native"
                       : "test",
     });
@@ -117,6 +118,17 @@ export function macosJobs(): readonly MacosLaneJob[] {
       platform: { os: "macos-15", target: "macos-aarch64" },
       shard,
     });
+  }
+  for (let shard = 1; shard <= 3; shard++) {
+    add(
+      "test_native_optimized",
+      String(shard),
+      `native optimized (macos-aarch64, ${shard}/3)`,
+      {
+        platform: { os: "macos-15", target: "macos-aarch64" },
+        shard,
+      },
+    );
   }
   // `tests/native.ts` partitions its fixtures and scenarios round-robin, so
   // each native shard carries about half of the suite; the runtime fixtures

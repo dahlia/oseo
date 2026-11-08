@@ -13,12 +13,24 @@ import {
 import { tmpdir } from "node:os";
 import { delimiter, join } from "node:path";
 import { describeTarget } from "../packages/compiler/src/index.ts";
-import type { NativeToolchain } from "../packages/compiler/src/index.ts";
+import type {
+  NativeBuildConfiguration,
+  NativeToolchain,
+} from "../packages/compiler/src/index.ts";
 import {
   createHostCcToolchain,
   hostCcEnvironment,
 } from "../packages/toolchain-host-cc/src/index.ts";
 import { zigToolchain } from "../packages/toolchain-zig/src/index.ts";
+
+/** Test configuration shared by fixture, standards, and property lanes. */
+export const nativeBuildConfiguration: NativeBuildConfiguration = (() => {
+  const value = process.env.OSEO_NATIVE_BUILD_CONFIG ?? "checked";
+  if (value !== "checked" && value !== "optimized") {
+    throw new Error("OSEO_NATIVE_BUILD_CONFIG must be checked or optimized.");
+  }
+  return value;
+})();
 
 /** The sanitizer lane is an explicit test-entry-point choice. */
 export const hostCcLane: boolean =
@@ -39,7 +51,13 @@ function executable(name: string): string | undefined {
 
 /** Select once, then fail closed if the chosen compiler lacks ASan. */
 function select(): NativeToolchain {
-  if (!hostCcLane) return zigToolchain;
+  if (!hostCcLane)
+    return { ...zigToolchain, buildConfiguration: nativeBuildConfiguration };
+  if (nativeBuildConfiguration === "optimized") {
+    throw new Error(
+      "Host C compiler supports only the checked build configuration.",
+    );
+  }
   const target =
     process.platform === "linux" && process.arch === "x64"
       ? describeTarget("linux-x86_64-gnu")

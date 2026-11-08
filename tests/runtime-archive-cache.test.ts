@@ -171,3 +171,67 @@ test("an unavailable environment cannot select a cache", async () => {
     /Cannot capture/u,
   );
 });
+
+test("configuration isolates restored runtime archives", async () => {
+  const directory = await mkdtemp(join(tmpdir(), "oseo-ci-config-cache-"));
+  const concrete = createNodeHost();
+  assert.ok(concrete.cache != null);
+  const host: CompilerHost = {
+    ...concrete,
+    cache: { ...concrete.cache, getDirectory: async () => directory },
+    captureEnvironment: async () => ({ variables: { PATH: "/compiler" } }),
+    readTextFile: async () => "int runtime(void) { return 1; }",
+    run: async () => ({
+      exitStatus: 0,
+      stdout: "compiler identity",
+      stderr: "",
+    }),
+  };
+  try {
+    const { buildConfiguration: _configuration, ...adapter } = nativeToolchain;
+    const checked = await runtimeArchiveCache(
+      host,
+      adapter,
+      runtime,
+      target,
+      directory,
+    );
+    await writeFile(checked.path, "checked archive bytes");
+    const explicit = await runtimeArchiveCache(
+      host,
+      { ...adapter, buildConfiguration: "checked" },
+      runtime,
+      target,
+      directory,
+    );
+    assert.deepEqual(explicit, checked);
+    assert.equal(await host.cache!.hasFile(explicit.path), true);
+    if (hostCcLane) {
+      await assert.rejects(
+        runtimeArchiveCache(
+          host,
+          { ...adapter, buildConfiguration: "optimized" },
+          runtime,
+          target,
+          directory,
+        ),
+        /only the checked build configuration/u,
+      );
+    } else {
+      const optimized = await runtimeArchiveCache(
+        host,
+        { ...adapter, buildConfiguration: "optimized" },
+        runtime,
+        target,
+        directory,
+      );
+      assert.notEqual(optimized.key, checked.key);
+      assert.notEqual(optimized.path, checked.path);
+      assert.equal(await host.cache!.hasFile(optimized.path), false);
+      await writeFile(optimized.path, "optimized archive bytes");
+      assert.equal(await host.cache!.hasFile(checked.path), true);
+    }
+  } finally {
+    await rm(directory, { recursive: true, force: true });
+  }
+});

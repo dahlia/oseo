@@ -38,6 +38,7 @@ export async function runtimeArchiveCache(
   }
   const input = runtime.getRuntimeInput();
   const key = await reuse.createKey({
+    buildConfiguration: toolchain.buildConfiguration ?? "checked",
     runtimeAbiVersion: input.abiVersion,
     runtimeAssets: await Promise.all(
       input.assets.map(async (asset) => ({

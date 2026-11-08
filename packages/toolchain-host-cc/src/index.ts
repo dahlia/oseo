@@ -1,6 +1,7 @@
 import { createHarnessObjectKey } from "@oseo/compiler";
 import type {
   NativeToolchain,
+  NativeBuildConfiguration,
   ProcessEnvironmentPolicy,
   TargetDescription,
 } from "@oseo/compiler";
@@ -37,6 +38,14 @@ export const hostCcEnvironment: ProcessEnvironmentPolicy = {
   inherit: ["PATH", "HOME", "TMPDIR"],
 };
 
+function requireConfiguration(configuration?: NativeBuildConfiguration): void {
+  if (configuration === "optimized") {
+    throw new Error(
+      "Host C compiler supports only the checked build configuration.",
+    );
+  }
+}
+
 /** Plan instrumented builds for a compiler verified by the caller. */
 export function createHostCcToolchain(options: HostCcOptions): NativeToolchain {
   const hostTarget =
@@ -54,6 +63,7 @@ export function createHostCcToolchain(options: HostCcOptions): NativeToolchain {
   const libraries = ["-lm", "-lpthread"];
   const flags = [
     "-std=c11",
+    "-ffp-contract=off",
     `-DOSEO_CALLABLE_FRAME_MULTIPLIER=${hostCcCallableFrameMultiplier}u`,
     `-DOSEO_CALLABLE_FRAME_BASE_SLOTS=${hostCcCallableFrameBaseSlots}u`,
     "-Wall",
@@ -92,6 +102,7 @@ export function createHostCcToolchain(options: HostCcOptions): NativeToolchain {
     identity: options.identity,
     environment: hostCcEnvironment,
     createBuildPlan(input) {
+      requireConfiguration(input.buildConfiguration);
       requireTarget(input.target);
       if (
         (input.prebuiltRuntimeArchivePath == null) ===
@@ -116,6 +127,7 @@ export function createHostCcToolchain(options: HostCcOptions): NativeToolchain {
       // A composer that pinned this toolchain supplies the resolved path.
       const compiler = input.compilerPath ?? options.compiler;
       return {
+        buildConfiguration: "checked",
         executablePath,
         target: input.target,
         ...includePropertiesWhen(() => {
@@ -163,6 +175,7 @@ export function createHostCcToolchain(options: HostCcOptions): NativeToolchain {
     },
     harnessObjectReuse: {
       async createKey(input) {
+        requireConfiguration(input.buildConfiguration);
         requireTarget(input.target);
         return await createHarnessObjectKey(input, {
           adapter: `host-cc-fragments-v1:${options.identity}`,
@@ -194,6 +207,7 @@ export function createHostCcToolchain(options: HostCcOptions): NativeToolchain {
         });
       },
       createBuildRequest(input) {
+        requireConfiguration(input.buildConfiguration);
         requireTarget(input.target);
         for (const name of Object.keys(input.environment.variables)) {
           if (!hostCcEnvironment.inherit.includes(name)) {
@@ -236,6 +250,7 @@ export function createHostCcToolchain(options: HostCcOptions): NativeToolchain {
         };
       },
       async createKey(input) {
+        requireConfiguration(input.buildConfiguration);
         requireTarget(input.target);
         const bytes = new TextEncoder().encode(
           JSON.stringify({
@@ -243,7 +258,14 @@ export function createHostCcToolchain(options: HostCcOptions): NativeToolchain {
             options,
             flags,
             libraries,
-            input,
+            input: {
+              buildConfiguration: input.buildConfiguration ?? "checked",
+              runtimeAbiVersion: input.runtimeAbiVersion,
+              runtimeAssets: input.runtimeAssets,
+              target: input.target,
+              toolchainEnvironment: input.toolchainEnvironment,
+              toolchainIdentity: input.toolchainIdentity,
+            },
           }),
         );
         const digest = await crypto.subtle.digest("SHA-256", bytes);

@@ -9,7 +9,13 @@ import { runNativeFixture } from "../native-fixture.ts";
  * compiler invocation and target.
  */
 
-import { hostCcLane } from "../../tests/native-toolchain.ts";
+import {
+  hostCcLane,
+  nativeBuildConfiguration,
+  nativeToolchain,
+} from "../../tests/native-toolchain.ts";
+import { describeTarget } from "../../packages/compiler/src/index.ts";
+import { mkdirSync } from "node:fs";
 import { buildHostCcFixture } from "../../tests/host-cc-runtime.ts";
 import { spawnSync } from "node:child_process";
 import { join, resolve } from "node:path";
@@ -147,6 +153,9 @@ export function buildClockProgram(options: ClockBuildOptions): ClockBuild {
     );
     return { executable, invocation, target: options.target };
   }
+  if (nativeBuildConfiguration === "optimized") {
+    return buildOptimizedClockProgram(options);
+  }
   const args = [
     "cc",
     "-target",
@@ -156,6 +165,7 @@ export function buildClockProgram(options: ClockBuildOptions): ClockBuild {
     "-Wextra",
     "-Werror",
     "-pedantic",
+    "-ffp-contract=off",
     options.optimize ?? "-O1",
     ...(options.sanitize ? ["-fsanitize=address,undefined"] : []),
     "-I",
@@ -281,4 +291,60 @@ export function runClockScheduler(
   environment: Readonly<Record<string, string>> = {},
 ): ClockRun {
   return runClockCommand(build.executable, [], { environment, input });
+}
+
+/** Use the production adapter for optimized clock properties and probes. */
+function buildOptimizedClockProgram(options: ClockBuildOptions): ClockBuild {
+  const target =
+    options.target === "x86_64-linux-gnu"
+      ? "linux-x86_64-gnu"
+      : options.target === "aarch64-macos"
+        ? "macos-aarch64"
+        : options.target === "aarch64-linux-musl"
+          ? "linux-aarch64-musl"
+          : undefined;
+  if (target == null) {
+    throw new Error(`Unsupported optimized clock target: ${options.target}.`);
+  }
+  const directory = join(options.directory, options.program);
+  mkdirSync(directory, { recursive: true });
+  const sources = programSources(options.program);
+  const variables = Object.fromEntries(
+    (nativeToolchain.environment?.inherit ?? []).flatMap((name) => {
+      const value = process.env[name];
+      return value == null ? [] : [[name, value]];
+    }),
+  );
+  const plan = nativeToolchain.createBuildPlan({
+    buildConfiguration: nativeBuildConfiguration,
+    generatedSourcePath: sources[0]!,
+    additionalGeneratedSourcePaths: sources.slice(1),
+    runtimeDirectory,
+    runtimeSourcePaths: runtimeSources(),
+    target: describeTarget(target),
+    workingDirectory: directory,
+    environment: { variables },
+  });
+  const link = plan.requests.at(-1)!;
+  const invocation = [link.command, ...link.args, "-lpthread"];
+  for (const request of plan.requests) {
+    const args =
+      request === link ? [...request.args, "-lpthread"] : request.args;
+    const run = spawnSync(request.command, args, {
+      cwd: request.cwd,
+      env: request.environment?.variables,
+      encoding: "utf8",
+    });
+    if (run.status !== 0) {
+      throw new Error(
+        `build-config=${nativeBuildConfiguration}\n` +
+          describeFailure(request.command, args, run),
+      );
+    }
+  }
+  return {
+    executable: plan.executablePath,
+    invocation,
+    target: options.target,
+  };
 }

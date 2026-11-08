@@ -39,7 +39,7 @@ Command syntax
 
 ~~~~ text
 oseo [--module] [--script SCRIPT] [--no-specialization] [--target TARGET]
-  [--no-runtime-archive-reuse] SOURCE
+  [--no-runtime-archive-reuse] [--build-config checked|optimized] SOURCE
 oseo [--dump-mir | --emit-c] [--module] [--script SCRIPT]
   [--no-specialization] SOURCE
 oseo --help
@@ -58,6 +58,7 @@ Options may appear before or after the source path.
 | `--script SCRIPT`            | Evaluate a Script before the module entry    |
 | `--no-specialization`        | Compile only the generic native path         |
 | `--no-runtime-archive-reuse` | Rebuild the C runtime archive for this run   |
+| `--build-config CONFIG`      | Choose `checked` (default) or `optimized`    |
 | `--target TARGET`            | Select an explicit native execution target   |
 | `--help`                     | Print help generated from the CLI grammar    |
 | `--version`                  | Print the lockstep Oseo package version      |
@@ -65,6 +66,15 @@ Options may appear before or after the source path.
 `--dump-mir` and `--emit-c` are mutually exclusive. Unknown options,
 duplicate options, a missing source path, and extra positional arguments are
 rejected before Oseo reads or compiles the source file.
+
+Native builds default to `checked`, which keeps the target's sanitizer
+requests. `--build-config optimized` compiles generated C and the runtime
+with `-O2` and disables sanitizers. Both configurations disable floating-point
+contraction and preserve JavaScript behavior. The MIR and C text modes reject
+`--build-config` because their output is configuration-neutral. Runtime archives
+and harness objects have separate cache identities for each configuration.
+[ADR 0036](./adr/0036-optimized-native-build-configuration.md) defines the
+compiler options and verification gates.
 
 
 Compile and run a script

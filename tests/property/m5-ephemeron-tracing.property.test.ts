@@ -1,5 +1,9 @@
 import { runNativeFixture } from "../../tools/native-fixture.ts";
-import { hostCcLane } from "../native-toolchain.ts";
+import {
+  hostCcLane,
+  nativeBuildConfiguration,
+  nativeToolchain,
+} from "../native-toolchain.ts";
 import { buildHostCcFixture } from "../host-cc-runtime.ts";
 import assert from "node:assert/strict";
 import { spawnSync } from "node:child_process";
@@ -12,6 +16,7 @@ import { fileURLToPath } from "node:url";
 import fc from "fast-check";
 
 import { cRuntimeProvider } from "../../packages/runtime-c/src/index.ts";
+import { describeTarget } from "../../packages/compiler/src/index.ts";
 
 const { assertProperty } = await import(
   ["../../packages/testkit/tests/", "property-support.ts"].join("")
@@ -72,10 +77,7 @@ function run(command: string, args: readonly string[]): string {
     encoding: "utf8" as const,
     env: { ...process.env, OSEO_GC_EVERY_SAFEPOINT: "1" },
   };
-  const result =
-    command === "zig"
-      ? spawnSync(command, args, optionsForRun)
-      : runNativeFixture(command, args, optionsForRun);
+  const result = runNativeFixture(command, args, optionsForRun);
   assert.equal(
     result.status,
     0,
@@ -148,26 +150,60 @@ test(
   async () => {
     const directory = await mkdtemp(join(tmpdir(), "oseo-ephemeron-property-"));
     try {
-      const executable = join(directory, "runtime-ephemeron-property");
+      let executable = join(directory, "runtime-ephemeron-property");
       if (hostCcLane) {
         buildHostCcFixture(fixture, runtime, runtimeSources, executable);
-      } else
-        run("zig", [
-          "cc",
-          "-target",
-          zigNativeTarget ?? "x86_64-linux-gnu",
-          "-std=c11",
-          "-Wall",
-          "-Wextra",
-          "-Werror",
-          "-fsanitize=address,undefined",
-          "-I",
-          runtime,
-          fixture,
-          ...runtimeSources,
-          "-o",
-          executable,
-        ]);
+      } else {
+        const variables = Object.fromEntries(
+          (nativeToolchain.environment?.inherit ?? []).flatMap((name) => {
+            const value = process.env[name];
+            return value == null ? [] : [[name, value]];
+          }),
+        );
+        const plan = nativeToolchain.createBuildPlan({
+          buildConfiguration: nativeBuildConfiguration,
+          generatedSourcePath: fixture,
+          runtimeDirectory: runtime,
+          runtimeSourcePaths: runtimeSources,
+          target: describeTarget(
+            process.platform === "darwin"
+              ? "macos-aarch64"
+              : "linux-x86_64-gnu",
+          ),
+          workingDirectory: directory,
+          environment: { variables },
+        });
+        assert.equal(plan.buildConfiguration, nativeBuildConfiguration);
+        const compilations = plan.requests.filter(
+          (request) => request.args[0] === "cc",
+        );
+        assert.ok(compilations.length > 0);
+        for (const request of compilations) {
+          assert.ok(request.args.includes("-ffp-contract=off"));
+          if (nativeBuildConfiguration === "optimized") {
+            assert.ok(request.args.includes("-O2"));
+            assert.ok(request.args.includes("-fno-sanitize=all"));
+            assert.ok(
+              request.args.every((arg) => !arg.startsWith("-fsanitize=")),
+            );
+          }
+        }
+        for (const request of plan.requests) {
+          const result = spawnSync(request.command, request.args, {
+            cwd: request.cwd,
+            env: request.environment?.variables,
+            encoding: "utf8",
+          });
+          assert.equal(
+            result.status,
+            0,
+            `build-config=${nativeBuildConfiguration}\n` +
+              `${request.command} ${request.args.join(" ")}\n` +
+              `${result.error?.stack ?? ""}\n${result.stderr}`,
+          );
+        }
+        executable = plan.executablePath;
+      }
       assertProperty(
         "ephemeron fixed points, weak clearing, and cleanup order agree",
         fc.property(caseArbitrary, (testCase) => {

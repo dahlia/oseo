@@ -1,6 +1,9 @@
 import { parseArgs } from "node:util";
 
-import { nativeShardCosts } from "./native-shard-costs.ts";
+import {
+  nativeShardCosts,
+  optimizedNativeShardCosts,
+} from "./native-shard-costs.ts";
 import { parseTestShardArguments } from "./shard.ts";
 import type { TestShard } from "./shard.ts";
 
@@ -71,8 +74,12 @@ export interface NativeShardModel {
 /** Select the measured host model, independent of local CPU availability. */
 export function nativeShardModel(platform: string): NativeShardModel {
   const target = platform === "darwin" ? "macos-aarch64" : "linux-x86_64-gnu";
+  const costs =
+    process.env.OSEO_NATIVE_BUILD_CONFIG === "optimized"
+      ? optimizedNativeShardCosts
+      : nativeShardCosts;
   return {
-    costs: nativeShardCosts[target] ?? {},
+    costs: costs[target] ?? {},
     width: platform === "darwin" ? 3 : 4,
   };
 }

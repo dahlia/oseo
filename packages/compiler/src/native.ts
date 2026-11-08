@@ -101,8 +101,13 @@ export interface ProcessObservation {
   readonly stdout: string;
 }
 
+/** Compiler configuration for the same native target. */
+export type NativeBuildConfiguration = "checked" | "optimized";
+
 /** Files and commands required for one native build. */
 export interface NativeBuildPlan {
+  /** Defaults to checked when omitted. */
+  readonly buildConfiguration?: NativeBuildConfiguration;
   readonly executablePath: string;
   readonly requests: readonly ProcessRequest[];
   readonly runtimeArchivePath?: string;
@@ -118,6 +123,8 @@ export interface RuntimeArchiveAsset {
 
 /** Complete semantic and tool inputs covered by one runtime archive key. */
 export interface RuntimeArchiveKeyInput {
+  /** Defaults to checked when omitted. */
+  readonly buildConfiguration?: NativeBuildConfiguration;
   readonly runtimeAbiVersion: string;
   readonly runtimeAssets: readonly RuntimeArchiveAsset[];
   readonly target: TargetDescription;
@@ -191,6 +198,8 @@ export interface RuntimeArchiveReuse {
  * filesystem enumeration never selects sources or archive layout.
  */
 export interface NativeBuildInput {
+  /** Defaults to checked when omitted. */
+  readonly buildConfiguration?: NativeBuildConfiguration;
   /**
    * Absolute path the toolchain must invoke instead of resolving its
    * compiler through the host's search path. A composer that pinned the
@@ -212,6 +221,8 @@ export interface NativeBuildInput {
 
 /** Toolchain boundary that constructs commands without executing them. */
 export interface NativeToolchain {
+  /** Configuration selected by a composing test or application. */
+  readonly buildConfiguration?: NativeBuildConfiguration;
   /** Exact compiler identity retained in failure and replay metadata. */
   readonly identity?: string;
   createBuildPlan(input: NativeBuildInput): NativeBuildPlan;
@@ -317,6 +328,8 @@ export function targetForExecutionHost(
 
 /** Normalized object staging contains harness.c and runtime headers. */
 export interface HarnessObjectBuildInput {
+  /** Defaults to checked when omitted. */
+  readonly buildConfiguration?: NativeBuildConfiguration;
   /** Pinned compiler, with the same meaning as on `NativeBuildInput`. */
   readonly compilerPath?: string;
   readonly workingDirectory: string;
