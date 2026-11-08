@@ -3234,3 +3234,40 @@ test(
     }
   },
 );
+
+test("profiling capture stays in the existing hosted Mac Deno job", () => {
+  const mac = after.jobs.test_macos_deno!;
+  assert.equal(mac["runs-on"], "macos-latest");
+  const capture = mac.steps.find(
+    (step) => step.name === "Capture synthetic native profiling probe",
+  );
+  assert.ok(capture);
+  assert.match(
+    readFileSync("tools/perf-profile-smoke.ts", "utf8"),
+    /darwin\/arm64/u,
+  );
+  assert.match(String(capture.run), /perf:profile:smoke/u);
+  assert.match(String(capture.run), /RUNNER_TEMP/u);
+  const archive = mac.steps.find(
+    (step) => step.name === "Archive profiling capture with executable modes",
+  );
+  assert.match(String(archive?.run), /tar -czf/u);
+  const upload = mac.steps.find(
+    (step) => step.name === "Retain native profiling capture",
+  );
+  assert.equal(upload?.if, "always() && runner.os == 'macOS'");
+  assert.equal(
+    parsedMapping(upload?.with, "Capture upload")["if-no-files-found"],
+    "error",
+  );
+  // The Linux/Windows matrix retains the template's steps, whose conditions
+  // exclude Mac operations. The generator strips only false Mac job entries.
+  for (const step of after.jobs.test!.steps.filter((candidate) =>
+    /profiling (?:probe|capture)/u.test(String(candidate.name)),
+  )) {
+    assert.ok(
+      String(step.if).includes("macos-latest") ||
+        String(step.if).includes("runner.os == 'macOS'"),
+    );
+  }
+});

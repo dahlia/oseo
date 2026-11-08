@@ -1,3 +1,7 @@
+import {
+  captureArtifact,
+  validateCaptureRequest,
+} from "./perf-profile-capture.ts";
 import { spawnSync } from "node:child_process";
 import {
   accessSync,
@@ -49,7 +53,8 @@ export function profilingProbes(
   throw new Error(`Unsupported profiling discovery host: ${platform}`);
 }
 
-function executablePath(command: string): string | null {
+/** Resolve an installed executable without installing or modifying it. */
+export function executablePath(command: string): string | null {
   const candidates = isAbsolute(command)
     ? [command]
     : (process.env.PATH ?? "")
@@ -120,8 +125,23 @@ if (
   process.argv[1] != null &&
   import.meta.url === pathToFileURL(resolve(process.argv[1])).href
 ) {
-  if (process.argv.length !== 4 || process.argv[2] !== "discover") {
-    throw new Error("usage: node tools/perf-profile.ts discover NEW_DIRECTORY");
+  if (process.argv.length === 4 && process.argv[2] === "discover") {
+    process.stdout.write(discoverProfilingTools(resolve(process.argv[3]!)));
+  } else if (process.argv.length === 5 && process.argv[2] === "capture") {
+    const { readFileSync } = await import("node:fs");
+    const request = validateCaptureRequest(
+      JSON.parse(readFileSync(process.argv[3]!, "utf8")),
+    );
+    process.exitCode = (await captureArtifact(
+      request,
+      resolve(process.argv[4]!),
+    ))
+      ? 0
+      : 1;
+  } else {
+    throw new Error(
+      "usage: perf-profile.ts discover NEW_DIRECTORY | " +
+        "capture REQUEST_JSON NEW_DIRECTORY",
+    );
   }
-  process.stdout.write(discoverProfilingTools(resolve(process.argv[3]!)));
 }

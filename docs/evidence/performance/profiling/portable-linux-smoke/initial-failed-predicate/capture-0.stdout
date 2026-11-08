@@ -1,0 +1,15 @@
+[Thread debugging using libthread_db enabled]
+Using host libthread_db library "/lib64/libthread_db.so.1".
+0x000000000108aaa4 in oseo_environment_create (context=0x7fff73d361a0, slot_count=slot_count@entry=7) at runtime_binding.c:12
+
+Thread 1 (Thread 0x7f27f3371b80 (LWP 691992) "fixture-linux-x"):
+#0  0x000000000108aaa4 in oseo_environment_create (context=0x7fff73d361a0, slot_count=slot_count@entry=7) at runtime_binding.c:12
+#1  0x000000000108ad8d in oseo_environment_clone (context=context@entry=0x7fff73d361a0, environment_value=<optimized out>) at runtime_binding.c:101
+#2  0x000000000104b93d in oseo_function_0 (context=0x7fff73d361a0, callee=9222527612601162384, receiver=<optimized out>, argument_count=2, arguments=0x28491188, new_target=<optimized out>) at /home/dahlia/.local/state/oseo-preview/lanes/perf-profiling/capture-ci-20261109/linux-smoke-a/build/generated.c:76
+#3  oseo_dispatch_function (context=0x7fff73d361a0, callee=9222527612601162384, receiver=9221683186994511872, argument_count=2, arguments=0x28491188, new_target=<optimized out>) at /home/dahlia/.local/state/oseo-preview/lanes/perf-profiling/capture-ci-20261109/linux-smoke-a/build/generated.c:31
+#4  0x000000000106217c in call_in_running_realm (context=context@entry=0x7fff73d361a0, callee=callee@entry=9222527612601162384, receiver=receiver@entry=9221683186994511872, argument_count=argument_count@entry=2, arguments=arguments@entry=0x28491188, new_target=new_target@entry=9221683186994511872) at runtime_function.c:3146
+#5  0x0000000001061d46 in call_once (context=context@entry=0x7fff73d361a0, callee=callee@entry=9222527612601162384, receiver=receiver@entry=9221683186994511872, argument_count=argument_count@entry=2, arguments=arguments@entry=0x28491188, new_target=9221683186994511872) at runtime_function.c:3232
+#6  0x000000000106060e in oseo_call_function (context=context@entry=0x7fff73d361a0, callee=7, callee@entry=9222527612601162384, receiver=9222527612601161984, receiver@entry=9221683186994511872, argument_count=9222527611924643840, argument_count@entry=2, arguments=0x108, arguments@entry=0x28491188, new_target=139809562979008) at runtime_function.c:3625
+#7  0x000000000104b4f8 in oseo_function_script (context=0x7fff73d361a0, receiver=<optimized out>, argument_count=0, arguments=0x0, new_target=<optimized out>, callee=<optimized out>) at /home/dahlia/.local/state/oseo-preview/lanes/perf-profiling/capture-ci-20261109/linux-smoke-a/build/generated.c:312
+#8  main () at /home/dahlia/.local/state/oseo-preview/lanes/perf-profiling/capture-ci-20261109/linux-smoke-a/build/generated.c:391
+[Inferior 1 (process 691992) detached]

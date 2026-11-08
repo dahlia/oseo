@@ -1,0 +1,18 @@
+{
+  "argv": [
+    "/home/dahlia/.local/state/oseo-preview/lanes/perf-profiling/capture-ci-20261109/linux-smoke-g/build/fixture-linux-x86_64-gnu"
+  ],
+  "cwd": "/home/dahlia/.local/state/oseo-preview/lanes/perf-profiling/capture-ci-20261109/linux-smoke-g",
+  "env": {},
+  "startedUtc": "2026-11-08T21:20:31.032Z",
+  "finishedUtc": "2026-11-08T21:20:34.239Z",
+  "pid": 802738,
+  "status": 0,
+  "signal": null,
+  "error": null,
+  "timedOut": false,
+  "stdout": "preflight.stdout",
+  "stderr": "preflight.stderr",
+  "cleanup": [],
+  "groupGone": true
+}

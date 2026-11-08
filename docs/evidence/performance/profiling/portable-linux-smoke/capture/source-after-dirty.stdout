@@ -1,0 +1,10 @@
+ M .github/workflows/main.yaml
+ M docs/evidence/performance/profiling.md
+ M mise.toml
+ M tests/macos-lanes.test.ts
+ M tests/perf-profiling.test.ts
+ M tools/main-workflow.template.yaml
+ M tools/perf-profile.ts
+?? docs/evidence/performance/profiling/portable-linux-smoke/
+?? tools/perf-profile-capture.ts
+?? tools/perf-profile-smoke.ts

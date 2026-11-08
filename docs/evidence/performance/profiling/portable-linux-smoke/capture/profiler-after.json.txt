@@ -1,0 +1,7 @@
+{
+  "path": "/usr/libexec/gdb",
+  "realpath": "/usr/libexec/gdb",
+  "sha256": "37e6d48cabb60d5d5d729eecaac425c396e92b182fe9e56eb9df60cacbacaf30",
+  "bytes": 16584520,
+  "mode": 493
+}

@@ -7,11 +7,13 @@ Status and contract
 This method belongs to the first Measurement checkpoint of
 [*PLAN-PERF.md*](../../../PLAN-PERF.md), alongside
 [*PLAN-PREVIEW.md*](../../../PLAN-PREVIEW.md). Linux GDB has recovered useful
-user stacks from an actual optimized synthetic program; the
+user stacks from actual optimized synthetic programs; the
 [smoke evidence](./profiling/linux-smoke/README.md) also retains a failed
 late attachment. This establishes limited tool and unwind feasibility,
-not corpus acceptance or measured costs. macOS tools and captures remain
-unverified. Generic path costs and optimization design remain out of scope.
+not corpus acceptance or measured costs. Portable capture is available; actual
+macOS tools and captures remain unverified until the existing hosted Mac-Deno
+job executes that capture. Generic path costs and optimization design remain
+out of scope.
 
 [ADR 0036](../../adr/0036-optimized-native-build-configuration.md) fixes the
 measurement configuration: `optimized`, with `-O2` for generated C
@@ -31,8 +33,8 @@ The compiler host (Node.js or Deno) is separate from the execution host;
 profile the produced program, not the compiler or a compile-and-run wrapper.
 
 
-Artifact and run procedure, pending validation
-----------------------------------------------
+Artifact and run procedure
+--------------------------
 
 Read-only tool discovery runs from the checkout through:
 
@@ -41,16 +43,16 @@ mise run perf:profile:discover NEW_DIRECTORY
 ~~~~
 
 The parent directory must exist; the command refuses an existing output
-directory. It preserves each probe's argv, UTC boundaries, status, signal,
-error, resolved tool path, and byte stdout/stderr in *discovery.json* and
-sidecars. It prints the same JSON bundle, including base64 output bytes,
-for collection from CI logs. Require complete logs and compare decoded
-bytes with sidecars when those are collected. Missing tools, timeouts, and
-nonzero help statuses remain visible; successful discovery reports
-`acceptance: unverified`. It neither captures a target nor
-reserves a measurement slot. On macOS, probes are designed to inspect the
-selected Xcode, `xctrace` record/export help and templates, and `sample` help
-without installing tools or changing permissions.
+directory. It preserves each probe's `argv`, UTC boundaries, status, signal,
+error, resolved tool path, and raw `stdout` and `stderr` bytes in
+*discovery.json* and sidecars. It prints the same JSON bundle, including base64
+output bytes, for collection from CI logs. Require complete logs and compare
+decoded bytes with sidecars when those are collected. Missing tools, timeouts,
+and nonzero help statuses remain visible; successful discovery reports
+`acceptance: unverified`. It neither captures a target nor reserves a
+measurement slot. On macOS, probes are designed to inspect the selected Xcode,
+`xctrace` help for `record` and `export`, available templates, and `sample`
+help without installing tools or changing permissions.
 
 The CI probe runs in the hosted `test (macos-latest, deno)` job and uploads
 *profiler-tool-discovery-macos-N*, where `N` is the workflow attempt number.
@@ -58,6 +60,106 @@ Its `uname` and `sw_vers` output
 identify that hosted image; they do not establish installed tools on
 `oseo-mac-1` or `oseo-mac-2`. Repeat discovery on the actual capture host
 through Root's approved route before accepting its profiling method.
+
+The existing hosted Mac-Deno job also runs the synthetic native method
+probe after its Deno tests and uploads *profiler-native-capture-macos-N*.
+It checks the actual `darwin/arm64` host in the helper, uses a fresh directory
+under `RUNNER_TEMP`, and archives the evidence with `tar` to retain executable
+modes and the path mapping. Archive and upload steps use `always()` and
+`if-no-files-found: error`; hard job termination can still prevent upload.
+No job, runner placement, matrix, permission, required gate or timeout is added
+or changed. No unverified service default is used as a time budget. This
+connection has not yet supplied a Mac capture or a successful candidate CI.
+
+Two commands separate caller artifacts from the synthetic build:
+
+~~~~ sh
+mise run perf:profile:capture REQUEST_JSON NEW_DIRECTORY
+mise run perf:profile:smoke NEW_DIRECTORY
+~~~~
+
+`capture` never builds, strips, signs, changes extended attributes, or
+modifies its input files. Its JSON request declares `kind` as
+`existing-artifact` or `synthetic-method-probe`; an absolute `executable`, its
+`sha256`, and a nonempty `inputs` array of absolute paths and SHA-256 values
+freeze the source, generated C, runtime and build metadata supplied by the
+caller. `argv`, `env` and absolute `cwd` specify the complete launch contract.
+No ambient environment is added to the target. `stdinBase64`, `stdoutBase64`,
+`stderrBase64` and `exitStatus` specify exact input and output bytes and the
+correctness oracle. The request is independent of the corpus harness's schema;
+Root must connect its final timed artifact and complete build provenance later.
+A caller must not put secrets in a recorded launch environment.
+
+The programmatic `captureArtifact(request, directory, checker)` API accepts an
+optional `CaptureStdoutChecker` for `existing-artifact` requests. This permits a
+caller to validate a checksum while checking variable elapsed fields, without
+changing the executable or discarding its output. The CLI and synthetic probe
+keep the exact-byte oracle. A checker supplies `id`, `sourcePath`,
+`sourceSha256` and a synchronous `check(stdout)` function. Its actual source
+file must be in the frozen `inputs` set. The source digest and actual function
+representation digest are recorded in *stdout-oracle.json*; these identities do
+not prove checker semantics. The final integration owner must bind the correct
+semantic oracle and include its complete source/data dependencies after the
+harness lands. No unlanded harness code or schema is used here.
+
+A checker must be pure, deterministic and bounded over the retained stdout
+bytes; it must not launch processes or change files. Missing source identity,
+a missing callable, an exception or any result other than `true` fails the
+capture with raw evidence. Expected exit status, signal/timeout checks, cleanup
+and exact stderr bytes remain mandatory. *preflight-check.json* and
+*target-check.json* retain output digests and the independent result, including
+checker errors; target output is checked even when stack capture fails.
+
+`smoke` uses the public compiler, C backend, runtime, Node host and Zig APIs
+already available after the optimized build unit. It builds the same
+unhinted two-million-iteration source as the earlier longer smoke, explicitly
+selecting `optimized`, disabled specialization and no instrumentation. It
+retains generated C, runtime source, actual build requests and raw compiler
+outputs, the executable and tool identities. It changes no compiler flags.
+This build belongs only to method verification and has no timed-artifact ID.
+Both commands refuse an existing output directory. Neither runs the corpus,
+collects benchmark timings or supplies missing harness acceptance.
+
+The initial 50 ms attach delay and eight serial captures can outlive a short
+native program. A failed or insufficient capture of an unchanged timed
+artifact remains unaccepted; do not add program waits or rebuild with larger
+iterations to make it pass. Launch-under-profiler support would require
+separate tool and input-forwarding validation and is not provided by this
+attach primitive.
+
+The capture helper discovers tools again on the actual host. Linux uses eight
+serial GDB attachments with the existing five-second command limit and
+16-frame backtraces. macOS requires local `sample` help to confirm duration,
+interval and `-file` syntax, then attempts eight one-second captures at a
+requested ten-millisecond interval, each with a twenty-second command limit.
+This bounded attach method is separate from Time Profiler; its requested
+interval does not establish CPU sampling semantics or an effective frequency.
+The preflight and profiled target each have a 120-second process timeout;
+smoke build commands have a 600-second limit. These are cleanup bounds, not
+measurement populations or changes to benchmark/review budgets.
+
+Each capture checks the owned live child's identity before attachment and
+requires the raw report to name that PID. A useful stack has a resolved
+generated user frame and at least one caller, with no detected unknown frame,
+hit on the 16-frame cap, truncation or loss diagnostic. At least one capture
+must also resolve runtime context. Generated-only stacks remain useful user
+observations while leaving runtime attribution unknown. Tool exit zero alone
+cannot pass. The summary records all eight positions, including failed races
+and unattempted stops after exit. Detected unknown/truncated frames fail the
+method probe; absence of a diagnostic does not prove complete unwinding.
+
+A separate untimed correctness preflight preserves the Mac discard in this
+probe's launch history; it does not establish whether a caller ran those bytes
+earlier. Both target runs must match the oracle. Executable/input digests,
+paths and modes are compared before and after, as are profiler bytes and
+available ELF build-ID or Mach-O UUID command outputs. The preserved copies
+and *file-map.json* map original absolute paths to numbered evidence files.
+`capture.json`, per-process JSON records and byte sidecars retain host/source
+state, selected nonsecret CI identifiers, failures and cleanup. GDB loss
+counters remain unavailable, not zero. Separate process groups bound all
+owned target, build, discovery and profiler lifetimes; on failure or a caught
+signal, the helper kills and reaps those groups. Uncatchable termination and
+descendants that escape their group remain explicit cleanup limits.
 
 1.  After dependencies land and their main CI passes, discover the actual
     harness and build tasks with `mise tasks`. This draft does not reserve
@@ -171,6 +273,11 @@ after process exit. A separate fixed, longer synthetic workload completed
 all eight requested attachments, including allocation and call-context
 frames. These runs have different hashes and workload sizes; neither
 is a timing population. Complete capture of a short program is not assured.
+The [portable smoke](./profiling/portable-linux-smoke/README.md) also retains
+all eight captures, exact launch/input and file identities, process-group
+lifetimes and an earlier failed predicate result. It validates the portable
+build/capture connection on Linux while leaving Mac and timed-corpus acceptance
+pending.
 
 After launching the frozen artifact with its exact workload contract,
 identify the child PID and verify its executable identity before attaching.
@@ -209,8 +316,8 @@ macOS candidate: Instruments Time Profiler
 ------------------------------------------
 
 Apple's [toolchain documentation][apple-tools] says `xctrace` ships with
-Xcode, not the standalone Command Line Tools package. No Mac toolchain or
-macOS AArch64 artifact was inspected here. Apple describes
+Xcode, not the standalone Command Line Tools package. No actual Mac toolchain or
+macOS AArch64 capture has been accepted here. Apple describes
 [Time Profiler on Apple silicon][apple-cpu] as timer-based sampling of
 on-CPU user stacks, with possible aliasing; heterogeneous CPU frequencies
 also affect interpretation. This is distinct from the newer CPU Profiler
@@ -229,7 +336,7 @@ xcrun xctrace record --template 'Time Profiler' \
 
 Before adopting it, a Mac owner must retain the selected Xcode version,
 local `xctrace` help, available templates, and a successful capture against
-the identified optimized program. Attach misses startup and may miss an
+the identified optimized program. The attach mode misses startup and may miss an
 entire short-lived process. Prefer a verified launch workflow for those
 programs; its exact launch syntax, stdin and argument forwarding, and export
 commands remain TODOs for the installed Apple toolchain. Do not use a shell
@@ -248,10 +355,11 @@ prevent capture, preserve the diagnostic and return the decision to Root.
 Apple's retired [sample guide][apple-sample] documents
 `sample TextEdit 5 10 -wait`, meaning a five-second capture at ten-millisecond
 intervals while waiting for that named process. This confirms historical
-syntax only, not current macOS AArch64 support. `sample` is a possible
-bounded fallback to investigate with the installed manual, process identity,
-and an actual capture. It is not accepted here as a launch-complete or
-Time Profiler-equivalent method.
+syntax only, not current macOS AArch64 support. The portable helper now
+connects a bounded `sample` fallback, gated by the installed help, process
+identity, actual capture and stack checks described above. Actual Mac execution
+remains pending. It is not accepted here as a launch-complete or Time
+Profiler-equivalent method.
 
 [apple-tools]: https://developer.apple.com/documentation/xcode/installing-the-command-line-tools
 [apple-cpu]: https://developer.apple.com/videos/play/wwdc2025/308/

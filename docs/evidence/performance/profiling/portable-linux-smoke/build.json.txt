@@ -1,0 +1,31 @@
+{
+  "buildConfiguration": "optimized",
+  "executablePath": "/home/dahlia/.local/state/oseo-preview/lanes/perf-profiling/capture-ci-20261109/linux-smoke-g/build/fixture-linux-x86_64-gnu",
+  "exitStatus": 0,
+  "stderr": "",
+  "stdout": "",
+  "compilerInvocation": [
+    "zig cc -target x86_64-linux-gnu -std=c11 -Wall -Wextra -Werror -pedantic -I /home/dahlia/.local/state/oseo-preview/lanes/perf-profiling/capture-ci-20261109/linux-smoke-g/build -ffp-contract=off -O2 -fno-sanitize=all /home/dahlia/.local/state/oseo-preview/lanes/perf-profiling/capture-ci-20261109/linux-smoke-g/build/generated.c /home/dahlia/.cache/oseo/runtime-archives/liboseo-runtime-22e42687f1064fee578158907af505fad3817680b65456269f3b52b49862ad42.a -o /home/dahlia/.local/state/oseo-preview/lanes/perf-profiling/capture-ci-20261109/linux-smoke-g/build/fixture-linux-x86_64-gnu"
+  ],
+  "executionHost": {
+    "architecture": "x86_64",
+    "operatingSystem": "linux"
+  },
+  "target": {
+    "abi": "gnu",
+    "architecture": "x86_64",
+    "atomicsPauseHint": "x86-pause",
+    "cStandard": "c11",
+    "executableFormat": "elf",
+    "name": "linux-x86_64-gnu",
+    "operatingSystem": "linux",
+    "sanitizers": [
+      "address",
+      "undefined"
+    ]
+  },
+  "role": "synthetic-method-probe",
+  "timedArtifactId": null,
+  "instrumentation": false,
+  "specialization": "disabled"
+}

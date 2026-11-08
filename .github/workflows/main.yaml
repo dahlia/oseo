@@ -205,6 +205,24 @@ jobs:
             ${{ runner.temp }}/oseo-perf-correctness.tar.gz
             ${{ runner.temp }}/oseo-perf-correctness.tar.gz.sha256
           if-no-files-found: error
+      - if: matrix.os == 'macos-latest'
+        name: Capture synthetic native profiling probe
+        run: |
+          mise run perf:profile:smoke "$RUNNER_TEMP/oseo-profiler-capture"
+      - name: Archive profiling capture with executable modes
+        if: always() && runner.os == 'macOS'
+        run: >-
+          tar -czf "$RUNNER_TEMP/oseo-profiler-capture.tar.gz"
+          -C "$RUNNER_TEMP/oseo-profiler-capture" .
+      - name: Retain native profiling capture
+        if: always() && runner.os == 'macOS'
+        uses: actions/upload-artifact@v7
+        with:
+          name: profiler-native-capture-macos-${{ github.run_attempt }}
+          path: |
+            ${{ runner.temp }}/oseo-profiler-capture
+            ${{ runner.temp }}/oseo-profiler-capture.tar.gz
+          if-no-files-found: error
 
   # macOS. The wrapper reproduces Node's default discovery, removes the
   # dedicated Array and exhaustive RegExp literal files, and assigns the
@@ -1406,6 +1424,23 @@ jobs:
           path: |
             ${{ runner.temp }}/oseo-perf-correctness.tar.gz
             ${{ runner.temp }}/oseo-perf-correctness.tar.gz.sha256
+          if-no-files-found: error
+      - name: Capture synthetic native profiling probe
+        run: |
+          mise run perf:profile:smoke "$RUNNER_TEMP/oseo-profiler-capture"
+      - name: Archive profiling capture with executable modes
+        if: always() && runner.os == 'macOS'
+        run: >-
+          tar -czf "$RUNNER_TEMP/oseo-profiler-capture.tar.gz"
+          -C "$RUNNER_TEMP/oseo-profiler-capture" .
+      - name: Retain native profiling capture
+        if: always() && runner.os == 'macOS'
+        uses: actions/upload-artifact@v7
+        with:
+          name: profiler-native-capture-macos-${{ github.run_attempt }}
+          path: |
+            ${{ runner.temp }}/oseo-profiler-capture
+            ${{ runner.temp }}/oseo-profiler-capture.tar.gz
           if-no-files-found: error
 
   # macOS. The wrapper reproduces Node's default discovery, removes the
