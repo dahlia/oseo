@@ -292,6 +292,13 @@ raw_args = true
 run = "node tools/run-native-tests.ts tests/property/*.property.test.ts"
 env.OSEO_NATIVE_BUILD_CONFIG = "optimized"
 
+[tasks."test:property:native:optimized:shard"]
+description = "Run selected optimized host-native property test files"
+depends = ["build"]
+raw_args = true
+run = "node tools/run-native-tests.ts"
+env.OSEO_NATIVE_BUILD_CONFIG = "optimized"
+
 [tasks."test:node"]
 description = "Run source, version, and built ESM tests under Node.js"
 depends = ["build"]

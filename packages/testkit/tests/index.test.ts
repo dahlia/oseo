@@ -1,4 +1,7 @@
 import assert from "node:assert/strict";
+import { mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
 import test from "node:test";
 
 import { describeTarget } from "@oseo/compiler";
@@ -155,6 +158,104 @@ test("retains artifacts when differential comparison fails", async () => {
   assert.ok(state.files.has("/tmp/oseo-native-test/generated.c"));
   assert.ok(state.files.has("/tmp/oseo-native-test/native-observation.json"));
 });
+
+for (const buildConfiguration of ["checked", "optimized"] as const) {
+  for (const targetId of ["linux-x86_64-gnu", "macos-aarch64"] as const) {
+    for (const failure of ["execution", "inspection"] as const) {
+      const name = `recovers retained ${buildConfiguration} ${targetId}`;
+      test(`${name} ${failure}`, async () => {
+        const target = describeTarget(targetId);
+        const executionHost = {
+          architecture: target.architecture,
+          operatingSystem: target.operatingSystem,
+        };
+        const observation = {
+          exitStatus: failure === "execution" ? 1 : 0,
+          stderr: "original fixture error\n",
+          stdout: "native output\n",
+        };
+        const state = memoryHost(
+          [
+            { exitStatus: 0, stderr: "", stdout: "compiler output" },
+            observation,
+          ],
+          executionHost,
+        );
+        const directory = await mkdtemp(
+          join(tmpdir(), "oseo-native (build-config=checked) "),
+        );
+        const original = new Error("original inspection error");
+        try {
+          const error = await withNativeFixture(
+            {
+              ...fixtureOptions(state.host, ["compile"]),
+              buildConfiguration,
+              host: {
+                ...state.host,
+                async makeTemporaryDirectory() {
+                  return directory;
+                },
+                async writeTextFile(path, contents) {
+                  await writeFile(path, contents);
+                },
+              },
+              target,
+            },
+            () => {
+              if (failure === "execution") {
+                assert.fail("A failed execution must not reach inspection.");
+              }
+              throw original;
+            },
+          ).then(
+            () => assert.fail("The fixture must fail."),
+            (cause: unknown) => cause,
+          );
+          assert.ok(error instanceof Error);
+          assert.ok(
+            error.message.includes(`build-config=${buildConfiguration}`),
+          );
+          assert.ok(error.cause instanceof Error);
+          if (failure === "inspection") {
+            assert.equal(error.cause, original);
+          } else {
+            assert.equal(
+              error.cause.message,
+              "Native fixture failed (1):\noriginal fixture error\n",
+            );
+          }
+          // Keep the end-anchored recovery used by import-operation-support.
+          const recovered = /Native artifacts retained at (.+)$/u.exec(
+            error.message,
+          )?.[1];
+          assert.equal(recovered, directory);
+          const bytes = await readFile(
+            join(recovered, "native-observation.json"),
+            "utf8",
+          );
+          // SAFETY: withNativeFixture writes this record on every failure.
+          const metadata = JSON.parse(bytes) as {
+            readonly buildConfiguration: string;
+            readonly error: string;
+            readonly executionHost: typeof executionHost;
+            readonly observation: ProcessObservation;
+            readonly target: typeof target;
+          };
+          assert.equal(metadata.buildConfiguration, buildConfiguration);
+          assert.equal(metadata.error, String(error.cause));
+          assert.deepEqual(metadata.executionHost, executionHost);
+          assert.deepEqual(metadata.target, target);
+          assert.equal(metadata.observation.exitStatus, observation.exitStatus);
+          assert.equal(metadata.observation.stderr, observation.stderr);
+          assert.equal(metadata.observation.stdout, observation.stdout);
+          assert.deepEqual(state.removed, []);
+        } finally {
+          await rm(directory, { force: true, recursive: true });
+        }
+      });
+    }
+  }
+}
 
 test("rejects compile-only targets before creating a fixture", async () => {
   const state = memoryHost([], {

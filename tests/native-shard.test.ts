@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import { readFile, readdir } from "node:fs/promises";
 import test from "node:test";
+import { parse } from "yaml";
 
 import {
   nativeShardCosts,
@@ -57,6 +58,98 @@ test("native property shards cover every file exactly once", async () => {
         }
       }
     }
+  }
+});
+
+test("optimized CI isolates files with exact property coverage", async () => {
+  const files = (await readdir(new URL("property/", import.meta.url)))
+    .filter((path) => path.endsWith(".property.test.ts"))
+    .map((path) => `tests/property/${path}`);
+  // SAFETY: The assertions below validate the workflow fields used here.
+  const workflow = parse(
+    await readFile(
+      new URL("../.github/workflows/native-optimized.yaml", import.meta.url),
+      "utf8",
+    ),
+  ) as {
+    readonly env: Readonly<Record<string, string>>;
+    readonly jobs: Readonly<
+      Record<
+        string,
+        {
+          readonly strategy: {
+            readonly matrix: {
+              readonly os: readonly string[];
+              readonly shard?: readonly number[];
+              readonly file?: readonly string[];
+            };
+          };
+          readonly steps: readonly {
+            readonly run?: string;
+            readonly env?: Readonly<Record<string, string>>;
+          }[];
+        }
+      >
+    >;
+  };
+  assert.deepEqual(workflow.env, { OSEO_NATIVE_BUILD_CONFIG: "optimized" });
+  const shared = workflow.jobs.properties!;
+  const dedicated = workflow.jobs["dedicated-properties"]!;
+  const hosts = ["ubuntu-latest", "macos-15"];
+  assert.deepEqual(shared.strategy.matrix.os, hosts);
+  assert.deepEqual(dedicated.strategy.matrix.os, hosts);
+  assert.deepEqual(shared.strategy.matrix.shard, [1, 2, 3, 4, 5, 6, 7]);
+  // Array has dedicated ordinary macOS and extended Linux placement too.
+  const isolated = new Set([
+    ...caseShardedNativeFiles,
+    ...dedicatedLinuxNativeFiles,
+    ...dedicatedMacosNodeFiles,
+  ]);
+  const dedicatedFiles = dedicated.strategy.matrix.file!;
+  assert.deepEqual(dedicatedFiles.toSorted(), [...isolated].toSorted());
+  const sharedRun = shared.steps.find((step) => step.run != null)!;
+  const dedicatedRun = dedicated.steps.find((step) => step.run != null)!;
+  for (const step of [sharedRun, dedicatedRun]) {
+    assert.deepEqual(step.env, { TMPDIR: "${{ runner.temp }}" });
+  }
+  const task = "test:property:native:optimized:shard";
+  const taskHeader = `[tasks."${task}"]`;
+  const mise = await readFile(new URL("../mise.toml", import.meta.url), "utf8");
+  const definition = mise.split(taskHeader)[1]?.split("\n[")[0];
+  assert.ok(definition);
+  assert.match(definition, /^raw_args = true$/mu);
+  assert.match(definition, /^run = "node tools\/run-native-tests.ts"$/mu);
+  assert.match(definition, /^env\.OSEO_NATIVE_BUILD_CONFIG = "optimized"$/mu);
+  for (const platform of ["linux", "darwin"]) {
+    const indices = shared.strategy.matrix.shard!;
+    const selected: string[] = indices.flatMap((index) => {
+      const args = sharedRun
+        .run!.replace("${{ matrix.shard }}", String(index))
+        .trim()
+        .split(/\s+/u);
+      assert.deepEqual(args.slice(0, 3), ["mise", "run", task]);
+      return nativeTestArguments(
+        args
+          .slice(3)
+          .flatMap((arg) =>
+            arg === "tests/property/*.property.test.ts" ? files : [arg],
+          ),
+        platform,
+      );
+    });
+    assert.ok(selected.every((file) => !isolated.has(file)));
+    for (const file of dedicatedFiles) {
+      const args = dedicatedRun
+        .run!.replace("${{ matrix.file }}", file)
+        .trim()
+        .split(/\s+/u);
+      assert.deepEqual(args.slice(0, 3), ["mise", "run", task]);
+      const single = nativeTestArguments(args.slice(3), platform);
+      assert.deepEqual(single, [file]);
+      selected.push(...single);
+    }
+    assert.deepEqual(selected.toSorted(), files.toSorted());
+    assert.equal(new Set(selected).size, selected.length);
   }
 });
 

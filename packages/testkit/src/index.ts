@@ -649,9 +649,10 @@ export async function withNativeFixture<T>(
         { cause: metadataError },
       );
     }
+    // Keep the path last for consumers that recover failed native runs.
     throw new Error(
-      `Native artifacts retained at ${directory} ` +
-        `(build-config=${buildConfiguration})`,
+      `(build-config=${buildConfiguration})\n` +
+        `Native artifacts retained at ${directory}`,
       {
         cause: error,
       },
