@@ -1,0 +1,410 @@
+#include "oseo_runtime.h"
+
+#include <math.h>
+#include <stddef.h>
+#include <stdint.h>
+#include <stdlib.h>
+
+static OseoResult oseo_function_0(OseoContext *, OseoValue, OseoValue, size_t, const OseoValue *, OseoValue);
+static OseoResult oseo_function_script(OseoContext *, OseoValue, OseoValue, size_t, const OseoValue *, OseoValue);
+
+static OseoResult oseo_dispatch_function(
+    OseoContext *context,
+    OseoValue callee,
+    OseoValue receiver,
+    size_t argument_count,
+    const OseoValue *arguments,
+    OseoValue new_target
+) {
+    size_t code_id = 0u;
+    OseoResult result = oseo_function_code_id(
+        context, callee, &code_id);
+    if (result.status != OSEO_STATUS_NORMAL) return result;
+    (void)receiver;
+    (void)argument_count;
+    (void)arguments;
+    (void)new_target;
+    switch (code_id) {
+    case 0u:
+        result = oseo_frame_enter(context, OSEO_CALLABLE_FRAME_COST(33u));
+        if (result.status == OSEO_STATUS_NORMAL) {
+            result = oseo_function_0(
+                context, callee, receiver, argument_count,
+                arguments, new_target);
+            oseo_frame_leave(context, OSEO_CALLABLE_FRAME_COST(33u));
+        }
+        return result;
+    default:
+        return oseo_unknown_function(context, code_id);
+    }
+}
+
+static OseoResult oseo_function_0(
+    OseoContext *context,
+    OseoValue callee,
+    OseoValue receiver,
+    size_t argument_count,
+    const OseoValue *arguments,
+    OseoValue new_target
+) {
+#if OSEO_CALLABLE_FRAME_COST(33u) > OSEO_MAX_ACTIVE_FRAME_SLOTS
+    (void)callee;
+    (void)receiver;
+    (void)argument_count;
+    (void)arguments;
+    (void)new_target;
+    return oseo_frame_enter(context, OSEO_MAX_ACTIVE_FRAME_SLOTS + 1u);
+#else
+    OseoRootFrame frame = {NULL, NULL, 0u};
+    OseoValue *roots;
+    OseoResult result;
+    (void)callee;
+    (void)receiver;
+    (void)argument_count;
+    (void)arguments;
+    (void)new_target;
+    result = oseo_roots_allocate(context, &frame, 33u);
+    if (result.status != OSEO_STATUS_NORMAL) return result;
+    roots = frame.slots;
+    oseo_context_location(context, 1u, 1u);
+    result = oseo_this_value(context, receiver);
+    if (result.status != OSEO_STATUS_NORMAL) goto abrupt;
+    roots[32] = result.value;
+    receiver = result.value;
+    result = oseo_function_environment(context, callee);
+    if (result.status != OSEO_STATUS_NORMAL) goto abrupt;
+    result = oseo_environment_clone(context, result.value);
+    roots[3] = result.value;
+    if (result.status != OSEO_STATUS_NORMAL) goto abrupt;
+    result = oseo_cell_create(context, oseo_uninitialized());
+    roots[4] = result.value;
+    if (result.status != OSEO_STATUS_NORMAL) goto abrupt;
+    result = oseo_environment_set(context, roots[3], 2u, roots[4]);
+    if (result.status != OSEO_STATUS_NORMAL) goto abrupt;
+    result = oseo_cell_create(context, oseo_uninitialized());
+    roots[4] = result.value;
+    if (result.status != OSEO_STATUS_NORMAL) goto abrupt;
+    result = oseo_environment_set(context, roots[3], 3u, roots[4]);
+    if (result.status != OSEO_STATUS_NORMAL) goto abrupt;
+    result = oseo_environment_get(context, roots[3], 2u);
+    if (result.status != OSEO_STATUS_NORMAL) goto abrupt;
+    result = oseo_cell_initialize(context, result.value, (argument_count > 0u ? arguments[0] : oseo_undefined()));
+    if (result.status != OSEO_STATUS_NORMAL) goto abrupt;
+    result = oseo_environment_get(context, roots[3], 3u);
+    if (result.status != OSEO_STATUS_NORMAL) goto abrupt;
+    result = oseo_cell_initialize(context, result.value, (argument_count > 1u ? arguments[1] : oseo_undefined()));
+    if (result.status != OSEO_STATUS_NORMAL) goto abrupt;
+    static const OseoGeneratedOperation generated_operation_0 = {0u, 3u, 2u, NULL, 0u, 1u, 29u};
+    if (!oseo_generated_binding_read_at(context, roots, &generated_operation_0, &result)) goto abrupt;
+    if (result.status != OSEO_STATUS_NORMAL) goto abrupt;
+    static const OseoGeneratedOperation generated_operation_1 = {1u, 3u, 3u, NULL, 0u, 1u, 33u};
+    if (!oseo_generated_binding_read_at(context, roots, &generated_operation_1, &result)) goto abrupt;
+    if (result.status != OSEO_STATUS_NORMAL) goto abrupt;
+    oseo_context_location(context, 1u, 29u);
+    result = oseo_add(context, roots[0], roots[1]);
+    roots[2] = result.value;
+    if (result.status != OSEO_STATUS_NORMAL) goto abrupt;
+    result = (OseoResult){OSEO_STATUS_NORMAL, roots[2]};
+    oseo_roots_release(context, &frame);
+    return result;
+    abrupt:
+    oseo_roots_release(context, &frame);
+    return result;
+#endif
+}
+
+static OseoResult oseo_function_script(
+    OseoContext *context,
+    OseoValue callee,
+    OseoValue receiver,
+    size_t argument_count,
+    const OseoValue *arguments,
+    OseoValue new_target
+) {
+#if 93u > OSEO_MAX_ACTIVE_FRAME_SLOTS
+    (void)callee;
+    (void)receiver;
+    (void)argument_count;
+    (void)arguments;
+    (void)new_target;
+    return oseo_frame_enter(context, OSEO_MAX_ACTIVE_FRAME_SLOTS + 1u);
+#else
+    OseoRootFrame frame = {NULL, NULL, 0u};
+    OseoValue *roots;
+    OseoResult result;
+    (void)callee;
+    (void)receiver;
+    (void)argument_count;
+    (void)arguments;
+    (void)new_target;
+    result = oseo_roots_allocate(context, &frame, 51u);
+    if (result.status != OSEO_STATUS_NORMAL) return result;
+    roots = frame.slots;
+    result = oseo_environment_create(context, 7u);
+    roots[45] = result.value;
+    if (result.status != OSEO_STATUS_NORMAL) goto abrupt;
+    result = oseo_cell_create(context, oseo_uninitialized());
+    roots[46] = result.value;
+    if (result.status != OSEO_STATUS_NORMAL) goto abrupt;
+    result = oseo_environment_set(context, roots[45], 0u, roots[46]);
+    if (result.status != OSEO_STATUS_NORMAL) goto abrupt;
+    result = oseo_cell_create(context, oseo_uninitialized());
+    roots[46] = result.value;
+    if (result.status != OSEO_STATUS_NORMAL) goto abrupt;
+    result = oseo_environment_set(context, roots[45], 1u, roots[46]);
+    if (result.status != OSEO_STATUS_NORMAL) goto abrupt;
+    result = oseo_cell_create(context, oseo_uninitialized());
+    roots[46] = result.value;
+    if (result.status != OSEO_STATUS_NORMAL) goto abrupt;
+    result = oseo_environment_set(context, roots[45], 5u, roots[46]);
+    if (result.status != OSEO_STATUS_NORMAL) goto abrupt;
+    result = oseo_cell_create(context, oseo_uninitialized());
+    roots[46] = result.value;
+    if (result.status != OSEO_STATUS_NORMAL) goto abrupt;
+    result = oseo_environment_set(context, roots[45], 6u, roots[46]);
+    if (result.status != OSEO_STATUS_NORMAL) goto abrupt;
+    static const uint16_t global_lexical_units_0[] = {116, 111, 116, 97, 108};
+    static const uint16_t *const global_lexical_names[] = {global_lexical_units_0};
+    static const size_t global_lexical_lengths[] = {5};
+    static const size_t global_lexical_lines[] = {1};
+    static const size_t global_lexical_columns[] = {42};
+    static const uint16_t global_object_units_0[] = {97, 100, 100};
+    static const uint16_t *const global_object_names[] = {global_object_units_0};
+    static const size_t global_object_lengths[] = {3};
+    static const size_t global_object_lines[] = {1};
+    static const size_t global_object_columns[] = {1};
+    static const size_t global_object_bindings[] = {0};
+    static const bool global_object_functions[] = {true};
+    result = oseo_global_object_create(context, roots[45], 1u, global_lexical_names, global_lexical_lengths, global_lexical_lines, global_lexical_columns, 1u, global_object_names, global_object_lengths, global_object_lines, global_object_columns, global_object_bindings, global_object_functions, NULL);
+    if (result.status != OSEO_STATUS_NORMAL) goto abrupt;
+    static const uint16_t function_name_units_0[] = {97, 100, 100};
+    oseo_context_location(context, 1u, 1u);
+    result = oseo_function_create_non_strict(context, 0u, roots[45], function_name_units_0, 3u, 2u, OSEO_FUNCTION_ORDINARY, receiver, oseo_undefined(), OSEO_FUNCTION_NAME_PREFIX_NONE);
+    roots[0] = result.value;
+    static const uint16_t function_source_units_0[] = {102, 117, 110, 99, 116, 105, 111, 110, 32, 97, 100, 100, 40, 97, 44, 32, 98, 41, 32, 123, 32, 114, 101, 116, 117, 114, 110, 32, 97, 32, 43, 32, 98, 59, 32, 125};
+    if (result.status == OSEO_STATUS_NORMAL) {
+    result = oseo_function_set_source(context, roots[0], function_source_units_0, 36u);
+    roots[0] = result.value;
+    }
+    if (result.status != OSEO_STATUS_NORMAL) goto abrupt;
+    roots[1] = roots[0];
+    oseo_context_location(context, 1u, 1u);
+    result = oseo_environment_get(context, roots[45], 0u);
+    if (result.status != OSEO_STATUS_NORMAL) goto abrupt;
+    result = oseo_global_function_initialize(context, result.value, roots[0]);
+    if (result.status != OSEO_STATUS_NORMAL) goto abrupt;
+    roots[2] = oseo_number(0.0);
+    roots[3] = roots[2];
+    oseo_context_location(context, 1u, 38u);
+    result = oseo_environment_get(context, roots[45], 1u);
+    if (result.status != OSEO_STATUS_NORMAL) goto abrupt;
+    result = oseo_cell_initialize(context, result.value, roots[2]);
+    if (result.status != OSEO_STATUS_NORMAL) goto abrupt;
+    oseo_context_location(context, 1u, 62u);
+    result = oseo_cell_create(context, oseo_uninitialized());
+    roots[4] = result.value;
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = oseo_environment_set(context, roots[45], 5u, roots[4]);
+    }
+    if (result.status != OSEO_STATUS_NORMAL) goto abrupt;
+    roots[5] = oseo_number(0.0);
+    roots[6] = roots[5];
+    oseo_context_location(context, 1u, 62u);
+    result = oseo_environment_get(context, roots[45], 5u);
+    if (result.status != OSEO_STATUS_NORMAL) goto abrupt;
+    result = oseo_cell_initialize(context, result.value, roots[5]);
+    if (result.status != OSEO_STATUS_NORMAL) goto abrupt;
+    static const OseoGeneratedOperation generated_operation_7 = {7u, 45u, 5u, NULL, 0u, 1u, 62u};
+    if (!oseo_generated_binding_read_at(context, roots, &generated_operation_7, &result)) goto abrupt;
+    if (result.status != OSEO_STATUS_NORMAL) goto abrupt;
+    oseo_context_location(context, 1u, 62u);
+    result = oseo_cell_create(context, oseo_uninitialized());
+    roots[8] = result.value;
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = oseo_environment_set(context, roots[45], 5u, roots[8]);
+    }
+    if (result.status != OSEO_STATUS_NORMAL) goto abrupt;
+    roots[9] = roots[7];
+    oseo_context_location(context, 1u, 62u);
+    result = oseo_environment_get(context, roots[45], 5u);
+    if (result.status != OSEO_STATUS_NORMAL) goto abrupt;
+    result = oseo_cell_initialize(context, result.value, roots[7]);
+    if (result.status != OSEO_STATUS_NORMAL) goto abrupt;
+    goto bb1;
+    bb1:;
+    static const OseoGeneratedOperation generated_operation_10 = {10u, 45u, 5u, NULL, 0u, 1u, 69u};
+    if (!oseo_generated_binding_read_at(context, roots, &generated_operation_10, &result)) goto abrupt;
+    if (result.status != OSEO_STATUS_NORMAL) goto abrupt;
+    roots[11] = oseo_number(2000000.0);
+    oseo_context_location(context, 1u, 69u);
+    result = oseo_less_than(context, roots[10], roots[11]);
+    roots[12] = result.value;
+    if (result.status != OSEO_STATUS_NORMAL) goto abrupt;
+    if (oseo_to_boolean(roots[12])) goto bb2;
+    goto bb4;
+    bb2:;
+    oseo_context_location(context, 1u, 89u);
+    result = oseo_cell_create(context, oseo_uninitialized());
+    roots[13] = result.value;
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = oseo_environment_set(context, roots[45], 6u, roots[13]);
+    }
+    if (result.status != OSEO_STATUS_NORMAL) goto abrupt;
+    oseo_context_location(context, 1u, 99u);
+    result = oseo_object_literal_create(context);
+    roots[14] = result.value;
+    if (result.status != OSEO_STATUS_NORMAL) goto abrupt;
+    static const uint16_t string_units_15[] = {118, 97, 108, 117, 101};
+    oseo_context_location(context, 1u, 101u);
+    result = oseo_string_from_units(context, string_units_15, 5u);
+    roots[15] = result.value;
+    if (result.status != OSEO_STATUS_NORMAL) goto abrupt;
+    static const OseoGeneratedOperation generated_operation_16 = {16u, 15u, 0u, NULL, 0u, 1u, 101u};
+    oseo_generated_property_key_at(context, roots, &generated_operation_16, &result);
+    if (result.status != OSEO_STATUS_NORMAL) goto abrupt;
+    static const OseoGeneratedOperation generated_operation_17 = {17u, 45u, 5u, NULL, 0u, 1u, 108u};
+    if (!oseo_generated_binding_read_at(context, roots, &generated_operation_17, &result)) goto abrupt;
+    if (result.status != OSEO_STATUS_NORMAL) goto abrupt;
+    roots[18] = oseo_number(7.0);
+    oseo_context_location(context, 1u, 108u);
+    result = oseo_remainder(context, roots[17], roots[18]);
+    roots[19] = result.value;
+    if (result.status != OSEO_STATUS_NORMAL) goto abrupt;
+    oseo_context_location(context, 1u, 99u);
+    result = oseo_object_define(context, roots[14], roots[16], roots[19], (OseoPropertyAttributes){true, true, true, false});
+    roots[20] = result.value;
+    if (result.status != OSEO_STATUS_NORMAL) goto abrupt;
+    roots[21] = roots[14];
+    oseo_context_location(context, 1u, 89u);
+    result = oseo_environment_get(context, roots[45], 6u);
+    if (result.status != OSEO_STATUS_NORMAL) goto abrupt;
+    result = oseo_cell_initialize(context, result.value, roots[14]);
+    if (result.status != OSEO_STATUS_NORMAL) goto abrupt;
+    static const OseoGeneratedOperation generated_operation_22 = {22u, 45u, 0u, NULL, 0u, 1u, 125u};
+    if (!oseo_generated_binding_read_at(context, roots, &generated_operation_22, &result)) goto abrupt;
+    if (result.status != OSEO_STATUS_NORMAL) goto abrupt;
+    roots[23] = oseo_undefined();
+    static const OseoGeneratedOperation generated_operation_24 = {24u, 45u, 1u, NULL, 0u, 1u, 129u};
+    if (!oseo_generated_binding_read_at(context, roots, &generated_operation_24, &result)) goto abrupt;
+    if (result.status != OSEO_STATUS_NORMAL) goto abrupt;
+    static const OseoGeneratedOperation generated_operation_25 = {25u, 45u, 6u, NULL, 0u, 1u, 136u};
+    if (!oseo_generated_binding_read_at(context, roots, &generated_operation_25, &result)) goto abrupt;
+    if (result.status != OSEO_STATUS_NORMAL) goto abrupt;
+    static const uint16_t string_units_26[] = {118, 97, 108, 117, 101};
+    oseo_context_location(context, 1u, 138u);
+    result = oseo_string_from_units(context, string_units_26, 5u);
+    roots[26] = result.value;
+    if (result.status != OSEO_STATUS_NORMAL) goto abrupt;
+    static const OseoGeneratedOperation generated_operation_27 = {27u, 26u, 0u, NULL, 0u, 1u, 138u};
+    oseo_generated_property_key_at(context, roots, &generated_operation_27, &result);
+    if (result.status != OSEO_STATUS_NORMAL) goto abrupt;
+    static const OseoGeneratedOperation generated_operation_28 = {28u, 25u, 27u, NULL, 0u, 1u, 136u};
+    oseo_generated_property_get_at(context, roots, &generated_operation_28, &result);
+    if (result.status != OSEO_STATUS_NORMAL) goto abrupt;
+    roots[29] = oseo_number(0.25);
+    oseo_context_location(context, 1u, 136u);
+    result = oseo_add(context, roots[28], roots[29]);
+    roots[30] = result.value;
+    if (result.status != OSEO_STATUS_NORMAL) goto abrupt;
+    oseo_context_location(context, 1u, 125u);
+    roots[47] = roots[24];
+    roots[48] = roots[30];
+    result = oseo_call_function(context, roots[22], roots[23], 2u, &roots[47], oseo_undefined());
+    roots[31] = result.value;
+    if (result.status != OSEO_STATUS_NORMAL) goto abrupt;
+    roots[32] = roots[31];
+    oseo_context_location(context, 1u, 117u);
+    result = oseo_environment_get(context, roots[45], 1u);
+    if (result.status != OSEO_STATUS_NORMAL) goto abrupt;
+    result = oseo_cell_set(context, result.value, roots[31]);
+    if (result.status != OSEO_STATUS_NORMAL) goto abrupt;
+    goto bb3;
+    bb3:;
+    static const OseoGeneratedOperation generated_operation_33 = {33u, 45u, 5u, NULL, 0u, 1u, 62u};
+    if (!oseo_generated_binding_read_at(context, roots, &generated_operation_33, &result)) goto abrupt;
+    if (result.status != OSEO_STATUS_NORMAL) goto abrupt;
+    oseo_context_location(context, 1u, 62u);
+    result = oseo_cell_create(context, oseo_uninitialized());
+    roots[34] = result.value;
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = oseo_environment_set(context, roots[45], 5u, roots[34]);
+    }
+    if (result.status != OSEO_STATUS_NORMAL) goto abrupt;
+    roots[35] = roots[33];
+    oseo_context_location(context, 1u, 62u);
+    result = oseo_environment_get(context, roots[45], 5u);
+    if (result.status != OSEO_STATUS_NORMAL) goto abrupt;
+    result = oseo_cell_initialize(context, result.value, roots[33]);
+    if (result.status != OSEO_STATUS_NORMAL) goto abrupt;
+    static const OseoGeneratedOperation generated_operation_36 = {36u, 45u, 5u, NULL, 0u, 1u, 82u};
+    if (!oseo_generated_binding_read_at(context, roots, &generated_operation_36, &result)) goto abrupt;
+    if (result.status != OSEO_STATUS_NORMAL) goto abrupt;
+    oseo_context_location(context, 1u, 82u);
+    result = oseo_to_numeric(context, roots[36]);
+    roots[37] = result.value;
+    if (result.status != OSEO_STATUS_NORMAL) goto abrupt;
+    oseo_context_location(context, 1u, 82u);
+    result = oseo_numeric_one(context, roots[37]);
+    roots[38] = result.value;
+    if (result.status != OSEO_STATUS_NORMAL) goto abrupt;
+    oseo_context_location(context, 1u, 82u);
+    result = oseo_add(context, roots[37], roots[38]);
+    roots[39] = result.value;
+    if (result.status != OSEO_STATUS_NORMAL) goto abrupt;
+    roots[40] = roots[39];
+    oseo_context_location(context, 1u, 82u);
+    result = oseo_environment_get(context, roots[45], 5u);
+    if (result.status != OSEO_STATUS_NORMAL) goto abrupt;
+    result = oseo_cell_set(context, result.value, roots[39]);
+    if (result.status != OSEO_STATUS_NORMAL) goto abrupt;
+    goto bb1;
+    bb4:;
+    static const OseoGeneratedOperation generated_operation_42 = {42u, 45u, 1u, NULL, 0u, 1u, 167u};
+    if (!oseo_generated_binding_read_at(context, roots, &generated_operation_42, &result)) goto abrupt;
+    if (result.status != OSEO_STATUS_NORMAL) goto abrupt;
+    oseo_context_location(context, 1u, 155u);
+    roots[47] = roots[42];
+    result = oseo_console_log(context, 1u, &roots[47]);
+    roots[43] = result.value;
+    if (result.status != OSEO_STATUS_NORMAL) goto abrupt;
+    roots[44] = oseo_undefined();
+    result = (OseoResult){OSEO_STATUS_NORMAL, roots[44]};
+    oseo_roots_release(context, &frame);
+    return result;
+    abrupt:
+    oseo_roots_release(context, &frame);
+    return result;
+#endif
+}
+
+int main(void) {
+    OseoContext context;
+    OseoResult result;
+    (void)oseo_function_0;
+    oseo_context_init(
+        &context, "profiling-smoke.js", 18u);
+    oseo_context_set_function_dispatcher(
+        &context, oseo_dispatch_function);
+    result = oseo_frame_enter(
+        &context, 93u);
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = oseo_function_script(
+            &context, oseo_undefined(), oseo_undefined(), 0u,
+            NULL, oseo_undefined());
+        oseo_frame_leave(
+            &context, 93u);
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = oseo_event_loop_run(
+            &context, result.value);
+    } else {
+        result = oseo_entry_task_checkpoint(&context, result);
+    }
+    if (result.status != OSEO_STATUS_NORMAL) {
+        oseo_context_print_thrown(&context, result.value);
+        oseo_context_destroy(&context);
+        return 1;
+    }
+    oseo_context_destroy(&context);
+    return 0;
+}
