@@ -8,6 +8,7 @@ import {
   compileSource,
   describeTarget,
 } from "../../packages/compiler/src/index.ts";
+import type { NativeBuildPlan } from "../../packages/compiler/src/index.ts";
 import { defaultComponents } from "../../packages/cli/src/index.ts";
 import { zigToolchain } from "../../packages/toolchain-zig/src/index.ts";
 
@@ -44,6 +45,19 @@ export interface BuildManifest {
   readonly method: Method;
   readonly forms: readonly BuiltForm[];
   readonly buildJournal: Artifact;
+}
+
+/** Native provenance sealed into each form's build.json identity. */
+export interface NativeBuildMetadata {
+  readonly source: Artifact;
+  readonly compiler: Artifact;
+  readonly runtimeAssets: readonly Artifact[];
+  readonly specialization: "enabled" | "disabled";
+  readonly observeSpecialization: boolean;
+  readonly runtimeAbiVersion: string;
+  readonly cache: "cold-private-no-archive-reuse";
+  readonly plan: NativeBuildPlan;
+  readonly generatedC: readonly Artifact[];
 }
 
 function executable(
@@ -171,13 +185,13 @@ function nativeBuild(
     target: describeTarget(host.target),
     workingDirectory: directory,
   });
-  const metadata = {
+  const metadata: NativeBuildMetadata = {
     source: artifact(source),
     compiler: artifact(realpathSync(plan.requests[0]!.command)),
     runtimeAssets: runtime.assets.map((asset) =>
       artifact(join(directory, asset.name)),
     ),
-    specialization: variant.specialization,
+    specialization: variant.specialization!,
     observeSpecialization: observed,
     runtimeAbiVersion: runtime.abiVersion,
     cache: "cold-private-no-archive-reuse",

@@ -3075,3 +3075,162 @@ test("ordinary Node shards cover four Linux and six macOS indices", () => {
     Array.from({ length: 6 }, (_, index) => ({ shard: index + 1, total: 6 })),
   );
 });
+
+test("correctness CI executes only on the existing hosted Mac Deno job", () => {
+  const mac = after.jobs.test_macos_deno!;
+  assert.equal(mac["runs-on"], "macos-latest");
+  const additions = mac.steps.filter(
+    (step) =>
+      String(step.name).includes("performance correctness") ||
+      step.name === "Check performance artifact correctness",
+  );
+  assert.equal(additions.length, 5);
+  assert.ok(
+    mac.steps.findIndex((step) => step.run === "mise run test:deno") <
+      mac.steps.indexOf(additions[0]!),
+  );
+  for (const step of additions) {
+    assert.match(String(step.if), /runner\.os == 'macOS'/u);
+    assert.doesNotMatch(String(step.if), /matrix\./u);
+  }
+  const build = String(additions[0]!.run);
+  assert.match(build, /process\.platform !== "darwin"/u);
+  assert.match(build, /process\.arch !== "arm64"/u);
+  assert.match(build, /mkdir "\$root"/u);
+  assert.match(build, /mise run perf:build/u);
+  assert.match(String(additions[1]!.run), /mise run perf:correctness/u);
+  assert.match(String(additions[2]!.run), /test -s/u);
+  assert.match(String(additions[2]!.run), /tar --null -czpPf/u);
+  for (const step of additions.slice(2))
+    assert.match(String(step.if), /^always\(\)/u);
+  for (const step of additions.slice(3)) {
+    assert.equal(step.uses, "actions/upload-artifact@v7");
+    assert.equal(
+      parsedMapping(step.with, "upload")["if-no-files-found"],
+      "error",
+    );
+  }
+  assert.equal(mac["timeout-minutes"], undefined);
+  assert.equal(mac.permissions, before.jobs.test!.permissions);
+  for (const [row, host] of [
+    [{ runtime: "deno" }, "Linux"],
+    [{ runtime: "deno" }, "Windows"],
+    [{ runtime: "node" }, "Windows"],
+  ] as const) {
+    const remaining = after.jobs.test!;
+    for (const step of remaining.steps.filter((entry) =>
+      String(entry.name).includes("performance"),
+    )) {
+      // Evaluate the actual generator output with the concrete runner and
+      // matrix row, rather than assuming a label implies the right host.
+      const condition = String(step.if)
+        .replaceAll("always()", "true")
+        .replaceAll("runner.os", JSON.stringify(host))
+        .replaceAll("matrix.runtime", JSON.stringify(row.runtime));
+      assert.equal(runInNewContext(condition), false);
+    }
+  }
+  assert.equal(mac.if, "${{ !cancelled() }}");
+  assert.ok(additions.every((step) => step["continue-on-error"] == null));
+});
+
+test(
+  "correctness archive preserves bytes, executable modes and path mappings",
+  {
+    skip: process.platform === "win32" ? "requires Bash and tar" : false,
+  },
+  () => {
+    const directory = realpathSync(
+      mkdtempSync(join(tmpdir(), "perf-ci-archive-")),
+    );
+    try {
+      const root = join(directory, "oseo-perf-correctness");
+      mkdirSync(join(root, "build"), { recursive: true });
+      const engine = join(directory, "engine with spaces");
+      const binary = Buffer.from([0x7f, 0x45, 0x4c, 0x46, 0xff]);
+      writeFileSync(engine, binary);
+      chmodSync(engine, 0o755);
+      const dispatch = join(directory, "engine-dispatch");
+      symlinkSync(engine, dispatch);
+      writeFileSync(join(root, "source-host.txt"), "synthetic provenance\n");
+      writeFileSync(
+        join(root, "build", "built.json"),
+        JSON.stringify({
+          forms: [
+            { run: { command: dispatch }, identities: [{ path: engine }] },
+          ],
+        }),
+      );
+      const script = after.jobs.test_macos_deno!.steps.find(
+        (step) => step.name === "Archive performance correctness artifacts",
+      )!.run;
+      assert.ok(isString(script));
+      const result = spawnSync("bash", ["-c", script], {
+        env: { ...process.env, RUNNER_TEMP: directory },
+        encoding: "utf8",
+      });
+      assert.equal(result.status, 0, result.stderr);
+      const archive = join(directory, "oseo-perf-correctness.tar.gz");
+      assert.ok(statSync(archive).size > 0);
+      assert.ok(statSync(archive + ".sha256").size > 0);
+      const contents = spawnSync("tar", ["-P", "-xOf", archive, engine]);
+      assert.equal(contents.status, 0, String(contents.stderr));
+      assert.deepEqual(contents.stdout, binary);
+      const list = spawnSync("tar", ["-P", "-tvf", archive], {
+        encoding: "utf8",
+      });
+      assert.equal(list.status, 0, list.stderr);
+      assert.match(list.stdout, /-rwxr-xr-x.*engine with spaces/u);
+      assert.match(list.stdout, /engine-dispatch -> .*engine with spaces/u);
+      const bin = join(directory, "bin");
+      mkdirSync(bin);
+      const tar = join(bin, "tar");
+      writeFileSync(
+        tar,
+        '#!/bin/sh\n/usr/bin/tar "$@"\n' +
+          'printf "synthetic tar failure\\n" >&2\nexit 1\n',
+      );
+      chmodSync(tar, 0o700);
+      const failedTar = spawnSync("bash", ["-c", script], {
+        env: {
+          ...process.env,
+          RUNNER_TEMP: directory,
+          PATH: `${bin}:${process.env.PATH ?? ""}`,
+        },
+        encoding: "utf8",
+      });
+      assert.notEqual(failedTar.status, 0);
+      assert.match(
+        readFileSync(join(root, "archive.stderr"), "utf8"),
+        /synthetic tar failure/u,
+      );
+      assert.equal(
+        readFileSync(join(root, "archive-tar.status"), "utf8").trim(),
+        "1",
+      );
+      assert.ok(statSync(archive + ".sha256").size > 0);
+      const partial = join(root, "build", "partial-program");
+      writeFileSync(partial, binary);
+      chmodSync(partial, 0o700);
+      writeFileSync(join(root, "build", "built.json"), "{");
+      const malformed = spawnSync("bash", ["-c", script], {
+        env: { ...process.env, RUNNER_TEMP: directory },
+        encoding: "utf8",
+      });
+      assert.notEqual(malformed.status, 0);
+      assert.ok(statSync(archive + ".sha256").size > 0);
+      assert.ok(statSync(join(root, "archive-diagnostics.jsonl")).size > 0);
+      const preserved = spawnSync("tar", ["-P", "-xOf", archive, partial]);
+      assert.equal(preserved.status, 0, String(preserved.stderr));
+      assert.deepEqual(preserved.stdout, binary);
+      writeFileSync(join(root, "source-host.txt"), "");
+      const empty = spawnSync("bash", ["-c", script], {
+        env: { ...process.env, RUNNER_TEMP: directory },
+        encoding: "utf8",
+      });
+      assert.notEqual(empty.status, 0);
+    } finally {
+      rmSync(directory, { recursive: true, force: true });
+    }
+  },
+);

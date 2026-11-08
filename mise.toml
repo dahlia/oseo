@@ -522,6 +522,10 @@ run = "node tools/perf/build.ts"
 description = "Measure frozen artifacts in a Root-assigned exclusive slot"
 run = "node tools/perf/measure.ts"
 
+[tasks."perf:correctness"]
+description = "Check all frozen roles without collecting measurement samples"
+run = "node tools/perf/correctness.ts"
+
 [tasks."generate:commands"]
 description = "Generate the static CLI command registry"
 run = "node packages/cli/tools/generate-commands.ts"

@@ -42,6 +42,14 @@ builds all nine forms, including both Oseo policies through the landed
 optimized compiler API. Neither command overwrites an existing destination;
 a prepared directory is an inspection input, not a build destination.
 
+After building, `mise run perf:correctness` executes the frozen 36 kernel,
+8 observed, and 9 startup roles once. Set `OSEO_PERF_DIRECTORY` to the build
+directory and `OSEO_PERF_RESULTS` to a fresh directory outside the checkout.
+It checks the original 100 kernel iterations and one startup iteration,
+retains raw bytes and failures, and creates no performance populations.
+The producing host, clean source revision, tools, pins and artifact hashes
+must match before and after execution.
+
 Root assigns the exclusive slot for `mise run perf:measure`, which executes
 the frozen build artifacts. The
 [*evidence contract*](../docs/evidence/performance/README.md) describes its

@@ -112,11 +112,8 @@ function knownIdentity(value: string): boolean {
   );
 }
 
-/** Reject missing provenance without consulting the ingestion host's files. */
-export function validateProvenance(
-  evidence: Pick<Evidence, "host" | "runId" | "measuredAt" | "conditions">,
-): void {
-  const host = evidence.host;
+/** Validate producing host and source identities for every driver phase. */
+export function validateHostMetadata(host: Evidence["host"]): void {
   if (!isObject(host) || Array.isArray(host)) {
     throw new Error("Invalid host metadata.");
   }
@@ -166,6 +163,13 @@ export function validateProvenance(
       throw new Error(`Invalid host provenance: ${key}`);
     }
   }
+}
+
+/** Reject missing provenance without consulting the ingestion host's files. */
+export function validateProvenance(
+  evidence: Pick<Evidence, "host" | "runId" | "measuredAt" | "conditions">,
+): void {
+  validateHostMetadata(evidence.host);
   if (!knownIdentity(evidence.runId)) {
     throw new Error("Invalid measurement provenance: runId");
   }

@@ -1,5 +1,10 @@
-import { mkdirSync, writeFileSync, appendFileSync } from "node:fs";
-import { join } from "node:path";
+import {
+  mkdirSync,
+  readFileSync,
+  writeFileSync,
+  appendFileSync,
+} from "node:fs";
+import { dirname, join } from "node:path";
 
 import { artifact } from "./evidence.ts";
 import type { Artifact } from "./evidence.ts";
@@ -17,6 +22,7 @@ export interface LaunchContext {
   readonly role: "build" | "timed" | "startup" | "observe";
   readonly round: number | null;
   readonly retained: boolean;
+  readonly timingEligible?: false;
   readonly reason: string;
   readonly identities: readonly Artifact[];
 }
@@ -95,4 +101,66 @@ export class Journal {
     this.last = record;
     return result;
   }
+}
+
+/** Recheck request links and original bytes, including empty streams. */
+export function verifyJournal(path: string): readonly LaunchRecord[] {
+  const text = readFileSync(path, "utf8");
+  if (text.trim() === "") throw new Error("Raw launch journal is empty.");
+  const records: readonly LaunchRecord[] = text
+    .trimEnd()
+    .split("\n")
+    .map((line) => JSON.parse(line));
+  const requests: readonly Partial<LaunchRecord>[] = readFileSync(
+    join(dirname(path), "requests.jsonl"),
+    "utf8",
+  )
+    .trimEnd()
+    .split("\n")
+    .map((line) => JSON.parse(line));
+  if (records.length !== requests.length) {
+    throw new Error("Incomplete raw request/launch journal.");
+  }
+  for (const [index, record] of records.entries()) {
+    if (record.id !== String(index).padStart(6, "0")) {
+      throw new Error("Missing or duplicated raw launch identity.");
+    }
+    const request = requests[index]!;
+    const required = [
+      "id",
+      "phase",
+      "artifactId",
+      "role",
+      "round",
+      "retained",
+      "reason",
+      "identities",
+      "command",
+      "args",
+      "cwd",
+      "env",
+      "stdin",
+      "enqueuedAt",
+    ] as const;
+    if (
+      required.some(
+        (key) => !Object.hasOwn(request, key) || !Object.hasOwn(record, key),
+      )
+    ) {
+      throw new Error("Missing raw request/launch metadata.");
+    }
+    // SAFETY: Journal's request producer uses only LaunchRecord fields.
+    for (const key of Object.keys(request) as (keyof LaunchRecord)[]) {
+      if (JSON.stringify(request[key]) !== JSON.stringify(record[key])) {
+        throw new Error(`Raw request/launch mismatch: ${record.id}/${key}`);
+      }
+    }
+    for (const file of [record.stdin, record.stdout, record.stderr]) {
+      const current = artifact(file.path);
+      if (current.bytes !== file.bytes || current.sha256 !== file.sha256) {
+        throw new Error(`Raw stream changed: ${file.path}`);
+      }
+    }
+  }
+  return records;
 }

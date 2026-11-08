@@ -45,6 +45,43 @@ source, resolved executable, generated C, native build metadata and build
 journal digests. Resolve dependencies before the measurement slot. Builds,
 preparation and correctness preflights use the heavy gate outside timing.
 
+`mise run perf:correctness` checks a fresh clean-source build without a
+measurement slot. Use the same producing host and tools, with fresh absolute
+paths outside the checkout:
+
+~~~~ sh
+OSEO_PERF_DIRECTORY="$RUNNER_TEMP/oseo-perf-build" mise run perf:build
+OSEO_PERF_DIRECTORY="$RUNNER_TEMP/oseo-perf-build" \
+OSEO_PERF_RESULTS="$RUNNER_TEMP/oseo-perf-check" mise run perf:correctness
+~~~~
+
+The correctness driver uses the existing manifest validator, byte journal
+and output/counter checkers. It runs all 36 timed-role, 8 observed-role and
+9 startup-role commands serially with their saved inputs. Kernel commands
+keep 100 iterations and startup commands keep one. It checks source, host,
+tool, pin and artifact identities before and after execution.
+*correctness.json* links the completed roles and eight counter records to the
+build manifest and raw journal. Every launch record has `retained: false` and
+`timingEligible: false`; raw clocks are diagnostics. No timing or RSS
+populations are collected, and the measurement policy stays at 3 warmups, 15
+repetitions, 100 kernel iterations and 15 separate RSS launches.
+
+A rejected manifest or source, failed launch, invalid UTF-8, wrong output,
+missing counter or changed identity leaves *failure.json*, the copied build
+manifest when available and all raw records from attempted launches. A failed
+role links to its last launch and the completed prefix; no success summary is
+written. On macOS, the first standalone launch is recorded as an excluded
+discard.
+
+The existing hosted Mac Deno CI job requires a `darwin/arm64` runner and
+runs build and correctness after its Deno tests. Uploads from failed runs
+preserve raw records, command logs, commit and tree identities, and host
+identity. A hashed tar archive
+preserves absolute path mappings, executable modes, build assets and resolved
+engine files. Required upload steps fail when files are absent. The CI job keeps
+its existing timeout settings; each child command retains its 600,000 ms
+limit. A completed upload alone proves neither correctness nor Mac acceptance.
+
 `mise run perf:measure` runs the sealed matrix without building. Set
 `OSEO_PERF_DIRECTORY` to the build directory, `OSEO_PERF_RESULTS` to a new
 absolute directory, `OSEO_PERF_RUN_ID` to the run identifier, and
@@ -68,7 +105,9 @@ Every launch preserves explicit stdin, individual arguments, environment,
 working directory, UTC boundaries, monotonic boundaries, status and signal.
 *raw/requests.jsonl* records an attempt before spawning;
 *raw/launches.jsonl* links its original stdin/stdout/stderr byte files and
-digests before kernel text decoding. Invalid UTF-8 bytes remain intact. Spawn
+digests before kernel text decoding. Before accepting a build matrix or a
+completed run, the drivers recheck every raw stream and request/launch link.
+Invalid UTF-8 bytes remain intact. Spawn
 errors, wrong output and nonzero exits leave *failure.json* and all prior
 attempts; they produce no successful *measurements.json*.
 

@@ -1,13 +1,15 @@
 import { mkdirSync, readFileSync, realpathSync, writeFileSync } from "node:fs";
 import { dirname, join, resolve } from "node:path";
 import process from "node:process";
-import { pathToFileURL } from "node:url";
+import { fileURLToPath, pathToFileURL } from "node:url";
 
 import { digest, kernels } from "./corpus.ts";
-import type { BuildManifest, BuiltForm } from "./build.ts";
+import type { BuildManifest, BuiltForm, NativeBuildMetadata } from "./build.ts";
+import { cRuntimeProvider } from "../../packages/runtime-c/src/index.ts";
+import type { Artifact } from "./evidence.ts";
 import { artifact, validateEvidence, validateProvenance } from "./evidence.ts";
 import type { Evidence, KernelEvidence } from "./evidence.ts";
-import { Journal } from "./journal.ts";
+import { Journal, verifyJournal } from "./journal.ts";
 import type { RawExecutor, LaunchContext } from "./journal.ts";
 import { checkExecution, executionText, parseCounters } from "./observation.ts";
 import { parseRss, rssCommand, requireRssTool } from "./observation.ts";
@@ -31,6 +33,14 @@ const ids = [
   "deno-compile",
   "bun-compile",
 ];
+
+function sameFile(left: Artifact, right: Artifact): boolean {
+  return (
+    left?.path === right.path &&
+    left.bytes === right.bytes &&
+    left.sha256 === right.sha256
+  );
+}
 
 /** Recheck frozen files without building or repairing artifacts. */
 export function verifyMatrix(manifest: BuildManifest): void {
@@ -60,6 +70,17 @@ export function verifyMatrix(manifest: BuildManifest): void {
   if (JSON.stringify(expected) !== JSON.stringify(actual)) {
     throw new Error("Incomplete built role matrix.");
   }
+  const runtime = cRuntimeProvider.getRuntimeInput();
+  const checked = new Map<string, Artifact>();
+  const verifyFiles = (files: readonly Artifact[]) => {
+    for (const file of files) {
+      const current = checked.get(file.path) ?? artifact(file.path);
+      checked.set(file.path, current);
+      if (current.sha256 !== file.sha256 || current.bytes !== file.bytes) {
+        throw new Error(`Artifact changed: ${file.path}`);
+      }
+    }
+  };
   for (const form of manifest.forms) {
     const native = form.id.startsWith("oseo-");
     const compiled =
@@ -123,10 +144,71 @@ export function verifyMatrix(manifest: BuildManifest): void {
     ) {
       throw new Error("Unpinned launch executable.");
     }
-    for (const file of files) {
-      const current = artifact(file.path);
-      if (current.sha256 !== file.sha256 || current.bytes !== file.bytes) {
-        throw new Error(`Artifact changed: ${file.path}`);
+    verifyFiles(files);
+    if (native) {
+      const metadataPath = join(dirname(form.run.command), "build.json");
+      if (
+        form.identities.filter((file) => file.path === metadataPath).length !==
+        1
+      ) {
+        throw new Error("Missing native build metadata identity.");
+      }
+      const metadata: NativeBuildMetadata = JSON.parse(
+        readFileSync(metadataPath, "utf8"),
+      );
+      if (
+        !sameFile(metadata.source, form.source) ||
+        metadata.specialization !== form.specialization ||
+        metadata.observeSpecialization !== form.observeSpecialization ||
+        metadata.runtimeAbiVersion !== runtime.abiVersion ||
+        metadata.cache !== "cold-private-no-archive-reuse" ||
+        metadata.plan?.buildConfiguration !== "optimized" ||
+        metadata.plan?.target?.name !== manifest.host.target ||
+        metadata.plan?.executablePath !== form.run.command ||
+        !Array.isArray(metadata.plan?.requests) ||
+        metadata.plan.requests.length === 0 ||
+        !Array.isArray(metadata.generatedC) ||
+        metadata.generatedC.length !== form.generatedC!.length ||
+        metadata.generatedC.some(
+          (file, index) => !sameFile(file, form.generatedC![index]!),
+        ) ||
+        !Array.isArray(metadata.runtimeAssets) ||
+        JSON.stringify(
+          metadata.runtimeAssets.map((file) => file.path).toSorted(),
+        ) !==
+          JSON.stringify(
+            runtime.assets
+              .map((asset) => join(dirname(metadataPath), asset.name))
+              .toSorted(),
+          )
+      ) {
+        throw new Error("Invalid native build metadata.");
+      }
+      for (const request of metadata.plan.requests) {
+        if (
+          realpathSync(request.command) !== metadata.compiler?.path ||
+          request.cwd !== dirname(metadataPath) ||
+          !Array.isArray(request.args)
+        ) {
+          throw new Error(
+            "Native compiler identity does not match build plan.",
+          );
+        }
+      }
+      verifyFiles([metadata.compiler, ...metadata.runtimeAssets]);
+      for (const [index, asset] of runtime.assets.entries()) {
+        const runtimeSource = artifact(fileURLToPath(asset.url));
+        const copy = metadata.runtimeAssets.find(
+          (file) => file.path === join(dirname(metadataPath), asset.name),
+        )!;
+        if (
+          copy.sha256 !== runtimeSource.sha256 ||
+          copy.bytes !== runtimeSource.bytes
+        ) {
+          throw new Error(
+            `Runtime source identity changed: ${index}/${asset.name}`,
+          );
+        }
       }
     }
   }
@@ -136,6 +218,19 @@ export function verifyMatrix(manifest: BuildManifest): void {
     journal.bytes !== manifest.buildJournal.bytes
   ) {
     throw new Error("Build journal changed.");
+  }
+  const launches = verifyJournal(manifest.buildJournal.path);
+  if (
+    launches.some(
+      (row) =>
+        row.phase !== "build" ||
+        row.role !== "build" ||
+        row.status !== 0 ||
+        row.signal != null ||
+        row.error != null,
+    )
+  ) {
+    throw new Error("Invalid successful build launch journal.");
   }
 }
 
@@ -370,6 +465,7 @@ export function measureMatrix(
       kernels: measured,
     };
     validateEvidence(evidence);
+    verifyJournal(join(journal.directory, "launches.jsonl"));
     writeFileSync(
       join(destination, "measurements.json"),
       JSON.stringify(evidence, null, 2) + "\n",
