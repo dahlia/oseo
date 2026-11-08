@@ -12,6 +12,7 @@ import {
   orderForRound,
   perfHost,
   variants,
+  validateMethod,
 } from "../tools/perf/plan.ts";
 import {
   checkExecution,
@@ -44,20 +45,28 @@ import type {
 
 const host: HostMetadata = {
   target: "linux-x86_64-gnu",
-  os: "test",
+  os: "linux 6.18.0",
   architecture: "x64",
-  cpu: "test",
+  cpu: "AMD EPYC synthetic fixture",
   logicalCpus: 2,
   memoryBytes: 100,
   commit: "a".repeat(40),
   dirty: false,
-  node: "test",
-  deno: "test",
-  bun: "test",
-  zig: "test",
-  postject: "test",
+  node: "v24.21.0",
+  deno: "deno 2.9.7 (stable, release, x86_64-unknown-linux-gnu)",
+  bun: "1.4.4",
+  zig: "0.16.0",
+  postject: '{"npm:postject":[{"version":"1.0.0-alpha.6"}]}',
   pinsSha256: "b".repeat(64),
   lockSha256: "c".repeat(64),
+};
+const macHost: HostMetadata = {
+  ...host,
+  target: "macos-aarch64",
+  os: "darwin 25.0.0",
+  architecture: "arm64",
+  cpu: "Apple M4",
+  deno: "deno 2.9.7 (stable, release, aarch64-apple-darwin)",
 };
 const kernel = kernels[0]!;
 const counters = {
@@ -302,15 +311,15 @@ function evidence(): Evidence {
     schema: 1,
     phase: "measured",
     runId: "synthetic-test",
-    measuredAt: "test",
+    measuredAt: "2026-11-08T00:00:00.000Z",
     host,
     method: defaultMethod,
     buildConfiguration: "optimized",
     observeSpecialization: false,
     sanitizers: [],
     conditions: {
-      power: "test",
-      backgroundLoad: "test",
+      power: "AC power, performance mode (synthetic)",
+      backgroundLoad: "idle (synthetic)",
       cachePolicy: "warm-process-launch",
       notes: "synthetic, no measurement",
     },
@@ -348,10 +357,7 @@ test("publication rejects incomplete evidence and a lone native host", () => {
   const valid = evidence();
   validateEvidence(valid);
   assert.throws(() => requireBothHosts([valid]), /Linux AMD64/u);
-  requireBothHosts([
-    valid,
-    { ...valid, host: { ...host, target: "macos-aarch64" } },
-  ]);
+  requireBothHosts([valid, { ...valid, host: macHost }]);
   assert.throws(() =>
     validateEvidence({ ...valid, sanitizers: ["undefined"] }),
   );
@@ -407,7 +413,14 @@ function damagedEvidence(change: (record: Evidence) => void): Evidence {
 }
 
 function damageField<Value>(
-  target: Artifact | CounterEvidence | Counters | Evidence,
+  target:
+    | Artifact
+    | CounterEvidence
+    | Counters
+    | Evidence
+    | HostMetadata
+    | Evidence["conditions"]
+    | Evidence["method"],
   key: string,
   value: Value,
 ): void {
@@ -560,11 +573,7 @@ test("publication compares canonical observed and timed digests", () => {
     message: "Separate observed executable and generated C required.",
   });
   assert.throws(
-    () =>
-      requireBothHosts([
-        record,
-        { ...evidence(), host: { ...host, target: "macos-aarch64" } },
-      ]),
+    () => requireBothHosts([record, { ...evidence(), host: macHost }]),
     { message: "Separate observed executable and generated C required." },
   );
 });
@@ -573,6 +582,7 @@ test("publication requires the existing schema and explicit timed flag", () => {
   for (const [key, values] of [
     ["schema", [undefined, 0, 2, "1"]],
     ["observeSpecialization", [undefined, null, 0, "", true]],
+    ["sanitizers", ["", { length: 0 }, undefined, null]],
   ] as const) {
     for (const value of values) {
       const record = damagedEvidence((item) => damageField(item, key, value));
@@ -581,4 +591,289 @@ test("publication requires the existing schema and explicit timed flag", () => {
       });
     }
   }
+});
+
+test("publication requires complete host provenance", () => {
+  for (const value of [undefined, null, [], false, "host"]) {
+    assert.throws(
+      () =>
+        validateEvidence(
+          damagedEvidence((item) => {
+            damageField(item, "host", value);
+          }),
+        ),
+      { message: "Invalid host metadata." },
+    );
+  }
+  for (const value of [undefined, null, true, 0, "false"]) {
+    assert.throws(
+      () =>
+        validateEvidence(
+          damagedEvidence((item) => {
+            damageField(item.host, "dirty", value);
+          }),
+        ),
+      { message: "Measurements require a clean tree." },
+    );
+  }
+  for (const key of [
+    "os",
+    "architecture",
+    "cpu",
+    "node",
+    "deno",
+    "bun",
+    "zig",
+    "postject",
+  ] as const) {
+    for (const value of [
+      undefined,
+      null,
+      1,
+      false,
+      [],
+      {},
+      "",
+      "  ",
+      "unknown",
+    ]) {
+      assert.throws(
+        () =>
+          validateEvidence(
+            damagedEvidence((item) => {
+              damageField(item.host, key, value);
+            }),
+          ),
+        { message: `Invalid host provenance: ${key}` },
+      );
+    }
+  }
+  for (const key of ["logicalCpus", "memoryBytes"] as const) {
+    for (const value of [
+      undefined,
+      null,
+      "1",
+      false,
+      0,
+      -1,
+      0.5,
+      NaN,
+      Infinity,
+      -Infinity,
+      Number.MAX_SAFE_INTEGER + 1,
+    ]) {
+      assert.throws(
+        () =>
+          validateEvidence(
+            damagedEvidence((item) => {
+              damageField(item.host, key, value);
+            }),
+          ),
+        { message: `Invalid host provenance: ${key}` },
+      );
+    }
+  }
+  for (const key of ["pinsSha256", "lockSha256"] as const) {
+    for (const value of [
+      undefined,
+      null,
+      1,
+      "",
+      "unknown",
+      "a".repeat(63),
+      "a".repeat(65),
+      "g".repeat(64),
+      "a".repeat(64) + "\n",
+    ]) {
+      assert.throws(
+        () =>
+          validateEvidence(
+            damagedEvidence((item) => {
+              damageField(item.host, key, value);
+            }),
+          ),
+        { message: `Invalid host provenance: ${key}` },
+      );
+    }
+  }
+});
+
+test("publication requires matching native host descriptions", () => {
+  for (const [key, values] of [
+    ["target", [undefined, null, 1, "linux-aarch64-musl", "macos-aarch64"]],
+    ["os", ["darwin 25.0.0"]],
+    ["architecture", ["arm64"]],
+  ] as const) {
+    for (const value of values) {
+      assert.throws(
+        () =>
+          validateEvidence(
+            damagedEvidence((item) => {
+              damageField(item.host, key, value);
+            }),
+          ),
+        { message: "Host target, OS and architecture must match." },
+      );
+    }
+  }
+  for (const key of ["logicalCpus", "memoryBytes"] as const) {
+    for (const value of [1, Number.MAX_SAFE_INTEGER]) {
+      validateEvidence(
+        damagedEvidence((item) => {
+          damageField(item.host, key, value);
+        }),
+      );
+    }
+  }
+  requireBothHosts([evidence(), { ...evidence(), host: macHost }]);
+});
+
+test("publication rejects missing or invalid revision identities", () => {
+  for (const value of [
+    undefined,
+    null,
+    1,
+    "",
+    "unknown",
+    "HEAD",
+    "a".repeat(39),
+    "a".repeat(41),
+    "g".repeat(40),
+    "0".repeat(40),
+    "0".repeat(64),
+  ]) {
+    assert.throws(
+      () =>
+        validateEvidence(
+          damagedEvidence((item) => {
+            damageField(item.host, "commit", value);
+          }),
+        ),
+      { message: "Invalid host provenance: commit" },
+    );
+  }
+  const linux = damagedEvidence((item) => {
+    damageField(item.host, "commit", undefined);
+  });
+  const mac = { ...evidence(), host: structuredClone(macHost) };
+  damageField(mac.host, "commit", undefined);
+  assert.throws(() => requireBothHosts([linux, mac]), {
+    message: "Invalid host provenance: commit",
+  });
+  assert.throws(
+    () =>
+      requireBothHosts([
+        evidence(),
+        { ...evidence(), host: { ...macHost, commit: "d".repeat(40) } },
+      ]),
+    { message: "Hosts must measure the same revision and policy." },
+  );
+  validateEvidence(
+    damagedEvidence((item) => {
+      damageField(item.host, "commit", "d".repeat(64));
+    }),
+  );
+});
+
+test("publication compares canonical known revisions", () => {
+  requireBothHosts([
+    evidence(),
+    { ...evidence(), host: { ...macHost, commit: "A".repeat(40) } },
+  ]);
+});
+
+test("publication requires run identity and measurement conditions", () => {
+  for (const value of [undefined, null, 1, [], false]) {
+    assert.throws(
+      () =>
+        validateEvidence(
+          damagedEvidence((item) => {
+            damageField(item, "conditions", value);
+          }),
+        ),
+      { message: "Invalid measurement conditions." },
+    );
+  }
+  for (const [key, values] of [
+    ["runId", [undefined, null, 1, "", "  ", "unknown"]],
+    [
+      "measuredAt",
+      [undefined, null, 1, "", "test", "2026-02-30T00:00:00.000Z"],
+    ],
+  ] as const) {
+    for (const value of values) {
+      assert.throws(
+        () =>
+          validateEvidence(
+            damagedEvidence((item) => {
+              damageField(item, key, value);
+            }),
+          ),
+        { message: `Invalid measurement provenance: ${key}` },
+      );
+    }
+  }
+  for (const [key, values] of [
+    ["power", [undefined, null, 1, [], "", "  ", "unknown"]],
+    ["backgroundLoad", [undefined, null, 1, [], "", "  ", "unknown"]],
+    ["cachePolicy", [undefined, null, 1, "", "cold"]],
+    ["notes", [undefined, null, 1, [], {}]],
+  ] as const) {
+    for (const value of values) {
+      assert.throws(
+        () =>
+          validateEvidence(
+            damagedEvidence((item) => {
+              damageField(item.conditions, key, value);
+            }),
+          ),
+        { message: `Invalid measurement condition: ${key}` },
+      );
+    }
+  }
+  validateEvidence(
+    damagedEvidence((item) => {
+      damageField(item.conditions, "notes", "");
+      damageField(item.host, "pinsSha256", "B".repeat(64));
+      damageField(item.host, "lockSha256", "C".repeat(64));
+    }),
+  );
+});
+
+test("persisted sampling policies require rotating order", () => {
+  for (const value of [undefined, null, false, 1, "", "fixed", []]) {
+    const record = damagedEvidence((item) => {
+      damageField(item.method, "order", value);
+    });
+    for (const validate of [
+      () => validateMethod(record.method),
+      () => validateEvidence(record),
+    ]) {
+      assert.throws(validate, {
+        message: "Rotating engine order is required.",
+      });
+    }
+  }
+});
+
+test("publication compares policy values independently of key order", () => {
+  const mac: Evidence = {
+    ...evidence(),
+    host: macHost,
+    method: {
+      order: defaultMethod.order,
+      iterations: defaultMethod.iterations,
+      repetitions: defaultMethod.repetitions,
+      warmups: defaultMethod.warmups,
+    },
+  };
+  requireBothHosts([evidence(), mac]);
+  assert.throws(
+    () =>
+      requireBothHosts([
+        evidence(),
+        { ...mac, method: { ...mac.method, warmups: mac.method.warmups + 1 } },
+      ]),
+    { message: "Hosts must measure the same revision and policy." },
+  );
 });

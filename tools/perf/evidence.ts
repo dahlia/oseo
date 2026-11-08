@@ -1,6 +1,6 @@
 import { lstatSync, readFileSync } from "node:fs";
 
-import { isString } from "../value-kinds.ts";
+import { isObject, isString } from "../value-kinds.ts";
 
 import { digest, kernels } from "./corpus.ts";
 import type { Method, PerfHost } from "./plan.ts";
@@ -103,6 +103,93 @@ function validNumbers(values: readonly number[], count: number): boolean {
   );
 }
 
+function knownIdentity(value: string): boolean {
+  return (
+    isString(value) &&
+    value.trim().length > 0 &&
+    value.trim().toLowerCase() !== "unknown"
+  );
+}
+
+/** Reject missing provenance without consulting the ingestion host's files. */
+function validateProvenance(evidence: Evidence): void {
+  const host = evidence.host;
+  if (!isObject(host) || Array.isArray(host)) {
+    throw new Error("Invalid host metadata.");
+  }
+  if (host.dirty !== false) {
+    throw new Error("Measurements require a clean tree.");
+  }
+  if (
+    !isString(host.commit) ||
+    !/^(?:[a-f0-9]{40}|[a-f0-9]{64})$/iu.test(host.commit) ||
+    /^0+$/u.test(host.commit)
+  ) {
+    throw new Error("Invalid host provenance: commit");
+  }
+  for (const key of [
+    "os",
+    "architecture",
+    "cpu",
+    "node",
+    "deno",
+    "bun",
+    "zig",
+    "postject",
+  ] as const) {
+    if (!knownIdentity(host[key])) {
+      throw new Error(`Invalid host provenance: ${key}`);
+    }
+  }
+  if (
+    !(
+      (host.target === "linux-x86_64-gnu" &&
+        host.architecture === "x64" &&
+        host.os.startsWith("linux ")) ||
+      (host.target === "macos-aarch64" &&
+        host.architecture === "arm64" &&
+        host.os.startsWith("darwin "))
+    )
+  ) {
+    throw new Error("Host target, OS and architecture must match.");
+  }
+  for (const key of ["logicalCpus", "memoryBytes"] as const) {
+    if (!Number.isSafeInteger(host[key]) || host[key] < 1) {
+      throw new Error(`Invalid host provenance: ${key}`);
+    }
+  }
+  for (const key of ["pinsSha256", "lockSha256"] as const) {
+    if (!isString(host[key]) || !/^[a-f0-9]{64}$/iu.test(host[key])) {
+      throw new Error(`Invalid host provenance: ${key}`);
+    }
+  }
+  if (!knownIdentity(evidence.runId)) {
+    throw new Error("Invalid measurement provenance: runId");
+  }
+  if (
+    !isString(evidence.measuredAt) ||
+    !Number.isFinite(Date.parse(evidence.measuredAt)) ||
+    new Date(evidence.measuredAt).toISOString() !== evidence.measuredAt
+  ) {
+    throw new Error("Invalid measurement provenance: measuredAt");
+  }
+  const conditions = evidence.conditions;
+  if (!isObject(conditions) || Array.isArray(conditions)) {
+    throw new Error("Invalid measurement conditions.");
+  }
+  for (const key of ["power", "backgroundLoad"] as const) {
+    if (!knownIdentity(conditions[key])) {
+      throw new Error(`Invalid measurement condition: ${key}`);
+    }
+  }
+  if (conditions.cachePolicy !== "warm-process-launch") {
+    throw new Error("Invalid measurement condition: cachePolicy");
+  }
+  if (!isString(conditions.notes)) {
+    throw new Error("Invalid measurement condition: notes");
+  }
+}
+
 /** Reject missing forms or repetitions before publishing a comparison. */
 export function validateEvidence(evidence: Evidence): void {
   validateMethod(evidence.method);
@@ -111,12 +198,12 @@ export function validateEvidence(evidence: Evidence): void {
     evidence.phase !== "measured" ||
     evidence.buildConfiguration !== "optimized" ||
     evidence.observeSpecialization !== false ||
+    !Array.isArray(evidence.sanitizers) ||
     evidence.sanitizers.length !== 0
   ) {
     throw new Error("Evidence must use uninstrumented optimized builds.");
   }
-  if (evidence.host.dirty)
-    throw new Error("Measurements require a clean tree.");
+  validateProvenance(evidence);
   if (evidence.kernels.length === 0)
     throw new Error("Missing kernel evidence.");
   if (
@@ -219,8 +306,18 @@ export function requireBothHosts(evidence: readonly Evidence[]): void {
     );
   }
   if (
-    new Set(evidence.map((item) => item.host.commit)).size !== 1 ||
-    new Set(evidence.map((item) => JSON.stringify(item.method))).size !== 1
+    new Set(evidence.map((item) => item.host.commit.toLowerCase())).size !==
+      1 ||
+    new Set(
+      evidence.map((item) =>
+        JSON.stringify([
+          item.method.warmups,
+          item.method.repetitions,
+          item.method.iterations,
+          item.method.order,
+        ]),
+      ),
+    ).size !== 1
   ) {
     throw new Error("Hosts must measure the same revision and policy.");
   }

@@ -52,6 +52,9 @@ export function perfHost(platform: string, architecture: string): PerfHost {
 
 /** Reject incomplete sampling policies instead of quietly shortening runs. */
 export function validateMethod(method: Method): void {
+  if (method == null || method.order !== "rotating") {
+    throw new Error("Rotating engine order is required.");
+  }
   requireIterations(method.iterations);
   if (!Number.isSafeInteger(method.warmups) || method.warmups < 3) {
     throw new Error("At least three warmups are required.");
