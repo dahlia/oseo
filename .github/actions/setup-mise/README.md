@@ -27,6 +27,13 @@ it disables upstream archive signature checks.
 
 `MISE_DATA_DIR` points subsequent job steps at the restored tools.
 `CURL_HOME` applies only to upstream setup and contains no credentials.
+That step also sets `TMPDIR`, `TMP`, and `TEMP` to `runner.temp`, the parent
+of the installation directory. Upstream downloads and extracts under
+`os.tmpdir()`, then renames the executable and Windows shim into place.
+Keeping both paths on the same file system avoids `EXDEV` when the Windows
+system temp directory and runner temp directory use different drives. The
+three temp overrides apply only to upstream setup; later steps retain their
+inherited temp environment.
 Each curl transfer has two retries, a five-second delay, a ten-second
 connection timeout, a thirty-second transfer timeout, and a seventy-second
 retry window. Upstream also retains its five retries at two-second

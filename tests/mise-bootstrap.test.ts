@@ -1,12 +1,13 @@
 /* eslint-disable no-await-in-loop -- Cache state transitions are sequential. */
 
-import { spawn } from "node:child_process";
+import { spawn, spawnSync } from "node:child_process";
 import assert from "node:assert/strict";
 import { generateKeyPairSync, createHash, sign } from "node:crypto";
 import { mkdir, mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
 import type { AddressInfo } from "node:net";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
+import { parse } from "yaml";
 import { createServer } from "node:http";
 import { test } from "node:test";
 import {
@@ -327,4 +328,116 @@ test("mise curl configuration names work with older Windows curl", () => {
   assert.equal(curlConfigName("win32"), "_curlrc");
   assert.equal(curlConfigName("linux"), ".curlrc");
   assert.equal(curlConfigName("darwin"), ".curlrc");
+});
+
+/** Only the upstream process receives the temporary-directory overrides. */
+interface BootstrapStep {
+  readonly uses: string;
+  readonly env?: Readonly<Record<string, string>>;
+}
+
+interface BootstrapAction {
+  readonly runs: { readonly steps: readonly BootstrapStep[] };
+}
+
+async function bootstrapSteps(): Promise<readonly BootstrapStep[]> {
+  // SAFETY: This repository-owned composite action has a steps array;
+  // the tests below check its upstream identity and environment values.
+  const action = parse(
+    await readFile(
+      new URL("../.github/actions/setup-mise/action.yaml", import.meta.url),
+      "utf8",
+    ),
+  ) as BootstrapAction;
+  return action.runs.steps;
+}
+
+test("mise temp overrides belong only to upstream setup", async () => {
+  const steps = await bootstrapSteps();
+  const upstream = steps.filter((step) => step.uses === "jdx/mise-action@v4");
+  assert.equal(upstream.length, 1);
+  for (const step of steps) {
+    for (const name of ["TMPDIR", "TMP", "TEMP"]) {
+      assert.equal(
+        step.env?.[name],
+        step === upstream[0] ? "${{ runner.temp }}" : undefined,
+      );
+    }
+  }
+  const policy = await readFile(
+    new URL("../tools/ci/mise-bootstrap.ts", import.meta.url),
+    "utf8",
+  );
+  assert.doesNotMatch(policy, /(?:TMPDIR|TMP|TEMP)=/u);
+});
+
+test("mise extraction and both Windows binaries use runner temp", async () => {
+  const steps = await bootstrapSteps();
+  const upstream = steps.find((step) => step.uses === "jdx/mise-action@v4");
+  assert.ok(upstream?.env);
+  // On hosted Windows, the inherited temp is on C: and RUNNER_TEMP on D:.
+  // Locally this proves the process contract, not a Windows execution pass.
+  const runnerTemp = process.env.RUNNER_TEMP || tmpdir();
+  const directory = await mkdtemp(join(runnerTemp, "mise path test-"));
+  const inherited = { ...process.env };
+  const env = { ...inherited };
+  for (const name of ["TMPDIR", "TMP", "TEMP"]) {
+    assert.equal(upstream.env[name], "${{ runner.temp }}");
+    env[name] = runnerTemp;
+  }
+  const script = `
+    import assert from "node:assert/strict";
+    import { mkdtemp, mkdir, realpath, rename, stat, writeFile }
+      from "node:fs/promises";
+    import { tmpdir } from "node:os";
+    import { join, parse } from "node:path";
+    const root = process.env.MISE_TEST_ROOT;
+    const temporary = await mkdtemp(join(tmpdir(), "mise-action-"));
+    const extract = join(temporary, "extract", "mise", "bin");
+    const target = join(root, "oseo-mise-data", "bin");
+    try {
+      await mkdir(extract, { recursive: true });
+      await mkdir(target, { recursive: true });
+      assert.equal(await realpath(tmpdir()),
+        await realpath(process.env.RUNNER_TEMP));
+      assert.equal((await stat(extract)).dev, (await stat(target)).dev);
+      assert.equal(parse(await realpath(extract)).root.toLowerCase(),
+        parse(await realpath(target)).root.toLowerCase());
+      for (const name of ["mise.exe", "mise-shim.exe"]) {
+        await writeFile(join(extract, name), name);
+        await rename(join(extract, name), join(target, name));
+      }
+    } finally {
+      const { rm } = await import("node:fs/promises");
+      await rm(temporary, { recursive: true, force: true });
+    }
+  `;
+  try {
+    const result = spawnSync(
+      "node",
+      ["--input-type=module", "--eval", script],
+      {
+        env: { ...env, RUNNER_TEMP: runnerTemp, MISE_TEST_ROOT: directory },
+        encoding: "utf8",
+      },
+    );
+    assert.equal(result.error, undefined);
+    assert.equal(result.status, 0, result.stderr);
+    for (const name of ["mise.exe", "mise-shim.exe"]) {
+      assert.equal(
+        await readFile(join(directory, "oseo-mise-data", "bin", name), "utf8"),
+        name,
+      );
+    }
+    for (const name of ["TMPDIR", "TMP", "TEMP"]) {
+      assert.equal(process.env[name], inherited[name]);
+    }
+    const later = spawnSync("node", ["-p", "require('node:os').tmpdir()"], {
+      encoding: "utf8",
+    });
+    assert.equal(later.status, 0, later.stderr);
+    assert.equal(later.stdout.trim(), tmpdir());
+  } finally {
+    await rm(directory, { recursive: true, force: true });
+  }
 });

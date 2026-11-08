@@ -50,6 +50,9 @@ runs:
         install_args: ${{ inputs.install_args }}
       env:
         CURL_HOME: ${{ steps.policy.outputs.curl-home }}
+        TMPDIR: ${{ runner.temp }}
+        TMP: ${{ runner.temp }}
+        TEMP: ${{ runner.temp }}
     - uses: actions/cache/save@v5
       if: >-
         steps.cache.outputs.cache-hit != 'true' && inputs.install == 'true'
