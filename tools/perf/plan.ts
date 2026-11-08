@@ -10,6 +10,9 @@ export type PerfHost = "linux-x86_64-gnu" | "macos-aarch64";
 export interface Command {
   readonly command: string;
   readonly args: readonly string[];
+  readonly cwd?: string;
+  readonly env?: Readonly<Record<string, string>>;
+  readonly stdin?: Uint8Array | readonly number[];
 }
 
 /** One independently built engine/policy form of a kernel. */
@@ -92,8 +95,8 @@ function interpreted(
 }
 
 /**
- * Prepare exact reference-engine recipes. Oseo stays blocked until its
- * optimized and retained-build units are integrated; checked is no substitute.
+ * Prepare reference recipes and native destinations. The build driver uses
+ * the landed compiler API for Oseo; it never assumes a retained-build CLI.
  */
 export function variants(
   kernel: Kernel,
@@ -134,16 +137,25 @@ export function variants(
     seaBuilds.push({ command: "codesign", args: ["--sign", "-", sea] });
   }
   return [
-    ...(["enabled", "disabled"] as const).map((specialization) => ({
-      id: `oseo-${specialization}`,
-      run: { command: executable(`-oseo-${specialization}`), args: [] },
-      builds: [],
-      executable: executable(`-oseo-${specialization}`),
-      specialization,
-      generatedC: executable(`-oseo-${specialization}.c`),
-      blocked:
-        "Requires integrated optimized build and retained executable API",
-    })),
+    ...(["enabled", "disabled"] as const).map((specialization) => {
+      const id = `oseo-${specialization}`;
+      const role = kernel.id === "startup" ? "startup" : "timed";
+      const nativePath = join(
+        directory,
+        `${kernel.id}-${id}-${role}`,
+        `fixture-${host}`,
+      );
+      return {
+        id,
+        run: { command: nativePath, args: [] },
+        builds: [],
+        executable: nativePath,
+        specialization,
+        // The backend assigns the complete unit list during the build.
+        generatedC: null,
+        blocked: null,
+      };
+    }),
     interpreted("node", "node", [source]),
     interpreted("node-jitless", "node", ["--jitless", source]),
     interpreted("deno", "deno", ["run", "--no-config", source]),

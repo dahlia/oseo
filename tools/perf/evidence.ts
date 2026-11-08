@@ -107,12 +107,15 @@ function knownIdentity(value: string): boolean {
   return (
     isString(value) &&
     value.trim().length > 0 &&
-    value.trim().toLowerCase() !== "unknown"
+    value.trim().toLowerCase() !== "unknown" &&
+    !/^(?:\[\s*\]|\{\s*\})$/u.test(value.trim())
   );
 }
 
 /** Reject missing provenance without consulting the ingestion host's files. */
-function validateProvenance(evidence: Evidence): void {
+export function validateProvenance(
+  evidence: Pick<Evidence, "host" | "runId" | "measuredAt" | "conditions">,
+): void {
   const host = evidence.host;
   if (!isObject(host) || Array.isArray(host)) {
     throw new Error("Invalid host metadata.");

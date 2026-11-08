@@ -1,11 +1,11 @@
 Performance evidence
 ====================
 
-No comparison has been measured here. The preparation tools implement the
-corpus and evidence skeleton for the first Measurement checkpoint of
+No comparison has been measured here. The build and measurement drivers
+implement the corpus harness for the first Measurement checkpoint of
 [*PLAN-PERF.md*](../../../PLAN-PERF.md). Root owns the Wave2 measurement
-slot, integration with optimized native builds, and publication on both
-native hosts. Preparation does not complete the checkpoint's exit criteria.
+slot and publication on both native hosts. Driver validation does not
+complete the checkpoint's exit criteria.
 
 
 Preparation and integration
@@ -28,21 +28,76 @@ source is a self-contained Script with no imports; snapshot and code cache
 are disabled. See the [Node.js SEA documentation], [Deno compile reference],
 and [Bun executable documentation] for the underlying command contracts.
 
-Oseo forms deliberately have no build recipe yet. Root must replace their
-`blocked` state only after wiring the accepted optimized configuration
-through the compiler and retained executable API. It must record
-`buildConfiguration: "optimized"`, no sanitizers, the selected policy,
-complete build argv, toolchain identity, cache disposition, and artifact
-digests. A checked build is never eligible. No compiler, lowering, runtime,
-or target code is copied into this harness.
+`mise run perf:build` uses the landed compiler, backend and Zig APIs to
+build Oseo with `buildConfiguration: "optimized"` and no sanitizers. It
+stages all generated C and runtime assets in private build directories,
+without archive reuse. Native *build.json* records the source, policy,
+observation selection, runtime ABI, generated units and exact build plan.
+The build journal retains each child request and raw output. No retained
+CLI or other unlanded implementation is required. Prepared native commands
+name the timed or startup build destination. The backend assigns C filenames;
+the build manifest records the complete emitted unit list.
 
-For each policy, Root also builds a separate executable from the same source
-and iteration count with `observeSpecialization: true`. Running that executable
-yields `guardHits`, `guardMisses`, `overflowMisses`, `genericAdditionCalls`,
-`allocations`, and `collections` through the existing private observation
-protocol. Missing or invalid counters fail the run. Its artifact digest must
-differ from the uninstrumented executable's digest. Timing and RSS runners
-reject observation markers; observation runs do not supply timing populations.
+Set `OSEO_PERF_DIRECTORY` to a fresh absolute directory before building,
+under ignored *artifacts/.oseo-perf/* or outside the checkout.
+The driver writes *built.json* and its detached *built.sha256*, linking
+source, resolved executable, generated C, native build metadata and build
+journal digests. Resolve dependencies before the measurement slot. Builds,
+preparation and correctness preflights use the heavy gate outside timing.
+
+`mise run perf:measure` runs the sealed matrix without building. Set
+`OSEO_PERF_DIRECTORY` to the build directory, `OSEO_PERF_RESULTS` to a new
+absolute directory, `OSEO_PERF_RUN_ID` to the run identifier, and
+`OSEO_PERF_CONDITIONS` to a JSON object with `power`, `backgroundLoad`,
+`cachePolicy: "warm-process-launch"` and `notes`. The command rejects a
+changed producing host, revision, pin, lockfile or tool version. Root must
+assign the exclusive Wave2 slot first: Linux uses the approved heavy gate
+with `--measure`; macOS requires its separate physical-host reservation.
+The Linux wrapper does not run on macOS.
+
+*build-manifest.json* and *run.json* bind the raw journal to frozen files.
+Fixed-corpus launches select environment entries needed by the build tools,
+caches, temporary directories, locale and timezone. Credentials and ambient
+engine options are excluded before the child runs. `Journal` requires
+explicit cwd, stdin and environment, including any demo adapter variables.
+Executable commands preserve their dispatch paths while identities hash
+resolved target files, so symlink dispatch does not change `argv[0]`. The
+real executor checks RSS-tool availability before starting any population.
+
+Every launch preserves explicit stdin, individual arguments, environment,
+working directory, UTC boundaries, monotonic boundaries, status and signal.
+*raw/requests.jsonl* records an attempt before spawning;
+*raw/launches.jsonl* links its original stdin/stdout/stderr byte files and
+digests before kernel text decoding. Invalid UTF-8 bytes remain intact. Spawn
+errors, wrong output and nonzero exits leave *failure.json* and all prior
+attempts; they produce no successful *measurements.json*.
+
+Set `OSEO_PERF_RSS_FIRST=1` to collect RSS before each kernel's timing
+population and exercise the excluded preflight. The default runs timing
+before RSS.
+
+The driver rotates the nine forms serially through all runtime and startup
+rounds, then collects separate RSS and observed populations. It verifies
+frozen hashes around each population. On macOS, the first warmup of every
+new standalone executable is retained only as a discard record. An RSS-first
+collection performs an excluded correctness preflight before its fifteen
+RSS launches. Observed artifacts receive their own excluded preflight.
+Neither observed time nor first-launch time enters the retained populations.
+
+`Journal` in *tools/perf/* provides the audited byte transport for demo
+evidence adapters. Its underlying `executeRaw()` helper preserves legacy
+inheritance when cwd or environment are omitted. Demo adapters use `Journal`
+with explicit inputs. Demo registration and byte oracles belong to the
+comparison lane; they do not extend the four-kernel schema.
+
+For each policy, the build driver creates a separate executable from the
+same source and iteration count with `observeSpecialization: true`. Running
+that executable yields `guardHits`, `guardMisses`, `overflowMisses`,
+`genericAdditionCalls`, `allocations`, and `collections` through the existing
+private observation protocol. Missing or invalid counters fail the run. Its
+artifact digest must differ from the uninstrumented executable's digest. Timing
+and RSS runners reject observation markers; observation runs do not supply
+timing populations.
 
 [Node.js SEA documentation]: https://nodejs.org/docs/latest-v24.x/api/single-executable-applications.html
 [Deno compile reference]: https://docs.deno.com/runtime/reference/cli/compile/
@@ -115,8 +170,9 @@ lockfile and pin digests, sampling policy, power mode, background load,
 cache policy, and limitations. A prepared plan has `phase: "prepared"` and
 cannot be validated as measured evidence. Raw samples identify their kernel,
 variant, and repetition index. Failures belong in the run's separate failure
-record with command, output, signal, and phase; they never become zero-valued
-measurements.
+record, which references the last completed journal launch and its command,
+raw output files, status, signal and phase. Errors outside a launch remain
+described separately; failures never become zero-valued measurements.
 
 Publication requires native execution on both hosts at the same revision
 and sampling policy. Keep their results separate; cross-linking AArch64
@@ -132,4 +188,4 @@ Time Profiler captures with the matching executable digest, symbols, command,
 and tool version. Group stacks by generic helpers, allocation/collection,
 property lookup, calls, and numeric boxing, and retain unattributed samples.
 Neither profiler is required to prepare this corpus, and no profiling result
-or validated attribution method is claimed by this skeleton.
+or validated attribution method is claimed by this driver.

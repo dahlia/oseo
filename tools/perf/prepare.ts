@@ -5,6 +5,10 @@ import { resolve } from "node:path";
 import process from "node:process";
 import { pathToFileURL } from "node:url";
 
+import { parsedObject } from "../structured-data.ts";
+import type { StructuredDataValue } from "../structured-data.ts";
+import { isString } from "../value-kinds.ts";
+
 import { digest, kernels, readKernel, renderKernel } from "./corpus.ts";
 import { defaultMethod, perfHost, variants } from "./plan.ts";
 import type { Method, PerfHost } from "./plan.ts";
@@ -33,6 +37,25 @@ function command(name: string, args: readonly string[]): string {
   return execFileSync(name, args, { encoding: "utf8", timeout: 30_000 }).trim();
 }
 
+/** Missing or ambiguous installations cannot identify the pinned SEA tool. */
+export function postjectIdentity(text: string): string {
+  const entries: StructuredDataValue = JSON.parse(text);
+  if (!Array.isArray(entries) || entries.length !== 1) {
+    throw new Error("Expected one active postject installation.");
+  }
+  const entry = parsedObject(entries[0], "Postject installation");
+  if (
+    entry.installed !== true ||
+    entry.active !== true ||
+    !isString(entry.version) ||
+    entry.version.trim() === "" ||
+    entry.version.trim().toLowerCase() === "unknown"
+  ) {
+    throw new Error("Expected one active postject installation.");
+  }
+  return text;
+}
+
 /** Capture identities only; no build or workload execution occurs here. */
 export function hostMetadata(): HostMetadata {
   return {
@@ -49,7 +72,9 @@ export function hostMetadata(): HostMetadata {
     bun: command("bun", ["--version"]),
     zig: command("zig", ["version"]),
     // postject has no version flag; retain mise's active installation record.
-    postject: command("mise", ["ls", "--current", "--json", "npm:postject"]),
+    postject: postjectIdentity(
+      command("mise", ["ls", "--current", "--json", "npm:postject"]),
+    ),
     pinsSha256: digest(readRepositoryFile("mise.toml")),
     lockSha256: digest(readRepositoryFile("pnpm-lock.yaml")),
   };
@@ -61,8 +86,8 @@ function readRepositoryFile(path: string): string {
 }
 
 /**
- * Write source and argv recipes to a fresh directory. Missing native APIs are
- * explicit blockers; preparation never starts builds or benchmark processes.
+ * Write source and argv recipes to a fresh directory. The build driver owns
+ * native API composition; preparation starts no builds or workloads.
  */
 export function prepare(
   destination: string,
@@ -128,7 +153,7 @@ export function prepare(
         sanitizers: [],
         observeSpecialization: false,
         measurementBlocked:
-          "Root integrates optimized/retained APIs and assigns slot",
+          "Run perf:build, then Root assigns the perf:measure slot",
         corpus,
         counterBuild: {
           observeSpecialization: true,

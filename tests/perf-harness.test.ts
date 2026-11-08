@@ -29,7 +29,7 @@ import {
   sampleRss,
   sampleStartup,
 } from "../tools/perf/sampling.ts";
-import { prepare } from "../tools/perf/prepare.ts";
+import { prepare, postjectIdentity } from "../tools/perf/prepare.ts";
 import type { HostMetadata } from "../tools/perf/prepare.ts";
 import {
   artifact,
@@ -182,10 +182,10 @@ test("both native hosts plan all engines and separate startup binaries", () => {
   for (const target of ["linux-x86_64-gnu", "macos-aarch64"] as const) {
     const forms = variants(kernel, "/path with spaces", target, "/node");
     assert.equal(forms.length, 9);
-    assert.equal(forms.filter((form) => form.blocked != null).length, 2);
+    assert.equal(forms.filter((form) => form.blocked != null).length, 0);
     assert.deepEqual(
       forms.find((form) => form.id === "node-jitless")!.run.args,
-      ["--jitless", "/path with spaces/sieve.js"],
+      ["--jitless", join("/path with spaces", "sieve.js")],
     );
     const sea = forms.find((form) => form.id === "node-sea")!;
     assert.equal(
@@ -194,7 +194,15 @@ test("both native hosts plan all engines and separate startup binaries", () => {
     );
     assert.ok(sea.builds.find((build) => build.command === "postject"));
     assert.throws(
-      () => sampleKernel(kernel, forms, defaultMethod, () => result()),
+      () =>
+        sampleKernel(
+          kernel,
+          forms.map((form) =>
+            Object.assign({}, form, { blocked: "not built" }),
+          ),
+          defaultMethod,
+          () => result(),
+        ),
       /fully built/u,
     );
   }
@@ -277,7 +285,7 @@ test("distribution keeps dispersion and rejects invalid samples", () => {
   }
 });
 
-test("preparation writes blocked recipes without starting engines", () => {
+test("preparation writes build recipes without starting engines", () => {
   const directory = scratch();
   try {
     const destination = join(directory, "prepared");
@@ -285,7 +293,7 @@ test("preparation writes blocked recipes without starting engines", () => {
     const text = readFileSync(join(destination, "plan.json"), "utf8");
     assert.match(text, /"phase": "prepared"/u);
     assert.match(text, /"observeSpecialization": true/u);
-    assert.match(text, /Requires integrated optimized/u);
+    assert.match(text, /perf:build/u);
     assert.match(
       readFileSync(join(destination, "startup.js"), "utf8"),
       /PERF_OK startup 1/u,
@@ -329,7 +337,7 @@ function evidence(): Evidence {
       variants: variants(item, "/fake", host.target, "/node").map((form) => ({
         id: form.id,
         executable: form.executable == null ? null : { ...file },
-        generatedC: form.generatedC == null ? null : [{ ...file }],
+        generatedC: form.specialization == null ? null : [{ ...file }],
         counterBuild:
           form.specialization == null
             ? null
@@ -876,4 +884,33 @@ test("publication compares policy values independently of key order", () => {
       ]),
     { message: "Hosts must measure the same revision and policy." },
   );
+});
+
+test("postject provenance requires an active installed version", () => {
+  const installed = JSON.stringify([
+    { installed: true, active: true, version: "1.0.0-alpha.6" },
+  ]);
+  assert.equal(postjectIdentity(installed), installed);
+  for (const text of [
+    "[]",
+    "{}",
+    "null",
+    "[{}]",
+    '[{"installed":false,"active":true,"version":"1"}]',
+    '[{"installed":true,"active":false,"version":"1"}]',
+    '[{"installed":true,"active":true,"version":""}]',
+  ]) {
+    assert.throws(() => postjectIdentity(text));
+  }
+  for (const text of ["[]", "{}", "[ ]", "{ }"]) {
+    const valid = evidence();
+    assert.throws(
+      () =>
+        validateEvidence({
+          ...valid,
+          host: { ...valid.host, postject: text },
+        }),
+      /Invalid host provenance: postject/u,
+    );
+  }
 });

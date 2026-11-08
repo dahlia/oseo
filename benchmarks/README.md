@@ -30,18 +30,21 @@ runs the same source on every engine, checks every iteration, and throws on
 a wrong checksum before printing the completion marker. An absent marker,
 a nonzero exit, or an extra output line invalidates a sample.
 
-`mise run check:perf` runs the kernels for correctness and injects a wrong
-computation into each to prove that its self-check fails. These are unit
-checks, not comparison measurements. `mise run perf:prepare` writes the
-fixed input programs, startup control, SEA configuration files, source
-digests, and engine command plans under *artifacts/.oseo-perf/prepared/*. It
-refuses an existing destination. Preserve that directory with its eventual
-run, or remove it explicitly before preparing another run.
+`mise run check:perf` builds its package dependencies, runs kernel
+correctness checks, and injects a wrong computation into each kernel to
+prove that its self-check fails. It also exercises the driver with fake
+executors. These checks produce no comparison measurements.
 
-The preparation command does not build executables or measure workloads.
-Oseo's two policy forms stay blocked until Root integrates the optimized
-build and retained executable units. The
-[*evidence contract*](../docs/evidence/performance/README.md) defines that
-integration boundary and the measurements that follow it.
+`mise run perf:prepare` writes sources, startup controls, SEA configuration
+and command recipes without building or measuring. `mise run perf:build`
+prepares a separate fresh directory selected by `OSEO_PERF_DIRECTORY`, then
+builds all nine forms, including both Oseo policies through the landed
+optimized compiler API. Neither command overwrites an existing destination;
+a prepared directory is an inspection input, not a build destination.
+
+Root assigns the exclusive slot for `mise run perf:measure`, which executes
+the frozen build artifacts. The
+[*evidence contract*](../docs/evidence/performance/README.md) describes its
+configuration, raw journals, artifact roles and publication requirements.
 
 [Are We Fast Yet? kernels]: https://github.com/smarr/are-we-fast-yet/tree/74306fec151070fd07157cefeacf19e7e0bcdc89/benchmarks/JavaScript

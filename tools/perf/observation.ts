@@ -1,5 +1,8 @@
+import { accessSync, constants, statSync } from "node:fs";
 import { spawnSync } from "node:child_process";
 import { performance } from "node:perf_hooks";
+import { resolve } from "node:path";
+import process from "node:process";
 
 import type { Command, PerfHost } from "./plan.ts";
 import { isNumber } from "../value-kinds.ts";
@@ -18,22 +21,80 @@ export interface Execution {
 /** Injected execution tests failure handling without benchmarking. */
 export type Executor = (command: Command) => Execution;
 
-/** Execute one bounded command; this function never runs during preparation. */
-export function execute(command: Command): Execution {
+/** Byte transport shared with workloads whose output is not UTF-8. */
+export interface RawExecution {
+  readonly stdout: Uint8Array;
+  readonly stderr: Uint8Array;
+  readonly status: number | null;
+  readonly signal: string | null;
+  readonly error: string | null;
+  readonly startedAt: string;
+  readonly finishedAt: string;
+  readonly monotonicStartMs: number;
+  readonly monotonicEndMs: number;
+  readonly wallMs: number;
+}
+
+/** Snapshot requested inputs once for execution and journaling. */
+export function explicitCommand(command: Command): Command & {
+  readonly cwd: string;
+  readonly env: Readonly<Record<string, string>>;
+  readonly stdin: Uint8Array;
+} {
+  const env: Record<string, string> = {};
+  for (const [key, value] of Object.entries(command.env ?? process.env)) {
+    if (value != null) env[key] = value;
+  }
+  return {
+    ...command,
+    args: [...command.args],
+    cwd: resolve(command.cwd ?? process.cwd()),
+    env,
+    stdin: Uint8Array.from(command.stdin ?? []),
+  };
+}
+
+/** Preserve partial output, timeout and spawn errors before validation. */
+export function executeRaw(command: Command): RawExecution {
+  const input = explicitCommand(command);
+  const startedAt = new Date().toISOString();
   const start = performance.now();
-  const result = spawnSync(command.command, command.args, {
-    encoding: "utf8",
+  const result = spawnSync(input.command, input.args, {
+    cwd: input.cwd,
+    env: input.env,
+    input: input.stdin,
     timeout: 600_000,
     maxBuffer: 16 * 1024 * 1024,
   });
-  if (result.error != null) throw result.error;
+  const end = performance.now();
   return {
-    stdout: result.stdout,
-    stderr: result.stderr,
+    stdout: result.stdout ?? new Uint8Array(),
+    stderr: result.stderr ?? new Uint8Array(),
     status: result.status,
     signal: result.signal,
-    wallMs: performance.now() - start,
+    error: result.error?.message ?? null,
+    startedAt,
+    finishedAt: new Date().toISOString(),
+    monotonicStartMs: start,
+    monotonicEndMs: end,
+    wallMs: end - start,
   };
+}
+
+/** Derive kernel text only after retaining the original byte record. */
+export function executionText(result: RawExecution): Execution {
+  if (result.error != null) throw new Error(result.error);
+  const decoder = new TextDecoder("utf-8", { fatal: true });
+  return {
+    ...result,
+    stdout: decoder.decode(result.stdout),
+    stderr: decoder.decode(result.stderr),
+  };
+}
+
+/** Compatibility executor for the string kernel sampler. */
+export function execute(command: Command): Execution {
+  return executionText(executeRaw(command));
 }
 
 const prefix = "OSEO_OBSERVATIONS ";
@@ -116,9 +177,16 @@ export function checkExecution(
   return runtimeMs;
 }
 
+/** Fail before populations if the required host RSS wrapper is unavailable. */
+export function requireRssTool(path = "/usr/bin/time"): void {
+  accessSync(path, constants.X_OK);
+  if (!statSync(path).isFile()) throw new Error("RSS tool must be a file.");
+}
+
 /** Peak RSS commands run separately from timing to avoid wrapper overhead. */
 export function rssCommand(host: PerfHost, command: Command): Command {
   return {
+    ...command,
     command: "/usr/bin/time",
     args: [
       ...(host === "linux-x86_64-gnu" ? ["-f", "PERF_RSS_KIB %M"] : ["-l"]),

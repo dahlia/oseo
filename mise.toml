@@ -509,8 +509,18 @@ description = "Prepare the comparison matrix without building or measuring"
 run = "node tools/perf/prepare.ts"
 
 [tasks."check:perf"]
+depends = ["build"]
 description = "Validate benchmark self-checks and evidence contracts"
-run = "node --test tests/perf-harness.test.ts"
+run = "node --test tests/perf-harness.test.ts tests/perf-driver.test.ts"
+
+[tasks."perf:build"]
+description = "Build and freeze the nine-form optimized measurement matrix"
+depends = ["build"]
+run = "node tools/perf/build.ts"
+
+[tasks."perf:measure"]
+description = "Measure frozen artifacts in a Root-assigned exclusive slot"
+run = "node tools/perf/measure.ts"
 
 [tasks."generate:commands"]
 description = "Generate the static CLI command registry"
