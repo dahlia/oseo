@@ -11,8 +11,13 @@ scope:
   - "The Node.js type-stripping boundary: namespaces containing only types
     erase; enums, namespaces with runtime statements, parameter properties,
     import aliases with values, angle-bracket assertions and export assignment
-    remain unsupported. The parser rejects decorators. Runtime JavaScript
-    still follows the independently admitted ECMAScript profile."
+    remain unsupported. The parser rejects decorators."
+  - "The frontend uses TypeScript grammar for every source, without a source
+    language selector. Ambiguous a < b > (c) and a < b > followed by a newline
+    use TypeScript generic-call and instantiation semantics, as in Node.js and
+    Deno TypeScript sources. These forms were rejected before generic erasure
+    was admitted. The complete test262 update and existing compatibility
+    gates must verify the reviewed ECMAScript results."
   - "Only any, bigint, boolean, null, number, string, undefined and unknown
     map to hints. Existing inline object, tuple and array destructuring
     mappings remain. Unresolved annotations erase without hints; container

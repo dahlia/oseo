@@ -51,6 +51,8 @@ interface ErasureResult {
   readonly diagnostics: readonly Diagnostic[];
   /** Namespace module restrictions do not apply after whole ambient erasure. */
   readonly ambientModuleStarts: ReadonlySet<number>;
+  /** Optional binding-pattern parameters validated by the stripped reparse. */
+  readonly optionalPatternStarts: ReadonlySet<number>;
   /** Exact runtime reflection text, independent of parsing coordinates. */
   readonly sourceText: (start: number, end: number) => string;
 }
@@ -98,8 +100,10 @@ export function eraseTypeSyntax(
 ): ErasureResult {
   const diagnostics: Diagnostic[] = [];
   const ambientModuleStarts = new Set<number>();
+  const optionalPatternStarts = new Set<number>();
   const spans: (readonly [number, number])[] = [];
   const semicolons = new Set<number>();
+  const movedOpeners: (readonly [number, number])[] = [];
   const movedClosers: (readonly [number, number])[] = [];
   const tokens = nodes(file.tokens);
   function remove(value: BabelNode, statement = false): void {
@@ -190,11 +194,14 @@ export function eraseTypeSyntax(
       }
     }
   }
-  function reject(value: BabelNode): BabelNode {
+  function reject(
+    value: BabelNode,
+    message = "This TypeScript syntax requires runtime transformation.",
+  ): BabelNode {
     diagnostics.push({
       byteRange: bytes(locations, value),
       code: "OSEO1001",
-      message: "This TypeScript syntax requires runtime transformation.",
+      message,
       range: sourceRange(locations, value),
       sourceId: input.sourceId,
     });
@@ -317,18 +324,34 @@ export function eraseTypeSyntax(
       modifiers.push(value.accessibility);
     }
     removeTokens(prefix, modifiers);
-    if (value.optional === true || value.definite === true) {
-      removeTokens(
-        {
-          start: elementKey?.end ?? value.start,
-          end:
-            node(value.typeAnnotation)?.start ??
-            node(value.value)?.start ??
-            value.end,
-        },
-        [value.optional === true ? "?" : "!"],
-        true,
-      );
+    if (
+      (value.optional === true || value.definite === true) &&
+      value.type !== "OptionalMemberExpression" &&
+      value.type !== "OptionalCallExpression"
+    ) {
+      if (
+        value.optional === true &&
+        (value.type === "ObjectPattern" || value.type === "ArrayPattern")
+      ) {
+        const marker = tokenNear(
+          node(value.typeAnnotation)?.start ?? value.end ?? 0,
+          -1,
+        );
+        if (input.source.slice(marker?.start, marker?.end) === "?") {
+          remove(marker!);
+        }
+      } else
+        removeTokens(
+          {
+            start: elementKey?.end ?? value.start,
+            end:
+              node(value.typeAnnotation)?.start ??
+              node(value.value)?.start ??
+              value.end,
+          },
+          [value.optional === true ? "?" : "!"],
+          true,
+        );
     }
     if (
       value.type === "ClassProperty" &&
@@ -362,6 +385,19 @@ export function eraseTypeSyntax(
       if (erasedFields.has(key)) {
         const type = node(child);
         if (type != null) remove(type);
+        if (
+          key === "typeParameters" &&
+          value.type === "ArrowFunctionExpression" &&
+          value.async === true &&
+          type?.start != null &&
+          type.end != null &&
+          /[\n\r\u2028\u2029]/u.test(input.source.slice(type.start, type.end))
+        ) {
+          const open = tokenNear(type.end, 1);
+          if (input.source.slice(open?.start, open?.end) === "(") {
+            movedOpeners.push([open!.start!, type.start]);
+          }
+        }
         continue;
       }
       if (key === "tokens" || key === "comments" || key === "errors") {
@@ -438,12 +474,70 @@ export function eraseTypeSyntax(
                 value.type ?? "",
               )) ||
             (key === "consequent" && value.type === "SwitchCase");
+          const parameter =
+            itemNode.type === "AssignmentPattern"
+              ? node(itemNode.left)
+              : undefined;
+          if (key === "params" && parameter?.optional === true) {
+            diagnostics.push(
+              earlyErrorDiagnostic(
+                input,
+                locations,
+                itemNode,
+                "An optional parameter cannot have an initializer.",
+              ),
+            );
+          }
+          if (
+            key === "params" &&
+            itemNode.optional === true &&
+            (itemNode.type === "ObjectPattern" ||
+              itemNode.type === "ArrayPattern") &&
+            itemNode.start != null
+          ) {
+            optionalPatternStarts.add(itemNode.start);
+          }
           const converted = erase(itemNode, statementList);
           return converted == null ? [] : [converted];
         });
       } else {
         const childNode = node(child);
-        result[key] = childNode?.type == null ? child : erase(childNode);
+        const converted = childNode?.type == null ? child : erase(childNode);
+        if (value.type === "WithStatement" && key === "body") {
+          let originalBody = childNode;
+          let remainingBody = node(converted);
+          while (
+            originalBody?.type === "LabeledStatement" &&
+            remainingBody?.type === "LabeledStatement"
+          ) {
+            originalBody = node(originalBody.body);
+            remainingBody = node(remainingBody.body);
+          }
+          if (originalBody != null && remainingBody == null) {
+            reject(
+              originalBody,
+              "A with body cannot be an erased TypeScript declaration.",
+            );
+          }
+        }
+        if (
+          converted == null &&
+          childNode?.declare === true &&
+          childNode.start != null &&
+          ((value.type === "IfStatement" &&
+            (key === "consequent" || key === "alternate")) ||
+            (key === "body" &&
+              [
+                "WhileStatement",
+                "DoWhileStatement",
+                "ForStatement",
+                "ForInStatement",
+                "ForOfStatement",
+              ].includes(value.type ?? "")))
+        ) {
+          semicolons.add(childNode.start);
+        }
+        result[key] = converted;
       }
     }
     return result;
@@ -511,6 +605,7 @@ export function eraseTypeSyntax(
     return {
       diagnostics,
       ambientModuleStarts,
+      optionalPatternStarts,
       file: normalized,
       source: input.source,
       sourceText: (start, end) => input.source.slice(start, end),
@@ -536,6 +631,11 @@ export function eraseTypeSyntax(
   }
   // TypeScript's inserted semicolons must survive the JavaScript reparse.
   for (const index of semicolons) characters[index] = ";";
+  // Node.js moves the opener before erased generic line breaks in async arrows.
+  for (const [from, to] of movedOpeners) {
+    characters[from] = " ";
+    characters[to] = "(";
+  }
   const reflectedOverrides = new Map<number, string>();
   for (const [from, to] of movedClosers) {
     characters[from] = " ";
@@ -624,6 +724,7 @@ export function eraseTypeSyntax(
     return {
       diagnostics,
       ambientModuleStarts,
+      optionalPatternStarts,
       file: visit(stripped, true),
       source,
       sourceText,
@@ -636,6 +737,7 @@ export function eraseTypeSyntax(
     return {
       diagnostics,
       ambientModuleStarts,
+      optionalPatternStarts,
       file: normalized,
       source,
       sourceText,

@@ -29,6 +29,108 @@ const forms = [
   'export type * from "missing"; export default interface T {}',
 ] as const;
 
+test("keeps optional pattern hints and runtime errors", () => {
+  const typedSource = `
+type Alias = unknown;
+function object({ known, other }?: { known: number; other: Alias }) {
+  return [known, other];
+}
+function array([head, tail]?: [string, Alias]) { return [head, tail]; }
+`;
+  for (const result of [
+    babelFrontend.parse({ source: typedSource, sourceId: "patterns.ts" }),
+    babelModuleFrontend.parseModule({
+      source: typedSource,
+      sourceId: "patterns.ts",
+    }),
+  ]) {
+    assert.equal(result.parsed, true, JSON.stringify(result.diagnostics));
+  }
+  const compiled = compileSource(babelFrontend, {
+    source: typedSource,
+    sourceId: "patterns.ts",
+  });
+  assert.deepEqual(compiled.diagnostics, []);
+  assert.ok(compiled.hir != null);
+  const hir = printHir(compiled.hir);
+  assert.match(hir, /known hints=\[typescript:number\]/u);
+  assert.match(hir, /head hints=\[typescript:string\]/u);
+  assert.doesNotMatch(hir, /(?:other|tail) hints=/u);
+  for (const source of [
+    "function f(...values?: number[]) {}",
+    "function f(...[x]?: number[]) {}",
+    "try {} catch ({ x }?: unknown) {}",
+    "const [x]?: number[] = [];",
+    "function f({ x }?: T, { x }?: T) {}",
+    "function f({ x }?: T) { 'use strict'; }",
+    "function f({ x }?: T = {}) {}",
+    "function f([x]? = []) {}",
+    "function f(x?: number = 1) {}",
+  ]) {
+    for (const result of [
+      babelFrontend.parse({ source, sourceId: "invalid.ts" }),
+      babelModuleFrontend.parseModule({ source, sourceId: "invalid.ts" }),
+    ]) {
+      assert.equal(result.parsed, false, source);
+      assert.equal(result.diagnostics[0]?.code, "OSEO0001", source);
+    }
+  }
+});
+
+test("uses TypeScript grammar for ambiguous generic expressions", () => {
+  for (const [source, kind] of [
+    ["const x = a < b > (c);", "call"],
+    ["const x = a < b >\n c;", "identifier"],
+  ] as const) {
+    const result = babelFrontend.parse({ source, sourceId: "ambiguous.js" });
+    assert.equal(result.parsed, true, JSON.stringify(result.diagnostics));
+    const declaration = result.program?.body[0];
+    assert.ok(declaration?.kind === "const");
+    assert.equal(declaration.initializer.kind, kind);
+  }
+});
+
+test("rejects erased with bodies and retains JavaScript with", () => {
+  for (const body of [
+    "declare var y: number;",
+    "declare function f(): void;",
+    "declare class C {}",
+    "declare namespace N {}",
+    "namespace N { type T = number; }",
+    "label: declare var y: number;",
+    "外: inner: declare class C {}",
+    "label: namespace N { type T = number; }",
+  ]) {
+    const source = `var n = 0; with ({ n: 5 }) ${body} n++;`;
+    const result = babelFrontend.parse({ source, sourceId: "with.ts" });
+    assert.equal(result.parsed, false, source);
+    assert.equal(result.diagnostics[0]?.code, "OSEO1001", source);
+    const keyword = body.includes("declare") ? "declare" : "namespace";
+    const prefix = source.slice(0, source.indexOf(keyword));
+    assert.equal(
+      result.diagnostics[0]?.byteRange.start,
+      new TextEncoder().encode(prefix).length,
+      source,
+    );
+    assert.equal(
+      result.diagnostics[0]?.range.start.column,
+      Array.from(prefix).length + 1,
+      source,
+    );
+  }
+  for (const source of [
+    "var n = 0; with ({ n: 5 }) n++;",
+    "var n: number = 0; with ({ n: 5 }) n++;",
+    "var n: number = 0; with ({ n: 5 }) label: n++;",
+  ]) {
+    assert.equal(
+      babelFrontend.parse({ source, sourceId: "with.js" }).parsed,
+      true,
+      source,
+    );
+  }
+});
+
 for (const source of forms) {
   test(`erases ${source}`, () => {
     for (const result of [

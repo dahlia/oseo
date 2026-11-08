@@ -491,6 +491,11 @@ export function convertModule(
         error.reasonCode !== "VarRedeclaration" &&
         error.reasonCode !== "ModuleExportUndefined" &&
         !(
+          error.reasonCode === "PatternIsOptional" &&
+          erased.diagnostics.length === 0 &&
+          erased.optionalPatternStarts.has(errorOffset(error))
+        ) &&
+        !(
           ["ImportInTSNamespace", "ExportInTSNamespace"].includes(
             error.reasonCode ?? "",
           ) && erased.ambientModuleStarts.has(errorOffset(error))

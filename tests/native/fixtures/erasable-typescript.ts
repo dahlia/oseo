@@ -89,6 +89,64 @@ console.log(
   Object.hasOwn(fields, "set"),
   fields.first(), fields.second(), fields.third(3),
 );
+const asyncIdentity = async <
+  T
+>(value: T): T => value;
+const asyncPattern = async <T /*
+  comment
+*/> /*keep*/ ({ value }: { value: T }):
+  T => value;
+const asyncRest = async <
+  T
+>(...values: T[]): T[] => values;
+asyncIdentity(7).then(value => console.log(value));
+asyncIdentity("wrong" as any).then(value => console.log(value));
+asyncPattern({ value: 8 }).then(value => console.log(value));
+asyncRest(9, 10).then(values => console.log(values[0], values[1]));
+let standalone = 0;
+if (false) declare var ambientIf: number;
+standalone++;
+if (true) standalone++;
+else declare var ambientElse: number;
+standalone++;
+while (false) declare function ambientWhile(): void;
+standalone++;
+do declare var ambientDo: number; while (false);
+for (; false;) declare var ambientFor: number;
+standalone++;
+for (const key in {}) declare var ambientForIn: number;
+standalone++;
+for (const item of []) declare var ambientForOf: number;
+standalone++;
+console.log(standalone);
+const chainObject = { value: 11 };
+console.log((true ? chainObject : null)?.value);
+console.log(identity?.(true ? 12 : 13), values?.[true ? 0 : 1]);
+const genericCallable = value => value;
+const genericArgument = 14;
+const genericValue = 15;
+console.log(genericCallable < genericArgument > (genericValue));
+const genericIdentity = genericCallable < genericArgument >
+genericValue;
+console.log(genericIdentity === genericCallable);
+function optionalObject(
+  { value = true ? 16 : 17 }?: { value: number },
+) { return value; }
+const optionalArray = async <
+  T
+>([value = true ? 18 : 19]?: [number]): number => value;
+console.log(
+  optionalObject({}), optionalObject({ value: "wrong" } as any),
+  optionalObject.length,
+);
+try { optionalObject(); } catch (error) {
+  console.log(error instanceof TypeError);
+}
+optionalArray([]).then(value => console.log(value));
+optionalArray(["false hint"] as any).then(value => console.log(value));
+optionalArray().then(
+  undefined, error => console.log(error instanceof TypeError),
+);
 `,
   },
 ];

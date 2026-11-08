@@ -1143,4 +1143,10 @@ The source frontend accepts the erasable TypeScript subset described in the
 [family record](./language-profile-es2026/families/erasable-typescript.yaml).
 It erases types without checking them and retains only the existing primitive
 and destructuring hints. Runtime TypeScript transformations remain unsupported.
-This source-language extension changes no ECMAScript compatibility count.
+The frontend continues to use TypeScript grammar for every source, without a
+source-language selector. Ambiguous sequences such as `a < b > (c)` use generic
+call semantics; `a < b >` followed by a newline can be an instantiation
+expression. Node.js and Deno TypeScript sources use the same interpretation.
+These forms were previously rejected. The complete test262 update and
+compatibility gates must verify that the reviewed ECMAScript results remain
+unchanged.
