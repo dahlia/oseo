@@ -7,6 +7,7 @@ import type {
   MirProgram,
   ModuleSourceFrontend,
   NativeBackend,
+  NativeBuildConfiguration,
   NativeToolchain,
   ProcessEnvironment,
   ProcessObservation,
@@ -178,7 +179,14 @@ const targetParser = optional(
   ),
 );
 
+const buildConfigurationParser = optional(
+  option("--build-config", choice(["checked", "optimized"] as const), {
+    description: message`Select checked (default) or optimized builds.`,
+  }),
+);
+
 const cliParser = object({
+  buildConfiguration: buildConfigurationParser,
   module: moduleParser,
   mode: modeParser,
   runtimeArchiveReuse: runtimeArchiveReuseParser,
@@ -623,6 +631,15 @@ function emitCliMir(mode: CliInvocation["mode"], mir: MirProgram): CliResult {
 export function runCli(request: CliRequest): CliResult {
   const parsed = parseCliRequest(request);
   if (parsed.kind === "result") return parsed.value;
+  if (parsed.value.buildConfiguration != null) {
+    return diagnosticResult(
+      hostDiagnostic(
+        request.sourceId ?? parsed.value.sourceId,
+        "The --build-config option applies only to asynchronous " +
+          "native execution.",
+      ),
+    );
+  }
   if (parsed.value.target != null) {
     return diagnosticResult(
       hostDiagnostic(
@@ -815,6 +832,7 @@ export interface PreparedRuntimeAsset {
  * not observed.
  */
 export interface PreparedNativeRuntime {
+  readonly buildConfiguration: NativeBuildConfiguration;
   readonly archiveKey: string;
   readonly assetDigest: string;
   readonly assets: readonly PreparedRuntimeAsset[];
@@ -929,6 +947,7 @@ function sameToolchainEnvironment(
 function requirePreparedNativeRuntime(
   prepared: PreparedNativeRuntime,
   observed: {
+    readonly buildConfiguration: NativeBuildConfiguration;
     readonly host: CompilerHost;
     readonly runtime: RuntimeInput;
     readonly target: TargetDescription;
@@ -936,6 +955,9 @@ function requirePreparedNativeRuntime(
     readonly toolchainEnvironment: ProcessEnvironment | undefined;
   },
 ): void {
+  if (prepared.buildConfiguration !== observed.buildConfiguration) {
+    throw new PreparedNativeRuntimeMismatchError("native build configuration");
+  }
   if (prepared.host !== observed.host) {
     throw new PreparedNativeRuntimeMismatchError("compiler host");
   }
@@ -1020,6 +1042,8 @@ export async function prepareNativeRuntime(
   toolchain: NativeToolchain,
   target: TargetDescription,
   runtimeProvider: RuntimeInputProvider = defaultComponents.runtime,
+  buildConfiguration: NativeBuildConfiguration = toolchain.buildConfiguration ??
+    "checked",
 ): Promise<PreparedNativeRuntime> {
   const reuse = toolchain.runtimeArchiveReuse;
   if (reuse == null) {
@@ -1154,6 +1178,7 @@ export async function prepareNativeRuntime(
     );
   }
   const archiveKey = await reuse.createKey({
+    buildConfiguration,
     runtimeAbiVersion,
     runtimeAssets: assets.map(({ contents, kind, name }) => ({
       contents,
@@ -1165,6 +1190,7 @@ export async function prepareNativeRuntime(
     toolchainIdentity,
   });
   return {
+    buildConfiguration,
     archiveKey,
     assetDigest: await sha256Hex(
       JSON.stringify(
@@ -1265,7 +1291,8 @@ async function executeNativeWorkflow(
   target: TargetDescription,
   archiveReuse: CliInvocation["runtimeArchiveReuse"],
   toolchain: NativeToolchain,
-  prepared?: PreparedNativeRuntime,
+  prepared: PreparedNativeRuntime | undefined,
+  buildConfiguration: NativeBuildConfiguration,
 ): Promise<CliResult> {
   const units = "sources" in input ? input : undefined;
   const emitted =
@@ -1344,6 +1371,7 @@ async function executeNativeWorkflow(
   }
   if (prepared != null) {
     requirePreparedNativeRuntime(prepared, {
+      buildConfiguration,
       host,
       runtime,
       target,
@@ -1400,6 +1428,7 @@ async function executeNativeWorkflow(
       const key =
         prepared?.archiveKey ??
         (await reuse.createKey({
+          buildConfiguration,
           runtimeAbiVersion: runtime.abiVersion,
           runtimeAssets: readAssets.map((entry) => ({
             contents: entry.contents,
@@ -1474,6 +1503,7 @@ async function executeNativeWorkflow(
   let executablePath: string | undefined;
   try {
     const plan = toolchain.createBuildPlan({
+      buildConfiguration,
       ...includePropertiesWhen(() => {
         if (prepared == null) return undefined;
         return { compilerPath: prepared.compilerPath };
@@ -1623,6 +1653,17 @@ export async function runNativeCli(
   const parsed = parseCliRequest(request);
   if (parsed.kind === "result") return parsed.value;
   const sourceId = request.sourceId ?? parsed.value.sourceId;
+  if (
+    parsed.value.mode !== "execute" &&
+    parsed.value.buildConfiguration != null
+  ) {
+    return diagnosticResult(
+      hostDiagnostic(
+        sourceId,
+        "The --build-config option applies only to native execution.",
+      ),
+    );
+  }
   if (parsed.value.mode !== "execute" && parsed.value.target != null) {
     return diagnosticResult(
       hostDiagnostic(
@@ -1793,6 +1834,10 @@ export async function runNativeCli(
       selected.target,
       parsed.value.runtimeArchiveReuse,
       toolchain,
+      undefined,
+      parsed.value.buildConfiguration ??
+        toolchain.buildConfiguration ??
+        "checked",
     );
   } catch {
     result = diagnosticResult(
@@ -1834,6 +1879,8 @@ export async function runNativeUnits(
   toolchain: NativeToolchain,
   archiveReuse: "enabled" | "disabled" = "enabled",
   preparedRuntime?: PreparedNativeRuntime,
+  buildConfiguration: NativeBuildConfiguration = toolchain.buildConfiguration ??
+    "checked",
 ): Promise<CliResult> {
   const selected = selectExecutionTarget(host, undefined, sourceId);
   if ("diagnostic" in selected) return diagnosticResult(selected.diagnostic);
@@ -1860,6 +1907,7 @@ export async function runNativeUnits(
       archiveReuse,
       toolchain,
       preparedRuntime,
+      buildConfiguration,
     );
   } catch (error) {
     if (error instanceof PreparedNativeRuntimeMismatchError) mismatch = error;

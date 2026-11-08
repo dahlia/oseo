@@ -272,6 +272,7 @@ function propertyFailure(
       (process.env.OSEO_NATIVE_TOOLCHAIN === "host-cc"
         ? `compiler=${process.env.OSEO_HOST_CC_IDENTITY ?? "unknown"}\n`
         : "") +
+      `build-config=${process.env.OSEO_NATIVE_BUILD_CONFIG ?? "checked"}\n` +
       propertyContext(options) +
       (shard == null || replay
         ? ""

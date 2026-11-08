@@ -2,6 +2,15 @@ import type { Fixture } from "../fixture.ts";
 
 export const expressionFixtures: readonly Fixture[] = [
   {
+    name: "number-multiply-add-rounding",
+    source: `
+function multiplyAdd(a, b, c) { return a * b + c; }
+const epsilon = 2.220446049250313e-16;
+console.log(multiplyAdd(1 + epsilon, 1 - epsilon, -1));
+console.log(Object.is(multiplyAdd(-0, 1, -0), -0));
+`,
+  },
+  {
     name: "var-async",
     source: `
 async function accumulate(start) {

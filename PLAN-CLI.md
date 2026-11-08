@@ -113,9 +113,10 @@ execution host. An explicit target must still pass `canExecuteTarget()` before
 compilation starts. A target that Oseo can build but the current host cannot
 execute is rejected by `run`. The caller must use `build` for that target.
 
-The existing `--module`, `--no-specialization`, `--target`, and
-`--no-runtime-archive-reuse` behavior belongs to `run` where it affects this
-workflow. `run` does not accept `--dump-mir` or `--emit-c`.
+The existing `--module`, `--no-specialization`, `--target`,
+`--build-config checked|optimized`, and `--no-runtime-archive-reuse` behavior
+belongs to `run` where it affects this workflow. `run` does not accept
+`--dump-mir` or `--emit-c`.
 
 
 Build command
@@ -149,6 +150,10 @@ These two modes are target-neutral. They reject `--target` and
 `--no-runtime-archive-reuse`, which cannot affect their result. The
 compiler-input options `--module` and `--no-specialization` remain available
 because they can change the selected source goal or emitted program.
+
+Native `run` defaults to `checked` and native `build` defaults to `optimized`.
+Both accept `--build-config checked|optimized`; the text modes reject it,
+as [ADR 0036](./docs/adr/0036-optimized-native-build-configuration.md) requires.
 
 The old direct forms `oseo --dump-mir SOURCE` and `oseo --emit-c SOURCE` are
 not compatibility aliases. They become parse errors when the subcommand grammar

@@ -260,6 +260,7 @@ const reviewedExecutionRetryLimit = 1;
 
 /** Host-varying facts reported outside the canonical manifest. */
 export interface ReviewedTest262RunMetadata {
+  readonly buildConfiguration: "checked" | "optimized";
   readonly toolchainIdentity?: string;
   readonly durationMilliseconds: number;
   readonly poolLimit: number;
@@ -2621,6 +2622,8 @@ function runMetadata(
   retries: number,
 ): ReviewedTest262RunMetadata {
   return {
+    buildConfiguration:
+      nativeExecution?.toolchain.buildConfiguration ?? "checked",
     ...includePropertiesWhen(() => {
       const identity = nativeExecution?.toolchain.identity;
       if (identity == null) return undefined;

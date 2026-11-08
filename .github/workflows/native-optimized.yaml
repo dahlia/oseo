@@ -1,0 +1,108 @@
+name: optimized native semantics
+
+on:
+  schedule:
+    - cron: "23 3 * * 0"
+  workflow_dispatch:
+
+env:
+  OSEO_NATIVE_BUILD_CONFIG: optimized
+
+permissions:
+  contents: read
+
+concurrency:
+  group: optimized-native-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  test262:
+    name: optimized test262 (${{ matrix.os }}, ${{ matrix.shard }}/12)
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 90
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-15]
+        shard: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: jdx/mise-action@v4
+        with:
+          install: true
+      - uses: ./.github/actions/runtime-archive-cache
+      - run: mise run test:test262:optimized --shard ${{ matrix.shard }}/12
+        env:
+          TMPDIR: ${{ runner.temp }}
+      - if: failure() || cancelled()
+        uses: actions/upload-artifact@v7
+        with:
+          name: optimized-test262-${{ matrix.os }}-${{ matrix.shard }}
+          path: ${{ runner.temp }}/oseo-*
+          if-no-files-found: warn
+
+  properties:
+    name: optimized properties (${{ matrix.os }}, ${{ matrix.shard }}/7)
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 90
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-15]
+        shard: [1, 2, 3, 4, 5, 6, 7]
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: jdx/mise-action@v4
+        with:
+          install: true
+      - uses: ./.github/actions/runtime-archive-cache
+      - run: >-
+          mise run test:property:native:optimized:shard
+          --shard ${{ matrix.shard }}/7
+          --exclude-case-sharded --exclude-dedicated-linux
+          tests/property/*.property.test.ts
+        env:
+          TMPDIR: ${{ runner.temp }}
+      - if: failure() || cancelled()
+        uses: actions/upload-artifact@v7
+        with:
+          name: optimized-properties-${{ matrix.os }}-${{ matrix.shard }}
+          path: ${{ runner.temp }}/oseo-*
+          if-no-files-found: warn
+
+  dedicated-properties:
+    name: optimized property (${{ matrix.os }}, ${{ matrix.file }})
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 90
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-15]
+        file:
+          - tests/property/m5-object-own-keys.property.test.ts
+          - tests/property/m5-reflect-namespace.property.test.ts
+          - tests/property/m5-regexp-literal-exhaustive.property.test.ts
+          - tests/property/m5-array-constructor.property.test.ts
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: jdx/mise-action@v4
+        with:
+          install: true
+      - uses: ./.github/actions/runtime-archive-cache
+      - run: >-
+          mise run test:property:native:optimized:shard
+          --shard 1/1 ${{ matrix.file }}
+        env:
+          TMPDIR: ${{ runner.temp }}
+      - if: failure() || cancelled()
+        uses: actions/upload-artifact@v7
+        with:
+          name: optimized-property-${{ matrix.os }}-${{ strategy.job-index }}
+          path: ${{ runner.temp }}/oseo-*
+          if-no-files-found: warn

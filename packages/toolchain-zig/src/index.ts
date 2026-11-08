@@ -1,6 +1,7 @@
 import { createHarnessObjectKey } from "@oseo/compiler";
 import type {
   NativeBuildInput,
+  NativeBuildConfiguration,
   HarnessObjectKeyInput,
   NativeBuildPlan,
   NativeToolchain,
@@ -164,6 +165,7 @@ function sanitizerFlags(target: TargetDescription): readonly string[] {
 function commonFlags(
   target: TargetDescription,
   runtimeDirectory: string,
+  configuration: NativeBuildConfiguration = "checked",
 ): readonly string[] {
   return [
     "-target",
@@ -175,15 +177,22 @@ function commonFlags(
     "-pedantic",
     "-I",
     runtimeDirectory,
-    ...sanitizerFlags(target),
+    "-ffp-contract=off",
+    ...(configuration === "optimized"
+      ? ["-O2", "-fno-sanitize=all"]
+      : sanitizerFlags(target)),
   ];
 }
 
 function runtimeCompileFlags(
   target: TargetDescription,
   runtimeDirectory: string,
+  configuration: NativeBuildConfiguration = "checked",
 ): readonly string[] {
-  return ["-O2", ...commonFlags(target, runtimeDirectory)];
+  return [
+    ...(configuration === "checked" ? ["-O2"] : []),
+    ...commonFlags(target, runtimeDirectory, configuration),
+  ];
 }
 
 function runtimePathFlags(): readonly string[] {
@@ -203,9 +212,18 @@ function relativePath(
 
 function archiveKeyRecord(input: RuntimeArchiveKeyInput) {
   requireZigEnvironment(input.toolchainEnvironment);
-  const runtimeCommon = runtimeCompileFlags(input.target, ".");
-  const linkCommon = commonFlags(input.target, "<runtime-directory>");
+  const runtimeCommon = runtimeCompileFlags(
+    input.target,
+    ".",
+    input.buildConfiguration,
+  );
+  const linkCommon = commonFlags(
+    input.target,
+    "<runtime-directory>",
+    input.buildConfiguration,
+  );
   return {
+    buildConfiguration: input.buildConfiguration ?? "checked",
     archiveInvocation: [
       "ar",
       "rcs",
@@ -341,13 +359,22 @@ export const zigToolchain: NativeToolchain = {
       input.workingDirectory,
       `fixture-${suffix}`,
     );
-    const runtimeCommon = runtimeCompileFlags(input.target, ".");
-    const linkCommon = commonFlags(input.target, input.runtimeDirectory);
+    const runtimeCommon = runtimeCompileFlags(
+      input.target,
+      ".",
+      input.buildConfiguration,
+    );
+    const linkCommon = commonFlags(
+      input.target,
+      input.runtimeDirectory,
+      input.buildConfiguration,
+    );
     const runtimePaths = runtimePathFlags();
     // A composer that pinned this toolchain supplies the absolute path the
     // recorded identity describes; otherwise the host resolves "zig".
     const compiler = input.compilerPath ?? "zig";
     return {
+      buildConfiguration: input.buildConfiguration ?? "checked",
       executablePath,
       requests: [
         ...runtimeSources.map((source) =>
@@ -417,7 +444,7 @@ export const zigToolchain: NativeToolchain = {
         adapter: "zig-fragments-v1",
         compileFlags: [
           "cc",
-          ...harnessFlags(input.target),
+          ...harnessFlags(input.target, input.buildConfiguration),
           "-ffile-prefix-map=<working-directory>=/oseo/harness",
           "-c",
           "harness.c",
@@ -425,12 +452,16 @@ export const zigToolchain: NativeToolchain = {
           "harness.o",
         ],
         runtimeFlags: [
-          ...runtimeCompileFlags(input.target, "."),
+          ...runtimeCompileFlags(input.target, ".", input.buildConfiguration),
           ...runtimePathFlags(),
         ],
         linkFlags: [
           "cc",
-          ...commonFlags(input.target, "<runtime-directory>"),
+          ...commonFlags(
+            input.target,
+            "<runtime-directory>",
+            input.buildConfiguration,
+          ),
           "-fno-lto",
           "<launcher>",
           "<case>",
@@ -445,7 +476,7 @@ export const zigToolchain: NativeToolchain = {
         input.compilerPath ?? "zig",
         [
           "cc",
-          ...harnessFlags(input.target),
+          ...harnessFlags(input.target, input.buildConfiguration),
           `-ffile-prefix-map=${input.workingDirectory}=/oseo/harness`,
           "-c",
           "harness.c",
@@ -481,10 +512,13 @@ export const zigToolchain: NativeToolchain = {
   },
 };
 
-function harnessFlags(target: TargetDescription): readonly string[] {
+function harnessFlags(
+  target: TargetDescription,
+  configuration: NativeBuildConfiguration = "checked",
+): readonly string[] {
   return [
-    ...commonFlags(target, "."),
-    "-g",
+    ...commonFlags(target, ".", configuration),
+    ...(configuration === "checked" ? ["-g"] : []),
     "-fno-lto",
     "-fdebug-compilation-dir=/oseo/harness",
   ];

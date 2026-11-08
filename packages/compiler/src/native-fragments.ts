@@ -65,12 +65,14 @@ export async function prepareHarnessObject(
     const buildInput: HarnessObjectBuildInput =
       pin == null
         ? {
+            buildConfiguration: input.buildConfiguration ?? "checked",
             workingDirectory: work,
             target: input.target,
             environment: input.toolchainEnvironment,
           }
         : {
             compilerPath: pin.compilerPath,
+            buildConfiguration: input.buildConfiguration ?? "checked",
             workingDirectory: work,
             target: input.target,
             environment: input.toolchainEnvironment,
@@ -114,6 +116,7 @@ export async function createHarnessObjectKey(
 ): Promise<string> {
   const bytes = new TextEncoder().encode(
     JSON.stringify({
+      buildConfiguration: input.buildConfiguration ?? "checked",
       fragmentAbiVersion: input.fragmentAbiVersion,
       harnessSources: input.harnessSources.map((source) => [
         source.sourceId,

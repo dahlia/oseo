@@ -244,6 +244,44 @@ jobs:
           path: ${{ runner.temp }}/oseo-native-*
           if-no-files-found: warn
 
+  test_native_optimized:
+    env:
+      OSEO_NATIVE_BUILD_CONFIG: optimized
+    name: >-
+      native optimized (${{ matrix.platform.target }}, ${{ matrix.shard }}/3)
+    runs-on: ${{ matrix.platform.os }}
+    timeout-minutes: 60
+    strategy:
+      fail-fast: false
+      matrix:
+        platform:
+          - os: ubuntu-latest
+            target: linux-x86_64-gnu
+          - os: macos-15
+            target: macos-aarch64
+        shard:
+          - 1
+          - 2
+          - 3
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: jdx/mise-action@v4
+        with:
+          install: true
+      - uses: ./.github/actions/runtime-archive-cache
+      - run: mise run test:native:optimized --shard ${{ matrix.shard }}/3
+        env:
+          TMPDIR: ${{ runner.temp }}
+      - if: failure() || cancelled()
+        uses: actions/upload-artifact@v7
+        with:
+          name: >-
+            native-optimized-${{ matrix.platform.target }}-${{ matrix.shard }}
+          path: ${{ runner.temp }}/oseo-native-*
+          if-no-files-found: warn
+
   test_sanitizer:
     name: host C sanitizers (Linux, ${{ matrix.shard }}/3)
     runs-on: ubuntu-latest
@@ -934,6 +972,7 @@ jobs:
     if: ${{ always() }}
     needs:
       - test_native
+      - test_native_optimized
       - test_sanitizer_property
       - test_sanitizer_property_dedicated
       - test_sanitizer_macos

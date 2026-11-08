@@ -184,6 +184,7 @@ export type { ProcessEnvironmentPolicy } from "./native.ts";
 export type { ProcessRequest } from "./native.ts";
 export type { ProcessObservation } from "./native.ts";
 export type { NativeBuildPlan } from "./native.ts";
+export type { NativeBuildConfiguration } from "./native.ts";
 export type { NativeBuildInput } from "./native.ts";
 export type { NativeToolchain } from "./native.ts";
 export type { CompilerHost } from "./native.ts";

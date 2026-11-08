@@ -1,3 +1,8 @@
+/* Keep fixture preconditions active in both build configurations. */
+#ifdef NDEBUG
+#undef NDEBUG
+#endif
+
 #include "runtime_internal.h"
 
 #include <assert.h>

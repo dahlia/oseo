@@ -44,6 +44,7 @@
  * Replay a failure with `OSEO_PROPERTY_SEED` and `OSEO_PROPERTY_PATH`.
  */
 
+import { hostCcLane, nativeBuildConfiguration } from "../native-toolchain.ts";
 import assert from "node:assert/strict";
 import { mkdtemp, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
@@ -525,14 +526,23 @@ async function withScheduler(
 ): Promise<void> {
   const directory = await mkdtemp(join(tmpdir(), "oseo-clock-property-"));
   try {
-    await body(
-      buildClockProgram({
-        directory,
-        program: "scheduler",
-        sanitize: true,
-        target: hostClockTarget() ?? "x86_64-linux-gnu",
-      }),
-    );
+    const build = buildClockProgram({
+      directory,
+      program: "scheduler",
+      sanitize: true,
+      target: hostClockTarget() ?? "x86_64-linux-gnu",
+    });
+    if (!hostCcLane) {
+      assert.ok(build.invocation.includes("-ffp-contract=off"));
+    }
+    if (nativeBuildConfiguration === "optimized") {
+      assert.ok(build.invocation.includes("-O2"));
+      assert.ok(build.invocation.includes("-fno-sanitize=all"));
+      assert.ok(
+        build.invocation.every((arg) => !arg.startsWith("-fsanitize=")),
+      );
+    }
+    await body(build);
   } finally {
     await rm(directory, { force: true, recursive: true });
   }
@@ -551,13 +561,15 @@ function assertTrace(build: ClockBuild, schedule: Schedule): void {
 }
 
 const target = hostClockTarget();
+const sanitizers =
+  nativeBuildConfiguration === "optimized" ? "none" : "address,undefined";
 const context =
   target == null
     ? ["target=unsupported"]
     : [
         `target=${target}`,
         `host=${process.platform}/${process.arch}`,
-        "adapter=deterministic sanitizers=address,undefined",
+        `adapter=deterministic sanitizers=${sanitizers}`,
       ];
 
 test(
