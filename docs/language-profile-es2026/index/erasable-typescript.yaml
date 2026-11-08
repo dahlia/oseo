@@ -1,0 +1,3 @@
+version: 1
+id: erasable-typescript
+record: docs/language-profile-es2026/families/erasable-typescript.yaml

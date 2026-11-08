@@ -184,7 +184,11 @@ test("escaped static ASI fields retain roles, hints and original spans", () => {
           source,
         );
         if (member?.kind === "method") {
-          assert.equal(member.value.sourceText, method, source);
+          assert.equal(
+            member.value.sourceText,
+            method.replace(": number", "        "),
+            source,
+          );
           assert.equal(member.value.parameters[0]?.hints[0]?.name, "number");
         }
         const module = babelModuleFrontend.parseModule({

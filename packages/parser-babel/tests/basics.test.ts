@@ -1305,7 +1305,7 @@ test("maps fixed tuple spreads before following binding elements", () => {
   assert.match(hir, /restTail hints=\[typescript:boolean\]/u);
 });
 
-test("rejects unsupported members exposed by fixed tuple spreads", () => {
+test("leaves unresolved fixed tuple spread members unhinted", () => {
   const result = compileSource(babelFrontend, {
     source:
       "const input = [1, 'two', true];\n" +
@@ -1313,12 +1313,12 @@ test("rejects unsupported members exposed by fixed tuple spreads", () => {
       "  [...[number, Value], boolean] = input;\n",
     sourceId: "fixed-tuple-spread-unsupported-hints.ts",
   });
-  assert.equal(result.diagnostics.length, 1);
-  assert.equal(result.diagnostics[0]?.code, "OSEO1001");
-  assert.equal(
-    result.diagnostics[0]?.message,
-    "This TypeScript type is not an M1 hint.",
-  );
+  assert.deepEqual(result.diagnostics, []);
+  assert.ok(result.hir != null);
+  const hir = printHir(result.hir);
+  assert.match(hir, /first hints=\[typescript:number\]/u);
+  assert.match(hir, /third hints=\[typescript:boolean\]/u);
+  assert.doesNotMatch(hir, /unresolved hints=/u);
 });
 
 test("maps structured annotations in declaration binding contexts", () => {
@@ -1469,7 +1469,7 @@ test("keeps computed object binding keys unhinted", () => {
   assert.match(hir, /fixed hints=\[typescript:number\]/u);
 });
 
-test("rejects pattern annotations that require type resolution", () => {
+test("erases pattern annotations that require type resolution", () => {
   for (const [name, source] of [
     [
       "resolved-parameter-hints",
@@ -1517,22 +1517,13 @@ test("rejects pattern annotations that require type resolution", () => {
       source,
       sourceId: `${name}.ts`,
     });
-    assert.equal(result.diagnostics.length, 1);
-    assert.equal(result.diagnostics[0]?.code, "OSEO1001");
-    assert.equal(
-      result.diagnostics[0]?.message,
-      name === "resolved-array-hints" ||
-        name === "resolved-nested-array-hints" ||
-        name === "resolved-nested-array-query-hints" ||
-        name === "resolved-nested-array-union-hints"
-        ? "An array binding annotation must be an array or tuple type."
-        : "An object binding annotation must be an inline object type.",
-    );
+    assert.deepEqual(result.diagnostics, []);
+    assert.ok(result.mir != null);
   }
 });
 
-test("rejects root structured annotation shape mismatches", () => {
-  for (const [name, source, message] of [
+test("erases root structured annotation shape mismatches", () => {
+  for (const [name, source] of [
     [
       "array-with-object-annotation",
       "const [value]: { value: number } = [1];\n",
@@ -1558,13 +1549,12 @@ test("rejects root structured annotation shape mismatches", () => {
       source,
       sourceId: `${name}.ts`,
     });
-    assert.equal(result.diagnostics.length, 1);
-    assert.equal(result.diagnostics[0]?.code, "OSEO1001");
-    assert.equal(result.diagnostics[0]?.message, message);
+    assert.deepEqual(result.diagnostics, []);
+    assert.ok(result.mir != null);
   }
 });
 
-test("rejects annotations outside declaration binding contexts", () => {
+test("erases annotations outside declaration binding contexts", () => {
   for (const [name, source] of [
     [
       "for-of-pattern-hints",
@@ -1577,11 +1567,12 @@ test("rejects annotations outside declaration binding contexts", () => {
       source,
       sourceId: `${name}.ts`,
     });
-    assert.equal(result.diagnostics[0]?.code, "OSEO1001");
-    assert.equal(
-      result.diagnostics[0]?.message,
-      "TypeScript annotations on binding patterns are unsupported.",
-    );
+    if (name === "for-of-pattern-hints") {
+      assert.equal(result.diagnostics[0]?.code, "OSEO0001");
+    } else {
+      assert.deepEqual(result.diagnostics, []);
+      assert.ok(result.mir != null);
+    }
   }
 });
 
@@ -2453,18 +2444,13 @@ test("keeps duplicate object prototype setters as an early error", () => {
   });
 });
 
-test("rejects the smallest syntax form outside the profile", () => {
+test("erases declare fields in class expressions", () => {
   const result = babelFrontend.parse({
     source: "const value = class extends Base { declare field: number; };",
-    sourceId: "class-static-private-generator.ts",
+    sourceId: "declare-field.ts",
   });
-  assert.ok(!result.parsed);
-  assert.equal(result.program, undefined);
-  assert.equal(result.diagnostics[0]?.code, "OSEO1001");
-  assert.deepEqual(result.diagnostics[0]?.range.start, {
-    column: 36,
-    line: 1,
-  });
+  assert.equal(result.parsed, true);
+  assert.deepEqual(result.diagnostics, []);
 });
 
 test("lowers a class body to a constructor and prototype methods", () => {
@@ -2626,20 +2612,18 @@ const outer = Named;`,
   );
 });
 
-test("rejects class elements outside the admitted profile", () => {
-  const cases: readonly (readonly [string, RegExp])[] = [
-    ["class C { declare field: number; }", /class field modifiers/u],
-    ["class C { readonly field = 1; }", /class field modifiers/u],
-    ["class C { field?: number; }", /class field modifiers/u],
-  ];
-  for (const [source, message] of cases) {
+test("erases type-only class field modifiers", () => {
+  for (const source of [
+    "class C { declare field: number; }",
+    "class C { readonly field = 1; }",
+    "class C { field?: number; }",
+  ]) {
     const result = compileSource(babelFrontend, {
       source,
-      sourceId: "class-rejection.ts",
+      sourceId: "class-types.ts",
     });
-    assert.equal(result.mir, undefined, source);
-    assert.equal(result.diagnostics[0]?.code, "OSEO1001", source);
-    assert.match(result.diagnostics[0]?.message ?? "", message, source);
+    assert.deepEqual(result.diagnostics, [], source);
+    assert.ok(result.mir != null);
   }
 });
 

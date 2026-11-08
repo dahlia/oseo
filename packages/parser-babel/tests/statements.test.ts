@@ -1613,23 +1613,7 @@ test("converts with statements to owned syntax", () => {
   assert.match(printHir(result.hir), /with \(%b\d+\(environment\)\)/u);
 });
 
-const unsupportedForms = [
-  ["property", "console.error(1);"],
-  ["optional parameter", "function value(input?: number) {}"],
-  [
-    "TypeScript this parameter",
-    "function value(this: any, input: number) { return input; }",
-  ],
-  [
-    "generic function",
-    "function identity<T>(value: number): number { return value; }",
-  ],
-  [
-    "call type arguments",
-    "function identity(value: number) { return value; } identity<number>(1);",
-  ],
-  ["console.log type arguments", 'console.log<string>("value");'],
-] as const;
+const unsupportedForms = [["property", "console.error(1);"]] as const;
 
 for (const [name, source] of unsupportedForms) {
   test(`rejects unsupported ${name} syntax`, () => {
@@ -1650,7 +1634,7 @@ test("rejects a static import as a Script grammar error", () => {
   assert.equal(result.mir, undefined);
 });
 
-test("rejects constructor type arguments instead of erasing them", () => {
+test("erases constructor type arguments", () => {
   const result = compileSource(babelFrontend, {
     source: [
       "function Box(value: number) { return value; }",
@@ -1658,8 +1642,8 @@ test("rejects constructor type arguments instead of erasing them", () => {
     ].join(" "),
     sourceId: "constructor-type-arguments.ts",
   });
-  assert.equal(result.diagnostics[0]?.code, "OSEO1001");
-  assert.match(result.diagnostics[0]?.message ?? "", /Constructor type/u);
+  assert.deepEqual(result.diagnostics, []);
+  assert.ok(result.mir != null);
 });
 
 const lineTerminators = [

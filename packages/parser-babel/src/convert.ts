@@ -1493,14 +1493,6 @@ export function bindingPattern(
       "Only identifier, array, and object binding patterns are supported.",
     );
   }
-  const annotation = node(value.typeAnnotation);
-  if (annotation != null) {
-    return unsupported(
-      context,
-      annotation,
-      "TypeScript annotations on binding patterns are unsupported.",
-    );
-  }
   if (value.type === "ObjectPattern") {
     const properties: SyntaxObjectBindingPattern<
       SyntaxAssignmentPattern,
@@ -1785,22 +1777,6 @@ function annotationPropertyName(value: BabelNode): string | undefined {
   return undefined;
 }
 
-function annotationHasConcreteType(typeNode: BabelNode): boolean {
-  return (
-    typeNode.type === "TSAnyKeyword" ||
-    typeNode.type === "TSBooleanKeyword" ||
-    typeNode.type === "TSNullKeyword" ||
-    typeNode.type === "TSNumberKeyword" ||
-    typeNode.type === "TSStringKeyword" ||
-    typeNode.type === "TSUndefinedKeyword" ||
-    typeNode.type === "TSUnknownKeyword" ||
-    typeNode.type === "TSLiteralType" ||
-    typeNode.type === "TSTypeLiteral" ||
-    typeNode.type === "TSArrayType" ||
-    typeNode.type === "TSTupleType"
-  );
-}
-
 /**
  * Index required noncomputed members once for one object binding pattern.
  *
@@ -1962,15 +1938,13 @@ function annotationArrayRestType(
  * Map syntactically visible tuple, array, and object type members to the
  * binding leaves they describe without invoking TypeScript's type checker.
  *
- * Root container mismatches and types without a concrete syntactic shape
- * retain owned diagnostics. A concrete nested container mismatch stops only
- * that subtree's mapping.
+ * Container mismatches and types without a concrete syntactic shape stop
+ * only that subtree's mapping; the annotation still erases.
  */
 function bindingPatternTypeHints(
   context: ConvertContext,
   pattern: SyntaxBindingPattern,
   annotationValue: BabelNodeValue,
-  atRoot = true,
 ): SyntaxBindingPattern {
   const typeNode = annotationType(annotationValue);
   if (typeNode == null) return pattern;
@@ -1983,13 +1957,6 @@ function bindingPatternTypeHints(
   }
   if (pattern.kind === "object-binding-pattern") {
     if (typeNode.type !== "TSTypeLiteral") {
-      if (atRoot || !annotationHasConcreteType(typeNode)) {
-        unsupported(
-          context,
-          typeNode,
-          "An object binding annotation must be an inline object type.",
-        );
-      }
       return pattern;
     }
     const propertyTypes = annotationPropertyTypes(typeNode);
@@ -2010,20 +1977,12 @@ function bindingPatternTypeHints(
                 context,
                 property.pattern,
                 propertyType,
-                false,
               ),
             };
       }),
     };
   }
   if (typeNode.type !== "TSArrayType" && typeNode.type !== "TSTupleType") {
-    if (atRoot || !annotationHasConcreteType(typeNode)) {
-      unsupported(
-        context,
-        typeNode,
-        "An array binding annotation must be an array or tuple type.",
-      );
-    }
     return pattern;
   }
   const arrayTypes = annotationArrayTypes(typeNode);
@@ -2041,7 +2000,6 @@ function bindingPatternTypeHints(
               context,
               element.pattern,
               elementType,
-              false,
             ),
           };
     }),
@@ -2052,7 +2010,6 @@ function bindingPatternTypeHints(
           context,
           pattern.rest,
           annotationArrayRestType(arrayTypes, pattern.elements.length),
-          false,
         ),
       };
     }),
@@ -4210,7 +4167,7 @@ export function functionDeclaration(
     ...includePropertiesWhen(() => {
       if (sourceStart == null || value.end == null) return undefined;
       return {
-        sourceText: context.input.source.slice(sourceStart, value.end),
+        sourceText: context.sourceText(sourceStart, value.end),
       };
     }),
     ...includePropertiesWhen(() => {
@@ -4565,7 +4522,7 @@ export function classExpression(
   const classSource =
     value.start == null || value.end == null
       ? undefined
-      : context.input.source.slice(value.start, value.end);
+      : context.sourceText(value.start, value.end);
   const selectedConstructor = constructorFunction ?? implicitConstructor;
   const classConstructor =
     classSource == null

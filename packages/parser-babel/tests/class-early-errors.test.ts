@@ -154,16 +154,6 @@ test("constructor-named elements keep their distinct class roles", () => {
 test("unrelated profile rejections retain unsupported diagnostics", () => {
   const cases: readonly (readonly [string, string, string])[] = [
     [
-      "class Example<T> {}",
-      "Generic classes are unsupported.",
-      "class Example<T> {}",
-    ],
-    [
-      "class Example { readonly value = 1; }",
-      "TypeScript class field modifiers are unsupported.",
-      "readonly value = 1;",
-    ],
-    [
       "import('module');",
       "ImportExpression is outside the M1 profile.",
       "import('module')",

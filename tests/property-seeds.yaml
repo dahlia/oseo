@@ -684,3 +684,7 @@ families:
     owner: tests/property/import-operation.property.test.ts
     start: 0x6000ac00
     end: 0x6000acff
+  - family: erasable-typescript
+    owner: tests/property/erasable-typescript.property.test.ts
+    start: 0x6000ad00
+    end: 0x6000adff

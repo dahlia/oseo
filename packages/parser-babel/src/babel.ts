@@ -9,6 +9,7 @@ import type {
 } from "@oseo/compiler";
 
 export interface ParserError {
+  readonly reasonCode?: string;
   readonly pos?: number;
   readonly position?: number;
   readonly raisedAt?: number;
@@ -91,6 +92,8 @@ export interface ConvertOptions {
 }
 
 export interface ConvertContext {
+  /** Runtime reflection text; parsing input retains original UTF-16 offsets. */
+  readonly sourceText: (start: number, end: number) => string;
   readonly diagnostics: Diagnostic[];
   readonly input: SourceInput;
   readonly locations: SourceIndex;

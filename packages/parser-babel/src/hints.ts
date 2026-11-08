@@ -6,7 +6,7 @@ import {
   type BabelNodeValue,
   type ConvertContext,
 } from "./babel.ts";
-import { sourceRange, unsupported } from "./locations.ts";
+import { sourceRange } from "./locations.ts";
 
 const hintNames: ReadonlyMap<string, HintName> = new Map<string, HintName>([
   ["TSAnyKeyword", "any"],
@@ -36,7 +36,6 @@ export function typeHint(
     if (literal?.type === "NullLiteral") name = "null";
   }
   if (name == null) {
-    unsupported(context, typeNode, "This TypeScript type is not an M1 hint.");
     return undefined;
   }
   return {

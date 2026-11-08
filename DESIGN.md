@@ -591,21 +591,21 @@ classic `for` declaration heads reuse the mapping.
 Optional members remain unhinted. Array element types continue through
 unambiguous nested array rest targets. Direct fixed-length tuple spreads expand
 before mapping, so their members and following suffix retain their syntactic
-positions. Expanded members follow the ordinary primitive-hint and
-unsupported-type rules.
+positions. Expanded members follow the ordinary primitive-hint rules; other
+member types remain unhinted.
 
 Variadic array rests and type-reference spreads remain unhinted where their
 length makes a position ambiguous. Object targets inside an array rest remain
 unhinted. Object member types map only through noncomputed source properties,
 so even a computed literal key remains unhinted.
 
-An annotation that requires type resolution remains an owned unsupported
-boundary. When an inline annotation's container shape disagrees with a nested
-binding subtree, mapping stops only for that subtree and leaves its binding
-leaves unhinted without a diagnostic. Sibling mappings continue. A root
-container mismatch, a type reference that requires alias or interface
-resolution, or another type without an admitted concrete syntactic shape remain
-source-located unsupported boundaries.
+Annotations that require type resolution erase without hints. When an inline
+annotation's container shape disagrees with a binding subtree, mapping stops
+only for that subtree and leaves its binding leaves unhinted without a
+diagnostic. Sibling mappings continue. The same rule applies to root container
+mismatches. The
+[erasable TypeScript family](./docs/language-profile-es2026/families/erasable-typescript.yaml)
+records the source-language boundary independently from the hint vocabulary.
 
 When a parameter list contains an expression, a body `var` that shares a
 parameter name receives a distinct body cell initialized from an outer copy of

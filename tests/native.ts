@@ -87,6 +87,7 @@ import * as agentFixtures from "./native/fixtures/atomics-and-shared-memory.ts";
 import { blockingAgentFixture } from "./native/fixtures/non-blocking-agent.ts";
 import { crossRealmFixtures } from "./native/fixtures/cross-realm.ts";
 import { weakCollectionFixtures } from "./native/fixtures/weak-collections.ts";
+import * as erasable from "./native/fixtures/erasable-typescript.ts";
 import {
   withGetBindingValueExpected,
   withGetBindingValueSource,
@@ -261,6 +262,7 @@ const fixtures: readonly Fixture[] = [
   residualValueOracleFixture,
   records.completionRecordOracleFixture,
   ...functionFixtures,
+  ...erasable.erasableTypeScriptFixtures,
   ...callableCases,
   ...ds22BoundaryCoreFixtures,
   cs.constructionStaticFixture,
@@ -1402,6 +1404,7 @@ for (const fixture of selectedFixtures) {
     fixture.name === "typed-array-core" ||
     fixture.name === "shared-array-buffer" ||
     fixture.name === "atomics-single-agent" ||
+    fixture.name === "erasable-typescript" ||
     fixture.name === "agent-default-blocking-policy" ||
     fixture.name === "agent-cluster-broadcast" ||
     fixture.name === "agent-wait-notify" ||
@@ -1551,6 +1554,7 @@ for (const fixture of selectedFixtures) {
     fixture.name === "typed-array-core" ||
     fixture.name === "shared-array-buffer" ||
     fixture.name === "atomics-single-agent" ||
+    fixture.name === "erasable-typescript" ||
     fixture.name === "agent-default-blocking-policy" ||
     fixture.name === "agent-cluster-broadcast" ||
     fixture.name === "agent-wait-notify" ||
@@ -1929,6 +1933,7 @@ for (const fixture of selectedFixtures) {
             fixture.name === "typed-array-core" ||
             fixture.name === "shared-array-buffer" ||
             fixture.name === "atomics-single-agent" ||
+            fixture.name === "erasable-typescript" ||
             fixture.name === "typed-array-iterative" ||
             fixture.name === "typed-array-search-and-join" ||
             fixture.name === "typed-array-mutation" ||

@@ -1211,13 +1211,13 @@ test("converts an optional catch binding to owned syntax", () => {
   assert.doesNotMatch(mir, /caught catch parameter/u);
 });
 
-test("rejects ambient declare declarations", () => {
+test("erases ambient declare declarations", () => {
   const result = compileSource(babelFrontend, {
     source: "declare var ambient: number;",
     sourceId: "declare-var.ts",
   });
-  assert.equal(result.diagnostics[0]?.code, "OSEO1001");
-  assert.match(result.diagnostics[0]?.message ?? "", /Ambient declarations/u);
+  assert.deepEqual(result.diagnostics, []);
+  assert.ok(result.mir != null);
 });
 
 test("keeps module var hoisting ahead of earlier assignments", () => {

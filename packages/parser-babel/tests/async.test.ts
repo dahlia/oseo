@@ -144,13 +144,11 @@ test("preserves async returns and bindings across await", () => {
 
 test("validates unreachable async statements", () => {
   const loop = compileSource(babelFrontend, {
-    source:
-      "async function invalid() { return 1; " +
-      "class Later { [key: string]: number; } }",
+    source: "async function invalid() { return 1; enum Later { Value } }",
     sourceId: "async-unreachable-loop.ts",
   });
   assert.equal(loop.mir, undefined);
-  assert.match(loop.diagnostics[0]?.message ?? "", /class element/u);
+  assert.match(loop.diagnostics[0]?.message ?? "", /runtime transformation/u);
 
   const awaitValue = compileSource(babelFrontend, {
     source: "async function invalid() { throw 1; if (true) await 0; }",
@@ -162,11 +160,14 @@ test("validates unreachable async statements", () => {
   const continuation = compileSource(babelFrontend, {
     source:
       "async function invalid() { await 0; return 1; " +
-      "class Later { [key: string]: number; } }",
+      "enum Later { Value } }",
     sourceId: "async-unreachable-continuation.ts",
   });
   assert.equal(continuation.mir, undefined);
-  assert.match(continuation.diagnostics[0]?.message ?? "", /class element/u);
+  assert.match(
+    continuation.diagnostics[0]?.message ?? "",
+    /runtime transformation/u,
+  );
 });
 
 test("admits nested async await operands", () => {
@@ -226,14 +227,14 @@ test("lowers timer globals while preserving lexical shadowing", () => {
   );
 });
 
-test("rejects type-only imports instead of creating runtime bindings", () => {
+test("erases type-only imports without creating runtime bindings", () => {
   const result = babelModuleFrontend.parseModule({
     source: 'import type { Model } from "./types.ts";',
     sourceId: "file:///app/main.ts",
   });
-  assert.equal(result.parsed, false);
-  assert.equal(result.diagnostics[0]?.code, "OSEO1001");
-  assert.match(result.diagnostics[0]?.message ?? "", /Type-only imports/u);
+  assert.equal(result.parsed, true);
+  assert.ok(result.module != null);
+  assert.deepEqual(result.module.imports, []);
 });
 
 test("retains static attributes as owned module request metadata", () => {
