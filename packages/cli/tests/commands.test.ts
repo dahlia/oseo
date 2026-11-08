@@ -1,3 +1,5 @@
+import { resolve } from "node:path";
+import { pathToFileURL } from "node:url";
 import assert from "node:assert/strict";
 import test from "node:test";
 import type {
@@ -87,7 +89,7 @@ test("root and run use checked temporary execution", async () => {
     const result = await runNativeCli(
       { ...request, args },
       state.host,
-      state.toolchain,
+      { ...state.toolchain, buildConfiguration: "optimized" },
       state.publisher,
     );
     assert.equal(result.exitStatus, 0, result.stderr);
@@ -391,10 +393,12 @@ test("root reservation permits command names as option values", async () => {
 });
 
 test("build diagnoses invalid source URLs before host effects", async () => {
+  const directory = new URL(".", pathToFileURL(resolve("entry.ts")));
+  const encodedSlash = new URL("a%2Fb.ts", directory).href;
   for (const source of [
-    "file:///tmp/a%2Fb.ts",
-    "FILE:///tmp/a%2Fb.ts",
-    "file:///tmp/bad%ZZ.ts",
+    encodedSlash,
+    encodedSlash.replace(/^file:/u, "FILE:"),
+    new URL("bad%ZZ.ts", directory).href,
   ]) {
     for (const output of [[], ["--output", "program"]]) {
       const state = fixture();
@@ -416,16 +420,36 @@ test("build diagnoses invalid source URLs before host effects", async () => {
 });
 
 test("build decodes file URL stems regardless of scheme case", async () => {
+  const sourceUrl = pathToFileURL(resolve("hello world.ts")).href;
   for (const scheme of ["file:", "FILE:", "FiLe:"]) {
     const state = fixture();
     // eslint-disable-next-line no-await-in-loop -- Verify each URL spelling.
     const result = await runNativeCli(
-      { ...request, args: ["build", `${scheme}///tmp/hello%20world.ts`] },
+      { ...request, args: ["build", sourceUrl.replace(/^file:/u, scheme)] },
       state.host,
       state.toolchain,
       state.publisher,
     );
     assert.equal(result.exitStatus, 0, result.stderr);
     assert.equal(state.inspections[0]?.path, "hello world");
+  }
+});
+
+test("explicit run configuration overrides defaults", async () => {
+  for (const command of [[], ["run"]]) {
+    const state = fixture();
+    // eslint-disable-next-line no-await-in-loop -- Compare root and run.
+    const result = await runNativeCli(
+      {
+        ...request,
+        args: [...command, "entry.ts", "--build-config", "optimized"],
+      },
+      state.host,
+      { ...state.toolchain, buildConfiguration: "checked" },
+      state.publisher,
+    );
+    assert.equal(result.exitStatus, 0, result.stderr);
+    assert.equal(state.builds[0]?.buildConfiguration, "optimized");
+    assert.equal(result.executed, true);
   }
 });

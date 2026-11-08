@@ -17,6 +17,7 @@ import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
 import { randomUUID } from "node:crypto";
 import { pathToFileURL } from "node:url";
+import { platform } from "node:process";
 
 import { createPublicationWithFiles } from "../src/executable-publication.ts";
 
@@ -43,10 +44,12 @@ test("publishes unchanged bytes and linker permission bits", async () => {
     const output = join(directory, "output");
     await writeFile(linked, elf);
     await chmod(linked, 0o751);
+    const linkedMode = (await lstat(linked)).mode & 0o7777;
+    if (platform !== "win32") assert.equal(linkedMode, 0o751);
     const destination = await publisher.inspect(output, [linked]);
     await publisher.publish(linked, destination);
     assert.deepEqual(await readFile(output), elf);
-    assert.equal((await lstat(output)).mode & 0o777, 0o751);
+    assert.equal((await lstat(output)).mode & 0o7777, linkedMode);
     assert.deepEqual((await readdir(directory)).toSorted(), [
       "linked",
       "output",

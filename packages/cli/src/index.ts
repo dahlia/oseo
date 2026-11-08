@@ -1217,6 +1217,14 @@ async function requirePinnedToolchain(
   }
 }
 
+interface NativeWorkflowOptions {
+  readonly buildConfiguration: NativeBuildConfiguration;
+  readonly publication?: {
+    readonly publisher: ExecutablePublisher;
+    readonly destination: ExecutableDestination;
+  };
+}
+
 async function executeNativeWorkflow(
   host: CompilerHost,
   sourceId: string,
@@ -1225,14 +1233,8 @@ async function executeNativeWorkflow(
   target: TargetDescription,
   archiveReuse: CliInvocation["runtimeArchiveReuse"],
   toolchain: NativeToolchain,
-  prepared?: PreparedNativeRuntime,
-  options: {
-    readonly buildConfiguration: NativeBuildConfiguration;
-    readonly publication?: {
-      readonly publisher: ExecutablePublisher;
-      readonly destination: ExecutableDestination;
-    };
-  } = { buildConfiguration: toolchain.buildConfiguration ?? "checked" },
+  prepared: PreparedNativeRuntime | undefined,
+  options: NativeWorkflowOptions,
 ): Promise<CliResult> {
   const { buildConfiguration, publication } = options;
   const units = "sources" in input ? input : undefined;
@@ -1628,37 +1630,6 @@ export async function executeCliInvocation(
   if (invalid != null) return diagnosticResult(invalid);
   const parsed = { value: invocation };
   const sourceId = request.sourceId ?? parsed.value.sourceId;
-  if (
-    parsed.value.mode !== "execute" &&
-    parsed.value.buildConfiguration != null
-  ) {
-    return diagnosticResult(
-      hostDiagnostic(
-        sourceId,
-        "The --build-config option applies only to native execution.",
-      ),
-    );
-  }
-  if (parsed.value.mode !== "execute" && parsed.value.target != null) {
-    return diagnosticResult(
-      hostDiagnostic(
-        sourceId,
-        "The --target option applies only to native execution.",
-      ),
-    );
-  }
-  if (
-    parsed.value.mode !== "execute" &&
-    parsed.value.runtimeArchiveReuse === "disabled"
-  ) {
-    return diagnosticResult(
-      hostDiagnostic(
-        sourceId,
-        "The --no-runtime-archive-reuse option applies only to native " +
-          "execution.",
-      ),
-    );
-  }
   const selected =
     parsed.value.mode === "execute"
       ? parsed.value.command === "build" && parsed.value.target != null
@@ -1668,7 +1639,7 @@ export async function executeCliInvocation(
   if (selected != null && "diagnostic" in selected) {
     return diagnosticResult(selected.diagnostic);
   }
-  let publication;
+  let publication: NativeWorkflowOptions["publication"];
   if (parsed.value.command === "build" && parsed.value.mode === "execute") {
     let destination = parsed.value.output ?? parsed.value.sourceId;
     try {
@@ -1870,10 +1841,11 @@ export async function executeCliInvocation(
       toolchain,
       undefined,
       {
-        buildConfiguration: parsed.value.buildConfiguration ??
+        buildConfiguration:
+          parsed.value.buildConfiguration ??
           (parsed.value.command === "build" ? "optimized" : "checked"),
         ...includePropertiesWhen(() =>
-          publication == null ? undefined : { publication }
+          publication == null ? undefined : { publication },
         ),
       },
     );

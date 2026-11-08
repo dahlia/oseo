@@ -79,11 +79,12 @@ defaults to `checked`; `build` defaults to `optimized`. Unknown options,
 duplicate options, a missing source path, and extra positional arguments are
 rejected before Oseo reads or compiles the source file.
 
-The `checked` configuration keeps the target's sanitizer requests. `--build-config optimized` compiles generated C and the runtime
-with `-O2` and disables sanitizers. Both configurations disable floating-point
-contraction and preserve JavaScript behavior. The MIR and C text modes reject
-`--build-config` because their output is configuration-neutral. Runtime archives
-and harness objects have separate cache identities for each configuration.
+The `checked` configuration keeps the target's sanitizer requests.
+`--build-config optimized` compiles generated C and the runtime with `-O2` and
+disables sanitizers. Both configurations disable floating-point contraction and
+preserve JavaScript behavior. The MIR and C text modes reject `--build-config`
+because their output is configuration-neutral. Runtime archives and harness
+objects have separate cache identities for each configuration.
 [ADR 0036](./adr/0036-optimized-native-build-configuration.md) defines the
 compiler options and verification gates.
 

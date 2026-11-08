@@ -1,3 +1,4 @@
+import type { NativeBuildConfiguration } from "@oseo/compiler";
 import { object, or } from "@optique/core/constructs";
 import { message } from "@optique/core/message";
 import { map, optional, withDefault } from "@optique/core/modifiers";
@@ -10,7 +11,7 @@ import type { ProgramHookContext } from "@optique/discover/command";
 export interface CliInvocation {
   readonly command: "run" | "build";
   readonly mode: "execute" | "dump-mir" | "emit-c";
-  readonly buildConfiguration: "checked" | "optimized" | undefined;
+  readonly buildConfiguration: NativeBuildConfiguration | undefined;
   readonly programArgs: readonly string[];
   readonly output: string | undefined;
   readonly module: boolean;
