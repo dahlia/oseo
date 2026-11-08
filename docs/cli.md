@@ -38,15 +38,17 @@ Command syntax
 --------------
 
 ~~~~ text
-oseo [RUN_OPTIONS] SOURCE
-oseo run [RUN_OPTIONS] SOURCE
+oseo [RUN_OPTIONS] SOURCE [-- ARGS...]
+oseo run [RUN_OPTIONS] SOURCE [-- ARGS...]
 oseo build [BUILD_OPTIONS] SOURCE
 oseo --help
 oseo --version
 ~~~~
 
 `SOURCE` is the path of one JavaScript or TypeScript script or module entry.
-Oseo reads the file from that path; standard input and `-` are not supported.
+The source must be a file; `-` does not select standard input. A running
+program can read its standard input through `readFileSync(0)` from
+`node:fs`.
 Options may appear before or after the source path. `run` compiles and
 executes a temporary program; the root shortcut uses the same workflow.
 `build` retains an executable without starting it.
@@ -344,3 +346,41 @@ performs type checking.
 
 Run `oseo --help` when scripting the command. Its usage and option descriptions
 come from the same grammar that parses each invocation.
+
+
+Program input and exit status
+-----------------------------
+
+The initial realm exposes `process.argv`, `process.env`, `process.exitCode`,
+`process.exit()`, `process.stdout.write()`, and `process.stderr.write()`.
+`process.argv.slice(2)` contains the program's user arguments. Element 0 is the
+executable's absolute path; element 1 is its path as invoked, following Node.js
+single executable applications. `process.env` is an ordinary snapshot:
+assigning a value stores that value without converting it to a string, unlike
+Node.js.
+
+`node:process` exports the process object as its default and `argv`, `env`,
+`exit`, `stdout`, and `stderr` as named exports. `node:fs` exports
+`readFileSync`, also available on its default object. It accepts file
+descriptor 0 and returns a `Uint8Array` when no encoding is given, or text when
+the encoding is `"utf8"` or `"utf-8"`. Text preserves a leading BOM and
+replaces invalid UTF-8. After EOF, repeated reads return an empty `Uint8Array`
+or an empty string, depending on the encoding.
+
+Stream writes accept a string or a `Uint8Array`, run synchronously, and
+return `true`. String writes use UTF-8 and replace lone surrogates.
+Normal completion waits for scheduled work and uses `process.exitCode`
+modulo 256, or 0 when it is unset. `process.exit()` flushes output and ends
+immediately without running a `finally` block or pending jobs. Uncaught
+exceptions, unhandled rejections, and runtime diagnostics give exit status 1.
+[ADR 0038] records the validation rules, unsupported forms, and deviations from
+Node.js and Deno.
+
+The executable inherits stdin, stdout and stderr for the user program. The
+native process owns those descriptors, including closed-pipe behavior, and
+the CLI does not capture or print its output again. Library calls capture
+output by default; `inheritOutput` selects inherited stdout and stderr and
+returns empty output strings. Combining inherited stdin with explicit
+`input`, or inherited output with `captureBytes`, throws a `TypeError`.
+
+[ADR 0038]: ./adr/0038-process-input-and-exit-subset.md

@@ -233,7 +233,9 @@ test("JSON grammar never becomes JavaScript and keeps data keys", async () => {
     '{"__proto__":{"x":1},"x":1,"x":2,"zero":-0}',
   );
   assert.deepEqual(result.diagnostics, []);
-  const declaration = result.graph?.modules[1]?.syntax.exports[0];
+  const node = result.graph?.modules[1];
+  assert.ok(node != null && node.moduleKind !== "builtin");
+  const declaration = node.syntax.exports[0];
   assert.equal(declaration?.kind, "default");
   if (declaration?.kind !== "default") return;
   const expression = declaration.declaration;

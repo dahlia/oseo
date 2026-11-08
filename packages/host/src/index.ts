@@ -1,3 +1,5 @@
+import { builtinModuleExports, isBuiltinModuleSpecifier } from "@oseo/compiler";
+
 import type {
   CompilerCache,
   CompilerCacheLock,
@@ -18,10 +20,17 @@ import {
   renameClaimedCacheLockDirectory,
 } from "./cache-files.ts";
 
+import { validateProcessStreams } from "./spawn-protocol.ts";
+
 function includePropertiesWhen<const Properties extends object>(
   properties: () => Properties | undefined,
 ): Properties | { [Key in keyof Properties]?: never } {
   return properties() ?? {};
+}
+
+/** Text requests encode once; byte requests retain their original bytes. */
+function isTextProcessInput(value: string | Uint8Array): value is string {
+  return typeof value === "string";
 }
 
 /** Normalize Node.js or Deno platform facts at the concrete host boundary. */
@@ -53,8 +62,14 @@ interface DenoCommandOutput {
   readonly stdout: Uint8Array;
 }
 
+interface DenoCommandChild {
+  readonly output: () => Promise<DenoCommandOutput>;
+  readonly stdin: WritableStream<Uint8Array>;
+}
+
 interface DenoCommandInstance {
   output(): Promise<DenoCommandOutput>;
+  spawn(): DenoCommandChild;
 }
 
 interface DenoCommandOptions {
@@ -62,8 +77,9 @@ interface DenoCommandOptions {
   readonly clearEnv?: boolean;
   readonly cwd: string;
   readonly env?: Readonly<Record<string, string>>;
-  readonly stderr: "piped";
-  readonly stdout: "piped";
+  readonly stderr: "piped" | "inherit";
+  readonly stdin?: "piped" | "inherit" | "null";
+  readonly stdout: "piped" | "inherit";
 }
 
 interface DenoCommandConstructor {
@@ -916,11 +932,40 @@ export function hashModuleSource(source: string): string {
 }
 
 /** Load canonical file URLs through one explicit compiler host. */
-export function createFileModuleLoader(host: CompilerHost): ModuleLoader {
+export function createFileModuleLoader(
+  host: CompilerHost,
+  runtimeAbiVersion = "m5-160",
+): ModuleLoader {
   return {
     async load(canonicalId, referrer) {
+      if (isBuiltinModuleSpecifier(canonicalId)) {
+        return {
+          diagnostics: [],
+          builtin: {
+            kind: "builtin",
+            specifier: canonicalId,
+            sourceHash: hashModuleSource(
+              JSON.stringify({
+                exports: builtinModuleExports[canonicalId],
+                runtimeAbiVersion,
+              }),
+            ),
+          },
+        };
+      }
       const diagnosticSourceId = referrer?.importerId ?? canonicalId;
       const diagnosticSpecifier = referrer?.specifier;
+      if (canonicalId.startsWith("node:")) {
+        return {
+          diagnostics: [
+            moduleDiagnostic(
+              diagnosticSourceId,
+              diagnosticSpecifier,
+              "Only node:process and node:fs builtin modules are supported.",
+            ),
+          ],
+        };
+      }
       let url: URL;
       try {
         url = new URL(canonicalId);
@@ -976,6 +1021,20 @@ export function createFileModuleLoader(host: CompilerHost): ModuleLoader {
 /** Resolve the relative file specifiers frozen by the M4 profile. */
 export const fileModuleResolver: ModuleResolver = {
   resolve(importerId, specifier) {
+    if (isBuiltinModuleSpecifier(specifier.value)) {
+      return { canonicalId: specifier.value, diagnostics: [] };
+    }
+    if (specifier.value.startsWith("node:")) {
+      return {
+        diagnostics: [
+          moduleDiagnostic(
+            importerId,
+            specifier,
+            "Only node:process and node:fs builtin modules are supported.",
+          ),
+        ],
+      };
+    }
     if (
       !specifier.value.startsWith("./") &&
       !specifier.value.startsWith("../")
@@ -1101,6 +1160,7 @@ export function createNodeHost(options: NodeHostOptions = {}): NodeHost {
       await rm(path, { force: true, recursive: true });
     },
     async run(request: ProcessRequest): Promise<ProcessObservation> {
+      validateProcessStreams(request);
       if (delegate != null) return await (await delegate).run(request);
       const { spawn } = await import("node:child_process");
       return await new Promise((resolve, reject) => {
@@ -1108,18 +1168,41 @@ export function createNodeHost(options: NodeHostOptions = {}): NodeHost {
         const child = spawn(request.command, [...request.args], {
           cwd: request.cwd,
           env: environment?.variables ?? process.env,
-          stdio: ["ignore", "pipe", "pipe"],
+          stdio: [
+            request.input == null && request.inheritStdin ? "inherit" : "pipe",
+            request.inheritOutput ? "inherit" : "pipe",
+            request.inheritOutput ? "inherit" : "pipe",
+          ],
         });
+        if (
+          !request.inheritOutput &&
+          (child.stdout == null || child.stderr == null)
+        ) {
+          throw new Error("Process output pipes are unavailable.");
+        }
         const stdout: Uint8Array[] = [];
         const stderr: Uint8Array[] = [];
-        child.stdout.on("data", (chunk: Uint8Array) => stdout.push(chunk));
-        child.stderr.on("data", (chunk: Uint8Array) => stderr.push(chunk));
+        child.stdout?.on("data", (chunk: Uint8Array) => stdout.push(chunk));
+        child.stderr?.on("data", (chunk: Uint8Array) => stderr.push(chunk));
+        // A program may exit before consuming all input. Its status and
+        // output remain authoritative when the input pipe closes early.
+        child.stdin?.on("error", (error: NodeJS.ErrnoException) => {
+          if (error.code !== "EPIPE") reject(error);
+        });
+        child.stdin?.end(request.input);
         child.on("error", reject);
         child.on("close", (code) => {
           resolve({
             exitStatus: code ?? 1,
             stderr: Buffer.concat(stderr).toString("utf8"),
             stdout: Buffer.concat(stdout).toString("utf8"),
+            ...includePropertiesWhen(() => {
+              if (!request.captureBytes) return undefined;
+              return {
+                stdoutBytes: new Uint8Array(Buffer.concat(stdout)),
+                stderrBytes: new Uint8Array(Buffer.concat(stderr)),
+              };
+            }),
           });
         });
       });
@@ -1134,7 +1217,7 @@ export function createNodeHost(options: NodeHostOptions = {}): NodeHost {
 /** Create the Deno implementation of compiler host operations. */
 export function createDenoHost(): CompilerHost {
   const runtime = denoRuntime();
-  const decoder = new TextDecoder();
+  const decoder = new TextDecoder("utf-8", { ignoreBOM: true });
   return {
     cache: createDenoCache(runtime),
     captureEnvironment(policy) {
@@ -1212,6 +1295,7 @@ export function createDenoHost(): CompilerHost {
       await runtime.remove(path, { recursive: true });
     },
     async run(request: ProcessRequest): Promise<ProcessObservation> {
+      validateProcessStreams(request);
       const environment = request.environment;
       const command = new runtime.Command(request.command, {
         args: request.args,
@@ -1223,14 +1307,50 @@ export function createDenoHost(): CompilerHost {
           };
         }),
         cwd: request.cwd,
-        stderr: "piped",
-        stdout: "piped",
+        ...includePropertiesWhen(() => {
+          if (request.input != null) return { stdin: "piped" as const };
+          if (request.inheritStdin) return { stdin: "inherit" as const };
+          return { stdin: "null" as const };
+        }),
+        stderr: request.inheritOutput ? "inherit" : "piped",
+        stdout: request.inheritOutput ? "inherit" : "piped",
       });
-      const output = await command.output();
+      let output: DenoCommandOutput;
+      if (request.input == null) {
+        output = await command.output();
+      } else {
+        const child = command.spawn();
+        const capture = child.output();
+        const writer = child.stdin.getWriter();
+        try {
+          await writer.write(
+            isTextProcessInput(request.input)
+              ? new TextEncoder().encode(request.input)
+              : request.input,
+          );
+          await writer.close();
+        } catch (error) {
+          // Deno uses BrokenPipe when the program exits without reading.
+          if (!(error instanceof Error) || error.name !== "BrokenPipe") {
+            await capture;
+            throw error;
+          }
+        } finally {
+          writer.releaseLock();
+        }
+        output = await capture;
+      }
       return {
         exitStatus: output.code,
-        stderr: decoder.decode(output.stderr),
-        stdout: decoder.decode(output.stdout),
+        stderr: request.inheritOutput ? "" : decoder.decode(output.stderr),
+        stdout: request.inheritOutput ? "" : decoder.decode(output.stdout),
+        ...includePropertiesWhen(() => {
+          if (!request.captureBytes) return undefined;
+          return {
+            stdoutBytes: output.stdout,
+            stderrBytes: output.stderr,
+          };
+        }),
       };
     },
     async writeTextFile(path: string, contents: string): Promise<void> {

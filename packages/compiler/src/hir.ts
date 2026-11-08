@@ -476,6 +476,7 @@ export function intrinsicGlobalKind(
     name === "Math" ||
     name === "Number" ||
     name === "Object" ||
+    name === "process" ||
     name === "Promise" ||
     name === "Proxy" ||
     name === "Reflect" ||
@@ -526,6 +527,7 @@ export function anonymousDefinition(expression: HirExpression): boolean {
 
 /** A resolved call target in HIR. */
 export type HirCallTarget =
+  | { readonly kind: "builtin-export" }
   | {
       /** A host Script binding can shadow an otherwise private call target. */
       readonly kind: "host-runtime-intrinsic";

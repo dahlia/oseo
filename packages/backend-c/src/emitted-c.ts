@@ -1518,14 +1518,15 @@ export const emittedC = {
       ["\n\n"],
       [""],
       [
-        "\nint main(void) {\n    OseoContext context;\n    O",
+        "\nint main(int argc, char **argv) {\n    OseoContext context;\n    O",
         "seoResult result;\n",
       ],
       [""],
       ['    oseo_context_init(\n        &context, "'],
       ['", '],
       [
-        "u);\n    oseo_context_set_function_dispatcher(\n  ",
+        "u);\n    oseo_process_start(&context, argc, argv);\n",
+        "    oseo_context_set_function_dispatcher(\n  ",
         "      &context, oseo_dispatch_function);\n",
       ],
       [""],
@@ -1548,7 +1549,10 @@ export const emittedC = {
         "ue);\n        oseo_context_destroy(&context);\n   ",
         "     return 1;\n    }\n",
       ],
-      ["    oseo_context_destroy(&context);\n    return 0", ";\n}\n"],
+      [
+        "    int status = oseo_process_finish(&context);\n",
+        "    oseo_context_destroy(&context);\n    return status;\n}\n",
+      ],
     ],
   },
 } as const;

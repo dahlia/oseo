@@ -77,6 +77,7 @@ test("keeps the reviewed ordered runtime asset list", () => {
       ["header", "runtime_unicode_tables.h"],
       ["source", "runtime_core.c"],
       ["source", "runtime_memory.c"],
+      ["source", "runtime_process.c"],
       ["source", "runtime_binding.c"],
       ["source", "runtime_string.c"],
       ["source", "runtime_string_match.c"],

@@ -690,3 +690,7 @@ families:
     owner: tests/property/erasable-typescript.property.test.ts
     start: 0x6000ad00
     end: 0x6000adff
+  - family: preview-process
+    owner: tests/property/preview-process.property.test.ts
+    start: 0x6000b000
+    end: 0x6000b0ff

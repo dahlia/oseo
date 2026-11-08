@@ -1,7 +1,7 @@
 import type { RuntimeInput, RuntimeInputProvider } from "@oseo/compiler";
 
 const runtimeInput: RuntimeInput = {
-  abiVersion: "m5-159",
+  abiVersion: "m5-160",
   assets: [
     {
       kind: "header",
@@ -27,6 +27,11 @@ const runtimeInput: RuntimeInput = {
       kind: "source",
       name: "runtime_memory.c",
       url: new URL("../native/runtime_memory.c", import.meta.url),
+    },
+    {
+      kind: "source",
+      name: "runtime_process.c",
+      url: new URL("../native/runtime_process.c", import.meta.url),
     },
     {
       kind: "source",

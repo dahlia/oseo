@@ -92,6 +92,14 @@ export interface ProcessRequest {
   readonly command: string;
   readonly cwd: string;
   readonly environment?: ProcessEnvironment;
+  /** Bytes or UTF-8 text written to stdin, then EOF; omission means EOF. */
+  readonly input?: string | Uint8Array;
+  /** Preserve output bytes as well as the legacy UTF-8 text observation. */
+  readonly captureBytes?: boolean;
+  /** Use the invoking terminal or pipe when no explicit input is supplied. */
+  readonly inheritStdin?: boolean;
+  /** Inherit stdout/stderr; observations then contain empty output strings. */
+  readonly inheritOutput?: boolean;
 }
 
 /** Host-independent subprocess observation. */
@@ -99,6 +107,9 @@ export interface ProcessObservation {
   readonly exitStatus: number;
   readonly stderr: string;
   readonly stdout: string;
+  /** Present when the request asks for byte-exact output capture. */
+  readonly stdoutBytes?: Uint8Array;
+  readonly stderrBytes?: Uint8Array;
 }
 
 /** Compiler configuration for the same native target. */

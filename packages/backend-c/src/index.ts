@@ -1653,6 +1653,12 @@ function emitCall(state: EmitState, operation: MirOperation): void {
         argumentsValue.count,
       ) + renderC(emittedC.common.callSuffix, argumentsValue.name),
     );
+  } else if (target.kind === "builtin-export") {
+    line(
+      state,
+      `result = oseo_builtin_export(context, ${argumentsValue.count}, ` +
+        `${argumentsValue.name});`,
+    );
   } else if (target.kind === "module-evaluate") {
     line(
       state,
@@ -5060,7 +5066,11 @@ function nativeSource(
   );
   source =
     source.replace(
-      /\n(int main\(void\)|OseoResult oseo_agent_program_\d+\()/u,
+      new RegExp(
+        String.raw`\n(int main\(int argc, char \*\*argv\)|` +
+          String.raw`OseoResult oseo_agent_program_\d+\()`,
+        "u",
+      ),
       "\n#if !defined(OSEO_C_BODY_UNIT) || OSEO_C_BODY_UNIT == 0\n$1",
     ) + "\n#endif\n";
   const compilationUnits = Array.from(

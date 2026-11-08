@@ -436,7 +436,8 @@ function printHirExpression(expression: HirExpression): string {
           ? `intrinsic Promise.${expression.target.method}`
           : expression.target.kind === "timer-intrinsic"
             ? `intrinsic ${expression.target.method}`
-            : expression.target.kind === "module-evaluate" ||
+            : expression.target.kind === "builtin-export" ||
+                expression.target.kind === "module-evaluate" ||
                 expression.target.kind === "module-import"
               ? `intrinsic ${expression.target.kind}`
               : expression.target.kind === "dynamic"

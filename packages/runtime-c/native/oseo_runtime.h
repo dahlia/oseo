@@ -448,7 +448,19 @@ typedef enum {
     OSEO_INTRINSIC_DISPOSABLE_STACK = 278,
     OSEO_INTRINSIC_ASYNC_DISPOSABLE_STACK_PROTOTYPE = 279,
     OSEO_INTRINSIC_ASYNC_DISPOSABLE_STACK = 280,
-    OSEO_INTRINSIC_COUNT = 281,
+    OSEO_INTRINSIC_PROCESS = 281,
+    OSEO_INTRINSIC_PROCESS_ARGV = 282,
+    OSEO_INTRINSIC_PROCESS_ENV = 283,
+    OSEO_INTRINSIC_PROCESS_STDOUT = 284,
+    OSEO_INTRINSIC_PROCESS_STDERR = 285,
+    OSEO_INTRINSIC_PROCESS_FS = 286,
+    OSEO_INTRINSIC_PROCESS_EXIT = 287,
+    OSEO_INTRINSIC_PROCESS_STDOUT_WRITE = 288,
+    OSEO_INTRINSIC_PROCESS_STDERR_WRITE = 289,
+    OSEO_INTRINSIC_PROCESS_READ_FILE_SYNC = 290,
+    OSEO_INTRINSIC_PROCESS_EXIT_CODE_GET = 291,
+    OSEO_INTRINSIC_PROCESS_EXIT_CODE_SET = 292,
+    OSEO_INTRINSIC_COUNT = 293,
 } OseoIntrinsic;
 
 typedef struct {
@@ -627,6 +639,13 @@ struct OseoContext {
      * Every realm of one context shares its heap, collector, job queues,
      * well-known symbols, and symbol registry (ADR 0027).
      */
+    /* Startup strings outlive the context; snapshots are traced intrinsics. */
+    int process_argc;
+    char **process_argv;
+    bool process_has_exit_code;
+    int32_t process_exit_code;
+    bool process_stdout_closed;
+    bool process_stderr_closed;
     OseoRealm initial_realm;
     OseoRealm *realm;
     OseoValue realm_record;
@@ -1041,6 +1060,17 @@ OseoValue oseo_null(void);
 OseoValue oseo_boolean(bool value);
 OseoValue oseo_number(double value);
 bool oseo_to_boolean(OseoValue value);
+
+/* Capture the native invocation before any user code can observe process. */
+void oseo_process_start(OseoContext *context, int argc, char **argv);
+/* Flush streams and select the normal-completion exit status. */
+int oseo_process_finish(OseoContext *context);
+/* Compiler-owned builtin export lookup; arguments are module/export indexes. */
+OseoResult oseo_builtin_export(
+    OseoContext *context,
+    size_t argument_count,
+    const OseoValue *arguments
+);
 
 OseoResult oseo_string_from_units(
     OseoContext *context,

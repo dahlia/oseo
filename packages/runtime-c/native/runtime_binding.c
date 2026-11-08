@@ -474,6 +474,10 @@ static OseoResult global_this_object(OseoContext *context) {
             frame.slots[0]
         );
     }
+    if (result.status == OSEO_STATUS_NORMAL &&
+        context->realm == &context->initial_realm) {
+        result = oseo_internal_install_process_global(context, frame.slots[0]);
+    }
     static const char *const intrinsic_names[] = {
         "Function",
         "Symbol",

@@ -91,6 +91,12 @@ void oseo_context_init(
     const char *source_id,
     size_t source_id_length
 ) {
+    context->process_argc = 0;
+    context->process_argv = NULL;
+    context->process_has_exit_code = false;
+    context->process_exit_code = 0;
+    context->process_stdout_closed = false;
+    context->process_stderr_closed = false;
     context->roots = NULL;
     context->objects = NULL;
     context->host_scripts = NULL;

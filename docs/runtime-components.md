@@ -22,57 +22,64 @@ symbol, and size differences introduced by the migration remain
 explainable.
 
 
+Preview process ownership
+-------------------------
+
+The program input and exit unit of ADR 0038 reserves builtin code range
+index 31 (256 IDs), intrinsic slots 281–312, and heap kinds 42–45.
+*runtime\_process.c* owns argument and environment snapshots, the initial
+realm's `process` object, the `node:process` and `node:fs` export values,
+standard input and output, and exit status. It uses existing ordinary
+objects and their traced property vectors. Slots 281–292 are used; no new
+heap kind is used. Slots 293–312 and heap kinds 42–45 remain reserved.
+
+The `process`, environment, `stdout`, `stderr`, and `fs` objects each own
+their initial property vector. There is no global property-number allocation.
+This unit adds no well-known symbol. The compiler owns builtin graph
+nodes and live export cells, and the CLI owns arguments after `--`.
+
+
 Component ownership after extraction
 ------------------------------------
 
-The runtime input now lists forty-six reviewed assets in this order:
+The runtime input now lists fifty-one reviewed assets in this order:
 *oseo\_runtime.h*, *runtime\_internal.h*,
 *runtime\_unicode\_tables.h*, *runtime\_core.c*,
-*runtime\_memory.c*, *runtime\_binding.c*, *runtime\_string.c*,
-*runtime\_string\_match.c*, *runtime\_object.c*, *runtime\_property.c*,
-*runtime\_descriptor.c*, *runtime\_array.c*, *runtime\_object\_builtin.c*,
-*runtime\_number.c*, *runtime\_boolean.c*, *runtime\_array\_buffer.c*,
-*runtime\_set.c*,
-*runtime\_typed\_array.c*, *runtime\_weak\_collection.c*,
-*runtime\_disposal.c*, *runtime\_arguments.c*,
+*runtime\_memory.c*, *runtime\_process.c*, *runtime\_binding.c*,
+*runtime\_string.c*, *runtime\_string\_match.c*, *runtime\_object.c*,
+*runtime\_property.c*, *runtime\_descriptor.c*, *runtime\_array.c*,
+*runtime\_object\_builtin.c*, *runtime\_number.c*, *runtime\_boolean.c*,
+*runtime\_array\_buffer.c*, *runtime\_set.c*, *runtime\_typed\_array.c*,
+*runtime\_weak\_collection.c*, *runtime\_disposal.c*, *runtime\_arguments.c*,
 *runtime\_enumeration.c*, *runtime\_function.c*, *runtime\_error.c*,
 *runtime\_symbol.c*, *runtime\_iterator.c*, *runtime\_generator.c*,
-*runtime\_async\_generator.c*, *runtime\_bigint.c*,
-*runtime\_primitive.c*, *runtime\_promise.c*,
-*runtime\_event\_loop.c*, *runtime\_clock.c*,
-*runtime\_clock\_posix.c*, *runtime\_map.c*,
-*runtime\_bigint\_object.c*, *runtime\_data\_view.c*,
-*runtime\_date.c*,
-*runtime\_regexp.c*, *runtime\_regexp\_matcher.c*,
-*runtime\_regexp\_symbol.c*, and
-*runtime\_math.c*, *runtime\_uri.c*, *runtime\_reflect.c*,
+*runtime\_async\_generator.c*, *runtime\_bigint.c*, *runtime\_primitive.c*,
+*runtime\_promise.c*, *runtime\_module.c*, *runtime\_event\_loop.c*,
+*runtime\_clock.c*, *runtime\_clock\_posix.c*, *runtime\_map.c*,
+*runtime\_bigint\_object.c*, *runtime\_data\_view.c*, *runtime\_date.c*,
+*runtime\_regexp.c*, *runtime\_regexp\_matcher.c*, *runtime\_regexp\_symbol.c*,
+and *runtime\_math.c*, *runtime\_uri.c*, *runtime\_reflect.c*,
 *runtime\_proxy.c*, *runtime\_json.c*, *runtime\_atomics.c*,
-*runtime\_agent.c*, and *runtime\_realm.c*. The M5
-named-error-intrinsics
-unit added *runtime\_error.c* as the first post-componentization
-component, and the symbol, iterator-protocol, generator,
-asynchronous-generator, BigInt, string-prototype-match-and-split,
-map-intrinsic, BigInt-intrinsic, DataView, RegExp-intrinsic,
-RegExp-prototype-and-exec, Math-namespace,
+*runtime\_agent.c*, and *runtime\_realm.c*. The M5 named-error-intrinsics unit
+added *runtime\_error.c* as the first post-componentization component, and the
+symbol, iterator-protocol, generator, asynchronous-generator, BigInt,
+string-prototype-match-and-split, map-intrinsic, BigInt-intrinsic, DataView,
+RegExp-intrinsic, RegExp-prototype-and-exec, Math-namespace,
 RegExp-symbol-methods, URI-handling-functions, Boolean-intrinsic,
-Reflect-namespace, Proxy-exotic-object, Date-family, JSON-parse,
-Set-intrinsic, TypedArray-constructor, single-agent Atomics,
-weak-collections, agent-cluster, and cross-realm units each
-added one
-component the same
-way. The M5b
-preparation unit then split the
-original *runtime\_object.c* into the eight object-family components
-listed above, so the standard built-in objects can be authored in
-parallel lanes instead of competing for one translation unit; that
-split moved code and promoted eleven file-local helpers to the internal
-header without changing behavior. Every addition follows the same
-ownership, include, and one-definition rules. No catch-all *runtime.c*
-remains, and no temporary forwarding helper was needed at any point in
-the migration. Each source compiles as its own translation unit and is
-archived in exactly this order. The symbols test in
-*packages/runtime-c/tests/symbols.test.ts* enforces the reviewed list,
-the include boundaries, and the one-definition rule on every change.
+Reflect-namespace, Proxy-exotic-object, Date-family, JSON-parse, Set-intrinsic,
+TypedArray-constructor, single-agent Atomics, weak-collections, agent-cluster,
+and cross-realm units each added one component the same way. The M5b
+preparation unit then split the original *runtime\_object.c* into the eight
+object-family components listed above, so the standard built-in objects can be
+authored in parallel lanes instead of competing for one translation unit; that
+split moved code and promoted eleven file-local helpers to the internal header
+without changing behavior. Every addition follows the same ownership, include,
+and one-definition rules. No catch-all *runtime.c* remains, and no temporary
+forwarding helper was needed at any point in the migration. Each source
+compiles as its own translation unit and is archived in exactly this order. The
+symbols test in *packages/runtime-c/tests/symbols.test.ts* enforces the
+reviewed list, the include boundaries, and the one-definition rule on every
+change.
 
 Ownership follows the plan's target layout:
 

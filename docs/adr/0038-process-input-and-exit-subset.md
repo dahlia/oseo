@@ -137,6 +137,14 @@ status 0 and its `process.stdout.write()` loop with status 1, as under
 Node.js. The other behaviors above were not checked under Deno; the
 differential tests do that.
 
+A separate pinned-host probe compared the named `stdout` and `stderr`
+exports of `node:process` with the properties of its default export.
+Node.js 24.21.0 reports equal identities for both. Deno 2.9.7 reports
+unequal identities for both, while repeated imports return the same module
+namespace object. The differential tests check that Oseo's exports have
+the same identities as in Node.js and record Deno's different results as
+separate expectations.
+
 The Node.js documentation shows `process.argv` in a single executable
 application as the executable's path, then the path as invoked, then the
 user arguments.

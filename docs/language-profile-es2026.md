@@ -1150,3 +1150,16 @@ expression. Node.js and Deno TypeScript sources use the same interpretation.
 These forms were previously rejected. The complete test262 update and
 compatibility gates must verify that the reviewed ECMAScript results remain
 unchanged.
+
+
+Preview host process subset
+---------------------------
+
+[ADR 0038](./adr/0038-process-input-and-exit-subset.md) adds `process` to the
+initial realm and admits `node:process` and `node:fs` as builtin graph
+nodes. These host APIs add no ECMA-262 compatibility result. The
+[*preview-process.yaml*](./language-profile-es2026/families/preview-process.yaml)
+family records their native, differential, generated, collector, and structural
+evidence. Deno's named `stdout` and `stderr` exports are not identical to the
+corresponding properties on the default process object; the tests record those
+observations separately from the Node.js identities that Oseo matches.

@@ -309,6 +309,7 @@ function isPropertyOwnedIntrinsicName(name: string): boolean {
     name === "NaN" ||
     name === "Number" ||
     name === "Object" ||
+    name === "process" ||
     name === "Promise" ||
     name === "Proxy" ||
     name === "Reflect" ||

@@ -349,6 +349,58 @@ test("separates private runtime counters from fixture stderr", async () => {
   });
 });
 
+test("preserves binary stderr and user counters", async () => {
+  const marker =
+    "OSEO_OBSERVATIONS " +
+    JSON.stringify({
+      guardHits: 1,
+      guardMisses: 2,
+      overflowMisses: 3,
+      genericAdditionCalls: 4,
+      allocations: 5,
+      collections: 6,
+    }) +
+    "\n";
+  const encoder = new TextEncoder();
+  const prefix = new Uint8Array([
+    ...encoder.encode(marker),
+    255,
+    0,
+    ...encoder.encode("tail"),
+  ]);
+  const text = new TextDecoder("utf-8", { ignoreBOM: true }).decode(prefix);
+  await Promise.all(
+    [false, true].map(async (observed) => {
+      const state = memoryHost([
+        { exitStatus: 0, stdout: "", stderr: "" },
+        {
+          exitStatus: 0,
+          stdout: "",
+          stderr: text + (observed ? marker : ""),
+          stdoutBytes: new Uint8Array(),
+          stderrBytes: new Uint8Array([
+            ...prefix,
+            ...(observed ? encoder.encode(marker) : []),
+          ]),
+        },
+      ]);
+      const options = fixtureOptions(state.host, ["compile"]);
+      await withNativeFixture(
+        {
+          ...options,
+          input: { ...options.input, observeSpecialization: observed },
+          execution: { captureBytes: true },
+        },
+        (native) => {
+          assert.equal(native.stderr, text);
+          assert.deepEqual(native.stderrBytes, prefix);
+          assert.equal(native.counters != null, observed);
+        },
+      );
+    }),
+  );
+});
+
 test("keeps a fixture's own thrown-marker text observable", async () => {
   // The runtime writes the thrown-value identity marker only on the
   // failure path, and a failed execution never becomes a fixture
