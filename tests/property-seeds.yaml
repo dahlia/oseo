@@ -684,6 +684,8 @@ families:
     owner: tests/property/import-operation.property.test.ts
     start: 0x6000ac00
     end: 0x6000acff
+  # 0x6000ad00: native invariance; 0x6000ad01: invalid continuations.
+  # 0x6000ad02: runtime relations after non-idempotent type stripping.
   - family: erasable-typescript
     owner: tests/property/erasable-typescript.property.test.ts
     start: 0x6000ad00

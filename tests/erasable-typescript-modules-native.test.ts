@@ -60,6 +60,16 @@ export declare const phantom: number;
 export function overload(x: number): number;
 export const done = value;
 console.log("entry", done);
+const x = 1, T = 2, y = 3;
+export const relation = x<T>
++y;
+console.log("relation", relation, x<T>/*\n*/-y);
+class RelationalBox { valueOf() { return x; } }
+export const newRelation = new RelationalBox<T>
+-y;
+console.log("new relation", newRelation);
+export const nestedRelation = new RelationalBox<(T<unknown>)>/*\n*/+y;
+console.log("nested relation", nestedRelation);
 let calls = 0;
 function echo(value) { calls = calls + 1; return value; }
 const keptImport = echo
@@ -86,11 +96,13 @@ console.log("boundary", typeof keptImport, typeof keptExport, calls);
         exitStatus: 0,
         stderr: "",
         stdout:
-          "import\nexport\nmixed\nentry 7\n" +
-          "boundary function function 0\nexports done\n",
+          "import\nexport\nmixed\nentry 7\nrelation false true\n" +
+          "new relation true\nnested relation false\n" +
+          "boundary function function 0\nexports " +
+          "done,nestedRelation,newRelation,relation\n",
       };
       const references = await Promise.all([
-        host.run({ command: process.execPath, args: [entry], cwd: directory }),
+        host.run({ command: "node", args: [entry], cwd: directory }),
         host.run({
           command: "deno",
           args: ["run", "--quiet", "--config", `${directory}/deno.json`, entry],
@@ -171,7 +183,7 @@ test(
       const path = `${directory}/case.ts`;
       await host.writeTextFile(path, fixture.source);
       const references = await Promise.all([
-        host.run({ command: process.execPath, args: [path], cwd: directory }),
+        host.run({ command: "node", args: [path], cwd: directory }),
         host.run({
           command: "deno",
           args: ["run", "--quiet", path],
@@ -217,7 +229,7 @@ test(
 );
 
 test(
-  "reflected Unicode TypeScript source matches Node stripping",
+  "reflected Unicode TypeScript source matches Node.js stripping",
   {
     skip: nativeTarget == null ? "requires a supported native host" : false,
   },
@@ -238,7 +250,7 @@ console.log(
       const path = `${directory}/case.ts`;
       await host.writeTextFile(path, source);
       const reference = await host.run({
-        command: process.execPath,
+        command: "node",
         args: [path],
         cwd: directory,
       });
@@ -280,7 +292,7 @@ console.log(
 );
 
 test(
-  "anonymous abstract default classes retain native values and Node source",
+  "anonymous abstract default classes retain native values and Node.js source",
   {
     skip: nativeTarget == null ? "requires a supported native host" : false,
   },
@@ -307,7 +319,7 @@ test(
       const valuesPath = `${directory}/values.mts`;
       const valueReferences = await Promise.all([
         host.run({
-          command: process.execPath,
+          command: "node",
           args: [valuesPath],
           cwd: directory,
         }),
@@ -323,7 +335,7 @@ test(
       ]);
       const entry = `${directory}/main.mts`;
       const reference = await host.run({
-        command: process.execPath,
+        command: "node",
         args: [entry],
         cwd: directory,
       });

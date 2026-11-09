@@ -1804,18 +1804,12 @@ test("rejects every binding position that declares this", () => {
   assert.equal(assignmentTarget.diagnostics[0]?.code, "OSEO0001");
 
   // A plain first parameter named `this` is TypeScript's receiver
-  // annotation rather than a binding, so it keeps the unsupported
-  // classification that boundary already had.
+  // annotation rather than a binding, so erasure removes it.
   const parameter = compileSource(babelFrontend, {
     source: "function receiver(this) {}",
     sourceId: "this-binding.ts",
   });
-  assert.equal(parameter.diagnostics.length, 1);
-  assert.equal(parameter.diagnostics[0]?.code, "OSEO1001");
-  assert.match(
-    parameter.diagnostics[0]?.message ?? "",
-    /this parameters are unsupported/u,
-  );
+  assert.deepEqual(parameter.diagnostics, []);
 
   // The reserved word check reads binding positions only, so a property
   // key spelled `this` still names an ordinary property, and a pattern

@@ -28,6 +28,14 @@ function identity<T>(this: unknown, value?: T): T | undefined {
   return value;
 }
 const id = identity<number>;
+function receiver(this, value: number) { return value; }
+function soleReceiver(this) { return 23; }
+const receiverObject = { method(this, value: number) { return value; } };
+class ReceiverClass { method(this, value: number) { return value; } }
+console.log(receiver(21), soleReceiver(), receiverObject.method(22));
+console.log(
+  new ReceiverClass().method(24), receiver.length, soleReceiver.length,
+);
 const values: Array<number | string> = [3, "four"];
 const { value: extracted }: { value: number } = { value: 5 };
 const [head, tail]: [number, string] = values as [number, string];
@@ -129,6 +137,44 @@ console.log(genericCallable < genericArgument > (genericValue));
 const genericIdentity = genericCallable < genericArgument >
 genericValue;
 console.log(genericIdentity === genericCallable);
+const x = 1, T = 2, y = 3;
+const relationalPlus = x<T>
++y;
+const relationalMinus = x<T>/*
+*/-y;
+console.log(relationalPlus, relationalMinus);
+console.log(x<T> +y, x<T> -y, (x<T>) +y);
+function relation(value: number): boolean { return value<T>
++y; }
+console.log(relation(x), { value: x<T>
+-y }.value, [x<T>
++y][0]);
+const separatedGeneric = genericCallable<T>
+!y;
+console.log(separatedGeneric === genericCallable);
+class RelationalBox { valueOf() { return x; } }
+console.log(new RelationalBox<T>
++y, new RelationalBox<T>/*
+*/-y);
+console.log(new RelationalBox<T>() +y, new RelationalBox<T>() -y);
+console.log(x<T> << 1, (x<T>) < y);
+console.log(x<(T<unknown>)>
++y, new RelationalBox<[T<unknown>]>
+-y);
+console.log(x<{ value: T<unknown> }>
++y, x<(T as number)>
+-y, new RelationalBox<(T satisfies number)>
++y, x<(T!)>
+-y);
+let boundaryY = -2;
+function nestedArrowBoundary() {
+  return x<(<U>(value: U): U => value)>
+  ++boundaryY;
+}
+console.log(nestedArrowBoundary(), boundaryY);
+function trueInstantiationBoundary() { return x<T>
+++boundaryY; }
+console.log(trueInstantiationBoundary(), boundaryY);
 function optionalObject(
   { value = true ? 16 : 17 }?: { value: number },
 ) { return value; }

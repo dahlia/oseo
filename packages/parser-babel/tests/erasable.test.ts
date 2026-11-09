@@ -14,6 +14,12 @@ const forms = [
   "namespace Empty {}",
   "function f(x: string): string; function f(x: any) { return x; }",
   "function f<T>(this: unknown, x?: T): T | undefined { return x; }",
+  "function f(this) {}",
+  "function f(this, x: number) { return x; }",
+  "function f(this?, x = 1) { return x; }",
+  "const f = function(this, x: number) { return x; };",
+  "const o = { m(this, x: number) { return x; } };",
+  "class C { m(this, x: number) { return x; } }",
   "const f = <T,>(x: T): T => x; f<number>(1); const g = f<string>;",
   "const xs: ReadonlyArray<number | string> = [1];",
   "const x = (1 as unknown satisfies unknown)!;",
@@ -28,6 +34,26 @@ const forms = [
   'import type T = require("missing");',
   'export type * from "missing"; export default interface T {}',
 ] as const;
+
+test("rejects invalid receiver parameter positions", () => {
+  for (const source of [
+    "function f(this = 1) {}",
+    "function f(...this) {}",
+    "function f(x, this) {}",
+    "function f(this, this) {}",
+    "const f = (this, x) => x;",
+    "class C { constructor(this) {} }",
+    "class C { constructor(this: unknown) {} }",
+  ]) {
+    for (const result of [
+      babelFrontend.parse({ source, sourceId: "receiver.ts" }),
+      babelModuleFrontend.parseModule({ source, sourceId: "receiver.ts" }),
+    ]) {
+      assert.equal(result.parsed, false, source);
+      assert.ok(result.diagnostics.length > 0, source);
+    }
+  }
+});
 
 test("keeps optional pattern hints and runtime errors", () => {
   const typedSource = `
@@ -87,6 +113,51 @@ test("uses TypeScript grammar for ambiguous generic expressions", () => {
     const declaration = result.program?.body[0];
     assert.ok(declaration?.kind === "const");
     assert.equal(declaration.initializer.kind, kind);
+  }
+});
+
+test("keeps relational angles before unary plus and minus", () => {
+  for (const gap of [" ", "\n", "\r", "\r\n", "\u2028", "\u2029", "/*\n*/"]) {
+    for (const sign of ["+", "-"]) {
+      for (const callee of ["x", "new X"]) {
+        for (const annotation of ["", ": boolean"]) {
+          const source = `const z${annotation} = ${callee}<T>${gap}${sign}y;`;
+          for (const result of [
+            babelFrontend.parse({ source, sourceId: "relational.ts" }),
+            babelModuleFrontend.parseModule({
+              source,
+              sourceId: "relational.ts",
+            }),
+          ]) {
+            assert.equal(
+              result.parsed,
+              true,
+              JSON.stringify(result.diagnostics),
+            );
+          }
+          const result = babelFrontend.parse({
+            source,
+            sourceId: "relational.ts",
+          });
+          const declaration = result.program?.body[0];
+          assert.ok(declaration?.kind === "const");
+          const expression = declaration.initializer;
+          assert.equal(expression.kind, "binary");
+          assert.ok(expression.kind === "binary");
+          assert.equal(expression.operator, ">");
+          assert.ok(expression.byteRange != null);
+          assert.equal(
+            expression.byteRange.start,
+            source.indexOf(`${callee}<T>`),
+          );
+          assert.equal(
+            expression.byteRange.end,
+            new TextEncoder().encode(source.slice(0, source.indexOf("y;") + 1))
+              .length,
+          );
+        }
+      }
+    }
   }
 });
 
@@ -281,7 +352,7 @@ test("reparses directives and keeps stripped function text", () => {
   }
 });
 
-test("rejects annotated for-in/of heads like Node", () => {
+test("rejects annotated for-in/of heads like Node.js", () => {
   for (const source of [
     "for (const [x]: [number] of [[1]]) {}",
     "for (const x: number in {}) {}",
@@ -332,7 +403,7 @@ test("retains default imports and handles trailing type-only commas", () => {
   }
 });
 
-test("rejects namespace value members like Node", () => {
+test("rejects namespace value members like Node.js", () => {
   for (const source of [
     'namespace N { import type { X } from "m"; }',
     "namespace N { declare const x: number; }",
@@ -435,7 +506,7 @@ test("keeps heritage when a generic constraint names implements", () => {
   assert.ok(declaration.initializer.heritage != null);
 });
 
-test("rejects repeated declare in ambient namespace contexts like Node", () => {
+test("rejects repeated declare in ambient contexts like Node.js", () => {
   for (const source of [
     "namespace N { declare global { declare interface X {} } }",
     "namespace N { declare global { export declare type X = number; } }",

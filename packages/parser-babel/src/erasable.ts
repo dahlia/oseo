@@ -62,7 +62,7 @@ interface MutableBabelNode extends BabelNode {
   [key: string]: BabelNodeValue;
 }
 
-// Node classifies namespace bodies before discarding ambient declarations.
+// Node.js classifies namespace bodies before discarding ambient declarations.
 // An ambient value member still makes a non-ambient namespace unsupported.
 function typeOnlyNamespace(value: BabelNode): boolean {
   if (value.type === "ExportNamedDeclaration") {
@@ -102,10 +102,13 @@ export function eraseTypeSyntax(
   const ambientModuleStarts = new Set<number>();
   const optionalPatternStarts = new Set<number>();
   const spans: (readonly [number, number])[] = [];
+  let relationalInstantiation = false;
+  let runtimeAngles = false;
+  let assertionStart: number | undefined;
   const semicolons = new Set<number>();
   const movedOpeners: (readonly [number, number])[] = [];
   const movedClosers: (readonly [number, number])[] = [];
-  const tokens = nodes(file.tokens);
+  let tokens = nodes(file.tokens);
   function remove(value: BabelNode, statement = false): void {
     if (value.start != null && value.end != null) {
       spans.push([value.start, value.end]);
@@ -144,6 +147,14 @@ export function eraseTypeSyntax(
     )
       index += direction;
     return tokens[index];
+  }
+  function relationalContinuation(end: number | undefined): boolean {
+    const next = tokenNear(end ?? 0, 1);
+    const text = input.source.slice(next?.start, next?.end);
+    if (text === "<" && next?.start != null) {
+      assertionStart = Math.min(assertionStart ?? Infinity, next.start);
+    }
+    return ["+", "-", "<"].includes(text);
   }
   function continuesExpression(token: BabelNode | undefined): boolean {
     const first = token?.start == null ? "" : input.source[token.start];
@@ -207,6 +218,72 @@ export function eraseTypeSyntax(
     });
     return value;
   }
+  /** Recover an assertion read as a relation after an instantiation. */
+  function assertionContinuation(): BabelNode | undefined {
+    if (assertionStart == null) return undefined;
+    const start = assertionStart;
+    // Multiplication makes the following < begin an operand, in the original
+    // async, generator, private-name and module context. This probe never runs.
+    const marker = "*0*";
+    const probe =
+      input.source.slice(0, start) + marker + input.source.slice(start);
+    try {
+      const parsed = node(
+        parseWithClassStaticAsi(probe, {
+          allowImportExportEverywhere: true,
+          createParenthesizedExpressions: true,
+          errorRecovery: true,
+          plugins: ["typescript"],
+          sourceType:
+            node(file.program)?.sourceType === "module" ? "module" : "script",
+          tokens: true,
+        }),
+      );
+      // Existing type-only binding errors are handled by the normal reparse.
+      // SAFETY: Babel parser errors expose the optional offsets read here.
+      const errors = new Set(
+        nodes(file.errors).map(
+          (error) => `${error.reasonCode}:${errorOffset(error as ParserError)}`,
+        ),
+      );
+      if (
+        nodes(parsed?.errors).some((error) => {
+          // SAFETY: Babel parser errors expose optional offsets.
+          const offset = errorOffset(error as ParserError);
+          const original =
+            offset <= start ? offset : Math.max(start, offset - marker.length);
+          return !errors.has(`${error.reasonCode}:${original}`);
+        })
+      )
+        return undefined;
+      const assertions: BabelNode[] = [];
+      function find(value: BabelNode): void {
+        if (
+          value.type === "TSTypeAssertion" &&
+          value.start === start + marker.length
+        ) {
+          assertions.push(value);
+        }
+        for (const [key, child] of Object.entries(value)) {
+          if (["tokens", "comments", "errors"].includes(key)) continue;
+          for (const item of Array.isArray(child) ? child : [child]) {
+            const childNode = node(item);
+            if (childNode?.type != null) find(childNode);
+          }
+        }
+      }
+      if (parsed != null) find(parsed);
+      const assertion = assertions[0];
+      if (assertion?.start == null || assertion.end == null) return undefined;
+      return {
+        type: "TSTypeAssertion",
+        start: assertion.start - marker.length,
+        end: assertion.end - marker.length,
+      };
+    } catch {
+      return undefined;
+    }
+  }
   function erase(value: BabelNode, statement = false): BabelNode | undefined {
     if (value.type === "ForOfStatement" || value.type === "ForInStatement") {
       for (const declaration of nodes(node(value.left)?.declarations)) {
@@ -240,6 +317,16 @@ export function eraseTypeSyntax(
     }
     if (expressionWrappers.has(value.type ?? "")) {
       const inner = node(value.expression);
+      if (
+        value.type === "TSInstantiationExpression" &&
+        relationalContinuation(value.end)
+      ) {
+        // Babel can treat angles before +, -, or < as an instantiation.
+        // Node.js parses a relation, including before an unsupported assertion.
+        // Keep those tokens for the final JavaScript reparse.
+        relationalInstantiation = true;
+        return inner == null ? reject(value) : erase(inner);
+      }
       if (inner?.end != null && value.end != null) {
         if (
           value.type === "TSAsExpression" ||
@@ -384,6 +471,16 @@ export function eraseTypeSyntax(
     for (const [key, child] of Object.entries(value)) {
       if (erasedFields.has(key)) {
         const type = node(child);
+        if (
+          value.type === "NewExpression" &&
+          (key === "typeArguments" || key === "typeParameters") &&
+          type != null &&
+          relationalContinuation(type.end)
+        ) {
+          // Babel moves an unparenthesized callee's type arguments here.
+          relationalInstantiation = true;
+          continue;
+        }
         if (type != null) remove(type);
         if (
           key === "typeParameters" &&
@@ -449,10 +546,10 @@ export function eraseTypeSyntax(
           if (itemNode?.type == null) return [item];
           if (
             key === "params" &&
+            value.kind !== "constructor" &&
             itemNode === child[0] &&
             itemNode.type === "Identifier" &&
-            itemNode.name === "this" &&
-            itemNode.typeAnnotation != null
+            itemNode.name === "this"
           ) {
             const next = node(child[1]);
             const separator = firstToken(
@@ -599,9 +696,75 @@ export function eraseTypeSyntax(
       }
     }
   }
+  const continuationGaps: (readonly [number, number])[] = [];
+  function findContinuationGaps(value: BabelNode): void {
+    if (
+      value.type === "BinaryExpression" &&
+      ["<", ">"].includes(String(value.operator))
+    )
+      runtimeAngles = true;
+    const end =
+      value.type === "TSInstantiationExpression"
+        ? value.end
+        : value.type === "NewExpression"
+          ? node(value.typeArguments ?? value.typeParameters)?.end
+          : undefined;
+    if (end != null) {
+      const next = tokenNear(end, 1);
+      if (
+        next?.start != null &&
+        ["+", "-"].includes(input.source.slice(next.start, next.end)) &&
+        /[\n\r\u2028\u2029]/u.test(input.source.slice(end, next.start))
+      ) {
+        continuationGaps.push([end, next.start]);
+      }
+    }
+    for (const [key, child] of Object.entries(value)) {
+      if (["tokens", "comments", "errors"].includes(key)) continue;
+      for (const item of Array.isArray(child) ? child : [child]) {
+        const childNode = node(item);
+        if (childNode?.type != null) findContinuationGaps(childNode);
+      }
+    }
+  }
+  findContinuationGaps(file);
+  if (continuationGaps.length > 0) {
+    const probe = input.source.split("");
+    for (const [start, end] of continuationGaps) {
+      for (let offset = start; offset < end; offset += 1) probe[offset] = " ";
+    }
+    try {
+      // Without the gap's line break, Babel exposes nested runtime erasures.
+      // Only parser coordinates come from this probe; output uses input.source.
+      const parsed = node(
+        parseWithClassStaticAsi(probe.join(""), {
+          allowImportExportEverywhere: true,
+          attachComment: true,
+          createParenthesizedExpressions: true,
+          errorRecovery: true,
+          plugins: ["typescript"],
+          sourceType:
+            node(file.program)?.sourceType === "module" ? "module" : "script",
+          tokens: true,
+        }),
+      );
+      if (parsed != null) {
+        file = parsed;
+        tokens = nodes(file.tokens);
+      }
+    } catch {
+      // The original tree and stripped reparse retain malformed-source errors.
+    }
+    relationalInstantiation = true;
+  }
   validateAmbient(file);
   const normalized = erase(file) ?? file;
-  if (spans.length === 0 || diagnostics.length > 0) {
+  // Erasing an inner type must not turn an existing relation into type syntax.
+  if (spans.length > 0 && runtimeAngles) relationalInstantiation = true;
+  if (
+    (spans.length === 0 && !relationalInstantiation) ||
+    diagnostics.length > 0
+  ) {
     return {
       diagnostics,
       ambientModuleStarts,
@@ -611,7 +774,8 @@ export function eraseTypeSyntax(
       sourceText: (start, end) => input.source.slice(start, end),
     };
   }
-  // Node uses whitespace of the same UTF-8 and UTF-16 width. Parsing keeps
+  const assertion = assertionContinuation();
+  // Node.js uses whitespace of the same UTF-8 and UTF-16 width. Parsing keeps
   // original UTF-16 coordinates even when an arrow's moved closing paren
   // requires a wider reflected spelling for a final Unicode type name.
   const characters = input.source.split("");
@@ -706,15 +870,26 @@ export function eraseTypeSyntax(
         attachComment: true,
         createParenthesizedExpressions: true,
         errorRecovery: true,
-        plugins: ["typescript"],
+        plugins: relationalInstantiation ? [] : ["typescript"],
         sourceType:
           node(file.program)?.sourceType === "module" ? "module" : "script",
         tokens: true,
       }),
     );
     if (stripped == null) throw new Error("Babel returned no stripped tree.");
-    if (Array.isArray(stripped.errors)) {
-      for (const error of stripped.errors) {
+    const errors = Array.isArray(stripped.errors) ? stripped.errors : [];
+    // A malformed first relation takes precedence over the assertion.
+    // SAFETY: Babel parser errors expose the optional offsets read here.
+    if (
+      assertion != null &&
+      errors.every(
+        (error) =>
+          errorOffset(error as ParserError) >= (assertion.start ?? Infinity),
+      )
+    ) {
+      reject(assertion);
+    } else {
+      for (const error of errors) {
         // SAFETY: Babel's error array contains errors with optional offsets.
         diagnostics.push(
           diagnosticAt(input, locations, errorOffset(error as ParserError)),
@@ -731,9 +906,10 @@ export function eraseTypeSyntax(
     };
   } catch (error) {
     // SAFETY: Babel exceptions expose the optional offsets read here.
-    diagnostics.push(
-      diagnosticAt(input, locations, errorOffset(error as ParserError)),
-    );
+    const offset = errorOffset(error as ParserError);
+    if (assertion != null && offset >= (assertion.start ?? Infinity)) {
+      reject(assertion);
+    } else diagnostics.push(diagnosticAt(input, locations, offset));
     return {
       diagnostics,
       ambientModuleStarts,

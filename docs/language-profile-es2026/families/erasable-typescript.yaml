@@ -15,7 +15,14 @@ scope:
   - "The frontend uses TypeScript grammar for every source, without a source
     language selector. Ambiguous a < b > (c) and a < b > followed by a newline
     use TypeScript generic-call and instantiation semantics, as in Node.js and
-    Deno TypeScript sources. These forms were rejected before generic erasure
+    Deno TypeScript sources. Unary + and - continuations retain relational
+    operators even after a line break; parentheses close the instantiation
+    before an outer arithmetic continuation. The same rule applies to new
+    expressions without an argument list. A following < does not hide an
+    unsupported angle-bracket assertion. Nested runtime type syntax erases
+    before the JavaScript reparse, including across line breaks.
+    These forms were rejected before
+    generic erasure
     was admitted. The complete test262 update and existing compatibility
     gates must verify the reviewed ECMAScript results."
   - "Only any, bigint, boolean, null, number, string, undefined and unknown

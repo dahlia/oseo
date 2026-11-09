@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import { stripTypeScriptTypes } from "node:module";
 import test from "node:test";
+import { runInNewContext } from "node:vm";
 import {
   babelFrontend,
   babelModuleFrontend,
@@ -59,6 +60,14 @@ for (const source of [
   "function f(this:unknown,){}",
   "function f(this:T){ return [1,2]; }",
   "function f(this:T/*keep*/){ return [1,2]; }",
+  "function f(this) {}",
+  "function f(this,) {}",
+  "function f(this /* keep λ😀 */) {}",
+  "function f(this,/* keep λ😀 */x: number) { return x; }",
+  "function f(this?, x = 1) { return x; }",
+  "const f = function(this, x: number) { return x; };",
+  "function f() { return { m(this, x: number) { return x; } }; }",
+  "function f() { return class { m(this, x: number) { return x; } }; }",
   "function f(){return x /*keep*/ !;}",
   "function f(){return x! /*keep*/ !;}",
   "function f(x: /* comment */ number): string { return 'λ😀'; }",
@@ -88,7 +97,7 @@ for (const source of [
   "const f = async <\nT\n>([x=true?1:2]?:[T]):\n T=>x;",
   "function f(\r\nx: number,\r\ny?: unknown\r\n): void {}",
 ]) {
-  test(`function source matches Node stripping: ${source}`, () => {
+  test(`function source matches Node.js stripping: ${source}`, () => {
     const stripped = stripTypeScriptTypes(source);
     const typed = babelFrontend.parse({ source, sourceId: "typed.ts" });
     const plain = babelFrontend.parse({
@@ -121,10 +130,135 @@ for (const source of [
       "functionValue" in expected ? expected.functionValue : expected;
     assert.ok(actualFunction.sourceText != null);
     assert.equal(actualFunction.sourceText, expectedFunction.sourceText);
+    const reference = runInNewContext(`${stripped}; f`);
+    assert.equal(
+      actualFunction.sourceText,
+      Function.prototype.toString.call(reference),
+      source,
+    );
   });
 }
 
-test("anonymous abstract default class text matches Node stripping", () => {
+test("instantiation continuations retain Node.js source and grammar", () => {
+  for (const gap of [" ", "\n", "\r", "\r\n", "\u2028", "\u2029", "/*\n*/"]) {
+    for (const tail of ["+y", "-y", "++y", "--y", "!y", "~y", "typeof y"]) {
+      for (const callee of ["x", "new X"]) {
+        for (const angles of [
+          "<T>",
+          "<T | U>",
+          "<T<U>>",
+          "<(T<U>)>",
+          "<[T<U>]>",
+          "<{ x: T<U> }>",
+          "<(T as number)>",
+          "<(T satisfies number)>",
+          "<(T!)>",
+          "<(<U>(value: U): U => value)>",
+          "<(async <U>(value: U): 한글 => value)>",
+        ]) {
+          const expression = `${callee}${angles}${gap}${tail}`;
+          const source = `function f(x: number) { return ${expression}; }`;
+          const stripped = stripTypeScriptTypes(source);
+          const actual = babelFrontend.parse({ source, sourceId: "typed.ts" });
+          const expected = babelFrontend.parse({
+            source: stripped,
+            sourceId: "plain.js",
+          });
+          assert.equal(actual.parsed, true, JSON.stringify(actual.diagnostics));
+          assert.equal(expected.parsed, true);
+          const fn = actual.program?.body[0];
+          const plain = expected.program?.body[0];
+          assert.ok(fn?.kind === "function" && plain?.kind === "function");
+          const reference = runInNewContext(`${stripped}; f`);
+          assert.equal(
+            fn.sourceText,
+            Function.prototype.toString.call(reference),
+            source,
+          );
+        }
+      }
+    }
+    for (const continuation of [
+      "<U>y",
+      "<U>(y)",
+      "<U>[y]",
+      "<U>+y",
+      "<U>y ** 2",
+      "<y",
+    ]) {
+      for (const callee of ["x", "new X"]) {
+        const expression = `${callee}<T>${gap}${continuation}`;
+        const source = `function f() { return ${expression}; }`;
+        assert.throws(() => stripTypeScriptTypes(source), SyntaxError, source);
+        for (const result of [
+          babelFrontend.parse({ source, sourceId: "assertion.ts" }),
+          babelModuleFrontend.parseModule({ source, sourceId: "assertion.ts" }),
+        ]) {
+          assert.equal(result.parsed, false, source);
+          assert.ok(result.diagnostics[0]?.byteRange != null, source);
+          assert.equal(
+            result.diagnostics[0]?.code,
+            continuation === "<y" ? "OSEO0001" : "OSEO1001",
+            source,
+          );
+        }
+      }
+    }
+    for (const angles of [
+      "<T[]>",
+      "<T,>",
+      "<{ x: T; }>",
+      "<(T<U>]>",
+      "<[T<U>)>",
+    ]) {
+      const source = `function f() { return x${angles}${gap}+y; }`;
+      assert.throws(() => stripTypeScriptTypes(source), SyntaxError, source);
+      for (const result of [
+        babelFrontend.parse({ source, sourceId: "invalid.ts" }),
+        babelModuleFrontend.parseModule({ source, sourceId: "invalid.ts" }),
+      ]) {
+        assert.equal(result.parsed, false, source);
+        assert.equal(result.diagnostics[0]?.code, "OSEO0001", source);
+      }
+    }
+  }
+});
+
+test("assertion continuation diagnostics retain their grammar context", () => {
+  for (const [prefix, expression, suffix] of [
+    ["async function f() { return ", "x<T><U>await y", "; }"],
+    ["function* f() { return ", "x<T><U>(yield y)", "; }"],
+    ["class C { #y = 1; f() { return ", "x<T><U>this.#y", "; } }"],
+    ["function f() { return ", "x<T><U>\ny", "; }"],
+    ["function f() { return [", "x<T><U>(y)", "]; }"],
+  ]) {
+    const source = `/* 한글 */${prefix}${expression}${suffix}`;
+    assert.throws(() => stripTypeScriptTypes(source), SyntaxError, source);
+    for (const result of [
+      babelFrontend.parse({ source, sourceId: "context.ts" }),
+      babelModuleFrontend.parseModule({ source, sourceId: "context.ts" }),
+    ]) {
+      assert.equal(result.parsed, false, source);
+      const diagnostic = result.diagnostics[0];
+      assert.equal(diagnostic?.code, "OSEO1001", source);
+      assert.ok(diagnostic?.byteRange != null, source);
+      assert.equal(
+        diagnostic.byteRange.start,
+        new TextEncoder().encode(source.slice(0, source.indexOf("<U>"))).length,
+        source,
+      );
+    }
+  }
+  for (const expression of ["x<T><U>()", "x<T[]><U>y", "x<T><y"]) {
+    const source = `function f() { return ${expression}; }`;
+    assert.throws(() => stripTypeScriptTypes(source), SyntaxError, source);
+    const result = babelFrontend.parse({ source, sourceId: "malformed.ts" });
+    assert.equal(result.parsed, false, source);
+    assert.equal(result.diagnostics[0]?.code, "OSEO0001", source);
+  }
+});
+
+test("anonymous abstract default class text matches Node.js stripping", () => {
   for (const source of [
     "export default abstract class { value: number = 1; }",
     "export default abstract class {}",
