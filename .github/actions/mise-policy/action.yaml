@@ -2,7 +2,7 @@ name: Resolve mise release
 description: Resolve the official release and check restored binary bytes
 inputs:
   phase:
-    description: Resolve metadata or check the restored cache
+    description: Discover latest, verify metadata, or check restored bytes
     default: prepare
   sha256:
     description: Expected raw binary SHA256 when checking a restore
@@ -13,6 +13,12 @@ inputs:
   cache-hit:
     description: Whether the cache service returned the exact key
     default: "false"
+  version:
+    description: Exact discovered release when verifying metadata
+    default: ""
+  metadata-directory:
+    description: Job-local signed metadata cache directory
+    default: ""
   config-hash:
     description: Hash of the same configuration files as upstream setup
     default: ""
@@ -20,6 +26,10 @@ inputs:
     description: Upstream tool selection to include in cache identity
     default: ""
 outputs:
+  metadata-dir:
+    description: Job-local directory for checksum text and signature
+  metadata-key:
+    description: Exact metadata schema, release and target identity
   version:
     description: Current official release
   sha256:

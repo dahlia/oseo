@@ -7,14 +7,24 @@ transport retries and checks restored mise binaries before upstream setup
 can execute them. It uses the same whole-data cache boundary as upstream;
 there is no second binary cache.
 
-The wrapper resolves `https://mise.jdx.dev/VERSION` once per job, then reads
-`SHASUMS256.txt` and its minisign signature from that exact official GitHub
-release. The checksum signature and the trusted-comment signature must verify
-against mise's release key. The selected checksum entry names the exact raw
-binary for the version, OS, and architecture. These static downloads make
-no GitHub REST API requests.
+The wrapper resolves `https://mise.jdx.dev/VERSION` once per job, then restores
+a separate metadata cache for that exact release and target. This cache holds
+the original *SHASUMS256.txt* and its minisign signature. Every restore must
+verify the checksum signature and the trusted-comment signature against mise's
+release key before selecting the checksum for the exact version, OS, and
+architecture. A valid exact metadata hit needs no checksum or signature HTTP
+request. Latest-version discovery still requires the official VERSION endpoint;
+an unavailable endpoint never selects an older release.
 
-The cache key includes the asset name and hash, runner image, configuration
+On a metadata miss, the wrapper downloads both files from that exact official
+GitHub release with bounded retries and saves them only after verification.
+The metadata cache has its own schema namespace and a fixed job-temporary path.
+Non-exact restores are discarded. An exact hit with a missing counterpart,
+invalid signature, or absent selected asset fails without a download fallback.
+The cache service and its key supply no checksum authority. These static
+downloads make no GitHub REST API requests.
+
+The data cache key includes the asset name and hash, runner image, configuration
 hash, install arguments, and `MISE_ENV`. Its path is a fixed job-temporary
 directory so Actions cache versions remain reusable. The directory starts
 empty. A prefix restore is discarded; an exact restore with missing or

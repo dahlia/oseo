@@ -10,9 +10,21 @@ inputs:
 runs:
   using: composite
   steps:
+    - id: release
+      uses: ./.github/actions/mise-policy
+      with:
+        phase: discover
+    - id: metadata
+      uses: actions/cache/restore@v5
+      with:
+        path: ${{ steps.release.outputs.metadata-dir }}
+        key: ${{ steps.release.outputs.metadata-key }}
     - id: policy
       uses: ./.github/actions/mise-policy
       with:
+        version: ${{ steps.release.outputs.version }}
+        metadata-directory: ${{ steps.release.outputs.metadata-dir }}
+        cache-hit: ${{ steps.metadata.outputs.cache-hit }}
         install-args: ${{ inputs.install_args }}
         config-hash: >-
           ${{ hashFiles(
@@ -30,6 +42,11 @@ runs:
             '**/.mise/config.*.toml', '**/.mise/config.*.lock',
             '**/mise/config.toml', '**/mise/config.lock',
             '**/mise/config.*.toml', '**/mise/config.*.lock') }}
+    - uses: actions/cache/save@v5
+      if: steps.metadata.outputs.cache-hit != 'true'
+      with:
+        path: ${{ steps.release.outputs.metadata-dir }}
+        key: ${{ steps.release.outputs.metadata-key }}
     - id: cache
       uses: actions/cache/restore@v5
       with:
