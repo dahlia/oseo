@@ -2,12 +2,13 @@ import {
   captureArtifact,
   validateCaptureRequest,
 } from "./perf-profile-capture.ts";
-import { spawnSync } from "node:child_process";
+import { ProfilingSession } from "./perf-profile-process.ts";
 import {
   accessSync,
   constants,
   mkdirSync,
   realpathSync,
+  readFileSync,
   writeFileSync,
 } from "node:fs";
 import { delimiter, isAbsolute, join, resolve } from "node:path";
@@ -71,39 +72,17 @@ export function executablePath(command: string): string | null {
   return null;
 }
 
-/** Save probe bytes and return a log bundle without accepting a method. */
-export function discoverProfilingTools(directory: string): string {
+/** Save partial probe bytes after every command, including caught signals. */
+export async function discoverProfilingTools(
+  directory: string,
+  sharedSession?: ProfilingSession,
+): Promise<string> {
   const probes = profilingProbes(process.platform);
   mkdirSync(directory, { recursive: false });
-  const commands = probes.map((argv, index) => {
-    const startedUtc = new Date().toISOString();
-    const toolPath = executablePath(argv[0]!);
-    const executedArgv = [toolPath ?? argv[0]!, ...argv.slice(1)];
-    const result = spawnSync(executedArgv[0]!, executedArgv.slice(1), {
-      timeout: 20_000,
-      maxBuffer: 4 * 1024 * 1024,
-      stdio: ["ignore", "pipe", "pipe"],
-    });
-    const finishedUtc = new Date().toISOString();
-    const stdout = `${index}.stdout`;
-    const stderr = `${index}.stderr`;
-    writeFileSync(resolve(directory, stdout), result.stdout ?? Buffer.alloc(0));
-    writeFileSync(resolve(directory, stderr), result.stderr ?? Buffer.alloc(0));
-    return {
-      argv: executedArgv,
-      toolPath,
-      startedUtc,
-      finishedUtc,
-      status: result.status,
-      signal: result.signal,
-      error: result.error?.message ?? null,
-      stdout,
-      stderr,
-      stdoutBase64: (result.stdout ?? Buffer.alloc(0)).toString("base64"),
-      stderrBase64: (result.stderr ?? Buffer.alloc(0)).toString("base64"),
-    };
-  });
-  const bundle =
+  const session = sharedSession ?? new ProfilingSession();
+  const commands: object[] = [];
+  let completed = false;
+  const bundle = (): string =>
     JSON.stringify(
       {
         kind: "profiling-tool-discovery",
@@ -112,13 +91,63 @@ export function discoverProfilingTools(directory: string): string {
         architecture: process.arch,
         cwd: process.cwd(),
         developerDirectory: process.env.DEVELOPER_DIR ?? null,
+        interrupted: session.interrupted,
+        completed: completed && session.interrupted == null,
         commands,
       },
       null,
       2,
     ) + "\n";
-  writeFileSync(resolve(directory, "discovery.json"), bundle);
-  return bundle;
+  const save = (): string => {
+    const text = bundle();
+    writeFileSync(resolve(directory, "discovery.json"), text);
+    return text;
+  };
+  try {
+    save();
+    for (const [index, argv] of probes.entries()) {
+      const toolPath = executablePath(argv[0]!);
+      const executedArgv = [toolPath ?? argv[0]!, ...argv.slice(1)];
+      const run = session.launch(
+        directory,
+        String(index),
+        executedArgv,
+        process.cwd(),
+        Object.fromEntries(
+          ["PATH", "HOME", "DEVELOPER_DIR", "LANG", "LC_ALL", "TMPDIR"]
+            .map((name) => [name, process.env[name]])
+            .filter((entry): entry is [string, string] => entry[1] != null),
+        ),
+        Buffer.alloc(0),
+        20_000,
+      );
+      // eslint-disable-next-line no-await-in-loop -- Bound each probe.
+      const record = await run.done;
+      commands.push({
+        ...record,
+        toolPath,
+        stdoutBase64: readFileSync(resolve(directory, record.stdout)).toString(
+          "base64",
+        ),
+        stderrBase64: readFileSync(resolve(directory, record.stderr)).toString(
+          "base64",
+        ),
+      });
+      completed =
+        commands.length === probes.length &&
+        !record.timedOut &&
+        record.groupGone;
+      save();
+      if (record.timedOut || !record.groupGone || session.interrupted != null) {
+        completed = false;
+        break;
+      }
+    }
+  } finally {
+    if (sharedSession == null) await session.finish();
+    save();
+  }
+  return bundle();
 }
 
 if (
@@ -126,9 +155,15 @@ if (
   import.meta.url === pathToFileURL(resolve(process.argv[1])).href
 ) {
   if (process.argv.length === 4 && process.argv[2] === "discover") {
-    process.stdout.write(discoverProfilingTools(resolve(process.argv[3]!)));
+    process.stdout.write(
+      await discoverProfilingTools(resolve(process.argv[3]!)),
+    );
+    // Missing tools are inventory; interrupted operations must fail.
+    const record = JSON.parse(
+      readFileSync(resolve(process.argv[3]!, "discovery.json"), "utf8"),
+    );
+    if (!record.completed) process.exitCode = 1;
   } else if (process.argv.length === 5 && process.argv[2] === "capture") {
-    const { readFileSync } = await import("node:fs");
     const request = validateCaptureRequest(
       JSON.parse(readFileSync(process.argv[3]!, "utf8")),
     );

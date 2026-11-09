@@ -1,11 +1,10 @@
-import { spawn } from "node:child_process";
+import { ProfilingSession } from "./perf-profile-process.ts";
+import type { OwnedRun, RunRecord } from "./perf-profile-process.ts";
 import { createHash } from "node:crypto";
 import {
   chmodSync,
-  closeSync,
   copyFileSync,
   mkdirSync,
-  openSync,
   readFileSync,
   realpathSync,
   statSync,
@@ -14,14 +13,13 @@ import {
 import { arch, hostname, release } from "node:os";
 import { isAbsolute, join } from "node:path";
 import { setTimeout as delay } from "node:timers/promises";
-import { fileURLToPath } from "node:url";
-import { executablePath } from "./perf-profile.ts";
+import { discoverProfilingTools, executablePath } from "./perf-profile.ts";
 import type {
   StructuredDataInput,
   StructuredDataValue,
 } from "./structured-data.ts";
 import { parsedMapping } from "./structured-data.ts";
-import { isNumber, isObject, isString } from "./value-kinds.ts";
+import { isNumber, isString } from "./value-kinds.ts";
 
 /** A caller-owned artifact contract, independent of the corpus harness. */
 export interface CaptureRequest {
@@ -154,116 +152,7 @@ export function validateCaptureRequest<Candidate>(
   };
 }
 
-interface RunRecord {
-  readonly argv: readonly string[];
-  readonly cwd: string;
-  readonly env: Readonly<Record<string, string>>;
-  readonly startedUtc: string;
-  readonly finishedUtc: string;
-  readonly pid: number | null;
-  readonly status: number | null;
-  readonly signal: string | null;
-  readonly error: string | null;
-  readonly timedOut: boolean;
-  readonly stdout: string;
-  readonly stderr: string;
-  readonly cleanup: readonly string[];
-  readonly groupGone: boolean;
-}
-
-interface OwnedRun {
-  readonly pid: number | undefined;
-  readonly done: Promise<RunRecord>;
-  readonly exited: () => boolean;
-  readonly stop: (reason: string) => void;
-}
-
-function groupExists(pid: number): boolean {
-  try {
-    process.kill(-pid, 0);
-    return true;
-  } catch (error) {
-    return !isObject(error) || !("code" in error) || error.code !== "ESRCH";
-  }
-}
-
-/** Own a process group; retain bytes on timeout and spawn failure. */
-function launch(
-  directory: string,
-  name: string,
-  argv: readonly string[],
-  cwd: string,
-  env: Readonly<Record<string, string>>,
-  stdin: Buffer,
-  timeoutMs: number,
-): OwnedRun {
-  const stdout = `${name}.stdout`;
-  const stderr = `${name}.stderr`;
-  const out = openSync(join(directory, stdout), "wx");
-  const err = openSync(join(directory, stderr), "wx");
-  const startedUtc = new Date().toISOString();
-  const child = spawn(argv[0]!, argv.slice(1), {
-    cwd,
-    env,
-    detached: true,
-    stdio: ["pipe", out, err],
-  });
-  closeSync(out);
-  closeSync(err);
-  let exited = false;
-  let error: string | null = null;
-  let timedOut = false;
-  const cleanup: string[] = [];
-  const stop = (reason: string): void => {
-    if (child.pid == null || !groupExists(child.pid)) return;
-    cleanup.push(reason);
-    try {
-      process.kill(-child.pid, "SIGKILL");
-    } catch (cause) {
-      cleanup.push(String(cause));
-    }
-  };
-  child.on("error", (cause) => {
-    error = String(cause);
-  });
-  // EPIPE is observable when a short-lived child closes input immediately.
-  child.stdin?.on("error", (cause) => {
-    error ??= String(cause);
-  });
-  child.stdin?.end(stdin);
-  const timer = setTimeout(() => {
-    timedOut = true;
-    stop("timeout: SIGKILL owned process group");
-  }, timeoutMs);
-  const done = new Promise<RunRecord>((fulfill) => {
-    child.once("close", (status, signal) => {
-      exited = true;
-      clearTimeout(timer);
-      stop("post-exit: SIGKILL remaining owned group members");
-      const record: RunRecord = {
-        argv,
-        cwd,
-        env,
-        startedUtc,
-        finishedUtc: new Date().toISOString(),
-        pid: child.pid ?? null,
-        status,
-        signal,
-        error,
-        timedOut,
-        stdout,
-        stderr,
-        cleanup,
-        groupGone: child.pid == null || !groupExists(child.pid),
-      };
-      writeJson(join(directory, `${name}.json`), record);
-      fulfill(record);
-    });
-  });
-  return { pid: child.pid, done, exited: () => exited, stop };
-}
-
-/** Run a smoke build command with the same owned-group cleanup and raw log. */
+/** Run a smoke build command with owned-group cleanup and raw logs. */
 export async function runProfilingCommand(
   directory: string,
   name: string,
@@ -271,17 +160,19 @@ export async function runProfilingCommand(
   cwd: string,
   env: Readonly<Record<string, string>>,
 ): Promise<RunRecord> {
-  const run = launch(directory, name, argv, cwd, env, Buffer.alloc(0), 600_000);
-  const interrupt = (): void => run.stop("signal: cleanup owned build group");
-  process.on("SIGINT", interrupt);
-  process.on("SIGTERM", interrupt);
+  const session = new ProfilingSession();
   try {
-    return await run.done;
+    return await session.launch(
+      directory,
+      name,
+      argv,
+      cwd,
+      env,
+      Buffer.alloc(0),
+      600_000,
+    ).done;
   } finally {
-    run.stop("finally: cleanup owned build group");
-    await run.done;
-    process.off("SIGINT", interrupt);
-    process.off("SIGTERM", interrupt);
+    await session.finish();
   }
 }
 
@@ -319,8 +210,36 @@ export function inspectStack(text: string, platform: string): StackQuality {
         ? /^#\d+\s/u.test(line)
         : /^\s+[+!:|\s]*\d+\s+.*(?:\(|\[)/u.test(line),
     );
-  const runtime = frames.some((line) => /\boseo_(?!function_)\w+/u.test(line));
-  const generated = frames.some((line) => /\boseo_function_\w+/u.test(line));
+  const symbols = frames.map((line) => {
+    // Capture only the symbol field, before arguments, image or source paths.
+    const match =
+      platform === "linux"
+        ? /^#\d+\s+(?:0x[\da-f]+\s+in\s+)?([\w.$]+)(?=\s|\()/iu.exec(line)
+        : /^\s+[+!:|\s]*\d+\s+([\w.$]+)(?=\s+\(in\s)/u.exec(line);
+    return (match?.[1] ?? "")
+      .replace(/\.(?:isra|constprop|part|llvm)\.[\da-f]+$/u, "")
+      .replace(/^_oseo_/u, "oseo_");
+  });
+  // Native body units prefix generated functions with their source filename.
+  // Dispatch/fragment/agent wrappers also originate in backend-c, while
+  // oseo_generated_* helpers are defined in runtime-c and remain runtime.
+  const generatedBody = new RegExp(
+    "^(?:[\\w]+_)?oseo_(?:function_(?:\\d+|script|instantiate|evaluate)|" +
+      "generator_body_\\d+\\w*|body_\\w+)$",
+    "u",
+  );
+  const generatedWrapper = new RegExp(
+    "^oseo_(?:dispatch_(?:function|generator)|fragment_location|" +
+      "(?:case|harness)_(?:instantiate|evaluate|dispatch|resume)|" +
+      "agent_program_\\d+)$",
+    "u",
+  );
+  const generatedSymbol = (symbol: string): boolean =>
+    generatedBody.test(symbol) || generatedWrapper.test(symbol);
+  const runtime = symbols.some(
+    (symbol) => /^oseo_\w+$/u.test(symbol) && !generatedSymbol(symbol),
+  );
+  const generated = symbols.some(generatedSymbol);
   const unknown = /\?\?|<unknown>|unresolved|unknown frame/iu.test(text);
   const truncated = /#15\s|truncat|incomplete stack/iu.test(text);
   const diagnostics =
@@ -349,23 +268,14 @@ export async function captureArtifact(
   const checker = providedChecker == null ? undefined : { ...providedChecker };
   mkdirSync(directory);
   writeJson(join(directory, "request.json"), request);
-  const owned = new Set<OwnedRun>();
-  let interrupted: string | null = null;
-  const interrupt = (signal: string): void => {
-    interrupted = signal;
-    for (const run of owned) run.stop(`${signal}: cleanup owned group`);
-  };
-  const sigint = (): void => interrupt("SIGINT");
-  const sigterm = (): void => interrupt("SIGTERM");
-  process.on("SIGINT", sigint);
-  process.on("SIGTERM", sigterm);
+  const session = new ProfilingSession();
   const commands: RunRecord[] = [];
   const execute = async (
     name: string,
     argv: readonly string[],
     timeoutMs = 20_000,
   ): Promise<RunRecord> => {
-    const run = launch(
+    const run = session.launch(
       directory,
       name,
       argv,
@@ -374,7 +284,6 @@ export async function captureArtifact(
       Buffer.alloc(0),
       timeoutMs,
     );
-    owned.add(run);
     const record = await run.done;
     commands.push(record);
     return record;
@@ -406,17 +315,13 @@ export async function captureArtifact(
     sourceBefore = await inspectSource("before");
     if (!sourceBefore.every(goodRun))
       throw new Error("Unknown source identity");
-    const discovery = await execute(
-      "discovery-command",
-      [
-        process.execPath,
-        fileURLToPath(new URL("./perf-profile.ts", import.meta.url)),
-        "discover",
-        join(directory, "discovery"),
-      ],
-      240_000,
+    const discovery = await discoverProfilingTools(
+      join(directory, "discovery"),
+      session,
     );
-    if (!goodRun(discovery)) throw new Error("Discovery command failed");
+    if (!JSON.parse(discovery).completed) {
+      throw new Error("Discovery interrupted or cleanup incomplete");
+    }
     if (
       !(
         (process.platform === "linux" && process.arch === "x64") ||
@@ -504,7 +409,7 @@ export async function captureArtifact(
       }
     }
     const startTarget = (name: string): OwnedRun => {
-      const run = launch(
+      const run = session.launch(
         directory,
         name,
         [request.executable, ...request.argv],
@@ -513,7 +418,6 @@ export async function captureArtifact(
         Buffer.from(request.stdinBase64, "base64"),
         120_000,
       );
-      owned.add(run);
       return run;
     };
     const correctness = (record: RunRecord, name: string): boolean => {
@@ -564,7 +468,8 @@ export async function captureArtifact(
     try {
       await delay(50);
       for (let index = 0; index < 8; index++) {
-        if (interrupted != null) throw new Error(`Interrupted: ${interrupted}`);
+        if (session.interrupted != null)
+          throw new Error(`Interrupted: ${session.interrupted}`);
         if (target.exited() || target.pid == null) {
           captures.push({ index, status: "not-attempted-target-exited" });
           continue;
@@ -697,11 +602,9 @@ export async function captureArtifact(
       accepted = false;
       failure ??= String(error);
     }
-    for (const run of owned) run.stop("finally: cleanup owned process group");
-    const lifetimes = await Promise.all([...owned].map((run) => run.done));
-    process.off("SIGINT", sigint);
-    process.off("SIGTERM", sigterm);
-    accepted &&= interrupted == null && lifetimes.every((run) => run.groupGone);
+    const lifetimes = await session.finish();
+    accepted &&=
+      session.interrupted == null && lifetimes.every((run) => run.groupGone);
     while (captures.length < 8) {
       captures.push({
         index: captures.length,
@@ -726,7 +629,7 @@ export async function captureArtifact(
       timedArtifactAcceptance: "caller must link to final measurement evidence",
       status: accepted ? "method-probe-passed" : "failed-or-incomplete",
       failure,
-      interrupted,
+      interrupted: session.interrupted,
       host: {
         platform: process.platform,
         architecture: arch(),
