@@ -38,7 +38,7 @@ jobs:
           BASELINE: >-
             ${{ github.event.pull_request.base.sha || github.event.before }}
         run: git fetch --no-tags origin "$BASELINE"
-      - uses: jdx/mise-action@v4
+      - uses: ./.github/actions/setup-mise
         with:
           install: true
       - name: Check introduced commit messages
@@ -77,7 +77,7 @@ jobs:
       - uses: actions/checkout@v7
         with:
           persist-credentials: false
-      - uses: jdx/mise-action@v4
+      - uses: ./.github/actions/setup-mise
         with:
           install: true
       - uses: ./.github/actions/runtime-archive-cache
@@ -113,7 +113,7 @@ jobs:
       - uses: actions/checkout@v7
         with:
           persist-credentials: false
-      - uses: jdx/mise-action@v4
+      - uses: ./.github/actions/setup-mise
         with:
           install: true
       - uses: ./.github/actions/runtime-archive-cache
@@ -130,7 +130,7 @@ jobs:
       - uses: actions/checkout@v7
         with:
           persist-credentials: false
-      - uses: jdx/mise-action@v4
+      - uses: ./.github/actions/setup-mise
         with:
           install: true
       - uses: ./.github/actions/runtime-archive-cache
@@ -150,7 +150,7 @@ jobs:
       - uses: actions/checkout@v7
         with:
           persist-credentials: false
-      - uses: jdx/mise-action@v4
+      - uses: ./.github/actions/setup-mise
         with:
           install: true
       - uses: ./.github/actions/runtime-archive-cache
@@ -185,7 +185,7 @@ jobs:
       - uses: actions/checkout@v7
         with:
           persist-credentials: false
-      - uses: jdx/mise-action@v4
+      - uses: ./.github/actions/setup-mise
         with:
           install: true
       - uses: ./.github/actions/runtime-archive-cache
@@ -202,7 +202,7 @@ jobs:
       - uses: actions/checkout@v7
         with:
           persist-credentials: false
-      - uses: jdx/mise-action@v4
+      - uses: ./.github/actions/setup-mise
         with:
           install: true
       - uses: ./.github/actions/runtime-archive-cache
@@ -230,7 +230,7 @@ jobs:
       - uses: actions/checkout@v7
         with:
           persist-credentials: false
-      - uses: jdx/mise-action@v4
+      - uses: ./.github/actions/setup-mise
         with:
           install: true
       - uses: ./.github/actions/runtime-archive-cache
@@ -267,7 +267,7 @@ jobs:
       - uses: actions/checkout@v7
         with:
           persist-credentials: false
-      - uses: jdx/mise-action@v4
+      - uses: ./.github/actions/setup-mise
         with:
           install: true
       - uses: ./.github/actions/runtime-archive-cache
@@ -300,7 +300,7 @@ jobs:
       - uses: actions/checkout@v7
         with:
           persist-credentials: false
-      - uses: jdx/mise-action@v4
+      - uses: ./.github/actions/setup-mise
         with:
           install: true
       - uses: ./.github/actions/runtime-archive-cache
@@ -354,7 +354,7 @@ jobs:
       - uses: actions/checkout@v7
         with:
           persist-credentials: false
-      - uses: jdx/mise-action@v4
+      - uses: ./.github/actions/setup-mise
         with:
           install: true
       - uses: ./.github/actions/runtime-archive-cache
@@ -384,7 +384,7 @@ jobs:
       - uses: actions/checkout@v7
         with:
           persist-credentials: false
-      - uses: jdx/mise-action@v4
+      - uses: ./.github/actions/setup-mise
         with:
           install: true
       - uses: ./.github/actions/runtime-archive-cache
@@ -447,7 +447,7 @@ jobs:
       - uses: actions/checkout@v7
         with:
           persist-credentials: false
-      - uses: jdx/mise-action@v4
+      - uses: ./.github/actions/setup-mise
         with:
           install: true
       - uses: ./.github/actions/runtime-archive-cache
@@ -585,7 +585,7 @@ jobs:
       - uses: actions/checkout@v7
         with:
           persist-credentials: false
-      - uses: jdx/mise-action@v4
+      - uses: ./.github/actions/setup-mise
         with:
           install: true
       - uses: ./.github/actions/runtime-archive-cache
@@ -699,7 +699,7 @@ jobs:
       - uses: actions/checkout@v7
         with:
           persist-credentials: false
-      - uses: jdx/mise-action@v4
+      - uses: ./.github/actions/setup-mise
         with:
           install: true
       - uses: ./.github/actions/runtime-archive-cache
@@ -766,7 +766,7 @@ jobs:
       - uses: actions/checkout@v7
         with:
           persist-credentials: false
-      - uses: jdx/mise-action@v4
+      - uses: ./.github/actions/setup-mise
         with:
           install: true
       - uses: ./.github/actions/runtime-archive-cache
@@ -832,7 +832,7 @@ jobs:
       - uses: actions/checkout@v7
         with:
           persist-credentials: false
-      - uses: jdx/mise-action@v4
+      - uses: ./.github/actions/setup-mise
         with:
           install: true
       - uses: ./.github/actions/runtime-archive-cache
@@ -906,7 +906,7 @@ jobs:
       - uses: actions/checkout@v7
         with:
           persist-credentials: false
-      - uses: jdx/mise-action@v4
+      - uses: ./.github/actions/setup-mise
         with:
           install: true
       - uses: ./.github/actions/runtime-archive-cache
@@ -951,7 +951,7 @@ jobs:
       - uses: actions/checkout@v7
         with:
           persist-credentials: false
-      - uses: jdx/mise-action@v4
+      - uses: ./.github/actions/setup-mise
         with:
           install: true
       - uses: ./.github/actions/runtime-archive-cache

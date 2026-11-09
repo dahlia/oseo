@@ -549,7 +549,7 @@ test("Array Linux job preserves the full extended invocation", () => {
   assert.equal(job.strategy, undefined);
   assert.deepEqual(job.steps.slice(0, 3), [
     { uses: "actions/checkout@v7", with: { "persist-credentials": false } },
-    { uses: "jdx/mise-action@v4", with: { install: true } },
+    { uses: "./.github/actions/setup-mise", with: { install: true } },
     { uses: "./.github/actions/runtime-archive-cache" },
   ]);
   assert.deepEqual(job.steps[3], {
@@ -966,7 +966,7 @@ test("one extra lane retains every job and aggregate dependency", () => {
     actions: "read",
   });
   const miseStep = readiness.steps.find(
-    (step) => step.uses === "jdx/mise-action@v4",
+    (step) => step.uses === "./.github/actions/setup-mise",
   );
   assert.ok(miseStep);
   assert.deepEqual(miseStep.with, {
