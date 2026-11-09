@@ -23,13 +23,14 @@ import type { PreparedNativeRuntime } from "../src/index.ts";
 
 test("prints deterministic MIR and C for accepted source", () => {
   const help = runCli({ args: ["--help"], version: "0.0.0" });
-  assert.ok(help.stdout.includes("--emit-c"));
-  assert.ok(help.stdout.includes("--dump-mir"));
+  const buildHelp = runCli({ args: ["build", "--help"], version: "0.0.0" });
+  assert.ok(buildHelp.stdout.includes("--emit-c"));
+  assert.ok(buildHelp.stdout.includes("--dump-mir"));
   assert.ok(help.stdout.includes("--no-specialization"));
   assert.ok(help.stdout.includes("--no-runtime-archive-reuse"));
   assert.ok(help.stdout.includes("--target"));
   const mir = runCli({
-    args: ["--dump-mir", "fixture.ts"],
+    args: ["build", "--dump-mir", "fixture.ts"],
     source: "console.log(42);",
     sourceId: "fixture.ts",
     version: "0.0.0",
@@ -37,7 +38,7 @@ test("prints deterministic MIR and C for accepted source", () => {
   assert.equal(mir.exitStatus, 0);
   assert.match(mir.stdout, /safepoint console_log/u);
   const emitted = runCli({
-    args: ["--emit-c", "fixture.ts"],
+    args: ["build", "--emit-c", "fixture.ts"],
     source: "console.log(42);",
     sourceId: "fixture.ts",
     version: "0.0.0",
@@ -48,7 +49,7 @@ test("prints deterministic MIR and C for accepted source", () => {
 
 test("composes the pinned Unicode property resolver", () => {
   const accepted = runCli({
-    args: ["--dump-mir", "fixture.ts"],
+    args: ["build", "--dump-mir", "fixture.ts"],
     source: "const value = /\\p{sc=Grek}/u;",
     sourceId: "fixture.ts",
     version: "0.0.0",
@@ -58,7 +59,7 @@ test("composes the pinned Unicode property resolver", () => {
   assert.match(accepted.stdout, /regexp-literal/u);
 
   const rejected = runCli({
-    args: ["--dump-mir", "fixture.ts"],
+    args: ["build", "--dump-mir", "fixture.ts"],
     source: "const value = /\\p{Latin}/u;",
     sourceId: "fixture.ts",
     version: "0.0.0",
@@ -91,7 +92,7 @@ test("composes the pinned resolver for module sources", async () => {
   };
   const result = await runNativeCli(
     {
-      args: ["--dump-mir", "/work/entry.mjs"],
+      args: ["build", "--dump-mir", "/work/entry.mjs"],
       source: "export default /\\p{sc=Grek}/u;",
       version: "0.0.0",
     },
@@ -107,12 +108,12 @@ test("passes an explicit generic-only policy through CLI orchestration", () => {
     "function add(left: number, right: number) { " +
     "return left + right; } add(1, 2);";
   const enabled = runCli({
-    args: ["--dump-mir", "fixture.ts"],
+    args: ["build", "--dump-mir", "fixture.ts"],
     source,
     version: "0.0.0",
   });
   const disabled = runCli({
-    args: ["--no-specialization", "--dump-mir", "fixture.ts"],
+    args: ["build", "--no-specialization", "--dump-mir", "fixture.ts"],
     source,
     version: "0.0.0",
   });
@@ -131,7 +132,7 @@ test("rejects invalid command-line shapes before compilation", () => {
   assert.match(unknown.stderr, /--unknown/u);
 
   const missingSource = runCli({
-    args: ["--dump-mir"],
+    args: ["build", "--dump-mir"],
     source: "console.log(42);",
     version: "0.0.0",
   });
@@ -139,7 +140,7 @@ test("rejects invalid command-line shapes before compilation", () => {
   assert.match(missingSource.stderr, /SOURCE/u);
 
   const conflictingModes = runCli({
-    args: ["--dump-mir", "--emit-c", "fixture.ts"],
+    args: ["build", "--dump-mir", "--emit-c", "fixture.ts"],
     source: "console.log(42);",
     version: "0.0.0",
   });
@@ -147,7 +148,7 @@ test("rejects invalid command-line shapes before compilation", () => {
   assert.match(conflictingModes.stderr, /--emit-c/u);
 
   const duplicateMode = runCli({
-    args: ["--dump-mir", "--dump-mir", "fixture.ts"],
+    args: ["build", "--dump-mir", "--dump-mir", "fixture.ts"],
     source: "console.log(42);",
     version: "0.0.0",
   });
@@ -173,12 +174,12 @@ test("rejects invalid command-line shapes before compilation", () => {
 
 test("rejects target selection for host-neutral output", () => {
   const result = runCli({
-    args: ["--target", "macos-aarch64", "--emit-c", "fixture.ts"],
+    args: ["build", "--target", "macos-aarch64", "--emit-c", "fixture.ts"],
     source: "console.log(42);",
     version: "0.0.0",
   });
   assert.equal(result.exitStatus, 1);
-  assert.match(result.stderr, /asynchronous native execution/u);
+  assert.match(result.stderr, /native output/u);
 });
 
 test("rejects unsupported target-host pairs before building", async () => {
@@ -240,8 +241,8 @@ test("rejects unsupported target-host pairs before building", async () => {
 
 test("accepts mode options on either side of the source argument", () => {
   for (const args of [
-    ["--dump-mir", "fixture.ts"],
-    ["fixture.ts", "--dump-mir"],
+    ["build", "--dump-mir", "fixture.ts"],
+    ["build", "fixture.ts", "--dump-mir"],
   ]) {
     const result = runCli({
       args,
@@ -277,7 +278,7 @@ test("separates the source path from its diagnostic identifier", async () => {
   };
   const result = await runNativeCli(
     {
-      args: ["--dump-mir", "/tmp/input.ts"],
+      args: ["build", "--dump-mir", "/tmp/input.ts"],
       sourceId: "display.ts",
       version: "0.0.0",
     },
@@ -310,7 +311,7 @@ test("reads a file URL entry as a URL", async () => {
   };
   const result = await runNativeCli(
     {
-      args: ["--dump-mir", "file:///work/input.ts"],
+      args: ["build", "--dump-mir", "file:///work/input.ts"],
       version: "0.0.0",
     },
     host,
@@ -348,7 +349,7 @@ test("loads and lowers a closed file module graph", async () => {
   };
   const result = await runNativeCli(
     {
-      args: ["--dump-mir", "/work/entry.js"],
+      args: ["build", "--dump-mir", "/work/entry.js"],
       source:
         'import * as values from "./values.js"; ' +
         "console.log(values.answer);",
@@ -385,7 +386,7 @@ test("locates unreadable dependencies at their import sites", async () => {
   };
   const result = await runNativeCli(
     {
-      args: ["--dump-mir", "/work/entry.js"],
+      args: ["build", "--dump-mir", "/work/entry.js"],
       source: 'console.log("before");\nimport "./missing.js";',
       version: "0.0.0",
     },
@@ -423,7 +424,7 @@ test("forces the module goal symbol with --module", async () => {
   const ambiguous = "await (0);";
   const asModule = await runNativeCli(
     {
-      args: ["--dump-mir", "--module", "/work/entry.js"],
+      args: ["build", "--dump-mir", "--module", "/work/entry.js"],
       source: ambiguous,
       version: "0.0.0",
     },
@@ -434,7 +435,7 @@ test("forces the module goal symbol with --module", async () => {
   assert.match(asModule.stdout, /generator-await/u);
   const asScript = await runNativeCli(
     {
-      args: ["--dump-mir", "/work/entry.js"],
+      args: ["build", "--dump-mir", "/work/entry.js"],
       source: ambiguous,
       version: "0.0.0",
     },
@@ -443,7 +444,7 @@ test("forces the module goal symbol with --module", async () => {
   assert.doesNotMatch(asScript.stdout, /generator-await/u);
   const strictModule = await runNativeCli(
     {
-      args: ["--dump-mir", "--module", "/work/entry.js"],
+      args: ["build", "--dump-mir", "--module", "/work/entry.js"],
       source: "function duplicate(parameter, parameter) {}",
       version: "0.0.0",
     },
@@ -480,7 +481,14 @@ test("evaluates a --script Script before the module graph", async () => {
   };
   const fromFile = await runNativeCli(
     {
-      args: ["--dump-mir", "--module", "--script", "/work/prelude.js", "e.js"],
+      args: [
+        "build",
+        "--dump-mir",
+        "--module",
+        "--script",
+        "/work/prelude.js",
+        "e.js",
+      ],
       source: "check(lexical);",
       version: "0.0.0",
     },
@@ -496,7 +504,7 @@ test("evaluates a --script Script before the module graph", async () => {
   // Without the Script, the module's own read is an unresolved global.
   const withoutScript = await runNativeCli(
     {
-      args: ["--dump-mir", "--module", "e.js"],
+      args: ["build", "--dump-mir", "--module", "e.js"],
       source: "check(lexical);",
       version: "0.0.0",
     },
@@ -506,7 +514,14 @@ test("evaluates a --script Script before the module graph", async () => {
   assert.doesNotMatch(withoutScript.stdout, /global-object/u);
   const inMemory = await runNativeCli(
     {
-      args: ["--dump-mir", "--module", "--script", "harness.js", "e.js"],
+      args: [
+        "build",
+        "--dump-mir",
+        "--module",
+        "--script",
+        "harness.js",
+        "e.js",
+      ],
       scriptSource: "var 1;",
       source: "export {};",
       version: "0.0.0",
@@ -518,7 +533,14 @@ test("evaluates a --script Script before the module graph", async () => {
   assert.deepEqual(reads, ["/work/prelude.js"]);
   const unreadable = await runNativeCli(
     {
-      args: ["--dump-mir", "--module", "--script", "/work/absent.js", "e.js"],
+      args: [
+        "build",
+        "--dump-mir",
+        "--module",
+        "--script",
+        "/work/absent.js",
+        "e.js",
+      ],
       source: "export {};",
       version: "0.0.0",
     },
@@ -528,7 +550,7 @@ test("evaluates a --script Script before the module graph", async () => {
   assert.match(unreadable.stderr, /The Script file could not be read/u);
   const scriptEntry = await runNativeCli(
     {
-      args: ["--dump-mir", "--script", "/work/prelude.js", "e.js"],
+      args: ["build", "--dump-mir", "--script", "/work/prelude.js", "e.js"],
       source: "check();",
       version: "0.0.0",
     },
@@ -580,7 +602,7 @@ test("recognizes top-level await without module declarations", async () => {
   };
   const result = await runNativeCli(
     {
-      args: ["--dump-mir", "/work/await.js"],
+      args: ["build", "--dump-mir", "/work/await.js"],
       source: "await Promise.resolve(1);",
       version: "0.0.0",
     },
@@ -626,7 +648,7 @@ test("preserves module parsing for plain module entries", async () => {
     ].map((sourcePath) =>
       runNativeCli(
         {
-          args: ["--dump-mir", sourcePath],
+          args: ["build", "--dump-mir", sourcePath],
           source,
           version: "0.0.0",
         },
@@ -639,7 +661,7 @@ test("preserves module parsing for plain module entries", async () => {
     assert.match(result.stderr, /error\[OSEO0001\]/u);
   }
   const script = await runNativeCli({
-    args: ["--dump-mir", "entry.js"],
+    args: ["build", "--dump-mir", "entry.js"],
     source,
     version: "0.0.0",
   });
@@ -1392,7 +1414,7 @@ test("compiles agent programs beside a test262 host program", () => {
   const help = runCli({ args: ["--help"], version: "0.0.0" });
   assert.ok(help.stdout.includes("--test262-host"));
   const mir = runCli({
-    args: ["--test262-host", "--dump-mir", "agents.js"],
+    args: ["build", "--test262-host", "--dump-mir", "agents.js"],
     source: agentSource,
     sourceId: "agents.js",
     version: "0.0.0",
@@ -1406,7 +1428,7 @@ test("compiles agent programs beside a test262 host program", () => {
   // them, and --emit-c rejects the program instead of printing C that
   // defines the same names twice.
   const emitted = runCli({
-    args: ["--test262-host", "--emit-c", "agents.js"],
+    args: ["build", "--test262-host", "--emit-c", "agents.js"],
     source: agentSource,
     sourceId: "agents.js",
     version: "0.0.0",
@@ -1421,7 +1443,7 @@ test("compiles agent programs beside a test262 host program", () => {
   );
   // A host program without an agent template is still one unit.
   const agentless = runCli({
-    args: ["--test262-host", "--emit-c", "agentless.js"],
+    args: ["build", "--test262-host", "--emit-c", "agentless.js"],
     source: "console.log(typeof $262.agent.getReport);",
     sourceId: "agentless.js",
     version: "0.0.0",
@@ -1435,7 +1457,7 @@ test("compiles agent programs beside a test262 host program", () => {
   assert.doesNotMatch(agentless.stdout, /oseo_agent_program_0/u);
 
   const plain = runCli({
-    args: ["--emit-c", "plain.js"],
+    args: ["build", "--emit-c", "plain.js"],
     source: "console.log(1);",
     sourceId: "plain.js",
     version: "0.0.0",
@@ -1444,7 +1466,7 @@ test("compiles agent programs beside a test262 host program", () => {
   // Without the host, `$262` is an ordinary global reference, and the
   // program installs no host object and links no agent program.
   const unhosted = runCli({
-    args: ["--emit-c", "unhosted.js"],
+    args: ["build", "--emit-c", "unhosted.js"],
     source: agentSource,
     sourceId: "unhosted.js",
     version: "0.0.0",
@@ -1474,7 +1496,7 @@ test("rejects agent templates whose holes are not literal positions", () => {
     ],
   ] as const) {
     const rejected = runCli({
-      args: ["--test262-host", "--dump-mir", "template.js"],
+      args: ["build", "--test262-host", "--dump-mir", "template.js"],
       source: `$262.agent.start(${template});`,
       sourceId: "template.js",
       version: "0.0.0",
@@ -1485,7 +1507,7 @@ test("rejects agent templates whose holes are not literal positions", () => {
   // A hole the Script reads twice, through typeof and a plain read, is
   // still one placeholder per substitution.
   const accepted = runCli({
-    args: ["--test262-host", "--dump-mir", "template.js"],
+    args: ["build", "--test262-host", "--dump-mir", "template.js"],
     source: "$262.agent.start(`let x = typeof ${1} + ${2};`);",
     sourceId: "template.js",
     version: "0.0.0",
@@ -1495,7 +1517,7 @@ test("rejects agent templates whose holes are not literal positions", () => {
   // An escaped identifier that decodes to a placeholder name moves the
   // placeholder instead of shadowing the hole.
   const escaped = runCli({
-    args: ["--test262-host", "--dump-mir", "template.js"],
+    args: ["build", "--test262-host", "--dump-mir", "template.js"],
     source:
       "$262.agent.start(`let $262AgentHol\\\\u{65}0 = 1; " +
       "$262.agent.report(${1} + $262AgentHol\\\\u{65}0);`);",
@@ -1519,7 +1541,7 @@ test("collects agent templates only through the host $262", () => {
     `with ({}) { $262.agent.start(${notSource}); }`,
   ]) {
     const shadowed = runCli({
-      args: ["--test262-host", "--dump-mir", "shadowed.js"],
+      args: ["build", "--test262-host", "--dump-mir", "shadowed.js"],
       source,
       sourceId: "shadowed.js",
       version: "0.0.0",
@@ -1534,7 +1556,7 @@ test("collects agent templates only through the host $262", () => {
     'var $262;\nfunction f() { $262.agent.start("$262.agent.leaving();"); }',
   ]) {
     const global = runCli({
-      args: ["--test262-host", "--dump-mir", "global.js"],
+      args: ["build", "--test262-host", "--dump-mir", "global.js"],
       source,
       sourceId: "global.js",
       version: "0.0.0",
@@ -1544,7 +1566,7 @@ test("collects agent templates only through the host $262", () => {
   }
   // The host call beside a shadowed one is still an agent program.
   const mixed = runCli({
-    args: ["--test262-host", "--dump-mir", "mixed.js"],
+    args: ["build", "--test262-host", "--dump-mir", "mixed.js"],
     source:
       `function f($262) { $262.agent.start(${notSource}); }\n` +
       '$262.agent.start("$262.agent.leaving();");',
@@ -2418,7 +2440,7 @@ test("a script entry resolves import() against its own path", async () => {
   };
   const result = await runNativeCli(
     {
-      args: ["--dump-mir", "/work/script.js"],
+      args: ["build", "--dump-mir", "/work/script.js"],
       source: 'var p = import("./lazy.mjs");',
       version: "0.0.0",
     },
@@ -2433,7 +2455,7 @@ test("a script entry resolves import() against its own path", async () => {
   // A computed specifier stays outside the admitted subset.
   const computed = await runNativeCli(
     {
-      args: ["--dump-mir", "/work/script.js"],
+      args: ["build", "--dump-mir", "/work/script.js"],
       source: 'var name = "./lazy.mjs";\nimport(name);',
       version: "0.0.0",
     },

@@ -9,7 +9,7 @@ import { describeTarget } from "../packages/compiler/dist/index.js";
 test("built ESM packages compose through public exports", () => {
   assert.equal(describeTarget("linux-x86_64-gnu").executableFormat, "elf");
   assert.match(
-    runCli({ args: ["--help"], version: "0.0.0" }).stdout,
+    runCli({ args: ["build", "--help"], version: "0.0.0" }).stdout,
     /--emit-c/u,
   );
 });
@@ -21,9 +21,13 @@ test("built npm CLI reads source for dump modes", () => {
   const fixture = fileURLToPath(
     new URL("./fixtures/native-reference.ts", import.meta.url),
   );
-  const result = spawnSync(process.execPath, [cli, "--emit-c", fixture], {
-    encoding: "utf8",
-  });
+  const result = spawnSync(
+    process.execPath,
+    [cli, "build", "--emit-c", fixture],
+    {
+      encoding: "utf8",
+    },
+  );
   assert.equal(result.status, 0, result.stderr);
   assert.match(result.stdout, /oseo_add/u);
   assert.match(result.stdout, /oseo_console_log/u);

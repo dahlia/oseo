@@ -1238,3 +1238,9 @@ export function createDenoHost(): CompilerHost {
     },
   };
 }
+
+export { createExecutablePublisher } from "./executable-publication.ts";
+export type {
+  ExecutableDestination,
+  ExecutablePublisher,
+} from "./executable-publication.ts";

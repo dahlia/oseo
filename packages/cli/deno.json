@@ -4,6 +4,6 @@
   "license": "GPL-3.0-only",
   "exports": "./src/index.ts",
   "publish": {
-    "exclude": ["dist/", "tests/"]
+    "exclude": ["dist/", "tests/", "tools/"]
   }
 }

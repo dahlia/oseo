@@ -38,6 +38,7 @@ import {
 import {
   canonicalizeFileModuleUrl,
   createDenoHost,
+  createExecutablePublisher,
   createFileModuleLoader,
   createNodeHost,
   fileModuleResolver,
@@ -55,14 +56,37 @@ import {
   ecma262UnicodeStringPropertySet,
   ecma262UnicodePropertySet,
 } from "@oseo/unicode";
-import { object, or } from "@optique/core/constructs";
 import { runParser } from "@optique/core/facade";
 import { message } from "@optique/core/message";
-import { map, optional, withDefault } from "@optique/core/modifiers";
-import type { InferValue } from "@optique/core/parser";
-import { argument, flag, option } from "@optique/core/primitives";
+import type { Mode, Parser } from "@optique/core/parser";
+import { createProgramParser } from "@optique/discover";
+import commands from "./commands.generated.ts";
 import { defineProgram } from "@optique/core/program";
-import { choice, string as stringValue } from "@optique/core/valueparser";
+import type { CliInvocation } from "./options.ts";
+
+function isSynchronousParser<T, State>(
+  parser: Parser<Mode, T, State>,
+): parser is Parser<"sync", T, State> {
+  return parser.mode === "sync";
+}
+
+function createCliProgram() {
+  const parser = createProgramParser(commands);
+  if (!isSynchronousParser(parser)) {
+    throw new Error("Embedded CLI parsing requires synchronous parsers.");
+  }
+  return defineProgram({
+    metadata: {
+      brief: message`Compile JavaScript source to a native executable.`,
+      name: "oseo",
+    },
+    parser,
+  });
+}
+
+import type { ExecutableDestination, ExecutablePublisher } from "@oseo/host";
+import { basename, extname } from "node:path";
+import { fileURLToPath } from "node:url";
 
 import { unicodeMatcherData } from "./regexp-unicode.ts";
 
@@ -78,138 +102,6 @@ function includePropertiesWhen<const Properties extends object>(
 ): Properties | { [Key in keyof Properties]?: never } {
   return properties() ?? {};
 }
-
-const modeParser = withDefault(
-  or(
-    map(
-      flag("--dump-mir", {
-        description: message`Print textual MIR for supported source.`,
-      }),
-      () => "dump-mir" as const,
-    ),
-    map(
-      flag("--emit-c", {
-        description: message`Print generated C11 for supported source.`,
-      }),
-      () => "emit-c" as const,
-    ),
-  ),
-  "execute" as const,
-);
-
-const specializationParser = withDefault(
-  map(
-    flag("--no-specialization", {
-      description: message`Compile only the generic native path.`,
-    }),
-    () => "disabled" as const,
-  ),
-  "enabled" as const,
-);
-
-const runtimeArchiveReuseParser = withDefault(
-  map(
-    flag("--no-runtime-archive-reuse", {
-      description: message`Rebuild the C runtime archive for this execution.`,
-    }),
-    () => "disabled" as const,
-  ),
-  "enabled" as const,
-);
-
-const test262HostParser = withDefault(
-  map(
-    flag("--test262-host", {
-      description: message`Provide the test262 host bindings and AOT sources.`,
-    }),
-    () => true,
-  ),
-  false,
-);
-
-const test262NonBlockingParser = withDefault(
-  map(
-    flag("--test262-non-blocking", {
-      description: message`Run the test262 main agent with [[CanBlock]] false.`,
-    }),
-    () => true,
-  ),
-  false,
-);
-
-// ADR 0030: the tolerant test262 rejection policy is its own explicit
-// option, independent of --test262-host, and every other run stays fatal.
-const unhandledRejectionPolicyParser = withDefault(
-  map(
-    flag("--test262-observe-rejections", {
-      description: message`Continue after unhandled rejections for test262.`,
-    }),
-    () => "observe" as const,
-  ),
-  "fatal" as const,
-);
-
-const moduleParser = withDefault(
-  map(
-    flag("--module", {
-      description: message`Compile the source as an ECMAScript module.`,
-    }),
-    () => true,
-  ),
-  false,
-);
-
-const scriptParser = optional(
-  option("--script", stringValue({ metavar: "SCRIPT" }), {
-    description: message`Evaluate a Script in the realm before the module.`,
-  }),
-);
-
-const targetParser = optional(
-  option(
-    "--target",
-    choice([
-      "linux-aarch64-musl",
-      "linux-x86_64-gnu",
-      "macos-aarch64",
-    ] as const),
-    {
-      description: message`Select an explicit native execution target.`,
-    },
-  ),
-);
-
-const buildConfigurationParser = optional(
-  option("--build-config", choice(["checked", "optimized"] as const), {
-    description: message`Select checked (default) or optimized builds.`,
-  }),
-);
-
-const cliParser = object({
-  buildConfiguration: buildConfigurationParser,
-  module: moduleParser,
-  mode: modeParser,
-  runtimeArchiveReuse: runtimeArchiveReuseParser,
-  script: scriptParser,
-  sourceId: argument(stringValue({ metavar: "SOURCE" }), {
-    description: message`Source file to compile.`,
-  }),
-  specialization: specializationParser,
-  target: targetParser,
-  test262Host: test262HostParser,
-  test262NonBlocking: test262NonBlockingParser,
-  unhandledRejectionPolicy: unhandledRejectionPolicyParser,
-});
-
-const cliProgram = defineProgram({
-  metadata: {
-    brief: message`Compile JavaScript source to a native executable.`,
-    name: "oseo",
-  },
-  parser: cliParser,
-});
-
-type CliInvocation = InferValue<typeof cliParser>;
 
 type CliParseResult =
   | { readonly kind: "invoke"; readonly value: CliInvocation }
@@ -317,12 +209,41 @@ function hostDiagnostic(
   };
 }
 
+function hostFailureReason(cause: unknown): string {
+  return cause instanceof Error ? cause.message : "unknown host failure";
+}
+
 function diagnosticResult(diagnostic: Diagnostic): CliResult {
   return {
     exitStatus: 1,
     stderr: `${renderDiagnostic(diagnostic)}\n`,
     stdout: "",
   };
+}
+
+function invocationDiagnostic(
+  value: CliInvocation,
+  sourceId: string,
+): Diagnostic | undefined {
+  if (value.mode !== "execute") {
+    const invalid =
+      value.target != null
+        ? "--target"
+        : value.runtimeArchiveReuse === "disabled"
+          ? "--no-runtime-archive-reuse"
+          : value.output != null
+            ? "--output"
+            : value.buildConfiguration != null
+              ? "--build-config"
+              : undefined;
+    if (invalid != null) {
+      return hostDiagnostic(
+        sourceId,
+        `The ${invalid} option applies only to native output.`,
+      );
+    }
+  }
+  return undefined;
 }
 
 function parseCliRequest(request: CliRequest): CliParseResult {
@@ -335,26 +256,33 @@ function parseCliRequest(request: CliRequest): CliParseResult {
     throw stopped;
   };
   try {
-    return {
-      kind: "invoke",
-      value: runParser(cliProgram, request.args, {
-        colors: false,
-        help: { onShow: stop, option: true },
-        maxWidth: 80,
-        onError: stop,
-        stderr: (text) => {
-          stderr += `${text}\n`;
-        },
-        stdout: (text) => {
-          stdout += `${text}\n`;
-        },
-        version: {
-          onShow: stop,
-          option: true,
-          value: request.version,
-        },
-      }),
-    };
+    const invocation = runParser(createCliProgram(), request.args, {
+      colors: false,
+      help: { onShow: stop, option: true },
+      maxWidth: 80,
+      onError: stop,
+      stderr: (text) => {
+        stderr += `${text}\n`;
+      },
+      stdout: (text) => {
+        stdout += `${text}\n`;
+      },
+      version: {
+        onShow: stop,
+        option: true,
+        value: request.version,
+      },
+    });
+    // SAFETY: All generated command modules declare CliInvocation; discovery
+    // erases those command-specific types at its heterogeneous boundary.
+    const value = invocation.value as CliInvocation;
+    const diagnostic = invocationDiagnostic(
+      value,
+      request.sourceId ?? value.sourceId,
+    );
+    return diagnostic == null
+      ? { kind: "invoke", value }
+      : { kind: "result", value: diagnosticResult(diagnostic) };
   } catch (error) {
     if (error !== stopped) throw error;
     return {
@@ -448,7 +376,10 @@ async function compileCliModuleGraph(
   specialization: CliInvocation["specialization"],
   unhandledRejectionPolicy: UnhandledRejectionPolicy,
   script?: CliPreludeScript,
-): Promise<{ readonly diagnostic: Diagnostic } | { readonly mir: MirProgram }> {
+): Promise<
+  | { readonly diagnostic: Diagnostic }
+  | { readonly mir: MirProgram; readonly sourcePaths: readonly string[] }
+> {
   let entryId: string;
   try {
     entryId =
@@ -517,7 +448,10 @@ async function compileCliModuleGraph(
       diagnostic: hostDiagnostic(entryId, "The compiler did not produce MIR."),
     };
   }
-  return { mir: compiled.mir };
+  return {
+    mir: compiled.mir,
+    sourcePaths: result.graph.modules.map((node) => node.canonicalId),
+  };
 }
 
 /**
@@ -1283,6 +1217,14 @@ async function requirePinnedToolchain(
   }
 }
 
+interface NativeWorkflowOptions {
+  readonly buildConfiguration: NativeBuildConfiguration;
+  readonly publication?: {
+    readonly publisher: ExecutablePublisher;
+    readonly destination: ExecutableDestination;
+  };
+}
+
 async function executeNativeWorkflow(
   host: CompilerHost,
   sourceId: string,
@@ -1292,8 +1234,9 @@ async function executeNativeWorkflow(
   archiveReuse: CliInvocation["runtimeArchiveReuse"],
   toolchain: NativeToolchain,
   prepared: PreparedNativeRuntime | undefined,
-  buildConfiguration: NativeBuildConfiguration,
+  options: NativeWorkflowOptions,
 ): Promise<CliResult> {
+  const { buildConfiguration, publication } = options;
   const units = "sources" in input ? input : undefined;
   const emitted =
     "sources" in input
@@ -1425,9 +1368,9 @@ async function executeNativeWorkflow(
       if (identity == null) {
         throw new Error("The native toolchain identity is unavailable.");
       }
-      const key =
-        prepared?.archiveKey ??
-        (await reuse.createKey({
+      let key = prepared?.archiveKey;
+      if (key == null) {
+        const keyInput = {
           buildConfiguration,
           runtimeAbiVersion: runtime.abiVersion,
           runtimeAssets: readAssets.map((entry) => ({
@@ -1438,7 +1381,9 @@ async function executeNativeWorkflow(
           target,
           toolchainEnvironment,
           toolchainIdentity: identity,
-        }));
+        };
+        key = await reuse.createKey(keyInput);
+      }
       const cacheDirectory = await cache.getDirectory("runtime-archives");
       const candidate = join(cacheDirectory, `liboseo-runtime-${key}.a`);
       cacheLock = await cache.acquireFileLock(candidate);
@@ -1502,7 +1447,7 @@ async function executeNativeWorkflow(
   }
   let executablePath: string | undefined;
   try {
-    const plan = toolchain.createBuildPlan({
+    const buildInput = {
       buildConfiguration,
       ...includePropertiesWhen(() => {
         if (prepared == null) return undefined;
@@ -1534,7 +1479,8 @@ async function executeNativeWorkflow(
       runtimeSourcePaths,
       target,
       workingDirectory: directory,
-    });
+    };
+    const plan = toolchain.createBuildPlan(buildInput);
     executablePath = plan.executablePath;
     // Staging ran between the last recheck and here, so the pin is confirmed
     // once more immediately before the compiler is invoked.
@@ -1583,6 +1529,13 @@ async function executeNativeWorkflow(
     return diagnosticResult(
       hostDiagnostic(sourceId, "The native executable is unavailable."),
     );
+  }
+  if (publication != null) {
+    await publication.publisher.publish(
+      executablePath,
+      publication.destination,
+    );
+    return { exitStatus: 0, stderr: "", stdout: "" };
   }
   const attempt = await observeProcess(host, {
     args: [],
@@ -1648,48 +1601,69 @@ export async function runNativeCli(
   request: CliRequest,
   host?: CompilerHost,
   toolchain: NativeToolchain = defaultComponents.toolchain,
+  publisher?: ExecutablePublisher,
 ): Promise<CliResult> {
   host ??= defaultNodeHost();
   const parsed = parseCliRequest(request);
   if (parsed.kind === "result") return parsed.value;
+  return executeCliInvocation(
+    parsed.value,
+    request,
+    host,
+    toolchain,
+    publisher,
+  );
+}
+
+/** Execute typed command values with an injected host and publisher. */
+export async function executeCliInvocation(
+  invocation: CliInvocation,
+  request: CliRequest,
+  host: CompilerHost = defaultNodeHost(),
+  toolchain: NativeToolchain = defaultComponents.toolchain,
+  publisher: ExecutablePublisher = createExecutablePublisher(),
+): Promise<CliResult> {
+  const invalid = invocationDiagnostic(
+    invocation,
+    request.sourceId ?? invocation.sourceId,
+  );
+  if (invalid != null) return diagnosticResult(invalid);
+  const parsed = { value: invocation };
   const sourceId = request.sourceId ?? parsed.value.sourceId;
-  if (
-    parsed.value.mode !== "execute" &&
-    parsed.value.buildConfiguration != null
-  ) {
-    return diagnosticResult(
-      hostDiagnostic(
-        sourceId,
-        "The --build-config option applies only to native execution.",
-      ),
-    );
-  }
-  if (parsed.value.mode !== "execute" && parsed.value.target != null) {
-    return diagnosticResult(
-      hostDiagnostic(
-        sourceId,
-        "The --target option applies only to native execution.",
-      ),
-    );
-  }
-  if (
-    parsed.value.mode !== "execute" &&
-    parsed.value.runtimeArchiveReuse === "disabled"
-  ) {
-    return diagnosticResult(
-      hostDiagnostic(
-        sourceId,
-        "The --no-runtime-archive-reuse option applies only to native " +
-          "execution.",
-      ),
-    );
-  }
   const selected =
     parsed.value.mode === "execute"
-      ? selectExecutionTarget(host, parsed.value.target, sourceId)
+      ? parsed.value.command === "build" && parsed.value.target != null
+        ? { target: describeTarget(parsed.value.target) }
+        : selectExecutionTarget(host, parsed.value.target, sourceId)
       : undefined;
   if (selected != null && "diagnostic" in selected) {
     return diagnosticResult(selected.diagnostic);
+  }
+  let publication: NativeWorkflowOptions["publication"];
+  if (parsed.value.command === "build" && parsed.value.mode === "execute") {
+    let destination = parsed.value.output ?? parsed.value.sourceId;
+    try {
+      const sourcePath = /^file:/iu.test(parsed.value.sourceId)
+        ? fileURLToPath(parsed.value.sourceId)
+        : parsed.value.sourceId;
+      const name = basename(sourcePath, extname(sourcePath));
+      const suffix =
+        parsed.value.target == null ? "" : `-${parsed.value.target}`;
+      destination = parsed.value.output ?? `${name}${suffix}`;
+      publication = {
+        destination: await publisher.inspect(destination, [
+          parsed.value.sourceId,
+        ]),
+        publisher,
+      };
+    } catch (error) {
+      return diagnosticResult(
+        hostDiagnostic(
+          sourceId,
+          `Destination '${destination}' was refused: ${error}`,
+        ),
+      );
+    }
   }
   let source: string;
   try {
@@ -1702,6 +1676,7 @@ export async function runNativeCli(
     );
   }
   let mir: MirProgram | NativeUnits;
+  const sourcePaths = [parsed.value.sourceId];
   const moduleGoal =
     parsed.value.module ||
     isModuleSource(source, sourceId, parsed.value.sourceId);
@@ -1753,6 +1728,8 @@ export async function runNativeCli(
       return diagnosticResult(compiled.diagnostic);
     }
     mir = compiled.mir;
+    sourcePaths.push(...compiled.sourcePaths);
+    if (script != null) sourcePaths.push(script.sourceId);
     if (parsed.value.mode !== "execute") {
       return emitCliMir(parsed.value.mode, mir);
     }
@@ -1766,6 +1743,11 @@ export async function runNativeCli(
     if ("diagnostic" in discovered) {
       return diagnosticResult(discovered.diagnostic);
     }
+    sourcePaths.push(
+      ...(discovered.requests?.closure.modules ?? []).map(
+        (node) => node.canonicalId,
+      ),
+    );
     if (parsed.value.mode !== "execute") {
       return compileCliSource(
         parsed.value.mode,
@@ -1810,6 +1792,29 @@ export async function runNativeCli(
         }
       : compiled.mir;
   }
+  if (publication != null) {
+    try {
+      const inspected = await publisher.inspect(
+        publication.destination.path,
+        sourcePaths,
+      );
+      const before = publication.destination.existing;
+      if (
+        inspected.existing?.device !== before?.device ||
+        inspected.existing?.inode !== before?.inode
+      ) {
+        throw new Error("The destination changed during graph compilation.");
+      }
+      publication = { ...publication, destination: inspected };
+    } catch (error) {
+      return diagnosticResult(
+        hostDiagnostic(
+          sourceId,
+          `Destination '${publication.destination.path}' was refused: ${error}`,
+        ),
+      );
+    }
+  }
   let directory: string;
   try {
     directory = await host.makeTemporaryDirectory("oseo-cli-");
@@ -1835,24 +1840,33 @@ export async function runNativeCli(
       parsed.value.runtimeArchiveReuse,
       toolchain,
       undefined,
-      parsed.value.buildConfiguration ??
-        toolchain.buildConfiguration ??
-        "checked",
+      {
+        buildConfiguration:
+          parsed.value.buildConfiguration ??
+          (parsed.value.command === "build" ? "optimized" : "checked"),
+        ...includePropertiesWhen(() =>
+          publication == null ? undefined : { publication },
+        ),
+      },
     );
-  } catch {
+  } catch (error) {
     result = diagnosticResult(
-      hostDiagnostic(sourceId, "The native host workflow failed."),
+      hostDiagnostic(
+        sourceId,
+        `The native host workflow failed: ${hostFailureReason(error)}`,
+      ),
     );
   }
   try {
     await host.remove(directory);
   } catch {
-    return diagnosticResult(
+    const cleanup = diagnosticResult(
       hostDiagnostic(
         sourceId,
         "The native temporary directory could not be removed.",
       ),
     );
+    return { ...cleanup, stderr: result.stderr + cleanup.stderr };
   }
   return result;
 }
@@ -1907,7 +1921,7 @@ export async function runNativeUnits(
       archiveReuse,
       toolchain,
       preparedRuntime,
-      buildConfiguration,
+      { buildConfiguration },
     );
   } catch (error) {
     if (error instanceof PreparedNativeRuntimeMismatchError) mismatch = error;

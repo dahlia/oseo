@@ -76,3 +76,18 @@ supervisors must continue to signal that group for timeout and descendant
 cleanup. The host API adds no timeout or cancellation protocol. Disconnect
 cleanup kills direct commands; arbitrary helper loss alone does not guarantee
 termination of descendants that outlive their direct parent.
+
+`createExecutablePublisher()` supplies retained-executable publication outside
+`CompilerHost`. Its Node.js-compatible filesystem operations run under both
+Node.js and Deno. Call `inspect(destination, protectedPaths)` before native
+compilation, retaining the returned destination identity, then call
+`publish(linkedPath, destination)` after a successful link. Protected paths
+include the source and every module in its closed graph.
+
+Inspection refuses missing parents, non-executables, symlinks, and graph-source
+aliases. Publication preserves linker bytes and mode bits, rechecks replacement
+identity, and stages in the destination directory so readers never see partial
+bytes. [ADR 0037] specifies hard-link fallback, concurrent replacement windows,
+and cleanup errors. This API adds no crash-durability guarantee.
+
+[ADR 0037]: ../../docs/adr/0037-retained-native-executables.md

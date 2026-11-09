@@ -44,6 +44,7 @@ test("only the explicit option emits the observe setup", () => {
   for (const hosted of [false, true]) {
     for (const specialization of ["disabled", "enabled"] as const) {
       const args = [
+        "build",
         ...(hosted ? ["--test262-host"] : []),
         ...(specialization === "disabled" ? ["--no-specialization"] : []),
         "--emit-c",
@@ -73,7 +74,7 @@ test("only the explicit option emits the observe setup", () => {
 
 test("the rejection policy is independent of the test262 host", () => {
   const observed = runCli({
-    args: ["--dump-mir", "--test262-observe-rejections", "policy.js"],
+    args: ["build", "--dump-mir", "--test262-observe-rejections", "policy.js"],
     source: "$262;",
     version: "0.1.0",
   });
@@ -81,7 +82,7 @@ test("the rejection policy is independent of the test262 host", () => {
   assert.match(observed.stdout, /unhandled-rejections observe/u);
   assert.doesNotMatch(observed.stdout, /agent/u);
   const hosted = runCli({
-    args: ["--dump-mir", "--test262-host", "policy.js"],
+    args: ["build", "--dump-mir", "--test262-host", "policy.js"],
     source,
     version: "0.1.0",
   });

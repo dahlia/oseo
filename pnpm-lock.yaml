@@ -53,6 +53,9 @@ importers:
       '@optique/core':
         specifier: 1.2.13
         version: 1.2.13
+      '@optique/discover':
+        specifier: 1.2.13
+        version: 1.2.13
       '@oseo/backend-c':
         specifier: workspace:*
         version: link:../backend-c
@@ -167,6 +170,15 @@ packages:
 
   '@optique/core@1.2.13':
     resolution: {integrity: sha512-DVf4FzICzd3vog1zFWXnGzqSp3R0h+MSBJye2xhu2nR90B2OO8aKbMcJGf7GMZyoFxdfz8lrhexA+cZPAGZAOA==}
+    engines: {bun: '>=1.2.0', deno: '>=2.3.0', node: '>=20.0.0'}
+
+  '@optique/discover@1.2.13':
+    resolution: {integrity: sha512-6RqtidGRQdq8esd7okn+ULvo0+iqlAeNtdn5H4zOn6Gui9n1gbh0n6My+N9WnAw6tBUE7n3OceLiDhlZoUqPpA==}
+    engines: {bun: '>=1.2.0', deno: '>=2.3.0', node: '>=20.0.0'}
+    hasBin: true
+
+  '@optique/run@1.2.13':
+    resolution: {integrity: sha512-GxsXMRf8jhfMFQ8mC2Qn7tSkMDnXeXPlHUfPz3GbCzkjyxmqUhYZYn+UXN/sRnEH1lYQYiq1m0WPKXQjn3VxpQ==}
     engines: {bun: '>=1.2.0', deno: '>=2.3.0', node: '>=20.0.0'}
 
   '@oxc-project/types@0.139.0':
@@ -957,6 +969,15 @@ snapshots:
     optional: true
 
   '@optique/core@1.2.13': {}
+
+  '@optique/discover@1.2.13':
+    dependencies:
+      '@optique/core': 1.2.13
+      '@optique/run': 1.2.13
+
+  '@optique/run@1.2.13':
+    dependencies:
+      '@optique/core': 1.2.13
 
   '@oxc-project/types@0.139.0': {}
 

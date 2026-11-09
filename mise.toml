@@ -45,6 +45,7 @@ depends = [
   "check:actions",
   "check:anti-slop",
   "check:boundaries",
+  "check:commands",
   "check:compatibility-ratchet",
   "check:evidence-lanes",
   "check:fmt",
@@ -498,3 +499,11 @@ node --test tests/macos-lanes.test.ts tests/node-shard.test.ts \
 [tasks."check:selfhosted-mac-shell"]
 description = "Lint dedicated Mac setup scripts"
 run = "shellcheck tools/selfhosted-mac/*.sh"
+
+[tasks."generate:commands"]
+description = "Generate the static CLI command registry"
+run = "node packages/cli/tools/generate-commands.ts"
+
+[tasks."check:commands"]
+description = "Check the static CLI command registry"
+run = "node packages/cli/tools/generate-commands.ts --check"
