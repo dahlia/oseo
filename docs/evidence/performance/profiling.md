@@ -48,7 +48,10 @@ error, resolved tool path, and raw `stdout` and `stderr` bytes in
 *discovery.json* and sidecars. It prints the same JSON bundle, including base64
 output bytes, for collection from CI logs. Require complete logs and compare
 decoded bytes with sidecars when those are collected. Missing tools, timeouts,
-and nonzero help statuses remain visible; successful discovery reports
+and nonzero help statuses remain visible. A timeout, incomplete cleanup or
+caught signal returns a failing status and preserves partial records after
+each probe. Each probe has a 20-second deadline and its own process group;
+SIGKILL ends that group even when a tool ignores SIGTERM. Discovery reports
 `acceptance: unverified`. It neither captures a target nor reserves a
 measurement slot. On macOS, probes are designed to inspect the selected Xcode,
 `xctrace` help for `record` and `export`, available templates, and `sample`
@@ -158,8 +161,13 @@ and *file-map.json* map original absolute paths to numbered evidence files.
 state, selected nonsecret CI identifiers, failures and cleanup. GDB loss
 counters remain unavailable, not zero. Separate process groups bound all
 owned target, build, discovery and profiler lifetimes; on failure or a caught
-signal, the helper kills and reaps those groups. Uncatchable termination and
-descendants that escape their group remain explicit cleanup limits.
+signal, the helper kills owned groups and reaps its direct children. It
+observes group disappearance for at most one additional second; surviving
+zombies owned by another reaper remain incomplete cleanup. Uncatchable
+termination and descendants that escape their group remain cleanup limits.
+Frame classification reads the symbol field, excluding arguments and paths.
+Generated dispatch, body, fragment and agent wrappers can provide useful
+generated context, but cannot satisfy the separate runtime-context gate.
 
 1.  After dependencies land and their main CI passes, discover the actual
     harness and build tasks with `mise tasks`. This draft does not reserve

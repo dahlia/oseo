@@ -70,6 +70,7 @@ try {
   for (const name of [
     "perf-profile.ts",
     "perf-profile-capture.ts",
+    "perf-profile-process.ts",
     "perf-profile-smoke.ts",
   ]) {
     const path = join(directory, name);
