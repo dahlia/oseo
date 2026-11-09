@@ -4,6 +4,7 @@ import { spawnSync } from "node:child_process";
 import { mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
+import { fileURLToPath } from "node:url";
 import {
   createNodeHost,
   normalizeExecutionHost,
@@ -252,3 +253,96 @@ test(
     }
   },
 );
+
+for (const buildConfiguration of ["checked", "optimized"] as const) {
+  if (hostCcLane && buildConfiguration === "optimized") continue;
+  test(
+    `retained builtin graph replacement (${buildConfiguration})`,
+    { skip: nativeTarget == null ? "requires a supported native host" : false },
+    async () => {
+      const directory = await mkdtemp(join(tmpdir(), "oseo-builtin-build-"));
+      const source = join(directory, "entry.ts");
+      const output = join(directory, "node:fs");
+      try {
+        await writeFile(
+          source,
+          `import { readFileSync } from "node:fs";
+import { argv } from "node:process";
+process.stdout.write(readFileSync(0));
+console.log(JSON.stringify(argv.slice(2)));`,
+        );
+        const input = new Uint8Array([239, 187, 191, 0, 255]);
+        const args = ["", "two words", "한글", "--target", "--build-config"];
+        const expected = new Uint8Array([
+          ...input,
+          ...new TextEncoder().encode(JSON.stringify(args) + "\n"),
+        ]);
+        const captured = await runNativeCli(
+          {
+            args: [
+              "run",
+              source,
+              "--build-config",
+              buildConfiguration,
+              "--",
+              ...args,
+            ],
+            execution: { input, captureBytes: true },
+            version: "0.0.0",
+          },
+          host,
+        );
+        assert.equal(captured.exitStatus, 0, captured.stderr);
+        assert.equal(captured.executed, true);
+        assert.deepEqual(captured.stdoutBytes, expected);
+        assert.deepEqual(captured.stderrBytes, new Uint8Array());
+        for (const launcher of [
+          [
+            "node",
+            fileURLToPath(
+              new URL("../packages/cli/dist/main.js", import.meta.url),
+            ),
+          ],
+          [
+            "deno",
+            "run",
+            "-A",
+            "--config",
+            fileURLToPath(new URL("../deno.json", import.meta.url)),
+            fileURLToPath(
+              new URL("../packages/cli/src/main.ts", import.meta.url),
+            ),
+          ],
+        ]) {
+          for (let publication = 0; publication < 2; publication += 1) {
+            const built = spawnSync(
+              launcher[0]!,
+              [
+                ...launcher.slice(1),
+                "build",
+                source,
+                "-o",
+                "node:fs",
+                "--build-config",
+                buildConfiguration,
+              ],
+              { cwd: directory, encoding: "utf8" },
+            );
+            assert.equal(built.status, 0, built.stderr);
+            assert.equal(built.stdout, "");
+            assert.equal(built.stderr, "");
+            const ran = spawnSync(output, args, {
+              input,
+              env: { ...process.env, OSEO_GC_EVERY_SAFEPOINT: "1" },
+            });
+            assert.equal(ran.status, 0, ran.stderr.toString());
+            assert.deepEqual(new Uint8Array(ran.stdout), expected);
+            assert.equal(ran.stderr.length, 0);
+          }
+        }
+      } finally {
+        await rm(directory, { recursive: true, force: true });
+      }
+    },
+  );
+}

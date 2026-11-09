@@ -1,5 +1,6 @@
 import { runNativeFixture } from "../tools/native-fixture.ts";
-import { runNativeCli as run } from "../packages/cli/src/index.ts";
+import { createNativeCliRunner } from "./native-cli-runner.ts";
+import type { runNativeCli as run } from "../packages/cli/src/index.ts";
 /* eslint-disable no-await-in-loop -- Compiler probing is ordered. */
 import { spawnSync } from "node:child_process";
 import {
@@ -181,27 +182,7 @@ int main(int argc, char **argv) {
 export const nativeToolchain: NativeToolchain = select();
 
 /** Compose the selected test compiler without changing CLI defaults. */
-export const runNativeCli: typeof run = (request, host) => {
-  const native = !request.args.some((arg) =>
-    ["--dump-mir", "--emit-c", "--help", "--version"].includes(arg),
-  );
-  const hasConfiguration = request.args.some(
-    (arg) => arg === "--build-config" || arg.startsWith("--build-config="),
-  );
-  const selectConfiguration = native && !hasConfiguration;
-  const [command, ...rest] = request.args;
-  const configuredArgs =
-    command === "run" || command === "build"
-      ? [command, "--build-config", nativeBuildConfiguration, ...rest]
-      : ["--build-config", nativeBuildConfiguration, ...request.args];
-  return run(
-    selectConfiguration
-      ? {
-          ...request,
-          args: configuredArgs,
-        }
-      : request,
-    host,
-    nativeToolchain,
-  );
-};
+export const runNativeCli: typeof run = createNativeCliRunner(
+  nativeToolchain,
+  nativeBuildConfiguration,
+);

@@ -41,9 +41,10 @@ unknown or duplicate options before compilation. Optique also derives help,
 usage, version, and parse-error output from the same command-line grammar.
 
 The npm package installs the `oseo` executable. A source path without a dump
-option compiles, links, and runs a script or a closed M4 `file:` module graph
+option compiles, links, and runs a script or a closed module graph
 through the pinned Zig toolchain, with guarded specialization when eligible.
-Module entries may use only relative file specifiers. Programmatic callers may
+Module entries may use relative file specifiers, `node:process`, and
+`node:fs`. Programmatic callers may
 override `sourceId` for script diagnostics without changing the positional path
 used to read the source file.
 
@@ -76,6 +77,12 @@ handler. The checked-in *src/commands.generated.ts* registry contains static
 imports for package and standalone builds; startup never scans directories.
 `mise run generate:commands` regenerates it and `mise run check:commands`
 refuses stale output. Help/completion command expansion remains separate work.
+
+`parseCliRequest()` exposes that same grammar to embedding callers. It returns
+either typed command values or completed parse, help, or version output without
+reading source files or starting processes. Callers can pass the command values
+to `executeCliInvocation()` after selecting a build configuration; options in
+program arguments and option values remain distinct from compiler options.
 
 [Optique]: https://optique.dev/
 [ADR 0037]: ../../docs/adr/0037-retained-native-executables.md

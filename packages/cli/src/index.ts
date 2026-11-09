@@ -103,7 +103,8 @@ function includePropertiesWhen<const Properties extends object>(
   return properties() ?? {};
 }
 
-type CliParseResult =
+/** Parsed command values or completed argument, help, and version output. */
+export type CliParseResult =
   | { readonly kind: "invoke"; readonly value: CliInvocation }
   | { readonly kind: "result"; readonly value: CliResult };
 
@@ -128,6 +129,15 @@ export interface NativeExecutionOptions {
   readonly inheritOutput?: boolean;
 }
 
+function validateNativeExecution(execution?: NativeExecutionOptions): void {
+  if (execution?.inheritStdin && execution.input != null) {
+    throw new TypeError("Process input cannot also inherit stdin.");
+  }
+  if (execution?.inheritOutput && execution.captureBytes) {
+    throw new TypeError("Inherited process output cannot also capture bytes.");
+  }
+}
+
 /** A host-independent invocation of the Oseo command-line contract. */
 export interface CliRequest {
   readonly execution?: NativeExecutionOptions;
@@ -144,6 +154,8 @@ export interface CliRequest {
 
 /** Captured command-line output and status. */
 export interface CliResult {
+  readonly stdoutBytes?: Uint8Array;
+  readonly stderrBytes?: Uint8Array;
   /**
    * `true` only when native execution started the compiled executable, so
    * the status and both streams are that program's own. It is absent when
@@ -153,8 +165,6 @@ export interface CliResult {
    * the reported text, so a program cannot forge or hide it by printing
    * a diagnostic.
    */
-  readonly stdoutBytes?: Uint8Array;
-  readonly stderrBytes?: Uint8Array;
   readonly executed?: true;
   readonly exitStatus: number;
   readonly stderr: string;
@@ -259,7 +269,8 @@ function invocationDiagnostic(
   return undefined;
 }
 
-function parseCliRequest(request: CliRequest): CliParseResult {
+/** Parse the shared CLI grammar without reading files or starting processes. */
+export function parseCliRequest(request: CliRequest): CliParseResult {
   let exitStatus = 0;
   let stderr = "";
   let stdout = "";
@@ -467,7 +478,7 @@ async function compileCliModuleGraph(
   return {
     mir: compiled.mir,
     sourcePaths: result.graph.modules
-      .filter((node) => node.kind !== "builtin")
+      .filter((node) => node.moduleKind !== "builtin")
       .map((node) => node.canonicalId),
   };
 }
@@ -1659,6 +1670,7 @@ export async function executeCliInvocation(
     request.sourceId ?? invocation.sourceId,
   );
   if (invalid != null) return diagnosticResult(invalid);
+  if (invocation.command === "run") validateNativeExecution(request.execution);
   const parsed = { value: invocation };
   const sourceId = request.sourceId ?? parsed.value.sourceId;
   const selected =
@@ -1776,7 +1788,7 @@ export async function executeCliInvocation(
     }
     sourcePaths.push(
       ...(discovered.requests?.closure.modules ?? [])
-        .filter((node) => node.kind !== "builtin")
+        .filter((node) => node.moduleKind !== "builtin")
         .map((node) => node.canonicalId),
     );
     if (parsed.value.mode !== "execute") {
@@ -1938,6 +1950,7 @@ export async function runNativeUnits(
     "checked",
   execution?: NativeExecutionOptions,
 ): Promise<CliResult> {
+  validateNativeExecution(execution);
   const selected = selectExecutionTarget(host, undefined, sourceId);
   if ("diagnostic" in selected) return diagnosticResult(selected.diagnostic);
   let directory: string;
