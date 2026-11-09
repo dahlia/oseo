@@ -17,7 +17,9 @@ import {
   curlPolicy,
   curlConfigName,
   downloadText,
+  discoverMise,
   rawAsset,
+  resolveMiseChecksum,
   verifyChecksums,
   verifyMiseBinary,
 } from "../tools/ci/mise-bootstrap.ts";
@@ -58,6 +60,48 @@ function signedChecksums(text: string): readonly [string, string] {
     ].join("\n"),
   ];
 }
+
+test("latest discovery precedes metadata restore", async () => {
+  const directory = await mkdtemp(join(tmpdir(), "mise-discovery-"));
+  const output = join(directory, "output");
+  const metadata = join(directory, "oseo-mise-metadata-v1");
+  const requests: string[] = [];
+  const fetcher: typeof fetch = async (input) => {
+    requests.push(String(input));
+    return new Response("2026.11.5\n");
+  };
+  try {
+    await mkdir(metadata);
+    await writeFile(join(metadata, "stale"), "old local metadata");
+    await discoverMise(directory, output, fetcher);
+    assert.deepEqual(requests, ["https://mise.jdx.dev/VERSION"]);
+    assert.equal(
+      await readFile(output, "utf8"),
+      `version=2026.11.5\nmetadata-dir=${metadata}\n` +
+        "metadata-key=oseo-mise-metadata-v1-" +
+        `${rawAsset("2026.11.5", process.platform, process.arch)}\n`,
+    );
+    await assert.rejects(readFile(join(metadata, "stale")));
+    await rm(output);
+    let attempts = 0;
+    await assert.rejects(
+      discoverMise(
+        directory,
+        output,
+        async () => {
+          attempts += 1;
+          return new Response("Gateway Timeout", { status: 504 });
+        },
+        async () => {},
+      ),
+      /HTTP 504/u,
+    );
+    assert.equal(attempts, 4);
+    await assert.rejects(readFile(output));
+  } finally {
+    await rm(directory, { recursive: true, force: true });
+  }
+});
 
 test("mise retries HTTP 504 and incomplete responses", async () => {
   let requests = 0;
@@ -179,6 +223,150 @@ test("mise signed checksums reject wrong hashes, keys and comments", () => {
     ),
   );
   assert.throws(() => verifyChecksums(text, "short", key));
+});
+
+test("signed metadata hits avoid HTTP and check binary bytes", async () => {
+  const directory = await mkdtemp(join(tmpdir(), "mise-metadata-test-"));
+  const metadata = join(directory, "metadata");
+  const binary = join(directory, "bin", "mise");
+  const bytes = "verified fixture bytes";
+  const digest = createHash("sha256").update(bytes).digest("hex");
+  const asset = rawAsset("2026.11.4", "linux", "x64");
+  const checksums = `${digest}  ${asset}\n`;
+  const [key, signature] = signedChecksums(checksums);
+  const requests: string[] = [];
+  let offline = false;
+  const fetcher: typeof fetch = async (input) => {
+    const url = String(input);
+    requests.push(url);
+    if (offline) return new Response("Gateway Timeout", { status: 504 });
+    return new Response(url.endsWith(".minisig") ? signature : checksums);
+  };
+  const resolve = (hit: boolean) =>
+    resolveMiseChecksum(
+      metadata,
+      hit,
+      "2026.11.4",
+      "linux",
+      "x64",
+      fetcher,
+      async () => {},
+      key,
+    );
+  try {
+    assert.equal(await resolve(false), digest);
+    assert.deepEqual(requests, [
+      "https://github.com/jdx/mise/releases/download/v2026.11.4/" +
+        "SHASUMS256.txt",
+      "https://github.com/jdx/mise/releases/download/v2026.11.4/" +
+        "SHASUMS256.txt.minisig",
+    ]);
+    offline = true;
+    requests.length = 0;
+    const cachedDigest = await resolve(true);
+    assert.equal(cachedDigest, digest);
+    assert.deepEqual(requests, []);
+    await mkdir(join(directory, "bin"));
+    await writeFile(binary, bytes);
+    await checkRestoredMise(directory, true, cachedDigest, "linux");
+    await writeFile(binary, "tampered");
+    await assert.rejects(
+      checkRestoredMise(directory, true, cachedDigest, "linux"),
+      /SHA256 mismatch/u,
+    );
+    // Non-exact restores must not use even a valid local signed pair.
+    await assert.rejects(resolve(false), /HTTP 504/u);
+    assert.equal(requests.length, 4);
+    await assert.rejects(readFile(join(metadata, "SHASUMS256.txt")));
+  } finally {
+    await rm(directory, { recursive: true, force: true });
+  }
+});
+
+test("metadata hits reject invalid pairs and wrong identities", async () => {
+  const directory = await mkdtemp(join(tmpdir(), "mise-metadata-invalid-"));
+  const asset = rawAsset("2026.11.4", "linux", "x64");
+  const checksums = `${"a".repeat(64)}  ${asset}\n`;
+  const [key, signature] = signedChecksums(checksums);
+  let requests = 0;
+  const fetcher: typeof fetch = async () => {
+    requests += 1;
+    throw new Error("must not fetch on exact hit");
+  };
+  const resolve = (version = "2026.11.4", os = "linux", arch = "x64") =>
+    resolveMiseChecksum(
+      directory,
+      true,
+      version,
+      os,
+      arch,
+      fetcher,
+      async () => {},
+      key,
+    );
+  const checksumPath = join(directory, "SHASUMS256.txt");
+  const signaturePath = `${checksumPath}.minisig`;
+  try {
+    await writeFile(checksumPath, checksums);
+    await writeFile(signaturePath, signature);
+    for (const [version, os, arch] of [
+      ["2026.11.3", "linux", "x64"],
+      ["2026.11.4", "darwin", "x64"],
+      ["2026.11.4", "linux", "arm64"],
+    ]) {
+      await assert.rejects(resolve(version, os, arch), /checksum for/u);
+    }
+    await writeFile(checksumPath, checksums.replace("a", "b"));
+    await assert.rejects(resolve(), /Invalid mise checksum signature/u);
+    await writeFile(checksumPath, checksums);
+    await writeFile(
+      signaturePath,
+      signature.replace("\ntrusted comment: fixture", "\ntrusted comment: x"),
+    );
+    await assert.rejects(resolve(), /Invalid mise checksum signature/u);
+    await writeFile(signaturePath, "incomplete");
+    await assert.rejects(resolve(), /signature format/u);
+    await rm(signaturePath);
+    await assert.rejects(resolve(), /ENOENT/u);
+    await writeFile(signaturePath, signature);
+    await rm(checksumPath);
+    await assert.rejects(resolve(), /ENOENT/u);
+    assert.equal(requests, 0);
+  } finally {
+    await rm(directory, { recursive: true, force: true });
+  }
+});
+
+test("metadata misses publish verified official pairs", async () => {
+  const directory = await mkdtemp(join(tmpdir(), "mise-metadata-miss-"));
+  const asset = rawAsset("2026.11.4", "win32", "arm64");
+  const checksums = `${"a".repeat(64)}  ${asset}\n`;
+  const [key, signature] = signedChecksums(checksums);
+  try {
+    for (const [body, sig] of [
+      [checksums, "bad signature"],
+      [checksums.replace("a", "b"), signature],
+      [checksums.replace(asset, `${asset}.zip`), signature],
+    ]) {
+      await assert.rejects(
+        resolveMiseChecksum(
+          directory,
+          false,
+          "2026.11.4",
+          "win32",
+          "arm64",
+          async (input) =>
+            new Response(String(input).endsWith(".minisig") ? sig : body),
+          async () => {},
+          key,
+        ),
+      );
+      await assert.rejects(readFile(join(directory, "SHASUMS256.txt")));
+      await assert.rejects(readFile(join(directory, "SHASUMS256.txt.minisig")));
+    }
+  } finally {
+    await rm(directory, { recursive: true, force: true });
+  }
 });
 
 test("mise wrapper preserves setup and archive verification", async () => {
@@ -332,7 +520,9 @@ test("mise curl configuration names work with older Windows curl", () => {
 
 /** Only the upstream process receives the temporary-directory overrides. */
 interface BootstrapStep {
+  readonly id?: string;
   readonly uses: string;
+  readonly with?: Readonly<Record<string, string>>;
   readonly env?: Readonly<Record<string, string>>;
 }
 
@@ -351,6 +541,33 @@ async function bootstrapSteps(): Promise<readonly BootstrapStep[]> {
   ) as BootstrapAction;
   return action.runs.steps;
 }
+
+test("metadata verification precedes saves and data restores", async () => {
+  const steps = await bootstrapSteps();
+  assert.equal(steps[0]?.with?.phase, "discover");
+  assert.equal(steps[1]?.id, "metadata");
+  assert.equal(steps[1]?.uses, "actions/cache/restore@v5");
+  assert.deepEqual(steps[1]?.with, {
+    path: "${{ steps.release.outputs.metadata-dir }}",
+    key: "${{ steps.release.outputs.metadata-key }}",
+  });
+  assert.equal(steps[2]?.id, "policy");
+  assert.equal(steps[2]?.with?.version, "${{ steps.release.outputs.version }}");
+  assert.equal(
+    steps[2]?.with?.["metadata-directory"],
+    "${{ steps.release.outputs.metadata-dir }}",
+  );
+  assert.equal(
+    steps[2]?.with?.["cache-hit"],
+    "${{ steps.metadata.outputs.cache-hit }}",
+  );
+  assert.equal(steps[3]?.uses, "actions/cache/save@v5");
+  assert.deepEqual(steps[3]?.with, steps[1]?.with);
+  assert.equal(steps[4]?.id, "cache");
+  for (const step of steps) {
+    assert.equal(step.with?.["restore-keys"], undefined);
+  }
+});
 
 test("mise temp overrides belong only to upstream setup", async () => {
   const steps = await bootstrapSteps();

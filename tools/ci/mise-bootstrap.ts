@@ -1,7 +1,14 @@
 /* eslint-disable no-await-in-loop -- Retry attempts must be sequential. */
 
 import { createHash, createPublicKey, verify } from "node:crypto";
-import { appendFile, mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
+import {
+  appendFile,
+  mkdir,
+  mkdtemp,
+  readFile,
+  rm,
+  writeFile,
+} from "node:fs/promises";
 import { join } from "node:path";
 import { setTimeout } from "node:timers/promises";
 
@@ -135,28 +142,97 @@ export function checksumForAsset(text: string, asset: string): string {
   return checksums[0]!;
 }
 
-/** Resolve latest once so cache identity and the final byte check agree. */
+/** Resolve latest before restoring metadata for that release and target. */
+export async function discoverMise(
+  temporaryDirectory: string,
+  outputFile: string,
+  fetcher: typeof fetch = fetch,
+  delay: (milliseconds: number) => Promise<void> = setTimeout,
+): Promise<void> {
+  const version = (
+    await downloadText(
+      "https://mise.jdx.dev/VERSION",
+      (text) => {
+        rawAsset(text.trim(), process.platform, process.arch);
+      },
+      fetcher,
+      delay,
+    )
+  ).trim();
+  const asset = rawAsset(version, process.platform, process.arch);
+  const metadataDirectory = join(temporaryDirectory, "oseo-mise-metadata-v1");
+  await rm(metadataDirectory, { recursive: true, force: true });
+  await appendFile(
+    outputFile,
+    `version=${version}\nmetadata-dir=${metadataDirectory}\n` +
+      `metadata-key=oseo-mise-metadata-v1-${asset}\n`,
+  );
+}
+
+/** Reverify cached signatures; only a miss downloads official metadata. */
+export async function resolveMiseChecksum(
+  directory: string,
+  exactHit: boolean,
+  version: string,
+  platform: string,
+  architecture: string,
+  fetcher: typeof fetch = fetch,
+  delay: (milliseconds: number) => Promise<void> = setTimeout,
+  encodedKey: string = publicKey,
+): Promise<string> {
+  const asset = rawAsset(version, platform, architecture);
+  const checksumPath = join(directory, "SHASUMS256.txt");
+  const signaturePath = `${checksumPath}.minisig`;
+  if (exactHit) {
+    const checksums = await readFile(checksumPath, "utf8");
+    const signature = await readFile(signaturePath, "utf8");
+    verifyChecksums(checksums, signature, encodedKey);
+    return checksumForAsset(checksums, asset);
+  }
+  await rm(directory, { recursive: true, force: true });
+  const url = `${releaseRoot}/v${version}/SHASUMS256.txt`;
+  const checksums = await downloadText(
+    url,
+    (text) => {
+      checksumForAsset(text, asset);
+    },
+    fetcher,
+    delay,
+  );
+  const signature = await downloadText(
+    `${url}.minisig`,
+    (text) => {
+      verifyChecksums(checksums, text, encodedKey);
+    },
+    fetcher,
+    delay,
+  );
+  const sha256 = checksumForAsset(checksums, asset);
+  await mkdir(directory, { recursive: true });
+  await writeFile(checksumPath, checksums);
+  await writeFile(signaturePath, signature);
+  return sha256;
+}
+
+/** Bind the verified metadata to the existing data-cache and setup contract. */
 export async function prepareMise(
   temporaryDirectory: string,
   outputFile: string,
   environmentFile: string,
   configHash: string,
   installArgs: string,
+  version: string,
+  metadataDirectory: string,
+  metadataExactHit: boolean,
 ): Promise<void> {
-  const version = (
-    await downloadText("https://mise.jdx.dev/VERSION", (text) => {
-      rawAsset(text.trim(), process.platform, process.arch);
-    })
-  ).trim();
   const asset = rawAsset(version, process.platform, process.arch);
-  const url = `${releaseRoot}/v${version}/SHASUMS256.txt`;
-  const checksums = await downloadText(url, (text) => {
-    checksumForAsset(text, asset);
-  });
-  const signature = await downloadText(`${url}.minisig`, (text) => {
-    verifyChecksums(checksums, text);
-  });
-  verifyChecksums(checksums, signature);
+  const sha256 = await resolveMiseChecksum(
+    metadataDirectory,
+    metadataExactHit,
+    version,
+    process.platform,
+    process.arch,
+  );
   const directory = await mkdtemp(join(temporaryDirectory, "mise-curl-"));
   await writeFile(
     join(directory, curlConfigName(process.platform)),
@@ -164,7 +240,6 @@ export async function prepareMise(
   );
   const dataDirectory = join(temporaryDirectory, "oseo-mise-data");
   await rm(dataDirectory, { recursive: true, force: true });
-  const sha256 = checksumForAsset(checksums, asset);
   const cacheKey = miseCacheKey(
     asset,
     sha256,

@@ -1,11 +1,14 @@
 import {
   checkRestoredMise,
+  discoverMise,
   prepareMise,
 } from "../../../tools/ci/mise-bootstrap.ts";
 
 try {
   const env = process.env;
-  if (env.INPUT_PHASE === "restore") {
+  if (env.INPUT_PHASE === "discover") {
+    await discoverMise(env.RUNNER_TEMP, env.GITHUB_OUTPUT);
+  } else if (env.INPUT_PHASE === "restore") {
     await checkRestoredMise(
       env.INPUT_DIRECTORY,
       env["INPUT_CACHE-HIT"] === "true",
@@ -18,6 +21,9 @@ try {
       env.GITHUB_ENV,
       env["INPUT_CONFIG-HASH"],
       env["INPUT_INSTALL-ARGS"],
+      env.INPUT_VERSION,
+      env["INPUT_METADATA-DIRECTORY"],
+      env["INPUT_CACHE-HIT"] === "true",
     );
   } else {
     throw new Error("Unknown mise policy phase");
