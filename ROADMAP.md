@@ -1081,15 +1081,16 @@ declarations, and classic `for` declaration heads.
 Optional members remain unhinted. Array element types continue through
 unambiguous nested array rest targets. Direct fixed-length tuple spreads
 expand before mapping, so their members and following suffix retain their
-syntactic positions. Expanded members follow the ordinary primitive-hint and
-unsupported-type rules. Variadic array rests and type-reference spreads remain
-unhinted where their length makes a position ambiguous. Object targets inside
-an array rest remain unhinted. Computed object properties remain unhinted even
-for literal keys. A nested array or object binding subtree whose inline
-annotation has another container shape remains unhinted without rejecting the
-program, while sibling mappings continue. Root container mismatches and type
-annotations that require resolution remain explicit boundaries. The generated
-domains vary truthful, false, and nested shape-mismatched TypeScript hints.
+syntactic positions. Expanded members follow the ordinary primitive-hint rules;
+other member types remain unhinted. Variadic array rests and type-reference
+spreads remain unhinted where their length makes a position ambiguous. Object
+targets inside an array rest remain unhinted. Computed object properties remain
+unhinted even for literal keys. A nested array or object binding subtree whose
+inline annotation has another container shape remains unhinted without
+rejecting the program, while sibling mappings continue. Root container
+mismatches also leave bindings unhinted, and annotations requiring resolution
+erase without hints. The generated domains vary truthful, false, and nested
+shape-mismatched TypeScript hints.
 
 Asynchronous functions and arrows run non-simple parameter initialization
 inside their asynchronous executor, so abrupt defaults reject the returned

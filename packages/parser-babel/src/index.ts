@@ -13,6 +13,7 @@ import {
 import { normalizeAnnexBFunctionStatements } from "./annexb-functions.ts";
 import { classStaticKeywordDiagnostics } from "./class-static-keyword.ts";
 import { program } from "./convert.ts";
+import { eraseTypeSyntax } from "./erasable.ts";
 import { newImportCallDiagnostics } from "./import-call-early-errors.ts";
 import { createSourceIndex, diagnosticAt, errorOffset } from "./locations.ts";
 import { convertModule, withImportCalls } from "./modules.ts";
@@ -29,7 +30,7 @@ export function createBabelFrontend(
     parse(input: SourceInput) {
       const locations = createSourceIndex(input.source);
       try {
-        const file = node(
+        let file = node(
           parseBabel(input.source, {
             // Preserve TS-only profile boundaries; the Script grammar is
             // checked on the parsed declarations before conversion below.
@@ -43,10 +44,30 @@ export function createBabelFrontend(
           }),
         );
         if (file == null) throw new Error("Babel returned a non-node result.");
+        const erased = eraseTypeSyntax(input, locations, file);
         let parserErrors: readonly ParserError[] = [];
         if (Array.isArray(file.errors)) {
           // SAFETY: Array.isArray establishes Babel's parser-error sequence.
           parserErrors = file.errors as readonly ParserError[];
+        }
+        // Type-only bindings may collide or be absent before erasure. The
+        // stripped reparse still rejects surviving runtime binding errors.
+        if (erased.source !== input.source) {
+          parserErrors = parserErrors.filter(
+            (error) =>
+              error.reasonCode !== "VarRedeclaration" &&
+              error.reasonCode !== "ModuleExportUndefined" &&
+              !(
+                error.reasonCode === "PatternIsOptional" &&
+                erased.diagnostics.length === 0 &&
+                erased.optionalPatternStarts.has(errorOffset(error))
+              ) &&
+              !(
+                ["ImportInTSNamespace", "ExportInTSNamespace"].includes(
+                  error.reasonCode ?? "",
+                ) && erased.ambientModuleStarts.has(errorOffset(error))
+              ),
+          );
         }
         if (parserErrors.length > 0) {
           return {
@@ -63,6 +84,14 @@ export function createBabelFrontend(
             diagnostics: moduleDeclarations.map((declaration) =>
               diagnosticAt(input, locations, declaration.start ?? 0),
             ),
+            parsed: false,
+            sourceId: input.sourceId,
+          };
+        }
+        file = erased.file;
+        if (erased.diagnostics.length > 0) {
+          return {
+            diagnostics: erased.diagnostics,
             parsed: false,
             sourceId: input.sourceId,
           };
@@ -94,7 +123,8 @@ export function createBabelFrontend(
         normalizeAnnexBFunctionStatements(file);
         const context: ConvertContext = {
           diagnostics: [],
-          input,
+          input: { ...input, source: erased.source },
+          sourceText: erased.sourceText,
           locations,
           receiverStack: [],
           regexpExtensions: options.regexpExtensions,

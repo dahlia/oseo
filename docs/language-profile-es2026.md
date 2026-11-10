@@ -8,7 +8,7 @@ The language compatibility work is implemented and observed, as the
 [language exit report](./m5c-closure/language-exit-report.md) records. This
 profile succeeds the [M5 language profile](./language-profile-m5.md) for the
 claim that [ADR 0032](./adr/0032-post-m5-edition-boundary.md) defines.
-The 21 indexed family records assess every evidence class.
+The 22 indexed family records assess every evidence class.
 
 A change that admits or measures behavior inside this boundary updates this
 document in the same change. A family's status describes tested current
@@ -1134,3 +1134,19 @@ asynchronous, fallback, and `null` resources, loop heads, and abrupt exits,
 and checks the disposal order and the final completion against an independent
 model and Node.js. The family record is
 [*using-declarations.yaml*](./language-profile-es2026/families/using-declarations.yaml).
+
+
+Erasable TypeScript source
+--------------------------
+
+The source frontend accepts the erasable TypeScript subset described in the
+[family record](./language-profile-es2026/families/erasable-typescript.yaml).
+It erases types without checking them and retains only the existing primitive
+and destructuring hints. Runtime TypeScript transformations remain unsupported.
+The frontend continues to use TypeScript grammar for every source, without a
+source-language selector. Ambiguous sequences such as `a < b > (c)` use generic
+call semantics; `a < b >` followed by a newline can be an instantiation
+expression. Node.js and Deno TypeScript sources use the same interpretation.
+These forms were previously rejected. The complete test262 update and
+compatibility gates must verify that the reviewed ECMAScript results remain
+unchanged.

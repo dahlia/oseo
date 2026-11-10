@@ -35,6 +35,7 @@ import {
 } from "./convert.ts";
 import { newImportCallDiagnostics } from "./import-call-early-errors.ts";
 import { collectImportCalls } from "./import-calls.ts";
+import { eraseTypeSyntax } from "./erasable.ts";
 import {
   createSourceIndex,
   diagnosticAt,
@@ -476,16 +477,44 @@ export function convertModule(
   options: ConvertOptions = {},
 ): ModuleFrontendResult {
   const locations = createSourceIndex(input.source);
+  const erased = eraseTypeSyntax(input, locations, file);
   let parserErrors: readonly ParserError[] = [];
   if (Array.isArray(file.errors)) {
     // SAFETY: Array.isArray establishes Babel's parser-error sequence.
     parserErrors = file.errors as readonly ParserError[];
+  }
+  // Type-only bindings may collide or be absent before erasure. The
+  // stripped reparse still rejects surviving runtime binding errors.
+  if (erased.source !== input.source) {
+    parserErrors = parserErrors.filter(
+      (error) =>
+        error.reasonCode !== "VarRedeclaration" &&
+        error.reasonCode !== "ModuleExportUndefined" &&
+        !(
+          error.reasonCode === "PatternIsOptional" &&
+          erased.diagnostics.length === 0 &&
+          erased.optionalPatternStarts.has(errorOffset(error))
+        ) &&
+        !(
+          ["ImportInTSNamespace", "ExportInTSNamespace"].includes(
+            error.reasonCode ?? "",
+          ) && erased.ambientModuleStarts.has(errorOffset(error))
+        ),
+    );
   }
   if (parserErrors.length > 0) {
     return {
       diagnostics: parserErrors.map((error) =>
         diagnosticAt(input, locations, errorOffset(error)),
       ),
+      parsed: false,
+      sourceId: input.sourceId,
+    };
+  }
+  file = erased.file;
+  if (erased.diagnostics.length > 0) {
+    return {
+      diagnostics: erased.diagnostics,
       parsed: false,
       sourceId: input.sourceId,
     };
@@ -512,7 +541,8 @@ export function convertModule(
   }
   const context: ConvertContext = {
     diagnostics: [],
-    input,
+    input: { ...input, source: erased.source },
+    sourceText: erased.sourceText,
     locations,
     receiverStack: [],
     regexpExtensions: options.regexpExtensions,

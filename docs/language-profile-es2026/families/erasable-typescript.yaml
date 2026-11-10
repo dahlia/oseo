@@ -1,0 +1,89 @@
+version: 1
+id: erasable-typescript
+title: "Erasable TypeScript syntax"
+scope:
+  - "Type annotations at every binding, parameter, return, field and
+    expression position supported by the JavaScript profile; interfaces,
+    type aliases, as, satisfies, non-null assertions, generic parameters and
+    arguments, ambient declarations, overload signatures, optional and this
+    parameters,
+    class type modifiers and type-only imports and exports."
+  - "The Node.js type-stripping boundary: namespaces containing only types
+    erase; enums, namespaces with runtime statements, parameter properties,
+    import aliases with values, angle-bracket assertions and export assignment
+    remain unsupported. The parser rejects decorators."
+  - "The frontend uses TypeScript grammar for every source, without a source
+    language selector. Ambiguous a < b > (c) and a < b > followed by a newline
+    use TypeScript generic-call and instantiation semantics, as in Node.js and
+    Deno TypeScript sources. Unary + and - continuations retain relational
+    operators even after a line break; parentheses close the instantiation
+    before an outer arithmetic continuation. The same rule applies to new
+    expressions without an argument list. A following < does not hide an
+    unsupported angle-bracket assertion. Nested runtime type syntax erases
+    before the JavaScript reparse, including across line breaks.
+    These forms were rejected before
+    generic erasure
+    was admitted. The complete test262 update and existing compatibility
+    gates must verify the reviewed ECMAScript results."
+  - "Only any, bigint, boolean, null, number, string, undefined and unknown
+    map to hints. Existing inline object, tuple and array destructuring
+    mappings remain. Unresolved annotations erase without hints; container
+    mismatches leave bindings unhinted. Type checking and type-driven import
+    elision are absent."
+  - "Function source text follows Node.js whitespace-preserving stripping,
+    including comments outside erased spans and CRLF line endings. Deno
+    reformats function text when loading TypeScript, so source-text identity
+    uses Node.js alone; other execution observations compare with both hosts."
+  - "Whole import type and export type declarations create no module request.
+    Inline type specifiers erase individually, preserving a remaining empty
+    import or re-export and its module evaluation side effects. The Deno
+    module reference enables verbatimModuleSyntax; its default TypeScript
+    emitter drops these empty requests."
+owners:
+  - PLAN-PREVIEW.md
+  - packages/parser-babel/README.md
+evidence:
+  differential:
+    status: covered
+    references:
+      - tests/native/fixtures/erasable-typescript.ts
+      - tests/erasable-typescript-modules-native.test.ts
+      - tests/property/erasable-typescript.property.test.ts
+  fixed:
+    status: covered
+    references:
+      - packages/parser-babel/tests/erasable.test.ts
+      - tests/native/fixtures/erasable-typescript.ts
+  forced-collection:
+    status: covered
+    references:
+      - tests/native.ts
+      - tests/property/erasable-typescript.property.test.ts
+  generated:
+    status: covered
+    references:
+      - tests/property/erasable-typescript.property.test.ts
+      - tests/property-seeds.yaml
+  guard-fallback:
+    status: covered
+    references:
+      - tests/property/erasable-typescript.property.test.ts
+  specialization:
+    status: covered
+    references:
+      - tests/property/erasable-typescript.property.test.ts
+  standards:
+    status: omitted
+    reason: "TypeScript syntax is outside ECMA-262 and the test262 corpus. The
+      frontend grammar regressions preserve the Script/Module distinction;
+      the generated suite uses Node.js stripping as an independent eraser
+      and both Node.js and Deno as execution references."
+    replacements:
+      - packages/parser-babel/tests/script-module-declarations.test.ts
+      - tests/property/erasable-typescript.property.test.ts
+  structural:
+    status: covered
+    references:
+      - packages/parser-babel/tests/erasable.test.ts
+      - packages/parser-babel/tests/basics.test.ts
+      - tests/erasable-typescript-source.test.ts

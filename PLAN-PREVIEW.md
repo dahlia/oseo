@@ -4,7 +4,7 @@ Technical preview plan
 Status
 ------
 
-Implementation status: planned, not started. This plan defines a short
+Implementation status: in progress. This plan defines a short
 checkpoint that makes Oseo demonstrable to people outside the project before
 M6 begins: ordinary TypeScript programs compile, the CLI retains a native
 executable, a program can read its arguments and input and set its exit
@@ -35,20 +35,16 @@ slow. It makes no performance claim that the comparison does not measure.
 Current boundary
 ----------------
 
-Four gaps keep the current checkout from supporting that demonstration.
+The frontend admission below is implemented; the remaining gaps keep the
+current checkout from supporting that demonstration.
 
-TypeScript support covers annotations only. On an identifier binding, an
-annotation must be one of the eight hint names `any`, `bigint`, `boolean`,
-`null`, `number`, `string`, `undefined`, and `unknown`; `const xs: number[]`
-is rejected with OSEO1001. On a declaration or parameter destructuring pattern,
-inline object, tuple, and array annotations are accepted and map their
-primitive members to the bound names, as the
-[*@oseo/parser-babel* README](./packages/parser-babel/README.md) describes.
-Type references that need alias or interface resolution, `interface` and `type`
-declarations, the `as` and `satisfies` operators, and generic parameters are
-rejected; a type-reference spread inside a destructuring annotation, such as
-`[number, ...Array<string>]`, is accepted and left unhinted. Most TypeScript
-programs written for another runtime therefore fail before compilation.
+The frontend accepts erasable TypeScript syntax at the Node.js type-stripping
+boundary, recorded in the
+[erasable TypeScript family](./docs/language-profile-es2026/families/erasable-typescript.yaml).
+The hint vocabulary remains `any`, `bigint`, `boolean`, `null`, `number`,
+`string`, `undefined` and `unknown`, with the existing primitive mappings for
+inline destructuring annotations. Other annotations erase without hints.
+Runtime TypeScript transformations remain unsupported.
 
 Every executable built for Linux AMD64 or macOS AArch64 is a checking
 build. `describeTarget()` in *packages/compiler/src/native.ts* requests
@@ -85,9 +81,9 @@ erases it before lowering: annotations of any form at every position,
 assertions, generic parameters and arguments, `declare` declarations,
 overload signatures, optional parameters, and type-only imports and exports.
 The boundary is the erasable subset that Node.js type stripping accepts.
-Syntax with runtime semantics, such as `enum`, `namespace` with values,
-parameter properties, and legacy decorators, keeps its current OSEO1001
-rejection.
+Syntax with runtime semantics, such as `enum`, `namespace` with values and
+parameter properties, keeps its current OSEO1001 rejection. Legacy decorators
+keep their source-located OSEO0001 parser rejection.
 
 These are the frontend admissions that the TypeScript source unit of
 [*PLAN-PKG.md*](./PLAN-PKG.md) also needs. This unit lands them; that plan

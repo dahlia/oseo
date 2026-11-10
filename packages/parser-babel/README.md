@@ -8,10 +8,10 @@ diagnostics. Babel nodes do not cross its public boundary.
 Class declarations and expressions reject a second non-static constructor with
 a source-located `OSEO0001` early-error diagnostic, even when an earlier
 member, the first constructor body or the heritage uses unsupported syntax.
-Class-header rejections such as generics, TypeScript modifiers or decorators
-still report `OSEO1001`. Static methods and computed members named
-`constructor` keep their permitted class roles. Unrelated unsupported syntax
-retains its `OSEO1001` diagnostic.
+Class type parameters and type-only modifiers erase before conversion.
+Decorators retain source-located `OSEO0001` parser rejection. Static methods
+and computed members named `constructor` keep their permitted class roles.
+Unsupported runtime syntax retains its `OSEO1001` diagnostic.
 
 The Script frontend rejects ECMAScript static imports and exports at any
 statement depth with source-located `OSEO0001`, before conversion of an
@@ -19,9 +19,13 @@ earlier unsupported construct. Module code still admits them only in its
 top-level ModuleItemList. The permissive Babel option preserves parsing of
 TypeScript extensions; an owned adapter check enforces Script placement.
 
-Type-only import/export forms, namespaces, ambient modules, import-equals, and
-export-assignment retain their `OSEO1001` boundaries. Type-only star exports
-are unsupported too. Admitted primitive annotations are unchanged.
+Whole type-only imports and exports, including star exports, erase along with
+their module requests. Ambient module and namespace declarations erase;
+non-ambient namespaces erase only when they contain types alone. Type-only
+import aliases erase at the top level or inside ambient namespace bodies;
+nested statement positions remain grammar errors. Top-level value import
+aliases and export assignment retain their `OSEO1001` boundaries. Primitive and
+destructuring hint mapping remains unchanged.
 
 Dynamic `import()` keeps its `OSEO1001` rejection; `import.meta` remains an
 early error in Script and is admitted in Module code.
@@ -88,28 +92,46 @@ heads. Optional members remain unhinted.
 Array element types continue through unambiguous nested array rest targets.
 Direct fixed-length tuple spreads expand before mapping, so their members and
 following suffix retain their syntactic positions. Expanded members follow the
-ordinary primitive-hint and unsupported-type rules.
+ordinary primitive-hint rules; other member types remain unhinted.
 
 Variadic array rests and type-reference spreads remain unhinted where their
 length makes a position ambiguous. Object targets inside an array rest remain
 unhinted. Computed object properties remain unhinted even when their source
 key is a literal.
 
-When an inline annotation gives a nested array or object binding subtree
-another container shape, mapping stops only for that subtree and leaves it
-unhinted without a diagnostic. Matching siblings continue to map. Root
-container mismatches and type references that require alias or interface
-resolution, or otherwise lack an admitted concrete syntactic shape, remain
-explicit boundaries.
+Annotations of any form erase at every admitted JavaScript position. The
+adapter accepts interfaces, type aliases, `as`, `satisfies`, non-null
+assertions, generic parameters and arguments, ambient declarations, overload
+signatures, optional and `this` parameters, and class type modifiers. It erases
+namespaces that contain only types. Enums, namespaces with runtime statements,
+parameter properties, value import aliases, angle-bracket assertions and export
+assignment remain `OSEO1001` diagnostics. Decorators retain parser rejection.
+This follows the [Node.js type-stripping boundary] without expanding the
+admitted runtime JavaScript profile.
+
+Annotations requiring resolution erase without hints. Mapping leaves no hints
+for root or nested container mismatches; matching siblings continue to map. The
+hint vocabulary stays `any`, `bigint`, `boolean`, `null`, `number`, `string`,
+`undefined` and `unknown`; no type checker runs.
+
+Whole `import type` and `export type` declarations disappear, including their
+module requests. Inline type specifiers disappear individually, so
+`import { type T } from "m"` retains an empty import and evaluates `m`.
+Value imports are retained even if they occur only in annotations. Whole
+type-only declarations neither resolve a module nor create a runtime binding.
+
+Erased spans become whitespace with line endings preserved, retaining the
+semicolons needed at TypeScript statement and class-field boundaries. The
+adapter reparses that source so directive prologues and early errors follow the
+stripped JavaScript, then restores annotation hints by source position.
+Function source text follows Node.js stripping; Deno reformats TypeScript
+functions, so only Node.js is the reference for exact function text.
+Diagnostics retain the original source coordinates.
 
 Asynchronous functions and arrows run non-simple parameter initialization
 inside their owned asynchronous executor, so abrupt initialization rejects
-the returned promise. Optional parameters, TypeScript `this` parameters, and
-type references that require alias or interface resolution remain explicit
-boundaries.
-
-Call type arguments and other withheld forms are also rejected here. Source
-positions and UTF-8 byte offsets are indexed once for linear-time conversion.
+the returned promise. Source positions and UTF-8 byte offsets are indexed once
+for linear-time conversion.
 
 The script frontend uses non-strict script parsing. The module frontend uses
 module parsing and reports withheld module forms as `OSEO1001`. Only
@@ -176,8 +198,8 @@ conversion. A computed member target, a computed property name, and a default
 may each contain `await`. The frontend converts them unchanged and the
 compiler decides whether the enclosing body owns a suspension frame for them.
 `for-await-of` heads reuse the same declaration and assignment target
-conversion. Pattern type annotations on assignment, `for-of`, `for-in`, and
-catch targets remain explicit boundaries.
+conversion. Annotations follow the Node.js stripping boundary; annotations on
+`for-in` and `for-of` declaration heads remain parser errors.
 
 Compound assignment converts every arithmetic, exponentiation, bitwise, shift,
 and logical form into an owned identifier or member update. Await inside that
@@ -203,3 +225,5 @@ conversion. *script-goal.ts* checks ECMAScript declaration placement while
 preserving TypeScript extension boundaries. *index.ts* parses through Babel and
 exposes the two frontend factories and their unconfigured default values. These
 files remain package-private implementation paths.
+
+[Node.js type-stripping boundary]: https://nodejs.org/docs/latest-v24.x/api/typescript.html#type-stripping

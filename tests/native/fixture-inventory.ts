@@ -65,6 +65,7 @@ import * as agentFixtures from "./fixtures/atomics-and-shared-memory.ts";
 import { blockingAgentFixture } from "./fixtures/non-blocking-agent.ts";
 import { crossRealmFixtures } from "./fixtures/cross-realm.ts";
 import { weakCollectionFixtures } from "./fixtures/weak-collections.ts";
+import * as erasable from "./fixtures/erasable-typescript.ts";
 const { typedArrayIterativeFixtures } =
   await import("./fixtures/typed-array-iterative.ts");
 const { typedArraySearchAndJoinFixtures } =
@@ -184,6 +185,10 @@ export const nativeFixtureGroups: readonly NativeFixtureGroup[] = [
     fixtures: [records.completionRecordOracleFixture],
   },
   { module: "functions.ts", fixtures: functionFixtures },
+  {
+    module: "erasable-typescript.ts",
+    fixtures: erasable.erasableTypeScriptFixtures,
+  },
   { module: "callable-object-evidence.ts", fixtures: callableCases },
   { module: "ds22-boundary-core.ts", fixtures: ds22BoundaryCoreFixtures },
   {

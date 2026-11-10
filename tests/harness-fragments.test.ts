@@ -245,6 +245,46 @@ test("whole-Script output matches the main baseline", async () => {
   }
 });
 
+test("baseline reflection follows Node.js type stripping", async () => {
+  const { stripTypeScriptTypes } = await import("node:module");
+  const { runInNewContext } = await import("node:vm");
+  const { asyncFixtures } = await import("./native/fixtures/async.ts");
+  const fixture = asyncFixtures.find(
+    (value) => value.name === "async-await-positions",
+  );
+  assert.ok(fixture);
+  for (const name of ["hintedAdd", "trace"]) {
+    const declaration: string | undefined = fixture.source.match(
+      new RegExp(`function ${name}\\([^]*?\\n\\}`, "u"),
+    )?.[0];
+    assert.ok(declaration, name);
+    const stripped = stripTypeScriptTypes(declaration);
+    const expected = Function.prototype.toString.call(
+      runInNewContext(`${stripped}; ${name}`),
+    );
+    if (name === "hintedAdd") assert.notEqual(expected, declaration);
+    else assert.equal(expected, declaration);
+    for (const specialization of ["enabled", "disabled"] as const) {
+      const result = compileSource(
+        babelFrontend,
+        { source: fixture.source, sourceId: "async/async-await-positions.js" },
+        { specialization },
+      );
+      assert.deepEqual(result.diagnostics, []);
+      assert.ok(result.mir);
+      const c = cBackend.emit(result.mir).source;
+      const reflected = new Set(
+        Array.from(
+          c.matchAll(/function_source_units_\d+\[\] = \{([\d, ]*)\};/gu),
+          (match) => String.fromCharCode(...match[1]!.split(", ").map(Number)),
+        ),
+      );
+      assert.ok(reflected.has(expected), `${name}/${specialization}`);
+      if (name === "hintedAdd") assert.ok(!reflected.has(declaration));
+    }
+  }
+});
+
 test("unresolved with writes share the global object across fragments", () => {
   // A sloppy all-miss write reaches the realm global object's property,
   // which the launcher shares between the two fragments, so a later

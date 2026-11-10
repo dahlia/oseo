@@ -218,182 +218,33 @@ test("import expressions and keyword properties keep their roles", () => {
   }
 });
 
-test("type-only star exports retain located unsupported diagnostics", () => {
-  for (const declaration of [
+test("type-only declarations erase in either source goal", () => {
+  for (const source of [
     'export type * from "m";',
     'export type * as ns from "m";',
-  ]) {
-    const prefix = "// λ\r\n";
-    const source = prefix + declaration;
-    const input = { source, sourceId: "type-star.ts" };
-    for (const result of [
-      babelFrontend.parse(input),
-      babelModuleFrontend.parseModule(input),
-    ]) {
-      assert.equal(result.parsed, false);
-      assert.equal(result.diagnostics.length, 1);
-      const diagnostic = result.diagnostics[0];
-      assert.ok(diagnostic != null);
-      assert.equal(diagnostic.code, "OSEO1001");
-      const start = new TextEncoder().encode(prefix).length;
-      assert.deepEqual(diagnostic.byteRange, {
-        end: start + declaration.length,
-        start,
-      });
-      assert.deepEqual(diagnostic.range, {
-        end: { column: declaration.length + 1, line: 2 },
-        start: { column: 1, line: 2 },
-      });
-      assert.equal(diagnostic.sourceId, input.sourceId);
-    }
-  }
-});
-
-test("annotations and unsupported TS-only extensions keep their policy", () => {
-  for (const source of [
-    "const value: number = 1;",
-    "function f(x: number): number { return x; }",
-    "const { value }: { value: number } = { value: 1 };",
-  ]) {
-    const script = compileSource(babelFrontend, {
-      source,
-      sourceId: "hints.ts",
-    });
-    assert.deepEqual(script.diagnostics, [], source);
-    assert.ok(script.mir != null);
-    assert.equal(
-      babelModuleFrontend.parseModule({ source, sourceId: "hints.ts" }).parsed,
-      true,
-    );
-  }
-  for (const source of [
-    "interface T {}",
-    "type T = number;",
-    "declare const x: number;",
-    "namespace N { export const x = 1; }",
-    'declare module "m" { export const x: number; }',
-    "enum E { x }",
-    'import x = require("m");',
-    "export = 1;",
-    "export as namespace N;",
     'import type { T } from "m";',
-    'import { type T } from "m";',
+    "export interface T {}",
     "export type T = number;",
-    'export type * from "m";',
-    'export type * as ns from "m";',
-    'export { type T } from "m";',
-    "export interface T {}",
     "export declare const x: number;",
-    "export default interface T {}",
-  ]) {
-    for (const result of [
-      babelFrontend.parse({ source, sourceId: "unsupported.ts" }),
-      babelModuleFrontend.parseModule({ source, sourceId: "unsupported.ts" }),
-    ]) {
-      assert.equal(result.parsed, false, source);
-      assert.equal(result.diagnostics[0]?.code, "OSEO1001", source);
-      assert.equal(result.diagnostics[0]?.sourceId, "unsupported.ts");
-      assert.ok((result.diagnostics[0]?.byteRange.start ?? -1) >= 0, source);
-    }
-  }
-  // An unsupported assertion must not hide real executable grammar below it.
-  const source = "(() => { export default null; }) as unknown;";
-  assert.equal(
-    babelFrontend.parse({ source, sourceId: "assertion.ts" }).diagnostics[0]
-      ?.code,
-    "OSEO0001",
-  );
-});
-
-test("type-only function signatures retain unsupported diagnostics", () => {
-  for (const declaration of [
-    "function f();",
-    "function f(): void;",
-    "function f(x: number): number;",
-    "function f(x?: number): number;",
-    "function f(...xs: number[]): number;",
-    "function f<T>(x: T): T;",
-  ]) {
-    for (const exported of ["", "export ", "export default "]) {
-      const prefix = "// λ😀\r\n  ";
-      const source = prefix + exported + declaration;
-      const input = { source, sourceId: "signature.ts" };
-      for (const result of [
-        babelFrontend.parse(input),
-        babelModuleFrontend.parseModule(input),
-      ]) {
-        assert.equal(result.parsed, false, source);
-        assert.equal(result.diagnostics.length, 1, source);
-        const diagnostic = result.diagnostics[0];
-        assert.ok(diagnostic != null);
-        assert.equal(diagnostic.code, "OSEO1001", source);
-        assert.equal(diagnostic.sourceId, input.sourceId);
-        assert.equal(diagnostic.range.start.line, 2);
-        assert.equal(diagnostic.range.end.line, 2);
-        const start = new TextEncoder().encode(prefix).length;
-        assert.ok(diagnostic.byteRange.start >= start, source);
-        assert.equal(
-          diagnostic.byteRange.start - start,
-          diagnostic.range.start.column - 3,
-          source,
-        );
-        assert.equal(
-          diagnostic.byteRange.end,
-          new TextEncoder().encode(source).length,
-          source,
-        );
-      }
-    }
-  }
-  for (const declaration of [
-    "function();",
-    "function(): void;",
-    "function(x?: number): number;",
-  ]) {
-    const prefix = "// λ😀\r\n  ";
-    const source = `${prefix}export default ${declaration}`;
-    const input = { source, sourceId: "anonymous-signature.ts" };
-    const start = new TextEncoder().encode(prefix).length;
-    const end = new TextEncoder().encode(source).length;
-    for (const [result, offset] of [
-      [babelFrontend.parse(input), 0],
-      [babelModuleFrontend.parseModule(input), 15],
-    ] as const) {
-      assert.equal(result.parsed, false, source);
-      assert.equal(result.diagnostics.length, 1, source);
-      const diagnostic = result.diagnostics[0];
-      assert.ok(diagnostic != null);
-      assert.equal(diagnostic.code, "OSEO1001", source);
-      assert.equal(diagnostic.sourceId, input.sourceId);
-      assert.deepEqual(diagnostic.byteRange, { end, start: start + offset });
-      assert.deepEqual(diagnostic.range, {
-        end: { column: 3 + 15 + declaration.length, line: 2 },
-        start: { column: 3 + offset, line: 2 },
-      });
-    }
-  }
-});
-
-test("interfaces and ambient declarations stay unsupported", () => {
-  for (const source of [
-    "export interface T {}",
     "export default interface T {}",
     "export default interface T { f(x?: number): void; }",
     "declare function f(): void;",
     "export declare function f(): void;",
     "export declare function f(x?: number): number;",
     "declare namespace N { export function f(): void; }",
+    "function f();",
+    "function f<T>(x?: T): T;",
+    "export function f(x: number): number;",
+    "export default function f(x: number): number;",
+    "declare function f(x: number): number;",
     'declare module "m" { export default function f(): void; }',
   ]) {
-    const input = { source, sourceId: "type-declaration.ts" };
     for (const result of [
-      babelFrontend.parse(input),
-      babelModuleFrontend.parseModule(input),
+      babelFrontend.parse({ source, sourceId: "types.ts" }),
+      babelModuleFrontend.parseModule({ source, sourceId: "types.ts" }),
     ]) {
-      assert.equal(result.parsed, false, source);
-      assert.equal(result.diagnostics.length, 1, source);
-      assert.equal(result.diagnostics[0]?.code, "OSEO1001", source);
-      assert.equal(result.diagnostics[0]?.sourceId, input.sourceId);
+      assert.equal(result.parsed, true, source);
+      assert.deepEqual(result.diagnostics, [], source);
     }
   }
 });
@@ -423,16 +274,209 @@ test("runtime exports retain Script grammar with TS extensions", () => {
       line: 2,
     });
     const module = babelModuleFrontend.parseModule(input);
-    assert.equal(module.parsed, false, source);
-    assert.equal(module.diagnostics[0]?.code, "OSEO1001", source);
+    assert.equal(module.parsed, source !== "export default <any>x;", source);
+    if (!module.parsed) {
+      assert.equal(module.diagnostics[0]?.code, "OSEO1001", source);
+    }
   }
   const source = "declare function f(): void;\nexport default f;";
   const input = { source, sourceId: "declared-value-export.ts" };
   const script = babelFrontend.parse(input);
   assert.equal(script.diagnostics[0]?.code, "OSEO0001");
   assert.deepEqual(script.diagnostics[0]?.range.start, { column: 1, line: 2 });
-  assert.equal(
-    babelModuleFrontend.parseModule(input).diagnostics[0]?.code,
-    "OSEO1001",
+  assert.equal(babelModuleFrontend.parseModule(input).parsed, true);
+});
+
+test("overload signatures erase without runtime declarations", () => {
+  const named = [
+    "function f();",
+    "function f(): void;",
+    "function f(x: number): number;",
+    "function f(x?: number): number;",
+    "function f(...xs: number[]): number;",
+    "function f<T>(x: T): T;",
+  ];
+  const sources = named.flatMap((declaration) =>
+    ["", "export ", "export default "].map((prefix) => prefix + declaration),
   );
+  sources.push(
+    "export default function();",
+    "export default function(): void;",
+    "export default function(x?: number): number;",
+  );
+  for (const declaration of sources) {
+    const input = {
+      source: "// λ😀\r\n  " + declaration,
+      sourceId: "signature.ts",
+    };
+    const script = babelFrontend.parse(input);
+    assert.equal(script.parsed, true, declaration);
+    assert.deepEqual(script.diagnostics, [], declaration);
+    assert.deepEqual(script.program?.body, [], declaration);
+    const module = babelModuleFrontend.parseModule(input);
+    assert.equal(module.parsed, true, declaration);
+    assert.deepEqual(module.diagnostics, [], declaration);
+    assert.deepEqual(module.module?.body, [], declaration);
+    assert.deepEqual(module.module?.imports, [], declaration);
+    assert.deepEqual(module.module?.exports, [], declaration);
+  }
+});
+
+test("type import aliases retain top-level and namespace placement", () => {
+  for (const source of [
+    'import type T = require("m");',
+    'declare namespace N { import type T = require("m"); }',
+    'declare namespace N { import T = require("m"); }',
+    'declare namespace N { import type { T } from "m"; }',
+    'declare namespace N { import { T } from "m"; }',
+    'declare namespace N { namespace M { import type T = require("m"); } }',
+  ]) {
+    for (const result of [
+      babelFrontend.parse({ source, sourceId: "alias.ts" }),
+      babelModuleFrontend.parseModule({ source, sourceId: "alias.ts" }),
+    ])
+      assert.equal(result.parsed, true, JSON.stringify(result.diagnostics));
+  }
+  for (const kind of ["", "type "]) {
+    for (const [open, close] of contexts.slice(1)) {
+      const source = `${open}import ${kind}T = require("m");${close}`;
+      for (const result of [
+        babelFrontend.parse({ source, sourceId: "nested-alias.ts" }),
+        babelModuleFrontend.parseModule({
+          source,
+          sourceId: "nested-alias.ts",
+        }),
+      ]) {
+        assert.equal(result.parsed, false, source);
+        assert.equal(result.diagnostics[0]?.code, "OSEO0001", source);
+      }
+    }
+  }
+  for (const source of [
+    'declare namespace N { function f(){import type T=require("m");} }',
+    'declare namespace N { function f(){import T=require("m");} }',
+    'declare namespace N { function f(){import { T } from "m";} }',
+  ]) {
+    for (const result of [
+      babelFrontend.parse({ source, sourceId: "nested-ambient-alias.ts" }),
+      babelModuleFrontend.parseModule({
+        source,
+        sourceId: "nested-ambient-alias.ts",
+      }),
+    ]) {
+      assert.equal(result.parsed, false, source);
+      assert.equal(result.diagnostics[0]?.code, "OSEO0001", source);
+    }
+  }
+  for (const source of ['import T = require("m");']) {
+    for (const result of [
+      babelFrontend.parse({ source, sourceId: "runtime-alias.ts" }),
+      babelModuleFrontend.parseModule({ source, sourceId: "runtime-alias.ts" }),
+    ]) {
+      assert.equal(result.parsed, false, source);
+      assert.equal(result.diagnostics[0]?.code, "OSEO1001", source);
+    }
+  }
+});
+
+test("ordinary namespace imports retain parser rejection", () => {
+  for (const source of [
+    'namespace N { import type T = require("m"); }',
+    'namespace N { import T = require("m"); }',
+    'namespace N { import type { T } from "m"; }',
+  ]) {
+    for (const result of [
+      babelFrontend.parse({ source, sourceId: "namespace-import.ts" }),
+      babelModuleFrontend.parseModule({
+        source,
+        sourceId: "namespace-import.ts",
+      }),
+    ]) {
+      assert.equal(result.parsed, false, source);
+      assert.equal(result.diagnostics[0]?.code, "OSEO0001", source);
+    }
+  }
+});
+
+test("exported aliases retain their wrapper placement", () => {
+  for (const source of [
+    'export import type T = require("m");',
+    "declare namespace N { namespace M {} export import T = M; }",
+    'declare namespace N { export import type T = require("m"); }',
+  ]) {
+    for (const result of [
+      babelFrontend.parse({ source, sourceId: "exported-alias.ts" }),
+      babelModuleFrontend.parseModule({
+        source,
+        sourceId: "exported-alias.ts",
+      }),
+    ]) {
+      assert.equal(result.parsed, true, JSON.stringify(result.diagnostics));
+    }
+  }
+  for (const source of [
+    'function f(){ export import type T = require("m"); }',
+    '{ export import type T = require("m"); }',
+    "declare namespace N { function f(){ export import T = M; } }",
+    "declare namespace N { { export import T = M; } }",
+  ]) {
+    for (const result of [
+      babelFrontend.parse({ source, sourceId: "nested-exported-alias.ts" }),
+      babelModuleFrontend.parseModule({
+        source,
+        sourceId: "nested-exported-alias.ts",
+      }),
+    ]) {
+      assert.equal(result.parsed, false, source);
+      assert.equal(result.diagnostics[0]?.code, "OSEO0001", source);
+    }
+  }
+  for (const source of [
+    "namespace M {} export import T = M;",
+    "namespace N { namespace M {} export import T = M; }",
+  ]) {
+    for (const result of [
+      babelFrontend.parse({ source, sourceId: "runtime-exported-alias.ts" }),
+      babelModuleFrontend.parseModule({
+        source,
+        sourceId: "runtime-exported-alias.ts",
+      }),
+    ]) {
+      assert.equal(result.parsed, false, source);
+      assert.equal(result.diagnostics[0]?.code, "OSEO1001", source);
+    }
+  }
+});
+
+test("ambient namespace module members erase but nested exports fail", () => {
+  for (const source of [
+    "declare namespace N { export type { T }; }",
+    'declare namespace N { export type * from "m"; }',
+    "declare namespace N { export default interface T{} }",
+    "declare namespace N { export default abstract class {} }",
+  ]) {
+    for (const result of [
+      babelFrontend.parse({ source, sourceId: "ambient-export.ts" }),
+      babelModuleFrontend.parseModule({
+        source,
+        sourceId: "ambient-export.ts",
+      }),
+    ])
+      assert.equal(result.parsed, true, JSON.stringify(result.diagnostics));
+  }
+  for (const source of [
+    "declare namespace N { function f(){ export const x=1; } }",
+    "declare namespace N { function f(){ export type T=number; } }",
+  ]) {
+    for (const result of [
+      babelFrontend.parse({ source, sourceId: "nested-ambient-export.ts" }),
+      babelModuleFrontend.parseModule({
+        source,
+        sourceId: "nested-ambient-export.ts",
+      }),
+    ]) {
+      assert.equal(result.parsed, false, source);
+      assert.equal(result.diagnostics[0]?.code, "OSEO0001", source);
+    }
+  }
 });

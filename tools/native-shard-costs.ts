@@ -158,9 +158,21 @@
  * Object accessor file sums the two registrations of one local extended run;
  * none are CI file-shard sums. macOS keeps the unknown-file median fallback.
  * See U6 provenance.
+ *
+ * Erasable TypeScript retains the previous Linux unknown-file fallback of
+ * 423 seconds as an unmeasured scheduling placeholder, not an extended
+ * measurement or a conservative bound. At e5381dca, the local ordinary
+ * Node.js run's three passing registrations summed to 69,899.827684 ms
+ * (56,735.230862 + 33.875509 + 13,130.721313), rounded up to 70 seconds.
+ * That ordinary observation does not establish extended or optimized cost.
+ * Its source is the preview-ts-erasable lane's
+ * finalbase-b1-20261110/gates/ts-G-node.stdout, SHA-256
+ * b959f833596fb0e9e9920d5e325470c648d14ee7fa02f7f7fd22756a31a8a0da.
+ * macOS keeps its unknown-file fallback pending matching-host evidence.
  */
 export const nativeShardCosts = {
   "linux-x86_64-gnu": {
+    "tests/property/erasable-typescript.property.test.ts": 423,
     "tests/property/es2026-array-from-async.property.test.ts": 470,
     "tests/property/annexb-function-declarations.property.test.ts": 300,
     "tests/property/es2026-error-is-error.property.test.ts": 142,
