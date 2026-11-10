@@ -28,9 +28,11 @@ void oseo_process_start(OseoContext *context, int argc, char **argv) {
 
 /* Decode maximal valid UTF-8 prefixes, keeping a BOM and replacing each
  * ill-formed subsequence as Node's UTF-8 decoder does. Input is host/work
- * memory, never an unrooted pointer into the managed heap. */
+ * memory, never an unrooted pointer into the managed heap. Startup snapshot
+ * strings pass intern false so that they never enter the string table. */
 static OseoResult process_decode(
-    OseoContext *context, const unsigned char *bytes, size_t length
+    OseoContext *context, const unsigned char *bytes, size_t length,
+    bool intern
 ) {
     if (length > OSEO_MAX_STRING_LENGTH ||
         length > SIZE_MAX / sizeof(uint16_t)) {
@@ -89,7 +91,9 @@ static OseoResult process_decode(
             units[count++] = (uint16_t)(0xdc00u | (point & 0x3ffu));
         }
     }
-    OseoResult result = oseo_string_from_units(context, units, count);
+    OseoResult result = intern
+        ? oseo_string_from_units(context, units, count)
+        : oseo_internal_allocate_uninterned_string(context, units, count);
     free(units);
     return result;
 }
@@ -157,7 +161,7 @@ static OseoResult process_executable(OseoContext *context) {
             char *absolute = realpath(path, NULL);
             if (absolute != NULL) {
                 OseoResult result = process_decode(context,
-                    (const unsigned char *)absolute, strlen(absolute));
+                    (const unsigned char *)absolute, strlen(absolute), false);
                 free(absolute);
                 free(path);
                 return result;
@@ -172,7 +176,7 @@ static OseoResult process_executable(OseoContext *context) {
 #endif
         if (!retry && length > 0u) {
             OseoResult result = process_decode(context,
-                (const unsigned char *)path, length);
+                (const unsigned char *)path, length, false);
             free(path);
             return result;
         }
@@ -202,7 +206,7 @@ static OseoResult process_arguments(OseoContext *context) {
          index < context->process_argc; index += 1) {
         const char *argument = context->process_argv[index];
         result = process_decode(context,
-            (const unsigned char *)argument, strlen(argument));
+            (const unsigned char *)argument, strlen(argument), false);
         roots[0] = result.value;
         if (result.status == OSEO_STATUS_NORMAL) {
             result = oseo_array_append(context,
@@ -240,11 +244,11 @@ static OseoResult process_environment(OseoContext *context) {
         const char *equal = strchr(entry, '=');
         if (equal == NULL) continue;
         result = process_decode(context, (const unsigned char *)entry,
-            (size_t)(equal - entry));
+            (size_t)(equal - entry), false);
         roots[0] = result.value;
         if (result.status == OSEO_STATUS_NORMAL) {
             result = process_decode(context,
-                (const unsigned char *)(equal + 1), strlen(equal + 1));
+                (const unsigned char *)(equal + 1), strlen(equal + 1), false);
             roots[1] = result.value;
         }
         if (result.status == OSEO_STATUS_NORMAL) {
@@ -624,7 +628,7 @@ static OseoResult process_read(OseoContext *context, size_t count,
         }
     }
     if (result.status == OSEO_STATUS_NORMAL && text) {
-        result = process_decode(context, bytes, length);
+        result = process_decode(context, bytes, length, true);
     } else if (result.status == OSEO_STATUS_NORMAL) {
         result = oseo_internal_intrinsic(context, OSEO_INTRINSIC_UINT8_ARRAY);
         roots[1] = result.value;

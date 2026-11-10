@@ -85,6 +85,33 @@ test("other node modules and bare aliases remain unsupported", async () => {
   );
 });
 
+test("type-only builtin imports erase before graph construction", async () => {
+  // Whole type-only declarations create no module request, so unsupported
+  // node: specifiers and missing builtin exports in them never reach the
+  // graph. Inline type specifiers erase one by one.
+  const erased = await graphFor(`import type { Platform } from "node:os";
+import type * as path from "node:path";
+export type { Stats } from "node:fs";
+import process, { type Env, argv } from "node:process";
+import { type PathLike, readFileSync } from "node:fs";
+process.exitCode = argv.length satisfies number;
+readFileSync satisfies unknown;`);
+  assert.deepEqual(erased.diagnostics, []);
+  assert.ok(erased.graph);
+  assert.deepEqual(
+    erased.graph.modules.map((node) => node.canonicalId),
+    ["file:///process-entry.ts", "node:process", "node:fs"],
+  );
+  assert.deepEqual(linkModuleGraph(erased.graph).diagnostics, []);
+  // An import left empty by erasure still requests its module.
+  const empty = await graphFor('import { type Platform } from "node:os";');
+  assert.equal(empty.diagnostics[0]?.code, "OSEO3001");
+  assert.match(
+    empty.diagnostics[0]?.message ?? "",
+    /node:process and node:fs/u,
+  );
+});
+
 test("builtin import attributes cannot request JSON", async () => {
   const result = await graphFor(
     'import fs from "node:fs" with {type: "json"};',

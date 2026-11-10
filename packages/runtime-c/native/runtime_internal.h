@@ -4205,6 +4205,19 @@ OseoResult oseo_internal_allocate_string(
     const uint16_t *units,
     size_t length
 );
+/*
+ * Allocate like oseo_internal_allocate_string, sharing an existing table
+ * entry, but never add a new string to the table. The process snapshot of
+ * host arguments, environment, and executable path uses it, so host state
+ * cannot decide which later program strings are shared. The observed
+ * allocation count and the other program counters then do not depend on
+ * the environment; the collection count still grows with startup work.
+ */
+OseoResult oseo_internal_allocate_uninterned_string(
+    OseoContext *context,
+    const uint16_t *units,
+    size_t length
+);
 /* Reject a string length before a component allocates a staging buffer. */
 OseoResult oseo_internal_validate_string_length(
     OseoContext *context,

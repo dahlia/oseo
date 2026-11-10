@@ -3,6 +3,7 @@
 import assert from "node:assert/strict";
 import { spawn } from "node:child_process";
 import { openSync, closeSync } from "node:fs";
+import { dirname } from "node:path";
 import process from "node:process";
 
 import type {
@@ -205,6 +206,98 @@ console.log("ok");`;
         },
       );
     }
+  }
+
+  // The startup snapshot of argv and the environment must not decide which
+  // later strings the runtime shares. Entries equal to global property
+  // names, as environment values, environment keys, or arguments, leave
+  // the program's counters of one observed executable unchanged. The
+  // collection count is excluded: under forced collection it grows with
+  // the startup work, which depends on the size of the environment.
+  const inherited = Object.fromEntries(
+    Object.entries(process.env).filter(
+      (entry): entry is [string, string] => entry[1] != null,
+    ),
+  );
+  const globalNames = ["undefined", "process", "globalThis", "Infinity"];
+  for (const specialization of ["disabled", "enabled"] as const) {
+    const compiled = compileSource(
+      defaultComponents.frontend,
+      {
+        source:
+          "function add(left: number, right: number) " +
+          "{ return left + right; }\nadd(20, 22);\n",
+        sourceId: "process-snapshot-sharing.ts",
+      },
+      { specialization, observeSpecialization: true },
+    );
+    assert.deepEqual(compiled.diagnostics, []);
+    assert.ok(compiled.mir);
+    await withNativeFixture(
+      {
+        backend: cBackend,
+        host,
+        input: compiled.mir,
+        operation: "execute",
+        runtime: defaultComponents.runtime,
+        target,
+        toolchain: nativeToolchain,
+        execution: {
+          environment: {
+            variables: { ...inherited, OSEO_GC_EVERY_SAFEPOINT: "1" },
+          },
+        },
+      },
+      async (native) => {
+        assert.ok(native.counters);
+        assert.ok(native.counters.allocations > 0);
+        const variants = [
+          { args: [], variables: {} },
+          {
+            args: [],
+            variables: {
+              ...inherited,
+              ...Object.fromEntries(
+                globalNames.map((name, index) => [
+                  `OSEO_SNAPSHOT_VALUE_${index}`,
+                  name,
+                ]),
+              ),
+            },
+          },
+          {
+            args: [],
+            variables: {
+              ...inherited,
+              ...Object.fromEntries(globalNames.map((name) => [name, "1"])),
+            },
+          },
+          { args: globalNames, variables: inherited },
+        ];
+        for (const variant of variants) {
+          const observed = await host.run({
+            command: native.executablePath,
+            args: variant.args,
+            cwd: dirname(native.executablePath),
+            environment: {
+              variables: {
+                ...variant.variables,
+                OSEO_GC_EVERY_SAFEPOINT: "1",
+              },
+            },
+          });
+          assert.equal(observed.exitStatus, 0, observed.stderr);
+          const record = /^OSEO_OBSERVATIONS (.*)\n$/mu.exec(
+            observed.stderr,
+          )?.[1];
+          assert.ok(record, observed.stderr);
+          const { collections, ...counters } = JSON.parse(record);
+          const { collections: expected, ...baseline } = native.counters;
+          assert.ok(collections > 0 && expected > 0);
+          assert.deepEqual(counters, baseline);
+        }
+      },
+    );
   }
 
   // The pipe closes before the program's first write. This does not depend

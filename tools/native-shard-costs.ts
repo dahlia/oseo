@@ -169,10 +169,16 @@
  * finalbase-b1-20261110/gates/ts-G-node.stdout, SHA-256
  * b959f833596fb0e9e9920d5e325470c648d14ee7fa02f7f7fd22756a31a8a0da.
  * macOS keeps its unknown-file fallback pending matching-host evidence.
+ *
+ * The preview process file keeps the same 423-second Linux unknown-file
+ * fallback as an explicit unmeasured placeholder, so its placement does not
+ * change. It has no extended or optimized measurement, and macOS keeps its
+ * fallback.
  */
 export const nativeShardCosts = {
   "linux-x86_64-gnu": {
     "tests/property/erasable-typescript.property.test.ts": 423,
+    "tests/property/preview-process.property.test.ts": 423,
     "tests/property/es2026-array-from-async.property.test.ts": 470,
     "tests/property/annexb-function-declarations.property.test.ts": 300,
     "tests/property/es2026-error-is-error.property.test.ts": 142,
