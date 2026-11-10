@@ -264,6 +264,7 @@ depends = [
 
 [tasks."test:deno"]
 description = "Run package source tests under Deno"
+depends = ["build"]
 run = "deno test -A packages"
 
 [tasks."test:native"]

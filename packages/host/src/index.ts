@@ -20,7 +20,10 @@ import {
   renameClaimedCacheLockDirectory,
 } from "./cache-files.ts";
 
-import { validateProcessStreams } from "./spawn-protocol.ts";
+import {
+  isClosedInputError,
+  validateProcessStreams,
+} from "./spawn-protocol.ts";
 
 function includePropertiesWhen<const Properties extends object>(
   properties: () => Properties | undefined,
@@ -1187,7 +1190,7 @@ export function createNodeHost(options: NodeHostOptions = {}): NodeHost {
         // A program may exit before consuming all input. Its status and
         // output remain authoritative when the input pipe closes early.
         child.stdin?.on("error", (error: NodeJS.ErrnoException) => {
-          if (error.code !== "EPIPE") reject(error);
+          if (!isClosedInputError(error)) reject(error);
         });
         child.stdin?.end(request.input);
         child.on("error", reject);

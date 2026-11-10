@@ -106,6 +106,18 @@ export function restoreSpawnError(details: SpawnError): Error {
   return error;
 }
 
+/**
+ * Recognize the input pipe error of a command that exited before reading
+ * all of its input. POSIX reports the closed pipe as EPIPE. Node.js on
+ * Windows reports the same write as EOF.
+ */
+export function isClosedInputError(error: NodeJS.ErrnoException): boolean {
+  return (
+    error.code === "EPIPE" ||
+    (error.code === "EOF" && error.syscall === "write")
+  );
+}
+
 /** Reject contradictory stream ownership before starting a command. */
 export function validateProcessStreams(request: ProcessRequest): void {
   if (request.inheritStdin && request.input != null) {

@@ -5,6 +5,18 @@ import { fileURLToPath } from "node:url";
 import test from "node:test";
 
 import { createDenoHost, createNodeHost } from "../src/index.ts";
+import { isClosedInputError } from "../src/spawn-protocol.ts";
+
+function failure(code: string, syscall: string): NodeJS.ErrnoException {
+  return Object.assign(new Error(code), { code, syscall });
+}
+
+test("closed process input is recognized on every host", () => {
+  assert.equal(isClosedInputError(failure("EPIPE", "write")), true);
+  assert.equal(isClosedInputError(failure("EOF", "write")), true);
+  assert.equal(isClosedInputError(failure("EOF", "read")), false);
+  assert.equal(isClosedInputError(failure("ECONNRESET", "write")), false);
+});
 
 for (const delegated of [false, true]) {
   test(`process input and bytes, delegated=${delegated}`, async () => {
@@ -127,7 +139,12 @@ for (const mode of [
         }),
       );
     });
-    assert.equal(observed.code, 23);
+    assert.equal(
+      observed.code,
+      23,
+      `status ${observed.code}, stderr:\n` +
+        new TextDecoder().decode(observed.stderr),
+    );
     const expected = mode.endsWith("-eof") ? new Uint8Array() : input;
     assert.deepEqual(new Uint8Array(observed.stdout), expected);
     assert.deepEqual(new Uint8Array(observed.stderr), expected);

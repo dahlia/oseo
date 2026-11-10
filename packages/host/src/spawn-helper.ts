@@ -2,6 +2,7 @@ import { spawn } from "node:child_process";
 import type { ChildProcess } from "node:child_process";
 import {
   describeSpawnError,
+  isClosedInputError,
   validateProcessStreams,
 } from "./spawn-protocol.ts";
 import type { SpawnRequest, SpawnResponse } from "./spawn-protocol.ts";
@@ -50,7 +51,7 @@ process.on("message", ({ id, request }: SpawnRequest) => {
     child.stdout?.on("data", (chunk: Uint8Array) => stdout.push(chunk));
     child.stderr?.on("data", (chunk: Uint8Array) => stderr.push(chunk));
     child.stdin?.on("error", (error: NodeJS.ErrnoException) => {
-      if (error.code === "EPIPE") return;
+      if (isClosedInputError(error)) return;
       failed = true;
       respond({ id, error: describeSpawnError(error) });
     });
