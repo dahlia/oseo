@@ -231,25 +231,64 @@ static void probe_real_time(
     );
 }
 
-static uint64_t deadline_after(OseoContext *context, uint64_t milliseconds) {
-    uint64_t now = 0u;
-    if (!context->clock_adapter->monotonic(context->clock_state, &now)) {
-        return 0u;
+/*
+ * Sets *deadline that many milliseconds after one adapter reading, which
+ * it also stores in *started; both are 0 when the reading fails. The
+ * adapter selects the clock with the same __APPLE__ test as
+ * PROBE_MONOTONIC_CLOCK and converts it to nanoseconds the same way, so a
+ * later host_monotonic reading minus *started is the time since the
+ * deadline was set.
+ */
+static bool deadline_from(
+    OseoContext *context,
+    uint64_t milliseconds,
+    uint64_t *started,
+    uint64_t *deadline
+) {
+    *started = 0u;
+    *deadline = 0u;
+    if (!context->clock_adapter->monotonic(context->clock_state, started)) {
+        *started = 0u;
+        return false;
     }
-    return now + milliseconds * PROBE_NANOSECONDS_PER_MILLISECOND;
+    *deadline = *started + milliseconds * PROBE_NANOSECONDS_PER_MILLISECOND;
+    return true;
 }
 
+static uint64_t deadline_after(OseoContext *context, uint64_t milliseconds) {
+    uint64_t started = 0u;
+    uint64_t deadline = 0u;
+    (void)deadline_from(context, milliseconds, &started, &deadline);
+    return deadline;
+}
+
+/* The time from the deadline's reading to the return of the wait. */
+static uint64_t since(bool started_read, uint64_t started, uint64_t now) {
+    return started_read && now > started ? now - started : 0u;
+}
+
+/*
+ * The measured interval starts at the reading the deadline is computed
+ * from and ends as soon as the wait returns, so elapsed time below the
+ * requested interval means the wait returned before its deadline.
+ */
 static void probe_deadline_wait(OseoContext *context, uint64_t milliseconds) {
     const OseoClockAdapter *adapter = context->clock_adapter;
-    uint64_t deadline = deadline_after(context, milliseconds);
+    uint64_t started = 0u;
+    uint64_t deadline = 0u;
     uint64_t cpu_started = cpu_microseconds();
-    uint64_t started = host_monotonic();
+    bool started_read = deadline_from(
+        context,
+        milliseconds,
+        &started,
+        &deadline
+    );
     OseoClockWaitResult result = adapter->wait(
         context->clock_state,
         true,
         deadline
     );
-    uint64_t elapsed = host_monotonic() - started;
+    uint64_t elapsed = since(started_read, started, host_monotonic());
     uint64_t cpu = cpu_microseconds() - cpu_started;
     uint64_t reached = 0u;
     bool read = adapter->monotonic(context->clock_state, &reached);
@@ -312,11 +351,15 @@ static void probe_cross_thread(
      */
     OseoClockCapabilities capabilities;
     oseo_clock_capabilities(context, &capabilities);
-    uint64_t deadline = deadline_after(
+    /* Measure from the deadline's own reading, as probe_deadline_wait does. */
+    uint64_t started = 0u;
+    uint64_t deadline = 0u;
+    bool started_read = deadline_from(
         context,
-        capabilities.wakeup == NULL ? 300u : 5000u
+        capabilities.wakeup == NULL ? 300u : 5000u,
+        &started,
+        &deadline
     );
-    uint64_t started = host_monotonic();
     if (pthread_create(&thread, NULL, wake_later, &waker) != 0) abort();
     OseoClockWaitResult result = context->clock_adapter->wait(
         context->clock_state,
@@ -343,7 +386,7 @@ static void probe_cross_thread(
         key,
         waker.woke ? "true" : "false",
         wait_name(result),
-        (returned - started) / UINT64_C(1000),
+        since(started_read, started, returned) / UINT64_C(1000),
         latency / UINT64_C(1000)
     );
 }
