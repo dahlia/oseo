@@ -281,7 +281,20 @@ test("Linux weights match the three-run median case sums", async () => {
     "utf8",
   );
   const rows = evidence.trimEnd().split("\n").slice(1);
-  const { costs } = nativeShardModel("linux");
+  const { costs: registeredCosts } = nativeShardModel("linux");
+  // TypeScript has no extended measurement. Its explicit placeholder keeps
+  // the previous unknown-file assignment, outside the measured TSV.
+  const typescript = "tests/property/erasable-typescript.property.test.ts";
+  const { [typescript]: placeholder, ...costs } = registeredCosts;
+  const measured = Object.values(costs).toSorted((a, b) => a - b);
+  assert.equal(placeholder, measured[Math.floor(measured.length / 2)]);
+  assert.equal(placeholder, 423);
+  assert.equal(
+    Object.values(registeredCosts).toSorted((a, b) => a - b)[
+      Math.floor(Object.keys(registeredCosts).length / 2)
+    ],
+    placeholder,
+  );
   // Added after the three source runs; they keep their earlier weights.
   // The module, with-var and module driver files use one candidate run
   // each (see U6).
