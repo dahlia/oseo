@@ -467,12 +467,21 @@ fs.writeFileSync('contract.json', JSON.stringify({
     assert.deepEqual(contract.args, ["^눈|error", "a b", ""]);
     assert.equal(contract.env.DEMO_LABEL, "ignored");
     assert.equal(contract.env.OSEO_PERF_PARENT_ONLY, undefined);
-    assert.equal(contract.cwd, realpathSync.native(directory));
+    // Windows cwd may use the short alias of the requested temp path.
+    assert.equal(
+      realpathSync.native(contract.cwd),
+      realpathSync.native(directory),
+    );
     const entries = readFileSync(
       join(directory, "journal", "launches.jsonl"),
       "utf8",
     ).trim();
     const record = JSON.parse(entries);
+    assert.equal(record.cwd, directory);
+    const request = JSON.parse(
+      readFileSync(join(directory, "journal", "requests.jsonl"), "utf8"),
+    );
+    assert.equal(request.cwd, directory);
     assert.deepEqual([...readFileSync(record.stdin.path)], [...input]);
     assert.deepEqual([...readFileSync(record.stdout.path)], [...input]);
     assert.deepEqual([...readFileSync(record.stderr.path)], [255, 0, 128]);
