@@ -88,6 +88,111 @@ jobs:
       - uses: ./.github/actions/runtime-archive-cache
         if: runner.os != 'Windows'
       - run: mise run test:${{ matrix.runtime }}
+      - name: Build performance correctness artifacts
+        if: runner.os == 'macOS'
+        shell: bash
+        run: |
+          set -euo pipefail
+          root="$RUNNER_TEMP/oseo-perf-correctness"
+          mkdir "$root"
+          {
+            git rev-parse HEAD 'HEAD^{tree}'
+            node -p 'JSON.stringify({platform:process.platform,
+              arch:process.arch,node:process.version,
+              runId:process.env.GITHUB_RUN_ID,
+              attempt:process.env.GITHUB_RUN_ATTEMPT,
+              job:process.env.GITHUB_JOB,runner:process.env.RUNNER_NAME})'
+            shasum -a 256 mise.toml pnpm-lock.yaml
+            deno --version
+            bun --version
+            zig version
+            mise ls --current --json npm:postject
+          } > "$root/source-host.txt" 2>&1
+          node -e 'if (process.platform !== "darwin" ||
+            process.arch !== "arm64") process.exit(1)'
+          OSEO_PERF_DIRECTORY="$root/build" \
+            mise run perf:build 2>&1 | tee "$root/build.log"
+      - name: Check performance artifact correctness
+        if: runner.os == 'macOS'
+        shell: bash
+        run: |
+          set -euo pipefail
+          root="$RUNNER_TEMP/oseo-perf-correctness"
+          OSEO_PERF_DIRECTORY="$root/build" \
+          OSEO_PERF_RESULTS="$root/correctness" \
+            mise run perf:correctness 2>&1 | tee "$root/correctness.log"
+      - name: Archive performance correctness artifacts
+        if: always() && runner.os == 'macOS'
+        shell: bash
+        run: |
+          set -euo pipefail
+          root="$RUNNER_TEMP/oseo-perf-correctness"
+          test -s "$root/source-host.txt"
+          # Keep absolute path mappings and executable modes, including
+          # resolved engine files outside the fresh build directory.
+          node --input-type=module - "$root" <<'JS'
+          import { appendFileSync, existsSync, lstatSync,
+            readFileSync, writeFileSync } from 'node:fs';
+          const root = process.argv[2];
+          const manifest = root + '/build/built.json';
+          const paths = new Set([root]);
+          const problem = (error) => {
+            appendFileSync(root + '/archive-diagnostics.jsonl',
+              JSON.stringify({ error: String(error) }) + '\n');
+            writeFileSync(root + '/archive-incomplete', 'incomplete\n');
+          };
+          if (existsSync(manifest)) {
+            try {
+              const forms = JSON.parse(readFileSync(manifest)).forms;
+              if (!Array.isArray(forms)) throw Error('Missing form list');
+              for (const form of forms) {
+                if (!form.run.command.startsWith(root + '/')) {
+                  paths.add(form.run.command);
+                }
+                for (const file of form.identities) {
+                  if (!file.path.startsWith(root + '/')) paths.add(file.path);
+                }
+              }
+            } catch (error) { problem(error); }
+          } else { problem(Error('Build manifest unavailable')); }
+          const available = [];
+          for (const path of paths) {
+            try { lstatSync(path); available.push(path); }
+            catch (error) { problem(error); }
+          }
+          writeFileSync(root + '/archive-paths',
+            available.join('\0') + '\0');
+          JS
+          archive_status=0
+          tar --null -czpPf "$RUNNER_TEMP/oseo-perf-correctness.tar.gz" \
+            -T "$root/archive-paths" \
+            2> "$RUNNER_TEMP/oseo-perf-correctness-tar.stderr" \
+            || archive_status=$?
+          cp "$RUNNER_TEMP/oseo-perf-correctness-tar.stderr" \
+            "$root/archive.stderr"
+          printf '%s\n' "$archive_status" > "$root/archive-tar.status"
+          shasum -a 256 "$RUNNER_TEMP/oseo-perf-correctness.tar.gz" \
+            > "$RUNNER_TEMP/oseo-perf-correctness.tar.gz.sha256"
+          test "$archive_status" -eq 0
+          test ! -e "$root/archive-incomplete"
+      - name: Upload performance correctness raw records
+        if: always() && runner.os == 'macOS'
+        uses: actions/upload-artifact@v7
+        with:
+          name: >-
+            perf-correctness-raw-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/oseo-perf-correctness/
+          if-no-files-found: error
+      - name: Upload performance correctness archive
+        if: always() && runner.os == 'macOS'
+        uses: actions/upload-artifact@v7
+        with:
+          name: >-
+            perf-correctness-tar-${{ github.run_id }}-${{ github.run_attempt }}
+          path: |
+            ${{ runner.temp }}/oseo-perf-correctness.tar.gz
+            ${{ runner.temp }}/oseo-perf-correctness.tar.gz.sha256
+          if-no-files-found: error
 
   # macOS. The wrapper reproduces Node's default discovery, removes the
   # dedicated Array and exhaustive RegExp literal files, and assigns the
@@ -1174,6 +1279,111 @@ jobs:
       - uses: ./.github/actions/runtime-archive-cache
         if: runner.os != 'Windows'
       - run: mise run test:deno
+      - name: Build performance correctness artifacts
+        if: runner.os == 'macOS'
+        shell: bash
+        run: |
+          set -euo pipefail
+          root="$RUNNER_TEMP/oseo-perf-correctness"
+          mkdir "$root"
+          {
+            git rev-parse HEAD 'HEAD^{tree}'
+            node -p 'JSON.stringify({platform:process.platform,
+              arch:process.arch,node:process.version,
+              runId:process.env.GITHUB_RUN_ID,
+              attempt:process.env.GITHUB_RUN_ATTEMPT,
+              job:process.env.GITHUB_JOB,runner:process.env.RUNNER_NAME})'
+            shasum -a 256 mise.toml pnpm-lock.yaml
+            deno --version
+            bun --version
+            zig version
+            mise ls --current --json npm:postject
+          } > "$root/source-host.txt" 2>&1
+          node -e 'if (process.platform !== "darwin" ||
+            process.arch !== "arm64") process.exit(1)'
+          OSEO_PERF_DIRECTORY="$root/build" \
+            mise run perf:build 2>&1 | tee "$root/build.log"
+      - name: Check performance artifact correctness
+        if: runner.os == 'macOS'
+        shell: bash
+        run: |
+          set -euo pipefail
+          root="$RUNNER_TEMP/oseo-perf-correctness"
+          OSEO_PERF_DIRECTORY="$root/build" \
+          OSEO_PERF_RESULTS="$root/correctness" \
+            mise run perf:correctness 2>&1 | tee "$root/correctness.log"
+      - name: Archive performance correctness artifacts
+        if: always() && runner.os == 'macOS'
+        shell: bash
+        run: |
+          set -euo pipefail
+          root="$RUNNER_TEMP/oseo-perf-correctness"
+          test -s "$root/source-host.txt"
+          # Keep absolute path mappings and executable modes, including
+          # resolved engine files outside the fresh build directory.
+          node --input-type=module - "$root" <<'JS'
+          import { appendFileSync, existsSync, lstatSync,
+            readFileSync, writeFileSync } from 'node:fs';
+          const root = process.argv[2];
+          const manifest = root + '/build/built.json';
+          const paths = new Set([root]);
+          const problem = (error) => {
+            appendFileSync(root + '/archive-diagnostics.jsonl',
+              JSON.stringify({ error: String(error) }) + '\n');
+            writeFileSync(root + '/archive-incomplete', 'incomplete\n');
+          };
+          if (existsSync(manifest)) {
+            try {
+              const forms = JSON.parse(readFileSync(manifest)).forms;
+              if (!Array.isArray(forms)) throw Error('Missing form list');
+              for (const form of forms) {
+                if (!form.run.command.startsWith(root + '/')) {
+                  paths.add(form.run.command);
+                }
+                for (const file of form.identities) {
+                  if (!file.path.startsWith(root + '/')) paths.add(file.path);
+                }
+              }
+            } catch (error) { problem(error); }
+          } else { problem(Error('Build manifest unavailable')); }
+          const available = [];
+          for (const path of paths) {
+            try { lstatSync(path); available.push(path); }
+            catch (error) { problem(error); }
+          }
+          writeFileSync(root + '/archive-paths',
+            available.join('\0') + '\0');
+          JS
+          archive_status=0
+          tar --null -czpPf "$RUNNER_TEMP/oseo-perf-correctness.tar.gz" \
+            -T "$root/archive-paths" \
+            2> "$RUNNER_TEMP/oseo-perf-correctness-tar.stderr" \
+            || archive_status=$?
+          cp "$RUNNER_TEMP/oseo-perf-correctness-tar.stderr" \
+            "$root/archive.stderr"
+          printf '%s\n' "$archive_status" > "$root/archive-tar.status"
+          shasum -a 256 "$RUNNER_TEMP/oseo-perf-correctness.tar.gz" \
+            > "$RUNNER_TEMP/oseo-perf-correctness.tar.gz.sha256"
+          test "$archive_status" -eq 0
+          test ! -e "$root/archive-incomplete"
+      - name: Upload performance correctness raw records
+        if: always() && runner.os == 'macOS'
+        uses: actions/upload-artifact@v7
+        with:
+          name: >-
+            perf-correctness-raw-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/oseo-perf-correctness/
+          if-no-files-found: error
+      - name: Upload performance correctness archive
+        if: always() && runner.os == 'macOS'
+        uses: actions/upload-artifact@v7
+        with:
+          name: >-
+            perf-correctness-tar-${{ github.run_id }}-${{ github.run_attempt }}
+          path: |
+            ${{ runner.temp }}/oseo-perf-correctness.tar.gz
+            ${{ runner.temp }}/oseo-perf-correctness.tar.gz.sha256
+          if-no-files-found: error
 
   # macOS. The wrapper reproduces Node's default discovery, removes the
   # dedicated Array and exhaustive RegExp literal files, and assigns the
