@@ -67,7 +67,7 @@ export function startSpawnHelper(): ChildProcess {
     env: { ...process.env, NODE_OPTIONS: undefined },
     execArgv: [],
     serialization: "advanced",
-    stdio: ["ignore", "ignore", "ignore", "ipc"],
+    stdio: ["inherit", "inherit", "inherit", "ipc"],
   });
 }
 

@@ -334,6 +334,13 @@ by removed `case` lines inside completion dispatch switches; printed
 HIR/MIR are unchanged. Outlining then splits the shorter bodies at other
 points, so helper boundaries and unit numbers also move.
 
+The [ADR 0038](./adr/0038-process-input-and-exit-subset.md) process unit
+moves all 44 records because generated `main` now takes `argc` and `argv`,
+passes them to `oseo_process_start` after context initialization, and
+returns the exit status from `oseo_process_finish`; printed HIR and MIR are
+unchanged, and undoing those three edits to `main` reproduces every prior
+hash.
+
 
 Stage 2 interfaces and ownership
 --------------------------------

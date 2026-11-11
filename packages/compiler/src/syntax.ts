@@ -1348,10 +1348,21 @@ export interface LoadedJsonModule extends SourceInput {
   readonly sourceHash: string;
 }
 
+/** Canonical identities of the preview's two source-free modules. */
+export type BuiltinModuleSpecifier = "node:process" | "node:fs";
+
+/** Export-table and runtime-ABI digest supplied by the loader. */
+export interface LoadedBuiltinModule {
+  readonly kind: "builtin";
+  readonly specifier: BuiltinModuleSpecifier;
+  readonly sourceHash: string;
+}
+
 /** Owned result of loading one canonical module identifier. */
 export interface ModuleLoadResult {
   readonly diagnostics: readonly Diagnostic[];
   readonly source?: LoadedModuleSource | LoadedJsonModule;
+  readonly builtin?: LoadedBuiltinModule;
 }
 
 /** Import site that caused a dependency module to be loaded. */
@@ -1402,12 +1413,20 @@ interface ModuleGraphNodeBase {
   readonly dependencies: readonly ModuleDependency[];
   readonly resolutions: readonly ModuleResolution[];
   readonly sourceHash: string;
-  readonly syntax: SyntaxModule;
 }
 
-/** A source node or a default-only synthetic JSON node. */
+/** Source syntax and source-free builtin records remain distinct. */
 export type ModuleGraphNode = ModuleGraphNodeBase &
-  ({ readonly moduleKind?: "javascript" } | { readonly moduleKind: "json" });
+  (
+    | {
+        readonly moduleKind?: "javascript" | "json";
+        readonly syntax: SyntaxModule;
+      }
+    | {
+        readonly moduleKind: "builtin";
+        readonly builtin: BuiltinModuleSpecifier;
+      }
+  );
 
 /**
  * The source that contains a module request. A Script referrer is not a

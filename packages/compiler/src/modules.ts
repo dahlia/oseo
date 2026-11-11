@@ -1,4 +1,5 @@
 import type { ByteRange, Diagnostic } from "./source.ts";
+import { moduleNodeSyntax } from "./module-builtin.ts";
 import { jsonModuleSyntax } from "./module-json.ts";
 import type {
   LocatedSyntax,
@@ -325,7 +326,50 @@ async function discoverModules(
         ),
       );
     }
-    if (loaded.source == null || loaded.diagnostics.length > 0) return;
+    if (loaded.diagnostics.length > 0) return;
+    if (loaded.builtin != null) {
+      if (canonicalId !== loaded.builtin.specifier) {
+        diagnostics.push(
+          linkDiagnostic(
+            canonicalId,
+            {
+              range: {
+                start: { line: 1, column: 1 },
+                end: { line: 1, column: 1 },
+              },
+            },
+            "A builtin module must use its canonical specifier identity.",
+          ),
+        );
+        return;
+      }
+      if (referrer?.specifier.attributes?.length) {
+        diagnostics.push(
+          linkDiagnostic(
+            referrer.importerId,
+            referrer.specifier,
+            "A builtin module does not accept import attributes.",
+          ),
+        );
+        return;
+      }
+      if (discovered.has(canonicalId)) return;
+      discovered.add(canonicalId);
+      if (request != null) {
+        origins.set(canonicalId, request.origin);
+        originSites.set(canonicalId, request.site);
+      }
+      modules.push({
+        canonicalId,
+        moduleKind: "builtin",
+        builtin: loaded.builtin.specifier,
+        sourceHash: loaded.builtin.sourceHash,
+        dependencies: [],
+        resolutions: [],
+      });
+      return;
+    }
+    if (loaded.source == null) return;
     if (referrer == null && loaded.source.kind === "json") {
       diagnostics.push(
         linkDiagnostic(
@@ -692,7 +736,7 @@ export function importedBinding(
   module: ModuleGraphNode,
   localName: string,
 ): SyntaxImportEntry | undefined {
-  return module.syntax.imports.find(
+  return moduleNodeSyntax(module).imports.find(
     (entry) => entry.localName === localName && entry.importedName != null,
   );
 }
@@ -902,7 +946,7 @@ export function linkModuleGraph(graph: ModuleGraph): ModuleLinkResult {
     exportsByModule.set(module.canonicalId, moduleExports);
     explicitNames.set(module.canonicalId, names);
     ambiguousNames.set(module.canonicalId, new Set());
-    for (const [index, entry] of module.syntax.exports.entries()) {
+    for (const [index, entry] of moduleNodeSyntax(module).exports.entries()) {
       if (entry.kind === "star") continue;
       if (names.has(entry.exportedName)) {
         diagnostics.push(
@@ -964,7 +1008,7 @@ export function linkModuleGraph(graph: ModuleGraph): ModuleLinkResult {
       ) {
         throw new Error("Module link state is incomplete.");
       }
-      for (const entry of module.syntax.exports) {
+      for (const entry of moduleNodeSyntax(module).exports) {
         if (entry.kind === "local") {
           const imported = importedBinding(module, entry.localName);
           if (imported == null) continue;
@@ -1043,7 +1087,7 @@ export function linkModuleGraph(graph: ModuleGraph): ModuleLinkResult {
   for (const module of graph.modules) {
     const imports: LinkedModuleImport[] = [];
     linkedImports.set(module.canonicalId, imports);
-    for (const entry of module.syntax.exports) {
+    for (const entry of moduleNodeSyntax(module).exports) {
       if (entry.kind !== "indirect") continue;
       const targetId = resolvedModuleId(module, entry.specifier);
       const targetAmbiguous =
@@ -1070,7 +1114,7 @@ export function linkModuleGraph(graph: ModuleGraph): ModuleLinkResult {
         );
       }
     }
-    for (const entry of module.syntax.imports) {
+    for (const entry of moduleNodeSyntax(module).imports) {
       if (entry.localName == null || entry.importedName == null) continue;
       const targetId = resolvedModuleId(module, entry.specifier);
       if (targetId == null || !nodes.has(targetId)) {

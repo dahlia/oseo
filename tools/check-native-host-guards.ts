@@ -16,6 +16,7 @@ const nativeHelpers = new Set([
   "assertMemberReferenceCase",
   "assertReferenceCase",
   "runNativeUnits",
+  "runProcessProgram",
   "prepareHarnessObject",
   "createTest262FragmentExecutor",
   "buildHostCcFixture",
@@ -318,6 +319,7 @@ function nativeCall(
     name === "assertNativeMemberReference" ||
     name === "assertMemberReferenceCase" ||
     name === "assertReferenceCase" ||
+    name === "runProcessProgram" ||
     name === "buildHostCcFixture" ||
     name === "buildClockProgram" ||
     name === "runClockProbe" ||

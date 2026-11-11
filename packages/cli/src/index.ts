@@ -103,7 +103,8 @@ function includePropertiesWhen<const Properties extends object>(
   return properties() ?? {};
 }
 
-type CliParseResult =
+/** Parsed command values or completed argument, help, and version output. */
+export type CliParseResult =
   | { readonly kind: "invoke"; readonly value: CliInvocation }
   | { readonly kind: "result"; readonly value: CliResult };
 
@@ -118,8 +119,28 @@ export interface DefaultComponents {
   readonly toolchain: NativeToolchain;
 }
 
+/** Program execution inputs, separate from compiler toolchain requests. */
+export interface NativeExecutionOptions {
+  readonly args?: readonly string[];
+  readonly environment?: ProcessEnvironment;
+  readonly input?: string | Uint8Array;
+  readonly captureBytes?: boolean;
+  readonly inheritStdin?: boolean;
+  readonly inheritOutput?: boolean;
+}
+
+function validateNativeExecution(execution?: NativeExecutionOptions): void {
+  if (execution?.inheritStdin && execution.input != null) {
+    throw new TypeError("Process input cannot also inherit stdin.");
+  }
+  if (execution?.inheritOutput && execution.captureBytes) {
+    throw new TypeError("Inherited process output cannot also capture bytes.");
+  }
+}
+
 /** A host-independent invocation of the Oseo command-line contract. */
 export interface CliRequest {
+  readonly execution?: NativeExecutionOptions;
   readonly args: readonly string[];
   /**
    * In-memory text of the `--script` file, which is then not read from
@@ -133,6 +154,8 @@ export interface CliRequest {
 
 /** Captured command-line output and status. */
 export interface CliResult {
+  readonly stdoutBytes?: Uint8Array;
+  readonly stderrBytes?: Uint8Array;
   /**
    * `true` only when native execution started the compiled executable, so
    * the status and both streams are that program's own. It is absent when
@@ -246,7 +269,8 @@ function invocationDiagnostic(
   return undefined;
 }
 
-function parseCliRequest(request: CliRequest): CliParseResult {
+/** Parse the shared CLI grammar without reading files or starting processes. */
+export function parseCliRequest(request: CliRequest): CliParseResult {
   let exitStatus = 0;
   let stderr = "";
   let stdout = "";
@@ -394,7 +418,10 @@ async function compileCliModuleGraph(
       ),
     };
   }
-  const fileLoader = createFileModuleLoader(host);
+  const fileLoader = createFileModuleLoader(
+    host,
+    defaultComponents.runtime.getRuntimeInput().abiVersion,
+  );
   const result = await buildModuleGraph(
     defaultComponents.moduleFrontend,
     {
@@ -450,7 +477,9 @@ async function compileCliModuleGraph(
   }
   return {
     mir: compiled.mir,
-    sourcePaths: result.graph.modules.map((node) => node.canonicalId),
+    sourcePaths: result.graph.modules
+      .filter((node) => node.moduleKind !== "builtin")
+      .map((node) => node.canonicalId),
   };
 }
 
@@ -493,7 +522,10 @@ async function discoverCliScriptRequests(
   }
   const result = await buildScriptRequests(
     defaultComponents.moduleFrontend,
-    createFileModuleLoader(host),
+    createFileModuleLoader(
+      host,
+      defaultComponents.runtime.getRuntimeInput().abiVersion,
+    ),
     fileModuleResolver,
     [{ canonicalId, program: parsed.program }],
   );
@@ -1218,6 +1250,7 @@ async function requirePinnedToolchain(
 }
 
 interface NativeWorkflowOptions {
+  readonly execution?: NativeExecutionOptions;
   readonly buildConfiguration: NativeBuildConfiguration;
   readonly publication?: {
     readonly publisher: ExecutablePublisher;
@@ -1236,7 +1269,7 @@ async function executeNativeWorkflow(
   prepared: PreparedNativeRuntime | undefined,
   options: NativeWorkflowOptions,
 ): Promise<CliResult> {
-  const { buildConfiguration, publication } = options;
+  const { buildConfiguration, publication, execution } = options;
   const units = "sources" in input ? input : undefined;
   const emitted =
     "sources" in input
@@ -1538,7 +1571,8 @@ async function executeNativeWorkflow(
     return { exitStatus: 0, stderr: "", stdout: "" };
   }
   const attempt = await observeProcess(host, {
-    args: [],
+    ...execution,
+    args: execution?.args ?? [],
     command: executablePath,
     cwd: directory,
   });
@@ -1551,6 +1585,14 @@ async function executeNativeWorkflow(
     exitStatus: observation.exitStatus,
     stderr: observation.stderr,
     stdout: observation.stdout,
+    ...includePropertiesWhen(() => {
+      if (observation.stdoutBytes == null) return undefined;
+      return { stdoutBytes: observation.stdoutBytes };
+    }),
+    ...includePropertiesWhen(() => {
+      if (observation.stderrBytes == null) return undefined;
+      return { stderrBytes: observation.stderrBytes };
+    }),
   };
 }
 
@@ -1628,6 +1670,7 @@ export async function executeCliInvocation(
     request.sourceId ?? invocation.sourceId,
   );
   if (invalid != null) return diagnosticResult(invalid);
+  if (invocation.command === "run") validateNativeExecution(request.execution);
   const parsed = { value: invocation };
   const sourceId = request.sourceId ?? parsed.value.sourceId;
   const selected =
@@ -1744,9 +1787,9 @@ export async function executeCliInvocation(
       return diagnosticResult(discovered.diagnostic);
     }
     sourcePaths.push(
-      ...(discovered.requests?.closure.modules ?? []).map(
-        (node) => node.canonicalId,
-      ),
+      ...(discovered.requests?.closure.modules ?? [])
+        .filter((node) => node.moduleKind !== "builtin")
+        .map((node) => node.canonicalId),
     );
     if (parsed.value.mode !== "execute") {
       return compileCliSource(
@@ -1847,6 +1890,16 @@ export async function executeCliInvocation(
         ...includePropertiesWhen(() =>
           publication == null ? undefined : { publication },
         ),
+        ...includePropertiesWhen(() =>
+          parsed.value.command !== "run"
+            ? undefined
+            : {
+                execution: {
+                  ...request.execution,
+                  args: request.execution?.args ?? parsed.value.programArgs,
+                },
+              },
+        ),
       },
     );
   } catch (error) {
@@ -1895,7 +1948,9 @@ export async function runNativeUnits(
   preparedRuntime?: PreparedNativeRuntime,
   buildConfiguration: NativeBuildConfiguration = toolchain.buildConfiguration ??
     "checked",
+  execution?: NativeExecutionOptions,
 ): Promise<CliResult> {
+  validateNativeExecution(execution);
   const selected = selectExecutionTarget(host, undefined, sourceId);
   if ("diagnostic" in selected) return diagnosticResult(selected.diagnostic);
   let directory: string;
@@ -1921,7 +1976,12 @@ export async function runNativeUnits(
       archiveReuse,
       toolchain,
       preparedRuntime,
-      { buildConfiguration },
+      {
+        buildConfiguration,
+        ...includePropertiesWhen(() =>
+          execution == null ? undefined : { execution },
+        ),
+      },
     );
   } catch (error) {
     if (error instanceof PreparedNativeRuntimeMismatchError) mismatch = error;

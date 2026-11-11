@@ -6,9 +6,10 @@ import type {
   CompilerHost,
   NativeBuildInput,
   NativeToolchain,
+  ProcessRequest,
 } from "@oseo/compiler";
 import type { ExecutableDestination, ExecutablePublisher } from "@oseo/host";
-import { runCli, runNativeCli } from "../src/index.ts";
+import { runCli, runNativeCli, runNativeUnits } from "../src/index.ts";
 import commands from "../src/commands.generated.ts";
 import { parse } from "@optique/core/parser";
 import { createProgramParser } from "@optique/discover";
@@ -16,6 +17,7 @@ import { createProgramParser } from "@optique/discover";
 function fixture() {
   const builds: NativeBuildInput[] = [];
   const processes: string[] = [];
+  const requests: ProcessRequest[] = [];
   const removed: string[] = [];
   const inspections: ExecutableDestination[] = [];
   const publications: string[] = [];
@@ -38,6 +40,7 @@ function fixture() {
     },
     run(request) {
       processes.push(request.command);
+      requests.push(request);
       return Promise.resolve({ exitStatus: 0, stderr: "", stdout: "" });
     },
     writeTextFile() {
@@ -76,6 +79,7 @@ function fixture() {
     publisher,
     reads,
     removed,
+    requests,
     toolchain,
   };
 }
@@ -86,6 +90,7 @@ test("root and run use checked temporary execution", async () => {
   for (const args of [["entry.ts"], ["run", "entry.ts"]]) {
     const state = fixture();
     // eslint-disable-next-line no-await-in-loop -- Compare the two workflows.
+    // eslint-disable-next-line no-await-in-loop -- Separate command cases.
     const result = await runNativeCli(
       { ...request, args },
       state.host,
@@ -177,6 +182,8 @@ test("invalid native and text options have no host effects", async () => {
     ["run"],
     ["build", "entry.ts", "--build-config", "unsafe"],
     ["run", "entry.ts", "--unknown"],
+    ["run", "entry.ts", "extra"],
+    ["build", "entry.ts", "--", "extra"],
   ]) {
     const state = fixture();
     // eslint-disable-next-line no-await-in-loop -- Keep observations separate.
@@ -451,5 +458,143 @@ test("explicit run configuration overrides defaults", async () => {
     assert.equal(result.exitStatus, 0, result.stderr);
     assert.equal(state.builds[0]?.buildConfiguration, "optimized");
     assert.equal(result.executed, true);
+  }
+});
+
+test("run forwards delimited arguments only to the user process", async () => {
+  const args = ["", "two words", "한국어", "--target", "--", "-x"];
+  for (const prefix of [[], ["run"]]) {
+    const state = fixture();
+    // eslint-disable-next-line no-await-in-loop -- Separate command cases.
+    const result = await runNativeCli(
+      {
+        ...request,
+        args: [...prefix, "entry.ts", "--", ...args],
+        execution: { inheritStdin: true, inheritOutput: true },
+      },
+      state.host,
+      state.toolchain,
+      state.publisher,
+    );
+    assert.equal(result.exitStatus, 0, result.stderr);
+    assert.deepEqual(state.requests[0]?.args, []);
+    assert.equal(state.requests[0]?.inheritStdin, undefined);
+    assert.equal(state.requests[0]?.inheritOutput, undefined);
+    assert.deepEqual(state.requests[1]?.args, args);
+    assert.equal(state.requests[1]?.inheritStdin, true);
+    assert.equal(state.requests[1]?.inheritOutput, true);
+  }
+});
+
+test("embedded execution preserves arguments and bytes", async () => {
+  const state = fixture();
+  const bytes = new Uint8Array([255, 0, 239, 187, 191]);
+  const result = await runNativeCli(
+    {
+      ...request,
+      args: ["run", "entry.ts", "--", "parsed"],
+      execution: { args: ["explicit"], input: bytes, captureBytes: true },
+    },
+    {
+      ...state.host,
+      run(value) {
+        state.requests.push(value);
+        return Promise.resolve({
+          exitStatus: 0,
+          stderr: "�",
+          stdout: "�",
+          stderrBytes: bytes,
+          stdoutBytes: bytes,
+        });
+      },
+    },
+    state.toolchain,
+    state.publisher,
+  );
+  assert.equal(result.executed, true);
+  assert.deepEqual(result.stdoutBytes, bytes);
+  assert.deepEqual(result.stderrBytes, bytes);
+  assert.deepEqual(state.requests.at(-1)?.args, ["explicit"]);
+  assert.deepEqual(state.requests.at(-1)?.input, bytes);
+  assert.equal(state.requests[0]?.captureBytes, undefined);
+});
+
+test("build ignores execution and protects graph files", async () => {
+  const state = fixture();
+  const result = await runNativeCli(
+    {
+      source: 'import { argv } from "node:process"; console.log(argv);',
+      version: "0.0.0",
+      args: ["build", "--module", "entry.ts"],
+      execution: { args: ["unused"], inheritStdin: true, inheritOutput: true },
+    },
+    state.host,
+    state.toolchain,
+    state.publisher,
+  );
+  assert.equal(result.exitStatus, 0, result.stderr);
+  assert.equal(result.executed, undefined);
+  assert.equal(result.stdout, "");
+  assert.equal(result.stderr, "");
+  assert.deepEqual(state.processes, ["linker"]);
+  assert.ok(
+    state.inspections.every(
+      (entry) => !entry.protectedPaths.includes("node:process"),
+    ),
+  );
+});
+
+test("empty tails and escaped sources keep their grammar", async () => {
+  for (const args of [
+    ["entry.ts", "--"],
+    ["run", "entry.ts", "--"],
+    ["--", "build"],
+  ]) {
+    const state = fixture();
+    // eslint-disable-next-line no-await-in-loop -- Separate command cases.
+    const result = await runNativeCli(
+      { ...request, args },
+      state.host,
+      state.toolchain,
+      state.publisher,
+    );
+    assert.equal(result.exitStatus, 0, result.stderr);
+    assert.deepEqual(state.requests.at(-1)?.args, []);
+  }
+});
+
+test("stream conflicts reject before subprocesses", async () => {
+  for (const execution of [
+    { input: "", inheritStdin: true },
+    { captureBytes: true, inheritOutput: true },
+  ]) {
+    const state = fixture();
+    // eslint-disable-next-line no-await-in-loop -- Isolated invalid inputs.
+    await assert.rejects(
+      runNativeCli(
+        { ...request, args: ["run", "entry.ts"], execution },
+        state.host,
+        state.toolchain,
+        state.publisher,
+      ),
+      TypeError,
+    );
+    // eslint-disable-next-line no-await-in-loop -- Isolated invalid inputs.
+    await assert.rejects(
+      runNativeUnits(
+        { sources: [], prebuiltObjectPaths: [] },
+        "entry.ts",
+        state.host,
+        state.toolchain,
+        "enabled",
+        undefined,
+        undefined,
+        execution,
+      ),
+      TypeError,
+    );
+    assert.deepEqual(state.requests, []);
+    assert.deepEqual(state.builds, []);
+    assert.deepEqual(state.reads, []);
   }
 });

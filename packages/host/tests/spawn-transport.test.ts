@@ -226,3 +226,17 @@ test("construction and send errors reject safely", async () => {
   await assert.rejects(service.run(request), /send failed/u);
   await service.close();
 });
+
+test("rejects malformed raw byte observations across IPC", async () => {
+  for (const field of ["stdoutBytes", "stderrBytes"]) {
+    const helper = new FakeHelper();
+    const service = createSpawnDelegate(() => helper);
+    const call = service.run({ ...request, captureBytes: true });
+    helper.emit("message", {
+      id: 0,
+      observation: { exitStatus: 0, stdout: "", stderr: "", [field]: [255] },
+    });
+    await assert.rejects(call, /malformed response/u);
+    await service.close();
+  }
+});

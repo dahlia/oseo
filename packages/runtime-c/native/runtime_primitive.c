@@ -2216,74 +2216,26 @@ OseoResult oseo_greater_equal(
     return relational(context, left, right, 'g');
 }
 
-static int write_code_point(uint32_t point) {
-    unsigned char bytes[4];
-    size_t length;
-    if (point <= UINT32_C(0x7f)) {
-        bytes[0] = (unsigned char)point;
-        length = 1u;
-    } else if (point <= UINT32_C(0x7ff)) {
-        bytes[0] = (unsigned char)(UINT32_C(0xc0) | (point >> 6u));
-        bytes[1] = (unsigned char)(UINT32_C(0x80) | (point & 0x3fu));
-        length = 2u;
-    } else if (point <= UINT32_C(0xffff)) {
-        bytes[0] = (unsigned char)(UINT32_C(0xe0) | (point >> 12u));
-        bytes[1] = (unsigned char)(UINT32_C(0x80) | ((point >> 6u) & 0x3fu));
-        bytes[2] = (unsigned char)(UINT32_C(0x80) | (point & 0x3fu));
-        length = 3u;
-    } else {
-        bytes[0] = (unsigned char)(UINT32_C(0xf0) | (point >> 18u));
-        bytes[1] = (unsigned char)(UINT32_C(0x80) | ((point >> 12u) & 0x3fu));
-        bytes[2] = (unsigned char)(UINT32_C(0x80) | ((point >> 6u) & 0x3fu));
-        bytes[3] = (unsigned char)(UINT32_C(0x80) | (point & 0x3fu));
-        length = 4u;
-    }
-    return fwrite(bytes, 1u, length, stdout) == length ? 0 : 1;
-}
-
-static int write_string(OseoValue value) {
-    OseoString *string = string_object(value);
-    for (size_t index = 0u; index < string->length; index += 1u) {
-        uint32_t point = string->units[index];
-        if (point >= UINT32_C(0xd800) && point <= UINT32_C(0xdbff) &&
-            index + 1u < string->length) {
-            uint32_t low = string->units[index + 1u];
-            if (low >= UINT32_C(0xdc00) && low <= UINT32_C(0xdfff)) {
-                point = UINT32_C(0x10000) +
-                    ((point - UINT32_C(0xd800)) << 10u) +
-                    (low - UINT32_C(0xdc00));
-                index += 1u;
-            } else {
-                point = UINT32_C(0xfffd);
-            }
-        } else if (point >= UINT32_C(0xd800) &&
-                   point <= UINT32_C(0xdfff)) {
-            point = UINT32_C(0xfffd);
-        }
-        if (write_code_point(point) != 0) return 1;
-    }
-    return 0;
-}
-
 OseoResult oseo_console_log(
     OseoContext *context,
     size_t argument_count,
     const OseoValue *arguments
 ) {
     for (size_t index = 0u; index < argument_count; index += 1u) {
-        if (index > 0u && fputc(' ', stdout) == EOF) {
-            return failure(context, "OSEO3001", "Standard output failed.");
+        if (index > 0u) {
+            const unsigned char space = ' ';
+            OseoResult written = oseo_internal_process_write(
+                context, false, &space, 1u, false);
+            if (written.status != OSEO_STATUS_NORMAL) return written;
         }
         OseoResult string = is_symbol(arguments[index])
             ? oseo_internal_symbol_text(context, arguments[index])
             : oseo_internal_value_string(context, arguments[index]);
         if (string.status != OSEO_STATUS_NORMAL) return string;
-        if (write_string(string.value) != 0) {
-            return failure(context, "OSEO3001", "Standard output failed.");
-        }
+        OseoResult written = oseo_internal_process_write_string(
+            context, false, string.value, false);
+        if (written.status != OSEO_STATUS_NORMAL) return written;
     }
-    if (fputc('\n', stdout) == EOF) {
-        return failure(context, "OSEO3001", "Standard output failed.");
-    }
-    return normal(oseo_undefined());
+    const unsigned char newline = '\n';
+    return oseo_internal_process_write(context, false, &newline, 1u, false);
 }

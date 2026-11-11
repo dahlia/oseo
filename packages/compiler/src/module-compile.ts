@@ -17,6 +17,11 @@ import {
 } from "./hir-build.ts";
 import type { CompilerOptions, MirProgram } from "./mir.ts";
 import { buildMir } from "./mir-build.ts";
+import {
+  builtinModuleExports,
+  moduleNodeRange,
+  moduleNodeSyntax,
+} from "./module-builtin.ts";
 import { linkModuleGraph } from "./modules.ts";
 import type { LinkedModule, LinkedModuleGraph } from "./modules.ts";
 import type { Diagnostic, SourceRange } from "./source.ts";
@@ -667,7 +672,10 @@ function compileModuleTable(
         throw new Error("Module namespace cell is unavailable.");
       }
       namespaceBindings.set(targetId, bindingId);
-      const targetRange = retainModuleSource(targetNode.syntax.range, targetId);
+      const targetRange = retainModuleSource(
+        moduleNodeRange(targetNode),
+        targetId,
+      );
       namespaceInitializers.push(
         moduleNamespaceInitializer(target, bindingId, targetRange),
       );
@@ -690,7 +698,7 @@ function compileModuleTable(
       moduleNamespaceInitializer(
         target,
         bindingId,
-        retainModuleSource(targetNode.syntax.range, target.canonicalId),
+        retainModuleSource(moduleNodeRange(targetNode), target.canonicalId),
       ),
     );
   }
@@ -700,6 +708,35 @@ function compileModuleTable(
     const linkedModule = linkedModules.get(moduleId);
     if (node == null || linkedModule == null) {
       throw new Error(`Linked module '${moduleId}' is unavailable.`);
+    }
+    if (node.moduleKind === "builtin") {
+      const range = moduleNodeRange(node);
+      for (const cellId of linkedModule.cellIds) {
+        const cell = cells.get(cellId);
+        if (cell == null) throw new Error("Missing builtin export cell.");
+        const names: readonly string[] = builtinModuleExports[node.builtin];
+        const exportIndex = names.indexOf(cell.localName);
+        if (exportIndex < 0) continue;
+        globalBindings.push({ id: cellId, name: cell.localName });
+        intrinsicInitializers.push({
+          kind: "const",
+          hint: undefined,
+          bindingId: cellId,
+          name: cell.localName,
+          range,
+          initializer: {
+            kind: "call",
+            target: { kind: "builtin-export" },
+            arguments: [
+              moduleNumber(node.builtin === "node:process" ? 0 : 1, range),
+              moduleNumber(exportIndex, range),
+            ],
+            range,
+          },
+        });
+      }
+      moduleBodies.set(moduleId, []);
+      continue;
     }
     const bindings = new Map<string, Binding>();
     for (const imported of linkedModule.imports) {
@@ -728,12 +765,15 @@ function compileModuleTable(
       const cell = cells.get(cellId);
       if (cell == null) throw new Error(`Module cell '${cellId}' is missing.`);
       if (bindings.has(cell.localName)) {
-        const declaration = declarationNamed(node.syntax.body, cell.localName);
+        const declaration = declarationNamed(
+          moduleNodeSyntax(node).body,
+          cell.localName,
+        );
         return {
           diagnostics: [
             sourceDiagnostic(
               moduleId,
-              declaration ?? node.syntax,
+              declaration ?? { range: moduleNodeRange(node) },
               `Duplicate declaration '${cell.localName}'.`,
             ),
           ],
@@ -750,9 +790,9 @@ function compileModuleTable(
     // module's own declarations and imports shadow them.
     const result = buildSeededHir(
       {
-        body: moduleProgramBody(node.syntax),
+        body: moduleProgramBody(moduleNodeSyntax(node)),
         kind: "program",
-        range: node.syntax.range,
+        range: moduleNodeRange(node),
         sourceId: moduleId,
         strict: true,
       },
@@ -781,7 +821,7 @@ function compileModuleTable(
     globalBindings.push(...(result.program.globalBindings ?? []));
     globalBindings.push(...collectHirBindings(moduleBody));
     const evaluationBody: HirStatement[] = [];
-    const varNames = new Set(node.syntax.varNames);
+    const varNames = new Set(moduleNodeSyntax(node).varNames);
     for (const statement of moduleBody) {
       if (statement.kind === "let" && varNames.has(statement.name)) {
         // InitializeEnvironment creates each var binding as undefined
@@ -864,7 +904,7 @@ function compileModuleTable(
     if (node == null || moduleBody == null) {
       throw new Error(`Module evaluation '${moduleId}' is unavailable.`);
     }
-    const range = retainModuleSource(node.syntax.range, moduleId);
+    const range = retainModuleSource(moduleNodeRange(node), moduleId);
     // Asynchronous module evaluators use the same traced frames as async
     // functions, including suspension inside binding and assignment
     // steps.
@@ -989,7 +1029,7 @@ export function compileModuleGraph(
     (module) => module.canonicalId === graph.entryId,
   );
   if (entry == null) throw new Error("The module entry is unavailable.");
-  const entryRange = retainModuleSource(entry.syntax.range, graph.entryId);
+  const entryRange = retainModuleSource(moduleNodeRange(entry), graph.entryId);
   const preludeHir = resolvedPrelude?.hir;
   const hir: HirProgram = {
     body: [

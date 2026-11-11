@@ -22,7 +22,7 @@ export interface SpawnError {
   readonly spawnargs?: readonly string[] | undefined;
 }
 
-/** Responses are sent only after both child output pipes have closed. */
+/** Respond after child exit and closure of any captured output pipes. */
 export type SpawnResponse =
   | { readonly id: number; readonly observation: ProcessObservation }
   | { readonly id: number; readonly error: SpawnError };
@@ -57,7 +57,11 @@ export function isSpawnResponse<T>(value: T): value is T & SpawnResponse {
     "stdout" in observation &&
     typeof observation.stdout === "string" &&
     "stderr" in observation &&
-    typeof observation.stderr === "string"
+    typeof observation.stderr === "string" &&
+    (!("stdoutBytes" in observation) ||
+      observation.stdoutBytes instanceof Uint8Array) &&
+    (!("stderrBytes" in observation) ||
+      observation.stderrBytes instanceof Uint8Array)
   );
 }
 
@@ -100,4 +104,26 @@ export function restoreSpawnError(details: SpawnError): Error {
       });
   }
   return error;
+}
+
+/**
+ * Recognize the input pipe error of a command that exited before reading
+ * all of its input. POSIX reports the closed pipe as EPIPE. Node.js on
+ * Windows reports the same write as EOF.
+ */
+export function isClosedInputError(error: NodeJS.ErrnoException): boolean {
+  return (
+    error.code === "EPIPE" ||
+    (error.code === "EOF" && error.syscall === "write")
+  );
+}
+
+/** Reject contradictory stream ownership before starting a command. */
+export function validateProcessStreams(request: ProcessRequest): void {
+  if (request.inheritStdin && request.input != null) {
+    throw new TypeError("Process input cannot also inherit stdin.");
+  }
+  if (request.inheritOutput && request.captureBytes) {
+    throw new TypeError("Inherited process output cannot also capture bytes.");
+  }
 }

@@ -282,13 +282,20 @@ test("Linux weights match the three-run median case sums", async () => {
   );
   const rows = evidence.trimEnd().split("\n").slice(1);
   const { costs: registeredCosts } = nativeShardModel("linux");
-  // TypeScript has no extended measurement. Its explicit placeholder keeps
-  // the previous unknown-file assignment, outside the measured TSV.
+  // TypeScript and the preview process file have no extended measurement.
+  // Their explicit placeholders keep the previous unknown-file assignment,
+  // outside the measured TSV.
   const typescript = "tests/property/erasable-typescript.property.test.ts";
-  const { [typescript]: placeholder, ...costs } = registeredCosts;
+  const processFile = "tests/property/preview-process.property.test.ts";
+  const {
+    [typescript]: placeholder,
+    [processFile]: processPlaceholder,
+    ...costs
+  } = registeredCosts;
   const measured = Object.values(costs).toSorted((a, b) => a - b);
   assert.equal(placeholder, measured[Math.floor(measured.length / 2)]);
   assert.equal(placeholder, 423);
+  assert.equal(processPlaceholder, placeholder);
   assert.equal(
     Object.values(registeredCosts).toSorted((a, b) => a - b)[
       Math.floor(Object.keys(registeredCosts).length / 2)

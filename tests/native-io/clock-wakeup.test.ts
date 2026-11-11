@@ -101,15 +101,19 @@ function assertReadableClocks(entry: ClockProbeConfiguration): void {
 }
 
 function assertIdleDeadline(entry: ClockProbeConfiguration): void {
-  assert.equal(entry.deadlineWait.result, "deadline");
-  assert.equal(entry.deadlineWait.reachedDeadline, true);
+  const observed = `${entry.configuration} deadline wait ${JSON.stringify(
+    entry.deadlineWait,
+  )}`;
+  assert.equal(entry.deadlineWait.result, "deadline", observed);
+  assert.equal(entry.deadlineWait.reachedDeadline, true, observed);
   assert.ok(
     (entry.deadlineWait.elapsedMicroseconds ?? 0) >=
       idleWaitMilliseconds * 1000,
+    `idle wait elapsed: ${observed}`,
   );
   assert.ok(
     (entry.deadlineWait.cpuMicroseconds ?? Infinity) < idleCpuLimitMicroseconds,
-    `idle wait CPU ${entry.deadlineWait.cpuMicroseconds}`,
+    `idle wait CPU ${entry.deadlineWait.cpuMicroseconds}: ${observed}`,
   );
 }
 
@@ -201,7 +205,12 @@ test(
         [sleep.crossThreadWakeup?.accepted, sleep.crossThreadWakeup?.result],
         [false, "deadline"],
       );
-      assert.ok((sleep.crossThreadWakeup?.elapsedMicroseconds ?? 0) >= 300_000);
+      assert.ok(
+        (sleep.crossThreadWakeup?.elapsedMicroseconds ?? 0) >= 300_000,
+        `sleep-fallback cross-thread wait ${JSON.stringify(
+          sleep.crossThreadWakeup,
+        )}`,
+      );
       assert.deepEqual(
         [sleep.indefiniteWait?.accepted, sleep.indefiniteWait?.result],
         [false, "failed"],

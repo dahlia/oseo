@@ -301,3 +301,9 @@ export { lowerFragmentPhases } from "./fragments.ts";
 
 export { createHarnessObjectKey } from "./native-fragments.ts";
 export type { HarnessToolchainPolicy } from "./native-fragments.ts";
+
+export {
+  builtinModuleExports,
+  isBuiltinModuleSpecifier,
+} from "./module-builtin.ts";
+export type { BuiltinModuleSpecifier, LoadedBuiltinModule } from "./syntax.ts";

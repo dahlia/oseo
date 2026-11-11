@@ -151,10 +151,11 @@ void oseo_internal_string_table_release(OseoContext *context) {
     context->string_table = NULL;
 }
 
-OseoResult oseo_internal_allocate_string(
+static OseoResult allocate_string(
     OseoContext *context,
     const uint16_t *units,
-    size_t length
+    size_t length,
+    bool intern
 ) {
     OseoResult valid = oseo_internal_validate_string_length(context, length);
     if (valid.status != OSEO_STATUS_NORMAL) return valid;
@@ -177,10 +178,26 @@ OseoResult oseo_internal_allocate_string(
     if (length > 0u) memcpy(object->units, units, length * sizeof(uint16_t));
     OseoResult published = oseo_internal_publish_heap(
         context, &object->header, OSEO_HEAP_STRING);
-    if (published.status == OSEO_STATUS_NORMAL && shareable) {
+    if (published.status == OSEO_STATUS_NORMAL && shareable && intern) {
         string_table_insert(context, published.value, hash);
     }
     return published;
+}
+
+OseoResult oseo_internal_allocate_string(
+    OseoContext *context,
+    const uint16_t *units,
+    size_t length
+) {
+    return allocate_string(context, units, length, true);
+}
+
+OseoResult oseo_internal_allocate_uninterned_string(
+    OseoContext *context,
+    const uint16_t *units,
+    size_t length
+) {
+    return allocate_string(context, units, length, false);
 }
 
 OseoResult oseo_string_from_units(

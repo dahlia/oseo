@@ -1915,7 +1915,7 @@ test("populates the realm-owned weak collection intrinsic cluster", () => {
     header,
     /OSEO_INTRINSIC_FINALIZATION_REGISTRY_UNREGISTER = 260/u,
   );
-  assert.match(header, /OSEO_INTRINSIC_COUNT = 281/u);
+  assert.match(header, /OSEO_INTRINSIC_COUNT = 293/u);
   for (const property of [
     "WeakMap",
     "WeakSet",
@@ -2762,7 +2762,7 @@ test("populates the single-agent shared memory clusters", () => {
   assert.match(header, /OSEO_INTRINSIC_SHARED_ARRAY_BUFFER = 240/u);
   assert.match(header, /OSEO_INTRINSIC_SHARED_ARRAY_BUFFER_SPECIES = 241/u);
   assert.match(header, /OSEO_INTRINSIC_ATOMICS = 242/u);
-  assert.match(header, /OSEO_INTRINSIC_COUNT = 281/u);
+  assert.match(header, /OSEO_INTRINSIC_COUNT = 293/u);
   // ValidateIntegerTypedArray rejects every floating element type,
   // including Float16, before any index conversion.
   assert.match(

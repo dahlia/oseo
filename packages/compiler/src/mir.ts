@@ -24,6 +24,7 @@ export type MirConstant =
 
 /** A direct call target independent of HIR and source syntax. */
 export type MirCallTarget =
+  | { readonly kind: "builtin-export" }
   | { readonly kind: "console-log" }
   | { readonly kind: "dynamic" }
   | { readonly kind: "super" }

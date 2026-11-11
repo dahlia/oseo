@@ -1,0 +1,54 @@
+version: 1
+id: preview-process
+title: "Preview process input and exit"
+scope:
+  - "The initial-realm process global, arguments, environment snapshots,
+    standard streams, exitCode validation and immediate process.exit."
+  - "The node:process and node:fs builtin graph nodes, export cells,
+    namespaces, and synchronous standard input reads of ADR 0038."
+owners:
+  - docs/adr/0038-process-input-and-exit-subset.md
+evidence:
+  differential:
+    status: covered
+    references:
+      - tests/native/fixtures/process.ts
+      - tests/property/preview-process.property.test.ts
+  fixed:
+    status: covered
+    references:
+      - tests/native/fixtures/process.ts
+      - tests/native/scenarios/process.ts
+      - tests/process-modules.test.ts
+      - packages/host/tests/process-input.test.ts
+  forced-collection:
+    status: covered
+    references:
+      - tests/preview-process-support.ts
+      - tests/property/preview-process.property.test.ts
+  generated:
+    status: covered
+    references:
+      - tests/property/preview-process.property.test.ts
+  guard-fallback:
+    status: covered
+    references:
+      - tests/property/preview-process.property.test.ts
+  specialization:
+    status: covered
+    references:
+      - tests/preview-process-support.ts
+      - tests/property/preview-process.property.test.ts
+  standards:
+    status: omitted
+    reason: "Node.js host APIs are outside ECMA-262; Root separately runs
+      the full test262 update to review global own-key observations."
+    replacements:
+      - tests/native/scenarios/process.ts
+      - tests/process-modules.test.ts
+  structural:
+    status: covered
+    references:
+      - tests/process-modules.test.ts
+      - packages/runtime-c/tests/builtin-code-registry.test.ts
+      - packages/runtime-c/tests/symbols.test.ts

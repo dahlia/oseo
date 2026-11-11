@@ -1142,6 +1142,13 @@
 #define OSEO_ASYNC_DISPOSE_REJECTED_CODE_ID \
     (OSEO_DISPOSAL_CODE_ID_RANGE_LAST - 18u)
 
+/* ADR 0038 process functions own range 31. */
+#define OSEO_PROCESS_CODE_ID_RANGE_INDEX ((size_t)31u)
+#define OSEO_PROCESS_CODE_ID_RANGE_FIRST \
+    OSEO_BUILTIN_CODE_RANGE_FIRST(OSEO_PROCESS_CODE_ID_RANGE_INDEX)
+#define OSEO_PROCESS_CODE_ID_RANGE_LAST \
+    OSEO_BUILTIN_CODE_RANGE_LAST(OSEO_PROCESS_CODE_ID_RANGE_INDEX)
+
 /* Well-known symbol table indexes shared with the public context. */
 #define OSEO_WELL_KNOWN_ASYNC_ITERATOR ((size_t)0u)
 #define OSEO_WELL_KNOWN_HAS_INSTANCE ((size_t)1u)
@@ -4198,6 +4205,19 @@ OseoResult oseo_internal_allocate_string(
     const uint16_t *units,
     size_t length
 );
+/*
+ * Allocate like oseo_internal_allocate_string, sharing an existing table
+ * entry, but never add a new string to the table. The process snapshot of
+ * host arguments, environment, and executable path uses it, so host state
+ * cannot decide which later program strings are shared. The observed
+ * allocation count and the other program counters then do not depend on
+ * the environment; the collection count still grows with startup work.
+ */
+OseoResult oseo_internal_allocate_uninterned_string(
+    OseoContext *context,
+    const uint16_t *units,
+    size_t length
+);
 /* Reject a string length before a component allocates a staging buffer. */
 OseoResult oseo_internal_validate_string_length(
     OseoContext *context,
@@ -5220,6 +5240,21 @@ OseoResult oseo_internal_install_proxy_global(
     OseoContext *context,
     OseoValue global
 );
+/* Initial-realm process snapshots, builtin exports, and standard streams. */
+OseoResult oseo_internal_process_intrinsic(OseoContext *context);
+OseoResult oseo_internal_install_process_global(
+    OseoContext *context, OseoValue global);
+OseoResult oseo_internal_process_builtin_dispatch(
+    OseoContext *context, size_t code_id, OseoValue callee,
+    OseoValue receiver, size_t argument_count,
+    const OseoValue *arguments, OseoValue new_target);
+OseoResult oseo_internal_process_write(
+    OseoContext *context, bool standard_error,
+    const unsigned char *bytes, size_t length, bool strict);
+OseoResult oseo_internal_process_write_string(
+    OseoContext *context, bool standard_error,
+    OseoValue string, bool strict);
+
 /*
  * The realm's lazily created JSON namespace, its JSON.parse function,
  * and the replaceable global property that exposes the namespace.

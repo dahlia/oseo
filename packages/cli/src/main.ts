@@ -34,10 +34,15 @@ await runProgram<CliCommandContext>({
           async invoke(value) {
             const result = await executeCliInvocation(value, {
               args: [],
+              execution: { inheritStdin: true, inheritOutput: true },
               version: manifest.version,
             });
-            if (result.stdout !== "") process.stdout.write(result.stdout);
-            if (result.stderr !== "") process.stderr.write(result.stderr);
+            if (result.stdout !== "") {
+              process.stdout.write(result.stdoutBytes ?? result.stdout);
+            }
+            if (result.stderr !== "") {
+              process.stderr.write(result.stderrBytes ?? result.stderr);
+            }
             process.exitCode = result.exitStatus;
           },
         },

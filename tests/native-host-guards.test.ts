@@ -15,6 +15,35 @@ import test from "node:test";
 import { withNativeFixture } from "../../packages/testkit/src/index.ts";
 `;
 
+test("process imports require a native host guard", () => {
+  const prefix = `
+import test from "node:test";
+import { runProcessProgram as observe } from "./preview-process-support.ts";
+const nativeTarget = targetForExecutionHost(executionHost);
+`;
+  const guarded = `${prefix}
+test("guarded process", {
+  skip: nativeTarget == null ? "requires a supported native host" : false,
+}, async () => { await observe({}); });
+`;
+  const unguarded = `${prefix}
+test("unguarded process", async () => { await observe({}); });
+`;
+  const unused = `${prefix}
+async function unusedProcess() { await observe({}); }
+test("pure model", () => { assert.equal(typeof observe, "function"); });
+`;
+  const path = "tests/property/preview-process.property.test.ts";
+  assert.deepEqual(checkNativeHostGuardSource(path, guarded), []);
+  assert.deepEqual(
+    checkNativeHostGuardSource(path, unguarded).map(
+      (problem) => problem.testName,
+    ),
+    ["unguarded process"],
+  );
+  assert.deepEqual(checkNativeHostGuardSource(path, unused), []);
+});
+
 test("compound Reference imports require a native host guard", () => {
   for (const helper of [
     "assertNativeMemberReference",

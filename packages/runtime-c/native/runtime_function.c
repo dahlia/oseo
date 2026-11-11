@@ -203,6 +203,9 @@ static const OseoBuiltinDispatchRange builtin_dispatch_ranges[] = {
     {OSEO_REALM_CODE_ID_RANGE_FIRST,
      OSEO_REALM_CODE_ID_RANGE_LAST,
      oseo_internal_realm_builtin_dispatch},
+    {OSEO_PROCESS_CODE_ID_RANGE_FIRST,
+     OSEO_PROCESS_CODE_ID_RANGE_LAST,
+     oseo_internal_process_builtin_dispatch},
     {OSEO_DISPOSAL_CODE_ID_RANGE_FIRST,
      OSEO_DISPOSAL_CODE_ID_RANGE_LAST,
      oseo_internal_disposal_builtin_dispatch},
@@ -1130,6 +1133,9 @@ OseoResult oseo_intrinsic(OseoContext *context, OseoIntrinsic intrinsic) {
         materialized = oseo_internal_reflect_intrinsic(context);
     } else if (intrinsic == OSEO_INTRINSIC_PROXY) {
         materialized = oseo_internal_proxy_intrinsic(context);
+    } else if (intrinsic >= OSEO_INTRINSIC_PROCESS &&
+               intrinsic <= OSEO_INTRINSIC_PROCESS_EXIT_CODE_SET) {
+        materialized = oseo_internal_process_intrinsic(context);
     } else if (intrinsic == OSEO_INTRINSIC_JSON ||
                intrinsic == OSEO_INTRINSIC_JSON_PARSE) {
         materialized = oseo_internal_json_intrinsic(context);

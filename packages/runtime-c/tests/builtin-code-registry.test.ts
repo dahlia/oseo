@@ -47,6 +47,7 @@ const components = [
   "AGENT",
   "REALM",
   "DISPOSAL",
+  "PROCESS",
 ] as const;
 
 test("allocates one stable built-in code range per runtime component", () => {

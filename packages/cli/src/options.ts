@@ -1,7 +1,7 @@
 import type { NativeBuildConfiguration } from "@oseo/compiler";
 import { object, or } from "@optique/core/constructs";
 import { message } from "@optique/core/message";
-import { map, optional, withDefault } from "@optique/core/modifiers";
+import { map, multiple, optional, withDefault } from "@optique/core/modifiers";
 import type { Parser } from "@optique/core/parser";
 import { argument, constant, flag, option } from "@optique/core/primitives";
 import { choice, string as stringValue } from "@optique/core/valueparser";
@@ -159,6 +159,21 @@ const sharedParsers = {
 
 const emptyProgramArgs: readonly string[] = [];
 
+const programArgument = argument(stringValue({ metavar: "ARG" }));
+const terminatedProgramArgument: typeof programArgument = {
+  ...programArgument,
+  parse(context) {
+    if (!context.optionsTerminated && context.buffer[0] !== "--") {
+      return {
+        success: false,
+        consumed: 0,
+        error: message`Program arguments must follow --.`,
+      };
+    }
+    return programArgument.parse(context);
+  },
+};
+
 /** Compose run options with a SOURCE parser for the selected command. */
 export function createRunOptionsParser(
   sourceId: Parser<"sync", string> = sourceArgumentParser,
@@ -169,7 +184,7 @@ export function createRunOptionsParser(
     command: constant("run" as const),
     mode: constant("execute" as const),
     output: constant(undefined),
-    programArgs: constant(emptyProgramArgs),
+    programArgs: multiple(terminatedProgramArgument),
   });
 }
 

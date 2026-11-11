@@ -64,6 +64,10 @@ export interface NativeFixtureOptions {
   readonly input: MirProgram;
   readonly keepArtifacts?: boolean;
   readonly operation: NativeFixtureOperation;
+  /** Inputs belong to the program, never to a compiler subprocess. */
+  readonly execution?: Omit<ProcessRequest, "command" | "cwd" | "args"> & {
+    readonly args?: readonly string[];
+  };
   readonly runtime: RuntimeInputProvider;
   readonly runtimeArchiveReuse?: "disabled" | "enabled";
   readonly target: TargetDescription;
@@ -266,17 +270,15 @@ function errorMessage(cause: unknown): string {
     : `${cause}`;
 }
 
-function splitCounters(observation: ProcessObservation) {
+/** An observed build appends its record after arbitrary user stderr bytes. */
+function splitCounters(observation: ProcessObservation, expected: boolean) {
+  if (!expected) return { observation };
   const prefix = "OSEO_OBSERVATIONS ";
-  // The runtime writes the machine-readable thrown-value identity marker
-  // only on the failure path, and a fixture whose execution failed is
-  // rejected before it reaches this point, so no observation here can
-  // carry one. A marker-shaped line is therefore output the program
-  // printed itself, and it stays observable.
-  const lines = observation.stderr.split(/(?<=\n)/u);
-  const index = lines.findLastIndex((line) => line.startsWith(prefix));
-  const line = index < 0 ? undefined : lines[index];
-  if (line == null) return { observation };
+  const start = observation.stderr.lastIndexOf(prefix);
+  if (start < 0) return { observation };
+  const end = observation.stderr.indexOf("\n", start);
+  if (end < 0) throw new Error("Incomplete runtime observation record.");
+  const line = observation.stderr.slice(start, end + 1);
   // SAFETY: Every counter field is validated before the record is returned.
   const parsed = JSON.parse(
     line.slice(prefix.length),
@@ -294,11 +296,30 @@ function splitCounters(observation: ProcessObservation) {
       throw new Error(`Runtime observation has invalid ${key}.`);
     }
   }
-  lines.splice(index, 1);
   return {
     // SAFETY: The loop above validates every RuntimeObservationCounters field.
     counters: parsed as RuntimeObservationCounters,
-    observation: { ...observation, stderr: lines.join("") },
+    observation: {
+      ...observation,
+      stderr:
+        observation.stderr.slice(0, start) + observation.stderr.slice(end + 1),
+      ...includePropertiesWhen(() => {
+        if (observation.stderrBytes == null) return undefined;
+        const marker = new TextEncoder().encode(line);
+        const bytes = observation.stderrBytes;
+        let byteStart = bytes.length - marker.length;
+        while (
+          byteStart >= 0 &&
+          !marker.every((byte, offset) => bytes[byteStart + offset] === byte)
+        )
+          byteStart -= 1;
+        if (byteStart < 0) throw new Error("Missing raw observation record.");
+        const filtered = new Uint8Array(bytes.length - marker.length);
+        filtered.set(bytes.subarray(0, byteStart));
+        filtered.set(bytes.subarray(byteStart + marker.length), byteStart);
+        return { stderrBytes: filtered };
+      }),
+    },
   };
 }
 
@@ -578,7 +599,8 @@ export async function withNativeFixture<T>(
     let observation: ProcessObservation;
     if (options.operation === "execute") {
       const request = {
-        args: [],
+        ...options.execution,
+        args: options.execution?.args ?? [],
         command: plan.executablePath,
         cwd: directory,
       };
@@ -593,7 +615,10 @@ export async function withNativeFixture<T>(
           observation.stderr,
       );
     }
-    const separated = splitCounters(observation);
+    const separated = splitCounters(
+      observation,
+      options.input.observeSpecialization === true,
+    );
     if (
       options.input.observeSpecialization === true &&
       options.operation === "execute" &&
@@ -675,7 +700,9 @@ export function assertMatchingObservations(
     if (
       observation.exitStatus !== first.exitStatus ||
       observation.stderr !== first.stderr ||
-      observation.stdout !== first.stdout
+      observation.stdout !== first.stdout ||
+      !matchingBytes(observation.stdoutBytes, first.stdoutBytes) ||
+      !matchingBytes(observation.stderrBytes, first.stderrBytes)
     ) {
       throw new Error(
         "Fixture observations differ:\n" +
@@ -684,4 +711,18 @@ export function assertMatchingObservations(
       );
     }
   }
+}
+
+/** Raw comparison applies when both executions requested capture. */
+function matchingBytes(
+  left: Uint8Array | undefined,
+  right: Uint8Array | undefined,
+): boolean {
+  return (
+    (left == null && right == null) ||
+    (left != null &&
+      right != null &&
+      left.length === right.length &&
+      left.every((byte, index) => byte === right[index]))
+  );
 }

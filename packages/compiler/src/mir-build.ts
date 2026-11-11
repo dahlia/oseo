@@ -5449,6 +5449,7 @@ function lowerExpression(
     };
     detail = expression.target.method;
   } else if (
+    expression.target.kind === "builtin-export" ||
     expression.target.kind === "module-evaluate" ||
     expression.target.kind === "module-import"
   ) {
@@ -5463,7 +5464,9 @@ function lowerExpression(
     detail =
       expression.target.kind === "module-import"
         ? "module_import"
-        : "module_evaluate";
+        : expression.target.kind === "builtin-export"
+          ? "builtin_export"
+          : "module_evaluate";
   } else if (expression.target.kind === "super") {
     return lowerSuperCall(
       expression,
