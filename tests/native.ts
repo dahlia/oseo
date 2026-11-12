@@ -192,6 +192,7 @@ const { functionIntrinsicChainFixtures, functionIntrinsicKeyOrderFixtures } =
 const { regexpSymbolMethodsFixtures } =
   await import("./native/fixtures/regexp-symbol-methods.ts");
 
+import { runPreviewDemoScenarios } from "./native/scenarios/preview-demos.ts";
 import { runProcessScenarios } from "./native/scenarios/process.ts";
 import { runNativeScenario0 } from "./native/scenarios/shard-0.ts";
 import { runNativeScenario1 } from "./native/scenarios/shard-1.ts";
@@ -2363,6 +2364,9 @@ if (isTestShardPosition(0, nativeArguments.shard)) {
 }
 
 if (isTestShardPosition(1, nativeArguments.shard)) {
+  nativeProgress("preview demos begin");
+  await runPreviewDemoScenarios(host);
+  nativeProgress("preview demos end");
   nativeProgress("scenario 1 begin");
   await runNativeScenario1({
     host,
