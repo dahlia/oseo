@@ -12,6 +12,7 @@ import {
 import { tmpdir } from "node:os";
 import { basename, join, resolve } from "node:path";
 import test from "node:test";
+import { performance } from "node:perf_hooks";
 import { ProfilingSession } from "../tools/perf-profile-process.ts";
 import type { OwnedRun, RunRecord } from "../tools/perf-profile-process.ts";
 import type { StackCapture } from "../tools/perf-profile-capture.ts";
@@ -1350,6 +1351,10 @@ for (const scenario of [
             env,
             startedUtc: new Date().toISOString(),
             finishedUtc: new Date().toISOString(),
+            // Synthetic fixture values, never owned-process clock evidence.
+            monotonicStartMs: 10,
+            monotonicEndMs: 20,
+            wallMs: 10,
             pid: process.pid,
             status:
               (isTarget && scenario === "raw-read-status") ||
@@ -1560,6 +1565,111 @@ for (const scenario of [
         context.mock.restoreAll();
         if (originalPath == null) delete process.env.PATH;
         else process.env.PATH = originalPath;
+        rmSync(directory, { recursive: true, force: true });
+      }
+    },
+  );
+}
+
+// These Node.js children test actual receipts without building native code.
+for (const outcome of ["success", "spawn-failure", "timeout", "interruption"]) {
+  test(
+    `owned process receipts retain monotonic lifecycle bounds: ${outcome}`,
+    { skip: process.platform === "win32" },
+    async () => {
+      const directory = mkdtempSync(join(tmpdir(), "oseo-run-receipt-"));
+      const session = new ProfilingSession();
+      const input = Buffer.from([0, 255, 65, 10]);
+      const program = `
+const fs = require('node:fs');
+fs.writeSync(1, fs.readFileSync(0));
+fs.writeSync(1, process.env.RECEIPT + ':' + process.argv[1]);
+fs.writeSync(2, Buffer.from([0, 254, 10]));
+${outcome === "timeout" ? "setInterval(() => {}, 1000);" : ""}
+`;
+      const argv =
+        outcome === "spawn-failure"
+          ? [join(directory, "missing-executable")]
+          : [process.execPath, "-e", program, "argument"];
+      const env = { RECEIPT: "owned" };
+      const before = performance.now();
+      const startedBefore = Date.now();
+      try {
+        const run = session.launch(
+          directory,
+          "receipt",
+          argv,
+          directory,
+          env,
+          input,
+          2_000,
+        );
+        if (outcome === "interruption") process.emit("SIGTERM");
+        const record = await run.done;
+        const after = performance.now();
+        const finishedAfter = Date.now();
+        assert.ok(Number.isFinite(record.monotonicStartMs));
+        assert.ok(Number.isFinite(record.monotonicEndMs));
+        assert.ok(Number.isFinite(record.wallMs));
+        assert.ok(record.monotonicStartMs >= before);
+        assert.ok(record.monotonicEndMs >= record.monotonicStartMs);
+        assert.ok(record.monotonicEndMs <= after);
+        assert.equal(
+          record.wallMs,
+          record.monotonicEndMs - record.monotonicStartMs,
+        );
+        assert.ok(Date.parse(record.startedUtc) >= startedBefore);
+        assert.ok(Date.parse(record.finishedUtc) <= finishedAfter);
+        assert.deepEqual(record.argv, argv);
+        assert.deepEqual(record.env, env);
+        assert.equal(record.cwd, directory);
+        assert.equal(record.directory, directory);
+        assert.equal(record.pid, run.pid ?? null);
+        assert.equal(run.exited(), true);
+        assert.equal(record.groupGone, true);
+        assert.equal(record.timedOut, outcome === "timeout");
+        const stdout = readFileSync(join(directory, record.stdout));
+        const stderr = readFileSync(join(directory, record.stderr));
+        if (outcome === "spawn-failure") {
+          assert.equal(run.pid, undefined);
+          assert.equal(record.status, null);
+          assert.equal(record.signal, null);
+          assert.match(record.error!, /ENOENT/u);
+          assert.deepEqual(record.cleanup, []);
+          assert.equal(stdout.length, 0);
+          assert.equal(stderr.length, 0);
+        } else if (outcome === "interruption") {
+          assert.equal(record.status, null);
+          assert.equal(record.signal, "SIGKILL");
+          assert.equal(session.interrupted, "SIGTERM");
+          assert.deepEqual(record.cleanup, [
+            "signal SIGTERM: cleanup owned group",
+          ]);
+        } else {
+          assert.equal(record.error, null);
+          assert.deepEqual(
+            stdout,
+            Buffer.concat([input, Buffer.from("owned:argument")]),
+          );
+          assert.deepEqual(stderr, Buffer.from([0, 254, 10]));
+          if (outcome === "timeout") {
+            assert.equal(record.status, null);
+            assert.equal(record.signal, "SIGKILL");
+            assert.deepEqual(record.cleanup, [
+              "timeout: SIGKILL owned process group",
+            ]);
+          } else {
+            assert.equal(record.status, 0);
+            assert.equal(record.signal, null);
+            assert.deepEqual(record.cleanup, []);
+          }
+        }
+        assert.deepEqual(
+          JSON.parse(readFileSync(join(directory, "receipt.json"), "utf8")),
+          record,
+        );
+      } finally {
+        await session.finish();
         rmSync(directory, { recursive: true, force: true });
       }
     },

@@ -188,6 +188,16 @@ signal, the helper kills owned groups and reaps its direct children. It
 observes group disappearance for at most one additional second; surviving
 zombies owned by another reaper remain incomplete cleanup. Uncatchable
 termination and descendants that escape their group remain cleanup limits.
+
+Current per-process receipts also record `monotonicStartMs`,
+`monotonicEndMs` and `wallMs` from the launching process's
+`performance.now()` clock. These process-local bounds span the same owned-run
+lifecycle as the UTC boundaries, from launch through close and bounded group
+cleanup; `wallMs` is their difference. The end records receipt creation, not an
+earlier exact kernel exit instant. Profile lifecycle durations do not enter the
+timing population. Historical smoke and CI raw records remain unchanged and
+may lack these fields.
+
 Frame classification reads the symbol field, excluding arguments and paths.
 Generated dispatch, body, fragment and agent wrappers can provide useful
 generated context, but cannot satisfy the separate runtime-context gate.

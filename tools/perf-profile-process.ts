@@ -1,6 +1,7 @@
 import { spawn } from "node:child_process";
 import { closeSync, openSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
+import { performance } from "node:perf_hooks";
 import { setTimeout as delay } from "node:timers/promises";
 import { isObject } from "./value-kinds.ts";
 
@@ -12,6 +13,14 @@ export interface RunRecord {
   readonly env: Readonly<Record<string, string>>;
   readonly startedUtc: string;
   readonly finishedUtc: string;
+  /**
+   * Process-local performance.now() bounds of the owned run, including bounded
+   * cleanup after close. These profile lifecycles never enter timing samples;
+   * the end is receipt creation, not an exact kernel exit instant.
+   */
+  readonly monotonicStartMs: number;
+  readonly monotonicEndMs: number;
+  readonly wallMs: number;
   readonly pid: number | null;
   readonly status: number | null;
   readonly signal: string | null;
@@ -55,6 +64,7 @@ export function launch(
   const out = openSync(join(directory, stdout), "wx");
   const err = openSync(join(directory, stderr), "wx");
   const startedUtc = new Date().toISOString();
+  const monotonicStartMs = performance.now();
   const child = spawn(argv[0]!, argv.slice(1), {
     cwd,
     env,
@@ -100,6 +110,7 @@ export function launch(
         // eslint-disable-next-line no-await-in-loop -- Observe group cleanup.
         await delay(20);
       }
+      const monotonicEndMs = performance.now();
       const record: RunRecord = {
         directory,
         argv,
@@ -107,6 +118,9 @@ export function launch(
         env,
         startedUtc,
         finishedUtc: new Date().toISOString(),
+        monotonicStartMs,
+        monotonicEndMs,
+        wallMs: monotonicEndMs - monotonicStartMs,
         pid: child.pid ?? null,
         status: child.pid == null ? null : status,
         signal,
