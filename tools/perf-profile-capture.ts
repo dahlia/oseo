@@ -258,7 +258,210 @@ export function inspectStack(text: string, platform: string): StackQuality {
   };
 }
 
-/** Capture eight stops of an existing file, without rebuilding or timing it. */
+/** One separately launched capture; failed positions stay in the evidence. */
+export interface StackCapture {
+  readonly index: number;
+  readonly status: string;
+  readonly record?: RunRecord;
+  readonly stack?: StackQuality;
+  readonly processMatches?: boolean;
+  readonly error?: string;
+  readonly targetAliveAtCompletion?: boolean;
+  readonly windowComplete?: boolean;
+  readonly overlappingCommandIndices?: readonly number[];
+}
+
+/** Inputs to the owned-target capture phase, also used by process tests. */
+export interface OwnedStackCapture {
+  readonly target: OwnedRun;
+  readonly request: CaptureRequest;
+  readonly directory: string;
+  readonly profiler: string;
+  readonly platform: string;
+  readonly execute: (
+    name: string,
+    argv: readonly string[],
+    timeoutMs?: number,
+  ) => Promise<RunRecord>;
+  readonly interrupted: () => string | null;
+  /** Retain completed positions even when a later serial capture throws. */
+  readonly captures: StackCapture[];
+}
+
+/** Whole capture-phase acceptance, used by the artifact correctness gate. */
+export interface StackCaptureResult {
+  readonly captures: readonly StackCapture[];
+  readonly complete: boolean;
+}
+
+function stackCaptureResult(
+  captures: readonly StackCapture[],
+): StackCaptureResult {
+  return {
+    captures,
+    complete:
+      captures.length === 8 &&
+      captures.every((capture) => capture.status === "useful-stack") &&
+      captures.some((capture) => capture.stack?.runtime === true),
+  };
+}
+
+/** Collect distinct Mac samplers together; Linux keeps serial GDB stops. */
+export async function captureOwnedStacks({
+  target,
+  request,
+  directory,
+  profiler,
+  platform,
+  execute,
+  interrupted,
+  captures,
+}: OwnedStackCapture): Promise<StackCaptureResult> {
+  const captureOne = async (index: number): Promise<StackCapture> => {
+    if (interrupted() != null) throw new Error(`Interrupted: ${interrupted()}`);
+    if (target.exited() || target.pid == null) {
+      return { index, status: "not-attempted-target-exited" };
+    }
+    let identityMatches = false;
+    if (platform === "linux") {
+      try {
+        identityMatches =
+          fileIdentity(`/proc/${target.pid}/exe`).sha256 === request.sha256;
+      } catch {
+        // Exit/attach races are retained as failures, never as samples.
+      }
+    } else {
+      const ps = await execute(`identity-${index}`, [
+        "/bin/ps",
+        "-p",
+        String(target.pid),
+        "-o",
+        "comm=",
+      ]);
+      identityMatches =
+        goodRun(ps) &&
+        readFileSync(join(directory, ps.stdout), "utf8").trim() ===
+          realpathSync(request.executable);
+    }
+    if (!identityMatches || target.exited()) {
+      return { index, status: "attach-identity-failed" };
+    }
+    const argv =
+      platform === "linux"
+        ? [
+            profiler,
+            "--nx",
+            "--nh",
+            "--batch",
+            "-iex",
+            "set auto-load off",
+            "-iex",
+            "set debuginfod enabled off",
+            "-p",
+            String(target.pid),
+            "-ex",
+            "thread apply all bt 16",
+            "-ex",
+            "detach",
+          ]
+        : [
+            profiler,
+            String(target.pid),
+            "1",
+            "10",
+            "-file",
+            join(directory, `sample-${index}.txt`),
+          ];
+    const record = await execute(
+      `capture-${index}`,
+      argv,
+      platform === "linux" ? 5_000 : 20_000,
+    );
+    let raw = readFileSync(join(directory, record.stdout), "utf8");
+    if (platform === "darwin") {
+      try {
+        raw = readFileSync(join(directory, `sample-${index}.txt`), "utf8");
+      } catch {
+        raw = "";
+      }
+    }
+    const stack = inspectStack(
+      raw + "\n" + readFileSync(join(directory, record.stderr), "utf8"),
+      platform,
+    );
+    const processMatches =
+      platform === "linux"
+        ? raw.includes(`process ${target.pid}`)
+        : new RegExp(`^Process:.*\\[${target.pid}\\]`, "mu").test(raw);
+    const targetAliveAtCompletion = !target.exited();
+    const stderr = readFileSync(join(directory, record.stderr), "utf8");
+    // Lifecycle duration is only a lower-bound check, not sample coverage.
+    const windowComplete =
+      platform !== "darwin" ||
+      (targetAliveAtCompletion &&
+        Date.parse(record.finishedUtc) - Date.parse(record.startedUtc) >=
+          1_000 &&
+        /^Target Type:\s+live task$/mu.test(raw) &&
+        /^Analysis of sampling .* every 10 milliseconds$/mu.test(raw) &&
+        /^Binary Images:/mu.test(raw) &&
+        stderr.includes("Sampling completed, processing symbols..."));
+    const capture: StackCapture = {
+      index,
+      status:
+        goodRun(record) &&
+        stack.useful &&
+        processMatches &&
+        windowComplete &&
+        (platform !== "darwin" || stack.runtime)
+          ? "useful-stack"
+          : "failed-or-insufficient-stack",
+      record,
+      stack,
+      processMatches,
+    };
+    return platform === "darwin"
+      ? { ...capture, targetAliveAtCompletion, windowComplete }
+      : capture;
+  };
+  if (platform !== "darwin") {
+    for (let index = 0; index < 8; index++) {
+      // eslint-disable-next-line no-await-in-loop -- Linux stays serial.
+      captures.push(await captureOne(index));
+    }
+    return stackCaptureResult(captures);
+  }
+  // Each promise starts its own identity probe and sampler. Join all children
+  // before returning even if a launch, read, or identity check fails.
+  const collected = await Promise.all(
+    Array.from({ length: 8 }, (_, index) =>
+      captureOne(index).catch((error) => ({
+        index,
+        status: "capture-error",
+        error: String(error),
+      })),
+    ),
+  );
+  captures.push(
+    ...collected.map((capture) =>
+      Object.assign(capture, {
+        overlappingCommandIndices: collected.flatMap((other) =>
+          "record" in capture &&
+          capture.record != null &&
+          "record" in other &&
+          other.record != null &&
+          capture.index !== other.index &&
+          capture.record.startedUtc < other.record.finishedUtc &&
+          other.record.startedUtc < capture.record.finishedUtc
+            ? [other.index]
+            : [],
+        ),
+      }),
+    ),
+  );
+  return stackCaptureResult(captures);
+}
+
+/** Capture eight stacks of an existing file without rebuilding or timing it. */
 export async function captureArtifact(
   value: CaptureRequest,
   directory: string,
@@ -302,13 +505,7 @@ export async function captureArtifact(
   let accepted = false;
   let failure: string | null = null;
   let targetCorrect: boolean | null = null;
-  const captures: {
-    readonly index: number;
-    readonly status: string;
-    readonly record?: RunRecord;
-    readonly stack?: StackQuality;
-    readonly processMatches?: boolean;
-  }[] = [];
+  const captures: StackCapture[] = [];
   let before: ReturnType<typeof fileIdentity>[] = [];
   let after: ReturnType<typeof fileIdentity>[] = [];
   try {
@@ -467,98 +664,16 @@ export async function captureArtifact(
     const target = startTarget("target");
     try {
       await delay(50);
-      for (let index = 0; index < 8; index++) {
-        if (session.interrupted != null)
-          throw new Error(`Interrupted: ${session.interrupted}`);
-        if (target.exited() || target.pid == null) {
-          captures.push({ index, status: "not-attempted-target-exited" });
-          continue;
-        }
-        let identityMatches = false;
-        if (process.platform === "linux") {
-          try {
-            identityMatches =
-              fileIdentity(`/proc/${target.pid}/exe`).sha256 === request.sha256;
-          } catch {
-            // Exit/attach races are retained as failures, never as samples.
-          }
-        } else {
-          // eslint-disable-next-line no-await-in-loop -- Verify each live PID.
-          const ps = await execute(`identity-${index}`, [
-            "/bin/ps",
-            "-p",
-            String(target.pid),
-            "-o",
-            "comm=",
-          ]);
-          identityMatches =
-            goodRun(ps) &&
-            readFileSync(join(directory, ps.stdout), "utf8").trim() ===
-              realpathSync(request.executable);
-        }
-        if (!identityMatches || target.exited()) {
-          captures.push({ index, status: "attach-identity-failed" });
-          continue;
-        }
-        const argv =
-          process.platform === "linux"
-            ? [
-                profiler,
-                "--nx",
-                "--nh",
-                "--batch",
-                "-iex",
-                "set auto-load off",
-                "-iex",
-                "set debuginfod enabled off",
-                "-p",
-                String(target.pid),
-                "-ex",
-                "thread apply all bt 16",
-                "-ex",
-                "detach",
-              ]
-            : [
-                profiler,
-                String(target.pid),
-                "1",
-                "10",
-                "-file",
-                join(directory, `sample-${index}.txt`),
-              ];
-        // eslint-disable-next-line no-await-in-loop -- Captures are serial.
-        const record = await execute(
-          `capture-${index}`,
-          argv,
-          process.platform === "linux" ? 5_000 : 20_000,
-        );
-        let raw = readFileSync(join(directory, record.stdout), "utf8");
-        if (process.platform === "darwin") {
-          try {
-            raw = readFileSync(join(directory, `sample-${index}.txt`), "utf8");
-          } catch {
-            raw = "";
-          }
-        }
-        const stack = inspectStack(
-          raw + "\n" + readFileSync(join(directory, record.stderr), "utf8"),
-          process.platform,
-        );
-        const processMatches =
-          process.platform === "linux"
-            ? raw.includes(`process ${target.pid}`)
-            : new RegExp(`^Process:.*\\[${target.pid}\\]`, "mu").test(raw);
-        captures.push({
-          index,
-          status:
-            goodRun(record) && stack.useful && processMatches
-              ? "useful-stack"
-              : "failed-or-insufficient-stack",
-          record,
-          stack,
-          processMatches,
-        });
-      }
+      const captured = await captureOwnedStacks({
+        target,
+        request,
+        directory,
+        profiler,
+        platform: process.platform,
+        execute,
+        interrupted: () => session.interrupted,
+        captures,
+      });
       const result = await target.done;
       targetCorrect = correctness(result, "target");
       const symbolsAfter = await execute("symbols-after", symbolArgv);
@@ -573,21 +688,26 @@ export async function captureArtifact(
           readFileSync(join(directory, symbolsAfter.stdout)),
         );
       accepted =
-        captures.some((capture) => capture.stack?.runtime === true) &&
-        captures.length === 8 &&
-        captures.every((capture) => capture.status === "useful-stack") &&
+        captured.complete &&
         JSON.stringify(profilerBefore) === JSON.stringify(profilerAfter) &&
         targetCorrect &&
         unchanged &&
         symbolsUnchanged;
       if (!accepted)
         failure = "Incomplete capture, correctness or identity evidence";
+    } catch (error) {
+      // Retain the capture failure if target finalization also fails.
+      failure = String(error);
+      throw error;
     } finally {
       target.stop("finally: cleanup owned target");
-      await target.done;
+      const result = await target.done;
+      if (targetCorrect == null) {
+        targetCorrect = correctness(result, "target");
+      }
     }
   } catch (error) {
-    failure = String(error);
+    failure ??= String(error);
   } finally {
     try {
       sourceAfter = await inspectSource("after");
@@ -651,6 +771,17 @@ export async function captureArtifact(
       ),
       targetCorrect,
       requestedCaptures: 8,
+      captureScheduling:
+        process.platform === "darwin"
+          ? {
+              mode: "overlapping-samplers-one-target",
+              requestedDurationSeconds: 1,
+              requestedIntervalMs: 10,
+              correlatedObservations: true,
+              boundaries: "command lifetimes, not effective sample windows",
+              effectiveCoverage: "unknown; inspect retained raw reports",
+            }
+          : { mode: "serial-debugger-stops" },
       captures,
       before,
       after,

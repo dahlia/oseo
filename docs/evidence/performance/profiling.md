@@ -10,10 +10,11 @@ This method belongs to the first Measurement checkpoint of
 user stacks from actual optimized synthetic programs; the
 [smoke evidence](./profiling/linux-smoke/README.md) also retains a failed
 late attachment. This establishes limited tool and unwind feasibility,
-not corpus acceptance or measured costs. Portable capture is available; actual
-macOS tools and captures remain unverified until the existing hosted Mac-Deno
-job executes that capture. Generic path costs and optimization design remain
-out of scope.
+not corpus acceptance or measured costs. Portable capture is available. The
+first hosted Mac-Deno capture failed: the serial requests outlived the
+unchanged target. The approved overlapping Mac method still needs new
+actual-host evidence. Generic path costs and optimization design remain out of
+scope.
 
 [ADR 0036](../../adr/0036-optimized-native-build-configuration.md) fixes the
 measurement configuration: `optimized`, with `-O2` for generated C
@@ -71,8 +72,9 @@ under `RUNNER_TEMP`, and archives the evidence with `tar` to retain executable
 modes and the path mapping. Archive and upload steps use `always()` and
 `if-no-files-found: error`; hard job termination can still prevent upload.
 No job, runner placement, matrix, permission, required gate or timeout is added
-or changed. No unverified service default is used as a time budget. This
-connection has not yet supplied a Mac capture or a successful candidate CI.
+or changed. No unverified service default is used as a time budget. The
+retained serial Mac attempt failed the eight-capture requirement. New CI
+evidence must validate the overlapping method before Mac acceptance.
 
 Two commands separate caller artifacts from the synthetic build:
 
@@ -123,33 +125,54 @@ This build belongs only to method verification and has no timed-artifact ID.
 Both commands refuse an existing output directory. Neither runs the corpus,
 collects benchmark timings or supplies missing harness acceptance.
 
-The initial 50 ms attach delay and eight serial captures can outlive a short
-native program. A failed or insufficient capture of an unchanged timed
-artifact remains unaccepted; do not add program waits or rebuild with larger
-iterations to make it pass. Launch-under-profiler support would require
-separate tool and input-forwarding validation and is not provided by this
-attach primitive.
+The initial 50 ms attach delay remains. Even overlapping captures can
+outlive a short native program. A failed or insufficient capture of an
+unchanged timed artifact remains unaccepted; do not add program waits or
+rebuild with larger iterations to make it pass. Launch-under-profiler support
+would require separate tool and input-forwarding validation and is not provided
+by this attach primitive.
 
 The capture helper discovers tools again on the actual host. Linux uses eight
 serial GDB attachments with the existing five-second command limit and
 16-frame backtraces. macOS requires local `sample` help to confirm duration,
-interval and `-file` syntax, then attempts eight one-second captures at a
-requested ten-millisecond interval, each with a twenty-second command limit.
-This bounded attach method is separate from Time Profiler; its requested
-interval does not establish CPU sampling semantics or an effective frequency.
-The preflight and profiled target each have a 120-second process timeout;
-smoke build commands have a 600-second limit. These are cleanup bounds, not
-measurement populations or changes to benchmark/review budgets.
+interval and `-file` syntax, then starts eight separate concurrent one-second
+captures of the same owned target at a requested ten-millisecond interval. Each
+command keeps its own twenty-second limit, raw output path and result. All
+launched samplers settle before the capture phase returns, including after
+interruption or failure. This bounded attach method is separate from Time
+Profiler; its requested interval does not establish CPU sampling semantics or
+an effective frequency. The preflight and profiled target each have a
+120-second process timeout; smoke build commands have a 600-second limit. These
+are cleanup bounds, not measurement populations or changes to benchmark/review
+budgets.
 
 Each capture checks the owned live child's identity before attachment and
 requires the raw report to name that PID. A useful stack has a resolved
 generated user frame and at least one caller, with no detected unknown frame,
-hit on the 16-frame cap, truncation or loss diagnostic. At least one capture
-must also resolve runtime context. Generated-only stacks remain useful user
-observations while leaving runtime attribution unknown. Tool exit zero alone
-cannot pass. The summary records all eight positions, including failed races
-and unattempted stops after exit. Detected unknown/truncated frames fail the
-method probe; absence of a diagnostic does not prove complete unwinding.
+hit on the 16-frame cap, truncation or loss diagnostic. Every Mac capture must
+also resolve runtime context. Linux keeps its existing requirement for runtime
+context in at least one capture; generated-only Linux stacks remain useful user
+observations with runtime attribution unknown. Tool exit zero alone cannot
+pass. The summary records all eight positions, including failed races and
+unattempted stops after exit. Detected unknown/truncated frames fail the method
+probe; absence of a diagnostic does not prove complete unwinding.
+
+Mac reports must retain the live-task header, ten-millisecond request header,
+image section and completion message. A target that exits before a sampler
+settles, a command lifetime under one second, or incomplete raw output fails
+that position. These checks cannot establish effective sampling frequency,
+full live-window coverage or zero loss; actual raw inspection remains required.
+
+*capture.json* identifies the Mac schedule as
+`overlapping-samplers-one-target`, with `correlatedObservations: true`.
+Each result retains its command's UTC boundaries and
+`overlappingCommandIndices`. These are launch/settlement lifetimes, including
+setup, report production and cleanup, rather than effective sample windows.
+Eight correlated reports do not supply eight disjoint seconds or eight
+independent workload executions. Concurrent profiler overhead may also change
+scheduling. No target repetitions, waits, build changes or merged/copied reports
+make up for a failed capture. Fake-process tests establish supervision and
+rejection behavior only, never Mac, corpus or timed-hash acceptance.
 
 A separate untimed correctness preflight preserves the Mac discard in this
 probe's launch history; it does not establish whether a caller ran those bytes
@@ -365,9 +388,9 @@ Apple's retired [sample guide][apple-sample] documents
 intervals while waiting for that named process. This confirms historical
 syntax only, not current macOS AArch64 support. The portable helper now
 connects a bounded `sample` fallback, gated by the installed help, process
-identity, actual capture and stack checks described above. Actual Mac execution
-remains pending. It is not accepted here as a launch-complete or Time
-Profiler-equivalent method.
+identity, actual capture and stack checks described above. Actual overlapping
+Mac execution remains pending. It is not accepted here as a launch-complete or
+Time Profiler-equivalent method.
 
 [apple-tools]: https://developer.apple.com/documentation/xcode/installing-the-command-line-tools
 [apple-cpu]: https://developer.apple.com/videos/play/wwdc2025/308/
@@ -457,8 +480,8 @@ The acceptance boundary is explicit:
 | Linux useful user stack | Short smoke retains a failed late attach; longer smoke completes eight useful stops                                                           |
 | Five cost families      | Synthetic helper, allocation and call context survive; property lookup and numeric boxing remain unresolved, and no corpus costs are assigned |
 | Same timed hash         | Smoke hash unchanged; no timing population exists for it, so this requirement remains pending                                                 |
-| macOS tool discovery    | Pending execution on an approved existing route                                                                                               |
-| macOS useful capture    | Pending actual host/tool/settings, output, stack and discard evidence                                                                         |
+| macOS tool discovery    | Hosted serial attempt retained discovery; each actual capture host still requires its own inventory                                           |
+| macOS useful capture    | Serial attempt failed eight-capture acceptance; overlapping method requires new actual raw evidence                                           |
 
 Root owns harness-index crosslinks, the measurement reservation, corpus
 execution, outer review, checkpoint gates and publication. The two-target

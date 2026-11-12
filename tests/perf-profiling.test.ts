@@ -1,5 +1,6 @@
 import assert from "node:assert/strict";
 import { spawnSync } from "node:child_process";
+import { createHash } from "node:crypto";
 import {
   existsSync,
   mkdirSync,
@@ -11,6 +12,9 @@ import {
 import { tmpdir } from "node:os";
 import { basename, join, resolve } from "node:path";
 import test from "node:test";
+import { ProfilingSession } from "../tools/perf-profile-process.ts";
+import type { OwnedRun, RunRecord } from "../tools/perf-profile-process.ts";
+import type { StackCapture } from "../tools/perf-profile-capture.ts";
 import { profilingProbes } from "../tools/perf-profile.ts";
 
 function excludesRecordingAndAttachment(argv: readonly string[]): boolean {
@@ -149,8 +153,13 @@ test(
 );
 
 // Simulated profiler text below is not native acceptance evidence.
-const { captureArtifact, fileIdentity, inspectStack, validateCaptureRequest } =
-  await import("../tools/perf-profile-capture.ts");
+const {
+  captureArtifact,
+  captureOwnedStacks,
+  fileIdentity,
+  inspectStack,
+  validateCaptureRequest,
+} = await import("../tools/perf-profile-capture.ts");
 
 test("stack acceptance rejects unknown, truncated and empty captures", () => {
   const linux = "#0 oseo_cell_get ()\n#1 oseo_function_script ()\n#2 main ()";
@@ -772,3 +781,787 @@ setInterval(() => {}, 1000);
     }
   },
 );
+
+// Real owned child processes below emit fake reports. They do not exercise
+// Apple tooling, a native workload, or measurement acceptance.
+for (const mode of [
+  "valid",
+  "nonzero",
+  "missing",
+  "partial",
+  "runtime-only",
+  "generated-only",
+  "wrong-pid",
+  "wrong-identity",
+  "target-exit",
+  "already-exited",
+  "timeout",
+  "interrupt",
+  "launch-error",
+]) {
+  test(
+    `overlapping Mac samplers preserve independent outcomes: ${mode}`,
+    { skip: process.platform === "win32" },
+    async () => {
+      const directory = mkdtempSync(join(tmpdir(), "oseo-mac-overlap-"));
+      const session = new ProfilingSession();
+      const profiler = join(directory, "sample");
+      const records: RunRecord[] = [];
+      const deadlines: number[] = [];
+      let launches = 0;
+      let signalTimer: ReturnType<typeof setTimeout> | undefined;
+      const target = session.launch(
+        directory,
+        "target",
+        [process.execPath, "-e", "setInterval(() => {}, 1000)"],
+        directory,
+        {},
+        Buffer.alloc(0),
+        120_000,
+      );
+      const targetHash = fileIdentity(process.execPath).sha256;
+      const request = {
+        kind: "synthetic-method-probe" as const,
+        executable: process.execPath,
+        sha256: targetHash,
+        inputs: [{ path: profiler, sha256: "0".repeat(64) }],
+        argv: [],
+        env: {},
+        cwd: directory,
+        stdinBase64: "",
+        stdoutBase64: "",
+        stderrBase64: "",
+        exitStatus: 0,
+      };
+      try {
+        writeFileSync(
+          profiler,
+          `#!${process.execPath}
+const fs = require('node:fs');
+const [pid, duration, interval, flag, file] = process.argv.slice(2);
+const index = Number(/sample-(\\d+)\\.txt$/.exec(file)[1]);
+const mode = process.env.FAKE_MODE;
+console.log(JSON.stringify({ pid, duration, interval, flag, file,
+  samplerPid: process.pid }));
+const raw = 'Analysis of sampling fixture (pid ' + pid +
+  ') every 10 milliseconds\\nProcess: fixture [' +
+  (mode === 'wrong-pid' && index === 3 ? '0' : pid) +
+  ']\\nTarget Type: live task\\n' +
+  (mode === 'generated-only' && index === 3 ? '' :
+    '    + 4 oseo_cell_get (in fixture) [0x1]\\n') +
+  (mode === 'runtime-only' && index === 3 ?
+    '    + 4 main (in fixture) [0x2]\\n' :
+    '    + 4 oseo_function_script (in fixture) [0x2]\\n') +
+  (mode === 'generated-only' && index === 3 ?
+    '    + 4 main (in fixture) [0x3]\\n' : '') +
+  (mode === 'partial' && index === 3 ? '' : 'Binary Images:\\n');
+if (!(mode === 'missing' && index === 3)) fs.writeFileSync(file, raw);
+if (mode === 'timeout' && index === 3) {
+  process.on('SIGTERM', () => {});
+  setInterval(() => {}, 1000);
+} else {
+  setTimeout(() => {
+    if (!(mode === 'partial' && index === 3))
+      console.error('Sampling completed, processing symbols...');
+    process.exitCode = mode === 'nonzero' && index === 3 ? 7 : 0;
+  }, 1_100);
+}
+`,
+          { mode: 0o700 },
+        );
+        if (mode === "already-exited") {
+          target.stop("test: target exited before capture phase");
+          await target.done;
+        }
+        const { captures, complete } = await captureOwnedStacks({
+          target,
+          request,
+          directory,
+          profiler,
+          platform: "darwin",
+          interrupted: () => session.interrupted,
+          captures: [],
+          execute: async (name, argv, timeoutMs = 20_000) => {
+            let actualArgv = argv;
+            if (name.startsWith("identity-")) {
+              assert.deepEqual(argv, [
+                "/bin/ps",
+                "-p",
+                String(target.pid),
+                "-o",
+                "comm=",
+              ]);
+              // Emulate macOS ps output only after checking the actual live
+              // child executable; Linux ps comm has different semantics.
+              actualArgv = [
+                process.execPath,
+                "-e",
+                "const fs = require('node:fs');" +
+                  "process.stdout.write(fs.realpathSync(" +
+                  JSON.stringify(
+                    process.platform === "linux"
+                      ? `/proc/${target.pid}/exe`
+                      : process.execPath,
+                  ) +
+                  "));",
+              ];
+              if (mode === "wrong-identity" && name === "identity-3") {
+                actualArgv = [process.execPath, "-e", "console.log('wrong')"];
+              }
+            } else {
+              assert.deepEqual(argv.slice(0, 5), [
+                profiler,
+                String(target.pid),
+                "1",
+                "10",
+                "-file",
+              ]);
+              assert.equal(timeoutMs, 20_000);
+              deadlines.push(timeoutMs);
+              if (mode === "launch-error" && name === "capture-3") {
+                throw new Error("test launch failed");
+              }
+              launches++;
+              if (launches === 8) {
+                if (mode === "interrupt")
+                  signalTimer = setTimeout(() => process.emit("SIGINT"), 100);
+                if (mode === "target-exit")
+                  signalTimer = setTimeout(
+                    () => target.stop("test: exit during sampling"),
+                    100,
+                  );
+              }
+            }
+            const record = await session.launch(
+              directory,
+              name,
+              actualArgv,
+              directory,
+              { FAKE_MODE: mode },
+              Buffer.alloc(0),
+              timeoutMs,
+            ).done;
+            records.push(record);
+            return record;
+          },
+        });
+        assert.deepEqual(
+          captures.map((capture) => capture.index),
+          [0, 1, 2, 3, 4, 5, 6, 7],
+        );
+        assert.equal(complete, mode === "valid");
+        assert.equal(
+          launches,
+          mode === "already-exited"
+            ? 0
+            : ["wrong-identity", "launch-error"].includes(mode)
+              ? 7
+              : 8,
+        );
+        const samplers = records.filter((record) =>
+          record.stdout.startsWith("capture-"),
+        );
+        assert.equal(
+          new Set(samplers.map((record) => record.pid)).size,
+          samplers.length,
+        );
+        assert.equal(
+          new Set(samplers.map((record) => record.stdout)).size,
+          samplers.length,
+        );
+        assert.equal(
+          new Set(samplers.map((record) => record.stderr)).size,
+          samplers.length,
+        );
+        if (mode === "valid") {
+          assert.equal(samplers.length, 8);
+          assert.equal(deadlines.length, 8);
+          assert.ok(
+            Math.max(
+              ...samplers.map((record) => Date.parse(record.startedUtc)),
+            ) <
+              Math.min(
+                ...samplers.map((record) => Date.parse(record.finishedUtc)),
+              ),
+          );
+          for (const capture of captures) {
+            assert.equal(capture.windowComplete, true);
+            assert.equal(capture.targetAliveAtCompletion, true);
+            assert.equal(capture.processMatches, true);
+            assert.equal(capture.stack?.runtime, true);
+            assert.equal(capture.stack?.generated, true);
+            assert.equal(capture.overlappingCommandIndices?.length, 7);
+            const observed = JSON.parse(
+              readFileSync(join(directory, capture.record!.stdout), "utf8"),
+            );
+            assert.equal(observed.pid, String(target.pid));
+            assert.equal(observed.samplerPid, capture.record!.pid);
+            assert.equal(
+              observed.file,
+              join(directory, `sample-${capture.index}.txt`),
+            );
+          }
+        } else if (mode === "target-exit") {
+          assert.ok(
+            captures.every(
+              (capture) => capture.targetAliveAtCompletion === false,
+            ),
+          );
+        } else if (mode === "already-exited") {
+          assert.ok(
+            captures.every(
+              (capture) => capture.status === "not-attempted-target-exited",
+            ),
+          );
+        } else if (mode === "timeout") {
+          assert.equal(captures[3]!.record?.timedOut, true);
+          assert.equal(captures[3]!.record?.signal, "SIGKILL");
+        } else if (mode === "launch-error") {
+          assert.match(captures[3]!.error!, /test launch failed/u);
+          assert.equal(captures[3]!.status, "capture-error");
+        } else if (mode !== "interrupt") {
+          assert.notEqual(captures[3]!.status, "useful-stack");
+          assert.ok(
+            captures
+              .filter((capture) => capture.index !== 3)
+              .every((capture) => capture.status === "useful-stack"),
+          );
+        }
+        assert.equal(fileIdentity(process.execPath).sha256, targetHash);
+      } finally {
+        clearTimeout(signalTimer);
+        const lifetimes = await session.finish();
+        assert.ok(lifetimes.every((record) => record.groupGone));
+        for (const record of lifetimes) {
+          if (record.pid != null)
+            assert.throws(() => process.kill(-record.pid!, 0), {
+              code: "ESRCH",
+            });
+        }
+        rmSync(directory, { recursive: true, force: true });
+      }
+    },
+  );
+}
+
+test(
+  "Linux owned captures keep eight serial bounded GDB stops",
+  {
+    skip: process.platform !== "linux",
+  },
+  async () => {
+    const directory = mkdtempSync(join(tmpdir(), "oseo-linux-capture-"));
+    const session = new ProfilingSession();
+    try {
+      const target = session.launch(
+        directory,
+        "target",
+        [process.execPath, "-e", "setInterval(() => {}, 1000)"],
+        directory,
+        {},
+        Buffer.alloc(0),
+        120_000,
+      );
+      let active = 0;
+      const names: string[] = [];
+      const { captures, complete } = await captureOwnedStacks({
+        target,
+        directory,
+        platform: "linux",
+        profiler: "fake-gdb",
+        request: {
+          kind: "synthetic-method-probe",
+          executable: process.execPath,
+          sha256: fileIdentity(process.execPath).sha256,
+          inputs: [],
+          argv: [],
+          env: {},
+          cwd: directory,
+          stdinBase64: "",
+          stdoutBase64: "",
+          stderrBase64: "",
+          exitStatus: 0,
+        },
+        interrupted: () => session.interrupted,
+        captures: [],
+        execute: async (name, argv, timeoutMs) => {
+          assert.equal(active++, 0);
+          names.push(name);
+          assert.equal(timeoutMs, 5_000);
+          assert.deepEqual(argv, [
+            "fake-gdb",
+            "--nx",
+            "--nh",
+            "--batch",
+            "-iex",
+            "set auto-load off",
+            "-iex",
+            "set debuginfod enabled off",
+            "-p",
+            String(target.pid),
+            "-ex",
+            "thread apply all bt 16",
+            "-ex",
+            "detach",
+          ]);
+          const record = await session.launch(
+            directory,
+            name,
+            [
+              process.execPath,
+              "-e",
+              "console.log(" +
+                JSON.stringify(
+                  `#0 oseo_cell_get ()\n#1 oseo_function_script ()\n` +
+                    `[Inferior 1 (process ${target.pid}) detached]`,
+                ) +
+                ")",
+            ],
+            directory,
+            {},
+            Buffer.alloc(0),
+            timeoutMs!,
+          ).done;
+          active--;
+          return record;
+        },
+      });
+      assert.equal(captures.length, 8);
+      assert.equal(complete, true);
+      assert.ok(captures.every((capture) => capture.status === "useful-stack"));
+      assert.deepEqual(
+        names,
+        Array.from({ length: 8 }, (_, i) => `capture-${i}`),
+      );
+      assert.ok(
+        captures.every((capture) => capture.overlappingCommandIndices == null),
+      );
+    } finally {
+      assert.ok((await session.finish()).every((record) => record.groupGone));
+      rmSync(directory, { recursive: true, force: true });
+    }
+  },
+);
+
+for (const failure of ["signal", "launch-error", "raw-read-error"]) {
+  test(
+    `Linux retains earlier capture positions after ${failure}`,
+    {
+      skip: process.platform !== "linux",
+    },
+    async () => {
+      const directory = mkdtempSync(join(tmpdir(), "oseo-linux-partial-"));
+      const session = new ProfilingSession();
+      const retained: StackCapture[] = [];
+      try {
+        const target = session.launch(
+          directory,
+          "target",
+          [process.execPath, "-e", "setInterval(() => {}, 1000)"],
+          directory,
+          {},
+          Buffer.alloc(0),
+          120_000,
+        );
+        await assert.rejects(
+          captureOwnedStacks({
+            target,
+            directory,
+            platform: "linux",
+            profiler: "fake-gdb",
+            request: {
+              kind: "synthetic-method-probe",
+              executable: process.execPath,
+              sha256: fileIdentity(process.execPath).sha256,
+              inputs: [],
+              argv: [],
+              env: {},
+              cwd: directory,
+              stdinBase64: "",
+              stdoutBase64: "",
+              stderrBase64: "",
+              exitStatus: 0,
+            },
+            captures: retained,
+            interrupted: () => session.interrupted,
+            execute: async (name, _argv, timeoutMs) => {
+              if (failure === "launch-error" && name === "capture-2") {
+                throw new Error("test failed launch");
+              }
+              const record = await session.launch(
+                directory,
+                name,
+                [
+                  process.execPath,
+                  "-e",
+                  "console.log(" +
+                    JSON.stringify(
+                      `#0 oseo_cell_get ()\n#1 oseo_function_script ()\n` +
+                        `[Inferior 1 (process ${target.pid}) detached]`,
+                    ) +
+                    ")",
+                ],
+                directory,
+                {},
+                Buffer.alloc(0),
+                timeoutMs!,
+              ).done;
+              if (failure === "signal" && name === "capture-1") {
+                process.emit("SIGINT");
+              }
+              return failure === "raw-read-error" && name === "capture-2"
+                ? { ...record, stdout: "missing-output" }
+                : record;
+            },
+          }),
+          failure === "signal"
+            ? /Interrupted/u
+            : failure === "launch-error"
+              ? /test failed launch/u
+              : /ENOENT/u,
+        );
+        assert.deepEqual(
+          retained.map((capture) => capture.index),
+          [0, 1],
+        );
+        assert.ok(
+          retained.every(
+            (capture) =>
+              capture.status === "useful-stack" &&
+              capture.stack?.runtime &&
+              capture.stack.generated &&
+              capture.processMatches,
+          ),
+        );
+        for (const capture of retained) {
+          assert.ok(existsSync(join(directory, capture.record!.stdout)));
+          assert.ok(existsSync(join(directory, capture.record!.stderr)));
+        }
+      } finally {
+        assert.ok((await session.finish()).every((record) => record.groupGone));
+        rmSync(directory, { recursive: true, force: true });
+      }
+    },
+  );
+}
+
+// Fake owned runs exercise the artifact finalizer without native execution.
+for (const scenario of [
+  "raw-read-pass",
+  "raw-read-wrong-output",
+  "raw-read-status",
+  "raw-read-timeout",
+  "raw-read-checker-error",
+  "launch-error",
+  "interruption",
+  "preflight-failure",
+]) {
+  test(
+    `artifact target oracle survives ${scenario}`,
+    { skip: process.platform !== "linux" || process.arch !== "x64" },
+    async (context) => {
+      const directory = mkdtempSync(join(tmpdir(), "oseo-target-oracle-"));
+      const output = join(directory, "capture");
+      const profiler = join(directory, "gdb");
+      writeFileSync(profiler, "fake profiler\n", { mode: 0o700 });
+      const originalPath = process.env.PATH;
+      process.env.PATH = directory;
+      const bytes = Buffer.from([0, 255, 65, 10]);
+      const launches: { readonly name: string; readonly timeout: number }[] =
+        [];
+      const stops: string[] = [];
+      const completion = Promise.withResolvers<RunRecord>();
+      let targetRecord: RunRecord | undefined;
+      let targetExited = false;
+      let checkerCalls = 0;
+      const targetPass = scenario === "raw-read-pass";
+      const originalFailure =
+        scenario === "launch-error"
+          ? /fixture launch failed/u
+          : scenario === "interruption"
+            ? /Interrupted: SIGINT/u
+            : scenario === "preflight-failure"
+              ? /Preflight output\/status mismatch/u
+              : /ENOENT.*capture-2.stdout/u;
+      const resolveTarget = (record: RunRecord): void => {
+        targetExited = true;
+        writeFileSync(join(output, "target.json"), JSON.stringify(record));
+        completion.resolve(record);
+      };
+      context.mock.method(
+        ProfilingSession.prototype,
+        "launch",
+        function (
+          this: ProfilingSession,
+          ...args: Parameters<ProfilingSession["launch"]>
+        ): OwnedRun {
+          const [destination, name, argv, cwd, env, stdin, timeout] = args;
+          launches.push({ name, timeout });
+          if (name === "capture-2" && scenario === "launch-error") {
+            throw new Error("fixture launch failed");
+          }
+          const isTarget = name === "target";
+          const isProgram = isTarget || name === "preflight";
+          if (isProgram) {
+            assert.equal(timeout, 120_000);
+            assert.deepEqual(argv, [process.execPath, "fixture-argument"]);
+            assert.equal(cwd, directory);
+            assert.deepEqual(env, { FIXTURE: "target-oracle" });
+            assert.deepEqual(stdin, bytes);
+          } else if (name.startsWith("capture-")) {
+            assert.equal(timeout, 5_000);
+            assert.deepEqual(argv, [
+              profiler,
+              "--nx",
+              "--nh",
+              "--batch",
+              "-iex",
+              "set auto-load off",
+              "-iex",
+              "set debuginfod enabled off",
+              "-p",
+              String(process.pid),
+              "-ex",
+              "thread apply all bt 16",
+              "-ex",
+              "detach",
+            ]);
+          } else {
+            assert.equal(timeout, 20_000);
+          }
+          const stdout = `${name}.stdout`;
+          const stderr = `${name}.stderr`;
+          const stdoutBytes = isProgram
+            ? isTarget && scenario === "raw-read-wrong-output"
+              ? Buffer.from("wrong\n")
+              : bytes
+            : name.startsWith("capture-")
+              ? Buffer.from(
+                  "#0 oseo_cell_get ()\n#1 oseo_function_script ()\n" +
+                    `[Inferior 1 (process ${process.pid}) detached]\n`,
+                )
+              : Buffer.from("fixture identity\n");
+          writeFileSync(join(destination, stdout), stdoutBytes);
+          writeFileSync(join(destination, stderr), Buffer.alloc(0));
+          const record: RunRecord = {
+            directory: destination,
+            argv,
+            cwd,
+            env,
+            startedUtc: new Date().toISOString(),
+            finishedUtc: new Date().toISOString(),
+            pid: process.pid,
+            status:
+              (isTarget && scenario === "raw-read-status") ||
+              (name === "preflight" && scenario === "preflight-failure")
+                ? 7
+                : 0,
+            signal: null,
+            error: null,
+            timedOut: false,
+            stdout,
+            stderr,
+            cleanup: [],
+            groupGone: true,
+          };
+          writeFileSync(
+            join(destination, `${name}.json`),
+            JSON.stringify(record),
+          );
+          if (isTarget) targetRecord = record;
+          if (name === "capture-2") {
+            assert.ok(targetRecord);
+            resolveTarget(
+              scenario === "raw-read-timeout"
+                ? {
+                    ...targetRecord,
+                    status: null,
+                    signal: "SIGKILL",
+                    timedOut: true,
+                    cleanup: ["timeout: SIGKILL owned process group"],
+                  }
+                : targetRecord,
+            );
+            rmSync(join(destination, stdout));
+          }
+          const run: OwnedRun = {
+            pid: process.pid,
+            exited: () => !isTarget || targetExited,
+            done: isTarget ? completion.promise : Promise.resolve(record),
+            stop: (reason) => {
+              if (!isTarget) return;
+              stops.push(reason);
+              if (targetExited) return;
+              resolveTarget({
+                ...record,
+                status: null,
+                signal: "SIGKILL",
+                cleanup: [reason],
+              });
+            },
+          };
+          this.runs.add(run);
+          if (name === "capture-1" && scenario === "interruption") {
+            process.emit("SIGINT");
+          }
+          return run;
+        },
+      );
+      try {
+        const request = {
+          kind: "existing-artifact" as const,
+          executable: process.execPath,
+          sha256: fileIdentity(process.execPath).sha256,
+          inputs: [{ path: profiler, sha256: fileIdentity(profiler).sha256 }],
+          argv: ["fixture-argument"],
+          env: { FIXTURE: "target-oracle" },
+          cwd: directory,
+          stdinBase64: bytes.toString("base64"),
+          stdoutBase64: bytes.toString("base64"),
+          stderrBase64: "",
+          exitStatus: 0,
+        };
+        assert.equal(
+          await captureArtifact(
+            request,
+            output,
+            scenario === "raw-read-checker-error"
+              ? {
+                  id: "fixture-checker",
+                  sourcePath: profiler,
+                  sourceSha256: request.inputs[0]!.sha256,
+                  check: () => {
+                    if (++checkerCalls === 1) return true;
+                    throw new Error("fixture target checker failed");
+                  },
+                }
+              : undefined,
+          ),
+          false,
+        );
+        const result = JSON.parse(
+          readFileSync(join(output, "capture.json"), "utf8"),
+        );
+        assert.equal(result.status, "failed-or-incomplete");
+        assert.match(result.failure, originalFailure);
+        assert.equal(result.performanceEvidence, false);
+        assert.equal(result.captures.length, 8);
+        assert.ok(result.lifetimes.every((run: RunRecord) => run.groupGone));
+        assert.equal(
+          launches.filter(({ name }) => name === "preflight").length,
+          1,
+        );
+        const preflight = JSON.parse(
+          readFileSync(join(output, "preflight-check.json"), "utf8"),
+        );
+        if (scenario === "preflight-failure") {
+          assert.equal(preflight.correct, false);
+          assert.equal(
+            launches.some(({ name }) => name === "target"),
+            false,
+          );
+          assert.equal(result.targetCorrect, null);
+          assert.equal(existsSync(join(output, "target-check.json")), false);
+          return;
+        }
+        assert.equal(preflight.correct, true);
+        assert.equal(
+          launches.filter(({ name }) => name === "target").length,
+          1,
+        );
+        assert.ok(stops.includes("finally: cleanup owned target"));
+        assert.equal(targetExited, true);
+        assert.equal(result.targetCorrect, targetPass);
+        const proof = JSON.parse(
+          readFileSync(join(output, "target-check.json"), "utf8"),
+        );
+        const joined = JSON.parse(
+          readFileSync(join(output, "target.json"), "utf8"),
+        );
+        assert.equal(proof.correct, targetPass);
+        assert.equal(
+          proof.processCorrect,
+          [
+            "raw-read-pass",
+            "raw-read-wrong-output",
+            "raw-read-checker-error",
+          ].includes(scenario),
+        );
+        assert.equal(
+          proof.outputCorrect,
+          !["raw-read-wrong-output", "raw-read-checker-error"].includes(
+            scenario,
+          ),
+        );
+        assert.equal(
+          proof.checkerError,
+          scenario === "raw-read-checker-error"
+            ? "Error: fixture target checker failed"
+            : null,
+        );
+        assert.equal(
+          checkerCalls,
+          scenario === "raw-read-checker-error" ? 2 : 0,
+        );
+        for (const stream of ["stdout", "stderr"] as const) {
+          assert.equal(
+            proof[`${stream}Sha256`],
+            createHash("sha256")
+              .update(readFileSync(join(output, joined[stream])))
+              .digest("hex"),
+          );
+        }
+        assert.equal(joined.timedOut, scenario === "raw-read-timeout");
+        assert.equal(
+          joined.signal,
+          ["raw-read-timeout", "launch-error", "interruption"].includes(
+            scenario,
+          )
+            ? "SIGKILL"
+            : null,
+        );
+        assert.equal(joined.error, null);
+        assert.equal(
+          joined.status,
+          joined.signal != null ? null : scenario === "raw-read-status" ? 7 : 0,
+        );
+        assert.equal(
+          result.interrupted,
+          scenario === "interruption" ? "SIGINT" : null,
+        );
+        assert.deepEqual(
+          result.captures
+            .slice(0, 2)
+            .map((capture: StackCapture) => capture.index),
+          [0, 1],
+        );
+        for (const capture of result.captures.slice(0, 2)) {
+          assert.equal(capture.status, "useful-stack");
+          assert.ok(existsSync(join(output, capture.record.stdout)));
+          assert.ok(existsSync(join(output, capture.record.stderr)));
+        }
+        assert.ok(
+          result.captures
+            .slice(2)
+            .every(
+              (capture: StackCapture) =>
+                capture.status === "not-attempted-after-failure",
+            ),
+        );
+        assert.deepEqual(
+          launches
+            .filter(({ name }) => name.startsWith("capture-"))
+            .map(({ name }) => name),
+          scenario === "interruption"
+            ? ["capture-0", "capture-1"]
+            : ["capture-0", "capture-1", "capture-2"],
+        );
+      } finally {
+        context.mock.restoreAll();
+        if (originalPath == null) delete process.env.PATH;
+        else process.env.PATH = originalPath;
+        rmSync(directory, { recursive: true, force: true });
+      }
+    },
+  );
+}
