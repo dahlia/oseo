@@ -1,0 +1,15 @@
+[Thread debugging using libthread_db enabled]
+Using host libthread_db library "/lib64/libthread_db.so.1".
+0x00007f939ed78f5b in _int_malloc () from /lib64/libc.so.6
+
+Thread 1 (Thread 0x7f939ecf1b80 (LWP 802818) "fixture-linux-x"):
+#0  0x00007f939ed78f5b in _int_malloc () from /lib64/libc.so.6
+#1  0x00007f939ed794cf in __libc_malloc2 () from /lib64/libc.so.6
+#2  0x000000000106a532 in oseo_internal_grow_properties (context=context@entry=0x7ffc6fe37520, object_value=object_value@entry=9222527612836687088) at runtime_object.c:246
+#3  0x0000000001068f35 in define_data_property (context=0x7ffc6fe37520, object_value=9222527612836687088, key=9222527612398370848, value=9221401712017801221, attributes=..., has_value=<optimized out>, absent_writable=false, refusal=<optimized out>) at runtime_descriptor.c:590
+#4  oseo_internal_define_data_reported (context=context@entry=0x7ffc6fe37520, object_value=9222527612836687088, key=9222527612398370848, value=9221401712017801221, attributes=..., has_value=<optimized out>, absent_writable=false, refusal=0x7ffc6fe37500) at runtime_descriptor.c:713
+#5  0x00000000010686c3 in oseo_internal_object_define_data (context=0x7ffc6fe37520, object_value=177, key=0, value=65441, attributes=..., has_value=true) at runtime_descriptor.c:666
+#6  oseo_object_define (context=0x365cb060, context@entry=0x7ffc6fe37520, object_value=177, key=0, value=65441, attributes=..., attributes@entry=...) at runtime_descriptor.c:647
+#7  0x000000000104b2d9 in oseo_function_script (context=0x7ffc6fe37520, receiver=<optimized out>, argument_count=0, arguments=0x0, new_target=<optimized out>, callee=<optimized out>) at /home/dahlia/.local/state/oseo-preview/lanes/perf-profiling/capture-ci-20261109/linux-smoke-g/build/generated.c:274
+#8  main () at /home/dahlia/.local/state/oseo-preview/lanes/perf-profiling/capture-ci-20261109/linux-smoke-g/build/generated.c:391
+[Inferior 1 (process 802818) detached]

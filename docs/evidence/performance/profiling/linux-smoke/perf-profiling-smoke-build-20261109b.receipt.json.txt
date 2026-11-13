@@ -1,0 +1,22 @@
+{
+  "enqueuedUtc": "2026-11-08T17:54:12.392412+00:00",
+  "argv": [
+    "python3",
+    "/home/dahlia/.local/state/oseo-preview/tools/run-gate.py",
+    "--cwd",
+    "/home/dahlia/orca/workspaces/oseo/perf-profiling",
+    "--logdir",
+    "/home/dahlia/.local/state/oseo-preview/lanes/perf-profiling/acceptance-20261109/gates",
+    "--label",
+    "perf-profiling-smoke-build-20261109b",
+    "--wait-lock",
+    "mise",
+    "exec",
+    "--",
+    "node",
+    "/home/dahlia/.local/state/oseo-preview/lanes/perf-profiling/acceptance-20261109/build-smoke.mjs"
+  ],
+  "cwd": "/home/dahlia/orca/workspaces/oseo/perf-profiling",
+  "TMPDIR": "/home/dahlia/.local/state/oseo-preview/lanes/perf-profiling/acceptance-20261109/tmp",
+  "pid": 3678568
+}

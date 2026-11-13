@@ -1,0 +1,42 @@
+{
+  "cwd": "/home/dahlia/orca/workspaces/oseo/perf-profiling",
+  "argv": [
+    "choom",
+    "-n",
+    "1000",
+    "--",
+    "systemd-run",
+    "--user",
+    "--scope",
+    "--quiet",
+    "-p",
+    "MemoryMax=104G",
+    "mise",
+    "exec",
+    "--",
+    "node",
+    "/home/dahlia/.local/state/oseo-preview/lanes/perf-profiling/acceptance-20261109/long-smoke/build-smoke.mjs"
+  ],
+  "capacity": {
+    "profile": "generous",
+    "reason": "desktop-idle",
+    "gates": "1",
+    "lanes": "6",
+    "nice": "0",
+    "cpuquota": "none",
+    "memorymax": "104G",
+    "idle_minutes": "10732",
+    "hour": "3",
+    "mem_available_gib": "67",
+    "guard": "none",
+    "measure": "yes",
+    "prefix": "systemd-run --user --scope --quiet -p MemoryMax=104G"
+  },
+  "lightCheck": false,
+  "heavyLock": true,
+  "startedAt": "2026-11-08T18:05:49.459867+00:00",
+  "measure": false,
+  "naturalExit": 0,
+  "finishedAt": "2026-11-08T18:05:52.976786+00:00",
+  "wallSeconds": 3.516708570998162
+}

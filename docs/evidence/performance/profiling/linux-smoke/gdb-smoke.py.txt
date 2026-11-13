@@ -1,0 +1,33 @@
+import datetime,hashlib,json,os,subprocess,time
+from pathlib import Path
+p=Path(__file__).parent
+build=json.loads((p/'build-observation.json').read_text());exe=Path(build['executablePath'])
+def stamp(): return datetime.datetime.now(datetime.timezone.utc).isoformat()
+initial=hashlib.sha256(exe.read_bytes()).hexdigest()
+records=[]
+with (p/'profile.stdout').open('xb') as out,(p/'profile.stderr').open('xb') as err:
+    started=stamp(); child=subprocess.Popen([str(exe)],stdin=subprocess.DEVNULL,stdout=out,stderr=err)
+    try:
+        time.sleep(0.05)
+        for index in range(8):
+            if child.poll() is not None: break
+            argv=['gdb','--nx','--nh','--batch','-iex','set auto-load off','-iex','set debuginfod enabled off','-p',str(child.pid),'-ex','thread apply all bt 16','-ex','detach']
+            before=stamp()
+            try:
+                r=subprocess.run(argv,stdin=subprocess.DEVNULL,stdout=subprocess.PIPE,stderr=subprocess.PIPE,timeout=5)
+                so,se,status,error=r.stdout,r.stderr,r.returncode,None
+            except subprocess.TimeoutExpired as e:
+                so,se,status,error=e.stdout or b'',e.stderr or b'',None,'timeout'
+            (p/f'gdb-{index}.stdout').write_bytes(so);(p/f'gdb-{index}.stderr').write_bytes(se)
+            records.append({'argv':argv,'startedUtc':before,'finishedUtc':stamp(),'status':status,'error':error,'stdout':f'gdb-{index}.stdout','stderr':f'gdb-{index}.stderr'})
+        status=child.wait(timeout=30)
+    finally:
+        if child.poll() is None:
+            child.kill();child.wait()
+final=hashlib.sha256(exe.read_bytes()).hexdigest()
+receipt={'kind':'method-acceptance-smoke','performanceEvidence':False,'timedArtifactId':None,'artifact':str(exe),'sha256Before':initial,'sha256After':final,'pid':child.pid,'argv':[str(exe)],'cwd':os.getcwd(),'stdin':'empty','environment':'inherited from run-gate; no extra program env','startedUtc':started,'finishedUtc':stamp(),'status':status,'outputMatchesBuildCorrectness':(p/'profile.stdout').read_bytes()==build['stdout'].encode() and (p/'profile.stderr').read_bytes()==b'', 'captures':records}
+(p/'gdb-smoke-receipt.json').write_text(json.dumps(receipt,indent=2)+'\n')
+assert initial==final==build['sha256']
+assert status==0 and receipt['outputMatchesBuildCorrectness']
+assert records and all(r['status']==0 for r in records)
+print('GDB smoke raw captures retained; usefulness requires frame inspection.')

@@ -1,0 +1,32 @@
+{
+  "buildConfiguration": "optimized",
+  "executablePath": "/home/dahlia/.local/state/oseo-preview/lanes/perf-profiling/acceptance-20261109/tmp/oseo-native-jfuVss/fixture-linux-x86_64-gnu",
+  "exitStatus": 0,
+  "stderr": "",
+  "stdout": "6499995\n",
+  "compilerInvocation": [
+    "zig cc -target x86_64-linux-gnu -std=c11 -Wall -Wextra -Werror -pedantic -I /home/dahlia/.local/state/oseo-preview/lanes/perf-profiling/acceptance-20261109/tmp/oseo-native-jfuVss -ffp-contract=off -O2 -fno-sanitize=all /home/dahlia/.local/state/oseo-preview/lanes/perf-profiling/acceptance-20261109/tmp/oseo-native-jfuVss/generated.c /home/dahlia/.cache/oseo/runtime-archives/liboseo-runtime-7c98a284f45175b513290cd57c7f57f4c882f8cd247fc36ef0deba94c5623fec.a -o /home/dahlia/.local/state/oseo-preview/lanes/perf-profiling/acceptance-20261109/tmp/oseo-native-jfuVss/fixture-linux-x86_64-gnu"
+  ],
+  "executionHost": {
+    "architecture": "x86_64",
+    "operatingSystem": "linux"
+  },
+  "target": {
+    "abi": "gnu",
+    "architecture": "x86_64",
+    "atomicsPauseHint": "x86-pause",
+    "cStandard": "c11",
+    "executableFormat": "elf",
+    "name": "linux-x86_64-gnu",
+    "operatingSystem": "linux",
+    "sanitizers": [
+      "address",
+      "undefined"
+    ]
+  },
+  "sha256": "c1d9ee3253f0bbd2e95189e6b2e1341f8884642e419e32958da6321a313b0979",
+  "bytes": 4333752,
+  "role": "method-acceptance-smoke",
+  "timedArtifactId": null,
+  "source": "function add(a, b) { return a + b; } let total = 0; for (let i = 0; i < 2000000; i++) { const o = { value: i % 7 }; total = add(total, o.value + 0.25); } console.log(total);"
+}

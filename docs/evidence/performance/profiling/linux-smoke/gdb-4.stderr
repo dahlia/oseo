@@ -1,0 +1,3 @@
+warning: process 3685113 is a zombie - the process has already terminated
+ptrace: Operation not permitted.
+The program is not being run.

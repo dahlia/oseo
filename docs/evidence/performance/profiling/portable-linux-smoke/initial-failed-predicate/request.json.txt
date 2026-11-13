@@ -1,0 +1,230 @@
+{
+  "kind": "synthetic-method-probe",
+  "executable": "/home/dahlia/.local/state/oseo-preview/lanes/perf-profiling/capture-ci-20261109/linux-smoke-a/build/fixture-linux-x86_64-gnu",
+  "sha256": "2a90fde97326ac9b3df801c7e6ab06ec9d47b142b2156f3e912cd91df258c98c",
+  "inputs": [
+    {
+      "path": "/home/dahlia/.local/state/oseo-preview/lanes/perf-profiling/capture-ci-20261109/linux-smoke-a/smoke.js",
+      "sha256": "af75797b7e177528de48de75630939cf9ebe8af93557590484c6208333474545"
+    },
+    {
+      "path": "/home/dahlia/.local/state/oseo-preview/lanes/perf-profiling/capture-ci-20261109/linux-smoke-a/runtime-source/oseo_runtime.h",
+      "sha256": "58c4b22f617313b648cb05875b41ec6bf1dd316cf207c0a7d26b91084213d7bf"
+    },
+    {
+      "path": "/home/dahlia/.local/state/oseo-preview/lanes/perf-profiling/capture-ci-20261109/linux-smoke-a/runtime-source/runtime_internal.h",
+      "sha256": "1cadd409546c9eb6de77376b71b8c6e7ca9b68502d6d72db2761078d55afe6c6"
+    },
+    {
+      "path": "/home/dahlia/.local/state/oseo-preview/lanes/perf-profiling/capture-ci-20261109/linux-smoke-a/runtime-source/runtime_unicode_tables.h",
+      "sha256": "6ef745c96148db8eae733350825b2aa2ab831efcf42ddf1d7b1a4c4f8f7e3e13"
+    },
+    {
+      "path": "/home/dahlia/.local/state/oseo-preview/lanes/perf-profiling/capture-ci-20261109/linux-smoke-a/runtime-source/runtime_core.c",
+      "sha256": "bcf729b61049bdd7486c230c5cb653edfaae769360bc4d3ee0c4f1eea10a663b"
+    },
+    {
+      "path": "/home/dahlia/.local/state/oseo-preview/lanes/perf-profiling/capture-ci-20261109/linux-smoke-a/runtime-source/runtime_memory.c",
+      "sha256": "e152eceff3ee63d56e9d666db1832401f3b8fe2ae555b52e8e63c9bcbcddc430"
+    },
+    {
+      "path": "/home/dahlia/.local/state/oseo-preview/lanes/perf-profiling/capture-ci-20261109/linux-smoke-a/runtime-source/runtime_binding.c",
+      "sha256": "ddfcacff82a4096a3bb2deb95231e26b1830d764d995471a01a0897bb5f52ba7"
+    },
+    {
+      "path": "/home/dahlia/.local/state/oseo-preview/lanes/perf-profiling/capture-ci-20261109/linux-smoke-a/runtime-source/runtime_string.c",
+      "sha256": "539053230ce555a7c8841d802560dfdd4eab86713243650037c4b838166d4394"
+    },
+    {
+      "path": "/home/dahlia/.local/state/oseo-preview/lanes/perf-profiling/capture-ci-20261109/linux-smoke-a/runtime-source/runtime_string_match.c",
+      "sha256": "ad67b61ba998de0fc029235325d7608d231ea101a10c3218300345d3c3e0aee7"
+    },
+    {
+      "path": "/home/dahlia/.local/state/oseo-preview/lanes/perf-profiling/capture-ci-20261109/linux-smoke-a/runtime-source/runtime_object.c",
+      "sha256": "0d0f08c90c516f64eaae8d268cbcdacefb4ba5b079e77bd409fcc1698fb689ca"
+    },
+    {
+      "path": "/home/dahlia/.local/state/oseo-preview/lanes/perf-profiling/capture-ci-20261109/linux-smoke-a/runtime-source/runtime_property.c",
+      "sha256": "5eed877a98a732945c3406b65abfe4ae8ba8c01209225abd44a7524701b0ac0b"
+    },
+    {
+      "path": "/home/dahlia/.local/state/oseo-preview/lanes/perf-profiling/capture-ci-20261109/linux-smoke-a/runtime-source/runtime_descriptor.c",
+      "sha256": "3f6e091b6ab51fb1747129877255c1218be6a642e6a6ae2f348d80c05215a31a"
+    },
+    {
+      "path": "/home/dahlia/.local/state/oseo-preview/lanes/perf-profiling/capture-ci-20261109/linux-smoke-a/runtime-source/runtime_array.c",
+      "sha256": "bd0b0cf35b3c5e13960f31941a1fb4d3c8632c091161e007ce3d00b40285503d"
+    },
+    {
+      "path": "/home/dahlia/.local/state/oseo-preview/lanes/perf-profiling/capture-ci-20261109/linux-smoke-a/runtime-source/runtime_object_builtin.c",
+      "sha256": "7818fc384cef7e23cabf12da215ba1572206d26f27f6e3eae0da1c08735fe56c"
+    },
+    {
+      "path": "/home/dahlia/.local/state/oseo-preview/lanes/perf-profiling/capture-ci-20261109/linux-smoke-a/runtime-source/runtime_number.c",
+      "sha256": "4f9ff1d699da3efd8af1a9089df31a853e57baffab613eb905b0cd7be59c658e"
+    },
+    {
+      "path": "/home/dahlia/.local/state/oseo-preview/lanes/perf-profiling/capture-ci-20261109/linux-smoke-a/runtime-source/runtime_boolean.c",
+      "sha256": "16ce1332c546302e9170b707bf88b273183e9c4b6aabcd68087eeffbdb3c0e0b"
+    },
+    {
+      "path": "/home/dahlia/.local/state/oseo-preview/lanes/perf-profiling/capture-ci-20261109/linux-smoke-a/runtime-source/runtime_array_buffer.c",
+      "sha256": "c0055f4b0b2cc7ea73fb652c7b4463bee0627ae9f2acd0e514b519da63039b7a"
+    },
+    {
+      "path": "/home/dahlia/.local/state/oseo-preview/lanes/perf-profiling/capture-ci-20261109/linux-smoke-a/runtime-source/runtime_set.c",
+      "sha256": "c58f58acd2be15d4fdf55f4f9b5464967ac327a3af39c9a05c1486eccf88bfe1"
+    },
+    {
+      "path": "/home/dahlia/.local/state/oseo-preview/lanes/perf-profiling/capture-ci-20261109/linux-smoke-a/runtime-source/runtime_typed_array.c",
+      "sha256": "fa45e430134d413b725c412d39f698c5c573a5e5a0221a998d8f5b2716f5e8c5"
+    },
+    {
+      "path": "/home/dahlia/.local/state/oseo-preview/lanes/perf-profiling/capture-ci-20261109/linux-smoke-a/runtime-source/runtime_weak_collection.c",
+      "sha256": "afa1eda0062dd0a223a66281f95d406c6f1fa4ac144af86c75cbcf48ee95b83f"
+    },
+    {
+      "path": "/home/dahlia/.local/state/oseo-preview/lanes/perf-profiling/capture-ci-20261109/linux-smoke-a/runtime-source/runtime_disposal.c",
+      "sha256": "3564b06052d6906407009fecb46f0e1c432b88bc64a81acd7f8885138c596336"
+    },
+    {
+      "path": "/home/dahlia/.local/state/oseo-preview/lanes/perf-profiling/capture-ci-20261109/linux-smoke-a/runtime-source/runtime_arguments.c",
+      "sha256": "a98a8fc092e2a35ad8a40624ae326828cd2f4866be704c04c628c94d05b9c74c"
+    },
+    {
+      "path": "/home/dahlia/.local/state/oseo-preview/lanes/perf-profiling/capture-ci-20261109/linux-smoke-a/runtime-source/runtime_enumeration.c",
+      "sha256": "fae79a111a6a55070a46154523beff44ccf994024a0505cde5dfc448f56a69e3"
+    },
+    {
+      "path": "/home/dahlia/.local/state/oseo-preview/lanes/perf-profiling/capture-ci-20261109/linux-smoke-a/runtime-source/runtime_function.c",
+      "sha256": "5161606474c6d7ba062dc80b319a42cbb81f0a6f9affbf6824365920ff7156af"
+    },
+    {
+      "path": "/home/dahlia/.local/state/oseo-preview/lanes/perf-profiling/capture-ci-20261109/linux-smoke-a/runtime-source/runtime_error.c",
+      "sha256": "d59367abe8227d52e18aff6b5dd33249528b3c50ef9991c354eff36fb2a0601d"
+    },
+    {
+      "path": "/home/dahlia/.local/state/oseo-preview/lanes/perf-profiling/capture-ci-20261109/linux-smoke-a/runtime-source/runtime_symbol.c",
+      "sha256": "46bfe139446851c26e6d7439d26cfe18c7aea1623807d65d005f9a146da62a39"
+    },
+    {
+      "path": "/home/dahlia/.local/state/oseo-preview/lanes/perf-profiling/capture-ci-20261109/linux-smoke-a/runtime-source/runtime_iterator.c",
+      "sha256": "37bc5fac679a5c1259967611e6b7ea158522183b537e817df381f413dc4580fa"
+    },
+    {
+      "path": "/home/dahlia/.local/state/oseo-preview/lanes/perf-profiling/capture-ci-20261109/linux-smoke-a/runtime-source/runtime_generator.c",
+      "sha256": "b548616b3baa940d0b66e1b813e70850dade9d8c9109aa007576f73c6d8c9a41"
+    },
+    {
+      "path": "/home/dahlia/.local/state/oseo-preview/lanes/perf-profiling/capture-ci-20261109/linux-smoke-a/runtime-source/runtime_async_generator.c",
+      "sha256": "8c5b995f9f3257a1dbf0ad63a80555ff51dd530a292a4c6dead0e8c24cf3abe7"
+    },
+    {
+      "path": "/home/dahlia/.local/state/oseo-preview/lanes/perf-profiling/capture-ci-20261109/linux-smoke-a/runtime-source/runtime_bigint.c",
+      "sha256": "bbeed65338b9801ffe5acdfcbd734d445cb5d788c300338891b0cea4761f364c"
+    },
+    {
+      "path": "/home/dahlia/.local/state/oseo-preview/lanes/perf-profiling/capture-ci-20261109/linux-smoke-a/runtime-source/runtime_primitive.c",
+      "sha256": "5336717055ae6379198f978383d021ccd23dd75f368c9fe8d3f44e5c26a6752d"
+    },
+    {
+      "path": "/home/dahlia/.local/state/oseo-preview/lanes/perf-profiling/capture-ci-20261109/linux-smoke-a/runtime-source/runtime_promise.c",
+      "sha256": "3a78aa454f52088c61b73e00ffb1b9fca3e8c8d98fc56e020d4d090f852a8033"
+    },
+    {
+      "path": "/home/dahlia/.local/state/oseo-preview/lanes/perf-profiling/capture-ci-20261109/linux-smoke-a/runtime-source/runtime_module.c",
+      "sha256": "3dc70b42c8e308e5489bf2df1521ecdabf9ac28d3fe1406f7c8fc0e17315308e"
+    },
+    {
+      "path": "/home/dahlia/.local/state/oseo-preview/lanes/perf-profiling/capture-ci-20261109/linux-smoke-a/runtime-source/runtime_event_loop.c",
+      "sha256": "39e7b6c8e6b46f14c0f1037bcecb47192027db3306bf4ab14fe88babf8c4de62"
+    },
+    {
+      "path": "/home/dahlia/.local/state/oseo-preview/lanes/perf-profiling/capture-ci-20261109/linux-smoke-a/runtime-source/runtime_clock.c",
+      "sha256": "279f9c6fc14ddf3775354b985f065f9739275a2068d6c5b617eff3658bf3ad4f"
+    },
+    {
+      "path": "/home/dahlia/.local/state/oseo-preview/lanes/perf-profiling/capture-ci-20261109/linux-smoke-a/runtime-source/runtime_clock_posix.c",
+      "sha256": "a1e4fe3c7b0acf7bdc0959ffd21cd8871b7de3c36e962b1676f9686e072074b1"
+    },
+    {
+      "path": "/home/dahlia/.local/state/oseo-preview/lanes/perf-profiling/capture-ci-20261109/linux-smoke-a/runtime-source/runtime_map.c",
+      "sha256": "86e3853a2088d98c62bab4e3a2f90f220ffe3f032d040931764b1dc8c6f95300"
+    },
+    {
+      "path": "/home/dahlia/.local/state/oseo-preview/lanes/perf-profiling/capture-ci-20261109/linux-smoke-a/runtime-source/runtime_bigint_object.c",
+      "sha256": "be5d3ec2b3350e1f5b61b08a8c66c6830b674ff7e0fafcb67de54126291a240d"
+    },
+    {
+      "path": "/home/dahlia/.local/state/oseo-preview/lanes/perf-profiling/capture-ci-20261109/linux-smoke-a/runtime-source/runtime_data_view.c",
+      "sha256": "832d3c50b5ddbd049095367c065a0525c99b928c32051e82b64c768cd4ff0657"
+    },
+    {
+      "path": "/home/dahlia/.local/state/oseo-preview/lanes/perf-profiling/capture-ci-20261109/linux-smoke-a/runtime-source/runtime_date.c",
+      "sha256": "15ffea37885d1a0c2e4e1c3722a0ca6bfe56bdcb7128a3a5f37007b1d4c213cd"
+    },
+    {
+      "path": "/home/dahlia/.local/state/oseo-preview/lanes/perf-profiling/capture-ci-20261109/linux-smoke-a/runtime-source/runtime_regexp.c",
+      "sha256": "e7844d650248e0c613656754bc899e2b42ca19cc0c494098549574ecb8b5e509"
+    },
+    {
+      "path": "/home/dahlia/.local/state/oseo-preview/lanes/perf-profiling/capture-ci-20261109/linux-smoke-a/runtime-source/runtime_regexp_matcher.c",
+      "sha256": "89de887fe13fe4483e2e3199999edc05dbb9b338deae09fc2f010d677fe28e47"
+    },
+    {
+      "path": "/home/dahlia/.local/state/oseo-preview/lanes/perf-profiling/capture-ci-20261109/linux-smoke-a/runtime-source/runtime_regexp_symbol.c",
+      "sha256": "1ac6ec8003032ab5ad46c120ef8fbfbe9eebdc894140b2b54a7ecafce5779c22"
+    },
+    {
+      "path": "/home/dahlia/.local/state/oseo-preview/lanes/perf-profiling/capture-ci-20261109/linux-smoke-a/runtime-source/runtime_math.c",
+      "sha256": "2278e6e8ed2aa18b0035f8fbe5b77597bed3e188d260a8103a630e2136a23eb5"
+    },
+    {
+      "path": "/home/dahlia/.local/state/oseo-preview/lanes/perf-profiling/capture-ci-20261109/linux-smoke-a/runtime-source/runtime_uri.c",
+      "sha256": "24adff1cd9ceaf6a721cb2aa51fae19566715bc720d99181a91713ae9350c3aa"
+    },
+    {
+      "path": "/home/dahlia/.local/state/oseo-preview/lanes/perf-profiling/capture-ci-20261109/linux-smoke-a/runtime-source/runtime_reflect.c",
+      "sha256": "845de2846c37bae0c0f4214ba39da8d2e77e66022e95f5ac8bf2010a3c928613"
+    },
+    {
+      "path": "/home/dahlia/.local/state/oseo-preview/lanes/perf-profiling/capture-ci-20261109/linux-smoke-a/runtime-source/runtime_proxy.c",
+      "sha256": "22f2c71b3adfc9e2946bace5c70b5095ba53034cddfb047baca9d903902306d5"
+    },
+    {
+      "path": "/home/dahlia/.local/state/oseo-preview/lanes/perf-profiling/capture-ci-20261109/linux-smoke-a/runtime-source/runtime_json.c",
+      "sha256": "4ab2f3ae3a73b1f4be9da9ced0ccab44306de3a21a117166c73d6e0b54029b29"
+    },
+    {
+      "path": "/home/dahlia/.local/state/oseo-preview/lanes/perf-profiling/capture-ci-20261109/linux-smoke-a/runtime-source/runtime_atomics.c",
+      "sha256": "527e93a2f62ecf1cda036803390607adba6730d5d46046304a4477fdf7e395b8"
+    },
+    {
+      "path": "/home/dahlia/.local/state/oseo-preview/lanes/perf-profiling/capture-ci-20261109/linux-smoke-a/runtime-source/runtime_agent.c",
+      "sha256": "067ed44d1b1a2780ab6a25ea8640146157b637154c617030645c7ac519e9bca2"
+    },
+    {
+      "path": "/home/dahlia/.local/state/oseo-preview/lanes/perf-profiling/capture-ci-20261109/linux-smoke-a/runtime-source/runtime_realm.c",
+      "sha256": "d668cca225ce6a51e75860813aeef6f0c284f48d9333c104135f1fd74f71fafc"
+    },
+    {
+      "path": "/home/dahlia/.local/state/oseo-preview/lanes/perf-profiling/capture-ci-20261109/linux-smoke-a/build.json",
+      "sha256": "33d89680672b4bfac454094c484ec13e7a03c0775598e39a5018fd7190f747b6"
+    },
+    {
+      "path": "/home/dahlia/.local/state/oseo-preview/lanes/perf-profiling/capture-ci-20261109/linux-smoke-a/generated.c",
+      "sha256": "50391834c2d1006c7afe31ddb1e6ee67f9f97e8002ce6fc41ee7a0b619b7f15b"
+    },
+    {
+      "path": "/home/dahlia/.local/state/oseo-preview/lanes/perf-profiling/capture-ci-20261109/linux-smoke-a/build-requests.json",
+      "sha256": "f932163660635484d3329b06b6c2a16c024ca6b32f792a8e17fca8617c5d12e0"
+    }
+  ],
+  "argv": [],
+  "env": {},
+  "cwd": "/home/dahlia/.local/state/oseo-preview/lanes/perf-profiling/capture-ci-20261109/linux-smoke-a",
+  "stdinBase64": "",
+  "stdoutBase64": "NjQ5OTk5NQo=",
+  "stderrBase64": "",
+  "exitStatus": 0
+}

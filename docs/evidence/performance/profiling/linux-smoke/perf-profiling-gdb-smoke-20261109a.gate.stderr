@@ -1,0 +1,5 @@
+Traceback (most recent call last):
+  File "/home/dahlia/.local/state/oseo-preview/lanes/perf-profiling/acceptance-20261109/gdb-smoke.py", line 32, in <module>
+    assert records and all(r['status']==0 for r in records)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError

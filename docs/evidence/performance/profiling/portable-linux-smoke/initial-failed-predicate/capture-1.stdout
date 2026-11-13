@@ -1,0 +1,9 @@
+[Thread debugging using libthread_db enabled]
+Using host libthread_db library "/lib64/libthread_db.so.1".
+0x000000000104c2a3 in oseo_context_location (context=context@entry=0x7fff73d361a0, line=line@entry=1, column=column@entry=82) at runtime_core.c:266
+
+Thread 1 (Thread 0x7f27f3371b80 (LWP 691992) "fixture-linux-x"):
+#0  0x000000000104c2a3 in oseo_context_location (context=context@entry=0x7fff73d361a0, line=line@entry=1, column=column@entry=82) at runtime_core.c:266
+#1  0x000000000104b6ca in oseo_function_script (context=0x7fff73d361a0, receiver=<optimized out>, argument_count=0, arguments=0x0, new_target=<optimized out>, callee=<optimized out>) at /home/dahlia/.local/state/oseo-preview/lanes/perf-profiling/capture-ci-20261109/linux-smoke-a/build/generated.c:346
+#2  main () at /home/dahlia/.local/state/oseo-preview/lanes/perf-profiling/capture-ci-20261109/linux-smoke-a/build/generated.c:391
+[Inferior 1 (process 691992) detached]

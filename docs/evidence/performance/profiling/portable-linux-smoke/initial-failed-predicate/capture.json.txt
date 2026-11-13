@@ -1,0 +1,1811 @@
+{
+  "kind": "synthetic-method-probe",
+  "performanceEvidence": false,
+  "timedArtifactAcceptance": "caller must link to final measurement evidence",
+  "status": "failed-or-incomplete",
+  "failure": "Incomplete capture, correctness or identity evidence",
+  "interrupted": null,
+  "host": {
+    "platform": "linux",
+    "architecture": "x64",
+    "hostname": "dorikom",
+    "release": "7.2.11-200.fc44.x86_64"
+  },
+  "source": "a58536b94126635657cf6446055ebf5b2338db41\n4cea1ec0521c76d14a4253b4d739d9551837cbb4\n",
+  "dirty": " M .github/workflows/main.yaml\n M mise.toml\n M tests/macos-lanes.test.ts\n M tests/perf-profiling.test.ts\n M tools/main-workflow.template.yaml\n M tools/perf-profile.ts\n?? tools/perf-profile-capture.ts\n?? tools/perf-profile-smoke.ts\n",
+  "requestedCaptures": 8,
+  "captures": [
+    {
+      "index": 0,
+      "status": "useful-stack",
+      "record": {
+        "argv": [
+          "/usr/libexec/gdb",
+          "--nx",
+          "--nh",
+          "--batch",
+          "-iex",
+          "set auto-load off",
+          "-iex",
+          "set debuginfod enabled off",
+          "-p",
+          "691992",
+          "-ex",
+          "thread apply all bt 16",
+          "-ex",
+          "detach"
+        ],
+        "cwd": "/home/dahlia/orca/workspaces/oseo/perf-profiling",
+        "env": {
+          "PATH": "/home/dahlia/.cabal/bin:/home/dahlia/.bun/bin:/home/dahlia/.local/share/pnpm:/home/dahlia/.local/share/mise/installs/aqua-dahlia-hongdown/0.5.3:/home/dahlia/.local/share/mise/installs/aqua-nushell-nushell/0.116.0/.mise-bins:/home/dahlia/.local/share/mise/installs/ubi-jdx-jactionlint/2.1.0:/home/dahlia/.local/share/mise/installs/pnpm/12.18.0:/home/dahlia/.local/share/mise/installs/deno/2.9.7/bin:/home/dahlia/.local/share/mise/installs/deno/2.9.7/.deno/bin:/home/dahlia/.local/share/mise/installs/node/24.21.0/bin:/home/dahlia/.local/share/mise/installs/oxfmt/0.70.0/node_modules/.bin:/home/dahlia/.local/share/mise/installs/shellcheck/0.11.0/shellcheck-v0.11.0:/home/dahlia/.local/share/mise/installs/zig/0.16.0/bin:/home/dahlia/.local/share/mise/installs/python/latest/bin:/home/dahlia/.local/share/mise/installs/bun/latest/bin:/home/dahlia/.local/share/mise/installs/github-dahlia-dojang/latest:/home/dahlia/.local/share/mise/installs/claude-code/latest:/home/dahlia/.local/share/mise/installs/codex/latest/bin:/home/dahlia/.local/share/mise/installs/opencode/latest/node_modules/.bin:/home/dahlia/.local/share/mise/installs/antigravity-cli/latest:/home/dahlia/.local/share/mise/installs/npm-fedify-cli/latest/node_modules/.bin:/home/dahlia/.local/share/mise/installs/aws/latest/.mise-bins:/home/dahlia/.local/share/mise/installs/github-steipete-codex-bar/latest:/home/dahlia/.local/share/mise/installs/pypi-matrix-mcp/latest/bin:/home/dahlia/.local/share/mise/shims:/home/dahlia/.ghcup/bin:/home/dahlia/.local/bin:/home/dahlia/bin:/home/dahlia/.config/orca/codex-accounts/0be9f85b-a42b-4ef8-ae43-7b936f40efa7/home/tmp/arg0-linux/codex-arg0fuEOem:/home/dahlia/.config/orca/linux-orca-cli-shim:/home/dahlia/.cargo/bin:/usr/local/bin:/usr/bin:/home/dahlia/.dotnet/tools:/home/dahlia/.fzf/bin:/home/dahlia/.volta/bin:/home/dahlia/.asdf/shims:/home/dahlia/.fnm/aliases/default/bin:/home/dahlia/.yarn/bin:/opt/homebrew/bin:/opt/homebrew/sbin:/usr/local/sbin:/snap/bin:/home/linuxbrew/.linuxbrew/bin:/nix/var/nix/profiles/default/bin:/home/dahlia/.nix-profile/bin:/home/dahlia/.opencode/bin:/home/dahlia/.vite-plus/bin"
+        },
+        "startedUtc": "2026-11-08T21:04:15.764Z",
+        "finishedUtc": "2026-11-08T21:04:15.865Z",
+        "pid": 691993,
+        "status": 0,
+        "signal": null,
+        "error": null,
+        "timedOut": false,
+        "stdout": "capture-0.stdout",
+        "stderr": "capture-0.stderr",
+        "cleanup": [],
+        "groupGone": true
+      },
+      "stack": {
+        "useful": true,
+        "runtime": true,
+        "generated": true,
+        "unknown": false,
+        "truncated": false,
+        "diagnostics": false
+      }
+    },
+    {
+      "index": 1,
+      "status": "useful-stack",
+      "record": {
+        "argv": [
+          "/usr/libexec/gdb",
+          "--nx",
+          "--nh",
+          "--batch",
+          "-iex",
+          "set auto-load off",
+          "-iex",
+          "set debuginfod enabled off",
+          "-p",
+          "691992",
+          "-ex",
+          "thread apply all bt 16",
+          "-ex",
+          "detach"
+        ],
+        "cwd": "/home/dahlia/orca/workspaces/oseo/perf-profiling",
+        "env": {
+          "PATH": "/home/dahlia/.cabal/bin:/home/dahlia/.bun/bin:/home/dahlia/.local/share/pnpm:/home/dahlia/.local/share/mise/installs/aqua-dahlia-hongdown/0.5.3:/home/dahlia/.local/share/mise/installs/aqua-nushell-nushell/0.116.0/.mise-bins:/home/dahlia/.local/share/mise/installs/ubi-jdx-jactionlint/2.1.0:/home/dahlia/.local/share/mise/installs/pnpm/12.18.0:/home/dahlia/.local/share/mise/installs/deno/2.9.7/bin:/home/dahlia/.local/share/mise/installs/deno/2.9.7/.deno/bin:/home/dahlia/.local/share/mise/installs/node/24.21.0/bin:/home/dahlia/.local/share/mise/installs/oxfmt/0.70.0/node_modules/.bin:/home/dahlia/.local/share/mise/installs/shellcheck/0.11.0/shellcheck-v0.11.0:/home/dahlia/.local/share/mise/installs/zig/0.16.0/bin:/home/dahlia/.local/share/mise/installs/python/latest/bin:/home/dahlia/.local/share/mise/installs/bun/latest/bin:/home/dahlia/.local/share/mise/installs/github-dahlia-dojang/latest:/home/dahlia/.local/share/mise/installs/claude-code/latest:/home/dahlia/.local/share/mise/installs/codex/latest/bin:/home/dahlia/.local/share/mise/installs/opencode/latest/node_modules/.bin:/home/dahlia/.local/share/mise/installs/antigravity-cli/latest:/home/dahlia/.local/share/mise/installs/npm-fedify-cli/latest/node_modules/.bin:/home/dahlia/.local/share/mise/installs/aws/latest/.mise-bins:/home/dahlia/.local/share/mise/installs/github-steipete-codex-bar/latest:/home/dahlia/.local/share/mise/installs/pypi-matrix-mcp/latest/bin:/home/dahlia/.local/share/mise/shims:/home/dahlia/.ghcup/bin:/home/dahlia/.local/bin:/home/dahlia/bin:/home/dahlia/.config/orca/codex-accounts/0be9f85b-a42b-4ef8-ae43-7b936f40efa7/home/tmp/arg0-linux/codex-arg0fuEOem:/home/dahlia/.config/orca/linux-orca-cli-shim:/home/dahlia/.cargo/bin:/usr/local/bin:/usr/bin:/home/dahlia/.dotnet/tools:/home/dahlia/.fzf/bin:/home/dahlia/.volta/bin:/home/dahlia/.asdf/shims:/home/dahlia/.fnm/aliases/default/bin:/home/dahlia/.yarn/bin:/opt/homebrew/bin:/opt/homebrew/sbin:/usr/local/sbin:/snap/bin:/home/linuxbrew/.linuxbrew/bin:/nix/var/nix/profiles/default/bin:/home/dahlia/.nix-profile/bin:/home/dahlia/.opencode/bin:/home/dahlia/.vite-plus/bin"
+        },
+        "startedUtc": "2026-11-08T21:04:15.870Z",
+        "finishedUtc": "2026-11-08T21:04:15.963Z",
+        "pid": 692017,
+        "status": 0,
+        "signal": null,
+        "error": null,
+        "timedOut": false,
+        "stdout": "capture-1.stdout",
+        "stderr": "capture-1.stderr",
+        "cleanup": [],
+        "groupGone": true
+      },
+      "stack": {
+        "useful": true,
+        "runtime": true,
+        "generated": true,
+        "unknown": false,
+        "truncated": false,
+        "diagnostics": false
+      }
+    },
+    {
+      "index": 2,
+      "status": "failed-or-insufficient-stack",
+      "record": {
+        "argv": [
+          "/usr/libexec/gdb",
+          "--nx",
+          "--nh",
+          "--batch",
+          "-iex",
+          "set auto-load off",
+          "-iex",
+          "set debuginfod enabled off",
+          "-p",
+          "691992",
+          "-ex",
+          "thread apply all bt 16",
+          "-ex",
+          "detach"
+        ],
+        "cwd": "/home/dahlia/orca/workspaces/oseo/perf-profiling",
+        "env": {
+          "PATH": "/home/dahlia/.cabal/bin:/home/dahlia/.bun/bin:/home/dahlia/.local/share/pnpm:/home/dahlia/.local/share/mise/installs/aqua-dahlia-hongdown/0.5.3:/home/dahlia/.local/share/mise/installs/aqua-nushell-nushell/0.116.0/.mise-bins:/home/dahlia/.local/share/mise/installs/ubi-jdx-jactionlint/2.1.0:/home/dahlia/.local/share/mise/installs/pnpm/12.18.0:/home/dahlia/.local/share/mise/installs/deno/2.9.7/bin:/home/dahlia/.local/share/mise/installs/deno/2.9.7/.deno/bin:/home/dahlia/.local/share/mise/installs/node/24.21.0/bin:/home/dahlia/.local/share/mise/installs/oxfmt/0.70.0/node_modules/.bin:/home/dahlia/.local/share/mise/installs/shellcheck/0.11.0/shellcheck-v0.11.0:/home/dahlia/.local/share/mise/installs/zig/0.16.0/bin:/home/dahlia/.local/share/mise/installs/python/latest/bin:/home/dahlia/.local/share/mise/installs/bun/latest/bin:/home/dahlia/.local/share/mise/installs/github-dahlia-dojang/latest:/home/dahlia/.local/share/mise/installs/claude-code/latest:/home/dahlia/.local/share/mise/installs/codex/latest/bin:/home/dahlia/.local/share/mise/installs/opencode/latest/node_modules/.bin:/home/dahlia/.local/share/mise/installs/antigravity-cli/latest:/home/dahlia/.local/share/mise/installs/npm-fedify-cli/latest/node_modules/.bin:/home/dahlia/.local/share/mise/installs/aws/latest/.mise-bins:/home/dahlia/.local/share/mise/installs/github-steipete-codex-bar/latest:/home/dahlia/.local/share/mise/installs/pypi-matrix-mcp/latest/bin:/home/dahlia/.local/share/mise/shims:/home/dahlia/.ghcup/bin:/home/dahlia/.local/bin:/home/dahlia/bin:/home/dahlia/.config/orca/codex-accounts/0be9f85b-a42b-4ef8-ae43-7b936f40efa7/home/tmp/arg0-linux/codex-arg0fuEOem:/home/dahlia/.config/orca/linux-orca-cli-shim:/home/dahlia/.cargo/bin:/usr/local/bin:/usr/bin:/home/dahlia/.dotnet/tools:/home/dahlia/.fzf/bin:/home/dahlia/.volta/bin:/home/dahlia/.asdf/shims:/home/dahlia/.fnm/aliases/default/bin:/home/dahlia/.yarn/bin:/opt/homebrew/bin:/opt/homebrew/sbin:/usr/local/sbin:/snap/bin:/home/linuxbrew/.linuxbrew/bin:/nix/var/nix/profiles/default/bin:/home/dahlia/.nix-profile/bin:/home/dahlia/.opencode/bin:/home/dahlia/.vite-plus/bin"
+        },
+        "startedUtc": "2026-11-08T21:04:15.968Z",
+        "finishedUtc": "2026-11-08T21:04:16.062Z",
+        "pid": 692029,
+        "status": 0,
+        "signal": null,
+        "error": null,
+        "timedOut": false,
+        "stdout": "capture-2.stdout",
+        "stderr": "capture-2.stderr",
+        "cleanup": [],
+        "groupGone": true
+      },
+      "stack": {
+        "useful": false,
+        "runtime": false,
+        "generated": true,
+        "unknown": false,
+        "truncated": false,
+        "diagnostics": false
+      }
+    },
+    {
+      "index": 3,
+      "status": "useful-stack",
+      "record": {
+        "argv": [
+          "/usr/libexec/gdb",
+          "--nx",
+          "--nh",
+          "--batch",
+          "-iex",
+          "set auto-load off",
+          "-iex",
+          "set debuginfod enabled off",
+          "-p",
+          "691992",
+          "-ex",
+          "thread apply all bt 16",
+          "-ex",
+          "detach"
+        ],
+        "cwd": "/home/dahlia/orca/workspaces/oseo/perf-profiling",
+        "env": {
+          "PATH": "/home/dahlia/.cabal/bin:/home/dahlia/.bun/bin:/home/dahlia/.local/share/pnpm:/home/dahlia/.local/share/mise/installs/aqua-dahlia-hongdown/0.5.3:/home/dahlia/.local/share/mise/installs/aqua-nushell-nushell/0.116.0/.mise-bins:/home/dahlia/.local/share/mise/installs/ubi-jdx-jactionlint/2.1.0:/home/dahlia/.local/share/mise/installs/pnpm/12.18.0:/home/dahlia/.local/share/mise/installs/deno/2.9.7/bin:/home/dahlia/.local/share/mise/installs/deno/2.9.7/.deno/bin:/home/dahlia/.local/share/mise/installs/node/24.21.0/bin:/home/dahlia/.local/share/mise/installs/oxfmt/0.70.0/node_modules/.bin:/home/dahlia/.local/share/mise/installs/shellcheck/0.11.0/shellcheck-v0.11.0:/home/dahlia/.local/share/mise/installs/zig/0.16.0/bin:/home/dahlia/.local/share/mise/installs/python/latest/bin:/home/dahlia/.local/share/mise/installs/bun/latest/bin:/home/dahlia/.local/share/mise/installs/github-dahlia-dojang/latest:/home/dahlia/.local/share/mise/installs/claude-code/latest:/home/dahlia/.local/share/mise/installs/codex/latest/bin:/home/dahlia/.local/share/mise/installs/opencode/latest/node_modules/.bin:/home/dahlia/.local/share/mise/installs/antigravity-cli/latest:/home/dahlia/.local/share/mise/installs/npm-fedify-cli/latest/node_modules/.bin:/home/dahlia/.local/share/mise/installs/aws/latest/.mise-bins:/home/dahlia/.local/share/mise/installs/github-steipete-codex-bar/latest:/home/dahlia/.local/share/mise/installs/pypi-matrix-mcp/latest/bin:/home/dahlia/.local/share/mise/shims:/home/dahlia/.ghcup/bin:/home/dahlia/.local/bin:/home/dahlia/bin:/home/dahlia/.config/orca/codex-accounts/0be9f85b-a42b-4ef8-ae43-7b936f40efa7/home/tmp/arg0-linux/codex-arg0fuEOem:/home/dahlia/.config/orca/linux-orca-cli-shim:/home/dahlia/.cargo/bin:/usr/local/bin:/usr/bin:/home/dahlia/.dotnet/tools:/home/dahlia/.fzf/bin:/home/dahlia/.volta/bin:/home/dahlia/.asdf/shims:/home/dahlia/.fnm/aliases/default/bin:/home/dahlia/.yarn/bin:/opt/homebrew/bin:/opt/homebrew/sbin:/usr/local/sbin:/snap/bin:/home/linuxbrew/.linuxbrew/bin:/nix/var/nix/profiles/default/bin:/home/dahlia/.nix-profile/bin:/home/dahlia/.opencode/bin:/home/dahlia/.vite-plus/bin"
+        },
+        "startedUtc": "2026-11-08T21:04:16.066Z",
+        "finishedUtc": "2026-11-08T21:04:16.165Z",
+        "pid": 692041,
+        "status": 0,
+        "signal": null,
+        "error": null,
+        "timedOut": false,
+        "stdout": "capture-3.stdout",
+        "stderr": "capture-3.stderr",
+        "cleanup": [],
+        "groupGone": true
+      },
+      "stack": {
+        "useful": true,
+        "runtime": true,
+        "generated": true,
+        "unknown": false,
+        "truncated": false,
+        "diagnostics": false
+      }
+    },
+    {
+      "index": 4,
+      "status": "useful-stack",
+      "record": {
+        "argv": [
+          "/usr/libexec/gdb",
+          "--nx",
+          "--nh",
+          "--batch",
+          "-iex",
+          "set auto-load off",
+          "-iex",
+          "set debuginfod enabled off",
+          "-p",
+          "691992",
+          "-ex",
+          "thread apply all bt 16",
+          "-ex",
+          "detach"
+        ],
+        "cwd": "/home/dahlia/orca/workspaces/oseo/perf-profiling",
+        "env": {
+          "PATH": "/home/dahlia/.cabal/bin:/home/dahlia/.bun/bin:/home/dahlia/.local/share/pnpm:/home/dahlia/.local/share/mise/installs/aqua-dahlia-hongdown/0.5.3:/home/dahlia/.local/share/mise/installs/aqua-nushell-nushell/0.116.0/.mise-bins:/home/dahlia/.local/share/mise/installs/ubi-jdx-jactionlint/2.1.0:/home/dahlia/.local/share/mise/installs/pnpm/12.18.0:/home/dahlia/.local/share/mise/installs/deno/2.9.7/bin:/home/dahlia/.local/share/mise/installs/deno/2.9.7/.deno/bin:/home/dahlia/.local/share/mise/installs/node/24.21.0/bin:/home/dahlia/.local/share/mise/installs/oxfmt/0.70.0/node_modules/.bin:/home/dahlia/.local/share/mise/installs/shellcheck/0.11.0/shellcheck-v0.11.0:/home/dahlia/.local/share/mise/installs/zig/0.16.0/bin:/home/dahlia/.local/share/mise/installs/python/latest/bin:/home/dahlia/.local/share/mise/installs/bun/latest/bin:/home/dahlia/.local/share/mise/installs/github-dahlia-dojang/latest:/home/dahlia/.local/share/mise/installs/claude-code/latest:/home/dahlia/.local/share/mise/installs/codex/latest/bin:/home/dahlia/.local/share/mise/installs/opencode/latest/node_modules/.bin:/home/dahlia/.local/share/mise/installs/antigravity-cli/latest:/home/dahlia/.local/share/mise/installs/npm-fedify-cli/latest/node_modules/.bin:/home/dahlia/.local/share/mise/installs/aws/latest/.mise-bins:/home/dahlia/.local/share/mise/installs/github-steipete-codex-bar/latest:/home/dahlia/.local/share/mise/installs/pypi-matrix-mcp/latest/bin:/home/dahlia/.local/share/mise/shims:/home/dahlia/.ghcup/bin:/home/dahlia/.local/bin:/home/dahlia/bin:/home/dahlia/.config/orca/codex-accounts/0be9f85b-a42b-4ef8-ae43-7b936f40efa7/home/tmp/arg0-linux/codex-arg0fuEOem:/home/dahlia/.config/orca/linux-orca-cli-shim:/home/dahlia/.cargo/bin:/usr/local/bin:/usr/bin:/home/dahlia/.dotnet/tools:/home/dahlia/.fzf/bin:/home/dahlia/.volta/bin:/home/dahlia/.asdf/shims:/home/dahlia/.fnm/aliases/default/bin:/home/dahlia/.yarn/bin:/opt/homebrew/bin:/opt/homebrew/sbin:/usr/local/sbin:/snap/bin:/home/linuxbrew/.linuxbrew/bin:/nix/var/nix/profiles/default/bin:/home/dahlia/.nix-profile/bin:/home/dahlia/.opencode/bin:/home/dahlia/.vite-plus/bin"
+        },
+        "startedUtc": "2026-11-08T21:04:16.169Z",
+        "finishedUtc": "2026-11-08T21:04:16.266Z",
+        "pid": 692057,
+        "status": 0,
+        "signal": null,
+        "error": null,
+        "timedOut": false,
+        "stdout": "capture-4.stdout",
+        "stderr": "capture-4.stderr",
+        "cleanup": [],
+        "groupGone": true
+      },
+      "stack": {
+        "useful": true,
+        "runtime": true,
+        "generated": true,
+        "unknown": false,
+        "truncated": false,
+        "diagnostics": false
+      }
+    },
+    {
+      "index": 5,
+      "status": "useful-stack",
+      "record": {
+        "argv": [
+          "/usr/libexec/gdb",
+          "--nx",
+          "--nh",
+          "--batch",
+          "-iex",
+          "set auto-load off",
+          "-iex",
+          "set debuginfod enabled off",
+          "-p",
+          "691992",
+          "-ex",
+          "thread apply all bt 16",
+          "-ex",
+          "detach"
+        ],
+        "cwd": "/home/dahlia/orca/workspaces/oseo/perf-profiling",
+        "env": {
+          "PATH": "/home/dahlia/.cabal/bin:/home/dahlia/.bun/bin:/home/dahlia/.local/share/pnpm:/home/dahlia/.local/share/mise/installs/aqua-dahlia-hongdown/0.5.3:/home/dahlia/.local/share/mise/installs/aqua-nushell-nushell/0.116.0/.mise-bins:/home/dahlia/.local/share/mise/installs/ubi-jdx-jactionlint/2.1.0:/home/dahlia/.local/share/mise/installs/pnpm/12.18.0:/home/dahlia/.local/share/mise/installs/deno/2.9.7/bin:/home/dahlia/.local/share/mise/installs/deno/2.9.7/.deno/bin:/home/dahlia/.local/share/mise/installs/node/24.21.0/bin:/home/dahlia/.local/share/mise/installs/oxfmt/0.70.0/node_modules/.bin:/home/dahlia/.local/share/mise/installs/shellcheck/0.11.0/shellcheck-v0.11.0:/home/dahlia/.local/share/mise/installs/zig/0.16.0/bin:/home/dahlia/.local/share/mise/installs/python/latest/bin:/home/dahlia/.local/share/mise/installs/bun/latest/bin:/home/dahlia/.local/share/mise/installs/github-dahlia-dojang/latest:/home/dahlia/.local/share/mise/installs/claude-code/latest:/home/dahlia/.local/share/mise/installs/codex/latest/bin:/home/dahlia/.local/share/mise/installs/opencode/latest/node_modules/.bin:/home/dahlia/.local/share/mise/installs/antigravity-cli/latest:/home/dahlia/.local/share/mise/installs/npm-fedify-cli/latest/node_modules/.bin:/home/dahlia/.local/share/mise/installs/aws/latest/.mise-bins:/home/dahlia/.local/share/mise/installs/github-steipete-codex-bar/latest:/home/dahlia/.local/share/mise/installs/pypi-matrix-mcp/latest/bin:/home/dahlia/.local/share/mise/shims:/home/dahlia/.ghcup/bin:/home/dahlia/.local/bin:/home/dahlia/bin:/home/dahlia/.config/orca/codex-accounts/0be9f85b-a42b-4ef8-ae43-7b936f40efa7/home/tmp/arg0-linux/codex-arg0fuEOem:/home/dahlia/.config/orca/linux-orca-cli-shim:/home/dahlia/.cargo/bin:/usr/local/bin:/usr/bin:/home/dahlia/.dotnet/tools:/home/dahlia/.fzf/bin:/home/dahlia/.volta/bin:/home/dahlia/.asdf/shims:/home/dahlia/.fnm/aliases/default/bin:/home/dahlia/.yarn/bin:/opt/homebrew/bin:/opt/homebrew/sbin:/usr/local/sbin:/snap/bin:/home/linuxbrew/.linuxbrew/bin:/nix/var/nix/profiles/default/bin:/home/dahlia/.nix-profile/bin:/home/dahlia/.opencode/bin:/home/dahlia/.vite-plus/bin"
+        },
+        "startedUtc": "2026-11-08T21:04:16.271Z",
+        "finishedUtc": "2026-11-08T21:04:16.364Z",
+        "pid": 692070,
+        "status": 0,
+        "signal": null,
+        "error": null,
+        "timedOut": false,
+        "stdout": "capture-5.stdout",
+        "stderr": "capture-5.stderr",
+        "cleanup": [],
+        "groupGone": true
+      },
+      "stack": {
+        "useful": true,
+        "runtime": true,
+        "generated": true,
+        "unknown": false,
+        "truncated": false,
+        "diagnostics": false
+      }
+    },
+    {
+      "index": 6,
+      "status": "useful-stack",
+      "record": {
+        "argv": [
+          "/usr/libexec/gdb",
+          "--nx",
+          "--nh",
+          "--batch",
+          "-iex",
+          "set auto-load off",
+          "-iex",
+          "set debuginfod enabled off",
+          "-p",
+          "691992",
+          "-ex",
+          "thread apply all bt 16",
+          "-ex",
+          "detach"
+        ],
+        "cwd": "/home/dahlia/orca/workspaces/oseo/perf-profiling",
+        "env": {
+          "PATH": "/home/dahlia/.cabal/bin:/home/dahlia/.bun/bin:/home/dahlia/.local/share/pnpm:/home/dahlia/.local/share/mise/installs/aqua-dahlia-hongdown/0.5.3:/home/dahlia/.local/share/mise/installs/aqua-nushell-nushell/0.116.0/.mise-bins:/home/dahlia/.local/share/mise/installs/ubi-jdx-jactionlint/2.1.0:/home/dahlia/.local/share/mise/installs/pnpm/12.18.0:/home/dahlia/.local/share/mise/installs/deno/2.9.7/bin:/home/dahlia/.local/share/mise/installs/deno/2.9.7/.deno/bin:/home/dahlia/.local/share/mise/installs/node/24.21.0/bin:/home/dahlia/.local/share/mise/installs/oxfmt/0.70.0/node_modules/.bin:/home/dahlia/.local/share/mise/installs/shellcheck/0.11.0/shellcheck-v0.11.0:/home/dahlia/.local/share/mise/installs/zig/0.16.0/bin:/home/dahlia/.local/share/mise/installs/python/latest/bin:/home/dahlia/.local/share/mise/installs/bun/latest/bin:/home/dahlia/.local/share/mise/installs/github-dahlia-dojang/latest:/home/dahlia/.local/share/mise/installs/claude-code/latest:/home/dahlia/.local/share/mise/installs/codex/latest/bin:/home/dahlia/.local/share/mise/installs/opencode/latest/node_modules/.bin:/home/dahlia/.local/share/mise/installs/antigravity-cli/latest:/home/dahlia/.local/share/mise/installs/npm-fedify-cli/latest/node_modules/.bin:/home/dahlia/.local/share/mise/installs/aws/latest/.mise-bins:/home/dahlia/.local/share/mise/installs/github-steipete-codex-bar/latest:/home/dahlia/.local/share/mise/installs/pypi-matrix-mcp/latest/bin:/home/dahlia/.local/share/mise/shims:/home/dahlia/.ghcup/bin:/home/dahlia/.local/bin:/home/dahlia/bin:/home/dahlia/.config/orca/codex-accounts/0be9f85b-a42b-4ef8-ae43-7b936f40efa7/home/tmp/arg0-linux/codex-arg0fuEOem:/home/dahlia/.config/orca/linux-orca-cli-shim:/home/dahlia/.cargo/bin:/usr/local/bin:/usr/bin:/home/dahlia/.dotnet/tools:/home/dahlia/.fzf/bin:/home/dahlia/.volta/bin:/home/dahlia/.asdf/shims:/home/dahlia/.fnm/aliases/default/bin:/home/dahlia/.yarn/bin:/opt/homebrew/bin:/opt/homebrew/sbin:/usr/local/sbin:/snap/bin:/home/linuxbrew/.linuxbrew/bin:/nix/var/nix/profiles/default/bin:/home/dahlia/.nix-profile/bin:/home/dahlia/.opencode/bin:/home/dahlia/.vite-plus/bin"
+        },
+        "startedUtc": "2026-11-08T21:04:16.369Z",
+        "finishedUtc": "2026-11-08T21:04:16.464Z",
+        "pid": 692082,
+        "status": 0,
+        "signal": null,
+        "error": null,
+        "timedOut": false,
+        "stdout": "capture-6.stdout",
+        "stderr": "capture-6.stderr",
+        "cleanup": [],
+        "groupGone": true
+      },
+      "stack": {
+        "useful": true,
+        "runtime": true,
+        "generated": true,
+        "unknown": false,
+        "truncated": false,
+        "diagnostics": false
+      }
+    },
+    {
+      "index": 7,
+      "status": "useful-stack",
+      "record": {
+        "argv": [
+          "/usr/libexec/gdb",
+          "--nx",
+          "--nh",
+          "--batch",
+          "-iex",
+          "set auto-load off",
+          "-iex",
+          "set debuginfod enabled off",
+          "-p",
+          "691992",
+          "-ex",
+          "thread apply all bt 16",
+          "-ex",
+          "detach"
+        ],
+        "cwd": "/home/dahlia/orca/workspaces/oseo/perf-profiling",
+        "env": {
+          "PATH": "/home/dahlia/.cabal/bin:/home/dahlia/.bun/bin:/home/dahlia/.local/share/pnpm:/home/dahlia/.local/share/mise/installs/aqua-dahlia-hongdown/0.5.3:/home/dahlia/.local/share/mise/installs/aqua-nushell-nushell/0.116.0/.mise-bins:/home/dahlia/.local/share/mise/installs/ubi-jdx-jactionlint/2.1.0:/home/dahlia/.local/share/mise/installs/pnpm/12.18.0:/home/dahlia/.local/share/mise/installs/deno/2.9.7/bin:/home/dahlia/.local/share/mise/installs/deno/2.9.7/.deno/bin:/home/dahlia/.local/share/mise/installs/node/24.21.0/bin:/home/dahlia/.local/share/mise/installs/oxfmt/0.70.0/node_modules/.bin:/home/dahlia/.local/share/mise/installs/shellcheck/0.11.0/shellcheck-v0.11.0:/home/dahlia/.local/share/mise/installs/zig/0.16.0/bin:/home/dahlia/.local/share/mise/installs/python/latest/bin:/home/dahlia/.local/share/mise/installs/bun/latest/bin:/home/dahlia/.local/share/mise/installs/github-dahlia-dojang/latest:/home/dahlia/.local/share/mise/installs/claude-code/latest:/home/dahlia/.local/share/mise/installs/codex/latest/bin:/home/dahlia/.local/share/mise/installs/opencode/latest/node_modules/.bin:/home/dahlia/.local/share/mise/installs/antigravity-cli/latest:/home/dahlia/.local/share/mise/installs/npm-fedify-cli/latest/node_modules/.bin:/home/dahlia/.local/share/mise/installs/aws/latest/.mise-bins:/home/dahlia/.local/share/mise/installs/github-steipete-codex-bar/latest:/home/dahlia/.local/share/mise/installs/pypi-matrix-mcp/latest/bin:/home/dahlia/.local/share/mise/shims:/home/dahlia/.ghcup/bin:/home/dahlia/.local/bin:/home/dahlia/bin:/home/dahlia/.config/orca/codex-accounts/0be9f85b-a42b-4ef8-ae43-7b936f40efa7/home/tmp/arg0-linux/codex-arg0fuEOem:/home/dahlia/.config/orca/linux-orca-cli-shim:/home/dahlia/.cargo/bin:/usr/local/bin:/usr/bin:/home/dahlia/.dotnet/tools:/home/dahlia/.fzf/bin:/home/dahlia/.volta/bin:/home/dahlia/.asdf/shims:/home/dahlia/.fnm/aliases/default/bin:/home/dahlia/.yarn/bin:/opt/homebrew/bin:/opt/homebrew/sbin:/usr/local/sbin:/snap/bin:/home/linuxbrew/.linuxbrew/bin:/nix/var/nix/profiles/default/bin:/home/dahlia/.nix-profile/bin:/home/dahlia/.opencode/bin:/home/dahlia/.vite-plus/bin"
+        },
+        "startedUtc": "2026-11-08T21:04:16.469Z",
+        "finishedUtc": "2026-11-08T21:04:16.566Z",
+        "pid": 692094,
+        "status": 0,
+        "signal": null,
+        "error": null,
+        "timedOut": false,
+        "stdout": "capture-7.stdout",
+        "stderr": "capture-7.stderr",
+        "cleanup": [],
+        "groupGone": true
+      },
+      "stack": {
+        "useful": true,
+        "runtime": true,
+        "generated": true,
+        "unknown": false,
+        "truncated": false,
+        "diagnostics": false
+      }
+    }
+  ],
+  "before": [
+    {
+      "path": "/home/dahlia/.local/state/oseo-preview/lanes/perf-profiling/capture-ci-20261109/linux-smoke-a/build/fixture-linux-x86_64-gnu",
+      "realpath": "/home/dahlia/.local/state/oseo-preview/lanes/perf-profiling/capture-ci-20261109/linux-smoke-a/build/fixture-linux-x86_64-gnu",
+      "sha256": "2a90fde97326ac9b3df801c7e6ab06ec9d47b142b2156f3e912cd91df258c98c",
+      "bytes": 4333744,
+      "mode": 493
+    },
+    {
+      "path": "/home/dahlia/.local/state/oseo-preview/lanes/perf-profiling/capture-ci-20261109/linux-smoke-a/smoke.js",
+      "realpath": "/home/dahlia/.local/state/oseo-preview/lanes/perf-profiling/capture-ci-20261109/linux-smoke-a/smoke.js",
+      "sha256": "af75797b7e177528de48de75630939cf9ebe8af93557590484c6208333474545",
+      "bytes": 174,
+      "mode": 420
+    },
+    {
+      "path": "/home/dahlia/.local/state/oseo-preview/lanes/perf-profiling/capture-ci-20261109/linux-smoke-a/runtime-source/oseo_runtime.h",
+      "realpath": "/home/dahlia/.local/state/oseo-preview/lanes/perf-profiling/capture-ci-20261109/linux-smoke-a/runtime-source/oseo_runtime.h",
+      "sha256": "58c4b22f617313b648cb05875b41ec6bf1dd316cf207c0a7d26b91084213d7bf",
+      "bytes": 92472,
+      "mode": 420
+    },
+    {
+      "path": "/home/dahlia/.local/state/oseo-preview/lanes/perf-profiling/capture-ci-20261109/linux-smoke-a/runtime-source/runtime_internal.h",
+      "realpath": "/home/dahlia/.local/state/oseo-preview/lanes/perf-profiling/capture-ci-20261109/linux-smoke-a/runtime-source/runtime_internal.h",
+      "sha256": "1cadd409546c9eb6de77376b71b8c6e7ca9b68502d6d72db2761078d55afe6c6",
+      "bytes": 212078,
+      "mode": 420
+    },
+    {
+      "path": "/home/dahlia/.local/state/oseo-preview/lanes/perf-profiling/capture-ci-20261109/linux-smoke-a/runtime-source/runtime_unicode_tables.h",
+      "realpath": "/home/dahlia/.local/state/oseo-preview/lanes/perf-profiling/capture-ci-20261109/linux-smoke-a/runtime-source/runtime_unicode_tables.h",
+      "sha256": "6ef745c96148db8eae733350825b2aa2ab831efcf42ddf1d7b1a4c4f8f7e3e13",
+      "bytes": 816714,
+      "mode": 420
+    },
+    {
+      "path": "/home/dahlia/.local/state/oseo-preview/lanes/perf-profiling/capture-ci-20261109/linux-smoke-a/runtime-source/runtime_core.c",
+      "realpath": "/home/dahlia/.local/state/oseo-preview/lanes/perf-profiling/capture-ci-20261109/linux-smoke-a/runtime-source/runtime_core.c",
+      "sha256": "bcf729b61049bdd7486c230c5cb653edfaae769360bc4d3ee0c4f1eea10a663b",
+      "bytes": 15428,
+      "mode": 420
+    },
+    {
+      "path": "/home/dahlia/.local/state/oseo-preview/lanes/perf-profiling/capture-ci-20261109/linux-smoke-a/runtime-source/runtime_memory.c",
+      "realpath": "/home/dahlia/.local/state/oseo-preview/lanes/perf-profiling/capture-ci-20261109/linux-smoke-a/runtime-source/runtime_memory.c",
+      "sha256": "e152eceff3ee63d56e9d666db1832401f3b8fe2ae555b52e8e63c9bcbcddc430",
+      "bytes": 51974,
+      "mode": 420
+    },
+    {
+      "path": "/home/dahlia/.local/state/oseo-preview/lanes/perf-profiling/capture-ci-20261109/linux-smoke-a/runtime-source/runtime_binding.c",
+      "realpath": "/home/dahlia/.local/state/oseo-preview/lanes/perf-profiling/capture-ci-20261109/linux-smoke-a/runtime-source/runtime_binding.c",
+      "sha256": "ddfcacff82a4096a3bb2deb95231e26b1830d764d995471a01a0897bb5f52ba7",
+      "bytes": 34373,
+      "mode": 420
+    },
+    {
+      "path": "/home/dahlia/.local/state/oseo-preview/lanes/perf-profiling/capture-ci-20261109/linux-smoke-a/runtime-source/runtime_string.c",
+      "realpath": "/home/dahlia/.local/state/oseo-preview/lanes/perf-profiling/capture-ci-20261109/linux-smoke-a/runtime-source/runtime_string.c",
+      "sha256": "539053230ce555a7c8841d802560dfdd4eab86713243650037c4b838166d4394",
+      "bytes": 97394,
+      "mode": 420
+    },
+    {
+      "path": "/home/dahlia/.local/state/oseo-preview/lanes/perf-profiling/capture-ci-20261109/linux-smoke-a/runtime-source/runtime_string_match.c",
+      "realpath": "/home/dahlia/.local/state/oseo-preview/lanes/perf-profiling/capture-ci-20261109/linux-smoke-a/runtime-source/runtime_string_match.c",
+      "sha256": "ad67b61ba998de0fc029235325d7608d231ea101a10c3218300345d3c3e0aee7",
+      "bytes": 38180,
+      "mode": 420
+    },
+    {
+      "path": "/home/dahlia/.local/state/oseo-preview/lanes/perf-profiling/capture-ci-20261109/linux-smoke-a/runtime-source/runtime_object.c",
+      "realpath": "/home/dahlia/.local/state/oseo-preview/lanes/perf-profiling/capture-ci-20261109/linux-smoke-a/runtime-source/runtime_object.c",
+      "sha256": "0d0f08c90c516f64eaae8d268cbcdacefb4ba5b079e77bd409fcc1698fb689ca",
+      "bytes": 14606,
+      "mode": 420
+    },
+    {
+      "path": "/home/dahlia/.local/state/oseo-preview/lanes/perf-profiling/capture-ci-20261109/linux-smoke-a/runtime-source/runtime_property.c",
+      "realpath": "/home/dahlia/.local/state/oseo-preview/lanes/perf-profiling/capture-ci-20261109/linux-smoke-a/runtime-source/runtime_property.c",
+      "sha256": "5eed877a98a732945c3406b65abfe4ae8ba8c01209225abd44a7524701b0ac0b",
+      "bytes": 28624,
+      "mode": 420
+    },
+    {
+      "path": "/home/dahlia/.local/state/oseo-preview/lanes/perf-profiling/capture-ci-20261109/linux-smoke-a/runtime-source/runtime_descriptor.c",
+      "realpath": "/home/dahlia/.local/state/oseo-preview/lanes/perf-profiling/capture-ci-20261109/linux-smoke-a/runtime-source/runtime_descriptor.c",
+      "sha256": "3f6e091b6ab51fb1747129877255c1218be6a642e6a6ae2f348d80c05215a31a",
+      "bytes": 39725,
+      "mode": 420
+    },
+    {
+      "path": "/home/dahlia/.local/state/oseo-preview/lanes/perf-profiling/capture-ci-20261109/linux-smoke-a/runtime-source/runtime_array.c",
+      "realpath": "/home/dahlia/.local/state/oseo-preview/lanes/perf-profiling/capture-ci-20261109/linux-smoke-a/runtime-source/runtime_array.c",
+      "sha256": "bd0b0cf35b3c5e13960f31941a1fb4d3c8632c091161e007ce3d00b40285503d",
+      "bytes": 193716,
+      "mode": 420
+    },
+    {
+      "path": "/home/dahlia/.local/state/oseo-preview/lanes/perf-profiling/capture-ci-20261109/linux-smoke-a/runtime-source/runtime_object_builtin.c",
+      "realpath": "/home/dahlia/.local/state/oseo-preview/lanes/perf-profiling/capture-ci-20261109/linux-smoke-a/runtime-source/runtime_object_builtin.c",
+      "sha256": "7818fc384cef7e23cabf12da215ba1572206d26f27f6e3eae0da1c08735fe56c",
+      "bytes": 140455,
+      "mode": 420
+    },
+    {
+      "path": "/home/dahlia/.local/state/oseo-preview/lanes/perf-profiling/capture-ci-20261109/linux-smoke-a/runtime-source/runtime_number.c",
+      "realpath": "/home/dahlia/.local/state/oseo-preview/lanes/perf-profiling/capture-ci-20261109/linux-smoke-a/runtime-source/runtime_number.c",
+      "sha256": "4f9ff1d699da3efd8af1a9089df31a853e57baffab613eb905b0cd7be59c658e",
+      "bytes": 71911,
+      "mode": 420
+    },
+    {
+      "path": "/home/dahlia/.local/state/oseo-preview/lanes/perf-profiling/capture-ci-20261109/linux-smoke-a/runtime-source/runtime_boolean.c",
+      "realpath": "/home/dahlia/.local/state/oseo-preview/lanes/perf-profiling/capture-ci-20261109/linux-smoke-a/runtime-source/runtime_boolean.c",
+      "sha256": "16ce1332c546302e9170b707bf88b273183e9c4b6aabcd68087eeffbdb3c0e0b",
+      "bytes": 9527,
+      "mode": 420
+    },
+    {
+      "path": "/home/dahlia/.local/state/oseo-preview/lanes/perf-profiling/capture-ci-20261109/linux-smoke-a/runtime-source/runtime_array_buffer.c",
+      "realpath": "/home/dahlia/.local/state/oseo-preview/lanes/perf-profiling/capture-ci-20261109/linux-smoke-a/runtime-source/runtime_array_buffer.c",
+      "sha256": "c0055f4b0b2cc7ea73fb652c7b4463bee0627ae9f2acd0e514b519da63039b7a",
+      "bytes": 60674,
+      "mode": 420
+    },
+    {
+      "path": "/home/dahlia/.local/state/oseo-preview/lanes/perf-profiling/capture-ci-20261109/linux-smoke-a/runtime-source/runtime_set.c",
+      "realpath": "/home/dahlia/.local/state/oseo-preview/lanes/perf-profiling/capture-ci-20261109/linux-smoke-a/runtime-source/runtime_set.c",
+      "sha256": "c58f58acd2be15d4fdf55f4f9b5464967ac327a3af39c9a05c1486eccf88bfe1",
+      "bytes": 56345,
+      "mode": 420
+    },
+    {
+      "path": "/home/dahlia/.local/state/oseo-preview/lanes/perf-profiling/capture-ci-20261109/linux-smoke-a/runtime-source/runtime_typed_array.c",
+      "realpath": "/home/dahlia/.local/state/oseo-preview/lanes/perf-profiling/capture-ci-20261109/linux-smoke-a/runtime-source/runtime_typed_array.c",
+      "sha256": "fa45e430134d413b725c412d39f698c5c573a5e5a0221a998d8f5b2716f5e8c5",
+      "bytes": 175060,
+      "mode": 420
+    },
+    {
+      "path": "/home/dahlia/.local/state/oseo-preview/lanes/perf-profiling/capture-ci-20261109/linux-smoke-a/runtime-source/runtime_weak_collection.c",
+      "realpath": "/home/dahlia/.local/state/oseo-preview/lanes/perf-profiling/capture-ci-20261109/linux-smoke-a/runtime-source/runtime_weak_collection.c",
+      "sha256": "afa1eda0062dd0a223a66281f95d406c6f1fa4ac144af86c75cbcf48ee95b83f",
+      "bytes": 42007,
+      "mode": 420
+    },
+    {
+      "path": "/home/dahlia/.local/state/oseo-preview/lanes/perf-profiling/capture-ci-20261109/linux-smoke-a/runtime-source/runtime_disposal.c",
+      "realpath": "/home/dahlia/.local/state/oseo-preview/lanes/perf-profiling/capture-ci-20261109/linux-smoke-a/runtime-source/runtime_disposal.c",
+      "sha256": "3564b06052d6906407009fecb46f0e1c432b88bc64a81acd7f8885138c596336",
+      "bytes": 56529,
+      "mode": 420
+    },
+    {
+      "path": "/home/dahlia/.local/state/oseo-preview/lanes/perf-profiling/capture-ci-20261109/linux-smoke-a/runtime-source/runtime_arguments.c",
+      "realpath": "/home/dahlia/.local/state/oseo-preview/lanes/perf-profiling/capture-ci-20261109/linux-smoke-a/runtime-source/runtime_arguments.c",
+      "sha256": "a98a8fc092e2a35ad8a40624ae326828cd2f4866be704c04c628c94d05b9c74c",
+      "bytes": 13241,
+      "mode": 420
+    },
+    {
+      "path": "/home/dahlia/.local/state/oseo-preview/lanes/perf-profiling/capture-ci-20261109/linux-smoke-a/runtime-source/runtime_enumeration.c",
+      "realpath": "/home/dahlia/.local/state/oseo-preview/lanes/perf-profiling/capture-ci-20261109/linux-smoke-a/runtime-source/runtime_enumeration.c",
+      "sha256": "fae79a111a6a55070a46154523beff44ccf994024a0505cde5dfc448f56a69e3",
+      "bytes": 23392,
+      "mode": 420
+    },
+    {
+      "path": "/home/dahlia/.local/state/oseo-preview/lanes/perf-profiling/capture-ci-20261109/linux-smoke-a/runtime-source/runtime_function.c",
+      "realpath": "/home/dahlia/.local/state/oseo-preview/lanes/perf-profiling/capture-ci-20261109/linux-smoke-a/runtime-source/runtime_function.c",
+      "sha256": "5161606474c6d7ba062dc80b319a42cbb81f0a6f9affbf6824365920ff7156af",
+      "bytes": 125662,
+      "mode": 420
+    },
+    {
+      "path": "/home/dahlia/.local/state/oseo-preview/lanes/perf-profiling/capture-ci-20261109/linux-smoke-a/runtime-source/runtime_error.c",
+      "realpath": "/home/dahlia/.local/state/oseo-preview/lanes/perf-profiling/capture-ci-20261109/linux-smoke-a/runtime-source/runtime_error.c",
+      "sha256": "d59367abe8227d52e18aff6b5dd33249528b3c50ef9991c354eff36fb2a0601d",
+      "bytes": 34860,
+      "mode": 420
+    },
+    {
+      "path": "/home/dahlia/.local/state/oseo-preview/lanes/perf-profiling/capture-ci-20261109/linux-smoke-a/runtime-source/runtime_symbol.c",
+      "realpath": "/home/dahlia/.local/state/oseo-preview/lanes/perf-profiling/capture-ci-20261109/linux-smoke-a/runtime-source/runtime_symbol.c",
+      "sha256": "46bfe139446851c26e6d7439d26cfe18c7aea1623807d65d005f9a146da62a39",
+      "bytes": 35157,
+      "mode": 420
+    },
+    {
+      "path": "/home/dahlia/.local/state/oseo-preview/lanes/perf-profiling/capture-ci-20261109/linux-smoke-a/runtime-source/runtime_iterator.c",
+      "realpath": "/home/dahlia/.local/state/oseo-preview/lanes/perf-profiling/capture-ci-20261109/linux-smoke-a/runtime-source/runtime_iterator.c",
+      "sha256": "37bc5fac679a5c1259967611e6b7ea158522183b537e817df381f413dc4580fa",
+      "bytes": 184456,
+      "mode": 420
+    },
+    {
+      "path": "/home/dahlia/.local/state/oseo-preview/lanes/perf-profiling/capture-ci-20261109/linux-smoke-a/runtime-source/runtime_generator.c",
+      "realpath": "/home/dahlia/.local/state/oseo-preview/lanes/perf-profiling/capture-ci-20261109/linux-smoke-a/runtime-source/runtime_generator.c",
+      "sha256": "b548616b3baa940d0b66e1b813e70850dade9d8c9109aa007576f73c6d8c9a41",
+      "bytes": 39204,
+      "mode": 420
+    },
+    {
+      "path": "/home/dahlia/.local/state/oseo-preview/lanes/perf-profiling/capture-ci-20261109/linux-smoke-a/runtime-source/runtime_async_generator.c",
+      "realpath": "/home/dahlia/.local/state/oseo-preview/lanes/perf-profiling/capture-ci-20261109/linux-smoke-a/runtime-source/runtime_async_generator.c",
+      "sha256": "8c5b995f9f3257a1dbf0ad63a80555ff51dd530a292a4c6dead0e8c24cf3abe7",
+      "bytes": 32270,
+      "mode": 420
+    },
+    {
+      "path": "/home/dahlia/.local/state/oseo-preview/lanes/perf-profiling/capture-ci-20261109/linux-smoke-a/runtime-source/runtime_bigint.c",
+      "realpath": "/home/dahlia/.local/state/oseo-preview/lanes/perf-profiling/capture-ci-20261109/linux-smoke-a/runtime-source/runtime_bigint.c",
+      "sha256": "bbeed65338b9801ffe5acdfcbd734d445cb5d788c300338891b0cea4761f364c",
+      "bytes": 45357,
+      "mode": 420
+    },
+    {
+      "path": "/home/dahlia/.local/state/oseo-preview/lanes/perf-profiling/capture-ci-20261109/linux-smoke-a/runtime-source/runtime_primitive.c",
+      "realpath": "/home/dahlia/.local/state/oseo-preview/lanes/perf-profiling/capture-ci-20261109/linux-smoke-a/runtime-source/runtime_primitive.c",
+      "sha256": "5336717055ae6379198f978383d021ccd23dd75f368c9fe8d3f44e5c26a6752d",
+      "bytes": 77637,
+      "mode": 420
+    },
+    {
+      "path": "/home/dahlia/.local/state/oseo-preview/lanes/perf-profiling/capture-ci-20261109/linux-smoke-a/runtime-source/runtime_promise.c",
+      "realpath": "/home/dahlia/.local/state/oseo-preview/lanes/perf-profiling/capture-ci-20261109/linux-smoke-a/runtime-source/runtime_promise.c",
+      "sha256": "3a78aa454f52088c61b73e00ffb1b9fca3e8c8d98fc56e020d4d090f852a8033",
+      "bytes": 113756,
+      "mode": 420
+    },
+    {
+      "path": "/home/dahlia/.local/state/oseo-preview/lanes/perf-profiling/capture-ci-20261109/linux-smoke-a/runtime-source/runtime_module.c",
+      "realpath": "/home/dahlia/.local/state/oseo-preview/lanes/perf-profiling/capture-ci-20261109/linux-smoke-a/runtime-source/runtime_module.c",
+      "sha256": "3dc70b42c8e308e5489bf2df1521ecdabf9ac28d3fe1406f7c8fc0e17315308e",
+      "bytes": 32004,
+      "mode": 420
+    },
+    {
+      "path": "/home/dahlia/.local/state/oseo-preview/lanes/perf-profiling/capture-ci-20261109/linux-smoke-a/runtime-source/runtime_event_loop.c",
+      "realpath": "/home/dahlia/.local/state/oseo-preview/lanes/perf-profiling/capture-ci-20261109/linux-smoke-a/runtime-source/runtime_event_loop.c",
+      "sha256": "39e7b6c8e6b46f14c0f1037bcecb47192027db3306bf4ab14fe88babf8c4de62",
+      "bytes": 24221,
+      "mode": 420
+    },
+    {
+      "path": "/home/dahlia/.local/state/oseo-preview/lanes/perf-profiling/capture-ci-20261109/linux-smoke-a/runtime-source/runtime_clock.c",
+      "realpath": "/home/dahlia/.local/state/oseo-preview/lanes/perf-profiling/capture-ci-20261109/linux-smoke-a/runtime-source/runtime_clock.c",
+      "sha256": "279f9c6fc14ddf3775354b985f065f9739275a2068d6c5b617eff3658bf3ad4f",
+      "bytes": 4873,
+      "mode": 420
+    },
+    {
+      "path": "/home/dahlia/.local/state/oseo-preview/lanes/perf-profiling/capture-ci-20261109/linux-smoke-a/runtime-source/runtime_clock_posix.c",
+      "realpath": "/home/dahlia/.local/state/oseo-preview/lanes/perf-profiling/capture-ci-20261109/linux-smoke-a/runtime-source/runtime_clock_posix.c",
+      "sha256": "a1e4fe3c7b0acf7bdc0959ffd21cd8871b7de3c36e962b1676f9686e072074b1",
+      "bytes": 18517,
+      "mode": 420
+    },
+    {
+      "path": "/home/dahlia/.local/state/oseo-preview/lanes/perf-profiling/capture-ci-20261109/linux-smoke-a/runtime-source/runtime_map.c",
+      "realpath": "/home/dahlia/.local/state/oseo-preview/lanes/perf-profiling/capture-ci-20261109/linux-smoke-a/runtime-source/runtime_map.c",
+      "sha256": "86e3853a2088d98c62bab4e3a2f90f220ffe3f032d040931764b1dc8c6f95300",
+      "bytes": 52545,
+      "mode": 420
+    },
+    {
+      "path": "/home/dahlia/.local/state/oseo-preview/lanes/perf-profiling/capture-ci-20261109/linux-smoke-a/runtime-source/runtime_bigint_object.c",
+      "realpath": "/home/dahlia/.local/state/oseo-preview/lanes/perf-profiling/capture-ci-20261109/linux-smoke-a/runtime-source/runtime_bigint_object.c",
+      "sha256": "be5d3ec2b3350e1f5b61b08a8c66c6830b674ff7e0fafcb67de54126291a240d",
+      "bytes": 20303,
+      "mode": 420
+    },
+    {
+      "path": "/home/dahlia/.local/state/oseo-preview/lanes/perf-profiling/capture-ci-20261109/linux-smoke-a/runtime-source/runtime_data_view.c",
+      "realpath": "/home/dahlia/.local/state/oseo-preview/lanes/perf-profiling/capture-ci-20261109/linux-smoke-a/runtime-source/runtime_data_view.c",
+      "sha256": "832d3c50b5ddbd049095367c065a0525c99b928c32051e82b64c768cd4ff0657",
+      "bytes": 39075,
+      "mode": 420
+    },
+    {
+      "path": "/home/dahlia/.local/state/oseo-preview/lanes/perf-profiling/capture-ci-20261109/linux-smoke-a/runtime-source/runtime_date.c",
+      "realpath": "/home/dahlia/.local/state/oseo-preview/lanes/perf-profiling/capture-ci-20261109/linux-smoke-a/runtime-source/runtime_date.c",
+      "sha256": "15ffea37885d1a0c2e4e1c3722a0ca6bfe56bdcb7128a3a5f37007b1d4c213cd",
+      "bytes": 68321,
+      "mode": 420
+    },
+    {
+      "path": "/home/dahlia/.local/state/oseo-preview/lanes/perf-profiling/capture-ci-20261109/linux-smoke-a/runtime-source/runtime_regexp.c",
+      "realpath": "/home/dahlia/.local/state/oseo-preview/lanes/perf-profiling/capture-ci-20261109/linux-smoke-a/runtime-source/runtime_regexp.c",
+      "sha256": "e7844d650248e0c613656754bc899e2b42ca19cc0c494098549574ecb8b5e509",
+      "bytes": 116499,
+      "mode": 420
+    },
+    {
+      "path": "/home/dahlia/.local/state/oseo-preview/lanes/perf-profiling/capture-ci-20261109/linux-smoke-a/runtime-source/runtime_regexp_matcher.c",
+      "realpath": "/home/dahlia/.local/state/oseo-preview/lanes/perf-profiling/capture-ci-20261109/linux-smoke-a/runtime-source/runtime_regexp_matcher.c",
+      "sha256": "89de887fe13fe4483e2e3199999edc05dbb9b338deae09fc2f010d677fe28e47",
+      "bytes": 120740,
+      "mode": 420
+    },
+    {
+      "path": "/home/dahlia/.local/state/oseo-preview/lanes/perf-profiling/capture-ci-20261109/linux-smoke-a/runtime-source/runtime_regexp_symbol.c",
+      "realpath": "/home/dahlia/.local/state/oseo-preview/lanes/perf-profiling/capture-ci-20261109/linux-smoke-a/runtime-source/runtime_regexp_symbol.c",
+      "sha256": "1ac6ec8003032ab5ad46c120ef8fbfbe9eebdc894140b2b54a7ecafce5779c22",
+      "bytes": 48208,
+      "mode": 420
+    },
+    {
+      "path": "/home/dahlia/.local/state/oseo-preview/lanes/perf-profiling/capture-ci-20261109/linux-smoke-a/runtime-source/runtime_math.c",
+      "realpath": "/home/dahlia/.local/state/oseo-preview/lanes/perf-profiling/capture-ci-20261109/linux-smoke-a/runtime-source/runtime_math.c",
+      "sha256": "2278e6e8ed2aa18b0035f8fbe5b77597bed3e188d260a8103a630e2136a23eb5",
+      "bytes": 31078,
+      "mode": 420
+    },
+    {
+      "path": "/home/dahlia/.local/state/oseo-preview/lanes/perf-profiling/capture-ci-20261109/linux-smoke-a/runtime-source/runtime_uri.c",
+      "realpath": "/home/dahlia/.local/state/oseo-preview/lanes/perf-profiling/capture-ci-20261109/linux-smoke-a/runtime-source/runtime_uri.c",
+      "sha256": "24adff1cd9ceaf6a721cb2aa51fae19566715bc720d99181a91713ae9350c3aa",
+      "bytes": 23572,
+      "mode": 420
+    },
+    {
+      "path": "/home/dahlia/.local/state/oseo-preview/lanes/perf-profiling/capture-ci-20261109/linux-smoke-a/runtime-source/runtime_reflect.c",
+      "realpath": "/home/dahlia/.local/state/oseo-preview/lanes/perf-profiling/capture-ci-20261109/linux-smoke-a/runtime-source/runtime_reflect.c",
+      "sha256": "845de2846c37bae0c0f4214ba39da8d2e77e66022e95f5ac8bf2010a3c928613",
+      "bytes": 20510,
+      "mode": 420
+    },
+    {
+      "path": "/home/dahlia/.local/state/oseo-preview/lanes/perf-profiling/capture-ci-20261109/linux-smoke-a/runtime-source/runtime_proxy.c",
+      "realpath": "/home/dahlia/.local/state/oseo-preview/lanes/perf-profiling/capture-ci-20261109/linux-smoke-a/runtime-source/runtime_proxy.c",
+      "sha256": "22f2c71b3adfc9e2946bace5c70b5095ba53034cddfb047baca9d903902306d5",
+      "bytes": 57072,
+      "mode": 420
+    },
+    {
+      "path": "/home/dahlia/.local/state/oseo-preview/lanes/perf-profiling/capture-ci-20261109/linux-smoke-a/runtime-source/runtime_json.c",
+      "realpath": "/home/dahlia/.local/state/oseo-preview/lanes/perf-profiling/capture-ci-20261109/linux-smoke-a/runtime-source/runtime_json.c",
+      "sha256": "4ab2f3ae3a73b1f4be9da9ced0ccab44306de3a21a117166c73d6e0b54029b29",
+      "bytes": 72583,
+      "mode": 420
+    },
+    {
+      "path": "/home/dahlia/.local/state/oseo-preview/lanes/perf-profiling/capture-ci-20261109/linux-smoke-a/runtime-source/runtime_atomics.c",
+      "realpath": "/home/dahlia/.local/state/oseo-preview/lanes/perf-profiling/capture-ci-20261109/linux-smoke-a/runtime-source/runtime_atomics.c",
+      "sha256": "527e93a2f62ecf1cda036803390607adba6730d5d46046304a4477fdf7e395b8",
+      "bytes": 44001,
+      "mode": 420
+    },
+    {
+      "path": "/home/dahlia/.local/state/oseo-preview/lanes/perf-profiling/capture-ci-20261109/linux-smoke-a/runtime-source/runtime_agent.c",
+      "realpath": "/home/dahlia/.local/state/oseo-preview/lanes/perf-profiling/capture-ci-20261109/linux-smoke-a/runtime-source/runtime_agent.c",
+      "sha256": "067ed44d1b1a2780ab6a25ea8640146157b637154c617030645c7ac519e9bca2",
+      "bytes": 55320,
+      "mode": 420
+    },
+    {
+      "path": "/home/dahlia/.local/state/oseo-preview/lanes/perf-profiling/capture-ci-20261109/linux-smoke-a/runtime-source/runtime_realm.c",
+      "realpath": "/home/dahlia/.local/state/oseo-preview/lanes/perf-profiling/capture-ci-20261109/linux-smoke-a/runtime-source/runtime_realm.c",
+      "sha256": "d668cca225ce6a51e75860813aeef6f0c284f48d9333c104135f1fd74f71fafc",
+      "bytes": 14716,
+      "mode": 420
+    },
+    {
+      "path": "/home/dahlia/.local/state/oseo-preview/lanes/perf-profiling/capture-ci-20261109/linux-smoke-a/build.json",
+      "realpath": "/home/dahlia/.local/state/oseo-preview/lanes/perf-profiling/capture-ci-20261109/linux-smoke-a/build.json",
+      "sha256": "33d89680672b4bfac454094c484ec13e7a03c0775598e39a5018fd7190f747b6",
+      "bytes": 23369,
+      "mode": 420
+    },
+    {
+      "path": "/home/dahlia/.local/state/oseo-preview/lanes/perf-profiling/capture-ci-20261109/linux-smoke-a/generated.c",
+      "realpath": "/home/dahlia/.local/state/oseo-preview/lanes/perf-profiling/capture-ci-20261109/linux-smoke-a/generated.c",
+      "sha256": "50391834c2d1006c7afe31ddb1e6ee67f9f97e8002ce6fc41ee7a0b619b7f15b",
+      "bytes": 19521,
+      "mode": 420
+    },
+    {
+      "path": "/home/dahlia/.local/state/oseo-preview/lanes/perf-profiling/capture-ci-20261109/linux-smoke-a/build-requests.json",
+      "realpath": "/home/dahlia/.local/state/oseo-preview/lanes/perf-profiling/capture-ci-20261109/linux-smoke-a/build-requests.json",
+      "sha256": "f932163660635484d3329b06b6c2a16c024ca6b32f792a8e17fca8617c5d12e0",
+      "bytes": 168711,
+      "mode": 420
+    }
+  ],
+  "after": [
+    {
+      "path": "/home/dahlia/.local/state/oseo-preview/lanes/perf-profiling/capture-ci-20261109/linux-smoke-a/build/fixture-linux-x86_64-gnu",
+      "realpath": "/home/dahlia/.local/state/oseo-preview/lanes/perf-profiling/capture-ci-20261109/linux-smoke-a/build/fixture-linux-x86_64-gnu",
+      "sha256": "2a90fde97326ac9b3df801c7e6ab06ec9d47b142b2156f3e912cd91df258c98c",
+      "bytes": 4333744,
+      "mode": 493
+    },
+    {
+      "path": "/home/dahlia/.local/state/oseo-preview/lanes/perf-profiling/capture-ci-20261109/linux-smoke-a/smoke.js",
+      "realpath": "/home/dahlia/.local/state/oseo-preview/lanes/perf-profiling/capture-ci-20261109/linux-smoke-a/smoke.js",
+      "sha256": "af75797b7e177528de48de75630939cf9ebe8af93557590484c6208333474545",
+      "bytes": 174,
+      "mode": 420
+    },
+    {
+      "path": "/home/dahlia/.local/state/oseo-preview/lanes/perf-profiling/capture-ci-20261109/linux-smoke-a/runtime-source/oseo_runtime.h",
+      "realpath": "/home/dahlia/.local/state/oseo-preview/lanes/perf-profiling/capture-ci-20261109/linux-smoke-a/runtime-source/oseo_runtime.h",
+      "sha256": "58c4b22f617313b648cb05875b41ec6bf1dd316cf207c0a7d26b91084213d7bf",
+      "bytes": 92472,
+      "mode": 420
+    },
+    {
+      "path": "/home/dahlia/.local/state/oseo-preview/lanes/perf-profiling/capture-ci-20261109/linux-smoke-a/runtime-source/runtime_internal.h",
+      "realpath": "/home/dahlia/.local/state/oseo-preview/lanes/perf-profiling/capture-ci-20261109/linux-smoke-a/runtime-source/runtime_internal.h",
+      "sha256": "1cadd409546c9eb6de77376b71b8c6e7ca9b68502d6d72db2761078d55afe6c6",
+      "bytes": 212078,
+      "mode": 420
+    },
+    {
+      "path": "/home/dahlia/.local/state/oseo-preview/lanes/perf-profiling/capture-ci-20261109/linux-smoke-a/runtime-source/runtime_unicode_tables.h",
+      "realpath": "/home/dahlia/.local/state/oseo-preview/lanes/perf-profiling/capture-ci-20261109/linux-smoke-a/runtime-source/runtime_unicode_tables.h",
+      "sha256": "6ef745c96148db8eae733350825b2aa2ab831efcf42ddf1d7b1a4c4f8f7e3e13",
+      "bytes": 816714,
+      "mode": 420
+    },
+    {
+      "path": "/home/dahlia/.local/state/oseo-preview/lanes/perf-profiling/capture-ci-20261109/linux-smoke-a/runtime-source/runtime_core.c",
+      "realpath": "/home/dahlia/.local/state/oseo-preview/lanes/perf-profiling/capture-ci-20261109/linux-smoke-a/runtime-source/runtime_core.c",
+      "sha256": "bcf729b61049bdd7486c230c5cb653edfaae769360bc4d3ee0c4f1eea10a663b",
+      "bytes": 15428,
+      "mode": 420
+    },
+    {
+      "path": "/home/dahlia/.local/state/oseo-preview/lanes/perf-profiling/capture-ci-20261109/linux-smoke-a/runtime-source/runtime_memory.c",
+      "realpath": "/home/dahlia/.local/state/oseo-preview/lanes/perf-profiling/capture-ci-20261109/linux-smoke-a/runtime-source/runtime_memory.c",
+      "sha256": "e152eceff3ee63d56e9d666db1832401f3b8fe2ae555b52e8e63c9bcbcddc430",
+      "bytes": 51974,
+      "mode": 420
+    },
+    {
+      "path": "/home/dahlia/.local/state/oseo-preview/lanes/perf-profiling/capture-ci-20261109/linux-smoke-a/runtime-source/runtime_binding.c",
+      "realpath": "/home/dahlia/.local/state/oseo-preview/lanes/perf-profiling/capture-ci-20261109/linux-smoke-a/runtime-source/runtime_binding.c",
+      "sha256": "ddfcacff82a4096a3bb2deb95231e26b1830d764d995471a01a0897bb5f52ba7",
+      "bytes": 34373,
+      "mode": 420
+    },
+    {
+      "path": "/home/dahlia/.local/state/oseo-preview/lanes/perf-profiling/capture-ci-20261109/linux-smoke-a/runtime-source/runtime_string.c",
+      "realpath": "/home/dahlia/.local/state/oseo-preview/lanes/perf-profiling/capture-ci-20261109/linux-smoke-a/runtime-source/runtime_string.c",
+      "sha256": "539053230ce555a7c8841d802560dfdd4eab86713243650037c4b838166d4394",
+      "bytes": 97394,
+      "mode": 420
+    },
+    {
+      "path": "/home/dahlia/.local/state/oseo-preview/lanes/perf-profiling/capture-ci-20261109/linux-smoke-a/runtime-source/runtime_string_match.c",
+      "realpath": "/home/dahlia/.local/state/oseo-preview/lanes/perf-profiling/capture-ci-20261109/linux-smoke-a/runtime-source/runtime_string_match.c",
+      "sha256": "ad67b61ba998de0fc029235325d7608d231ea101a10c3218300345d3c3e0aee7",
+      "bytes": 38180,
+      "mode": 420
+    },
+    {
+      "path": "/home/dahlia/.local/state/oseo-preview/lanes/perf-profiling/capture-ci-20261109/linux-smoke-a/runtime-source/runtime_object.c",
+      "realpath": "/home/dahlia/.local/state/oseo-preview/lanes/perf-profiling/capture-ci-20261109/linux-smoke-a/runtime-source/runtime_object.c",
+      "sha256": "0d0f08c90c516f64eaae8d268cbcdacefb4ba5b079e77bd409fcc1698fb689ca",
+      "bytes": 14606,
+      "mode": 420
+    },
+    {
+      "path": "/home/dahlia/.local/state/oseo-preview/lanes/perf-profiling/capture-ci-20261109/linux-smoke-a/runtime-source/runtime_property.c",
+      "realpath": "/home/dahlia/.local/state/oseo-preview/lanes/perf-profiling/capture-ci-20261109/linux-smoke-a/runtime-source/runtime_property.c",
+      "sha256": "5eed877a98a732945c3406b65abfe4ae8ba8c01209225abd44a7524701b0ac0b",
+      "bytes": 28624,
+      "mode": 420
+    },
+    {
+      "path": "/home/dahlia/.local/state/oseo-preview/lanes/perf-profiling/capture-ci-20261109/linux-smoke-a/runtime-source/runtime_descriptor.c",
+      "realpath": "/home/dahlia/.local/state/oseo-preview/lanes/perf-profiling/capture-ci-20261109/linux-smoke-a/runtime-source/runtime_descriptor.c",
+      "sha256": "3f6e091b6ab51fb1747129877255c1218be6a642e6a6ae2f348d80c05215a31a",
+      "bytes": 39725,
+      "mode": 420
+    },
+    {
+      "path": "/home/dahlia/.local/state/oseo-preview/lanes/perf-profiling/capture-ci-20261109/linux-smoke-a/runtime-source/runtime_array.c",
+      "realpath": "/home/dahlia/.local/state/oseo-preview/lanes/perf-profiling/capture-ci-20261109/linux-smoke-a/runtime-source/runtime_array.c",
+      "sha256": "bd0b0cf35b3c5e13960f31941a1fb4d3c8632c091161e007ce3d00b40285503d",
+      "bytes": 193716,
+      "mode": 420
+    },
+    {
+      "path": "/home/dahlia/.local/state/oseo-preview/lanes/perf-profiling/capture-ci-20261109/linux-smoke-a/runtime-source/runtime_object_builtin.c",
+      "realpath": "/home/dahlia/.local/state/oseo-preview/lanes/perf-profiling/capture-ci-20261109/linux-smoke-a/runtime-source/runtime_object_builtin.c",
+      "sha256": "7818fc384cef7e23cabf12da215ba1572206d26f27f6e3eae0da1c08735fe56c",
+      "bytes": 140455,
+      "mode": 420
+    },
+    {
+      "path": "/home/dahlia/.local/state/oseo-preview/lanes/perf-profiling/capture-ci-20261109/linux-smoke-a/runtime-source/runtime_number.c",
+      "realpath": "/home/dahlia/.local/state/oseo-preview/lanes/perf-profiling/capture-ci-20261109/linux-smoke-a/runtime-source/runtime_number.c",
+      "sha256": "4f9ff1d699da3efd8af1a9089df31a853e57baffab613eb905b0cd7be59c658e",
+      "bytes": 71911,
+      "mode": 420
+    },
+    {
+      "path": "/home/dahlia/.local/state/oseo-preview/lanes/perf-profiling/capture-ci-20261109/linux-smoke-a/runtime-source/runtime_boolean.c",
+      "realpath": "/home/dahlia/.local/state/oseo-preview/lanes/perf-profiling/capture-ci-20261109/linux-smoke-a/runtime-source/runtime_boolean.c",
+      "sha256": "16ce1332c546302e9170b707bf88b273183e9c4b6aabcd68087eeffbdb3c0e0b",
+      "bytes": 9527,
+      "mode": 420
+    },
+    {
+      "path": "/home/dahlia/.local/state/oseo-preview/lanes/perf-profiling/capture-ci-20261109/linux-smoke-a/runtime-source/runtime_array_buffer.c",
+      "realpath": "/home/dahlia/.local/state/oseo-preview/lanes/perf-profiling/capture-ci-20261109/linux-smoke-a/runtime-source/runtime_array_buffer.c",
+      "sha256": "c0055f4b0b2cc7ea73fb652c7b4463bee0627ae9f2acd0e514b519da63039b7a",
+      "bytes": 60674,
+      "mode": 420
+    },
+    {
+      "path": "/home/dahlia/.local/state/oseo-preview/lanes/perf-profiling/capture-ci-20261109/linux-smoke-a/runtime-source/runtime_set.c",
+      "realpath": "/home/dahlia/.local/state/oseo-preview/lanes/perf-profiling/capture-ci-20261109/linux-smoke-a/runtime-source/runtime_set.c",
+      "sha256": "c58f58acd2be15d4fdf55f4f9b5464967ac327a3af39c9a05c1486eccf88bfe1",
+      "bytes": 56345,
+      "mode": 420
+    },
+    {
+      "path": "/home/dahlia/.local/state/oseo-preview/lanes/perf-profiling/capture-ci-20261109/linux-smoke-a/runtime-source/runtime_typed_array.c",
+      "realpath": "/home/dahlia/.local/state/oseo-preview/lanes/perf-profiling/capture-ci-20261109/linux-smoke-a/runtime-source/runtime_typed_array.c",
+      "sha256": "fa45e430134d413b725c412d39f698c5c573a5e5a0221a998d8f5b2716f5e8c5",
+      "bytes": 175060,
+      "mode": 420
+    },
+    {
+      "path": "/home/dahlia/.local/state/oseo-preview/lanes/perf-profiling/capture-ci-20261109/linux-smoke-a/runtime-source/runtime_weak_collection.c",
+      "realpath": "/home/dahlia/.local/state/oseo-preview/lanes/perf-profiling/capture-ci-20261109/linux-smoke-a/runtime-source/runtime_weak_collection.c",
+      "sha256": "afa1eda0062dd0a223a66281f95d406c6f1fa4ac144af86c75cbcf48ee95b83f",
+      "bytes": 42007,
+      "mode": 420
+    },
+    {
+      "path": "/home/dahlia/.local/state/oseo-preview/lanes/perf-profiling/capture-ci-20261109/linux-smoke-a/runtime-source/runtime_disposal.c",
+      "realpath": "/home/dahlia/.local/state/oseo-preview/lanes/perf-profiling/capture-ci-20261109/linux-smoke-a/runtime-source/runtime_disposal.c",
+      "sha256": "3564b06052d6906407009fecb46f0e1c432b88bc64a81acd7f8885138c596336",
+      "bytes": 56529,
+      "mode": 420
+    },
+    {
+      "path": "/home/dahlia/.local/state/oseo-preview/lanes/perf-profiling/capture-ci-20261109/linux-smoke-a/runtime-source/runtime_arguments.c",
+      "realpath": "/home/dahlia/.local/state/oseo-preview/lanes/perf-profiling/capture-ci-20261109/linux-smoke-a/runtime-source/runtime_arguments.c",
+      "sha256": "a98a8fc092e2a35ad8a40624ae326828cd2f4866be704c04c628c94d05b9c74c",
+      "bytes": 13241,
+      "mode": 420
+    },
+    {
+      "path": "/home/dahlia/.local/state/oseo-preview/lanes/perf-profiling/capture-ci-20261109/linux-smoke-a/runtime-source/runtime_enumeration.c",
+      "realpath": "/home/dahlia/.local/state/oseo-preview/lanes/perf-profiling/capture-ci-20261109/linux-smoke-a/runtime-source/runtime_enumeration.c",
+      "sha256": "fae79a111a6a55070a46154523beff44ccf994024a0505cde5dfc448f56a69e3",
+      "bytes": 23392,
+      "mode": 420
+    },
+    {
+      "path": "/home/dahlia/.local/state/oseo-preview/lanes/perf-profiling/capture-ci-20261109/linux-smoke-a/runtime-source/runtime_function.c",
+      "realpath": "/home/dahlia/.local/state/oseo-preview/lanes/perf-profiling/capture-ci-20261109/linux-smoke-a/runtime-source/runtime_function.c",
+      "sha256": "5161606474c6d7ba062dc80b319a42cbb81f0a6f9affbf6824365920ff7156af",
+      "bytes": 125662,
+      "mode": 420
+    },
+    {
+      "path": "/home/dahlia/.local/state/oseo-preview/lanes/perf-profiling/capture-ci-20261109/linux-smoke-a/runtime-source/runtime_error.c",
+      "realpath": "/home/dahlia/.local/state/oseo-preview/lanes/perf-profiling/capture-ci-20261109/linux-smoke-a/runtime-source/runtime_error.c",
+      "sha256": "d59367abe8227d52e18aff6b5dd33249528b3c50ef9991c354eff36fb2a0601d",
+      "bytes": 34860,
+      "mode": 420
+    },
+    {
+      "path": "/home/dahlia/.local/state/oseo-preview/lanes/perf-profiling/capture-ci-20261109/linux-smoke-a/runtime-source/runtime_symbol.c",
+      "realpath": "/home/dahlia/.local/state/oseo-preview/lanes/perf-profiling/capture-ci-20261109/linux-smoke-a/runtime-source/runtime_symbol.c",
+      "sha256": "46bfe139446851c26e6d7439d26cfe18c7aea1623807d65d005f9a146da62a39",
+      "bytes": 35157,
+      "mode": 420
+    },
+    {
+      "path": "/home/dahlia/.local/state/oseo-preview/lanes/perf-profiling/capture-ci-20261109/linux-smoke-a/runtime-source/runtime_iterator.c",
+      "realpath": "/home/dahlia/.local/state/oseo-preview/lanes/perf-profiling/capture-ci-20261109/linux-smoke-a/runtime-source/runtime_iterator.c",
+      "sha256": "37bc5fac679a5c1259967611e6b7ea158522183b537e817df381f413dc4580fa",
+      "bytes": 184456,
+      "mode": 420
+    },
+    {
+      "path": "/home/dahlia/.local/state/oseo-preview/lanes/perf-profiling/capture-ci-20261109/linux-smoke-a/runtime-source/runtime_generator.c",
+      "realpath": "/home/dahlia/.local/state/oseo-preview/lanes/perf-profiling/capture-ci-20261109/linux-smoke-a/runtime-source/runtime_generator.c",
+      "sha256": "b548616b3baa940d0b66e1b813e70850dade9d8c9109aa007576f73c6d8c9a41",
+      "bytes": 39204,
+      "mode": 420
+    },
+    {
+      "path": "/home/dahlia/.local/state/oseo-preview/lanes/perf-profiling/capture-ci-20261109/linux-smoke-a/runtime-source/runtime_async_generator.c",
+      "realpath": "/home/dahlia/.local/state/oseo-preview/lanes/perf-profiling/capture-ci-20261109/linux-smoke-a/runtime-source/runtime_async_generator.c",
+      "sha256": "8c5b995f9f3257a1dbf0ad63a80555ff51dd530a292a4c6dead0e8c24cf3abe7",
+      "bytes": 32270,
+      "mode": 420
+    },
+    {
+      "path": "/home/dahlia/.local/state/oseo-preview/lanes/perf-profiling/capture-ci-20261109/linux-smoke-a/runtime-source/runtime_bigint.c",
+      "realpath": "/home/dahlia/.local/state/oseo-preview/lanes/perf-profiling/capture-ci-20261109/linux-smoke-a/runtime-source/runtime_bigint.c",
+      "sha256": "bbeed65338b9801ffe5acdfcbd734d445cb5d788c300338891b0cea4761f364c",
+      "bytes": 45357,
+      "mode": 420
+    },
+    {
+      "path": "/home/dahlia/.local/state/oseo-preview/lanes/perf-profiling/capture-ci-20261109/linux-smoke-a/runtime-source/runtime_primitive.c",
+      "realpath": "/home/dahlia/.local/state/oseo-preview/lanes/perf-profiling/capture-ci-20261109/linux-smoke-a/runtime-source/runtime_primitive.c",
+      "sha256": "5336717055ae6379198f978383d021ccd23dd75f368c9fe8d3f44e5c26a6752d",
+      "bytes": 77637,
+      "mode": 420
+    },
+    {
+      "path": "/home/dahlia/.local/state/oseo-preview/lanes/perf-profiling/capture-ci-20261109/linux-smoke-a/runtime-source/runtime_promise.c",
+      "realpath": "/home/dahlia/.local/state/oseo-preview/lanes/perf-profiling/capture-ci-20261109/linux-smoke-a/runtime-source/runtime_promise.c",
+      "sha256": "3a78aa454f52088c61b73e00ffb1b9fca3e8c8d98fc56e020d4d090f852a8033",
+      "bytes": 113756,
+      "mode": 420
+    },
+    {
+      "path": "/home/dahlia/.local/state/oseo-preview/lanes/perf-profiling/capture-ci-20261109/linux-smoke-a/runtime-source/runtime_module.c",
+      "realpath": "/home/dahlia/.local/state/oseo-preview/lanes/perf-profiling/capture-ci-20261109/linux-smoke-a/runtime-source/runtime_module.c",
+      "sha256": "3dc70b42c8e308e5489bf2df1521ecdabf9ac28d3fe1406f7c8fc0e17315308e",
+      "bytes": 32004,
+      "mode": 420
+    },
+    {
+      "path": "/home/dahlia/.local/state/oseo-preview/lanes/perf-profiling/capture-ci-20261109/linux-smoke-a/runtime-source/runtime_event_loop.c",
+      "realpath": "/home/dahlia/.local/state/oseo-preview/lanes/perf-profiling/capture-ci-20261109/linux-smoke-a/runtime-source/runtime_event_loop.c",
+      "sha256": "39e7b6c8e6b46f14c0f1037bcecb47192027db3306bf4ab14fe88babf8c4de62",
+      "bytes": 24221,
+      "mode": 420
+    },
+    {
+      "path": "/home/dahlia/.local/state/oseo-preview/lanes/perf-profiling/capture-ci-20261109/linux-smoke-a/runtime-source/runtime_clock.c",
+      "realpath": "/home/dahlia/.local/state/oseo-preview/lanes/perf-profiling/capture-ci-20261109/linux-smoke-a/runtime-source/runtime_clock.c",
+      "sha256": "279f9c6fc14ddf3775354b985f065f9739275a2068d6c5b617eff3658bf3ad4f",
+      "bytes": 4873,
+      "mode": 420
+    },
+    {
+      "path": "/home/dahlia/.local/state/oseo-preview/lanes/perf-profiling/capture-ci-20261109/linux-smoke-a/runtime-source/runtime_clock_posix.c",
+      "realpath": "/home/dahlia/.local/state/oseo-preview/lanes/perf-profiling/capture-ci-20261109/linux-smoke-a/runtime-source/runtime_clock_posix.c",
+      "sha256": "a1e4fe3c7b0acf7bdc0959ffd21cd8871b7de3c36e962b1676f9686e072074b1",
+      "bytes": 18517,
+      "mode": 420
+    },
+    {
+      "path": "/home/dahlia/.local/state/oseo-preview/lanes/perf-profiling/capture-ci-20261109/linux-smoke-a/runtime-source/runtime_map.c",
+      "realpath": "/home/dahlia/.local/state/oseo-preview/lanes/perf-profiling/capture-ci-20261109/linux-smoke-a/runtime-source/runtime_map.c",
+      "sha256": "86e3853a2088d98c62bab4e3a2f90f220ffe3f032d040931764b1dc8c6f95300",
+      "bytes": 52545,
+      "mode": 420
+    },
+    {
+      "path": "/home/dahlia/.local/state/oseo-preview/lanes/perf-profiling/capture-ci-20261109/linux-smoke-a/runtime-source/runtime_bigint_object.c",
+      "realpath": "/home/dahlia/.local/state/oseo-preview/lanes/perf-profiling/capture-ci-20261109/linux-smoke-a/runtime-source/runtime_bigint_object.c",
+      "sha256": "be5d3ec2b3350e1f5b61b08a8c66c6830b674ff7e0fafcb67de54126291a240d",
+      "bytes": 20303,
+      "mode": 420
+    },
+    {
+      "path": "/home/dahlia/.local/state/oseo-preview/lanes/perf-profiling/capture-ci-20261109/linux-smoke-a/runtime-source/runtime_data_view.c",
+      "realpath": "/home/dahlia/.local/state/oseo-preview/lanes/perf-profiling/capture-ci-20261109/linux-smoke-a/runtime-source/runtime_data_view.c",
+      "sha256": "832d3c50b5ddbd049095367c065a0525c99b928c32051e82b64c768cd4ff0657",
+      "bytes": 39075,
+      "mode": 420
+    },
+    {
+      "path": "/home/dahlia/.local/state/oseo-preview/lanes/perf-profiling/capture-ci-20261109/linux-smoke-a/runtime-source/runtime_date.c",
+      "realpath": "/home/dahlia/.local/state/oseo-preview/lanes/perf-profiling/capture-ci-20261109/linux-smoke-a/runtime-source/runtime_date.c",
+      "sha256": "15ffea37885d1a0c2e4e1c3722a0ca6bfe56bdcb7128a3a5f37007b1d4c213cd",
+      "bytes": 68321,
+      "mode": 420
+    },
+    {
+      "path": "/home/dahlia/.local/state/oseo-preview/lanes/perf-profiling/capture-ci-20261109/linux-smoke-a/runtime-source/runtime_regexp.c",
+      "realpath": "/home/dahlia/.local/state/oseo-preview/lanes/perf-profiling/capture-ci-20261109/linux-smoke-a/runtime-source/runtime_regexp.c",
+      "sha256": "e7844d650248e0c613656754bc899e2b42ca19cc0c494098549574ecb8b5e509",
+      "bytes": 116499,
+      "mode": 420
+    },
+    {
+      "path": "/home/dahlia/.local/state/oseo-preview/lanes/perf-profiling/capture-ci-20261109/linux-smoke-a/runtime-source/runtime_regexp_matcher.c",
+      "realpath": "/home/dahlia/.local/state/oseo-preview/lanes/perf-profiling/capture-ci-20261109/linux-smoke-a/runtime-source/runtime_regexp_matcher.c",
+      "sha256": "89de887fe13fe4483e2e3199999edc05dbb9b338deae09fc2f010d677fe28e47",
+      "bytes": 120740,
+      "mode": 420
+    },
+    {
+      "path": "/home/dahlia/.local/state/oseo-preview/lanes/perf-profiling/capture-ci-20261109/linux-smoke-a/runtime-source/runtime_regexp_symbol.c",
+      "realpath": "/home/dahlia/.local/state/oseo-preview/lanes/perf-profiling/capture-ci-20261109/linux-smoke-a/runtime-source/runtime_regexp_symbol.c",
+      "sha256": "1ac6ec8003032ab5ad46c120ef8fbfbe9eebdc894140b2b54a7ecafce5779c22",
+      "bytes": 48208,
+      "mode": 420
+    },
+    {
+      "path": "/home/dahlia/.local/state/oseo-preview/lanes/perf-profiling/capture-ci-20261109/linux-smoke-a/runtime-source/runtime_math.c",
+      "realpath": "/home/dahlia/.local/state/oseo-preview/lanes/perf-profiling/capture-ci-20261109/linux-smoke-a/runtime-source/runtime_math.c",
+      "sha256": "2278e6e8ed2aa18b0035f8fbe5b77597bed3e188d260a8103a630e2136a23eb5",
+      "bytes": 31078,
+      "mode": 420
+    },
+    {
+      "path": "/home/dahlia/.local/state/oseo-preview/lanes/perf-profiling/capture-ci-20261109/linux-smoke-a/runtime-source/runtime_uri.c",
+      "realpath": "/home/dahlia/.local/state/oseo-preview/lanes/perf-profiling/capture-ci-20261109/linux-smoke-a/runtime-source/runtime_uri.c",
+      "sha256": "24adff1cd9ceaf6a721cb2aa51fae19566715bc720d99181a91713ae9350c3aa",
+      "bytes": 23572,
+      "mode": 420
+    },
+    {
+      "path": "/home/dahlia/.local/state/oseo-preview/lanes/perf-profiling/capture-ci-20261109/linux-smoke-a/runtime-source/runtime_reflect.c",
+      "realpath": "/home/dahlia/.local/state/oseo-preview/lanes/perf-profiling/capture-ci-20261109/linux-smoke-a/runtime-source/runtime_reflect.c",
+      "sha256": "845de2846c37bae0c0f4214ba39da8d2e77e66022e95f5ac8bf2010a3c928613",
+      "bytes": 20510,
+      "mode": 420
+    },
+    {
+      "path": "/home/dahlia/.local/state/oseo-preview/lanes/perf-profiling/capture-ci-20261109/linux-smoke-a/runtime-source/runtime_proxy.c",
+      "realpath": "/home/dahlia/.local/state/oseo-preview/lanes/perf-profiling/capture-ci-20261109/linux-smoke-a/runtime-source/runtime_proxy.c",
+      "sha256": "22f2c71b3adfc9e2946bace5c70b5095ba53034cddfb047baca9d903902306d5",
+      "bytes": 57072,
+      "mode": 420
+    },
+    {
+      "path": "/home/dahlia/.local/state/oseo-preview/lanes/perf-profiling/capture-ci-20261109/linux-smoke-a/runtime-source/runtime_json.c",
+      "realpath": "/home/dahlia/.local/state/oseo-preview/lanes/perf-profiling/capture-ci-20261109/linux-smoke-a/runtime-source/runtime_json.c",
+      "sha256": "4ab2f3ae3a73b1f4be9da9ced0ccab44306de3a21a117166c73d6e0b54029b29",
+      "bytes": 72583,
+      "mode": 420
+    },
+    {
+      "path": "/home/dahlia/.local/state/oseo-preview/lanes/perf-profiling/capture-ci-20261109/linux-smoke-a/runtime-source/runtime_atomics.c",
+      "realpath": "/home/dahlia/.local/state/oseo-preview/lanes/perf-profiling/capture-ci-20261109/linux-smoke-a/runtime-source/runtime_atomics.c",
+      "sha256": "527e93a2f62ecf1cda036803390607adba6730d5d46046304a4477fdf7e395b8",
+      "bytes": 44001,
+      "mode": 420
+    },
+    {
+      "path": "/home/dahlia/.local/state/oseo-preview/lanes/perf-profiling/capture-ci-20261109/linux-smoke-a/runtime-source/runtime_agent.c",
+      "realpath": "/home/dahlia/.local/state/oseo-preview/lanes/perf-profiling/capture-ci-20261109/linux-smoke-a/runtime-source/runtime_agent.c",
+      "sha256": "067ed44d1b1a2780ab6a25ea8640146157b637154c617030645c7ac519e9bca2",
+      "bytes": 55320,
+      "mode": 420
+    },
+    {
+      "path": "/home/dahlia/.local/state/oseo-preview/lanes/perf-profiling/capture-ci-20261109/linux-smoke-a/runtime-source/runtime_realm.c",
+      "realpath": "/home/dahlia/.local/state/oseo-preview/lanes/perf-profiling/capture-ci-20261109/linux-smoke-a/runtime-source/runtime_realm.c",
+      "sha256": "d668cca225ce6a51e75860813aeef6f0c284f48d9333c104135f1fd74f71fafc",
+      "bytes": 14716,
+      "mode": 420
+    },
+    {
+      "path": "/home/dahlia/.local/state/oseo-preview/lanes/perf-profiling/capture-ci-20261109/linux-smoke-a/build.json",
+      "realpath": "/home/dahlia/.local/state/oseo-preview/lanes/perf-profiling/capture-ci-20261109/linux-smoke-a/build.json",
+      "sha256": "33d89680672b4bfac454094c484ec13e7a03c0775598e39a5018fd7190f747b6",
+      "bytes": 23369,
+      "mode": 420
+    },
+    {
+      "path": "/home/dahlia/.local/state/oseo-preview/lanes/perf-profiling/capture-ci-20261109/linux-smoke-a/generated.c",
+      "realpath": "/home/dahlia/.local/state/oseo-preview/lanes/perf-profiling/capture-ci-20261109/linux-smoke-a/generated.c",
+      "sha256": "50391834c2d1006c7afe31ddb1e6ee67f9f97e8002ce6fc41ee7a0b619b7f15b",
+      "bytes": 19521,
+      "mode": 420
+    },
+    {
+      "path": "/home/dahlia/.local/state/oseo-preview/lanes/perf-profiling/capture-ci-20261109/linux-smoke-a/build-requests.json",
+      "realpath": "/home/dahlia/.local/state/oseo-preview/lanes/perf-profiling/capture-ci-20261109/linux-smoke-a/build-requests.json",
+      "sha256": "f932163660635484d3329b06b6c2a16c024ca6b32f792a8e17fca8617c5d12e0",
+      "bytes": 168711,
+      "mode": 420
+    }
+  ],
+  "commands": [
+    {
+      "argv": [
+        "/usr/bin/readelf",
+        "-n",
+        "/home/dahlia/.local/state/oseo-preview/lanes/perf-profiling/capture-ci-20261109/linux-smoke-a/build/fixture-linux-x86_64-gnu"
+      ],
+      "cwd": "/home/dahlia/orca/workspaces/oseo/perf-profiling",
+      "env": {
+        "PATH": "/home/dahlia/.cabal/bin:/home/dahlia/.bun/bin:/home/dahlia/.local/share/pnpm:/home/dahlia/.local/share/mise/installs/aqua-dahlia-hongdown/0.5.3:/home/dahlia/.local/share/mise/installs/aqua-nushell-nushell/0.116.0/.mise-bins:/home/dahlia/.local/share/mise/installs/ubi-jdx-jactionlint/2.1.0:/home/dahlia/.local/share/mise/installs/pnpm/12.18.0:/home/dahlia/.local/share/mise/installs/deno/2.9.7/bin:/home/dahlia/.local/share/mise/installs/deno/2.9.7/.deno/bin:/home/dahlia/.local/share/mise/installs/node/24.21.0/bin:/home/dahlia/.local/share/mise/installs/oxfmt/0.70.0/node_modules/.bin:/home/dahlia/.local/share/mise/installs/shellcheck/0.11.0/shellcheck-v0.11.0:/home/dahlia/.local/share/mise/installs/zig/0.16.0/bin:/home/dahlia/.local/share/mise/installs/python/latest/bin:/home/dahlia/.local/share/mise/installs/bun/latest/bin:/home/dahlia/.local/share/mise/installs/github-dahlia-dojang/latest:/home/dahlia/.local/share/mise/installs/claude-code/latest:/home/dahlia/.local/share/mise/installs/codex/latest/bin:/home/dahlia/.local/share/mise/installs/opencode/latest/node_modules/.bin:/home/dahlia/.local/share/mise/installs/antigravity-cli/latest:/home/dahlia/.local/share/mise/installs/npm-fedify-cli/latest/node_modules/.bin:/home/dahlia/.local/share/mise/installs/aws/latest/.mise-bins:/home/dahlia/.local/share/mise/installs/github-steipete-codex-bar/latest:/home/dahlia/.local/share/mise/installs/pypi-matrix-mcp/latest/bin:/home/dahlia/.local/share/mise/shims:/home/dahlia/.ghcup/bin:/home/dahlia/.local/bin:/home/dahlia/bin:/home/dahlia/.config/orca/codex-accounts/0be9f85b-a42b-4ef8-ae43-7b936f40efa7/home/tmp/arg0-linux/codex-arg0fuEOem:/home/dahlia/.config/orca/linux-orca-cli-shim:/home/dahlia/.cargo/bin:/usr/local/bin:/usr/bin:/home/dahlia/.dotnet/tools:/home/dahlia/.fzf/bin:/home/dahlia/.volta/bin:/home/dahlia/.asdf/shims:/home/dahlia/.fnm/aliases/default/bin:/home/dahlia/.yarn/bin:/opt/homebrew/bin:/opt/homebrew/sbin:/usr/local/sbin:/snap/bin:/home/linuxbrew/.linuxbrew/bin:/nix/var/nix/profiles/default/bin:/home/dahlia/.nix-profile/bin:/home/dahlia/.opencode/bin:/home/dahlia/.vite-plus/bin"
+      },
+      "startedUtc": "2026-11-08T21:04:12.661Z",
+      "finishedUtc": "2026-11-08T21:04:12.666Z",
+      "pid": 691896,
+      "status": 0,
+      "signal": null,
+      "error": null,
+      "timedOut": false,
+      "stdout": "symbols-before.stdout",
+      "stderr": "symbols-before.stderr",
+      "cleanup": [],
+      "groupGone": true
+    },
+    {
+      "argv": [
+        "/usr/libexec/gdb",
+        "--nx",
+        "--nh",
+        "--batch",
+        "-iex",
+        "set auto-load off",
+        "-iex",
+        "set debuginfod enabled off",
+        "-p",
+        "691992",
+        "-ex",
+        "thread apply all bt 16",
+        "-ex",
+        "detach"
+      ],
+      "cwd": "/home/dahlia/orca/workspaces/oseo/perf-profiling",
+      "env": {
+        "PATH": "/home/dahlia/.cabal/bin:/home/dahlia/.bun/bin:/home/dahlia/.local/share/pnpm:/home/dahlia/.local/share/mise/installs/aqua-dahlia-hongdown/0.5.3:/home/dahlia/.local/share/mise/installs/aqua-nushell-nushell/0.116.0/.mise-bins:/home/dahlia/.local/share/mise/installs/ubi-jdx-jactionlint/2.1.0:/home/dahlia/.local/share/mise/installs/pnpm/12.18.0:/home/dahlia/.local/share/mise/installs/deno/2.9.7/bin:/home/dahlia/.local/share/mise/installs/deno/2.9.7/.deno/bin:/home/dahlia/.local/share/mise/installs/node/24.21.0/bin:/home/dahlia/.local/share/mise/installs/oxfmt/0.70.0/node_modules/.bin:/home/dahlia/.local/share/mise/installs/shellcheck/0.11.0/shellcheck-v0.11.0:/home/dahlia/.local/share/mise/installs/zig/0.16.0/bin:/home/dahlia/.local/share/mise/installs/python/latest/bin:/home/dahlia/.local/share/mise/installs/bun/latest/bin:/home/dahlia/.local/share/mise/installs/github-dahlia-dojang/latest:/home/dahlia/.local/share/mise/installs/claude-code/latest:/home/dahlia/.local/share/mise/installs/codex/latest/bin:/home/dahlia/.local/share/mise/installs/opencode/latest/node_modules/.bin:/home/dahlia/.local/share/mise/installs/antigravity-cli/latest:/home/dahlia/.local/share/mise/installs/npm-fedify-cli/latest/node_modules/.bin:/home/dahlia/.local/share/mise/installs/aws/latest/.mise-bins:/home/dahlia/.local/share/mise/installs/github-steipete-codex-bar/latest:/home/dahlia/.local/share/mise/installs/pypi-matrix-mcp/latest/bin:/home/dahlia/.local/share/mise/shims:/home/dahlia/.ghcup/bin:/home/dahlia/.local/bin:/home/dahlia/bin:/home/dahlia/.config/orca/codex-accounts/0be9f85b-a42b-4ef8-ae43-7b936f40efa7/home/tmp/arg0-linux/codex-arg0fuEOem:/home/dahlia/.config/orca/linux-orca-cli-shim:/home/dahlia/.cargo/bin:/usr/local/bin:/usr/bin:/home/dahlia/.dotnet/tools:/home/dahlia/.fzf/bin:/home/dahlia/.volta/bin:/home/dahlia/.asdf/shims:/home/dahlia/.fnm/aliases/default/bin:/home/dahlia/.yarn/bin:/opt/homebrew/bin:/opt/homebrew/sbin:/usr/local/sbin:/snap/bin:/home/linuxbrew/.linuxbrew/bin:/nix/var/nix/profiles/default/bin:/home/dahlia/.nix-profile/bin:/home/dahlia/.opencode/bin:/home/dahlia/.vite-plus/bin"
+      },
+      "startedUtc": "2026-11-08T21:04:15.764Z",
+      "finishedUtc": "2026-11-08T21:04:15.865Z",
+      "pid": 691993,
+      "status": 0,
+      "signal": null,
+      "error": null,
+      "timedOut": false,
+      "stdout": "capture-0.stdout",
+      "stderr": "capture-0.stderr",
+      "cleanup": [],
+      "groupGone": true
+    },
+    {
+      "argv": [
+        "/usr/libexec/gdb",
+        "--nx",
+        "--nh",
+        "--batch",
+        "-iex",
+        "set auto-load off",
+        "-iex",
+        "set debuginfod enabled off",
+        "-p",
+        "691992",
+        "-ex",
+        "thread apply all bt 16",
+        "-ex",
+        "detach"
+      ],
+      "cwd": "/home/dahlia/orca/workspaces/oseo/perf-profiling",
+      "env": {
+        "PATH": "/home/dahlia/.cabal/bin:/home/dahlia/.bun/bin:/home/dahlia/.local/share/pnpm:/home/dahlia/.local/share/mise/installs/aqua-dahlia-hongdown/0.5.3:/home/dahlia/.local/share/mise/installs/aqua-nushell-nushell/0.116.0/.mise-bins:/home/dahlia/.local/share/mise/installs/ubi-jdx-jactionlint/2.1.0:/home/dahlia/.local/share/mise/installs/pnpm/12.18.0:/home/dahlia/.local/share/mise/installs/deno/2.9.7/bin:/home/dahlia/.local/share/mise/installs/deno/2.9.7/.deno/bin:/home/dahlia/.local/share/mise/installs/node/24.21.0/bin:/home/dahlia/.local/share/mise/installs/oxfmt/0.70.0/node_modules/.bin:/home/dahlia/.local/share/mise/installs/shellcheck/0.11.0/shellcheck-v0.11.0:/home/dahlia/.local/share/mise/installs/zig/0.16.0/bin:/home/dahlia/.local/share/mise/installs/python/latest/bin:/home/dahlia/.local/share/mise/installs/bun/latest/bin:/home/dahlia/.local/share/mise/installs/github-dahlia-dojang/latest:/home/dahlia/.local/share/mise/installs/claude-code/latest:/home/dahlia/.local/share/mise/installs/codex/latest/bin:/home/dahlia/.local/share/mise/installs/opencode/latest/node_modules/.bin:/home/dahlia/.local/share/mise/installs/antigravity-cli/latest:/home/dahlia/.local/share/mise/installs/npm-fedify-cli/latest/node_modules/.bin:/home/dahlia/.local/share/mise/installs/aws/latest/.mise-bins:/home/dahlia/.local/share/mise/installs/github-steipete-codex-bar/latest:/home/dahlia/.local/share/mise/installs/pypi-matrix-mcp/latest/bin:/home/dahlia/.local/share/mise/shims:/home/dahlia/.ghcup/bin:/home/dahlia/.local/bin:/home/dahlia/bin:/home/dahlia/.config/orca/codex-accounts/0be9f85b-a42b-4ef8-ae43-7b936f40efa7/home/tmp/arg0-linux/codex-arg0fuEOem:/home/dahlia/.config/orca/linux-orca-cli-shim:/home/dahlia/.cargo/bin:/usr/local/bin:/usr/bin:/home/dahlia/.dotnet/tools:/home/dahlia/.fzf/bin:/home/dahlia/.volta/bin:/home/dahlia/.asdf/shims:/home/dahlia/.fnm/aliases/default/bin:/home/dahlia/.yarn/bin:/opt/homebrew/bin:/opt/homebrew/sbin:/usr/local/sbin:/snap/bin:/home/linuxbrew/.linuxbrew/bin:/nix/var/nix/profiles/default/bin:/home/dahlia/.nix-profile/bin:/home/dahlia/.opencode/bin:/home/dahlia/.vite-plus/bin"
+      },
+      "startedUtc": "2026-11-08T21:04:15.870Z",
+      "finishedUtc": "2026-11-08T21:04:15.963Z",
+      "pid": 692017,
+      "status": 0,
+      "signal": null,
+      "error": null,
+      "timedOut": false,
+      "stdout": "capture-1.stdout",
+      "stderr": "capture-1.stderr",
+      "cleanup": [],
+      "groupGone": true
+    },
+    {
+      "argv": [
+        "/usr/libexec/gdb",
+        "--nx",
+        "--nh",
+        "--batch",
+        "-iex",
+        "set auto-load off",
+        "-iex",
+        "set debuginfod enabled off",
+        "-p",
+        "691992",
+        "-ex",
+        "thread apply all bt 16",
+        "-ex",
+        "detach"
+      ],
+      "cwd": "/home/dahlia/orca/workspaces/oseo/perf-profiling",
+      "env": {
+        "PATH": "/home/dahlia/.cabal/bin:/home/dahlia/.bun/bin:/home/dahlia/.local/share/pnpm:/home/dahlia/.local/share/mise/installs/aqua-dahlia-hongdown/0.5.3:/home/dahlia/.local/share/mise/installs/aqua-nushell-nushell/0.116.0/.mise-bins:/home/dahlia/.local/share/mise/installs/ubi-jdx-jactionlint/2.1.0:/home/dahlia/.local/share/mise/installs/pnpm/12.18.0:/home/dahlia/.local/share/mise/installs/deno/2.9.7/bin:/home/dahlia/.local/share/mise/installs/deno/2.9.7/.deno/bin:/home/dahlia/.local/share/mise/installs/node/24.21.0/bin:/home/dahlia/.local/share/mise/installs/oxfmt/0.70.0/node_modules/.bin:/home/dahlia/.local/share/mise/installs/shellcheck/0.11.0/shellcheck-v0.11.0:/home/dahlia/.local/share/mise/installs/zig/0.16.0/bin:/home/dahlia/.local/share/mise/installs/python/latest/bin:/home/dahlia/.local/share/mise/installs/bun/latest/bin:/home/dahlia/.local/share/mise/installs/github-dahlia-dojang/latest:/home/dahlia/.local/share/mise/installs/claude-code/latest:/home/dahlia/.local/share/mise/installs/codex/latest/bin:/home/dahlia/.local/share/mise/installs/opencode/latest/node_modules/.bin:/home/dahlia/.local/share/mise/installs/antigravity-cli/latest:/home/dahlia/.local/share/mise/installs/npm-fedify-cli/latest/node_modules/.bin:/home/dahlia/.local/share/mise/installs/aws/latest/.mise-bins:/home/dahlia/.local/share/mise/installs/github-steipete-codex-bar/latest:/home/dahlia/.local/share/mise/installs/pypi-matrix-mcp/latest/bin:/home/dahlia/.local/share/mise/shims:/home/dahlia/.ghcup/bin:/home/dahlia/.local/bin:/home/dahlia/bin:/home/dahlia/.config/orca/codex-accounts/0be9f85b-a42b-4ef8-ae43-7b936f40efa7/home/tmp/arg0-linux/codex-arg0fuEOem:/home/dahlia/.config/orca/linux-orca-cli-shim:/home/dahlia/.cargo/bin:/usr/local/bin:/usr/bin:/home/dahlia/.dotnet/tools:/home/dahlia/.fzf/bin:/home/dahlia/.volta/bin:/home/dahlia/.asdf/shims:/home/dahlia/.fnm/aliases/default/bin:/home/dahlia/.yarn/bin:/opt/homebrew/bin:/opt/homebrew/sbin:/usr/local/sbin:/snap/bin:/home/linuxbrew/.linuxbrew/bin:/nix/var/nix/profiles/default/bin:/home/dahlia/.nix-profile/bin:/home/dahlia/.opencode/bin:/home/dahlia/.vite-plus/bin"
+      },
+      "startedUtc": "2026-11-08T21:04:15.968Z",
+      "finishedUtc": "2026-11-08T21:04:16.062Z",
+      "pid": 692029,
+      "status": 0,
+      "signal": null,
+      "error": null,
+      "timedOut": false,
+      "stdout": "capture-2.stdout",
+      "stderr": "capture-2.stderr",
+      "cleanup": [],
+      "groupGone": true
+    },
+    {
+      "argv": [
+        "/usr/libexec/gdb",
+        "--nx",
+        "--nh",
+        "--batch",
+        "-iex",
+        "set auto-load off",
+        "-iex",
+        "set debuginfod enabled off",
+        "-p",
+        "691992",
+        "-ex",
+        "thread apply all bt 16",
+        "-ex",
+        "detach"
+      ],
+      "cwd": "/home/dahlia/orca/workspaces/oseo/perf-profiling",
+      "env": {
+        "PATH": "/home/dahlia/.cabal/bin:/home/dahlia/.bun/bin:/home/dahlia/.local/share/pnpm:/home/dahlia/.local/share/mise/installs/aqua-dahlia-hongdown/0.5.3:/home/dahlia/.local/share/mise/installs/aqua-nushell-nushell/0.116.0/.mise-bins:/home/dahlia/.local/share/mise/installs/ubi-jdx-jactionlint/2.1.0:/home/dahlia/.local/share/mise/installs/pnpm/12.18.0:/home/dahlia/.local/share/mise/installs/deno/2.9.7/bin:/home/dahlia/.local/share/mise/installs/deno/2.9.7/.deno/bin:/home/dahlia/.local/share/mise/installs/node/24.21.0/bin:/home/dahlia/.local/share/mise/installs/oxfmt/0.70.0/node_modules/.bin:/home/dahlia/.local/share/mise/installs/shellcheck/0.11.0/shellcheck-v0.11.0:/home/dahlia/.local/share/mise/installs/zig/0.16.0/bin:/home/dahlia/.local/share/mise/installs/python/latest/bin:/home/dahlia/.local/share/mise/installs/bun/latest/bin:/home/dahlia/.local/share/mise/installs/github-dahlia-dojang/latest:/home/dahlia/.local/share/mise/installs/claude-code/latest:/home/dahlia/.local/share/mise/installs/codex/latest/bin:/home/dahlia/.local/share/mise/installs/opencode/latest/node_modules/.bin:/home/dahlia/.local/share/mise/installs/antigravity-cli/latest:/home/dahlia/.local/share/mise/installs/npm-fedify-cli/latest/node_modules/.bin:/home/dahlia/.local/share/mise/installs/aws/latest/.mise-bins:/home/dahlia/.local/share/mise/installs/github-steipete-codex-bar/latest:/home/dahlia/.local/share/mise/installs/pypi-matrix-mcp/latest/bin:/home/dahlia/.local/share/mise/shims:/home/dahlia/.ghcup/bin:/home/dahlia/.local/bin:/home/dahlia/bin:/home/dahlia/.config/orca/codex-accounts/0be9f85b-a42b-4ef8-ae43-7b936f40efa7/home/tmp/arg0-linux/codex-arg0fuEOem:/home/dahlia/.config/orca/linux-orca-cli-shim:/home/dahlia/.cargo/bin:/usr/local/bin:/usr/bin:/home/dahlia/.dotnet/tools:/home/dahlia/.fzf/bin:/home/dahlia/.volta/bin:/home/dahlia/.asdf/shims:/home/dahlia/.fnm/aliases/default/bin:/home/dahlia/.yarn/bin:/opt/homebrew/bin:/opt/homebrew/sbin:/usr/local/sbin:/snap/bin:/home/linuxbrew/.linuxbrew/bin:/nix/var/nix/profiles/default/bin:/home/dahlia/.nix-profile/bin:/home/dahlia/.opencode/bin:/home/dahlia/.vite-plus/bin"
+      },
+      "startedUtc": "2026-11-08T21:04:16.066Z",
+      "finishedUtc": "2026-11-08T21:04:16.165Z",
+      "pid": 692041,
+      "status": 0,
+      "signal": null,
+      "error": null,
+      "timedOut": false,
+      "stdout": "capture-3.stdout",
+      "stderr": "capture-3.stderr",
+      "cleanup": [],
+      "groupGone": true
+    },
+    {
+      "argv": [
+        "/usr/libexec/gdb",
+        "--nx",
+        "--nh",
+        "--batch",
+        "-iex",
+        "set auto-load off",
+        "-iex",
+        "set debuginfod enabled off",
+        "-p",
+        "691992",
+        "-ex",
+        "thread apply all bt 16",
+        "-ex",
+        "detach"
+      ],
+      "cwd": "/home/dahlia/orca/workspaces/oseo/perf-profiling",
+      "env": {
+        "PATH": "/home/dahlia/.cabal/bin:/home/dahlia/.bun/bin:/home/dahlia/.local/share/pnpm:/home/dahlia/.local/share/mise/installs/aqua-dahlia-hongdown/0.5.3:/home/dahlia/.local/share/mise/installs/aqua-nushell-nushell/0.116.0/.mise-bins:/home/dahlia/.local/share/mise/installs/ubi-jdx-jactionlint/2.1.0:/home/dahlia/.local/share/mise/installs/pnpm/12.18.0:/home/dahlia/.local/share/mise/installs/deno/2.9.7/bin:/home/dahlia/.local/share/mise/installs/deno/2.9.7/.deno/bin:/home/dahlia/.local/share/mise/installs/node/24.21.0/bin:/home/dahlia/.local/share/mise/installs/oxfmt/0.70.0/node_modules/.bin:/home/dahlia/.local/share/mise/installs/shellcheck/0.11.0/shellcheck-v0.11.0:/home/dahlia/.local/share/mise/installs/zig/0.16.0/bin:/home/dahlia/.local/share/mise/installs/python/latest/bin:/home/dahlia/.local/share/mise/installs/bun/latest/bin:/home/dahlia/.local/share/mise/installs/github-dahlia-dojang/latest:/home/dahlia/.local/share/mise/installs/claude-code/latest:/home/dahlia/.local/share/mise/installs/codex/latest/bin:/home/dahlia/.local/share/mise/installs/opencode/latest/node_modules/.bin:/home/dahlia/.local/share/mise/installs/antigravity-cli/latest:/home/dahlia/.local/share/mise/installs/npm-fedify-cli/latest/node_modules/.bin:/home/dahlia/.local/share/mise/installs/aws/latest/.mise-bins:/home/dahlia/.local/share/mise/installs/github-steipete-codex-bar/latest:/home/dahlia/.local/share/mise/installs/pypi-matrix-mcp/latest/bin:/home/dahlia/.local/share/mise/shims:/home/dahlia/.ghcup/bin:/home/dahlia/.local/bin:/home/dahlia/bin:/home/dahlia/.config/orca/codex-accounts/0be9f85b-a42b-4ef8-ae43-7b936f40efa7/home/tmp/arg0-linux/codex-arg0fuEOem:/home/dahlia/.config/orca/linux-orca-cli-shim:/home/dahlia/.cargo/bin:/usr/local/bin:/usr/bin:/home/dahlia/.dotnet/tools:/home/dahlia/.fzf/bin:/home/dahlia/.volta/bin:/home/dahlia/.asdf/shims:/home/dahlia/.fnm/aliases/default/bin:/home/dahlia/.yarn/bin:/opt/homebrew/bin:/opt/homebrew/sbin:/usr/local/sbin:/snap/bin:/home/linuxbrew/.linuxbrew/bin:/nix/var/nix/profiles/default/bin:/home/dahlia/.nix-profile/bin:/home/dahlia/.opencode/bin:/home/dahlia/.vite-plus/bin"
+      },
+      "startedUtc": "2026-11-08T21:04:16.169Z",
+      "finishedUtc": "2026-11-08T21:04:16.266Z",
+      "pid": 692057,
+      "status": 0,
+      "signal": null,
+      "error": null,
+      "timedOut": false,
+      "stdout": "capture-4.stdout",
+      "stderr": "capture-4.stderr",
+      "cleanup": [],
+      "groupGone": true
+    },
+    {
+      "argv": [
+        "/usr/libexec/gdb",
+        "--nx",
+        "--nh",
+        "--batch",
+        "-iex",
+        "set auto-load off",
+        "-iex",
+        "set debuginfod enabled off",
+        "-p",
+        "691992",
+        "-ex",
+        "thread apply all bt 16",
+        "-ex",
+        "detach"
+      ],
+      "cwd": "/home/dahlia/orca/workspaces/oseo/perf-profiling",
+      "env": {
+        "PATH": "/home/dahlia/.cabal/bin:/home/dahlia/.bun/bin:/home/dahlia/.local/share/pnpm:/home/dahlia/.local/share/mise/installs/aqua-dahlia-hongdown/0.5.3:/home/dahlia/.local/share/mise/installs/aqua-nushell-nushell/0.116.0/.mise-bins:/home/dahlia/.local/share/mise/installs/ubi-jdx-jactionlint/2.1.0:/home/dahlia/.local/share/mise/installs/pnpm/12.18.0:/home/dahlia/.local/share/mise/installs/deno/2.9.7/bin:/home/dahlia/.local/share/mise/installs/deno/2.9.7/.deno/bin:/home/dahlia/.local/share/mise/installs/node/24.21.0/bin:/home/dahlia/.local/share/mise/installs/oxfmt/0.70.0/node_modules/.bin:/home/dahlia/.local/share/mise/installs/shellcheck/0.11.0/shellcheck-v0.11.0:/home/dahlia/.local/share/mise/installs/zig/0.16.0/bin:/home/dahlia/.local/share/mise/installs/python/latest/bin:/home/dahlia/.local/share/mise/installs/bun/latest/bin:/home/dahlia/.local/share/mise/installs/github-dahlia-dojang/latest:/home/dahlia/.local/share/mise/installs/claude-code/latest:/home/dahlia/.local/share/mise/installs/codex/latest/bin:/home/dahlia/.local/share/mise/installs/opencode/latest/node_modules/.bin:/home/dahlia/.local/share/mise/installs/antigravity-cli/latest:/home/dahlia/.local/share/mise/installs/npm-fedify-cli/latest/node_modules/.bin:/home/dahlia/.local/share/mise/installs/aws/latest/.mise-bins:/home/dahlia/.local/share/mise/installs/github-steipete-codex-bar/latest:/home/dahlia/.local/share/mise/installs/pypi-matrix-mcp/latest/bin:/home/dahlia/.local/share/mise/shims:/home/dahlia/.ghcup/bin:/home/dahlia/.local/bin:/home/dahlia/bin:/home/dahlia/.config/orca/codex-accounts/0be9f85b-a42b-4ef8-ae43-7b936f40efa7/home/tmp/arg0-linux/codex-arg0fuEOem:/home/dahlia/.config/orca/linux-orca-cli-shim:/home/dahlia/.cargo/bin:/usr/local/bin:/usr/bin:/home/dahlia/.dotnet/tools:/home/dahlia/.fzf/bin:/home/dahlia/.volta/bin:/home/dahlia/.asdf/shims:/home/dahlia/.fnm/aliases/default/bin:/home/dahlia/.yarn/bin:/opt/homebrew/bin:/opt/homebrew/sbin:/usr/local/sbin:/snap/bin:/home/linuxbrew/.linuxbrew/bin:/nix/var/nix/profiles/default/bin:/home/dahlia/.nix-profile/bin:/home/dahlia/.opencode/bin:/home/dahlia/.vite-plus/bin"
+      },
+      "startedUtc": "2026-11-08T21:04:16.271Z",
+      "finishedUtc": "2026-11-08T21:04:16.364Z",
+      "pid": 692070,
+      "status": 0,
+      "signal": null,
+      "error": null,
+      "timedOut": false,
+      "stdout": "capture-5.stdout",
+      "stderr": "capture-5.stderr",
+      "cleanup": [],
+      "groupGone": true
+    },
+    {
+      "argv": [
+        "/usr/libexec/gdb",
+        "--nx",
+        "--nh",
+        "--batch",
+        "-iex",
+        "set auto-load off",
+        "-iex",
+        "set debuginfod enabled off",
+        "-p",
+        "691992",
+        "-ex",
+        "thread apply all bt 16",
+        "-ex",
+        "detach"
+      ],
+      "cwd": "/home/dahlia/orca/workspaces/oseo/perf-profiling",
+      "env": {
+        "PATH": "/home/dahlia/.cabal/bin:/home/dahlia/.bun/bin:/home/dahlia/.local/share/pnpm:/home/dahlia/.local/share/mise/installs/aqua-dahlia-hongdown/0.5.3:/home/dahlia/.local/share/mise/installs/aqua-nushell-nushell/0.116.0/.mise-bins:/home/dahlia/.local/share/mise/installs/ubi-jdx-jactionlint/2.1.0:/home/dahlia/.local/share/mise/installs/pnpm/12.18.0:/home/dahlia/.local/share/mise/installs/deno/2.9.7/bin:/home/dahlia/.local/share/mise/installs/deno/2.9.7/.deno/bin:/home/dahlia/.local/share/mise/installs/node/24.21.0/bin:/home/dahlia/.local/share/mise/installs/oxfmt/0.70.0/node_modules/.bin:/home/dahlia/.local/share/mise/installs/shellcheck/0.11.0/shellcheck-v0.11.0:/home/dahlia/.local/share/mise/installs/zig/0.16.0/bin:/home/dahlia/.local/share/mise/installs/python/latest/bin:/home/dahlia/.local/share/mise/installs/bun/latest/bin:/home/dahlia/.local/share/mise/installs/github-dahlia-dojang/latest:/home/dahlia/.local/share/mise/installs/claude-code/latest:/home/dahlia/.local/share/mise/installs/codex/latest/bin:/home/dahlia/.local/share/mise/installs/opencode/latest/node_modules/.bin:/home/dahlia/.local/share/mise/installs/antigravity-cli/latest:/home/dahlia/.local/share/mise/installs/npm-fedify-cli/latest/node_modules/.bin:/home/dahlia/.local/share/mise/installs/aws/latest/.mise-bins:/home/dahlia/.local/share/mise/installs/github-steipete-codex-bar/latest:/home/dahlia/.local/share/mise/installs/pypi-matrix-mcp/latest/bin:/home/dahlia/.local/share/mise/shims:/home/dahlia/.ghcup/bin:/home/dahlia/.local/bin:/home/dahlia/bin:/home/dahlia/.config/orca/codex-accounts/0be9f85b-a42b-4ef8-ae43-7b936f40efa7/home/tmp/arg0-linux/codex-arg0fuEOem:/home/dahlia/.config/orca/linux-orca-cli-shim:/home/dahlia/.cargo/bin:/usr/local/bin:/usr/bin:/home/dahlia/.dotnet/tools:/home/dahlia/.fzf/bin:/home/dahlia/.volta/bin:/home/dahlia/.asdf/shims:/home/dahlia/.fnm/aliases/default/bin:/home/dahlia/.yarn/bin:/opt/homebrew/bin:/opt/homebrew/sbin:/usr/local/sbin:/snap/bin:/home/linuxbrew/.linuxbrew/bin:/nix/var/nix/profiles/default/bin:/home/dahlia/.nix-profile/bin:/home/dahlia/.opencode/bin:/home/dahlia/.vite-plus/bin"
+      },
+      "startedUtc": "2026-11-08T21:04:16.369Z",
+      "finishedUtc": "2026-11-08T21:04:16.464Z",
+      "pid": 692082,
+      "status": 0,
+      "signal": null,
+      "error": null,
+      "timedOut": false,
+      "stdout": "capture-6.stdout",
+      "stderr": "capture-6.stderr",
+      "cleanup": [],
+      "groupGone": true
+    },
+    {
+      "argv": [
+        "/usr/libexec/gdb",
+        "--nx",
+        "--nh",
+        "--batch",
+        "-iex",
+        "set auto-load off",
+        "-iex",
+        "set debuginfod enabled off",
+        "-p",
+        "691992",
+        "-ex",
+        "thread apply all bt 16",
+        "-ex",
+        "detach"
+      ],
+      "cwd": "/home/dahlia/orca/workspaces/oseo/perf-profiling",
+      "env": {
+        "PATH": "/home/dahlia/.cabal/bin:/home/dahlia/.bun/bin:/home/dahlia/.local/share/pnpm:/home/dahlia/.local/share/mise/installs/aqua-dahlia-hongdown/0.5.3:/home/dahlia/.local/share/mise/installs/aqua-nushell-nushell/0.116.0/.mise-bins:/home/dahlia/.local/share/mise/installs/ubi-jdx-jactionlint/2.1.0:/home/dahlia/.local/share/mise/installs/pnpm/12.18.0:/home/dahlia/.local/share/mise/installs/deno/2.9.7/bin:/home/dahlia/.local/share/mise/installs/deno/2.9.7/.deno/bin:/home/dahlia/.local/share/mise/installs/node/24.21.0/bin:/home/dahlia/.local/share/mise/installs/oxfmt/0.70.0/node_modules/.bin:/home/dahlia/.local/share/mise/installs/shellcheck/0.11.0/shellcheck-v0.11.0:/home/dahlia/.local/share/mise/installs/zig/0.16.0/bin:/home/dahlia/.local/share/mise/installs/python/latest/bin:/home/dahlia/.local/share/mise/installs/bun/latest/bin:/home/dahlia/.local/share/mise/installs/github-dahlia-dojang/latest:/home/dahlia/.local/share/mise/installs/claude-code/latest:/home/dahlia/.local/share/mise/installs/codex/latest/bin:/home/dahlia/.local/share/mise/installs/opencode/latest/node_modules/.bin:/home/dahlia/.local/share/mise/installs/antigravity-cli/latest:/home/dahlia/.local/share/mise/installs/npm-fedify-cli/latest/node_modules/.bin:/home/dahlia/.local/share/mise/installs/aws/latest/.mise-bins:/home/dahlia/.local/share/mise/installs/github-steipete-codex-bar/latest:/home/dahlia/.local/share/mise/installs/pypi-matrix-mcp/latest/bin:/home/dahlia/.local/share/mise/shims:/home/dahlia/.ghcup/bin:/home/dahlia/.local/bin:/home/dahlia/bin:/home/dahlia/.config/orca/codex-accounts/0be9f85b-a42b-4ef8-ae43-7b936f40efa7/home/tmp/arg0-linux/codex-arg0fuEOem:/home/dahlia/.config/orca/linux-orca-cli-shim:/home/dahlia/.cargo/bin:/usr/local/bin:/usr/bin:/home/dahlia/.dotnet/tools:/home/dahlia/.fzf/bin:/home/dahlia/.volta/bin:/home/dahlia/.asdf/shims:/home/dahlia/.fnm/aliases/default/bin:/home/dahlia/.yarn/bin:/opt/homebrew/bin:/opt/homebrew/sbin:/usr/local/sbin:/snap/bin:/home/linuxbrew/.linuxbrew/bin:/nix/var/nix/profiles/default/bin:/home/dahlia/.nix-profile/bin:/home/dahlia/.opencode/bin:/home/dahlia/.vite-plus/bin"
+      },
+      "startedUtc": "2026-11-08T21:04:16.469Z",
+      "finishedUtc": "2026-11-08T21:04:16.566Z",
+      "pid": 692094,
+      "status": 0,
+      "signal": null,
+      "error": null,
+      "timedOut": false,
+      "stdout": "capture-7.stdout",
+      "stderr": "capture-7.stderr",
+      "cleanup": [],
+      "groupGone": true
+    },
+    {
+      "argv": [
+        "/usr/bin/readelf",
+        "-n",
+        "/home/dahlia/.local/state/oseo-preview/lanes/perf-profiling/capture-ci-20261109/linux-smoke-a/build/fixture-linux-x86_64-gnu"
+      ],
+      "cwd": "/home/dahlia/orca/workspaces/oseo/perf-profiling",
+      "env": {
+        "PATH": "/home/dahlia/.cabal/bin:/home/dahlia/.bun/bin:/home/dahlia/.local/share/pnpm:/home/dahlia/.local/share/mise/installs/aqua-dahlia-hongdown/0.5.3:/home/dahlia/.local/share/mise/installs/aqua-nushell-nushell/0.116.0/.mise-bins:/home/dahlia/.local/share/mise/installs/ubi-jdx-jactionlint/2.1.0:/home/dahlia/.local/share/mise/installs/pnpm/12.18.0:/home/dahlia/.local/share/mise/installs/deno/2.9.7/bin:/home/dahlia/.local/share/mise/installs/deno/2.9.7/.deno/bin:/home/dahlia/.local/share/mise/installs/node/24.21.0/bin:/home/dahlia/.local/share/mise/installs/oxfmt/0.70.0/node_modules/.bin:/home/dahlia/.local/share/mise/installs/shellcheck/0.11.0/shellcheck-v0.11.0:/home/dahlia/.local/share/mise/installs/zig/0.16.0/bin:/home/dahlia/.local/share/mise/installs/python/latest/bin:/home/dahlia/.local/share/mise/installs/bun/latest/bin:/home/dahlia/.local/share/mise/installs/github-dahlia-dojang/latest:/home/dahlia/.local/share/mise/installs/claude-code/latest:/home/dahlia/.local/share/mise/installs/codex/latest/bin:/home/dahlia/.local/share/mise/installs/opencode/latest/node_modules/.bin:/home/dahlia/.local/share/mise/installs/antigravity-cli/latest:/home/dahlia/.local/share/mise/installs/npm-fedify-cli/latest/node_modules/.bin:/home/dahlia/.local/share/mise/installs/aws/latest/.mise-bins:/home/dahlia/.local/share/mise/installs/github-steipete-codex-bar/latest:/home/dahlia/.local/share/mise/installs/pypi-matrix-mcp/latest/bin:/home/dahlia/.local/share/mise/shims:/home/dahlia/.ghcup/bin:/home/dahlia/.local/bin:/home/dahlia/bin:/home/dahlia/.config/orca/codex-accounts/0be9f85b-a42b-4ef8-ae43-7b936f40efa7/home/tmp/arg0-linux/codex-arg0fuEOem:/home/dahlia/.config/orca/linux-orca-cli-shim:/home/dahlia/.cargo/bin:/usr/local/bin:/usr/bin:/home/dahlia/.dotnet/tools:/home/dahlia/.fzf/bin:/home/dahlia/.volta/bin:/home/dahlia/.asdf/shims:/home/dahlia/.fnm/aliases/default/bin:/home/dahlia/.yarn/bin:/opt/homebrew/bin:/opt/homebrew/sbin:/usr/local/sbin:/snap/bin:/home/linuxbrew/.linuxbrew/bin:/nix/var/nix/profiles/default/bin:/home/dahlia/.nix-profile/bin:/home/dahlia/.opencode/bin:/home/dahlia/.vite-plus/bin"
+      },
+      "startedUtc": "2026-11-08T21:04:19.049Z",
+      "finishedUtc": "2026-11-08T21:04:19.056Z",
+      "pid": 692274,
+      "status": 0,
+      "signal": null,
+      "error": null,
+      "timedOut": false,
+      "stdout": "symbols-after.stdout",
+      "stderr": "symbols-after.stderr",
+      "cleanup": [],
+      "groupGone": true
+    }
+  ],
+  "lifetimes": [
+    {
+      "argv": [
+        "/usr/bin/readelf",
+        "-n",
+        "/home/dahlia/.local/state/oseo-preview/lanes/perf-profiling/capture-ci-20261109/linux-smoke-a/build/fixture-linux-x86_64-gnu"
+      ],
+      "cwd": "/home/dahlia/orca/workspaces/oseo/perf-profiling",
+      "env": {
+        "PATH": "/home/dahlia/.cabal/bin:/home/dahlia/.bun/bin:/home/dahlia/.local/share/pnpm:/home/dahlia/.local/share/mise/installs/aqua-dahlia-hongdown/0.5.3:/home/dahlia/.local/share/mise/installs/aqua-nushell-nushell/0.116.0/.mise-bins:/home/dahlia/.local/share/mise/installs/ubi-jdx-jactionlint/2.1.0:/home/dahlia/.local/share/mise/installs/pnpm/12.18.0:/home/dahlia/.local/share/mise/installs/deno/2.9.7/bin:/home/dahlia/.local/share/mise/installs/deno/2.9.7/.deno/bin:/home/dahlia/.local/share/mise/installs/node/24.21.0/bin:/home/dahlia/.local/share/mise/installs/oxfmt/0.70.0/node_modules/.bin:/home/dahlia/.local/share/mise/installs/shellcheck/0.11.0/shellcheck-v0.11.0:/home/dahlia/.local/share/mise/installs/zig/0.16.0/bin:/home/dahlia/.local/share/mise/installs/python/latest/bin:/home/dahlia/.local/share/mise/installs/bun/latest/bin:/home/dahlia/.local/share/mise/installs/github-dahlia-dojang/latest:/home/dahlia/.local/share/mise/installs/claude-code/latest:/home/dahlia/.local/share/mise/installs/codex/latest/bin:/home/dahlia/.local/share/mise/installs/opencode/latest/node_modules/.bin:/home/dahlia/.local/share/mise/installs/antigravity-cli/latest:/home/dahlia/.local/share/mise/installs/npm-fedify-cli/latest/node_modules/.bin:/home/dahlia/.local/share/mise/installs/aws/latest/.mise-bins:/home/dahlia/.local/share/mise/installs/github-steipete-codex-bar/latest:/home/dahlia/.local/share/mise/installs/pypi-matrix-mcp/latest/bin:/home/dahlia/.local/share/mise/shims:/home/dahlia/.ghcup/bin:/home/dahlia/.local/bin:/home/dahlia/bin:/home/dahlia/.config/orca/codex-accounts/0be9f85b-a42b-4ef8-ae43-7b936f40efa7/home/tmp/arg0-linux/codex-arg0fuEOem:/home/dahlia/.config/orca/linux-orca-cli-shim:/home/dahlia/.cargo/bin:/usr/local/bin:/usr/bin:/home/dahlia/.dotnet/tools:/home/dahlia/.fzf/bin:/home/dahlia/.volta/bin:/home/dahlia/.asdf/shims:/home/dahlia/.fnm/aliases/default/bin:/home/dahlia/.yarn/bin:/opt/homebrew/bin:/opt/homebrew/sbin:/usr/local/sbin:/snap/bin:/home/linuxbrew/.linuxbrew/bin:/nix/var/nix/profiles/default/bin:/home/dahlia/.nix-profile/bin:/home/dahlia/.opencode/bin:/home/dahlia/.vite-plus/bin"
+      },
+      "startedUtc": "2026-11-08T21:04:12.661Z",
+      "finishedUtc": "2026-11-08T21:04:12.666Z",
+      "pid": 691896,
+      "status": 0,
+      "signal": null,
+      "error": null,
+      "timedOut": false,
+      "stdout": "symbols-before.stdout",
+      "stderr": "symbols-before.stderr",
+      "cleanup": [],
+      "groupGone": true
+    },
+    {
+      "argv": [
+        "/home/dahlia/.local/state/oseo-preview/lanes/perf-profiling/capture-ci-20261109/linux-smoke-a/build/fixture-linux-x86_64-gnu"
+      ],
+      "cwd": "/home/dahlia/.local/state/oseo-preview/lanes/perf-profiling/capture-ci-20261109/linux-smoke-a",
+      "env": {},
+      "startedUtc": "2026-11-08T21:04:12.667Z",
+      "finishedUtc": "2026-11-08T21:04:15.707Z",
+      "pid": 691897,
+      "status": 0,
+      "signal": null,
+      "error": null,
+      "timedOut": false,
+      "stdout": "preflight.stdout",
+      "stderr": "preflight.stderr",
+      "cleanup": [],
+      "groupGone": true
+    },
+    {
+      "argv": [
+        "/home/dahlia/.local/state/oseo-preview/lanes/perf-profiling/capture-ci-20261109/linux-smoke-a/build/fixture-linux-x86_64-gnu"
+      ],
+      "cwd": "/home/dahlia/.local/state/oseo-preview/lanes/perf-profiling/capture-ci-20261109/linux-smoke-a",
+      "env": {},
+      "startedUtc": "2026-11-08T21:04:15.707Z",
+      "finishedUtc": "2026-11-08T21:04:19.049Z",
+      "pid": 691992,
+      "status": 0,
+      "signal": null,
+      "error": null,
+      "timedOut": false,
+      "stdout": "target.stdout",
+      "stderr": "target.stderr",
+      "cleanup": [],
+      "groupGone": true
+    },
+    {
+      "argv": [
+        "/usr/libexec/gdb",
+        "--nx",
+        "--nh",
+        "--batch",
+        "-iex",
+        "set auto-load off",
+        "-iex",
+        "set debuginfod enabled off",
+        "-p",
+        "691992",
+        "-ex",
+        "thread apply all bt 16",
+        "-ex",
+        "detach"
+      ],
+      "cwd": "/home/dahlia/orca/workspaces/oseo/perf-profiling",
+      "env": {
+        "PATH": "/home/dahlia/.cabal/bin:/home/dahlia/.bun/bin:/home/dahlia/.local/share/pnpm:/home/dahlia/.local/share/mise/installs/aqua-dahlia-hongdown/0.5.3:/home/dahlia/.local/share/mise/installs/aqua-nushell-nushell/0.116.0/.mise-bins:/home/dahlia/.local/share/mise/installs/ubi-jdx-jactionlint/2.1.0:/home/dahlia/.local/share/mise/installs/pnpm/12.18.0:/home/dahlia/.local/share/mise/installs/deno/2.9.7/bin:/home/dahlia/.local/share/mise/installs/deno/2.9.7/.deno/bin:/home/dahlia/.local/share/mise/installs/node/24.21.0/bin:/home/dahlia/.local/share/mise/installs/oxfmt/0.70.0/node_modules/.bin:/home/dahlia/.local/share/mise/installs/shellcheck/0.11.0/shellcheck-v0.11.0:/home/dahlia/.local/share/mise/installs/zig/0.16.0/bin:/home/dahlia/.local/share/mise/installs/python/latest/bin:/home/dahlia/.local/share/mise/installs/bun/latest/bin:/home/dahlia/.local/share/mise/installs/github-dahlia-dojang/latest:/home/dahlia/.local/share/mise/installs/claude-code/latest:/home/dahlia/.local/share/mise/installs/codex/latest/bin:/home/dahlia/.local/share/mise/installs/opencode/latest/node_modules/.bin:/home/dahlia/.local/share/mise/installs/antigravity-cli/latest:/home/dahlia/.local/share/mise/installs/npm-fedify-cli/latest/node_modules/.bin:/home/dahlia/.local/share/mise/installs/aws/latest/.mise-bins:/home/dahlia/.local/share/mise/installs/github-steipete-codex-bar/latest:/home/dahlia/.local/share/mise/installs/pypi-matrix-mcp/latest/bin:/home/dahlia/.local/share/mise/shims:/home/dahlia/.ghcup/bin:/home/dahlia/.local/bin:/home/dahlia/bin:/home/dahlia/.config/orca/codex-accounts/0be9f85b-a42b-4ef8-ae43-7b936f40efa7/home/tmp/arg0-linux/codex-arg0fuEOem:/home/dahlia/.config/orca/linux-orca-cli-shim:/home/dahlia/.cargo/bin:/usr/local/bin:/usr/bin:/home/dahlia/.dotnet/tools:/home/dahlia/.fzf/bin:/home/dahlia/.volta/bin:/home/dahlia/.asdf/shims:/home/dahlia/.fnm/aliases/default/bin:/home/dahlia/.yarn/bin:/opt/homebrew/bin:/opt/homebrew/sbin:/usr/local/sbin:/snap/bin:/home/linuxbrew/.linuxbrew/bin:/nix/var/nix/profiles/default/bin:/home/dahlia/.nix-profile/bin:/home/dahlia/.opencode/bin:/home/dahlia/.vite-plus/bin"
+      },
+      "startedUtc": "2026-11-08T21:04:15.764Z",
+      "finishedUtc": "2026-11-08T21:04:15.865Z",
+      "pid": 691993,
+      "status": 0,
+      "signal": null,
+      "error": null,
+      "timedOut": false,
+      "stdout": "capture-0.stdout",
+      "stderr": "capture-0.stderr",
+      "cleanup": [],
+      "groupGone": true
+    },
+    {
+      "argv": [
+        "/usr/libexec/gdb",
+        "--nx",
+        "--nh",
+        "--batch",
+        "-iex",
+        "set auto-load off",
+        "-iex",
+        "set debuginfod enabled off",
+        "-p",
+        "691992",
+        "-ex",
+        "thread apply all bt 16",
+        "-ex",
+        "detach"
+      ],
+      "cwd": "/home/dahlia/orca/workspaces/oseo/perf-profiling",
+      "env": {
+        "PATH": "/home/dahlia/.cabal/bin:/home/dahlia/.bun/bin:/home/dahlia/.local/share/pnpm:/home/dahlia/.local/share/mise/installs/aqua-dahlia-hongdown/0.5.3:/home/dahlia/.local/share/mise/installs/aqua-nushell-nushell/0.116.0/.mise-bins:/home/dahlia/.local/share/mise/installs/ubi-jdx-jactionlint/2.1.0:/home/dahlia/.local/share/mise/installs/pnpm/12.18.0:/home/dahlia/.local/share/mise/installs/deno/2.9.7/bin:/home/dahlia/.local/share/mise/installs/deno/2.9.7/.deno/bin:/home/dahlia/.local/share/mise/installs/node/24.21.0/bin:/home/dahlia/.local/share/mise/installs/oxfmt/0.70.0/node_modules/.bin:/home/dahlia/.local/share/mise/installs/shellcheck/0.11.0/shellcheck-v0.11.0:/home/dahlia/.local/share/mise/installs/zig/0.16.0/bin:/home/dahlia/.local/share/mise/installs/python/latest/bin:/home/dahlia/.local/share/mise/installs/bun/latest/bin:/home/dahlia/.local/share/mise/installs/github-dahlia-dojang/latest:/home/dahlia/.local/share/mise/installs/claude-code/latest:/home/dahlia/.local/share/mise/installs/codex/latest/bin:/home/dahlia/.local/share/mise/installs/opencode/latest/node_modules/.bin:/home/dahlia/.local/share/mise/installs/antigravity-cli/latest:/home/dahlia/.local/share/mise/installs/npm-fedify-cli/latest/node_modules/.bin:/home/dahlia/.local/share/mise/installs/aws/latest/.mise-bins:/home/dahlia/.local/share/mise/installs/github-steipete-codex-bar/latest:/home/dahlia/.local/share/mise/installs/pypi-matrix-mcp/latest/bin:/home/dahlia/.local/share/mise/shims:/home/dahlia/.ghcup/bin:/home/dahlia/.local/bin:/home/dahlia/bin:/home/dahlia/.config/orca/codex-accounts/0be9f85b-a42b-4ef8-ae43-7b936f40efa7/home/tmp/arg0-linux/codex-arg0fuEOem:/home/dahlia/.config/orca/linux-orca-cli-shim:/home/dahlia/.cargo/bin:/usr/local/bin:/usr/bin:/home/dahlia/.dotnet/tools:/home/dahlia/.fzf/bin:/home/dahlia/.volta/bin:/home/dahlia/.asdf/shims:/home/dahlia/.fnm/aliases/default/bin:/home/dahlia/.yarn/bin:/opt/homebrew/bin:/opt/homebrew/sbin:/usr/local/sbin:/snap/bin:/home/linuxbrew/.linuxbrew/bin:/nix/var/nix/profiles/default/bin:/home/dahlia/.nix-profile/bin:/home/dahlia/.opencode/bin:/home/dahlia/.vite-plus/bin"
+      },
+      "startedUtc": "2026-11-08T21:04:15.870Z",
+      "finishedUtc": "2026-11-08T21:04:15.963Z",
+      "pid": 692017,
+      "status": 0,
+      "signal": null,
+      "error": null,
+      "timedOut": false,
+      "stdout": "capture-1.stdout",
+      "stderr": "capture-1.stderr",
+      "cleanup": [],
+      "groupGone": true
+    },
+    {
+      "argv": [
+        "/usr/libexec/gdb",
+        "--nx",
+        "--nh",
+        "--batch",
+        "-iex",
+        "set auto-load off",
+        "-iex",
+        "set debuginfod enabled off",
+        "-p",
+        "691992",
+        "-ex",
+        "thread apply all bt 16",
+        "-ex",
+        "detach"
+      ],
+      "cwd": "/home/dahlia/orca/workspaces/oseo/perf-profiling",
+      "env": {
+        "PATH": "/home/dahlia/.cabal/bin:/home/dahlia/.bun/bin:/home/dahlia/.local/share/pnpm:/home/dahlia/.local/share/mise/installs/aqua-dahlia-hongdown/0.5.3:/home/dahlia/.local/share/mise/installs/aqua-nushell-nushell/0.116.0/.mise-bins:/home/dahlia/.local/share/mise/installs/ubi-jdx-jactionlint/2.1.0:/home/dahlia/.local/share/mise/installs/pnpm/12.18.0:/home/dahlia/.local/share/mise/installs/deno/2.9.7/bin:/home/dahlia/.local/share/mise/installs/deno/2.9.7/.deno/bin:/home/dahlia/.local/share/mise/installs/node/24.21.0/bin:/home/dahlia/.local/share/mise/installs/oxfmt/0.70.0/node_modules/.bin:/home/dahlia/.local/share/mise/installs/shellcheck/0.11.0/shellcheck-v0.11.0:/home/dahlia/.local/share/mise/installs/zig/0.16.0/bin:/home/dahlia/.local/share/mise/installs/python/latest/bin:/home/dahlia/.local/share/mise/installs/bun/latest/bin:/home/dahlia/.local/share/mise/installs/github-dahlia-dojang/latest:/home/dahlia/.local/share/mise/installs/claude-code/latest:/home/dahlia/.local/share/mise/installs/codex/latest/bin:/home/dahlia/.local/share/mise/installs/opencode/latest/node_modules/.bin:/home/dahlia/.local/share/mise/installs/antigravity-cli/latest:/home/dahlia/.local/share/mise/installs/npm-fedify-cli/latest/node_modules/.bin:/home/dahlia/.local/share/mise/installs/aws/latest/.mise-bins:/home/dahlia/.local/share/mise/installs/github-steipete-codex-bar/latest:/home/dahlia/.local/share/mise/installs/pypi-matrix-mcp/latest/bin:/home/dahlia/.local/share/mise/shims:/home/dahlia/.ghcup/bin:/home/dahlia/.local/bin:/home/dahlia/bin:/home/dahlia/.config/orca/codex-accounts/0be9f85b-a42b-4ef8-ae43-7b936f40efa7/home/tmp/arg0-linux/codex-arg0fuEOem:/home/dahlia/.config/orca/linux-orca-cli-shim:/home/dahlia/.cargo/bin:/usr/local/bin:/usr/bin:/home/dahlia/.dotnet/tools:/home/dahlia/.fzf/bin:/home/dahlia/.volta/bin:/home/dahlia/.asdf/shims:/home/dahlia/.fnm/aliases/default/bin:/home/dahlia/.yarn/bin:/opt/homebrew/bin:/opt/homebrew/sbin:/usr/local/sbin:/snap/bin:/home/linuxbrew/.linuxbrew/bin:/nix/var/nix/profiles/default/bin:/home/dahlia/.nix-profile/bin:/home/dahlia/.opencode/bin:/home/dahlia/.vite-plus/bin"
+      },
+      "startedUtc": "2026-11-08T21:04:15.968Z",
+      "finishedUtc": "2026-11-08T21:04:16.062Z",
+      "pid": 692029,
+      "status": 0,
+      "signal": null,
+      "error": null,
+      "timedOut": false,
+      "stdout": "capture-2.stdout",
+      "stderr": "capture-2.stderr",
+      "cleanup": [],
+      "groupGone": true
+    },
+    {
+      "argv": [
+        "/usr/libexec/gdb",
+        "--nx",
+        "--nh",
+        "--batch",
+        "-iex",
+        "set auto-load off",
+        "-iex",
+        "set debuginfod enabled off",
+        "-p",
+        "691992",
+        "-ex",
+        "thread apply all bt 16",
+        "-ex",
+        "detach"
+      ],
+      "cwd": "/home/dahlia/orca/workspaces/oseo/perf-profiling",
+      "env": {
+        "PATH": "/home/dahlia/.cabal/bin:/home/dahlia/.bun/bin:/home/dahlia/.local/share/pnpm:/home/dahlia/.local/share/mise/installs/aqua-dahlia-hongdown/0.5.3:/home/dahlia/.local/share/mise/installs/aqua-nushell-nushell/0.116.0/.mise-bins:/home/dahlia/.local/share/mise/installs/ubi-jdx-jactionlint/2.1.0:/home/dahlia/.local/share/mise/installs/pnpm/12.18.0:/home/dahlia/.local/share/mise/installs/deno/2.9.7/bin:/home/dahlia/.local/share/mise/installs/deno/2.9.7/.deno/bin:/home/dahlia/.local/share/mise/installs/node/24.21.0/bin:/home/dahlia/.local/share/mise/installs/oxfmt/0.70.0/node_modules/.bin:/home/dahlia/.local/share/mise/installs/shellcheck/0.11.0/shellcheck-v0.11.0:/home/dahlia/.local/share/mise/installs/zig/0.16.0/bin:/home/dahlia/.local/share/mise/installs/python/latest/bin:/home/dahlia/.local/share/mise/installs/bun/latest/bin:/home/dahlia/.local/share/mise/installs/github-dahlia-dojang/latest:/home/dahlia/.local/share/mise/installs/claude-code/latest:/home/dahlia/.local/share/mise/installs/codex/latest/bin:/home/dahlia/.local/share/mise/installs/opencode/latest/node_modules/.bin:/home/dahlia/.local/share/mise/installs/antigravity-cli/latest:/home/dahlia/.local/share/mise/installs/npm-fedify-cli/latest/node_modules/.bin:/home/dahlia/.local/share/mise/installs/aws/latest/.mise-bins:/home/dahlia/.local/share/mise/installs/github-steipete-codex-bar/latest:/home/dahlia/.local/share/mise/installs/pypi-matrix-mcp/latest/bin:/home/dahlia/.local/share/mise/shims:/home/dahlia/.ghcup/bin:/home/dahlia/.local/bin:/home/dahlia/bin:/home/dahlia/.config/orca/codex-accounts/0be9f85b-a42b-4ef8-ae43-7b936f40efa7/home/tmp/arg0-linux/codex-arg0fuEOem:/home/dahlia/.config/orca/linux-orca-cli-shim:/home/dahlia/.cargo/bin:/usr/local/bin:/usr/bin:/home/dahlia/.dotnet/tools:/home/dahlia/.fzf/bin:/home/dahlia/.volta/bin:/home/dahlia/.asdf/shims:/home/dahlia/.fnm/aliases/default/bin:/home/dahlia/.yarn/bin:/opt/homebrew/bin:/opt/homebrew/sbin:/usr/local/sbin:/snap/bin:/home/linuxbrew/.linuxbrew/bin:/nix/var/nix/profiles/default/bin:/home/dahlia/.nix-profile/bin:/home/dahlia/.opencode/bin:/home/dahlia/.vite-plus/bin"
+      },
+      "startedUtc": "2026-11-08T21:04:16.066Z",
+      "finishedUtc": "2026-11-08T21:04:16.165Z",
+      "pid": 692041,
+      "status": 0,
+      "signal": null,
+      "error": null,
+      "timedOut": false,
+      "stdout": "capture-3.stdout",
+      "stderr": "capture-3.stderr",
+      "cleanup": [],
+      "groupGone": true
+    },
+    {
+      "argv": [
+        "/usr/libexec/gdb",
+        "--nx",
+        "--nh",
+        "--batch",
+        "-iex",
+        "set auto-load off",
+        "-iex",
+        "set debuginfod enabled off",
+        "-p",
+        "691992",
+        "-ex",
+        "thread apply all bt 16",
+        "-ex",
+        "detach"
+      ],
+      "cwd": "/home/dahlia/orca/workspaces/oseo/perf-profiling",
+      "env": {
+        "PATH": "/home/dahlia/.cabal/bin:/home/dahlia/.bun/bin:/home/dahlia/.local/share/pnpm:/home/dahlia/.local/share/mise/installs/aqua-dahlia-hongdown/0.5.3:/home/dahlia/.local/share/mise/installs/aqua-nushell-nushell/0.116.0/.mise-bins:/home/dahlia/.local/share/mise/installs/ubi-jdx-jactionlint/2.1.0:/home/dahlia/.local/share/mise/installs/pnpm/12.18.0:/home/dahlia/.local/share/mise/installs/deno/2.9.7/bin:/home/dahlia/.local/share/mise/installs/deno/2.9.7/.deno/bin:/home/dahlia/.local/share/mise/installs/node/24.21.0/bin:/home/dahlia/.local/share/mise/installs/oxfmt/0.70.0/node_modules/.bin:/home/dahlia/.local/share/mise/installs/shellcheck/0.11.0/shellcheck-v0.11.0:/home/dahlia/.local/share/mise/installs/zig/0.16.0/bin:/home/dahlia/.local/share/mise/installs/python/latest/bin:/home/dahlia/.local/share/mise/installs/bun/latest/bin:/home/dahlia/.local/share/mise/installs/github-dahlia-dojang/latest:/home/dahlia/.local/share/mise/installs/claude-code/latest:/home/dahlia/.local/share/mise/installs/codex/latest/bin:/home/dahlia/.local/share/mise/installs/opencode/latest/node_modules/.bin:/home/dahlia/.local/share/mise/installs/antigravity-cli/latest:/home/dahlia/.local/share/mise/installs/npm-fedify-cli/latest/node_modules/.bin:/home/dahlia/.local/share/mise/installs/aws/latest/.mise-bins:/home/dahlia/.local/share/mise/installs/github-steipete-codex-bar/latest:/home/dahlia/.local/share/mise/installs/pypi-matrix-mcp/latest/bin:/home/dahlia/.local/share/mise/shims:/home/dahlia/.ghcup/bin:/home/dahlia/.local/bin:/home/dahlia/bin:/home/dahlia/.config/orca/codex-accounts/0be9f85b-a42b-4ef8-ae43-7b936f40efa7/home/tmp/arg0-linux/codex-arg0fuEOem:/home/dahlia/.config/orca/linux-orca-cli-shim:/home/dahlia/.cargo/bin:/usr/local/bin:/usr/bin:/home/dahlia/.dotnet/tools:/home/dahlia/.fzf/bin:/home/dahlia/.volta/bin:/home/dahlia/.asdf/shims:/home/dahlia/.fnm/aliases/default/bin:/home/dahlia/.yarn/bin:/opt/homebrew/bin:/opt/homebrew/sbin:/usr/local/sbin:/snap/bin:/home/linuxbrew/.linuxbrew/bin:/nix/var/nix/profiles/default/bin:/home/dahlia/.nix-profile/bin:/home/dahlia/.opencode/bin:/home/dahlia/.vite-plus/bin"
+      },
+      "startedUtc": "2026-11-08T21:04:16.169Z",
+      "finishedUtc": "2026-11-08T21:04:16.266Z",
+      "pid": 692057,
+      "status": 0,
+      "signal": null,
+      "error": null,
+      "timedOut": false,
+      "stdout": "capture-4.stdout",
+      "stderr": "capture-4.stderr",
+      "cleanup": [],
+      "groupGone": true
+    },
+    {
+      "argv": [
+        "/usr/libexec/gdb",
+        "--nx",
+        "--nh",
+        "--batch",
+        "-iex",
+        "set auto-load off",
+        "-iex",
+        "set debuginfod enabled off",
+        "-p",
+        "691992",
+        "-ex",
+        "thread apply all bt 16",
+        "-ex",
+        "detach"
+      ],
+      "cwd": "/home/dahlia/orca/workspaces/oseo/perf-profiling",
+      "env": {
+        "PATH": "/home/dahlia/.cabal/bin:/home/dahlia/.bun/bin:/home/dahlia/.local/share/pnpm:/home/dahlia/.local/share/mise/installs/aqua-dahlia-hongdown/0.5.3:/home/dahlia/.local/share/mise/installs/aqua-nushell-nushell/0.116.0/.mise-bins:/home/dahlia/.local/share/mise/installs/ubi-jdx-jactionlint/2.1.0:/home/dahlia/.local/share/mise/installs/pnpm/12.18.0:/home/dahlia/.local/share/mise/installs/deno/2.9.7/bin:/home/dahlia/.local/share/mise/installs/deno/2.9.7/.deno/bin:/home/dahlia/.local/share/mise/installs/node/24.21.0/bin:/home/dahlia/.local/share/mise/installs/oxfmt/0.70.0/node_modules/.bin:/home/dahlia/.local/share/mise/installs/shellcheck/0.11.0/shellcheck-v0.11.0:/home/dahlia/.local/share/mise/installs/zig/0.16.0/bin:/home/dahlia/.local/share/mise/installs/python/latest/bin:/home/dahlia/.local/share/mise/installs/bun/latest/bin:/home/dahlia/.local/share/mise/installs/github-dahlia-dojang/latest:/home/dahlia/.local/share/mise/installs/claude-code/latest:/home/dahlia/.local/share/mise/installs/codex/latest/bin:/home/dahlia/.local/share/mise/installs/opencode/latest/node_modules/.bin:/home/dahlia/.local/share/mise/installs/antigravity-cli/latest:/home/dahlia/.local/share/mise/installs/npm-fedify-cli/latest/node_modules/.bin:/home/dahlia/.local/share/mise/installs/aws/latest/.mise-bins:/home/dahlia/.local/share/mise/installs/github-steipete-codex-bar/latest:/home/dahlia/.local/share/mise/installs/pypi-matrix-mcp/latest/bin:/home/dahlia/.local/share/mise/shims:/home/dahlia/.ghcup/bin:/home/dahlia/.local/bin:/home/dahlia/bin:/home/dahlia/.config/orca/codex-accounts/0be9f85b-a42b-4ef8-ae43-7b936f40efa7/home/tmp/arg0-linux/codex-arg0fuEOem:/home/dahlia/.config/orca/linux-orca-cli-shim:/home/dahlia/.cargo/bin:/usr/local/bin:/usr/bin:/home/dahlia/.dotnet/tools:/home/dahlia/.fzf/bin:/home/dahlia/.volta/bin:/home/dahlia/.asdf/shims:/home/dahlia/.fnm/aliases/default/bin:/home/dahlia/.yarn/bin:/opt/homebrew/bin:/opt/homebrew/sbin:/usr/local/sbin:/snap/bin:/home/linuxbrew/.linuxbrew/bin:/nix/var/nix/profiles/default/bin:/home/dahlia/.nix-profile/bin:/home/dahlia/.opencode/bin:/home/dahlia/.vite-plus/bin"
+      },
+      "startedUtc": "2026-11-08T21:04:16.271Z",
+      "finishedUtc": "2026-11-08T21:04:16.364Z",
+      "pid": 692070,
+      "status": 0,
+      "signal": null,
+      "error": null,
+      "timedOut": false,
+      "stdout": "capture-5.stdout",
+      "stderr": "capture-5.stderr",
+      "cleanup": [],
+      "groupGone": true
+    },
+    {
+      "argv": [
+        "/usr/libexec/gdb",
+        "--nx",
+        "--nh",
+        "--batch",
+        "-iex",
+        "set auto-load off",
+        "-iex",
+        "set debuginfod enabled off",
+        "-p",
+        "691992",
+        "-ex",
+        "thread apply all bt 16",
+        "-ex",
+        "detach"
+      ],
+      "cwd": "/home/dahlia/orca/workspaces/oseo/perf-profiling",
+      "env": {
+        "PATH": "/home/dahlia/.cabal/bin:/home/dahlia/.bun/bin:/home/dahlia/.local/share/pnpm:/home/dahlia/.local/share/mise/installs/aqua-dahlia-hongdown/0.5.3:/home/dahlia/.local/share/mise/installs/aqua-nushell-nushell/0.116.0/.mise-bins:/home/dahlia/.local/share/mise/installs/ubi-jdx-jactionlint/2.1.0:/home/dahlia/.local/share/mise/installs/pnpm/12.18.0:/home/dahlia/.local/share/mise/installs/deno/2.9.7/bin:/home/dahlia/.local/share/mise/installs/deno/2.9.7/.deno/bin:/home/dahlia/.local/share/mise/installs/node/24.21.0/bin:/home/dahlia/.local/share/mise/installs/oxfmt/0.70.0/node_modules/.bin:/home/dahlia/.local/share/mise/installs/shellcheck/0.11.0/shellcheck-v0.11.0:/home/dahlia/.local/share/mise/installs/zig/0.16.0/bin:/home/dahlia/.local/share/mise/installs/python/latest/bin:/home/dahlia/.local/share/mise/installs/bun/latest/bin:/home/dahlia/.local/share/mise/installs/github-dahlia-dojang/latest:/home/dahlia/.local/share/mise/installs/claude-code/latest:/home/dahlia/.local/share/mise/installs/codex/latest/bin:/home/dahlia/.local/share/mise/installs/opencode/latest/node_modules/.bin:/home/dahlia/.local/share/mise/installs/antigravity-cli/latest:/home/dahlia/.local/share/mise/installs/npm-fedify-cli/latest/node_modules/.bin:/home/dahlia/.local/share/mise/installs/aws/latest/.mise-bins:/home/dahlia/.local/share/mise/installs/github-steipete-codex-bar/latest:/home/dahlia/.local/share/mise/installs/pypi-matrix-mcp/latest/bin:/home/dahlia/.local/share/mise/shims:/home/dahlia/.ghcup/bin:/home/dahlia/.local/bin:/home/dahlia/bin:/home/dahlia/.config/orca/codex-accounts/0be9f85b-a42b-4ef8-ae43-7b936f40efa7/home/tmp/arg0-linux/codex-arg0fuEOem:/home/dahlia/.config/orca/linux-orca-cli-shim:/home/dahlia/.cargo/bin:/usr/local/bin:/usr/bin:/home/dahlia/.dotnet/tools:/home/dahlia/.fzf/bin:/home/dahlia/.volta/bin:/home/dahlia/.asdf/shims:/home/dahlia/.fnm/aliases/default/bin:/home/dahlia/.yarn/bin:/opt/homebrew/bin:/opt/homebrew/sbin:/usr/local/sbin:/snap/bin:/home/linuxbrew/.linuxbrew/bin:/nix/var/nix/profiles/default/bin:/home/dahlia/.nix-profile/bin:/home/dahlia/.opencode/bin:/home/dahlia/.vite-plus/bin"
+      },
+      "startedUtc": "2026-11-08T21:04:16.369Z",
+      "finishedUtc": "2026-11-08T21:04:16.464Z",
+      "pid": 692082,
+      "status": 0,
+      "signal": null,
+      "error": null,
+      "timedOut": false,
+      "stdout": "capture-6.stdout",
+      "stderr": "capture-6.stderr",
+      "cleanup": [],
+      "groupGone": true
+    },
+    {
+      "argv": [
+        "/usr/libexec/gdb",
+        "--nx",
+        "--nh",
+        "--batch",
+        "-iex",
+        "set auto-load off",
+        "-iex",
+        "set debuginfod enabled off",
+        "-p",
+        "691992",
+        "-ex",
+        "thread apply all bt 16",
+        "-ex",
+        "detach"
+      ],
+      "cwd": "/home/dahlia/orca/workspaces/oseo/perf-profiling",
+      "env": {
+        "PATH": "/home/dahlia/.cabal/bin:/home/dahlia/.bun/bin:/home/dahlia/.local/share/pnpm:/home/dahlia/.local/share/mise/installs/aqua-dahlia-hongdown/0.5.3:/home/dahlia/.local/share/mise/installs/aqua-nushell-nushell/0.116.0/.mise-bins:/home/dahlia/.local/share/mise/installs/ubi-jdx-jactionlint/2.1.0:/home/dahlia/.local/share/mise/installs/pnpm/12.18.0:/home/dahlia/.local/share/mise/installs/deno/2.9.7/bin:/home/dahlia/.local/share/mise/installs/deno/2.9.7/.deno/bin:/home/dahlia/.local/share/mise/installs/node/24.21.0/bin:/home/dahlia/.local/share/mise/installs/oxfmt/0.70.0/node_modules/.bin:/home/dahlia/.local/share/mise/installs/shellcheck/0.11.0/shellcheck-v0.11.0:/home/dahlia/.local/share/mise/installs/zig/0.16.0/bin:/home/dahlia/.local/share/mise/installs/python/latest/bin:/home/dahlia/.local/share/mise/installs/bun/latest/bin:/home/dahlia/.local/share/mise/installs/github-dahlia-dojang/latest:/home/dahlia/.local/share/mise/installs/claude-code/latest:/home/dahlia/.local/share/mise/installs/codex/latest/bin:/home/dahlia/.local/share/mise/installs/opencode/latest/node_modules/.bin:/home/dahlia/.local/share/mise/installs/antigravity-cli/latest:/home/dahlia/.local/share/mise/installs/npm-fedify-cli/latest/node_modules/.bin:/home/dahlia/.local/share/mise/installs/aws/latest/.mise-bins:/home/dahlia/.local/share/mise/installs/github-steipete-codex-bar/latest:/home/dahlia/.local/share/mise/installs/pypi-matrix-mcp/latest/bin:/home/dahlia/.local/share/mise/shims:/home/dahlia/.ghcup/bin:/home/dahlia/.local/bin:/home/dahlia/bin:/home/dahlia/.config/orca/codex-accounts/0be9f85b-a42b-4ef8-ae43-7b936f40efa7/home/tmp/arg0-linux/codex-arg0fuEOem:/home/dahlia/.config/orca/linux-orca-cli-shim:/home/dahlia/.cargo/bin:/usr/local/bin:/usr/bin:/home/dahlia/.dotnet/tools:/home/dahlia/.fzf/bin:/home/dahlia/.volta/bin:/home/dahlia/.asdf/shims:/home/dahlia/.fnm/aliases/default/bin:/home/dahlia/.yarn/bin:/opt/homebrew/bin:/opt/homebrew/sbin:/usr/local/sbin:/snap/bin:/home/linuxbrew/.linuxbrew/bin:/nix/var/nix/profiles/default/bin:/home/dahlia/.nix-profile/bin:/home/dahlia/.opencode/bin:/home/dahlia/.vite-plus/bin"
+      },
+      "startedUtc": "2026-11-08T21:04:16.469Z",
+      "finishedUtc": "2026-11-08T21:04:16.566Z",
+      "pid": 692094,
+      "status": 0,
+      "signal": null,
+      "error": null,
+      "timedOut": false,
+      "stdout": "capture-7.stdout",
+      "stderr": "capture-7.stderr",
+      "cleanup": [],
+      "groupGone": true
+    },
+    {
+      "argv": [
+        "/usr/bin/readelf",
+        "-n",
+        "/home/dahlia/.local/state/oseo-preview/lanes/perf-profiling/capture-ci-20261109/linux-smoke-a/build/fixture-linux-x86_64-gnu"
+      ],
+      "cwd": "/home/dahlia/orca/workspaces/oseo/perf-profiling",
+      "env": {
+        "PATH": "/home/dahlia/.cabal/bin:/home/dahlia/.bun/bin:/home/dahlia/.local/share/pnpm:/home/dahlia/.local/share/mise/installs/aqua-dahlia-hongdown/0.5.3:/home/dahlia/.local/share/mise/installs/aqua-nushell-nushell/0.116.0/.mise-bins:/home/dahlia/.local/share/mise/installs/ubi-jdx-jactionlint/2.1.0:/home/dahlia/.local/share/mise/installs/pnpm/12.18.0:/home/dahlia/.local/share/mise/installs/deno/2.9.7/bin:/home/dahlia/.local/share/mise/installs/deno/2.9.7/.deno/bin:/home/dahlia/.local/share/mise/installs/node/24.21.0/bin:/home/dahlia/.local/share/mise/installs/oxfmt/0.70.0/node_modules/.bin:/home/dahlia/.local/share/mise/installs/shellcheck/0.11.0/shellcheck-v0.11.0:/home/dahlia/.local/share/mise/installs/zig/0.16.0/bin:/home/dahlia/.local/share/mise/installs/python/latest/bin:/home/dahlia/.local/share/mise/installs/bun/latest/bin:/home/dahlia/.local/share/mise/installs/github-dahlia-dojang/latest:/home/dahlia/.local/share/mise/installs/claude-code/latest:/home/dahlia/.local/share/mise/installs/codex/latest/bin:/home/dahlia/.local/share/mise/installs/opencode/latest/node_modules/.bin:/home/dahlia/.local/share/mise/installs/antigravity-cli/latest:/home/dahlia/.local/share/mise/installs/npm-fedify-cli/latest/node_modules/.bin:/home/dahlia/.local/share/mise/installs/aws/latest/.mise-bins:/home/dahlia/.local/share/mise/installs/github-steipete-codex-bar/latest:/home/dahlia/.local/share/mise/installs/pypi-matrix-mcp/latest/bin:/home/dahlia/.local/share/mise/shims:/home/dahlia/.ghcup/bin:/home/dahlia/.local/bin:/home/dahlia/bin:/home/dahlia/.config/orca/codex-accounts/0be9f85b-a42b-4ef8-ae43-7b936f40efa7/home/tmp/arg0-linux/codex-arg0fuEOem:/home/dahlia/.config/orca/linux-orca-cli-shim:/home/dahlia/.cargo/bin:/usr/local/bin:/usr/bin:/home/dahlia/.dotnet/tools:/home/dahlia/.fzf/bin:/home/dahlia/.volta/bin:/home/dahlia/.asdf/shims:/home/dahlia/.fnm/aliases/default/bin:/home/dahlia/.yarn/bin:/opt/homebrew/bin:/opt/homebrew/sbin:/usr/local/sbin:/snap/bin:/home/linuxbrew/.linuxbrew/bin:/nix/var/nix/profiles/default/bin:/home/dahlia/.nix-profile/bin:/home/dahlia/.opencode/bin:/home/dahlia/.vite-plus/bin"
+      },
+      "startedUtc": "2026-11-08T21:04:19.049Z",
+      "finishedUtc": "2026-11-08T21:04:19.056Z",
+      "pid": 692274,
+      "status": 0,
+      "signal": null,
+      "error": null,
+      "timedOut": false,
+      "stdout": "symbols-after.stdout",
+      "stderr": "symbols-after.stderr",
+      "cleanup": [],
+      "groupGone": true
+    }
+  ],
+  "lossCount": null,
+  "limits": "Attach stops are not CPU shares or call counts; escaped process groups and uncatchable termination cannot be cleaned here"
+}

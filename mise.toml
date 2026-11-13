@@ -34,6 +34,27 @@ run = "pnpm install --frozen-lockfile"
 description = "Build every npm package as validated ESM"
 run = "pnpm exec tsdown --workspace"
 
+[tasks."perf:profile:discover"]
+description = "Record read-only profiler tool discovery (not acceptance)"
+usage = 'arg "<directory>" help="New evidence directory; parent must exist"'
+run = 'node tools/perf-profile.ts discover "${usage_directory?}"'
+
+[tasks."perf:profile:capture"]
+description = "Capture an unchanged native artifact from an explicit contract"
+usage = '''
+arg "<request>" help="JSON launch contract with frozen hashes and byte oracle"
+arg "<directory>" help="New evidence directory; parent must exist"
+'''
+run = '''
+node tools/perf-profile.ts capture "${usage_request?}" "${usage_directory?}"
+'''
+
+[tasks."perf:profile:smoke"]
+description = "Build and capture a synthetic optimized native method probe"
+depends = ["build"]
+usage = 'arg "<directory>" help="New probe directory; not performance evidence"'
+run = 'node tools/perf-profile-smoke.ts "${usage_directory?}"'
+
 [tasks.bump-versions]
 description = "Atomically set the lockstep package version"
 usage = 'arg "<version>" help="Strict SemVer for every @oseo package"'

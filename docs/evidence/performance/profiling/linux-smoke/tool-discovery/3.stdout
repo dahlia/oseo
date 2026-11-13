@@ -1,0 +1,31 @@
+This GDB was configured as follows:
+   configure --host=x86_64-redhat-linux-gnu --target=x86_64-redhat-linux-gnu
+	     --enable-targets=aarch64-linux-gnu,powerpc-linux-gnu,riscv64-linux-gnu,s390-linux-gnu,x86_64-redhat-linux-gnu,arm-linux-gnu
+	     --with-auto-load-dir=$debugdir:$datadir/auto-load
+	     --with-auto-load-safe-path=$debugdir:$datadir/auto-load
+	     --with-expat
+	     --with-gdb-datadir=/usr/share/gdb
+	     --with-jit-reader-dir=/usr/lib64/gdb
+	     --without-libunwind-ia64
+	     --with-lzma
+	     --with-babeltrace
+	     --with-intel-pt
+	     --with-xxhash
+	     --with-python=/usr
+	     --with-python-libdir=/usr/lib
+	     --with-debuginfod
+	     --with-curses
+	     --without-guile
+	     --without-amd-dbgapi
+	     --enable-source-highlight
+	     --enable-threading
+	     --enable-tui
+	     --with-system-readline
+	     --with-separate-debug-dir=/usr/lib/debug
+	     --with-system-gdbinit=/etc/gdbinit
+
+("Relocatable" means the directory can be moved with the GDB installation
+tree, and GDB will still find it.)
+
+GNU Readline library version: 8.3	(system)
+17.2-4.fc44

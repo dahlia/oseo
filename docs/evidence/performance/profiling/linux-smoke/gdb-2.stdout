@@ -1,0 +1,9 @@
+[Thread debugging using libthread_db enabled]
+Using host libthread_db library "/lib64/libthread_db.so.1".
+0x000000000108ce4f in oseo_internal_retire_registered_symbols (context=context@entry=0x7ffe3b1ac5e0) at runtime_symbol.c:318
+
+Thread 1 (Thread 0x7fe0136a7b80 (LWP 3685113) "fixture-linux-x"):
+#0  0x000000000108ce4f in oseo_internal_retire_registered_symbols (context=context@entry=0x7ffe3b1ac5e0) at runtime_symbol.c:318
+#1  0x000000000104c278 in oseo_context_destroy (context=context@entry=0x7ffe3b1ac5e0) at runtime_core.c:254
+#2  0x000000000104afba in main () at /home/dahlia/.local/state/oseo-preview/lanes/perf-profiling/acceptance-20261109/tmp/oseo-native-NgJ0Zg/generated.c:403
+[Inferior 1 (process 3685113) detached]
