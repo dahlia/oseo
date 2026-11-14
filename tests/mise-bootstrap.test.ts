@@ -518,7 +518,7 @@ test("mise curl configuration names work with older Windows curl", () => {
   assert.equal(curlConfigName("darwin"), ".curlrc");
 });
 
-/** Only the upstream process receives the temporary-directory overrides. */
+/** Environment overrides belong to individual bootstrap steps. */
 interface BootstrapStep {
   readonly id?: string;
   readonly uses: string;
@@ -657,4 +657,121 @@ test("mise extraction and both Windows binaries use runner temp", async () => {
   } finally {
     await rm(directory, { recursive: true, force: true });
   }
+});
+
+const denoArchive = "deno-aarch64-apple-darwin.zip";
+const denoSource = "https://dl.deno.land/release/v2.9.7/";
+const denoRelease =
+  "https://github.com/denoland/deno/releases/download/v2.9.7/";
+
+/**
+ * Model the reviewed literal rules, not the Rust regex language or HTTP.
+ * Inputs are serialized URLs. Rust's strict end anchor needs translation;
+ * JavaScript's dollar anchor alone also matches before a final newline.
+ * Non-global replace models Rust regex.replace's first match only.
+ */
+function fixtureUrlReplacement(
+  url: string,
+  rules: Readonly<Record<string, string>>,
+): string {
+  for (const [pattern, replacement] of Object.entries(rules)) {
+    assert.ok(pattern.startsWith("regex:"));
+    const regex = new RegExp(
+      pattern.slice("regex:".length).replaceAll("\\z", "(?![\\s\\S])"),
+      "u",
+    );
+    const changed = url.replace(regex, replacement);
+    if (changed === url) continue;
+    try {
+      return new URL(changed).href;
+    } catch {
+      // mise skips changes that do not parse as a URL.
+    }
+  }
+  return url;
+}
+
+test("Deno routing is exact and confined to upstream setup", async () => {
+  const steps = await bootstrapSteps();
+  const upstream = steps.find((step) => step.uses === "jdx/mise-action@v4");
+  assert.ok(upstream?.env?.MISE_URL_REPLACEMENTS);
+  // SAFETY: This repository-owned JSON object is compared in full below.
+  const rules = JSON.parse(upstream.env.MISE_URL_REPLACEMENTS) as Readonly<
+    Record<string, string>
+  >;
+  const pattern =
+    "regex:^https://dl\\.deno\\.land/release/v2\\.9\\.7/" +
+    "deno-aarch64-apple-darwin\\.zip";
+  assert.deepEqual(rules, {
+    [`${pattern}\\z`]: `${denoRelease}${denoArchive}`,
+    [`${pattern}\\.sha256sum\\z`]: `${denoRelease}${denoArchive}.sha256sum`,
+  });
+  for (const suffix of ["", ".sha256sum"]) {
+    const url = `${denoSource}${denoArchive}${suffix}`;
+    assert.equal(
+      fixtureUrlReplacement(url, rules),
+      `${denoRelease}${denoArchive}${suffix}`,
+    );
+    const others = [
+      url.replace("2.9.7", "2.9.6"),
+      url.replace("2.9.7", "2.9.70"),
+      url.replace("aarch64", "x86_64"),
+      url.replace("apple-darwin", "unknown-linux-gnu"),
+      url.replace("apple-darwin", "pc-windows-msvc"),
+      url.replace("dl.deno.land", "dl.deno.land.example.org"),
+      url.replace("dl.deno.land", "dlXdenoXland"),
+      url.replace("2.9.7", "2X9X7"),
+      url.replace(".zip", "Xzip"),
+      url.replace("https:", "http:"),
+      url.replace("/release/", "/other/release/"),
+      `https://example.invalid/?next=${url}`,
+      `${denoRelease}${denoArchive}${suffix}`,
+      ...[".bak", ".sha256sum.extra", "/", "?x=1", "#x", "%0A"].map(
+        (extra) => `${url}${extra}`,
+      ),
+    ];
+    for (const other of others) {
+      assert.equal(fixtureUrlReplacement(other, rules), other, other);
+    }
+  }
+  for (const step of steps) {
+    if (step !== upstream) {
+      assert.equal(step.env?.MISE_URL_REPLACEMENTS, undefined);
+    }
+  }
+  const policy = await readFile(
+    new URL("../tools/ci/mise-bootstrap.ts", import.meta.url),
+    "utf8",
+  );
+  assert.doesNotMatch(policy, /MISE_URL_REPLACEMENTS/u);
+  assert.deepEqual(upstream.with, {
+    version: "${{ steps.policy.outputs.version }}",
+    mise_dir: "${{ steps.policy.outputs.data-dir }}",
+    cache: "false",
+    install: "${{ inputs.install }}",
+    install_args: "${{ inputs.install_args }}",
+  });
+});
+
+test("routing fixture uses the first match and first valid change", () => {
+  const url = "https://example.invalid/a/a";
+  assert.equal(
+    fixtureUrlReplacement(url, {
+      "regex:/a": "/b",
+      "regex:/b": "/c",
+    }),
+    "https://example.invalid/b/a",
+  );
+  assert.equal(
+    fixtureUrlReplacement(url, {
+      "regex:^https:": "https:",
+      "regex:^.*\\z": "http://[",
+      "regex:/a": "/b",
+    }),
+    "https://example.invalid/b/a",
+  );
+  assert.equal(
+    fixtureUrlReplacement(`${url}\n`, { "regex:/a/a\\z": "/b" }),
+    `${url}\n`,
+  );
 });

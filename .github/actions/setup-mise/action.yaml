@@ -66,6 +66,14 @@ runs:
         install: ${{ inputs.install }}
         install_args: ${{ inputs.install_args }}
       env:
+        # Route only these two official Deno assets; keep mise verification.
+        MISE_URL_REPLACEMENTS: >-
+          {
+            "regex:^https://dl\\.deno\\.land/release/v2\\.9\\.7/deno-aarch64-apple-darwin\\.zip\\z":
+            "https://github.com/denoland/deno/releases/download/v2.9.7/deno-aarch64-apple-darwin.zip",
+            "regex:^https://dl\\.deno\\.land/release/v2\\.9\\.7/deno-aarch64-apple-darwin\\.zip\\.sha256sum\\z":
+            "https://github.com/denoland/deno/releases/download/v2.9.7/deno-aarch64-apple-darwin.zip.sha256sum"
+          }
         CURL_HOME: ${{ steps.policy.outputs.curl-home }}
         TMPDIR: ${{ runner.temp }}
         TMP: ${{ runner.temp }}
