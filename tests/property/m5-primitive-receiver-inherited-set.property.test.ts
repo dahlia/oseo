@@ -211,7 +211,8 @@ test(
       sourceId: "primitive-set-allocation.js",
     });
     assert.deepEqual(compiled.diagnostics, []);
-    assert.ok(compiled.mir != null);
+    const input = compiled.mir;
+    assert.ok(input != null);
     const source = await readFile(
       new URL(
         "../fixtures/primitive-receiver-inherited-set/allocation.c",
@@ -219,20 +220,56 @@ test(
       ),
       "utf8",
     );
-    await withNativeFixture(
-      {
-        backend: { emit: () => ({ sourceName: "allocation.c", source }) },
-        host,
-        input: compiled.mir,
-        operation: "execute",
-        runtime: cRuntimeProvider,
-        target: nativeTarget,
-        toolchain: nativeToolchain,
-      },
-      (native) => {
-        assert.equal(native.stdout, "primitive Set roots and realms passed\n");
-        assert.equal(native.stderr, "");
-      },
-    );
+    const run = (fixture: string) =>
+      withNativeFixture(
+        {
+          backend: {
+            emit: () => ({ sourceName: "allocation.c", source: fixture }),
+          },
+          host,
+          input,
+          operation: "execute",
+          runtime: cRuntimeProvider,
+          target: nativeTarget,
+          toolchain: nativeToolchain,
+        },
+        (native) => {
+          assert.equal(
+            native.stdout,
+            "primitive Set roots and realms passed\n",
+          );
+          assert.equal(native.stderr, "");
+        },
+      );
+    await run(source);
+    // Each false variant must abort in the active build configuration, so
+    // the fixture's checks cannot compile away under an implicit NDEBUG.
+    for (const [original, falsified] of [
+      ["assert(argument_count == 1u);", "assert(argument_count == 2u);"],
+      [
+        "assert(require_normal(result) == roots[4]);",
+        "assert(require_normal(result) != roots[4]);",
+      ],
+    ] as const) {
+      assert.equal(source.split(original).length, 2);
+      let directory: string | undefined;
+      await assert.rejects(
+        run(source.replace(original, falsified)),
+        (error) => {
+          assert.ok(error instanceof Error);
+          directory = /Native artifacts retained at (.+)$/u.exec(
+            error.message,
+          )?.[1];
+          assert.ok(error.cause instanceof Error);
+          assert.match(error.cause.message, /^Native fixture failed \(/u);
+          assert.ok(
+            error.cause.message.includes(falsified.slice(7, -2)),
+            error.cause.message,
+          );
+          return true;
+        },
+      );
+      if (directory != null) await host.remove(directory);
+    }
   },
 );
