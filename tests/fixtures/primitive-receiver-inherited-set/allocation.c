@@ -1,3 +1,10 @@
+/* Keep fixture assertions active in both build configurations: Zig 0.16.0
+ * defines NDEBUG for every `zig cc -O2` compilation, which the optimized
+ * configuration uses. */
+#ifdef NDEBUG
+#undef NDEBUG
+#endif
+
 #include "runtime_internal.h"
 
 #include <assert.h>
