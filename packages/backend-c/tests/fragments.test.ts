@@ -40,6 +40,10 @@ test("an empty unit still exports dispatch and both phase entries", () => {
     harnessLineOffset: 0,
     bodyLineOffset: 0,
   });
+  for (const unit of [result.harness, result.body, result.launcher]) {
+    assert.match(unit.source, /SPDX-License-Identifier: MIT/u);
+    assert.match(unit.source, /SPDX-License-Identifier: Unicode-3\.0/u);
+  }
   assert.match(result.harness.source, /oseo_harness_dispatch/u);
   assert.match(result.harness.source, /oseo_harness_resume/u);
   assert.match(result.harness.source, /oseo_harness_instantiate/u);

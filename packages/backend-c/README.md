@@ -7,6 +7,11 @@ completion, guarded operations, root frames, and safepoint locations. It does
 not execute a compiler or choose runtime sources. MIR blocks and terminators are
 its only semantic input; it never replays HIR.
 
+The backend logic is under GPL-3.0-or-later. The Oseo-authored C templates
+and support they contribute to output are under MIT; see *MIT-LICENSE.txt*.
+Generated C includes the applicable notices without licensing the user's
+program under MIT or GPL.
+
 Lexical bindings use traced environments and shared cells. Their values remain
 rooted across calls and collection.
 

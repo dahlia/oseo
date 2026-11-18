@@ -1,3 +1,6 @@
+/* SPDX-License-Identifier: MIT */
+/* Copyright (c) 2026 Hong Minhee; see ../MIT-LICENSE.txt. */
+
 #ifndef OSEO_RUNTIME_INTERNAL_H
 #define OSEO_RUNTIME_INTERNAL_H
 

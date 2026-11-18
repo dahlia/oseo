@@ -80,10 +80,9 @@ Why the originals are not included
 
 The message files stay outside the repository for four reasons.
 
- -  The text belongs to its authors. The repository is `GPL-3.0-only`, every
-    package ships an identical *LICENSE*, and the project cannot grant terms
-    for third-party text. A summary with short quotations keeps the record
-    without importing the full messages.
+ -  The text belongs to its authors, and the project cannot grant terms for
+    third-party text. A summary with short quotations keeps the record without
+    importing the full messages.
  -  The messages quote staff-internal remarks and reassignment lines that were
     not written for publication.
  -  The headers carry the maintainer's client IP and mailer version. Removing

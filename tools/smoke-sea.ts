@@ -80,8 +80,10 @@ async function smoke(archive: string, version: string, zig?: string) {
     assert.equal(new Set(contents).size, contents.length);
     for (const file of [
       "LICENSE",
+      "MIT-LICENSE.txt",
       "NODE-LICENSE.txt",
       "README.md",
+      "ROLLDOWN-LICENSE.txt",
       "UNICODE-LICENSE.txt",
       "oseo",
       "oseo-source.tar.gz",
