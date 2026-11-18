@@ -119,11 +119,9 @@ async function stageNotices(
     ["UNICODE-LICENSE.txt", join(packages, "runtime-c")],
   ]);
   await Promise.all(
-    [...noticeSources].map(async ([name, source]) => {
-      if ((await readdir(source)).includes(name)) {
-        await copyFile(join(source, name), join(directory, name));
-      }
-    }),
+    [...noticeSources].map(([name, source]) =>
+      copyFile(join(source, name), join(directory, name)),
+    ),
   );
   // The last node_modules segment is the installed package. This also works
   // for transitive dependencies in pnpm's virtual store.
