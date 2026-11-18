@@ -1,51 +1,36 @@
 @oseo/testkit
 =============
 
-This package compares reference and native observations through injected public
-interfaces. It accepts MIR rather than a synthetic native module and
-does not import private package files or concrete compiler adapters.
+`@oseo/testkit` supports Oseo's native and conformance tests. It takes
+the compiler's mid-level intermediate representation (MIR) and uses
+the backend, runtime, toolchain, and host you provide. It does not
+select or install those adapters.
 
-`withNativeFixture` keeps generated files alive until its inspection callback
-completes. A build, execution, or inspection failure retains the directory and
-writes *native-observation.json* with the target, emitted C, complete compiler
-request sequence, and every captured process observation.
+If you are building tests around the Oseo compiler, install with
+`npm install @oseo/testkit` or `deno add jsr:@oseo/testkit`. To run Oseo's
+own tests from a checkout, follow the [contributor guide] instead.
 
-Each fixture declares whether it needs compilation or execution. Execution
-fixtures validate the injected host against the selected target before a build
-starts.
+[contributor guide]: https://github.com/dahlia/oseo/blob/main/CONTRIBUTING.md
 
-Retained observations and property failures include both normalized host and
-target identities so a replay does not silently change environments.
 
-When both injected adapters support it, fixtures share the same host-cached
-runtime archive as CLI execution. `runtimeArchiveReuse: "disabled"` retains a
-direct rebuild path for a replay that suspects stale cache state. Same-key cold
-fixtures serialize archive publication, and an unavailable cache operation
-falls back to a temporary rebuild. Failed toolchain identity observations are
-not retained, so a recovered toolchain can rejoin archive reuse.
+Native fixtures
+---------------
 
-Each fixture uses one captured compiler environment for its identity, key, and
-build requests. A fixture whose host cannot capture that environment rebuilds
-without archive reuse.
+Use `withNativeFixture()` to build a fixture and, with `operation: "execute"`,
+run it. Execution requires a host that can run the requested target. The
+generated files are available during the inspection callback. On success,
+they are removed unless you set `keepArtifacts: true`. Failures after
+temporary-directory creation retain the artifacts and attempt to write
+*native-observation.json* for replay.
 
-When compiler observation is enabled, the harness removes the runtime's private
-counter record from stderr and exposes typed guard, overflow, generic-addition,
-allocation, and collection counts beside the ordinary process observation.
-Reference comparison therefore remains limited to JavaScript-visible output,
-status, and errors.
+`assertMatchingObservations()` compares exit status and standard streams
+across reference and native runs, including bytes when captured. See the
+[native test driver] for how the repository supplies the adapters and
+compares runs.
 
-Test262 observations retain the declared `parse`, `resolution`, or `runtime`
-failure phase. The `parse` phase includes static-semantics early errors.
-An unavailable observation capability is recorded explicitly and classifies
-the case as unsupported rather than manufacturing an expected observation.
+`classifyTest262()` and `summarizeTest262()` classify and aggregate Test262
+observations; they do not run the suite. See the
+[fixture and observation notes] for replay, caching, and strictness variants.
 
-One reviewed result aggregates every strictness mode requested by the upstream
-case. A positive case passes only when specialization-disabled and
-specialization-enabled native execution both succeed with identical output in
-every mode.
-
-Cross-package M4 properties use the same retained native-fixture protocol for
-generated asynchronous schedules. The repository property runner records an
-explicit seed, replay path, size tier, run scale, profile, and domain. Its
-asynchronous entry point waits for shrinking and native inspection to finish,
-and an interrupted budget is a failure rather than a shortened pass.
+[native test driver]: https://github.com/dahlia/oseo/blob/main/tests/native.ts
+[fixture and observation notes]: https://github.com/dahlia/oseo/blob/main/docs/development/package-testkit.md

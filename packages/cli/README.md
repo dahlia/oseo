@@ -1,89 +1,59 @@
-@oseo/cli
-=========
+`@oseo/cli`
+===========
 
-This package is Oseo's composition root. `oseo run SOURCE` and its
-`oseo SOURCE` shortcut compile and execute a temporary native program.
-`oseo build SOURCE` retains a native executable without starting it, or prints
-compiler output with `--dump-mir` or `--emit-c`.
-Specialization is enabled by default. `--no-specialization` selects the same
-pipeline with the M1 generic graph and no guarded operations.
+`@oseo/cli` provides `oseo`, the command for compiling JavaScript and
+TypeScript ahead of time to native executables. Oseo compiles a
+[supported subset] of the languages. It uses type annotations as optimization
+hints, not as type checks.
 
-The default source frontends receive the exact ECMA-262 Unicode property
-resolver from `@oseo/unicode` here. The Babel adapter and compiler core remain
-independent of the concrete pinned tables.
+[supported subset]: https://github.com/dahlia/oseo/blob/main/docs/using/features.md
 
-Parser, profile, runtime, toolchain, and host failures remain owned diagnostics
-or captured native observations. Temporary-directory, runtime-asset, generated
-source, process-spawn, and cleanup failures are reported as `OSEO3001` without
-exposing a host stack. Once created, the native temporary directory is removed
-after both successful and failed workflows. Runtime assets are copied
-sequentially so every started read or write settles before
-temporary-directory cleanup begins.
 
-Native execution reuses a host-cached runtime archive when the host and
-toolchain expose that capability. A cache hit reads every reviewed runtime
-asset for key calculation, copies only the headers needed by generated C, and
-links without compiling the runtime translation units again. The
-`--no-runtime-archive-reuse` option is the deliberate rebuild path for
-investigating suspected staleness. Concurrent cold executions serialize one
-archive build per key. Cache setup, lookup, lease, and publication failures are
-optional optimization failures, so execution continues with a temporary
-uncached build.
+Install and run
+---------------
 
-Each execution captures one compiler environment snapshot and uses it for the
-identity probe, key, and build requests. A failed or empty identity observation
-is not retained. An unavailable snapshot, including under Deno without
-`--allow-env`, disables reuse but preserves ordinary native compilation.
+The npm package requires Node.js 24 or later:
 
-The command line is defined with [Optique]. Its parser requires exactly one
-source path, keeps `--dump-mir` and `--emit-c` mutually exclusive, and rejects
-unknown or duplicate options before compilation. Optique also derives help,
-usage, version, and parse-error output from the same command-line grammar.
+~~~~ sh
+npm install --global @oseo/cli
+oseo --help
+~~~~
 
-The npm package installs the `oseo` executable. A source path without a dump
-option compiles, links, and runs a script or a closed module graph
-through the pinned Zig toolchain, with guarded specialization when eligible.
-Module entries may use relative file specifiers, `node:process`, and
-`node:fs`. Programmatic callers may
-override `sourceId` for script diagnostics without changing the positional path
-used to read the source file.
+Save `console.log(6 * 7);` in *answer.js*, then run:
 
-Native execution selects `linux-x86_64-gnu` on Linux AMD64 and
-`macos-aarch64` on macOS AArch64. `--target` makes that choice explicit and is
-valid for native `run` and `build`. `build` also accepts cross-targets and
-does not apply the execution-host compatibility check. For `run` and the
-shortcut, unsupported or mismatched host-target pairs fail before compilation
-rather than producing or starting an incompatible artifact. The option accepts
-stable OS-first Oseo target IDs. The Zig adapter maps them to Zig's
-architecture-first strings when it creates compiler requests.
+~~~~ sh
+oseo run answer.js
+~~~~
 
-An entry with imports, exports, or top-level await enters the module-graph
-workflow. Top-level await does not need an otherwise unused module declaration.
-The produced executable drains runtime-owned promise jobs and timer tasks; it
-does not embed the Node.js or Deno host used to compile it.
+This compiles and runs a temporary executable, prints `42`, and removes the
+temporary files. Use `oseo build answer.js -o answer` to keep the executable
+without running it. The resulting executable does not need Node.js or Deno.
 
-`run` defaults to the `checked` build configuration and `build` to `optimized`.
-Both accept `--build-config checked|optimized`. Text modes reject that option,
-`--target`, `--output`, and `--no-runtime-archive-reuse`.
+Native execution is supported on Linux AMD64 and macOS AArch64. On first
+native compilation, Oseo downloads and verifies its pinned Zig toolchain unless
+you supply an existing executable with `--zig PATH`. The download requires
+`tar` with XZ support. `oseo build answer.js --dump-mir` and
+`oseo build answer.js --emit-c` print intermediate code and C11 respectively,
+without downloading or running Zig.
 
-Retained output defaults to the entry's filename without its last extension in
-the current working directory, with a target suffix when `--target` is
-explicit. `-o` or `--output` selects another path. [ADR 0037] defines
-replacement, source-graph protection, permission copying, and atomic
-publication.
 
-Typed command modules under *src/commands/* share parsers and a host-injected
-handler. The checked-in *src/commands.generated.ts* registry contains static
-imports for package and standalone builds; startup never scans directories.
-`mise run generate:commands` regenerates it and `mise run check:commands`
-refuses stale output. The executable enables Optique's help and shell
-completion in both command and option forms.
+Use the API
+-----------
 
-`parseCliRequest()` exposes that same grammar to embedding callers. It returns
-either typed command values or completed parse, help, or version output without
-reading source files or starting processes. Callers can pass the command values
-to `executeCliInvocation()` after selecting a build configuration; options in
-program arguments and option values remain distinct from compiler options.
+To import the API in a Node.js project, install the dependency locally with
+`npm install @oseo/cli`. In a Deno project, use `deno add jsr:@oseo/cli`.
+Both expose the API at `@oseo/cli`, but only the npm package installs the
+`oseo` executable.
 
-[Optique]: https://optique.dev/
-[ADR 0037]: ../../docs/adr/0037-retained-native-executables.md
+`parseCliRequest()` parses the same arguments as the executable without reading
+source files or starting processes. It returns a typed invocation or a result
+containing help, version, or error output. Pass an invocation to
+`executeCliInvocation()` to run it. That function uses the pinned Zig
+toolchain for native compilation unless you supply a toolchain.
+
+See the [command-line guide] for module entry points, target selection,
+program arguments, and build options. See the [CLI implementation notes] for
+the command registry and host workflow.
+
+[command-line guide]: https://github.com/dahlia/oseo/blob/main/docs/cli.md
+[CLI implementation notes]: https://github.com/dahlia/oseo/blob/main/docs/development/package-cli.md

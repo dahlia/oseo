@@ -17,3 +17,15 @@ toolchain links it with the Oseo runtime.
 [design document]: https://github.com/dahlia/oseo/blob/main/DESIGN.md
 [architecture decision records]: https://github.com/dahlia/oseo/tree/main/docs/adr
 [roadmap]: https://github.com/dahlia/oseo/blob/main/ROADMAP.md
+
+
+Package internals
+-----------------
+
+ -  Front end: [Babel adapter](./package-parser-babel.md) and
+    [Unicode data](./package-unicode.md).
+ -  Compilation and execution: [compiler](./package-compiler.md),
+    [C backend](./package-backend-c.md), [C runtime](./package-runtime-c.md),
+    and [Zig adapter](./package-toolchain-zig.md).
+ -  Integration and testing: [CLI](./package-cli.md),
+    [host adapters](./package-host.md), and [test kit](./package-testkit.md).
