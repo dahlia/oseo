@@ -48,6 +48,9 @@ mise run test
 commit-msg hook runs `mise run check:commit-message` on the message file Git
 passes it. Repeating the install refreshes both.
 
+For documentation-only commits, put `[ci skip]` on its own line above any
+commit trailers. Do not use it on release commits.
+
 A commit message uses a subject of 50 columns or fewer, a blank second line,
 and a body wrapped at 72. The commit-msg hook does not enforce that. It rejects
 a message whose subject reaches 80 columns, whose second line is not blank, or
