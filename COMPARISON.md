@@ -21,9 +21,9 @@ The shortest accurate description is therefore not “TypeScript to native.”
 Oseo compiles both the dynamic answer and selected checked shortcuts before the
 program starts.
 
-This comparison reflects Oseo at commit `9eb7de2` and the public sources
-inspected on 26 July 2026. Version-sensitive observations below identify the
-source or revision used.
+This comparison reflects Oseo at commit `9eb7de2` and, unless noted otherwise,
+public sources inspected on 26 July 2026. Version-sensitive observations
+below identify the source or revision used.
 
 That distinction is already implemented in a deliberately narrow but real
 case. The M2 small-integer addition path contains tag guards, checked
@@ -42,16 +42,17 @@ What the comparison is actually comparing
 The projects below overlap in syntax, output format, or use case. They do not
 all occupy the same layer.
 
-| Project        | Source language                                                         | Execution model                                                            | Role of types                                                           | Primary boundary or goal                                               |
-| -------------- | ----------------------------------------------------------------------- | -------------------------------------------------------------------------- | ----------------------------------------------------------------------- | ---------------------------------------------------------------------- |
-| Node.js        | JavaScript, with TypeScript normally erased before execution            | V8 interpreter and several JIT tiers                                       | No role in V8 after ordinary TypeScript erasure                         | A general server runtime and the Node.js API ecosystem                 |
-| AssemblyScript | A strictly typed TypeScript-like language                               | Ahead-of-time compilation to WebAssembly                                   | Types define what programs mean and which programs are valid            | Small, efficient WebAssembly modules                                   |
-| Perry          | A practical TypeScript and JavaScript subset                            | Ahead-of-time LLVM native code, with an optional JavaScript evaluator path | Types are erased; compiler inference guides native code generation      | Native applications and broad practical API compatibility              |
-| scriptc        | TypeScript and JavaScript checked against a compiler-owned type surface | Typed LLVM or C native code, with an opt-in QuickJS-ng island              | Checker results choose representations; dynamic crossings are validated | Small native programs with practical Node.js and package compatibility |
-| Porffor        | An experimental JavaScript/TypeScript sub- and superset                 | Ahead-of-time WebAssembly, with a separate IR-to-C native path             | Annotations can be enabled as unchecked optimization input              | Tiny, from-scratch AOT JavaScript research                             |
-| Static Hermes  | A sound typed JavaScript subset plus untyped JavaScript                 | Native compilation for typed code alongside evolving VM tiers              | Typed annotations are enforced with compile-time and checked casts      | High-performance typed JavaScript and React Native                     |
-| QuickJS        | JavaScript                                                              | Stack bytecode interpreted by QuickJS                                      | No TypeScript optimization contract                                     | A small embeddable JavaScript engine                                   |
-| Oseo           | An explicit JavaScript profile plus erasable TypeScript syntax          | Generic native code plus guarded specialized native code                   | Annotations are fallible hints and must not affect behavior             | A standards-measured, whole-program native server runtime              |
+| Project                | Source language                                                         | Execution model                                                                  | Role of types                                                               | Primary boundary or goal                                               |
+| ---------------------- | ----------------------------------------------------------------------- | -------------------------------------------------------------------------------- | --------------------------------------------------------------------------- | ---------------------------------------------------------------------- |
+| Node.js                | JavaScript, with TypeScript normally erased before execution            | V8 interpreter and several JIT tiers                                             | No role in V8 after ordinary TypeScript erasure                             | A general server runtime and the Node.js API ecosystem                 |
+| Bun (experimental AOT) | JavaScript and TypeScript                                               | Native code in a JIT-free JavaScriptCore runtime; interpreter for dynamic source | TypeScript checking at build time; annotations guide guarded specialization | Bun executables with build-time compilation of reachable code          |
+| AssemblyScript         | A strictly typed TypeScript-like language                               | Ahead-of-time compilation to WebAssembly                                         | Types define what programs mean and which programs are valid                | Small, efficient WebAssembly modules                                   |
+| Perry                  | A practical TypeScript and JavaScript subset                            | Ahead-of-time LLVM native code, with an optional JavaScript evaluator path       | Types are erased; compiler inference guides native code generation          | Native applications and broad practical API compatibility              |
+| scriptc                | TypeScript and JavaScript checked against a compiler-owned type surface | Typed LLVM or C native code, with an opt-in QuickJS-ng island                    | Checker results choose representations; dynamic crossings are validated     | Small native programs with practical Node.js and package compatibility |
+| Porffor                | An experimental JavaScript/TypeScript sub- and superset                 | Ahead-of-time WebAssembly, with a separate IR-to-C native path                   | Annotations can be enabled as unchecked optimization input                  | Tiny, from-scratch AOT JavaScript research                             |
+| Static Hermes          | A sound typed JavaScript subset plus untyped JavaScript                 | Native compilation for typed code alongside evolving VM tiers                    | Typed annotations are enforced with compile-time and checked casts          | High-performance typed JavaScript and React Native                     |
+| QuickJS                | JavaScript                                                              | Stack bytecode interpreted by QuickJS                                            | No TypeScript optimization contract                                         | A small embeddable JavaScript engine                                   |
+| Oseo                   | An explicit JavaScript profile plus erasable TypeScript syntax          | Generic native code plus guarded specialized native code                         | Annotations are fallible hints and must not affect behavior                 | A standards-measured, whole-program native server runtime              |
 
 This table describes architectural intent, not maturity. Node.js is a mature
 runtime. AssemblyScript is an established language and toolchain. Perry is
@@ -126,6 +127,42 @@ automatically from compiling JavaScript semantics.
 [Node.js SEA documentation]: https://nodejs.org/api/single-executable-applications.html
 [TypeScript documentation]: https://nodejs.org/api/typescript.html
 [Minimum common web API]: https://min-common-api.proposal.wintertc.org/
+
+
+Bun: native AOT with a JavaScriptCore interpreter
+-------------------------------------------------
+
+The experimental `bun compile` command compiles JavaScript and TypeScript
+to machine code, including reachable functions from npm dependencies. The
+older `bun build --compile` packages the program with the ordinary Bun
+runtime, where JavaScriptCore can still JIT-compile code as it runs. The AOT
+executable instead keeps JavaScriptCore's value model, garbage collector,
+and interpreter but leaves out its JIT tiers.
+
+Bun and Oseo handle a failed specialization guard in much the same way:
+control passes to code already compiled into the executable, without
+reconstructing an interpreter frame. Bun's [AOT design] describes local
+generic branches as well as separate loop and function versions. An
+interpreter remains available for a different case: source that was not
+known at build time, such as a string constructed at run time and passed
+to `new Function()`. Oseo's closed profile rejects dynamic source rather
+than retaining an interpreter for it.
+
+Bun checks TypeScript at build time and can reject type errors. In code
+that compiles, a TypeScript annotation can guide speculation but does not
+by itself prove that a run-time check can be omitted. Oseo shares that
+distinction between a hint and a proof, but it does not use a TypeScript
+checker to decide which programs to accept. Bun also restricts some
+mutations in AOT mode: replacing `Array.prototype.push()`, for example,
+is disallowed. The ability to compile a program ahead of time does not
+imply that it behaves the same as under `bun run`.
+
+This comparison uses the November 2026 [AOT design] and the
+[Bun AOT documentation] inspected on 18 November 2026. It compares
+execution models, not benchmark results.
+
+[AOT design]: https://bun.com/bun-aot-how
+[Bun AOT documentation]: https://bun.com/docs/compiler/aot
 
 
 AssemblyScript: familiar syntax, a different language
@@ -331,14 +368,14 @@ ECMAScript profile with a stricter generic-fallback requirement.
 Porffor: the nearest compiler research comparison
 -------------------------------------------------
 
-Porffor shares more of Oseo's starting point than any other project considered
-here. It is written in JavaScript, uses an external parser behind a
-from-scratch compiler, has no interpreter or JIT in the ordinary path, accepts
-JavaScript and TypeScript syntax, runs test262, and can produce both WebAssembly
-and native binaries. Its [project site] and [current README] describe it as an
-experimental JavaScript/TypeScript-to-WebAssembly/C engine, compiler, and
-runtime. It even offers `--opt-types`, which uses unchecked type annotations as
-compiler hints.
+Porffor shares Oseo's starting point as a compiler built apart from an
+existing JavaScript VM. It is written in JavaScript, uses an external parser
+behind a from-scratch compiler, has no interpreter or JIT in the ordinary path,
+accepts JavaScript and TypeScript syntax, runs test262, and can produce both
+WebAssembly and native binaries. Its [project site] and [current README]
+describe it as an experimental JavaScript/TypeScript-to-WebAssembly/C engine,
+compiler, and runtime. It even offers `--opt-types`, which uses unchecked type
+annotations as compiler hints.
 
 Porffor's primary artifact is WebAssembly. Its experimental native path lowers
 its own generated low-level instruction arrays through the 2c IR-to-C compiler

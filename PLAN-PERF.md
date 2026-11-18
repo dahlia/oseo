@@ -172,6 +172,21 @@ bindings, type references that need resolution, and interfaces compile only
 after the erasable TypeScript unit
 of [*PLAN-PREVIEW.md*](./PLAN-PREVIEW.md) lands.
 
+If profiling shows that repeated guards or boxing are costly in a hot loop,
+try loop versioning: compile a specialized loop and a generic loop, and
+select between them with guards before the first iteration. Start with
+assumptions that hold for the entire loop once checked. Measure execution
+time and the code-size cost of duplicating the loop.
+
+A transfer after the loop has started is a separate experiment. It must
+pass the live values the generic loop needs without repeating observable
+work. [Bun's AOT design] restarts the current iteration only if no observable
+work would be repeated. It can restore the old value after certain slot
+stores; if an effect prevents a restart, the guard branches to a local
+generic path instead.
+
+[Bun's AOT design]: https://bun.com/bun-aot-how
+
 ### Whole-program inference
 
 Type and shape inference over the closed graph, so that code without

@@ -1032,6 +1032,14 @@ compilation. The test strategy has six layers:
     schedules, then compare reference, specialization, collection, or model
     observations.
 
+For specializations whose fallback edges are hard to reach through inputs
+alone, consider a test-only build that forces a selected guard to fail
+without changing its inputs. A structural test shows that the guard has a
+compiled generic successor. A native test must verify that execution took
+that edge and that the result, exceptions, and visible side effects match
+the build with specialization disabled. This supplements natural guard
+misses and false-hint tests; it does not replace them.
+
 Property suites use explicit reviewed seeds, case budgets, and size limits.
 They retain structured inputs through source printing so failures shrink within
 the admitted profile. A failure report records enough metadata to replay the
