@@ -40,7 +40,6 @@ import {
   createDenoHost,
   createExecutablePublisher,
   createFileModuleLoader,
-  createNodeHost,
   fileModuleResolver,
   hashModuleSource,
 } from "@oseo/host";
@@ -48,7 +47,7 @@ import {
   createBabelFrontend,
   createBabelModuleFrontend,
 } from "@oseo/parser-babel";
-import { cRuntimeProvider } from "@oseo/runtime-c";
+import { cRuntimeProvider, createNodeHost } from "./cli-assets.ts";
 import { zigToolchain } from "@oseo/toolchain-zig";
 import {
   binaryPropertySet,
