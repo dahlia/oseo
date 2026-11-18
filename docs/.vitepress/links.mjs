@@ -1,10 +1,11 @@
 import { readdir, readFile } from "node:fs/promises";
 import { join, relative, sep } from "node:path";
 
-const origin = "https://oseo.dev";
-
 // VitePress checks Markdown page links, but not theme links or fragments.
-export async function checkInternalLinks(outDir) {
+export async function checkInternalLinks(
+  outDir,
+  origin = "https://preview.invalid",
+) {
   const files = new Set(
     (await readdir(outDir, { recursive: true, withFileTypes: true }))
       .filter((entry) => entry.isFile())
