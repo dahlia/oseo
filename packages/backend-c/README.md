@@ -1,147 +1,59 @@
-@oseo/backend-c
-===============
+`@oseo/backend-c`
+=================
 
-This package emits deterministic C11 source from backend-neutral MIR. It
-preserves generic and dynamic calls, receivers, constructors, explicit abrupt
-completion, guarded operations, root frames, and safepoint locations. It does
-not execute a compiler or choose runtime sources. MIR blocks and terminators are
-its only semantic input; it never replays HIR.
+`@oseo/backend-c` emits deterministic C11 from Oseo's mid-level intermediate
+representation (MIR). It does not parse JavaScript, choose runtime inputs, or
+invoke a C compiler. If you only want to inspect the C for a JavaScript or
+TypeScript file, run `oseo build FILE --emit-c` with the [Oseo CLI].
 
-The backend logic is under GPL-3.0-or-later. The Oseo-authored C templates
-and support they contribute to output are under MIT; see *MIT-LICENSE.txt*.
-Generated C includes the applicable notices without licensing the user's
-program under MIT or GPL.
+[Oseo CLI]: https://github.com/dahlia/oseo/blob/main/docs/cli.md
 
-Lexical bindings use traced environments and shared cells. Their values remain
-rooted across calls and collection.
 
-Binding reads, property-key conversion, and ordinary property gets use
-statically selected native helpers from the runtime archive. Their call-site
-records carry root indices and source positions, so each generated program
-compiles fewer operand loads and result stores. The helpers perform the same
-runtime calls and root stores. MIR still owns guards and abrupt routing.
-Fragment emission retains its dynamically relocated source-location call.
+Emit C from MIR
+---------------
 
-Only functions reachable from the script and blocks reachable from function
-entry are emitted. Self-recursive calls use a standard C volatile function
-pointer so strict warning settings do not reject valid recursion.
+If you already have a `MirProgram` from [`@oseo/compiler`], install the
+backend:
 
-Every declared-function call enters the runtime call-depth budget before the
-callee enters generated C. The call leaves the budget while unwinding either a
-normal or abrupt result. Generated root slots and call-argument scratch slots
-use a heap-backed root frame instead of a variable-sized C stack array.
+~~~~ sh
+npm install @oseo/backend-c
+~~~~
 
-The backend also charges each entry against the runtime's active root-slot
-budget before entering generated C. A wide function therefore cannot exhaust
-the process stack before an owned resource diagnostic is possible. Script
-entries charge dense value slots plus binding-access calls separately from heap
-allocation. Non-recursive generated expression temporaries can also exhaust C
-stack space.
+Or, in a Deno project:
 
-UTF-16 string-constant units use static read-only storage rather than automatic
-compound literals, so source literal size does not enlarge a generated stack
-frame.
+~~~~ sh
+deno add jsr:@oseo/backend-c
+~~~~
 
-Large bodies run through bounded native helpers that return continuation
-indices to an iterative owner. The owner retains roots, completion records,
-and scalar state across helper calls. Static data keeps one identity, and
-normal or abrupt completion releases the owner's root frame exactly once.
-This preserves the existing logical frame charge and 65,536-unit ceiling.
+~~~~ js
+import { cBackend } from "@oseo/backend-c";
 
-The backend also supplies optional compilation units for large programs. Each
-wrapper selects a bounded group of definitions from the standalone C source.
-Native composition stages and compiles these wrappers through the toolchain's
-existing multiple-source contract, without cross-unit LTO. This bounds compiler
-IR retention as well as individual execution bodies. Splitting functions inside
-one translation unit alone is insufficient for unoptimized sanitizer builds.
-The standalone source remains available for inspection and direct C emission.
+const output = cBackend.emit(mir);
+console.log(output.source);
+~~~~
 
-Function creation passes MIR-owned UTF-16 names and plain parameter counts to
-the runtime. It does not consult HIR or source syntax.
+`output.source` is the standalone C translation unit. To build an executable,
+compile the generated C and link it with the matching [Oseo C runtime]. If
+`output.compilationUnits` is present, compile those files instead of the
+standalone file and keep it beside them under `output.sourceName` for their
+includes.
+The [Oseo CLI] handles these steps for you. See the
+[backend implementation notes] for how the emitter bounds native stack and
+compiler memory use.
 
-Value-slot discovery scans MIR argument IDs iteratively, so source-level call
-size does not become a JavaScript call-stack limit during C emission. Generated
-entry code passes diagnostic source identifiers with their UTF-8 byte lengths.
+[`@oseo/compiler`]: https://github.com/dahlia/oseo/tree/main/packages/compiler
+[Oseo C runtime]: https://github.com/dahlia/oseo/tree/main/packages/runtime-c
+[backend implementation notes]: https://github.com/dahlia/oseo/blob/main/docs/development/package-backend-c.md
 
-M2 guard failures and checked-addition overflow branch to the same emitted
-generic addition block. The hit path uses private inline runtime primitives and
-does not call generic addition or allocate. Block parameters carry the selected
-result into one ordinary continuation.
 
-M3 named property reads likewise preserve MIR-owned object and shape guards, a
-fixed-slot hit, one generic fallback, and a block-parameter join. The runtime
-exposes only private cache tests, fixed-slot loads, and cache updates to the C
-backend. A named cache belongs to one static key site, so its hit path does not
-allocate or materialize the property key.
+License
+-------
 
-Pending throws carry their diagnostic location and message through generated
-completion slots, so intervening `finally` operations cannot overwrite an
-unhandled exception's report.
+The backend logic is licensed under GPL-3.0-or-later. The Oseo-authored C
+templates and support that the backend contributes to its output are
+[MIT-licensed]. The output includes the applicable notices; it does not put
+your program under either license. See the [runtime linking decision] for
+the separate terms that apply when the Oseo runtime is linked in.
 
-Iterator operations keep the iterator, captured next method, and yielded value
-in distinct root slots. Generated close blocks consult the stored completion
-kind so `IteratorClose` preserves the required throw precedence.
-
-Dynamic array accumulation emits runtime value and hole append operations.
-Array spread steps its captured iterator method in MIR control-flow blocks and
-returns abrupt acquisition, step, and append results without synthesizing a
-close block.
-
-Call and constructor spread use the same iterator control flow while appending
-values to a GC-traced argument list. Generated invocations borrow the list count
-and stable value pointer only for the call. Fixed-arity paths keep their
-positional arguments.
-
-Array binding lowering associates iterator get, next, and close operations with
-a backend-local done bit. Exhaustion suppresses later steps and close calls.
-Generated cleanup blocks close only a still-open iterator and preserve an
-in-flight throw over a close failure.
-
-Object binding lowering emits the MIR-owned coercibility check before computed
-keys, then uses the existing property-key and generic property-read operations.
-Nested patterns reuse the same binding targets and abrupt-completion path.
-
-Catch parameter lowering captures the pending thrown value and resets every
-catch cell. It runs the same recursive binding path before entering the body.
-Pattern failures retain iterator cleanup and continue through an enclosing
-`finally`.
-
-`for-of` declaration patterns reuse that binding path after each outer iterator
-step. Generated code resets lexical cells per iteration and writes hoisted `var`
-cells in place. When initialization fails, generated code closes nested
-iterators before the outer iterator.
-
-`for-of` assignment patterns reuse the existing-target path after each outer
-step. They add no target cells. A checked identifier or member write failure
-closes nested pattern iterators before the outer iterator.
-
-Standalone destructuring assignment reuses the same recursive path. That path
-includes checked writes to existing identifier cells and property writes
-through member references evaluated before the corresponding source value.
-Generated code preserves the original right-hand value as the expression
-result. It routes an immutable, imported, member-reference, or member-write
-failure through every active array-pattern close block.
-
-Compound assignment emits the existing binding or property read, binary
-operation, and checked write sequence against one retained reference. Logical
-forms branch before emitting the right operand and write. They preserve the
-current value on the short path without adding a runtime ABI operation.
-
-Update expressions emit the same checked binding or member read and write
-operations around numeric coercion and arithmetic by one. A postfix form keeps
-the coerced previous value in its root slot across the write. A prefix form
-returns the assigned value. Member forms retain one object and raw key
-evaluation but emit separate property-key conversions for the read and write. A
-nullish-base check precedes those conversions.
-
-M4 whole-graph programs allocate shared module cells and namespaces before
-executing dependency-ordered bodies. Generated functions register one shared
-code-identity dispatcher used by dynamic calls, promise executors, reactions,
-and asynchronous continuations. Promise, timer, and top-level await MIR targets
-remain runtime calls, so generated C does not own job queues or scheduler
-policy.
-
-Guaranteed-rejected frames use a C preprocessor branch to omit their bodies
-before sanitizer IR construction. Entry points retain their runtime charge.
-Callable charges use `OSEO_CALLABLE_FRAME_COST`, whose multiplier is supplied
-by the toolchain; scripts retain their compact-root and binding-access charge.
+[MIT-licensed]: https://github.com/dahlia/oseo/blob/main/packages/backend-c/MIT-LICENSE.txt
+[runtime linking decision]: https://github.com/dahlia/oseo/blob/main/docs/adr/0021-runtime-linking-exception.md
