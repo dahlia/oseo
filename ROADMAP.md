@@ -120,9 +120,9 @@ collectors remain measured decisions rather than milestone assumptions.
 
 A release and distribution track is recorded in
 [*PLAN-RELEASE.md*](./PLAN-RELEASE.md). It fixes the artifact, channel, and
-toolchain-acquisition contracts for future releases but leaves the first
-release gate undecided. It reserves no milestone and changes no semantics or
-compatibility counts.
+toolchain-acquisition contracts. [*PLAN-0.1.0.md*](./PLAN-0.1.0.md) sets the
+first release gate and schedule. Neither plan reserves a milestone or changes
+semantics or compatibility counts.
 
 A command-line evolution track is recorded in
 [*PLAN-CLI.md*](./PLAN-CLI.md). It separates compile-and-run behavior from
@@ -351,17 +351,19 @@ Release and distribution track
 
 Oseo has published no release. [*PLAN-RELEASE.md*](./PLAN-RELEASE.md) defines
 the distribution channels: standalone CLI archives for the supported
-execution environments, the `@oseo/*` packages on npm and JSR, and an
-unscoped npm launcher. It separately defines automatic acquisition of the
-pinned Zig toolchain by the released CLI. Before M8, `deno compile` embeds a
-JavaScript runtime in the archive binary; native executables produced by that
-CLI embed no JavaScript runtime. M8 changes only how the CLI executable is
-produced.
+execution environments and the `@oseo/*` packages on npm and JSR. An unscoped
+npm launcher is not required for the first release. The plan also defines
+automatic acquisition of the pinned Zig toolchain by the released CLI.
+Before M8, [Node.js SEA]
+embeds the compiler's JavaScript host in the archive
+binary. Programs produced by the CLI embed no JavaScript runtime. M8 changes
+how the CLI executable is produced, not the distribution contract.
 
-The first release waits for recorded capability prerequisites from the
-measured tracks, and selecting the moment within them remains a maintainer
-judgment based on timing and surrounding conditions. Intermediate releases
-publish exact coverage and known gaps without the conformance label.
+[*PLAN-0.1.0.md*](./PLAN-0.1.0.md) coordinates the first release separately
+from the preview feature work. Intermediate releases publish exact coverage
+and known gaps without the conformance label.
+
+[Node.js SEA]: https://nodejs.org/api/single-executable-applications.html
 
 
 M0: Architecture and project foundations

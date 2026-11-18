@@ -772,6 +772,24 @@ exact lockstep release version, then inspects the packed manifest. Every package
 root must contain a *LICENSE* file identical to the repository license so that
 both npm and JSR artifacts distribute the GPL text.
 
+### Planned release workflow
+
+Send backward-compatible features to `main` and breaking changes to `next`
+when that branch is active. Send bug fixes to the oldest supported
+`x.y-maintenance` branch affected, or to the development branch that contains
+the bug if it has not shipped. Fixes move forward to newer lines, then to
+`main` and `next` where applicable. Report vulnerabilities privately as
+described in [*SECURITY.md*](./SECURITY.md).
+
+The current *VERSION* workflow above stays in place until the Sacho migration
+lands. After the migration, *changes.d/next* holds the next intended release
+on each development branch. `mise run bump-version <version>` will call
+`sacho next` and synchronize the npm and JSR manifests as one operation.
+The release commit will have no *changes.d/next*; its version checks compare
+the manifests with the frozen section in *CHANGES.md* and, on tag builds,
+with the tag. Canary version suffixes are applied only in CI staging.
+The maintainer procedure is in [*docs/releasing.md*](./docs/releasing.md).
+
 
 Documentation and design changes
 --------------------------------
