@@ -4,6 +4,25 @@ import { readFileSync } from "node:fs";
 import type { EmittedNativeSource } from "../../packages/compiler/src/index.ts";
 import { cRuntimeProvider } from "../../packages/runtime-c/src/index.ts";
 
+/** Expected C notice built from the checked-in license texts. */
+export const emittedCNotice: string = [
+  "/*",
+  "Oseo-authored output support only (SPDX-License-Identifier: MIT).",
+  readFileSync(new URL("../../MIT-LICENSE.txt", import.meta.url), "utf8")
+    .replaceAll("\r\n", "\n")
+    .trimEnd(),
+  "",
+  "Unicode-derived tables, where present " +
+    "(SPDX-License-Identifier: Unicode-3.0).",
+  readFileSync(
+    new URL("../../packages/runtime-c/UNICODE-LICENSE.txt", import.meta.url),
+    "utf8",
+  )
+    .replaceAll("\r\n", "\n")
+    .trimEnd(),
+  "*/\n",
+].join("\n");
+
 interface Helper {
   readonly name: string;
   readonly base: string;
@@ -39,7 +58,12 @@ export function includeSelectedSources(
   if (emitted.compilationUnits == null) return [emitted.source];
   return emitted.compilationUnits.map((unit, index) => {
     assert.equal(
-      unit.source,
+      unit.source.slice(0, emittedCNotice.length),
+      emittedCNotice,
+      "the compiler input begins with the MIT and Unicode notices",
+    );
+    assert.equal(
+      unit.source.slice(emittedCNotice.length),
       `#define OSEO_C_BODY_UNIT ${index}\n` +
         `#include "${emitted.sourceName}"\n`,
       "the actual compiler input includes the original source coordinates",

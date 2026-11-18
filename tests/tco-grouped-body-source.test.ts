@@ -25,6 +25,7 @@ import {
 } from "./helpers/balanced-backend.ts";
 import {
   assertTailOwnerExit,
+  emittedCNotice,
   includeSelectedSources,
 } from "./helpers/tail-owner-exit.ts";
 
@@ -158,13 +159,11 @@ wide(0);`,
       const balancedSelected = includeSelectedSources(balanced);
       for (const [index, unit] of units.entries()) {
         const actual = selected[index]!;
-        assert.ok(
-          unit.source.startsWith(`#define OSEO_C_BODY_UNIT ${index}\n`),
-        );
+        const prefix = emittedCNotice + `#define OSEO_C_BODY_UNIT ${index}\n`;
+        assert.ok(unit.source.startsWith(prefix));
         assert.equal(
           unit.source,
-          `#define OSEO_C_BODY_UNIT ${index}\n` +
-            `#include "${emitted.sourceName}"\n`,
+          prefix + `#include "${emitted.sourceName}"\n`,
         );
         assert.ok(unit.sourceName.endsWith(`-unit-${index}.c`));
         if (tail.test(actual)) tailOwners++;
@@ -232,18 +231,22 @@ test("include-selected static identity keeps its owner and coordinates", () => {
   const sourceName = "original-source.c";
   const emitted = {
     sourceName,
-    source: [
-      "#if FRAME_COST <= OSEO_MAX_ACTIVE_FRAME_SLOTS",
-      "#if !defined(OSEO_C_BODY_UNIT) || OSEO_C_BODY_UNIT == 1",
-      "const uint16_t shared_text[] = {17, 23};",
-      "#else",
-      "extern const uint16_t shared_text[];",
-      "#endif",
-      "#endif",
-    ].join("\n"),
+    source:
+      emittedCNotice +
+      [
+        "#if FRAME_COST <= OSEO_MAX_ACTIVE_FRAME_SLOTS",
+        "#if !defined(OSEO_C_BODY_UNIT) || OSEO_C_BODY_UNIT == 1",
+        "const uint16_t shared_text[] = {17, 23};",
+        "#else",
+        "extern const uint16_t shared_text[];",
+        "#endif",
+        "#endif",
+      ].join("\n"),
     compilationUnits: [0, 1, 2].map((unit) => ({
       sourceName: `original-source-unit-${unit}.c`,
-      source: `#define OSEO_C_BODY_UNIT ${unit}\n#include "${sourceName}"\n`,
+      source:
+        emittedCNotice +
+        `#define OSEO_C_BODY_UNIT ${unit}\n#include "${sourceName}"\n`,
     })),
   };
   const selected = includeSelectedSources(emitted);
@@ -259,7 +262,7 @@ test("include-selected static identity keeps its owner and coordinates", () => {
     assert.doesNotMatch(selected[index]!, /= \{17, 23\}/u);
   }
   for (const source of selected) {
-    assert.ok(source.startsWith("#if FRAME_COST <="));
+    assert.ok(source.startsWith(emittedCNotice + "#if FRAME_COST <="));
     assert.ok(source.endsWith("#endif"));
   }
   const wrongInclude = {

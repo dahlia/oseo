@@ -3,7 +3,12 @@ import { mkdtemp, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import test from "node:test";
-import { executeCliInvocation, parseCliRequest } from "../src/index.ts";
+import type { ProcessRequest } from "@oseo/compiler";
+import {
+  defaultComponents,
+  executeCliInvocation,
+  parseCliRequest,
+} from "../src/index.ts";
 
 test("native output alone selects Zig; --zig works offline", async (t) => {
   const temporary = await mkdtemp(join(tmpdir(), "oseo-cli-zig-test-"));
@@ -62,8 +67,23 @@ test("native output alone selects Zig; --zig works offline", async (t) => {
   };
   const parsed = parseCliRequest(request);
   assert.equal(parsed.kind, "invoke");
-  const built = await executeCliInvocation(parsed.value, request);
+  const compilerRequests: ProcessRequest[] = [];
+  const built = await executeCliInvocation(parsed.value, request, {
+    ...defaultComponents.createNodeHost(),
+    run(processRequest) {
+      compilerRequests.push(processRequest);
+      return Promise.resolve({ exitStatus: 47, stdout: "", stderr: "" });
+    },
+  });
+  assert.deepEqual(
+    compilerRequests.map(({ command, args }) => [command, args[0]]),
+    [[zig, "cc"]],
+  );
   assert.equal(built.exitStatus, 1);
-  assert.match(built.stderr, /exit 47/u);
+  assert.equal(
+    built.stderr,
+    "app.js:1:1: error[OSEO3001]: The native toolchain for " +
+      "target 'linux-x86_64-gnu' failed (exit 47).\n",
+  );
   assert.equal(requests, 0);
 });
