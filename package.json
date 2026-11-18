@@ -9,13 +9,10 @@
   },
   "funding": "https://github.com/sponsors/dahlia",
   "workspaces": [
-    "packages/*"
+    "packages/*",
+    "docs"
   ],
   "type": "module",
-  "scripts": {
-    "docs:build": "vitepress build docs",
-    "docs:dev": "vitepress dev docs"
-  },
   "devDependencies": {
     "@arethetypeswrong/core": "0.18.5",
     "@babel/parser": "8.0.4",
@@ -27,7 +24,6 @@
     "test262": "github:tc39/test262#f2d1435644797268dca1f7988cad5a4e89ccd8d2",
     "tsdown": "0.22.7",
     "typescript": "7.0.2",
-    "vitepress": "1.6.4",
     "yaml": "2.9.0"
   },
   "engines": {

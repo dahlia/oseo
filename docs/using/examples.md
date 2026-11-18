@@ -11,7 +11,7 @@ argument `1` requests one pass through the array.
 
 ~~~~ sh
 mkdir -p artifacts
-mise exec -- node packages/cli/dist/main.js build examples/numeric-hinted.ts \
+mise run oseo build examples/numeric-hinted.ts \
   -o artifacts/numeric
 printf '[[20,22]]\n' | ./artifacts/numeric 1
 ~~~~

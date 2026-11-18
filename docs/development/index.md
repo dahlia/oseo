@@ -30,14 +30,14 @@ after `mise install`:
 
 ~~~~ sh
 mise exec -- pnpm install --frozen-lockfile
-mise exec -- pnpm run docs:build
+mise run docs:build
 ~~~~
 
 The build fails on broken internal page links and anchors, including links
 in the default theme navigation. Links to external sites such as GitHub are
 not fetched during the build. The static output is in
 *docs/.vitepress/dist/*. For a local development server, run
-`mise exec -- pnpm run docs:dev`.
+`mise run docs:dev`.
 
 Release CI sets `OSEO_DOCS_CHANNEL` and `OSEO_DOCS_VERSION` from the release
 identity. Stable builds include the version's download and install

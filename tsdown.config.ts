@@ -23,6 +23,7 @@ const config: UserConfig = defineConfig({
   },
   sourcemap: true,
   unbundle: true,
+  workspace: "packages/*",
 });
 
 export default config;
