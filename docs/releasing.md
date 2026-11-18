@@ -31,9 +31,9 @@ branch.
     stops midway, rerun it against the original staged artifacts; do not move
     the tag or try to replace a published version.
 
-For 0.1.0, the first released section needs no change fragments. Do not
-backfill work that preceded the first release. Use a release introduction if
-readers need context.
+For 0.1.0, run `mise exec -- sacho release --allow-empty` if there are no change
+fragments. Do not backfill work that preceded the first release. Use a release
+introduction if readers need context.
 
 
 Forward-port fixes

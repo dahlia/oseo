@@ -1,7 +1,9 @@
 /* eslint-disable no-await-in-loop -- Fixture files are created in order. */
 
 import assert from "node:assert/strict";
+import { execFile } from "node:child_process";
 import {
+  copyFile,
   mkdtemp,
   mkdir,
   readFile,
@@ -12,10 +14,11 @@ import {
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import test from "node:test";
+import { promisify } from "node:util";
 
 import {
+  bumpWorkspaceVersion,
   checkWorkspaceVersions,
-  setWorkspaceVersion,
 } from "../tools/versions.ts";
 import type { VersionFileOperations } from "../tools/versions.ts";
 
@@ -31,9 +34,21 @@ const packages = [
   ["unicode", "@oseo/unicode"],
 ] as const;
 
+const execFileAsync = promisify(execFile);
+
 async function fixtureWorkspace(): Promise<string> {
   const root = await mkdtemp(join(tmpdir(), "oseo-versions-"));
-  await writeFile(join(root, "VERSION"), "0.0.0\n");
+  await copyFile(
+    new URL("../sacho.toml", import.meta.url),
+    join(root, "sacho.toml"),
+  );
+  await mkdir(join(root, "changes.d"));
+  await writeFile(join(root, "changes.d", "next"), "0.0.0\n");
+  await writeFile(
+    join(root, "CHANGES.md"),
+    "Oseo changelog\n==============\n\nVersion 0.0.0\n-------------\n\n" +
+      "To be released.\n",
+  );
   for (const [directory, name] of packages) {
     const packageRoot = join(root, "packages", directory);
     await mkdir(packageRoot, { recursive: true });
@@ -53,7 +68,8 @@ async function fixtureWorkspace(): Promise<string> {
 
 async function workspaceSnapshot(root: string): Promise<readonly string[]> {
   const paths = [
-    join(root, "VERSION"),
+    join(root, "changes.d", "next"),
+    join(root, "CHANGES.md"),
     ...packages.flatMap(([directory]) => [
       join(root, "packages", directory, "package.json"),
       join(root, "packages", directory, "deno.json"),
@@ -98,9 +114,10 @@ function fileOperations(options?: {
 test("updates every package version in one operation", async () => {
   const root = await fixtureWorkspace();
   try {
-    await setWorkspaceVersion(root, "1.2.3");
+    await bumpWorkspaceVersion(root, "1.2.3");
     assert.deepEqual(await checkWorkspaceVersions(root), {
       packageCount: 9,
+      state: "development",
       version: "1.2.3",
     });
   } finally {
@@ -125,9 +142,10 @@ test("discovers newly added workspace packages", async () => {
     }
     assert.deepEqual(await checkWorkspaceVersions(root), {
       packageCount: 10,
+      state: "development",
       version: "0.0.0",
     });
-    await setWorkspaceVersion(root, "1.2.3");
+    await bumpWorkspaceVersion(root, "1.2.3");
     for (const filename of ["package.json", "deno.json"]) {
       // SAFETY: The fixture generator writes manifests with a version field.
       const manifest = JSON.parse(
@@ -145,7 +163,7 @@ test("keeps manifests after a temporary write failure", async () => {
   try {
     const before = await workspaceSnapshot(root);
     await assert.rejects(
-      setWorkspaceVersion(
+      bumpWorkspaceVersion(
         root,
         "1.2.3",
         fileOperations({ failTemporaryWrite: true }),
@@ -162,7 +180,29 @@ test("rolls back replaced files after a rename failure", async () => {
   try {
     const before = await workspaceSnapshot(root);
     await assert.rejects(
-      setWorkspaceVersion(root, "1.2.3", fileOperations({ failRenameAt: 2 })),
+      bumpWorkspaceVersion(root, "1.2.3", fileOperations({ failRenameAt: 2 })),
+    );
+    assert.deepEqual(await workspaceSnapshot(root), before);
+  } finally {
+    await rm(root, { force: true, recursive: true });
+  }
+});
+
+test("restores manifests when Sacho cannot complete the bump", async () => {
+  const root = await fixtureWorkspace();
+  try {
+    const before = await workspaceSnapshot(root);
+    const operations = fileOperations();
+    await assert.rejects(
+      bumpWorkspaceVersion(root, "1.2.3", {
+        ...operations,
+        async rename(from, to) {
+          // Simulate a configuration failure after the preflight check.
+          await writeFile(join(root, "sacho.toml"), "invalid toml\n");
+          await operations.rename(from, to);
+        },
+      }),
+      /original files were restored/u,
     );
     assert.deepEqual(await workspaceSnapshot(root), before);
   } finally {
@@ -220,11 +260,90 @@ test("rejects malformed dependency fields and ranges", async () => {
   }
 });
 
-test("rejects invalid strict SemVer values", async () => {
+test("requires an unadorned x.y.z for the development version", async () => {
   const root = await fixtureWorkspace();
   try {
-    await assert.rejects(setWorkspaceVersion(root, "1.0.0-01"), /SemVer/u);
-    await assert.rejects(setWorkspaceVersion(root, "01.0.0"), /SemVer/u);
+    for (const version of [
+      "1.0.0-rc.1",
+      "1.0.0+meta",
+      "01.0.0",
+      "v1.0.0",
+      "1.0.0\n",
+    ]) {
+      await assert.rejects(bumpWorkspaceVersion(root, version), /SemVer/u);
+    }
+    await writeFile(join(root, "changes.d", "next"), "0.0.0\n0.0.1\n");
+    await assert.rejects(checkWorkspaceVersions(root), /one x\.y\.z SemVer/u);
+  } finally {
+    await rm(root, { force: true, recursive: true });
+  }
+});
+
+test("requires a frozen Sacho section when next is absent", async () => {
+  const root = await fixtureWorkspace();
+  try {
+    await rm(join(root, "changes.d", "next"));
+    await assert.rejects(checkWorkspaceVersions(root), /sacho check failed/u);
+    await writeFile(
+      join(root, "CHANGES.md"),
+      "Oseo changelog\n==============\n\nVersion 0.0.1\n-------------\n\n" +
+        "Released on November 19, 2026.\n",
+    );
+    await assert.rejects(
+      checkWorkspaceVersions(root),
+      /sacho show 0\.0\.0 failed/u,
+    );
+  } finally {
+    await rm(root, { force: true, recursive: true });
+  }
+});
+
+test("rejects a manifest that disagrees with next", async () => {
+  const root = await fixtureWorkspace();
+  try {
+    await writeFile(join(root, "changes.d", "next"), "0.0.1\n");
+    await assert.rejects(checkWorkspaceVersions(root), /does not match/u);
+  } finally {
+    await rm(root, { force: true, recursive: true });
+  }
+});
+
+test("validates a release-only tree and opens its next cycle", async () => {
+  const root = await fixtureWorkspace();
+  const next = join(root, "changes.d", "next");
+  const changelog = join(root, "CHANGES.md");
+  try {
+    await execFileAsync(
+      "sacho",
+      ["release", "--allow-empty", "--date", "2026-11-19"],
+      { cwd: root },
+    );
+    // Git does not retain an empty fragment directory in a checkout.
+    await rm(join(root, "changes.d"), { recursive: true });
+    await assert.rejects(readFile(next), { code: "ENOENT" });
+    const released = await readFile(changelog, "utf8");
+    assert.deepEqual(await checkWorkspaceVersions(root), {
+      packageCount: 9,
+      state: "released",
+      version: "0.0.0",
+    });
+    await assert.rejects(
+      bumpWorkspaceVersion(root, "0.0.0"),
+      /already released/u,
+    );
+    await bumpWorkspaceVersion(root, "0.0.1");
+    assert.equal(await readFile(next, "utf8"), "0.0.1\n");
+    assert.match(await readFile(changelog, "utf8"), /Version 0\.0\.1/u);
+    assert.ok(
+      (await readFile(changelog, "utf8")).endsWith(
+        released.slice(released.indexOf("Version 0.0.0")),
+      ),
+    );
+    assert.deepEqual(await checkWorkspaceVersions(root), {
+      packageCount: 9,
+      state: "development",
+      version: "0.0.1",
+    });
   } finally {
     await rm(root, { force: true, recursive: true });
   }

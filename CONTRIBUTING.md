@@ -109,6 +109,7 @@ The workspace uses this toolchain:
     workspace management;
  -  [Oxfmt] for JavaScript, TypeScript, and data-file formatting;
  -  [Oxlint] for JavaScript and TypeScript linting;
+ -  [Sacho] for the changelog and next release version;
  -  [ShellCheck] for shell fragments embedded in GitHub Actions workflows;
  -  [TypeScript] for static checking of repository source;
  -  [tsdown] for npm package builds;
@@ -144,6 +145,7 @@ modify dependencies. Do not hand-edit generated lockfiles.
 [pnpm]: https://pnpm.io/
 [Oxfmt]: https://oxc.rs/docs/guide/usage/formatter
 [Oxlint]: https://oxc.rs/docs/guide/usage/linter
+[Sacho]: https://github.com/dahlia/sacho
 [ShellCheck]: https://www.shellcheck.net/
 [TypeScript]: https://www.typescriptlang.org/
 [tsdown]: https://tsdown.dev/
@@ -750,16 +752,18 @@ manifests for the same package must report the same version. Internal package
 dependencies should use the workspace protocol rather than hard-coded local
 versions.
 
-The root *VERSION* file is the single source of truth for the lockstep version.
-`mise run check:versions` verifies its strict SemVer value against every
-published npm and JSR package manifest. The check also validates manifest
-pairs, package names, and `workspace:*` internal dependency ranges. Do not edit
-*VERSION* or one package manifest independently.
+On development branches, *changes.d/next* holds the next intended release as
+an `x.y.z` version. `mise run check:versions` compares that value with every
+npm and JSR package manifest. When a release commit has no *changes.d/next*,
+the manifests must all agree with a released section in *CHANGES.md*. On
+stable tag builds, the manifests must also match the tag. The version check
+also checks the changelog against the fragments and validates package names,
+manifest pairs, and npm `workspace:*` ranges.
 
-Version changes are maintainer-driven and should not be included in unrelated
-contributions. Use `mise run bump-versions <version>` to update *VERSION* and
-every package manifest atomically. If the command cannot complete the full
-update, it restores the previous contents.
+Use `mise run bump-version <version>` to run `sacho next` and synchronize the
+npm and JSR manifests in one operation. Leave version bumps to the maintainer,
+and do not change one manifest independently. CI applies canary version
+suffixes only to the copies it stages for publishing.
 
 npm artifacts should be ESM packages built with tsdown and include declaration
 files and source maps. JSR packages should publish TypeScript source. Package
@@ -784,13 +788,6 @@ the bug if it has not shipped. Fixes move forward to newer lines, then to
 `main` and `next` where applicable. Report vulnerabilities privately as
 described in [*SECURITY.md*](./SECURITY.md).
 
-The current *VERSION* workflow above stays in place until the Sacho migration
-lands. After the migration, *changes.d/next* holds the next intended release
-on each development branch. `mise run bump-version <version>` will call
-`sacho next` and synchronize the npm and JSR manifests as one operation.
-The release commit will have no *changes.d/next*; its version checks compare
-the manifests with the frozen section in *CHANGES.md* and, on tag builds,
-with the tag. Canary version suffixes are applied only in CI staging.
 The maintainer procedure is in [*docs/releasing.md*](./docs/releasing.md).
 
 
