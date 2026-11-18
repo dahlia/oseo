@@ -55,6 +55,10 @@ depends = ["build"]
 usage = 'arg "<directory>" help="New probe directory; not performance evidence"'
 run = 'node tools/perf-profile-smoke.ts "${usage_directory?}"'
 
+[tasks."perf:mac:discover"]
+description = "Observe read-only Mac preparation facts in an existing CI job"
+run = "node tools/perf/mac-discovery.ts"
+
 [tasks.bump-versions]
 description = "Atomically set the lockstep package version"
 usage = 'arg "<version>" help="Strict SemVer for every @oseo package"'

@@ -4,6 +4,11 @@ on:
   schedule:
     - cron: "23 3 * * 0"
   workflow_dispatch:
+    inputs:
+      mac_discovery:
+        description: Read-only Mac preparation diagnostics
+        type: boolean
+        default: false
 
 env:
   OSEO_NATIVE_BUILD_CONFIG: optimized
@@ -12,11 +17,16 @@ permissions:
   contents: read
 
 concurrency:
-  group: optimized-native-${{ github.ref }}
+  group: >-
+    optimized-native-${{ github.ref }}-${{
+      inputs.mac_discovery == true && 'discovery' || 'semantic' }}
   cancel-in-progress: false
 
 jobs:
   test262:
+    if: >-
+      github.event_name != 'workflow_dispatch' ||
+      !inputs.mac_discovery
     name: optimized test262 (${{ matrix.os }}, ${{ matrix.shard }}/12)
     runs-on: ${{ matrix.os }}
     timeout-minutes: 90
@@ -44,6 +54,9 @@ jobs:
           if-no-files-found: warn
 
   properties:
+    if: >-
+      github.event_name != 'workflow_dispatch' ||
+      !inputs.mac_discovery
     name: optimized properties (${{ matrix.os }}, ${{ matrix.shard }}/7)
     runs-on: ${{ matrix.os }}
     timeout-minutes: 90
@@ -75,6 +88,9 @@ jobs:
           if-no-files-found: warn
 
   dedicated-properties:
+    if: >-
+      github.event_name != 'workflow_dispatch' ||
+      !inputs.mac_discovery
     name: optimized property (${{ matrix.os }}, ${{ matrix.file }})
     runs-on: ${{ matrix.os }}
     timeout-minutes: 90
@@ -106,3 +122,71 @@ jobs:
           name: optimized-property-${{ matrix.os }}-${{ strategy.job-index }}
           path: ${{ runner.temp }}/oseo-*
           if-no-files-found: warn
+
+  mac-discovery-1:
+    if: >-
+      github.event_name == 'workflow_dispatch' &&
+      inputs.mac_discovery
+    name: Mac preparation discovery 1
+    runs-on: [self-hosted, macOS, ARM64, oseo-mac-1]
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: ./.github/actions/setup-mise
+        with:
+          install: "false"
+      - name: Observe preparation facts
+        run: mise exec --no-deps -- node tools/perf/mac-discovery.ts
+        env:
+          MISE_AUTO_INSTALL: "false"
+          OSEO_DISCOVERY_LABEL: oseo-mac-1
+      - name: Archive derived evidence before runner cleanup
+        if: always()
+        run: mise exec --no-deps -- node tools/perf/mac-discovery.ts
+        env:
+          MISE_AUTO_INSTALL: "false"
+          OSEO_DISCOVERY_LABEL: oseo-mac-1
+          OSEO_DISCOVERY_ARCHIVE_ONLY: "true"
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: mac-discovery-${{ github.run_id }}-${{ github.run_attempt }}-1
+          path: ${{ runner.temp }}/mac-discovery-derived.tar
+          if-no-files-found: error
+          retention-days: 7
+
+  mac-discovery-2:
+    if: >-
+      github.event_name == 'workflow_dispatch' &&
+      inputs.mac_discovery
+    name: Mac preparation discovery 2
+    runs-on: [self-hosted, macOS, ARM64, oseo-mac-2]
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: ./.github/actions/setup-mise
+        with:
+          install: "false"
+      - name: Observe preparation facts
+        run: mise exec --no-deps -- node tools/perf/mac-discovery.ts
+        env:
+          MISE_AUTO_INSTALL: "false"
+          OSEO_DISCOVERY_LABEL: oseo-mac-2
+      - name: Archive derived evidence before runner cleanup
+        if: always()
+        run: mise exec --no-deps -- node tools/perf/mac-discovery.ts
+        env:
+          MISE_AUTO_INSTALL: "false"
+          OSEO_DISCOVERY_LABEL: oseo-mac-2
+          OSEO_DISCOVERY_ARCHIVE_ONLY: "true"
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: mac-discovery-${{ github.run_id }}-${{ github.run_attempt }}-2
+          path: ${{ runner.temp }}/mac-discovery-derived.tar
+          if-no-files-found: error
+          retention-days: 7

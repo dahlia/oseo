@@ -25,7 +25,7 @@ import type {
   NativeBuildMetadata,
 } from "../tools/perf/build.ts";
 import { artifact, validateEvidence } from "../tools/perf/evidence.ts";
-import { digest, kernels } from "../tools/perf/corpus.ts";
+import { digest, kernelProfileFlag, kernels } from "../tools/perf/corpus.ts";
 import { Journal } from "../tools/perf/journal.ts";
 import { checkMatrix } from "../tools/perf/correctness.ts";
 import type { LaunchRecord } from "../tools/perf/journal.ts";
@@ -1098,3 +1098,31 @@ test(
     }
   },
 );
+
+test("the 53-role matrix refuses profile arguments in each recipe", () => {
+  const directory = mkdtempSync(join(tmpdir(), "perf-profile-recipe-"));
+  try {
+    const manifest = fixture(directory);
+    assert.equal(manifest.forms.length, 53);
+    for (const changed of manifest.forms) {
+      for (const extra of [[kernelProfileFlag], ["--", kernelProfileFlag]]) {
+        const altered = {
+          ...changed,
+          run: { ...changed.run, args: [...changed.run.args, ...extra] },
+        };
+        assert.throws(
+          () =>
+            verifyMatrix({
+              ...manifest,
+              forms: manifest.forms.map((form) =>
+                form === changed ? altered : form,
+              ),
+            }),
+          /Launch arguments do not match frozen source/u,
+        );
+      }
+    }
+  } finally {
+    rmSync(directory, { recursive: true, force: true });
+  }
+});

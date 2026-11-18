@@ -6,7 +6,12 @@ import { join } from "node:path";
 import process from "node:process";
 import test from "node:test";
 
-import { kernels, readKernel, renderKernel } from "../tools/perf/corpus.ts";
+import {
+  kernelProfileIterations,
+  kernels,
+  readKernel,
+  renderKernel,
+} from "../tools/perf/corpus.ts";
 import {
   defaultMethod,
   orderForRound,
@@ -913,4 +918,118 @@ test("postject provenance requires an active installed version", () => {
       /Invalid host provenance: postject/u,
     );
   }
+});
+
+const profileCounts = new Map([
+  ["sieve", 2000],
+  ["permute", 1000],
+  ["json-roundtrip", 10000],
+  ["regexp", 10000],
+]);
+const profileFlag = "--oseo-kernel-profile";
+
+test("generated wrappers select only the fixed explicit profile count", () => {
+  const directory = scratch();
+  try {
+    for (const item of kernels) {
+      const count = profileCounts.get(item.id)!;
+      const path = join(directory, item.id + ".cjs");
+      const body = `function benchmark() { return ${item.expected}; }`;
+      writeFileSync(path, renderKernel(item, body, 100));
+      for (const [args, expected] of [
+        [[], 100],
+        [[profileFlag], count],
+      ] as const) {
+        const output = spawnSync(process.execPath, [path, ...args], {
+          encoding: "utf8",
+        });
+        assert.equal(output.status, 0, output.stderr);
+        checkExecution({ ...output, wallMs: 1 }, item.id, expected);
+      }
+      for (const args of [
+        [""],
+        ["100"],
+        [String(count)],
+        [profileFlag + "=" + count],
+        [profileFlag.toUpperCase()],
+        ["--unknown"],
+        [profileFlag, "extra"],
+        [profileFlag, profileFlag],
+        [profileFlag, ""],
+        ["", profileFlag],
+        ["extra", profileFlag],
+        ["--", profileFlag],
+      ]) {
+        const output = spawnSync(process.execPath, [path, ...args], {
+          encoding: "utf8",
+        });
+        assert.notEqual(output.status, 0, JSON.stringify(args));
+        assert.doesNotMatch(output.stdout, /PERF_OK|PERF_TIME/u);
+      }
+    }
+  } finally {
+    rmSync(directory, { recursive: true, force: true });
+  }
+});
+
+test("generated wrappers check the last call and never call N plus one", () => {
+  const directory = scratch();
+  try {
+    for (const item of kernels) {
+      const path = join(directory, item.id + ".cjs");
+      for (const [args, count] of [
+        [[], 100],
+        [[profileFlag], profileCounts.get(item.id)!],
+      ] as const) {
+        for (const failAt of [count, count + 1]) {
+          const body = `let calls = 0;
+function benchmark() {
+  calls += 1;
+  if (calls === ${failAt}) return -1;
+  return ${item.expected};
+}`;
+          writeFileSync(path, renderKernel(item, body, 100));
+          const output = spawnSync(process.execPath, [path, ...args], {
+            encoding: "utf8",
+          });
+          if (failAt === count) {
+            assert.notEqual(output.status, 0);
+            assert.match(output.stderr, /Self-check failed/u);
+            assert.doesNotMatch(output.stdout, /PERF_OK|PERF_TIME/u);
+          } else {
+            assert.equal(output.status, 0, output.stderr);
+            checkExecution({ ...output, wallMs: 1 }, item.id, count);
+          }
+        }
+      }
+    }
+  } finally {
+    rmSync(directory, { recursive: true, force: true });
+  }
+});
+
+test("profile counts reject unknown kernels and keep the startup stub", () => {
+  for (const item of kernels) {
+    assert.equal(kernelProfileIterations(item.id), profileCounts.get(item.id));
+  }
+  for (const id of ["", "unknown", "startup", "Sieve", "toString"]) {
+    assert.throws(() => kernelProfileIterations(id), /Unknown profile kernel/u);
+  }
+  assert.throws(() => renderKernel({ ...kernel, id: "unknown" }, "", 100));
+  const body = "function benchmark() { return 0; }";
+  assert.equal(
+    renderKernel({ ...kernel, id: "startup", expected: 0 }, body, 1),
+    `${body}
+const perfStart = Date.now();
+for (let repeat = 0; repeat < 1; repeat += 1) {
+  const result = benchmark();
+  if (result !== 0) {
+    throw new Error("Self-check failed: startup: " + result);
+  }
+}
+const perfElapsed = Date.now() - perfStart;
+console.log("PERF_OK startup 1");
+console.log("PERF_TIME " + perfElapsed);
+`,
+  );
 });

@@ -104,12 +104,12 @@ real executor checks RSS-tool availability before starting any population.
 Every launch preserves explicit stdin, individual arguments, environment,
 working directory, UTC boundaries, monotonic boundaries, status and signal.
 *raw/requests.jsonl* records an attempt before spawning;
-*raw/launches.jsonl* links its original stdin/stdout/stderr byte files and
-digests before kernel text decoding. Before accepting a build matrix or a
-completed run, the drivers recheck every raw stream and request/launch link.
-Invalid UTF-8 bytes remain intact. Spawn
-errors, wrong output and nonzero exits leave *failure.json* and all prior
-attempts; they produce no successful *measurements.json*.
+*raw/launches.jsonl* links each launch's original `stdin`, `stdout`, and
+`stderr` byte files and digests before kernel text decoding. Before accepting a
+build matrix or a completed run, the drivers recheck every raw stream and
+request/launch link. Invalid UTF-8 bytes remain intact. Spawn errors, wrong
+output and nonzero exits leave *failure.json* and all prior attempts; they
+produce no successful *measurements.json*.
 
 Set `OSEO_PERF_RSS_FIRST=1` to collect RSS before each kernel's timing
 population and exercise the excluded preflight. The default runs timing
@@ -155,6 +155,45 @@ order rotates each round to distribute drift. Workloads run serially.
 Record any changed iteration policy as a separate run before executing it;
 never shorten a failing run or discard an outlier.
 
+The generated kernel source also supports one explicit diagnostic mode:
+`--oseo-kernel-profile`. With no user arguments it keeps the default
+100 calls. Exactly that single argument selects the following fixed count;
+other arguments fail before the clock starts or any success marker is printed.
+The minimal startup stub has no mode parser.
+
+| Kernel         | Timing, RSS and observe calls | Profile calls |
+| -------------- | ----------------------------- | ------------- |
+| sieve          | 100                           | 2000          |
+| permute        | 100                           | 1000          |
+| json-roundtrip | 100                           | 10000         |
+| regexp         | 100                           | 10000         |
+
+The ordered comparison profiles the same new optimized, uninstrumented native
+executable used for timing, with the same path, bytes and hash. Its separate
+`profile` descriptor has kind `kernel-fixed-count-v1`, the fixed `iterations`
+and a complete `run` command. Only its arguments change to the single flag;
+command, cwd, environment and stdin retain their baseline values. The built
+`form.run` and all 53 correctness-role commands keep their original arguments.
+The source and every call's checksum stay the same across engines and policies.
+
+The caller checker requires `PERF_OK <kernel> <profile-count>` and the existing
+`PERF_TIME` line. Its ID is
+`H/checkExecution/kernel-fixed-count-v1/<kernel>/<profile-count>`.
+The checker inputs pin *corpus.ts*, which defines the flag and fixed counts,
+alongside the checker and its source dependencies. Correctness stdout remains
+the factual 100-call baseline; it is never relabeled as profile output.
+The profile target journal records the separate command and original target
+bytes, and `launchSha256` hashes that complete profile command. These records
+remain excluded from timing with reason `profile-target-not-timing`.
+
+This is a separate workload diagnostic on the same new binary. Different
+iteration counts can change JIT, cache and collection behavior. Profile batch
+time neither enters the retained 100-call timing population nor supplies its
+time breakdown or direct call proportions. It is not divided by 100. Fixed
+counts do not guarantee useful captures or target survival. The eight-capture
+requirements, target timeout, both-host acceptance and separate profile and
+timing windows remain required.
+
 The wrapper records batch runtime with `Date.now()` around the kernel loop,
 including self-checks. Its millisecond resolution can produce zero for short
 batches; preserve those zeros and report the resolution limit. Dividing by
@@ -162,10 +201,11 @@ batches; preserve those zeros and report the resolution limit. Dividing by
 The subprocess executor separately records monotonic process wall time.
 
 Startup uses the matching engine or a separately built minimal startup
-executable; its output and exit status are checked. It includes process
-creation, engine initialization, output, and teardown on a warm filesystem
-cache. It is not cold boot or time to first instruction. Never subtract its
-median from the kernel median to invent a steady-state time.
+executable. The startup command's output and exit status are checked.
+Startup time includes process creation, engine initialization, output, and
+teardown on a warm filesystem cache. It is not cold boot or time to first
+instruction. Never subtract its median from the kernel median to invent a
+steady-state time.
 
 RSS is sampled in separate processes, fifteen per form, with the same
 kernel input. `/usr/bin/time -f 'PERF_RSS_KIB %M'` on Linux reports KiB;
@@ -221,10 +261,12 @@ load before comparing results. Report slower Oseo results as measured.
 Root must run the optimized corpus and property exit gates and complete
 the two-host evidence before declaring Measurement complete.
 
-A portable profiling method remains a Measurement dependency. After the
-optimized artifacts exist, Root can retain Linux `perf` and macOS Instruments
-Time Profiler captures with the matching executable digest, symbols, command,
-and tool version. Group stacks by generic helpers, allocation/collection,
-property lookup, calls, and numeric boxing, and retain unattributed samples.
-Neither profiler is required to prepare this corpus, and no profiling result
-or validated attribution method is claimed by this driver.
+A portable profiling method remains a Measurement dependency. The
+[profiling method](./profiling.md) uses Linux GDB and macOS `sample` with
+existing tools and documents `perf` and Instruments Time Profiler alternatives.
+After the optimized artifacts exist, Root can retain captures with the
+matching executable digest, symbols, command, and tool version. Group stacks
+by generic helpers, allocation/collection, property lookup, calls, and numeric
+boxing, and retain unattributed samples. Corpus preparation does not establish
+profiler acceptance or time attribution; actual timed-corpus acceptance remains
+pending.

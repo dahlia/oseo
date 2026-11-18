@@ -36,6 +36,24 @@ export const kernels: readonly Kernel[] = [
   },
 ];
 
+/** Only this explicit user argument selects the diagnostic workload. */
+export const kernelProfileFlag = "--oseo-kernel-profile";
+
+/** Fixed diagnostic counts; timing, RSS and observe retain 100 calls. */
+export function kernelProfileIterations(id: string): number {
+  switch (id) {
+    case "sieve":
+      return 2000;
+    case "permute":
+      return 1000;
+    case "json-roundtrip":
+    case "regexp":
+      return 10000;
+    default:
+      throw new Error(`Unknown profile kernel: ${id}`);
+  }
+}
+
 /** Reject unreasonable or fractional loop counts before generating source. */
 export function requireIterations(iterations: number): void {
   if (!Number.isSafeInteger(iterations) || iterations < 1) {
@@ -50,16 +68,31 @@ export function renderKernel(
   iterations: number,
 ): string {
   requireIterations(iterations);
+  const startup = kernel.id === "startup";
+  const selection = startup
+    ? ""
+    : `let perfIterations = ${iterations};
+if (process.argv.length === 3 &&
+    process.argv[2] === "${kernelProfileFlag}") {
+  perfIterations = ${kernelProfileIterations(kernel.id)};
+} else if (process.argv.length !== 2) {
+  throw new Error("Invalid kernel arguments.");
+}
+`;
+  const count = startup ? String(iterations) : "perfIterations";
+  const marker = startup
+    ? `"PERF_OK ${kernel.id} ${iterations}"`
+    : `"PERF_OK ${kernel.id} " + perfIterations`;
   return `${body}
-const perfStart = Date.now();
-for (let repeat = 0; repeat < ${iterations}; repeat += 1) {
+${selection}const perfStart = Date.now();
+for (let repeat = 0; repeat < ${count}; repeat += 1) {
   const result = benchmark();
   if (result !== ${kernel.expected}) {
     throw new Error("Self-check failed: ${kernel.id}: " + result);
   }
 }
 const perfElapsed = Date.now() - perfStart;
-console.log("PERF_OK ${kernel.id} ${iterations}");
+console.log(${marker});
 console.log("PERF_TIME " + perfElapsed);
 `;
 }

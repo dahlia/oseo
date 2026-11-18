@@ -128,9 +128,17 @@ collects benchmark timings or supplies missing harness acceptance.
 The initial 50 ms attach delay remains. Even overlapping captures can
 outlive a short native program. A failed or insufficient capture of an
 unchanged timed artifact remains unaccepted; do not add program waits or
-rebuild with larger iterations to make it pass. Launch-under-profiler support
-would require separate tool and input-forwarding validation and is not provided
-by this attach primitive.
+rebuild with larger iterations to make it pass. The approved kernel-only
+exception uses the same new final binary and hash for timing and profiling,
+with the same `cwd`, environment and `stdin`. The only argument change is the
+addition of `--oseo-kernel-profile`, which selects the
+[fixed profile-count mapping](./README.md#method-and-limits); the kernel
+bodies, inputs and per-call checksums stay unchanged. Expanded profiles are
+separate diagnostics, not a breakdown of the 100-call timing or a direct
+measure of its call proportions. Do not grow counts automatically or change
+counts or timeouts after failure. Launch-under-profiler support would require
+separate tool and input-forwarding validation and is not provided by this
+attach primitive.
 
 The capture helper discovers tools again on the actual host. Linux uses eight
 serial GDB attachments with the existing five-second command limit and
@@ -209,7 +217,8 @@ generated context, but cannot satisfy the separate runtime-context gate.
     specialization policy and output-correctness evidence.
 2.  Preserve the exact executable used by the unprofiled timing run and
     compute its SHA-256 before and after profiling. Use those same bytes,
-    arguments, input, environment, and working directory for sampling.
+    arguments, input, environment, and working directory for sampling,
+    except for the approved kernel-only profile flag described above.
     Retain generated C, source maps if any, runtime inputs, and any existing
     symbol files. A rebuild with matching source is not proof of identity.
 3.  On macOS, discard the first execution of each newly built executable
