@@ -11,7 +11,11 @@ import {
 } from "../packages/host/src/index.ts";
 import { targetForExecutionHost } from "../packages/compiler/src/index.ts";
 import { runNativeCli } from "./native-cli.ts";
-import { hostCcLane, nativeBuildConfiguration } from "./native-toolchain.ts";
+import {
+  hostCcLane,
+  localZigPath,
+  nativeBuildConfiguration,
+} from "./native-toolchain.ts";
 
 const host = createNodeHost();
 const nativeTarget = targetForExecutionHost(
@@ -146,6 +150,7 @@ test(
     const directory = await mkdtemp(join(tmpdir(), "oseo-cli-config-"));
     const source = join(directory, "entry.ts");
     const output = join(directory, "program");
+    const zig = localZigPath();
     try {
       await writeFile(source, "console.log(42);");
       const invocations = [
@@ -163,7 +168,7 @@ test(
         for (const args of invocations) {
           const result = spawnSync(
             launcher[0]!,
-            [...launcher.slice(1), ...args],
+            [...launcher.slice(1), ...args, "--zig", zig],
             {
               encoding: "utf8",
             },
@@ -296,6 +301,7 @@ console.log(JSON.stringify(argv.slice(2)));`,
         assert.equal(captured.executed, true);
         assert.deepEqual(captured.stdoutBytes, expected);
         assert.deepEqual(captured.stderrBytes, new Uint8Array());
+        const zig = localZigPath();
         for (const launcher of [
           [
             "node",
@@ -325,6 +331,8 @@ console.log(JSON.stringify(argv.slice(2)));`,
                 "node:fs",
                 "--build-config",
                 buildConfiguration,
+                "--zig",
+                zig,
               ],
               { cwd: directory, encoding: "utf8" },
             );

@@ -37,6 +37,19 @@ export const nativeBuildConfiguration: NativeBuildConfiguration = (() => {
 export const hostCcLane: boolean =
   process.env.OSEO_NATIVE_TOOLCHAIN === "host-cc";
 
+/** Give real CLI subprocess tests the local Zig without acquiring it. */
+export function localZigPath(): string {
+  const result = spawnSync("zig", ["env"], { encoding: "utf8" });
+  const path =
+    result.status === 0
+      ? zigToolchain.runtimeArchiveReuse?.pinToolchain?.(result.stdout)
+          ?.compilerPath
+      : undefined;
+  if (path == null)
+    throw new Error(`Could not identify the test Zig: ${result.stderr}`);
+  return path;
+}
+
 function executable(name: string): string | undefined {
   for (const directory of (process.env.PATH ?? "").split(delimiter)) {
     const path = join(directory, name);

@@ -12,6 +12,8 @@ import type {
 } from "@oseo/compiler";
 import { posix, win32 } from "node:path";
 
+export { resolveZigExecutable } from "./acquire.ts";
+
 function includePropertiesWhen<const Properties extends object>(
   properties: () => Properties | undefined,
 ): Properties | { [Key in keyof Properties]?: never } {
@@ -511,6 +513,48 @@ export const zigToolchain: NativeToolchain = {
     },
   },
 };
+
+/** Use one selected Zig for identity, compilation, archiving and linking. */
+export function zigToolchainAt(path: string): NativeToolchain {
+  const { harnessObjectReuse, runtimeArchiveReuse } = zigToolchain;
+  return {
+    ...zigToolchain,
+    createBuildPlan: (input) =>
+      zigToolchain.createBuildPlan({
+        ...input,
+        compilerPath: input.compilerPath ?? path,
+      }),
+    ...includePropertiesWhen(() =>
+      harnessObjectReuse == null
+        ? undefined
+        : {
+            harnessObjectReuse: {
+              ...harnessObjectReuse,
+              createBuildRequest: (input) =>
+                harnessObjectReuse.createBuildRequest({
+                  ...input,
+                  compilerPath: input.compilerPath ?? path,
+                }),
+            } satisfies typeof harnessObjectReuse,
+          },
+    ),
+    ...includePropertiesWhen(() =>
+      runtimeArchiveReuse == null
+        ? undefined
+        : {
+            runtimeArchiveReuse: {
+              ...runtimeArchiveReuse,
+              createIdentityRequest: (directory, environment, compilerPath) =>
+                runtimeArchiveReuse.createIdentityRequest(
+                  directory,
+                  environment,
+                  compilerPath ?? path,
+                ),
+            } satisfies typeof runtimeArchiveReuse,
+          },
+    ),
+  };
+}
 
 function harnessFlags(
   target: TargetDescription,
