@@ -24,8 +24,7 @@ if (
   throw new Error(`Invalid OSEO_DOCS_VERSION for ${channel} docs.`);
 }
 
-const label = { stable: "", canary: "Canary", preview: "Preview" }[channel];
-const title = ["Oseo", label, version].filter(Boolean).join(" ");
+const title = "Oseo";
 const description =
   "A native ahead-of-time engine for JavaScript and TypeScript";
 const origin =
@@ -55,6 +54,7 @@ if (channel !== "stable") {
 export default defineConfig({
   title,
   description,
+  cleanUrls: true,
   // Keep engineering records in the repository rather than rendering them.
   srcExclude: readdirSync(new URL("../", import.meta.url), {
     withFileTypes: true,
@@ -66,7 +66,7 @@ export default defineConfig({
     if (origin == null || page.relativePath === "404.md") return;
     const path = page.relativePath
       .replace(/(^|\/)index\.md$/u, "$1")
-      .replace(/\.md$/u, ".html");
+      .replace(/\.md$/u, "");
     const url = new URL(path, origin).href;
     page.frontmatter.head ??= [];
     page.frontmatter.head.push(
@@ -89,6 +89,7 @@ export default defineConfig({
     nav: [
       { text: "Using Oseo", link: "/using/install" },
       { text: "Development", link: "/development/" },
+      ...(version != null ? [{ text: version, link: "/using/install" }] : []),
       ...(channel === "canary"
         ? [{ text: "Stable docs", link: `${stableOrigin}/` }]
         : []),
@@ -112,6 +113,18 @@ export default defineConfig({
         ],
       },
     ],
-    socialLinks: [{ icon: "github", link: "https://github.com/dahlia/oseo" }],
+    socialLinks: [
+      { icon: "github", link: "https://github.com/dahlia/oseo" },
+      {
+        icon: "jsr",
+        link: "https://jsr.io/@oseo/cli",
+        ariaLabel: "Oseo on JSR",
+      },
+      {
+        icon: "npm",
+        link: "https://www.npmjs.com/package/@oseo/cli",
+        ariaLabel: "Oseo on npm",
+      },
+    ],
   },
 });

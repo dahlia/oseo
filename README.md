@@ -16,7 +16,7 @@ repository root with [mise] installed:
 mise install
 mise run build
 mkdir -p artifacts
-mise exec -- node packages/cli/dist/main.js build examples/numeric-hinted.ts \
+mise run oseo build examples/numeric-hinted.ts \
   -o artifacts/numeric
 printf '[[20,22]]\n' | ./artifacts/numeric 1
 ~~~~
@@ -27,7 +27,7 @@ either to run.
 
 When the first release is published, download the standalone CLI archive
 for your platform from [GitHub Releases], extract it, and use the included
-`oseo` in place of `mise exec -- node packages/cli/dist/main.js`, using its
+`oseo` in place of `mise run oseo`, using its
 path if it is not on `PATH`. The standalone CLI is planned to run without a
 separately installed Node.js. It still needs Zig to compile native programs.
 See the [installation guide](./docs/using/install.md) for the planned release

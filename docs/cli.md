@@ -19,12 +19,12 @@ checkout:
 ~~~~ sh
 mise install
 mise run build
-mise exec -- node packages/cli/dist/main.js --help
+mise run oseo --help
 ~~~~
 
 The remaining examples use `oseo`, the command name for the standalone
 archive and npm package. In a development checkout, replace `oseo`
-with `mise exec -- node packages/cli/dist/main.js`. See
+with `mise run oseo` (or `mise oseo`). See
 [installation](./using/install.md) for the distinction between the
 checkout and release channels.
 
@@ -60,6 +60,13 @@ program can read its standard input through `readFileSync(0)` from
 Options may appear before or after the source path. `run` compiles and
 executes a temporary program; the root shortcut uses the same workflow.
 `build` retains an executable without starting it.
+
+From a checkout, use `-- --` before program arguments. mise consumes the
+first `--`; the second reaches `oseo`. For example:
+
+~~~~ sh
+mise run oseo run examples/ray-tracer.ts -- -- 1 1
+~~~~
 
 Command names (`run`, `build`, `help`, and `completion`) are reserved in the
 shortcut form before `--`, even after a run option. Use `./build`,
