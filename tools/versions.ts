@@ -1,26 +1,21 @@
 /* eslint-disable no-await-in-loop -- Atomic writes and renames are ordered. */
 
 import process from "node:process";
+import { execFile } from "node:child_process";
 import { readFile, readdir, rename, rm, writeFile } from "node:fs/promises";
 import { dirname, join } from "node:path";
 import { pathToFileURL } from "node:url";
+import { promisify } from "node:util";
 
 import { isObject, isString } from "./value-kinds.ts";
 
 const numericIdentifier = String.raw`(?:0|[1-9]\d*)`;
-const dotIdentifier = String.raw`[0-9A-Za-z-]+(?:\.[0-9A-Za-z-]+)*`;
-const alphanumericIdentifier = String.raw`\d*[A-Za-z-][0-9A-Za-z-]*`;
-const prereleaseIdentifier = `(?:0|[1-9]\\d*|${alphanumericIdentifier})`;
-const prerelease = `${prereleaseIdentifier}(?:\\.${prereleaseIdentifier})*`;
-const coreVersion = [
-  numericIdentifier,
-  numericIdentifier,
-  numericIdentifier,
-].join(String.raw`\.`);
-const semverPattern = new RegExp(
-  `^${coreVersion}(?:-${prerelease})?(?:\\+${dotIdentifier})?$`,
+const releaseVersion = new RegExp(
+  String.raw`^${numericIdentifier}(\.${numericIdentifier}){2}(?![\s\S])`,
   "u",
 );
+const nextFile = join("changes.d", "next");
+const execFileAsync = promisify(execFile);
 
 interface PackageManifest {
   readonly name?: unknown;
@@ -56,6 +51,7 @@ export interface VersionFileOperations {
 /** Result of validating one complete lockstep workspace. */
 export interface VersionCheckResult {
   readonly packageCount: number;
+  readonly state: "development" | "released";
   readonly version: string;
 }
 
@@ -75,16 +71,37 @@ const defaultOperations: VersionFileOperations = {
 };
 
 function strictVersion(bytes: string, source: string): string {
-  if (!bytes.endsWith("\n") || bytes.slice(0, -1).includes("\n")) {
+  if (!bytes.endsWith("\n") || !releaseVersion.test(bytes.slice(0, -1))) {
     throw new Error(
-      `${source} must contain one SemVer and a trailing newline.`,
+      `${source} must contain one x.y.z SemVer and a trailing newline.`,
     );
   }
-  const version = bytes.slice(0, -1);
-  if (!semverPattern.test(version)) {
-    throw new Error(`${source} does not contain a strict SemVer.`);
+  return bytes.slice(0, -1);
+}
+
+async function readNextVersion(
+  root: string,
+  operations: VersionFileOperations,
+): Promise<string | undefined> {
+  const path = join(root, nextFile);
+  let bytes: string;
+  try {
+    bytes = await operations.read(path);
+  } catch (error) {
+    if (isObject(error) && "code" in error && error.code === "ENOENT") {
+      return undefined;
+    }
+    throw error;
   }
-  return version;
+  return strictVersion(bytes, nextFile);
+}
+
+async function runSacho(root: string, args: readonly string[]): Promise<void> {
+  try {
+    await execFileAsync("sacho", args, { cwd: root });
+  } catch (error) {
+    throw new Error(`sacho ${args.join(" ")} failed.`, { cause: error });
+  }
 }
 
 function parseManifest(bytes: string, path: string): PackageManifest {
@@ -160,14 +177,7 @@ function checkInternalDependencies(
 async function loadWorkspace(
   root: string,
   operations: VersionFileOperations,
-): Promise<
-  readonly [string, readonly LoadedManifest[], readonly LoadedManifest[]]
-> {
-  const versionPath = join(root, "VERSION");
-  const version = strictVersion(
-    await operations.read(versionPath),
-    versionPath,
-  );
+): Promise<readonly [readonly LoadedManifest[], readonly LoadedManifest[]]> {
   const npmManifests: LoadedManifest[] = [];
   const denoManifests: LoadedManifest[] = [];
   const packageDirectories = (
@@ -185,7 +195,7 @@ async function loadWorkspace(
       await loadManifest(join(packageRoot, "deno.json"), operations),
     );
   }
-  return [version, npmManifests, denoManifests];
+  return [npmManifests, denoManifests];
 }
 
 /** Validate package names, versions, pairs, and internal dependency ranges. */
@@ -193,10 +203,15 @@ export async function checkWorkspaceVersions(
   root: string,
   operations: VersionFileOperations = defaultOperations,
 ): Promise<VersionCheckResult> {
-  const [version, npmManifests, denoManifests] = await loadWorkspace(
-    root,
-    operations,
-  );
+  const [npmManifests, denoManifests] = await loadWorkspace(root, operations);
+  const first = npmManifests[0];
+  if (first == null) throw new Error("No package manifests found.");
+  const next = await readNextVersion(root, operations);
+  const version = next ?? first.manifest.version;
+  if (!isString(version) || !releaseVersion.test(version)) {
+    throw new Error(`${first.path} must contain an x.y.z SemVer.`);
+  }
+  const source = next == null ? "released version" : nextFile;
   const packageNames = new Set<string>();
   for (let index = 0; index < npmManifests.length; index += 1) {
     const npm = npmManifests[index];
@@ -216,16 +231,22 @@ export async function checkWorkspaceVersions(
       throw new Error(`${npm.path} must be public.`);
     }
     if (npm.manifest.version !== version) {
-      throw new Error(`${npm.path} does not match VERSION ${version}.`);
+      throw new Error(`${npm.path} does not match ${source} ${version}.`);
     }
     if (deno.manifest.version !== version) {
-      throw new Error(`${deno.path} does not match VERSION ${version}.`);
+      throw new Error(`${deno.path} does not match ${source} ${version}.`);
     }
   }
   for (const npm of npmManifests) {
     checkInternalDependencies(npm.manifest, npm.path);
   }
-  return { packageCount: packageNames.size, version };
+  await runSacho(root, ["check"]);
+  if (next == null) await runSacho(root, ["show", version]);
+  return {
+    packageCount: packageNames.size,
+    state: next == null ? "released" : "development",
+    version,
+  };
 }
 
 function updatedManifest(loaded: LoadedManifest, version: string): string {
@@ -263,45 +284,30 @@ async function restoreEdits(
   }
 }
 
-/** Atomically update VERSION and all npm and JSR package manifests. */
-export async function setWorkspaceVersion(
+/** Update Sacho and npm/JSR manifests, rolling back on failure. */
+export async function bumpWorkspaceVersion(
   root: string,
   version: string,
   operations: VersionFileOperations = defaultOperations,
 ): Promise<void> {
-  if (!semverPattern.test(version)) {
-    throw new Error(`Invalid strict SemVer: ${version}`);
+  if (!releaseVersion.test(version)) {
+    throw new Error(`Expected an x.y.z SemVer, got: ${version}`);
   }
-  await checkWorkspaceVersions(root, operations);
-  const [, npmManifests, denoManifests] = await loadWorkspace(root, operations);
-  const versionPath = join(root, "VERSION");
-  const versionOriginal = await operations.read(versionPath);
-  const files: readonly Omit<PlannedEdit, "temporaryPath">[] = [
-    {
-      original: versionOriginal,
-      path: versionPath,
-      replacement: `${version}\n`,
-    },
-    ...npmManifests.map((loaded) => ({
-      original: loaded.bytes,
-      path: loaded.path,
-      replacement: updatedManifest(loaded, version),
-    })),
-    ...denoManifests.map((loaded) => ({
-      original: loaded.bytes,
-      path: loaded.path,
-      replacement: updatedManifest(loaded, version),
-    })),
-  ];
-  const edits = files.map((file, index): PlannedEdit => {
+  const current = await checkWorkspaceVersions(root, operations);
+  if (current.state === "released" && current.version === version) {
+    throw new Error(`${version} is already released; choose a new version.`);
+  }
+  if (current.version === version) return;
+  const [npmManifests, denoManifests] = await loadWorkspace(root, operations);
+  const edits = [...npmManifests, ...denoManifests].map((file, index) => {
     const temporaryPath = join(
       dirname(file.path),
       `.oseo-version-${process.pid}-${index}.tmp`,
     );
     return {
-      original: file.original,
+      original: file.bytes,
       path: file.path,
-      replacement: file.replacement,
+      replacement: updatedManifest(file, version),
       temporaryPath,
     };
   });
@@ -322,6 +328,9 @@ export async function setWorkspaceVersion(
       await operations.rename(edit.temporaryPath, edit.path);
       replaced.push(edit);
     }
+    // Sacho updates next and the materialized changelog in its own transaction.
+    // Run it last so any earlier filesystem failure leaves both untouched.
+    await runSacho(root, ["next", version]);
   } catch (error) {
     await restoreEdits(replaced, operations);
     await removeTemporaries(edits, operations);
@@ -337,21 +346,22 @@ async function main(args: readonly string[]): Promise<void> {
   if (mode === "check") {
     const result = await checkWorkspaceVersions(root);
     console.log(
-      `version=${result.version} packages=${result.packageCount} status=valid`,
+      `version=${result.version} packages=${result.packageCount} ` +
+        `state=${result.state} status=valid`,
     );
     return;
   }
-  if (mode === "set") {
+  if (mode === "bump") {
     // SAFETY: This probe only reads the optional Deno global discriminator.
     const deno = (globalThis as { readonly Deno?: unknown }).Deno;
-    if (deno != null) throw new Error("Version set mode requires Node.js.");
+    if (deno != null) throw new Error("Version bump mode requires Node.js.");
     const version = args[1];
-    if (version == null) throw new Error("Set mode requires a version.");
-    await setWorkspaceVersion(root, version);
+    if (version == null) throw new Error("Bump mode requires a version.");
+    await bumpWorkspaceVersion(root, version);
     console.log(`version=${version} status=updated`);
     return;
   }
-  throw new Error("Usage: versions.ts check | set <version>");
+  throw new Error("Usage: versions.ts check | bump <version>");
 }
 
 const entryPath = process.argv[1];

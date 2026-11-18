@@ -9,6 +9,7 @@ postinstall = "mise run install-hooks"
 [tools]
 "aqua:dahlia/hongdown" = "0.5.3"
 "aqua:nushell/nushell" = "0.116.0"
+"github:dahlia/sacho" = "0.3.2"
 # The mise registry has no jactionlint entry yet, so name the backend.
 "ubi:jdx/jactionlint" = "2.1.0"
 pnpm = "12.18.0"
@@ -55,13 +56,10 @@ depends = ["build"]
 usage = 'arg "<directory>" help="New probe directory; not performance evidence"'
 run = 'node tools/perf-profile-smoke.ts "${usage_directory?}"'
 
-[tasks.bump-versions]
-description = "Atomically set the lockstep package version"
-usage = 'arg "<version>" help="Strict SemVer for every @oseo package"'
-run = '''
-node tools/versions.ts set "${usage_version?}"
-mise run check:versions
-'''
+[tasks.bump-version]
+description = "Set Sacho's next version and synchronize the package manifests"
+usage = 'arg "<version>" help="Next x.y.z release for every @oseo package"'
+run = 'node tools/versions.ts bump "${usage_version?}"'
 
 [tasks.check]
 depends = [
@@ -211,9 +209,10 @@ description = "Reject Unicode tables the pinned inputs do not produce"
 run = "node tools/unicode-tables.ts"
 
 [tasks."check:versions"]
+description = "Validate the Sacho version and the lockstep package manifests"
 run = '''
 node tools/versions.ts check
-deno run --allow-read tools/versions.ts check
+deno run --allow-read --allow-env --allow-run=sacho tools/versions.ts check
 '''
 
 [tasks.clean]
