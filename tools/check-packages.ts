@@ -33,6 +33,7 @@ interface CommandResult {
 }
 
 interface PackageManifest {
+  readonly license?: unknown;
   readonly dependencies?: Readonly<Record<string, string>>;
   readonly devDependencies?: Readonly<Record<string, string>>;
   readonly name?: unknown;
@@ -83,6 +84,44 @@ function requireFile(
 }
 
 const runtimeNativePrefix = "native/";
+const gpl = "GPL-3.0-or-later";
+const mitNotice = "MIT-LICENSE.txt";
+const unicodeNotice = "UNICODE-LICENSE.txt";
+const rolldownNotice = "ROLLDOWN-LICENSE.txt";
+
+function licenseFor(directory: string): string {
+  if (directory === "backend-c") return `${gpl} AND MIT`;
+  if (directory === "runtime-c") return `${gpl} AND MIT AND Unicode-3.0`;
+  if (directory === "unicode") return `${gpl} AND Unicode-3.0`;
+  return gpl;
+}
+
+function requireLicense(manifest: PackageManifest, directory: string): void {
+  const expected = licenseFor(directory);
+  if (manifest.license !== expected) {
+    throw new Error(`${directory} license field must be ${expected}.`);
+  }
+}
+
+function licenseFiles(directory: string): readonly string[] {
+  if (directory === "backend-c") return ["LICENSE", mitNotice];
+  if (directory === "runtime-c") return ["LICENSE", mitNotice, unicodeNotice];
+  if (directory === "unicode") return ["LICENSE", unicodeNotice];
+  if (directory === "cli") return ["LICENSE", rolldownNotice];
+  return ["LICENSE"];
+}
+
+function noticeSource(root: string, notice: string): string {
+  if (notice === unicodeNotice)
+    return join(root, "packages", "unicode", notice);
+  if (notice === rolldownNotice) return join(root, "packages", "cli", notice);
+  return join(root, notice);
+}
+
+function requireNotice(actual: string, expected: string, path: string): void {
+  if (!actual.includes(expected))
+    throw new Error(`${path} lacks its expected notice.`);
+}
 
 /**
  * Archive paths of the reviewed C runtime assets, derived from the
@@ -189,13 +228,12 @@ async function stagePackage(
   if (!isString(manifest.version)) {
     throw new Error(`${directory} package version is missing.`);
   }
-  const [rootLicense, packageLicense] = await Promise.all([
-    readFile(join(root, "LICENSE"), "utf8"),
-    readFile(join(source, "LICENSE"), "utf8"),
-  ]);
-  if (packageLicense !== rootLicense) {
-    throw new Error(`${directory} LICENSE does not match the repository.`);
-  }
+  requireLicense(manifest, directory);
+  // SAFETY: Checked-in Deno manifests are repository-owned build inputs.
+  const denoManifest = JSON.parse(
+    await readFile(join(source, "deno.json"), "utf8"),
+  ) as PackageManifest;
+  requireLicense(denoManifest, directory);
   const releaseManifest = {
     ...manifest,
     dependencies: releaseDependencies(manifest.dependencies, manifest.version),
@@ -213,22 +251,23 @@ async function stagePackage(
     ),
   };
   await mkdir(stage);
-  await copyFile(join(source, "LICENSE"), join(stage, "LICENSE"));
+  for (const notice of licenseFiles(directory)) {
+    const path = join(source, notice);
+    const [canonical, local] = await Promise.all([
+      readFile(noticeSource(root, notice), "utf8"),
+      readFile(path, "utf8"),
+    ]);
+    if (local !== canonical) {
+      throw new Error(`${directory}/${notice} does not match the repository.`);
+    }
+    await copyFile(path, join(stage, notice));
+  }
   await copyFile(join(source, "README.md"), join(stage, "README.md"));
   await cp(join(source, "dist"), join(stage, "dist"), { recursive: true });
   if (directory === "runtime-c") {
     await cp(join(source, "native"), join(stage, "native"), {
       recursive: true,
     });
-  }
-  // The Unicode tables are derived from Unicode Data Files, whose license
-  // requires its notice to travel with every copy, so the artifact carries it
-  // beside the repository license rather than only naming it in prose.
-  if (directory === "unicode") {
-    await copyFile(
-      join(source, "UNICODE-LICENSE.txt"),
-      join(stage, "UNICODE-LICENSE.txt"),
-    );
   }
   await writeFile(
     join(stage, "package.json"),
@@ -241,6 +280,21 @@ async function main(): Promise<void> {
   const root = process.cwd();
   const destination = await mkdtemp(join(tmpdir(), "oseo-packages-"));
   try {
+    const example = join(destination, "license-example.ts");
+    await writeFile(
+      example,
+      'const result: boolean = /\\p{Letter}/u.test("A");',
+    );
+    const emitted = await run(
+      process.execPath,
+      ["packages/cli/dist/main.js", "build", "--emit-c", example],
+      root,
+    );
+    for (const notice of [mitNotice, unicodeNotice]) {
+      const canonical = await readFile(noticeSource(root, notice), "utf8");
+      requireNotice(emitted.stdout, canonical, "CLI emitted C");
+    }
+
     const packageDirectories = (
       await readdir(join(root, "packages"), { withFileTypes: true })
     )
@@ -266,7 +320,7 @@ async function main(): Promise<void> {
         throw new Error(`${directory} did not produce a pack.`);
       const files = new Set(packed.files.map((file) => file.path));
       for (const path of [
-        "LICENSE",
+        ...licenseFiles(directory),
         "README.md",
         "dist/index.d.ts",
         "dist/index.d.ts.map",
@@ -279,23 +333,54 @@ async function main(): Promise<void> {
       if ([...files].some((path) => path.startsWith("src/"))) {
         throw new Error(`${packed.name} npm archive contains private source.`);
       }
-      if (packed.name === "@oseo/runtime-c") {
+      const readPacked = async (path: string): Promise<string> =>
+        (
+          await run(
+            "tar",
+            [
+              "-xOzf",
+              resolvePath(destination, packed.filename),
+              `package/${path}`,
+            ],
+            root,
+          )
+        ).stdout;
+      for (const notice of licenseFiles(directory)) {
+        if (
+          (await readPacked(notice)) !==
+          (await readFile(noticeSource(root, notice), "utf8"))
+        ) {
+          throw new Error(`${packed.name} packs a different ${notice}.`);
+        }
+      }
+      if (directory === "runtime-c") {
         requireRuntimeNativeFiles(files, packed.name);
+        for (const path of runtimeNativeFiles) {
+          const identifier = path.endsWith("/runtime_unicode_tables.h")
+            ? "MIT AND Unicode-3.0"
+            : "MIT";
+          requireNotice(
+            await readPacked(path),
+            `SPDX-License-Identifier: ${identifier} */`,
+            path,
+          );
+        }
       }
-      if (packed.name === "@oseo/unicode") {
-        requireFile(files, "UNICODE-LICENSE.txt", packed.name);
+      if (directory === "backend-c") {
+        for (const suffix of [".js", ".js.map", ".d.ts", ".d.ts.map"]) {
+          requireFile(files, `dist/emitted-c${suffix}`, packed.name);
+        }
+        requireNotice(
+          await readPacked("dist/emitted-c.js"),
+          "/*! SPDX-License-Identifier: MIT",
+          "dist/emitted-c.js",
+        );
       }
-      const manifestBytes = await run(
-        "tar",
-        [
-          "-xOzf",
-          resolvePath(destination, packed.filename),
-          "package/package.json",
-        ],
-        root,
-      );
       // SAFETY: npm exposes the packed package.json bytes at this exact path.
-      const manifest = JSON.parse(manifestBytes.stdout) as PackageManifest;
+      const manifest = JSON.parse(
+        await readPacked("package.json"),
+      ) as PackageManifest;
+      requireLicense(manifest, directory);
       requireReleaseDependencies(manifest, packed.name);
       console.log(`${packed.name}: npm archive valid`);
     }

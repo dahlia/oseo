@@ -1,3 +1,6 @@
+// Fixed C output templates in this file are MIT (../MIT-LICENSE.txt).
+// Compiler logic is GPL-3.0-or-later (../LICENSE).
+
 import type {
   RegExpMatcherInstruction,
   RegExpMatcherProgram,

@@ -775,6 +775,9 @@ manifests. The staging step rewrites internal `workspace:*` dependencies to the
 exact lockstep release version, then inspects the packed manifest. Every package
 root must contain a *LICENSE* file identical to the repository license so that
 both npm and JSR artifacts distribute the GPL text.
+Keep the npm and JSR license metadata in sync with the
+[*runtime support surface inventory*](./docs/runtime-support-surface.md)
+and preserve the MIT and upstream notices on the files covered by them.
 
 ### Planned release workflow
 
