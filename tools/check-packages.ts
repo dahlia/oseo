@@ -13,6 +13,7 @@ import {
 } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join, resolve as resolvePath } from "node:path";
+import { pathToFileURL } from "node:url";
 
 import { cRuntimeProvider } from "../packages/runtime-c/src/index.ts";
 import { isString } from "./value-kinds.ts";
@@ -133,8 +134,9 @@ function requireRuntimeNativeFiles(
 function requireReleaseDependencies(
   manifest: PackageManifest,
   expectedName: string,
+  version: string,
 ): void {
-  if (manifest.name !== expectedName || !isString(manifest.version)) {
+  if (manifest.name !== expectedName || manifest.version !== version) {
     throw new Error(`${expectedName} archive has invalid package metadata.`);
   }
   const fields = [
@@ -179,6 +181,7 @@ async function stagePackage(
   root: string,
   directory: string,
   destination: string,
+  version?: string,
 ): Promise<string> {
   const source = join(root, "packages", directory);
   const stage = join(destination, `stage-${directory}`);
@@ -198,18 +201,22 @@ async function stagePackage(
   }
   const releaseManifest = {
     ...manifest,
-    dependencies: releaseDependencies(manifest.dependencies, manifest.version),
+    version: version ?? manifest.version,
+    dependencies: releaseDependencies(
+      manifest.dependencies,
+      version ?? manifest.version,
+    ),
     devDependencies: releaseDependencies(
       manifest.devDependencies,
-      manifest.version,
+      version ?? manifest.version,
     ),
     optionalDependencies: releaseDependencies(
       manifest.optionalDependencies,
-      manifest.version,
+      version ?? manifest.version,
     ),
     peerDependencies: releaseDependencies(
       manifest.peerDependencies,
-      manifest.version,
+      version ?? manifest.version,
     ),
   };
   await mkdir(stage);
@@ -224,11 +231,10 @@ async function stagePackage(
   // The Unicode tables are derived from Unicode Data Files, whose license
   // requires its notice to travel with every copy, so the artifact carries it
   // beside the repository license rather than only naming it in prose.
-  if (directory === "unicode") {
-    await copyFile(
-      join(source, "UNICODE-LICENSE.txt"),
-      join(stage, "UNICODE-LICENSE.txt"),
-    );
+  for (const file of await readdir(source)) {
+    if (/LICENSE|NOTICE/u.test(file) && file !== "LICENSE") {
+      await copyFile(join(source, file), join(stage, file));
+    }
   }
   await writeFile(
     join(stage, "package.json"),
@@ -237,9 +243,13 @@ async function stagePackage(
   return stage;
 }
 
-async function main(): Promise<void> {
-  const root = process.cwd();
-  const destination = await mkdtemp(join(tmpdir(), "oseo-packages-"));
+/** Pack and inspect the very tarballs retained for release. */
+export async function packNpmPackages(
+  root: string,
+  destination: string,
+  version?: string,
+): Promise<void> {
+  const scratch = await mkdtemp(join(tmpdir(), "oseo-packages-"));
   try {
     const packageDirectories = (
       await readdir(join(root, "packages"), { withFileTypes: true })
@@ -248,7 +258,7 @@ async function main(): Promise<void> {
       .map((entry) => entry.name)
       .toSorted();
     for (const directory of packageDirectories) {
-      const stage = await stagePackage(root, directory, destination);
+      const stage = await stagePackage(root, directory, scratch, version);
       const result = await run(
         "pnpm",
         [
@@ -296,12 +306,31 @@ async function main(): Promise<void> {
       );
       // SAFETY: npm exposes the packed package.json bytes at this exact path.
       const manifest = JSON.parse(manifestBytes.stdout) as PackageManifest;
-      requireReleaseDependencies(manifest, packed.name);
+      // SAFETY: The staging step wrote this manifest from repository inputs.
+      const expected = JSON.parse(
+        await readFile(join(stage, "package.json"), "utf8"),
+      ) as PackageManifest;
+      if (!isString(expected.version)) throw new Error("Missing pack version.");
+      requireReleaseDependencies(
+        manifest,
+        `@oseo/${directory}`,
+        expected.version,
+      );
       console.log(`${packed.name}: npm archive valid`);
     }
+  } finally {
+    await rm(scratch, { force: true, recursive: true });
+  }
+}
+
+if (
+  process.argv[1] != null &&
+  pathToFileURL(process.argv[1]).href === import.meta.url
+) {
+  const destination = await mkdtemp(join(tmpdir(), "oseo-checked-packages-"));
+  try {
+    await packNpmPackages(process.cwd(), destination);
   } finally {
     await rm(destination, { force: true, recursive: true });
   }
 }
-
-await main();

@@ -933,6 +933,468 @@ jobs:
       - run: >-
           mise run check:property-case-durations
           "${{ runner.temp }}/property-case-durations"
+  release_identity:
+    if: ${{ !cancelled() }}
+    needs:
+      - mac_ready
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    outputs:
+      channel: ${{ steps.version.outputs.channel }}
+      version: ${{ steps.version.outputs.npm }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: ./.github/actions/setup-mise
+      - run: pnpm install --frozen-lockfile
+      - run: node --test tests/release-pipeline.test.ts
+      - id: version
+        run: node tools/release/stage.ts identity "$RUNNER_TEMP/identity"
+
+  release_packages:
+    needs: release_identity
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    outputs:
+      artifact: ${{ steps.upload.outputs.artifact-id }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: ./.github/actions/setup-mise
+      - run: mise run build
+      - run: node tools/release/stage.ts packages "$RUNNER_TEMP/packages"
+      - id: upload
+        uses: actions/upload-artifact@v7
+        with:
+          name: release-packages-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/packages
+          if-no-files-found: error
+
+  release_cli_linux:
+    needs: release_identity
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: read
+    outputs:
+      artifact: ${{ steps.upload.outputs.artifact-id }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: ./.github/actions/setup-mise
+      - run: pnpm install --frozen-lockfile
+      - uses: actions/setup-node@v6
+        with:
+          node-version: "26.13.1"
+          package-manager-cache: false
+      - name: Prepare isolated network namespace for the offline smoke
+        run: |
+          cat > "$RUNNER_TEMP/oseo-offline" <<'SH'
+          #!/bin/bash
+          set -euo pipefail
+          exec /usr/bin/sudo /usr/bin/unshare --net -- /usr/bin/setpriv \
+            --reuid "$(/usr/bin/id -u)" --regid "$(/usr/bin/id -g)" \
+            --init-groups -- /usr/bin/env -i HOME="$HOME" PATH="$PATH" \
+            TMPDIR="$TMPDIR" XDG_CACHE_HOME="$XDG_CACHE_HOME" "$@"
+          SH
+          chmod +x "$RUNNER_TEMP/oseo-offline"
+      - run: bash tools/release/archive.sh linux-x86_64-gnu
+        env:
+          RELEASE_VERSION: ${{ needs.release_identity.outputs.version }}
+          OSEO_SEA_OFFLINE_WRAPPER: ${{ runner.temp }}/oseo-offline
+      - id: upload
+        uses: actions/upload-artifact@v7
+        with:
+          name: release-cli-linux-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/release-cli
+          if-no-files-found: error
+
+  release_cli_macos:
+    needs: release_identity
+    runs-on: macos-15
+    permissions:
+      contents: read
+    outputs:
+      artifact: ${{ steps.upload.outputs.artifact-id }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: ./.github/actions/setup-mise
+      - run: pnpm install --frozen-lockfile
+      - uses: actions/setup-node@v6
+        with:
+          node-version: "26.13.1"
+          package-manager-cache: false
+      - run: bash tools/release/archive.sh macos-aarch64
+        env:
+          RELEASE_VERSION: ${{ needs.release_identity.outputs.version }}
+      - id: upload
+        uses: actions/upload-artifact@v7
+        with:
+          name: release-cli-macos-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/release-cli
+          if-no-files-found: error
+
+  release_docs:
+    needs: release_identity
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    outputs:
+      artifact: ${{ steps.upload.outputs.artifact-id }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: ./.github/actions/setup-mise
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm docs:build
+        env:
+          OSEO_DOCS_CHANNEL: ${{ needs.release_identity.outputs.channel }}
+          OSEO_DOCS_VERSION: ${{ needs.release_identity.outputs.version }}
+      - run: |
+          mkdir "$RUNNER_TEMP/release-docs"
+          mv docs/.vitepress/dist "$RUNNER_TEMP/release-docs/site"
+          node --input-type=module -e '
+            import { seal } from "./tools/release/artifacts.ts";
+            seal(process.argv[1], process.env.GITHUB_SHA);
+          ' "$RUNNER_TEMP/release-docs"
+      - id: upload
+        uses: actions/upload-artifact@v7
+        with:
+          name: release-docs-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/release-docs
+          include-hidden-files: true
+          if-no-files-found: error
+
+  release_gate:
+    # The generator replaces this list with every check and staging job.
+    needs:
+      - check
+      - test
+      - test_node_shard_linux
+      - test_regexp_exhaustive_linux
+      - test_native
+      - test_native_optimized
+      - test_sanitizer
+      - test_sanitizer_property
+      - test_sanitizer_property_dedicated
+      - test_test262
+      - test_native_support
+      - test_property_case
+      - test_reflect_case
+      - test_regexp_exhaustive_case
+      - test_array_constructor
+      - native
+      - release_identity
+      - release_packages
+      - release_cli_linux
+      - release_cli_macos
+      - release_docs
+      - test_macos_deno
+      - test_node_shard_macos_1
+      - test_node_shard_macos_2
+      - test_node_shard_macos_3
+      - test_node_shard_macos_4
+      - test_node_shard_macos_5
+      - test_node_shard_macos_6
+      - test_array_constructor_macos_macos_node
+      - test_regexp_exhaustive_macos_macos_node
+      - test_native_macos_1
+      - test_native_macos_2
+      - test_native_macos_3
+      - test_native_optimized_macos_1
+      - test_native_optimized_macos_2
+      - test_native_optimized_macos_3
+      - test_sanitizer_macos_macos_native_1
+      - test_sanitizer_macos_macos_native_2
+      - test_sanitizer_macos_macos_property
+      - test_sanitizer_macos_macos_property_regexp_literals
+      - test_test262_macos_1
+      - test_test262_macos_2
+      - test_test262_macos_3
+      - test_test262_macos_4
+      - test_test262_macos_5
+      - test_test262_macos_6
+      - test_test262_macos_7
+      - test_test262_macos_8
+      - test_test262_macos_9
+      - test_test262_macos_10
+      - test_test262_macos_11
+      - test_test262_macos_12
+      - test_native_support_macos_1
+      - test_native_support_macos_2
+      - test_native_support_macos_3
+      - test_native_support_macos_4
+      - test_native_support_macos_5
+      - test_native_support_macos_6
+      - test_native_support_macos_7
+      - test_native_support_macos_8
+      - test_native_support_macos_9
+      - test_native_support_macos_10
+      - test_native_support_macos_11
+      - test_native_support_macos_12
+      - test_reflect_case_macos_1
+      - test_reflect_case_macos_2
+      - test_reflect_case_macos_3
+      - test_regexp_exhaustive_case_macos_1
+      - test_regexp_exhaustive_case_macos_2
+      - test_regexp_exhaustive_case_macos_3
+      - test_regexp_exhaustive_case_macos_4
+      - test_regexp_exhaustive_case_macos_5
+      - test_property_case_macos_1
+      - test_property_case_macos_2
+      - test_property_case_macos_3
+      - mac_ready
+    runs-on: ubuntu-latest
+    permissions: {}
+    if: ${{ !cancelled() }}
+    steps:
+      - name: Require every CI check and staged artifact
+        env:
+          RESULTS: ${{ toJSON(needs.*.result) }}
+        run: |
+          node -e '
+            const results = JSON.parse(process.env.RESULTS);
+            process.exit(results.length && results.every(r => r === "success")
+              ? 0 : 1);
+          '
+
+  release_publish_npm:
+    needs: [release_gate, release_identity, release_packages]
+    if: >-
+      vars.OSEO_ENABLE_PUBLICATION == 'true' &&
+      github.repository == 'dahlia/oseo' && github.event_name == 'push' &&
+      (needs.release_identity.outputs.channel == 'canary' ||
+      needs.release_identity.outputs.channel == 'stable')
+    runs-on: ubuntu-latest
+    environment: release-npm
+    concurrency:
+      group: oseo-npm-publication
+      cancel-in-progress: false
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v6
+        with:
+          node-version: "26.13.1"
+          registry-url: https://registry.npmjs.org
+          package-manager-cache: false
+      - name: Install the verified npm CLI with dist-tag OIDC support
+        shell: bash
+        run: |
+          root="$RUNNER_TEMP/npm-11.21.0"
+          mkdir "$root"
+          curl --fail --silent --show-error --location \
+            https://registry.npmjs.org/npm/-/npm-11.21.0.tgz \
+            --output "$root/npm.tgz"
+          expected=Zov8KhamNneiLdELtj5YALtNmJW4L4fCLTzjfpzXG2w6MSHcf0Uxg
+          expected+=dlK5uloCuksWT+7mGUU7wi79cO6RqivPg==
+          actual=$(openssl dgst -sha512 -binary "$root/npm.tgz" |
+            openssl base64 -A)
+          test "$actual" = "$expected"
+          tar -xzf "$root/npm.tgz" -C "$root"
+          ln -s "$root/package/bin/npm-cli.js" "$root/npm"
+          echo "$root" >> "$GITHUB_PATH"
+      - uses: actions/download-artifact@v7
+        with:
+          artifact-ids: ${{ needs.release_packages.outputs.artifact }}
+          path: ${{ runner.temp }}/packages
+      - run: node tools/release/publish.ts npm "$RUNNER_TEMP/packages"
+        env:
+          OSEO_ENABLE_PUBLICATION: ${{ vars.OSEO_ENABLE_PUBLICATION }}
+
+  release_publish_jsr:
+    needs: [release_gate, release_identity, release_packages]
+    if: >-
+      vars.OSEO_ENABLE_PUBLICATION == 'true' &&
+      github.repository == 'dahlia/oseo' && github.event_name == 'push' &&
+      (needs.release_identity.outputs.channel == 'canary' ||
+      needs.release_identity.outputs.channel == 'stable')
+    runs-on: ubuntu-latest
+    environment: release-jsr
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v6
+        with:
+          node-version: "26.13.1"
+          package-manager-cache: false
+      - uses: denoland/setup-deno@v2
+        with:
+          deno-version: "2.9.7"
+      - uses: actions/download-artifact@v7
+        with:
+          artifact-ids: ${{ needs.release_packages.outputs.artifact }}
+          path: ${{ runner.temp }}/packages
+      - run: node tools/release/publish.ts jsr "$RUNNER_TEMP/packages"
+        env:
+          OSEO_ENABLE_PUBLICATION: ${{ vars.OSEO_ENABLE_PUBLICATION }}
+
+  release_github:
+    needs:
+      - release_identity
+      - release_packages
+      - release_cli_linux
+      - release_cli_macos
+      - release_publish_npm
+      - release_publish_jsr
+    if: >-
+      vars.OSEO_ENABLE_PUBLICATION == 'true' &&
+      github.repository == 'dahlia/oseo' && github.event_name == 'push' &&
+      needs.release_identity.outputs.channel == 'stable'
+    runs-on: ubuntu-latest
+    concurrency:
+      group: oseo-github-release-${{ github.ref }}
+      cancel-in-progress: false
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v6
+        with:
+          node-version: "26.13.1"
+          package-manager-cache: false
+      - uses: actions/download-artifact@v7
+        with:
+          artifact-ids: ${{ needs.release_packages.outputs.artifact }}
+          path: ${{ runner.temp }}/packages
+      - uses: actions/download-artifact@v7
+        with:
+          artifact-ids: ${{ needs.release_cli_linux.outputs.artifact }}
+          path: ${{ runner.temp }}/linux
+      - uses: actions/download-artifact@v7
+        with:
+          artifact-ids: ${{ needs.release_cli_macos.outputs.artifact }}
+          path: ${{ runner.temp }}/macos
+      - run: >-
+          node tools/release/publish.ts github "$RUNNER_TEMP/packages"
+          "$RUNNER_TEMP/linux" "$RUNNER_TEMP/macos"
+        env:
+          GH_TOKEN: ${{ github.token }}
+          OSEO_ENABLE_PUBLICATION: ${{ vars.OSEO_ENABLE_PUBLICATION }}
+
+  release_docs_stable:
+    needs: [release_identity, release_packages, release_docs, release_github]
+    if: >-
+      vars.OSEO_ENABLE_PUBLICATION == 'true' &&
+      github.repository == 'dahlia/oseo' && github.event_name == 'push' &&
+      needs.release_identity.outputs.channel == 'stable'
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deploy.outputs.page_url }}
+    concurrency:
+      group: oseo-docs-stable
+      cancel-in-progress: false
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v6
+        with:
+          node-version: "26.13.1"
+          package-manager-cache: false
+      - uses: actions/download-artifact@v7
+        with:
+          artifact-ids: ${{ needs.release_packages.outputs.artifact }}
+          path: ${{ runner.temp }}/packages
+      - uses: actions/download-artifact@v7
+        with:
+          artifact-ids: ${{ needs.release_docs.outputs.artifact }}
+          path: ${{ runner.temp }}/docs
+      - id: fresh
+        run: |
+          deploy=$(node tools/release/publish.ts stable-docs \
+            "$RUNNER_TEMP/packages" "$RUNNER_TEMP/docs")
+          echo "deploy=$deploy" >> "$GITHUB_OUTPUT"
+        env:
+          OSEO_ENABLE_PUBLICATION: ${{ vars.OSEO_ENABLE_PUBLICATION }}
+      - if: steps.fresh.outputs.deploy == 'true'
+        uses: actions/upload-pages-artifact@v5
+        with:
+          name: release-pages-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/docs/site
+      - if: steps.fresh.outputs.deploy == 'true'
+        id: deploy
+        uses: actions/deploy-pages@v5
+        with:
+          artifact_name: release-pages-${{ github.run_attempt }}
+
+  release_docs_canary:
+    needs:
+      - release_identity
+      - release_packages
+      - release_docs
+      - release_publish_npm
+      - release_publish_jsr
+    if: >-
+      vars.OSEO_ENABLE_PUBLICATION == 'true' &&
+      github.repository == 'dahlia/oseo' && github.event_name == 'push' &&
+      needs.release_identity.outputs.channel == 'canary'
+    runs-on: ubuntu-latest
+    environment:
+      name: release-canary
+      url: https://canary.oseo.dev
+    concurrency:
+      group: oseo-docs-canary
+      cancel-in-progress: false
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v6
+        with:
+          node-version: "26.13.1"
+          package-manager-cache: false
+      - uses: actions/download-artifact@v7
+        with:
+          artifact-ids: ${{ needs.release_packages.outputs.artifact }}
+          path: ${{ runner.temp }}/packages
+      - uses: actions/download-artifact@v7
+        with:
+          artifact-ids: ${{ needs.release_docs.outputs.artifact }}
+          path: ${{ runner.temp }}/docs
+      - id: fresh
+        run: |
+          deploy=$(node tools/release/publish.ts canary-docs \
+            "$RUNNER_TEMP/packages" "$RUNNER_TEMP/docs")
+          echo "deploy=$deploy" >> "$GITHUB_OUTPUT"
+        env:
+          GH_TOKEN: ${{ github.token }}
+          OSEO_ENABLE_PUBLICATION: ${{ vars.OSEO_ENABLE_PUBLICATION }}
+      - if: steps.fresh.outputs.deploy == 'true'
+        run: >-
+          npm exec --yes --package wrangler@4.106.0 --
+          wrangler pages deploy "$RUNNER_TEMP/docs/site"
+          --project-name "$PAGES_PROJECT" --branch main
+        env:
+          PAGES_PROJECT: ${{ vars.OSEO_CANARY_PAGES_PROJECT }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ vars.CLOUDFLARE_ACCOUNT_ID }}
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_PAGES_API_TOKEN }}
 
   mac_ready:
     name: macOS self-hosted availability

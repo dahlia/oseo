@@ -254,7 +254,8 @@ test("every check name and concurrency policy is preserved", () => {
   assert.deepEqual(names(after), names(before));
   assert.equal(nameBaseline.sourceRun, 36516215200);
   const existingNames = names(after).filter(
-    (name) => !name.startsWith("own-key cases ("),
+    (name) =>
+      !name.startsWith("own-key cases (") && !name.startsWith("release_"),
   );
   assert.deepEqual(
     existingNames,
@@ -344,7 +345,10 @@ test("every check name and concurrency policy is preserved", () => {
       ),
     ].toSorted(),
   );
-  assert.equal(names(after).length, 104);
+  assert.equal(
+    names(after).filter((name) => !name.startsWith("release_")).length,
+    104,
+  );
   const { jobs: _beforeJobs, ...beforeHeader } = before;
   const { jobs: _afterJobs, ...afterHeader } = after;
   assert.deepEqual(afterHeader, beforeHeader);
@@ -392,7 +396,7 @@ test("literal names acquire a suffix when a matrix remains", () => {
   ]);
 });
 
-test("every macOS job occurs exactly once in five LPT chains", () => {
+test("every existing macOS job occurs once in five LPT chains", () => {
   const lanes = macosLanes();
   assert.equal(lanes.length, 5);
   const jobs = lanes.flat();
@@ -405,7 +409,10 @@ test("every macOS job occurs exactly once in five LPT chains", () => {
       .toSorted(),
   );
   const macIds = Object.entries(after.jobs)
-    .filter(([, job]) => job["runs-on"].startsWith("macos-"))
+    .filter(
+      ([id, job]) =>
+        id !== "release_cli_macos" && job["runs-on"].startsWith("macos-"),
+    )
     .map(([id]) => id)
     .toSorted();
   assert.deepEqual(macIds, jobs.map((job) => job.id).toSorted());
