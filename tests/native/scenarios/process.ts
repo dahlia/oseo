@@ -21,7 +21,7 @@ import {
   defaultComponents,
   runNativeUnits,
 } from "../../../packages/cli/src/index.ts";
-import { nativeToolchain } from "../../native-toolchain.ts";
+import { localZigPath, nativeToolchain } from "../../native-toolchain.ts";
 import { processCases } from "../fixtures/process.ts";
 
 import {
@@ -350,12 +350,13 @@ console.log("ok");`;
   const cliDirectory = await host.makeTemporaryDirectory("oseo-process-cli-");
   try {
     const entry = `${cliDirectory}/entry.js`;
+    const zig = localZigPath();
     for (const runtime of ["node", "deno"]) {
-      const cliArgs = [
+      const launcherArgs = [
         ...(runtime === "deno" ? ["run", "-A"] : []),
         "packages/cli/src/main.ts",
-        entry,
       ];
+      const cliArgs = [...launcherArgs, entry, "--zig", zig];
       const input = new Uint8Array([239, 187, 191, 0, 255, 226, 130]);
       await host.writeTextFile(
         entry,
@@ -398,9 +399,11 @@ process.stderr.write(bytes);`,
         const observed = await host.run({
           command: runtime,
           args: [
-            ...cliArgs.slice(0, -1),
+            ...launcherArgs,
             ...prefix,
             entry,
+            "--zig",
+            zig,
             "--",
             ...programArgs,
           ],
