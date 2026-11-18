@@ -25,6 +25,7 @@ zig = "0.16.0"
 auto = true
 sources = [
   "package.json",
+  "docs/package.json",
   "packages/*/package.json",
   "pnpm-lock.yaml",
   "pnpm-workspace.yaml",
@@ -33,7 +34,22 @@ run = "pnpm install --frozen-lockfile"
 
 [tasks.build]
 description = "Build every npm package as validated ESM"
-run = "pnpm exec tsdown --workspace"
+run = "pnpm exec tsdown"
+
+[tasks.oseo]
+description = "Run the Oseo CLI built from this checkout"
+raw_args = true
+run = "node packages/cli/dist/main.js"
+
+[tasks."docs:build"]
+description = "Build the documentation site"
+raw_args = true
+run = "pnpm --dir docs exec vitepress build"
+
+[tasks."docs:dev"]
+description = "Serve the documentation site for local editing"
+raw_args = true
+run = "pnpm --dir docs exec vitepress dev"
 
 [tasks."perf:profile:discover"]
 description = "Record read-only profiler tool discovery (not acceptance)"

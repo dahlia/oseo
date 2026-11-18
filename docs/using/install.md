@@ -13,7 +13,7 @@ from its root with [mise] installed:
 ~~~~ sh
 mise install
 mise run build
-mise exec -- node packages/cli/dist/main.js --help
+mise run oseo --help
 ~~~~
 
 The checkout CLI runs on Node.js. The repository pins Node.js, pnpm, and Zig

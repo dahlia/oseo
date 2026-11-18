@@ -19,18 +19,24 @@ checkout:
 ~~~~ sh
 mise install
 mise run build
-mise exec -- node packages/cli/dist/main.js --help
+mise run oseo --help
 ~~~~
 
 The remaining examples use `oseo`, the command name for the standalone
 archive and npm package. In a development checkout, replace `oseo`
-with `mise exec -- node packages/cli/dist/main.js`. See
+with `mise run oseo` (or `mise oseo`). See
 [installation](./using/install.md) for the distinction between the
 checkout and release channels.
 
-The executable requires Node.js 24 or later. Native execution also requires
-Zig's C toolchain. `mise install` supplies the pinned Zig version used by the
-repository.
+The npm and checkout commands require Node.js 24 or later. The standalone
+archive embeds Node.js and does not require a separate installation.
+
+Native compilation uses Zig's C toolchain. By default, the CLI downloads
+and verifies the pinned Zig release on first use, then reuses the user
+cache without accessing the network. The download requires `tar` with XZ
+support. To use an existing Zig installation, including the one supplied
+by mise, pass `--zig PATH` to `oseo build` or `oseo run`. Help, version,
+completion, and text-only output do not download Zig.
 
 
 Command syntax
@@ -55,6 +61,13 @@ Options may appear before or after the source path. `run` compiles and
 executes a temporary program; the root shortcut uses the same workflow.
 `build` retains an executable without starting it.
 
+From a checkout, use `-- --` before program arguments. mise consumes the
+first `--`; the second reaches `oseo`. For example:
+
+~~~~ sh
+mise run oseo run examples/ray-tracer.ts -- -- 1 1
+~~~~
+
 Command names (`run`, `build`, `help`, and `completion`) are reserved in the
 shortcut form before `--`, even after a run option. Use `./build`,
 `run build`, or `-- build` for a source named
@@ -76,6 +89,7 @@ shell completion script with `oseo completion bash` (or
 | `--no-specialization`        | Compile only the generic native path         |
 | `--no-runtime-archive-reuse` | Rebuild the C runtime archive for this run   |
 | `--target TARGET`            | Select an explicit native target             |
+| `--zig PATH`                 | Use the given Zig executable                 |
 | `--help`                     | Print help generated from the CLI grammar    |
 | `--version`                  | Print the lockstep Oseo package version      |
 

@@ -1,93 +1,77 @@
 @oseo/host
 ==========
 
-This package adapts filesystem, temporary-directory, and subprocess operations
-for Node.js and Deno. Compiler-core code consumes only the host-neutral
-interface. Both hosts canonicalize file module identities and share a relative
-`file:` resolver, content hashing, and owned loader diagnostics.
+`@oseo/host` supplies the [Oseo compiler] with filesystem, temporary-directory,
+and subprocess operations on Node.js and Deno. Use `createNodeHost()` on
+Node.js or `createDenoHost()` on Deno. If you use only the Oseo CLI, you do
+not need to install this adapter separately.
 
-The file loader identifies dependencies with a *.json* pathname as JSON
-modules and other files as JavaScript modules. It retains their original
-bytes and digest. The compiler validates static `type: "json"` requests
-against that module kind before canonical identity deduplication; the host
-does not parse JSON or execute dynamic import options.
+Install with `npm install @oseo/host` or `deno add jsr:@oseo/host`, then
+import from `@oseo/host`.
 
-Node.js and Deno adapters also normalize their runtime operating-system and
-architecture spellings into an execution-host description. Unknown values stay
-explicitly unknown so the composition root can reject unsupported native
-execution without inheriting an ambient toolchain target.
+[Oseo compiler]: https://github.com/dahlia/oseo/tree/main/packages/compiler
 
-The host also owns optional persistent compiler-cache storage. Linux uses
-`XDG_CACHE_HOME`, falling back to *~/.cache*, and macOS uses
-*~/Library/Caches*. Cache clients receive an existing namespaced directory,
-nonempty regular-file checks, per-artifact exclusive leases, and atomic
-publication.
 
-The selected root is resolved to an absolute normalized path, so clients and
-toolchain subprocesses observe the same archive from different working
-directories. Namespace names must be portable leaf names other than `.` and
-`..`, so clients cannot escape the Oseo-owned directory.
+Load a module graph
+-------------------
 
-A lease serializes the lookup-through-publication interval for concurrent cold
-callers. Owner tokens make release ownership-safe, and an expiration time lets
-a later caller reclaim a lease abandoned by an interrupted process. An active
-owner renews that time.
+Pair `createFileModuleLoader()` with `fileModuleResolver` to load a file
+entry point and follow relative imports. The resolver does not use Node.js
+or Deno package resolution. The loader classifies paths ending in `.json`
+as JSON modules; the compiler checks their import attributes and contents.
 
-Release and reclamation atomically rename the exact observed state file, then
-move the complete lock directory to a unique disposal path before deletion. An
-exclusive state file also protects the interval before initial owner
-publication, so an earlier owner or concurrent reclaimer cannot target a
-replacement lease. Renewal overwrites only the already-claimed state file and
-cannot recreate it in a replacement directory.
+Add `@oseo/compiler` and `@oseo/parser-babel` to your project to run this
+example. Save it as *inspect.mjs* beside the *main.js* you want to load.
+On Deno, use `createDenoHost()` and grant read access to the source files.
 
-The host selects the location and lifetime. An injected host may omit cache
-support or reject an unavailable operation and keep the caller on its uncached
-path.
+~~~~ js
+import { buildModuleGraph } from "@oseo/compiler";
+import {
+  createFileModuleLoader,
+  createNodeHost,
+  fileModuleResolver,
+} from "@oseo/host";
+import { babelModuleFrontend } from "@oseo/parser-babel";
 
-Content-addressed archives remain until the operating system or user removes
-the Oseo cache namespace. There is no automatic age or count pruning. Removing
-that namespace is safe; the next native workflow rebuilds its archive.
+const host = createNodeHost();
+const { diagnostics, graph } = await buildModuleGraph(
+  babelModuleFrontend,
+  createFileModuleLoader(host),
+  fileModuleResolver,
+  new URL("./main.js", import.meta.url).href,
+);
 
-Toolchains declare the host variables they permit their subprocesses to
-inherit. A capable host captures those variables once, and every process request
-in that workflow receives the same immutable snapshot. Unlisted ambient
-compiler settings cannot leak across the toolchain boundary. A Deno host
-without `--allow-env` reports snapshot capture as unavailable; the caller
-disables cache reuse and process requests retain ordinary child inheritance.
+if (graph === undefined) {
+  throw new Error(JSON.stringify(diagnostics));
+}
+console.log(`Loaded ${graph.modules.length} modules`);
+~~~~
 
-Node hosts may opt into `createNodeHost({ delegateSpawns: true })`. One lazy,
-reusable Node process then spawns commands and collects their output. The
-helper imports no compiler implementation, so repeated forks do not copy the
-compiler's address space. The product CLI keeps direct spawning by default.
-`await host.close()` drains accepted requests and closes the helper. Idle
-helpers do not keep the parent alive, and process exit disconnects their IPC.
 
-Delegated requests capture the caller's current environment and absolute working
-directory. Commands inherit the umask the helper started with; reading the
-umask in Node briefly sets it to zero for the whole process, which would race
-with other threads. Output is decoded once after each pipe closes, just as in
-the direct host. Signal termination retains the host's existing status mapping
-(`null` becomes `1`). Spawn errors retain Node's error codes and command
-metadata. Transport failure rejects outstanding and future requests; commands
-are never replayed after an uncertain failure.
+Native builds
+-------------
 
-The helper and its commands retain the caller's process group. Existing fixture
-supervisors must continue to signal that group for timeout and descendant
-cleanup. The host API adds no timeout or cancellation protocol. Disconnect
-cleanup kills direct commands; arbitrary helper loss alone does not guarantee
-termination of descendants that outlive their direct parent.
+The adapters report normalized operating-system and architecture names
+so callers can check whether a native target can run on the current host.
+The optional persistent cache uses `XDG_CACHE_HOME` or *~/.cache* on Linux
+and *~/Library/Caches* on macOS. Oseo does not prune cached archives. If you
+remove them, the next native build recreates the archives it needs.
 
-`createExecutablePublisher()` supplies retained-executable publication outside
-`CompilerHost`. Its Node.js-compatible filesystem operations run under both
-Node.js and Deno. Call `inspect(destination, protectedPaths)` before native
-compilation, retaining the returned destination identity, then call
-`publish(linkedPath, destination)` after a successful link. Protected paths
-include the source and every module in its closed graph.
+On Node.js, use `createNodeHost({ delegateSpawns: true })` to run subprocesses
+through a reusable helper. Call `await host.close()` to drain accepted
+requests and shut down the helper.
 
-Inspection refuses missing parents, non-executables, symlinks, and graph-source
-aliases. Publication preserves linker bytes and mode bits, rechecks replacement
-identity, and stages in the destination directory so readers never see partial
-bytes. [ADR 0037] specifies hard-link fallback, concurrent replacement windows,
-and cleanup errors. This API adds no crash-durability guarantee.
 
-[ADR 0037]: ../../docs/adr/0037-retained-native-executables.md
+Publish an executable
+---------------------
+
+To retain a linked executable, use `createExecutablePublisher()` on either
+host. Call `inspect(destination, protectedPaths)` before building, with the
+entry source and graph sources in `protectedPaths`. Pass the returned
+destination record to `publish(linkedPath, inspectedDestination)` after a
+successful link. Publication stages the file beside its destination so
+readers do not see partial bytes; it does not guarantee crash durability.
+See the [publication contract] and the [host implementation notes].
+
+[publication contract]: https://github.com/dahlia/oseo/blob/main/docs/adr/0037-retained-native-executables.md
+[host implementation notes]: https://github.com/dahlia/oseo/blob/main/docs/development/package-host.md

@@ -1101,7 +1101,7 @@ jobs:
           persist-credentials: false
       - uses: ./.github/actions/setup-mise
       - run: pnpm install --frozen-lockfile
-      - run: pnpm docs:build
+      - run: mise run docs:build
         env:
           OSEO_DOCS_CHANNEL: ${{ needs.release_identity.outputs.channel }}
           OSEO_DOCS_VERSION: ${{ needs.release_identity.outputs.version }}

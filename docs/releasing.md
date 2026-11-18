@@ -9,6 +9,43 @@ This procedure is planned for Oseo 0.1.0. See
 [*PLAN-0.1.0.md*](../PLAN-0.1.0.md) for the first release gate.
 
 
+Set up a new package for publishing
+-----------------------------------
+
+Configure both registries before merging a new `@oseo/*` package into a
+branch that publishes automatically. Trusted publishing is configured per
+package, not once for the whole scope.
+
+1.  On npm, build and check a seed tarball for the new package. Give it the
+    next release version with a `-canary.0` suffix, and check that its
+    dependencies are available on npm. Publish it from a maintainer's
+    terminal with `npm publish <tarball> --access public --tag canary`.
+    Approve npm's browser authentication prompt if required. Do not move
+    `latest` or seed existing packages again.
+
+2.  Once npm lists the seed version, add a [trusted publisher][npm-trust]
+    for the package. Set the GitHub repository to `dahlia/oseo`, the workflow
+    filename to `main.yaml`, and the environment to `release-npm`. With an
+    npm CLI that supports `npm trust`, use:
+
+    ~~~~ sh
+    npm trust github @oseo/example --repo dahlia/oseo --file main.yaml \
+      --env release-npm --allow-publish
+    ~~~~
+
+    Replace `@oseo/example` with the new package name. In the package's
+    trusted publisher settings on npmjs.com, also enable **Allow npm dist-tag**.
+    The CLI command above grants publishing permission, not dist-tag access.
+
+3.  On JSR, reserve the new package name under `@oseo`. In the package's
+    settings, [link the GitHub repository][jsr-publish] `dahlia/oseo`.
+    Do not upload a seed to JSR: linking the reserved package enables
+    GitHub Actions OIDC before the first version is published.
+
+[npm-trust]: https://docs.npmjs.com/trusted-publishers/
+[jsr-publish]: https://jsr.io/docs/publishing-packages#publishing-from-github-actions
+
+
 Cut a release
 -------------
 
