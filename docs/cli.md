@@ -5,10 +5,8 @@ Status
 ------
 
 This guide describes the command line implemented by the current Oseo
-checkout. Oseo accepts the frozen M3 and M4 source-language profiles and
-enables the implemented specializations when a function is eligible.
-Language features planned for later milestones are not available through
-this command line.
+checkout. See [supported features](./using/features.md) for the measured
+language profile and current limits.
 
 
 Run the CLI from a checkout
@@ -20,14 +18,15 @@ checkout:
 
 ~~~~ sh
 mise install
-mise deps
 mise run build
-node packages/cli/dist/main.js --help
+mise exec -- node packages/cli/dist/main.js --help
 ~~~~
 
-The `@oseo/cli` package installs an executable named `oseo`. The
-remaining examples use that shorter name. In a development checkout, replace
-`oseo` with `node packages/cli/dist/main.js`.
+The remaining examples use `oseo`, the command name for the planned
+standalone archive and npm package. In a development checkout, replace `oseo`
+with `mise exec -- node packages/cli/dist/main.js`. See
+[installation](./using/install.md) for the distinction between the
+checkout and release channels.
 
 The executable requires Node.js 24 or later. Native execution also requires
 Zig's C toolchain. `mise install` supplies the pinned Zig version used by the
@@ -95,8 +94,10 @@ disables sanitizers. Both configurations disable floating-point contraction and
 preserve JavaScript behavior. The MIR and C text modes reject `--build-config`
 because their output is configuration-neutral. Runtime archives and harness
 objects have separate cache identities for each configuration.
-[ADR 0036](./adr/0036-optimized-native-build-configuration.md) defines the
+[ADR 0036] defines the
 compiler options and verification gates.
+
+[ADR 0036]: https://github.com/dahlia/oseo/blob/main/docs/adr/0036-optimized-native-build-configuration.md
 
 
 Retain a native executable
@@ -124,8 +125,10 @@ file, then links or renames it into place. Failures before publication leave
 the previous destination unchanged and remove the sibling file; cleanup
 failures are reported after the original failure. Filesystems without hard
 links use the fallback and race boundary recorded in
-[ADR 0037](./adr/0037-retained-native-executables.md). Publication is atomic
+[ADR 0037]. Publication is atomic
 for readers but does not promise crash durability.
+
+[ADR 0037]: https://github.com/dahlia/oseo/blob/main/docs/adr/0037-retained-native-executables.md
 
 
 Compile and run a script
@@ -251,7 +254,9 @@ oseo build --no-specialization --emit-c add.ts
 The option may change MIR, generated C, and native code shape. It must not
 change source acceptance, output, errors, side-effect order, or other
 JavaScript-visible behavior. The detailed optimization contract is recorded in
-[*specialization-m2.md*](./specialization-m2.md).
+[*specialization-m2.md*][specialization].
+
+[specialization]: https://github.com/dahlia/oseo/blob/main/docs/specialization-m2.md
 
 
 Module entries
@@ -285,20 +290,9 @@ script entry is rejected with a diagnostic.
 Source-language limits
 ----------------------
 
-Oseo compiles the language profiles frozen through M4: primitives, objects,
-arrays, closures, exceptions, closed module graphs, promises, restricted
-asynchronous functions, top-level `await`, and timers. The living M5 profile
-grows this surface checkpoint by checkpoint.
 TypeScript annotations and JSDoc types are optimization hints. Oseo does not
-run the TypeScript type checker.
-
-Web APIs, Node.js APIs, and package resolution are not part of the current
-source profile. See [*language-profile-m3.md*](./language-profile-m3.md) and
-[*language-profile-m4.md*](./language-profile-m4.md) for the exact accepted
-syntax and semantics, and
-[*language-profile-m5.md*](./language-profile-m5.md) for the boundary the
-current milestone measures against. [*ROADMAP.md*](../ROADMAP.md) describes
-intended later milestones without presenting them as current CLI features.
+run the TypeScript type checker. See [supported features](./using/features.md)
+for the scope of the ECMAScript 2026 measurement and the host API boundaries.
 
 
 Output and diagnostics
@@ -345,12 +339,9 @@ repository checkout and confirm that `zig version` succeeds in the same shell.
 The `--dump-mir` and `--emit-c` modes can still isolate frontend or backend
 problems because they do not start the toolchain.
 
-If Oseo reports `OSEO1001`, compare the source form with
-[*language-profile-m3.md*](./language-profile-m3.md) and
-[*language-profile-m4.md*](./language-profile-m4.md), and check the known-gap
-list in [*language-profile-m5.md*](./language-profile-m5.md). A `.ts`
-filename does not imply that Oseo accepts the full TypeScript language or
-performs type checking.
+If Oseo reports `OSEO1001`, compare the source form with the
+[supported features](./using/features.md). A *.ts* filename does not imply
+that Oseo accepts the full TypeScript language or performs type checking.
 
 Run `oseo --help` when scripting the command. Its usage and option descriptions
 come from the same grammar that parses each invocation.
@@ -391,4 +382,4 @@ output by default; `inheritOutput` selects inherited stdout and stderr and
 returns empty output strings. Combining inherited stdin with explicit
 `input`, or inherited output with `captureBytes`, throws a `TypeError`.
 
-[ADR 0038]: ./adr/0038-process-input-and-exit-subset.md
+[ADR 0038]: https://github.com/dahlia/oseo/blob/main/docs/adr/0038-process-input-and-exit-subset.md

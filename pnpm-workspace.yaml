@@ -3,6 +3,10 @@ packages:
 
 verifyDepsBeforeRun: error
 
+# Vite uses esbuild's platform package without its postinstall fallback.
+allowBuilds:
+  "esbuild@0.21.5": false
+
 permissions:
   "@optique/core":
     skills: [optique]

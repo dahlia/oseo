@@ -1,6 +1,8 @@
 node_modules/
 packages/*/dist/
 artifacts/
+docs/.vitepress/cache/
+docs/.vitepress/dist/
 *.tgz
 
 *.o
