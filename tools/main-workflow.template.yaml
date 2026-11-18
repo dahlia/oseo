@@ -3,6 +3,7 @@ name: main
 on:
   pull_request:
   push:
+    # The generator keeps only artifact jobs on release-rehearsal pushes.
   workflow_dispatch:
     inputs:
       baseline:

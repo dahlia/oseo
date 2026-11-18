@@ -8,6 +8,12 @@ lane. The GitHub artifact names include the attempt number; downstream
 jobs use the specific producer's artifact ID and verify the source SHA and
 payload manifest.
 
+Push the candidate to `release-rehearsal` in `dahlia/oseo` to run only
+release artifact builds and smoke tests. This branch does not run the
+full CI gate or publish to any channel, even if publication is enabled.
+Its artifacts are for inspection and do not qualify a release. Pull
+requests, other branches, and tags keep their normal CI checks.
+
 To stage packages locally from the repository root:
 
 ~~~~ sh

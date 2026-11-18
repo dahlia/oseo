@@ -39,6 +39,7 @@ test("only canonical main and exact stable tag pushes can publish", () => {
     { GITHUB_EVENT_NAME: "pull_request" },
     { GITHUB_EVENT_NAME: "workflow_dispatch" },
     { GITHUB_REF: "refs/heads/next" },
+    { GITHUB_REF: "refs/heads/release-rehearsal" },
     { GITHUB_REF: "refs/tags/v0.1.0" },
     { GITHUB_REF: "refs/tags/0.1.0-rc.1" },
   ]) {

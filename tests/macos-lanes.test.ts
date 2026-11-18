@@ -250,6 +250,59 @@ function executedSteps(
   return steps;
 }
 
+const fullRunGuard =
+  "!(github.event_name == 'push' &&\n" +
+  "  github.repository == 'dahlia/oseo' &&\n" +
+  "  github.ref == 'refs/heads/release-rehearsal')";
+
+test("rehearsal runs only hosted read-only artifact jobs", () => {
+  const artifactJobs = new Set([
+    "release_identity",
+    "release_packages",
+    "release_cli_linux",
+    "release_cli_macos",
+    "release_docs",
+  ]);
+  const publicationJobs = new Set([
+    "release_publish_npm",
+    "release_publish_jsr",
+    "release_github",
+    "release_docs_stable",
+    "release_docs_canary",
+  ]);
+  for (const lanes of [0, configuredSelfHostedLanes]) {
+    const generatedJobs = parsedMapping(
+      parse(generateMacosWorkflow(template, lanes)),
+      "Workflow",
+    ).jobs;
+    const jobs = parsedMapping(generatedJobs, "Workflow jobs");
+    for (const [id, value] of Object.entries(jobs)) {
+      const job = parsedMapping(value, id);
+      if (artifactJobs.has(id)) {
+        assert.equal(job.if, undefined, id);
+        assert.deepEqual(job.permissions, { contents: "read" }, id);
+        assert.equal(job.environment, undefined, id);
+        assert.ok(job.needs == null || job.needs === "release_identity", id);
+        assert.match(String(job["runs-on"]), /^(ubuntu|macos)-/u, id);
+      } else if (publicationJobs.has(id)) {
+        const original = before.jobs[id]!;
+        assert.deepEqual(job, original, id);
+        assert.match(String(job.if), /OSEO_ENABLE_PUBLICATION == 'true'/u);
+      } else {
+        assert.ok(String(job.if).startsWith(fullRunGuard), id);
+      }
+    }
+    const gate = parsedMapping(jobs.release_gate, "Release gate");
+    assert.equal(gate.if, `${fullRunGuard} && !cancelled()`);
+    assert.deepEqual(
+      Array.isArray(gate.needs) ? gate.needs.map(String).toSorted() : [],
+      Object.keys(jobs)
+        .filter((id) => id !== "release_gate" && !publicationJobs.has(id))
+        .toSorted(),
+    );
+  }
+});
+
 test("every check name and concurrency policy is preserved", () => {
   assert.deepEqual(names(after), names(before));
   assert.equal(nameBaseline.sourceRun, 36516215200);
@@ -419,7 +472,7 @@ test("every existing macOS job occurs once in five LPT chains", () => {
   for (const lane of lanes) {
     for (const [index, planned] of lane.entries()) {
       const actual = after.jobs[planned.id]!;
-      assert.equal(actual.if, "${{ !cancelled() }}");
+      assert.equal(actual.if, `${fullRunGuard} && !cancelled()`);
       assert.equal(actual.needs, lane[index - 1]?.id);
       assert.equal(actual.name, planned.name);
       assert.equal(actual["runs-on"], planned.os);
@@ -515,7 +568,8 @@ test("generated macOS jobs preserve their template contract", () => {
     const original = before.jobs[id]!;
     const actual = after.jobs[id]!;
     const { strategy: _strategy, ...originalContract } = original;
-    const { strategy: _newStrategy, ...actualContract } = actual;
+    const { strategy: _newStrategy, if: condition, ...actualContract } = actual;
+    assert.equal(condition, fullRunGuard, id);
     assert.deepEqual(actualContract, originalContract, id);
     assert.deepEqual(
       entries(actual),
@@ -549,7 +603,8 @@ test("macOS native sanitizer timeout covers the slow run", () => {
 });
 
 test("Array Linux job preserves the full extended invocation", () => {
-  const job = after.jobs.test_array_constructor!;
+  const { if: condition, ...job } = after.jobs.test_array_constructor!;
+  assert.equal(condition, fullRunGuard);
   assert.deepEqual(job, before.jobs.test_array_constructor);
   assert.equal(job["timeout-minutes"], 45);
   assert.equal(job.env, undefined);
@@ -583,7 +638,7 @@ test("Array Linux job preserves the full extended invocation", () => {
   ]);
   assert.equal(
     configured.jobs.test_array_constructor!.if,
-    "${{ !cancelled() }}",
+    `${fullRunGuard} && !cancelled()`,
   );
 });
 
@@ -763,7 +818,7 @@ test("native aggregate explicitly requires all native and test262 jobs", () => {
       .map((job) => job.id),
   ].toSorted();
   const aggregate = after.jobs.native!;
-  assert.equal(aggregate.if, "${{ always() }}");
+  assert.equal(aggregate.if, `${fullRunGuard} && always()`);
   const needs = aggregate.needs;
   if (needs == null || isString(needs)) {
     throw new Error("Aggregate requires an explicit dependency list");
@@ -1009,7 +1064,7 @@ test("one extra lane retains every job and aggregate dependency", () => {
       assert.match(actual["runs-on"], /\|\| '"macos-15"'/);
       assert.ok(Array.isArray(actual.needs));
       assert.ok(actual.needs.includes("mac_ready"));
-      assert.equal(actual.if, "${{ !cancelled() }}");
+      assert.equal(actual.if, `${fullRunGuard} && !cancelled()`);
     }
   }
 });
@@ -1649,7 +1704,7 @@ test("eight Mac lanes route each label with its own hosted fallback", () => {
           ` || '"macos-15"') }}`,
       );
       assert.deepEqual(actual.needs, ["mac_ready"]);
-      assert.equal(actual.if, "${{ !cancelled() }}");
+      assert.equal(actual.if, `${fullRunGuard} && !cancelled()`);
     }
   }
 });
@@ -3137,7 +3192,7 @@ test("correctness CI executes only on the existing hosted Mac Deno job", () => {
       assert.equal(runInNewContext(condition), false);
     }
   }
-  assert.equal(mac.if, "${{ !cancelled() }}");
+  assert.equal(mac.if, `${fullRunGuard} && !cancelled()`);
   assert.ok(additions.every((step) => step["continue-on-error"] == null));
 });
 
