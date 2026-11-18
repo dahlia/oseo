@@ -28,9 +28,15 @@ with `mise exec -- node packages/cli/dist/main.js`. See
 [installation](./using/install.md) for the distinction between the
 checkout and release channels.
 
-The executable requires Node.js 24 or later. Native execution also requires
-Zig's C toolchain. `mise install` supplies the pinned Zig version used by the
-repository.
+The npm and checkout commands require Node.js 24 or later. The standalone
+archive embeds Node.js and does not require a separate installation.
+
+Native compilation uses Zig's C toolchain. By default, the CLI downloads
+and verifies the pinned Zig release on first use, then reuses the user
+cache without accessing the network. The download requires `tar` with XZ
+support. To use an existing Zig installation, including the one supplied
+by mise, pass `--zig PATH` to `oseo build` or `oseo run`. Help, version,
+completion, and text-only output do not download Zig.
 
 
 Command syntax
@@ -76,6 +82,7 @@ shell completion script with `oseo completion bash` (or
 | `--no-specialization`        | Compile only the generic native path         |
 | `--no-runtime-archive-reuse` | Rebuild the C runtime archive for this run   |
 | `--target TARGET`            | Select an explicit native target             |
+| `--zig PATH`                 | Use the given Zig executable                 |
 | `--help`                     | Print help generated from the CLI grammar    |
 | `--version`                  | Print the lockstep Oseo package version      |
 
