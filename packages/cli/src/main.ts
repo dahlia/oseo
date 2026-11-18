@@ -25,8 +25,8 @@ await runProgram<CliCommandContext>({
     name: "oseo",
     version: manifest.version,
   },
-  help: "option",
-  completion: false,
+  help: "both",
+  completion: "both",
   hooks: {
     beforeEach() {
       return {

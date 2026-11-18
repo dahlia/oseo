@@ -307,14 +307,12 @@ compilation does not change the M5 exclusion of language-level `eval`, the
 Command-line track
 ------------------
 
-Oseo's current command line compiles one source entry and either prints an
-intermediate form or builds and runs a temporary native executable.
-[*PLAN-CLI.md*](./PLAN-CLI.md) records the transition to an explicit `run`
-command, a cross-target `build` command, a compatible root shortcut, and public
-help and completion commands.
+Oseo's CLI provides an explicit `run` command, a cross-target `build` command,
+a root shortcut for `run`, and help and shell completion.
+[*PLAN-CLI.md*](./PLAN-CLI.md) records these contracts.
 
-This track is planned and its implementation has not started. It changes the
-outer composition and artifact lifecycle without changing accepted JavaScript
+The track changes the outer composition and artifact lifecycle without
+changing accepted JavaScript
 or the compiler's dependency direction. The command registry remains
 statically visible to Node.js, Deno, JSR publication, and the standalone CLI
 pipeline; feature-specific commands enter only after their owning plans supply

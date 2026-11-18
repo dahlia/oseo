@@ -121,8 +121,7 @@ cross-compilation to AArch64 Linux. `build` selects the optimized configuration
 above. Because `build` is a subcommand, the unit also lands the part of
 step 4 that the subcommand grammar needs: typed command modules for the root,
 `run`, and `build`, and the static generated registry that dispatches them.
-The help and completion tests of step 3 and the shell completion of step 4
-stay with that plan.
+Help and shell completion are covered separately in that plan.
 
 ### Program input and exit status
 

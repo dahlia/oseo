@@ -150,7 +150,7 @@ modify dependencies. Do not hand-edit generated lockfiles.
 
 ### Dependency Agent Skills
 
-The CLI uses Optique 1.2.13, which ships its `optique` Agent Skill. During
+The CLI uses Optique 1.3.7, which ships its `optique` Agent Skill. During
 installation, pnpm links that approved skill into *.agents/skills/* and
 *.claude/skills/* during installation. These generated directories are ignored
 by Git. The other pinned direct dependencies do not currently ship skills.

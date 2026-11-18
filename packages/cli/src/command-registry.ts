@@ -28,11 +28,17 @@ function reserveChildNames<Value>(
   };
 }
 
-/** Apply shortcut reservation from the generated registry's child names. */
+/** Reserve named and built-in commands in the root SOURCE position. */
 export function reserveRootCommandNames(
   entries: readonly ModuleCommand<CliCommandContext>[],
 ): readonly ModuleCommand<CliCommandContext>[] {
-  const names = new Set(entries.flatMap((entry) => entry.path.slice(0, 1)));
+  // runProgram gives leading commands precedence, but not the embedded
+  // createProgramParser path or a SOURCE consumed after a root option.
+  const names = new Set([
+    "help",
+    "completion",
+    ...entries.flatMap((entry) => entry.path.slice(0, 1)),
+  ]);
   // Object parsing can consume an option and SOURCE in one step. Guard
   // both boundaries while leaving option values to their own parsers.
   const command: Omit<

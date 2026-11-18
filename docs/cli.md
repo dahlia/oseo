@@ -41,6 +41,9 @@ Command syntax
 oseo [RUN_OPTIONS] SOURCE [-- ARGS...]
 oseo run [RUN_OPTIONS] SOURCE [-- ARGS...]
 oseo build [BUILD_OPTIONS] SOURCE
+oseo help [COMMAND...]
+oseo completion SHELL
+oseo --completion SHELL
 oseo --help
 oseo --version
 ~~~~
@@ -53,10 +56,15 @@ Options may appear before or after the source path. `run` compiles and
 executes a temporary program; the root shortcut uses the same workflow.
 `build` retains an executable without starting it.
 
-Command names are reserved in the shortcut form before `--`, even after a
-run option. Use `./build`, `run build`, or `-- build` for a source named
+Command names (`run`, `build`, `help`, and `completion`) are reserved in the
+shortcut form before `--`, even after a run option. Use `./build`,
+`run build`, or `-- build` for a source named
 *build*. For example, `oseo --module -- build` treats *build* as the module
 source.
+
+Use `oseo help build` or `oseo build --help` for build options. Generate a
+shell completion script with `oseo completion bash` (or
+`oseo --completion bash`). See `oseo completion --help` for usage.
 
 | Option                       | Behavior                                     |
 | ---------------------------- | -------------------------------------------- |

@@ -76,7 +76,8 @@ Typed command modules under *src/commands/* share parsers and a host-injected
 handler. The checked-in *src/commands.generated.ts* registry contains static
 imports for package and standalone builds; startup never scans directories.
 `mise run generate:commands` regenerates it and `mise run check:commands`
-refuses stale output. Help/completion command expansion remains separate work.
+refuses stale output. The executable enables Optique's help and shell
+completion in both command and option forms.
 
 `parseCliRequest()` exposes that same grammar to embedding callers. It returns
 either typed command values or completed parse, help, or version output without

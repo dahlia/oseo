@@ -4,16 +4,13 @@ Oseo command-line evolution plan
 Status
 ------
 
-Implementation status: planned, not started. This plan defines the command
-model, composition boundary, and packaging rules for evolving Oseo's current
-single-command interface into an extensible command program. It does not add a
-command by itself, reserve a numbered milestone, or change JavaScript
-semantics or compatibility counts.
+Implementation status: the root shortcut, `run`, `build`, compiler text
+output, help, and completion are implemented through the static command
+registry. Package resolver changes and standalone archive verification remain
+in their respective tracks. This plan does not reserve a numbered milestone
+or change JavaScript semantics or compatibility counts.
 
-The implemented command line remains the contract described in
-[*docs/cli.md*](./docs/cli.md) until a tested implementation and its user
-documentation land together. Planned syntax in this document must not be
-presented as available before that change.
+[*docs/cli.md*](./docs/cli.md) is the reference for implemented behavior.
 
 This plan is governed by [*WHITEPAPER.md*](./WHITEPAPER.md),
 [*DESIGN.md*](./DESIGN.md), [*ROADMAP.md*](./ROADMAP.md),
@@ -43,10 +40,10 @@ definitions. The definitions remain statically visible to npm packaging, JSR
 publication, and the planned standalone CLI build.
 
 
-Current boundary
-----------------
+Original boundary
+-----------------
 
-The current parser accepts exactly one source path. With no output-mode flag,
+The original parser accepted exactly one source path. With no output-mode flag,
 the CLI compiles the source, links a native executable in a temporary
 directory, runs it, forwards its output and status, and removes the directory.
 
@@ -65,11 +62,11 @@ parsing.
 Command model
 -------------
 
-The planned top-level forms are:
+The top-level forms are:
 
 ~~~~ text
-oseo [RUN_OPTIONS] SOURCE
-oseo run [RUN_OPTIONS] SOURCE
+oseo [RUN_OPTIONS] SOURCE [-- ARGS...]
+oseo run [RUN_OPTIONS] SOURCE [-- ARGS...]
 oseo build [BUILD_OPTIONS] SOURCE
 oseo help [COMMAND...]
 oseo completion SHELL
@@ -126,10 +123,9 @@ Build command
 mode produces a native executable at a caller-visible destination and does not
 start it.
 
-Before this mode lands, the plan or an architecture decision must record the
+[ADR 0037](./docs/adr/0037-retained-native-executables.md) records the
 destination option, default file name, overwrite policy, executable suffix,
-permission behavior, and atomic replacement rules. The current
-temporary-execution workflow provides no safe defaults for those choices.
+permission behavior, and atomic replacement rules.
 
 Native `build` accepts every supported target that the selected toolchain can
 produce. It does not apply `canExecuteTarget()`, because cross-compilation is a
@@ -164,8 +160,8 @@ ambiguity without preserving a released contract.
 Command modules and discovery
 -----------------------------
 
-The CLI uses Optique 1.2.13. The first implementation unit adds
-`@optique/discover` from that release line. Direct Optique dependencies stay
+The CLI uses Optique 1.3.7, which gives named and built-in commands
+precedence over root positionals in `runProgram()`. Direct dependencies stay
 on one version so parser, runner, and discovery behavior remain compatible.
 
 Each user command is a module whose default export is created with

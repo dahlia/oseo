@@ -9,7 +9,12 @@ import type {
   ProcessRequest,
 } from "@oseo/compiler";
 import type { ExecutableDestination, ExecutablePublisher } from "@oseo/host";
-import { runCli, runNativeCli, runNativeUnits } from "../src/index.ts";
+import {
+  parseCliRequest,
+  runCli,
+  runNativeCli,
+  runNativeUnits,
+} from "../src/index.ts";
 import commands from "../src/commands.generated.ts";
 import { parse } from "@optique/core/parser";
 import { createProgramParser } from "@optique/discover";
@@ -366,7 +371,7 @@ test("native-only diagnostics keep the display source ID", async () => {
 });
 
 test("shortcut names become literal after the option terminator", async () => {
-  for (const name of ["build", "run"]) {
+  for (const name of ["build", "run", "help", "completion"]) {
     for (const flags of [[], ["--module"]]) {
       // eslint-disable-next-line no-await-in-loop -- Inspect each parse state.
       const literal = await parse(createProgramParser(commands), [
@@ -383,11 +388,26 @@ test("shortcut names become literal after the option terminator", async () => {
       ]);
       assert.equal(reserved.success, false);
     }
+    for (const [args, sourceId, programArgs] of [
+      [["--module", "--", name], name, []],
+      [[`./${name}`], `./${name}`, []],
+      [["run", name], name, []],
+      [
+        ["--module", "entry.ts", "--", name, "--help"],
+        "entry.ts",
+        [name, "--help"],
+      ],
+    ] as const) {
+      const parsed = parseCliRequest({ ...request, args });
+      assert.equal(parsed.kind, "invoke", JSON.stringify(args));
+      assert.equal(parsed.value.sourceId, sourceId);
+      assert.deepEqual(parsed.value.programArgs, programArgs);
+    }
   }
 });
 
 test("root reservation permits command names as option values", async () => {
-  for (const name of ["build", "run"]) {
+  for (const name of ["build", "run", "help", "completion"]) {
     // eslint-disable-next-line no-await-in-loop -- Inspect both reserved names.
     const result = await parse(createProgramParser(commands), [
       "--script",

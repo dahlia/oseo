@@ -6,6 +6,52 @@ import { fileURLToPath } from "node:url";
 import { runCli } from "../packages/cli/dist/index.js";
 import { describeTarget } from "../packages/compiler/dist/index.js";
 
+function runBuiltCli(...args: readonly string[]) {
+  const cli = fileURLToPath(
+    new URL("../packages/cli/dist/main.js", import.meta.url),
+  );
+  return spawnSync(process.execPath, [cli, ...args], { encoding: "utf8" });
+}
+
+test("built CLI exposes root and build help in both forms", () => {
+  for (const [command, option] of [
+    [["help"], ["--help"]],
+    [
+      ["help", "build"],
+      ["build", "--help"],
+    ],
+  ] as const) {
+    const result = runBuiltCli(...command);
+    const alternate = runBuiltCli(...option);
+    assert.equal(result.status, 0, result.stderr);
+    assert.equal(alternate.status, 0, alternate.stderr);
+    assert.equal(result.stderr, "");
+    assert.equal(alternate.stderr, "");
+    assert.equal(result.stdout, alternate.stdout);
+    assert.match(result.stdout, command.length === 1 ? /SOURCE/u : /--output/u);
+  }
+});
+
+test("built CLI generates and serves shell completion in both forms", () => {
+  const command = runBuiltCli("completion", "bash");
+  const option = runBuiltCli("--completion", "bash");
+  assert.equal(command.status, 0, command.stderr);
+  assert.equal(option.status, 0, option.stderr);
+  assert.equal(command.stderr, "");
+  assert.equal(option.stderr, "");
+  assert.match(command.stdout, /function _oseo\b/u);
+  for (const name of ["completion", "--completion"]) {
+    const query = runBuiltCli(name, "bash", "build", "--out");
+    assert.equal(query.status, 0, query.stderr);
+    assert.equal(query.stderr, "");
+    assert.match(query.stdout, /--output/u);
+  }
+  const invalid = runBuiltCli("completion", "not-a-shell");
+  assert.equal(invalid.status, 1);
+  assert.equal(invalid.stdout, "");
+  assert.match(invalid.stderr, /not-a-shell/u);
+});
+
 test("built ESM packages compose through public exports", () => {
   assert.equal(describeTarget("linux-x86_64-gnu").executableFormat, "elf");
   assert.match(
