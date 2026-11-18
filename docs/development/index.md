@@ -38,3 +38,9 @@ in the default theme navigation. Links to external sites such as GitHub are
 not fetched during the build. The static output is in
 *docs/.vitepress/dist/*. For a local development server, run
 `mise exec -- pnpm run docs:dev`.
+
+Release CI sets `OSEO_DOCS_CHANNEL` and `OSEO_DOCS_VERSION` from the release
+identity. Stable builds include the version's download and install
+instructions. Canary builds show their canary version and link to the
+stable site. Preview builds are not indexed and do not include release
+downloads; a local build with no release metadata is a preview.

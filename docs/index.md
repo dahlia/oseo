@@ -14,6 +14,6 @@ hero:
 ---
 
 Oseo is under active development. Start with the
-[checkout example](./using/examples.md), or see the
+[installation guide](./using/install.md), or see the
 [language and host boundaries](./using/features.md) before trying it on
 your own code.

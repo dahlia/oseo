@@ -22,8 +22,8 @@ mise run build
 mise exec -- node packages/cli/dist/main.js --help
 ~~~~
 
-The remaining examples use `oseo`, the command name for the planned
-standalone archive and npm package. In a development checkout, replace `oseo`
+The remaining examples use `oseo`, the command name for the standalone
+archive and npm package. In a development checkout, replace `oseo`
 with `mise exec -- node packages/cli/dist/main.js`. See
 [installation](./using/install.md) for the distinction between the
 checkout and release channels.
