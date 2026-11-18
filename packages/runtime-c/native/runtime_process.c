@@ -1,3 +1,6 @@
+/* SPDX-License-Identifier: MIT */
+/* Copyright (c) 2026 Hong Minhee; see ../MIT-LICENSE.txt. */
+
 #define _XOPEN_SOURCE 700
 #include "runtime_internal.h"
 

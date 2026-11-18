@@ -13,6 +13,11 @@ ordinary objects, arrays, environments, binding cells, function objects, and
 the deterministic `console.log` intrinsic. Native assets remain separate files
 and are included in npm and JSR packages.
 
+Oseo-authored native support is under MIT; see *MIT-LICENSE.txt*. The
+Unicode-derived tables retain their terms in *UNICODE-LICENSE.txt*. The
+TypeScript asset provider is under GPL-3.0-or-later. Include the MIT and
+Unicode notices when redistributing the linked runtime in a program.
+
 The reviewed asset list is ordered. *oseo\_runtime.h* stays the only header
 included by generated C and direct native fixtures. *runtime\_internal.h* is
 package-private and owns the shared heap layouts, tag masks, and inline value

@@ -1,16 +1,38 @@
-A linking exception for the runtime surface
-===========================================
+License the runtime and output support under MIT
+================================================
 
 Status
 ------
 
-Proposed, 2026-07-28, revised 2026-11-03. Three questions remain open below,
-and the maintainer decides acceptance after they are answered. This record
-does not assess the legal effect of any license text.
+Accepted for 0.1.0, 2026-11-19. The earlier proposal to adopt a GPL linking
+exception was not adopted. The proposal and probe evidence below are retained
+as history; the following decision replaces them.
 
-Correspondence with the FSF licensing queue is under way. It is recorded below
-as evidence of the questions in play, not as an answer to any of them.
 
+Release decision
+----------------
+
+Oseo-authored material is licensed under GPL version 3 or any later version,
+except for the Oseo-authored support surface identified in the
+[*runtime support surface inventory*](../runtime-support-surface.md), which is
+licensed under MIT. Third-party material keeps its own terms. MIT applies to
+the runtime, the support that Oseo emits, and the source templates or
+generator inputs for that support. It does not apply to compiler-only logic,
+even where a file contains both templates and logic.
+
+This choice gives up copyleft for runtime modifications. It avoids making
+redistribution of generated C, linked executables, or future source-supplied
+built-ins depend on how an exception defines eligible compilation and target
+code. No FSF endorsement or legal opinion is implied.
+
+Carry the MIT notice with the support, whether distributed as source or
+object code. Preserve Unicode and other upstream notices where applicable.
+A program's own terms do not change because Oseo compiles it. Update the
+inventory and distribution checks whenever a new output input is added.
+
+
+Historical proposal
+-------------------
 
 Context
 -------

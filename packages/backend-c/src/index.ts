@@ -1,3 +1,6 @@
+// Fixed C output templates in this file are MIT (../MIT-LICENSE.txt).
+// Compiler logic is GPL-3.0-or-later (../LICENSE).
+
 import type {
   BinaryOperator,
   HarnessFragment,
@@ -19,7 +22,11 @@ import type {
 
 import { lowerFragmentPhases, scriptFragmentAbi } from "@oseo/compiler";
 
-import { emittedC as emittedCSource, type CFragment } from "./emitted-c.ts";
+import {
+  emittedC as emittedCSource,
+  emittedCNotice,
+  type CFragment,
+} from "./emitted-c.ts";
 import { encodeRegExpProgram } from "./regexp-program.ts";
 import {
   boundBody,
@@ -5048,6 +5055,7 @@ function nativeSource(
   sourceName: string,
   units?: BodyUnits,
 ): EmittedNativeSource {
+  source = emittedCNotice + source;
   if (units == null) return { source, sourceName };
   source = replaceSyntax(
     source,
@@ -5076,7 +5084,9 @@ function nativeSource(
   const compilationUnits = Array.from(
     { length: units.count + 1 },
     (_, unit) => ({
-      source: `#define OSEO_C_BODY_UNIT ${unit}\n#include "${sourceName}"\n`,
+      source:
+        emittedCNotice +
+        `#define OSEO_C_BODY_UNIT ${unit}\n#include "${sourceName}"\n`,
       sourceName: `${sourceName.slice(0, -2)}-unit-${unit}.c`,
     }),
   );
@@ -5451,6 +5461,7 @@ OseoResult oseo_${unit}_${name}(OseoContext *context,
     .join("\n");
   const generatorCases = generatorDispatchCases(functions, counts);
   return (
+    emittedCNotice +
     fragmentIncludes +
     `
 typedef OseoResult (*OseoFunctionEntry)(OseoContext *, OseoValue,
@@ -5706,6 +5717,6 @@ ${[
       source: emitFragmentUnit(body, "case", globals),
       sourceName: "case.c",
     },
-    launcher: { source: launcher, sourceName: "launcher.c" },
+    launcher: { source: emittedCNotice + launcher, sourceName: "launcher.c" },
   };
 }

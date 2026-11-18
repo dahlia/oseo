@@ -1,3 +1,6 @@
+/* SPDX-License-Identifier: MIT */
+/* Copyright (c) 2026 Hong Minhee; see ../MIT-LICENSE.txt. */
+
 #include "runtime_internal.h"
 
 #include <stdlib.h>
