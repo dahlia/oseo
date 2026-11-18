@@ -6,6 +6,38 @@ code ahead of time, using type annotations as guarded optimization hints.
 No interpreter, no JIT, no deoptimization.
 
 
+Try Oseo
+--------
+
+From a checkout on Linux AMD64 or macOS AArch64, run this from the
+repository root with [mise] installed:
+
+~~~~ sh
+mise install
+mise run build
+mkdir -p artifacts
+mise exec -- node packages/cli/dist/main.js build examples/numeric-hinted.ts \
+  -o artifacts/numeric
+printf '[[20,22]]\n' | ./artifacts/numeric 1
+~~~~
+
+The retained executable prints `{"iterations":1,"results":[42]}`. Building
+from a checkout uses Node.js and Zig; the compiled program does not need
+either to run.
+
+When the first release is published, download the standalone CLI archive
+for your platform from [GitHub Releases], extract it, and use the included
+`oseo` in place of `mise exec -- node packages/cli/dist/main.js`, using its
+path if it is not on `PATH`. The standalone CLI is planned to run without a
+separately installed Node.js. It still needs Zig to compile native programs.
+See the [installation guide](./docs/using/install.md) for the planned release
+channels and the [development guide](./docs/development/index.md) for the
+checkout setup.
+
+[mise]: https://mise.jdx.dev/
+[GitHub Releases]: https://github.com/dahlia/oseo/releases
+
+
 How it works
 ------------
 
@@ -49,6 +81,10 @@ kept as a compile-link and inspection target.
 Documentation
 -------------
 
+ -  [Using Oseo](./docs/using/install.md) covers installation, examples, CLI
+    options, and supported features.
+ -  [Development](./docs/development/index.md) covers building the project
+    and the documentation, and links to design and test evidence.
  -  [*WHITEPAPER.md*](./WHITEPAPER.md) explains the motivation and intended
     scope, and why the design is worth building now.
  -  [*DESIGN.md*](./DESIGN.md) records the architectural constraints and how the
@@ -77,8 +113,6 @@ mise run test
 `mise tasks` lists the commands available in the current checkout. A command
 described in a design or plan document may not exist until its implementation
 lands.
-
-[mise]: https://mise.jdx.dev/
 
 
 About the name

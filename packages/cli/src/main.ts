@@ -1,29 +1,22 @@
 #!/usr/bin/env node
 
 import process from "node:process";
-import { readFile } from "node:fs/promises";
 
 import { message } from "@optique/core/message";
 import { runProgram } from "@optique/discover";
 import commands from "./commands.generated.ts";
 import { executeCliInvocation } from "./index.ts";
 import type { CliCommandContext } from "./options.ts";
+import { readCliVersion } from "./cli-assets.ts";
 
-interface PackageManifest {
-  readonly version: string;
-}
-
-// SAFETY: This checked-in manifest is validated by the package checks.
-const manifest = JSON.parse(
-  await readFile(new URL("../package.json", import.meta.url), "utf8"),
-) as PackageManifest;
+const version = await readCliVersion();
 await runProgram<CliCommandContext>({
   args: process.argv.slice(2),
   commands,
   metadata: {
     brief: message`Compile JavaScript source to a native executable.`,
     name: "oseo",
-    version: manifest.version,
+    version,
   },
   help: "both",
   completion: "both",
@@ -35,7 +28,7 @@ await runProgram<CliCommandContext>({
             const result = await executeCliInvocation(value, {
               args: [],
               execution: { inheritStdin: true, inheritOutput: true },
-              version: manifest.version,
+              version,
             });
             if (result.stdout !== "") {
               process.stdout.write(result.stdoutBytes ?? result.stdout);

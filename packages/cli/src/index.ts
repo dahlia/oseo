@@ -40,7 +40,6 @@ import {
   createDenoHost,
   createExecutablePublisher,
   createFileModuleLoader,
-  createNodeHost,
   fileModuleResolver,
   hashModuleSource,
 } from "@oseo/host";
@@ -48,8 +47,11 @@ import {
   createBabelFrontend,
   createBabelModuleFrontend,
 } from "@oseo/parser-babel";
-import { cRuntimeProvider } from "@oseo/runtime-c";
-import { zigToolchain } from "@oseo/toolchain-zig";
+import {
+  resolveZigExecutable,
+  zigToolchain,
+  zigToolchainAt,
+} from "@oseo/toolchain-zig";
 import {
   binaryPropertySet,
   codePointSetHas,
@@ -86,8 +88,10 @@ function createCliProgram() {
 
 import type { ExecutableDestination, ExecutablePublisher } from "@oseo/host";
 import { basename, extname } from "node:path";
+import process from "node:process";
 import { fileURLToPath } from "node:url";
 
+import { cRuntimeProvider, createNodeHost } from "./cli-assets.ts";
 import { unicodeMatcherData } from "./regexp-unicode.ts";
 
 export {
@@ -250,15 +254,17 @@ function invocationDiagnostic(
 ): Diagnostic | undefined {
   if (value.mode !== "execute") {
     const invalid =
-      value.target != null
-        ? "--target"
-        : value.runtimeArchiveReuse === "disabled"
-          ? "--no-runtime-archive-reuse"
-          : value.output != null
-            ? "--output"
-            : value.buildConfiguration != null
-              ? "--build-config"
-              : undefined;
+      value.zig != null
+        ? "--zig"
+        : value.target != null
+          ? "--target"
+          : value.runtimeArchiveReuse === "disabled"
+            ? "--no-runtime-archive-reuse"
+            : value.output != null
+              ? "--output"
+              : value.buildConfiguration != null
+                ? "--build-config"
+                : undefined;
     if (invalid != null) {
       return hostDiagnostic(
         sourceId,
@@ -1638,7 +1644,10 @@ function selectExecutionTarget(
   return { target };
 }
 
-/** Compile and execute one source invocation through the native toolchain. */
+/**
+ * Compile and execute using an embedder-selected toolchain (PATH Zig by
+ * default). The executable instead dispatches directly to executeCliInvocation.
+ */
 export async function runNativeCli(
   request: CliRequest,
   host?: CompilerHost,
@@ -1657,12 +1666,12 @@ export async function runNativeCli(
   );
 }
 
-/** Execute typed command values with an injected host and publisher. */
+/** Execute typed command values, acquiring pinned Zig unless injected. */
 export async function executeCliInvocation(
   invocation: CliInvocation,
   request: CliRequest,
   host: CompilerHost = defaultNodeHost(),
-  toolchain: NativeToolchain = defaultComponents.toolchain,
+  toolchain?: NativeToolchain,
   publisher: ExecutablePublisher = createExecutablePublisher(),
 ): Promise<CliResult> {
   const invalid = invocationDiagnostic(
@@ -1873,6 +1882,13 @@ export async function executeCliInvocation(
   try {
     if (selected == null) {
       throw new Error("The native execution target is unavailable.");
+    }
+    if (toolchain == null || parsed.value.zig != null) {
+      toolchain = zigToolchainAt(
+        await resolveZigExecutable(parsed.value.zig, (status) => {
+          process.stderr.write(`${status}\n`);
+        }),
+      );
     }
     result = await executeNativeWorkflow(
       host,

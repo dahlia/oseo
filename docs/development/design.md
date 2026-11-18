@@ -1,0 +1,19 @@
+Architecture and decisions
+==========================
+
+The frontend parses JavaScript and TypeScript into an Oseo representation.
+The compiler builds a generic graph and, where applicable, a guarded
+specialized path. The C11 backend emits code for those paths, and a native
+toolchain links it with the Oseo runtime.
+
+ -  The [whitepaper] explains the motivation and intended scope.
+ -  The [design document] describes the compiler, backend, runtime, and the
+    boundaries between them.
+ -  The [architecture decision records] document choices such as the C11 and
+    Zig boundary, generic values, and native target support.
+ -  The [roadmap] separates measured milestones from future work.
+
+[whitepaper]: https://github.com/dahlia/oseo/blob/main/WHITEPAPER.md
+[design document]: https://github.com/dahlia/oseo/blob/main/DESIGN.md
+[architecture decision records]: https://github.com/dahlia/oseo/tree/main/docs/adr
+[roadmap]: https://github.com/dahlia/oseo/blob/main/ROADMAP.md

@@ -27,6 +27,7 @@ export interface CliInvocation {
   readonly test262Host: boolean;
   readonly test262NonBlocking: boolean;
   readonly unhandledRejectionPolicy: "fatal" | "observe";
+  readonly zig: string | undefined;
 }
 
 /** Host-injected command dispatch, supplied by the outer executable. */
@@ -155,6 +156,11 @@ const sharedParsers = {
   test262Host: test262HostParser,
   test262NonBlocking: test262NonBlockingParser,
   unhandledRejectionPolicy: unhandledRejectionPolicyParser,
+  zig: optional(
+    option("--zig", stringValue({ metavar: "PATH" }), {
+      description: message`Use an installed Zig executable without downloads.`,
+    }),
+  ),
 };
 
 const emptyProgramArgs: readonly string[] = [];
