@@ -96,5 +96,11 @@ takes the faster route when the ground allows it.
 License
 -------
 
-Oseo is distributed under the terms of the GNU General Public License version 3.
-See [*LICENSE*](./LICENSE) for the full text.
+Oseo-authored material is licensed under the GNU General Public License,
+version 3 or (at your option) any later version, unless otherwise noted.
+See [*LICENSE*](./LICENSE). The Oseo-authored runtime and support incorporated
+into compiled programs are under the [MIT license](./MIT-LICENSE.txt). That
+license does not change the terms of your own code; retain the MIT notice
+and any applicable third-party notices when distributing the output.
+The [license inventory](./docs/runtime-support-surface.md) identifies those
+parts and their notices.

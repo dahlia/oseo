@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "description": "Pinned Unicode property, case, and word-character tables.",
   "bugs": "https://github.com/dahlia/oseo/issues",
-  "license": "GPL-3.0-only",
+  "license": "GPL-3.0-or-later AND Unicode-3.0",
   "author": {
     "name": "Hong Minhee",
     "email": "hong@minhee.org",

@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "description": "Host C sanitizer toolchain planning for Oseo native builds.",
   "bugs": "https://github.com/dahlia/oseo/issues",
-  "license": "GPL-3.0-only",
+  "license": "GPL-3.0-or-later",
   "author": {
     "name": "Hong Minhee",
     "email": "hong@minhee.org",

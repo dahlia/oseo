@@ -1,9 +1,9 @@
 {
   "name": "@oseo/cli",
   "version": "0.1.0",
-  "license": "GPL-3.0-only",
+  "license": "GPL-3.0-or-later",
   "exports": "./src/index.ts",
   "publish": {
-    "exclude": ["dist/", "tests/", "tools/"]
+    "exclude": ["dist/", "tests/", "tools/", "ROLLDOWN-LICENSE.txt"]
   }
 }

@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "description": "Composition root and command-line contract for Oseo.",
   "bugs": "https://github.com/dahlia/oseo/issues",
-  "license": "GPL-3.0-only",
+  "license": "GPL-3.0-or-later",
   "author": {
     "name": "Hong Minhee",
     "email": "hong@minhee.org",
@@ -20,7 +20,8 @@
   },
   "files": [
     "dist",
-    "README.md"
+    "README.md",
+    "ROLLDOWN-LICENSE.txt"
   ],
   "type": "module",
   "sideEffects": false,

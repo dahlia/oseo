@@ -1,7 +1,7 @@
 {
   "name": "@oseo/runtime-c",
   "version": "0.1.0",
-  "license": "GPL-3.0-only",
+  "license": "GPL-3.0-or-later AND MIT AND Unicode-3.0",
   "exports": "./src/index.ts",
   "publish": {
     "exclude": ["dist/", "tests/"]

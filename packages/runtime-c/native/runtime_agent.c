@@ -1,3 +1,6 @@
+/* SPDX-License-Identifier: MIT */
+/* Copyright (c) 2026 Hong Minhee; see ../MIT-LICENSE.txt. */
+
 /*
  * Feature-test macros must precede every system header, including the
  * ones runtime_internal.h includes, so they come before it here. Beside

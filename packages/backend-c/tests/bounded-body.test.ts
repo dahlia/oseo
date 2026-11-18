@@ -215,6 +215,12 @@ test("large main and agent generators have disjoint exported helpers", () => {
   const agent = cBackend.emit({ ...program, agentProgram: 0 });
   assert.ok(main.compilationUnits != null);
   assert.ok(agent.compilationUnits != null);
+  for (const emitted of [main, agent]) {
+    for (const unit of [emitted, ...(emitted.compilationUnits ?? [])]) {
+      assert.match(unit.source, /SPDX-License-Identifier: MIT/u);
+      assert.match(unit.source, /SPDX-License-Identifier: Unicode-3\.0/u);
+    }
+  }
   assert.match(main.source, /generated_c_oseo_generator_body_0_0/u);
   assert.match(agent.source, /agent_0_c_oseo_generator_body_0_0/u);
   assert.doesNotMatch(main.source, /\bsize_t oseo_generator_body_0_/u);
