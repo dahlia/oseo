@@ -2,10 +2,10 @@ Introduction
 ============
 
 Oseo compiles JavaScript and TypeScript ahead of time into native code.
-With `oseo build`, you can turn a program into an executable for a supported
-target and run it without installing Node.js or Deno on the destination
-machine. The compiler emits C and links in Oseo's runtime for the language
-features the program uses.
+The compiler itself is written in TypeScript and runs on Node.js or Deno.
+With `oseo build`, it emits C11 and links in Oseo's C runtime to produce a
+native executable for a supported target. You don't need Node.js or Deno
+on the machine that runs the executable.
 
 
 Why Oseo exists

@@ -138,10 +138,14 @@ Deno during early development, so the usual debugger, error messages, and
 ecosystem tooling are there from the start instead of needing to be rebuilt
 alongside the engine itself.
 
+Those hosts are needed to run the compiler, not the native executables it
+produces. The [compiler comparison](./COMPARISON.md) separates that
+deployment choice from the language each compiler is written in.
+
 Once the core architecture settles (the tagged value representation, the
 guarded code generation, the object model), the plan is to refactor the
-compiler's own source down into the subset of TypeScript it knows how to
-compile, and have Oseo compile itself into a native binary. SBCL and Chez
+compiler's own source down into the subset of TypeScript it can compile,
+and have Oseo compile itself into a native binary. SBCL and Chez
 Scheme both reached this point in their own histories. PyPy's RPython is
 probably the closest existing precedent: a Python subset restricted enough
 that a translator can analyze and compile it ahead of time, used to
