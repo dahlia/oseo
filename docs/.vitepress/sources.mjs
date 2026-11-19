@@ -39,8 +39,11 @@ for (const page of [
   const include = /^<!-- @include: ([^\n]+) -->\s*$/u.exec(text);
   const source = include == null ? file : resolve(dirname(file), include[1]);
   const route = `/${page.replace(/(^|\/)index\.md$/u, "$1")}`;
-  published.set(source, route);
-  if (include != null) included.set(file, source);
+  published.set(file, route);
+  if (include != null) {
+    published.set(source, route);
+    included.set(file, source);
+  }
   if (page.startsWith("adr/") && adrPattern.test(page.slice(4))) {
     adrs.push({ page, title: text.split("\n")[0] });
   }
