@@ -3,9 +3,26 @@
 Oseo
 ====
 
+[![npm][npm badge]][npm]
+[![JSR][JSR badge]][JSR]
+[![GitHub Actions][GitHub Actions badge]][GitHub Actions]
+[![License: GPL-3.0-or-later][GPL badge]][GPL]
+[![GitHub Sponsors][GitHub Sponsors badge]][GitHub Sponsors]
+
 A JavaScript and TypeScript engine that compiles every function to native
 code ahead of time, using type annotations as guarded optimization hints.
 No interpreter, no JIT, no deoptimization.
+
+[npm badge]: https://img.shields.io/npm/v/@oseo/cli?logo=npm
+[npm]: https://www.npmjs.com/package/@oseo/cli
+[JSR badge]: https://jsr.io/badges/@oseo/cli
+[JSR]: https://jsr.io/@oseo
+[GitHub Actions badge]: https://github.com/dahlia/oseo/actions/workflows/main.yaml/badge.svg
+[GitHub Actions]: https://github.com/dahlia/oseo/actions/workflows/main.yaml
+[GPL badge]: https://img.shields.io/badge/license-GPL--3.0--or--later-blue
+[GPL]: #license
+[GitHub Sponsors badge]: https://img.shields.io/github/sponsors/dahlia?logo=githubsponsors
+[GitHub Sponsors]: https://github.com/sponsors/dahlia
 
 
 Try Oseo
