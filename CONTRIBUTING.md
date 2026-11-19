@@ -485,7 +485,7 @@ Those lanes are the host C compiler sanitizer lane and a generated Mac-lane
 `native support` job whose readiness probe fell back to a hosted runner.
 
 A job-level value is visible to every test in the job, including the
-`packages/testkit` tests that assert the unscaled limit. The always-hosted
+`packages/testkit` tests that assert the unscaled limit. The ordinary
 `test` jobs therefore carry none. It never changes the case budget, so an
 interrupted run still fails. Minimize a failure and retain it as an ordinary
 regression fixture before fixing the implementation.
@@ -699,10 +699,11 @@ earlier lane job fails. See
 both Linux and macOS. It contains only
 *tests/property/m5-regexp-literal-exhaustive.property.test.ts*, whose plain
 properties reached their 600-second interrupt beside other file workers.
-The hosted `ubuntu-latest` and `macos-latest` jobs run all four properties with
-one file worker, the original seeds and limits, and no time scaling. The lane
-generator places the macOS job on a hosted lane as it does the Array job, and
-`native` requires both. See
+The Linux job on `ubuntu-latest` and the macOS job run all four properties
+with one file worker, the original seeds and limits, and no time scaling.
+The macOS job heads a lane that uses `macos-latest` by default and can use
+the runner described in the [Avrea pilot](docs/self-hosted-mac.md#avrea-pilot).
+`native` requires both jobs. See
 [*ordinary exhaustive RegExp placement*](docs/evidence/regexp-exhaustive-node/README.md).
 
 The ordinary Node.js gate runs in four Linux and six macOS shards through
