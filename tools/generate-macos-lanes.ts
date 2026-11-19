@@ -34,6 +34,54 @@ export interface MacosLaneJob {
 const templatePath = "tools/main-workflow.template.yaml";
 const workflowPath = ".github/workflows/main.yaml";
 
+// The first four jobs head distinct hosted lanes in the committed workflow.
+// The other Node.js shards keep their predecessors in the eight-job mode.
+const avreaMacJobs = new Map([
+  ["test_regexp_exhaustive_macos_macos_node", "four"],
+  ["test_sanitizer_macos_macos_native_1", "four"],
+  ["test_node_shard_macos_1", "four"],
+  ["test_node_shard_macos_5", "four"],
+  ["test_node_shard_macos_2", "eight"],
+  ["test_node_shard_macos_3", "eight"],
+  ["test_node_shard_macos_4", "eight"],
+  ["test_node_shard_macos_6", "eight"],
+]);
+
+function avreaRunsOn(job: MacosLaneJob): string | undefined {
+  const mode = avreaMacJobs.get(job.id);
+  if (mode == null) return undefined;
+  const modes =
+    mode === "four"
+      ? [
+          "          (vars.OSEO_AVREA_MAC_MODE == 'four' ||",
+          "           vars.OSEO_AVREA_MAC_MODE == 'eight') &&",
+        ]
+      : ["          vars.OSEO_AVREA_MAC_MODE == 'eight' &&"];
+  return [
+    "    runs-on: >-",
+    "      ${{ github.repository == 'dahlia/oseo' &&",
+    "          github.ref_type == 'branch' &&",
+    "          github.ref != 'refs/heads/release-rehearsal' &&",
+    "          (github.event_name == 'push' ||",
+    "           github.event_name == 'workflow_dispatch') &&",
+    ...modes,
+    `          'avrea-macos-26-8-vcpu' || '${job.os}' }}`,
+    "",
+  ].join("\n");
+}
+
+const avreaImageCheck = [
+  "      - name: Verify Avrea macOS image",
+  "        if: runner.environment == 'self-hosted'",
+  "        shell: bash",
+  "        run: |",
+  '          version="$(sw_vers -productVersion)"',
+  '          arch="$(uname -m)"',
+  '          printf "macOS %s (%s)\\n" "$version" "$arch"',
+  '          [[ "$version" == 26.* && "$arch" == arm64 ]]',
+  "",
+].join("\n");
+
 /**
  * File shards of the macOS native sanitizer suite. Two keep each job
  * within about 46 minutes even at the slowest measured runner. They chain
@@ -957,6 +1005,7 @@ export function generateMacosWorkflow(
       block = block.replace(/^    name: >-\n(?:      [^\n]*\n)+/m, "");
       block = block.replace(/^    name: [^\n]*\n/m, "");
       const selfHosted = laneIndex >= hostedLaneCount;
+      const pilotRunsOn = selfHosted ? undefined : avreaRunsOn(job);
       const runnerOutput = `r${laneIndex - hostedLaneCount + 1}`;
       const runner = selfHosted
         ? `\${{ fromJSON(needs.mac_ready.outputs.${runnerOutput}` +
@@ -975,13 +1024,14 @@ export function generateMacosWorkflow(
         /^    steps:\n/m,
         "    steps:\n" +
           "      - name: Record macOS host version\n" +
-          "        run: sw_vers -productVersion\n",
+          "        run: sw_vers -productVersion\n" +
+          (pilotRunsOn == null ? "" : avreaImageCheck),
       );
       const predecessor = lane[index - 1];
       block = block.replace(
         /^    runs-on: [^\n]*\n/m,
         (line) =>
-          `${line}    if: \${{ !cancelled() }}\n` +
+          `${pilotRunsOn ?? line}    if: \${{ !cancelled() }}\n` +
           (selfHosted
             ? "    needs:\n      - mac_ready\n" +
               hostedFallbackEnvironment(job, runnerOutput)

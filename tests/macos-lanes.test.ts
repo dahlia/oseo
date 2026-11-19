@@ -255,6 +255,31 @@ const fullRunGuard =
   "  github.repository == 'dahlia/oseo' &&\n" +
   "  github.ref == 'refs/heads/release-rehearsal')";
 
+const candidatePush = {
+  repository: "dahlia/oseo",
+  ref_type: "branch",
+  ref: "refs/heads/preview-avrea-macos-pilot",
+  event_name: "push",
+};
+
+function selectHostedRunner(
+  job: Job,
+  mode?: string,
+  github = candidatePush,
+): string {
+  const label = job["runs-on"];
+  if (!label.includes("vars.OSEO_AVREA_MAC_MODE")) return label;
+  const selector = /^\$\{\{ ([\s\S]+) }}$/.exec(label);
+  assert.ok(selector);
+  const selected: unknown = runInNewContext(selector[1]!, {
+    github,
+    // GitHub compares these strings without regard to case.
+    vars: { OSEO_AVREA_MAC_MODE: mode?.toLowerCase() },
+  });
+  assert.ok(isString(selected));
+  return selected;
+}
+
 test("rehearsal runs only hosted read-only artifact jobs", () => {
   const artifactJobs = new Set([
     "release_identity",
@@ -464,7 +489,8 @@ test("every existing macOS job occurs once in five LPT chains", () => {
   const macIds = Object.entries(after.jobs)
     .filter(
       ([id, job]) =>
-        id !== "release_cli_macos" && job["runs-on"].startsWith("macos-"),
+        id !== "release_cli_macos" &&
+        selectHostedRunner(job).startsWith("macos-"),
     )
     .map(([id]) => id)
     .toSorted();
@@ -475,7 +501,7 @@ test("every existing macOS job occurs once in five LPT chains", () => {
       assert.equal(actual.if, `${fullRunGuard} && !cancelled()`);
       assert.equal(actual.needs, lane[index - 1]?.id);
       assert.equal(actual.name, planned.name);
-      assert.equal(actual["runs-on"], planned.os);
+      assert.equal(selectHostedRunner(actual), planned.os);
       assert.equal(
         actual.strategy,
         undefined,
@@ -541,8 +567,11 @@ test("generated macOS jobs preserve their template contract", () => {
       name: "Record macOS host version",
       run: "sw_vers -productVersion",
     });
+    const templateSteps = actual.steps
+      .slice(1)
+      .filter((step) => step.name !== "Verify Avrea macOS image");
     assert.deepEqual(
-      executedSteps({ ...actual, steps: actual.steps.slice(1) }, {}),
+      executedSteps({ ...actual, steps: templateSteps }, {}),
       executedSteps(original, planned.matrix),
       planned.name,
     );
@@ -921,8 +950,89 @@ test("zero self-hosted lanes route every macOS job to hosted", () => {
   const zero = parse(generated) as Workflow;
   assert.equal(zero.jobs.mac_ready, undefined);
   for (const job of macosJobs()) {
-    assert.equal(zero.jobs[job.id]!["runs-on"], job.os);
+    assert.equal(selectHostedRunner(zero.jobs[job.id]!), job.os);
   }
+});
+
+test("Avrea opt-in keeps four starts and the existing chains", () => {
+  // SAFETY: jactionlint validates the generated workflow schema.
+  const workflow = parse(
+    generateMacosWorkflow(template, configuredSelfHostedLanes),
+  ) as Workflow;
+  const lanes = macosLanes(configuredSelfHostedLanes);
+  const hosted = lanes.slice(0, 5).flat();
+  const first = [
+    "test_node_shard_macos_1",
+    "test_node_shard_macos_5",
+    "test_regexp_exhaustive_macos_macos_node",
+    "test_sanitizer_macos_macos_native_1",
+  ];
+  const expanded = [
+    ...first,
+    "test_node_shard_macos_2",
+    "test_node_shard_macos_3",
+    "test_node_shard_macos_4",
+    "test_node_shard_macos_6",
+  ].toSorted();
+  const runner = "avrea-macos-26-8-vcpu";
+  const selected = (mode?: string, github = candidatePush) =>
+    hosted
+      .filter(({ id, os }) => {
+        const label = selectHostedRunner(workflow.jobs[id]!, mode, github);
+        assert.ok(label === os || label === runner, id);
+        return label === runner;
+      })
+      .map(({ id }) => id)
+      .toSorted();
+
+  assert.deepEqual(selected("four"), first);
+  assert.deepEqual(selected("eight"), expanded);
+  assert.deepEqual(selected("FOUR"), first);
+  for (const mode of [
+    undefined,
+    "",
+    "off",
+    " four ",
+    "8",
+    "four,eight",
+    runner,
+  ]) {
+    assert.deepEqual(selected(mode), [], mode);
+  }
+  assert.deepEqual(
+    selected("four", { ...candidatePush, event_name: "workflow_dispatch" }),
+    first,
+  );
+  for (const github of [
+    { ...candidatePush, event_name: "pull_request" },
+    { ...candidatePush, event_name: "pull_request_target" },
+    { ...candidatePush, repository: "fork/oseo" },
+    { ...candidatePush, ref_type: "tag", ref: "refs/tags/v0.1.0" },
+    { ...candidatePush, ref: "refs/heads/release-rehearsal" },
+  ]) {
+    assert.deepEqual(selected("eight", github), [], JSON.stringify(github));
+  }
+  for (const id of first) assert.equal(workflow.jobs[id]!.needs, "mac_ready");
+  const probes = Object.entries(workflow.jobs).flatMap(([id, job]) =>
+    job.steps
+      .filter((step) => step.name === "Verify Avrea macOS image")
+      .map((step) => ({ id, step })),
+  );
+  assert.deepEqual(probes.map(({ id }) => id).toSorted(), expanded);
+  for (const { step } of probes) {
+    assert.equal(step.if, "runner.environment == 'self-hosted'");
+    assert.equal(step.shell, "bash");
+    assert.match(String(step.run), /sw_vers -productVersion/u);
+    assert.match(String(step.run), /uname -m/u);
+    assert.match(
+      String(step.run),
+      /"\$version" == 26\.\* && "\$arch" == arm64/u,
+    );
+  }
+  assert.equal(
+    names(workflow).filter((name) => !name.startsWith("release_")).length,
+    105,
+  );
 });
 
 test("lane-count preview leaves the committed workflow alone", () => {
@@ -1007,7 +1117,7 @@ test("one extra lane retains every job and aggregate dependency", () => {
     (entry) => entry.family === "test" || entry.family === "host C sanitizers",
   )) {
     const actual = workflow.jobs[planned.id]!;
-    assert.equal(actual["runs-on"], planned.os);
+    assert.equal(selectHostedRunner(actual), planned.os);
     // A hosted lane head waits for the probe so that nothing competes with
     // it for the first slot, but no hosted job takes its runner from the
     // probe's outputs.
@@ -1690,7 +1800,7 @@ test("eight Mac lanes route each label with its own hosted fallback", () => {
       const actual = workflow.jobs[job.id]!;
       assert.equal(actual.name, job.name);
       if (index < 5) {
-        assert.equal(actual["runs-on"], job.os);
+        assert.equal(selectHostedRunner(actual), job.os);
         // The head waits for the probe; the rest chain in lane order.
         assert.equal(
           actual.needs,
@@ -3081,10 +3191,14 @@ test("ordinary exhaustive RegExp literals keep one job per host", () => {
   );
   assert.ok(planned);
   const job = after.jobs[planned.id]!;
-  assert.equal(job["runs-on"], "macos-latest");
+  assert.equal(selectHostedRunner(job), "macos-latest");
   assert.equal(job.env, undefined);
   assert.deepEqual(
-    job.steps.filter((step) => step.run).map((step) => step.run),
+    job.steps
+      .filter(
+        (step) => step.run && step.if !== "runner.environment == 'self-hosted'",
+      )
+      .map((step) => step.run),
     ["sw_vers -productVersion", command],
   );
   assert.equal(after.jobs.test_regexp_exhaustive_macos, undefined);

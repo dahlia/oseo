@@ -1491,7 +1491,15 @@ jobs:
   # macOS lane 1, longest jobs first.
   test_regexp_exhaustive_macos_macos_node:
     name: RegExp literals exhaustive (macos-latest, node)
-    runs-on: macos-latest
+    runs-on: >-
+      ${{ github.repository == 'dahlia/oseo' &&
+          github.ref_type == 'branch' &&
+          github.ref != 'refs/heads/release-rehearsal' &&
+          (github.event_name == 'push' ||
+           github.event_name == 'workflow_dispatch') &&
+          (vars.OSEO_AVREA_MAC_MODE == 'four' ||
+           vars.OSEO_AVREA_MAC_MODE == 'eight') &&
+          'avrea-macos-26-8-vcpu' || 'macos-latest' }}
     if: >-
       !(github.event_name == 'push' &&
         github.repository == 'dahlia/oseo' &&
@@ -1500,6 +1508,14 @@ jobs:
     steps:
       - name: Record macOS host version
         run: sw_vers -productVersion
+      - name: Verify Avrea macOS image
+        if: runner.environment == 'self-hosted'
+        shell: bash
+        run: |
+          version="$(sw_vers -productVersion)"
+          arch="$(uname -m)"
+          printf "macOS %s (%s)\n" "$version" "$arch"
+          [[ "$version" == 26.* && "$arch" == arm64 ]]
       - uses: actions/checkout@v7
         with:
           persist-credentials: false
@@ -1520,7 +1536,14 @@ jobs:
 
   test_node_shard_macos_4:
     name: test (macos-latest, node, 4/6)
-    runs-on: macos-latest
+    runs-on: >-
+      ${{ github.repository == 'dahlia/oseo' &&
+          github.ref_type == 'branch' &&
+          github.ref != 'refs/heads/release-rehearsal' &&
+          (github.event_name == 'push' ||
+           github.event_name == 'workflow_dispatch') &&
+          vars.OSEO_AVREA_MAC_MODE == 'eight' &&
+          'avrea-macos-26-8-vcpu' || 'macos-latest' }}
     if: >-
       !(github.event_name == 'push' &&
         github.repository == 'dahlia/oseo' &&
@@ -1529,6 +1552,14 @@ jobs:
     steps:
       - name: Record macOS host version
         run: sw_vers -productVersion
+      - name: Verify Avrea macOS image
+        if: runner.environment == 'self-hosted'
+        shell: bash
+        run: |
+          version="$(sw_vers -productVersion)"
+          arch="$(uname -m)"
+          printf "macOS %s (%s)\n" "$version" "$arch"
+          [[ "$version" == 26.* && "$arch" == arm64 ]]
       - uses: actions/checkout@v7
         with:
           persist-credentials: false
@@ -1652,7 +1683,15 @@ jobs:
   # macOS lane 3, longest jobs first.
   test_sanitizer_macos_macos_native_1:
     name: host C sanitizers (macOS, native, 1/2)
-    runs-on: macos-15
+    runs-on: >-
+      ${{ github.repository == 'dahlia/oseo' &&
+          github.ref_type == 'branch' &&
+          github.ref != 'refs/heads/release-rehearsal' &&
+          (github.event_name == 'push' ||
+           github.event_name == 'workflow_dispatch') &&
+          (vars.OSEO_AVREA_MAC_MODE == 'four' ||
+           vars.OSEO_AVREA_MAC_MODE == 'eight') &&
+          'avrea-macos-26-8-vcpu' || 'macos-15' }}
     if: >-
       !(github.event_name == 'push' &&
         github.repository == 'dahlia/oseo' &&
@@ -1674,6 +1713,14 @@ jobs:
     steps:
       - name: Record macOS host version
         run: sw_vers -productVersion
+      - name: Verify Avrea macOS image
+        if: runner.environment == 'self-hosted'
+        shell: bash
+        run: |
+          version="$(sw_vers -productVersion)"
+          arch="$(uname -m)"
+          printf "macOS %s (%s)\n" "$version" "$arch"
+          [[ "$version" == 26.* && "$arch" == arm64 ]]
       - uses: actions/checkout@v7
         with:
           persist-credentials: false
@@ -1758,7 +1805,15 @@ jobs:
   # macOS lane 4, longest jobs first.
   test_node_shard_macos_1:
     name: test (macos-latest, node, 1/6)
-    runs-on: macos-latest
+    runs-on: >-
+      ${{ github.repository == 'dahlia/oseo' &&
+          github.ref_type == 'branch' &&
+          github.ref != 'refs/heads/release-rehearsal' &&
+          (github.event_name == 'push' ||
+           github.event_name == 'workflow_dispatch') &&
+          (vars.OSEO_AVREA_MAC_MODE == 'four' ||
+           vars.OSEO_AVREA_MAC_MODE == 'eight') &&
+          'avrea-macos-26-8-vcpu' || 'macos-latest' }}
     if: >-
       !(github.event_name == 'push' &&
         github.repository == 'dahlia/oseo' &&
@@ -1767,6 +1822,14 @@ jobs:
     steps:
       - name: Record macOS host version
         run: sw_vers -productVersion
+      - name: Verify Avrea macOS image
+        if: runner.environment == 'self-hosted'
+        shell: bash
+        run: |
+          version="$(sw_vers -productVersion)"
+          arch="$(uname -m)"
+          printf "macOS %s (%s)\n" "$version" "$arch"
+          [[ "$version" == 26.* && "$arch" == arm64 ]]
       - uses: actions/checkout@v7
         with:
           persist-credentials: false
@@ -1783,7 +1846,14 @@ jobs:
 
   test_node_shard_macos_3:
     name: test (macos-latest, node, 3/6)
-    runs-on: macos-latest
+    runs-on: >-
+      ${{ github.repository == 'dahlia/oseo' &&
+          github.ref_type == 'branch' &&
+          github.ref != 'refs/heads/release-rehearsal' &&
+          (github.event_name == 'push' ||
+           github.event_name == 'workflow_dispatch') &&
+          vars.OSEO_AVREA_MAC_MODE == 'eight' &&
+          'avrea-macos-26-8-vcpu' || 'macos-latest' }}
     if: >-
       !(github.event_name == 'push' &&
         github.repository == 'dahlia/oseo' &&
@@ -1792,6 +1862,14 @@ jobs:
     steps:
       - name: Record macOS host version
         run: sw_vers -productVersion
+      - name: Verify Avrea macOS image
+        if: runner.environment == 'self-hosted'
+        shell: bash
+        run: |
+          version="$(sw_vers -productVersion)"
+          arch="$(uname -m)"
+          printf "macOS %s (%s)\n" "$version" "$arch"
+          [[ "$version" == 26.* && "$arch" == arm64 ]]
       - uses: actions/checkout@v7
         with:
           persist-credentials: false
@@ -1996,7 +2074,15 @@ jobs:
   # macOS lane 5, longest jobs first.
   test_node_shard_macos_5:
     name: test (macos-latest, node, 5/6)
-    runs-on: macos-latest
+    runs-on: >-
+      ${{ github.repository == 'dahlia/oseo' &&
+          github.ref_type == 'branch' &&
+          github.ref != 'refs/heads/release-rehearsal' &&
+          (github.event_name == 'push' ||
+           github.event_name == 'workflow_dispatch') &&
+          (vars.OSEO_AVREA_MAC_MODE == 'four' ||
+           vars.OSEO_AVREA_MAC_MODE == 'eight') &&
+          'avrea-macos-26-8-vcpu' || 'macos-latest' }}
     if: >-
       !(github.event_name == 'push' &&
         github.repository == 'dahlia/oseo' &&
@@ -2005,6 +2091,14 @@ jobs:
     steps:
       - name: Record macOS host version
         run: sw_vers -productVersion
+      - name: Verify Avrea macOS image
+        if: runner.environment == 'self-hosted'
+        shell: bash
+        run: |
+          version="$(sw_vers -productVersion)"
+          arch="$(uname -m)"
+          printf "macOS %s (%s)\n" "$version" "$arch"
+          [[ "$version" == 26.* && "$arch" == arm64 ]]
       - uses: actions/checkout@v7
         with:
           persist-credentials: false
@@ -2021,7 +2115,14 @@ jobs:
 
   test_node_shard_macos_2:
     name: test (macos-latest, node, 2/6)
-    runs-on: macos-latest
+    runs-on: >-
+      ${{ github.repository == 'dahlia/oseo' &&
+          github.ref_type == 'branch' &&
+          github.ref != 'refs/heads/release-rehearsal' &&
+          (github.event_name == 'push' ||
+           github.event_name == 'workflow_dispatch') &&
+          vars.OSEO_AVREA_MAC_MODE == 'eight' &&
+          'avrea-macos-26-8-vcpu' || 'macos-latest' }}
     if: >-
       !(github.event_name == 'push' &&
         github.repository == 'dahlia/oseo' &&
@@ -2030,6 +2131,14 @@ jobs:
     steps:
       - name: Record macOS host version
         run: sw_vers -productVersion
+      - name: Verify Avrea macOS image
+        if: runner.environment == 'self-hosted'
+        shell: bash
+        run: |
+          version="$(sw_vers -productVersion)"
+          arch="$(uname -m)"
+          printf "macOS %s (%s)\n" "$version" "$arch"
+          [[ "$version" == 26.* && "$arch" == arm64 ]]
       - uses: actions/checkout@v7
         with:
           persist-credentials: false
@@ -2046,7 +2155,14 @@ jobs:
 
   test_node_shard_macos_6:
     name: test (macos-latest, node, 6/6)
-    runs-on: macos-latest
+    runs-on: >-
+      ${{ github.repository == 'dahlia/oseo' &&
+          github.ref_type == 'branch' &&
+          github.ref != 'refs/heads/release-rehearsal' &&
+          (github.event_name == 'push' ||
+           github.event_name == 'workflow_dispatch') &&
+          vars.OSEO_AVREA_MAC_MODE == 'eight' &&
+          'avrea-macos-26-8-vcpu' || 'macos-latest' }}
     if: >-
       !(github.event_name == 'push' &&
         github.repository == 'dahlia/oseo' &&
@@ -2055,6 +2171,14 @@ jobs:
     steps:
       - name: Record macOS host version
         run: sw_vers -productVersion
+      - name: Verify Avrea macOS image
+        if: runner.environment == 'self-hosted'
+        shell: bash
+        run: |
+          version="$(sw_vers -productVersion)"
+          arch="$(uname -m)"
+          printf "macOS %s (%s)\n" "$version" "$arch"
+          [[ "$version" == 26.* && "$arch" == arm64 ]]
       - uses: actions/checkout@v7
         with:
           persist-credentials: false
