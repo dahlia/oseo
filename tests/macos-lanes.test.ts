@@ -41,7 +41,7 @@ import type {
 } from "../tools/selfhosted-mac/availability.ts";
 import {
   defaultRecheckDelayMilliseconds,
-  runnerSelections,
+  runnerRouting,
   wedged,
 } from "../tools/selfhosted-mac/availability.ts";
 import {
@@ -255,6 +255,33 @@ const fullRunGuard =
   "  github.repository == 'dahlia/oseo' &&\n" +
   "  github.ref == 'refs/heads/release-rehearsal')";
 
+const candidatePush = {
+  repository: "dahlia/oseo",
+  ref_type: "branch",
+  ref: "refs/heads/preview-avrea-macos-pilot",
+  event_name: "push",
+};
+
+function selectHostedRunner(
+  job: Job,
+  mode?: string,
+  github = candidatePush,
+  overflow?: string,
+): string {
+  const label = job["runs-on"];
+  if (!label.includes("vars.OSEO_AVREA_MAC_MODE")) return label;
+  const selector = /^\$\{\{ ([\s\S]+) }}$/.exec(label);
+  assert.ok(selector);
+  const selected: unknown = runInNewContext(selector[1]!, {
+    github,
+    // GitHub compares these strings without regard to case.
+    vars: { OSEO_AVREA_MAC_MODE: mode?.toLowerCase() },
+    needs: { mac_ready: { outputs: { avrea_overflow: overflow } } },
+  });
+  assert.ok(isString(selected));
+  return selected;
+}
+
 test("rehearsal runs only hosted read-only artifact jobs", () => {
   const artifactJobs = new Set([
     "release_identity",
@@ -464,7 +491,8 @@ test("every existing macOS job occurs once in five LPT chains", () => {
   const macIds = Object.entries(after.jobs)
     .filter(
       ([id, job]) =>
-        id !== "release_cli_macos" && job["runs-on"].startsWith("macos-"),
+        id !== "release_cli_macos" &&
+        selectHostedRunner(job).startsWith("macos-"),
     )
     .map(([id]) => id)
     .toSorted();
@@ -475,7 +503,7 @@ test("every existing macOS job occurs once in five LPT chains", () => {
       assert.equal(actual.if, `${fullRunGuard} && !cancelled()`);
       assert.equal(actual.needs, lane[index - 1]?.id);
       assert.equal(actual.name, planned.name);
-      assert.equal(actual["runs-on"], planned.os);
+      assert.equal(selectHostedRunner(actual), planned.os);
       assert.equal(
         actual.strategy,
         undefined,
@@ -541,8 +569,11 @@ test("generated macOS jobs preserve their template contract", () => {
       name: "Record macOS host version",
       run: "sw_vers -productVersion",
     });
+    const templateSteps = actual.steps
+      .slice(1)
+      .filter((step) => step.name !== "Verify Avrea macOS image");
     assert.deepEqual(
-      executedSteps({ ...actual, steps: actual.steps.slice(1) }, {}),
+      executedSteps({ ...actual, steps: templateSteps }, {}),
       executedSteps(original, planned.matrix),
       planned.name,
     );
@@ -921,8 +952,111 @@ test("zero self-hosted lanes route every macOS job to hosted", () => {
   const zero = parse(generated) as Workflow;
   assert.equal(zero.jobs.mac_ready, undefined);
   for (const job of macosJobs()) {
-    assert.equal(zero.jobs[job.id]!["runs-on"], job.os);
+    assert.equal(selectHostedRunner(zero.jobs[job.id]!), job.os);
   }
+});
+
+test("Avrea opt-in keeps four starts and the existing chains", () => {
+  // SAFETY: jactionlint validates the generated workflow schema.
+  const workflow = parse(
+    generateMacosWorkflow(template, configuredSelfHostedLanes),
+  ) as Workflow;
+  const lanes = macosLanes(configuredSelfHostedLanes);
+  const hosted = lanes.slice(0, 5).flat();
+  const first = [
+    "test_node_shard_macos_1",
+    "test_node_shard_macos_5",
+    "test_regexp_exhaustive_macos_macos_node",
+    "test_sanitizer_macos_macos_native_1",
+  ];
+  const expanded = [
+    ...first,
+    "test_node_shard_macos_2",
+    "test_node_shard_macos_3",
+    "test_node_shard_macos_4",
+    "test_node_shard_macos_6",
+  ].toSorted();
+  const runner = "avrea-macos-26-8-vcpu";
+  const selected = (mode?: string, github = candidatePush, overflow?: string) =>
+    hosted
+      .filter(({ id, os }) => {
+        const label = selectHostedRunner(
+          workflow.jobs[id]!,
+          mode,
+          github,
+          overflow,
+        );
+        assert.ok(label === os || label === runner, id);
+        return label === runner;
+      })
+      .map(({ id }) => id)
+      .toSorted();
+
+  assert.deepEqual(selected("four"), first);
+  assert.deepEqual(selected("eight"), expanded);
+  assert.deepEqual(selected("FOUR"), first);
+  assert.deepEqual(selected("auto"), []);
+  assert.deepEqual(selected("auto", candidatePush, "false"), []);
+  assert.deepEqual(selected("auto", candidatePush, "true"), first);
+  assert.deepEqual(selected("off", candidatePush, "true"), []);
+  for (const mode of [
+    undefined,
+    "",
+    "off",
+    " four ",
+    "8",
+    "four,eight",
+    runner,
+  ]) {
+    assert.deepEqual(selected(mode), [], mode);
+  }
+  assert.deepEqual(
+    selected("four", { ...candidatePush, event_name: "workflow_dispatch" }),
+    first,
+  );
+  assert.deepEqual(
+    selected(
+      "auto",
+      { ...candidatePush, event_name: "workflow_dispatch" },
+      "true",
+    ),
+    [],
+  );
+  for (const github of [
+    { ...candidatePush, event_name: "pull_request" },
+    { ...candidatePush, event_name: "pull_request_target" },
+    { ...candidatePush, repository: "fork/oseo" },
+    { ...candidatePush, ref_type: "tag", ref: "refs/tags/v0.1.0" },
+    { ...candidatePush, ref: "refs/heads/release-rehearsal" },
+  ]) {
+    assert.deepEqual(selected("eight", github), [], JSON.stringify(github));
+    assert.deepEqual(
+      selected("auto", github, "true"),
+      [],
+      JSON.stringify(github),
+    );
+  }
+  for (const id of first) assert.equal(workflow.jobs[id]!.needs, "mac_ready");
+  const probes = Object.entries(workflow.jobs).flatMap(([id, job]) =>
+    job.steps
+      .filter((step) => step.name === "Verify Avrea macOS image")
+      .map((step) => ({ id, step })),
+  );
+  assert.deepEqual(probes.map(({ id }) => id).toSorted(), expanded);
+  for (const { step } of probes) {
+    assert.equal(step.if, "runner.environment == 'self-hosted'");
+    assert.equal(step.shell, "bash");
+    assert.match(String(step.run), /sw_vers -productVersion/u);
+    assert.match(String(step.run), /uname -m/u);
+    assert.match(
+      String(step.run),
+      /"\$version" == 26\.\* && "\$arch" == arm64/u,
+    );
+  }
+  assert.equal(
+    names(workflow).filter((name) => !name.startsWith("release_")).length,
+    105,
+  );
 });
 
 test("lane-count preview leaves the committed workflow alone", () => {
@@ -1007,11 +1141,13 @@ test("one extra lane retains every job and aggregate dependency", () => {
     (entry) => entry.family === "test" || entry.family === "host C sanitizers",
   )) {
     const actual = workflow.jobs[planned.id]!;
-    assert.equal(actual["runs-on"], planned.os);
-    // A hosted lane head waits for the probe so that nothing competes with
-    // it for the first slot, but no hosted job takes its runner from the
-    // probe's outputs.
-    assert.ok(!JSON.stringify(actual).includes("mac_ready.outputs"));
+    assert.equal(selectHostedRunner(actual), planned.os);
+    // A hosted job can read the overflow signal. The per-lane outputs
+    // belong to the own-Mac jobs.
+    assert.doesNotMatch(
+      JSON.stringify(actual),
+      /mac_ready\.outputs\.(?!avrea_overflow\b)/u,
+    );
   }
   assert.deepEqual(
     names(workflow).filter((name) => name !== "macOS self-hosted availability"),
@@ -1036,7 +1172,11 @@ test("one extra lane retains every job and aggregate dependency", () => {
     install_args: "node",
   });
   const outputs = parsedMapping(readiness.outputs, "Readiness outputs");
-  assert.deepEqual(Object.keys(outputs).toSorted(), ["r1"]);
+  assert.deepEqual(Object.keys(outputs).toSorted(), ["avrea_overflow", "r1"]);
+  assert.equal(
+    outputs.avrea_overflow,
+    "${{ steps.probe.outputs.avrea_overflow }}",
+  );
   const probe = readiness.steps.find((step) => step.id === "probe");
   assert.ok(probe);
   const condition = String(probe.if);
@@ -1047,6 +1187,7 @@ test("one extra lane retains every job and aggregate dependency", () => {
     assert.ok(condition.includes(required));
   }
   const probeEnv = parsedMapping(probe.env, "Probe environment");
+  assert.equal(probeEnv.OSEO_AVREA_MAC_MODE, "${{ vars.OSEO_AVREA_MAC_MODE }}");
   assert.equal(probeEnv.OSEO_WORKFLOW_TOKEN, "${{ github.token }}");
   assert.equal(
     probeEnv.OSEO_RUNNER_STATUS_TOKEN,
@@ -1082,11 +1223,15 @@ interface FakeJob {
 interface FakeRun {
   readonly id: number;
   readonly status: "queued" | "in_progress";
+  readonly createdAt?: string | undefined;
   readonly jobs: readonly FakeJob[];
+  readonly jobTotal?: number;
 }
 
 interface FakeActions {
   readonly runners: readonly FakeRunner[];
+  readonly runnerTotal?: number;
+  readonly inProgressTotal?: number;
   readonly runs?: readonly FakeRun[];
 }
 
@@ -1115,20 +1260,37 @@ function fakeActionsApi(
     const runs = current.runs ?? [];
     const listed = /\/actions\/runs\?status=(\w+)&/.exec(url);
     const jobs = /\/actions\/runs\/(\d+)\/jobs\?/.exec(url);
+    const matchingRuns = runs.filter((run) => run.status === listed?.[1]);
+    const jobRun = runs.find((run) => run.id === Number(jobs?.[1]));
     const body = runners
-      ? { runners: current.runners }
+      ? {
+          runners: current.runners,
+          total_count: current.runnerTotal ?? current.runners.length,
+        }
       : listed != null
         ? {
-            workflow_runs: runs
-              .filter((run) => run.status === listed[1])
-              .map((run) => ({ id: run.id })),
+            total_count:
+              (listed[1] === "in_progress"
+                ? current.inProgressTotal
+                : undefined) ?? matchingRuns.length,
+            workflow_runs: matchingRuns.map((run) => ({
+              id: run.id,
+              created_at: run.createdAt,
+            })),
           }
-        : jobs != null
-          ? { jobs: runs.find((run) => run.id === Number(jobs[1]))!.jobs }
+        : jobRun != null
+          ? {
+              jobs: jobRun.jobs,
+              total_count: jobRun.jobTotal ?? jobRun.jobs.length,
+            }
           : assert.fail(`Unexpected probe request: ${url}`);
     // The real boundary hands the probe parsed JSON; do the same here.
     return { ok: true, json: async () => JSON.parse(JSON.stringify(body)) };
   };
+}
+
+async function runnerSelections(...args: Parameters<typeof runnerRouting>) {
+  return (await runnerRouting(...args)).selections;
 }
 
 const idleRunner = {
@@ -1669,6 +1831,7 @@ test("eight Mac lanes route each label with its own hosted fallback", () => {
   const readiness = workflow.jobs.mac_ready!;
   const outputs = parsedMapping(readiness.outputs, "Readiness outputs");
   assert.deepEqual(Object.keys(outputs).toSorted(), [
+    "avrea_overflow",
     "r1",
     "r2",
     "r3",
@@ -1690,7 +1853,7 @@ test("eight Mac lanes route each label with its own hosted fallback", () => {
       const actual = workflow.jobs[job.id]!;
       assert.equal(actual.name, job.name);
       if (index < 5) {
-        assert.equal(actual["runs-on"], job.os);
+        assert.equal(selectHostedRunner(actual), job.os);
         // The head waits for the probe; the rest chain in lane order.
         assert.equal(
           actual.needs,
@@ -1911,7 +2074,7 @@ interface FakeRunner {
   readonly status: string;
   /** A string or a missing value stands in for a malformed API body. */
   readonly busy?: boolean | string;
-  readonly labels: readonly { readonly name: string }[];
+  readonly labels?: readonly { readonly name?: string }[] | undefined;
 }
 
 const twoRunners: readonly FakeRunner[] = [
@@ -1948,6 +2111,186 @@ const twoLaneEnv = {
 const hostedSelection = '"macos-15"';
 const mac1 = '["self-hosted","macOS","ARM64","oseo-mac-1"]';
 const mac2 = '["self-hosted","macOS","ARM64","oseo-mac-2"]';
+
+test("Avrea overflow needs backlog and no idle own lane", async () => {
+  const env = {
+    ...twoLaneEnv,
+    OSEO_AVREA_MAC_MODE: "auto",
+    GITHUB_REF_TYPE: "branch",
+    GITHUB_REF: "refs/heads/main",
+    GITHUB_RUN_ID: "5",
+  };
+  const [first, second] = twoRunners;
+  const busy = { ...first!, busy: true };
+  const offline = { ...second!, status: "offline" };
+  const stock = { id: 31, status: "queued", labels: ["macos-latest"] };
+  const prior = {
+    id: 7,
+    status: "in_progress",
+    createdAt: "2026-11-19T10:00:00Z",
+    jobs: [stock, { id: 32, status: "in_progress", labels: ["oseo-mac-1"] }],
+  } as const;
+  const current = {
+    id: 5,
+    status: "in_progress",
+    createdAt: "2026-11-19T10:00:01Z",
+    jobs: [stock],
+  } as const;
+  const state = { runners: [busy, offline], runs: [prior, current] };
+  const probe = (
+    changes: FakeActions,
+    envChanges: Readonly<Record<string, string | undefined>> = {},
+  ) =>
+    runnerRouting(
+      { ...env, ...envChanges },
+      fakeActionsApi(() => changes),
+      noSleep,
+    );
+
+  assert.deepEqual(await probe(state), {
+    selections: [mac1, hostedSelection],
+    avreaOverflow: true,
+  });
+  assert.deepEqual(await probe({ ...state, runners: [] }), {
+    selections: [hostedSelection, hostedSelection],
+    avreaOverflow: true,
+  });
+  assert.deepEqual(await probe({ ...state, runners: [], runnerTotal: 1 }), {
+    selections: [hostedSelection, hostedSelection],
+    avreaOverflow: false,
+  });
+  assert.deepEqual(await probe({ ...state, inProgressTotal: 3 }), {
+    selections: [mac1, hostedSelection],
+    avreaOverflow: false,
+  });
+  assert.deepEqual(await probe({ ...state, runners: [busy, second!] }), {
+    selections: [mac1, mac2],
+    avreaOverflow: false,
+  });
+  await Promise.all(
+    [
+      { ...stock, status: "in_progress" },
+      { ...stock, labels: [] },
+      { ...stock, labels: ["avrea-macos-26-8-vcpu"] },
+      { ...stock, labels: ["self-hosted", "macos-latest"] },
+      { ...stock, labels: ["oseo-mac-2"] },
+      { ...stock, labels: ["ubuntu-latest"] },
+    ].map(async (uncounted) => {
+      const ignored = { ...prior, jobs: [uncounted, prior.jobs[1]] };
+      const result = await probe({ ...state, runs: [ignored, current] });
+      assert.equal(result.avreaOverflow, false, JSON.stringify(uncounted));
+    }),
+  );
+  await Promise.all(
+    [
+      undefined,
+      "invalid",
+      "2026-11-19",
+      "2026-11-19T10:00:00",
+      "2026-09-31T10:00:00Z",
+      current.createdAt,
+      "2026-11-19T10:00:02Z",
+    ].map(async (createdAt) => {
+      const unordered = { ...prior, createdAt };
+      const result = await probe({ ...state, runs: [unordered, current] });
+      assert.equal(result.avreaOverflow, false, createdAt);
+    }),
+  );
+  assert.equal((await probe({ ...state, runs: [prior] })).avreaOverflow, false);
+  await Promise.all(
+    [
+      [offline, offline],
+      [{ ...offline, labels: undefined }],
+      [{ ...second!, busy: "invalid" }],
+      [{ ...offline, labels: [{}] }],
+      [{ ...second!, labels: [{ name: "OSEO-MAC-2" }] }],
+    ].map(async (runners) => {
+      const result = await probe({ ...state, runners: [busy, ...runners] });
+      assert.deepEqual(result, {
+        selections: [mac1, hostedSelection],
+        avreaOverflow: false,
+      });
+    }),
+  );
+  const disabled = await Promise.all(
+    [
+      { OSEO_AVREA_MAC_MODE: "off" },
+      { GITHUB_RUN_ID: "invalid" },
+      { GITHUB_REF_TYPE: "tag" },
+      { GITHUB_REF: "refs/heads/release-rehearsal" },
+    ].map((changes) => probe(state, changes)),
+  );
+  for (const result of disabled) {
+    assert.deepEqual(result, {
+      selections: [mac1, hostedSelection],
+      avreaOverflow: false,
+    });
+  }
+  assert.deepEqual(await runnerRouting(env, unavailableRunnerApi), {
+    selections: [hostedSelection, hostedSelection],
+    avreaOverflow: false,
+  });
+
+  const stuck = queuedLaneJob(33, "queued", 1);
+  await Promise.all(
+    [true, false].map(async (backlogPersists) => {
+      let waits = 0;
+      const result = await runnerRouting(
+        env,
+        fakeActionsApi((observation) => ({
+          runners: [first!, offline],
+          runs: [
+            {
+              ...prior,
+              jobs:
+                observation === 0 || backlogPersists ? [stuck, stock] : [stuck],
+            },
+            current,
+          ],
+        })),
+        {
+          sleep: async () => {
+            waits++;
+          },
+        },
+      );
+      assert.equal(waits, 1);
+      assert.deepEqual(result, {
+        selections: [hostedSelection, hostedSelection],
+        avreaOverflow: backlogPersists,
+      });
+    }),
+  );
+  const completedOwnJob = queuedLaneJob(34, "completed", 1);
+  let waits = 0;
+  const incompleteQueue = await runnerRouting(
+    env,
+    fakeActionsApi((observation) => ({
+      runners: [first!, offline],
+      runs: [
+        {
+          ...prior,
+          jobTotal: 3,
+          jobs:
+            observation === 0
+              ? [stuck, stock]
+              : [stuck, stock, completedOwnJob],
+        },
+        current,
+      ],
+    })),
+    {
+      sleep: async () => {
+        waits++;
+      },
+    },
+  );
+  assert.equal(waits, 1);
+  assert.deepEqual(incompleteQueue, {
+    selections: [hostedSelection, hostedSelection],
+    avreaOverflow: false,
+  });
+});
 
 test("availability decides each Mac lane independently", async () => {
   const env = twoLaneEnv;
@@ -3081,10 +3424,14 @@ test("ordinary exhaustive RegExp literals keep one job per host", () => {
   );
   assert.ok(planned);
   const job = after.jobs[planned.id]!;
-  assert.equal(job["runs-on"], "macos-latest");
+  assert.equal(selectHostedRunner(job), "macos-latest");
   assert.equal(job.env, undefined);
   assert.deepEqual(
-    job.steps.filter((step) => step.run).map((step) => step.run),
+    job.steps
+      .filter(
+        (step) => step.run && step.if !== "runner.environment == 'self-hosted'",
+      )
+      .map((step) => step.run),
     ["sw_vers -productVersion", command],
   );
   assert.equal(after.jobs.test_regexp_exhaustive_macos, undefined);
