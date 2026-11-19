@@ -13,10 +13,10 @@ toolchain links it with the Oseo runtime.
     Zig boundary, generic values, and native target support.
  -  The [roadmap] separates measured milestones from future work.
 
-[whitepaper]: https://github.com/dahlia/oseo/blob/main/WHITEPAPER.md
-[design document]: https://github.com/dahlia/oseo/blob/main/DESIGN.md
-[architecture decision records]: https://github.com/dahlia/oseo/tree/main/docs/adr
-[roadmap]: https://github.com/dahlia/oseo/blob/main/ROADMAP.md
+[whitepaper]: ../overview/white-paper.md
+[design document]: ./compiler-design.md
+[architecture decision records]: ../adr/index.md
+[roadmap]: ../overview/roadmap.md
 
 
 Package internals

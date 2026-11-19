@@ -10,7 +10,8 @@ registry. Package resolver changes and standalone archive verification remain
 in their respective tracks. This plan does not reserve a numbered milestone
 or change JavaScript semantics or compatibility counts.
 
-[*docs/cli.md*](./docs/cli.md) is the reference for implemented behavior.
+[*docs/using/cli.md*](./docs/using/cli.md) is the reference for implemented
+behavior.
 
 This plan is governed by [*WHITEPAPER.md*](./WHITEPAPER.md),
 [*DESIGN.md*](./DESIGN.md), [*ROADMAP.md*](./ROADMAP.md),
@@ -259,8 +260,9 @@ conditions to the resolver's active set, which rejects `types`, and the
 printing of every graph diagnostic described below. Neither lands before the
 resolver unit that needs it.
 
-[*docs/cli.md*](./docs/cli.md) remains a guide to implemented behavior. It
-changes only when the corresponding command, tests, and packaging checks land.
+[*docs/using/cli.md*](./docs/using/cli.md) remains a guide to implemented
+behavior. It changes only when the corresponding command, tests, and packaging
+checks land.
 
 
 Compatibility and diagnostics
@@ -345,9 +347,9 @@ Delivery order
 6.  Print every graph diagnostic with its provenance notes and add the export
     condition option, each in the change that lands the resolver unit of
     [*PLAN-PKG.md*](./PLAN-PKG.md) it serves.
-7.  Update *docs/cli.md*, package documentation, examples, generation checks,
-    and clean-package smoke tests in the implementation change that makes the
-    new syntax available.
+7.  Update *docs/using/cli.md*, package documentation, examples, generation
+    checks, and clean-package smoke tests in the implementation change that
+    makes the new syntax available.
 
 At every checkpoint, the repository checks pass. A partial checkpoint must not
 document a planned command as usable or leave the generated command registry

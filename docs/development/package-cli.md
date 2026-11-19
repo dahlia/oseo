@@ -5,7 +5,7 @@ The [command-line guide] covers the public command grammar, native build
 configurations, target selection, and diagnostics. The [design document]
 describes the runtime archive cache and its fallback paths.
 
-[command-line guide]: ../cli.md
+[command-line guide]: ../using/cli.md
 [design document]: https://github.com/dahlia/oseo/blob/main/DESIGN.md
 
 

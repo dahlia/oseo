@@ -46,6 +46,12 @@ sanitizer policy.
 The collector queues newly marked objects through an intrusive worklist, so it
 traces each reachable object once regardless of allocation-list order.
 
+[activity audit]: https://github.com/dahlia/oseo/blob/main/docs/sanitizer-activity.md
+
+
+Runtime ABI changes through `m5-145`
+------------------------------------
+
 M3 property operations implement descriptors, prototypes, array holes and
 length, ordered own-key enumeration, and private cache primitives for explicit
 MIR property-read guards.
@@ -1358,8 +1364,6 @@ child agents initialize true, and realms retain their owning context's policy.
 `Atomics.wait` checks it after argument validation and conversion, before
 comparing memory. `Atomics.waitAsync` is unchanged.
 
-[activity audit]: https://github.com/dahlia/oseo/blob/main/docs/sanitizer-activity.md
-
 
 With binding object boxing
 --------------------------
@@ -1374,6 +1378,10 @@ The compiler roots the result before initializing the with environment, so
 repeated lookups and escaped closures retain one binding object. The helper
 does not read a mutable JavaScript `Object` binding or invoke primitive
 conversion hooks.
+
+
+Realm, module, and legacy compatibility changes
+-----------------------------------------------
 
 ABI `m5-146` adds a context pointer to the saved caller realm of the active
 ordinary call. The matching realm scope roots that realm until return.
@@ -1647,6 +1655,10 @@ detached from the global object when an earlier Script's lexical declaration
 holds the name, or when the object is not extensible and lacks the property;
 otherwise it binds the entry the way it binds a `var`. Unmarked entries behave
 as before.
+
+
+Explicit resource management
+----------------------------
 
 ABI `m5-157` adds the explicit resource management built-ins. The well-known
 symbol table grows from thirteen to fifteen entries: `Symbol.asyncDispose` at

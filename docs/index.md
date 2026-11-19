@@ -9,8 +9,8 @@ hero:
       text: Using Oseo
       link: /using/install
     - theme: alt
-      text: Development
-      link: /development/
+      text: Introduction
+      link: /overview/
 ---
 
 Oseo is under active development. Start with the

@@ -249,5 +249,5 @@ The preview is complete when:
     differential tests;
  -  the demonstration programs build, run, and pass their tests in CI;
  -  the comparison evidence is published with its method and limits; and
- -  *README.md* and *docs/cli.md* describe how to build and run the
+ -  *README.md* and *docs/using/cli.md* describe how to build and run the
     demonstrations from a checkout.

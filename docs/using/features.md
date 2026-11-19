@@ -15,10 +15,10 @@ and deferrals, including the Annex B boundary. This is a measured subset,
 not a claim of conformance to an edition of ECMAScript.
 
 Oseo is not a drop-in Node.js or browser runtime. It implements a small
-[program input and exit status subset](../cli.md#program-input-and-exit-status),
+[program input and exit status subset](./cli.md#program-input-and-exit-status),
 not the full Node.js or Web APIs. Oseo cannot compile arbitrary runtime source
 strings. Dynamic `import()` is limited to a string literal whose target can
-be resolved while building. The [module entry section](../cli.md#module-entries)
+be resolved while building. The [module entry section](./cli.md#module-entries)
 describes entry selection and import resolution.
 
 Linux AMD64 and macOS AArch64 are supported native execution hosts. Linux

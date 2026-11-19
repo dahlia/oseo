@@ -177,9 +177,7 @@ New paths never join this selector. Changing the pinned suite revision, or
 adding a path with the `caller` feature, requires a new reviewed scope
 decision.
 
-
-Exact selector
---------------
+### Exact selector
 
 The list is exhaustive. Entries marked “dynamic source” also call `eval` or a
 source-compiling `Function` form.

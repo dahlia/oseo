@@ -8,7 +8,7 @@ guarded optimizations. It defines the interfaces for frontends, backends,
 runtimes, and toolchains but does not ship those adapters. To compile and run
 a file from the shell, use the [Oseo CLI].
 
-[Oseo CLI]: https://github.com/dahlia/oseo/blob/main/docs/cli.md
+[Oseo CLI]: https://github.com/dahlia/oseo/blob/main/docs/using/cli.md
 
 
 Compile a script to MIR

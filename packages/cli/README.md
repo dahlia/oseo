@@ -55,5 +55,5 @@ See the [command-line guide] for module entry points, target selection,
 program arguments, and build options. See the [CLI implementation notes] for
 the command registry and host workflow.
 
-[command-line guide]: https://github.com/dahlia/oseo/blob/main/docs/cli.md
+[command-line guide]: https://github.com/dahlia/oseo/blob/main/docs/using/cli.md
 [CLI implementation notes]: https://github.com/dahlia/oseo/blob/main/docs/development/package-cli.md

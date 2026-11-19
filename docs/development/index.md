@@ -18,7 +18,7 @@ compiler changes.
 
 [Oseo repository]: https://github.com/dahlia/oseo
 [mise]: https://mise.jdx.dev/
-[contributor guide]: https://github.com/dahlia/oseo/blob/main/CONTRIBUTING.md
+[contributor guide]: ./contributing.md
 
 
 Build and check the docs

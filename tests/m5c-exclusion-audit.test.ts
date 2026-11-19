@@ -2362,10 +2362,16 @@ test("the ADR 0028 selector is exactly the pinned caller paths", () => {
   assert.equal(selector.size, 23);
   assert.ok(selector.has("test/built-ins/Function/15.3.5.4_2-12gs.js"));
   assert.ok(selector.has("test/language/arguments-object/10.6-13-a-3.js"));
+  assert.deepEqual(
+    legacyCallerSelector(
+      record.replace("\n### Exact selector\n", "\nExact selector\n---\n"),
+    ),
+    selector,
+  );
   assert.throws(
     () =>
       legacyCallerSelector(
-        record.replace("\nExact selector\n", "\nSelector\n"),
+        record.replace("\n### Exact selector\n", "\n### Selector\n"),
       ),
     /Exact selector section/u,
   );

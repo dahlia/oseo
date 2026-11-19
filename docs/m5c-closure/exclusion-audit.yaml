@@ -2,8 +2,8 @@ version: 1
 suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
 records:
   0013-m5-edition-and-manifest:
-    digest: "70c505dc6e2823c1f99e7631ed920d135994dddd5f1a99726a\
-      cddb881932e40c"
+    digest: "6d8e8ece7114d4625f04aeb0115514d4c30b208b8ff234128f\
+      7fc44ce3c6d075"
     authorization:
       - Annex B legacy web semantics are excluded from the
         claim.
@@ -70,8 +70,8 @@ records:
         behavior other than source evaluation reopens the
         boundary rather than this record.
   0028-legacy-function-caller-boundary:
-    digest: "166d3ebe9107395455d3c08fc0d2c6a0299acdf7f632ed8c8f\
-      b17ddc34fcca6b"
+    digest: "a862dd04385e9d6c7e7381267abbfe5e987c19064b21b69f1\
+      172abb313e8b06c"
     authorization:
       - The optional legacy caller extension is outside the
         M5 profile.

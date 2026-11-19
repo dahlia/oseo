@@ -3988,6 +3988,10 @@ prerequisite boundaries for the unadmitted `Array`, `Boolean`, `Date`, `JSON`,
 `Math`, `RegExp`, and `String` globals, `Proxy`, and the `Reflect.construct`
 the constructor-check harness needs.
 
+
+M5b implementation history
+--------------------------
+
 M5b node `array-constructor` makes `Array` a replaceable intrinsic value and
 completes its realm cluster with length-argument construction,
 `Symbol.species`, `from`, `of`, and `isArray`. Fixed native and generated
@@ -5528,9 +5532,7 @@ admitted runtime checkpoint moves the ABI to `oseo-runtime-m5-93`, allocates
 four code IDs inside the existing Array range, and adds no generated-code
 entry point or graph-state change.
 
-
-String prototype case conversion and normalization
---------------------------------------------------
+### String prototype case conversion and normalization
 
 M5b node `string-prototype-case` adds `toLowerCase`, `toUpperCase`,
 `toLocaleLowerCase`, `toLocaleUpperCase`, `trim`, `trimStart`, `trimEnd`,
@@ -5720,9 +5722,7 @@ nodes remains outside this change and belongs to the reviewed-subset-growth
 backlog. The suite revision, 41,091-path inventory, manifest schema and
 vocabulary, target-parity policy, and zero-override policy are unchanged.
 
-
-Generator and asynchronous function intrinsic chains
-----------------------------------------------------
+### Generator and asynchronous function intrinsic chains
 
 M5b node `function-intrinsic-chains` materializes `%GeneratorFunction%`,
 `%AsyncFunction%`, and `%AsyncGeneratorFunction%` as realm-owned intrinsic
@@ -6032,9 +6032,7 @@ pattern, and a non-branded `IsRegExp` pattern still parse dynamically, and
 dynamic Unicode properties, class sets, unlinked case folding, and a
 non-ASCII identity escape without `u` keep their located boundary.
 
-
-Promise settled combinators
----------------------------
+### Promise settled combinators
 
 The M5b node `promise-allsettled-and-any` completes the four iterable Promise
 combinators. It replaces the deferred `Promise.allSettled` and `Promise.any`
@@ -6105,9 +6103,7 @@ are unchanged. The admitted runtime checkpoint sets the runtime ABI to
 range. It adds no generated-code entry point and leaves the graph's
 orchestration state unchanged.
 
-
-Lazy iterator helpers
----------------------
+### Lazy iterator helpers
 
 M5b node `iterator-helpers-lazy` adds `map`, `filter`, `take`, `drop`, and
 `flatMap` to the realm-owned `%IteratorPrototype%`. Each is a writable,
@@ -6220,9 +6216,7 @@ The new heap kind and the expanded intrinsic table move the runtime ABI to
 range, without adding a generated-code entry point or changing the graph's
 orchestration state.
 
-
-URI handling functions
-----------------------
+### URI handling functions
 
 M5b node `uri-handling-functions` materializes the four URI handling
 functions of 19.2.6. `decodeURI`, `decodeURIComponent`, `encodeURI`, and
@@ -6369,9 +6363,7 @@ and zero-override policy are unchanged; the dependency vocabulary adds the
 runtime ABI to `oseo-runtime-m5-94` without adding a generated-code entry point
 or changing the graph's orchestration state.
 
-
-Global numeric functions
-------------------------
+### Global numeric functions
 
 M5b node `global-numeric-functions` materializes the four global numeric
 function properties of 19.2. `isFinite`, `isNaN`, `parseFloat`, and
@@ -6490,9 +6482,7 @@ unchanged. The admitted runtime checkpoint moves the runtime ABI to
 `oseo-runtime-m5-95`, adds the `oseo_super_constructor_check` entry
 point, and does not change the graph's orchestration state.
 
-
-Reflect namespace
------------------
+### Reflect namespace
 
 M5b node `reflect-namespace` materializes the `Reflect` namespace object of
 28.1. `Reflect` is an ordinary object whose `[[Prototype]]` is the realm's
@@ -6707,9 +6697,7 @@ The admitted runtime checkpoint moves the runtime ABI to `oseo-runtime-m5-96`,
 adds the `oseo_super_constructor_receiver` generated-code entry point, and does
 not change the graph's orchestration state.
 
-
-Array prototype iterators
--------------------------
+### Array prototype iterators
 
 M5b node `array-prototype-iterators` adds ordinary `entries`, `keys`, and
 `values` functions to the realm-owned `%Array.prototype%` and makes its
@@ -6884,9 +6872,7 @@ table grows by 24 slots for the new constructor and prototype pairs. The value
 representation and the generated-code entry points are unchanged, and no graph
 state moves.
 
-
-Proxy exotic objects
---------------------
+### Proxy exotic objects
 
 M5b node `proxy-exotic-object` admits the `Proxy` constructor and
 `Proxy.revocable`. `Proxy` is a constructible built-in with no own
@@ -6966,9 +6952,7 @@ from 131 to 132 domains and seeds and from 5,478 to 5,490 ordinary cases.
 The suite revision, manifest schema, classification vocabulary, and
 zero-override policy remain unchanged.
 
-
-Eager iterator helpers
-----------------------
+### Eager iterator helpers
 
 M5b node `iterator-helpers-eager` adds `reduce`, `toArray`, `forEach`, `some`,
 `every`, and `find` to the realm-owned `%IteratorPrototype%`, completing the
@@ -7064,9 +7048,7 @@ allocates six code IDs inside the existing iterator range without adding a heap
 kind, a generated-code entry point, or a change to the graph's orchestration
 state.
 
-
-Date family
------------
+### Date family
 
 M5b node `date-family` admits the `Date` constructor, its `now`, `parse`,
 and `UTC` statics, `%Date.prototype%` with its forty-four own methods, and
@@ -7227,9 +7209,7 @@ property ratchet moves from 163 to 164 domains and seeds and from 5,873 to
 5,893 ordinary cases, the evidence inventory stays at 140 families, and the
 runtime ABI moves to `oseo-runtime-m5-125`.
 
-
-String iteration
-----------------
+### String iteration
 
 M5b node `string-iterator` materializes
 %String.prototype%[`Symbol.iterator`] as the ordinary `[Symbol.iterator]`
@@ -7274,9 +7254,7 @@ moves from 117 to 118 records. The runtime ABI moves to
 range, and adds three realm intrinsics without adding a heap kind, a
 generated-code entry point, or a graph-state change.
 
-
-JSON parse
-----------
+### JSON parse
 
 M5b node `json-parse` admits the replaceable `JSON` namespace and its
 ordinary, non-constructible `parse` function. Parsing begins after ToString
@@ -7329,9 +7307,7 @@ records. The property ratchet moves from 137 to 138 domains and seeds and from
 adds one runtime component, one built-in code ID range, and two intrinsic
 slots, and adds no generated-code entry point.
 
-
-Set intrinsic
--------------
+### Set intrinsic
 
 M5b node `set-intrinsic` materializes `%Set%`, `%Set.prototype%`, and
 `%SetIteratorPrototype%`. Calling `Set` without `new` throws a `TypeError`,
@@ -7389,9 +7365,7 @@ zero-override policy are otherwise unchanged. The new component and two heap
 kinds move the runtime ABI to `oseo-runtime-m5-104` without a public layout
 change and without changing the graph's orchestration state.
 
-
-JSON stringify
---------------
+### JSON stringify
 
 M5b node `json-stringify` admits the ordinary, non-constructible
 `JSON.stringify` function and completes SerializeJSONProperty. For each value,
@@ -7461,9 +7435,7 @@ unsupported profile features, and 1,556 expected negatives, with zero semantic,
 harness, or infrastructure failures. No reviewed path outside the node roots
 changes classification.
 
-
-Promise harness helper
-----------------------
+### Promise harness helper
 
 M5b node `harness-promise-helper` completes the reviewed *promiseHelper.js*
 include as ordinary JavaScript assembled before each upstream test body. The
@@ -7503,9 +7475,7 @@ budget, and the evidence inventory has 122 families. The suite revision,
 applicable inventory, classification vocabulary, target-parity policy,
 forced-collection policy, and zero-override policy are unchanged.
 
-
-TypedArray core prototype
--------------------------
+### TypedArray core prototype
 
 M5b node `typed-array-core` completes the integer-indexed exotic object for
 every TypedArray view. A canonical numeric string key never reaches ordinary
@@ -7608,9 +7578,7 @@ strict core replacement evidence, not a pass.
 The seven SharedArrayBuffer paths above now pass under the already-admitted
 shared-buffer support. The original admission counts above are historical.
 
-
-TypedArray iteration methods
-----------------------------
+### TypedArray iteration methods
 
 M5b node `typed-array-iterative` adds `every`, `some`, `forEach`, `map`,
 `filter`, `reduce`, and `reduceRight` to `%TypedArray.prototype%`. Each is an
@@ -7676,9 +7644,7 @@ The RAB harness update is complete. All 23 paths in the node's seven inventory
 roots that include *resizableArrayBufferUtils.js* are passes with ledger owner
 `observation`, and none remains unsupported.
 
-
-TypedArray search and joining
------------------------------
+### TypedArray search and joining
 
 M5b node `typed-array-search-and-join` adds `find`, `findIndex`, `findLast`,
 `findLastIndex`, `includes`, `indexOf`, `lastIndexOf`, `join`, and
@@ -7786,9 +7752,7 @@ _user-provided-tolocalestring-\*.js_ cases remain unsupported, with active
 owner `primitive-wrapper-objects`; neither is an exclusion. The original
 admission counts above are historical.
 
-
-TypedArray mutation and copying
--------------------------------
+### TypedArray mutation and copying
 
 M5b node `typed-array-mutation` adds `copyWithin`, `fill`, `reverse`,
 `slice`, `toReversed`, and `with` to `%TypedArray.prototype%`. Each is an
@@ -7883,9 +7847,7 @@ source `2e3d973f`, observes all ten paths in these roots that include
 *resizableArrayBufferUtils.js* as passes, with ledger owner `observation`.
 None remains unsupported. The original admission counts above are historical.
 
-
-TypedArray sorting
-------------------
+### TypedArray sorting
 
 M5b node `typed-array-sort` adds `sort` and `toSorted` to
 `%TypedArray.prototype%`. Both are distinct ordinary non-constructible methods
@@ -7949,9 +7911,7 @@ The completed RAB harness update at `fbdb0824` passes all four paths in these
 roots that include *resizableArrayBufferUtils.js*, with ledger owner
 `observation`. None remains unsupported.
 
-
-TypedArray statics
-------------------
+### TypedArray statics
 
 M5b node `typed-array-statics` adds `from` and `of` to `%TypedArray%`, so every
 concrete constructor inherits them rather than owning copies. They are distinct
@@ -8039,9 +7999,7 @@ that include *resizableArrayBufferUtils.js*. The remaining
 strict core replacement evidence, not a pass. The original admission counts
 above are historical.
 
-
-Set composition methods
------------------------
+### Set composition methods
 
 M5b node `set-composition-methods` adds `union`, `intersection`,
 `difference`, `symmetricDifference`, `isSubsetOf`, `isSupersetOf`, and
@@ -8121,9 +8079,7 @@ The suite revision, applicable inventory, classification vocabulary,
 target-parity policy, forced-collection policy, and zero-override policy are
 unchanged.
 
-
-Single-agent shared memory and Atomics
---------------------------------------
+### Single-agent shared memory and Atomics
 
 M5b node `atomics-single-agent` admits `SharedArrayBuffer` and the `Atomics`
 namespace for a realm that is the only agent of its agent cluster. A
@@ -8244,9 +8200,7 @@ seven SharedArrayBuffer code IDs, code range index 25 holds the thirteen
 Atomics functions, the public intrinsic table gains four slots, the heap gains
 the Atomics waiter kind, and the context gains the WaiterList store roots.
 
-
-Agent clusters and cross-agent shared memory
---------------------------------------------
+### Agent clusters and cross-agent shared memory
 
 M5b node `atomics-and-shared-memory` admits agent clusters and the
 `$262.agent` harness capability under
@@ -8344,9 +8298,7 @@ moves to `oseo-runtime-m5-123` with code range index 28 for the eight
 context's agent record and broadcast callback root, and the generated-code
 entry points `oseo_test262_host_install` and `oseo_agent_hole`.
 
-
-Weak collections
-----------------
+### Weak collections
 
 M5b node `weak-collections` materializes `WeakMap`, `WeakSet`, `WeakRef`, and
 `FinalizationRegistry` with their prototypes as one realm-owned intrinsic
@@ -8486,9 +8438,7 @@ The new component, four heap kinds, and the public KeptAlive fields move the
 runtime ABI to `oseo-runtime-m5-113` without changing the graph's orchestration
 state.
 
-
-Array prototype change by copy
-------------------------------
+### Array prototype change by copy
 
 M5b node `array-prototype-change-by-copy` adds ordinary `with`, `toSpliced`,
 and `toReversed` functions to the realm-owned `%Array.prototype%`. Each method
@@ -8538,9 +8488,7 @@ realm intrinsic slot. The suite revision, 41,091-path inventory, manifest
 schema and vocabulary, forced-collection policy, and zero-override policy are
 unchanged.
 
-
-String prototype padding and well-formedness
---------------------------------------------
+### String prototype padding and well-formedness
 
 M5b node `string-prototype-pad` adds `repeat`, `padStart`, `padEnd`,
 `isWellFormed`, and `toWellFormed` to the realm-owned `%String.prototype%`.
@@ -8585,9 +8533,7 @@ infrastructure failures. The property ratchet has 155 domains and seeds, with
 The runtime ABI is `m5-118`. The node allocates five IDs in the existing String
 built-in range, and adds no runtime component or generated-code entry point.
 
-
-Boolean intrinsic and wrappers
-------------------------------
+### Boolean intrinsic and wrappers
 
 M5b node `boolean-intrinsic` materializes the callable and constructible
 `Boolean` global, its false-valued `%Boolean.prototype%`, collector-traced
@@ -8620,9 +8566,7 @@ The public intrinsic table, Boolean built-in code range, and new runtime
 component put the ABI at `oseo-runtime-m5-119` without adding a generated-code
 entry point. The graph's orchestration state remains coordinator-owned.
 
-
-globalThis binding
-------------------
+### globalThis binding
 
 M5b node `globalthis-binding` exposes the realm global object as the writable,
 non-enumerable, configurable `globalThis` property. Known globals keep their
@@ -8706,8 +8650,10 @@ The new `oseo_unresolvable_cell_create` entry point puts the ABI at
 coordinator-owned.
 
 
-Realms beyond the initial realm
--------------------------------
+M5c implementation history
+--------------------------
+
+### Realms beyond the initial realm
 
 M5c node `cross-realm-host` admits realm creation beyond the initial realm and
 the `$262.createRealm` harness capability under
@@ -8814,9 +8760,7 @@ evidence inventory is at 142 families. The runtime ABI is
 `oseo-runtime-m5-127`, with code range index 29 for `%eval%` and `createRealm`,
 the realm record heap kind, and the context's initial and running realm.
 
-
-The import.meta meta property
------------------------------
+### The import.meta meta property
 
 M5c node `import-meta` admits the test262 `import.meta` feature. In Module
 code, `import.meta` evaluates to one ordinary, extensible object per module.
@@ -8828,9 +8772,7 @@ object.
 `import.meta` in Script code, escaped, or as an assignment target is an early
 SyntaxError.
 
-
-Module export forms
--------------------
+### Module export forms
 
 M5c node `module-export-forms` admits `export var`,
 `export * as name from "./module.js"`, and arbitrary module namespace names.
@@ -8886,9 +8828,7 @@ The generated domain in
 *tests/property/m5-module-namespace-uninitialized.property.test.ts* reserves
 seed block `0x60009000`.
 
-
-Iterator next callability timing
---------------------------------
+### Iterator next callability timing
 
 M5c node `iterator-next-callability` repairs synchronous iterator
 acquisition. `GetIterator` captures the `next` value once, without testing
@@ -8925,9 +8865,7 @@ The destructuring-assignment, sync-generators, and sync-iteration family
 records keep their identities and guard-fallback omissions; the semantic
 callability check is not an optimization guard.
 
-
-Hashbang comments
------------------
+### Hashbang comments
 
 M5c node `hashbang-comments` admits the test262 `hashbang` feature. ECMA-262
 2025 12.5 defines a HashbangComment as `#!` followed by
@@ -9381,8 +9319,10 @@ retains its exact 1,199-path reservation and first canonical admission of the
 duplicate case.
 
 
-Strict assignment through with environments
--------------------------------------------
+Later M5c implementation history
+--------------------------------
+
+### Strict assignment through with environments
 
 M5c node `with-strict-assignment-fallback` retains the selected Object
 Environment Record through simple, compound, logical, and update writes.
@@ -9441,9 +9381,7 @@ budget, runtime ABI, and package versions remain unchanged. B12 retains first
 canonical admission of its eleven compound-assignment paths. This focused
 evidence does not replace the whole ordinary and extended gates.
 
-
-Compound member key order
--------------------------
+### Compound member key order
 
 M5c node `compound-member-assignment-key-order` repairs `base[key] op= value`
 for the twelve arithmetic, exponentiation, bitwise, and shift operators on an
@@ -9576,9 +9514,7 @@ retry. Batch 14 keeps their first canonical admission, and batches 8 and 16
 keep the related simple assignment and update subjects, so this node adds no
 subset row.
 
-
-Keyed pattern targets through with environments
------------------------------------------------
+### Keyed pattern targets through with environments
 
 M5c node `destructuring-binding-target-order` resolves a keyed object pattern
 identifier leaf before its source read. ECMA-262 2025
@@ -9657,9 +9593,7 @@ keeps its first canonical admission.
 [keyed binding case]: https://github.com/tc39/test262/blob/f2d1435644797268dca1f7988cad5a4e89ccd8d2/test/language/destructuring/binding/keyed-destructuring-property-reference-target-evaluation-order-with-bindings.js
 [assignment-pattern twin]: https://github.com/tc39/test262/blob/f2d1435644797268dca1f7988cad5a4e89ccd8d2/test/language/expressions/assignment/destructuring/keyed-destructuring-property-reference-target-evaluation-order-with-bindings.js
 
-
-Identifier reads through with environments
-------------------------------------------
+### Identifier reads through with environments
 
 M5c node `eval-intrinsic-value` makes an identifier read through a selected
 Object Environment Record perform ECMA-262 2025 GetBindingValue (9.1.1.2.6).
@@ -9771,9 +9705,7 @@ until it lands.
 [call trace]: https://github.com/tc39/test262/blob/f2d1435644797268dca1f7988cad5a4e89ccd8d2/test/language/statements/with/get-binding-value-call-with-proxy-env.js
 [strict deletion case]: https://github.com/tc39/test262/blob/f2d1435644797268dca1f7988cad5a4e89ccd8d2/test/language/statements/with/get-mutable-binding-binding-deleted-in-get-unscopables-strict-mode.js
 
-
-Parenthesized assignment targets
---------------------------------
+### Parenthesized assignment targets
 
 M5c node `parenthesized-assignment-function-name` repairs NamedEvaluation
 through a parenthesized identifier target. ECMA-262 2025 13.15.2 names an
@@ -9835,9 +9767,7 @@ their subset rows were retained. The only new observation is a pass for
 This is preparation evidence; landing and the whole ordinary and extended
 gates remain pending.
 
-
-Primitive wrapper call bindings
--------------------------------
+### Primitive wrapper call bindings
 
 M5c node `primitive-wrapper-objects` admits the missing non-strict call
 boundary for all five wrapper kinds. Boolean, Number, String, Symbol, and
@@ -9891,9 +9821,7 @@ landing remain pending. Zig's address and undefined flags
 alone establish no ASan activity; the exact candidate's host C sanitizer
 lanes must supply that evidence.
 
-
-Generator continuation stack accounting
----------------------------------------
+### Generator continuation stack accounting
 
 M5c node `generator-dispatch-stack-charge` applies the existing callable
 native-frame charge to every continuation dispatch, including ordinary async
@@ -9920,9 +9848,7 @@ ASan/UBSan. macOS execution and the full ordinary and extended gates remain
 exact-candidate CI obligations; this source change records no new test262
 observations.
 
-
-Synchronous yield-star throw callability correction
----------------------------------------------------
+### Synchronous yield-star throw callability correction
 
 M5c node `yield-star-throw-callability` corrects the synchronous GetMethod
 boundary for a noncallable delegate `throw`. That failure raises `TypeError`
@@ -9972,9 +9898,7 @@ and CHECK/hooks are recorded in the source preparation report. Runtime,
 reference, and native execution, affected review, fresh full observations, and
 exact candidate/Main gates remain pending.
 
-
-Primitive receiver inherited Set
---------------------------------
+### Primitive receiver inherited Set
 
 M5c node `primitive-receiver-inherited-set` completes PutValue for a
 primitive base, following ECMA-262 2025 PutValue,
@@ -10028,9 +9952,7 @@ sixteen-sample suite keeps seed `0x60008b00`. Native runs use both
 specialization policies with collection forced at every safepoint and
 require positive collection counts.
 
-
-Omitted legacy accessor metadata boundary
------------------------------------------
+### Omitted legacy accessor metadata boundary
 
 The `__proto__` rejection diagnoses required legacy getter/setter behavior.
 Core descriptor queries expose distinct, stable native getter/setter
@@ -10084,9 +10006,7 @@ metadata specialization exists, and the generated false-hint, guard-miss,
 and disabled-policy assertions remain. No Annex B body, accepted exclusion,
 feature, or family is added.
 
-
-Proper tail calls
------------------
+### Proper tail calls
 
 M5c node `proper-tail-calls` implements ECMA-262 15.10. A call is a tail call
 exactly when IsInTailPosition holds. Its body must be strict source code of
@@ -10159,9 +10079,7 @@ also loses that code, which can lower its declared frame slots.
 *tests/completion-target-labels.test.ts* checks the emitted labels and
 dispatch.
 
-
-Ahead-of-time host Script bindings
-----------------------------------
+### Ahead-of-time host Script bindings
 
 The explicit `--test262-host` compilation admits `$262.evalScript` and
 `print` under [ADR 0029](./adr/0029-ahead-of-time-host-script-bindings.md).
@@ -10243,9 +10161,7 @@ measuring a 510-second Linux scheduling weight; macOS remains unmeasured at
 the 296-second fallback. See *docs/evidence/u6/README.md*. Those results
 retain their actual source identities and do not validate this later repair.
 
-
-Host Script and final GC bitmap source composition
---------------------------------------------------
+#### Host Script and final GC bitmap source composition
 
 The complete Host source on `918a6d93` is prepared on fixed TCO/Reg source
 `beea6880c6db826ad3420cb9a021a1a124bfe2d4` (tree
@@ -10267,9 +10183,7 @@ Affected internal reviews and Full remain pending. Reg's existing observations
 and matcher owners, both TCO unsupported expectations and all fourteen Host
 unsupported expectations are preserved; no promotion is predicted here.
 
-
-Composed Host focused evidence
-------------------------------
+#### Composed Host focused evidence
 
 Source `20d6119bac41c5a6c819a268476dec017a2475d6`, tree
 `fbb16dadcaee5047ac692200d28efbc5ca56bd71`, completed eight exact focused
@@ -10304,9 +10218,7 @@ Full/classification, admission and exact candidate/Main gates remain pending.
 Reg's existing records, both TCO unsupported expectations and all fourteen
 Host unsupported expectations are preserved, with no predicted promotions.
 
-
-Host Script directive and with-fallback repairs
------------------------------------------------
+#### Host Script directive and with-fallback repairs
 
 Two compiler repairs follow the composed evidence. `da99d0dd` keeps the last
 directive's cooked string and location in the owned syntax program and seeds
@@ -10354,9 +10266,7 @@ hashes and limits. Internal review pass 4 of the with-fallback scope was
 clean at both stages. Outer reviews, Full/classification, admission and
 exact candidate/Main gates remain pending, and no promotion is predicted.
 
-
-Host Script loop-head and alias repairs
----------------------------------------
+#### Host Script loop-head and alias repairs
 
 Outer review pass 2 found two defects on `f3e2c1e6`. A host Script's simple
 `var` head in a `for`, `for-in` or `for-of` statement wrote the hoisted
@@ -10398,9 +10308,7 @@ against base `f3e2c1e6` could not start because the reviewer's
 authentication was revoked, and it remains pending with outer reviews,
 Full/classification, admission and exact candidate/Main gates.
 
-
-Accepted remote Full on the TCO and Host composition
-----------------------------------------------------
+#### Accepted remote Full on the TCO and Host composition
 
 Root accepted remote job `20261027T105544Z-904e10b15d52` on source
 U `28d57fc50ce3cda616459175715ddf82ad9db1f8`, tree
@@ -10432,9 +10340,7 @@ Earlier source-qualified observations and pending-at-the-time statements
 remain historical. This Full supplies no candidate/Main gate, macOS
 execution, graph landing or publication; Root owns those later gates.
 
-
-Iterator helpers tag activation preparation
--------------------------------------------
+### Iterator helpers tag activation preparation
 
 M5c IH-A admits `iterator-helpers` in the reviewed feature list and removes
 an obsolete `Iterator.from` rejection of String primitives. Lookup and Call
@@ -10464,9 +10370,7 @@ signal could still open. Its focused precheck observes the three
 [its work note](./m5c-graph/temporal-helpers-harness.md) records the decision
 and evidence.
 
-
-With var loop-head resolution
------------------------------
+### With var loop-head resolution
 
 Simple `var` heads in `for-in` and `for-of`, including `for await`, resolve the
 identifier through the active `with` chain on each iteration. A classic `for`
@@ -10497,9 +10401,7 @@ ordinary cases each, both specialization policies and forced collection.
 These sources add no test262 path or classification. D3, full observation,
 review and publication remain separate gates owned by Root.
 
-
-Module top-level await patterns
--------------------------------
+### Module top-level await patterns
 
 Module binding and assignment patterns admit await in computed keys, defaults,
 and member targets. Catch parameters, classic for initializers, and for-of and

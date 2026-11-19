@@ -4,6 +4,11 @@ packages:
 
 verifyDepsBeforeRun: error
 
+peerDependencyRules:
+  allowedVersions:
+    # Tested together on the production docs build and in the browser.
+    "vitepress-plugin-mermaid@2.0.17>vitepress": "2.0.0-alpha.21"
+
 permissions:
   "@optique/core":
     skills: [optique]

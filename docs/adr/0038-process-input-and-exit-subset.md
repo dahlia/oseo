@@ -323,7 +323,7 @@ property reads return `undefined`.
 The differential harness gains standard input and byte-exact output
 comparison, which later NIO and M7 work can reuse.
 
-*docs/cli.md* drops its statement that standard input is unsupported and
+*docs/using/cli.md* drops its statement that standard input is unsupported and
 documents `oseo run SOURCE -- ARGS...` when the implementation lands.
 
 

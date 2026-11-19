@@ -198,7 +198,7 @@ Decision
     name exact files; no extension is probed and no directory index is
     assumed.
  -  A bare specifier names a package and an optional subpath. The package
-    directory is the first *node\_modules/<name>* found while walking up
+    directory is the first `node_modules/<name>` found while walking up
     from the importer's directory after symbolic links are resolved. Scoped
     names use two path segments.
  -  A specifier beginning with `#` resolves through the `imports` field of

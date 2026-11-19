@@ -11,6 +11,6 @@ and the parts of the system they measure. The [contributor guide] explains
 how to add or refresh results.
 
 [reviewed Test262 results]: https://github.com/dahlia/oseo/blob/main/tests/test262/results.yaml
-[ECMAScript 2026 profile]: https://github.com/dahlia/oseo/blob/main/docs/language-profile-es2026.md
+[ECMAScript 2026 profile]: ./language-profile-es2026.md
 [evidence directory]: https://github.com/dahlia/oseo/tree/main/docs/evidence
-[contributor guide]: https://github.com/dahlia/oseo/blob/main/CONTRIBUTING.md
+[contributor guide]: ./contributing.md

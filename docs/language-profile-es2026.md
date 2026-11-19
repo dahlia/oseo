@@ -175,9 +175,7 @@ contracts from the additions described here.
 | `for-in` `var` initializers                                    | [Statement forms](#statement-forms)                                                                                                                                       |
 | Call assignment targets                                        | [Statement forms](#statement-forms)                                                                                                                                       |
 
-
-Annex B built-ins
------------------
+### Annex B built-ins
 
 The Annex B B.2 built-ins enter the claim through
 [ADR 0032](./adr/0032-post-m5-edition-boundary.md). They exist in every realm,
@@ -186,7 +184,7 @@ including realms that `$262.createRealm` creates. Their family records are
 owned test262 paths pass, and each record's standards class cites the results
 partitions that hold its rows.
 
-### `escape` and `unescape`
+#### `escape` and `unescape`
 
 The `annexb-escape` unit installs `escape` and `unescape` of B.2.1 as global
 functions. Each is an ordinary built-in function with its specified name, a
@@ -222,7 +220,7 @@ computed from each unit's bits, `unescape` against an independent decoder, and
 the `unescape(escape(s))` round trip. The 35 test262 paths are those under
 *test/annexB/built-ins/escape/* and *unescape/*.
 
-### `String.prototype` methods
+#### `String.prototype` methods
 
 The `annexb-string-methods` unit installs `substr` of B.2.2.1 and the thirteen
 HTML methods of B.2.2.2 through B.2.2.14 on `%String.prototype%` as ordinary
@@ -262,7 +260,7 @@ markup characters, whitespace, and surrogates and checks `substr`, CreateHTML,
 and both trim aliases against independent models. The 105 test262 paths are
 those of these methods under *test/annexB/built-ins/String/prototype/*.
 
-### `Date.prototype` methods
+#### `Date.prototype` methods
 
 The `annexb-date-methods` unit installs `getYear` and `setYear` of B.2.3.1 and
 B.2.3.2 on `%Date.prototype%` as ordinary built-in methods, writable,
@@ -307,9 +305,7 @@ Gregorian calendar model. Its second test observes the read-before-conversion
 case natively. The 24 test262 paths are those under
 *test/annexB/built-ins/Date/prototype/*.
 
-
-Annex B Object accessors
-------------------------
+### Annex B Object accessors
 
 The `annexb-object-accessors` family record covers the normative-optional
 accessor and methods of ECMA-262 20.1.3.8 through 20.1.3.12, which
@@ -386,9 +382,7 @@ partitions that hold them. The two TypedArray rows include
 *tests/test262/harness/* writes its three subclasses as class expressions
 instead of compiling them through the `Function` constructor.
 
-
-Annex B language semantics
---------------------------
+### Annex B language semantics
 
 The `annexb-function-declarations` and `annexb-statement-forms` units implement
 the Annex B rules that change non-strict code: B.3.1 through B.3.5 for
@@ -399,7 +393,7 @@ error they reported before. Their family records are
 test262 rows, 326 pass and six report the parse-time `SyntaxError` they expect;
 each record's standards class cites the results partitions that hold its rows.
 
-### Function declarations
+#### Function declarations
 
 The frontend rewrites the two Annex B declaration positions into forms the
 rest of the compiler already handles. `if (x) function f() {}` becomes a Block
@@ -459,7 +453,7 @@ host Script whose block-level function shares a name with an earlier Script's
 the copy runs, and enumerable for an intrinsic such as `parseInt`. test262
 checks the nested-Block, `arguments`, and attribute cases.
 
-### Statement forms
+#### Statement forms
 
 B.3.5 admits one initializer in a non-strict `for (var x = init in obj)` head
 whose binding is a plain identifier. The frontend emits the initializer as an
@@ -481,7 +475,7 @@ gives, and the abrupt body closes a `for-of` iterator. The five
 *test/annexB/language/statements/try/* rows already passed and need only
 admission.
 
-### Evidence
+#### Evidence
 
 *tests/annexb-function-declarations-native.test.ts* runs the fixtures in
 *tests/native/fixtures/annexb-functions.ts* under both
@@ -507,9 +501,7 @@ domain beyond their fixed shapes, so their record omits the generated class.
 *packages/parser-babel/tests/annexb-functions.test.ts* checks which
 declarations receive a copy and which forms stay early errors.
 
-
-Annex B syntax and `compile`
-----------------------------
+### Annex B syntax and `compile`
 
 The `annexb-syntax` and `annexb-regexp-compile` units add the Annex B
 language syntax that has no family elsewhere and the one Annex B
@@ -522,7 +514,7 @@ class cites the results partitions that hold its rows. The two
 `eval` and are observed as unsupported. They are ADR 0016 exclusions, because
 the exhaustive literal property observes every escaped literal they build.
 
-### HTML-like comments
+#### HTML-like comments
 
 The parser already accepted the B.1.1 comments in Script code and rejected
 them in Module code, and both goals keep that behavior. `<!--` starts a
@@ -532,7 +524,7 @@ line, and after a multi-line comment that contains a line terminator,
 U+2028 and U+2029 included. Anywhere else `-->` is a decrement followed by a
 greater-than comparison. A Module that uses either form reports `OSEO0001`.
 
-### Legacy numeric and string literals
+#### Legacy numeric and string literals
 
 The edition's lexical grammar keeps four legacy forms for sloppy Script code:
 `010`, `08`, the octal string escapes through `\377`, and the string escapes
@@ -550,7 +542,7 @@ padding, and checks a hand-written table of values apart from the hosts.
 *tests/annexb-legacy-literals.test.ts* gives each early error one verdict per
 goal from the compiler and from both hosts.
 
-### Regular expression patterns
+#### Regular expression patterns
 
 A pattern without `u` or `v` follows the grammar of B.1.2 in both places that
 compile patterns: the build-time parser in *regexp-parse.ts*, whose artifact
@@ -612,7 +604,7 @@ same patterns natively as literals and through the runtime compiler. The
 exhaustive literal suite now accepts all 65,521 selected code units of each
 escaped domain and checks the core grammar's 50,784 rejections separately.
 
-### `RegExp.prototype.compile`
+#### `RegExp.prototype.compile`
 
 `compile` of B.2.4.1 is a writable, non-enumerable, configurable method with
 `length` 2 and no `prototype`, installed after `toString` in every realm. It

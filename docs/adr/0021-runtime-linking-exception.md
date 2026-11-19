@@ -34,8 +34,7 @@ inventory and distribution checks whenever a new output input is added.
 Historical proposal
 -------------------
 
-Context
--------
+### Context
 
 Oseo compiles a program and links Oseo-authored support code into the result.
 Under the current licensing, that support code reaches the user under plain
@@ -56,9 +55,7 @@ below are measured against.
 The size and direction of the support surface bear on the choice, so both are
 measured rather than assumed.
 
-
-Probe evidence
---------------
+### Probe evidence
 
 Measurements come from commit `8f2fff6`. Package licensing was read from the
 eight *package.json* and eight *deno.json* manifests under *packages/* and
@@ -68,9 +65,7 @@ commit `4920000`. The generated C came from `runNativeCli` with `--emit-c` on
 the program `const x = 1 + 1;`. Backend emission was read from
 *packages/backend-c/src/index.ts*.
 
-
-Observed results
-----------------
+### Observed results
 
 All eight packages declare `GPL-3.0-only` in both manifest forms, and every
 package *LICENSE* is byte-identical to the repository *LICENSE*, which is the
@@ -109,9 +104,7 @@ support, though this record does not attribute the growth to any one family.
 Relicensing after outside contributions arrive would require agreement from
 those contributors.
 
-
-Correspondence
---------------
+### Correspondence
 
 GNU RT ticket `#2446621` holds the exchange with the FSF Licensing and
 Compliance team, from the maintainer's question on 2026-07-28 to the
@@ -146,9 +139,7 @@ a separately built library.
 Neither answer has arrived. Nothing in the exchange selects an exception,
 resolves whether it reaches source-supplied built-ins, or changes a license.
 
-
-Alternatives considered
------------------------
+### Alternatives considered
 
 1.  **Keep plain GPL everywhere.** Rejected. It leaves the obligation on
     compiled programs unresolved, which is the problem this record opens.
@@ -165,9 +156,7 @@ Alternatives considered
     depends on choosing the text, resolving how it treats self-hosted
     built-ins, and fixing the surface inventory.
 
-
-Decision
---------
+### Decision
 
 This record proposes that the support surface carry GPL-3.0-only plus an
 existing linking exception, while everything else stays GPL-3.0-only without
@@ -196,9 +185,7 @@ built-ins would be packaged, so whether they are embedded per program or linked
 from a shared artifact is undecided, and the surface cannot be sized ahead of
 that decision.
 
-
-Open questions
---------------
+### Open questions
 
 **Which exception.** The GCC Runtime Library Exception 3.1
 (`GPL-3.0-only WITH GCC-exception-3.1`) has the closest precedent and was
@@ -251,9 +238,7 @@ source-supplied built-ins questions should be on file from the FSF licensing
 team or another identified source. The inventory question is settled in the
 repository.
 
-
-Consequences
-------------
+### Consequences
 
 If accepted, the work is larger than a manifest edit. An exception of this
 kind applies to the files that carry its notice, so every covered source and
@@ -280,9 +265,7 @@ Opening the repository to outside contributions is what makes this urgent.
 Until outside contributions arrive, the maintainer can change the license
 without anyone else's agreement.
 
-
-Failure modes and replacement triggers
---------------------------------------
+### Failure modes and replacement triggers
 
  -  Evidence that the selected exception does not reach self-hosted built-ins
     compiled into user programs reopens the choice of text.
@@ -297,9 +280,7 @@ Failure modes and replacement triggers
     how the backend's emitted fragments and the generated file reach users,
     separately from how the executable does.
 
-
-Links
------
+### Links
 
  -  [ADR 0003](./0003-c11-runtime-and-zig-boundary.md) defines the runtime and
     toolchain boundary this record licenses.

@@ -7,7 +7,7 @@ Status
 Accepted on 2026-11-08 as delivery step 2 of
 [*PLAN-CLI.md*](../../PLAN-CLI.md), which requires this contract before
 `oseo build` lands. Until `oseo build` lands, the CLI only executes programs
-from a temporary directory, as [*docs/cli.md*](../cli.md) describes.
+from a temporary directory, as [*docs/using/cli.md*](../using/cli.md) describes.
 
 
 Context
@@ -21,7 +21,7 @@ workflow provides no safe default for any of them.
 
 Today the CLI creates a private temporary directory, builds into it, runs the
 executable, and removes the directory. The Zig adapter's build plan names the
-executable *fixture-<target>* inside the working directory it is given, and
+executable `fixture-<target>` inside the working directory it is given, and
 the final `zig cc ... -o` writes that path directly. No step copies or
 renames the executable afterwards.
 
@@ -138,7 +138,7 @@ file or picks another path.
 
 The toolchain links into the private temporary directory as `run` does. The
 CLI then copies the executable to a new file in the destination's directory,
-named *.<destination name>.oseo-<random>.tmp*, and gives it the linked file's
+named `.<destination name>.oseo-<random>.tmp`, and gives it the linked file's
 permission bits.
 
 Compilation can take minutes, so the check above is repeated at

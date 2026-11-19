@@ -24,5 +24,5 @@ specified Zig executable. The adapter is an Oseo component, not a
 standalone C build tool. See the [toolchain design notes] for target
 mapping and archive reuse.
 
-[Oseo CLI]: https://github.com/dahlia/oseo/blob/main/docs/cli.md
+[Oseo CLI]: https://github.com/dahlia/oseo/blob/main/docs/using/cli.md
 [toolchain design notes]: https://github.com/dahlia/oseo/blob/main/docs/development/package-toolchain-zig.md

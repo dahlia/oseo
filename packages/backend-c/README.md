@@ -6,7 +6,7 @@ representation (MIR). It does not parse JavaScript, choose runtime inputs, or
 invoke a C compiler. If you only want to inspect the C for a JavaScript or
 TypeScript file, run `oseo build FILE --emit-c` with the [Oseo CLI].
 
-[Oseo CLI]: https://github.com/dahlia/oseo/blob/main/docs/cli.md
+[Oseo CLI]: https://github.com/dahlia/oseo/blob/main/docs/using/cli.md
 
 
 Emit C from MIR

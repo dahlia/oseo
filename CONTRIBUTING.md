@@ -336,7 +336,7 @@ Tests shared by Node.js and Deno must import `test` from `node:test` and
 hosts execute unchanged. Do not add host-specific registration wrappers or
 repository-local assertion helpers for APIs provided by these modules.
 
-Place tests owned by one package under *packages/<package>/tests/* and name
+Place tests owned by one package under `packages/<package>/tests/` and name
 executable test files *.test.ts* so Node.js and Deno discover them. Reserve the
 repository-level *tests/* directory for cross-package integration, native
 fixtures, built-artifact validation, and workspace tooling. A package test may
@@ -449,7 +449,7 @@ model. Keep example, differential, structural, sanitizer, and standards tests
 when they prove contracts that generated observations cannot.
 
 Property tests use `fast-check` and the *.property.test.ts* suffix. Package
-properties live under *packages/<package>/tests/*; cross-package native
+properties live under `packages/<package>/tests/`; cross-package native
 properties live under *tests/property/*. The same package test source runs
 unchanged under Node.js and Deno.
 
@@ -636,6 +636,8 @@ path recorded twice, and rewrites the index, summary, and parity from that
 union. Use it to repair the derived files after merging two branches whose
 scoped updates touched disjoint paths. It never changes a record, cannot judge
 freshness, and treats a path recorded twice as an error to resolve by hand.
+
+### CI test sharding
 
 The wrapper's `--shard INDEX/TOTAL` uses the checked-in measured weights in
 *tools/native-shard-costs.ts*. It sorts files by descending weight, breaking

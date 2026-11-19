@@ -380,14 +380,16 @@ export function legacyCallerSelector(record: string): ReadonlySet<string> {
   const lines = record.split("\n");
   const heading = lines.findIndex(
     (line, index) =>
-      line === "Exact selector" && /^-+$/u.test(lines[index + 1] ?? ""),
+      /^#{2,6} Exact selector$/u.test(line) ||
+      (line === "Exact selector" && /^-+$/u.test(lines[index + 1] ?? "")),
   );
   if (heading < 0) {
     throw new Error("ADR 0028 needs its Exact selector section.");
   }
   const paths: string[] = [];
-  for (const line of lines.slice(heading + 2)) {
-    if (/^-+$/u.test(line)) break;
+  const start = heading + (lines[heading]!.startsWith("#") ? 1 : 2);
+  for (const line of lines.slice(start)) {
+    if (/^(?:-+|#{1,6} .+)$/u.test(line)) break;
     const match = /^ -  \*(test\/[^*]+)\*(?: \(dynamic source\))?$/u.exec(line);
     if (match != null) paths.push(match[1]!.replace(/\\(.)/gu, "$1"));
   }

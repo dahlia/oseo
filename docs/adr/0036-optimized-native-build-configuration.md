@@ -220,9 +220,9 @@ undefined behavior the debug build happened to tolerate, now becomes a
 fixture or scheduled-job failure rather than staying latent. The UBSan
 evidence from `checked` remains the guard against introducing such code.
 
-The command-line option becomes public in [*docs/cli.md*](../cli.md) when
-the implementation lands, and [*PLAN-CLI.md*](../../PLAN-CLI.md) records it
-in its option inventory.
+The command-line option becomes public in
+[*docs/using/cli.md*](../using/cli.md) when the implementation lands, and
+[*PLAN-CLI.md*](../../PLAN-CLI.md) records it in its option inventory.
 
 
 Failure modes and replacement triggers

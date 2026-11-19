@@ -179,7 +179,7 @@ The deterministic partition group is the same path group used by the summary:
 the first two directory segments under *test/*. Within that group, the key is
 the first byte of the SHA-256 digest of the upstream path, written as two
 lowercase hexadecimal digits. A partition path is exactly
-*results/<group>/<key>.yaml*. This bounded hash bucket avoids recreating one
+`results/<group>/<key>.yaml`. This bounded hash bucket avoids recreating one
 large file for a high-volume group while keeping nearby review changes within
 the owning group. The index order, each partition's record order, group, key,
 path, revision, and derived summary are validated when read. Regeneration also

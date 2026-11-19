@@ -23,7 +23,7 @@ printf '[[20,22]]\n' | ./artifacts/numeric 1
 `build` leaves the executable at *artifacts/numeric* without starting it.
 The executable runs directly, without Node.js or Zig. To compile and run
 in one step without retaining the executable, replace `build` with `run`
-and omit the `-o` option. The [CLI reference](../cli.md) also covers
+and omit the `-o` option. The [CLI reference](./cli.md) also covers
 intermediate representation and C output.
 
 The [examples directory] includes the numeric program without annotations,

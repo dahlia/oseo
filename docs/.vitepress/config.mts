@@ -1,9 +1,10 @@
-import { readdirSync, readFileSync } from "node:fs";
+import { readFileSync } from "node:fs";
 import process from "node:process";
 import { defineConfig, type HeadConfig } from "vitepress";
+import { withMermaid } from "vitepress-plugin-mermaid";
 import { checkInternalLinks } from "./links.mjs";
+import { adrIndex, repositoryLinks, srcExclude } from "./sources.mjs";
 
-const siteSources = new Set(["index.md", "cli.md", "using", "development"]);
 const stableOrigin = "https://oseo.dev";
 const canaryOrigin = "https://canary.oseo.dev";
 const rawChannel = process.env.OSEO_DOCS_CHANNEL ?? "preview";
@@ -51,80 +52,128 @@ if (channel !== "stable") {
   head.push(["meta", { name: "robots", content: "noindex" }]);
 }
 
-export default defineConfig({
-  title,
-  description,
-  cleanUrls: true,
-  // Keep engineering records in the repository rather than rendering them.
-  srcExclude: readdirSync(new URL("../", import.meta.url), {
-    withFileTypes: true,
-  })
-    .filter(({ name }) => !name.startsWith(".") && !siteSources.has(name))
-    .map((entry) => (entry.isDirectory() ? `${entry.name}/**` : entry.name)),
-  head,
-  transformPageData(page) {
-    if (origin == null || page.relativePath === "404.md") return;
-    const path = page.relativePath
-      .replace(/(^|\/)index\.md$/u, "$1")
-      .replace(/\.md$/u, "");
-    const url = new URL(path, origin).href;
-    page.frontmatter.head ??= [];
-    page.frontmatter.head.push(
-      ["link", { rel: "canonical", href: url }],
-      ["meta", { property: "og:url", content: url }],
-    );
-  },
-  markdown: {
-    config(md) {
-      md.core.ruler.before("normalize", "oseo-quickstart", (state) => {
-        state.src = state.src.replace(
-          "<!-- OSEO_STABLE_QUICKSTART -->",
-          () => quickstart,
-        );
-      });
+const config = withMermaid(
+  defineConfig({
+    title,
+    description,
+    cleanUrls: true,
+    // Keep engineering records in the repository rather than rendering them.
+    srcExclude,
+    head,
+    transformPageData(page) {
+      if (origin == null || page.relativePath === "404.md") return;
+      const path = page.relativePath
+        .replace(/(^|\/)index\.md$/u, "$1")
+        .replace(/\.md$/u, "");
+      const url = new URL(path, origin).href;
+      page.frontmatter.head ??= [];
+      page.frontmatter.head.push(
+        ["link", { rel: "canonical", href: url }],
+        ["meta", { property: "og:url", content: url }],
+      );
     },
-  },
-  buildEnd: (site) => checkInternalLinks(site.outDir, origin ?? undefined),
-  themeConfig: {
-    nav: [
-      { text: "Using Oseo", link: "/using/install" },
-      { text: "Development", link: "/development/" },
-      ...(version != null ? [{ text: version, link: "/using/install" }] : []),
-      ...(channel === "canary"
-        ? [{ text: "Stable docs", link: `${stableOrigin}/` }]
-        : []),
-    ],
-    sidebar: [
-      {
-        text: "Using Oseo",
-        items: [
-          { text: "Installation", link: "/using/install" },
-          { text: "Examples", link: "/using/examples" },
-          { text: "CLI reference", link: "/cli" },
-          { text: "Supported features", link: "/using/features" },
-        ],
+    markdown: {
+      include: { rebaseRelativeUrls: false },
+      config(md) {
+        repositoryLinks(
+          md,
+          channel === "stable" ? version : process.env.GITHUB_SHA || "main",
+        );
+        md.core.ruler.before("normalize", "oseo-quickstart", (state) => {
+          state.src = state.src
+            .replace("<!-- OSEO_STABLE_QUICKSTART -->", () => quickstart)
+            .replace("<!-- OSEO_ADR_INDEX -->", () => adrIndex);
+        });
       },
-      {
-        text: "Development",
-        items: [
-          { text: "Contributing", link: "/development/" },
-          { text: "Architecture and decisions", link: "/development/design" },
-          { text: "Evidence", link: "/development/evidence" },
-        ],
-      },
-    ],
-    socialLinks: [
-      { icon: "github", link: "https://github.com/dahlia/oseo" },
-      {
-        icon: "jsr",
-        link: "https://jsr.io/@oseo/cli",
-        ariaLabel: "Oseo on JSR",
-      },
-      {
-        icon: "npm",
-        link: "https://www.npmjs.com/package/@oseo/cli",
-        ariaLabel: "Oseo on npm",
-      },
-    ],
-  },
-});
+    },
+    buildEnd: (site) => checkInternalLinks(site.outDir, origin ?? undefined),
+    themeConfig: {
+      nav: [
+        { text: "Overview", link: "/overview/" },
+        { text: "Using Oseo", link: "/using/install" },
+        { text: "Development", link: "/development/" },
+        ...(version != null ? [{ text: version, link: "/using/install" }] : []),
+        ...(channel === "canary"
+          ? [{ text: "Stable docs", link: `${stableOrigin}/` }]
+          : []),
+      ],
+      sidebar: [
+        {
+          text: "Overview",
+          items: [
+            { text: "Introduction", link: "/overview/" },
+            { text: "Comparison", link: "/overview/comparison" },
+            { text: "White paper", link: "/overview/white-paper" },
+            { text: "Roadmap", link: "/overview/roadmap" },
+          ],
+        },
+        {
+          text: "Using Oseo",
+          items: [
+            { text: "Installation", link: "/using/install" },
+            { text: "Examples", link: "/using/examples" },
+            { text: "CLI reference", link: "/using/cli" },
+            { text: "Supported features", link: "/using/features" },
+          ],
+        },
+        {
+          text: "Development",
+          items: [
+            { text: "Development setup", link: "/development/" },
+            { text: "Contributing", link: "/development/contributing" },
+            { text: "Releasing", link: "/development/releasing" },
+            {
+              text: "Architecture",
+              items: [
+                { text: "Architecture overview", link: "/development/design" },
+                {
+                  text: "Compiler design",
+                  link: "/development/compiler-design",
+                },
+                {
+                  text: "Runtime components",
+                  link: "/development/runtime-components",
+                },
+                { text: "Architecture decision records", link: "/adr/" },
+              ],
+            },
+            {
+              text: "Language compatibility",
+              items: [
+                {
+                  text: "ECMAScript 2026 profile",
+                  link: "/development/language-profile-es2026",
+                },
+                {
+                  text: "M5 profile (historical)",
+                  link: "/development/language-profile-m5",
+                },
+              ],
+            },
+            { text: "Evidence", link: "/development/evidence" },
+            { text: "Security", link: "/development/security" },
+          ],
+        },
+      ],
+      socialLinks: [
+        { icon: "github", link: "https://github.com/dahlia/oseo" },
+        {
+          icon: "jsr",
+          link: "https://jsr.io/@oseo/cli",
+          ariaLabel: "Oseo on JSR",
+        },
+        {
+          icon: "npm",
+          link: "https://www.npmjs.com/package/@oseo/cli",
+          ariaLabel: "Oseo on npm",
+        },
+      ],
+    },
+  }),
+);
+
+// The plugin lists Mermaid's transitive dependencies as top-level imports.
+// Under pnpm, pre-bundle Mermaid itself so Vite resolves them from Mermaid.
+config.vite.optimizeDeps.include = ["mermaid"];
+
+export default config;

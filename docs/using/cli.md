@@ -5,7 +5,7 @@ Status
 ------
 
 This guide describes the command line implemented by the current Oseo
-checkout. See [supported features](./using/features.md) for the measured
+checkout. See [supported features](./features.md) for the measured
 language profile and current limits.
 
 
@@ -25,7 +25,7 @@ mise run oseo --help
 The remaining examples use `oseo`, the command name for the standalone
 archive and npm package. In a development checkout, replace `oseo`
 with `mise run oseo` (or `mise oseo`). See
-[installation](./using/install.md) for the distinction between the
+[installation](./install.md) for the distinction between the
 checkout and release channels.
 
 The npm and checkout commands require Node.js 24 or later. The standalone
@@ -111,7 +111,7 @@ objects have separate cache identities for each configuration.
 [ADR 0036] defines the
 compiler options and verification gates.
 
-[ADR 0036]: https://github.com/dahlia/oseo/blob/main/docs/adr/0036-optimized-native-build-configuration.md
+[ADR 0036]: ../adr/0036-optimized-native-build-configuration.md
 
 
 Retain a native executable
@@ -142,7 +142,7 @@ links use the fallback and race boundary recorded in
 [ADR 0037]. Publication is atomic
 for readers but does not promise crash durability.
 
-[ADR 0037]: https://github.com/dahlia/oseo/blob/main/docs/adr/0037-retained-native-executables.md
+[ADR 0037]: ../adr/0037-retained-native-executables.md
 
 
 Compile and run a script
@@ -305,7 +305,7 @@ Source-language limits
 ----------------------
 
 TypeScript annotations and JSDoc types are optimization hints. Oseo does not
-run the TypeScript type checker. See [supported features](./using/features.md)
+run the TypeScript type checker. See [supported features](./features.md)
 for the scope of the ECMAScript 2026 measurement and the host API boundaries.
 
 
@@ -354,7 +354,7 @@ The `--dump-mir` and `--emit-c` modes can still isolate frontend or backend
 problems because they do not start the toolchain.
 
 If Oseo reports `OSEO1001`, compare the source form with the
-[supported features](./using/features.md). A *.ts* filename does not imply
+[supported features](./features.md). A *.ts* filename does not imply
 that Oseo accepts the full TypeScript language or performs type checking.
 
 Run `oseo --help` when scripting the command. Its usage and option descriptions
@@ -396,4 +396,4 @@ output by default; `inheritOutput` selects inherited stdout and stderr and
 returns empty output strings. Combining inherited stdin with explicit
 `input`, or inherited output with `captureBytes`, throws a `TypeError`.
 
-[ADR 0038]: https://github.com/dahlia/oseo/blob/main/docs/adr/0038-process-input-and-exit-subset.md
+[ADR 0038]: ../adr/0038-process-input-and-exit-subset.md
