@@ -21,8 +21,8 @@ The shortest accurate description is therefore not “TypeScript to native.”
 Oseo compiles both the dynamic answer and selected checked shortcuts before the
 program starts.
 
-This comparison reflects Oseo at commit `9eb7de2` and, unless noted otherwise,
-public sources inspected on 26 July 2026. Version-sensitive observations
+This comparison reflects Oseo at commit `4cbe20c9` and, unless noted otherwise,
+public sources checked on 19 November 2026. Version-sensitive observations
 below identify the source or revision used.
 
 That distinction is already implemented in a deliberately narrow but real
@@ -47,10 +47,10 @@ all occupy the same layer.
 | Node.js                | JavaScript, with TypeScript normally erased before execution            | V8 interpreter and several JIT tiers                                             | No role in V8 after ordinary TypeScript erasure                             | A general server runtime and the Node.js API ecosystem                 |
 | Bun (experimental AOT) | JavaScript and TypeScript                                               | Native code in a JIT-free JavaScriptCore runtime; interpreter for dynamic source | TypeScript checking at build time; annotations guide guarded specialization | Bun executables with build-time compilation of reachable code          |
 | AssemblyScript         | A strictly typed TypeScript-like language                               | Ahead-of-time compilation to WebAssembly                                         | Types define what programs mean and which programs are valid                | Small, efficient WebAssembly modules                                   |
-| Perry                  | A practical TypeScript and JavaScript subset                            | Ahead-of-time LLVM native code, with an optional JavaScript evaluator path       | Types are erased; compiler inference guides native code generation          | Native applications and broad practical API compatibility              |
-| scriptc                | TypeScript and JavaScript checked against a compiler-owned type surface | Typed LLVM or C native code, with an opt-in QuickJS-ng island                    | Checker results choose representations; dynamic crossings are validated     | Small native programs with practical Node.js and package compatibility |
-| Porffor                | An experimental JavaScript/TypeScript sub- and superset                 | Ahead-of-time WebAssembly, with a separate IR-to-C native path                   | Annotations can be enabled as unchecked optimization input                  | Tiny, from-scratch AOT JavaScript research                             |
-| Static Hermes          | A sound typed JavaScript subset plus untyped JavaScript                 | Native compilation for typed code alongside evolving VM tiers                    | Typed annotations are enforced with compile-time and checked casts          | High-performance typed JavaScript and React Native                     |
+| Perry                  | A practical TypeScript and JavaScript subset                            | LLVM native code; a limited evaluator for runtime source                         | Types are erased; compiler inference guides native code generation          | Native applications and broad practical API compatibility              |
+| scriptc                | TypeScript and JavaScript checked against a compiler-owned type surface | LLVM native or WASI output; in-process Node.js for selected modules              | Checker results choose representations; dynamic operations are checked      | Small native programs with practical Node.js and package compatibility |
+| Porffor                | An experimental JavaScript/TypeScript sub- and superset                 | Ahead-of-time native code through C                                              | Annotations can guide optimization without a type check                     | Small artifacts and compiler self-hosting                              |
+| Static Hermes          | A sound typed JavaScript dialect beside untyped JavaScript              | Native compilation for both modes; Hermes also runs bytecode                     | Typed mode enforces annotations with static checks and runtime casts        | JavaScript compilation and the React Native engine                     |
 | QuickJS                | JavaScript                                                              | Stack bytecode interpreted by QuickJS                                            | No TypeScript optimization contract                                         | A small embeddable JavaScript engine                                   |
 | Oseo                   | An explicit JavaScript profile plus erasable TypeScript syntax          | Generic native code plus guarded specialized native code                         | Annotations are fallible hints and must not affect behavior                 | A standards-measured, whole-program native server runtime              |
 
@@ -68,8 +68,8 @@ Node.js is the practical baseline for server-side JavaScript, but it is not an
 ahead-of-time JavaScript compiler. Its language engine is V8. In V8, JavaScript
 first becomes Ignition bytecode and begins execution without assumptions about
 future values. The engine gathers type and object-shape feedback while the
-program runs. Sparkplug, Maglev, and TurboFan then occupy progressively more
-optimized tiers.
+program runs. Sparkplug is the baseline JIT; Maglev and TurboFan are
+optimizing tiers.
 
 Maglev can emit a checked fixed-offset property load after observing a stable
 shape, but it also emits frame-state metadata so a failed assumption can
@@ -99,12 +99,16 @@ as a compact home for cold code. In return, its executable does not need the
 profiling, tiering, on-stack replacement, and deoptimization machinery that
 makes adaptive optimization possible.
 
-Node.js single-executable applications do not change this distinction. The
-current [Node.js SEA documentation] says that a prepared blob containing a
-bundled script is injected into the `node` binary and executed when that binary
-starts. Code cache and startup snapshots can reduce startup work, but the
-result remains a Node.js and V8 executable. “One file” describes distribution,
-not whole-program native compilation.
+Node.js single-executable applications do not change this distinction.
+In Node.js 26.13.1, [`node --build-sea`][Node.js SEA documentation] embeds a
+CommonJS or ES module entry point in the `node` executable. Code cache and
+startup snapshots can reduce startup work, but the result still runs on V8.
+“One file” describes distribution, not whole-program native compilation.
+
+[`deno compile`][Deno compile documentation] similarly packages the program
+with a stripped Deno runtime. It uses V8 by default and offers an experimental
+QuickJS option. Replacing the JIT-capable engine with an interpreter still
+does not compile the application to native code.
 
 Current Node.js can also execute files that contain erasable TypeScript syntax.
 Its [TypeScript documentation] says that Node.js replaces the syntax with
@@ -124,29 +128,29 @@ architectural base. The distinction matters whenever a package assumes
 automatically from compiling JavaScript semantics.
 
 [Maglev description]: https://v8.dev/blog/maglev
-[Node.js SEA documentation]: https://nodejs.org/api/single-executable-applications.html
-[TypeScript documentation]: https://nodejs.org/api/typescript.html
+[Node.js SEA documentation]: https://nodejs.org/download/release/v26.13.1/docs/api/single-executable-applications.html
+[Deno compile documentation]: https://docs.deno.com/runtime/reference/cli/compile/#choosing-a-javascript-engine
+[TypeScript documentation]: https://nodejs.org/download/release/v26.13.1/docs/api/typescript.html
 [Minimum common web API]: https://min-common-api.proposal.wintertc.org/
 
 
 Bun: native AOT with a JavaScriptCore interpreter
 -------------------------------------------------
 
-The experimental `bun compile` command compiles JavaScript and TypeScript
-to machine code, including reachable functions from npm dependencies. The
-older `bun build --compile` packages the program with the ordinary Bun
-runtime, where JavaScriptCore can still JIT-compile code as it runs. The AOT
-executable instead keeps JavaScriptCore's value model, garbage collector,
-and interpreter but leaves out its JIT tiers.
+The experimental `bun compile` command (`bun build --compile --aot`) compiles
+JavaScript and TypeScript to machine code, including reachable functions from
+npm dependencies. Without `--aot`, `bun build --compile` packages the program
+with the ordinary Bun runtime, where JavaScriptCore can still JIT-compile
+code as it runs. The AOT executable keeps JavaScriptCore's value model,
+garbage collector, and interpreter but leaves out its JIT tiers.
 
-Bun and Oseo handle a failed specialization guard in much the same way:
-control passes to code already compiled into the executable, without
+Bun and Oseo both handle guard failures in compiled code without
 reconstructing an interpreter frame. Bun's [AOT design] describes local
-generic branches as well as separate loop and function versions. An
-interpreter remains available for a different case: source that was not
-known at build time, such as a string constructed at run time and passed
-to `new Function()`. Oseo's closed profile rejects dynamic source rather
-than retaining an interpreter for it.
+generic branches and cases where a loop iteration restarts in another
+compiled version. Oseo's fallback must not replay visible work. Bun keeps
+an interpreter for supported runtime source strings and for code loaded from
+disk with `--aot-allow-code-from-disk`. Oseo does not retain an interpreter
+for either case.
 
 Bun checks TypeScript at build time and can reject type errors. In code
 that compiles, a TypeScript annotation can guide speculation but does not
@@ -157,12 +161,11 @@ mutations in AOT mode: replacing `Array.prototype.push()`, for example,
 is disallowed. The ability to compile a program ahead of time does not
 imply that it behaves the same as under `bun run`.
 
-This comparison uses the November 2026 [AOT design] and the
-[Bun AOT documentation] inspected on 18 November 2026. It compares
-execution models, not benchmark results.
+The [Bun AOT documentation] describes the canary at `8206e7e`. Stable Bun
+1.4.4 does not include this AOT compiler.
 
 [AOT design]: https://bun.com/bun-aot-how
-[Bun AOT documentation]: https://bun.com/docs/compiler/aot
+[Bun AOT documentation]: https://github.com/oven-sh/bun/blob/8206e7e27918ba10b8819ea3c13ecea32606abb6/docs/compiler/aot.mdx
 
 
 AssemblyScript: familiar syntax, a different language
@@ -175,14 +178,15 @@ without porting. The language is intentionally strict. It has WebAssembly
 integer types, no `any`, no general `undefined`, restricted objects, and no
 prototype patching. Several dynamic JavaScript features are omitted because
 supporting them would pull the implementation toward an interpreter. The
-[AssemblyScript concepts guide] makes that trade explicit.
+[AssemblyScript concepts guide] makes that trade explicit. The release
+checked here is [AssemblyScript 0.28.20].
 
 This is not a temporary gap on the way to becoming Oseo. It is a different
 answer to AOT compilation. AssemblyScript obtains predictable WebAssembly by
 narrowing the language and asking types to prove what machine operations are
-valid. An `i32` annotation is a semantic commitment. A TypeScript assertion
-acts as a conversion. Code that violates the type rules is not another dynamic
-case for a generic JavaScript operator.
+valid. An `i32` annotation is a semantic commitment. TypeScript-style
+[assertions in AssemblyScript] are explicit conversions. Code that violates
+the type rules is not another dynamic case for a generic JavaScript operator.
 
 Oseo preserves the opposite rule. A parameter annotated as `number` may receive
 a string through `any`, an assertion, plain JavaScript, or an untyped package.
@@ -193,8 +197,8 @@ type annotation must not change the result.
 
 The deployment boundary differs as much as the type system. AssemblyScript
 produces a WebAssembly module whose access to the outside world comes through
-explicit imports. That gives it a strong sandbox and makes a JavaScript or
-standalone WebAssembly host part of the application design.
+explicit imports. A JavaScript or standalone WebAssembly host controls which
+external capabilities it supplies through those imports.
 
 Oseo currently emits native executables and owns a private runtime ABI,
 collector, module linker, promise jobs, and scheduler. Its future web and
@@ -210,6 +214,8 @@ taking on the more expensive problem of accepting dynamic JavaScript behavior
 without retaining a JavaScript VM tier.
 
 [AssemblyScript concepts guide]: https://www.assemblyscript.org/concepts.html
+[AssemblyScript 0.28.20]: https://github.com/AssemblyScript/assemblyscript/releases/tag/v0.28.20
+[assertions in AssemblyScript]: https://www.assemblyscript.org/types.html#casting
 
 
 Perry: a broad native application compiler
@@ -223,13 +229,14 @@ library, Web APIs, and native extension support. This is real compiler and
 runtime work, not a Node.js single-file wrapper. Perry's
 [compiler introduction] and [memory model] describe that pipeline directly.
 
-The product center is different. Perry asks how much useful TypeScript,
-JavaScript, npm, Node.js, and platform UI code can become a deployable native
-application now. It supports a practical subset, infers types for native code,
-and offers an optional JavaScript evaluator for packages that are not compiled
-natively. Its [runtime opt-in policy] treats that evaluator as privileged and
-requires an explicit build choice. That boundary is thoughtful, but it is
-still a compatibility route that Oseo's present design excludes.
+Perry focuses on compiling applications that use TypeScript, npm packages,
+Node.js APIs, and platform UI libraries. In [Perry 0.5.1665], the
+[compile gate] rejects modules that would require a separate JavaScript
+engine. The [old V8 integration] has been removed, despite older flag
+documentation still describing it. Perry does retain a [limited evaluator]
+that walks SWC syntax trees for supported runtime source, including some
+`new Function()` patterns used by libraries. That is not a general npm
+fallback or an Oseo-style compiled guard miss.
 
 Oseo asks a narrower engine question before it asks the product question:
 what generic ECMAScript semantics does an accepted construct have for every
@@ -252,33 +259,22 @@ in several policies:
     until its ECMAScript and native I/O foundations can support measured
     compatibility.
 
-Perry's public documentation changes quickly and currently disagrees about
-some implementation details. For example, its runtime opt-in page describes a
-QuickJS-based evaluator, while its [CLI flag reference] calls the optional
-runtime V8. The stable fact for this comparison is the explicit optional
-evaluator boundary, not which engine implements it in a particular release.
-The same caution applies to advertised compatibility percentages. Oseo's
-current capability is much smaller, but its checked-in manifest has a fixed
-denominator, exact upstream revision, and classifications that do not turn
-unsupported cases into passes.
-
 [compiler introduction]: https://docs.perryts.com/
-[memory model]: https://docs.perryts.com/internals/memory-model.html
-[runtime opt-in policy]: https://docs.perryts.com/cli/allow-js-runtime.html
-[CLI flag reference]: https://docs.perryts.com/cli/flags.html
+[memory model]: https://github.com/PerryTS/perry/blob/08b384fa365bf1a656498f629f97d6a9e688cffd/docs/src/internals/memory-model.md
+[Perry 0.5.1665]: https://github.com/PerryTS/perry/releases/tag/v0.5.1665
+[compile gate]: https://github.com/PerryTS/perry/blob/08b384fa365bf1a656498f629f97d6a9e688cffd/crates/perry/src/commands/compile/bootstrap.rs#L360-L369
+[old V8 integration]: https://github.com/PerryTS/perry/blob/08b384fa365bf1a656498f629f97d6a9e688cffd/crates/perry-runtime/src/closure/v8_stubs.rs#L1-L15
+[limited evaluator]: https://github.com/PerryTS/perry/blob/08b384fa365bf1a656498f629f97d6a9e688cffd/crates/perry-runtime/src/dyn_eval/mod.rs#L1-L23
 
 
 scriptc: typed native code with an explicit VM boundary
 -------------------------------------------------------
 
-scriptc is a direct product comparison because its default artifact looks much
-like the artifact Oseo eventually wants to ship: a small native executable,
-compiled ahead of time, without Node.js, V8, or a JavaScript engine. At
-scriptc commit [`ee1f869`], TypeScript 7 parses and checks the program, the
-compiler converts the checker output into a typed IR, and the default backend
-lowers that IR through LLVM. A C emitter remains as a reference and fallback
-backend. The executable links only the feature-selected parts of scriptc's C
-runtime.
+An island-free [scriptc 0.4.14] executable resembles Oseo's output: native
+code compiled ahead of time, without a general JavaScript engine. The
+compiler uses a TypeScript checker to build a typed IR and LLVM 22 to emit
+native or WASI output. The old C code generator is gone, but the compiler still
+links in C runtime support.
 
 That last detail gives “zero-runtime TypeScript” a precise meaning. A static
 scriptc artifact has no general JavaScript engine, but it does have a native
@@ -287,15 +283,12 @@ networking, and other selected features. This is close to Oseo's deployment
 goal and unlike a QuickJS bytecode executable. It is not the same compilation
 contract.
 
-The largest difference is what types are allowed to prove. scriptc's typed IR
-records a concrete type on every expression. It has monomorphic arrays, exact
-records, tagged unions, and distinct representations for values that cross its
-dynamic boundary. The compiler can monomorphize generic code and select native
-operations for supported generic functions because the TypeScript checker
-result is part of the admitted program. Its [documented limitations] make the
-consequences explicit: structures are exact, arrays are dense, several
-JavaScript coercions and reflection cases are rejected or differ, and a false
-assertion can fail a runtime validation.
+The largest difference is what types are allowed to prove. scriptc uses
+checker results to choose representations and lower supported generic code.
+Values typed as `any` or `unknown` can compile natively in its
+[checked-dynamic model]. An operation that crosses into a typed
+representation can fail validation rather than take a generic JavaScript
+path.
 
 Oseo reads the same annotation as fallible provenance. A `number` annotation
 may justify adding a guarded numeric path, but it cannot remove the generic
@@ -305,29 +298,19 @@ defining a compiler-owned type and runtime model. Oseo is instead trying to
 preserve the behavior of its declared ECMAScript profile when annotations are
 erased, added, or falsified.
 
-scriptc handles code outside its static type model through an explicit second
-choice. The `--dynamic` flag links QuickJS-ng for npm packages that ship
-JavaScript and for values typed as `any`. Values are copied and validated when
-they cross the boundary, and the island has its own heap and microtask queue.
-This makes the compatibility cost visible and opt-in. It also means scriptc
-does not require a compiled generic ECMAScript path beside every typed native
-function.
+Modules that scriptc cannot compile natively are a separate case. Under the
+[default Node island policy], unsupported npm dependencies can run in an
+in-process Node.js runtime. Application modules must be marked explicitly;
+`--node-islands=off` disables that fallback altogether. An executable with
+an island is not engine-free.
 
 Oseo's closed profile excludes this VM tier. Its generic fallback must be
 native code in the same artifact, while any future runtime source compiler must
 also produce native code as an explicit capability.
 
-scriptc's LLVM-to-C fallback should not be confused with that dynamic island.
-Both backends consume the same typed IR and produce native code. When the
-default LLVM backend does not yet cover an IR feature, the compiler retries
-only emission through C; it does not repeat the frontend or switch the program
-to interpreted JavaScript. Pinning the LLVM backend turns the same limitation
-into a diagnostic. The execution-model boundary is between the static compiler
-and opt-in QuickJS-ng, not between the LLVM and C emitters.
-
 The runtimes reflect the two semantic models. scriptc uses typed layouts,
-reference counting with a synchronous cycle collector, stackful fibers, and a
-native server stack. Oseo uses a tagged generic value ABI, tracing collection,
+reference counting with a cycle collector, and both stackless coroutines and
+stackful fibers. Oseo uses a tagged generic value ABI, tracing collection,
 and explicit continuation frames so that generic JavaScript values can survive
 calls, suspension, and guard failure without changing representation. scriptc
 already exposes a substantially broader server and package surface. Oseo is
@@ -335,65 +318,35 @@ spending more of its current effort on the generic semantic substrate that
 scriptc's type contract lets it narrow.
 
 Their compatibility evidence also answers different questions. scriptc's
-[architecture guide] says correctness means matching Node.js on differential
-tests, not claiming that a feature has been implemented directly from the
-specification. The [scriptc overview] reports more than 800 differential
-tests, along with sanitizer and reference-counting audits. Oseo compares with
-Node.js and Deno too, but M5 additionally pins an ECMA-262 edition and test262
-revision and records every reviewed pass, negative, and unsupported case in a
-manifest. scriptc is measuring whether its supported programs behave like
-Node.js. Oseo is building a versioned standards claim before broadening its
-host APIs.
+[architecture guide] describes differential tests against Node.js alongside
+sanitizer checks. Oseo also compares behavior with Node.js and Deno, but
+its language profile additionally pins an ECMA-262 edition and a test262
+revision and records each reviewed pass, expected negative, and unsupported
+case.
 
-scriptc demonstrates why Oseo's lack of a `tsc` dependency is a choice rather
-than a technical impossibility. The compiler pins TypeScript 7.0.2 and its
-[TypeScript frontend adapter] imports `typescript/unstable/sync`. That gives
-scriptc authoritative checker types at the cost of tracking an explicitly
-unstable API. Oseo avoids that dependency because checker authority would
-conflict with its false-hint invariant, and because syntax-level hints are
-enough for the guarded optimizations it permits.
-
-This comparison uses scriptc 0.0.14 at the fixed revision above. It compares
-contracts rather than benchmark results: scriptc is already much broader as a
-native TypeScript product, while Oseo currently implements a smaller
-ECMAScript profile with a stricter generic-fallback requirement.
-
-[`ee1f869`]: https://github.com/vercel-labs/scriptc/tree/ee1f8697b800d00f0cc674f806b4960aa5f9e291
-[documented limitations]: https://github.com/vercel-labs/scriptc/blob/ee1f8697b800d00f0cc674f806b4960aa5f9e291/docs/src/app/limitations/page.mdx
-[architecture guide]: https://github.com/vercel-labs/scriptc/blob/ee1f8697b800d00f0cc674f806b4960aa5f9e291/docs/src/app/how-it-works/page.mdx
-[scriptc overview]: https://github.com/vercel-labs/scriptc/blob/ee1f8697b800d00f0cc674f806b4960aa5f9e291/README.md
-[TypeScript frontend adapter]: https://github.com/vercel-labs/scriptc/blob/ee1f8697b800d00f0cc674f806b4960aa5f9e291/packages/compiler/src/frontend/ts7/program.ts#L1-L27
+[scriptc 0.4.14]: https://github.com/vercel-labs/scriptc/releases/tag/v0.4.14
+[checked-dynamic model]: https://github.com/vercel-labs/scriptc/blob/04d854f64341fea7c5a23f40478b7cfd2ee52908/docs/content/limitations/untyped-values.mdx
+[default Node island policy]: https://github.com/vercel-labs/scriptc/blob/04d854f64341fea7c5a23f40478b7cfd2ee52908/packages/compiler/src/node-islands/policy.ts
+[architecture guide]: https://github.com/vercel-labs/scriptc/blob/04d854f64341fea7c5a23f40478b7cfd2ee52908/docs/content/docs/how-it-works.mdx
 
 
 Porffor: the nearest compiler research comparison
 -------------------------------------------------
 
 Porffor shares Oseo's starting point as a compiler built apart from an
-existing JavaScript VM. It is written in JavaScript, uses an external parser
-behind a from-scratch compiler, has no interpreter or JIT in the ordinary path,
-accepts JavaScript and TypeScript syntax, runs test262, and can produce both
-WebAssembly and native binaries. Its [project site] and [current README]
-describe it as an experimental JavaScript/TypeScript-to-WebAssembly/C engine,
-compiler, and runtime. It even offers `--opt-types`, which uses unchecked type
-annotations as compiler hints.
+existing JavaScript VM. In [Porffor alpha 25], the compiler uses its own parser
+and lowers JavaScript through an IR to C, with no interpreter or JIT. The
+release ships native Linux and macOS binaries. Its [CI workflow] builds the
+self-hosted compiler through C and checks it with a test262 harness. Oseo also
+emits C today, but self-hosting is still a roadmap milestone.
 
-Porffor's primary artifact is WebAssembly. Its experimental native path lowers
-its own generated low-level instruction arrays through the 2c IR-to-C compiler
-and then a system compiler. Oseo's MIR is backend-neutral, but its current
-primary artifact path is native C11 and a statically linked runtime. C is meant
-to remain an inspectable reference even if a later LLVM, code-generation
-library, or direct emitter becomes primary. Oseo target identities, runtime
-ABI, collector metadata, and JavaScript semantics are not defined by
-WebAssembly or C.
+Porffor does not publish Oseo's hint-safety invariant. In alpha 25, the
+compiler still [enables `optTypes` by default], turns
+[writes to annotated locals] into assertion nodes, and
+[lowers those assertions] according to the annotated representation.
 
-Porffor does not publish Oseo's hint-safety invariant. Its README says type
-annotations can be optimization hints without type checking, but the current
-implementation also treats assignment to an annotated local as a TypeScript
-assertion and may lower the value according to that annotation.
-
-At Porffor commit
-[`8ef8aaa`], the following deliberately ill-typed program was run in three
-configurations:
+The following deliberately ill-typed program was run at the older Porffor
+commit [`8ef8aaa`]. These results were not measured on alpha 25.
 
 ~~~~ typescript
 function f(x: number) {
@@ -416,37 +369,30 @@ on a particular specification version, so this experiment does not show Porffor
 breaking its stated contract. It shows that its contract is not Oseo's
 contract.
 
-The relevant Porffor source makes [`optTypes` a default preference], turns
-[writes to annotated locals] into type-assertion nodes, and
-[lowers those assertions] according to the annotated representation.
-
 Under Oseo's design, this is the canonical false-hint test. Provided that the
 source forms are in the active profile, both specialization-enabled and
 specialization-disabled builds must print `21`. A `number` hint may put guards
 and numeric code in the binary. It cannot authorize the numeric code to consume
 the string.
 
-Porffor also optimizes for very small artifacts, advertising no constant
-prelude and as few WebAssembly imports as possible. Oseo expects an owned
+Porffor also optimizes for small artifacts. Oseo uses its own
 runtime with generic semantic helpers, a collector, scheduler, and host
 components. It plans capability-aware composition so closed programs do not
 retain unused compiler or loader machinery, but it does not make “no runtime”
 the semantic goal. The runtime is where much of JavaScript's generic meaning
 lives.
 
-Porffor describes current language support pragmatically and warns that it is
-seriously limited. Oseo is building toward a named ECMA-262 edition with one
-reviewed manifest row per upstream test path. Oseo is not presently more
-compatible. The difference is that a versioned standards claim, including
-negative and unsupported results, is part of Oseo's architecture rather than a
-later scorecard.
+Porffor describes its language support as limited. Oseo publishes a measured
+profile for a named ECMA-262 edition and records expected negatives and
+unsupported paths alongside passes. These records do not rank the
+compilers' compatibility against each other.
 
-[project site]: https://porffor.dev/
-[current README]: https://github.com/CanadaHonk/porffor/blob/8ef8aaaad9199de14a35bd1aa214f4d3e23bf97a/README.md
+[Porffor alpha 25]: https://github.com/CanadaHonk/porffor/releases/tag/alpha-25
+[CI workflow]: https://github.com/CanadaHonk/porffor/blob/c9af40c8c6913e04d491412ae9fe0f34b97b51df/.github/workflows/ci.yaml
+[enables `optTypes` by default]: https://github.com/CanadaHonk/porffor/blob/c9af40c8c6913e04d491412ae9fe0f34b97b51df/compiler/prefs.js#L1
+[writes to annotated locals]: https://github.com/CanadaHonk/porffor/blob/c9af40c8c6913e04d491412ae9fe0f34b97b51df/compiler/codegen.js#L2919-L2924
+[lowers those assertions]: https://github.com/CanadaHonk/porffor/blob/c9af40c8c6913e04d491412ae9fe0f34b97b51df/compiler/codegen.js#L709-L724
 [`8ef8aaa`]: https://github.com/CanadaHonk/porffor/tree/8ef8aaaad9199de14a35bd1aa214f4d3e23bf97a
-[`optTypes` a default preference]: https://github.com/CanadaHonk/porffor/blob/8ef8aaaad9199de14a35bd1aa214f4d3e23bf97a/compiler/prefs.js#L1-L7
-[writes to annotated locals]: https://github.com/CanadaHonk/porffor/blob/8ef8aaaad9199de14a35bd1aa214f4d3e23bf97a/compiler/codegen.js#L2360-L2364
-[lowers those assertions]: https://github.com/CanadaHonk/porffor/blob/8ef8aaaad9199de14a35bd1aa214f4d3e23bf97a/compiler/codegen.js#L632-L645
 
 
 Static Hermes: sound typed JavaScript beside untyped JavaScript
@@ -459,42 +405,46 @@ casts from `any`. If a declaration has an annotation, the annotation wins.
 Those rules let the compiler use layouts and operations that ordinary
 JavaScript cannot promise.
 
-The price is a language boundary. Typed arrays are explicitly incompatible with
-untyped JavaScript arrays, and typed code has stricter behavior than ordinary
-JavaScript. Current work on the `static_h` branch also includes untyped
-JavaScript execution with interpreter and JIT configurations, as the project's
-[December 2024 update] and [June 2025 performance update] describe.
+The price is a language boundary. Arrays in the typed dialect are
+incompatible with ordinary JavaScript arrays. The dialect is one part of
+Hermes development on the [main development branch], `static_h`. At
+`e5d8795`,
+`shermes` compiles both typed and untyped JavaScript to native code, as
+described in the [Hermes README].
+That does not mean React Native ships typed native code: its production path
+still compiles JavaScript to bytecode ahead of time and interprets that
+bytecode. Hermes also has a baseline JIT.
 
-Oseo avoids both halves of that split. It does not turn annotated code into a
-sound JavaScript dialect, and it does not reserve a VM tier for untyped code.
+Oseo does not turn annotated code into a sound JavaScript dialect or
+reserve a VM tier for untyped code.
 Typed and untyped inputs enter the same JavaScript value model. An annotation
 can change code shape only behind a guard. This sacrifices many optimizations
 that a sound type system can justify, but it preserves ordinary TypeScript's
 erasable-type expectation.
 
-[typed-language guide]: https://github.com/facebook/hermes/blob/static_h/doc/TypedLanguage.md
-[December 2024 update]: https://github.com/facebook/hermes/blob/static_h/doc/blog/2024-12-19-static-hermes-update-dec-2024.md
-[June 2025 performance update]: https://github.com/facebook/hermes/blob/static_h/doc/blog/2025-07-15-static-h-performance-june-2025.md
+[typed-language guide]: https://github.com/meta/hermes/blob/e5d8795020c304dfad439a09f5a7ad14e061457d/doc/TypedLanguage.md
+[main development branch]: https://github.com/meta/hermes/blob/e5d8795020c304dfad439a09f5a7ad14e061457d/doc/Branches.md
+[Hermes README]: https://github.com/meta/hermes/blob/e5d8795020c304dfad439a09f5a7ad14e061457d/README.md
 
 
 QuickJS: why an executable can still be interpreted
 ---------------------------------------------------
 
-QuickJS provides the cleanest counterexample to “executable means native
-JavaScript.” Its `qjsc` tool compiles JavaScript to compact stack bytecode,
+Upstream [QuickJS 2026-06-04] provides a counterexample to “executable means
+native JavaScript.” Its `qjsc` tool compiles JavaScript to stack bytecode,
 serializes that bytecode into generated C, and can add a `main()` function plus
 the QuickJS engine. The system C compiler then produces an ordinary executable.
 The [QuickJS internals documentation] is explicit that the C source contains
 bytecode and initializes the engine to evaluate it.
 
-QuickJS offers small deployment, fast compilation, broad JavaScript behavior,
-and optional removal of the source compiler when `eval` is not needed. It
-solves a different problem. Generic execution is bytecode interpretation. In
-Oseo, generic execution is native code generated from MIR, and generated C
+Disabling `eval` lets the system compiler remove source-evaluation code
+through link-time optimization. The resulting executable still interprets
+bytecode. Oseo instead generates native code from MIR: the generated C
 contains the function's control flow rather than a serialized instruction
 stream for a JavaScript VM.
 
-[QuickJS internals documentation]: https://bellard.org/quickjs/quickjs.html
+[QuickJS 2026-06-04]: https://bellard.org/quickjs/
+[QuickJS internals documentation]: https://bellard.org/quickjs/quickjs.html#Executable-generation
 
 
 What is fundamental in Oseo
@@ -515,7 +465,8 @@ from JavaScript VMs.
 ### Types choose opportunities, not meanings
 
 AssemblyScript and Static Hermes gain power by making types part of the
-language contract. Porffor's current type optimization can affect behavior.
+language contract. Porffor's unchecked type optimization has affected
+behavior in the experiment above.
 scriptc lets checker results determine IR representations and validates
 dynamic crossings. Perry uses inference to shape native code but does not make
 specialization-disabled equivalence the center of its public model. Oseo's
@@ -530,13 +481,14 @@ semantically harmless.
 
 ### Whole-program AOT is also a deployment policy
 
-Oseo links a closed module graph before execution. `eval`, the `Function`
-constructor family, and unrestricted dynamic import are currently rejected
-rather than interpreted approximately. [*PLAN-DYN.md*](./PLAN-DYN.md) divides
-future work into closed source, a finite precompiled dynamic module set, late
-native artifacts, and optional runtime source compilation. A closed binary
-must be able to prove that it contains no parser, compiler, incremental loader,
-or dormant source-evaluation path.
+Oseo links a closed module graph before execution. A dynamic `import()` is
+accepted only when its argument is a string literal and the target resolves
+at build time. Oseo does not evaluate arbitrary source strings through
+`eval()` or the `Function` constructor family. [*PLAN-DYN.md*](./PLAN-DYN.md)
+divides future work into closed source, a finite precompiled dynamic module
+set, late native artifacts, and optional runtime source compilation. A closed
+binary must be able to prove that it contains no parser, compiler, incremental
+loader, or dormant source-evaluation path.
 
 This is stricter than merely having an AOT backend. It treats compiler presence,
 code lifetime, executable-memory policy, module identity, and retained runtime
@@ -548,10 +500,11 @@ Oseo executable pay that cost.
 
 Oseo separates ECMAScript, web APIs, Node.js APIs, package resolution, and
 native dependencies. It does not turn a successful demo into a claim about the
-whole layer. M5 pins an ECMA-262 edition and test262 revision. M6 plans the same
-discipline for the Minimum common web API and web-platform tests. M7 intends to
-report package versions and exact scenarios instead of a context-free
-compatibility percentage.
+whole layer. The language profile pins an ECMA-262 edition and test262
+revision. The M6 plan calls for pinning the Minimum common web API and
+web-platform tests in the same way. The M7 plan calls for reporting package
+versions and exact scenarios instead of a context-free compatibility
+percentage.
 
 The property-testing plan applies the same suspicion to Oseo's own optimizer.
 Generated programs run under Node.js, Deno, specialization-disabled Oseo,
@@ -574,24 +527,24 @@ static compiler has, then recover by deoptimizing when it was wrong.
 Oseo is also choosing the longest compatibility route. AssemblyScript can omit
 dynamic behavior by defining another language. Perry can prioritize the
 packages and APIs that unlock applications. scriptc can use a typed static
-profile and route explicitly dynamic dependencies through an optional engine.
+profile and route selected modules through an embedded Node.js engine.
 QuickJS can rely on one compact bytecode engine. Oseo intends to implement
 generic ECMAScript behavior, native object and collector semantics, a
 web-compatible server host, selected Node.js APIs, and self-hosting while
-keeping the no-interpreter guarantee. Dynamic source, proxies, regular
-expressions, WebAssembly, TLS, streams, and package resolution each expose a
-large independent design problem.
+keeping the no-interpreter guarantee. Runtime source compilation,
+WebAssembly integration, and a broader native I/O layer are separate pieces
+of that work.
 
-The present status should be read with that cost in mind. Oseo has completed
-M5, measured ECMAScript compatibility. The
-[M5 exit report](./docs/m5c-closure/m5-exit-report.md) reviews all 41,091
-applicable test262 paths of the ECMA-262 16th edition inventory: 34,778
-passes, 4,401 expected negatives, and 1,912 unsupported profile features, each
-covered by an authorized exclusion or a named deferral, with no semantic,
-harness, or infrastructure failures. Oseo does not claim unqualified ECMA-262
-conformance, because `eval`, the `Function` constructor, and dynamic import
-remain unsupported. Linux on AMD64 and macOS on AArch64 execute the
-native corpus; AArch64 Linux is a compile-link and inspection target.
+The [current language profile](./docs/language-profile-es2026.md) covers
+ECMAScript 2026 plus three finished ECMAScript 2027 features. The
+[language exit report](./docs/m5c-closure/language-exit-report.md) records
+43,007 reviewed test262 paths: 36,408 passes, 4,480 expected negatives, and
+2,119 unsupported paths. Of the unsupported paths, 2,062 are authorized
+exclusions and 57 are named deferrals. This is not an unqualified ECMA-262
+conformance claim. The [M5 exit report](./docs/m5c-closure/m5-exit-report.md)
+preserves the earlier 41,091-path measurement. Linux on AMD64 and macOS on
+AArch64 execute the native corpus; AArch64 Linux is a compile-link and
+inspection target.
 
 The Minimum common web API, real native I/O, selected Node.js compatibility,
 broad package support, and self-hosting are plans, not current features. Oseo
