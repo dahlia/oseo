@@ -1465,6 +1465,7 @@ jobs:
       r6: ${{ steps.probe.outputs.r6 }}
       r7: ${{ steps.probe.outputs.r7 }}
       r8: ${{ steps.probe.outputs.r8 }}
+      avrea_overflow: ${{ steps.probe.outputs.avrea_overflow }}
     steps:
       - uses: actions/checkout@v7
         with:
@@ -1479,6 +1480,7 @@ jobs:
               github.repository == 'dahlia/oseo' }}
         env:
           OSEO_SELFHOSTED_LANES: 8
+          OSEO_AVREA_MAC_MODE: ${{ vars.OSEO_AVREA_MAC_MODE }}
           OSEO_SELFHOSTED_ENABLED: >-
             ${{ vars.OSEO_SELFHOSTED_MAC_ENABLED }}
           OSEO_EVENT: ${{ github.event_name }}
@@ -1498,7 +1500,11 @@ jobs:
           (github.event_name == 'push' ||
            github.event_name == 'workflow_dispatch') &&
           (vars.OSEO_AVREA_MAC_MODE == 'four' ||
-           vars.OSEO_AVREA_MAC_MODE == 'eight') &&
+           vars.OSEO_AVREA_MAC_MODE == 'eight' ||
+           (vars.OSEO_AVREA_MAC_MODE == 'auto' &&
+            github.event_name == 'push' &&
+            needs.mac_ready.outputs.avrea_overflow ==
+              'true')) &&
           'avrea-macos-26-8-vcpu' || 'macos-latest' }}
     if: >-
       !(github.event_name == 'push' &&
@@ -1690,7 +1696,11 @@ jobs:
           (github.event_name == 'push' ||
            github.event_name == 'workflow_dispatch') &&
           (vars.OSEO_AVREA_MAC_MODE == 'four' ||
-           vars.OSEO_AVREA_MAC_MODE == 'eight') &&
+           vars.OSEO_AVREA_MAC_MODE == 'eight' ||
+           (vars.OSEO_AVREA_MAC_MODE == 'auto' &&
+            github.event_name == 'push' &&
+            needs.mac_ready.outputs.avrea_overflow ==
+              'true')) &&
           'avrea-macos-26-8-vcpu' || 'macos-15' }}
     if: >-
       !(github.event_name == 'push' &&
@@ -1812,7 +1822,11 @@ jobs:
           (github.event_name == 'push' ||
            github.event_name == 'workflow_dispatch') &&
           (vars.OSEO_AVREA_MAC_MODE == 'four' ||
-           vars.OSEO_AVREA_MAC_MODE == 'eight') &&
+           vars.OSEO_AVREA_MAC_MODE == 'eight' ||
+           (vars.OSEO_AVREA_MAC_MODE == 'auto' &&
+            github.event_name == 'push' &&
+            needs.mac_ready.outputs.avrea_overflow ==
+              'true')) &&
           'avrea-macos-26-8-vcpu' || 'macos-latest' }}
     if: >-
       !(github.event_name == 'push' &&
@@ -2081,7 +2095,11 @@ jobs:
           (github.event_name == 'push' ||
            github.event_name == 'workflow_dispatch') &&
           (vars.OSEO_AVREA_MAC_MODE == 'four' ||
-           vars.OSEO_AVREA_MAC_MODE == 'eight') &&
+           vars.OSEO_AVREA_MAC_MODE == 'eight' ||
+           (vars.OSEO_AVREA_MAC_MODE == 'auto' &&
+            github.event_name == 'push' &&
+            needs.mac_ready.outputs.avrea_overflow ==
+              'true')) &&
           'avrea-macos-26-8-vcpu' || 'macos-latest' }}
     if: >-
       !(github.event_name == 'push' &&

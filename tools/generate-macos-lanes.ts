@@ -47,14 +47,26 @@ const avreaMacJobs = new Map([
   ["test_node_shard_macos_6", "eight"],
 ]);
 
-function avreaRunsOn(job: MacosLaneJob): string | undefined {
+function avreaRunsOn(
+  job: MacosLaneJob,
+  canOverflow: boolean,
+): string | undefined {
   const mode = avreaMacJobs.get(job.id);
   if (mode == null) return undefined;
   const modes =
     mode === "four"
       ? [
           "          (vars.OSEO_AVREA_MAC_MODE == 'four' ||",
-          "           vars.OSEO_AVREA_MAC_MODE == 'eight') &&",
+          "           vars.OSEO_AVREA_MAC_MODE == 'eight'" +
+            (canOverflow ? " ||" : ") &&"),
+          ...(canOverflow
+            ? [
+                "           (vars.OSEO_AVREA_MAC_MODE == 'auto' &&",
+                "            github.event_name == 'push' &&",
+                "            needs.mac_ready.outputs.avrea_overflow ==",
+                "              'true')) &&",
+              ]
+            : []),
         ]
       : ["          vars.OSEO_AVREA_MAC_MODE == 'eight' &&"];
   return [
@@ -1005,7 +1017,10 @@ export function generateMacosWorkflow(
       block = block.replace(/^    name: >-\n(?:      [^\n]*\n)+/m, "");
       block = block.replace(/^    name: [^\n]*\n/m, "");
       const selfHosted = laneIndex >= hostedLaneCount;
-      const pilotRunsOn = selfHosted ? undefined : avreaRunsOn(job);
+      const predecessor = lane[index - 1];
+      const pilotRunsOn = selfHosted
+        ? undefined
+        : avreaRunsOn(job, selfHostedCount > 0 && predecessor == null);
       const runnerOutput = `r${laneIndex - hostedLaneCount + 1}`;
       const runner = selfHosted
         ? `\${{ fromJSON(needs.mac_ready.outputs.${runnerOutput}` +
@@ -1027,7 +1042,6 @@ export function generateMacosWorkflow(
           "        run: sw_vers -productVersion\n" +
           (pilotRunsOn == null ? "" : avreaImageCheck),
       );
-      const predecessor = lane[index - 1];
       block = block.replace(
         /^    runs-on: [^\n]*\n/m,
         (line) =>
@@ -1100,6 +1114,7 @@ function selfHostedAvailabilityJob(count: number): string {
     "      actions: read",
     "    outputs:",
     outputs,
+    "      avrea_overflow: ${{ steps.probe.outputs.avrea_overflow }}",
     "    steps:",
     "      - uses: actions/checkout@v7",
     "        with:",
@@ -1114,6 +1129,7 @@ function selfHostedAvailabilityJob(count: number): string {
     "              github.repository == 'dahlia/oseo' }}",
     "        env:",
     `          OSEO_SELFHOSTED_LANES: ${count}`,
+    "          OSEO_AVREA_MAC_MODE: ${{ vars.OSEO_AVREA_MAC_MODE }}",
     "          OSEO_SELFHOSTED_ENABLED: >-",
     "            ${{ vars.OSEO_SELFHOSTED_MAC_ENABLED }}",
     "          OSEO_EVENT: ${{ github.event_name }}",
