@@ -1,3 +1,5 @@
+![](./artwork/logo-autocolor.svg)
+
 Oseo
 ====
 
