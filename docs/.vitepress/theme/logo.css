@@ -1,0 +1,9 @@
+.VPNavBarTitle .logo,
+.VPHero .image-src {
+  color-scheme: light;
+}
+
+.dark .VPNavBarTitle .logo,
+.dark .VPHero .image-src {
+  color-scheme: dark;
+}

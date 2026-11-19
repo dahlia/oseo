@@ -42,6 +42,7 @@ const quickstart =
       ).replaceAll("{{VERSION}}", version)
     : "";
 const head: HeadConfig[] = [
+  ["link", { rel: "icon", type: "image/svg+xml", href: "/oseo-logo.svg" }],
   ["meta", { property: "og:site_name", content: title }],
   ["meta", { name: "oseo:channel", content: channel }],
 ];
@@ -88,6 +89,7 @@ const config = withMermaid(
     },
     buildEnd: (site) => checkInternalLinks(site.outDir, origin ?? undefined),
     themeConfig: {
+      logo: { src: "/oseo-logo.svg", alt: "" },
       nav: [
         { text: "Overview", link: "/overview/" },
         { text: "Using Oseo", link: "/using/install" },
