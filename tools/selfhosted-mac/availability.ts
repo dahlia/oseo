@@ -10,6 +10,7 @@ import { isBoolean, isNumber, isString } from "../value-kinds.ts";
 
 const hosted = JSON.stringify("macos-15");
 const actionsApi = "https://api.github.com/repos/dahlia/oseo/actions";
+const stockMacLabels = new Set(["macos-15", "macos-26", "macos-latest"]);
 
 /** The runner fields the probe reads, validated from the API body. */
 interface Runner {
@@ -17,6 +18,7 @@ interface Runner {
   readonly status: string | undefined;
   readonly busy: boolean | undefined;
   readonly labels: readonly string[];
+  readonly labelsKnown: boolean;
 }
 
 /** The job fields the probe reads, validated from the API body. */
@@ -26,6 +28,16 @@ interface WorkflowJob {
   readonly labels: readonly string[];
 }
 
+interface WorkflowRun {
+  readonly id: number;
+  readonly createdAt: number;
+}
+
+interface PagedList<T> {
+  readonly items: readonly T[];
+  readonly complete: boolean;
+}
+
 /** Validate one runner entry; a malformed label list is an empty one. */
 function runnerOf(entry: StructuredDataValue): Runner {
   const record = parsedMapping(entry, "Runner");
@@ -33,6 +45,7 @@ function runnerOf(entry: StructuredDataValue): Runner {
     name: isString(record.name) ? record.name : undefined,
     status: isString(record.status) ? record.status : undefined,
     busy: isBoolean(record.busy) ? record.busy : undefined,
+    labelsKnown: Array.isArray(record.labels),
     labels: Array.isArray(record.labels)
       ? record.labels.map((label) => {
           const name = parsedMapping(label, "Runner label").name;
@@ -54,13 +67,18 @@ function jobOf(entry: StructuredDataValue): WorkflowJob {
   };
 }
 
-/** Validate one workflow run entry down to the ID the probe needs. */
-function runIdOf(entry: StructuredDataValue): number {
-  const id = parsedMapping(entry, "Workflow run").id;
+/** The timestamp is optional for the existing runner readiness probe. */
+function runOf(entry: StructuredDataValue): WorkflowRun {
+  const { id, created_at } = parsedMapping(entry, "Workflow run");
   if (!isNumber(id) || !Number.isInteger(id)) {
     throw new Error("Malformed workflow run");
   }
-  return id;
+  const timestamp = isString(created_at) ? Date.parse(created_at) : NaN;
+  // GitHub returns complete UTC timestamps with second precision.
+  const valid =
+    Number.isFinite(timestamp) &&
+    new Date(timestamp).toISOString().replace(".000Z", "Z") === created_at;
+  return { id, createdAt: valid ? timestamp : NaN };
 }
 
 /** The subset of `fetch` the probe uses; only `ok` and the JSON body. */
@@ -102,6 +120,12 @@ export interface LaneObservation {
   readonly queued: ReadonlySet<number>;
   /** IDs of in-progress jobs that request this lane's label. */
   readonly running: ReadonlySet<number>;
+}
+
+/** The existing lane decisions and the separate hosted overflow signal. */
+export interface RunnerRouting {
+  readonly selections: readonly string[];
+  readonly avreaOverflow: boolean;
 }
 
 /**
@@ -149,10 +173,9 @@ function suspicious(observation: LaneObservation): boolean {
  * and the wedge check below could not read it, so it stays hosted.
  */
 function usableRunner(
-  runners: readonly Runner[],
+  carriers: readonly Runner[],
   label: string,
 ): Runner | undefined {
-  const carriers = runners.filter((runner) => runner.labels.includes(label));
   const runner = carriers.length === 1 ? carriers[0] : undefined;
   return runner != null &&
     runner.name === label &&
@@ -178,13 +201,17 @@ function usableRunner(
  * runner is online but not moving its queue (see `wedged`). Each lane
  * decides independently; an API or network failure sends every lane to
  * hosted.
+ *
+ * The overflow signal uses the latest observation and requires a queued
+ * stock macOS job from a strictly earlier run. A healthy idle own lane
+ * or an uncertain runner inventory keeps overflow off.
  */
-export async function runnerSelections(
+export async function runnerRouting(
   env: Readonly<Record<string, string | undefined>>,
   // SAFETY: Only Response.ok and its JSON result are used and validated.
   fetchApi: ApiFetch = fetch as ApiFetch,
   options: ProbeOptions = {},
-): Promise<readonly string[]> {
+): Promise<RunnerRouting> {
   const count = Number(env.OSEO_SELFHOSTED_LANES);
   if (
     !Number.isInteger(count) ||
@@ -203,7 +230,15 @@ export async function runnerSelections(
     !env.OSEO_RUNNER_STATUS_TOKEN ||
     !env.OSEO_WORKFLOW_TOKEN
   )
-    return selections;
+    return { selections, avreaOverflow: false };
+  const currentRun = Number(env.GITHUB_RUN_ID);
+  const auto =
+    env.OSEO_AVREA_MAC_MODE?.toLowerCase() === "auto" &&
+    env.GITHUB_REF_TYPE === "branch" &&
+    env.GITHUB_REF?.startsWith("refs/heads/") === true &&
+    env.GITHUB_REF !== "refs/heads/release-rehearsal" &&
+    Number.isSafeInteger(currentRun) &&
+    currentRun > 0;
   const sleep =
     options.sleep ??
     ((milliseconds: number) =>
@@ -220,7 +255,8 @@ export async function runnerSelections(
       parse: (entry: StructuredDataValue) => T,
       prior: readonly T[] = [],
       page = 1,
-    ): Promise<readonly T[]> {
+      priorTotal?: number,
+    ): Promise<PagedList<T>> {
       const separator = url.includes("?") ? "&" : "?";
       const paged = `${url}${separator}per_page=100&page=${page}`;
       const response = await fetchApi(paged, {
@@ -232,62 +268,88 @@ export async function runnerSelections(
         signal: AbortSignal.timeout(10_000),
       });
       if (!response.ok) throw new Error("GitHub API unavailable");
-      const entries = parsedMapping(await response.json(), "API response")[key];
+      const body = parsedMapping(await response.json(), "API response");
+      const entries = body[key];
       if (!Array.isArray(entries)) {
         throw new Error("Malformed GitHub API response");
       }
       const items = [...prior, ...entries.map(parse)];
-      if (entries.length < 100) return items;
+      const advertised = body.total_count;
+      const total =
+        isNumber(advertised) && (page === 1 || advertised === priorTotal)
+          ? advertised
+          : undefined;
+      if (entries.length < 100) {
+        return { items, complete: items.length === total };
+      }
       if (page === 10) throw new Error("GitHub API pagination limit");
-      return listPages(token, url, key, parse, items, page + 1);
+      return listPages(token, url, key, parse, items, page + 1, total);
     }
     const runnerToken = env.OSEO_RUNNER_STATUS_TOKEN;
     const workflowToken = env.OSEO_WORKFLOW_TOKEN;
 
     /** Jobs of every queued or running workflow run in the repository. */
-    async function activeJobs(): Promise<readonly WorkflowJob[]> {
+    async function activeJobs() {
       // A run whose jobs are partly running can still be listed as queued,
       // as run 37636486388 was with nine running jobs, so ask for both.
-      const runs = (
-        await Promise.all(
-          ["queued", "in_progress"].map((status) =>
-            listPages(
-              workflowToken,
-              `${actionsApi}/runs?status=${status}`,
-              "workflow_runs",
-              runIdOf,
-            ),
+      const pages = await Promise.all(
+        ["queued", "in_progress"].map((status) =>
+          listPages(
+            workflowToken,
+            `${actionsApi}/runs?status=${status}`,
+            "workflow_runs",
+            runOf,
           ),
-        )
-      ).flat();
-      return (
-        await Promise.all(
-          runs.map((run) =>
-            listPages(
-              workflowToken,
-              `${actionsApi}/runs/${run}/jobs?filter=latest`,
-              "jobs",
-              jobOf,
-            ),
-          ),
-        )
-      ).flat();
+        ),
+      );
+      const runs = pages.flatMap(({ items }) => items);
+      const current = runs.find((run) => run.id === currentRun);
+      const jobsByRun = await Promise.all(
+        runs.map(async (run) => {
+          const jobs = await listPages(
+            workflowToken,
+            `${actionsApi}/runs/${run.id}/jobs?filter=latest`,
+            "jobs",
+            jobOf,
+          );
+          return {
+            prior:
+              run.id !== currentRun &&
+              current != null &&
+              run.createdAt < current.createdAt,
+            jobs: jobs.items,
+            complete: jobs.complete,
+          };
+        }),
+      );
+      return {
+        runs: jobsByRun,
+        complete:
+          pages.every((page) => page.complete) &&
+          jobsByRun.every((run) => run.complete),
+      };
     }
 
-    async function observe(): Promise<readonly LaneObservation[]> {
+    async function observe() {
       const runners = await listPages(
         runnerToken,
         `${actionsApi}/runners`,
         "runners",
         runnerOf,
       );
-      const lanes = selfHostedLaneLabels
-        .slice(0, count)
-        .map((label) => ({ label, runner: usableRunner(runners, label) }));
-      const jobs = lanes.some((lane) => lane.runner != null)
-        ? await activeJobs()
-        : [];
-      return lanes.map(({ label, runner }) => {
+      const configured = selfHostedLaneLabels.slice(0, count);
+      const lanes = configured.map((label) => {
+        const carriers = runners.items.filter((item) =>
+          item.labels.includes(label),
+        );
+        return { label, carriers, runner: usableRunner(carriers, label) };
+      });
+      const active =
+        auto || lanes.some((lane) => lane.runner != null)
+          ? await activeJobs()
+          : { runs: [], complete: false };
+      const jobs = active.runs.flatMap((run) => run.jobs);
+      const observations = lanes.map(({ label, runner }): LaneObservation => {
         const ids = (status: string): ReadonlySet<number> =>
           new Set(
             jobs.flatMap((job) =>
@@ -305,17 +367,53 @@ export async function runnerSelections(
           running: ids("in_progress"),
         };
       });
+      const complete =
+        auto &&
+        active.complete &&
+        runners.complete &&
+        runners.items.every(
+          (runner) =>
+            runner.labelsKnown &&
+            runner.labels.every(
+              (label) =>
+                label !== "" &&
+                (label === label.toLowerCase() ||
+                  !configured.includes(label.toLowerCase())),
+            ),
+        ) &&
+        lanes.every(
+          ({ label, carriers, runner }) =>
+            runner != null ||
+            carriers.length === 0 ||
+            (carriers.length === 1 &&
+              carriers[0]?.name === label &&
+              carriers[0].status === "offline"),
+        );
+      const backlog =
+        complete &&
+        active.runs.some(
+          ({ prior, jobs: runJobs }) =>
+            prior &&
+            runJobs.some(
+              ({ id, status, labels }) =>
+                id != null &&
+                status === "queued" &&
+                labels.length === 1 &&
+                stockMacLabels.has(labels[0]!),
+            ),
+        );
+      return { observations, complete, backlog };
     }
 
     const first = await observe();
     let second = first;
-    if (first.some(suspicious)) {
+    if (first.observations.some(suspicious)) {
       await sleep(delay);
       second = await observe();
     }
     for (let index = 0; index < count; index++) {
-      const before = first[index]!;
-      const after = second[index]!;
+      const before = first.observations[index]!;
+      const after = second.observations[index]!;
       if (before.usable && after.usable && !wedged(before, after)) {
         selections[index] = JSON.stringify([
           "self-hosted",
@@ -325,25 +423,40 @@ export async function runnerSelections(
         ]);
       }
     }
+    const idleOwnLane = second.observations.some((after, index) => {
+      const before = first.observations[index]!;
+      return (
+        after.usable &&
+        !after.busy &&
+        (!before.usable || !wedged(before, after))
+      );
+    });
+    return {
+      selections,
+      avreaOverflow: first.complete && second.backlog && !idleOwnLane,
+    };
   } catch {
     // API or network failure is a hosted decision, not a skipped test.
   }
-  return selections;
+  return { selections, avreaOverflow: false };
 }
 
 if (
   process.argv[1] != null &&
   import.meta.url === pathToFileURL(process.argv[1]).href
 ) {
-  const selections = await runnerSelections(process.env);
-  const lines =
-    selections.map((value, index) => `r${index + 1}=${value}`).join("\n") +
-    "\n";
+  const { selections, avreaOverflow } = await runnerRouting(process.env);
+  const lines = [
+    ...selections.map((value, index) => `r${index + 1}=${value}`),
+    `avrea_overflow=${avreaOverflow}`,
+    "",
+  ].join("\n");
   if (process.env.GITHUB_OUTPUT == null) {
     throw new Error("GITHUB_OUTPUT is required");
   }
   await appendFile(process.env.GITHUB_OUTPUT, lines);
   process.stdout.write(
-    selections.map((value, index) => `r${index + 1}: ${value}\n`).join(""),
+    selections.map((value, index) => `r${index + 1}: ${value}\n`).join("") +
+      `Avrea overflow: ${avreaOverflow}\n`,
   );
 }

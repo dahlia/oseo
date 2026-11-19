@@ -27,10 +27,11 @@ The generator, availability probe, installer, health check, and job-wall
 report share that allow-list. The generator places only Zig-backed
 `macos-aarch64` test262, extended native property, own-key case, and native
 fixture jobs there. Apple clang host sanitizer jobs and `macos-latest`
-Node.js/Deno jobs always use hosted runners. Every generated macOS job logs
-`sw_vers -productVersion` before its test steps. The existing check names,
-targets, shard totals, seeds, commands, timeouts, and native aggregate remain
-required.
+Node.js/Deno jobs use GitHub-hosted runners by default. The
+[Avrea pilot](#avrea-pilot) can route some sanitizer and Node.js jobs to Avrea.
+Every generated macOS job logs `sw_vers -productVersion` before its test
+steps. The existing check names, targets, shard totals, seeds, commands,
+timeouts, and native aggregate remain required.
 
 The weights in *tools/macos-job-costs.ts* combine hosted job medians and
 one-lane M6 job walls; their comments identify the source attempts. A job
@@ -126,6 +127,63 @@ maintainer registered `oseo-mac-2` on 2026-10-06 with the steps below.
 [U28 evidence]: ./evidence/u28/README.md
 [U25 evidence]: ./evidence/u25/README.md
 [U26 evidence]: ./evidence/u26/README.md
+
+
+Avrea pilot
+-----------
+
+The repository variable `OSEO_AVREA_MAC_MODE` controls which jobs can use
+`avrea-macos-26-8-vcpu`. For each queued job with this label, the connected
+Avrea GitHub App handles just-in-time repository runner registration and
+cleanup in place of the manual setup for persistent runners below.
+The [Avrea runner reference] lists the image and size, and
+[Avrea's GitHub App permissions] describes registration.
+
+ -  `off`, unset, or an unrecognized value keeps the original routes.
+ -  `four` selects four independent heads of the GitHub-hosted lanes.
+    These are the first macOS native sanitizer shard, the dedicated
+    ordinary Node.js exhaustive RegExp job, and macOS Node.js shards
+    1/6 and 5/6.
+ -  `eight` also selects Node.js shards 2/6, 3/6, 4/6, and 6/6. Their
+    existing predecessor chains limit the run to four simultaneous Avrea
+    jobs. Verify the provider's account-wide concurrency separately
+    before enabling the pilot. Multiple workflow runs can overlap.
+ -  `auto` selects the same four heads as `four` when the readiness
+    probe reports `avrea_overflow=true` on an eligible push.
+
+Mode values are case-insensitive and must have no surrounding whitespace.
+The pilot applies only on branches of `dahlia/oseo` other than
+`release-rehearsal`. The `four` and `eight` modes apply to pushes and
+manual workflow dispatches. The `auto` mode applies only to pushes and
+requires `OSEO_SELFHOSTED_MAC_ENABLED=true`, the existing
+`OSEO_RUNNER_STATUS_TOKEN` with repository Administration read access,
+and the workflow token with `actions: read`.
+
+With `auto` enabled, the probe needs a complete observation of runner
+state and active workflow jobs. Its latest observation must show a
+queued job from a strictly earlier run requesting exactly one stock Mac
+label (`macos-15`, `macos-26`, or `macos-latest`) and no healthy idle
+configured own-Mac lane. The probe uses visible backlog in this repository
+as a snapshot of demand. It has no account-wide slot count. Incomplete
+API lists, ambiguous own-Mac runner state, API failures, or a missing
+probe result leave the eligible jobs on their original GitHub-hosted
+routes in `auto` mode.
+The eight own-Mac lanes continue to use the readiness rules above.
+
+On an Avrea runner, the selected job checks for macOS 26 and `arm64`
+before setup and tests. Native jobs still use `macos-aarch64`. The pilot
+keeps the same 105 non-release jobs, including 54 macOS jobs, with their
+check names, required aggregates, test cases, shards, seeds, budgets, and
+timeouts.
+
+Start with `four` and verify the runner assignment, image preflight, tool
+setup, and required checks on the exact candidate. To roll back, set
+`OSEO_AVREA_MAC_MODE` to `off` before starting a new run. Jobs already
+queued keep their assigned labels. The workflow has no automatic expiry,
+so schedule a reminder to turn the pilot off 15 days after activation.
+
+[Avrea runner reference]: https://docs.avrea.com/runners/#macos
+[Avrea's GitHub App permissions]: https://docs.avrea.com/github-permissions/#administration-read-and-write
 
 
 Runner service
