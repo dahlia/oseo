@@ -157,7 +157,13 @@ function stageImports(
   return result;
 }
 
-function stageJsr(
+const jsrCompoundLicenses = new Map([
+  ["@oseo/backend-c", "GPL-3.0-or-later AND MIT"],
+  ["@oseo/runtime-c", "GPL-3.0-or-later AND MIT AND Unicode-3.0"],
+  ["@oseo/unicode", "GPL-3.0-or-later AND Unicode-3.0"],
+]);
+
+export function stageJsr(
   root: string,
   destination: string,
   packages: readonly SourcePackage[],
@@ -176,6 +182,18 @@ function stageJsr(
       JSON.parse(readFileSync(join(source, "deno.json"), "utf8")),
       `JSR config for ${pkg.name}`,
     );
+    // JSR accepts one identifier. The copied files carry the component terms.
+    const compoundLicense = jsrCompoundLicenses.get(pkg.name);
+    const license =
+      compoundLicense != null && config.license === compoundLicense
+        ? "GPL-3.0-or-later"
+        : config.license;
+    if (
+      license !== undefined &&
+      (!isString(license) || !/^[A-Za-z0-9][A-Za-z0-9.-]*\+?$/u.test(license))
+    ) {
+      throw new Error(`${pkg.name} needs a single JSR license identifier.`);
+    }
     for (const entry of readdirSync(source)) {
       if (
         entry === "src" ||
@@ -186,7 +204,7 @@ function stageJsr(
         cpSync(join(source, entry), join(target, entry), { recursive: true });
       }
     }
-    writeJson(join(target, "deno.json"), { ...config, version });
+    writeJson(join(target, "deno.json"), { ...config, license, version });
     for (const path of Object.keys(inventory(target))) {
       if (!path.endsWith(".ts")) continue;
       const file = join(target, path);
@@ -200,23 +218,14 @@ function stageJsr(
       );
     }
   }
-  execFileSync("deno", ["publish", "--dry-run", "--allow-slow-types"], {
-    cwd: destination,
-    stdio: "inherit",
-  });
 }
 
-const [mode, output] = process.argv.slice(2);
-if (output == null || !["identity", "packages"].includes(mode ?? "")) {
-  throw new Error(
-    "Usage: node tools/release/stage.ts identity|packages <output>",
-  );
-}
-const root = process.cwd();
-const destination = resolve(output);
-mkdirSync(destination);
-const identity = await prepare(root, destination);
-if (mode === "packages") {
+async function stagePackages(
+  root: string,
+  destination: string,
+  npmVersion: string,
+  jsrVersion: string,
+): Promise<void> {
   const packages = packageOrder(
     readdirSync(join(root, "packages"), { withFileTypes: true })
       .filter((entry) => entry.isDirectory())
@@ -239,13 +248,35 @@ if (mode === "packages") {
     packages: packages.map(({ directory, name }) => ({
       directory,
       name,
-      tarball: `oseo-${directory}-${identity.npm}.tgz`,
+      tarball: `oseo-${directory}-${npmVersion}.tgz`,
     })),
   });
   const npm = join(destination, "npm");
   mkdirSync(npm);
-  await packNpmPackages(root, npm, identity.npm);
-  smokeNpm(npm, packages, identity.npm);
-  stageJsr(root, join(destination, "jsr"), packages, identity.jsr);
+  await packNpmPackages(root, npm, npmVersion);
+  smokeNpm(npm, packages, npmVersion);
+  const jsr = join(destination, "jsr");
+  stageJsr(root, jsr, packages, jsrVersion);
+  execFileSync("deno", ["publish", "--dry-run", "--allow-slow-types"], {
+    cwd: jsr,
+    stdio: "inherit",
+  });
 }
-seal(destination, identity.sha);
+
+const entry = process.argv[1];
+if (entry != null && import.meta.filename === resolve(entry)) {
+  const [mode, output] = process.argv.slice(2);
+  if (output == null || !["identity", "packages"].includes(mode ?? "")) {
+    throw new Error(
+      "Usage: node tools/release/stage.ts identity|packages <output>",
+    );
+  }
+  const root = process.cwd();
+  const destination = resolve(output);
+  mkdirSync(destination);
+  const identity = await prepare(root, destination);
+  if (mode === "packages") {
+    await stagePackages(root, destination, identity.npm, identity.jsr);
+  }
+  seal(destination, identity.sha);
+}

@@ -1,5 +1,5 @@
 /* eslint-disable no-await-in-loop -- Writes follow dependency order. */
-import { execFileSync } from "node:child_process";
+import { execFileSync, spawn } from "node:child_process";
 import { createHash } from "node:crypto";
 import { readFileSync, readdirSync } from "node:fs";
 import { join, resolve } from "node:path";
@@ -106,7 +106,7 @@ async function requireNpmIntegrity(
   const data = await registry(`${npmRegistry}/${encodeURIComponent(name)}`);
   if (data === undefined) return false;
   const existing = object(object(data).versions)[version];
-  if (existing == null) return false;
+  if (existing === undefined) return false;
   if (object(object(existing).dist).integrity !== expected) {
     throw new Error(`${name}@${version} differs from the staged tarball.`);
   }
@@ -131,6 +131,51 @@ async function confirm(
   throw new Error(`${name} was not visible after publication.`);
 }
 
+const rekorConflict = new RegExp(
+  "^npm error code TLOG_CREATE_ENTRY_ERROR\\r?\\n" +
+    "npm error error creating tlog entry - \\(409\\) an equivalent " +
+    "entry already exists in the transparency log with UUID " +
+    "(?:[0-9a-f]{64}|[0-9a-f]{80})\\r?$",
+  "mu",
+);
+
+async function runNpmPublish(
+  directory: string,
+  args: readonly string[],
+  allowRekorRetry: boolean,
+): Promise<Error | undefined> {
+  return await new Promise((complete, reject) => {
+    const child = spawn("npm", args, {
+      cwd: directory,
+      stdio: ["inherit", "inherit", "pipe"],
+    });
+    child.stderr.pipe(process.stderr, { end: false });
+    const stderr: Uint8Array[] = [];
+    if (allowRekorRetry) {
+      child.stderr.on("data", (chunk: Uint8Array) => stderr.push(chunk));
+    }
+    child.once("error", reject);
+    child.once("close", (status, signal) => {
+      if (status === 0) {
+        complete(undefined);
+        return;
+      }
+      const error = new Error(
+        `npm publish failed (${signal ?? `exit ${status}`}).`,
+      );
+      if (
+        allowRekorRetry &&
+        status === 1 &&
+        rekorConflict.test(Buffer.concat(stderr).toString("utf8"))
+      ) {
+        complete(error);
+      } else {
+        reject(error);
+      }
+    });
+  });
+}
+
 async function publishNpm(
   directory: string,
   version: string,
@@ -144,27 +189,38 @@ async function publishNpm(
     const check = async (): Promise<boolean> =>
       await requireNpmIntegrity(pkg.name, version, `sha512-${hash}`);
     const existing = await check();
-    const current = (await npmTags(pkg.name))[tag];
-    const advance = advancesTag(version, current);
+    let current = (await npmTags(pkg.name))[tag];
     if (!existing) {
-      const destination = advance ? tag : `${tag}-older`;
-      execFileSync(
-        "npm",
-        [
-          "publish",
-          file,
-          "--access",
-          "public",
-          "--tag",
-          destination,
-          "--registry",
-          npmRegistry,
-          "--ignore-scripts",
-        ],
-        { cwd: directory, stdio: "inherit" },
-      );
-      await confirm(check, pkg.name);
-    } else if (advance && current !== version) {
+      const destination = advancesTag(version, current) ? tag : `${tag}-older`;
+      const args = [
+        "publish",
+        file,
+        "--access",
+        "public",
+        "--tag",
+        destination,
+        "--registry",
+        npmRegistry,
+        "--ignore-scripts",
+      ];
+      const conflict = await runNpmPublish(directory, args, true);
+      if (conflict == null) {
+        await confirm(check, pkg.name);
+        continue;
+      }
+      const published = await check();
+      current = (await npmTags(pkg.name))[tag];
+      if (!published) {
+        if (destination === tag && !advancesTag(version, current)) {
+          throw conflict;
+        }
+        console.error(`Retrying npm publish for ${pkg.name}@${version}.`);
+        await runNpmPublish(directory, args, false);
+        await confirm(check, pkg.name);
+        continue;
+      }
+    }
+    if (advancesTag(version, current) && current !== version) {
       execFileSync(
         "npm",
         [

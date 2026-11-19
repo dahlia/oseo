@@ -113,16 +113,23 @@ comments. Zig itself is a separate tool download, not an Oseo archive
 component. Review the per-target Zig compiler-rt and C library components that
 actually enter redistributed native binaries.
 
-Both registries ship the GPL text as `LICENSE`. The following expressions
-summarize each package's source terms; `AND` describes distinct portions of
-one package, not a recipient's choice of license.
+Both registries ship the GPL text as `LICENSE`. The checked-in manifests and
+the npm packages record the full SPDX expressions. `AND` identifies terms
+that apply to distinct portions of the same package. Recipients must follow
+the applicable terms for each portion.
 
-| Package                  | npm and JSR SPDX expression                | Additional texts                         |
+| Package                  | Source and npm SPDX expression             | Additional texts                         |
 | ------------------------ | ------------------------------------------ | ---------------------------------------- |
 | `@oseo/backend-c`        | `GPL-3.0-or-later AND MIT`                 | `MIT-LICENSE.txt`                        |
 | `@oseo/runtime-c`        | `GPL-3.0-or-later AND MIT AND Unicode-3.0` | `MIT-LICENSE.txt`, `UNICODE-LICENSE.txt` |
 | `@oseo/unicode`          | `GPL-3.0-or-later AND Unicode-3.0`         | `UNICODE-LICENSE.txt`                    |
 | Other `@oseo/*` packages | `GPL-3.0-or-later`                         | See CLI build helper below.              |
+
+JSR accepts one SPDX identifier in the published `license` field. The staged
+configs for `@oseo/backend-c`, `@oseo/runtime-c`, and `@oseo/unicode` use
+`GPL-3.0-or-later` for the GPL-covered code. The shipped READMEs and license
+files record the terms for all parts, including the MIT-licensed support and
+Unicode data where present. [JSR license requirements]
 
 The npm `dist/emitted-c.js`, its declarations and its maps correspond to the
 MIT template module. Compiler modules retain their source classification.
@@ -133,6 +140,8 @@ notice. The npm CLI includes a Rolldown-generated JavaScript helper and ships
 `ROLLDOWN-LICENSE.txt` for it. The JSR CLI ships TypeScript source and does not
 contain this helper. Babel and Optique remain dependencies of registry
 packages rather than being copied into them.
+
+[JSR license requirements]: https://jsr.io/docs/licenses
 
 
 Standalone CLI distribution
