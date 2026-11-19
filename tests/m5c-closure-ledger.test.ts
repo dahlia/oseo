@@ -498,11 +498,11 @@ test("only a record whose status begins with Accepted is accepted", () => {
   assert.ok(!isAcceptedDecisionRecord("ADR 9999\n\nAccepted.\n"));
 });
 
-test("the checked-in accepted records exclude proposals", () => {
+test("the checked-in records are selected by their current status", () => {
   const accepted = readCurrentAcceptedRecords();
   assert.ok(accepted.has("0013-m5-edition-and-manifest"));
   assert.ok(accepted.has("0016-dynamic-source-boundary"));
-  assert.ok(!accepted.has("0021-runtime-linking-exception"));
+  assert.ok(accepted.has("0021-runtime-linking-exception"));
   assert.ok(!accepted.has("0022-async-context-boundary"));
   assert.ok(!accepted.has("0000-template"));
 });
