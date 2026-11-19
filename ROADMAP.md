@@ -1,6 +1,22 @@
 Oseo roadmap
 ============
 
+Milestone map
+-------------
+
+| Milestone | Result                                                             |
+| --------- | ------------------------------------------------------------------ |
+| M0        | Architecture contracts and a reproducible project foundation       |
+| M1        | A generic-only compiler that produces a native executable          |
+| M2        | Guarded native specialization with a compiled generic fallback     |
+| M3        | A garbage-collected object model and dynamic language core         |
+| M4        | Modules, promises, asynchronous execution, and a native event loop |
+| M5        | Broad, measured ECMAScript compatibility                           |
+| M6        | Minimum common web API coverage and eventual WinterTC conformance  |
+| M7        | Selected Node.js APIs, CommonJS, and the Node.js-dependent corpus  |
+| M8        | A self-hosting Oseo compiler                                       |
+
+
 Status
 ------
 
@@ -176,22 +192,6 @@ Milestone work follows these rules:
  -  Compatibility findings are classified as language, runtime API, module
     resolution, package format or convention, native dependency, or external
     system behavior.
-
-
-Milestone map
--------------
-
-| Milestone | Result                                                             |
-| --------- | ------------------------------------------------------------------ |
-| M0        | Architecture contracts and a reproducible project foundation       |
-| M1        | A generic-only compiler that produces a native executable          |
-| M2        | Guarded native specialization with a compiled generic fallback     |
-| M3        | A garbage-collected object model and dynamic language core         |
-| M4        | Modules, promises, asynchronous execution, and a native event loop |
-| M5        | Broad, measured ECMAScript compatibility                           |
-| M6        | Minimum common web API coverage and eventual WinterTC conformance  |
-| M7        | Selected Node.js APIs, CommonJS, and the Node.js-dependent corpus  |
-| M8        | A self-hosting Oseo compiler                                       |
 
 
 Garbage collector track
