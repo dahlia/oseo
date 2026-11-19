@@ -1,42 +1,19 @@
 Oseo command-line guide
 =======================
 
-Status
-------
+Run the CLI
+-----------
 
-This guide describes the command line implemented by the current Oseo
-checkout. See [supported features](./features.md) for the measured
+After [installing Oseo](./install.md), run `oseo --help` to list commands
+and options. See [supported features](./features.md) for the measured
 language profile and current limits.
-
-
-Run the CLI from a checkout
----------------------------
-
-Oseo uses mise to install its development tools and pnpm to synchronize the
-workspace. Build the packages before invoking the executable from a repository
-checkout:
-
-~~~~ sh
-mise install
-mise run build
-mise run oseo --help
-~~~~
-
-The remaining examples use `oseo`, the command name for the standalone
-archive and npm package. In a development checkout, replace `oseo`
-with `mise run oseo` (or `mise oseo`). See
-[installation](./install.md) for the distinction between the
-checkout and release channels.
-
-The npm and checkout commands require Node.js 24 or later. The standalone
-archive embeds Node.js and does not require a separate installation.
 
 Native compilation uses Zig's C toolchain. By default, the CLI downloads
 and verifies the pinned Zig release on first use, then reuses the user
 cache without accessing the network. The download requires `tar` with XZ
-support. To use an existing Zig installation, including the one supplied
-by mise, pass `--zig PATH` to `oseo build` or `oseo run`. Help, version,
-completion, and text-only output do not download Zig.
+support. To use an existing Zig installation, pass `--zig PATH` to
+`oseo build` or `oseo run`. Help, version, completion, and text-only output
+do not download Zig.
 
 
 Command syntax
@@ -61,8 +38,9 @@ Options may appear before or after the source path. `run` compiles and
 executes a temporary program; the root shortcut uses the same workflow.
 `build` retains an executable without starting it.
 
-From a checkout, use `-- --` before program arguments. mise consumes the
-first `--`; the second reaches `oseo`. For example:
+If you [built from a checkout], replace `oseo` with `mise run oseo`. Use
+`-- --` before program arguments: mise consumes the first `--`, and the
+second reaches `oseo`. For example:
 
 ~~~~ sh
 mise run oseo run examples/ray-tracer.ts -- -- 1 1
@@ -111,6 +89,7 @@ objects have separate cache identities for each configuration.
 [ADR 0036] defines the
 compiler options and verification gates.
 
+[built from a checkout]: ./install.md#build-from-a-checkout
 [ADR 0036]: ../adr/0036-optimized-native-build-configuration.md
 
 
