@@ -271,8 +271,8 @@ export async function runNativeScenario2(
   // A throw in the prelude Script, at its top level or inside one of its
   // functions that a module calls, reports the Script's own location.
   for (const [prelude, entry, location] of [
-    ["throwing-prelude.js", "entry.mjs", "2:1"],
-    ["failing-prelude.js", "calls-prelude.mjs", "3:3"],
+    ["throwing-prelude.js", "entry.mjs", "20:1"],
+    ["failing-prelude.js", "calls-prelude.mjs", "21:3"],
   ] as const) {
     for (const specialization of ["disabled", "enabled"] as const) {
       const thrown = await runNativeCli(
