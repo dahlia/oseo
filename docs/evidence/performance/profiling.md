@@ -71,6 +71,24 @@ It checks the actual `darwin/arm64` host in the helper, uses a fresh directory
 under `RUNNER_TEMP`, and archives the evidence with `tar` to retain executable
 modes and the path mapping. Archive and upload steps use `always()` and
 `if-no-files-found: error`; hard job termination can still prevent upload.
+The smoke copies the repository *LICENSE* before writing any source and
+includes its digest among the capture inputs.
+On GitHub-hosted ARM64 Mac CI, the fixed synthetic smoke also records a
+call-graph witness in *hosted-mac-synthetic-stacks.json*. Every one of the
+eight existing reports must have a fully named path from the recorded
+program caller through a generated frame into runtime code, with the
+witness addresses inside their named binary images. A complete report with a
+valid graph and no diagnostics retains its main-thread stack count even
+without a witness. It counts stacks beneath topmost unknown frames and
+beneath topmost deduplicated frames separately. Nested frames of the same
+kind count once per stack.
+The two counts can overlap. A malformed graph, missing witness, truncated
+report, loss or other diagnostic still fails. The raw reports and the
+original strict *capture.json* verdict are retained. These correlated counts
+do not establish sample coverage, time shares or cost attribution. Actual
+artifacts and local or Linux smoke runs retain the strict whole-report
+unknown-frame veto.
+
 No job, runner placement, matrix, permission, required gate or timeout is added
 or changed. No unverified service default is used as a time budget. The
 retained serial Mac attempt failed the eight-capture requirement. New CI
@@ -116,12 +134,14 @@ and exact stderr bytes remain mandatory. *preflight-check.json* and
 checker errors; target output is checked even when stack capture fails.
 
 `smoke` uses the public compiler, C backend, runtime, Node host and Zig APIs
-already available after the optimized build unit. It builds the same
-unhinted two-million-iteration source as the earlier longer smoke, explicitly
-selecting `optimized`, disabled specialization and no instrumentation. It
-retains generated C, runtime source, actual build requests and raw compiler
-outputs, the executable and tool identities. It changes no compiler flags.
-This build belongs only to method verification and has no timed-artifact ID.
+already available after the optimized build unit. The fixed unhinted
+workload accumulates two million values and expects `6499995` on stdout.
+The GitHub-hosted ARM64 Mac fixture runs that loop inside an ordinary
+generated function so the call can remain visible during the loop.
+Both sources select `optimized`, disabled specialization and no
+instrumentation. The helper keeps the source, generated C, runtime source,
+actual build requests, raw compiler output and executable and tool identities.
+The build uses the same compiler flags and has no timed-artifact ID.
 Both commands refuse an existing output directory. Neither runs the corpus,
 collects benchmark timings or supplies missing harness acceptance.
 
@@ -154,8 +174,9 @@ also resolve runtime context. Linux keeps its existing requirement for runtime
 context in at least one capture; generated-only Linux stacks remain useful user
 observations with runtime attribution unknown. Tool exit zero alone cannot
 pass. The summary records all eight positions, including failed races and
-unattempted stops after exit. Detected unknown/truncated frames fail the method
-probe; absence of a diagnostic does not prove complete unwinding.
+unattempted stops after exit. The strict report check rejects detected unknown
+and truncated frames. Absence of a diagnostic does not prove complete
+unwinding.
 
 Mac reports must retain the live-task header, ten-millisecond request header,
 image section and completion message. A target that exits before a sampler
