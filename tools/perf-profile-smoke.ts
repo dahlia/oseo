@@ -1,213 +1,272 @@
-import { cBackend } from "../packages/backend-c/src/index.ts";
-import {
-  compileSource,
-  targetForExecutionHost,
-} from "../packages/compiler/src/index.ts";
-import { createNodeHost } from "../packages/host/src/index.ts";
-import { babelFrontend } from "../packages/parser-babel/src/index.ts";
-import { cRuntimeProvider } from "../packages/runtime-c/src/index.ts";
-import { withNativeFixture } from "../packages/testkit/src/index.ts";
-import { zigToolchain } from "../packages/toolchain-zig/src/index.ts";
-import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
+/*
+ * Oseo, an ahead-of-time compiler for JavaScript and TypeScript.
+ * Copyright (C) 2026 Hong Minhee <https://hongminhee.org/>
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
+import { copyFileSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { join, resolve } from "node:path";
 import {
-  captureArtifact,
   fileIdentity,
+  runFixedProfileSmoke,
   runProfilingCommand,
 } from "./perf-profile-capture.ts";
+import type { CaptureRequest } from "./perf-profile-capture.ts";
 
-const directory = resolve(process.argv[2] ?? "");
-if (process.argv.length !== 3) {
-  throw new Error("usage: node tools/perf-profile-smoke.ts NEW_DIRECTORY");
+interface SmokeCaptureResult {
+  readonly accepted: boolean;
+  readonly reportSha256: string;
 }
-mkdirSync(directory);
-try {
-  writeFileSync(
-    join(directory, "host.json"),
-    JSON.stringify(
+
+/** Internal fixed build used by the capture-owned smoke entry. */
+export async function buildFixedProfileSmoke(
+  directory: string,
+  capture: (
+    request: CaptureRequest,
+    directory: string,
+  ) => Promise<SmokeCaptureResult>,
+): Promise<void> {
+  mkdirSync(directory);
+  try {
+    const license = join(directory, "LICENSE");
+    copyFileSync(new URL("../LICENSE", import.meta.url), license);
+    const unicodeLicense = join(directory, "UNICODE-LICENSE.txt");
+    copyFileSync(
+      new URL("../packages/runtime-c/UNICODE-LICENSE.txt", import.meta.url),
+      unicodeLicense,
+    );
+    writeFileSync(
+      join(directory, "host.json"),
+      JSON.stringify(
+        {
+          platform: process.platform,
+          architecture: process.arch,
+          required: "linux/x64 or darwin/arm64",
+        },
+        null,
+        2,
+      ) + "\n",
+    );
+    if (
+      !(
+        (process.platform === "linux" && process.arch === "x64") ||
+        (process.platform === "darwin" && process.arch === "arm64")
+      )
+    ) {
+      writeFileSync(
+        join(directory, "failure.txt"),
+        "Unsupported native host\n",
+      );
+      throw new Error("Requires Linux x64 or macOS arm64");
+    }
+    const [
+      { cBackend },
+      { compileSource, targetForExecutionHost },
+      { createNodeHost },
+      { babelFrontend },
+      { cRuntimeProvider },
+      { withNativeFixture },
+      { zigToolchain },
+    ] = await Promise.all([
+      import("../packages/backend-c/src/index.ts"),
+      import("../packages/compiler/src/index.ts"),
+      import("../packages/host/src/index.ts"),
+      import("../packages/parser-babel/src/index.ts"),
+      import("../packages/runtime-c/src/index.ts"),
+      import("../packages/testkit/src/index.ts"),
+      import("../packages/toolchain-zig/src/index.ts"),
+    ]);
+    const host = createNodeHost();
+    const target =
+      host.executionHost == null
+        ? undefined
+        : targetForExecutionHost(host.executionHost);
+    if (target == null)
+      throw new Error("Requires a supported native execution host");
+    const body =
+      "function add(a, b) { return a + b; } let total = 0; " +
+      "for (let i = 0; i < 2000000; i++) { const o = { value: i % 7 }; " +
+      "total = add(total, o.value + 0.25); }";
+    const hostedMac =
+      process.platform === "darwin" &&
+      process.arch === "arm64" &&
+      process.env.GITHUB_ACTIONS === "true" &&
+      process.env.RUNNER_ENVIRONMENT === "github-hosted";
+    // Keep a generated call active while the hosted sampler sees the loop.
+    const source = hostedMac
+      ? `function sum() { ${body} return total; } console.log(sum());`
+      : `${body} console.log(total);`;
+    const sourcePath = join(directory, "smoke.js");
+    writeFileSync(sourcePath, source + "\n");
+    const compiled = compileSource(
+      babelFrontend,
+      { sourceId: "profiling-smoke.js", source },
+      { specialization: "disabled" },
+    );
+    if (compiled.diagnostics.length !== 0 || compiled.mir == null) {
+      throw new Error(JSON.stringify(compiled.diagnostics));
+    }
+    const requests: object[] = [];
+    const inputs = [license, unicodeLicense, sourcePath];
+    for (const name of [
+      "perf-profile.ts",
+      "perf-profile-capture.ts",
+      "perf-profile-process.ts",
+      "perf-profile-smoke.ts",
+    ]) {
+      const path = join(directory, name);
+      writeFileSync(path, readFileSync(new URL(name, import.meta.url)));
+      inputs.push(path);
+    }
+    const build = join(directory, "build");
+    // Retain runtime source even when the archive cache is reused.
+    const runtimeDirectory = join(directory, "runtime-source");
+    mkdirSync(runtimeDirectory);
+    for (const asset of cRuntimeProvider.getRuntimeInput().assets) {
+      const path = join(runtimeDirectory, asset.name);
+      // eslint-disable-next-line no-await-in-loop -- Preserve asset order.
+      writeFileSync(path, await host.readTextFile(asset.url));
+      inputs.push(path);
+    }
+    await withNativeFixture(
       {
-        platform: process.platform,
-        architecture: process.arch,
-        required: "linux/x64 or darwin/arm64",
-      },
-      null,
-      2,
-    ) + "\n",
-  );
-  if (
-    !(
-      (process.platform === "linux" && process.arch === "x64") ||
-      (process.platform === "darwin" && process.arch === "arm64")
-    )
-  ) {
-    writeFileSync(join(directory, "failure.txt"), "Unsupported native host\n");
-    throw new Error("Requires Linux x64 or macOS arm64");
-  }
-  const host = createNodeHost();
-  const target =
-    host.executionHost == null
-      ? undefined
-      : targetForExecutionHost(host.executionHost);
-  if (target == null)
-    throw new Error("Requires a supported native execution host");
-  // Keep the earlier longer-workload's exact work size and arithmetic oracle.
-  const source =
-    "function add(a, b) { return a + b; } let total = 0; " +
-    "for (let i = 0; i < 2000000; i++) { const o = { value: i % 7 }; " +
-    "total = add(total, o.value + 0.25); } console.log(total);";
-  const sourcePath = join(directory, "smoke.js");
-  writeFileSync(sourcePath, source + "\n");
-  const compiled = compileSource(
-    babelFrontend,
-    { sourceId: "profiling-smoke.js", source },
-    { specialization: "disabled" },
-  );
-  if (compiled.diagnostics.length !== 0 || compiled.mir == null) {
-    throw new Error(JSON.stringify(compiled.diagnostics));
-  }
-  const requests: object[] = [];
-  const inputs = [sourcePath];
-  for (const name of [
-    "perf-profile.ts",
-    "perf-profile-capture.ts",
-    "perf-profile-process.ts",
-    "perf-profile-smoke.ts",
-  ]) {
-    const path = join(directory, name);
-    writeFileSync(path, readFileSync(new URL(name, import.meta.url)));
-    inputs.push(path);
-  }
-  const build = join(directory, "build");
-  // Retain runtime source even when the archive cache is reused.
-  const runtimeDirectory = join(directory, "runtime-source");
-  mkdirSync(runtimeDirectory);
-  for (const asset of cRuntimeProvider.getRuntimeInput().assets) {
-    const path = join(runtimeDirectory, asset.name);
-    // eslint-disable-next-line no-await-in-loop -- Preserve asset order.
-    writeFileSync(path, await host.readTextFile(asset.url));
-    inputs.push(path);
-  }
-  await withNativeFixture(
-    {
-      backend: cBackend,
-      host: {
-        ...host,
-        makeTemporaryDirectory: async () => {
-          mkdirSync(build);
-          return build;
-        },
-        run: async (request) => {
-          const startedUtc = new Date().toISOString();
-          try {
-            if (request.environment == null) {
-              throw new Error("Build command lacks an explicit environment");
-            }
-            const run = await runProfilingCommand(
-              directory,
-              `build-command-${requests.length}`,
-              [request.command, ...request.args],
-              request.cwd,
-              request.environment.variables,
-            );
-            const result = {
-              exitStatus: run.status ?? 1,
-              stdout: readFileSync(join(directory, run.stdout), "utf8"),
-              stderr: readFileSync(join(directory, run.stderr), "utf8"),
-            };
-            if (!run.groupGone || run.error != null || run.timedOut) {
-              throw new Error("Build process cleanup or execution failed");
-            }
-            for (const argument of request.args) {
-              if (argument.startsWith("/") && argument.endsWith(".a")) {
-                inputs.push(argument);
-              }
-            }
-            requests.push({
-              request,
-              startedUtc,
-              finishedUtc: new Date().toISOString(),
-              result,
-            });
-            return result;
-          } catch (error) {
-            requests.push({
-              request,
-              startedUtc,
-              finishedUtc: new Date().toISOString(),
-              error: String(error),
-            });
-            throw error;
-          } finally {
-            writeFileSync(
-              join(directory, "build-requests.json"),
-              JSON.stringify(requests, null, 2) + "\n",
-            );
-          }
-        },
-      },
-      input: compiled.mir,
-      operation: "compile",
-      runtime: cRuntimeProvider,
-      target,
-      toolchain: zigToolchain,
-      buildConfiguration: "optimized",
-      keepArtifacts: true,
-    },
-    async (observation) => {
-      const metadata = join(directory, "build.json");
-      writeFileSync(
-        metadata,
-        JSON.stringify(
-          {
-            ...observation,
-            emittedC: undefined,
-            role: "synthetic-method-probe",
-            timedArtifactId: null,
-            instrumentation: false,
-            specialization: "disabled",
+        backend: cBackend,
+        host: {
+          ...host,
+          makeTemporaryDirectory: async () => {
+            mkdirSync(build);
+            return build;
           },
-          null,
-          2,
-        ) + "\n",
-      );
-      const generated = join(directory, "generated.c");
-      writeFileSync(generated, observation.emittedC);
-      inputs.push(metadata, generated, join(directory, "build-requests.json"));
-      const request = {
-        kind: "synthetic-method-probe" as const,
-        executable: observation.executablePath,
-        sha256: fileIdentity(observation.executablePath).sha256,
-        inputs: inputs.map((path) => ({
-          path,
-          sha256: fileIdentity(path).sha256,
-        })),
-        argv: [],
-        env: {},
-        cwd: directory,
-        stdinBase64: "",
-        stdoutBase64: Buffer.from("6499995\n").toString("base64"),
-        stderrBase64: "",
-        exitStatus: 0,
-      };
-      writeFileSync(
-        join(directory, "request.json"),
-        JSON.stringify(request, null, 2) + "\n",
-      );
-      process.exitCode = (await captureArtifact(
-        request,
-        join(directory, "capture"),
-      ))
-        ? 0
-        : 1;
-    },
-  );
-  // Reading the persisted result catches an absent final report independently.
-  if (
-    JSON.parse(readFileSync(join(directory, "capture", "capture.json"), "utf8"))
-      .status !== "method-probe-passed"
-  )
-    process.exitCode = 1;
-} catch (error) {
-  writeFileSync(join(directory, "failure.txt"), String(error) + "\n");
-  throw error;
+          run: async (request) => {
+            const startedUtc = new Date().toISOString();
+            try {
+              if (request.environment == null) {
+                throw new Error("Build command lacks an explicit environment");
+              }
+              const run = await runProfilingCommand(
+                directory,
+                `build-command-${requests.length}`,
+                [request.command, ...request.args],
+                request.cwd,
+                request.environment.variables,
+              );
+              const result = {
+                exitStatus: run.status ?? 1,
+                stdout: readFileSync(join(directory, run.stdout), "utf8"),
+                stderr: readFileSync(join(directory, run.stderr), "utf8"),
+              };
+              if (!run.groupGone || run.error != null || run.timedOut) {
+                throw new Error("Build process cleanup or execution failed");
+              }
+              for (const argument of request.args) {
+                if (argument.startsWith("/") && argument.endsWith(".a")) {
+                  inputs.push(argument);
+                }
+              }
+              requests.push({
+                request,
+                startedUtc,
+                finishedUtc: new Date().toISOString(),
+                result,
+              });
+              return result;
+            } catch (error) {
+              requests.push({
+                request,
+                startedUtc,
+                finishedUtc: new Date().toISOString(),
+                error: String(error),
+              });
+              throw error;
+            } finally {
+              writeFileSync(
+                join(directory, "build-requests.json"),
+                JSON.stringify(requests, null, 2) + "\n",
+              );
+            }
+          },
+        },
+        input: compiled.mir,
+        operation: "compile",
+        runtime: cRuntimeProvider,
+        target,
+        toolchain: zigToolchain,
+        buildConfiguration: "optimized",
+        keepArtifacts: true,
+      },
+      async (observation) => {
+        const metadata = join(directory, "build.json");
+        writeFileSync(
+          metadata,
+          JSON.stringify(
+            {
+              ...observation,
+              emittedC: undefined,
+              role: "synthetic-method-probe",
+              timedArtifactId: null,
+              instrumentation: false,
+              specialization: "disabled",
+            },
+            null,
+            2,
+          ) + "\n",
+        );
+        const generated = join(directory, "generated.c");
+        writeFileSync(generated, observation.emittedC);
+        inputs.push(
+          metadata,
+          generated,
+          join(directory, "build-requests.json"),
+        );
+        const request = {
+          kind: "synthetic-method-probe" as const,
+          executable: observation.executablePath,
+          sha256: fileIdentity(observation.executablePath).sha256,
+          inputs: inputs.map((path) => ({
+            path,
+            sha256: fileIdentity(path).sha256,
+          })),
+          argv: [],
+          env: {},
+          cwd: directory,
+          stdinBase64: "",
+          stdoutBase64: Buffer.from("6499995\n").toString("base64"),
+          stderrBase64: "",
+          exitStatus: 0,
+        };
+        writeFileSync(
+          join(directory, "request.json"),
+          JSON.stringify(request, null, 2) + "\n",
+        );
+        const captureDirectory = join(directory, "capture");
+        const result = await capture(request, captureDirectory);
+        // Match the published raw result to the same session.
+        const persisted = fileIdentity(join(captureDirectory, "capture.json"));
+        process.exitCode =
+          result.accepted && persisted.sha256 === result.reportSha256 ? 0 : 1;
+      },
+    );
+  } catch (error) {
+    writeFileSync(join(directory, "failure.txt"), String(error) + "\n");
+    throw error;
+  }
+}
+
+if (import.meta.main) {
+  if (process.argv.length !== 3) {
+    throw new Error("usage: node tools/perf-profile-smoke.ts NEW_DIRECTORY");
+  }
+  await runFixedProfileSmoke(resolve(process.argv[2]!));
 }

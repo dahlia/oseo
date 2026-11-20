@@ -1,6 +1,25 @@
+/*
+ * Oseo, an ahead-of-time compiler for JavaScript and TypeScript.
+ * Copyright (C) 2026 Hong Minhee <https://hongminhee.org/>
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
 import assert from "node:assert/strict";
 import { spawnSync } from "node:child_process";
 import { createHash } from "node:crypto";
+import { once } from "node:events";
 import {
   existsSync,
   mkdirSync,
@@ -158,6 +177,8 @@ const {
   captureArtifact,
   captureOwnedStacks,
   fileIdentity,
+  inspectHostedMacSyntheticCapture,
+  inspectHostedMacSyntheticStack,
   inspectStack,
   validateCaptureRequest,
 } = await import("../tools/perf-profile-capture.ts");
@@ -184,9 +205,168 @@ test("stack acceptance rejects unknown, truncated and empty captures", () => {
   );
 });
 
+const hostedMacCallGraph = [
+  "Call graph:",
+  "    4 Thread_1 DispatchQueue_1: com.apple.main-thread (serial)",
+  "      3 start (in dyld) + 4 [0x2004]",
+  "      + 3 main (in fixture) + 4 [0x1004]",
+  "      + ! 3 oseo_call_function (in fixture) + 4 [0x1014]",
+  "      + !   3 oseo_dispatch_function (in fixture) + 4 [0x1024]",
+  "      + !   : 3 oseo_cell_create (in fixture) + 4 [0x1034]",
+  "      + !   : | 3 DYLD-STUB$$_platform_bzero (in libsystem_malloc.dylib)" +
+    " + 8 [0x3004]",
+  "      1 ??? (in <unknown binary>) [0x9000]",
+  "        1 ??? (in <unknown binary>) [0x9004]",
+  "",
+  "Total number in stack (recursive counted multiple, when >=5):",
+  "",
+  "Sort by top of stack, same collapsed (when >= 5):",
+  "",
+  "Binary Images:",
+  "    0x1000 - 0x10ff +fixture (0) " +
+    "<ADEBFB7E-5B41-366F-B2A5-A16E391120D8> /tmp/fixture",
+  "    0x2000 - 0x20ff dyld (1.0.0 - 1387.2) " +
+    "<57F4E7E7-A497-38BB-A3D2-A459C622460B> /usr/lib/dyld",
+  "    0x3000 - 0x30ff libsystem_malloc.dylib (812.160.5) " +
+    "<8CF02A42-BC33-38BF-B14A-FA9B13B3CA3F> " +
+    "/usr/lib/system/libsystem_malloc.dylib",
+  "       0x28d26e000 -        0x28d26ebbf  libsystem_trial.dylib " +
+    "(474.2.18.2.1) <698A199E-73E6-3D12-AB87-C8E100BEA52E> " +
+    "/usr/lib/system/libsystem_trial.dylib",
+  "",
+].join("\n");
+
+test("hosted Mac smoke requires a complete named call-graph witness", () => {
+  const complete = hostedMacCallGraph;
+  assert.deepEqual(inspectHostedMacSyntheticStack(complete, "fixture"), {
+    mainThreadReportedStacks: 4,
+    unknownBranches: 1,
+    reportedStacksWithUnknown: 1,
+    deduplicatedBranches: 0,
+    reportedStacksWithDeduplicated: 0,
+    witnessLines: [3, 4, 5, 6, 7, 8],
+    witnessReportedStacks: 3,
+  });
+  assert.equal(inspectStack(complete, "darwin").useful, false);
+  const withFiveUnknown = complete
+    .replace("4 Thread", "8 Thread")
+    .replace("      1 ???", "      5 ???");
+  const summary = "        ???  (in <unknown binary>)        5";
+  const withSummary = withFiveUnknown.replace(
+    "Binary Images:",
+    summary + "\n\nBinary Images:",
+  );
+  const fiveUnknown = inspectHostedMacSyntheticStack(
+    withFiveUnknown,
+    "fixture",
+  );
+  assert.ok(fiveUnknown);
+  assert.equal(fiveUnknown.mainThreadReportedStacks, 8);
+  assert.equal(fiveUnknown.unknownBranches, 1);
+  assert.equal(fiveUnknown.reportedStacksWithUnknown, 5);
+  assert.deepEqual(
+    inspectHostedMacSyntheticStack(withSummary, "fixture"),
+    fiveUnknown,
+  );
+  assert.equal(inspectStack(withSummary, "darwin").useful, false);
+
+  const withoutWitness = {
+    ...fiveUnknown,
+    witnessLines: [],
+    witnessReportedStacks: 0,
+  };
+  for (const graph of [
+    withFiveUnknown.replace("oseo_dispatch_function", "unknown_dispatch"),
+    withFiveUnknown.replace("oseo_call_function", "unknown_runtime"),
+    withFiveUnknown.replace("oseo_cell_create", "oseo_function_0"),
+  ]) {
+    assert.deepEqual(
+      inspectHostedMacSyntheticStack(graph, "fixture"),
+      withoutWitness,
+    );
+  }
+  const unknownCaller = withFiveUnknown.replace(
+    "3 start (in dyld) + 4 [0x2004]",
+    "3 ??? (in <unknown binary>) [0x9040]",
+  );
+  assert.deepEqual(inspectHostedMacSyntheticStack(unknownCaller, "fixture"), {
+    ...withoutWitness,
+    unknownBranches: 2,
+    reportedStacksWithUnknown: 8,
+  });
+
+  const deduplicated = withFiveUnknown
+    .replace("oseo_cell_create", "<deduplicated_symbol>")
+    .replace("DYLD-STUB$$_platform_bzero", "<deduplicated_symbol>")
+    .replace(
+      "5 ??? (in <unknown binary>) [0x9000]",
+      "5 <deduplicated_symbol> (in fixture) [0x1040]",
+    );
+  assert.deepEqual(inspectHostedMacSyntheticStack(deduplicated, "fixture"), {
+    ...withoutWitness,
+    deduplicatedBranches: 3,
+    reportedStacksWithDeduplicated: 8,
+    reportedStacksWithUnknown: 1,
+  });
+
+  const cut = complete.indexOf("libsystem_trial.dylib") + "libs".length;
+  for (const bad of [
+    complete.replace("4 Thread", "5 Thread"),
+    complete.replace("[0x1024]", "[0x9040]"),
+    complete.replace("DYLD-STUB$$", "BAD-STUB$$"),
+    complete.replace("DYLD-STUB$$_platform_bzero", "0x3004"),
+    complete.replace("DYLD-STUB$$_platform_bzero", "..."),
+    complete.replace("[0x3004]", "[0x9040]"),
+    complete.slice(0, cut),
+    complete.slice(0, cut) + "\n",
+    complete.trimEnd(),
+    "Truncated report\n" + complete,
+    "Lost samples\n" + complete,
+    withSummary.replace(summary, summary + "\n" + summary),
+    withSummary.replace(summary, summary.replace(/5$/u, "6")),
+    complete.replace("Binary Images:", summary + "\nBinary Images:"),
+    complete.replace("+ !   : 3", "+ !   :   3"),
+    complete.replace("Total number in stack", "malformed graph"),
+    complete.replace("Binary Images:", "unresolved frame\nBinary Images:"),
+  ]) {
+    assert.equal(inspectHostedMacSyntheticStack(bad, "fixture"), undefined);
+  }
+});
+
 test("capture validates launch, bytes and frozen inputs", () => {
   for (const value of [null, {}, { kind: "existing-artifact" }]) {
     assert.throws(() => validateCaptureRequest(value));
+  }
+  const directory = mkdtempSync(join(tmpdir(), "oseo-smoke-license-"));
+  const output = join(directory, "output");
+  try {
+    // Stop the real CLI at host selection, before it copies any source.
+    const result = spawnSync(
+      process.execPath,
+      [
+        "--import",
+        "data:text/javascript," +
+          "Object.defineProperty(process,'arch',{value:'unsupported'})",
+        resolve("tools/perf-profile-smoke.ts"),
+        output,
+      ],
+      { encoding: "utf8", timeout: 10_000 },
+    );
+    assert.equal(result.status, 1, result.stderr);
+    assert.match(result.stderr, /Requires Linux x64 or macOS arm64/u);
+    assert.equal(existsSync(join(output, "smoke.js")), false);
+    assert.deepEqual(
+      readFileSync(join(output, "LICENSE")),
+      readFileSync(new URL("../LICENSE", import.meta.url)),
+    );
+    assert.deepEqual(
+      readFileSync(join(output, "UNICODE-LICENSE.txt")),
+      readFileSync(
+        new URL("../packages/runtime-c/UNICODE-LICENSE.txt", import.meta.url),
+      ),
+    );
+  } finally {
+    rmSync(directory, { recursive: true, force: true });
   }
 });
 
@@ -792,9 +972,11 @@ for (const mode of [
   "partial",
   "runtime-only",
   "generated-only",
+  "unknown-branch",
   "wrong-pid",
   "wrong-identity",
   "target-exit",
+  "target-exit-before-last-report",
   "already-exited",
   "timeout",
   "interrupt",
@@ -810,17 +992,26 @@ for (const mode of [
       const records: RunRecord[] = [];
       const deadlines: number[] = [];
       let launches = 0;
+      let settledSamplers = 0;
+      const firstSevenSettled = Promise.withResolvers<void>();
       let signalTimer: ReturnType<typeof setTimeout> | undefined;
       const target = session.launch(
         directory,
         "target",
-        [process.execPath, "-e", "setInterval(() => {}, 1000)"],
+        [
+          process.execPath,
+          "-e",
+          "const keepAlive = setInterval(() => {}, 1000);" +
+            "process.on('SIGUSR2', () => clearInterval(keepAlive));",
+        ],
         directory,
         {},
         Buffer.alloc(0),
         120_000,
       );
       const targetHash = fileIdentity(process.execPath).sha256;
+      const image = basename(process.execPath);
+      const witnessGraph = hostedMacCallGraph.replaceAll("fixture", image);
       const request = {
         kind: "synthetic-method-probe" as const,
         executable: process.execPath,
@@ -844,10 +1035,12 @@ const index = Number(/sample-(\\d+)\\.txt$/.exec(file)[1]);
 const mode = process.env.FAKE_MODE;
 console.log(JSON.stringify({ pid, duration, interval, flag, file,
   samplerPid: process.pid }));
-const raw = 'Analysis of sampling fixture (pid ' + pid +
+const heading = 'Analysis of sampling fixture (pid ' + pid +
   ') every 10 milliseconds\\nProcess: fixture [' +
   (mode === 'wrong-pid' && index === 3 ? '0' : pid) +
-  ']\\nTarget Type: live task\\n' +
+  ']\\nTarget Type: live task\\n';
+const raw = heading + (mode === 'target-exit-before-last-report' ?
+  ${JSON.stringify(witnessGraph)} :
   (mode === 'generated-only' && index === 3 ? '' :
     '    + 4 oseo_cell_get (in fixture) [0x1]\\n') +
   (mode === 'runtime-only' && index === 3 ?
@@ -855,7 +1048,9 @@ const raw = 'Analysis of sampling fixture (pid ' + pid +
     '    + 4 oseo_function_script (in fixture) [0x2]\\n') +
   (mode === 'generated-only' && index === 3 ?
     '    + 4 main (in fixture) [0x3]\\n' : '') +
-  (mode === 'partial' && index === 3 ? '' : 'Binary Images:\\n');
+  (mode === 'unknown-branch' && index === 3 ?
+    '    + 1 ??? (in <unknown binary>) [0x9000]\\n' : '') +
+  (mode === 'partial' && index === 3 ? '' : 'Binary Images:\\n'));
 if (!(mode === 'missing' && index === 3)) fs.writeFileSync(file, raw);
 if (mode === 'timeout' && index === 3) {
   process.on('SIGTERM', () => {});
@@ -943,6 +1138,25 @@ if (mode === 'timeout' && index === 3) {
               timeoutMs,
             ).done;
             records.push(record);
+            if (mode === "target-exit-before-last-report") {
+              if (name === "capture-7") {
+                await Promise.race([
+                  firstSevenSettled.promise,
+                  once(AbortSignal.timeout(timeoutMs), "abort").then(() =>
+                    assert.fail("Earlier sampler fixtures did not settle"),
+                  ),
+                ]);
+                // Let the other capture continuations observe the live child.
+                await new Promise<void>((resolveTurn) =>
+                  setImmediate(resolveTurn),
+                );
+                process.kill(target.pid!, "SIGUSR2");
+                assert.equal((await target.done).status, 0);
+              } else if (name.startsWith("capture-")) {
+                settledSamplers++;
+                if (settledSamplers === 7) firstSevenSettled.resolve();
+              }
+            }
             return record;
           },
         });
@@ -1002,6 +1216,57 @@ if (mode === 'timeout' && index === 3) {
               join(directory, `sample-${capture.index}.txt`),
             );
           }
+        } else if (mode === "target-exit-before-last-report") {
+          const verdicts = captures.map((capture) => {
+            const record = capture.record!;
+            const raw = readFileSync(
+              join(directory, `sample-${capture.index}.txt`),
+            );
+            const input = {
+              image,
+              pid: target.pid!,
+              stdout: readFileSync(join(directory, record.stdout), "utf8"),
+              stderr: readFileSync(join(directory, record.stderr), "utf8"),
+            };
+            const verdict = inspectHostedMacSyntheticCapture(
+              capture,
+              raw,
+              input,
+            );
+            assert.ok(verdict.evidence);
+            if (capture.index === 0) {
+              assert.equal(verdict.accepted, true);
+              const missingWitness = Buffer.from(
+                raw.toString().replace("oseo_dispatch_function", "other"),
+              );
+              const failed = inspectHostedMacSyntheticCapture(
+                capture,
+                missingWitness,
+                input,
+              );
+              assert.deepEqual(failed.evidence, {
+                ...verdict.evidence,
+                witnessLines: [],
+                witnessReportedStacks: 0,
+              });
+              assert.equal(failed.accepted, false);
+            }
+            assert.equal(capture.processMatches, true);
+            assert.equal(record.status, 0);
+            return verdict.accepted;
+          });
+          assert.deepEqual(verdicts, [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            false,
+          ]);
+          assert.equal(captures[7]!.targetAliveAtCompletion, false);
+          assert.equal(captures[7]!.windowComplete, false);
         } else if (mode === "target-exit") {
           assert.ok(
             captures.every(
@@ -1021,6 +1286,11 @@ if (mode === 'timeout' && index === 3) {
           assert.match(captures[3]!.error!, /test launch failed/u);
           assert.equal(captures[3]!.status, "capture-error");
         } else if (mode !== "interrupt") {
+          if (mode === "unknown-branch") {
+            assert.equal(captures[3]!.windowComplete, true);
+            assert.equal(captures[3]!.processMatches, true);
+            assert.equal(captures[3]!.stack?.unknown, true);
+          }
           assert.notEqual(captures[3]!.status, "useful-stack");
           assert.ok(
             captures

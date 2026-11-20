@@ -1,4 +1,22 @@
 /*
+ * Oseo, an ahead-of-time compiler for JavaScript and TypeScript.
+ * Copyright (C) 2026 Hong Minhee <https://hongminhee.org/>
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
+/*
  * An independent model of the Uint8Array base64 and hex methods, written
  * from the ECMAScript 2026 text (23.3.2.1, 23.3.2.2, 23.3.3.12 to
  * 23.3.3.15, and the FromBase64 and FromHex operations). It shares no code

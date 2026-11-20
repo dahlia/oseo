@@ -87,8 +87,10 @@ applied that patch. Script sources use *.txt* so that repository
 formatting, lint, and line-length checks do not treat these historical files as
 maintained source. None of them is a supported tool API. The three read-only
 scans in *saturation.log* are safe to re-run against a checkout, and that file
-gives the exact commands. The measurement drivers are not, because they delete
-cache directories and launch hour-long gate runs.
+gives the exact commands. To repeat the three scans, use those commands with
+the script paths under *docs/evidence/u4/replay/*. The measurement drivers
+are not safe to re-run because they delete cache directories and launch
+hour-long gate runs.
 
 
 Recomputing the table

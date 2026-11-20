@@ -211,8 +211,9 @@ python3 extract.py.txt macos-15 macos-15.log
 Use the other job IDs in the fixed-cost table for their logs. GitHub's
 `gh run view --log` refused logs while other jobs were still running;
 the completed-job REST endpoint above supplied them. A local smoke run
-uses `mise exec -- python3 exec-probe.py.txt` with the lane cache
-variable. Hosted reproduction requires a separately authorized push of
+from the repository root uses
+`mise exec -- python3 tools/selfhosted-mac/exec-probe.py` with the lane
+cache variable. Hosted reproduction requires a separately authorized push of
 the experiment branch; the preserved workflow must never replace the
 normal workflow on `main`.
 
