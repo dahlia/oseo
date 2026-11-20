@@ -1,3 +1,21 @@
+/*
+ * Oseo, an ahead-of-time compiler for JavaScript and TypeScript.
+ * Copyright (C) 2026 Hong Minhee <https://hongminhee.org/>
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
 import { createTest262FragmentExecutor } from "./test262-fragments.ts";
 import { createTest262FragmentEmitter } from "./test262-emission.ts";
 import {
@@ -9,9 +27,10 @@ import type { Test262FragmentInput } from "./test262-fragments.ts";
 /* eslint-disable no-await-in-loop -- Each bounded worker sequences its case. */
 
 import { execFileSync } from "node:child_process";
+import { createHash } from "node:crypto";
 import { mkdir, readFile, readdir, rm, writeFile } from "node:fs/promises";
 import { availableParallelism } from "node:os";
-import { dirname, join, resolve } from "node:path";
+import { basename, dirname, join, resolve } from "node:path";
 import { performance } from "node:perf_hooks";
 import process from "node:process";
 import { fileURLToPath } from "node:url";
@@ -2462,66 +2481,124 @@ async function readHarnesses(root: string): Promise<Test262Harnesses> {
   return { ...harnesses, upstreamDefinitions, upstreamMembers };
 }
 
+const reviewedHarnessNoticeDigests = new Map([
+  [
+    "asyncHelpers.js",
+    "b8ee69b622e15923a61eff8c83f89dedab1162367083c3d664b7e8be6f66be70",
+  ],
+  [
+    "base.js",
+    "e1853106ad74a99d1a1af627049bf7ecc6a1be7977db31389ffdbe9eb3adde18",
+  ],
+  [
+    "compareArray.js",
+    "29f820aac0628a9ca6c7d72eb71b0aae6661c6fb632f8c6b3246be61d58760a2",
+  ],
+  [
+    "compareIterator.js",
+    "5f0c65d7bb27969fa2e0c70bdccbe326dcc8b58f09f24926d5cb4f20e2fd0b1f",
+  ],
+  [
+    "deepEqual.js",
+    "29f820aac0628a9ca6c7d72eb71b0aae6661c6fb632f8c6b3246be61d58760a2",
+  ],
+  [
+    "detachArrayBuffer.js",
+    "4346283372e090cf5ea6b4f67a91170240e4f12ac4a69491bc75b0d8133425a2",
+  ],
+  [
+    "doneprintHandle.js",
+    "8b818aff3ff456388e536ddedd5c61dce410cc2f2cf3107f599891eac92645f2",
+  ],
+  [
+    "nativeErrors.js",
+    "f9b193fee3b070280ed1791c40f9bc0e61558932b941a095a9ce48e48c738033",
+  ],
+  [
+    "promiseHelper.js",
+    "8b818aff3ff456388e536ddedd5c61dce410cc2f2cf3107f599891eac92645f2",
+  ],
+  [
+    "propertyHelper.js",
+    "cdeed6cb33fa96b24c4721abc1ba4e483e4fb311376e28565a6e07461b000c39",
+  ],
+  [
+    "regExpUtils.js",
+    "ceffd8bc85138f7afd505c68d2cbb5f191c8b1b6758aac8b9aee015b3f032102",
+  ],
+  [
+    "wellKnownIntrinsicObjects.js",
+    "ceffd8bc85138f7afd505c68d2cbb5f191c8b1b6758aac8b9aee015b3f032102",
+  ],
+]);
+
+/**
+ * Remove the checked-in license comment before assembling a Test262 input.
+ * The leading directive and closed notice must match the reviewed bytes so
+ * unrelated comments and the harness program retain their source positions.
+ */
+export function stripReviewedHarnessNotice(
+  name: string,
+  source: string,
+): string {
+  const expected = reviewedHarnessNoticeDigests.get(name);
+  if (expected == null) return source;
+  const directive =
+    source.match(/^\/\* eslint-disable [^\r\n]*\*\/\n\n/u)?.[0] ?? "";
+  const marker = "/* Oseo source license\n";
+  if (!source.startsWith(marker, directive.length)) return source;
+  const close = source.indexOf("*/", directive.length + marker.length);
+  const terminator = "*/\n\n";
+  if (close < 0 || !source.startsWith(terminator, close)) return source;
+  const body = close + terminator.length;
+  const digest = createHash("sha256")
+    .update(source.slice(0, body))
+    .digest("hex");
+  if (digest !== expected) return source;
+  return directive + source.slice(body);
+}
+
 async function readReviewedHarnesses(): Promise<Test262Harnesses> {
+  const read = async (path: string): Promise<string> =>
+    stripReviewedHarnessNotice(basename(path), await readFile(path, "utf8"));
   return {
-    base: await readFile(baseHarnessPath, "utf8"),
-    done: await readFile(doneHarnessPath, "utf8"),
+    base: await read(baseHarnessPath),
+    done: await read(doneHarnessPath),
     includes: new Map([
-      ["asyncHelpers.js", await readFile(asyncHelpersHarnessPath, "utf8")],
-      ["atomicsHelper.js", await readFile(atomicsHelperHarnessPath, "utf8")],
-      [
-        "byteConversionValues.js",
-        await readFile(byteConversionHarnessPath, "utf8"),
-      ],
-      [
-        "assertRelativeDateMs.js",
-        await readFile(assertRelativeDateHarnessPath, "utf8"),
-      ],
-      ["compareArray.js", await readFile(compareArrayHarnessPath, "utf8")],
-      ["dateConstants.js", await readFile(dateConstantsHarnessPath, "utf8")],
-      [
-        "compareIterator.js",
-        await readFile(compareIteratorHarnessPath, "utf8"),
-      ],
-      [
-        "decimalToHexString.js",
-        await readFile(decimalToHexStringHarnessPath, "utf8"),
-      ],
-      ["deepEqual.js", await readFile(deepEqualHarnessPath, "utf8")],
-      [
-        "detachArrayBuffer.js",
-        await readFile(detachArrayBufferHarnessPath, "utf8"),
-      ],
-      ["fnGlobalObject.js", await readFile(fnGlobalObjectHarnessPath, "utf8")],
-      ["isConstructor.js", await readFile(isConstructorHarnessPath, "utf8")],
-      [
-        "iteratorZipUtils.js",
-        await readFile(iteratorZipUtilsHarnessPath, "utf8"),
-      ],
-      ["nans.js", await readFile(nansHarnessPath, "utf8")],
+      ["asyncHelpers.js", await read(asyncHelpersHarnessPath)],
+      ["atomicsHelper.js", await read(atomicsHelperHarnessPath)],
+      ["byteConversionValues.js", await read(byteConversionHarnessPath)],
+      ["assertRelativeDateMs.js", await read(assertRelativeDateHarnessPath)],
+      ["compareArray.js", await read(compareArrayHarnessPath)],
+      ["dateConstants.js", await read(dateConstantsHarnessPath)],
+      ["compareIterator.js", await read(compareIteratorHarnessPath)],
+      ["decimalToHexString.js", await read(decimalToHexStringHarnessPath)],
+      ["deepEqual.js", await read(deepEqualHarnessPath)],
+      ["detachArrayBuffer.js", await read(detachArrayBufferHarnessPath)],
+      ["fnGlobalObject.js", await read(fnGlobalObjectHarnessPath)],
+      ["isConstructor.js", await read(isConstructorHarnessPath)],
+      ["iteratorZipUtils.js", await read(iteratorZipUtilsHarnessPath)],
+      ["nans.js", await read(nansHarnessPath)],
       [
         "nativeFunctionMatcher.js",
-        await readFile(nativeFunctionMatcherHarnessPath, "utf8"),
+        await read(nativeFunctionMatcherHarnessPath),
       ],
-      ["nativeErrors.js", await readFile(nativeErrorsHarnessPath, "utf8")],
-      ["propertyHelper.js", await readFile(propertyHarnessPath, "utf8")],
-      ["promiseHelper.js", await readFile(promiseHarnessPath, "utf8")],
-      ["proxyTrapsHelper.js", await readFile(proxyTrapsHarnessPath, "utf8")],
-      ["regExpUtils.js", await readFile(regexpUtilsHarnessPath, "utf8")],
+      ["nativeErrors.js", await read(nativeErrorsHarnessPath)],
+      ["propertyHelper.js", await read(propertyHarnessPath)],
+      ["promiseHelper.js", await read(promiseHarnessPath)],
+      ["proxyTrapsHelper.js", await read(proxyTrapsHarnessPath)],
+      ["regExpUtils.js", await read(regexpUtilsHarnessPath)],
       [
         "resizableArrayBufferUtils.js",
-        await readFile(resizableArrayBufferUtilsHarnessPath, "utf8"),
+        await read(resizableArrayBufferUtilsHarnessPath),
       ],
-      ["tcoHelper.js", await readFile(tcoHelperHarnessPath, "utf8")],
-      ["testAtomics.js", await readFile(testAtomicsHarnessPath, "utf8")],
-      [
-        "temporalHelpers.js",
-        await readFile(temporalHelpersHarnessPath, "utf8"),
-      ],
-      ["testTypedArray.js", await readFile(testTypedArrayHarnessPath, "utf8")],
+      ["tcoHelper.js", await read(tcoHelperHarnessPath)],
+      ["testAtomics.js", await read(testAtomicsHarnessPath)],
+      ["temporalHelpers.js", await read(temporalHelpersHarnessPath)],
+      ["testTypedArray.js", await read(testTypedArrayHarnessPath)],
       [
         "wellKnownIntrinsicObjects.js",
-        await readFile(wellKnownIntrinsicObjectsHarnessPath, "utf8"),
+        await read(wellKnownIntrinsicObjectsHarnessPath),
       ],
     ]),
   };

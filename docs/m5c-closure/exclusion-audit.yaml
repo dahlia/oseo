@@ -113,20 +113,20 @@ assessments:
         "9e9cb874d7e3449a29cdfa6da9b075a1a27bcf073f7a5bb4\
         de1e233d002e654e"
       tests/native/fixtures/trainc-ordinary-evidence.ts:
-        "09f2ff5f03ec78f88848b42878a50464caf94ff346db0e92\
-        07ad008ec300bd49"
+        "e1d4b92f9c2e5e2949765cbdc9151c0557bd30aa29f53d4d\
+        67389d86af9e405a"
       tests/trainc-ordinary-evidence.test.ts:
-        "42a2b5adcea97e0a3644dd128901d0e9d3e962422b38445a\
-        b75594a265f9eba6"
+        "9facf27e508664d521aed8f974f48c830727839c2a7b5a43\
+        0b3f76fbc728f8b9"
       tests/trainc-ordinary-source.test.ts:
-        "b39847456bec796078ece3c22939494371f3006467bbb90a\
-        e27f25abf8eaa76b"
+        "01cd441c92506bb0299baf07cd8e07ff0f86f04ecf89ea26\
+        bdb2d23991a5f6bf"
       tests/native/host-script-reference.ts:
-        "d01339d26b85c0c7e315f453a831bd12a725261ce11635ba\
-        a6ea62c1b8cab262"
+        "cb3a57723b9db1818658c7b220f069191154de1b142f3569\
+        531a42abab03288d"
       tests/test262/harness/base.js:
-        "50331feeca513cb2e2354e05e7c68f82d5aeccd9b766d6c8\
-        8438c5ef118075f6"
+        "d689241f1fb83e085d7055088d3348093045c01192d994f5\
+        a5ed83038ea41686"
   trainc-sloppy-body-static:
     disposition: exclusion
     normativeDependency: source-evaluation-only
@@ -149,20 +149,20 @@ assessments:
         "9e9cb874d7e3449a29cdfa6da9b075a1a27bcf073f7a5bb4\
         de1e233d002e654e"
       tests/native/fixtures/trainc-ordinary-evidence.ts:
-        "09f2ff5f03ec78f88848b42878a50464caf94ff346db0e92\
-        07ad008ec300bd49"
+        "e1d4b92f9c2e5e2949765cbdc9151c0557bd30aa29f53d4d\
+        67389d86af9e405a"
       tests/trainc-ordinary-evidence.test.ts:
-        "42a2b5adcea97e0a3644dd128901d0e9d3e962422b38445a\
-        b75594a265f9eba6"
+        "9facf27e508664d521aed8f974f48c830727839c2a7b5a43\
+        0b3f76fbc728f8b9"
       tests/trainc-ordinary-source.test.ts:
-        "b39847456bec796078ece3c22939494371f3006467bbb90a\
-        e27f25abf8eaa76b"
+        "01cd441c92506bb0299baf07cd8e07ff0f86f04ecf89ea26\
+        bdb2d23991a5f6bf"
       tests/native/host-script-reference.ts:
-        "d01339d26b85c0c7e315f453a831bd12a725261ce11635ba\
-        a6ea62c1b8cab262"
+        "cb3a57723b9db1818658c7b220f069191154de1b142f3569\
+        531a42abab03288d"
       tests/test262/harness/base.js:
-        "50331feeca513cb2e2354e05e7c68f82d5aeccd9b766d6c8\
-        8438c5ef118075f6"
+        "d689241f1fb83e085d7055088d3348093045c01192d994f5\
+        a5ed83038ea41686"
   trainc-constructor-phase:
     disposition: exclusion
     normativeDependency: source-evaluation-only
@@ -185,20 +185,20 @@ assessments:
         "9e9cb874d7e3449a29cdfa6da9b075a1a27bcf073f7a5bb4\
         de1e233d002e654e"
       tests/native/fixtures/trainc-ordinary-evidence.ts:
-        "09f2ff5f03ec78f88848b42878a50464caf94ff346db0e92\
-        07ad008ec300bd49"
+        "e1d4b92f9c2e5e2949765cbdc9151c0557bd30aa29f53d4d\
+        67389d86af9e405a"
       tests/trainc-ordinary-evidence.test.ts:
-        "42a2b5adcea97e0a3644dd128901d0e9d3e962422b38445a\
-        b75594a265f9eba6"
+        "9facf27e508664d521aed8f974f48c830727839c2a7b5a43\
+        0b3f76fbc728f8b9"
       tests/trainc-ordinary-source.test.ts:
-        "b39847456bec796078ece3c22939494371f3006467bbb90a\
-        e27f25abf8eaa76b"
+        "01cd441c92506bb0299baf07cd8e07ff0f86f04ecf89ea26\
+        bdb2d23991a5f6bf"
       tests/native/host-script-reference.ts:
-        "d01339d26b85c0c7e315f453a831bd12a725261ce11635ba\
-        a6ea62c1b8cab262"
+        "cb3a57723b9db1818658c7b220f069191154de1b142f3569\
+        531a42abab03288d"
       tests/test262/harness/base.js:
-        "50331feeca513cb2e2354e05e7c68f82d5aeccd9b766d6c8\
-        8438c5ef118075f6"
+        "d689241f1fb83e085d7055088d3348093045c01192d994f5\
+        a5ed83038ea41686"
   ds9-eval-arguments-only:
     disposition: exclusion
     normativeDependency: source-evaluation-only
@@ -221,11 +221,11 @@ assessments:
       docs/m5c-graph/dynamic-source-scope-arguments-assessment.yaml:
         "7f0bec44449504e52505bd027cf4492a\
         a052aa1035ce18716a2413b7aa68a620"
-      tests/scope-arguments-native.test.ts: "557add2d4107210fd3ab18027c4f7a18\
-        061bd830a74f565ae1f5e748762d7143"
+      tests/scope-arguments-native.test.ts: "07e4f984952fab1c2eda6099585d5768\
+        33e83fcccd57f6489bbab38ea0349130"
       tests/native/fixtures/scope-arguments-evidence.ts:
-        "ebb6c52f9eeb8b66f205ce4190a1720e\
-        e66f0cdd7023b086a77760ddf94c97da"
+        "cebe505e3d781418dd345067649b98c5\
+        20ad7ede30b67c2f3a3cb3cc6c7a958b"
     reason: Maintainer decision 2026-10-28 item 1 applies path by path as mapped
       in docs/m5c-graph/dynamic-source-scope-arguments-evidence.md. Each of the
       six arrow cells has a static native witness that keeps its
@@ -292,17 +292,17 @@ assessments:
         "a10e31e227b720dd22f70347ac142698107d50f0365a0fa6\
         89446ee44f8dd85a"
       tests/native/fixtures/compound-reference-base.ts:
-        "5e76424696454ae6172d498b911e2898204cafc862fe8bdb\
-        f77d68b58bf0757e"
+        "f2d136969a72d3cbc9e1a1c8a1e3896bf3675e49a8411ab2\
+        01004fa935da7968"
       tests/compound-reference-base-evidence.test.ts:
-        "d39fac459d66236eb9af9397591286932ea4c3bcc07acd0e\
-        2e2af2e41ee18044"
+        "0568867c39eb1d7f1a2ecd0338cc2a0e24e1cc65dc028f91\
+        118a3536a95cfa59"
       tests/compound-reference-base-source.test.ts:
-        "04f6a73154e06045f0a1be3ecbb42c574fe61299016a6ee5\
-        66771c0c8b44d5d6"
+        "1a2af0516b38e86a83473b53f970fcd44938394dbb2cb274\
+        872a1e2aafca0225"
       tests/test262/harness/base.js:
-        "50331feeca513cb2e2354e05e7c68f82d5aeccd9b766d6c8\
-        8438c5ef118075f6"
+        "d689241f1fb83e085d7055088d3348093045c01192d994f5\
+        a5ed83038ea41686"
   regexp-roundtrip:
     disposition: remediation
     normativeDependency: not-demonstrated
@@ -367,23 +367,23 @@ assessments:
         "a10e31e227b720dd22f70347ac142698107d50f0365a0fa6\
         89446ee44f8dd85a"
       tests/native/fixtures/global-lexical-configurable-var.ts:
-        "db8f75afb722b38b2553bb286f4599b5bcb1ff00ffc4ca2b\
-        1367a370a1d9a88a"
+        "0d942ecc45aa34ce240afbc1c28e7d17c26407ca33d84df4\
+        7ac268338fb61671"
       tests/native/fixtures/compound-reference-base.ts:
-        "5e76424696454ae6172d498b911e2898204cafc862fe8bdb\
-        f77d68b58bf0757e"
+        "f2d136969a72d3cbc9e1a1c8a1e3896bf3675e49a8411ab2\
+        01004fa935da7968"
       tests/global-lexical-configurable-var-evidence.test.ts:
-        "73de4c7a393fa79caf2023904f1f926714aed314fe285288\
-        7504802204d7837c"
+        "c3bef7300fa087779a6102f2ce5d310fe0adf112b98103f6\
+        b3210d44018859ad"
       tests/global-lexical-configurable-var-source.test.ts:
-        "dfbde9b8ce31fc07a7fa172416a42a1adb090a8ac1160d22\
-        8be653e1d14d0ea4"
+        "d9de9b454811bc77abc8cf52ddfaf51636db405910756c51\
+        e335a453b5cc58ce"
       tests/native/host-script-reference.ts:
-        "d01339d26b85c0c7e315f453a831bd12a725261ce11635ba\
-        a6ea62c1b8cab262"
+        "cb3a57723b9db1818658c7b220f069191154de1b142f3569\
+        531a42abab03288d"
       tests/test262/harness/base.js:
-        "50331feeca513cb2e2354e05e7c68f82d5aeccd9b766d6c8\
-        8438c5ef118075f6"
+        "d689241f1fb83e085d7055088d3348093045c01192d994f5\
+        a5ed83038ea41686"
   annex-b-pattern:
     disposition: remediation
     remediationOwner: unit:annexb-syntax
@@ -410,11 +410,11 @@ assessments:
       reopening triggers.
     replacementEvidence:
       tests/native/fixtures/annex-b-mixed-core.ts:
-        "45e4571f2e9f7556a21c4555d86720fd37a674479b9af0c291714648\
-        071a28cd"
+        "0ad49e48fa9d622944faaddc717cb56238a25b8becfea195a2993839\
+        b98d91e4"
       tests/annex-b-mixed-core-native.test.ts:
-        "ddc15ccc41702279c065d280cccfb666cf03069a9a16862282f9e4d7\
-        e2a58bfc"
+        "d4fdef13f217346def1ebda3a4a9699c67278375adf8562d06b7726e\
+        a52b4962"
   mixed-static-functions:
     disposition: remediation
     normativeDependency: not-demonstrated
@@ -465,11 +465,11 @@ assessments:
       optional Annex B policy, or on ADR 0019's reopening triggers.
     replacementEvidence:
       tests/native/fixtures/annex-b-mixed-core.ts:
-        "45e4571f2e9f7556a21c4555d86720fd37a674479b9af0c291714648\
-        071a28cd"
+        "0ad49e48fa9d622944faaddc717cb56238a25b8becfea195a2993839\
+        b98d91e4"
       tests/annex-b-mixed-core-native.test.ts:
-        "ddc15ccc41702279c065d280cccfb666cf03069a9a16862282f9e4d7\
-        e2a58bfc"
+        "d4fdef13f217346def1ebda3a4a9699c67278375adf8562d06b7726e\
+        a52b4962"
   import-call-attributes:
     disposition: exclusion
     normativeDependency: source-evaluation-only
@@ -517,14 +517,14 @@ assessments:
     normativeDependency: source-evaluation-only
     replacementEvidence:
       tests/fixtures/import-attributes/cycle.mjs:
-        "b9c59034c52fac5ce3507ad75cdeb7b55d097ef6f3d965ce0f\
-        ec836d487d7c35"
+        "8d8aafefc251d7f765d839337007a291053bfff82f52be2231\
+        d0cc7fddde7ada"
       tests/fixtures/import-attributes/entry.mjs:
-        "86f0cc52c67ba959156355fffdbf252e7c404c351483457ab9\
-        8078000fc8faf9"
+        "83cc3b596464d2dfb69a1c3358e99b8c782bdc4401a58d9fb0\
+        8b444c9de8d8df"
       tests/property/m5-import-attributes.property.test.ts:
-        "36ae672a0e4761633f067e97d8e8110e9596eb4495c8c1b1d3\
-        80b659839248f8"
+        "ce470c1a509772112b38a0ec5334da7f0c8a6af156c986b853\
+        ebbb6870819436"
     reason: >-
       The subject is that every import site of one JSON module receives the
       same object, and the import sites include a dynamic import() call. Its
@@ -710,11 +710,11 @@ assessments:
       triggers.
     replacementEvidence:
       tests/native/fixtures/classes.ts:
-        "5cc9537c4e20618e9bfdd2343f479650c9674424b1a3a6e0fddfab63\
-        a7879d61"
+        "c69c71843f3c35caac25a692c865379e9174d48ee4dbc2b1097db469\
+        777d3112"
       tests/class-private-accessor-coverage-native.test.ts:
-        "e74c273c881242c06bf298817dbc5f41a743eb41e3a4a7369debb23b\
-        b63a4a62"
+        "5e3117a54c9f12d9ed57fa5b9bcec712ba6ace29ce5113cdc66ecbc7\
+        b9d90f5e"
   annex-b-legacy-lookup-class-expression:
     disposition: remediation
     remediationOwner: unit:annexb-object-accessors
@@ -746,11 +746,11 @@ assessments:
       ADR 0019's reopening triggers.
     replacementEvidence:
       tests/native/fixtures/classes.ts:
-        "5cc9537c4e20618e9bfdd2343f479650c9674424b1a3a6e0fddfab63\
-        a7879d61"
+        "c69c71843f3c35caac25a692c865379e9174d48ee4dbc2b1097db469\
+        777d3112"
       tests/class-private-accessor-coverage-native.test.ts:
-        "e74c273c881242c06bf298817dbc5f41a743eb41e3a4a7369debb23b\
-        b63a4a62"
+        "5e3117a54c9f12d9ed57fa5b9bcec712ba6ace29ce5113cdc66ecbc7\
+        b9d90f5e"
   legacy-caller:
     disposition: exclusion
     normativeDependency: legacy-caller-only
@@ -772,11 +772,11 @@ assessments:
     disposition: exclusion
     normativeDependency: source-evaluation-only
     replacementEvidence:
-      tests/legacy-caller.test.ts: "6a9f2438eb23b8cce0072755b46913e896a2726f\
-        bb33ed33188f607fba2a34aa"
+      tests/legacy-caller.test.ts: "9084b864370ae79c87b1762ba053efc62b901981\
+        60b014aff477f8d2f94b4926"
       tests/native/fixtures/legacy-caller.ts:
-        "637ea934eab9113c5ebc0465c786e4284143175\
-        699ea34ce832004c190e4bf34"
+        "a0dbdecaedc81ca46f64a5da4fcc7b9e5445c29\
+        2cc1a85915f81fef4563a0a88"
     reason: The test reaches its read of a non-strict function's
       `caller` through code that `eval`, indirect `eval`, the
       `Function` constructor, or `new Function` compiles. Since
@@ -797,12 +797,12 @@ assessments:
     disposition: exclusion
     normativeDependency: source-evaluation-only
     replacementEvidence:
-      tests/es2026-builtins-native.test.ts: "ab69ca90335f086800e1eb6523bc83b32b\
-        9514e83f7c89b2a748fafe120afe2b"
-      tests/native/fixtures/error-is-error.ts: "e004e4fe172da79b2bf1391518fd9b1\
-        4fac9a53f79f15596fb4f44ac14005a25"
-      tests/native/fixtures/upsert.ts: "76d260a8ef0748cfaf30cb3d3b93d78ac14b420\
-        16a784d335bacc5fc7f2a81d6"
+      tests/es2026-builtins-native.test.ts: "f6e18f03c3eeafbc20271c9c90748d31f0\
+        321c578e27a4c93760c54b841bbc00"
+      tests/native/fixtures/error-is-error.ts: "085b3c645bda247103c7c2f9b0a5273\
+        f9286da3d4bb3fb6edd3fe092d3efa939"
+      tests/native/fixtures/upsert.ts: "1746f8a094655ae158ff9f71f6b1842cb2d67d8\
+        d2072274ce3f6f959aed773a5"
     reason: Each test builds one of its values with the `Function`
       constructor, which ADR 0016 excludes. The OSEO1001 rejection
       stops the Map and WeakMap tests at compile time and the
@@ -831,8 +831,8 @@ assessments:
     normativeDependency: source-evaluation-only
     replacementEvidence:
       tests/disposal-dynamic-source-native.test.ts:
-        "b961ef58efe4803e1aa14d203e555c092e04e0763249c197\
-        ace5b32b9d49cdc6"
+        "56f33993d1e1c961da18ee48db861fd16814f6fa0771751e\
+        1f47678502293bb0"
       tests/fixtures/disposal-dynamic-source/witnesses.js.txt:
         "001c9c9143606e23ca65c2efca3539bb8b75cf9dd3cfa1cc\
         4d8e6616bce5a438"
@@ -860,8 +860,8 @@ assessments:
     normativeDependency: source-evaluation-only
     replacementEvidence:
       tests/disposal-dynamic-source-native.test.ts:
-        "b961ef58efe4803e1aa14d203e555c092e04e0763249c197\
-        ace5b32b9d49cdc6"
+        "56f33993d1e1c961da18ee48db861fd16814f6fa0771751e\
+        1f47678502293bb0"
       tests/fixtures/disposal-dynamic-source/witnesses.js.txt:
         "001c9c9143606e23ca65c2efca3539bb8b75cf9dd3cfa1cc\
         4d8e6616bce5a438"
@@ -910,11 +910,11 @@ assessments:
       reopening triggers.
     replacementEvidence:
       tests/native/fixtures/annex-b-mixed-core.ts:
-        "45e4571f2e9f7556a21c4555d86720fd37a674479b9af0c291714648\
-        071a28cd"
+        "0ad49e48fa9d622944faaddc717cb56238a25b8becfea195a2993839\
+        b98d91e4"
       tests/annex-b-mixed-core-native.test.ts:
-        "ddc15ccc41702279c065d280cccfb666cf03069a9a16862282f9e4d7\
-        e2a58bfc"
+        "d4fdef13f217346def1ebda3a4a9699c67278375adf8562d06b7726e\
+        a52b4962"
   annex-b-resizable-typed-array-prototype:
     disposition: remediation
     remediationOwner: unit:annexb-object-accessors
@@ -940,11 +940,11 @@ assessments:
       policy, or on ADR 0019's reopening triggers.
     replacementEvidence:
       tests/native/fixtures/annex-b-mixed-core.ts:
-        "45e4571f2e9f7556a21c4555d86720fd37a674479b9af0c291714648\
-        071a28cd"
+        "0ad49e48fa9d622944faaddc717cb56238a25b8becfea195a2993839\
+        b98d91e4"
       tests/annex-b-mixed-core-native.test.ts:
-        "ddc15ccc41702279c065d280cccfb666cf03069a9a16862282f9e4d7\
-        e2a58bfc"
+        "d4fdef13f217346def1ebda3a4a9699c67278375adf8562d06b7726e\
+        a52b4962"
   static-this-and-call-context:
     disposition: remediation
     normativeDependency: not-demonstrated
@@ -1093,14 +1093,14 @@ assessments:
         "f54655780498f6edb3a058753c0f4d2d\
         b8bb20fb513a41a28f2495cf5871ffe7"
       tests/fixtures/module-default-namespace-update/entry.mjs:
-        "edaea4f950fa73e0da9327bb6dfb184d\
-        8430c36e397160fb7cda63acd064b06d"
+        "8b487b1e0722d16f11ee3cb4a753df03\
+        5315fe27610924bf3cfa3bd9bb0d9df4"
       tests/fixtures/module-default-namespace-update/value.mjs:
-        "e7af490b37682b37fdd279708d245985\
-        1fb5de3ea45c5a0b2f906c8c118837c3"
+        "dd8afa18b9546b0134572f2f57944409\
+        2eca1286e90fd2ec740b9709a072855b"
       tests/module-default-namespace-update-native.test.ts:
-        "2c2a90017527471bc6873fbf5ed9c40a\
-        a7f0518fc845b424f84eb8673c858de7"
+        "295c55c63271975e2269c5061a29b2d7\
+        14de94a0532babe88b85505914d741b0"
       tests/test262/results/language/module-code/05.yaml:
         "c63bc4ab17391190b18ac37327a35bc5\
         5160a4e7612f9dd8c1a6b705f7fd0d46"
@@ -1256,18 +1256,18 @@ assessments:
         "afb36c7cbc4fd23bfe00cf15babf6b42\
         e29ecdf24c114074c8655b690ec7f2a2"
       tests/native/fixtures/eval-code-inline-evidence.ts:
-        "1d81b5ee9597f586cc4fe72991061fbd\
-        bff15b2616d6cdf44cae419b94b38d9d"
+        "17a119b0d8524b2bdc53d16e077073db\
+        871c0a64866089d6a153434a2d89b1c5"
       tests/eval-code-inline-evidence.test.ts:
-        "5a2a30605deda066547518c8b6a12ea7\
-        6cfda4bc216e1caa0c8bd1f3721f22e6"
+        "b5b25fbc7f0db6546b8d84f940691f8e\
+        d1e74e0eed5101ebeca12855314911b4"
       tests/native/fixtures/host-script-evidence.ts:
-        "d804fcda15e50a5b2f9ecbaaa1679671\
-        0150e5cefb8d98fc213693f3ca618a0c"
-      tests/native/host-script-reference.ts: "d01339d26b85c0c7e315f453a831bd12\
-        a725261ce11635baa6ea62c1b8cab262"
-      tests/test262/harness/base.js: "50331feeca513cb2e2354e05e7c68f82\
-        d5aeccd9b766d6c88438c5ef118075f6"
+        "fcb78d3e13775c4934074b0a23f96458\
+        315bd64fcb66980ce91940447da0b4e8"
+      tests/native/host-script-reference.ts: "cb3a57723b9db1818658c7b220f06919\
+        1154de1b142f3569531a42abab03288d"
+      tests/test262/harness/base.js: "d689241f1fb83e085d7055088d334809\
+        3045c01192d994f5a5ed83038ea41686"
       tests/test262/results/language/global-code/c0.yaml:
         "dea613977e65f47e379b5f4886bd9e43\
         6be72f458ca522552341fac76b41215c"
@@ -1557,8 +1557,8 @@ assessments:
       source form; ADR 0019 non-source reopening remains in force."
     replacementEvidence:
       tests/native/fixtures/string-prototype-case.ts:
-        "d3742f6a27ebe1a0bd943860031b80d44614587f40733519\
-        e1d2d7bb7ebfdba8"
+        "32362930dbffb595ef970dc71c3bb1efee5c38fd618ee924\
+        8926b81431cf8fae"
   ds7-62:
     disposition: exclusion
     normativeDependency: source-evaluation-only
@@ -1573,8 +1573,8 @@ assessments:
       source form; ADR 0019 non-source reopening remains in force."
     replacementEvidence:
       tests/native/fixtures/string-prototype-case.ts:
-        "d3742f6a27ebe1a0bd943860031b80d44614587f40733519\
-        e1d2d7bb7ebfdba8"
+        "32362930dbffb595ef970dc71c3bb1efee5c38fd618ee924\
+        8926b81431cf8fae"
   ds7-63:
     disposition: exclusion
     normativeDependency: source-evaluation-only
@@ -1589,8 +1589,8 @@ assessments:
       non-source reopening remains in force."
     replacementEvidence:
       tests/native/fixtures/string-prototype-case.ts:
-        "d3742f6a27ebe1a0bd943860031b80d44614587f40733519\
-        e1d2d7bb7ebfdba8"
+        "32362930dbffb595ef970dc71c3bb1efee5c38fd618ee924\
+        8926b81431cf8fae"
   ds7-64:
     disposition: exclusion
     normativeDependency: source-evaluation-only
@@ -1605,8 +1605,8 @@ assessments:
       non-source reopening remains in force."
     replacementEvidence:
       tests/native/fixtures/string-prototype-case.ts:
-        "d3742f6a27ebe1a0bd943860031b80d44614587f40733519\
-        e1d2d7bb7ebfdba8"
+        "32362930dbffb595ef970dc71c3bb1efee5c38fd618ee924\
+        8926b81431cf8fae"
   ds7-79:
     disposition: exclusion
     normativeDependency: source-evaluation-only
@@ -1623,8 +1623,8 @@ assessments:
       reopening remains in force."
     replacementEvidence:
       tests/native/fixtures/function-intrinsic-chains.ts:
-        "c5eb018779c47f7de2959da4a1a64969475c8026fc831102\
-        f06e8bef6382e1e3"
+        "33b9618efa23376996cf3977abdb96f528fa3db2cc864645\
+        df0aa251832992ab"
   observation-train-b24-b25:
     disposition: deferral
     normativeDependency: not-demonstrated
@@ -1660,13 +1660,13 @@ assessments:
     normativeDependency: source-evaluation-only
     replacementEvidence:
       tests/native/fixtures/template-site-identity.ts:
-        "2a343025a834e1a3608e708ce218ec0b16610c85228aa35c\
-        e771008f46d9d5de"
+        "0345017d44611e9ea26f78b208d1ee6a50c783ff587dde74\
+        c43391d0b4d7d90f"
       tests/native/fixtures/bindings.ts:
-        "f3e20be237b2b772c59670f481af8147bfa59312098aa503\
-        e3817879ab0fb31b"
-      tests/native.ts: "fd6c0dce57f15cb8fa818226e11af8c9ac011d3946996970\
-        d15711bffa9f159a"
+        "584546fb242b1f30c12b356fb2103a3241eb953472deb8ed\
+        c008dd4a2cf0c536"
+      tests/native.ts: "acb5db12015f8b73bd02182d398bd0e92b980a40f3f87ea6\
+        cb0cdb037dabd546"
     reason: Maintainer decision 2026-10-28 item 1 applies to the single path in
       dynamic-source-template-site-evidence.paths.txt. The
       template-site-identity native fixture observes both same-site equalities
@@ -1687,12 +1687,12 @@ assessments:
     disposition: exclusion
     normativeDependency: source-evaluation-only
     replacementEvidence:
-      tests/native/fixtures/dynamic-source-static-core.ts: "98ea4cd57ed18639\
-        a6cd702ad4f7ca06e6d1e3365f1f3c3adf5ece84d2ef6a00"
-      tests/dynamic-source-static-core.test.ts: "7c838e320786198f64288a68646\
-        fafe58071f1e58cd87f89f02ed119b4133603"
-      tests/dynamic-source-static-core-source.test.ts: "a4d59f8ee23f8434c1fb\
-        07dbaa8eded15b42a554ab087b2b349e9773b66f6188"
+      tests/native/fixtures/dynamic-source-static-core.ts: "ca77fea92cb50093\
+        1e41202b663df9d26da721d123c80f3969fd17050c4f8741"
+      tests/dynamic-source-static-core.test.ts: "36a9279bda7edb9a00570817f92\
+        c272afd9d84c22eb5beb2910de3c16a6cda9a"
+      tests/dynamic-source-static-core-source.test.ts: "c5ca802eac36bfbab627\
+        f1c91c34bb9046fc2bac0ecc73b3f314e6672a5f36e3"
     reason: "ds15-aggregate-newtarget: An ordinary static NewTarget and the
       same Proxy get trap observe all eight prototype values,
       Reflect.construct and the AggregateError intrinsic fallback; only
@@ -1703,12 +1703,12 @@ assessments:
     disposition: exclusion
     normativeDependency: source-evaluation-only
     replacementEvidence:
-      tests/native/fixtures/dynamic-source-static-core.ts: "98ea4cd57ed18639\
-        a6cd702ad4f7ca06e6d1e3365f1f3c3adf5ece84d2ef6a00"
-      tests/dynamic-source-static-core.test.ts: "7c838e320786198f64288a68646\
-        fafe58071f1e58cd87f89f02ed119b4133603"
-      tests/dynamic-source-static-core-source.test.ts: "a4d59f8ee23f8434c1fb\
-        07dbaa8eded15b42a554ab087b2b349e9773b66f6188"
+      tests/native/fixtures/dynamic-source-static-core.ts: "ca77fea92cb50093\
+        1e41202b663df9d26da721d123c80f3969fd17050c4f8741"
+      tests/dynamic-source-static-core.test.ts: "36a9279bda7edb9a00570817f92\
+        c272afd9d84c22eb5beb2910de3c16a6cda9a"
+      tests/dynamic-source-static-core-source.test.ts: "c5ca802eac36bfbab627\
+        f1c91c34bb9046fc2bac0ecc73b3f314e6672a5f36e3"
     reason: "ds15-object-entries: globalThis supplies the realm global
       object without Function; the same fake Object, identity assertion
       and entries(1).length assertion witness intrinsic lookup despite
@@ -1719,12 +1719,12 @@ assessments:
     disposition: exclusion
     normativeDependency: source-evaluation-only
     replacementEvidence:
-      tests/native/fixtures/dynamic-source-static-core.ts: "98ea4cd57ed18639\
-        a6cd702ad4f7ca06e6d1e3365f1f3c3adf5ece84d2ef6a00"
-      tests/dynamic-source-static-core.test.ts: "7c838e320786198f64288a68646\
-        fafe58071f1e58cd87f89f02ed119b4133603"
-      tests/dynamic-source-static-core-source.test.ts: "a4d59f8ee23f8434c1fb\
-        07dbaa8eded15b42a554ab087b2b349e9773b66f6188"
+      tests/native/fixtures/dynamic-source-static-core.ts: "ca77fea92cb50093\
+        1e41202b663df9d26da721d123c80f3969fd17050c4f8741"
+      tests/dynamic-source-static-core.test.ts: "36a9279bda7edb9a00570817f92\
+        c272afd9d84c22eb5beb2910de3c16a6cda9a"
+      tests/dynamic-source-static-core-source.test.ts: "c5ca802eac36bfbab627\
+        f1c91c34bb9046fc2bac0ecc73b3f314e6672a5f36e3"
     reason: "ds15-object-values: globalThis supplies the realm global object
       without Function; the same fake Object, identity assertion and
       values(1).length assertion witness intrinsic lookup despite
@@ -1735,12 +1735,12 @@ assessments:
     disposition: exclusion
     normativeDependency: source-evaluation-only
     replacementEvidence:
-      tests/native/fixtures/dynamic-source-static-core.ts: "98ea4cd57ed18639\
-        a6cd702ad4f7ca06e6d1e3365f1f3c3adf5ece84d2ef6a00"
-      tests/dynamic-source-static-core.test.ts: "7c838e320786198f64288a68646\
-        fafe58071f1e58cd87f89f02ed119b4133603"
-      tests/dynamic-source-static-core-source.test.ts: "a4d59f8ee23f8434c1fb\
-        07dbaa8eded15b42a554ab087b2b349e9773b66f6188"
+      tests/native/fixtures/dynamic-source-static-core.ts: "ca77fea92cb50093\
+        1e41202b663df9d26da721d123c80f3969fd17050c4f8741"
+      tests/dynamic-source-static-core.test.ts: "36a9279bda7edb9a00570817f92\
+        c272afd9d84c22eb5beb2910de3c16a6cda9a"
+      tests/dynamic-source-static-core-source.test.ts: "c5ca802eac36bfbab627\
+        f1c91c34bb9046fc2bac0ecc73b3f314e6672a5f36e3"
     reason: "ds15-string-charAt: A static numeric 1 preserves the borrowed
       charAt receiver, wizard conversion and all ignored extra arguments;
       only eval of the numeric input remains. Approved 2026-10-28 item 1
@@ -1750,12 +1750,12 @@ assessments:
     disposition: exclusion
     normativeDependency: source-evaluation-only
     replacementEvidence:
-      tests/native/fixtures/dynamic-source-static-core.ts: "98ea4cd57ed18639\
-        a6cd702ad4f7ca06e6d1e3365f1f3c3adf5ece84d2ef6a00"
-      tests/dynamic-source-static-core.test.ts: "7c838e320786198f64288a68646\
-        fafe58071f1e58cd87f89f02ed119b4133603"
-      tests/dynamic-source-static-core-source.test.ts: "a4d59f8ee23f8434c1fb\
-        07dbaa8eded15b42a554ab087b2b349e9773b66f6188"
+      tests/native/fixtures/dynamic-source-static-core.ts: "ca77fea92cb50093\
+        1e41202b663df9d26da721d123c80f3969fd17050c4f8741"
+      tests/dynamic-source-static-core.test.ts: "36a9279bda7edb9a00570817f92\
+        c272afd9d84c22eb5beb2910de3c16a6cda9a"
+      tests/dynamic-source-static-core-source.test.ts: "c5ca802eac36bfbab627\
+        f1c91c34bb9046fc2bac0ecc73b3f314e6672a5f36e3"
     reason: "ds15-string-charCodeAt: A static numeric 1 preserves the
       borrowed charCodeAt receiver, wizard conversion and all ignored
       extra arguments; only eval of the numeric input remains. Approved
@@ -1765,12 +1765,12 @@ assessments:
     disposition: exclusion
     normativeDependency: source-evaluation-only
     replacementEvidence:
-      tests/native/fixtures/dynamic-source-static-core.ts: "98ea4cd57ed18639\
-        a6cd702ad4f7ca06e6d1e3365f1f3c3adf5ece84d2ef6a00"
-      tests/dynamic-source-static-core.test.ts: "7c838e320786198f64288a68646\
-        fafe58071f1e58cd87f89f02ed119b4133603"
-      tests/dynamic-source-static-core-source.test.ts: "a4d59f8ee23f8434c1fb\
-        07dbaa8eded15b42a554ab087b2b349e9773b66f6188"
+      tests/native/fixtures/dynamic-source-static-core.ts: "ca77fea92cb50093\
+        1e41202b663df9d26da721d123c80f3969fd17050c4f8741"
+      tests/dynamic-source-static-core.test.ts: "36a9279bda7edb9a00570817f92\
+        c272afd9d84c22eb5beb2910de3c16a6cda9a"
+      tests/dynamic-source-static-core-source.test.ts: "c5ca802eac36bfbab627\
+        f1c91c34bb9046fc2bac0ecc73b3f314e6672a5f36e3"
     reason: "ds15-string-indexOf: The literal string -99 preserves indexOf
       ToIntegerOrInfinity/clamping and the result 2; only eval
       construction of that string remains. Approved 2026-10-28 item 1
@@ -1780,12 +1780,12 @@ assessments:
     disposition: exclusion
     normativeDependency: source-evaluation-only
     replacementEvidence:
-      tests/native/fixtures/dynamic-source-static-core.ts: "98ea4cd57ed18639\
-        a6cd702ad4f7ca06e6d1e3365f1f3c3adf5ece84d2ef6a00"
-      tests/dynamic-source-static-core.test.ts: "7c838e320786198f64288a68646\
-        fafe58071f1e58cd87f89f02ed119b4133603"
-      tests/dynamic-source-static-core-source.test.ts: "a4d59f8ee23f8434c1fb\
-        07dbaa8eded15b42a554ab087b2b349e9773b66f6188"
+      tests/native/fixtures/dynamic-source-static-core.ts: "ca77fea92cb50093\
+        1e41202b663df9d26da721d123c80f3969fd17050c4f8741"
+      tests/dynamic-source-static-core.test.ts: "36a9279bda7edb9a00570817f92\
+        c272afd9d84c22eb5beb2910de3c16a6cda9a"
+      tests/dynamic-source-static-core-source.test.ts: "c5ca802eac36bfbab627\
+        f1c91c34bb9046fc2bac0ecc73b3f314e6672a5f36e3"
     reason: "ds15-string-match: The fixture unconditionally installs
       Object.prototype.toString on the global receiver, checks the
       installation and observes match of bj through a bound method; only
@@ -1796,12 +1796,12 @@ assessments:
     disposition: exclusion
     normativeDependency: source-evaluation-only
     replacementEvidence:
-      tests/native/fixtures/dynamic-source-static-core.ts: "98ea4cd57ed18639\
-        a6cd702ad4f7ca06e6d1e3365f1f3c3adf5ece84d2ef6a00"
-      tests/dynamic-source-static-core.test.ts: "7c838e320786198f64288a68646\
-        fafe58071f1e58cd87f89f02ed119b4133603"
-      tests/dynamic-source-static-core-source.test.ts: "a4d59f8ee23f8434c1fb\
-        07dbaa8eded15b42a554ab087b2b349e9773b66f6188"
+      tests/native/fixtures/dynamic-source-static-core.ts: "ca77fea92cb50093\
+        1e41202b663df9d26da721d123c80f3969fd17050c4f8741"
+      tests/dynamic-source-static-core.test.ts: "36a9279bda7edb9a00570817f92\
+        c272afd9d84c22eb5beb2910de3c16a6cda9a"
+      tests/dynamic-source-static-core-source.test.ts: "c5ca802eac36bfbab627\
+        f1c91c34bb9046fc2bac0ecc73b3f314e6672a5f36e3"
     reason: "ds15-string-replace-empty: A static empty callable retains null
       search conversion, callable replacement returning undefined and the
       exact gundefineduna result; only Function construction remains.
@@ -1811,12 +1811,12 @@ assessments:
     disposition: exclusion
     normativeDependency: source-evaluation-only
     replacementEvidence:
-      tests/native/fixtures/dynamic-source-static-core.ts: "98ea4cd57ed18639\
-        a6cd702ad4f7ca06e6d1e3365f1f3c3adf5ece84d2ef6a00"
-      tests/dynamic-source-static-core.test.ts: "7c838e320786198f64288a68646\
-        fafe58071f1e58cd87f89f02ed119b4133603"
-      tests/dynamic-source-static-core-source.test.ts: "a4d59f8ee23f8434c1fb\
-        07dbaa8eded15b42a554ab087b2b349e9773b66f6188"
+      tests/native/fixtures/dynamic-source-static-core.ts: "ca77fea92cb50093\
+        1e41202b663df9d26da721d123c80f3969fd17050c4f8741"
+      tests/dynamic-source-static-core.test.ts: "36a9279bda7edb9a00570817f92\
+        c272afd9d84c22eb5beb2910de3c16a6cda9a"
+      tests/dynamic-source-static-core-source.test.ts: "c5ca802eac36bfbab627\
+        f1c91c34bb9046fc2bac0ecc73b3f314e6672a5f36e3"
     reason: "ds15-string-replace-offset: A static ordinary replacer retains
       the hoisted undefined x, boxed String receiver, arguments[1] offset
       addition and result 42; only Function construction remains. Approved
@@ -1826,12 +1826,12 @@ assessments:
     disposition: exclusion
     normativeDependency: source-evaluation-only
     replacementEvidence:
-      tests/native/fixtures/dynamic-source-static-core.ts: "98ea4cd57ed18639\
-        a6cd702ad4f7ca06e6d1e3365f1f3c3adf5ece84d2ef6a00"
-      tests/dynamic-source-static-core.test.ts: "7c838e320786198f64288a68646\
-        fafe58071f1e58cd87f89f02ed119b4133603"
-      tests/dynamic-source-static-core-source.test.ts: "a4d59f8ee23f8434c1fb\
-        07dbaa8eded15b42a554ab087b2b349e9773b66f6188"
+      tests/native/fixtures/dynamic-source-static-core.ts: "ca77fea92cb50093\
+        1e41202b663df9d26da721d123c80f3969fd17050c4f8741"
+      tests/dynamic-source-static-core.test.ts: "36a9279bda7edb9a00570817f92\
+        c272afd9d84c22eb5beb2910de3c16a6cda9a"
+      tests/dynamic-source-static-core-source.test.ts: "c5ca802eac36bfbab627\
+        f1c91c34bb9046fc2bac0ecc73b3f314e6672a5f36e3"
     reason: "ds15-string-slice: The function receiver preserves the
       non-primitive toString result and valueOf fallback, inherited slice,
       null start and nested callable end conversion; the static empty
@@ -1843,12 +1843,12 @@ assessments:
     disposition: exclusion
     normativeDependency: source-evaluation-only
     replacementEvidence:
-      tests/native/fixtures/dynamic-source-static-core.ts: "98ea4cd57ed18639\
-        a6cd702ad4f7ca06e6d1e3365f1f3c3adf5ece84d2ef6a00"
-      tests/dynamic-source-static-core.test.ts: "7c838e320786198f64288a68646\
-        fafe58071f1e58cd87f89f02ed119b4133603"
-      tests/dynamic-source-static-core-source.test.ts: "a4d59f8ee23f8434c1fb\
-        07dbaa8eded15b42a554ab087b2b349e9773b66f6188"
+      tests/native/fixtures/dynamic-source-static-core.ts: "ca77fea92cb50093\
+        1e41202b663df9d26da721d123c80f3969fd17050c4f8741"
+      tests/dynamic-source-static-core.test.ts: "36a9279bda7edb9a00570817f92\
+        c272afd9d84c22eb5beb2910de3c16a6cda9a"
+      tests/dynamic-source-static-core-source.test.ts: "c5ca802eac36bfbab627\
+        f1c91c34bb9046fc2bac0ecc73b3f314e6672a5f36e3"
     reason: "ds15-string-split-global: The installed global toString, bound
       split receiver, literal separator [, object limit valueOf 5, Array
       identity, length 2 and object substring assertion preserve every
@@ -1859,12 +1859,12 @@ assessments:
     disposition: exclusion
     normativeDependency: source-evaluation-only
     replacementEvidence:
-      tests/native/fixtures/dynamic-source-static-core.ts: "98ea4cd57ed18639\
-        a6cd702ad4f7ca06e6d1e3365f1f3c3adf5ece84d2ef6a00"
-      tests/dynamic-source-static-core.test.ts: "7c838e320786198f64288a68646\
-        fafe58071f1e58cd87f89f02ed119b4133603"
-      tests/dynamic-source-static-core-source.test.ts: "a4d59f8ee23f8434c1fb\
-        07dbaa8eded15b42a554ab087b2b349e9773b66f6188"
+      tests/native/fixtures/dynamic-source-static-core.ts: "ca77fea92cb50093\
+        1e41202b663df9d26da721d123c80f3969fd17050c4f8741"
+      tests/dynamic-source-static-core.test.ts: "36a9279bda7edb9a00570817f92\
+        c272afd9d84c22eb5beb2910de3c16a6cda9a"
+      tests/dynamic-source-static-core-source.test.ts: "c5ca802eac36bfbab627\
+        f1c91c34bb9046fc2bac0ecc73b3f314e6672a5f36e3"
     reason: "ds15-string-split-number: The Number prototype method, exact
       numeric receiver, RegExp 00, string limit 1 and all four result
       assertions are unchanged; only eval of 1 remains. Approved
@@ -1874,12 +1874,12 @@ assessments:
     disposition: exclusion
     normativeDependency: source-evaluation-only
     replacementEvidence:
-      tests/native/fixtures/dynamic-source-static-core.ts: "98ea4cd57ed18639\
-        a6cd702ad4f7ca06e6d1e3365f1f3c3adf5ece84d2ef6a00"
-      tests/dynamic-source-static-core.test.ts: "7c838e320786198f64288a68646\
-        fafe58071f1e58cd87f89f02ed119b4133603"
-      tests/dynamic-source-static-core-source.test.ts: "a4d59f8ee23f8434c1fb\
-        07dbaa8eded15b42a554ab087b2b349e9773b66f6188"
+      tests/native/fixtures/dynamic-source-static-core.ts: "ca77fea92cb50093\
+        1e41202b663df9d26da721d123c80f3969fd17050c4f8741"
+      tests/dynamic-source-static-core.test.ts: "36a9279bda7edb9a00570817f92\
+        c272afd9d84c22eb5beb2910de3c16a6cda9a"
+      tests/dynamic-source-static-core-source.test.ts: "c5ca802eac36bfbab627\
+        f1c91c34bb9046fc2bac0ecc73b3f314e6672a5f36e3"
     reason: "ds15-string-substring: A static empty callable preserves the
       function receiver valueOf override, inherited substring, null start,
       callable end ToNumber NaN and empty result; only Function
@@ -1890,12 +1890,12 @@ assessments:
     disposition: exclusion
     normativeDependency: source-evaluation-only
     replacementEvidence:
-      tests/native/fixtures/dynamic-source-static-core.ts: "98ea4cd57ed18639\
-        a6cd702ad4f7ca06e6d1e3365f1f3c3adf5ece84d2ef6a00"
-      tests/dynamic-source-static-core.test.ts: "7c838e320786198f64288a68646\
-        fafe58071f1e58cd87f89f02ed119b4133603"
-      tests/dynamic-source-static-core-source.test.ts: "a4d59f8ee23f8434c1fb\
-        07dbaa8eded15b42a554ab087b2b349e9773b66f6188"
+      tests/native/fixtures/dynamic-source-static-core.ts: "ca77fea92cb50093\
+        1e41202b663df9d26da721d123c80f3969fd17050c4f8741"
+      tests/dynamic-source-static-core.test.ts: "36a9279bda7edb9a00570817f92\
+        c272afd9d84c22eb5beb2910de3c16a6cda9a"
+      tests/dynamic-source-static-core-source.test.ts: "c5ca802eac36bfbab627\
+        f1c91c34bb9046fc2bac0ecc73b3f314e6672a5f36e3"
     reason: "ds15-global-presence-1: Static identifier reads preserve every
       original non-null check for NaN/Infinity/undefined; only executing
       those checks as eval source remains. Approved 2026-10-28 item 1
@@ -1905,12 +1905,12 @@ assessments:
     disposition: exclusion
     normativeDependency: source-evaluation-only
     replacementEvidence:
-      tests/native/fixtures/dynamic-source-static-core.ts: "98ea4cd57ed18639\
-        a6cd702ad4f7ca06e6d1e3365f1f3c3adf5ece84d2ef6a00"
-      tests/dynamic-source-static-core.test.ts: "7c838e320786198f64288a68646\
-        fafe58071f1e58cd87f89f02ed119b4133603"
-      tests/dynamic-source-static-core-source.test.ts: "a4d59f8ee23f8434c1fb\
-        07dbaa8eded15b42a554ab087b2b349e9773b66f6188"
+      tests/native/fixtures/dynamic-source-static-core.ts: "ca77fea92cb50093\
+        1e41202b663df9d26da721d123c80f3969fd17050c4f8741"
+      tests/dynamic-source-static-core.test.ts: "36a9279bda7edb9a00570817f92\
+        c272afd9d84c22eb5beb2910de3c16a6cda9a"
+      tests/dynamic-source-static-core-source.test.ts: "c5ca802eac36bfbab627\
+        f1c91c34bb9046fc2bac0ecc73b3f314e6672a5f36e3"
     reason: "ds15-global-presence-2: Static identifier reads preserve every
       original non-null check for eval and all eight parse/finite/URI
       functions; only executing those checks as eval source remains.
@@ -1920,12 +1920,12 @@ assessments:
     disposition: exclusion
     normativeDependency: source-evaluation-only
     replacementEvidence:
-      tests/native/fixtures/dynamic-source-static-core.ts: "98ea4cd57ed18639\
-        a6cd702ad4f7ca06e6d1e3365f1f3c3adf5ece84d2ef6a00"
-      tests/dynamic-source-static-core.test.ts: "7c838e320786198f64288a68646\
-        fafe58071f1e58cd87f89f02ed119b4133603"
-      tests/dynamic-source-static-core-source.test.ts: "a4d59f8ee23f8434c1fb\
-        07dbaa8eded15b42a554ab087b2b349e9773b66f6188"
+      tests/native/fixtures/dynamic-source-static-core.ts: "ca77fea92cb50093\
+        1e41202b663df9d26da721d123c80f3969fd17050c4f8741"
+      tests/dynamic-source-static-core.test.ts: "36a9279bda7edb9a00570817f92\
+        c272afd9d84c22eb5beb2910de3c16a6cda9a"
+      tests/dynamic-source-static-core-source.test.ts: "c5ca802eac36bfbab627\
+        f1c91c34bb9046fc2bac0ecc73b3f314e6672a5f36e3"
     reason: "ds15-global-presence-3: Static identifier reads preserve every
       original non-null check for all fifteen Object-through-URIError
       constructors; only executing those checks as eval source remains.
@@ -1935,12 +1935,12 @@ assessments:
     disposition: exclusion
     normativeDependency: source-evaluation-only
     replacementEvidence:
-      tests/native/fixtures/dynamic-source-static-core.ts: "98ea4cd57ed18639\
-        a6cd702ad4f7ca06e6d1e3365f1f3c3adf5ece84d2ef6a00"
-      tests/dynamic-source-static-core.test.ts: "7c838e320786198f64288a68646\
-        fafe58071f1e58cd87f89f02ed119b4133603"
-      tests/dynamic-source-static-core-source.test.ts: "a4d59f8ee23f8434c1fb\
-        07dbaa8eded15b42a554ab087b2b349e9773b66f6188"
+      tests/native/fixtures/dynamic-source-static-core.ts: "ca77fea92cb50093\
+        1e41202b663df9d26da721d123c80f3969fd17050c4f8741"
+      tests/dynamic-source-static-core.test.ts: "36a9279bda7edb9a00570817f92\
+        c272afd9d84c22eb5beb2910de3c16a6cda9a"
+      tests/dynamic-source-static-core-source.test.ts: "c5ca802eac36bfbab627\
+        f1c91c34bb9046fc2bac0ecc73b3f314e6672a5f36e3"
     reason: "ds15-global-presence-4: Static identifier reads preserve every
       original non-null check for Math; only executing those checks as
       eval source remains. Approved 2026-10-28 item 1 accounting retains
@@ -1950,12 +1950,12 @@ assessments:
     disposition: exclusion
     normativeDependency: source-evaluation-only
     replacementEvidence:
-      tests/native/fixtures/dynamic-source-static-core.ts: "98ea4cd57ed18639\
-        a6cd702ad4f7ca06e6d1e3365f1f3c3adf5ece84d2ef6a00"
-      tests/dynamic-source-static-core.test.ts: "7c838e320786198f64288a68646\
-        fafe58071f1e58cd87f89f02ed119b4133603"
-      tests/dynamic-source-static-core-source.test.ts: "a4d59f8ee23f8434c1fb\
-        07dbaa8eded15b42a554ab087b2b349e9773b66f6188"
+      tests/native/fixtures/dynamic-source-static-core.ts: "ca77fea92cb50093\
+        1e41202b663df9d26da721d123c80f3969fd17050c4f8741"
+      tests/dynamic-source-static-core.test.ts: "36a9279bda7edb9a00570817f92\
+        c272afd9d84c22eb5beb2910de3c16a6cda9a"
+      tests/dynamic-source-static-core-source.test.ts: "c5ca802eac36bfbab627\
+        f1c91c34bb9046fc2bac0ecc73b3f314e6672a5f36e3"
     reason: "ds15-global-enumeration-1: The static global Script checks
       non-enumerability directly and by for-in for NaN/Infinity/undefined;
       only executing the enumeration as eval source remains. Approved
@@ -1965,12 +1965,12 @@ assessments:
     disposition: exclusion
     normativeDependency: source-evaluation-only
     replacementEvidence:
-      tests/native/fixtures/dynamic-source-static-core.ts: "98ea4cd57ed18639\
-        a6cd702ad4f7ca06e6d1e3365f1f3c3adf5ece84d2ef6a00"
-      tests/dynamic-source-static-core.test.ts: "7c838e320786198f64288a68646\
-        fafe58071f1e58cd87f89f02ed119b4133603"
-      tests/dynamic-source-static-core-source.test.ts: "a4d59f8ee23f8434c1fb\
-        07dbaa8eded15b42a554ab087b2b349e9773b66f6188"
+      tests/native/fixtures/dynamic-source-static-core.ts: "ca77fea92cb50093\
+        1e41202b663df9d26da721d123c80f3969fd17050c4f8741"
+      tests/dynamic-source-static-core.test.ts: "36a9279bda7edb9a00570817f92\
+        c272afd9d84c22eb5beb2910de3c16a6cda9a"
+      tests/dynamic-source-static-core-source.test.ts: "c5ca802eac36bfbab627\
+        f1c91c34bb9046fc2bac0ecc73b3f314e6672a5f36e3"
     reason: "ds15-global-enumeration-2: The static global Script checks
       non-enumerability directly and by for-in for eval and all eight
       parse/finite/URI functions; only executing the enumeration as eval
@@ -1981,12 +1981,12 @@ assessments:
     disposition: exclusion
     normativeDependency: source-evaluation-only
     replacementEvidence:
-      tests/native/fixtures/dynamic-source-static-core.ts: "98ea4cd57ed18639\
-        a6cd702ad4f7ca06e6d1e3365f1f3c3adf5ece84d2ef6a00"
-      tests/dynamic-source-static-core.test.ts: "7c838e320786198f64288a68646\
-        fafe58071f1e58cd87f89f02ed119b4133603"
-      tests/dynamic-source-static-core-source.test.ts: "a4d59f8ee23f8434c1fb\
-        07dbaa8eded15b42a554ab087b2b349e9773b66f6188"
+      tests/native/fixtures/dynamic-source-static-core.ts: "ca77fea92cb50093\
+        1e41202b663df9d26da721d123c80f3969fd17050c4f8741"
+      tests/dynamic-source-static-core.test.ts: "36a9279bda7edb9a00570817f92\
+        c272afd9d84c22eb5beb2910de3c16a6cda9a"
+      tests/dynamic-source-static-core-source.test.ts: "c5ca802eac36bfbab627\
+        f1c91c34bb9046fc2bac0ecc73b3f314e6672a5f36e3"
     reason: "ds15-global-enumeration-3: The static global Script checks
       non-enumerability directly and by for-in for all fifteen
       Object-through-URIError constructors; only executing the enumeration
@@ -1997,12 +1997,12 @@ assessments:
     disposition: exclusion
     normativeDependency: source-evaluation-only
     replacementEvidence:
-      tests/native/fixtures/dynamic-source-static-core.ts: "98ea4cd57ed18639\
-        a6cd702ad4f7ca06e6d1e3365f1f3c3adf5ece84d2ef6a00"
-      tests/dynamic-source-static-core.test.ts: "7c838e320786198f64288a68646\
-        fafe58071f1e58cd87f89f02ed119b4133603"
-      tests/dynamic-source-static-core-source.test.ts: "a4d59f8ee23f8434c1fb\
-        07dbaa8eded15b42a554ab087b2b349e9773b66f6188"
+      tests/native/fixtures/dynamic-source-static-core.ts: "ca77fea92cb50093\
+        1e41202b663df9d26da721d123c80f3969fd17050c4f8741"
+      tests/dynamic-source-static-core.test.ts: "36a9279bda7edb9a00570817f92\
+        c272afd9d84c22eb5beb2910de3c16a6cda9a"
+      tests/dynamic-source-static-core-source.test.ts: "c5ca802eac36bfbab627\
+        f1c91c34bb9046fc2bac0ecc73b3f314e6672a5f36e3"
     reason: "ds15-global-enumeration-4: The static global Script checks
       non-enumerability directly and by for-in for Math; only executing
       the enumeration as eval source remains. Approved 2026-10-28 item 1
@@ -2012,12 +2012,12 @@ assessments:
     disposition: exclusion
     normativeDependency: source-evaluation-only
     replacementEvidence:
-      tests/native/fixtures/dynamic-source-static-core.ts: "98ea4cd57ed18639\
-        a6cd702ad4f7ca06e6d1e3365f1f3c3adf5ece84d2ef6a00"
-      tests/dynamic-source-static-core.test.ts: "7c838e320786198f64288a68646\
-        fafe58071f1e58cd87f89f02ed119b4133603"
-      tests/dynamic-source-static-core-source.test.ts: "a4d59f8ee23f8434c1fb\
-        07dbaa8eded15b42a554ab087b2b349e9773b66f6188"
+      tests/native/fixtures/dynamic-source-static-core.ts: "ca77fea92cb50093\
+        1e41202b663df9d26da721d123c80f3969fd17050c4f8741"
+      tests/dynamic-source-static-core.test.ts: "36a9279bda7edb9a00570817f92\
+        c272afd9d84c22eb5beb2910de3c16a6cda9a"
+      tests/dynamic-source-static-core-source.test.ts: "c5ca802eac36bfbab627\
+        f1c91c34bb9046fc2bac0ecc73b3f314e6672a5f36e3"
     reason: "ds15-delete-global-var: The global Script declares var x = 1,
       observes delete x returning false and both binding/property values
       staying 1; only observing that delete through eval remains. Approved
@@ -2027,12 +2027,12 @@ assessments:
     disposition: exclusion
     normativeDependency: source-evaluation-only
     replacementEvidence:
-      tests/native/fixtures/dynamic-source-static-core.ts: "98ea4cd57ed18639\
-        a6cd702ad4f7ca06e6d1e3365f1f3c3adf5ece84d2ef6a00"
-      tests/dynamic-source-static-core.test.ts: "7c838e320786198f64288a68646\
-        fafe58071f1e58cd87f89f02ed119b4133603"
-      tests/dynamic-source-static-core-source.test.ts: "a4d59f8ee23f8434c1fb\
-        07dbaa8eded15b42a554ab087b2b349e9773b66f6188"
+      tests/native/fixtures/dynamic-source-static-core.ts: "ca77fea92cb50093\
+        1e41202b663df9d26da721d123c80f3969fd17050c4f8741"
+      tests/dynamic-source-static-core.test.ts: "36a9279bda7edb9a00570817f92\
+        c272afd9d84c22eb5beb2910de3c16a6cda9a"
+      tests/dynamic-source-static-core-source.test.ts: "c5ca802eac36bfbab627\
+        f1c91c34bb9046fc2bac0ecc73b3f314e6672a5f36e3"
     reason: "ds15-object-truthiness: Every original object/boxed
       primitive/array/number/Date input remains in the truthiness fixture
       and a static empty function replaces new Function; all nineteen
@@ -2043,12 +2043,12 @@ assessments:
     disposition: exclusion
     normativeDependency: source-evaluation-only
     replacementEvidence:
-      tests/native/fixtures/dynamic-source-static-core.ts: "98ea4cd57ed18639\
-        a6cd702ad4f7ca06e6d1e3365f1f3c3adf5ece84d2ef6a00"
-      tests/dynamic-source-static-core.test.ts: "7c838e320786198f64288a68646\
-        fafe58071f1e58cd87f89f02ed119b4133603"
-      tests/dynamic-source-static-core-source.test.ts: "a4d59f8ee23f8434c1fb\
-        07dbaa8eded15b42a554ab087b2b349e9773b66f6188"
+      tests/native/fixtures/dynamic-source-static-core.ts: "ca77fea92cb50093\
+        1e41202b663df9d26da721d123c80f3969fd17050c4f8741"
+      tests/dynamic-source-static-core.test.ts: "36a9279bda7edb9a00570817f92\
+        c272afd9d84c22eb5beb2910de3c16a6cda9a"
+      tests/dynamic-source-static-core-source.test.ts: "c5ca802eac36bfbab627\
+        f1c91c34bb9046fc2bac0ecc73b3f314e6672a5f36e3"
     reason: "ds15-continue-script-boundary: ADR 0029 compiles the literal
       separate Script containing continue LABEL1 ahead of time and
       observes its SyntaxError inside the same labelled do loop; x is 1
@@ -2060,12 +2060,12 @@ assessments:
     disposition: exclusion
     normativeDependency: source-evaluation-only
     replacementEvidence:
-      tests/native/fixtures/dynamic-source-static-core.ts: "98ea4cd57ed18639\
-        a6cd702ad4f7ca06e6d1e3365f1f3c3adf5ece84d2ef6a00"
-      tests/dynamic-source-static-core.test.ts: "7c838e320786198f64288a68646\
-        fafe58071f1e58cd87f89f02ed119b4133603"
-      tests/dynamic-source-static-core-source.test.ts: "a4d59f8ee23f8434c1fb\
-        07dbaa8eded15b42a554ab087b2b349e9773b66f6188"
+      tests/native/fixtures/dynamic-source-static-core.ts: "ca77fea92cb50093\
+        1e41202b663df9d26da721d123c80f3969fd17050c4f8741"
+      tests/dynamic-source-static-core.test.ts: "36a9279bda7edb9a00570817f92\
+        c272afd9d84c22eb5beb2910de3c16a6cda9a"
+      tests/dynamic-source-static-core-source.test.ts: "c5ca802eac36bfbab627\
+        f1c91c34bb9046fc2bac0ecc73b3f314e6672a5f36e3"
     reason: "ds15-completion-do-once: ADR 0029 compiles the same do
       assignment/false condition as a finite literal Script; it observes
       completion 1 and assignment 1, leaving only the original eval call
@@ -2076,12 +2076,12 @@ assessments:
     disposition: exclusion
     normativeDependency: source-evaluation-only
     replacementEvidence:
-      tests/native/fixtures/dynamic-source-static-core.ts: "98ea4cd57ed18639\
-        a6cd702ad4f7ca06e6d1e3365f1f3c3adf5ece84d2ef6a00"
-      tests/dynamic-source-static-core.test.ts: "7c838e320786198f64288a68646\
-        fafe58071f1e58cd87f89f02ed119b4133603"
-      tests/dynamic-source-static-core-source.test.ts: "a4d59f8ee23f8434c1fb\
-        07dbaa8eded15b42a554ab087b2b349e9773b66f6188"
+      tests/native/fixtures/dynamic-source-static-core.ts: "ca77fea92cb50093\
+        1e41202b663df9d26da721d123c80f3969fd17050c4f8741"
+      tests/dynamic-source-static-core.test.ts: "36a9279bda7edb9a00570817f92\
+        c272afd9d84c22eb5beb2910de3c16a6cda9a"
+      tests/dynamic-source-static-core-source.test.ts: "c5ca802eac36bfbab627\
+        f1c91c34bb9046fc2bac0ecc73b3f314e6672a5f36e3"
     reason: "ds15-completion-do-break: ADR 0029 compiles the same
       do/break/unreachable assignment as a finite literal Script;
       completion 1, before 1 and after undefined are asserted, leaving
@@ -2092,12 +2092,12 @@ assessments:
     disposition: exclusion
     normativeDependency: source-evaluation-only
     replacementEvidence:
-      tests/native/fixtures/dynamic-source-static-core.ts: "98ea4cd57ed18639\
-        a6cd702ad4f7ca06e6d1e3365f1f3c3adf5ece84d2ef6a00"
-      tests/dynamic-source-static-core.test.ts: "7c838e320786198f64288a68646\
-        fafe58071f1e58cd87f89f02ed119b4133603"
-      tests/dynamic-source-static-core-source.test.ts: "a4d59f8ee23f8434c1fb\
-        07dbaa8eded15b42a554ab087b2b349e9773b66f6188"
+      tests/native/fixtures/dynamic-source-static-core.ts: "ca77fea92cb50093\
+        1e41202b663df9d26da721d123c80f3969fd17050c4f8741"
+      tests/dynamic-source-static-core.test.ts: "36a9279bda7edb9a00570817f92\
+        c272afd9d84c22eb5beb2910de3c16a6cda9a"
+      tests/dynamic-source-static-core-source.test.ts: "c5ca802eac36bfbab627\
+        f1c91c34bb9046fc2bac0ecc73b3f314e6672a5f36e3"
     reason: "ds15-completion-do-postfix: ADR 0029 compiles the same
       do/postfix update/condition as a finite literal Script; completion 4
       and final condition 5 are asserted, leaving only the original outer
@@ -2108,12 +2108,12 @@ assessments:
     disposition: exclusion
     normativeDependency: source-evaluation-only
     replacementEvidence:
-      tests/native/fixtures/dynamic-source-static-core.ts: "98ea4cd57ed18639\
-        a6cd702ad4f7ca06e6d1e3365f1f3c3adf5ece84d2ef6a00"
-      tests/dynamic-source-static-core.test.ts: "7c838e320786198f64288a68646\
-        fafe58071f1e58cd87f89f02ed119b4133603"
-      tests/dynamic-source-static-core-source.test.ts: "a4d59f8ee23f8434c1fb\
-        07dbaa8eded15b42a554ab087b2b349e9773b66f6188"
+      tests/native/fixtures/dynamic-source-static-core.ts: "ca77fea92cb50093\
+        1e41202b663df9d26da721d123c80f3969fd17050c4f8741"
+      tests/dynamic-source-static-core.test.ts: "36a9279bda7edb9a00570817f92\
+        c272afd9d84c22eb5beb2910de3c16a6cda9a"
+      tests/dynamic-source-static-core-source.test.ts: "c5ca802eac36bfbab627\
+        f1c91c34bb9046fc2bac0ecc73b3f314e6672a5f36e3"
     reason: "ds15-completion-do-continue: ADR 0029 compiles the same
       do/continue/string-split parity test as a finite literal Script;
       completion 4 and odds 5 are asserted, leaving only the original eval
@@ -2124,12 +2124,12 @@ assessments:
     disposition: exclusion
     normativeDependency: source-evaluation-only
     replacementEvidence:
-      tests/native/fixtures/dynamic-source-static-core.ts: "98ea4cd57ed18639\
-        a6cd702ad4f7ca06e6d1e3365f1f3c3adf5ece84d2ef6a00"
-      tests/dynamic-source-static-core.test.ts: "7c838e320786198f64288a68646\
-        fafe58071f1e58cd87f89f02ed119b4133603"
-      tests/dynamic-source-static-core-source.test.ts: "a4d59f8ee23f8434c1fb\
-        07dbaa8eded15b42a554ab087b2b349e9773b66f6188"
+      tests/native/fixtures/dynamic-source-static-core.ts: "ca77fea92cb50093\
+        1e41202b663df9d26da721d123c80f3969fd17050c4f8741"
+      tests/dynamic-source-static-core.test.ts: "36a9279bda7edb9a00570817f92\
+        c272afd9d84c22eb5beb2910de3c16a6cda9a"
+      tests/dynamic-source-static-core-source.test.ts: "c5ca802eac36bfbab627\
+        f1c91c34bb9046fc2bac0ecc73b3f314e6672a5f36e3"
     reason: "ds15-completion-expression-equality: ADR 0029 compiles both
       original equality expressions as finite literal Scripts and asserts
       both false completions; only the original eval calls that returned
@@ -2140,12 +2140,12 @@ assessments:
     disposition: exclusion
     normativeDependency: source-evaluation-only
     replacementEvidence:
-      tests/native/fixtures/dynamic-source-static-core.ts: "98ea4cd57ed18639\
-        a6cd702ad4f7ca06e6d1e3365f1f3c3adf5ece84d2ef6a00"
-      tests/dynamic-source-static-core.test.ts: "7c838e320786198f64288a68646\
-        fafe58071f1e58cd87f89f02ed119b4133603"
-      tests/dynamic-source-static-core-source.test.ts: "a4d59f8ee23f8434c1fb\
-        07dbaa8eded15b42a554ab087b2b349e9773b66f6188"
+      tests/native/fixtures/dynamic-source-static-core.ts: "ca77fea92cb50093\
+        1e41202b663df9d26da721d123c80f3969fd17050c4f8741"
+      tests/dynamic-source-static-core.test.ts: "36a9279bda7edb9a00570817f92\
+        c272afd9d84c22eb5beb2910de3c16a6cda9a"
+      tests/dynamic-source-static-core-source.test.ts: "c5ca802eac36bfbab627\
+        f1c91c34bb9046fc2bac0ecc73b3f314e6672a5f36e3"
     reason: "ds15-completion-expression-precedence: ADR 0029 compiles both
       original arithmetic/bitwise/equality expressions as finite literal
       Scripts and asserts completions 7 and 11; only runtime source-string
@@ -2156,12 +2156,12 @@ assessments:
     disposition: exclusion
     normativeDependency: source-evaluation-only
     replacementEvidence:
-      tests/native/fixtures/dynamic-source-static-core.ts: "98ea4cd57ed18639\
-        a6cd702ad4f7ca06e6d1e3365f1f3c3adf5ece84d2ef6a00"
-      tests/dynamic-source-static-core.test.ts: "7c838e320786198f64288a68646\
-        fafe58071f1e58cd87f89f02ed119b4133603"
-      tests/dynamic-source-static-core-source.test.ts: "a4d59f8ee23f8434c1fb\
-        07dbaa8eded15b42a554ab087b2b349e9773b66f6188"
+      tests/native/fixtures/dynamic-source-static-core.ts: "ca77fea92cb50093\
+        1e41202b663df9d26da721d123c80f3969fd17050c4f8741"
+      tests/dynamic-source-static-core.test.ts: "36a9279bda7edb9a00570817f92\
+        c272afd9d84c22eb5beb2910de3c16a6cda9a"
+      tests/dynamic-source-static-core-source.test.ts: "c5ca802eac36bfbab627\
+        f1c91c34bb9046fc2bac0ecc73b3f314e6672a5f36e3"
     reason: "ds15-with-mutate-1: The static sloppy with statement preserves
       string mutation, the original competing global p1 value and all
       object assertions; it additionally checks the global is unchanged,
@@ -2172,12 +2172,12 @@ assessments:
     disposition: exclusion
     normativeDependency: source-evaluation-only
     replacementEvidence:
-      tests/native/fixtures/dynamic-source-static-core.ts: "98ea4cd57ed18639\
-        a6cd702ad4f7ca06e6d1e3365f1f3c3adf5ece84d2ef6a00"
-      tests/dynamic-source-static-core.test.ts: "7c838e320786198f64288a68646\
-        fafe58071f1e58cd87f89f02ed119b4133603"
-      tests/dynamic-source-static-core-source.test.ts: "a4d59f8ee23f8434c1fb\
-        07dbaa8eded15b42a554ab087b2b349e9773b66f6188"
+      tests/native/fixtures/dynamic-source-static-core.ts: "ca77fea92cb50093\
+        1e41202b663df9d26da721d123c80f3969fd17050c4f8741"
+      tests/dynamic-source-static-core.test.ts: "36a9279bda7edb9a00570817f92\
+        c272afd9d84c22eb5beb2910de3c16a6cda9a"
+      tests/dynamic-source-static-core-source.test.ts: "c5ca802eac36bfbab627\
+        f1c91c34bb9046fc2bac0ecc73b3f314e6672a5f36e3"
     reason: "ds15-with-mutate-2: The static sloppy with statement preserves
       number mutation, the original competing global p1 value and all
       object assertions; it additionally checks the global is unchanged,
@@ -2188,12 +2188,12 @@ assessments:
     disposition: exclusion
     normativeDependency: source-evaluation-only
     replacementEvidence:
-      tests/native/fixtures/dynamic-source-static-core.ts: "98ea4cd57ed18639\
-        a6cd702ad4f7ca06e6d1e3365f1f3c3adf5ece84d2ef6a00"
-      tests/dynamic-source-static-core.test.ts: "7c838e320786198f64288a68646\
-        fafe58071f1e58cd87f89f02ed119b4133603"
-      tests/dynamic-source-static-core-source.test.ts: "a4d59f8ee23f8434c1fb\
-        07dbaa8eded15b42a554ab087b2b349e9773b66f6188"
+      tests/native/fixtures/dynamic-source-static-core.ts: "ca77fea92cb50093\
+        1e41202b663df9d26da721d123c80f3969fd17050c4f8741"
+      tests/dynamic-source-static-core.test.ts: "36a9279bda7edb9a00570817f92\
+        c272afd9d84c22eb5beb2910de3c16a6cda9a"
+      tests/dynamic-source-static-core-source.test.ts: "c5ca802eac36bfbab627\
+        f1c91c34bb9046fc2bac0ecc73b3f314e6672a5f36e3"
     reason: "ds15-with-mutate-3: The static sloppy with statement preserves
       boolean mutation, the original competing global p1 value and all
       object assertions; it additionally checks the global is unchanged,
@@ -2204,12 +2204,12 @@ assessments:
     disposition: exclusion
     normativeDependency: source-evaluation-only
     replacementEvidence:
-      tests/native/fixtures/dynamic-source-static-core.ts: "98ea4cd57ed18639\
-        a6cd702ad4f7ca06e6d1e3365f1f3c3adf5ece84d2ef6a00"
-      tests/dynamic-source-static-core.test.ts: "7c838e320786198f64288a68646\
-        fafe58071f1e58cd87f89f02ed119b4133603"
-      tests/dynamic-source-static-core-source.test.ts: "a4d59f8ee23f8434c1fb\
-        07dbaa8eded15b42a554ab087b2b349e9773b66f6188"
+      tests/native/fixtures/dynamic-source-static-core.ts: "ca77fea92cb50093\
+        1e41202b663df9d26da721d123c80f3969fd17050c4f8741"
+      tests/dynamic-source-static-core.test.ts: "36a9279bda7edb9a00570817f92\
+        c272afd9d84c22eb5beb2910de3c16a6cda9a"
+      tests/dynamic-source-static-core-source.test.ts: "c5ca802eac36bfbab627\
+        f1c91c34bb9046fc2bac0ecc73b3f314e6672a5f36e3"
     reason: "ds15-with-mutate-4: The static sloppy with statement preserves
       object including a missing old key and new b key mutation, the
       original competing global p1 value and all object assertions; it
@@ -2221,12 +2221,12 @@ assessments:
     disposition: exclusion
     normativeDependency: source-evaluation-only
     replacementEvidence:
-      tests/native/fixtures/dynamic-source-static-core.ts: "98ea4cd57ed18639\
-        a6cd702ad4f7ca06e6d1e3365f1f3c3adf5ece84d2ef6a00"
-      tests/dynamic-source-static-core.test.ts: "7c838e320786198f64288a68646\
-        fafe58071f1e58cd87f89f02ed119b4133603"
-      tests/dynamic-source-static-core-source.test.ts: "a4d59f8ee23f8434c1fb\
-        07dbaa8eded15b42a554ab087b2b349e9773b66f6188"
+      tests/native/fixtures/dynamic-source-static-core.ts: "ca77fea92cb50093\
+        1e41202b663df9d26da721d123c80f3969fd17050c4f8741"
+      tests/dynamic-source-static-core.test.ts: "36a9279bda7edb9a00570817f92\
+        c272afd9d84c22eb5beb2910de3c16a6cda9a"
+      tests/dynamic-source-static-core-source.test.ts: "c5ca802eac36bfbab627\
+        f1c91c34bb9046fc2bac0ecc73b3f314e6672a5f36e3"
     reason: "ds15-with-mutate-5: The static sloppy with statement preserves
       array element mutation, the original competing global p1 value and
       all object assertions; it additionally checks the global is
@@ -2237,12 +2237,12 @@ assessments:
     disposition: exclusion
     normativeDependency: source-evaluation-only
     replacementEvidence:
-      tests/native/fixtures/dynamic-source-static-core.ts: "98ea4cd57ed18639\
-        a6cd702ad4f7ca06e6d1e3365f1f3c3adf5ece84d2ef6a00"
-      tests/dynamic-source-static-core.test.ts: "7c838e320786198f64288a68646\
-        fafe58071f1e58cd87f89f02ed119b4133603"
-      tests/dynamic-source-static-core-source.test.ts: "a4d59f8ee23f8434c1fb\
-        07dbaa8eded15b42a554ab087b2b349e9773b66f6188"
+      tests/native/fixtures/dynamic-source-static-core.ts: "ca77fea92cb50093\
+        1e41202b663df9d26da721d123c80f3969fd17050c4f8741"
+      tests/dynamic-source-static-core.test.ts: "36a9279bda7edb9a00570817f92\
+        c272afd9d84c22eb5beb2910de3c16a6cda9a"
+      tests/dynamic-source-static-core-source.test.ts: "c5ca802eac36bfbab627\
+        f1c91c34bb9046fc2bac0ecc73b3f314e6672a5f36e3"
     reason: "ds15-with-mutate-6: The static sloppy with statement preserves
       function call mutation, the original competing global p1 value and
       all object assertions; it additionally checks the global is
@@ -2253,12 +2253,12 @@ assessments:
     disposition: exclusion
     normativeDependency: source-evaluation-only
     replacementEvidence:
-      tests/native/fixtures/dynamic-source-static-core.ts: "98ea4cd57ed18639\
-        a6cd702ad4f7ca06e6d1e3365f1f3c3adf5ece84d2ef6a00"
-      tests/dynamic-source-static-core.test.ts: "7c838e320786198f64288a68646\
-        fafe58071f1e58cd87f89f02ed119b4133603"
-      tests/dynamic-source-static-core-source.test.ts: "a4d59f8ee23f8434c1fb\
-        07dbaa8eded15b42a554ab087b2b349e9773b66f6188"
+      tests/native/fixtures/dynamic-source-static-core.ts: "ca77fea92cb50093\
+        1e41202b663df9d26da721d123c80f3969fd17050c4f8741"
+      tests/dynamic-source-static-core.test.ts: "36a9279bda7edb9a00570817f92\
+        c272afd9d84c22eb5beb2910de3c16a6cda9a"
+      tests/dynamic-source-static-core-source.test.ts: "c5ca802eac36bfbab627\
+        f1c91c34bb9046fc2bac0ecc73b3f314e6672a5f36e3"
     reason: "ds15-with-delete-1: The static sloppy with statement preserves
       string deletion, undefined object property, true delete result and
       the distinct global p1; every non-source assertion is observed,
@@ -2269,12 +2269,12 @@ assessments:
     disposition: exclusion
     normativeDependency: source-evaluation-only
     replacementEvidence:
-      tests/native/fixtures/dynamic-source-static-core.ts: "98ea4cd57ed18639\
-        a6cd702ad4f7ca06e6d1e3365f1f3c3adf5ece84d2ef6a00"
-      tests/dynamic-source-static-core.test.ts: "7c838e320786198f64288a68646\
-        fafe58071f1e58cd87f89f02ed119b4133603"
-      tests/dynamic-source-static-core-source.test.ts: "a4d59f8ee23f8434c1fb\
-        07dbaa8eded15b42a554ab087b2b349e9773b66f6188"
+      tests/native/fixtures/dynamic-source-static-core.ts: "ca77fea92cb50093\
+        1e41202b663df9d26da721d123c80f3969fd17050c4f8741"
+      tests/dynamic-source-static-core.test.ts: "36a9279bda7edb9a00570817f92\
+        c272afd9d84c22eb5beb2910de3c16a6cda9a"
+      tests/dynamic-source-static-core-source.test.ts: "c5ca802eac36bfbab627\
+        f1c91c34bb9046fc2bac0ecc73b3f314e6672a5f36e3"
     reason: "ds15-with-delete-2: The static sloppy with statement preserves
       number deletion, undefined object property, true delete result and
       the distinct global p1; every non-source assertion is observed,
@@ -2285,12 +2285,12 @@ assessments:
     disposition: exclusion
     normativeDependency: source-evaluation-only
     replacementEvidence:
-      tests/native/fixtures/dynamic-source-static-core.ts: "98ea4cd57ed18639\
-        a6cd702ad4f7ca06e6d1e3365f1f3c3adf5ece84d2ef6a00"
-      tests/dynamic-source-static-core.test.ts: "7c838e320786198f64288a68646\
-        fafe58071f1e58cd87f89f02ed119b4133603"
-      tests/dynamic-source-static-core-source.test.ts: "a4d59f8ee23f8434c1fb\
-        07dbaa8eded15b42a554ab087b2b349e9773b66f6188"
+      tests/native/fixtures/dynamic-source-static-core.ts: "ca77fea92cb50093\
+        1e41202b663df9d26da721d123c80f3969fd17050c4f8741"
+      tests/dynamic-source-static-core.test.ts: "36a9279bda7edb9a00570817f92\
+        c272afd9d84c22eb5beb2910de3c16a6cda9a"
+      tests/dynamic-source-static-core-source.test.ts: "c5ca802eac36bfbab627\
+        f1c91c34bb9046fc2bac0ecc73b3f314e6672a5f36e3"
     reason: "ds15-with-delete-3: The static sloppy with statement preserves
       boolean deletion, undefined object property, true delete result and
       the distinct global p1; every non-source assertion is observed,
@@ -2301,12 +2301,12 @@ assessments:
     disposition: exclusion
     normativeDependency: source-evaluation-only
     replacementEvidence:
-      tests/native/fixtures/dynamic-source-static-core.ts: "98ea4cd57ed18639\
-        a6cd702ad4f7ca06e6d1e3365f1f3c3adf5ece84d2ef6a00"
-      tests/dynamic-source-static-core.test.ts: "7c838e320786198f64288a68646\
-        fafe58071f1e58cd87f89f02ed119b4133603"
-      tests/dynamic-source-static-core-source.test.ts: "a4d59f8ee23f8434c1fb\
-        07dbaa8eded15b42a554ab087b2b349e9773b66f6188"
+      tests/native/fixtures/dynamic-source-static-core.ts: "ca77fea92cb50093\
+        1e41202b663df9d26da721d123c80f3969fd17050c4f8741"
+      tests/dynamic-source-static-core.test.ts: "36a9279bda7edb9a00570817f92\
+        c272afd9d84c22eb5beb2910de3c16a6cda9a"
+      tests/dynamic-source-static-core-source.test.ts: "c5ca802eac36bfbab627\
+        f1c91c34bb9046fc2bac0ecc73b3f314e6672a5f36e3"
     reason: "ds15-with-delete-4: The static sloppy with statement preserves
       object member read TypeError deletion, undefined object property,
       true delete result and the distinct global p1; every non-source
@@ -2317,12 +2317,12 @@ assessments:
     disposition: exclusion
     normativeDependency: source-evaluation-only
     replacementEvidence:
-      tests/native/fixtures/dynamic-source-static-core.ts: "98ea4cd57ed18639\
-        a6cd702ad4f7ca06e6d1e3365f1f3c3adf5ece84d2ef6a00"
-      tests/dynamic-source-static-core.test.ts: "7c838e320786198f64288a68646\
-        fafe58071f1e58cd87f89f02ed119b4133603"
-      tests/dynamic-source-static-core-source.test.ts: "a4d59f8ee23f8434c1fb\
-        07dbaa8eded15b42a554ab087b2b349e9773b66f6188"
+      tests/native/fixtures/dynamic-source-static-core.ts: "ca77fea92cb50093\
+        1e41202b663df9d26da721d123c80f3969fd17050c4f8741"
+      tests/dynamic-source-static-core.test.ts: "36a9279bda7edb9a00570817f92\
+        c272afd9d84c22eb5beb2910de3c16a6cda9a"
+      tests/dynamic-source-static-core-source.test.ts: "c5ca802eac36bfbab627\
+        f1c91c34bb9046fc2bac0ecc73b3f314e6672a5f36e3"
     reason: "ds15-with-delete-5: The static sloppy with statement preserves
       array element read TypeError deletion, undefined object property,
       true delete result and the distinct global p1; every non-source
@@ -2333,12 +2333,12 @@ assessments:
     disposition: exclusion
     normativeDependency: source-evaluation-only
     replacementEvidence:
-      tests/native/fixtures/dynamic-source-static-core.ts: "98ea4cd57ed18639\
-        a6cd702ad4f7ca06e6d1e3365f1f3c3adf5ece84d2ef6a00"
-      tests/dynamic-source-static-core.test.ts: "7c838e320786198f64288a68646\
-        fafe58071f1e58cd87f89f02ed119b4133603"
-      tests/dynamic-source-static-core-source.test.ts: "a4d59f8ee23f8434c1fb\
-        07dbaa8eded15b42a554ab087b2b349e9773b66f6188"
+      tests/native/fixtures/dynamic-source-static-core.ts: "ca77fea92cb50093\
+        1e41202b663df9d26da721d123c80f3969fd17050c4f8741"
+      tests/dynamic-source-static-core.test.ts: "36a9279bda7edb9a00570817f92\
+        c272afd9d84c22eb5beb2910de3c16a6cda9a"
+      tests/dynamic-source-static-core-source.test.ts: "c5ca802eac36bfbab627\
+        f1c91c34bb9046fc2bac0ecc73b3f314e6672a5f36e3"
     reason: "ds15-with-delete-6: The static sloppy with statement preserves
       function call TypeError deletion, undefined object property, true
       delete result and the distinct global p1; every non-source assertion
@@ -2349,12 +2349,12 @@ assessments:
     disposition: exclusion
     normativeDependency: source-evaluation-only
     replacementEvidence:
-      tests/native/fixtures/dynamic-source-static-core.ts: "98ea4cd57ed18639\
-        a6cd702ad4f7ca06e6d1e3365f1f3c3adf5ece84d2ef6a00"
-      tests/dynamic-source-static-core.test.ts: "7c838e320786198f64288a68646\
-        fafe58071f1e58cd87f89f02ed119b4133603"
-      tests/dynamic-source-static-core-source.test.ts: "a4d59f8ee23f8434c1fb\
-        07dbaa8eded15b42a554ab087b2b349e9773b66f6188"
+      tests/native/fixtures/dynamic-source-static-core.ts: "ca77fea92cb50093\
+        1e41202b663df9d26da721d123c80f3969fd17050c4f8741"
+      tests/dynamic-source-static-core.test.ts: "36a9279bda7edb9a00570817f92\
+        c272afd9d84c22eb5beb2910de3c16a6cda9a"
+      tests/dynamic-source-static-core-source.test.ts: "c5ca802eac36bfbab627\
+        f1c91c34bb9046fc2bac0ecc73b3f314e6672a5f36e3"
     reason: "ds15-unresolvable-strict-write: A strict static function makes
       the same unresolvable assignment and a surrounding catch observes
       ReferenceError and no new global property; only executing that
@@ -2370,11 +2370,11 @@ assessments:
       : "11490a75e084e3f4e5494e1d614700b8\
         7c36ea6f1bf5320bbbf2ad1ea21396dd"
       "packages/parser-babel/tests/ds12-import-meta-goals.test.ts":
-        "bd73572597045b8e471a32e9e91ebcb9\
-        9510ddf5c7fe9e57d6d654b18135754f"
+        "e1164f2d3fe7a756b875f0223d419632\
+        37205c2f751ee88d7b8e9b28a7ee4814"
       "tests/ds12-module-observables-native.test.ts":
-        "a30d3f3d7118156e93d796bf4ce8f6ea\
-        4ece8197a9a740a9019287758c8a35ac"
+        "9733dc55f125b0ce6a3d7f3198b0e1f0\
+        7073d5888fcc8972c1b3f8e48b7c24e0"
       "tests/fixtures/ds12-module-observables/LICENSE":
         "2c921a1fe5e04c956db32cbc3e68ad2c\
         ec59078611ddb147449c498d6955e548"
@@ -2685,8 +2685,8 @@ assessments:
     normativeDependency: source-evaluation-only
     replacementEvidence:
       tests/lexical-static-evidence.test.ts:
-        "f0517b358fe59f4083924d6307f277041168d548cde19a1b\
-        5be2d11c2f8c7cc5"
+        "b29fc81a0e9007e3a369038db12e62ccc65e673ba78f118f\
+        c2ab6450a105bb68"
       tests/fixtures/lexical-static-negatives.json:
         "24d86babb6f1f2fcc7b091fbd581ebeac75520c2f06588b8\
         f5403ef7fcbb01fb"
@@ -2708,14 +2708,14 @@ assessments:
     normativeDependency: source-evaluation-only
     replacementEvidence:
       tests/lexical-static-native.test.ts:
-        "92b2bd59258f0ffc79ccb7bcb0be40d3f97239f15f7e3c6e\
-        de2d03dd2cd35b78"
+        "5eb1c4ad97a6a5d201ba091c3163df6eff7a0f7822c76347\
+        158b928dad44fc09"
       tests/native/fixtures/lexical-bmp-comments.ts:
-        "66eeee10d6b139f746d882ed87eecdff3fc699c87db14a29\
-        820222c85f17b4cd"
+        "8a42a1845734ec05dac52a76b12fdd6cef7c2d5f5b19346c\
+        1061614655ac305c"
       tests/lexical-static-evidence.test.ts:
-        "f0517b358fe59f4083924d6307f277041168d548cde19a1b\
-        5be2d11c2f8c7cc5"
+        "b29fc81a0e9007e3a369038db12e62ccc65e673ba78f118f\
+        c2ab6450a105bb68"
     reason: Maintainer decision 2026-10-28 item 1 applies path by path as
       mapped in
       docs/m5c-graph/dynamic-source-lexical-static-assessment.yaml. All
@@ -2733,14 +2733,14 @@ assessments:
     normativeDependency: source-evaluation-only
     replacementEvidence:
       tests/lexical-static-native.test.ts:
-        "92b2bd59258f0ffc79ccb7bcb0be40d3f97239f15f7e3c6e\
-        de2d03dd2cd35b78"
+        "5eb1c4ad97a6a5d201ba091c3163df6eff7a0f7822c76347\
+        158b928dad44fc09"
       tests/native/fixtures/lexical-bmp-comments.ts:
-        "66eeee10d6b139f746d882ed87eecdff3fc699c87db14a29\
-        820222c85f17b4cd"
+        "8a42a1845734ec05dac52a76b12fdd6cef7c2d5f5b19346c\
+        1061614655ac305c"
       tests/lexical-static-evidence.test.ts:
-        "f0517b358fe59f4083924d6307f277041168d548cde19a1b\
-        5be2d11c2f8c7cc5"
+        "b29fc81a0e9007e3a369038db12e62ccc65e673ba78f118f\
+        c2ab6450a105bb68"
     reason: Maintainer decision 2026-10-28 item 1 applies path by path as
       mapped in
       docs/m5c-graph/dynamic-source-lexical-static-assessment.yaml. All
@@ -2757,14 +2757,14 @@ assessments:
     normativeDependency: source-evaluation-only
     replacementEvidence:
       tests/lexical-static-native.test.ts:
-        "92b2bd59258f0ffc79ccb7bcb0be40d3f97239f15f7e3c6e\
-        de2d03dd2cd35b78"
+        "5eb1c4ad97a6a5d201ba091c3163df6eff7a0f7822c76347\
+        158b928dad44fc09"
       tests/native/fixtures/lexical-static-evidence.ts:
-        "e2007c4535bd5f97698fc47139109b5b437e5663fdff7e96\
-        150180c391024282"
+        "9889d85d3ded11afd2905d4c45a4ce196c2a08ebc0583ea3\
+        e65ca103ac6bcf06"
       tests/lexical-static-evidence.test.ts:
-        "f0517b358fe59f4083924d6307f277041168d548cde19a1b\
-        5be2d11c2f8c7cc5"
+        "b29fc81a0e9007e3a369038db12e62ccc65e673ba78f118f\
+        c2ab6450a105bb68"
     reason: Maintainer decision 2026-10-28 item 1 applies path by path as
       mapped in
       docs/m5c-graph/dynamic-source-lexical-static-assessment.yaml. The
@@ -2782,14 +2782,14 @@ assessments:
     normativeDependency: source-evaluation-only
     replacementEvidence:
       tests/lexical-static-native.test.ts:
-        "92b2bd59258f0ffc79ccb7bcb0be40d3f97239f15f7e3c6e\
-        de2d03dd2cd35b78"
+        "5eb1c4ad97a6a5d201ba091c3163df6eff7a0f7822c76347\
+        158b928dad44fc09"
       tests/native/fixtures/lexical-static-evidence.ts:
-        "e2007c4535bd5f97698fc47139109b5b437e5663fdff7e96\
-        150180c391024282"
+        "9889d85d3ded11afd2905d4c45a4ce196c2a08ebc0583ea3\
+        e65ca103ac6bcf06"
       tests/lexical-static-evidence.test.ts:
-        "f0517b358fe59f4083924d6307f277041168d548cde19a1b\
-        5be2d11c2f8c7cc5"
+        "b29fc81a0e9007e3a369038db12e62ccc65e673ba78f118f\
+        c2ab6450a105bb68"
     reason: Maintainer decision 2026-10-28 item 1 applies path by path as
       mapped in
       docs/m5c-graph/dynamic-source-lexical-static-assessment.yaml. The
@@ -2807,14 +2807,14 @@ assessments:
     normativeDependency: source-evaluation-only
     replacementEvidence:
       tests/lexical-static-native.test.ts:
-        "92b2bd59258f0ffc79ccb7bcb0be40d3f97239f15f7e3c6e\
-        de2d03dd2cd35b78"
+        "5eb1c4ad97a6a5d201ba091c3163df6eff7a0f7822c76347\
+        158b928dad44fc09"
       tests/native/fixtures/lexical-static-evidence.ts:
-        "e2007c4535bd5f97698fc47139109b5b437e5663fdff7e96\
-        150180c391024282"
+        "9889d85d3ded11afd2905d4c45a4ce196c2a08ebc0583ea3\
+        e65ca103ac6bcf06"
       tests/lexical-static-evidence.test.ts:
-        "f0517b358fe59f4083924d6307f277041168d548cde19a1b\
-        5be2d11c2f8c7cc5"
+        "b29fc81a0e9007e3a369038db12e62ccc65e673ba78f118f\
+        c2ab6450a105bb68"
     reason: Maintainer decision 2026-10-28 item 1 applies path by path as
       mapped in
       docs/m5c-graph/dynamic-source-lexical-static-assessment.yaml. The
@@ -2832,14 +2832,14 @@ assessments:
     normativeDependency: source-evaluation-only
     replacementEvidence:
       tests/lexical-static-native.test.ts:
-        "92b2bd59258f0ffc79ccb7bcb0be40d3f97239f15f7e3c6e\
-        de2d03dd2cd35b78"
+        "5eb1c4ad97a6a5d201ba091c3163df6eff7a0f7822c76347\
+        158b928dad44fc09"
       tests/native/fixtures/lexical-static-evidence.ts:
-        "e2007c4535bd5f97698fc47139109b5b437e5663fdff7e96\
-        150180c391024282"
+        "9889d85d3ded11afd2905d4c45a4ce196c2a08ebc0583ea3\
+        e65ca103ac6bcf06"
       tests/lexical-static-evidence.test.ts:
-        "f0517b358fe59f4083924d6307f277041168d548cde19a1b\
-        5be2d11c2f8c7cc5"
+        "b29fc81a0e9007e3a369038db12e62ccc65e673ba78f118f\
+        c2ab6450a105bb68"
     reason: Maintainer decision 2026-10-28 item 1 applies path by path as
       mapped in
       docs/m5c-graph/dynamic-source-lexical-static-assessment.yaml. The
@@ -2857,14 +2857,14 @@ assessments:
     normativeDependency: source-evaluation-only
     replacementEvidence:
       tests/lexical-static-native.test.ts:
-        "92b2bd59258f0ffc79ccb7bcb0be40d3f97239f15f7e3c6e\
-        de2d03dd2cd35b78"
+        "5eb1c4ad97a6a5d201ba091c3163df6eff7a0f7822c76347\
+        158b928dad44fc09"
       tests/native/fixtures/lexical-static-evidence.ts:
-        "e2007c4535bd5f97698fc47139109b5b437e5663fdff7e96\
-        150180c391024282"
+        "9889d85d3ded11afd2905d4c45a4ce196c2a08ebc0583ea3\
+        e65ca103ac6bcf06"
       tests/lexical-static-evidence.test.ts:
-        "f0517b358fe59f4083924d6307f277041168d548cde19a1b\
-        5be2d11c2f8c7cc5"
+        "b29fc81a0e9007e3a369038db12e62ccc65e673ba78f118f\
+        c2ab6450a105bb68"
     reason: Maintainer decision 2026-10-28 item 1 applies path by path as
       mapped in
       docs/m5c-graph/dynamic-source-lexical-static-assessment.yaml. The
@@ -2882,14 +2882,14 @@ assessments:
     normativeDependency: source-evaluation-only
     replacementEvidence:
       tests/lexical-static-native.test.ts:
-        "92b2bd59258f0ffc79ccb7bcb0be40d3f97239f15f7e3c6e\
-        de2d03dd2cd35b78"
+        "5eb1c4ad97a6a5d201ba091c3163df6eff7a0f7822c76347\
+        158b928dad44fc09"
       tests/native/fixtures/lexical-static-evidence.ts:
-        "e2007c4535bd5f97698fc47139109b5b437e5663fdff7e96\
-        150180c391024282"
+        "9889d85d3ded11afd2905d4c45a4ce196c2a08ebc0583ea3\
+        e65ca103ac6bcf06"
       tests/lexical-static-evidence.test.ts:
-        "f0517b358fe59f4083924d6307f277041168d548cde19a1b\
-        5be2d11c2f8c7cc5"
+        "b29fc81a0e9007e3a369038db12e62ccc65e673ba78f118f\
+        c2ab6450a105bb68"
     reason: Maintainer decision 2026-10-28 item 1 applies path by path as
       mapped in
       docs/m5c-graph/dynamic-source-lexical-static-assessment.yaml. The
@@ -2907,14 +2907,14 @@ assessments:
     normativeDependency: source-evaluation-only
     replacementEvidence:
       tests/lexical-static-native.test.ts:
-        "92b2bd59258f0ffc79ccb7bcb0be40d3f97239f15f7e3c6e\
-        de2d03dd2cd35b78"
+        "5eb1c4ad97a6a5d201ba091c3163df6eff7a0f7822c76347\
+        158b928dad44fc09"
       tests/native/fixtures/lexical-static-evidence.ts:
-        "e2007c4535bd5f97698fc47139109b5b437e5663fdff7e96\
-        150180c391024282"
+        "9889d85d3ded11afd2905d4c45a4ce196c2a08ebc0583ea3\
+        e65ca103ac6bcf06"
       tests/lexical-static-evidence.test.ts:
-        "f0517b358fe59f4083924d6307f277041168d548cde19a1b\
-        5be2d11c2f8c7cc5"
+        "b29fc81a0e9007e3a369038db12e62ccc65e673ba78f118f\
+        c2ab6450a105bb68"
     reason: Maintainer decision 2026-10-28 item 1 applies path by path as
       mapped in
       docs/m5c-graph/dynamic-source-lexical-static-assessment.yaml. The
@@ -2932,14 +2932,14 @@ assessments:
     normativeDependency: source-evaluation-only
     replacementEvidence:
       tests/lexical-static-native.test.ts:
-        "92b2bd59258f0ffc79ccb7bcb0be40d3f97239f15f7e3c6e\
-        de2d03dd2cd35b78"
+        "5eb1c4ad97a6a5d201ba091c3163df6eff7a0f7822c76347\
+        158b928dad44fc09"
       tests/native/fixtures/lexical-static-evidence.ts:
-        "e2007c4535bd5f97698fc47139109b5b437e5663fdff7e96\
-        150180c391024282"
+        "9889d85d3ded11afd2905d4c45a4ce196c2a08ebc0583ea3\
+        e65ca103ac6bcf06"
       tests/lexical-static-evidence.test.ts:
-        "f0517b358fe59f4083924d6307f277041168d548cde19a1b\
-        5be2d11c2f8c7cc5"
+        "b29fc81a0e9007e3a369038db12e62ccc65e673ba78f118f\
+        c2ab6450a105bb68"
     reason: Maintainer decision 2026-10-28 item 1 applies path by path as
       mapped in
       docs/m5c-graph/dynamic-source-lexical-static-assessment.yaml. The
@@ -2957,14 +2957,14 @@ assessments:
     normativeDependency: source-evaluation-only
     replacementEvidence:
       tests/lexical-static-native.test.ts:
-        "92b2bd59258f0ffc79ccb7bcb0be40d3f97239f15f7e3c6e\
-        de2d03dd2cd35b78"
+        "5eb1c4ad97a6a5d201ba091c3163df6eff7a0f7822c76347\
+        158b928dad44fc09"
       tests/native/fixtures/lexical-static-evidence.ts:
-        "e2007c4535bd5f97698fc47139109b5b437e5663fdff7e96\
-        150180c391024282"
+        "9889d85d3ded11afd2905d4c45a4ce196c2a08ebc0583ea3\
+        e65ca103ac6bcf06"
       tests/lexical-static-evidence.test.ts:
-        "f0517b358fe59f4083924d6307f277041168d548cde19a1b\
-        5be2d11c2f8c7cc5"
+        "b29fc81a0e9007e3a369038db12e62ccc65e673ba78f118f\
+        c2ab6450a105bb68"
     reason: Maintainer decision 2026-10-28 item 1 applies path by path as
       mapped in
       docs/m5c-graph/dynamic-source-lexical-static-assessment.yaml. The
@@ -2982,14 +2982,14 @@ assessments:
     normativeDependency: source-evaluation-only
     replacementEvidence:
       tests/lexical-static-native.test.ts:
-        "92b2bd59258f0ffc79ccb7bcb0be40d3f97239f15f7e3c6e\
-        de2d03dd2cd35b78"
+        "5eb1c4ad97a6a5d201ba091c3163df6eff7a0f7822c76347\
+        158b928dad44fc09"
       tests/native/fixtures/lexical-static-evidence.ts:
-        "e2007c4535bd5f97698fc47139109b5b437e5663fdff7e96\
-        150180c391024282"
+        "9889d85d3ded11afd2905d4c45a4ce196c2a08ebc0583ea3\
+        e65ca103ac6bcf06"
       tests/lexical-static-evidence.test.ts:
-        "f0517b358fe59f4083924d6307f277041168d548cde19a1b\
-        5be2d11c2f8c7cc5"
+        "b29fc81a0e9007e3a369038db12e62ccc65e673ba78f118f\
+        c2ab6450a105bb68"
     reason: Maintainer decision 2026-10-28 item 1 applies path by path as
       mapped in
       docs/m5c-graph/dynamic-source-lexical-static-assessment.yaml. The
@@ -3007,14 +3007,14 @@ assessments:
     normativeDependency: source-evaluation-only
     replacementEvidence:
       tests/lexical-static-native.test.ts:
-        "92b2bd59258f0ffc79ccb7bcb0be40d3f97239f15f7e3c6e\
-        de2d03dd2cd35b78"
+        "5eb1c4ad97a6a5d201ba091c3163df6eff7a0f7822c76347\
+        158b928dad44fc09"
       tests/native/fixtures/lexical-static-evidence.ts:
-        "e2007c4535bd5f97698fc47139109b5b437e5663fdff7e96\
-        150180c391024282"
+        "9889d85d3ded11afd2905d4c45a4ce196c2a08ebc0583ea3\
+        e65ca103ac6bcf06"
       tests/lexical-static-evidence.test.ts:
-        "f0517b358fe59f4083924d6307f277041168d548cde19a1b\
-        5be2d11c2f8c7cc5"
+        "b29fc81a0e9007e3a369038db12e62ccc65e673ba78f118f\
+        c2ab6450a105bb68"
     reason: Maintainer decision 2026-10-28 item 1 applies path by path as
       mapped in
       docs/m5c-graph/dynamic-source-lexical-static-assessment.yaml. The
@@ -3032,14 +3032,14 @@ assessments:
     normativeDependency: source-evaluation-only
     replacementEvidence:
       tests/lexical-static-native.test.ts:
-        "92b2bd59258f0ffc79ccb7bcb0be40d3f97239f15f7e3c6e\
-        de2d03dd2cd35b78"
+        "5eb1c4ad97a6a5d201ba091c3163df6eff7a0f7822c76347\
+        158b928dad44fc09"
       tests/native/fixtures/lexical-static-evidence.ts:
-        "e2007c4535bd5f97698fc47139109b5b437e5663fdff7e96\
-        150180c391024282"
+        "9889d85d3ded11afd2905d4c45a4ce196c2a08ebc0583ea3\
+        e65ca103ac6bcf06"
       tests/lexical-static-evidence.test.ts:
-        "f0517b358fe59f4083924d6307f277041168d548cde19a1b\
-        5be2d11c2f8c7cc5"
+        "b29fc81a0e9007e3a369038db12e62ccc65e673ba78f118f\
+        c2ab6450a105bb68"
     reason: Maintainer decision 2026-10-28 item 1 applies path by path as
       mapped in
       docs/m5c-graph/dynamic-source-lexical-static-assessment.yaml. The
@@ -3057,14 +3057,14 @@ assessments:
     normativeDependency: source-evaluation-only
     replacementEvidence:
       tests/lexical-static-native.test.ts:
-        "92b2bd59258f0ffc79ccb7bcb0be40d3f97239f15f7e3c6e\
-        de2d03dd2cd35b78"
+        "5eb1c4ad97a6a5d201ba091c3163df6eff7a0f7822c76347\
+        158b928dad44fc09"
       tests/native/fixtures/lexical-static-evidence.ts:
-        "e2007c4535bd5f97698fc47139109b5b437e5663fdff7e96\
-        150180c391024282"
+        "9889d85d3ded11afd2905d4c45a4ce196c2a08ebc0583ea3\
+        e65ca103ac6bcf06"
       tests/lexical-static-evidence.test.ts:
-        "f0517b358fe59f4083924d6307f277041168d548cde19a1b\
-        5be2d11c2f8c7cc5"
+        "b29fc81a0e9007e3a369038db12e62ccc65e673ba78f118f\
+        c2ab6450a105bb68"
     reason: Maintainer decision 2026-10-28 item 1 applies path by path as
       mapped in
       docs/m5c-graph/dynamic-source-lexical-static-assessment.yaml. The
@@ -3081,14 +3081,14 @@ assessments:
     normativeDependency: source-evaluation-only
     replacementEvidence:
       tests/lexical-static-native.test.ts:
-        "92b2bd59258f0ffc79ccb7bcb0be40d3f97239f15f7e3c6e\
-        de2d03dd2cd35b78"
+        "5eb1c4ad97a6a5d201ba091c3163df6eff7a0f7822c76347\
+        158b928dad44fc09"
       tests/native/fixtures/lexical-static-evidence.ts:
-        "e2007c4535bd5f97698fc47139109b5b437e5663fdff7e96\
-        150180c391024282"
+        "9889d85d3ded11afd2905d4c45a4ce196c2a08ebc0583ea3\
+        e65ca103ac6bcf06"
       tests/lexical-static-evidence.test.ts:
-        "f0517b358fe59f4083924d6307f277041168d548cde19a1b\
-        5be2d11c2f8c7cc5"
+        "b29fc81a0e9007e3a369038db12e62ccc65e673ba78f118f\
+        c2ab6450a105bb68"
     reason: Maintainer decision 2026-10-28 item 1 applies path by path as
       mapped in
       docs/m5c-graph/dynamic-source-lexical-static-assessment.yaml. The
@@ -3105,14 +3105,14 @@ assessments:
     normativeDependency: source-evaluation-only
     replacementEvidence:
       tests/lexical-static-native.test.ts:
-        "92b2bd59258f0ffc79ccb7bcb0be40d3f97239f15f7e3c6e\
-        de2d03dd2cd35b78"
+        "5eb1c4ad97a6a5d201ba091c3163df6eff7a0f7822c76347\
+        158b928dad44fc09"
       tests/native/fixtures/lexical-static-evidence.ts:
-        "e2007c4535bd5f97698fc47139109b5b437e5663fdff7e96\
-        150180c391024282"
+        "9889d85d3ded11afd2905d4c45a4ce196c2a08ebc0583ea3\
+        e65ca103ac6bcf06"
       tests/lexical-static-evidence.test.ts:
-        "f0517b358fe59f4083924d6307f277041168d548cde19a1b\
-        5be2d11c2f8c7cc5"
+        "b29fc81a0e9007e3a369038db12e62ccc65e673ba78f118f\
+        c2ab6450a105bb68"
     reason: Maintainer decision 2026-10-28 item 1 applies path by path as
       mapped in
       docs/m5c-graph/dynamic-source-lexical-static-assessment.yaml. The
@@ -3129,14 +3129,14 @@ assessments:
     normativeDependency: source-evaluation-only
     replacementEvidence:
       tests/lexical-static-native.test.ts:
-        "92b2bd59258f0ffc79ccb7bcb0be40d3f97239f15f7e3c6e\
-        de2d03dd2cd35b78"
+        "5eb1c4ad97a6a5d201ba091c3163df6eff7a0f7822c76347\
+        158b928dad44fc09"
       tests/native/fixtures/lexical-static-evidence.ts:
-        "e2007c4535bd5f97698fc47139109b5b437e5663fdff7e96\
-        150180c391024282"
+        "9889d85d3ded11afd2905d4c45a4ce196c2a08ebc0583ea3\
+        e65ca103ac6bcf06"
       tests/lexical-static-evidence.test.ts:
-        "f0517b358fe59f4083924d6307f277041168d548cde19a1b\
-        5be2d11c2f8c7cc5"
+        "b29fc81a0e9007e3a369038db12e62ccc65e673ba78f118f\
+        c2ab6450a105bb68"
     reason: Maintainer decision 2026-10-28 item 1 applies path by path as
       mapped in
       docs/m5c-graph/dynamic-source-lexical-static-assessment.yaml. The
@@ -3152,14 +3152,14 @@ assessments:
     normativeDependency: source-evaluation-only
     replacementEvidence:
       tests/lexical-static-native.test.ts:
-        "92b2bd59258f0ffc79ccb7bcb0be40d3f97239f15f7e3c6e\
-        de2d03dd2cd35b78"
+        "5eb1c4ad97a6a5d201ba091c3163df6eff7a0f7822c76347\
+        158b928dad44fc09"
       tests/native/fixtures/lexical-static-evidence.ts:
-        "e2007c4535bd5f97698fc47139109b5b437e5663fdff7e96\
-        150180c391024282"
+        "9889d85d3ded11afd2905d4c45a4ce196c2a08ebc0583ea3\
+        e65ca103ac6bcf06"
       tests/lexical-static-evidence.test.ts:
-        "f0517b358fe59f4083924d6307f277041168d548cde19a1b\
-        5be2d11c2f8c7cc5"
+        "b29fc81a0e9007e3a369038db12e62ccc65e673ba78f118f\
+        c2ab6450a105bb68"
     reason: Maintainer decision 2026-10-28 item 1 applies path by path as
       mapped in
       docs/m5c-graph/dynamic-source-lexical-static-assessment.yaml. The
@@ -3177,14 +3177,14 @@ assessments:
     normativeDependency: source-evaluation-only
     replacementEvidence:
       tests/lexical-static-native.test.ts:
-        "92b2bd59258f0ffc79ccb7bcb0be40d3f97239f15f7e3c6e\
-        de2d03dd2cd35b78"
+        "5eb1c4ad97a6a5d201ba091c3163df6eff7a0f7822c76347\
+        158b928dad44fc09"
       tests/native/fixtures/lexical-static-evidence.ts:
-        "e2007c4535bd5f97698fc47139109b5b437e5663fdff7e96\
-        150180c391024282"
+        "9889d85d3ded11afd2905d4c45a4ce196c2a08ebc0583ea3\
+        e65ca103ac6bcf06"
       tests/lexical-static-evidence.test.ts:
-        "f0517b358fe59f4083924d6307f277041168d548cde19a1b\
-        5be2d11c2f8c7cc5"
+        "b29fc81a0e9007e3a369038db12e62ccc65e673ba78f118f\
+        c2ab6450a105bb68"
     reason: Maintainer decision 2026-10-28 item 1 applies path by path as
       mapped in
       docs/m5c-graph/dynamic-source-lexical-static-assessment.yaml. The
@@ -3201,14 +3201,14 @@ assessments:
     normativeDependency: source-evaluation-only
     replacementEvidence:
       tests/lexical-static-native.test.ts:
-        "92b2bd59258f0ffc79ccb7bcb0be40d3f97239f15f7e3c6e\
-        de2d03dd2cd35b78"
+        "5eb1c4ad97a6a5d201ba091c3163df6eff7a0f7822c76347\
+        158b928dad44fc09"
       tests/native/fixtures/lexical-static-evidence.ts:
-        "e2007c4535bd5f97698fc47139109b5b437e5663fdff7e96\
-        150180c391024282"
+        "9889d85d3ded11afd2905d4c45a4ce196c2a08ebc0583ea3\
+        e65ca103ac6bcf06"
       tests/lexical-static-evidence.test.ts:
-        "f0517b358fe59f4083924d6307f277041168d548cde19a1b\
-        5be2d11c2f8c7cc5"
+        "b29fc81a0e9007e3a369038db12e62ccc65e673ba78f118f\
+        c2ab6450a105bb68"
     reason: Maintainer decision 2026-10-28 item 1 applies path by path as
       mapped in
       docs/m5c-graph/dynamic-source-lexical-static-assessment.yaml. The
@@ -3225,14 +3225,14 @@ assessments:
     normativeDependency: source-evaluation-only
     replacementEvidence:
       tests/lexical-static-native.test.ts:
-        "92b2bd59258f0ffc79ccb7bcb0be40d3f97239f15f7e3c6e\
-        de2d03dd2cd35b78"
+        "5eb1c4ad97a6a5d201ba091c3163df6eff7a0f7822c76347\
+        158b928dad44fc09"
       tests/native/fixtures/lexical-static-evidence.ts:
-        "e2007c4535bd5f97698fc47139109b5b437e5663fdff7e96\
-        150180c391024282"
+        "9889d85d3ded11afd2905d4c45a4ce196c2a08ebc0583ea3\
+        e65ca103ac6bcf06"
       tests/lexical-static-evidence.test.ts:
-        "f0517b358fe59f4083924d6307f277041168d548cde19a1b\
-        5be2d11c2f8c7cc5"
+        "b29fc81a0e9007e3a369038db12e62ccc65e673ba78f118f\
+        c2ab6450a105bb68"
     reason: Maintainer decision 2026-10-28 item 1 applies path by path as
       mapped in
       docs/m5c-graph/dynamic-source-lexical-static-assessment.yaml. The
@@ -3249,14 +3249,14 @@ assessments:
     normativeDependency: source-evaluation-only
     replacementEvidence:
       tests/lexical-static-native.test.ts:
-        "92b2bd59258f0ffc79ccb7bcb0be40d3f97239f15f7e3c6e\
-        de2d03dd2cd35b78"
+        "5eb1c4ad97a6a5d201ba091c3163df6eff7a0f7822c76347\
+        158b928dad44fc09"
       tests/native/fixtures/lexical-static-evidence.ts:
-        "e2007c4535bd5f97698fc47139109b5b437e5663fdff7e96\
-        150180c391024282"
+        "9889d85d3ded11afd2905d4c45a4ce196c2a08ebc0583ea3\
+        e65ca103ac6bcf06"
       tests/lexical-static-evidence.test.ts:
-        "f0517b358fe59f4083924d6307f277041168d548cde19a1b\
-        5be2d11c2f8c7cc5"
+        "b29fc81a0e9007e3a369038db12e62ccc65e673ba78f118f\
+        c2ab6450a105bb68"
     reason: Maintainer decision 2026-10-28 item 1 applies path by path as
       mapped in
       docs/m5c-graph/dynamic-source-lexical-static-assessment.yaml. The
@@ -3272,14 +3272,14 @@ assessments:
     normativeDependency: source-evaluation-only
     replacementEvidence:
       tests/lexical-static-native.test.ts:
-        "92b2bd59258f0ffc79ccb7bcb0be40d3f97239f15f7e3c6e\
-        de2d03dd2cd35b78"
+        "5eb1c4ad97a6a5d201ba091c3163df6eff7a0f7822c76347\
+        158b928dad44fc09"
       tests/native/fixtures/lexical-static-evidence.ts:
-        "e2007c4535bd5f97698fc47139109b5b437e5663fdff7e96\
-        150180c391024282"
+        "9889d85d3ded11afd2905d4c45a4ce196c2a08ebc0583ea3\
+        e65ca103ac6bcf06"
       tests/lexical-static-evidence.test.ts:
-        "f0517b358fe59f4083924d6307f277041168d548cde19a1b\
-        5be2d11c2f8c7cc5"
+        "b29fc81a0e9007e3a369038db12e62ccc65e673ba78f118f\
+        c2ab6450a105bb68"
     reason: Maintainer decision 2026-10-28 item 1 applies path by path as
       mapped in
       docs/m5c-graph/dynamic-source-lexical-static-assessment.yaml. The
@@ -3295,14 +3295,14 @@ assessments:
     normativeDependency: source-evaluation-only
     replacementEvidence:
       tests/lexical-static-native.test.ts:
-        "92b2bd59258f0ffc79ccb7bcb0be40d3f97239f15f7e3c6e\
-        de2d03dd2cd35b78"
+        "5eb1c4ad97a6a5d201ba091c3163df6eff7a0f7822c76347\
+        158b928dad44fc09"
       tests/native/fixtures/lexical-static-evidence.ts:
-        "e2007c4535bd5f97698fc47139109b5b437e5663fdff7e96\
-        150180c391024282"
+        "9889d85d3ded11afd2905d4c45a4ce196c2a08ebc0583ea3\
+        e65ca103ac6bcf06"
       tests/lexical-static-evidence.test.ts:
-        "f0517b358fe59f4083924d6307f277041168d548cde19a1b\
-        5be2d11c2f8c7cc5"
+        "b29fc81a0e9007e3a369038db12e62ccc65e673ba78f118f\
+        c2ab6450a105bb68"
     reason: Maintainer decision 2026-10-28 item 1 applies path by path as
       mapped in
       docs/m5c-graph/dynamic-source-lexical-static-assessment.yaml. The
@@ -3321,8 +3321,8 @@ assessments:
         "fa1e7018641f8550f5a381b6a36c23a0\
         4176f0ebc0c93ff3478b820ee8ec5111"
       tests/module-goal-validation-source.test.ts:
-        "8339a1e8ab6dd61e2d07440cc7c74e2e\
-        1ddbc2b79bd9aad35c61a28989c21261"
+        "76007a5da7cb3b653052c8a3fce4501c\
+        ee8cf3308606a58e3960bb151f3a704b"
     reason: >-
       The same var/function collision is accepted as sloppy and strict Script
       and rejected by Module parsing, both directly and through a static
@@ -3346,8 +3346,8 @@ assessments:
         "fa1e7018641f8550f5a381b6a36c23a0\
         4176f0ebc0c93ff3478b820ee8ec5111"
       tests/module-goal-validation-source.test.ts:
-        "8339a1e8ab6dd61e2d07440cc7c74e2e\
-        1ddbc2b79bd9aad35c61a28989c21261"
+        "76007a5da7cb3b653052c8a3fce4501c\
+        ee8cf3308606a58e3960bb151f3a704b"
     reason: >-
       The same indirect re-export requests x from two distinct star-export
       sources. All modules parse; Oseo linking rejects the ambiguous resolution
@@ -3370,8 +3370,8 @@ assessments:
         "fa1e7018641f8550f5a381b6a36c23a0\
         4176f0ebc0c93ff3478b820ee8ec5111"
       tests/module-goal-validation-source.test.ts:
-        "8339a1e8ab6dd61e2d07440cc7c74e2e\
-        1ddbc2b79bd9aad35c61a28989c21261"
+        "76007a5da7cb3b653052c8a3fce4501c\
+        ee8cf3308606a58e3960bb151f3a704b"
     reason: >-
       The same two-module indirect re-export cycle has no concrete x binding.
       All modules parse; Oseo linking rejects that unresolved resolution under
@@ -3394,20 +3394,20 @@ assessments:
         "fa1e7018641f8550f5a381b6a36c23a0\
         4176f0ebc0c93ff3478b820ee8ec5111"
       tests/module-goal-validation-source.test.ts:
-        "8339a1e8ab6dd61e2d07440cc7c74e2e\
-        1ddbc2b79bd9aad35c61a28989c21261"
+        "76007a5da7cb3b653052c8a3fce4501c\
+        ee8cf3308606a58e3960bb151f3a704b"
       tests/module-goal-validation-native.test.ts:
-        "e42a5e63c32b3b2d9ec71fd9a40d0113\
-        4f9e0d78d31713def24a588e63154bf6"
+        "0b89dbc2bd8802bc46a0b51469a33fc2\
+        7d629295d7e0bd303d7d3ac25da86af6"
       tests/fixtures/module-goal-validation/entry.mjs:
-        "d1e6eb304229ab13a7d39f21382eac99\
-        0db3e3fa924bab0aefb8b2654a1cf894"
+        "c973d5ebc8a2831a0a044eeb673c84e6\
+        0c7f2b1ea97b5d76f4586241c34520a5"
       tests/fixtures/module-goal-validation/target.mjs:
-        "a40085f1129e91c1699b4765f78e99bf\
-        f399ef8f127173fcb32ba88b4c56a159"
+        "7543c101a3172feebe95c0e1e8f90eb7\
+        03a8340d84987d75c57c7041a9c2ecbc"
       tests/fixtures/module-goal-validation/prelude.js:
-        "85383879a2786c478abf619fe3e7dfee\
-        c8638dc13b0426e2726d55c2049a84d8"
+        "996f3cb374f261f8f46bf145619b4a97\
+        6d624fec77238743aa6a117f91c798f2"
     reason: >-
       The fixture strictly compares all three namespace values and types
       against the finite nonzero numeric and string expectations, preserving
@@ -3433,13 +3433,13 @@ assessments:
     normativeDependency: source-evaluation-only
     replacementEvidence:
       tests/native/fixtures/callable-object-evidence.ts:
-        "e4c41001c23905e90aef35fa2fa94c5207f77e0d7ca6aef8faaa\
-        b6435b7a9b06"
+        "6b1dd839a4cfe4c493f469348f04a9ae0be135f0fdc6abfdadae\
+        c49c35b8ac60"
       tests/callable-object-evidence.test.ts:
-        "d2b814666e5645565ca2001f0419b931cd2949624777047f562d\
-        a479c71be70d"
-      tests/native.ts: "fd6c0dce57f15cb8fa818226e11af8c9ac011d3946996970d157\
-        11bffa9f159a"
+        "8af9636252a1dd50c9d4fa7b9899115989a8d2dff1a23f436bb4\
+        c477981b2a06"
+      tests/native.ts: "acb5db12015f8b73bd02182d398bd0e92b980a40f3f87ea6cb0c\
+        db037dabd546"
       docs/m5c-graph/dynamic-source-callable-object-assessment.md:
         "b4eb5774379e97332ac56111eb4fadf83a6e39b66f84b22bff74\
         10ffca7eaf37"
@@ -3465,13 +3465,13 @@ assessments:
     normativeDependency: source-evaluation-only
     replacementEvidence:
       tests/native/fixtures/callable-object-evidence.ts:
-        "e4c41001c23905e90aef35fa2fa94c5207f77e0d7ca6aef8faaa\
-        b6435b7a9b06"
+        "6b1dd839a4cfe4c493f469348f04a9ae0be135f0fdc6abfdadae\
+        c49c35b8ac60"
       tests/callable-object-evidence.test.ts:
-        "d2b814666e5645565ca2001f0419b931cd2949624777047f562d\
-        a479c71be70d"
-      tests/native.ts: "fd6c0dce57f15cb8fa818226e11af8c9ac011d3946996970d157\
-        11bffa9f159a"
+        "8af9636252a1dd50c9d4fa7b9899115989a8d2dff1a23f436bb4\
+        c477981b2a06"
+      tests/native.ts: "acb5db12015f8b73bd02182d398bd0e92b980a40f3f87ea6cb0c\
+        db037dabd546"
       docs/m5c-graph/dynamic-source-callable-object-assessment.md:
         "b4eb5774379e97332ac56111eb4fadf83a6e39b66f84b22bff74\
         10ffca7eaf37"
@@ -3494,13 +3494,13 @@ assessments:
     normativeDependency: source-evaluation-only
     replacementEvidence:
       tests/native/fixtures/callable-object-evidence.ts:
-        "e4c41001c23905e90aef35fa2fa94c5207f77e0d7ca6aef8faaa\
-        b6435b7a9b06"
+        "6b1dd839a4cfe4c493f469348f04a9ae0be135f0fdc6abfdadae\
+        c49c35b8ac60"
       tests/callable-object-evidence.test.ts:
-        "d2b814666e5645565ca2001f0419b931cd2949624777047f562d\
-        a479c71be70d"
-      tests/native.ts: "fd6c0dce57f15cb8fa818226e11af8c9ac011d3946996970d157\
-        11bffa9f159a"
+        "8af9636252a1dd50c9d4fa7b9899115989a8d2dff1a23f436bb4\
+        c477981b2a06"
+      tests/native.ts: "acb5db12015f8b73bd02182d398bd0e92b980a40f3f87ea6cb0c\
+        db037dabd546"
       docs/m5c-graph/dynamic-source-callable-object-assessment.md:
         "b4eb5774379e97332ac56111eb4fadf83a6e39b66f84b22bff74\
         10ffca7eaf37"
@@ -3538,13 +3538,13 @@ assessments:
     normativeDependency: source-evaluation-only
     replacementEvidence:
       tests/native/fixtures/callable-object-evidence.ts:
-        "e4c41001c23905e90aef35fa2fa94c5207f77e0d7ca6aef8faaa\
-        b6435b7a9b06"
+        "6b1dd839a4cfe4c493f469348f04a9ae0be135f0fdc6abfdadae\
+        c49c35b8ac60"
       tests/callable-object-evidence.test.ts:
-        "d2b814666e5645565ca2001f0419b931cd2949624777047f562d\
-        a479c71be70d"
-      tests/native.ts: "fd6c0dce57f15cb8fa818226e11af8c9ac011d3946996970d157\
-        11bffa9f159a"
+        "8af9636252a1dd50c9d4fa7b9899115989a8d2dff1a23f436bb4\
+        c477981b2a06"
+      tests/native.ts: "acb5db12015f8b73bd02182d398bd0e92b980a40f3f87ea6cb0c\
+        db037dabd546"
       docs/m5c-graph/dynamic-source-callable-object-assessment.md:
         "b4eb5774379e97332ac56111eb4fadf83a6e39b66f84b22bff74\
         10ffca7eaf37"
@@ -3566,13 +3566,13 @@ assessments:
     normativeDependency: source-evaluation-only
     replacementEvidence:
       tests/native/fixtures/callable-object-evidence.ts:
-        "e4c41001c23905e90aef35fa2fa94c5207f77e0d7ca6aef8faaa\
-        b6435b7a9b06"
+        "6b1dd839a4cfe4c493f469348f04a9ae0be135f0fdc6abfdadae\
+        c49c35b8ac60"
       tests/callable-object-evidence.test.ts:
-        "d2b814666e5645565ca2001f0419b931cd2949624777047f562d\
-        a479c71be70d"
-      tests/native.ts: "fd6c0dce57f15cb8fa818226e11af8c9ac011d3946996970d157\
-        11bffa9f159a"
+        "8af9636252a1dd50c9d4fa7b9899115989a8d2dff1a23f436bb4\
+        c477981b2a06"
+      tests/native.ts: "acb5db12015f8b73bd02182d398bd0e92b980a40f3f87ea6cb0c\
+        db037dabd546"
       docs/m5c-graph/dynamic-source-callable-object-assessment.md:
         "b4eb5774379e97332ac56111eb4fadf83a6e39b66f84b22bff74\
         10ffca7eaf37"
@@ -3598,13 +3598,13 @@ assessments:
     normativeDependency: source-evaluation-only
     replacementEvidence:
       tests/native/fixtures/callable-object-evidence.ts:
-        "e4c41001c23905e90aef35fa2fa94c5207f77e0d7ca6aef8faaa\
-        b6435b7a9b06"
+        "6b1dd839a4cfe4c493f469348f04a9ae0be135f0fdc6abfdadae\
+        c49c35b8ac60"
       tests/callable-object-evidence.test.ts:
-        "d2b814666e5645565ca2001f0419b931cd2949624777047f562d\
-        a479c71be70d"
-      tests/native.ts: "fd6c0dce57f15cb8fa818226e11af8c9ac011d3946996970d157\
-        11bffa9f159a"
+        "8af9636252a1dd50c9d4fa7b9899115989a8d2dff1a23f436bb4\
+        c477981b2a06"
+      tests/native.ts: "acb5db12015f8b73bd02182d398bd0e92b980a40f3f87ea6cb0c\
+        db037dabd546"
       docs/m5c-graph/dynamic-source-callable-object-assessment.md:
         "b4eb5774379e97332ac56111eb4fadf83a6e39b66f84b22bff74\
         10ffca7eaf37"
@@ -3628,13 +3628,13 @@ assessments:
     normativeDependency: source-evaluation-only
     replacementEvidence:
       tests/native/fixtures/callable-object-evidence.ts:
-        "e4c41001c23905e90aef35fa2fa94c5207f77e0d7ca6aef8faaa\
-        b6435b7a9b06"
+        "6b1dd839a4cfe4c493f469348f04a9ae0be135f0fdc6abfdadae\
+        c49c35b8ac60"
       tests/callable-object-evidence.test.ts:
-        "d2b814666e5645565ca2001f0419b931cd2949624777047f562d\
-        a479c71be70d"
-      tests/native.ts: "fd6c0dce57f15cb8fa818226e11af8c9ac011d3946996970d157\
-        11bffa9f159a"
+        "8af9636252a1dd50c9d4fa7b9899115989a8d2dff1a23f436bb4\
+        c477981b2a06"
+      tests/native.ts: "acb5db12015f8b73bd02182d398bd0e92b980a40f3f87ea6cb0c\
+        db037dabd546"
       docs/m5c-graph/dynamic-source-callable-object-assessment.md:
         "b4eb5774379e97332ac56111eb4fadf83a6e39b66f84b22bff74\
         10ffca7eaf37"
@@ -3667,13 +3667,13 @@ assessments:
     normativeDependency: source-evaluation-only
     replacementEvidence:
       tests/native/fixtures/callable-object-evidence.ts:
-        "e4c41001c23905e90aef35fa2fa94c5207f77e0d7ca6aef8faaa\
-        b6435b7a9b06"
+        "6b1dd839a4cfe4c493f469348f04a9ae0be135f0fdc6abfdadae\
+        c49c35b8ac60"
       tests/callable-object-evidence.test.ts:
-        "d2b814666e5645565ca2001f0419b931cd2949624777047f562d\
-        a479c71be70d"
-      tests/native.ts: "fd6c0dce57f15cb8fa818226e11af8c9ac011d3946996970d157\
-        11bffa9f159a"
+        "8af9636252a1dd50c9d4fa7b9899115989a8d2dff1a23f436bb4\
+        c477981b2a06"
+      tests/native.ts: "acb5db12015f8b73bd02182d398bd0e92b980a40f3f87ea6cb0c\
+        db037dabd546"
       docs/m5c-graph/dynamic-source-callable-object-assessment.md:
         "b4eb5774379e97332ac56111eb4fadf83a6e39b66f84b22bff74\
         10ffca7eaf37"
@@ -3695,13 +3695,13 @@ assessments:
     normativeDependency: source-evaluation-only
     replacementEvidence:
       tests/native/fixtures/callable-object-evidence.ts:
-        "e4c41001c23905e90aef35fa2fa94c5207f77e0d7ca6aef8faaa\
-        b6435b7a9b06"
+        "6b1dd839a4cfe4c493f469348f04a9ae0be135f0fdc6abfdadae\
+        c49c35b8ac60"
       tests/callable-object-evidence.test.ts:
-        "d2b814666e5645565ca2001f0419b931cd2949624777047f562d\
-        a479c71be70d"
-      tests/native.ts: "fd6c0dce57f15cb8fa818226e11af8c9ac011d3946996970d157\
-        11bffa9f159a"
+        "8af9636252a1dd50c9d4fa7b9899115989a8d2dff1a23f436bb4\
+        c477981b2a06"
+      tests/native.ts: "acb5db12015f8b73bd02182d398bd0e92b980a40f3f87ea6cb0c\
+        db037dabd546"
       docs/m5c-graph/dynamic-source-callable-object-assessment.md:
         "b4eb5774379e97332ac56111eb4fadf83a6e39b66f84b22bff74\
         10ffca7eaf37"
@@ -3727,13 +3727,13 @@ assessments:
     normativeDependency: source-evaluation-only
     replacementEvidence:
       tests/native/fixtures/callable-object-evidence.ts:
-        "e4c41001c23905e90aef35fa2fa94c5207f77e0d7ca6aef8faaa\
-        b6435b7a9b06"
+        "6b1dd839a4cfe4c493f469348f04a9ae0be135f0fdc6abfdadae\
+        c49c35b8ac60"
       tests/callable-object-evidence.test.ts:
-        "d2b814666e5645565ca2001f0419b931cd2949624777047f562d\
-        a479c71be70d"
-      tests/native.ts: "fd6c0dce57f15cb8fa818226e11af8c9ac011d3946996970d157\
-        11bffa9f159a"
+        "8af9636252a1dd50c9d4fa7b9899115989a8d2dff1a23f436bb4\
+        c477981b2a06"
+      tests/native.ts: "acb5db12015f8b73bd02182d398bd0e92b980a40f3f87ea6cb0c\
+        db037dabd546"
       docs/m5c-graph/dynamic-source-callable-object-assessment.md:
         "b4eb5774379e97332ac56111eb4fadf83a6e39b66f84b22bff74\
         10ffca7eaf37"
@@ -3758,13 +3758,13 @@ assessments:
     normativeDependency: source-evaluation-only
     replacementEvidence:
       tests/native/fixtures/callable-object-evidence.ts:
-        "e4c41001c23905e90aef35fa2fa94c5207f77e0d7ca6aef8faaa\
-        b6435b7a9b06"
+        "6b1dd839a4cfe4c493f469348f04a9ae0be135f0fdc6abfdadae\
+        c49c35b8ac60"
       tests/callable-object-evidence.test.ts:
-        "d2b814666e5645565ca2001f0419b931cd2949624777047f562d\
-        a479c71be70d"
-      tests/native.ts: "fd6c0dce57f15cb8fa818226e11af8c9ac011d3946996970d157\
-        11bffa9f159a"
+        "8af9636252a1dd50c9d4fa7b9899115989a8d2dff1a23f436bb4\
+        c477981b2a06"
+      tests/native.ts: "acb5db12015f8b73bd02182d398bd0e92b980a40f3f87ea6cb0c\
+        db037dabd546"
       docs/m5c-graph/dynamic-source-callable-object-assessment.md:
         "b4eb5774379e97332ac56111eb4fadf83a6e39b66f84b22bff74\
         10ffca7eaf37"
@@ -3798,13 +3798,13 @@ assessments:
     normativeDependency: source-evaluation-only
     replacementEvidence:
       tests/native/fixtures/callable-object-evidence.ts:
-        "e4c41001c23905e90aef35fa2fa94c5207f77e0d7ca6aef8faaa\
-        b6435b7a9b06"
+        "6b1dd839a4cfe4c493f469348f04a9ae0be135f0fdc6abfdadae\
+        c49c35b8ac60"
       tests/callable-object-evidence.test.ts:
-        "d2b814666e5645565ca2001f0419b931cd2949624777047f562d\
-        a479c71be70d"
-      tests/native.ts: "fd6c0dce57f15cb8fa818226e11af8c9ac011d3946996970d157\
-        11bffa9f159a"
+        "8af9636252a1dd50c9d4fa7b9899115989a8d2dff1a23f436bb4\
+        c477981b2a06"
+      tests/native.ts: "acb5db12015f8b73bd02182d398bd0e92b980a40f3f87ea6cb0c\
+        db037dabd546"
       docs/m5c-graph/dynamic-source-callable-object-assessment.md:
         "b4eb5774379e97332ac56111eb4fadf83a6e39b66f84b22bff74\
         10ffca7eaf37"
@@ -3828,13 +3828,13 @@ assessments:
     normativeDependency: source-evaluation-only
     replacementEvidence:
       tests/native/fixtures/callable-object-evidence.ts:
-        "e4c41001c23905e90aef35fa2fa94c5207f77e0d7ca6aef8faaa\
-        b6435b7a9b06"
+        "6b1dd839a4cfe4c493f469348f04a9ae0be135f0fdc6abfdadae\
+        c49c35b8ac60"
       tests/callable-object-evidence.test.ts:
-        "d2b814666e5645565ca2001f0419b931cd2949624777047f562d\
-        a479c71be70d"
-      tests/native.ts: "fd6c0dce57f15cb8fa818226e11af8c9ac011d3946996970d157\
-        11bffa9f159a"
+        "8af9636252a1dd50c9d4fa7b9899115989a8d2dff1a23f436bb4\
+        c477981b2a06"
+      tests/native.ts: "acb5db12015f8b73bd02182d398bd0e92b980a40f3f87ea6cb0c\
+        db037dabd546"
       docs/m5c-graph/dynamic-source-callable-object-assessment.md:
         "b4eb5774379e97332ac56111eb4fadf83a6e39b66f84b22bff74\
         10ffca7eaf37"
@@ -3856,13 +3856,13 @@ assessments:
     normativeDependency: source-evaluation-only
     replacementEvidence:
       tests/native/fixtures/callable-object-evidence.ts:
-        "e4c41001c23905e90aef35fa2fa94c5207f77e0d7ca6aef8faaa\
-        b6435b7a9b06"
+        "6b1dd839a4cfe4c493f469348f04a9ae0be135f0fdc6abfdadae\
+        c49c35b8ac60"
       tests/callable-object-evidence.test.ts:
-        "d2b814666e5645565ca2001f0419b931cd2949624777047f562d\
-        a479c71be70d"
-      tests/native.ts: "fd6c0dce57f15cb8fa818226e11af8c9ac011d3946996970d157\
-        11bffa9f159a"
+        "8af9636252a1dd50c9d4fa7b9899115989a8d2dff1a23f436bb4\
+        c477981b2a06"
+      tests/native.ts: "acb5db12015f8b73bd02182d398bd0e92b980a40f3f87ea6cb0c\
+        db037dabd546"
       docs/m5c-graph/dynamic-source-callable-object-assessment.md:
         "b4eb5774379e97332ac56111eb4fadf83a6e39b66f84b22bff74\
         10ffca7eaf37"
@@ -3885,13 +3885,13 @@ assessments:
     normativeDependency: source-evaluation-only
     replacementEvidence:
       tests/native/fixtures/callable-object-evidence.ts:
-        "e4c41001c23905e90aef35fa2fa94c5207f77e0d7ca6aef8faaa\
-        b6435b7a9b06"
+        "6b1dd839a4cfe4c493f469348f04a9ae0be135f0fdc6abfdadae\
+        c49c35b8ac60"
       tests/callable-object-evidence.test.ts:
-        "d2b814666e5645565ca2001f0419b931cd2949624777047f562d\
-        a479c71be70d"
-      tests/native.ts: "fd6c0dce57f15cb8fa818226e11af8c9ac011d3946996970d157\
-        11bffa9f159a"
+        "8af9636252a1dd50c9d4fa7b9899115989a8d2dff1a23f436bb4\
+        c477981b2a06"
+      tests/native.ts: "acb5db12015f8b73bd02182d398bd0e92b980a40f3f87ea6cb0c\
+        db037dabd546"
       docs/m5c-graph/dynamic-source-callable-object-assessment.md:
         "b4eb5774379e97332ac56111eb4fadf83a6e39b66f84b22bff74\
         10ffca7eaf37"
@@ -3917,13 +3917,13 @@ assessments:
     normativeDependency: source-evaluation-only
     replacementEvidence:
       tests/native/fixtures/callable-object-evidence.ts:
-        "e4c41001c23905e90aef35fa2fa94c5207f77e0d7ca6aef8faaa\
-        b6435b7a9b06"
+        "6b1dd839a4cfe4c493f469348f04a9ae0be135f0fdc6abfdadae\
+        c49c35b8ac60"
       tests/callable-object-evidence.test.ts:
-        "d2b814666e5645565ca2001f0419b931cd2949624777047f562d\
-        a479c71be70d"
-      tests/native.ts: "fd6c0dce57f15cb8fa818226e11af8c9ac011d3946996970d157\
-        11bffa9f159a"
+        "8af9636252a1dd50c9d4fa7b9899115989a8d2dff1a23f436bb4\
+        c477981b2a06"
+      tests/native.ts: "acb5db12015f8b73bd02182d398bd0e92b980a40f3f87ea6cb0c\
+        db037dabd546"
       docs/m5c-graph/dynamic-source-callable-object-assessment.md:
         "b4eb5774379e97332ac56111eb4fadf83a6e39b66f84b22bff74\
         10ffca7eaf37"
@@ -3949,14 +3949,14 @@ assessments:
     normativeDependency: source-evaluation-only
     replacementEvidence:
       tests/native/fixtures/ds22-boundary-core.ts:
-        "f755663992dab8573044d1750c30450c08ad6836\
-        fcf4d00777851ff53b90c744"
+        "3ed9b592c4dffcfaa7e011f9a367e26d1b4d1d2c\
+        b9963e1a24ea23386442d83d"
       tests/ds22-boundary-preparation.test.ts:
-        "63d2ce8273fb72a83b159f16fb30c302fca6c92f\
-        02cb15a3aec71bec8c99976a"
+        "f85ca661aaa05992b1711daf6067f822ee8e366c\
+        385f48289ef04b39ec53a8cf"
       tests/ds22-boundary-native.test.ts:
-        "6b723d9d542b188bbe683b0597335d270c08e875\
-        d0272a616ee823a5129cad58"
+        "6adc1a88e01cdb8b3cfa44c04df4cdeb8413872a\
+        e1348b2b1e55a592875f883b"
     reason: "Maintainer decision 2026-10-28 item 1: The block/case/default
       function is lexical in strict code, and reading its name outside that
       scope throws ReferenceError without creating a global property. The
@@ -3976,14 +3976,14 @@ assessments:
     normativeDependency: source-evaluation-only
     replacementEvidence:
       tests/native/fixtures/ds22-boundary-core.ts:
-        "f755663992dab8573044d1750c30450c08ad6836\
-        fcf4d00777851ff53b90c744"
+        "3ed9b592c4dffcfaa7e011f9a367e26d1b4d1d2c\
+        b9963e1a24ea23386442d83d"
       tests/ds22-boundary-preparation.test.ts:
-        "63d2ce8273fb72a83b159f16fb30c302fca6c92f\
-        02cb15a3aec71bec8c99976a"
+        "f85ca661aaa05992b1711daf6067f822ee8e366c\
+        385f48289ef04b39ec53a8cf"
       tests/ds22-boundary-native.test.ts:
-        "6b723d9d542b188bbe683b0597335d270c08e875\
-        d0272a616ee823a5129cad58"
+        "6adc1a88e01cdb8b3cfa44c04df4cdeb8413872a\
+        e1348b2b1e55a592875f883b"
     reason:
       "Maintainer decision 2026-10-28 item 1: The only original assertion is
       TypeError when reading a strict function caller, reached through direct or
@@ -4004,14 +4004,14 @@ assessments:
     normativeDependency: source-evaluation-only
     replacementEvidence:
       tests/native/fixtures/ds22-boundary-core.ts:
-        "f755663992dab8573044d1750c30450c08ad6836\
-        fcf4d00777851ff53b90c744"
+        "3ed9b592c4dffcfaa7e011f9a367e26d1b4d1d2c\
+        b9963e1a24ea23386442d83d"
       tests/ds22-boundary-preparation.test.ts:
-        "63d2ce8273fb72a83b159f16fb30c302fca6c92f\
-        02cb15a3aec71bec8c99976a"
+        "f85ca661aaa05992b1711daf6067f822ee8e366c\
+        385f48289ef04b39ec53a8cf"
       tests/ds22-boundary-native.test.ts:
-        "6b723d9d542b188bbe683b0597335d270c08e875\
-        d0272a616ee823a5129cad58"
+        "6adc1a88e01cdb8b3cfa44c04df4cdeb8413872a\
+        e1348b2b1e55a592875f883b"
     reason:
       "Maintainer decision 2026-10-28 item 1: The only original assertion is
       TypeError from gNonStrict.caller || gNonStrict.caller.throwTypeError
@@ -4047,10 +4047,10 @@ assessments:
       ADR 0016 admits eval, or ADR 0019 non-source normative dependence is
       established.
     replacementEvidence:
-      tests/native/fixtures/binding-reference-evidence.ts: "148176601d5cac6e8f\
-        b67444ac68efeadc9df8aacb596b23dbf158c2b48f1bba"
-      tests/native.ts: "fd6c0dce57f15cb8fa818226e11af8c9ac011d3946996970d15711\
-        bffa9f159a"
+      tests/native/fixtures/binding-reference-evidence.ts: "26a7b228a21c06cfa2\
+        7eb160dbe0e442334b063f5ef2632bdd9526fcdeba5154"
+      tests/native.ts: "acb5db12015f8b73bd02182d398bd0e92b980a40f3f87ea6cb0cdb\
+        037dabd546"
   ds18-static-class-fields:
     disposition: exclusion
     normativeDependency: source-evaluation-only
@@ -4069,10 +4069,10 @@ assessments:
       on changed source, observation or replacement evidence, an ADR 0016
       amendment admitting eval, or ADR 0019 non-source normative dependence.
     replacementEvidence:
-      tests/native/fixtures/binding-reference-evidence.ts: "148176601d5cac6e8f\
-        b67444ac68efeadc9df8aacb596b23dbf158c2b48f1bba"
-      tests/native.ts: "fd6c0dce57f15cb8fa818226e11af8c9ac011d3946996970d15711\
-        bffa9f159a"
+      tests/native/fixtures/binding-reference-evidence.ts: "26a7b228a21c06cfa2\
+        7eb160dbe0e442334b063f5ef2632bdd9526fcdeba5154"
+      tests/native.ts: "acb5db12015f8b73bd02182d398bd0e92b980a40f3f87ea6cb0cdb\
+        037dabd546"
   ds18-unresolvable-compound:
     disposition: exclusion
     normativeDependency: source-evaluation-only
@@ -4091,10 +4091,10 @@ assessments:
       evidence, an ADR 0016 amendment admitting eval, or ADR 0019 non-source
       normative dependence.
     replacementEvidence:
-      tests/native/fixtures/binding-reference-evidence.ts: "148176601d5cac6e8f\
-        b67444ac68efeadc9df8aacb596b23dbf158c2b48f1bba"
-      tests/native.ts: "fd6c0dce57f15cb8fa818226e11af8c9ac011d3946996970d15711\
-        bffa9f159a"
+      tests/native/fixtures/binding-reference-evidence.ts: "26a7b228a21c06cfa2\
+        7eb160dbe0e442334b063f5ef2632bdd9526fcdeba5154"
+      tests/native.ts: "acb5db12015f8b73bd02182d398bd0e92b980a40f3f87ea6cb0cdb\
+        037dabd546"
   ds21-finite-completion-records:
     disposition: exclusion
     normativeDependency: source-evaluation-only
@@ -4117,22 +4117,22 @@ assessments:
         "1380f0ccd6c601e58296a0898b4154661c33219e836c1e14\
         97bf54240172dfd0"
       tests/native/fixtures/completion-record-cases.ts:
-        "f3c04b154cf730b2ffcf1dc78c181257c83588060f18007f\
-        ade96760905840e0"
+        "30f5cd0e9fb44765794e8af0d328ddc06c64b29f0f0c73c6\
+        1831c640b842e70b"
       tests/native/fixtures/completion-records.ts:
-        "dac6fa1467ec501b5034300ae10d6ff37d9a69ef89e74552\
-        91e2b7dbeddb0d06"
+        "09b21fd25a6da913f908fd8ffdb466ab4f52b4a014a9b5ba\
+        c30647b620ccb222"
       tests/completion-records.test.ts:
-        "f053d02bcd11af6604c78d907e709ee0155fe6c33c4a551b\
-        79de0cc09474b624"
-      tests/native.ts: "fd6c0dce57f15cb8fa818226e11af8c9ac011d3946996970\
-        d15711bffa9f159a"
+        "b12a7a27a748770d50155d4197e917b2e37cd658e1599e91\
+        537bd1b833fa1bd0"
+      tests/native.ts: "acb5db12015f8b73bd02182d398bd0e92b980a40f3f87ea6\
+        cb0cdb037dabd546"
       tests/test262/harness/base.js:
-        "50331feeca513cb2e2354e05e7c68f82d5aeccd9b766d6c8\
-        8438c5ef118075f6"
+        "d689241f1fb83e085d7055088d3348093045c01192d994f5\
+        a5ed83038ea41686"
       packages/compiler/src/host-scripts.ts:
-        "e078da63c992b7d11fe1243abb4cdc0cc28d7843fe93c723\
-        444e469285601ce3"
+        "06140f866754912610c4c8c0529e639aec5db83bdd2dcfff\
+        45e9dc9ce0a74aef"
   ds19-01:
     disposition: exclusion
     normativeDependency: source-evaluation-only
@@ -4151,8 +4151,8 @@ assessments:
         "3dbfd18e6663dd1a604faa4e03b949009ce0d5ac7e11fdc6\
         c5cd70dc99451878"
       tests/dynamic-source-realm-host-evidence.test.ts:
-        "86c650b94794f06feb2712820e1722977377dbd1b162a968\
-        010cb47a76028ce9"
+        "33965b8ca8744572d91015a22d3bd4561e8a94d5475caecb\
+        1afdc4f3cea1f05e"
   ds19-02:
     disposition: exclusion
     normativeDependency: source-evaluation-only
@@ -4170,8 +4170,8 @@ assessments:
         "caad3f8e9b51e2f6c1e9237e91e47657571ac72288cb7720\
         d74e205c53dc6279"
       tests/dynamic-source-realm-host-evidence.test.ts:
-        "86c650b94794f06feb2712820e1722977377dbd1b162a968\
-        010cb47a76028ce9"
+        "33965b8ca8744572d91015a22d3bd4561e8a94d5475caecb\
+        1afdc4f3cea1f05e"
   ds19-03:
     disposition: exclusion
     normativeDependency: source-evaluation-only
@@ -4189,8 +4189,8 @@ assessments:
         "caad3f8e9b51e2f6c1e9237e91e47657571ac72288cb7720\
         d74e205c53dc6279"
       tests/dynamic-source-realm-host-evidence.test.ts:
-        "86c650b94794f06feb2712820e1722977377dbd1b162a968\
-        010cb47a76028ce9"
+        "33965b8ca8744572d91015a22d3bd4561e8a94d5475caecb\
+        1afdc4f3cea1f05e"
   ds19-04:
     disposition: exclusion
     normativeDependency: source-evaluation-only
@@ -4209,8 +4209,8 @@ assessments:
         "caad3f8e9b51e2f6c1e9237e91e47657571ac72288cb7720\
         d74e205c53dc6279"
       tests/dynamic-source-realm-host-evidence.test.ts:
-        "86c650b94794f06feb2712820e1722977377dbd1b162a968\
-        010cb47a76028ce9"
+        "33965b8ca8744572d91015a22d3bd4561e8a94d5475caecb\
+        1afdc4f3cea1f05e"
   ds19-05:
     disposition: exclusion
     normativeDependency: source-evaluation-only
@@ -4229,8 +4229,8 @@ assessments:
         "caad3f8e9b51e2f6c1e9237e91e47657571ac72288cb7720\
         d74e205c53dc6279"
       tests/dynamic-source-realm-host-evidence.test.ts:
-        "86c650b94794f06feb2712820e1722977377dbd1b162a968\
-        010cb47a76028ce9"
+        "33965b8ca8744572d91015a22d3bd4561e8a94d5475caecb\
+        1afdc4f3cea1f05e"
   ds19-06:
     disposition: exclusion
     normativeDependency: source-evaluation-only
@@ -4249,8 +4249,8 @@ assessments:
         "caad3f8e9b51e2f6c1e9237e91e47657571ac72288cb7720\
         d74e205c53dc6279"
       tests/dynamic-source-realm-host-evidence.test.ts:
-        "86c650b94794f06feb2712820e1722977377dbd1b162a968\
-        010cb47a76028ce9"
+        "33965b8ca8744572d91015a22d3bd4561e8a94d5475caecb\
+        1afdc4f3cea1f05e"
   ds19-07:
     disposition: exclusion
     normativeDependency: source-evaluation-only
@@ -4268,8 +4268,8 @@ assessments:
         "3412ab04c3986952bfbeb46387e46ea53e41a1b3f7385f5e\
         1d420fe14e4082cd"
       tests/dynamic-source-realm-host-evidence.test.ts:
-        "86c650b94794f06feb2712820e1722977377dbd1b162a968\
-        010cb47a76028ce9"
+        "33965b8ca8744572d91015a22d3bd4561e8a94d5475caecb\
+        1afdc4f3cea1f05e"
   ds19-08:
     disposition: exclusion
     normativeDependency: source-evaluation-only
@@ -4287,8 +4287,8 @@ assessments:
         "f20132eff2be2fdc1c744ddda002b18ad1c2b3f0fff30047\
         3dbf25f68e04d11a"
       tests/dynamic-source-realm-host-evidence.test.ts:
-        "86c650b94794f06feb2712820e1722977377dbd1b162a968\
-        010cb47a76028ce9"
+        "33965b8ca8744572d91015a22d3bd4561e8a94d5475caecb\
+        1afdc4f3cea1f05e"
   ds19-09:
     disposition: exclusion
     normativeDependency: source-evaluation-only
@@ -4306,8 +4306,8 @@ assessments:
         "3412ab04c3986952bfbeb46387e46ea53e41a1b3f7385f5e\
         1d420fe14e4082cd"
       tests/dynamic-source-realm-host-evidence.test.ts:
-        "86c650b94794f06feb2712820e1722977377dbd1b162a968\
-        010cb47a76028ce9"
+        "33965b8ca8744572d91015a22d3bd4561e8a94d5475caecb\
+        1afdc4f3cea1f05e"
   ds19-10:
     disposition: exclusion
     normativeDependency: source-evaluation-only
@@ -4325,8 +4325,8 @@ assessments:
         "3412ab04c3986952bfbeb46387e46ea53e41a1b3f7385f5e\
         1d420fe14e4082cd"
       tests/dynamic-source-realm-host-evidence.test.ts:
-        "86c650b94794f06feb2712820e1722977377dbd1b162a968\
-        010cb47a76028ce9"
+        "33965b8ca8744572d91015a22d3bd4561e8a94d5475caecb\
+        1afdc4f3cea1f05e"
   ds19-11:
     disposition: exclusion
     normativeDependency: source-evaluation-only
@@ -4344,8 +4344,8 @@ assessments:
         "80145916d1152c36ba8c12526899fdc55ff735f6dc5537b5\
         0d9429f9017a7449"
       tests/dynamic-source-realm-host-evidence.test.ts:
-        "86c650b94794f06feb2712820e1722977377dbd1b162a968\
-        010cb47a76028ce9"
+        "33965b8ca8744572d91015a22d3bd4561e8a94d5475caecb\
+        1afdc4f3cea1f05e"
   ds19-12:
     disposition: exclusion
     normativeDependency: source-evaluation-only
@@ -4363,8 +4363,8 @@ assessments:
         "80145916d1152c36ba8c12526899fdc55ff735f6dc5537b5\
         0d9429f9017a7449"
       tests/dynamic-source-realm-host-evidence.test.ts:
-        "86c650b94794f06feb2712820e1722977377dbd1b162a968\
-        010cb47a76028ce9"
+        "33965b8ca8744572d91015a22d3bd4561e8a94d5475caecb\
+        1afdc4f3cea1f05e"
   ds19-13:
     disposition: exclusion
     normativeDependency: source-evaluation-only
@@ -4382,8 +4382,8 @@ assessments:
         "80145916d1152c36ba8c12526899fdc55ff735f6dc5537b5\
         0d9429f9017a7449"
       tests/dynamic-source-realm-host-evidence.test.ts:
-        "86c650b94794f06feb2712820e1722977377dbd1b162a968\
-        010cb47a76028ce9"
+        "33965b8ca8744572d91015a22d3bd4561e8a94d5475caecb\
+        1afdc4f3cea1f05e"
   ds19-14:
     disposition: exclusion
     normativeDependency: source-evaluation-only
@@ -4401,8 +4401,8 @@ assessments:
         "3dbfd18e6663dd1a604faa4e03b949009ce0d5ac7e11fdc6\
         c5cd70dc99451878"
       tests/dynamic-source-realm-host-evidence.test.ts:
-        "86c650b94794f06feb2712820e1722977377dbd1b162a968\
-        010cb47a76028ce9"
+        "33965b8ca8744572d91015a22d3bd4561e8a94d5475caecb\
+        1afdc4f3cea1f05e"
   ds19-15:
     disposition: exclusion
     normativeDependency: source-evaluation-only
@@ -4421,8 +4421,8 @@ assessments:
         "e8e6b82e041b3243e289978d6ac59059bd1341b15114a49b\
         eb3567b2dcd27f9c"
       tests/dynamic-source-realm-host-evidence.test.ts:
-        "86c650b94794f06feb2712820e1722977377dbd1b162a968\
-        010cb47a76028ce9"
+        "33965b8ca8744572d91015a22d3bd4561e8a94d5475caecb\
+        1afdc4f3cea1f05e"
   ds19-16:
     disposition: exclusion
     normativeDependency: source-evaluation-only
@@ -4439,8 +4439,8 @@ assessments:
         "08613f09d833312122887ea120715c63d3d9a53bcd2f2273\
         2eb650690ecb998f"
       tests/dynamic-source-realm-host-evidence.test.ts:
-        "86c650b94794f06feb2712820e1722977377dbd1b162a968\
-        010cb47a76028ce9"
+        "33965b8ca8744572d91015a22d3bd4561e8a94d5475caecb\
+        1afdc4f3cea1f05e"
   ds19-17:
     disposition: exclusion
     normativeDependency: source-evaluation-only
@@ -4457,8 +4457,8 @@ assessments:
         "08613f09d833312122887ea120715c63d3d9a53bcd2f2273\
         2eb650690ecb998f"
       tests/dynamic-source-realm-host-evidence.test.ts:
-        "86c650b94794f06feb2712820e1722977377dbd1b162a968\
-        010cb47a76028ce9"
+        "33965b8ca8744572d91015a22d3bd4561e8a94d5475caecb\
+        1afdc4f3cea1f05e"
   ds19-18:
     disposition: exclusion
     normativeDependency: source-evaluation-only
@@ -4476,8 +4476,8 @@ assessments:
         "b51e578feb1409416b6a97feeb39e9ae70f58573abee3dda\
         87e828d8e7b168e7"
       tests/dynamic-source-realm-host-evidence.test.ts:
-        "86c650b94794f06feb2712820e1722977377dbd1b162a968\
-        010cb47a76028ce9"
+        "33965b8ca8744572d91015a22d3bd4561e8a94d5475caecb\
+        1afdc4f3cea1f05e"
   ds19-19:
     disposition: remediation
     normativeDependency: not-demonstrated
@@ -4497,8 +4497,8 @@ assessments:
         "ba537c1b6b27582f10a2d4f0fac920fd3a114fe4d22f8b6c\
         db9702938af6c52a"
       tests/dynamic-source-realm-host-evidence.test.ts:
-        "86c650b94794f06feb2712820e1722977377dbd1b162a968\
-        010cb47a76028ce9"
+        "33965b8ca8744572d91015a22d3bd4561e8a94d5475caecb\
+        1afdc4f3cea1f05e"
   ds19-20:
     disposition: remediation
     normativeDependency: not-demonstrated
@@ -4519,8 +4519,8 @@ assessments:
         "c1cb8d0db71d360241a0b7c5027f87fe8168117f8863a929\
         bcf038aad6718b64"
       tests/dynamic-source-realm-host-evidence.test.ts:
-        "86c650b94794f06feb2712820e1722977377dbd1b162a968\
-        010cb47a76028ce9"
+        "33965b8ca8744572d91015a22d3bd4561e8a94d5475caecb\
+        1afdc4f3cea1f05e"
   ds19-21:
     disposition: exclusion
     normativeDependency: source-evaluation-only
@@ -4541,8 +4541,8 @@ assessments:
         "48ea091945356e6a790b357f8da9376ae2c9ab68d40a7b96\
         460992d54220a506"
       tests/dynamic-source-realm-host-evidence.test.ts:
-        "86c650b94794f06feb2712820e1722977377dbd1b162a968\
-        010cb47a76028ce9"
+        "33965b8ca8744572d91015a22d3bd4561e8a94d5475caecb\
+        1afdc4f3cea1f05e"
   ds19-22:
     disposition: exclusion
     normativeDependency: source-evaluation-only
@@ -4562,8 +4562,8 @@ assessments:
         "48ea091945356e6a790b357f8da9376ae2c9ab68d40a7b96\
         460992d54220a506"
       tests/dynamic-source-realm-host-evidence.test.ts:
-        "86c650b94794f06feb2712820e1722977377dbd1b162a968\
-        010cb47a76028ce9"
+        "33965b8ca8744572d91015a22d3bd4561e8a94d5475caecb\
+        1afdc4f3cea1f05e"
   ds19-23:
     disposition: exclusion
     normativeDependency: source-evaluation-only
@@ -4581,8 +4581,8 @@ assessments:
         "08613f09d833312122887ea120715c63d3d9a53bcd2f2273\
         2eb650690ecb998f"
       tests/dynamic-source-realm-host-evidence.test.ts:
-        "86c650b94794f06feb2712820e1722977377dbd1b162a968\
-        010cb47a76028ce9"
+        "33965b8ca8744572d91015a22d3bd4561e8a94d5475caecb\
+        1afdc4f3cea1f05e"
   ds19-24:
     disposition: exclusion
     normativeDependency: source-evaluation-only
@@ -4601,8 +4601,8 @@ assessments:
         "b62edd09264493440f9a854590a63ac6f78a7cd1eec9953a\
         2992d293aea22fc1"
       tests/dynamic-source-realm-host-evidence.test.ts:
-        "86c650b94794f06feb2712820e1722977377dbd1b162a968\
-        010cb47a76028ce9"
+        "33965b8ca8744572d91015a22d3bd4561e8a94d5475caecb\
+        1afdc4f3cea1f05e"
   ds19-25:
     disposition: exclusion
     normativeDependency: source-evaluation-only
@@ -4620,8 +4620,8 @@ assessments:
         "b62edd09264493440f9a854590a63ac6f78a7cd1eec9953a\
         2992d293aea22fc1"
       tests/dynamic-source-realm-host-evidence.test.ts:
-        "86c650b94794f06feb2712820e1722977377dbd1b162a968\
-        010cb47a76028ce9"
+        "33965b8ca8744572d91015a22d3bd4561e8a94d5475caecb\
+        1afdc4f3cea1f05e"
   ds19-26:
     disposition: exclusion
     normativeDependency: source-evaluation-only
@@ -4639,8 +4639,8 @@ assessments:
         "b62edd09264493440f9a854590a63ac6f78a7cd1eec9953a\
         2992d293aea22fc1"
       tests/dynamic-source-realm-host-evidence.test.ts:
-        "86c650b94794f06feb2712820e1722977377dbd1b162a968\
-        010cb47a76028ce9"
+        "33965b8ca8744572d91015a22d3bd4561e8a94d5475caecb\
+        1afdc4f3cea1f05e"
   ds19-27:
     disposition: exclusion
     normativeDependency: source-evaluation-only
@@ -4659,8 +4659,8 @@ assessments:
         "3dbfd18e6663dd1a604faa4e03b949009ce0d5ac7e11fdc6\
         c5cd70dc99451878"
       tests/dynamic-source-realm-host-evidence.test.ts:
-        "86c650b94794f06feb2712820e1722977377dbd1b162a968\
-        010cb47a76028ce9"
+        "33965b8ca8744572d91015a22d3bd4561e8a94d5475caecb\
+        1afdc4f3cea1f05e"
   ds19-28:
     disposition: exclusion
     normativeDependency: source-evaluation-only
@@ -4678,8 +4678,8 @@ assessments:
         "3dbfd18e6663dd1a604faa4e03b949009ce0d5ac7e11fdc6\
         c5cd70dc99451878"
       tests/dynamic-source-realm-host-evidence.test.ts:
-        "86c650b94794f06feb2712820e1722977377dbd1b162a968\
-        010cb47a76028ce9"
+        "33965b8ca8744572d91015a22d3bd4561e8a94d5475caecb\
+        1afdc4f3cea1f05e"
   ds19-29:
     disposition: exclusion
     normativeDependency: source-evaluation-only
@@ -4698,8 +4698,8 @@ assessments:
         "8ef7cc5c8851671f7ad5fedae2a3a476c27845acdfe783be\
         1ec3d8d4038a69f1"
       tests/dynamic-source-realm-host-evidence.test.ts:
-        "86c650b94794f06feb2712820e1722977377dbd1b162a968\
-        010cb47a76028ce9"
+        "33965b8ca8744572d91015a22d3bd4561e8a94d5475caecb\
+        1afdc4f3cea1f05e"
   ds19-30:
     disposition: exclusion
     normativeDependency: source-evaluation-only
@@ -4718,8 +4718,8 @@ assessments:
         "8ef7cc5c8851671f7ad5fedae2a3a476c27845acdfe783be\
         1ec3d8d4038a69f1"
       tests/dynamic-source-realm-host-evidence.test.ts:
-        "86c650b94794f06feb2712820e1722977377dbd1b162a968\
-        010cb47a76028ce9"
+        "33965b8ca8744572d91015a22d3bd4561e8a94d5475caecb\
+        1afdc4f3cea1f05e"
   ds19-31:
     disposition: exclusion
     normativeDependency: source-evaluation-only
@@ -4738,8 +4738,8 @@ assessments:
         "8ef7cc5c8851671f7ad5fedae2a3a476c27845acdfe783be\
         1ec3d8d4038a69f1"
       tests/dynamic-source-realm-host-evidence.test.ts:
-        "86c650b94794f06feb2712820e1722977377dbd1b162a968\
-        010cb47a76028ce9"
+        "33965b8ca8744572d91015a22d3bd4561e8a94d5475caecb\
+        1afdc4f3cea1f05e"
   ds19-32:
     disposition: exclusion
     normativeDependency: source-evaluation-only
@@ -4758,8 +4758,8 @@ assessments:
         "8ef7cc5c8851671f7ad5fedae2a3a476c27845acdfe783be\
         1ec3d8d4038a69f1"
       tests/dynamic-source-realm-host-evidence.test.ts:
-        "86c650b94794f06feb2712820e1722977377dbd1b162a968\
-        010cb47a76028ce9"
+        "33965b8ca8744572d91015a22d3bd4561e8a94d5475caecb\
+        1afdc4f3cea1f05e"
   ds19-33:
     disposition: exclusion
     normativeDependency: source-evaluation-only
@@ -4778,8 +4778,8 @@ assessments:
         "8ef7cc5c8851671f7ad5fedae2a3a476c27845acdfe783be\
         1ec3d8d4038a69f1"
       tests/dynamic-source-realm-host-evidence.test.ts:
-        "86c650b94794f06feb2712820e1722977377dbd1b162a968\
-        010cb47a76028ce9"
+        "33965b8ca8744572d91015a22d3bd4561e8a94d5475caecb\
+        1afdc4f3cea1f05e"
   ds19-34:
     disposition: exclusion
     normativeDependency: source-evaluation-only
@@ -4798,8 +4798,8 @@ assessments:
         "8ef7cc5c8851671f7ad5fedae2a3a476c27845acdfe783be\
         1ec3d8d4038a69f1"
       tests/dynamic-source-realm-host-evidence.test.ts:
-        "86c650b94794f06feb2712820e1722977377dbd1b162a968\
-        010cb47a76028ce9"
+        "33965b8ca8744572d91015a22d3bd4561e8a94d5475caecb\
+        1afdc4f3cea1f05e"
   ds19-35:
     disposition: exclusion
     normativeDependency: source-evaluation-only
@@ -4817,8 +4817,8 @@ assessments:
         "f20132eff2be2fdc1c744ddda002b18ad1c2b3f0fff30047\
         3dbf25f68e04d11a"
       tests/dynamic-source-realm-host-evidence.test.ts:
-        "86c650b94794f06feb2712820e1722977377dbd1b162a968\
-        010cb47a76028ce9"
+        "33965b8ca8744572d91015a22d3bd4561e8a94d5475caecb\
+        1afdc4f3cea1f05e"
   ds19-36:
     disposition: exclusion
     normativeDependency: source-evaluation-only
@@ -4836,8 +4836,8 @@ assessments:
         "3dbfd18e6663dd1a604faa4e03b949009ce0d5ac7e11fdc6\
         c5cd70dc99451878"
       tests/dynamic-source-realm-host-evidence.test.ts:
-        "86c650b94794f06feb2712820e1722977377dbd1b162a968\
-        010cb47a76028ce9"
+        "33965b8ca8744572d91015a22d3bd4561e8a94d5475caecb\
+        1afdc4f3cea1f05e"
   ds19-37:
     disposition: exclusion
     normativeDependency: source-evaluation-only
@@ -4855,8 +4855,8 @@ assessments:
         "3dbfd18e6663dd1a604faa4e03b949009ce0d5ac7e11fdc6\
         c5cd70dc99451878"
       tests/dynamic-source-realm-host-evidence.test.ts:
-        "86c650b94794f06feb2712820e1722977377dbd1b162a968\
-        010cb47a76028ce9"
+        "33965b8ca8744572d91015a22d3bd4561e8a94d5475caecb\
+        1afdc4f3cea1f05e"
   ds19-38:
     disposition: exclusion
     normativeDependency: source-evaluation-only
@@ -4874,8 +4874,8 @@ assessments:
         "f5279728c927e16878f40902154f7f5c0a0d63ff13d0a7cb\
         e334360496f5ec13"
       tests/dynamic-source-realm-host-evidence.test.ts:
-        "86c650b94794f06feb2712820e1722977377dbd1b162a968\
-        010cb47a76028ce9"
+        "33965b8ca8744572d91015a22d3bd4561e8a94d5475caecb\
+        1afdc4f3cea1f05e"
   ds19-39:
     disposition: exclusion
     normativeDependency: source-evaluation-only
@@ -4893,8 +4893,8 @@ assessments:
         "f5279728c927e16878f40902154f7f5c0a0d63ff13d0a7cb\
         e334360496f5ec13"
       tests/dynamic-source-realm-host-evidence.test.ts:
-        "86c650b94794f06feb2712820e1722977377dbd1b162a968\
-        010cb47a76028ce9"
+        "33965b8ca8744572d91015a22d3bd4561e8a94d5475caecb\
+        1afdc4f3cea1f05e"
   ds19-40:
     disposition: exclusion
     normativeDependency: source-evaluation-only
@@ -4912,8 +4912,8 @@ assessments:
         "f5279728c927e16878f40902154f7f5c0a0d63ff13d0a7cb\
         e334360496f5ec13"
       tests/dynamic-source-realm-host-evidence.test.ts:
-        "86c650b94794f06feb2712820e1722977377dbd1b162a968\
-        010cb47a76028ce9"
+        "33965b8ca8744572d91015a22d3bd4561e8a94d5475caecb\
+        1afdc4f3cea1f05e"
   ds19-41:
     disposition: exclusion
     normativeDependency: source-evaluation-only
@@ -4931,8 +4931,8 @@ assessments:
         "f5279728c927e16878f40902154f7f5c0a0d63ff13d0a7cb\
         e334360496f5ec13"
       tests/dynamic-source-realm-host-evidence.test.ts:
-        "86c650b94794f06feb2712820e1722977377dbd1b162a968\
-        010cb47a76028ce9"
+        "33965b8ca8744572d91015a22d3bd4561e8a94d5475caecb\
+        1afdc4f3cea1f05e"
   ds19-42:
     disposition: exclusion
     normativeDependency: source-evaluation-only
@@ -4951,8 +4951,8 @@ assessments:
         "f5279728c927e16878f40902154f7f5c0a0d63ff13d0a7cb\
         e334360496f5ec13"
       tests/dynamic-source-realm-host-evidence.test.ts:
-        "86c650b94794f06feb2712820e1722977377dbd1b162a968\
-        010cb47a76028ce9"
+        "33965b8ca8744572d91015a22d3bd4561e8a94d5475caecb\
+        1afdc4f3cea1f05e"
   ds19-43:
     disposition: exclusion
     normativeDependency: source-evaluation-only
@@ -4970,8 +4970,8 @@ assessments:
         "f5279728c927e16878f40902154f7f5c0a0d63ff13d0a7cb\
         e334360496f5ec13"
       tests/dynamic-source-realm-host-evidence.test.ts:
-        "86c650b94794f06feb2712820e1722977377dbd1b162a968\
-        010cb47a76028ce9"
+        "33965b8ca8744572d91015a22d3bd4561e8a94d5475caecb\
+        1afdc4f3cea1f05e"
   ds19-44:
     disposition: exclusion
     normativeDependency: source-evaluation-only
@@ -4989,8 +4989,8 @@ assessments:
         "b5fe5ff81608358de6b65f8387a983a2ac7b4f79dc00e707\
         4570359959d6f997"
       tests/dynamic-source-realm-host-evidence.test.ts:
-        "86c650b94794f06feb2712820e1722977377dbd1b162a968\
-        010cb47a76028ce9"
+        "33965b8ca8744572d91015a22d3bd4561e8a94d5475caecb\
+        1afdc4f3cea1f05e"
   ds19-45:
     disposition: exclusion
     normativeDependency: source-evaluation-only
@@ -5008,8 +5008,8 @@ assessments:
         "b5fe5ff81608358de6b65f8387a983a2ac7b4f79dc00e707\
         4570359959d6f997"
       tests/dynamic-source-realm-host-evidence.test.ts:
-        "86c650b94794f06feb2712820e1722977377dbd1b162a968\
-        010cb47a76028ce9"
+        "33965b8ca8744572d91015a22d3bd4561e8a94d5475caecb\
+        1afdc4f3cea1f05e"
   ds19-46:
     disposition: exclusion
     normativeDependency: source-evaluation-only
@@ -5027,8 +5027,8 @@ assessments:
         "3dbfd18e6663dd1a604faa4e03b949009ce0d5ac7e11fdc6\
         c5cd70dc99451878"
       tests/dynamic-source-realm-host-evidence.test.ts:
-        "86c650b94794f06feb2712820e1722977377dbd1b162a968\
-        010cb47a76028ce9"
+        "33965b8ca8744572d91015a22d3bd4561e8a94d5475caecb\
+        1afdc4f3cea1f05e"
   ds19-47:
     disposition: exclusion
     normativeDependency: source-evaluation-only
@@ -5046,8 +5046,8 @@ assessments:
         "3412ab04c3986952bfbeb46387e46ea53e41a1b3f7385f5e\
         1d420fe14e4082cd"
       tests/dynamic-source-realm-host-evidence.test.ts:
-        "86c650b94794f06feb2712820e1722977377dbd1b162a968\
-        010cb47a76028ce9"
+        "33965b8ca8744572d91015a22d3bd4561e8a94d5475caecb\
+        1afdc4f3cea1f05e"
   ds19-48:
     disposition: exclusion
     normativeDependency: source-evaluation-only
@@ -5065,8 +5065,8 @@ assessments:
         "f20132eff2be2fdc1c744ddda002b18ad1c2b3f0fff30047\
         3dbf25f68e04d11a"
       tests/dynamic-source-realm-host-evidence.test.ts:
-        "86c650b94794f06feb2712820e1722977377dbd1b162a968\
-        010cb47a76028ce9"
+        "33965b8ca8744572d91015a22d3bd4561e8a94d5475caecb\
+        1afdc4f3cea1f05e"
   ds19-49:
     disposition: exclusion
     normativeDependency: source-evaluation-only
@@ -5083,8 +5083,8 @@ assessments:
         "c3cd677194a0f4f934fea39b4916912fa705af775e00a6e8\
         e7a3e262f0439d09"
       tests/dynamic-source-realm-host-evidence.test.ts:
-        "86c650b94794f06feb2712820e1722977377dbd1b162a968\
-        010cb47a76028ce9"
+        "33965b8ca8744572d91015a22d3bd4561e8a94d5475caecb\
+        1afdc4f3cea1f05e"
   ds19-50:
     disposition: exclusion
     normativeDependency: source-evaluation-only
@@ -5102,8 +5102,8 @@ assessments:
         "073f18367a3639a4e0cd8e08876b4cf7919e0637c28680c2\
         6a1925aea7078315"
       tests/dynamic-source-realm-host-evidence.test.ts:
-        "86c650b94794f06feb2712820e1722977377dbd1b162a968\
-        010cb47a76028ce9"
+        "33965b8ca8744572d91015a22d3bd4561e8a94d5475caecb\
+        1afdc4f3cea1f05e"
   ds19-51:
     disposition: exclusion
     normativeDependency: source-evaluation-only
@@ -5121,8 +5121,8 @@ assessments:
         "073f18367a3639a4e0cd8e08876b4cf7919e0637c28680c2\
         6a1925aea7078315"
       tests/dynamic-source-realm-host-evidence.test.ts:
-        "86c650b94794f06feb2712820e1722977377dbd1b162a968\
-        010cb47a76028ce9"
+        "33965b8ca8744572d91015a22d3bd4561e8a94d5475caecb\
+        1afdc4f3cea1f05e"
   ds19-52:
     disposition: exclusion
     normativeDependency: source-evaluation-only
@@ -5140,8 +5140,8 @@ assessments:
         "073f18367a3639a4e0cd8e08876b4cf7919e0637c28680c2\
         6a1925aea7078315"
       tests/dynamic-source-realm-host-evidence.test.ts:
-        "86c650b94794f06feb2712820e1722977377dbd1b162a968\
-        010cb47a76028ce9"
+        "33965b8ca8744572d91015a22d3bd4561e8a94d5475caecb\
+        1afdc4f3cea1f05e"
   ds19-53:
     disposition: exclusion
     normativeDependency: source-evaluation-only
@@ -5159,8 +5159,8 @@ assessments:
         "073f18367a3639a4e0cd8e08876b4cf7919e0637c28680c2\
         6a1925aea7078315"
       tests/dynamic-source-realm-host-evidence.test.ts:
-        "86c650b94794f06feb2712820e1722977377dbd1b162a968\
-        010cb47a76028ce9"
+        "33965b8ca8744572d91015a22d3bd4561e8a94d5475caecb\
+        1afdc4f3cea1f05e"
   ds19-54:
     disposition: exclusion
     normativeDependency: source-evaluation-only
@@ -5178,8 +5178,8 @@ assessments:
         "073f18367a3639a4e0cd8e08876b4cf7919e0637c28680c2\
         6a1925aea7078315"
       tests/dynamic-source-realm-host-evidence.test.ts:
-        "86c650b94794f06feb2712820e1722977377dbd1b162a968\
-        010cb47a76028ce9"
+        "33965b8ca8744572d91015a22d3bd4561e8a94d5475caecb\
+        1afdc4f3cea1f05e"
   ds19-55:
     disposition: exclusion
     normativeDependency: source-evaluation-only
@@ -5197,8 +5197,8 @@ assessments:
         "073f18367a3639a4e0cd8e08876b4cf7919e0637c28680c2\
         6a1925aea7078315"
       tests/dynamic-source-realm-host-evidence.test.ts:
-        "86c650b94794f06feb2712820e1722977377dbd1b162a968\
-        010cb47a76028ce9"
+        "33965b8ca8744572d91015a22d3bd4561e8a94d5475caecb\
+        1afdc4f3cea1f05e"
   ds19-56:
     disposition: exclusion
     normativeDependency: source-evaluation-only
@@ -5216,8 +5216,8 @@ assessments:
         "737a9958cbef3428359f766057662e1f803920e0a20ce6d1\
         28d8eee3942ed0a3"
       tests/dynamic-source-realm-host-evidence.test.ts:
-        "86c650b94794f06feb2712820e1722977377dbd1b162a968\
-        010cb47a76028ce9"
+        "33965b8ca8744572d91015a22d3bd4561e8a94d5475caecb\
+        1afdc4f3cea1f05e"
   ds19-57:
     disposition: exclusion
     normativeDependency: source-evaluation-only
@@ -5235,8 +5235,8 @@ assessments:
         "737a9958cbef3428359f766057662e1f803920e0a20ce6d1\
         28d8eee3942ed0a3"
       tests/dynamic-source-realm-host-evidence.test.ts:
-        "86c650b94794f06feb2712820e1722977377dbd1b162a968\
-        010cb47a76028ce9"
+        "33965b8ca8744572d91015a22d3bd4561e8a94d5475caecb\
+        1afdc4f3cea1f05e"
   ds19-58:
     disposition: exclusion
     normativeDependency: source-evaluation-only
@@ -5254,8 +5254,8 @@ assessments:
         "737a9958cbef3428359f766057662e1f803920e0a20ce6d1\
         28d8eee3942ed0a3"
       tests/dynamic-source-realm-host-evidence.test.ts:
-        "86c650b94794f06feb2712820e1722977377dbd1b162a968\
-        010cb47a76028ce9"
+        "33965b8ca8744572d91015a22d3bd4561e8a94d5475caecb\
+        1afdc4f3cea1f05e"
   ds19-59:
     disposition: exclusion
     normativeDependency: source-evaluation-only
@@ -5273,8 +5273,8 @@ assessments:
         "737a9958cbef3428359f766057662e1f803920e0a20ce6d1\
         28d8eee3942ed0a3"
       tests/dynamic-source-realm-host-evidence.test.ts:
-        "86c650b94794f06feb2712820e1722977377dbd1b162a968\
-        010cb47a76028ce9"
+        "33965b8ca8744572d91015a22d3bd4561e8a94d5475caecb\
+        1afdc4f3cea1f05e"
   ds19-60:
     disposition: exclusion
     normativeDependency: source-evaluation-only
@@ -5292,8 +5292,8 @@ assessments:
         "737a9958cbef3428359f766057662e1f803920e0a20ce6d1\
         28d8eee3942ed0a3"
       tests/dynamic-source-realm-host-evidence.test.ts:
-        "86c650b94794f06feb2712820e1722977377dbd1b162a968\
-        010cb47a76028ce9"
+        "33965b8ca8744572d91015a22d3bd4561e8a94d5475caecb\
+        1afdc4f3cea1f05e"
   ds19-61:
     disposition: exclusion
     normativeDependency: source-evaluation-only
@@ -5311,8 +5311,8 @@ assessments:
         "737a9958cbef3428359f766057662e1f803920e0a20ce6d1\
         28d8eee3942ed0a3"
       tests/dynamic-source-realm-host-evidence.test.ts:
-        "86c650b94794f06feb2712820e1722977377dbd1b162a968\
-        010cb47a76028ce9"
+        "33965b8ca8744572d91015a22d3bd4561e8a94d5475caecb\
+        1afdc4f3cea1f05e"
   ds19-62:
     disposition: exclusion
     normativeDependency: source-evaluation-only
@@ -5330,8 +5330,8 @@ assessments:
         "e8e6b82e041b3243e289978d6ac59059bd1341b15114a49b\
         eb3567b2dcd27f9c"
       tests/dynamic-source-realm-host-evidence.test.ts:
-        "86c650b94794f06feb2712820e1722977377dbd1b162a968\
-        010cb47a76028ce9"
+        "33965b8ca8744572d91015a22d3bd4561e8a94d5475caecb\
+        1afdc4f3cea1f05e"
   ds19-63:
     disposition: exclusion
     normativeDependency: source-evaluation-only
@@ -5350,8 +5350,8 @@ assessments:
         "e8e6b82e041b3243e289978d6ac59059bd1341b15114a49b\
         eb3567b2dcd27f9c"
       tests/dynamic-source-realm-host-evidence.test.ts:
-        "86c650b94794f06feb2712820e1722977377dbd1b162a968\
-        010cb47a76028ce9"
+        "33965b8ca8744572d91015a22d3bd4561e8a94d5475caecb\
+        1afdc4f3cea1f05e"
   ds19-64:
     disposition: exclusion
     normativeDependency: source-evaluation-only
@@ -5369,8 +5369,8 @@ assessments:
         "e8e6b82e041b3243e289978d6ac59059bd1341b15114a49b\
         eb3567b2dcd27f9c"
       tests/dynamic-source-realm-host-evidence.test.ts:
-        "86c650b94794f06feb2712820e1722977377dbd1b162a968\
-        010cb47a76028ce9"
+        "33965b8ca8744572d91015a22d3bd4561e8a94d5475caecb\
+        1afdc4f3cea1f05e"
   ds19-65:
     disposition: exclusion
     normativeDependency: source-evaluation-only
@@ -5402,8 +5402,8 @@ assessments:
         "97cc511e183cdbf5e7938fbf7103271f9b173649b805d650\
         c5423b1f1c63db8c"
       tests/dynamic-source-realm-host-evidence.test.ts:
-        "86c650b94794f06feb2712820e1722977377dbd1b162a968\
-        010cb47a76028ce9"
+        "33965b8ca8744572d91015a22d3bd4561e8a94d5475caecb\
+        1afdc4f3cea1f05e"
   ds19-67:
     disposition: exclusion
     normativeDependency: source-evaluation-only
@@ -5434,8 +5434,8 @@ assessments:
         "d19099f7a7c6da924becfdde101535b7d976e20aedbc63ed\
         cbc61785d48fc5af"
       tests/dynamic-source-realm-host-evidence.test.ts:
-        "86c650b94794f06feb2712820e1722977377dbd1b162a968\
-        010cb47a76028ce9"
+        "33965b8ca8744572d91015a22d3bd4561e8a94d5475caecb\
+        1afdc4f3cea1f05e"
   ds19-69:
     disposition: exclusion
     normativeDependency: source-evaluation-only
@@ -5453,8 +5453,8 @@ assessments:
         "d19099f7a7c6da924becfdde101535b7d976e20aedbc63ed\
         cbc61785d48fc5af"
       tests/dynamic-source-realm-host-evidence.test.ts:
-        "86c650b94794f06feb2712820e1722977377dbd1b162a968\
-        010cb47a76028ce9"
+        "33965b8ca8744572d91015a22d3bd4561e8a94d5475caecb\
+        1afdc4f3cea1f05e"
   ds19-70:
     disposition: exclusion
     normativeDependency: source-evaluation-only
@@ -5472,8 +5472,8 @@ assessments:
         "d19099f7a7c6da924becfdde101535b7d976e20aedbc63ed\
         cbc61785d48fc5af"
       tests/dynamic-source-realm-host-evidence.test.ts:
-        "86c650b94794f06feb2712820e1722977377dbd1b162a968\
-        010cb47a76028ce9"
+        "33965b8ca8744572d91015a22d3bd4561e8a94d5475caecb\
+        1afdc4f3cea1f05e"
   ds19-71:
     disposition: exclusion
     normativeDependency: source-evaluation-only
@@ -5491,8 +5491,8 @@ assessments:
         "d19099f7a7c6da924becfdde101535b7d976e20aedbc63ed\
         cbc61785d48fc5af"
       tests/dynamic-source-realm-host-evidence.test.ts:
-        "86c650b94794f06feb2712820e1722977377dbd1b162a968\
-        010cb47a76028ce9"
+        "33965b8ca8744572d91015a22d3bd4561e8a94d5475caecb\
+        1afdc4f3cea1f05e"
   ds19-72:
     disposition: exclusion
     normativeDependency: source-evaluation-only
@@ -5510,8 +5510,8 @@ assessments:
         "d19099f7a7c6da924becfdde101535b7d976e20aedbc63ed\
         cbc61785d48fc5af"
       tests/dynamic-source-realm-host-evidence.test.ts:
-        "86c650b94794f06feb2712820e1722977377dbd1b162a968\
-        010cb47a76028ce9"
+        "33965b8ca8744572d91015a22d3bd4561e8a94d5475caecb\
+        1afdc4f3cea1f05e"
   ds19-73:
     disposition: exclusion
     normativeDependency: source-evaluation-only
@@ -5529,8 +5529,8 @@ assessments:
         "d19099f7a7c6da924becfdde101535b7d976e20aedbc63ed\
         cbc61785d48fc5af"
       tests/dynamic-source-realm-host-evidence.test.ts:
-        "86c650b94794f06feb2712820e1722977377dbd1b162a968\
-        010cb47a76028ce9"
+        "33965b8ca8744572d91015a22d3bd4561e8a94d5475caecb\
+        1afdc4f3cea1f05e"
   ds19-74:
     disposition: exclusion
     normativeDependency: source-evaluation-only
@@ -5548,8 +5548,8 @@ assessments:
         "d19099f7a7c6da924becfdde101535b7d976e20aedbc63ed\
         cbc61785d48fc5af"
       tests/dynamic-source-realm-host-evidence.test.ts:
-        "86c650b94794f06feb2712820e1722977377dbd1b162a968\
-        010cb47a76028ce9"
+        "33965b8ca8744572d91015a22d3bd4561e8a94d5475caecb\
+        1afdc4f3cea1f05e"
   ds19-75:
     disposition: exclusion
     normativeDependency: source-evaluation-only
@@ -5567,8 +5567,8 @@ assessments:
         "d19099f7a7c6da924becfdde101535b7d976e20aedbc63ed\
         cbc61785d48fc5af"
       tests/dynamic-source-realm-host-evidence.test.ts:
-        "86c650b94794f06feb2712820e1722977377dbd1b162a968\
-        010cb47a76028ce9"
+        "33965b8ca8744572d91015a22d3bd4561e8a94d5475caecb\
+        1afdc4f3cea1f05e"
   ds19-76:
     disposition: exclusion
     normativeDependency: source-evaluation-only
@@ -5586,8 +5586,8 @@ assessments:
         "d19099f7a7c6da924becfdde101535b7d976e20aedbc63ed\
         cbc61785d48fc5af"
       tests/dynamic-source-realm-host-evidence.test.ts:
-        "86c650b94794f06feb2712820e1722977377dbd1b162a968\
-        010cb47a76028ce9"
+        "33965b8ca8744572d91015a22d3bd4561e8a94d5475caecb\
+        1afdc4f3cea1f05e"
   ds19-77:
     disposition: exclusion
     normativeDependency: source-evaluation-only
@@ -5605,8 +5605,8 @@ assessments:
         "d19099f7a7c6da924becfdde101535b7d976e20aedbc63ed\
         cbc61785d48fc5af"
       tests/dynamic-source-realm-host-evidence.test.ts:
-        "86c650b94794f06feb2712820e1722977377dbd1b162a968\
-        010cb47a76028ce9"
+        "33965b8ca8744572d91015a22d3bd4561e8a94d5475caecb\
+        1afdc4f3cea1f05e"
   ds19-78:
     disposition: exclusion
     normativeDependency: source-evaluation-only
@@ -5624,8 +5624,8 @@ assessments:
         "97cc511e183cdbf5e7938fbf7103271f9b173649b805d650\
         c5423b1f1c63db8c"
       tests/dynamic-source-realm-host-evidence.test.ts:
-        "86c650b94794f06feb2712820e1722977377dbd1b162a968\
-        010cb47a76028ce9"
+        "33965b8ca8744572d91015a22d3bd4561e8a94d5475caecb\
+        1afdc4f3cea1f05e"
   ds19-79:
     disposition: exclusion
     normativeDependency: source-evaluation-only
@@ -5643,8 +5643,8 @@ assessments:
         "4e7fb1e1becb058393b0cbc11a5a45174247f2d8f1a6d7ba\
         3b1e25a67301057c"
       tests/dynamic-source-realm-host-evidence.test.ts:
-        "86c650b94794f06feb2712820e1722977377dbd1b162a968\
-        010cb47a76028ce9"
+        "33965b8ca8744572d91015a22d3bd4561e8a94d5475caecb\
+        1afdc4f3cea1f05e"
   ds19-80:
     disposition: exclusion
     normativeDependency: source-evaluation-only
@@ -5661,8 +5661,8 @@ assessments:
         "1347e426eeecb98be2a7e5a4e0ceefa93f40353cb6a58379\
         ebe3b1bdd5dfa717"
       tests/dynamic-source-realm-host-evidence.test.ts:
-        "86c650b94794f06feb2712820e1722977377dbd1b162a968\
-        010cb47a76028ce9"
+        "33965b8ca8744572d91015a22d3bd4561e8a94d5475caecb\
+        1afdc4f3cea1f05e"
   ds19-81:
     disposition: exclusion
     normativeDependency: source-evaluation-only
@@ -5681,8 +5681,8 @@ assessments:
         "750987a370c663899c43f03660fb941031246341219141d4\
         9f7f351d3896b21f"
       tests/dynamic-source-realm-host-evidence.test.ts:
-        "86c650b94794f06feb2712820e1722977377dbd1b162a968\
-        010cb47a76028ce9"
+        "33965b8ca8744572d91015a22d3bd4561e8a94d5475caecb\
+        1afdc4f3cea1f05e"
   ds19-82:
     disposition: exclusion
     normativeDependency: source-evaluation-only
@@ -5701,18 +5701,18 @@ assessments:
         "750987a370c663899c43f03660fb941031246341219141d4\
         9f7f351d3896b21f"
       tests/dynamic-source-realm-host-evidence.test.ts:
-        "86c650b94794f06feb2712820e1722977377dbd1b162a968\
-        010cb47a76028ce9"
+        "33965b8ca8744572d91015a22d3bd4561e8a94d5475caecb\
+        1afdc4f3cea1f05e"
   ds13-static-construction-contracts:
     disposition: "exclusion"
     normativeDependency: "source-evaluation-only"
     replacementEvidence:
-      tests/construction-static-contracts.test.ts: "428628247b099d6e74148a55\
-        90f24966b2f41a0ebe9cabe4a5454e61063d6b54"
-      tests/native/fixtures/construction-static-contracts.ts: "784b3e71396e5\
-        f40e33a5b3cbe52a3ec28b59cdba905431d1e8e0c1d929ae6b6"
-      tests/native.ts: "fd6c0dce57f15cb8fa818226e11af8c9ac011d3946996970d157\
-        11bffa9f159a"
+      tests/construction-static-contracts.test.ts: "e76fcbc5530a95753065ed84\
+        0b09f6c79926e78a08e8503361eb20e2e0dd690b"
+      tests/native/fixtures/construction-static-contracts.ts: "75af168d1e86a\
+        b9efb5b0a532320f4a311fd5e9e7b6786f9c434a7c62c7bab82"
+      tests/native.ts: "acb5db12015f8b73bd02182d398bd0e92b980a40f3f87ea6cb0c\
+        db037dabd546"
     reason: >-
       Maintainer decision 2026-10-28 item 1 applies only to the 24 exclusion
       rows in docs/m5c-graph/dynamic-source-construction-assessment.yaml.
@@ -5751,8 +5751,8 @@ assessments:
       non-source reopening remains in force.
     replacementEvidence:
       tests/regexp-static-grammar.test.ts:
-        "6582ae85e7bca86210008bfb7640b9942d58786b2bb32b\
-        97d0a9a824c8d960f1"
+        "e950ffdc3101396639960bb847fec7f1d62b6e5e090c68\
+        bf36faef03405a728a"
   ds17-static-constructor-inputs:
     disposition: exclusion
     normativeDependency: source-evaluation-only
@@ -5768,8 +5768,8 @@ assessments:
       force.
     replacementEvidence:
       tests/native/fixtures/regexp-static-evidence.ts:
-        "218de3dad4661c298278d612c8b1e032218857c4903904\
-        0d14480f3574d6000f"
+        "7cb4480a247bb10c4b91fd7a6699e6efc42e52a07fb2cc\
+        0c202040cd302f5b2d"
   ds17-static-source-roundtrips:
     disposition: exclusion
     normativeDependency: source-evaluation-only
@@ -5788,11 +5788,11 @@ assessments:
       force.
     replacementEvidence:
       tests/native/fixtures/regexp-static-evidence.ts:
-        "218de3dad4661c298278d612c8b1e032218857c4903904\
-        0d14480f3574d6000f"
+        "7cb4480a247bb10c4b91fd7a6699e6efc42e52a07fb2cc\
+        0c202040cd302f5b2d"
       tests/regexp-static-grammar.test.ts:
-        "6582ae85e7bca86210008bfb7640b9942d58786b2bb32b\
-        97d0a9a824c8d960f1"
+        "e950ffdc3101396639960bb847fec7f1d62b6e5e090c68\
+        bf36faef03405a728a"
   ds17-exhaustive-plain-literals:
     disposition: exclusion
     normativeDependency: source-evaluation-only
@@ -5810,8 +5810,8 @@ assessments:
       non-source reopening remains in force.
     replacementEvidence:
       tests/property/m5-regexp-literal-exhaustive.property.test.ts:
-        "bd4b60db4432b86e026eb918760d66b4813e89aa4c24ee\
-        6042127c1acb24d7f1"
+        "030e88d57a8e1467def62d8106fda1a31df529669327df\
+        2987a9a78999907c60"
   ds17-exhaustive-escaped-annex-b:
     disposition: exclusion
     normativeDependency: source-evaluation-only
@@ -5834,8 +5834,8 @@ assessments:
       policy, or on ADR 0019's reopening triggers.
     replacementEvidence:
       tests/property/m5-regexp-literal-exhaustive.property.test.ts:
-        "bd4b60db4432b86e026eb918760d66b4813e89aa4c24ee\
-        6042127c1acb24d7f1"
+        "030e88d57a8e1467def62d8106fda1a31df529669327df\
+        2987a9a78999907c60"
   annexb-escaped-literal-eval:
     disposition: exclusion
     normativeDependency: source-evaluation-only
@@ -5854,8 +5854,8 @@ assessments:
       reopening triggers.
     replacementEvidence:
       tests/property/m5-regexp-literal-exhaustive.property.test.ts:
-        "bd4b60db4432b86e026eb918760d66b4813e89aa4c24ee\
-        6042127c1acb24d7f1"
+        "030e88d57a8e1467def62d8106fda1a31df529669327df\
+        2987a9a78999907c60"
   annexb-eval-func-block-functions:
     disposition: exclusion
     normativeDependency: source-evaluation-only
@@ -5874,14 +5874,14 @@ assessments:
         "74fa0e8dfbefadce0ff96723cf979ae13967d266247aa9\
         9da7da52aa088ba24b"
       tests/annexb-function-declarations-native.test.ts:
-        "e30268b52e9e17cf26b4a7fd4d2467a1016bb6dd2e5618\
-        92a7538d5905b30542"
+        "8dc06603342bdc6ea9d56a75d499b90b215bf6d2c501b7\
+        501d30c691c82d9fb0"
       tests/native/fixtures/annexb-functions.ts:
-        "21d638c5a6e070709b0edb13b1ee456fcba360a8ad5023\
-        567d9c5e0eef13fe63"
+        "aabff72868e34a78ab8a97c6eb85e20833bdf6bb4c0c89\
+        7330358651a82b41df"
       tests/property/annexb-function-declarations.property.test.ts:
-        "a64eddf65b3ec505ac9272db68d97530867f780b787ff1\
-        9654a56cb6282bfd24"
+        "9c84a4719343806411c7ab59bae645c445404dd2ad2ed9\
+        990aa73da5f0655328"
   annexb-eval-func-parameter-no-skip:
     disposition: exclusion
     normativeDependency: source-evaluation-only
@@ -5903,14 +5903,14 @@ assessments:
         "74fa0e8dfbefadce0ff96723cf979ae13967d266247aa9\
         9da7da52aa088ba24b"
       tests/annexb-function-declarations-native.test.ts:
-        "e30268b52e9e17cf26b4a7fd4d2467a1016bb6dd2e5618\
-        92a7538d5905b30542"
+        "8dc06603342bdc6ea9d56a75d499b90b215bf6d2c501b7\
+        501d30c691c82d9fb0"
       tests/native/fixtures/annexb-functions.ts:
-        "21d638c5a6e070709b0edb13b1ee456fcba360a8ad5023\
-        567d9c5e0eef13fe63"
+        "aabff72868e34a78ab8a97c6eb85e20833bdf6bb4c0c89\
+        7330358651a82b41df"
       tests/property/annexb-function-declarations.property.test.ts:
-        "a64eddf65b3ec505ac9272db68d97530867f780b787ff1\
-        9654a56cb6282bfd24"
+        "9c84a4719343806411c7ab59bae645c445404dd2ad2ed9\
+        990aa73da5f0655328"
   annexb-eval-global-block-functions:
     disposition: exclusion
     normativeDependency: source-evaluation-only
@@ -5930,14 +5930,14 @@ assessments:
         "74fa0e8dfbefadce0ff96723cf979ae13967d266247aa9\
         9da7da52aa088ba24b"
       tests/annexb-function-declarations-native.test.ts:
-        "e30268b52e9e17cf26b4a7fd4d2467a1016bb6dd2e5618\
-        92a7538d5905b30542"
+        "8dc06603342bdc6ea9d56a75d499b90b215bf6d2c501b7\
+        501d30c691c82d9fb0"
       tests/native/fixtures/annexb-functions.ts:
-        "21d638c5a6e070709b0edb13b1ee456fcba360a8ad5023\
-        567d9c5e0eef13fe63"
+        "aabff72868e34a78ab8a97c6eb85e20833bdf6bb4c0c89\
+        7330358651a82b41df"
       tests/property/annexb-function-declarations.property.test.ts:
-        "a64eddf65b3ec505ac9272db68d97530867f780b787ff1\
-        9654a56cb6282bfd24"
+        "9c84a4719343806411c7ab59bae645c445404dd2ad2ed9\
+        990aa73da5f0655328"
   annexb-eval-global-init-configurable:
     disposition: exclusion
     normativeDependency: source-evaluation-only
@@ -5955,14 +5955,14 @@ assessments:
       replacement evidence, or on ADR 0019's reopening triggers.
     replacementEvidence:
       tests/annexb-function-declarations-native.test.ts:
-        "e30268b52e9e17cf26b4a7fd4d2467a1016bb6dd2e5618\
-        92a7538d5905b30542"
+        "8dc06603342bdc6ea9d56a75d499b90b215bf6d2c501b7\
+        501d30c691c82d9fb0"
       tests/native/fixtures/annexb-functions.ts:
-        "21d638c5a6e070709b0edb13b1ee456fcba360a8ad5023\
-        567d9c5e0eef13fe63"
+        "aabff72868e34a78ab8a97c6eb85e20833bdf6bb4c0c89\
+        7330358651a82b41df"
       tests/property/annexb-function-declarations.property.test.ts:
-        "a64eddf65b3ec505ac9272db68d97530867f780b787ff1\
-        9654a56cb6282bfd24"
+        "9c84a4719343806411c7ab59bae645c445404dd2ad2ed9\
+        990aa73da5f0655328"
   annexb-eval-global-existing-property:
     disposition: exclusion
     normativeDependency: source-evaluation-only
@@ -5984,14 +5984,14 @@ assessments:
       evidence, or on ADR 0019's reopening triggers.
     replacementEvidence:
       tests/annexb-function-declarations-native.test.ts:
-        "e30268b52e9e17cf26b4a7fd4d2467a1016bb6dd2e5618\
-        92a7538d5905b30542"
+        "8dc06603342bdc6ea9d56a75d499b90b215bf6d2c501b7\
+        501d30c691c82d9fb0"
       tests/native/fixtures/annexb-functions.ts:
-        "21d638c5a6e070709b0edb13b1ee456fcba360a8ad5023\
-        567d9c5e0eef13fe63"
+        "aabff72868e34a78ab8a97c6eb85e20833bdf6bb4c0c89\
+        7330358651a82b41df"
       tests/property/annexb-function-declarations.property.test.ts:
-        "a64eddf65b3ec505ac9272db68d97530867f780b787ff1\
-        9654a56cb6282bfd24"
+        "9c84a4719343806411c7ab59bae645c445404dd2ad2ed9\
+        990aa73da5f0655328"
   annexb-eval-global-nostrict-visibility:
     disposition: exclusion
     normativeDependency: source-evaluation-only
@@ -6011,14 +6011,14 @@ assessments:
         "74fa0e8dfbefadce0ff96723cf979ae13967d266247aa9\
         9da7da52aa088ba24b"
       tests/annexb-function-declarations-native.test.ts:
-        "e30268b52e9e17cf26b4a7fd4d2467a1016bb6dd2e5618\
-        92a7538d5905b30542"
+        "8dc06603342bdc6ea9d56a75d499b90b215bf6d2c501b7\
+        501d30c691c82d9fb0"
       tests/native/fixtures/annexb-functions.ts:
-        "21d638c5a6e070709b0edb13b1ee456fcba360a8ad5023\
-        567d9c5e0eef13fe63"
+        "aabff72868e34a78ab8a97c6eb85e20833bdf6bb4c0c89\
+        7330358651a82b41df"
       tests/property/annexb-function-declarations.property.test.ts:
-        "a64eddf65b3ec505ac9272db68d97530867f780b787ff1\
-        9654a56cb6282bfd24"
+        "9c84a4719343806411c7ab59bae645c445404dd2ad2ed9\
+        990aa73da5f0655328"
   annexb-eval-global-lexical-no-collision:
     disposition: exclusion
     normativeDependency: source-evaluation-only
@@ -6039,17 +6039,17 @@ assessments:
         "74fa0e8dfbefadce0ff96723cf979ae13967d266247aa9\
         9da7da52aa088ba24b"
       tests/annexb-function-declarations-native.test.ts:
-        "e30268b52e9e17cf26b4a7fd4d2467a1016bb6dd2e5618\
-        92a7538d5905b30542"
+        "8dc06603342bdc6ea9d56a75d499b90b215bf6d2c501b7\
+        501d30c691c82d9fb0"
       tests/native/fixtures/annexb-functions.ts:
-        "21d638c5a6e070709b0edb13b1ee456fcba360a8ad5023\
-        567d9c5e0eef13fe63"
+        "aabff72868e34a78ab8a97c6eb85e20833bdf6bb4c0c89\
+        7330358651a82b41df"
       tests/native/fixtures/global-lexical-configurable-var.ts:
-        "db8f75afb722b38b2553bb286f4599b5bcb1ff00ffc4ca\
-        2b1367a370a1d9a88a"
+        "0d942ecc45aa34ce240afbc1c28e7d17c26407ca33d84d\
+        f47ac268338fb61671"
       tests/property/annexb-function-declarations.property.test.ts:
-        "a64eddf65b3ec505ac9272db68d97530867f780b787ff1\
-        9654a56cb6282bfd24"
+        "9c84a4719343806411c7ab59bae645c445404dd2ad2ed9\
+        990aa73da5f0655328"
   annexb-eval-catch-parameter-var-redeclaration:
     disposition: exclusion
     normativeDependency: source-evaluation-only
@@ -6084,11 +6084,11 @@ assessments:
         "8d68227f4c17c49865089c47f69f8fb2f8f727e6f61be2\
         20de0bd6ca0859cc03"
       tests/annexb-syntax-native.test.ts:
-        "8a76d101b374174b71cc04d3f19aac3307a3fb9c9290f4\
-        95e4d21c95239ea61c"
+        "596e6d4f41366e68d80188ebb5f2625885ec6ed7d57961\
+        91c5b027c70c880330"
       tests/native/fixtures/annexb-syntax.ts:
-        "b30872be218d362f634c35e08e6cd505d8a15536a8b68c\
-        14888f11e5bc5f1c2a"
+        "8f1c99a2b5f4fddab971d371e9a4470092710c4bc81ce5\
+        cc0da7969530655d56"
   residual-exact-completion:
     disposition: exclusion
     normativeDependency: source-evaluation-only
@@ -6112,22 +6112,22 @@ assessments:
         "8a0cddcd21f7223bc65f7d3b1314774849021810aebba9d9\
         ed4b8cade760e0ab"
       tests/native/fixtures/residual-completion-cases.ts:
-        "5a0888fa54174d4a86f31763436c445456a49548177ec6f9\
-        43c91575ed994c35"
+        "ce42eb4e1ae0c1e75216b2a5c40ce7ded954144ab57421f4\
+        d43fce30e8c786a9"
       tests/native/fixtures/dynamic-source-residual.ts:
-        "20e630cc639ca491192be7ea0193d333bb2723f5b3fc3d24\
-        81c22ffcee11b683"
+        "1057312731b08615826a72e6d4e131eaa45ab8fc3674afef\
+        21dc724e86bd7f78"
       tests/dynamic-source-residual-evidence.test.ts:
-        "578d18d9124d3817c4358f92ec4c99d815b9d5189594a095\
-        87ece93ee612e3bb"
+        "b60bbc750827408707f25238bab7116dd8e05f35ce6d85d1\
+        531d29a684555e60"
       tests/dynamic-source-residual-source.test.ts:
-        "f124147bde0d8023f6be413421e40d6cf3d09ec2a2e5abf9\
-        119442a0bb1d515c"
-      tests/native.ts: "fd6c0dce57f15cb8fa818226e11af8c9ac011d3946996970\
-        d15711bffa9f159a"
+        "9905ab2425ecaaca61b057a164c826c19c93379de3b98820\
+        f7384901dc84e6aa"
+      tests/native.ts: "acb5db12015f8b73bd02182d398bd0e92b980a40f3f87ea6\
+        cb0cdb037dabd546"
       tests/test262/harness/base.js:
-        "50331feeca513cb2e2354e05e7c68f82d5aeccd9b766d6c8\
-        8438c5ef118075f6"
+        "d689241f1fb83e085d7055088d3348093045c01192d994f5\
+        a5ed83038ea41686"
   residual-exact-class:
     disposition: exclusion
     normativeDependency: source-evaluation-only
@@ -6148,22 +6148,22 @@ assessments:
         "8a0cddcd21f7223bc65f7d3b1314774849021810aebba9d9\
         ed4b8cade760e0ab"
       tests/native/fixtures/residual-class-cases.ts:
-        "75b92b68c15d721bfacd72ef94394d68b3d8828f6ade7dbf\
-        70fb3f75f5b1adf0"
+        "d49410c3912985a3ac240bd2a3785e21a039d8760ed30d55\
+        1e6c284f6fa2d6f3"
       tests/native/fixtures/dynamic-source-residual.ts:
-        "20e630cc639ca491192be7ea0193d333bb2723f5b3fc3d24\
-        81c22ffcee11b683"
+        "1057312731b08615826a72e6d4e131eaa45ab8fc3674afef\
+        21dc724e86bd7f78"
       tests/dynamic-source-residual-evidence.test.ts:
-        "578d18d9124d3817c4358f92ec4c99d815b9d5189594a095\
-        87ece93ee612e3bb"
+        "b60bbc750827408707f25238bab7116dd8e05f35ce6d85d1\
+        531d29a684555e60"
       tests/dynamic-source-residual-source.test.ts:
-        "f124147bde0d8023f6be413421e40d6cf3d09ec2a2e5abf9\
-        119442a0bb1d515c"
-      tests/native.ts: "fd6c0dce57f15cb8fa818226e11af8c9ac011d3946996970\
-        d15711bffa9f159a"
+        "9905ab2425ecaaca61b057a164c826c19c93379de3b98820\
+        f7384901dc84e6aa"
+      tests/native.ts: "acb5db12015f8b73bd02182d398bd0e92b980a40f3f87ea6\
+        cb0cdb037dabd546"
       tests/test262/harness/base.js:
-        "50331feeca513cb2e2354e05e7c68f82d5aeccd9b766d6c8\
-        8438c5ef118075f6"
+        "d689241f1fb83e085d7055088d3348093045c01192d994f5\
+        a5ed83038ea41686"
   residual-derived-error-realm:
     disposition: exclusion
     normativeDependency: source-evaluation-only
@@ -6193,35 +6193,35 @@ assessments:
         "c1cb8d0db71d360241a0b7c5027f87fe8168117f8863a929\
         bcf038aad6718b64"
       tests/dynamic-source-realm-host-evidence.test.ts:
-        "86c650b94794f06feb2712820e1722977377dbd1b162a968\
-        010cb47a76028ce9"
+        "33965b8ca8744572d91015a22d3bd4561e8a94d5475caecb\
+        1afdc4f3cea1f05e"
       tests/native/fixtures/derived-constructor-realms.ts:
-        "f3c077755f14d3282c2d598ff3665550bd770a62fcb64c42\
-        eb4a29e5763f6e89"
+        "a767dfe9ea58cb26b71f2a5e1e2c5bfcb3139d04140f0655\
+        b0862f7474bf1476"
       tests/dynamic-source-residual-evidence.test.ts:
-        "578d18d9124d3817c4358f92ec4c99d815b9d5189594a095\
-        87ece93ee612e3bb"
+        "b60bbc750827408707f25238bab7116dd8e05f35ce6d85d1\
+        531d29a684555e60"
       tests/property/m5-class.property.test.ts:
-        "3b8a2f830428109db26f4a39770cc4bf0d859c34667339df\
-        1d48df4e07607262"
+        "d533a85507619fbd18d71829ea7a5099139a0b7024e43d72\
+        459b341d7129abe8"
       packages/runtime-c/native/runtime_function.c:
-        "cc37d293c49d58b4466f25840887e13feb6eff6998be90cc\
-        81b7c7c02430c2e1"
+        "542ff3664ec7b4cf5391137ef95f99ab90ace43e7d879e88\
+        6f8ff466c73ed89a"
       packages/runtime-c/native/runtime_memory.c:
-        "30f51e147d0146846e2137a612efc6e4e36873c6ff5c5be7\
-        179049750b717834"
+        "181c40185de86035017ae7779d6864d39e7b3aca274b9311\
+        fe5d3083f3f57559"
       packages/runtime-c/native/runtime_internal.h:
-        "94ef8bd9b31c5f4ca7e042b856b234b31cff943f16370359\
-        50af687c4f5734e2"
+        "a25c2c077edb6a19a142cac9d4900cdc474575289e083dcb\
+        eff935d3b40dfc24"
       packages/runtime-c/native/oseo_runtime.h:
-        "3c4e5792ba55f063f30a5cb122158f2e0605d1030bf4233f\
-        522ba43daafd964d"
+        "dd81bd379ee1ab557b2c1594787279ebe1c8e7d27e81f6f0\
+        e6ef67e2db71553d"
       packages/runtime-c/native/runtime_core.c:
-        "9c46c49fa1c0f61756eb2670226ca042989501fb54481efb\
-        cbfe5c85df417435"
+        "6796510f70d0a97ec7cebd3a808a4fc803821d60ed9a7380\
+        bb5cb58f4c98d08d"
       packages/runtime-c/src/index.ts:
-        "6a9f6d1361894aef58f8968352426529cd94f37d323d2e66\
-        393f395214eefed1"
+        "f722f30c5db3fd09164a015593a205927bf62a9b955d5e63\
+        20550dda786c8ca6"
   observation-train-b26a-b26b-b27:
     disposition: deferral
     normativeDependency: not-demonstrated
@@ -6287,11 +6287,11 @@ assessments:
       optional Annex B policy, or on ADR 0019's reopening triggers.
     replacementEvidence:
       tests/native/fixtures/annex-b-mixed-core.ts:
-        "45e4571f2e9f7556a21c4555d86720fd37a674479b9af0c291714648\
-        071a28cd"
+        "0ad49e48fa9d622944faaddc717cb56238a25b8becfea195a2993839\
+        b98d91e4"
       tests/annex-b-mixed-core-native.test.ts:
-        "ddc15ccc41702279c065d280cccfb666cf03069a9a16862282f9e4d7\
-        e2a58bfc"
+        "d4fdef13f217346def1ebda3a4a9699c67278375adf8562d06b7726e\
+        a52b4962"
   ds-host-script-finite-evidence:
     disposition: exclusion
     normativeDependency: source-evaluation-only
@@ -6320,23 +6320,23 @@ assessments:
         "2105e30144bad4783ce3847dbfc8edfa0992a135ecf33c42\
         f5eb1107084726a5"
       tests/native/fixtures/host-script-evidence-cases.ts:
-        "a556e07fbda41c6594120bd16c6f6a01deb7f897ec82acfe\
-        3c23b8c6b85ea196"
+        "52d1cf61d5043d1af6aac8690614324190ffb6f0b7ac5d36\
+        30f2932f4a6a53fa"
       tests/native/fixtures/host-script-evidence.ts:
-        "d804fcda15e50a5b2f9ecbaaa16796710150e5cefb8d98fc\
-        213693f3ca618a0c"
+        "fcb78d3e13775c4934074b0a23f96458315bd64fcb66980c\
+        e91940447da0b4e8"
       tests/native/host-script-main-reference.ts:
-        "8521eb0676f0f27268615f6bb45cad536fe612894f1b3c84\
-        2a6e6fa74eba8b6a"
+        "de7e75bb0f1f2f41cbe53bd3e63380039ef76b2f2d158be6\
+        fb5e56096cc35dce"
       tests/host-script-evidence.test.ts:
-        "023fbf22f8af246f867da9eb6ec2776bab46cd926ca822a8\
-        d70e6a52dc89974f"
+        "852045d6ef2f91023d8d8b8733e5acdf53d59ab367cf02b0\
+        fa13bd4e8016265c"
       tests/test262/harness/base.js:
-        "50331feeca513cb2e2354e05e7c68f82d5aeccd9b766d6c8\
-        8438c5ef118075f6"
+        "d689241f1fb83e085d7055088d3348093045c01192d994f5\
+        a5ed83038ea41686"
       tests/test262/harness/propertyHelper.js:
-        "bf9ce5ce4509a5b848cac4c3902e054dec385f1ed86284c0\
-        543f5da4949e7c35"
+        "0d04e00f63f7b3c6cafdfaa38566b9932301f8b17aace536\
+        0ba80821d5515f43"
   host-script-trainc-completion:
     disposition: exclusion
     normativeDependency: source-evaluation-only
@@ -6362,32 +6362,32 @@ assessments:
         "a191e21285ea733d00f91d2d717430356a92f748e9530f9b\
         0d0a18d193151df1"
       tests/native/fixtures/host-script-trainc-cases.ts:
-        "27ef80d272a4d9ed39a8e1091d83e6ff340ffcc8045b7aa0\
-        90b0cda2399de5b0"
+        "5ecd1fc910842b345700cda58535b282cad888445fab62e5\
+        e38b69b597be42df"
       tests/native/fixtures/host-script-trainc.ts:
-        "80cacb1a95fd173f8b5d5fbcaff2cdfb8a3734136c42d462\
-        baefa28b9f2ac388"
+        "3f4595642310b8ef17580adcdda8ef8c94767464b338c81c\
+        4b4999e6fbac2c01"
       tests/host-script-trainc-evidence.ts:
-        "47ffdb769b37f2ac888d517bc8523b9a22a35df11327b400\
-        26de49abe987520f"
+        "dc0edc61bfea8c9bf04f0b865cee8a6d805cc7a31dd59003\
+        947a79d87023e0be"
       tests/host-script-trainc-evidence-1.test.ts:
-        "c4c3e794b71efb89ca6d635e4be2656f302f2893afd57aeb\
-        1f14989e72ca8b63"
+        "e4c4e77b4fd9e2918328a404f16bec00fb0bc9aa119266d6\
+        05313476d9d349bb"
       tests/host-script-trainc-evidence-2.test.ts:
-        "5bb296c521ac0cd82fcaf3f8c532284e483990028c5045a8\
-        71f28aee7cedc4c4"
+        "7e4a00daca3f9f129b5240339e0faca0ec3a7ac3f5a913cf\
+        c2582d831df03ae6"
       tests/host-script-trainc-evidence-3.test.ts:
-        "292eabe309cd3d7c2f60eb1bf39680ff57311989f1fcf4a9\
-        c81463ea44e26dba"
+        "4a437fbae0ca565037cab3ddcd4acb9f80d9cb9011ec111c\
+        03b12374178dcd9b"
       tests/host-script-trainc-evidence-4.test.ts:
-        "81f5c192b1d54c35414ec5d72d5f18e16a0cf1ca23fea152\
-        1e7a118fc9aa1dda"
+        "57a4e1953fbd45b73d0c30afa705234439bc6aedcb22c70e\
+        d2256bb5cfef73c6"
       tests/host-script-trainc-source.test.ts:
-        "ce9202b76651d3e4d0b3eb1de117322f9de76ddea1c2c05d\
-        556f23993545153d"
+        "6332d336add6cb38e1110d1dea78d0e1ffc44761b6c2a519\
+        2b9dbce7ae7c9b62"
       tests/test262/harness/base.js:
-        "50331feeca513cb2e2354e05e7c68f82d5aeccd9b766d6c8\
-        8438c5ef118075f6"
+        "d689241f1fb83e085d7055088d3348093045c01192d994f5\
+        a5ed83038ea41686"
   ds-fc-argument-conversion:
     disposition: deferral
     normativeDependency: not-demonstrated
@@ -6440,13 +6440,13 @@ assessments:
         "8b79de681e58659f7c9f49b5e5659030\
         0a6723e28d355d779ac6f4d0b1a1aac3"
       tests/native/fixtures/function-constructor-evidence.ts:
-        "1c1091c3741ae0a5e0a9e91186106423\
-        afd5f5c799576dc0d7274f7b9f2f1ca8"
+        "23a25d9eda48cf62b1769f936c46580a\
+        6a8c2c3f9db6cde978aff62507770bd4"
       tests/function-constructor-evidence.test.ts:
-        "a906752672a9c759ccb84f3d62290b70\
-        6744b01a707e9fe36c5d8cdf86dfcd00"
-      tests/test262/harness/base.js: "50331feeca513cb2e2354e05e7c68f82\
-        d5aeccd9b766d6c88438c5ef118075f6"
+        "45e1ba30bd756e5f8b9418b182072595\
+        0fa299e41acc17e64fee1325b6ff6ac2"
+      tests/test262/harness/base.js: "d689241f1fb83e085d7055088d334809\
+        3045c01192d994f5a5ed83038ea41686"
       tests/test262/results/language/expressions/8f.yaml:
         "e8e64ad54c6324855d672f884ee44c74\
         49c0fea3dcd86ae2da2fd5a794d31db8"

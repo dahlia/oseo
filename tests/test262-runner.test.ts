@@ -1,4 +1,30 @@
+// Copyright (C) 2016 Michael Ficarra. All rights reserved.
+// The Test262 portions follow the BSD license in
+// test262/harness/LICENSE.
+
+/*
+ * Oseo, an ahead-of-time compiler for JavaScript and TypeScript.
+ * Copyright (C) 2026 Hong Minhee <https://hongminhee.org/>
+ *
+ * This notice covers Oseo-authored code. Material derived from
+ * Test262 retains its BSD license.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
 import assert from "node:assert/strict";
+import { createHash } from "node:crypto";
 import { mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
@@ -23,6 +49,7 @@ import {
   ReviewedTest262RunError,
   rewriteReviewedPromotions,
   selectManifestShard,
+  stripReviewedHarnessNotice,
   test262ModuleHarnessScript,
   unresolvedReferenceNames,
   validateReviewedResults,
@@ -1132,6 +1159,66 @@ test("assembles strict source with reviewed includes in order", () => {
       "function assert() {}\n" +
       "function verifyProperty() {}\n" +
       "const value = 1;\n",
+  );
+});
+
+test("reviewed harness notices preserve source coordinates", async () => {
+  const marked = await readFile(
+    new URL("test262/harness/base.js", import.meta.url),
+    "utf8",
+  );
+  const source = stripReviewedHarnessNotice("base.js", marked);
+  assert.equal(
+    createHash("sha256").update(source).digest("hex"),
+    "50331feeca513cb2e2354e05e7c68f82d5aeccd9b766d6c88438c5ef118075f6",
+  );
+
+  const path = "test/language/white-space/comment-single-vertical-tab.js";
+  const upstream = await readFile(
+    new URL(path, import.meta.resolve("test262/package.json")),
+    "utf8",
+  );
+  const parsed = parseTest262Case(upstream, path, revision);
+  const assembled = assembleTest262Source(
+    upstream,
+    "non-strict",
+    parsed.case,
+    { base: source, done: "", includes: new Map() },
+    false,
+  );
+  const firstEval = assembled
+    .split("\n")
+    .findIndex((line) => line.startsWith('eval("//\\u000B'));
+  assert.equal(firstEval + 1, 86);
+});
+
+test("reviewed harness loading removes only the exact notice", async () => {
+  const marked = await readFile(
+    new URL("test262/harness/base.js", import.meta.url),
+    "utf8",
+  );
+  const source = stripReviewedHarnessNotice("base.js", marked);
+  const marker = "/* Oseo source license\n";
+  const start = marked.indexOf(marker);
+  assert.ok(start >= 0);
+  const closing = marked.indexOf("*/", start + marker.length);
+  assert.ok(closing > start);
+  for (const variant of [
+    "\n" + marked,
+    marked.slice(0, closing),
+    marked.replace(marker, "/* Oseo license lookalike\n"),
+    marked.replace("GNU General Public License", "GNU license"),
+    marked.replace("Harness globals are used", "Harness names are used"),
+    marked.slice(0, closing) + marked.slice(closing + 2),
+    source + marked.slice(start, closing + 2),
+  ]) {
+    assert.equal(stripReviewedHarnessNotice("base.js", variant), variant);
+  }
+  assert.equal(stripReviewedHarnessNotice("unreviewed.js", marked), marked);
+  assert.equal(stripReviewedHarnessNotice("deepEqual.js", marked), marked);
+  assert.equal(
+    stripReviewedHarnessNotice("base.js", marked + "\n/* Body comment. */\n"),
+    source + "\n/* Body comment. */\n",
   );
 });
 

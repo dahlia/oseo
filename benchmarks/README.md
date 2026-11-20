@@ -7,12 +7,12 @@ published performance results. Richards, DeltaBlue, n-body, and ray tracing
 remain candidates for later corpus expansion; this initial set makes no
 claim about their behavior or performance.
 
-| Kernel          | Fixed input                      | Self-check                               | License      |
-| --------------- | -------------------------------- | ---------------------------------------- | ------------ |
-| Sieve           | Integers through 5,000           | 669 primes                               | MIT          |
-| Permute         | Six-element array                | 8,660 recursive visits                   | MIT          |
-| JSON round-trip | 100 records with quoted strings  | Strings preserved; even IDs sum to 2,450 | GPL-3.0-only |
-| RegExp          | 100 repeated three-field records | Parsed numbers sum to 17,400             | GPL-3.0-only |
+| Kernel          | Fixed input                      | Self-check                               | License          |
+| --------------- | -------------------------------- | ---------------------------------------- | ---------------- |
+| Sieve           | Integers through 5,000           | 669 primes                               | MIT              |
+| Permute         | Six-element array                | 8,660 recursive visits                   | MIT              |
+| JSON round-trip | 100 records with quoted strings  | Strings preserved; even IDs sum to 2,450 | GPL-3.0-or-later |
+| RegExp          | 100 repeated three-field records | Parsed numbers sum to 17,400             | GPL-3.0-or-later |
 
 Sieve and Permute adapt the corresponding
 [Are We Fast Yet? kernels].
@@ -23,7 +23,7 @@ becomes local state. The algorithms, input sizes, and expected results are
 unchanged. These adaptations are not scores from the upstream benchmark suite.
 
 JSON round-trip and RegExp are original Oseo workloads under the repository's
-[*GPL-3.0-only license*](../LICENSE). They exercise allocation and common
+[*GPL-3.0-or-later license*](../LICENSE). They exercise allocation and common
 built-ins without importing libraries or requesting new language features.
 All four sources are plain JavaScript Script programs. The generated wrapper
 runs the same source on every engine, checks every iteration, and throws on
