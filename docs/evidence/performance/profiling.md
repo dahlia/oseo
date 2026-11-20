@@ -71,6 +71,19 @@ It checks the actual `darwin/arm64` host in the helper, uses a fresh directory
 under `RUNNER_TEMP`, and archives the evidence with `tar` to retain executable
 modes and the path mapping. Archive and upload steps use `always()` and
 `if-no-files-found: error`; hard job termination can still prevent upload.
+On GitHub-hosted ARM64 Mac CI, the fixed synthetic smoke also records a
+call-graph witness in *hosted-mac-synthetic-stacks.json*. Every one of the
+eight existing reports must have a fully named path from the recorded
+program caller through a generated frame into runtime code, with the
+witness addresses inside their named binary images. Each report retains
+its number of recorded main-thread stacks and the number represented
+under topmost unknown branches. Nested unknowns count once. A malformed
+graph, missing witness, truncated report, loss or other diagnostic still
+fails. The raw reports and the original strict *capture.json* verdict
+are retained. These correlated counts do not establish sample coverage,
+time shares or cost attribution. Actual artifacts and local or Linux
+smoke runs retain the strict whole-report unknown-frame veto.
+
 No job, runner placement, matrix, permission, required gate or timeout is added
 or changed. No unverified service default is used as a time budget. The
 retained serial Mac attempt failed the eight-capture requirement. New CI
@@ -154,8 +167,9 @@ also resolve runtime context. Linux keeps its existing requirement for runtime
 context in at least one capture; generated-only Linux stacks remain useful user
 observations with runtime attribution unknown. Tool exit zero alone cannot
 pass. The summary records all eight positions, including failed races and
-unattempted stops after exit. Detected unknown/truncated frames fail the method
-probe; absence of a diagnostic does not prove complete unwinding.
+unattempted stops after exit. The strict report check rejects detected unknown
+and truncated frames. Absence of a diagnostic does not prove complete
+unwinding.
 
 Mac reports must retain the live-task header, ten-millisecond request header,
 image section and completion message. A target that exits before a sampler

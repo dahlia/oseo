@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import { spawnSync } from "node:child_process";
 import { createHash } from "node:crypto";
+import { once } from "node:events";
 import {
   existsSync,
   mkdirSync,
@@ -158,6 +159,8 @@ const {
   captureArtifact,
   captureOwnedStacks,
   fileIdentity,
+  inspectHostedMacSyntheticCapture,
+  inspectHostedMacSyntheticStack,
   inspectStack,
   validateCaptureRequest,
 } = await import("../tools/perf-profile-capture.ts");
@@ -182,6 +185,99 @@ test("stack acceptance rejects unknown, truncated and empty captures", () => {
     ).useful,
     true,
   );
+});
+
+const hostedMacCallGraph = [
+  "Call graph:",
+  "    4 Thread_1 DispatchQueue_1: com.apple.main-thread (serial)",
+  "      3 start (in dyld) + 4 [0x2004]",
+  "      + 3 main (in fixture) + 4 [0x1004]",
+  "      + ! 3 oseo_call_function (in fixture) + 4 [0x1014]",
+  "      + !   3 oseo_dispatch_function (in fixture) + 4 [0x1024]",
+  "      + !   : 3 oseo_cell_create (in fixture) + 4 [0x1034]",
+  "      + !   : | 3 DYLD-STUB$$_platform_bzero (in libsystem_malloc.dylib)" +
+    " + 8 [0x3004]",
+  "      1 ??? (in <unknown binary>) [0x9000]",
+  "        1 ??? (in <unknown binary>) [0x9004]",
+  "",
+  "Total number in stack (recursive counted multiple, when >=5):",
+  "",
+  "Sort by top of stack, same collapsed (when >= 5):",
+  "",
+  "Binary Images:",
+  "    0x1000 - 0x10ff +fixture (0) " +
+    "<ADEBFB7E-5B41-366F-B2A5-A16E391120D8> /tmp/fixture",
+  "    0x2000 - 0x20ff dyld (1.0.0 - 1387.2) " +
+    "<57F4E7E7-A497-38BB-A3D2-A459C622460B> /usr/lib/dyld",
+  "    0x3000 - 0x30ff libsystem_malloc.dylib (812.160.5) " +
+    "<8CF02A42-BC33-38BF-B14A-FA9B13B3CA3F> " +
+    "/usr/lib/system/libsystem_malloc.dylib",
+  "       0x28d26e000 -        0x28d26ebbf  libsystem_trial.dylib " +
+    "(474.2.18.2.1) <698A199E-73E6-3D12-AB87-C8E100BEA52E> " +
+    "/usr/lib/system/libsystem_trial.dylib",
+  "",
+].join("\n");
+
+test("hosted Mac smoke requires a complete named call-graph witness", () => {
+  const complete = hostedMacCallGraph;
+  assert.deepEqual(inspectHostedMacSyntheticStack(complete, "fixture"), {
+    mainThreadReportedStacks: 4,
+    unknownBranches: 1,
+    reportedStacksWithUnknown: 1,
+    deduplicatedBranches: 0,
+    witnessLines: [3, 4, 5, 6, 7, 8],
+    witnessReportedStacks: 3,
+  });
+  assert.equal(inspectStack(complete, "darwin").useful, false);
+  const withFiveUnknown = complete
+    .replace("4 Thread", "8 Thread")
+    .replace("      1 ???", "      5 ???");
+  const summary = "        ???  (in <unknown binary>)        5";
+  const withSummary = withFiveUnknown.replace(
+    "Binary Images:",
+    summary + "\n\nBinary Images:",
+  );
+  const fiveUnknown = inspectHostedMacSyntheticStack(
+    withFiveUnknown,
+    "fixture",
+  );
+  assert.ok(fiveUnknown);
+  assert.equal(fiveUnknown.mainThreadReportedStacks, 8);
+  assert.equal(fiveUnknown.unknownBranches, 1);
+  assert.equal(fiveUnknown.reportedStacksWithUnknown, 5);
+  assert.deepEqual(
+    inspectHostedMacSyntheticStack(withSummary, "fixture"),
+    fiveUnknown,
+  );
+  assert.equal(inspectStack(withSummary, "darwin").useful, false);
+
+  const cut = complete.indexOf("libsystem_trial.dylib") + "libs".length;
+  for (const bad of [
+    complete.replace("4 Thread", "5 Thread"),
+    complete.replace("[0x1024]", "[0x9040]"),
+    complete.replace("oseo_dispatch_function", "unknown_dispatch"),
+    complete.replace("oseo_call_function", "unknown_runtime"),
+    complete.replace("oseo_cell_create", "oseo_function_0"),
+    complete.replace("DYLD-STUB$$", "BAD-STUB$$"),
+    complete.replace("DYLD-STUB$$_platform_bzero", "0x3004"),
+    complete.replace("DYLD-STUB$$_platform_bzero", "..."),
+    complete.replace("[0x3004]", "[0x9040]"),
+    complete.slice(0, cut),
+    complete.slice(0, cut) + "\n",
+    complete.trimEnd(),
+    withSummary.replace(summary, summary + "\n" + summary),
+    withSummary.replace(summary, summary.replace(/5$/u, "6")),
+    complete.replace("Binary Images:", summary + "\nBinary Images:"),
+    complete.replace(
+      "3 start (in dyld) + 4 [0x2004]",
+      "3 ??? (in <unknown binary>) [0x9040]",
+    ),
+    complete.replace("+ !   : 3", "+ !   :   3"),
+    complete.replace("Total number in stack", "malformed graph"),
+    complete.replace("Binary Images:", "unresolved frame\nBinary Images:"),
+  ]) {
+    assert.equal(inspectHostedMacSyntheticStack(bad, "fixture"), undefined);
+  }
 });
 
 test("capture validates launch, bytes and frozen inputs", () => {
@@ -792,9 +888,11 @@ for (const mode of [
   "partial",
   "runtime-only",
   "generated-only",
+  "unknown-branch",
   "wrong-pid",
   "wrong-identity",
   "target-exit",
+  "target-exit-before-last-report",
   "already-exited",
   "timeout",
   "interrupt",
@@ -810,17 +908,26 @@ for (const mode of [
       const records: RunRecord[] = [];
       const deadlines: number[] = [];
       let launches = 0;
+      let settledSamplers = 0;
+      const firstSevenSettled = Promise.withResolvers<void>();
       let signalTimer: ReturnType<typeof setTimeout> | undefined;
       const target = session.launch(
         directory,
         "target",
-        [process.execPath, "-e", "setInterval(() => {}, 1000)"],
+        [
+          process.execPath,
+          "-e",
+          "const keepAlive = setInterval(() => {}, 1000);" +
+            "process.on('SIGUSR2', () => clearInterval(keepAlive));",
+        ],
         directory,
         {},
         Buffer.alloc(0),
         120_000,
       );
       const targetHash = fileIdentity(process.execPath).sha256;
+      const image = basename(process.execPath);
+      const witnessGraph = hostedMacCallGraph.replaceAll("fixture", image);
       const request = {
         kind: "synthetic-method-probe" as const,
         executable: process.execPath,
@@ -844,10 +951,12 @@ const index = Number(/sample-(\\d+)\\.txt$/.exec(file)[1]);
 const mode = process.env.FAKE_MODE;
 console.log(JSON.stringify({ pid, duration, interval, flag, file,
   samplerPid: process.pid }));
-const raw = 'Analysis of sampling fixture (pid ' + pid +
+const heading = 'Analysis of sampling fixture (pid ' + pid +
   ') every 10 milliseconds\\nProcess: fixture [' +
   (mode === 'wrong-pid' && index === 3 ? '0' : pid) +
-  ']\\nTarget Type: live task\\n' +
+  ']\\nTarget Type: live task\\n';
+const raw = heading + (mode === 'target-exit-before-last-report' ?
+  ${JSON.stringify(witnessGraph)} :
   (mode === 'generated-only' && index === 3 ? '' :
     '    + 4 oseo_cell_get (in fixture) [0x1]\\n') +
   (mode === 'runtime-only' && index === 3 ?
@@ -855,7 +964,9 @@ const raw = 'Analysis of sampling fixture (pid ' + pid +
     '    + 4 oseo_function_script (in fixture) [0x2]\\n') +
   (mode === 'generated-only' && index === 3 ?
     '    + 4 main (in fixture) [0x3]\\n' : '') +
-  (mode === 'partial' && index === 3 ? '' : 'Binary Images:\\n');
+  (mode === 'unknown-branch' && index === 3 ?
+    '    + 1 ??? (in <unknown binary>) [0x9000]\\n' : '') +
+  (mode === 'partial' && index === 3 ? '' : 'Binary Images:\\n'));
 if (!(mode === 'missing' && index === 3)) fs.writeFileSync(file, raw);
 if (mode === 'timeout' && index === 3) {
   process.on('SIGTERM', () => {});
@@ -943,6 +1054,25 @@ if (mode === 'timeout' && index === 3) {
               timeoutMs,
             ).done;
             records.push(record);
+            if (mode === "target-exit-before-last-report") {
+              if (name === "capture-7") {
+                await Promise.race([
+                  firstSevenSettled.promise,
+                  once(AbortSignal.timeout(timeoutMs), "abort").then(() =>
+                    assert.fail("Earlier sampler fixtures did not settle"),
+                  ),
+                ]);
+                // Let the other capture continuations observe the live child.
+                await new Promise<void>((resolveTurn) =>
+                  setImmediate(resolveTurn),
+                );
+                process.kill(target.pid!, "SIGUSR2");
+                assert.equal((await target.done).status, 0);
+              } else if (name.startsWith("capture-")) {
+                settledSamplers++;
+                if (settledSamplers === 7) firstSevenSettled.resolve();
+              }
+            }
             return record;
           },
         });
@@ -1002,6 +1132,35 @@ if (mode === 'timeout' && index === 3) {
               join(directory, `sample-${capture.index}.txt`),
             );
           }
+        } else if (mode === "target-exit-before-last-report") {
+          const verdicts = captures.map((capture) => {
+            const record = capture.record!;
+            const raw = readFileSync(
+              join(directory, `sample-${capture.index}.txt`),
+            );
+            const verdict = inspectHostedMacSyntheticCapture(capture, raw, {
+              image,
+              pid: target.pid!,
+              stdout: readFileSync(join(directory, record.stdout), "utf8"),
+              stderr: readFileSync(join(directory, record.stderr), "utf8"),
+            });
+            assert.ok(verdict.evidence);
+            assert.equal(capture.processMatches, true);
+            assert.equal(record.status, 0);
+            return verdict.accepted;
+          });
+          assert.deepEqual(verdicts, [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            false,
+          ]);
+          assert.equal(captures[7]!.targetAliveAtCompletion, false);
+          assert.equal(captures[7]!.windowComplete, false);
         } else if (mode === "target-exit") {
           assert.ok(
             captures.every(
@@ -1021,6 +1180,11 @@ if (mode === 'timeout' && index === 3) {
           assert.match(captures[3]!.error!, /test launch failed/u);
           assert.equal(captures[3]!.status, "capture-error");
         } else if (mode !== "interrupt") {
+          if (mode === "unknown-branch") {
+            assert.equal(captures[3]!.windowComplete, true);
+            assert.equal(captures[3]!.processMatches, true);
+            assert.equal(captures[3]!.stack?.unknown, true);
+          }
           assert.notEqual(captures[3]!.status, "useful-stack");
           assert.ok(
             captures
