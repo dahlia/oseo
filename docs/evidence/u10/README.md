@@ -17,7 +17,8 @@ The original bench and control instrumentation templates were extracted from
 instrumentation template also incorporates the original inline edits recovered
 from the U10 Codex session `01a0e28c-aab4-7583-9934-8fc60f427b7a`: mapping
 working directories to source IDs and writing metrics on process exit. These
-are preserved source templates with formatting only.
+preserve the original program bodies with formatting changes. Each template
+also carries its source license notice.
 
 The TypeScript templates use *.ts.txt* because historical runner internals do
 not form a supported tool API and these files must not be treated as live

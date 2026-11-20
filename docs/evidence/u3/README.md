@@ -90,11 +90,11 @@ repository holding this evidence, for a fresh Linux checkout:
 u3_probe_root=/absolute/path/to/disposable-checkout
 u3_aube=$(cd "$u3_probe_root" && mise which aube)
 u3_node=$(cd "$u3_probe_root" && mise which node)
-python3 docs/evidence/u3/probe-linux.py.txt \
+python3 docs/evidence/u3/replay/probe-linux.py.txt \
   "$u3_probe_root" "$u3_aube" "$u3_node"
 ~~~~
 
-For macOS, copy *probe-macos.py.txt* outside a new Desktop clone. With
+For macOS, copy *replay/probe-macos.py.txt* outside a new Desktop clone. With
 Homebrew GNU tar/zstd installed, run it under `/usr/bin/python3`, passing
 the clone's absolute path and pinned aube/Node paths obtained with
 `/opt/homebrew/bin/mise which`. The script records per-command logs and

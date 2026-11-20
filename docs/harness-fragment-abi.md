@@ -513,3 +513,11 @@ boxing lowering, which each regenerated records on their own base. Root
 recomputed all 44 records from the composed tree with the same hash shape
 as the test; eight differ from the last single-node values because more
 than one of those changes reaches the same fixture.
+
+
+Emitted C copyright notice
+--------------------------
+
+Adding the author URL to the emitted MIT copyright notice regenerates all
+44 whole-Script digest records. HIR and MIR are unchanged. Reversing only
+that URL addition recovers every previous digest.

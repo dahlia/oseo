@@ -32,7 +32,8 @@ The scripts carry a *.txt* suffix so that repository linting and
 formatting skip them, as the earlier evidence directories do. Copy each to a
 scratch path without that suffix before running it. The recorded runs used
 these scripts unchanged except that the preload was read from its in-tree
-path rather than through `RECORDER`.
+path rather than through `RECORDER`. The source license notices were added
+after those runs.
 
  -  *measurements.txt*: the measured run table and the per-phase per-execution
     costs from the least contended run.

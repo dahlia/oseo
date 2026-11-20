@@ -85,7 +85,7 @@ prefix="$result_root/$stamp-$$-$case_name-$cache_state"
   fi
   case $case_name in
     probe)
-      python3 docs/evidence/u17/exec-probe.py.txt
+      python3 tools/selfhosted-mac/exec-probe.py
       ;;
     test262)
       /usr/bin/time -p mise run test:test262 --shard 8/12

@@ -2487,6 +2487,10 @@ const reviewedHarnessNoticeDigests = new Map([
     "b8ee69b622e15923a61eff8c83f89dedab1162367083c3d664b7e8be6f66be70",
   ],
   [
+    "atomicsHelper.js",
+    "ceffd8bc85138f7afd505c68d2cbb5f191c8b1b6758aac8b9aee015b3f032102",
+  ],
+  [
     "base.js",
     "e1853106ad74a99d1a1af627049bf7ecc6a1be7977db31389ffdbe9eb3adde18",
   ],
@@ -2511,8 +2515,12 @@ const reviewedHarnessNoticeDigests = new Map([
     "8b818aff3ff456388e536ddedd5c61dce410cc2f2cf3107f599891eac92645f2",
   ],
   [
+    "fnGlobalObject.js",
+    "ceffd8bc85138f7afd505c68d2cbb5f191c8b1b6758aac8b9aee015b3f032102",
+  ],
+  [
     "nativeErrors.js",
-    "f9b193fee3b070280ed1791c40f9bc0e61558932b941a095a9ce48e48c738033",
+    "cd08a5a9235d795a1744aaa0d0c3c4e1a0ad59b785ea84308e24de1becf26368",
   ],
   [
     "promiseHelper.js",
@@ -2525,6 +2533,18 @@ const reviewedHarnessNoticeDigests = new Map([
   [
     "regExpUtils.js",
     "ceffd8bc85138f7afd505c68d2cbb5f191c8b1b6758aac8b9aee015b3f032102",
+  ],
+  [
+    "resizableArrayBufferUtils.js",
+    "ceffd8bc85138f7afd505c68d2cbb5f191c8b1b6758aac8b9aee015b3f032102",
+  ],
+  [
+    "temporalHelpers.js",
+    "51d1ab4da19e857357d05708e73b5a743cea1e16c66313952509dcfee33ea055",
+  ],
+  [
+    "testTypedArray.js",
+    "8b818aff3ff456388e536ddedd5c61dce410cc2f2cf3107f599891eac92645f2",
   ],
   [
     "wellKnownIntrinsicObjects.js",

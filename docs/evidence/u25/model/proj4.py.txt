@@ -1,3 +1,19 @@
+# Oseo, an ahead-of-time compiler for JavaScript and TypeScript.
+# Copyright (C) 2026 Hong Minhee <https://hongminhee.org/>
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
 import json
 src=open('proj2.py').read().split("a=run(); b=run(scale=1.0)")[0]
 src=src.replace("exec(open('proj.py').read()","exec(open('proj.py').read().replace('runs=[\"37121778924-1\"','runs=[\"37230598930-1\",\"37237684441-1\",\"37237684441-2\",\"37121778924-1\"')")
