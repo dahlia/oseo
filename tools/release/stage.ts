@@ -212,7 +212,19 @@ export function stageJsr(
     ) {
       throw new Error(`${pkg.name} needs a single JSR license identifier.`);
     }
+    const publish = config.publish;
     for (const entry of readdirSync(source)) {
+      // The source package explicitly excludes the npm helper's notice.
+      if (
+        pkg.name === "@oseo/cli" &&
+        entry === "ROLLDOWN-LICENSE.txt" &&
+        isObject(publish) &&
+        "exclude" in publish &&
+        Array.isArray(publish.exclude) &&
+        publish.exclude.includes(entry)
+      ) {
+        continue;
+      }
       if (
         entry === "src" ||
         entry === "native" ||
