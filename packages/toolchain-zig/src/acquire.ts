@@ -36,6 +36,7 @@ import { homedir } from "node:os";
 import { isAbsolute, join, resolve } from "node:path";
 import process from "node:process";
 import { promisify } from "node:util";
+import { downloadWithNode } from "./download.ts";
 import { verifyZigSignature, zigPublicKey } from "./minisign.ts";
 import { zigVersion } from "./pin.generated.ts";
 
@@ -47,7 +48,7 @@ interface AcquisitionOptions {
   readonly cacheDirectory: string;
   readonly host: string;
   readonly publicKey: string;
-  readonly fetch: typeof fetch;
+  readonly fetch?: typeof fetch;
   readonly report: (message: string) => void;
 }
 
@@ -97,12 +98,16 @@ async function isInstallation(directory: string): Promise<boolean> {
 }
 
 async function* download(
-  fetcher: typeof fetch,
+  fetcher: typeof fetch | undefined,
   url: string,
   limit: number,
   timeout: number,
 ): AsyncGenerator<Uint8Array<ArrayBuffer>> {
-  const response = await fetcher(url, { signal: AbortSignal.timeout(timeout) });
+  const signal = AbortSignal.timeout(timeout);
+  const response =
+    fetcher != null || process.versions.deno != null
+      ? await (fetcher ?? globalThis.fetch)(url, { signal })
+      : await downloadWithNode(url, signal);
   if (
     response.status !== 200 ||
     response.body == null ||
@@ -123,13 +128,16 @@ async function* download(
       yield result.value;
     }
   } finally {
-    await reader.cancel();
-    reader.releaseLock();
+    try {
+      await reader.cancel();
+    } finally {
+      reader.releaseLock();
+    }
   }
 }
 
 async function downloadText(
-  fetcher: typeof fetch,
+  fetcher: typeof fetch | undefined,
   url: string,
   limit: number,
 ): Promise<string> {
@@ -194,7 +202,7 @@ async function mirrorList(options: AcquisitionOptions): Promise<string[]> {
 }
 
 async function downloadArchive(
-  fetcher: typeof fetch,
+  fetcher: typeof fetch | undefined,
   url: string,
   path: string,
 ): Promise<Buffer> {
@@ -331,7 +339,6 @@ export async function resolveZigExecutable(
   }
   return acquireZig({
     cacheDirectory: userCache(),
-    fetch: globalThis.fetch,
     host: zigHost(),
     publicKey: zigPublicKey,
     report,
