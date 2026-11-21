@@ -1,6 +1,6 @@
 {
   "name": "@oseo/host",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Node.js and Deno host adapters for Oseo tooling.",
   "bugs": "https://github.com/dahlia/oseo/issues",
   "license": "GPL-3.0-or-later",

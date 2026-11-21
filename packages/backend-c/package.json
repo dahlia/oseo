@@ -1,6 +1,6 @@
 {
   "name": "@oseo/backend-c",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Deterministic C11 emission for Oseo backend input.",
   "bugs": "https://github.com/dahlia/oseo/issues",
   "license": "GPL-3.0-or-later AND MIT",

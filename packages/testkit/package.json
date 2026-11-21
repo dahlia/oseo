@@ -1,6 +1,6 @@
 {
   "name": "@oseo/testkit",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Cross-host and native fixture support for Oseo tests.",
   "bugs": "https://github.com/dahlia/oseo/issues",
   "license": "GPL-3.0-or-later",
