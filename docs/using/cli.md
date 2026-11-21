@@ -65,15 +65,15 @@ shell completion script with `oseo completion bash` (or
 | `--module`                   | Compile the source as an ECMAScript module   |
 | `--script SCRIPT`            | Evaluate a Script before the module entry    |
 | `--no-specialization`        | Compile only the generic native path         |
-| `--no-runtime-archive-reuse` | Rebuild the C runtime archive for this run   |
+| `--no-runtime-archive-reuse` | Rebuild the C runtime archive for this build |
 | `--target TARGET`            | Select an explicit native target             |
 | `--zig PATH`                 | Use the given Zig executable                 |
 | `--help`                     | Print help generated from the CLI grammar    |
 | `--version`                  | Print the lockstep Oseo package version      |
 
-`--dump-mir` and `--emit-c` belong only to `build` and are mutually
-exclusive. Their old root placements are parse errors. Text modes reject
-`--output`, `--target`, `--build-config`, and `--no-runtime-archive-reuse`.
+`--dump-mir` and `--emit-c` belong to `build` and are mutually exclusive.
+Text modes reject `--output`, `--target`, `--build-config`, `--zig`, and
+`--no-runtime-archive-reuse`.
 
 `--build-config checked|optimized` selects the native configuration. `run`
 defaults to `checked`; `build` defaults to `optimized`. Unknown options,
@@ -153,17 +153,17 @@ directory, links a native executable, and runs it. The example prints:
 Oseo forwards the native program's standard output, standard error, and exit
 status. It removes the temporary directory whether the run succeeds or fails.
 
-Native execution reuses a host-cached C runtime archive when the host and
-toolchain support that optimization. Use `--no-runtime-archive-reuse` to
-rebuild the archive deliberately, such as when investigating a suspected
-stale cache:
+Native builds through `oseo run` and `oseo build` reuse a host-cached C
+runtime archive when the host and toolchain support it. Use
+`--no-runtime-archive-reuse` to rebuild the archive deliberately, such as when
+investigating a suspected stale cache:
 
 ~~~~ sh
 oseo --no-runtime-archive-reuse add.ts
 ~~~~
 
-The option applies only to native execution. `--dump-mir` and `--emit-c`
-reject it because neither mode starts the native toolchain.
+`--dump-mir` and `--emit-c` reject the option because they stop before
+native compilation.
 
 Native execution selects `linux-x86_64-gnu` on Linux AMD64 and
 `macos-aarch64` on macOS AArch64. The default checked configuration requests
@@ -327,10 +327,11 @@ If the command reports that the source file could not be read, check the path
 and file permissions. The CLI resolves the path in the calling process's
 current working directory.
 
-If the native toolchain could not be started, run `mise install` in a
-repository checkout and confirm that `zig version` succeeds in the same shell.
-The `--dump-mir` and `--emit-c` modes can still isolate frontend or backend
-problems because they do not start the toolchain.
+If automatic Zig setup fails, check your network connection and whether
+`tar` supports XZ. To use an existing installation, check `zig version`
+and pass `--zig PATH`. In a repository checkout, `mise install` installs
+the pinned tools. You can still use `--dump-mir` or `--emit-c` to inspect
+compiler output without Zig.
 
 If Oseo reports `OSEO1001`, compare the source form with the
 [supported features](./features.md). A *.ts* filename does not imply

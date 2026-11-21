@@ -19,22 +19,19 @@
 
 import process from "node:process";
 
-import { message } from "@optique/core/message";
 import { runProgram } from "@optique/discover";
 import commands from "./commands.generated.ts";
 import { executeCliInvocation } from "./index.ts";
 import type { CliCommandContext } from "./options.ts";
 import { readCliVersion } from "./cli-assets.ts";
+import { cliMetadata, formatCliMessage } from "./program-metadata.ts";
 
 const version = await readCliVersion();
 await runProgram<CliCommandContext>({
   args: process.argv.slice(2),
   commands,
-  metadata: {
-    brief: message`Compile JavaScript source to a native executable.`,
-    name: "oseo",
-    version,
-  },
+  metadata: { ...cliMetadata, version },
+  messageFormatter: formatCliMessage,
   help: "both",
   completion: "both",
   hooks: {

@@ -31,12 +31,20 @@ function runBuiltCli(...args: readonly string[]) {
   return spawnSync(process.execPath, [cli, ...args], { encoding: "utf8" });
 }
 
-test("built CLI exposes root and build help in both forms", () => {
+test("built CLI exposes root and command help in both forms", () => {
   for (const [command, option] of [
     [["help"], ["--help"]],
     [
+      ["help", "run"],
+      ["run", "--help"],
+    ],
+    [
       ["help", "build"],
       ["build", "--help"],
+    ],
+    [
+      ["help", "completion"],
+      ["completion", "--help"],
     ],
   ] as const) {
     const result = runBuiltCli(...command);
@@ -46,8 +54,49 @@ test("built CLI exposes root and build help in both forms", () => {
     assert.equal(result.stderr, "");
     assert.equal(alternate.stderr, "");
     assert.equal(result.stdout, alternate.stdout);
-    assert.match(result.stdout, command.length === 1 ? /SOURCE/u : /--output/u);
+    if (command[1] === "completion") {
+      assert.match(result.stdout, /Examples:/u);
+      assert.match(result.stdout, /oseo completion bash/u);
+      assert.match(result.stdout, /oseo completion zsh/u);
+      assert.match(result.stdout, /oseo completion fish/u);
+      assert.match(result.stdout, /oseo completion pwsh/u);
+      assert.match(result.stdout, /oseo completion nu/u);
+    } else {
+      assert.match(
+        result.stdout,
+        command[1] === "build" ? /--output/u : /SOURCE/u,
+      );
+    }
+    assert.equal(
+      [...result.stdout.matchAll(/Copyright \(C\) 2026 Hong Minhee/gu)].length,
+      1,
+    );
+    assert.match(result.stdout, /ABSOLUTELY NO WARRANTY/u);
+    assert.ok(
+      result.stdout.includes("<https://www.gnu.org/licenses/gpl-3.0.html>"),
+    );
+    const footer = result.stdout.slice(result.stdout.indexOf("Copyright"));
+    assert.ok(
+      footer
+        .trimEnd()
+        .split("\n")
+        .every((line) => line.length <= 80),
+    );
+    if (command.length === 1) {
+      assert.match(result.stdout, /subset of JavaScript and TypeScript/u);
+      assert.match(result.stdout, /Hong Minhee <https:\/\/hongminhee\.org\/>/u);
+      assert.ok(
+        result.stdout.includes("<https://github.com/dahlia/oseo/issues>"),
+      );
+    }
   }
+});
+
+test("built CLI prints only its version for --version", () => {
+  const result = runBuiltCli("--version");
+  assert.equal(result.status, 0, result.stderr);
+  assert.equal(result.stderr, "");
+  assert.match(result.stdout, /^\d+\.\d+\.\d+\S*\n$/u);
 });
 
 test("built CLI generates and serves shell completion in both forms", () => {

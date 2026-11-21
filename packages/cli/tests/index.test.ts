@@ -30,6 +30,7 @@ import { describeTarget } from "@oseo/compiler";
 import type { FileFingerprint } from "@oseo/compiler";
 
 import {
+  parseCliRequest,
   PreparedNativeRuntimeMismatchError,
   prepareNativeRuntime,
   runCli,
@@ -38,6 +39,53 @@ import {
   verifyPreparedNativeRuntime,
 } from "../src/index.ts";
 import type { PreparedNativeRuntime } from "../src/index.ts";
+import { cliMetadata } from "../src/program-metadata.ts";
+
+test("CLI metadata uses structured URLs", () => {
+  for (const [metadata, href] of [
+    [cliMetadata.author, "https://hongminhee.org/"],
+    [cliMetadata.bugs, "https://github.com/dahlia/oseo/issues"],
+    [cliMetadata.footer, "https://www.gnu.org/licenses/gpl-3.0.html"],
+  ] as const) {
+    assert.ok(metadata);
+    assert.deepEqual(
+      metadata
+        .filter((term) => term.type === "url")
+        .map((term) => term.url.href),
+      [href],
+    );
+  }
+});
+
+test("embedded CLI renders the license notice in help", () => {
+  const version = "1.2.3";
+  for (const args of [["--help"], ["run", "--help"], ["build", "--help"]]) {
+    const parsed = parseCliRequest({ args, version });
+    assert.equal(parsed.kind, "result");
+    assert.equal(parsed.value.exitStatus, 0);
+    assert.equal(parsed.value.stderr, "");
+    const output = parsed.value.stdout;
+    assert.match(output, /Copyright \(C\) 2026 Hong Minhee/u);
+    assert.match(output, /ABSOLUTELY NO WARRANTY/u);
+    assert.match(output, /GNU GPL, version 3 or later/u);
+    assert.match(
+      output,
+      /<https:\/\/www\.gnu\.org\/licenses\/gpl-3\.0\.html>/u,
+    );
+    const footer = output.slice(output.indexOf("Copyright")).trimEnd();
+    assert.ok(footer.split("\n").every((line) => line.length <= 80));
+    if (args.length === 1) {
+      assert.match(output, /subset of JavaScript and TypeScript/u);
+      assert.match(output, /Hong Minhee <https:\/\/hongminhee\.org\/>/u);
+      assert.ok(output.includes("<https://github.com/dahlia/oseo/issues>"));
+    }
+  }
+
+  assert.deepEqual(parseCliRequest({ args: ["--version"], version }), {
+    kind: "result",
+    value: { exitStatus: 0, stdout: "1.2.3\n", stderr: "" },
+  });
+});
 
 test("prints deterministic MIR and C for accepted source", () => {
   const help = runCli({ args: ["--help"], version: "0.0.0" });

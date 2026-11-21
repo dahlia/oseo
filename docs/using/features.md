@@ -4,8 +4,11 @@ Supported features
 Oseo compiles source ahead of time. TypeScript annotations and JSDoc types
 can select specialized code paths, but they do not require a value to have
 the annotated type. If a runtime guard fails, execution continues in
-already-compiled generic code. Oseo does not type-check source, and it does
-not accept every TypeScript construct.
+already-compiled generic code. Oseo accepts erasable TypeScript syntax,
+including annotations, interfaces, type aliases, and type-only imports.
+Run a type checker separately for type diagnostics. Oseo rejects
+enums without `declare`, namespaces with runtime values, constructor
+parameter properties, and decorators.
 
 The measured profile includes primitives, objects, arrays, closures,
 exceptions, statically resolved module graphs, promises, asynchronous

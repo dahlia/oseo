@@ -171,3 +171,62 @@ test("publish only signed matching archives and reuse offline", async (t) => {
     /Cannot use --zig/iu,
   );
 });
+
+test("Zig releases rejected and over-limit response bodies", async (t) => {
+  const cacheDirectory = await mkdtemp(join(tmpdir(), "oseo-zig-read-test-"));
+  t.after(() => rm(cacheDirectory, { force: true, recursive: true }));
+  const broken = new ReadableStream<Uint8Array>({
+    pull: (controller) => controller.error(new Error("interrupted download")),
+  });
+  await assert.rejects(
+    acquireZig({
+      cacheDirectory,
+      host,
+      publicKey,
+      report: assert.fail,
+      fetch: async () => new Response(broken),
+    }),
+    /interrupted download/u,
+  );
+  assert.equal(broken.locked, false);
+
+  let serverCancelled = false;
+  const serverError = new ReadableStream<Uint8Array>({
+    cancel: () => {
+      serverCancelled = true;
+    },
+  });
+  await assert.rejects(
+    acquireZig({
+      cacheDirectory,
+      host,
+      publicKey,
+      report: assert.fail,
+      fetch: async () => new Response(serverError, { status: 503 }),
+    }),
+    /Expected an HTTPS download \(HTTP 503\)/u,
+  );
+  assert.equal(serverCancelled, true);
+  assert.equal(serverError.locked, false);
+
+  let cancelled = false;
+  const oversized = new ReadableStream<Uint8Array>({
+    start: (controller) => controller.enqueue(new Uint8Array(64 * 1024 + 1)),
+    cancel: () => {
+      cancelled = true;
+    },
+  });
+  await assert.rejects(
+    acquireZig({
+      cacheDirectory,
+      host,
+      publicKey,
+      report: assert.fail,
+      fetch: async () => new Response(oversized),
+    }),
+    /Download exceeded its size limit/u,
+  );
+  assert.equal(cancelled, true);
+  assert.equal(oversized.locked, false);
+  assert.deepEqual(await readdir(join(cacheDirectory, zigVersion)), []);
+});

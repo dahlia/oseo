@@ -41,9 +41,9 @@ Use the API
 -----------
 
 To import the API in a Node.js project, install the dependency locally with
-`npm install @oseo/cli`. In a Deno project, use `deno add jsr:@oseo/cli`.
-Both expose the API at `@oseo/cli`, but only the npm package installs the
-`oseo` executable.
+`npm install @oseo/cli`. With Deno 2.9 or later, use
+`deno add jsr:@oseo/cli`. Both routes expose the API at `@oseo/cli`.
+The npm package also provides the `oseo` command.
 
 `parseCliRequest()` parses the same arguments as the executable without reading
 source files or starting processes. It returns a typed invocation or a result

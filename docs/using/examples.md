@@ -32,22 +32,22 @@ without retaining the executable, use `oseo run hello.ts`. The
 Read standard input and program arguments
 -----------------------------------------
 
-Open the [numeric demo] on GitHub and save the raw file as
-*numeric-hinted.ts*. It reads a JSON array of pairs from standard input
-and adds each pair. The argument `1` specifies one pass through the array.
+Open the [line matcher] on GitHub and save the raw file as *line-match.ts*.
+Build it, then pass a regular expression as the first argument and pipe
+two lines into standard input. The `DEMO_LABEL` environment variable
+sets the label in the output.
 
 ~~~~ sh
-oseo build numeric-hinted.ts -o numeric
-printf '[[20,22]]\n' | ./numeric 1
+oseo build line-match.ts -o line-match
+printf '서울\n도쿄\n' | DEMO_LABEL=travel ./line-match '도쿄'
 ~~~~
 
 ~~~~ json
-{"iterations":1,"results":[42]}
+{"label":"travel","lines":2,"matches":[{"line":2,"text":"도쿄"}]}
 ~~~~
 
-The [examples directory] also contains variants of the numeric demo with no
-annotations or with deliberately wrong annotations, a line matcher, and a
-small ray tracer.
+The [examples directory] also contains a small ray tracer and a numeric
+demo with annotated, unannotated, and deliberately misannotated variants.
 
-[numeric demo]: ../../examples/numeric-hinted.ts
+[line matcher]: ../../examples/line-match.ts
 [examples directory]: ../../examples/
