@@ -17,11 +17,15 @@ hero:
 ---
 
 Oseo is under active development. Start with the
-[installation guide](./using/install.md), or see the
-[language and host boundaries](./using/features.md) before trying it on
-your own code.
+[installation guide](./using/install.md) and
+[compile your first program](./using/examples.md). Check the
+[language and host boundaries](./using/features.md) before trying your own code.
+
+Report bugs in [GitHub issues][issues]. To report a vulnerability, follow
+the [private reporting instructions](../SECURITY.md#reporting-a-vulnerability).
 
 [Oseo logo] by Lisa Yu (劉俐思), licensed under [CC BY-SA 4.0].
 
+[issues]: https://github.com/dahlia/oseo/issues
 [Oseo logo]: ../artwork/README.md
 [CC BY-SA 4.0]: https://creativecommons.org/licenses/by-sa/4.0/

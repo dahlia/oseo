@@ -77,12 +77,12 @@ import {
   ecma262UnicodePropertySet,
 } from "@oseo/unicode";
 import { runParser } from "@optique/core/facade";
-import { message } from "@optique/core/message";
 import type { Mode, Parser } from "@optique/core/parser";
 import { createProgramParser } from "@optique/discover";
 import commands from "./commands.generated.ts";
 import { defineProgram } from "@optique/core/program";
 import type { CliInvocation } from "./options.ts";
+import { cliMetadata } from "./program-metadata.ts";
 
 function isSynchronousParser<T, State>(
   parser: Parser<Mode, T, State>,
@@ -96,10 +96,7 @@ function createCliProgram() {
     throw new Error("Embedded CLI parsing requires synchronous parsers.");
   }
   return defineProgram({
-    metadata: {
-      brief: message`Compile JavaScript source to a native executable.`,
-      name: "oseo",
-    },
+    metadata: cliMetadata,
     parser,
   });
 }

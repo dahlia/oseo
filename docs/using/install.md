@@ -4,8 +4,9 @@ Installation
 Install the CLI
 ---------------
 
-Choose one way to install the latest stable release. The CLI supports
-Linux x86\_64 (GNU) and macOS on Apple Silicon.
+The CLI supports Linux x86\_64 (GNU) and macOS on Apple Silicon. Install it
+with one of the following commands or download a standalone archive from
+[GitHub Releases].
 
 ::: code-group
 
@@ -41,16 +42,19 @@ oseo --version
 ~~~~
 
 On the first native build, the CLI downloads and verifies a pinned Zig
-toolchain. Later builds can reuse it offline. To use an existing Zig
-installation, pass `--zig PATH` to `oseo build` or `oseo run`. See the
-[CLI reference](./cli.md#run-the-cli) for toolchain requirements and
-[a first example](./examples.md#build-and-run-the-example) to compile a program.
+toolchain. Automatic setup needs network access and `tar` with XZ support.
+Later builds can reuse the verified toolchain offline. To use an existing
+Zig installation, pass `--zig PATH` to `oseo build` or `oseo run`.
+Follow the [first example](./examples.md#build-and-run-the-example) to
+compile a program.
 
-The [JSR packages] provide modules for a JavaScript host such as Deno,
-not a standalone CLI.
+For use as a library, install the [JSR packages] in Deno 2.9 or later.
+For example, `deno add jsr:@oseo/cli` adds the CLI's JavaScript API to a
+Deno project.
 
 <!-- OSEO_STABLE_QUICKSTART -->
 
+[GitHub Releases]: https://github.com/dahlia/oseo/releases
 [mise]: https://mise.jdx.dev/
 [JSR packages]: https://jsr.io/@oseo
 

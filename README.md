@@ -28,33 +28,27 @@ No interpreter, no JIT, no deoptimization.
 Try Oseo
 --------
 
-From a checkout on Linux AMD64 or macOS AArch64, run this from the
-repository root with [mise] installed:
+Download the standalone CLI archive for Linux AMD64 or macOS AArch64
+from [GitHub Releases]. Extract it into a working directory and save
+[*line-match.ts*](./examples/line-match.ts) there from the raw source.
+Then build the TypeScript program and pass it a pattern and two input lines.
 
 ~~~~ sh
-mise install
-mise run build
-mkdir -p artifacts
-mise run oseo build examples/numeric-hinted.ts \
-  -o artifacts/numeric
-printf '[[20,22]]\n' | ./artifacts/numeric 1
+./oseo build line-match.ts -o line-match
+printf '서울\n도쿄\n' | DEMO_LABEL=travel ./line-match '도쿄'
 ~~~~
 
-The retained executable prints `{"iterations":1,"results":[42]}`. Building
-from a checkout uses Node.js and Zig; the compiled program does not need
-either to run.
+~~~~ json
+{"label":"travel","lines":2,"matches":[{"line":2,"text":"도쿄"}]}
+~~~~
 
-When the first release is published, download the standalone CLI archive
-for your platform from [GitHub Releases], extract it, and use the included
-`oseo` in place of `mise run oseo`, using its
-path if it is not on `PATH`. The standalone CLI is planned to run without a
-separately installed Node.js. It still needs Zig to compile native programs.
-See the [installation guide](./docs/using/install.md) for the planned release
-channels and the [development guide](./docs/development/index.md) for the
-checkout setup.
+The standalone CLI includes Node.js and acquires pinned Zig on the first
+native build. The compiled program runs without Node.js or Zig.
+See the [installation guide](./docs/using/install.md) for npm, pnpm, and
+mise installs, or [build the CLI from a checkout].
 
-[mise]: https://mise.jdx.dev/
 [GitHub Releases]: https://github.com/dahlia/oseo/releases
+[build the CLI from a checkout]: ./docs/using/install.md#build-from-a-checkout
 
 
 How it works
@@ -113,6 +107,11 @@ Documentation
  -  [*CONTRIBUTING.md*](./CONTRIBUTING.md) covers the development environment,
     package boundaries, and coding policy.
 
+Report bugs in [GitHub issues]. Report security vulnerabilities privately
+using the instructions in [*SECURITY.md*](./SECURITY.md).
+
+[GitHub issues]: https://github.com/dahlia/oseo/issues
+
 
 Getting started
 ---------------
@@ -133,6 +132,8 @@ mise run test
 described in a design or plan document may not exist until its implementation
 lands.
 
+[mise]: https://mise.jdx.dev/
+
 
 About the name
 --------------
@@ -151,9 +152,10 @@ License
 
 Oseo-authored material is licensed under the GNU General Public License,
 version 3 or (at your option) any later version, unless otherwise noted.
-See [*LICENSE*](./LICENSE). The Oseo-authored runtime and support incorporated
-into compiled programs are under the [MIT license](./MIT-LICENSE.txt). That
-license does not change the terms of your own code; retain the MIT notice
-and any applicable third-party notices when distributing the output.
-The [license inventory](./docs/runtime-support-surface.md) identifies those
-parts and their notices.
+This includes the compiler and CLI. See [*LICENSE*](./LICENSE). The
+Oseo-authored runtime and support incorporated into compiled programs are
+under the [MIT license](./MIT-LICENSE.txt). Your own code keeps its terms.
+If you distribute an executable, include the MIT and Unicode notices
+and any applicable third-party notices. See the
+[license inventory](./docs/runtime-support-surface.md#output-and-registry-notices)
+for the notice files and the license terms of each part.
