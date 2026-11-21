@@ -1,6 +1,6 @@
 {
   "name": "@oseo/compiler",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Host-neutral contracts for the Oseo compiler.",
   "bugs": "https://github.com/dahlia/oseo/issues",
   "license": "GPL-3.0-or-later",

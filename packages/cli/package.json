@@ -1,6 +1,6 @@
 {
   "name": "@oseo/cli",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Composition root and command-line contract for Oseo.",
   "bugs": "https://github.com/dahlia/oseo/issues",
   "license": "GPL-3.0-or-later",

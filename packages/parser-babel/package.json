@@ -1,6 +1,6 @@
 {
   "name": "@oseo/parser-babel",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Babel source frontend adapter for Oseo.",
   "bugs": "https://github.com/dahlia/oseo/issues",
   "license": "GPL-3.0-or-later",
