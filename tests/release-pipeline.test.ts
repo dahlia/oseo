@@ -189,6 +189,39 @@ test("JSR stages one license ID and preserves the component notices", () => {
   }
 });
 
+test("JSR stages the CLI without its excluded npm-only notice", () => {
+  const root = fileURLToPath(new URL("../", import.meta.url));
+  const work = mkdtempSync(join(tmpdir(), "oseo-stage-cli-test-"));
+  try {
+    const source = join(root, "packages", "cli");
+    const destination = join(work, "jsr");
+    const staged = join(destination, "cli");
+    const notice = "ROLLDOWN-LICENSE.txt";
+    const original = readFileSync(join(source, notice));
+    const npm = parsedObject(
+      JSON.parse(readFileSync(join(source, "package.json"), "utf8")),
+      "CLI npm config",
+    );
+    stageJsr(
+      root,
+      destination,
+      [{ directory: "cli", name: "@oseo/cli" }],
+      "0.1.0-canary.123+abcdef0",
+    );
+    throws(() => readFileSync(join(staged, notice)), { code: "ENOENT" });
+    deepStrictEqual(readFileSync(join(source, notice)), original);
+    equal(Array.isArray(npm.files) && npm.files.includes(notice), true);
+    for (const file of ["LICENSE", "README.md"]) {
+      deepStrictEqual(
+        readFileSync(join(staged, file)),
+        readFileSync(join(source, file)),
+      );
+    }
+  } finally {
+    rmSync(work, { force: true, recursive: true });
+  }
+});
+
 test("JSR rejects unmapped expressions and accepts an SPDX alias", () => {
   const root = mkdtempSync(join(tmpdir(), "oseo-stage-test-"));
   try {
