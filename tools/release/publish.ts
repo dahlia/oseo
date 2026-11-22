@@ -349,7 +349,7 @@ async function githubRelease(
         "--draft",
         "--verify-tag",
         "--title",
-        version,
+        `Oseo ${version}`,
         "--notes-file",
         join(directory, "notes.md"),
       ]);
