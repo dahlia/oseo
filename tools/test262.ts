@@ -2578,47 +2578,54 @@ export function stripReviewedHarnessNotice(
   return directive + source.slice(body);
 }
 
+const readHarness = async (path: string): Promise<string> =>
+  stripReviewedHarnessNotice(basename(path), await readFile(path, "utf8"));
+
 async function readReviewedHarnesses(): Promise<Test262Harnesses> {
-  const read = async (path: string): Promise<string> =>
-    stripReviewedHarnessNotice(basename(path), await readFile(path, "utf8"));
   return {
-    base: await read(baseHarnessPath),
-    done: await read(doneHarnessPath),
+    base: await readHarness(baseHarnessPath),
+    done: await readHarness(doneHarnessPath),
     includes: new Map([
-      ["asyncHelpers.js", await read(asyncHelpersHarnessPath)],
-      ["atomicsHelper.js", await read(atomicsHelperHarnessPath)],
-      ["byteConversionValues.js", await read(byteConversionHarnessPath)],
-      ["assertRelativeDateMs.js", await read(assertRelativeDateHarnessPath)],
-      ["compareArray.js", await read(compareArrayHarnessPath)],
-      ["dateConstants.js", await read(dateConstantsHarnessPath)],
-      ["compareIterator.js", await read(compareIteratorHarnessPath)],
-      ["decimalToHexString.js", await read(decimalToHexStringHarnessPath)],
-      ["deepEqual.js", await read(deepEqualHarnessPath)],
-      ["detachArrayBuffer.js", await read(detachArrayBufferHarnessPath)],
-      ["fnGlobalObject.js", await read(fnGlobalObjectHarnessPath)],
-      ["isConstructor.js", await read(isConstructorHarnessPath)],
-      ["iteratorZipUtils.js", await read(iteratorZipUtilsHarnessPath)],
-      ["nans.js", await read(nansHarnessPath)],
+      ["asyncHelpers.js", await readHarness(asyncHelpersHarnessPath)],
+      ["atomicsHelper.js", await readHarness(atomicsHelperHarnessPath)],
+      ["byteConversionValues.js", await readHarness(byteConversionHarnessPath)],
+      [
+        "assertRelativeDateMs.js",
+        await readHarness(assertRelativeDateHarnessPath),
+      ],
+      ["compareArray.js", await readHarness(compareArrayHarnessPath)],
+      ["dateConstants.js", await readHarness(dateConstantsHarnessPath)],
+      ["compareIterator.js", await readHarness(compareIteratorHarnessPath)],
+      [
+        "decimalToHexString.js",
+        await readHarness(decimalToHexStringHarnessPath),
+      ],
+      ["deepEqual.js", await readHarness(deepEqualHarnessPath)],
+      ["detachArrayBuffer.js", await readHarness(detachArrayBufferHarnessPath)],
+      ["fnGlobalObject.js", await readHarness(fnGlobalObjectHarnessPath)],
+      ["isConstructor.js", await readHarness(isConstructorHarnessPath)],
+      ["iteratorZipUtils.js", await readHarness(iteratorZipUtilsHarnessPath)],
+      ["nans.js", await readHarness(nansHarnessPath)],
       [
         "nativeFunctionMatcher.js",
-        await read(nativeFunctionMatcherHarnessPath),
+        await readHarness(nativeFunctionMatcherHarnessPath),
       ],
-      ["nativeErrors.js", await read(nativeErrorsHarnessPath)],
-      ["propertyHelper.js", await read(propertyHarnessPath)],
-      ["promiseHelper.js", await read(promiseHarnessPath)],
-      ["proxyTrapsHelper.js", await read(proxyTrapsHarnessPath)],
-      ["regExpUtils.js", await read(regexpUtilsHarnessPath)],
+      ["nativeErrors.js", await readHarness(nativeErrorsHarnessPath)],
+      ["propertyHelper.js", await readHarness(propertyHarnessPath)],
+      ["promiseHelper.js", await readHarness(promiseHarnessPath)],
+      ["proxyTrapsHelper.js", await readHarness(proxyTrapsHarnessPath)],
+      ["regExpUtils.js", await readHarness(regexpUtilsHarnessPath)],
       [
         "resizableArrayBufferUtils.js",
-        await read(resizableArrayBufferUtilsHarnessPath),
+        await readHarness(resizableArrayBufferUtilsHarnessPath),
       ],
-      ["tcoHelper.js", await read(tcoHelperHarnessPath)],
-      ["testAtomics.js", await read(testAtomicsHarnessPath)],
-      ["temporalHelpers.js", await read(temporalHelpersHarnessPath)],
-      ["testTypedArray.js", await read(testTypedArrayHarnessPath)],
+      ["tcoHelper.js", await readHarness(tcoHelperHarnessPath)],
+      ["testAtomics.js", await readHarness(testAtomicsHarnessPath)],
+      ["temporalHelpers.js", await readHarness(temporalHelpersHarnessPath)],
+      ["testTypedArray.js", await readHarness(testTypedArrayHarnessPath)],
       [
         "wellKnownIntrinsicObjects.js",
-        await read(wellKnownIntrinsicObjectsHarnessPath),
+        await readHarness(wellKnownIntrinsicObjectsHarnessPath),
       ],
     ]),
   };

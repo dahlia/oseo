@@ -180,9 +180,10 @@ test("treats registered and featureless core cases as edition members", () => {
   );
 });
 
+const classify = (path: string, features: readonly string[]) =>
+  classifyInventoryEntry(path, features, registry, policy);
+
 test("includes Annex B except IsHTMLDDA and claimed later features", () => {
-  const classify = (path: string, features: readonly string[]) =>
-    classifyInventoryEntry(path, features, registry, policy);
   assert.deepEqual(classify("test/annexB/language/comments/a.js", []), {
     basis: "edition-2026:annex-b",
     boundary: "included",
@@ -273,9 +274,10 @@ test("rejects a policy that claims an unknown or misplaced section", () => {
   );
 });
 
+const inM5 = (path: string, features: readonly string[]) =>
+  includedInM5Inventory(path, features, registry, m5Policy);
+
 test("the frozen M5 rule excludes every ADR 0032 addition", () => {
-  const inM5 = (path: string, features: readonly string[]) =>
-    includedInM5Inventory(path, features, registry, m5Policy);
   assert.equal(inM5("test/language/core.js", ["class"]), true);
   assert.equal(inM5("test/annexB/language/comments/a.js", []), false);
   assert.equal(

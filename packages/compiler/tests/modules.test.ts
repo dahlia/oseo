@@ -192,11 +192,6 @@ test("deduplicates module instances across cycles and aliases", async () => {
 test("keeps dependency order and canonical parser identity", async () => {
   const seenSourceIds: string[] = [];
   const seenReferrers: (string | undefined)[] = [];
-  const specifier = (value: string, start: number) => ({
-    byteRange: { end: start + value.length, start },
-    range: moduleRange,
-    value,
-  });
   const result = await buildModuleGraph(
     {
       parseModule(input) {
@@ -214,7 +209,7 @@ test("keeps dependency order and canonical parser identity", async () => {
                       importedName: "value",
                       kind: "indirect",
                       range: moduleRange,
-                      specifier: specifier("./first.js", 5),
+                      specifier: graphSpecifier("./first.js", 5),
                     },
                   ],
                   imports: [
@@ -223,7 +218,7 @@ test("keeps dependency order and canonical parser identity", async () => {
                       importedName: undefined,
                       localName: undefined,
                       range: moduleRange,
-                      specifier: specifier("./second.js", 20),
+                      specifier: graphSpecifier("./second.js", 20),
                     },
                   ],
                 }
@@ -407,31 +402,32 @@ test("links live cells, namespaces, cycles, and evaluation order", () => {
   ]);
 });
 
+const cyclicModuleNode = (
+  canonicalId: string,
+  dependencies: readonly {
+    readonly canonicalId: string;
+    readonly specifier: SyntaxModuleSpecifier;
+  }[],
+) => ({
+  canonicalId,
+  dependencies,
+  resolutions: dependencies,
+  sourceHash: canonicalId,
+  syntax: testModule(canonicalId, ""),
+});
+
 test("preserves dependency order within a cyclic component", () => {
   const fromA = graphSpecifier("./a.js", 0);
   const fromB = graphSpecifier("./b.js", 0);
   const fromC = graphSpecifier("./c.js", 10);
-  const node = (
-    canonicalId: string,
-    dependencies: readonly {
-      readonly canonicalId: string;
-      readonly specifier: SyntaxModuleSpecifier;
-    }[],
-  ) => ({
-    canonicalId,
-    dependencies,
-    resolutions: dependencies,
-    sourceHash: canonicalId,
-    syntax: testModule(canonicalId, ""),
-  });
-  const a = node("file:///a.js", [
+  const a = cyclicModuleNode("file:///a.js", [
     { canonicalId: "file:///b.js", specifier: fromB },
     { canonicalId: "file:///c.js", specifier: fromC },
   ]);
-  const b = node("file:///b.js", [
+  const b = cyclicModuleNode("file:///b.js", [
     { canonicalId: "file:///a.js", specifier: fromA },
   ]);
-  const c = node("file:///c.js", [
+  const c = cyclicModuleNode("file:///c.js", [
     { canonicalId: "file:///a.js", specifier: fromA },
   ]);
   const result = linkModuleGraph({
@@ -1016,26 +1012,27 @@ test("suspends await in object-rest assignment member targets", () => {
   assert.ok(result.mir.functions.some((value) => value.asyncFunction));
 });
 
+const moduleFunctionReturning = (value: number) => ({
+  body: [
+    {
+      expression: { kind: "number" as const, range, value },
+      kind: "return" as const,
+      range,
+    },
+  ],
+  kind: "function" as const,
+  name: "f",
+  parameters: [],
+  range,
+  returnHints: [],
+});
+
 test("rejects duplicate top-level function declarations in a module", () => {
   // A module's top-level function declarations are LexicallyDeclaredNames,
   // unlike a Script's or a FunctionBody's own top level, which treats them
   // as hoistable, var-like declarations any later declaration of the same
   // name freely replaces.
   const canonicalId = "file:///duplicate-function.js";
-  const declaration = (value: number) => ({
-    body: [
-      {
-        expression: { kind: "number" as const, range, value },
-        kind: "return" as const,
-        range,
-      },
-    ],
-    kind: "function" as const,
-    name: "f",
-    parameters: [],
-    range,
-    returnHints: [],
-  });
   const module = {
     canonicalId,
     dependencies: [],
@@ -1043,7 +1040,7 @@ test("rejects duplicate top-level function declarations in a module", () => {
     sourceHash: "duplicate-function",
     syntax: {
       ...testModule(canonicalId, ""),
-      body: [declaration(1), declaration(2)],
+      body: [moduleFunctionReturning(1), moduleFunctionReturning(2)],
     },
   };
   const result = compileModuleGraph({

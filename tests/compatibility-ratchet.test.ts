@@ -246,18 +246,19 @@ function inventoryText(paths: readonly string[]): string {
   ].join("\n");
 }
 
+const withInventory = (paths: readonly string[]) =>
+  createCompatibilitySnapshot(
+    subset(
+      ["test/language/statements/a.js"],
+      new Map([["test/language/statements/a.js", "pass"]]),
+    ),
+    results([["test/language/statements/a.js", "pass"]]),
+    [],
+    [],
+    inventoryText(paths),
+  );
+
 test("rejects a path leaving the inventory without an override path", () => {
-  const withInventory = (paths: readonly string[]) =>
-    createCompatibilitySnapshot(
-      subset(
-        ["test/language/statements/a.js"],
-        new Map([["test/language/statements/a.js", "pass"]]),
-      ),
-      results([["test/language/statements/a.js", "pass"]]),
-      [],
-      [],
-      inventoryText(paths),
-    );
   const grown = compareCompatibility(
     withInventory(["test/language/statements/a.js"]),
     withInventory([

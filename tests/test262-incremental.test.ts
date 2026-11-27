@@ -541,10 +541,11 @@ function manifestOf(
   };
 }
 
+const passEntry = (path: string): ReviewedTest262Entry =>
+  entry(path, { expectedClassification: "pass" });
+
 test("merging scoped observations enforces the selection algebra", () => {
   const records = allPaths.map((path) => passingRecord(path));
-  const passEntry = (path: string): ReviewedTest262Entry =>
-    entry(path, { expectedClassification: "pass" });
   const reviewed = subsetOf(allPaths.map((path) => passEntry(path)));
   const [kept, replaced] = records;
   assert.ok(kept && replaced);

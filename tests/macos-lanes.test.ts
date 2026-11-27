@@ -1692,35 +1692,45 @@ test("faster native support work uses additional capacity", () => {
   }
 });
 
+function selectLaneRunners(
+  runners: readonly FakeRunner[],
+  laneCount: string,
+): Promise<readonly string[]> {
+  return runnerSelections(
+    { ...twoLaneEnv, OSEO_SELFHOSTED_LANES: laneCount },
+    fakeActionsApi(() => ({ runners })),
+    noSleep,
+  );
+}
+
 test("availability decides the second machine's lanes too", async () => {
-  const select = (
-    runners: readonly FakeRunner[],
-    changes: Readonly<Record<string, string>> = {},
-  ) =>
-    runnerSelections(
-      { ...twoLaneEnv, OSEO_SELFHOSTED_LANES: "4", ...changes },
-      fakeActionsApi(() => ({ runners })),
-      noSleep,
-    );
   const mac3 = '["self-hosted","macOS","ARM64","oseo-mac-3"]';
   const mac4 = '["self-hosted","macOS","ARM64","oseo-mac-4"]';
-  assert.deepEqual(await select(fourRunners), [mac1, mac2, mac3, mac4]);
+  assert.deepEqual(await selectLaneRunners(fourRunners, "4"), [
+    mac1,
+    mac2,
+    mac3,
+    mac4,
+  ]);
   // One unready runner on the second machine sends only its own lane to
   // hosted, including the other lane of the same machine.
   const [one, two, three, four] = fourRunners;
   assert.deepEqual(
-    await select([one!, two!, { ...three!, status: "offline" }, four!]),
+    await selectLaneRunners(
+      [one!, two!, { ...three!, status: "offline" }, four!],
+      "4",
+    ),
     [mac1, mac2, hostedSelection, mac4],
   );
   // A machine that is not registered at all falls back on both its lanes.
-  assert.deepEqual(await select([one!, two!]), [
+  assert.deepEqual(await selectLaneRunners([one!, two!], "4"), [
     mac1,
     mac2,
     hostedSelection,
     hostedSelection,
   ]);
   // Three accepted lanes leave the second machine with one runner.
-  assert.deepEqual(await select(fourRunners, { OSEO_SELFHOSTED_LANES: "3" }), [
+  assert.deepEqual(await selectLaneRunners(fourRunners, "3"), [
     mac1,
     mac2,
     mac3,
@@ -3282,19 +3292,13 @@ test(
 );
 
 test("rented Mac lanes select independently and reject ambiguity", async () => {
-  const select = (runners: readonly FakeRunner[]) =>
-    runnerSelections(
-      { ...twoLaneEnv, OSEO_SELFHOSTED_LANES: "8" },
-      fakeActionsApi(() => ({ runners })),
-      noSleep,
-    );
   const expected = selfHostedLaneLabels.map((label) =>
     JSON.stringify(["self-hosted", "macOS", "ARM64", label]),
   );
-  assert.deepEqual(await select(allRunners), expected);
+  assert.deepEqual(await selectLaneRunners(allRunners, "8"), expected);
   // Landing before registration keeps the six owned lanes and falls back
   // only the rented pair. No API access occurs in these fake responses.
-  assert.deepEqual(await select(allRunners.slice(0, 6)), [
+  assert.deepEqual(await selectLaneRunners(allRunners.slice(0, 6), "8"), [
     ...expected.slice(0, 6),
     hostedSelection,
     hostedSelection,
@@ -3317,7 +3321,7 @@ test("rented Mac lanes select independently and reject ambiguity", async () => {
         at === index ? { ...runner, ...change } : runner,
       );
       checks.push(
-        select(runners).then((selected) => {
+        selectLaneRunners(runners, "8").then((selected) => {
           assert.equal(selected[index], hostedSelection);
           const other = index === 6 ? 7 : 6;
           const shared = change.labels?.some(
@@ -3332,7 +3336,10 @@ test("rented Mac lanes select independently and reject ambiguity", async () => {
     }
   }
   await Promise.all(checks);
-  const duplicates = await select([...allRunners, allRunners[6]!]);
+  const duplicates = await selectLaneRunners(
+    [...allRunners, allRunners[6]!],
+    "8",
+  );
   assert.equal(duplicates[6], hostedSelection);
   assert.equal(duplicates[7], expected[7]);
 });

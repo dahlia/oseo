@@ -754,16 +754,18 @@ function deliveredPaths(node: Batch11PrerequisiteNode): readonly string[] {
   return [...new Set(node.delivers.match(/test\/[^\s,]+\.js/gu))].toSorted();
 }
 
+function readNode(id: string): Batch11PrerequisiteNode {
+  // SAFETY: the contract tests first validate the graph nodes' structure.
+  return parseYaml(
+    readFileSync(
+      new URL(`../${m5cWorkGraphNodeDirectory}/${id}.yaml`, import.meta.url),
+      "utf8",
+    ),
+  ) as Batch11PrerequisiteNode;
+}
+
 test("class accessor prerequisites retain their bounded paths", () => {
   validateCurrentM5cWorkGraph();
-  const readNode = (id: string): Batch11PrerequisiteNode =>
-    // SAFETY: graph validation checked each parsed node's shape.
-    parseYaml(
-      readFileSync(
-        new URL(`../${m5cWorkGraphNodeDirectory}/${id}.yaml`, import.meta.url),
-        "utf8",
-      ),
-    ) as Batch11PrerequisiteNode;
   const classifierId = "annexb-legacy-lookup-dependency-classification";
   const coverageId = "class-private-accessor-lookup-coverage-remediation";
   const earlyErrorId = "class-duplicate-constructor-early-error";
@@ -804,14 +806,6 @@ test("class accessor prerequisites retain their bounded paths", () => {
 
 test("the with optional-call receiver defect stays on the exit path", () => {
   validateCurrentM5cWorkGraph();
-  const readNode = (id: string): NodeContract =>
-    // SAFETY: graph validation checked each parsed node's shape.
-    parseYaml(
-      readFileSync(
-        new URL(`../${m5cWorkGraphNodeDirectory}/${id}.yaml`, import.meta.url),
-        "utf8",
-      ),
-    ) as NodeContract;
   const remediationId = "with-optional-call-receiver";
   const remediation = readNode(remediationId);
   // GetBindingValue order comes from eval-intrinsic-value, and strict
@@ -856,14 +850,6 @@ test("the with optional-call receiver defect stays on the exit path", () => {
 
 test("computed member key order owns its Reference contract", () => {
   validateCurrentM5cWorkGraph();
-  const readNode = (id: string): Batch11PrerequisiteNode =>
-    // SAFETY: graph validation checked each parsed node's shape.
-    parseYaml(
-      readFileSync(
-        new URL(`../${m5cWorkGraphNodeDirectory}/${id}.yaml`, import.meta.url),
-        "utf8",
-      ),
-    ) as Batch11PrerequisiteNode;
   const ownerId = "computed-member-reference-key-order";
   const compoundId = "compound-member-assignment-key-order";
   const owner = readNode(ownerId);

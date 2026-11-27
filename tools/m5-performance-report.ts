@@ -764,16 +764,17 @@ function command(file: string, args: readonly string[]): string | null {
   return result.status === 0 ? result.stdout.trim() : null;
 }
 
+const readGit = (args: readonly string[]): string =>
+  execFileSync("git", ["--no-optional-locks", ...args], {
+    cwd: repositoryRoot,
+    encoding: "utf8",
+  }).trim();
+
 function describeHost(toolchain: NativeToolchain): M5PerformanceHost {
-  const git = (args: readonly string[]): string =>
-    execFileSync("git", ["--no-optional-locks", ...args], {
-      cwd: repositoryRoot,
-      encoding: "utf8",
-    }).trim();
   return {
     architecture: arch(),
-    cleanTree: git(["status", "--porcelain"]) === "",
-    commit: git(["rev-parse", "HEAD"]),
+    cleanTree: readGit(["status", "--porcelain"]) === "",
+    commit: readGit(["rev-parse", "HEAD"]),
     cpuModel: cpus()[0]?.model.trim() ?? "unknown",
     logicalCpus: cpus().length,
     memoryBytes: totalmem(),

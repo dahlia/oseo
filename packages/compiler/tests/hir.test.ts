@@ -1475,21 +1475,22 @@ test("hoists a switch clause function into one CaseBlock instantiation", () => {
   assert.equal(statement.cases[0]?.body.length, 0);
 });
 
+const emptySwitchFunction = (functionKind: "generator" | "ordinary") => ({
+  body: [],
+  functionKind,
+  kind: "function" as const,
+  name: "f",
+  parameters: [],
+  range,
+  returnHints: [],
+});
+
 test("admits duplicate switch functions only as Annex B allows", () => {
   // Annex B.3.2.5 exempts a duplicate LexicallyDeclaredNames entry from
   // a CaseBlock's early error only in non-strict code and only when
   // every declaration of the name is an ordinary function declaration.
   // Every other duplicate stays an early error, unlike a Script or
   // FunctionBody's own unconditional top-level exemption.
-  const declaration = (functionKind: "generator" | "ordinary") => ({
-    body: [],
-    functionKind,
-    kind: "function" as const,
-    name: "f",
-    parameters: [],
-    range,
-    returnHints: [],
-  });
   for (const strict of [false, true]) {
     for (const kinds of [
       ["ordinary", "ordinary"],
@@ -1500,12 +1501,12 @@ test("admits duplicate switch functions only as Annex B allows", () => {
           {
             cases: [
               {
-                body: [declaration(kinds[0])],
+                body: [emptySwitchFunction(kinds[0])],
                 range,
                 test: { kind: "number", range, value: 1 },
               },
               {
-                body: [declaration(kinds[1])],
+                body: [emptySwitchFunction(kinds[1])],
                 range,
                 test: { kind: "number", range, value: 2 },
               },
@@ -1538,36 +1539,40 @@ test("admits duplicate switch functions only as Annex B allows", () => {
   }
 });
 
+const topLevelFunctionReturning = (
+  functionKind: "generator" | "ordinary",
+  value: number,
+) => ({
+  body: [
+    {
+      expression: { kind: "number" as const, range, value },
+      kind: "return" as const,
+      range,
+    },
+  ],
+  functionKind,
+  kind: "function" as const,
+  name: "f",
+  parameters: [],
+  range,
+  returnHints: [],
+});
+
 test("admits a top-level function redeclaration of any kind", () => {
   // A Script or FunctionBody's top-level function declaration is a
   // hoistable, var-like declaration: ECMA-262 admits any later
   // declaration of the same name, of any kind, and in strict mode too,
   // unlike a Block or CaseBlock's LexicallyDeclaredNames.
-  const declaration = (
-    functionKind: "generator" | "ordinary",
-    value: number,
-  ) => ({
-    body: [
-      {
-        expression: { kind: "number" as const, range, value },
-        kind: "return" as const,
-        range,
-      },
-    ],
-    functionKind,
-    kind: "function" as const,
-    name: "f",
-    parameters: [],
-    range,
-    returnHints: [],
-  });
   for (const strict of [false, true]) {
     for (const kinds of [
       ["generator", "generator"],
       ["ordinary", "generator"],
     ] as const) {
       const result = buildHir({
-        body: [declaration(kinds[0], 1), declaration(kinds[1], 2)],
+        body: [
+          topLevelFunctionReturning(kinds[0], 1),
+          topLevelFunctionReturning(kinds[1], 2),
+        ],
         kind: "program",
         range,
         sourceId: "top-level-function-duplicate.ts",

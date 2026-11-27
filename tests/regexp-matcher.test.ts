@@ -465,6 +465,9 @@ test("complements a negated property the way each flag set does", () => {
   }
 });
 
+const matches = (source: string, flags: string, text: string): boolean =>
+  observe(source, flags, text) != null;
+
 /*
  * `CompileToCharSet` returns a lone General_Category value unfolded: the
  * production reads "Return the CharSet containing all Unicode code points
@@ -484,8 +487,6 @@ test("complements a negated property the way each flag set does", () => {
  * `u`-mode advance already is.
  */
 test("keeps a lone category exact through v-mode set algebra", () => {
-  const matches = (source: string, flags: string, text: string): boolean =>
-    observe(source, flags, text) != null;
   for (const [source, text] of [
     ["^[\\p{Ll}--\\p{Lu}]$", "a"],
     ["^[\\p{Ll}--\\p{Lu}]$", "A"],
