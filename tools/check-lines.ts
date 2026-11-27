@@ -22,7 +22,6 @@ import { extname, join, relative } from "node:path";
 
 const ignoredDirectories = new Set([".git", "dist", "node_modules"]);
 const ignoredFiles = new Set(["pnpm-lock.yaml"]);
-const ignoredPathPrefixes = ["tools/oxlint/anti-slop/"];
 const maintainedExtensions = new Set([
   ".c",
   ".h",
@@ -89,7 +88,6 @@ async function main(): Promise<void> {
   const root = process.cwd();
   const failures: string[] = [];
   for (const path of await walk(root, root)) {
-    if (ignoredPathPrefixes.some((prefix) => path.startsWith(prefix))) continue;
     const lines = (await readFile(join(root, path), "utf8")).split("\n");
     for (let index = 0; index < lines.length; index += 1) {
       const line = lines[index] ?? "";

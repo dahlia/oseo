@@ -123,9 +123,13 @@ The workspace uses this toolchain:
 Standalone repository-wide tools must be pinned through mise and exposed
 through mise tasks. Node.js-hosted tools that load workspace packages belong in
 the pnpm workspace manifest and must run through `pnpm exec` from a mise task.
-Oxlint follows the latter rule because its local JavaScript plugin requires the
+Oxlint follows the latter rule because its JavaScript plugin requires the
 Node.js wrapper. Package build and test dependencies also belong in pnpm
 workspace manifests.
+
+pnpm installs the anti-slop plugin from a GitHub archive pinned to an upstream
+commit in *package.json*. The plugin ships TypeScript source, so
+*tools/oxlint/anti-slop.mjs* loads it for Oxlint.
 
 Oxfmt owns JavaScript, TypeScript, and supported data files. Hongdown owns
 Markdown, and `mise fmt` owns *mise.toml*. Generated lockfiles are never
@@ -258,9 +262,6 @@ because `mise run check:m5c-closure-ledger` owns their canonical layout.
 A line in the generated *docs/m5c-closure/observation-batches.yaml* is exempt
 when it would fit without its upstream test path, as in the reviewed test262
 subset and manifest.
-
-Vendored source under *tools/oxlint/anti-slop/* is also exempt so that it stays
-directly comparable with upstream. Do not reformat it.
 
 
 C and native toolchain policy

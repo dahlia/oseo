@@ -233,7 +233,6 @@ depends = ["build"]
 run = '''
 pnpm exec tsc --version
 pnpm exec tsc --project tsconfig.json
-pnpm exec tsc --project tools/oxlint/tsconfig.json
 '''
 
 [tasks."check:unicode-tables"]

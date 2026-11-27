@@ -19,13 +19,12 @@
     ".windsurf/**",
     "packages/*/dist/**",
     "tests/fixtures/**",
-    "tests/test262/harness/**",
-    "tools/oxlint/anti-slop/**"
+    "tests/test262/harness/**"
   ],
   "jsPlugins": [
     {
       "name": "anti-slop",
-      "specifier": "./tools/oxlint/anti-slop/index.ts"
+      "specifier": "./tools/oxlint/anti-slop.mjs"
     }
   ],
   "rules": {

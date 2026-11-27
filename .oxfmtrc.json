@@ -10,8 +10,7 @@
     "packages/*/dist/**",
     "packages/unicode/src/tables.ts",
     "tests/test262/results.yaml",
-    "tests/test262/results/**",
-    "tools/oxlint/anti-slop/**"
+    "tests/test262/results/**"
   ],
   "printWidth": 80
 }

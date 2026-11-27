@@ -19,7 +19,7 @@
 import assert from "node:assert/strict";
 import { mkdir, mkdtemp, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
-import { dirname, join, resolve } from "node:path";
+import { dirname, join } from "node:path";
 import { spawnSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
 import test from "node:test";
@@ -112,7 +112,9 @@ const ruleCases = [
 
 const packagePath = fileURLToPath(import.meta.resolve("oxlint/package.json"));
 const oxlintPath = join(dirname(packagePath), "bin", "oxlint");
-const pluginPath = resolve("tools/oxlint/anti-slop/index.ts");
+const pluginPath = fileURLToPath(
+  new URL("../tools/oxlint/anti-slop.mjs", import.meta.url),
+);
 const cleanSource = "export const answer = 42 as const;\n";
 
 const temporaryRoot = await mkdtemp(join(tmpdir(), "oseo-anti-slop-"));
