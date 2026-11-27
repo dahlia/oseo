@@ -1,5 +1,5 @@
 {
-  "$schema": "https://unpkg.com/oxfmt@0.59.0/configuration_schema.json",
+  "$schema": "https://unpkg.com/oxfmt@0.80.0/configuration_schema.json",
   "ignorePatterns": [
     "**/*.md",
     "pnpm-lock.yaml",
