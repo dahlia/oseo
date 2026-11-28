@@ -58,7 +58,10 @@ function newOperandImportCall(callee: BabelNode): BabelNode | undefined {
   let current: BabelNode | undefined = callee;
   while (current != null) {
     if (importCall(current)) return current;
-    if (current.type === "MemberExpression") {
+    if (
+      current.type === "MemberExpression" ||
+      current.type === "OptionalMemberExpression"
+    ) {
       current = node(current.object);
     } else if (current.type === "TaggedTemplateExpression") {
       current = node(current.tag);
@@ -72,15 +75,25 @@ function newOperandImportCall(callee: BabelNode): BabelNode | undefined {
 }
 
 /**
- * Walk either source goal without recursing on the host stack.
+ * Walk either source goal without recursing on the host stack. The original
+ * parser may report errors in type hints that the runtime walk skips.
  */
-function* syntaxNodes(file: BabelNode): Iterable<BabelNode> {
+function* syntaxNodes(
+  file: BabelNode,
+  includeTypeHints = false,
+): Iterable<BabelNode> {
   const pending = [node(file.program) ?? file];
   while (pending.length > 0) {
     const value = pending.pop();
     if (value?.type == null) continue;
     yield value;
-    for (const child of Object.values(value)) {
+    for (const key of Object.keys(value)) {
+      if (
+        !includeTypeHints &&
+        (key === "typeAnnotation" || key === "returnType")
+      )
+        continue;
+      const child = value[key];
       if (Array.isArray(child)) {
         // A valid statement list can exceed the host's argument limit.
         for (const childNode of nodes(child)) pending.push(childNode);
@@ -131,10 +144,14 @@ export function unhandledParserDiagnostics(
     reasons.has("StrictDelete") ||
     reasons.has("DeletePrivateField")
   ) {
-    for (const value of syntaxNodes(file)) {
+    for (const value of syntaxNodes(file, true)) {
       if (value.type === "NewExpression") {
         const callee = node(value.callee);
-        if (callee == null || importCall(callee)) continue;
+        if (
+          callee == null ||
+          (importCall(callee) && node(value.typeArguments) == null)
+        )
+          continue;
         const call = newOperandImportCall(callee);
         if (call?.start != null) {
           handled.add(`${newImportReason}:${call.start}`);

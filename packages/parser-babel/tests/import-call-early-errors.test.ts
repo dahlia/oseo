@@ -231,6 +231,30 @@ test("admitted ImportCall grammar keeps its profile diagnostic", () => {
   }
 });
 
+test("reports the optional operator in a constructor operand", () => {
+  for (const suffix of ["?.p", "?.[0]"]) {
+    const input = { source: `new import('x')${suffix};`, sourceId: "chain.js" };
+    for (const result of [
+      babelFrontend.parse(input),
+      babelModuleFrontend.parseModule(input),
+    ]) {
+      assert.equal(result.parsed, false);
+      assert.deepEqual(
+        result.diagnostics.map((diagnostic) => ({
+          byteRange: diagnostic.byteRange,
+          message: diagnostic.message,
+        })),
+        [
+          {
+            byteRange: { end: 15, start: 15 },
+            message: "Source could not be parsed.",
+          },
+        ],
+      );
+    }
+  }
+});
+
 test("new over import.meta and ordinary members stays valid", () => {
   const module = babelModuleFrontend.parseModule({
     source: "let C = class {}; new C.constructor; new import.meta.constructor;",
