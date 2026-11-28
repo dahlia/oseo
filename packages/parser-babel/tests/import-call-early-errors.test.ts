@@ -231,9 +231,13 @@ test("admitted ImportCall grammar keeps its profile diagnostic", () => {
   }
 });
 
-test("reports the optional operator in a constructor operand", () => {
-  for (const suffix of ["?.p", "?.[0]"]) {
-    const input = { source: `new import('x')${suffix};`, sourceId: "chain.js" };
+test("reports constructor member errors at their operators", () => {
+  for (const [suffix, offset] of [
+    ["?.p", 15],
+    ["?.[0]", 15],
+    ["<U>.p", 18],
+  ] as const) {
+    const input = { source: `new import('x')${suffix};`, sourceId: "chain.ts" };
     for (const result of [
       babelFrontend.parse(input),
       babelModuleFrontend.parseModule(input),
@@ -246,7 +250,7 @@ test("reports the optional operator in a constructor operand", () => {
         })),
         [
           {
-            byteRange: { end: 15, start: 15 },
+            byteRange: { end: offset, start: offset },
             message: "Source could not be parsed.",
           },
         ],

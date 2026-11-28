@@ -52,7 +52,8 @@ function importCall(value: BabelNode): boolean {
  * an unparenthesized ImportCall may not begin that operand. A
  * ParenthesizedExpression ends the walk:
  * `new (import(...)).name` is a valid PrimaryExpression operand.
- * A TypeScript non-null assertion is transparent before erasure.
+ * TypeScript non-null assertions and instantiations are transparent
+ * before erasure.
  */
 function newOperandImportCall(callee: BabelNode): BabelNode | undefined {
   let current: BabelNode | undefined = callee;
@@ -65,7 +66,10 @@ function newOperandImportCall(callee: BabelNode): BabelNode | undefined {
       current = node(current.object);
     } else if (current.type === "TaggedTemplateExpression") {
       current = node(current.tag);
-    } else if (current.type === "TSNonNullExpression") {
+    } else if (
+      current.type === "TSNonNullExpression" ||
+      current.type === "TSInstantiationExpression"
+    ) {
       current = node(current.expression);
     } else {
       return undefined;
