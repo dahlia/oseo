@@ -111,17 +111,17 @@ export function newImportCallDiagnostics(
 }
 
 /**
- * Preserve the owned diagnostic spans for errors Babel 8.1 also reports
- * during recovery. Inspect the type-erased tree with its original offsets.
- * Bare `new import()` operands still use the bootstrap diagnostic.
+ * Report Babel errors that Oseo's own grammar checks do not handle.
+ * Babel 8.1 recovers from additional errors with usable syntax trees.
+ * Defer those cases to Oseo on the type-erased tree with original offsets.
  */
-export function recoveredParserDiagnostics(
+export function unhandledParserDiagnostics(
   input: SourceInput,
   index: SourceIndex,
   file: BabelNode,
   errors: readonly ParserError[],
 ): readonly Diagnostic[] {
-  const recovered = new Map<string, Diagnostic>();
+  const handled = new Set<string>();
   const reasons = new Set(errors.map((error) => error.reasonCode));
   if (
     reasons.has(newImportReason) ||
@@ -134,10 +134,7 @@ export function recoveredParserDiagnostics(
         if (callee == null || importCall(callee)) continue;
         const call = newOperandImportCall(callee);
         if (call?.start != null) {
-          recovered.set(
-            `${newImportReason}:${call.start}`,
-            earlyErrorDiagnostic(input, index, call, newImportMessage),
-          );
+          handled.add(`${newImportReason}:${call.start}`);
         }
       }
       if (
@@ -149,45 +146,19 @@ export function recoveredParserDiagnostics(
         continue;
       const operand = unparenthesizedExpression(value.argument);
       if (operand?.type === "Identifier") {
-        recovered.set(
-          `StrictDelete:${value.start}`,
-          earlyErrorDiagnostic(
-            input,
-            index,
-            operand,
-            "An identifier cannot be deleted in strict code.",
-          ),
-        );
+        handled.add(`StrictDelete:${value.start}`);
       } else if (
         operand != null &&
         node(operand.property)?.type === "PrivateName"
       ) {
-        recovered.set(
-          `DeletePrivateField:${value.start}`,
-          earlyErrorDiagnostic(
-            input,
-            index,
-            operand,
-            "A private member cannot be deleted.",
-          ),
-        );
+        handled.add(`DeletePrivateField:${value.start}`);
       }
     }
   }
-  // Babel can report an inner import before its enclosing import. Restore
-  // source order for those errors while keeping the other errors in place.
-  const importErrors = errors
-    .filter((error) => error.reasonCode === newImportReason)
-    .toSorted((left, right) => errorOffset(right) - errorOffset(left));
-  return errors.map((original) => {
-    const error =
-      original.reasonCode === newImportReason
-        ? (importErrors.pop() ?? original)
-        : original;
+  return errors.flatMap((error) => {
     const offset = errorOffset(error);
-    return (
-      recovered.get(`${error.reasonCode}:${offset}`) ??
-      diagnosticAt(input, index, offset)
-    );
+    return handled.has(`${error.reasonCode}:${offset}`)
+      ? []
+      : [diagnosticAt(input, index, offset)];
   });
 }

@@ -148,6 +148,32 @@ function array([head, tail]?: [string, Alias]) { return [head, tail]; }
   }
 });
 
+test("reports the first strict delete after type erasure", () => {
+  const input = {
+    source: '"use strict"; delete (x as any); delete (y);',
+    sourceId: "strict-delete-order.ts",
+  };
+  const start = input.source.indexOf("x as any");
+  for (const result of [
+    babelFrontend.parse(input),
+    babelModuleFrontend.parseModule(input),
+  ]) {
+    assert.equal(result.parsed, false);
+    assert.deepEqual(
+      result.diagnostics.map((diagnostic) => ({
+        byteRange: diagnostic.byteRange,
+        message: diagnostic.message,
+      })),
+      [
+        {
+          byteRange: { end: start + 1, start },
+          message: "An identifier cannot be deleted in strict code.",
+        },
+      ],
+    );
+  }
+});
+
 test("uses TypeScript grammar for ambiguous generic expressions", () => {
   for (const [source, kind] of [
     ["const x = a < b > (c);", "call"],

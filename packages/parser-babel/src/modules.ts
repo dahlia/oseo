@@ -53,7 +53,7 @@ import {
 } from "./convert.ts";
 import {
   newImportCallDiagnostics,
-  recoveredParserDiagnostics,
+  unhandledParserDiagnostics,
 } from "./import-call-early-errors.ts";
 import { collectImportCalls } from "./import-calls.ts";
 import { eraseTypeSyntax } from "./erasable.ts";
@@ -521,14 +521,15 @@ export function convertModule(
         ),
     );
   }
-  if (parserErrors.length > 0) {
+  const parserDiagnostics = unhandledParserDiagnostics(
+    input,
+    locations,
+    erased.file,
+    parserErrors,
+  );
+  if (parserDiagnostics.length > 0) {
     return {
-      diagnostics: recoveredParserDiagnostics(
-        input,
-        locations,
-        erased.file,
-        parserErrors,
-      ),
+      diagnostics: parserDiagnostics,
       parsed: false,
       sourceId: input.sourceId,
     };
