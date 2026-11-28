@@ -266,7 +266,7 @@ const rekorConflict = [
     `already exists in the transparency log with UUID ${"a".repeat(80)}`,
 ].join("\n");
 const registry = "https://registry.npmjs.org";
-const packument = `${registry}/%40oseo%2Fcompiler`;
+const packument = `${registry}/%40oseo%2Fcompiler?write=true`;
 const tagEndpoint = `${registry}/-/package/%40oseo%2Fcompiler/dist-tags`;
 const version = "0.1.0-canary.123";
 const older = { canary: "0.1.0-canary.122" };
@@ -313,6 +313,9 @@ childProcess.execFileSync = (command, args) => {
   console.log(JSON.stringify(args));
 };
 syncBuiltinESMExports();
+const { setTimeout } = globalThis;
+globalThis.setTimeout = (callback, delay, ...args) =>
+  setTimeout(callback, delay === 5000 ? 0 : delay, ...args);
 globalThis.fetch = async (url) => {
   console.log(JSON.stringify(url));
   assert.ok(responses.length, "Unexpected registry request");
@@ -430,6 +433,49 @@ test("npm retries with the same args and verifies bytes", () => {
       calls: ["check", "tags", "publish", "check", "tags", "publish", "check"],
     });
   }
+});
+
+test("npm confirms a successful publish past the first minute", () => {
+  const misses = Array.from({ length: 20 }, () => absent);
+  checkNpmScenario({
+    responses: [absent, older, ...misses, matching],
+    failures: [],
+    calls: [
+      "check",
+      "tags",
+      "publish",
+      ...misses.map(() => "check" as const),
+      "check",
+    ],
+  });
+});
+
+test("npm confirms a retried publish past the first minute", () => {
+  const misses = Array.from({ length: 20 }, () => absent);
+  checkNpmScenario({
+    responses: [absent, older, absent, older, ...misses, matching],
+    failures: [rekorConflict],
+    calls: [
+      "check",
+      "tags",
+      "publish",
+      "check",
+      "tags",
+      "publish",
+      ...misses.map(() => "check" as const),
+      "check",
+    ],
+  });
+});
+
+test("npm stops polling when a successful publish stays invisible", () => {
+  const misses = Array.from({ length: 36 }, () => absent);
+  checkNpmScenario({
+    responses: [absent, older, ...misses],
+    failures: [],
+    calls: ["check", "tags", "publish", ...misses.map(() => "check" as const)],
+    error: /was not visible after publication/u,
+  });
 });
 
 test("npm uses the current tag when an exact artifact appears", () => {

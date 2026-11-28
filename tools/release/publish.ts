@@ -34,6 +34,7 @@ import { inventory, sha256, verifyCurrent } from "./artifacts.ts";
 import { canonical, git, identify } from "./identity.ts";
 
 const npmRegistry = "https://registry.npmjs.org";
+const npmConfirmationAttempts = 36;
 
 async function registry(
   url: string,
@@ -119,9 +120,11 @@ async function requireNpmIntegrity(
   version: string,
   expected: string,
 ): Promise<boolean> {
-  // Read the packument rather than /:version, which is not a uniform
-  // lookup endpoint for scoped packages. Only absence is a retry signal.
-  const data = await registry(`${npmRegistry}/${encodeURIComponent(name)}`);
+  // Keep the packument lookup for scoped packages. The write query bypasses
+  // the shared cache, which can serve a pre-publish packument for five minutes.
+  const data = await registry(
+    `${npmRegistry}/${encodeURIComponent(name)}?write=true`,
+  );
   if (data === undefined) return false;
   const existing = object(object(data).versions)[version];
   if (existing === undefined) return false;
@@ -141,8 +144,9 @@ async function npmTags(name: string): Promise<StructuredDataRecord> {
 async function confirm(
   check: () => Promise<boolean>,
   name: string,
+  attempts = 12,
 ): Promise<void> {
-  for (let attempt = 0; attempt < 12; attempt++) {
+  for (let attempt = 0; attempt < attempts; attempt++) {
     if (await check()) return;
     await new Promise((done) => setTimeout(done, 5_000));
   }
@@ -223,7 +227,7 @@ async function publishNpm(
       ];
       const conflict = await runNpmPublish(directory, args, true);
       if (conflict == null) {
-        await confirm(check, pkg.name);
+        await confirm(check, pkg.name, npmConfirmationAttempts);
         continue;
       }
       const published = await check();
@@ -234,7 +238,7 @@ async function publishNpm(
         }
         console.error(`Retrying npm publish for ${pkg.name}@${version}.`);
         await runNpmPublish(directory, args, false);
-        await confirm(check, pkg.name);
+        await confirm(check, pkg.name, npmConfirmationAttempts);
         continue;
       }
     }
