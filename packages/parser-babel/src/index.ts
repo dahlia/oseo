@@ -80,7 +80,6 @@ export function createBabelFrontend(
               error.reasonCode !== "ModuleExportUndefined" &&
               !(
                 error.reasonCode === "PatternIsOptional" &&
-                erased.diagnostics.length === 0 &&
                 erased.optionalPatternStarts.has(errorOffset(error))
               ) &&
               !(

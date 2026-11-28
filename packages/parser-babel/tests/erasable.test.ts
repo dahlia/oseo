@@ -119,6 +119,33 @@ function array([head, tail]?: [string, Alias]) { return [head, tail]; }
       assert.equal(result.diagnostics[0]?.code, "OSEO0001", source);
     }
   }
+
+  const invalidDelete = {
+    source:
+      '"use strict";\n' +
+      "function f({ x }?: { x: number }) {}\n" +
+      "delete (x as any);",
+    sourceId: "optional-pattern-delete.ts",
+  };
+  const start = invalidDelete.source.indexOf("x as any");
+  for (const result of [
+    babelFrontend.parse(invalidDelete),
+    babelModuleFrontend.parseModule(invalidDelete),
+  ]) {
+    assert.equal(result.parsed, false);
+    assert.deepEqual(result.diagnostics, [
+      {
+        byteRange: { end: start + 1, start },
+        code: "OSEO0001",
+        message: "An identifier cannot be deleted in strict code.",
+        range: {
+          end: { column: 10, line: 3 },
+          start: { column: 9, line: 3 },
+        },
+        sourceId: invalidDelete.sourceId,
+      },
+    ]);
+  }
 });
 
 test("uses TypeScript grammar for ambiguous generic expressions", () => {
