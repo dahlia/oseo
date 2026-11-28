@@ -23,6 +23,10 @@ import { babelFrontend, babelModuleFrontend } from "../src/index.ts";
 
 const forms = [
   "type T<X> = X extends number ? { [K in keyof X]: X[K] } : never;",
+  '"use strict"; type T = { [delete (x)]: number };',
+  "type T = { [new import('x').member]: number };",
+  "type T = { [new import('x')!.member]: number };",
+  "type T = { [new import('x')!]: number };",
   "interface T<X> extends Array<X> { readonly value?: X; }",
   "declare const missing: number; declare class Absent { x: number; }",
   "declare function absent<T>(x: T): T; declare enum E { A }",

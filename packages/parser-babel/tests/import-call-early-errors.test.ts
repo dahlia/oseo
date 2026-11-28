@@ -188,6 +188,26 @@ test("non-null assertions preserve new operand boundaries", () => {
       ["OSEO1001"],
     );
   }
+
+  const bare = { source: "new import('x')!;", sourceId };
+  for (const result of [
+    babelFrontend.parse(bare),
+    babelModuleFrontend.parseModule(bare),
+  ]) {
+    assert.equal(result.parsed, false);
+    assert.deepEqual(
+      result.diagnostics.map((diagnostic) => ({
+        byteRange: diagnostic.byteRange,
+        message: diagnostic.message,
+      })),
+      [
+        {
+          byteRange: { end: 4, start: 4 },
+          message: "Source could not be parsed.",
+        },
+      ],
+    );
+  }
 });
 
 test("admitted ImportCall grammar keeps its profile diagnostic", () => {

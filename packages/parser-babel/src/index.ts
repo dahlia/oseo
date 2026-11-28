@@ -80,6 +80,7 @@ export function createBabelFrontend(
               error.reasonCode !== "ModuleExportUndefined" &&
               !(
                 error.reasonCode === "PatternIsOptional" &&
+                erased.diagnostics.length === 0 &&
                 erased.optionalPatternStarts.has(errorOffset(error))
               ) &&
               !(
@@ -92,7 +93,7 @@ export function createBabelFrontend(
         const parserDiagnostics = unhandledParserDiagnostics(
           input,
           locations,
-          erased.file,
+          file,
           parserErrors,
         );
         if (parserDiagnostics.length > 0) {

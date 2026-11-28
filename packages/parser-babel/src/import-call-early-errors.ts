@@ -52,6 +52,7 @@ function importCall(value: BabelNode): boolean {
  * an unparenthesized ImportCall may not begin that operand. A
  * ParenthesizedExpression ends the walk:
  * `new (import(...)).name` is a valid PrimaryExpression operand.
+ * A TypeScript non-null assertion is transparent before erasure.
  */
 function newOperandImportCall(callee: BabelNode): BabelNode | undefined {
   let current: BabelNode | undefined = callee;
@@ -61,6 +62,8 @@ function newOperandImportCall(callee: BabelNode): BabelNode | undefined {
       current = node(current.object);
     } else if (current.type === "TaggedTemplateExpression") {
       current = node(current.tag);
+    } else if (current.type === "TSNonNullExpression") {
+      current = node(current.expression);
     } else {
       return undefined;
     }
@@ -112,8 +115,8 @@ export function newImportCallDiagnostics(
 
 /**
  * Report Babel errors that Oseo's own grammar checks do not handle.
- * Babel 8.1 recovers from additional errors with usable syntax trees.
- * Defer those cases to Oseo on the type-erased tree with original offsets.
+ * Match each recoverable Babel 8.1 error against the tree that raised it.
+ * Type erasure and Oseo's grammar checks then handle those cases.
  */
 export function unhandledParserDiagnostics(
   input: SourceInput,
