@@ -3,7 +3,7 @@
   "private": true,
   "type": "module",
   "devDependencies": {
-    "mermaid": "11.17.2",
+    "mermaid": "12.3.0",
     "vitepress": "2.0.0-alpha.21",
     "vitepress-plugin-mermaid": "2.0.17"
   }
