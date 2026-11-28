@@ -161,7 +161,7 @@ ambiguity without preserving a released contract.
 Command modules and discovery
 -----------------------------
 
-The CLI uses Optique 1.3.7, which gives named and built-in commands
+The CLI uses Optique 1.4.0, which gives named and built-in commands
 precedence over root positionals in `runProgram()`. Direct dependencies stay
 on one version so parser, runner, and discovery behavior remain compatible.
 

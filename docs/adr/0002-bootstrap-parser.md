@@ -65,10 +65,12 @@ Source fidelity and recoverable diagnostics did drive it.
 Decision
 --------
 
-Use `@babel/parser` 8.0.4 behind a Babel-specific frontend package. Enable the
-TypeScript syntax plugin, comment attachment, token retention, and recoverable
-errors. Catch fatal parser exceptions at the adapter boundary. Convert both
-fatal and recoverable errors to `OSEO0001` diagnostics from
+Use `@babel/parser` behind a Babel-specific frontend package. The initial
+version was 8.0.4. The current pin lives in
+[*packages/parser-babel/package.json*](../../packages/parser-babel/package.json).
+Enable the TypeScript syntax plugin, comment attachment, token retention, and
+recoverable errors. Catch fatal parser exceptions at the adapter boundary.
+Convert both fatal and recoverable errors to `OSEO0001` diagnostics from
 [*docs/language-profile-m1.md*](../language-profile-m1.md).
 
 

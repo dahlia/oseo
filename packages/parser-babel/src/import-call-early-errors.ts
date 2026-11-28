@@ -17,8 +17,22 @@
  */
 
 import type { Diagnostic, SourceInput } from "@oseo/compiler";
-import { node, nodes, type BabelNode, type SourceIndex } from "./babel.ts";
-import { earlyErrorDiagnostic } from "./locations.ts";
+import {
+  node,
+  nodes,
+  type BabelNode,
+  type ParserError,
+  type SourceIndex,
+} from "./babel.ts";
+import { unparenthesizedExpression } from "./convert.ts";
+import {
+  diagnosticAt,
+  earlyErrorDiagnostic,
+  errorOffset,
+} from "./locations.ts";
+
+const newImportMessage = "An import() call cannot be the operand of new.";
+const newImportReason = "ImportCallNotNewExpression";
 
 /**
  * True when a Babel node is an ImportCall, in either the default
@@ -35,9 +49,8 @@ function importCall(value: BabelNode): boolean {
  * The ImportCall at the head of a `new` operand, if any. ECMA-262's
  * NewExpression and `new MemberExpression Arguments` productions accept only
  * a MemberExpression after `new`, and an ImportCall is a CallExpression, so
- * an unparenthesized ImportCall may not begin that operand. Babel rejects
- * only a bare `new import(...)` and accepts `new import(...).name`, element
- * access, and a tagged template. A ParenthesizedExpression ends the walk:
+ * an unparenthesized ImportCall may not begin that operand. A
+ * ParenthesizedExpression ends the walk:
  * `new (import(...)).name` is a valid PrimaryExpression operand.
  */
 function newOperandImportCall(callee: BabelNode): BabelNode | undefined {
@@ -56,23 +69,14 @@ function newOperandImportCall(callee: BabelNode): BabelNode | undefined {
 }
 
 /**
- * Find each ImportCall that begins the operand of `new` anywhere in a
- * parsed Script or Module, in source order. These are ECMA-262 grammar
- * errors the bootstrap parser accepts. The frontends report them before
- * profile conversion so the ImportCall's profile diagnostic cannot mask a
- * program that no profile could admit. No Babel node leaves the adapter.
+ * Walk either source goal without recursing on the host stack.
  */
-function newImportCalls(file: BabelNode): readonly BabelNode[] {
+function* syntaxNodes(file: BabelNode): Iterable<BabelNode> {
   const pending = [node(file.program) ?? file];
-  const calls: BabelNode[] = [];
   while (pending.length > 0) {
     const value = pending.pop();
     if (value?.type == null) continue;
-    if (value.type === "NewExpression") {
-      const callee = node(value.callee);
-      const call = callee == null ? undefined : newOperandImportCall(callee);
-      if (call != null) calls.push(call);
-    }
+    yield value;
     for (const child of Object.values(value)) {
       if (Array.isArray(child)) {
         // A valid statement list can exceed the host's argument limit.
@@ -83,27 +87,107 @@ function newImportCalls(file: BabelNode): readonly BabelNode[] {
       }
     }
   }
-  return calls.toSorted(
-    (left, right) => (left.start ?? 0) - (right.start ?? 0),
-  );
 }
 
 /**
  * One OSEO0001 early error per ImportCall that begins a `new` operand,
- * located at that ImportCall. The ImportCall itself stays outside the
- * profile under ADR 0016; this reports only the grammar error.
+ * located at that ImportCall. Run before profile conversion so an earlier
+ * unsupported construct cannot mask the grammar error.
  */
 export function newImportCallDiagnostics(
   input: SourceInput,
   index: SourceIndex,
   file: BabelNode,
 ): readonly Diagnostic[] {
-  return newImportCalls(file).map((call) =>
-    earlyErrorDiagnostic(
-      input,
-      index,
-      call,
-      "An import() call cannot be the operand of new.",
-    ),
-  );
+  const calls: BabelNode[] = [];
+  for (const value of syntaxNodes(file)) {
+    const callee = value.type === "NewExpression" ? node(value.callee) : null;
+    const call = callee == null ? undefined : newOperandImportCall(callee);
+    if (call != null) calls.push(call);
+  }
+  return calls
+    .toSorted((left, right) => (left.start ?? 0) - (right.start ?? 0))
+    .map((call) => earlyErrorDiagnostic(input, index, call, newImportMessage));
+}
+
+/**
+ * Preserve the owned diagnostic spans for errors Babel 8.1 also reports
+ * during recovery. Inspect the type-erased tree with its original offsets.
+ * Bare `new import()` operands still use the bootstrap diagnostic.
+ */
+export function recoveredParserDiagnostics(
+  input: SourceInput,
+  index: SourceIndex,
+  file: BabelNode,
+  errors: readonly ParserError[],
+): readonly Diagnostic[] {
+  const recovered = new Map<string, Diagnostic>();
+  const reasons = new Set(errors.map((error) => error.reasonCode));
+  if (
+    reasons.has(newImportReason) ||
+    reasons.has("StrictDelete") ||
+    reasons.has("DeletePrivateField")
+  ) {
+    for (const value of syntaxNodes(file)) {
+      if (value.type === "NewExpression") {
+        const callee = node(value.callee);
+        if (callee == null || importCall(callee)) continue;
+        const call = newOperandImportCall(callee);
+        if (call?.start != null) {
+          recovered.set(
+            `${newImportReason}:${call.start}`,
+            earlyErrorDiagnostic(input, index, call, newImportMessage),
+          );
+        }
+      }
+      if (
+        value.type !== "UnaryExpression" ||
+        value.operator !== "delete" ||
+        value.start == null ||
+        node(value.argument)?.type !== "ParenthesizedExpression"
+      )
+        continue;
+      const operand = unparenthesizedExpression(value.argument);
+      if (operand?.type === "Identifier") {
+        recovered.set(
+          `StrictDelete:${value.start}`,
+          earlyErrorDiagnostic(
+            input,
+            index,
+            operand,
+            "An identifier cannot be deleted in strict code.",
+          ),
+        );
+      } else if (
+        operand != null &&
+        node(operand.property)?.type === "PrivateName"
+      ) {
+        recovered.set(
+          `DeletePrivateField:${value.start}`,
+          earlyErrorDiagnostic(
+            input,
+            index,
+            operand,
+            "A private member cannot be deleted.",
+          ),
+        );
+      }
+    }
+  }
+  // Babel can report an inner import before its enclosing import. Restore
+  // source order for those errors while keeping the other errors in place.
+  const importErrors = errors
+    .filter((error) => error.reasonCode === newImportReason)
+    .toSorted((left, right) => errorOffset(right) - errorOffset(left));
+  return errors.map((original) => {
+    const error =
+      original.reasonCode === newImportReason
+        ? (importErrors.pop() ?? original)
+        : original;
+    const offset = errorOffset(error);
+    return (
+      recovered.get(`${error.reasonCode}:${offset}`) ??
+      diagnosticAt(input, index, offset)
+    );
+  });
 }

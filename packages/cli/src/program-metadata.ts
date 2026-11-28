@@ -46,7 +46,7 @@ export const cliMetadata: ProgramMetadata = {
 /** Append the program's footer to Optique's built-in completion examples. */
 export const formatCliMessage: MessageFormatter = (content, options) => {
   const heading = content[0];
-  // Optique 1.3.7 gives the completion examples precedence over the program
+  // Optique gives the completion examples precedence over the program
   // footer and provides no separate footer option for the completion command.
   const bashExample = `eval "$(${cliMetadata.name} completion bash)"`;
   const completionExamples =

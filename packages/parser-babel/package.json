@@ -29,7 +29,7 @@
     }
   },
   "dependencies": {
-    "@babel/parser": "8.0.4",
+    "@babel/parser": "8.1.3",
     "@oseo/compiler": "workspace:*"
   },
   "engines": {

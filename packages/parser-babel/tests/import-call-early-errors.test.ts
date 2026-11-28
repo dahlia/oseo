@@ -136,16 +136,58 @@ test("the early error precedes an earlier profile diagnostic", () => {
 });
 
 test("each ImportCall that begins a new operand is reported in order", () => {
-  const source = "new import('a')[0];\nnew import('b').c;";
-  const result = babelFrontend.parse({ source, sourceId: "two.js" });
-  assert.equal(result.parsed, false);
-  assert.deepEqual(
-    result.diagnostics.map((diagnostic) => diagnostic.range.start),
-    [
-      { column: 5, line: 1 },
-      { column: 5, line: 2 },
-    ],
-  );
+  const cases = [
+    {
+      source: "new import('a')[0];\nnew import('b').c;",
+      starts: [
+        { column: 5, line: 1 },
+        { column: 5, line: 2 },
+      ],
+    },
+    {
+      source: "new import(new import('x').y).z;",
+      starts: [
+        { column: 5, line: 1 },
+        { column: 16, line: 1 },
+      ],
+    },
+  ];
+  for (const { source, starts } of cases) {
+    for (const result of [
+      babelFrontend.parse({ source, sourceId: "two.js" }),
+      babelModuleFrontend.parseModule({ source, sourceId: "two.mjs" }),
+    ]) {
+      assert.equal(result.parsed, false);
+      assert.deepEqual(
+        result.diagnostics.map((diagnostic) => diagnostic.range.start),
+        starts,
+      );
+    }
+  }
+});
+
+test("non-null assertions preserve new operand boundaries", () => {
+  const source = "new import('x')!.y;";
+  const sourceId = "asserted-import.ts";
+  for (const result of [
+    babelFrontend.parse({ source, sourceId }),
+    babelModuleFrontend.parseModule({ source, sourceId }),
+  ]) {
+    assert.equal(result.parsed, false);
+    assertImportCallEarlyError(result.diagnostics, source, sourceId);
+  }
+
+  const parenthesized = { source: "new (import('x')!).y;", sourceId };
+  for (const result of [
+    babelFrontend.parse(parenthesized),
+    babelModuleFrontend.parseModule(parenthesized),
+  ]) {
+    assert.equal(result.parsed, false);
+    assert.deepEqual(
+      result.diagnostics.map((diagnostic) => diagnostic.code),
+      ["OSEO1001"],
+    );
+  }
 });
 
 test("admitted ImportCall grammar keeps its profile diagnostic", () => {

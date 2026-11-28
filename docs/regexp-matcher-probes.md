@@ -160,8 +160,8 @@ stays one readable line.
 *tests/regexp-probes.test.ts* checks that every `test262` provenance is
 a path the reviewed subset in *tests/test262/subset.yaml* still holds,
 so a corpus entry cannot drift away from the evidence it cites. The two
-package patterns come from `yaml`, which the workspace pins at 2.9.0 and
-which declares no dependencies of its own.
+package patterns were collected from `yaml` 2.9.0, which declares no
+dependencies of its own.
 
 The last four stress cases exist because each names one rule the
 edition states and no candidate component reproduces for free. They are

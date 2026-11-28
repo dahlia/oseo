@@ -32,7 +32,10 @@ import { normalizeAnnexBFunctionStatements } from "./annexb-functions.ts";
 import { classStaticKeywordDiagnostics } from "./class-static-keyword.ts";
 import { program } from "./convert.ts";
 import { eraseTypeSyntax } from "./erasable.ts";
-import { newImportCallDiagnostics } from "./import-call-early-errors.ts";
+import {
+  newImportCallDiagnostics,
+  recoveredParserDiagnostics,
+} from "./import-call-early-errors.ts";
 import { createSourceIndex, diagnosticAt, errorOffset } from "./locations.ts";
 import { convertModule, withImportCalls } from "./modules.ts";
 import { scriptModuleDeclarations } from "./script-goal.ts";
@@ -89,8 +92,11 @@ export function createBabelFrontend(
         }
         if (parserErrors.length > 0) {
           return {
-            diagnostics: parserErrors.map((error) =>
-              diagnosticAt(input, locations, errorOffset(error)),
+            diagnostics: recoveredParserDiagnostics(
+              input,
+              locations,
+              erased.file,
+              parserErrors,
             ),
             parsed: false,
             sourceId: input.sourceId,

@@ -27,6 +27,7 @@ import {
 import { bytes, sourceRange } from "./locations.ts";
 import type { SourceIndex } from "./babel.ts";
 import { parseWithClassStaticAsi } from "./class-static-asi.ts";
+import { recoveredParserDiagnostics } from "./import-call-early-errors.ts";
 import {
   diagnosticAt,
   earlyErrorDiagnostic,
@@ -907,12 +908,14 @@ export function eraseTypeSyntax(
     ) {
       reject(assertion);
     } else {
-      for (const error of errors) {
-        // SAFETY: Babel's error array contains errors with optional offsets.
-        diagnostics.push(
-          diagnosticAt(input, locations, errorOffset(error as ParserError)),
-        );
-      }
+      // SAFETY: Babel's error array contains errors with optional offsets.
+      for (const diagnostic of recoveredParserDiagnostics(
+        input,
+        locations,
+        stripped,
+        errors as readonly ParserError[],
+      ))
+        diagnostics.push(diagnostic);
     }
     return {
       diagnostics,

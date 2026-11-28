@@ -2134,7 +2134,7 @@ test("deletes top-level arguments through the global object", () => {
 });
 
 test("retains closed-world and early-error delete boundaries", () => {
-  const cases: readonly (readonly [string, string, RegExp])[] = [
+  const cases: readonly (readonly [string, string, RegExp, string?])[] = [
     [
       '"use strict"; delete binding;',
       "OSEO0001",
@@ -2144,6 +2144,25 @@ test("retains closed-world and early-error delete boundaries", () => {
       '"use strict"; delete ((binding));',
       "OSEO0001",
       /identifier cannot be deleted in strict code/u,
+      "binding",
+    ],
+    [
+      '"use strict"; delete (x as any);',
+      "OSEO0001",
+      /identifier cannot be deleted in strict code/u,
+      "x",
+    ],
+    [
+      "class A { #x; m() { delete ((this.#x)); } }",
+      "OSEO0001",
+      /private member cannot be deleted/u,
+      "this.#x",
+    ],
+    [
+      "class A { #x: number = 1; m() { delete (this.#x!); } }",
+      "OSEO0001",
+      /private member cannot be deleted/u,
+      "this.#x",
     ],
     [
       "delete console;",
@@ -2151,15 +2170,30 @@ test("retains closed-world and early-error delete boundaries", () => {
       /outside the admitted global-object profile/u,
     ],
   ];
-  for (const [source, code, message] of cases) {
+  for (const [source, code, message, operand] of cases) {
     const result = compileSource(babelFrontend, {
       source,
-      sourceId: "invalid-delete.js",
+      sourceId: "invalid-delete.ts",
     });
     assert.equal(result.mir, undefined, source);
-    assert.equal(result.diagnostics[0]?.code, code, source);
-    assert.match(result.diagnostics[0]?.message ?? "", message, source);
-    assert.ok((result.diagnostics[0]?.range.start.column ?? 0) > 0, source);
+    const diagnostic = result.diagnostics[0];
+    assert.ok(diagnostic != null, source);
+    assert.equal(diagnostic.code, code, source);
+    assert.match(diagnostic.message, message, source);
+    assert.ok(diagnostic.range.start.column > 0, source);
+    if (operand != null) {
+      const start = source.indexOf(operand);
+      const end = start + operand.length;
+      assert.deepEqual(diagnostic.byteRange, { end, start }, source);
+      assert.deepEqual(
+        diagnostic.range,
+        {
+          end: { column: end + 1, line: 1 },
+          start: { column: start + 1, line: 1 },
+        },
+        source,
+      );
+    }
   }
 });
 
