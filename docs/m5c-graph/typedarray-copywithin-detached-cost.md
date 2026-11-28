@@ -100,9 +100,9 @@ the case assembled as the runner does (base, *testTypedArray.js*,
 *detachArrayBuffer.js*, then the case, with `"use strict";` first for the
 strict variant), compiled with `--test262-host` and, for the generic
 variant, `--no-specialization`, through the default CLI toolchain, the
-Zig lane, with a warm cache. That lane passes the combined
-`-fsanitize=address,undefined` flag, which the pinned Zig 0.16.0 build
-reduces to UBSan alone (*docs/sanitizer-activity.md*), so these timings
+Zig lane, with a warm cache. That run used the combined
+`-fsanitize=address,undefined` flag, which Zig 0.16.0 reduced to UBSan
+alone (*docs/sanitizer-activity.md*), so these timings
 carry UBSan instrumentation but no ASan; the host-cc ASan coverage above
 belongs to the fixture, not to the timings. “Execution” is `Date.now()` around
 the whole program inside the native run; “compile and link” is the CLI wall

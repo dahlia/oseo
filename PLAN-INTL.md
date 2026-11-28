@@ -131,7 +131,7 @@ The units are a sketch for scheduling.
 8.  Admission of the *test/intl402/* rows.
 
 Units 3 through 6 depend on unit 2 and not on each other. Differential tests
-compare Node.js 24.21.0 and Deno 2.9.7 only for locales and options whose
+compare the pinned Node.js and Deno versions only for locales and options whose
 output both hosts agree on, because their ICU data versions may differ from
 the pinned data.
 

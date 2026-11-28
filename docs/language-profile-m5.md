@@ -9988,7 +9988,7 @@ needed for shadowing, so it agrees with `Object.keys` and Proxy enumeration
 when the key is made enumerable. The synthesized key is rooted across
 allocation.
 
-The pinned Deno 2.9.7 reference reports the reflected accessors as
+Deno 2.9.7 reported the reflected accessors as
 JavaScript functions named `__proto__` with own `prototype` properties,
 constructible and with non-native `Function.prototype.toString` text. Tests
 label that host metadata separately from Node.js and from the normative

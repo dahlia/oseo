@@ -69,8 +69,8 @@ for (const sanitizer of target.sanitizers) {
         skip: hostTarget == null ? "requires a supported native host" : false,
         todo:
           sanitizer === "address"
-            ? "Zig 0.16.0 drops address from address,undefined; " +
-              "separate flags lack the ASan runtime " +
+            ? "The Zig driver does not report AddressSanitizer errors " +
+              "with the combined sanitizer flag " +
               "(docs/sanitizer-activity.md)"
             : false,
       },

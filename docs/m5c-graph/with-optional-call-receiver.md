@@ -55,10 +55,9 @@ modules from that tree's source rather than built packages. Each program was
 compiled, linked, and executed natively for `linux-x86_64-gnu` with Zig
 0.16.0, requesting AddressSanitizer and UndefinedBehaviorSanitizer with
 `-fsanitize=address,undefined`, and collection forced at every safepoint,
-once under each specialization policy. The pinned Zig drops `address` from
-that combined flag, so these runs do not establish ASan coverage. The
-existing [sanitizer qualification](../sanitizer-activity.md) records the
-known UBSan instrumentation and the missing ASan coverage for this pin.
+once under each specialization policy. Zig 0.16.0 dropped `address` from
+that combined flag. The [sanitizer qualification](../sanitizer-activity.md)
+records the UBSan instrumentation and missing ASan coverage for that version.
 
 | Program                 | Expected | Disabled | Enabled |
 | ----------------------- | -------- | -------- | ------- |

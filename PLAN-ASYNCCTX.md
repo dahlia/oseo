@@ -51,12 +51,12 @@ Out of scope:
 Reference behavior
 ------------------
 
-The reference is the pinned Node.js 24.21.0. Node.js 24 implements
-`AsyncLocalStorage` over `AsyncContextFrame`, whose `enterWith` and promise
-behavior can differ from the older async hooks implementation. The first
-checkpoint records the observed behavior for every case below, under the
-pinned version, instead of assuming it. Deno 2.9.7 also provides
-`node:async_hooks` and serves as a second reference where it agrees.
+The reference is the Node.js version pinned in *mise.toml*. Node.js 24
+implements `AsyncLocalStorage` over `AsyncContextFrame`, whose `enterWith`
+and promise behavior can differ from the older async hooks implementation.
+The first checkpoint records the observed behavior for every case below.
+Deno also provides `node:async_hooks` and serves as a second reference
+where it agrees.
 
 
 Engine primitive
@@ -106,8 +106,8 @@ has no public API until the module exists.
 Work units
 ----------
 
-1.  Reference observation: record Node.js 24.21.0 and Deno 2.9.7 behavior for
-    every API and boundary above.
+1.  Reference observation: record behavior on the pinned Node.js and Deno
+    versions for every API and boundary above.
 2.  Placement decision: accept or supersede ADR 0022 with the snapshot
     representation and the measured empty-snapshot cost.
 3.  Engine primitive: the snapshot field and capture and restore at every

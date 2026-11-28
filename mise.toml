@@ -28,14 +28,14 @@ postinstall = "mise run install-hooks"
 "github:dahlia/sacho" = "0.3.2"
 # The mise registry has no jactionlint entry yet, so name the backend.
 "ubi:jdx/jactionlint" = "2.1.0"
-pnpm = "12.18.0"
+pnpm = "12.23.0"
 bun = "1.4.4"
 "npm:postject" = "1.0.0-alpha.6"
-deno = "2.9.7"
-node = "24.21.0"
+deno = "2.9.8"
+node = "24.22.3"
 oxfmt = "0.80.0"
 shellcheck = "0.11.0"
-zig = "0.16.0"
+zig = "0.17.1"
 
 [deps.pnpm]
 auto = true

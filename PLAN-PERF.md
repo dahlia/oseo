@@ -61,10 +61,10 @@ JSDoc tags, and primitive members of inline object, tuple, and array
 annotations on destructuring patterns. Only the M2 addition consumes hints.
 
 Both execution targets build every executable as a checking build:
-`describeTarget()` requests AddressSanitizer and UndefinedBehaviorSanitizer,
-although the pinned Zig passes only the latter, as the
-[sanitizer activity audit](./docs/sanitizer-activity.md) records. The
-runtime archive is compiled with `-O2`, and the generated C receives no
+`describeTarget()` requests AddressSanitizer and UndefinedBehaviorSanitizer.
+The [sanitizer activity audit](./docs/sanitizer-activity.md) records the
+verified coverage in the Zig and host C compiler lanes. The runtime
+archive is compiled with `-O2`, and the generated C receives no
 optimization flag, which leaves `zig cc` in its debug mode. Link-time
 optimization is disabled with `-fno-lto` when prebuilt objects or additional
 generated sources are linked.

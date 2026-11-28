@@ -29,10 +29,10 @@ list into one combined `-fsanitize=` argument. The host C compiler adapter in
 and always passes `-fsanitize=address,undefined -fno-sanitize-recover=all`,
 `-g`, and `-fno-omit-frame-pointer`.
 
-The pinned Zig 0.16.0 drops `address` from a combined `-fsanitize=` argument,
-as the [sanitizer activity audit](../sanitizer-activity.md) records, so Zig
-builds carry UndefinedBehaviorSanitizer but not AddressSanitizer. Address
-checking comes only from the host C compiler lane.
+Zig 0.16.0 dropped `address` from a combined `-fsanitize=` argument. The
+[sanitizer activity audit](../sanitizer-activity.md) records that cause and
+the subsequent Zig 0.17.1 probe results. The host C compiler lane supplies
+verified AddressSanitizer coverage.
 
 Both adapters compile the runtime objects with `-O2` and generated C with no
 optimization flag. Without `-O`, `zig cc` compiles in its debug mode, which

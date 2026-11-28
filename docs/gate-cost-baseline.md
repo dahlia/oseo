@@ -112,7 +112,8 @@ gh api --paginate repos/dahlia/oseo/actions/runs/37999730012/jobs
 ### U21 dedicated Mac mini day-one measurements
 
 The new dedicated Mac mini is an Apple M6 with 12 logical CPUs and 16 GiB RAM.
-It runs macOS 27.0.1 (26A434), Apple clang 21.0.0, and mise-pinned Zig 0.16.0.
+The day-one probes used macOS 27.0.1 (26A434), Apple clang 21.0.0, and
+Zig 0.16.0, the mise pin at the time.
 These observed host facts and the commands are in
 [*docs/evidence/u21/README.md*](./evidence/u21/README.md). All Mac job
 measurements use main commit `2434dd8b`. The machine remains unregistered as a
@@ -1200,7 +1201,7 @@ documentation-only audit.
 U8 inspected the workflow and mise tasks at `875506fe` (including U7) and
 compared the historical sources and logs for runs 36243816479, 36261458909
 and [36312192623] at `af9bb68c`. The first two runs used Node 24.18.0 and
-Deno 2.9.2; the third and current checkout use Node 24.21.0 and Deno 2.9.7.
+Deno 2.9.2; the third and the U8 checkout used Node 24.21.0 and Deno 2.9.7.
 Within each run, Linux and macOS use the same pinned runtime, source
 revision, task command and ordinary property inputs. These samples are not
 three repetitions of one unchanged configuration or workload.

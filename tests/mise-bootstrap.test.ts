@@ -677,9 +677,9 @@ test("mise extraction and both Windows binaries use runner temp", async () => {
 });
 
 const denoArchive = "deno-aarch64-apple-darwin.zip";
-const denoSource = "https://dl.deno.land/release/v2.9.7/";
+const denoSource = "https://dl.deno.land/release/v2.9.8/";
 const denoRelease =
-  "https://github.com/denoland/deno/releases/download/v2.9.7/";
+  "https://github.com/denoland/deno/releases/download/v2.9.8/";
 
 /**
  * Model the reviewed literal rules, not the Rust regex language or HTTP.
@@ -717,7 +717,7 @@ test("Deno routing is exact and confined to upstream setup", async () => {
     Record<string, string>
   >;
   const pattern =
-    "regex:^https://dl\\.deno\\.land/release/v2\\.9\\.7/" +
+    "regex:^https://dl\\.deno\\.land/release/v2\\.9\\.8/" +
     "deno-aarch64-apple-darwin\\.zip";
   assert.deepEqual(rules, {
     [`${pattern}\\z`]: `${denoRelease}${denoArchive}`,
@@ -730,14 +730,14 @@ test("Deno routing is exact and confined to upstream setup", async () => {
       `${denoRelease}${denoArchive}${suffix}`,
     );
     const others = [
-      url.replace("2.9.7", "2.9.6"),
-      url.replace("2.9.7", "2.9.70"),
+      url.replace("2.9.8", "2.9.6"),
+      url.replace("2.9.8", "2.9.80"),
       url.replace("aarch64", "x86_64"),
       url.replace("apple-darwin", "unknown-linux-gnu"),
       url.replace("apple-darwin", "pc-windows-msvc"),
       url.replace("dl.deno.land", "dl.deno.land.example.org"),
       url.replace("dl.deno.land", "dlXdenoXland"),
-      url.replace("2.9.7", "2X9X7"),
+      url.replace("2.9.8", "2X9X8"),
       url.replace(".zip", "Xzip"),
       url.replace("https:", "http:"),
       url.replace("/release/", "/other/release/"),

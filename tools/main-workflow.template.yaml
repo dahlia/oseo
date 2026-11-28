@@ -1380,7 +1380,7 @@ jobs:
           package-manager-cache: false
       - uses: denoland/setup-deno@v2
         with:
-          deno-version: "2.9.7"
+          deno-version: "2.9.8"
       - uses: actions/download-artifact@v7
         with:
           artifact-ids: ${{ needs.release_packages.outputs.artifact }}

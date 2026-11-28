@@ -1,11 +1,11 @@
 Sanitizer activity and the host C lane
 ======================================
 
-The native target descriptions request `address` and `undefined`, but the
-pinned Zig 0.16.0 build does not provide AddressSanitizer coverage. Passing the
-flags and completing a gate do not establish that ASan ran. This finding
-qualifies the sanitizer claims in the design, native-target ADR, plans, runtime
-documentation, and gate-cost records.
+The native target descriptions request `address` and `undefined`. The
+combined flags did not provide AddressSanitizer coverage with Zig 0.16.0.
+The regression probes below record the Linux x86-64 GNU result for
+Zig 0.17.1. These findings qualify the sanitizer claims in the design,
+native-target ADR, plans, runtime documentation, and gate-cost records.
 
 The Linux host C lane below supplies separate verified instrumentation.
 Historical Zig runs still lack ASan evidence. A bounded Apple Clang sample
@@ -32,7 +32,7 @@ does not supply the required ASan runtime in this configuration.
 
 The upstream reports [#24377] and [#11403] describe missing ASan runtime
 linking on Linux and macOS. They concern older Zig versions. The measurements
-below establish the behavior of the current pin. The [0.16.0 release notes]
+below establish the behavior of Zig 0.16.0. The [0.16.0 release notes]
 identify its LLVM version, but do not promise ASan support.
 
 The self-check allocates one `int`, writes through a volatile pointer at index
@@ -102,6 +102,10 @@ this finding. Deno 2.9.2 ignores these TODO cases, as confirmed by the focused
 Deno test run. Unsupported hosts skip native execution. Build and run timeouts
 bound the probes. The adapter's environment allowlist keeps ambient sanitizer
 options out.
+
+On 2026-11-28, Node.js 24.22.3 and Zig 0.17.1 ran these probes on Linux
+x86-64 GNU. Both address cases returned empty diagnostic output and
+remained TODOs. Both undefined cases produced the expected UBSan report.
 
 A TODO is an acknowledged coverage gap. Remove it only after the self-check
 reports the heap overflow on both primary execution targets. If a TODO test

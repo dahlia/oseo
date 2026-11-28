@@ -60,7 +60,7 @@ Deno download routing
 ---------------------
 
 Only the upstream setup step receives `MISE_URL_REPLACEMENTS`. Two anchored
-regex rules route the Deno 2.9.7 macOS arm64 ZIP and its adjacent
+regex rules route the Deno 2.9.8 macOS arm64 ZIP and its adjacent
 *.sha256sum* from `dl.deno.land` to the same assets in the official
 `denoland/deno` GitHub release. Both URLs must match in full, including the
 version, architecture, OS, and suffix. Other requests keep their existing

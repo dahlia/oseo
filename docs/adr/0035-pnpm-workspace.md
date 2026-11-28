@@ -39,7 +39,7 @@ An unfrozen install on every task would allow unintended dependency changes.
 Probe evidence
 --------------
 
-*mise.toml* pins pnpm 12.18.0. The workspace manifest and generated
+These probes ran with pnpm 12.18.0. The workspace manifest and generated
 *pnpm-lock.yaml* define the dependency inputs. Reproduce installation with
 `mise install` and `mise deps`; `mise run check`, `mise run build`, and
 `mise run check:packages` validate the toolchain and staged package archives.

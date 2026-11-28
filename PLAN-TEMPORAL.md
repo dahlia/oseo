@@ -40,8 +40,9 @@ even after Temporal enters, so 4,601 would enter the inventory.
 that ECMA-402 adds, and they enter only with
 [*PLAN-INTL.md*](./PLAN-INTL.md).
 
-Deno 2.9.7 exposes `Temporal`; Node.js 24.21.0 does not. Differential evidence
-therefore has one reference host. An independent model fills the gaps.
+Deno 2.9.8 exposes `Temporal`. Node.js 24.22.3 lacks it with the default
+flags. Differential evidence therefore has one reference host. An
+independent model fills the gaps.
 
 
 Specification boundary without ECMA-402
